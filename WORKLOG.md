@@ -5,10 +5,13 @@
 
 ## Current State
 - Status: doing
-- Focus: PRD v0.2 완료. 다음은 Hades Phase 0 실행 검증(7.18 클라이언트 확보됨)
+- Focus: Hades Phase 0 실행 검증 **통과**. 다음은 PRD 미결정 항목(D-001 엔진, D-004 기준 기기) 확정
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-09 — **Hades Phase 0 실행 검증 통과**(`docs/run-procedure.md` 10절 A단계 1~9). 로그인→맵 입장까지 완주: 서버 로그 `wren : Welcome to Lorule`, 게임서버 2615 ESTABLISHED, `aislings/wren.json`(`GameMaster=True`, `CurrentMapId=1`, `4,4`), stderr 0바이트, 10초 자동 저장 동작. 절차서와 달랐던 점 3가지를 문서에 반영: ① 빌드 출력이 `Staging/net5.0/`(SDK 8이 TFM 폴더 추가) ② `game/`에 `Legend.dat`·`cious.dat`가 없어 클라이언트가 `main data file not found`로 종료 — 같은 저장소 `database/archives/`에서 복사해야 함(`LOD_`의 7.41 자료 불필요) ③ 서버가 `Content.Location` 아래 `areas/*.json`을 자기 경로로 덮어쓰므로 `database/server`를 `tmp/hades-run/`로 복사해 가리켜야 submodule이 clean 유지. 클라이언트 비밀번호 칸은 합성 키 입력을 거부해 사람이 직접 입력해야 함(SendInput·WM_CHAR 모두 무시)
+- 2026-09-09 — 원본 실행으로 확인한 데이터 공백(PRD 픽스처 근거): 시작 시 로드가 Item 3 · Monster 3 · **Mundane 0** · Spell 0 · Skill 1 · Map 4 · Warp 4 · Popup 3 · Script 135. NPC 상호작용 검증에 필요한 Mundane 템플릿이 0개
+- 2026-09-09 — PRD 미결정 2건 해소: **자동 저장 주기** = `LoruleConfig.json` `ServerConfig.SaveRate: 10.0`(초). **지면 아이템 소멸** = 소멸 코드가 없다(아이템은 안 사라짐). `Area.cs:253`의 3분은 소멸이 아니라 남이 떨군 아이템의 소유권 보호(`Cursed`)가 풀리는 시간이며 설정 키 없이 하드코딩
 - 2026-09-09 — 로컬 Hades 자료 확인: `sources/Dark-Ages-Private-Server-master`는 중첩 복사본까지 조사했으나 NPC 템플릿·YAML 메뉴·시작맵 연계 몬스터/드롭 공백이 기존 submodule과 동일. `sources/DarkAges718single.exe`(SHA-256 `1E34B83A81E5F844AA62DE496A689706590334E3F3D01D8E1330B1907CBADAF7`) 확보 확인, 실행하지 않음
 - 2026-09-09 — PRD `docs/mobile-test-v1-prd.md` v0.2 마무리(Codex 검토 지적 반영: 맵 입장 실패 AC-013, 화면비 AC-014, 확정 드롭 조건, 반복 실행 초기화, 자동 저장 주기 반영, NPC 메뉴 경로 `interactive/Menus` vs `Scripts/Menus` 미확정 기록). Medenia 실험 원복: 패치 99줄 `tmp/medenia-local-run.patch` 보존 후 submodule clean, 로컬 프로세스 종료. DungMunkey 모듈 캐시 `.git/modules` 정리. `sources/`의 로컬 다운로드(7.18 exe, Hades zip)와 `.playwright-mcp/`를 gitignore
 - 2026-09-08 — 모바일 전환 기준선 결정: Hades 서버·JSON 데이터·게임 규칙을 유지하고 모바일 클라이언트를 신규 제작한다. Medenia는 실행 대상에서 제외하되 참고 자료와 미커밋 실험은 보존한다. `DungMunkey/Dark-Ages`는 네트워크 없는 오프라인 재현물이어서 submodule에서 제거(원격 저장소는 삭제하지 않음)

@@ -265,15 +265,24 @@ Copy-Item apps\client\.env.example apps\client\.env    # 3절대로 VITE_ASSET_P
 10. [ ] 결과(성공/실패 지점, 오류 문구)를 `WORKLOG.md`에 한 줄로 기록
 
 ### A단계 — Hades (질문 2 결정 후)
-1. [ ] `cd sources\wren11\Dark-Ages-Private-Server` → `dotnet restore src\Hades.sln` → `dotnet build src\Hades.sln -c Debug` — 확인: 오류 0, `Staging\Lorule.GameServer.dll` 존재. 경고는 기록만
-2. [ ] `Staging\`를 루트 `tmp\hades-run\`로 복사
-3. [ ] `tmp\hades-run\LoruleConfig.json`의 `Content.Location`·`Editor.Location`·`Editor.GameLocation`을 3절 값으로 수정(역슬래시 두 번). 질문 2·5 결정대로 `ClientVersion`·`GameMasters` 반영
-4. [ ] `cd tmp\hades-run` → `dotnet Lorule.GameServer.dll` — 확인: `Login server is online.` / `Game server is online.` 두 줄, 오류 로그 없음. 무언 종료면 3단계 경로 재확인
-5. [ ] `database\server\aislings\` 폴더가 생겼는지 확인
-6. [ ] 클라이언트 준비(질문 2): 127.0.0.1:2610으로 접속하도록 패치된 실행 파일. 원본 `.dat`는 `LOD_\raw_data`의 것을 **복사해서** 사용(원본은 건드리지 않음)
-7. [ ] 클라이언트 실행 → 캐릭터 생성 — 확인: `aislings\<이름>.json` 생성
-8. [ ] 로그인 — 확인: 서버 로그 `<이름> : Welcome to Lorule` + 클라이언트에 맵 표시
-9. [ ] 결과를 `WORKLOG.md`에 기록. `tmp\hades-run`은 `.gitignore` 대상이라 커밋되지 않음
+
+실행 결과 2026-09-09: **1~9 전부 통과 (로그인→맵 입장 완주)**. 확인된 신호는 서버 로그 `wren : Welcome to Lorule`, 게임서버 2615 ESTABLISHED, `aislings/wren.json`(`GameMaster=True`, `CurrentMapId=1`, `4,4`), stderr 0바이트다. 아래 단계 설명은 실행하며 확인된 값으로 고쳤다.
+
+1. [x] `cd sources\wren11\Dark-Ages-Private-Server` → `dotnet restore src\Hades.sln` → `dotnet build src\Hades.sln -c Debug` — 확인: 오류 0(실제 경고 8개), 출력은 **`Staging\net5.0\Lorule.GameServer.dll`**. .NET SDK 8로 빌드하면 대상 프레임워크 폴더가 하나 더 생긴다(확인됨). 경고는 기록만
+2. [x] **`Staging\net5.0\*`**를 루트 `tmp\hades-run\`로 복사
+3. [x] **`database\server`를 `tmp\hades-run\database\server`로 먼저 복사한 뒤**, `tmp\hades-run\LoruleConfig.json`의 **`Content.Location`은 그 사본 경로로**, `Editor.Location`·`Editor.GameLocation`은 3절 값으로 수정(역슬래시 두 번)
+   - **이유(확인됨)**: 서버는 시작할 때 `Content.Location` 아래 `areas/*.json`의 `FilePath`를 자기 절대경로로 다시 써서 저장한다. submodule을 직접 가리키면 매번 그 4개 파일이 수정된 상태가 된다. 사본은 2.3MB뿐이다
+   - `ClientVersion: 718`·`GameMasters: ["wren", "lol"]`은 기본값 그대로 쓰면 된다(질문 2·5 결론)
+4. [x] `cd tmp\hades-run` → `dotnet Lorule.GameServer.dll` — 확인: `Login server is online.` / `Game server is online.` 두 줄, 오류 로그 없음. 무언 종료면 3단계 경로 재확인
+5. [x] `database\server\aislings\` 폴더가 생겼는지 확인(3단계에서 만든 사본 쪽)
+6. [x] 클라이언트 준비: **받아 둔 `sources/DarkAges718single.exe`도 `LOD_\raw_data`의 7.41 자료도 필요 없다.** 저장소 `game/`에 7.18 클라이언트(`Hades.exe`, 127.0.0.1:2610으로 하드코딩된 `mServer.tbl`)와 `.dat` 8개가 통째로 커밋돼 있다(추적 파일 93개, 확인됨)
+   - `game/`을 `tmp\hades-run\game\`으로 복사한다(약 379MB). `game/`은 추적 대상이라 제자리에서 실행하면 submodule이 더러워진다
+   - **`game/`에는 `Legend.dat`과 `cious.dat`이 빠져 있다.** 그대로 실행하면 `LOD Error: main data file not found` 창을 띄우고 종료한다(확인됨). 둘 다 같은 저장소 `database\archives\legend\`·`database\archives\cious\`에 있으니 사본의 `game\`으로 복사한다
+7. [x] 클라이언트 실행 → 서버 공지(`Notification`) 창의 Ok → Create → 캐릭터 생성 — 확인: `aislings\<이름>.json` 생성
+   - **이 단계는 사람이 직접 타이핑해야 한다(확인됨).** 이름 칸은 합성 키 입력을 받지만 Password·Confirm 칸은 SendInput·WM_CHAR를 모두 무시한다. 자동화로는 계정을 만들 수 없다
+   - 관리자 권한을 쓰려면 이름을 `GameMasters` 목록의 값(`wren`)으로 만든다. 생성된 json에 `GameMaster: true`가 찍히면 성공
+8. [x] 메인 메뉴 Continue로 로그인 — 확인: 서버 로그 `<이름> : Welcome to Lorule`, 게임 포트 2615 연결이 ESTABLISHED, 클라이언트에 시작 맵 표시(설정값대로 zone `Safe House`, 좌표 4,4)
+9. [x] 결과를 `WORKLOG.md`에 기록. `tmp\hades-run`은 `.gitignore` 대상이라 커밋되지 않음
 
 ### 완료 판정
 - B: 체크리스트 8·9 통과 → "브라우저 클라이언트 로그인→맵 입장 검증 완료"
