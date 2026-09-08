@@ -13,7 +13,7 @@ Dark Ages 관련 원본 저장소, 현행 분석 문서, 이후 모바일 전환
 ```powershell
 git clone --recurse-submodules <이 작업공간의 GitHub URL>
 cd LOD
-gt repo init --trunk main
+.\scripts\gt.ps1 init --trunk main
 ```
 
 이미 작업공간만 받은 경우에는 다음 명령으로 원본 저장소를 내려받는다.
@@ -22,7 +22,9 @@ gt repo init --trunk main
 git submodule update --init --recursive
 ```
 
+이 작업공간은 관리자 권한 없이 설치한 PortableGit을 사용하므로 Graphite 명령은
+`.\scripts\gt.ps1 <command>` 형태로 실행한다.
+
 ## 분석 문서
 
 [현행 프로젝트 분석서](docs/current-system-analysis/README.md)
-

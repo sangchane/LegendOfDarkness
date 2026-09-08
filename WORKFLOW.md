@@ -11,14 +11,15 @@
 ## 일반 작업 흐름
 
 ```powershell
-gt sync
-gt create --message "docs: describe current architecture"
+.\scripts\gt.ps1 sync
+.\scripts\gt.ps1 create --message "docs: describe current architecture"
 # 파일 수정 및 검증
-gt modify --commit
-gt submit --stack
+.\scripts\gt.ps1 modify --commit
+.\scripts\gt.ps1 submit --stack
 ```
 
-실제 명령 옵션은 설치된 `gt --help`를 우선한다.
+실제 명령 옵션은 `.\scripts\gt.ps1 --help`를 우선한다. 이 래퍼는 Graphite가
+요구하는 Git 2.38 이상을 충족하도록 `.tools/PortableGit`을 PATH 앞에 둔다.
 
 ## submodule 변경 흐름
 
@@ -41,4 +42,3 @@ gt submit --stack
 - 보안 관련 입력·인증·비밀정보를 검토한다.
 - 루트 분석/결정 문서와 submodule 커밋이 실제 구현 상태와 일치한다.
 - PR에는 변경 이유, 영향 범위, 검증 방법, 관련 하위 PR을 기록한다.
-
