@@ -10,7 +10,6 @@
 | DAMapEditor | C#, .NET 8 Windows Forms | `MapEditor.sln` | `MapEditor.Program.Main` → `Form1` |
 | PalMake | C#, .NET 7 WPF | `PalMake.sln` | `App` → `MainWindow`; `FileProcessingService` |
 | Decipher | C#, .NET Framework 4.7.2 Windows Forms/Console | `Akorade.sln`, `Decipher Server.sln` | 양쪽 `Program.Main`; `Client`, `Server` |
-| DungMunkey/Dark-Ages | C++11, SDL2/SDL_ttf/SDL_mixer | GNU `Makefile` → `darkages` | `Darkages.cpp::main` → `CDarkages` |
 | Hades/Lorule | C# .NET 5 서버; .NET Framework 4.6.1 도구 클라이언트 | `src/Hades.sln` | `Lorule.GameServer.Program.Main` → `ServerContext` |
 | bmp2epf | C++, Visual Studio v141, GDI+ | `bmp2epf.vcxproj` | `main.cpp` |
 | da-lib | C#, .NET 9, SkiaSharp | `DALib.sln` | 라이브러리; `DataArchive`, `MapFile`, `EpfFile` |
@@ -27,4 +26,3 @@
 - **확인됨:** `PalMake`는 `bin/`, `obj/`, `bmp2epf.exe`, Visual C++ 런타임 DLL까지 저장소에 커밋했다.
 - **확인됨:** ETDA의 네이티브 프로젝트는 Windows SDK 8.1 및 v140/v141 도구 집합 흔적이 있어 최신 Visual Studio에서 그대로 빌드되지 않을 수 있다.
 - **미확인:** 이번 단계에서는 사용자 요청에 따라 빌드·실행·패키지 설치를 하지 않았다.
-

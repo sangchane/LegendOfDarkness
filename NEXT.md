@@ -1,8 +1,9 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[진행중]** Medenia(B) 실행 검증 · `docs/run-procedure.md` 10절 B단계 체크리스트를 순서대로 실행(결정: Medenia 먼저, submodule 임시 수정 허용·커밋 금지, 실행 주체 Claude) · 결과는 WORKLOG.md 한 줄
-- **[대기]** Hades(A)는 9절 질문 2(클라이언트 7.18 vs 7.41)·5(관리자 계정명) 답 나오면 A단계 시작
+- **[다음]** Hades(A) Phase 0 실행 검증 준비. 실제 실행은 사용자 요청 후 시작 · 근거: `docs/mobile-conversion-review.md` 4절, `docs/run-procedure.md` 10절 A단계
+- **[대기]** Hades 클라이언트 선택(7.18 우선 vs 보유 7.41 우선)과 관리자 계정명을 정해야 로그인→맵 입장 검증 가능
+- **[보존]** Medenia는 참고 자료만 유지. 실행 중 프로세스와 submodule 미커밋 변경은 건드리거나 커밋하지 않음
 <!-- NEXT-ACTION:END -->
 
 <!--

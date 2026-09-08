@@ -215,7 +215,7 @@ Copy-Item apps\client\.env.example apps\client\.env    # 3절대로 VITE_ASSET_P
 | 3 | **포트 8080 점유** — PID 7212(LOD_ 개발 관리자 서버 추정) | B | 확인됨 | 자산 서버 실패 → 화면 안 뜸 | 자산 서버를 8081로 수동 실행 + `VITE_ASSET_PATH` 변경 (무수정) |
 | 4 | 포트 4000 점유 — PID 42916 | B | 확인됨 | bun 디버거 충돌(동작 미확인) | `bun --watch ./src/index.ts`로 `--inspect` 없이 실행 (무수정) |
 | 5 | **외부 서버 접속 잔재 코드** — `da0.kru.com:2610`으로 로그인 패킷 전송 | B | 확인됨 | 원칙 2 위반, 원저작사 서버 접속, 처리 안 된 Promise 오류 가능 | 주석 처리(수정) 또는 Windows 방화벽 아웃바운드 규칙으로 차단(무수정) |
-| 6 | `sqlite3` 네이티브 모듈 | B | 미확인 | `bun install` 실패 가능 | 실행해 봐야 안다 |
+| 6 | `sqlite3` 네이티브 모듈 | B | 확인됨(실행) | 루트 `node_modules/sqlite3`에 미리 빌드된 바이너리가 정상 설치됨. 단 Python 3.14에는 distutils가 없어 node-gyp 재빌드는 실패함 | 재빌드하지 말 것. 중복 사본이 생기면 `apps/server/node_modules/sqlite3`를 지운다 (무수정) |
 | 7 | **클라이언트 7.18 ↔ 보유 7.41** | A | 확인됨(불일치) | `Format00Handler` 버전 검사에서 거부 | 9절 질문 2 |
 | 8 | `LoruleConfig.json` 절대경로 3곳 | A | 확인됨 | 조용히 빈 서버 | 3절 사본 방식 (무수정) |
 | 9 | 조용한 실패 — 전역 `try/catch`, `Location == null`이면 무언 종료 | A | 확인됨 | 원인 파악 어려움 | 7절 로그 체크포인트로 판정 |
@@ -224,6 +224,7 @@ Copy-Item apps\client\.env.example apps\client\.env    # 3절대로 VITE_ASSET_P
 | 12 | 패키지 다운로드(NuGet, bun) | A·B | 확인됨 | 인터넷 필요 | 원칙 2의 1회 예외로 인정 |
 | 13 | Hades 콘텐츠로 완주 가능한지(맵 5개, 스크립트 컴파일, 시작 맵 매핑) | A | 미확인 | | 실행 |
 | 14 | 7.41 클라이언트를 127.0.0.1로 돌리려면 실행 파일 패치 필요(Spark: `sources/FallenDev/Spark`, 호스트명 `0x4333C2`·포트 `0x4333E4`) | A | 확인됨(분석서 06) | 클라이언트가 원래 서버로 접속 시도 | 질문 2에 포함 |
+| 15 | **로그인 직전 프로토콜 오류** — 최초 실행에서 두 번째 `ServerTableRequestPacket`의 id가 0으로 처리돼 `entry.ip` TypeError 발생. 후속 미커밋 `ClientCrypto` 오프셋 수정 뒤 id=1과 redirect 송신까지 확인했으나 `ServerTableEntry.port`가 `NaN` | B | 확인됨(실행, 2026-09-08) | 로그인 완주 불가 | Medenia는 참고 자료로만 유지. 임시 변경은 커밋하지 않으며 추가 수정은 중단 |
 
 ---
 
@@ -250,6 +251,8 @@ Copy-Item apps\client\.env.example apps\client\.env    # 3절대로 VITE_ASSET_P
 - [ ] 방화벽 팝업이 뜨면 "개인 네트워크"만 허용
 
 ### B단계 — Medenia (권장 선행)
+실행 결과 2026-09-08: 1~7 통과(포트 8082/8081/5173, WS 원시 프로브 open), 8은 Playwright가 WS를 노출하지 않아 7의 원시 프로브로 대체, 9는 미완료(8절 15번). 최초 패치는 `web-server.ts`(http + `WEB_PORT`)·`index.ts`(`LEGACY_PROBE` 가드)·`bun.lockb`이며 `tmp/medenia-local-run.patch`에 보존했다. 후속 조사로 `gateway-listener.ts` 디버그 로그와 `client-crypto.ts` 암호화 오프셋 변경이 추가됐지만 미커밋 상태로만 보존한다. Medenia는 실행 대상에서 제외했으므로 추가 수정·로그인 검증은 진행하지 않는다. 롤백 명령은 `git -C sources/FallenDev/dark-ages-ts checkout -- . && git -C sources/FallenDev/dark-ages-ts clean -fd` + `.env` 2개·`db.sqlite` 삭제다.
+
 1. [ ] `cd sources\FallenDev\dark-ages-ts` → `bun install` — 성공 기준: 오류 0, `node_modules` 생성. `sqlite3` 빌드 오류가 나면 **중단하고 보고**
 2. [ ] `.env` 2개 복사, `apps/client/.env`의 `VITE_ASSET_PATH`를 `http://localhost:8081/`로
 3. [ ] 질문 3의 결정대로 80번/https 문제 처리 (무수정 우회 또는 임시 수정)

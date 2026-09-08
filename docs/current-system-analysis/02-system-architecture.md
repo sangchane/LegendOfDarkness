@@ -4,7 +4,7 @@
 
 ### Hades/Lorule 서버
 
-**확인됨:** `sources/wren11/Dark-Ages-Private-Server/src/Lorule.GameServer/Program.cs`의 `Program.Main`이 설정과 의존성 주입을 구성하고 `ServerContext.Start`를 호출한다. 핵심 서버는 다음처럼 나뉜다.
+**확인됨:** `sources/wren11/Dark-Ages-Private-Server/src/Lorule.GameServer/Program.cs`의 `Program.Main`이 설정과 의존성 주입을 구성해 `Server`를 생성하고, `Server` 생성자가 `ServerContext.Start`를 호출한다. 핵심 서버는 다음처럼 나뉜다.
 
 - `src/Hades.Server.Base/Network/Login/`: 로그인 서버 (`LoginServer`, `LoginClient`)
 - `src/Hades.Server.Base/Network/Game/`: 게임 서버 (`GameServer`, `GameClient`, `GameServerHandlers`)
@@ -26,10 +26,6 @@
 - `packages/serialization`: 이진 읽기/쓰기
 - `packages/fsm`: 상태 머신
 
-### DungMunkey/Dark-Ages
-
-**확인됨:** `Darkages.cpp::main`에서 SDL 창을 만들고 `CDarkages` 게임 루프를 시작하는 독립 실행형 오프라인 게임이다. 서버·로그인·DB·소켓 계층이 없다. `CWorld`, `CMap`, `CPlayer`, `CBattle`, `CLoadSave`가 월드, 맵, 플레이어, 턴제 전투, 저장을 담당한다.
-
 ## 2.2 프로토콜·역공학 계열
 
 - `Arbiter`: `Arbiter.Net.Proxy.ProxyServer/ProxyConnection`이 양방향 트래픽을 중계하고, `ClientMessageFactory`와 `ServerMessageFactory`가 패킷을 구조화한다.
@@ -45,5 +41,4 @@
 - 자동화/후킹: `SleepHunter4`, `da`, `ETDA`, `Dark-Ages-AI-Bot`
 - 미완성 골격: `Archivist` (`MainViewModel`에 “Actually do things” TODO만 존재)
 
-**추정:** 향후 제품 기준선은 Hades 서버의 도메인·콘텐츠와 Medenia의 웹 클라이언트 접근법을 비교하는 것이 합리적이다. 두 저장소는 그대로 결합되는 동일 구현체가 아니며 프로토콜 버전과 데이터 모델 정합성을 먼저 검증해야 한다.
-
+**결정됨(2026-09-08):** 향후 제품 기준선은 Hades 서버의 도메인·콘텐츠다. Medenia의 웹 클라이언트는 렌더링·자산 로딩 접근법만 참고하며 실행 대상이나 결합 대상으로 삼지 않는다. 두 저장소는 프로토콜 버전과 데이터 모델이 달라 그대로 결합할 수 없다.

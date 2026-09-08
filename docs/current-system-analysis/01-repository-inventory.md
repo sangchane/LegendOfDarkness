@@ -1,6 +1,6 @@
 # 01. 저장소 목록
 
-각 저장소는 `sources/<GitHub 소유자>/<저장소>`에 독립 클론했다. 원본 Git 이력과 `origin`을 보존했으며 분석 직후 모두 변경 사항이 없었다.
+최초 분석한 저장소는 `sources/<GitHub 소유자>/<저장소>`에 독립 클론했다. 원본 Git 이력과 `origin`을 보존했으며 분석 직후 모두 변경 사항이 없었다. 아래 표는 현재 유지 중인 16개 저장소다.
 
 | 저장소 | 기준 브랜치 / 커밋 | 확인된 역할 | 루트 라이선스 |
 |---|---|---|---|
@@ -12,7 +12,6 @@
 | `FallenDev/DAMapEditor` | `master` / `664540249792` | Windows 맵 편집기 | 있음 |
 | `FallenDev/PalMake` | `main` / `e47a66d005ba` | 스킬·마법 아이콘 PAL/EPF 생성기 | 있음 |
 | `FallenDev/Decipher` | `master` / `735738b7fecf` | 한↔영 번역 네트워크 프록시 | 있음 |
-| `DungMunkey/Dark-Ages` | `master` / `cb3698343b4a` | C++/SDL2 오프라인 게임 재현물 | 있음 |
 | `wren11/Dark-Ages-Private-Server` | `master` / `a839f49b52c3` | Hades/Lorule 게임 서버, 미완성 테스트 클라이언트, 편집 도구 | 있음 |
 | `wren11/bmp2epf` | `master` / `a70cd1367af7` | BMP/PNG 프레임을 EPF로 변환 | 없음 |
 | `wren11/da-lib` | `main` / `6030e257ad3d` | DAT/MAP/PAL/EPF/MPF/SPF/HPF 공용 라이브러리 | 있음 |
@@ -24,5 +23,6 @@
 
 **확인됨:** `Dark-Ages-Private-Server` URL은 두 번 제공되었지만 같은 저장소이므로 한 번만 클론했다.
 
-**주의:** 루트 라이선스가 없는 공개 저장소는 “코드를 볼 수 있음”과 “상업 게임에 재사용할 권리가 있음”이 다르다. 모바일 제품에 복사하기 전 저작권자의 별도 허가가 필요하다.
+**제외 기록:** `DungMunkey/Dark-Ages`(`cb3698343b4a`)는 네트워크·로그인·DB가 없는 C++/SDL2 오프라인 재현물이어서 모바일 MMORPG 기준선에 직접 재사용하지 않기로 결정했다. 2026-09-08 작업공간의 submodule에서 제거했으며 원격 GitHub 저장소는 삭제하지 않았다. 현재 유지 저장소는 16개다.
 
+**주의:** 루트 라이선스가 없는 공개 저장소는 “코드를 볼 수 있음”과 “상업 게임에 재사용할 권리가 있음”이 다르다. 모바일 제품에 복사하기 전 저작권자의 별도 허가가 필요하다.

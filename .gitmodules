@@ -22,9 +22,6 @@
 [submodule "sources/FallenDev/Decipher"]
 	path = sources/FallenDev/Decipher
 	url = https://github.com/FallenDev/Decipher.git
-[submodule "sources/DungMunkey/Dark-Ages"]
-	path = sources/DungMunkey/Dark-Ages
-	url = https://github.com/DungMunkey/Dark-Ages.git
 [submodule "sources/wren11/Dark-Ages-Private-Server"]
 	path = sources/wren11/Dark-Ages-Private-Server
 	url = https://github.com/wren11/Dark-Ages-Private-Server.git

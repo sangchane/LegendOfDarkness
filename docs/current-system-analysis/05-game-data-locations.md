@@ -32,7 +32,5 @@
 
 - `SleepHunter4/data/{Versions,Skills,Spells,Staves}.xml`: 자동화용 주소와 메타데이터이며 서버 원본 데이터가 아니다.
 - `DAGL/src/741/GameLogic`, `UI/SkillDatabase.cs`, `UI/SpellDatabase.cs`, `IO/MapFile.cs`: 7.41 동작과 자료 구조 참고.
-- `DungMunkey/Dark-Ages/Maps/*.map`, `Gfx/*.bmp`, `Music/*`, `Structs.h`: 오프라인 게임 데이터. 상당수 규칙은 `CDarkages.cpp`와 `CBattle.cpp`에 하드코딩되어 있다.
 - `da-lib/DALib/{Data,Drawing}`: DAT/MAP/팔레트/EPF/MPF/SPF/HPF 파서.
 - `DADataViewer`: 설치된 DA 데이터 파일을 읽어 아이템·스킬·몬스터·효과·음원을 표시한다.
-

@@ -16,7 +16,6 @@
 
 ## 네이티브 의존성
 
-- DungMunkey/Dark-Ages: GCC/G++ C++11, SDL2, SDL2_ttf, SDL2_mixer, pthread.
 - bmp2epf: Visual C++ v141, Windows GDI+ (`Gdiplus.lib`).
 - da / Dark-Ages-AI-Bot: Visual C++ v143 DLL, Windows 프로세스/후킹 API.
 - ETDA: Visual C++ v140/v141, DirectDraw (`ddraw.lib`, `dxguid.lib`), Detours 헤더; C# 쪽 Fasm.NET, MemorySharp, log4net.
@@ -29,4 +28,3 @@
 - Medenia의 `.env`, SQLite 런타임 파일, 브라우저용 대형 public assets.
 
 **확인됨:** Windows 전용 DLL/프로세스 접근 의존성은 모바일에서 사용할 수 없다. sqlite3·argon2·SkiaSharp·Magick.NET은 플랫폼별 네이티브 바이너리를 동반할 수 있어 목표 모바일 플랫폼별 검증이 필요하다.
-

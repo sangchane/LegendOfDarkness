@@ -31,7 +31,6 @@ Medenia 근거:
 - `Spark`: 클라이언트 실행 파일의 서버 주소/포트를 패치하고 접속 테스트를 하지만 게임 서버는 아니다.
 - `SleepHunter4`: 서버 소켓이 아니라 `ReadProcessMemory`, `WriteProcessMemory`, `PostMessage`로 로컬 게임 프로세스와 통신한다.
 - `da`, `ETDA`, `Dark-Ages-AI-Bot`: DLL 주입/함수 후킹으로 클라이언트 내부 송수신을 관찰하거나 호출한다.
-- `DungMunkey/Dark-Ages`, `DAMapEditor`, `PalMake`, `bmp2epf`, `DADataViewer`, `Archivist`: 게임 서버 통신 없음.
+- `DAMapEditor`, `PalMake`, `bmp2epf`, `DADataViewer`, `Archivist`: 게임 서버 통신 없음.
 
 **추정:** 모바일 클라이언트는 레거시 TCP를 직접 구현할 수도 있지만, 모바일 네트워크와 앱 심사·운영 편의상 TLS가 적용된 WebSocket 게이트웨이를 두고 내부에서 기존 패킷으로 변환하는 방식이 현실적이다. 이는 아직 구현 결정이 아니다.
-
