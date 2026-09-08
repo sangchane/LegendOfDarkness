@@ -1,0 +1,51 @@
+[submodule "sources/FallenDev/Spark"]
+	path = sources/FallenDev/Spark
+	url = https://github.com/FallenDev/Spark.git
+[submodule "sources/FallenDev/DAGL"]
+	path = sources/FallenDev/DAGL
+	url = https://github.com/FallenDev/DAGL.git
+[submodule "sources/FallenDev/Arbiter"]
+	path = sources/FallenDev/Arbiter
+	url = https://github.com/FallenDev/Arbiter.git
+[submodule "sources/FallenDev/SleepHunter4"]
+	path = sources/FallenDev/SleepHunter4
+	url = https://github.com/FallenDev/SleepHunter4.git
+[submodule "sources/FallenDev/dark-ages-ts"]
+	path = sources/FallenDev/dark-ages-ts
+	url = https://github.com/FallenDev/dark-ages-ts.git
+[submodule "sources/FallenDev/DAMapEditor"]
+	path = sources/FallenDev/DAMapEditor
+	url = https://github.com/FallenDev/DAMapEditor.git
+[submodule "sources/FallenDev/PalMake"]
+	path = sources/FallenDev/PalMake
+	url = https://github.com/FallenDev/PalMake.git
+[submodule "sources/FallenDev/Decipher"]
+	path = sources/FallenDev/Decipher
+	url = https://github.com/FallenDev/Decipher.git
+[submodule "sources/DungMunkey/Dark-Ages"]
+	path = sources/DungMunkey/Dark-Ages
+	url = https://github.com/DungMunkey/Dark-Ages.git
+[submodule "sources/wren11/Dark-Ages-Private-Server"]
+	path = sources/wren11/Dark-Ages-Private-Server
+	url = https://github.com/wren11/Dark-Ages-Private-Server.git
+[submodule "sources/wren11/bmp2epf"]
+	path = sources/wren11/bmp2epf
+	url = https://github.com/wren11/bmp2epf.git
+[submodule "sources/wren11/da-lib"]
+	path = sources/wren11/da-lib
+	url = https://github.com/wren11/da-lib.git
+[submodule "sources/wren11/da"]
+	path = sources/wren11/da
+	url = https://github.com/wren11/da.git
+[submodule "sources/wren11/Dark-Ages-AI-Bot"]
+	path = sources/wren11/Dark-Ages-AI-Bot
+	url = https://github.com/wren11/Dark-Ages-AI-Bot.git
+[submodule "sources/wren11/ETDA"]
+	path = sources/wren11/ETDA
+	url = https://github.com/wren11/ETDA.git
+[submodule "sources/wren11/DADataViewer"]
+	path = sources/wren11/DADataViewer
+	url = https://github.com/wren11/DADataViewer.git
+[submodule "sources/wren11/Archivist"]
+	path = sources/wren11/Archivist
+	url = https://github.com/wren11/Archivist.git
