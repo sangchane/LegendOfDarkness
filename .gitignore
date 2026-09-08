@@ -16,3 +16,9 @@ tmp/
 Thumbs.db
 *.swp
 *.swo
+
+# Local downloads dropped into sources/ and browser-tool output (never commit)
+sources/*.zip
+sources/*.exe
+sources/Dark-Ages-Private-Server-master/
+.playwright-mcp/

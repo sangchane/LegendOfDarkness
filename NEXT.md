@@ -1,9 +1,9 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[다음]** Hades(A) Phase 0 실행 검증 준비. 실제 실행은 사용자 요청 후 시작 · 근거: `docs/mobile-conversion-review.md` 4절, `docs/run-procedure.md` 10절 A단계
-- **[대기]** Hades 클라이언트 선택(7.18 우선 vs 보유 7.41 우선)과 관리자 계정명을 정해야 로그인→맵 입장 검증 가능
-- **[보존]** Medenia는 참고 자료만 유지. 실행 중 프로세스와 submodule 미커밋 변경은 건드리거나 커밋하지 않음
+- **[다음]** Hades(A) Phase 0 실행 검증: `docs/run-procedure.md` 10절 A단계. 클라이언트는 내려받은 7.18(`sources/DarkAges718single.exe`, gitignore)을 먼저, 관리자 계정명은 기본 `wren`. 실제 실행은 사용자 요청 후 시작 · 근거: `docs/mobile-conversion-review.md` 4절
+- **[대기]** PRD `docs/mobile-test-v1-prd.md` v0.2의 결정 필요 항목(D-001 엔진, D-004 기준 기기, 지면 아이템 소멸 시간 키)은 Phase 0 결과 뒤 확정
+- **[보존]** Medenia 실험은 `tmp/medenia-local-run.patch`(99줄)로만 보존. submodule은 원복(clean), 로컬 프로세스 종료됨. 재현하려면 패치 적용 + `.env` 2개
 <!-- NEXT-ACTION:END -->
 
 <!--
