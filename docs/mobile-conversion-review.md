@@ -28,7 +28,7 @@
 |---|---|---|---|
 | 서버 | Hades/Lorule (`sources/wren11/Dark-Ages-Private-Server`, C#/.NET 5) | 로그인·게임 서버 한 프로세스, JSON 파일 저장소, C# 스크립트(Roslyn) 런타임 컴파일. 빌드 조건 충족(이 PC .NET 5 SDK 있음). **실행 미검증** | `src/Lorule.GameServer/Program.cs`, `ServerContext.StartServers()`, `database/server/*`, run-procedure 2·4절 |
 | 서버 | Medenia (`sources/FallenDev/dark-ages-ts`, Bun/TypeScript) | 기동·WebSocket 연결까지 성공(2026-09-08). 최초 실행은 서버 선택 패킷 `id=0`으로 실패했고, 후속 임시 암호화 수정 뒤 `id=1` 리다이렉트까지 진전했으나 대상 포트가 `NaN`이라 로그인 완주는 미검증. 콘텐츠 얕음 | WORKLOG 2026-09-08, run-procedure 8절 15번, `tmp/logs/medenia-server.err.log` |
-| 클라이언트 | 원본 Windows 클라이언트 7.41 (`D:\_personal\LOD_\raw_data\DarkAges741single.exe`) | 실행 파일만 있음. **소스 없음**(넥슨/KRU 저작물) | 확인됨(파일 존재), 분석서 09 |
+| 클라이언트 | 원본 Windows 클라이언트 7.18 (`sources/DarkAges718single.exe`)와 7.41 (`D:\_personal\LOD_\raw_data\DarkAges741single.exe`) | 실행 파일만 있음. **소스 없음**(넥슨/KRU 저작물). 7.18은 Hades 설정과 일치하지만 접속은 미검증 | 확인됨(파일 존재), 분석서 09 |
 | 클라이언트 | DAGL (`sources/FallenDev/DAGL`, C#/.NET 8, Silk.NET/OpenGL, ImGui) | 7.41 클라이언트 재구현 시도. UI 파일 294개, 네트워크·그래픽 뼈대 있음. **실행 시작점 없음, 미완성**. 루트 라이선스 파일 없음 | 분석서 01·03·08 |
 | 클라이언트 | Medenia 웹 (Phaser/Svelte) | 브라우저에서 화면·자산 로드 확인. 변환된 자산 51,015개 포함 | 실행 결과, `apps/client/public` |
 | 게임 데이터 | Hades `database/server/` | 맵 5개(`maps/*.map`), 지역 4개, 템플릿(아이템·몬스터·국가·스킬·워프·월드맵), 스크립트 9종 폴더 | 확인됨 |
