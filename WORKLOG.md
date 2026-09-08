@@ -4,11 +4,12 @@
 긴 로그는 붙이지 말고 결과만 요약한다.
 
 ## Current State
-- Status: doing
-- Focus: Godot 4.6+C# 모바일 기반 Windows/Android 검증 **통과**. 다음은 Hades 7.18 로그인 프로토콜 계약과 격리 fixture
+- Status: review
+- Focus: 모바일 첫 테스트 6개 UI 상태·구조 와이어프레임 검토 대기. 승인 전 UI 구현 금지
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-09 — PRD v0.4를 기준으로 `docs/mobile-test-v1-wireframes.md` 작성. 로그인·단일 캐릭터 확인·기본 게임 HUD·NPC 대화 모달·전투 상태·읽기 중심 인벤토리만 포함하고, Mermaid 흐름도와 가로 구조 와이어프레임·전환 조건·48×48 터치 영역·글자 크기·16:9~20:9 대응·21:9 이상 레터박스·노치/홈 표시 안전 영역·접근성 초점 규칙을 정의. 색상·장식·구현은 제외하고 검토 대기로 전환
 - 2026-09-09 — **D-001 Windows/Android 기준 채택: Godot 4.6 + C#**. `experiments/godot-csharp-mobile-smoke/`의 RED 계약 커밋 뒤 구현했으며, Godot 4.6 Mono + .NET SDK 9.0.317에서 계약 검사, C# restore/build(경고·오류 0), Windows headless 실행을 통과했다. Android API 35 APK(ARM64+x86_64, minSdk 24, targetSdk 35)를 export하고 v2/v3 서명을 검증했으며, Android 15 x86_64 에뮬레이터에서 설치·최상위 실행·`MOBILE_SMOKE_OK | Godot C# | Android | .NET 9.0.19` 로그와 실제 가로 화면 렌더링을 확인했다. 최종 iOS 적합성은 Mac gate에서 확정한다
 - 2026-09-09 — **Mac 인계 가능한 소스 구성 확인**. 공유 대상은 Godot 프로젝트·C# solution·애플리케이션 소스·scene·asset·Android/iOS preset 뼈대다. 검사 대상 애플리케이션 파일에는 Windows 절대 경로와 Windows 전용 API가 없다. 같은 Git 커밋을 macOS의 Godot 4.6 .NET + .NET 9에서 이어서 검증할 수 있다. 다만 iOS C#은 experimental이고 실제 export/서명/arm64 iPhone 설치는 macOS+Xcode가 필요하므로 Mac 후속 gate로 남겼다. `.godot/`, `bin/`, `obj/`, `build/`, 서명 정보는 공유하지 않는다
 - 2026-09-09 — Android 검증 중 확인·해결한 도구 이슈: ETC2/ASTC import 설정이 없으면 Godot가 Android export를 거부하므로 활성화했고, 생성된 `android/**`·`build/**`가 C# 중복 컴파일되지 않게 제외했다. 플러그인이 없는 smoke 앱은 종료 hang이 발생한 Gradle export 대신 Godot 기본 APK export를 사용한다. SwiftShader 검은 화면은 호스트 NVIDIA GPU 재실행으로 해소했다

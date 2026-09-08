@@ -5,6 +5,7 @@
 - 기준일: 2026-09-08
 - 기준선: Hades/Lorule C# 서버 + 기존 JSON/MAP/스크립트 + 신규 모바일 클라이언트
 - 선행 문서: [모바일 전환 기술 검토서](mobile-conversion-review.md), [현행 프로젝트 분석서](current-system-analysis/README.md)
+- 후속 설계: [화면 흐름 및 구조 와이어프레임](mobile-test-v1-wireframes.md)
 - 범위 원칙: 이 문서는 요구사항만 정의한다. 구현·서버 실행·데이터 수정은 하지 않는다.
 
 표기:
