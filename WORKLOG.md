@@ -5,10 +5,13 @@
 
 ## Current State
 - Status: doing
-- Focus: Hades Phase 0 실행 검증 **통과**. 다음은 PRD 미결정 항목(D-001 엔진, D-004 기준 기기) 확정
+- Focus: Godot 4.6+C# 모바일 기반 Windows/Android 검증 **통과**. 다음은 Hades 7.18 로그인 프로토콜 계약과 격리 fixture
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-09 — **D-001 Windows/Android 기준 채택: Godot 4.6 + C#**. `experiments/godot-csharp-mobile-smoke/`의 RED 계약 커밋 뒤 구현했으며, Godot 4.6 Mono + .NET SDK 9.0.317에서 계약 검사, C# restore/build(경고·오류 0), Windows headless 실행을 통과했다. Android API 35 APK(ARM64+x86_64, minSdk 24, targetSdk 35)를 export하고 v2/v3 서명을 검증했으며, Android 15 x86_64 에뮬레이터에서 설치·최상위 실행·`MOBILE_SMOKE_OK | Godot C# | Android | .NET 9.0.19` 로그와 실제 가로 화면 렌더링을 확인했다. 최종 iOS 적합성은 Mac gate에서 확정한다
+- 2026-09-09 — **Mac 인계 가능한 소스 구성 확인**. 공유 대상은 Godot 프로젝트·C# solution·애플리케이션 소스·scene·asset·Android/iOS preset 뼈대다. 검사 대상 애플리케이션 파일에는 Windows 절대 경로와 Windows 전용 API가 없다. 같은 Git 커밋을 macOS의 Godot 4.6 .NET + .NET 9에서 이어서 검증할 수 있다. 다만 iOS C#은 experimental이고 실제 export/서명/arm64 iPhone 설치는 macOS+Xcode가 필요하므로 Mac 후속 gate로 남겼다. `.godot/`, `bin/`, `obj/`, `build/`, 서명 정보는 공유하지 않는다
+- 2026-09-09 — Android 검증 중 확인·해결한 도구 이슈: ETC2/ASTC import 설정이 없으면 Godot가 Android export를 거부하므로 활성화했고, 생성된 `android/**`·`build/**`가 C# 중복 컴파일되지 않게 제외했다. 플러그인이 없는 smoke 앱은 종료 hang이 발생한 Gradle export 대신 Godot 기본 APK export를 사용한다. SwiftShader 검은 화면은 호스트 NVIDIA GPU 재실행으로 해소했다
 - 2026-09-09 — iPhone 지원 요구 반영. Godot 4.6 공식 문서에서 C# Android·iOS 내보내기가 모두 가능하지만 experimental임을 확인(Android는 .NET 9 이상, iOS는 macOS+Xcode 필요). D-001은 양 플랫폼 빈 프로젝트 export smoke test 통과를 조건으로 Godot 4.6+C# 선택, 실패 시 Unity 전환으로 기록
 - 2026-09-09 — **`src/Hades.Client` 재사용 검토(spike): 불가 판정.** 클라이언트가 아니라 미완성 접속 테스트 도구다 — `Program.cs`의 Main이 `//TODO: Implement client that has been written.` + 스레드 대기이고, UI는 공격 패킷 1개를 보내는 버튼 하나뿐, 코드에 `Thread.Sleep(5000)`이 박혀 있다. 프로토콜 커버리지는 로그인까지: 서버가 처리하는 클라 패킷이 로그인 11종 + 월드 41종인데 `Client.cs`가 읽는 서버 패킷은 5개(0x7E·0x00·0x02·0x03·0x05)뿐이고 월드 진입 후 패킷은 하나도 파싱하지 않는다. 이식성도 없다 — .NET Framework 4.6.1(Windows 전용), `Hades.sln`에 미포함, 실제 빌드 시 참조 196개 미해결로 실패(`..\packages` 부재; C# 문법 오류는 0개). Windows 전용 의존은 `Forms/ClientForm*.cs`에만 있어 통신부 자체는 깨끗하지만 가져올 알맹이가 없다
 - 2026-09-09 — 위 검토의 대안(모바일 클라이언트 재료): **프로토콜 사양**은 서버 핸들러 52종이 유일한 정본, **암호화**는 `Hades.Server.Base/Security/SecurityProvider.cs`(`Hades.Client` 쪽 237줄과 거의 동일한 중복이므로 서버본을 쓴다), **`.dat` 자료 읽기**는 `Hades.Client.Base`(netstandard2.0 — 모바일 이식 가능, `Archive`·`PaletteCollection`·`Map`·`Tile`; 솔루션 빌드에 포함돼 오류 없이 빌드됨)

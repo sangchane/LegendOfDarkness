@@ -1,6 +1,6 @@
 # PRD — 모바일 전환 첫 테스트 버전
 
-- 문서 버전: 0.3 (Android+iPhone 및 엔진 판단 반영)
+- 문서 버전: 0.4 (Godot C# Windows/Android 기반 검증 결과 반영)
 - 상태: 구현 전 검토안
 - 기준일: 2026-09-08
 - 기준선: Hades/Lorule C# 서버 + 기존 JSON/MAP/스크립트 + 신규 모바일 클라이언트
@@ -219,7 +219,7 @@ FR-010은 선택 기능이 아니다. 현재 번들 데이터에는 시작 맵�
 
 | ID | 결정 사항 | 제안값 | 결정하지 않았을 때 영향 |
 |---|---|---|---|
-| D-001 | 모바일 엔진 | **조건부 선택: Godot 4.6 + C#**. 빈 C# 프로젝트의 Android·iOS 실기기 export smoke test를 먼저 통과하면 확정하고, 실패하면 Unity로 전환 | Godot C# 모바일 내보내기는 Android·iOS 모두 공식 지원되지만 아직 experimental |
+| D-001 | 모바일 엔진 | **Windows/Android 구현 기준 채택: Godot 4.6 + C#**. Windows 빌드·실행과 Android export·서명·에뮬레이터 C# 실행·화면 렌더링을 통과했다. 애플리케이션 소스의 Windows 전용 의존성이 없는 것은 확인했으며, 최종 iOS 적합성은 Mac의 Xcode/iPhone gate에서 확정한다. 그 gate가 막히면 Unity 전환 판단을 다시 연다 | Godot C# 모바일 내보내기는 Android·iOS 모두 공식 지원되지만 아직 experimental |
 | D-002 | Hades 접속 방식 | 첫 LAN 검증은 레거시 TCP 직접 구현, 외부 테스트는 TLS 게이트웨이 | 보안 범위와 네트워크 개발량이 달라짐 |
 | D-003 | 첫 플랫폼 | Android와 iPhone, 가로 고정 | 두 플랫폼에서 같은 흐름을 검증한다는 사용자 요구로 확정 |
 | D-004 | 기준 실기기와 최소 OS | 보유 Android 1대와 iPhone 1대, iOS 빌드용 Mac/Xcode 환경 지정 필요 | 성능·내보내기 합격 여부를 판정할 수 없음 |
@@ -231,7 +231,8 @@ FR-010은 선택 기능이 아니다. 현재 번들 데이터에는 시작 맵�
 
 ### 코드 실행으로 확인할 사항
 
-- Godot 4.6 .NET 빈 프로젝트가 Android(.NET 9 이상 필요)와 iOS(macOS·Xcode 필요) 실기기에 설치·실행되는가. 공식 문서상 두 플랫폼의 C# 지원은 experimental이다: [C# 플랫폼 지원](https://docs.godotengine.org/en/4.6/tutorials/scripting/c_sharp/index.html), [Android 내보내기](https://docs.godotengine.org/en/4.6/tutorials/export/exporting_for_android.html), [iOS 내보내기](https://docs.godotengine.org/en/4.6/tutorials/export/exporting_for_ios.html).
+- **완료(Windows/Android)**: Godot 4.6 .NET 빈 프로젝트가 Windows에서 빌드·실행되고 Android APK로 export·서명된 뒤 Android 15 x86_64 에뮬레이터에서 C# 실행과 화면 렌더링까지 통과했다. 증거 프로젝트는 `experiments/godot-csharp-mobile-smoke/`다.
+- **Mac 후속 gate**: 같은 커밋의 macOS 빌드·실행과 iOS Xcode export·서명·arm64 iPhone 실기기 설치를 확인한다. Windows 전용 의존성이 없는 것과 iOS preset 포함은 확인했지만, Windows에서는 Apple 도구 체인을 실행할 수 없다. 공식 문서상 C# Android·iOS 지원은 experimental이다: [C# 플랫폼 지원](https://docs.godotengine.org/en/4.6/tutorials/scripting/c_sharp/index.html), [Android 내보내기](https://docs.godotengine.org/en/4.6/tutorials/export/exporting_for_android.html), [iOS 내보내기](https://docs.godotengine.org/en/4.6/tutorials/export/exporting_for_ios.html).
 - Hades 서버가 현재 환경에서 빌드되고 로그인→맵 입장까지 실제 완주되는가.
 - SHA-256 `1E34B83A81E5F844AA62DE496A689706590334E3F3D01D8E1330B1907CBADAF7`인 로컬 7.18 실행 파일이 Hades 서버에 접속 가능한가.
 - `ClientVersion=718` 기준 패킷 정의가 신규 클라이언트 구현에 충분한가.
