@@ -8,6 +8,16 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 internal static class LoginFlow
 {
+    /// <summary>The codepage both sides of the 7.18 protocol use for text.</summary>
+    private static readonly System.Text.Encoding LegacyEncoding = CreateLegacyEncoding();
+
+    private static System.Text.Encoding CreateLegacyEncoding()
+    {
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+        return System.Text.Encoding.GetEncoding(949);
+    }
+
     /// <summary>Throwaway name for the isolated run. It never matches a real account.</summary>
     public const string SyntheticName = "lodharness";
 
@@ -134,10 +144,21 @@ internal static class LoginFlow
     private static byte[] Credentials(string name, string secret) =>
         [.. LengthPrefixed(name), .. LengthPrefixed(secret)];
 
-    // Synthetic names are ASCII. Korean names travel as CP949 and belong to the unit-test boundary in the
-    // stabilization plan, not to this flow.
-    private static byte[] LengthPrefixed(string value) =>
-        [(byte)value.Length, .. System.Text.Encoding.ASCII.GetBytes(value)];
+    /// <summary>
+    /// StringA on the wire: one length byte, then the CP949 bytes. The count is of bytes, not characters, so
+    /// a Korean name (two bytes per syllable) is framed correctly.
+    /// </summary>
+    private static byte[] LengthPrefixed(string value)
+    {
+        byte[] encoded = LegacyEncoding.GetBytes(value);
+
+        if (encoded.Length > byte.MaxValue)
+        {
+            throw new ArgumentException($"'{value}' does not fit in a single length byte.", nameof(value));
+        }
+
+        return [(byte)encoded.Length, .. encoded];
+    }
 
     private static void RequireIsolatedPort(int actual, int expected, string stage) =>
         Assert.True(
