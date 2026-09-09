@@ -1,0 +1,8 @@
+{
+  "description": "Command order observed against an isolated Hades 7.18 server. Synthetic input only: no real account, password, or captured session. Per-run values (seed, salt, hashes, serials, ports) are deliberately not frozen here.",
+  "steps": [
+    { "direction": "S2C", "command": "0x7E", "note": "handshake banner" },
+    { "direction": "C2S", "command": "0x00", "note": "client version 718" },
+    { "direction": "S2C", "command": "0x00", "note": "server table hash and encryption parameters" }
+  ]
+}

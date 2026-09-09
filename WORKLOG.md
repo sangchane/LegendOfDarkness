@@ -5,10 +5,11 @@
 
 ## Current State
 - Status: in-progress
-- Focus: Hades P0 안정화 S0 — P0-00 격리 harness 완료, 다음은 P0-01 golden fixture. 실제 모바일 연동은 S1 gate 이후
+- Focus: Hades P0 안정화 S0 — P0-00 완료, P0-01 golden fixture 진행 중(평문 핸드셰이크까지 재현). 실제 모바일 연동은 S1 gate 이후
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-09 — **P0-01 착수 — 평문 핸드셰이크 재현**(테스트 11개 통과). 격리 서버를 상대로 `S2C 0x7E → C2S 0x00(버전 718) → S2C 0x00(서버테이블 해시 + 암호화 파라미터)` 순서를 잡아 `Fixtures/hades-718-login-flow.json`에 명령 순서만 고정했다(seed·salt·해시·serial 등 매 실행 달라지는 값은 의도적으로 미고정, 실제 계정·비밀번호 없음). 이 과정에서 **두 번째 격리 구멍**을 찾아 막았다 — `MServerTable.xml`의 `Port`가 2610으로 박혀 있어 로비 리다이렉트가 격리 밖 포트로 클라이언트를 보낸다. harness가 실행마다 격리 로그인 포트로 다시 쓰도록 했다. 사용자 지시(하드코딩은 장기적으로 정리)에 따라 계획서에 **2.3 하드코딩 상수 목록**과 **P0-17 설정화 작업**을 추가해 S1 검토가 반드시 집어가게 했다. 프레임 코덱이 `mobile/src/Lod.Mobile.Core`와 중복인데, 그쪽은 .NET 9 SDK가 없어 빌드가 안 되므로 지금은 분리해 두고 코드 주석에 단일 출처 통합 대상으로 표시
 - 2026-09-09 — **P0-00 격리 harness 완료** (`tests/hades-characterization/`, net8.0 xunit, 테스트 9개 통과 15초). `IsolatedHadesServer`가 `Staging/net5.0`과 `database/server`를 임시 경로로 복사하고, 비어 있는 `aislings`·사용 중이 아닌 포트를 배정한 `LoruleConfig.json`을 써서 서버를 띄우고 종료 시 지운다. 원본 무변경 테스트는 격리를 일부러 깬 상태에서 실제로 실패하는 것까지 확인(`areas/*.json` 4개가 수정됨 → `git checkout`으로 원복). 진행 중 확인한 것 2가지: ① 이전 세션의 수동 Hades 서버(PID 89316)가 계속 떠서 2610·2615·2620을 잡고 있었음 — 사용자 승인 후 종료 ② `GameServer.Start`가 `http://localhost:2620/`을 **하드코딩**으로 열고, 그 `HttpListener` 예외가 `StartServers`의 `catch (SocketException)`을 통과해 **로그인 서버 없이 프로세스만 살아 있는** 상태가 된다. 계획서 2.1에 실증 항목으로 추가하고 harness는 2620 사전 검사로 즉시 실패하게 했다. 원본은 수정하지 않았고 S0 harness는 fork 대신 root 저장소에 둔다(계획서 1.1). 반복을 막기 위해 `scripts/stop-hades.ps1`(남은 서버 종료 + 2610·2615·2620 확인)을 추가하고 `docs/run-procedure.md` 2절 A·10절 A단계에 실행 전후 종료 단계를 넣었다
 - 2026-09-09 — `docs/hades-p0-stabilization-plan.md`로 Hades 안정화 순서와 회귀 테스트 경계를 확정. 전면 리팩터링·DB 교체·추측성 성능 최적화는 선행하지 않고, S0 정상 7.18 특성화 → S1 네트워크·입장 인증·연결·송신·원자적 저장·기본 전투 안전선 → S2 비밀번호·남용 방지·정상 종료·지원 LTS·10인 soak 순서로 진행한다. fixture 기반 Godot 작업은 S0 뒤, 실제 Hades 연동은 S1 뒤, 5~10인 비공개 테스트는 S2 뒤로 gate를 분리했다. 기존 미커밋 모바일 테스트 골격과 원본 submodule은 변경하지 않음
 - 2026-09-09 — GDC의 게임 UX 실무 모델과 Apple·Android·Godot 공식 가이드를 참고해 `docs/mobile-test-v1-wireframes.md` v0.2로 개정. 독립 화면 6장이 아니라 로그인·캐릭터 확인·게임 월드의 **3개 기본 프레임 + 대화·전투·인벤토리 3개 변형 상태**로 관리하고, 흐름 지도→box wire→상태 시트→실제 게임 화면 위 in-engine greybox→visual skin 단계로 분리했다. 초광폭 일괄 레터박스 대신 full-bleed 월드와 safe-area anchor, 정량 양손 도달성 검증을 사용하도록 PRD AC-014도 v0.5로 조정. 이번 변경은 조사·문서뿐이며 greybox 구현은 승인 후로 남김

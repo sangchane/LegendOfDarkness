@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 using Xunit;
 
 namespace Lod.Hades.Characterization.Tests;
@@ -150,6 +151,16 @@ public sealed class IsolatedHadesServerTests
         client.Connect(IPAddress.Loopback, port);
 
         Assert.True(client.Connected, $"Nothing accepted a connection on port {port}.");
+    }
+
+    [Fact]
+    public void Redirect_table_points_at_the_isolated_login_port()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+
+        XDocument table = XDocument.Load(Path.Combine(server.RunRoot, "MServerTable.xml"));
+
+        Assert.Equal(server.LoginPort.ToString(), table.Descendants("Port").Single().Value);
     }
 
     private static string ReadConfiguredContentLocation(IsolatedHadesServer server) =>

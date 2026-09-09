@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 
 namespace Lod.Hades.Characterization;
 
@@ -17,6 +18,7 @@ public sealed class IsolatedHadesServer : IDisposable
     private const string CharacterDirectoryName = "aislings";
     private const string LoginOnlineSignal = "Login server is online.";
     private const string GameOnlineSignal = "Game server is online.";
+    private const string RedirectTableFileName = "MServerTable.xml";
 
     private readonly StringBuilder _console = new();
     private readonly ManualResetEventSlim _ready = new();
@@ -50,6 +52,7 @@ public sealed class IsolatedHadesServer : IDisposable
 
         (int loginPort, int gamePort) = ReserveFreePorts();
         WriteIsolatedConfig(runRoot, contentLocation, loginPort, gamePort);
+        WriteIsolatedRedirectTable(runRoot, loginPort);
 
         return new IsolatedHadesServer(runRoot, loginPort, gamePort);
     }
@@ -203,6 +206,23 @@ public sealed class IsolatedHadesServer : IDisposable
         config["ServerConfig"]!["SERVER_PORT"] = gamePort;
 
         File.WriteAllText(configPath, config.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    /// <summary>
+    /// The lobby redirect sends the client to <c>MServerTable.xml</c>, which ships with port 2610, so an
+    /// isolated run would hand the client back to the manual server.
+    /// </summary>
+    private static void WriteIsolatedRedirectTable(string runRoot, int loginPort)
+    {
+        string tablePath = Path.Combine(runRoot, RedirectTableFileName);
+        XDocument table = XDocument.Load(tablePath);
+
+        foreach (XElement port in table.Descendants("Port"))
+        {
+            port.Value = loginPort.ToString();
+        }
+
+        table.Save(tablePath);
     }
 
     // ponytail: the ports are released before the server binds them; a colliding process would have to
