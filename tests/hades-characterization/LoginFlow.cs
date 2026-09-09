@@ -22,30 +22,44 @@ internal static class LoginFlow
     // ClientFormat00: version 718 as a big-endian ushort, then the two bytes the 7.18 client always sends.
     private static readonly byte[] ClientVersionPayload = [0x02, 0xCE, 0x4C, 0x4B];
 
-    public static IReadOnlyList<string> EnterWorld(IsolatedHadesServer server)
+    /// <summary>
+    /// A login-server connection that has cleared the handshake and the lobby redirect, so it is ready for
+    /// account, character and login packets.
+    /// </summary>
+    internal sealed record LoginSession(Hades718TestClient Client, IReadOnlyList<string> Observed) : IDisposable
+    {
+        public void Dispose() => Client.Dispose();
+    }
+
+    /// <summary>Runs the handshake and the lobby redirect, and hands back the connection they lead to.</summary>
+    public static LoginSession OpenSession(IsolatedHadesServer server)
     {
         List<string> observed = [];
+        PacketFrame parameters;
+        RedirectTarget lobbyTarget;
 
-        using Hades718TestClient lobby = Hades718TestClient.Connect(server.LoginPort);
-        observed.Add(Describe("S2C", lobby.Receive().Command));
+        using (Hades718TestClient lobby = Hades718TestClient.Connect(server.LoginPort))
+        {
+            observed.Add(Describe("S2C", lobby.Receive().Command));
 
-        lobby.Send(ClientVersionCommand, ClientVersionPayload);
-        observed.Add(Describe("C2S", ClientVersionCommand));
+            lobby.Send(ClientVersionCommand, ClientVersionPayload);
+            observed.Add(Describe("C2S", ClientVersionCommand));
 
-        PacketFrame parameters = lobby.Receive();
-        observed.Add(Describe("S2C", parameters.Command));
+            parameters = lobby.Receive();
+            observed.Add(Describe("S2C", parameters.Command));
 
-        lobby.UseEncryption(parameters);
-        lobby.SendSecured(EncryptionReceivedCommand, ordinal: 0, 0x00);
-        observed.Add(Describe("C2S", EncryptionReceivedCommand));
+            lobby.UseEncryption(parameters);
+            lobby.SendSecured(EncryptionReceivedCommand, ordinal: 0, 0x00);
+            observed.Add(Describe("C2S", EncryptionReceivedCommand));
 
-        PacketFrame lobbyRedirect = lobby.Receive();
-        observed.Add(Describe("S2C", lobbyRedirect.Command));
+            PacketFrame lobbyRedirect = lobby.Receive();
+            observed.Add(Describe("S2C", lobbyRedirect.Command));
 
-        RedirectTarget lobbyTarget = Hades718TestClient.ParseRedirect(lobbyRedirect);
-        RequireIsolatedPort(lobbyTarget.Port, server.LoginPort, "lobby");
+            lobbyTarget = Hades718TestClient.ParseRedirect(lobbyRedirect);
+            RequireIsolatedPort(lobbyTarget.Port, server.LoginPort, "lobby");
+        }
 
-        using Hades718TestClient login = Hades718TestClient.Connect(lobbyTarget.Port);
+        Hades718TestClient login = Hades718TestClient.Connect(lobbyTarget.Port);
         observed.Add(Describe("S2C", login.Receive().Command));
 
         login.SendRedirectRequest(lobbyTarget);
@@ -54,6 +68,38 @@ internal static class LoginFlow
 
         login.UseEncryption(parameters);
 
+        return new LoginSession(login, observed);
+    }
+
+    /// <summary>
+    /// Asks the server to create an account and character. Hanging up is a fine answer to a name the server
+    /// dislikes, so a closed connection is not treated as a failure here.
+    /// </summary>
+    public static void TryCreateAccount(IsolatedHadesServer server, string name)
+    {
+        using LoginSession session = OpenSession(server);
+
+        try
+        {
+            session.Client.SendSecured(CreateAccountCommand, ordinal: 0, Credentials(name, SyntheticSecret));
+            session.Client.Receive();
+
+            session.Client.SendSecured(CreateCharacterCommand, ordinal: 0, 0x01, 0x01, 0x01);
+
+            // Reading the reply also waits for the save to finish before the connection closes.
+            session.Client.Receive();
+        }
+        catch (Exception refused) when (refused is EndOfStreamException or IOException)
+        {
+            // The server closed the connection instead of answering.
+        }
+    }
+
+    public static IReadOnlyList<string> EnterWorld(IsolatedHadesServer server)
+    {
+        using LoginSession session = OpenSession(server);
+        List<string> observed = [.. session.Observed];
+        Hades718TestClient login = session.Client;
         login.SendSecured(CreateAccountCommand, ordinal: 0, Credentials());
         observed.Add(Describe("C2S", CreateAccountCommand));
         observed.Add(Describe("S2C", login.Receive().Command));
@@ -83,7 +129,10 @@ internal static class LoginFlow
 
     private static string Describe(string direction, byte command) => $"{direction} 0x{command:X2}";
 
-    private static byte[] Credentials() => [.. LengthPrefixed(SyntheticName), .. LengthPrefixed(SyntheticSecret)];
+    private static byte[] Credentials() => Credentials(SyntheticName, SyntheticSecret);
+
+    private static byte[] Credentials(string name, string secret) =>
+        [.. LengthPrefixed(name), .. LengthPrefixed(secret)];
 
     // Synthetic names are ASCII. Korean names travel as CP949 and belong to the unit-test boundary in the
     // stabilization plan, not to this flow.
