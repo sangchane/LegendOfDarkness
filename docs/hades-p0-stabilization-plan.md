@@ -1,7 +1,7 @@
 # Hades P0 안정화 계획 및 회귀 테스트 경계
 
-- 문서 버전: 1.0
-- 상태: 확정
+- 문서 버전: 1.1
+- 상태: 확정 (1.1 — S0 착수에서 확인한 객체 서버 포트 제약과 S0 harness 위치를 반영)
 - 기준일: 2026-09-09
 - 적용 대상: Hades/Lorule 7.18 C# 서버
 - 목적: 모바일 첫 테스트 버전을 실제 Hades 서버에 연결하기 전에 필요한 최소 안정화 범위와 통과 기준을 고정한다.
@@ -32,6 +32,7 @@ Godot 화면은 fixture를 사용하는 격리 작업이라면 S0 이후 진행�
 | 송신 | `BeginSend`의 완료 바이트 수와 부분 송신을 보장하지 않으며 사용자별 순서 보장 큐가 없다. | `Hades.Server.Base/Network/NetworkClient.cs`의 `FlushAndSend`, `SendCompleted` |
 | 저장 | 캐릭터 JSON을 대상 파일에 직접 쓰며 캐릭터별 동시 저장, 원자적 교체, 백업 복구가 없다. 저장 실패가 성공처럼 기록될 수 있다. | `Hades.Server.Base/Storage/AislingStorage.cs`의 `Save`; `Network/Game/GameClient.cs`의 `Save`; `Network/Game/Components/SaveComponent.cs` |
 | 기본 전투 | 기본 공격 간격 계산의 뺄셈 방향이 반대다. 존재하지 않는 주문 슬롯은 cast 스택에서 제거되지 않아 갱신 루프가 멈출 수 있다. | `Hades.Server.Base/Network/Game/GameServerHandlers.cs`의 `Assail`; `Network/Game/GameClient.cs`의 `DispatchCasts` |
+| 객체 서버 포트 | 게임 서버가 시작하면서 `http://localhost:2620/`을 하드코딩으로 연다. 설정 키가 없어 격리할 수 없고, 이미 사용 중이면 `HttpListener` 예외가 `SocketException`만 잡는 처리기를 그대로 통과해 **로그인 서버가 시작되지 않은 채 프로세스만 살아 있다.** (2026-09-09 harness에서 실제 재현) | `Hades.Server.Base/Network/Game/GameServer.cs`의 `Start`, `Network/WS/ObjectServer.cs`의 `Start`, `Infrastructure/ServerContext.cs`의 `StartServers` |
 | 유지보수 기반 | 자동화된 서버 테스트와 CI가 없고 서버가 지원 종료된 `net5.0`을 사용한다. | `src/Hades.Server.Base/Hades.Server.Base.csproj`, `src/Lorule.GameServer/Lorule.GameServer.csproj` |
 
 경로는 현재 submodule 배치를 기준으로 적었다. 구현 브랜치에서는 실제 fork 경로와 줄 번호를 다시 고정한다.
@@ -39,6 +40,7 @@ Godot 화면은 fixture를 사용하는 격리 작업이라면 S0 이후 진행�
 ### 2.2 판단 또는 아직 확인이 필요한 내용
 
 - 위 결함이 실제 운영 중 모두 재현됐다는 뜻은 아니다. 코드상 실패 가능성이 확인되어 P0 방어 대상으로 분류했다.
+- 다만 예외 격리 결함은 2026-09-09 S0 harness 실행에서 실제로 재현됐다. 2620이 선점된 상태에서 서버는 예외를 삼키고 로그인 서버 없이 계속 떠 있었다.
 - 원본 클라이언트가 기대하는 정상 패킷 바이트와 서버 상태 변화는 S0의 실제 캡처로 확정해야 한다.
 - Hades 서버의 현재 처리량 병목은 아직 측정하지 않았다. 따라서 CPU 최적화와 게임 루프 재설계는 P0에 포함하지 않는다.
 - 5~10명 규모에서는 JSON 저장을 유지할 수 있다고 판단한다. 단, 원자적 저장과 복구 시험을 통과해야 한다.
@@ -78,6 +80,8 @@ Godot 화면은 fixture를 사용하는 격리 작업이라면 S0 이후 진행�
 | P0-00 | 원본 서버를 수정하지 않는 격리 harness 구성 | 테스트 전용 프로세스·포트·임시 데이터 경로 | 실행 중인 수동 서버 및 실제 데이터와 분리됨 |
 | P0-01 | 7.18 로그인→redirect→게임 입장 정상 흐름 캡처 | 비밀정보가 제거된 golden packet/state fixture | 합성 계정으로 같은 입력이 같은 명령 순서와 핵심 상태를 재현함 |
 | P0-02 | 저장 전후 정상 상태 고정 | 최소 캐릭터 JSON fixture와 의미 비교기 | 시간·임의값을 제외한 필드 변화가 설명되고 반복 가능함 |
+
+**진행 상황 (2026-09-09):** P0-00 완료 — `tests/hades-characterization/`(net8.0, xunit)의 `IsolatedHadesServer`가 빌드 산출물과 `database/server`를 임시 경로로 복사하고, 비어 있는 `aislings`와 사용 중이 아닌 포트를 배정한 뒤 서버를 띄우고 종료 시 지운다. 테스트 9개가 통과하며, 격리를 일부러 깨면 원본 무변경 테스트가 실제로 실패하는 것까지 확인했다. 하드코딩된 2620 때문에 harness는 한 번에 한 대만 띄울 수 있어, 다른 Hades가 떠 있으면 `Start`가 즉시 실패한다.
 
 **S0 gate:** 격리 테스트가 원본 기준선에서 재현되며 fixture, 로그, 테스트 결과에 실제 계정이나 비밀번호가 없다.
 
@@ -144,6 +148,7 @@ P0 서버 suite는 Godot 표시 품질, 모바일 조작성, safe area, NPC 대�
 ### 6.1 원본과 fork
 
 - `sources/`의 원본 submodule은 읽기 전용 기준선으로 유지한다.
+- S0 특성화 harness는 원본을 수정하지 않으므로 root 저장소 `tests/hades-characterization/`에 두고, fork는 서버 코드를 실제로 고치는 S1 시점에 만든다.
 - 서버 변경은 `kimsangchan/Dark-Ages-Private-Server` fork를 만들거나 확인한 뒤 그 저장소에서 수행한다.
 - 원본 저장소는 `upstream`, 개인 fork는 `origin`으로 구분한다.
 - root 저장소에는 검증된 Hades fork의 submodule commit 포인터만 반영한다.
@@ -152,7 +157,7 @@ P0 서버 suite는 Godot 표시 품질, 모바일 조작성, safe area, NPC 대�
 
 서버 fork의 권장 스택은 다음과 같다.
 
-1. `test/hades-characterization`
+1. `test/hades-characterization` (S0 산출물은 root 저장소에 있으므로, 이 브랜치는 S1에서 fork로 옮겨 갈 때만 만든다)
 2. `fix/hades-network-boundary`
 3. `fix/hades-auth-boundary`
 4. `fix/hades-persistence`
