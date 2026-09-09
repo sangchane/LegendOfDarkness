@@ -1,0 +1,35 @@
+; Engine configuration file.
+; Kept in sync with experiments/godot-csharp-mobile-smoke, which validated this
+; toolchain on Windows and an Android device.
+
+config_version=5
+
+[application]
+
+config/name="LOD Client Greybox"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[display]
+
+; 800x360 is a modern phone's landscape size in logical units, so one unit is one
+; dp and the 48 unit touch minimum on screen is the real 48dp the guidelines mean.
+window/size/viewport_width=800
+window/size/viewport_height=360
+window/size/window_width_override=1000
+window/size/window_height_override=450
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=4
+
+[dotnet]
+
+project/assembly_name="LodClient"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.09, 0.09, 0.1, 1)
+textures/vram_compression/import_etc2_astc=true
