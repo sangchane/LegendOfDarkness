@@ -22,6 +22,9 @@ internal static class LoginFlow
     public const string SyntheticName = "lodharness";
 
     private const string SyntheticSecret = "not-a-real-secret";
+
+    // ServerConfig.ServerWelcomeMessage in LoruleConfig.json.
+    private const string ServerWelcome = "Welcome to Lorule";
     private const byte ClientVersionCommand = 0x00;
     private const byte EncryptionReceivedCommand = 0x57;
     private const byte RedirectRequestCommand = 0x10;
@@ -105,12 +108,17 @@ internal static class LoginFlow
         }
     }
 
-    public static IReadOnlyList<string> EnterWorld(IsolatedHadesServer server)
+    /// <summary>A captured game-entry ticket that has not been used yet.</summary>
+    internal sealed record GameTicket(RedirectTarget Target, IReadOnlyList<string> Observed);
+
+    /// <summary>Creates the account, logs in and stops at the game redirect without entering the world.</summary>
+    public static GameTicket LoginAndCaptureTicket(IsolatedHadesServer server, string name)
     {
         using LoginSession session = OpenSession(server);
         List<string> observed = [.. session.Observed];
         Hades718TestClient login = session.Client;
-        login.SendSecured(CreateAccountCommand, ordinal: 0, Credentials());
+
+        login.SendSecured(CreateAccountCommand, ordinal: 0, Credentials(name, SyntheticSecret));
         observed.Add(Describe("C2S", CreateAccountCommand));
         observed.Add(Describe("S2C", login.Receive().Command));
 
@@ -118,24 +126,36 @@ internal static class LoginFlow
         observed.Add(Describe("C2S", CreateCharacterCommand));
         observed.Add(Describe("S2C", login.Receive().Command));
 
-        login.SendSecured(LoginCommand, ordinal: 0, Credentials());
+        login.SendSecured(LoginCommand, ordinal: 0, Credentials(name, SyntheticSecret));
         observed.Add(Describe("C2S", LoginCommand));
         observed.Add(Describe("S2C", login.Receive().Command));
 
         PacketFrame gameRedirect = login.Receive();
         observed.Add(Describe("S2C", gameRedirect.Command));
 
-        RedirectTarget gameTarget = Hades718TestClient.ParseRedirect(gameRedirect);
-        RequireIsolatedPort(gameTarget.Port, server.GamePort, "game");
+        RedirectTarget target = Hades718TestClient.ParseRedirect(gameRedirect);
+        RequireIsolatedPort(target.Port, server.GamePort, "game");
 
-        using Hades718TestClient world = Hades718TestClient.Connect(gameTarget.Port);
-        world.SendRedirectRequest(gameTarget);
+        return new GameTicket(target, observed);
+    }
+
+    public static IReadOnlyList<string> EnterWorld(IsolatedHadesServer server)
+    {
+        GameTicket ticket = LoginAndCaptureTicket(server, SyntheticName);
+        List<string> observed = [.. ticket.Observed];
+
+        using Hades718TestClient world = Hades718TestClient.Connect(ticket.Target.Port);
+        world.SendRedirectRequest(ticket.Target);
         observed.Add(Describe("C2S", RedirectRequestCommand));
 
-        WaitForLog(server, $"{SyntheticName} : Welcome to Lorule", TimeSpan.FromSeconds(30));
+        WaitForLog(server, WelcomeMessage(SyntheticName), TimeSpan.FromSeconds(30));
 
         return observed;
     }
+
+    /// <summary>The only line the server logs on a successful world entry.</summary>
+    public static string WelcomeMessage(string name) =>
+        $"{name} : {ServerWelcome}";
 
     private static string Describe(string direction, byte command) => $"{direction} 0x{command:X2}";
 
@@ -165,7 +185,7 @@ internal static class LoginFlow
             actual == expected,
             $"The {stage} redirect pointed at port {actual}, outside the isolated run (expected {expected}).");
 
-    private static void WaitForLog(IsolatedHadesServer server, string expected, TimeSpan timeout)
+    public static void WaitForLog(IsolatedHadesServer server, string expected, TimeSpan timeout)
     {
         DateTime deadline = DateTime.UtcNow + timeout;
 
