@@ -26,14 +26,18 @@ public sealed class IsolatedHadesServer : IDisposable
     private bool _loginOnline;
     private bool _gameOnline;
 
-    private IsolatedHadesServer(string runRoot, int loginPort, int gamePort)
+    private IsolatedHadesServer(string runRoot, string contentLocation, int loginPort, int gamePort)
     {
         RunRoot = runRoot;
+        ContentLocation = contentLocation;
         LoginPort = loginPort;
         GamePort = gamePort;
     }
 
     public string RunRoot { get; }
+
+    /// <summary>The copied server data the run writes into, including its character directory.</summary>
+    public string ContentLocation { get; }
 
     public int LoginPort { get; }
 
@@ -54,7 +58,7 @@ public sealed class IsolatedHadesServer : IDisposable
         WriteIsolatedConfig(runRoot, contentLocation, loginPort, gamePort);
         WriteIsolatedRedirectTable(runRoot, loginPort);
 
-        return new IsolatedHadesServer(runRoot, loginPort, gamePort);
+        return new IsolatedHadesServer(runRoot, contentLocation, loginPort, gamePort);
     }
 
     /// <summary>Launches the copied server and waits until both listeners report themselves online.</summary>

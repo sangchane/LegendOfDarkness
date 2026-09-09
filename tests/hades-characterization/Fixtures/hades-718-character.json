@@ -1,0 +1,15 @@
+{
+  "description": "Stable fields of a freshly created 7.18 character right after its first world entry. Only fields that must not drift are listed; serials, timestamps and session state are deliberately absent.",
+  "stableFields": {
+    "Username": "lodharness",
+    "CurrentMapId": 1,
+    "X": 4,
+    "Y": 4,
+    "GameMaster": false
+  },
+  "volatileFields": {
+    "Created": "account creation timestamp",
+    "LastLogged": "login timestamp",
+    "SkillBook": "the skill granted by GiveAssailOnCreate carries a randomly generated ID; every other field of the book is identical between runs"
+  }
+}
