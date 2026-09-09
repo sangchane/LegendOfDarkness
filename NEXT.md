@@ -1,8 +1,9 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[검토 대기/UI]** 모바일 게임 UX 실무 참고 자료를 반영해 개정한 `docs/mobile-test-v1-wireframes.md` v0.2를 검토한다. 3개 기본 프레임+3개 HUD 변형, full-bleed/safe-area, 마지막 4개 결정 사항을 승인하기 전 UI greybox 구현 금지
-- **[다음/승인 후]** Hades 7.18 로그인 프로토콜 계약과 격리 테스트 fixture를 만든다. 구현 범위는 PRD와 승인된 와이어프레임을 넘기지 않는다
+- **[지금/P0-00]** `docs/hades-p0-stabilization-plan.md`에 따라 원본 Hades를 수정하지 않는 격리 harness와 7.18 로그인→맵 입장 golden fixture를 TDD로 만든다. 실제 계정·비밀번호와 실행 중 서버 데이터는 사용하지 않는다
+- **[다음/P0-10]** S0 gate가 통과하면 Hades fork에서 패킷 검증·예외 격리부터 작은 Graphite stack으로 수정한다. 실제 모바일 클라이언트 연결은 S1 전체 gate 전까지 금지한다
+- **[대기/UI·Mac]** UI greybox는 와이어프레임 마지막 4개 결정을 승인한 뒤 진행한다. iOS export·서명·실기기 검증은 같은 커밋을 Mac에서 여는 후속 gate로 유지한다
 - **[대기/Mac]** 같은 커밋을 Mac에서 Godot 4.6 .NET + .NET 9로 열어 macOS 실행 후 Xcode export·arm64 iPhone 실기기 설치를 확인한다. iOS C# 지원은 experimental이며 서명 Team ID와 기준 iPhone/OS는 그때 지정한다
 <!-- NEXT-ACTION:END -->
 

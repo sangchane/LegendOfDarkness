@@ -4,11 +4,12 @@
 긴 로그는 붙이지 말고 결과만 요약한다.
 
 ## Current State
-- Status: review
-- Focus: 모바일 첫 테스트 6개 UI 상태·구조 와이어프레임 검토 대기. 승인 전 UI 구현 금지
+- Status: planned
+- Focus: Hades P0 안정화 S0 특성화 기준선. 실제 모바일 연동은 S1 gate 이후
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-09 — `docs/hades-p0-stabilization-plan.md`로 Hades 안정화 순서와 회귀 테스트 경계를 확정. 전면 리팩터링·DB 교체·추측성 성능 최적화는 선행하지 않고, S0 정상 7.18 특성화 → S1 네트워크·입장 인증·연결·송신·원자적 저장·기본 전투 안전선 → S2 비밀번호·남용 방지·정상 종료·지원 LTS·10인 soak 순서로 진행한다. fixture 기반 Godot 작업은 S0 뒤, 실제 Hades 연동은 S1 뒤, 5~10인 비공개 테스트는 S2 뒤로 gate를 분리했다. 기존 미커밋 모바일 테스트 골격과 원본 submodule은 변경하지 않음
 - 2026-09-09 — GDC의 게임 UX 실무 모델과 Apple·Android·Godot 공식 가이드를 참고해 `docs/mobile-test-v1-wireframes.md` v0.2로 개정. 독립 화면 6장이 아니라 로그인·캐릭터 확인·게임 월드의 **3개 기본 프레임 + 대화·전투·인벤토리 3개 변형 상태**로 관리하고, 흐름 지도→box wire→상태 시트→실제 게임 화면 위 in-engine greybox→visual skin 단계로 분리했다. 초광폭 일괄 레터박스 대신 full-bleed 월드와 safe-area anchor, 정량 양손 도달성 검증을 사용하도록 PRD AC-014도 v0.5로 조정. 이번 변경은 조사·문서뿐이며 greybox 구현은 승인 후로 남김
 - 2026-09-09 — PRD v0.4를 기준으로 `docs/mobile-test-v1-wireframes.md` 작성. 로그인·단일 캐릭터 확인·기본 게임 HUD·NPC 대화 모달·전투 상태·읽기 중심 인벤토리만 포함하고, Mermaid 흐름도와 가로 구조 와이어프레임·전환 조건·48×48 터치 영역·글자 크기·16:9~20:9 대응·21:9 이상 레터박스·노치/홈 표시 안전 영역·접근성 초점 규칙을 정의. 색상·장식·구현은 제외하고 검토 대기로 전환
 - 2026-09-09 — **D-001 Windows/Android 기준 채택: Godot 4.6 + C#**. `experiments/godot-csharp-mobile-smoke/`의 RED 계약 커밋 뒤 구현했으며, Godot 4.6 Mono + .NET SDK 9.0.317에서 계약 검사, C# restore/build(경고·오류 0), Windows headless 실행을 통과했다. Android API 35 APK(ARM64+x86_64, minSdk 24, targetSdk 35)를 export하고 v2/v3 서명을 검증했으며, Android 15 x86_64 에뮬레이터에서 설치·최상위 실행·`MOBILE_SMOKE_OK | Godot C# | Android | .NET 9.0.19` 로그와 실제 가로 화면 렌더링을 확인했다. 최종 iOS 적합성은 Mac gate에서 확정한다

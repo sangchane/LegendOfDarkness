@@ -1,10 +1,10 @@
 # PRD — 모바일 전환 첫 테스트 버전
 
-- 문서 버전: 0.5 (모바일 게임 full-bleed·safe-area 와이어프레임 기준 반영)
-- 상태: 구현 전 검토안
+- 문서 버전: 0.6 (Hades P0 안정화 gate 반영)
+- 상태: 요구사항 확정, 실제 서버 연동은 S1 gate 대기
 - 기준일: 2026-09-08
 - 기준선: Hades/Lorule C# 서버 + 기존 JSON/MAP/스크립트 + 신규 모바일 클라이언트
-- 선행 문서: [모바일 전환 기술 검토서](mobile-conversion-review.md), [현행 프로젝트 분석서](current-system-analysis/README.md)
+- 선행 문서: [모바일 전환 기술 검토서](mobile-conversion-review.md), [현행 프로젝트 분석서](current-system-analysis/README.md), [Hades P0 안정화 계획 및 회귀 테스트 경계](hades-p0-stabilization-plan.md)
 - 후속 설계: [화면 흐름 및 구조 와이어프레임](mobile-test-v1-wireframes.md)
 - 범위 원칙: 이 문서는 요구사항만 정의한다. 구현·서버 실행·데이터 수정은 하지 않는다.
 
@@ -15,6 +15,13 @@
 - **결정 필요**: 구현 전에 사용자가 확정해야 한다.
 
 ## 0. 테스트 버전 정의
+
+### 0.1 구현 선행 gate
+
+- S0 특성화 기준선 통과 후에는 실제 Hades 대신 golden fixture와 격리 transport를 사용하는 프로토콜·화면 작업을 진행할 수 있다.
+- 네트워크, 입장 인증, 연결·송신, 저장, 기본 전투를 포함한 S1 gate 통과 전에는 모바일 클라이언트를 실제 Hades 서버에 연결하지 않는다.
+- 비밀번호 저장과 로그인 남용 방지, 정상 종료, 지원 LTS, 10인 soak를 포함한 S2 gate 통과 전에는 지인 5~10명에게 배포하지 않는다.
+- UI greybox는 위 서버 gate와 별개로 `mobile-test-v1-wireframes.md`의 마지막 4개 결정 사항 승인 후에만 시작한다.
 
 첫 테스트 버전은 아래 한 줄 흐름이 실제 모바일 기기에서 끝까지 이어지는지만 검증한다.
 

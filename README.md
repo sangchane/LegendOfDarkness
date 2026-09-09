@@ -28,3 +28,8 @@ git submodule update --init --recursive
 ## 분석 문서
 
 [현행 프로젝트 분석서](docs/current-system-analysis/README.md)
+
+## 실행 계획
+
+- [모바일 첫 테스트 버전 PRD](docs/mobile-test-v1-prd.md)
+- [Hades P0 안정화 계획 및 회귀 테스트 경계](docs/hades-p0-stabilization-plan.md)
