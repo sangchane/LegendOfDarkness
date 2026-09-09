@@ -30,4 +30,18 @@ public static class Greybox
 
     /// <summary>Filled portion of a bar. Always paired with numbers, never read by shade alone.</summary>
     public static StyleBoxFlat Fill() => new() { BgColor = BarFill };
+
+    /// <summary>
+    /// Marks a zone the layout has to respect. A greybox guide, not part of the game: it goes away once the
+    /// rule it shows has been checked on a device.
+    /// </summary>
+    public static StyleBoxFlat Outline() => new()
+    {
+        BgColor = new Color(0, 0, 0, 0),
+        BorderColor = new Color(0.38f, 0.38f, 0.42f, 0.55f),
+        BorderWidthLeft = 1,
+        BorderWidthTop = 1,
+        BorderWidthRight = 1,
+        BorderWidthBottom = 1
+    };
 }

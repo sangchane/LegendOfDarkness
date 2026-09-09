@@ -11,7 +11,9 @@ public partial class LoginScreen : Control
     private const int TitleFontSize = 22;
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
+    private const int CaptionWidth = 72;
 
+    private MarginContainer _safeArea = null!;
     private Label _status = null!;
     private LineEdit _username = null!;
     private LineEdit _password = null!;
@@ -28,12 +30,18 @@ public partial class LoginScreen : Control
 
     public override void _Ready()
     {
-        MarginContainer safeArea = Main.SafeAreaContainer();
-        AddChild(safeArea);
+        _safeArea = Main.SafeAreaContainer();
+        AddChild(_safeArea);
 
-        safeArea.AddChild(BuildStatusRow());
-        safeArea.AddChild(BuildForm());
-        safeArea.AddChild(BuildVersionLine());
+        // One child per container: a MarginContainer gives every child its whole rect, so three siblings
+        // would sit on top of one another instead of at the top, middle and bottom.
+        VBoxContainer rows = new();
+        rows.AddThemeConstantOverride("separation", Main.Gutter);
+        _safeArea.AddChild(rows);
+
+        rows.AddChild(BuildStatusRow());
+        rows.AddChild(BuildForm());
+        rows.AddChild(BuildVersionLine());
 
         RefreshSubmitState();
     }
@@ -41,12 +49,7 @@ public partial class LoginScreen : Control
     /// <summary>Environment on the left, server reachability on the right, both along the top edge.</summary>
     private static Control BuildStatusRow()
     {
-        HBoxContainer row = new()
-        {
-            Name = "StatusRow",
-            AnchorRight = 1,
-            GrowHorizontal = GrowDirection.Both
-        };
+        HBoxContainer row = new() { Name = "StatusRow" };
 
         row.AddChild(Aux("테스트 환경 · 로컬"));
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
@@ -60,10 +63,7 @@ public partial class LoginScreen : Control
         CenterContainer center = new()
         {
             Name = "FormCenter",
-            AnchorRight = 1,
-            AnchorBottom = 1,
-            GrowHorizontal = GrowDirection.Both,
-            GrowVertical = GrowDirection.Both
+            SizeFlagsVertical = SizeFlags.ExpandFill
         };
 
         PanelContainer panel = new() { CustomMinimumSize = new Vector2(FormWidth, 0) };
@@ -101,11 +101,11 @@ public partial class LoginScreen : Control
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
 
+        // Captions sit beside their fields rather than above them: in landscape the form has little height
+        // to spare, and stacked captions pushed it into the space the on-screen keyboard takes.
         form.AddChild(title);
-        form.AddChild(Aux("사용자명"));
-        form.AddChild(_username);
-        form.AddChild(Aux("비밀번호"));
-        form.AddChild(_password);
+        form.AddChild(FieldRow("사용자명", _username));
+        form.AddChild(FieldRow("비밀번호", _password));
         form.AddChild(_status);
         form.AddChild(_submit);
 
@@ -119,6 +119,23 @@ public partial class LoginScreen : Control
         return center;
     }
 
+    private static Control FieldRow(string caption, LineEdit field)
+    {
+        HBoxContainer row = new();
+        row.AddThemeConstantOverride("separation", Main.Gutter);
+
+        Label caption_label = Aux(caption);
+        caption_label.CustomMinimumSize = new Vector2(CaptionWidth, 0);
+        caption_label.VerticalAlignment = VerticalAlignment.Center;
+
+        field.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+        row.AddChild(caption_label);
+        row.AddChild(field);
+
+        return row;
+    }
+
     private static LineEdit Field(bool secret) => new()
     {
         Secret = secret,
@@ -128,19 +145,7 @@ public partial class LoginScreen : Control
     /// <summary>Client version and the font actually in use, which is what tells us Korean will render.</summary>
     private Control BuildVersionLine()
     {
-        VBoxContainer bottom = new()
-        {
-            Name = "VersionLine",
-            AnchorTop = 1,
-            AnchorRight = 1,
-            AnchorBottom = 1,
-            GrowHorizontal = GrowDirection.End,
-            GrowVertical = GrowDirection.Begin
-        };
-
-        bottom.AddChild(Aux($"클라이언트 0.1 greybox · 글꼴 {Main.FontName}"));
-
-        return bottom;
+        return Aux($"클라이언트 0.1 greybox · 글꼴 {Main.FontName}");
     }
 
     private static Label Aux(string text)
@@ -150,6 +155,22 @@ public partial class LoginScreen : Control
         label.AddThemeColorOverride("font_color", Greybox.Muted);
 
         return label;
+    }
+
+    /// <summary>
+    /// Keeps the field being typed into and the login button above the on-screen keyboard, which the
+    /// wireframes require. Shrinking the area the form centres in lifts it by exactly what the keyboard takes.
+    /// </summary>
+    public override void _Process(double delta)
+    {
+        int keyboard = DisplayServer.VirtualKeyboardGetHeight();
+        Vector2I screen = DisplayServer.ScreenGetSize();
+
+        int lift = keyboard > 0 && screen.Y > 0
+            ? Mathf.RoundToInt(keyboard / (float)screen.Y * GetViewportRect().Size.Y)
+            : 0;
+
+        _safeArea.AddThemeConstantOverride("margin_bottom", Main.SafeInsets.Bottom + lift);
     }
 
     /// <summary>No request goes out until both fields carry something, per the wireframe transition rules.</summary>
