@@ -10,6 +10,8 @@ namespace Lod.Hades.Characterization.Tests;
 public sealed class LoginFlowCharacterizationTests
 {
     private const byte ClientVersionCommand = 0x00;
+    private const byte EncryptionReceivedCommand = 0x57;
+    private const byte RedirectRequestCommand = 0x10;
 
     // ClientFormat00: version 718 as a big-endian ushort, then the two bytes the 7.18 client always sends.
     private static readonly byte[] ClientVersionPayload = [0x02, 0xCE, 0x4C, 0x4B];
@@ -27,7 +29,23 @@ public sealed class LoginFlowCharacterizationTests
         observed.Add(Describe("S2C", client.Receive().Command));
         client.Send(ClientVersionCommand, ClientVersionPayload);
         observed.Add(Describe("C2S", ClientVersionCommand));
-        observed.Add(Describe("S2C", client.Receive().Command));
+        PacketFrame parameters = client.Receive();
+        observed.Add(Describe("S2C", parameters.Command));
+
+        client.UseEncryption(parameters);
+        client.SendSecured(EncryptionReceivedCommand, ordinal: 0, 0x00);
+        observed.Add(Describe("C2S", EncryptionReceivedCommand));
+        PacketFrame lobbyRedirect = client.Receive();
+        observed.Add(Describe("S2C", lobbyRedirect.Command));
+
+        RedirectTarget target = Hades718TestClient.ParseRedirect(lobbyRedirect);
+        using Hades718TestClient redirected = Hades718TestClient.Connect(target.Port);
+
+        observed.Add(Describe("S2C", redirected.Receive().Command));
+
+        redirected.SendRedirectRequest(target);
+        observed.Add(Describe("C2S", RedirectRequestCommand));
+        observed.Add(Describe("S2C", redirected.Receive().Command));
 
         Assert.Equal(LoadRecordedFlow(), observed);
     }

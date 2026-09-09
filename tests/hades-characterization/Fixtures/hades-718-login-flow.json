@@ -1,8 +1,45 @@
 {
   "description": "Command order observed against an isolated Hades 7.18 server. Synthetic input only: no real account, password, or captured session. Per-run values (seed, salt, hashes, serials, ports) are deliberately not frozen here.",
   "steps": [
-    { "direction": "S2C", "command": "0x7E", "note": "handshake banner" },
-    { "direction": "C2S", "command": "0x00", "note": "client version 718" },
-    { "direction": "S2C", "command": "0x00", "note": "server table hash and encryption parameters" }
+    {
+      "direction": "S2C",
+      "command": "0x7E",
+      "note": "handshake banner"
+    },
+    {
+      "direction": "C2S",
+      "command": "0x00",
+      "note": "client version 718"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x00",
+      "note": "server table hash and encryption parameters"
+    },
+    {
+      "direction": "C2S",
+      "command": "0x57",
+      "note": "encryption received, type 0 asks for the server table"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x03",
+      "note": "lobby redirect to the isolated login port"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x7E",
+      "note": "the banner is sent again on the new connection"
+    },
+    {
+      "direction": "C2S",
+      "command": "0x10",
+      "note": "redirect request echoed back"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x60",
+      "note": "notification hash"
+    }
   ]
 }

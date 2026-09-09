@@ -9,6 +9,23 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- The server's own cipher is the oracle; its 9x256 substitution tables must not be retyped here. -->
+    <HadesServerAssembly>$(MSBuildThisFileDirectory)../../sources/wren11/Dark-Ages-Private-Server/Staging/net5.0/Darkages.dll</HadesServerAssembly>
+  </PropertyGroup>
+
+  <Target Name="RequireBuiltHadesServer" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(HadesServerAssembly)')"
+           Text="Build the Hades server first: dotnet build sources/wren11/Dark-Ages-Private-Server/src/Hades.sln -c Debug" />
+  </Target>
+
+  <ItemGroup>
+    <Reference Include="Darkages">
+      <HintPath>$(HadesServerAssembly)</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
   <ItemGroup>
     <None Update="Fixtures/*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

@@ -1,10 +1,18 @@
 using System.Net;
 using System.Net.Sockets;
+using Darkages.Network;
+using Darkages.Security;
 
 namespace Lod.Hades.Characterization;
 
 /// <summary>One framed 7.18 packet: the command byte and everything after it.</summary>
 public sealed record PacketFrame(byte Command, byte[] Payload);
+
+/// <summary>
+/// Where the server tells the client to continue. Name, salt and serial are kept as raw bytes because the
+/// client only echoes them back.
+/// </summary>
+public sealed record RedirectTarget(IPAddress Address, int Port, byte Seed, byte[] Salt, byte[] Name, byte[] Serial);
 
 /// <summary>
 /// Minimal 7.18 wire client used to drive the unmodified server. It only frames packets; anything that
@@ -21,8 +29,16 @@ public sealed class Hades718TestClient : IDisposable
     private const int HeaderLength = 3;
     private const int IoTimeoutMilliseconds = 10_000;
 
+    private const byte ServerParametersCommand = 0x00;
+    private const byte RedirectCommand = 0x03;
+    private const byte RedirectRequestCommand = 0x10;
+
+    // ServerFormat00 payload: type(1) + server table hash(4), then seed, salt length and salt.
+    private const int SeedOffset = 5;
+
     private readonly TcpClient _client;
     private readonly NetworkStream _stream;
+    private SecurityProvider? _encryption;
 
     private Hades718TestClient(TcpClient client)
     {
@@ -77,6 +93,106 @@ public sealed class Hades718TestClient : IDisposable
         _stream.Write(frame);
         _stream.Flush();
     }
+
+    /// <summary>Adopts the seed and salt the server handed out, so later packets use the session cipher.</summary>
+    public void UseEncryption(PacketFrame serverParameters)
+    {
+        if (serverParameters.Command != ServerParametersCommand)
+        {
+            throw new InvalidOperationException(
+                $"Encryption parameters arrive on command 0x{ServerParametersCommand:X2}, " +
+                $"but this frame was 0x{serverParameters.Command:X2}.");
+        }
+
+        byte[] payload = serverParameters.Payload;
+
+        if (payload.Length < SeedOffset + 2)
+        {
+            throw new InvalidOperationException("The encryption parameters packet ended before the seed.");
+        }
+
+        byte seed = payload[SeedOffset];
+        int saltLength = payload[SeedOffset + 1];
+        int saltEnd = SeedOffset + 2 + saltLength;
+
+        if (payload.Length < saltEnd)
+        {
+            throw new InvalidOperationException($"The encryption salt claims {saltLength} bytes but the packet is shorter.");
+        }
+
+        _encryption = new SecurityProvider(new SecurityParameters(seed, payload[(SeedOffset + 2)..saltEnd]));
+    }
+
+    /// <summary>Sends a packet whose body the session cipher covers. The ordinal itself stays in the clear.</summary>
+    public void SendSecured(byte command, byte ordinal, params byte[] payload)
+    {
+        SecurityProvider cipher = _encryption
+            ?? throw new InvalidOperationException("The server has not handed out its parameters yet; call UseEncryption first.");
+
+        byte[] body = [command, ordinal, .. payload];
+        NetworkPacket packet = new(body, body.Length);
+        cipher.Transform(packet);
+
+        Send(command, [ordinal, .. packet.Data]);
+    }
+
+    /// <summary>
+    /// Reads a lobby or game redirect. The address arrives with its bytes reversed, and the port follows in
+    /// network order.
+    /// </summary>
+    public static RedirectTarget ParseRedirect(PacketFrame frame)
+    {
+        if (frame.Command != RedirectCommand)
+        {
+            throw new InvalidOperationException(
+                $"A redirect arrives on command 0x{RedirectCommand:X2}, but this frame was 0x{frame.Command:X2}.");
+        }
+
+        byte[] payload = frame.Payload;
+        int offset = 0;
+
+        byte[] address = Take(payload, ref offset, 4);
+        Array.Reverse(address);
+        int port = (Take(payload, ref offset, 1)[0] << 8) | Take(payload, ref offset, 1)[0];
+        _ = Take(payload, ref offset, 1);
+        byte seed = Take(payload, ref offset, 1)[0];
+        byte[] salt = TakeLengthPrefixed(payload, ref offset);
+        byte[] name = TakeLengthPrefixed(payload, ref offset);
+        byte[] serial = Take(payload, ref offset, 4);
+
+        return new RedirectTarget(new IPAddress(address), port, seed, salt, name, serial);
+    }
+
+    /// <summary>Echoes the redirect back on the new connection, which is what admits the client.</summary>
+    public void SendRedirectRequest(RedirectTarget target)
+    {
+        byte[] payload =
+        [
+            target.Seed,
+            (byte)target.Salt.Length, .. target.Salt,
+            (byte)target.Name.Length, .. target.Name,
+            .. target.Serial
+        ];
+
+        Send(RedirectRequestCommand, payload);
+    }
+
+    private static byte[] Take(byte[] payload, ref int offset, int count)
+    {
+        if (offset + count > payload.Length)
+        {
+            throw new InvalidOperationException(
+                $"The packet ended after {payload.Length} bytes while reading {count} at offset {offset}.");
+        }
+
+        byte[] slice = payload[offset..(offset + count)];
+        offset += count;
+
+        return slice;
+    }
+
+    private static byte[] TakeLengthPrefixed(byte[] payload, ref int offset) =>
+        Take(payload, ref offset, Take(payload, ref offset, 1)[0]);
 
     public void Dispose()
     {
