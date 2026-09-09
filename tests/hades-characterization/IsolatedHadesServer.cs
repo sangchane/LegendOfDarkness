@@ -20,6 +20,9 @@ public sealed class IsolatedHadesServer : IDisposable
     private const string GameOnlineSignal = "Game server is online.";
     private const string RedirectTableFileName = "MServerTable.xml";
 
+    /// <summary>How long the isolated server tolerates a frame that stopped half way.</summary>
+    public const int IncompleteFrameTimeoutSeconds = 3;
+
     private readonly StringBuilder _console = new();
     private readonly ManualResetEventSlim _ready = new();
     private Process? _process;
@@ -206,6 +209,8 @@ public sealed class IsolatedHadesServer : IDisposable
         config["Content"]!["Location"] = contentLocation;
         config["Editor"]!["Location"] = Path.Combine(runRoot, "database");
         config["Editor"]!["GameLocation"] = Path.Combine(runRoot, "game");
+        // Short so the suite does not sit through the production default while proving the sweep runs.
+        config["ServerConfig"]!["IncompleteFrameTimeoutSeconds"] = IncompleteFrameTimeoutSeconds;
         config["ServerConfig"]!["LOGIN_PORT"] = loginPort;
         config["ServerConfig"]!["SERVER_PORT"] = gamePort;
 
