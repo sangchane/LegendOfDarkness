@@ -24,7 +24,7 @@
 	url = https://github.com/FallenDev/Decipher.git
 [submodule "sources/wren11/Dark-Ages-Private-Server"]
 	path = sources/wren11/Dark-Ages-Private-Server
-	url = https://github.com/wren11/Dark-Ages-Private-Server.git
+	url = https://github.com/kimsangchan/Dark-Ages-Private-Server.git
 [submodule "sources/wren11/bmp2epf"]
 	path = sources/wren11/bmp2epf
 	url = https://github.com/wren11/bmp2epf.git

@@ -109,12 +109,16 @@ public sealed class IsolatedHadesServerTests
     [Fact]
     public void Running_the_server_leaves_the_read_only_sources_untouched()
     {
+        // Compared before and after rather than against a clean tree: from S1 on, the fork legitimately
+        // carries work in progress. What must never change is that a run adds nothing of its own.
+        string before = GitStatus(HadesWorkspace.HadesRoot);
+
         using (IsolatedHadesServer server = IsolatedHadesServer.Prepare())
         {
             server.Start(TimeSpan.FromMinutes(2));
         }
 
-        Assert.Empty(GitStatus(HadesWorkspace.HadesRoot));
+        Assert.Equal(before, GitStatus(HadesWorkspace.HadesRoot));
         Assert.Empty(Directory.EnumerateFileSystemEntries(
             Path.Combine(HadesWorkspace.ServerDataDirectory, "aislings")));
     }

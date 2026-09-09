@@ -194,6 +194,13 @@ public sealed class Hades718TestClient : IDisposable
     private static byte[] TakeLengthPrefixed(byte[] payload, ref int offset) =>
         Take(payload, ref offset, Take(payload, ref offset, 1)[0]);
 
+    /// <summary>Writes bytes exactly as given, so tests can send frames the codec would never build.</summary>
+    public void SendRaw(params byte[] bytes)
+    {
+        _stream.Write(bytes);
+        _stream.Flush();
+    }
+
     public void Dispose()
     {
         _stream.Dispose();

@@ -116,6 +116,10 @@ P0-02 완료 — 갓 생성된 캐릭터의 최소 상태를 `Fixtures/hades-718
 | P0-16 | 기본 전투 정확성 | P0-10 | 공격 간격 경계가 결정적으로 동작하고 잘못된 cast가 갱신 루프를 막지 않음 |
 | P0-17 | 하드코딩 상수 설정화 | P0-10 | 2.3 표의 값이 설정 키로 분리되고 환경변수로 덮어써지며, harness가 객체 서버 포트까지 격리해 병렬 실행됨 |
 
+**진행 상황 (2026-09-09):** fork `kimsangchan/Dark-Ages-Private-Server`를 만들고 `upstream`/`origin`을 나눴다. root의 `.gitmodules`도 fork를 가리킨다.
+
+P0-10 일부 완료 — `fix/hades-network-boundary`. 악성 프레임 5종(잘못된 magic, 길이 0, 잘린 본문, 과대 길이, 미등록 명령)이 **서버 프로세스를 통째로 죽이던** 결함을 고쳤다. 원인은 `ServerContext.Error`가 한 번도 할당되지 않는데 모든 소켓 콜백의 catch 블록이 그것만 호출해, 수신 경로의 예외가 IO 완료 스레드에서 `NullReferenceException`으로 번져 unhandled로 끝나는 것이었다. 오류 sink에 스스로 던지지 않는 기본 구현을 줬다. 남은 것: 악성 프레임을 보낸 **연결 자체의 정리**(현재는 서비스가 멈출 뿐 socket이 닫히지 않는다. P0-13과 겹친다).
+
 **S1 gate:** 아래 5장의 필수 suite가 모두 통과하고, 변경 코드의 line/branch/method coverage가 각각 80% 이상이며 인증·경로·저장 손상 경계의 branch coverage는 100%이고 skip된 필수 테스트가 없다. 원본 7.18 클라이언트의 로그인→redirect→맵 입장이 10회 연속 성공해야 한다. 이 gate 뒤에만 Godot 클라이언트를 실제 Hades에 연결한다.
 
 ### S2 — 5~10인 비공개 테스트 안전선
