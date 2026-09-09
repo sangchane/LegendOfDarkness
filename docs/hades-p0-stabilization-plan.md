@@ -95,7 +95,7 @@ Godot 화면은 fixture를 사용하는 격리 작업이라면 S0 이후 진행�
 
 **진행 상황 (2026-09-09):** P0-00 완료 — `tests/hades-characterization/`(net8.0, xunit)의 `IsolatedHadesServer`가 빌드 산출물과 `database/server`를 임시 경로로 복사하고, 비어 있는 `aislings`와 사용 중이 아닌 포트를 배정한 뒤 서버를 띄우고 종료 시 지운다. 격리를 일부러 깨면 원본 무변경 테스트가 실제로 실패하는 것까지 확인했다. 하드코딩된 2620 때문에 harness는 한 번에 한 대만 띄울 수 있어, 다른 Hades가 떠 있으면 `Start`가 즉시 실패하고 스위트도 직렬로 실행한다(전체 11개, 약 1분).
 
-P0-01은 진행 중이다. 평문 구간 `S2C 0x7E → C2S 0x00 → S2C 0x00`을 `Fixtures/hades-718-login-flow.json`에 명령 순서만으로 고정했고, 암호화 구간(0x57 / 0x02 / 0x04 / 0x03)과 게임 포트 리다이렉트 뒤 0x10 입장이 남았다. 암호화는 서버의 `SecurityProvider`를 정본으로 재사용한다.
+P0-01 완료 — 합성 계정으로 로그인부터 월드 입장까지 완주하고, 16단계 명령 순서를 `Fixtures/hades-718-login-flow.json`에 고정했다. 성공 판정은 서버 로그의 `<이름> : Welcome to Lorule`이다. seed·salt·해시·serial처럼 실행마다 달라지는 값은 고정하지 않았고 실제 계정·비밀번호는 쓰지 않는다. 암호화는 재작성 대신 서버의 `SecurityProvider`를 참조해 정본으로 쓴다. 기록 과정에서 예상과 달랐던 동작 하나를 확인했다 — 리다이렉트 후 새 연결마다 handshake 배너(0x7E)가 다시 온다.
 
 **S0 gate:** 격리 테스트가 원본 기준선에서 재현되며 fixture, 로그, 테스트 결과에 실제 계정이나 비밀번호가 없다.
 

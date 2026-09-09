@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Xunit;
 
@@ -12,6 +13,14 @@ public sealed class LoginFlowCharacterizationTests
     private const byte ClientVersionCommand = 0x00;
     private const byte EncryptionReceivedCommand = 0x57;
     private const byte RedirectRequestCommand = 0x10;
+    private const byte CreateAccountCommand = 0x02;
+    private const byte CreateCharacterCommand = 0x04;
+    private const byte LoginCommand = 0x03;
+
+    // Synthetic throwaway credentials. The isolated run starts with an empty character directory, so these
+    // never collide with anything real and never leave this repository.
+    private const string SyntheticName = "lodharness";
+    private const string SyntheticSecret = "not-a-real-secret";
 
     // ClientFormat00: version 718 as a big-endian ushort, then the two bytes the 7.18 client always sends.
     private static readonly byte[] ClientVersionPayload = [0x02, 0xCE, 0x4C, 0x4B];
@@ -47,7 +56,55 @@ public sealed class LoginFlowCharacterizationTests
         observed.Add(Describe("C2S", RedirectRequestCommand));
         observed.Add(Describe("S2C", redirected.Receive().Command));
 
+        redirected.UseEncryption(parameters);
+
+        redirected.SendSecured(CreateAccountCommand, ordinal: 0, Credentials());
+        observed.Add(Describe("C2S", CreateAccountCommand));
+        observed.Add(Describe("S2C", redirected.Receive().Command));
+
+        redirected.SendSecured(CreateCharacterCommand, ordinal: 0, 0x01, 0x01, 0x01);
+        observed.Add(Describe("C2S", CreateCharacterCommand));
+        observed.Add(Describe("S2C", redirected.Receive().Command));
+
+        redirected.SendSecured(LoginCommand, ordinal: 0, Credentials());
+        observed.Add(Describe("C2S", LoginCommand));
+        observed.Add(Describe("S2C", redirected.Receive().Command));
+
+        PacketFrame gameRedirect = redirected.Receive();
+        observed.Add(Describe("S2C", gameRedirect.Command));
+
+        RedirectTarget game = Hades718TestClient.ParseRedirect(gameRedirect);
+        using Hades718TestClient world = Hades718TestClient.Connect(game.Port);
+        world.SendRedirectRequest(game);
+        observed.Add(Describe("C2S", RedirectRequestCommand));
+
         Assert.Equal(LoadRecordedFlow(), observed);
+        Assert.Equal(server.GamePort, game.Port);
+        WaitForLog(server, $"{SyntheticName} : Welcome to Lorule", TimeSpan.FromSeconds(30));
+    }
+
+    private static byte[] Credentials() => [.. LengthPrefixed(SyntheticName), .. LengthPrefixed(SyntheticSecret)];
+
+    // Synthetic names are ASCII. Korean names travel as CP949 and are covered by the unit-test boundary
+    // in the stabilization plan, not here.
+    private static byte[] LengthPrefixed(string value) => [(byte)value.Length, .. Encoding.ASCII.GetBytes(value)];
+
+    private static void WaitForLog(IsolatedHadesServer server, string expected, TimeSpan timeout)
+    {
+        DateTime deadline = DateTime.UtcNow + timeout;
+
+        while (DateTime.UtcNow < deadline)
+        {
+            if (server.ConsoleOutput.Contains(expected, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            Thread.Sleep(100);
+        }
+
+        throw new InvalidOperationException(
+            $"The server never logged '{expected}' within {timeout}.{Environment.NewLine}{server.ConsoleOutput}");
     }
 
     private static string Describe(string direction, byte command) => $"{direction} 0x{command:X2}";

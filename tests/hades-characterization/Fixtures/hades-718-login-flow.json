@@ -40,6 +40,46 @@
       "direction": "S2C",
       "command": "0x60",
       "note": "notification hash"
+    },
+    {
+      "direction": "C2S",
+      "command": "0x02",
+      "note": "create account with a synthetic name"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x02",
+      "note": "message box: the name is free"
+    },
+    {
+      "direction": "C2S",
+      "command": "0x04",
+      "note": "create character appearance"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x02",
+      "note": "message box: character saved"
+    },
+    {
+      "direction": "C2S",
+      "command": "0x03",
+      "note": "login"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x02",
+      "note": "message box"
+    },
+    {
+      "direction": "S2C",
+      "command": "0x03",
+      "note": "redirect to the isolated game port"
+    },
+    {
+      "direction": "C2S",
+      "command": "0x10",
+      "note": "redirect request on the game port: enters the world"
     }
   ]
 }
