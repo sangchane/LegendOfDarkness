@@ -12,6 +12,8 @@ public static class Greybox
 
     private static readonly Color SurfaceFill = new(0.16f, 0.16f, 0.18f);
     private static readonly Color SurfaceEdge = new(0.30f, 0.30f, 0.33f);
+    private static readonly Color WorldFill = new(0.11f, 0.11f, 0.12f);
+    private static readonly Color BarFill = new(0.55f, 0.55f, 0.58f);
 
     public static StyleBoxFlat Surface() => new()
     {
@@ -22,4 +24,10 @@ public static class Greybox
         BorderWidthRight = 1,
         BorderWidthBottom = 1
     };
+
+    /// <summary>The play area behind the HUD. Flat on purpose: the map is not this stage's question.</summary>
+    public static StyleBoxFlat World() => new() { BgColor = WorldFill };
+
+    /// <summary>Filled portion of a bar. Always paired with numbers, never read by shade alone.</summary>
+    public static StyleBoxFlat Fill() => new() { BgColor = BarFill };
 }

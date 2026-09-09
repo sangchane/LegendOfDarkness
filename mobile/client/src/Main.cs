@@ -3,7 +3,7 @@ using Godot;
 namespace LodClient;
 
 /// <summary>
-/// Greybox host. Applies the one theme every screen shares, keeps content inside the safe area, and mounts
+/// Greybox host. Applies the one theme every screen shares, works out the safe-area insets once, and mounts
 /// the screen under test. No colour or art here: greybox judges layout, reach and text, nothing else.
 /// </summary>
 public partial class Main : Control
@@ -14,18 +14,39 @@ public partial class Main : Control
     /// <summary>Smallest gap between controls, and the least distance kept from the safe-area edge.</summary>
     public const int Gutter = 8;
 
+    /// <summary>
+    /// Widest the two thumb clusters may sit apart. Past this the world keeps growing but the controls stay
+    /// where a thumb can still reach them, which is the rule for 20:9 and wider screens.
+    /// </summary>
+    public const int ThumbSpanMaximum = 680;
+
     private const int BodyFontSize = 16;
 
     // Windows ships a Korean face; Android and iOS do not have this path. Until a licensed font is bundled,
     // a missing face is reported on screen rather than left to render as empty boxes.
     private const string WindowsKoreanFont = "C:/Windows/Fonts/malgun.ttf";
 
+    /// <summary>Insets that keep text and controls clear of notches and the home indicator.</summary>
+    public static (int Left, int Top, int Right, int Bottom) SafeInsets { get; private set; } =
+        (Gutter, Gutter, Gutter, Gutter);
+
+    /// <summary>The font actually in use. Printed on screen, because Hangul depends on it.</summary>
+    public static string FontName { get; private set; } = "확인 전";
+
     public override void _Ready()
     {
-        Theme theme = BuildTheme(out string fontName);
-        Theme = theme;
+        Theme = BuildTheme();
+        SafeInsets = ComputeSafeInsets(GetViewportRect().Size);
 
-        MarginContainer safeArea = new()
+        AddChild(ScreenFromCommandLine() == "game" ? new GameScreen() : new LoginScreen());
+
+        Screenshot.CaptureIfRequested(this);
+    }
+
+    /// <summary>A container whose padding keeps its contents inside the safe area.</summary>
+    public static MarginContainer SafeAreaContainer()
+    {
+        MarginContainer container = new()
         {
             Name = "SafeArea",
             AnchorRight = 1,
@@ -34,15 +55,30 @@ public partial class Main : Control
             GrowVertical = GrowDirection.Both
         };
 
-        AddChild(safeArea);
-        ApplySafeAreaInsets(safeArea, GetViewportRect().Size);
+        container.AddThemeConstantOverride("margin_left", SafeInsets.Left);
+        container.AddThemeConstantOverride("margin_top", SafeInsets.Top);
+        container.AddThemeConstantOverride("margin_right", SafeInsets.Right);
+        container.AddThemeConstantOverride("margin_bottom", SafeInsets.Bottom);
 
-        safeArea.AddChild(new LoginScreen(fontName));
-
-        Screenshot.CaptureIfRequested(this);
+        return container;
     }
 
-    private Theme BuildTheme(out string fontName)
+    private static string ScreenFromCommandLine()
+    {
+        string[] args = OS.GetCmdlineUserArgs();
+
+        for (int index = 0; index < args.Length - 1; index++)
+        {
+            if (args[index] == "--screen")
+            {
+                return args[index + 1];
+            }
+        }
+
+        return "login";
+    }
+
+    private static Theme BuildTheme()
     {
         Theme theme = new() { DefaultFontSize = BodyFontSize };
 
@@ -51,42 +87,31 @@ public partial class Main : Control
             FontFile korean = new();
             korean.LoadDynamicFont(WindowsKoreanFont);
             theme.DefaultFont = korean;
-            fontName = "Malgun Gothic";
+            FontName = "Malgun Gothic";
         }
         else
         {
             // Godot's built-in face has no Hangul, so this is the state where Korean text breaks.
-            fontName = "없음 — 한글이 깨집니다";
+            FontName = "없음 — 한글이 깨집니다";
         }
 
         return theme;
     }
 
-    /// <summary>
-    /// Keeps content clear of notches and the home indicator. On a desktop window the safe area is the whole
-    /// window, so the gutter is what remains.
-    /// </summary>
-    private static void ApplySafeAreaInsets(MarginContainer container, Vector2 viewport)
+    private static (int Left, int Top, int Right, int Bottom) ComputeSafeInsets(Vector2 viewport)
     {
         Vector2I screen = DisplayServer.ScreenGetSize();
         Rect2I safe = DisplayServer.GetDisplaySafeArea();
 
-        int left = Gutter;
-        int top = Gutter;
-        int right = Gutter;
-        int bottom = Gutter;
-
-        if (screen.X > 0 && screen.Y > 0 && safe.Size.X > 0 && safe.Size.Y > 0)
+        if (screen.X <= 0 || screen.Y <= 0 || safe.Size.X <= 0 || safe.Size.Y <= 0)
         {
-            left += Mathf.RoundToInt(safe.Position.X / (float)screen.X * viewport.X);
-            top += Mathf.RoundToInt(safe.Position.Y / (float)screen.Y * viewport.Y);
-            right += Mathf.RoundToInt((screen.X - safe.End.X) / (float)screen.X * viewport.X);
-            bottom += Mathf.RoundToInt((screen.Y - safe.End.Y) / (float)screen.Y * viewport.Y);
+            return (Gutter, Gutter, Gutter, Gutter);
         }
 
-        container.AddThemeConstantOverride("margin_left", left);
-        container.AddThemeConstantOverride("margin_top", top);
-        container.AddThemeConstantOverride("margin_right", right);
-        container.AddThemeConstantOverride("margin_bottom", bottom);
+        return (
+            Gutter + Mathf.RoundToInt(safe.Position.X / (float)screen.X * viewport.X),
+            Gutter + Mathf.RoundToInt(safe.Position.Y / (float)screen.Y * viewport.Y),
+            Gutter + Mathf.RoundToInt((screen.X - safe.End.X) / (float)screen.X * viewport.X),
+            Gutter + Mathf.RoundToInt((screen.Y - safe.End.Y) / (float)screen.Y * viewport.Y));
     }
 }

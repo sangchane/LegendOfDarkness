@@ -12,16 +12,13 @@ public partial class LoginScreen : Control
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
 
-    private readonly string _fontName;
-
     private Label _status = null!;
     private LineEdit _username = null!;
     private LineEdit _password = null!;
     private Button _submit = null!;
 
-    public LoginScreen(string fontName)
+    public LoginScreen()
     {
-        _fontName = fontName;
         Name = "LoginScreen";
         AnchorRight = 1;
         AnchorBottom = 1;
@@ -31,9 +28,12 @@ public partial class LoginScreen : Control
 
     public override void _Ready()
     {
-        AddChild(BuildStatusRow());
-        AddChild(BuildForm());
-        AddChild(BuildVersionLine());
+        MarginContainer safeArea = Main.SafeAreaContainer();
+        AddChild(safeArea);
+
+        safeArea.AddChild(BuildStatusRow());
+        safeArea.AddChild(BuildForm());
+        safeArea.AddChild(BuildVersionLine());
 
         RefreshSubmitState();
     }
@@ -138,7 +138,7 @@ public partial class LoginScreen : Control
             GrowVertical = GrowDirection.Begin
         };
 
-        bottom.AddChild(Aux($"클라이언트 0.1 greybox · 글꼴 {_fontName}"));
+        bottom.AddChild(Aux($"클라이언트 0.1 greybox · 글꼴 {Main.FontName}"));
 
         return bottom;
     }
