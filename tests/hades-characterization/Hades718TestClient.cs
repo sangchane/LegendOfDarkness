@@ -201,6 +201,48 @@ public sealed class Hades718TestClient : IDisposable
         _stream.Flush();
     }
 
+    /// <summary>
+    /// Waits for the server to hang up on this connection. A reset counts as closed; anything the server
+    /// still sends is drained while waiting.
+    /// </summary>
+    public bool WaitForServerToClose(TimeSpan timeout)
+    {
+        int previousTimeout = _stream.ReadTimeout;
+        DateTime deadline = DateTime.UtcNow + timeout;
+        byte[] scratch = new byte[256];
+
+        try
+        {
+            while (DateTime.UtcNow < deadline)
+            {
+                _stream.ReadTimeout = Math.Max(1, (int)(deadline - DateTime.UtcNow).TotalMilliseconds);
+
+                if (_stream.Read(scratch, 0, scratch.Length) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch (IOException error) when (IsReadTimeout(error))
+        {
+            // Quiet, not closed. Treating a timeout as a close would make every caller pass.
+            return false;
+        }
+        catch (IOException)
+        {
+            return true;
+        }
+        finally
+        {
+            _stream.ReadTimeout = previousTimeout;
+        }
+    }
+
+    private static bool IsReadTimeout(IOException error) =>
+        error.InnerException is SocketException { SocketErrorCode: SocketError.TimedOut };
+
     public void Dispose()
     {
         _stream.Dispose();

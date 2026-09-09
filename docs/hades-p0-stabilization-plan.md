@@ -118,7 +118,9 @@ P0-02 완료 — 갓 생성된 캐릭터의 최소 상태를 `Fixtures/hades-718
 
 **진행 상황 (2026-09-09):** fork `kimsangchan/Dark-Ages-Private-Server`를 만들고 `upstream`/`origin`을 나눴다. root의 `.gitmodules`도 fork를 가리킨다.
 
-P0-10 일부 완료 — `fix/hades-network-boundary`. 악성 프레임 5종(잘못된 magic, 길이 0, 잘린 본문, 과대 길이, 미등록 명령)이 **서버 프로세스를 통째로 죽이던** 결함을 고쳤다. 원인은 `ServerContext.Error`가 한 번도 할당되지 않는데 모든 소켓 콜백의 catch 블록이 그것만 호출해, 수신 경로의 예외가 IO 완료 스레드에서 `NullReferenceException`으로 번져 unhandled로 끝나는 것이었다. 오류 sink에 스스로 던지지 않는 기본 구현을 줬다. 남은 것: 악성 프레임을 보낸 **연결 자체의 정리**(현재는 서비스가 멈출 뿐 socket이 닫히지 않는다. P0-13과 겹친다).
+P0-10 완료 — `fix/hades-network-boundary`. 악성 프레임 5종(잘못된 magic, 길이 0, 잘린 본문, 과대 길이, 미등록 명령)이 **서버 프로세스를 통째로 죽이던** 결함을 고쳤다. 원인은 `ServerContext.Error`가 한 번도 할당되지 않는데 모든 소켓 콜백의 catch 블록이 그것만 호출해, 수신 경로의 예외가 IO 완료 스레드에서 `NullReferenceException`으로 번져 unhandled로 끝나는 것이었다. 오류 sink에 스스로 던지지 않는 기본 구현을 줬다. 이어서 프레임 검증도 넣었다 — 수신 경로가 아무 3바이트나 헤더로 받아들여, magic이 틀리거나 길이가 0이거나 수신 버퍼(65534)를 넘는 프레임이 **오지 않을 본문을 기다리며 연결을 영원히 붙잡고** 있었다(과대 길이는 버퍼보다 1바이트 더 읽으려는 문제도 있었다). 모든 읽기가 지나가는 한 곳에서 검증하고 socket error를 보고하게 했으며, 두 수신 콜백이 이미 그 조건에서 연결을 끊으므로 해당 연결만 사라진다.
+
+형태만으로 판정할 수 없는 것은 손대지 않았다 — **잘린 본문은 느린 송신자와 구분되지 않아** handshake 시간 제한이 필요하고(P0-13), 미등록 명령은 구조적으로 멀쩡한 프레임이다.
 
 **S1 gate:** 아래 5장의 필수 suite가 모두 통과하고, 변경 코드의 line/branch/method coverage가 각각 80% 이상이며 인증·경로·저장 손상 경계의 branch coverage는 100%이고 skip된 필수 테스트가 없다. 원본 7.18 클라이언트의 로그인→redirect→맵 입장이 10회 연속 성공해야 한다. 이 gate 뒤에만 Godot 클라이언트를 실제 Hades에 연결한다.
 
