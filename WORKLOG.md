@@ -9,6 +9,7 @@
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-09 — GDC의 게임 UX 실무 모델과 Apple·Android·Godot 공식 가이드를 참고해 `docs/mobile-test-v1-wireframes.md` v0.2로 개정. 독립 화면 6장이 아니라 로그인·캐릭터 확인·게임 월드의 **3개 기본 프레임 + 대화·전투·인벤토리 3개 변형 상태**로 관리하고, 흐름 지도→box wire→상태 시트→실제 게임 화면 위 in-engine greybox→visual skin 단계로 분리했다. 초광폭 일괄 레터박스 대신 full-bleed 월드와 safe-area anchor, 정량 양손 도달성 검증을 사용하도록 PRD AC-014도 v0.5로 조정. 이번 변경은 조사·문서뿐이며 greybox 구현은 승인 후로 남김
 - 2026-09-09 — PRD v0.4를 기준으로 `docs/mobile-test-v1-wireframes.md` 작성. 로그인·단일 캐릭터 확인·기본 게임 HUD·NPC 대화 모달·전투 상태·읽기 중심 인벤토리만 포함하고, Mermaid 흐름도와 가로 구조 와이어프레임·전환 조건·48×48 터치 영역·글자 크기·16:9~20:9 대응·21:9 이상 레터박스·노치/홈 표시 안전 영역·접근성 초점 규칙을 정의. 색상·장식·구현은 제외하고 검토 대기로 전환
 - 2026-09-09 — **D-001 Windows/Android 기준 채택: Godot 4.6 + C#**. `experiments/godot-csharp-mobile-smoke/`의 RED 계약 커밋 뒤 구현했으며, Godot 4.6 Mono + .NET SDK 9.0.317에서 계약 검사, C# restore/build(경고·오류 0), Windows headless 실행을 통과했다. Android API 35 APK(ARM64+x86_64, minSdk 24, targetSdk 35)를 export하고 v2/v3 서명을 검증했으며, Android 15 x86_64 에뮬레이터에서 설치·최상위 실행·`MOBILE_SMOKE_OK | Godot C# | Android | .NET 9.0.19` 로그와 실제 가로 화면 렌더링을 확인했다. 최종 iOS 적합성은 Mac gate에서 확정한다
 - 2026-09-09 — **Mac 인계 가능한 소스 구성 확인**. 공유 대상은 Godot 프로젝트·C# solution·애플리케이션 소스·scene·asset·Android/iOS preset 뼈대다. 검사 대상 애플리케이션 파일에는 Windows 절대 경로와 Windows 전용 API가 없다. 같은 Git 커밋을 macOS의 Godot 4.6 .NET + .NET 9에서 이어서 검증할 수 있다. 다만 iOS C#은 experimental이고 실제 export/서명/arm64 iPhone 설치는 macOS+Xcode가 필요하므로 Mac 후속 gate로 남겼다. `.godot/`, `bin/`, `obj/`, `build/`, 서명 정보는 공유하지 않는다

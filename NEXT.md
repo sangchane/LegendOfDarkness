@@ -1,7 +1,7 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[검토 대기/UI]** `docs/mobile-test-v1-wireframes.md`의 6개 UI 상태·구조 와이어프레임과 마지막 4개 결정 사항을 검토한다. 승인 전 UI 구현 금지
+- **[검토 대기/UI]** 모바일 게임 UX 실무 참고 자료를 반영해 개정한 `docs/mobile-test-v1-wireframes.md` v0.2를 검토한다. 3개 기본 프레임+3개 HUD 변형, full-bleed/safe-area, 마지막 4개 결정 사항을 승인하기 전 UI greybox 구현 금지
 - **[다음/승인 후]** Hades 7.18 로그인 프로토콜 계약과 격리 테스트 fixture를 만든다. 구현 범위는 PRD와 승인된 와이어프레임을 넘기지 않는다
 - **[대기/Mac]** 같은 커밋을 Mac에서 Godot 4.6 .NET + .NET 9로 열어 macOS 실행 후 Xcode export·arm64 iPhone 실기기 설치를 확인한다. iOS C# 지원은 experimental이며 서명 Team ID와 기준 iPhone/OS는 그때 지정한다
 <!-- NEXT-ACTION:END -->
