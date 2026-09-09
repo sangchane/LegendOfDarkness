@@ -36,6 +36,15 @@
 - 구조 개선: `refactor/<topic>` / `refactor(<scope>): ...`
 - 실험: `experiment/<topic>`
 
+## 명령 주의 (이 저장소 특성)
+
+- **루트에서 `git status`를 그냥 쓰지 않는다.** submodule 16개(379MB 클라이언트 포함)를 전부 스캔하느라 매우 느리고, 2026-09-09에는 한 시간 넘게 멈춘 채 `.git/index.lock`을 잡아 모든 git 작업을 막았다.
+  - 평소: `git status --porcelain --ignore-submodules=all`
+  - submodule 오염 확인이 목적이면 그 저장소에서 직접: `git -C sources/<owner>/<repo> status --porcelain`
+- 같은 이유로 `git add -A`·`git diff`도 경로를 지정해서 쓴다.
+- 멈춘 git 프로세스가 `index.lock`을 남겼으면, 그 프로세스를 먼저 끝낸 뒤에만 락 파일을 지운다.
+- 테스트에 쓰는 Hades 서버는 실행 전후로 `powershell -File scripts\stop-hades.ps1` (`docs/run-procedure.md` 2절 A).
+
 ## 완료 기준
 
 - 변경된 저장소의 빌드·테스트·정적 검사가 통과한다.
