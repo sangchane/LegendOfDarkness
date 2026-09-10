@@ -215,6 +215,11 @@ Start-Process $godot -ArgumentList '--path','mobile/client','--','--login','frie
 (`tmp/hades-run/database/server/aislings/`). **클라이언트에 계정 생성 기능이 없어서 파일로 만든 것이다.**
 두 사람이 서로 보이는지 확인하려면 클라이언트를 두 번 띄우면 된다.
 
+**안전 가옥의 말벌도 손으로 만든 것이다.** `tmp/hades-run/database/server/templates/monsters/
+insight_1/safehouse_wasp.json` — 저장소의 `sources/` 에는 없다. `AreaID 1`·(23,27)·HP 30·
+`Drops: ["Shagreen Boots"]` 로, 잡으면 반드시 장화를 떨구게 해 뒀다(전투→드랍을 눈으로 보려고).
+`tmp/` 를 지우면 이 말벌도 사라지므로, 다시 만들려면 이 문단이 근거다.
+
 ---
 
 ## 5. 걸려 넘어졌던 것들

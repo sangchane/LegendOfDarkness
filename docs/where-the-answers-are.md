@@ -143,8 +143,8 @@ dat-extract metafile sources/wren11/Dark-Ages-Private-Server/database/server/met
 ### 드랍이 정해지는 순서
 
 1. `scripts/Creations/monsters.cs:199` — `LootType` 에 `Table` 깃발이 없으면 **표를 아예 안 만든다**.
-2. 같은 파일 `:203` — `Drops` 의 `"random"` 은 **레벨 차 10 이내인 아이템 템플릿 중 하나**를 뽑아 표에 넣는다.
-   이름을 그대로 적으면 그 아이템을 넣는다.
+2. 같은 파일 `:203` — `Drops` 의 값이 `"random"` 이면 **레벨 차 10 이내인 아이템 템플릿 중 하나**를 뽑아 표에 넣는다.
+   **아이템 이름을 그대로 적으면 레벨을 보지 않고** 그 아이템을 넣는다(`:213`).
 3. 죽으면 `Monster.GenerateRewards` → 설정의 `MonsterRewardScript` → `scripts/Formulas/monsterexp.cs`.
 4. `monsterexp.cs:131 GenerateDrops()` — `Table` 이면 `LootDropper.Drop(표, Random.Next(3))`.
    3 은 `LoruleConfig.json` 의 `LootTableStackSize`.
@@ -152,8 +152,14 @@ dat-extract metafile sources/wren11/Dark-Ages-Private-Server/database/server/met
 6. 등급은 `UpgradeTable` 8단계(Common~Forsaken)에서 따로 뽑는다.
 7. `Gold` 깃발이 있으면 `GenerateGold()` 가 돈을 따로 떨군다.
 
-말벌(레벨 1)에 실제로 들어갈 수 있는 아이템은 지금 **산호 귀걸이 하나뿐**이다 —
+`bees.json`(레벨 1, `Drops: ["random"]`)에 들어갈 수 있는 것은 **산호 귀걸이 하나뿐**이다 —
 아이템 템플릿 3개의 `LevelRequired` 가 각각 8 / 31 / 33 이라 10 이내는 8 하나다.
+
+**주의 — 안전 가옥에서 잡는 말벌은 `bees` 가 아니다.** `safehouse wasp` 라는 별도 템플릿이고,
+`tmp/hades-run/database/server/templates/monsters/insight_1/safehouse_wasp.json` **에만 있다**
+(저장소의 `sources/` 에는 없는 손으로 만든 시험용 콘텐츠다). `AreaID 1` · `MaximumHP 30` ·
+`LootType 4`(표만, 돈 없음) · `Drops: ["Shagreen Boots"]` — 이름을 적었으니 레벨 규칙을 타지 않고
+**항상 장화가 후보**다. 잡아 보면 실제로 장화가 떨어진다.
 
 ### 이동과 전투
 
