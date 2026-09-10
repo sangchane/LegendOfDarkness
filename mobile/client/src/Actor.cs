@@ -23,27 +23,45 @@ public sealed partial class Actor : Node2D
     /// <param name="Colours">
     /// What to dye each sheet, one per path. A piece with nothing to dye ignores it.
     /// </param>
+    /// <param name="StrikePaths">
+    /// The same pieces drawn swinging, one for one with <paramref name="Paths" />. A blow is drawn in a
+    /// file of its own rather than further along the walk, so this is a second set of sheets and not a
+    /// range of frames. Empty for anything with no blow of its own to draw.
+    /// </param>
     public sealed record Sheet(
         IReadOnlyList<string> Paths,
         IReadOnlyList<int> Colours,
         int CellWidth,
         int CellHeight,
         float FeetX,
-        float FeetY)
+        float FeetY,
+        IReadOnlyList<string> StrikePaths)
     {
-        public static Sheet Walk(params string[] paths) => Walk(paths, new int[paths.Length]);
+        public static Sheet Walk(params string[] paths) => Walk(paths, new int[paths.Length], []);
 
-        public static Sheet Walk(IReadOnlyList<string> paths, IReadOnlyList<int> colours) =>
-            new(paths, colours, 80, 88, 31.5f, 83f);
+        public static Sheet Walk(
+            IReadOnlyList<string> paths,
+            IReadOnlyList<int> colours,
+            IReadOnlyList<string> striking) =>
+            new(paths, colours, 80, 88, 31.5f, 83f, striking);
 
-        public static Sheet Creature(string path, int size) => new([path], [0], size, size, size / 2f, size);
+        public static Sheet Creature(string path, int size) =>
+            new([path], [0], size, size, size / 2f, size, []);
     }
 
     private readonly List<Sprite2D> _sprites = [];
+    private readonly List<Texture2D> _standing = [];
+    private readonly List<Texture2D> _swinging = [];
     private readonly Sheet _sheet;
+
+    /// <summary>How long one drawing of a swing is held. Two of them make a blow.</summary>
+    private const double SecondsPerStrikeFrame = 0.14;
 
     private Direction _direction = Direction.South;
     private int _step;
+
+    // Where we are in a swing, in seconds, or below zero when not swinging.
+    private double _struck = -1;
 
     public string DisplayName { get; }
 
@@ -61,10 +79,17 @@ public sealed partial class Actor : Node2D
     {
         for (int layer = 0; layer < _sheet.Paths.Count; layer++)
         {
+            Texture2D worn = Palettes.Load(_sheet.Paths[layer], _sheet.Colours[layer]);
+
+            _standing.Add(worn);
+            _swinging.Add(layer < _sheet.StrikePaths.Count
+                ? Palettes.Load(_sheet.StrikePaths[layer], _sheet.Colours[layer])
+                : worn);
+
             Sprite2D piece = new()
             {
                 Centered = false,
-                Texture = Palettes.Load(_sheet.Paths[layer], _sheet.Colours[layer]),
+                Texture = worn,
                 RegionEnabled = true,
 
                 // Drawn up and to the left of the origin, so the origin is between the feet.
@@ -100,6 +125,54 @@ public sealed partial class Actor : Node2D
     {
         _step = 0;
         ShowFrame(WalkMotion.Stand(Facing.Of(_direction).Side));
+    }
+
+    /// <summary>
+    /// Swings once. Nothing follows from it here — whether it hit is the server's to say — and a swing
+    /// already under way is left to finish rather than restarted.
+    /// </summary>
+    public void Strike()
+    {
+        if (_struck >= 0 || _sheet.StrikePaths.Count == 0)
+        {
+            return;
+        }
+
+        _struck = 0;
+        Wear(_swinging);
+        ShowFrame(WalkMotion.Strike(Facing.Of(_direction).Side, 0));
+    }
+
+    public override void _Process(double delta)
+    {
+        if (_struck < 0)
+        {
+            return;
+        }
+
+        _struck += delta;
+
+        int frame = (int)(_struck / SecondsPerStrikeFrame);
+
+        if (frame >= WalkMotion.StrikeFrames)
+        {
+            _struck = -1;
+            Wear(_standing);
+            Rest();
+
+            return;
+        }
+
+        ShowFrame(WalkMotion.Strike(Facing.Of(_direction).Side, frame));
+    }
+
+    /// <summary>Swaps every layer between the sheets it stands in and the ones it swings in.</summary>
+    private void Wear(List<Texture2D> sheets)
+    {
+        for (int layer = 0; layer < _sprites.Count && layer < sheets.Count; layer++)
+        {
+            _sprites[layer].Texture = sheets[layer];
+        }
     }
 
     private void ShowFrame(int frame)

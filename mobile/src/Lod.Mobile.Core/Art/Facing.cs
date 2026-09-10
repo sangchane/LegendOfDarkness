@@ -74,8 +74,23 @@ public static class WalkMotion
 {
     public const int WalkFrames = 4;
 
+    /// <summary>How many drawings one swing takes.</summary>
+    public const int StrikeFrames = 2;
+
     public static int Stand(Side side) => side == Side.Back ? 0 : 5;
 
     public static int Walk(Side side, int step) =>
         (side == Side.Back ? 1 : 6) + (((step % WalkFrames) + WalkFrames) % WalkFrames);
+
+    /// <summary>
+    /// A plain blow. It is drawn in a file of its own — the one ending 02 — which holds only this, so the
+    /// frames start again from zero rather than following the walk.
+    /// </summary>
+    /// <remarks>
+    /// The reference client says the same numbers (paper-doll-animations.ts: Attack startUp 0, startDown 2,
+    /// two frames), and so does docs/original-sprite-animation.md section 3.3.
+    /// </remarks>
+    public static int Strike(Side side, int step) =>
+        (side == Side.Back ? 0 : StrikeFrames)
+        + (((step % StrikeFrames) + StrikeFrames) % StrikeFrames);
 }

@@ -80,6 +80,15 @@ foreach ($gender in @('m', 'w')) {
 
         if ($LASTEXITCODE -ne 0) {
             Write-Output "  ${name}: 없음"
+            continue
+        }
+
+        # 평타는 파일이 따로다(끝 02). 네 칸뿐이고 걷기와 이어지지 않는다 — 3.3절.
+        & $dotnet $tool @('pose', $archive, "${name}02", "$Output/actor/parts/${name}02.png",
+            '0,1,2,3', '1', $cell, 'marker') | Out-Null
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Output "  ${name}02: 없음(평타 그림 없음)"
         }
     }
 }

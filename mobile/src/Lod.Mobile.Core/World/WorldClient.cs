@@ -34,6 +34,7 @@ public sealed class WorldClient(WorldSession session)
     private const byte AttackCommand = 0x13;
     private const byte HealthCommand = 0x13;
     private const byte SpokenCommand = 0x0A;
+    private const byte BodyMotionCommand = 0x1A;
     private const byte TalkCommand = 0x0E;
 
     private byte _ordinal;
@@ -58,6 +59,9 @@ public sealed class WorldClient(WorldSession session)
 
     // How hurt each of them is, out of a hundred. The server never says more than that about somebody else.
     private readonly ConcurrentDictionary<uint, int> _health = new();
+
+    // Drained by whoever is drawing, because a motion is a moment rather than a state.
+    private readonly ConcurrentQueue<uint> _motions = new();
 
     private volatile string _said = string.Empty;
     private volatile int _saidCount;
@@ -88,6 +92,17 @@ public sealed class WorldClient(WorldSession session)
     /// only speaks about this when something is struck, so an untouched monster has no answer here.
     /// </summary>
     public int? Health(uint serial) => _health.TryGetValue(serial, out int left) ? left : null;
+
+    /// <summary>
+    /// Takes the next figure the server said had moved its body, if any. The server tells everyone nearby
+    /// when somebody swings, and this is how that reaches whatever is drawing them.
+    /// </summary>
+    /// <remarks>
+    /// It says which motion as well, and we ignore that: there is one motion we can draw. The reference
+    /// client does the same — every one of these plays its attack (map-scene.ts). Telling the skill
+    /// motions apart needs skill.tbl, which is written up in docs/original-sprite-animation.md section 3.
+    /// </remarks>
+    public bool TakeMotion(out uint serial) => _motions.TryDequeue(out serial);
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
@@ -149,6 +164,18 @@ public sealed class WorldClient(WorldSession session)
 
                 case DisplayCharacterCommand:
                     Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
+                    continue;
+
+                case BodyMotionCommand:
+                {
+                    ReadOnlySpan<byte> motion = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                    if (motion.Length >= 4)
+                    {
+                        _motions.Enqueue(BinaryPrimitives.ReadUInt32BigEndian(motion));
+                    }
+                }
+
                     continue;
 
                 case HealthCommand:

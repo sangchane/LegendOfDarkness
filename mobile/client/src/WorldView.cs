@@ -15,6 +15,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 {
     private const string FloorPath = "res://assets/world/safehouse.png";
     private const string HeroSheet = "res://assets/actor/hero-walk.png";
+    private const string HeroStrikeSheet = "res://assets/actor/hero-attack.png";
 
     // Worn by anyone the server has not described — somebody we have only ever seen take a step.
     private const string OtherSheet = "res://assets/actor/npc-walk.png";
@@ -123,7 +124,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _camera.AddChild(_mark);
 
         _tile = new Tile(4, 4);
-        _player = Add(new Actor("수련생", Actor.Sheet.Walk(HeroSheet)), Ground(_tile));
+        _player = Add(
+            new Actor("수련생", Actor.Sheet.Walk([HeroSheet], [0], [HeroStrikeSheet])),
+            Ground(_tile));
 
         if (server is null)
         {
@@ -317,6 +320,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         List<string> paths = [];
         List<int> colours = [];
+        List<string> striking = [];
 
         foreach (Piece piece in Wardrobe.Pieces(one.Wearing))
         {
@@ -329,9 +333,14 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
             paths.Add(path);
             colours.Add(piece.Colour);
+
+            // A piece with no swing of its own keeps standing while the rest of the figure moves. That is
+            // how the original looks too — a hat does not swing.
+            string swung = $"{PartsFolder}{piece.Name}02.png";
+            striking.Add(ResourceLoader.Exists(swung) ? swung : path);
         }
 
-        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours) : Actor.Sheet.Walk(OtherSheet);
+        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, striking) : Actor.Sheet.Walk(OtherSheet);
     }
 
     /// <summary>
@@ -370,13 +379,15 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     {
         // Not the moment somebody appears: the view is still sliding to where the server put us, and a tap
         // aimed before it settles lands on empty floor.
-        if (_rehearsedStrike >= 0 && _rehearsedStrike++ == 30)
+        // 리허설은 1초에 한 번씩 휘두른다. 한 번만 휘두르면 0.28초짜리 동작을 사진으로 잡기가 어렵다.
+        // 화면의 버튼은 여전히 한 번 누르면 한 번이다(시안 AC-009).
+        if (_rehearsedStrike >= 0 && _rehearsedStrike++ % 60 == 30)
         {
             Strike();
         }
 
         // 한참 뒤에 결과를 본다 — 서버가 답하는 데 한 프레임보다 오래 걸린다.
-        if (_rehearsedStrike == 120 && server is not null)
+        if (_rehearsedStrike == 121 && server is not null)
         {
             foreach (Creature beast in server.Creatures)
             {
@@ -492,9 +503,35 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     public void Strike()
     {
-        if (!Frozen)
+        if (Frozen)
         {
-            _ = server?.AttackAsync(_leaving.Token);
+            return;
+        }
+
+        // Drawn straight away rather than waiting to be told: the server does not answer an allowed blow,
+        // the same as a step, and a swing that lags a third of a second reads as a broken button.
+        _player.Strike();
+
+        _ = server?.AttackAsync(_leaving.Token);
+    }
+
+    /// <summary>
+    /// Draws whoever the server says has swung. Our own blow is drawn as it is asked for rather than here,
+    /// so a swing of ours that comes back is left alone.
+    /// </summary>
+    private void Swings()
+    {
+        while (server is { } world && world.TakeMotion(out uint serial))
+        {
+            if (serial == world.Serial)
+            {
+                continue;
+            }
+
+            if (_crowd.TryGetValue(serial, out Actor? actor) || _herd.TryGetValue(serial, out actor))
+            {
+                actor.Strike();
+            }
         }
     }
 
@@ -527,6 +564,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Wear();
         Crowd();
         Herd();
+        Swings();
         RehearseAPick();
 
         if (_walked < 0 && _rehearsal.Count > 0)
