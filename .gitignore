@@ -26,3 +26,6 @@ sources/Dark-Ages-Private-Server-master/
 # .NET build output
 [Bb]in/
 [Oo]bj/
+
+# Graphify 지식 그래프 산출물 — 로컬에서 언제든 다시 만든다 (graphify .)
+graphify-out/
