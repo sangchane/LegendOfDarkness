@@ -9,6 +9,61 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git *)",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/guard_shell.py\""
+          },
+          {
+            "type": "command",
+            "if": "Bash(cp *)",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/guard_shell.py\""
+          },
+          {
+            "type": "command",
+            "if": "Bash(mv *)",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/guard_shell.py\""
+          },
+          {
+            "type": "command",
+            "if": "Bash(rsync *)",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/guard_shell.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/guard_shell.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Artifact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/prefer_docs_over_artifact.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/check_hades_ports.py\""
+          }
+        ]
+      }
     ]
   }
 }
