@@ -31,15 +31,21 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명|transparent]");
             Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율] [칸] [색번호|marker] [색표]");
             Console.Error.WriteLine("        dat-extract dyeslots <출력.txt>");
+            Console.Error.WriteLine("        dat-extract metafile <database/server/metafile/ItemInfo8> [찾을 말]");
             return 2;
         }
 
         string command = args[0];
 
-        // The one command that reads no archive: it only writes down what `pose … marker` leaves behind.
+        // The two commands that read no archive.
         if (command == "dyeslots")
         {
             return await WriteDyeSlots(args);
+        }
+
+        if (command == "metafile")
+        {
+            return ShowMetaFile(args);
         }
 
         string archivePath = Path.GetFullPath(args[1]);
@@ -427,6 +433,37 @@ internal static class Program
     /// then what it wears, then what it holds — each carrying its own offset inside a shared box, so the
     /// pieces line up when drawn in order at the same frame number.
     /// </summary>
+    /// <summary>
+    /// Prints one of the original game's own tables. They are not in any archive — they sit in the server's
+    /// database folder, one zlib stream each — and nothing else here reads them.
+    /// </summary>
+    private static int ShowMetaFile(string[] args)
+    {
+        if (args.Length < 2)
+        {
+            Console.Error.WriteLine("metafile <파일> [찾을 말]");
+            return 2;
+        }
+
+        string wanted = args.Length > 2 ? args[2] : string.Empty;
+        List<MetaFile.Row> rows = MetaFile.Read(Path.GetFullPath(args[1]));
+
+        List<MetaFile.Row> shown = wanted.Length == 0
+            ? rows
+            : [.. rows.Where(row =>
+                row.Name.Contains(wanted, StringComparison.OrdinalIgnoreCase)
+                || row.Fields.Any(field => field.Contains(wanted, StringComparison.OrdinalIgnoreCase)))];
+
+        foreach (MetaFile.Row row in shown)
+        {
+            Console.WriteLine($"{row.Name}	{string.Join(" | ", row.Fields)}");
+        }
+
+        Console.WriteLine($"— {shown.Count}줄 / 전체 {rows.Count}줄");
+
+        return 0;
+    }
+
     /// <summary>
     /// Writes the colours <c>pose … marker</c> leaves in the dyed slots, so whoever recolours the sheets
     /// does not have to be told them twice.

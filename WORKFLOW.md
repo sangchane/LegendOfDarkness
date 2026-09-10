@@ -21,6 +21,14 @@
 실제 명령 옵션은 `.\scripts\gt.ps1 --help`를 우선한다. 이 래퍼는 Graphite가
 요구하는 Git 2.38 이상을 충족하도록 `.tools/PortableGit`을 PATH 앞에 둔다.
 
+**로그인은 사람이 한 번 해야 한다.** Graphite CLI(1.8.6)는 설치돼 있고 이 저장소도 초기화돼 있지만
+(`.git/.graphite_repo_config`, trunk `main`), 계정 토큰은 없다. 로컬 스택 작업은 그대로 되고
+`submit`(PR 올리기)만 막힌다 — 래퍼가 그때 먼저 알려 준다.
+
+```powershell
+gt auth --token <graphite.dev 에서 발급한 토큰>
+```
+
 ## submodule 변경 흐름
 
 1. 대상 `sources/<owner>/<repo>`에서 별도 브랜치를 만든다.

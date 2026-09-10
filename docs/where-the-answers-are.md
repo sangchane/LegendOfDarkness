@@ -32,7 +32,8 @@
 | **원작 서버가 보내는 패킷**의 진짜 생김새 | `sources/FallenDev/dark-ages-ts/packages/network/src/packets/` | 필드 이름·크기·차례. **우리 서버(Hades)와 다르다** — 4절 |
 | 우리 서버가 보내는 것 | `sources/wren11/Dark-Ages-Private-Server/src/.../Network/ServerFormats/` | 실제로 우리 클라이언트가 받는 바이트 |
 | 동작 구간·몬스터 행동·색표 | `data/legend-tables/` (원본은 아래 4절) | `skill.tbl` `MobTile.tbl` `color.tbl` `color0.tbl` `itempal.tbl` … |
-| 그림·소리 원본 | `sources/Dark-Ages-Private-Server-master/game/*.dat` | `khan`(남) `khan2`(여) `hades`(몬스터) `roh`(효과) `seo`(타일) |
+| **원작 게임 자료표** — 아이템·기술·퀘스트·NPC 초상 | `sources/.../database/server/metafile/` | 아래 4.6절. **.dat 이 아니라 서버 데이터베이스 폴더에 있다** |
+| 그림·소리 원본 | `sources/Dark-Ages-Private-Server-master/game/*.dat` | `khan`(남) `khan2`(여) `hades`(몬스터) `roh`(효과) `seo`(타일) `ia`(아이콘) `setoa`(화면 배치) `national`(이야기) `cious`(던전) |
 | 이야기 삽화·음악·규칙표 원본 | `sources/wren11/Dark-Ages-Private-Server/database/archives/legend/Legend.dat` | 13MB. `.epf` 186 · `.mp3` 165 · `.tbl` 16 |
 
 ---
@@ -89,6 +90,29 @@ README 가 스스로 AI 로 대량 생성한 것이라고 밝히고 있고, 실�
 
 **있는 것은 움직임·전투 성향이다** — `MobTile.tbl`(`data/legend-tables/`, 원작 개발자 한글 주석 포함).
 말벌 행: `SFCnt 2 · WFCnt 2 · AFCnt 2 · fStop 0 · fChgDir 1`.
+
+---
+
+## 4.6 원작 게임 자료표 — 메타파일
+
+**.dat 안이 아니라 서버 데이터베이스 폴더에 있다.** 각각 zlib 한 덩어리고, 풀면 "몇 줄, 그리고 줄마다
+이름과 값 몇 개" 라는 단순한 목록이다.
+
+```
+dat-extract metafile sources/wren11/Dark-Ages-Private-Server/database/server/metafile/SClass1 Assail
+→ Assail   1/0/0 | 1/223/10 | 3/3/3/3/3 | 0/0 | 0/0
+```
+
+| 파일 | 줄 수 | 무엇인가 |
+|---|---|---|
+| `ItemInfo0`~`ItemInfo11` | 12개 (8~11만 2,110줄) | **원작 아이템 목록** — 이름, 등급, 착용 부위, 설명(`All Lev4, Wt 1`) |
+| `SClass1`~`SClass5` | 641줄 | **직업별 기술·마법** — 선행 조건(`Assail/10`), 능력치 요구, 배우는 곳 |
+| `SEvent1`~`SEvent7` | 361줄 | **퀘스트** — 제목·요약·조건 (`Choosing a Class` 등) |
+| `NPCIllust` | 170줄 | NPC 이름 → 초상 파일(`shaman.spf`, `npcbase.dat` 안에 있다) |
+| `Light` · `NationDesc` | 34 · 6 | 맵 밝기 · 나라 설명 |
+
+여기에도 **드랍표는 없다**(4.5절). 다만 `Shagreen Boots` 를 찾으면 0줄이 나오는 것으로
+**Hades 가 만든 아이템과 원작 아이템을 가릴 수 있다.**
 
 ---
 
