@@ -55,6 +55,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // Everything else standing on the floor — monsters, merchants — by the same kind of serial.
     private readonly Dictionary<uint, Actor> _herd = [];
 
+    // And what is lying on it. Marked rather than drawn: nothing has been cut out of the icon archive yet.
+    private readonly Dictionary<uint, GroundMark> _dropped = [];
+
     // Whoever is picked out, and the mark that says so. Zero is nobody.
     private readonly TargetMark _mark = new() { Name = "Target", Visible = false };
     private uint _target;
@@ -465,6 +468,21 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             present.Add(one.Serial);
 
+            if (one.Kind == CreatureKind.Passable)
+            {
+                if (!_dropped.TryGetValue(one.Serial, out GroundMark? mark))
+                {
+                    mark = new GroundMark { Name = $"Dropped{one.Serial}" };
+
+                    _camera.AddChild(mark);
+                    _dropped[one.Serial] = mark;
+                }
+
+                mark.Position = Ground(one.Where);
+
+                continue;
+            }
+
             if (!_herd.TryGetValue(one.Serial, out Actor? actor))
             {
                 string path = $"{CreatureFolder}mns{one.Sprite - CreatureNumbering:000}.png";
@@ -491,6 +509,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             _herd[serial].QueueFree();
             _herd.Remove(serial);
+        }
+
+        foreach (uint serial in _dropped.Keys.Where(known => !present.Contains(known)).ToList())
+        {
+            _dropped[serial].QueueFree();
+            _dropped.Remove(serial);
         }
     }
 

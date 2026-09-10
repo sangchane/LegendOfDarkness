@@ -64,6 +64,28 @@ public sealed class CreatureTests
         Assert.Equal(Direction.North, shown[1].Facing);
     }
 
+    /// <summary>
+    /// Something dropped on the floor is written like everything else here — the server used to write it
+    /// four bytes shorter with nothing to say so, which put every record behind it at the wrong offset.
+    /// </summary>
+    [Fact]
+    public void Something_dropped_on_the_floor_is_read_like_the_rest()
+    {
+        IReadOnlyList<Creature> shown = WorldClient.ReadCreatures(
+        [
+            0x00, 0x02,
+            .. Record(5, 6, 700, 32882, 0, 1),
+            .. Record(7, 8, 701, 16385, 2, 0)
+        ]);
+
+        Assert.Equal(2, shown.Count);
+        Assert.Equal(CreatureKind.Passable, shown[0].Kind);
+        Assert.Equal(32882, shown[0].Sprite);
+
+        Assert.Equal(701u, shown[1].Serial);
+        Assert.Equal(new Tile(7, 8), shown[1].Where);
+    }
+
     [Fact]
     public void A_packet_that_stops_short_is_refused()
     {
