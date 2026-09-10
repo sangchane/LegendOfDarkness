@@ -20,6 +20,7 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract dump <아카이브.dat> <출력 폴더> [이름 조각]");
             Console.Error.WriteLine("        dat-extract tiles <seo.dat> <출력.png> <시작> <개수> [가로칸]");
             Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png>");
+            Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
             return 2;
         }
 
@@ -41,6 +42,7 @@ internal static class Program
             "dump" => await Dump(entries, args),
             "tiles" => await Tiles(entries, args),
             "map" => await RenderMap(entries, args),
+            "sprite" => await RenderSprite(entries, args),
             _ => Unknown(command)
         };
     }
@@ -248,6 +250,82 @@ internal static class Program
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);
         await canvas.SaveAsPngAsync(output);
         Console.WriteLine($"바닥 {drawn}칸을 {width}x{height} 로 그려 {output} 에 저장했습니다.");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Renders one character sprite. The blob is splay-Huffman compressed; what comes out is a run of
+    /// palette indices where 0 means see-through.
+    /// </summary>
+    private static async Task<int> RenderSprite(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("sprite 에는 항목 이름과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string entryName = args[2];
+        string output = Path.GetFullPath(args[3]);
+        int width = args.Length > 4 ? int.Parse(args[4]) : 28;
+        int skip = args.Length > 5 ? int.Parse(args[5]) : 8;
+
+        ArchivedItem sprite = entries.FirstOrDefault(entry =>
+            entry.Name.Equals(entryName, StringComparison.OrdinalIgnoreCase));
+
+        if (sprite is null)
+        {
+            Console.Error.WriteLine($"항목을 찾지 못했습니다: {entryName}");
+            return 2;
+        }
+
+        byte[] pixels = Hpf.LooksCompressed(sprite.Data) ? Hpf.Decompress(sprite.Data) : sprite.Data;
+        Console.WriteLine($"{sprite.Name}: {sprite.Data.Length} → {pixels.Length} bytes");
+        Console.WriteLine($"  앞부분 {Convert.ToHexString(pixels.AsSpan(0, Math.Min(24, pixels.Length)))}");
+
+        List<Palette> palettes = Palette.FromArchive(
+            entries.Where(e => e.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase))
+                   .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase));
+
+        if (palettes.Count == 0)
+        {
+            Console.Error.WriteLine("팔레트를 찾지 못했습니다.");
+            return 2;
+        }
+
+        Palette palette = palettes[0];
+
+        if (skip > 0 && skip < pixels.Length)
+        {
+            pixels = pixels[skip..];
+        }
+
+        int height = pixels.Length / width;
+
+        if (height == 0)
+        {
+            Console.Error.WriteLine($"폭 {width} 로는 한 줄도 만들 수 없습니다.");
+            return 2;
+        }
+
+        using Image<Rgba32> image = new(width, height);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                byte code = pixels[(y * width) + x];
+                System.Drawing.Color colour = palette[code];
+                image[x, y] = code == 0
+                    ? new Rgba32(0, 0, 0, 0)
+                    : new Rgba32(colour.R, colour.G, colour.B, 255);
+            }
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+        await image.SaveAsPngAsync(output);
+        Console.WriteLine($"{width}x{height} 로 {output} 에 저장했습니다 (남는 바이트 {pixels.Length - (width * height)}).");
 
         return 0;
     }
