@@ -70,8 +70,7 @@ public sealed record Creature(
 /// something is picked up.
 /// </summary>
 /// <param name="Icon">
-/// Which picture to draw for it. We have no icons cut from the archives yet, so nothing reads this — the
-/// name is what a player sees.
+/// Which picture to draw for it — the same number whether the thing is carried, worn or lying on the floor.
 /// </param>
 public sealed record InventoryItem(
     int Slot,
@@ -81,6 +80,38 @@ public sealed record InventoryItem(
     int Stacks,
     int Durability,
     int MaxDurability);
+
+/// <summary>
+/// A piece of gear the character has on. The server names the place it sits by number — the same numbers
+/// the item templates use in <c>EquipmentSlot</c> — and says nothing about what that place looks like.
+/// </summary>
+/// <param name="Slot">Where it is worn: 1 weapon, 2 armour, 3 shield, 4 helmet … 13 boots. See <see cref="WornPlace"/>.</param>
+/// <param name="Name">What the item is called. <paramref name="Called"/> is that name after any upgrade is spelled into it.</param>
+public sealed record WornItem(
+    int Slot,
+    int Icon,
+    string Name,
+    string Called,
+    long Durability,
+    long MaxDurability);
+
+/// <summary>
+/// The names of the places gear is worn, so a screen can say "신발" rather than "13". Straight from the
+/// server's own <c>ItemSlots</c>; the gaps in the middle are the server's, not ours.
+/// </summary>
+public static class WornPlace
+{
+    private static readonly Dictionary<int, string> Names = new()
+    {
+        [1] = "무기", [2] = "갑옷", [3] = "방패", [4] = "투구", [5] = "귀고리",
+        [6] = "목걸이", [7] = "왼손", [8] = "오른손", [9] = "왼팔", [10] = "오른팔",
+        [11] = "허리", [12] = "다리", [13] = "신발", [14] = "장신구", [15] = "겉옷",
+        [16] = "겉투구", [17] = "장신구2",
+    };
+
+    /// <summary>The name of one place, or the number itself when the server uses one we do not know.</summary>
+    public static string Of(int slot) => Names.TryGetValue(slot, out string? called) ? called : slot.ToString();
+}
 
 /// <summary>
 /// Somebody else standing in the world: where they are, which way they face, what they wear and what they

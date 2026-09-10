@@ -1,24 +1,34 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
 /// <summary>
-/// What the character is carrying. A reading panel — nothing here equips, uses or throws anything away;
-/// it exists so that picking something up can be seen to have worked.
+/// What the character has on and what they are carrying, as the original showed it: a grid of pictures
+/// with no names in it. One thing is picked out at a time, and its name and what can be done with it are
+/// written underneath — a line of text per item eats a phone screen, and names here run past thirty letters.
 /// </summary>
 /// <remarks>
-/// The list is rebuilt only when what it would say changes, because it is asked every frame and a panel
-/// that throws its children away sixty times a second cannot be scrolled.
+/// The lists are rebuilt only when what they would show changes, because they are asked every frame and a
+/// panel that throws its children away sixty times a second cannot be pressed.
 /// </remarks>
 public sealed partial class PackPanel : PanelContainer
 {
-    private readonly VBoxContainer _rows = new() { Name = "Items" };
-    private readonly Label _count = new();
+    // 원작은 33x36 칸이었다. 손가락은 그보다 커서 시안의 최소 터치 크기를 쓴다.
+    private static readonly Vector2 Cell = new(Main.TouchMinimum, Main.TouchMinimum);
 
-    // 빈 문자열로 두면 "가진 것이 없다"는 첫 상태가 "바뀐 것 없음"과 구별되지 않아 안내가 안 나온다.
+    private readonly GridContainer _gear = new() { Name = "Worn" };
+    private readonly GridContainer _rows = new() { Name = "Items" };
+    private readonly Label _chosenName = new();
+    private readonly Button _use = new() { Text = "착용" };
+
+    // 무엇을 고쳐 그렸는지. 고른 것이 바뀌어도 테두리가 옮겨 가야 하므로 함께 센다.
     private string? _showing;
+
+    // 고른 것: 소지품이면 칸 번호, 걸친 것이면 자리 번호에 음수를 붙여 구별한다.
+    private int _chosen;
 
     public PackPanel()
     {
@@ -34,22 +44,54 @@ public sealed partial class PackPanel : PanelContainer
         head.AddChild(new Label { Text = "인벤토리", SizeFlagsVertical = SizeFlags.ShrinkCenter });
         head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
-        Close = new Button
-        {
-            Text = "닫기",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
+        Close = new Button { Text = "닫기", CustomMinimumSize = Cell };
         head.AddChild(Close);
 
-        // 시안대로 목록이 패널을 넘칠 때만 스크롤을 붙인다. 지금은 넣을 것이 몇 개뿐이라, 스크롤
-        // 상자가 남는 높이를 다 먹고 줄이 한 줄도 안 보이는 편이 더 나쁘다.
-        _rows.SizeFlagsVertical = SizeFlags.ExpandFill;
-        _rows.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        // 세로는 패널이 전폭이라 한 줄에 여섯, 가로는 오른쪽 3분의 1 남짓이라 넷이 들어간다.
+        _gear.Columns = Main.Portrait ? 6 : 4;
+        _rows.Columns = _gear.Columns;
+
+        VBoxContainer inside = new();
+        inside.AddThemeConstantOverride("separation", Main.Gutter);
+        inside.AddChild(Heading("장비"));
+        inside.AddChild(_gear);
+        inside.AddChild(Heading("소지품"));
+        inside.AddChild(_rows);
+
+        // 칸이 늘어 패널이 화면을 넘으면 제목과 닫기 버튼이 밀려난다(한 번 그렇게 됐다).
+        // 넘치는 것은 스크롤로 두고, 머리와 꼬리는 언제나 남긴다.
+        ScrollContainer scroll = new()
+        {
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
+        };
+
+        scroll.AddChild(inside);
+
+        _chosenName.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _chosenName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+        _use.CustomMinimumSize = Cell;
+        _use.Visible = false;
+
+        // 걸친 것은 음수로 두므로, 양수일 때만 쓸 것이 골라져 있다는 뜻이다.
+        _use.Pressed += () =>
+        {
+            if (_chosen > 0)
+            {
+                Used?.Invoke(_chosen);
+            }
+        };
+
+        HBoxContainer foot = new();
+        foot.AddThemeConstantOverride("separation", Main.Gutter);
+        foot.AddChild(_chosenName);
+        foot.AddChild(_use);
 
         body.AddChild(head);
-        body.AddChild(_rows);
-        body.AddChild(_count);
+        body.AddChild(scroll);
+        body.AddChild(foot);
 
         AddChild(body);
     }
@@ -57,13 +99,13 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>The button that shuts the panel, so whoever opened it can decide what that means.</summary>
     public Button Close { get; }
 
-    /// <summary>Somebody pressed a carried thing. The slot is what the server wants; the rest is its business.</summary>
+    /// <summary>Somebody asked to use a carried thing. The slot is what the server wants.</summary>
     public event System.Action<int>? Used;
 
-    /// <summary>Shows what is being carried, or says plainly that nothing is.</summary>
-    public void Show(IReadOnlyList<InventoryItem> carried)
+    /// <summary>Shows what is worn and what is carried, and says plainly when there is nothing.</summary>
+    public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn)
     {
-        string wanted = Describe(carried);
+        string wanted = Describe(carried, worn);
 
         if (wanted == _showing)
         {
@@ -72,41 +114,24 @@ public sealed partial class PackPanel : PanelContainer
 
         _showing = wanted;
 
-        foreach (Node row in _rows.GetChildren())
-        {
-            row.QueueFree();
-        }
+        Fill(_gear, worn.Select(gear => (Key: -gear.Slot, gear.Icon)));
+        Fill(_rows, carried.Select(item => (Key: item.Slot, item.Icon)));
 
-        if (carried.Count == 0)
-        {
-            _rows.AddChild(new Label
-            {
-                Text = "가진 것이 없습니다.",
-                CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
-                VerticalAlignment = VerticalAlignment.Center
-            });
-        }
-
-        foreach (InventoryItem item in carried)
-        {
-            _rows.AddChild(Row(item, () => Used?.Invoke(item.Slot)));
-        }
-
-        _count.Text = $"{carried.Count}가지";
-        _count.AddThemeColorOverride("font_color", Greybox.Muted);
+        ShowChosen(carried, worn);
     }
 
     /// <summary>
-    /// Presses the first carried thing, as a hand would. Only for a run with no hand on it — it goes
-    /// through the same button so the wiring is checked, not bypassed.
+    /// Picks the first carried thing and asks to use it, as a hand would. Only for a run with no hand on
+    /// it — it goes through the same event the button raises, so the wiring is checked, not bypassed.
     /// </summary>
     public bool PressFirst()
     {
-        foreach (Node row in _rows.GetChildren())
+        foreach (Node cell in _rows.GetChildren())
         {
-            if (row is Button button)
+            if (cell is Button button)
             {
                 button.EmitSignal(BaseButton.SignalName.Pressed);
+                _use.EmitSignal(BaseButton.SignalName.Pressed);
 
                 return true;
             }
@@ -115,50 +140,87 @@ public sealed partial class PackPanel : PanelContainer
         return false;
     }
 
-    /// <summary>One carried thing: its picture where there is one, and always its name. Pressing it uses it.</summary>
-    private static Control Row(InventoryItem item, System.Action pressed)
+    private static Label Heading(string text)
     {
-        // A button rather than a label: the whole row is the target, which is what a thumb expects.
-        Button row = new()
-        {
-            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
-            Flat = true
-        };
+        Label heading = new() { Text = text };
+        heading.AddThemeColorOverride("font_color", Greybox.Muted);
 
-        row.Pressed += pressed;
-
-        HBoxContainer line = new() { MouseFilter = Control.MouseFilterEnum.Ignore };
-        line.SetAnchorsPreset(LayoutPreset.FullRect);
-        line.AddThemeConstantOverride("separation", Main.Gutter);
-
-        // A row with no picture still has to line its name up with the rows that do.
-        line.AddChild(new TextureRect
-        {
-            Texture = ItemIcons.For(item.Icon),
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
-            StretchMode = TextureRect.StretchModeEnum.KeepCentered
-        });
-
-        line.AddChild(new Label
-        {
-            Text = item.Stacks > 1 ? $"{item.Name} ×{item.Stacks}" : item.Name,
-            SizeFlagsVertical = SizeFlags.ShrinkCenter
-        });
-
-        row.AddChild(line);
-
-        return row;
+        return heading;
     }
 
-    private static string Describe(IReadOnlyList<InventoryItem> carried)
+    /// <summary>Rebuilds one grid: one pressable picture per thing, and the picked one outlined.</summary>
+    private void Fill(GridContainer grid, IEnumerable<(int Key, int Icon)> things)
     {
-        string said = string.Empty;
-
-        foreach (InventoryItem item in carried)
+        foreach (Node cell in grid.GetChildren())
         {
-            said += $"{item.Slot}:{item.Name}:{item.Stacks};";
+            cell.QueueFree();
         }
 
-        return said;
+        bool any = false;
+
+        foreach ((int key, int icon) in things)
+        {
+            any = true;
+
+            Button cell = new()
+            {
+                CustomMinimumSize = Cell,
+                Icon = ItemIcons.For(icon),
+                ExpandIcon = true,
+                Flat = key != _chosen
+            };
+
+            cell.Pressed += () =>
+            {
+                _chosen = key;
+
+                // 테두리를 옮기려면 다시 그려야 한다. 다음 프레임의 Show 가 하도록 표시만 지운다.
+                _showing = null;
+            };
+
+            grid.AddChild(cell);
+        }
+
+        if (!any)
+        {
+            grid.AddChild(new Label { Text = "없음", CustomMinimumSize = Cell });
+        }
     }
+
+    /// <summary>Writes out whatever is picked, and offers to put it on when it is not on already.</summary>
+    private void ShowChosen(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn)
+    {
+        InventoryItem? held = carried.FirstOrDefault(item => item.Slot == _chosen);
+
+        if (held is not null)
+        {
+            _chosenName.Text = held.Stacks > 1 ? $"{held.Name} ×{held.Stacks}" : held.Name;
+            _use.Visible = true;
+
+            return;
+        }
+
+        WornItem? gear = worn.FirstOrDefault(one => -one.Slot == _chosen);
+
+        if (gear is not null)
+        {
+            _chosenName.Text = $"{WornPlace.Of(gear.Slot)} · {gear.Called}";
+            _use.Visible = false;
+
+            return;
+        }
+
+        _chosenName.Text = carried.Count == 0 && worn.Count == 0
+            ? "가진 것이 없습니다."
+            : $"{carried.Count}가지 · 걸친 것 {worn.Count}";
+
+        _chosenName.AddThemeColorOverride("font_color", Greybox.Muted);
+        _use.Visible = false;
+    }
+
+    private string Describe(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn) =>
+        $"{_chosen}|"
+        + string.Join(";", carried.Select(item => $"{item.Slot}:{item.Icon}:{item.Stacks}"))
+        + "|"
+        + string.Join(";", worn.Select(gear => $"{gear.Slot}:{gear.Icon}"));
 }

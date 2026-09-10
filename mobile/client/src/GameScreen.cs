@@ -101,6 +101,22 @@ public partial class GameScreen : Control
             rows.AddChild(_topRow);
             rows.AddChild(_packRow = BuildPackRow());
             rows.AddChild(_controlRow);
+
+            // 가로에서는 위 줄과 조작 줄 사이에 남는 높이가 아이콘 한 칸도 안 된다. 시안대로
+            // 모달이니 조작 줄 위로 덮게 두고(열려 있는 동안 이동·공격은 어차피 막힌다),
+            // 줄 자체는 빈자리로 남겨 조작 줄이 위로 올라오지 않게 한다.
+            // MarginContainer 는 자식을 꽉 채우므로 닻이 먹지 않는다. 그냥 Control 을 한 겹 두면
+            // 그 안에서는 닻이 그대로 듣는다.
+            Control over = new() { MouseFilter = MouseFilterEnum.Ignore };
+            hud.AddChild(over);
+            over.AddChild(_pack);
+
+            _pack.SetAnchorsPreset(LayoutPreset.FullRect);
+            _pack.AnchorLeft = 0.6f;
+            _pack.OffsetLeft = 0;
+            _pack.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
+            _pack.OffsetRight = 0;
+            _pack.OffsetBottom = 0;
         }
     }
 
@@ -132,6 +148,9 @@ public partial class GameScreen : Control
             });
 
             _pack.SizeFlagsStretchRatio = 38;
+
+            // 가로에서는 패널을 이 줄이 아니라 HUD 위에 덮어 놓는다. 줄은 빈자리로만 남는다.
+            return row;
         }
 
         row.AddChild(_pack);
@@ -291,7 +310,7 @@ public partial class GameScreen : Control
 
         if (_pack.Visible)
         {
-            _pack.Show(_server?.Pack ?? []);
+            _pack.Show(_server?.Pack ?? [], _server?.Worn ?? []);
 
             // 손 없이 확인할 때만. 목록이 채워진 다음 프레임에 첫 줄을 한 번 누른다.
             if (Main.Wearing && !_worn && _pack.PressFirst())
@@ -338,7 +357,7 @@ public partial class GameScreen : Control
 
         if (open)
         {
-            _pack.Show(_server?.Pack ?? []);
+            _pack.Show(_server?.Pack ?? [], _server?.Worn ?? []);
         }
     }
 

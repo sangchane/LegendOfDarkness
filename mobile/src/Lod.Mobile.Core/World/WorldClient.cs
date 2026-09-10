@@ -37,6 +37,8 @@ public sealed class WorldClient(WorldSession session)
     private const byte BodyMotionCommand = 0x1A;
     private const byte TalkCommand = 0x0E;
     private const byte UseCommand = 0x1C;
+    private const byte WornCommand = 0x37;
+    private const byte TookOffCommand = 0x38;
 
     private byte _ordinal;
     private byte _step;
@@ -54,6 +56,9 @@ public sealed class WorldClient(WorldSession session)
 
     // Keyed by the slot the server puts each thing in, which is how it refers to them afterwards.
     private readonly ConcurrentDictionary<int, InventoryItem> _pack = new();
+
+    /// <summary>무엇을 걸치고 있는지, 걸친 자리 번호를 열쇠로.</summary>
+    private readonly ConcurrentDictionary<int, WornItem> _worn = new();
 
     // Everything on the floor that is not a player, by the same serial the server removes them by.
     private readonly ConcurrentDictionary<uint, Creature> _creatures = new();
@@ -116,6 +121,9 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
+
+    /// <summary>What the character has on, in the order the places are numbered.</summary>
+    public IReadOnlyList<WornItem> Worn => [.. _worn.Values.OrderBy(item => item.Slot)];
 
     /// <summary>Everyone else the server has shown us, by serial. Our own character is not in here.</summary>
     public IReadOnlyCollection<Character> Others => (IReadOnlyCollection<Character>)_others.Values;
@@ -202,6 +210,26 @@ public sealed class WorldClient(WorldSession session)
                     {
                         _creatures[creature.Serial] = creature;
                     }
+
+                    continue;
+
+                case WornCommand:
+                {
+                    WornItem gear = ReadWorn(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    _worn[gear.Slot] = gear;
+                }
+
+                    continue;
+
+                case TookOffCommand:
+                {
+                    ReadOnlySpan<byte> bare = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                    if (bare.Length >= 1)
+                    {
+                        _worn.TryRemove(bare[0], out _);
+                    }
+                }
 
                     continue;
 
@@ -491,6 +519,39 @@ public sealed class WorldClient(WorldSession session)
             // Byte 4 says whether it stacks, which the count already tells us.
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest[9..]),
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest[5..]));
+    }
+
+    /// <summary>
+    /// One piece of gear the character is wearing. The place it sits comes first, then the picture, then a
+    /// byte the server always writes as three, then two names — what the item is and what this one is
+    /// called — and how worn out it is.
+    /// </summary>
+    public static WornItem ReadWorn(ReadOnlySpan<byte> body)
+    {
+        const int beforeName = 4;
+
+        if (body.Length < beforeName + 1)
+        {
+            throw new ProtocolException($"장비 안내가 {beforeName + 1}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        string name = LegacyKoreanEncoding.DecodeStringA(body[beforeName..], out int consumed);
+        ReadOnlySpan<byte> rest = body[(beforeName + consumed)..];
+        string called = LegacyKoreanEncoding.DecodeStringA(rest, out int alsoConsumed);
+        ReadOnlySpan<byte> wear = rest[alsoConsumed..];
+
+        if (wear.Length < 8)
+        {
+            throw new ProtocolException($"장비 안내의 이름 뒤가 8바이트보다 짧습니다 ({wear.Length}바이트).");
+        }
+
+        return new WornItem(
+            body[0],
+            BinaryPrimitives.ReadUInt16BigEndian(body[1..]),
+            name,
+            called,
+            BinaryPrimitives.ReadUInt32BigEndian(wear),
+            BinaryPrimitives.ReadUInt32BigEndian(wear[4..]));
     }
 
     /// <summary>The name, if the server got as far as writing one.</summary>
