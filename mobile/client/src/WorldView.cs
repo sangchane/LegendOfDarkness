@@ -59,6 +59,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private uint _target;
     private bool _rehearsedPick;
     private int _settling;
+    private int _rehearsedStrike = -1;
 
     private Queue<Direction> _rehearsal = new();
 
@@ -369,24 +370,58 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     {
         // Not the moment somebody appears: the view is still sliding to where the server put us, and a tap
         // aimed before it settles lands on empty floor.
-        if (_rehearsedPick || !(Main.Picking || Main.Saying.Length > 0) || _heard < 0 || _settling++ < 60)
+        if (_rehearsedStrike >= 0 && _rehearsedStrike++ == 30)
+        {
+            Strike();
+        }
+
+        // 한참 뒤에 결과를 본다 — 서버가 답하는 데 한 프레임보다 오래 걸린다.
+        if (_rehearsedStrike == 120 && server is not null)
+        {
+            foreach (Creature beast in server.Creatures)
+            {
+                GD.Print($"GREYBOX_STRUCK {beast.Serial} 체력 {server.Health(beast.Serial)?.ToString() ?? "모름"}");
+            }
+
+            GD.Print($"GREYBOX_SAID {server.Said}");
+        }
+
+        if (_rehearsedPick
+            || !(Main.Picking || Main.Striking || Main.Saying.Length > 0)
+            || _heard < 0
+            || (Main.Picking && _crowd.Count + _herd.Count == 0)
+            || _settling++ < 60)
         {
             return;
         }
 
         _rehearsedPick = true;
 
+        if (Main.Striking)
+        {
+            _rehearsedStrike = 0;
+        }
+
         if (Main.Saying.Length > 0)
         {
             _ = server?.SayAsync(Main.Saying, _leaving.Token);
         }
 
-        if (!Main.Picking || _crowd.Count == 0)
+        if (!Main.Picking)
         {
             return;
         }
 
-        Actor somebody = _crowd.Values.First();
+        // 괴물도 고를 수 있어야 전투가 확인된다 — 사람만 보면 아무도 없는 방에서 멈춘다. 가장 가까운
+        // 쪽을 고르는 것은 사람이 하는 것과 같고, 멀리 헤매다 화면 밖으로 나간 것을 누르지 않게 해 준다.
+        Actor? somebody = _herd.Values.Concat(_crowd.Values)
+            .OrderBy(actor => actor.Position.DistanceSquaredTo(_player.Position))
+            .FirstOrDefault();
+
+        if (somebody is null)
+        {
+            return;
+        }
 
         InputEventMouseButton tap = new()
         {
@@ -396,6 +431,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         };
 
         GetViewport().PushInput(tap, true);
+
+
         // Said out loud so a run with nobody watching can be checked afterwards.
         GD.Print($"GREYBOX_PICKED {TargetName}");
     }
@@ -443,6 +480,21 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             _herd[serial].QueueFree();
             _herd.Remove(serial);
+        }
+    }
+
+    /// <summary>Whoever is picked out, by serial, or zero for nobody.</summary>
+    public uint Target => _target;
+
+    /// <summary>
+    /// Swings at whatever stands in front of us. Nothing is assumed about the result — the server knows
+    /// where everyone is and how recently we last swung, and answers in words when it refuses.
+    /// </summary>
+    public void Strike()
+    {
+        if (!Frozen)
+        {
+            _ = server?.AttackAsync(_leaving.Token);
         }
     }
 

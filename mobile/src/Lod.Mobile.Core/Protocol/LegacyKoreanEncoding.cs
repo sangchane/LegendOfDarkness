@@ -38,6 +38,30 @@ public static class LegacyKoreanEncoding
         return encoded;
     }
 
+    /// <summary>
+    /// The other length-prefixed string the server writes: two bytes of length rather than one. Long text —
+    /// what it says to the player — comes this way.
+    /// </summary>
+    public static string DecodeStringB(ReadOnlySpan<byte> input, out int consumed)
+    {
+        if (input.Length < 2)
+        {
+            throw new ProtocolException("StringB 의 길이 낱말이 없습니다.");
+        }
+
+        int length = (input[0] << 8) | input[1];
+
+        if (input.Length < 2 + length)
+        {
+            throw new ProtocolException(
+                $"StringB 가 {length}바이트를 예고했는데 {input.Length - 2}바이트만 있습니다.");
+        }
+
+        consumed = 2 + length;
+
+        return Cp949.GetString(input.Slice(2, length));
+    }
+
     public static string DecodeStringA(ReadOnlySpan<byte> input, out int consumed)
     {
         if (input.Length == 0)

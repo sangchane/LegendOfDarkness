@@ -78,6 +78,9 @@ public partial class Main : Control
     /// <summary>Whether to open the pack on its own, as <c>--pack</c>. For checking it without a thumb.</summary>
     public static bool OpeningPack { get; private set; }
 
+    /// <summary>Whether to swing once after picking somebody, as <c>--strike</c>.</summary>
+    public static bool Striking { get; private set; }
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
@@ -87,6 +90,7 @@ public partial class Main : Control
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
+        Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
 
         // --size wins over the orientation's own default, so a check can walk several shapes of screen.
         Vector2I? asked = SizeFromCommandLine();

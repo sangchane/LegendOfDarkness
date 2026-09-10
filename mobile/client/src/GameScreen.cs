@@ -22,6 +22,11 @@ public partial class GameScreen : Control
     private Label _place = null!;
     private Label _target = null!;
     private PackPanel _pack = null!;
+    private Label _notice = null!;
+    private ProgressBar _targetHealth = null!;
+
+    // 서버가 말한 횟수. 같은 말을 다시 하는 것과 새로 하는 것을 가르려고 센다.
+    private int _heard = -1;
     private Control _packRow = null!;
 
     // 손 없이 확인할 때 스스로 열어 보기 위한 것. 월드가 자리를 잡을 때까지 센다.
@@ -205,7 +210,24 @@ public partial class GameScreen : Control
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
         _target = Aux(string.Empty);
-        row.AddChild(_target);
+
+        _targetHealth = new ProgressBar
+        {
+            CustomMinimumSize = new Vector2(Main.Portrait ? 48 : 72, 10),
+            MaxValue = 100,
+            ShowPercentage = false,
+            SizeFlagsVertical = SizeFlags.ShrinkCenter,
+            Visible = false
+        };
+        _targetHealth.AddThemeStyleboxOverride("background", Greybox.Surface());
+        _targetHealth.AddThemeStyleboxOverride("fill", Greybox.Fill());
+
+        HBoxContainer picked = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+        picked.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        picked.AddChild(_target);
+        picked.AddChild(_targetHealth);
+
+        row.AddChild(picked);
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
         // Where the server says we are. Offline it stays empty rather than claiming something untrue.
@@ -239,7 +261,13 @@ public partial class GameScreen : Control
             _place.Text = $"{_world.PlaceName} · {_world.Standing.X},{_world.Standing.Y}";
         }
 
-        _target.Text = _world.TargetName;
+        ShowTarget();
+
+        if (_server is { } server && server.SaidCount != _heard)
+        {
+            _heard = server.SaidCount;
+            _notice.Text = server.Said;
+        }
 
         if (Main.OpeningPack && !_pack.Visible && _settling++ == 90)
         {
@@ -249,6 +277,26 @@ public partial class GameScreen : Control
         if (_pack.Visible)
         {
             _pack.Show(_server?.Pack ?? []);
+        }
+    }
+
+    /// <summary>
+    /// Whoever is picked out, and how hurt they are. The bar is never alone — the number is beside it,
+    /// because health must not be readable by colour or length alone.
+    /// </summary>
+    private void ShowTarget()
+    {
+        int? left = _world.Target == 0 ? null : _server?.Health(_world.Target);
+
+        _target.Text = left is { } percent
+            ? $"{_world.TargetName} {percent}%"
+            : _world.TargetName;
+
+        _targetHealth.Visible = left is not null;
+
+        if (left is { } value)
+        {
+            _targetHealth.Value = value;
         }
     }
 
@@ -304,15 +352,15 @@ public partial class GameScreen : Control
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
-        Label status = new()
+        _notice = new Label
         {
-            Text = "그쪽으로는 갈 수 없습니다.",
+            Text = string.Empty,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
-        status.AddThemeFontSizeOverride("font_size", AuxFontSize);
-        status.AddThemeColorOverride("font_color", Greybox.Muted);
+        _notice.AddThemeFontSizeOverride("font_size", AuxFontSize);
+        _notice.AddThemeColorOverride("font_color", Greybox.Muted);
 
         // The notice floats over the floor in landscape, so it gets a plate of its own rather than an
         // outline: a line of text on gold tiles is unreadable either way without one.
@@ -322,18 +370,23 @@ public partial class GameScreen : Control
             SizeFlagsVertical = SizeFlags.ShrinkEnd
         };
         notice.AddThemeStyleboxOverride("panel", Greybox.Plate());
-        notice.AddChild(status);
+        notice.AddChild(_notice);
 
         row.AddChild(BuildMovementPad());
         row.AddChild(Main.Portrait
             ? new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill }
             : notice);
-        row.AddChild(new Button
+        Button strike = new()
         {
             Text = "공격",
             CustomMinimumSize = new Vector2(AttackSize, AttackSize),
             SizeFlagsVertical = SizeFlags.ShrinkEnd
-        });
+        };
+
+        // One tap is one blow. It does not chase and it does not repeat — the server decides whether it
+        // landed, and says so in words we show below rather than guessing at damage here.
+        strike.Pressed += () => _world.Strike();
+        row.AddChild(strike);
 
         return Main.Capped(row, Main.ThumbSpanMaximum);
     }

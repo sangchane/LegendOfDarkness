@@ -31,6 +31,9 @@ public sealed class WorldClient(WorldSession session)
     private const byte RemoveCommand = 0x0E;
     private const byte AddToPackCommand = 0x0F;
     private const byte ShowCreaturesCommand = 0x07;
+    private const byte AttackCommand = 0x13;
+    private const byte HealthCommand = 0x13;
+    private const byte SpokenCommand = 0x0A;
     private const byte TalkCommand = 0x0E;
 
     private byte _ordinal;
@@ -53,6 +56,12 @@ public sealed class WorldClient(WorldSession session)
     // Everything on the floor that is not a player, by the same serial the server removes them by.
     private readonly ConcurrentDictionary<uint, Creature> _creatures = new();
 
+    // How hurt each of them is, out of a hundred. The server never says more than that about somebody else.
+    private readonly ConcurrentDictionary<uint, int> _health = new();
+
+    private volatile string _said = string.Empty;
+    private volatile int _saidCount;
+
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
     public WorldEntry? State => _state;
 
@@ -73,6 +82,18 @@ public sealed class WorldClient(WorldSession session)
     /// shows us to ourselves like anybody else, so this is the same packet everyone else arrives in.
     /// </summary>
     public Character? Self => _self;
+
+    /// <summary>
+    /// How much of somebody's health is left, out of a hundred, or nothing if the server has not said. It
+    /// only speaks about this when something is struck, so an untouched monster has no answer here.
+    /// </summary>
+    public int? Health(uint serial) => _health.TryGetValue(serial, out int left) ? left : null;
+
+    /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
+    public string Said => _said;
+
+    /// <summary>How many times it has spoken, so a reader can tell a repeat from a new line.</summary>
+    public int SaidCount => _saidCount;
 
     /// <summary>Monsters and merchants the server has shown us, by serial.</summary>
     public IReadOnlyCollection<Creature> Creatures => (IReadOnlyCollection<Creature>)_creatures.Values;
@@ -130,6 +151,24 @@ public sealed class WorldClient(WorldSession session)
                     Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
                     continue;
 
+                case HealthCommand:
+                    ReadHealth(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    continue;
+
+                case SpokenCommand:
+                {
+                    ReadOnlySpan<byte> spoken = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                    // A sound with no words is still this packet; there is simply nothing to show.
+                    if (spoken.Length > 3)
+                    {
+                        _said = LegacyKoreanEncoding.DecodeStringB(spoken[1..], out _);
+                        _saidCount++;
+                    }
+                }
+
+                    continue;
+
                 case ShowCreaturesCommand:
                     foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
                     {
@@ -183,6 +222,14 @@ public sealed class WorldClient(WorldSession session)
     public Task SayAsync(string text, CancellationToken cancellationToken) =>
         Send(TalkCommand, [0, .. LegacyKoreanEncoding.EncodeStringA(text)], cancellationToken);
 
+    /// <summary>
+    /// Strikes whatever is in front of us. The server decides whether that hits anything — it knows where
+    /// everyone stands and how recently we last swung — so nothing is assumed here about the outcome.
+    /// One tap is one blow: it does not chase and does not repeat.
+    /// </summary>
+    public Task AttackAsync(CancellationToken cancellationToken) =>
+        Send(AttackCommand, [], cancellationToken);
+
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>
         Send(RefreshCommand, [], cancellationToken);
@@ -226,6 +273,15 @@ public sealed class WorldClient(WorldSession session)
 
         (int column, int row) = Facing.TileStep(facing);
         Tile now = new(fromX + column, fromY + row);
+
+        // Monsters walk too, and the server uses this same packet for them. Take somebody we already know
+        // to be a monster as a monster — otherwise it joins the crowd as a nameless person and stands there
+        // wearing borrowed clothes on the tile its own picture is drawn on.
+        if (_creatures.TryGetValue(serial, out Creature? beast))
+        {
+            _creatures[serial] = beast with { Where = now, Facing = facing };
+            return;
+        }
 
         // A step says nothing about clothes, so keep the ones we were shown rather than undressing them.
         Show(Known(serial) is { } known
@@ -284,6 +340,30 @@ public sealed class WorldClient(WorldSession session)
             BinaryPrimitives.ReadUInt16BigEndian(body[28..]));
 
         return new Character(serial, where, facing, wearing, ReadName(body, fixedLength));
+    }
+
+    /// <summary>
+    /// How hurt somebody is: whose, how much of their health is left out of a hundred, and a sound to play.
+    /// A full bar is written as 255 rather than 100 — that is the server saying there is nothing to show,
+    /// which is also how it answers a blow that could not land.
+    /// </summary>
+    private void ReadHealth(ReadOnlySpan<byte> body)
+    {
+        const int fixedLength = 7;
+
+        if (body.Length < fixedLength)
+        {
+            throw new ProtocolException($"체력 안내가 {fixedLength}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        int left = BinaryPrimitives.ReadUInt16BigEndian(body[4..]);
+
+        if (left > 100)
+        {
+            return;
+        }
+
+        _health[BinaryPrimitives.ReadUInt32BigEndian(body)] = left;
     }
 
     /// <summary>
