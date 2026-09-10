@@ -21,6 +21,10 @@ public partial class GameScreen : Control
     private WorldView _world = null!;
     private Label _place = null!;
     private Label _target = null!;
+    private PackPanel _pack = null!;
+
+    // 손 없이 확인할 때 스스로 열어 보기 위한 것. 월드가 자리를 잡을 때까지 센다.
+    private int _settling;
     private Control _topRow = null!;
     private Control _controlRow = null!;
 
@@ -49,6 +53,8 @@ public partial class GameScreen : Control
         rows.MouseFilter = MouseFilterEnum.Ignore;
 
         _topRow = BuildTopRow();
+        _pack = new PackPanel();
+        _pack.Close.Pressed += () => Carrying(false);
 
         if (Main.Portrait)
         {
@@ -61,6 +67,7 @@ public partial class GameScreen : Control
             hud.AddChild(rows);
             rows.AddChild(_topRow);
             rows.AddChild(_world);
+            rows.AddChild(BuildPackRow());
             rows.AddChild(BuildLog());
             rows.AddChild(_controlRow);
         }
@@ -74,13 +81,38 @@ public partial class GameScreen : Control
             AddChild(hud);
             hud.AddChild(rows);
             rows.AddChild(_topRow);
-            rows.AddChild(new Control
-            {
-                SizeFlagsVertical = SizeFlags.ExpandFill,
-                MouseFilter = MouseFilterEnum.Ignore
-            });
+            rows.AddChild(BuildPackRow());
             rows.AddChild(_controlRow);
         }
+    }
+
+    /// <summary>
+    /// Where the pack sits when it is open: against the right edge, over rather than beside the world, and
+    /// taking a bit over a third of the width. The rest of the row lets taps through to the floor.
+    /// </summary>
+    private Control BuildPackRow()
+    {
+        HBoxContainer row = new()
+        {
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+
+        row.AddChild(new Control
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsStretchRatio = 62,
+            MouseFilter = MouseFilterEnum.Ignore
+        });
+
+        // 높이는 남는 만큼만 — 최소 높이를 박으면 위·아래 줄이 화면 밖으로 밀린다(한 번 그렇게 됐다).
+        _pack.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _pack.SizeFlagsStretchRatio = 38;
+        _pack.SizeFlagsVertical = SizeFlags.ExpandFill;
+
+        row.AddChild(_pack);
+
+        return row;
     }
 
     /// <summary>
@@ -168,11 +200,14 @@ public partial class GameScreen : Control
             row.AddChild(_place);
         }
 
-        row.AddChild(new Button
+        Button pack = new()
         {
             Text = "인벤토리",
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        });
+        };
+
+        pack.Pressed += () => Carrying(true);
+        row.AddChild(pack);
 
         plate.AddChild(row);
 
@@ -188,6 +223,31 @@ public partial class GameScreen : Control
         }
 
         _target.Text = _world.TargetName;
+
+        if (Main.OpeningPack && !_pack.Visible && _settling++ == 90)
+        {
+            Carrying(true);
+        }
+
+        if (_pack.Visible)
+        {
+            _pack.Show(_server?.Pack ?? []);
+        }
+    }
+
+    /// <summary>
+    /// Opens or shuts the pack. While it is open the world takes no taps and no steps — the panel lies over
+    /// it, and a thumb aimed at the list must not walk the character.
+    /// </summary>
+    private void Carrying(bool open)
+    {
+        _pack.Visible = open;
+        _world.Frozen = open;
+
+        if (open)
+        {
+            _pack.Show(_server?.Pack ?? []);
+        }
     }
 
     /// <summary>Bar and numbers together: health must never be readable by colour alone.</summary>

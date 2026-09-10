@@ -60,6 +60,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private double _walked = -1;
     private int _drawnFrame = -1;
 
+    /// <summary>
+    /// While something is laid over the world — the pack, say — the floor takes neither taps nor steps.
+    /// The world keeps running underneath: other people still walk about.
+    /// </summary>
+    public bool Frozen { get; set; }
+
     /// <summary>The tile the player is on, as this client believes it — which is what a player wants shown.</summary>
     public Tile Standing => _tile;
 
@@ -147,6 +153,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     public override void _GuiInput(InputEvent @event)
     {
+        if (Frozen)
+        {
+            return;
+        }
+
         Vector2 at;
 
         switch (@event)
@@ -214,7 +225,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// <summary>Starts a step. Ignored while one is still running, so a tile is never half walked.</summary>
     public void Walk(Direction direction)
     {
-        if (_walked >= 0)
+        if (Frozen || _walked >= 0)
         {
             return;
         }
@@ -342,12 +353,22 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     {
         // Not the moment somebody appears: the view is still sliding to where the server put us, and a tap
         // aimed before it settles lands on empty floor.
-        if (_rehearsedPick || !Main.Picking || _crowd.Count == 0 || _heard < 0 || _settling++ < 60)
+        if (_rehearsedPick || !(Main.Picking || Main.Saying.Length > 0) || _heard < 0 || _settling++ < 60)
         {
             return;
         }
 
         _rehearsedPick = true;
+
+        if (Main.Saying.Length > 0)
+        {
+            _ = server?.SayAsync(Main.Saying, _leaving.Token);
+        }
+
+        if (!Main.Picking || _crowd.Count == 0)
+        {
+            return;
+        }
 
         Actor somebody = _crowd.Values.First();
 

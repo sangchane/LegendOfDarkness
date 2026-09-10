@@ -29,6 +29,8 @@ public sealed class WorldClient(WorldSession session)
     private const byte DisplayCharacterCommand = 0x33;
     private const byte CreatureWalkedCommand = 0x0C;
     private const byte RemoveCommand = 0x0E;
+    private const byte AddToPackCommand = 0x0F;
+    private const byte TalkCommand = 0x0E;
 
     private byte _ordinal;
     private byte _step;
@@ -43,6 +45,9 @@ public sealed class WorldClient(WorldSession session)
     private readonly ConcurrentDictionary<uint, Character> _others = new();
 
     private volatile Character? _self;
+
+    // Keyed by the slot the server puts each thing in, which is how it refers to them afterwards.
+    private readonly ConcurrentDictionary<int, InventoryItem> _pack = new();
 
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
     public WorldEntry? State => _state;
@@ -64,6 +69,9 @@ public sealed class WorldClient(WorldSession session)
     /// shows us to ourselves like anybody else, so this is the same packet everyone else arrives in.
     /// </summary>
     public Character? Self => _self;
+
+    /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
+    public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
 
     /// <summary>Everyone else the server has shown us, by serial. Our own character is not in here.</summary>
     public IReadOnlyCollection<Character> Others => (IReadOnlyCollection<Character>)_others.Values;
@@ -115,6 +123,14 @@ public sealed class WorldClient(WorldSession session)
                     Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
                     continue;
 
+                case AddToPackCommand:
+                    {
+                        InventoryItem carried = ReadPackItem(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _pack[carried.Slot] = carried;
+                    }
+
+                    continue;
+
                 case CreatureWalkedCommand:
                     Moved(HadesCipher.DecodeSecured(frame, session.Parameters));
                     continue;
@@ -139,6 +155,13 @@ public sealed class WorldClient(WorldSession session)
     /// <summary>Says we are taking one step. The count rises so the server can see how fast we claim to move.</summary>
     public Task WalkAsync(Direction direction, CancellationToken cancellationToken) =>
         Send(WalkCommand, [ToServer(direction), _step++], cancellationToken);
+
+    /// <summary>
+    /// Says something out loud. The server treats a line beginning with a known word as a command when the
+    /// speaker is allowed to give one, which is how a test gets an item into an empty pack.
+    /// </summary>
+    public Task SayAsync(string text, CancellationToken cancellationToken) =>
+        Send(TalkCommand, [0, .. LegacyKoreanEncoding.EncodeStringA(text)], cancellationToken);
 
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>
@@ -241,6 +264,38 @@ public sealed class WorldClient(WorldSession session)
             BinaryPrimitives.ReadUInt16BigEndian(body[28..]));
 
         return new Character(serial, where, facing, wearing, ReadName(body, fixedLength));
+    }
+
+    /// <summary>
+    /// Something the server has put in our pack: which slot, what it looks like, what it is called, how
+    /// many, and how worn out.
+    /// </summary>
+    public static InventoryItem ReadPackItem(ReadOnlySpan<byte> body)
+    {
+        const int beforeName = 4;
+
+        if (body.Length < beforeName + 1)
+        {
+            throw new ProtocolException($"소지품 안내가 {beforeName + 1}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        string name = LegacyKoreanEncoding.DecodeStringA(body[beforeName..], out int consumed);
+        ReadOnlySpan<byte> rest = body[(beforeName + consumed)..];
+
+        if (rest.Length < 13)
+        {
+            throw new ProtocolException($"소지품 안내의 이름 뒤가 13바이트보다 짧습니다 ({rest.Length}바이트).");
+        }
+
+        return new InventoryItem(
+            body[0],
+            BinaryPrimitives.ReadUInt16BigEndian(body[1..]),
+            body[3],
+            name,
+            (int)BinaryPrimitives.ReadUInt32BigEndian(rest),
+            // Byte 4 says whether it stacks, which the count already tells us.
+            (int)BinaryPrimitives.ReadUInt32BigEndian(rest[9..]),
+            (int)BinaryPrimitives.ReadUInt32BigEndian(rest[5..]));
     }
 
     /// <summary>The name, if the server got as far as writing one.</summary>

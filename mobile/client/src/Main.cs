@@ -68,6 +68,16 @@ public partial class Main : Control
     /// </summary>
     public static bool Picking { get; private set; }
 
+    /// <summary>
+    /// A line to say once the world is open, as <c>--say "give Shagreen Boots"</c>. The server reads a
+    /// line like that as a command when the speaker is allowed to give one, which is how a test puts
+    /// something in an empty pack.
+    /// </summary>
+    public static string Saying { get; private set; } = string.Empty;
+
+    /// <summary>Whether to open the pack on its own, as <c>--pack</c>. For checking it without a thumb.</summary>
+    public static bool OpeningPack { get; private set; }
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
@@ -75,6 +85,8 @@ public partial class Main : Control
         ReadRehearsal(Flag("--login"));
         Rehearse = Flag("--walk");
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
+        Saying = Flag("--say");
+        OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
 
         if (Portrait)
         {

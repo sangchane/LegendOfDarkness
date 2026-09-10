@@ -39,6 +39,23 @@ public sealed record Appearance(
     int OverCoat);
 
 /// <summary>
+/// One thing in a character's pack. The server sends these one at a time, both on the way in and whenever
+/// something is picked up.
+/// </summary>
+/// <param name="Icon">
+/// Which picture to draw for it. We have no icons cut from the archives yet, so nothing reads this — the
+/// name is what a player sees.
+/// </param>
+public sealed record InventoryItem(
+    int Slot,
+    int Icon,
+    int Colour,
+    string Name,
+    int Stacks,
+    int Durability,
+    int MaxDurability);
+
+/// <summary>
 /// Somebody else standing in the world: where they are, which way they face, what they wear and what they
 /// are called. A character who is dead, or who has taken a monster's shape, arrives without a wardrobe.
 /// </summary>
