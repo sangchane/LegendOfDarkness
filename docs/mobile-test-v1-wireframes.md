@@ -165,7 +165,7 @@ flowchart LR
 
 가로 360을 나눈 근거: HUD를 겹치지 않고서는 방향판 150과 월드를 동시에 넣을 수 없다. 그래서 가로는 겹치되, 겹치는 자리를 아래 양쪽 모서리로 몰아 화면 가운데(플레이어가 서 있는 곳)를 비워 둔다.
 
-확인: [`ui/hud-mockup.html`](ui/hud-mockup.html)에서 실시간으로 바꿔 볼 수 있고, [`ui/wireframes.html`](ui/wireframes.html)은 여섯 장 모두 두 방향을 보여준다.
+확인: [`개발 대시보드의 화면 실험실`](index.html?view=prototypes)에서 여섯 화면과 HUD 상태를 바로 바꿔 볼 수 있다.
 
 ### 2.2 터치와 글자 기준
 
