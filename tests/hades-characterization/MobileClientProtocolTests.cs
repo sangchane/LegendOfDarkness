@@ -99,6 +99,27 @@ public sealed class MobileClientProtocolTests
     }
 
     [Fact]
+    public async Task The_world_tells_us_our_own_name()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+
+        using WorldSession session = await LoginAsync(server);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Settled(world, seen => seen is not null);
+
+        // The HUD has no other source for it — anything else it shows is invented.
+        Character? self = await Mine(world);
+
+        Assert.Equal(MobileName, self!.Name);
+    }
+
+    [Fact]
     public async Task Walking_moves_the_character_on_the_server()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
@@ -241,6 +262,24 @@ public sealed class MobileClientProtocolTests
         }
 
         throw new TimeoutException($"서버가 {serial} 가 떠났다고 알려주지 않았습니다.");
+    }
+
+    /// <summary>Waits until the server has said which character is ours.</summary>
+    private async Task<Character?> Mine(WorldClient world)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            if (world.Self is not null)
+            {
+                return world.Self;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException("서버가 우리 자신을 알려주지 않았습니다.");
     }
 
     /// <summary>Waits for the watcher to be told about a particular character.</summary>

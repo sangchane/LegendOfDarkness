@@ -19,6 +19,7 @@ public partial class GameScreen : Control
     private const int LogHeight = 76;
 
     private WorldView _world = null!;
+    private Label _who = null!;
     private Label _place = null!;
     private Label _target = null!;
     private PackPanel _pack = null!;
@@ -204,7 +205,11 @@ public partial class GameScreen : Control
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
-        row.AddChild(Aux("수련생"));
+        // Empty until the server names us, in step with the place name below: a made-up name on the
+        // HUD is worse than none, because there is no way to tell it from a real one.
+        _who = Aux(string.Empty);
+
+        row.AddChild(_who);
         row.AddChild(BuildHealth());
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
@@ -259,6 +264,12 @@ public partial class GameScreen : Control
         if (_world.PlaceName.Length > 0)
         {
             _place.Text = $"{_world.PlaceName} · {_world.Standing.X},{_world.Standing.Y}";
+        }
+
+        // The server names us in 0x33; nothing else on this screen knows who we are.
+        if (_server?.Self?.Name is { Length: > 0 } called)
+        {
+            _who.Text = called;
         }
 
         ShowTarget();
