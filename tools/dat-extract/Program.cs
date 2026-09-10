@@ -19,6 +19,7 @@ internal static class Program
             Console.Error.WriteLine("사용법: dat-extract list <아카이브.dat>");
             Console.Error.WriteLine("        dat-extract dump <아카이브.dat> <출력 폴더> [이름 조각]");
             Console.Error.WriteLine("        dat-extract tiles <seo.dat> <출력.png> <시작> <개수> [가로칸]");
+            Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png>");
             return 2;
         }
 
@@ -39,6 +40,7 @@ internal static class Program
             "list" => List(entries),
             "dump" => await Dump(entries, args),
             "tiles" => await Tiles(entries, args),
+            "map" => await RenderMap(entries, args),
             _ => Unknown(command)
         };
     }
@@ -176,6 +178,146 @@ internal static class Program
         Console.WriteLine($"{count}개 타일을 {output} 에 그렸습니다.");
 
         return 0;
+    }
+
+    /// <summary>
+    /// Draws a map's floor as the client does: the grid is diamond shaped, so each cell steps half a tile
+    /// across and half a tile down from its neighbours. Floor index 0 means nothing is laid there.
+    /// </summary>
+    private static async Task<int> RenderMap(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 6)
+        {
+            Console.Error.WriteLine("map 에는 맵파일, 가로칸, 세로칸, 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string mapPath = Path.GetFullPath(args[2]);
+        int columns = int.Parse(args[3]);
+        int rows = int.Parse(args[4]);
+        string output = Path.GetFullPath(args[5]);
+
+        if (!File.Exists(mapPath))
+        {
+            Console.Error.WriteLine($"맵 파일을 찾을 수 없습니다: {mapPath}");
+            return 2;
+        }
+
+        TileSource source = TileSource.From(entries);
+        if (source is null)
+        {
+            return 2;
+        }
+
+        List<MapTile> cells = Map.LoadMapTiles(mapPath).ToList();
+        Console.WriteLine($"{Path.GetFileName(mapPath)} — 칸 {cells.Count}개 ({columns}x{rows} = {columns * rows})");
+
+        const int halfWidth = TileWidth / 2;
+        const int halfHeight = 13;
+
+        int width = (columns + rows) * halfWidth;
+        int height = ((columns + rows) * halfHeight) + TileHeight;
+        int originX = rows * halfWidth;
+
+        using Image<Rgba32> canvas = new(width, height);
+        int drawn = 0;
+
+        for (int row = 0; row < rows; row++)
+        {
+            for (int column = 0; column < columns; column++)
+            {
+                int cell = (row * columns) + column;
+                if (cell >= cells.Count)
+                {
+                    continue;
+                }
+
+                int floor = cells[cell].Floor;
+                if (floor <= 0 || floor > source.Tiles.Count)
+                {
+                    continue;
+                }
+
+                int x = originX + ((column - row) * halfWidth) - halfWidth;
+                int y = (column + row) * halfHeight;
+                source.Draw(canvas, floor - 1, x, y);
+                drawn++;
+            }
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+        await canvas.SaveAsPngAsync(output);
+        Console.WriteLine($"바닥 {drawn}칸을 {width}x{height} 로 그려 {output} 에 저장했습니다.");
+
+        return 0;
+    }
+
+    private const int TileWidth = 56;
+    private const int TileHeight = 27;
+
+    /// <summary>The ground tile set and the palettes that colour it, read once and reused.</summary>
+    private sealed class TileSource
+    {
+        public required List<Tile> Tiles { get; init; }
+        public required List<Palette> Palettes { get; init; }
+        public required List<PaletteTable> Tables { get; init; }
+
+        public static TileSource From(List<ArchivedItem> entries)
+        {
+            ArchivedItem tileSet = entries.FirstOrDefault(entry =>
+                entry.Name.Equals("TILEA.BMP", StringComparison.OrdinalIgnoreCase));
+
+            if (tileSet is null)
+            {
+                Console.Error.WriteLine("TILEA.BMP 를 찾지 못했습니다.");
+                return null;
+            }
+
+            return new TileSource
+            {
+                Tiles = new TileCollection(tileSet).Load(),
+                Palettes = Palette.FromArchive(Matching(entries, ".pal")),
+                Tables = PaletteTable.FromArchive(Matching(entries, ".tbl"), "mpt", _ => { }).Result
+            };
+        }
+
+        private static IEnumerable<ArchivedItem> Matching(List<ArchivedItem> entries, string extension) =>
+            entries.Where(e => e.Name.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
+                            && e.Name.StartsWith("mpt", StringComparison.OrdinalIgnoreCase))
+                   .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase);
+
+        public void Draw(Image<Rgba32> canvas, int index, int originX, int originY)
+        {
+            Palette palette = PaletteFor(index, Tables, Palettes);
+            byte[] data = Tiles[index].Data;
+
+            for (int y = 0; y < TileHeight; y++)
+            {
+                int targetY = originY + y;
+                if (targetY < 0 || targetY >= canvas.Height)
+                {
+                    continue;
+                }
+
+                for (int x = 0; x < TileWidth; x++)
+                {
+                    int targetX = originX + x;
+                    if (targetX < 0 || targetX >= canvas.Width)
+                    {
+                        continue;
+                    }
+
+                    byte code = data[(y * TileWidth) + x];
+                    if (code == 0)
+                    {
+                        continue;
+                    }
+
+                    System.Drawing.Color colour = palette[code];
+                    canvas[targetX, targetY] = new Rgba32(colour.R, colour.G, colour.B, 255);
+                }
+            }
+        }
     }
 
     private static Palette PaletteFor(int index, List<PaletteTable> tables, List<Palette> palettes)
