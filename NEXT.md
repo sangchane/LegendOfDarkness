@@ -1,10 +1,10 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[지금/화면]** **Godot에 원작 그림을 올린다.** 로그인·월드 입장은 붙었다(`mobile/src/Lod.Mobile.Core`, 시험 19+26개 통과). 이제 회색 상자를 실제 스프라이트로 바꾼다 — 바닥은 `tools/dat-extract`의 `map`, 사람은 `pose`, 괴물은 `mpf`로 뽑는다. **방향 규칙은 `docs/original-sprite-animation.md`를 따른다**(등·앞 두 벌 + 서·남 좌우 뒤집기, 뒤집는 축은 발 위치, 방패 z순서 교체)
-- **[다음/통신]** 월드에 들어간 뒤의 패킷 — 이동·시야·대화. `WorldSession`이 연결과 암호 매개변수를 들고 있으므로 `HadesCipher.EncodeSecured`/`DecodeSecured`로 바로 주고받을 수 있다
+- **[지금/통신]** **월드에 들어간 뒤의 패킷** — 서버가 보내는 지도·주변 사람·이동을 읽고, 우리 이동을 보낸다. 지금 Godot 월드는 그림만 진짜고 위치는 우리가 정한 값이다. `WorldSession`이 연결과 암호 매개변수를 들고 있으므로 `HadesCipher.EncodeSecured`/`DecodeSecured`로 바로 주고받을 수 있다. 시작점은 서버의 `ServerFormat15`(지도 바꾸기)·`0x0B`(이동)
 - **[다음/P0-14~P0-17]** 서버 안정화 마무리 — 송신 큐, 원자적 저장, 기본 전투 정확성, 하드코딩 상수 설정화
 - **[다음/자산]** 벽 타일(`TILEAS.BMP`는 고정 크기 아님)과 아이템 아이콘. 지면·맵·캐릭터·괴물·사물은 끝났다. **`LOD_`의 복원본은 쓰지 않는다**
+- **[다음/화면]** 대상 고르기·전투·인벤토리를 Godot에 올린다. 배치는 시안(`docs/ui/`)에 이미 있다
 - **[대기/Mac]** 같은 커밋을 Mac에서 Godot 4.6 .NET + .NET 9로 열어 macOS 실행 후 Xcode export·arm64 iPhone 실기기 설치를 확인한다. iOS C# 지원은 experimental이며 서명 Team ID와 기준 iPhone/OS는 그때 지정한다
 
 <!-- NEXT-ACTION:END -->
