@@ -310,33 +310,53 @@ m  b   001   c  .epf
 칸을 부위마다 자기 그림에 맞추면 모자가 머리에서 벗겨진다. 칸보다 큰 그림이 나오면 잘라 내지 않고
 멈춘다.
 
-아직 안 되는 것은 **색(`HairColor`·`BootColor`)** 하나다. 팔레트를 바꿔 끼우는 일이라 그림을 겹치는
-것만으로는 안 되고, 참고 클라이언트도 조각마다 염색 셰이더를 건다(`paper-doll-container.ts` 의
-`setDye`).
-
 여자 그림(`khan2.dat`)에는 색표가 없어 `khan.dat` 것을 빌려 쓴다 — `pose` 가 알아서 옆집을 연다.
+
+### 색 — 그림을 다시 그리지 않고 염색한다
+
+같은 머리 모양을 색만 바꿔 쓰려고 그림을 색깔 수만큼 뽑지 않는다. **그 조각이 그려진 팔레트의
+98번부터 여섯 칸을 색표의 여섯 색으로 덮어쓴다.** 그게 전부다.
+
+- 근거: `sources/wren11/da-lib/DALib/Drawing/Palette.cs` 의 `Dye()`, 시작 번호는 같은 저장소
+  `Definitions/CONSTANTS.cs` 의 `PALETTE_DYE_INDEX_START = 98`.
+- 색표: `Legend.dat` 의 `color0.tbl`(번호 0~71, 한 번호에 여섯 색). `color.tbl` 은 14번부터인 부분표다.
+- 염색되는 부위는 셋뿐이다 — **머리/투구**(`HairColor`), **신발**(`BootColor`), **바지**(몸 바이트의
+  아래 반쪽). 갑옷·방패·무기·장신구는 참고 클라이언트도 염색하지 않는다
+  (`map-scene.ts` 의 `onDisplayAisling`).
+
+우리는 실행 중에 사람마다 색이 달라야 하므로, **염색 자리를 표시색으로 구워 둔다.**
+`dat-extract pose … marker` 가 98~103번을 `255,0,250`~`255,0,255` 로 칠하고
+(`dat-extract dyeslots` 가 그 여섯 값을 파일로 적어 준다), 클라이언트가 그 화소만 찾아 진짜 색으로
+갈아 끼운다(`mobile/client/src/Palettes.cs`, 조각·색 한 쌍당 한 번만 만들고 보관한다).
+
+표시색이 팔레트의 다른 자리와 겹치면 엉뚱한 화소가 칠해지므로, `pose` 가 굽기 전에 겹침을 확인하고
+겹치면 멈춘다.
 
 ---
 
-## 8. `Legend.dat` 은 이 저장소에 없다
+## 8. `Legend.dat` 은 저장소 안에 있다
 
-`skill.tbl`·`MobTile.tbl`·`itempal.tbl`·`emo32~40.tbl`은 모두 `Legend.dat` 안에 있는데,
-**이 저장소의 `sources/Dark-Ages-Private-Server-master/game/` 에는 `Legend.dat`이 없다.**
-(`cious.dat`도 없다.) 설치 클라이언트에는 있다:
+> **2026-09-10 정정.** 이 절은 "이 저장소에 없다, 설치 클라이언트에만 있다"고 적혀 있었다. **틀렸다.**
+> 그림 자료 폴더에 없을 뿐 서버 저장소 쪽에 들어 있다. 그 문장 때문에 한 번 헛되이 접었다 —
+> `docs/where-the-answers-are.md` 4절 참고.
+
+`skill.tbl`·`MobTile.tbl`·`itempal.tbl`·`color.tbl`·`emo32~40.tbl` 이 모두 여기 들어 있다:
 
 ```
-C:\Program Files (x86)\KRU\Dark Ages\Legend.dat
+sources/wren11/Dark-Ages-Private-Server/database/archives/legend/Legend.dat   (13MB)
 ```
 
 읽는 법:
 
 ```
-dat-extract dump "C:/Program Files (x86)/KRU/Dark Ages/Legend.dat" <출력폴더> .tbl
+dat-extract list sources/wren11/Dark-Ages-Private-Server/database/archives/legend/Legend.dat
+dat-extract dump sources/wren11/Dark-Ages-Private-Server/database/archives/legend/Legend.dat <출력폴더> .tbl
 ```
 
-실제로 쓰는 표(50KB)는 뽑아서 [`../data/legend-tables/`](../data/legend-tables/) 에 넣어 두었다.
-설치 클라이언트가 없는 기기에서도 그대로 읽을 수 있다. 13MB 아카이브 전체와 이야기 삽화·음악은
-넣지 않았다 — 필요해지면 위 경로에서 뽑는다.
+안에는 `.tbl` 16개 · 이야기 삽화 `.epf` 186장 · 음악 `.mp3` 165곡이 있다. 규칙 표 16개(50KB)는
+[`../data/legend-tables/`](../data/legend-tables/) 에 그대로 뽑아 두었다 — **아카이브 안의 것과 같은
+파일들이다.** 13MB를 매번 열지 않으려는 것뿐이다. `cious.dat`(8MB)는 여전히 없고 설치 클라이언트에만
+있다.
 
 ---
 

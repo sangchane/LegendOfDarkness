@@ -29,11 +29,19 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
             Console.Error.WriteLine("        dat-extract epf <khan.dat> <이름조각> <출력.png> [칸수] [배율] [팔레트.dat]");
             Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명|transparent]");
-            Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율]");
+            Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율] [칸] [색번호|marker] [색표]");
+            Console.Error.WriteLine("        dat-extract dyeslots <출력.txt>");
             return 2;
         }
 
         string command = args[0];
+
+        // The one command that reads no archive: it only writes down what `pose … marker` leaves behind.
+        if (command == "dyeslots")
+        {
+            return await WriteDyeSlots(args);
+        }
+
         string archivePath = Path.GetFullPath(args[1]);
 
         if (!File.Exists(archivePath))
@@ -419,12 +427,36 @@ internal static class Program
     /// then what it wears, then what it holds — each carrying its own offset inside a shared box, so the
     /// pieces line up when drawn in order at the same frame number.
     /// </summary>
+    /// <summary>
+    /// Writes the colours <c>pose … marker</c> leaves in the dyed slots, so whoever recolours the sheets
+    /// does not have to be told them twice.
+    /// </summary>
+    private static async Task<int> WriteDyeSlots(string[] args)
+    {
+        if (args.Length < 2)
+        {
+            Console.Error.WriteLine("dyeslots 에는 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string output = Path.GetFullPath(args[1]);
+        Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+
+        await File.WriteAllLinesAsync(
+            output,
+            ColourTable.Markers.Select(marker => $"{marker.R},{marker.G},{marker.B}"));
+
+        Console.WriteLine($"표시색 {ColourTable.Markers.Length}개를 {output} 에 적었습니다.");
+
+        return 0;
+    }
+
     private static async Task<int> RenderPose(List<ArchivedItem> entries, string[] args)
     {
         if (args.Length < 4)
         {
             Console.Error.WriteLine(
-                "pose <아카이브> <겹칠 이름들> <출력> [자세들] [확대] [칸 크기 예: 116x92]");
+                "pose <아카이브> <겹칠 이름들> <출력> [자세들] [확대] [칸 크기 예: 80x88] [색 번호] [색표 경로]");
             return 2;
         }
 
@@ -435,6 +467,25 @@ internal static class Program
             .Select(int.Parse)
             .ToArray();
         int zoom = args.Length > 5 ? int.Parse(args[5]) : 4;
+
+        // Optional: a dye number and the table it is in, which recolours the run of palette entries the
+        // original leaves free for exactly that.
+        System.Drawing.Color[]? dye = null;
+
+        if (args.Length > 7 && args[7].Equals("marker", StringComparison.OrdinalIgnoreCase))
+        {
+            dye = ColourTable.Markers;
+        }
+        else if (args.Length > 8 && int.TryParse(args[7], out int wantedDye))
+        {
+            Dictionary<int, System.Drawing.Color[]> table = ColourTable.Read(Path.GetFullPath(args[8]));
+
+            if (!table.TryGetValue(wantedDye, out dye))
+            {
+                Console.Error.WriteLine($"색 {wantedDye} 번이 {args[8]} 에 없습니다.");
+                return 2;
+            }
+        }
 
         bool female = Path.GetFileName(args[1]).StartsWith("khan2", StringComparison.OrdinalIgnoreCase);
 
@@ -471,6 +522,27 @@ internal static class Program
             {
                 Console.Error.WriteLine($"  {layer}: 색표를 찾지 못했습니다");
                 return 2;
+            }
+
+            // The markers only work because nothing else in the palette wears those colours.
+            if (dye == ColourTable.Markers)
+            {
+                for (int code = 1; code < 256; code++)
+                {
+                    if (code >= ColourTable.FirstDyedIndex && code < ColourTable.FirstDyedIndex + dye.Length)
+                    {
+                        continue;
+                    }
+
+                    if (ColourTable.Markers.Any(marker =>
+                            marker.R == palette[code].R
+                            && marker.G == palette[code].G
+                            && marker.B == palette[code].B))
+                    {
+                        Console.Error.WriteLine($"  {layer}: 표시색이 팔레트 {code} 번과 겹칩니다");
+                        return 2;
+                    }
+                }
             }
             Epf.Sheet sheet = Epf.Read(item.Data);
             List<Epf.Frame> frames = sheet.Frames;
@@ -543,7 +615,8 @@ internal static class Program
                     frame.Height,
                     palette,
                     (slot * cellWidth) + 2 + frame.Left - pieceX,
-                    2 + frame.Top - pieceY);
+                    2 + frame.Top - pieceY,
+                    dye);
             }
         }
 

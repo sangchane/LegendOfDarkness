@@ -20,16 +20,23 @@ public sealed partial class Actor : Node2D
     /// for the tallest pose, so the figure is nowhere near the middle of it and the cell cannot say where
     /// the feet are. Both numbers come from scripts/build-client-assets.ps1, which cuts every sheet.
     /// </param>
+    /// <param name="Colours">
+    /// What to dye each sheet, one per path. A piece with nothing to dye ignores it.
+    /// </param>
     public sealed record Sheet(
         IReadOnlyList<string> Paths,
+        IReadOnlyList<int> Colours,
         int CellWidth,
         int CellHeight,
         float FeetX,
         float FeetY)
     {
-        public static Sheet Walk(params string[] paths) => new(paths, 80, 88, 31.5f, 83f);
+        public static Sheet Walk(params string[] paths) => Walk(paths, new int[paths.Length]);
 
-        public static Sheet Creature(string path, int size) => new([path], size, size, size / 2f, size);
+        public static Sheet Walk(IReadOnlyList<string> paths, IReadOnlyList<int> colours) =>
+            new(paths, colours, 80, 88, 31.5f, 83f);
+
+        public static Sheet Creature(string path, int size) => new([path], [0], size, size, size / 2f, size);
     }
 
     private readonly List<Sprite2D> _sprites = [];
@@ -52,12 +59,12 @@ public sealed partial class Actor : Node2D
 
     public override void _Ready()
     {
-        foreach (string path in _sheet.Paths)
+        for (int layer = 0; layer < _sheet.Paths.Count; layer++)
         {
             Sprite2D piece = new()
             {
                 Centered = false,
-                Texture = GD.Load<Texture2D>(path),
+                Texture = Palettes.Load(_sheet.Paths[layer], _sheet.Colours[layer]),
                 RegionEnabled = true,
 
                 // Drawn up and to the left of the origin, so the origin is between the feet.

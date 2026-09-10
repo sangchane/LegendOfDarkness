@@ -5,9 +5,15 @@ namespace Lod.Mobile.Core.World;
 /// letter, the part letter, and the number padded to three digits — docs/original-sprite-animation.md
 /// section 7 has the letters and where each one was confirmed.
 /// </summary>
+/// <summary>
+/// One drawing and the colour to dye it. Only the head, the boots and the trousers are dyed — the
+/// server sends a colour for those and for nothing else, and the reference client dyes the same three.
+/// </summary>
+public sealed record Piece(string Name, int Colour);
+
 public static class Wardrobe
 {
-    // The body byte holds the kind of body in its top half and the trousers in its bottom half.
+    // The body byte holds the kind of body in its top half and the trousers' colour in its bottom half.
     private const int Kind = 0xF0;
     private const int Trousers = 0x0F;
 
@@ -23,32 +29,40 @@ public static class Wardrobe
     /// (sources/FallenDev/dark-ages-ts/.../paper-doll-container.ts): the shield behind everything, then the
     /// body and what covers it, then the weapon, then the head.
     /// </remarks>
-    public static IReadOnlyList<string> Pieces(Appearance worn)
+    public static IReadOnlyList<Piece> Pieces(Appearance worn)
     {
         char gender = Women.Contains((worn.Body & Kind) >> 4) ? 'w' : 'm';
-        List<string> pieces = [];
+        List<Piece> pieces = [];
 
         Add('s', worn.Shield);
 
         // The body is always the same drawing; which archive it comes out of is what the gender decides.
-        pieces.Add($"{gender}b001");
+        pieces.Add(new Piece($"{gender}b001", 0));
 
-        Add('n', worn.Body & Trousers);
-        Add('l', worn.Boots);
+        // Trousers are always drawing 001, and only for men — the bottom half of the body byte is the
+        // colour they are dyed, not which pair they are. The reference client says so outright
+        // (map-scene.ts: setItemId(1) then setDye(79 + (bodyShape & 0x0f))), and the women's archive has
+        // no wn001 at all.
+        if (gender == 'm')
+        {
+            pieces.Add(new Piece("mn001", worn.Body & Trousers));
+        }
+
+        Add('l', worn.Boots, worn.BootColor);
         Add('u', worn.Armor);
         Add('i', worn.OverCoat);
         Add('w', worn.Weapon);
-        Add('h', worn.Head);
+        Add('h', worn.Head, worn.HairColor);
         Add('c', worn.HeadAccessory1);
         Add('c', worn.HeadAccessory2);
 
         return pieces;
 
-        void Add(char part, int number)
+        void Add(char part, int number, int colour = 0)
         {
             if (number > 0)
             {
-                pieces.Add($"{gender}{part}{number:000}");
+                pieces.Add(new Piece($"{gender}{part}{number:000}", colour));
             }
         }
     }

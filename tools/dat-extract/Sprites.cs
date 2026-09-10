@@ -103,7 +103,15 @@ internal static class Sprites
     }
 
     /// <summary>Draws one frame of palette indices onto the canvas, leaving index 0 untouched.</summary>
-    public static void Blit(Image<Rgba32> canvas, byte[] data, int width, int height, Palette palette, int originX, int originY)
+    public static void Blit(
+        Image<Rgba32> canvas,
+        byte[] data,
+        int width,
+        int height,
+        Palette palette,
+        int originX,
+        int originY,
+        IReadOnlyList<System.Drawing.Color>? dye = null)
     {
         for (int y = 0; y < height; y++)
         {
@@ -124,7 +132,12 @@ internal static class Sprites
                     continue;
                 }
 
-                System.Drawing.Color colour = palette[code];
+                // A dye does not repaint the picture, it replaces a run of the palette it was drawn with.
+                int dyed = code - ColourTable.FirstDyedIndex;
+
+                System.Drawing.Color colour = dye is not null && dyed >= 0 && dyed < dye.Count
+                    ? dye[dyed]
+                    : palette[code];
                 canvas[targetX, targetY] = new Rgba32(colour.R, colour.G, colour.B, 255);
             }
         }

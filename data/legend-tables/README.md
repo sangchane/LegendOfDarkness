@@ -5,16 +5,22 @@
 
 ## 왜 여기 있나
 
-`Legend.dat`은 **이 작업공간의 게임 자료 폴더에 없다.** 개인 서버 배포본에는 안 들어 있고, 설치된
-원작 클라이언트에만 있다.
+`Legend.dat`은 **저장소 안에 있다** — 게임 자료 폴더가 아니라 서버 저장소 쪽이다 (2026-09-10 정정,
+그 전에는 "설치 클라이언트에만 있다"고 잘못 적혀 있었다).
 
 ```
-C:\Program Files (x86)\KRU\Dark Ages\Legend.dat   (13MB)
-C:\Program Files (x86)\KRU\Dark Ages\cious.dat    ( 8MB)   ← 마찬가지로 없음
+sources/wren11/Dark-Ages-Private-Server/database/archives/legend/Legend.dat   (13MB)
 ```
 
-13MB 아카이브를 통째로 들이는 대신, 실제로 쓰는 표만 뽑아 두었다. 그림(이야기 삽화 186장)과
-음악(165곡)은 필요해질 때 위 경로에서 뽑는다.
+안에 `.tbl` 16개 · 이야기 삽화 `.epf` 186장 · 음악 `.mp3` 165곡이 들어 있다. **표 16개는 여기 있는
+것과 같은 것들이다** — 13MB를 매번 여는 대신 규칙 표만 뽑아 둔 것이다. 그림과 음악은 필요해질 때
+위 경로에서 뽑는다:
+
+```powershell
+dat-extract list sources/wren11/Dark-Ages-Private-Server/database/archives/legend/Legend.dat
+```
+
+`cious.dat`(8MB)는 여전히 없고 설치 클라이언트에만 있다.
 
 ## 다시 뽑는 법
 

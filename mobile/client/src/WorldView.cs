@@ -189,12 +189,23 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return Actor.Sheet.Walk(OtherSheet);
         }
 
-        string[] pieces = Wardrobe.Pieces(one.Wearing)
-            .Select(piece => $"{PartsFolder}{piece}.png")
-            .Where(path => ResourceLoader.Exists(path))
-            .ToArray();
+        List<string> paths = [];
+        List<int> colours = [];
 
-        return Actor.Sheet.Walk(pieces.Length > 0 ? pieces : [OtherSheet]);
+        foreach (Piece piece in Wardrobe.Pieces(one.Wearing))
+        {
+            string path = $"{PartsFolder}{piece.Name}.png";
+
+            if (!ResourceLoader.Exists(path))
+            {
+                continue;
+            }
+
+            paths.Add(path);
+            colours.Add(piece.Colour);
+        }
+
+        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours) : Actor.Sheet.Walk(OtherSheet);
     }
 
     /// <summary>

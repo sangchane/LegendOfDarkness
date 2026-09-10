@@ -74,8 +74,9 @@ foreach ($gender in @('m', 'w')) {
         $name = "$gender$piece"
 
         # Not every piece is drawn for both genders, and a missing one is not a failure.
+        # 'marker': 염색되는 자리를 표시색으로 남긴다. 클라이언트가 실행 중에 진짜 색으로 갈아 끼운다.
         & $dotnet $tool @('pose', $archive, "${name}01", "$Output/actor/parts/$name.png",
-            '0,1,2,3,4,5,6,7,8,9', '1', $cell) | Out-Null
+            '0,1,2,3,4,5,6,7,8,9', '1', $cell, 'marker') | Out-Null
 
         if ($LASTEXITCODE -ne 0) {
             Write-Output "  ${name}: 없음"
@@ -84,6 +85,10 @@ foreach ($gender in @('m', 'w')) {
 }
 
 $ErrorActionPreference = 'Stop'
+
+# 표시색이 무엇인지, 그리고 번호마다 무슨 색인지 — 클라이언트가 둘 다 읽어야 갈아 끼울 수 있다.
+Invoke-Extract @('dyeslots', "$Output/actor/parts/dye-slots.txt")
+Copy-Item "$PSScriptRoot/../data/legend-tables/color0.tbl" "$Output/actor/parts/dye-colours.txt" -Force
 
 Write-Output 'Drawing a creature...'
 # 'transparent' rather than the Korean spelling: an argument in Hangul does not survive PowerShell's
