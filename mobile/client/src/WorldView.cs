@@ -22,6 +22,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // One drawing per wardrobe piece, all cut on the same cell, so they stack without arithmetic.
     private const string PartsFolder = "res://assets/actor/parts/";
 
+    // Monsters, named by the number the server calls them. It counts from 0x4000; the archive counts from 1.
+    private const string CreatureFolder = "res://assets/actor/creature/";
+    private const int CreatureNumbering = 0x4000;
+
     /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in.</summary>
     private const double StepSeconds = 0.28;
 
@@ -46,6 +50,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     // Everyone the server has shown us, by the serial it calls them.
     private readonly Dictionary<uint, Actor> _crowd = [];
+
+    // Everything else standing on the floor — monsters, merchants — by the same kind of serial.
+    private readonly Dictionary<uint, Actor> _herd = [];
 
     // Whoever is picked out, and the mark that says so. Zero is nobody.
     private readonly TargetMark _mark = new() { Name = "Target", Visible = false };
@@ -87,7 +94,16 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
             Character? one = server?.Others.FirstOrDefault(other => other.Serial == _target);
 
-            return one is null ? string.Empty : one.Name.Length > 0 ? one.Name : one.Serial.ToString();
+            if (one is not null)
+            {
+                return one.Name.Length > 0 ? one.Name : one.Serial.ToString();
+            }
+
+            Creature? beast = server?.Creatures.FirstOrDefault(other => other.Serial == _target);
+
+            return beast is null ? string.Empty
+                : beast.Name.Length > 0 ? beast.Name
+                : $"괴물 {beast.Sprite - CreatureNumbering}";
         }
     }
 
@@ -192,7 +208,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         _target = 0;
 
-        foreach ((uint serial, Actor actor) in _crowd)
+        foreach ((uint serial, Actor actor) in _crowd.Concat(_herd))
         {
             float distance = (actor.Position - new Vector2(0, waist)).DistanceSquaredTo(where);
 
@@ -209,7 +225,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// <summary>Puts the mark on whoever is picked out, or takes it away.</summary>
     private void Mark()
     {
-        if (_target != 0 && _crowd.TryGetValue(_target, out Actor? actor))
+        if (_target != 0 && (_crowd.TryGetValue(_target, out Actor? actor) || _herd.TryGetValue(_target, out actor)))
         {
             // A hair above the figure so the ring sorts behind its feet rather than over them.
             _mark.Position = actor.Position - new Vector2(0, 1);
@@ -384,6 +400,52 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         GD.Print($"GREYBOX_PICKED {TargetName}");
     }
 
+    /// <summary>
+    /// Draws the monsters and merchants the server has shown us, and stops drawing the ones it has taken
+    /// away. Same shape as the crowd, but each of these brings its own drawing rather than a wardrobe.
+    /// </summary>
+    private void Herd()
+    {
+        if (server is null)
+        {
+            return;
+        }
+
+        HashSet<uint> present = [];
+
+        foreach (Creature one in server.Creatures)
+        {
+            present.Add(one.Serial);
+
+            if (!_herd.TryGetValue(one.Serial, out Actor? actor))
+            {
+                string path = $"{CreatureFolder}mns{one.Sprite - CreatureNumbering:000}.png";
+
+                if (!ResourceLoader.Exists(path))
+                {
+                    // Nothing cut for this one yet. Better an empty tile than a wrong picture.
+                    continue;
+                }
+
+                // Frames lie side by side, so a cell is as tall as the sheet and as wide as it is tall.
+                int size = GD.Load<Texture2D>(path).GetHeight();
+                string called = one.Name.Length > 0 ? one.Name : one.Serial.ToString();
+
+                actor = Add(new Actor(called, Actor.Sheet.Creature(path, size)), Ground(one.Where));
+                _herd[one.Serial] = actor;
+            }
+
+            actor.Position = Ground(one.Where);
+            actor.Face(one.Facing);
+        }
+
+        foreach (uint serial in _herd.Keys.Where(known => !present.Contains(known)).ToList())
+        {
+            _herd[serial].QueueFree();
+            _herd.Remove(serial);
+        }
+    }
+
     /// <summary>Takes the server's word for where we are, whenever it gives one.</summary>
     private void Listen()
     {
@@ -412,6 +474,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Listen();
         Wear();
         Crowd();
+        Herd();
         RehearseAPick();
 
         if (_walked < 0 && _rehearsal.Count > 0)

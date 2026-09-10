@@ -38,6 +38,33 @@ public sealed record Appearance(
     int Resting,
     int OverCoat);
 
+/// <summary>What kind of thing the server is showing, which decides how the rest of it is read.</summary>
+public enum CreatureKind
+{
+    /// <summary>A monster. It fights.</summary>
+    Hostile = 0,
+
+    /// <summary>Something that can be walked through.</summary>
+    Passable = 1,
+
+    /// <summary>A merchant or other standing character. This one is named.</summary>
+    Merchant = 2
+}
+
+/// <summary>
+/// A monster, a merchant, or anything else the server puts on the floor beside the players.
+/// </summary>
+/// <param name="Sprite">
+/// Which drawing, in the monster archive's own numbering — not the wardrobe numbering that dresses people.
+/// </param>
+public sealed record Creature(
+    uint Serial,
+    Tile Where,
+    Art.Direction Facing,
+    int Sprite,
+    CreatureKind Kind,
+    string Name);
+
 /// <summary>
 /// One thing in a character's pack. The server sends these one at a time, both on the way in and whenever
 /// something is picked up.

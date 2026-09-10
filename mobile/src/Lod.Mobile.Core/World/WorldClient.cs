@@ -30,6 +30,7 @@ public sealed class WorldClient(WorldSession session)
     private const byte CreatureWalkedCommand = 0x0C;
     private const byte RemoveCommand = 0x0E;
     private const byte AddToPackCommand = 0x0F;
+    private const byte ShowCreaturesCommand = 0x07;
     private const byte TalkCommand = 0x0E;
 
     private byte _ordinal;
@@ -48,6 +49,9 @@ public sealed class WorldClient(WorldSession session)
 
     // Keyed by the slot the server puts each thing in, which is how it refers to them afterwards.
     private readonly ConcurrentDictionary<int, InventoryItem> _pack = new();
+
+    // Everything on the floor that is not a player, by the same serial the server removes them by.
+    private readonly ConcurrentDictionary<uint, Creature> _creatures = new();
 
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
     public WorldEntry? State => _state;
@@ -69,6 +73,9 @@ public sealed class WorldClient(WorldSession session)
     /// shows us to ourselves like anybody else, so this is the same packet everyone else arrives in.
     /// </summary>
     public Character? Self => _self;
+
+    /// <summary>Monsters and merchants the server has shown us, by serial.</summary>
+    public IReadOnlyCollection<Creature> Creatures => (IReadOnlyCollection<Creature>)_creatures.Values;
 
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
@@ -123,6 +130,14 @@ public sealed class WorldClient(WorldSession session)
                     Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
                     continue;
 
+                case ShowCreaturesCommand:
+                    foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
+                    {
+                        _creatures[creature.Serial] = creature;
+                    }
+
+                    continue;
+
                 case AddToPackCommand:
                     {
                         InventoryItem carried = ReadPackItem(HadesCipher.DecodeSecured(frame, session.Parameters));
@@ -136,9 +151,14 @@ public sealed class WorldClient(WorldSession session)
                     continue;
 
                 case RemoveCommand:
-                    _others.TryRemove(
-                        BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters)),
-                        out _);
+                {
+                    uint gone = BinaryPrimitives.ReadUInt32BigEndian(
+                        HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                    _others.TryRemove(gone, out _);
+                    _creatures.TryRemove(gone, out _);
+                }
+
                     continue;
 
                 default:
@@ -264,6 +284,65 @@ public sealed class WorldClient(WorldSession session)
             BinaryPrimitives.ReadUInt16BigEndian(body[28..]));
 
         return new Character(serial, where, facing, wearing, ReadName(body, fixedLength));
+    }
+
+    /// <summary>
+    /// Everything the server is showing at once: how many, then that many records.
+    /// </summary>
+    /// <remarks>
+    /// Each record is the same seventeen bytes — place, serial, drawing, four bytes the server leaves
+    /// empty, a direction, one more empty, and what kind of thing it is. A merchant is named after that
+    /// and nothing else is.
+    ///
+    /// Things lying on the floor are written shorter than this by our server (thirteen bytes, with no
+    /// direction and no kind), and there is nothing in the record to tell them apart from the start of a
+    /// monster — so a floor with something dropped on it would be read wrongly from that point. The
+    /// original format has no such gap; ours does. Nothing can be dropped here yet, and this is where to
+    /// come back when it can be.
+    /// </remarks>
+    public static IReadOnlyList<Creature> ReadCreatures(ReadOnlySpan<byte> body)
+    {
+        const int recordLength = 17;
+
+        if (body.Length < 2)
+        {
+            throw new ProtocolException($"물체 안내에 개수가 없습니다 ({body.Length}바이트).");
+        }
+
+        int expected = BinaryPrimitives.ReadUInt16BigEndian(body);
+        List<Creature> shown = [];
+        ReadOnlySpan<byte> rest = body[2..];
+
+        for (int index = 0; index < expected; index++)
+        {
+            if (rest.Length < recordLength)
+            {
+                throw new ProtocolException(
+                    $"물체 {index + 1}번째가 {recordLength}바이트보다 짧습니다 ({rest.Length}바이트).");
+            }
+
+            CreatureKind kind = (CreatureKind)rest[16];
+            string name = string.Empty;
+            int read = recordLength;
+
+            if (kind == CreatureKind.Merchant)
+            {
+                name = LegacyKoreanEncoding.DecodeStringA(rest[recordLength..], out int consumed);
+                read += consumed;
+            }
+
+            shown.Add(new Creature(
+                BinaryPrimitives.ReadUInt32BigEndian(rest[4..]),
+                new Tile(BinaryPrimitives.ReadUInt16BigEndian(rest), BinaryPrimitives.ReadUInt16BigEndian(rest[2..])),
+                FromServer(rest[14]),
+                BinaryPrimitives.ReadUInt16BigEndian(rest[8..]),
+                kind,
+                name));
+
+            rest = rest[read..];
+        }
+
+        return shown;
     }
 
     /// <summary>

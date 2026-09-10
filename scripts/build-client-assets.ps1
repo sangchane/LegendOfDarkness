@@ -95,6 +95,10 @@ Write-Output 'Drawing a creature...'
 # hand-off to a native executable on this machine, and the sheet comes out with its background filled in.
 Invoke-Extract @('mpf', "$Game/hades.dat", 'MNS001.MPF', "$Output/actor/wasp.png", '1', 'transparent')
 
+# 같은 그림을 서버가 부르는 번호로도 둔다. 서버는 16385 라고 하고, 그림은 MNS001 이다 — 0x4000 을 뺀다.
+New-Item -ItemType Directory -Force -Path "$Output/actor/creature" | Out-Null
+Invoke-Extract @('mpf', "$Game/hades.dat", 'MNS001.MPF', "$Output/actor/creature/mns001.png", '1', 'transparent')
+
 Get-ChildItem -Path $Output -Recurse -Filter *.png | ForEach-Object {
     Write-Output ("  {0}  {1:N0} bytes" -f $_.FullName.Substring($_.FullName.IndexOf('assets')), $_.Length)
 }
