@@ -20,7 +20,7 @@ internal static class Program
             Console.Error.WriteLine("사용법: dat-extract list <아카이브.dat>");
             Console.Error.WriteLine("        dat-extract dump <아카이브.dat> <출력 폴더> [이름 조각]");
             Console.Error.WriteLine("        dat-extract tiles <seo.dat> <출력.png> <시작> <개수> [가로칸]");
-            Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png>");
+            Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png> [잘라낼 x y 폭 높이]");
             Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
             Console.Error.WriteLine("        dat-extract epf <khan.dat> <이름조각> <출력.png> [칸수] [배율] [팔레트.dat]");
             Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명]");
@@ -252,6 +252,14 @@ internal static class Program
                 source.Draw(canvas, floor - 1, x, y);
                 drawn++;
             }
+        }
+
+        if (args.Length >= 10)
+        {
+            // 화면 크기에 맞는 조각만 남긴다 — 세로 화면 배경처럼 비율이 다른 곳에 쓰려면 필요하다.
+            Rectangle window = new(int.Parse(args[6]), int.Parse(args[7]), int.Parse(args[8]), int.Parse(args[9]));
+            canvas.Mutate(context => context.Crop(window));
+            Console.WriteLine($"  {window.X},{window.Y} 에서 {window.Width}x{window.Height} 만 잘랐습니다.");
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);

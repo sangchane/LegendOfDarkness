@@ -11,6 +11,7 @@
 :root{
   /* 원작 화면에서 뽑은 재질 — 푸른기 도는 석재, 횃불 주황, 금빛 글자 */
   --stone-900:#0c0e14;
+  --stone-850:#10131c;
   --stone-800:#141824;
   --edge:#4a5468;
   --gold:#c9a227;
@@ -18,6 +19,7 @@
   --ink:#e8e2d4;
   --ink-dim:#98a0b0;
   --hp:#b3323c;
+  --mp:#3d6ea8;
   --hit:#4fd6c1;
 
   --serif:"Gowun Batang",serif;
@@ -30,93 +32,100 @@
 *{box-sizing:border-box}
 html,body{margin:0}
 body{min-height:100dvh;background:var(--stone-900);color:var(--ink);font-family:var(--sans)}
-main{display:grid;grid-template-rows:auto auto 1fr;gap:18px}
-header,footer,.stage{max-width:1000px;margin:0 auto;width:100%}
+main{display:grid;grid-template-rows:auto auto auto;gap:18px;align-content:start}
+header,footer,.stage{max-width:1040px;margin:0 auto;width:100%}
 h1{font-family:var(--serif);font-size:26px;margin:0 0 6px;text-wrap:balance}
 .sub{color:var(--ink-dim);margin:0;font-size:14px;max-width:64ch;line-height:1.7}
 
-.stage{display:grid;justify-items:center;gap:14px}
-.phone{width:100%;aspect-ratio:20/9;position:relative;overflow:hidden;border:1px solid #2b3242}
-.scale{position:absolute;inset:0;width:800px;height:360px;transform-origin:top left}
+/* ---------- 화면틀 ---------- */
+.stage{display:grid;justify-items:center;gap:16px}
+.frame{position:relative;overflow:hidden;border:1px solid #2b3242;background:#04060b}
+.frame[data-mode="landscape"]{width:100%;max-width:900px;aspect-ratio:800/360}
+.frame[data-mode="portrait"]{width:min(360px,86vw);aspect-ratio:360/780}
+.screen{position:absolute;left:0;top:0;transform-origin:top left}
+.frame[data-mode="landscape"] .screen{width:800px;height:360px}
+.frame[data-mode="portrait"] .screen{width:360px;height:780px}
 
-.world{position:absolute;inset:0;overflow:hidden;cursor:crosshair}
-.world img{position:absolute;inset:0;width:800px;height:360px;image-rendering:pixelated;transition:opacity .3s ease}
+/* ---------- 월드 ---------- */
+.viewport{position:absolute;overflow:hidden;background:#04060b;cursor:crosshair}
+.camera{position:absolute;left:0;top:0;will-change:transform}
+.camera .map{display:block;image-rendering:pixelated}
 .vignette{position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(125% 95% at 50% 45%,transparent 42%,#04060b 100%);opacity:.8}
+  background:radial-gradient(125% 95% at 50% 45%,transparent 46%,#04060b 100%);opacity:.75}
 
-/* 월드 객체 — 보이는 그림은 배경에 있고, 여기는 손가락이 닿는 영역만 */
-.obj{position:absolute;background:none;border:0;padding:0;cursor:pointer}
-.obj .art{position:absolute;border:1px dashed #ffffff00}
-.obj .zone{position:absolute;inset:0;border:1px dashed #c9a22788;border-radius:4px;background:#c9a2270f}
-.obj:focus-visible .zone{outline:2px solid var(--gold);outline-offset:2px}
-.show-zones .obj .art{border-color:#ff9c6e}
-.show-zones .obj .zone{border-color:var(--hit);background:#4fd6c11a}
-.obj .tip{
-  position:absolute;left:50%;top:-16px;transform:translateX(-50%);
-  font-size:10px;white-space:nowrap;color:var(--ink);opacity:.85;transition:opacity .15s ease;
-  text-shadow:0 1px 3px #000,0 0 6px #000;
-}
-.obj:hover .tip,.show-zones .obj .tip{opacity:1}
+/* 배우 — 원본 .dat에서 뽑은 스프라이트 시트를 칸 단위로 잘라 쓴다 */
+.actor{position:absolute;width:var(--cw);height:var(--ch);
+  margin:calc(var(--ch) * -1) 0 0 calc(var(--cw) / -2 - var(--ox, 0px));
+  background-repeat:no-repeat;image-rendering:pixelated;pointer-events:none;
+  background-position:calc(var(--f,0) * var(--cw) * -1) calc(var(--r,0) * var(--ch) * -1)}
+.actor.flip{transform:scaleX(-1)}
+.shadow{position:absolute;width:26px;height:9px;margin:-4px 0 0 -13px;border-radius:50%;
+  background:#04060b;opacity:.45;pointer-events:none}
+
+/* 손가락이 닿는 영역. 그림보다 넓다 — 원작 캐릭터는 폭이 28픽셀뿐이다 */
+.hit{position:absolute;width:var(--touch);height:60px;margin:-62px 0 0 -24px;
+  background:none;border:0;padding:0;cursor:pointer}
+.hit .ring{position:absolute;inset:0;border:1px dashed transparent;border-radius:6px}
+.hit .art{position:absolute;left:50%;bottom:0;width:28px;height:52px;margin-left:-14px;border:1px dashed transparent}
+.hit:focus-visible .ring{border-color:var(--gold);outline:2px solid var(--gold);outline-offset:1px}
+.show-zones .hit .ring{border-color:var(--hit);background:#4fd6c11a}
+.show-zones .hit .art{border-color:#ff9c6e}
+.hit .tip{position:absolute;left:50%;top:-15px;transform:translateX(-50%);
+  font-size:10px;white-space:nowrap;color:var(--ink);opacity:0;transition:opacity .15s ease;
+  text-shadow:0 1px 3px #000,0 0 6px #000}
+.hit:hover .tip,.show-zones .hit .tip{opacity:1}
+.hit.chosen .ring{border-color:var(--gold);background:#c9a2271f}
 
 .tapmark{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;
   border:2px solid var(--gold);border-radius:50%;opacity:0;pointer-events:none}
 .tapmark.on{animation:ping .5s ease-out}
 @keyframes ping{from{opacity:.9;transform:scale(.4)}to{opacity:0;transform:scale(1.35)}}
 
-/* ---------- HUD ---------- */
+/* ---------- HUD 조각 ---------- */
+.panel{background:linear-gradient(180deg,#1e2331e6,#12161fe6);border:1px solid var(--edge);
+  box-shadow:inset 0 1px 0 #6d7a92,0 2px 10px #00000073}
 .hud{position:absolute;inset:0;pointer-events:none;transition:opacity .25s ease}
-.hud.dim{opacity:.3}
-.hud > *{pointer-events:auto}
+.hud.dim{opacity:.28}
+.hud > *{pointer-events:auto;position:absolute}
 
-.panel{
-  background:linear-gradient(180deg,#1e2331e6,#12161fe6);
-  border:1px solid var(--edge);
-  /* 깎인 돌 윗면의 반사 한 줄 + 바닥 그림자. 원작 패널의 입체감을 최소로 옮긴 것 */
-  box-shadow:inset 0 1px 0 #6d7a92,0 2px 10px #00000073;
-}
-.plate{position:absolute;display:flex;align-items:center;gap:8px;padding:6px 10px}
-
-.status{left:var(--gutter);top:var(--gutter);flex-direction:column;align-items:flex-start;gap:5px}
-.status .who{font-family:var(--serif);font-size:15px}
+.status{display:flex;align-items:center;gap:10px;padding:6px 10px}
+.status .who{font-family:var(--serif);font-size:15px;white-space:nowrap}
+.gauges{display:grid;gap:4px}
 .gauge{display:flex;align-items:center;gap:6px}
 .track{width:120px;height:9px;background:#080a10;border:1px solid var(--edge);position:relative;overflow:hidden}
 .fill{position:absolute;inset:0;transform-origin:left center;transition:transform .4s ease;
   background:linear-gradient(180deg,#d0454f,var(--hp))}
+.fill.mana{background:linear-gradient(180deg,#5b8fd0,var(--mp))}
 .num{font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-dim)}
 
-.system{right:var(--gutter);top:var(--gutter);gap:6px;padding:0;background:none;border:0;box-shadow:none}
-.sysbtn{
-  min-width:var(--touch);height:var(--touch);display:grid;place-items:center;gap:1px;
+.system{display:flex;gap:6px}
+.sysbtn{min-width:var(--touch);height:var(--touch);display:grid;place-items:center;gap:1px;
   font-family:var(--sans);font-size:11px;color:var(--ink);
   background:linear-gradient(180deg,#1e2331e6,#12161fe6);
   border:1px solid var(--edge);box-shadow:inset 0 1px 0 #6d7a92;cursor:pointer;
-  transition:transform .08s ease,filter .15s ease;
-}
+  transition:transform .08s ease,filter .15s ease}
 .sysbtn:active{transform:translateY(1px);filter:brightness(1.3)}
 .sysbtn .glyph{font-size:15px;line-height:1}
 
-.target{left:50%;top:var(--gutter);transform:translateX(-50%) translateY(-10px);
-  opacity:0;transition:opacity .2s ease,transform .2s ease;
-  flex-direction:column;align-items:center;gap:3px;min-width:150px}
-.target.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.target{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:150px;padding:5px 10px;
+  opacity:0;transition:opacity .2s ease,transform .2s ease}
+.target.on{opacity:1}
 .target .who{font-family:var(--serif);font-size:13px}
 
-.controls{position:absolute;left:0;right:0;bottom:var(--gutter);
-  display:grid;grid-template-columns:auto 1fr auto;align-items:end;gap:12px;
-  padding:0 var(--gutter);max-width:680px;margin:0 auto}
+.log{padding:6px 9px;display:grid;gap:2px;align-content:end;overflow:hidden;font-size:11px;line-height:1.5}
+.log p{margin:0;color:var(--ink-dim)}
+.log p b{color:var(--ink);font-weight:500}
+.log p.fresh{color:var(--ink)}
+
 .pad{display:grid;grid-template-columns:repeat(3,var(--touch));grid-template-rows:repeat(3,var(--touch));gap:3px}
 .key{display:grid;place-items:center;font-size:17px;color:var(--ink);
   background:linear-gradient(180deg,#1e2331d9,#12161fd9);
   border:1px solid var(--edge);box-shadow:inset 0 1px 0 #6d7a92;
   cursor:pointer;user-select:none;transition:transform .08s ease,filter .12s ease}
-.key:active,.key.hit{transform:translateY(1px);filter:brightness(1.45)}
+.key:active,.key.hit-flash{transform:translateY(1px);filter:brightness(1.45)}
 .key.void{visibility:hidden}
 
-.toast{align-self:end;text-align:center;font-size:12px;padding-bottom:6px;
-  text-shadow:0 1px 3px #000,0 0 8px #000;opacity:0;transition:opacity .25s ease}
-.toast.on{opacity:1}
-
-.attack{position:relative;width:72px;height:72px;display:grid;place-items:center;
+.attack{position:absolute;width:72px;height:72px;display:grid;place-items:center;
   font-family:var(--serif);font-size:16px;color:#15110a;
   background:radial-gradient(120% 120% at 50% 22%,#dfc476,var(--gold) 58%,var(--gold-dim));
   border:1px solid #e8d189;border-radius:50%;
@@ -126,23 +135,65 @@ h1{font-family:var(--serif);font-size:26px;margin:0 0 6px;text-wrap:balance}
 .sweep{position:absolute;inset:-1px;border-radius:50%;pointer-events:none;
   background:conic-gradient(#0c0e14cc 0turn,#0c0e14cc var(--sweep,0turn),transparent var(--sweep,0turn))}
 
+.quick{display:flex;gap:6px}
+.slot{width:var(--touch);height:var(--touch);display:grid;place-items:center;gap:1px;
+  font-size:10px;color:var(--ink-dim);
+  background:linear-gradient(180deg,#1a1e2ad9,#0f131cd9);border:1px solid #333b4c;cursor:pointer;
+  transition:filter .12s ease}
+.slot:active{filter:brightness(1.4)}
+.slot .glyph{font-size:16px;line-height:1;color:var(--ink)}
+
+.toast{text-align:center;font-size:12px;text-shadow:0 1px 3px #000,0 0 8px #000;
+  opacity:0;transition:opacity .25s ease;pointer-events:none}
+.toast.on{opacity:1}
+
 .offline{position:absolute;inset:0;display:grid;place-items:center;background:#04060bcc;
-  opacity:0;pointer-events:none;transition:opacity .3s ease}
+  opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:5}
 .offline.on{opacity:1;pointer-events:auto}
 .offline .box{padding:16px 22px;text-align:center}
 .offline p{margin:0 0 4px;font-family:var(--serif);font-size:16px}
 .offline span{font-size:12px;color:var(--ink-dim)}
 
+/* ---------- 가로: 월드가 화면 전부, HUD가 그 위에 뜬다 ---------- */
+[data-mode="landscape"] .viewport{inset:0}
+[data-mode="landscape"] .status{left:var(--gutter);top:var(--gutter)}
+[data-mode="landscape"] .system{right:var(--gutter);top:var(--gutter)}
+[data-mode="landscape"] .target{left:50%;top:var(--gutter);transform:translateX(-50%) translateY(-10px)}
+[data-mode="landscape"] .target.on{transform:translateX(-50%) translateY(0)}
+[data-mode="landscape"] .log{display:none}
+[data-mode="landscape"] .pad{left:var(--gutter);bottom:var(--gutter)}
+[data-mode="landscape"] .attack{right:16px;bottom:14px}
+[data-mode="landscape"] .quick{right:14px;bottom:96px;flex-direction:column}
+[data-mode="landscape"] .toast{left:50%;bottom:22px;transform:translateX(-50%);width:280px}
+
+/* ---------- 세로: 월드와 조작을 위아래로 나눈다 ---------- */
+[data-mode="portrait"] .viewport{left:0;right:0;top:52px;width:360px;height:400px}
+[data-mode="portrait"] .status{left:0;top:0;width:242px;height:52px;border-width:0 1px 1px 0;gap:8px;padding:6px 8px}
+[data-mode="portrait"] .status .track{width:96px}
+[data-mode="portrait"] .system{right:0;top:2px}
+[data-mode="portrait"] .system .sysbtn{height:48px;border-top:0}
+[data-mode="portrait"] .target{left:50%;top:60px;transform:translateX(-50%) translateY(-10px)}
+[data-mode="portrait"] .target.on{transform:translateX(-50%) translateY(0)}
+[data-mode="portrait"] .log{left:0;right:0;top:452px;height:76px;border-width:1px 0}
+[data-mode="portrait"] .toast{left:0;right:0;top:420px}
+[data-mode="portrait"] .pad{left:18px;bottom:26px}
+[data-mode="portrait"] .attack{right:26px;bottom:44px}
+[data-mode="portrait"] .quick{left:0;right:0;top:540px;justify-content:center}
+
+/* ---------- 조작 도구 ---------- */
 .tools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .tool{font-size:13px;color:var(--ink);background:var(--stone-800);border:1px solid var(--edge);
   padding:9px 13px;cursor:pointer;transition:filter .12s ease}
 .tool:hover{filter:brightness(1.35)}
 .tool[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
 
-footer{color:var(--ink-dim);font-size:13px;line-height:1.8}
+footer{color:var(--ink-dim);font-size:13px;line-height:1.8;padding-bottom:60px}
 footer b{color:var(--ink);font-weight:600}
 footer code{font-family:var(--mono);font-size:12px}
 footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle;margin-right:4px}
+footer table{border-collapse:collapse;margin:10px 0;font-size:12px;width:100%}
+footer th,footer td{border-bottom:1px solid #2b3242;padding:6px 10px 6px 0;text-align:left;vertical-align:top}
+footer th{color:var(--ink);font-weight:600;white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -154,71 +205,68 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
 <header>
   <h1>어둠의 전설 모바일 — HUD 시안</h1>
   <p class="sub">
-    배경은 이 저장소의 원본 자료에서 직접 그린 안전 가옥 바닥입니다. 새로 그린 그림은 없습니다.
-    배치와 조작은 요즘 모바일 게임에서 검증된 방식을 따르고, 패널의 재질과 색은 원작 화면에서
-    가져왔습니다. 아래 버튼으로 직접 눌러 보세요.
+    바닥도 사람도 벌레도 전부 이 저장소의 원본 <code>.dat</code>에서 뽑은 그림입니다. 새로 그린 것은
+    없습니다. 방향 버튼을 누르면 실제로 걸어가고 화면이 따라옵니다.
+    <b>세로와 가로를 같은 화면 구성으로 처음부터 함께</b> 만들었습니다 — 아래에서 바꿔 보세요.
   </p>
 </header>
 
 <div class="stage">
-  <div class="phone" id="phone">
-    <div class="scale" id="scale">
-      <div class="world" id="world">
-        <img id="map" src="assets/world-safehouse.png" alt="안전 가옥 바닥">
+  <div class="frame" id="frame" data-mode="portrait">
+    <div class="screen" id="screen">
+
+      <div class="viewport" id="viewport">
+        <div class="camera" id="camera">
+          <img class="map" src="assets/world-safehouse-full.png" alt="안전 가옥 바닥" width="1708" height="820">
+          <div class="tapmark" id="tapmark"></div>
+        </div>
         <div class="vignette"></div>
-
-        <button class="obj" data-name="주모" data-kind="npc"
-                style="left:414px;top:150px;width:52px;height:88px">
-          <span class="art" style="left:12px;top:12px;right:12px;bottom:0"></span>
-          <span class="zone"></span><span class="tip">주모 · 대화 가능</span>
-        </button>
-
-        <button class="obj" data-name="수련생" data-kind="me"
-                style="left:378px;top:170px;width:52px;height:88px">
-          <span class="art" style="left:10px;top:11px;right:9px;bottom:0"></span>
-          <span class="zone"></span><span class="tip">수련생 · 나</span>
-        </button>
-
-        <button class="obj" data-name="멜로린" data-kind="monster"
-                style="left:556px;top:128px;width:48px;height:76px">
-          <span class="art" style="left:10px;top:10px;right:10px;bottom:2px"></span>
-          <span class="zone"></span><span class="tip">멜로린 · 체력 3/10</span>
-        </button>
-
-        <div class="tapmark" id="tapmark"></div>
       </div>
 
       <div class="hud" id="hud">
-        <div class="plate panel status">
+        <div class="panel status">
           <span class="who">수련생</span>
-          <div class="gauge">
-            <span class="track"><span class="fill" id="hpfill"></span></span>
-            <span class="num" id="hpnum">180 / 250</span>
+          <div class="gauges">
+            <div class="gauge">
+              <span class="track"><span class="fill" id="hpfill"></span></span>
+              <span class="num" id="hpnum">180 / 250</span>
+            </div>
+            <div class="gauge">
+              <span class="track"><span class="fill mana" id="mpfill"></span></span>
+              <span class="num">40 / 60</span>
+            </div>
           </div>
         </div>
 
-        <div class="plate system">
+        <div class="system">
           <button class="sysbtn" id="btn-bag"><span class="glyph">◧</span>가방</button>
           <button class="sysbtn" id="btn-hide"><span class="glyph">◑</span>HUD</button>
         </div>
 
-        <div class="plate panel target" id="target">
-          <span class="who" id="tname">멜로린</span>
+        <div class="panel target" id="target">
+          <span class="who" id="tname">말벌</span>
           <div class="gauge">
             <span class="track"><span class="fill" id="tfill"></span></span>
-            <span class="num">3 / 10</span>
+            <span class="num" id="tnum">3 / 10</span>
           </div>
         </div>
 
-        <div class="controls">
-          <div class="pad" id="pad">
-            <span class="key void"></span><button class="key" data-dir="up">↑</button><span class="key void"></span>
-            <button class="key" data-dir="left">←</button><span class="key void"></span><button class="key" data-dir="right">→</button>
-            <span class="key void"></span><button class="key" data-dir="down">↓</button><span class="key void"></span>
-          </div>
-          <div class="toast" id="toast"></div>
-          <button class="attack" id="attack">공격<span class="sweep" id="sweep"></span></button>
+        <div class="panel log" id="log"></div>
+        <div class="toast" id="toast"></div>
+
+        <div class="pad" id="pad">
+          <span class="key void"></span><button class="key" data-dir="up">↑</button><span class="key void"></span>
+          <button class="key" data-dir="left">←</button><span class="key void"></span><button class="key" data-dir="right">→</button>
+          <span class="key void"></span><button class="key" data-dir="down">↓</button><span class="key void"></span>
         </div>
+
+        <div class="quick">
+          <button class="slot"><span class="glyph">✚</span>회복</button>
+          <button class="slot"><span class="glyph">✦</span>주문</button>
+          <button class="slot"><span class="glyph">↺</span>귀환</button>
+        </div>
+
+        <button class="attack" id="attack">공격<span class="sweep" id="sweep"></span></button>
       </div>
 
       <div class="offline" id="offline">
@@ -227,11 +275,12 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
           <span>다시 연결하는 중…</span>
         </div>
       </div>
+
     </div>
   </div>
 
   <div class="tools">
-    <button class="tool" id="t-map">지도 바꾸기</button>
+    <button class="tool" id="t-mode">가로로 보기</button>
     <button class="tool" id="t-zones" aria-pressed="false">터치 영역 보기</button>
     <button class="tool" id="t-hit">피격</button>
     <button class="tool" id="t-offline" aria-pressed="false">연결 끊김</button>
@@ -240,15 +289,33 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
 </div>
 
 <footer>
-  <b>캐릭터 그림은 아직 없습니다.</b> 점선 상자가 캐릭터가 설 자리이며, 스프라이트는 아직
-  <code>.dat</code>에서 추출하지 못했습니다. 「터치 영역 보기」를 누르면
-  <span class="legend" style="background:#ff9c6e"></span>주황이 원작 캐릭터의 실제 크기,
-  <span class="legend" style="background:#4fd6c1"></span>청록이 손가락이 닿아야 하는 영역입니다.
-  원작 캐릭터는 폭이 28픽셀이라 그대로 두면 손가락으로 누를 수가 없습니다. 그래서 보이는 그림보다
-  넓은 반응 영역을 따로 둡니다 — 런스케이프 모바일이 같은 문제를 같은 방법으로 풀었습니다.
-  <br>
-  자산 출처: <code>tools/dat-extract</code>로 이 저장소의 <code>game/seo.dat</code>과
-  <code>database/server/maps/lod1.map</code>에서 직접 그린 안전 가옥 바닥입니다.
+  <b>세로와 가로는 같은 HUD를 다르게 놓은 것입니다.</b> 화면 조각은 하나뿐이고 자리만 바뀝니다.
+  <table>
+    <tr><th>구분</th><th>세로 360×780</th><th>가로 800×360</th></tr>
+    <tr><th>월드</th>
+      <td>위쪽 400칸을 차지하고, 조작 영역과 겹치지 않습니다. 손가락이 화면을 가리지 않는 것이 세로의 가장 큰 장점입니다.</td>
+      <td>화면 전체입니다. 세로만큼의 여유가 없어 HUD가 월드 위에 떠 있고, 아래 양쪽 모서리를 손가락이 가립니다.</td></tr>
+    <tr><th>대화·전투 기록</th>
+      <td>항상 보이는 칸이 따로 있습니다. 원작의 아래쪽 대화창에 해당합니다.</td>
+      <td>자리가 없어 지나가는 알림으로만 띄웁니다.</td></tr>
+    <tr><th>시스템 버튼</th>
+      <td>위쪽 오른편. 세로에서는 위 모서리에 엄지가 닿지 않으므로, 급하지 않은 것만 둡니다.</td>
+      <td>위쪽 오른편. 가로에서는 양손으로 쥐므로 닿습니다.</td></tr>
+    <tr><th>빠른 슬롯</th>
+      <td>가운데 아래. 양쪽 엄지 어느 쪽으로도 닿습니다.</td>
+      <td>오른쪽 세로줄. 공격 버튼 바로 위입니다.</td></tr>
+  </table>
+
+  <b>터치 영역.</b> 「터치 영역 보기」를 누르면
+  <span class="legend" style="background:#ff9c6e"></span>주황이 원작 그림의 실제 크기,
+  <span class="legend" style="background:#4fd6c1"></span>청록이 손가락이 닿아야 하는 48칸 영역입니다.
+  원작 캐릭터는 폭이 28픽셀이라 그림 그대로는 누를 수가 없습니다. 그래서 보이는 것보다 넓은 반응 영역을
+  따로 둡니다 — 런스케이프 모바일이 같은 문제를 같은 방법으로 풀었습니다.
+
+  <br><br>
+  <b>자산 출처.</b> 바닥은 <code>game/seo.dat</code> + <code>database/server/maps/lod1.map</code>,
+  사람은 <code>game/khan.dat</code>의 몸·옷·모자를 겹친 것, 말벌은 <code>game/hades.dat</code>의
+  <code>MNS001.MPF</code>입니다. 모두 <code>tools/dat-extract</code>로 이 저장소에서 직접 뽑았습니다.
 </footer>
 </main>
 
@@ -256,29 +323,173 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
 (function () {
   "use strict";
 
-  var BASE_W = 800;
-  var phone = document.getElementById("phone");
-  var scale = document.getElementById("scale");
+  /* ---- 월드 좌표계 ----
+     원작 바닥은 마름모로 깔린다. 한 칸 옆으로 가면 가로로 28, 세로로 13 움직인다.
+     그래서 네 방향은 화면에서 대각선으로 나타난다. */
+  var STEP_X = 28, STEP_Y = 13;
+  var MAP_W = 1708, MAP_H = 820;
 
-  function fit() { scale.style.transform = "scale(" + (phone.clientWidth / BASE_W) + ")"; }
-  fit();
-  addEventListener("resize", fit);
+  var DIRS = {
+    right: { dx:  STEP_X, dy:  STEP_Y, row: 5, flip: false },
+    down:  { dx: -STEP_X, dy:  STEP_Y, row: 5, flip: true  },
+    left:  { dx: -STEP_X, dy: -STEP_Y, row: 0, flip: true  },
+    up:    { dx:  STEP_X, dy: -STEP_Y, row: 0, flip: false }
+  };
 
+  var SHEETS = {
+    hero: { url: "assets/hero-walk.png", cw: 47, ch: 83, ox: 8, stand: [0, 5], walk: [[1,2,3,4],[6,7,8,9]] },
+    npc:  { url: "assets/npc-walk.png",  cw: 47, ch: 83, ox: 8, stand: [0, 5], walk: [[1,2,3,4],[6,7,8,9]] },
+    wasp: { url: "assets/mob-wasp.png",  cw: 59, ch: 59, ox: 0, stand: [0, 0], walk: [[0,1,2,3],[0,1,2,3]] }
+  };
+
+  var frame    = document.getElementById("frame");
+  var screen   = document.getElementById("screen");
+  var viewport = document.getElementById("viewport");
+  var camera   = document.getElementById("camera");
+  var tapmark  = document.getElementById("tapmark");
+
+  /* ---- 배우 ---- */
+  function Actor(kind, name, x, y, options) {
+    var sheet = SHEETS[kind];
+    var art = document.createElement("div");
+    art.className = "actor";
+    art.style.setProperty("--cw", sheet.cw + "px");
+    art.style.setProperty("--ch", sheet.ch + "px");
+    art.style.setProperty("--ox", (sheet.ox || 0) + "px");
+    art.style.backgroundImage = "url(" + sheet.url + ")";
+
+    var shadow = document.createElement("div");
+    shadow.className = "shadow";
+
+    var hit = document.createElement("button");
+    hit.className = "hit";
+    hit.innerHTML = '<span class="art"></span><span class="ring"></span><span class="tip"></span>';
+    hit.querySelector(".tip").textContent = name + " · " + options.tip;
+
+    camera.append(shadow, art, hit);
+
+    var self = {
+      kind: kind, name: name, x: x, y: y, facing: 1, node: art, hit: hit,
+      hp: options.hp || 10, hpMax: options.hp || 10, role: options.role
+    };
+
+    self.draw = function (frameIndex) {
+      art.style.setProperty("--f", frameIndex);
+      art.classList.toggle("flip", self.facing === 1 ? false : self.flipped === true);
+      art.style.left = self.x + "px";
+      art.style.top = self.y + "px";
+      shadow.style.left = self.x + "px";
+      shadow.style.top = self.y + "px";
+      hit.style.left = self.x + "px";
+      hit.style.top = self.y + "px";
+    };
+
+    self.face = function (dir) {
+      var d = DIRS[dir];
+      self.flipped = d.flip;
+      self.row = d.row;
+      art.classList.toggle("flip", d.flip);
+      self.draw(sheet.stand[d.row === 0 ? 0 : 1]);
+    };
+
+    self.step = function (dir, done) {
+      var d = DIRS[dir];
+      var toX = Math.max(40, Math.min(MAP_W - 40, self.x + d.dx));
+      var toY = Math.max(60, Math.min(MAP_H - 10, self.y + d.dy));
+      var cycle = sheet.walk[d.row === 0 ? 0 : 1];
+      var fromX = self.x, fromY = self.y, start = performance.now(), span = 260;
+
+      self.flipped = d.flip;
+      art.classList.toggle("flip", d.flip);
+
+      (function tick(now) {
+        var p = Math.min(1, (now - start) / span);
+        self.x = fromX + (toX - fromX) * p;
+        self.y = fromY + (toY - fromY) * p;
+        self.draw(cycle[Math.min(cycle.length - 1, Math.floor(p * cycle.length))]);
+        if (p < 1) { requestAnimationFrame(tick); }
+        else { self.draw(sheet.stand[d.row === 0 ? 0 : 1]); if (done) { done(); } }
+      })(start);
+    };
+
+    self.face("down");
+    return self;
+  }
+
+  var me    = Actor("hero", "수련생", 700, 470, { tip: "나", role: "me", hp: 250 });
+  var host  = Actor("npc",  "주모",   790, 425, { tip: "대화 가능", role: "npc" });
+  var wasp  = Actor("wasp", "말벌",   640, 415, { tip: "체력 3/10", role: "monster", hp: 10 });
+  var cast  = [me, host, wasp];
+
+  wasp.hp = 3;
+  host.face("left");
+  wasp.face("right");
+
+  /* ---- 화면 맞추기 ---- */
+  function fit() {
+    var mode = frame.getAttribute("data-mode");
+    var logical = mode === "portrait" ? 360 : 800;
+    screen.style.transform = "scale(" + (frame.clientWidth / logical) + ")";
+    look();
+  }
+
+  /* 카메라는 나를 가운데 두되, 지도 밖을 보여주지 않는다 */
+  function look() {
+    var w = viewport.clientWidth, h = viewport.clientHeight;
+    var x = Math.max(0, Math.min(MAP_W - w, me.x - w / 2));
+    var y = Math.max(0, Math.min(MAP_H - h, me.y - h / 2 - 20));
+    camera.style.transform = "translate(" + (-x) + "px," + (-y) + "px)";
+  }
+
+  /* ---- 기록과 알림 ---- */
+  var logBox = document.getElementById("log");
   var toast = document.getElementById("toast");
   var toastTimer = 0;
-  function say(text) {
-    toast.textContent = text;
+
+  function say(text, who) {
+    var line = document.createElement("p");
+    line.className = "fresh";
+    line.innerHTML = who ? "<b>" + who + ":</b> " + text : text;
+    logBox.appendChild(line);
+    while (logBox.children.length > 4) { logBox.removeChild(logBox.firstChild); }
+    Array.prototype.forEach.call(logBox.children, function (node, index) {
+      node.classList.toggle("fresh", index === logBox.children.length - 1);
+    });
+
+    toast.textContent = who ? who + ": " + text : text;
     toast.classList.add("on");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { toast.classList.remove("on"); }, 2200);
   }
 
-  var world = document.getElementById("world");
-  var tapmark = document.getElementById("tapmark");
-  world.addEventListener("click", function (event) {
-    if (event.target.closest(".obj")) { return; }
-    var box = world.getBoundingClientRect();
-    var k = box.width / BASE_W;
+  /* ---- 이동 ---- */
+  var walking = false;
+
+  function move(dir) {
+    if (walking) { return; }
+    walking = true;
+    me.step(dir, function () { walking = false; look(); });
+    var glide = setInterval(look, 16);
+    setTimeout(function () { clearInterval(glide); look(); }, 300);
+  }
+
+  document.getElementById("pad").addEventListener("click", function (event) {
+    var key = event.target.closest("[data-dir]");
+    if (!key) { return; }
+    key.classList.add("hit-flash");
+    setTimeout(function () { key.classList.remove("hit-flash"); }, 130);
+    move(key.getAttribute("data-dir"));
+  });
+
+  addEventListener("keydown", function (event) {
+    var map = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
+    if (map[event.key]) { event.preventDefault(); move(map[event.key]); }
+  });
+
+  viewport.addEventListener("click", function (event) {
+    if (event.target.closest(".hit")) { return; }
+    var box = camera.getBoundingClientRect();
+    var k = box.width / MAP_W;
     tapmark.style.left = ((event.clientX - box.left) / k) + "px";
     tapmark.style.top = ((event.clientY - box.top) / k) + "px";
     tapmark.classList.remove("on");
@@ -287,42 +498,47 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
     say("그 칸으로 이동합니다.");
   });
 
+  /* ---- 고르기 ---- */
   var target = document.getElementById("target");
   var tname = document.getElementById("tname");
+  var tnum = document.getElementById("tnum");
+  var tfill = document.getElementById("tfill");
   var chosen = null;
 
-  Array.prototype.forEach.call(document.querySelectorAll(".obj"), function (obj) {
-    obj.addEventListener("click", function (event) {
-      event.stopPropagation();
-      var name = obj.getAttribute("data-name");
-      var kind = obj.getAttribute("data-kind");
+  function drawTarget() {
+    if (!chosen) { target.classList.remove("on"); return; }
+    tname.textContent = chosen.name;
+    tnum.textContent = chosen.hp + " / " + chosen.hpMax;
+    tfill.style.transform = "scaleX(" + (chosen.hp / chosen.hpMax) + ")";
+    target.classList.add("on");
+  }
 
-      if (kind === "monster") {
-        chosen = name;
-        tname.textContent = name;
-        target.classList.add("on");
-        say(name + "을 겨눕니다.");
-      } else if (kind === "npc") {
-        say(name + "에게 말을 겁니다.");
+  cast.forEach(function (actor) {
+    actor.hit.addEventListener("click", function (event) {
+      event.stopPropagation();
+      cast.forEach(function (other) { other.hit.classList.remove("chosen"); });
+
+      if (actor.role === "monster") {
+        chosen = actor;
+        actor.hit.classList.add("chosen");
+        drawTarget();
+        say(actor.name + "을 겨눕니다.");
+      } else if (actor.role === "npc") {
+        say("어서 오시게. 오늘은 무엇을 도와드릴까?", actor.name);
       } else {
         say("나 자신입니다.");
       }
     });
   });
 
-  document.getElementById("pad").addEventListener("click", function (event) {
-    var key = event.target.closest("[data-dir]");
-    if (!key) { return; }
-    key.classList.add("hit");
-    setTimeout(function () { key.classList.remove("hit"); }, 130);
-    say("한 칸 이동합니다.");
-  });
-
+  /* ---- 공격 ---- */
   var sweep = document.getElementById("sweep");
   var cooling = false;
+
   document.getElementById("attack").addEventListener("click", function () {
     if (cooling) { say("아직 숨을 고르는 중입니다."); return; }
     if (!chosen) { say("먼저 대상을 고르세요."); return; }
+
     cooling = true;
     var start = performance.now(), span = 900;
     (function tick(now) {
@@ -330,44 +546,44 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
       sweep.style.setProperty("--sweep", (1 - p) + "turn");
       if (p < 1) { requestAnimationFrame(tick); } else { cooling = false; }
     })(start);
-    say(chosen + "을 공격했습니다.");
+
+    chosen.hp = chosen.hp > 1 ? chosen.hp - 1 : chosen.hpMax;
+    chosen.hit.querySelector(".tip").textContent = chosen.name + " · 체력 " + chosen.hp + "/" + chosen.hpMax;
+    drawTarget();
+    say(chosen.name + "에게 1 피해를 입혔습니다.");
   });
 
+  /* ---- 내 상태 ---- */
   var hp = 180;
   var hpfill = document.getElementById("hpfill");
   var hpnum = document.getElementById("hpnum");
+
   function drawHp() {
     hpfill.style.transform = "scaleX(" + (hp / 250) + ")";
     hpnum.textContent = hp + " / 250";
   }
+
   document.getElementById("t-hit").addEventListener("click", function () {
     hp = hp <= 40 ? 250 : hp - 40;
     drawHp();
-    say(hp <= 40 ? "체력을 회복했습니다." : "피해를 입었습니다.");
+    say(hp <= 40 ? "체력을 회복했습니다." : "말벌에게 40 피해를 입었습니다.");
   });
 
-  var maps = [
-    ["assets/world-safehouse.png", "안전 가옥"],
-    ["assets/world-safehouse-2.png", "안전 가옥 · 다른 자리"]
-  ];
-  var mapIndex = 0;
-  document.getElementById("t-map").addEventListener("click", function () {
-    mapIndex = (mapIndex + 1) % maps.length;
-    var img = document.getElementById("map");
-    img.style.opacity = "0";
-    setTimeout(function () {
-      img.src = maps[mapIndex][0];
-      img.alt = maps[mapIndex][1];
-      img.style.opacity = "1";
-    }, 170);
-    // 캐릭터는 원작 화면에만 있으므로 다른 지도에서는 반응 영역을 감춘다
-    document.body.classList.toggle("no-objects", mapIndex !== 0);
-    Array.prototype.forEach.call(document.querySelectorAll(".obj"), function (obj) {
-      obj.style.display = mapIndex === 0 ? "" : "none";
-    });
-    say(maps[mapIndex][1]);
+  /* ---- 세로·가로 ---- */
+  var modeButton = document.getElementById("t-mode");
+
+  function setMode(mode) {
+    frame.setAttribute("data-mode", mode);
+    modeButton.textContent = mode === "portrait" ? "가로로 보기" : "세로로 보기";
+    fit();
+    say(mode === "portrait" ? "세로 — 월드와 조작이 위아래로 나뉩니다." : "가로 — HUD가 월드 위에 뜹니다.");
+  }
+
+  modeButton.addEventListener("click", function () {
+    setMode(frame.getAttribute("data-mode") === "portrait" ? "landscape" : "portrait");
   });
 
+  /* ---- 나머지 도구 ---- */
   function press(id, cls, host) {
     var button = document.getElementById(id);
     button.addEventListener("click", function () {
@@ -391,25 +607,26 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
     say("가방은 첫 테스트에서 읽기 전용입니다.");
   });
 
+  /* ---- 처음 상태 ---- */
+  document.getElementById("mpfill").style.transform = "scaleX(0.66)";
   drawHp();
-  document.getElementById("tfill").style.transform = "scaleX(0.3)";
+  fit();
+  addEventListener("resize", fit);
 
-  // 주소 뒤에 ?zones=1&target=1 을 붙이면 그 상태로 바로 열린다 — 캡처와 공유용
+  // 주소 뒤에 ?mode=landscape&zones=1&target=1 을 붙이면 그 상태로 열린다 — 캡처와 공유용
   var params = new URLSearchParams(location.search);
+  if (params.get("mode") === "landscape") { setMode("landscape"); }
   if (params.get("zones")) {
     document.body.classList.add("show-zones");
     document.getElementById("t-zones").setAttribute("aria-pressed", "true");
   }
-  if (params.get("target")) {
-    chosen = "멜로린";
-    target.classList.add("on");
-  }
+  if (params.get("target")) { chosen = wasp; wasp.hit.classList.add("chosen"); drawTarget(); }
   if (params.get("dim")) {
     hud.classList.add("dim");
     document.getElementById("t-hud").setAttribute("aria-pressed", "true");
   }
 
-  say(params.get("zones") ? "주황은 그림 크기, 청록은 손가락이 닿는 영역입니다." : "안전 가옥에 들어왔습니다.");
+  say("안전 가옥에 들어왔습니다. 방향 버튼으로 걸어 보세요.");
 })();
 </script>
 </body>
