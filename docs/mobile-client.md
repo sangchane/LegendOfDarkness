@@ -192,6 +192,7 @@ Start-Process -FilePath 'D:\_personal\LOD\tmp\hades-run\Lorule.GameServer.exe' `
 ```powershell
 Start-Process $godot -ArgumentList '--path','mobile/client','--','--login','friend:test1234'
 & $godot --path mobile/client -- --login wren:test1234 --pick --shot out.png --shot-after 22
+& $godot --path mobile/client -- --login wren:test1234 --wear --shot out.png --shot-after 30   # 첫 줄을 입어 본다
 ```
 
 `--pick` 이 성공하면 로그에 `GREYBOX_PICKED <이름>` 이 찍힌다.
