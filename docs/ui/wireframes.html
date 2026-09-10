@@ -17,8 +17,8 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{min-height:100dvh;background:var(--stone-900);color:var(--ink);font-family:var(--sans);
-  padding:28px 16px 72px;display:grid;gap:44px;justify-items:center}
+body{min-height:100dvh;background:var(--stone-900);color:var(--ink);font-family:var(--sans)}
+.wrap{display:grid;gap:44px}
 .wrap{max-width:1000px;width:100%;display:grid;gap:44px}
 h1{font-family:var(--serif);font-size:28px;margin:0 0 8px;text-wrap:balance}
 h2{font-family:var(--serif);font-size:20px;margin:0}
@@ -132,7 +132,9 @@ footer b{color:var(--ink)}
 </style>
 </head>
 <body>
-<div class="wrap">
+<script src="../nav.js"></script>
+<script>buildNav("screens", "../");</script>
+<main><div class="wrap">
 
 <header>
   <h1>어둠의 전설 모바일 — 화면 6장</h1>
@@ -322,7 +324,7 @@ footer b{color:var(--ink)}
   단위로 같습니다(<code>setoa.dat</code>만 버전이 다름).
 </footer>
 
-</div>
+</div></main>
 
 <script>
 (function () {

@@ -29,11 +29,8 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{
-  min-height:100dvh;background:var(--stone-900);color:var(--ink);
-  font-family:var(--sans);display:grid;grid-template-rows:auto auto 1fr;gap:18px;
-  padding:24px 16px 48px;
-}
+body{min-height:100dvh;background:var(--stone-900);color:var(--ink);font-family:var(--sans)}
+main{display:grid;grid-template-rows:auto auto 1fr;gap:18px}
 header,footer,.stage{max-width:1000px;margin:0 auto;width:100%}
 h1{font-family:var(--serif);font-size:26px;margin:0 0 6px;text-wrap:balance}
 .sub{color:var(--ink-dim);margin:0;font-size:14px;max-width:64ch;line-height:1.7}
@@ -150,13 +147,16 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
 </style>
 </head>
 <body>
+<script src="../nav.js"></script>
+<script>buildNav("hud", "../");</script>
+<main>
 
 <header>
   <h1>어둠의 전설 모바일 — HUD 시안</h1>
   <p class="sub">
-    원작 클라이언트가 실제로 그린 화면 위에 HUD만 얹었습니다. 배경도 캐릭터도 원작 그대로이고,
-    새로 그린 그림은 없습니다. 배치와 조작은 요즘 모바일 게임에서 검증된 방식을 따르고, 패널의 재질과
-    색은 원작 화면에서 가져왔습니다. 아래 버튼으로 직접 눌러 보세요.
+    배경은 이 저장소의 원본 자료에서 직접 그린 안전 가옥 바닥입니다. 새로 그린 그림은 없습니다.
+    배치와 조작은 요즘 모바일 게임에서 검증된 방식을 따르고, 패널의 재질과 색은 원작 화면에서
+    가져왔습니다. 아래 버튼으로 직접 눌러 보세요.
   </p>
 </header>
 
@@ -250,6 +250,7 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
   자산 출처: <code>tools/dat-extract</code>로 이 저장소의 <code>game/seo.dat</code>과
   <code>database/server/maps/lod1.map</code>에서 직접 그린 안전 가옥 바닥입니다.
 </footer>
+</main>
 
 <script>
 (function () {
