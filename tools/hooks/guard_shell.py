@@ -30,7 +30,10 @@ QUOTED = re.compile(r"[\"']")
 
 SUBMODULE_SAFE = ("--ignore-submodules", "-C sources", "-C ./sources", "-C sources/")
 
-COPYING = re.compile(r"\b(cp|copy|xcopy|robocopy|mv|move|rsync|Copy-Item|Move-Item)\b", re.IGNORECASE)
+COPYING = re.compile(
+    r"^\s*(?:sudo\s+|&\s+)?(?:\S*[/\\])?(cp|copy|xcopy|robocopy|mv|move|rsync|Copy-Item|Move-Item)\b",
+    re.IGNORECASE,
+)
 LOD_UNDERSCORE = re.compile(r"LOD_(?![A-Za-z0-9])")
 
 
@@ -73,6 +76,14 @@ def main() -> int:
         # `git commit -m "... 두 낱말 ..."` 처럼 메시지 안에 적힌 것까지 명령으로 오인한다.
         head = QUOTED.split(part, 1)[0]
 
+        if COPYING.search(head) and LOD_UNDERSCORE.search(head):
+            warn(
+                "`LOD_` 의 산출물은 이 저장소로 들여오지 않기로 했습니다 — 추출 *방법*만 참고하고, "
+                "자산은 이 저장소 원본 `.dat` 에서 `tools/dat-extract` 로 직접 뽑습니다. "
+                "정말 필요하면 그대로 진행하되, 어디서 가져왔는지 남기세요."
+            )
+            return 0
+
         if GIT_STATUS.search(head) and not any(safe in head for safe in SUBMODULE_SAFE):
             deny(
                 "이 저장소에서 그냥 `git status` 는 submodule 17개를 스캔하다 멈추고, 멈추면 "
@@ -81,13 +92,6 @@ def main() -> int:
                 "`git -C sources/<소유자>/<저장소> status` 를 쓰세요."
             )
             return 0
-
-    if COPYING.search(command) and LOD_UNDERSCORE.search(command):
-        warn(
-            "`LOD_` 의 산출물은 이 저장소로 들여오지 않기로 했습니다 — 추출 *방법*만 참고하고, "
-            "자산은 이 저장소 원본 `.dat` 에서 `tools/dat-extract` 로 직접 뽑습니다. "
-            "정말 필요하면 그대로 진행하되, 어디서 가져왔는지 남기세요."
-        )
 
     return 0
 

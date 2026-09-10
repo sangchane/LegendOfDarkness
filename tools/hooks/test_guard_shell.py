@@ -21,6 +21,8 @@ CASES = [
     ("git log --oneline -1", "PASS"),
     ("cp D:/_personal/LOD_/extract/hero.png mobile/client/assets/", "WARN"),
     ("ls -la", "PASS"),
+    # 문서 본문에 낱말이 적혀 있을 뿐인 것: 한 번 이렇게 헛경고가 났다.
+    ('python - <<PY\n"cp·mv 로 LOD_ 에서 가져오지 마라"\nPY', "PASS"),
 ]
 
 
