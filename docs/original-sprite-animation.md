@@ -278,7 +278,9 @@ C:\Program Files (x86)\KRU\Dark Ages\Legend.dat
 dat-extract dump "C:/Program Files (x86)/KRU/Dark Ages/Legend.dat" <출력폴더> .tbl
 ```
 
-동작 표를 코드에 넣을 때는 이 문서의 3.2절 값을 쓰고, 원본이 필요하면 위 경로에서 다시 뽑는다.
+실제로 쓰는 표(50KB)는 뽑아서 [`../data/legend-tables/`](../data/legend-tables/) 에 넣어 두었다.
+설치 클라이언트가 없는 기기에서도 그대로 읽을 수 있다. 13MB 아카이브 전체와 이야기 삽화·음악은
+넣지 않았다 — 필요해지면 위 경로에서 뽑는다.
 
 ---
 
