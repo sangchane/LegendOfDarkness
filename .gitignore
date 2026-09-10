@@ -22,3 +22,7 @@ sources/*.zip
 sources/*.exe
 sources/Dark-Ages-Private-Server-master/
 .playwright-mcp/
+
+# .NET build output
+[Bb]in/
+[Oo]bj/

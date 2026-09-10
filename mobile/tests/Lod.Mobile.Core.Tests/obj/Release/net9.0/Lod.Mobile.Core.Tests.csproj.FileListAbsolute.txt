@@ -1,8 +1,0 @@
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\bin\Release\net9.0\.msCoverageSourceRootsMapping_Lod.Mobile.Core.Tests
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\bin\Release\net9.0\CoverletSourceRootsMapping_Lod.Mobile.Core.Tests
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\obj\Release\net9.0\Lod.Mobile.Core.Tests.csproj.AssemblyReference.cache
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\obj\Release\net9.0\Lod.Mobile.Core.Tests.GeneratedMSBuildEditorConfig.editorconfig
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\obj\Release\net9.0\Lod.Mobile.Core.Tests.AssemblyInfoInputs.cache
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\obj\Release\net9.0\Lod.Mobile.Core.Tests.AssemblyInfo.cs
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\obj\Release\net9.0\Lod.Mobile.Core.Tests.csproj.CoreCompileInputs.cache
-D:\_personal\LOD\mobile\tests\Lod.Mobile.Core.Tests\obj\Release\net9.0\Lod.Mobile.Core.Tests.sourcelink.json
