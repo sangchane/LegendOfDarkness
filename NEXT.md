@@ -1,7 +1,7 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[지금/서버]** **괴물을 하나 세운다.** 전투 화면이 막혀 있는 유일한 이유다 — 안전 가옥에 괴물이 없어 대상 HP도 공격 거부도 확인할 수가 없다. `cm` 은 채팅 명령이 아니라 주문이니, `database/server/templates/monsters/` 에 템플릿을 넣는 쪽을 먼저 본다
+- **[지금/서버]** **괴물이 안 뜬다 — 여기서 막혔다.** 안전 가옥(AreaID 1) 24,27 에 템플릿을 넣었고 서버가 읽는다(`Monster Templates Loaded: 4`). 스폰 조건은 다 맞아 보이는데(`SpawnType 4 = Defined`, `GlobalSpawnTimer 1000`, `MonsterCreationScript "Create Monster"` 등록됨) 클라이언트에 `0x07` 이 한 번도 안 온다. **다음에 볼 곳**: `scripts/Creations/monsters.cs` 의 `Create` 뒷부분(어디서 null 을 돌려주는지)과 `MonolithComponent.AddObject`. 템플릿은 `tmp/hades-run/.../monsters/insight_1/safehouse_wasp.json` 에 그대로 있다
 - **[다음/화면]** **전투.** 괴물이 서면 바로 이어서 — 대상 HP·공격 버튼·거부 문구. 배치는 시안 7절
 - **[다음/화면]** **갈아입어도 다시 안 그린다.** 사람이 나갔다 들어와야 바뀐다(`WorldView.Crowd`·`Wear`). 입을 아이템이 생기면 그때 고친다 — 이 서버 아이템 템플릿은 셋뿐이다
 - **[다음/화면]** HUD의 이름이 `수련생`으로 박혀 있다(`GameScreen.BuildTopRow`). 서버가 `0x33`에서 진짜 이름을 준다 — `WorldClient.Self.Name`
