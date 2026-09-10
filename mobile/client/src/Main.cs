@@ -22,6 +22,9 @@ public partial class Main : Control
 
     private const int BodyFontSize = 16;
 
+    /// <summary>Logical size of a portrait screen. One unit is one dp here too.</summary>
+    private static readonly Vector2I PortraitSize = new(360, 780);
+
     // Windows ships a Korean face; Android and iOS do not have this path. Until a licensed font is bundled,
     // a missing face is reported on screen rather than left to render as empty boxes.
     private const string WindowsKoreanFont = "C:/Windows/Fonts/malgun.ttf";
@@ -33,12 +36,26 @@ public partial class Main : Control
     /// <summary>The font actually in use. Printed on screen, because Hangul depends on it.</summary>
     public static string FontName { get; private set; } = "확인 전";
 
+    /// <summary>
+    /// Which way the screen is held. Portrait is not landscape squeezed: it has enough height to keep the
+    /// controls out of the world, so the screens lay themselves out differently rather than scaling.
+    /// </summary>
+    public static bool Portrait { get; private set; }
+
     public override void _Ready()
     {
+        Portrait = Flag("--orient") == "portrait";
+
+        if (Portrait)
+        {
+            GetWindow().ContentScaleSize = PortraitSize;
+            DisplayServer.WindowSetSize(PortraitSize * 5 / 4);
+        }
+
         Theme = BuildTheme();
         SafeInsets = ComputeSafeInsets(GetViewportRect().Size);
 
-        AddChild(ScreenFromCommandLine() == "game" ? new GameScreen() : new LoginScreen());
+        AddChild(Flag("--screen") == "game" ? new GameScreen() : new LoginScreen());
 
         Screenshot.CaptureIfRequested(this);
     }
@@ -63,19 +80,20 @@ public partial class Main : Control
         return container;
     }
 
-    private static string ScreenFromCommandLine()
+    /// <summary>Reads a value passed after a double dash, as in <c>-- --screen game --orient portrait</c>.</summary>
+    private static string Flag(string name)
     {
         string[] args = OS.GetCmdlineUserArgs();
 
         for (int index = 0; index < args.Length - 1; index++)
         {
-            if (args[index] == "--screen")
+            if (args[index] == name)
             {
                 return args[index + 1];
             }
         }
 
-        return "login";
+        return string.Empty;
     }
 
     private static Theme BuildTheme()

@@ -11,6 +11,10 @@ public partial class GameScreen : Control
     private const int AuxFontSize = 14;
     private const int AttackSize = 64;
     private const int StatusBarWidth = 120;
+    private const int PortraitStatusBarWidth = 96;
+
+    /// <summary>Rows the chat and combat log keeps in portrait. Landscape has no room for it at all.</summary>
+    private const int LogHeight = 76;
 
     private Control _world = null!;
     private Control _topRow = null!;
@@ -28,22 +32,39 @@ public partial class GameScreen : Control
 
     public override void _Ready()
     {
-        _world = BuildWorld();
-        AddChild(_world);
-
         MarginContainer hud = Main.SafeAreaContainer();
-        AddChild(hud);
 
         VBoxContainer rows = new();
         rows.AddThemeConstantOverride("separation", Main.Gutter);
-        hud.AddChild(rows);
 
         _topRow = BuildTopRow();
         _controlRow = BuildControlRow();
 
-        rows.AddChild(_topRow);
-        rows.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
-        rows.AddChild(_controlRow);
+        if (Main.Portrait)
+        {
+            // Portrait has the height to give the world a row of its own, so nothing the player is aiming
+            // at sits under a thumb. That is the whole reason to hold the phone this way.
+            _world = BuildWorld(fullBleed: false);
+
+            AddChild(hud);
+            hud.AddChild(rows);
+            rows.AddChild(_topRow);
+            rows.AddChild(_world);
+            rows.AddChild(BuildLog());
+            rows.AddChild(_controlRow);
+        }
+        else
+        {
+            // Landscape has no such room: the world fills the screen and the HUD floats over its corners.
+            _world = BuildWorld(fullBleed: true);
+
+            AddChild(_world);
+            AddChild(hud);
+            hud.AddChild(rows);
+            rows.AddChild(_topRow);
+            rows.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
+            rows.AddChild(_controlRow);
+        }
 
         _ = PlaceWorldOnceMeasured();
     }
@@ -64,6 +85,20 @@ public partial class GameScreen : Control
         // Laid out around the band's centre rather than the screen's, which is what a camera has to do too.
         Vector2 centre = band.Position + (band.Size / 2);
 
+        if (Main.Portrait)
+        {
+            // Only 360 across, so the objects stand on two rows rather than shrinking below the tap minimum.
+            float upper = centre.Y - Main.TouchMinimum - 24;
+            float lower = centre.Y + 24;
+
+            Place("Npc", new Vector2(centre.X - 110, upper));
+            Place("Monster", new Vector2(centre.X + 30, upper));
+            Place("GroundItem", new Vector2(centre.X - 145, lower));
+            Place("Player", new Vector2(centre.X - (Main.TouchMinimum / 2), lower));
+
+            return;
+        }
+
         // One row: the band is only tall enough for a single object plus its caption, which is itself worth
         // seeing. A three row movement pad takes a large share of a 360 unit high screen.
         float row = centre.Y - (Main.TouchMinimum / 2);
@@ -76,6 +111,12 @@ public partial class GameScreen : Control
 
     private Rect2 FocusBand()
     {
+        // In portrait the world already is the band, so its own rect answers the question.
+        if (Main.Portrait)
+        {
+            return new Rect2(Vector2.Zero, _world.Size);
+        }
+
         float top = _topRow.GlobalPosition.Y + _topRow.Size.Y + Main.Gutter;
         float bottom = _controlRow.GlobalPosition.Y - Main.Gutter;
         float left = Main.SafeInsets.Left;
@@ -91,16 +132,22 @@ public partial class GameScreen : Control
     /// Full-bleed world. Greybox stands the objects in for sprites, which still live inside the .dat
     /// archives, so their tap sizes can be judged before any art exists.
     /// </summary>
-    private Control BuildWorld()
+    private Control BuildWorld(bool fullBleed)
     {
-        Panel world = new()
+        Panel world = new() { Name = "World" };
+
+        if (fullBleed)
         {
-            Name = "World",
-            AnchorRight = 1,
-            AnchorBottom = 1,
-            GrowHorizontal = GrowDirection.Both,
-            GrowVertical = GrowDirection.Both
-        };
+            world.AnchorRight = 1;
+            world.AnchorBottom = 1;
+            world.GrowHorizontal = GrowDirection.Both;
+            world.GrowVertical = GrowDirection.Both;
+        }
+        else
+        {
+            world.SizeFlagsVertical = SizeFlags.ExpandFill;
+        }
+
         world.AddThemeStyleboxOverride("panel", Greybox.World());
 
         _focusBand = new Panel { Name = "FocusBand" };
@@ -139,6 +186,40 @@ public partial class GameScreen : Control
         return group;
     }
 
+    /// <summary>
+    /// What the original kept at the bottom of its screen. Portrait has the height to keep it, and it is
+    /// what replaces the passing notice landscape has to make do with.
+    /// </summary>
+    private static Control BuildLog()
+    {
+        Panel frame = new() { CustomMinimumSize = new Vector2(0, LogHeight) };
+        frame.AddThemeStyleboxOverride("panel", Greybox.Surface());
+
+        MarginContainer inset = new()
+        {
+            AnchorRight = 1,
+            AnchorBottom = 1,
+            GrowHorizontal = GrowDirection.Both,
+            GrowVertical = GrowDirection.Both
+        };
+        inset.AddThemeConstantOverride("margin_left", Main.Gutter);
+        inset.AddThemeConstantOverride("margin_right", Main.Gutter);
+        inset.AddThemeConstantOverride("margin_bottom", Main.Gutter / 2);
+        frame.AddChild(inset);
+
+        VBoxContainer lines = new() { Alignment = BoxContainer.AlignmentMode.End };
+        lines.AddThemeConstantOverride("separation", 2);
+
+        foreach (string line in new[] { "\uc548\uc804 \uac00\uc625\uc5d0 \ub4e4\uc5b4\uc654\uc2b5\ub2c8\ub2e4.", "\uc8fc\ubaa8: \uc5b4\uc11c \uc624\uc2dc\uac8c.", "\uac70\ubbf8\ub97c \uaca8\ub215\ub2c8\ub2e4." })
+        {
+            lines.AddChild(Aux(line));
+        }
+
+        inset.AddChild(lines);
+
+        return frame;
+    }
+
     /// <summary>Name and health on the left, world state and inventory on the right.</summary>
     private static Control BuildTopRow()
     {
@@ -148,8 +229,14 @@ public partial class GameScreen : Control
         row.AddChild(Aux("수련생"));
         row.AddChild(BuildHealth());
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        row.AddChild(Aux("안전 가옥"));
-        row.AddChild(Aux("연결됨"));
+
+        // 360 across cannot hold the map name and the connection state as well; the log carries them instead.
+        if (!Main.Portrait)
+        {
+            row.AddChild(Aux("안전 가옥"));
+            row.AddChild(Aux("연결됨"));
+        }
+
         row.AddChild(new Button
         {
             Text = "인벤토리",
@@ -167,7 +254,7 @@ public partial class GameScreen : Control
 
         ProgressBar bar = new()
         {
-            CustomMinimumSize = new Vector2(StatusBarWidth, 12),
+            CustomMinimumSize = new Vector2(Main.Portrait ? PortraitStatusBarWidth : StatusBarWidth, 12),
             MaxValue = 250,
             Value = 180,
             ShowPercentage = false,
@@ -177,7 +264,7 @@ public partial class GameScreen : Control
         bar.AddThemeStyleboxOverride("fill", Greybox.Fill());
 
         health.AddChild(bar);
-        health.AddChild(Aux("HP 180 / 250"));
+        health.AddChild(Aux(Main.Portrait ? "180 / 250" : "HP 180 / 250"));
 
         return health;
     }
@@ -190,7 +277,11 @@ public partial class GameScreen : Control
     {
         CenterContainer center = new();
 
-        HBoxContainer row = new() { CustomMinimumSize = new Vector2(Main.ThumbSpanMaximum, 0) };
+        HBoxContainer row = new()
+        {
+            CustomMinimumSize = new Vector2(Main.Portrait ? 0 : Main.ThumbSpanMaximum, 0),
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
         Label status = new()
@@ -205,7 +296,9 @@ public partial class GameScreen : Control
         status.AddThemeColorOverride("font_color", Greybox.Muted);
 
         row.AddChild(BuildMovementPad());
-        row.AddChild(status);
+        row.AddChild(Main.Portrait
+            ? new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill }
+            : status);
         row.AddChild(new Button
         {
             Text = "공격",
