@@ -1,0 +1,8 @@
+{
+  "description": "Synthetic Hades-compatible 7.18 login contract; contains no real credentials.",
+  "versionRequestHex": "AA00050002CE4C4B",
+  "serverParametersHex": "AA001100000102030400094E65786F6E496E632E",
+  "loginRequestHex": "AA000E03004808170D07250B675A2A170D",
+  "redirectHex": "AA001E030100007F0A371600094E65786F6E496E632E066D6F62696C6501020304",
+  "gameEntryHex": "AA00171000094E65786F6E496E632E066D6F62696C6501020304"
+}
