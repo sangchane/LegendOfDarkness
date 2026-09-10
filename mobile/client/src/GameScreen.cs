@@ -22,6 +22,7 @@ public partial class GameScreen : Control
     private Label _place = null!;
     private Label _target = null!;
     private PackPanel _pack = null!;
+    private Control _packRow = null!;
 
     // 손 없이 확인할 때 스스로 열어 보기 위한 것. 월드가 자리를 잡을 때까지 센다.
     private int _settling;
@@ -39,6 +40,13 @@ public partial class GameScreen : Control
         GrowHorizontal = GrowDirection.Both;
         GrowVertical = GrowDirection.Both;
     }
+
+    /// <summary>
+    /// The pieces a layout check walks: everything that has to stay on the screen and out of each other's
+    /// way. Named in Korean because the names are printed for a person to read.
+    /// </summary>
+    public IReadOnlyList<(string Name, Control Part)> Parts =>
+        [("위 줄", _topRow), ("조작 줄", _controlRow), ("인벤토리", _pack), ("월드", _world)];
 
     public override void _Ready()
     {
@@ -67,7 +75,7 @@ public partial class GameScreen : Control
             hud.AddChild(rows);
             rows.AddChild(_topRow);
             rows.AddChild(_world);
-            rows.AddChild(BuildPackRow());
+            rows.AddChild(_packRow = BuildPackRow());
             rows.AddChild(BuildLog());
             rows.AddChild(_controlRow);
         }
@@ -81,7 +89,7 @@ public partial class GameScreen : Control
             AddChild(hud);
             hud.AddChild(rows);
             rows.AddChild(_topRow);
-            rows.AddChild(BuildPackRow());
+            rows.AddChild(_packRow = BuildPackRow());
             rows.AddChild(_controlRow);
         }
     }
@@ -98,19 +106,28 @@ public partial class GameScreen : Control
             MouseFilter = MouseFilterEnum.Ignore
         };
 
-        row.AddChild(new Control
-        {
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            SizeFlagsStretchRatio = 62,
-            MouseFilter = MouseFilterEnum.Ignore
-        });
-
         // 높이는 남는 만큼만 — 최소 높이를 박으면 위·아래 줄이 화면 밖으로 밀린다(한 번 그렇게 됐다).
         _pack.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        _pack.SizeFlagsStretchRatio = 38;
         _pack.SizeFlagsVertical = SizeFlags.ExpandFill;
 
+        if (!Main.Portrait)
+        {
+            // 가로에서는 이 줄이 위 줄과 조작 줄 사이의 빈 자리이기도 하다. 닫혀 있어도 남아 있어야
+            // 조작 줄이 위로 올라오지 않는다. 패널은 오른쪽 3분의 1 남짓만 덮는다.
+            row.AddChild(new Control
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsStretchRatio = 62,
+                MouseFilter = MouseFilterEnum.Ignore
+            });
+
+            _pack.SizeFlagsStretchRatio = 38;
+        }
+
         row.AddChild(_pack);
+
+        // 세로에서는 시안대로 월드 아래 전폭이고, 닫혀 있으면 줄째로 사라져 월드에 자리를 돌려준다.
+        row.Visible = !Main.Portrait;
 
         return row;
     }
@@ -244,6 +261,11 @@ public partial class GameScreen : Control
         _pack.Visible = open;
         _world.Frozen = open;
 
+        if (Main.Portrait)
+        {
+            _packRow.Visible = open;
+        }
+
         if (open)
         {
             _pack.Show(_server?.Pack ?? []);
@@ -274,18 +296,12 @@ public partial class GameScreen : Control
     }
 
     /// <summary>
-    /// Movement on the left, attack on the right, status between them. Centred inside a capped width so the
+    /// Movement on the left, attack on the right, status between them, inside a width capped so the two
     /// clusters never drift further apart than a thumb can travel on a very wide screen.
     /// </summary>
     private Control BuildControlRow()
     {
-        CenterContainer center = new();
-
-        HBoxContainer row = new()
-        {
-            CustomMinimumSize = new Vector2(Main.Portrait ? 0 : Main.ThumbSpanMaximum, 0),
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
+        HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
         Label status = new()
@@ -319,9 +335,7 @@ public partial class GameScreen : Control
             SizeFlagsVertical = SizeFlags.ShrinkEnd
         });
 
-        center.AddChild(row);
-
-        return center;
+        return Main.Capped(row, Main.ThumbSpanMaximum);
     }
 
     /// <summary>

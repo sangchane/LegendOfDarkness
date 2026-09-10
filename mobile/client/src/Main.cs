@@ -88,7 +88,15 @@ public partial class Main : Control
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
 
-        if (Portrait)
+        // --size wins over the orientation's own default, so a check can walk several shapes of screen.
+        Vector2I? asked = SizeFromCommandLine();
+
+        if (asked is { } wanted)
+        {
+            GetWindow().ContentScaleSize = wanted;
+            DisplayServer.WindowSetSize(wanted);
+        }
+        else if (Portrait)
         {
             GetWindow().ContentScaleSize = PortraitSize;
             DisplayServer.WindowSetSize(PortraitSize * 5 / 4);
@@ -99,7 +107,10 @@ public partial class Main : Control
 
         if (Flag("--screen") == "game")
         {
-            AddChild(new GameScreen());
+            GameScreen game = new();
+
+            AddChild(game);
+            LayoutCheck.RunIfRequested(this, game);
         }
         else
         {
@@ -122,6 +133,49 @@ public partial class Main : Control
         login.QueueFree();
 
         AddChild(new GameScreen(new Lod.Mobile.Core.World.WorldClient(session)));
+    }
+
+    /// <summary>The screen size a run asks for, as <c>--size 360x780</c>, or nothing for the default.</summary>
+    private static Vector2I? SizeFromCommandLine()
+    {
+        string given = Flag("--size");
+        string[] parts = given.Split('x', 'X');
+
+        return parts.Length == 2
+               && int.TryParse(parts[0], out int across)
+               && int.TryParse(parts[1], out int down)
+               && across > 0
+               && down > 0
+            ? new Vector2I(across, down)
+            : null;
+    }
+
+    /// <summary>
+    /// Keeps a row from growing wider than a thumb can travel, without forcing that width on a screen that
+    /// is narrower than it.
+    /// </summary>
+    /// <remarks>
+    /// Godot sizes a control by its minimum and has no maximum, so a minimum width of the thumb span made
+    /// the row hang off both edges of a 640-wide screen — and dragged the status bar out with it, because
+    /// the column is as wide as its widest child. The width is a ceiling, not a floor, so the side margins
+    /// are worked out again whenever the box changes shape.
+    /// </remarks>
+    public static MarginContainer Capped(Control inner, int widest)
+    {
+        MarginContainer box = new();
+
+        inner.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        box.AddChild(inner);
+
+        box.Resized += () =>
+        {
+            int side = Mathf.Max(0, Mathf.RoundToInt((box.Size.X - widest) / 2));
+
+            box.AddThemeConstantOverride("margin_left", side);
+            box.AddThemeConstantOverride("margin_right", side);
+        };
+
+        return box;
     }
 
     /// <summary>A container whose padding keeps its contents inside the safe area.</summary>
