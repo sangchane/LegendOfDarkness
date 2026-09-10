@@ -236,6 +236,11 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
       <a href="mobile-test-v1-wireframes.md">와이어프레임 문서</a>
     </div>
     <div class="card">
+      <h4>원작 동작 구조</h4>
+      <p>방향이 두 벌뿐인 이유, 프레임 구간이 어디에 적혀 있고 어디에 없는지. 스킬·주문 작업 전에 읽으세요.</p>
+      <a href="original-sprite-animation.md">동작 구조 문서</a>
+    </div>
+    <div class="card">
       <h4>레퍼런스 조사</h4>
       <p>참고 링크의 실제 구현 방식, 같은 문제를 먼저 푼 게임들에서 가져온 결정.</p>
       <a href="mobile-ui-references.md">조사 기록</a>
@@ -257,7 +262,7 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
       <tr><th>대상</th><th>상태</th><th>비고</th></tr>
       <tr><td>지면 타일</td><td><span class="state done">읽힘</span></td><td class="num">seo.dat 에서 19,243장, 팔레트 74개, 팔레트 표 488개</td></tr>
       <tr><td>맵</td><td><span class="state done">그려짐</span></td><td>맵 5개. 안전 가옥(<code>lod1.map</code>) 30×31칸의 바닥을 실제로 그렸습니다</td></tr>
-      <tr><td>캐릭터</td><td><span class="state done">읽힘</span></td><td>khan.dat 10,417개(남) · khan2.dat 10,404개(여). 몸·옷·모자를 겹쳐 한 사람을 만듭니다</td></tr>
+      <tr><td>캐릭터</td><td><span class="state done">읽힘</span></td><td>khan.dat 10,417개(남) · khan2.dat 10,404개(여). 몸·옷·모자를 겹쳐 한 사람을 만듭니다. 동작 구조는 <a href="original-sprite-animation.md">별도 문서</a></td></tr>
       <tr><td>괴물</td><td><span class="state done">읽힘</span></td><td>hades.dat 742마리. 서기·걷기·공격 구간이 파일에 적혀 있어 그대로 움직입니다</td></tr>
       <tr><td>사물</td><td><span class="state done">읽힘</span></td><td>ia.dat 19,664개. 벽걸이·장식장·탁자 같은 실내 물건입니다(압축 해제 필요)</td></tr>
       <tr><td>벽</td><td><span class="state now">미해결</span></td><td><code>TILEAS.BMP</code>는 고정 크기 타일이 아니어서 별도 해석이 필요합니다</td></tr>

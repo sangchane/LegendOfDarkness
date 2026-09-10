@@ -58,7 +58,7 @@ h1{font-family:var(--serif);font-size:26px;margin:0 0 6px;text-wrap:balance}
   margin:calc(var(--ch) * -1) 0 0 calc(var(--cw) / -2 - var(--ox, 0px));
   background-repeat:no-repeat;image-rendering:pixelated;pointer-events:none;
   background-position:calc(var(--f,0) * var(--cw) * -1) calc(var(--r,0) * var(--ch) * -1)}
-.actor.flip{transform:scaleX(-1)}
+.actor.flip{transform:scaleX(-1);transform-origin:calc(50% + var(--ox, 0px)) center}
 .shadow{position:absolute;width:26px;height:9px;margin:-4px 0 0 -13px;border-radius:50%;
   background:#04060b;opacity:.45;pointer-events:none}
 
@@ -306,6 +306,13 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
       <td>오른쪽 세로줄. 공격 버튼 바로 위입니다.</td></tr>
   </table>
 
+  <b>방향은 두 벌뿐입니다.</b> 원작은 캐릭터를 네 방향으로 그리지 않았습니다. 등을 보이는 한 벌과
+  앞을 보는 한 벌만 그려 두고, <b>서쪽과 남쪽은 그 그림을 좌우로 뒤집어</b> 씁니다. 그래서 북과 서는
+  같은 그림, 동과 남도 같은 그림입니다. 걸어 보면 몸이 뒤집히는 것이 보입니다. 같은 구조가 스킬과
+  주문에서도 반복되므로 따로 정리해 두었습니다 —
+  <a href="../original-sprite-animation.md" style="color:var(--gold)">원작 동작 구조 문서</a>.
+
+  <br><br>
   <b>터치 영역.</b> 「터치 영역 보기」를 누르면
   <span class="legend" style="background:#ff9c6e"></span>주황이 원작 그림의 실제 크기,
   <span class="legend" style="background:#4fd6c1"></span>청록이 손가락이 닿아야 하는 48칸 영역입니다.
@@ -329,17 +336,30 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
   var STEP_X = 28, STEP_Y = 13;
   var MAP_W = 1708, MAP_H = 820;
 
+  /* ---- 방향 ----
+     원작은 그림을 네 방향으로 그리지 않고 두 벌만 그린다. 등을 보이는 한 벌과 앞을 보는 한 벌이고,
+     서쪽·남쪽은 그 그림을 좌우로 뒤집어 쓴다. 그래서 북=등, 서=등 뒤집기, 동=앞, 남=앞 뒤집기다.
+     저장소의 참고 클라이언트(sources/FallenDev/dark-ages-ts)가 같은 규칙을 쓴다. */
+  var BACK = 0, FRONT = 1;
+
   var DIRS = {
-    right: { dx:  STEP_X, dy:  STEP_Y, row: 5, flip: false },
-    down:  { dx: -STEP_X, dy:  STEP_Y, row: 5, flip: true  },
-    left:  { dx: -STEP_X, dy: -STEP_Y, row: 0, flip: true  },
-    up:    { dx:  STEP_X, dy: -STEP_Y, row: 0, flip: false }
+    up:    { dx:  STEP_X, dy: -STEP_Y, side: BACK,  flip: false },
+    left:  { dx: -STEP_X, dy: -STEP_Y, side: BACK,  flip: true  },
+    right: { dx:  STEP_X, dy:  STEP_Y, side: FRONT, flip: false },
+    down:  { dx: -STEP_X, dy:  STEP_Y, side: FRONT, flip: true  }
   };
 
+  /* ---- 프레임 구간 ----
+     …01.epf 열 칸은 [0]=등 서기, [1..4]=등 걷기, [5]=앞 서기, [6..9]=앞 걷기.
+     …02.epf 네 칸은 [0,1]=등 공격, [2,3]=앞 공격. 원작이 정한 구간을 그대로 쓴다. */
   var SHEETS = {
-    hero: { url: "assets/hero-walk.png", cw: 47, ch: 83, ox: 8, stand: [0, 5], walk: [[1,2,3,4],[6,7,8,9]] },
-    npc:  { url: "assets/npc-walk.png",  cw: 47, ch: 83, ox: 8, stand: [0, 5], walk: [[1,2,3,4],[6,7,8,9]] },
-    wasp: { url: "assets/mob-wasp.png",  cw: 59, ch: 59, ox: 0, stand: [0, 0], walk: [[0,1,2,3],[0,1,2,3]] }
+    hero: {
+      url: "assets/hero-walk.png", cw: 47, ch: 83, ox: 8,
+      stand: [0, 5], walk: [[1, 2, 3, 4], [6, 7, 8, 9]],
+      attack: { url: "assets/hero-attack.png", cw: 53, ch: 85, ox: 7, frames: [[0, 1], [2, 3]] }
+    },
+    npc:  { url: "assets/npc-walk.png",  cw: 47, ch: 83, ox: 8, stand: [0, 5], walk: [[1, 2, 3, 4], [6, 7, 8, 9]] },
+    wasp: { url: "assets/mob-wasp.png",  cw: 59, ch: 59, ox: 0, stand: [0, 0], walk: [[0, 1, 2, 3], [0, 1, 2, 3]] }
   };
 
   var frame    = document.getElementById("frame");
@@ -369,13 +389,12 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
     camera.append(shadow, art, hit);
 
     var self = {
-      kind: kind, name: name, x: x, y: y, facing: 1, node: art, hit: hit,
+      kind: kind, name: name, x: x, y: y, side: FRONT, node: art, hit: hit,
       hp: options.hp || 10, hpMax: options.hp || 10, role: options.role
     };
 
     self.draw = function (frameIndex) {
       art.style.setProperty("--f", frameIndex);
-      art.classList.toggle("flip", self.facing === 1 ? false : self.flipped === true);
       art.style.left = self.x + "px";
       art.style.top = self.y + "px";
       shadow.style.left = self.x + "px";
@@ -386,21 +405,50 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
 
     self.face = function (dir) {
       var d = DIRS[dir];
-      self.flipped = d.flip;
-      self.row = d.row;
+      self.side = d.side;
       art.classList.toggle("flip", d.flip);
-      self.draw(sheet.stand[d.row === 0 ? 0 : 1]);
+      self.rest();
+    };
+
+    self.rest = function () {
+      self.wear(sheet);
+      self.draw(sheet.stand[self.side]);
+    };
+
+    /* 공격은 다른 파일에 있으므로 시트를 갈아 끼운다. 칸 크기도 함께 바뀐다. */
+    self.wear = function (which) {
+      art.style.setProperty("--cw", which.cw + "px");
+      art.style.setProperty("--ch", which.ch + "px");
+      art.style.setProperty("--ox", (which.ox || 0) + "px");
+      art.style.backgroundImage = "url(" + which.url + ")";
+    };
+
+    self.swing = function (done) {
+      if (!sheet.attack) { if (done) { done(); } return; }
+
+      var cycle = sheet.attack.frames[self.side];
+      var start = performance.now(), span = 320;
+
+      self.wear(sheet.attack);
+
+      (function tick(now) {
+        var p = Math.min(1, (now - start) / span);
+        self.draw(cycle[Math.min(cycle.length - 1, Math.floor(p * cycle.length))]);
+        if (p < 1) { requestAnimationFrame(tick); }
+        else { self.rest(); if (done) { done(); } }
+      })(start);
     };
 
     self.step = function (dir, done) {
       var d = DIRS[dir];
       var toX = Math.max(40, Math.min(MAP_W - 40, self.x + d.dx));
       var toY = Math.max(60, Math.min(MAP_H - 10, self.y + d.dy));
-      var cycle = sheet.walk[d.row === 0 ? 0 : 1];
+      var cycle = sheet.walk[d.side];
       var fromX = self.x, fromY = self.y, start = performance.now(), span = 260;
 
-      self.flipped = d.flip;
+      self.side = d.side;
       art.classList.toggle("flip", d.flip);
+      self.wear(sheet);
 
       (function tick(now) {
         var p = Math.min(1, (now - start) / span);
@@ -408,7 +456,7 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
         self.y = fromY + (toY - fromY) * p;
         self.draw(cycle[Math.min(cycle.length - 1, Math.floor(p * cycle.length))]);
         if (p < 1) { requestAnimationFrame(tick); }
-        else { self.draw(sheet.stand[d.row === 0 ? 0 : 1]); if (done) { done(); } }
+        else { self.rest(); if (done) { done(); } }
       })(start);
     };
 
@@ -422,7 +470,7 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
   var cast  = [me, host, wasp];
 
   wasp.hp = 3;
-  host.face("left");
+  host.face("down");
   wasp.face("right");
 
   /* ---- 화면 맞추기 ---- */
@@ -532,6 +580,15 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
   });
 
   /* ---- 공격 ---- */
+  /* 대상이 어느 쪽에 있는지로 몸을 돌린다. 화면의 대각선 네 방향이 곧 게임의 동서남북이다. */
+  function facingToward(who) {
+    var dx = who.x - me.x, dy = who.y - me.y;
+
+    if (dy >= 0) { return dx >= 0 ? "right" : "down"; }
+
+    return dx >= 0 ? "up" : "left";
+  }
+
   var sweep = document.getElementById("sweep");
   var cooling = false;
 
@@ -540,6 +597,9 @@ footer th{color:var(--ink);font-weight:600;white-space:nowrap}
     if (!chosen) { say("먼저 대상을 고르세요."); return; }
 
     cooling = true;
+    me.face(facingToward(chosen));
+    me.swing();
+
     var start = performance.now(), span = 900;
     (function tick(now) {
       var p = Math.min(1, (now - start) / span);
