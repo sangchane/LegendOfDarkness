@@ -47,6 +47,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // Everyone the server has shown us, by the serial it calls them.
     private readonly Dictionary<uint, Actor> _crowd = [];
 
+    // Whoever is picked out, and the mark that says so. Zero is nobody.
+    private readonly TargetMark _mark = new() { Name = "Target", Visible = false };
+    private uint _target;
+    private bool _rehearsedPick;
+    private int _settling;
+
     private Queue<Direction> _rehearsal = new();
 
     private Vector2 _from;
@@ -60,6 +66,25 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// <summary>What the server calls this map, once it has said.</summary>
     public string PlaceName => server?.State?.Map.Name ?? string.Empty;
 
+    /// <summary>
+    /// Whoever is picked out, by the name the server gave them, or nothing if nobody is. A serial stands in
+    /// when we have only ever seen them take a step.
+    /// </summary>
+    public string TargetName
+    {
+        get
+        {
+            if (_target == 0)
+            {
+                return string.Empty;
+            }
+
+            Character? one = server?.Others.FirstOrDefault(other => other.Serial == _target);
+
+            return one is null ? string.Empty : one.Name.Length > 0 ? one.Name : one.Serial.ToString();
+        }
+    }
+
     public override void _ExitTree() => _leaving.Cancel();
 
     public override void _Ready()
@@ -72,6 +97,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         AddChild(_camera);
         _camera.AddChild(_floor);
+        _camera.AddChild(_mark);
 
         _tile = new Tile(4, 4);
         _player = Add(new Actor("수련생", Actor.Sheet.Walk(HeroSheet)), Ground(_tile));
@@ -113,6 +139,76 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _camera.AddChild(actor);
 
         return actor;
+    }
+
+    /// <summary>
+    /// A tap picks out whoever was tapped, and picks nobody when it lands on empty floor. Nothing follows
+    /// from that on its own — attacking and talking are separate asks — so a mistaken tap costs nothing.
+    /// </summary>
+    public override void _GuiInput(InputEvent @event)
+    {
+        Vector2 at;
+
+        switch (@event)
+        {
+            case InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } click:
+                at = click.Position;
+                break;
+
+            case InputEventScreenTouch { Pressed: true } touch:
+                at = touch.Position;
+                break;
+
+            default:
+                return;
+        }
+
+        // Already in this view's own coordinates; the camera says how far the world has been slid under it.
+        Choose(at - _camera.Position);
+        AcceptEvent();
+    }
+
+    /// <summary>
+    /// Whoever stands nearest the tap, if anybody stands near enough. Measured against the middle of a
+    /// figure rather than its feet, because that is the part of it a thumb aims at.
+    /// </summary>
+    private void Choose(Vector2 where)
+    {
+        const float reach = 34;
+        const float waist = 32;
+
+        float nearest = reach * reach;
+
+        _target = 0;
+
+        foreach ((uint serial, Actor actor) in _crowd)
+        {
+            float distance = (actor.Position - new Vector2(0, waist)).DistanceSquaredTo(where);
+
+            if (distance < nearest)
+            {
+                nearest = distance;
+                _target = serial;
+            }
+        }
+
+        Mark();
+    }
+
+    /// <summary>Puts the mark on whoever is picked out, or takes it away.</summary>
+    private void Mark()
+    {
+        if (_target != 0 && _crowd.TryGetValue(_target, out Actor? actor))
+        {
+            // A hair above the figure so the ring sorts behind its feet rather than over them.
+            _mark.Position = actor.Position - new Vector2(0, 1);
+            _mark.Visible = true;
+
+            return;
+        }
+
+        _target = 0;
+        _mark.Visible = false;
     }
 
     /// <summary>Starts a step. Ignored while one is still running, so a tile is never half walked.</summary>
@@ -176,6 +272,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             _crowd[serial].QueueFree();
             _crowd.Remove(serial);
         }
+
+        Mark();
     }
 
     /// <summary>
@@ -235,6 +333,36 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _player.Face(looking);
     }
 
+    /// <summary>
+    /// Taps the first person the server shows us, once, when asked to on the command line. It goes through
+    /// the same event the screen sends, so a run without a hand on it still checks the arithmetic that
+    /// turns a place on the screen into a person.
+    /// </summary>
+    private void RehearseAPick()
+    {
+        // Not the moment somebody appears: the view is still sliding to where the server put us, and a tap
+        // aimed before it settles lands on empty floor.
+        if (_rehearsedPick || !Main.Picking || _crowd.Count == 0 || _heard < 0 || _settling++ < 60)
+        {
+            return;
+        }
+
+        _rehearsedPick = true;
+
+        Actor somebody = _crowd.Values.First();
+
+        InputEventMouseButton tap = new()
+        {
+            ButtonIndex = MouseButton.Left,
+            Pressed = true,
+            Position = somebody.Position + _camera.Position - new Vector2(0, 32)
+        };
+
+        GetViewport().PushInput(tap, true);
+        // Said out loud so a run with nobody watching can be checked afterwards.
+        GD.Print($"GREYBOX_PICKED {TargetName}");
+    }
+
     /// <summary>Takes the server's word for where we are, whenever it gives one.</summary>
     private void Listen()
     {
@@ -263,6 +391,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Listen();
         Wear();
         Crowd();
+        RehearseAPick();
 
         if (_walked < 0 && _rehearsal.Count > 0)
         {

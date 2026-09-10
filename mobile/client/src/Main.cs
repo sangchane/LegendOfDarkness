@@ -62,12 +62,19 @@ public partial class Main : Control
     /// </summary>
     public static string Rehearse { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Whether to tap the first other person the server shows us, as <c>--pick</c>. A real tap on their
+    /// figure, so what it checks is the same path a thumb takes.
+    /// </summary>
+    public static bool Picking { get; private set; }
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
         ReadServer(Flag("--server"));
         ReadRehearsal(Flag("--login"));
         Rehearse = Flag("--walk");
+        Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
 
         if (Portrait)
         {

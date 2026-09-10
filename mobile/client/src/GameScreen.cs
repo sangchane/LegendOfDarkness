@@ -20,6 +20,7 @@ public partial class GameScreen : Control
 
     private WorldView _world = null!;
     private Label _place = null!;
+    private Label _target = null!;
     private Control _topRow = null!;
     private Control _controlRow = null!;
 
@@ -41,6 +42,11 @@ public partial class GameScreen : Control
 
         VBoxContainer rows = new();
         rows.AddThemeConstantOverride("separation", Main.Gutter);
+
+        // In landscape the HUD lies over the whole world, and a container that eats taps would stop anyone
+        // ever touching a figure. The plates and buttons inside it still take their own.
+        hud.MouseFilter = MouseFilterEnum.Ignore;
+        rows.MouseFilter = MouseFilterEnum.Ignore;
 
         _topRow = BuildTopRow();
 
@@ -68,7 +74,11 @@ public partial class GameScreen : Control
             AddChild(hud);
             hud.AddChild(rows);
             rows.AddChild(_topRow);
-            rows.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
+            rows.AddChild(new Control
+            {
+                SizeFlagsVertical = SizeFlags.ExpandFill,
+                MouseFilter = MouseFilterEnum.Ignore
+            });
             rows.AddChild(_controlRow);
         }
     }
@@ -144,6 +154,11 @@ public partial class GameScreen : Control
         row.AddChild(BuildHealth());
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
+        // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
+        _target = Aux(string.Empty);
+        row.AddChild(_target);
+        row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+
         // Where the server says we are. Offline it stays empty rather than claiming something untrue.
         _place = Aux(string.Empty);
 
@@ -164,16 +179,15 @@ public partial class GameScreen : Control
         return plate;
     }
 
-    /// <summary>
-    /// Keeps the place name in step with the server. Nothing else on this screen changes yet, so this is
-    /// the one thing worth watching each frame.
-    /// </summary>
+    /// <summary>Keeps the place name and whoever is picked out in step with the world below.</summary>
     public override void _Process(double delta)
     {
         if (_world.PlaceName.Length > 0)
         {
             _place.Text = $"{_world.PlaceName} · {_world.Standing.X},{_world.Standing.Y}";
         }
+
+        _target.Text = _world.TargetName;
     }
 
     /// <summary>Bar and numbers together: health must never be readable by colour alone.</summary>
