@@ -50,13 +50,13 @@ h1{font-family:var(--serif);font-size:26px;margin:0 0 6px;text-wrap:balance}
 /* 월드 객체 — 보이는 그림은 배경에 있고, 여기는 손가락이 닿는 영역만 */
 .obj{position:absolute;background:none;border:0;padding:0;cursor:pointer}
 .obj .art{position:absolute;border:1px dashed #ffffff00}
-.obj .zone{position:absolute;inset:0;border:1px solid #00000000;border-radius:4px}
+.obj .zone{position:absolute;inset:0;border:1px dashed #c9a22788;border-radius:4px;background:#c9a2270f}
 .obj:focus-visible .zone{outline:2px solid var(--gold);outline-offset:2px}
 .show-zones .obj .art{border-color:#ff9c6e}
 .show-zones .obj .zone{border-color:var(--hit);background:#4fd6c11a}
 .obj .tip{
   position:absolute;left:50%;top:-16px;transform:translateX(-50%);
-  font-size:10px;white-space:nowrap;color:var(--ink);opacity:0;transition:opacity .15s ease;
+  font-size:10px;white-space:nowrap;color:var(--ink);opacity:.85;transition:opacity .15s ease;
   text-shadow:0 1px 3px #000,0 0 6px #000;
 }
 .obj:hover .tip,.show-zones .obj .tip{opacity:1}
@@ -164,7 +164,7 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
   <div class="phone" id="phone">
     <div class="scale" id="scale">
       <div class="world" id="world">
-        <img id="map" src="assets/world-live.png" alt="원작 클라이언트 화면">
+        <img id="map" src="assets/world-safehouse.png" alt="안전 가옥 바닥">
         <div class="vignette"></div>
 
         <button class="obj" data-name="주모" data-kind="npc"
@@ -240,14 +240,15 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
 </div>
 
 <footer>
-  <b>「터치 영역 보기」를 꼭 눌러 보세요.</b>
+  <b>캐릭터 그림은 아직 없습니다.</b> 점선 상자가 캐릭터가 설 자리이며, 스프라이트는 아직
+  <code>.dat</code>에서 추출하지 못했습니다. 「터치 영역 보기」를 누르면
   <span class="legend" style="background:#ff9c6e"></span>주황이 원작 캐릭터의 실제 크기,
   <span class="legend" style="background:#4fd6c1"></span>청록이 손가락이 닿아야 하는 영역입니다.
   원작 캐릭터는 폭이 28픽셀이라 그대로 두면 손가락으로 누를 수가 없습니다. 그래서 보이는 그림보다
   넓은 반응 영역을 따로 둡니다 — 런스케이프 모바일이 같은 문제를 같은 방법으로 풀었습니다.
   <br>
-  자산 출처: 화면 <code>picture/page_inGame.png</code>(원작 클라이언트 캡처),
-  지도 <code>lod1_호러캐슬1</code> · <code>lod108_천족의성</code>. 모두 원작에서 나온 것입니다.
+  자산 출처: <code>tools/dat-extract</code>로 이 저장소의 <code>game/seo.dat</code>과
+  <code>database/server/maps/lod1.map</code>에서 직접 그린 안전 가옥 바닥입니다.
 </footer>
 
 <script>
@@ -345,9 +346,8 @@ footer .legend{display:inline-block;width:10px;height:10px;vertical-align:middle
   });
 
   var maps = [
-    ["assets/world-live.png", "원작 클라이언트 화면"],
-    ["assets/world-castle.png", "호러캐슬 지하"],
-    ["assets/world-heaven.png", "천족의 성"]
+    ["assets/world-safehouse.png", "안전 가옥"],
+    ["assets/world-safehouse-2.png", "안전 가옥 · 다른 자리"]
   ];
   var mapIndex = 0;
   document.getElementById("t-map").addEventListener("click", function () {

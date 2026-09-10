@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>어둠의 전설 모바일 — 작업 현황</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+:root{
+  --stone-900:#0c0e14;--stone-850:#10131c;--stone-800:#141824;--stone-700:#1b2030;
+  --edge:#2b3242;--edge-soft:#232938;
+  --gold:#c9a227;--ink:#e8e2d4;--ink-dim:#98a0b0;
+  --done:#4f9d76;--now:#c9a227;--wait:#6b7280;--bad:#b3323c;
+  --serif:"Gowun Batang",serif;--sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100dvh;background:var(--stone-900);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.7;display:grid;grid-template-columns:230px 1fr}
+
+/* ---------- 왼쪽 메뉴 ---------- */
+nav{position:sticky;top:0;height:100dvh;overflow:auto;background:var(--stone-850);
+  border-right:1px solid var(--edge);padding:22px 0;display:flex;flex-direction:column;gap:4px}
+nav .brand{font-family:var(--serif);font-size:17px;padding:0 20px 14px;border-bottom:1px solid var(--edge);
+  margin-bottom:10px}
+nav .brand small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--gold);margin-top:4px}
+nav a{display:flex;align-items:center;gap:9px;padding:9px 20px;color:var(--ink-dim);
+  text-decoration:none;font-size:14px;border-left:2px solid transparent;transition:color .12s,background .12s}
+nav a:hover{color:var(--ink);background:#ffffff08}
+nav a.on{color:var(--ink);border-left-color:var(--gold);background:#c9a2270f}
+nav a .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+nav .foot{margin-top:auto;padding:14px 20px 0;border-top:1px solid var(--edge);
+  font-family:var(--mono);font-size:11px;color:var(--wait)}
+
+main{padding:34px 34px 90px;max-width:1080px}
+section{scroll-margin-top:20px;margin-bottom:56px}
+h1{font-family:var(--serif);font-size:30px;margin:0 0 8px;text-wrap:balance}
+h2{font-family:var(--serif);font-size:22px;margin:0 0 4px;text-wrap:balance}
+h3{font-size:15px;margin:22px 0 8px}
+p{margin:0 0 12px;max-width:74ch}
+.dim{color:var(--ink-dim)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 6px}
+code{font-family:var(--mono);font-size:13px;background:#ffffff0d;padding:1px 5px}
+a{color:var(--gold)}
+
+/* 지표 */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:var(--edge);border:1px solid var(--edge);margin:18px 0 26px}
+.metric{background:var(--stone-850);padding:14px 16px}
+.metric b{display:block;font-family:var(--mono);font-size:26px;font-variant-numeric:tabular-nums;
+  line-height:1.2;margin-bottom:2px}
+.metric span{font-size:12px;color:var(--ink-dim)}
+.metric.good b{color:var(--done)}
+.metric.warn b{color:var(--now)}
+
+/* 진행 막대 */
+.bar{height:8px;background:var(--stone-700);border:1px solid var(--edge);position:relative;overflow:hidden;margin:6px 0 14px}
+.bar i{position:absolute;inset:0;transform-origin:left;background:var(--done)}
+
+/* 항목 목록 */
+.items{border-top:1px solid var(--edge-soft)}
+.item{display:grid;grid-template-columns:74px 1fr auto;gap:14px;align-items:baseline;
+  padding:11px 0;border-bottom:1px solid var(--edge-soft)}
+.item .id{font-family:var(--mono);font-size:12px;color:var(--ink-dim)}
+.item .what{font-size:14px}
+.item .what em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-dim);margin-top:2px}
+.state{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.state.done{color:var(--done)}
+.state.now{color:var(--now)}
+.state.wait{color:var(--wait)}
+
+/* 타임라인 */
+.timeline{border-left:1px solid var(--edge);margin-left:6px;padding-left:18px;display:grid;gap:10px}
+.commit{display:grid;grid-template-columns:74px 84px 1fr;gap:12px;align-items:baseline;position:relative}
+.commit::before{content:"";position:absolute;left:-23px;top:9px;width:7px;height:7px;border-radius:50%;
+  background:var(--stone-700);border:1px solid var(--edge)}
+.commit.fork::before{background:var(--gold);border-color:var(--gold)}
+.commit .sha{font-family:var(--mono);font-size:11.5px;color:var(--gold)}
+.commit .when{font-family:var(--mono);font-size:11.5px;color:var(--wait)}
+.commit .msg{font-size:13.5px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink-dim);margin:0 0 14px}
+.legend span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:6px;vertical-align:middle}
+.legend .root::before{background:var(--stone-700);border:1px solid var(--edge)}
+.legend .fk::before{background:var(--gold)}
+
+/* 카드 */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.card{background:var(--stone-850);border:1px solid var(--edge);padding:14px 16px;display:grid;gap:6px}
+.card h4{margin:0;font-family:var(--serif);font-size:16px}
+.card p{margin:0;font-size:13px;color:var(--ink-dim)}
+.card a{font-size:13px}
+
+table{border-collapse:collapse;width:100%;margin:10px 0 18px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--edge-soft);vertical-align:top;font-size:13.5px}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--gold);font-weight:400}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+
+.callout{border-left:2px solid var(--gold);background:#c9a2270d;padding:12px 16px;margin:14px 0}
+.callout p:last-child{margin:0}
+
+@media (max-width:860px){
+  body{grid-template-columns:1fr}
+  nav{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:12px}
+  nav .brand,nav .foot{width:100%}
+  nav .foot{margin-top:8px}
+  main{padding:22px 16px 70px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">어둠의 전설 모바일<small>작업 현황</small></div>
+  <a href="#now" class="on"><span class="dot"></span>지금</a>
+  <a href="#roadmap"><span class="dot"></span>로드맵</a>
+  <a href="#flow"><span class="dot"></span>작업 흐름</a>
+  <a href="#screens"><span class="dot"></span>화면</a>
+  <a href="#assets"><span class="dot"></span>자산</a>
+  <a href="#decisions"><span class="dot"></span>결정</a>
+  <div class="foot">기준일 2026-09-10<br>수기 갱신</div>
+</nav>
+
+<main>
+
+<!-- ================= 지금 ================= -->
+<section id="now">
+  <p class="eyebrow">한눈에</p>
+  <h1>지금 어디까지 왔나</h1>
+  <p class="dim">
+    서버를 안전하게 만드는 일과 화면을 만드는 일이 함께 갑니다. 서버는 낯선 입력에 버티는지 확인하고
+    고치는 중이고, 화면은 원작 자료로 시안을 세우는 중입니다.
+  </p>
+
+  <div class="metrics">
+    <div class="metric good"><b>23</b><span>자동 시험 통과</span></div>
+    <div class="metric warn"><b>7</b><span>고친 서버 결함</span></div>
+    <div class="metric"><b>4 / 8</b><span>S1 진행</span></div>
+    <div class="metric"><b>6</b><span>화면 시안</span></div>
+    <div class="metric"><b>19,243</b><span>읽어낸 원작 타일</span></div>
+  </div>
+
+  <div class="callout">
+    <p><b>가장 최근에 넘은 고비.</b> 같은 시험 23개를 원본 서버에 돌리면 7개가 실패합니다. 그중 하나는
+    악성 패킷 한 개로 서버 프로세스가 통째로 꺼지는 것이었고, 다른 하나는 캐릭터 이름만 골라서 서버가
+    쓸 수 있는 아무 위치에나 파일을 만들 수 있는 것이었습니다. 지금은 23개 모두 통과합니다.</p>
+  </div>
+
+  <h3>다음에 할 일</h3>
+  <div class="items">
+    <div class="item"><span class="id">자산</span><span class="what">캐릭터 스프라이트 추출<em>맵은 그려지는데 캐릭터가 없어 시안이 반쪽입니다</em></span><span class="state now">지금</span></div>
+    <div class="item"><span class="id">자산</span><span class="what">벽 타일<em><code>TILEAS.BMP</code>는 고정 크기가 아니라 별도 해석이 필요합니다</em></span><span class="state now">지금</span></div>
+    <div class="item"><span class="id">P0-14</span><span class="what">송신 큐와 완전 전송<em>느린 수신자에게 패킷이 잘리거나 순서가 뒤집힐 수 있습니다</em></span><span class="state wait">대기</span></div>
+    <div class="item"><span class="id">UI</span><span class="what">이동 패드가 화면을 가리는 문제<em>실기기에서 손을 대보고 정해야 합니다</em></span><span class="state wait">결정 필요</span></div>
+  </div>
+</section>
+
+<!-- ================= 로드맵 ================= -->
+<section id="roadmap">
+  <p class="eyebrow">계획</p>
+  <h2>로드맵</h2>
+  <p class="dim">
+    세 개의 관문이 있습니다. 각 관문을 넘기 전에는 다음 단계로 가지 않기로 계획서에 못박아 두었습니다.
+    원문은 <code>docs/hades-p0-stabilization-plan.md</code>.
+  </p>
+
+  <h3>S0 · 현행 동작 기록 <span class="state done">통과</span></h3>
+  <p class="dim">고치기 전에 서버가 무엇을 하는지 먼저 녹음합니다. 녹음본이 있어야 나중에 "원래 이랬나, 내가 깼나"를 가릴 수 있습니다.</p>
+  <div class="bar"><i style="transform:scaleX(1)"></i></div>
+  <div class="items">
+    <div class="item"><span class="id">P0-00</span><span class="what">원본을 건드리지 않는 격리 실행 장치</span><span class="state done">완료</span></div>
+    <div class="item"><span class="id">P0-01</span><span class="what">로그인부터 월드 입장까지 16단계 기록</span><span class="state done">완료</span></div>
+    <div class="item"><span class="id">P0-02</span><span class="what">갓 만든 캐릭터의 상태 고정</span><span class="state done">완료</span></div>
+  </div>
+
+  <h3>S1 · 연동 안전선 <span class="state now">4 / 8</span></h3>
+  <p class="dim">모바일을 실제로 붙이기 전에 없애야 할 치명적 결함들입니다. 이 관문을 넘어야 실제 서버에 연결합니다.</p>
+  <div class="bar"><i style="transform:scaleX(.5)"></i></div>
+  <div class="items">
+    <div class="item"><span class="id">P0-10</span><span class="what">패킷 검증과 예외 격리<em>악성 패킷 하나로 서버가 죽던 것과, 연결을 영원히 붙잡던 것</em></span><span class="state done">완료</span></div>
+    <div class="item"><span class="id">P0-11</span><span class="what">이름과 저장 경로 검증<em>이름으로 아무 위치에나 파일을 쓸 수 있었습니다. 한글 이름은 지원합니다</em></span><span class="state done">완료</span></div>
+    <div class="item"><span class="id">P0-12</span><span class="what">입장 자격 확인 순서<em>확인이 입장 뒤에 있어 같은 표로 둘이 들어갔습니다</em></span><span class="state done">완료</span></div>
+    <div class="item"><span class="id">P0-13</span><span class="what">연결 수명과 동시성<em>반쯤 보내고 멈춘 연결이 소켓을 영원히 붙잡았습니다</em></span><span class="state done">완료</span></div>
+    <div class="item"><span class="id">P0-14</span><span class="what">송신 큐와 완전 전송</span><span class="state wait">대기</span></div>
+    <div class="item"><span class="id">P0-15</span><span class="what">원자적 저장과 복구</span><span class="state wait">대기</span></div>
+    <div class="item"><span class="id">P0-16</span><span class="what">기본 전투 정확성</span><span class="state wait">대기</span></div>
+    <div class="item"><span class="id">P0-17</span><span class="what">하드코딩된 주소·포트를 설정으로</span><span class="state wait">대기</span></div>
+  </div>
+
+  <h3>S2 · 지인 테스트 안전선 <span class="state wait">대기</span></h3>
+  <p class="dim">지인 5~10명에게 나눠주기 전 단계입니다. 비밀번호 저장 방식, 로그인 남용 방지, 정상 종료, 지원 런타임 이전, 10인 30분 부하 시험.</p>
+  <div class="bar"><i style="transform:scaleX(0)"></i></div>
+</section>
+
+<!-- ================= 작업 흐름 ================= -->
+<section id="flow">
+  <p class="eyebrow">어떻게 일하고 있나</p>
+  <h2>작업 흐름</h2>
+
+  <h3>저장소가 둘로 나뉩니다</h3>
+  <p class="dim">
+    원본 서버는 남의 저장소입니다. 그래서 <b>읽기 전용으로 두고</b>, 고칠 것은 개인 사본(fork)에서 고칩니다.
+    이 작업 공간은 그 사본의 어느 시점을 쓸지만 가리킵니다. 원본을 망가뜨릴 위험이 없습니다.
+  </p>
+  <div class="scroll">
+    <table>
+      <tr><th>저장소</th><th>역할</th><th>현재 가지</th></tr>
+      <tr><td>이 작업 공간</td><td>문서, 시험, 화면 시안, 도구</td><td><code>test/hades-characterization</code></td></tr>
+      <tr><td>Hades 개인 사본</td><td>서버 코드 수정</td><td><code>fix/hades-network-boundary</code></td></tr>
+      <tr><td>Hades 원본</td><td>손대지 않음</td><td><code>upstream/master</code></td></tr>
+    </table>
+  </div>
+
+  <h3>쌓아 올리는 가지 (Graphite)</h3>
+  <p class="dim">
+    큰 변경을 한 덩어리로 올리지 않고, <b>작은 가지를 차곡차곡 쌓습니다.</b> 아래 가지가 승인되면 그 위에
+    쌓은 가지가 따라 올라갑니다. 하나가 잘못돼도 그 가지만 되돌리면 되고, 검토하는 사람도 한 번에 한 가지
+    변경만 봅니다. 아직 원격에 올리지 않았으므로 지금은 전부 이 컴퓨터 안에 있습니다.
+  </p>
+
+  <h3>지금까지 한 일</h3>
+  <p class="legend"><span class="root">작업 공간</span><span class="fk">서버 사본 — 실제로 고친 결함</span></p>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<!-- ================= 화면 ================= -->
+<section id="screens">
+  <p class="eyebrow">보이는 것</p>
+  <h2>화면</h2>
+  <p class="dim">
+    배치 규칙은 와이어프레임 문서가 정했고, 시안은 그 규칙대로 세운 실제 화면입니다. 아래 두 페이지는
+    브라우저로 열면 직접 눌러볼 수 있습니다.
+  </p>
+  <div class="cards">
+    <div class="card">
+      <h4>화면 6장</h4>
+      <p>로그인 · 캐릭터 확인 · 기본 게임 · NPC 대화 · 전투 · 인벤토리. 각각 눌러볼 수 있습니다.</p>
+      <a href="ui/wireframes.html">ui/wireframes.html 열기</a>
+    </div>
+    <div class="card">
+      <h4>HUD 자세히 보기</h4>
+      <p>터치 영역, 대상 선택, 재사용 대기, HUD 흐리게, 연결 끊김 상태.</p>
+      <a href="ui/hud-mockup.html">ui/hud-mockup.html 열기</a>
+    </div>
+    <div class="card">
+      <h4>배치 규칙 원문</h4>
+      <p>안전 영역, 48dp 터치 최소, 화면비 대응, 접근성 규칙, 결정 4건.</p>
+      <a href="mobile-test-v1-wireframes.md">와이어프레임 문서</a>
+    </div>
+    <div class="card">
+      <h4>레퍼런스 조사</h4>
+      <p>참고 링크의 실제 구현 방식, 같은 문제를 먼저 푼 게임들에서 가져온 결정.</p>
+      <a href="mobile-ui-references.md">조사 기록</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 자산 ================= -->
+<section id="assets">
+  <p class="eyebrow">그림과 데이터</p>
+  <h2>자산</h2>
+  <p class="dim">
+    자산은 <b>이 저장소의 원본 <code>.dat</code>에서 직접</b> 뽑습니다. 설치된 클라이언트와 대조한 결과
+    10개 중 9개가 바이트 단위로 같고 <code>setoa.dat</code>만 버전이 다릅니다. 도구는
+    <code>tools/dat-extract</code>.
+  </p>
+  <div class="scroll">
+    <table>
+      <tr><th>대상</th><th>상태</th><th>비고</th></tr>
+      <tr><td>지면 타일</td><td><span class="state done">읽힘</span></td><td class="num">seo.dat 에서 19,243장, 팔레트 74개, 팔레트 표 488개</td></tr>
+      <tr><td>맵</td><td><span class="state done">그려짐</span></td><td>맵 5개. 안전 가옥(<code>lod1.map</code>) 30×31칸의 바닥을 실제로 그렸습니다</td></tr>
+      <tr><td>벽</td><td><span class="state now">미해결</span></td><td><code>TILEAS.BMP</code>는 고정 크기 타일이 아니어서 별도 해석이 필요합니다</td></tr>
+      <tr><td>캐릭터 스프라이트</td><td><span class="state now">미해결</span></td><td>아직 어느 아카이브에 있는지 확정하지 못했습니다</td></tr>
+      <tr><td>아이템 아이콘</td><td><span class="state wait">미착수</span></td><td>인벤토리 화면에 필요합니다</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ================= 결정 ================= -->
+<section id="decisions">
+  <p class="eyebrow">정한 것과 남은 것</p>
+  <h2>결정</h2>
+  <div class="scroll">
+    <table>
+      <tr><th>결정</th><th>내용</th><th>상태</th></tr>
+      <tr><td>게임 엔진</td><td>Godot 4.6 + C#. 안드로이드 내보내기와 실기기 실행까지 확인했습니다</td><td><span class="state done">확정</span></td></tr>
+      <tr><td>서버</td><td>Hades를 그대로 쓰고 안전한 부분만 고칩니다. 전면 재작성·DB 교체는 하지 않습니다</td><td><span class="state done">확정</span></td></tr>
+      <tr><td>UI 언어</td><td>우리가 만드는 문구는 한국어, 서버가 보내는 메시지는 영문 그대로</td><td><span class="state done">확정</span></td></tr>
+      <tr><td>한글 이름</td><td>지원합니다. 서버 프로토콜이 이미 한글을 나르고, 시험으로 고정해 두었습니다</td><td><span class="state done">확정</span></td></tr>
+      <tr><td>자산 출처</td><td>이 저장소의 원본 <code>.dat</code>. 다른 곳의 복원본은 쓰지 않습니다</td><td><span class="state done">확정</span></td></tr>
+      <tr><td>이동 패드</td><td>화면을 꽤 가립니다. 반투명·자동 흐림·접기 중 무엇으로 할지</td><td><span class="state now">결정 필요</span></td></tr>
+      <tr><td>세로 모드</td><td>지금은 가로 전용입니다. 세로도 지원할지</td><td><span class="state now">결정 필요</span></td></tr>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // 커밋 기록. 갱신하려면 이 배열만 고치면 됩니다.
+  var COMMITS = [
+    ["ee5f5b7", "09-10", "우리 저장소 자료로 맵 바닥을 그림", false],
+    ["ed5b403", "09-10", "우리 저장소 아카이브를 읽는 도구", false],
+    ["a788de3", "09-10", "원작 화면 위에 HUD 시안", false],
+    ["eebccfd", "09-10", "참고 링크의 실제 구현 방식 기록", false],
+    ["edab847", "09-10", "반쯤 보내고 멈춘 연결을 끊음", true],
+    ["9a81df0", "09-10", "접속자 목록 잠금을 실제로 걸음", true],
+    ["0dfa146", "09-10", "입장 자격을 입장 전에 확인", true],
+    ["5a76065", "09-10", "로그인 폼과 엄지 가림 수정", false],
+    ["7f38369", "09-10", "기본 게임 HUD 시안", false],
+    ["6d392f5", "09-10", "로그인 화면 시안", false],
+    ["5f293f2", "09-10", "와이어프레임 결정 4건 확정", false],
+    ["06b5c69", "09-09", "캐릭터 이름 정책", true],
+    ["e49473f", "09-09", "이름으로 아무 데나 파일 쓰던 것 차단", true],
+    ["2843f85", "09-09", "패킷일 수 없는 프레임 거절", true],
+    ["49a0329", "09-09", "악성 패킷에 서버가 죽던 것 수정", true],
+    ["4baedaa", "09-09", "캐릭터 상태 고정 · S0 관문 통과", false],
+    ["a48a18f", "09-09", "로그인부터 월드 입장까지 기록", false],
+    ["bd80820", "09-09", "격리 실행 장치", false]
+  ];
+
+  var timeline = document.getElementById("timeline");
+  COMMITS.forEach(function (row) {
+    var line = document.createElement("div");
+    line.className = "commit" + (row[3] ? " fork" : "");
+    line.innerHTML =
+      '<span class="sha">' + row[0] + '</span>' +
+      '<span class="when">' + row[1] + '</span>' +
+      '<span class="msg">' + row[2] + '</span>';
+    timeline.appendChild(line);
+  });
+
+  // 스크롤에 따라 왼쪽 메뉴를 따라가게 한다
+  var links = Array.prototype.slice.call(document.querySelectorAll("nav a"));
+  var sections = links.map(function (link) {
+    return document.querySelector(link.getAttribute("href"));
+  });
+
+  var observer = new IntersectionObserver(function (records) {
+    records.forEach(function (record) {
+      if (!record.isIntersecting) { return; }
+      var index = sections.indexOf(record.target);
+      links.forEach(function (link, i) { link.classList.toggle("on", i === index); });
+    });
+  }, { rootMargin: "-10% 0px -75% 0px" });
+
+  sections.forEach(function (section) { if (section) { observer.observe(section); } });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>어둠의 전설 모바일 — 화면 6장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+:root{
+  --stone-900:#0c0e14;--stone-800:#141824;--edge:#4a5468;
+  --gold:#c9a227;--gold-dim:#8d7420;--ink:#e8e2d4;--ink-dim:#98a0b0;--hp:#b3323c;--hit:#4fd6c1;
+  --serif:"Gowun Batang",serif;--sans:"IBM Plex Sans KR","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",Consolas,monospace;
+  --touch:48px;--gutter:8px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100dvh;background:var(--stone-900);color:var(--ink);font-family:var(--sans);
+  padding:28px 16px 72px;display:grid;gap:44px;justify-items:center}
+.wrap{max-width:1000px;width:100%;display:grid;gap:44px}
+h1{font-family:var(--serif);font-size:28px;margin:0 0 8px;text-wrap:balance}
+h2{font-family:var(--serif);font-size:20px;margin:0}
+.sub{color:var(--ink-dim);margin:0;font-size:14px;line-height:1.75;max-width:66ch}
+.screen{display:grid;gap:12px}
+.head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.note{color:var(--ink-dim);font-size:13px;margin:0;line-height:1.7;max-width:70ch}
+.note code{font-family:var(--mono);font-size:12px}
+
+/* ---------- 기기 ---------- */
+.phone{width:100%;aspect-ratio:20/9;position:relative;overflow:hidden;border:1px solid #2b3242}
+.scale{position:absolute;inset:0;width:800px;height:360px;transform-origin:top left}
+.bg{position:absolute;inset:0;width:800px;height:360px;image-rendering:pixelated}
+.bg.smooth{image-rendering:auto}
+.vignette{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(125% 95% at 50% 45%,transparent 42%,#04060b 100%);opacity:.8}
+.veil{position:absolute;inset:0;background:#04060b99;pointer-events:none}
+
+/* ---------- 공통 부품 ---------- */
+.panel{background:linear-gradient(180deg,#1e2331e6,#12161fe6);border:1px solid var(--edge);
+  box-shadow:inset 0 1px 0 #6d7a92,0 2px 10px #00000073}
+.plate{position:absolute;display:flex;align-items:center;gap:8px;padding:6px 10px}
+.who{font-family:var(--serif);font-size:14px}
+.gauge{display:flex;align-items:center;gap:6px}
+.track{width:118px;height:9px;background:#080a10;border:1px solid var(--edge);position:relative;overflow:hidden}
+.fill{position:absolute;inset:0;transform-origin:left center;transition:transform .4s ease;
+  background:linear-gradient(180deg,#d0454f,var(--hp))}
+.num{font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-dim)}
+
+.btn{font-family:var(--sans);font-size:13px;color:var(--ink);
+  background:linear-gradient(180deg,#1e2331e6,#12161fe6);border:1px solid var(--edge);
+  box-shadow:inset 0 1px 0 #6d7a92;cursor:pointer;min-height:var(--touch);padding:0 14px;
+  transition:transform .08s ease,filter .12s ease}
+.btn:hover{filter:brightness(1.25)}
+.btn:active{transform:translateY(1px);filter:brightness(1.45)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{color:#15110a;border-color:#e8d189;
+  background:radial-gradient(130% 130% at 50% 15%,#dfc476,var(--gold) 60%,var(--gold-dim));
+  box-shadow:inset 0 2px 0 #ffffff4d,0 0 14px #c9a2272e}
+.btn.square{min-width:var(--touch);padding:0;display:grid;place-items:center}
+
+.field{display:flex;align-items:center;gap:8px}
+.field label{font-size:12px;color:var(--ink-dim);width:64px}
+.field input{flex:1;min-height:var(--touch);background:#080a10;border:1px solid var(--edge);
+  color:var(--ink);font-family:var(--sans);font-size:14px;padding:0 10px}
+.field input:focus{outline:2px solid var(--gold);outline-offset:-1px}
+
+.hint{font-size:12px;color:var(--ink-dim)}
+.topbar{position:absolute;left:var(--gutter);right:var(--gutter);top:var(--gutter);
+  display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-dim)}
+.topbar .grow{flex:1}
+.center{position:absolute;inset:0;display:grid;place-items:center;padding:0 var(--gutter)}
+
+/* HUD */
+.status{left:var(--gutter);top:var(--gutter);flex-direction:column;align-items:flex-start;gap:5px}
+.system{right:var(--gutter);top:var(--gutter);gap:6px;padding:0;background:none;border:0;box-shadow:none}
+.sysbtn{min-width:var(--touch);height:var(--touch);display:grid;place-items:center;gap:1px;font-size:11px;
+  color:var(--ink);background:linear-gradient(180deg,#1e2331e6,#12161fe6);border:1px solid var(--edge);
+  box-shadow:inset 0 1px 0 #6d7a92;cursor:pointer}
+.sysbtn .glyph{font-size:15px;line-height:1}
+.target{left:50%;top:var(--gutter);transform:translateX(-50%);flex-direction:column;align-items:center;gap:3px;min-width:150px}
+.controls{position:absolute;left:0;right:0;bottom:var(--gutter);display:grid;
+  grid-template-columns:auto 1fr auto;align-items:end;gap:12px;padding:0 var(--gutter);max-width:680px;margin:0 auto}
+.pad{display:grid;grid-template-columns:repeat(3,var(--touch));grid-template-rows:repeat(3,var(--touch));gap:3px}
+.key{display:grid;place-items:center;font-size:17px;color:var(--ink);
+  background:linear-gradient(180deg,#1e2331d9,#12161fd9);border:1px solid var(--edge);
+  box-shadow:inset 0 1px 0 #6d7a92;cursor:pointer;user-select:none;transition:transform .08s ease,filter .12s ease}
+.key:active{transform:translateY(1px);filter:brightness(1.45)}
+.key.void{visibility:hidden}
+.toast{align-self:end;text-align:center;font-size:12px;padding-bottom:6px;text-shadow:0 1px 3px #000,0 0 8px #000}
+.attack{position:relative;width:72px;height:72px;display:grid;place-items:center;font-family:var(--serif);
+  font-size:16px;color:#15110a;border-radius:50%;border:1px solid #e8d189;
+  background:radial-gradient(120% 120% at 50% 22%,#dfc476,var(--gold) 58%,var(--gold-dim));
+  box-shadow:0 0 0 3px #0c0e14cc,0 0 16px #c9a2273d,inset 0 2px 0 #ffffff4d;cursor:pointer;
+  transition:transform .08s ease}
+.attack:active{transform:scale(.94)}
+.sweep{position:absolute;inset:-1px;border-radius:50%;pointer-events:none;
+  background:conic-gradient(#0c0e14cc 0turn,#0c0e14cc var(--sweep,0turn),transparent var(--sweep,0turn))}
+
+/* 월드 위 표식 */
+.marker{position:absolute;border:2px solid var(--hit);border-radius:4px;
+  box-shadow:0 0 10px #4fd6c166;animation:breathe 1.6s ease-in-out infinite}
+.marker::after{content:"대상";position:absolute;left:50%;top:-15px;transform:translateX(-50%);
+  font-size:10px;color:var(--hit);text-shadow:0 1px 3px #000}
+@keyframes breathe{0%,100%{opacity:.6}50%{opacity:1}}
+.figure{position:absolute;image-rendering:pixelated}
+.figure-slot{display:grid;place-items:center;width:84px;height:120px;font-size:11px;line-height:1.4;
+  color:var(--ink-dim);text-align:center;border:1px dashed #c9a22788;background:#c9a2270f}
+.figure-slot.small{width:34px;height:34px;font-size:10px}
+
+/* 모달 */
+.modal{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:520px;padding:12px 14px;
+  display:grid;gap:10px}
+.modal .head-row{display:flex;align-items:center;gap:10px}
+.modal .head-row .grow{flex:1}
+.modal .body{font-size:14px;line-height:1.7;min-height:44px}
+.bag{position:absolute;right:var(--gutter);top:var(--gutter);bottom:var(--gutter);width:300px;
+  padding:10px;display:grid;grid-template-rows:auto 1fr auto;gap:8px}
+.slots{display:grid;gap:6px;align-content:start;overflow:auto}
+.slot{display:flex;align-items:center;gap:10px;min-height:var(--touch);padding:0 8px;
+  background:#0b0e15;border:1px solid #2b3242}
+.slot .icon{width:28px;height:28px;background:#1e2331;border:1px solid var(--edge)}
+.slot.empty{color:var(--ink-dim);font-size:12px;justify-content:center}
+.slot .qty{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-dim)}
+
+footer{color:var(--ink-dim);font-size:13px;line-height:1.8;max-width:1000px;width:100%}
+footer code{font-family:var(--mono);font-size:12px}
+footer b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>어둠의 전설 모바일 — 화면 6장</h1>
+  <p class="sub">
+    와이어프레임에 정해진 화면 전부를, 원작 클라이언트가 실제로 그린 그림 위에 세웠습니다. 새로 그린
+    그림은 없습니다. 각 화면은 눌러볼 수 있습니다 — 로그인은 두 칸을 채워야 버튼이 열리고, 대화는 다음
+    문장으로 넘어가고, 전투는 공격할수록 상대 체력이 줄어듭니다.
+  </p>
+</header>
+
+<!-- 1. 로그인 -->
+<section class="screen" id="s-login">
+  <div class="head"><h2>1 · 로그인</h2><span class="tag">입력이 있는 유일한 화면</span></div>
+  <p class="note">
+    글자 칸은 위쪽에 둡니다. 모바일 키보드는 아래에서 올라오기 때문입니다. 캡션을 칸 옆에 두어 가로
+    화면에서 세로를 아낍니다. 두 칸이 모두 채워지기 전에는 서버로 아무것도 보내지 않습니다.
+  </p>
+  <div class="phone"><div class="scale">
+    <img class="bg" src="assets/world-safehouse-2.png" alt="안전 가옥 바닥">
+    <div class="veil"></div>
+    <div class="topbar"><span>테스트 환경 · 로컬</span><span class="grow"></span><span>서버 상태: 연결 가능</span></div>
+    <div class="center">
+      <div class="panel" style="width:320px;padding:14px;display:grid;gap:8px">
+        <div class="field"><label for="i-id">사용자명</label><input id="i-id" autocomplete="off"></div>
+        <div class="field"><label for="i-pw">비밀번호</label><input id="i-pw" type="password" autocomplete="off"></div>
+        <span class="hint" id="login-hint">사용자명과 비밀번호를 입력하세요.</span>
+        <button class="btn primary" id="login-go" disabled>로그인</button>
+      </div>
+    </div>
+    <div class="topbar" style="top:auto;bottom:var(--gutter)"><span>클라이언트 0.1</span></div>
+  </div></div>
+</section>
+
+<!-- 2. 캐릭터 선택 -->
+<section class="screen" id="s-select">
+  <div class="head"><h2>2 · 캐릭터 확인</h2><span class="tag">계정당 한 명</span></div>
+  <p class="note">
+    Hades는 계정과 별개의 캐릭터 목록이 없습니다. 그래서 고르는 화면이 아니라 <b>확인하고 들어가는</b>
+    화면입니다. 카드는 하나만 놓고, 아래에 입장 진행 상태를 글자로 보여줍니다.
+  </p>
+  <div class="phone"><div class="scale">
+    <img class="bg" src="assets/world-safehouse-2.png" alt="배경">
+    <div class="veil"></div><div class="vignette"></div>
+    <div class="topbar">
+      <button class="btn square" style="min-height:36px;height:36px">←</button>
+      <span class="grow" style="text-align:center;font-family:var(--serif);font-size:14px;color:var(--ink)">캐릭터 확인</span>
+      <span>연결됨</span>
+    </div>
+    <div class="center">
+      <div class="panel" style="width:300px;padding:14px;display:grid;gap:10px;justify-items:center">
+        <span class="figure-slot">캐릭터 그림<br>준비 중</span>
+        <span class="who">수련생</span>
+        <span class="hint">이 계정에는 캐릭터가 한 명 있습니다.</span>
+        <button class="btn primary" id="enter-go" style="width:100%">게임 입장</button>
+        <span class="hint" id="enter-state">&nbsp;</span>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<!-- 3. 기본 게임 -->
+<section class="screen" id="s-game">
+  <div class="head"><h2>3 · 기본 게임</h2><span class="tag">나머지 화면의 바탕</span></div>
+  <p class="note">
+    월드가 화면 전체를 채우고 HUD는 그 위에 뜹니다. 왼쪽 아래 방향 패드, 오른쪽 아래 공격,
+    가운데 아래 상태 알림. 이 배치가 아래 전투·대화·인벤토리에서 그대로 유지됩니다.
+    자세히 눌러보려면 <code>hud-mockup.html</code>을 여세요.
+  </p>
+  <div class="phone"><div class="scale">
+    <img class="bg" src="assets/world-safehouse.png" alt="원작 클라이언트 화면">
+    <div class="vignette"></div>
+    <div class="plate panel status">
+      <span class="who">수련생</span>
+      <div class="gauge"><span class="track"><span class="fill" style="transform:scaleX(.72)"></span></span><span class="num">180 / 250</span></div>
+    </div>
+    <div class="plate system">
+      <button class="sysbtn"><span class="glyph">◧</span>가방</button>
+      <button class="sysbtn"><span class="glyph">◑</span>HUD</button>
+    </div>
+    <div class="controls">
+      <div class="pad">
+        <span class="key void"></span><button class="key">↑</button><span class="key void"></span>
+        <button class="key">←</button><span class="key void"></span><button class="key">→</button>
+        <span class="key void"></span><button class="key">↓</button><span class="key void"></span>
+      </div>
+      <div class="toast">안전 가옥에 들어왔습니다.</div>
+      <button class="attack">공격<span class="sweep"></span></button>
+    </div>
+  </div></div>
+</section>
+
+<!-- 4. NPC 대화 -->
+<section class="screen" id="s-talk">
+  <div class="head"><h2>4 · NPC 대화</h2><span class="tag">게임 화면 위의 모달</span></div>
+  <p class="note">
+    패널이 열린 동안 이동·공격·월드 탭은 막힙니다. 패널은 아래쪽에 두어 위쪽 월드가 보이게 하고,
+    닫기는 오른쪽 위 48×48입니다. 선택지를 눌러 보세요.
+  </p>
+  <div class="phone"><div class="scale">
+    <img class="bg" src="assets/world-safehouse.png" alt="원작 클라이언트 화면">
+    <div class="vignette"></div><div class="veil"></div>
+    <div class="plate panel status">
+      <span class="who">수련생</span>
+      <div class="gauge"><span class="track"><span class="fill" style="transform:scaleX(.72)"></span></span><span class="num">180 / 250</span></div>
+    </div>
+    <div class="panel modal" id="talk">
+      <div class="head-row">
+        <span class="figure-slot small">NPC</span>
+        <span class="who grow">주모</span>
+        <button class="btn square" id="talk-close">닫기</button>
+      </div>
+      <div class="body" id="talk-body">어서 오게. 이 성은 밤이면 더 위험해지니 조심하시게.</div>
+      <button class="btn" id="talk-next" style="width:100%">알겠습니다</button>
+    </div>
+  </div></div>
+</section>
+
+<!-- 5. 전투 -->
+<section class="screen" id="s-fight">
+  <div class="head"><h2>5 · 전투</h2><span class="tag">기본 화면의 상태 변화</span></div>
+  <p class="note">
+    새 화면이 아니라 상태입니다. 대상 정보가 위쪽 가운데에 뜨고 몬스터에 표식이 생기는 것 말고는
+    배치가 그대로입니다. 표식은 색만으로 구분하지 않고 「대상」 글자를 함께 답니다.
+    공격을 눌러 보세요 — 재사용 대기가 돌고, 체력이 0이 되면 아이템이 떨어집니다.
+  </p>
+  <div class="phone"><div class="scale">
+    <img class="bg" src="assets/world-safehouse.png" alt="원작 클라이언트 화면">
+    <div class="vignette"></div>
+    <div class="marker" id="fight-marker" style="left:556px;top:128px;width:48px;height:76px"></div>
+    <div class="figure" id="fight-drop" style="left:566px;top:186px;width:16px;height:16px;background:var(--gold);
+      box-shadow:0 0 12px var(--gold);transform:rotate(45deg);display:none"></div>
+    <div class="plate panel status">
+      <span class="who">수련생</span>
+      <div class="gauge"><span class="track"><span class="fill" style="transform:scaleX(.72)"></span></span><span class="num">180 / 250</span></div>
+    </div>
+    <div class="plate panel target" id="fight-target">
+      <span class="who">멜로린</span>
+      <div class="gauge"><span class="track"><span class="fill" id="foe-fill"></span></span><span class="num" id="foe-num">10 / 10</span></div>
+    </div>
+    <div class="plate system"><button class="sysbtn"><span class="glyph">◧</span>가방</button></div>
+    <div class="controls">
+      <div class="pad">
+        <span class="key void"></span><button class="key">↑</button><span class="key void"></span>
+        <button class="key">←</button><span class="key void"></span><button class="key">→</button>
+        <span class="key void"></span><button class="key">↓</button><span class="key void"></span>
+      </div>
+      <div class="toast" id="fight-toast">멜로린을 겨눕니다.</div>
+      <button class="attack" id="fight-go">공격<span class="sweep" id="fight-sweep"></span></button>
+    </div>
+  </div></div>
+</section>
+
+<!-- 6. 인벤토리 -->
+<section class="screen" id="s-bag">
+  <div class="head"><h2>6 · 인벤토리</h2><span class="tag">첫 테스트에서는 읽기 전용</span></div>
+  <p class="note">
+    획득이 됐는지 확인하는 용도입니다. 사용·장착·버리기·정렬은 넣지 않습니다. 오른쪽 패널로 열어
+    왼쪽 월드가 계속 보이게 하고, 각 줄은 최소 48 높이로 둡니다.
+  </p>
+  <div class="phone"><div class="scale">
+    <img class="bg" src="assets/world-safehouse.png" alt="원작 클라이언트 화면">
+    <div class="vignette"></div><div class="veil"></div>
+    <div class="plate panel status">
+      <span class="who">수련생</span>
+      <div class="gauge"><span class="track"><span class="fill" style="transform:scaleX(.72)"></span></span><span class="num">180 / 250</span></div>
+    </div>
+    <div class="panel bag">
+      <div class="head-row" style="display:flex;align-items:center;gap:10px">
+        <span class="who" style="flex:1">인벤토리</span>
+        <button class="btn square">닫기</button>
+      </div>
+      <div class="slots">
+        <div class="slot"><span class="icon"></span>시험 물약<span class="qty">×1</span></div>
+        <div class="slot"><span class="icon"></span>낡은 열쇠<span class="qty">×1</span></div>
+        <div class="slot empty">빈 칸</div>
+        <div class="slot empty">빈 칸</div>
+      </div>
+      <span class="hint">획득한 시험 아이템 2개</span>
+    </div>
+  </div></div>
+</section>
+
+<footer>
+  <b>자산 출처.</b> 배경은 <code>tools/dat-extract</code>로 이 저장소의 <code>game/seo.dat</code>과
+  <code>database/server/maps/lod1.map</code>에서 직접 그린 안전 가옥 바닥입니다. 벽과 캐릭터는 아직
+  추출하지 못해 점선 자리로 두었습니다. 저장소의 <code>game/*.dat</code>는 설치된 클라이언트와 바이트
+  단위로 같습니다(<code>setoa.dat</code>만 버전이 다름).
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  Array.prototype.forEach.call(document.querySelectorAll(".phone"), function (phone) {
+    var scale = phone.querySelector(".scale");
+    function fit() { scale.style.transform = "scale(" + (phone.clientWidth / 800) + ")"; }
+    fit();
+    addEventListener("resize", fit);
+  });
+
+  // 1. 로그인 — 두 칸이 모두 채워지기 전에는 보내지 않는다
+  var id = document.getElementById("i-id");
+  var pw = document.getElementById("i-pw");
+  var go = document.getElementById("login-go");
+  var hint = document.getElementById("login-hint");
+  function refresh() {
+    var ready = id.value.length > 0 && pw.value.length > 0;
+    go.disabled = !ready;
+    hint.textContent = ready ? "로그인할 준비가 됐습니다." : "사용자명과 비밀번호를 입력하세요.";
+  }
+  id.addEventListener("input", refresh);
+  pw.addEventListener("input", refresh);
+  go.addEventListener("click", function () {
+    go.disabled = true;
+    hint.textContent = "서버에 접속하는 중…";
+    setTimeout(function () { hint.textContent = "캐릭터 확인으로 넘어갑니다."; }, 900);
+  });
+
+  // 2. 캐릭터 확인 — 누르면 잠그고 진행 상태를 글자로
+  var enter = document.getElementById("enter-go");
+  var state = document.getElementById("enter-state");
+  enter.addEventListener("click", function () {
+    enter.disabled = true;
+    state.textContent = "게임 서버에 접속하는 중…";
+    setTimeout(function () { state.textContent = "맵을 불러오는 중…"; }, 700);
+    setTimeout(function () {
+      state.textContent = "안전 가옥에 입장했습니다.";
+      enter.disabled = false;
+    }, 1500);
+  });
+
+  // 4. 대화 — 다음 문장, 그리고 끝
+  var lines = [
+    "어서 오게. 이 성은 밤이면 더 위험해지니 조심하시게.",
+    "지하로 내려가려거든 등불부터 챙기게.",
+    "무운을 비네."
+  ];
+  var step = 0;
+  var body = document.getElementById("talk-body");
+  var next = document.getElementById("talk-next");
+  next.addEventListener("click", function () {
+    step += 1;
+    if (step < lines.length) {
+      body.textContent = lines[step];
+      next.textContent = step === lines.length - 1 ? "대화를 마칩니다" : "알겠습니다";
+    } else {
+      step = 0;
+      body.textContent = lines[0];
+      next.textContent = "알겠습니다";
+    }
+  });
+  document.getElementById("talk-close").addEventListener("click", function () {
+    step = 0;
+    body.textContent = lines[0];
+    next.textContent = "알겠습니다";
+  });
+
+  // 5. 전투 — 공격할수록 줄고, 0이 되면 아이템이 떨어진다
+  var foe = 10;
+  var foeFill = document.getElementById("foe-fill");
+  var foeNum = document.getElementById("foe-num");
+  var toast = document.getElementById("fight-toast");
+  var marker = document.getElementById("fight-marker");
+  var drop = document.getElementById("fight-drop");
+  var sweep = document.getElementById("fight-sweep");
+  var cooling = false;
+
+  document.getElementById("fight-go").addEventListener("click", function () {
+    if (cooling) { toast.textContent = "아직 숨을 고르는 중입니다."; return; }
+    if (foe <= 0) {
+      foe = 10; drop.style.display = "none"; marker.style.display = "";
+      document.getElementById("fight-target").style.display = "";
+      toast.textContent = "멜로린을 겨눕니다.";
+      draw();
+      return;
+    }
+    cooling = true;
+    var start = performance.now();
+    (function tick(now) {
+      var p = Math.min(1, (now - start) / 800);
+      sweep.style.setProperty("--sweep", (1 - p) + "turn");
+      if (p < 1) { requestAnimationFrame(tick); } else { cooling = false; }
+    })(start);
+
+    foe -= 3;
+    if (foe <= 0) {
+      foe = 0;
+      marker.style.display = "none";
+      document.getElementById("fight-target").style.display = "none";
+      drop.style.display = "";
+      toast.textContent = "멜로린이 쓰러지고 무언가를 떨어뜨렸습니다.";
+    } else {
+      toast.textContent = "멜로린에게 3의 피해를 입혔습니다.";
+    }
+    draw();
+  });
+
+  function draw() {
+    foeFill.style.transform = "scaleX(" + (foe / 10) + ")";
+    foeNum.textContent = foe + " / 10";
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
