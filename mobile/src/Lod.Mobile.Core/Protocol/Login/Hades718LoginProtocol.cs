@@ -31,13 +31,6 @@ public static class Hades718LoginProtocol
     /// <summary>The build this project targets. The server refuses anything else.</summary>
     public const ushort ClientVersion = 718;
 
-    /// <summary>
-    /// The only cipher table this client implements. The server's own default uses it, and the nine other
-    /// tables exist for configurations we have never seen on the wire.
-    /// </summary>
-    /// <remarks>ponytail: seed 0 only — port the remaining tables if a server ever announces another.</remarks>
-    public const byte SupportedSeed = 0;
-
     private const byte VersionCommand = 0x00;
     private const byte LoginCommand = 0x03;
     private const byte RedirectCommand = 0x03;
@@ -103,11 +96,7 @@ public static class Hades718LoginProtocol
             .. LegacyKoreanEncoding.EncodeStringA(password)
         ];
 
-        Encipher(body, parameters, ordinal);
-
-        byte[] payload = [LoginCommand, ordinal, .. body];
-
-        return PacketFrameCodec.Encode(payload);
+        return HadesCipher.EncodeSecured(LoginCommand, ordinal, body, parameters);
     }
 
     public static RedirectTarget ParseRedirect(PacketFrame frame)
@@ -190,36 +179,4 @@ public static class Hades718LoginProtocol
         return PacketFrameCodec.Encode(payload);
     }
 
-    /// <summary>
-    /// The server's cipher, which is its own inverse. Each byte is mixed with the salt byte at its position,
-    /// the packet's ordinal, and how many salt-lengths into the body it sits.
-    /// </summary>
-    private static void Encipher(Span<byte> body, EncryptionParameters parameters, byte ordinal)
-    {
-        if (parameters.Seed != SupportedSeed)
-        {
-            // Names the seeds, never the credentials being enciphered.
-            throw new ProtocolException(
-                $"이 클라이언트는 seed {SupportedSeed} 만 다룹니다. 서버가 seed {parameters.Seed} 를 요구했습니다.");
-        }
-
-        ReadOnlySpan<byte> salt = parameters.Salt.Span;
-
-        if (salt.Length == 0)
-        {
-            throw new ProtocolException("서버가 빈 salt 를 보냈습니다.");
-        }
-
-        for (int index = 0; index < body.Length; index++)
-        {
-            int block = (index / salt.Length) & 0xFF;
-
-            body[index] ^= (byte)(salt[index % salt.Length] ^ ordinal ^ block);
-
-            if (ordinal == block)
-            {
-                body[index] ^= ordinal;
-            }
-        }
-    }
 }

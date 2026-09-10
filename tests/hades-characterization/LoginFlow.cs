@@ -21,7 +21,8 @@ internal static class LoginFlow
     /// <summary>Throwaway name for the isolated run. It never matches a real account.</summary>
     public const string SyntheticName = "lodharness";
 
-    private const string SyntheticSecret = "not-a-real-secret";
+    /// <summary>Throwaway secret for the isolated run.</summary>
+    public const string SyntheticSecret = "not-a-real-secret";
 
     // ServerConfig.ServerWelcomeMessage in LoruleConfig.json.
     private const string ServerWelcome = "Welcome to Lorule";
