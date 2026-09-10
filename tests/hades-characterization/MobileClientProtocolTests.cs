@@ -200,6 +200,10 @@ public sealed class MobileClientProtocolTests
 
         Assert.Equal(theirStart.Where, standing.Where);
 
+        // The name sits past the wardrobe, so reading it back proves every offset in between.
+        Assert.Equal(OtherName, standing.Name, ignoreCase: true);
+        Assert.NotNull(standing.Wearing);
+
         await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
         await walking.WalkAsync(Direction.East, _deadline.Token);
 
@@ -207,6 +211,10 @@ public sealed class MobileClientProtocolTests
 
         Assert.Equal(new Tile(standing.Where.X + 1, standing.Where.Y), stepped.Where);
         Assert.Equal(Direction.East, stepped.Facing);
+
+        // A step is announced without a wardrobe, and walking must not undress anybody.
+        Assert.Equal(standing.Wearing, stepped.Wearing);
+        Assert.Equal(standing.Name, stepped.Name);
 
         // And we are never in our own list of other people.
         Assert.DoesNotContain(watching.Others, one => one.Serial == watching.Serial);

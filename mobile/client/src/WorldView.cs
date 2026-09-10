@@ -151,7 +151,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
             if (!_crowd.TryGetValue(one.Serial, out Actor? actor))
             {
-                actor = Add(new Actor(one.Serial.ToString(), Actor.Sheet.Walk(OtherSheet)), Ground(one.Where));
+                // The server gives a name with the appearance; a serial is only for somebody we have
+                // only ever seen take a step.
+                string called = one.Name.Length > 0 ? one.Name : one.Serial.ToString();
+
+                actor = Add(new Actor(called, Actor.Sheet.Walk(OtherSheet)), Ground(one.Where));
                 _crowd[one.Serial] = actor;
             }
 

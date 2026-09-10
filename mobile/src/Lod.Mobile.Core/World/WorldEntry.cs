@@ -15,7 +15,36 @@ public readonly record struct Tile(int X, int Y);
 public sealed record WorldEntry(MapInfo Map, Tile Where);
 
 /// <summary>
-/// Somebody else standing in the world. Only what is needed to draw them: appearance comes later, and the
-/// name arrives past a stretch of the packet we do not read yet.
+/// What somebody is wearing. Every number here names a drawing: the gender letter, the part letter, the
+/// number padded to three digits, then the action — <c>mh285</c> is a man's helmet 285. The letters are in
+/// docs/original-sprite-animation.md section 7.
 /// </summary>
-public sealed record Character(uint Serial, Tile Where, Art.Direction Facing);
+/// <remarks>
+/// <see cref="Head" /> is the helmet when one is worn and the hair otherwise; the server decides which and
+/// does not say. Colours are palette rows, not parts.
+/// </remarks>
+public sealed record Appearance(
+    int Head,
+    int Body,
+    int Armor,
+    int Boots,
+    int Shield,
+    int Weapon,
+    int HairColor,
+    int BootColor,
+    int HeadAccessory1,
+    int Lantern,
+    int HeadAccessory2,
+    int Resting,
+    int OverCoat);
+
+/// <summary>
+/// Somebody else standing in the world: where they are, which way they face, what they wear and what they
+/// are called. A character who is dead, or who has taken a monster's shape, arrives without a wardrobe.
+/// </summary>
+public sealed record Character(
+    uint Serial,
+    Tile Where,
+    Art.Direction Facing,
+    Appearance? Wearing = null,
+    string Name = "");

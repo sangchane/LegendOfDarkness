@@ -163,26 +163,70 @@ public sealed class WorldClient(WorldSession session)
         Direction facing = FromServer(body[8]);
 
         (int column, int row) = Facing.TileStep(facing);
-        Character moved = new(serial, new Tile(fromX + column, fromY + row), facing);
+        Tile now = new(fromX + column, fromY + row);
 
-        Show(moved);
+        // A step says nothing about clothes, so keep the ones we were shown rather than undressing them.
+        Show(_others.TryGetValue(serial, out Character? known)
+            ? known with { Where = now, Facing = facing }
+            : new Character(serial, now, facing));
     }
 
-    /// <summary>Somebody to draw: where they are, which way they face, and who they are.</summary>
-    private static Character ReadCharacter(ReadOnlySpan<byte> body)
+    /// <summary>Somebody to draw: where they are, which way they face, what they wear, and their name.</summary>
+    /// <remarks>
+    /// Place, direction and serial take nine bytes; then twenty-one bytes of wardrobe, one byte saying
+    /// whether the map allows killing, and the name. A dead character is written bare and the server stops
+    /// before the name, which is why the name is only read when there are bytes left for it.
+    /// </remarks>
+    public static Character ReadCharacter(ReadOnlySpan<byte> body)
     {
-        const int fixedLength = 9;
+        const int fixedLength = 31;
+        const int wornLength = 11;
+
+        if (body.Length < wornLength)
+        {
+            throw new ProtocolException($"사람 안내가 {wornLength}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        uint serial = BinaryPrimitives.ReadUInt32BigEndian(body[5..]);
+        Tile where = new(BinaryPrimitives.ReadUInt16BigEndian(body), BinaryPrimitives.ReadUInt16BigEndian(body[2..]));
+        Direction facing = FromServer(body[4]);
+        int head = BinaryPrimitives.ReadUInt16BigEndian(body[9..]);
+
+        // Somebody wearing a monster's shape carries its number where the wardrobe would be, and the rest
+        // of the packet is laid out differently.
+        // ponytail: read the name and leave the shape alone — no map here has monsters to check it against.
+        if (head == 0xFFFF)
+        {
+            return new Character(serial, where, facing, null, ReadName(body, 22));
+        }
 
         if (body.Length < fixedLength)
         {
             throw new ProtocolException($"사람 안내가 {fixedLength}바이트보다 짧습니다 ({body.Length}바이트).");
         }
 
-        return new Character(
-            BinaryPrimitives.ReadUInt32BigEndian(body[5..]),
-            new Tile(BinaryPrimitives.ReadUInt16BigEndian(body), BinaryPrimitives.ReadUInt16BigEndian(body[2..])),
-            FromServer(body[4]));
+        // Byte 15 is the armour written a second time and byte 26 is left empty; both are the server's habit.
+        Appearance wearing = new(
+            head,
+            body[11],
+            BinaryPrimitives.ReadUInt16BigEndian(body[12..]),
+            body[14],
+            body[17],
+            body[18],
+            body[19],
+            body[20],
+            BinaryPrimitives.ReadUInt16BigEndian(body[21..]),
+            body[23],
+            BinaryPrimitives.ReadUInt16BigEndian(body[24..]),
+            body[27],
+            BinaryPrimitives.ReadUInt16BigEndian(body[28..]));
+
+        return new Character(serial, where, facing, wearing, ReadName(body, fixedLength));
     }
+
+    /// <summary>The name, if the server got as far as writing one.</summary>
+    private static string ReadName(ReadOnlySpan<byte> body, int at) =>
+        body.Length > at ? LegacyKoreanEncoding.DecodeStringA(body[at..], out _) : string.Empty;
 
     private static Direction FromServer(byte direction) => direction switch
     {

@@ -260,6 +260,30 @@ m  b   001   c  .epf
 여자 아카이브에는 팔레트가 없고 `khan.dat` 것을 함께 쓴다. 색은 부위 글자별 표에서 찾는다 —
 `palh.tbl`(모자), `palc.tbl`(장신구) …. 표의 셋째 값이 `-1`이면 남자 전용 줄, `-2`면 여자 전용 줄이다.
 
+### 서버가 주는 번호는 어느 파일인가
+
+서버는 사람을 보여 줄 때(`0x33`) 자리·방향·일련번호 9바이트 뒤에 입은 것을 21바이트 붙이고, 마지막에
+이름을 붙인다. `Lod.Mobile.Core.World.Appearance` 가 그 21바이트다. 번호는 그대로 파일 이름의 가운데
+세 자리다 — 성별 글자 + 부위 글자 + 번호(3자리) + 동작(2자리).
+
+| `Appearance` 칸 | 자리 | 부위 글자 | 확인 |
+|---|---|---|---|
+| `Head` | 9–10 | `h` | `build-client-assets.ps1` 의 `MH28501` |
+| `Body` | 11 | `b` | 같은 스크립트의 `mb00101`. 서버가 몸 번호에 바지를 더해서 보낸다 |
+| `Armor` | 12–13 | `u` | 같은 스크립트의 `MU06101` |
+| `OverCoat` | 28–29 | `i` | 같은 스크립트의 `mi00101` |
+| `Boots` | 14 | `l` | 부위 글자 표(참고 클라이언트) |
+| `Shield` | 17 | `s` | 〃 |
+| `Weapon` | 18 | `w` | 〃 |
+| `HeadAccessory1` `HeadAccessory2` | 21–22 · 24–25 | `c` `p` `o` 중 하나 | **미확인** |
+| `HairColor` `BootColor` | 19 · 20 | — | 파일이 아니라 팔레트 줄 번호 |
+
+투구를 쓰면 `Head` 에 투구 번호가 오고 안 썼으면 머리 모양 번호가 온다. **서버는 둘 중 무엇인지
+말해 주지 않는다** — 원작은 100 이하를 머리로 봤다(`ServerFormat33`).
+
+자리 15–16 은 갑옷을 한 번 더 쓴 것이고 26 은 서버가 비워 둔다. 죽은 사람은 옷 대신 0 이 오고
+**이름도 오지 않는다**. 변신한 사람은 9–10 이 `0xFFFF` 고 그 뒤가 다른 짜임이다(확인 못 함).
+
 ---
 
 ## 8. `Legend.dat` 은 이 저장소에 없다
@@ -288,7 +312,7 @@ dat-extract dump "C:/Program Files (x86)/KRU/Dark Ages/Legend.dat" <출력폴더
 
 | 위치 | 내용 |
 |---|---|
-| `docs/ui/hud-mockup.html` | `DIRS`(방향→등/앞 + 뒤집기), `SHEETS`(프레임 구간), `.actor.flip`(뒤집는 축) |
+| `docs/index.html?view=prototypes` | 개발 대시보드 안에서 원작 월드와 모바일 HUD 배치를 함께 확인 |
 | `tools/dat-extract/Epf.cs` | EPF 읽기 |
 | `tools/dat-extract/Mpf.cs` | MPF 읽기 (서기·걷기·공격 구간 포함) |
 | `tools/dat-extract/Program.cs` | `epf`(칸 전부 뽑기) · `pose`(부위 겹치기) · `mpf`(몬스터) |
