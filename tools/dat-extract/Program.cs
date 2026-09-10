@@ -23,7 +23,7 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png> [잘라낼 x y 폭 높이]");
             Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
             Console.Error.WriteLine("        dat-extract epf <khan.dat> <이름조각> <출력.png> [칸수] [배율] [팔레트.dat]");
-            Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명]");
+            Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명|transparent]");
             Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율]");
             return 2;
         }
@@ -516,7 +516,8 @@ internal static class Program
         string entryName = args[2];
         string output = Path.GetFullPath(args[3]);
         int zoom = args.Length > 4 ? int.Parse(args[4]) : 3;
-        bool transparent = args.Length > 5 && args[5] == "투명";
+        // Both spellings: a Korean argument does not always survive the hand-off from a shell.
+        bool transparent = args.Length > 5 && args[5] is "투명" or "transparent";
 
         string[] names = entryName.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         List<(byte[] Data, int Width, int Height, Palette Palette)> cells = [];

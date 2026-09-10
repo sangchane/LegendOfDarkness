@@ -1,4 +1,5 @@
 using Godot;
+using Lod.Mobile.Core.Art;
 
 namespace LodClient;
 
@@ -16,10 +17,9 @@ public partial class GameScreen : Control
     /// <summary>Rows the chat and combat log keeps in portrait. Landscape has no room for it at all.</summary>
     private const int LogHeight = 76;
 
-    private Control _world = null!;
+    private WorldView _world = null!;
     private Control _topRow = null!;
     private Control _controlRow = null!;
-    private Panel _focusBand = null!;
 
     public GameScreen()
     {
@@ -38,13 +38,13 @@ public partial class GameScreen : Control
         rows.AddThemeConstantOverride("separation", Main.Gutter);
 
         _topRow = BuildTopRow();
-        _controlRow = BuildControlRow();
 
         if (Main.Portrait)
         {
             // Portrait has the height to give the world a row of its own, so nothing the player is aiming
             // at sits under a thumb. That is the whole reason to hold the phone this way.
-            _world = BuildWorld(fullBleed: false);
+            BuildWorld(fullBleed: false);
+            _controlRow = BuildControlRow();
 
             AddChild(hud);
             hud.AddChild(rows);
@@ -56,7 +56,8 @@ public partial class GameScreen : Control
         else
         {
             // Landscape has no such room: the world fills the screen and the HUD floats over its corners.
-            _world = BuildWorld(fullBleed: true);
+            BuildWorld(fullBleed: true);
+            _controlRow = BuildControlRow();
 
             AddChild(_world);
             AddChild(hud);
@@ -65,125 +66,29 @@ public partial class GameScreen : Control
             rows.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
             rows.AddChild(_controlRow);
         }
-
-        _ = PlaceWorldOnceMeasured();
     }
 
     /// <summary>
-    /// Everything the player must see or tap goes in the band between the two HUD rows. Below it is where a
-    /// thumb rests, and a monster or a dropped item there is hidden by the player's own hand.
-    /// </summary>
-    private async System.Threading.Tasks.Task PlaceWorldOnceMeasured()
-    {
-        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-
-        Rect2 band = FocusBand();
-
-        _focusBand.Position = band.Position;
-        _focusBand.Size = band.Size;
-
-        // Laid out around the band's centre rather than the screen's, which is what a camera has to do too.
-        Vector2 centre = band.Position + (band.Size / 2);
-
-        if (Main.Portrait)
-        {
-            // Only 360 across, so the objects stand on two rows rather than shrinking below the tap minimum.
-            float upper = centre.Y - Main.TouchMinimum - 24;
-            float lower = centre.Y + 24;
-
-            Place("Npc", new Vector2(centre.X - 110, upper));
-            Place("Monster", new Vector2(centre.X + 30, upper));
-            Place("GroundItem", new Vector2(centre.X - 145, lower));
-            Place("Player", new Vector2(centre.X - (Main.TouchMinimum / 2), lower));
-
-            return;
-        }
-
-        // One row: the band is only tall enough for a single object plus its caption, which is itself worth
-        // seeing. A three row movement pad takes a large share of a 360 unit high screen.
-        float row = centre.Y - (Main.TouchMinimum / 2);
-
-        Place("Npc", new Vector2(centre.X - 230, row));
-        Place("GroundItem", new Vector2(centre.X - 115, row));
-        Place("Player", new Vector2(centre.X - (Main.TouchMinimum / 2), row));
-        Place("Monster", new Vector2(centre.X + 120, row));
-    }
-
-    private Rect2 FocusBand()
-    {
-        // In portrait the world already is the band, so its own rect answers the question.
-        if (Main.Portrait)
-        {
-            return new Rect2(Vector2.Zero, _world.Size);
-        }
-
-        float top = _topRow.GlobalPosition.Y + _topRow.Size.Y + Main.Gutter;
-        float bottom = _controlRow.GlobalPosition.Y - Main.Gutter;
-        float left = Main.SafeInsets.Left;
-        float right = Size.X - Main.SafeInsets.Right;
-
-        return new Rect2(left, top, right - left, Mathf.Max(bottom - top, Main.TouchMinimum));
-    }
-
-    private void Place(string name, Vector2 position) =>
-        _world.GetNode<Control>(name).Position = position;
-
-    /// <summary>
-    /// Full-bleed world. Greybox stands the objects in for sprites, which still live inside the .dat
-    /// archives, so their tap sizes can be judged before any art exists.
+    /// The world itself. In landscape it fills the screen and the HUD floats over it; in portrait it takes a
+    /// row of its own so nothing the player is aiming at sits under a thumb.
     /// </summary>
     private Control BuildWorld(bool fullBleed)
     {
-        Panel world = new() { Name = "World" };
+        _world = new WorldView();
 
         if (fullBleed)
         {
-            world.AnchorRight = 1;
-            world.AnchorBottom = 1;
-            world.GrowHorizontal = GrowDirection.Both;
-            world.GrowVertical = GrowDirection.Both;
+            _world.AnchorRight = 1;
+            _world.AnchorBottom = 1;
+            _world.GrowHorizontal = GrowDirection.Both;
+            _world.GrowVertical = GrowDirection.Both;
         }
         else
         {
-            world.SizeFlagsVertical = SizeFlags.ExpandFill;
+            _world.SizeFlagsVertical = SizeFlags.ExpandFill;
         }
 
-        world.AddThemeStyleboxOverride("panel", Greybox.World());
-
-        _focusBand = new Panel { Name = "FocusBand" };
-        _focusBand.AddThemeStyleboxOverride("panel", Greybox.Outline());
-        world.AddChild(_focusBand);
-
-        // Node names stay plain because a caption may carry characters a node path cannot.
-        world.AddChild(WorldObject("Npc", "NPC"));
-        world.AddChild(WorldObject("Monster", "거미 3/10"));
-        world.AddChild(WorldObject("Player", "플레이어"));
-        world.AddChild(WorldObject("GroundItem", "지면 아이템"));
-
-        return world;
-    }
-
-    /// <summary>A tappable world object. Sized to the touch minimum because taps land on it directly.</summary>
-    private static Control WorldObject(string name, string caption)
-    {
-        VBoxContainer group = new() { Name = name };
-        group.AddThemeConstantOverride("separation", 2);
-
-        Panel body = new() { CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
-        body.AddThemeStyleboxOverride("panel", Greybox.Surface());
-
-        Label label = new()
-        {
-            Text = caption,
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        label.AddThemeFontSizeOverride("font_size", AuxFontSize);
-        label.AddThemeColorOverride("font_color", Greybox.Muted);
-
-        group.AddChild(body);
-        group.AddChild(label);
-
-        return group;
+        return _world;
     }
 
     /// <summary>
@@ -220,9 +125,13 @@ public partial class GameScreen : Control
         return frame;
     }
 
-    /// <summary>Name and health on the left, world state and inventory on the right.</summary>
+    /// <summary>Name and health on the left, world state and inventory on the right, on a plate that keeps
+    /// them readable over the floor.</summary>
     private static Control BuildTopRow()
     {
+        PanelContainer plate = new();
+        plate.AddThemeStyleboxOverride("panel", Greybox.Plate());
+
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
@@ -243,7 +152,9 @@ public partial class GameScreen : Control
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
         });
 
-        return row;
+        plate.AddChild(row);
+
+        return plate;
     }
 
     /// <summary>Bar and numbers together: health must never be readable by colour alone.</summary>
@@ -273,7 +184,7 @@ public partial class GameScreen : Control
     /// Movement on the left, attack on the right, status between them. Centred inside a capped width so the
     /// clusters never drift further apart than a thumb can travel on a very wide screen.
     /// </summary>
-    private static Control BuildControlRow()
+    private Control BuildControlRow()
     {
         CenterContainer center = new();
 
@@ -288,17 +199,26 @@ public partial class GameScreen : Control
         {
             Text = "그쪽으로는 갈 수 없습니다.",
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            VerticalAlignment = VerticalAlignment.Center,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
         status.AddThemeFontSizeOverride("font_size", AuxFontSize);
         status.AddThemeColorOverride("font_color", Greybox.Muted);
 
+        // The notice floats over the floor in landscape, so it gets a plate of its own rather than an
+        // outline: a line of text on gold tiles is unreadable either way without one.
+        PanelContainer notice = new()
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ShrinkEnd
+        };
+        notice.AddThemeStyleboxOverride("panel", Greybox.Plate());
+        notice.AddChild(status);
+
         row.AddChild(BuildMovementPad());
         row.AddChild(Main.Portrait
             ? new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill }
-            : status);
+            : notice);
         row.AddChild(new Button
         {
             Text = "공격",
@@ -311,24 +231,42 @@ public partial class GameScreen : Control
         return center;
     }
 
-    /// <summary>Four directions, no diagonals: one tap is one tile, which is what this game is about.</summary>
-    private static Control BuildMovementPad()
+    /// <summary>
+    /// Four directions, no diagonals: one tap is one tile, which is what this game is about. The floor is
+    /// laid in diamonds, so each of them moves diagonally on screen.
+    /// </summary>
+    private Control BuildMovementPad()
     {
         GridContainer pad = new() { Columns = 3, SizeFlagsVertical = SizeFlags.ShrinkEnd };
         pad.AddThemeConstantOverride("h_separation", Main.Gutter / 2);
         pad.AddThemeConstantOverride("v_separation", Main.Gutter / 2);
 
-        string?[] layout = [null, "↑", null, "←", null, "→", null, "↓", null];
+        (string Glyph, Direction Where)?[] layout =
+        [
+            null, ("↑", Direction.North), null,
+            ("←", Direction.West), null, ("→", Direction.East),
+            null, ("↓", Direction.South), null
+        ];
 
-        foreach (string? direction in layout)
+        foreach ((string Glyph, Direction Where)? key in layout)
         {
-            pad.AddChild(direction is null
-                ? new Control { CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) }
-                : new Button
-                {
-                    Text = direction,
-                    CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-                });
+            if (key is null)
+            {
+                pad.AddChild(new Control { CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) });
+                continue;
+            }
+
+            Direction where = key.Value.Where;
+
+            Button button = new()
+            {
+                Text = key.Value.Glyph,
+                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+            };
+
+            button.Pressed += () => _world.Walk(where);
+
+            pad.AddChild(button);
         }
 
         return pad;

@@ -1,0 +1,11 @@
+# Godot writes these itself and reads them back on every open. They must be committed, and with the line
+# endings Godot writes, or every checkout on another machine shows them as changed.
+*.import  text eol=lf
+*.uid     text eol=lf
+*.godot   text eol=lf
+*.tscn    text eol=lf
+
+# Original game data. Never normalise it.
+*.dat  binary
+*.tbl  -text
+*.map  binary

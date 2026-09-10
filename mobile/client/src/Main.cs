@@ -56,11 +56,18 @@ public partial class Main : Control
     /// </summary>
     public static (string Username, string Password) Rehearsal { get; private set; } = (string.Empty, string.Empty);
 
+    /// <summary>
+    /// Steps to walk on their own once the world opens, as <c>--walk NESW</c>. Same purpose as --login: it
+    /// lets a build be checked without a hand on the screen.
+    /// </summary>
+    public static string Rehearse { get; private set; } = string.Empty;
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
         ReadServer(Flag("--server"));
         ReadRehearsal(Flag("--login"));
+        Rehearse = Flag("--walk");
 
         if (Portrait)
         {
@@ -157,6 +164,14 @@ public partial class Main : Control
             // Godot's built-in face has no Hangul, so this is the state where Korean text breaks.
             FontName = "없음 — 한글이 깨집니다";
         }
+
+        // Buttons sit over the map now. The engine default is translucent, which the floor shows straight
+        // through, so every button carries its own opaque plate.
+        theme.SetStylebox("normal", "Button", Greybox.Plate());
+        theme.SetStylebox("hover", "Button", Greybox.Plate());
+        theme.SetStylebox("pressed", "Button", Greybox.Surface());
+        theme.SetStylebox("focus", "Button", Greybox.Plate());
+        theme.SetStylebox("disabled", "Button", Greybox.Surface());
 
         return theme;
     }

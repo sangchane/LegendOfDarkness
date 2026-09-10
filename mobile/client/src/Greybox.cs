@@ -25,6 +25,24 @@ public static class Greybox
         BorderWidthBottom = 1
     };
 
+    /// <summary>
+    /// A panel that has to stay readable over the map. The greybox surface was made for a flat grey
+    /// background; over gold floor tiles its text disappears, so this one is nearly opaque.
+    /// </summary>
+    public static StyleBoxFlat Plate() => new()
+    {
+        BgColor = new Color(0.08f, 0.09f, 0.12f, 0.9f),
+        BorderColor = SurfaceEdge,
+        BorderWidthLeft = 1,
+        BorderWidthTop = 1,
+        BorderWidthRight = 1,
+        BorderWidthBottom = 1,
+        ContentMarginLeft = 8,
+        ContentMarginRight = 8,
+        ContentMarginTop = 4,
+        ContentMarginBottom = 4
+    };
+
     /// <summary>The play area behind the HUD. Flat on purpose: the map is not this stage's question.</summary>
     public static StyleBoxFlat World() => new() { BgColor = WorldFill };
 
