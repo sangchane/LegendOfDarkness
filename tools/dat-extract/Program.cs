@@ -3,6 +3,7 @@ using Lorule.Client.Base.Types;
 using Lorule.Content.Editor.Dat;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Lod.DatExtract;
 
@@ -21,6 +22,9 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract tiles <seo.dat> <출력.png> <시작> <개수> [가로칸]");
             Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png>");
             Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
+            Console.Error.WriteLine("        dat-extract epf <khan.dat> <이름조각> <출력.png> [칸수] [배율] [팔레트.dat]");
+            Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명]");
+            Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율]");
             return 2;
         }
 
@@ -43,6 +47,9 @@ internal static class Program
             "tiles" => await Tiles(entries, args),
             "map" => await RenderMap(entries, args),
             "sprite" => await RenderSprite(entries, args),
+            "epf" => await RenderEpf(entries, args),
+            "mpf" => await RenderMpf(entries, args),
+            "pose" => await RenderPose(entries, args),
             _ => Unknown(command)
         };
     }
@@ -326,6 +333,220 @@ internal static class Program
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);
         await image.SaveAsPngAsync(output);
         Console.WriteLine($"{width}x{height} 로 {output} 에 저장했습니다 (남는 바이트 {pixels.Length - (width * height)}).");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Draws the wardrobe pieces a player is built from. One .epf holds every frame of one piece, and the
+    /// piece's number decides its colours, so each frame is drawn with the palette its own table names.
+    /// </summary>
+    private static async Task<int> RenderEpf(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("epf 에는 이름 조각과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string filter = args[2];
+        string output = Path.GetFullPath(args[3]);
+        int columns = args.Length > 4 ? int.Parse(args[4]) : 12;
+        int zoom = args.Length > 5 ? int.Parse(args[5]) : 3;
+
+        // khan2.dat carries the women's pieces but no palettes of its own; they live in khan.dat.
+        List<ArchivedItem> palettes = args.Length > 6 ? await ReadEntries(Path.GetFullPath(args[6])) : entries;
+        bool female = Path.GetFileName(args[1]).StartsWith("khan2", StringComparison.OrdinalIgnoreCase);
+
+        string[] wanted = filter.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        List<ArchivedItem> chosen = entries
+            .Where(entry => entry.Name.EndsWith(".epf", StringComparison.OrdinalIgnoreCase)
+                         && wanted.Any(part => entry.Name.Contains(part, StringComparison.OrdinalIgnoreCase)))
+            .OrderBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (chosen.Count == 0)
+        {
+            Console.Error.WriteLine($"{filter} 에 맞는 .epf 가 없습니다.");
+            return 2;
+        }
+
+        List<(byte[] Data, int Width, int Height, Palette Palette)> cells = [];
+
+        foreach (ArchivedItem item in chosen)
+        {
+            Palette palette = Sprites.ForWardrobe(palettes, item.Name, female)
+                              ?? Sprites.Named(palettes, "palb000.pal")!;
+
+            List<Epf.Frame> frames = Epf.Read(item.Data);
+            Console.WriteLine($"  {item.Name}: 프레임 {frames.Count}개");
+
+            foreach (Epf.Frame frame in frames)
+            {
+                cells.Add((frame.Data, frame.Width, frame.Height, palette));
+            }
+        }
+
+        if (cells.Count == 0)
+        {
+            Console.Error.WriteLine("그릴 프레임이 없습니다.");
+            return 2;
+        }
+
+        await Sprites.Save(output, cells, columns, zoom);
+        Console.WriteLine($"{chosen.Count}개 파일 · 프레임 {cells.Count}개를 {output} 에 그렸습니다.");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Stacks wardrobe pieces into one figure. The original draws a character as separate layers — body,
+    /// then what it wears, then what it holds — each carrying its own offset inside a shared box, so the
+    /// pieces line up when drawn in order at the same frame number.
+    /// </summary>
+    private static async Task<int> RenderPose(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("pose 에는 겹칠 이름들과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string[] layers = args[2].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        string output = Path.GetFullPath(args[3]);
+        int[] poses = (args.Length > 4 ? args[4] : "0")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(int.Parse)
+            .ToArray();
+        int zoom = args.Length > 5 ? int.Parse(args[5]) : 4;
+
+        bool female = Path.GetFileName(args[1]).StartsWith("khan2", StringComparison.OrdinalIgnoreCase);
+        List<(Epf.Frame Frame, Palette Palette)>[] stacks = new List<(Epf.Frame, Palette)>[poses.Length];
+
+        for (int slot = 0; slot < poses.Length; slot++)
+        {
+            stacks[slot] = [];
+        }
+
+        foreach (string layer in layers)
+        {
+            ArchivedItem? item = entries.FirstOrDefault(entry =>
+                Path.GetFileNameWithoutExtension(entry.Name).Equals(layer, StringComparison.OrdinalIgnoreCase));
+
+            if (item is null)
+            {
+                Console.Error.WriteLine($"  {layer}: 없습니다");
+                continue;
+            }
+
+            Palette palette = Sprites.ForWardrobe(entries, item.Name, female)
+                              ?? Sprites.Named(entries, "palb000.pal")!;
+            List<Epf.Frame> frames = Epf.Read(item.Data);
+            Console.WriteLine($"  {item.Name}: 프레임 {frames.Count}개, 첫 칸 {frames.FirstOrDefault()?.Left},{frames.FirstOrDefault()?.Top}");
+
+            for (int slot = 0; slot < poses.Length; slot++)
+            {
+                if (poses[slot] < frames.Count)
+                {
+                    stacks[slot].Add((frames[poses[slot]], palette));
+                }
+            }
+        }
+
+        if (stacks.All(stack => stack.Count == 0))
+        {
+            Console.Error.WriteLine("겹칠 것이 없습니다.");
+            return 2;
+        }
+
+        int cellWidth = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Left + entry.Frame.Width) + 4;
+        int cellHeight = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Top + entry.Frame.Height) + 4;
+
+        // Transparent, because these figures get laid over a map rather than viewed on their own.
+        using Image<Rgba32> canvas = new(cellWidth * poses.Length, cellHeight);
+
+        for (int slot = 0; slot < poses.Length; slot++)
+        {
+            foreach ((Epf.Frame frame, Palette palette) in stacks[slot])
+            {
+                Sprites.Blit(
+                    canvas,
+                    frame.Data,
+                    frame.Width,
+                    frame.Height,
+                    palette,
+                    (slot * cellWidth) + 2 + frame.Left,
+                    2 + frame.Top);
+            }
+        }
+
+        if (zoom > 1)
+        {
+            canvas.Mutate(context => context.Resize(
+                canvas.Width * zoom,
+                canvas.Height * zoom,
+                KnownResamplers.NearestNeighbor));
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+        await canvas.SaveAsPngAsync(output);
+        Console.WriteLine($"{layers.Length}겹 · 자세 {poses.Length}개를 {output} 에 그렸습니다.");
+
+        return 0;
+    }
+
+    /// <summary>Draws a monster's animation frames in the order the file gives them.</summary>
+    private static async Task<int> RenderMpf(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("mpf 에는 항목 이름과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string entryName = args[2];
+        string output = Path.GetFullPath(args[3]);
+        int zoom = args.Length > 4 ? int.Parse(args[4]) : 3;
+        bool transparent = args.Length > 5 && args[5] == "투명";
+
+        string[] names = entryName.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        List<(byte[] Data, int Width, int Height, Palette Palette)> cells = [];
+
+        foreach (string name in names)
+        {
+            ArchivedItem? item = entries.FirstOrDefault(entry =>
+                entry.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            if (item is null)
+            {
+                Console.Error.WriteLine($"항목을 찾지 못했습니다: {name}");
+                continue;
+            }
+
+            Mpf.Sheet sheet = Mpf.Read(item.Data);
+            Palette palette = Sprites.Named(entries, $"mns{sheet.PaletteNumber:000}.pal")
+                              ?? Sprites.Named(entries, "mns000.pal")!;
+
+            Console.WriteLine($"{item.Name}: 프레임 {sheet.Frames.Count}개 · 팔레트 {sheet.PaletteNumber} · 화폭 {sheet.CanvasWidth}x{sheet.CanvasHeight}");
+            Console.WriteLine($"  서기 {sheet.StandStart}+{sheet.StandCount} · 걷기 {sheet.WalkStart}+{sheet.WalkCount} · 공격 {sheet.AttackStart}+{sheet.AttackCount}");
+
+            // One name shows the whole animation; several show each creature standing, side by side.
+            IEnumerable<Mpf.Frame> wanted = names.Length == 1
+                ? sheet.Frames
+                : sheet.Frames.Skip(sheet.StandStart).Take(1);
+
+            cells.AddRange(wanted.Select(frame => (frame.Data, frame.Width, frame.Height, palette)));
+        }
+
+        if (cells.Count == 0)
+        {
+            Console.Error.WriteLine("그릴 프레임이 없습니다.");
+            return 2;
+        }
+
+        await Sprites.Save(output, cells, Math.Min(cells.Count, 8), zoom, transparent);
+        Console.WriteLine($"프레임 {cells.Count}개를 {output} 에 그렸습니다.");
 
         return 0;
     }
