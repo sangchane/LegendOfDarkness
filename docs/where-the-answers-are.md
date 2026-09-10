@@ -202,6 +202,10 @@ dat-extract metafile sources/wren11/Dark-Ages-Private-Server/database/server/met
 확인한 세 개 — 32882 초록 장화 · 32957 청동 방패 · 33002 파란 구슬 귀걸이. 셋 다 `item001.epf`,
 색표는 `item000.pal`(`itempal.tbl` 의 첫 줄이 2395부터라 2394 이하는 색표 0이다).
 
+**돈도 같은 번호 체계다.** `Money.Image = MoneySprites + 0x8000`(`Types/Money.cs:38`) — 금·은·동
+낱개가 137·138·139, 무더기가 140·141·142 이므로 32905~32910 이다. 아이템과 똑같이 `item001.epf`
+의 136~141번 칸이라, 아이콘을 읽는 코드가 돈을 따로 알 필요가 없다.
+
 뽑는 명령: `dat-extract icon <Legend.dat> <번호들> <출력.png> [배율]`.
 `build-client-assets.ps1` 이 서버의 아이템 템플릿을 읽어 번호마다 한 장씩 `assets/item/<번호>.png` 로 둔다.
 

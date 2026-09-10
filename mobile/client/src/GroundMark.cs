@@ -37,8 +37,10 @@ public sealed partial class GroundMark : Node2D
 
         if (Picture is not null)
         {
+            // Lying on the tile, not standing on it: the middle of the picture goes where the middle
+            // of the diamond is, the way a dropped coin sits flat on the floor.
             Vector2 size = Picture.GetSize();
-            DrawTexture(Picture, new Vector2(-size.X / 2, -Standing - size.Y));
+            DrawTexture(Picture, new Vector2(-size.X / 2, -Standing - (size.Y / 2)));
         }
     }
 }

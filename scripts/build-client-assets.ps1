@@ -126,6 +126,12 @@ Get-ChildItem -Path $Items -Filter *.json | ForEach-Object {
     Invoke-Extract @('icon', "$Archives/legend/Legend.dat", "$display", "$Output/item/$display.png", '1')
 }
 
+# 돈도 같은 번호 체계다 — Money.Image = MoneySprites + 0x8000 (Types/Money.cs:38).
+# 템플릿이 아니라 enum 이라 여섯 개를 그대로 적는다: 금·은·동 낱개와 무더기.
+foreach ($coin in 32905, 32906, 32907, 32908, 32909, 32910) {
+    Invoke-Extract @('icon', "$Archives/legend/Legend.dat", "$coin", "$Output/item/$coin.png", '1')
+}
+
 Get-ChildItem -Path $Output -Recurse -Filter *.png | ForEach-Object {
     Write-Output ("  {0}  {1:N0} bytes" -f $_.FullName.Substring($_.FullName.IndexOf('assets')), $_.Length)
 }

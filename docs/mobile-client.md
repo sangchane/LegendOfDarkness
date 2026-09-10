@@ -217,8 +217,10 @@ Start-Process $godot -ArgumentList '--path','mobile/client','--','--login','frie
 
 **안전 가옥의 말벌도 손으로 만든 것이다.** `tmp/hades-run/database/server/templates/monsters/
 insight_1/safehouse_wasp.json` — 저장소의 `sources/` 에는 없다. `AreaID 1`·(23,27)·HP 30·
-`Drops: ["Shagreen Boots"]` 로, 잡으면 반드시 장화를 떨구게 해 뒀다(전투→드랍을 눈으로 보려고).
-`tmp/` 를 지우면 이 말벌도 사라지므로, 다시 만들려면 이 문단이 근거다.
+`Drops: ["Shagreen Boots"]` · `LootType 36`(= `Gold` 32 + `Table` 4) 이라 잡으면 **장화와 돈을** 떨군다.
+돈이 바닥에 남는 것을 보려면 `wren.json` 의 `GameSettings` 에서 `AUTO LOOT GOLD` 를 `false` 로 둬야
+한다 — 켜져 있으면 서버가 곧바로 주워서 "You've Received N coins." 만 뜬다(그렇게 해 뒀다).
+`tmp/` 를 지우면 이 말벌도 설정도 사라지므로, 다시 만들려면 이 문단이 근거다.
 
 ---
 

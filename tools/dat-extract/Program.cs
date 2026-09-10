@@ -522,7 +522,8 @@ internal static class Program
             return 2;
         }
 
-        await Sprites.Save(output, cells, cells.Count, zoom);
+        // 아이콘은 화면 위에 얹는 것이라 바탕을 깔면 검은 사각이 따라다닌다.
+        await Sprites.Save(output, cells, cells.Count, zoom, transparent: true);
         Console.WriteLine($"아이콘 {cells.Count}개를 {output} 에 그렸습니다.");
 
         return 0;
