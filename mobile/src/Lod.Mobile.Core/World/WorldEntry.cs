@@ -13,3 +13,9 @@ public readonly record struct Tile(int X, int Y);
 
 /// <summary>What the server says as soon as a character is admitted: where it is and on what.</summary>
 public sealed record WorldEntry(MapInfo Map, Tile Where);
+
+/// <summary>
+/// Somebody else standing in the world. Only what is needed to draw them: appearance comes later, and the
+/// name arrives past a stretch of the packet we do not read yet.
+/// </summary>
+public sealed record Character(uint Serial, Tile Where, Art.Direction Facing);

@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Collections.Concurrent;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.Protocol;
@@ -24,6 +25,10 @@ public sealed class WorldClient(WorldSession session)
     private const byte RefreshCommand = 0x38;
     private const byte MapChangedCommand = 0x15;
     private const byte LocationCommand = 0x04;
+    private const byte OwnSerialCommand = 0x05;
+    private const byte DisplayCharacterCommand = 0x33;
+    private const byte CreatureWalkedCommand = 0x0C;
+    private const byte RemoveCommand = 0x0E;
 
     private byte _ordinal;
     private byte _step;
@@ -32,6 +37,10 @@ public sealed class WorldClient(WorldSession session)
     // from one moment and a tile from another.
     private volatile WorldEntry? _state;
     private volatile int _reports;
+    private volatile uint _serial;
+
+    // Keyed by serial, which is the only name the server gives them at first.
+    private readonly ConcurrentDictionary<uint, Character> _others = new();
 
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
     public WorldEntry? State => _state;
@@ -41,6 +50,15 @@ public sealed class WorldClient(WorldSession session)
     /// refuses a step — so a rise the client did not ask for means a walk was turned down.
     /// </summary>
     public int PositionReports => _reports;
+
+    /// <summary>
+    /// The serial the server uses for our own character in the world. It is not the number the login
+    /// server handed over — that one only opened the door.
+    /// </summary>
+    public uint Serial => _serial;
+
+    /// <summary>Everyone else the server has shown us, by serial. Our own character is not in here.</summary>
+    public IReadOnlyCollection<Character> Others => (IReadOnlyCollection<Character>)_others.Values;
 
     /// <summary>The direction bytes the server walks by: 0 north, 1 east, 2 south, 3 west.</summary>
     public static byte ToServer(Direction direction) => direction switch
@@ -73,6 +91,26 @@ public sealed class WorldClient(WorldSession session)
                     _reports++;
                     break;
 
+                case OwnSerialCommand:
+                    _serial = BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    // It may arrive after we have already been shown ourselves.
+                    _others.TryRemove(_serial, out _);
+                    continue;
+
+                case DisplayCharacterCommand:
+                    Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
+                    continue;
+
+                case CreatureWalkedCommand:
+                    Moved(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    continue;
+
+                case RemoveCommand:
+                    _others.TryRemove(
+                        BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters)),
+                        out _);
+                    continue;
+
                 default:
                     continue;
             }
@@ -96,6 +134,63 @@ public sealed class WorldClient(WorldSession session)
         session.Connection.SendAsync(
             HadesCipher.EncodeSecured(command, _ordinal++, body, session.Parameters),
             cancellationToken);
+
+    /// <summary>Remembers somebody, unless it is us — the server shows us our own character too.</summary>
+    private void Show(Character character)
+    {
+        if (character.Serial == _serial)
+        {
+            return;
+        }
+
+        _others[character.Serial] = character;
+    }
+
+    /// <summary>
+    /// A step somebody took. The tile in the packet is where they were, not where they are now, so the
+    /// direction has to be applied to it.
+    /// </summary>
+    private void Moved(ReadOnlySpan<byte> body)
+    {
+        if (body.Length < 9)
+        {
+            throw new ProtocolException($"걸음 안내가 9바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        uint serial = BinaryPrimitives.ReadUInt32BigEndian(body);
+        int fromX = BinaryPrimitives.ReadUInt16BigEndian(body[4..]);
+        int fromY = BinaryPrimitives.ReadUInt16BigEndian(body[6..]);
+        Direction facing = FromServer(body[8]);
+
+        (int column, int row) = Facing.TileStep(facing);
+        Character moved = new(serial, new Tile(fromX + column, fromY + row), facing);
+
+        Show(moved);
+    }
+
+    /// <summary>Somebody to draw: where they are, which way they face, and who they are.</summary>
+    private static Character ReadCharacter(ReadOnlySpan<byte> body)
+    {
+        const int fixedLength = 9;
+
+        if (body.Length < fixedLength)
+        {
+            throw new ProtocolException($"사람 안내가 {fixedLength}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        return new Character(
+            BinaryPrimitives.ReadUInt32BigEndian(body[5..]),
+            new Tile(BinaryPrimitives.ReadUInt16BigEndian(body), BinaryPrimitives.ReadUInt16BigEndian(body[2..])),
+            FromServer(body[4]));
+    }
+
+    private static Direction FromServer(byte direction) => direction switch
+    {
+        0 => Direction.North,
+        1 => Direction.East,
+        2 => Direction.South,
+        _ => Direction.West
+    };
 
     /// <summary>Map number, its size in tiles, flags, a spare word, a hash of the file, then its name.</summary>
     private static MapInfo ReadMap(ReadOnlySpan<byte> body)

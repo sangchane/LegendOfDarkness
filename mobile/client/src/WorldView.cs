@@ -14,6 +14,10 @@ namespace LodClient;
 public sealed partial class WorldView(WorldClient? server = null) : Control
 {
     private const string FloorPath = "res://assets/world/safehouse.png";
+    private const string HeroSheet = "res://assets/actor/hero-walk.png";
+
+    // Everyone else wears this until the server's appearance packet is read.
+    private const string OtherSheet = "res://assets/actor/npc-walk.png";
 
     /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in.</summary>
     private const double StepSeconds = 0.28;
@@ -33,6 +37,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private Tile _tile;
     private int _heard = -1;
     private int _rows = 31;
+
+    // Everyone the server has shown us, by the serial it calls them.
+    private readonly Dictionary<uint, Actor> _crowd = [];
 
     private Queue<Direction> _rehearsal = new();
 
@@ -60,15 +67,16 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         AddChild(_camera);
         _camera.AddChild(_floor);
 
-        // Offline the figures stand on the dark rug in the middle of the safe house; connected, the server
-        // says where the player is and this moves them there as soon as it does.
         _tile = new Tile(4, 4);
+        _player = Add(new Actor("수련생", Actor.Sheet.Walk(HeroSheet)), Ground(_tile));
 
-        _player = Add(new Actor("수련생", Actor.Sheet.Walk("res://assets/actor/hero-walk.png")), Ground(_tile));
-        Add(new Actor("주모", Actor.Sheet.Walk("res://assets/actor/npc-walk.png")), Ground(new Tile(6, 4))).Face(Direction.South);
-        Add(new Actor("말벌", Actor.Sheet.Creature("res://assets/actor/wasp.png", 59)), Ground(new Tile(3, 6)));
-
-        if (server is not null)
+        if (server is null)
+        {
+            // Nobody to ask, so stand a couple of figures up to look at.
+            Add(new Actor("주모", Actor.Sheet.Walk(OtherSheet)), Ground(new Tile(6, 4))).Face(Direction.South);
+            Add(new Actor("말벌", Actor.Sheet.Creature("res://assets/actor/wasp.png", 59)), Ground(new Tile(3, 6)));
+        }
+        else
         {
             _ = server.PumpAsync(_leaving.Token);
         }
@@ -125,6 +133,39 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _drawnFrame = -1;
     }
 
+    /// <summary>
+    /// Draws everyone the server has shown us, and stops drawing the ones it has taken away.
+    /// </summary>
+    private void Crowd()
+    {
+        if (server is null)
+        {
+            return;
+        }
+
+        HashSet<uint> present = [];
+
+        foreach (Character one in server.Others)
+        {
+            present.Add(one.Serial);
+
+            if (!_crowd.TryGetValue(one.Serial, out Actor? actor))
+            {
+                actor = Add(new Actor(one.Serial.ToString(), Actor.Sheet.Walk(OtherSheet)), Ground(one.Where));
+                _crowd[one.Serial] = actor;
+            }
+
+            actor.Position = Ground(one.Where);
+            actor.Face(one.Facing);
+        }
+
+        foreach (uint serial in _crowd.Keys.Where(known => !present.Contains(known)).ToList())
+        {
+            _crowd[serial].QueueFree();
+            _crowd.Remove(serial);
+        }
+    }
+
     /// <summary>Takes the server's word for where we are, whenever it gives one.</summary>
     private void Listen()
     {
@@ -151,6 +192,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     public override void _Process(double delta)
     {
         Listen();
+        Crowd();
 
         if (_walked < 0 && _rehearsal.Count > 0)
         {

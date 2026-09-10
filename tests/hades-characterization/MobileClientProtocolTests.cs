@@ -16,6 +16,7 @@ namespace Lod.Hades.Characterization.Tests;
 public sealed class MobileClientProtocolTests
 {
     private const string MobileName = "lodmobile";
+    private const string OtherName = "lodfriend";
 
     /// <summary>
     /// A stalled exchange should fail the test rather than hold the run. One per test, not one for the
@@ -167,6 +168,96 @@ public sealed class MobileClientProtocolTests
         Assert.InRange(after.Where.Y, 0, 30);
     }
 
+    [Fact]
+    public async Task A_second_character_is_seen_and_seen_to_move()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+        LoginFlow.TryCreateAccount(server, OtherName);
+
+        using WorldSession watcher = await LoginAsync(server, MobileName);
+        WorldClient watching = new(watcher);
+        _ = watching.PumpAsync(_deadline.Token);
+
+        await Settled(watching, seen => seen is not null);
+
+        using WorldSession walker = await LoginAsync(server, OtherName);
+        WorldClient walking = new(walker);
+        _ = walking.PumpAsync(_deadline.Token);
+
+        WorldEntry theirStart = await Settled(walking, seen => seen is not null);
+
+        // The number the login server handed over opened the door; the world has its own for a character,
+        // and the server tells each client its own.
+        uint theirSerial = walking.Serial;
+
+        Assert.NotEqual(0u, theirSerial);
+
+        // Both start on the same entry tile, so the watcher should be shown somebody standing on it.
+        Character standing = await Sees(watching, theirSerial);
+
+        Assert.Equal(theirStart.Where, standing.Where);
+
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+        await walking.WalkAsync(Direction.East, _deadline.Token);
+
+        Character stepped = await Sees(watching, theirSerial, one => one.Where != standing.Where);
+
+        Assert.Equal(new Tile(standing.Where.X + 1, standing.Where.Y), stepped.Where);
+        Assert.Equal(Direction.East, stepped.Facing);
+
+        // And we are never in our own list of other people.
+        Assert.DoesNotContain(watching.Others, one => one.Serial == watching.Serial);
+
+        // Leaving takes them off the screen again, which the server says with its own packet.
+        walker.Dispose();
+
+        await Gone(watching, theirSerial);
+    }
+
+    /// <summary>Waits for the watcher to be told somebody left.</summary>
+    private async Task Gone(WorldClient world, uint serial)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            if (world.Others.All(one => one.Serial != serial))
+            {
+                return;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"서버가 {serial} 가 떠났다고 알려주지 않았습니다.");
+    }
+
+    /// <summary>Waits for the watcher to be told about a particular character.</summary>
+    private async Task<Character> Sees(WorldClient world, uint serial, Func<Character, bool>? wanted = null)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            Character? one = world.Others.FirstOrDefault(other => other.Serial == serial);
+
+            if (one is not null && (wanted is null || wanted(one)))
+            {
+                return one;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"서버가 {serial} 를 알려주지 않았습니다. 본 사람: {watchList(world)}");
+
+        static string watchList(WorldClient world) =>
+            string.Join(", ", world.Others.Select(one => $"{one.Serial}@{one.Where}"));
+    }
+
     /// <summary>Waits for the pump to report a state the test is looking for.</summary>
     private async Task<WorldEntry> Settled(
         WorldClient world,
@@ -190,11 +281,11 @@ public sealed class MobileClientProtocolTests
         throw new TimeoutException($"서버가 기다리는 상태를 알려주지 않았습니다. 마지막으로 본 것: {world.State}");
     }
 
-    private Task<WorldSession> LoginAsync(IsolatedHadesServer server) =>
+    private Task<WorldSession> LoginAsync(IsolatedHadesServer server, string? name = null) =>
         HadesLoginClient.LoginAsync(
             IPAddress.Loopback,
             server.LoginPort,
-            MobileName,
+            name ?? MobileName,
             LoginFlow.SyntheticSecret,
             progress: null,
             _deadline.Token);
