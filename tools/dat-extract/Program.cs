@@ -15,6 +15,10 @@ internal static class Program
 {
     // What a wardrobe piece is drawn on unless its own file says wider. Everything but weapons and
     // accessories uses this.
+    /// <summary>Item icons live in files of this many frames; the number the server sends adds 0x8000.</summary>
+    private const int FramesPerItemFile = 266;
+    private const int ItemImageFlag = 0x8000;
+
     private const int WardrobeWidth = 57;
     private const int WardrobeHeight = 85;
 
@@ -27,9 +31,11 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract tiles <seo.dat> <출력.png> <시작> <개수> [가로칸]");
             Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png> [잘라낼 x y 폭 높이]");
             Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
+            Console.Error.WriteLine("        dat-extract list <아카이브.dat> [이름조각]");
             Console.Error.WriteLine("        dat-extract epf <khan.dat> <이름조각> <출력.png> [칸수] [배율] [팔레트.dat]");
             Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명|transparent]");
             Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율] [칸] [색번호|marker] [색표]");
+            Console.Error.WriteLine("        dat-extract icon <Legend.dat> <번호들> <출력.png> [배율]");
             Console.Error.WriteLine("        dat-extract dyeslots <출력.txt>");
             Console.Error.WriteLine("        dat-extract metafile <database/server/metafile/ItemInfo8> [찾을 말]");
             return 2;
@@ -61,7 +67,7 @@ internal static class Program
 
         return command switch
         {
-            "list" => List(entries),
+            "list" => List(entries, args),
             "dump" => await Dump(entries, args),
             "tiles" => await Tiles(entries, args),
             "map" => await RenderMap(entries, args),
@@ -69,6 +75,7 @@ internal static class Program
             "epf" => await RenderEpf(entries, args),
             "mpf" => await RenderMpf(entries, args),
             "pose" => await RenderPose(entries, args),
+            "icon" => await RenderIcon(entries, args),
             _ => Unknown(command)
         };
     }
@@ -88,8 +95,23 @@ internal static class Program
         return entries;
     }
 
-    private static int List(List<ArchivedItem> entries)
+    private static int List(List<ArchivedItem> entries, string[] args)
     {
+        // With a name fragment we want every match by name, not four samples per extension.
+        string filter = args.Length > 2 ? args[2] : string.Empty;
+
+        if (filter.Length > 0)
+        {
+            foreach (ArchivedItem entry in entries
+                .Where(entry => entry.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(entry => entry.Name))
+            {
+                Console.WriteLine($"  {entry.Name}  {entry.Data.Length} bytes");
+            }
+
+            return 0;
+        }
+
         foreach (IGrouping<string, ArchivedItem> group in entries
             .GroupBy(entry => Path.GetExtension(entry.Name).ToLowerInvariant())
             .OrderByDescending(group => group.Count()))
@@ -424,6 +446,84 @@ internal static class Program
 
         await Sprites.Save(output, cells, columns, zoom);
         Console.WriteLine($"{chosen.Count}개 파일 · 프레임 {cells.Count}개를 {output} 에 그렸습니다.");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Draws item icons. The server sends <c>DisplayImage</c>, which carries 0x8000 to say "this is an
+    /// item"; below that is a tile number counted across the <c>item###.epf</c> files at 266 frames each.
+    /// The palette comes from <c>itempal.tbl</c>, written in the same 1-based tile numbers.
+    /// </summary>
+    private static async Task<int> RenderIcon(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("icon 에는 번호들과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string output = Path.GetFullPath(args[3]);
+        int zoom = args.Length > 4 && int.TryParse(args[4], out int given) ? given : 4;
+
+        ArchivedItem? table = entries.FirstOrDefault(entry =>
+            entry.Name.Equals("itempal.tbl", StringComparison.OrdinalIgnoreCase));
+
+        if (table is null)
+        {
+            Console.Error.WriteLine("itempal.tbl 이 이 아카이브에 없습니다.");
+            return 2;
+        }
+
+        List<(byte[] Data, int Width, int Height, Palette Palette)> cells = [];
+
+        foreach (string word in args[2].Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (!int.TryParse(word, out int display))
+            {
+                continue;
+            }
+
+            // The tile number counts from 1, so step back one before splitting it into file and frame.
+            int tile = display >= ItemImageFlag ? display - ItemImageFlag : display;
+            int fileNumber = ((tile - 1) / FramesPerItemFile) + 1;
+            int frameNumber = (tile - 1) % FramesPerItemFile;
+
+            ArchivedItem? file = entries.FirstOrDefault(entry =>
+                entry.Name.Equals($"item{fileNumber:000}.epf", StringComparison.OrdinalIgnoreCase));
+
+            if (file is null)
+            {
+                Console.Error.WriteLine($"  {display}: item{fileNumber:000}.epf 이 없습니다.");
+                continue;
+            }
+
+            Epf.Sheet sheet = Epf.Read(file.Data);
+
+            if (frameNumber >= sheet.Frames.Count)
+            {
+                Console.Error.WriteLine($"  {display}: {file.Name} 에는 칸이 {sheet.Frames.Count}개뿐입니다.");
+                continue;
+            }
+
+            int palette = IconPalettes.PaletteFor(table.Data, tile);
+            Palette colours = Sprites.Named(entries, $"item{palette:000}.pal")
+                              ?? throw new InvalidOperationException($"item{palette:000}.pal 이 없습니다.");
+
+            Epf.Frame frame = sheet.Frames[frameNumber];
+            Console.WriteLine(
+                $"  {display} -> {file.Name} 칸 {frameNumber} · 색표 item{palette:000}.pal · {frame.Width}x{frame.Height}");
+            cells.Add((frame.Data, frame.Width, frame.Height, colours));
+        }
+
+        if (cells.Count == 0)
+        {
+            Console.Error.WriteLine("그릴 아이콘이 없습니다.");
+            return 2;
+        }
+
+        await Sprites.Save(output, cells, cells.Count, zoom);
+        Console.WriteLine($"아이콘 {cells.Count}개를 {output} 에 그렸습니다.");
 
         return 0;
     }
