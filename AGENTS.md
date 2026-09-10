@@ -18,15 +18,20 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 ## 스택
 - 루트: Markdown 문서 + PowerShell 래퍼(`scripts/gt.ps1`), Git submodule, Graphite stacked PR
 - 서버 기준선: C#/.NET 5 — Hades/Lorule (`sources/wren11/Dark-Ages-Private-Server`)
+- 모바일 클라이언트: C#/.NET 9 — 알맹이 `mobile/src/Lod.Mobile.Core`(엔진 없이 시험됨), 화면 `mobile/client`(Godot 4.6 + C#)
 - 웹 실험: TypeScript/Bun + Phaser/Svelte — Medenia (`sources/FallenDev/dark-ages-ts`)
 - 나머지 저장소(C# 도구, C++ 후킹 도구 등): `docs/current-system-analysis/01-repository-inventory.md`
 
 ## 네비게이션 (무엇이 어디에)
 - 다음 할 일(단일 출처): `NEXT.md`
 - 히스토리/핸드오프 로그: `WORKLOG.md`
+- **모바일 클라이언트 — 빌드·실행·인자·함정: `docs/mobile-client.md`** (클라이언트를 만지면 여기부터)
+- 원작 스프라이트 방향·프레임 구간: `docs/original-sprite-animation.md`
+- 화면 배치(세로·가로): `docs/mobile-test-v1-wireframes.md` · 눌러볼 시안: `docs/ui/`
+- 서버 안정화 계획과 결과: `docs/hades-p0-stabilization-plan.md`
 - 스코프 규칙(온디맨드): `sources/CLAUDE.md`
 - 현행 프로젝트 분석서: `docs/current-system-analysis/README.md` (01~09)
-- 실행 절차·체크리스트: `docs/run-procedure.md`
+- 서버 실행 절차·체크리스트: `docs/run-procedure.md`
 - Git/Graphite 작업 규칙: `WORKFLOW.md` · 처음 받기: `README.md`
 
 ## 규약
