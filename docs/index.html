@@ -92,6 +92,11 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .callout p:last-child{margin:0}
 
 @media (max-width:860px){ main{padding:22px 16px 70px} }
+.gallery{display:grid;gap:14px;margin-top:18px}
+.gallery figure{margin:0;display:grid;gap:6px}
+.gallery .plate{border:1px solid var(--edge,#2b3242);background:#0b0e15;overflow-x:auto}
+.gallery img{display:block;image-rendering:pixelated}
+.gallery figcaption{font-size:12px;color:var(--ink-dim,#98a0b0);line-height:1.6}
 </style>
 </head>
 <body>
@@ -115,18 +120,23 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
     <div class="metric"><b>4 / 8</b><span>S1 진행</span></div>
     <div class="metric"><b>6</b><span>화면 시안</span></div>
     <div class="metric"><b>19,243</b><span>읽어낸 원작 타일</span></div>
+    <div class="metric good"><b>21,563</b><span>읽어낸 사람·괴물 그림</span></div>
   </div>
 
   <div class="callout">
-    <p><b>가장 최근에 넘은 고비.</b> 같은 시험 23개를 원본 서버에 돌리면 7개가 실패합니다. 그중 하나는
+    <p><b>가장 최근에 넘은 고비.</b> 원작의 사람과 괴물 그림을 열었습니다. 캐릭터는 몸·옷·모자가
+    따로 저장돼 겹쳐 그리는 방식이고(<code>khan.dat</code> 20,821개), 괴물은 서기·걷기·공격 구간이
+    파일 머리말에 적힌 애니메이션입니다(<code>hades.dat</code> 742개). 이제 시안의 사람은 자리표가
+    아니라 원작 그림입니다.</p>
+    <p><b>그 앞의 고비.</b> 같은 시험 23개를 원본 서버에 돌리면 7개가 실패합니다. 그중 하나는
     악성 패킷 한 개로 서버 프로세스가 통째로 꺼지는 것이었고, 다른 하나는 캐릭터 이름만 골라서 서버가
     쓸 수 있는 아무 위치에나 파일을 만들 수 있는 것이었습니다. 지금은 23개 모두 통과합니다.</p>
   </div>
 
   <h3>다음에 할 일</h3>
   <div class="items">
-    <div class="item"><span class="id">자산</span><span class="what">캐릭터 스프라이트 추출<em>맵은 그려지는데 캐릭터가 없어 시안이 반쪽입니다</em></span><span class="state now">지금</span></div>
-    <div class="item"><span class="id">자산</span><span class="what">벽 타일<em><code>TILEAS.BMP</code>는 고정 크기가 아니라 별도 해석이 필요합니다</em></span><span class="state now">지금</span></div>
+    <div class="item"><span class="id">자산</span><span class="what">벽 타일<em><code>TILEAS.BMP</code>는 고정 크기가 아니라 별도 해석이 필요합니다. 사람과 괴물은 끝났습니다</em></span><span class="state now">지금</span></div>
+    <div class="item"><span class="id">자산</span><span class="what">아이템 아이콘<em>인벤토리 화면에 필요합니다. 캐릭터와 같은 EPF 형식일 가능성이 큽니다</em></span><span class="state wait">대기</span></div>
     <div class="item"><span class="id">P0-14</span><span class="what">송신 큐와 완전 전송<em>느린 수신자에게 패킷이 잘리거나 순서가 뒤집힐 수 있습니다</em></span><span class="state wait">대기</span></div>
     <div class="item"><span class="id">UI</span><span class="what">이동 패드가 화면을 가리는 문제<em>실기기에서 손을 대보고 정해야 합니다</em></span><span class="state wait">결정 필요</span></div>
   </div>
@@ -206,17 +216,18 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
   <h2>화면</h2>
   <p class="dim">
     배치 규칙은 와이어프레임 문서가 정했고, 시안은 그 규칙대로 세운 실제 화면입니다. 아래 두 페이지는
-    브라우저로 열면 직접 눌러볼 수 있습니다.
+    브라우저로 열면 직접 눌러볼 수 있습니다. <b>세로와 가로를 처음부터 함께</b> 만들었으니 두 페이지
+    모두 방향을 바꿔 보세요.
   </p>
   <div class="cards">
     <div class="card">
       <h4>화면 6장</h4>
-      <p>로그인 · 캐릭터 확인 · 기본 게임 · NPC 대화 · 전투 · 인벤토리. 각각 눌러볼 수 있습니다.</p>
+      <p>로그인 · 캐릭터 확인 · 기본 게임 · NPC 대화 · 전투 · 인벤토리. 여섯 장 모두 세로와 가로로 볼 수 있습니다.</p>
       <a href="ui/wireframes.html">ui/wireframes.html 열기</a>
     </div>
     <div class="card">
       <h4>HUD 자세히 보기</h4>
-      <p>터치 영역, 대상 선택, 재사용 대기, HUD 흐리게, 연결 끊김 상태.</p>
+      <p>세로·가로 전환, 방향 버튼으로 실제로 걷기, 터치 영역, 대상 선택, 재사용 대기, 연결 끊김.</p>
       <a href="ui/hud-mockup.html">ui/hud-mockup.html 열기</a>
     </div>
     <div class="card">
@@ -246,10 +257,25 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
       <tr><th>대상</th><th>상태</th><th>비고</th></tr>
       <tr><td>지면 타일</td><td><span class="state done">읽힘</span></td><td class="num">seo.dat 에서 19,243장, 팔레트 74개, 팔레트 표 488개</td></tr>
       <tr><td>맵</td><td><span class="state done">그려짐</span></td><td>맵 5개. 안전 가옥(<code>lod1.map</code>) 30×31칸의 바닥을 실제로 그렸습니다</td></tr>
+      <tr><td>캐릭터</td><td><span class="state done">읽힘</span></td><td>khan.dat 10,417개(남) · khan2.dat 10,404개(여). 몸·옷·모자를 겹쳐 한 사람을 만듭니다</td></tr>
+      <tr><td>괴물</td><td><span class="state done">읽힘</span></td><td>hades.dat 742마리. 서기·걷기·공격 구간이 파일에 적혀 있어 그대로 움직입니다</td></tr>
+      <tr><td>사물</td><td><span class="state done">읽힘</span></td><td>ia.dat 19,664개. 벽걸이·장식장·탁자 같은 실내 물건입니다(압축 해제 필요)</td></tr>
       <tr><td>벽</td><td><span class="state now">미해결</span></td><td><code>TILEAS.BMP</code>는 고정 크기 타일이 아니어서 별도 해석이 필요합니다</td></tr>
-      <tr><td>캐릭터 스프라이트</td><td><span class="state now">미해결</span></td><td>아직 어느 아카이브에 있는지 확정하지 못했습니다</td></tr>
       <tr><td>아이템 아이콘</td><td><span class="state wait">미착수</span></td><td>인벤토리 화면에 필요합니다</td></tr>
+      <tr><td>이야기 삽화·음악</td><td><span class="state wait">미착수</span></td><td>Legend.dat 에 삽화와 음악 165곡</td></tr>
     </table>
+  </div>
+  <div class="gallery">
+    <figure>
+      <div class="plate"><img src="ui/assets/mob-gallery.png" alt="원작 괴물 16종" width="1488" height="486" style="width:1488px;max-width:none"></div>
+      <figcaption><b>괴물 16마리.</b> <code>hades.dat</code>의 742마리 중 열여섯을 골라 서 있는 자세만 뽑았습니다.
+      늑대·거미·기사·상인·해골 등 각자의 팔레트로 칠해집니다.</figcaption>
+    </figure>
+    <figure>
+      <div class="plate"><img src="ui/assets/hero-walk.png" alt="캐릭터 걷기 10칸" width="470" height="83" style="width:940px;max-width:none"></div>
+      <figcaption><b>사람 한 명, 열 자세.</b> 몸(<code>mb00101</code>) 위에 푸른 도포(<code>mi00101</code>)와
+      깃털 모자(<code>MH28501</code>)를 겹쳐 만든 것입니다. 앞의 다섯은 등을 보이고, 뒤의 다섯은 앞을 봅니다.</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -281,6 +307,10 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
   // 커밋 기록. 갱신하려면 이 배열만 고치면 됩니다.
   var COMMITS = [
+    ["6cc6a02", "09-10", "Godot 시안도 세로 방향으로", false],
+    ["cf96eb7", "09-10", "세로 화면을 가로와 같은 무게로 설계", false],
+    ["a2e4417", "09-10", "사람·괴물 그림 형식 해독", false],
+    ["a809ee7", "09-10", "압축된 그림 덩어리를 풀어냄", false],
     ["ee5f5b7", "09-10", "우리 저장소 자료로 맵 바닥을 그림", false],
     ["ed5b403", "09-10", "우리 저장소 아카이브를 읽는 도구", false],
     ["a788de3", "09-10", "원작 화면 위에 HUD 시안", false],
