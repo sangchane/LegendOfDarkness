@@ -472,7 +472,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             {
                 if (!_dropped.TryGetValue(one.Serial, out GroundMark? mark))
                 {
-                    mark = new GroundMark { Name = $"Dropped{one.Serial}" };
+                    mark = new GroundMark
+                    {
+                        Name = $"Dropped{one.Serial}",
+                        Picture = ItemIcons.For(one.Sprite)
+                    };
 
                     _camera.AddChild(mark);
                     _dropped[one.Serial] = mark;

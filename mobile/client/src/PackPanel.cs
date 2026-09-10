@@ -86,17 +86,34 @@ public sealed partial class PackPanel : PanelContainer
 
         foreach (InventoryItem item in carried)
         {
-            _rows.AddChild(new Label
-            {
-                // No icons are cut from the archives yet, so the name has to carry it.
-                Text = item.Stacks > 1 ? $"{item.Name} ×{item.Stacks}" : item.Name,
-                CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
-                VerticalAlignment = VerticalAlignment.Center
-            });
+            _rows.AddChild(Row(item));
         }
 
         _count.Text = $"{carried.Count}가지";
         _count.AddThemeColorOverride("font_color", Greybox.Muted);
+    }
+
+    /// <summary>One carried thing: its picture where there is one, and always its name.</summary>
+    private static Control Row(InventoryItem item)
+    {
+        HBoxContainer row = new() { CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        row.AddThemeConstantOverride("separation", Main.Gutter);
+
+        // A row with no picture still has to line its name up with the rows that do.
+        row.AddChild(new TextureRect
+        {
+            Texture = ItemIcons.For(item.Icon),
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
+            StretchMode = TextureRect.StretchModeEnum.KeepCentered
+        });
+
+        row.AddChild(new Label
+        {
+            Text = item.Stacks > 1 ? $"{item.Name} ×{item.Stacks}" : item.Name,
+            SizeFlagsVertical = SizeFlags.ShrinkCenter
+        });
+
+        return row;
     }
 
     private static string Describe(IReadOnlyList<InventoryItem> carried)

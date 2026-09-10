@@ -13,6 +13,8 @@
 param(
     [string] $Game = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/game",
     [string] $Maps = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/database/server/maps",
+    [string] $Archives = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/database/archives",
+    [string] $Items = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/database/server/templates/items",
     [string] $Output = "$PSScriptRoot/../mobile/client/assets"
 )
 
@@ -107,6 +109,22 @@ Invoke-Extract @('mpf', "$Game/hades.dat", 'MNS001.MPF', "$Output/actor/wasp.png
 # 같은 그림을 서버가 부르는 번호로도 둔다. 서버는 16385 라고 하고, 그림은 MNS001 이다 — 0x4000 을 뺀다.
 New-Item -ItemType Directory -Force -Path "$Output/actor/creature" | Out-Null
 Invoke-Extract @('mpf', "$Game/hades.dat", 'MNS001.MPF', "$Output/actor/creature/mns001.png", '1', 'transparent')
+
+Write-Output 'Drawing item icons...'
+# 서버는 아이템마다 DisplayImage 한 개를 준다. 0x8000 을 빼면 1부터 세는 칸 번호이고,
+# 그 칸은 Legend.dat 의 item###.epf 안에 있다 (한 파일에 266칸). 서버가 가진 템플릿만 뽑는다.
+New-Item -ItemType Directory -Force -Path "$Output/item" | Out-Null
+
+Get-ChildItem -Path $Items -Filter *.json | ForEach-Object {
+    $display = (Get-Content $_.FullName -Raw | ConvertFrom-Json).DisplayImage
+
+    if (-not $display) {
+        Write-Output "  $($_.Name): no DisplayImage, skipped"
+        return
+    }
+
+    Invoke-Extract @('icon', "$Archives/legend/Legend.dat", "$display", "$Output/item/$display.png", '1')
+}
 
 Get-ChildItem -Path $Output -Recurse -Filter *.png | ForEach-Object {
     Write-Output ("  {0}  {1:N0} bytes" -f $_.FullName.Substring($_.FullName.IndexOf('assets')), $_.Length)
