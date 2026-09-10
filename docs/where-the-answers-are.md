@@ -86,7 +86,7 @@ README 가 스스로 AI 로 대량 생성한 것이라고 밝히고 있고, 실�
 없다.
 
 지금 쓰는 드랍은 **Hades 가 만든 것**이다: 괴물 템플릿의 `Drops` → `LootTable(템플릿 이름)` →
-`LootDropper`, 개수는 설정의 `LootTableStackSize`. 바꾸려면 거기를 본다.
+`LootDropper`, 개수는 설정의 `LootTableStackSize`. 실제 파일·줄·숫자는 **4.7 절**에 있다.
 
 **있는 것은 움직임·전투 성향이다** — `MobTile.tbl`(`data/legend-tables/`, 원작 개발자 한글 주석 포함).
 말벌 행: `SFCnt 2 · WFCnt 2 · AFCnt 2 · fStop 0 · fChgDir 1`.
@@ -113,6 +113,57 @@ dat-extract metafile sources/wren11/Dark-Ages-Private-Server/database/server/met
 
 여기에도 **드랍표는 없다**(4.5절). 다만 `Shagreen Boots` 를 찾으면 0줄이 나오는 것으로
 **Hades 가 만든 아이템과 원작 아이템을 가릴 수 있다.**
+
+---
+
+## 4.7 Hades 의 드랍·이동·전투 — 실제 파일과 숫자
+
+4.5 가 "드랍은 Hades 가 정한다"까지 말했다. 어디서 어떻게 정하는지가 여기 있다.
+**규칙은 `src/` 가 아니라 `database/server/scripts/` 의 Roslyn 스크립트에 있다** — 서버 실행 중에
+컴파일된다. `src/` 만 뒤지면 못 찾는다(그래서 한 번 못 찾았다).
+
+### 숫자를 글자로 바꾸는 표
+`database/server/templates/EnumReference.txt` — 템플릿 JSON 의 모든 숫자를 여기서 읽는다.
+`MoodQualifer` `PathQualifer` `LootQualifer` `SpawnQualifer` `ItemFlags` `ItemColor` `TileContent` 등.
+
+### 괴물 템플릿 — 말벌(`templates/monsters/insight_1/bees.json`)
+
+| 칸 | 값 | 뜻 |
+|---|---|---|
+| `Image` | 16385 | `0x4001` — 괴물 그림 번호 |
+| `LootType` | 36 | **깃발 합** = `Gold`(32) + `Table`(4). `Random`(2) 은 꺼져 있다 |
+| `Drops` | `["random"]` | 표에 넣을 후보 고르는 방법 |
+| `PathQualifer` | 1 | `Wander` — 목표가 없으면 아무 데나 |
+| `MoodType` | 4 | `Unpredicable` |
+| `SpawnType` | 4 | `Defined` — `DefinedX/Y` (45, 33) 에 고정 |
+| `MovementSpeed` / `EngagedWalkingSpeed` | 1000 / 1000 | ms. 목표가 생기면 뒤엣것으로 바뀐다 |
+| `AttackSpeed` / `CastSpeed` | 1000 / 8000 | ms |
+| `SpawnMax` / `SpawnRate` | 1 / 1 | 한 마리씩 |
+
+### 드랍이 정해지는 순서
+
+1. `scripts/Creations/monsters.cs:199` — `LootType` 에 `Table` 깃발이 없으면 **표를 아예 안 만든다**.
+2. 같은 파일 `:203` — `Drops` 의 `"random"` 은 **레벨 차 10 이내인 아이템 템플릿 중 하나**를 뽑아 표에 넣는다.
+   이름을 그대로 적으면 그 아이템을 넣는다.
+3. 죽으면 `Monster.GenerateRewards` → 설정의 `MonsterRewardScript` → `scripts/Formulas/monsterexp.cs`.
+4. `monsterexp.cs:131 GenerateDrops()` — `Table` 이면 `LootDropper.Drop(표, Random.Next(3))`.
+   3 은 `LoruleConfig.json` 의 `LootTableStackSize`.
+5. 뽑기 무게는 `ItemTemplate.Weight => DropRate` (`Templates/ItemTemplate.cs:112`). **`DropRate` 가 곧 가중치다.**
+6. 등급은 `UpgradeTable` 8단계(Common~Forsaken)에서 따로 뽑는다.
+7. `Gold` 깃발이 있으면 `GenerateGold()` 가 돈을 따로 떨군다.
+
+말벌(레벨 1)에 실제로 들어갈 수 있는 아이템은 지금 **산호 귀걸이 하나뿐**이다 —
+아이템 템플릿 3개의 `LevelRequired` 가 각각 8 / 31 / 33 이라 10 이내는 8 하나다.
+
+### 이동과 전투
+
+`scripts/Monsters/CommonMonster.cs` — 템플릿의 `ScriptName: "Common Monster"` 가 이 파일이다.
+
+- `HandleMonsterState`(`:227`) 가 시계 셋(`BashTimer` `CastTimer` `WalkTimer`)을 굴린다.
+  목표가 생기면 `WalkTimer.Delay` 를 `EngagedWalkingSpeed` 로 바꾼다.
+- `Walk()`(`:352`) — 목표가 **옆칸이면** 방향을 맞추고 `Bash()`, 아니면 `WalkTo`,
+  길이 막히면 `Wander()`. 목표가 없으면 `Patrol`(`Waypoints` 있을 때)이거나 `Wander()`.
+- 죽으면 `OnDeath`(`:106`) → `GenerateRewards` → 위 순서.
 
 ---
 
