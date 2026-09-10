@@ -50,6 +50,28 @@ public static class HadesCipher
         }
     }
 
+    /// <summary>
+    /// Takes a secured frame apart. The first byte after the command is the ordinal, in the clear, because
+    /// the reader needs it to undo the mixing; everything after it is the enciphered body.
+    /// </summary>
+    public static byte[] DecodeSecured(PacketFrame frame, EncryptionParameters parameters)
+    {
+        ArgumentNullException.ThrowIfNull(frame);
+
+        ReadOnlySpan<byte> data = frame.Data.Span;
+
+        if (data.Length == 0)
+        {
+            throw new ProtocolException($"보안 패킷 0x{frame.Command:X2} 에 서수가 없습니다.");
+        }
+
+        byte[] body = data[1..].ToArray();
+
+        Transform(body, parameters, data[0]);
+
+        return body;
+    }
+
     /// <summary>Builds a secured frame: command and ordinal in the clear, body enciphered.</summary>
     public static byte[] EncodeSecured(byte command, byte ordinal, ReadOnlySpan<byte> body, EncryptionParameters parameters)
     {

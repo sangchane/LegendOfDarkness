@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
     <DefaultItemExcludes>$(DefaultItemExcludes);android/**;build/**</DefaultItemExcludes>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../src/Lod.Mobile.Core/Lod.Mobile.Core.csproj" />
+  </ItemGroup>
+
 </Project>

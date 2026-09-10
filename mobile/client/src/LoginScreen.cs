@@ -1,4 +1,10 @@
+using System.Collections.Concurrent;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using System.IO;
 using Godot;
+using Lod.Mobile.Core.Net;
 
 namespace LodClient;
 
@@ -12,6 +18,12 @@ public partial class LoginScreen : Control
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
     private const int CaptionWidth = 72;
+
+    private readonly ConcurrentQueue<string> _reported = new();
+    private readonly CancellationTokenSource _closing = new();
+
+    private Task<WorldSession>? _attempt;
+    private WorldSession? _session;
 
     private MarginContainer _safeArea = null!;
     private Label _status = null!;
@@ -44,18 +56,80 @@ public partial class LoginScreen : Control
         rows.AddChild(BuildVersionLine());
 
         RefreshSubmitState();
+
+        if (Main.Rehearsal.Username.Length > 0)
+        {
+            _username.Text = Main.Rehearsal.Username;
+            _password.Text = Main.Rehearsal.Password;
+            BeginLogin();
+        }
     }
 
-    /// <summary>Environment on the left, server reachability on the right, both along the top edge.</summary>
+    /// <summary>Environment on the left, which server we will talk to on the right.</summary>
     private static Control BuildStatusRow()
     {
         HBoxContainer row = new() { Name = "StatusRow" };
 
         row.AddChild(Aux("테스트 환경 · 로컬"));
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        row.AddChild(Aux("서버 상태: 연결 가능"));
+        row.AddChild(Aux($"서버 {Main.ServerAddress}:{Main.ServerPort}"));
 
         return row;
+    }
+
+    /// <summary>
+    /// Starts the login and leaves it running. Nothing here touches the tree from the task: progress lands
+    /// in a queue and _Process drains it, because a Godot node may only be changed on the main thread.
+    /// </summary>
+    private void BeginLogin()
+    {
+        if (_attempt is not null)
+        {
+            return;
+        }
+
+        _submit.Disabled = true;
+        _status.Text = "접속하는 중…";
+
+        _attempt = HadesLoginClient.LoginAsync(
+            Main.ServerAddress,
+            Main.ServerPort,
+            _username.Text,
+            _password.Text,
+            new Progress<string>(_reported.Enqueue),
+            _closing.Token);
+    }
+
+    /// <summary>Reports what the login is doing, and what became of it.</summary>
+    private void DrainLogin()
+    {
+        while (_reported.TryDequeue(out string? line))
+        {
+            _status.Text = line;
+        }
+
+        if (_attempt is null || !_attempt.IsCompleted)
+        {
+            return;
+        }
+
+        Task<WorldSession> finished = _attempt;
+        _attempt = null;
+
+        if (finished.IsCompletedSuccessfully)
+        {
+            _session = finished.Result;
+            _status.Text = $"{_session.Character.CharacterName} 님, 월드에 들어왔습니다.";
+            _submit.Text = "접속됨";
+
+            return;
+        }
+
+        // The server's own words when it has them, ours when the socket failed before it could speak.
+        Exception failure = finished.Exception?.GetBaseException() ?? new IOException("알 수 없는 오류");
+
+        _status.Text = failure.Message;
+        _submit.Disabled = false;
     }
 
     private Control BuildForm()
@@ -115,6 +189,7 @@ public partial class LoginScreen : Control
 
         _username.TextChanged += _ => RefreshSubmitState();
         _password.TextChanged += _ => RefreshSubmitState();
+        _submit.Pressed += BeginLogin;
 
         return center;
     }
@@ -171,11 +246,25 @@ public partial class LoginScreen : Control
             : 0;
 
         _safeArea.AddThemeConstantOverride("margin_bottom", Main.SafeInsets.Bottom + lift);
+
+        DrainLogin();
+    }
+
+    public override void _ExitTree()
+    {
+        _closing.Cancel();
+        _session?.Dispose();
+        _closing.Dispose();
     }
 
     /// <summary>No request goes out until both fields carry something, per the wireframe transition rules.</summary>
     private void RefreshSubmitState()
     {
+        if (_attempt is not null || _session is not null)
+        {
+            return;
+        }
+
         bool ready = _username.Text.Length > 0 && _password.Text.Length > 0;
 
         _submit.Disabled = !ready;

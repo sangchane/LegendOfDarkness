@@ -22,6 +22,9 @@ public partial class Main : Control
 
     private const int BodyFontSize = 16;
 
+    /// <summary>Where the login server is, unless --server says otherwise.</summary>
+    private const string DefaultServer = "127.0.0.1:2610";
+
     /// <summary>Logical size of a portrait screen. One unit is one dp here too.</summary>
     private static readonly Vector2I PortraitSize = new(360, 780);
 
@@ -42,9 +45,22 @@ public partial class Main : Control
     /// </summary>
     public static bool Portrait { get; private set; }
 
+    /// <summary>The login server this run talks to. Pass <c>--server host:port</c> to change it.</summary>
+    public static System.Net.IPAddress ServerAddress { get; private set; } = System.Net.IPAddress.Loopback;
+
+    public static int ServerPort { get; private set; }
+
+    /// <summary>
+    /// Credentials to fill in and submit without waiting for typing, as <c>--login name:secret</c>. For
+    /// checking a build against a local server without a device in hand; empty in a normal run.
+    /// </summary>
+    public static (string Username, string Password) Rehearsal { get; private set; } = (string.Empty, string.Empty);
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
+        ReadServer(Flag("--server"));
+        ReadRehearsal(Flag("--login"));
 
         if (Portrait)
         {
@@ -94,6 +110,35 @@ public partial class Main : Control
         }
 
         return string.Empty;
+    }
+
+    /// <summary>Reads <c>host:port</c>, falling back to the local server the run scripts start.</summary>
+    private static void ReadServer(string value)
+    {
+        string[] parts = (value.Length > 0 ? value : DefaultServer).Split(':');
+
+        if (parts.Length != 2
+            || !System.Net.IPAddress.TryParse(parts[0], out System.Net.IPAddress? address)
+            || !int.TryParse(parts[1], out int port))
+        {
+            GD.PushWarning($"--server 를 읽을 수 없어 {DefaultServer} 을 씁니다: {value}");
+            parts = DefaultServer.Split(':');
+            address = System.Net.IPAddress.Parse(parts[0]);
+            port = int.Parse(parts[1]);
+        }
+
+        ServerAddress = address;
+        ServerPort = port;
+    }
+
+    private static void ReadRehearsal(string value)
+    {
+        int split = value.IndexOf(':');
+
+        if (split > 0 && split < value.Length - 1)
+        {
+            Rehearsal = (value[..split], value[(split + 1)..]);
+        }
     }
 
     private static Theme BuildTheme()
