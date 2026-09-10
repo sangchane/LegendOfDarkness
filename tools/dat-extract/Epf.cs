@@ -10,13 +10,19 @@ internal static class Epf
 
     internal sealed record Frame(int Left, int Top, int Width, int Height, byte[] Data);
 
-    public static List<Frame> Read(byte[] blob)
+    /// <summary>
+    /// The frames and the canvas they are placed on. Every drawing sits somewhere inside that canvas, so two
+    /// files only line up with each other when both are laid out on it rather than on their own contents.
+    /// </summary>
+    internal sealed record Sheet(int Width, int Height, List<Frame> Frames);
+
+    public static Sheet Read(byte[] blob)
     {
         using BinaryReader reader = new(new MemoryStream(blob));
 
         int expected = reader.ReadUInt16();
-        reader.ReadUInt16();
-        reader.ReadUInt16();
+        int canvasWidth = reader.ReadUInt16();
+        int canvasHeight = reader.ReadUInt16();
         reader.ReadUInt16();
         long toc = reader.ReadUInt32() + HeaderLength;
 
@@ -63,6 +69,6 @@ internal static class Epf
             frames.Add(new Frame(left, top, width, height, data));
         }
 
-        return frames;
+        return new Sheet(canvasWidth, canvasHeight, frames);
     }
 }

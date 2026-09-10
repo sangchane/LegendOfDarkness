@@ -16,8 +16,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private const string FloorPath = "res://assets/world/safehouse.png";
     private const string HeroSheet = "res://assets/actor/hero-walk.png";
 
-    // Everyone else wears this until the server's appearance packet is read.
+    // Worn by anyone the server has not described — somebody we have only ever seen take a step.
     private const string OtherSheet = "res://assets/actor/npc-walk.png";
+
+    // One drawing per wardrobe piece, all cut on the same cell, so they stack without arithmetic.
+    private const string PartsFolder = "res://assets/actor/parts/";
 
     /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in.</summary>
     private const double StepSeconds = 0.28;
@@ -155,7 +158,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 // only ever seen take a step.
                 string called = one.Name.Length > 0 ? one.Name : one.Serial.ToString();
 
-                actor = Add(new Actor(called, Actor.Sheet.Walk(OtherSheet)), Ground(one.Where));
+                // Somebody who changes clothes is not redressed until they leave and come back; the
+                // server does say so, and this is where to listen when there is anything to wear.
+                actor = Add(new Actor(called, Dress(one)), Ground(one.Where));
                 _crowd[one.Serial] = actor;
             }
 
@@ -168,6 +173,25 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             _crowd[serial].QueueFree();
             _crowd.Remove(serial);
         }
+    }
+
+    /// <summary>
+    /// The pieces somebody is drawn from. A piece we have no picture for is left out rather than left
+    /// blank — the wardrobe in this repository only holds what the world can currently hand out.
+    /// </summary>
+    private static Actor.Sheet Dress(Character one)
+    {
+        if (one.Wearing is null)
+        {
+            return Actor.Sheet.Walk(OtherSheet);
+        }
+
+        string[] pieces = Wardrobe.Pieces(one.Wearing)
+            .Select(piece => $"{PartsFolder}{piece}.png")
+            .Where(path => ResourceLoader.Exists(path))
+            .ToArray();
+
+        return Actor.Sheet.Walk(pieces.Length > 0 ? pieces : [OtherSheet]);
     }
 
     /// <summary>Takes the server's word for where we are, whenever it gives one.</summary>

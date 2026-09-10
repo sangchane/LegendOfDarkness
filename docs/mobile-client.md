@@ -19,7 +19,7 @@
 | 지도·내 위치를 서버에서 받음 | 됨 |
 | 걷기(예측 + 서버 정정) | 됨 |
 | 다른 사람 표시·이동·사라짐 | 됨 |
-| 사람마다 다른 옷 | **안 됨** — 전부 같은 옷 |
+| 사람마다 다른 옷 | **부분** — 서버가 말한 몸·머리·바지·신발·방패·갑옷·도포를 겹쳐 그린다. 무기와 색은 아직 |
 | 괴물·상인·바닥 아이템 | **안 됨** — 이 서버의 안전 가옥에 하나도 없어 확인 불가 |
 | 전투·대화·인벤토리 | **안 됨** — 시안만 있음 |
 
@@ -35,7 +35,7 @@ mobile/
     Net/                          소켓 하나, 로그인 전체 절차
     World/                        월드에 들어간 뒤 — 지도·위치·다른 사람
     Art/                          방향 규칙, 칸 → 화면 좌표
-  tests/Lod.Mobile.Core.Tests/  위의 시험 28개 (서버 없이 돈다)
+  tests/Lod.Mobile.Core.Tests/  위의 시험 42개 (서버 없이 돈다)
   client/                       Godot 4.6 + C#
     src/                          화면들
     assets/                       scripts/build-client-assets.ps1 이 만든 그림
@@ -61,7 +61,7 @@ $dotnet = "$env:DOTNET_ROOT\dotnet.exe"
 ### 시험
 
 ```powershell
-& $dotnet test mobile/tests/Lod.Mobile.Core.Tests/Lod.Mobile.Core.Tests.csproj   # 28개, 몇 초
+& $dotnet test mobile/tests/Lod.Mobile.Core.Tests/Lod.Mobile.Core.Tests.csproj   # 42개, 몇 초
 & $dotnet test tests/hades-characterization/Hades.Characterization.Tests.csproj  # 46개, 약 1분
 ```
 
@@ -108,6 +108,14 @@ $dotnet = "$env:DOTNET_ROOT\dotnet.exe"
 
 `dat-extract`는 **net8.0이라 시스템 dotnet으로 실행한다**(`C:/Program Files/dotnet/dotnet.exe`).
 빌드는 작업공간 SDK로 한다. 스크립트가 이미 그렇게 되어 있다.
+
+**부위 그림을 늘리려면** `build-client-assets.ps1` 위쪽 `$wardrobe` 목록에 번호를 더한다. 아카이브에
+없는 번호는 "없음"만 찍고 넘어간다. 모든 부위를 **같은 칸(`47x83`)** 으로 뽑는 것이 핵심이다 — 칸이
+다르면 모자가 머리에서 벗겨진다. 새 그림을 넣은 뒤에는 Godot 가져오기를 한 번 돌린다:
+
+```powershell
+& '<godot>' --headless --path mobile/client --import
+```
 
 ---
 

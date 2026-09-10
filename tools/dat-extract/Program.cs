@@ -387,7 +387,8 @@ internal static class Program
             Palette palette = Sprites.ForWardrobe(palettes, item.Name, female)
                               ?? Sprites.Named(palettes, "palb000.pal")!;
 
-            List<Epf.Frame> frames = Epf.Read(item.Data);
+            Epf.Sheet sheet = Epf.Read(item.Data);
+            List<Epf.Frame> frames = sheet.Frames;
             Console.WriteLine($"  {item.Name}: 프레임 {frames.Count}개");
 
             foreach (Epf.Frame frame in frames)
@@ -417,7 +418,8 @@ internal static class Program
     {
         if (args.Length < 4)
         {
-            Console.Error.WriteLine("pose 에는 겹칠 이름들과 출력 파일이 필요합니다.");
+            Console.Error.WriteLine(
+                "pose <아카이브> <겹칠 이름들> <출력> [자세들] [확대] [칸 크기 예: 116x92]");
             return 2;
         }
 
@@ -430,6 +432,14 @@ internal static class Program
         int zoom = args.Length > 5 ? int.Parse(args[5]) : 4;
 
         bool female = Path.GetFileName(args[1]).StartsWith("khan2", StringComparison.OrdinalIgnoreCase);
+
+        // The women's archive carries no palettes of its own and shares the men's, so colours are looked
+        // up next door.
+        List<ArchivedItem> palettes =
+            entries.Any(entry => entry.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase))
+                ? entries
+                : await ReadEntries(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "khan.dat"));
+
         List<(Epf.Frame Frame, Palette Palette)>[] stacks = new List<(Epf.Frame, Palette)>[poses.Length];
 
         for (int slot = 0; slot < poses.Length; slot++)
@@ -448,10 +458,19 @@ internal static class Program
                 continue;
             }
 
-            Palette palette = Sprites.ForWardrobe(entries, item.Name, female)
-                              ?? Sprites.Named(entries, "palb000.pal")!;
-            List<Epf.Frame> frames = Epf.Read(item.Data);
-            Console.WriteLine($"  {item.Name}: 프레임 {frames.Count}개, 첫 칸 {frames.FirstOrDefault()?.Left},{frames.FirstOrDefault()?.Top}");
+            Palette? palette = Sprites.ForWardrobe(palettes, item.Name, female)
+                               ?? Sprites.Named(palettes, "palb000.pal");
+
+            if (palette is null)
+            {
+                Console.Error.WriteLine($"  {layer}: 색표를 찾지 못했습니다");
+                return 2;
+            }
+            Epf.Sheet sheet = Epf.Read(item.Data);
+            List<Epf.Frame> frames = sheet.Frames;
+            Console.WriteLine(
+                $"  {item.Name}: 프레임 {frames.Count}개, 바탕 {sheet.Width}x{sheet.Height}, " +
+                $"첫 칸 {frames.FirstOrDefault()?.Left},{frames.FirstOrDefault()?.Top}");
 
             for (int slot = 0; slot < poses.Length; slot++)
             {
@@ -468,8 +487,31 @@ internal static class Program
             return 2;
         }
 
-        int cellWidth = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Left + entry.Frame.Width) + 4;
-        int cellHeight = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Top + entry.Frame.Height) + 4;
+        int drawnWidth = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Left + entry.Frame.Width) + 4;
+        int drawnHeight = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Top + entry.Frame.Height) + 4;
+        int cellWidth = drawnWidth;
+        int cellHeight = drawnHeight;
+
+        // Parts drawn on their own only line up with each other when every sheet uses the same cell: the
+        // frames already share one origin, and a cell fitted to each part's own contents would move it.
+        // Weapons reach far outside the body, so the caller says how big rather than each sheet deciding.
+        if (args.Length > 6)
+        {
+            string[] size = args[6].Split('x', 'X');
+
+            if (size.Length != 2 || !int.TryParse(size[0], out cellWidth) || !int.TryParse(size[1], out cellHeight))
+            {
+                Console.Error.WriteLine($"칸 크기는 '너비x높이' 여야 합니다: {args[6]}");
+                return 2;
+            }
+
+            if (cellWidth < drawnWidth || cellHeight < drawnHeight)
+            {
+                Console.Error.WriteLine(
+                    $"칸 {cellWidth}x{cellHeight} 이 그림 {drawnWidth}x{drawnHeight} 보다 작아 잘립니다.");
+                return 2;
+            }
+        }
 
         // Transparent, because these figures get laid over a map rather than viewed on their own.
         using Image<Rgba32> canvas = new(cellWidth * poses.Length, cellHeight);
