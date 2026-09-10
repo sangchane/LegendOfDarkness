@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -29,12 +30,13 @@ public sealed class IsolatedHadesServer : IDisposable
     private bool _loginOnline;
     private bool _gameOnline;
 
-    private IsolatedHadesServer(string runRoot, string contentLocation, int loginPort, int gamePort)
+    private IsolatedHadesServer(string runRoot, string contentLocation, int loginPort, int gamePort, int objectPort)
     {
         RunRoot = runRoot;
         ContentLocation = contentLocation;
         LoginPort = loginPort;
         GamePort = gamePort;
+        ObjectPort = objectPort;
     }
 
     public string RunRoot { get; }
@@ -45,6 +47,9 @@ public sealed class IsolatedHadesServer : IDisposable
     public int LoginPort { get; }
 
     public int GamePort { get; }
+
+    /// <summary>The object server's port for this run. Its own, so two runs do not collide.</summary>
+    public int ObjectPort { get; }
 
     public static IsolatedHadesServer Prepare()
     {
@@ -57,18 +62,16 @@ public sealed class IsolatedHadesServer : IDisposable
         Directory.CreateDirectory(Path.Combine(contentLocation, CharacterDirectoryName));
         Directory.CreateDirectory(Path.Combine(runRoot, "game"));
 
-        (int loginPort, int gamePort) = ReserveFreePorts();
+        (int loginPort, int gamePort, int objectPort) = ReserveFreePorts();
         WriteIsolatedConfig(runRoot, contentLocation, loginPort, gamePort);
         WriteIsolatedRedirectTable(runRoot, loginPort);
 
-        return new IsolatedHadesServer(runRoot, contentLocation, loginPort, gamePort);
+        return new IsolatedHadesServer(runRoot, contentLocation, loginPort, gamePort, objectPort);
     }
 
     /// <summary>Launches the copied server and waits until both listeners report themselves online.</summary>
     public void Start(TimeSpan readinessTimeout)
     {
-        RequireFreeObjectServerPort();
-
         ProcessStartInfo startInfo = new("dotnet")
         {
             WorkingDirectory = RunRoot,
@@ -78,6 +81,10 @@ public sealed class IsolatedHadesServer : IDisposable
             CreateNoWindow = true
         };
         startInfo.ArgumentList.Add(HadesWorkspace.ServerEntryPoint);
+
+        // The object server's address used to be written into the code, so a machine could hold one server
+        // at a time. It is a configuration key now, and the environment overrides the file.
+        startInfo.Environment["ServerConfig__ObjectServerPort"] = ObjectPort.ToString(CultureInfo.InvariantCulture);
 
         Process process = new() { StartInfo = startInfo, EnableRaisingEvents = true };
         process.OutputDataReceived += (_, e) => Observe(e.Data);
@@ -168,20 +175,6 @@ public sealed class IsolatedHadesServer : IDisposable
         }
     }
 
-    private static void RequireFreeObjectServerPort()
-    {
-        bool taken = IPGlobalProperties.GetIPGlobalProperties()
-            .GetActiveTcpListeners()
-            .Any(endpoint => endpoint.Port == HadesWorkspace.ObjectServerPort);
-
-        if (taken)
-        {
-            throw new InvalidOperationException(
-                $"Port {HadesWorkspace.ObjectServerPort} is already bound, so this server would start without " +
-                "its login listener. Stop the other Hades instance before running the characterization suite.");
-        }
-    }
-
     private static void RequireBuiltServer()
     {
         string entryPoint = Path.Combine(HadesWorkspace.StagingDirectory, HadesWorkspace.ServerEntryPoint);
@@ -236,14 +229,19 @@ public sealed class IsolatedHadesServer : IDisposable
 
     // ponytail: the ports are released before the server binds them; a colliding process would have to
     // grab one inside that window. Retry the whole preparation if that ever shows up as a flake.
-    private static (int LoginPort, int GamePort) ReserveFreePorts()
+    private static (int LoginPort, int GamePort, int ObjectPort) ReserveFreePorts()
     {
         using TcpListener login = new(IPAddress.Loopback, 0);
         using TcpListener game = new(IPAddress.Loopback, 0);
+        using TcpListener objects = new(IPAddress.Loopback, 0);
         login.Start();
         game.Start();
+        objects.Start();
 
-        return (((IPEndPoint)login.LocalEndpoint).Port, ((IPEndPoint)game.LocalEndpoint).Port);
+        return (
+            ((IPEndPoint)login.LocalEndpoint).Port,
+            ((IPEndPoint)game.LocalEndpoint).Port,
+            ((IPEndPoint)objects.LocalEndpoint).Port);
     }
 
     private static void CopyDirectory(string source, string destination, string? skipDirectory = null)

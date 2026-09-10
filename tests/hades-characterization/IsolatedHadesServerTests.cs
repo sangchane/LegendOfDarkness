@@ -89,21 +89,23 @@ public sealed class IsolatedHadesServerTests
         AssertAcceptsConnection(server.GamePort);
     }
 
+    /// <summary>
+    /// The object server's address used to be written into the code, so a machine could hold one server at a
+    /// time and a second came up quietly without its login listener. It is a configuration key now, and each
+    /// run is given its own port.
+    /// </summary>
     [Fact]
-    public void Start_fails_immediately_when_the_hardcoded_object_server_port_is_taken()
+    public void A_run_brings_its_own_object_server_port()
     {
         using TcpListener squatter = new(IPAddress.Loopback, HadesWorkspace.ObjectServerPort);
         squatter.Start();
 
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
 
-        InvalidOperationException error = Assert.Throws<InvalidOperationException>(
-            () => server.Start(TimeSpan.FromSeconds(10)));
+        Assert.NotEqual(HadesWorkspace.ObjectServerPort, server.ObjectPort);
 
-        Assert.Contains(
-            HadesWorkspace.ObjectServerPort.ToString(),
-            error.Message,
-            StringComparison.Ordinal);
+        // The port the code used to insist on is taken, and it no longer matters.
+        server.Start(TimeSpan.FromMinutes(2));
     }
 
     [Fact]

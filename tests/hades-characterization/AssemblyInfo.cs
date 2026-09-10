@@ -1,5 +1,6 @@
 using Xunit;
 
-// The server opens a hardcoded object-server port (2620), so only one isolated instance can run at a
-// time. Without this, xunit runs the test classes in parallel and their servers collide.
-[assembly: CollectionBehavior(DisableTestParallelization = true)]
+// The object server's port used to be written into the server's code, so two isolated instances collided
+// and the suite had to run one class at a time. Each run brings its own port now, so the classes run
+// together — which is most of the difference between three minutes and one.
+[assembly: CollectionBehavior(DisableTestParallelization = false)]
