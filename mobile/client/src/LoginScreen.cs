@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Godot;
 using Lod.Mobile.Core.Net;
+using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
@@ -24,6 +25,9 @@ public partial class LoginScreen : Control
 
     private Task<WorldSession>? _attempt;
     private WorldSession? _session;
+
+    /// <summary>Called on the main thread once the character is in the world.</summary>
+    public Action<WorldSession>? Entered { get; set; }
 
     private MarginContainer _safeArea = null!;
     private Label _status = null!;
@@ -121,6 +125,11 @@ public partial class LoginScreen : Control
             _session = finished.Result;
             _status.Text = $"{_session.Character.CharacterName} 님, 월드에 들어왔습니다.";
             _submit.Text = "접속됨";
+
+            // The world takes the connection from here, so this screen must not close it.
+            WorldSession handed = _session;
+            _session = null;
+            Entered?.Invoke(handed);
 
             return;
         }

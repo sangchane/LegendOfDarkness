@@ -78,9 +78,31 @@ public partial class Main : Control
         Theme = BuildTheme();
         SafeInsets = ComputeSafeInsets(GetViewportRect().Size);
 
-        AddChild(Flag("--screen") == "game" ? new GameScreen() : new LoginScreen());
+        if (Flag("--screen") == "game")
+        {
+            AddChild(new GameScreen());
+        }
+        else
+        {
+            LoginScreen login = new();
+
+            // Deferred, because this runs from the login screen's own frame and the tree may not be changed
+            // in the middle of one.
+            login.Entered = session => Callable.From(() => Enter(login, session)).CallDeferred();
+
+            AddChild(login);
+        }
 
         Screenshot.CaptureIfRequested(this);
+    }
+
+    /// <summary>Swaps the login screen for the world the connection leads to.</summary>
+    private void Enter(LoginScreen login, Lod.Mobile.Core.Net.WorldSession session)
+    {
+        RemoveChild(login);
+        login.QueueFree();
+
+        AddChild(new GameScreen(new Lod.Mobile.Core.World.WorldClient(session)));
     }
 
     /// <summary>A container whose padding keeps its contents inside the safe area.</summary>

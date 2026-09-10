@@ -1,5 +1,6 @@
 using Godot;
 using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
@@ -18,11 +19,15 @@ public partial class GameScreen : Control
     private const int LogHeight = 76;
 
     private WorldView _world = null!;
+    private Label _place = null!;
     private Control _topRow = null!;
     private Control _controlRow = null!;
 
-    public GameScreen()
+    private readonly WorldClient? _server;
+
+    public GameScreen(WorldClient? server = null)
     {
+        _server = server;
         Name = "GameScreen";
         AnchorRight = 1;
         AnchorBottom = 1;
@@ -74,7 +79,7 @@ public partial class GameScreen : Control
     /// </summary>
     private Control BuildWorld(bool fullBleed)
     {
-        _world = new WorldView();
+        _world = new WorldView(_server);
 
         if (fullBleed)
         {
@@ -127,7 +132,7 @@ public partial class GameScreen : Control
 
     /// <summary>Name and health on the left, world state and inventory on the right, on a plate that keeps
     /// them readable over the floor.</summary>
-    private static Control BuildTopRow()
+    private Control BuildTopRow()
     {
         PanelContainer plate = new();
         plate.AddThemeStyleboxOverride("panel", Greybox.Plate());
@@ -139,11 +144,13 @@ public partial class GameScreen : Control
         row.AddChild(BuildHealth());
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
-        // 360 across cannot hold the map name and the connection state as well; the log carries them instead.
+        // Where the server says we are. Offline it stays empty rather than claiming something untrue.
+        _place = Aux(string.Empty);
+
+        // 360 across cannot hold this as well, so in portrait the log carries it instead.
         if (!Main.Portrait)
         {
-            row.AddChild(Aux("안전 가옥"));
-            row.AddChild(Aux("연결됨"));
+            row.AddChild(_place);
         }
 
         row.AddChild(new Button
@@ -155,6 +162,18 @@ public partial class GameScreen : Control
         plate.AddChild(row);
 
         return plate;
+    }
+
+    /// <summary>
+    /// Keeps the place name in step with the server. Nothing else on this screen changes yet, so this is
+    /// the one thing worth watching each frame.
+    /// </summary>
+    public override void _Process(double delta)
+    {
+        if (_world.PlaceName.Length > 0)
+        {
+            _place.Text = $"{_world.PlaceName} · {_world.Standing.X},{_world.Standing.Y}";
+        }
     }
 
     /// <summary>Bar and numbers together: health must never be readable by colour alone.</summary>

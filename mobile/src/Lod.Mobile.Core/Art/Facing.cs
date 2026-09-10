@@ -42,6 +42,16 @@ public readonly record struct Facing(Side Side, bool Mirror)
         _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "알 수 없는 방향입니다.")
     };
 
+    /// <summary>How one step changes the tile the character stands on, as the server counts them.</summary>
+    public static (int Column, int Row) TileStep(Direction direction) => direction switch
+    {
+        Direction.North => (0, -1),
+        Direction.East => (1, 0),
+        Direction.South => (0, 1),
+        Direction.West => (-1, 0),
+        _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "알 수 없는 방향입니다.")
+    };
+
     public static (int X, int Y) Step(Direction direction) => direction switch
     {
         Direction.North => (StepX, -StepY),

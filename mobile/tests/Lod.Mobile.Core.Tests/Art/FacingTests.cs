@@ -43,6 +43,24 @@ public sealed class FacingTests
     }
 
     [Fact]
+    public void A_step_on_screen_is_the_same_step_on_the_floor()
+    {
+        const int rows = 31;
+
+        foreach (Direction direction in Enum.GetValues<Direction>())
+        {
+            (int column, int row) = Facing.TileStep(direction);
+            (int x, int y) = Facing.Step(direction);
+
+            (int fromX, int fromY) = IsometricFloor.Corner(10, 10, rows);
+            (int toX, int toY) = IsometricFloor.Corner(10 + column, 10 + row, rows);
+
+            // The two ways of saying "one step" have to agree, or the figure drifts off the tiles.
+            Assert.Equal((x, y), (toX - fromX, toY - fromY));
+        }
+    }
+
+    [Fact]
     public void Standing_and_walking_frames_stay_inside_their_own_half()
     {
         Assert.Equal(0, WalkMotion.Stand(Side.Back));
