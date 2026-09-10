@@ -10,8 +10,10 @@ public sealed class WardrobeTests
         int armor = 0,
         int boots = 0,
         int shield = 0,
-        int overCoat = 0) =>
-        new(head, body, armor, boots, shield, 0, 0, 0, 0, 0, 0, 0, overCoat);
+        int overCoat = 0,
+        int weapon = 0,
+        int accessory = 0) =>
+        new(head, body, armor, boots, shield, weapon, 0, 0, accessory, 0, 0, 0, overCoat);
 
     [Fact]
     public void A_man_in_nothing_is_still_a_body()
@@ -22,10 +24,12 @@ public sealed class WardrobeTests
     [Fact]
     public void The_shield_goes_behind_and_the_head_on_top()
     {
-        IReadOnlyList<string> pieces = Wardrobe.Pieces(
-            Wearing(head: 3, body: 16 + 2, armor: 61, boots: 1, shield: 6, overCoat: 7));
+        IReadOnlyList<string> pieces = Wardrobe.Pieces(Wearing(
+            head: 3, body: 16 + 2, armor: 61, boots: 1, shield: 6, overCoat: 7, weapon: 20, accessory: 9));
 
-        Assert.Equal(["ms006", "mb001", "mn002", "ml001", "mu061", "mi007", "mh003"], pieces);
+        Assert.Equal(
+            ["ms006", "mb001", "mn002", "ml001", "mu061", "mi007", "mw020", "mh003", "mc009"],
+            pieces);
     }
 
     /// <summary>The head number is a hat above a hundred and hair below it, in the same family of files.</summary>

@@ -42,17 +42,20 @@ New-Item -ItemType Directory -Force -Path "$Output/world", "$Output/actor" | Out
 Write-Output 'Drawing the safe house floor...'
 Invoke-Extract @('map', "$Game/seo.dat", "$Maps/lod1.map", '30', '31', "$Output/world/safehouse.png")
 
+# Every figure and every piece is cut on the same cell, wide enough for a weapon held out to the side.
+# A piece that does not fit stops the run rather than being quietly clipped.
+$cell = '80x88'
+
 Write-Output 'Stacking the wardrobe into figures...'
 # Body, then what it wears, then what it wears on its head — the order the original draws them in.
-Invoke-Extract @('pose', "$Game/khan.dat", 'mb00101,mi00101,MH28501', "$Output/actor/hero-walk.png", '0,1,2,3,4,5,6,7,8,9', '1')
-Invoke-Extract @('pose', "$Game/khan.dat", 'mb00102,mi00102,MH28502', "$Output/actor/hero-attack.png", '0,1,2,3', '1')
-Invoke-Extract @('pose', "$Game/khan.dat", 'mb00101,MU06101,MH28501', "$Output/actor/npc-walk.png", '0,1,2,3,4,5,6,7,8,9', '1')
+Invoke-Extract @('pose', "$Game/khan.dat", 'mb00101,mi00101,MH28501', "$Output/actor/hero-walk.png", '0,1,2,3,4,5,6,7,8,9', '1', $cell)
+Invoke-Extract @('pose', "$Game/khan.dat", 'mb00102,mi00102,MH28502', "$Output/actor/hero-attack.png", '0,1,2,3', '1', $cell)
+Invoke-Extract @('pose', "$Game/khan.dat", 'mb00101,MU06101,MH28501', "$Output/actor/npc-walk.png", '0,1,2,3,4,5,6,7,8,9', '1', $cell)
 
 Write-Output 'Cutting the wardrobe into single pieces...'
 # One file per piece, so the client can dress each person in whatever the server says they are wearing.
 # Every sheet uses the same cell, which is what keeps a hat on a head once they are drawn apart.
 # A number that is not here is simply not drawn — add a line when the world gains the item.
-$cell = '47x83'
 $wardrobe = @('b001', 'n001') + (1..8 | ForEach-Object { 'h{0:000}' -f $_ }) +
     @(
         'l001'  # 신발 — Shagreen Boots (Image 1)

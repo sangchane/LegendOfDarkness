@@ -15,15 +15,21 @@ public sealed partial class Actor : Node2D
     /// drawing sits inside its cell. Wardrobe pieces are cut on one shared cell, so several sheets laid
     /// over each other line up without any further arithmetic.
     /// </summary>
-    public sealed record Sheet(IReadOnlyList<string> Paths, int CellWidth, int CellHeight, int ArtOffset)
+    /// <param name="FeetX">
+    /// Where in the cell the figure stands. A wardrobe cell has room for a weapon held out to one side and
+    /// for the tallest pose, so the figure is nowhere near the middle of it and the cell cannot say where
+    /// the feet are. Both numbers come from scripts/build-client-assets.ps1, which cuts every sheet.
+    /// </param>
+    public sealed record Sheet(
+        IReadOnlyList<string> Paths,
+        int CellWidth,
+        int CellHeight,
+        float FeetX,
+        float FeetY)
     {
-        /// <summary>
-        /// Stacked wardrobe pieces do not land in the middle of their cell — the clothes decide where the
-        /// figure sits — so the offset says how far right of centre it actually is.
-        /// </summary>
-        public static Sheet Walk(params string[] paths) => new(paths, 47, 83, 8);
+        public static Sheet Walk(params string[] paths) => new(paths, 80, 88, 31.5f, 83f);
 
-        public static Sheet Creature(string path, int size) => new([path], size, size, 0);
+        public static Sheet Creature(string path, int size) => new([path], size, size, size / 2f, size);
     }
 
     private readonly List<Sprite2D> _sprites = [];
@@ -33,6 +39,9 @@ public sealed partial class Actor : Node2D
     private int _step;
 
     public string DisplayName { get; }
+
+    /// <summary>Which way the figure is turned, so a replacement can be stood the same way.</summary>
+    public Direction Looking => _direction;
 
     public Actor(string displayName, Sheet sheet)
     {
@@ -52,7 +61,7 @@ public sealed partial class Actor : Node2D
                 RegionEnabled = true,
 
                 // Drawn up and to the left of the origin, so the origin is between the feet.
-                Offset = new Vector2(-(_sheet.CellWidth / 2f) - _sheet.ArtOffset, -_sheet.CellHeight)
+                Offset = new Vector2(-_sheet.FeetX, -_sheet.FeetY)
             };
 
             _sprites.Add(piece);

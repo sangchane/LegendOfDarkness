@@ -19,9 +19,9 @@ public static class Wardrobe
     /// in the list; a caller with no picture for a piece should skip that piece rather than the person.
     /// </summary>
     /// <remarks>
-    /// The weapon is left out on purpose. Its drawings do not sit on the same spot as the rest — a sword
-    /// lands well to the right of the body — and nobody on this server carries one yet, so there is
-    /// nothing to check a guess against.
+    /// The order is the one the reference client adds its pieces in
+    /// (sources/FallenDev/dark-ages-ts/.../paper-doll-container.ts): the shield behind everything, then the
+    /// body and what covers it, then the weapon, then the head.
     /// </remarks>
     public static IReadOnlyList<string> Pieces(Appearance worn)
     {
@@ -37,7 +37,10 @@ public static class Wardrobe
         Add('l', worn.Boots);
         Add('u', worn.Armor);
         Add('i', worn.OverCoat);
+        Add('w', worn.Weapon);
         Add('h', worn.Head);
+        Add('c', worn.HeadAccessory1);
+        Add('c', worn.HeadAccessory2);
 
         return pieces;
 

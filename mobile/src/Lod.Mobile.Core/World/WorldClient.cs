@@ -42,6 +42,8 @@ public sealed class WorldClient(WorldSession session)
     // Keyed by serial, which is the only name the server gives them at first.
     private readonly ConcurrentDictionary<uint, Character> _others = new();
 
+    private volatile Character? _self;
+
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
     public WorldEntry? State => _state;
 
@@ -56,6 +58,12 @@ public sealed class WorldClient(WorldSession session)
     /// server handed over — that one only opened the door.
     /// </summary>
     public uint Serial => _serial;
+
+    /// <summary>
+    /// Our own character as the server describes it — what we are wearing and what it calls us. The server
+    /// shows us to ourselves like anybody else, so this is the same packet everyone else arrives in.
+    /// </summary>
+    public Character? Self => _self;
 
     /// <summary>Everyone else the server has shown us, by serial. Our own character is not in here.</summary>
     public IReadOnlyCollection<Character> Others => (IReadOnlyCollection<Character>)_others.Values;
@@ -93,8 +101,14 @@ public sealed class WorldClient(WorldSession session)
 
                 case OwnSerialCommand:
                     _serial = BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    // It may arrive after we have already been shown ourselves.
-                    _others.TryRemove(_serial, out _);
+
+                    // It may arrive after we have already been shown ourselves, in which case we are
+                    // standing in the crowd under our own name until now.
+                    if (_others.TryRemove(_serial, out Character? mistaken))
+                    {
+                        _self = mistaken;
+                    }
+
                     continue;
 
                 case DisplayCharacterCommand:
@@ -135,16 +149,21 @@ public sealed class WorldClient(WorldSession session)
             HadesCipher.EncodeSecured(command, _ordinal++, body, session.Parameters),
             cancellationToken);
 
-    /// <summary>Remembers somebody, unless it is us — the server shows us our own character too.</summary>
+    /// <summary>Remembers somebody. The server shows us our own character too, and that one is kept apart.</summary>
     private void Show(Character character)
     {
         if (character.Serial == _serial)
         {
+            _self = character;
             return;
         }
 
         _others[character.Serial] = character;
     }
+
+    /// <summary>Whoever we already know by that serial, so a packet without clothes does not undress them.</summary>
+    private Character? Known(uint serial) =>
+        serial == _serial ? _self : _others.GetValueOrDefault(serial);
 
     /// <summary>
     /// A step somebody took. The tile in the packet is where they were, not where they are now, so the
@@ -166,7 +185,7 @@ public sealed class WorldClient(WorldSession session)
         Tile now = new(fromX + column, fromY + row);
 
         // A step says nothing about clothes, so keep the ones we were shown rather than undressing them.
-        Show(_others.TryGetValue(serial, out Character? known)
+        Show(Known(serial) is { } known
             ? known with { Where = now, Facing = facing }
             : new Character(serial, now, facing));
     }

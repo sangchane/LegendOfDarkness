@@ -13,6 +13,11 @@ namespace Lod.DatExtract;
 /// </summary>
 internal static class Program
 {
+    // What a wardrobe piece is drawn on unless its own file says wider. Everything but weapons and
+    // accessories uses this.
+    private const int WardrobeWidth = 57;
+    private const int WardrobeHeight = 85;
+
     private static async Task<int> Main(string[] args)
     {
         if (args.Length < 2)
@@ -440,7 +445,8 @@ internal static class Program
                 ? entries
                 : await ReadEntries(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "khan.dat"));
 
-        List<(Epf.Frame Frame, Palette Palette)>[] stacks = new List<(Epf.Frame, Palette)>[poses.Length];
+        List<(Epf.Frame Frame, Palette Palette, int ShiftX, int ShiftY)>[] stacks =
+            new List<(Epf.Frame, Palette, int, int)>[poses.Length];
 
         for (int slot = 0; slot < poses.Length; slot++)
         {
@@ -472,11 +478,19 @@ internal static class Program
                 $"  {item.Name}: 프레임 {frames.Count}개, 바탕 {sheet.Width}x{sheet.Height}, " +
                 $"첫 칸 {frames.FirstOrDefault()?.Left},{frames.FirstOrDefault()?.Top}");
 
+            // Every piece is centred on the canvas its own file declares, and the plain wardrobe canvas is
+            // 57x85. A weapon or an accessory declares a wider one so it can reach out past the body, and
+            // lining the two centres up is what puts the hilt in a hand instead of a stick beside it. The
+            // atlases the reference client ships agree piece for piece
+            // (sources/FallenDev/dark-ages-ts/apps/client/public/aislings/*.atlas).
+            int shiftX = (Math.Max(sheet.Width, WardrobeWidth) - WardrobeWidth) / 2;
+            int shiftY = (Math.Max(sheet.Height, WardrobeHeight) - WardrobeHeight) / 2;
+
             for (int slot = 0; slot < poses.Length; slot++)
             {
                 if (poses[slot] < frames.Count)
                 {
-                    stacks[slot].Add((frames[poses[slot]], palette));
+                    stacks[slot].Add((frames[poses[slot]], palette, shiftX, shiftY));
                 }
             }
         }
@@ -487,8 +501,10 @@ internal static class Program
             return 2;
         }
 
-        int drawnWidth = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Left + entry.Frame.Width) + 4;
-        int drawnHeight = stacks.SelectMany(stack => stack).Max(entry => entry.Frame.Top + entry.Frame.Height) + 4;
+        int drawnWidth = stacks.SelectMany(stack => stack)
+            .Max(entry => entry.Frame.Left - entry.ShiftX + entry.Frame.Width) + 4;
+        int drawnHeight = stacks.SelectMany(stack => stack)
+            .Max(entry => entry.Frame.Top - entry.ShiftY + entry.Frame.Height) + 4;
         int cellWidth = drawnWidth;
         int cellHeight = drawnHeight;
 
@@ -518,7 +534,7 @@ internal static class Program
 
         for (int slot = 0; slot < poses.Length; slot++)
         {
-            foreach ((Epf.Frame frame, Palette palette) in stacks[slot])
+            foreach ((Epf.Frame frame, Palette palette, int pieceX, int pieceY) in stacks[slot])
             {
                 Sprites.Blit(
                     canvas,
@@ -526,8 +542,8 @@ internal static class Program
                     frame.Width,
                     frame.Height,
                     palette,
-                    (slot * cellWidth) + 2 + frame.Left,
-                    2 + frame.Top);
+                    (slot * cellWidth) + 2 + frame.Left - pieceX,
+                    2 + frame.Top - pieceY);
             }
         }
 

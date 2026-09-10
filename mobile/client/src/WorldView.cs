@@ -33,6 +33,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private readonly CancellationTokenSource _leaving = new();
 
     private Actor _player = null!;
+
+    // Our own figure starts in borrowed clothes because the server has not spoken yet.
+    private bool _wearingOwn;
     private Vector2 _floorSize;
 
     // The tile we believe we are on. A walk moves it straight away, because the server answers an allowed
@@ -194,6 +197,33 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         return Actor.Sheet.Walk(pieces.Length > 0 ? pieces : [OtherSheet]);
     }
 
+    /// <summary>
+    /// Puts our own figure into what the server says we are wearing. It describes us like anybody else, but
+    /// only after we are already standing there, so the figure has to be built again once it does.
+    /// </summary>
+    private void Wear()
+    {
+        if (_wearingOwn || server?.Self is not { Wearing: not null } mine)
+        {
+            return;
+        }
+
+        _wearingOwn = true;
+
+        Direction looking = _player.Looking;
+
+        Actor dressed = new(mine.Name.Length > 0 ? mine.Name : _player.DisplayName, Dress(mine))
+        {
+            Position = _player.Position
+        };
+
+        _camera.AddChild(dressed);
+        _player.QueueFree();
+
+        _player = dressed;
+        _player.Face(looking);
+    }
+
     /// <summary>Takes the server's word for where we are, whenever it gives one.</summary>
     private void Listen()
     {
@@ -220,6 +250,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     public override void _Process(double delta)
     {
         Listen();
+        Wear();
         Crowd();
 
         if (_walked < 0 && _rehearsal.Count > 0)
