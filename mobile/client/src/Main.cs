@@ -81,6 +81,9 @@ public partial class Main : Control
     /// <summary>Whether to swing once after picking somebody, as <c>--strike</c>.</summary>
     public static bool Striking { get; private set; }
 
+    /// <summary>Whether to press the first carried thing once the pack is open, as <c>--wear</c>.</summary>
+    public static bool Wearing { get; private set; }
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
@@ -91,6 +94,10 @@ public partial class Main : Control
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
+        Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
+
+        // 입어 보려면 소지품이 열려 있어야 한다 — 따로 적게 하지 않는다.
+        OpeningPack = OpeningPack || Wearing;
 
         // --size wins over the orientation's own default, so a check can walk several shapes of screen.
         Vector2I? asked = SizeFromCommandLine();

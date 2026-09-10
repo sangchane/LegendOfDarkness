@@ -57,6 +57,9 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>The button that shuts the panel, so whoever opened it can decide what that means.</summary>
     public Button Close { get; }
 
+    /// <summary>Somebody pressed a carried thing. The slot is what the server wants; the rest is its business.</summary>
+    public event System.Action<int>? Used;
+
     /// <summary>Shows what is being carried, or says plainly that nothing is.</summary>
     public void Show(IReadOnlyList<InventoryItem> carried)
     {
@@ -86,32 +89,63 @@ public sealed partial class PackPanel : PanelContainer
 
         foreach (InventoryItem item in carried)
         {
-            _rows.AddChild(Row(item));
+            _rows.AddChild(Row(item, () => Used?.Invoke(item.Slot)));
         }
 
         _count.Text = $"{carried.Count}가지";
         _count.AddThemeColorOverride("font_color", Greybox.Muted);
     }
 
-    /// <summary>One carried thing: its picture where there is one, and always its name.</summary>
-    private static Control Row(InventoryItem item)
+    /// <summary>
+    /// Presses the first carried thing, as a hand would. Only for a run with no hand on it — it goes
+    /// through the same button so the wiring is checked, not bypassed.
+    /// </summary>
+    public bool PressFirst()
     {
-        HBoxContainer row = new() { CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
-        row.AddThemeConstantOverride("separation", Main.Gutter);
+        foreach (Node row in _rows.GetChildren())
+        {
+            if (row is Button button)
+            {
+                button.EmitSignal(BaseButton.SignalName.Pressed);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>One carried thing: its picture where there is one, and always its name. Pressing it uses it.</summary>
+    private static Control Row(InventoryItem item, System.Action pressed)
+    {
+        // A button rather than a label: the whole row is the target, which is what a thumb expects.
+        Button row = new()
+        {
+            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+            Flat = true
+        };
+
+        row.Pressed += pressed;
+
+        HBoxContainer line = new() { MouseFilter = Control.MouseFilterEnum.Ignore };
+        line.SetAnchorsPreset(LayoutPreset.FullRect);
+        line.AddThemeConstantOverride("separation", Main.Gutter);
 
         // A row with no picture still has to line its name up with the rows that do.
-        row.AddChild(new TextureRect
+        line.AddChild(new TextureRect
         {
             Texture = ItemIcons.For(item.Icon),
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
             StretchMode = TextureRect.StretchModeEnum.KeepCentered
         });
 
-        row.AddChild(new Label
+        line.AddChild(new Label
         {
             Text = item.Stacks > 1 ? $"{item.Name} ×{item.Stacks}" : item.Name,
             SizeFlagsVertical = SizeFlags.ShrinkCenter
         });
+
+        row.AddChild(line);
 
         return row;
     }

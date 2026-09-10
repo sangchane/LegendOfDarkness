@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json.Nodes;
 using Darkages.Network;
 using Darkages.Security;
 using Lod.Mobile.Core.Net;
@@ -96,6 +97,41 @@ public sealed class MobileClientProtocolTests
         // LoruleConfig.json drops a new character.
         Assert.Equal(new MapInfo(1, 30, 31, "Safe House"), entry.Map);
         Assert.Equal(new Tile(4, 4), entry.Where);
+    }
+
+    [Fact]
+    public async Task Wearing_something_changes_how_the_server_describes_us()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+
+        // 새 계정의 소지품은 비어 있다. 채팅 명령 `/give` 는 운영자만 쓸 수 있고 인용부호까지
+        // 얽히므로, 서버가 접속할 때 읽는 파일에 직접 넣는다 — 문서가 말하는 방법 그대로다.
+        PutBootsInThePack(server, MobileName);
+
+        using WorldSession session = await LoginAsync(server);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Settled(world, seen => seen is not null);
+
+        Character before = (await Mine(world))!;
+
+        InventoryItem boots = await Carried(world, "Shagreen Boots");
+
+        await world.UseAsync(boots.Slot, _deadline.Token);
+
+        // The server answers a piece of clothing by describing us again — that is what redraws the figure.
+        Character after = await Changed(world, before.Wearing);
+
+        Assert.NotEqual(before.Wearing, after.Wearing);
+
+        // Boot.cs sets Aisling.Boots to the item template's Image, and this template's is 1.
+        Assert.Equal(0, before.Wearing!.Boots);
+        Assert.Equal(1, after.Wearing!.Boots);
     }
 
     [Fact]
@@ -262,6 +298,71 @@ public sealed class MobileClientProtocolTests
         }
 
         throw new TimeoutException($"서버가 {serial} 가 떠났다고 알려주지 않았습니다.");
+    }
+
+    /// <summary>
+    /// Puts one pair of boots in a freshly created character's first pack slot, and raises the character
+    /// to the level the boots ask for. The server fills in the rest of the template by name when it loads
+    /// the character, so only the name and the slot matter.
+    /// </summary>
+    private static void PutBootsInThePack(IsolatedHadesServer server, string name)
+    {
+        string path = Path.Combine(server.ContentLocation, "aislings", $"{name}.json");
+        JsonNode saved = JsonNode.Parse(File.ReadAllText(path))!;
+
+        // 이 신발은 33레벨을 요구한다(GameClient.CheckReqs). 새 계정은 1레벨이라 그대로면 못 신는다.
+        saved["ExpLevel"] = 33;
+
+        saved["Inventory"]!["Items"]!["1"] = new JsonObject
+        {
+            ["Template"] = new JsonObject { ["Name"] = "Shagreen Boots" },
+            ["Slot"] = 1,
+            ["Image"] = 1,
+            ["DisplayImage"] = 32882,
+            ["Color"] = 1,
+            ["Stacks"] = 1,
+            ["Durability"] = 100,
+        };
+
+        File.WriteAllText(path, saved.ToJsonString());
+    }
+
+    /// <summary>Waits until something by that name is in the pack.</summary>
+    private async Task<InventoryItem> Carried(WorldClient world, string called)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            InventoryItem? found = world.Pack.FirstOrDefault(item => item.Name == called);
+
+            if (found is not null)
+            {
+                return found;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"소지품에 {called} 가 들어오지 않았습니다. 든 것: {world.Pack.Count}가지. 서버가 한 말({world.SaidCount}번): {world.Said}");
+    }
+
+    /// <summary>Waits until the server describes us as wearing something other than this.</summary>
+    private async Task<Character> Changed(WorldClient world, Appearance? before)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            if (world.Self is { Wearing: not null } now && now.Wearing != before)
+            {
+                return now;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"서버가 겉모습을 다시 알려주지 않았습니다. 마지막: {world.Self?.Wearing}");
     }
 
     /// <summary>Waits until the server has said which character is ours.</summary>

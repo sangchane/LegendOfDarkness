@@ -40,7 +40,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private Actor _player = null!;
 
     // Our own figure starts in borrowed clothes because the server has not spoken yet.
-    private bool _wearingOwn;
+    // 우리 자신이 마지막으로 그려졌을 때 입고 있던 것. 아직 아무것도 못 들었으면 null 이 아니라
+    // 없음이라, 사전과 달리 값 하나로 둔다.
+    private Appearance? _wearingOwn;
+    private bool _dressedOnce;
     private Vector2 _floorSize;
 
     // The tile we believe we are on. A walk moves it straight away, because the server answers an allowed
@@ -51,6 +54,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     // Everyone the server has shown us, by the serial it calls them.
     private readonly Dictionary<uint, Actor> _crowd = [];
+
+    // 마지막으로 그렸을 때 무엇을 입고 있었는지. 서버가 갈아입은 사람을 다시 알려 주면 이것과
+    // 달라지고, 그때만 그림을 새로 짓는다 — 매 프레임 다시 지으면 걸음이 끊긴다.
+    private readonly Dictionary<uint, Appearance?> _worn = [];
 
     // Everything else standing on the floor — monsters, merchants — by the same kind of serial.
     private readonly Dictionary<uint, Actor> _herd = [];
@@ -285,6 +292,15 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             present.Add(one.Serial);
 
+            // 갈아입었으면 그리던 것을 버리고 다시 짓는다.
+            if (_crowd.TryGetValue(one.Serial, out Actor? standing)
+                && _worn.TryGetValue(one.Serial, out Appearance? before)
+                && before != one.Wearing)
+            {
+                standing.QueueFree();
+                _crowd.Remove(one.Serial);
+            }
+
             if (!_crowd.TryGetValue(one.Serial, out Actor? actor))
             {
                 // The server gives a name with the appearance; a serial is only for somebody we have
@@ -295,6 +311,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 // server does say so, and this is where to listen when there is anything to wear.
                 actor = Add(new Actor(called, Dress(one)), Ground(one.Where));
                 _crowd[one.Serial] = actor;
+                _worn[one.Serial] = one.Wearing;
             }
 
             actor.Position = Ground(one.Where);
@@ -305,6 +322,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             _crowd[serial].QueueFree();
             _crowd.Remove(serial);
+            _worn.Remove(serial);
         }
 
         Mark();
@@ -352,12 +370,18 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     private void Wear()
     {
-        if (_wearingOwn || server?.Self is not { Wearing: not null } mine)
+        if (server?.Self is not { Wearing: not null } mine)
         {
             return;
         }
 
-        _wearingOwn = true;
+        if (_dressedOnce && _wearingOwn == mine.Wearing)
+        {
+            return;
+        }
+
+        _wearingOwn = mine.Wearing;
+        _dressedOnce = true;
 
         Direction looking = _player.Looking;
 

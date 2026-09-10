@@ -32,6 +32,9 @@ public partial class GameScreen : Control
 
     // 손 없이 확인할 때 스스로 열어 보기 위한 것. 월드가 자리를 잡을 때까지 센다.
     private int _settling;
+
+    // 리허설로 한 번만 입어 본다.
+    private bool _worn;
     private Control _topRow = null!;
     private Control _controlRow = null!;
 
@@ -69,6 +72,7 @@ public partial class GameScreen : Control
         _topRow = BuildTopRow();
         _pack = new PackPanel();
         _pack.Close.Pressed += () => Carrying(false);
+        _pack.Used += slot => _ = _server?.UseAsync(slot, System.Threading.CancellationToken.None);
 
         if (Main.Portrait)
         {
@@ -288,6 +292,13 @@ public partial class GameScreen : Control
         if (_pack.Visible)
         {
             _pack.Show(_server?.Pack ?? []);
+
+            // 손 없이 확인할 때만. 목록이 채워진 다음 프레임에 첫 줄을 한 번 누른다.
+            if (Main.Wearing && !_worn && _pack.PressFirst())
+            {
+                _worn = true;
+                GD.Print("GREYBOX_WORE 첫 줄을 눌렀다");
+            }
         }
     }
 

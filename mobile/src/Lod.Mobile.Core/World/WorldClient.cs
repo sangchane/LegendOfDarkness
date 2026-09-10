@@ -36,6 +36,7 @@ public sealed class WorldClient(WorldSession session)
     private const byte SpokenCommand = 0x0A;
     private const byte BodyMotionCommand = 0x1A;
     private const byte TalkCommand = 0x0E;
+    private const byte UseCommand = 0x1C;
 
     private byte _ordinal;
     private byte _step;
@@ -256,6 +257,14 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public Task AttackAsync(CancellationToken cancellationToken) =>
         Send(AttackCommand, [], cancellationToken);
+
+    /// <summary>
+    /// Uses what is in one pack slot. What that means is the item's own business — boots are worn,
+    /// food is eaten — so nothing is assumed here beyond the slot number. The server answers a piece
+    /// of clothing by describing us again, which is how the figure comes to be redrawn.
+    /// </summary>
+    public Task UseAsync(int slot, CancellationToken cancellationToken) =>
+        Send(UseCommand, [(byte)slot], cancellationToken);
 
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>
