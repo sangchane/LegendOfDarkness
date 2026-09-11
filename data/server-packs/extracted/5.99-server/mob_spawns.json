@@ -1,0 +1,4028 @@
+[
+ {
+  "맵": "아벨해안1-A",
+  "괴물": "퐁퐁이1",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안1-A",
+  "괴물": "터틀1",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안1-A",
+  "괴물": "크라켄1",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-A",
+  "괴물": "퐁퐁이2",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-A",
+  "괴물": "터틀2",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-A",
+  "괴물": "크라켄2",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-A",
+  "괴물": "그래브",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-A",
+  "괴물": "슬러그1",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-A",
+  "괴물": "일1",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-A",
+  "괴물": "바크",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-A",
+  "괴물": "일2",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-A",
+  "괴물": "슬러그2",
+  "마리수": "13",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-A",
+  "괴물": "문어",
+  "마리수": "16",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-A",
+  "괴물": "애스코모이드",
+  "마리수": "16",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-A",
+  "괴물": "슬러그",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-A",
+  "괴물": "문어",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-A",
+  "괴물": "애스코모이드",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-A",
+  "괴물": "킹아크퍼스1",
+  "마리수": "1",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-A",
+  "괴물": "킹아크퍼스2",
+  "마리수": "1",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안1-B",
+  "괴물": "퐁퐁이1",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안1-B",
+  "괴물": "터틀1",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안1-B",
+  "괴물": "크라켄1",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-B",
+  "괴물": "퐁퐁이2",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-B",
+  "괴물": "터틀2",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-B",
+  "괴물": "크라켄2",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-B",
+  "괴물": "그래브",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-B",
+  "괴물": "슬러그1",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-B",
+  "괴물": "일1",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-B",
+  "괴물": "바크",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-B",
+  "괴물": "일2",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-B",
+  "괴물": "슬러그2",
+  "마리수": "13",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-B",
+  "괴물": "문어",
+  "마리수": "16",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-B",
+  "괴물": "애스코모이드",
+  "마리수": "16",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-B",
+  "괴물": "슬러그",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-B",
+  "괴물": "문어",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-B",
+  "괴물": "애스코모이드",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-A",
+  "괴물": "킹아크퍼스1",
+  "마리수": "1",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-A",
+  "괴물": "킹아크퍼스2",
+  "마리수": "1",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-C",
+  "괴물": "퐁퐁이2",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-C",
+  "괴물": "터틀2",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-C",
+  "괴물": "크라켄2",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-C",
+  "괴물": "그래브",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-C",
+  "괴물": "슬러그1",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-C",
+  "괴물": "일1",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안2-C",
+  "괴물": "바크",
+  "마리수": "9",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-C",
+  "괴물": "일2",
+  "마리수": "6",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-C",
+  "괴물": "슬러그2",
+  "마리수": "13",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-C",
+  "괴물": "문어",
+  "마리수": "16",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안3-C",
+  "괴물": "애스코모이드",
+  "마리수": "16",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-C",
+  "괴물": "슬러그",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-C",
+  "괴물": "문어",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-C",
+  "괴물": "애스코모이드",
+  "마리수": "12",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-C",
+  "괴물": "킹아크퍼스1",
+  "마리수": "1",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "아벨해안4-C",
+  "괴물": "킹아크퍼스2",
+  "마리수": "1",
+  "출처": "mob/Abel/Abel_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "그림록1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "그림록병사1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "그림록근위병1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "광산드워프1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "오크가드1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "오크전사1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "오크병사1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-1갱도",
+  "괴물": "드라코1",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "그림록2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "그림록병사2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "그림록근위병2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "광산드워프2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "오크가드2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "오크전사2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "오크병사2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-2갱도",
+  "괴물": "드라코2",
+  "마리수": "30",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "헬법사",
+  "마리수": "10",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "헬도적",
+  "마리수": "10",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "헬전사",
+  "마리수": "10",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "그림록퀸",
+  "마리수": "10",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "헬직자",
+  "마리수": "10",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "헬도가",
+  "마리수": "10",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "오크전사3",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "오크병사3",
+  "마리수": "20",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "카스마늄제1-3갱도",
+  "괴물": "드라코3",
+  "마리수": "10",
+  "출처": "mob/Casmanum/Casmanum_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-1",
+  "괴물": "트리변장홉고블린1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-1",
+  "괴물": "루돌프변장늑대인간1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-1",
+  "괴물": "산타옷늑대1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-1",
+  "괴물": "크리스마스니에1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-1",
+  "괴물": "목도리니에1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-1",
+  "괴물": "설원의늑대1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-1",
+  "괴물": "크리스마스스켈레톤1",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-2",
+  "괴물": "트리변장홉고블린1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-2",
+  "괴물": "루돌프변장늑대인간1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-2",
+  "괴물": "산타옷늑대1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-2",
+  "괴물": "크리스마스니에1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-2",
+  "괴물": "목도리니에1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-2",
+  "괴물": "설원의늑대1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-2",
+  "괴물": "크리스마스스켈레톤1",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-3",
+  "괴물": "트리변장홉고블린1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-3",
+  "괴물": "루돌프변장늑대인간1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-3",
+  "괴물": "산타옷늑대1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-3",
+  "괴물": "크리스마스니에1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-3",
+  "괴물": "목도리니에1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-3",
+  "괴물": "설원의늑대1",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리1-3",
+  "괴물": "크리스마스스켈레톤1",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-1",
+  "괴물": "트리변장홉고블린2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-1",
+  "괴물": "루돌프변장늑대인간2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-1",
+  "괴물": "산타옷늑대2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-1",
+  "괴물": "크리스마스니에2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-1",
+  "괴물": "목도리니에2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-1",
+  "괴물": "설원의늑대2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-1",
+  "괴물": "크리스마스스켈레톤2",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-2",
+  "괴물": "트리변장홉고블린2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-2",
+  "괴물": "루돌프변장늑대인간2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-2",
+  "괴물": "산타옷늑대2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-2",
+  "괴물": "크리스마스니에2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-2",
+  "괴물": "목도리니에2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-2",
+  "괴물": "설원의늑대2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-2",
+  "괴물": "크리스마스스켈레톤2",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-3",
+  "괴물": "트리변장홉고블린2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-3",
+  "괴물": "루돌프변장늑대인간2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-3",
+  "괴물": "산타옷늑대2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-3",
+  "괴물": "크리스마스니에2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-3",
+  "괴물": "목도리니에2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-3",
+  "괴물": "설원의늑대2",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리2-3",
+  "괴물": "크리스마스스켈레톤2",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-1",
+  "괴물": "트리변장홉고블린3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-1",
+  "괴물": "루돌프변장늑대인간3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-1",
+  "괴물": "산타옷늑대3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-1",
+  "괴물": "크리스마스니에3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-1",
+  "괴물": "목도리니에3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-1",
+  "괴물": "설원의늑대3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-1",
+  "괴물": "크리스마스스켈레톤3",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-2",
+  "괴물": "트리변장홉고블린3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-2",
+  "괴물": "루돌프변장늑대인간3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-2",
+  "괴물": "산타옷늑대3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-2",
+  "괴물": "크리스마스니에3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-2",
+  "괴물": "목도리니에3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-2",
+  "괴물": "설원의늑대3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-2",
+  "괴물": "크리스마스스켈레톤3",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-3",
+  "괴물": "트리변장홉고블린3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-3",
+  "괴물": "루돌프변장늑대인간3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-3",
+  "괴물": "산타옷늑대3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-3",
+  "괴물": "크리스마스니에3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-3",
+  "괴물": "목도리니에3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-3",
+  "괴물": "설원의늑대3",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리3-3",
+  "괴물": "크리스마스스켈레톤3",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-1",
+  "괴물": "트리변장홉고블린4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-1",
+  "괴물": "루돌프변장늑대인간4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-1",
+  "괴물": "산타옷늑대4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-1",
+  "괴물": "크리스마스니에4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-1",
+  "괴물": "목도리니에4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-1",
+  "괴물": "설원의늑대4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-1",
+  "괴물": "크리스마스스켈레톤4",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-2",
+  "괴물": "트리변장홉고블린4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-2",
+  "괴물": "루돌프변장늑대인간4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-2",
+  "괴물": "산타옷늑대4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-2",
+  "괴물": "크리스마스니에4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-2",
+  "괴물": "목도리니에4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-2",
+  "괴물": "설원의늑대4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-2",
+  "괴물": "크리스마스스켈레톤4",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-3",
+  "괴물": "트리변장홉고블린4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-3",
+  "괴물": "루돌프변장늑대인간4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-3",
+  "괴물": "산타옷늑대4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-3",
+  "괴물": "크리스마스니에4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-3",
+  "괴물": "목도리니에4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-3",
+  "괴물": "설원의늑대4",
+  "마리수": "8",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "마운틴메리4-3",
+  "괴물": "크리스마스스켈레톤4",
+  "마리수": "2",
+  "출처": "mob/Christmas/Christmas_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "백작부인",
+  "마리수": "1",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서1",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서1",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서1",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서1",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서1",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서1",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서2",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서2",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서2",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서2",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서2",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서2",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서3",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서3",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서3",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서3",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서3",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서3",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서4",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서4",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서4",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서4",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서4",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서4",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서5",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서5",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서5",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서5",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서5",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서5",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서6",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서6",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서6",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서6",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서6",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서6",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서7",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서7",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서7",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서7",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서7",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서7",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서8",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서8",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서8",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서8",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서8",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서8",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서9",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서9",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서9",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서9",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서9",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서9",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서10",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서10",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서10",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서10",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서10",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서10",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서11",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서11",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서11",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서11",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서11",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서11",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서12",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서12",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서12",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서12",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서12",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서12",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서13",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서13",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서13",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서13",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서13",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서13",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서14",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서14",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서14",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서14",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서14",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서14",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서15",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서15",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서15",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서15",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서15",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서15",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서16",
+  "괴물": "로밍래더4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서16",
+  "괴물": "로밍스테츄4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서16",
+  "괴물": "로밍체어4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서16",
+  "괴물": "부4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서16",
+  "괴물": "레아로4",
+  "마리수": "4",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성서16",
+  "괴물": "미러테이블4",
+  "마리수": "3",
+  "출처": "mob/DraculaCastle/DraculaCastle_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲1존",
+  "괴물": "옐로우팜팻",
+  "마리수": "10",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲1존",
+  "괴물": "그린팜팻",
+  "마리수": "10",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲1존",
+  "괴물": "레드팜팻",
+  "마리수": "10",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲1존",
+  "괴물": "퍼플팜팻",
+  "마리수": "10",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲1존",
+  "괴물": "실버팜팻",
+  "마리수": "4",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲1존",
+  "괴물": "사슴",
+  "마리수": "1",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲2존",
+  "괴물": "사슴",
+  "마리수": "1",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲3존",
+  "괴물": "사슴",
+  "마리수": "1",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲4존",
+  "괴물": "사슴",
+  "마리수": "1",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲5존",
+  "괴물": "사슴",
+  "마리수": "1",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲6존",
+  "괴물": "사슴",
+  "마리수": "1",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲2존",
+  "괴물": "그린팜팻",
+  "마리수": "12",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲2존",
+  "괴물": "레드팜팻",
+  "마리수": "12",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲2존",
+  "괴물": "퍼플팜팻",
+  "마리수": "15",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲2존",
+  "괴물": "실버팜팻",
+  "마리수": "4",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲2존",
+  "괴물": "트랜트",
+  "마리수": "10",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲2존",
+  "괴물": "옐로우팜팻",
+  "마리수": "10",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲3존",
+  "괴물": "실버팜팻",
+  "마리수": "5",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲3존",
+  "괴물": "트랜트",
+  "마리수": "15",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲3존",
+  "괴물": "레드팜팻",
+  "마리수": "20",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲3존",
+  "괴물": "엔트라이온",
+  "마리수": "7",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲3존",
+  "괴물": "그린팜팻",
+  "마리수": "13",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲4존",
+  "괴물": "엔트라이온",
+  "마리수": "10",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲4존",
+  "괴물": "엔트자이언트",
+  "마리수": "4",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲4존",
+  "괴물": "놀",
+  "마리수": "19",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲4존",
+  "괴물": "실버팜팻",
+  "마리수": "5",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲5존",
+  "괴물": "엔트자이언트",
+  "마리수": "6",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲5존",
+  "괴물": "놀",
+  "마리수": "12",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲5존",
+  "괴물": "은빛늑대",
+  "마리수": "7",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲5존",
+  "괴물": "놀",
+  "마리수": "8",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲6존",
+  "괴물": "은빛늑대",
+  "마리수": "7",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "포테의숲6존",
+  "괴물": "엔트자이언트",
+  "마리수": "7",
+  "출처": "mob/Fota/Fota_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-1",
+  "괴물": "촌촌",
+  "마리수": "5",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-1",
+  "괴물": "요오다",
+  "마리수": "5",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-1",
+  "괴물": "가스",
+  "마리수": "5",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-1",
+  "괴물": "그렘린",
+  "마리수": "5",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-1",
+  "괴물": "오튜",
+  "마리수": "5",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-1",
+  "괴물": "크라켄",
+  "마리수": "5",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-1",
+  "괴물": "쿠우",
+  "마리수": "5",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-2",
+  "괴물": "촌촌",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-2",
+  "괴물": "요오다",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-2",
+  "괴물": "가스",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-2",
+  "괴물": "그렘린",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-2",
+  "괴물": "오튜",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-2",
+  "괴물": "크라켄",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-2",
+  "괴물": "쿠우",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-3",
+  "괴물": "촌촌",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-3",
+  "괴물": "요오다",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-3",
+  "괴물": "가스",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-3",
+  "괴물": "그렘린",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-3",
+  "괴물": "오튜",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-3",
+  "괴물": "크라켄",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-3",
+  "괴물": "쿠우",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-4",
+  "괴물": "촌촌",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-4",
+  "괴물": "요오다",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-4",
+  "괴물": "가스",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-4",
+  "괴물": "그렘린",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-4",
+  "괴물": "오튜",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-4",
+  "괴물": "크라켄",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-4",
+  "괴물": "쿠우",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-5",
+  "괴물": "촌촌",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-5",
+  "괴물": "요오다",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-5",
+  "괴물": "가스",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-5",
+  "괴물": "그렘린",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-5",
+  "괴물": "오튜",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-5",
+  "괴물": "크라켄",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "지하수로D-5",
+  "괴물": "쿠우",
+  "마리수": "3",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "승급던젼",
+  "괴물": "광관돌돌이",
+  "마리수": "120",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "승급던젼",
+  "괴물": "광관드워프",
+  "마리수": "30",
+  "출처": "mob/Groundwater/Groundwater_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동1",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동2",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동3",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동4",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "로밍래더1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "로밍스테츄1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "로밍체어1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "부1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "레아로1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동5",
+  "괴물": "미러테이블1",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동6",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동7",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동8",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동9",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "로밍래더2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "로밍스테츄2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "로밍체어2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "부2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "레아로2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동10",
+  "괴물": "미러테이블2",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동11",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동12",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동13",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동14",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동15",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "로밍래더3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "로밍스테츄3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "로밍체어3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "부3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "레아로3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "드라큐라백작의성동16",
+  "괴물": "미러테이블3",
+  "마리수": "3",
+  "출처": "mob/HorrorCastle/HorrorCastle_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원A",
+  "괴물": "녹색벌",
+  "마리수": "10",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원A",
+  "괴물": "팜팻1",
+  "마리수": "15",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원A",
+  "괴물": "팜팻2",
+  "마리수": "4",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원A",
+  "괴물": "브라운맨티스",
+  "마리수": "7",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원A",
+  "괴물": "노비스풀뱀",
+  "마리수": "15",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원B",
+  "괴물": "녹색벌",
+  "마리수": "10",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원B",
+  "괴물": "팜팻1",
+  "마리수": "15",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원B",
+  "괴물": "팜팻2",
+  "마리수": "4",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원B",
+  "괴물": "브라운맨티스",
+  "마리수": "7",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스평원B",
+  "괴물": "노비스풀뱀",
+  "마리수": "15",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A1",
+  "괴물": "팜팻",
+  "마리수": "11",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A1",
+  "괴물": "브라운맨티스",
+  "마리수": "10",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A1",
+  "괴물": "카디",
+  "마리수": "12",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A1",
+  "괴물": "멜로더",
+  "마리수": "12",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A1",
+  "괴물": "노비스풀뱀",
+  "마리수": "10",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A2",
+  "괴물": "독거미",
+  "마리수": "20",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A2",
+  "괴물": "생쥐",
+  "마리수": "17",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A3",
+  "괴물": "독거미",
+  "마리수": "20",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전A3",
+  "괴물": "생쥐",
+  "마리수": "17",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전B1",
+  "괴물": "독거미",
+  "마리수": "20",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전B1",
+  "괴물": "생쥐",
+  "마리수": "17",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전B2",
+  "괴물": "독거미",
+  "마리수": "20",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전B2",
+  "괴물": "지네",
+  "마리수": "11",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전B2",
+  "괴물": "노비스엔트자이언트",
+  "마리수": "7",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전B3",
+  "괴물": "독거미",
+  "마리수": "20",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전B3",
+  "괴물": "생쥐",
+  "마리수": "17",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전C3",
+  "괴물": "팜팻",
+  "마리수": "11",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전C3",
+  "괴물": "브라운맨티스",
+  "마리수": "10",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전C3",
+  "괴물": "카디",
+  "마리수": "12",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전C3",
+  "괴물": "멜로더",
+  "마리수": "12",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스지하던전C3",
+  "괴물": "노비스풀뱀",
+  "마리수": "10",
+  "출처": "mob/Novice/Novice_Spawn.txt"
+ },
+ {
+  "맵": "노비스마을",
+  "괴물": "노비스주민1",
+  "마리수": "1",
+  "출처": "mob/Npc_Move/Npc_Spawn.txt"
+ },
+ {
+  "맵": "노비스마을",
+  "괴물": "노비스주민2",
+  "마리수": "1",
+  "출처": "mob/Npc_Move/Npc_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을1",
+  "괴물": "좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을1",
+  "괴물": "목수좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을1",
+  "괴물": "거지좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을2",
+  "괴물": "마법좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을2",
+  "괴물": "좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을2",
+  "괴물": "광부좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을2",
+  "괴물": "마법좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을2",
+  "괴물": "거지좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을3",
+  "괴물": "좀비",
+  "마리수": "20",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을3",
+  "괴물": "농부좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을3",
+  "괴물": "목수좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을3",
+  "괴물": "광부좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을3",
+  "괴물": "고사목",
+  "마리수": "20",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을4",
+  "괴물": "좀비",
+  "마리수": "20",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을4",
+  "괴물": "광부좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을4",
+  "괴물": "마법좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을4",
+  "괴물": "농부좀비",
+  "마리수": "30",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "죽음의마을4",
+  "괴물": "고사목",
+  "마리수": "20",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-1",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-1",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-2",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-2",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-3",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-3",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-1",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-1",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-2",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-2",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-3",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-3",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-1",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-1",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-2",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-2",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-3",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-3",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-1",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-1",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-2",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-2",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-3",
+  "괴물": "도깨비불",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-3",
+  "괴물": "블랙캣",
+  "마리수": "10",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-1",
+  "괴물": "독거미2",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-1",
+  "괴물": "웨어랫",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-1",
+  "괴물": "니크르",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-2",
+  "괴물": "독거미2",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-2",
+  "괴물": "웨어랫",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-2",
+  "괴물": "니크르",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-3",
+  "괴물": "독거미2",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-3",
+  "괴물": "웨어랫",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-3",
+  "괴물": "니크르",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-4",
+  "괴물": "독거미2",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-4",
+  "괴물": "웨어랫",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-4",
+  "괴물": "니크르",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-5",
+  "괴물": "독거미2",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-5",
+  "괴물": "웨어랫",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-5",
+  "괴물": "니크르",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-6",
+  "괴물": "독거미2",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-6",
+  "괴물": "웨어랫",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽음의마을1-6",
+  "괴물": "니크르",
+  "마리수": "14",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-4",
+  "괴물": "독거미2",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-4",
+  "괴물": "웨어랫",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안5-4",
+  "괴물": "니크르",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-4",
+  "괴물": "독거미2",
+  "마리수": "13",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-4",
+  "괴물": "웨어랫",
+  "마리수": "13",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안21-4",
+  "괴물": "니크르",
+  "마리수": "13",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-4",
+  "괴물": "독거미2",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-4",
+  "괴물": "웨어랫",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안2-4",
+  "괴물": "니크르",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-4",
+  "괴물": "독거미2",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-4",
+  "괴물": "웨어랫",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "신죽마집안4-4",
+  "괴물": "니크르",
+  "마리수": "17",
+  "출처": "mob/VOD/VOD_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-1",
+  "괴물": "완두콩1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-1",
+  "괴물": "니에1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-1",
+  "괴물": "브라운맨티스1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-1",
+  "괴물": "녹색말벌1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-1",
+  "괴물": "뱀1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-2",
+  "괴물": "완두콩1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-2",
+  "괴물": "니에1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-2",
+  "괴물": "브라운맨티스1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-2",
+  "괴물": "녹색말벌1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-2",
+  "괴물": "뱀1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-3",
+  "괴물": "완두콩1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-3",
+  "괴물": "니에1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-3",
+  "괴물": "브라운맨티스1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-3",
+  "괴물": "녹색말벌1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드1-3",
+  "괴물": "뱀1",
+  "마리수": "10",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드2-1",
+  "괴물": "뱀2",
+  "마리수": "15",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드2-1",
+  "괴물": "완두콩2",
+  "마리수": "15",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드2-1",
+  "괴물": "맨티스1",
+  "마리수": "15",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드2-1",
+  "괴물": "녹색말벌2",
+  "마리수": "15",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드3-1",
+  "괴물": "맨티스2",
+  "마리수": "63",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드3-1",
+  "괴물": "녹색말벌3",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드3-1",
+  "괴물": "늑대1",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드4-1",
+  "괴물": "맨티스3",
+  "마리수": "63",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드4-1",
+  "괴물": "녹색말벌4",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드4-1",
+  "괴물": "늑대2",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드5-1",
+  "괴물": "맨티스4",
+  "마리수": "63",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드5-1",
+  "괴물": "늑대인간1",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드5-1",
+  "괴물": "늑대3",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드6-1",
+  "괴물": "맨티스5",
+  "마리수": "63",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드6-1",
+  "괴물": "늑대인간2",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드6-1",
+  "괴물": "늑대4",
+  "마리수": "60",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드14-1",
+  "괴물": "홉고블린1",
+  "마리수": "31",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드14-1",
+  "괴물": "고블린병사1",
+  "마리수": "31",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드14-1",
+  "괴물": "고블린가드1",
+  "마리수": "31",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ },
+ {
+  "맵": "우드랜드14-1",
+  "괴물": "고블린전사1",
+  "마리수": "31",
+  "출처": "mob/WoodLand/WoodLand_Spawn.txt"
+ }
+]
