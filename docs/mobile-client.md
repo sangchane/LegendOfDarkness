@@ -114,6 +114,38 @@ Command Line Tools 를 가리켜 `xcodebuild` 가 거부했을 뿐이라, `DEVEL
 를 주면 sudo 없이 쓴다. 게이트 프로젝트와 결과는 `experiments/godot-csharp-mobile-smoke/README.md`.
 **실기기에서도 떴다** — iPad 9세대(iPad12,2, iPadOS 26.5.2)에서 실행 확인했다(2026-09-11).
 
+### 실기기에서 서버에 붙기 (2026-09-11 확인)
+
+아이패드에서 Mac 의 Hades 에 붙어 **월드 입장까지 확인했다**(서버 로그에 `lodtest : Welcome to Lorule`).
+막은 것이 넷이었고 전부 다른 층이었다.
+
+**① 서버 주소를 코드에 두지 않는다.** 실기기는 아이콘을 탭해 여는 것이 전부라 `--server` 도 환경변수도
+받을 수 없다. 그렇다고 주소를 박으면 붙을 기계가 바뀔 때마다 소스를 고쳐야 한다. 읽는 순서는 이렇다:
+
+```
+--server 인자  →  LOD_SERVER 환경변수  →  res://server.cfg 첫 줄  →  127.0.0.1:2610
+```
+
+`mobile/client/server.cfg` 는 **커밋되지 않는다**(`.gitignore`). 한 줄에 `host:port` 만 적는다. 프리셋의
+`include_filter="*.cfg"` 가 그 파일을 빌드에 싣는다.
+
+**② `OS.HasFeature("mobile")` 로 기기를 가려내면 안 된다.** Godot 4 의 iOS 에서 거짓이다. 그것 때문에
+실기기가 `127.0.0.1`(자기 자신)에 붙으려다 **"연결이 거부되었습니다"** 가 났다. 기기를 가려야 하면
+`OS.GetName()` 을 쓴다.
+
+**③ iOS 로컬 네트워크 권한.** iOS 14 부터 같은 망의 기기에 붙으려면 권한이 필요하고, `Info.plist` 에
+`NSLocalNetworkUsageDescription` 이 없으면 **묻지도 않고 조용히 막는다.** 서버에는 연결 시도조차 닿지
+않는다. 프리셋의 `application/additional_plist_content` 에 넣어 뒀다.
+
+**④ 서버가 알려 주는 주소가 두 군데에서 온다.** 이것이 가장 오래 걸렸다 — `run-procedure.md` 0.6절.
+
+**확인하는 법.** 화면만 보면 전부 똑같이 "접속중" 이거나 "거부" 다. 서버 쪽에서 본다:
+
+```bash
+lsof -nP -iTCP:2610 -iTCP:2615 | grep <기기 IP>   # 어디까지 닿았나
+grep "Welcome to Lorule" <서버 로그>              # 월드에 들어왔나
+```
+
 ### iPad·iPhone 에 클라이언트 올리기 (2026-09-11 확인)
 
 로그인 화면까지 iPad 9세대에서 확인했다. 준비물은 위 macOS 절과 같고, 여기에 `DEVELOPER_DIR` 이 필요하다.

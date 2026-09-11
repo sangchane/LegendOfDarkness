@@ -25,11 +25,13 @@ public partial class Main : Control
     /// <summary>Where the login server is, unless --server says otherwise.</summary>
     private const string DefaultServer = "127.0.0.1:2610";
 
-    // 실기기에서는 아이콘을 탭해 여는 것이 전부라 --server 를 넘길 방법이 없다. 그리고 거기서
-    // 127.0.0.1 은 기기 자신이라 아무것도 없다. 그래서 시험 중에 붙을 서버를 여기 적어 둔다.
-    // 데스크톱은 그대로 로컬이다 — 개발 중 띄우는 서버가 거기 있다.
-    // 시험용 값이므로 붙을 Mac·PC 가 바뀌면 이 줄을 고치고 다시 올린다.
-    private const string MobileTestServer = "192.168.0.8:2610";
+    // 실기기에서는 아이콘을 탭해 여는 것이 전부라 --server 를 넘길 방법이 없고, 거기서 127.0.0.1 은
+    // 기기 자신이라 아무것도 없다. 그렇다고 주소를 코드에 박으면 붙을 기계가 바뀔 때마다 소스를
+    // 고쳐야 한다. 그래서 빌드에 함께 실리는 이 파일에서 읽는다 — 커밋되지 않는다(.gitignore).
+    private const string ServerFile = "res://server.cfg";
+
+    /// <summary>환경변수로도 준다. 데스크톱에서 인자 없이 다른 서버를 가리킬 때 쓴다.</summary>
+    private const string ServerVariable = "LOD_SERVER";
 
     /// <summary>Logical size of a portrait screen. One unit is one dp here too.</summary>
     private static readonly Vector2I PortraitSize = new(360, 780);
@@ -274,7 +276,7 @@ public partial class Main : Control
     /// <summary>Reads <c>host:port</c>, falling back to the local server the run scripts start.</summary>
     private static void ReadServer(string value)
     {
-        string fallback = OS.HasFeature("mobile") ? MobileTestServer : DefaultServer;
+        string fallback = ServerFromEnvironment() ?? ServerFromFile() ?? DefaultServer;
         string[] parts = (value.Length > 0 ? value : fallback).Split(':');
 
         if (parts.Length != 2
@@ -289,6 +291,31 @@ public partial class Main : Control
 
         ServerAddress = address;
         ServerPort = port;
+    }
+
+    /// <summary>`LOD_SERVER=host:port`. 없으면 null.</summary>
+    private static string? ServerFromEnvironment()
+    {
+        string value = OS.GetEnvironment(ServerVariable);
+
+        return value.Length > 0 ? value : null;
+    }
+
+    /// <summary>
+    /// 빌드에 함께 실리는 `server.cfg` 의 첫 줄(`host:port`). 실기기는 인자도 환경변수도 받을 수 없어
+    /// 이것이 유일한 길이다. 파일은 커밋하지 않으므로 저장소에 기계 주소가 남지 않는다.
+    /// </summary>
+    private static string? ServerFromFile()
+    {
+        if (!Godot.FileAccess.FileExists(ServerFile))
+        {
+            return null;
+        }
+
+        using Godot.FileAccess file = Godot.FileAccess.Open(ServerFile, Godot.FileAccess.ModeFlags.Read);
+        string line = file?.GetLine().Trim() ?? string.Empty;
+
+        return line.Length > 0 && !line.StartsWith('#') ? line : null;
     }
 
     private static void ReadRehearsal(string value)

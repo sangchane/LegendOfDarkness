@@ -761,13 +761,19 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Look();
     }
 
-    /// <summary>Keeps the player in the middle without showing anything past the edge of the floor.</summary>
+    /// <summary>
+    /// Keeps the player in the middle of the view, wherever they stand. The view used to stop at the edge
+    /// of the floor so that nothing past it showed, but the starting tile is a corner one and the screen is
+    /// bigger than the original's, so that rule left the character parked in a corner of the screen.
+    /// Showing a little emptiness past the edge is the smaller cost.
+    /// </summary>
     private void Look()
     {
         Vector2 window = Size;
 
-        float x = Mathf.Clamp(_player.Position.X - (window.X / 2), 0, Mathf.Max(0, _floorSize.X - window.X));
-        float y = Mathf.Clamp(_player.Position.Y - (window.Y / 2) - 20, 0, Mathf.Max(0, _floorSize.Y - window.Y));
+        // The 20 keeps the character a little below the exact middle, where the original put it.
+        float x = _player.Position.X - (window.X / 2);
+        float y = _player.Position.Y - (window.Y / 2) - 20;
 
         _camera.Position = new Vector2(-Mathf.Round(x), -Mathf.Round(y));
     }

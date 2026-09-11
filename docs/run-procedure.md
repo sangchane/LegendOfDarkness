@@ -50,8 +50,24 @@ cd sources/wren11/Dark-Ages-Private-Server/Staging/net9.0 && dotnet Lorule.GameS
 **서버가 실행 중에 `database/server/areas/*.json` 을 다시 쓴다.** 기록된 `FilePath` 의 구분자가 바뀐다 —
 런타임 산출물이지 소스가 아니고, 플랫폼을 오가면 왔다 갔다 한다.
 
-**아직 아이패드에서 붙지는 못한다.** 클라이언트 기본 주소가 `127.0.0.1` 인데 실기기에서는 인자를 넘길
-방법이 없다(`NEXT.md` 의 [다음/클라이언트]).
+## 0.6 다른 기기에서 붙게 하려면 — 주소가 두 군데에 있다
+
+`LoruleConfig.json` 의 `ServerIP` 만 고치면 될 것 같지만 **아니다.** 로그인 절차에는 리다이렉트가 두 번
+있고 둘이 서로 다른 곳에서 주소를 가져온다.
+
+| 단계 | 주소 출처 | 고치는 곳 |
+|---|---|---|
+| 로비 → 로그인 | `MServerTable.Servers[0].Address` (`LoginServer.Format57Handler`) | **`MServerTable.xml`** 의 `<Addr>` |
+| 로그인 → 게임 | `ServerContext.IpAddress` (설정의 `ServerIP`) | `LoruleConfig.json` |
+
+`MServerTable.xml` 이 `127.0.0.1` 이면 서버가 클라이언트에게 **"네 자신에게 접속하라"** 고 알려 준다.
+같은 기계에서는 그것이 맞아 성공하고, 다른 기기에서는 **"연결이 거부되었습니다"** 가 난다. 서버는
+정상으로 보이고 로그에도 아무 말이 없다 — 첫 연결은 실제로 닿기 때문에 방화벽·IP 를 의심하게 된다.
+
+**빌드하면 둘 다 덮어써진다.** `LoruleConfig.json` 과 `MServerTable.xml` 은 빌드 출력에 복사된다. 서버
+코드를 다시 빌드했으면 두 파일을 다시 고쳐야 한다. 안 그러면 서버가 원작자 PC 경로를 찾다가 시작하지
+못한다(오류는 첫 줄에만 찍히고, 그 뒤로는 평소처럼 GM 명령 목록이 이어져 정상으로 보인다).
+
 
 ---
 
