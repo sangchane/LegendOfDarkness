@@ -32,6 +32,26 @@ and the Godot Mono export templates. First verify `--import`,
 export the Xcode project, build for an arm64 iPhone, and run it on a real device.
 Signing identities and provisioning profiles must remain machine-local.
 
+The 2026-09-11 Mac gate passed everything except the device install. Godot 4.6
+Mono, .NET SDK 9.0.317, the 4.6.stable.mono export templates, and Xcode 26.5 with
+the iOS 26.5 SDK produced a signed 31 MB `MobileSmoke.ipa`: arm64, `iPhoneOS`,
+bundle `com.fallendev.lod.mobilesmoke`, signed with an Apple Development identity
+under an automatically issued team provisioning profile. `--import`,
+`--build-solutions`, `dotnet_publish_project`, `generate_xcframework`, and
+`xcodebuild` archive and export all succeeded headlessly.
+
+Two things that cost time and are worth knowing next time. Xcode was installed
+but `xcode-select` pointed at the Command Line Tools, so `xcodebuild` refused to
+run; `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` fixes that
+without sudo. And the Team ID is the certificate's OU field, not the identifier
+in parentheses after the certificate name — read it with
+`security find-certificate -c "Apple Development" -p | openssl x509 -noout -subject`.
+The Team ID was filled in only for the duration of the export and reverted
+immediately; it is not committed.
+
+What remains is the device itself: connect an arm64 iPhone, install the `.ipa`,
+and confirm `MOBILE_SMOKE_OK` on a real screen.
+
 The checked application runtime and project configuration contain no
 Windows-only API or absolute Windows path. The Windows-specific SDK locations
 live in `scripts/verify-windows.ps1`; that script is a local verification

@@ -105,7 +105,10 @@ GODOT="$PWD/.tools/godot-4.6-mono/Godot_mono.app/Contents/MacOS/Godot"   # 4.6-s
 가 `null` 이라 그 조건이 그냥 맞아 버린다. 못 돈 시험이 초록으로 보이는 쪽이 못 도는 것보다 나쁘다.
 나머지는 성하다: `node --test tests/*.test.js` 가 37개 중 그 둘만 빼고 통과한다.
 
-**아직 못 한 것 — iOS.** Xcode 가 없어(Command Line Tools 만 있다) export 와 실기기 설치는 손대지 못했다.
+**iOS 는 .ipa 까지 됐다**(2026-09-11). Xcode 26.5 · iOS 26.5 SDK 가 이 Mac 에 이미 있었다 — `xcode-select` 가
+Command Line Tools 를 가리켜 `xcodebuild` 가 거부했을 뿐이라, `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`
+를 주면 sudo 없이 쓴다. 게이트 프로젝트와 결과는 `experiments/godot-csharp-mobile-smoke/README.md`.
+**남은 것은 실기기 설치뿐이고 iPhone 을 꽂아야 한다.**
 
 ### 화면이 들어맞는지
 

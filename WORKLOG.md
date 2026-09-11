@@ -9,6 +9,11 @@
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-11 — **서명된 arm64 .ipa 가 나왔다.** 실기기 설치만 남았다. 게이트는 `experiments/godot-csharp-mobile-smoke` 이고 결과는 그 README.
+  - Godot 4.6 Mono · .NET 9.0.317 · `4.6.stable.mono` export templates · Xcode 26.5(iOS 26.5 SDK)로 31MB `MobileSmoke.ipa`. arm64, `iPhoneOS`, Apple Development 서명, 팀 프로비저닝 프로파일 자동 발급. `--import`·`--build-solutions`·`dotnet_publish_project`·`generate_xcframework`·xcodebuild archive/export 전부 headless 로 통과했다.
+  - **Xcode 는 처음부터 있었다.** `xcodebuild` 가 "requires Xcode" 라고 거부하길래 없는 줄 알았는데, `xcode-select` 가 Command Line Tools 를 가리키고 있었을 뿐이다. `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` 면 sudo 없이 쓴다.
+  - **Team ID 는 인증서 이름 뒤 괄호가 아니라 OU 다.** 괄호 안(`W7Y2PYS4FD`)을 Team ID 로 쓰면 안 된다 — `security find-certificate -c "Apple Development" -p | openssl x509 -noout -subject` 의 OU 를 본다. export 하는 동안만 프리셋에 넣고 곧바로 되돌렸다. 커밋하지 않는다(그 README 의 규칙).
+  - 처음 한 번은 `build/ios/` 가 없어 실패한다 — Godot 이 만들어 주지 않는다.
 - 2026-09-11 — **Mac 에서도 돈다.** 같은 커밋을 Apple M2(macOS 26.5)에서 열어 빌드·시험·실행·촬영까지 확인했다. 절차는 `docs/mobile-client.md` 3절 "macOS".
   - **도구는 윈도우와 같은 버전으로 맞췄다** — .NET SDK 9.0.317(osx-arm64), Godot 4.6-stable **mono**. 버전을 맞춰야 다르게 나오는 것이 곧 플랫폼 차이가 된다. 둘 다 `.tools/` 라 커밋되지 않는다.
   - 결과: 코어 시험 **123개 통과**(38ms), `LodClient` 빌드 경고 0, 게임 화면이 OpenGL 4.1 Metal(GL Compatibility)로 그려지고 촬영도 된다. 레이아웃 12화면 전부 통과.
