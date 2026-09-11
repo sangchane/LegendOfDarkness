@@ -134,13 +134,29 @@ def extract(path):
     return found, hashlib.sha256(data).hexdigest()
 
 
+NAME = r'[a-z_][a-z0-9_]{1,30}'
+CALL_PAREN = re.compile(rf'(?<![@#$\w]){NAME}(?=\s*\()')
+CALL_STMT = re.compile(rf'(?:^|[;{{}}])\s*({NAME})\s+(?=["@#\d\-])')
+
+
 def used_in(pack):
-    """이 팩의 스크립트가 실제로 부르는 이름."""
+    """이 팩의 스크립트가 실제로 부르는 이름.
+
+    @name·#name 은 변수지 명령이 아니고, 문자열과 주석은 코드가 아니다.
+    느슨하게 세면 if(@type1 == 3) 의 type1 까지 명령으로 잡힌다 —
+    classify-script-names.py 와 같은 잣대를 쓴다.
+    """
     db = ROOT / "data" / "server-packs" / pack / "db"
-    call = re.compile(r'\b([a-z_][a-z0-9_]{2,30})\s*[( ]')
     seen = set()
     for f in (db / "script").rglob("*.txt"):
-        seen |= set(call.findall(f.read_text(encoding="utf-8", errors="replace")))
+        if f.name.endswith("_db.txt"):
+            continue
+        code = f.read_text(encoding="utf-8", errors="replace")
+        code = re.sub(r'"[^"]*"', '""', code)
+        code = re.sub(r'//[^\n]*', '', code)
+        code = re.sub(r'/\*.*?\*/', '', code, flags=re.S)
+        seen |= set(m.group(0) for m in CALL_PAREN.finditer(code))
+        seen |= set(CALL_STMT.findall(code))
     return seen
 
 

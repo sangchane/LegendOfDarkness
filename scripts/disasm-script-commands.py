@@ -225,6 +225,25 @@ def main():
     for r in rows:                      # 명령마다 공통 helper 는 빼고 남긴다
         r["가르는helper"] = [c for c in r["부르는함수"] if c not in common]
 
+    # 오프셋도 마찬가지다. st->stack·st->start 를 훑는 자리(+0x4 +0x8 +0xC +0x10 +0x14 +0x20)는
+    # 거의 모든 명령이 읽는다 — 인자를 꺼내는 틀이라 아무것도 가르지 못한다.
+    # 40% 넘게 나오는 오프셋을 빼고 나면 그 명령만의 자리가 남는다.
+    off_count = Counter()
+    for r in rows:
+        off_count.update(set(r["읽는오프셋"]) | set(r["쓰는오프셋"]))
+    boiler = {o for o, c in off_count.items() if c > n * 0.4}
+    for r in rows:
+        r["고유읽기"] = [o for o in r["읽는오프셋"] if o not in boiler]
+        r["고유쓰기"] = [o for o in r["쓰는오프셋"] if o not in boiler]
+
+    by_off = defaultdict(list)
+    for r in rows:
+        for o in r["고유쓰기"]:
+            by_off[o].append(r["이름"])
+    off_groups = [{"쓰는자리": o, "명령수": len(v), "명령": sorted(v)}
+                  for o, v in sorted(by_off.items(), key=lambda kv: -len(kv[1]))
+                  if len(v) >= 2]
+
     out = {
         "출처실행파일": Path(exe).name,
         "명령수": len(rows),
@@ -233,9 +252,11 @@ def main():
                 "무엇을 하는지는 코드가 말해 주지 않는다. 짐작을 적지 않았다.",
         "거의모두가부르는함수": [{"helper": c, "명령수": v} for c, v in
                             sorted(common.items(), key=lambda kv: -kv[1])],
+        "거의모두가건드리는오프셋": sorted(boiler, key=lambda o: -off_count[o]),
         "명령": rows,
         "같은helper를부르는무리": groups[:80],
         "같은문자열을쓰는무리": string_groups[:60],
+        "같은자리에쓰는무리": off_groups[:60],
     }
     d = OUT / pack
     d.mkdir(parents=True, exist_ok=True)
@@ -249,7 +270,9 @@ def main():
     print(f"   문자열을 참조하는 것 {withstr} · 구조체에 쓰는 것 {withwrite}")
     print(f"   갈래를 가르는 helper {len(groups)}개 (거의 모두가 부르는 것 {len(common)}개는 뺐다)")
     print(f"   같은 문자열을 쓰는 무리 {len(string_groups)}개")
-    alone = sum(1 for r in rows if not r["가르는helper"] and not r["참조문자열"])
+    alone = sum(1 for r in rows if not r["가르는helper"] and not r["참조문자열"]
+                and not r["고유읽기"] and not r["고유쓰기"])
+    print(f"   같은 자리에 쓰는 무리 {len(off_groups)}개")
     print(f"   증거가 하나도 안 붙은 명령 {alone}개")
     print(f"   → extracted/{pack}/script-command-evidence.json")
 
