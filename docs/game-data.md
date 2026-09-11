@@ -8,6 +8,10 @@
 
 ## 1. 어디서 나오나
 
+> **계열: Hades (7.18).** 이 문서의 수치는 전부 Hades 저장소에서 나온 것이다. `data/server-packs/`
+> 의 배포 팩(5.99·혼든)은 한글로 된 **다른 계보의 다른 표**이므로 여기 수치로 설명하면 안 된다.
+> `data/README.md` 참고.
+
 `database/server/metafile/` — **`.dat` 아카이브가 아니라 서버 데이터베이스 폴더**다
 (`where-the-answers-are.md` 4.6절). 각각 zlib 한 덩어리이고, 풀면 "줄마다 이름과 값 몇 개"인 표다.
 
