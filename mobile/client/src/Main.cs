@@ -32,6 +32,11 @@ public partial class Main : Control
     // a missing face is reported on screen rather than left to render as empty boxes.
     private const string WindowsKoreanFont = "C:/Windows/Fonts/malgun.ttf";
 
+    // Desktops other than Windows may still have a Korean face. Asking the system for one by name is the
+    // only way to tell — the question is whether Hangul draws, not whether one particular file exists.
+    private static readonly string[] SystemKoreanFonts =
+        { "Apple SD Gothic Neo", "Noto Sans CJK KR", "Noto Sans KR", "Malgun Gothic", "NanumGothic" };
+
     /// <summary>Insets that keep text and controls clear of notches and the home indicator.</summary>
     public static (int Left, int Top, int Right, int Bottom) SafeInsets { get; private set; } =
         (Gutter, Gutter, Gutter, Gutter);
@@ -289,6 +294,26 @@ public partial class Main : Control
         }
     }
 
+    /// <summary>
+    /// The first system face that actually carries Hangul, or null when this machine has none. Names are
+    /// tried in order because the engine reports a match for a family it can substitute, not only for one
+    /// it has; the glyph check is what decides.
+    /// </summary>
+    private static SystemFont? SystemKoreanFont()
+    {
+        foreach (string name in SystemKoreanFonts)
+        {
+            SystemFont candidate = new() { FontNames = new[] { name } };
+
+            if (candidate.HasChar('가'))
+            {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
     private static Theme BuildTheme()
     {
         Theme theme = new() { DefaultFontSize = BodyFontSize };
@@ -300,9 +325,17 @@ public partial class Main : Control
             theme.DefaultFont = korean;
             FontName = "Malgun Gothic";
         }
+        else if (SystemKoreanFont() is SystemFont system)
+        {
+            // A desktop that is not Windows can still have a Korean face — macOS does. Saying "Hangul
+            // breaks" while Hangul is plainly drawing on this very line is worse than saying nothing.
+            theme.DefaultFont = system;
+            FontName = $"시스템 {system.FontNames[0]}";
+        }
         else
         {
             // Godot's built-in face has no Hangul, so this is the state where Korean text breaks.
+            // Phones land here: neither the Windows path nor a system Korean face exists.
             FontName = "없음 — 한글이 깨집니다";
         }
 
