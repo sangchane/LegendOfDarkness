@@ -84,6 +84,12 @@ public partial class Main : Control
     /// <summary>Whether to press the first carried thing once the pack is open, as <c>--wear</c>.</summary>
     public static bool Wearing { get; private set; }
 
+    /// <summary>
+    /// Whether the pack opens on the gear tab rather than the pack tab, as <c>--gear</c>. Without it there
+    /// is no way to photograph the gear tab with no hand on the screen.
+    /// </summary>
+    public static bool OnGear { get; private set; }
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
@@ -93,6 +99,7 @@ public partial class Main : Control
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
+        OnGear = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
 

@@ -57,6 +57,9 @@ public partial class GameScreen : Control
     public IReadOnlyList<(string Name, Control Part)> Parts =>
         [("위 줄", _topRow), ("조작 줄", _controlRow), ("인벤토리", _pack), ("월드", _world)];
 
+    /// <summary>Which tab the pack shows. Only a layout check asks — a thumb presses the tab itself.</summary>
+    public void ShowGearTab(bool gear) => _pack.ShowTab(gear);
+
     public override void _Ready()
     {
         MarginContainer hud = Main.SafeAreaContainer();
@@ -129,7 +132,12 @@ public partial class GameScreen : Control
         _pack.SetAnchorsPreset(LayoutPreset.FullRect);
 
         // 가로는 오른쪽 기둥, 세로는 전폭. 위 줄만 남겨 두어 이름과 체력은 계속 보인다.
-        _pack.AnchorLeft = Main.Portrait ? 0 : 0.6f;
+        // 기둥은 3분의 1 남짓이면 충분했지만 장비 탭의 고리는 그보다 넓다 — 좁은 화면에서는 고리가
+        // 들어갈 만큼 떼어 준다. 16:9 에서는 그게 화면의 절반 남짓이다(시안 8.1절).
+        float across = GetViewportRect().Size.X;
+        float column = across > 0 ? 1f - (GearGrid.PanelWidth / across) : 0.6f;
+
+        _pack.AnchorLeft = Main.Portrait ? 0 : Mathf.Min(0.6f, column);
         _pack.OffsetLeft = 0;
         _pack.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
         _pack.OffsetRight = 0;
@@ -317,14 +325,18 @@ public partial class GameScreen : Control
             _notice.Text = server.Said;
         }
 
-        if (Main.OpeningPack && !_pack.Visible && _settling++ == 90)
+        // 레이아웃 검사는 세 프레임 만에 재고 끝난다. 90 프레임을 기다리면 닫힌 화면을 재게 되고,
+        // 실제로 그래서 장비 칸이 넘쳤는데도 0 오류였다 — 검사 중에는 바로 연다.
+        int settle = LayoutCheck.Requested() || LayoutCheck.PretendPack.Count > 0 ? 0 : 90;
+
+        if (Main.OpeningPack && !_pack.Visible && _settling++ == settle)
         {
             Carrying(true);
         }
 
         if (_pack.Visible)
         {
-            _pack.Show(_server?.Pack ?? [], _server?.Worn ?? []);
+            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf);
 
             // 손 없이 확인할 때만. 목록이 채워진 다음 프레임에 첫 줄을 한 번 누른다.
             if (Main.Wearing && !_worn && _pack.PressFirst())
@@ -399,7 +411,7 @@ public partial class GameScreen : Control
 
         if (open)
         {
-            _pack.Show(_server?.Pack ?? [], _server?.Worn ?? []);
+            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf);
         }
     }
 

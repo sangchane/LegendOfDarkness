@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Godot;
+using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
@@ -18,7 +20,73 @@ public static class LayoutCheck
 {
     private const string Flag = "--layout";
 
+    private const string StuffFlag = "--stuff";
+
     public static bool Requested() => System.Array.IndexOf(OS.GetCmdlineUserArgs(), Flag) >= 0;
+
+    /// <summary>
+    /// Whether to fill the pack with pretend things while nothing is connected, as <c>--stuff</c>. The
+    /// layout check always does; a screenshot has to ask, because a picture of an empty panel proves
+    /// nothing either.
+    /// </summary>
+    private static bool Stuffed() =>
+        Requested() || System.Array.IndexOf(OS.GetCmdlineUserArgs(), StuffFlag) >= 0;
+
+    // 실제로 잘라 둔 아이템 그림. 없는 번호를 쓰면 칸이 비어 크기가 줄어든다.
+    private static readonly int[] Icons = [32882, 32957, 33002, 32905, 32910];
+
+    /// <summary>
+    /// Things to put in the pack while nothing is connected. A check against an empty panel measures a
+    /// panel nobody will ever see: the worn places were added, the panel overflowed, and the check still
+    /// said nothing was wrong because there was nothing in it to overflow with.
+    /// </summary>
+    /// <remarks>
+    /// A full pack rather than a likely one — sixty slots is what the original holds, and the panel has to
+    /// survive the worst of it. The numbers are the item pictures that have actually been cut.
+    /// </remarks>
+    public static IReadOnlyList<InventoryItem> PretendPack { get; } = Stuffed()
+        ? [.. Enumerable(1, 60, slot => new InventoryItem(
+            slot,
+            Icons[slot % Icons.Length],
+            0,
+            $"자리 {slot} 의 시험용 물건",
+            slot % 3 == 0 ? 12 : 1,
+            30,
+            100))]
+        : [];
+
+    /// <summary>Something on in every place the server can name, for the same reason.</summary>
+    public static IReadOnlyList<WornItem> PretendWorn { get; } = Stuffed()
+        ? [.. Enumerable(1, 18, slot => new WornItem(
+            slot,
+            Icons[slot % Icons.Length],
+            $"자리 {slot} 의 시험용 장비",
+            WornPlace.Of(slot),
+            30,
+            100))]
+        : [];
+
+    /// <summary>
+    /// Somebody to stand in the middle of the equipment ring while nothing is connected. The numbers are
+    /// wardrobe pieces that have actually been cut — head 1, body 1, boots 1, shield 6 — so the figure that
+    /// comes up is the one a real character would be drawn from.
+    /// </summary>
+    public static Character? PretendSelf { get; } = Stuffed()
+        ? new Character(
+            1,
+            new Tile(0, 0),
+            Direction.South,
+            new Appearance(1, 1, 0, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0),
+            "시험용 수련생")
+        : null;
+
+    private static IEnumerable<T> Enumerable<T>(int from, int count, System.Func<int, T> make)
+    {
+        for (int index = 0; index < count; index++)
+        {
+            yield return make(from + index);
+        }
+    }
 
     public static void RunIfRequested(Node host, GameScreen screen)
     {
@@ -30,6 +98,31 @@ public static class LayoutCheck
 
     private static async System.Threading.Tasks.Task ReportAfterLayout(Node host, GameScreen screen)
     {
+        List<string> wrong = [];
+
+        // 소지품 탭을 재고, 장비 탭으로 넘겨 한 번 더 잰다. 둘의 높이가 다르고 넘치는 쪽은 장비였다.
+        foreach (bool gear in new[] { false, true })
+        {
+            wrong.AddRange(await Measure(host, screen, gear));
+        }
+
+        foreach (string complaint in wrong)
+        {
+            GD.Print($"GREYBOX_LAYOUT_BAD {complaint}");
+        }
+
+        GD.Print(wrong.Count == 0 ? "GREYBOX_LAYOUT_OK" : $"GREYBOX_LAYOUT_BAD {wrong.Count}건");
+
+        host.GetTree().Quit(wrong.Count == 0 ? 0 : 1);
+    }
+
+    private static async System.Threading.Tasks.Task<List<string>> Measure(
+        Node host,
+        GameScreen screen,
+        bool gear)
+    {
+        screen.ShowGearTab(gear);
+
         // Containers settle over a couple of frames; asking before that reads sizes nobody will ever see.
         await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
         await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
@@ -37,8 +130,9 @@ public static class LayoutCheck
 
         Vector2 screenSize = host.GetViewport().GetVisibleRect().Size;
         List<string> wrong = [];
+        string tab = gear ? "장비" : "소지품";
 
-        GD.Print($"GREYBOX_LAYOUT size {screenSize.X}x{screenSize.Y}");
+        GD.Print($"GREYBOX_LAYOUT size {screenSize.X}x{screenSize.Y} tab {tab}");
 
         foreach ((string name, Control part) in screen.Parts)
         {
@@ -66,20 +160,17 @@ public static class LayoutCheck
 
         wrong.AddRange(Overlaps(screen.Parts));
 
-        foreach (string complaint in wrong)
-        {
-            GD.Print($"GREYBOX_LAYOUT_BAD {complaint}");
-        }
-
-        GD.Print(wrong.Count == 0 ? "GREYBOX_LAYOUT_OK" : $"GREYBOX_LAYOUT_BAD {wrong.Count}건");
-
-        host.GetTree().Quit(wrong.Count == 0 ? 0 : 1);
+        return [.. wrong.ConvertAll(complaint => $"[{tab}] {complaint}")];
     }
 
     /// <summary>
-    /// The bars must not sit on top of each other. The world is left out — in landscape everything is meant
-    /// to float over it, and the pack is meant to cover part of it.
+    /// The bars must not sit on top of each other. Two are left out: the world, because in landscape
+    /// everything is meant to float over it, and the pack, because it is a modal that runs from under the
+    /// top row to the bottom edge on purpose and nothing under it can be pressed while it is open
+    /// (docs/mobile-test-v1-wireframes.md 8절). Only a bar hiding another bar is a fault.
     /// </summary>
+    private static readonly string[] MeantToCover = ["월드", "인벤토리"];
+
     private static IEnumerable<string> Overlaps(IReadOnlyList<(string Name, Control Part)> parts)
     {
         for (int first = 0; first < parts.Count; first++)
@@ -89,7 +180,10 @@ public static class LayoutCheck
                 (string oneName, Control one) = parts[first];
                 (string otherName, Control other) = parts[second];
 
-                if (oneName == "월드" || otherName == "월드" || !one.Visible || !other.Visible)
+                if (System.Array.IndexOf(MeantToCover, oneName) >= 0
+                    || System.Array.IndexOf(MeantToCover, otherName) >= 0
+                    || !one.Visible
+                    || !other.Visible)
                 {
                     continue;
                 }

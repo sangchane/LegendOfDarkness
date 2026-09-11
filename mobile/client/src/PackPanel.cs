@@ -6,24 +6,32 @@ using Lod.Mobile.Core.World;
 namespace LodClient;
 
 /// <summary>
-/// What the character has on and what they are carrying, as the original showed it: a grid of pictures
-/// with no names in it. One thing is picked out at a time, and its name and what can be done with it are
-/// written underneath — a line of text per item eats a phone screen, and names here run past thirty letters.
+/// What the character has on and what they are carrying, as the original showed it: pictures with no names
+/// in them. One thing is picked out at a time, and its name and what can be done with it are written
+/// underneath — a line of text per item eats a phone screen, and names here run past thirty letters.
 /// </summary>
 /// <remarks>
-/// The lists are rebuilt only when what they would show changes, because they are asked every frame and a
-/// panel that throws its children away sixty times a second cannot be pressed.
+/// The two are separate tabs, not one list above another, because the original kept them in separate
+/// windows and stacking them pushed the pack off the screen as the worn places filled up. The gear tab is
+/// the original's own ring of places (<see cref="GearGrid" />); the pack tab is a plain grid of pictures.
+/// Both are rebuilt only when what they would show changes, because they are asked every frame and a panel
+/// that throws its children away sixty times a second cannot be pressed.
 /// </remarks>
 public sealed partial class PackPanel : PanelContainer
 {
     // 원작은 33x36 칸이었다. 손가락은 그보다 커서 시안의 최소 터치 크기를 쓴다.
     private static readonly Vector2 Cell = new(Main.TouchMinimum, Main.TouchMinimum);
 
-    private readonly GridContainer _gear = new() { Name = "Worn" };
+    private readonly GearGrid _gear = new();
     private readonly GridContainer _rows = new() { Name = "Items" };
+    private readonly Button _gearTab = new() { Text = "장비", ToggleMode = true };
+    private readonly Button _packTab = new() { Text = "소지품", ToggleMode = true };
     private readonly Label _chosenName = new();
-    private readonly Button _use = new() { Text = "착용" };
+    private readonly Button _use = new() { Text = "입기" };
     private readonly Button _drop = new() { Text = "버리기" };
+
+    // 어느 탭이 보이나. 장비면 true.
+    private bool _onGear;
 
     // 무엇을 고쳐 그렸는지. 고른 것이 바뀌어도 테두리가 옮겨 가야 하므로 함께 센다.
     private string? _showing;
@@ -42,7 +50,14 @@ public sealed partial class PackPanel : PanelContainer
 
         HBoxContainer head = new();
         head.AddThemeConstantOverride("separation", Main.Gutter);
-        head.AddChild(new Label { Text = "인벤토리", SizeFlagsVertical = SizeFlags.ShrinkCenter });
+
+        _gearTab.CustomMinimumSize = Cell;
+        _packTab.CustomMinimumSize = Cell;
+        _gearTab.Pressed += () => ShowTab(gear: true);
+        _packTab.Pressed += () => ShowTab(gear: false);
+
+        head.AddChild(_gearTab);
+        head.AddChild(_packTab);
         head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
         Tidy = new Button { Text = "정렬", CustomMinimumSize = Cell };
@@ -52,14 +67,18 @@ public sealed partial class PackPanel : PanelContainer
         head.AddChild(Close);
 
         // 세로는 패널이 전폭이라 한 줄에 여섯, 가로는 오른쪽 3분의 1 남짓이라 넷이 들어간다.
-        _gear.Columns = Main.Portrait ? 6 : 4;
-        _rows.Columns = _gear.Columns;
+        _rows.Columns = Main.Portrait ? 6 : 4;
+
+        // 걸친 것을 고르는 것은 소지품과 같은 한 자리를 쓴다. 음수로 두어 칸 번호와 구별한다.
+        _gear.Chosen += slot =>
+        {
+            _chosen = -slot;
+            _showing = null;
+        };
 
         VBoxContainer inside = new();
         inside.AddThemeConstantOverride("separation", Main.Gutter);
-        inside.AddChild(Heading("장비"));
         inside.AddChild(_gear);
-        inside.AddChild(Heading("소지품"));
         inside.AddChild(_rows);
 
         // 칸이 늘어 패널이 화면을 넘으면 제목과 닫기 버튼이 밀려난다(한 번 그렇게 됐다).
@@ -110,6 +129,27 @@ public sealed partial class PackPanel : PanelContainer
         body.AddChild(foot);
 
         AddChild(body);
+
+        ShowTab(Main.OnGear);
+    }
+
+    /// <summary>
+    /// Shows one tab and hides the other. Nothing is asked of the server — both were already sent, so this
+    /// is only which of them is on screen. Tidying is a pack thing, so its button goes with the pack.
+    /// </summary>
+    internal void ShowTab(bool gear)
+    {
+        _onGear = gear;
+
+        _gear.Visible = gear;
+        _rows.Visible = !gear;
+        _gearTab.ButtonPressed = gear;
+        _packTab.ButtonPressed = !gear;
+        Tidy.Visible = !gear;
+
+        // 탭을 옮기면 고른 것이 다른 탭에 있을 수 있다. 놓고 다시 고르게 한다.
+        _chosen = 0;
+        _showing = null;
     }
 
     /// <summary>The button that shuts the panel, so whoever opened it can decide what that means.</summary>
@@ -125,8 +165,11 @@ public sealed partial class PackPanel : PanelContainer
     public Button Tidy { get; }
 
     /// <summary>Shows what is worn and what is carried, and says plainly when there is nothing.</summary>
-    public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn)
+    public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn, Character? self = null)
     {
+        // 종이인형은 목록과 따로 갱신한다 — 차림이 바뀌는 것과 소지품이 바뀌는 것은 같은 일이 아니다.
+        _gear.ShowDoll(self);
+
         string wanted = Describe(carried, worn);
 
         if (wanted == _showing)
@@ -136,7 +179,7 @@ public sealed partial class PackPanel : PanelContainer
 
         _showing = wanted;
 
-        Fill(_gear, worn.Select(gear => (Key: -gear.Slot, gear.Icon)));
+        _gear.Show(worn, _chosen);
         Fill(_rows, carried.Select(item => (Key: item.Slot, item.Icon)));
 
         ShowChosen(carried, worn);
@@ -160,14 +203,6 @@ public sealed partial class PackPanel : PanelContainer
         }
 
         return false;
-    }
-
-    private static Label Heading(string text)
-    {
-        Label heading = new() { Text = text };
-        heading.AddThemeColorOverride("font_color", Greybox.Muted);
-
-        return heading;
     }
 
     /// <summary>Rebuilds one grid: one pressable picture per thing, and the picked one outlined.</summary>
@@ -234,9 +269,9 @@ public sealed partial class PackPanel : PanelContainer
             return;
         }
 
-        _chosenName.Text = carried.Count == 0 && worn.Count == 0
-            ? "가진 것이 없습니다."
-            : $"{carried.Count}가지 · 걸친 것 {worn.Count}";
+        _chosenName.Text = _onGear
+            ? worn.Count == 0 ? "걸친 것이 없습니다." : $"걸친 것 {worn.Count}가지"
+            : carried.Count == 0 ? "가진 것이 없습니다." : $"{carried.Count}가지";
 
         _chosenName.AddThemeColorOverride("font_color", Greybox.Muted);
         _use.Visible = false;
