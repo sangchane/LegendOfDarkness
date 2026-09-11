@@ -1,4 +1,4 @@
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
@@ -40,6 +40,9 @@ public sealed class WorldClient(WorldSession session)
     private const byte DropCommand = 0x08;
     private const byte TakeFromPackCommand = 0x10;
     private const byte MoveCommand = 0x30;
+
+    /// <summary>Taking something off. One byte: the worn place, the same number 0x37 names.</summary>
+    private const byte TakeOffCommand = 0x44;
 
     /// <summary>소지품 칸을 가리키는 번호. 주문·기술 칸도 같은 명령을 쓴다.</summary>
     private const byte InventoryPane = 0x00;
@@ -326,6 +329,14 @@ public sealed class WorldClient(WorldSession session)
                 (byte)(amount >> 24), (byte)(amount >> 16), (byte)(amount >> 8), (byte)amount
             ],
             cancellationToken);
+
+    /// <summary>
+    /// Takes off whatever is in one worn place. The place is the server's own number — the one it gave us
+    /// in <c>0x37</c> when it said the place was filled — and the item goes back into the pack, so nothing
+    /// here has to say where. The server answers by describing us again, which redraws the figure.
+    /// </summary>
+    public Task TakeOffAsync(int place, CancellationToken cancellationToken) =>
+        Send(TakeOffCommand, [(byte)place], cancellationToken);
 
     /// <summary>
     /// Swaps two pack slots. Tidying the pack is a run of these — the server keeps no order of its own, so

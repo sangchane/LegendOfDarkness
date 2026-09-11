@@ -172,6 +172,9 @@ public sealed partial class GearGrid : Control
         }
     }
 
+    /// <summary>The places, in the order the ring lays them out. Only a run with no hand on it asks.</summary>
+    public IEnumerable<Node> Cells => _ring.GetChildren();
+
     /// <summary>The drawing the original shows while a place is empty.</summary>
     private static Texture2D? Empty(int slot) => GearSlotArt.For(GearLayout.Of(slot).Drawing);
 

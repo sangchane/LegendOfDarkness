@@ -76,6 +76,7 @@ public partial class GameScreen : Control
         _pack = new PackPanel();
         _pack.Close.Pressed += () => Carrying(false);
         _pack.Used += slot => _ = _server?.UseAsync(slot, System.Threading.CancellationToken.None);
+        _pack.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
         _pack.Dropped += slot => _ = Throw(slot);
         _pack.Tidy.Pressed += () => _ = Straighten();
 

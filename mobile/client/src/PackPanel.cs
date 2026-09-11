@@ -98,12 +98,17 @@ public sealed partial class PackPanel : PanelContainer
         _use.CustomMinimumSize = Cell;
         _use.Visible = false;
 
-        // 걸친 것은 음수로 두므로, 양수일 때만 쓸 것이 골라져 있다는 뜻이다.
+        // 한 버튼이 둘을 한다. 고른 것이 소지품이면 입고, 걸친 것이면 벗는다 — 둘이 동시에 골라지는
+        // 일이 없으므로 버튼을 둘 둘 이유가 없다. 걸친 것은 음수로 두어 어느 쪽인지 가린다.
         _use.Pressed += () =>
         {
             if (_chosen > 0)
             {
                 Used?.Invoke(_chosen);
+            }
+            else if (_chosen < 0)
+            {
+                TakenOff?.Invoke(-_chosen);
             }
         };
 
@@ -161,6 +166,9 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>Somebody asked to throw a carried thing away. The server decides whether it may be.</summary>
     public event System.Action<int>? Dropped;
 
+    /// <summary>Somebody asked to take off what is in one worn place. The number is the server's own.</summary>
+    public event System.Action<int>? TakenOff;
+
     /// <summary>The button that pulls everything to the front of the pack.</summary>
     public Button Tidy { get; }
 
@@ -186,12 +194,13 @@ public sealed partial class PackPanel : PanelContainer
     }
 
     /// <summary>
-    /// Picks the first carried thing and asks to use it, as a hand would. Only for a run with no hand on
-    /// it — it goes through the same event the button raises, so the wiring is checked, not bypassed.
+    /// Picks the first thing on whichever tab is showing and presses the button beside it — put it on from
+    /// the pack, take it off from the gear ring. Only for a run with no hand on it: it goes through the
+    /// same events the buttons raise, so the wiring is checked, not bypassed.
     /// </summary>
     public bool PressFirst()
     {
-        foreach (Node cell in _rows.GetChildren())
+        foreach (Node cell in (_onGear ? _gear.Cells : _rows.GetChildren()))
         {
             if (cell is Button button)
             {
@@ -252,6 +261,7 @@ public sealed partial class PackPanel : PanelContainer
         if (held is not null)
         {
             _chosenName.Text = held.Stacks > 1 ? $"{held.Name} ×{held.Stacks}" : held.Name;
+            _use.Text = "입기";
             _use.Visible = true;
             _drop.Visible = true;
 
@@ -263,7 +273,10 @@ public sealed partial class PackPanel : PanelContainer
         if (gear is not null)
         {
             _chosenName.Text = $"{WornPlace.Of(gear.Slot)} · {gear.Called}";
-            _use.Visible = false;
+            _use.Text = "벗기";
+            _use.Visible = true;
+
+            // 걸친 것은 바로 버릴 수 없다. 벗어서 소지품에 든 다음에야 버릴 것이 생긴다.
             _drop.Visible = false;
 
             return;

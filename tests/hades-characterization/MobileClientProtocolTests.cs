@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text.Json.Nodes;
 using Darkages.Network;
 using Darkages.Security;
@@ -132,6 +132,45 @@ public sealed class MobileClientProtocolTests
         // Boot.cs sets Aisling.Boots to the item template's Image, and this template's is 1.
         Assert.Equal(0, before.Wearing!.Boots);
         Assert.Equal(1, after.Wearing!.Boots);
+    }
+
+    [Fact]
+    public async Task Taking_something_off_puts_it_back_in_the_pack()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+        PutBootsInThePack(server, MobileName);
+
+        using WorldSession session = await LoginAsync(server);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Settled(world, seen => seen is not null);
+
+        Character before = (await Mine(world))!;
+        InventoryItem boots = await Carried(world, "Shagreen Boots");
+
+        await world.UseAsync(boots.Slot, _deadline.Token);
+
+        Character dressed = await Changed(world, before.Wearing);
+        Assert.Equal(1, dressed.Wearing!.Boots);
+
+        // 서버는 걸친 자리를 0x37 로 따로 알려준다. 어느 자리에 갔는지는 그것으로만 안다.
+        WornItem worn = await WornIn(world, "Shagreen Boots");
+
+        await world.TakeOffAsync(worn.Slot, _deadline.Token);
+
+        // 벗는 것도 입는 것과 같다 — 서버가 우리를 다시 묘사하는 것이 그림을 고쳐 그리게 한다.
+        Character bare = await Changed(world, dressed.Wearing);
+
+        Assert.Equal(0, bare.Wearing!.Boots);
+        Assert.DoesNotContain(world.Worn, one => one.Slot == worn.Slot);
+
+        // 벗은 것은 사라지지 않고 소지품으로 돌아온다.
+        await Carried(world, "Shagreen Boots");
     }
 
     [Fact]
@@ -423,6 +462,28 @@ public sealed class MobileClientProtocolTests
         }
 
         throw new TimeoutException($"소지품에 {called} 가 들어오지 않았습니다. 든 것: {world.Pack.Count}가지. 서버가 한 말({world.SaidCount}번): {world.Said}");
+    }
+
+    /// <summary>Waits until something by that name is worn, and says which place it went to.</summary>
+    private async Task<WornItem> WornIn(WorldClient world, string called)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            WornItem? found = world.Worn.FirstOrDefault(one => one.Called == called || one.Name == called);
+
+            if (found is not null)
+            {
+                return found;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException(
+            $"{called} 를 걸친 것으로 알려주지 않았습니다. 걸친 것: "
+            + string.Join(", ", world.Worn.Select(one => $"{one.Slot}:{one.Called}")));
     }
 
     /// <summary>Waits until the server describes us as wearing something other than this.</summary>
