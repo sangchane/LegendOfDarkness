@@ -139,9 +139,22 @@ PathQualifer   Wander:1  Fixed:2  Patrol:3
 
 ---
 
-## 7. 지금 있는 것
+## 7. 지금 있는 것 — 저렙 사냥터 셋뿐
 
-저장소 템플릿은 **셋뿐**이다(`tmp/hades-run` 에는 손으로 만든 `safehouse_wasp` 가 하나 더 있다).
+**이 저장소에는 괴물 템플릿이 셋밖에 없다**(`tmp/hades-run` 에 손으로 만든 `safehouse_wasp` 가 하나
+더 있다). 셋 다 **저렙 사냥터 몬스터**라 비선공인 것이 정상이다 — 원작에서도 레벨이 올라가면 선공
+몬스터가 많아진다. **셋을 보고 서버 전체를 판단하면 안 된다.**
+
+움직이는 기계(`scripts/`)와 그 기계에 넣을 내용(`templates/`)의 양이 크게 다르다:
+
+| | 개수 |
+|---|---|
+| `scripts/Spells` · `Skills` · `Mundanes` … | **115개** — 기술·마법·NPC 행동이 다 짜여 있다 |
+| `templates/monsters` · `items` · `spells` … | **17개** — 괴물 3, 아이템 3, 마법 0 |
+
+즉 **규칙은 다 있는데 넣어 둔 내용이 거의 없는 상태**다. 원작의 자료표는 따로 있다 —
+`database/server/metafile/` 에 기술·마법 641줄, 퀘스트 361줄, 아이템 2,110줄
+(`where-the-answers-are.md` 4.6절).
 
 | 이름 | `Image` | 기분 | 이동 | 기술 | 타격 / 시전 |
 |---|---|---|---|---|---|
@@ -149,10 +162,11 @@ PathQualifer   Wander:1  Fixed:2  Patrol:3
 | `Spider 5s` 거미 | 16437 → MNS053 | **`Neutral`(8) → 비선공** | `Wander` | `Assail` | 1000 / 2500 |
 | `Minion` | 0x40C5 → MNS197 | `Unpredicable`(4) | `Wander` | 없음 | 1000 / 2000 |
 
-**셋 다 확정 선공이 아니다.** 둘은 스폰 때 동전 던지기, 하나는 비선공이다. 선공 괴물이 필요하면
-`MoodType` 을 **2**로 적어야 한다 — 16을 적으면 2절 때문에 오히려 비선공이 된다.
+셋 다 저렙다운 값이다 — 둘은 동전 던지기, 거미는 비선공. **선공 괴물을 만들 때는 `MoodType` 을
+반드시 `2`로 적는다.** `16`(VeryAggressive)을 적으면 2절 때문에 오히려 비선공이 된다.
 
-주문을 하나도 안 가졌는데 `CastSpeed` 는 다 적혀 있다. 시계는 도는데 걸 것이 없는 셈이다.
+주문을 하나도 안 가졌는데 `CastSpeed` 는 다 적혀 있다. 시계는 도는데 걸 것이 없는 셈이다 —
+`templates/spells` 가 비어 있는 것과 같은 이야기다.
 
 `Spider 5s` 의 JSON 은 목록 끝에 쉼표가 남아 있고 셋째는 `Image` 를 `0x40C5` 로 적어 두었다.
 서버의 파서는 둘 다 봐주지만 엄격한 파서는 거부한다 — `build-client-assets.ps1` 이 JSON 으로
