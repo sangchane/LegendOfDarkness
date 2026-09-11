@@ -204,8 +204,12 @@ $godot --path mobile/client -- --screen game --size 360x780 --orient portrait `
 
 ```powershell
 & $dotnet test mobile/tests/Lod.Mobile.Core.Tests/Lod.Mobile.Core.Tests.csproj   # 42개, 몇 초
-& $dotnet test tests/hades-characterization/Hades.Characterization.Tests.csproj  # 46개, 약 1분
+& $dotnet test tests/hades-characterization/Hades.Characterization.Tests.csproj  # 52개, 약 1분
+& $dotnet test tools/tests/DatExtract.Tests/DatExtract.Tests.csproj              # 12개, 즉시
 ```
+
+**격리 시험을 돌리기 전에 `sources/wren11/Dark-Ages-Private-Server/database/server/aislings/` 를 비운다.**
+그 폴더가 비어 있어야 한다고 시험이 단언하는데, 손으로 만든 계정과 서버가 만드는 `.backup` 이 거기 쌓인다.
 
 격리 시험은 **`Staging/net5.0`의 서버 바이너리를 실행한다.** 서버 코드를 고쳤으면 먼저 빌드해야
 바뀐 것을 시험한다:

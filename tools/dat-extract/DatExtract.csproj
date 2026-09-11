@@ -19,4 +19,10 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The parsing worth testing is internal to the tool, and making it public only for tests would say
+         it is part of an interface it is not. -->
+    <InternalsVisibleTo Include="DatExtract.Tests" />
+  </ItemGroup>
+
 </Project>

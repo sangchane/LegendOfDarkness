@@ -522,6 +522,18 @@ internal static class Program
     /// item"; below that is a tile number counted across the <c>item###.epf</c> files at 266 frames each.
     /// The palette comes from <c>itempal.tbl</c>, written in the same 1-based tile numbers.
     /// </summary>
+    /// <summary>
+    /// Where one item icon lives. The number the server sends carries 0x8000 to say "this is an item", and
+    /// below that the tile is counted from 1 across the <c>item###.epf</c> files at 266 frames each — so
+    /// the number steps back one before it is split, and tile 267 is the first frame of the second file.
+    /// </summary>
+    internal static (int File, int Frame, int Tile) IconCell(int display)
+    {
+        int tile = display >= ItemImageFlag ? display - ItemImageFlag : display;
+
+        return (((tile - 1) / FramesPerItemFile) + 1, (tile - 1) % FramesPerItemFile, tile);
+    }
+
     private static async Task<int> RenderIcon(List<ArchivedItem> entries, string[] args)
     {
         if (args.Length < 4)
@@ -551,10 +563,7 @@ internal static class Program
                 continue;
             }
 
-            // The tile number counts from 1, so step back one before splitting it into file and frame.
-            int tile = display >= ItemImageFlag ? display - ItemImageFlag : display;
-            int fileNumber = ((tile - 1) / FramesPerItemFile) + 1;
-            int frameNumber = (tile - 1) % FramesPerItemFile;
+            (int fileNumber, int frameNumber, int tile) = IconCell(display);
 
             ArchivedItem? file = entries.FirstOrDefault(entry =>
                 entry.Name.Equals($"item{fileNumber:000}.epf", StringComparison.OrdinalIgnoreCase));
