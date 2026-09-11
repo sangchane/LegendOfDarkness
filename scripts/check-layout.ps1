@@ -44,11 +44,15 @@ foreach ($screen in $screens) {
 
         $output = & $godot @arguments 2>&1
         $bad = $output | Select-String 'GREYBOX_LAYOUT_BAD'
+        $runtimeErrors = $output |
+            Select-String '^ERROR:' |
+            Where-Object { $_.Line -notmatch 'were leaked at exit' }
 
-        if ($bad) {
+        if ($bad -or $runtimeErrors) {
             $failed++
             Write-Output "실패  $label"
             $bad | ForEach-Object { Write-Output "      $_" }
+            $runtimeErrors | ForEach-Object { Write-Output "      $_" }
             $output | Select-String 'GREYBOX_LAYOUT ' | ForEach-Object { Write-Output "      $_" }
         }
         else {
