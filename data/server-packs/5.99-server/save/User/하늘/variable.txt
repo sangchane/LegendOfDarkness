@@ -1,0 +1,14 @@
+#gahotime	24
+#logintime	1435156183
+#logouttime	1435156183
+#hair	14
+#sex	2
+#newbie	1
+#pointset	70
+#EG	1000
+#realmap	4
+#mhunting	14
+#end_time	0
+#exptime	576
+#expba	2
+#teleport	1435156196

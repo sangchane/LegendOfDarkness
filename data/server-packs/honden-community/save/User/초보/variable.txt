@@ -1,0 +1,12 @@
+#logintime	1550728871
+#new	1
+#teleport	1550728849
+#underpassC	0
+#underpassD	0
+#underpassS	0
+#auto_hp	0
+#auto_mp	0
+#ablc	75
+#S3attack	1
+#SAttack3	1
+#logouttime	1550728912

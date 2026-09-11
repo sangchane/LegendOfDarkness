@@ -1,0 +1,8 @@
+itemShopUrl	http://lod.nexon.com/	http://shop.lod.nexon.com
+nexonIdRegisterUrl	https://www.nexon.com/join/page/nx.aspx?url=join/join&codeRegSite=161
+PasswordChangeNotifyUrl	http://login.lod.nexon.com/Soap/SendMessage.aspx
+AgeAuthUrl	http://classicrpgcharacter.nexon.com/service/classicrpgcheckage.aspx?gameid=%s&servercode=%d&gametype=%d
+AgeCheckEnable	0
+NexonAuthEnable	1
+UserNumDisplayMode	1
+UserNumFactor	10

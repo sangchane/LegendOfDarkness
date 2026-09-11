@@ -1,0 +1,17 @@
+#logintime	1550383633
+#new	1
+#underpassC	0
+#underpassD	0
+#underpassS	0
+#auto_mp	0
+#returnx	8
+#returny	11
+#returnc	1
+#logouttime	1550383883
+#auto_hp	0
+#ablc	20
+#SAttack3	2
+#PlayAttack	2
+#HollyCuracaogunnera	1
+#exppoint	1
+#teleport	1550383810

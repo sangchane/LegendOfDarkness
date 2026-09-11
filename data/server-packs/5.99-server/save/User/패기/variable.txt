@@ -1,0 +1,16 @@
+#gahotime	30
+#logintime	1435665120
+#logouttime	1435665120
+#hair	3
+#sex	1
+#newbie	1
+#pointset	70
+#EG	1000
+#exptime	0
+#expba	2
+#realmap	4
+#mhunting	147
+#end_time	0
+#teleport	1435668206
+#husick	1435590247
+#bloodearl	2

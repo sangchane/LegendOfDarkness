@@ -1,0 +1,7 @@
+#logintime	1550574134
+#new	1
+#teleport	1550575976
+#underpassC	1
+#underpassS	0
+#underpassD	0
+#logouttime	1550575986

@@ -1,0 +1,2435 @@
+1	주문서	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	if(@item$=="[주문서]PER+1%"){
+		darkre:
+		set@darkper,menu(0,"PER+1% 주문서를 사용하시겠습니까? 성공시 주문서의 특성치가 아이템에 부여됩니다.","주문서를 사용한다","주문서 사용 방법");
+		if(@darkper== 0){goto darkre;}
+		if(@darkper== 1){
+			if(item_one_check(@myid)=="흑비화무갑주(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화무투구(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화무투구(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비현진의(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비현진건(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비현진의(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비현진건(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화후의(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화후관(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화후의(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비화후관(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비류선의(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비류선후(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비류선의(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑비류선후(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑태극의(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑태극현(남)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑태극의(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)"){
+				if(rand2(1,100) > 20){goto darkgo1;}
+				item_add "흑태극현(여)(+1)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화무투구(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화무투구(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비현진의(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비현진건(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비현진의(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비현진건(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화후의(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화후관(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화후의(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비화후관(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비류선의(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비류선후(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비류선의(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑비류선후(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑태극의(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑태극현(남)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑태극의(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+1)"){
+				if(rand2(1,100) > 10){goto darkgo1;}
+				item_add "흑태극현(여)(+2)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화무투구(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화무투구(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비현진의(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비현진건(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비현진의(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비현진건(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화후의(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화후관(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화후의(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비화후관(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비류선의(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비류선후(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비류선의(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑비류선후(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑태극의(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑태극현(남)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑태극의(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+2)"){
+				if(rand2(1,100) > 5){goto darkgo1;}
+				item_add "흑태극현(여)(+3)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화무투구(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화무투구(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비현진의(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비현진건(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비현진의(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비현진건(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화후의(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화후관(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화후의(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비화후관(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비류선의(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비류선후(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비류선의(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑비류선후(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑태극의(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑태극현(남)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑태극의(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+3)"){
+				if(rand2(1,100) > 1){goto darkgo1;}
+				item_add "흑태극현(여)(+4)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화무투구(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화무투구(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비현진의(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비현진건(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비현진의(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비현진건(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화후의(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화후관(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화후의(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비화후관(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비류선의(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비류선후(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비류선의(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑비류선후(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑태극의(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑태극현(남)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑태극의(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+4)"){
+				if(rand2(1,1000) > 8){goto darkgo1;}
+				item_add "흑태극현(여)(+5)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화무투구(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화무투구(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비현진의(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비현진건(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비현진의(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비현진건(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화후의(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화후관(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화후의(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비화후관(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비류선의(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비류선후(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비류선의(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑비류선후(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑태극의(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑태극현(남)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑태극의(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+5)"){
+				if(rand2(1,1000) > 5){goto darkgo1;}
+				item_add "흑태극현(여)(+6)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화무투구(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화무투구(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비현진의(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비현진건(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비현진의(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비현진건(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화후의(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화후관(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화후의(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비화후관(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비류선의(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비류선후(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비류선의(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑비류선후(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑태극의(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑태극현(남)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑태극의(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+6)"){
+				if(rand2(1,1000) > 3){goto darkgo1;}
+				item_add "흑태극현(여)(+7)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화무투구(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화무투구(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비현진의(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비현진건(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비현진의(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비현진건(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화후의(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화후관(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화후의(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비화후관(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비류선의(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비류선후(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비류선의(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑비류선후(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑태극의(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑태극현(남)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑태극의(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+7)"){
+				if(rand2(1,1000) > 1){goto darkgo1;}
+				item_add "흑태극현(여)(+8)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화무투구(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화무투구(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비현진의(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비현진건(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비현진의(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비현진건(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화후의(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화후관(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화후의(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비화후관(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비류선의(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비류선후(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비류선의(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑비류선후(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑태극의(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑태극현(남)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑태극의(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+8)"){
+				if(rand2(1,2000) > 5){goto darkgo1;}
+				item_add "흑태극현(여)(+9)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화무갑주(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화무투구(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무갑주(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화무갑주(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화무투구(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화무투구(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비현진의(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비현진건(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진의(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비현진의(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비현진건(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비현진건(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화후의(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화후관(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후의(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화후의(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비화후관(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비화후관(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비류선의(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비류선후(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선의(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비류선의(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑비류선후(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑비류선후(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑태극의(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(남)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑태극현(남)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극의(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑태극의(여)(+10)",1;
+				goto darkgo2;
+			}
+			if(item_one_check(@myid)=="흑태극현(여)(+9)"){
+				if(rand2(1,2000) > 1){goto darkgo1;}
+				item_add "흑태극현(여)(+10)",1;
+				goto darkgo2;
+			}else{
+				mes 0, "첫 번째 칸에 아이템이 없거나, 첫 번째 칸에 있는 아이템이 주문서 부여에 적합한 아이템이 아닙니다.";
+			}
+		}else if(@darkper==2){
+			mes 1, "PER+1% 주문서는 흑비 갑옷,투구 아이템에 {=qEXP{=a, {=wAP {=a퍼센트지 효과를 부여할 수 있는 주문서 입니다.\\n주문서 부여 성공시 1%씩 퍼센트지 효과를 받으실 수 있습니다.";
+			mes 1, "아이템 인벤토리(a) 첫 번째 슬롯에 주문서를 부여할 아이템 1종을 선택하시고 주문서를 사용하시면 일정 확률로 아이템에 주문서의 특성치 효과를 부여 하실 수 있게 됩니다.";
+			mes 1, "PER+1%는 주문서 부여를 실패를 하셔도 파괴되지 않으며, 별도의 {=c파괴 보호+100% {=a주문서를 꼭 지참하지 않으셔도 주문서 부여에 큰 무리가 없습니다.";
+			goto darkre;
+		}
+		end;
+		darkgo1:
+			item_del "[주문서]PER+1%",1;
+			message 3,"실패했습니다";
+		end;
+		darkgo2:
+			item_del "[주문서]PER+1%",1;
+			set@itemname$,item_one_check(@myid);
+			item_del@itemname$,1;
+			effect@myid,306,0,100;
+			message 3,"성공했습니다";
+			del @itemname$;
+		end;
+	}
+}
+
+1	포스피스	{
+	set@myid,get_myid();
+	mes 1,"{=c1. 지정된 게임아이템 2종을 합하여 강화된 아이템(무기한)으로 교환해 드립니다.\\n(게임아이템의 EXP,AP효과가 1%씩 향상됩니다.)\\n2. 포스피스를 사용시 일정확률로 뮤레칸가면(무기한)을 획득하실 수 있습니다.";
+	re:
+	set@mes1$," 아이템 2개가 필요합니다.\\n아이템 창 1번, 2번 슬롯에 아이템 두개를 올린 후 사용해주세요.";
+	set@mes2$,"아이템 합성 준비를 모두 마치셨습니까?";
+	set@pospis,menu(0,"{=c먼저 원하시는 아이템을 골라주세요.","베네티티타늄클립","강화된세피라링(Lev10)","그만둔다");
+	if(@pospis==1){
+		mes 1,"베네티티타늄클립을 만들기 위해서는 베네티미스릴클립"+@mes1$;
+		set@pospis2,menu(0,@mes2$,"아니오","네");
+		if(@pospis2==2){
+			if(item_exist(@myid,"베네티미스릴클립")<2){goto go1;}
+			item_del "포스피스",1;
+			item_del "베네티미스릴클립",1;
+			item_del "베네티미스릴클립",1;
+			item_add "베네티티타늄클립",1;
+			goto go2;
+		}else{goto re;}
+	}else if(@pospis==2){
+		mes 1,"강화된세피라링(Lev10)을 만들기 위해서는 세피라링(Lev10)"+@mes1$;
+		set@pospis2,menu(0,@mes2$,"아니오","네");
+		if(@pospis2==2){
+			if(item_exist(@myid,"세피라링(Lev10)")<2){goto go1;}
+			item_del "포스피스",1;
+			item_del "세피라링(Lev10)",1;
+			item_del "세피라링(Lev10)",1;
+			item_add "강화된세피라링(Lev10)",1;
+			goto go2;
+		}else{goto re;}
+	}else{goto re;}
+	go1:
+	del@mes1$;
+	del@mes2$;
+	mes 0,"아이템 합성 재료가 부족합니다.";
+	end;
+	go2:
+	if(rand2(1,1000) < 1){
+		set@rand2,rand2(1,4);
+		if(@rand2<1||@rand2>4){goto te5;}
+		switch(@rand2){
+			case 1:
+				set@Tread$,"세오의가호(Lev1) 100개";
+				item_add "세오의가호(Lev1)", 100;
+			break;
+			case 2:
+				set@Tread$,"뮤레칸가면";
+				item_add "뮤레칸가면",1;
+			break;
+			case 3:
+				set@Tread$,"[10일]퀸셰어의귀걸이";
+				item_add_term @myid,"[10일]퀸셰어의귀걸이", 1, 864000;
+			break;
+			case 4:
+				set@Tread$,"스켈톤갑옷";
+				item_add "스켈톤갑옷",1;
+			break;
+		}
+		broadcast 5, get_name(@myid) +"님이 강화 잔여물로 "+@Tread$+"획득!";
+	}
+	effect@myid,306,0,100;
+	del@mes1$;
+	del@mes2$;
+	mes 0,"아이템 합성을 성공했습니다.";
+	end;
+}
+
+1	염색제	{
+	set @myid ,get_myid();
+	set@item$,last_item();
+	set@check$,item_one_check(@myid);
+	set@menu$,"{=c염색이 가능한 아이템을 1번창에 놓아주세요.\\n{=a계속 진행하시면 염색 후 ";
+	set@menu2$,"를 사용하시겠습니까?";
+	npc_look @myid, 0, 0;
+	if(@item$=="흰색염색제"||@item$=="분홍색염색제"||@item$=="레몬색염색제"||@item$=="하늘색염색제"||@item$=="퓨어블랙염색제"){
+		go:
+		set@menu,menu(0,@menu$+""+@item$+"는 사라집니다. "+@item$+""+@menu2$,"아니오","네");
+		if(@menu==2){goto go1;}else{goto go;}
+	end;
+	}
+	end;
+	go1:
+	if(@check$=="85라피드0"||@check$=="85라피드15"||@check$=="85라피드16"||@check$=="85라피드19"||@check$=="85라피드30"||@check$=="85라피드69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "85라피드15",1;}
+		if(@item$=="분홍색염색제"){item_add "85라피드16",1;}
+		if(@item$=="레몬색염색제"){item_add "85라피드19",1;}
+		if(@item$=="하늘색염색제"){item_add "85라피드30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "85라피드69",1;}
+		goto go2;
+	end;
+	}
+	if(@check$=="지존라피드0"||@check$=="지존라피드15"||@check$=="지존라피드16"||@check$=="지존라피드19"||@check$=="지존라피드30"||@check$=="지존라피드69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "지존라피드15",1;}
+		if(@item$=="분홍색염색제"){item_add "지존라피드16",1;}
+		if(@item$=="레몬색염색제"){item_add "지존라피드19",1;}
+		if(@item$=="하늘색염색제"){item_add "지존라피드30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "지존라피드69",1;}
+		goto go2;
+	end;
+	}
+	if(@check$=="승급라피드0"||@check$=="승급라피드15"||@check$=="승급라피드16"||@check$=="승급라피드19"||@check$=="승급라피드30"||@check$=="승급라피드69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "승급라피드15",1;}
+		if(@item$=="분홍색염색제"){item_add "승급라피드16",1;}
+		if(@item$=="레몬색염색제"){item_add "승급라피드19",1;}
+		if(@item$=="하늘색염색제"){item_add "승급라피드30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "승급라피드69",1;}
+		go2:
+		message 3,"염색을 완료했습니다.";
+	end;
+	}
+	if(@check$=="천하제일기0"||@check$=="천하제일기15"||@check$=="천하제일기16"||@check$=="천하제일기19"||@check$=="천하제일기30"||@check$=="천하제일기69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "천하제일기15",1;}
+		if(@item$=="분홍색염색제"){item_add "천하제일기16",1;}
+		if(@item$=="레몬색염색제"){item_add "천하제일기19",1;}
+		if(@item$=="하늘색염색제"){item_add "천하제일기30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "천하제일기69",1;}
+		goto go2;
+	end;
+	}
+	if(@check$=="천하제일기0"||@check$=="천하제일기15"||@check$=="천하제일기16"||@check$=="천하제일기19"||@check$=="천하제일기30"||@check$=="천하제일기69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "천하제일기15",1;}
+		if(@item$=="분홍색염색제"){item_add "천하제일기16",1;}
+		if(@item$=="레몬색염색제"){item_add "천하제일기19",1;}
+		if(@item$=="하늘색염색제"){item_add "천하제일기30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "천하제일기69",1;}
+		goto go2;
+	end;
+	}
+	if(@check$=="스타킹0"||@check$=="스타킹15"||@check$=="스타킹16"||@check$=="스타킹19"||@check$=="스타킹30"||@check$=="스타킹69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "스타킹15",1;}
+		if(@item$=="분홍색염색제"){item_add "스타킹16",1;}
+		if(@item$=="레몬색염색제"){item_add "스타킹19",1;}
+		if(@item$=="하늘색염색제"){item_add "스타킹30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "스타킹69",1;}
+		goto go2;
+	end;
+	}
+	if(@check$=="퀸버터플라이윙0"||@check$=="퀸버터플라이윙15"||@check$=="퀸버터플라이윙16"||@check$=="퀸버터플라이윙19"||@check$=="퀸버터플라이윙30"||@check$=="퀸버터플라이윙69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "퀸버터플라이윙15",1;}
+		if(@item$=="분홍색염색제"){item_add "퀸버터플라이윙16",1;}
+		if(@item$=="레몬색염색제"){item_add "퀸버터플라이윙19",1;}
+		if(@item$=="하늘색염색제"){item_add "퀸버터플라이윙30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "퀸버터플라이윙69",1;}
+		goto go2;
+	end;
+	}
+	if(@check$=="루캐트의윙0"||@check$=="루캐트의윙15"||@check$=="루캐트의윙16"||@check$=="루캐트의윙19"||@check$=="루캐트의윙30"||@check$=="루캐트의윙69"){
+		item_del@item$,1;
+		item_del@check$,1;
+		if(@item$=="흰색염색제"){item_add "루캐트의윙15",1;}
+		if(@item$=="분홍색염색제"){item_add "루캐트의윙16",1;}
+		if(@item$=="레몬색염색제"){item_add "루캐트의윙19",1;}
+		if(@item$=="하늘색염색제"){item_add "루캐트의윙30",1;}
+		if(@item$=="퓨어블랙염색제"){item_add "루캐트의윙69",1;}
+		goto go2;
+	end;
+	}
+	mes 0,"1번창의 아이템은 염색가능한 아이템이 아닙니다.";
+	del@item$;
+	del@check$;
+	del@menu$;
+	del@menu2$;
+	end;
+}
+
+1	소모성아이템	{
+	set @myid ,get_myid();
+	set@item$,last_item();
+	set@check$,item_one_check(@myid);
+	if(@item$=="채집용설탕물"){
+		set@bug,menu(0,"채집용 설탕물을 사용할 시 채집용 설탕물 100포인트가 충전됩니다.\\n{=c채집 스킬{=a을 사용할 시 포인트가 {=c1{=a씩 감소합니다. 사용하시겠습니까?","예","아니오");
+		if(@bug==1){
+			item_del "채집용설탕물", 1;
+			set #bugpoint, #bugpoint + 100;
+			message 3,"현재 채집용설탕물 포인트 {=c"+#bugpoint;
+			mes 0,"채집용설탕물 포인트가 충전되었습니다.";
+		}
+	end;
+	}
+	if(@item$=="케라코라석상"){
+		npc_look @myid, 0, 0;
+		set@hiyatbox,menu(1,"무엇을 선택할까?","어빌리티 포인트","경험치","자아의조각","금전");
+		if(@hiyatbox==1){
+			kera:
+			set @rand, rand2(1,8);
+			if(@rand < 1 || @rand > 8){goto kera;}
+			switch(@rand){
+				case 1:set @ab, 2000;break;
+				case 2:set @ab, 3000;break;
+				case 3:set @ab, 4000;break;
+				case 4:set @ab, 5000;break;
+				case 5:set @ab, 6000;break;
+				case 6:set @ab, 7000;break;
+				case 7:set @ab, 8000;break;
+				case 8:set @ab, 9000;break;
+			}
+			item_del "케라코라석상", 1;
+			message 3,"어빌리티가 {=c"+@ab+" {=u가 상승했습니다.";
+			ability_exp_add @ab;
+		}else if(@hiyatbox==2){
+			kera2:
+			set @rand, rand2(1,8);
+			if(@rand < 1 || @rand > 8){goto kera2;}
+			switch(@rand){
+				case 1:set @exp, 10000;break;
+				case 2:set @exp, 100000;break;
+				case 3:set @exp, 1000000;break;
+				case 4:set @exp, 1000000;break;
+				case 5:set @exp, 10000000;break;
+				case 6:set @exp, 10000000;break;
+				case 7:set @exp, 10000000;break;
+				case 8:set @exp, 10000000;break;
+			}
+			item_del "케라코라석상", 1;
+			message 3,"경험치가 {=c"+@exp+" {=u가 상승했습니다.";
+			exp_add @exp;
+		}else if(@hiyatbox==3){
+			item_del "케라코라석상", 1;
+			item_add "자아의조각", 1;
+			message 3,"{=c자아의조각{=u을 한개 받았습니다.";
+		}else if(@hiyatbox==4){
+			kera3:
+			set @rand, rand2(1,8);
+			if(@rand < 1 || @rand > 8){goto kera3;}
+			switch(@rand){
+				case 1:set @gold, 100000;break;
+				case 2:set @gold, 100000;break;
+				case 3:set @gold, 100000;break;
+				case 4:set @gold, 100000;break;
+				case 5:set @gold, 100000;break;
+				case 6:set @gold, 1000000;break;
+				case 7:set @gold, 1000000;break;
+				case 8:set @gold, 10000000;break;
+			}
+			item_del "케라코라석상", 1;
+			money_add @gold;
+			message 3,"금전 {=c"+@gold+"{=u전을 획득했습니다.";
+		}
+	end;
+	}
+	if(@item$=="시련의탑석상"){
+		npc_look @myid, 0, 0;
+		set@hiyatbox,menu(1,"무엇을 선택할까?","어빌리티 포인트","경험치","자아의조각","금전");
+		if(@hiyatbox==1){
+			si:
+			set @rand, rand2(1,8);
+			if(@rand < 1 || @rand > 8){goto si;}
+			switch(@rand){
+				case 1:set @ab, 20000;break;
+				case 2:set @ab, 30000;break;
+				case 3:set @ab, 40000;break;
+				case 4:set @ab, 50000;break;
+				case 5:set @ab, 60000;break;
+				case 6:set @ab, 70000;break;
+				case 7:set @ab, 80000;break;
+				case 8:set @ab, 90000;break;
+			}
+			item_del "시련의탑석상", 1;
+			message 3,"어빌리티가 {=c"+@ab+" {=u가 상승했습니다.";
+			ability_exp_add @ab;
+		}else if(@hiyatbox==2){
+			si2:
+			set @rand, rand2(1,8);
+			if(@rand < 1 || @rand > 8){goto si2;}
+			switch(@rand){
+				case 1:set @exp, 100000;break;
+				case 2:set @exp, 1000000;break;
+				case 3:set @exp, 10000000;break;
+				case 4:set @exp, 10000000;break;
+				case 5:set @exp, 100000000;break;
+				case 6:set @exp, 100000000;break;
+				case 7:set @exp, 200000000;break;
+				case 8:set @exp, 300000000;break;
+			}
+			item_del "시련의탑석상", 1;
+			message 3,"경험치가 {=c"+@exp+" {=u가 상승했습니다.";
+			exp_add @exp;
+		}else if(@hiyatbox==3){
+			item_del "시련의탑석상", 1;
+			item_add "자아의조각", 1;
+			message 3,"{=c자아의조각{=u을 한개 받았습니다.";
+		}else if(@hiyatbox==4){
+			si3:
+			set @rand, rand2(1,8);
+			if(@rand < 1 || @rand > 8){goto si3;}
+			switch(@rand){
+				case 1:set @gold, 100000;break;
+				case 2:set @gold, 100000;break;
+				case 3:set @gold, 100000;break;
+				case 4:set @gold, 100000;break;
+				case 5:set @gold, 100000;break;
+				case 6:set @gold, 1000000;break;
+				case 7:set @gold, 1000000;break;
+				case 8:set @gold, 10000000;break;
+			}
+			item_del "시련의탑석상", 1;
+			money_add @gold;
+			message 3,"금전 {=c"+@gold+"{=u전을 획득했습니다.";
+		}
+	end;
+	}
+	if(@item$=="파프리카"){
+		set@time,time() - #papricaB;
+		if(@time<24){set@time2,24 -@time;message 3,"{=q"+#papricaA+"/2{=u회 사용. {=q"+@time2+"초{=u동안 {=q"+#papricaC+"번 더 사용 가능.";goto paprica;}
+		set #papricaB,time();
+		paprica:
+		if(@time<24){
+			if(#papricaA>=2){end;}
+		}
+		if(#papricaA>=2){
+			set #papricaA, 0;
+			set #papricaC, 2;
+		}
+		set #papricaA,#papricaA+1;
+		set #papricaC,#papricaC-1;
+		item_del "파프리카", 1;
+		set_manal get_mana(@myid) + 1000;
+	end;
+	}
+	if(@item$=="블루피치"){
+		set@time,time() - #bluepeachB;
+		if(@time<24){set@time2,24 -@time;message 3,"{=q"+#bluepeachA+"/2000{=u회 사용. {=q"+@time2+"초{=u동안 {=q"+#bluepeachC+"번 더 사용 가능.";goto bluepeach;}
+		set #bluepeachB,time();
+		bluepeach:
+		if(@time<24){
+			if(#bluepeachA>=2000){end;}
+		}
+		if(#bluepeachA>=2000){
+			set #bluepeachA, 0;
+			set #bluepeachC, 2;
+		}
+		set #bluepeachA,#bluepeachA+1;
+		set #bluepeachC,#bluepeachC-1;
+		item_del "블루피치", 1;
+		set_manal get_mana(@myid) + 2500;
+	end;
+	}
+	if(@item$=="아프리코트"){
+		set@time,time() - #apricotB;
+		if(@time<24){set@time2,24 -@time;message 3,"{=q"+#apricotA+"/3{=u회 사용. {=q"+@time2+"초{=u동안 {=q"+#apricotC+"번 더 사용 가능.";goto apricot;}
+		set #apricotB,time();
+		apricot:
+		if(@time<24){
+			if(#apricotA>=3){end;}
+		}
+		if(#apricotA>=3){
+			set #apricotA, 0;
+			set #apricotC, 3;
+		}
+		set #apricotA,#apricotA+1;
+		set #apricotC,#apricotC-1;
+		item_del "아프리코트", 1;
+		set_manal get_mana(@myid) + 500;
+	end;
+	}
+	if(@item$=="수상한버섯"){
+		set_vital 1;
+		message 3,"당신의 체력은 1이 되었습니다.";
+	end;
+	}
+	if(@item$=="디베노뭄"){	
+		mobpoison_end@myid;
+	end;
+	}
+	if(@item$=="엑스체력포션"){
+		if(get_mapname(@myid)=="베크나탑-1층"||get_mapname(@myid)=="베크나탑-2층"||get_mapname(@myid)=="베크나탑-3층"||get_mapname(@myid)=="베크나탑-4층"||get_mapname(@myid)=="베크나탑-5층"||get_mapname(@myid)=="베크나탑-6층"||get_mapname(@myid)=="베크나탑-7층"||get_mapname(@myid)=="베크나탑-8층"||get_mapname(@myid)=="베크나탑-최상층"){
+			set_vital get_vita(@myid)+get_basevita(@myid)/100*30;
+		}else{
+			message 3,"이 곳에선 사용이 불가능합니다.";
+		}
+	end;
+	}
+	if(@item$=="성전환캡슐"){
+		sexchenge:
+		set@sex,menu(0,"남, 여의 성별을 바꿀수 있는 시약 입니다","시약 사용 설명서","성전환 하기","나가기");
+		if(@sex==1){
+			mes 0,"시약은 {=c장비와 옷을 모두 벗으신후{=a에 사용 가능합니다.\\n시약을 사용하게 되면 남자는 여자로 여자는 남자로 성별이 바뀌게 됩니다";
+		}else if(@sex==2){
+			set@sex2,menu(0,"정말로 성전환을 하시겠습니까?","아니오","예");
+			if(@sex2==1){
+				goto sexchenge;
+			}else if(@sex2==2){
+				if(get_ac(@myid) <= 66){mes 0,"시약은 {=c장비와 옷을 모두 벗으신후{=a에 사용 가능합니다";end;}
+				item_del"성전환캡슐",1;
+				if(get_sex() == 1){
+					message 3,"성별이 {=c여자{=a로 바뀌었습니다 새로운 세상에 오신걸 축하드려요~^^";
+					set_sex 2;
+					set_body @myid,32;
+				}else{
+					message 3,"성별이 {=c남자{=a로 바뀌었습니다 새로운 세상에 오신걸 축하드려요~^^";
+					set_sex 1;
+					set_body @myid,16;
+				}
+				set_ys(get_ys(@myid)-0);
+				end;
+			}
+		}
+	end;
+	}
+	if(@item$=="변환키트-승급의상"){
+		set@sc,menu(0,"유저가 가진 성별이 정해진 아이템중에서 버리거나 교환이 안된는 물품을 자신의 성에 알맞게 바꿀수 있는 시약 입니다","시약 사용 설명서","자신의 성에 맞는 아이템으로 교환","나가기");
+		if(@sc==1){
+			mes 0,"성별이 정해진 아이템중에서 버리거나 교환이 안된는 물품을 자신의 성에 알맞게 바꿀수 있는 시약 입니다.\\n인벤토리창의 {=c첫번째 칸{=a에 교환하고 싶은 아이템을 올려놓으신후 사용하세요";
+		}else if(@sc==2){
+			if(get_sex()==1){
+				if(@check$=="여전승"){item_del"여전승",1;item_add"전승",1;goto sex1;}
+				if(@check$=="여전승모"){item_del"여전승모",1;item_add"전승모",1;goto sex1;}
+				if(@check$=="아레스1"){item_del"아레스1",1;item_add"레오파드1",1;goto sex1;}
+				if(@check$=="아레스2"){item_del"아레스2",1;item_add"레오파드2",1;goto sex1;}
+				if(@check$=="살렛1"){item_del"살렛1",1;item_add"헬름1",1;goto sex1;}
+				if(@check$=="살렛2"){item_del"살렛2",1;item_add"헬름2",1;goto sex1;}
+				if(@check$=="여도승"){item_del"여도승",1;item_add"도승",1;goto sex1;}
+				if(@check$=="레일라1"){item_del"레일라1",1;item_add"아비스1",1;goto sex1;}
+				if(@check$=="레일라2"){item_del"레일라2",1;item_add"아비스2",1;goto sex1;}
+				if(@check$=="라멜1"){item_del"라멜1",1;item_add"루크1",1;goto sex1;}
+				if(@check$=="라멜2"){item_del"라멜2",1;item_add"루크2",1;goto sex1;}
+				if(@check$=="여마승"){item_del"여마승",1;item_add"마승",1;goto sex1;}
+				if(@check$=="여마승모"){item_del"여마승모",1;item_add"마승모",1;goto sex1;}
+				if(@check$=="세르네티1"){item_del"세르네티1",1;item_add"솔라레스1",1;goto sex1;}
+				if(@check$=="세르네티2"){item_del"세르네티2",1;item_add"솔라레스2",1;goto sex1;}
+				if(@check$=="마아트1"){item_del"마아트1",1;item_add"마르두크1",1;goto sex1;}
+				if(@check$=="마아트2"){item_del"마아트2",1;item_add"마르두크2",1;goto sex1;}
+				if(@check$=="여성승"){item_del"여성승",1;item_add"성승",1;goto sex1;}
+				if(@check$=="여성승모"){item_del"여성승모",1;item_add"성승모",1;goto sex1;}
+				if(@check$=="라피스라즐리1"){item_del"라피스라즐리1",1;item_add"데메테르1",1;goto sex1;}
+				if(@check$=="라피스라즐리2"){item_del"라피스라즐리2",1;item_add"데메테르2",1;goto sex1;}
+				if(@check$=="큐이레스1"){item_del"큐이레스1",1;item_add"아가트1",1;goto sex1;}
+				if(@check$=="큐이레스2"){item_del"큐이레스2",1;item_add"아가트2",1;goto sex1;}
+				if(@check$=="여무승"){item_del"여무승",1;item_add"무승",1;goto sex1;}
+				if(@check$=="여무승모"){item_del"여무승모",1;item_add"무승모",1;goto sex1;}
+				if(@check$=="가릉비가1"){item_del"가릉비가1",1;item_add"위타천1",1;goto sex1;}
+				if(@check$=="가릉비가2"){item_del"가릉비가2",1;item_add"위타천2",1;goto sex1;}
+				if(@check$=="화영잠1"){item_del"화영잠1",1;item_add"투신의머리띠1",1;goto sex1;}
+				if(@check$=="화영잠2"){item_del"화영잠2",1;item_add"투신의머리띠2",1;goto sex1;}
+				mes 0,"이 시약으로 교환할 수 있는 아이템이 아닙니다";
+			}else if(get_sex()==2){
+				if(@check$=="전승"){item_del"전승",1;item_add"여전승",1;goto sex1;}
+				if(@check$=="전승모"){item_del"전승모",1;item_add"여전승모",1;goto sex1;}
+				if(@check$=="레오파드1"){item_del"레오파드1",1;item_add"아레스1",1;goto sex1;}
+				if(@check$=="레오파드2"){item_del"레오파드2",1;item_add"아레스2",1;goto sex1;}
+				if(@check$=="헬름1"){item_del"헬름1",1;item_add"살렛1",1;goto sex1;}
+				if(@check$=="헬름2"){item_del"헬름2",1;item_add"살렛2",1;goto sex1;}
+				if(@check$=="도승"){item_del"도승",1;item_add"여도승",1;goto sex1;}
+				if(@check$=="아비스1"){item_del"아비스1",1;item_add"레일라1",1;goto sex1;}
+				if(@check$=="아비스2"){item_del"아비스2",1;item_add"레일라2",1;goto sex1;}
+				if(@check$=="루크1"){item_del"루크1",1;item_add"라멜1",1;goto sex1;}
+				if(@check$=="루크2"){item_del"루크2",1;item_add"라멜2",1;goto sex1;}
+				if(@check$=="마승"){item_del"마승",1;item_add"여마승",1;goto sex1;}
+				if(@check$=="마승모"){item_del"마승모",1;item_add"여마승모",1;goto sex1;}
+				if(@check$=="솔라레스1"){item_del"솔라레스1",1;item_add"세르네티1",1;goto sex1;}
+				if(@check$=="솔라레스2"){item_del"솔라레스2",1;item_add"세르네티2",1;goto sex1;}
+				if(@check$=="마르두크1"){item_del"마르두크1",1;item_add"마아트1",1;goto sex1;}
+				if(@check$=="마르두크2"){item_del"마르두크2",1;item_add"마아트2",1;goto sex1;}
+				if(@check$=="성승"){item_del"성승",1;item_add"여성승",1;goto sex1;}
+				if(@check$=="성승모"){item_del"성승모",1;item_add"여성승모",1;goto sex1;}
+				if(@check$=="데메테르1"){item_del"데메테르1",1;item_add"라피스라즐리1",1;goto sex1;}
+				if(@check$=="데메테르2"){item_del"데메테르2",1;item_add"라피스라즐리2",1;goto sex1;}
+				if(@check$=="아가트1"){item_del"아가트1",1;item_add"큐이레스1",1;goto sex1;}
+				if(@check$=="아가트2"){item_del"아가트2",1;item_add"큐이레스2",1;goto sex1;}
+				if(@check$=="무승"){item_del"무승",1;item_add"여무승",1;goto sex1;}
+				if(@check$=="무승모"){item_del"무승모",1;item_add"여무승모",1;goto sex1;}
+				if(@check$=="위타천1"){item_del"위타천1",1;item_add"가릉비가1",1;goto sex1;}
+				if(@check$=="위타천2"){item_del"위타천2",1;item_add"가릉비가2",1;goto sex1;}
+				if(@check$=="투신의머리띠1"){item_del"투신의머리띠1",1;item_add"화영잠1",1;goto sex1;}
+				if(@check$=="투신의머리띠2"){item_del"투신의머리띠2",1;item_add"화영잠2",1;goto sex1;}
+				mes 0,"이 시약으로 교환할 수 있는 아이템이 아닙니다";	
+			}
+			sex1:
+			item_del"변환키트-승급의상",1;
+			message 3,"{=c아이템의 착용가능 성별이 변경되었습니다";
+		}
+	end;
+	}
+	if(@item$=="변환키트-화론의상"){
+		set@sc,menu(0,"유저가 가진 성별이 정해진 아이템중에서 버리거나 교환이 안된는 물품을 자신의 성에 알맞게 바꿀수 있는 시약 입니다","시약 사용 설명서","자신의 성에 맞는 아이템으로 교환","나가기");
+		if(@sc==1){
+			mes 0,"성별이 정해진 아이템중에서 버리거나 교환이 안된는 물품을 자신의 성에 알맞게 바꿀수 있는 시약 입니다.\\n인벤토리창의 {=c첫번째 칸{=a에 교환하고 싶은 아이템을 올려놓으신후 사용하세요";
+		}else if(@sc==2){
+			if(get_sex()==1){
+				if(@check$=="적비화무갑주(여)"){item_del"적비화무갑주(여)",1;item_add"적비화무갑주(남)",1;goto sex2;}
+				if(@check$=="흑비화무갑주(여)"){item_del"흑비화무갑주(여)",1;item_add"흑비화무갑주(남)",1;goto sex2;}
+				if(@check$=="적비화무투구(여)"){item_del"적비화무투구(여)",1;item_add"적비화무투구(남)",1;goto sex2;}
+				if(@check$=="흑비화무투구(여)"){item_del"흑비화무투구(여)",1;item_add"흑비화무투구(남)",1;goto sex2;}
+				if(@check$=="적비현진의(여)"){item_del"적비현진의(여)",1;item_add"적비현진의(남)",1;goto sex2;}
+				if(@check$=="흑비현진의(여)"){item_del"흑비현진의(여)",1;item_add"흑비현진의(남)",1;goto sex2;}
+				if(@check$=="적비현진건(여)"){item_del"적비현진건(여)",1;item_add"적비현진건(남)",1;goto sex2;}
+				if(@check$=="흑비현진건(여)"){item_del"흑비현진건(여)",1;item_add"흑비현진건(남)",1;goto sex2;}
+				if(@check$=="적비화후의(여)"){item_del"적비화후의(여)",1;item_add"적비화후의(남)",1;goto sex2;}
+				if(@check$=="흑비비화후의(여)"){item_del"흑비비화후의(여)",1;item_add"흑비화후의(남)",1;goto sex2;}
+				if(@check$=="적비화후관(여)"){item_del"적비화후관(여)",1;item_add"적비화후관(남)",1;goto sex2;}
+				if(@check$=="흑비화후관(여)"){item_del"흑비화후관(여)",1;item_add"흑비화후관(남)",1;goto sex2;}
+				if(@check$=="적비류선의(여)"){item_del"적비류선의(여)",1;item_add"적비류선의(남)",1;goto sex2;}
+				if(@check$=="흑비류선의(여)"){item_del"흑비류선의(여)",1;item_add"흑비류선의(남)",1;goto sex2;}
+				if(@check$=="적비류선후(여)"){item_del"적비류선후(여)",1;item_add"적비류선후(남)",1;goto sex2;}
+				if(@check$=="흑비류선후(여)"){item_del"흑비류선후(여)",1;item_add"흑비류선후(남)",1;goto sex2;}
+				if(@check$=="적태극의(여)"){item_del"적태극의(여)",1;item_add"적태극의(남)",1;goto sex2;}
+				if(@check$=="흑태극의(여)"){item_del"흑태극의(여)",1;item_add"흑태극의(남)",1;goto sex2;}
+				if(@check$=="적태극현(여)"){item_del"적태극현(여)",1;item_add"적태극현(남)",1;goto sex2;}
+				if(@check$=="흑태극현(여)"){item_del"흑태극현(여)",1;item_add"흑태극현(남)",1;goto sex2;}
+				mes 0,"이 시약으로 교환할 수 있는 아이템이 아닙니다";
+			}else if(get_sex()==2){
+				if(@check$=="적비화무갑주(남)"){item_del"적비화무갑주(남)",1;item_add"적비화무갑주(여)",1;goto sex2;}
+				if(@check$=="흑비화무갑주(남)"){item_del"흑비화무갑주(남)",1;item_add"흑비화무갑주(여)",1;goto sex2;}
+				if(@check$=="적비화무투구(남)"){item_del"적비화무투구(남)",1;item_add"적비화무투구(여)",1;goto sex2;}
+				if(@check$=="흑비화무투구(남)"){item_del"흑비화무투구(남)",1;item_add"흑비화무투구(여)",1;goto sex2;}
+				if(@check$=="적비현진의(남)"){item_del"적비현진의(남)",1;item_add"적비현진의(여)",1;goto sex2;}
+				if(@check$=="흑비현진의(남)"){item_del"흑비현진의(남)",1;item_add"흑비현진의(여)",1;goto sex2;}
+				if(@check$=="적비현진건(남)"){item_del"적비현진건(남)",1;item_add"적비현진건(여)",1;goto sex2;}
+				if(@check$=="흑비현진건(남)"){item_del"흑비현진건(남)",1;item_add"흑비현진건(여)",1;goto sex2;}
+				if(@check$=="적비화후의(남)"){item_del"적비화후의(남)",1;item_add"적비화후의(여)",1;goto sex2;}
+				if(@check$=="흑비화후의(남)"){item_del"흑비화후의(남)",1;item_add"흑비비화후의(여)",1;goto sex2;}
+				if(@check$=="적비화후관(남)"){item_del"적비화후관(남)",1;item_add"적비화후관(여)",1;goto sex2;}
+				if(@check$=="흑비화후관(남)"){item_del"흑비화후관(남)",1;item_add"흑비화후관(여)",1;goto sex2;}
+				if(@check$=="적비류선의(남)"){item_del"적비류선의(남)",1;item_add"적비류선의(여)",1;goto sex2;}
+				if(@check$=="흑비류선의(남)"){item_del"흑비류선의(남)",1;item_add"흑비류선의(여)",1;goto sex2;}
+				if(@check$=="적비류선후(남)"){item_del"적비류선후(남)",1;item_add"적비류선후(여)",1;goto sex2;}
+				if(@check$=="흑비류선후(남)"){item_del"흑비류선후(남)",1;item_add"흑비류선후(여)",1;goto sex2;}
+				if(@check$=="적태극의(남)"){item_del"적태극의(남)",1;item_add"적태극의(여)",1;goto sex2;}
+				if(@check$=="흑태극의(남)"){item_del"흑태극의(남)",1;item_add"흑태극의(여)",1;goto sex2;}
+				if(@check$=="적태극현(남)"){item_del"적태극현(남)",1;item_add"적태극현(여)",1;goto sex2;}
+				if(@check$=="흑태극현(남)"){item_del"흑태극현(남)",1;item_add"흑태극현(여)",1;goto sex2;}
+				mes 0,"이 시약으로 교환할 수 있는 아이템이 아닙니다";
+			}
+			sex2:
+			item_del"변환키트-화론의상",1;
+			message 3,"{=c아이템의 착용가능 성별이 변경되었습니다";
+		}
+	end;
+	}
+	if(@item$=="변환키트-캐시의상"){
+		set@sc,menu(0,"유저가 가진 성별이 정해진 아이템중에서 버리거나 교환이 안된는 물품을 자신의 성에 알맞게 바꿀수 있는 시약 입니다","시약 사용 설명서","자신의 성에 맞는 아이템으로 교환","나가기");
+		if(@sc==1){
+			mes 0,"성별이 정해진 아이템중에서 버리거나 교환이 안된는 물품을 자신의 성에 알맞게 바꿀수 있는 시약 입니다.\\n인벤토리창의 {=c첫번째 칸{=a에 교환하고 싶은 아이템을 올려놓으신후 사용하세요";
+		}else if(@sc==2){
+			if(get_sex()==1){
+				if(@check$=="라이온투구(여)"){item_del"라이온투구(여)",1;item_add"라이온투구(남)",1;goto sex3;}
+				if(@check$=="강화된프린세스드레스"){item_del"강화된프린세스드레스",1;item_add"강화된프린스더블렛",1;goto sex3;}
+				if(@check$=="강화된프린세스드레스(+1)"){item_del"강화된프린세스드레스(+1)",1;item_add"강화된프린스더블렛(+1)",1;goto sex3;}
+				if(@check$=="아벨프릴"){item_del"아벨프릴",1;item_add"아벨로더",1;goto sex3;}
+				if(@check$=="피에트프릴"){item_del"피에트프릴",1;item_add"피에트로더",1;goto sex3;}
+				if(@check$=="아벨캐프린"){item_del"아벨캐프린",1;item_add"아벨티로라인",1;goto sex3;}
+				if(@check$=="피에트캐프린"){item_del"피에트캐프린",1;item_add"피에트티로라인",1;goto sex3;}
+				mes 0,"이 시약으로 교환할 수 있는 아이템이 아닙니다";
+			}else if(get_sex()==2){
+				if(@check$=="라이온투구(남)"){item_del"라이온투구(남)",1;item_add"라이온투구(여)",1;goto sex3;}
+				if(@check$=="강화된프린스더블렛"){item_del"강화된프린스더블렛",1;item_add"강화된프린세스드레스",1;goto sex3;}
+				if(@check$=="강화된프린스더블렛(+1)"){item_del"강화된프린스더블렛(+1)",1;item_add"강화된프린세스드레스(+1)",1;goto sex3;}
+				if(@check$=="아벨로더"){item_del"아벨로더",1;item_add"아벨프릴",1;goto sex3;}
+				if(@check$=="피에트로더"){item_del"피에트로더",1;item_add"피에트프릴",1;goto sex3;}
+				if(@check$=="아벨티로라인"){item_del"아벨티로라인",1;item_add"아벨캐프린",1;goto sex3;}
+				if(@check$=="피에트티로라인"){item_del"피에트티로라인",1;item_add"피에트캐프린",1;goto sex3;}
+				mes 0,"이 시약으로 교환할 수 있는 아이템이 아닙니다";
+			}
+			sex3:
+			item_del"변환키트-캐시의상",1;
+			message 3,"{=c아이템의 착용가능 성별이 변경되었습니다";
+		}
+	end;
+	}
+}
+
+2	상점개설	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	if(@item$=="상점개설스킬스크롤"){
+		if(slot_skill_exist("노점개설")){mes 0,"상점을 개설할 수 있는 사람에게는 소용이 없습니다.";end;}
+		slot_skill_add "노점개설";
+		item_del"상점개설스킬스크롤",1;
+		message 3,"노점개설 기술이 추가 되었습니다. 확인해 보세요";
+	}
+	if(@item$=="상점개설입문서"){
+		mes 1,"---상점개설입문서---";
+		mes 1,"당신도 소규모 점포에서 대부호가 될수있다! 상점개설을 통한 울트라 초 슈퍼 럭셔리 라이프.";
+		mes 1,"상점개설을 위한 준비\\n1.상점개설스킬스크롤을 구입한다\\n2.스크롤을 클릭하여 노점개설을 습득한다.\\n3.만약 스킬창에 빈슬롯이 없으면 배울 수 없으니 낭패!";
+		mes 1,"4.노점개설을 클릭해서 사용해보자.\\n5.상점전용창이 뜨는것이 보인다면 성공!\\n6.체험판유저의 경우에는 2종류의 아이템만 상점에 판매할 수 있다.\\n7.상점팡에 아이템을 마우스로 끌어서 놓는다.\\n8.상점에 올려둔 아이템을 클릭해보자.";
+		mes 1,"9.아이템의 판매가격을 적을 수 있다.\\n10.판매가격이 쓰여지면 바로 판매개시!! 가격을 제대로 적도록 하자!";
+		mes 1,"상점메뉴설명------\\n자물쇠:현재까지 벌어드린 돈을 즉시 회수할 수 있다.\\nDissmissal:상점을 해체한다. 약 3초의 시간이 걸린다.\\nCLR:선택한 아이템의 판매를 중단한다.";
+		mes 0,"---상점개설입문서 끝: 자세한 내용은 홈페이지를 참고하시라.---";
+	}
+	end;
+}
+
+3	가호	{
+	set@myid,get_myid();
+	if(blessing_check(@myid)){mes 0, "이미 효과가 걸려 있습니다."; end;}
+	effect@myid,22,0,75;
+	set@item$,last_item();
+	set@e$,"ApExpBooster-";
+	set@e2$,"을 외웠습니다.";
+	set@e3$,"의 가호로ApExpBooster-";
+	set@e4$,"효과를 얻었다.";
+	if(@item$=="세토아의가호(Lev1)"){
+		exp_per@myid,150,2,3;
+ 		item_del"세토아의가호(Lev1)",1;
+		message 3,@e$+"200"+@e2$;
+		message 3,"세토아"+@e3$+"200"+@e4$;
+	}if(@item$=="세토아의가호(Lev2)"){
+		exp_per@myid,300,3,3;
+ 		item_del"세토아의가호(Lev2)",1;
+		message 3,@e$+"300"+@e2$;
+		message 3,"세토아"+@e3$+"300"+@e4$;
+	}if(@item$=="이아의가호(Lev1)"){
+		exp_per@myid,200,3,3;
+ 		item_del"이아의가호(Lev1)",1;
+		message 3,@e$+"300"+@e2$;
+		message 3,"이아"+@e3$+"300"+@e4$;
+	}if(@item$=="이아의가호(Lev2)"){
+		exp_per@myid,900,4,3;
+ 		item_del"이아의가호(Lev2)",1;
+		message 3,@e$+"400"+@e2$;
+		message 3,"이아"+@e3$+"400"+@e4$;
+	}if(@item$=="세오의가호(Lev1)"){
+		exp_per@myid,300,4,3;
+ 		item_del"세오의가호(Lev1)",1;
+		message 3,@e$+"400"+@e2$;
+		message 3,"세오"+@e3$+"400"+@e4$;
+	}if(@item$=="세오의가호(Lev2)"){
+		exp_per@myid,600,4,3;
+ 		item_del"세오의가호(Lev2)",1;
+		message 3,@e$+"400"+@e2$;
+		message 3,"세오"+@e3$+"400"+@e4$;
+	}if(@item$=="세오의가호(SLev1)"){
+		exp_per@myid,600,4,3;
+ 		item_del"세오의가호(SLev1)",1;
+		message 3,@e$+"400"+@e2$;
+		message 3,"세오"+@e3$+"400"+@e4$;
+	}if(@item$=="크리스마스가호(Lev1)"){
+		exp_per@myid,600,10,3;
+ 		item_del"크리스마스가호(Lev1)",1;
+		message 3,@e$+"1000"+@e2$;
+		message 3,"크리스마스"+@e3$+"1000"+@e4$;
+	}
+	del @e$;
+	del @e2$;
+	del @e3$;
+	del @e4$;
+	del @item$;
+	del @myid;
+	end;
+}
+
+6	헤어	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	set@hr$,"캐시샵 판매전용 헤어스타일입니다.사용하시면 헤어스타일이 변경됩니다. 대신 {=c";
+	set@hr2$,"{=a은/는 사라집니다";
+	if(@item$=="쑥대머리-남성헤어"){
+		set@m,menu(0,@hr$+"쑥대머리-남성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"쑥대머리-남성헤어",1;
+			set_hair 412;
+			goto go1;
+		}
+	}if(@item$=="피스드래곤레이어-남성헤어"){
+		set@m,menu(0,@hr$+"피스드래곤레이어-남성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"피스드래곤레이어-남성헤어",1;
+			set_hair 333;
+			goto go1;
+		}
+	}if(@item$=="롱롱스타일-남성헤어"){
+		set@m,menu(0,@hr$+"롱롱스타일-남성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"롱롱스타일-남성헤어",1;
+			set_hair 392;
+			goto go1;
+		}
+	}if(@item$=="깔끔밴드-남성헤어"){
+		set@m,menu(0,@hr$+"깔끔밴드-남성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"깔끔밴드-남성헤어",1;
+			set_hair 324;
+			goto go1;
+		}
+	}if(@item$=="프린스-남성헤어"){
+		set@m,menu(0,@hr$+"프린스-남성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"프린스-남성헤어",1;
+			set_hair 325;
+			goto go1;
+		}
+	}if(@item$=="미녀는석류-남성헤어"){
+		set@m,menu(0,@hr$+"미녀는석류-남성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"미녀는석류-남성헤어",1;
+			set_hair 326;
+			goto go1;
+		}
+	}if(@item$=="샤기미듐컷-남성헤어"){
+		set@m,menu(0,@hr$+"샤기미듐컷-남성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"샤기미듐컷-남성헤어",1;
+			set_hair 327;
+			goto go1;
+		}
+	}if(@item$=="셀레브스타일-여성헤어"){
+		set@m,menu(0,@hr$+"셀레브스타일-여성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"셀레브스타일-여성헤어",1;
+			set_hair 346;
+			goto go1;
+		}
+	}if(@item$=="삐삐머리-여성헤어"){
+		set@m,menu(0,@hr$+"삐삐머리-여성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"삐삐머리-여성헤어",1;
+			set_hair 412;
+			goto go1;
+		}
+	}if(@item$=="빨간리본-여성헤어"){
+		set@m,menu(0,@hr$+"빨간리본-여성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"빨간리본-여성헤어",1;
+			set_hair 345;
+			goto go1;
+			message 3,"헤어스타일이 성공적으로 변경되었습니다.";
+		}
+	}if(@item$=="깔끔밴드-여성헤어"){
+		set@m,menu(0,@hr$+"깔끔밴드-여성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"깔끔밴드-여성헤어",1;
+			set_hair 324;
+			goto go1;
+			message 3,"헤어스타일이 성공적으로 변경되었습니다.";
+		}
+	}if(@item$=="폼폼-여성헤어"){
+		set@m,menu(0,@hr$+"폼폼-여성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"폼폼-여성헤어",1;
+			set_hair 325;
+			goto go1;
+			message 3,"헤어스타일이 성공적으로 변경되었습니다.";
+		}
+	}if(@item$=="롤롤-여성헤어"){
+		set@m,menu(0,@hr$+"롤롤-여성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"롤롤-여성헤어",1;
+			set_hair 327;
+			goto go1;
+			message 3,"헤어스타일이 성공적으로 변경되었습니다.";
+		}
+	}if(@item$=="큐티핀업-여성헤어"){
+		set@m,menu(0,@hr$+"큐티핀업-여성헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"큐티핀업-여성헤어",1;
+			set_hair 326;
+			goto go1;
+			message 3,"헤어스타일이 성공적으로 변경되었습니다.";
+		}
+	}if(@item$=="뽀글이스타일-남녀헤어"){
+		set@m,menu(0,@hr$+"뽀글이스타일-남녀헤어"+@hr2$,"스타일을 바꾼다","좀 더 생각해볼까..?");
+		if(@m==1){
+			item_del"뽀글이스타일-남녀헤어",1;
+			set_hair 411;
+			go1:
+			message 3,"헤어스타일이 성공적으로 변경되었습니다.";
+		}
+	}
+	del@item$;
+	del@hr$;
+	del@hr2$;
+	end;
+}
+
+7	del	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	set@pC$,"게임포인트가 적립되었습니다.\\n현제 소지하고 계신 게임포인트 ["+get_love(@myid)+"]";
+	if(@item$=="100게임포인트쿠폰"){item_del"100게임포인트쿠폰",1;set_love get_love(@myid) + 100;}
+	if(@item$=="500게임포인트쿠폰"){item_del"500게임포인트쿠폰",1;set_love get_love(@myid) + 500;}
+	if(@item$=="1000게임포인트쿠폰"){item_del"1000게임포인트쿠폰",1;set_love get_love(@myid) + 1000;}
+	if(@item$=="5000게임포인트쿠폰"){item_del"5000게임포인트쿠폰",1;set_love get_love(@myid) + 5000;}
+	if(@item$=="10000게임포인트쿠폰"){item_del"10000게임포인트쿠폰",1;set_love get_love(@myid) + 10000;}
+	if(@item$=="50000게임포인트쿠폰"){item_del"50000게임포인트쿠폰",1;set_love get_love(@myid) + 50000;}
+	if(@item$=="100000게임포인트쿠폰"){item_del"100000게임포인트쿠폰",1;set_love get_love(@myid) + 100000;}
+	set@pC$,"게임포인트가 적립되었습니다.\\n현제 소지하고 계신 게임포인트 ["+get_love(@myid)+"]";
+	message 8,@pC$;
+	del@pC$;
+	end;
+}
+
+8	변신스크롤	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	effect@myid,164,0,100;
+	if(@item$=="변신스크롤(트렌트)"){char_disguise 264,60,0,183;item_del"변신스크롤(트렌트)",1;end;}
+	if(@item$=="변신스크롤(은빛늑대)"){char_disguise 278,60,0,183;item_del"변신스크롤(은빛늑대)",1;end;}
+	if(@item$=="변신스크롤(데스나이트)"){char_disguise 199,60,0,183;item_del"변신스크롤(데스나이트)",1;end;}
+	if(@item$=="변신스크롤(드래곤뉴트)"){char_disguise 202,60,0,183;item_del"변신스크롤(드래곤뉴트)",1;end;}
+}
+
+9	바디염색	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	set@b,menu(0,"바디를 염색 할수 있는 아이템입니다. 염색 하시겠습니까?","네..","아니오");
+	if(@b==1){
+		if(@item$=="백인바디페인팅쿠폰"){newtypeset@myid,6,1;item_del"백인바디페인팅쿠폰",1;}
+		if(@item$=="흑인바디페인팅쿠폰"){newtypeset@myid,6,2;item_del"흑인바디페인팅쿠폰",1;}
+		if(@item$=="오크바디페인팅쿠폰"){newtypeset@myid,6,3;item_del"오크바디페인팅쿠폰",1;}
+		if(@item$=="황금색바디페인팅쿠폰"){newtypeset@myid,6,4;item_del"황금색바디페인팅쿠폰",1;}
+		if(@item$=="구리빛바디페인팅쿠폰"){newtypeset@myid,6,5;item_del"구리빛바디페인팅쿠폰",1;}
+		if(@item$=="회색바디페인팅쿠폰"){newtypeset@myid,6,6;item_del"회색바디페인팅쿠폰",1;}
+		if(@item$=="창백한바디페인팅쿠폰"){newtypeset@myid,6,7;item_del"창백한바디페인팅쿠폰",1;}
+		if(@item$=="붉은색바디페인팅쿠폰"){newtypeset@myid,6,8;item_del"붉은색바디페인팅쿠폰",1;}
+		if(@item$=="악마바디페인팅쿠폰"){newtypeset@myid,6,9;item_del"악마바디페인팅쿠폰",1;}
+		if(@item$=="기본바디페인팅쿠폰"){newtypeset@myid,6,0;item_del"기본바디페인팅쿠폰",1;}
+		message 3,"바디가 {=c염색{=s되었습니다";
+	}
+	end;
+}
+
+10	제조	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	set@c,get_class();
+	set@j$,"일반제조";
+	set@j2$,"USER_MUST_GET_RELATED_SKILL_FOR_MANUAL";
+	set@j3$,"에 필요한 장비가 없습니다.";
+	if(@item$=="일반제조입문서"){
+		mes 1,"---"+@j$+"입문서---";
+		mes 1,@j$+"기술이란?\\n주변에서 흔히 구할 수 없는 아이템들을 여러가지 재료들을 조합함으로써 어떤 물건을 생성해내는 것이다.";
+		mes 1,@j$+"책이란?\\n"+@j$+"용 조합서를 기록해두는 책으로 은행보관이나 상점거래는 불가능하다.";
+		mes 1,@j$+"용조합서란?\\n어떠한 물건을 제조할때 그 재료등이 적혀있는 레시피,상점에서 팔거나 누군가에게서 받을 수 있다.";
+		mes 1,"제조지팡이란?\\n"+@j$+"를 하기 위해서 필요한 도구,책에 적혀져 있는 내용을 제조하기 위해서 사용되는\\n지팡이이다.제로를 할때에는 지팡이를 꼭 착용해야만 한다.";
+		mes 1,"부가재료란?\\n어떤 제조는 특별한 부가재료를 사용함으로써 부가적인 특성을 가지게 된다.예를들어 지역스크롤의 경우에는 지역프레임을 추가함으로인하여 해당지역성격을 가지게 되는것이다.";
+		mes 1,@j$+"의실패와성공\\n일반적으로 성공을 하였을 때에는 만들고자 하는 것이 만들어지고 재료는 사라지게 된다.실패를 했을때는 재료중 한가지가 남는것이 일반적이지만,때로는 모든 재료를 소실하게 된다.";
+		mes 0,"제조방법\\n1."+@j$+"책을 아이템창에 소지한다.\\n2."+@j$+"조합서를 입수하여 조합서를 클릭한다.\\n4.책을 열어 원하는 아이템의 제조페이지를 연다\\n5.아이템창에 해당 재료를 소지한다.\\n6.만약 부가재료가 필요한 조합일경우 부가재료를 부가재료창에 끼워넣는다.\\n7.모든 준비가 완료되었으면 OK버튼을 누른다.\\n8.성공할경우 해당 아이템을 입수할 수 있다.";
+	}if(@item$=="수상한버섯조합서"){
+		if(#Making==1){message 3,"이미 배운 요리입니다.";end;}
+		if(!item_exist(@myid,"일반제조책")){message 3,"요리책이 없습니다.";end;}
+		message 3,"수상한버섯제조 요리법을 요리책에 옮겨 적었습니다.";
+		item_del"수상한버섯조합서",1;
+		set#Making,1;
+	}if(@item$=="일반제조책"){
+		if(#Making==1){goto Make;}
+		set @Making, menu(0, "만들수 있는 아이템", "적갑제조");
+		if(@Making==1){goto JM;}
+		end;
+		Make:
+		set@Making2,menu(0,"만들수 있는 아이템","적갑제조","수상한버섯제조");
+		if(@Making2==1){
+			JM:set@JMaking2,menu(0,"{=c필요한 재료\\n{=aAbility: 28","만들어 본다","흠..고민고민");
+			if(@JMaking2==1){
+				if(slot_skill_exist("일반제조")){goto MakingA2;}
+					message 3,@j2$;
+					end;
+				MakingA2:
+				if(get_wearitem_weapon(@myid)=="제조지팡이"){
+					if(get_ability(@myid)>=28&&#WestQuest007==0){
+						if(get_sex()==1){
+							if(@c==1){item_add"적비화무갑주(남)",1;item_add"적비화무투구(남)",1;}
+							if(@c==2){item_add"적비현진의(남)",1;item_add"적비현진건(남)",1;}
+							if(@c==3){item_add"적비화후의(남)",1;item_add"적비화후관(남)",1;}
+							if(@c==4){item_add"적비류선의(남)",1;item_add"적비류선후(남)",1;}
+							if(@c==5){item_add"적태극의(남)",1;item_add"적태극현(남)",1;}
+						}if(get_sex()==2){
+							if(@c==1){item_add"적비화무갑주(여)",1;item_add"적비화무투구(여)",1;}
+							if(@c==2){item_add"적비현진의(여)",1;item_add"적비현진건(여)",1;}
+							if(@c==3){item_add"적비화후의(여)",1;item_add"적비화후관(여)",1;}
+							if(@c==4){item_add"적비류선의(여)",1;item_add"적비류선후(여)",1;}
+							if(@c==5){item_add"적태극의(여)",1;item_add"적태극현(여)",1;}
+						}
+						set #WestQuest007,1;
+						if(@c==1){message 3,"적비화무갑주성공";message 3,"적비화무투구성공";}
+						if(@c==2){message 3,"적비현진의성공";message 3,"적비현진건성공";}
+						if(@c==3){message 3,"적비화후의성공";message 3,"적비화후관성공";}
+						if(@c==4){message 3,"적비류선의성공";message 3,"적비류선후성공";}
+						if(@c==5){message 3,"적태극의성공";message 3,"적태극현성공";}
+					}else{
+						if(@c==1){message 3,"적비화무갑주실패";message 3,"적비화무투구실패";}
+						if(@c==2){message 3,"적비현진의실패";message 3,"적비현진건실패";}
+						if(@c==3){message 3,"적비화후의실패";message 3,"적비화후관실패";}
+						if(@c==4){message 3,"적비류선의실패";message 3,"적비류선후실패";}
+						if(@c==5){message 3,"적태극의실패";message 3,"적태극현실패";}
+					}
+					end;
+				}
+				message 3,"["+@j$+"]"+@j3$;
+				goto n1;
+			}
+		}else if(@Making2==2){
+			set@Making2,menu(0,"{=c필요한 재료\\n{=a어쩐지수상한시약(1)\\n파란버섯(1)","만들어 본다","흠..고민고민");
+			if(slot_skill_exist(""+@j$+"")){goto MakingB2;}
+			message 3,@j2$;
+			end;
+			MakingB2:if(get_wearitem_weapon(@myid)=="제조지팡이"){goto MakingB3;}
+			message 3,"["+@j$+"]"+@j3$;
+			n1:
+			message 3,"실패했습니다";
+			end;
+			MakingB3:if(@Making2==1){
+			if(!item_exist(@myid,"어쩐지수상한시약")||!item_exist(@myid,"파란버섯")){item_del"파란버섯",1;item_del"어쩐지수상한시약",1;message 3,"수상한버섯실패";goto Make;}
+				if(rand2(1,10)>5){item_del"파란버섯",1;item_del"어쩐지수상한시약",1;item_add"수상한버섯",10;message 3,"수상한버섯성공";goto Make;}else{item_del"파란버섯",1;item_del"어쩐지수상한시약",1;message 3,"수상한버섯실패";goto Make;}
+			}
+		}
+	}
+	end;
+}
+
+11	스크롤	{
+	set@myid,get_myid();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@side,get_side(@myid);
+	set@item$,last_item();
+	if(get_mapname(@myid)=="알세이드스-화산암지대(C)"||#underpassC==1||#underpassD==1||#underpassS==1||get_mapname(@myid)=="베크나탑-1층"||get_mapname(@myid)=="베크나탑-2층"||get_mapname(@myid)=="베크나탑-3층"||get_mapname(@myid)=="베크나탑-4층"||get_mapname(@myid)=="베크나탑-5층"||get_mapname(@myid)=="베크나탑-6층"||get_mapname(@myid)=="베크나탑-7층"||get_mapname(@myid)=="베크나탑-8층"||get_mapname(@myid)=="베크나탑-최상층"){
+		if(@item$=="스크롤(바르도)"){
+			if(@side==0){
+				set@mob,get_mobxy(@x1,(@y1)-1);set@type1,istype(@mob);
+				if(@type1==1){
+					if(magic_exist(1,@mob,1)){goto s;}
+					magic 1,@mob,"바르도",120,35,@myid;
+					effect@mob,0,258,100;
+					del mob;
+					goto g1;
+				}
+			}if(@side==1){
+				set@mob1,get_mobxy(@x1+1,(@y1));set@type1,istype(@mob1);
+				if(@type1==1){
+					if(magic_exist(1,@mob1,1)){goto s;}
+					magic 1,@mob1,"바르도",120,35,@myid;
+					effect@mob1,0,258,100;
+					del mob1;
+					goto g1;
+				}
+			}if(@side==2){
+				set@mob2,get_mobxy(@x1,(@y1)+1);set@type1,istype(@mob2);
+				if(@type1==1){
+					if(magic_exist(1,@mob2,1)){goto s;}
+					magic 1,@mob2,"바르도",120,35,@myid;
+					effect@mob2,0,258,100;
+					del mob2;
+					goto g1;
+				}
+			}if(@side==3){
+				set@mob3,get_mobxy(@x1-1,(@y1));set@type1,istype(@mob3);
+				if(@type1==1){
+					if(magic_exist(1,@mob3,1)){goto s;}
+					magic 1,@mob3,"바르도",120,35,@myid;
+					effect@mob3,0,258,100;
+					del mob3;
+					goto g1;
+				}
+			}
+			end;
+			g1:
+			game_sound 8,0;
+			motion 136,40;
+			message 3,"바르도를 외웠습니다.";
+			s:
+			item_del"스크롤(바르도)",1;
+		end;
+		}if(@item$=="스크롤(데프레코)"){
+			if(@side==0){
+				set@mob,get_mobxy(@x1,(@y1)-1);set@type1,istype(@mob);
+				if(@type1==1){
+					if(magic_exist(1,@mob,1)){goto s2;}
+					magic 1,@mob,"데프레타",120,35,@myid;
+					effect@mob,0,243,100;
+					del mob;
+					goto g2;
+				}
+			}if(@side==1){
+				set@mob1,get_mobxy(@x1+1,(@y1));set@type1,istype(@mob1);
+				if(@type1==1){
+					if(magic_exist(1,@mob1,1)){goto s2;}
+					magic 1,@mob1,"데프레타",120,35,@myid;
+					effect@mob1,0,243,100;
+					del mob1;
+					goto g2;
+				}
+			}if(@side==2){
+				set@mob2,get_mobxy(@x1,(@y1)+1);set@type1,istype(@mob2);
+				if(@type1==1){
+					if(magic_exist(1,@mob2,1)){goto s2;}
+					magic 1,@mob2,"데프레타",120,35,@myid;
+					effect@mob2,0,243,100;
+					del mob2;
+					goto g2;
+				}
+			}if(@side==3){
+				set@mob3,get_mobxy(@x1-1,(@y1));set@type1,istype(@mob3);
+				if(@type1==1){
+					if(magic_exist(1,@mob3,1)){goto s2;}
+					magic 1,@mob3,"데프레타",120,35,@myid;
+					effect@mob3,0,243,100;
+					del mob3;
+					goto g2;
+				}
+			}
+			end;
+			g2:
+			game_sound 8,0;
+			motion 136,40;
+			message 3,"데프레코를 외웠습니다.";
+			s2:
+			item_del"스크롤(데프레코)",1;
+		end;
+		}if(@item$=="스크롤(프라보)"){
+			if(@side==0){
+				set@mob,get_mobxy(@x1,(@y1)-1);set@type1,istype(@mob);
+				if(@type1==1){
+					if(magic_exist(1,@mob,1)){goto s3;}
+					magic 1,@mob,"프라보",120,35,@myid;
+					effect@mob,0,257,100;
+					del mob;
+					goto g3;
+				}
+			}if(@side==1){
+				set@mob1,get_mobxy(@x1+1,(@y1));set@type1,istype(@mob1);
+				if(@type1==1){
+					if(magic_exist(1,@mob1,1)){goto s3;}
+					magic 1,@mob1,"프라보",120,35,@myid;
+					effect@mob1,0,257,100;
+					del mob1;
+					goto g3;
+				}
+			}if(@side==2){
+				set@mob2,get_mobxy(@x1,(@y1)+1);set@type1,istype(@mob2);
+				if(@type1==1){
+					if(magic_exist(1,@mob2,1)){goto s3;}
+					magic 1,@mob2,"프라보",120,35,@myid;
+					effect@mob2,0,257,100;
+					del mob2;
+					goto g3;
+				}
+			}if(@side==3){
+				set@mob3,get_mobxy(@x1-1,(@y1));set@type1,istype(@mob3);
+				if(@type1==1){
+					if(magic_exist(1,@mob3,1)){goto s3;}
+					magic 1,@mob3,"프라보",120,35,@myid;
+					effect@mob3,0,257,100;
+					del mob3;
+					goto g3;
+				}
+			}
+			end;
+			g3:
+			game_sound 27,0;
+			motion 136,40;
+			message 3,"프라보를 외웠습니다.";
+			s3:
+			item_del"스크롤(프라보)",1;
+		end;
+		}
+	}
+	message 3,"이곳에서는 사용할수 없다";
+	end;
+}
+
+12	블랙셋효과on	{
+	set@myid,get_myid();
+	if(#blacksetchar == 1){end;}
+	if(get_class(@myid)==1){
+		if(get_wearitem_armor(@myid)=="윌화이어아머A"&&get_wearitem_gaiter(@myid)=="윌화이어각반A"){
+			if(get_wearitem_helmet(@myid)=="윌화이어투구A"||get_wearitem_helmet(@myid)=="대왕관"){
+				if(get_wearitem_glove1(@myid)=="윌화이어장갑A"||get_wearitem_glove2(@myid)=="윌화이어장갑A"){
+					message 3, "세트 아이템 월화이어세트A 효과를 발휘됩니다";
+					if(skill_exist("데빌크래셔")){
+						skill_del "데빌크래셔";
+						skill_add"데빌크래셔(세트효과)";
+						set #blackset, 2;
+					}
+				}
+			}
+		}
+		if(get_wearitem_armor(@myid)=="윌화이어아머B"&&get_wearitem_gaiter(@myid)=="윌화이어각반B"){
+			if(get_wearitem_helmet(@myid)=="윌화이어투구B"||get_wearitem_helmet(@myid)=="대왕관"){
+				if(get_wearitem_glove1(@myid)=="윌화이어장갑B"||get_wearitem_glove2(@myid)=="윌화이어장갑B"){
+					message 3, "세트 아이템 월화이어세트B 효과를 발휘됩니다";
+					if(skill_exist("크래셔")){
+						skill_del "크래셔";
+						skill_add"크래셔(세트효과)";
+						set #blackset, 2;
+					}
+				}
+			}
+		}
+	}
+	if(get_class(@myid)==2){
+		if(get_wearitem_armor(@myid)=="레인헌트아머"&&get_wearitem_gaiter(@myid)=="레인헌트각반"){
+			if(get_wearitem_helmet(@myid)=="레인헌트투구"||get_wearitem_helmet(@myid)=="대왕관"){
+				if(get_wearitem_glove1(@myid)=="레인헌트장갑"||get_wearitem_glove2(@myid)=="레인헌트장갑"){
+					message 3, "세트 아이템 레인헌트세트 효과를 발휘됩니다";
+					if(skill_exist("기습")){
+						skill_del "기습";
+						skill_add"기습(세트효과)";
+						set #blackset, 2;
+					}
+				}
+			}
+		}
+	}
+	if(get_class(@myid)==3){
+		if(get_wearitem_armor(@myid)=="브레스럭아머"&&get_wearitem_gaiter(@myid)=="브레스럭각반"){
+			if(get_wearitem_helmet(@myid)=="브레스럭투구"||get_wearitem_helmet(@myid)=="대왕관"){
+				if(get_wearitem_glove1(@myid)=="브레스럭장갑"||get_wearitem_glove2(@myid)=="브레스럭장갑"){
+					message 3, "세트 아이템 브레스럭세트 효과를 발휘됩니다";
+					if(spell_exist("나르콜리")){
+						spell_del "나르콜리";
+						spell_add"나르콜리(세트효과)";
+						set #blackset, 1;
+					}
+				}
+			}
+		}
+	}
+	if(get_class(@myid)==4){
+		if(get_wearitem_armor(@myid)=="페이로브아머"&&get_wearitem_gaiter(@myid)=="페이로브각반"){
+			if(get_wearitem_helmet(@myid)=="페이로브투구"||get_wearitem_helmet(@myid)=="대왕관"){
+				if(get_wearitem_glove1(@myid)=="페이로브장갑"||get_wearitem_glove2(@myid)=="페이로브장갑"){
+					message 3, "세트 아이템 페이로브세트 효과를 발휘됩니다";
+					if(spell_exist("리베라토")){
+						spell_del "리베라토";
+						spell_add"리베라토(세트효과)";
+						set #blackset, 1;
+					}
+				}
+			}
+		}
+	}
+	if(get_class(@myid)==5){
+		if(get_wearitem_armor(@myid)=="브릴윙아머"&&get_wearitem_gaiter(@myid)=="브릴윙각반"){
+			if(get_wearitem_helmet(@myid)=="브릴윙투구"||get_wearitem_helmet(@myid)=="대왕관"){
+				if(get_wearitem_glove1(@myid)=="브릴윙팔찌"||get_wearitem_glove2(@myid)=="브릴윙팔찌"){
+					message 3, "세트 아이템 브릴윙세트 효과를 발휘됩니다";
+					if(spell_exist("다라밀공")){
+						spell_del "다라밀공";
+						spell_add"다라밀공(세트효과)";
+						set #blackset, 1;
+					}
+				}
+			}
+		}
+	}
+	end;
+}
+
+13	블랙셋효과off	{
+	set @myid, get_myid();
+	if(#blacksetchar == 1){end;}
+	set #blackset, 0;
+	if(get_class(@myid)==1){
+		message 3, "세트 아이템 월화이어세트 효과가 사라집니다";
+		if(skill_exist("데빌크래셔(세트효과)")){
+			skill_del"데빌크래셔(세트효과)";
+			skill_add "데빌크래셔";
+		}
+		if(skill_exist("크래셔(세트효과)")){
+			skill_del"크래셔(세트효과)";
+			skill_add "크래셔";
+		}
+	}
+	if(get_class(@myid) == 2){
+		message 3, "세트 아이템 레인헌트세트 효과가 사라집니다";
+		if(skill_exist("기습(세트효과)")){
+			skill_del"기습(세트효과)";
+			skill_add "기습";
+		}
+	}
+	if(get_class(@myid) == 3){
+		message 3, "세트 아이템 브레스럭세트 효과가 사라집니다";
+		if(spell_exist("나르콜리(세트효과)")){
+			spell_del"나르콜리(세트효과)";
+			spell_add "나르콜리";
+		}
+	}
+	if(get_class(@myid) == 4){
+		message 3, "세트 아이템 페이로브세트 효과가 사라집니다";
+		if(spell_exist("리베라토(세트효과)")){
+			spell_del"리베라토(세트효과)";
+			spell_add "리베라토";
+		}
+	}
+	if(get_class(@myid) == 5){
+		message 3, "세트 아이템 브릴윙세트 효과가 사라집니다";
+		if(spell_exist("다라밀공(세트효과)")){
+			spell_del"다라밀공(세트효과)";
+			spell_add "다라밀공";
+		}
+	}
+	end;
+}
+
+14	방패	{
+	set@myid,get_myid();
+	if(get_wearitem_weapon(@myid)=="제조지팡이"||get_wearitem_weapon(@myid)=="매직스태프"||get_wearitem_weapon(@myid)=="홀리스태프"||get_wearitem_weapon(@myid)=="매직마르시아"||get_wearitem_weapon(@myid)=="홀리머큐리아"||get_wearitem_weapon(@myid)=="매직쥬피티아"||get_wearitem_weapon(@myid)=="홀리쥬피티아"||get_wearitem_weapon(@myid)=="매직새티아"||get_wearitem_weapon(@myid)=="홀리새티아"||get_wearitem_weapon(@myid)=="매직솔라"||get_wearitem_weapon(@myid)=="홀리솔라"||get_wearitem_weapon(@myid)=="매직루나"||get_wearitem_weapon(@myid)=="홀리루나"||get_wearitem_weapon(@myid)=="매직가이아"||get_wearitem_weapon(@myid)=="홀리가이아"||get_wearitem_weapon(@myid)=="매직파나"||get_wearitem_weapon(@myid)=="홀리파나"||get_wearitem_weapon(@myid)=="투핸드가이아두스"||get_wearitem_weapon(@myid)=="투핸드크레이모어"||get_wearitem_weapon(@myid)=="투핸드크레이모어수"||get_wearitem_weapon(@myid)=="투핸드엑시큐터"||get_wearitem_weapon(@myid)=="투핸드드래곤크로어"||get_wearitem_weapon(@myid)=="피닉스크로어1"||get_wearitem_weapon(@myid)=="피닉스크로어2"||get_wearitem_weapon(@myid)=="피닉스크로어3"||get_wearitem_weapon(@myid)=="피닉스크로어4"||get_wearitem_weapon(@myid)=="피닉스크로어5"||get_wearitem_weapon(@myid)=="아스카론"||get_wearitem_weapon(@myid)=="앵거바딜"||get_wearitem_weapon(@myid)=="로오의은총"||get_wearitem_weapon(@myid)=="다크디아나"||get_wearitem_weapon(@myid)=="이아의은총"||get_wearitem_weapon(@myid)=="홀리디아나"||get_wearitem_weapon(@myid)=="로오의빛"||get_wearitem_weapon(@myid)=="이아의빛"||get_wearitem_weapon(@myid)=="아룬다이트"||get_wearitem_weapon(@myid)=="매직아룬다이트"||get_wearitem_weapon(@myid)=="커스아룬다이트"||get_wearitem_weapon(@myid)=="홀리아룬다이트"||get_wearitem_weapon(@myid)=="큐어아룬다이트"||get_wearitem_weapon(@myid)=="다인블레이드"||get_wearitem_weapon(@myid)=="우드보우"||get_wearitem_weapon(@myid)=="우드하프"||get_wearitem_weapon(@myid)=="로운"||get_wearitem_weapon(@myid)=="샤인"||get_wearitem_weapon(@myid)=="프린세스보우"||get_wearitem_weapon(@myid)=="골드베리하프"||get_wearitem_weapon(@myid)=="본브레이크"||get_wearitem_weapon(@myid)=="다크본브레이크"||get_wearitem_weapon(@myid)=="마론비쥬"||get_wearitem_weapon(@myid)=="람피드비쥬"||get_wearitem_weapon(@myid)=="프린세스하프"||get_wearitem_weapon(@myid)=="황금나무의하프"||get_wearitem_weapon(@myid)=="반보우"||get_wearitem_weapon(@myid)=="레드반보우"||get_wearitem_weapon(@myid)=="히야트마법가지"||get_wearitem_weapon(@myid)=="히야트홀리스태프"||get_wearitem_weapon(@myid)=="히야트스냅"||get_wearitem_weapon(@myid)=="영월도"||get_wearitem_weapon(@myid)=="영월궁"||get_wearitem_weapon(@myid)=="영월충"||get_wearitem_weapon(@myid)=="비파"||get_wearitem_weapon(@myid)=="[전사]뮤레칸의스냅(+1)"||get_wearitem_weapon(@myid)=="[전사]뮤레칸의스냅(+2)"||get_wearitem_weapon(@myid)=="[전사]뮤레칸의스냅(+3)"||get_wearitem_weapon(@myid)=="[전사]뮤레칸의스냅(+4)"||get_wearitem_weapon(@myid)=="[전사]뮤레칸의스냅(+5)"||get_wearitem_weapon(@myid)=="[마법사]뮤레칸의지팡이(+1)"||get_wearitem_weapon(@myid)=="[마법사]뮤레칸의지팡이(+2)"||get_wearitem_weapon(@myid)=="[마법사]뮤레칸의지팡이(+3)"||get_wearitem_weapon(@myid)=="[마법사]뮤레칸의지팡이(+4)"||get_wearitem_weapon(@myid)=="[마법사]뮤레칸의지팡이(+5)"||get_wearitem_weapon(@myid)=="[성직자]뮤레칸의스태프(+1)"||get_wearitem_weapon(@myid)=="[성직자]뮤레칸의스태프(+2)"||get_wearitem_weapon(@myid)=="[성직자]뮤레칸의스태프(+3)"||get_wearitem_weapon(@myid)=="[성직자]뮤레칸의스태프(+4)"||get_wearitem_weapon(@myid)=="[성직자]뮤레칸의스태프(+5)"){
+	message 3,"양손 무기와 방패는 동시장착이 불가능합니다.";
+	weapon_del@myid;
+	}
+	end;
+}
+
+15	리콜	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	set@r14$,"이동을 원하시는 장소를 골라주세요.";
+	if(#underpassC==1||#underpassD==1||#underpassS==1){set#underpassC,0;set#underpassD,0;set#underpassS,0;}
+	if(#Eestbossch==1){set #Eestbossch,0;set $Eestbossch,0;}
+	if(#Hiyateon==1){set#Hiyateon,0;set $HiyateBoss,0;set $WestHiyate,0;}
+	if(#EestMuerecan==1){set#EestMuerecan,0;set $EestMuerecan,0;}
+	if(#EestMuerecan2==1){set#EestMuerecan2,0;set $EestMuerecan2,0;}
+	if(#bosseasy==1){set#bosseasy,0;set $bosseasy,0;}
+	if(#bossnormal==1){set#bossnormal,0;set $bossnormal,0;}
+	if(#bosshard==1){set#bosshard,0;set $bosshard,0;}
+	if(#beknatop==1){set#beknatop,0;set $beknatop,0;}
+	if(#templeofwater==1){set#templeofwater,0;set $templeofwater,0;}
+	if(#katacomA==1){set #katacomA,0;set $katacomA,0;}
+	if(@item$=="리콜"){
+		item_del"리콜",1;
+		if(get_nation(@myid)==5){set @rand, rand2(1,10);if(@rand<=4){warp"노엠여관",12,8;}else{warp"아슬론여관",6,5;}}
+		if(get_nation(@myid)==6){set @rand, rand2(1,10);if(@rand<=3){warp"화염의세계수의사당", 12, 17;}else if(@rand<=6){warp"여관-금화장", 19, 28;}else{warp"알세이드스-화론마을", 88, 49;}}
+		if(get_nation(@myid)==8){set @rand, rand2(1,10);if(@rand<=3){warp"아만마을", 41, 40;}else{warp"아만여관", 10, 20;}}
+		if(get_nation(@myid)==10){set @rand, rand2(1,10);if(@rand<=3){warp"타바리여관", 15, 14;}else{warp"타바리마을", 55, 55;}}
+		if(get_nation(@myid)==1){
+		set @rand,rand2(1,75);
+		if(@rand<=30){set @Inn$,"밀레스";}
+			else if(@rand<=35){set @Inn$,"아벨";}
+			else if(@rand<=40){set @Inn$,"뤼케시온";}
+			else if(@rand<=45){set @Inn$,"로톤";}
+			else if(@rand<=50){set @Inn$,"호엔";}
+			else if(@rand<=55){set @Inn$,"루어스";}
+			else if(@rand<=60){set @Inn$,"운디네";}
+			else if(@rand<=65){set @Inn$,"수오미";}
+			else if(@rand<=70){set @Inn$,"피에트";}
+			else if(@rand<=75){set @Inn$,"타고르";}
+			warp @Inn$+"여관",15,6;
+		}
+		del@rand;
+	}if(@item$=="밀레스리콜"){
+		item_del"밀레스리콜",1;
+		warp"밀레스마을",48,44;
+	}if(@item$=="피에트리콜"){
+		item_del"피에트리콜",1;
+		warp"피에트마을",57,30;
+	}if(@item$=="루어스리콜"){
+		item_del"루어스리콜",1;
+		warp"루어스마을",49,52;
+	}if(@item$=="만남의광장리콜"){
+		item_del"만남의광장리콜",1;
+		warp"만남의광장",51,22;
+	}if(@item$=="루어스마을리콜"){
+		item_del"루어스마을리콜",1;
+		warp"루어스마을",49,52;
+	}if(@item$=="아벨리콜"){
+		item_del"아벨리콜",1;
+		warp"아벨마을",53,21;
+	}if(@item$=="수오미리콜"){
+		item_del"수오미리콜",1;
+		warp"수오미마을",24,52;
+	}if(@item$=="뤼케시온리콜"){
+		item_del"뤼케시온리콜",1;
+		warp"뤼케시온마을",42,27;
+	}if(@item$=="시장리콜"){
+		item_del"시장리콜",1;
+		warp"시장2", 13,13;
+	}if(@item$=="운디네리콜"){
+		item_del"운디네리콜",1;
+		warp"운디네마을",82,83;
+	}if(@item$=="로톤리콜"){
+		item_del"로톤리콜",1;
+		warp"로톤마을",34,52;
+	}if(@item$=="호엔리콜"){
+		item_del"호엔리콜",1;
+		warp"호엔마을",24,52;
+	}if(@item$=="마인리콜"){
+		item_del"마인리콜",1;
+		warp"마인마을",22,43;
+	}if(@item$=="타고르리콜"){
+		item_del"타고르리콜",1;
+		warp"타고르마을",30,19;
+	}if(@item$=="홀리루딘성리콜"){
+		item_del"홀리루딘성리콜",1;
+		warp"홀리루딘성", 44,49;
+	}if(@item$=="죽음의마을리콜"){
+		item_del"죽음의마을리콜",1;
+		warp"죽음의마을지하마을",24,16;
+	}if(@item$=="블랙리콜"){
+		item_del"블랙리콜",1;
+		warp"서약의제단",18,23;
+	}
+	if(@item$=="마법의리콜"){
+		if(get_class(@myid)==0){warp"노비스직업신전",6,6;}else{
+			set@m,menu(0,@r14$+"\\n마을에 한하여 이동 가능하며, 아이템 사용기간 까지만 이용할 수 있습니다.","마이소시아","메데니아","사냥터");
+			if(@m==1){
+				set@v,menu(0,"이동을 원하시는 장소를 골라주세요.","밀레스  마을","피에트  마을","아벨   마을","수오미  마을","운디네  마을","뤼케시온마을","루어스  마을","마인   마을","신들의세계");
+				if(@v==1){warp"밀레스마을",84,22;}
+				else if(@v==2){warp"피에트마을",57,30;}
+				else if(@v==3){warp"아벨마을",53,21;}
+				else if(@v==4){warp"수오미마을",67,32;}
+				else if(@v==5){warp"운디네마을",65,47;}
+				else if(@v==6){warp"뤼케시온마을",23,14;}
+				else if(@v==7){warp"루어스마을",49,55;}
+				else if(@v==8){warp"마인마을",12,9;}
+                                                       else if(@v==9){warp"신들의세계",23,24;}
+			}else if(@m==2){
+				set@magic2,menu(0,@r14$, "아슬론마을","노엠마을","아만마을");
+				if(@magic2==1){warp"아슬론마을",50,54;}
+				else if(@magic2==2){warp"노엠마을",34,27;}
+				else if(@magic2==3){warp"아만마을",30,60;}
+                        }else if(@m==3){
+                                set@magic3,menu(0,@r14$, "레드오피온의굴26","블랙오피온의굴29","아만정글입구","카타콤지하15","이아길드성궁");
+                                if(@magic3==1){warp"레드오피온의굴26",50,54;}
+                                else if(@magic3==2){warp"블랙오피온의굴29",25,27;}
+                                else if(@magic3==3){warp"아만정글입구",47,25;}
+                                else if(@magic3==4){warp"카타콤지하15",17,14;}
+                                else if(@magic3==5){warp"이아길드성궁",37,16;}
+
+			}
+		}
+	}if(@item$=="메데니아마법의리콜"){
+		set@M,menu(0,@r14$+"\\n마을에 한하여 이동 가능하며, 메데니아 국적자만 이용할 수 있습니다.","아슬론마을","노엠마을","아만마을");
+		if(@M==1){warp"아슬론마을",50,54;item_del"메데니아마법의리콜",1;}
+		else if(@M==2){warp"노엠마을",34,27;item_del"메데니아마법의리콜",1;}
+		else if(@M==3){warp"아만마을",30,60;item_del"메데니아마법의리콜",1;}
+	}
+	end;
+}
+
+16	강화석교환권	{
+	set@myid,get_myid();
+	set@item$,last_item();
+	if(@item$=="장갑강화석교환권"){
+		item_del"장갑강화석교환권",1;
+		item_add"장갑강화석",5;
+	}if(@item$=="각반강화석교환권"){
+		item_del"각반강화석교환권",1;
+		item_add"각반강화석",5;
+	}if(@item$=="갑옷강화석교환권"){
+		item_del"갑옷강화석교환권",1;
+		item_add"갑옷강화석",5;
+	}if(@item$=="투구강화석교환권"){
+		item_del"투구강화석교환권",1;
+		item_add"투구강화석",5;
+	}if(@item$=="무기강화석교환권"){
+		item_del"무기강화석교환권",1;
+		item_add"무기강화석",5;
+	}
+	message 3,"지급되었습니다. 인벤토리를 확인해보십시오.";
+	end;
+}
+
+Item	HP보너스캅셀	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select, menu(0, "HP보너스캅셀을 사용하여 체력최대치를 1~10% 올리시겠습니까?", "사용한다.", "사용하지 않는다.");
+	if(@select == 1){
+		set @rand, rand2(1,5);
+		if(@rand < 1 || @rand > 5){goto re;}
+		set_basevita get_basevita2(@myid) + get_basevita2(@myid) / 100 * @rand;
+		item_del "HP보너스캅셀", 1;
+		save_user @myid;
+		mes 0, "체력최대치가 " + @rand + "%만큼 올랐습니다.";
+		end;
+	}else if(@select == 2){
+		mes 0, "사용하지 않습니다.";
+		end;
+	}
+}
+
+Item	MP보너스캅셀	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select, menu(0, "MP보너스캅셀을 사용하여 마력최대치를 1~5% 올리시겠습니까?", "사용한다.", "사용하지 않는다.");
+	if(@select == 1){
+		set @rand, rand2(1,5);
+		if(@rand < 1 || @rand > 5){goto re;}
+		set_basemana get_basemana2(@myid) + get_basemana2(@myid) / 100 * @rand;
+		item_del "MP보너스캅셀", 1;
+		save_user @myid;
+		mes 0, "마력최대치가 " + @rand + "%만큼 올랐습니다.";
+		end;
+	}else if(@select == 2){
+		mes 0, "사용하지 않습니다.";
+		end;
+	}
+}
+
+Item	엉망색염색약	{
+	set @myid, get_myid();
+	set_haircolor 46;
+	item_del "엉망색염색약", 1;
+}
+
+0,0,0,0,0,0,0	십억경	{
+	if(get_body() != 16 && get_body() != 32){message 1, "유령은 아이템을 사용할수없습니다."; end;}
+	set @val, menu(0,"십억경을 사용하시겠습니까?", "사용한다.");
+	if(@val == 1){exp_add 1000000000; item_del "십억경", 1; mes 1, "풀억경을 사용하셧습니다."; end;}
+	end;
+}

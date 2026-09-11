@@ -1,0 +1,6 @@
+domain	localhost
+authPage	nexon_auth.php
+nexonID	strNexonID
+nexonPW	strPassword
+gameID	strGameID
+serverIndex	n4GameServerNumber

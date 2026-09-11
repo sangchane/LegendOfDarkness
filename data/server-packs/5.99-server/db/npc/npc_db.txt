@@ -1,0 +1,6 @@
+//Npc
+npc:db/npc/Npc.txt
+//Shop
+shop:db/npc/Shop.txt
+//Spawn
+spawn:db/npc/Spawn.txt

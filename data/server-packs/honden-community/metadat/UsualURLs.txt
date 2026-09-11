@@ -1,0 +1,2 @@
+CharacterAdminURL	http://localhost/nexon_auth.php
+NexonClubNewURL	http://localhost/nexon_auth.php

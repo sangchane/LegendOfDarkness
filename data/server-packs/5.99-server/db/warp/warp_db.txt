@@ -1,0 +1,13 @@
+//Warp
+warp:db/warp/Novice_Warp.txt
+warp:db/warp/Abel_Warp.txt
+warp:db/warp/E.T.C.txt
+warp:db/warp/Mileth_Warp.txt
+warp:db/warp/Park_Warp.txt
+warp:db/warp/Mine_Warp.txt
+warp:db/warp/VOD_Warp.txt
+warp:db/warp/WoodLand_Warp.txt
+//Worldmap
+warp:db/warp/World_Map.txt
+//Script
+warp:db/warp/Warp_script.txt

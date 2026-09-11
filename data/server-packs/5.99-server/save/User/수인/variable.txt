@@ -1,0 +1,10 @@
+#gahotime	25
+#logintime	1435172611
+#logouttime	1435172611
+#hair	10
+#sex	2
+#newbie	1
+#pointset	70
+#real	3
+#realmap	2
+#mhunting	4

@@ -1,0 +1,13 @@
+#logintime	1550225640
+#new	1
+#underpassC	0
+#underpassD	0
+#underpassS	0
+#auto_hp	0
+#auto_mp	0
+#classchange	1
+#returnx	5
+#returny	6
+#returnc	0
+#logouttime	1550225648
+#S3attack	1

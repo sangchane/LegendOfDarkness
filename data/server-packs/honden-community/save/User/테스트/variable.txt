@@ -1,0 +1,12 @@
+#logintime	1550554227
+#new	1
+#EestQuest010	1
+#returnx	18
+#returny	22
+#returnc	1
+#logouttime	1550554242
+#EestMuerecan	0
+#Body	0
+#skill26	1550231298
+#hondon	0
+#honpoint	50
