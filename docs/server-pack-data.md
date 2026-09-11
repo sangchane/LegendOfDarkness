@@ -165,11 +165,67 @@ if(@npc$=="구피"){                                    ← 누가 주나
 `disconnect`·`console_output`·`door_parse` 같은 것들이다. 엔진이 할 수 있는데 이 팩이
 그 기능을 안 쓴다는 뜻이지, 명령이 망가졌다는 뜻은 아니다.
 
+### 기계어에서 기계적으로 붙인 증거 (5.99 만)
+
+401개를 손으로 읽는 것은 현실적이지 않다. 대신 **사람 손을 타지 않는 사실만** 전부에 붙였다
+(`scripts/disasm-script-commands.py`, capstone + pefile). 명령마다 함수를 따라가며 갈래를
+양쪽 다 밟고 `ret` 에서 멈춘 뒤, 참조하는 문자열 · 부르는 함수 · 읽고 쓰는 구조체 오프셋을 적는다.
+
+| | 5.99 (`Novaonline.exe`) |
+|---|---|
+| 뜯은 명령 | 401 |
+| 문자열을 참조하는 것 | 71 |
+| 구조체에 쓰는 것 | 156 |
+| 갈래를 가르는 helper | 44 |
+| 증거가 하나도 안 붙은 것 | 114 |
+
+**문자열이 가장 크게 말한다.** 오류 메시지가 같으면 하는 일이 닮았다.
+
+| 문자열 | 명령 |
+|---|---|
+| `이미 걸려있습니다.` | 20개 — `belra` `colama` `dell` `enare` `defens` `antimagic` `hide` `immortal` … |
+| `buildin_skill_exist: invalid name!` | `skill_add` `skill_add2` `skill_del` `skill_del2` `skill_exist` |
+| `buildin_item_add: invalid name!` | `item_add` `group_item_add` |
+| `%s: %s` | `mob_say` `mob_say2` `pet_say` `user_say` |
+| `몸이 얼어 움직일수 없습니다.` | `item_pickup` `mobsor_delay` `mobsor_delay2` |
+| `잠이 쏟아져 옵니다.` | `item_pickup` `mobnar_delay` `mobnar_delay2` |
+
+첫 줄의 20개는 이름이 원작 마법 그대로다(벨라·코마·델·에나레). 같은 "이미 걸려있습니다" 를
+내는 것으로 보아 **상태를 거는 계열이 한 무리**라는 것까지는 자료가 말해 준다.
+
+`buildin_del: invalid name` 처럼 함수 이름이 오류 문자열에 그대로 박힌 것도 있다 —
+eAthena 혈통이 여기서 또 확인된다.
+
+**구조체 오프셋도 무리를 만든다.** 같은 자리에 쓰는 것끼리 묶인다.
+
+| 쓰는 자리 | 명령 |
+|---|---|
+| `+0xCC` | `get_hp_add` `set_hp_add` `set_vita` `set_vital` `group_hill` |
+| `+0xF0` | `char_disguise` `hide` `pet_rescue` `set_state` `set_state1` |
+| `+0xE0` | `money_add` |
+
+다섯이 모두 `+0xCC` 에 쓴다는 것은 사실이다. **그 자리가 체력이라는 것은 코드가 말해 주지 않는다** —
+이름에서 그렇게 읽힐 뿐이다. 그래서 표에는 자리만 적었다.
+
 ### 여기서 멈춘 곳
 
-**각 명령이 무엇을 하는지는 적지 않았다.** 이름과 인자 개수는 바이너리에 적힌 사실이지만,
-동작은 기계어를 읽어야 알 수 있고 그건 하지 않았다. `set_map_pk` 가 PK 를 켠다는 것은
-이름에서 짐작될 뿐 확인된 것이 아니다. 짐작을 적으면 다음 사람이 그것을 근거로 삼는다.
+**각 명령이 무엇을 하는지는 여전히 적지 않았다.** 위 증거는 "이 함수가 0x10150 에 더한다",
+"이 함수가 `이미 걸려있습니다` 를 참조한다" 까지다. 0xCC 가 체력인지, `belra` 가 무엇을 거는
+마법인지는 다음 사람이 판단할 몫이다. 짐작을 적으면 그것이 근거로 둔갑한다.
+
+증거가 하나도 안 붙은 명령이 114개 남았다. 문자열도 안 쓰고 갈래를 가르는 helper 도
+안 부르는 짧은 함수들이다 — 더 알려면 그 114개는 손으로 읽어야 한다.
+
+혼든(`Yuki.exe`, 500개)은 아직 안 했다. 같은 명령으로 팩 이름만 바꾸면 된다.
+
+### 도구
+
+capstone·pefile 이 필요하다. 시스템 파이썬에는 넣지 않는다(PEP 668):
+
+```
+python3 -m venv .venv && .venv/bin/pip install capstone pefile
+.venv/bin/python scripts/disasm-script-commands.py <서버.exe> <팩이름>
+```
 
 ## 4. 믿을 수 있는 만큼만
 
