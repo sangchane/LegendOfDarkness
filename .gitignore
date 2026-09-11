@@ -11,6 +11,10 @@ logs/
 tmp/
 *.log
 
+# Python 바이트코드
+__pycache__/
+*.pyc
+
 # OS/editor files
 .DS_Store
 Thumbs.db
