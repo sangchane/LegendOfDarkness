@@ -1,0 +1,19 @@
+﻿{
+    "name":  "Temuair",
+    "field":  1,
+    "describes":  "Temuair, Refuge, East Woodlands",
+    "portals":  [
+                    {
+                        "shows":  "Refugee Camp",
+                        "toArea":  2,
+                        "toAt":  "66,35",
+                        "atPoint":  "442,225"
+                    },
+                    {
+                        "shows":  "Lost Woods",
+                        "toArea":  3,
+                        "toAt":  "95,50",
+                        "atPoint":  "417,50"
+                    }
+                ]
+}

@@ -1,0 +1,55 @@
+﻿[
+    {
+        "name":  "Map Warp from 1 to 2",
+        "type":  "Map",
+        "fromArea":  1,
+        "steppingOn":  [
+                           "29,14"
+                       ],
+        "toArea":  2,
+        "toAt":  "20,15",
+        "needsLevel":  1
+    },
+    {
+        "name":  "Map Warp from 2 to 1",
+        "type":  "Map",
+        "fromArea":  2,
+        "steppingOn":  [
+                           "17,15"
+                       ],
+        "toArea":  1,
+        "toAt":  "24,13",
+        "needsLevel":  1
+    },
+    {
+        "name":  "Warp from 2 to World Map.",
+        "type":  "World",
+        "fromArea":  2,
+        "steppingOn":  [
+                           "69,38",
+                           "69,37",
+                           "69,36",
+                           "69,35",
+                           "69,34",
+                           "69,33",
+                           "69,32",
+                           "69,31",
+                           "69,30"
+                       ],
+        "toArea":  null,
+        "toAt":  null,
+        "needsLevel":  1
+    },
+    {
+        "name":  "Warp from 3 to World Map.",
+        "type":  1,
+        "fromArea":  3,
+        "steppingOn":  [
+                           "14,137",
+                           "15,137"
+                       ],
+        "toArea":  null,
+        "toAt":  null,
+        "needsLevel":  1
+    }
+]

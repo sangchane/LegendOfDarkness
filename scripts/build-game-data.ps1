@@ -242,6 +242,93 @@ $npcScripts | ConvertTo-Json -Depth 6 | Set-Content "$Output/npc-scripts.json" -
 $named = ($npcScripts | Where-Object { $_.items.Count + $_.spells.Count + $_.skills.Count -gt 0 }).Count
 Write-Output "  npc-scripts.json — $($npcScripts.Count) (이름을 직접 부르는 것 $named)"
 
+# ── 맵·워프·월드맵 ────────────────────────────────────────────────────────────
+# 맵은 database/server/areas/*.json 이 정의한다(이름·크기·음악·.map 파일). 맵끼리는 워프로 잇고,
+# 월드맵(temuair)은 그림 위의 점에서 맵으로 들어간다. 괴물은 AreaID 로 맵에 걸린다.
+#
+# WarpType 이 'Map' 이면 To.AreaID 가 목적지 맵이고, 'World' 면 월드맵 화면으로 나간다(To.Location 이 null).
+Write-Output ''
+Write-Output 'Reading maps and warps...'
+
+$serverRoot = Split-Path $Metafile
+
+# 이 파일들은 "Id" 와 "ID" 를 둘 다 들고 있다. 서버의 파서는 봐주지만 PowerShell 은 같은 열쇠로 보고
+# 거부한다 — 뒤에 붙은 "ID" 를 떼고 읽는다. 값은 "Id" 와 같다.
+$areas = @(Get-ChildItem -Path (Join-Path $serverRoot 'areas') -Filter *.json | ForEach-Object {
+    # -creplace 로 대소문자를 가린다. -replace 는 안 가려서 "Id" 까지 지운다(실제로 그랬다).
+    $a = ((Get-Content $_.FullName -Raw) -creplace ',\s*"ID"\s*:\s*\d+', '') | ConvertFrom-Json
+
+    [pscustomobject]@{
+        id      = $a.Id
+        name    = $a.Name
+        content = $a.ContentName
+        cols    = $a.Cols
+        rows    = $a.Rows
+        music   = $a.Music
+        mapFile = Split-Path $a.FilePath -Leaf
+    }
+})
+
+$areas | ConvertTo-Json -Depth 4 | Set-Content "$Output/areas.json" -Encoding utf8
+Write-Output "  areas.json — $($areas.Count)"
+
+$warps = @(Get-ChildItem -Path (Join-Path $serverRoot 'templates/warps') -Filter *.json | ForEach-Object {
+    $w = Get-Content $_.FullName -Raw | ConvertFrom-Json
+
+    [pscustomobject]@{
+        name     = $w.Name
+        type     = $w.WarpType
+        fromArea = $w.ActivationMapId
+        # 밟는 칸이 여럿일 수 있다 — 월드맵으로 나가는 문은 아홉 칸이 한 줄로 늘어서 있다.
+        steppingOn = @($w.Activations | ForEach-Object { "$($_.Location.X),$($_.Location.Y)" })
+        toArea   = if ($w.WarpType -eq 'Map') { $w.To.AreaID } else { $null }
+        toAt     = if ($w.WarpType -eq 'Map' -and $w.To.Location) { "$($w.To.Location.X),$($w.To.Location.Y)" } else { $null }
+        needsLevel = $w.LevelRequired
+    }
+})
+
+$warps | ConvertTo-Json -Depth 4 | Set-Content "$Output/warps.json" -Encoding utf8
+Write-Output "  warps.json — $($warps.Count)"
+
+$worldmaps = @(Get-ChildItem -Path (Join-Path $serverRoot 'templates/worldmaps') -Filter *.json | ForEach-Object {
+    $m = Get-Content $_.FullName -Raw | ConvertFrom-Json
+
+    [pscustomobject]@{
+        name    = $m.Name
+        field   = $m.FieldNumber
+        describes = $m.Description
+        portals = @($m.Portals | ForEach-Object {
+            [pscustomobject]@{
+                shows  = $_.DisplayName
+                toArea = $_.Destination.AreaID
+                toAt   = "$($_.Destination.Location.X),$($_.Destination.Location.Y)"
+                # 월드맵 그림 위의 점. field###.png 가 그 그림이다.
+                atPoint = "$($_.PointX),$($_.PointY)"
+            }
+        })
+    }
+})
+
+$worldmaps | ConvertTo-Json -Depth 5 | Set-Content "$Output/worldmaps.json" -Encoding utf8
+Write-Output "  worldmaps.json — $($worldmaps.Count) (문 $(($worldmaps.portals | Measure-Object).Count)개)"
+
+# 괴물이 어느 맵에 나오나 — 템플릿의 AreaID. JSON 으로 읽지 않는 이유는 위와 같다.
+$spawns = @(Get-ChildItem -Path (Join-Path $serverRoot 'templates/monsters') -Filter *.json -Recurse | ForEach-Object {
+    $text = Get-Content $_.FullName -Raw
+    $name = [regex]::Match($text, '"Name"\s*:\s*"([^"]+)"')
+    $area = [regex]::Match($text, '"AreaID"\s*:\s*(\d+)')
+
+    if (-not $name.Success) { return }
+
+    [pscustomobject]@{
+        monster = $name.Groups[1].Value
+        areaId  = if ($area.Success) { [int] $area.Groups[1].Value } else { $null }
+    }
+})
+
+$spawns | ConvertTo-Json -Depth 3 | Set-Content "$Output/monster-spawns.json" -Encoding utf8
+Write-Output "  monster-spawns.json — $($spawns.Count)"
+
 # ── Obsidian 노트 ─────────────────────────────────────────────────────────────
 # 표를 그래프로 만드는 마지막 걸음. 간선이 자료 안에 이미 또렷하게 있으므로(선행 기술, 퀘스트 글 속의
 # NPC 이름) LLM 으로 짐작할 것이 없다 — 그대로 [[링크]] 로 옮긴다. 짐작이 없으니 틀릴 일도 없다.
@@ -401,6 +488,83 @@ foreach ($group in $items | Group-Object kind) {
 
 Write-Output "  items/ — $(($items | Group-Object kind).Count) 종류, $($items.Count)개"
 
+# 맵 노트 — 나가는 문·들어오는 문·나오는 괴물이 한 장에 모인다.
+New-Item -ItemType Directory -Force -Path (Join-Path $vault 'maps') | Out-Null
+
+$areaName = @{}
+$areas | ForEach-Object { $areaName[$_.id] = $_.name }
+
+foreach ($area in $areas) {
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $lines.Add('---')
+    $lines.Add('kind: map')
+    $lines.Add("areaId: $($area.id)")
+    $lines.Add('---')
+    $lines.Add("# $($area.name)")
+    $lines.Add('')
+    $lines.Add("$($area.cols) x $($area.rows) 칸 · 음악 $($area.music) · 지도 파일 $($area.mapFile)")
+    if ($area.content -ne $area.name) { $lines.Add("안에서 부르는 이름: $($area.content)") }
+    $lines.Add('')
+
+    $out = @($warps | Where-Object { $_.fromArea -eq $area.id })
+    if ($out.Count -gt 0) {
+        $lines.Add('**나가는 문**')
+        foreach ($w in $out) {
+            if ($w.type -eq 'Map' -and $areaName.ContainsKey($w.toArea)) {
+                $lines.Add("- $($w.steppingOn -join ' · ') 칸 → [[$(Get-SafeName $areaName[$w.toArea])]] 의 $($w.toAt) (레벨 $($w.needsLevel)+)")
+            } else {
+                $lines.Add("- $($w.steppingOn -join ' · ') 칸 → 월드맵 화면 (레벨 $($w.needsLevel)+)")
+            }
+        }
+        $lines.Add('')
+    }
+
+    $into = @($warps | Where-Object { $_.type -eq 'Map' -and $_.toArea -eq $area.id })
+    if ($into.Count -gt 0) {
+        $lines.Add('**들어오는 문**')
+        foreach ($w in $into) {
+            $lines.Add("- [[$(Get-SafeName $areaName[$w.fromArea])]] 에서 → $($w.toAt)")
+        }
+        $lines.Add('')
+    }
+
+    foreach ($m in $worldmaps) {
+        $doors = @($m.portals | Where-Object { $_.toArea -eq $area.id })
+        if ($doors.Count -eq 0) { continue }
+        $lines.Add("**월드맵에서 바로** — $($m.name) 그림의 $(($doors | ForEach-Object { $_.atPoint }) -join ' · ') 점에서 $(($doors | ForEach-Object { $_.toAt }) -join ' · ') 로 들어온다.")
+        $lines.Add('')
+    }
+
+    $here = @($spawns | Where-Object { $_.areaId -eq $area.id })
+    if ($here.Count -gt 0) {
+        $lines.Add('**나오는 괴물**')
+        foreach ($one in $here) { $lines.Add("- $($one.monster)") }
+        $lines.Add('')
+    }
+
+    Write-Note (Join-Path $vault "maps/$(Get-SafeName $area.name).md") $lines
+}
+
+# 어느 맵에도 걸리지 않는 괴물 — 가리키는 AreaID 가 areas/ 에 없다는 뜻이고, 그러면 뜨지 않는다.
+$orphans = @($spawns | Where-Object { -not $areaName.ContainsKey($_.areaId) })
+
+if ($orphans.Count -gt 0) {
+    Write-Note (Join-Path $vault 'maps/없는 맵.md') (@(
+        '---'
+        'kind: map'
+        '---'
+        '# 없는 맵'
+        ''
+        ('아래 괴물들은 ' + (($orphans | ForEach-Object { $_.areaId } | Sort-Object -Unique) -join ', ') +
+         ' 번 맵에 나오게 돼 있는데, `areas/` 에 그런 맵이 없다. **그래서 뜨지 않는다.**')
+        ''
+        '안전 가옥이 비어 있던 이유이고, 시험용으로 `safehouse_wasp`(AreaID 1)를 손으로 만들어야 했던 이유다.'
+        ''
+    ) + @($orphans | ForEach-Object { "- $($_.monster) (AreaID $($_.areaId))" }))
+}
+
+Write-Output "  maps/ — $($areas.Count) (맵 없는 괴물 $($orphans.Count)마리)"
+
 # NPC 스크립트 노트 — 여기서 아이템·마법·퀘스트로 링크가 나간다.
 New-Item -ItemType Directory -Force -Path (Join-Path $vault 'npc-scripts') | Out-Null
 
@@ -464,6 +628,7 @@ $tick = [char] 96
     "- **NPC** $($portraits.Count)명 — ${tick}npcs/${tick}."
     "- **아이템** $($items.Count)개 — ${tick}items/${tick}, 종류 목차는 ${tick}items/_kinds/${tick} 에 $(($items | Group-Object kind).Count)장."
     "- **NPC 스크립트** $($npcScripts.Count)개 — ${tick}npc-scripts/${tick}. 부르는 아이템·마법과 퀘스트 열쇠."
+    "- **맵** $($areas.Count)개 — ${tick}maps/${tick}. 나가는 문·들어오는 문·나오는 괴물."
 )
 
 Write-Note (Join-Path $vault 'index.md') $indexLines

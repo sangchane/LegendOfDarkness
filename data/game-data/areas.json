@@ -1,0 +1,38 @@
+﻿[
+    {
+        "id":  99999,
+        "name":  "Hades",
+        "content":  "Hades_Death_Map",
+        "cols":  25,
+        "rows":  25,
+        "music":  3,
+        "mapFile":  "lod99999.map"
+    },
+    {
+        "id":  3,
+        "name":  "Lost Woods",
+        "content":  "Lost Woods",
+        "cols":  255,
+        "rows":  255,
+        "music":  3,
+        "mapFile":  "lod3.map"
+    },
+    {
+        "id":  2,
+        "name":  "Refugee Camp",
+        "content":  "Refuge_Safe_Map",
+        "cols":  70,
+        "rows":  70,
+        "music":  27,
+        "mapFile":  "lod2.map"
+    },
+    {
+        "id":  1,
+        "name":  "Safe House",
+        "content":  "Starting_Zone_Safe_House",
+        "cols":  30,
+        "rows":  31,
+        "music":  1,
+        "mapFile":  "lod1.map"
+    }
+]
