@@ -198,14 +198,14 @@ public sealed partial class PackPanel : PanelContainer
     /// the pack, take it off from the gear ring. Only for a run with no hand on it: it goes through the
     /// same events the buttons raise, so the wiring is checked, not bypassed.
     /// </summary>
-    public bool PressFirst()
+    public bool PressFirst(bool throwing = false)
     {
         foreach (Node cell in (_onGear ? _gear.Cells : _rows.GetChildren()))
         {
             if (cell is Button button)
             {
                 button.EmitSignal(BaseButton.SignalName.Pressed);
-                _use.EmitSignal(BaseButton.SignalName.Pressed);
+                (throwing ? _drop : _use).EmitSignal(BaseButton.SignalName.Pressed);
 
                 return true;
             }

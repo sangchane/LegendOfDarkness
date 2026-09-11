@@ -36,6 +36,20 @@ public static class LayoutCheck
     private static readonly int[] Icons = [32882, 32957, 33002, 32905, 32910];
 
     /// <summary>
+    /// 걸친 것으로 꾸며 볼 때 어느 자리에 무엇을 놓나. **자리는 아이템이 정한다** — 서버의 아이템
+    /// 템플릿에 <c>EquipmentSlot</c> 이 적혀 있고(장화 13 · 방패 3 · 귀걸이 5), 그 번호가 곧
+    /// <c>WornPlace</c> 이고 <c>GearLayout</c> 이 그리는 자리다. 그래서 꾸민 것도 아무 자리에나
+    /// 놓지 않는다: 그림이 있는 셋은 제자리에 놓고, 나머지는 비워 부위 그림이 나오게 둔다.
+    /// 돈은 여기 없다 — 걸칠 수 있는 것이 아니다.
+    /// </summary>
+    private static readonly Dictionary<int, int> WornIcons = new()
+    {
+        [3] = 32957,   // 방패 — Luathas Bronze Shield
+        [5] = 33002,   // 귀고리 — Luathas Coral Earrings
+        [13] = 32882,  // 신발 — Shagreen Boots
+    };
+
+    /// <summary>
     /// Things to put in the pack while nothing is connected. A check against an empty panel measures a
     /// panel nobody will ever see: the worn places were added, the panel overflowed, and the check still
     /// said nothing was wrong because there was nothing in it to overflow with.
@@ -55,11 +69,15 @@ public static class LayoutCheck
             100))]
         : [];
 
-    /// <summary>Something on in every place the server can name, for the same reason.</summary>
+    /// <summary>
+    /// Something on in every place the server can name, so the panel is measured full rather than empty.
+    /// Only the three places we have a drawing for wear one; the rest are worn but pictureless, which is
+    /// also what the real thing does for an item whose icon has not been cut yet.
+    /// </summary>
     public static IReadOnlyList<WornItem> PretendWorn { get; } = Stuffed()
         ? [.. Enumerable(1, 18, slot => new WornItem(
             slot,
-            Icons[slot % Icons.Length],
+            WornIcons.TryGetValue(slot, out int icon) ? icon : 0,
             $"자리 {slot} 의 시험용 장비",
             WornPlace.Of(slot),
             30,

@@ -213,8 +213,17 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// Whoever stands nearest the tap, if anybody stands near enough. Measured against the middle of a
     /// figure rather than its feet, because that is the part of it a thumb aims at.
     /// </summary>
+    /// <remarks>
+    /// Things lying on the floor are looked at first. They are small and they sit under everyone's feet,
+    /// so a tap that lands on both is far likelier to have meant the thing than the figure standing over it.
+    /// </remarks>
     private void Choose(Vector2 where)
     {
+        if (Lift(where))
+        {
+            return;
+        }
+
         const float reach = 34;
         const float waist = 32;
 
@@ -234,6 +243,57 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         Mark();
+    }
+
+    /// <summary>
+    /// Asks for whatever lies nearest the tap, and says whether there was anything to ask for. **The
+    /// original has no automatic looting** — walking over a thing leaves it lying there, and only asking
+    /// takes it — so this happens on a tap and at no other time.
+    /// </summary>
+    /// <remarks>
+    /// Nothing is drawn or removed here. The server decides whether we are close enough (its
+    /// <c>ClickLootDistance</c> is ten tiles) and answers by no longer showing the thing, which is what
+    /// makes it disappear. A tap on bare floor sends nothing.
+    /// </remarks>
+    private bool Lift(Vector2 where)
+    {
+        if (server is null)
+        {
+            return false;
+        }
+
+        // 한 칸 남짓. 사람을 고르는 34 보다 좁은 것은, 빗나간 탭이 엉뚱한 것을 줍는 편이
+        // 아무도 고르지 못하는 것보다 나쁘기 때문이다.
+        const float reach = 24;
+
+        float nearest = reach * reach;
+        GroundMark? asked = null;
+
+        // 그려진 것을 그대로 재려고 server.Creatures 가 아니라 표식을 돈다. 같은 칸이라도 그림 크기에
+        // 따라 눌러야 할 자리가 달라진다.
+        foreach (GroundMark mark in _dropped.Values)
+        {
+            float distance = (mark.Position + mark.Middle).DistanceSquaredTo(where);
+
+            if (distance < nearest)
+            {
+                nearest = distance;
+                asked = mark;
+            }
+        }
+
+        if (asked is null)
+        {
+            return false;
+        }
+
+        _ = server.PickUpAsync(asked.Where, _leaving.Token);
+
+        // 실제로 보낼 때만 말한다. 리허설 쪽에서 말하면 화면이 얼어 탭이 무시돼도 찍혀서,
+        // 되는 줄 알고 한참 헤맸다(2026-09-11).
+        GD.Print($"GREYBOX_LIFTED {asked.Where.X},{asked.Where.Y} 그림 {asked.Sprite}");
+
+        return true;
     }
 
     /// <summary>Puts the mark on whoever is picked out, or takes it away.</summary>
@@ -429,10 +489,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         if (_rehearsedPick
-            || !(Main.Picking || Main.Striking || Main.Saying.Length > 0)
+            || !(Main.Picking || Main.Striking || Main.Lifting || Main.Saying.Length > 0)
             || _heard < 0
             || (Main.Picking && _crowd.Count + _herd.Count == 0)
-            || _settling++ < 60)
+            || (Main.Lifting && _dropped.Count == 0)
+            // 버린 다음에 주우려면 버릴 때까지 기다려야 한다. 소지품은 90 프레임에 열린다.
+            || _settling++ < (Main.Throwing && Main.Lifting ? 150 : 60))
         {
             return;
         }
@@ -447,6 +509,33 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         if (Main.Saying.Length > 0)
         {
             _ = server?.SayAsync(Main.Saying, _leaving.Token);
+        }
+
+        if (Main.Lifting)
+        {
+            // 가장 가까운 것 하나. 그림 한가운데를 누른다 — 눈이 겨냥하는 자리와 같아야 Lift 의 셈까지
+            // 확인된다. 표식이 스스로 어디가 가운데인지 말하므로 여기서 다시 세지 않는다.
+            GroundMark? thing = _dropped.Values
+                .OrderBy(mark => mark.Position.DistanceSquaredTo(_player.Position))
+                .FirstOrDefault();
+
+            // 무엇이 보이는지 먼저 말한다 — 안 주워질 때 자리와 그림 번호가 없으면 물어볼 것이 없다.
+            foreach (GroundMark seen in _dropped.Values)
+            {
+                GD.Print($"GREYBOX_ONFLOOR {seen.Where.X},{seen.Where.Y} 그림 {seen.Sprite}");
+            }
+
+            if (thing is not null)
+            {
+                InputEventMouseButton onIt = new()
+                {
+                    ButtonIndex = MouseButton.Left,
+                    Pressed = true,
+                    Position = thing.Position + thing.Middle + _camera.Position
+                };
+
+                GetViewport().PushInput(onIt, true);
+            }
         }
 
         if (!Main.Picking)
@@ -510,6 +599,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                     _dropped[one.Serial] = mark;
                 }
 
+                mark.Where = one.Where;
+                mark.Sprite = one.Sprite;
                 mark.Position = Ground(one.Where);
 
                 continue;

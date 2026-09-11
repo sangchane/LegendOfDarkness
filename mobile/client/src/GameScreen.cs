@@ -340,10 +340,17 @@ public partial class GameScreen : Control
             _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf);
 
             // 손 없이 확인할 때만. 목록이 채워진 다음 프레임에 첫 줄을 한 번 누른다.
-            if (Main.Wearing && !_worn && _pack.PressFirst())
+            if ((Main.Wearing || Main.Throwing) && !_worn && _pack.PressFirst(Main.Throwing))
             {
                 _worn = true;
-                GD.Print("GREYBOX_WORE 첫 줄을 눌렀다");
+                GD.Print(Main.Throwing ? "GREYBOX_THREW 첫 줄을 버렸다" : "GREYBOX_WORE 첫 줄을 눌렀다");
+
+                // 버린 것을 이어서 주워 보려면 손을 뗀 화면이어야 한다 — 소지품이 열려 있으면 월드가
+                // 얼어 탭이 통째로 무시된다. 그래서 여기서 닫는다.
+                if (Main.Throwing && Main.Lifting)
+                {
+                    Carrying(false);
+                }
             }
         }
     }

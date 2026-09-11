@@ -81,8 +81,20 @@ public partial class Main : Control
     /// <summary>Whether to swing once after picking somebody, as <c>--strike</c>.</summary>
     public static bool Striking { get; private set; }
 
+    /// <summary>
+    /// Whether to tap the nearest thing lying on the floor, as <c>--lift</c>. A real tap on its picture,
+    /// so what it checks is the arithmetic a thumb goes through — not just the command underneath it.
+    /// </summary>
+    public static bool Lifting { get; private set; }
+
     /// <summary>Whether to press the first carried thing once the pack is open, as <c>--wear</c>.</summary>
     public static bool Wearing { get; private set; }
+
+    /// <summary>
+    /// Whether to throw the first carried thing on the floor instead, as <c>--throw</c>. Together with
+    /// <c>--lift</c> in a second run that closes the loop with no hand on it: down, then back up.
+    /// </summary>
+    public static bool Throwing { get; private set; }
 
     /// <summary>
     /// Whether the pack opens on the gear tab rather than the pack tab, as <c>--gear</c>. Without it there
@@ -101,10 +113,20 @@ public partial class Main : Control
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OnGear = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
+        Lifting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--lift") >= 0;
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
+        Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 
-        // 입어 보려면 소지품이 열려 있어야 한다 — 따로 적게 하지 않는다.
-        OpeningPack = OpeningPack || Wearing;
+        // 입거나 버려 보려면 소지품이 열려 있어야 한다 — 따로 적게 하지 않는다.
+        OpeningPack = OpeningPack || Wearing || Throwing;
+
+        // 사진을 찍거나 자리를 재는 실행은 사람이 볼 것이 아니다. 창을 아주 없앨 수는 없다 —
+        // --headless 는 아무것도 그리지 않을 뿐 아니라 --size 도 듣지 않아 780x780 을 재게 된다.
+        // 그래서 화면 밖으로 내보내고 키보드를 빼앗지 않게 한다. 작업표시줄에만 남는다.
+        if (Screenshot.Requested() || LayoutCheck.Requested())
+        {
+            StayOutOfTheWay();
+        }
 
         // --size wins over the orientation's own default, so a check can walk several shapes of screen.
         Vector2I? asked = SizeFromCommandLine();
@@ -151,6 +173,12 @@ public partial class Main : Control
         login.QueueFree();
 
         AddChild(new GameScreen(new Lod.Mobile.Core.World.WorldClient(session)));
+    }
+
+    private static void StayOutOfTheWay()
+    {
+        DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.NoFocus, true);
+        DisplayServer.WindowSetPosition(new Vector2I(-4000, -4000));
     }
 
     /// <summary>The screen size a run asks for, as <c>--size 360x780</c>, or nothing for the default.</summary>

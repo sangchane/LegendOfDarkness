@@ -152,6 +152,30 @@
 
 ---
 
+## 3.5 어느 자리에 놓이나 — 아이템이 정한다
+
+클라이언트가 고르는 것이 아니다. **서버의 아이템 템플릿에 `EquipmentSlot` 이 적혀 있고**, 그 번호가
+곧 `WornPlace` 이자 이 문서의 자리 번호다.
+
+```
+database/server/templates/items/Shagreen_Boots.json        "EquipmentSlot": 13   → 신발
+database/server/templates/items/Luathas_Bronze_Shield.json "EquipmentSlot": 3    → 방패
+database/server/templates/items/Luathas_Coral_Earrings.json "EquipmentSlot": 5   → 귀고리
+```
+
+번호의 이름표는 `Hades.Server.Base/Types/ItemSlots.cs` 의 `EquipSlot` 열거형이다(1 Weapon · 2 Armor ·
+3 Shield · 4 Helmet · 5 Earring · 6 Necklace · 7·8 LHand/RHand · 9·10 LArm/RArm · 11 Waist · 12 Leg ·
+13 Foot · 14 FirstAcc · 15 Trousers · 16 Coat · 17 SecondAcc).
+
+입으면 `EquipmentManager` 가 그 자리에 넣고 **`0x37`** 로 자리 번호와 함께 알려 준다. 클라이언트는
+그 번호를 `GearLayout` 에 넣어 칸을 찾을 뿐, 무엇이 어디에 가는지 스스로 판단하지 않는다 — 그래서
+서버가 아이템을 새로 만들어도 화면은 고칠 것이 없다.
+
+> 열거형의 `[Description]` 은 자리 이름과 어긋나 있다 — `Trousers = 15` 에 "Jewels", `Coat = 16` 에
+> "Pants" 가 붙어 있다. 이름표가 아니라 **번호**를 믿는다.
+
+---
+
 ## 4. 그림
 
 두 세대가 그림도 따로 들고 있다. 둘 다 뽑아서 `docs/ui/assets/` 에 두었고 `docs/index.html` 에서 볼 수 있다.

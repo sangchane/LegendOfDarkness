@@ -44,6 +44,16 @@ public sealed class WorldClient(WorldSession session)
     /// <summary>Taking something off. One byte: the worn place, the same number 0x37 names.</summary>
     private const byte TakeOffCommand = 0x44;
 
+    /// <summary>Picking something up off the floor. A pack slot to aim at, then the tile.</summary>
+    private const byte PickUpCommand = 0x07;
+
+    /// <summary>
+    /// Which pack slot to put a picked-up thing in. The server finds a free one itself
+    /// (<c>Format07Handler</c> hands the item to <c>GiveTo</c>, which does not read this), so nothing is
+    /// gained by choosing — and choosing wrongly would be a way to lose things.
+    /// </summary>
+    private const byte AnyPackSlot = 0;
+
     /// <summary>소지품 칸을 가리키는 번호. 주문·기술 칸도 같은 명령을 쓴다.</summary>
     private const byte InventoryPane = 0x00;
     private const byte WornCommand = 0x37;
@@ -337,6 +347,22 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public Task TakeOffAsync(int place, CancellationToken cancellationToken) =>
         Send(TakeOffCommand, [(byte)place], cancellationToken);
+
+    /// <summary>
+    /// Picks up whatever lies on one tile. The original has no automatic looting — walking over a thing
+    /// leaves it there, and only asking for it takes it — so this is sent when the tile is tapped and at
+    /// no other time. The server takes the topmost thing within <c>ClickLootDistance</c> (10 tiles) of us
+    /// and says nothing at all when there is none, so a tap on bare floor costs nothing.
+    /// </summary>
+    public Task PickUpAsync(Tile where, CancellationToken cancellationToken) =>
+        Send(
+            PickUpCommand,
+            [
+                AnyPackSlot,
+                (byte)(where.X >> 8), (byte)where.X,
+                (byte)(where.Y >> 8), (byte)where.Y
+            ],
+            cancellationToken);
 
     /// <summary>
     /// Swaps two pack slots. Tidying the pack is a run of these — the server keeps no order of its own, so

@@ -211,6 +211,37 @@ public sealed class MobileClientProtocolTests
     }
 
     [Fact]
+    public async Task What_is_thrown_down_lies_on_that_tile_and_can_be_picked_back_up()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+        PutBootsInThePack(server, MobileName);
+
+        using WorldSession session = await LoginAsync(server);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        WorldEntry standing = await Settled(world, seen => seen is not null);
+
+        InventoryItem boots = await Carried(world, "Shagreen Boots");
+
+        await world.DropAsync(boots.Slot, 1, standing.Where, _deadline.Token);
+        await Emptied(world);
+
+        // 바닥에 놓인 것은 서버가 사람·괴물과 같은 형식(0x07)으로 보내되 지나갈 수 있다고 말한다.
+        Creature lying = await Lying(world, standing.Where);
+
+        await world.PickUpAsync(standing.Where, _deadline.Token);
+
+        // 주우면 소지품으로 돌아오고, 그 칸에서는 사라진다.
+        await Carried(world, "Shagreen Boots");
+        await Gone(world, lying.Serial);
+    }
+
+    [Fact]
     public async Task The_world_tells_us_our_own_name()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
@@ -484,6 +515,29 @@ public sealed class MobileClientProtocolTests
         throw new TimeoutException(
             $"{called} 를 걸친 것으로 알려주지 않았습니다. 걸친 것: "
             + string.Join(", ", world.Worn.Select(one => $"{one.Slot}:{one.Called}")));
+    }
+
+    /// <summary>Waits until something passable is lying on that tile, and says what it is.</summary>
+    private async Task<Creature> Lying(WorldClient world, Tile where)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            Creature? found = world.Creatures.FirstOrDefault(one =>
+                one.Kind == CreatureKind.Passable && one.Where == where);
+
+            if (found is not null)
+            {
+                return found;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException(
+            $"{where} 에 놓인 것이 보이지 않았습니다. 보이는 것: "
+            + string.Join(", ", world.Creatures.Select(one => $"{one.Serial}:{one.Kind}@{one.Where}")));
     }
 
     /// <summary>Waits until the server describes us as wearing something other than this.</summary>

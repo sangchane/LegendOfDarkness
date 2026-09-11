@@ -1,5 +1,6 @@
 using Godot;
 using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
@@ -13,11 +14,29 @@ namespace LodClient;
 /// </remarks>
 public sealed partial class GroundMark : Node2D
 {
-    // The figure stands a little below the middle of its tile, and a dropped thing sits on the same spot.
-    private const float Standing = 8;
+    /// <summary>
+    /// How far above the tile's own point a thing lying on it is drawn. The figure stands a little below
+    /// the middle of its tile and a dropped thing sits on the same spot, so a thumb aiming at the picture
+    /// is aiming here — which is why this is not private.
+    /// </summary>
+    public const float Standing = 8;
 
     /// <summary>What the thing looks like, when that has been cut from the archive.</summary>
     public Texture2D? Picture { get; init; }
+
+    /// <summary>Which tile it lies on, so a tap on it can ask the server for that tile.</summary>
+    public Tile Where { get; set; }
+
+    /// <summary>The number the server calls it, said out loud when a run has nobody watching.</summary>
+    public int Sprite { get; set; }
+
+    /// <summary>
+    /// The middle of the drawing, measured from this node's own point. A thumb aims at the picture, not at
+    /// the tile under it, so this is what a tap is judged against — and what a hands-free run aims at.
+    /// </summary>
+    public Vector2 Middle => new(0, -Standing - (Half(Picture) / 2));
+
+    private static float Half(Texture2D? picture) => picture?.GetSize().Y ?? 2 * Standing;
 
     public override void _Draw()
     {
