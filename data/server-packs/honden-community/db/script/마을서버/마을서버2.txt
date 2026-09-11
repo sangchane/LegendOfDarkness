@@ -1,0 +1,687 @@
+/*
+마을서버2.txt는이벤트및아이템에관련된script만추가해놨습니다.
+*/
+2	마을서버2	{
+	set@myid,get_myid();
+	set@npc$,last_npc();
+	set@start$,"안녕하세요. 무엇을 도와드릴까요?";
+	set@Lv,get_level(@myid);
+	if(get_mapname(@myid)=="아벨미용실"){
+		set@a,menu(0,"새로운 헤어스타일로 머리를 바꿔 보겠나?","예","아니오","염색만 할레요..");
+		if(@a==1){
+			if(@Lv<=98){mes 0,"거짓말 하면 안되지.. 5써클이 아니면 헤어스타일을 만들수가 없다네..";}
+			hair2:
+			mes 1,"이 헤어스타일은 특별한 것이라 5써클들만 할수 있다네.. 자네 5써클 맞나?";
+			input@hair,1,"어떤 헤어스타일로 할지 선택해봐\\n(1~60번중)","제가 원하는 헤어스타일 번호는","번 입니다.",2;
+			if(@hair<0||@hair>60){mes 1,"해줄수 있는 머리범위 밖이라네.";goto hair2;}
+			set_hair@hair;
+			goto hair4;
+		}else if(@a==2){
+			mes 1,"이런 저런 이유로 지금 자네 헤어스타일을 변경 할수 없겠군..";
+			goto hair4;
+		}else if(@a==3){
+			hair3:
+			mes 1,"염색은 무료로 해주고 있어..";
+			input@haircolor,1,"원하는 머리카락 색깔을 선택해봐.\\n(1~69번중)","제가 원하는 헤어스타일 번호는","번 입니다.",2;
+			if(@haircolor<1||@haircolor>69){mes 1,"해줄수 있는 머리색깔 범위 밖이라네.";goto hair3;}
+			set_haircolor@haircolor;
+			hair4:
+			mes 0,"심혈을 기울인 아트 작업을 했더니.. 피곤하군.. 이제 좀 쉴까하네..";
+		}
+	end;
+	}
+	if(@npc$=="정복자루딘"){
+		set@MW1$,"뮤레칸의 역습";
+		set@MW2$,"엄청난 힘의 기운이 느껴지는구만!\\n자! 힘좀 써볼까! 이야압!!";
+		set@MW,menu(0,@start$,"[승급]"+@MW1$+"이란","[승급]"+@MW1$+" 참가방법","[승급]뮤레칸의 무기란","[승급]아이템 강화란","[승급]"+@MW1$+" 입장하기","[승급]아이템 강화방법","[승급]강화석 교환하기","[승급]아이템 강화");
+		if(@MW==1){
+			mes 1,"지하세계에서 살고있던 뮤레칸이 엄청난 힘으로 다시 돌아왔다네..\\n뮤레칸은 내가 없던 틈을 타.. 막간한 힘과 그의 군대를 앞세워 마을을 침투하였지!";
+			mes 1,"지난 날 내가 그를 무찔러 지하세계로 보냈지만..\\n이번엔 너무 강력해서.. 나 혼자선 무리라네...";
+			mes 0,"그래서 지금부터 용사들을 모집하기 위해 돌아왔다네!\\n자네도 나와 함께 뮤레칸을 무찌르러 가지 않겠나?!";
+	 	}else if(@MW==2){
+			mes 1,"뮤레칸의 힘은 엄청나게 강하다네..\\n그래서 강인한 용사가 필요하다네!";
+			mes 1,"{=c첫째, 그곳은 혼자 갈 수 없기 때문에, 그룹이 있어야만 입장이 가능하네!";
+			mes 1,"{=c둘째, 그륩원 개인의 어빌리티가 38이상 이어야만 입장이 가능하네!!";
+			mes 0,"정말 험난한 전쟁이 될거야.. 자네 정도라면 음..";
+		}else if(@MW==3){
+			mes 1,"뮤레칸은 자신이 빼앗은 마을 곳곳에 자신의 부하들을 놓았더군.";
+			mes 1,"그 부하들에게는 뮤레칸이 각 왕국에서 빼앗은 무기를 봉인했다고 하더군!";
+			mes 1,"그들을 무찌르면 봉인된 무기를 얻을 수 있다네!";
+			mes 1,"{=c그 무기는 너무나도 악한 힘이 있어서..\\n{=c그 힘을 제어하려면 어빌리티 38이상 이어야만 착용이 가능하다네!!";
+			mes 1,"{=c또한 아이템을 강화할수록 어빌제한이 1씩 증가하는 것을 잊지말게!!";
+			mes 0,"그 무기들은 모두 전설속에만 나오는 무기로!\\n나의 창과 맞먹는다고 하니.. 정말 엄청난 힘이 숨겨져 있다고 하더군.";
+		}else if(@MW==4){
+			mes 1,"뮤레칸의 부하들에게서 희득한 무기를 강화할 수 있다네!";
+			mes 1,"무기와 장비를 모두 5레벨까지 강화할 수 있지!";
+			mes 1,"그렇게만 된다면.. 정말 엄청난 힘을 갖게 되지!";
+			mes 1,"하지만 그만큼의 대가가 따르지!\\n아이템은 성공과 실패 둘중에 하나이지!!";
+			mes 0,"각 나라의 국왕들은 엄청난 힘을 갖기 위해 많은 도전을 했지만..\\n모두 실패하여 지금은.. 몇개 남지 않았지..";
+		}else if(@MW==5){
+			set@MWA,menu(0,"자네가 원하는 던전 번호를 선택하게!\\n던전의 각 번호는 크게 상관이 없네!",@MW1$+"[1]",@MW1$+"[2]",@MW1$+"[3]",@MW1$+"[4]",@MW1$+"[5]");
+			if(@MWA==1){
+				if($EestMuerecan==1){MWNO1:sleep 300;message 3,"뮤레칸역습 던전을 초기화 하고 있습니다. 대기 해주세요.";end;}
+				if(group_count(@myid, 0) > 13){MWNO3:mes 0,"{=c너무 많은 사람이 들어갈 수는 없네!\\n뜻을 함께 할 동료들 7명이 필요하네!";end;}
+				if(get_ability()<38){MWNO4:mes 0,"동료들중에 어빌리티 38가 되지 않아 들어갈 수 없네!";end;}
+				if(get_basevita2(@myid)<=499999&&get_basemana2(@myid)<=299999){MWNO5:mes 0,"체력 마력 조건에 충족되지 않아 들어갈 수 없네!\\n체력 50만 이상 혹은 마력 30만 이상인 사람들만 입장할 수 있네.";end;}
+				group_val "#EestMuerecan",0,1;
+				set #EestMuerecan,1;
+				set $EestMuerecan,1;
+				set $피에트던전1몬스터체크,0;
+				set $뤼케시온던전1몬스터체크,0;
+				set $밀레스던전1몬스터체크,0;
+				set $루어스던전1몬스터체크,0;
+				set $홀리루딘던전1몬스터체크,0;
+				set $피에트던전1보스클리어,0;
+				set $뤼케시온던전1보스클리어,0;
+				set $밀레스던전1보스클리어,0;
+				set $루어스던전1보스클리어,0;
+				group_warp"[뮤레칸]피에트던전(1)",52, 96;
+				mob_clear "[뮤레칸]피에트던전(1)";
+				set $피에트던전1몬스터체크, 1;
+				goto mobspawn;
+			}else if(@MWA==2){
+				if($EestMuerecan2==1){goto MWNO1;}
+				if(group_count(@myid, 0) < 2){goto MWNO2;}
+				if(group_count(@myid, 0) > 13){goto MWNO3;}
+				if(get_ability() < 38){goto MWNO4;}
+				if(get_basevita2(@myid)<=499999&&get_basemana2(@myid)<=299999){goto MWNO5;}
+				group_val "#EestMuerecan2",0,1;
+				set #EestMuerecan2,1;
+				set $EestMuerecan2,1;
+				set $피에트던전2몬스터체크,0;
+				set $뤼케시온던전2몬스터체크,0;
+				set $밀레스던전2몬스터체크,0;
+				set $루어스던전2몬스터체크,0;
+				set $홀리루딘던전2몬스터체크,0;
+				set $피에트던전2보스클리어,0;
+				set $뤼케시온던전2보스클리어,0;
+				set $밀레스던전2보스클리어,0;
+				set $루어스던전2보스클리어,0;
+				group_warp"[뮤레칸]피에트던전(2)",52, 96;
+				mob_clear "[뮤레칸]피에트던전(2)";
+				set $피에트던전2몬스터체크, 1;
+				goto mobspawn;
+			}
+		}else if(@MW==6){
+			mes 1,"아이템을 강화시키려면\\n인벤토리의 첫번째 칸에 강화 시키려는 아이템을 놓고 {=c나를 통해 아이템강화를 하도록!!";
+			mes 0,"{=c그리고 아이템 강화는 정말 성스러운 일이라.. 높은 집중력이 필요하네!\\n그러니 동시에 여럿이 나에게 부탁하지 말게나!!";
+		}else if(@MW==7){
+			mes 1,"강화석 아이템으로 바꾸어 주겠네!";
+			set@MWA,menu(0,"먼저 자네가 교환할 강화석 아이템의 종류를 선택하게!","장갑강화석-재료5개","각반강화석-재료5개","투구강화석-재료10개","갑옷강화석-재료10개","무기강화석-재료15개");
+			if(@MWA==1){
+				if(item_exist(@myid,"부서진강화조각") < 5){goto MI;}
+				item_del "부서진강화조각",5;
+				item_add "장갑강화석",1;
+			}else if(@MWA==2){
+				if(item_exist(@myid,"부서진강화조각") < 5){goto MI;}
+				item_del "부서진강화조각",5;
+				item_add "각반강화석",1;				
+			}else if(@MWA==3){
+				if(item_exist(@myid,"부서진강화조각") < 10){goto MI;}
+				item_del "부서진강화조각",10;
+				item_add "투구강화석",1;	
+			}else if(@MWA==4){
+				if(item_exist(@myid,"부서진강화조각") < 10){goto MI;}
+				item_del "부서진강화조각",10;
+				item_add "갑옷강화석",1;	
+			}else if(@MWA==5){
+				if(item_exist(@myid,"부서진강화조각") < 15){goto MI;}
+				item_del "부서진강화조각",15;
+				item_add "무기강화석",1;	
+			}
+			message 3,"{=q아이템 강화에 성공하였습니다!";
+		}else if(@MW==8){
+			set@MWB,menu(0,"{=c강화시킬 아이템의 종류를 선택하게!\\n한번 선택하면 절대 바꿀 수 없은 주의하도록!\\n{=a현재 사용된 파괴 보호 주문서 개수 : "+$Totalprotect,"장갑류","각반류","투구류","갑옷류","무기류");
+			if(@MWB==1){
+				if(!item_exist(@myid,"장갑강화석")){goto MI2;}
+				item_del "장갑강화석",1;
+				set@check$,item_one_check(@myid);
+				if(item_one_check(@myid)=="[전사]래비아왕국장갑(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[전사]래비아왕국장갑(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]래비아왕국장갑(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[전사]래비아왕국장갑(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]래비아왕국장갑(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[전사]래비아왕국장갑(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]래비아왕국장갑(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[전사]래비아왕국장갑(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]래비아왕국장갑(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[도적]래비아왕국장갑(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]래비아왕국장갑(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[도적]래비아왕국장갑(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]래비아왕국장갑(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[도적]래비아왕국장갑(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]래비아왕국장갑(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[도적]래비아왕국장갑(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]래비아왕국장갑(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[마법사]래비아왕국장갑(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]래비아왕국장갑(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[마법사]래비아왕국장갑(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]래비아왕국장갑(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[마법사]래비아왕국장갑(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]래비아왕국장갑(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[마법사]래비아왕국장갑(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]래비아왕국장갑(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[성직자]래비아왕국장갑(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]래비아왕국장갑(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[성직자]래비아왕국장갑(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]래비아왕국장갑(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[성직자]래비아왕국장갑(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]래비아왕국장갑(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[성직자]래비아왕국장갑(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]래비아왕국장갑(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[무도가]래비아왕국장갑(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]래비아왕국장갑(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[무도가]래비아왕국장갑(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]래비아왕국장갑(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[무도가]래비아왕국장갑(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]래비아왕국장갑(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[무도가]래비아왕국장갑(+5)",1;
+					goto MI4;
+				}else{
+					goto MI2;
+				}
+			}else if(@MWB==2){
+				if(!item_exist(@myid,"각반강화석")){goto MI2;}
+				item_del "각반강화석",1;
+				set@check$,item_one_check(@myid);
+				if(item_one_check(@myid)=="[전사]오래된왕국각반(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[전사]오래된왕국각반(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]오래된왕국각반(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[전사]오래된왕국각반(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]오래된왕국각반(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[전사]오래된왕국각반(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]오래된왕국각반(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[도적]오래된왕국각반(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]오래된왕국각반(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[도적]오래된왕국각반(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]오래된왕국각반(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[도적]오래된왕국각반(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]오래된왕국각반(+4)"){
+					if(rand2(1,1000) > 70){goto MI3;}
+					item_add "[도적]오래된왕국각반(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]오래된왕국각반(+1)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[마법사]오래된왕국각반(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]오래된왕국각반(+2)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[마법사]오래된왕국각반(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]오래된왕국각반(+3)"){
+					if(rand2(1,100) > 40){goto MI3;}
+					item_add "[마법사]오래된왕국각반(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]오래된왕국각반(+4)"){
+					if(rand2(1,1000) > 30){goto MI3;}
+					item_add "[마법사]오래된왕국각반(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]오래된왕국각반(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[성직자]오래된왕국각반(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]오래된왕국각반(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[성직자]오래된왕국각반(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]오래된왕국각반(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[성직자]오래된왕국각반(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]오래된왕국각반(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[성직자]오래된왕국각반(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]오래된왕국각반(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[무도가]오래된왕국각반(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]오래된왕국각반(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[무도가]오래된왕국각반(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]오래된왕국각반(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[무도가]오래된왕국각반(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]오래된왕국각반(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[무도가]오래된왕국각반(+5)",1;
+					goto MI4;
+				}else{
+					goto MI2;
+				}
+			}else if(@MWB==3){
+				if(!item_exist(@myid,"투구강화석")){goto MI2;}
+				item_del "투구강화석",1;
+				set@check$,item_one_check(@myid);
+				if(item_one_check(@myid)=="[전사]마사이왕국투구(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[전사]마사이왕국투구(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]마사이왕국투구(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[전사]마사이왕국투구(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]마사이왕국투구(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[전사]마사이왕국투구(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]마사이왕국투구(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[전사]마사이왕국투구(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]마사이왕국투구(+1)"){
+					if(rand2(1,100) > 30){goto MI3;}
+					item_add "[도적]마사이왕국투구(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]마사이왕국투구(+2)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[도적]마사이왕국투구(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]마사이왕국투구(+3)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[도적]마사이왕국투구(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]마사이왕국투구(+4)"){
+					if(rand2(1,1000) > 50){goto MI3;}
+					item_add "[도적]마사이왕국투구(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]마사이왕국투구(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[마법사]마사이왕국투구(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]마사이왕국투구(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[마법사]마사이왕국투구(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]마사이왕국투구(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[마법사]마사이왕국투구(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]마사이왕국투구(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[마법사]마사이왕국투구(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]마사이왕국투구(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[성직자]마사이왕국투구(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]마사이왕국투구(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[성직자]마사이왕국투구(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]마사이왕국투구(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[성직자]마사이왕국투구(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]마사이왕국투구(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[성직자]마사이왕국투구(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]마사이왕국투구(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[무도가]마사이왕국투구(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]마사이왕국투구(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[무도가]마사이왕국투구(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]마사이왕국투구(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[무도가]마사이왕국투구(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]마사이왕국투구(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[무도가]마사이왕국투구(+5)",1;
+					goto MI4;
+				}else{
+					goto MI2;
+				}
+			}else if(@MWB==4){
+				if(!item_exist(@myid,"갑옷강화석")){goto MI2;}
+				item_del "갑옷강화석",1;
+				set@check$,item_one_check(@myid);
+				if(item_one_check(@myid)=="[전사]사라센왕국갑옷(+1)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[전사]사라센왕국갑옷(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]사라센왕국갑옷(+2)"){
+					if(rand2(1,100) > 55){goto MI3;}
+					item_add "[전사]사라센왕국갑옷(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]사라센왕국갑옷(+3)"){
+					if(rand2(1,100) > 45){goto MI3;}
+					item_add "[전사]사라센왕국갑옷(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]사라센왕국갑옷(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[전사]사라센왕국갑옷(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]사라센왕국갑옷(+1)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[도적]사라센왕국갑옷(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]사라센왕국갑옷(+2)"){
+					if(rand2(1,100) > 55){goto MI3;}
+					item_add "[도적]사라센왕국갑옷(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]사라센왕국갑옷(+3)"){
+					if(rand2(1,100) > 45){goto MI3;}
+					item_add "[도적]사라센왕국갑옷(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]사라센왕국갑옷(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[도적]사라센왕국갑옷(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]사라센왕국갑옷(+1)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[마법사]사라센왕국갑옷(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]사라센왕국갑옷(+2)"){
+					if(rand2(1,100) > 55){goto MI3;}
+					item_add "[마법사]사라센왕국갑옷(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]사라센왕국갑옷(+3)"){
+					if(rand2(1,100) > 45){goto MI3;}
+					item_add "[마법사]사라센왕국갑옷(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]사라센왕국갑옷(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[마법사]사라센왕국갑옷(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]사라센왕국갑옷(+1)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[성직자]사라센왕국갑옷(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]사라센왕국갑옷(+2)"){
+					if(rand2(1,100) > 55){goto MI3;}
+					item_add "[성직자]사라센왕국갑옷(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]사라센왕국갑옷(+3)"){
+					if(rand2(1,100) > 45){goto MI3;}
+					item_add "[성직자]사라센왕국갑옷(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]사라센왕국갑옷(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[성직자]사라센왕국갑옷(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]사라센왕국갑옷(+1)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[무도가]사라센왕국갑옷(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]사라센왕국갑옷(+2)"){
+					if(rand2(1,100) > 55){goto MI3;}
+					item_add "[무도가]사라센왕국갑옷(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]사라센왕국갑옷(+3)"){
+					if(rand2(1,100) > 45){goto MI3;}
+					item_add "[무도가]사라센왕국갑옷(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]사라센왕국갑옷(+4)"){
+					if(rand2(1,1000) > 40){goto MI3;}
+					item_add "[무도가]사라센왕국갑옷(+5)",1;
+					goto MI4;
+				}else{
+					goto MI2;
+				}
+			}else if(@MWB==5){
+				if(!item_exist(@myid,"무기강화석")){goto MI2;}
+				item_del "무기강화석",1;
+				set@check$,item_one_check(@myid);
+				if(item_one_check(@myid)=="[전사]뮤레칸의스냅(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[전사]뮤레칸의스냅(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]뮤레칸의스냅(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[전사]뮤레칸의스냅(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]뮤레칸의스냅(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[전사]뮤레칸의스냅(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[전사]뮤레칸의스냅(+4)"){
+					if(rand2(1,1000) > 30){goto MI3;}
+					item_add "[전사]뮤레칸의스냅(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]뮤레칸의디그(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[도적]뮤레칸의디그(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]뮤레칸의디그(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[도적]뮤레칸의디그(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]뮤레칸의디그(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[도적]뮤레칸의디그(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[도적]뮤레칸의디그(+4)"){
+					if(rand2(1,1000) > 30){goto MI3;}
+					item_add "[도적]뮤레칸의디그(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]뮤레칸의지팡이(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[마법사]뮤레칸의지팡이(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]뮤레칸의지팡이(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[마법사]뮤레칸의지팡이(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]뮤레칸의지팡이(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[마법사]뮤레칸의지팡이(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[마법사]뮤레칸의지팡이(+4)"){
+					if(rand2(1,1000) > 30){goto MI3;}
+					item_add "[마법사]뮤레칸의지팡이(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]뮤레칸의스태프(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[성직자]뮤레칸의스태프(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]뮤레칸의스태프(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[성직자]뮤레칸의스태프(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]뮤레칸의스태프(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[성직자]뮤레칸의스태프(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[성직자]뮤레칸의스태프(+4)"){
+					if(rand2(1,1000) > 30){goto MI3;}
+					item_add "[성직자]뮤레칸의스태프(+5)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]뮤레칸의글러브(+1)"){
+					if(rand2(1,100) > 70){goto MI3;}
+					item_add "[무도가]뮤레칸의글러브(+2)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]뮤레칸의글러브(+2)"){
+					if(rand2(1,100) > 60){goto MI3;}
+					item_add "[무도가]뮤레칸의글러브(+3)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]뮤레칸의글러브(+3)"){
+					if(rand2(1,100) > 50){goto MI3;}
+					item_add "[무도가]뮤레칸의글러브(+4)",1;
+					goto MI4;
+				}else if(item_one_check(@myid)=="[무도가]뮤레칸의글러브(+4)"){
+					if(rand2(1,1000) > 30){goto MI3;}
+					item_add "[무도가]뮤레칸의글러브(+5)",1;
+					goto MI4;
+				}else{
+					goto MI2;
+				}
+			}
+		}
+		end;
+		MI:
+		mes 0,"{=q강화석 제조에 필요한 강화조각 아이템 개수가 부족하네!!";
+		end;
+		MI2:
+		mes 0,"{=q자네가 강화하고자 하는 아이템의 종류가 다르네!\\n다시 한번 확인하도록!!";
+		end;
+		MI3:
+		set@itemname$,item_one_check(@myid);
+		if(item_exist(@myid,"[주문서]파괴보호+100%")){
+			set $Totalprotect, $Totalprotect + 1;
+			item_del "[주문서]파괴보호+100%",1;
+			message 3,"[주문서]파괴보호+100% 효과로 "+@itemname$+"이 파괴되지 않았습니다.";
+		}else{
+			item_del@itemname$,1;
+		}
+		message 3,"아이템 강화에 실패하였습니다!";
+		mes 0,@MW2$;
+		end;
+		MI4:
+		effect@myid,319,0,100;
+		set@itemname$,item_one_check(@myid);
+		item_del@itemname$,1;
+		message 3,"{=q아이템 강화에 성공하였습니다!";
+		mes 0,@MW2$;
+	end;
+	}
+	end;
+	mobspawn:
+		mob_spawn "[수]아이스해골전사", 50, 84, 2;
+		mob_spawn "[화]불타는해골전사", 52, 84, 2;
+		mob_spawn "[풍]사악한해골전사", 50, 86, 2;
+		mob_spawn "[토]저주받은해골법사", 52, 86, 2;
+		
+		mob_spawn "[수]아이스해골전사", 50, 71, 2;
+		mob_spawn "[화]불타는해골전사", 52, 71, 2;
+		mob_spawn "[풍]사악한해골전사", 50, 73, 2;
+		mob_spawn "[토]저주받은해골법사", 52, 73, 2;
+		
+		mob_spawn "[수]아이스해골전사", 32, 77, 2;
+		mob_spawn "[화]불타는해골전사", 34, 77, 2;
+		mob_spawn "[풍]사악한해골전사", 32, 79, 2;
+		mob_spawn "[토]저주받은해골법사", 34, 79, 2;
+		
+		mob_spawn "[수]아이스해골전사", 35, 89, 2;
+		mob_spawn "[화]불타는해골전사", 37, 89, 2;
+		mob_spawn "[풍]사악한해골전사", 35, 91, 2;
+		mob_spawn "[토]저주받은해골법사", 37, 91, 2;
+		
+		mob_spawn "[수]아이스해골전사", 24, 95, 2;
+		mob_spawn "[화]불타는해골전사", 26, 95, 2;
+		mob_spawn "[풍]사악한해골전사", 24, 97, 2;
+		mob_spawn "[토]저주받은해골법사", 26, 97, 2;
+		
+		mob_spawn "[수]아이스해골전사", 12, 58, 2;
+		mob_spawn "[화]불타는해골전사", 14, 58, 2;
+		mob_spawn "[풍]사악한해골전사", 12, 60, 2;
+		mob_spawn "[토]저주받은해골법사", 14, 60, 2;
+		
+		mob_spawn "[수]아이스해골전사", 21, 34, 2;
+		mob_spawn "[화]불타는해골전사", 23, 34, 2;
+		mob_spawn "[풍]사악한해골전사", 21, 36, 2;
+		mob_spawn "[토]저주받은해골법사", 23, 36, 2;
+		
+		//진짜보스
+		mob_spawn "[수]아이스해골전사", 11, 47, 2;
+		mob_spawn "[화]불타는해골전사", 13, 47, 2;
+		mob_spawn "[풍]사악한해골전사", 11, 49, 2;
+		mob_spawn "[토]저주받은해골법사", 13, 49, 2;
+		mob_spawn "피에트관리자", 8, 49, 2;
+		
+		//가짜보스
+		mob_spawn "[수]아이스해골전사", 22, 21, 2;
+		mob_spawn "[화]불타는해골전사", 24, 21, 2;
+		mob_spawn "[풍]사악한해골전사", 22, 23, 2;
+		mob_spawn "[토]저주받은해골법사", 24, 23, 2;
+		mob_spawn "피에트관리자의분신", 19, 23, 2;
+		
+		mob_spawn "[수]아이스해골전사", 44, 24, 2;
+		mob_spawn "[화]불타는해골전사", 46, 24, 2;
+		mob_spawn "[풍]사악한해골전사", 44, 26, 2;
+		mob_spawn "[토]저주받은해골법사", 46, 26, 2;
+		
+		mob_spawn "[수]아이스해골전사", 55, 13, 2;
+		mob_spawn "[화]불타는해골전사", 57, 13, 2;
+		mob_spawn "[풍]사악한해골전사", 55, 15, 2;
+		mob_spawn "[토]저주받은해골법사", 57, 15, 2;
+		
+		mob_spawn "[수]아이스해골전사", 75, 16, 2;
+		mob_spawn "[화]불타는해골전사", 77, 16, 2;
+		mob_spawn "[풍]사악한해골전사", 75, 18, 2;
+		mob_spawn "[토]저주받은해골법사", 77, 18, 2;
+		
+		mob_spawn "[수]아이스해골전사", 73, 48, 2;
+		mob_spawn "[화]불타는해골전사", 75, 48, 2;
+		mob_spawn "[풍]사악한해골전사", 73, 50, 2;
+		mob_spawn "[토]저주받은해골법사", 75, 50, 2;
+		
+		//가짜보스2
+		mob_spawn "[수]아이스해골전사", 93, 49, 2;
+		mob_spawn "[화]불타는해골전사", 95, 49, 2;
+		mob_spawn "[풍]사악한해골전사", 93, 51, 2;
+		mob_spawn "[토]저주받은해골법사", 95, 51, 2;
+		mob_spawn "피에트관리자의분신", 94, 54, 2;
+		
+		mob_spawn "[수]아이스해골전사", 66, 66, 2;
+		mob_spawn "[화]불타는해골전사", 68, 66, 2;
+		mob_spawn "[풍]사악한해골전사", 66, 68, 2;
+		mob_spawn "[토]저주받은해골법사", 68, 68, 2;
+		
+		mob_spawn "[수]아이스해골전사", 81, 77, 2;
+		mob_spawn "[화]불타는해골전사", 83, 77, 2;
+		mob_spawn "[풍]사악한해골전사", 81, 79, 2;
+		mob_spawn "[토]저주받은해골법사", 83, 79, 2;
+		
+		mob_spawn "[수]아이스해골전사", 93, 91, 2;
+		mob_spawn "[화]불타는해골전사", 95, 91, 2;
+		mob_spawn "[풍]사악한해골전사", 93, 93, 2;
+		mob_spawn "[토]저주받은해골법사", 95, 93, 2;
+}

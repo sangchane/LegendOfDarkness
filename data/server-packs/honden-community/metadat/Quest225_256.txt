@@ -1,0 +1,74 @@
+251	루프와 씰리의 기계파편 연구	18	0	루프와 씰리를 도와서 로톤 북쪽 숲속에 등장한 로봇연구를 진행하자
+251_1	DESC_STR0	TMAP_NPC0
+251_1_DESC_STR0	루프의 조카인 씰리에게 인사하러 가보자.
+251_1_TMAP_NPC0	8065	씰리	0
+251_2	DESC_STR0	TMAP_NPC0
+251_2_DESC_STR0	씰리와 인사를 마쳤으면 루프에게 다시 가보자
+251_2_TMAP_NPC0	8065	루프	0
+251_3	DESC_STR0	TMAP_NPC0
+251_3_DESC_STR0	씰리에게 가서 영류결계석을 받자
+251_3_TMAP_NPC0	8065	씰리	0
+251_4	DESC_STR0	ITEM0	TMAP_NPC0
+251_4_DESC_STR0	A구역의기계파편 30개를 모아서 루프에게 가자
+251_4_ITEM0	A구역의기계파편	30
+251_4_TMAP_NPC0	8065	루프	0
+251_5	DESC_STR0	TMAP_NPC0
+251_5_DESC_STR0	루프가 기계파편에 대한 조사를 하는동안 씰리에게 가보자
+251_5_TMAP_NPC0	8065	씰리	0
+251_6	DESC_STR0	TMAP_NPC0
+251_6_DESC_STR0	씰리에게 받은 영류결계석B를 가지고 루프에게 가보자
+251_6_TMAP_NPC0	8065	루프	0
+251_7	DESC_STR0	ITEM0	TMAP_NPC0
+251_7_DESC_STR0	로봇들에게서 B구역의기계파편 50개를 모아서 루프에게 가자
+251_7_ITEM0	B구역의기계파편	50
+251_7_TMAP_NPC0	8065	루프	0
+251_8	DESC_STR0	TMAP_NPC0
+251_8_DESC_STR0	씰리에게 가서 루프가 맞겨 놓은 로봇 연구일지를 보고 영류결계석을 받자.
+251_8_TMAP_NPC0	8065	씰리	0
+251_9	DESC_STR0	TMAP_NPC0
+251_9_DESC_STR0	씰리에게서 받은 영류결계석C를 가지고 루프에게 가보자
+251_9_TMAP_NPC0	8065	루프	0
+251_10	DESC_STR0	ITEM0	TMAP_NPC0
+251_10_DESC_STR0	로봇에게서 C구역의기계파편 50개를 구해서 루프에게 가져가자
+251_10_ITEM0	C구역의기계파편	50
+251_10_TMAP_NPC0	8065	루프	0
+251_11	DESC_STR0	TMAP_NPC0
+251_11_DESC_STR0	씰리에게 가서 영류결계석D를 받자
+251_11_TMAP_NPC0	8065	씰리	0
+251_12	DESC_STR0	ITEM0	TMAP_NPC0
+251_12_DESC_STR0	D구역의기계파편 50개를 구해서 루프에게 가져가자
+251_12_ITEM0	D구역의기계파편	50
+251_12_TMAP_NPC0	8065	루프	0
+251_13	DESC_STR0	TMAP_NPC0
+251_13_DESC_STR0	씰리에게 가서 영류결계석E를 받자
+251_13_TMAP_NPC0	8065	씰리	0
+251_14	DESC_STR0	ITEM0	TMAP_NPC0
+251_14_DESC_STR0	로봇들에게서 E구역의기계파편 50개를 구해서 루프에게 가져가자
+251_14_ITEM0	E구역의기계파편	50
+251_14_TMAP_NPC0	8065	루프	0
+251_15	DESC_STR0	TMAP_NPC0
+251_15_DESC_STR0	씰리에게 가서 영류결계석F를 받자
+251_15_TMAP_NPC0	8065	씰리	0
+251_16	DESC_STR0	ITEM0	TMAP_NPC0
+251_16_DESC_STR0	로봇들에게서 F구역의기계파편 20개를 모아서 루프에게 가져가자
+251_16_ITEM0	F구역의기계파편	20
+251_16_TMAP_NPC0	8065	루프	0
+251_17	DESC_STR0	REQUITAL6	TMAP_NPC0
+251_17_DESC_STR0	씰리에게가서 루프가 만든 마도코어를 받자
+251_17_REQUITAL6	마도코어
+251_17_TMAP_NPC0	8065	씰리	0
+252	천재소년 루이	6	0	알수없는 비밀을 간직한 천재소년 루이
+252_1	DESC_STR0	TMAP_NPC0
+252_1_DESC_STR0	로톤마을 {=c무기점{=u 한켠에서 기계장치를 고쳐주고 있는 {=c천재루이{=u에 대해서 알아보자
+252_1_TMAP_NPC0	15663	천재루이	68	98	0	0
+252_2	DESC_STR0	TMAP_NPC0
+252_2_DESC_STR0	로톤마을 식당에서 일하고 있는 {=c헬렌{=u을 만나 루이에 대해 더 알아보자
+252_2_TMAP_NPC0	15663	헬렌	16	16	0	0
+252_3	DESC_STR0	TMAP_NPC0
+252_3_DESC_STR0	로톤마을 무기점에 가서 천재루이와 다시 대화를 나눠보자
+252_3_TMAP_NPC0	15663	천재루이	68	98	0	0
+252_4	DESC_STR0	ITEM0	REQUITAL1	TMAP_NPC0
+252_4_DESC_STR0	{=c로톤 북쪽 숲{=u에 가서 (입구좌표 105,1) FS-R 로열더스트(F구역 출현)에게서 {=c나겔금속펜던트{=u를 구해서 로톤 무기점 {=c천재루이{=c에게 돌아가자
+252_4_ITEM0	나겔금속펜던트	1
+252_4_REQUITAL1	EXP10000000
+252_4_TMAP_NPC0	15663	천재루이	68	98	0	0

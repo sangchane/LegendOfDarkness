@@ -1,0 +1,293 @@
+Warp	죽음의마을이동1	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(get_mapname(@myid) == "직업퀘스트룸대기실"){
+		egf:
+		if(get_xs(@myid) == 23 && get_ys(@myid) == 0){
+			set $Eestbossch, 1;
+			mob_clear "직업퀘스트룸2";
+			group_warp "직업퀘스트룸2", 4, 13;
+			mob_spawn "전사졸개", 3, 6, 2;
+			mob_spawn "법사졸개", 2, 6, 2;
+			mob_spawn "결계도적", 4, 5, 2;
+			mob_spawn "직자졸개", 6, 6, 2;
+			mob_spawn "도가졸개", 5, 6, 2;
+			group_val "#Eestbossch", 1, 1;
+		end;
+		}
+		if(get_xs(@myid) == 13 && get_ys(@myid) == 0){
+			set $Eestbossch, 1;
+			mob_clear "직업퀘스트룸5";
+			group_warp "직업퀘스트룸5", 4, 13;
+			mob_spawn "전사졸개", 2, 6, 2;
+			mob_spawn "도적졸개", 3, 6, 2;
+			mob_spawn "결계도가", 4, 5, 2;
+			mob_spawn "직자졸개", 5, 6, 2;
+			mob_spawn "법사졸개", 6, 6, 2;
+			group_val "#Eestbossch", 1, 1;
+		end;
+		}
+		if(get_xs(@myid) == 4 && get_ys(@myid) == 0){
+			set $Eestbossch, 1;
+			mob_clear "직업퀘스트룸1";
+			group_warp "직업퀘스트룸1", 4, 13;
+			mob_spawn "도적졸개", 2, 6, 2;
+			mob_spawn "법사졸개", 3, 6, 2;
+			mob_spawn "결계전사", 4, 5, 2;
+			mob_spawn "직자졸개", 5, 6, 2;
+			mob_spawn "도가졸개", 6, 6, 2;
+			group_val "#Eestbossch", 1, 1;
+		end;
+		}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 4){
+			set $Eestbossch, 1;
+			mob_clear "직업퀘스트룸3";
+			group_warp "직업퀘스트룸3", 12, 5;
+			mob_spawn "전사졸개", 4, 7, 2;
+			mob_spawn "도적졸개", 4, 6, 2;
+			mob_spawn "직자졸개", 3, 4, 2;
+			mob_spawn "결계법사", 3, 5, 2;
+			mob_spawn "도가졸개", 4, 3, 2;
+			group_val "#Eestbossch", 1, 1;
+		end;
+		}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 13){
+			set $Eestbossch, 1;
+			mob_clear "직업퀘스트룸4";
+			group_warp "직업퀘스트룸4", 12, 5;
+			mob_spawn "도적졸개", 4, 7, 2;
+			mob_spawn "도가졸개", 4, 6, 2;
+			mob_spawn "전사졸개", 4, 4, 2;
+			mob_spawn "결계직자", 3, 5, 2;
+			mob_spawn "법사졸개", 4, 3, 2;
+			group_val "#Eestbossch", 1, 1;
+		end;
+		}
+		if(get_xs(@myid) == 19 && get_ys(@myid) == 12){
+			goto br;
+		end;
+		}
+		if(get_xs(@myid) == 20 && get_ys(@myid) == 12){
+			goto br;
+		end;
+		}
+		if(get_xs(@myid) == 19 && get_ys(@myid) == 13){
+			goto br;
+		end;
+		}
+		if(get_xs(@myid) == 20 && get_ys(@myid) == 13){
+			goto br;
+		end;
+		}
+		end;
+		br:
+		if(#EestQuest010A == 1 && #EestQuest010B == 1 && #EestQuest010C == 1 && #EestQuest010D == 1 && #EestQuest010E == 1){
+			mes 3, "엘리멘탈의 시험장으로 이동합니다. 만약 실패한다면 가디언의 시험부터 다시 시작하셔야 합니다.";
+			group_warp "화염의엘리멘탈대기실", 10, 14;
+			group_val "#EestQuest010A", 0, 0;
+			group_val "#EestQuest010B", 0, 0;
+			group_val "#EestQuest010C", 0, 0;
+			group_val "#EestQuest010D", 0, 0;
+			group_val "#EestQuest010E", 0, 0;
+			end;
+		}
+		mes 2, "가디언들의 퀘스트를 모두 마치시기 바랍니다.";
+	end;
+	}
+	if(get_xs(@myid) == 9 || get_xs(@myid) == 8 && get_ys(@myid) == 3){
+		if(get_mapname(@myid) == "화염의엘리멘탈대기실"){
+			group_warp "화염의엘리멘탈룸", 10, 10;
+			mob_spawn2 "화염의엘리멘탈2", 2, 8, 1, group_bighp() * 10;
+			mob_spawn2 "화염의엘리멘탈2", 3, 9, 1, group_bighp() * 10;
+			mob_spawn2 "화염의엘리멘탈", 4, 10, 1, group_bighp() * 10;
+			mob_spawn2 "화염의엘리멘탈2", 3, 11, 1, group_bighp() * 10;
+			mob_spawn2 "화염의엘리멘탈2", 2, 12, 1, group_bighp() * 10;
+			mob_spawn2 "벽", 2, 9, 1, group_bighp() * 10;
+		end;
+		}
+		if(get_mapname(@myid) == "바람의엘리멘탈대기실"){
+			group_warp "바람의엘리멘탈룸", 10, 10;
+			mob_spawn2 "바람의엘리멘탈2", 8, 2, 1, group_bighp() * 10;
+			mob_spawn2 "바람의엘리멘탈2", 9, 3, 1, group_bighp() * 10;
+			mob_spawn2 "바람의엘리멘탈", 10, 4, 1, group_bighp() * 10;
+			mob_spawn2 "바람의엘리멘탈2", 11, 3, 1, group_bighp() * 10;
+			mob_spawn2 "바람의엘리멘탈2", 12, 2, 1, group_bighp() * 10;
+			mob_spawn2 "벽", 10, 2, 1, group_bighp() * 10;	
+		end;
+		}
+		if(get_mapname(@myid) == "대지의엘리멘탈대기실"){
+			group_warp "대지의엘리멘탈룸", 10, 10;
+			mob_spawn2 "대지의엘리멘탈2", 8, 2, 1, group_bighp() * 10;
+			mob_spawn2 "대지의엘리멘탈2", 9, 3, 1, group_bighp() * 10;
+			mob_spawn2 "대지의엘리멘탈", 10, 4, 1, group_bighp() * 10;
+			mob_spawn2 "대지의엘리멘탈2", 11, 3, 1, group_bighp() * 10;
+			mob_spawn2 "대지의엘리멘탈2", 12, 2, 1, group_bighp() * 10;
+			mob_spawn2 "벽", 10, 2, 1, group_bighp() * 10;
+		end;
+		}
+		if(get_mapname(@myid) == "바다의엘리멘탈대기실"){
+			group_warp "바다의엘리멘탈룸", 10, 10;
+			mob_spawn2 "바다의엘리멘탈2", 2, 8, 1, group_bighp() * 10;
+			mob_spawn2 "바다의엘리멘탈2", 3, 9, 1, group_bighp() * 10;
+			mob_spawn2 "바다의엘리멘탈", 4, 10, 1, group_bighp() * 10;
+			mob_spawn2 "바다의엘리멘탈2", 3, 11, 1, group_bighp() * 10;
+			mob_spawn2 "바다의엘리멘탈2", 2, 12, 1, group_bighp() * 10;
+			mob_spawn2 "벽", 2, 9, 1, group_bighp() * 10;
+		end;
+		}
+	end;
+	}
+	if(get_xs(@myid) == 1 && get_ys(@myid) == 9){
+		if(get_mapname(@myid) == "화염의엘리멘탈룸"){
+			group_warp "바람의엘리멘탈대기실", 10, 14;
+		end;
+		}
+		if(get_mapname(@myid) == "바다의엘리멘탈룸"){
+			group_warp "적룡의척추", 27,147;
+		end;
+		}
+	end;
+	}
+	if(get_xs(@myid) == 10 && get_ys(@myid) == 1){
+		if(get_mapname(@myid) == "바람의엘리멘탈룸"){
+			group_warp "대지의엘리멘탈대기실", 10, 14;
+		end;
+		}
+		if(get_mapname(@myid) == "대지의엘리멘탈룸"){
+			group_warp "바다의엘리멘탈대기실", 10, 14;
+		end;
+		}
+	end;
+	}
+	if(get_xs(@myid) == 23 || get_xs(@myid) == 24 && get_ys(@myid) == 3){
+		if(get_mapname(@myid) == "적룡의척추"){
+			group_warp "적룡의결계", 20, 20;
+			mob_spawn2 "봉인의주인", 19, 14, 1, group_bighp() * 18;
+			end;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "서약의제단"){
+		if(#EestQuest011B == 1 && #EestQuest011R == 1 && #EestQuest011G == 1 && #EestQuest011Y == 1){
+			mes 1, "뭔가 모를 힘이 어디론가 이동시키려 한다\\n그륩한 동료들과 함께 갈수 있습니다";
+			set #EestQuest0112, 0;
+			set #EestQuest011B, 0;
+			set #EestQuest011R, 0;
+			set #EestQuest011Y, 0;
+			set #EestQuest011G, 0;
+			group_warp "블랙보스방", 7,8;
+			mob_spawn "아이언카이사르", 36, 28, 4;
+			if(#EestQuest011 == 16){npc_spawn "노브","블랙보스방", 4,9,2;}
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "브론즈오피온의굴28"||get_mapname(@myid) == "블루오피온의굴28"||get_mapname(@myid) == "레드오피온의굴28"){
+		mes 3, "으..정말 뜨겁다.. 열기가 대단하군.. 내 체력이 견딜 수 있을까..";
+		warp "용암아랫길1", 2,7;
+		mes 2, "으..정말 뜨겁다.. 열기가 대단하군.. 내 체력이 견딜 수 있을까..";
+	end;
+	}
+	if(get_mapname(@myid) == "죽음의마을36"){
+		if(get_class() == 1){warp "전사승급신전", 5, 7;}
+		if(get_class() == 2){warp "도적승급신전", 5, 7;}
+		if(get_class() == 3){warp "마법사승급신전", 5, 7;}
+		if(get_class() == 4){warp "성직자승급신전", 5, 7;}
+		if(get_class() == 5){warp "무도가승급신전", 5, 7;}
+	end;
+	}
+	if(get_mapname(@myid) == "호러캐슬서쪽복도"){
+		if(!group_exist(@myid)){message 3, "그륩을 하고 입장하셔야 합니다."; warp "호러캐슬메인홀", 25,15; end;}
+		goto horerwarp1;
+	end;
+	}
+	if(get_mapname(@myid) == "호러캐슬01" || get_mapname(@myid) == "호러캐슬02" || get_mapname(@myid) == "호러캐슬03" || get_mapname(@myid) == "호러캐슬04"){
+		if(!group_exist(@myid)){mob_clear get_mapname(@myid); message 3, "그륩을 하고 입장하셔야 합니다."; warp "호러캐슬메인홀", 25,15; end;}
+		if(map_objmob(@myid) >= 1){message 3, "방 안에 몬스터를 모두 잡으셔야합니다."; end;}
+		horerwarp1:
+		CC2:
+		set @rand3, rand(0,4);
+		if(@rand3 <= 0 || @rand3 > 4){goto CC2;}
+		if(@rand3 == 1){group_warp "호러캐슬01", 9,2;}
+		if(@rand3 == 2){group_warp "호러캐슬02", 9,2;}
+		if(@rand3 == 3){group_warp "호러캐슬03", 9,2;}
+		if(@rand3 == 4){group_warp "호러캐슬04", 9,2;}
+		mob_spawn "아므나파시우스", 6, 13, 1;
+		mob_spawn "헤라시우스", 7, 13, 1;
+		mob_spawn "헤브렐리우스", 9, 12, 1;
+		mob_spawn "캐스타우스", 9, 13, 1;
+		mob_spawn "바클라시우스", 9, 11, 1;
+		mob_spawn "슈크래시우스", 10, 12, 1;
+		mob_spawn "스니크라우스", 10, 14, 1;
+		mob_spawn "타클라시우스", 10, 13, 1;
+		mob_spawn "브로팔라우스", 7, 14, 1;
+		mob_spawn "바탈리우스", 6, 14, 1;
+	end;
+	}
+	//집털이(죽음의마을1)
+	if(get_mapname(@myid)=="죽음의마을1"){
+		if(get_basevita(@myid)<=249999&&get_basemana(@myid)<=249999){
+			vip:
+			if(get_xs(@myid)==86||get_xs(@myid)==87&&get_ys(@myid)==90){
+				warp "신죽마집안21-1", 9, 17;
+			}
+			else if(get_xs(@myid)==92&&get_ys(@myid)==84){
+				warp "신죽마집안21-4", 10, 13;
+			}
+			else if(get_xs(@myid)==6&&get_ys(@myid)==67){
+				warp "신죽마집안5-1", 17, 16;
+			}
+			else if(get_xs(@myid)==7&&get_ys(@myid)==66){
+				warp "신죽마집안5-2", 17, 5;
+			}
+			else if(get_xs(@myid)==11&&get_ys(@myid)==15||get_ys(@myid)==16||get_ys(@myid)==17){
+				warp "신죽마집안4-1", 16, 16;
+			}
+			else if(get_xs(@myid)==64||get_xs(@myid)==65&&get_ys(@myid)==15){
+				warp "신죽마집안2-1", 10, 17;
+			}
+			else if(get_xs(@myid)==70&&get_ys(@myid)==9){
+				warp "신죽마집안2-4", 10, 12;
+			}
+		}else{
+			message 3, "들어가기에 창피합니다.";
+			sleep 300;
+			if(get_side(@myid)==0){
+				set_ys(get_ys(@myid)+1);
+			}
+			if(get_side(@myid)==3){
+				set_xs(get_xs(@myid)+1);
+			}
+		}
+	}
+	//백작부인의별장
+	if(get_mapname(@myid)=="백작부인의별장응접실1"){
+		if(get_xs(@myid)==0){
+			if(get_ys(@myid)==10||get_ys(@myid)==11||get_ys(@myid)==12){
+				if(get_class_sub(@myid) >= 1){
+					warp "백작부인의별장서1", 27, 15;
+					end;
+				}else{
+					X1:
+					message 3, "들어갈 수도 있는데..."; 
+					sleep 200;
+					set_xs(get_xs(@myid)+1);		
+				}
+			}
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="백작부인의별장응접실2"){
+		if(get_xs(@myid)==0&&get_ys(@myid)==13||get_ys(@myid)==14){
+			if(get_class_sub(@myid) >= 1){
+				warp "백작부인의별장서16", 27, 15;
+				end;
+			}else{
+				goto X1;
+			}
+		}
+		if(get_xs(@myid)==29&&get_ys(@myid)==14||get_ys(@myid)==15||get_ys(@myid)==16){
+			warp "백작부인의별장동16", 2, 14; 
+		}
+	end;
+	}
+}

@@ -1,0 +1,6 @@
+spell:db/spell/공통마법.txt
+spell:db/spell/전사.txt
+spell:db/spell/도적.txt
+spell:db/spell/마법사.txt
+spell:db/spell/성직자.txt
+spell:db/spell/무도가.txt

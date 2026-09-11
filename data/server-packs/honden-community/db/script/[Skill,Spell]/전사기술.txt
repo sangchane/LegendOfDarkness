@@ -1,0 +1,868 @@
+0	SKILL_블레이드	{
+	set@myid,get_myid();
+	if(skill_exist("스톰블레이드")){
+		skill_del "윈드블레이드";
+		set@target,skill_target();
+		set@x1,get_xs();
+		set@y1,get_ys();
+		set@dam,(get_att_damage(@myid)*4);
+		if(get_critical(@myid)){set@damage,@damage*2;}
+		set@type,istype(@target);
+		set@side,get_side(@myid);
+		if(get_map_pk()){	
+			switch(@side){
+			case 0:
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,265,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,265,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,265,100;}
+			break;
+			case 1:
+			set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,265,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,265,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,265,100;}
+			break;
+			case 2:
+			set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,265,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,265,100;}
+			if(istype(@mob3)==3){char_damaged@mob2,@dam,265,100;}
+			break;
+			case 3:
+			set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,265,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,265,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,265,100;}
+			break;
+			}
+		}
+		direct_damage@myid,0,3,@dam,265,100;
+		if(get_class()==1){motion 129,25;}else{motion 1,25;}
+		skill_delay 6;
+		game_sound 1,100;
+		game_sound 7,100;
+	end;
+	}
+	if(skill_exist("윈드블레이드")){
+		set@target,skill_target();
+		set@x1,get_xs();
+		set@y1,get_ys();
+		set@dam,get_att_damage(@myid)/10*25;
+		set@dam,@dam+(get_att_damage(@myid)/2);
+		if(get_critical(@myid)){set@dam,@dam*2;}
+		set@type,istype(@target);
+		set@side,get_side(@myid);
+		if(get_map_pk()){	
+			switch(@side){
+			case 0:
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,248,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,248,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,248,100;}
+			break;
+			case 1:
+			set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,248,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,248,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,248,100;}
+			break;
+			case 2:
+			set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,248,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,248,100;}
+			if(istype(@mob3)==3){char_damaged@mob2,@dam,248,100;}
+			break;
+			case 3:
+			set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,248,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,248,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,248,100;}
+			break;
+			}
+		}
+		direct_damage@myid,0,3,@dam,248,100;
+		if(get_class()==1){motion 129,25;}else{motion 1,25;}
+		skill_delay 5;
+		game_sound 1,100;
+		game_sound 18,0;
+	end;
+	}
+	set@target,skill_target();
+	set@damage,(get_str(@myid)*4);
+	if(get_critical(@myid)){set@damage,@damage*2;}
+	skill_delay 6;
+	if(!@target){
+		if(istype(get_front_char(@myid))==3&&get_map_pk()){
+			set@damage,(get_str(@myid)*2);
+			if(get_critical(@myid)){set@damage,@damage*2;}
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,26,100;
+			motion 129,40;
+			game_sound 18,0;
+		}
+	}else{
+		effect@target,0,26,100;
+		damaged@target,@damage;
+		motion 1,25;
+		game_sound 18,0;
+	}
+	end;
+}
+
+0	SKILL_블레이드2	{
+	set@myid,get_myid();
+	if(skill_exist("룬블레이드")){
+		skill_del "메가블레이드";
+		set@target,skill_target();
+		set@x1,get_xs();
+		set@y1,get_ys();
+		set@dam,(get_att_damage(@myid)*4);
+		if(get_critical(@myid)){set@damage,@damage*2;}
+		set@type,istype(@target);
+		set@mob1,get_mobxy(@x1,(@y1)-1);
+		set@mob2,get_mobxy(@x1,(@y1)+1);
+		set@mob3,get_mobxy((@x1)-1,@y1);
+		set@mob4,get_mobxy((@x1)+1,@y1);
+		if(istype(@mob1)==1){effect@mob1,0,266,100;damaged@mob1,@dam;}
+		if(istype(@mob2)==1){effect@mob2,0,266,100;damaged@mob2,@dam;}
+		if(istype(@mob3)==1){effect@mob3,0,266,100;damaged@mob3,@dam;}
+		if(istype(@mob4)==1){effect@mob4,0,266,100;damaged@mob4,@dam;}
+		if(get_map_pk()){
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,266,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,266,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,266,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,266,100;}
+		}
+		if(get_class()==1){motion 129,25;}else{motion 1,30;}
+		game_sound 1,100;
+		game_sound 7,100;
+		skill_delay 12;
+	}else{
+		set@target,skill_target();
+		set@x1,get_xs();
+		set@y1,get_ys();
+		set@dam,(get_att_damage(@myid)*2);
+		if(get_critical(@myid)){set@damage,@damage*2;}
+		set@type,istype(@target);
+		set@mob1,get_mobxy(@x1,(@y1)-1);
+		set@mob2,get_mobxy(@x1,(@y1)+1);
+		set@mob3,get_mobxy((@x1)-1,@y1);
+		set@mob4,get_mobxy((@x1)+1,@y1);
+		if(istype(@mob1)==1){effect@mob1,0,248,100;damaged@mob1,@dam;}
+		if(istype(@mob2)==1){effect@mob2,0,248,100;damaged@mob2,@dam;}
+		if(istype(@mob3)==1){effect@mob3,0,248,100;damaged@mob3,@dam;}
+		if(istype(@mob4)==1){effect@mob4,0,248,100;damaged@mob4,@dam;}
+		if(get_map_pk()){
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,248,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,248,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,248,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,248,100;}
+		}
+		if(get_class()==1){motion 129,25;}else{motion 1,30;}
+		game_sound 1,100;
+		game_sound 7,0;
+		skill_delay 5;
+	}
+}
+
+0	SPELL_집중	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<800){message 3,"마력이 부족합니다.";del@myid;end;}
+   	manal_del 800;
+	if(focus(@myid,80)==1){
+		message 3,"이미 걸려있습니다.";
+	}else{
+		effect@myid,278,0,100;
+		game_sound 81,0;
+		motion 6,30;
+		message 3,"집중을 외웠습니다.";
+	}
+}
+
+0	SKILL_레스큐	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@damage,1;
+	skill_delay 6;
+	if(!@target){message 3,"대상이 없습니다";end;}
+	game_sound 1,100;
+	effect@target,0,27,100;
+	damaged@target,@damage;
+	motion 1,20;
+}
+
+0	SKILL_바투	{
+	set@myid,get_myid();
+	if(get_mapname(@myid)=="엔도르-여왕의거처"){message 3,"바티아를 외웠습니다.";end;}
+	set@target,skill_target();
+	set@type,istype(@target);
+	if(@type != 1||!@target) {goto go;}
+	if(magic_exist(6,@target,1)) {message 3,"이미 걸려있습니다.";end;}
+	magic 6,@target,0,15,0,@myid;
+	message 3,"바티아를 외웠습니다.";
+go:
+	if(istype(get_front_char(@myid))==3){
+		set@target,get_front_char(@myid);
+		message 3,"바티아를 외웠습니다.";
+		batu_delay @target, 8;
+		effect@target,0,41,75;
+	}
+	
+	if(get_class()==1){motion 129,20;}else{motion 1,20;}
+	game_sound 22,100;
+	skill_delay 12;
+}
+
+0	SKILL_디바투	{
+	set@myid,get_myid();
+	batu_end@myid;
+	message 3,"디바티아를 외웠습니다.";
+	effect@myid,3,0,135;
+	if(get_class()==1){motion 129,35;}else{motion 1,35;}
+	game_sound 8,100;
+	skill_delay 5;
+}
+
+0	SKILL_드래곤모드	{
+	set@myid,get_myid();
+	if(get_vita(@myid)<100){message 3,"체력이 부족합니다.";del@myid;end;}
+	set_vital get_vita(@myid) - get_vita(@myid)/100*9;
+	skill_delay 20;
+	if(phoenix(@myid,60)==1){
+		game_sound 18,100;
+		message 3,"드래곤";
+		message 3,"온몸에 이상한 기운이 돕니다";
+		effect@myid,34,0,100;
+		if(get_class()==1){motion 129,25;}else{motion 1,20;}
+		sleep 50;
+		message 3,"드래곤을 외웠습니다.";
+	}
+	del@target;
+	del@type;
+}
+
+0	SKILL_적무기해체	{
+	skill_delay 20;
+	set@myid,get_myid();
+	if(!get_map_pk()){message 3,"배틀장에서만 사용할 수 있습니다";end;}
+	set@target,get_front_char(@myid);
+	set@type,istype(@target);
+	if(@type==3){
+		message 3,"적무기해체를 외웠습니다.";
+		weapon_del@target;
+		motion 1,20;
+	}
+}
+
+0	SKILL_완전방어	{
+	set@myid,get_myid();
+	skill_delay 27;
+	game_sound 19,0;
+	if(get_class()==1){motion 130,35;}else{motion 1,35;}
+	if(rand2(1,10)>8){message 3,"마법이 실패했습니다";end;}
+	defens@myid,15;
+	message 3,"완전 방어";
+	sleep 30;
+	message 3,"육체이모탈을 외웠습니다.";
+	effect@myid,301,0,85;
+}
+
+0	SKILL_매드소울	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	skill_delay 10;
+	set@damage,get_vita(@myid) *240/100;
+	if(focus(@myid,0)){set@damage,@damage*2;}
+	if(!@target){
+		if(istype(get_front_char(@myid))==3&&get_map_pk()){
+			set@damage,get_vita(@myid)* 1;
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,289,100;
+			set_vital get_basevita(@myid)/100*2;
+			motion 130,20;
+			game_sound 17,0;
+		}
+	}else{
+		effect@target,0,289,75;
+		damaged@target,@damage;
+		set_vital get_basevita(@myid)/100*2;
+		game_sound 17,0;
+		if(get_class()==1){motion 130,20;}else{motion 1,20;}
+	}
+}
+
+0	SKILL_매드소울진	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	skill_del "매드소울";
+	skill_delay 8;
+	set@damage,get_vita(@myid) *300/100;
+	if(focus(@myid,0)){set@damage,@damage*2;}
+	if(!@target){
+		if(istype(get_front_char(@myid))==3&&get_map_pk()){
+			set@damage,get_vita(@myid) *110/100;
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,289,100;
+			set_vital get_basevita(@myid)/100*2;
+			motion 130,20;
+			game_sound 17,0;
+		}
+	}else{
+		effect@target,0,289,75;
+		damaged@target,@damage;
+		set_vital get_basevita(@myid)/100*2;
+		game_sound 17,0;
+		if(get_class()==1){motion 130,20;}else{motion 1,20;}
+	}
+}
+
+0	SKILL_크래셔	{
+	set@myid,get_myid();
+	skill_del "데빌크래셔";
+	set@time,time() - #skill26;
+	set #skill26,time();
+	if(#blackset == 1||#blacksetchar == 1){
+		skill_delay 8;
+	}else{
+		skill_delay 12;
+	}
+	set@target,skill_target();
+	if(get_vita(@myid)<=get_basevita(@myid)*8){
+		set@damage,get_basevita2(@myid) *8;
+	}else{
+		set@damage,get_basevita2(@myid) *8;
+	}
+	if(focus(@myid,0)){set @damage,@damage*8;}
+	if(!@target){
+		if(istype(get_front_char(@myid))==3&&get_map_pk()){
+			set@damage,get_basevita(@myid)*8;
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,299,100;
+			effect@target,299,0,75;
+			set_vital get_basevita(@myid)*8;
+			if(get_class()==1){motion 130,20;}else{motion 1,20;}
+			game_sound 44,0;
+		}
+	}else{
+		effect@target,299,299,75;
+		damaged@target,@damage;
+		set_vital get_basevita(@myid)/100*1;
+		if(get_class()==1){motion 130,20;}else{motion 1,20;}
+		game_sound 44,0;
+	}
+}
+
+0	SKILL_데빌크래셔	{
+	set@myid,get_myid();
+	skill_del "크래셔";
+	set@time,time() - #skill26;
+	set #skill26,time();
+	if(#blackset == 1||#blacksetchar == 1){
+		skill_del "데빌크래셔";
+		skill_delay 6;
+	}else{
+		skill_delay 10;
+	}
+	set@target,skill_target();
+	if(get_vita(@myid)<=get_basevita(@myid)*16){
+		set@damage,get_basevita2(@myid) *16;
+	}else{
+		set@damage,get_basevita2(@myid) *16;
+	}
+	if(focus(@myid,0)){set @damage,@damage*16;}
+	if(!@target){
+		if(istype(get_front_char(@myid))==3&&get_map_pk()){
+			set@damage,get_basevita(@myid)*16;
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,303,100;
+			effect@target,303,0,75;
+			set_vital get_basevita(@myid)*16;
+			if(get_class()==1){motion 130,20;}else{motion 1,20;}
+			game_sound 44,0;
+		}
+	}else{
+		effect@target,303,303,75;
+		damaged@target,@damage;
+		set_vital get_basevita(@myid)*16;
+		if(get_class()==1){motion 130,20;}else{motion 1,20;}
+		game_sound 44,0;
+	}
+}
+
+0	SKILL_피닉스모드	{
+	set@myid,get_myid();
+	if(get_vita(@myid)<100){message 3,"체력이 부족합니다.";del@myid;end;}
+	set_vital get_vita(@myid) - get_vita(@myid)/100*7;
+	skill_delay 20;
+	if(phoenix(@myid,60)==1){
+		game_sound 18,100;
+		effect@myid,291,34,100;
+		if(get_class()==1){motion 129,25;}else{motion 1,20;}
+		message 3,"피닉스";
+		sleep 50;
+		message 3,"칼끝이 빛납니다";
+		sleep 50;
+		message 3,"피닉스를 외웠습니다.";
+	}
+	del@target;
+	del@type;
+	end;
+}
+
+0	SKILL_포효	{
+	set@myid,get_myid();
+	if(get_mapname(@myid)=="엔도르-여왕의거처"){message 3,"M-포효를 외웠습니다.";end;}
+	set@side,get_side(@myid);
+	switch(@side){
+		case 0:
+			set@target,get_mobxy(get_xs(@myid),get_ys(@myid)-1);
+			break;
+		case 1:
+			set@target,get_mobxy(get_xs(@myid)+1,get_ys(@myid));
+			break;
+		case 2:
+			set@target,get_mobxy(get_xs(@myid),get_ys(@myid)+1);
+			break;
+		case 3:
+			set@target,get_mobxy(get_xs(@myid)-1,get_ys(@myid));
+			break;
+	}
+	if(istype(@target)==1){
+		if(get_mana(@myid)<get_basemana(@myid)/100*3){message 3,"마나가 부족합니다.";del@myid;end;}
+   		manal_del get_basemana(@myid)/100*3;
+		set@x1,get_xs(@myid)-7;
+		set@x2,get_xs(@myid)+7;
+		set@y1,get_ys(@myid)-7;
+		set@y2,get_ys(@myid)+7;
+		for(set@i,@x1;@i <=@x2;set@i,@i +1){
+			for(set@j,@y1;@j <=@y2;set@j,@j+1){
+				del@mob;
+				del@type;
+				set@mob,get_mobxy(@i,@j);
+				if(!@mob){goto go;}
+				set@type,istype(@mob);
+				if(@mob&&@type==1){
+					magic 6,@mob,0,13,0,@myid;
+    					effect@mob,0,41,75;
+				}
+				go:
+			}
+		}
+		effect@myid,73,0,100;
+   		game_sound 48,0;
+	}
+	skill_delay 20;
+	message 3,"M-포효를 외웠습니다.";
+	del @side;
+	del @x1;
+	del @x2;
+	del @y1;
+	del @y2;
+	end;
+}
+
+0	SKILL_돌진	{
+	set@myid,get_myid();
+	set@damage,(get_att_damage(@myid)*10);
+	set@damage,@damage+(get_con(@myid)*200);
+	set@side,get_side(@myid);
+	if(@side==0){
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-1)||get_mobxy(get_xs(@myid),get_ys(@myid)-1)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-1)){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-2)||get_mobxy(get_xs(@myid),get_ys(@myid)-2)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-2)){set_ys(get_ys(@myid)-1);goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-3)||get_mobxy(get_xs(@myid),get_ys(@myid)-3)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-3)){set_ys(get_ys(@myid)-2);goto go;}	
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-4)||get_mobxy(get_xs(@myid),get_ys(@myid)-4)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-4)){set_ys(get_ys(@myid)-3);goto go;}
+		set_ys(get_ys(@myid)-4);
+	}
+	if(@side==1){
+		if(get_xy_block(@myid,get_xs(@myid)+1,get_ys(@myid))||get_mobxy(get_xs(@myid)+1,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+1,get_ys(@myid))){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)+2,get_ys(@myid))||get_mobxy(get_xs(@myid)+2,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+2,get_ys(@myid))){set_xs(get_xs(@myid)+1);goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)+3,get_ys(@myid))||get_mobxy(get_xs(@myid)+3,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+3,get_ys(@myid))){set_xs(get_xs(@myid)+2);goto go;}	
+		if(get_xy_block(@myid,get_xs(@myid)+4,get_ys(@myid))||get_mobxy(get_xs(@myid)+4,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+4,get_ys(@myid))){set_xs(get_xs(@myid)+3);goto go;}
+		set_xs(get_xs(@myid)+4);
+	}
+	if(@side==2){
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+1)||get_mobxy(get_xs(@myid),get_ys(@myid)+1)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+1)){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+2)||get_mobxy(get_xs(@myid),get_ys(@myid)+2)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+2)){set_ys(get_ys(@myid)+1);goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+3)||get_mobxy(get_xs(@myid),get_ys(@myid)+3)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+3)){set_ys(get_ys(@myid)+2);goto go;}	
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+4)||get_mobxy(get_xs(@myid),get_ys(@myid)+4)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+4)){set_ys(get_ys(@myid)+3);goto go;}
+		set_ys(get_ys(@myid)+4);
+	}
+	if(@side==3){
+		if(get_xy_block(@myid,get_xs(@myid)-1,get_ys(@myid))||get_mobxy(get_xs(@myid)-1,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-1,get_ys(@myid))){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)-2,get_ys(@myid))||get_mobxy(get_xs(@myid)-2,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-2,get_ys(@myid))){set_xs(get_xs(@myid)-1);goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)-3,get_ys(@myid))||get_mobxy(get_xs(@myid)-3,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-3,get_ys(@myid))){set_xs(get_xs(@myid)-2);goto go;}	
+		if(get_xy_block(@myid,get_xs(@myid)-4,get_ys(@myid))||get_mobxy(get_xs(@myid)-4,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-4,get_ys(@myid))){set_xs(get_xs(@myid)-3);goto go;}
+		set_xs(get_xs(@myid)-4);
+	}
+	go:
+	if(@side==0){
+		set@mob,get_mobxy(get_xs(@myid),get_ys(@myid) - 1);
+		set@type,istype(@mob);
+		if(@mob&&@type==1){
+			effect@mob,0,261,100;
+			motion 130,25;
+			game_sound 45,0;
+			damaged@mob,@damage;
+		}else if(get_map_pk(@myid)){
+			set@mob,get_char_serial(@myid,get_xs(@myid),get_ys(@myid) - 1);
+			set@type,istype(@mob);
+			if(@mob&&@type==3){
+				char_damaged@mob,@damage,261,100;
+				motion 130,25;
+				game_sound 45,0;
+			}
+		}
+	}else if(@side==1){
+		set@mob,get_mobxy(get_xs(@myid)+1,get_ys(@myid));
+		set@type,istype(@mob);
+		if(@mob&&@type==1){
+			effect@mob,0,261,100;
+			motion 130,25;
+			game_sound 45,0;
+			damaged@mob,@damage;
+		}else if(get_map_pk(@myid)){
+			set@mob,get_char_serial(@myid,get_xs(@myid)+1,get_ys(@myid));
+			set@type,istype(@mob);
+			if(@mob&&@type==3){
+				char_damaged@mob,@damage,261,100;
+				motion 130,25;
+				game_sound 45,0;
+			}
+		}
+	}else if(@side==2){
+		set@mob,get_mobxy(get_xs(@myid),get_ys(@myid)+1);
+		set@type,istype(@mob);
+		if(@mob&&@type==1){
+			effect@mob,0,261,100;
+			motion 130,25;
+			game_sound 45,0;
+			damaged@mob,@damage;
+		}else if(get_map_pk(@myid)){
+			set@mob,get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+1);
+			set@type,istype(@mob);
+			if(@mob&&@type==3){
+				char_damaged@mob,@damage,261,100;
+				motion 130,25;
+				game_sound 45,0;
+			}
+		}
+	}else if(@side==3){
+		set@mob,get_mobxy(get_xs(@myid) - 1,get_ys(@myid));
+		set@type,istype(@mob);
+		if(@mob&&@type==1){
+			effect@mob,0,261,100;
+			motion 130,25;
+			game_sound 45,0;
+			damaged@mob,@damage;
+		}else if(get_map_pk(@myid)){
+			set@mob,get_char_serial(@myid,get_xs(@myid) - 1,get_ys(@myid));
+			set@type,istype(@mob);
+			if(@mob&&@type==3){
+				char_damaged@mob,@damage,261,100;
+				motion 130,25;
+				game_sound 45,0;
+			}
+		}
+	}
+	skill_delay 15;
+}
+//검투사
+
+0	SKILL_내려치기	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	if(#LowerAttack==1){
+		set@dam,(get_att_damage(@myid)*5);
+		set@dam,@dam+(get_con(@myid)*100);
+	}
+	if(#LowerAttack==2){
+		set@dam,(get_att_damage(@myid)*6);
+		set@dam,@dam+(get_con(@myid)*100);
+	}
+	if(#LowerAttack==3){
+		set@dam,(get_att_damage(@myid)*7);
+		set@dam,@dam+(get_con(@myid)*100);
+	}
+	if(#LowerAttack==4){
+		set@dam,(get_att_damage(@myid)*8);
+		set@dam,@dam+(get_con(@myid)*100);
+	}
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:      
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,166,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,166,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,166,100;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,166,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,166,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,166,100;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,166,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,166,100;}
+		if(istype(@mob3)==3){char_damaged@mob2,@dam,166,100;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,166,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,166,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,166,100;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,166,100;
+	motion 141,25;
+	skill_delay 12;
+	game_sound 1,100;
+	game_sound 18,50;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@myid;
+	del@x1;
+	del@y1;
+	del@skill_delay;
+}
+
+0	SKILL_사방치기	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	if(#Surroundingattacks==1){
+		set@dam,(get_att_damage(@myid)*6);
+		set@dam,@dam+(get_con(@myid)*120);
+	}
+	if(#Surroundingattacks==2){
+		set@dam,(get_att_damage(@myid)*7);
+		set@dam,@dam+(get_con(@myid)*120);
+	}
+	if(#Surroundingattacks==3){
+		set@dam,(get_att_damage(@myid)*8);
+		set@dam,@dam+(get_con(@myid)*120);
+	}
+	if(#Surroundingattacks==4){
+		set@dam,(get_att_damage(@myid)*9);
+		set@dam,@dam+(get_con(@myid)*120);
+	}
+	set@type,istype(@target);
+	set@mob1,get_mobxy(@x1,(@y1)-1);
+	set@mob2,get_mobxy(@x1,(@y1)+1);
+	set@mob3,get_mobxy((@x1)-1,@y1);
+	set@mob4,get_mobxy((@x1)+1,@y1);
+	if(istype(@mob1)==1){effect@mob1,0,165,100;damaged@mob1,@dam;}
+	if(istype(@mob2)==1){effect@mob2,0,165,100;damaged@mob2,@dam;}
+	if(istype(@mob3)==1){effect@mob3,0,165,100;damaged@mob3,@dam;}
+	if(istype(@mob4)==1){effect@mob4,0,165,100;damaged@mob4,@dam;}
+	if(get_map_pk()){
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,165,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,165,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,165,100;}
+		if(istype(@mob4)==3){char_damaged@mob4,@dam,165,100;}
+	}
+	motion 140,25;
+	game_sound 1,100;
+	game_sound 7,0;
+	skill_delay 13;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@mob4;
+	del@myid;
+	del@x1;
+	del@y1;
+}
+
+0	SKILL_퓨리소윌루	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	skill_delay 11;
+	if(get_map_pk(@myid)){
+		if(#FurysowolLu==1){
+			set@dam,(get_con(@myid)*7597);
+		}
+		if(#FurysowolLu==2){
+			set@dam,(get_con(@myid)*12816);
+		}
+		if(#FurysowolLu==3){
+			set@dam,(get_con(@myid)*16375);
+		}
+		if(#FurysowolLu==4){
+			set@dam,(get_con(@myid)*21062);
+		}
+		if(#FurysowolLu==5){
+			set@dam,(get_con(@myid)*26555);
+		}
+		if(#FurysowolLu==6){;
+			set@dam,(get_con(@myid)*31250);
+		}
+	}else{
+		if(#FurysowolLu==1){
+			set@dam,(get_con(@myid)*8097);
+		}
+		if(#FurysowolLu==2){
+			set@dam,(get_con(@myid)*13316);
+		}
+		if(#FurysowolLu==3){
+			set@dam,(get_con(@myid)*17975);
+		}
+		if(#FurysowolLu==4){
+			set@dam,(get_con(@myid)*22962);
+		}
+		if(#FurysowolLu==5){
+			set@dam,(get_con(@myid)*27555);
+		}
+		if(#FurysowolLu==6){;
+			set@dam,(get_con(@myid)*33950);
+		}
+	}
+	set@type,istype(@target);
+	set@mob1,get_mobxy(@x1,(@y1)-1);
+	set@mob2,get_mobxy(@x1,(@y1)+1);
+	set@mob3,get_mobxy((@x1)-1,@y1);
+	set@mob4,get_mobxy((@x1)+1,@y1);
+	if(istype(@mob1)==1){effect@mob1,0,328,100;damaged@mob1,@dam;}
+	if(istype(@mob2)==1){effect@mob2,0,328,100;damaged@mob2,@dam;}
+	if(istype(@mob3)==1){effect@mob3,0,328,100;damaged@mob3,@dam;}
+	if(istype(@mob4)==1){effect@mob4,0,328,100;damaged@mob4,@dam;}
+	if(get_map_pk()){
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,328,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,328,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,328,100;}
+		if(istype(@mob4)==3){char_damaged@mob4,@dam,328,100;}
+	}
+	motion 139,25;
+	game_sound 1,100;
+	game_sound 102,0;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@mob4;
+	del@myid;
+	del@x1;
+	del@y1;
+}
+
+0	SKILL_바람의상처	{
+	set@myid,get_myid();
+	set@time,time() - #skill26;
+	set #skill26,time();
+	if(#blackset == 1||#blacksetchar == 1){
+		skill_delay 6;
+	}else{
+		skill_delay 10;
+	}
+	set@target,skill_target();
+	if(get_vita(@myid)<=get_basevita(@myid)*25){
+		set@damage,get_basevita2(@myid) *25;
+	}else{
+		set@damage,get_basevita2(@myid) *25;
+	}
+	if(focus(@myid,0)){set @damage,@damage*25;}
+	if(!@target){
+		if(istype(get_front_char(@myid))==3&&get_map_pk()){
+			set@damage,get_basevita(@myid)*25;
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,309,100;
+			effect@target,309,0,75;
+			set_vital get_basevita(@myid)*25;
+			if(get_class()==1){motion 130,20;}else{motion 1,20;}
+			game_sound 44,0;
+		}
+	}else{
+		effect@target,371,372,75;
+		damaged@target,@damage;
+		set_vital get_basevita(@myid)*25;
+		if(get_class()==1){motion 130,20;}else{motion 1,20;}
+		game_sound 44,0;
+	}
+}
+
+0	SKILL_검신(檢身)	{
+	set@myid,get_myid();
+	set@time,time() - #skill26;
+	set #skill26,time();
+	if(#blackset == 1||#blacksetchar == 1){
+		skill_delay 8;
+	}else{
+		skill_delay 8;
+	}
+	set@target,skill_target();
+	if(get_vita(@myid)<=get_basevita(@myid)/100*2){
+		set@damage,get_basevita2(@myid) *2050/100;
+	}else{
+		set@damage,get_basevita2(@myid) *2350/100;
+	}
+	if(focus(@myid,0)){set @damage,@damage*2;}
+	if(!@target){
+		if(istype(get_front_char(@myid))==3&&get_map_pk()){
+			set@damage,get_basevita(@myid)*15;
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,309,100;
+			effect@target,309,0,75;
+			set_vital get_basevita(@myid)/100*17;
+			if(get_class()==1){motion 130,20;}else{motion 1,20;}
+			game_sound 44,0;
+		}
+	}else{
+		effect@target,74,82,75;
+		damaged@target,@damage;
+		set_vital get_basevita(@myid)/100*1;
+		if(get_class()==1){motion 130,20;}else{motion 1,20;}
+		game_sound 17,0;
+	}
+}

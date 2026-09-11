@@ -1,0 +1,245 @@
+디스펠	뮤레칸의역습_피에트	{
+	set @myid, get_myid();
+	if(get_ability()<38){
+		no:
+		if($EestMuerecan == 1){
+			set #EestMuerecan, 0;
+			set $EestMuerecan, 0;
+		}
+		if($EestMuerecan2 == 1){
+			set #EestMuerecan2, 0;
+			set $EestMuerecan2, 0;
+		}
+		group_warp "마인마을",48, 55;
+		end;
+	}
+	if(get_basevita2(@myid)<=499999&&get_basemana2(@myid)<=299999){goto no;}
+	if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+	set @mu, rand2(1,3);
+	if(@mu<1){
+		game_sound 8,100;
+		message 3, object_name() + "가 나르콜리를 가합니다.";
+		mobnar_delay @myid, 8;
+		end;
+	}if(@mu<2){
+		game_sound 8,100;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+		end;
+	}if(@mu<3){
+		if(char_curse(@myid, "프라보", 120, 65, 84)){end;}
+		message 3, object_name() + "가 프라보를 가합니다.";
+		effect @myid, 257,0,140;
+		game_sound 27,0;
+		end;
+	}
+}
+
+디스펠	뮤레칸의역습_개미파이터	{
+	set @myid, get_myid();
+	//유저를 향해 바투
+}
+
+디스펠	뮤레칸의역습_밀레스	{
+	set @myid, get_myid();
+	if(get_ability()<38){
+		no:
+		if($EestMuerecan == 1){
+			set #EestMuerecan, 0;
+			set $EestMuerecan, 0;
+		}
+		if($EestMuerecan2 == 1){
+			set #EestMuerecan2, 0;
+			set $EestMuerecan2, 0;
+		}
+		group_warp "마인마을",48, 55;
+		end;
+	}
+	if(get_basevita2(@myid)<=499999&&get_basemana2(@myid)<=299999){goto no;}
+	if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+	set @mu3, rand2(1,10);
+	if(@mu3<4){
+		game_sound 8,100;
+		message 3, object_name() + "가 나르콜리를 가합니다.";
+		mobnar_delay @myid, 8;
+	}if(@mu3<8){
+		game_sound 8,100;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+	}
+}
+
+디스펠	뮤레칸의역습_죽음의스펙터	{
+	set @myid, get_myid();
+	if(get_ability()<38){
+		no:
+		if($EestMuerecan == 1){
+			set #EestMuerecan, 0;
+			set $EestMuerecan, 0;
+		}
+		if($EestMuerecan2 == 1){
+			set #EestMuerecan2, 0;
+			set $EestMuerecan2, 0;
+		}
+		group_warp "마인마을",48, 55;
+		end;
+	}
+	if(get_basevita2(@myid)<=499999&&get_basemana2(@myid)<=299999){goto no;}
+	if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+	if(char_curse(@myid,"어둠의각인",120,65,133)){end;}
+	message 3, object_name() + "가 어둠의각인을 가합니다.";
+	game_sound 27,100;
+	effect @myid, 104, 0, 70;
+	end;
+}
+
+디스펠	뮤레칸의역습_죽음의그랜드드래곤	{
+	set @myid, get_myid();
+	//공격마법?
+}
+
+디스펠	뮤레칸의역습_보스2	{
+	set@myid,get_myid();
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @side, get_side(@myid);
+	if(get_mapname(@myid)=="[뮤레칸]피에트던전(1)"||get_mapname(@myid)=="[뮤레칸]피에트던전(2)"){
+		go3:
+		set_spellban@myid,8;
+		game_sound 8,0;
+		effect @myid,270,0,100;
+		if(get_class()==5){message 3, object_name() + "가 다라밀공금지1를 가합니다.";end;}
+		message 3, object_name() + "가 스펠금지1를 가합니다.";
+		end;
+	}
+	if(get_mapname(@myid)=="[뮤레칸]뤼케시온던전(1)"||get_mapname(@myid)=="[뮤레칸]뤼케시온던전(2)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(1)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(2)"){
+		if(rand2(1,10)>5){
+			if(@side == 0){
+				set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+				if(@type1 == 1){
+					if(get_mapname(@myid)=="[뮤레칸]홀리루딘던전(1)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(2)"){
+						goto vitadel;
+					}else{
+						goto manedel;
+					}
+				}
+			}
+			if(@side == 1){
+				set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+				if(@type1 == 1){
+					if(get_mapname(@myid)=="[뮤레칸]홀리루딘던전(1)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(2)"){
+						goto vitadel;
+					}else{
+						goto manedel;
+					}
+				}
+			}
+			if(@side == 2){
+				set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+				if(@type1 == 1){
+					if(get_mapname(@myid)=="[뮤레칸]홀리루딘던전(1)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(2)"){
+						goto vitadel;
+					}else{
+						goto manedel;
+					}
+				}
+			}
+			if(@side == 3){
+				set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+				if(get_mapname(@myid)=="[뮤레칸]홀리루딘던전(1)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(2)"){
+					vitadel:
+					group_hill 0, 162;
+					set_vital get_basevita(@myid)/100*5;
+					effect @myid, 162, 0, 100;
+					group_damaged_per @myid, 1;
+				}else{
+					if(@type1 == 1){
+						manedel:
+						if(get_mana(@myid)<get_basemana(@myid)/100*70){
+							set_manal 0;
+						}else{
+							set_manal get_mana(@myid) - get_basemana(@myid)/100*70;
+						}
+						group_hill 0, 161;
+						effect @myid, 161, 0, 100;
+					}
+				}
+			}
+		}else{
+			set @rand, rand2(1,12);
+			if(@rand<2){
+				if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+				game_sound 8,100;
+				message 3, object_name() + "가 나르콜리를 가합니다.";
+				mobnar_delay @myid, 8;
+			}if(@rand<4){
+				if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+				game_sound 8,100;
+				message 3, object_name() + "가 마비를 가합니다.";
+	 			mobsor_delay @myid, 8;
+			}if(@rand<6){
+				goto go3;
+			}if(@rand<8){
+				if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+				if(char_curse(@myid,"어둠의각인",120,65,133)){end;}
+				message 3, object_name() + "가 어둠의각인을 가합니다.";
+				game_sound 27,100;
+				effect @myid, 104, 0, 70;
+			}if(@rand<10){
+				goto go2;
+			}
+			del @rand;
+		}
+	}
+	if(get_mapname(@myid)=="[뮤레칸]밀레스던전(1)"||get_mapname(@myid)=="[뮤레칸]밀레스던전(2)"){
+		go2:
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		if(!@mob){end;}
+		effect @mob, 0, 6, 100;
+		game_sound 8, 0;
+		magic 10,@mob,"어둠의각인", 17, 0,@myid;
+		end;
+	}
+	if(get_mapname(@myid)=="[뮤레칸]루어스던전(1)"||get_mapname(@myid)=="[뮤레칸]루어스던전(2)"){
+		if(rand2(1,10)>5){
+			if(@side == 0){
+				set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+				if(@type1 == 1){
+					goto go1;
+				}
+			}
+			if(@side == 1){
+				set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+				if(@type1 == 1){
+					goto go1;
+				}
+			}
+			if(@side == 2){
+				set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+				if(@type1 == 1){
+					goto go1;
+				}
+			}
+			if(@side == 3){
+				set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+				if(@type1 == 1){
+					go1:
+					set @wadel, rand2(1,10);
+					if(@wadel<4){
+						weapon_del@myid;
+						message 3, object_name() + "가 적무기해체를 가합니다.";
+					}if(@wadel<8){
+						arm_del@myid;
+						message 3, object_name() + "가 적갑옷해체를 가합니다.";
+					}
+					del @wadel;
+				}
+			}
+		}else{
+			goto go2;
+		}
+	}
+	end;
+}

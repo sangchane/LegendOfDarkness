@@ -1,0 +1,366 @@
+$openevent	0
+$map_num	6076
+$@__SW3_VAL	0
+$@__SW2_VAL	0
+$board9title15$	
+
+$board9sub15$	
+
+$board9title14$	
+
+$board9sub14$	
+
+$board9title13$	
+
+$board9sub13$	
+
+$board9title12$	
+
+$board9sub12$	
+
+$board9title11$	
+
+$board9sub11$	
+
+$board9title10$	
+
+$board9sub10$	
+
+$board9title9$	
+
+$board9sub9$	
+
+$board9title8$	
+
+$board9sub8$	
+
+$board9title7$	[vogue] 길원구해요(천둥/2013년8월27일8시13분)
+
+$board9sub7$	ㅇ
+
+$board9title6$	하나님바붕(칵테일/2013년8월31일18시36분)
+
+$board9sub6$	ㅋㅋㅋㅋ
+
+$board9title5$	데빌님 더 바보(하나/2013년8월31일18시37분)
+
+$board9sub5$	바보 데빌
+
+$board9title4$	보징어땅콩들아(하나/2013년9월1일21시47분)
+
+$board9sub4$	음훼훼휀
+
+$board9title3$	출.근.(천둥/2013년9월3일8시15분)
+
+$board9sub3$	ㅇ
+
+$board9title2$	{=b情 비승길드원모집합니다(머야/2013년9월10일23시43분)
+
+$board9sub2$	情 비승길드원모집 혼탑,베크,공성 다합니다.
+
+$board9title1$	나 다녀감 고추 절언 어딨노..(칼과꽃/2013년9월21일0시42분)
+
+$board9sub1$	흑흑
+
+$board5title10$	{=c지존 도적 놀아요 !(유아인/2013년9월1일11시31분)
+
+$board5sub10$	귓 주세요 ㅎㅎ
+
+$board5title9$	지존도적 놉니다(망치/2013년9월2일17시44분)
+
+$board5sub9$	지존도적 놀아요
+
+$board5title8$	비승도전 항상 사냥가요(도전/2013년9월3일7시0분)
+
+$board5sub8$	귓주세요~
+
+$board5title7$	지존분들 백장사냥갑시다!!!!(법사/2013년9월11일21시11분)
+
+$board5sub7$	귓말 ㄱㄱ
+
+$board5title6$	지존님들 캐슬가요~~ 귓(법사/2013년9월11일21시17분)
+
+$board5sub6$	귓귓
+
+$board5title5$	사냥가실때 항상불러주세요(이불/2013년9월13일18시39분)
+
+$board5sub5$	사냥가실때 항상불러주세요 ㅎㅎ
+
+$board5title4$	법직 불러만줘용(진슬/2013년9월14일10시52분)
+
+$board5sub4$	ㅎㅎ
+
+$board5title3$	지존 사냥가고 싶어요 팀구해요(조지아/2013년9월15일14시42분)
+
+$board5sub3$	팀구합니다
+
+$board5title2$	조지아&칸타타 사냥갑니다(조지아/2013년9월15일16시23분)
+
+$board5sub2$	조지아&칸타타 사냥갑니다
+
+$board5title1$	갓지존도적 사냥갑니다(얌마/2013년9월18일22시13분)
+
+$board5sub1$	갓지존도적사냥갑니다
+
+$@__SW4_VAL	0
+$board8title15$	
+
+$board8sub15$	
+
+$board8title14$	
+
+$board8sub14$	
+
+$board8title13$	
+
+$board8sub13$	
+
+$board8title12$	
+
+$board8sub12$	
+
+$board8title11$	
+
+$board8sub11$	
+
+$board8title10$	
+
+$board8sub10$	
+
+$board8title9$	
+
+$board8sub9$	
+
+$board8title8$	
+
+$board8sub8$	
+
+$board8title7$	
+
+$board8sub7$	
+
+$board8title6$	
+
+$board8sub6$	
+
+$board8title5$	
+
+$board8sub5$	
+
+$board8title4$	
+
+$board8sub4$	
+
+$board8title3$	레셤 4~5천 에 팝니다(순직/2013년9월1일12시31분)
+
+$board8sub3$	레셤 4~5천에 팝니다
+
+$board8title2$	블루껍질사염!!(고량주/2013년9월4일10시25분)
+
+$board8sub2$	ㅂㄹ
+
+$board8title1$	헤헤도적블랙셋 ㅍㅍ(맥주/2013년9월8일13시0분)
+
+$board8sub1$	ㄹㄹ
+
+$board1title10$	
+
+$board1sub10$	
+
+$board1title9$	
+
+$board1sub9$	
+
+$board1title8$	
+
+$board1sub8$	
+
+$board1title7$	
+
+$board1sub7$	
+
+$board1title6$	
+
+$board1sub6$	
+
+$board1title5$	
+
+$board1sub5$	
+
+$board1title4$	
+
+$board1sub4$	
+
+$board1title3$	
+
+$board1sub3$	
+
+$board1title2$	
+
+$board1sub2$	
+
+$board1title1$	ㅎㅇㅎㅇ(다시/2013년9월9일21시42분)
+
+$board1sub1$	ㅎㅇㅎㅇ
+
+$board7title10$	
+
+$board7sub10$	
+
+$board7title9$	
+
+$board7sub9$	
+
+$board7title8$	
+
+$board7sub8$	
+
+$board7title7$	
+
+$board7sub7$	
+
+$board7title6$	
+
+$board7sub6$	
+
+$board7title5$	
+
+$board7sub5$	
+
+$board7title4$	
+
+$board7sub4$	
+
+$board7title3$	
+
+$board7sub3$	
+
+$board7title2$	사냥좀ㄱ ㅏ여 님들아 ㅠ(미니이/2013년9월9일22시0분)
+
+$board7sub2$	사냥좀 가요 ㅠㅜㅜ
+
+$board7title1$	전사 사냥가고싶어용(칸타타/2013년9월22일18시6분)
+
+$board7sub1$	전사 사냥가고픔!
+
+$board2title10$	
+
+$board2sub10$	
+
+$board2title9$	
+
+$board2sub9$	
+
+$board2title8$	
+
+$board2sub8$	
+
+$board2title7$	
+
+$board2sub7$	
+
+$board2title6$	
+
+$board2sub6$	
+
+$board2title5$	
+
+$board2sub5$	
+
+$board2title4$	
+
+$board2sub4$	
+
+$board2title3$	
+
+$board2sub3$	
+
+$board2title2$	
+
+$board2sub2$	
+
+$board2title1$	ㅋㅋㅋ(잠시/2013년9월9일23시40분)
+
+$board2sub1$	ㅋㅋㅋㅋ
+
+$board3title10$	
+
+$board3sub10$	
+
+$board3title9$	
+
+$board3sub9$	
+
+$board3title8$	
+
+$board3sub8$	
+
+$board3title7$	
+
+$board3sub7$	
+
+$board3title6$	
+
+$board3sub6$	
+
+$board3title5$	
+
+$board3sub5$	
+
+$board3title4$	
+
+$board3sub4$	
+
+$board3title3$	
+
+$board3sub3$	
+
+$board3title2$	
+
+$board3sub2$	
+
+$board3title1$	사냥가실분 ㅋ(소지섭/2013년9월11일18시9분)
+
+$board3sub1$	사냥가실분ㅋ
+
+$board4title10$	
+
+$board4sub10$	
+
+$board4title9$	
+
+$board4sub9$	
+
+$board4title8$	
+
+$board4sub8$	
+
+$board4title7$	
+
+$board4sub7$	
+
+$board4title6$	
+
+$board4sub6$	
+
+$board4title5$	
+
+$board4sub5$	
+
+$board4title4$	
+
+$board4sub4$	
+
+$board4title3$	
+
+$board4sub3$	
+
+$board4title2$	
+
+$board4sub2$	
+
+$board4title1$	백작가실 직자님ㅋㅋ(소지섭/2013년9월11일19시5분)
+
+$board4sub1$	ㄱㄱ
+
+$@__SW0_VAL	0

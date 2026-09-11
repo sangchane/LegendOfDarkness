@@ -1,0 +1,1205 @@
+0	제조책	{
+	set @jejo, 0;
+	del @jejo;
+	re:
+	set @myid, get_myid();
+	set @jejo, menu(0, "제작할것을 선택하세요", "생명의시약", "암흑의시약", "루딘블레이드", "세피라링(lev10)", "비밀의황금열쇠");
+	if(@jejo == 0 || !@jejo){goto re;}
+	if(@jejo == 1){
+		mes 1, "생명의시약을 제작합니다. 확률은100퍼";
+		mes 1, "{=c재료는 여의주5개, 다이아몬드5개, 레드오피온의수염7개, 블루오피온의수염7개, 브론즈오피온의수염7개, 레드오피온의등껍질7개, 블루오피온의등껍질7개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "여의주") >= 5 && item_exist(@myid, "다이아몬드") >= 5 && item_exist(@myid, "레드오피온의수염") >=7 && item_exist(@myid, "블루오피온의수염") >=7 && item_exist(@myid, "브론즈오피온의수염") >=7 && item_exist(@myid, "레드오피온의등껍질") >=7 && item_exist(@myid, "블루오피온의등껍질") >=7){
+			item_del "여의주", 5;
+			item_del "다이아몬드", 5;
+			item_del "레드오피온의수염", 7;
+			item_del "블루오피온의수염", 7;
+			item_del "브론즈오피온의수염", 7;
+			item_del "레드오피온의등껍질", 7;
+			item_del "블루오피온의등껍질", 7;
+			item_add "생명의시약", 1;
+                                      item_del "제조책", 1;
+			mes 1, "생명의시약 제작이 완료되었습니다.";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 2){
+		mes 1, "암흑의시약을 제작합니다. 확률은100퍼";
+		mes 1, "{=c재료는 여의주5개, 다이아몬드5개, 레드오피온의수염7개, 블루오피온의수염7개, 브론즈오피온의수염7개, 레드오피온의등껍질7개, 블루오피온의등껍질7개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "여의주") >= 5 && item_exist(@myid, "다이아몬드") >= 5 && item_exist(@myid, "레드오피온의수염") >=7 && item_exist(@myid, "블루오피온의수염") >=7 && item_exist(@myid, "브론즈오피온의수염") >=7 && item_exist(@myid, "레드오피온의등껍질") >=7 && item_exist(@myid, "블루오피온의등껍질") >=7){
+			item_del "여의주", 5;
+			item_del "다이아몬드", 10;
+			item_del "레드오피온의수염", 7;
+			item_del "블루오피온의수염", 7;
+			item_del "브론즈오피온의수염", 7;
+			item_del "레드오피온의등껍질", 7;
+			item_del "블루오피온의등껍질", 7;
+			item_add "암흑의시약", 1;
+                                      item_del "제조책", 1;
+			mes 1, "암흑의시약 제작이 완료되었습니다.";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 3){
+		mes 1, "루딘블레이드를 제작합니다 확률은 100퍼";
+		mes 1, "{=c재료는 생명의시약1개,더브릴3개,뉴트의혀5개,드래곤뉴트의뿔2개,여의주5개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "더브릴") >= 3 && item_exist(@myid, "뉴트의혀") >=5 && item_exist(@myid, "드래곤뉴트의뿔") >=2 && item_exist(@myid, "여의주") >= 5){
+			item_del "생명의시약", 1;
+			item_del "더브릴", 1;
+			item_del "더브릴", 1;
+			item_del "더브릴", 1;
+			item_del "뉴트의혀", 10;
+			item_del "드래곤뉴트의뿔", 2;
+			item_del "여의주", 5;
+			item_add "루딘블레이드", 1;
+                                      item_del "제조책", 1;
+			mes 1, "루딘블레이드 제작에 성공하셨습니다!!";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 4){
+		mes 1, "세피라링(lev10)을 제작합니다 확률은 100퍼";
+		mes 1, "{=c재료는 생명의시약1개,바이런의반지5개,뉴트의혀5개,드래곤뉴트의뿔5개,여의주5개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "바이런의반지") >= 5 && item_exist(@myid, "뉴트의혀") >=5 && item_exist(@myid, "드래곤뉴트의뿔") >=5 && item_exist(@myid, "여의주") >= 5){
+			item_del "생명의시약", 1;
+			item_del "바이런의반지", 1;
+			item_del "바이런의반지", 1;
+			item_del "바이런의반지", 1;
+			item_del "바이런의반지", 1;
+			item_del "바이런의반지", 1;
+			item_del "뉴트의혀", 5;
+			item_del "드래곤뉴트의뿔", 5;
+			item_del "여의주", 10;
+			item_add "세피라링(lev10)", 1;
+                                      item_del "제조책", 1;
+			mes 1, "세피라링(lev10) 제작에 성공하셨습니다!!";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 5){
+		mes 1, "비밀의황금열쇠를 제작합니다 확률은 100퍼";
+		mes 1, "{=c재료는 레드오피온의비늘5개,뉴트의혀2개,드래곤뉴트의뿔2개,여의주2개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "레드오피온의비늘") >= 5 && item_exist(@myid, "뉴트의혀") >= 2 && item_exist(@myid, "드래곤뉴트의뿔") >=2 && item_exist(@myid, "여의주") >=2){
+			item_del "레드오피온의비늘", 5;
+			item_del "뉴트의혀", 2;
+			item_del "드래곤뉴트의뿔", 2;
+			item_del "여의주", 2;
+			item_add "비밀의황금열쇠", 1;
+                                      item_del "제조책", 1;
+			mes 1, "비밀의황금열쇠 제작에 성공하셨습니다!!";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+		}
+	}
+}
+
+0	정화된전사	{
+RE:
+ set @rand, rand(1,100);
+ if(@rand <0) goto RE;
+		mes 1, "뮤레칸장비를 정화하고싶으신가요??";
+		set @select, menu(0, "재료만 주신다면야... ", "[전사]사라센왕국갑옷(+5) 정화하기", "[전사]뮤레칸의스냅(+5)정화하기", "[전사]마사이왕국투구(+5)정화하기");
+		if(@select == 1)
+		{
+		mes 1, "[전사]사라센왕국갑옷(+5)을 정화해보겠습니다!";
+		mes 1, "{=c재료는 [전사]사라센왕국갑옷(+5), 정화된보석7개, 금전500만원";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+		if(item_exist(@myid, "[전사]사라센왕국갑옷(+5)") >= 1 && item_exist(@myid, "정화된보석") >= 7){
+		if(get_money() >= 5000000) {
+			money_del "5000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 40)	{
+			item_del "정화된보석", 7;
+			mes 1, "[전사]사라센왕국갑옷(+5)을 정화하고있으니 기다려봐..........";
+			mes 1, "{=c 대박!! [전사]사라센왕국갑옷(+5)를 정화했어!!!  엄청난 힘이느껴져!!  ";
+                                      item_del "[전사]사라센왕국갑옷(+5)", 1;
+                                      item_del "정화된보석", 7;
+			item_add "정화된뮤레칸전사의상", 1;
+			broadcast 5, "[[" + get_name() +"님이 [전사]사라센왕국갑옷(+5)을 정화하셨습니다!! !! ]]";
+ 			legend_add 7, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ", [전사]사라센왕국갑옷(+5)을 정화하다!!";
+		}else{
+			item_del "정화된보석", 7;
+			mes 1, "{=q 호에에엥....ㅠㅠ 미안... 정화도중에 보석을깨먹었어  미안 ㅠㅠ ";
+			broadcast 5, "[[" + get_name() +"님이 [전사]사라센왕국갑옷(+5) 정화에 실패하셨습니다 ㅠ ]]";
+ 			legend_add 7, 246, "뮤레칸 " + $년도 + "년 " + $계절$ + ", [전사]사라센왕국갑옷(+5) 정화에 실패하다ㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 2)
+		{
+		mes 1, "[전사]뮤레칸의스냅(+5)을 정화해보겠습니다!! ";
+		mes 1, "{=c재료는 [전사]뮤레칸의스냅(+5), 정화된보석7개 금전5백만원";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+		if(item_exist(@myid, "[전사]뮤레칸의스냅(+5)") >= 1 && item_exist(@myid, "정화된보석") >= 7){
+		if(get_money() >= 5000000) {
+			money_del "5000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 40)	{
+			item_del "[전사]뮤레칸의스냅(+5)", 1;
+			item_del "정화된보석", 7;
+			mes 1, "[전사]뮤레칸의스냅(+5)을 정화하고있으니 기다려봐~~~";
+			mes 1, "{=c대박!! [전사]뮤레칸의스냅(+5)을 정화했어!!! 엄청난 힘이느껴져!!";
+			item_add "정화된뮤레칸블레이드", 1;
+			broadcast 5, "[[" + get_name() +"님이 [전사]뮤레칸의스냅(+5)을 정화하셨습니다!! ]]";
+ 			legend_add 7, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ", [전사]뮤레칸의스냅(+5)을 정화하다!!";
+		}else{
+			item_del "정화된보석", 7;
+			mes 1, "{=q 호에에엥..ㅜㅜ 미안... 정화도중에 보석을깨먹었어 미안 ㅠㅠ";
+			broadcast 5, "[[" + get_name() +"님이 [전사]뮤레칸의스냅(+5) 정화에 실패하셨습니다ㅠ ]]";
+ 			legend_add 7, 246, "뮤레칸 " + $년도 + "년 " + $계절$ + ", [전사]뮤레칸의스냅(+5) 정화에 실패하다ㅠ.";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+}
+	}else if(@select == 3)
+		{
+		mes 1, "[전사]마사이왕국투구(+5)를 정화해보겠습니다!! ";
+		mes 1, "{=c재료는 [전사]마사이왕국투구(+5), 정화된보석7개 금전5백만원";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+		if(item_exist(@myid, "[전사]마사이왕국투구(+5)") >= 1 && item_exist(@myid, "정화된보석") >= 7){
+		if(get_money() >= 5000000) {
+			money_del "5000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 40)	{
+			item_del "정화된보석", 7;
+			mes 1, "[전사]마사이왕국투구(+5)를 정화하고있으니 기다려봐~~~";
+			mes 1, "{=c대박!! [전사]마사이왕국투구(+5)를 정화했어!!! 엄청난 힘이느껴져!!";
+			item_add "정화된뮤레칸전사투구", 1;
+			broadcast 5, "[[" + get_name() +"님이 [전사]마사이왕국투구(+5)를 정화하셨습니다!! ]]";
+ 			legend_add 7, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ",[전사]마사이왕국투구(+5)를 정화하다!!";
+		}else{
+			item_del "정화된보석", 7;
+			mes 1, "{=q 호에에엥..ㅜㅜ 미안... 정화도중에 보석을깨먹었어 미안 ㅠㅠ";
+			broadcast 5, "[[" + get_name() +"님이 [전사]마사이왕국투구(+5) 정화에 실패하셨습니다ㅠ ]]";
+ 			legend_add 7, 246, "뮤레칸 " + $년도 + "년 " + $계절$ + ", [전사]마사이왕국투구(+5) 정화에 실패하다ㅠ.";
+		}
+		}else{
+		}
+}
+	del @select;
+	del @rand;
+	del @myid;
+}
+
+0,0,0,0,0,0,0	시련의탑보상	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	del @menu;
+	mes 1, "시련의탑 최상층을 클리어하신것을 축하드립니다.";
+	mes 1, "시련의탑 클리어 보상으로, 십억경20개, 크리스마스가호1개, 3000000GOLD, 시련의탑석상1개, [주문서]파괴보호+100%3개, 시련포인트 50을 드리겠습니다.";
+	set @menu, menu(0,"클리어 보상을 받겠습니까??", "받는다.", "안받는다.");
+	if(@menu == 1){
+		set #hondon, 0;
+		item_add "십억경", 20;
+                         item_add "시련의탑석상", 1;
+                         item_add "크리스마스가호(Lev1)", 1;
+                         item_add "[주문서]파괴보호+100%", 3;
+		money_add 3000000;
+		set #honpoint, #honpoint + 50;
+		mes 1, "보상지급이 완료되었습니다. 대기실로 귀환됩니다.";
+		warp "용자의공원", 20, 57;
+		end;
+	}
+	if(@menu == 2){
+		mes 1, "여기서 안받으면, 대기실에서 기본 보상으로 대처됩니다.";
+		end;
+	}
+}
+
+0	시련의탑입장도우미	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @hondone, #hondon * 150000000;
+	set @hondong, #hondon * 100;
+	set @hondonm, #hondon * 100000;
+	del @menu;
+	item_del "시련의열쇠1", 90;
+	item_del "시련의열쇠2", 90;
+	mes 1, "시련의탑에 오신것을환영합니다.";
+	re:
+	set @select, menu(0, "시련의탑에 대해 궁금하신게 있으신가요?... ", "시련의탑이란,..?", "각층격파법?", "보상관련", "보상받기", "시련의장비 교환");
+	if(@select == 1){  
+		mes 1, "시련의탑이란, 2명이상의 승급파티원들과 함께 할수있는 파티퀘스트입니다.";
+		mes 1, "파티원구성에는 2명이상 존재해야합니다.";
+		mes 1, "몬스터의 체력은 자신파티구성원중에 체력이 제일높은사람을 기준으로 지정됩니다.";
+		goto re;
+	}if(@select == 2){
+		mes 1, "각층격파법을 설명해드리겠습니다.";
+		mes 1, "1,4,5,7,9,10,12층은 모든몬스터를 잡는 올킬모드입니다.";
+		mes 1, "3,8,13층은 폰3마리를 없애는 인내모드입니다.";
+		mes 1, "2,6,11층은 특정몬스터를 잡고 특정제물을 얻어 다음방으로 가는 조건모드입니다.";
+		mes 1, "14층은 보스몬스터를 처리하는 피니쉬모드입니다.";
+		goto re;
+	}if(@select == 3){
+		mes 1, "보상은 어느층까지 격파했냐에 따라 다르게 지급됩니다.";
+		mes 1, "격파하는도중에 실패를 하였다면, 저한테서 보상을 받을수있습니다.";
+		mes 1, "참고로, 보상은 5층이상 격파하신분들만 받으실수있습니다.";
+		mes 1, "만약 피니쉬모드를 깨고 보상의방으로 가신다면, 저에게서 받는것보다 훨씬좋은보상이 기다리고있습니다.";
+		mes 1, "＊참고＊보상은 골드 : 십만원 x 올라간탑층, 경험치 : 3억 x 올라간탑층\n[중도 포기및 실패시에만 해당]";
+		goto re;
+	}if(@select == 4){
+		mes 1, "보상을 지급해드리겠습니다.";
+		if(#hondon < 5){mes 1, "당신은 보상을 받을수없습니다. \n보상은 5층이상부터..."; end;}
+		mes 1, "현재 당신의 마지막 시련의탑기록은" + #hondon + "층까지입니다.";
+		set #honpoint, #honpoint + #hondon;
+		exp_add @hondone;
+		set_eg @hondong + @eg;
+		money_add @hondonm;
+		set #hondon, 0;
+		mes 1, "보상 골드 : [" + @hondonm + "], 경험치 : [" + @hondone + "]을 얻었습니다.";
+		goto re;
+	}if(@select == 5){
+		mes 1, "시련의장비는  시련포인트 1000포인트당 한부위로 교환이 가능합니다.";
+		mes 1, "교환하기에 앞서, 아이템창에 빈공간이 없다면 공간을 확보해주세요.\n만약 아이템창자리가 없어서 증발시 복구불가능합니다.";
+		re2:
+		del @select;	
+		del @select2;
+		set @select, menu(0,"어느직업으로 교환하시겠습니까?\n현재소유포인트 [" + #honpoint + "]", "전사", "도적", "마법사", "성직자", "무도가");
+		if(@select == 1){
+			if(get_class(@myid) != 1){mes 1, "당신은 전사가 아닙니다."; goto re;}
+			set @select2, menu(0,"어느 부위로 교환하시겠습니까?", "시련의갑옷(전사)", "시련의투구(전사)");
+			if(#honpoint < 1000){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 1000; item_add "시련의갑옷(전사)", 1; mes 1, "시련의갑옷(전사) 교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 1000; item_add "시련의투구(전사)", 1; mes 1, "시련의투구(전사) 교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 2){
+			if(get_class(@myid) != 2){mes 1, "당신은 도적이 아닙니다."; goto re;}
+			set @select2, menu(0,"어느 부위로 교환하시겠습니까?", "시련의갑옷(도적)", "시련의투구(도적)");
+			if(#honpoint < 1000){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 1000; item_add "시련의갑옷(도적)", 1; mes 1, "시련의갑옷(도적) 교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 1000; item_add "시련의투구(도적)", 1; mes 1, "시련의투구(도적) 교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 3){
+			if(get_class(@myid) != 3){mes 1, "당신은 마법사가 아닙니다."; goto re;}
+			set @select2, menu(0,"어느 부위로 교환하시겠습니까?", "시련의갑옷(마법사)", "시련의투구(마법사)");
+			if(#honpoint < 1000){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 1000; item_add "시련의갑옷(마법사)", 1; mes 1, "시련의갑옷(마법사) 교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 1000; item_add "시련의투구(마법사)", 1; mes 1, "시련의투구(마법사) 교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 4){
+			if(get_class(@myid) != 4){mes 1, "당신은 성직자가 아닙니다."; goto re;}
+			set @select2, menu(0,"어느 부위로 교환하시겠습니까?", "시련의갑옷(성직자)", "시련의투구(성직자)");
+			if(#honpoint < 1000){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 1000; item_add "시련의갑옷(성직자)", 1; mes 1, "시련의갑옷(성직자) 교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 1000; item_add "시련의투구(성직자)", 1; mes 1, "시련의투구(성직자)."; goto re2;}
+		}
+		if(@select == 5){
+			if(get_class(@myid) != 5){mes 1, "당신은 무도가가 아닙니다."; goto re;}
+			set @select2, menu(0,"어느 부위로 교환하시겠습니까?", "시련의갑옷(무도가)", "시련의투구(무도가)");
+			if(#honpoint < 1000){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 1000; item_add "시련의갑옷(무도가)", 1; mes 1, "시련의갑옷(무도가) 교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 1000; item_add "시련의투구(무도가)", 1; mes 1, "시련의투구(무도가) 교환이 완료됬습니다."; goto re2;}
+		}
+		del @select;	
+		del @select2;
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	시련의탑함정	{
+	set @myid, get_myid();
+	re2:
+	set @rand2, rand(1,10);
+	if(@rand2 < 1 || @rand > 10){goto re;}
+	if(@rand2 <= 7){del @rand2; end;}
+	re:
+	set @rand, rand(1,6);
+	if(@rand < 1 || @rand > 6){goto re;}
+	del @rand2;
+	if(@rand <=4){end;}
+	if(@rand < 4){mobnar_delay @myid, 15; message 3, "함정에 빠졌습니다."; end;}
+	if(@rand == 4){mobsor_delay @myid, 10; message 3, "함정에 빠졌습니다."; end;}
+	if(@rand == 5){set_vital "1"; message 3, "함정에 빠졌습니다."; end;}
+	if(@rand == 6){
+		go:
+		set @rand, rand(1,3);
+		if(@rand < 1 || @rand > 3){goto go;}	
+		if(@rand == 2){set_coma @myid, 1; set_state1 @myid, 1; coma_delay @myid, 15;}
+	}
+}
+
+0,0,0,0,0,0,0	시련의탑입장	{
+	set @select, 0;
+	set @i, 1;
+	set @myid, get_myid();
+	item_del "시련의열쇠1", 90;
+	item_del "시련의열쇠2", 90;
+	set @select, menu("시련의탑으로 입장하겠습니까?[그룹원중 2직업이 모두 있어야 입장가능.]","이동");
+	if(group_exist() == 0){message 3, "그룹이 없습니다.";end;}
+	if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; end;}
+	gogo:
+	if(map_user_exist("시련의탑1층1") == 0 || map_user_exist("시련의탑2층1") == 0 || map_user_exist("시련의탑3층1") == 0 || map_user_exist("시련의탑4층1") == 0 || map_user_exist("시련의탑5층1") == 0 || map_user_exist("시련의탑6층1") == 0 || map_user_exist("시련의탑7층1") == 0 || map_user_exist("시련의탑8층1") == 0 || map_user_exist("시련의탑9층1") == 0 || map_user_exist("시련의탑10층1") == 0 || map_user_exist("시련의탑11층1") == 0 || map_user_exist("시련의탑12층1") == 0 || map_user_exist("시련의탑13층1") == 0 || map_user_exist("시련의탑14층1") == 0){group_warp "시련의탑1층1", 15,27; goto go;}
+	if(map_user_exist("시련의탑1층2") == 0 || map_user_exist("시련의탑2층2") == 0 || map_user_exist("시련의탑3층2") == 0 || map_user_exist("시련의탑4층2") == 0 || map_user_exist("시련의탑5층2") == 0 || map_user_exist("시련의탑6층2") == 0 || map_user_exist("시련의탑7층2") == 0 || map_user_exist("시련의탑8층2") == 0 || map_user_exist("시련의탑9층2") == 0 || map_user_exist("시련의탑10층2") == 0 || map_user_exist("시련의탑11층2") == 0 || map_user_exist("시련의탑12층2") == 0 || map_user_exist("시련의탑13층2") == 0 || map_user_exist("시련의탑14층2") == 0){group_warp "시련의탑1층2", 15,27; goto go;}
+	if(map_user_exist("시련의탑1층3") == 0 || map_user_exist("시련의탑2층3") == 0 || map_user_exist("시련의탑3층3") == 0 || map_user_exist("시련의탑4층3") == 0 || map_user_exist("시련의탑5층3") == 0 || map_user_exist("시련의탑6층3") == 0 || map_user_exist("시련의탑7층3") == 0 || map_user_exist("시련의탑8층3") == 0 || map_user_exist("시련의탑9층3") == 0 || map_user_exist("시련의탑10층3") == 0 || map_user_exist("시련의탑11층3") == 0 || map_user_exist("시련의탑12층3") == 0 || map_user_exist("시련의탑13층3") == 0 || map_user_exist("시련의탑14층3") == 0){group_warp "시련의탑1층3", 15,27; goto go;}
+	if(map_user_exist("시련의탑1층4") == 0 || map_user_exist("시련의탑2층4") == 0 || map_user_exist("시련의탑3층4") == 0 || map_user_exist("시련의탑4층4") == 0 || map_user_exist("시련의탑5층4") == 0 || map_user_exist("시련의탑6층4") == 0 || map_user_exist("시련의탑7층4") == 0 || map_user_exist("시련의탑8층4") == 0 || map_user_exist("시련의탑9층4") == 0 || map_user_exist("시련의탑10층4") == 0 || map_user_exist("시련의탑11층4") == 0 || map_user_exist("시련의탑12층4") == 0 || map_user_exist("시련의탑13층4") == 0 || map_user_exist("시련의탑14층4") == 0){group_warp "시련의탑1층4", 15,27; goto go;}
+	if(map_user_exist("시련의탑1층5") == 0 || map_user_exist("시련의탑2층5") == 0 || map_user_exist("시련의탑3층5") == 0 || map_user_exist("시련의탑4층5") == 0 || map_user_exist("시련의탑5층5") == 0 || map_user_exist("시련의탑6층5") == 0 || map_user_exist("시련의탑7층5") == 0 || map_user_exist("시련의탑8층5") == 0 || map_user_exist("시련의탑9층5") == 0 || map_user_exist("시련의탑10층5") == 0 || map_user_exist("시련의탑11층5") == 0 || map_user_exist("시련의탑12층5") == 0 || map_user_exist("시련의탑13층5") == 0 || map_user_exist("시련의탑14층5") == 0){group_warp "시련의탑1층5", 15,27; goto go;}
+	mes 1, "시련의탑에 비어있는 방이없습니다. 다른파티가 나올때까지 기다려주세요.";
+	end;
+	go:
+	sleep 700;
+	mob_clear get_mapname();
+output "001";
+	group_message 3, "{=q시련의탑 1단계. 모든몬스터를잡아라!";
+output "002";
+	message 3, "{=q시련의탑 1단계. 모든몬스터를잡아라!";
+	if(map_objmob()>=1){end;}
+	mob_spawn2 "시련의관리자", 15, 15, 1, group_bighp() * 16;
+output "003";
+	for(set @i, 1;@i <= 13; set @i, @i +1){
+		AA:
+		set @rand1, rand(1,get_mapxs(@myid));
+		if(@rand1 <= 0){goto AA;}
+		BB:
+		set @rand2, rand(1,get_mapys(@myid)-6);
+		if(@rand2 <= 0){goto BB;}
+		mob_spawn2 "시련의슬라임1", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "시련의슬라임2", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "시련의엘리자베스", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}
+ del @rand1;
+ del @rand2;
+ del @rand3;
+ del @select;
+}
+
+0,0,0,0,0,0,0	시련의탑2층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		item_clear get_mapname();
+		if(get_mapname() == "시련의탑1층1"){group_warp "시련의탑2층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑1층2"){group_warp "시련의탑2층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑1층3"){group_warp "시련의탑2층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑1층4"){group_warp "시련의탑2층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑1층5"){group_warp "시련의탑2층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "시련의정령", @rand1, @rand2, 1, group_bighp() * 12;
+		group_message 3, "{=q시련의탑 2단계. 시련의정령을 잡고, 열쇠를 획득하라!";
+		message 3, "{=q시련의탑 2단계. 시련의정령을 잡고, 열쇠를 획득하라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+		mob_spawn2 "시련의슬라임1", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "시련의슬라임2", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "시련의엘리자베스", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+		group_val "#hondon", 1,1;
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑3층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(item_exist(@myid, "시련의열쇠1") < 1){mes 1, "다음층으로 갈수있는 열쇠가 없습니다."; end;}
+		item_del "시련의열쇠1", 90;
+		item_del "시련의열쇠2", 90;
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 2,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다.."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑2층1"){group_warp "시련의탑3층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑2층2"){group_warp "시련의탑3층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑2층3"){group_warp "시련의탑3층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑2층4"){group_warp "시련의탑3층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑2층5"){group_warp "시련의탑3층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		CC:
+		set @rand3, rand(1,get_mapxs(@myid)-3);
+		if(@rand3 <= 0){goto CC;}
+		DD:
+		set @rand4, rand(1,get_mapys(@myid)-3);
+		if(@rand4 <= 0){goto DD;}
+		mob_spawn "시련의폰", @rand3, @rand4, 1;
+		EE:
+		set @rand5, rand(1,get_mapxs(@myid)-3);
+		if(@rand5 <= 0){goto EE;}
+		FF:
+		set @rand6, rand(1,get_mapys(@myid)-3);
+		if(@rand6 <= 0){goto FF;}
+		mob_spawn "시련의폰", @rand5, @rand6, 1;
+		GG:
+		set @rand7, rand(1,get_mapxs(@myid)-3);
+		if(@rand7 <= 0){goto GG;}
+		HH:
+		set @rand8, rand(1,get_mapys(@myid)-3);
+		if(@rand8 <= 0){goto HH;}
+		mob_spawn "시련의폰", @rand7, @rand8, 1;
+		group_message 3, "{=q시련의탑 3단계. 폰 3개를 모두 없애라!";
+		message 3, "{=q시련의탑 3단계. 폰 3개를 모두 없애라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+		mob_spawn2 "시련의슬라임1", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "시련의슬라임2", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "시련의엘리자베스", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑4층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob2("시련의폰") >= 1){message 3, "폰을 모두 잡아주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 3,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다.."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑3층1"){group_warp "시련의탑4층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑3층2"){group_warp "시련의탑4층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑3층3"){group_warp "시련의탑4층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑3층4"){group_warp "시련의탑4층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑3층5"){group_warp "시련의탑4층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "시련의관리자", 15, 15, 1, group_bighp() * 17;
+		group_message 3, "{=q시련의탑 4단계. 모든몬스터를잡아라!";
+		message 3, "{=q시련의탑 4단계. 모든몬스터를잡아라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의도깨비불", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "시련의블랙캣", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "시련의독거미", @rand1, @rand2, 1, group_bighp() * 7;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑5층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 4,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑4층1"){group_warp "시련의탑5층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑4층2"){group_warp "시련의탑5층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑4층3"){group_warp "시련의탑5층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑4층4"){group_warp "시련의탑5층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑4층5"){group_warp "시련의탑5층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q시련의탑 5단계. 모든몬스터를잡아라!";
+		message 3, "{=q시련의탑 5단계. 모든몬스터를잡아라!";
+		mob_spawn2 "시련의관리자", 15, 15, 1, group_bighp() * 17;
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의도깨비불", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "시련의블랙캣", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "시련의독거미", @rand1, @rand2, 1, group_bighp() * 7;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑6층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 5,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑5층1"){group_warp "시련의탑6층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑5층2"){group_warp "시련의탑6층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑5층3"){group_warp "시련의탑6층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑5층4"){group_warp "시련의탑6층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑5층5"){group_warp "시련의탑6층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "시련의유니콘", 15, 15, 1, group_bighp() * 14;
+		group_message 3, "{=q시련의탑 6단계. 유니콘을잡고 다이아몬드를 획득하라!";
+		message 3, "{=q시련의탑 6단계. 유니콘을잡고 다이아몬드를 획득하라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의도깨비불", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "시련의블랙캣", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "시련의독거미", @rand1, @rand2, 1, group_bighp() * 7;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑7층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(item_exist(@myid, "시련의다이아몬드") < 1){mes 1, "다음층으로 갈수있는 다이아몬드가 없습니다."; end;}
+		item_del "시련의다이아몬드", 90;
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 6,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다.."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑6층1"){group_warp "시련의탑7층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑6층2"){group_warp "시련의탑7층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑6층3"){group_warp "시련의탑7층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑6층4"){group_warp "시련의탑7층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑6층5"){group_warp "시련의탑7층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q시련의탑 7단계. 모든몬스터를잡아라!";
+		message 3, "{=q시련의탑 7단계. 모든몬스터를잡아라!";
+		mob_spawn2 "시련의관리자", 15, 15, 1, group_bighp() * 18;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn "", @rand1, @rand2, 1;
+			mob_spawn2 "시련의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑8층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 7,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑7층1"){group_warp "시련의탑8층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑7층2"){group_warp "시련의탑8층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑7층3"){group_warp "시련의탑8층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑7층4"){group_warp "시련의탑8층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑7층5"){group_warp "시련의탑8층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		CC:
+		set @rand3, rand(1,get_mapxs(@myid)-3);
+		if(@rand3 <= 0){goto CC;}
+		DD:
+		set @rand4, rand(1,get_mapys(@myid)-3);
+		if(@rand4 <= 0){goto DD;}
+		mob_spawn "시련의폰", @rand3, @rand4, 1;
+		EE:
+		set @rand5, rand(1,get_mapxs(@myid)-3);
+		if(@rand5 <= 0){goto EE;}
+		FF:
+		set @rand6, rand(1,get_mapys(@myid)-3);
+		if(@rand6 <= 0){goto FF;}
+		mob_spawn "시련의폰", @rand5, @rand6, 1;
+		GG:
+		set @rand7, rand(1,get_mapxs(@myid)-3);
+		if(@rand7 <= 0){goto GG;}
+		HH:
+		set @rand8, rand(1,get_mapys(@myid)-3);
+		if(@rand8 <= 0){goto HH;}
+		mob_spawn "시련의폰", @rand7, @rand8, 1;
+		group_message 3, "{=q시련의탑 8단계. 폰 3개를 모두 없애라!";
+		message 3, "{=q시련의탑 8단계. 폰 3개를 모두 없애라!";
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑9층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob2("시련의폰") >= 1){message 3, "폰을 모두 잡아주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 8,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑8층1"){group_warp "시련의탑9층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑8층2"){group_warp "시련의탑9층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑8층3"){group_warp "시련의탑9층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑8층4"){group_warp "시련의탑9층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑8층5"){group_warp "시련의탑9층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q시련의탑 9단계. 모든몬스터를잡아라!";
+		message 3, "{=q시련의탑 9단계. 모든몬스터를잡아라!";
+		mob_spawn2 "시련의관리자", 15, 15, 1, group_bighp() * 18;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑10층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 9,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑9층1"){group_warp "시련의탑10층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑9층2"){group_warp "시련의탑10층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑9층3"){group_warp "시련의탑10층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑9층4"){group_warp "시련의탑10층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑9층5"){group_warp "시련의탑10층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q시련의탑 10단계. 모든몬스터를잡아라!";
+		message 3, "{=q시련의탑 10단계. 모든몬스터를잡아라!";
+		mob_spawn2 "시련의관리자", 15, 15, 1, group_bighp() * 24;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑11층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 10,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑10층1"){group_warp "시련의탑11층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑10층2"){group_warp "시련의탑11층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑10층3"){group_warp "시련의탑11층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑10층4"){group_warp "시련의탑11층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑10층5"){group_warp "시련의탑11층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q시련의탑 11단계. 시련의악충이5를 잡고, 열쇠를 획득하라!";
+		message 3, "{=q시련의탑 11단계. 시련의악충이5를 잡고, 열쇠를 획득하라!";
+			mob_spawn2 "시련의악충이5", @rand1, @rand2, 1, group_bighp() * 17;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "시련의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑12층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(item_exist(@myid, "시련의열쇠2") < 1){mes 1, "다음층으로 갈수있는 열쇠가 없습니다."; end;}
+		item_del "시련의열쇠1", 90;
+		item_del "시련의열쇠2", 90;
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 11,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑11층1"){group_warp "시련의탑12층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑11층2"){group_warp "시련의탑12층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑11층3"){group_warp "시련의탑12층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑11층4"){group_warp "시련의탑12층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑11층5"){group_warp "시련의탑12층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q시련의탑 12단계. 모든몬스터를잡아라!";
+		message 3, "{=q시련의탑 12단계. 모든몬스터를잡아라!";
+		mob_spawn2 "시련의관리자", 15, 15, 1, group_bighp() * 28;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의그림록", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록병사", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록근위병", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록퀸", @rand1, @rand2, 1, group_bighp() * 10;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑13층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 12,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑12층1"){group_warp "시련의탑13층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑12층2"){group_warp "시련의탑13층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑12층3"){group_warp "시련의탑13층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑12층4"){group_warp "시련의탑13층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑12층5"){group_warp "시련의탑13층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		CC:
+		set @rand3, rand(1,get_mapxs(@myid)-3);
+		if(@rand3 <= 0){goto CC;}
+		DD:
+		set @rand4, rand(1,get_mapys(@myid)-3);
+		if(@rand4 <= 0){goto DD;}
+		mob_spawn "시련의폰", @rand3, @rand4, 1;
+		EE:
+		set @rand5, rand(1,get_mapxs(@myid)-3);
+		if(@rand5 <= 0){goto EE;}
+		FF:
+		set @rand6, rand(1,get_mapys(@myid)-3);
+		if(@rand6 <= 0){goto FF;}
+		mob_spawn "시련의폰", @rand5, @rand6, 1;
+		GG:
+		set @rand7, rand(1,get_mapxs(@myid)-3);
+		if(@rand7 <= 0){goto GG;}
+		HH:
+		set @rand8, rand(1,get_mapys(@myid)-3);
+		if(@rand8 <= 0){goto HH;}
+		mob_spawn "시련의폰", @rand7, @rand8, 1;
+		group_message 3, "{=q시련의탑 13단계. 폰 3개를 모두 없애라!";
+		message 3, "{=q시련의탑 13단계. 폰 3개를 모두 없애라!";
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의그림록", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록병사", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록근위병", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록퀸", @rand1, @rand2, 1, group_bighp() * 10;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑14층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu(0,"다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob2("시련의폰") >= 1){message 3, "폰을 모두 잡아주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 13,1;
+		if(group_count(@myid, 0) < 2){mes 1, "같은맵에 그룹원이 2명이상존재하지 않습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "시련의탑13층1"){group_warp "시련의탑14층1", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑13층2"){group_warp "시련의탑14층2", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑13층3"){group_warp "시련의탑14층3", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑13층4"){group_warp "시련의탑14층4", 15,27; goto Go;}
+		if(get_mapname() == "시련의탑13층5"){group_warp "시련의탑14층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "시련의제왕", @rand1, @rand2, 1, group_bighp() * 40;
+		group_message 3, "{=q시련의탑 14단계. 시련의제왕을 잡아라!";
+		message 3, "{=q시련의탑 14단계. 시련의제왕을 잡아라!";
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "시련의그림록", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록병사", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록근위병", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "시련의그림록퀸", @rand1, @rand2, 1, group_bighp() * 10;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	시련의탑보상층가기	{
+	set @myid, get_myid();
+	set @select, menu(0,"보상방으로 이동하겠습니까?","이동하기[그룹]");
+	if(@select == 1){
+	if(map_objmob2("시련의제왕") >= 1){message 3, "시련의제왕 을 물리쳐 주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		broadcast 5, "[[" + get_name() +"님의 파티가 시련의탑을 격파하였습니다!! ]]";
+		group_val "#hondon", 14,1;
+		group_warp "시련의탑보상의방", 5,5;
+	}
+}
+
+0,0,0,0,0,0,0	시련의탑	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @hondone, #hondon * 150000000;
+	set @hondong, #hondon * 100;
+	set @hondonm, #hondon * 100000;
+	del @menu;
+	item_del "시련의열쇠1", 90;
+	item_del "시련의열쇠2", 90;
+	re:
+	set @rand, rand(1,4);
+	set @menu, menu(0,"시련의탑대기실로 가겠습니까?\\n[시련의탑입장티켓필요]", "예", "아니오", "보상받기");
+	if(@menu == 1){
+	if(get_level(@myid) < 99){mes 1, "레벨이 99미만이라 입장이 불가능합니다."; end;}
+	if(item_exist(@myid, "시련의탑입장티켓") == 0){
+		mes 1, "시련의탑입장티켓이 없습니다.";
+		mes 1, "즉석입장은 시련의탑입장티켓가격에 50%를 더한 150만원입니다.";
+		set @menu, menu(0,"즉석입장을 하시겠습니까?\\n[50만골드소모]", "예", "아니오");
+		if(@menu == 1){
+			if(get_money(@myid) < 500000){mes 1, "돈이 부족합니다."; end;}
+			mes 1, "시련의탑대기실로 이동합니다.";
+			if(@rand < 1 || @rnad > 4){goto re;}
+			if(@rand == 1){warp "시련의탑대기실", 14,14;}
+			if(@rand == 2){warp "시련의탑대기실", 15,14;}
+			if(@rand == 3){warp "시련의탑대기실", 14,15;}
+			if(@rand == 4){warp "시련의탑대기실", 15,15;}
+			money_del 1500000;
+			mes 3, "시련의탑대기실로 귀환하셧습니다.";		
+			del @myid;
+			end;
+		}
+		if(@menu == 2){mes 1, "안녕히 가십시오."; end;}
+	}
+	mes 1, "시련의탑입장티켓을 받았습니다.";
+	mes 1, "시련의탑대기실로 이동합니다.";
+	if(@rand < 1 || @rnad > 4){goto re;}
+	if(@rand == 1){warp "시련의탑대기실", 14,14;}
+	if(@rand == 2){warp "시련의탑대기실", 15,14;}
+	if(@rand == 3){warp "시련의탑대기실", 14,15;}
+	if(@rand == 4){warp "시련의탑대기실", 15,15;}
+	item_del "시련의탑입장티켓", 1;
+	mes 3, "시련의탑대기실로 귀환하셧습니다.";
+	end;
+	}
+	if(@menu == 3){
+		mes 1, "보상을 지급해드리겠습니다.";
+		if(#hondon < 5){mes 1, "당신은 보상을 받을수없습니다. \n보상은 5층이상부터..."; end;}
+		mes 1, "현재 당신의 마지막 시련의탑기록은" + #hondon + "층까지입니다.";
+		set #honpoint, #honpoint + #hondon;
+		exp_add @hondone;
+		money_add @hondonm;
+		set #hondon, 0;
+		mes 1, "보상 골드 : [" + @hondonm + "], 경험치 : [" + @hondone + "]을 얻었습니다.";
+		goto re;
+}
+		del @select;	
+		del @select2;
+		end;
+	}
+}
+
+0	이아추종자	{
+RE:
+ set @rand, rand(1,100);
+ if(@rand <0) goto RE;
+		mes 1, "이아의영혼이 깃든 이아의크리스탈을 제작해주고있어 관심있니?";
+		set @select, menu(0, "이아의크리스탈 만들어볼래?", "이아의크리스탈을 만든다", "생각해보니 재료가없는듯...");
+		if(@select == 1)
+		{
+		mes 1, "이아의크리스탈을 제작하겠습니다";
+		mes 1, "{=c재료는 이아의영혼10개 + 금전 1000만원";
+		mes 1, "재료를 확인해볼께";
+		set @myid, get_myid();
+		if(item_exist(@myid, "이아의영혼") >= 10){
+		if(get_money() >= 10000000) {
+			money_del "10000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 45)	{
+			item_del "이아의영혼", 10;
+			mes 1, "이아의영혼을 크리스탈에 주입하는중...............";
+			mes 1, "{=c우와~~ 축하해 여기!! 이아의크리스탈을 받아줘~!~";
+			item_add "이아의크리스탈", 1;
+			broadcast 5, "[[" + get_name() +"님이 이아의크리스탈 제작에 성공하셨습니다!! ]]";
+ 			legend_add 7, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 이아의크리스탈을 제작하다!";
+		}else{
+			item_del "이아의영혼", 7;
+			mes 1, "{=q 이런.. 영혼을 크리스탈에 주입하다 영혼몇개가 소멸해버렸어... 미안.. 주입했던 일부 영혼들은 다시돌려줄께";
+			broadcast 5, "[[" + get_name() +"님이 이아의크리스탈 제작에 실패하셨습니다ㅠ ]]";
+ 			legend_add 7, 246, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 이아의크리스탈 제작에 실패하다ㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 2)
+		{
+		mes 1, "그래 다음에또보자~~ ";
+		}
+}
+	del @select;
+	del @rand;
+	del @myid;
+}
+
+0	동쪽대륙대장장이	{
+RE:
+ set @rand, rand(1,100);
+ if(@rand <0) goto RE;
+		mes 1, "안녕하세요 동쪽대륙에서 최고의실력을 가졌다고 자부하는 대장장이입니다";
+		set @select, menu(0, "제가 마이소시아에 마스터대장장이 선발대회에서 1위를 수상한 저의 작품 리스트입니다 ", "이아의반지", "동쪽대륙정복자의귀걸이", "이아블레이드");
+		if(@select == 1)
+		{
+		mes 1, "이아의반지는 악(뮤레칸)의힘이 깃든 반지에 선(이아)의힘을 주입하는건데... 선과 악의힘이 양쪽에서 밀어내는힘이 너무쎄서 제작과정이 아주까다롭죠..  ";
+		mes 1, "{=c재료는 정화된뮤레칸의반지 + 이아의영혼10개 + 금전 1000만원입니다 !!";
+		mes 1, "자 이제 시작해볼께요 잠시 뒤로 물러나계세요";
+		set @myid, get_myid();
+		if(item_exist(@myid, "정화된뮤레칸의반지") >= 1 && item_exist(@myid, "이아의영혼") >= 10){
+		if(get_money() >= 10000000) {
+			money_del "10000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 35)	{
+			item_del "이아의영혼", 10;
+			mes 1, "이아의영혼을 정화된뮤레칸의반지에 주입하는중...............";
+			mes 1, "{=c우와~~ 축하해 여기!! 이아의반지를 받아줘  역시 내작품은 멋있어!! 사람들한테가서 자랑해줘~~!~";
+			item_add "정화된뮤레칸의반지", 1;
+			broadcast 5, "[[" + get_name() +"님이 이아의반지 제작에 성공하셨습니다!! ]]";
+ 			legend_add 7, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 이아의반지를 제작하다!";
+		}else{
+			item_del "이아의영혼", 10;
+			mes 1, "{=q 이런 이번에는 뮤레칸의힘이 너무강했어 아무리 정화된반지라지만.... 절대 내 실력에 문제가 있는건 아닌거같아... ^.^;;;;;";
+			broadcast 5, "[[" + get_name() +"님이 이아의반지 제작에 실패하셨습니다ㅠ ]]";
+ 			legend_add 7, 246, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 이아의반지 제작에 실패하다ㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 2)
+		{
+		mes 1, "동쪽대륙정복자의귀걸이? 이건내가 발명한거야!! 향상된리젠트다이아귀걸이의 화려한장식은 뗴어내고 성능을 대폭올렸지 ";
+		mes 1, "{=c재료는 향상된리젠트다이아귀걸이, 정화된보석10개, 금전5백만원만 있으면되는데 내가 전성기실력이아니라 신의가호를 받고해야겠어 이아의영혼5개도필요해";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+		if(item_exist(@myid, "향상된리젠트다이아귀걸이") >= 1 && item_exist(@myid, "정화된보석") >= 10 && item_exist(@myid, "이아의영혼") >= 5){
+		if(get_money() >= 5000000) {
+			money_del "5000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 30)	{
+                                      item_del "향상된리젠트다이아귀걸이", 1;
+			item_del "이아의영혼", 5;
+			item_del "정화된보석", 10;
+			mes 1, "기달려봐~~ 시작해볼께 일단 이것부터 분해하고...그 다음....";
+			mes 1, "후훗 봤지? 역시 내작품은멋있어!! 여기 동쪽대륙정복자의귀걸이를 받아줘 내 명성을 마이소시아에 퍼트려줘~~";
+			item_add "동쪽대륙정복자의귀걸이", 1;
+			broadcast 5, "[[" + get_name() +"님이 동쪽대륙정복자의귀걸이 제조에 성공하셨습니다!! ]]";
+ 			legend_add 7, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 동쪽대륙정복자의귀걸이를 제조하다!!";
+		}else{
+			item_del "정화된보석", 10;
+                                      item_del "이아의영혼", 5;
+                                      item_add "리젠트다이아귀걸이", 1;
+			mes 1, "{=q 이런 성능올리는 과정에서 너무 무리하게 올렸나.. 과부화되서 중요한부품이 터져버렸어  ㅠㅠ";
+			broadcast 5, "[[" + get_name() +"님이 동쪽대륙정복자의귀걸이 제조에 실패하셨습니다 ㅠ ]]";
+ 			legend_add 7, 246, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 동쪽대륙정복자의귀걸이 제조에 실패하다ㅠ.";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족한데??...";
+}
+	}else if(@select == 3)
+		{
+		mes 1, "이아블레이드는 내가 서쪽대륙으로 유학갔을때 어떤 장인한테 전수받은건데 이아의크리스탈 보석을 조각내서 한땀한땀 루딘블레이드에 박아주는건데 손이많이가는 작품이야   ";
+		mes 1, "{=c재료는 이아의크리스탈1개, 정화된보석10개, 자칼의칼10개, 금전5백만원";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+		if(item_exist(@myid, "이아의크리스탈") >= 1 && item_exist(@myid, "정화된보석") >= 10 && item_exist(@myid, "자칼의칼") >= 10 && item_exist(@myid, "루딘블레이드") >= 1){
+		if(get_money() >= 5000000) {
+			money_del "5000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 35)	{
+                                      item_del "루딘블레이드", 1;
+			item_del "이아의크리스탈", 1;
+                                      item_del "정화된보석", 10;
+                                      item_del "자칼의칼", 10;
+			mes 1, "이제 제작 시작해볼께 너무 기대하진 말아줘~";
+			mes 1, "휴..! 조각난 보석 알맹이들 계속보니까 눈이빠지겠네..ㅎㅎ 여기 이아블레이드야 동쪽대륙에서 이런무기은 처음보지? 역시 내작품이야!! ";
+			item_add "이아블레이드", 1;
+			broadcast 5, "[[" + get_name() +"님이 이아블레이드 제작에 성공하셨습니다!! ]]";
+ 			legend_add 7, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ",이아블레이드 제작에 성공하다!!";
+		}else{
+                                     item_del "이아의크리스탈", 1;
+			item_del "정화된보석", 7;
+                                      item_del "자칼의칼", 10;
+			mes 1, "{=q 이런... 너무 힘을쎄게줬나... 이아의크리스탈을 조각낸다는게 완전 가루로 만들어버렸네...";
+			broadcast 5, "[[" + get_name() +"님이 이아블레이드 제작에 실패하셨습니다 ㅠ ]]";
+ 			legend_add 7, 246, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 이아블레이드 제작에 실패하다ㅠ.";
+		}
+		}else{
+		}
+}
+	del @select;
+	del @rand;
+	del @myid;
+}

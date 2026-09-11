@@ -1,0 +1,81 @@
+{
+번호	501
+이름	피에트마을
+너비	70
+높이	70
+CRC	54570
+맵파일	db/maps/piet/maps/lod501.map
+}
+
+{
+번호	148
+이름	피에트은행
+너비	20
+높이	20
+CRC	0
+맵파일	db/maps/piet/maps/lod148.map
+}
+
+{
+번호	149
+이름	피에트주점
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/piet/maps/lod149.map
+}
+
+{
+번호	150
+이름	피에트여관
+너비	20
+높이	20
+CRC	0
+맵파일	db/maps/piet/maps/lod150.map
+}
+
+{
+번호	161
+이름	피에트시약상점
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/piet/maps/lod161.map
+}
+
+{
+번호	162
+이름	피에트음식점
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/piet/maps/lod162.map
+}
+
+{
+번호	163
+이름	피에트방어구점
+너비	12
+높이	12
+CRC	0
+맵파일	db/maps/piet/maps/lod163.map
+}
+
+{
+번호	164
+이름	피에트리콜상점
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/piet/maps/lod164.map
+}
+
+{
+번호	165
+이름	피에트무기점
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/piet/maps/lod165.map
+}
+

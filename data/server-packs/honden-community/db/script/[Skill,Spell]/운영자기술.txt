@@ -1,0 +1,47 @@
+0	SKILL_GM전체공격	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 70){message 3, "사용하기에 마력량이적습니다. [필요마나 : 70이상]"; del @myid; end;}
+	if(get_vita(@myid) < get_basevita(@myid)/100*1){message 3, "체력이 부족합니다. [필요체력 : 1%]"; del @myid; end;}
+   	manal_del "70";
+   	game_sound 44, 0;
+	skill_delay 0;
+	set@damage,get_vita(@myid)*8000000;
+	set@damage,@damage + (get_mana(@myid)*8000000);
+	set @x1, get_xs(@myid)-6;
+	set @x2, get_xs(@myid)+6;
+	set @y1, get_ys(@myid)-6;
+	set @y2, get_ys(@myid)+6;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				damaged @mob, @damage;
+    				effect @mob, 0, 373, 80;
+				}
+			}
+		}
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_GM홀리쿠라노	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<1){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del"1";
+	set@hill,get_wis(@myid)*685000;
+	set@target,spell_target();
+	set@type,istype(@target);
+	motion 128,30;
+	if(@type==3){
+		heal@target,@hill;
+		message 3,"GM홀리쿠라노를 외웠습니다.";
+		if(@target!=@myid){message1@target,3,get_name()+"님이 GM홀리쿠라노를 외워주셨습니다.";effect@target,0,71,100;}else{effect@target,71,0,100;}
+		game_sound 38,0;
+	}
+	del@myid;
+	del@target;
+	del@hill;
+	del@type;
+}

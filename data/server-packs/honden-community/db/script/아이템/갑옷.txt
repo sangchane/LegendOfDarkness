@@ -1,0 +1,11 @@
+0	바디1	{
+	set@myid,get_myid();
+	set_body@myid,"17";
+	set#Body,1;
+}
+
+0	바디2	{
+	set@myid,get_myid();
+	set_body@myid,"16";
+	set#Body,0;
+}

@@ -1,0 +1,33 @@
+script:db/script/script.txt
+script:db/script/Mob_Spell.txt
+script:db/script/Dungeon.txt
+script:db/script/EG_Shop.txt
+script:db/script/Warp_Script.txt
+script:db/script/Board.txt
+script:db/script/Guild.txt
+//엔피시관련 스크립트
+script:db/script/Npc/Npc_Script.txt
+script:db/script/Npc/Npc_Shop.txt
+script:db/script/Npc/Npc_Skill.txt
+script:db/script/Npc/Npc_Quest.txt
+script:db/script/Npc/Npc_Warp.txt
+script:db/script/Npc/Npc_Making.txt
+//아이템관련 스크립트
+script:db/script/item/Cashi.txt
+script:db/script/item/Blessing.txt
+script:db/script/item/Quest.txt
+script:db/script/item/E.T.C.txt
+script:db/script/item/Staff_Delay.txt
+script:db/script/item/Potion.txt
+//스킬관련 스크립트
+script:db/script/Skill/전사(비전직).txt
+script:db/script/Skill/도적(비전직).txt
+script:db/script/Skill/성직자(비전직).txt
+script:db/script/Skill/법사(비전직).txt
+script:db/script/Skill/무도가(비전직).txt
+script:db/script/Skill/공통스킬.txt
+script:db/script/Skill/Warrior.txt
+script:db/script/Skill/Rogue.txt
+script:db/script/Skill/Monk.txt
+script:db/script/Skill/Wizard.txt
+script:db/script/Skill/Jigja.txt

@@ -1,0 +1,40 @@
+0,0,0,0,0,0,0	미션두루마리(몬스터헌터)	{
+	set @myid, get_myid();
+	set @selcet, 0;
+	re:
+	set @select, menu("미션두루마리A! (몬스터헌터)\\n몬스터 700마리 소탕할 때마다 2000EG + 30000Gold지급!\\n달성도 : [" + #mhunting + " / 700]\\n(파티사냥시 다른유저가 잡은 몬스터도 포함.)\\n(700이 넘어가도 추가보상X)", "보상지급받기");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(#mhunting < 700){mes 0, "아직 보상을 받을수 없습니다."; end;}
+		set #mhunting, 0;
+		set #EG, #EG + 2000;
+		money_add 30000;
+		mes 0, "몬스터헌터 달성도가 초기화 됬습니다!\\n보상 2000EG + 30000Gold를 획득하셧습니다.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	미션두루마리(리쿠리쿠줍기)	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("미션두루마리B! (리쿠리쿠줍기)\\n아무 몬스터나 잡으면 떨구는 리쿠리쿠를 100개 주워오면 1000EG + 10000Gold지급!\\n달성도 : [" + #requrequ + " / 100]", "리쿠리쿠 등록하기", "보상지급받기");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(item_exist(@myid, "리쿠리쿠") >= 1){
+			set #requrequ, #requrequ + item_exist(@myid, "리쿠리쿠");
+			item_del "리쿠리쿠", item_exist(@myid, "리쿠리쿠");
+			mes 0, "리쿠리쿠를 현재까지 총 [" + #requrequ + "]개 등록 하셧습니다!";
+		}else{
+			mes 0, "리쿠리쿠를 소지하고 계시지 않습니다."; end;
+		}
+	}else if(@select == 2){
+		if(#requrequ < 100){mes 0, "아직 보상을 받을수 없습니다."; end;}
+		set #requrequ, 0;
+		set #EG, #EG + 1000;
+		money_add 10000;
+		item_del "미션두루마리B", 1;
+		mes 0 , "리쿠리쿠줍기 달성도가 초기화 됬습니다!\\n보상 1000EG + 10000Gold를 획득하셧습니다.";
+		end;
+	}
+}

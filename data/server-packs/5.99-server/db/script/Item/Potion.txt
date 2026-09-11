@@ -1,0 +1,31 @@
+0,0,0,0,0,0,0	코마디움	{
+	set @myid, get_myid();
+	if(get_state(@myid) != 0){end;}
+	item_del "코마디움", 1;
+	set @target, get_front_char(@myid);
+	if(!@target) {end;}
+	if(get_state1(@target) != 1 && get_coma(@target) == 0){end;}
+	set_state1 @target, 0;
+	set_coma @target, 0;
+	coma_delay @target, 0;
+	del_coma @target;
+	set_vita @target, 1000;
+	set_mana @target, 1000;
+	effect @target, 0, 5, 75;
+	game_sound 8,0;
+}
+
+0,0,0,0,0,0,0	엑스코마디움	{
+	set @myid, get_myid();
+	item_del "엑스코마디움", 1;
+	if(get_state1(@myid) == 1&& get_coma(@myid) == 1){
+		set_state1 @myid, 0;
+		set_coma @myid, 0;
+		coma_delay @myid, 0;
+		set_vita @myid, 1000;
+		set_mana @myid, 1000;
+		del_coma @myid;
+		effect @myid, 5, 0, 75;
+	}
+	end;
+}

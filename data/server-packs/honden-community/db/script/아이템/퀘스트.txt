@@ -1,0 +1,65 @@
+item	개방의주문서	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "개방의주문서1") && get_mapname(@myid) == "아슬론검투사의장"){
+		item_del "개방의주문서1", 1;
+		item_add "개방의주문서8", 1;
+		mes 1, "주문서가 점령에게 반응하고 있다.";
+		mes 0, "개방의주문서가 검투기의 힘을 흡수하였다.";
+		end;
+	}
+	if(item_exist(@myid, "개방의주문서1") && get_mapname(@myid) == "아슬론궁수의장"){
+		item_del "개방의주문서1", 1;
+		item_add "개방의주문서8", 1;
+		mes 1, "주문서가 점령에게 반응하고 있다.";
+		mes 0, "개방의주문서가 궁수의 힘을 흡수하였다.";
+	}
+	if(item_exist(@myid, "개방의주문서1") && get_mapname(@myid) == "아슬론소환사의장"){
+		item_del "개방의주문서1", 1;
+		item_add "개방의주문서8", 1;
+		mes 1, "주문서가 점령에게 반응하고 있다.";
+		mes 0, "개방의주문서가 소환기의 힘을 흡수하였다.";
+	}
+	if(item_exist(@myid, "개방의주문서1") && get_mapname(@myid) == "아슬론바드의장"){
+		item_del "개방의주문서1", 1;
+		item_add "개방의주문서8", 1;
+		mes 1, "주문서가 점령에게 반응하고 있다.";
+		mes 0, "개방의주문서가 바드의 힘을 흡수하였다.";
+	}
+	if(item_exist(@myid, "개방의주문서1") && get_mapname(@myid) == "아슬론포유류의장"){
+		item_del "개방의주문서1", 1;
+		item_add "개방의주문서8", 1;
+		mes 1, "주문서가 점령에게 반응하고 있다.";
+		mes 0, "개방의주문서가 포유류의 힘을 흡수하였다.";
+	}
+	if(item_exist(@myid, "개방의주문서1") && get_mapname(@myid) == "아슬론파충류의장"){
+		item_del "개방의주문서1", 1;
+		item_add "개방의주문서8", 1;
+		mes 1, "주문서가 점령에게 반응하고 있다.";
+		mes 0, "개방의주문서가 파충류의 힘을 흡수하였다.";
+	}
+	if(item_exist(@myid, "개방의주문서1") && get_mapname(@myid) == "아슬론조류의장"){
+		item_del "개방의주문서1", 1;
+		item_add "개방의주문서8", 1;
+		mes 1, "주문서가 점령에게 반응하고 있다.";
+		mes 0, "개방의주문서가 조류의 힘을 흡수하였다.";
+	}
+	if(get_mapname(@myid) == "엔도르걸쳐진방" && item_exist(@myid, "개방의주문서8")){
+		message 3, "개방의 주문서를 사용해서 엔도르킹을 소환했습니다.";
+		item_del "개방의주문서8", 1;
+		mob_spawn "엔도르킹", 16, 16, 3;
+	end;
+	}
+}
+
+item	푸른색의깃털	{
+	set @myid, get_myid();
+	set @Pugit, menu(0, "푸른색의깃털을 사용하시겠습니까? 푸른색의깃털은 아슬론마을에서만 사용 가능합니다.", "아니오", "네");
+	if(@Pugit == 2){
+		if(get_mapname(@myid) == "아슬론마을"){
+			group_warp "엔도르걸쳐진방", 27, 27;
+			warp "엔도르걸쳐진방", 15,25;
+			item_del "푸른색의깃털", 1;
+		}
+	}
+	end;
+}

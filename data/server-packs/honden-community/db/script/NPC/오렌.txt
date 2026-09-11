@@ -1,0 +1,229 @@
+0	오렌	{
+	set@myid,get_myid();
+	set@npc$,last_npc();
+	if(@npc$=="오렌항구선원"){
+		oren1:
+		set@oren,menu(0,"안녕하세요. 무엇을 도와드릴까요?","대화하기","뤼케시온출항","룸바호승선");
+		if(@oren==1){
+			mes 0,"룸바호는 오렌에서 뤼케시온으로 가는 배죠.뤼케시온까지는 바로 보내드리지만 만약 다른곳을 여행하고싶으시면 배에 승선해보세요";
+		}else if(@oren==2){
+			mes 1,"뤼케시온항구로 출발하는 배입니다. 뤼케시온항구로 가시기 위해서는 출항비 30000전이 필요합니다.";
+			set@oren2,menu(0,"뤼케시온항구로 가시겠습니까?","네","별로...");
+			if(@oren2==1){
+				if(get_money(@myid)<30000){mes 0,"출항비가 모자라는군요.";}
+				mes 1,"그럼 뤼케시온항구로 보내드리겠습니다.";
+				money_del 30000;
+				warp "뤼케시온항구",97,34;
+			}else{goto oren1;}
+		}else if(@oren==3){
+			mes 1,"룸바로에 타시겠습니까? 선장님을 만나고 싶다군요?...뭐 저야\\n상관없습니다만..그분은..음...음..이런말해도 될지 모르겠지만 얘기하길 좋아하는 분이니까요..";
+			set@oren3,menu(0,"룸바호에 타시려면 승선비 150000전만 내십쇼.","배에 탄다.","승선비도 있나..?? 안탈래..");
+			if(@oren3==1){
+				if(get_money(@myid)<150000){mes 0,"승선비가 모자라는군요.";}
+				mes 1,"어서오십쇼~~";
+				message 3,"승선비 150000전을 냈습니다.";
+				warp "룸바호",21,16;
+			}else{goto oren1;}
+		}
+		del@oren;
+	}
+	if(@npc$=="룸바호선원"){
+		set@rumbaout,menu(0,"음? 내리실려구요? 내리시면 뤼케시온항구입니다.","네, 내려주세요.","아니..그냥 심심해서..");
+		if(@rumbaout==1){
+			mes 1,"그럼 뤼케시온항구로 보내드리겠습니다.";
+			warp "뤼케시온항구",97,34;
+		}else{mes 0,"....할일 없으시면 선내나 돌아다니면서 운동이나 하시구려";}
+	}
+	if(@npc$=="귀화한해적"){
+		mes 0,"음..난 원래 해적이었지만 이제 나쁜짓은 싫어. 그래서 이 룸바호의 선원이 되었지. 아직은 걸레질정도지만 이다음엔 꼭 선장이 되고 싶어!";
+	}
+	if(@npc$=="룸바"){
+		set@rumba,menu(0,"{=c생선구이 {=a요리를 구해다주면 보답으로 물의신전에 데려다주지","자!가져왔어요 ^^","흠..무슨요리였죠??");
+		if(@rumba==1){
+			if(!item_exist(@myid,"생선구이")){mes 0,"아직도 못구했나... 빨리좀 가져다 주게.. 그분은 {=c피에트마을 식당{=a에 계시다네...";}
+			item_del "생선구이",1;
+			set #rumbaship,1;
+			mes 1,"우옷!! 이 냄새!! 제대로구만!! 크아~!!! 정말 고맙네!!";
+			mes 1,"약속했던데로 물의신전에 데려다주지.{=c선내의 지하실에 문이 하나 있는데{=a이 있는데, 그 문을 열고 나가면 물의신전에 갈 수 있다네.";
+			mes 0,"우적우적!!....크오오오~!!{=c생선구이{=a는 얼마든지 먹을 수 있어! 하하하하하하하";
+		}else if(@rumba==2){
+			mes 0,"{=c피에트마을 식당 아주머니가 만드시는 요리{=a라고 말해줬던것 같은데.-_-자네, 까마귀 고기라도 먹은게야?...";
+		}
+	}
+	if(@npc$=="문지기선원"){
+		if(#rumbaship==1){
+			mes 1,"아! 기다리고 있었습니다. 선장님께서 "+get_name(@myid)+" 님이 오시면 문을 열어주라고 말씀하셨습니다. 어서 나가시죠.";
+			set #rumbaship,0;
+			warp"물의신전",17,29;
+		}else{
+			mes 1,"저에게 무슨 볼일 이라도.. 아~ 이 문 말씀이십니까? 이 문은 운디네마을 중앙의 큰호수 지하에 위치한 물의신전으로 통해있습니다. 왜 그런지는 저도 잘 모른답니다. 아마 선장님만 알고 계실 것 같군요.";
+			mes 0,"이 문안으로 들어가보고 싶으시다고요? 이 문은 선장님의 허락없이는 절대 열어드릴 수 없습니다. 문 안으로 들어가고 싶으시다면 선장님께 가보시죠. 선장님은 2층 선장실에 계십니다.";
+		}
+	}
+	if(@npc$=="돌고래"){
+		mes 1,"대기실로 돌아가실래요? 저를 이용하시면 대기실까지 태워드릴께요.대기실로 가실거면 계속진행하시고 아직 할일이 남으셨다면 취소를 눌러주세요.";
+		if(#templeofwater==1){
+			set #templeofwater, 0;
+		}
+		warp"물의신전대기실",17,17;
+	}
+	del@npc$;
+	end;
+}
+
+0	물의신전R	{
+	set@myid,get_myid();
+	if(get_mapname(@myid)=="물의신전"){
+		if(map_objmob(@myid)==0){
+			mob_spawn4 "운디네","물의신전대기실",11,2,2;
+		}
+		warp "물의신전대기실",11,24;
+	end;
+	}
+	if(get_mapname(@myid)=="물의신전대기실"){
+		if($templeofwater==0){
+			if(#templeofchack == localtime(3)){warp"물의신전대기실",17,17;message 3,"물의신전은 하루 {=c1{=u회만 입장 가능합니다.";end;}
+			if(group_count(@myid,0)<2){warp"물의신전대기실",17,17;message 3,"적어도 한명 이상의 동료가 필요합니다 그륩 만들어 다시 오세요..";end;}
+			set #templeofchack, localtime(3);
+			set #templeofwater, 1;
+			set $templeofwater1, 0;
+			set $templeofwater2, 0;
+			set $templeofwater3, 0;
+			set $templeofwater4, 0;
+			set $templeofwater5, 0;
+			set $templeofwater6, 0;
+			set $templeofwater7, 0;
+			mob_clear "물의신전1";
+			sleep 400;
+			group_message 3, "3초뒤 물의신전을 시작합니다.";
+			message 3, "3초뒤 물의신전을 시작합니다.";
+			sleep 1000;
+			group_message 3, "2초뒤 물의신전을 시작합니다.";
+			message 3, "2초뒤 물의신전을 시작합니다.";
+			sleep 1000;
+			group_message 3, "1초뒤 물의신전을 시작합니다.";
+			message 3, "1초뒤 물의신전을 시작합니다.";
+			sleep 1000;
+			group_warp "물의신전1", 19,34;
+		}else{
+			message 3,"물의신전을 초기화 하고 있습니다. 대기 해주세요.";
+			end;
+		}
+	}
+	if(get_mapname(@myid)=="물의신전1"){
+		if(get_ys(@myid)==37&&get_xs(@myid)==7||get_xs(@myid)==8){
+			if($templeofwater1==0){
+				set $templeofwater1,1;
+				sleep 400;
+				group_message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				sleep 10000;
+				mob_spawn4 "온","물의신전1",6,36,2;
+				mob_spawn4 "온","물의신전1",7,36,2;
+				mob_spawn4 "네레이스","물의신전1",9,41,2;
+				mob_spawn4 "머메이드","물의신전1",10,41,2;
+				mob_spawn4 "네레이스","물의신전1",11,41,2;
+			}
+		}
+		else if(get_xs(@myid)==27&&get_ys(@myid)==44||get_ys(@myid)==45){
+			if($templeofwater2==0){
+				set $templeofwater2,1;
+				sleep 400;
+				group_message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				sleep 10000;
+				mob_spawn4 "온","물의신전1",26,44,2;
+				mob_spawn4 "온","물의신전1",26,45,2;
+				mob_spawn4 "네레이스","물의신전1",30,38,2;
+				mob_spawn4 "머메이드","물의신전1",30,39,2;
+				mob_spawn4 "머메이드","물의신전1",30,40,2;
+				mob_spawn4 "네레이스","물의신전1",30,41,2;
+				mob_spawn4 "젤리피쉬","물의신전1",31,39,2;
+				mob_spawn4 "젤리피쉬","물의신전1",31,40,2;
+			}
+		}
+		else if(get_xs(@myid)==23&&get_ys(@myid)==3||get_ys(@myid)==4){
+			if($templeofwater3==0){
+				set $templeofwater3,1;
+				sleep 400;
+				group_message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				sleep 10000;
+				mob_spawn4 "온","물의신전1",22,3,2;
+				mob_spawn4 "온","물의신전1",22,4,2;
+				mob_spawn4 "온","물의신전1",33,5,2;
+				mob_spawn4 "온","물의신전1",33,6,2;
+				mob_spawn4 "온","물의신전1",27,15,2;
+				mob_spawn4 "온","물의신전1",28,15,2;
+				mob_spawn4 "네레이스","물의신전1",27,6,2;
+				mob_spawn4 "머메이드","물의신전1",27,7,2;
+				mob_spawn4 "머메이드","물의신전1",27,8,2;
+				mob_spawn4 "네레이스","물의신전1",27,9,2;
+				mob_spawn4 "젤리피쉬","물의신전1",28,7,2;
+				mob_spawn4 "젤리피쉬","물의신전1",28,8,2;
+			}
+		}
+		else if(get_xs(@myid)==39&&get_ys(@myid)==5||get_ys(@myid)==6){
+			if($templeofwater4==0){
+				set $templeofwater4,1;
+				sleep 400;
+				group_message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				sleep 10000;
+				mob_spawn4 "온","물의신전1",38,5,2;
+				mob_spawn4 "온","물의신전1",38,6,2;
+				mob_spawn4 "젤리피쉬","물의신전1",44,6,2;
+				mob_spawn4 "머메이드","물의신전1",44,7,2;
+				mob_spawn4 "젤리피쉬","물의신전1",44,8,2;
+			}
+		}
+		else if(get_ys(@myid)==21&&get_xs(@myid)==27||get_xs(@myid)==28){
+			if($templeofwater5==0){
+				set $templeofwater5,1;
+				sleep 400;
+				group_message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				sleep 10000;
+				mob_spawn4 "온","물의신전1",27,20,2;
+				mob_spawn4 "온","물의신전1",28,20,2;
+				mob_spawn4 "온","물의신전1",30,23,2;
+				mob_spawn4 "온","물의신전1",30,24,2;
+				mob_spawn4 "젤리피쉬","물의신전1",25,23,2;
+				mob_spawn4 "머메이드","물의신전1",25,24,2;
+				mob_spawn4 "네레이스","물의신전1",25,25,2;
+			}
+		}
+		else if(get_xs(@myid)==36&&get_ys(@myid)==27||get_ys(@myid)==28){
+			if($templeofwater6==0){
+				set $templeofwater6,1;
+				sleep 400;
+				group_message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				sleep 10000;
+				mob_spawn4 "온","물의신전1",35,27,2;
+				mob_spawn4 "온","물의신전1",35,28,2;
+				mob_spawn4 "온","물의신전1",44,34,2;
+				mob_spawn4 "온","물의신전1",45,34,2;
+				mob_spawn4 "네레이스","물의신전1",41,28,2;
+				mob_spawn4 "머메이드","물의신전1",42,29,2;
+				mob_spawn4 "네레이스","물의신전1",41,30,2;
+				mob_spawn4 "젤리피쉬","물의신전1",43,28,2;
+				mob_spawn4 "젤리피쉬","물의신전1",43,30,2;
+			}
+		}
+		else if(get_xs(@myid)==47&&get_ys(@myid)==46||get_ys(@myid)==46){
+			if($templeofwater7==0){
+				set $templeofwater7,1;
+				sleep 400;
+				group_message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				message 3, "10초 뒤 몬스터가 소환됩니다. 모두 색상 라인 안으로 들어와주십시오.";
+				sleep 10000;
+				mob_spawn4 "온","물의신전1",46,45,2;
+				mob_spawn4 "온","물의신전1",47,45,2;
+				mob_spawn4 "젤리피쉬","물의신전1",40,44,2;
+				mob_spawn4 "머메이드","물의신전1",40,45,2;
+				mob_spawn4 "젤리피쉬","물의신전1",40,46,2;
+			}
+		}
+	}
+}

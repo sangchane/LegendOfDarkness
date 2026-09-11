@@ -1,0 +1,169 @@
+0,0,0,0,0,0,0	Dungeon__Script	{
+	set @myid, get_myid();
+	if(get_map_stage(@myid) == 0 || !get_map_stage(@myid)){
+		set #stage2, 0;
+	}
+	if(get_map_stage(@myid) == 1){
+		if(get_map_sub_stage(@myid) == 3){
+			if(map_objmob(@myid) <= 0){
+				if(#end_time > 0){set #end_time, #end_time - 1; message 3, "{=c안내 : " + #end_time + "초뒤 던전에서 퇴장합니다."; end;}
+				if(get_level(@myid) < 5){set @point, (5 - get_level(@myid)) * 2; set_point get_point(@myid) + @point; set_level 5;}
+				set #realmap, 4;
+				set_nation @myid, 1;
+				message 8, "{=u\\n던전클리어\\n\\n던전이름 : 초보자튜토리얼\\n\\n클리어타임(초) : " + get_clear_time(@myid) + "\\n\\n잡은 몬스터수 : " + get_kill_mob(@myid) + "\\n\\n클리어경험치 : 레벨5\\n\\n마이소시아 국적을 따셧습니다!";
+				legend_add 1, 75, "어둠의전설, 초보자 튜토리얼을 완료 하였다.";
+				warp "노비스마을", 38,31;
+				effect @myid, 79, 0, 100;
+			}else{set #end_time, 5;}
+		}
+	}
+	if(get_map_stage(@myid) == 2){
+		if(get_map_sub_stage(@myid) == 3){
+			if(map_objmob(@myid) <= 0){
+				if(#end_time > 0){set #end_time, #end_time - 1; message 3, "{=c안내 : " + #end_time + "초뒤 던전에서 퇴장합니다."; end;}
+				exp_add 50000;
+				message 8, "{=u\\n던전클리어\\n\\n던전이름 : 노비스지하동굴\\n\\n클리어타임(초) : " + get_clear_time(@myid) + "\\n\\n잡은 몬스터수 : " + get_kill_mob(@myid) + "\\n\\n클리어경험치 : 50000";
+				warp "노비스지하던전B2", 16,16;
+			}else{set #end_time, 5;}
+		}
+	}
+	if(get_map_stage(@myid) == 3){
+		if(get_map_sub_stage(@myid) == 1){
+			if(get_xs(@myid) == #fota_x && get_ys(@myid) == #fota_y){end;}
+			if(rand(1,5) == 3){
+				if(item_exist(@myid, "엔트자이언트의날개")){message 3, "엔트자이언트의 날개를 소모하였다."; item_del "엔트자이언트의날개", 1; end;}
+				set_coma @myid, 1; set_state 1,1; coma_delay @myid, 12; end;
+				}
+			set #fota_x, get_xs(@myid);
+			set #fota_y, get_ys(@myid);
+		}
+		if(get_map_sub_stage(@myid) == 3){
+			if(map_objmob(@myid) <= 0){
+				if(#end_time > 0){set #end_time, #end_time - 1; message 3, "{=c안내 : " + #end_time + "초뒤 던전에서 퇴장합니다."; end;}
+				exp_add 200000;
+				message 8, "{=u\\n던전클리어\\n\\n던전이름 : 포테의숲오솔길\\n\\n클리어타임(초) : " + get_clear_time(@myid) + "\\n\\n잡은 몬스터수 : " + get_kill_mob(@myid) + "\\n\\n클리어경험치 : 200000";
+				warp "포테의숲5존", 16,16;
+			}else{set #end_time, 5;}
+		}
+	}
+	if(get_map_stage(@myid) == 4){
+		if(map_objmob(@myid) <= 0){
+			if(#end_time > 0){set #end_time, #end_time - 1; message 3, "{=c안내 : " + #end_time + "초뒤 던전에서 퇴장합니다."; end;}
+			message 8, "{=u\\n던전클리어\\n\\n던전이름 : 박물관옥탑\\n\\n클리어타임(초) : " + get_clear_time(@myid) + "\\n\\n잡은 몬스터수 : " + get_kill_mob(@myid);
+			warp "박물관3층", 12,18;
+		}else{set #end_time, 5;}
+	}
+	if(get_map_stage(@myid) == 6){
+		if(map_objmob(@myid) <= 0 && #bloodearl == 2){
+			group_val "#bloodearl", 3, 1;
+			sleep 1300;
+			if(map_objmob(@myid)){end;}
+			mob_spawn2 "블러드백작", 14, 18, 1, group_bighp() * 23;
+			group_message 3, "{=c안내 : 블러드백작이 잠에서 깨어 났습니다!";
+			message 3, "{=c안내 : 블러드백작이 잠에서 깨어 났습니다!";
+			set @mob, get_mobxy(14, 18);
+			effect @mob, 0, 306, 200;
+			mob_say2 @mob, 0, 0, "누가 감히 나의 잠을 깨우느냐!!";
+		}
+		if(#bloodearl == 4){set #end_time, 10; set #bloodearl, 5;}
+		if(#bloodearl == 5){
+			if(#end_time > 0){set #end_time, #end_time - 1; message 3, "{=c안내 : " + #end_time + "초뒤 던전에서 퇴장합니다."; end;}
+			exp_add 5000000;
+			message 8, "{=u\\n던전클리어\\n\\n던전이름 : 블러드백작의결계\\n\\n클리어타임(초) : " + get_clear_time(@myid) + "\\n\\n잡은 몬스터수 : " + get_kill_mob(@myid) + "\\n\\n경험치 : 5백만";
+			warp "베크나탑미로대기실", 11,6;
+		}
+	}
+	if(get_map_stage(@myid) == 9){
+		if(get_map_sub_stage(@myid) == 2){
+			if(map_objmob(@myid) <= 0 && #jobquest1 == 0){
+				sleep rand(100,800);
+				if(#jobquest1 != 0){end;}
+				group_val "#jobquest1", 1, 1;
+				mob_spawn2 "결계남전사", 1, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계여도적", 3, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계남법사", 4, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계전사", 4, 1, 1, group_bighp() * 13;
+				mob_spawn2 "결계여직자", 5, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계남도가", 7, 4, 1, group_bighp() * 8;
+			}
+			if(map_objmob(@myid) <= 0 && #jobquest1 == 1){
+				group_val "#jobquest1", 2, 1;
+			}
+		}
+		if(get_map_sub_stage(@myid) == 3){
+			if(map_objmob(@myid) <= 0 && #jobquest2 == 0){
+				sleep rand(100,800);
+				if(#jobquest2 != 0){end;}
+				group_val "#jobquest2", 1, 1;
+				mob_spawn2 "결계남전사", 1, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계여도적", 3, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계남법사", 4, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계도적", 4, 1, 1, group_bighp() * 13;
+				mob_spawn2 "결계여직자", 5, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계남도가", 7, 4, 1, group_bighp() * 8;
+			}
+			if(map_objmob(@myid) <= 0 && #jobquest2 == 1){
+				group_val "#jobquest2", 2, 1;
+			}
+		}
+		if(get_map_sub_stage(@myid) == 4){
+			if(map_objmob(@myid) <= 0 && #jobquest3 == 0){
+				sleep rand(100,800);
+				if(#jobquest3 != 0){end;}
+				group_val "#jobquest3", 1, 1;
+				mob_spawn2 "결계남전사", 1, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계여도적", 3, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계남법사", 4, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계도가", 4, 1, 1, group_bighp() * 13;
+				mob_spawn2 "결계여직자", 5, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계남도가", 7, 4, 1, group_bighp() * 8;
+			}
+			if(map_objmob(@myid) <= 0 && #jobquest3 == 1){
+				group_val "#jobquest3", 2, 1;
+			}
+		}
+		if(get_map_sub_stage(@myid) == 5){
+			if(map_objmob(@myid) <= 0 && #jobquest4 == 0){
+				sleep rand(100,800);
+				if(#jobquest4 != 0){end;}
+				group_val "#jobquest4", 1, 1;
+				mob_spawn2 "결계남전사", 4, 1, 1, group_bighp() * 8;
+				mob_spawn2 "결계여도적", 4, 3, 1, group_bighp() * 8;
+				mob_spawn2 "결계남법사", 4, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계법사", 1, 4, 1, group_bighp() * 13;
+				mob_spawn2 "결계여직자", 4, 5, 1, group_bighp() * 8;
+				mob_spawn2 "결계남도가", 4, 7, 1, group_bighp() * 8;
+			}
+			if(map_objmob(@myid) <= 0 && #jobquest4 == 1){
+				group_val "#jobquest4", 2, 1;
+			}
+		}
+		if(get_map_sub_stage(@myid) == 6){
+			if(map_objmob(@myid) <= 0 && #jobquest5 == 0){
+				sleep rand(100,800);
+				if(#jobquest5 != 0){end;}
+				group_val "#jobquest5", 1, 1;
+				mob_spawn2 "결계남전사", 4, 1, 1, group_bighp() * 8;
+				mob_spawn2 "결계여도적", 4, 3, 1, group_bighp() * 8;
+				mob_spawn2 "결계남법사", 4, 4, 1, group_bighp() * 8;
+				mob_spawn2 "결계직자", 1, 4, 1, group_bighp() * 13;
+				mob_spawn2 "결계여직자", 4, 5, 1, group_bighp() * 8;
+				mob_spawn2 "결계남도가", 4, 7, 1, group_bighp() * 8;
+			}
+			if(map_objmob(@myid) <= 0 && #jobquest5 == 1){
+				group_val "#jobquest5", 2, 1;
+			}
+		}
+		if(get_map_sub_stage(@myid) == 8){
+			if(#jobquest6 == 2){
+				set #end_time, 6;
+				set #jobquest6, 3;
+			}else if(#jobquest6 == 3){
+				if(#end_time > 0){set #end_time, #end_time - 1; message 3, "{=c안내 : " + #end_time + "초뒤 던전에서 퇴장합니다."; end;}
+				exp_add 450000000;
+				message 8, "{=u\\n던전클리어\\n\\n던전이름 : 직업퀘스트\\n\\n클리어타임(초) : " + get_clear_time(@myid) + "\\n\\n잡은 몬스터수 : " + get_kill_mob(@myid) + "\\n\\n경험치 : 450000000";
+				warp "죽음의마을입구5", 10,10;
+			}
+		}
+	}
+}

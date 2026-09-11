@@ -1,0 +1,109 @@
+{
+번호	14
+이름	라이트닝무브
+이미지	55
+타입	5
+딜레이	0
+script_do	SPELL_라이트닝무브
+}
+
+{
+번호	15
+이름	하이드
+이미지	10
+타입	5
+딜레이	0
+script_do	SPELL_하이드
+}
+
+{
+번호	16
+이름	함정찾기1
+이미지	105
+타입	5
+딜레이	0
+script_do	SPELL_함정찾기1
+}
+
+{
+번호	17
+이름	함정찾기2
+이미지	106
+타입	5
+딜레이	0
+script_do	SPELL_함정찾기2
+}
+
+{
+번호	18
+이름	센서스
+이미지	7
+타입	5
+딜레이	0
+script_do	SPELL_센서스
+}
+
+{
+번호	19
+이름	하이더
+이미지	131
+타입	2
+딜레이	1
+script_do	SPELL_하이더
+}
+
+{
+이름	Charge(Lev1)
+이미지	159
+타입	2
+딜레이	0
+script_do	SPELL_Charge
+}
+
+{
+이름	Charge(Lev2)
+이미지	159
+타입	2
+딜레이	0
+script_do	SPELL_Charge
+}
+
+{
+이름	Charge(Lev3)
+이미지	159
+타입	2
+딜레이	0
+script_do	SPELL_Charge
+}
+
+{
+이름	Charge(Lev4)
+이미지	159
+타입	2
+딜레이	0
+script_do	SPELL_Charge
+}
+
+{
+이름	회심의저격(Lev1)
+이미지	209
+타입	2
+딜레이	0
+script_do	SPELL_회심의저격
+}
+
+{
+이름	회심의저격(Lev2)
+이미지	209
+타입	2
+딜레이	0
+script_do	SPELL_회심의저격
+}
+
+{
+이름	회심의저격(Lev3)
+이미지	209
+타입	2
+딜레이	0
+script_do	SPELL_회심의저격
+}

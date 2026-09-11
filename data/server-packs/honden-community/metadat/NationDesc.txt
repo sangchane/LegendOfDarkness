@@ -1,0 +1,14 @@
+nation_0	
+nation_1	마이소시아
+nation_2	하이엘
+nation_3	아스타로스
+nation_4	운영자
+nation_5	노에스
+nation_6	알세이드스
+nation_7	실라이온
+nation_8	아만자치국
+nation_9	엔다리온
+nation_10	셀라임
+nation_11	엘카
+nation_12	나겔링
+nation_13	모두의서

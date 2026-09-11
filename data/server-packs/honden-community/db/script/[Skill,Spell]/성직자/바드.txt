@@ -1,0 +1,783 @@
+0	SKILL_연주공격(Lev1)	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*40;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*112;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (112 + @sex);
+				break;
+			}
+		}
+	}
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}
+
+0	SKILL_연주공격(Lev2)	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*50;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*112;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (112 + @sex);
+				break;
+			}
+		}
+	}
+
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}
+
+0	SKILL_연주공격(Lev3)	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*60;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*112;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (112 + @sex);
+				break;
+			}
+		}
+	}
+
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}
+
+0	SKILL_연주공격(Lev4)	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*70;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*112;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (112 + @sex);
+				break;
+			}
+		}
+	}
+
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}
+
+0	SKILL_연주공격(Lev5)	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*80;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*112;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (112 + @sex);
+				break;
+			}
+		}
+	}
+
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}
+
+0	SKILL_연주공격(Lev6)	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*100;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*112;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (112 + @sex);
+				break;
+			}
+		}
+	}
+
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}
+
+0	SKILL_연주공격(Lev7)	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*130;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*112;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (112 + @sex);
+				break;
+			}
+		}
+	}
+
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,0,0;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,0,0;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,0,0;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}
+
+0	SPELL_홀리쿠라네라(Lev1)	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<3120){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del"3120";
+	set@hill,get_wis(@myid)*1000;
+	message 3,"홀리쿠라네라(Lev1)를 외웠습니다.";
+	group_message 3,get_name()+"님이 홀리쿠라네라(Lev1)를 외워주셧습니다.";
+	group_hill @hill, 1000;
+	if(#blackset == 1||#blacksetchar == 1){
+		heal @myid, @hill;
+	}else{
+		group_hill @hill, 1000;
+	}
+	motion 128,30;
+	game_sound 38,0;
+	del@hill;
+	end;
+}
+
+0	SPELL_홀리쿠라네라(Lev2)	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<3120){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del"3120";
+	set@hill,get_wis(@myid)*1100;
+	message 3,"홀리쿠라네라(Lev2)를 외웠습니다.";
+	group_message 3,get_name()+"님이 홀리쿠라네라(Lev2)를 외워주셧습니다.";
+	group_hill @hill, 1100;
+	if(#blackset == 1||#blacksetchar == 1){
+		heal @myid, @hill;
+	}else{
+		group_hill @hill, 2100;
+	}
+	motion 128,30;
+	game_sound 38,0;
+	del@hill;
+	end;
+}
+
+0	SPELL_홀리쿠라네라(Lev3)	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<3120){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del"3120";
+	set@hill,get_wis(@myid)*1500;
+	message 3,"홀리쿠라네라(Lev3)를 외웠습니다.";
+	group_message 3,get_name()+"님이 홀리쿠라네라(Lev3)를 외워주셧습니다.";
+	group_hill @hill, 3200;
+	if(#blackset == 1||#blacksetchar == 1){
+		heal @myid, @hill;
+	}else{
+		group_hill @hill, 3200;
+	}
+	motion 128,30;
+	game_sound 38,0;
+	del@hill;
+	end;
+}
+
+0	SPELL_홀리쿠라네라(Lev4)	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<3120){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del"3120";
+	set@hill,get_wis(@myid)*2000;
+	message 3,"홀리쿠라네라(Lev4)를 외웠습니다.";
+	group_message 3,get_name()+"님이 홀리쿠라네라(Lev4)를 외워주셧습니다.";
+	group_hill @hill, 4300;
+	if(#blackset == 1||#blacksetchar == 1){
+		heal @myid, @hill;
+	}else{
+		group_hill @hill, 4300;
+	}
+	motion 128,30;
+	game_sound 38,0;
+	del@hill;
+	end;
+}
+
+0	SPELL_리젠	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<3000){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del 3000;
+	set@target,spell_target();
+	set@type,istype(@target);
+	if(@type!=3){end;}
+	if(#Regen==1){
+		hprecovery@target,15,get_basevita2(@target) / 100*10;
+		message 3,"리젠1을 외웠습니다.";
+		if(@target!=@myid){message1@target,3,get_name()+"님께서 리젠(Lev1)를 외워주셨습니다.";}
+	}
+	if(#Regen==2){
+		hprecovery@target,15,get_basevita2(@target) / 100*20;
+		message 3,"리젠2을 외웠습니다.";
+		if(@target!=@myid){message1@target,3,get_name()+"님께서 리젠(Lev2)를 외워주셨습니다.";}
+	}
+	if(#Regen==3){
+		hprecovery@target,15,get_basevita2(@target) / 100*30;
+		message 3,"리젠3을 외웠습니다.";
+		if(@target!=@myid){message1@target,3,get_name()+"님께서 리젠(Lev3)를 외워주셨습니다.";}
+	}
+	if(#Regen==4){
+		hprecovery@target,15,get_basevita2(@target) / 100*40;
+		message 3,"리젠4을 외웠습니다.";
+		if(@target!=@myid){message1@target,3,get_name()+"님께서 리젠(Lev4)를 외워주셨습니다.";}
+	}
+	game_sound 8,0;
+}
+
+0	SPELL_슈페이아움	{
+	set@myid,get_myid();
+	set@time,time()-#iaum1;
+	if(@time<60){set@time2,60-@time;message 3,"재사용까지"+@time2+"초 남으셧습니다.";end;}
+	if(get_mana(@myid)<3120){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del"3120";
+	if(group_exist(@myid)==0){end;}
+	if(#bardum==1){iaum_delay 2,50;message 3,"슈페이아움(Lev1)을 외웠습니다.";}
+	if(#bardum==2){iaum_delay 2,60;message 3,"슈페이아움(Lev2)을 외웠습니다.";}
+	if(#bardum==3){iaum_delay 2,70;message 3,"슈페이아움(Lev3)을 외웠습니다.";}
+	if(#bardum==4){iaum_delay 2,80;message 3,"슈페이아움(Lev4)을 외웠습니다.";}
+	game_sound 38,0;
+	set #iaum1,time();
+}
+
+0	SKILL_세오의비명	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,(get_basemana2(@myid)*1)/100*180;
+	set @i, 0;
+	set @y, 0;
+	set @damage, 0;
+	set @sex, 0;
+	if(get_basemana2(@myid) <= 100000){
+		set@dam,@dam/100*312;
+	}else{
+		for(set @i, @i;  @i <= 100; set @i, @i+1){
+			set @sex, @sex+1;		
+			if(100000 +(@sex * 10000) >  get_basemana2(@myid)){
+				set @dam, @dam / 100 * (312 + @sex);
+				break;
+			}
+		}
+	}
+
+	set@side,get_side(@myid);
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){
+		switch(@side){
+		case 0:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,381,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,381,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,381,100;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,381,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,381,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,381,100;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,381,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,381,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,381,100;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,381,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,381,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,381,100;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,0,0;
+	motion 137,20;
+	game_sound 1,0;
+	skill_delay 1;
+	del@dam;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@x1;
+	del@y1;
+	del@i;
+	del@y;
+	del@damage;
+	del@sex;
+	del@skill_delay;
+	end;
+}

@@ -1,0 +1,383 @@
+0	__Shop_Script__	{
+	set@myid,get_myid();
+	set @sel1, 0;
+	set @sel2, 0;
+	reshop:
+	set @sel1, menu(0, "안녕하세요. 무엇을 도와드릴까요? 포인트 충전은 게임상 관리자 문의 \\n{=q현재 보유 게임포인트(GP) : ["+get_love(@myid)+"]\\n{=e※아이템복사 및 정상적인 경로가 아닌 포인트이용은 {=b벤{=e 입니다.", "{=u상점 이용하기", "{=u도움말", "{=w버닝 {=a이벤트란?");
+	if(@sel1 == 0){goto reshop;}
+	if(@sel1 == 1){
+		re:
+		npc_look @myid, 0, 0;
+		set @sel2, menu(0, "원하시는 품목을 선택해주세요.\\n{=q현재 보유 게임포인트(GP) : ["+get_love(@myid)+"]", "{=w캐시 아이템(무료)", "{=u장비류", "{=u생활잡화", "{=u신망포인트 환전", "이전으로");
+		if(@sel2 == 0){goto re;}
+		if(@sel2 == 1){
+			set @cesh, menu(0, "상단{=c 메뉴얼을 통해 다양한 캐시아이템을 확인해보실수 있습니다.", "의상", "날개", "무기", "이펙트", "생활잡화", "이전으로");
+			if(@cesh == 1){
+				cash_shop 0, "캐시의상", "원하시는 것을 골라보세요.";
+			}else if(@cesh == 2){
+				shop 0, "캐시날개", "원하시는 것을 골라보세요.";
+			}else if(@cesh == 3){
+				shop 0, "캐시무기", "원하시는 것을 골라보세요.";
+			}else if(@cesh == 4){
+				shop 0, "캐시이펙트", "원하시는 것을 골라보세요.";
+			}else if(@cesh == 5){
+				shop 0, "생활잡화", "원하시는 것을 골라보세요.";
+			}else{goto re;}
+		}else if(@sel2 == 2){
+			A1:
+			set @sel2,menu(0,"원하시는 품목을 골라주세요.","귀걸이", "무기류", "반지류", "세트류", "이전으로");
+			if(@sel2==1){
+				A2:
+				set @sel4, menu(0, "무엇을 사시게요?", "퀸셰어의귀걸이(10일) : 운영자 문의", "루딘의귀걸이(10일) : 운영자 문의", "강화된리젠트다이아귀걸이(무제한) : 10000point", "향상된리젠트다이아귀걸이(무제한) : 15000point", "이전으로");
+				if(@sel4 == 1){
+					mes 1,"{=c퀸셰어의귀걸이(10일){=a를 구입하시려면 운영자에게 문의주시길 바랍니다.";
+					goto re;
+				}else if(@sel4 == 2){
+					mes 1,"{=c루딘의귀걸이(10일){=a를 구입하시려면 운영자에게 문의주시길 바랍니다.";
+					goto re;
+				}else if(@sel4 == 3){
+					set @menu, menu(0, "{=c강화된리젠트다이아귀걸이(무제한) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "강화된리젠트다이아귀걸이", 1;
+						message 8, "강화된리젠트다이아귀걸이(무제한)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A2;}
+				}else if(@sel4 == 4){
+					set @menu, menu(0, "{=c향상된리젠트다이아귀걸이(무제한) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 15000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 15000;
+						item_add "향상된리젠트다이아귀걸이", 1;
+						message 8, "향상된리젠트다이아귀걸이(무제한)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A2;}
+				}else{goto re;}
+			}else if(@sel2==2){
+				A3:
+				set @sel4, menu(0, "무엇을 사시게요?", "채집망 : {=w무료", "루딘블레이드 : 10000point", "이전으로");
+				if(@sel4 == 1){
+					set @menu, menu(0, "{=c채집망 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						item_add "채집망", 1;
+						message 8, "채집망을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A3;}
+				}else if(@sel4 == 2){
+					set @menu, menu(0, "{=c루딘블레이드 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "루딘블레이드", 1;
+						message 8, "루딘블레이드를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A3;}
+				}else{goto re;}
+			}else if(@sel2==3){
+				A5:
+				set @sel4, menu(0, "무엇을 사시게요?", "세피라링(Lev10) : 5000point", "강화된세피라링(Lev10) : 7000point", "이전으로");
+				if(@sel4 == 1){
+					set @menu, menu(0, "{=c세피라링(Lev10) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 5000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 5000;
+						item_add "세피라링(Lev10)", 1;
+						message 8, "세피라링(Lev10)를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A5;}
+				}else if(@sel4 == 2){
+					set @menu, menu(0, "{=c강화된세피라링(Lev10) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 7000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 7000;
+						item_add "강화된세피라링(Lev10)", 1;
+						message 8, "강화된세피라링(Lev10)를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A5;}
+				}else{goto re;}
+			}else if(@sel2==4){
+				A4:
+				set @menu, menu(0, "무엇을 사시게요?\\n{=e아이템 종류마다 착용 직업군이 다르니 신중하게 선택하시길 바랍니다.", "  {=w(12/22~12/31)군인세트 : 5000point",  "  윌화이어세트A(순수전사) : 10000point", "윌화이어세트B(전직용전사) : 10000point", "       레인헌트세트(도적) : 10000point", "     브레스럭세트(마법사) : 10000point", "     페이로브세트(성직자) : 10000point", "       브릴윙세트(무도가) : 10000point","이전으로");
+				if(@menu == 1){
+					set @menu2, menu(0, "{=c군인세트 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu2 == 1){
+						if(get_love(@myid) < 5000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 5000;
+						item_add "군인옷", 1;
+						item_add "군인모자", 1;
+                                                                           item_add "완전군장", 1;
+                                                                           item_add "화생방방독면", 1;
+                                                                           item_add "K2소총", 1;
+						message 8, "군인세트를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A4;}
+				}else if(@menu == 2){
+					set @menu2, menu(0, "{=c윌화이어세트A {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu2 == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "윌화이어아머A", 1;
+						item_add "윌화이어투구A", 1;
+						item_add "윌화이어장갑A", 1;
+						item_add "윌화이어각반A", 1;
+						message 8, "윌화이어세트A를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A4;}
+				}else if(@menu == 3){
+					set @menu2, menu(0, "{=c윌화이어세트B {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu2 == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "윌화이어아머B", 1;
+						item_add "윌화이어투구B", 1;
+						item_add "윌화이어장갑B", 1;
+						item_add "윌화이어각반B", 1;
+						message 8, "윌화이어세트B를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A4;}
+				}else if(@menu == 4){
+					set @menu2, menu(0, "{=c레인헌트세트 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu2 == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "레인헌트아머", 1;
+						item_add "레인헌트투구", 1;
+						item_add "레인헌트장갑", 1;
+						item_add "레인헌트각반", 1;
+						message 8, "레인헌트세트를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A4;}
+				}else if(@menu == 5){
+					set @menu2, menu(0, "{=c브레스럭세트 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu2 == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "브레스럭아머", 1;
+						item_add "브레스럭투구", 1;
+						item_add "브레스럭장갑", 1;
+						item_add "브레스럭각반", 1;
+						message 8, "브레스럭세트를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A4;}
+				}else if(@menu == 6){
+					set @menu2, menu(0, "{=c페이로브세트 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu2 == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "페이로브아머", 1;
+						item_add "페이로브투구", 1;
+						item_add "페이로브장갑", 1;
+						item_add "페이로브각반", 1;
+						message 8, "페이로브세트를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A4;}
+				}else if(@menu == 7){
+					set @menu2, menu(0, "{=c브릴윙세트 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu2 == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "브릴윙아머", 1;
+						item_add "브릴윙투구", 1;
+						item_add "브릴윙팔찌", 1;
+						item_add "브릴윙각반", 1;
+						message 8, "브릴윙를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto A4;}
+				}else{goto re;}
+			}else{goto re;}
+		}else if(@sel2 == 3){
+			B1:
+			set @sel3,menu(0,"원하시는 품목을 골라주세요.","기능성 아이템","치창 아이템","소비 아이템","이전으로");
+			if(@sel3==1){
+				B2:
+				set @sel4, menu(0, "무엇을 사시게요?", "마법의리콜(100일) : 100point", "리턴스피릿(10개) : 1000point", "채집용꿀(50개) : 500point", "가방열쇠 : 1000point", "이전으로");
+				if(@sel4==1){
+					set @menu, menu(0, "{=c마법의리콜(100일) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 100){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 100;
+						item_add_term @myid,"마법의리콜", 1, 8640000;
+						message 8, "마법의리콜(100일)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B2;}
+				}else if(@sel4==2){
+					set @menu, menu(0, "{=c리턴스피릿(10개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(item_exist(@myid,"리턴스피릿")>5){mes 1,"더 구입하실 수 없습니다.";goto re;}
+						if(get_love(@myid) < 1000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 1000;
+						item_add "리턴스피릿", 10;
+						message 8, "리턴스피릿(10개)를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B2;}
+				}else if(@sel4==3){
+					set @menu, menu(0, "{=c채집용꿀(50개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(item_exist(@myid,"채집용꿀")>951){mes 1,"더 구입하실 수 없습니다.";goto re;}
+						if(get_love(@myid) < 500){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 500;
+						item_add "채집용꿀", 50;
+						message 8, "채집용꿀(50개)를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B2;}
+				}else if(@sel4==4){
+					set @menu, menu(0, "{=c가방열쇠 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 1000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 1000;
+						item_add "가방열쇠", 1;
+						message 8, "가방열쇠를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B2;}
+				}else{goto B1;}
+			}else if(@sel3==2){
+				B3:
+				set @sel4, menu(0, "무엇을 사시게요?", "성전환캡슐 : 2000point", "변환키트-승급의상 : 1000point", "변환키트-화론의상 : 1000point", "변환키트-캐시의상 : 1000point", "이전으로");
+				if(@sel4==1){
+					set @menu, menu(0, "{=c성전환캡슐 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 1000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 1000;
+						item_add "성전환캡슐", 1;
+						message 8, "성전환캡슐 를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B3;}
+				}else if(@sel4==2){
+					set @menu, menu(0, "{=c변환키트-승급의상 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 500){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 500;
+						item_add "변환키트-승급의상", 1;
+						message 8, "변환키트-승급의상 를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B3;}
+				}else if(@sel4==3){
+					set @menu, menu(0, "{=c변환키트-화론의상 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 500){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 500;
+						item_add "변환키트-화론의상", 1;
+						message 8, "변환키트-화론의상 를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B3;}
+				}else if(@sel4==4){
+					set @menu, menu(0, "{=c변환키트-캐시의상 {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 500){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 500;
+						item_add "변환키트-캐시의상", 1;
+						message 8, "변환키트-캐시의상 를 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B3;}
+				}else{goto B1;}
+			}else if(@sel3==3){
+				B4:
+				set @sel4, menu(0, "무엇을 사시게요?\\n{=e번들 아이템은 1000개 이상일경우 구입에 아이템 증발이 있을수 있으니, 모두 소진했을때 다시 구입하시길 바랍니다.", "자아의조각(30개) : 2500point","파프리카 100개 : 500point", "블루피치 100개 : 1000point", "[주문서]파괴보호+100% 50개 : 5000point", "세오의가호(Lev1) 100개 : 10000point", "레전드리상자 : 3000point", "이전으로");
+				if(@sel4==1){
+					set @menu, menu(0, "{=c자아의조각(30개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 2500){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 2500;
+						item_add "자아의조각", 30;
+						message 8, "자아의조각(30개)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B4;}
+				}else if(@sel4==2){
+					set @menu, menu(0, "{=c파프리카(200개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 500){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 500;
+						item_add "파프리카", 200;
+						message 8, "파프리카(200개)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B4;}
+				}else if(@sel4==3){
+					set @menu, menu(0, "{=c블루피치(200개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 1000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 1000;
+						item_add "블루피치", 200;
+						message 8, "블루피치(200개)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B4;}
+				}else if(@sel4==4){
+					set @menu, menu(0, "{=c[주문서]파괴보호+100%(50개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 5000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 5000;
+						item_add "[주문서]파괴보호+100%", 50;
+						message 8, "[주문서]파괴보호+100%(50개)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B4;}
+				}else if(@sel4==5){
+					set @menu, menu(0, "{=c세오의가호1(100개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 10000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 10000;
+						item_add "세오의가호(Lev1)", 100;
+						message 8, "세오의가호1(100개)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B4;}
+				}else if(@sel4==6){
+					set @menu, menu(0, "{=c레전드리무지개상자(1개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(get_love(@myid) < 3000){mes 1, "게임포인트(GP)가 부족합니다."; goto re;}
+						set_love get_love(@myid) - 3000;
+						item_add "레전드리무지개상자", 1;
+						message 8, "레전드리무지개상자(1개)을 구입하셧습니다.\\n["+get_love(@myid)+"]게임포인트(GP)가 남았습니다.";
+						goto re;
+					}else{goto B4;}
+				}else{goto B1;}
+			}else{goto re;}
+		}else if(@sel2 == 4){
+			set @kwin2, menu(0, "마이소시아신망 으로. 게임포인트(GP)를 교환하실수 있습니다.\\n{=c현제 보유 마이소시아신망 : " + #pointQ, "게임포인트(GP)로 교환하기", "이전으로");
+			if(@kwin2 == 1){
+				Kwin:
+				set @kwin3, menu(0, "얼마만큼 교환하겠습니까?\\n{=c현제 보유 마이소시아신망 : " + #pointQ, " {=q100{=aGP : 마이소시아신망 : {=c1", " {=q1000{=aGP : 마이소시아신망 : {=c10", " {=q3000{=aGP : 마이소시아신망 : {=c30", " {=q5000{=aGP : 마이소시아신망 : {=c50", "{=q10000{=aGP : 마이소시아신망 : {=c100", "처음으로");
+				if(@kwin3 == 1){
+					if(#pointQ < 1){Q1:mes 1, "마이소시아신망이 부족해서 게임포인트(GP)로 교환할 수 없습니다.";goto Kwin;}
+					mes 1, "다음을 누르시면 1 마이소시아신망 을 소모하여 100 게임포인트(GP) 를 받습니다.";
+					set #pointQ, #pointQ - 1;
+					set_love get_love(@myid) + 100;
+					Q2:
+					mes 1, "교환이 완료 되었습니다.\\n{=q{=q현재 보유 게임포인트(GP) : ["+get_love(@myid)+"]";
+					goto Kwin;
+				}else if(@kwin3 == 2){
+					if(#pointQ < 10){goto Q1;}
+					mes 1, "다음을 누르시면 10 마이소시아신망 을 소모하여 1000 게임포인트(GP) 를 받습니다.";
+					set #pointQ, #pointQ - 10;
+					set_love get_love(@myid) + 1000;
+					goto Q2;
+				}else if(@kwin3 == 3){
+					if(#pointQ < 30){goto Q1;}
+					mes 1, "다음을 누르시면 30 마이소시아신망 을 소모하여 3000 게임포인트(GP) 를 받습니다.";
+					set #pointQ, #pointQ - 30;
+					set_love get_love(@myid) + 3000;
+					goto Q2;
+				}else if(@kwin3 == 4){
+					if(#pointQ < 100){goto Q1;}
+					mes 1, "다음을 누르시면 50 마이소시아신망 을 소모하여 5000 게임포인트(GP) 를 받습니다.";
+					set #pointQ, #pointQ - 100;
+					set_love get_love(@myid) + 5000;
+					goto Q2;
+				}else if(@kwin3 == 5){
+					if(#pointQ < 100){goto Q1;}
+					mes 1, "다음을 누르시면 100 마이소시아신망 을 소모하여 10000 게임포인트(GP) 를 받습니다.";
+					set #pointQ, #pointQ - 100;
+					set_love get_love(@myid) + 10000;
+					goto Q2;
+				}else{goto re;}
+			}else{goto re;}
+		}else{goto reshop;}
+	}else if(@sel1 == 2){
+		call_func @myid, "도움말";
+	}else if(@sel1 == 3){
+		mes 1,"아직 {=w버닝 {=a이벤트에 대해서 모르신다구요? 이런..이런.. 지금부터 {=w버닝{=a 이벤트에 대해 간단한 설명을 해드리도록 하겠습니다.";
+		mes 1,"케릭터 누적 접속 시간 30분마다 게임포인트(GP)를 50점씩 얻으실 수가 있는데요.\\n출석체크 이벤트처럼 지정된 케릭터만 게임포인트(GP)를 얻는 방식이 아닌, 모든 게임케릭터가 이용하실 수 있는 컨텐츠 입니다.";
+		mes 1,"게임포인트(GP)는 상태창(G)에서 확인하실 수 있습니다. 그리고, {=c죽음의마을입구5 {=a에 계실 경우 포인트가 두 배로 얻을 수 있단 점 잊지 말도록 하십시오! 이상 설명은 여기까지입니다.";
+		goto reshop;
+	}
+	end;
+}
+//cash_shop(상점 설정인데 게임돈이 GP 로 나온다.

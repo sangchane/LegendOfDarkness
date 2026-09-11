@@ -1,0 +1,402 @@
+W9	흉가퇴장	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(get_mapname(@myid) == "흉가1층"){
+		if(!item_exist(@myid, "파랑빈항아리")&&!item_exist(@myid, "파랑항아리")&&!item_exist(@myid, "파랑상자")&&!item_exist(@myid, "파랑빈상자")&&!item_exist(@myid, "빨간빈상자")&&!item_exist(@myid, "빨간상자")&&!item_exist(@myid, "조그만석상")&&!item_exist(@myid, "신비로운이서린돌")){
+			mes 3, "여기서 얻은것은 가지고 나갈수 없다!!~~ 놓고가라~";
+			set #GostHouse, 0;
+			warp "알세이드스-화론마을", 8, 68;
+		}
+	mes 2, "여기서 얻은것은 가지고 나갈수 없다!!~~ 놓고가라~";
+	end;
+	}
+}
+
+W10	지하장치05	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(!item_exist(@myid, "파랑빈상자")){
+		set @bb, menu(1, "상자안에 파랑색 조그만상자가 들어있다.", "잡는다", "그냥놔둔다");
+		if(@bb == 1){
+			item_add "파랑빈상자", 1;
+			mob_spawn "흉가링", 2, 2, 1 ;
+			mes 2, "조그만 상자를 얻었다.";
+		}
+	}
+	end;
+}
+
+W11	지하장치04	{
+	set @myid, get_myid();
+	if(!item_exist(@myid, "조그만석상")){mes 0, "알수없는 힘이막고있어 들어갈 수 없다."; end;}
+	mob_clear "흉가지하";
+	item_del "조그만석상", 1;
+	warp "흉가지하-방", 6,10;
+}
+
+W12	지하장치06	{
+	set @myid, get_myid();
+	mob_clear "흉가지하-방";
+	warp "흉가지하", 8,14;
+}
+
+W13	지하장치01	{
+	set @myid, get_myid();
+	if(!item_exist(@myid, "파랑빈상자")){
+		mob_spawn "유령", 15, 15, 4;
+		mob_spawn "유령", 15, 15, 4;
+		mob_spawn "유령", 15, 15, 4;
+	}
+	end;
+}
+
+W14	지하장치02	{
+	set @myid, get_myid();
+	if(!item_exist(@myid, "파랑빈상자")){
+		mob_spawn "유령", 16, 3, 3;
+		mob_spawn "유령", 16, 3, 3;
+		mob_spawn "유령", 16, 3, 3;
+	}
+	end;
+}
+
+W15	지하장치03	{
+	set @myid, get_myid();
+	if(!item_exist(@myid, "파랑빈상자")){
+		mob_spawn "유령", 2, 2, 2;
+		mob_spawn "유령", 2, 2, 2;
+		mob_spawn "유령", 2, 2, 2;
+	}
+	end;
+}
+
+W16	지하장치07	{
+	if(item_exist(@myid, "파랑빈상자")){
+		mob_spawn "유령", 2, 10, 4;
+		mob_spawn "유령", 2, 10, 4;
+		mob_spawn "유령", 2, 10, 4;
+		mob_spawn "유령", 2, 10, 4;
+		mob_spawn "유령", 2, 10, 4;
+		mob_spawn "유령", 2, 10, 4;
+	}
+	end;
+}
+
+W17	지하장치08	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "파랑빈상자")){
+		mob_spawn "유령", 15, 7, 2;
+		mob_spawn "유령", 15, 7, 2;
+		mob_spawn "유령", 15, 7, 2;
+	}
+	end;
+}	
+
+W18	지하장치09	{
+	set @myid, get_myid();
+	mob_clear "흉가지하";
+	warp "흉가1층", 12,38;
+	end;
+}
+
+W19	1층장치10	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(!item_exist(@myid, "빨간빈상자")){
+		mes 3, "상자앞에 '나의 물건을 건드리는자 용서치 않으리라' 라고쓰여있다.";
+ 		set @select, menu(1, "상자안에 빨간색 조그만상자가 들어있다.", "잡는다", "그냥놔둔다");
+ 		if(@select == 1){
+			item_add "빨간빈상자", 1;
+			mob_spawn "흉가링", 8, 8, 1 ;
+			mob_spawn "흉가링", 8, 9, 1 ;
+  			mes 2, "조그만 상자를 얻었다.";
+		}
+	}
+	end;
+}
+
+W20	1층장치05	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(!item_exist(@myid, "조그만석상")){
+		set @select, menu(1, "조그만 돌석상들이 구석에 놓여있다.", "잡는다", "그냥놔둔다");
+		if(@select == 1){
+			item_add "조그만석상", 1;
+			mes 2, "조그만 석상을 얻었다.";
+		}
+	}
+	end;
+}
+
+
+W21	1층장치11	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	message 3, "건조하고 차가운 바람이나오고있다.";
+	effect @myid, 292, 292, 140;
+	if(item_exist(@myid, "파랑항아리")){end;}
+	if(!item_exist(@myid, "빨간상자")){
+		if(!item_exist(@myid, "파랑상자")){set_ys(get_ys(@myid)+2); item_del "조그만석상", 1; mes 2, "석상이 얼어 부서져버렸다.";}
+		end;
+	}
+	item_del "빨간상자", 1;
+	item_add "빨간빈상자", 1;
+	set_ys(get_ys(@myid)+2);
+	mes 2, "석상이 얼어 부서져버렸다.";
+}
+
+W22	1층장치12	{
+	set @myid, get_myid();
+	message 3, "건조하고 차가운 바람이 나오고있다.";
+	effect @myid, 292, 292, 140;
+}
+
+W23	1층장치13	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "조그만석상") < 1){message 3, "보이지 않는 벽으로 막혀있다."; set_xs(get_xs(@myid)+2); end;}
+	warp "흉가2층", 2, 3;
+	item_del "조그만석상", 1;
+	end;
+}
+
+W24	흉가1	{
+	set @myid, get_myid();
+	message 3, "건조하고 뜨거운 바람이 나오고있다.";
+	effect @myid, 293, 293, 140;
+}
+
+W25	1층이동장치	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(item_exist(@myid, "빨간상자")){message 3, "알수없는 힘에 의해 밀려났다"; set_ys(get_ys(@myid)+3); set #WestQuestgost2, 0; end;}
+	if(item_exist(@myid, "조그만석상") < 1){message 3, "알수없는 힘에 의해 밀려났다"; set_ys(get_ys(@myid)-3); end;}
+	item_del "조그만석상", 1;
+	effect @myid, 293, 293, 140;
+	mes 2, "석상이 부서져버렸다.";
+	effect @myid, 293, 293, 140;
+	message 3, "건조하고 뜨거운 바람이 나오고있다.";
+	end;
+}
+
+W26	1층이동장치2	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "조그만석상") < 1){message 3, "알수없는 힘에 의해 밀려났다"; warp "흉가1층", 19, 21; end;}
+	warp "흉가1층", 20, 28;
+	item_del "조그만석상", 1;
+	set #WestQuestgost2, 0;
+	end;
+}
+
+W27	1층이동장치4	{
+	set @myid, get_myid();
+	mob_clear "흉가1층-방4";
+	warp "흉가1층", 15,7;
+}
+
+W28	2층장치09	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(!item_exist(@myid, "돌")){
+		set @select, menu(1, "신비한 색의 돌덩이가 떨어져있다.", "줍는다", "줍지 않는다");
+		if(@select == 1){
+			item_add "돌", 1;
+			end;
+		}
+	}
+	mes 2, "신비한 색을 발하는 돌덩이가 떨어져 있지만,더 이상 얻을 필요가 없다.";
+	end;
+}
+
+W29	2층장치10	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "흉가2층"){warp "흉가2층-방3", 8,7; end;}
+	if(get_mapname(@myid) == "흉가2층-방3" && #WestQuestgostroom == 3){warp "흉가2층-방1", 8,7; set #WestQuestgostroom, 0; end;}
+	if(get_mapname(@myid) == "흉가2층-방1" && #WestQuestgostroom == 1){warp "흉가2층-방5", 8,7; set #WestQuestgostroom, 0; end;}
+	if(get_mapname(@myid) == "흉가2층-방5" && #WestQuestgostroom == 5){warp "흉가2층-방6", 1,7; set #WestQuestgostroom, 5; end;}
+	if(get_mapname(@myid) == "흉가2층-방6" && #WestQuestgostroom == 5){warp "흉가2층-방2", 1,7; set #WestQuestgostroom, 0; end;}
+	if(get_mapname(@myid) == "흉가2층-방2" && #WestQuestgostroom == 2){warp "흉가2층-방8", 1,7; set #WestQuestgostroom, 0; end;}
+	if(get_mapname(@myid) == "흉가2층-방8"){warp "흉가2층", 21,4; set #WestQuestgostroom, 0; end;}
+	if(#WestQuestgostroom == 0){warp "흉가2층", 15,18; end;}
+}
+
+W30	2층장치11	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(!item_exist(@myid, "돌")){
+		mes 3, "'욕심을 부리는자 벌을 받을것이다'라고 써있다.";
+ 		set @select, menu(1, "신비한 색의 돌덩이가 떨어져있다.", "줍는다", "줍지 않는다");
+ 		if(@select == 1){
+			item_add "신비로운이서린돌", 1;
+  			end;
+		}
+	}
+	mes 2, "신비한 색을 발하는 돌덩이가 떨어져 있지만,더 이상 얻을 필요가 없다.";
+	end;
+}
+
+W31	3층이동장치1	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "신비로운이서린돌") < 1){message 3, "알수없는 힘에 의해 밀려났다"; set_xs(get_xs(@myid)-2); end;}
+	message 3, "알수없는 힘에 의해 밀려났다";
+	set_xs(get_xs(@myid)+3);
+	end;
+}
+
+W32	3층이동장치2	{
+	set @myid, get_myid();
+	mob_spawn "유령2", 8, 20, 4 ;
+	mob_spawn "유령2", 13, 20, 4 ;
+	mob_spawn "유령2", 8, 4, 2 ;
+	mob_spawn "유령2", 13, 4, 2 ;
+	end;
+}
+
+W33	3층이동장치3	{
+	set @myid, get_myid();
+	warp "흉가3층", 7,12;
+	mob_spawn "유령2", 8, 20, 4 ;
+	mob_spawn "유령2", 13, 20, 4 ;
+	mob_spawn "유령2", 8, 4, 2 ;
+	mob_spawn "유령2", 13, 4, 2 ;
+	end;
+}
+
+W34	3층이동장치4	{
+	set @myid, get_myid();
+	mob_clear "흉가3층";
+	warp "흉가2층", 25,48;
+	end;
+}
+
+W35	3층장치01	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "신비로운이서린돌") < 1){message 3, "보이지 않는 벽으로 막혀있다."; set_xs(get_xs(@myid)+2); end;}
+	input @undine, 2, "주문을 따라 말하라 그럼 길이 열릴지어다 '대지를 얻을 수 있는자' 라고 적혀있다.", " ", " ", 21;
+	if(@undine < "대지를 얻을 수 있는자"){message 3, "알수없는 힘에 의해 밀려났다"; set_xs(get_xs(@myid)+2); end;}
+ 	item_del "신비로운이서린돌", 1;
+	mob_clear "흉가3층";
+	warp "흉가3층-방1", 13,10;
+	end;
+}
+
+W36	3층장치02	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "빈통") < 1){message 3, "주변에 조그만 돌들이 널려있다.";end;}
+	item_del "빈통", 1;
+	message 3, "주변에 조그만 돌들이 널려있다.";
+	sleep 3000;
+	message 3, "조그만 돌하나를 통에  담았다.";
+	item_add "이끼묻은돌이든통", 1;
+	end;
+}
+
+W37	3층장치03	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(!item_exist(@myid, "파랑빈항아리")){
+		set @select, menu(1, "상자안에 파랑색 항아리가 들어있다.", "줍는다", "줍지 않는다");
+		if(@select == 1){
+			item_add "파랑빈항아리", 1;
+			mes 0, "파란색 항아리를 얻었다.";
+ 			end;
+		}
+	}
+	mes 0, "파란색항아리가있지만 더이상 얻을 수 없는것 같다.";
+	end;
+}
+
+Item	돌1	{
+	set @myid, get_myid();
+	set @door, menu(0, "돌을 버리시겠습니까?", "예", "아니오");
+	if(@door == 1){
+		if(get_mapname(@myid) == "흉가2층-방1"){set #WestQuestgostroom, 1;}
+		if(get_mapname(@myid) == "흉가2층-방2"){set #WestQuestgostroom, 2;}
+		if(get_mapname(@myid) == "흉가2층-방3"){set #WestQuestgostroom, 3;}
+		if(get_mapname(@myid) == "흉가2층-방4"){set #WestQuestgostroom, 4;}
+		if(get_mapname(@myid) == "흉가2층-방5"){set #WestQuestgostroom, 5;}
+		if(get_mapname(@myid) == "흉가2층-방6"){set #WestQuestgostroom, 0;}
+		item_del "돌", 1;
+	}
+}
+
+Item	빨간상자	{
+	set @myid, get_myid();
+	set @select, menu(1, "상자에서 석상을 꺼내시겠습니까?.", "예", "아니오");
+	if(@select == 1){
+		message 3, "상자가 파손되어 다시쓸수없게되었다.";
+		item_del "빨간상자", 1;
+		item_add "조그만석상", 1;
+	}
+	del @select;
+}
+
+Item	빨간빈상자	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "조그만석상") < 1){end;}
+	set @select, menu(1, "상자에 석상을 담겠습니까?", "예", "아니오");
+	if(@select == 1){
+		item_del "조그만석상", 1;
+		item_del "빨간빈상자", 1;
+		item_add "빨간상자", 1;
+	}
+	del @select;
+}
+
+Item	파랑상자	{
+	set @myid, get_myid();
+	set @select, menu(1, "상자에서 석상을 꺼내시겠습니까?.", "예", "아니오");
+	if(@select == 1){
+		message 3, "상자가 파손되어 다시쓸수없게되었다.";
+		item_del "파랑상자", 1;
+		item_add "조그만석상", 1;
+	}
+	del @select;
+}
+
+Item	파랑빈상자	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "조그만석상") < 1){end;}
+	set @select, menu(1, "상자에 석상을 담겠습니까?", "예", "아니오");
+	if(@select == 1){
+		item_del "조그만석상", 1;
+		item_del "파랑빈상자", 1;
+		item_add "파랑상자", 1;
+	}
+	del @select;
+}
+
+Item	파랑항아리	{
+	set @myid, get_myid();
+	set @select, menu(1, "상자에서 석상을 꺼내시겠습니까?.", "예", "아니오");
+	if(@select == 1){
+		message 3, "항아리가 파손되어 다시쓸수없게되었다.";
+		item_del "파랑항아리", 1;
+		item_add "이끼묻은돌이든통", 1;
+	}
+	del @select;
+}
+
+Item	파랑빈항아리	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "이끼묻은돌이든통") < 1){mes 0, "통정도는 가볍게 들어갈수있는 빈항아리다."; end;}
+	set @select, menu(1, "항아리에 통을 담겠습니까?", "예", "아니오");
+	if(@select == 1){
+		item_del "이끼묻은돌이든통", 1;
+		item_del "파랑빈항아리", 1;
+		item_add "파랑항아리", 1;
+	}
+	del @select;
+}
+
+Warp	1층이동장치3	{
+	set @myid, get_myid();
+	if(#WestQuestgost == 1){end;}
+	if(item_exist(@myid, "빈통") < 1){message 3, "주변에 조그만 돌들이 널려있다.";end;}
+	item_del "빈통", 1;
+	message 3, "주변에 조그만 돌들이 널려있다.";
+	sleep 3000;
+	message 3, "조그만 돌하나를 통에  담았다.";
+	item_add "이끼묻은돌이든통", 1;
+	set #WestQuestgost, 1;
+	end;
+}

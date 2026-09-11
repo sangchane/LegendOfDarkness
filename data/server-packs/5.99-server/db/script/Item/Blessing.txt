@@ -1,0 +1,17 @@
+0,0,0,0,0,0,0	이벤트가호	{
+	set @myid, get_myid();
+	if(#exptime > 0){message 1, "이미 가호를 받고있습니다."; end;}
+	exp_per @myid,1800,2,3;
+	set #expba, 2;
+ 	item_del "이벤트가호", 1;
+	message 1, "경험치획득량이 30분동안 2배가 됩니다."; 
+}
+
+0,0,0,0,0,0,0	세오의가호	{
+	set @myid, get_myid();
+	if(#exptime > 0){message 1, "이미 가호를 받고있습니다."; end;}
+	exp_per @myid,3600,3,3;
+	set #expba, 3;
+	item_del "세오의가호", 1;
+	message 1, "경험치가 1시간동안 3배가 됩니다."; 
+}

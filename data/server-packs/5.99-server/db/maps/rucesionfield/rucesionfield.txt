@@ -1,0 +1,59 @@
+{
+번호	505
+이름	뤼케시온필드
+너비	50
+높이	50
+배경음	144
+CRC	10731
+맵파일	db/maps/rucesionfield/maps/lod505.map
+}
+
+{
+번호	135
+이름	뤼케시온은행field
+너비	20
+높이	20
+배경음	144
+CRC	22022
+맵파일	db/maps/rucesionfield/maps/lod135.map
+}
+
+{
+번호	136
+이름	뤼케시온여관field
+너비	20
+높이	20
+배경음	144
+CRC	8902
+맵파일	db/maps/rucesionfield/maps/lod136.map
+}
+
+{
+번호	132
+이름	뤼케시온무기점field
+너비	15
+높이	15
+배경음	144
+CRC	54397
+맵파일	db/maps/rucesionfield/maps/lod132.map
+}
+
+{
+번호	133
+이름	뤼케시온방어구점field
+너비	12
+높이	12
+배경음	144
+CRC	16963
+맵파일	db/maps/rucesionfield/maps/lod133.map
+}
+
+{
+번호	164
+이름	뤼케시온field대기실
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/rucesionfield/maps/lod164.map
+}
+

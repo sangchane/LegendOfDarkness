@@ -1,0 +1,71 @@
+{
+이름	연주(Lev1)
+이미지	98
+script_do	SKILL_검활소연비
+}
+
+{
+이름	연주(Lev2)
+이미지	98
+script_do	SKILL_검활소연비
+}
+
+{
+이름	연주(Lev3)
+이미지	98
+script_do	SKILL_검활소연비
+}
+
+{
+이름	연주(Lev4)
+이미지	98
+script_do	SKILL_검활소연비
+}
+
+{
+이름	연주공격(Lev1)
+이미지	98
+script_do	SKILL_연주공격(Lev1)
+}
+
+{
+이름	연주공격(Lev2)
+이미지	98
+script_do	SKILL_연주공격(Lev2)
+}
+
+{
+이름	연주공격(Lev3)
+이미지	98
+script_do	SKILL_연주공격(Lev3)
+}
+
+{
+이름	연주공격(Lev4)
+이미지	98
+script_do	SKILL_연주공격(Lev4)
+}
+
+{
+이름	연주공격(Lev5)
+이미지	98
+script_do	SKILL_연주공격(Lev5)
+}
+
+{
+이름	연주공격(Lev6)
+이미지	98
+script_do	SKILL_연주공격(Lev6)
+}
+
+{
+이름	연주공격(Lev7)
+이미지	98
+script_do	SKILL_연주공격(Lev7)
+}
+
+{
+이름	세오의비명
+이미지	98
+script_do	SKILL_세오의비명
+}

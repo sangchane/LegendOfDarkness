@@ -1,0 +1,8 @@
+제조	Transforms
+성장(검투사)	Produces
+성장(소환사)	Produces
+성장(궁수)	Produces
+성장(바드)	Produces
+성장(포유류)	Produces
+성장(조류)	Produces
+성장(파충류)	Produces

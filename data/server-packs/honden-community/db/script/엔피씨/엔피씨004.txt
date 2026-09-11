@@ -1,0 +1,957 @@
+Script	서쪽대륙A	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "아슬론마을"){
+		mes 1, "어 .. 어서와요. 난 베르민이야. 이곳저곳 떠돌면서 모험을 하다가, 우연찮게 메데니아까지 흘러들어왔지";
+		mes 1, "자네도 할 일이 없어서 빈둥대는 사람인가? 저런저런 .. 하긴 이곳은 대체로 낯설어서, 뭐를 어떻게 해야하는지 모르는 사람이 종종 있더군.";
+		set @select, menu(0, "그래, 궁금한게 뭐야? 내가 알고 있는건 두 가지 정도 뿐이야 ..", "아슬론 아르바이트", "작은 악마 메핏", "악마 모르윈");
+		if(@select == 1){
+			mes 1, "아하 .. 아르바이트. 그래. 이건 사실 돈을 주는건 아니고. 단지 자네의 {=c경험{=a에 좀더 도움이 될 수는 있겠군.";
+			mes 1, "마을 식당에 가면 타이바르라는 사람이 있는데, 그 사람이 아르바이트를 준다네. 이왕 사냥을 할거면 좀더 깊은 경험을 하는 쪽이 좋겠지? 가서 알아보게.";
+			mes 0, "타이바르는 수시로, 또 무제한으로 아르바이트 일거리를 준다네. 많은 기대를 하지만 않는다면\\n나름대로 만족할만할거야";
+		}else if(@select == 2){
+			mes 1, "메핏이라 .. 귀여운 녀석이지. 그놈도 악마라니 어떤 속내를 가지고 있을지야 나는 모르겠지만 아무튼 ..";
+			mes 1, "이 녀석이 요즘에 뭔가를 구하고 있는 모양이던데 .. 나로서는 그게 뭔지 잘 모르겠더군. 직접 가서 알아보는게 어떨까?";
+			mes 1, "메핏녀석은 가마들이 늘어서있는 곳 구석에 안보이게 서있는 거 같던데. 한번 가보라구.";
+			mes 1, "아참 한가지. 모르윈과 메핏은 사이가 별로 좋지 않아. 그래서 모르윈의 부탁을 받았다면 메핏은 자네를 멀리할거야. 절대 뭔가를 부탁하지 않겠지";
+			mes 1, "마찬가지로 메핏의 부탁을 받은 경우에는 모르윈이 절대 아무것도 부탁하지 않을테니까, 유의하라고. 어느쪽의 부탁을 들어줄 것인지는 물론 자네 선택이야";
+			mes 1, "어떤 놈으로부터 부탁을 받았건간에, 단 한번만 가능해. 물론 실패하면 다시 도전해도 되겠지만, 성공한다면 그걸로 끝이야. 녀석들은 까다로워서, 같은 사람에게 같은 일을 두번이상 맡기지 않아.";
+			mes 0, "어느쪽을 편들 것인지는 자네가 잘 알아서 결정하라구.";
+		}else if(@select == 3){
+ 			mes 1, "모르윈이라 .. 녀석은 악마야. 뭐 그렇다고 하더라도 모든 악마가 나쁜 것은 아니기에, 나도 실은 잘 모르겠어. 그냥 종족이 악마라는 것 뿐이지";
+ 			mes 1, "모르윈은 최근 뭔가 숨기는 게 있는 것 같더니. 가만보니까 누군가가 자기 심부름을 해주길 바라는 것 같아. 왜인지는 나도 잘 모르지.";
+ 			mes 1, "그냥 눈치를 보아하니 그런 것뿐이니까 .. 너무 믿지는 말라구. 혹시 모르윈이 보고싶다면 딸기밭쪽에 가봐. 그쪽 구석에서 노는걸 좋아해.";
+ 			mes 1, "아참 한가지. 모르윈과 메핏은 사이가 별로 좋지 않아. 그래서 모르윈의 부탁을 받았다면 메핏은 자네를 멀리할거야. 절대 뭔가를 부탁하지 않겠지";
+ 			mes 1, "마찬가지로 메핏의 부탁을 받은 경우에는 모르윈이 절대 아무것도 부탁하지 않을테니까, 유의하라고. 어느쪽의 부탁을 들어줄 것인지는 물론 자네 선택이야";
+ 			mes 1, "어떤 놈으로부터 부탁을 받았건간에, 단 한번만 가능해. 물론 실패하면 다시 도전해도 되겠지만, 성공한다면 그걸로 끝이야. 녀석들은 까다로워서, 같은 사람에게 같은 일을 두번이상 맡기지 않아.";
+ 			mes 0, "어느쪽을 편들 것인지는 자네가 잘 알아서 결정하라구.";
+ 		}
+	end;
+	}
+	if(get_mapname(@myid) == "노엠여관방A"){
+		mes 1, "이제야 정신이 들었나 보구려. 사막에 정신을 잃고 쓰러져있던 당신을 누군가 우연히 지나가던 한상인이 발견하여 여기로 옮겨왔소이다.";
+ 		mes 1, "오아시스에 오래있으면 가끔식 불어오는 모래바람에 정신을 잃을수도 있으니 유의하시구려";
+		set @Innkeeper, menu(0, "사막에서 주의해야 할 것들은 알고나 있소?", "예", "아니오");
+		if(@Innkeeper == 1){
+			mes 0, "조심하시구려.";
+		}else if(@Innkeeper == 2){
+			mes 1, "그것도 모르고 사막 여행을 하다니 참 무모하구려";
+			mes 1, "사막을 여행하기 위해선 우선 {=c'물통'{=a이 매우 중요하오 물통이 없으면 갈증으로 인해 체력이 깎이게 되지";
+			mes 1, "그리고 자신이 있는 좌표도 잘 봐두고 기억해 놓아야하오 사막은 매우 넓어 길을 잃어 버리기 쉽상이오";
+			mes 0, "조심하시구려.";
+ 		}
+	end;
+	}
+	if(get_mapname(@myid) == "대지의세계수의사당"){
+		mes 1, "대지의 세계수로부터 영험한 기운이 흘러나오고 있다. 이 기운을 받으면 정령의 가호를 받게되 서쪽 사람으로 인정을 받을수 있다고 한다.";
+		set @nation, menu(0, "대지의 세계수의 가호를 받겠습니까? 한번 바뀐 국적은 변경할 수 없다.", "대지의 세계수의 기운을 받는다.", "음..고민고민..");
+		if(@nation == 1){
+			mes 1, "메데니아 7정령중 대지의 점렴의 가호를 받은 노에스 지방주민으로 인정을 받았다.";
+			set_nation @myid, 5;
+			message 3,"자기보기창을 눌러 깃발을 확인하세요.";
+ 		}
+	end;
+	}
+	if(get_mapname(@myid) == "노엠주점"){
+		if(get_ability() >= 25){goto Headman2;}
+		set @Headman, menu(0, "나에게 무슨 용무인가?", "화론마을에 대하여");
+		if(@Headman == 1){
+ 			goto headmantip;
+ 		}
+  		end;
+		Headman2:
+		set @Headman, menu(0, "나에게 무슨 용무인가?", "화론마을에 대하여", "청룡의 통행증발급");
+		if(@Headman == 1){
+			headmantip:
+			mes 0, "화론마을은 여기서 서쪽에 있는 사막을 지나 화산지대에 위치한 마을이지.";
+		}else if(@Headman == 2){
+			mes 1, "미안하지만 그냥은 발급해줄수없네";
+			mes 1, "요즘 우리마을이 상당히 어렵네 좀도와주게나";
+			set @select3, menu(0, "좀 도와주게나", "예. 도와드리죠", "아니요 싫습니다.");
+			if(@select3 == 1){
+				input @undine, 2, "고맙네 얼마나 기부하겠나?", "금전", "전 기부하겠습니다..", 9;
+				if(@undine == 0){
+					mes 0,"너무 적다고 생각하지 않나? 실망이네.";
+					end;
+				}
+				if(@undine < 99999){mes 0,"너무 적다고 생각하지 않나? 실망이네."; end;}
+				if(get_money(@myid) < 999999){mes 0,"너무 적다고 생각하지 않나? 실망이네."; end;}
+				money_del @undine;
+				mes 1, "정말 고맙네 복받을걸세 자 받게나.";
+ 				item_add "청룡의통행증", 1;
+				if(#noem == 1){goto go1;}
+				set #noem, 1;
+				legend_add 0, 255, "노엠마을에 1번 기부하다.";
+				go1:
+				set @select4, menu(0, "아 한가지 알아야 할 사항이 있네 들어보겠나?", "예", "아니오");
+				if(@select4 == 1){
+					mes 1, "화론마을 사람들은 '인증서'를 가지고있지 않은 이방인은 불청객으로 생각하기때문에 물건을 팔기는 고사하고 상대도 안한다네";
+					mes 1, "즉 인증서를 가지고 있지 않으면 마을에 가도 아무것도 할수 없다는 말일세.";
+					mes 0, "일단 화론마을 촌장을 찾아가 보게나.";
+					del @undine;
+					del @ret;
+				}
+			}
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "아만마을"){
+		if(#WestQuest010 < 9){mes 0, "...";}
+		set @select, menu(0, "모허엄가아여어..나의..저엉기를 받기이를 원하느은가아....", "네, 아만 국적을 가지고 싶습니다.", "아니오.");
+			if(@select == 1){
+ 			mes 1, "메데니아 7정령중 바람의 점렴의 가호를 받은 아만 지방주민으로 인정을 받았다.";
+ 			set_nation @myid, 8;
+ 			message 3,"자기보기창을 눌러 깃발을 확인하세요.";
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "아만정글5"){
+		if(#WestQuest010 == 2){
+			set #AmanTotemD, 1;
+			message 3, "수호토템D를 살펴보았다.";
+		}
+		if(#WestQuest010 == 4 && item_exist(@myid, "생명의물D")){
+			item_del "생명의물D", 1;
+			mob_spawn "켈라D", 16, 28, 1;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "아만정글4"){
+		if(#WestQuest010 == 2){
+			set #AmanTotemC, 1;
+			message 3, "수호토템C를 살펴보았다.";
+		}
+		if(#WestQuest010 == 4 && item_exist(@myid, "생명의물C")){
+			item_del "생명의물C", 1;
+			mob_spawn "켈라C", 12, 18, 1;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "아만정글3"){
+		if(#WestQuest010 == 2){
+			set #AmanTotemB, 1;
+			message 3, "수호토템B를 살펴보았다.";
+		}
+		if(#WestQuest010 == 4 && item_exist(@myid, "생명의물B")){
+			item_del "생명의물B", 1;
+			mob_spawn "켈라B", 24, 32, 1;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "아만정글2"){
+		if(#WestQuest010 == 2){
+			set #AmanTotemA, 1;
+			message 3, "수호토템A를 살펴보았다.";
+		}
+		if(#WestQuest010 == 4 && item_exist(@myid, "생명의물A")){
+			item_del "생명의물A", 1;
+			mob_spawn "켈라A", 23, 10, 1;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "화염의세계수의사당"){
+		set @nation6, menu(0, "화염의 기운을 가지고 있는 성스러운 불의 신전이다", "국적구하기", "수맥이동:대지의세계수로 이동한다.");
+		if(@nation6 == 1){
+			mes 1, "화염의 세계수로부터 영험한 기운이 흘러나오고 있다. 이 기운을 받으면 불의민족으로 인정되어\\n알세이드스 국민으로 등록되게 된다.";
+			set @nation62, menu(0, "화염의 세계수의 가호를 받겠습니까? 한번 바뀐 국적은 변경할 수 없다.", "화염의 세계수의 기운을 받는다.", "음..고민고민..");
+			if(@nation62 == 1){
+				mes 1, "메데니아 7정령중 화염의 점렴의 가호를 받은 알세이드스 지방주민으로 인정을 받았다.";
+				set_nation @myid, 6;
+				message 3,"자기보기창을 눌러 깃발을 확인하세요.";
+				}else if(@select == 2){
+ 				end;
+ 			}
+ 		}else if(@nation6 == 2){
+			warp "노엠여관", 7,3;
+			mes 0, "화염의세계수의 수맥을 통하여 화염의세계수로 이동합니다.";
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "알세이드스-화론마을"){
+		if(get_nation (@myid) != 6){mes 0, "이방인하고는 개인적인 이야기는 하고 싶지 않아모";}
+		mes 1, "호오~ 이제 화론사람 티가 난다모. 예전에 비해서 아주 훌륭해졌다모";
+		mes 1, "천의방의 여주인은 엄청난 내공의 소유자다모. 그녀는 그녀가 짜는 비단에 화룡신님의 힘을\\n부여할수 있다모";
+		mes 0, "그 천으로 옷을 만들어 입으면 화룡신님의 힘을 이어받게 되는거다모.";
+	end;
+	}
+	if(get_mapname(@myid) == "여관-금화장"){
+		if(#WestQuest009 != 23){mes 0, "이방인하고는 개인적인 이야기는 하고 싶지 않아모";}
+		mes 1, "헤에..촌장어르신께 인정받은거냐모? 그것은 그것대로 대단하긴 하지만 역시 대댄한건 우리\\n화론사람이다모. 역시 우리 사람 훌륭하다모.";
+		mes 1, "화룡의인장 기술은 배웠냐모? 화룡의인장 기술은 화룡신님의 증표라고 할 수 있다모. 그건\\n화론사람이라면 누구나 받는거다모.";
+		mes 1, "그게 있어야만 화룡신님의 힘이 깃든 물건들을 착용할 수 있다모. 화룡의인장 기술을 아직 배우지 않았다면 연무관에 가봐라모.";
+		mes 1, "연무관 주인의 형은 화룡신님에게 인정받은 장인이다모. 그 사람을 찾아가면 화룡의인장을 배울수 있을거다모.";
+		mes 0, ".....아..그냥은 안가르쳐준다모..화론사람들은 태어날때부터 가지고 있는 증표가 있지만\\n외부인들은 다른 증표로 대신해야할거다모...";
+	end;
+	}
+	if(get_mapname(@myid) == "무기점-연무관"){
+		set @Hshop1, menu(0, "어서오라모.화론은 정말 근사한곳이지 않나모? 이만한 기술을 가진나라도 드물다모!", "주작의반지 - 15폐", "주작의목걸이 - 20폐", "주작의벨트 - 10폐", "그만둔다");
+		if(@Hshop1 == 1){
+			npc_look @myid, 1, 2075;
+			set @Hshop2, menu(0, "화론에서만 구입할 수 있는 반지! 가격은 15폐(150론)", "구입한다", "그만둔다");
+			if(@Hshop2 == 1){
+				if(item_exist(@myid, "론") >= 150){
+					item_del "론", 150;
+				}else{
+					if(item_exist(@myid, "폐") < 15){goto ASO;}
+					item_del "폐", 15;
+				}
+				item_add "주작의반지", 1;
+				message 3, "주작의반지를 입수 했습니다.";
+			}
+		}else if(@Hshop1 == 2){
+			npc_look @myid, 1, 3272;
+			set @Hshop2, menu(0, "화론에서만 구입할 수 있는 반지! 가격은 20폐(200론)", "구입한다", "그만둔다");
+			if(@Hshop2 == 1){
+				if(item_exist(@myid, "론") >= 200){
+					item_del "론", 200;
+				}else{
+					if(item_exist(@myid, "폐") < 20){goto ASO;}
+					item_del "폐", 20;
+				}
+				item_add "주작의목걸이", 1;
+				message 3, "주작의목걸이를 입수 했습니다.";
+			}	
+		}else if(@Hshop1 == 3){
+			npc_look @myid, 1, 1902;
+			set @Hshop2, menu(0, "화론에서만 구입할 수 있는 반지! 가격은 10폐(100론)", "구입한다", "그만둔다");
+			if(@Hshop2 == 1){
+				if(item_exist(@myid, "론") >= 100){
+					item_del "론", 100;
+				}else{
+					if(item_exist(@myid, "폐") < 10){goto ASO;}
+					item_del "폐", 10;
+				}
+				item_add "주작의벨트", 1;
+				message 3, "주작의벨트를 입수 했습니다.";
+			}	
+		}else if(@Hshop1 == 4){
+			mes 0, "뭐냐.안사는거냐모? 이래서 이방인들이란..";
+		}
+		end;
+		ASO:
+		npc_look @myid, 0, 599;
+		mes 0, "아이템창에 거스름돈을 받을 빈칸이 없거나, 화론 화폐가 모자랍니다. 화론 화폐는\\n화론폐환전소에서 환전할 수 있습니다.";
+	}
+}
+
+Script	서쪽대륙B	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "아슬론마을"){
+		if(get_class_sub(@myid) == 0){message 3, "승급자만 가능합니다.";}
+		mes 1, "2차직업 수련장으로 보내드립니다.";
+		warp "아슬론교련장", 9, 11;
+	end;
+	}
+	if(get_mapname(@myid) == "아슬론교련장"){
+		set @renoa, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "2차직업안내", "이차직업구하기");
+		if(@renoa == 1){
+			mes 1, "어서오십시요. 수행자 여러분, 마스터들께서는 여러분들을 기다리고 계십니다.";
+			mes 1, "각 직업에 맞는 마스터를 찾아가셔서 당신이 앞으로 배워야 할것들에 대한 가르침을 받으시길 바랍니다.";
+			set @renoa2, menu(0, "궁금하신 것이 있으십니까??", "2차직업에 대한 설명듣기");
+			if(@renoa == 1){
+				set @renoa3, menu(0, "2차직업에 대해서 설명해 드리겠습니다.어떤 직업에대해 듣기를 원하십니까?", "검투사", "궁사", "소환사", "바드", "수인");
+				if(@renoa3 == 1){
+					mes 1, "{=c검투사{=a는 1차직업 전사 계열의 마스터분들이 2차로 구할 수 있는 직업입니다.";
+					mes 1, "무거운 창과 도를 사용해서 마물을 퇴치하는 일들을 하게 됩니다. 마법에 대한 습득은 그리 많이 하지 않습니다.";
+					mes 1, "단단한 방어구와 높은 체력, 그리고 강한 힘으로 당신 자신과 당신을 따르는 다른 이들을 지키는 역활을 하게 될것입니다.";
+				}else if(@renoa3 == 2){
+					mes 1, "a";
+				}else if(@renoa3 == 3){
+					mes 1, "a";
+				}else if(@renoa3 == 4){
+					mes 1, "a";
+				}else if(@renoa3 == 5){
+					mes 1, "a";
+				}
+			}
+		}else if(@renoa == 2){
+			if(get_class_sub(@myid) == 2){mes 1, "이미 2차직업을 구하신 분이로군요..용무가 없으시면 돌아가주실래요?"; warp "아슬론마을", 26,30; end;}
+			mes 1, "어서오세요. 저는 2차직업을 관장하는 직업정령입니다. 현재 가진 직업외에 새로운 직업을 받기를 원하시는 분들에게 새직업을 얻도록 해드리고 있습니다.";
+			set @renoa2, menu(0, "2차직업을 얻으시겠습니까?", "네, 2차직업을 얻고싶습니다.", "싫소. 난 이대로 살려하오.");
+			if(@renoa2 == 1){
+				set @renoa3, menu(0, "2차직업을 얻기 위해서는 경험치 10억과 체력 500,마력 500이 필요합니다. 이 조건을 충분히\\n갖추셨습니까?", "네", "헛..그런게 필요한가? 생각도 못했네..");
+				if(@renoa3 == 1){
+					if(get_baseexp(@myid) < 1000000000 || get_basevita2(@myid) < 501 || get_basemana2(@myid) < 501){mes 0, "조건이 충족하지 못합니다."; end;}
+					exp_del "1000000000";
+					set_basevita get_basevita2(@myid) - 500;
+					set_basemana get_basemana2(@myid) - 500;
+					set_class_sub 2;
+					mes 0,"2차승급이 완료되었습니다.";
+				}
+			}
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "아슬론검투사의장" || get_mapname(@myid) == "아슬론궁수의장" || get_mapname(@myid) == "아슬론소환사의장" || get_mapname(@myid) == "아슬론바드의장" || get_mapname(@myid) == "아슬론포유류의장" || get_mapname(@myid) == "아슬론조류의장" || get_mapname(@myid) == "아슬론파충류의장"){
+		if(spell_exist("성장(검투사)") || spell_exist("성장(궁수)") || spell_exist("성장(소환사)") || spell_exist("성장(바드)") || spell_exist("성장(포유류)") || spell_exist("성장(조류)") || spell_exist("성장(파충류)")){goto go1;}
+		if(get_class() == 3){goto abclass3;}
+		set @mutay, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "마법 배우기", "마법 지우기", "물건 사기", "물건 팔기");
+		abclass3:
+		if(get_class() == 3){set @mutay, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "마법 배우기", "마법 지우기", "물건 사기", "물건 팔기", "기초소환술");}
+		if(@mutay == 1){
+			if(get_class_sub(@myid)==2){
+				if(#disguise == 1){set @brak2, menu(0, "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", "성장(포유류)");}
+				if(#disguise == 2){set @brak2, menu(0, "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", "성장(파충류)");}
+				if(#disguise == 3){set @brak2, menu(0, "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", "성장(조류)");}
+				if(get_class() == 1){set @brak2, menu(0, "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", "성장(검투사)");}
+				if(get_class() == 2){set @brak2, menu(0, "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", "성장(궁수)");}
+				if(get_class() == 3){set @brak2, menu(0, "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", "성장(소환사)");}
+				if(get_class() == 4){set @brak2, menu(0, "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", "성장(바드)");}
+				if(@brak2 == 1){
+					if(#disguise == 1){set @brak4, menu(0, "성장(포유류)를 배우기 위해서는 마음을 굳게 먹어야 하느니라. 각오는 되어 있느냐?", "예", "아니오");}
+					if(#disguise == 2){set @brak4, menu(0, "성장(파충류)를 배우기 위해서는 마음을 굳게 먹어야 하느니라. 각오는 되어 있느냐?", "예", "아니오");}
+					if(#disguise == 3){set @brak4, menu(0, "성장(조류)를 배우기 위해서는 마음을 굳게 먹어야 하느니라. 각오는 되어 있느냐?", "예", "아니오");}
+					if(get_class() == 1){set @brak4, menu(0, "성장(검투사)를 배우기 위해서는 마음을 굳게 먹어야 하느니라. 각오는 되어 있느냐?", "예", "아니오");}
+					if(get_class() == 2){set @brak4, menu(0, "성장(궁수)를 배우기 위해서는 마음을 굳게 먹어야 하느니라. 각오는 되어 있느냐?", "예", "아니오");}
+					if(get_class() == 3){set @brak4, menu(0, "성장(소환사)를 배우기 위해서는 마음을 굳게 먹어야 하느니라. 각오는 되어 있느냐?", "예", "아니오");}
+					if(get_class() == 4){set @brak4, menu(0, "성장(바드)를 배우기 위해서는 마음을 굳게 먹어야 하느니라. 각오는 되어 있느냐?", "예", "아니오");}
+					if(@brak4 == 1){
+						if(#disguise == 1){spell_add2 "성장(포유류)";}
+						if(#disguise == 2){spell_add2 "성장(파충류)";}
+						if(#disguise == 3){spell_add2 "성장(조류)";}
+						if(get_class() == 1){spell_add2 "성장(검투사)";}
+						if(get_class() == 2){spell_add2 "성장(궁수)";}
+						if(get_class() == 3){spell_add2 "성장(소환사)";}
+						if(get_class() == 4){spell_add2 "성장(바드)";}
+						goto Growthlearningmagic;
+						end;
+					}else if(@brak4 == 2){
+						goto Growthlearningmagic;
+					}
+				}else if(@brak2 == 2){
+					goto Growthlearningmagic;
+				}
+			}
+		}else if(@mutay == 2){
+			spell_del_menu @myid, "지금 네가 지울 수 있는 마법은 다음과 같단다. 다시 한 번 심사 숙고 하고 지우도록 하여라", 5000;
+		}else if(@mutay == 3){
+			goto Learningbookfraud;
+		}else if(@mutay == 4){
+			goto SellBooks;
+		}else if(@mutay == 5){
+			goto Information1;
+		}
+		end;
+		go1:
+		set @mutay2, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "마법 지우기", "물건 사기", "물건 팔기");
+		if(@mutay2 == 1){
+			spell_del_menu @myid, "지금 네가 지울 수 있는 마법은 다음과 같단다. 다시 한 번 심사 숙고 하고 지우도록 하여라", 5000;
+		}else if(@mutay2 == 2){
+			Learningbookfraud:
+			if(get_class() == 1){shop 0, "타쿠", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+			if(get_class() == 2){shop 0, "윈섬", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+			if(get_class() == 3){shop 0, "셀라", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+			if(get_class() == 4){shop 0, "네아", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+			if(get_class() == 5){shop 0, "무타이", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+		}else if(@mutay2 == 3){
+			goto SellBooks;
+		}else if(@mutay2 == 4){
+			Information1:
+			mes 1, "어서오세요. 전 초급 소환을 위해 여러분들을 안내할 도우미 입니다.";
+			mes 1, "초급소환술인 바람,물,화염,대지에 대한 기초소환을 가르쳐드립니다. 초급소환술 4개를 10까지 올리시는 분들만이 중급 소환을 배우실수 있게 됩니다.";
+			mes 1, "중급 소환술이 오픈되면 중급소환에 대해 다시 말씀드릴께요..";
+			mes 1, "아직 기초 소환 마법을 배우지 않으셨으면 마법배우기를 클릭하도록 하세요";
+			mes 0, "후에 중급소환술에 대한 메뉴가 신설될것입니다.";
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "아슬론수인의장"){
+		if(#disguise != 0||get_class(@myid) != 5){mes 0, "이미 갈길이 정해졌으면 팔자입니다. 운명을 받아드리세요."; end;}
+		set @select2, menu(0, "어느 종류의 변신을 배우시겠습니까?\\n한번 선택후 바꿀 수 없습니다.", "늑대", "엘리게이터", "독수리");
+		if(@select2 == 1){
+			set @select3, menu(0, "포유류를 선택합니까? 선택하게되면 되돌릴수 없습니다", "결정", "고민고민");
+			if(@select3 == 1){
+			set #disguise, 1;
+			legend_add 0, 255, "수인-포유류가되다";
+			mes 0, "당신은 이제 수인-포유류로써의 가르침을 얻게됩니다";
+			}	
+		}else if(@select2 == 2){
+			set @select3, menu(0, "파충류를 선택합니까? 선택하게되면 되돌릴수 없습니다", "결정", "고민고민");
+			if(@select3 == 1){
+			set #disguise, 2; 
+			legend_add 0, 255, "수인-파충류가되다";
+			mes 0, "당신은 이제 수인-파충류로써의 가르침을 얻게됩니다";
+			}
+		}else if(@select2 == 3){
+			set @select3, menu(0, "조류를 선택합니까? 선택하게되면 되돌릴수 없습니다", "결정", "고민고민");
+			set #disguise, 3;
+			legend_add 0, 255, "수인-조류가되다";
+			mes 0, "당신은 이제 수인-조류로써의 가르침을 얻게됩니다";
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "노엠마을" || get_mapname(@myid) == "아만잡화상점"){
+		set @westselect, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+		if(@westselect == 1){
+			if(get_mapname(@myid) == "아만잡화상점"){shop 0, "브레이스", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+			if(get_mapname(@myid) == "노엠마을"){shop 0, "무에타할머니", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+		}else if(@westselect == 2){
+			shop 0, "무에타할머니", "무엇을 파시게요?";
+		}
+	end;
+	}
+	SellBooks:
+	shop 1, "물건팔기", "무엇을 파시게요?";
+	end;
+	Growthlearningmagic:
+	set @Growthlearningmagic, menu(0, "배움의 길은 늘 멀고 험난한 법이니 더더욱 노력하는 자세를 갖도록 하거라.");
+	end;
+}
+
+Script	서쪽대륙C	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "아슬론마을"){
+		if(#WestQuest001 == 2){mes 0, "뭐야,, 넌. 애송이의 냄새가 나는군. 저리가라. 너따위에게 볼일 없으니. 썩 사라져줘. 모두를 위해서 켓헤헤헤헤헤헤"; end;}
+		if(#WestQuest002 == 1){goto go1;}
+		if(#WestQuest002 == 2){
+			mes 1, "오 .. 어서오게 친구 !! 앗 .. 표정이 왜그래? 악마가 친구라고 불렀다고 불쾌해하는거야? 너무 그러지 말아. 우린 동지아냐 동지. 켓헤헤헤헤";
+			mes 0, "지난번엔 고마웠어. 하지만 이젠 맡길 일도 없구만. 다음에 다시 보자구. 켓헤헤헤헤헤헤";
+			end;
+		}
+		mes 1, "헤이 .. 이봐. 이런데서 뭘 얼쩡거리고 있는거야. 그렇게 할 일이 없나? 심심한건 이해하지만 이 근처는 함부로 돌아다니면 위험하다구. 나 같은 악마가 있으니까 .. 케헤헤헤헤";
+		mes 1, "뭐, 네가 정말 한가하다면 내가 좀 도와줄 수도 있어. 나를 위해 약간의 일을 해주겠다면 말이지만.\\n크게 어려운 일도 아니고, 크게 나쁜 일도 아니야. 크게 나쁜 일이라면 내가 직접 했겠지? 켓헤헤헤헤";
+		mes 1, "어린 것들이 건발지기는 예나 지금이나 다름없듯이, 악마의 세계나 인간의 세계나 다를바가 없다고. 저쪽에 있는 '메핏'이라는 놈을 알고 있나? 재수없기로는 바닷물이 말라버릴 지경이고 건방지기로는 나겔링 탑이 무너질 정도야.";
+		mes 1, "쪼그마한 것이 감히 상위 악마가 되겟다고 깨작거리는 폼이, 영 거슬린다구. 어때, 너도 그렇지 않아? 갓 태어난 저레벨들이 버르장머리없게 굴면 화나지 않아? 이봐이봐, 그런 눈으로 보지말라고.\\n사실은 사실이야.";
+		mes 1, "그게 사람이든 악마든, 경험으로부터 나오는 지혜는 존중해줘야하는거야. 거기에서부터 위계질서가 나오는거라구. 하지만 요즘을 봐봐. 어디 그런걸 아랑곳이나 하나? 너도 동감하지? 그렇지. 너도\\n뼈저리게 느끼고 있을거야";
+		mes 1, "그렇다면 말이야. 바로잡아야하지 않겠어? 허허 또 왜 그런 눈초리를 하는거야. 악마가 사는데나 사람이 사는데나 다들 비슷비슷하다구. 악마라고 꼭 뒤틀리고 나쁜 짓만 하라는 법은 없어. 바로잡을건 바로잡아야지. 안그래?";
+		mes 1, "만약 네가 내 말이 동감한다면 말이야, 조금쯤 손을 빌려줘도 괜찮겠지? 저 꼬맹이에게 예의범절이 뭔지 가르쳐줘야할거 아니냐 ... 이말이야. 안그래?";
+		mes 1, "만약 생각있다면, 아슬론 초원에 나가서 베이비드라의 뼈를 10개만 구해다 줘. 왜냐구? 그야 낸들 아나. 메핏놈이 그걸 필요로 하니까, 우리가 먼저 선수라도 쳐야하지 않겠냐는거지.";
+		mes 1, "녀석이 그걸 필요로 한다면, 우리가 가로채는거야, 뭔지 모르지만 저렇게 애타게 구하는걸로 봐서는 놈들에게 중요한 물건이겠지? 그걸 가로채면 놈도 정신을 차리게된다 .. 이말이야.";
+		set @morwin, menu(0, "어때? 생각있나? 망설이지 말라구. 우리는 질서를 바로잡으려는 것 뿐이야.", "그럼 한번 해볼까?", "그만두는게 낫겠어");
+		if(@morwin == 1){
+			mes 1, "좋아, 좋아. 뭔가 확고한 의지를 가진 사람이로군. 믿음직스러워. 켓헤헤헤헤헤. 그럼 어서 아슬론 초원으로 나가서 베이비드라의 뼈를 10개 모아오라구.";
+			mes 1, "아참, 한가지 말하는걸 까먹었군. 나라고 언제까지 너를 기다리고만 있을 수는 없지 않겠어? 시간이 오래걸리면 안돼. 딱 5시간 줄께. 그전에 베이비드라의 뼈를 10개 모아가지고 와.";
+			set #WestQuest002, 1;
+			mes 0, "너무 늦으면 모른척 해버릴꺼야. 그러니 늦지 말라구. 딱 5시간이야 !! 베이비드라의 뼈 10개 !!";
+		}else if(@morwin == 2){
+			mes 0, "쳇, 사회정의를 실현하려는 의지가 박약한 놈이로군. 어서 다른 곳으로 가버려 !! 콱 잡아먹기전에 !!";
+		}
+		end;
+		go1:
+		mes 1, "오 ~!! 드디어 왔군. 어서와 어서와. 그래, 어땠어? 베이비드라의 뼈는 많이 모아왔나? 저쪽 애송이의 부탁을 들어준 멍청이들도 많이 봤나?";
+		if(item_exist(@myid, "베이비드라의뼈") < 10){mes 0, "이런이런 .. 실망인데? 실망이야. 아직도 베이비드라의 뼈를 10개 모으지 못한거야? 어서가서 수고 좀 하라고. 자네의 수고가 사회정의를 바로세우는거야! 켓헤헤헤헤"; end;}
+		message 3, "{=wAP가 300 올랐습니다.";
+		item_del "베이비드라의뼈", 10;
+		item_add "바람의칸나목걸이", 1;
+		ability_exp_add 300;
+		set #WestQuest002, 2;
+		legend_add 0, 255, "아슬론 마을의 모르윈을 돕다.";
+		mes 1, "아 .. 고마워, 정말 고마워. 자네는 우리 사회에 작지만 큰 발자국을 남긴거야. 지켜야 할 것이 지켜지는 사회. 그걸 만들기 위해서 노력한거지. 스스로 자부심을 가져도 좋아. 케헤헤헤";
+		mes 1, "바람의 칸나 목걸이는 선물이야. 뭐 변변치 않긴 하지만 .. 없는 것보다는 낫지 않겠어? 게다가\\n덤으로 자네 AP도 5 포인트 올라갔어. 뭐 이것도 그렇게 많은건 아니지만. 역시 없는것보다는 좋지? 케헤헤헤";
+		mes 0, "그럼 잘가라구. 수고 많았어. 앞으로도 그런 정의감 투철한 정신상태로 살아가라구. 케헤헤헤헤";
+	end;
+	}
+}
+
+Script	서쪽대륙D	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "아슬론마을"){
+		if(#WestQuest002 == 2){mes 0, "엇 .. 넌 누구냐. 너에게서 나쁜 냄새가 난다. 나쁘다. 나빠. 나쁜 냄새는 나쁜 녀석에게서 옮는다.\\n가까이 오지마라. 가까이 오지마 !"; end;}
+		if(#WestQuest001 == 1){goto go;}
+		if(#WestQuest001 == 2){mes 0, "지난번엔 고마웠다. 다음에 다시 보자."; end;}
+		mes 1, "어서와라 어서와. 내 이름은 메핏. 작은 악마 메핏이다. 너는 나를 해치지는 않겠지? 나는 약하다 너를 해치지 못한다. 너도 나를 해치지 말아라. 안그러면 메핏은 도망간다. 멀리 도망간다";
+		mes 1, "해치지 않겠다고? 좋아. 좋아. 좋아. 좋아. 만약 너에게 여유가 있다면, 메핏이 부탁하고 싶은게 있다. 어렵지 않다. 너에게는 어렵지 않다. 부탁 들어주겠나?";
+		mes 1, "어렵지 않은 부탁이다. 어렵지 않아. 난 아슬론 초원에서 나오는 베이비드라의 뼈가 필요하다. 베이비드라의 뼈. 난 큰 악마가 될꺼다. 큰 악마가 되지만 너와 이곳을 해치지 않는다";
+		mes 1, "이번 지옥으로 돌아와서 큰 악마가 되어 지옥을 평화롭게 다스리고 싶다. 인간들과 싸우지 않게 평화롭게 다스리고 싶다. 하지만 큰 악마가 되려면 베이비드라의 뼈가 필요해.";
+		mes 1, "베이비드라의 뼈 10 개를 구해다주면 내가 좋은 것을 주지. 좋은 것을 준다. 베이비드라의 뼈 10개가 필요하다. 큰 악마가 되어 지옥을 평화롭게 만든다. 그러기 위해서 베이비드라의 뼈 10개가 필요하다";
+		set @select, menu(0, "베이비드라의 뼈 10개를 메핏에게 구해다줄 수 있나?", "한번 해보마", "힘들겠는걸");
+		if(@select == 1){
+			mes 1, "고맙다 !! 고맙다 !! 그럼 베이비드라의 뼈를 10개만 모아줘라 !!";
+			set #WestQuest001, 1;
+			end;
+ 		}else if(@select == 2){
+			mes 0, "뭐 어쩔 수 없지. 어렵다면 어쩔 수 없다. 그럼 잘가라. 잘가. 무사해라";
+			end;
+		}
+		go:
+		mes 1, "어서와라 어서와 !! 기다리고 있었다 !! 베이비드라의 뼈는 모아왔나? 모아왔겠지? 선량한 메핏의 부탁을 들어주는거겠지?";
+		if(item_exist(@myid, "베이비드라의뼈") < 10){mes 0, "이런이런 .. 실망인데? 실망이야, 아직도 베이비드라의 뼈를 10개 모으지 못한거야? 어서가서 수고 좀 하라고."; end;}
+		message 3, "{=wAP가 300 올랐습니다.";
+		set #WestQuest001, 2;
+		item_del "베이비드라의뼈", 10;
+		item_add "화염의칸나목걸이", 1;
+		ability_exp_add 300;
+		money_add 50000;
+		legend_add 0, 255, "아슬론 마을의 작은악마 메핏을 돕다.";
+		mes 1, "고맙다. 정말 고맙다. 덕분에 메핏이 큰 악마가 될 수 있겠다. 아직 다 모은건 아니지만 이제 얼마 남지 않았다. 고맙다. 정말 고맙다. 반드시 지옥을 평화롭게 다스리며 사람들에게 피해를 끼치지 않도록 노력하겠다..";
+		mes 1, "화염의 칸나목걸이는 작은 성의다. 메핏이 마련한 작은 성의이니 받아줘라. 메핏은 아직 큰 악마가 아라 많은 것을 주지 못한다. 미안하다. 하지만 나중에 더 큰 것을 줄지도 모른다..";
+		mes 0, "다음에 다시 보자. 오늘은 정말 고맙다. 고마워. 잊지 않겠다";
+	end;
+	}
+}
+
+Script	서쪽대륙상점A	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "무기점-연무관" && #WestQuest008 == 23){
+		set @AS, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "화론연무관무기상", "대화하기-연무관주인");
+		if(@AS == 1){
+			set @ASA, menu(0, "저는 화론 연무관의 주인입니다모.물건을 사주는 사람은 누구든 환영합니다모.^^ 자자, 무엇을 도와드릴까요모?", "영월도 - 50폐", "영월궁 - 50폐", "영월충 - 50폐", "비파 - 50폐", "나간다");
+			if(@ASA == 1){
+				npc_look @myid, 1, 3193;
+				set @ASB, menu(0, "달의힘을 받은 신비한 철광석을 화론의 비밀의 비법으로 재련한 검투사용 무기. 가격은\\n50폐(500론)입니다.", "구입한다", "그만둔다");
+				if(@ASB == 1){
+					if(item_exist(@myid, "론") >= 500){
+						item_del "론", 500;
+					}else{
+						if(item_exist(@myid, "폐") < 50){goto ASO;}
+						item_del "폐", 50;
+					}
+					item_add "영월도", 1;
+					message 3, "영월도를 입수 했습니다.";
+				}
+			}else if(@ASA == 2){
+				npc_look @myid, 1, 2373;
+				set @ASB, menu(0, "전문가들을 위해 특별이 만들어진 궁수용 활,달의 힘을 받은 신목으로 만들어졌다. 가격은\\n50폐(500론)!", "구입한다", "그만둔다");
+				if(@ASB == 1){
+					if(item_exist(@myid, "론") >= 500){
+						item_del "론", 500;
+					}else{
+						if(item_exist(@myid, "폐") < 50){goto ASO;}
+						item_del "폐", 50;
+					}
+					item_add "영월궁", 1;
+					message 3, "영월궁를 입수 했습니다.";
+				}
+			}else if(@ASA == 3){
+				npc_look @myid, 1, 2374;
+				set @ASB, menu(0, "정령을 다루는 소환사들을 위한 탁월한 선택! 가격은 50폐(500론)!", "구입한다", "그만둔다");
+				if(@ASB == 1){
+					if(item_exist(@myid, "론") >= 500){
+						item_del "론", 500;
+					}else{
+						if(item_exist(@myid, "폐") < 50){goto ASO;}
+						item_del "폐", 50;
+					}
+					item_add "영월충", 1;
+					message 3, "영월충를 입수 했습니다.";
+				}
+			}else if(@ASA == 4){
+				npc_look @myid, 1, 2371;
+				set @ASB, menu(0, "성스러운 마법의 힘을 가지고있는 바드용 비파,음색 또한 일품!! 가격은 50폐!(500론)", "구입한다", "그만둔다");
+				if(@ASB == 1){
+					if(item_exist(@myid, "론") >= 500){
+						item_del "론", 500;
+					}else{
+						if(item_exist(@myid, "폐") < 50){goto ASO;}
+						item_del "폐", 50;
+					}
+					item_add "비파", 1;
+					message 3, "비파를 입수 했습니다.";
+				}
+			}else if(@ASA == 5){
+				mes 0, "뭐냐모? 그냥 구경꾼이냐모?";
+			}
+		}else if(@AS == 2){
+			mes 1, "오..촌장님의 인정을 받다니모..실력이 보통이 아닌가보군모?? 하지만 그걸로 여기 있는 무기들을 쓸수 있다고 자신하는건 아니겠지?";
+			mes 1, "이 무기들을 쓰기 위해서는 {=c화룡의인장{=a이라는 기술이 필요하지모..화론의 모든 아이템에는 화룡신님의 힘이 깃들어 있단말이지모";
+			mes 1, "그걸 어디서 배우냐고모? 뭐..촌장어르신의 인정도 받았겠다..저기 보이는 문으로 들어가봐. 그 안에 우리 형이 기다리고 있을거야. 우리형은 화룡으로 부터 인정받은 무술인이라고.";
+			mes 0, "화룡의인장을 배우고 나면 이제 이 무기들도 자네를 따를꺼야모.";
+		}
+		end;
+		ASO:
+		npc_look @myid, 0, 602;
+		mes 0, "아이템창에 거스름돈을 받을 빈칸이 없거나, 화론 화폐가 모자랍니다. 화론 화폐는\\n화론폐환전소에서 환전할 수 있습니다.";
+	}
+	if(get_mapname(@myid) == "아만대장간"){
+		set @amanshop1, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "물건 고치기", "모두 고치기");
+		if(@amanshop1 == 1){
+			repair_item @myid, "무엇을 고치시게요?";
+		}else if(@amanshop1 == 2){
+			repair_item_all @myid;
+		}
+	}
+	set @select, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기", "물건 고치기", "모두 고치기");
+	if(@select == 1){
+		if(get_mapname(@myid) == "아슬론무기상점"){shop 0, "쥬얼", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+		if(get_mapname(@myid) == "노엠마을"){shop 0, "아사히", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";} 
+	}else if(@select == 2){
+		if(get_mapname(@myid) == "아슬론무기상점"){end;}
+		if(get_mapname(@myid) == "노엠마을"){shop 1, "아사히", "무엇을 파시게요?";}
+	}else if(@select == 3){
+		repair_item @myid, "무엇을 고치시게요?";
+	}else if(@select == 4){
+		repair_item_all @myid;
+	}
+}
+
+Script	서쪽대륙상점B	{
+	set @myid, get_myid();
+	set @select, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기", "물건 고치기", "모두 고치기");
+	if(@select == 1){
+		if(get_mapname(@myid) == "아슬론무기상점"){shop 0, "아쿰", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+		if(get_mapname(@myid) == "노엠마을"){shop 0, "카스", "원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}
+ 	}else if(@select == 2){
+		if(get_mapname(@myid) == "아슬론무기상점"){shop 1, "물건팔기", "무엇을 파시게요?";}
+		if(get_mapname(@myid) == "노엠마을"){shop 1, "카스", "무엇을 파시게요?";}
+	}else if(@select == 3){
+		repair_item @myid, "무엇을 고치시게요?";
+	}else if(@select == 4){
+		repair_item_all @myid;
+	}
+}
+
+Script	서쪽대륙잡화A	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "메데니아뱅크(아만지점)" || get_mapname(@myid) == "메데니아뱅크(아슬론지점)" || get_mapname(@myid) == "메데니아뱅크(노엠지점)" || get_mapname(@myid) == "메데니아뱅크-화론지점"){
+		set @WestBank, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "대화하기", "금전 맡기기", "물건 맡기기", "금전 찾기", "물건 찾기", "화론폐환전소");
+		if(@WestBank == 1){
+			if(get_mapname(@myid) == "메데니아뱅크(노엠지점)"){mes 0, "메데니아뱅크 노엠지점입니다. 성실하게 모시겠습니다.";}
+			if(get_mapname(@myid) == "메데니아뱅크-화론지점"){mes 0, "메데니아뱅크 화론지점입니다. 성실하게 모시겠습니다.";}
+			if(get_mapname(@myid) == "메데니아뱅크(아만지점)"){mes 0, "메데니아뱅크 아만지점입니다. 성실하게 모시겠습니다.";}
+			mes 0, "메데니아뱅크 아슬론지점입니다. 성실하게 모시겠습니다.";
+		}else if(@WestBank == 2){
+			deposit_money();
+		}else if(@WestBank == 3){
+			deposit_item();
+		}else if(@WestBank == 4){
+			withdraw_money();
+		}else if(@WestBank == 5){
+			withdraw_item();
+		}else if(@WestBank == 6){
+			set @WestBank2, menu(0, "안녕하세요.화론 화폐로 환전해드리고 있습니다. 무엇을 도와드릴까요?", "Gold를 폐로 환전한다", "화론 화폐에 대한 설명을 듣는다...", "대화를 그만둔다");
+			if(@WestBank2 == 1){
+				shop 0, "메데니아뱅크", "환률은 1폐에 {=v1500000전{=a입니다~\\n{=c서쪽대륙의 돈은 동쪽대륙의 돈으로 바꿀 수 없으니 주의해서 바꿔주세요!";
+			}else if(@WestBank2 == 2){
+				mes 0, "화론의 화폐는 두단위로 되어있어요. 하나는 폐, 하나는 론인데.... 폐가 론보다 10배 가치를\\n가지고 있지요. 1폐는 Gold로 1500000전 이고 1론은 그 1/10인 150000전이에요. 환전소에서는\\n폐밖에는 바꿀 수 없습니다^^. 그럼 좋은하루 되세요!";
+			}
+		}
+	end;
+	}
+}
+
+W1	서쪽대륙워프일	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(get_mapname(@myid)=="히야트던전F-1"||get_mapname(@myid)=="히야트던전F-2"||get_mapname(@myid)=="히야트던전F-3"||get_mapname(@myid)=="히야트던전F-4"||get_mapname(@myid)=="히야트던전F-5"||get_mapname(@myid)=="히야트던전F-6"||get_mapname(@myid)=="히야트던전F-7"||get_mapname(@myid)=="히야트던전F-8"||get_mapname(@myid)=="히야트던전F-9"||get_mapname(@myid)=="히야트던전F-10"||get_mapname(@myid)=="히야트던전F-11"){
+		if(!group_exist(@myid)){
+			sleep 300;
+			message 3, "히야트의 힘에 의해 아만으로 튕겨졌다.";
+			set #Hiyate, 0;
+			set #Hiyateon, 0;
+			set $WestHiyate, 0;
+			warp "아만마을", 49,82;
+			end;
+		}
+	}
+	if(get_mapname(@myid) == "노엠대평원"){
+		if(get_ability() >= 5){warp "엔도르1", 20, 35; end;}
+		sleep 300;
+		set_ys(get_ys(@myid)+1);
+		message 3, "어빌리티가 조금더 높다면 들어갈수도...?";
+	end;
+	}
+	if(get_mapname(@myid) == "엔도르1"){
+		npc_look @myid, 0, 541;
+		Endor:
+		set @Endor, menu(1, "어디로 이동하시겠습니까?", "엔도르80", "엔도르148", "취소");
+		if(@Endor==0){goto Endor;}
+		if(@Endor==1){
+			if(#WestQuest009==14){
+				warp "엔도르80", 35,22;
+			}else{
+				mes 2, "사용할 자격이 없습니다.";
+			}
+		}else if(@Endor==2){
+			if(#WestQuest009==14){
+				warp "엔도르148", 24,25;
+			}else{
+				mes 2, "사용할 자격이 없습니다.";
+			}
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "불의사막입구"){
+		if(get_ability() >= 15){warp "불의사막1", 3, 2; end;}
+		sleep 300;
+		set_ys(get_ys(@myid)-1);
+		message 3, "오직 강한자만 입장 가능합니다.";
+	end;
+	}
+	if(get_mapname(@myid) == "화산암지대가는길"){
+		if(!group_exist(@myid)){warp "알세이드스-화산암지대(A)", 38,2;end;}
+		sleep 300;
+		set_ys(get_ys(@myid)-1);
+	end;
+	}
+	if(get_mapname(@myid) == "알세이드스-화산암지대(A)"){
+		if(get_ability() >= 25){warp "알세이드스-화론마을", 95, 48;end;}
+		sleep 300;
+		set_xs(get_xs(@myid)+1);
+		message 3, "오직 강한자만 입장 가능합니다.";
+	end;
+	}
+	if(get_mapname(@myid) == "알세이드스-화산암지대(C)"){
+		if(get_ability() >= 25){warp "알세이드스-화론마을", 2, 27;end;}
+		sleep 300;
+		set_xs(get_xs(@myid)-1);
+		message 3, "오직 강한자만 입장 가능합니다.";
+	end;
+	}
+	if(get_mapname(@myid) == "아만정글입구"){
+		if(!group_exist(@myid)){warp "알세이드스-화산암지대(C)", 2, 21; end;}
+		sleep 300;
+		set_ys(get_ys(@myid)-1);
+	end;
+	}
+	if(get_mapname(@myid) == "알세이드스-화론마을"){
+		npc_look @myid, 0, 603;
+		if(get_xs(@myid) == 7 && get_ys(@myid) == 67){goto gosthousewarp;}
+		if(get_xs(@myid) == 7 && get_ys(@myid) == 68){
+			gosthousewarp:
+			warp "흉가1층", 26,20; 
+			set #GostHouse, 1;
+			end;
+		}
+		if(get_nation (@myid) == 6){end;}
+		if(!item_exist(@myid, "청룡의통행증") && !item_exist(@myid, "백호의증명서")){
+			if(get_xs(@myid) == 50 && get_ys(@myid) == 16){goto North;}
+			if(get_xs(@myid) == 51 && get_ys(@myid) == 16){goto North;}
+			if(get_xs(@myid) == 52 && get_ys(@myid) == 16){goto North;}
+			if(get_xs(@myid) == 50 && get_ys(@myid) == 16){goto North;}
+	
+			if(get_xs(@myid) == 82 && get_ys(@myid) == 46){goto Eest;}
+			if(get_xs(@myid) == 82 && get_ys(@myid) == 47){goto Eest;}
+			if(get_xs(@myid) == 82 && get_ys(@myid) == 48){goto Eest;}
+	
+			if(get_xs(@myid) == 15 && get_ys(@myid) == 69){goto West;}
+			if(get_xs(@myid) == 15 && get_ys(@myid) == 70){goto West;}
+			if(get_xs(@myid) == 15 && get_ys(@myid) == 71){goto West;}
+			if(get_xs(@myid) == 15 && get_ys(@myid) == 72){goto West;}
+	
+			if(get_xs(@myid) == 50 && get_ys(@myid) == 83){goto South;}
+			if(get_xs(@myid) == 51 && get_ys(@myid) == 83){goto South;}
+			if(get_xs(@myid) == 52 && get_ys(@myid) == 83){goto South;}
+			if(get_xs(@myid) == 53 && get_ys(@myid) == 83){goto South;}
+		}
+		item_del "청룡의통행증", 1;
+		end;
+		North:
+		warp "알세이드스-화론마을", 51,14;
+		goto hwarp;
+		South:
+		warp "알세이드스-화론마을", 52,85;
+		goto hwarp;
+		Eest:
+		warp "알세이드스-화론마을", 84,47;
+		goto hwarp;
+		West:
+		warp "알세이드스-화론마을", 13,70;
+		hwarp:
+		mes 2, "통행증이 없으면 통행이 불가능하네";
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-1"){
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 2){warp "히야트던전F-2", 58,46;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 3){warp "히야트던전F-2", 58,47;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 4){warp "히야트던전F-2", 58,48;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 5){warp "히야트던전F-2", 58,49;}
+		if($Hiyate == 0){
+			set $Hiyate, 1;
+			mob_spawn "롤라", 47, 35, 2;
+			mob_spawn "롤라", 47, 33, 2;
+			mob_spawn "롤라", 48, 34, 2;
+			mob_spawn "아만족여전사", 46, 17, 2;
+			mob_spawn "아만족전사", 45, 18, 2;
+			mob_spawn "아만족전사", 45, 16, 2;
+			mob_spawn "아만족여전사", 36, 31, 2;
+			mob_spawn "아만족여전사", 35, 30, 2;
+			mob_spawn "아만족여전사", 34, 31, 2;
+			mob_spawn "롤라", 20, 29, 2;
+			mob_spawn "롤라", 21, 30, 2;
+			mob_spawn "롤라", 19, 30, 2;
+			mob_spawn "식인식물", 5, 45, 3;
+			mob_spawn "롤라", 4, 46, 2;
+			mob_spawn "아만족전사", 6, 46, 2;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-2"){
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 44){warp "히야트던전F-3", 58,5;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 45){warp "히야트던전F-3", 58,6;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 46){warp "히야트던전F-3", 58,7;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 47){warp "히야트던전F-3", 58,8;}
+		if($Hiyate == 1){
+			set $Hiyate, 2;
+			mob_spawn "식인식물", 30, 11, 4;
+			mob_spawn "아만족전사", 47, 33, 4;
+			mob_spawn "아만족전사", 48, 34, 4;
+			mob_spawn "아만족여전사", 30, 21, 4;
+			mob_spawn "아만족전사", 31, 20, 4;
+			mob_spawn "아만족전사", 31, 22, 4;
+			mob_spawn "식인식물", 17, 36, 4;
+			mob_spawn "아만족궁사", 18, 35, 4;
+			mob_spawn "아만족궁사", 18, 37, 4;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-3"){
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 55){warp "히야트던전F-4", 58,1;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 56){warp "히야트던전F-4", 58,2;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 57){warp "히야트던전F-4", 58,3;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 58){warp "히야트던전F-4", 58,4;}
+		if($Hiyate == 2){
+			set $Hiyate, 3;
+			mob_spawn "아만족여전사", 45, 6, 2;
+			mob_spawn "아만족전사", 46, 5, 2;
+			mob_spawn "아만족전사", 47, 6, 2;
+			mob_spawn "아만족여전사", 31, 14, 2;
+			mob_spawn "아만족전사", 32, 13, 2;
+			mob_spawn "아만족궁사", 33, 14, 2;
+			mob_spawn "아만족여전사", 26, 20, 2;
+			mob_spawn "아만족전사", 25, 19, 2;
+			mob_spawn "아만족전사", 27, 19, 2;
+			mob_spawn "아만족전사", 32, 46, 2;
+			mob_spawn "아만족전사", 31, 45, 2;
+			mob_spawn "아만족전사", 30, 46, 2;
+			mob_spawn "식인식물", 31, 47, 2;
+			mob_spawn "아만족전사", 3, 57, 2;
+			mob_spawn "아만족전사", 3, 55, 2;
+			mob_spawn "식인식물", 4, 56, 2;
+		}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-4"){
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 53){warp "히야트던전F-5", 58,53;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 54){warp "히야트던전F-5", 58,54;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 55){warp "히야트던전F-5", 58,55;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 56){warp "히야트던전F-5", 58,56;}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-5"){
+		if(get_xs(@myid) == 25 && get_ys(@myid) == 0){warp "히야트던전F-6", 27,58;}
+		if(get_xs(@myid) == 26 && get_ys(@myid) == 0){warp "히야트던전F-6", 28,58;}
+		if(get_xs(@myid) == 27 && get_ys(@myid) == 0){warp "히야트던전F-6", 29,58;}
+		if(get_xs(@myid) == 28 && get_ys(@myid) == 0){warp "히야트던전F-6", 30,58;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 53){warp "히야트던전F-8", 58,10;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 54){warp "히야트던전F-8", 58,11;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 55){warp "히야트던전F-8", 58,12;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 56){warp "히야트던전F-8", 58,13;}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-6"){
+		if(get_xs(@myid) == 14 && get_ys(@myid) == 0){warp "히야트던전F-7", 55,58;}
+		if(get_xs(@myid) == 15 && get_ys(@myid) == 0){warp "히야트던전F-7", 56,58;}
+		if(get_xs(@myid) == 16 && get_ys(@myid) == 0){warp "히야트던전F-7", 57,58;}
+		if(get_xs(@myid) == 17 && get_ys(@myid) == 0){warp "히야트던전F-7", 58,58;}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-8"){
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 9){warp "히야트던전F-9", 58,39;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 10){warp "히야트던전F-9", 58,40;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 11){warp "히야트던전F-9", 58,41;}
+		if(get_xs(@myid) == 0 && get_ys(@myid) == 12){warp "히야트던전F-9", 58,42;}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-9"){
+		if(get_xs(@myid) == 15 && get_ys(@myid) == 59){warp "히야트던전F-10", 11,1;}
+		if(get_xs(@myid) == 16 && get_ys(@myid) == 59){warp "히야트던전F-10", 12,1;}
+		if(get_xs(@myid) == 17 && get_ys(@myid) == 59){warp "히야트던전F-10", 13,1;}
+		if(get_xs(@myid) == 18 && get_ys(@myid) == 59){warp "히야트던전F-10", 14,1;}
+	end;
+	}
+	if(get_mapname(@myid) == "히야트던전F-10"){
+		if(get_xs(@myid) == 30 && get_ys(@myid) == 59){warp "히야트던전F-11", 23,1;}
+		if(get_xs(@myid) == 31 && get_ys(@myid) == 59){warp "히야트던전F-11", 24,1;}
+		if(get_xs(@myid) == 32 && get_ys(@myid) == 59){warp "히야트던전F-11", 25,1;}
+		if(get_xs(@myid) == 33 && get_ys(@myid) == 59){warp "히야트던전F-11", 26,1;}
+	end;
+	}
+	if(get_class() == 1){warp "아슬론검투사의장", 5,6; end;}
+	warp "아슬론교련장", 6,3;
+	mes 2, "전사계열의 수행자만 입장하실수 있습니다.";
+	end;
+}
+
+W2	서쪽대륙워프이	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(get_mapname(@myid) == "알세이드스-화론마을"){
+		if(!group_exist(@myid)){warp "알세이드스-화산암지대(A)", 2,39; end;}
+		sleep 300;
+		set_xs(get_xs(@myid)-1);
+	end;
+	}
+	if(get_class() == 2){warp "아슬론궁수의장", 5,6; end;}
+	warp "아슬론교련장", 14,3;
+	mes 2, "도적계열의 수행자만 입장하실수 있습니다.";
+	end;
+}
+
+W3	서쪽대륙워프삼	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(get_mapname(@myid) == "알세이드스-화론마을"){
+		if(!group_exist(@myid)){warp "알세이드스-화산암지대(C)", 47,25; end;}
+		sleep 300;
+		set_xs(get_xs(@myid)+1);
+	end;
+	}
+	if(get_class() == 3){warp "아슬론소환사의장", 8,10; end;}
+	warp "아슬론교련장", 14,3;
+	mes 2, "마법계열의 수행자만 입장하실수 있습니다.";
+	end;
+}
+
+W4	서쪽대륙워프사	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(get_mapname(@myid) == "알세이드스-화론마을"){
+		if(#WestQuest008 == 23){warp "화염의세계수의사당", 12,22; end;}
+		sleep 300;
+		set_ys(get_ys(@myid)+1);
+	end;
+	}
+	if(get_class() == 4){warp "아슬론바드의장", 5,6; end;}
+	warp "아슬론교련장", 14,3;
+	mes 2, "성직계열의 수행자만 입장하실수 있습니다.";
+	end;
+}
+
+W5	서쪽대륙워프오	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(item_exist(@myid,"개방의주문서5")||item_exist(@myid,"개방의주문서6")||item_exist(@myid,"개방의주문서7")){message 3,"개방의 주문서의 힘으로 이동되었습니다."; goto go1;}
+	if(get_class() == 5){go1:warp "아슬론수인의장", 8,8; end;}
+	warp "아슬론교련장", 15,7;
+	mes 2, "무도가계열의 수행자만 입장하실수 있습니다.";
+	end;
+}
+
+W6	포유류계열	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(item_exist(@myid,"개방의주문서5")){message 3,"개방의 주문서의 힘으로 이동되었습니다."; goto go1;}
+	if(#disguise == 1){go1:warp "아슬론포유류의장", 5,7; end;}
+	warp "아슬론수인의장", 5,3;
+	message 3, "포유류 계열만 입장할수 있습니다";
+	end;
+}
+
+W7	조류계열	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(item_exist(@myid,"개방의주문서7")){message 3,"개방의 주문서의 힘으로 이동되었습니다."; goto go1;}
+	if(#disguise == 3){go1:warp "아슬론조류의장", 5,7; end;}
+	warp "아슬론수인의장", 8,3;
+	message 3, "조류 계열만 입장할수 있습니다";
+	end;
+}
+
+W8	파충류계열	{
+	set @myid, get_myid();
+	npc_look @myid, 0, 0;
+	if(item_exist(@myid,"개방의주문서6")){message 3,"개방의 주문서의 힘으로 이동되었습니다."; goto go1;}
+	if(#disguise == 2){go1:warp "아슬론파충류의장", 5,7; end;}
+	warp "아슬론수인의장", 11,2;
+	message 3, "파충류 계열만 입장할수 있습니다";
+	end;
+}
+
+item	주술이걸린글래스조각	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "아만정글입구"){
+		set #AmanTotemE, 0;
+		item_del "주술이걸린글래스조각", 1;
+		message 3, "정글글래스 : 누가 나를 깨운거야!!";
+		mob_spawn "정글글래스", 30, 17, 1;
+	}
+}

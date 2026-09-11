@@ -1,0 +1,662 @@
+0,0,0,0,0,0,0	노비스지하동굴입장	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	if(get_level(@myid) >= 22){mes 0, "강한힘이 입장을 거부하고 있다."; end;}
+	set @select, menu("※던전※\\n노비스 지하동굴로 입장 하시겠습니까?\\n그룹원이 있다면 같이 이동됩니다.", "입장한다", "입장하지 않는다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(get_mapname(@myid) != "노비스지하던전B2"){mes 0, "알수 없는 에러!"; end;}
+		set $map_num, $map_num + 1;
+		set @name1$, "사냥터" + get_name() + "노비스지하동굴1";
+		set @name2$, "사냥터" + get_name() + "노비스지하동굴2";
+		set @name3$, "사냥터" + get_name() + "노비스지하동굴3";
+		map_create $map_num, @name1$, "노비스지하동굴1", 21, 22, 140, 2, 1, "db/maps/던전/lod001.map";
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name2$, "노비스지하동굴2", 22, 20, 140, 2, 2, "db/maps/던전/lod002.map";
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name3$, "노비스지하동굴3", 22, 25, 140, 2, 3, "db/maps/던전/lod004.map";
+		warp_create 0,@name1$,20,12,@name2$,3,5,11,22,0;
+		warp_create 0,@name2$,20,4,@name3$,3,19,11,22,0;
+		item_clear @name1$;
+		mob_clear @name1$;
+		item_clear @name2$;
+		mob_clear @name2$;
+		item_clear @name3$;
+		mob_clear @name3$;
+		group_warp @name1$, 4, 13;
+		group_message 3, "{=c※던전※ 노비스지하동굴에 입장하셧습니다.";
+		message 3, "{=c※던전※ 노비스지하동굴에 입장하셧습니다.";
+		mob_spawn3 "동굴지네", @name1$, 40, 48, 1600, 7;
+		mob_spawn3 "동굴지네", @name2$, 40, 48, 1600, 7;
+		mob_spawn3 "동굴지네", @name3$, 40, 48, 1600, 5;
+		mob_spawn3 "동굴쥐", @name1$, 38, 45, 1800, 7;
+		mob_spawn3 "동굴쥐", @name2$, 38, 45, 1800, 7;
+		mob_spawn3 "동굴쥐", @name3$, 38, 45, 1800, 5;
+		mob_spawn3 "고대의좀비", @name3$, 50, 70, 5000, 1;
+	}else if(@select == 2){
+		mes 0, "신중히 고려해 주세요.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	포테의숲오솔길입장	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	if(get_level(@myid) >= 52){message 3, "강한힘이 입장을 거부하고 있다."; end;}
+	set @select, menu("※던전※\\n포테의숲 오솔길로 입장 하시겠습니까?\\n그룹원이 있다면 같이 이동됩니다.", "입장한다", "입장하지 않는다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(get_mapname(@myid) != "포테의숲5존"){mes 0, "알수 없는 에러!"; end;}
+		set $map_num, $map_num + 1;
+		set @name4$, "사냥터" + get_name() + "포테의숲오솔길";
+		set @name5$, "사냥터" + get_name() + "포테의숲오솔길대기실";
+		set @name6$, "사냥터" + get_name() + "포테의숲오솔길보스존";
+		map_create $map_num, @name4$, "포테의숲오솔길", 20, 40, 145, 3, 1, "db/maps/default/maps/lod4612.map";
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name5$, "포테의숲오솔길대기실", 10, 10, 145, 3, 2, "db/maps/default/maps/lod4613.map";
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name6$, "포테의숲오솔길보스존", 20, 20, 145, 3, 3, "db/maps/default/maps/lod4615.map";
+		warp_create 0,@name4$,9,0,@name5$,4,9,21,52,0;
+		warp_create 0,@name5$,4,0,@name6$,10,19,21,52,1;
+		item_clear @name4$;
+		mob_clear @name4$;
+		item_clear @name5$;
+		mob_clear @name5$;
+		item_clear @name6$;
+		mob_clear @name6$;
+		group_warp @name4$, 9, 39;
+		group_message 3, "{=c※던전※ 포테의숲오솔길에 입장하셧습니다.";
+		message 3, "{=c※던전※ 포테의숲오솔길에 입장하셧습니다.";
+		mob_spawn3 "사나운은빛늑대", @name5$, 150, 160, 4500, 6;
+		mob_spawn3 "사나운은빛늑대", @name6$, 150, 160, 4500, 8;
+		mob_spawn3 "자이언트맨티스", @name6$, 220, 240, 15000, 1;
+	}else if(@select == 2){
+		mes 0, "신중히 고려해 주세요.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	블러드백작의결계	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("베크나탑의기운이 느껴진다.\\n입장 하겠습니까?\\n(그룹장만 입장신청이 가능합니다.)\\n(입장제한X)", "입장한다.", "입장하지 않는다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(!group_master(@myid)){mes 0, "당신은 그룹이 없거나, 그룹장이 아닙니다."; end;}
+		set @name1$, "사냥터" + get_name() + "블러드백작의결계";
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name1$, "블러드백작의결계", 30, 31, 142, 6, 1, "db/maps/드라큐라백작의성/maps/lod117.map";
+		group_val "#bloodearl", 1, 1;
+		item_clear @name1$;
+		mob_clear @name1$;
+		group_warp @name1$, 13, 29;
+		group_message 3, "{=c※던전※ 베크나탑에 입장하셧습니다.";
+		message 3, "{=c※던전※ 베크나탑에 입장하셧습니다.";
+		sleep 1000;
+		mob_spawn2 "유령하녀1", 11, 23, 1, group_bighp() * 9;
+		mob_spawn2 "유령하녀2", 14, 25, 1, group_bighp() * 9;
+		mob_spawn2 "유령하녀3", 17, 23, 1, group_bighp() * 9;
+		mob_spawn2 "로밍체어3", 19, 20, 1, group_bighp() * 4;
+		mob_spawn2 "로밍레더3", 5, 12, 1, group_bighp() * 4;
+		mob_spawn2 "부3", 7, 15, 1, group_bighp() * 4;
+		mob_spawn2 "로밍스테츄3", 23, 28, 1, group_bighp() * 4;
+		mob_spawn2 "미러테이블3", 7, 25, 1, group_bighp() * 4;
+		mob_spawn2 "레아로3", 16, 16, 1, group_bighp() * 4;
+		set @mob, get_mobxy(11, 23);
+		set @mob1, get_mobxy(14, 25);
+		set @mob2, get_mobxy(17, 23);
+		if(@mob){
+			effect @mob, 0, 307, 100;
+			mob_say2 @mob, 0, 0, "나가 주세요..";
+		}
+		if(@mob1){
+			effect @mob1, 0, 307, 100;
+			mob_say2 @mob1, 0, 0, "나가 주세요..";
+		}
+		if(@mob2){
+			effect @mob2, 0, 307, 100;
+			mob_say2 @mob2, 0, 0, "나가 주세요..";
+		}
+		end;
+	}else if(@select == 2){
+		mes 0, "입장을 하지 않습니다.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	호러캐슬입장	{
+	set @myid, get_myid();
+	set @select, 0;
+	mes 1, "그래 .. 자네도 호러캐슬에 가려고 하는겐가? 생각보다 만만치 않은 곳이라는걸 알아둬야 할텐데 ..";
+	if(get_class_sub(@myid) != 0){mes 0, "승급자는 입장할수 없습니다."; end;}
+	if(get_level(@myid) < 99){mes 0, "아직 입장할수 없습니다."; end;}
+	re:
+	set @select, menu("호러캐슬에 입장하려면 기부금 조로 3천골드를 지급해야 한다네 .. 성 보수도 해야하고.. 의외로 돈들어가는 곳이 많지...", "딴데간다", "3천골드를 낸다");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		mes 0, "그래 딴데를 가보도록 해보게..";
+		end;
+	}else if(@select == 2){
+		if(get_money(@myid) < 3000){
+			mes 0, "골드가 부족하다네, 입장할려면 3000골드가 필요하다네.";
+			end;
+		}else{
+			money_del 3000;
+			warp "호러캐슬메인홀", 46, 15;
+			mes 0, "기부금 3천골드 받았습니다. 이동시켜 드리겠습니다.";
+			end;
+		}
+	}
+}
+
+0,0,0,0,0,0,0	호러캐슬	{
+	set @myid, get_myid();
+	if(!group_exist(@myid)){message 3, "당신은 그룹이 없습니다."; warp "호러캐슬메인홀", 23,15; end;}
+	if(get_class_sub(@myid) != 0){message 3, "승급자는 입장불가"; warp "호러캐슬메인홀", 23,15; end;}
+	if(group_class_sub()){message 3, "그룹원중에 승급자가 존재하여 대기실로 나가집니다."; group_warp "호러캐슬메인홀", 23,15; end;}
+	if(group_bighp(@myid) > 50000 || group_bigmp(@myid) > 30000){message 3, "강한 힘을 가진 그룹원이 존재하여, 몬스터가 강해집니다.";}
+	set @name1$, "사냥터" + get_name() + "호러캐슬";
+	set $map_num, $map_num + 1;
+	map_create $map_num, @name1$, "호러캐슬", 15, 15, 154, 0, 0, "db/maps/호러캐슬/maps/lod0001.map";
+	warp_create 3,@name1$,9,0,"호러캐슬다음방",0,0,99,99,0;
+	item_clear @name1$;
+	mob_clear @name1$;
+	group_warp @name1$, 9,2;
+	if(group_bighp(@myid) < 50000){
+		//일반입장
+		sleep 300;
+		if(map_objmob()>=1){end;}
+		for(set @i, 1;@i <= 17; set @i, @i +1){
+		AA:
+			set @rand1, rand(1,get_mapxs(@myid)-8);
+			if(@rand1 <= 0){goto AA;}
+		BB:
+			set @rand2, rand(1,get_mapys(@myid)-1);
+			if(@rand2 <= 0){goto BB;}
+		CC:
+			set @rand3, rand(0,9);
+			if(@rand3 <= 0 || @rand3 > 7){goto CC;}
+			if(@rand3 == 1){mob_spawn "바탈리우스1", @rand1, @rand2, 1;}
+			if(@rand3 == 2){mob_spawn "헤라시우스1", @rand1, @rand2, 2;}
+			if(@rand3 == 3){mob_spawn "헤라시우스1", @rand1, @rand2, 3;}
+			if(@rand3 == 4){mob_spawn "헤브렐리우스1", @rand1, @rand2, 1;}
+			if(@rand3 == 5){mob_spawn "바클라시우스1", @rand1, @rand2, 2;}
+			if(@rand3 == 6){mob_spawn "슈크래시우스1", @rand1, @rand2, 3;}
+			if(@rand3 == 7){mob_spawn "타클라시우스1", @rand1, @rand2, 1;}
+		}
+	}else{
+		//강한입장
+		sleep 300;
+		if(map_objmob()>=1){end;}
+		for(set @i, 1;@i <= 17; set @i, @i +1){
+		DD:
+			set @rand1, rand(1,get_mapxs(@myid)-8);
+			if(@rand1 <= 0){goto DD;}
+		EE:
+			set @rand2, rand(1,get_mapys(@myid)-1);
+			if(@rand2 <= 0){goto EE;}
+		FF:
+			set @rand3, rand(0,9);
+			if(@rand3 <= 0 || @rand3 > 7){goto FF;}
+			if(@rand3 == 1){mob_spawn "바탈리우스2", @rand1, @rand2, 1;}
+			if(@rand3 == 2){mob_spawn "헤라시우스2", @rand1, @rand2, 2;}
+			if(@rand3 == 3){mob_spawn "헤라시우스2", @rand1, @rand2, 3;}
+			if(@rand3 == 4){mob_spawn "헤브렐리우스2", @rand1, @rand2, 1;}
+			if(@rand3 == 5){mob_spawn "바클라시우스2", @rand1, @rand2, 2;}
+			if(@rand3 == 6){mob_spawn "슈크래시우스2", @rand1, @rand2, 3;}
+			if(@rand3 == 7){mob_spawn "타클라시우스2", @rand1, @rand2, 1;}
+		}
+	}
+}
+
+0,0,0,0,0,0,0	호러캐슬다음방	{
+	set @myid, get_myid();
+	if(!group_exist(@myid)){message 3, "당신은 그룹이 없습니다."; warp "호러캐슬메인홀", 23,15; end;}
+	if(get_class_sub(@myid) != 0){message 3, "승급자는 입장불가"; warp "호러캐슬메인홀", 23,15; end;}
+	if(map_user_exist(get_mapname(@myid)) == 1){message 3, "그룹원이 같은맵에없습니다."; warp "호러캐슬대기실", 27,14; end;}
+	if(group_class_sub()){message 3, "그룹원중에 승급자가 존재하여 대기실로 나가집니다."; group_warp "호러캐슬메인홀", 23,15; end;}
+	if(group_bighp(@myid) > 50000 || group_bigmp(@myid) > 30000){message 3, "강한 힘을 가진 그룹원이 존재하여, 몬스터가 강해집니다.";}
+	if(map_objmob(@myid) >= 1){message 3, "몬스터가 남아있습니다."; end;}
+	item_clear get_mapname();
+	mob_clear get_mapname();
+	group_warp get_mapname(),9,2;
+	if(group_bighp(@myid) < 50000 && group_bigmp(@myid) < 30000){
+		sleep 300;
+		for(set @i, 1;@i <= 17; set @i, @i +1){
+		AA:
+			set @rand1, rand(1,get_mapxs(@myid)-8);
+			if(@rand1 <= 0){goto AA;}
+		BB:
+			set @rand2, rand(1,get_mapys(@myid)-1);
+			if(@rand2 <= 0){goto BB;}
+		CC:
+			set @rand3, rand(0,9);
+			if(@rand3 <= 0 || @rand3 > 7){goto CC;}
+			if(@rand3 == 1){mob_spawn "바탈리우스1", @rand1, @rand2, 1;}
+			if(@rand3 == 2){mob_spawn "헤라시우스1", @rand1, @rand2, 2;}
+			if(@rand3 == 3){mob_spawn "헤라시우스1", @rand1, @rand2, 3;}
+			if(@rand3 == 4){mob_spawn "헤브렐리우스1", @rand1, @rand2, 1;}
+			if(@rand3 == 5){mob_spawn "바클라시우스1", @rand1, @rand2, 2;}
+			if(@rand3 == 6){mob_spawn "슈크래시우스1", @rand1, @rand2, 3;}
+			if(@rand3 == 7){mob_spawn "타클라시우스1", @rand1, @rand2, 1;}
+		}
+	}else{
+		sleep 300;
+		for(set @i, 1;@i <= 17; set @i, @i +1){
+		DD:
+			set @rand1, rand(1,get_mapxs(@myid)-8);
+			if(@rand1 <= 0){goto DD;}
+		EE:
+			set @rand2, rand(1,get_mapys(@myid)-1);
+			if(@rand2 <= 0){goto EE;}
+		FF:
+			set @rand3, rand(0,9);
+			if(@rand3 <= 0 || @rand3 > 7){goto FF;}
+			if(@rand3 == 1){mob_spawn "바탈리우스2", @rand1, @rand2, 1;}
+			if(@rand3 == 2){mob_spawn "헤라시우스2", @rand1, @rand2, 2;}
+			if(@rand3 == 3){mob_spawn "헤라시우스2", @rand1, @rand2, 3;}
+			if(@rand3 == 4){mob_spawn "헤브렐리우스2", @rand1, @rand2, 1;}
+			if(@rand3 == 5){mob_spawn "바클라시우스2", @rand1, @rand2, 2;}
+			if(@rand3 == 6){mob_spawn "슈크래시우스2", @rand1, @rand2, 3;}
+			if(@rand3 == 7){mob_spawn "타클라시우스2", @rand1, @rand2, 1;}
+		}
+	}
+}
+
+0,0,0,0,0,0,0	개인던전입장도우미	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("솔로사냥터로 이동하시겠습니까?\\n요금은 1500Gold입니다.", "지하수로(지존)", "승급던전");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(get_money(@myid) < 1500){mes 0, "솔로던전 입장요금이 부족합니다."; end;}
+		if(get_level(@myid) != 99 || get_class_sub(@myid) != 0){mes 0, "지존만 입장할수 있습니다."; end;}
+		group_end @myid;
+		warp "지하수로D-1", 5, 5;
+		money_del "1500";
+	}else if(@select == 2){
+		if(get_money(@myid) < 1500){mes 0, "솔로던전 입장요금이 부족합니다."; end;}
+		if(get_level(@myid) != 99 || get_class_sub(@myid) != 2){mes 0, "승급이상만 입장할수 있습니다."; end;}
+		group_end @myid;
+		warp "승급던젼", 37, 13;
+		money_del "1500";
+	}
+}
+
+0,0,0,0,0,0,0	애교	{
+	set @myid, get_myid();
+	set @select, 0;
+	mes 1, "어디든지 배를 타고갈수 있는곳이라면 대려다주지.";
+	re:
+	set @select, menu("참고로 운항비는 옆에 적혀있으니깐, 착오없도록해!", "오렌마을(5000Gold)");	
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(get_money(@myid) < 5000){mes 0, "운항비가 부족하잖아! 돈을벌어와."; end;}
+		money_del "5000";
+		warp "오렌", 57,169;
+		mes 0, "자! 다도착했다구!";
+	}
+}
+
+0,0,0,0,0,0,0	워프할아버지	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	//end;///////
+	set @select, menu("용건이 무엇인가?", "적룡플라밋의굴대기실 이동", "직업퀘스트진행(그룹이동)");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		mes 1, "적룡플라밋의굴대기실로 이동하겠나? 요금은 1만Gold라네.";
+		re2:
+		set @select2, menu("요금을 내고 적룡플라밋의굴로 이동하겠나?", "이동한다.", "이동하지 않는다.");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			if(get_money(@myid) < 10000){mes 0, "골드가 부족하다네."; end;}
+			warp "적룡플라밋의굴대기실", 15, 15;
+			money_del 10000;
+			mes 0, "이동이 완료되었다네.";
+			end;
+		}else if(@select2 == 2){
+			end;
+		}
+	}
+	if(@select == 2){
+		mes 1, "그룹원들과 함께하는 그룹퀘스트라네. 일명 결계라고도 하지.";
+		mes 1, "입장시 그룹원들과 바로입장되며, 입장비로는 입장신청자가 7만골드를 내면 된다네.";
+		re3:
+		set @select2, menu("어떤가? 7만골드를 당신이 지불하고 입장하겠나?\\n(그룹원이 5명 이상이여야 입장가능)", "입장한다.", "입장하지 않는다.");
+		//if(@select2 == 0){goto re3;}
+		//if(@select2 == 1){
+			//if(get_money(@myid) < 70000){mes 0, "골드가 부족하다네."; end;}
+			//if(!group_exist(@myid)){message 3, "자네는 그룹이 없지않은가!"; end;}
+			//if(group_count(@myid, 0) < 5){mes 0, "현재 이공간에 같은그룹원이 5명이상이 되지 않다네."; end;}
+			//if(group_class_sub2(@myid) == 1){mes 0, "그룹원중 비승급자가 존재해서 입장할수 없다네."; end;}
+			money_del 70000;
+			set @name1$, "사냥터" + get_name() + "직업퀘스트대기실";
+			set @name2$, "사냥터" + get_name() + "직업퀘스트(전사)";
+			set @name3$, "사냥터" + get_name() + "직업퀘스트(도적)";
+			set @name4$, "사냥터" + get_name() + "직업퀘스트(무도가)";
+			set @name5$, "사냥터" + get_name() + "직업퀘스트(마법사)";
+			set @name6$, "사냥터" + get_name() + "직업퀘스트(성직자)";
+			set $map_num, $map_num + 1;
+			map_create $map_num, @name1$, "직업퀘스트대기실", 35, 20, 185, 9, 1, "db/maps/직업퀘스트/lod7000.map";
+			set $map_num, $map_num + 1;
+			map_create $map_num, @name2$, "직업퀘스트(전사)", 15, 15, 185, 9, 2, "db/maps/직업퀘스트/lod7001.map";
+			set $map_num, $map_num + 1;
+			map_create $map_num, @name3$, "직업퀘스트(도적)", 15, 15, 185, 9, 3, "db/maps/직업퀘스트/lod7001.map";
+			set $map_num, $map_num + 1;
+			map_create $map_num, @name4$, "직업퀘스트(무도가)", 15, 15, 185, 9, 4, "db/maps/직업퀘스트/lod7001.map";
+			set $map_num, $map_num + 1;
+			map_create $map_num, @name5$, "직업퀘스트(마법사)", 15, 15, 185, 9, 5, "db/maps/직업퀘스트/lod7002.map";
+			set $map_num, $map_num + 1;
+			map_create $map_num, @name6$, "직업퀘스트(성직자)", 15, 15, 185, 9, 6, "db/maps/직업퀘스트/lod7002.map";
+			warp_create 0, @name1$,4,0,@name2$,4,13,99,99,1;
+			warp_create 0, @name1$,23,0,@name3$,4,13,99,99,1;
+			warp_create 0, @name1$,13,0,@name4$,4,13,99,99,1;
+			warp_create 0, @name1$,0,4,@name5$,13,5,99,99,1;
+			warp_create 0, @name1$,0,13,@name6$,13,5,99,99,1;
+			warp_create 0, @name2$,4,14,@name1$,4,3,99,99,1;
+			warp_create 0, @name2$,5,14,@name1$,4,3,99,99,1;
+			warp_create 0, @name2$,6,14,@name1$,4,3,99,99,1;
+			warp_create 0, @name3$,4,14,@name1$,23,3,99,99,1;
+			warp_create 0, @name3$,5,14,@name1$,23,3,99,99,1;
+			warp_create 0, @name3$,6,14,@name1$,23,3,99,99,1;
+			warp_create 0, @name4$,4,14,@name1$,13,3,99,99,1;
+			warp_create 0, @name4$,5,14,@name1$,13,3,99,99,1;
+			warp_create 0, @name4$,6,14,@name1$,13,3,99,99,1;
+			warp_create 0, @name5$,14,4,@name1$,3,4,99,99,1;
+			warp_create 0, @name5$,14,5,@name1$,3,4,99,99,1;
+			warp_create 0, @name5$,14,6,@name1$,3,4,99,99,1;
+			warp_create 0, @name6$,14,4,@name1$,3,13,99,99,1;
+			warp_create 0, @name6$,14,5,@name1$,3,13,99,99,1;
+			warp_create 0, @name6$,14,6,@name1$,3,13,99,99,1;
+			mob_clear @name2$;
+			item_clear @name2$;
+			mob_clear @name3$;
+			item_clear @name3$;
+			mob_clear @name4$;
+			item_clear @name4$;
+			mob_clear @name5$;
+			item_clear @name5$;
+			mob_clear @name6$;
+			item_clear @name6$;
+			warp_create 3, @name1$,19,12, "엘리멘탈이동(수)",0,0,99,99,0;
+			warp_create 3, @name1$,19,13, "엘리멘탈이동(수)",0,0,99,99,0;
+			warp_create 3, @name1$,20,12, "엘리멘탈이동(수)",0,0,99,99,0;
+			warp_create 3, @name1$,20,13, "엘리멘탈이동(수)",0,0,99,99,0;
+			group_val "#jobquest1", 0, 1;
+			group_val "#jobquest2", 0, 1;
+			group_val "#jobquest3", 0, 1;
+			group_val "#jobquest4", 0, 1;
+			group_val "#jobquest5", 0, 1;
+			group_val "#jobquest6", 0, 1;
+			group_warp @name1$, 18, 7;
+		}else if(@select2 == 2){
+			end;
+		}
+	}
+}
+
+0,0,0,0,0,0,0	엘리멘탈이동(수)	{
+	set @myid, get_myid();
+	if(#jobquest1 != 2 || #jobquest2 != 2 || #jobquest3 != 2 || #jobquest4 != 2 || #jobquest5 != 2){message 3, "모든 직업방의 몬스터를 처리한후 시도하세요."; end;}
+	set @name7$, "사냥터" + get_name() + "엘리멘탈(수)";
+	set $map_num, $map_num + 1;
+	map_create $map_num, @name7$, "엘리멘탈(수)", 25, 25, 191, 9, 7, "db/maps/직업퀘스트/lod7007.map";
+	warp_create 3, @name7$,1,9, "엘리멘탈이동(토)",0,0,99,99,0;
+	mob_clear @name7$;
+	item_clear @name7$;
+	group_warp @name7$, 13, 9;
+	mob_spawn2 "바다의엘리멘탈", 3, 9, 1, group_bighp() * 25;
+}
+
+0,0,0,0,0,0,0	엘리멘탈이동(토)	{
+	set @myid, get_myid();
+	if(map_objmob(@myid) >= 1){message 3, "몬스터가 남아있습니다."; end;}
+	set @name8$, "사냥터" + get_name() + "엘리멘탈(토)";
+	set $map_num, $map_num + 1;
+	map_create $map_num, @name8$, "엘리멘탈(토)", 25, 25, 191, 9, 7, "db/maps/직업퀘스트/lod7007.map";
+	warp_create 3, @name8$,1,9, "엘리멘탈이동(풍)",0,0,99,99,0;
+	mob_clear @name8$;
+	item_clear @name8$;
+	group_warp @name8$, 13, 9;
+	mob_spawn2 "대지의엘리멘탈", 3, 9, 1, group_bighp() * 25;
+}
+
+0,0,0,0,0,0,0	엘리멘탈이동(풍)	{
+	set @myid, get_myid();
+	if(map_objmob(@myid) >= 1){message 3, "몬스터가 남아있습니다."; end;}
+	set @name9$, "사냥터" + get_name() + "엘리멘탈(풍)";
+	set $map_num, $map_num + 1;
+	map_create $map_num, @name9$, "엘리멘탈(풍)", 25, 25, 191, 9, 7, "db/maps/직업퀘스트/lod7007.map";
+	warp_create 3, @name9$,1,9, "엘리멘탈이동(화)",0,0,99,99,0;
+	mob_clear @name9$;
+	item_clear @name9$;
+	group_warp @name9$, 13, 9;
+	mob_spawn2 "바람의엘리멘탈", 3, 9, 1, group_bighp() * 25;
+}
+
+0,0,0,0,0,0,0	엘리멘탈이동(화)	{
+	set @myid, get_myid();
+	if(map_objmob(@myid) >= 1){message 3, "몬스터가 남아있습니다."; end;}
+	set @name10$, "사냥터" + get_name() + "엘리멘탈(화)";
+	set $map_num, $map_num + 1;
+	map_create $map_num, @name10$, "엘리멘탈(화)", 25, 25, 191, 9, 7, "db/maps/직업퀘스트/lod7007.map";
+	warp_create 3, @name10$,1,9, "적룡의척추",0,0,99,99,0;
+	mob_clear @name10$;
+	item_clear @name10$;
+	group_warp @name10$, 13, 9;
+	mob_spawn2 "화염의엘리멘탈", 3, 9, 1, group_bighp() * 25;
+}
+
+0,0,0,0,0,0,0	적룡의척추	{
+	set @myid, get_myid();
+	if(map_objmob(@myid) >= 1){message 3, "몬스터가 남아있습니다."; end;}
+	set @name11$, "사냥터" + get_name() + "적룡의척추";
+	set $map_num, $map_num + 1;
+	map_create $map_num, @name11$, "적룡의척추", 50, 150, 191, 0, 0, "db/maps/직업퀘스트/lod7011.map";
+	warp_create 3, @name11$,23,3, "적룡의결계",0,0,99,99,0;
+	warp_create 3, @name11$,24,3, "적룡의결계",0,0,99,99,0;
+	group_warp @name11$, 27, 145;
+}
+
+0,0,0,0,0,0,0	적룡의결계	{
+	set @myid, get_myid();
+	set @name12$, "사냥터" + get_name() + "적룡의결계";
+	set $map_num, $map_num + 1;
+	map_create $map_num, @name12$, "적룡의결계", 40, 40, 191, 9, 8, "db/maps/직업퀘스트/lod7012.map";
+	group_warp @name12$, 20, 23;
+	mob_clear @name12$;
+	item_clear @name12$;
+	mob_spawn2 "봉인의주인(봉)", 18, 13, 1, group_bighp() * 1000;
+}
+
+0,0,0,0,0,0,0	배틀장퇴장	{
+	set @myid, get_myid();
+	set @select, 0;
+	mes 1, "배틀장을 퇴장하여 빛의신전으로 가고싶습니까?";
+	re:
+	set @select, menu("빛의신전으로 가시겠습니까?", "이동한다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		warp "빛의신전", 19, 17;
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	빛의이아	{
+	set @myid, get_myid();
+	set @select, 0;
+	mes 1, "황폐해진 영혼이여...안심하세요...여기는 빛의 신전...저는 빛과 치유의 여신 이아입니다.";
+	mes 1, "험한 싸움에서 패배하셧다고 너무 낙심하지 마세요. 제가 당신을 위해 해드릴 수있는 것은 영혼을 새롭게 해드리는 것 뿐이지만, 그것으로 당신이 새롭게 도전할수 있길 바랍니다.";
+	mes 1, "자 일어나세요...신의 축복이 당신에게 가득하기를...";
+	re:
+	set @select, menu("당신이 돌아가야 할 곳이 있나요?", "마을로 가길 원합니다.", "밀레스대련장으로 가길 원합니다.", "수오미대련장으로 가길 원합니다.", "루어스대련장으로 가길 원합니다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		set_vita @myid, get_basevita;
+		set_state 0,0;
+		if(get_sex(@myid) == 1){set_body @myid, 16;}else{set_body @myid, 32;}
+		warp "뤼케시온마을", 42, 27;
+		end;
+	}
+	if(@select == 2){
+		warp "밀레스대련장", 4, 4,;
+		end;
+	}
+	if(@select == 3){
+		warp "수오미대련장", 4, 4,;
+		end;
+	}
+	if(@select == 4){
+		warp "루어스대련장", 4, 4,;
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	루그이동	{
+set @s1, menu("오우.. 이런 누추한곳에는 어쩐일인가??","루그라는 사람을 아십니까?","아 그냥 인사차들렀습니다.");
+	if(@s1 == 2) {
+	mes 0,"아하 .. 온김에 여기저기 둘러보시다 가시죠.";
+	end;
+	}
+mes 1, "헉..그분을 어떻게 알고계시죠? 아.. 그분은.. 저희마을의 장인으로써.. 일찍이 왕궁의 전속 대장장이로 일하시면서 훌륭한 무기와 아이템들을 만들어내셨지요.";
+mes 1, "하지만 그분의 작품을 헛되게 사용하는 사람들이 능러나면서, 그분은 은둔생활을 시작하셨습니다. 그리고 어떤 누구도 만나려고 하지 않으셨죠.";
+mes 1, "그분이 계시는 작업장에는 특수한 자물쇠가 걸려있어서 그것을 열기위해서는 신비한 힘을 가진 황금의만능열쇠가 필요하다고 합니다.";
+mes 1, "그것은 아마도 적룡굴에서 구할수 있다고 들었습니다만... 그분은 굉장히 까다로운분이라서..";
+
+set @s2, menu("그런데.. 무엇때문에 그러시죠?","루그가 만드는아이템에 관심이있어서요.. 직접만나고싶습니다.","아.. 아무것도아닙니다...");
+	if(@s2 == 2) {
+	mes 0,"아. 그러십니까... 그러시군요..그럼 다음에도 뵙죠.";
+	end;
+	}
+
+set @s3, menu("루그님께 가고 싶으시다고요? 열쇠가 필요한것은 아시겠죠? 혹시, 열쇠를 가지고 오셨습니까?","네. 구해왔습니다.","아뇨.. 아직구하지못했습니다.");
+	if(@s3 == 1){
+		if(pc_itemcheck("비밀의황금열쇠") == 0x01){
+			mes 1, "가지고 오셨군요.. 자 그럼 저를 따라오세요.";
+			item_del "비밀의황금열쇠",1;
+			warp "루그방",7,7;
+			end ;
+	}else{
+		mes 0,"으음.. 열쇠가 있어야 자물쇠를 열수 있습니다. 열쇠를 구해오시면 언제든지 안내해드리겠습니다.";
+		end;
+	}
+
+del @s1;
+del @s2;
+del @s3;
+}
+}
+}
+}
+
+0,0,0,0,0,0,0	뮤레칸역습이동	{
+	set @myid, get_myid();
+	set @selectz, 0;
+	del @selectz;
+	re:
+	if(get_basevita(@myid) < 400000 && get_basemana(@myid) < 200000){mes 0, "오직 강한자만...";}
+	set @selectz, menu("뮤레칸의역습맵으로 이동하시겠습니까?\\n[격수 체력 40만이상 || 비격 마력 20만이상입장가능]", "아벨");
+	if(@selectz == 0 || !@selectz){goto re;}
+	if(@selectz == 1){
+		if(item_exist(@myid, "뮤레칸입장티켓") == 0){mes 0, "뮤레칸입장티켓이 없습니다.";}
+		item_del "뮤레칸입장티켓", 1;
+		warp "뮤레칸의역습::아벨", 67,23;
+		mes 1, "뮤레칸입장티켓을 받았습니다.\\n[이동이 완료되었습니다.]";
+	}
+}
+
+0,0,0,0,0,0,0	타바리마을이동	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	//end;///////
+	set @select, menu("용건이 무엇인가?", "타바리마을 이동!");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		mes 1, "강화리젠트 를 주는 셀라임보스 등 이쁜마을 ^_^ 요금은 30만Gold라네.";
+		re2:
+		set @select2, menu("요금을 내고 타바리마을로 이동하겠나?", "이동한다.", "이동하지 않는다.");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			if(get_money(@myid) < 300000){mes 0, "골드가 부족하다네."; end;}
+			warp "타바리마을", 67, 92;
+			money_del 300000;
+			mes 0, "이동이 완료되었다네.";
+			end;
+		}else if(@select2 == 2){
+			end;
+		}
+	}
+}
+
+0,0,0,0,0,0,0	히야트입장	{
+	set @myid, get_myid();
+	mes 1, "파티 어빌사냥터인 히야트던전으로 이동가능 ";
+	mes 1, "4인파티기준으로 시작하며 매너 지켜주세요";
+	mes 1, "입장료는 40만골드 파티원당 10만원씩 보태세요";
+	mes 1, "그룹도 없는데, 괞히 입장할려하면 돈만 날라갑니다.";
+	if(get_money(@myid) < 400000){mes 0, "골드가 부족하다네."; end;}
+	if(!group_exist(@myid)){message 3, "자네는 그룹이 없지않은가!"; end;}
+	if(group_count(@myid, 0) < 4){mes 0, "현재 이공간에 같은그룹원이 4명이상이 되지 않다네."; end;}
+	if(group_class_sub2(@myid) == 1){mes 0, "그룹원중 비승급자가 존재해서 입장할수 없다네."; end;}
+	set @select, menu("이동할껀가요?", "히야트던전 이동");
+	if(@select == 1){group_warp "히야트던전A-1", 36, 57; money_del 400000;}
+ del @select;
+}
+
+0,0,0,0,0,0	알세이드스	{
+	set @myid, get_myid();
+	if(get_ability() < 1){message 3, "2차를 하신분만 입장가능."; end;}
+	mes 1, "안녕하세요 화론마을로 이동시켜드립니다.";
+	warp "알세이드스-화론마을", 90,48; end;
+}
+
+0,0,0,0,0,0	아만마을로	{
+	set @myid, get_myid();
+	if(get_ability() < 10){message 3, "어빌리티 10이하는 입장하실수없습니다."; end;}
+	mes 1, "안녕하세요 아만마을로 이동시켜드립니다.";
+	warp "아만마을", 32,61; end;
+}
+
+0,0,0,0,0,0	노엠마을	{
+	set @myid, get_myid();
+	if(get_ability() < 18){message 3, "어빌리티 18이하는 입장하실수없습니다."; end;}
+	mes 1, "안녕하세요 노엠마을로 이동시켜드립니다.";
+	warp "노엠마을", 35,27; end;
+}
+
+0,0,0,0,0,0	아슬론마을	{
+	set @myid, get_myid();
+	if(get_ability() < 1){message 3, "2차를 하신분만 입장가능."; end;}
+	mes 1, "안녕하세요 아슬론마을로 이동시켜드립니다.";
+	warp "아슬론마을", 48,56; end;
+}
+
+0,0,0,0,0,0	개미굴가자	{
+	set @myid, get_myid();
+	if(get_ability() < 22){message 3, "어빌리티 22이하는 입장하실수없습니다."; end;}
+	mes 1, "안녕하세요 개미굴로 이동시켜드립니다.";
+	warp "블랙팜던전1층", 37,62; end;
+}
+
+0,0,0,0,0,0	빈집털이	{
+	set @myid, get_myid();
+	if(get_basevita() > 100000 || get_basemana() > 100000){message 3, "들어가기에 창피한걸."; end;}
+	mes 1, "안녕하세요 빈집털이로 이동시켜드립니다.";
+	warp "신죽마집안21-1", 10,16; end;
+}
+
+0,0,0,0,0,0	빈집털이1	{
+	set @myid, get_myid();
+	if(get_basevita() > 100000 || get_basemana() > 100000){message 3, "들어가기에 창피한걸."; end;}
+	mes 1, "안녕하세요 빈집털이로 이동시켜드립니다.";
+	warp "신죽마집안5-2", 17,5; end;
+}

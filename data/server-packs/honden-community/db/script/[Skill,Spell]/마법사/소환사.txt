@@ -1,0 +1,1222 @@
+0	SPELL_소환술	{
+ 	set @myid, get_myid();
+ 	set @target, spell_target();
+	set @type, istype(@target);
+	set @xs,get_xs(@myid);
+	set @ys,get_ys(@myid);
+
+	manal_del"700";
+
+        //체크 #magic 은 소환술 레벨, 이펙트 또한 스킬레벨에 따라 바뀜
+	if(#S3attack == 1 || #S3attack == 2){
+	set @rand, rand2(1,4);
+	if(@rand < 1 || @rand > 4){set @rand, 1;}   // set @rand, 1을 한이유는 goto re를 사용하면 소환술을 2번실행시켰을경우 2번실행되서 마법이 날라오면 튕길우려를 고려해서 set 1로한거
+	if(@rand == 1){effect@myid,146,0,70; set @effect, 221;}
+	if(@rand == 2){effect@myid,143,0,70; set @effect, 153;}
+	if(@rand == 3){effect@myid,144,0,70; set @effect, 222;}
+	if(@rand == 4){effect@myid,145,0,70; set @effect, 226;}
+ 	}else if(#S3attack == 3 || #S3attack == 4){
+	set @rand, rand2(1,4);
+	if(@rand < 1 || @rand > 4){set @rand, 1;}  
+	if(@rand == 1){effect@myid,146,0,70; set @effect, 223;}
+	if(@rand == 2){effect@myid,143,0,70; set @effect, 154;}
+	if(@rand == 3){effect@myid,144,0,70; set @effect, 228;}
+	if(@rand == 4){effect@myid,145,0,70; set @effect, 229;}
+ 	}else if(#S3attack == 5 || #S3attack >= 7){
+	set @rand, rand2(1,4);
+	if(@rand < 1 || @rand > 4){set @rand, 1;}  
+	if(@rand == 1){effect@myid,146,0,70; set @effect, 225;}
+	if(@rand == 2){effect@myid,143,0,70; set @effect, 154;}
+	if(@rand == 3){effect@myid,144,0,70; set @effect, 228;}
+	if(@rand == 4){effect@myid,145,0,70; set @effect, 227;}
+ 	}else{message 3," {=c[[ERROR]]{=v운영자{=g에게 {=q문의{=g해주세요.";goto ended;} // 버그 발생방지용.[튕김방지용]
+	
+
+             //데미지 공식 -> #magic/100
+	if(#S3attack==1){
+		set @dam,(get_int(@myid)*1)*25;
+	}else if(#S3attack==2){
+		set @dam,(get_int(@myid)*1)*50;
+	}else if(#S3attack==3){
+		set @dam,(get_int(@myid)*1)*100;
+	}else if(#S3attack==4){
+		set @dam,(get_int(@myid)*1)*160;
+	}else if(#S3attack==5){
+		set @dam,(get_int(@myid)*1)*240;
+	}else if(#S3attack==6){
+		set @dam,(get_int(@myid)*1)*320;
+	}else if(#S3attack>=7){
+		set @dam,(get_int(@myid)*1)*400;
+	}
+	set @dam,@dam+(get_mgc_damage(@myid)/10*200);
+	set @dam2,@dam+(get_mgc_damage(@myid)/10*200);
+
+	if(get_critical(@myid)){set@dam,@dam*2; set@dam2,@dam2*2;}
+	
+	if(!@target || get_mobdie){goto ended;} // 그냥 end시키면 임시변수가 모이니 그냥 goto로해줘서 임시변수 전부삭제.
+
+	if(!get_map_pk(@myid) && istype(@target) == 1){ //맵 pk가 아니고 몹일시. 실행
+
+	set @mobx, get_mobx(@target);
+	set @moby, get_moby(@target);
+	set @mob, get_mobxy(@mobx,@moby);
+
+	if(#S3attack == 1){ // LEVEL 1
+	if(@mob) {damaged @mob, @dam; effect @mob, 0,@effect, 60;}
+	goto ended;
+	}
+ 	set @mob1, get_mobxy(@mobx,@moby-1);
+	set @mob2, get_mobxy(@mobx+1,@moby);
+	set @mob3, get_mobxy(@mobx,@moby+1);
+	set @mob4, get_mobxy(@mobx-1,@moby);
+	set @mob5, get_mobxy(@mobx,@moby-2);
+	set @mob6, get_mobxy(@mobx+2,@moby);
+ 	set @mob7, get_mobxy(@mobx,@moby+2);
+ 	set @mob8, get_mobxy(@mobx-2,@moby);
+	if(@mob) {damaged @mob, @dam; effect @mob, 0,@effect, 60;}
+ 	if(@mob1 && istype(@mob1)) {damaged @mob1, @dam;effect @mob1, 0,@effect, 60;}
+ 	if(@mob2 && istype(@mob2)) {damaged @mob2, @dam;effect @mob2, 0,@effect, 60;}
+ 	if(@mob3 && istype(@mob3)) {damaged @mob3, @dam;effect @mob3, 0,@effect, 60;}
+ 	if(@mob4 && istype(@mob4)) {damaged @mob4, @dam;effect @mob4, 0,@effect, 60;}
+ 	if(@mob5 && istype(@mob5)) {damaged @mob5, @dam;effect @mob5, 0,@effect, 60;}
+ 	if(@mob6 && istype(@mob6)) {damaged @mob6, @dam;effect @mob6, 0,@effect, 60;}
+ 	if(@mob7 && istype(@mob7)) {damaged @mob7, @dam;effect @mob7, 0,@effect, 60;}
+ 	if(@mob8 && istype(@mob8)){ damaged @mob8, @dam;effect @mob8, 0,@effect, 60;}
+	game_sound 65,0;
+	
+	}else if(get_map_pk(@myid) && istype(@target) == 3 || get_map_pk(@myid) && istype(@target) == 1) { // 맵이 피케이 상태며 상대방이거나, 몹일시
+	
+	if(@type == 1){
+ 	set @mobx, get_mobx(@target);
+	set @moby, get_moby(@target);
+	set @mob,  get_mobxy(@mobx,@moby);
+ 	set @mob1, get_mobxy(@mobx,@moby-1);
+	set @mob2, get_mobxy(@mobx+1,@moby);
+	set @mob3, get_mobxy(@mobx,@moby+1);
+	set @mob4, get_mobxy(@mobx-1,@moby);
+	set @mob5, get_mobxy(@mobx,@moby-2);
+	set @mob6, get_mobxy(@mobx+2,@moby);
+ 	set @mob7, get_mobxy(@mobx,@moby+2);
+ 	set @mob8, get_mobxy(@mobx-2,@moby);
+
+	if(#S3attack == 1){ // LEVEL 1
+	if(@mob) {damaged @mob, @dam; effect @mob, 0,@effect, 60;}
+	goto ended;
+	}
+
+	if(@mob) {damaged @mob, @dam; effect @mob, 0,@effect, 60;}
+ 	if(@mob1 && istype(@mob1)) {damaged @mob1, @dam;effect @mob1, 0,@effect, 60;}
+ 	if(@mob2 && istype(@mob2)) {damaged @mob2, @dam;effect @mob2, 0,@effect, 60;}
+ 	if(@mob3 && istype(@mob3)) {damaged @mob3, @dam;effect @mob3, 0,@effect, 60;}
+ 	if(@mob4 && istype(@mob4)) {damaged @mob4, @dam;effect @mob4, 0,@effect, 60;}
+ 	if(@mob5 && istype(@mob5)) {damaged @mob5, @dam;effect @mob5, 0,@effect, 60;}
+ 	if(@mob6 && istype(@mob6)) {damaged @mob6, @dam;effect @mob6, 0,@effect, 60;}
+ 	if(@mob7 && istype(@mob7)) {damaged @mob7, @dam;effect @mob7, 0,@effect, 60;}
+ 	if(@mob8 && istype(@mob8)){ damaged @mob8, @dam;effect @mob8, 0,@effect, 60;}
+	}else if(@type == 3){
+
+	set @xs, get_xs1(@target);
+	set @ys, get_ys1(@target);
+	set @char1, get_char_serial(@myid, (@xs), @ys-1);
+	set @char2, get_char_serial(@myid, (@xs)+1, @ys);
+	set @char3, get_char_serial(@myid, (@xs), @ys+1);
+	set @char4, get_char_serial(@myid, (@xs)-1, @ys);
+	set @char5, get_char_serial(@myid, (@xs), @ys-2);
+	set @char6, get_char_serial(@myid, (@xs)+2, @ys);
+ 	set @char7, get_char_serial(@myid, (@xs), @ys+2);
+ 	set @char8, get_char_serial(@myid, (@xs-2), @ys);
+
+	if(#S3attack == 1){ // LEVEL 1
+	if(istype(@target) == 3) {char_damaged2 @target, @dam2, 0, 0;effect @target, 0,@effect, 60;}
+	goto ended;
+	}
+
+	if(istype(@target) == 3) {char_damaged2 @target, @dam2, 0, 0;effect @target, 0,@effect, 60;}
+ 	if(@char1 && istype(@char1) == 3) {char_damaged2 @char1, @dam2, 0, 0;effect @char1, 0,@effect, 60;}
+ 	if(@char2 && istype(@char2) == 3) {char_damaged2 @char2, @dam2, 0, 0;effect @char2, 0,@effect, 60;}
+ 	if(@char3 && istype(@char3) == 3) {char_damaged2 @char3, @dam2, 0, 0;effect @char3, 0,@effect, 60;}
+ 	if(@char4 && istype(@char4) == 3) {char_damaged2 @char4, @dam2, 0, 0;effect @char4, 0,@effect, 60;}
+ 	if(@char5 && istype(@char5) == 3) {char_damaged2 @char5, @dam2, 0, 0;effect @char5, 0,@effect, 60;}
+ 	if(@char6 && istype(@char6) == 3) {char_damaged2 @char6, @dam2, 0, 0;effect @char6, 0,@effect, 60;}
+ 	if(@char7 && istype(@char7) == 3) {char_damaged2 @char7, @dam2, 0, 0;effect @char7, 0,@effect, 60;}
+ 	if(@char8 && istype(@char8) == 3) {char_damaged2 @char8, @dam2, 0, 0;effect @char8, 0,@effect, 60;}
+	game_sound 65,0;
+        //좀더 빠른 스크립트 진행을 하고싶으면 이 줄에다가 goto ended;를 해주면 스크립트 읽는속도가 올라가진다. [굳이 안해줘도 ㄱㅊ]-1
+	}else{ goto ended;} // 튕 방지
+    //좀더 빠른 스크립트 진행을 하고싶으면 이 줄에다가 goto ended;를 해주면 스크립트 읽는속도가 올라가진다. [굳이 안해줘도 ㄱㅊ]-2 [주의점 1에 넣었는데 2에 넣지말자]
+}
+	
+	ended:
+	del @mobx;
+	del @moby;
+	del @dam;
+	del @dam2;
+	del @mob;
+	del @char;
+    	del @mob1;
+	del @mob2;
+	del @mob3;
+      	del @mob4;
+	del @mob5;
+	del @mob6;
+      	del @mob7;
+	del @mob8;
+      	del @char1;
+	del @char2;
+	del @char3;
+     	del @char4;
+	del @char5;
+	del @char6;
+     	del @char7;
+	del @char8;
+	del @xs;
+	del @ys;
+	del @effect;
+	del @rand;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0	SPELL_소환술1	{
+ 	set @myid, get_myid();
+	if(get_mana(@myid)<get_basemana(@myid)/100*2){message 3,"마력이 부족합니다.";end;}
+	effect@myid,146,0,70;
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*1;
+	set@damage,(get_int(@myid)*1)*35;
+	set@damage,(get_basemana(@myid)*1)/100*10;
+	set@damage,@damage+(get_mgc_damage(@myid)/10*200);
+	set@target,spell_target();
+	set@type,istype(@target);
+	if(@target&&@type==1&&get_mobdie){end;}
+	if(@type==1){
+		effect@target,0,0,100;
+		att_damaged@target,@damage,5;
+	}else{
+		if(@type==3&&get_map_pk()){
+			set@damage,(get_int(@myid)*1)*20;
+			set@damage,@damage+(get_mgc_damage(@myid)/10*200);
+			if(magic_protection(@target)){effect@target,0,33,130;end;}
+			char_damaged2@target,@damage,0,100;
+			if(@target!=@myid){message1@target,3,get_name()+"님이 소환술1를 가합니다.";}
+		}
+	}
+	message 3,"소환술1를 외웠습니다.";
+	motion 136,40;
+	game_sound 72,0;
+	del@myid;
+	del@target;
+	del@type;
+}
+
+0	SPELL_소환술2	{
+ 	set @myid, get_myid();
+	if(get_mana(@myid)<get_basemana(@myid)/100*1){message 3,"마력이 부족합니다.";end;}
+	effect@myid,146,0,70;
+	set_manal get_mana(@myid)-get_basemana(@myid)/1000*5;
+	set@damage,(get_int(@myid)*1)*80;
+	set@damage,(get_basemana(@myid)*1)/100*20;
+	set@damage,@damage+(get_mgc_damage(@myid)/10*210);
+	set@target,spell_target();
+	set@type,istype(@target);
+	if(@target&&@type==1&&get_mobdie){end;}
+	if(@type==1){
+		effect@target,0,0,100;
+		att_damaged@target,@damage,5;
+	}else{
+		if(@type==3&&get_map_pk()){
+			set@damage,(get_int(@myid)*1)*40;
+			set@damage,@damage+(get_mgc_damage(@myid)/10*200);
+			if(magic_protection(@target)){effect@target,0,33,130;end;}
+			char_damaged2@target,@damage,0,100;
+			if(@target!=@myid){message1@target,3,get_name()+"님이 소환술2를 가합니다.";}
+		}
+	}
+	message 3,"소환술2를 외웠습니다.";
+	motion 136,40;
+	game_sound 72,0;
+	del@myid;
+	del@target;
+	del@type;
+}
+
+0	SPELL_소환술3	{
+ 	set @myid, get_myid();
+	if(get_mana(@myid)<get_basemana(@myid)/100*1){message 3,"마력이 부족합니다.";end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	set @xs, get_mobxs(@target);
+	set @ys, get_mobys(@target);
+	set @effect1, 146;
+	set @effect2, 223;
+	set@damage,(get_int(@myid)*1)*150;
+	set@damage,(get_basemana(@myid)*1)/100*25;
+	set@damage,@damage+(get_mgc_damage(@myid)/10*220);
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @damage, @damage * 2 / 3;
+	message 3, "소환술3를 외웠습니다.";
+	if(!get_map_pk()){if(@xs == 1000 || @ys == 1000){end;}}
+	set @mob1, get_mobxy((@xs)+1, @ys);
+	set @mob2, get_mobxy((@xs)+2, @ys);
+	set @mob3, get_mobxy((@xs)-1, @ys);
+	set @mob4, get_mobxy((@xs)-2, @ys);
+	set @mob5, get_mobxy(@xs, (@ys)+1);
+	set @mob6, get_mobxy(@xs, (@ys)+2);
+	set @mob7, get_mobxy(@xs, (@ys)-1);
+	set @mob8, get_mobxy(@xs, (@ys)-2);
+	set @mob9, get_mobxy((@xs)+1, (@ys)+1);
+	set @mob10, get_mobxy((@xs)+1, (@ys)-1);
+	set @mob11, get_mobxy((@xs)-1, (@ys)+1);
+	set @mob12, get_mobxy((@xs)-1, (@ys)-1);
+	set @type1, istype(@mob1);
+	set @type2, istype(@mob2);
+	set @type3, istype(@mob3);
+	set @type4, istype(@mob4);
+	set @type5, istype(@mob5);
+	set @type6, istype(@mob6);
+	set @type7, istype(@mob7);
+	set @type8, istype(@mob8);
+	set @type9, istype(@mob9);
+	set @type10, istype(@mob10);
+	set @type11, istype(@mob11);
+	set @type12, istype(@mob12);
+	if(@target && @type == 1){effect @target, @effect1, @effect2, 75; damaged @target, @damage;}
+	if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; damaged @mob1, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; damaged @mob2, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob3, @effect1, @effect2, 75; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob4, @effect1, @effect2, 75; damaged @mob4, @damage;}
+	if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; damaged @mob5, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; damaged @mob6, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob7, @effect1, @effect2, 75; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob8, @effect1, @effect2, 75; damaged @mob8, @damage;}
+	if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; damaged @mob9, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; damaged @mob10, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob11, @effect1, @effect2, 75; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob12, @effect1, @effect2, 75; damaged @mob12, @damage;}
+	if(get_map_pk()){
+		set @xs, get_xs1(@target);
+		set @ys, get_ys1(@target);
+		set @mob1, get_char_serial(@myid, (@xs)+1, @ys);
+		set @mob2, get_char_serial(@myid, (@xs)+2, @ys);
+		set @mob3, get_char_serial(@myid, (@xs)-1, @ys);
+		set @mob4, get_char_serial(@myid, (@xs)-2, @ys);
+		set @mob5, get_char_serial(@myid, @xs, (@ys)+1);
+		set @mob6, get_char_serial(@myid, @xs, (@ys)+2);
+		set @mob7, get_char_serial(@myid, @xs, (@ys)-1);
+		set @mob8, get_char_serial(@myid, @xs, (@ys)-2);
+		set @mob9, get_char_serial(@myid, (@xs)+1, (@ys)+1);
+		set @mob10, get_char_serial(@myid, (@xs)+1, (@ys)-1);
+		set @mob11, get_char_serial(@myid, (@xs)-1, (@ys)+1);
+		set @mob12, get_char_serial(@myid, (@xs)-1, (@ys)-1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+		set @type5, istype(@mob5);
+		set @type6, istype(@mob6);
+		set @type7, istype(@mob7);
+		set @type8, istype(@mob8);
+		set @type9, istype(@mob9);
+		set @type10, istype(@mob10);
+		set @type11, istype(@mob11);
+		set @type12, istype(@mob12);
+		if(@target && @type == 3){effect @target, @effect1, @effect2, 75; char_damaged2 @target, @damage, 134, 100;}
+		if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob4, @damage, 138, 100;}
+		if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob8, @damage, 138, 100;}
+		if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob12, @damage, 138, 100;}
+	}
+	motion 145, 15;
+	game_sound 65, 0;
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @mob5;
+	del @mob6;
+	del @mob7;
+	del @mob8;
+	del @mob9;
+	del @mob10;
+	del @mob11;
+	del @mob12;
+	del @effect1;
+	del @effect2;
+}
+
+0	SPELL_소환술4	{
+ 	set @myid, get_myid();
+	if(get_mana(@myid)<get_basemana(@myid)/100*1){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid)-get_basemana(@myid)/1000*5;
+	set @target, spell_target();
+	set @type, istype(@target);
+	set @xs, get_mobxs(@target);
+	set @ys, get_mobys(@target);
+	set @effect1, 146;
+	set @effect2, 223;
+	set@damage,(get_int(@myid)*1)*180;
+	set@damage,(get_basemana(@myid)*1)/100*30;
+	set@damage,@damage+(get_mgc_damage(@myid)/10*230);
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @damage, @damage * 2 / 3;
+	message 3, "소환술4를 외웠습니다.";
+	if(!get_map_pk()){if(@xs == 1000 || @ys == 1000){end;}}
+	set @mob1, get_mobxy((@xs)+1, @ys);
+	set @mob2, get_mobxy((@xs)+2, @ys);
+	set @mob3, get_mobxy((@xs)-1, @ys);
+	set @mob4, get_mobxy((@xs)-2, @ys);
+	set @mob5, get_mobxy(@xs, (@ys)+1);
+	set @mob6, get_mobxy(@xs, (@ys)+2);
+	set @mob7, get_mobxy(@xs, (@ys)-1);
+	set @mob8, get_mobxy(@xs, (@ys)-2);
+	set @mob9, get_mobxy((@xs)+1, (@ys)+1);
+	set @mob10, get_mobxy((@xs)+1, (@ys)-1);
+	set @mob11, get_mobxy((@xs)-1, (@ys)+1);
+	set @mob12, get_mobxy((@xs)-1, (@ys)-1);
+	set @type1, istype(@mob1);
+	set @type2, istype(@mob2);
+	set @type3, istype(@mob3);
+	set @type4, istype(@mob4);
+	set @type5, istype(@mob5);
+	set @type6, istype(@mob6);
+	set @type7, istype(@mob7);
+	set @type8, istype(@mob8);
+	set @type9, istype(@mob9);
+	set @type10, istype(@mob10);
+	set @type11, istype(@mob11);
+	set @type12, istype(@mob12);
+	if(@target && @type == 1){effect @target, @effect1, @effect2, 75; damaged @target, @damage;}
+	if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; damaged @mob1, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; damaged @mob2, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob3, @effect1, @effect2, 75; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob4, @effect1, @effect2, 75; damaged @mob4, @damage;}
+	if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; damaged @mob5, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; damaged @mob6, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob7, @effect1, @effect2, 75; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob8, @effect1, @effect2, 75; damaged @mob8, @damage;}
+	if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; damaged @mob9, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; damaged @mob10, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob11, @effect1, @effect2, 75; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob12, @effect1, @effect2, 75; damaged @mob12, @damage;}
+	if(get_map_pk()){
+		set @xs, get_xs1(@target);
+		set @ys, get_ys1(@target);
+		set @mob1, get_char_serial(@myid, (@xs)+1, @ys);
+		set @mob2, get_char_serial(@myid, (@xs)+2, @ys);
+		set @mob3, get_char_serial(@myid, (@xs)-1, @ys);
+		set @mob4, get_char_serial(@myid, (@xs)-2, @ys);
+		set @mob5, get_char_serial(@myid, @xs, (@ys)+1);
+		set @mob6, get_char_serial(@myid, @xs, (@ys)+2);
+		set @mob7, get_char_serial(@myid, @xs, (@ys)-1);
+		set @mob8, get_char_serial(@myid, @xs, (@ys)-2);
+		set @mob9, get_char_serial(@myid, (@xs)+1, (@ys)+1);
+		set @mob10, get_char_serial(@myid, (@xs)+1, (@ys)-1);
+		set @mob11, get_char_serial(@myid, (@xs)-1, (@ys)+1);
+		set @mob12, get_char_serial(@myid, (@xs)-1, (@ys)-1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+		set @type5, istype(@mob5);
+		set @type6, istype(@mob6);
+		set @type7, istype(@mob7);
+		set @type8, istype(@mob8);
+		set @type9, istype(@mob9);
+		set @type10, istype(@mob10);
+		set @type11, istype(@mob11);
+		set @type12, istype(@mob12);
+		if(@target && @type == 3){effect @target, @effect1, @effect2, 75; char_damaged2 @target, @damage, 134, 100;}
+		if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob4, @damage, 138, 100;}
+		if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob8, @damage, 138, 100;}
+		if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob12, @damage, 138, 100;}
+	}
+	motion 145, 15;
+	game_sound 65, 0;
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @mob5;
+	del @mob6;
+	del @mob7;
+	del @mob8;
+	del @mob9;
+	del @mob10;
+	del @mob11;
+	del @mob12;
+	del @effect1;
+	del @effect2;
+}
+
+0	SPELL_소환술5	{
+ 	set @myid, get_myid();
+	if(get_mana(@myid)<get_basemana(@myid)/100*1){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid)-get_basemana(@myid)/1000*5;
+	set @target, spell_target();
+	set @type, istype(@target);
+	set @xs, get_mobxs(@target);
+	set @ys, get_mobys(@target);
+	set @effect1, 146;
+	set @effect2, 223;
+	set@damage,(get_int(@myid)*1)*200;
+	set@damage,(get_basemana(@myid)*1)/100*35;
+	set@damage,@damage+(get_mgc_damage(@myid)/10*240);
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @damage, @damage * 2 / 3;
+	message 3, "소환술5를 외웠습니다.";
+	if(!get_map_pk()){if(@xs == 1000 || @ys == 1000){end;}}
+	set @mob1, get_mobxy((@xs)+1, @ys);
+	set @mob2, get_mobxy((@xs)+2, @ys);
+	set @mob3, get_mobxy((@xs)-1, @ys);
+	set @mob4, get_mobxy((@xs)-2, @ys);
+	set @mob5, get_mobxy(@xs, (@ys)+1);
+	set @mob6, get_mobxy(@xs, (@ys)+2);
+	set @mob7, get_mobxy(@xs, (@ys)-1);
+	set @mob8, get_mobxy(@xs, (@ys)-2);
+	set @mob9, get_mobxy((@xs)+1, (@ys)+1);
+	set @mob10, get_mobxy((@xs)+1, (@ys)-1);
+	set @mob11, get_mobxy((@xs)-1, (@ys)+1);
+	set @mob12, get_mobxy((@xs)-1, (@ys)-1);
+	set @type1, istype(@mob1);
+	set @type2, istype(@mob2);
+	set @type3, istype(@mob3);
+	set @type4, istype(@mob4);
+	set @type5, istype(@mob5);
+	set @type6, istype(@mob6);
+	set @type7, istype(@mob7);
+	set @type8, istype(@mob8);
+	set @type9, istype(@mob9);
+	set @type10, istype(@mob10);
+	set @type11, istype(@mob11);
+	set @type12, istype(@mob12);
+	if(@target && @type == 1){effect @target, @effect1, @effect2, 75; damaged @target, @damage;}
+	if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; damaged @mob1, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; damaged @mob2, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob3, @effect1, @effect2, 75; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob4, @effect1, @effect2, 75; damaged @mob4, @damage;}
+	if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; damaged @mob5, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; damaged @mob6, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob7, @effect1, @effect2, 75; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob8, @effect1, @effect2, 75; damaged @mob8, @damage;}
+	if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; damaged @mob9, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; damaged @mob10, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob11, @effect1, @effect2, 75; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob12, @effect1, @effect2, 75; damaged @mob12, @damage;}
+	if(get_map_pk()){
+		set @xs, get_xs1(@target);
+		set @ys, get_ys1(@target);
+		set @mob1, get_char_serial(@myid, (@xs)+1, @ys);
+		set @mob2, get_char_serial(@myid, (@xs)+2, @ys);
+		set @mob3, get_char_serial(@myid, (@xs)-1, @ys);
+		set @mob4, get_char_serial(@myid, (@xs)-2, @ys);
+		set @mob5, get_char_serial(@myid, @xs, (@ys)+1);
+		set @mob6, get_char_serial(@myid, @xs, (@ys)+2);
+		set @mob7, get_char_serial(@myid, @xs, (@ys)-1);
+		set @mob8, get_char_serial(@myid, @xs, (@ys)-2);
+		set @mob9, get_char_serial(@myid, (@xs)+1, (@ys)+1);
+		set @mob10, get_char_serial(@myid, (@xs)+1, (@ys)-1);
+		set @mob11, get_char_serial(@myid, (@xs)-1, (@ys)+1);
+		set @mob12, get_char_serial(@myid, (@xs)-1, (@ys)-1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+		set @type5, istype(@mob5);
+		set @type6, istype(@mob6);
+		set @type7, istype(@mob7);
+		set @type8, istype(@mob8);
+		set @type9, istype(@mob9);
+		set @type10, istype(@mob10);
+		set @type11, istype(@mob11);
+		set @type12, istype(@mob12);
+		if(@target && @type == 3){effect @target, @effect1, @effect2, 75; char_damaged2 @target, @damage, 134, 100;}
+		if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob4, @damage, 138, 100;}
+		if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob8, @damage, 138, 100;}
+		if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob12, @damage, 138, 100;}
+	}
+	motion 145, 15;
+	game_sound 65, 0;
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @mob5;
+	del @mob6;
+	del @mob7;
+	del @mob8;
+	del @mob9;
+	del @mob10;
+	del @mob11;
+	del @mob12;
+	del @effect1;
+	del @effect2;
+}
+
+0	SPELL_소환술6	{
+ 	set @myid, get_myid();
+	if(get_mana(@myid)<get_basemana(@myid)/100*1){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid)-get_basemana(@myid)/1000*5;
+	set @target, spell_target();
+	set @type, istype(@target);
+	set @xs, get_mobxs(@target);
+	set @ys, get_mobys(@target);
+	set @effect1, 146;
+	set @effect2, 223;
+	set@damage,(get_int(@myid)*1)*220;
+	set@damage,(get_basemana(@myid)*1)/100*40;
+	set@damage,@damage+(get_mgc_damage(@myid)/10*245);
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @damage, @damage * 2 / 3;
+	message 3, "소환술6를 외웠습니다.";
+	if(!get_map_pk()){if(@xs == 1000 || @ys == 1000){end;}}
+	set @mob1, get_mobxy((@xs)+1, @ys);
+	set @mob2, get_mobxy((@xs)+2, @ys);
+	set @mob3, get_mobxy((@xs)-1, @ys);
+	set @mob4, get_mobxy((@xs)-2, @ys);
+	set @mob5, get_mobxy(@xs, (@ys)+1);
+	set @mob6, get_mobxy(@xs, (@ys)+2);
+	set @mob7, get_mobxy(@xs, (@ys)-1);
+	set @mob8, get_mobxy(@xs, (@ys)-2);
+	set @mob9, get_mobxy((@xs)+1, (@ys)+1);
+	set @mob10, get_mobxy((@xs)+1, (@ys)-1);
+	set @mob11, get_mobxy((@xs)-1, (@ys)+1);
+	set @mob12, get_mobxy((@xs)-1, (@ys)-1);
+	set @type1, istype(@mob1);
+	set @type2, istype(@mob2);
+	set @type3, istype(@mob3);
+	set @type4, istype(@mob4);
+	set @type5, istype(@mob5);
+	set @type6, istype(@mob6);
+	set @type7, istype(@mob7);
+	set @type8, istype(@mob8);
+	set @type9, istype(@mob9);
+	set @type10, istype(@mob10);
+	set @type11, istype(@mob11);
+	set @type12, istype(@mob12);
+	if(@target && @type == 1){effect @target, @effect1, @effect2, 75; damaged @target, @damage;}
+	if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; damaged @mob1, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; damaged @mob2, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob3, @effect1, @effect2, 75; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob4, @effect1, @effect2, 75; damaged @mob4, @damage;}
+	if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; damaged @mob5, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; damaged @mob6, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob7, @effect1, @effect2, 75; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob8, @effect1, @effect2, 75; damaged @mob8, @damage;}
+	if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; damaged @mob9, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; damaged @mob10, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob11, @effect1, @effect2, 75; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob12, @effect1, @effect2, 75; damaged @mob12, @damage;}
+	if(get_map_pk()){
+		set @xs, get_xs1(@target);
+		set @ys, get_ys1(@target);
+		set @mob1, get_char_serial(@myid, (@xs)+1, @ys);
+		set @mob2, get_char_serial(@myid, (@xs)+2, @ys);
+		set @mob3, get_char_serial(@myid, (@xs)-1, @ys);
+		set @mob4, get_char_serial(@myid, (@xs)-2, @ys);
+		set @mob5, get_char_serial(@myid, @xs, (@ys)+1);
+		set @mob6, get_char_serial(@myid, @xs, (@ys)+2);
+		set @mob7, get_char_serial(@myid, @xs, (@ys)-1);
+		set @mob8, get_char_serial(@myid, @xs, (@ys)-2);
+		set @mob9, get_char_serial(@myid, (@xs)+1, (@ys)+1);
+		set @mob10, get_char_serial(@myid, (@xs)+1, (@ys)-1);
+		set @mob11, get_char_serial(@myid, (@xs)-1, (@ys)+1);
+		set @mob12, get_char_serial(@myid, (@xs)-1, (@ys)-1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+		set @type5, istype(@mob5);
+		set @type6, istype(@mob6);
+		set @type7, istype(@mob7);
+		set @type8, istype(@mob8);
+		set @type9, istype(@mob9);
+		set @type10, istype(@mob10);
+		set @type11, istype(@mob11);
+		set @type12, istype(@mob12);
+		if(@target && @type == 3){effect @target, @effect1, @effect2, 75; char_damaged2 @target, @damage, 134, 100;}
+		if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob4, @damage, 138, 100;}
+		if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob8, @damage, 138, 100;}
+		if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob12, @damage, 138, 100;}
+	}
+	motion 145, 15;
+	game_sound 65, 0;
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @mob5;
+	del @mob6;
+	del @mob7;
+	del @mob8;
+	del @mob9;
+	del @mob10;
+	del @mob11;
+	del @mob12;
+	del @effect1;
+	del @effect2;
+}
+
+0	SPELL_소환술7	{
+ 	set @myid, get_myid();
+	if(get_mana(@myid)<get_basemana(@myid)/100*1){message 3,"마력이 부족합니다.";end;}
+	set_manal get_mana(@myid)-get_basemana(@myid)/1000*5;
+	set @target, spell_target();
+	set @type, istype(@target);
+	set @xs, get_mobxs(@target);
+	set @ys, get_mobys(@target);
+	set @effect1, 146;
+	set @effect2, 223;
+	set@damage,(get_int(@myid)*1)*240;
+	set@damage,(get_basemana(@myid)*1)/100*45;
+	set@damage,@damage+(get_mgc_damage(@myid)/10*250);
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @damage, @damage * 2 / 3;
+	message 3, "소환술7를 외웠습니다.";
+	if(!get_map_pk()){if(@xs == 1000 || @ys == 1000){end;}}
+	set @mob1, get_mobxy((@xs)+1, @ys);
+	set @mob2, get_mobxy((@xs)+2, @ys);
+	set @mob3, get_mobxy((@xs)-1, @ys);
+	set @mob4, get_mobxy((@xs)-2, @ys);
+	set @mob5, get_mobxy(@xs, (@ys)+1);
+	set @mob6, get_mobxy(@xs, (@ys)+2);
+	set @mob7, get_mobxy(@xs, (@ys)-1);
+	set @mob8, get_mobxy(@xs, (@ys)-2);
+	set @mob9, get_mobxy((@xs)+1, (@ys)+1);
+	set @mob10, get_mobxy((@xs)+1, (@ys)-1);
+	set @mob11, get_mobxy((@xs)-1, (@ys)+1);
+	set @mob12, get_mobxy((@xs)-1, (@ys)-1);
+	set @type1, istype(@mob1);
+	set @type2, istype(@mob2);
+	set @type3, istype(@mob3);
+	set @type4, istype(@mob4);
+	set @type5, istype(@mob5);
+	set @type6, istype(@mob6);
+	set @type7, istype(@mob7);
+	set @type8, istype(@mob8);
+	set @type9, istype(@mob9);
+	set @type10, istype(@mob10);
+	set @type11, istype(@mob11);
+	set @type12, istype(@mob12);
+	if(@target && @type == 1){effect @target, @effect1, @effect2, 75; damaged @target, @damage;}
+	if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 == 1){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob3, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 == 1){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob4, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 == 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob2, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob4, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob3, @damage;}
+	else if(@type1 == 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; damaged @mob1, @damage; damaged @mob2, @damage;}
+	else if(@type1 == 1 && @type2 != 1 && @type3 != 1 && @type4 != 1){effect @mob1, @effect1, @effect2, 75; damaged @mob1, @damage;}
+	else if(@type1 != 1 && @type2 == 1 && @type3 != 1 && @type4 != 1){effect @mob2, @effect1, @effect2, 75; damaged @mob2, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 == 1 && @type4 != 1){effect @mob3, @effect1, @effect2, 75; damaged @mob3, @damage;}
+	else if(@type1 != 1 && @type2 != 1 && @type3 != 1 && @type4 == 1){effect @mob4, @effect1, @effect2, 75; damaged @mob4, @damage;}
+	if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 == 1){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob7, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 == 1){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob8, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 == 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob6, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob8, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob7, @damage;}
+	else if(@type5 == 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; damaged @mob5, @damage; damaged @mob6, @damage;}
+	else if(@type5 == 1 && @type6 != 1 && @type7 != 1 && @type8 != 1){effect @mob5, @effect1, @effect2, 75; damaged @mob5, @damage;}
+	else if(@type5 != 1 && @type6 == 1 && @type7 != 1 && @type8 != 1){effect @mob6, @effect1, @effect2, 75; damaged @mob6, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 == 1 && @type8 != 1){effect @mob7, @effect1, @effect2, 75; damaged @mob7, @damage;}
+	else if(@type5 != 1 && @type6 != 1 && @type7 != 1 && @type8 == 1){effect @mob8, @effect1, @effect2, 75; damaged @mob8, @damage;}
+	if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 == 1){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob11, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 == 1){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob12, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 == 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob10, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob12, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob11, @damage;}
+	else if(@type9 == 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; damaged @mob9, @damage; damaged @mob10, @damage;}
+	else if(@type9 == 1 && @type10 != 1 && @type11 != 1 && @type12 != 1){effect @mob9, @effect1, @effect2, 75; damaged @mob9, @damage;}
+	else if(@type9 != 1 && @type10 == 1 && @type11 != 1 && @type12 != 1){effect @mob10, @effect1, @effect2, 75; damaged @mob10, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 == 1 && @type12 != 1){effect @mob11, @effect1, @effect2, 75; damaged @mob11, @damage;}
+	else if(@type9 != 1 && @type10 != 1 && @type11 != 1 && @type12 == 1){effect @mob12, @effect1, @effect2, 75; damaged @mob12, @damage;}
+	if(get_map_pk()){
+		set @xs, get_xs1(@target);
+		set @ys, get_ys1(@target);
+		set @mob1, get_char_serial(@myid, (@xs)+1, @ys);
+		set @mob2, get_char_serial(@myid, (@xs)+2, @ys);
+		set @mob3, get_char_serial(@myid, (@xs)-1, @ys);
+		set @mob4, get_char_serial(@myid, (@xs)-2, @ys);
+		set @mob5, get_char_serial(@myid, @xs, (@ys)+1);
+		set @mob6, get_char_serial(@myid, @xs, (@ys)+2);
+		set @mob7, get_char_serial(@myid, @xs, (@ys)-1);
+		set @mob8, get_char_serial(@myid, @xs, (@ys)-2);
+		set @mob9, get_char_serial(@myid, (@xs)+1, (@ys)+1);
+		set @mob10, get_char_serial(@myid, (@xs)+1, (@ys)-1);
+		set @mob11, get_char_serial(@myid, (@xs)-1, (@ys)+1);
+		set @mob12, get_char_serial(@myid, (@xs)-1, (@ys)-1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+		set @type5, istype(@mob5);
+		set @type6, istype(@mob6);
+		set @type7, istype(@mob7);
+		set @type8, istype(@mob8);
+		set @type9, istype(@mob9);
+		set @type10, istype(@mob10);
+		set @type11, istype(@mob11);
+		set @type12, istype(@mob12);
+		if(@target && @type == 3){effect @target, @effect1, @effect2, 75; char_damaged2 @target, @damage, 134, 100;}
+		if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 == 3){effect @mob3, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 == 3){effect @mob2, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 == 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob1, @effect1, @effect2, 75; effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob4, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 == 3 && @type2 != 3 && @type3 != 3 && @type4 != 3){effect @mob1, @effect1, @effect2, 75; char_damaged2 @mob1, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 == 3 && @type3 != 3 && @type4 != 3){effect @mob2, @effect1, @effect2, 75; char_damaged2 @mob2, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 == 3 && @type4 != 3){effect @mob3, @effect1, @effect2, 75; char_damaged2 @mob3, @damage, 138, 100;}
+		else if(@type1 != 3 && @type2 != 3 && @type3 != 3 && @type4 == 3){effect @mob4, @effect1, @effect2, 75; char_damaged2 @mob4, @damage, 138, 100;}
+		if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 == 3){effect @mob7, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 == 3){effect @mob6, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 == 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob5, @effect1, @effect2, 75; effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob8, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 == 3 && @type6 != 3 && @type7 != 3 && @type8 != 3){effect @mob5, @effect1, @effect2, 75; char_damaged2 @mob5, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 == 3 && @type7 != 3 && @type8 != 3){effect @mob6, @effect1, @effect2, 75; char_damaged2 @mob6, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 == 3 && @type8 != 3){effect @mob7, @effect1, @effect2, 75; char_damaged2 @mob7, @damage, 138, 100;}
+		else if(@type5 != 3 && @type6 != 3 && @type7 != 3 && @type8 == 3){effect @mob8, @effect1, @effect2, 75; char_damaged2 @mob8, @damage, 138, 100;}
+		if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 == 3){effect @mob11, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 == 3){effect @mob10, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 == 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob9, @effect1, @effect2, 75; effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob12, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 == 3 && @type10 != 3 && @type11 != 3 && @type12 != 3){effect @mob9, @effect1, @effect2, 75; char_damaged2 @mob9, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 == 3 && @type11 != 3 && @type12 != 3){effect @mob10, @effect1, @effect2, 75; char_damaged2 @mob10, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 == 3 && @type12 != 3){effect @mob11, @effect1, @effect2, 75; char_damaged2 @mob11, @damage, 138, 100;}
+		else if(@type9 != 3 && @type10 != 3 && @type11 != 3 && @type12 == 3){effect @mob12, @effect1, @effect2, 75; char_damaged2 @mob12, @damage, 138, 100;}
+	}
+	motion 145, 15;
+	game_sound 65, 0;
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @mob5;
+	del @mob6;
+	del @mob7;
+	del @mob8;
+	del @mob9;
+	del @mob10;
+	del @mob11;
+	del @mob12;
+	del @effect1;
+	del @effect2;
+}
+
+0	SPELL_나르콜룸	{
+	set @myid, get_myid();
+	if(get_class(@myid) != 3){spell_del2 "나르콜룸"; end;}
+	if(get_mana(@myid) < 6000){message 3, "마력이 부족합니다. [필요마나 : 6000]"; del @myid; end;}
+	manal_del "6000";
+	set @x1, get_xs(@myid)-6;
+	set @x2, get_xs(@myid)+6;
+	set @y1, get_ys(@myid)-6;
+	set @y2, get_ys(@myid)+6;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				set @rnd, rand(1,10);
+    				if(!magic_exist(2,@mob,1)){
+					if(@rnd < 6){
+						magic 2,@mob, 0, 12, 0,@myid;
+					}else{effect @mob, 0, 33, 130;}
+				}
+			}
+		go:
+		}
+	}
+	message 3, "나르콜룸을 외웠습니다.";
+    	game_sound 8,0;
+}
+
+0	SPELL_속성강화(그룹)	{
+	set @myid, get_myid();
+	set @time, time() - #sokupall;
+	if(@time < 60 && get_name(@myid) != "메인"){set @time2, 60 - @time; message 3, "재사용까지 " + @time2 + "초 남으셧습니다."; end;}
+	if(group_exist(@myid) == 0){message 3, "그룹이 없습니다.";end;}
+	if(get_mana(@myid) < 6020){message 3, "마나가 부족합니다."; del @myid; end;}
+	manal_del "6020";
+	sokup_all_delay 120;
+	set #sokupall, time();
+	message 3, "속성강화(그룹)을 외우셧습니다.";
+}
+
+0	SPELL_신의파멸	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 22960){message 3, "마력이 부족합니다. [필요마나 : 22960]"; del @myid; end;}
+	message 3, "신의파멸을 외웠습니다.";
+	game_sound 8,0;
+	if(#blackset >= 4){
+		if(get_son() == 0){set @damage, get_mana(@myid) * 3;}
+		if(get_son() == 1){set @damage, get_mana(@myid) * 4;}
+		set @damage, @damage + @damage/3;
+	}else{
+		if(get_son() == 0){set @damage, get_mana(@myid) * 3;}
+		if(get_son() == 1){set @damage, get_mana(@myid) * 4;}
+	}
+	set @x1, get_xs(@myid)-9;
+	set @x2, get_xs(@myid)+9;
+	set @y1, get_ys(@myid)-9;
+	set @y2, get_ys(@myid)+9;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			set_manal 0;
+			if(@mob && @type == 1){
+				effect @mob, 0, 217, 90;
+				damaged @mob, @damage;
+			}else{
+			go:
+				if(get_map_pk() && istype(get_char_serial(@myid,@i,@j)) == 3){
+					set @mob, get_char_serial(@myid,@i,@j);
+					if(@myid != @mob){
+						if(magic_protection(@mob)){effect @mob, 0, 33, 130;}else{
+							char_damaged2 @mob, @damage, 72, 100;
+							message1 @mob, 3, get_name() + "님이 신의파멸을 가합니다.";
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,859 @@
+MR	좀비	{
+	set @myid, get_myid();
+	set @obj, get_revival_mob(@myid, 1);
+	set @objx, get_revival_mob(@myid, 2);
+	set @objy, get_revival_mob(@myid, 3);
+	if(rand2(1,10)>4){
+		if(!mob_strabismus(@obj, 3)){end;}
+		mob_say2 @obj, 1, 0, "좀비: 끄어억~~~";
+		if(@rand <= 2){sleep 500; mob_say2 @obj, 1, 0, "좀비: 한꺼번에 덤비다니~~~~~~~";}
+		if(rand2(1,10)>4){
+			mob_say2 @obj, 1, 0, "좀비: 끄어억~~~";
+			sleep 2000;
+			object_del 1, "밀레스마을", @objx, @objy;
+			if(rand2(1,10)>4){
+				mob_spawn "식인악마", @objx, @objy, 1;
+				set#mobsay6,0;
+				end;
+			}
+		}
+		end;
+	}
+	mob_say2 @obj, 1, 0, "좀비: 끄어억~~~";
+	sleep 1000;
+	object_del 1, "밀레스마을", @objx, @objy;
+	exp_add 1;
+	message 3,"경험치가 1 올랐습니다.";
+	end;
+}
+
+MR	식인악마1	{
+	set @myid, get_myid();
+	set @obj, get_revival_mob(@myid, 1);
+	set @objx, get_revival_mob(@myid, 2);
+	set @objy, get_revival_mob(@myid, 3);
+	mob_say2 @mob, 1, 0, "식인악마: 날 건드리다니...겁이 없구나...";
+	if(rand2(1,10)>7){
+		exp_add 64575;
+		message 3,"경험치가 64575 올랐습니다.";
+		object_del 1, "밀레스마을", @objx, @objy;
+		sleep 500;
+		mob_spawn "밀레스좀비", @objx, @objy, 1;
+		end;
+	}
+	sleep 100;
+	mob_say2 @obj, 1, 0, "식인악마: 냠냠...오늘은 이만하고...";
+	sleep 500;
+	object_del 1, "밀레스마을", @objx, @objy;
+	exp_add 64575;
+	message 3,"경험치가 64575 올랐습니다.";
+	
+}
+
+Spell	식인악마2	{
+	set@myid, get_myid();
+	set@mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	if(#mobsay6==0){mob_say2 @mob, 1, 0, "식인악마: 날 건드리다니...겁이 없구나...";set#mobsay6,1;}
+	sleep 1000;
+	if(rand2(1,10)>9){
+		mob_say2 @mob, 1, 0, "식인악마: 푸하핫...가소로운 것...맛좀 봐라.";
+		if(char_curse(@myid, "프라보", 120, 65, 84)){end;}
+		message 3, object_name() + "가 프라보를 가합니다.";
+		effect @myid, 257,0,140;
+		game_sound 27,0;
+	}
+	mob_say2 @mob, 1, 0, "식인악마: 우오오오오오오~~~~";
+}
+
+0	2Sat	{
+	set@myid,get_myid();
+	if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+	set @rand,rand2(1,4);
+	if(@rand<3){
+		if(char_curse(@myid,"렌토",120,65,84)){end;}
+		message 3,object_name()+"가 렌토를 가합니다.";
+		game_sound 8,100;
+		effect @myid,259,0,130;
+	}if(@rand<2){
+		effect @myid,237,0,100;
+		game_sound 10,0;
+		message 3, object_name() + "가 플라모를 가합니다.";
+ 		char_damaged4@myid,150,150;
+	}
+	del@rand;
+}
+
+0	3Sat	{
+	set@myid,get_myid();
+	if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+	set @rand,rand2(1,4);
+	if(@rand<3){
+		if(char_curse(@myid,"바르도",120,65,84)){end;}
+		message 3,object_name()+"가 바르도를 가합니다.";
+		game_sound 8,100;
+		effect @myid,258,0,130;
+	}if(@rand<2){
+		effect @myid,235,0,100;
+		game_sound 73,0;
+		message 3, object_name() + "가 마레누스를 가합니다.";
+ 		char_damaged4@myid,250,250;
+	}
+	del@rand;
+}
+
+Spell	알세이드스_화산암지대_화론반점	{
+	set @myid, get_myid();
+	if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+	message 3, object_name() + "가 퀘이크를 가합니다.";
+ 	char_damaged4 @myid, 1060,1060;
+	effect @myid, 103, 0, 100;
+	game_sound 76,0;
+	effect2 (@xs+2), (@ys), 230, 100;
+	effect2 (@xs+3), (@ys-1), 230, 100;
+	effect2 (@xs+3), (@ys+1), 230, 100;
+	effect2 (@xs+4), (@ys), 230, 100;
+	effect2 (@xs-4), (@ys+1), 230, 100;
+	effect2 (@xs-3), (@ys), 230, 100;
+	effect2 (@xs-3), (@ys+2), 230, 100;
+	effect2 (@xs-2), (@ys+1), 230, 100;
+	end;
+}
+
+Spell	알세이드스_화산암지대	{
+	set @myid, get_myid();
+	effect2 (@xs+2), (@ys), 230, 100;
+	effect2 (@xs+3), (@ys-1), 230, 100;
+	effect2 (@xs+3), (@ys+1), 230, 100;
+	effect2 (@xs+4), (@ys), 230, 100;
+	effect2 (@xs-4), (@ys+1), 230, 100;
+	effect2 (@xs-3), (@ys), 230, 100;
+	effect2 (@xs-3), (@ys+2), 230, 100;
+	effect2 (@xs-2), (@ys+1), 230, 100;
+	end;
+}
+
+Spell	알세이드스_흉가	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @side, get_side(@myid);
+	if(@side == 0){
+		set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto gostmobout;
+		}
+	}if(@side == 1){
+		set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto gostmobout;
+		}
+	}if(@side == 2){
+		set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto gostmobout;
+		}
+	}if(@side == 3){
+		set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto gostmobout;
+		}
+	}
+	end;
+	gostmobout:
+	warp "알세이드스-화론마을", 8,67;
+	item_del "빨간빈상자", 1;
+	item_del "빨간상자", 1;
+	item_del "파랑상자", 1;
+	item_del "파랑빈상자", 1;
+	item_del "조그만석상", 1;
+	if(item_exist(@myid, "파랑항아리")){
+		item_add "빈통", 1;
+	}
+	item_del "파랑항아리", 1;
+	item_del "파랑빈항아리", 1;
+	item_del "돌", 1;
+	item_del "신비로운이서린돌", 1;
+	mob_clear "흉가1층-방4";
+	mob_clear "흉가지하";
+	mob_clear "흉가지하-방";
+	mob_clear "흉가3층";
+	set #GostHouse, 0;
+	set #gostbox, 0;
+	end;
+}
+
+0,0,0,0,0,0,0	히야트보스스킬	{
+	set @myid, get_myid();
+	if(rand(1, 10) >= 3){
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		if(!@mob){end;}
+		effect @mob, 0, 6, 100;
+		magic 10,@mob,"어둠의각인", 17, 0,@myid;
+	}else{
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		mob_say2 @mob, 0, 0, "모두공격!";
+		effect @mob, 135, 146, 100;
+		game_sound 1,100;
+		game_sound 65, 0;
+		sleep 900;
+		if(get_mapname(@myid) == "히야트던전F-7"){
+			mob_say2 @mob, 0, 0, "우워어! 나 화났어!";
+		}
+	}
+}
+
+MR	케라코라부활	{
+	set @myid, get_myid();
+	set @obj, get_revival_mob(@myid, 1);
+	set @objx, get_revival_mob(@myid, 2);
+	set @objy, get_revival_mob(@myid, 3);
+	sleep 1000;
+	mob_say2 @obj, 0, 0, "그런것으론 날 없앨순 없다.";
+	if(@rand <= 2){
+		sleep 100;
+		mob_say2 @obj, 0, 0, "공격!";
+		game_sound 38,0;
+		effect @obj, 0, 71, 75;
+		mob_spawn "아만족전사", 30, 28, 2;
+		mob_spawn "아만족전사", 24, 28, 2;
+	}
+}
+
+MR	우루쿤부활	{
+	set @myid, get_myid();
+	if($HiyateBoss==2){end;}
+	set @obj, get_revival_mob(@myid, 1);
+	if($HiyateBosscheck==3){
+		mob_spawn4 "케라코라","히야트던전F-11",27,26,2;
+		set $HiyateBoss,2;
+		magic 7,@obj,0,30,0,@myid;
+		sleep 1000;
+		mob_say2 @obj, 0, 0, "너희 착하구나!!";
+		sleep 1000;
+		mob_say2 @obj, 0, 0, "나 뭔가 흐릿한 기억밖에 없어. 근데..";
+		sleep 3000;
+		mob_say2 @obj, 0, 0, "이거 필요할꺼다.";
+		sleep 3000;
+		mob_say2 @obj, 0, 0, "나... 나는 이제 여기 없을꺼야.";
+		sleep 1500;
+		mob_clear "히야트던전F-7";
+		set @objx, get_revival_mob(@myid, 2);
+		set @objy, get_revival_mob(@myid, 3);
+		set $HiyateBosscheck,0;
+		if(rand2(1,100)>99){
+			if(rand2(1,10)>8){item_spawn "스컬나이트방패","히야트던전F-7",@objx,@objy,1;}
+			item_spawn "나겔링파워","히야트던전F-7",@objx,@objy,1;
+		}
+	}else{
+		set $HiyateBosscheck,$HiyateBosscheck+1;
+		mob_say2 @obj, 0, 0, "케이 지켜주지 못해 미안해.";
+	}
+	del @obj;
+	del @objx;
+	del @objy;
+	end;
+}
+
+MR	히야트부활	{
+	set @myid, get_myid();
+	set @obj, get_revival_mob(@myid, 1);
+	sleep 1000;
+	mob_say2 @obj, 0, 0, "도와줘!";
+	if(@rand <= 2){sleep 100; mob_say2 @obj, 0, 0, "도와줘!"; game_sound 38,0; effect @obj, 0, 71, 75;}
+	del @obj;
+	end;
+}
+
+Spell	히야트던전	{
+	set @myid, get_myid();
+	if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+	set @rand, rand2(1,6);
+	if(@rand < 2){
+		game_sound 8,100;
+		message 3, object_name() + "가 나르콜리를 가합니다.";
+		mobnar_delay @myid, 8;
+	}if(@rand < 4){
+		game_sound 8,100;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+	}if(@rand < 6){
+		if(char_curse(@myid, "어둠의각인", 120, 65, 133)){end;}
+		message 3, object_name() + "가 어둠의각인을 가합니다.";
+		game_sound 27,100;
+		effect @myid, 104, 0, 70;
+	}
+	del @rand;
+}
+
+MR	드래곤뉴트	{
+	set @myid, get_myid();
+	set @obj, get_revival_mob(@myid, 1);
+	mob_say2 @obj, 1, 0, "드래곤뉴트: 크워어어어억!!!";
+	if(@rand <= 2){sleep 100; mob_say2 @obj, 1, 0, "드래곤뉴트: 크워어어어억!!!";}
+	if(!mob_strabismus(@obj, 7)){end;}
+	del @obj;
+	end;
+}
+
+Spell	미궁스펠	{
+	set @myid, get_myid();
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	set @rand, rand(1,5);
+	if(@rand <= 1){
+		if(get_mapname(@myid) == "라미아의묘실"){
+			if(map_objmob(@myid) == 1){
+				mob_spawn "라미아2", 10, 12, 2;
+				mob_spawn "라미아2", 12, 12, 2;
+				goto go1;
+			}
+		}
+		sleep 100;
+		mob_say2 @mob, 0, 0, "" + get_name() + "가 여기에? 세월이 많이도 흘렀나보군 애송이!!";
+		goto go1;
+	}
+	if(@rand <= 2){
+		if(get_mapname(@myid) == "라미아의묘실"){
+			sleep 100;
+			mob_say2 @mob, 0, 0, "아이스블러스트 3초전!!";
+			sleep 900;
+			mob_say2 @mob, 0, 0, "아이스블러스트 2초전!!";
+			sleep 900;
+			mob_say2 @mob, 0, 0, "아이스블러스트 1초전!!";
+			sleep 900;
+			effect @myid, 101, 0, 100;
+			game_sound 77,0;
+		 	char_damaged4 @myid, 15000,15000;
+			goto go1;
+		}
+		if(get_mapname(@myid) == "묘실C"){
+			sleep 100;
+			mob_say2 @mob, 0, 0, "플레어 3초전!!";
+			sleep 900;
+			mob_say2 @mob, 0, 0, "플레어 2초전!!";
+			sleep 900;
+			mob_say2 @mob, 0, 0, "플레어 1초전!!";
+			sleep 900;
+			effect @myid, 102, 0, 100;
+			game_sound 75,0;
+		 	char_damaged4 @myid, 15000,15000;
+			goto go1;
+		}
+		if(get_mapname(@myid) == "묘실D"){
+			sleep 100;
+			mob_say2 @mob, 0, 0, "퀘이크 3초전!!";
+			sleep 900;
+			mob_say2 @mob, 0, 0, "퀘이크 2초전!!";
+			sleep 900;
+			mob_say2 @mob, 0, 0, "퀘이크 1초전!!";
+			sleep 900;
+			effect @myid, 103, 0, 100;
+			game_sound 76,0;
+		 	char_damaged4 @myid, 15000,15000;
+			goto go1;
+		}
+	}
+	if(@rand <= 3){
+		sleep 100;
+		mob_say2 @mob, 0, 0, "" + get_name() + "가 여기에? 세월이 많이도 흘렀나보군 애송이!!";
+		goto go1;
+	}
+	go1:
+	del @rand;
+	del @mob;
+	end;
+}
+
+Spell	1말	{
+	set @myid, get_myid();
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+	set @rand, rand2(1,10);
+	if(@rand < 2){
+		game_sound 8,100;
+		message 3, object_name() + "가 나르콜리를 가합니다.";
+		mobnar_delay @myid, 8;
+	}if(@rand < 4){
+		game_sound 8,100;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+	}if(@rand < 6){
+		if(#Hiyateon == 1){
+			mob_say2 @mob, 0, 0, "오호홋! 지배 할꺼야!";
+			effect @mob, 135, 146, 100;
+			game_sound 1,100;
+			game_sound 65, 0;
+			char_damaged4 @myid, 25000,25000;
+			end;
+		}
+		if(char_curse(@myid, "프라보", 120, 65, 84)){end;}
+		message 3, object_name() + "가 프라보를 가합니다.";
+		effect @myid, 257,0,140; 
+		game_sound 27,0;
+	}
+	del @rand;
+}
+
+0,0,0,0,0,0,0	백작부인의별장	{
+	set @myid, get_myid();
+	if(get_gm(@myid)){
+		end;
+	}
+	if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	game_sound 8,0;
+	effect @mob, 0, 311, 100;
+	set @rand, rand2(1,10);
+	if(@rand < 2){
+		if(#Hiyateon == 1){end;}
+		if(get_mapname(@myid) == "아만정글1" || get_mapname(@myid) == "아만정글2" || get_mapname(@myid) == "아만정글3" || get_mapname(@myid) == "아만정글4" || get_mapname(@myid) == "아만정글5"){end;}
+		if(get_class_sub() >= 1){
+			reberato @myid;
+			game_sound 8,0;
+			effect @myid, 232, 0, 100;
+			message 3, object_name() + "님이 리베를 외워주셨습니다.";
+		}
+	}else if(@rand < 4){
+		game_sound 8,0;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+	}else if(@rand < 6){
+		game_sound 10,0;
+		message 3, object_name() + "가 나르콜리를 가합니다.";
+	 	mobnar_delay @myid, 8;
+	}else if(@rand < 8){
+		if(get_mapname(@myid) == "아만정글1" || get_mapname(@myid) == "아만정글2" || get_mapname(@myid) == "아만정글3" || get_mapname(@myid) == "아만정글4" || get_mapname(@myid) == "아만정글5"){
+			goto prabo1;
+		}
+		if(get_class_sub() >= 1){
+			if(get_basevita2(@myid) >= 70000 || get_basemana2(@myid) >= 50000){
+				if(char_curse(@myid, "어둠의각인", 120, 65, 133)){end;}
+				message 3, object_name() + "가 어둠의각인을 가합니다.";
+				game_sound 27,100;
+				effect @myid, 104, 0, 70;
+				end;
+			}
+		}
+		prabo1:
+		if(char_curse(@myid, "프라보", 120, 65, 84)){end;}
+		message 3, object_name() + "가 프라보를 가합니다.";
+		effect @myid, 257,0,140; 
+		game_sound 27,0;
+	}
+	del @rand;
+}
+
+0,0,0,0,0,0,0	공격마법	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "알세이드스-화산암지대(A)"){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		message 3, object_name() + "가 플레어를 가합니다.";
+ 		char_damaged4 @myid, 1000,1000;
+		effect @myid, 102, 0, 100;
+		game_sound 75,0;
+	end;
+	}
+	if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+	if(#Hiyateon == 1){
+		effect @myid, 272, 0, 100;
+		game_sound 66, 0;
+		char_damaged4 @myid, 25000,25000;
+		end;
+	}
+	if(get_class_sub() >= 1){
+		if(get_basevita2(@myid) >= 70000 || get_basemana2(@myid) >= 50000){
+			effect @myid, 72, 0, 100;
+			game_sound 8, 0;
+			message 3, object_name() + "가 코메트를 가합니다.";
+ 			char_damaged4 @myid, 4323,4323;
+			end;
+		}
+	}
+	effect @myid, 236, 0, 75;
+	game_sound 74,0;
+	message 3, object_name() + "이 마레네라를 가합니다.";
+ 	char_damaged4 @myid, 988,988;	
+}
+
+0,0,0,0,0,0,0	노에스엔도르탑	{
+	set @myid, get_myid();
+	set @rand, rand(1,4);
+	if(@rand <= 1){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		game_sound 8,0;
+		message 3, object_name() + "가 나르콜리를 가합니다.";
+ 		mobnar_delay @myid, 8;
+	}
+	if(@rand <= 2){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		if(char_curse(@myid, "프라보", 120, 65, 84)){end;}
+		message 3, object_name() + "가 프라보를 가합니다.";
+		effect @myid, 257,0,140; 
+		game_sound 27,0;
+	}
+	if(@rand <= 3){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		game_sound 8,0;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+	}
+	if(@rand <= 4){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		effect @myid, 72, 0, 100;
+		char_damaged4 @myid, 50000,50000;
+		game_sound 8, 0;
+		message 3, object_name() + "가 코메트를 가합니다.";
+	}
+	del @rand;
+}
+
+디스펠	럭셔리군	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @side, get_side(@myid);
+	if(@side == 0){
+		set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto manad;
+		}
+	}
+	if(@side == 1){
+		set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto manad;
+		}
+	}
+	if(@side == 2){
+		set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto manad;
+		}
+	}
+	if(@side == 3){
+		set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			manad:
+			if(get_mana(@myid)<get_basemana(@myid)/100*70){
+				set_manal 0;
+				goto manad2;
+			}
+			set_manal get_mana(@myid) - get_basemana(@myid)/100*70;
+			manad2:
+			group_hill 0, 161;
+			effect @myid, 161, 0, 100;
+		}
+	}
+	if(rand2(1,100)>30){
+		if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+		set @mu, rand2(1,2);
+		if(@mu<1){
+			game_sound 8,100;
+			message 3, object_name() + "가 나르콜리를 가합니다.";
+			mobnar_delay @myid, 8;
+			end;
+		}if(@mu<2){
+			game_sound 8,100;
+			message 3, object_name() + "가 마비를 가합니다.";
+ 			mobsor_delay @myid, 8;
+			end;
+		}
+	}
+}
+
+디스펠	로열군	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @side, get_side(@myid);
+	if(@side == 0){
+		set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto vitad;
+		}
+	}if(@side == 1){
+		set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto vitad;
+		}
+	}if(@side == 2){
+		set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			goto vitad;
+		}
+	}if(@side == 3){
+		set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			vitad:
+			group_hill 0, 162;
+			set_vital get_basevita(@myid)/100*5;
+			effect @myid, 162, 0, 100;
+			group_damaged_per @myid, 1;
+		}
+	}
+	if(rand2(1,100)>30){
+		if(magic_protection(@myid)){effect @myid,33,0,130;end;}
+		set @mu, rand2(1,2);
+		if(@mu<1){
+			game_sound 8,100;
+			message 3, object_name() + "가 나르콜리를 가합니다.";
+			mobnar_delay @myid, 8;
+			end;
+		}if(@mu<2){
+			game_sound 8,100;
+			message 3, object_name() + "가 마비를 가합니다.";
+ 			mobsor_delay @myid, 8;
+			end;
+		}
+	}
+}
+
+0,0,0,0,0,0,0	특수부대군	{
+	set @myid, get_myid();
+	set @rand, rand(1,2);
+	if(@rand == 1){
+		set @target, skill_target();
+		set @x1, get_xs();
+		set @y1, get_ys();
+		set @side, get_side(@myid);
+		if(@side == 0){
+			set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+			if(@type1 == 1){
+				group_hill 0, 53;
+				set_vital get_basevita(@myid)/100*70;
+				effect @myid, 53, 0, 100;
+				group_damaged_per @myid, 1;
+			}
+		}if(@side == 1){
+			set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+			if(@type1 == 1){
+				group_hill 0, 50;
+				set_vital get_basevita(@myid)/100*70;
+				effect @myid, 50, 0, 100;
+				group_damaged_per @myid, 1;
+			}
+		}if(@side == 2){
+			set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+			if(@type1 == 1){
+				group_hill 0, 53;
+				set_vital get_basevita(@myid)/100*70;
+				effect @myid, 53, 0, 100;
+				group_damaged_per @myid, 1;
+			}
+		}if(@side == 3){
+			set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+			if(@type1 == 1){
+				group_hill 0, 50;
+				set_vital get_basevita(@myid)/100*70;
+				effect @myid, 50, 0, 100;
+				group_damaged_per @myid, 1;
+			}
+		}
+	}
+	if(@rand == 2){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		effect @myid, 72, 0, 100;
+		char_damaged4 @myid, 80000,80000;
+		game_sound 8, 0;
+		message 3, object_name() + "가 코메트를 가합니다.";
+		end;
+	}
+	del @rand;
+}
+
+0,0,0,0,0,0,0	호위병군	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @side, get_side(@myid);
+	if(@side == 0){
+		set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			group_hill 0, 50;
+			set_vital get_basevita(@myid)/100*60;
+			effect @myid, 50, 0, 100;
+			group_damaged_per @myid, 1;
+		}
+	}if(@side == 1){
+		set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			group_hill 0, 53;
+			set_vital get_basevita(@myid)/100*60;
+			effect @myid, 53, 0, 100;
+			group_damaged_per @myid, 1;
+		}
+	}if(@side == 2){
+		set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			group_hill 0, 50;
+			set_vital get_basevita(@myid)/100*60;
+			effect @myid, 50, 0, 100;
+			group_damaged_per @myid, 1;
+		}
+	}if(@side == 3){
+		set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			group_hill 0, 53;
+			set_vital get_basevita(@myid)/100*60;
+			effect @myid, 53, 0, 100;
+			group_damaged_per @myid, 1;
+		}
+	}
+	end;
+}
+
+0	메카닉비선공	{
+	set@myid,get_myid();
+	set@mob,get_mobxy(get_last_object_xs(@myid),get_last_object_ys(@myid));
+	game_sound 8,0;
+	effect @mob,0,311,100;
+	if(rand2(1,10)>5){
+		if(get_last_object_xs(@myid)==1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		if(!@mob){end;}
+		effect @mob, 0,6,100;
+		game_sound 8, 0;
+		magic 10,@mob,"어둠의각인",17,0,@myid;
+	}else{
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		if(get_ac(@myid) <= -30){if(rand2(1,100) > 80){effect @myid, 33, 0, 130;end;}}
+		game_sound 8,100;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+	}
+}
+
+0	나노박스	{
+	set @myid, get_myid();
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	game_sound 8,0;
+	effect @mob, 0, 311, 100;
+	set @rand, rand2(1,10);
+	if(@rand < 4){
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		if(!@mob){end;}
+		effect @mob, 0, 6, 100;
+		game_sound 8, 0;
+		magic 10,@mob,"어둠의각인", 17, 0,@myid;
+	}
+	if(@rand < 6){
+		effect @myid, 7, 0, 100;
+		game_sound 25, 0;
+		game_sound 1, 0;
+		message 3, object_name() + "가 다크스타를 가합니다.";
+ 		set_vital get_basevita(@myid)/100*50;
+	}
+	if(@rand < 8){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		if(get_ac(@myid) <= -30){if(rand2(1,100) > 80){effect @myid, 33, 0, 130;end;}}
+		game_sound 8,100;
+		message 3, object_name() + "가 나르콜리를 가합니다.";
+		mobnar_delay @myid, 8;
+	}
+	del @rand;
+}
+
+Spell	암포트	{
+	set@myid,get_myid();
+	set@say$,"삐리삐릭 조준: "+get_name()+" Count : ";
+	set@mob,get_mobxy(get_last_object_xs(@myid),get_last_object_ys(@myid));
+	game_sound 8,0;
+	effect @mob,0,311,100;
+	effect @myid,43,0,100;
+	sleep 100;
+	mob_say2 @mob,0,0,@say$+"5";
+	sleep 900;
+	mob_say2 @mob,0,0,@say$+"4";
+	sleep 900;
+	mob_say2 @mob,0,0,@say$+"3";
+	sleep 900;
+	mob_say2 @mob,0,0,@say$+"2";
+	sleep 900;
+	mob_say2 @mob,0,0,@say$+"1";
+	sleep 900;
+	effect @myid,378,0,100;
+	char_damaged4 @myid,10000000,10000000;
+	del@rand;
+	del@mob;
+}
+
+0	쉘드앤트	{
+	set @myid, get_myid();
+	if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	if(!@mob){end;}
+	game_sound 8,0;
+	effect @mob, 0, 311, 100;
+	magic 10,@mob,"어둠의각인", 17, 0,@myid;
+}
+
+0	킹피셔	{
+	set @myid, get_myid();
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	game_sound 8,0;
+	effect @mob, 0, 311, 100;
+	set @rand, rand2(1,10);
+	if(@rand < 4){
+		effect @myid, 97, 0, 100;
+		game_sound 78, 0;
+		game_sound 1, 0;
+		message 3, object_name() + "가 플레쉬스톰을 가합니다.";
+ 		set_vital get_basevita(@myid)/100*1;
+	}
+	if(@rand < 6){
+		effect @myid, 288, 0, 100;
+		game_sound 98, 0;
+		game_sound 1, 0;
+		message 3, object_name() + "가 다라밀공를 가합니다.";
+ 		set_vital get_basevita(@myid)/100*70;
+	}
+	if(@rand < 8){
+		if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+		if(get_ac(@myid) <= -30){if(rand2(1,100) > 80){effect @myid, 33, 0, 130;end;}}
+		game_sound 8,100;
+		message 3, object_name() + "가 마비를 가합니다.";
+ 		mobsor_delay @myid, 8;
+	}
+	del @rand;
+}
+
+0,0,0,0,0,0,0	로열더스트	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @side, get_side(@myid);
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	effect @myid, 374, 0, 80;
+	if(@side == 0){
+		set @mob1, get_mobxy(@x1, (@y1)-1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			set_manal "0";
+			effect @myid, 373, 0, 100;
+		}
+	}if(@side == 1){
+		set @mob1, get_mobxy(@x1+1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			set_manal "0";
+			effect @myid, 373, 0, 100;
+		}
+	}if(@side == 2){
+		set @mob1, get_mobxy(@x1, (@y1)+1);set @type1, istype(@mob1);
+		if(@type1 == 1){
+			set_manal "0";
+			effect @myid, 373, 0, 100;
+		}
+	}if(@side == 3){
+		set @mob1, get_mobxy(@x1-1, (@y1));set @type1, istype(@mob1);
+		if(@type1 == 1){
+			set_manal "0";
+			effect @myid, 373, 0, 100;
+		}
+	}
+	end;
+}

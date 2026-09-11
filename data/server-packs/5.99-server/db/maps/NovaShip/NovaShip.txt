@@ -1,0 +1,88 @@
+{
+번함선	6542
+이름	블팜함선
+너비	50
+높이	30
+배경음	162
+맵파일	db/maps/default/maps/lod6542.map
+}
+{
+번함선	6549
+이름	블팜함선선장실
+너비	15
+높이	15
+배경음	162
+맵파일	db/maps/default/maps/lod6549.map
+}
+{
+번함선	6543
+이름	블팜함선내부
+너비	50
+높이	20
+배경음	162
+맵파일	db/maps/default/maps/lod6543.map
+}
+{
+번함선	6544
+이름	블팜함선선실5
+너비	20
+높이	20
+배경음	162
+맵파일	db/maps/default/maps/lod6544.map
+}
+{
+번함선	6545
+이름	블팜함선선실6
+너비	15
+높이	15
+배경음	162
+맵파일	db/maps/default/maps/lod6545.map
+}
+{
+번함선	6546
+이름	블팜함선선실7
+너비	15
+높이	15
+배경음	162
+맵파일	db/maps/default/maps/lod6546.map
+}
+{
+번함선	6547
+이름	블팜함선선실1
+너비	20
+높이	20
+배경음	162
+맵파일	db/maps/default/maps/lod6547.map
+}
+{
+번함선	6548
+이름	블팜함선선실2
+너비	20
+높이	20
+배경음	162
+맵파일	db/maps/default/maps/lod6548.map
+}
+{
+번함선	6550
+이름	블팜함선선실3
+너비	25
+높이	25
+배경음	162
+맵파일	db/maps/default/maps/lod6550.map
+}
+{
+번함선	6551
+이름	블팜함선선실4
+너비	40
+높이	40
+배경음	162
+맵파일	db/maps/default/maps/lod6551.map
+}
+{
+번함선	6552
+이름	블팜함선선실8
+너비	40
+높이	40
+배경음	162
+맵파일	db/maps/default/maps/lod6552.map
+}

@@ -1,0 +1,315 @@
+Script	화론경비병	{
+	set @myid, get_myid();
+	if(#WestQuest008 == 8){
+		set #WestQuest008C, 1;
+		mes 0, "인증서를 안써주신다고요? 내가 가서 말씀드려보겠네.";
+	}
+	if(get_nation (@myid) == 6){mes 0, "여기를 지나가려면 통행증이 있어야하네"; end;}
+	mes 1, "여기를 지나가려면 통행증이 있어야하네";
+	set @door, menu(0, "뭐궁금한것이 있나?", "통행증?");
+	if(@door == 1){
+		mes 1, "통행증을 모르나 외부인은 청룡의 통행증이라는 것이 필요하네 노엠촌장님이 발급해주시지";
+		mes 0, "그냥은 발급안해주시겠지만 하번 가보게";
+	}
+	end;
+}
+
+Script	화론촌장손녀	{
+	set @myid, get_myid();
+	if(#WestQuest008 == 0){
+		set @rand, rand2(1,5);
+		if(@rand <= 1){
+			mes 1, "휴 당신 정말 끈질기군요. 알겠어요 무슨일이 있었는지 알려드리죠.";
+			mes 1, "몇 일전 노엠마을의 촌장님이 찾아오셨어요. 몇일 묵어가겠다고 하시더군요.";
+			mes 1, "저희 할아버님이랑 노엠촌장님이랑은 정말 술을 좋아하시는 분들이시라 만났다하면 거하게 취할때까지 드시죠.";
+			mes 1, "그 날도 두분은 정신을 못차리실정도로 드셨어요. 그때 노엠촌장님이 볼일보신다고 나가시고는\\n한참동안 소식이 없으셨죠.";
+			mes 1, "그래서 저희 할아버님은 거하게 취하신 몸으로 노엠촌장님을 찾으러 나가셨죠. 그리고는 한두시간후 노엠촌장님과 같이 비틀거리고 들어오셨죠";
+			mes 1, "그때도 이상한 조짐이 보였지만 술을 많이 드셔서 그런 줄 알고 넘어갔죠. 그런데 노엠촌장님께서\\n다음날 돌아가실때까지 정신을 못차리시 더군요.";
+			mes 1, "그이후로 계속 이런상태예요.";
+			set @WestQuestnpc1, menu(0, "혹시 저를 도와주실수 있으신가요", "예 도와드리겠습니다.", "아니요. 도와드릴수가 없네요.");
+			if(@WestQuestnpc1 == 1){
+				mes 1, "고마워요. 제가 조사하는중  한가지 의심이 가는 부분이 있었어요.";
+				mes 1, "그날 할아버지가 흉가에서 가져왔다고 하는 돌에 붙어있던 이끼가 처음보는 종류의 이끼더군요.";
+				mes 1, "여러가지 실험을 해보려고 했지만 이끼가 대부분 말라 죽어버려서........";
+				mes 1, "그 돌과 함께 이끼를 가져와주셨으면 좋겠어요.부탁드립니다.";
+				item_add "빈통", 1;
+				item_add "청룡의통행증", 1;
+				set #WestQuest008, 1;
+				mes 0, "자여기 이 빈통에다가 담아와 주세요.여기 청룡의통행증도.";
+			}
+		}if(@rand >= 2){
+			mes 0, "이방인하고는 개인적인 이야기는 하고 싶지 않아모";
+		}else{
+			mes 0, "할아버지에게 무슨일이 있었는지 당신이 알필요 없어요,";
+		}
+	end;
+	}
+	if(#WestQuest008 == 1){
+		mes 1, "이끼를 담아오셨나요?";
+		if(!item_exist(@myid, "이끼묻은돌이든통")){mes 0, "빈통에 이끼를 담아오셔야 해요..";end;}
+		mes 1, "감사합니다. 작지만 이거라도 받아주세요.";
+		item_add "백호의증명서", 1;
+		item_del "이끼묻은돌이든통", 1;
+		set #WestQuest008, 2;
+		mes 0, "이제 조사를 시작해야 겠네요. 끝날쯤 한번더 들려주세요.";
+	end;
+	}
+	if(#WestQuest008 == 2){
+		mes 1, "조사가 끝났어요.";
+		mes 1, "무언가 걸리는 점이있긴하지만 저로써는 알수가 없네요. 문서에도 안남아있는 걸봐서 돌연변이 또는 아직 알려지지 않은 종같아요.";
+		mes 1, "아! 혹시 상약국주인에게 물어보면 알지도 모르겠네요.";
+		item_add "이끼묻은돌이든통", 1;
+		item_add "화론촌장손녀의편지", 1;
+		set #WestQuest008, 3;
+		mes 0, "이 편지와 함께 이것을 상약국주인에게 가져다주세요.";
+	end;
+	}
+	if(#WestQuest008 == 6){
+		if(!item_exist(@myid, "약병")){mes 0, "이방인하고는 개인적인 이야기는 하고 싶지 않아모"; end;}
+		item_del "약병", 1;
+		set #WestQuest008, 7;
+		mes 0, "약을 가져오셨군요 바로 할아버지에게 드려야겠어요. 정말로 감사해요.";
+	}
+	if(#WestQuest008 == 8){
+		set #WestQuest008A, 1;
+		mes 0, "인증서를 안써주신다고요? 조금이라도 도움이된다면  제가 가서 말씀드려볼께요.";
+	end;
+	}
+	if(#WestQuest008 == 23){mes 0, "도와주셔서 감사해요.";}
+	if(get_nation (@myid) != 6){mes 0, "이방인하고는 개인적인 이야기는 하고 싶지 않아모";}
+}
+
+Script	화론촌장	{
+	set @myid, get_myid();
+	if(#WestQuest008 == 7){
+		mes 1, "아 자넨가? 내병을 고치는 것에 많은 도움을준자가.";
+		mes 1, "정말고맙네.";
+		set @menu, menu(0, "뭔가 보답하고 싶네만 뭐 원하는거 있나?", "인증서를 써주셨으면 합니다.", "아니오 아무것도 필요없습니다.");
+		if(@menu == 1){
+			mes 1, "인증서?! 흐음 미안하네 인증서는 만은 안되네.";
+			mes 1, "인증서를 받을려면 일단 소개장을 가져와야하네 그다음 시험을 치뤄야하네.";
+			set #WestQuest008, 8;
+			mes 0, "그럼 잘가게나.";
+		}
+	end;
+	}
+	if(#WestQuest008 == 9){
+		mes 1, "자 시험을 계속 하세";
+		mes 1, "두번째 시험일세";
+		mes 1, "두번째 시험내용은 마을 사람에게 확인을 받아오는 거네, 그사람 앞에가서 '확인' 이라고 외치면되네";
+		mes 1, "단 순서대로 받아와야하며 순서대로 받지 않으면 처음부터 다시 받아와야하네.";
+		mes 1, "처음은 '거지'네";
+		item_add "확인서1", 1;
+		set #WestQuest008, 10;
+		mes 0, "이 확인서를 가져가서 확인을 받아오게나";
+	end;
+	}
+	if(#WestQuest008 == 21){
+		mes 1, "자 시험을 계속 하세";
+		mes 1, "마지막 시험일세";
+		mes 1, "마지막 시험내용은 인증서를 써줄 종이와 도장을 가져오는거네";
+		mes 1, "도장은 마을 어딘가에 숨겨져있네.";
+		mes 1, "하지만 종이는 직접만들어와야 하네.";
+		mes 1, "'인증서종이'로 제조를 하면 만들수가 있네. 재료는 마을사람들에게 직접 물어보게나.";
+		mes 1, "'인증서'라고 말을 하면 알려줄걸세";
+		set #WestQuest008, 22;
+		mes 0, "자 그럼'라고오게나.";
+	end;
+	}
+	if(#WestQuest008 == 22){
+		mes 1, "자 시험을 계속 하세";
+		if(!item_exist(@myid, "인증도장") || !item_exist(@myid, "인증서종이")){mes 0, "인증도장과 인증서종이를 가져다 주게"; end;}
+		mes 1, "수고했네";
+		mes 1, "축하하네 모든시험에 통과했구려";
+		item_add "화룡의인장기술서", 1;
+		item_del "인증도장", 1;
+		item_del "인증서종이", 1;
+		legend_add 0, 255, "화론마을 인증서를 발급받다.";
+		set #WestQuest008, 23;
+		mes 0, "인증서를 발급해주겠네.";
+	end;
+	}
+	if(#WestQuest008 == 8 && #WestQuest008A == 1 && #WestQuest008B == 1 && #WestQuest008C == 1){
+		mes 1, "휴 다들 자네가 좋은사람이 라고 하니 어쩔수가 없구려.";
+		mes 1, "그럼 인증서를 받기 위한 시험을 치루겠네";
+		mes 1, "자 첫번째 시험일세";
+		mes 1, "내가 내는 문제를 맞추어보게나. 5가지를 모두 맞추면 통과일세";
+		mes 1, "문제가 나가네";
+		start:
+		if(#westionset == 5){
+			set #WestQuest008, 9;
+			mes 0, "1차 시험 합격이네 좀 쉬고 시험을 치루세";
+		}
+		set @rand, rand(0,5);
+		if(@rand < 1 || @rand > 5){goto start;}
+		if(@rand == 1){
+			set @select2, menu(0, "아슬론 잡화상점에서 물건을 파는 npc의이름은 무엇입니까?", "해리슨", "허드슨", "브레이시", "베르민");
+			if(@select2 == 3){
+				set #westionset, #westionset + 1;
+				goto start2;
+			}else{
+				mes 0, "아쉽게도 틀렸네, 시험은 다시 치룰수 있으니 한번 더 말을 걸어주게나.";
+				set #westionset, 0;
+				end;
+			}
+		}else if(@rand == 2){
+			set @select2, menu(0, "아슬론 무기점에서 판매하는 칸의동장갑R의 가격은 얼마입니까?", "2000000", "3000000", "4000000", "5000000");
+			if(@select2 == 4){
+				set #westionset, #westionset + 1;
+				goto start2;
+			}else{
+				mes 0, "아쉽게도 틀렸네, 시험은 다시 치룰수 있으니 한번 더 말을 걸어주게나.";
+				set #westionset, 0;
+				end;
+			}
+		}else if(@rand == 3){
+			set @select2, menu(0, "아슬론 무기상점에서 무기와 스태프, 그리고 칸나목걸이를 파는 npc의 이름은 무엇입니까?", "피엘", "아쿰", "후치", "푸이");
+			if(@select2 == 2){
+				set #westionset, #westionset + 1;
+				goto start2;
+			}else{
+				mes 0, "아쉽게도 틀렸네, 시험은 다시 치룰수 있으니 한번 더 말을 걸어주게나.";
+				set #westionset, 0;
+				end;
+			}
+		}else if(@rand == 4){
+			set @select2, menu(0, "아슬론교련장 입장 도우미npc의 이름은 무엇입니까?", "티나", "프리드", "레노아", "데이미");
+			if(@select2 == 3){
+				set #westionset, #westionset + 1;
+				goto start2;
+			}else{
+				mes 0, "아쉽게도 틀렸네, 시험은 다시 치룰수 있으니 한번 더 말을 걸어주게나.";
+				set #westionset, 0;
+				end;
+			}
+		}else if(@rand == 5){
+			set @select2, menu(0, "아슬론 무기점에서 판매하는 이아의금장갑R의 가격은 얼마입니까?", "2500000", "1500000", "3500000", "500000");
+			if(@select2 == 2){
+				set #westionset, #westionset + 1;
+				goto start2;
+			}else{
+				mes 0, "아쉽게도 틀렸네, 시험은 다시 치룰수 있으니 한번 더 말을 걸어주게나.";
+				set #westionset, 0;
+				end;
+			}
+		}
+	end;
+	start2:
+	mes 1, "그럼 다음문제";
+	goto start;
+	}
+	if(#WestQuest008 == 23){mes 0, "우리 화론마을에 온것을 환영하네"; end;}
+	mes 1, ".....히히.....흐흐...히히히";
+	mes 1, "이히히 너..너..너는 누구냐..히히.";
+	set @menu, menu(0, "너 ..외부인이구나!! 뭐하러 왔냐!!크흐흐", "인증서를 받으러 왔습니다.", "그냥.....와 봤습니다.");
+	if(@menu == 1){
+		mes 1, "인증서? 하! 외부인은 아무도 인정 할 수없어 당장꺼져";
+		warp "알세이드스-화론마을", 26,45;
+		mes 0, "다시는 올생각도 하지마!!";
+	}
+}	
+	
+Script	상약국주인	{
+	set @myid, get_myid();
+	if(#WestQuest008 == 3){
+		set @WestQuestmenu3, menu(0, "응? 무슨용무인가요? 이방인인 당신과 오랫동안 이야기하기 싫으니 빨리 말하세요.", "촌장님때문에..", "아무것도 아닙니다.");
+		if(@WestQuestmenu3 == 1){
+			mes 1, "촌장님일이라 무슨 소리인가요? 요즘촌장님 건강이 좋지 않으시다는 소리가 들리던데...";
+			set @WestQuestmenu32, menu(0, "무슨일이 있나요?", "편지와 이끼를 건네준다.", "건네주지 않는다.");
+			if(@WestQuestmenu32 == 1){
+				mes 1, "으응! 이것은!!";
+				mes 1, "급한일 같군요 잠시만 기다려주세요. ..";
+				mes 1, "흐음...음....";
+				mes 1, "음음.";
+				mes 1, "...";
+				set @WestQuestmenu33, menu(0, "그렇군요. 아마도 이 이끼는 음기를 많이 흡수하며 자란것같네요 일단은 양기가 충만한 약재 몇가지만 구해주었으면 하는데요. 괜찮겠어요?", "예", "아니오");
+				if(@WestQuestmenu33 == 1){
+					mes 1, "고마워요. 나중에 촌장에게 잘 말해드릴께요..";
+					mes 1, "구해올 물품은 인삼 10개와 생강 10개 그리고 흉가에 있었다는 그 돌도 하나더 가져와 주세요.";
+					mes 1, "인삼은 사막지역에서 구할수 있고 생강은 화산지역에서 구할수있을 꺼에요.";
+					item_del "화론촌장손녀의편지", 1;
+					item_del "이끼묻은돌이든통", 1;
+					item_add "빈통", 1;
+					set #WestQuest008, 4;
+					mes 0, "수고해주세요.";
+				}
+			}
+		} 
+	end;
+	}
+	if(#WestQuest008 == 4){
+		mes 1, "오 약재를 가져왔나요?";
+		if(item_exist(@myid, "생강") < 10 || item_exist(@myid, "인삼") < 10 || !item_exist(@myid, "이끼묻은돌이든통")){mes 0, "아직 멀었군요. 빨리 가져다주세요.";}
+		item_del "생강", 10;
+		item_del "인삼", 10;
+		item_del "이끼묻은돌이든통", 1;
+		set #WestQuest008, 5;
+		mes 0, "맞게 가져왔군요. 잠시만 기다리세요. 약을 바로 만들어주겠어요.";
+	end;
+	}
+	if(#WestQuest008 == 5){
+		set @rand, rand2(1,10);
+		if(@rand <= 1){
+			item_add "약병", 1;
+			set #WestQuest008, 6;
+			mes 0, "자 여기있어요 빨리 촌장님에게 약을 드리세요.";
+		}if(@rand <= 4){
+			mes 0, "조금만 더 기다리세요.";
+		}if(@rand <= 6){
+			mes 0, "조금만 더 기다리세요.";
+		}else{
+			mes 0, "조금만 더 기다리세요.";
+		}
+	end;
+	}
+	if(#WestQuest008 == 8){
+		set #WestQuest008B, 1;
+		mes 0, "인증서를 안써주신다고요? 조금이라도 도움이된다면  제가 가서 말씀드려볼께요.";
+	}
+	if(#WestQuest008 == 23){mes 0, "촌장님이 건강해지셔서 다행이야..";}
+}
+
+Script	화룡의장인	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "화룡의인장기술서") || skill_exist("화룡의인장")){
+		mes 1, "날 찾아온 것을 보니 화룡의인장이 필요한가보군모...난 외부사람을 그다지 좋아하지 않아모.\\n하지만 촌장의 인정을 받았다니..어쩔 수 없지모..화론에서 만들어진 갑주와 무기, 방어구들은 화룡의힘이 깃들어 있어서 화룡의힘을 받지 않은 사람이라면 착용할 수 없다모.";
+		mes 1, "켈켈켈..내가 그 갑주를 입고 다닐거냐고모? 내가 필요로 하는 건 그 갑주들의 성분이지..그건 이곳에서는 구할 수 없거든모.뭐 내가 필요로 하지 않는 부분들은 버려지게 되겠지만모..";
+		set @injang, menu(0, "동쪽대륙에서 가장 훌륭한 갑주를 바친다면 생각해보지모..어쩌겠냐모??", "빛의 갑주로 화룡의힘을 원합니다.", "암흑의갑주로 화룡의힘을 원합니다.");
+		if(@injang == 1){
+			if(item_exist(@myid, "레오파드2") && item_exist(@myid, "헬름2")){item_del "레오파드2", 1; item_del "헬름2", 1; goto Injang;}
+			if(item_exist(@myid, "아레스2") && item_exist(@myid, "살렛2")){item_del "아레스2", 1; item_del "살렛2", 1; goto Injang;}
+			if(item_exist(@myid, "아비스2") && item_exist(@myid, "루크2")){item_del "아비스2", 1; item_del "루크2", 1; goto Injang;}
+			if(item_exist(@myid, "레일라2") && item_exist(@myid, "라멜2")){item_del "레일라2", 1; item_del "라멜2", 1; goto Injang;}
+			if(item_exist(@myid, "솔라레스2") && item_exist(@myid, "마르두크2")){item_del "솔라레스2", 1; item_del "마르두크2", 1; goto Injang;}
+			if(item_exist(@myid, "세르네티2") && item_exist(@myid, "마아트2")){item_del "세르네티2", 1; item_del "마아트2", 1; goto Injang;}
+			if(item_exist(@myid, "데메테르2") && item_exist(@myid, "아가트2")){item_del "데메테르2", 1; item_del "아가트2", 1; goto Injang;}
+			if(item_exist(@myid, "라피스라즐리2") && item_exist(@myid, "큐이레스2")){item_del "라피스라즐리2", 1; item_del "큐이레스2", 1; goto Injang;}
+			if(item_exist(@myid, "위타천2") && item_exist(@myid, "투신의머리띠2")){item_del "위타천2", 1; item_del "투신의머리띠2", 1; goto Injang;}
+			if(item_exist(@myid, "가릉비가2") && item_exist(@myid, "화영잠2")){item_del "가릉비가2", 1; item_del "화영잠2", 1; goto Injang;}
+			end;
+			Injang:
+			skill_add2 "화룡의인장";
+			item_del "화룡의인장기술서", 1;
+			item_add "주작의서클릿", 1;
+			mes 0, "화룡의힘이 느껴지는가모?? 흠..자네의 갑주중 이부분은 별로 필요가 없는데..이걸로\\n주작의서클릿을 만들 수 있을 것 같은데..뭐 덤으로 줄테니 가지고 가게.";
+		}else if(@injang == 2){
+			if(item_exist(@myid, "레오파드1") && item_exist(@myid, "헬름1")){item_del "레오파드1", 1; item_del "헬름1", 1; goto Injang1;}
+			if(item_exist(@myid, "아레스1") && item_exist(@myid, "살렛1")){item_del "아레스1", 1; item_del "살렛1", 1; goto Injang1;}
+			if(item_exist(@myid, "아비스1") && item_exist(@myid, "루크1")){item_del "아비스1", 1; item_del "루크1", 1; goto Injang1;}
+			if(item_exist(@myid, "레일라1") && item_exist(@myid, "라멜1")){item_del "레일라1", 1; item_del "라멜1", 1; goto Injang1;}
+			if(item_exist(@myid, "솔라레스1") && item_exist(@myid, "마르두크1")){item_del "솔라레스1", 1; item_del "마르두크1", 1; goto Injang1;}
+			if(item_exist(@myid, "세르네티1") && item_exist(@myid, "마아트1")){item_del "세르네티1", 1; item_del "마아트1", 1; goto Injang1;}
+			if(item_exist(@myid, "데메테르1") && item_exist(@myid, "아가트1")){item_del "데메테르1", 1; item_del "아가트1", 1; goto Injang1;}
+			if(item_exist(@myid, "라피스라즐리1") && item_exist(@myid, "큐이레스1")){item_del "라피스라즐리1", 1; item_del "큐이레스1", 1; goto Injang1;}
+			if(item_exist(@myid, "위타천1") && item_exist(@myid, "투신의머리띠1")){item_del "위타천1", 1; item_del "투신의머리띠1", 1; goto Injang1;}
+			if(item_exist(@myid, "가릉비가1") && item_exist(@myid, "화영잠1")){item_del "가릉비가1", 1; item_del "화영잠1", 1; goto Injang1;}
+			end;
+			Injang1:
+			skill_add2 "화룡의인장";
+			item_del "화룡의인장기술서", 1;
+			item_add "주작의눈물", 1;
+			mes 0, "화룡의힘이 느껴지는가모?? 흠..자네의 갑주중 이부분은 별로 필요가 없는데..이걸로\\n주작의눈물을 만들 수 있을 것 같은데..뭐 덤으로 줄테니 가지고 가게.";
+		}
+	}
+	mes 0, "날 찾아온걸 보니 자네가 원하는건 기술이 아니던가모?? 기술서는 어디다 팔아먹었나모?";}
+}

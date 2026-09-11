@@ -1,0 +1,261 @@
+0,0,0,0,0,0,0	Monster_플라모	{
+	set @myid, get_myid();
+	effect @myid, 12, 0, 75;
+	game_sound 10,0;
+	message 3, object_name() + "가(이) 플라모를 가합니다.";
+ 	char_damaged2 @myid, 20,20;
+}
+
+0,0,0,0,0,0,0	Monster_마레노	{
+	set @myid, get_myid();
+	effect @myid, 10, 0, 75;
+	game_sound 10,0;
+	message 3, object_name() + "가(이) 마레노를 가합니다.";
+ 	char_damaged2 @myid, 30,30;
+}
+
+0,0,0,0,0,0,0	Monster_나르콜리	{
+	set @myid, get_myid();
+	game_sound 10,0;
+	message 3, object_name() + "가(이) 나르콜리를 가합니다.";
+ 	mobnar_delay @myid, 8;
+}
+
+0,0,0,0,0,0,0	Monster_소루마	{
+	set @myid, get_myid();
+	game_sound 10,0;
+	message 3, object_name() + "가(이) 소루마를 가합니다.";
+ 	mobsor_delay @myid, 8;
+}
+
+0,0,0,0,0,0,0	Monster_리베라토	{
+	set @myid, get_myid();
+	reberato @myid;
+	game_sound 10,0;
+	effect @myid, 232, 0, 100;
+	message 3, object_name() + "가(이) 리베라토를 가합니다.";
+}
+
+0,0,0,0,0,0,0	Monster_유령하녀	{
+	set @myid, get_myid();
+	if(rand(1, 8) > 6){
+		if(set_strabismus(@myid, 12)){
+			end;
+		}else{
+			game_sound 8,0;
+			message 3, object_name() + "가(이) 딜루메니를 가합니다.";
+			effect @myid, 276,0,80;
+		}
+	}else{
+		reberato @myid;
+		game_sound 10,0;
+		effect @myid, 232, 0, 100;
+		message 3, object_name() + "가(이) 리베라토를 가합니다.";
+	}
+}
+
+0,0,0,0,0,0,0	Monster_이상한빛	{
+	set @myid, get_myid();
+	set @rand, rand(1,3);
+	if(@rand == 1){
+		reberato @myid;
+		game_sound 10,0;
+		effect @myid, 232, 0, 100;
+		message 3, object_name() + "가(이) 리베라토를 가합니다.";
+	}else if(@rand == 2){
+		set @myid, get_myid();
+		game_sound 10,0;
+		message 3, object_name() + "가(이) 나르콜리를 가합니다.";
+ 		mobnar_delay @myid, 8;
+	}else if(@rand == 3){
+		set @myid, get_myid();
+		effect @myid, 23, 0, 75;
+		game_sound 10,0;
+		message 3, object_name() + "가(이) 아듀로를 가합니다.";
+ 		char_damaged2 @myid, 485,485;
+	}
+}
+
+0,0,0,0,0,0,0	Monster_마네나로	{
+	set @myid, get_myid();
+	group_hill 0, 236;
+	effect @myid, 236, 0, 100;
+	group_damaged2 @myid, group_bighp() / 4;
+	game_sound 63, 0;
+	message 3, object_name() + "가(이) 마네나로를 가합니다.";
+}
+
+0,0,0,0,0,0,0	Monster_블러드백작	{
+	set @myid, get_myid();
+	if(rand(1, 10) < 3){
+		reberato @myid;
+		game_sound 10,0;
+		effect @myid, 232, 0, 100;
+		mob_say2 get_object_id(@myid), 0, 0, "리베라토.";
+		message 3, object_name() + "가(이) 리베라토를 가합니다.";
+	}else if(rand(1, 10) < 6){
+		group_hill 0, 72;
+		effect @myid, 72, 0, 100;
+		group_damaged2 @myid, group_bighp() / 3;
+		game_sound 63, 0;
+		mob_say2 get_object_id(@myid), 0, 0, "메테오.";
+		message 3, object_name() + "가(이) 메테오를 가합니다.";
+	}else{
+		game_sound 10,0;
+		mob_say2 get_object_id(@myid), 0, 0, "소루마.";
+		message 3, object_name() + "가(이) 소루마를 가합니다.";
+	 	mobsor_delay @myid, 8;
+	}
+}
+
+0,0,0,0,0,0,0	Monster_타겟홀드	{
+	set @myid, get_myid();
+	effect @myid, 89, 0, 75;
+	game_sound 63,0;
+	message 3, object_name() + "가(이) 타겟팅홀리드래곤을 가합니다.";
+ 	char_damaged2 @myid, 2000,2000;
+}
+
+0,0,0,0,0,0,0	Monster_홀리드래곤	{
+	set @myid, get_myid();
+	group_hill 0, 89;
+	effect @myid, 89, 0, 100;
+	group_damaged2 @myid, group_bighp() / 4;
+	game_sound 63, 0;
+	message 3, object_name() + "가(이) 홀리드래곤을 가합니다.";
+}
+
+0,0,0,0,0,0,0	Monster_연막	{
+	set @myid, get_myid();
+	if(set_strabismus(@myid, 12)){
+		end;
+	}else{
+		game_sound 8,0;
+		message 3, object_name() + "가(이) 연막을 가합니다.";
+		effect @myid, 276,0,80;
+	}
+}
+
+0,0,0,0,0,0,0	Monster_자르반	{
+	set @myid, get_myid();
+	if(rand(1, 10) < 3){
+		reberato @myid;
+		game_sound 10,0;
+		effect @myid, 232, 0, 100;
+		mob_say2 get_object_id(@myid), 0, 0, "리베라토.";
+		message 3, object_name() + "가(이) 리베라토를 가합니다.";
+		game_sound 10,0;
+		mob_say2 get_object_id(@myid), 0, 0, "소루마.";
+		message 3, object_name() + "가(이) 소루마를 가합니다.";
+	 	mobsor_delay @myid, 8;
+	}else if(rand(1, 10) < 11){
+		group_hill 0, 72;
+		effect @myid, 72, 0, 100;
+		group_damaged2 @myid, group_bighp() / 3;
+		game_sound 63, 0;
+		mob_say2 get_object_id(@myid), 0, 0, "메테오.";
+		message 3, object_name() + "가(이) 메테오를 가합니다.";
+	}
+}
+
+0,0,0,0,0,0,0	Monster_결계전사	{
+	set @myid, get_myid();
+	if(rand(1, 10) >= 6){
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		effect @mob, 0, 301, 100;
+		mob_say2 @mob, 0, 0, "완전방어!";
+		magic 10,@mob,"어둠의각인", 17, 0,@myid;
+	}else{
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		mob_say2 @mob, 0, 0, "메가블레이드!";
+		game_sound 18, 0;
+		effect @myid, 166, 0, 75;
+		char_damaged @myid, 4000, 4000;
+	}
+}
+
+0,0,0,0,0,0,0	Monster_결계도적	{
+	if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	mob_say2 @mob, 0, 0, "동면!";
+	game_sound 10,0;
+	mobsor_delay @myid, 8;
+}
+
+
+0,0,0,0,0,0,0	Monster_결계법사	{
+	set @myid, get_myid();
+	if(rand(1, 10) >= 6){
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		mob_say2 @mob, 0, 0, "나르콜리";
+		game_sound 10,0;
+		message 3, object_name() + "가(이) 나르콜리를 가합니다.";
+ 		mobnar_delay @myid, 8;
+	}else{
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		mob_say2 @mob, 0, 0, "마레누스";
+		game_sound 47, 0;
+		effect @myid, 235, 0, 75;
+		char_damaged2 @myid, 4000, 4000;
+	}
+}
+
+0,0,0,0,0,0,0	Monster_결계직자	{
+	set @myid, get_myid();
+	if(rand(1, 10) >= 3){
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		effect @mob, 0, 6, 100;
+		mob_say2 @mob, 0, 0, "이모탈";
+		magic 10,@mob,"어둠의각인", 17, 0,@myid;
+	}else{
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		mob_say2 @mob, 0, 0, "홀리드래곤!";
+		group_hill 0, 89;
+		effect @myid, 89, 0, 100;
+		group_damaged2 @myid, group_bighp() / 5000;
+		game_sound 63, 0;
+		message 3, object_name() + "가(이) 홀리드래곤을 가합니다.";
+	}
+}
+
+0,0,0,0,0,0,0	Monster_결계도가	{
+	set @myid, get_myid();
+	if(rand(1, 10) >= 6){
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		effect @mob, 0, 6, 100;
+		mob_say2 @mob, 0, 0, "금강불괴";
+		magic 10,@mob,"어둠의각인", 17, 0,@myid;
+	}else{
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		mob_say2 @mob, 0, 0, "장풍!";
+		game_sound 15, 0;
+		effect @myid, 158, 0, 75;
+		char_damaged @myid, 4000, 4000;
+	}
+}
+
+0,0,0,0,0,0,0	Monster_바다의엘리멘탈	{
+	set @myid, get_myid();
+	if(rand(1, 10) >= 5){
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		effect @mob, 0, 6, 100;
+		magic 10,@mob,"어둠의각인", 17, 0,@myid;
+	}else{
+		if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+		set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+		group_hill 0, 236;
+		effect @myid, 236, 0, 100;
+		group_damaged2 @myid, group_bighp() / 4;
+		game_sound 63, 0;
+	}
+}
+/////////////////////////

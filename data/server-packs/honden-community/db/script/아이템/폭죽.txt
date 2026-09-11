@@ -1,0 +1,104 @@
+item	폭죽	{
+	set @myid, get_myid();
+	effect @myid, 35, 0, 200;
+	item_del "폭죽", 1;
+	end;
+}
+
+item	축하폭죽	{
+	set @myid, get_myid();
+	effect @myid, 99, 0, 200;
+	item_del "축하폭죽", 1;
+	end;
+}
+
+item	파랑폭죽F	{
+	set @myid, get_myid();
+	effect @myid, 172, 0, 230;
+	item_del "파랑폭죽F", 1;
+	end;
+}
+
+item	파랑폭죽I	{
+	set @myid, get_myid();
+	effect @myid, 174, 0, 230;
+	item_del "파랑폭죽I", 1;
+	end;
+}
+
+item	파랑폭죽G	{
+	set @myid, get_myid();
+	effect @myid, 176, 0, 230;
+	item_del "파랑폭죽G", 1;
+	end;
+}
+
+item	파랑폭죽H	{
+	set @myid, get_myid();
+	effect @myid, 178, 0, 230;
+	item_del "파랑폭죽H", 1;
+	end;
+}
+
+item	파랑폭죽T	{
+	set @myid, get_myid();
+	effect @myid, 180, 0, 230;
+	item_del "파랑폭죽T", 1;
+	end;
+}
+
+item	파랑폭죽N	{
+	set @myid, get_myid();
+	effect @myid, 182, 0, 230;
+	item_del "파랑폭죽N", 1;
+	end;
+}
+
+item	빨강폭죽F	{
+	set @myid, get_myid();
+	effect @myid, 173, 0, 230;
+	item_del "빨강폭죽F", 1;
+	end;
+}
+
+item	빨강폭죽I	{
+	set @myid, get_myid();
+	effect @myid, 175, 0, 230;
+	item_del "빨강폭죽I", 1;
+	end;
+}
+
+item	빨강폭죽G	{
+	set @myid, get_myid();
+	effect @myid, 177, 0, 230;
+	item_del "빨강폭죽G", 1;
+	end;
+}
+
+item	빨강폭죽H	{
+	set @myid, get_myid();
+	effect @myid, 179, 0, 230;
+	item_del "빨강폭죽H", 1;
+	end;
+}
+
+item	빨강폭죽T	{
+	set @myid, get_myid();
+	effect @myid, 181, 0, 230;
+	item_del "빨강폭죽T", 1;
+	end;
+}
+
+item	빨강폭죽N	{
+	set @myid, get_myid();
+	effect @myid, 183, 0, 230;
+	item_del "빨강폭죽N", 1;
+	end;
+}
+
+item	크리스마스폭죽	{
+	set @myid, get_myid();
+	effect @myid, 220, 0, 230;
+	item_del "크리스마스폭죽", 1;
+	end;
+}

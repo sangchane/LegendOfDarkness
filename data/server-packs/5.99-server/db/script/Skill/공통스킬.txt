@@ -1,0 +1,118 @@
+0,0,0,0,0,0,0	SKILL_기본공격	{
+	attack_skill();
+	effect @target, 0, 0, 75;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠로토	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < get_basemana(@myid)/100*3){message 3, "사용하기에 마력량이적습니다. [필요마나 : 3%]"; del @myid; end;}
+	manal_del get_basemana(@myid)/100*3;
+	set @hill, get_wis(@myid)*5;
+	if(@hill > 300){set @hill, 300;}
+	set @type, istype(@myid);
+	motion 136, 75;
+	effect @target, 4, 0, 75;
+	game_sound 8 ,0;
+	set_vita @myid, get_vita(@myid)+@hill;
+	del @myid;
+	del @type;
+	del @target;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠라노토	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < get_basemana(@myid)/100*3){message 3, "사용하기에 마력량이적습니다. [필요마나 : 3%]"; del @myid; end;}
+	manal_del get_basemana(@myid)/100*3;
+	set @hill, get_wis(@myid)*15;
+	if(@hill > 6000){set @hill, 6000;}
+	set @type, istype(@myid);
+	motion 136, 75;
+	effect @target, 4, 0, 75;
+	game_sound 8 ,0;
+	set_vita @myid, get_vita(@myid)+@hill;
+	del @myid;
+	del @type;
+	del @target;
+}
+
+0,0,0,0,0,0,0	SKILL_탐색	{
+	set @myid, get_myid();
+	discovery_skill();
+}
+
+0,0,0,0,0,0,0	SPELL_아들레스투	{
+	set @myid, get_myid();
+	item_info();
+}
+
+0,0,0,0,0,0,0	SKILL_센스	{
+	set @myid, get_myid();
+	sense_user();
+}
+
+0,0,0,0,0,0,0	SKILL_품뒤져보기	{
+	set @myid, get_myid();
+	sense_item();
+}
+
+0,0,0,0,0,0,0	SPELL_로카메아	{
+	set @myid, get_myid();
+	set @name$, spell_input(@myid);
+	set @target, get_user(@name$);
+	if(!@target){message 3, "대상이 존재하지 않습니다."; end;}
+	if(@target == @myid){message 3, "자기자신을 소환대상으로 정할수는 없습니다."; end;}
+	if(get_mapname1(@target) != get_mapname1(@myid)){message 3, "같은 맵에 있는 유저만 소환이 가능합니다."; end;}
+	message 3, "[" + @name$ + "]님을 소환합니다.";
+	warp3 @target, get_mapname1(@myid), get_xs(@myid), get_ys(@myid);
+	message1 @target, 3, get_name(@myid) + "님이 로카메아로 당신을 소환했습니다.";
+}
+
+0,0,0,0,0,0,0	SKILL_수영	{
+	set @myid, get_myid();
+}
+
+0,0,0,0,0,0,0	SPELL_휴식	{
+	set @myid, get_myid();
+	if(time() - #husick < 1){end;}
+	set #husick, time();
+	re:
+	set @rand, rand(0,4);
+	if(@rand < 1 || @rand > 3){goto re;}
+	set_rest @myid, @rand;
+}
+
+0,0,0,0,0,0,0	SPELL_봉인	{
+ set @myid, get_myid();
+ //set @mapxs, get_mapxx()-1;
+ //set @mapys, get_mapyy()-1;
+ set @x1, get_xs(@myid)-8;
+ set @x2, get_xs(@myid)+8;
+ set @y1, get_ys(@myid)-8;
+ set @y2, get_ys(@myid)+8;
+ set @damage, ((get_mana(@myid)+100))*5;
+ //if(@x1 < 0) { set @x1, 0; }
+ //if(@x2 > @mapxs) { set @x2, @mapxs; }
+ //if(@y1 < 0) { set @y1, 0; }
+ //if(@y2 > @mapys) { set @y2, @mapys; }
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @type, istype(@mob);
+   set @rnd, rand(1,10);
+   if(@rnd <= 10){
+   if(@mob && @type == 1) {
+     if(!magic_exist(1,@mob, 0)) {
+ magic 2,@mob, 0, 60, 0,@myid;
+ message 3, "봉인을 외웠습니다.";
+    effect @mob, 0, 104, 130;
+     game_sound 8,0;
+	}else{
+    effect @target, 0, 33, 130;
+	 message 3, "몬스터가 마법을 피했다!";
+}
+    }
+   }   
+  }
+ }
+del @val;
+}

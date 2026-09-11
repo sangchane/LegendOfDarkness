@@ -1,0 +1,3004 @@
+0	__SCRIPT_LOGIN__	{
+	set@myid,get_myid();
+	set@m1$,"분만에 어둠으로";
+	set@m2$,"흭득하였습니다.";
+	set@m3$,"이 2차 비밀번호";
+	set #logintime, time();
+	un_hide @myid;
+	skill_add "기본공격";
+	if(get_mapname(@myid)=="물의신전대기실"){
+		if(map_objmob(@myid)==0){
+			mob_spawn4 "운디네","물의신전대기실",11,2,2;
+		}
+	}
+	if(spell_exist("휴식")){
+		spell_del "휴식";
+		slot_spell_add "휴식";
+	}
+	if(spell_exist("아들레스투")){
+		spell_del "아들레스투";
+		slot_spell_add "아들레스투";
+	}
+	if(skill_exist("노점개설")){
+		skill_del2 "노점개설";
+		slot_skill_add "노점개설";
+	}
+	if(!slot_skill_exist("탐색")){
+		slot_skill_add "탐색";
+	}
+	if(!slot_skill_exist("채집")){
+		slot_skill_add "채집";
+	}
+	if(!slot_skill_exist("낚시(Lev1)")){
+		slot_skill_add "낚시(Lev1)";
+	}
+	if(!slot_skill_exist("수영")){
+		slot_skill_add "수영";
+	}
+	if(#auto_hp!= 0||#auto_mp!=0){
+		set#auto_hp,0;
+		set#auto_mp,0;
+	}
+	if(bag_slot_get(@myid)==0){
+		bag_slot_set @myid, 0;
+	}
+	message 3, "총 방어 능력치(AC "+get_ac(@myid)+"  재생력 10 마법방어 0)";
+	if(#logouttime){
+		set @time, time();
+		if(@time - #logouttime < 60){
+			message 3, "0시간 0"+@m1$;
+		}else if(@time - #logouttime < 3600){
+			message 3, "0시간 " + (@time - #logouttime) / 60 + ""+@m1$;
+		}else if(@time - #logouttime >= 3600){
+			message 3, (@time - #logouttime) / 3600 + "시간 " + (@time - #logouttime) / 60 + ""+@m1$;
+		}
+	}else{
+		message 3, "6786일 0시간만에 어둠으로";
+	}
+	message 3, "뮤레칸 " + $년도 + "년 " +localtime(2)+"월 "+localtime(3)+"일 "+localtime(4)+"시";
+	if(#new==0){
+		set #new, 1;
+		legend_add 0, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + " 생";
+		item_add "신병더블백", 1;
+		item_add "낚시입문서", 1;
+		item_add "신규지원백", 1;
+                         item_add "만남의광장리콜", 100;
+                         item_add "골드무지개상자", 10;
+		set_guild_state @myid, 1;
+		set_guild_title @myid, "초보자";
+		exp_add 1;
+		money_add 1500000;
+		sleep 1000;
+		message 3, "{=c[채집]스킬을 "+@m2$;
+		message 3, "{=c[낚시(Lev1)]스킬을 "+@m2$;
+		message 3, "{=c[낚시입문서]를 "+@m2$;
+		message 3, "{=c[150.00.00 Gold]초기자원금을 "+@m2$;
+	}
+	if(get_state(@myid)==0){
+		if(get_sex()==1){
+			if(#body==1){
+				set_body @myid,17;
+			}else{
+				set_body @myid,16;
+			}
+		}else{
+			set_body @myid,32;
+		}
+	}
+	if(get_birthday(@myid)==0){
+		sleep 1000;
+		npc_look @myid, 0, 686;
+		mes 3,"{=q대단히 중요하니 끝까지 읽어주세요! {=c빈번히 발생하는 아이디 해킹을 미연에 방지하기 위해 또 하나의 2차 비밀번호를 정해야 합니다.";
+		mes 3,@m3$+"는 한번 결정을 하시면 변경이 불가능 합니다. 이 2차 비밀번호는 자신의 게임 접속 비밀번호를 바꿀 때에만 사용합니다.";
+		mes 3,@m3$+"는 자신의 생년월일로 해주세요. 예를 들면 자신의 생일이 79년 03월 07일이면, 790307으로 입력해주세요.(반드시 6자리)";
+		mes 3,@m3$+"는 분실하실 이유가 없기 때문에(자신의 생년월일이므로) "+@m3$+"를 모르시는 분은 해당 아이디에 대한 소유권을 박탈 합니다.";
+		mes 3,@m3$+"를 모르시고 처음의 비밀번호 분실신고를 하셔도 저희는 가르쳐 드릴수가 없습니다. 그만큼 중요한 것이오니 신중히 그리고 정확히 입력해 주세요.";
+		mes 3,"또한 이 두번째 비밀번호(생년월일)를 입력하지 않으시고 다음에 비밀번호 분실신고를 하셔도 저희는 해 드릴수가 없으니 반드시 두번째 비번을 입력하시기 바랍니다.";
+		birthday1:
+		input @birthday, 2, "자신의 생년월일을 입력해 주세요.", "저의 생년월일은", "입니다.", 6;
+		if(@birthday <= 99999){goto birthday2;}
+		if(@birthday==0){
+			birthday2:
+			mes 3,"두번째 비밀번호를 정하지 않으면 게임을 할 수 없습니다. 반드시 해주세요.";
+			goto birthday1;
+		}
+		set @ret, menu(1, "당신의 생년월일이 " + @birthday + "가 맞습니까?", "예", "아니오");
+		if(@ret==0){goto birthday1;}
+		if(@ret==1){
+			set_birthday @birthday;
+			mes 2, "2차 비밀번호가 설정되었습니다.";
+		}else{
+			goto birthday1;
+		}
+		del @birthday;
+		del @ret;
+	}
+}
+
+0	__SCRIPT_LOGOUT__	{
+	set @myid, get_myid();
+	set #logouttime, time();
+	del @myid;
+}
+
+0	__SCRIPT_DEAD__	{
+	set @myid, get_myid();
+	if(get_mapname(@myid)=="수오미길드성-외각"||get_mapname(@myid)=="수오미길드성-내각"||get_mapname(@myid)=="수오미길드성-1층로비"||get_mapname(@myid)=="수오미길드성-2층로비"||get_mapname(@myid)=="수오미길드성-알현실"){
+		reberato @myid;
+		reberato2 @myid;
+		if(get_vita(@myid) != 0)set_vita @myid, 1000;
+		set_body @myid, 64;
+		set_state 1, 1;
+		warp"빛의신전001",18,17;
+		end;
+	}
+	if(get_mapname(@myid)=="넥슨운영배틀링"||get_mapname(@myid)=="배틀링"||get_mapname(@myid) =="통합대련장"||get_mapname(@myid)=="밀레스대련장"||get_mapname(@myid)=="수오미대련장"||get_mapname(@myid)=="루어스대련장"){
+		reberato @myid;
+		reberato2 @myid;
+		if(get_vita(@myid) != 0)set_vita @myid, 1000;
+		set_body @myid, 64;
+		set_state 1, 1;
+		set_ys(get_ys(@myid)-0);
+		end;
+	}
+	set@returnname$,get_mapname(@myid);
+	set#returnx,get_xs(@myid);
+	set#returny,get_ys(@myid);
+	set#returnc,1;
+	if(get_map_expother(@myid)==1){set_coma @myid,1;set_state 1,1;coma_delay @myid,25;end;}
+	if(group_exist(@myid)==1||pet_user(@myid)==1){
+		set_coma @myid,1;
+		set_state 1,1;
+		coma_delay @myid,25;
+	end;
+	}
+	call_func @myid, "__SCRIPT_DEAD2__";
+}
+
+0	__SCRIPT_DEAD2__	{
+	set @myid, get_myid();
+ 	if(get_map_somer()){
+		if(map_user_exist(get_mapname())==1){
+			if(map_objmob()>=1){
+				mob_clear get_mapname();
+				item_clear get_mapname();
+			}
+		}
+	}
+	if(#Eestbossch==1){set #Eestbossch,0;set $Eestbossch, 0;}
+	if(#Hiyateon==1){set $WestHiyate,0;set #Hiyate, 0; set #HiyateBoss, 0; set #Hiyateon, 0;}
+	if(#EestMuerecan==1){set #EestMuerecan,0;set $EestMuerecan, 0;}
+	if(#EestMuerecan2==1){set #EestMuerecan2,0;set $EestMuerecan2, 0;}
+	if(#bosseasy==1){set#bosseasy,0;set $bosseasy,0;}
+	if(#bossnormal==1){set#bossnormal,0;set $bossnormal,0;}
+	if(#bosshard==1){set#bosshard,0;set $bosshard,0;}
+	if(#beknatop==1){set#beknatop,0;set $beknatop,0;}
+	if(#templeofwater==1){set#templeofwater,0;set $templeofwater,0;}
+	if(#katacomA==1){set #katacomA,0;set $katacomA,0;}
+	if(get_level() <= 12){message 8, "\\n                    사망통지서\\n\\n안타깝게도 당신은 사망을 하셨습니다.다만 레벨이 낮으신 관계로 신이 특별히 돌보아 주셨네요.\\n\\n다음번에는 죽지않도록 조심하시기 바랍니다.\\n\\n마을로 가시고 싶으면 앞에 보이는 하데스의\\n머리부분을 마우스로 클릭하세요."; warp "하데스의방001", 8,8; end;}
+	reberato @myid;
+	reberato2 @myid;
+	batu_end @myid;
+	if(get_vita(@myid) != 0) set_vita @myid, 1000;
+	char_dead();
+	if(get_sex(@myid)==1){set_body @myid, 48;}else{set_body @myid, 64;}
+	set_state 1, 1;
+	if(#underpassC==1||#underpassD==1||#underpassS==1){
+		set #underpassC,0;
+		set #underpassD,0;
+		set #underpassS,0;
+		goto case5;
+	}
+	set @rand, rand2(1,5);
+	if(@rand <= 1){warp "뮤레칸의방001", 20, 19;}
+	else if(@rand <= 2){warp "뮤레칸의방002", 20, 19;}
+	else if(@rand <= 3){warp "뮤레칸의방003", 20, 19;}
+	else if(@rand <= 4){warp "뮤레칸의방004", 20, 19;}
+	else if(@rand <= 5){case5:warp "빛의신전001", 18, 17;}
+	del @rand;
+	del @myid;
+}
+
+0	__LEVEL_SCRIPT__	{
+	set @myid, get_myid(); 
+	if(get_level(@myid)==99){
+		sleep 100;
+		item_add "엑스쿠라눔", 10;
+	}
+}
+
+
+0	__MOB_KILL__	{
+	set@myid, get_myid();
+	set@name$, last_object(@myid);
+	set $Totalkill, $Totalkill + 1;
+	if(get_mapname(@myid)=="크리스마스선물공장"){
+		mob_clear "크리스마스선물공장";
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",10,10,1;
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",11,10,1;
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",12,10,1;
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",12,11,1;
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",12,12,1;
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",11,12,1;
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",10,12,1;
+		mob_spawn4 "크리스마스케이크벽","크리스마스선물공장",10,11,1;
+		if($Serverevent==1){
+			set $Serverevent,2;
+			effect2 11, 11, 347, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크1","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==2){
+			set $Serverevent,3;
+			effect2 11, 11, 348, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크2","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==3){
+			set $Serverevent,4;
+			effect2 11, 11, 349, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크3","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==4){
+			set $Serverevent,5;
+			effect2 11, 11, 350, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크4","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==5){
+			set $Serverevent,6;
+			effect2 11, 11, 351, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크5","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==6){
+			set $Serverevent,7;
+			effect2 11, 11, 352, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크6","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==7){
+			set $Serverevent,8;
+			effect2 11, 11, 353, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크7","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==8){
+			set $Serverevent,9;
+			effect2 11, 11, 354, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크8","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==9){
+			set $Serverevent,10;
+			effect2 11, 11, 355, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크9","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==10){
+			set $Serverevent,11;
+			effect2 11, 11, 356, 75;
+			sleep 700;
+			mob_spawn4 "크리스마스케이크10","크리스마스선물공장",11,11,1;
+		end;
+		}
+		if($Serverevent==11){
+			set $Serverevent,0;
+			broadcast 0,"크리스마스케이크가 종료되었습니다.";
+			set_map_bgm "크리스마스선물공장",29;
+			mob_clear "크리스마스선물공장";
+			effect2 11, 11, 357, 75;
+			sleep 700;
+			effect2 11, 11, 359, 75;
+			broadcast 0,"{=q5초뒤 아이템이 떨어집니다!!";
+			sleep 5000;
+			broadcast 0,"{=wMerry Christmas";
+			item_spawn "나겔링파워","크리스마스선물공장",2,10,1;
+			item_spawn "윙부츠","크리스마스선물공장",3,10,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",4,9,1;
+			item_spawn "투핸드샤크블레이드","크리스마스선물공장",5,10,1;
+			item_spawn "세피라링(Lev10)","크리스마스선물공장",6,11,1;
+			item_spawn "프린세스드레스","크리스마스선물공장",6,11,1;
+			item_spawn "레드다이아반지","크리스마스선물공장",4,15,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",3,14,1;
+			item_spawn "쥬얼십자가목걸이FX","크리스마스선물공장",2,15,1;
+			item_spawn "크리스마스가호(Lev1)","크리스마스선물공장",2,16,1;
+			item_spawn "생명의벨트","크리스마스선물공장",2,17,1;
+			item_spawn "[주문서]UPGRADE+30%","크리스마스선물공장",4,17,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",5,18,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",6,18,1;
+			item_spawn "스타킹0","크리스마스선물공장",8,17,1;
+			item_spawn "스타킹0","크리스마스선물공장",7,16,1;
+			item_spawn "루딘블레이드","크리스마스선물공장",8,14,1;
+			item_spawn "암흑의목걸이","크리스마스선물공장",8,12,1;
+			item_spawn "저승사자낫","크리스마스선물공장",8,11,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",8,9,1;
+			item_spawn "강화된목도","크리스마스선물공장",9,17,1;
+			item_spawn "저승사자낫","크리스마스선물공장",10,7,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",9,7,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",10,2,1;
+			item_spawn "프린스더블렛","크리스마스선물공장",11,3,1;
+			item_spawn "라이온아머","크리스마스선물공장",12,4,1;
+			item_spawn "프린세스드레스","크리스마스선물공장",11,5,1;
+			item_spawn "엑스쿠라눔","크리스마스선물공장",12,6,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",15,5,1;
+			item_spawn "윙부츠","크리스마스선물공장",15,3,1;
+			item_spawn "생명의목걸이","크리스마스선물공장",15,2,1;
+			item_spawn "생명의벨트","크리스마스선물공장",17,3,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",16,6,1;
+			item_spawn "지존라피드0","크리스마스선물공장",15,6,1;
+			item_spawn "생명의목걸이","크리스마스선물공장",14,6,1;
+			item_spawn "승급라피드0","크리스마스선물공장",12,6,1;
+			item_spawn "세피라링(Lev10)","크리스마스선물공장",11,7,1;
+			item_spawn "수상한버섯","크리스마스선물공장",10,8,200;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",15,12,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",16,13,1;
+			item_spawn "스컬나이트방패","크리스마스선물공장",18,14,1;
+			item_spawn "히야트마법가지","크리스마스선물공장",18,12,1;
+			item_spawn "악마꼬리","크리스마스선물공장",17,10,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",4,16,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",4,17,1;
+			item_spawn "크리스마스가호(Lev1)","크리스마스선물공장",5,18,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",7,18,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",8,15,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",11,9,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",12,10,1;
+			item_spawn "크리스마스가호(Lev1)","크리스마스선물공장",10,3,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",10,6,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",12,8,1;
+			item_spawn "스켈톤갑옷","크리스마스선물공장",6,13,1;
+			item_spawn "암흑의벨트","크리스마스선물공장",3,15,1;
+			item_spawn "프린세스드레스","크리스마스선물공장",3,16,1;
+			item_spawn "암흑의목걸이","크리스마스선물공장",3,17,1;
+			item_spawn "생명의목걸이","크리스마스선물공장",3,17,1;
+			item_spawn "지존라피드0","크리스마스선물공장",6,18,1;
+			item_spawn "[주문서]UPGRADE+30%","크리스마스선물공장",10,16,1;
+			item_spawn "[주문서]UPGRADE+70%","크리스마스선물공장",13,17,1;
+			item_spawn "라이온아머","크리스마스선물공장",15,16,1;
+			item_spawn "라이온투구(여)","크리스마스선물공장",15,10,1;
+			item_spawn "라이온투구(남)","크리스마스선물공장",15,18,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",18,14,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",17,10,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",16,8,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",18,10,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",18,16,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",15,10,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",15,11,1;
+			item_spawn "강화된리젠트다이아귀걸이","크리스마스선물공장",11,13,1;
+			item_spawn "스컬나이트방패","크리스마스선물공장",4,14,1;
+			item_spawn "세오의가호(Lev2)","크리스마스선물공장",5,14,10;
+			item_spawn "세오의가호(Lev2)","크리스마스선물공장",6,14,10;
+			item_spawn "세오의가호(Lev2)","크리스마스선물공장",7,14,10;
+			item_spawn "세오의가호(Lev2)","크리스마스선물공장",13,9,10;
+			item_spawn "스켈톤갑옷","크리스마스선물공장",14,9,1;
+			item_spawn "세오의가호(Lev2)","크리스마스선물공장",15,9,10;
+			item_spawn "세오의가호(Lev2)","크리스마스선물공장",16,9,10;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",9,8,1;
+			item_spawn "1000게임포인트쿠폰","크리스마스선물공장",9,9,1;
+			item_spawn "생명의목걸이","크리스마스선물공장",8,9,1;
+			item_spawn "암흑의목걸이","크리스마스선물공장",7,9,1;
+			item_spawn "10000게임포인트쿠폰","크리스마스선물공장",9,1,1;
+			item_spawn "강화된리젠트다이아귀걸이","크리스마스선물공장",16,14,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",16,15,3;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",16,16,3;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",5,15,1;
+			item_spawn "플래티넘무지개상자","크리스마스선물공장",6,15,1;
+			item_spawn "히야트디그","크리스마스선물공장",5,16,1;
+			item_spawn "히야트스냅","크리스마스선물공장",5,17,1;
+			item_spawn "베네티미스릴클립","크리스마스선물공장",6,10,1;
+			item_spawn "베네티미스릴클립","크리스마스선물공장",7,10,1;
+			item_spawn "암흑의벨트","크리스마스선물공장",8,10,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",10,4,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",11,4,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",13,4,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",14,4,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",15,4,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",16,4,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",14,4,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",14,12,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",14,12,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",15,12,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",14,13,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",13,12,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",8,13,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",8,15,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",8,16,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",6,17,1;
+			item_spawn "[주문서]파괴보호+100%","크리스마스선물공장",10,17,1;
+		end;
+		}
+	}
+	if(get_mapname(@myid)=="밀레스큰연습장"){
+		if(@name$=="샌드백1"){
+			mob_spawn4 "샌드백1","밀레스큰연습장",2,4,2;
+		}
+		if(@name$=="샌드백2"){
+			mob_spawn4 "샌드백2","밀레스큰연습장",3,5,2;
+		}
+		if(@name$=="샌드백3"){
+			mob_spawn4 "샌드백3","밀레스큰연습장",4,4,1;
+		}
+		if(@name$=="샌드백4"){
+			mob_spawn4 "샌드백4","밀레스큰연습장",5,3,1;
+		}
+		if(@name$=="샌드백5"){
+			mob_spawn4 "샌드백5","밀레스큰연습장",6,4,2;
+		}
+		if(@name$=="샌드백6"){
+			mob_spawn4 "샌드백6","밀레스큰연습장",7,5,2;
+		}
+		if(@name$=="샌드백7"){
+			mob_spawn4 "샌드백7","밀레스큰연습장",8,4,1;
+		}
+		if(@name$=="샌드백8"){
+			mob_spawn4 "샌드백8","밀레스큰연습장",9,3,2;
+		}
+		if(@name$=="샌드백9"){
+			mob_spawn4 "샌드백9","밀레스큰연습장",10,4,2;
+		}
+		if(@name$=="샌드백10"){
+			mob_spawn4 "샌드백10","밀레스큰연습장",2,8,2;
+		}
+		if(@name$=="샌드백11"){
+			mob_spawn4 "샌드백11","밀레스큰연습장",3,9,2;
+		}
+		if(@name$=="샌드백12"){
+			mob_spawn4 "샌드백12","밀레스큰연습장",4,8,1;
+		}
+		if(@name$=="샌드백13"){
+			mob_spawn4 "샌드백13","밀레스큰연습장",5,7,2;
+		}
+		if(@name$=="샌드백14"){
+			mob_spawn4 "샌드백14","밀레스큰연습장",6,8,1;
+		}
+		if(@name$=="샌드백15"){
+			mob_spawn4 "샌드백15","밀레스큰연습장",7,9,1;
+		}
+		if(@name$=="샌드백16"){
+			mob_spawn4 "샌드백16","밀레스큰연습장",8,8,1;
+		}
+		if(@name$=="샌드백17"){
+			mob_spawn4 "샌드백17","밀레스큰연습장",9,7,1;
+		}
+		if(@name$=="샌드백18"){
+			mob_spawn4 "샌드백18","만남의광장",51,25,2;
+		}
+		if(@name$=="샌드백19"){
+			mob_spawn4 "샌드백19","만남의광장",51,26,1;
+		}
+		if(@name$=="샌드백20"){
+			mob_spawn4 "샌드백20","만남의광장",51,27,1;
+		}
+		if(@name$=="샌드백21"){
+			mob_spawn4 "샌드백21","만남의광장",51,28,1;
+		}
+		if(@name$=="샌드백22"){
+			mob_spawn4 "샌드백22","만남의광장",51,29,2;
+		}
+	}
+	if(get_mapname(@myid)=="밀레스작은연습장"){
+		if(@name$=="샌드백18"){
+			mob_spawn4 "샌드백18","밀레스작은연습장",3,2,1;
+		}
+		if(@name$=="샌드백11"){
+			mob_spawn4 "샌드백11","밀레스작은연습장",4,1,1;
+		}
+		if(@name$=="샌드백19"){
+			mob_spawn4 "샌드백19","밀레스작은연습장",5,2,1;
+		}
+		if(@name$=="샌드백20"){
+			mob_spawn4 "샌드백20","밀레스작은연습장",8,2,1;
+		}
+		if(@name$=="샌드백21"){
+			mob_spawn4 "샌드백21","밀레스작은연습장",9,1,2;
+		}
+		if(@name$=="샌드백22"){
+			mob_spawn4 "샌드백22","밀레스작은연습장",10,2,1;
+		}
+		if(@name$=="샌드백23"){
+			mob_spawn4 "샌드백23","밀레스작은연습장",3,6,2;
+		}
+		if(@name$=="샌드백24"){
+			mob_spawn4 "샌드백24","밀레스작은연습장",4,5,1;
+		}
+		if(@name$=="샌드백25"){
+			mob_spawn4 "샌드백25","밀레스작은연습장",5,6,1;
+		}
+		if(@name$=="샌드백26"){
+			mob_spawn4 "샌드백26","밀레스작은연습장",8,6,1;
+		}
+		if(@name$=="샌드백27"){
+			mob_spawn4 "샌드백27","밀레스작은연습장",9,5,2;
+		}
+		if(@name$=="샌드백28"){
+			mob_spawn4 "샌드백28","밀레스작은연습장",10,6,2;
+		}
+	}
+	if(#EestQuest014==5){
+		if(@name$=="대평원강력한그림록"){
+			set #EestQuest014A, 1;
+		}
+		if(@name$=="대평원강력한그림록근위병"){
+			set #EestQuest014B, 1;
+		}
+	}
+	if(#EestQuest014==11){
+		if(@name$=="미샤의가디언"){
+			group_val "#EestQuest014C", 1, 1;
+			sleep 400;
+			message 3,"이상한 느낌이 든다. 왠지 봉인이 해제된 것 같다.";
+		}
+	}
+	if(#EestQuest015==2){
+		if(@name$=="대평원강력한포보리아"){
+			set #EestQuest015A, 1;
+		}
+		if(@name$=="대평원강력한해골지네"){
+			set #EestQuest015B, 1;
+		}
+	}
+	if(#EestQuest015==3){
+		if(@name$=="로딘의가디언"){
+			group_val "#EestQuest015C", 1, 1;
+			sleep 400;
+			message 3,"이상한 느낌이 든다. 왠지 봉인이 해제된 것 같다.";
+		}
+	}
+	if(@name$=="대평원글래스"){
+		group_val "#EestQuest015E", 1, 1;
+		if(group_count(@myid, 0)==2){
+			mob_spawn"대평원보상상자",11,17,2;
+			if(group_count(@myid, 0)==3){
+				mob_spawn"대평원보상상자",13,18,2;
+				if(group_count(@myid, 0)==3){
+					mob_spawn"대평원보상상자",9,19,2;
+					if(group_count(@myid, 0)==4){
+						mob_spawn"대평원보상상자",7,17,2;
+						if(group_count(@myid, 0)==5){
+							mob_spawn"대평원보상상자",7,13,2;
+						}
+					}
+				}
+			}
+		}
+		mob_spawn"대평원보상상자",11,11,2;
+		sleep 500;
+		group_message 3,"30초 뒤에 결계로 이동됩니다.";
+		message 3, "30초 뒤에 결계로 이동됩니다.";
+		sleep 30000;
+		mob_clear "대평원던전의끝1";
+		group_warp "대평원던전결계", 7,16;
+		group_message 3,"알 수 없는 힘에 의해서 결계로 이동되었다.";
+		message 3,"알 수 없는 힘에 의해서 결계로 이동되었다.";
+	}
+	if(@name$=="대평원보상상자"){
+		message 3,"상자를 열어 {=c다크그레이각반+1{=u을 얻었다!!";
+	}
+	if(@name$=="피에트관리자"){
+		if(get_mapname(@myid)=="[뮤레칸]피에트던전(1)"){
+			set $피에트던전1보스클리어,1;
+		}
+		if(get_mapname(@myid)=="[뮤레칸]피에트던전(2)"){
+			set $피에트던전2보스클리어,1;
+		}
+	}
+	if(@name$=="피에트관리자"){
+		if(get_mapname(@myid)=="[뮤레칸]피에트던전(1)"){
+			set $피에트던전1보스클리어,1;
+		}
+		if(get_mapname(@myid)=="[뮤레칸]피에트던전(2)"){
+			set $피에트던전2보스클리어,1;
+		}
+	}
+	if(@name$=="뤼케시온관리자"){
+		if(get_mapname(@myid)=="[뮤레칸]뤼케시온던전(1)"){
+			set $뤼케시온던전1보스클리어,1;
+		}
+		if(get_mapname(@myid)=="[뮤레칸]뤼케시온던전(2)"){
+			set $뤼케시온던전2보스클리어,1;
+		}
+	}
+	if(@name$=="밀레스관리자"){
+		if(get_mapname(@myid)=="[뮤레칸]밀레스던전(1)"){
+			set $밀레스던전1보스클리어,1;
+		}
+		if(get_mapname(@myid)=="[뮤레칸]밀레스던전(2)"){
+			set $밀레스던전2보스클리어,1;
+		}
+	}
+	if(@name$=="루어스관리자"){
+		if(get_mapname(@myid)=="[뮤레칸]루어스던전(1)"){
+			set $루어스던전1보스클리어,1;
+		}
+		if(get_mapname(@myid)=="[뮤레칸]루어스던전(2)"){
+			set $루어스던전2보스클리어,1;
+		}
+	}
+	if(@name$=="홀리루딘관리자"){
+		group_val2 "#dailyquest6B", 1, 1;
+	}
+	if(get_mapname(@myid)=="알세이드스-화산암지대(A)"||get_mapname(@myid)=="알세이드스-화산암지대(C)"){
+		if(group_exist(@myid)){
+			message 3,"뮤레칸이 분노중입니다. 그룹을 해지후 입장해 주십시오";
+			warp "화산암지대가는길",9,12;
+			end;
+		}
+	}
+	if(@name$=="의문의상자"){
+		if(rand2(1,100) > 30){
+			message 3, "상자가 부서졌다.하지만 아무것도 나오지 않았다.";
+		}else{
+			re:
+			set @rand, rand2(1,13);
+			if(@rand < 1||@rand > 14){goto re;}
+			switch(@rand){
+				case 1: set @item$, "홀디트링"; break;
+				case 2: set @item$, "화염의승염벨트"; break;
+				case 3: set @item$, "바람의승염벨트"; break;
+				case 4: set @item$, "대지의승염벨트"; break;
+				case 5: set @item$, "바다의승염벨트"; break;
+				case 6: set @item$, "크리스탈목걸이"; break;
+				case 7: set @item$, "체력의고무장갑"; break;
+				case 8: set @item$, "마력의고무장갑"; break;
+				case 9: set @item$, "세토아의고무장갑"; break;
+				case 10: set @item$, "셔스의고무장갑"; break;
+				case 11: set @item$, "칸의고무장갑"; break;
+				case 12: set @item$, "칸의레더글러브"; break;
+				case 13: set @item$, "이아의레더글러브"; break;
+				case 14: set @item$, "베가리스트"; break;
+
+			}
+			item_add @item$, 1;
+			message 3, "상자가 깨졌다!! 상자 속에서 " + @item$ + " {=a이(가) 나왔다!?!";
+			end;
+		}
+	}
+	if(#dailyab1A==1){
+		if(@name$=="주걱프란츠"){
+			if(#dailyab1B>=20){message 3,"{=q주걱프란츠 : 20/20";end;}
+			group_val2"#dailyab1B", 1, 1;
+			message 3,"{=q주걱프란츠 : " + #dailyab1B + "/20";
+		}
+	}
+	if(#dailyab2A==1){
+		if(@name$=="머시"){
+			if(#dailyab2B>=20){message 3,"{=q머시 : 20/20";end;}
+			group_val2"#dailyab2B", 1, 1;
+			message 3,"{=q머시 : " + #dailyab2B + "/20";
+		}
+	}
+	if(#dailyab3A==1){
+		if(@name$=="끈끈프란츠"){
+			if(#dailyab3B>=20){message 3,"{=q끈끈프란츠 : 20/20";end;}
+			group_val2"#dailyab3B", 1, 1;
+			message 3,"{=q끈끈프란츠 : " + #dailyab3B + "/20";
+		}
+	}
+	if(#dailyab4A==1){
+		if(@name$=="무우프란츠"){
+			if(#dailyab4B>=20){message 3,"{=q무우프란츠 : 20/20";end;}
+			group_val2"#dailyab4B", 1, 1;
+			message 3,"{=q무우프란츠 : " + #dailyab4B + "/20";
+		}
+	}
+	if(#dailyab5A==1){
+		if(@name$=="꼬마머시"){
+			if(#dailyab5B>=20){message 3,"{=q꼬마머시 : 20/20";end;}
+			group_val2"#dailyab5B", 1, 1;
+			message 3,"{=q꼬마머시 : " + #dailyab5B + "/20";
+		}
+	}
+	if(#EestQuest005==1){
+		if(@name$=="오노"){
+			group_val2 "#ono", 1, 1;
+		}
+		if(@name$=="안톤"){
+			group_val2 "#anton", 1, 1;
+		}
+		if(@name$=="쥰"){
+			group_val2 "#jun", 1, 1;
+		}
+	}
+	if(get_mapname(@myid)=="직업퀘스트룸1"){
+		sleep 1000;
+		if(map_objmob(@myid)==0){
+			group_val "#EestQuest010A", 1, 1;
+			goto eb;
+		}
+	}
+	if(get_mapname(@myid)=="직업퀘스트룸2"){
+		sleep 1000;
+		if(map_objmob(@myid)==0){
+			group_val "#EestQuest010B", 1, 1;
+			goto eb;
+		}
+	}
+	if(get_mapname(@myid)=="직업퀘스트룸3"){
+		sleep 1000;
+		if(map_objmob(@myid)==0){
+			group_val "#EestQuest010C", 1, 1;
+			goto eb;
+		}
+	}
+	if(get_mapname(@myid)=="직업퀘스트룸4"){
+		sleep 1000;
+		if(map_objmob(@myid)==0){
+			group_val "#EestQuest010D", 1, 1;
+			goto eb;
+		}
+	}
+	if(get_mapname(@myid)=="직업퀘스트룸5"){
+		sleep 1000;
+		if(map_objmob(@myid)==0){
+			group_val "#EestQuest010E", 1, 1;
+			eb:
+			sleep 2000;
+			group_warp "직업퀘스트룸대기실", 5, 5;
+		}
+	}
+	if(get_mapname(@myid)=="화염의엘리멘탈룸"||get_mapname(@myid)=="바람의엘리멘탈룸"||get_mapname(@myid)=="대지의엘리멘탈룸"||get_mapname(@myid)=="바다의엘리멘탈룸"){
+		sleep 500;
+		mob_clear get_mapname();
+	}
+	if(#pointC1==1){
+		if(@name$=="레드팜팻"){
+			if(#pointC1a>=4){message 3,"{=q레드팜팻 : 4/4";end;}
+			group_val2"#pointC1a", 1, 1;
+			message 3,"{=q레드팜팻 : " + #pointC1a + "/4";
+		}
+		if(@name$=="그린팜팻"){
+			if(#pointC1b>=4){message 3,"{=q그린팜팻 : 4/4";end;}
+			group_val2"#pointC1b", 1, 1;
+			message 3,"{=q그린팜팻 : " + #pointC1b + "/4";
+		}
+		if(@name$=="퍼플팜팻"){
+			if(#pointC1c>=4){message 3,"{=q퍼플팜팻 : 4/4";end;}
+			group_val2"#pointC1c", 1, 1;
+			message 3,"{=q퍼플팜팻 : " + #pointC1c + "/4";
+		}
+	}
+	if(#pointC1==2){
+		if(@name$=="색다른프로그"){
+			if(#pointC1a>=5){message 3,"{=q색다른프로그 : 5/5";end;}
+			group_val2"#pointC1a", 1, 1;
+			message 3,"{=q색다른프로그 : " + #pointC1a + "/5";	
+		}
+		if(@name$=="색다른그래브"){
+			if(#pointC1b>=5){message 3,"{=q색다른그래브 : 5/5";end;}
+			group_val2"#pointC1b", 1, 1;
+			message 3,"{=q색다른그래브 : " + #pointC1b + "/5";	
+		}
+		if(@name$=="색다른말미잘"){
+			if(#pointC1c>=5){message 3,"{=q색다른말미잘 : 5/5";end;}
+			group_val2"#pointC1c", 1, 1;
+			message 3,"{=q색다른말미잘 : " + #pointC1c + "/5";	
+		}
+	}
+	if(#pointC1==3){
+		if(@name$=="놀"){
+			if(#pointC1a>=10){message 3,"{=q놀 : 10/10";end;}
+			group_val2"#pointC1a", 1, 1;
+			message 3,"{=q놀 : " + #pointC1a + "/10";	
+		}
+		if(@name$=="은빛늑대"){
+			if(#pointC1b>=10){message 3,"{=q은빛늑대 : 10/10";end;}
+			group_val2"#pointC1b", 1, 1;
+			message 3,"{=q은빛늑대 : " + #pointC1b + "/10";	
+		}
+	}
+	if(#pointC1==4){
+		if(@name$=="강력한터틀"){
+			if(#pointC1a>=1){message 3,"{=q강력한터틀 : 1/1";end;}
+			group_val2"#pointC1a", 1, 1;
+			message 3,"{=q강력한터틀 : " + #pointC1a + "/1";	
+		}
+		if(@name$=="강력한그래브"){
+			if(#pointC1b>=1){message 3,"{=q강력한그래브 : 1/1";end;}
+			group_val2"#pointC1b", 1, 1;
+			message 3,"{=q강력한그래브 : " + #pointC1b + "/1";	
+		}
+		if(@name$=="강력한말미잘"){
+			if(#pointC1c>=1){message 3,"{=q강력한말미잘 : 1/1";end;}
+			group_val2"#pointC1c", 1, 1;
+			message 3,"{=q강력한말미잘 : " + #pointC1c + "/1";	
+		}
+	}
+	if(@name$=="써큐버스MB"){
+		if(#dayquest4b==1){
+			if(#dayquest4c >= 20){message 3, "{=q써큐버스 : 20/20"; end;}
+			group_val2 "#dayquest4c", 1, 1;
+			message 3, "{=q써큐버스 : " + #dayquest4c + "/20";
+		}	
+	}
+	if(@name$=="봉인의주인"){
+		if(#EestQuest010==0){
+			set #EestQuest010, 1;
+			legend_add 0, 255, "동쪽대륙의 마지막 봉인을 해제하다";
+		}
+		if(rand2(1,100) <= 10){
+			item_add_term @myid,"퀸셰어의귀걸이", 1, 86400;
+			message 3,"" + get_name() + " picks up 퀸셰어의귀걸이";
+		}
+		broadcast 5, "봉인의주인 : 크오오오오 .. 이것이 전부라고 믿지는 말거라 ..";
+		sleep 3000;
+		group_warp "직업퀘스트룸대기실",8,10;
+	}
+	if(@name$=="이아(분신)"){
+		if(#EestQuest010==0){
+			set #EestQuest010, 1;
+			legend_add 0, 255, "이아(분신)를 처치하고 동쪽대륙의 평화가 찾아왔다";
+		}
+		if(rand2(1,100) <= 10){
+			item_add_term @myid,"퀸셰어의귀걸이", 1, 259200;
+			message 3,"" + get_name() + " picks up 퀸셰어의귀걸이";
+		}
+		broadcast 5, "이아(분신) : 건방진애송이 .. 널 지옥으로 보내주마 ..";
+		sleep 3000;
+		group_warp "타락한이아의신전",19,18;
+	}
+	if(@name$=="타락한이아"){
+		if(#EestQuest010==0){
+			set #EestQuest010, 1;
+			legend_add 0, 255, "타락한이아를 처치하고 동쪽대륙의 평화가 찾아왔다";
+		}
+		if(rand2(1,100) <= 10){
+			item_add_term @myid,"퀸셰어의귀걸이", 1, 18000;
+			message 3,"" + get_name() + " picks up 퀸셰어의귀걸이";
+		}
+		broadcast 5, "타락한이아 : 크오오오.. 이것이 전부라고 믿지는 말거라 ..";
+		sleep 3000;
+		group_warp "용자의공원",19,18;
+	}
+	if(@name$=="길잃은자이언트맨티스"){
+		if(#EestQuest010==0){
+			set #EestQuest010, 1;
+			legend_add 0, 255, "동쪽대륙의 마지막 봉인을 해제하다";
+		}
+		if(rand2(1,100) <= 30){
+			item_add_term @myid,"퀸셰어의귀걸이", 1, 18000;
+			message 3,"" + get_name() + " picks up 퀸셰어의귀걸이";
+		}
+		broadcast 5, "길잃은자이언트맨티스 : 크오오오오 .. 이것이 전부라고 믿지는 말거라 ..";
+		sleep 3000;
+	}
+	if(@name$=="제단비석"){
+		if(#EestQuest010==0){
+			set #EestQuest010, 1;
+			legend_add 0, 255, "동쪽대륙의 마지막 봉인을 해제하다";
+		}
+		if(rand2(1,100) <= 40){
+			item_add_term @myid,"퀸셰어의귀걸이", 1, 18000;
+			message 3,"" + get_name() + " picks up 퀸셰어의귀걸이";
+		}
+		broadcast 5, "제단비석 : 크오오오오 .. 이것이 전부라고 믿지는 말거라 ..";
+		sleep 3000;
+	}
+	if(@name$=="길드성문지기"){
+		set $Guildwar, 4;
+	}
+	if(@name$=="성문"){
+		broadcast 0, "성문이 무너지기 시작했습니다!";
+		mob_spawn "약간허름한성문", 31, 23, 1;
+	}
+	if(@name$=="약간허름한성문"){
+		broadcast 0, "성문이 무너지기 시작했습니다!";
+		mob_spawn "허름한성문", 31, 23, 1;
+	}
+	if(@name$=="허름한성문"){
+		broadcast 0, "성문이 무너지기 시작했습니다!";
+		mob_spawn "성문의잔해", 31, 23, 1;
+	}
+	if(@name$=="성문의잔해"){
+		broadcast 0, "성문이 완전히 무너졌습니다!";
+		mob_clear "수오미길드성-외각";
+	}
+	if(@name$=="수오미엘리멘탈스톤"){
+		set_guildstone get_guild_title(@myid);
+		set $Guildname$,get_guild_title(@myid);
+		set $Guildwar,0;
+		mob_clear "수오미길드성-외각";
+		mob_clear "수오미길드성-내각";
+		mob_clear "수오미길드성-알현실";
+		set_map_bgm "수오미길드성-외각",34;
+		set_map_pk "수오미길드성-외각",0;
+		set_map_bgm "수오미길드성-내각",34;
+		set_map_pk "수오미길드성-내각",0;
+		set_map_bgm "수오미길드성-1층로비",34;
+		set_map_pk "수오미길드성-1층로비",0;
+		set_map_bgm "수오미길드성-2층로비",34;
+		set_map_pk "수오미길드성-2층로비",0;
+		set_map_bgm "수오미길드성-알현실",34;
+		set_map_pk "수오미길드성-알현실",0;
+		item_add_term @myid,"수오미길드소드", 2, 172800;
+		item_add_term @myid,"수오미길드코트", 2, 172800;
+		broadcast 0, "공성전이 끝났습니다.";
+		sleep 1000;
+		broadcast 0, "성주는 "+get_guild_title(@myid)+" 문파입니다.";
+	}
+	if(@name$=="광부좀비"){
+		if(#EestQuest006==4){
+			if(#EestQuest006A >= 10){message 3, "{=q다크틸블러드 : 10/10"; end;}
+			group_val2 "#EestQuest006A", 1, 1;
+			message 3, "{=q광부좀비 : " + #EestQuest006A + "/10";
+		}
+	}
+	if(@name$=="다크틸블러드"){
+		if(#EestQuest011==4){
+			if(#EestQuest011A >= 30){message 3, "{=q다크틸블러드 : 30/30"; end;}
+			group_val2 "#EestQuest011A", 1, 1;
+			message 3, "{=q다크틸블러드 : " + #EestQuest011A + "/30";
+		}
+	}
+	if(@name$=="데몬스라바"){
+		if(#EestQuest011==6){
+			if(#EestQuest011A >= 30){message 3, "{=q데몬스라바 : 30/30"; end;}
+			group_val2 "#EestQuest011A", 1, 1;
+			message 3, "{=q데몬스라바 : " + #EestQuest011A + "/30";
+		}
+	}
+	if(@name$=="다크엘프의애완견"){
+		if(#WestQuest011==3){
+			if(#WestQuest011A >= 5){message 3, "{=q다크엘프의애완견 : 5/5"; end;}
+			group_val2 "#WestQuest011A", 1, 1;
+			message 3, "{=q다크엘프의애완견 : " + #WestQuest011A + "/5";
+		}
+	}
+	if(@name$=="다크엘프(도적)"){
+		if(#WestQuest011==4){
+			if(#WestQuest011A >= 5){message 3, "{=q다크엘프(도적) : 5/5"; end;}
+			group_val2 "#WestQuest011A", 1, 1;
+			message 3, "{=q다크엘프(도적) : " + #WestQuest011A + "/5";
+		}
+	}
+	if(@name$=="다크엘프(법사)"){
+		if(#WestQuest011==5){
+			if(#WestQuest011A >= 5){message 3, "{=q다크엘프(법사) : 5/5"; end;}
+			group_val2 "#WestQuest011A", 1, 1;
+			message 3, "{=q다크엘프(법사) : " + #WestQuest011A + "/5";
+		}
+	}
+	if(@name$=="아이언카이사르"){
+		group_val2 "#EestQuest0112", 1, 1;
+	}
+	if(@name$=="케라코라"){
+		mob_clear "히야트던전F-11";
+		group_val2 "#dailyquest5B", 1, 1;
+		sleep 2000;
+		group_message 3, "던전 정리중입니다. 절대 파티를 해체하거나 다른 맵으로 가지 마세요.";
+		message 3, "던전 정리중입니다. 절대 파티를 해체하거나 다른 맵으로 가지 마세요.";
+		sleep 2000;
+		group_message 3, "{=q케라코라석상{=u을 획득하였다!!";
+		message 3, "{=q케라코라석상{=u을 획득하였다!!";
+		if(group_exist(@myid)){
+			group_item_add "케라코라석상", 1;
+		}else{
+			item_add "케라코라석상", 1;
+		}
+		sleep 2000;
+		group_message 3, "보상은 1시간 이내로 사용해야 합니다.";
+		message 3, "보상은 1시간 이내로 사용해야 합니다.";
+		group_warp "아만마을", 2,31;
+		set $HiyateBoss,0;
+		set $WestHiyate, 0;
+		set $Hiyate, 0;
+		group_val "#Hiyateon", 0, 1;
+		set #Hiyateon, 0;
+	}
+	if(@name$=="정글글래스"){
+		group_val2 "#AmanTotemE", 1, 1;
+	}
+	if(@name$=="켈라D"){
+		group_val2 "#AmanTotemD", 2, 1;
+	}
+	if(@name$=="켈라C"){
+		group_val2 "#AmanTotemC", 2, 1;
+	}
+	if(@name$=="켈라B"){
+		group_val2 "#AmanTotemB", 2, 1;
+	}
+	if(@name$=="켈라A"){
+		group_val2 "#AmanTotemA", 2, 1;
+	}
+	if(@name$=="켄토라우스"){
+		sleep 200;
+		broadcast 5, "켄토라우스: 크오오 " + get_name(@myid) + ", 이 원한은 잊지 않겠다 !!";
+		if(group_exist(@myid)){
+			group_item_add "빈코로나", 1;
+		}else{
+			item_add "빈코로나", 1;
+		}
+	}
+	if(@name$=="세르네아스"){
+		sleep 200;
+		broadcast 5, "세르네아스: 설마 " + get_name(@myid) + "에게 죽을 줄이야 .. 크윽";
+		if(group_exist(@myid)){
+			group_item_add "화염의엠버", 1;
+			group_item_add "바다의엠버", 1;
+		}else{
+			item_add "화염의엠버", 1;
+			item_add "바다의엠버", 1;
+		}
+	}
+	if(@name$=="아루스"){
+		sleep 200;
+		broadcast 5, "아루스: " + get_name(@myid) + " 많이도 성장했군 ...";
+		if(group_exist(@myid)){
+			group_item_add "흑의엠버", 1;
+			group_item_add "백의엠버", 1;
+		}else{
+			item_add "흑의엠버", 1;
+			item_add "백의엠버", 1;
+		}
+	}
+	if(@name$=="고르데아"){
+		sleep 200;
+		broadcast 5, "고르데아: 이럴리가!! " + get_name(@myid) + "에게 죽을 수는 ..";
+		if(group_exist(@myid)){
+			group_item_add "대지의엠버", 1;
+			group_item_add "바람의엠버", 1;
+		}else{
+			item_add "대지의엠버", 1;
+			item_add "바람의엠버", 1;
+		}
+	}
+	if(@name$=="라미아"){
+		sleep 200;
+		broadcast 5, "라미아: " + get_name(@myid) + " 훌륭하군요 ...";
+		if(#orenquest001==0){legend_add 0, 255, "오렌미궁의 라미아를 퇴치하다"; set #orenquest001, 1;}
+		group_val "#orenquest002", 1, 1;
+	}
+	if(@name$=="집쥐" && #Quest001==1){
+		group_val2 "#Questmonster001", 1, 1;
+	}
+	if(@name$=="거미" && #Quest001==2){
+		group_val2 "#Questmonster002", 1, 1;
+	}
+	if(@name$=="엔도르퀸"){
+		sleep 200;
+		if(rand2(1,10) > 3){
+			group_message 3, "{=q[주문서]PER+1%{=u을 획득하였다!!";
+			message 3, "{=q[주문서]PER+1%{=u을 획득하였다!!";
+			if(group_exist(@myid)){
+				group_item_add "[주문서]per+1%", 1;
+			}else{
+				item_add "[주문서]per+1%", 1;
+			}
+		}
+		group_val2 "#dailyquest9B", 1, 1;
+		sleep 1000;
+		group_message 3, "여왕의거처 던전을 클리어하셨습니다.";
+		message 3, "여왕의거처 던전을 클리어하셨습니다.";
+		sleep 2000;
+		group_message 3, "노엠마을로 이동합니다.";
+		sleep 2000;
+		group_warp "노엠마을", 50, 50;
+	}
+//보스컨텐츠
+	if(get_mapname(@myid)=="[Easy]혼돈의탑-1층"||get_mapname(@myid)=="[Easy]혼돈의탑-2층"||get_mapname(@myid)=="[Easy]혼돈의탑-3층"||get_mapname(@myid)=="[Easy]혼돈의탑-4층"||get_mapname(@myid)=="[Easy]혼돈의탑-5층"||get_mapname(@myid)=="[Easy]혼돈의탑-6층"){
+		group_val2 "#bosspoint", 1, 1;
+		group_message 3, "보스기여도 {=c1 {=u상승했습니다.";
+		message 3,"보스기여도 {=c1 {=u상승했습니다.";
+		sleep 400;
+		group_message 3, "3초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "3초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		group_message 3, "2초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "2초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		group_message 3, "1초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "1초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		if(@name$=="보스큐르페이"){
+			group_warp "[Easy]혼돈의탑-2층", 7,12;
+			mob_spawn "보스거대니에", 7, 7, 2;
+			message 3,"이지단계 두 번째 보스는 {=c거대니에{=u 입니다.";
+		}
+		if(@name$=="보스거대니에"){
+			group_warp "[Easy]혼돈의탑-3층", 7,12;
+			mob_spawn "보스자이언트맨티스", 7, 7, 2;
+			message 3,"이지단계 세 번째 보스는 {=c자이언트맨티스{=u 입니다.";
+		}
+		if(@name$=="보스자이언트맨티스"){
+			group_warp "[Easy]혼돈의탑-4층", 7,12;
+			mob_spawn "보스킹아크퍼스", 7, 7, 2;
+			message 3,"이지단계 네 번째 보스는 {=c킹아크퍼스{=u 입니다.";
+		}
+		if(@name$=="보스킹아크퍼스"){
+			group_warp "[Easy]혼돈의탑-5층", 7,12;
+			mob_spawn "보스에리얼", 7, 7, 2;
+			message 3,"이지단계 다섯 번째 보스는 {=c에리얼{=u 입니다.";
+		}
+		if(@name$=="보스에리얼"){
+			group_warp "[Easy]혼돈의탑-6층", 7,12;
+			mob_spawn "보스고사목", 7, 7, 2;
+			message 3,"이지단계 여섯 번째 보스는 {=c고사목{=u 입니다.";
+		}
+		if(@name$=="보스고사목"){
+			group_val2 "#dailyquest1B", 1, 1;
+			group_warp "혼돈의탑통합대기실", 7,7;
+			group_message 3, "{=q[Easy]{=u난이도 클리어! 축하드립니다.";
+			message 3,"{=q[Easy]{=u난이도 클리어! 축하드립니다.";
+			set #bosseasy,0;
+			set $bosseasy,0;
+		}
+	}
+	if(get_mapname(@myid)=="[Normal]혼돈의탑-7층"||get_mapname(@myid)=="[Normal]혼돈의탑-8층"||get_mapname(@myid)=="[Normal]혼돈의탑-9층"||get_mapname(@myid)=="[Normal]혼돈의탑-10층"||get_mapname(@myid)=="[Normal]혼돈의탑-11층"||get_mapname(@myid)=="[Normal]혼돈의탑-12층"||get_mapname(@myid)=="[Normal]혼돈의탑-13층"||get_mapname(@myid)=="[Normal]혼돈의탑-14층"){
+		group_val2 "#bosspoint", 3, 1;
+		group_message 3, "보스기여도 {=c3 {=u상승했습니다.";
+		message 3,"보스기여도 {=c3 {=u상승했습니다.";
+		sleep 400;
+		group_message 3, "3초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "3초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		group_message 3, "2초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "2초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		group_message 3, "1초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "1초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		if(@name$=="보스켄토라우스"){
+			group_warp "[Normal]혼돈의탑-8층", 7,12;
+			mob_spawn "보스세르네아스", 7, 7, 2;
+			message 3,"노말단계 두 번째 보스는 {=c세르네아스{=u 입니다.";
+		}
+		if(@name$=="보스세르네아스"){
+			group_warp "[Normal]혼돈의탑-9층", 7,12;
+			mob_spawn "보스아루스", 7, 7, 2;
+			message 3,"노말단계 세 번째 보스는 {=c아루스{=u 입니다.";
+		}
+		if(@name$=="보스아루스"){
+			group_warp "[Normal]혼돈의탑-10층", 7,12;
+			mob_spawn "보스고르데아", 7, 7, 2;
+			message 3,"노말단계 네 번째 보스는 {=c고르데아{=u 입니다.";
+		}
+		if(@name$=="보스고르데아"){
+			group_warp "[Normal]혼돈의탑-11층", 7,12;
+			mob_spawn "보스라미아", 7, 7, 2;
+			message 3,"노말단계 다섯 번째 보스는 {=c라미아{=u 입니다.";
+		}
+		if(@name$=="보스라미아"){
+			group_warp "[Normal]혼돈의탑-12층", 7,12;
+			mob_spawn "보스백작부인", 7, 7, 2;
+			message 3,"노말단계 여섯 번째 보스는 {=c백작부인{=u 입니다.";
+		}
+		if(@name$=="보스백작부인"){
+			group_warp "[Normal]혼돈의탑-13층", 7,12;
+			mob_spawn "보스드라큐라백작", 7, 7, 2;
+			message 3,"노말단계 일곱 번째 보스는 {=c드라큐라백작{=u 입니다.";
+		}
+		if(@name$=="보스드라큐라백작"){
+			group_warp "[Normal]혼돈의탑-14층", 7,12;
+			mob_spawn "보스글래스", 7, 7, 2;
+			message 3,"노말단계 여덜 번째 보스는 {=c글래스{=u 입니다.";
+		}
+		if(@name$=="보스글래스"){
+			group_val2 "#dailyquest2B", 1, 1;
+			group_warp "혼돈의탑통합대기실", 7,7;
+			group_message 3, "{=c[Normal]{=u난이도 클리어! 축하드립니다.";
+			message 3,"{=c[Normal]{=u난이도 클리어! 축하드립니다.";
+			set #bossnormal,0;
+			set $bossnormal,0;
+		}
+	}
+	if(get_mapname(@myid)=="[Hard]혼돈의탑-15층"||get_mapname(@myid)=="[Hard]혼돈의탑-16층"||get_mapname(@myid)=="[Hard]혼돈의탑-17층"||get_mapname(@myid)=="[Hard]혼돈의탑-18층"||get_mapname(@myid)=="[Hard]혼돈의탑-19층"||get_mapname(@myid)=="[Hard]혼돈의탑-20층"||get_mapname(@myid)=="[Hard]혼돈의탑-21층"||get_mapname(@myid)=="[Hard]혼돈의탑-22층"){
+		hard:
+		set @rand, rand2(1,8);
+		if(@rand < 1||@rand > 12){goto hard;}
+		switch(@rand){
+			case 1:
+				group_val2 "#bosspoint", 3, 1;
+				group_message 3, "보스기여도 {=c3 {=u상승했습니다.";
+				message 3,"보스기여도 {=c3 {=u상승했습니다.";
+			break;
+			case 2:
+				group_val2 "#bosspoint", 4, 1;
+				group_message 3, "보스기여도 {=c4 {=u상승했습니다.";
+				message 3,"보스기여도 {=c4 {=u상승했습니다.";
+			break;
+			case 3:
+				group_val2 "#bosspoint", 5, 1;
+				group_message 3, "보스기여도 {=c5 {=u상승했습니다.";
+				message 3,"보스기여도 {=c5 {=u상승했습니다.";
+			break;
+			case 4:
+				group_val2 "#bosspoint", 6, 1;
+				group_message 3, "보스기여도 {=c6 {=u상승했습니다.";
+				message 3,"보스기여도 {=c7 {=u상승했습니다.";
+			break;
+			case 5:
+				group_val2 "#bosspoint", 7, 1;
+				group_message 3, "보스기여도 {=c7 {=u상승했습니다.";
+				message 3,"보스기여도 {=c7 {=u상승했습니다.";
+			break;
+			case 6:
+				group_val2 "#bosspoint", 8, 1;
+				group_message 3, "보스기여도 {=c8 {=u상승했습니다.";
+				message 3,"보스기여도 {=c8 {=u상승했습니다.";
+			break;
+			case 7:
+				group_val2 "#bosspoint", 9, 1;
+				group_message 3, "보스기여도 {=c9 {=u상승했습니다.";
+				message 3,"보스기여도 {=c9 {=u상승했습니다.";
+			break;
+			case 8:
+				group_val2 "#bosspoint", 10, 1;
+				group_message 3, "보스기여도 {=c10 {=u상승했습니다.";
+				message 3,"보스기여도 {=c10 {=u상승했습니다.";
+			break;
+			case 9:
+				group_val2 "#bosspoint", 3, 1;
+				group_message 3, "보스기여도 {=c3 {=u상승했습니다.";
+				message 3,"보스기여도 {=c3 {=u상승했습니다.";
+			break;
+			case 10:
+				group_val2 "#bosspoint", 3, 1;
+				group_message 3, "보스기여도 {=c3 {=u상승했습니다.";
+				message 3,"보스기여도 {=c3 {=u상승했습니다.";
+			break;
+			case 11:
+				group_val2 "#bosspoint", 3, 1;
+				group_message 3, "보스기여도 {=c3 {=u상승했습니다.";
+				message 3,"보스기여도 {=c3 {=u상승했습니다.";
+			break;
+			case 12:
+				group_val2 "#bosspoint", 3, 1;
+				group_message 3, "보스기여도 {=c3 {=u상승했습니다.";
+				message 3,"보스기여도 {=c3 {=u상승했습니다.";
+			break;
+		}
+		sleep 400;
+		group_message 3, "3초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "3초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		group_message 3, "2초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "2초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		group_message 3, "1초뒤 다음 스테이지로 이동됩니다.";
+		message 3, "1초뒤 다음 스테이지로 이동됩니다.";
+		sleep 1000;
+		if(@name$=="보스드래곤뉴트"){
+			group_warp "[Hard]혼돈의탑-16층", 7,12;
+			mob_spawn "보스봉인의주인", 7, 7, 2;
+			message 3,"하드단계 두 번째 보스는 {=c봉인의주인{=u 입니다.";
+		}
+		if(@name$=="보스봉인의주인"){
+			group_warp "[Hard]혼돈의탑-17층", 7,12;
+			mob_spawn "보스우루쿤", 7, 7, 2;
+			message 3,"하드단계 세 번째 보스는 {=c우루쿤{=u 입니다.";
+		}
+		if(@name$=="보스우루쿤"){
+			group_warp "[Hard]혼돈의탑-18층", 7,12;
+			mob_spawn "보스케라코라", 7, 7, 2;
+			message 3,"하드단계 네 번째 보스는 {=c케라코라{=u 입니다.";
+		}
+		if(@name$=="보스케라코라"){
+			group_warp "[Hard]혼돈의탑-19층", 7,12;
+			mob_spawn "보스로열더스트", 7, 7, 2;
+			message 3,"하드단계 다섯 번째 보스는 {=c로열더스트{=u 입니다.";
+		}
+		if(@name$=="보스로열더스트"){
+			group_warp "[Hard]혼돈의탑-20층", 7,12;
+			mob_spawn "보스엔도르킹", 7, 7, 2;
+			message 3,"하드단계 여섯 번째 보스는 {=c엔도르킹{=u 입니다.";
+		}
+		if(@name$=="보스엔도르킹"){
+			group_warp "[Hard]혼돈의탑-21층", 7,12;
+			mob_spawn "보스아이언카이사르", 7, 7, 2;
+			message 3,"하드단계 일곱 번째 보스는 {=c아이언카이사르{=u 입니다.";
+		}
+		if(@name$=="보스아이언카이사르"){
+			group_warp "[Hard]혼돈의탑-22층", 7,12;
+			mob_spawn "보스엔도르퀸", 7, 7, 2;
+			message 3,"하드단계 여덜 번째 보스는 {=c엔도르퀸{=u 입니다.";
+		}
+		if(@name$=="보스엔도르퀸"){
+			group_val2 "#dailyquest3B", 1, 1;
+			group_warp "혼돈의탑통합대기실", 7,7;
+			group_message 3, "{=b[Hard]{=u난이도 클리어! 축하드립니다.";
+			message 3,"{=b[Hard]{=u난이도 클리어! 축하드립니다.";
+			set #bosshard,0;
+			set $bosshard,0;
+		}
+	}
+	if(get_mapname(@myid)=="베크나탑-최상층"){
+		if(@name$=="용마기사"){
+			group_val2 "#dailyquest4B", 1, 1;
+		}
+	}
+	if(get_mapname(@myid)=="물의신전1"){
+		if($templeofwater7>=1){
+			if(@name$=="머메이드"||@name$=="젤리피쉬"){
+				set $templeofwater7,$templeofwater7+1;
+			}
+			if($templeofwater7==4){
+				sleep 2200;
+				object_del 1,"물의신전1",46,45;
+				object_del 1,"물의신전1",47,45;
+				mob_spawn4 "오프","물의신전1",46,45,2;
+				mob_spawn4 "오프","물의신전1",47,45,2;
+				if($templeofwater1>=4&&$templeofwater2>=7&&$templeofwater3>=7&&$templeofwater4>=4&&$templeofwater5>=4&&$templeofwater6>=6&&$templeofwater7>=4){
+					sleep 2200;
+					group_message 3, "물의신전을 모두 클리어 했습니다.";
+					message 3,"물의신전을 모두 클리어 했습니다.";
+					sleep 2200;
+					group_val2 "#dailyquest7B", 1, 1;
+					group_warp "물의신전보상방", 12,12;
+				}
+			}
+		}
+		if($templeofwater6>=1){
+			if(@name$=="머메이드"||@name$=="네레이스"||@name$=="젤리피쉬"){
+				set $templeofwater6,$templeofwater6+1;
+			}
+			if($templeofwater6==6){
+				sleep 2200;
+				object_del 1,"물의신전1",35,27;
+				object_del 1,"물의신전1",35,28;
+				object_del 1,"물의신전1",44,34;
+				object_del 1,"물의신전1",45,34;
+				mob_spawn4 "오프","물의신전1",35,27,2;
+				mob_spawn4 "오프","물의신전1",35,28,2;
+				mob_spawn4 "오프","물의신전1",44,34,2;
+				mob_spawn4 "오프","물의신전1",45,34,2;
+				group_warp "물의신전1", 44,37;
+			}
+		}
+		if($templeofwater5>=1){
+			if(@name$=="머메이드"||@name$=="네레이스"||@name$=="젤리피쉬"){
+				set $templeofwater5,$templeofwater5+1;
+			}
+			if($templeofwater5==4){
+				sleep 2200;
+				object_del 1,"물의신전1",27,20;
+				object_del 1,"물의신전1",28,20;
+				mob_spawn4 "오프","물의신전1",27,15,2;
+				mob_spawn4 "오프","물의신전1",28,15,2;
+				mob_spawn4 "오프","물의신전1",27,20,2;
+				mob_spawn4 "오프","물의신전1",28,20,2;
+				mob_spawn4 "오프","물의신전1",30,23,2;
+				mob_spawn4 "오프","물의신전1",30,24,2;
+				group_warp "물의신전1", 32,24;
+			}
+		}
+		if($templeofwater4>=1){
+			if(@name$=="머메이드"||@name$=="젤리피쉬"){
+				set $templeofwater4,$templeofwater4+1;
+			}
+			if($templeofwater4==4){
+				sleep 2200;
+				object_del 1,"물의신전1",38,5;
+				object_del 1,"물의신전1",38,6;
+				object_del 1,"물의신전1",27,15;
+				object_del 1,"물의신전1",28,15;
+				mob_spawn4 "오프","물의신전1",38,5,2;
+				mob_spawn4 "오프","물의신전1",38,6,2;
+				mob_spawn4 "오프","물의신전1",33,5,2;
+				mob_spawn4 "오프","물의신전1",33,6,2;
+				group_warp "물의신전1", 30,6;
+			}
+		}
+		if($templeofwater3>=1){
+			if(@name$=="머메이드"||@name$=="네레이스"||@name$=="젤리피쉬"){
+				set $templeofwater3,$templeofwater3+1;
+			}
+			if($templeofwater3==7){
+				sleep 2200;
+				object_del 1,"물의신전1",22,3;
+				object_del 1,"물의신전1",22,4;
+				object_del 1,"물의신전1",33,5;
+				object_del 1,"물의신전1",33,6;
+				mob_spawn4 "오프","물의신전1",22,3,2;
+				mob_spawn4 "오프","물의신전1",22,4,2;
+				mob_spawn4 "오프","물의신전1",39,19,2;
+				mob_spawn4 "오프","물의신전1",40,19,2;
+				mob_spawn4 "오프","물의신전1",39,20,2;
+				mob_spawn4 "오프","물의신전1",40,20,2;
+				mob_spawn4 "오프","물의신전1",47,25,2;
+				mob_spawn4 "오프","물의신전1",47,26,2;
+				mob_spawn4 "오프","물의신전1",48,25,2;
+				mob_spawn4 "오프","물의신전1",48,26,2;
+			}
+		}
+		if($templeofwater2>=1){
+			if(@name$=="머메이드"||@name$=="네레이스"||@name$=="젤리피쉬"){
+				set $templeofwater2,$templeofwater2+1;
+			}
+			if($templeofwater2==7){
+				sleep 2200;
+				object_del 1,"물의신전1",26,44;
+				object_del 1,"물의신전1",26,45;
+				mob_spawn4 "오프","물의신전1",26,44,2;
+				mob_spawn4 "오프","물의신전1",26,45,2;
+				group_warp "물의신전1", 24,44;
+			}
+		}
+		if($templeofwater1>=1){
+			if(@name$=="머메이드"||@name$=="네레이스"){
+				set $templeofwater1,$templeofwater1+1;
+			}
+			if($templeofwater1==4){
+				sleep 2200;
+				object_del 1,"물의신전1",6,36;
+				object_del 1,"물의신전1",7,36;
+				mob_spawn4 "오프","물의신전1",6,36,2;
+				mob_spawn4 "오프","물의신전1",7,36,2;
+				mob_spawn4 "오프","물의신전1",19,7,2;
+				mob_spawn4 "오프","물의신전1",19,8,2;
+				mob_spawn4 "오프","물의신전1",20,7,2;
+				mob_spawn4 "오프","물의신전1",20,8,2;
+				group_warp "물의신전1", 7,34;
+			}
+		}
+	}
+	if(get_mapname(@myid)=="카타콤성소A"){
+		if(@name$=="다크엘프용기사"){
+			if($katacomdoor==3){
+				set $katacomdoor,0;
+				object_del 2,"카타콤성소A",6,58;
+				object_del 2,"카타콤성소A",7,58;
+				object_del 2,"카타콤성소A",8,58;
+				object_del 2,"카타콤성소A",9,58;
+			}
+			if($katacomdoor==2){
+				set $katacomdoor,3;
+				object_del 2,"카타콤성소A",58,60;
+				object_del 2,"카타콤성소A",58,61;
+				object_del 2,"카타콤성소A",58,62;
+				object_del 2,"카타콤성소A",58,63;
+			}
+			if($katacomdoor==1){
+				set $katacomdoor,2;
+				object_del 2,"카타콤성소A",65,11;
+				object_del 2,"카타콤성소A",66,11;
+				object_del 2,"카타콤성소A",67,11;
+				object_del 2,"카타콤성소A",68,11;
+			}
+		}
+		if(@name$=="암흑덩어리"){
+			if(rand2(1,100) <= 30){
+				item_add_term @myid,"루딘의귀걸이", 1, 86400;
+				group_message 3, "" + get_name() + " picks up 루딘의귀걸이";
+				message 3, "" + get_name() + " picks up 루딘의귀걸이";
+			}
+			group_val2 "#dailyquest8B", 1, 1;
+			group_val2 "#WestQuest011A",1,1;
+			sleep 1000;
+			group_message 3, "카타콤성소 던전을 클리어하셨습니다.";
+			message 3, "카타콤성소 던전을 클리어하셨습니다.";
+			set #katacomA,0;
+			set $katacomA,0;
+			sleep 2000;
+			group_warp "카타콤지하15", 6, 6;
+			group_message 3, "곧 대기실로 이동합니다.";
+			message 3, "카타콤성소에 입장합니다.";
+		}
+	}
+	if(get_level(@myid)<=11){
+		if(get_mapname(@myid)=="노비스평원A"||get_mapname(@myid)=="노비스지하던전A1"||get_mapname(@myid)=="노비스지하던전A2"||get_mapname(@myid)=="노비스지하던전A3"||get_mapname(@myid)=="지하묘지1-1"||get_mapname(@myid)=="지하묘지2-1"||get_mapname(@myid)=="지하묘지2-2"||get_mapname(@myid)=="지하묘지2-3"||get_mapname(@myid)=="지하묘지3-1"||get_mapname(@myid)=="지하묘지3-2"||get_mapname(@myid)=="지하묘지3-3"){
+			goto levelup;
+		}
+	}
+	if(get_level(@myid)<=40){
+		if(get_mapname(@myid)=="포테의 숲 1-L"||get_mapname(@myid)=="포테의 숲 1-R"||get_mapname(@myid)=="포테의 숲 2-L"||get_mapname(@myid)=="포테의 숲 2-C"||get_mapname(@myid)=="포테의 숲 2-R"||get_mapname(@myid)=="포테의 숲 3-L"||get_mapname(@myid)=="포테의 숲 3-C"||get_mapname(@myid)=="포테의 숲 3-R"||get_mapname(@myid)=="포테의 숲 4-L"||get_mapname(@myid)=="포테의 숲 4-C"||get_mapname(@myid)=="포테의 숲 4-R"){
+			goto levelup;
+		}
+	}
+	if(get_level(@myid)<=70){
+		if(#underpassC==1){goto levelup;}
+	}
+	if(get_level(@myid) <= 98){
+		if(#underpassD==1){
+			levelup:
+			exp_add 295294923;
+			exp_add 295294923;
+			exp_add 295294923;
+			set_exp 0;
+			exp_add 1;
+		}
+	}
+	del @name$;
+}
+
+0	__SAY_SCRIPT__	{
+	set @myid, get_myid();
+	set @say$, last_say(@myid);
+	set @xs, get_xs(@myid);
+	set @ys, get_ys(@myid);
+	if(get_mapname(@myid)=="밀레스마을"){
+		if(map_objmob(@myid) <= 1){
+			mob_spawn "밀레스좀비", 28, 55, 1;
+			mob_spawn "밀레스좀비", 28, 56, 1;
+		}
+	}
+	if(instr(last_say(@myid), "#323")){
+		set#Hiyateon,0;set $HiyateBoss,0;set $WestHiyate,0;
+	}
+	if(instr(last_say(@myid), "#도우미")){
+		if(#guide==1){
+			message 3,"[도우미: OFF]";
+			set #guide,0;
+		}else{
+			message 3,"[도우미: ON]";
+			set #guide,1;
+		}
+	}
+	if(instr(last_say(@myid), "#990417")){
+			set_basevita 31450;
+			set_basemana 15425;
+			set_level "99";
+			set_str "180";
+			set_int "150";
+			set_wis "100";
+			set_dex "215";
+			set_con "100";
+	}
+	if(instr(last_say(@myid), "#돌돌이")){
+		call_func @myid, "돌돌이";
+	}
+            if(@say$ == "#귀환"){    ////따옴표 타이핑할 말적으시면되요 ex.ㄱㅎ,밀레스,마을,귀환 등..
+            warp "만남의광장", 52, 22;    /// 이동할마을 및 좌표 적기 입니다.
+            message 3, "{=q[안내]: 만남의광장으로 이동되었습니다.";
+            }
+            if(@say$ == "#시장"){
+            warp "시장2", 15, 15;
+            message 3, "{=q[안내]: 시장으로 이동되었습니다.";
+           }
+           if(@say$ == "#아슬론"){
+           warp "아슬론마을", 11, 6;
+           message 3, "{=q[안내]: 아슬론여관으로 이동되었습니다.";
+           }
+	if(instr(last_say(@myid), "#풀경")){
+		call_func @myid, "경험치축적";
+	}
+	if(split(last_say(@myid), " ", 0)=="#표정"){
+		if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+		newtypeset @myid, 5, split(last_say(@myid), " ", 1);
+		message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]번호의 표정으로 변경되었습니다! 확인해보세요.";
+	}
+	if(split(last_say(@myid), " ", 0)=="#엠블럼1"){
+		if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+
+		newtypeset @myid, 2, split(last_say(@myid), " ", 1);
+		message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]번호의 엠블럼1으로 변경했습니다! 확인해보세요.";
+	}	
+	if(split(last_say(@myid), " ", 0)=="#엠블럼2"){
+		if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+		newtypeset @myid, 3, split(last_say(@myid), " ", 1);
+		message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]번호의 엠블럼2으로 변경했습니다! 확인해보세요.";
+	}
+	if(instr(last_say(@myid), "#사냥터이동")){
+		call_func @myid, "이동명령R";
+	}
+	if(instr(last_say(@myid), "#삭제")){
+		npc_look @myid, 0, 0;
+		idel:
+		set @del, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "{=c골드{=a를 소모하여 아이템 삭제","나가기");
+		if(@del==0){goto idel;}
+		if(@del==1){
+			mes 1, "삭제하려고 하는 아이템을 인벤토리 {=c첫째칸{=a에 놓아야합니다.";
+			//mes 1, "아이템을 지우는데 드는 댓가는 {=c십만 Gold{=a입니다.";
+			set @del2, menu(0, "삭제하고자 하는 아이템이 {=c첫째칸{=a에 있고 정말 삭제 하시겠습니까?", "네...", "아니오");
+			if(@del2==1){
+				if(item_one_check(@myid)==0){mes 1, "이 아이템은 제가 삭제할 수 없습니다.";goto idel;}
+				//if(get_money(@myid) < 100000){mes 0, "골드가 부족하시네요..";goto idel;}
+				set@itemname$,item_one_check(@myid);
+				item_del@itemname$,1;
+				//money_del 100000;
+				mes 0, "아이템을 삭제했습니다.";
+			}else if(@del2==2){mes 0, "다음에 뵙겠습니다..";}
+		}
+	}
+	if(get_gm(@myid)){
+		if(instr(last_say(@myid), "#싹제")){
+			set@itemname$,item_one_check(@myid);
+			item_del@itemname$,1;
+		}
+		if(split(last_say(@myid), " ", 0)=="#수성길드"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set_guildstone split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]방어길드 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip1"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname1$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip1멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip2"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname2$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip2멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip3"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname3$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip3멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip4"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname4$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip4멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip5"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname5$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip5멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip6"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname6$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip5멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip7"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname7$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip5멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#vip8"){
+			if(split(last_say(@myid), " ", 1)=="NULL"){end;}
+			set $vipname8$, split(last_say(@myid), " ", 1);
+			message 3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 1) + "{=q]vip5멤버로 설정";
+		}
+		if(split(last_say(@myid), " ", 0)=="#지급"){
+			if(split(last_say(@myid), " ", 1)=="NULL"||split(last_say(@myid), " ", 2)=="NULL"||split(last_say(@myid), " ", 3)=="NULL"){end;}
+			set @target, get_user(split(last_say(@myid), " ", 1));
+			if(!@target){message 3,"{=g" + split(last_say(@myid), " ", 1) + "는(은) 존재하지 않는 유저 이거나 접속중이 아닙니다."; del @name$; end;}
+			item_add1 @target, split(last_say(@myid), " ", 2), split(last_say(@myid), " ", 3);
+			message 3, "{=q안내 :: [{=w" + split(last_say(@myid), " ", 1) + "{=q]님에게 [{=e" + split(last_say(@myid), " ", 2) + "{=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급.";
+			message1 @target ,3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 2) + "{=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급받으셨습니다.";
+		}
+		if(split(last_say(@myid), " ", 0)=="#10일"){
+			if(split(last_say(@myid), " ", 1)=="NULL"||split(last_say(@myid), " ", 2)=="NULL"||split(last_say(@myid), " ", 3)=="NULL"){end;}
+			set @target, get_user(split(last_say(@myid), " ", 1));
+			if(!@target){message 3,"{=g" + split(last_say(@myid), " ", 1) + "는(은) 존재하지 않는 유저 이거나 접속중이 아닙니다."; del @name$; end;}
+			item_add_term @target,split(last_say(@myid), " ", 2), split(last_say(@myid), " ", 3), 864000;
+			message 3, "{=q안내 :: [{=w" + split(last_say(@myid), " ", 1) + "{=q]님에게 [{=e" + split(last_say(@myid), " ", 2) + "{=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급.";
+			message1 @target ,3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 2) + "(10일){=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급받으셨습니다.";
+		}
+		if(split(last_say(@myid), " ", 0)=="#7일"){
+			if(split(last_say(@myid), " ", 1)=="NULL"||split(last_say(@myid), " ", 2)=="NULL"||split(last_say(@myid), " ", 3)=="NULL"){end;}
+			set @target, get_user(split(last_say(@myid), " ", 1));
+			if(!@target){message 3,"{=g" + split(last_say(@myid), " ", 1) + "는(은) 존재하지 않는 유저 이거나 접속중이 아닙니다."; del @name$; end;}
+			item_add_term @target,split(last_say(@myid), " ", 2), split(last_say(@myid), " ", 3), 604800;
+			message 3, "{=q안내 :: [{=w" + split(last_say(@myid), " ", 1) + "{=q]님에게 [{=e" + split(last_say(@myid), " ", 2) + "{=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급.";
+			message1 @target ,3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 2) + "(7일){=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급받으셨습니다.";
+		}
+		if(split(last_say(@myid), " ", 0)=="#1일"){
+			if(split(last_say(@myid), " ", 1)=="NULL"||split(last_say(@myid), " ", 2)=="NULL"||split(last_say(@myid), " ", 3)=="NULL"){end;}
+			set @target, get_user(split(last_say(@myid), " ", 1));
+			if(!@target){message 3,"{=g" + split(last_say(@myid), " ", 1) + "는(은) 존재하지 않는 유저 이거나 접속중이 아닙니다."; del @name$; end;}
+			item_add_term @target,split(last_say(@myid), " ", 2), split(last_say(@myid), " ", 3), 86400;
+			message 3, "{=q안내 :: [{=w" + split(last_say(@myid), " ", 1) + "{=q]님에게 [{=e" + split(last_say(@myid), " ", 2) + "{=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급.";
+			message1 @target ,3, "{=q안내 :: [{=e" + split(last_say(@myid), " ", 2) + "(1일){=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 지급받으셨습니다.";
+		}
+		if(@say$=="사이드체크"){
+			if(get_side(@myid)==1){message 3,"side1";}
+			if(get_side(@myid)==2){message 3,"side2";}
+			if(get_side(@myid)==3){message 3,"side3";}
+			if(get_side(@myid)==0){message 3,"side0";}
+		}
+		if(@say$=="맵청소"){
+			item_clear get_mapname(@myid);
+		}
+		if(@say$=="몹청소"){
+			mob_clear get_mapname(@myid);
+		}
+		if(split(last_say(@myid), " ", 0)=="#제거"){
+			if(split(last_say(@myid), " ", 1)=="NULL"||split(last_say(@myid), " ", 2)=="NULL"||split(last_say(@myid), " ", 3)=="NULL"){end;}
+			set @target, get_user(split(last_say(@myid), " ", 1));
+			if(!@target){message 3,"{=g" + split(last_say(@myid), " ", 1) + "는(은) 존재하지 않는 유저 이거나 접속중이 아닙니다."; del @name$; end;}
+			item_del1 @target, split(last_say(@myid), " ", 2), split(last_say(@myid), " ", 3);
+			message 3, "{=q안내 :: [{=w" + split(last_say(@myid), " ", 1) + "{=q]님의 [{=e" + split(last_say(@myid), " ", 2) + "{=q]을(를) {=s" + split(last_say(@myid), " ", 3) + "{=q개 제거.";
+		}
+		if(split(last_say(@myid), " ", 0)=="#국적"){
+			if(split(last_say(@myid), " ", 1)=="NULL"||split(last_say(@myid), " ", 2)=="NULL"){end;}
+			set @target, get_user(split(last_say(@myid), " ", 1));
+			if(!@target){message 3,"{=g" + split(last_say(@myid), " ", 1) + "는(은) 존재하지 않는 유저 이거나 접속중이 아닙니다."; del @name$; end;}
+			set_nation @target, split(last_say(@myid), " ", 2);
+			message 3, "{=q안내 :: [{=w" + split(last_say(@myid), " ", 1) + "{=q]님에게 [{=e" + split(last_say(@myid), " ", 2) + "{=q]번호의 국적 지급.";
+			message1 @target ,3, "{=q안내 :: 당신의 국적이 변경되었습니다! 확인해보세요.";
+		}
+		if(split(last_say(@myid), " ", 0)=="#타이틀"){
+			if(split(last_say(@myid), " ", 1)=="NULL"||split(last_say(@myid), " ", 2)=="NULL"){end;}
+			set @target, get_user(split(last_say(@myid), " ", 1));
+			if(!@target){message 3,"{=g" + split(last_say(@myid), " ", 1) + "는(은) 존재하지 않는 유저 이거나 접속중이 아닙니다."; del @name$; end;}
+			newtypeset @target, 1, split(last_say(@myid), " ", 2);
+			message 3, "{=q안내 :: [{=w" + split(last_say(@myid), " ", 1) + "{=q]님에게 [{=e" + split(last_say(@myid), " ", 2) + "{=q]번호의 타이틀 지급.";
+			message1 @target ,3, "{=q안내 :: 당신의 타이틀이 변경되었습니다! 확인해보세요.";
+		}
+		if(@say$=="#이동"){
+			set @side, get_side(@myid);
+			if(@side==0){set_ys(get_ys(@myid)-1);}
+			if(@side==1){set_xs(get_xs(@myid)+1);}
+			if(@side==2){set_ys(get_ys(@myid)+1);}
+			if(@side==3){set_xs(get_xs(@myid)-1);}
+		}
+	}
+	//블랙셋분해■■■■■■■■■■■■■■■■■■■
+	if(get_mapname(@myid)=="마인대장간"){
+		npc_look @myid, 0, 249;
+		if(instr(last_say(@myid), "분해")){
+			blackdel:
+			set@blackdel,menu(1,"블랙굴에서 나오는 무구 아이템들을 분해 해드립니다. 무엇을 도와드릴까요?","분해 한다.","설명을 들어본다..");
+			if(@blackdel==1){
+				set@blackdel2,menu(1,"분해 하실 블랙굴 무구를 인벤토리 첫 번째 슬롯에 두시고 다음을 진행해주시길 바랍니다.\\n준비가 되셨습니까?","아이템을 분해한다.","그만둔다");
+				if(@blackdel2==1){
+					if(get_money(@myid) < 1000000){mes 3, "분해하시는데 필요한 비용이 부족합니다.";goto blackdel;}
+					set@check$,item_one_check(@myid);
+					if(@check$=="윌화이어아머A"||@check$=="윌화이어투구A"||@check$=="윌화이어장갑A"||@check$=="윌화이어각반A"||@check$=="윌화이어아머B"||@check$=="윌화이어투구B"||@check$=="윌화이어장갑B"||@check$=="윌화이어각반B"||@check$=="레인헌트아머"||@check$=="레인헌트투구"||@check$=="레인헌트장갑"||@check$=="레인헌트각반"||@check$=="브레스럭아머"||@check$=="브레스럭투구"||@check$=="브레스럭장갑"||@check$=="브레스럭각반"||@check$=="페이로브아머"||@check$=="페이로브투구"||@check$=="페이로브장갑"||@check$=="페이로브각반"||@check$=="브릴윙아머"||@check$=="브릴윙투구"||@check$=="브릴윙팔찌"||@check$=="브릴윙각반"){
+					set@itemname$,item_one_check(@myid);
+					item_del@itemname$,1;
+					money_del 1000000;
+					item_add "블랙오피온의수염",1;
+					message 3,@itemname$+"를 분해하여 {=c블랙오피온의수염{=a을 얻었다.";
+					mes 2,"아이템 분해가 완료됬습니다.";
+					}else{mes 3,"제가 분해할 수 있는 아이템이 아닙니다.";goto blackdel;}
+				}else{goto blackdel;}
+			}else if(@blackdel==2){
+				mes 3,"블랙오피온의굴 에서 제작가능한 블랙굴 무구를 분해하시면 {=c블랙오피온의수염 {=a과 여러 아이템들을 얻으실 수 있습니다.";
+				mes 3,"다만 분해해서 나오는 아이템은 제가 필요로 하기에… 좋습니다. 제가 인심 써서 모험가님에겐 분해 아이템의 핵심 요소인 {=c블랙오피온의수염 {=a아이템을 돌려드리겠습니다.";
+				mes 3,"블랙굴 무구를 분해하시는데 필요한 비용은 {=c100만Gold {=a입니다. 마음의 준비가 다되시면 저에게 다시 말을 걸어주세요.";
+				goto blackdel;
+			}else{goto blackdel;}
+		}
+	}
+	//생선구이만들기■■■■■■■■■■■■■■■■■
+	if(get_mapname(@myid)=="피에트식당"){
+		npc_look @myid, 0, 24;
+		if(instr(last_say(@myid), "요리")){
+			if(#fishfood==0){
+				mes 3,"어서와요.얼굴을 보아하니..내가 파는 일반 음식에는 별 관심은 없는것 같고...뭔가 부탁을 하러 오셨구만..";
+				mes 3," {=c생선구이{=a를 만들어 달라고? 오호~ 그 요리는 내가  이 마이소시아에서 최고지... 먹어본 사람은 평생 나를 잊지못한다오... 호호호\\n아이고... 또 주책을 부렸네.. 호호";
+				mes 3,"하지만..그냥 돈주고 만들어 주는 그런 음식은 아니라우...왕이 와서 일만금을 준다고 해도 안팔지~ 하지만..내가 요새 새 생선요리를 하나 연구중인데,생선이 한두마리 필요한게 아니라서 말이지..";
+				mes 3,"몇마리냐고? 놀라지마셔... 무려{=c10{=a마리정도??\\n어차피 연습용으로 쓸거라,크기는 상관없고..구해다만 준다면야 그까짓 생선요리쯤은 바로 만들어 줄텐데 말이우??~~호호호호";
+				set@food,menu(1,"뭐..잡아오겠다고 약속하면 내 요리를 만들기 시작하겠우.","맡겨두세요!","너무하시는거 아녜요?");
+				if(@food==1){
+					set #fishfood,1;
+					mes 2,"좋아요! 호호호! 자긴 호탕해서 마음에 드네! 물고기를 잡으면 가지고 와요.한꺼번에 가져와도 좋고,잡았을때 그때그때 가져다 줘도 좋고...다시 말하지만 크기는 별로 중요하지 않으니 어떤 물고기라도 {=c10{=a마리면 되요.";
+				}else if(@food==2){
+					mes 2,"너무하던 말던 그건 내 알바가 아니지..생선요리는 별로 필요 없나봐요? 호호호";
+				}
+			}else{
+				mes 3,"물고기는 많이 잡아 오셨나? 음하하하.. 왜이리 터프해 졌나 궁금하지않소?\\n사실은 물고기를 많이 먹어서 그렇다오..";
+				mes 3,"요새 연구중인 생선 요리가 쉬운게 아니라10번 하면 9마리는 내가 먹어 보기때문에 힘과 몸무게가 남아 돈다오... 음하하하..";
+				mes 3,"그나저나 물고기를 많이 먹다 보니 콜레스테롤이 많아져서 점점 남자가 되가는것 같군..\\n음.. 자 그럼 잡아온 물고기 좀 볼까?";
+				set@food2,menu(1,"잡아온 물고기를 나에게 줄라우??{=q 물고기 크기는 상관없이 마구잡이로 가져가니 원하지 않으면 다시 오시오", "잡아온 물고기를 준다", "다음에 다시온다");
+				if(@food2==1){
+					set@food3,menu(1,"잡아온 물고기 종류를 선택해주세요.{=q 각 물고기가 10마리씩 필요하오~","골든레드피쉬","네기피쉬","트로피칼테트라");
+					if(@food3==1){
+						if(item_exist(@myid,"골든레드피쉬")<10){food1:mes 2,"...물고기는 한마리도 안보이는데....대신 당신의 소중한 아이템을 요리재료로 써줄까??\\n하하하하하하하하하하하하.";}
+						item_del "골든레드피쉬",10;
+						food2:
+						item_add "생선구이",1;
+						set #fishfood,0;
+						mes 2,"호호호~ 고마워요. 약속했던 보답으로 {=c생선구이{=a를 드리도록 할게요.\\n물고기를 구해다 오시면 또 만들어 드릴 테니 언제든 찾아오시구랴~ 호호호호호";
+					}else if(@food3==2){
+						if(item_exist(@myid,"네기피쉬")<10){goto food1;}
+						item_del "네기피쉬",10;
+						goto food2;
+					}else if(@food3==3){
+						if(item_exist(@myid,"트로피칼테트라")<10){goto food1;}
+						item_del "트로피칼테트라",10;
+						goto food2;
+					}
+				}
+			}
+		}
+	}
+	//피닉스크로어퀘스트■■■■■■■■■■■■■■■
+	if(get_mapname(@myid)=="밀레스식당"){
+		if(@say$=="완전방어"&&get_class(@myid)==1&&#EestQuest007==0){
+			npc_look @myid, 0, 21;
+			mes 3,"한때 난 잘나가는 기사였지....";
+			mes 3,"왕을모시고 전장을 누비는 영웅이었지...";
+			mes 3,"이야기를 하려니 목이마르군.";
+			mes 3,"나는 포도주를 좋아하지.";
+			mes 3,"요즘은 좋은 포도주를 구하기 힘들다더군.";
+			mes 3,"내가 듣기로는 포도주는 물이 많은 어느 마을에서 구할수 있다더군.";
+			mes 3,"어딘가 예전의 기법으로 포도주를 만들어주는 여자가 있다고 하던데";
+			set #EestQuest007, 1;
+			mes 2,"포도주를 구하면 나에게 주게나. 수고하게나.";
+		}
+	}
+	//연습장■■■■■■■■■■■■■■■■■■■■■■
+	if(get_mapname(@myid)=="밀레스여관"){
+		if(@say$=="연습"){
+		npc_look @myid, 0, 22;
+		room:
+		set @room,menu(1,"연습장에 들어가시려면 사용료 5000골드가 필요합니다. 돈을 내시겠습니까?","예. 전 연습하길 원합니다.","아니오. 전 돈이 없거든요.");
+		if(@room==0){goto room;}
+		if(@room==1){
+			if(get_money(@myid)<5000){
+				mes 3,"어머나. 돈도 없으시면서... 돈을 가지고 오세요.";
+				mes 2,"혹시나 연습이 필요하시면 언제든지 오세요.";
+				end;
+			}
+			money_del 5000;
+			set @room2,menu(1,"5000골드 받았습니다. 어느 연습장으로 가길 원하세요?","큰연습장","작은연습장");
+			if(@room2==1){
+				mes 3,"그럼 큰 연습장으로 보내드리겠습니다.";
+				warp "밀레스큰연습장",1,2;
+				if(map_objmob(@myid)<=17){
+					mob_spawn4 "샌드백1","밀레스큰연습장",2,4,2;
+					mob_spawn4 "샌드백2","밀레스큰연습장",3,5,2;
+					mob_spawn4 "샌드백3","밀레스큰연습장",4,4,1;
+					mob_spawn4 "샌드백4","밀레스큰연습장",5,3,1;
+					mob_spawn4 "샌드백5","밀레스큰연습장",6,4,2;
+					mob_spawn4 "샌드백6","밀레스큰연습장",7,5,2;
+					mob_spawn4 "샌드백7","밀레스큰연습장",8,4,1;
+					mob_spawn4 "샌드백8","밀레스큰연습장",9,3,2;
+					mob_spawn4 "샌드백9","밀레스큰연습장",10,4,2;
+					mob_spawn4 "샌드백10","밀레스큰연습장",2,8,2;
+					mob_spawn4 "샌드백11","밀레스큰연습장",3,9,2;
+					mob_spawn4 "샌드백12","밀레스큰연습장",4,8,1;
+					mob_spawn4 "샌드백13","밀레스큰연습장",5,7,2;
+					mob_spawn4 "샌드백14","밀레스큰연습장",6,8,1;
+					mob_spawn4 "샌드백15","밀레스큰연습장",7,9,1;
+					mob_spawn4 "샌드백16","밀레스큰연습장",8,8,1;
+					mob_spawn4 "샌드백17","밀레스큰연습장",9,7,1;
+				}
+			}else if(@room2==2){
+				mes 3,"그럼 작은 연습장으로 보내드리겠습니다.";
+				warp "밀레스작은연습장",1,9;
+				if(map_objmob(@myid)<=11){
+					mob_spawn4 "샌드백18","밀레스작은연습장",3,2,1;
+					mob_spawn4 "샌드백11","밀레스작은연습장",4,1,1;
+					mob_spawn4 "샌드백19","밀레스작은연습장",5,2,1;
+					mob_spawn4 "샌드백20","밀레스작은연습장",8,2,1;
+					mob_spawn4 "샌드백21","밀레스작은연습장",9,1,2;
+					mob_spawn4 "샌드백22","밀레스작은연습장",10,2,1;
+					mob_spawn4 "샌드백23","밀레스작은연습장",3,6,2;
+					mob_spawn4 "샌드백24","밀레스작은연습장",4,5,1;
+					mob_spawn4 "샌드백25","밀레스작은연습장",5,6,1;
+					mob_spawn4 "샌드백26","밀레스작은연습장",8,6,1;
+					mob_spawn4 "샌드백27","밀레스작은연습장",9,5,2;
+					mob_spawn4 "샌드백28","밀레스작은연습장",10,6,2;
+				}
+			}
+		}else if(@room==2){
+			mes 3,"연습장을 운영하기 위해선 돈이 필요하답니다. 죄송합니다.";
+			mes 2,"혹시나 연습이 필요하시면 언제든지 오세요.";
+		}
+		}
+	}
+	//용의발톱퀘스트■■■■■■■■■■■■■■■■■■
+	if(get_mapname(@myid)=="밀레스주점"){
+		if(@say$=="조커"&&#EestQuest006==1){
+			npc_look @myid, 0, 20;
+			mes 3,"아아..그분..저번에 저희 주점에 오셨었죠. 절 계속 보고계셨는데.. 그분의 눈길이 머릿속에서 떠나질 않아요.";
+			set @rana,menu(1,"어째서 였을까요?","당신의 춤은 굉장히 멋지니까요.","뭘 그런 사람을 기억하고 그러는지...");
+			if(@rana==1){
+				mes 3,"어머~ 감사합니다. 사실은 이번 왕국 댄스 콘테스트에 나갈생각이예요. 새 드레스도 준비했고...";
+				mes 3,"하지만 그 드레스에 어울릴만한 장신구를 구하지 못해서 걱정이예요..어멋..처음 뵙는 분에게 제가 무슨 말을~!!";
+				set #EestQuest006,2;
+				mes 2,"그냥 지나가는 말이예요~ 신경쓰지 마세요.";
+			}
+		}	
+	}
+	if(get_mapname(@myid)=="수오미보석상점A"){
+		npc_look @myid, 0, 163;
+		if(@say$=="장신구"&&#EestQuest006==3){
+			mes 3,"어서오세요~ 오~호호호호.. 저희가게는 제가 수공예로 만든 진귀한 장신구들이 잔뜩있답니다. 물론 아무나 가질수 있는 그런 제품은 만들지 않아요~ 전 자존심이 높거든요.";
+			set @suomiA,menu(1,"무엇이 필요하신가요?","여자분에게 잘 어울릴 장신구가 필요합니다.","아닙니다. 실례했습니다.");
+			if(@suomiA==1){
+				mes 3,"호호호호~ 그러세요? 하지만 ~ 아까도 말씀드렸지만 전 아무나에게 보석들을 팔지 않아요. 보석이란 그것에 맞는 사람에게 주어졌을때 비로서 빛이 나게 마련이지요~";
+				mes 3,"제 사촌이 죽음의마을에서 광부좀비에게 처참하게 당한적이 있었지요. 그 괴물을 10마리 잡아오시면 당신을 인정해드리겠어요.";
+				set #EestQuest006,4;
+				mes 2,"잡아오셨으면 {=c잡아왔습니다. {=a라고 말씀해주세요.";
+			}
+		}
+		if(@say$=="잡아왔습니다"&&#EestQuest006==4&&#EestQuest006A>=10){
+			mes 3,"빨리 다녀오셨네요. 그럼 어디 볼까요?";
+			mes 3,"호오~ 실력이 대단하신걸요? 당신은 제가 만든 작품을 받기에 충분한 자격이 있으신분이로군요!";
+			mes 3,"네? 라나와 조커님이?";
+			mes 3,"어머나..그런 사연이 있는줄 모르고...죄송해요 당신은 정말 멋진분이로군요. 그렇다면 저도 스페셜한 장신구를 만들어 드려야 겠는데..";
+			mes 3,"지금 있는 재료로는 충분하지가 않고...죄송하지만 재료를 구해다 주세요.";
+			set #EestQuest006, 5;
+			set #EestQuest006A, 0;
+			mes 2,"그 재료는 몇일전에 뤼케시온 해안가에서 다른 대륙의 상인이 배가 난파되서 떠내려왔더군요. 그 상인은 여러가지 진귀한 물건들을 많이 가지고 있는데..그 상인에게서 장신구에 쓰일만한 재료를 구해주세요.";
+		}
+		if(@say$=="보석"&&#EestQuest006==7&&item_exist(@myid, "홍염의진주")){
+			mes 3,"보석을 구해오셨나요?!";
+			mes 3,"어머나~ 정말 구해오셨군요~~~!!!";
+			mes 3,"자 ~ 이제 멋진 목걸이를 만들어 드릴께요~";
+			mes 3,"이 목걸이를 가지고 이제 조커님에게 돌아가보세요.";
+			item_del "홍염의진주", 1;
+			set #EestQuest006, 8;
+			mes 2,"좋은 결과가 있었으면 좋겠네요..수고하세요~호호호호";
+		}
+	}
+	if(get_mapname(@myid)=="뤼케시온여관"){
+		if(@say$=="물건"&&#EestQuest006==5){
+			npc_look @myid, 0, 58;
+			mes 3,"나는 이 대륙의 사람이 아니지요..제가 타고있던 배가 난파되는 바람에 여러날을 판자에 의지해서 떠내려왔습니다.";
+			mes 3,"언젠가 돌아갈 날을 준비하고 있지요. 전 상인체질이라서 이 곳에서도 장사를 조금하고 있지요.";
+			mes 3,"보석이 필요하시다구요? 제게는 저희 고장의 특산품인 귀한 보석이 있지만 ...돈을 받고 팔지는 않습니다. 전 이곳돈은 필요가 없거든요.";
+			mes 3,"대신 제가 제 대륙으로 돌아가서 장사할수 있는 재품들을 모으고 있는데..제가 원하는 것은 드라코의비늘입니다. 저희 고장에서는 그것이 귀중한 시약재료로 쓰이거든요.";
+			set #EestQuest006, 6;
+			mes 2,"그 조각을 5개 모아다 주시면 보석을 드리도록 하지요. 다 모아오셨으면  드라코의비늘을 모아왔다고 말씀해주세요.";
+		}
+		if(@say$=="잡아왔습니다"&&#EestQuest006==6&&item_exist(@myid, "드라코의비늘")>=5){
+			npc_look @myid, 0, 58;
+			mes 3,"흐음..어디 볼까요?";
+			mes 3,"호오~ 확실히 드라코의비늘 5개로군요.";
+			set #EestQuest006, 7;
+			item_del "드라코의비늘",1;
+			item_del "드라코의비늘",1;
+			item_del "드라코의비늘",1;
+			item_del "드라코의비늘",1;
+			item_del "드라코의비늘",1;
+			item_add "홍염의진주", 1;
+			mes 2,"자..원하시던 보석을 드렸습니다. 잘 쓰십시요.";
+		}
+	}
+	//진정한강자퀘스트■■■■■■■■■■■■■■■■■
+	if(get_mapname(@myid)=="연무관-창고"||get_mapname(@myid)=="여관-금화장"||get_mapname(@myid)=="무기점-연무관"||get_mapname(@myid)=="아슬론교련장"){
+		if(@say$=="진정한"||@say$=="실수"||@say$=="땅의고장"||@say$=="엔도르킹"||@say$=="개방의주문서"||@say$=="다녀왔습니다"||@say$=="물리쳤습니다"||@say$=="물리쳤습니다"||@say$=="모아왔습니다"||@say$=="강화"||@say$=="엔도르퀸"||@say$=="해방의주문서"){call_func @myid, "WestQuest009_A";end;}
+	}
+	if(get_mapname(@myid)=="로톤대장간"){
+		npc_look @myid, 0, 833;
+		if(instr(last_say(@myid), "로딘")){
+			if(#EestQuest013A==1){
+				mes 3,"아.. {=c로딘 {=a씨에게 이야기는 들었어요.";
+				mes 3,"아마 그 {=c고철군{=a은 동력원이 고장나 있을거에요. 말끔하게 고칠 수도 있겠지만, 로딘씨는 그렇게 되면 곤란하다고 하시더라고요.";
+				mes 3,"적당히 사람을 해칠 수 없는 정도로 만들어서 상품으로 만들려는 것 같던데 음... 뭐 괜한 참견을 하고싶지는 않네요. 나름의 사정이 있으시겠죠?";
+				mes 3,"어쨋든 {=c새로운 동력원{=a을 만들기 위해선 기계들의 파편이 필요해요. 네 맞아요. {=c로톤 북쪽의 숲{=a에서 구할 수 있죠.";
+				set #EestQuest013A, 2;
+				mes 2,"위험한 곳이란건 알고 있지만.. 다른 방법이 없네요. 제가 필요한 물품을 적어드리겠습니다.\\n{=v[필요준비물: B구역의기계파편 20개]";
+			}
+			if(#EestQuest013A==2){
+				if(item_exist(@myid, "B구역의기계파편") < 20){mes 2,"아직 재료들이 덜 모인 것 같네요.";}
+				mes 3,"재료가 모두 모였군요. 잠시만 기다려주세요.";
+				mes 3,"(뚝딱뚝딱) 휴.. 자 이게 {=c출력제한동력원{=a입니다. 아마 고철군은 보통 꼬마아이 정도의 힘밖에 내지 못하게 될 거에요.";
+				item_del "B구역의기계파편", 20;
+				item_add "출력제한동력원", 1;
+				mes 2,"이걸 가지고 {=c로딘{=a씨에게 가보시면 될 것 같습니다.";
+			}
+		end;
+		}
+		if(instr(last_say(@myid), "하이넬")){
+			if(#EestQuest013B==1){
+				mes 3,"음 {=c하이넬{=a에게 이야기는 들었어요.";
+				mes 3,"고철군을 그냥 본래 상태로 수리한다니.. 아마 로딘씨가 알게 되면 날뛰시겠지만, 대충 실수했다고 둘러댈 수는 있을거같네요.";
+				mes 3,"저도 하이넬한테 신세지는 것도 있고 하니 하이넬의 말대로 한번 해보도록 하겠습니다.";
+				mes 3,"어쨋든 {=c새로운 동력원{=a을 만들기 위해선 기계들의 파편이 필요해요. 네 맞아요. {=c로톤 북쪽의 숲{=a에서 구할 수 있죠.";
+				set #EestQuest013B, 2;
+				mes 2,"위험한 곳이란건 알고 있지만.. 다른 방법이 없네요. 제가 필요한 물품을 적어드리겠습니다.\\n{=v[필요준비물: B구역의기계파편 20개]";
+			}
+			if(#EestQuest013B==2){
+				if(item_exist(@myid, "B구역의기계파편") < 20){mes 2,"아직 재료들이 덜 모인 것 같네요.";}
+				mes 3,"재료가 모두 모였군요. 잠시만 기다려주세요.";
+				mes 3,"(뚝딱뚝딱) 휴.. 자 이게 {=c정상적인동력원{=a입니다. 아마 고철군은 정상적인 기능을 하게 될 거에요.";
+				item_del "B구역의기계파편", 20;
+				item_add "정상적인동력원", 1;
+				mes 2,"이걸 가지고 {=c하이넬{=a씨에게 가보시면 될 것 같습니다.";
+			}
+		end;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="루어스성3층집무실"){
+		npc_look @myid, 0, 44;
+		if(instr(last_say(@myid), "탐사대")){
+			if(#EestQuest011==1){
+				mes 3, "어서오게. 소문이 생각보다 빨리 퍼진 모양이로군.";
+				mes 3, "사실 이전에도 적룡굴의 심층부에 잠들어있다하는 {=c고대재보{=a를 발굴하려는 시도는 적지 않았지.";
+				mes 3, "하지만 {=c고대재보{=a의 정체에 대한 의견이 분분했기에 발굴단은 매번 뿔뿔히 흩어지게 되었고 험난한 적룡굴의 여정을 견디지 못해 모두 와해 되었다네.";
+				mes 3, "자네같은 모험가들이 이 일을 지원해 준다면, 이번에야 말로 성공할 수 있을지도 모르지.";
+				set @RA, menu(1, "어때? 지원해 볼 의향이 있는가?", "네,지원하고 싶습니다.", "아니오,하지 않겠습니다.");
+				if(@RA==1){
+					mes 3, "협력에 감사하네. 탐사대가 출발한지 오래되지 않았으니 지금 {=c적룡굴의 레드오피온 캠프{=a로 출발해도 늦지 않을걸세.";
+					set #EestQuest011, 2;
+					mes 2, "부디 고대재보가 사악한 세력들에 의해 악용되지 않고 무사히 발굴될 수 있도록 힘을 보태주게나.";
+				}
+			}
+			if(#EestQuest011==19){
+				mes 3, "자네를 기다리고 있었네.. 탐사대장에게 보고받은 바에 의하면 테네즈의 후예들이 다른 차원의 무엇과 서약을 맺고 재기를 도모하고 있었다고?!";
+				mes 3, "테네즈의 후예들이 또 어떤 일을 꾸미고 있는지 아직은 알 수 없지만, 가능한 최대한의 정보를 모아볼 참이네.";
+				mes 3, "우리에게 닥친 과제가 너무나도 거대한 것 같군. 자네는 이번 일에 정말 공헌이 많았어. 앞으로도 가능하다면 많은 도움을 받고 싶군.";
+				mes 3, "앞으로 테네즈의 후예들의 행동에 대한 윤곽이 잡힌다면 그 때 다시 힘을 빌려주게나.";
+				item_add "화이어윙", 1;
+				set #EestQuest011, 20;
+				legend_add 7, 254, "고대 재보의 탐사를 지원하다";
+				message 3, "루어스국왕으로 부터 {=c화이어윙 {=s아이템을 선물로 받았습니다";
+				sleep 200;
+				message 3, "{=c고대재보의 탐사를 지원하다!!";
+			}
+		end;
+		}
+	end;
+	}
+	if(instr(last_say(@myid), "복숭아주")){
+		if(get_mapname(@myid)=="노엠주점"){
+			if(#WestQuest010B==1){
+				npc_look @myid, 0, 536;
+				set @WestQuest010B2, menu(1, "혹시 내가 좋아하는 복숭아주를 가져온건가!?", "네~", "죄송...");
+				if(@WestQuest010B2==1){
+					if(!item_exist(@myid, "복숭아주")){mes 2, "복숭아주를 좀 갖다 주게나..";}
+					mes 3, "오~ 고맙네, 이건 답례일세. 받아주게나.";
+					set #WestQuest010B, 0;
+					item_del "복숭아주", 1;
+					item_add "생명의물B", 1;
+					message 3, "노엠촌장에게 {=c생명의물B{=a를 받았습니다.";
+				}
+			}
+		end;
+		}
+		if(get_mapname(@myid)=="화론-조리장"){
+			npc_look @myid, 0, 601;
+			mes 3, "여기까지 무슨일인가모. 복숭아주가 필요한가모? 노엠촌장님의 부탁이라고 하니, 그럼 특별히 재료값만 받겠다모. 5론만 달라모.";
+			if(item_exist(@myid, "론") < 5){mes 2, "론이 부족하다모.";}
+			item_del "론", 5;
+			item_add "복숭아주", 1;
+			mes 2, "여기 있다모";
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="알세이드스-화론마을"){
+		if(@say$=="확인" && #WestQuest008==10){
+			npc_look @myid, 0, 26;
+			mes 3, "나에게 무슨 볼일인가? 확인서? 한푼만 주면 해주지.";
+			input @Westmoney, 2, "얼마나 줄껀가?", "금전", "전", 6;
+			if(@Westmoney==0){
+				mes 2,"너무 적다고 생각하지 않나? 실망이네.";
+			}
+			if(@Westmoney < 99999){mes 2,"너무 적다고 생각하지 않나? 실망이네."; end;}
+			if(get_money(@myid) < 99999){mes 2,"너무 적다고 생각하지 않나? 실망이네."; end;}
+			money_del @Westmoney;
+			mes 3, "확인했다.";
+			mes 3, "다음은'화론촌장손녀'네";
+			item_del "확인서1", 1;
+			item_add "확인서2", 1;
+			set #WestQuest008, 11;
+			mes 2, "잘가게나~";
+		end;
+		}
+		if(@say$=="확인" && #WestQuest008==13){
+			npc_look @myid, 0, 603;
+			mes 3, "확인서를 가지고 오셨소?";
+			if(!item_exist(@myid, "확인서4")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			mes 3, "확인했습니다.";
+			mes 3, "다음은'연무관주인' 이요";
+			item_del "확인서4", 1;
+			item_add "확인서5", 1;
+			set #WestQuest008, 14;
+			mes 2, "그럼 수고하시오.";
+		end;
+		}
+		if(@say$=="확인" && #WestQuest008==15){
+			npc_look @myid, 0, 600;
+			mes 3, "확인서를 가지고 오셨소?";
+			if(!item_exist(@myid, "확인서6")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			mes 3, "확인했습니다.";
+			mes 3, "다음은'화론경비병' 이요";
+			item_del "확인서6", 1;
+			item_add "확인서7", 1;
+			set #WestQuest008, 16;
+			mes 2, "그럼 수고하시오.";
+		end;
+		}
+		if(@say$=="확인" && #WestQuest008==16){
+			npc_look @myid, 0, 603;
+			mes 3, "확인서를 가지고 오셨소?";
+			if(!item_exist(@myid, "확인서7")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			mes 3, "확인했습니다.";
+			mes 3, "다음은'화론촌장손녀' 이요";
+			item_del "확인서7", 1;
+			item_add "확인서8", 1;
+			set #WestQuest008, 17;
+			mes 2, "그럼 수고하시오.";
+		end;
+		}
+		if(@say$=="확인" && #WestQuest008==19){
+			npc_look @myid, 0, 603;
+			mes 3, "확인서를 가지고 오셨소?";
+			if(!item_exist(@myid, "확인서10")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			mes 3, "확인했습니다.";
+			mes 3, "다음은'상약국주인' 이요";
+			item_del "확인서10", 1;
+			item_add "확인서11", 1;
+			set #WestQuest008, 20;
+			mes 2, "그럼 수고하시오.";
+		end;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="여관-금화장"){
+		if(@say$=="확인" && #WestQuest008==11){
+			npc_look @myid, 0, 605;
+			mes 3, "확인서를 가지고 오셨나요?";
+			if(!item_exist(@myid, "확인서2")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			mes 3, "확인했습니다.";
+			mes 3, "다음은'연무관주인' 이예요";
+			item_del "확인서2", 1;
+			item_add "확인서3", 1;
+			set #WestQuest008, 12;
+			mes 2, "그럼 수고하세요.";
+		end;
+		}
+		if(@say$=="확인" && #WestQuest008==17){
+			npc_look @myid, 0, 605;
+			mes 3, "확인서를 가지고 오셨나요?";
+			if(!item_exist(@myid, "확인서8")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			mes 3, "확인했습니다.";
+			mes 3, "다음은'상약국주인' 이예요";
+			item_del "확인서8", 1;
+			item_add "확인서9", 1;
+			set #WestQuest008, 18;
+			mes 2, "그럼 수고하세요.";
+		end;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="시약점-상약국"){
+		npc_look @myid, 0, 601;
+		if(@say$=="확인" && #WestQuest008==18){
+			mes 3, "확인서를 가지고 오셨나요?";
+			if(!item_exist(@myid, "확인서9")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			mes 3, "확인했습니다.";
+			mes 3, "다음은'화론경비병' 이예요";
+			item_del "확인서9", 1;
+			item_add "확인서10", 1;
+			set #WestQuest008, 19;
+			mes 2, "그럼 수고하세요.";
+		end;
+		}
+		if(@say$=="확인" && #WestQuest008==20){
+			if(!item_exist(@myid, "확인서11")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+			item_del "확인서11", 1;
+			set #WestQuest008, 21;
+			mes 2, "이제 됬어?충분해요 촌장한테 가보세요.";
+		end;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="무기점-연무관"){
+		npc_look @myid, 0, 602;
+		if(@say$=="확인"){
+			if(#WestQuest008==12){
+			mes 3, "확인서를 가지고 오셨소?";
+			if(!item_exist(@myid, "확인서3")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+				mes 3, "확인했습니다.";
+				mes 3, "다음은'화론경비병' 이요";
+				item_del "확인서3", 1;
+				item_add "확인서4", 1;
+				set #WestQuest008, 13;
+				mes 2, "그럼 수고하시오.";
+				end;
+			}
+			if(#WestQuest008==14){
+				mes 3, "확인서를 가지고 오셨소?";
+				if(!item_exist(@myid, "확인서5")){set #WestQuest008, 9; mes 2, "확인서가 없군요. 촌장님의 통해 다시 시험을 치루시길 바랍니다."; end;}
+				mes 3, "확인했습니다.";
+				mes 3, "다음은'화론떠돌이' 요";
+				item_del "확인서5", 1;
+				item_add "확인서6", 1;
+				set #WestQuest008, 15;
+				mes 2, "그럼 수고하시오.";
+			end;
+			}
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="운디네마을"){
+		if(@say$=="생명의물"){
+			npc_look @myid, 0, 58;
+			mes 3, "어라. 살다 보니 생명의물에 대해 알고 있는 사람을 만날 줄이야.";
+			set @WestQuest010A, menu(1, "성수 10개를 가지고 오면 그걸 증류해서 생명의물 한 개를 만들 수 있지.\\n생명의물의 힘은 강력해서 보통 인간이나 식물에는 사용할 수 없을텐데... 필요하다면\\n만들어주겠네. 성수 10개를 가져왔는가?", "네.", "아니오");
+			if(@WestQuest010A==1){
+				if(item_exist(@myid, "성수") < 10){mes 2, "성수는 어디에 있는가?";}
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_del "성수", 1;
+				item_add "생명의물A", 1;
+				message 3, "성수상인에게 {=c생명의물A{=a를 받았습니다.";
+			}else if(@westquest010A==2){
+				mes 2, "다음에 봅세.";
+			}
+		}
+	end;
+	}
+	if(@say$=="생명의물" && get_mapname(@myid)=="노엠주점"){
+		npc_look @myid, 0, 536;
+		set @WestQuest010B, menu(1, "생명의물이 필요하다고? 미안하지만 떠돌이 모험가에게 그 귀한걸 줄 순 없어.\\n내 부탁을 한가지 들어주면 생각해보도록 하지.", "무슨 부탁이신가요?", "귀찮아요");
+		if(@WestQuest010B==1){
+			mes 3, "실은…내가 술을 좋아하는데, 화론 마을의 복숭아주가 일품이란 말이지.\\n가끔 가서 화론촌장과 즐기곤 했는데, 노인네가 통 정신이 오락가락 하는데에다가 화론 촌장 손녀 눈치도 보이고...";
+			set #WestQuest010B, 1;
+			mes 2, "나도 촌장이다 보니 바빠서말야. 그래서 말인데, 복숭아주를 좀 갖다 주지 않겠나?\\n얻어오거든 {=c복숭아주{=a라고 말해주게~";
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="아만여관"){
+		npc_look @myid, 0, 921;
+		if(@say$=="봉인"){
+			if(#WestQuest010==5){
+				mes 3, "동쪽 대륙 용자의 자손들이 여기까지 와서 다시 한번 더 우리를 위해 힘써주는군. 골골.\\n내가 어릴 적 마이소시아의 용자가 화론으로 가는 길목에서 거대한 괴물과 싸웠다고 하더군.";
+				set #WestQuest010, 6;
+				set #WestQuest010C, 1;
+				item_add "주술이걸린글래스조각", 1;
+				mes 2, "우리 아버님 말씀이 그때 그 괴물이 지하로 도망치는 것을 두눈으로 똑똑히 보았다고 했지...\\n이건 부모님께 물려받은 그때 가져온 몬스터의 파편일세. 여기에 주술을 걸어두었으니, 화론에서 가는 길목에서 사용하면 몬스터가 나타날거야.골골.";
+			}
+			if(#AmanTotemE >= 1 && #WestQuest010C==1){
+				set #WestQuest010, 8;
+				mes 2, "자네가 해냈군? 가서 페이칸 군주님께 {=c봉인{=a에 대해서 보고하게나.";
+			}
+		}
+		if(@say$=="생명의물"){
+			if(#WaterofLifeC != 0){
+				if(!item_exist(@myid, "루딘의부러진칼조각")){mes 2, "내가 무엇을 믿고 자네에게 줄 수 있겠나. 믿을만한 증거를 가지고 오게나. 골골.";}
+				mes 3, "오, 이 문양과 모양...이것은 딱봐도 내가 들었던 그때 루딘 님이 썼다는 칼 조각이군. 골골.\\n자네라면 믿을 수 있겠군. 이걸 받아주게.골골";
+				item_del "루딘의부러진칼조각", 1;
+				item_add "생명의물C", 1;
+				message 3, "빌리칸에게 {=c생명의물C{=a를 받았습니다.";
+				set #WaterofLifeC, 0;
+				end;
+			}
+			mes 3, "허허, 내가 생명의물을 보관하고 있다는 사실은 어떻게 안 겐가? 골골.\\n아주 오래 전, 동쪽 대륙의 용사가 우리 집안에 맡기고 간 것이지. 나쁜 사람에게 넘어가지 않도록 지켜달라고 신신당부를 하더군.";
+			mes 3, "내가 무엇을 믿고 자네에게 줄 수 있겠나. 믿을만한 증거를 가지고 오게나. 골골.";
+			set #WaterofLifeC, 1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="아만자치국회관"){
+		npc_look @myid, 0, 920;
+		if(@say$=="다녀왔습니다"){
+			if(#WestQuest010==2){
+				if(#AmanTotemD == 1 && #AmanTotemC == 1 && #AmanTotemB == 1 && #AmanTotemA == 1){
+					mes 3, "그래, 그 4개의 토템과 마을의 세계수가 이 마을을 지탱하는 힘일세.\\n아주 오래 전에 이곳을 지나간 용자의 말에 의하면, 세상에는 식물의 힘을 강화시킬 수 있는 신성한 힘을 가진 물이 있다고 하던데…";
+					set #WestQuest010, 3;
+					mes 2, "얼마전에 안 사실인데 성수들은 각각  동쪽 대륙의 성수상인이, 노엠총장이, 빌리칸이, 그리고 정글 몬스터가 가지고 있다고 하네.\\n가지고오면 {=c모아왔습니다{=a라고 말해주게나.";		
+				}else{
+					mes 2, "수호토템 들을 보고 오게.";
+				}
+			}
+		}
+		if(@say$=="봉인"){
+			if(#WestQuest010==8){
+				mes 3, "드디어 봉인이 해체되었군. 모든 것은 자네 덕분일세. 그 동안의 노고에 감사드리네. 아만주민들을 대표하여 내가 주는 선물을 받아주게나.";
+				legend_add 0, 255, "아만과 화론사이의 봉인을 약화시켜 아만 군주에게 인정받다.";
+				message 3, "정글과 화론 사이의 봉인을 해체했다.";
+				item_add "정글악어악세", 1;
+				set #WestQuest010, 9;
+				end;
+			}
+		}
+		if(@say$=="물리쳤습니다"){
+			if(#WestQuest010==4){
+				if(#AmanTotemD >= 2 && #AmanTotemC >= 2 && #AmanTotemB >= 2 && #AmanTotemA >= 2){
+				set #WestQuest010, 5;
+				mes 2, "이상하군, 아직도 화론으로 가는 길이 뚫어지지 않았는데… 나도 영문을 모르겠어. 남아있는 괴물이 더 있는걸까…";
+				}
+			}
+		}
+		if(@say$=="모아왔습니다"){
+			if(#WestQuest010==3){
+				if(!item_exist(@myid, "생명의물A")||!item_exist(@myid, "생명의물B")||!item_exist(@myid, "생명의물C")||!item_exist(@myid, "생명의물D")){mes 2, "성수들은 각각  동쪽 대륙의 성수상인이, 노엠총장이, 빌리칸이, 그리고 정글 몬스터가 가지고 있다고 하네.";}
+				mes 3, "오오, 이게 바로 그 신성한 물이로군. 정말 구해올 줄이야. 이걸 토템에게 사용해주게. 아마 강한 힘을 견디지 못하고 지하에 숨어있던 몬스터가 밖으로 나올거야.";
+				set #WestQuest010, 4;
+				mes 2, "그걸 해치워주게. 돌아오면 {=c물리쳤습니다{=a라고 보고해주게.";
+			}
+		}
+		if(@say$=="고민"){
+			if(#WestQuest010==9){mes 2, "그대야말로 진정한 용자일세.";}
+			if(#WestQuest010==2){mes 2, "수호토템 들을 보고 오게.";}
+			if(#WestQuest010==1){
+				if(!item_exist(@myid, "엘로푸이열매")){goto peican1;}
+				set #AmanTotemA, 0;
+				set #AmanTotemB, 0;
+				set #AmanTotemC, 0;
+				set #AmanTotemD, 0;
+				mes 3, "헛, 이건 내가 좋아하는 엘로푸이열매….\\n먹을걸 주다니 자네 괜찮은 사람이구만! 내가 먹을 것에 약한 건 어떻게 알고…(침을 질질 흘리고 있다.)";
+				mes 3, "도와준다고 하니 털어놓겠네.\\n예전 우리 마을은 알세이드스와 종종 교류하던 사이였지. 그런데 악에 지배당한 추장 루칸 덕분에 정글이 오염되면서. 아만을 지탱하고 있던 토템과 세계수의 힘이 약해져 버렸어.";
+				mes 3, "루칸은 땅 밑에 정기를 빼앗는 괴물들을 심어둔 모양이더군.\\n덕분에 이곳은 고립되어 버렸고,,, 다시 토템의 힘을 강화할 수만 있다면 좋을텐데 말야…";
+				item_del "엘로푸이열매", 1;
+				set #WestQuest010, 2;
+				mes 2, "정말 도와줄 생각이라면 사전조사부터 해야겠지? 정글에는 아만의 떠받느는 4개의 토템이 있다네,\\n우선 그 토템들을 둘러보고 오게나. 와서 {=c다녀왔습니다{=a라고 말해주게.";
+			}
+			set @rand, rand2(1,10);
+			if(@rand <= 3){
+				mes 2, "뭐, 우리 동의 없이 여기까지 와서 왜 자꾸 귀찮게 하는가?";
+			}if(@rand <= 4){
+				mes 2, "이 먼 곳까지 타지 사람이 왠 일이지? 오해를 사기전에 빨리 돌아가게.";
+			}if(@rand <= 6){
+				mes 2, "이 먼 곳까지 타지 사람이 왠 일이지? 오해를 사기전에 빨리 돌아가게.";
+			}else{
+				peican1:
+				set @peican, menu(1, "난 아주 바쁜 몸이라고, 상대할 시간 없네.", "고민이 있으시다고 들었어요.", "고집불통 이시네요?");
+				if(@peican==1){
+					set #WestQuest010, 1;
+					mes 2, "누가 그런 헛소문을…타지 사람의 도움을 받고 싶은 생각은 없네,\\n내가 자네의 무엇을 보고 믿겠는가?";
+				}
+			}
+		}
+	end;
+	}
+	if(@say$=="루그" && get_mapname(@myid)=="호엔대장간B"){
+		npc_look @myid, 0, 30;
+		mes 3, "헉...그분을 어떻게 알고세시죠? 으으음...그분은 저희 호엔마을의 장인으로써..일찍이 왕궁의\\n전속 대장장이로 일하시면서 훌륭한 무기와 아이템들을 만들어 내셨었지요.";
+		mes 3, "하지만 그분의 작품들을 헛되게 사용하는 사람들이 늘어나면서, 그분은 은둔생활을 시작하셨습니다. 그리고 자신을 찾기위해 노력하는 자가 아니면 만나려고 하지 않으시죠.";
+		mes 3, "그분이 게시는 작업장에는 특수한 자물쇠가 걸려있어서 그것을 열기위해서는 신비한 힘을 가진 황금의 만능열쇠가 필요하다고 합니다.";
+		mes 3, "그것은 아마도 적룡굴에서 구할수 있다고 들었습니다만...그분은 굉장히 까다로운 분이라서..";
+		set @rugwarp, menu(1, "그런데..무엇때문에 그러시죠?", "루그가 만드는 아이템에 관심이 있습니다.", "아뇨..뭐..그냥....");
+		if(@rugwarp==1){
+			rugre:
+			set @rugwarp2, menu(1, "루그님이 만드는 아이템을 설명해드리지요. 어떤것을 알고싶습니까?", "생명의목걸이", "생명의벨트", "암흑의목걸이", "암흑의벨트", "루그에게 가는 방법을 알고싶습니다.");
+			if(@rugwarp2==1){
+				mes 3, "생명의목걸이는 천사의 눈물이라고 하는 다이라룬드가 박혀있어서 그 보석으로 하여금 성스러운 기운을 내뿜어 악한 기운을 물리친다고 합니다.";
+				mes 3, "그 목걸이를 만들기 위해서는 <홀리팬플룻> 이라고 하는 성스러운 악기와 <블루오피온의수염>이\\n필요하다고 합니다.";
+				mes 3, "잊지 마셔야 할것은 꼭 재료를 모두 준비해서 가셔야 한다는 것입니다. 그분은 재료가 모자라면\\n받은 재료도 돌려주지 않습니다.";
+				goto rugre;
+			}else if(@rugwarp2==2){
+				mes 3, "생명의벨트는 그 모습만 봐도 화려하다고 느낄정도로 빛나는 벨트입니다. 재련할때에 한방울만 써도 죽음의 기운이 달아난다는 생명의시약을 뿌린다고 하는군요";
+				mes 3, "그 재료는 <드래곤뉴트의 뿔> 과 성스러운 <생명의시약>이라고 합니다.";
+				mes 3, "잊지 마셔야 할것은 꼭 재료를 모두 준비해서 가셔야 한다는 것입니다. 그분은 재료가 모자라면\\n받은 재료도 돌려주지 않습니다.";
+				goto rugre;		
+			}else if(@rugwarp2==3){
+				mes 3, "암흑의 목걸이는 뮤레칸의 종인 어떤 드래곤이 소지하고 있다는 구슬로 만들어 차고있는 자체로도 그 용의 암흑의 기운이 몸을 지배한다고 하는군요.";
+				mes 3, "그 목걸이를 만드는데는 <여의주>라고 불리우는 구슬과 <레드오피온의수염>이 필요하다고 합니다.";
+				mes 3, "잊지 마셔야 할것은 꼭 재료를 모두 준비해서 가셔야 한다는 것입니다. 그분은 재료가 모자라면\\n받은 재료도 돌려주지 않습니다.";
+				goto rugre;
+			}else if(@rugwarp2==4){
+				mes 3, "암흑의벨트는 생명의벨트와 마찬가지로 제련할때에 죽음의 기운이 담긴 시약을 뿌려 완성한다고\\n합니다.";
+				mes 3, "그 벨트를 만드는데는 <암흑의시약>과 <드래곤드래곤뉴트의뿔>이 필요하다고 합니다.";
+				mes 3, "잊지 마셔야 할것은 꼭 재료를 모두 준비해서 가셔야 한다는 것입니다. 그분은 재료가 모자라면\\n받은 재료도 돌려주지 않습니다.";
+				goto rugre;
+			}else if(@rugwarp2==5){
+				set @rugwarp3, menu(1, "루그님께 가고 싶으시다고요? 열쇠가 필요한것은 아시겠죠? 혹시, 열쇠를 가지고 오셨습니까?", "네, 구해왔습니다.", "아니오");
+				if(@rugwarp3==1){
+					if(!item_exist(@myid, "비밀의황금열쇠")){mes 0, "열쇠가없으시군요.열쇠를 구해오세요"; end;}
+					mes 3, "오호~구해오셨군요. 그럼 이제 그분의 작업실로 안내하겠습니다. 따라오세요";
+					item_del "비밀의황금열쇠", 1;
+					warp "루그의비밀작업장", 12,12;
+					end;
+				}else if(@rugwarp3==2){
+					mes 2, "으음..열쇠가 있어야 자물쇠를 열수 있습니다. 열쇠를 구해오시면 언제든지 안내해드리겠습니다.";
+				}
+			}
+		}else if(@rugwarp==2){
+			mes 2, "저는 바쁜사람입니다.용무가 없으면 돌아가주세요.";
+		}
+		end;
+	}
+	if(get_mapname(@myid)=="전사승급신전"||get_mapname(@myid)=="도적승급신전"||get_mapname(@myid)=="마법사승급신전"||get_mapname(@myid)=="성직자승급신전"||get_mapname(@myid)=="무도가승급신전"){
+		if(get_mapname(@myid)=="전사승급신전"){npc_look @myid, 0, 39;}
+		if(get_mapname(@myid)=="도적승급신전"){npc_look @myid, 0, 60;}
+		if(get_mapname(@myid)=="마법사승급신전"){npc_look @myid, 0, 679;}
+		if(get_mapname(@myid)=="성직자승급신전"){npc_look @myid, 0, 40;}
+		if(get_mapname(@myid)=="무도가승급신전"){npc_look @myid, 0, 678;}
+		if(instr(last_say(@myid), "복구")){
+			call_func @myid, "승급기본장비복구도우미";
+		}
+		if(instr(last_say(@myid), "업그레이드")){
+			call_func @myid, "승급장비업그레이드";
+		}
+		if(instr(last_say(@myid), "승급")){
+			call_func @myid, "승급도우미";
+		}
+		if(instr(last_say(@myid), "능력")){
+			call_func @myid, "능력치도우미";
+		}
+	}
+	if(instr(last_say(@myid), "라미아")){
+		if(get_mapname(@myid)=="오렌군주의저택"){
+			if(#orenquest002==1){
+				npc_look @myid, 0, 39;
+				if(get_class()==1||get_class()==2||get_class()==5){item_add "다크셀피어", 1;}
+				if(get_class()==3||get_class()==4){item_add "홀리셀피어", 1;}
+				set #orenquest002, 0;
+				mes 0, "흠..라미아를 잡았는가? 대단한 실력이군... 그럼 그에 상응하는 댓가를 주마..";
+				end;
+			}
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="밀레스신전"){
+		if(instr(last_say(@myid), "체력")){
+			npc_look @myid, 0, 61;
+			mes 3, "어머나...어서 오세요. 이 세계를 어둠에서 구해주실 용사님...";
+			mes 3, "그동안 당신의 모험담은 노래로 지어져서 널리 퍼져 있답니다.";
+			mes 3, "저 역시 당신의 팬이에요...호호";
+			mes 3, "어머나...내 정신 봐라...";
+			set @sunjin, menu(1, "신들을 만나보고 싶으시다고요?", "네. 신의 축복이 필요하거든요.", "아니오. 아직은 제가 경험치 부족하군요.");
+			if(@sunjin==1){
+				mes 3, "신들을 만나고 싶으시다면 예물이 필요해요. 예물은 엑스쿠라눔이란 희귀한 시약 1병입니다.";
+				mes 3, "신들의 세계로 가실려면, 신들에게 제물로 엑스쿠라눔 1개를 바치셔야 합니다.";
+				set @select2, menu(1, "당신은 신들께 예물을 마치실 준비가 되어있습니까?", "예. 엑스쿠라눔을 가져 왔습니다.", "잉. 예물이 필요해요?");
+				if(@select2==1){
+					mes 3, "당신께 엑스쿠라눔이 있는지 보고, 예물을 받도록 하겠습니다.";
+					if(get_level(@myid) != 99){mes 3, "신들을 만나시려면... 당신의 능력치 부터 올리셔야 합니다..."; end;}
+					if(item_exist(@myid, "엑스쿠라눔")==0){mes 4, "미처 예물을 준비 못하신듯 하네요. 예물을 준비하시고 다시 오시도록 하세요.";}
+					mes 3, "호호... 1병 확실히 받았습니다.";
+					mes 3, "이제 당신을 신들이 사는 신전으로 보내드리겠습니다.";
+					mes 3, "신전은 당신이 처음 태어나실대 보셨던 곳입니다. 그곳에서 세오님과 칸님을 찾아가시면 되요";
+					mes 3, "신들께 “당신의 은총을 바랍니다”라고 하시면 됩니다. 세오님은 체력으로, 칸님은 마력으로 보답하실거에요.";
+					mes 3, "당신의 앞날에 신의 가호가 있기를 기원합니다.";
+					item_del "엑스쿠라눔", 1;
+					warp "신들의세계", 25, 25;
+					end;
+				}else if(@select2==2){
+					mes 3, "아시다시피 신들은 꽤 욕심이 많답니다...호호";
+					mes 4, "예물을 준비하셔서 다시 오도록 하세요.";
+				}
+			}else if(@sunjin==2){
+				mes 4, "호호... 급하게 서두르실 필요 없어요. 신들은 한가하거든요. 담번에 또 와주세요.";
+			}
+		end;
+		}
+		if(@say$=="승급"){
+			npc_look @myid, 0, 61;
+			mes 3, "승급을 할 레벨이시군요.";
+			mes 3, "승급신전 으 로 보내드리겠습니다.";
+				if(get_class()==1){warp "전사승급신전", 5, 7; end;}
+				if(get_class()==2){warp "도적승급신전", 5, 7; end;}
+				if(get_class()==3){warp "마법사승급신전", 5, 7; end;}
+				if(get_class()==4){warp "성직자승급신전", 5, 7; end;}
+				if(get_class()==5){warp "무도가승급신전", 5, 7; end;}
+			mes 4, "승급신전으로 이동하였습니다.";
+		end;
+		}	
+		if(@say$=="능력"){
+			npc_look @myid, 0, 61;
+			if(get_class_sub(@myid)==0){mes 0, "승급자가 아니면 감히 갈수 없습니다."; end;}
+			mes 3, "마스터시군요.";
+			mes 3, "능력치를 올리시려고 가시나보죠??";
+			set @sunjin, menu(1, "신들을 만나보고 싶으시다고요?", "네. 신의 축복이 필요하거든요.", "아니오. 아직은 제가 경험치 부족하군요.");
+			if(@sunjin==1){
+				mes 3, "신들을 만나고 싶으시다면 예물이 필요해요. 예물은 엑스쿠라눔이란 희귀한 시약 1병입니다.";
+				mes 3, "신들의 세계로 가실려면, 신들에게 제물로 엑스쿠라눔 1개를 바치셔야 합니다.";
+				set @select2, menu(1, "당신은 신들께 예물을 마치실 준비가 되어있습니까?", "예. 엑스쿠라눔을 가져 왔습니다.", "잉. 예물이 필요해요?");
+				if(@select2==1){
+					mes 3, "당신께 엑스쿠라눔이 있는지 보고, 예물을 받도록 하겠습니다.";
+					if(get_level(@myid) != 99){mes 3, "신들을 만나시려면... 당신의 능력치 부터 올리셔야 합니다..."; end;}
+					if(item_exist(@myid, "엑스쿠라눔")==0){mes 4, "미처 예물을 준비 못하신듯 하네요. 예물을 준비하시고 다시 오시도록 하세요.";}
+					mes 3, "호호... 1병 확실히 받았습니다.";
+					mes 3, "이제 당신을 신들이 사는 신전으로 보내드리겠습니다.";
+					mes 3, "신들께 “능력을 올리고 싶습니다.”라고 하시면 됩니다.";
+					mes 3, "당신의 앞날에 신의 가호가 있기를 기원합니다.";
+					item_del "엑스쿠라눔", 1;
+					if(get_class()==1){warp "전사승급신전", 5, 7; end;}
+					if(get_class()==2){warp "도적승급신전", 5, 7; end;}
+					if(get_class()==3){warp "마법사승급신전", 5, 7; end;}
+					if(get_class()==4){warp "성직자승급신전", 5, 7; end;}
+					if(get_class()==5){warp "무도가승급신전", 5, 7; end;}
+					end;
+				}else if(@select2==2){
+					mes 3, "아시다시피 신들은 꽤 욕심이 많답니다...호호";
+					mes 4, "예물을 준비하셔서 다시 오도록 하세요.";
+				}
+			}else if(@sunjin==2){
+				mes 4, "호호... 급하게 서두르실 필요 없어요. 신들은 한가하거든요. 담번에 또 와주세요.";
+			}
+		end;
+		}
+		if(@say$=="순수"){
+			npc_look @myid, 0, 61;
+			if(get_class()==5||get_son()==0 ||get_class_sub(@myid)==0){mes 2, "죄송합니다.순수직업 승급자분들만 입장이 가능합니다.";}
+			warp "순수직업관", 7,5;
+			mes 4, "순수직업승급자들을 위한 직업신전으로 이동합니다.";
+		end;
+		}
+		if(@say$=="전직"){
+			npc_look @myid, 0, 61;
+			set @class, get_class(@myid);
+			set @HP, get_basevita2(@myid);
+			set @MP, get_basemana2(@myid);
+			if(get_level(myid) < 99){end;}
+			if(get_class_sub() != 0){mes 3, "마스터시군요."; mes 4, "마스터는 전직할수 없습니다.";}
+			mes 3, "전직을 원하시나보죠?";
+			mes 3, "전직은 신중하게생각하고 하시길...";
+			if(#classchange==1){goto go8;}
+			mes 3, "전직은 자신의 직업에서 다른 직업으로 변함을 말합니다.";
+			mes 3, "자신의 직업이 좋다면 다신 한번 자신의 직업으로 변할수도 있구요.";
+			mes 3, "단 전직은 오직 한번이니 신중하게 결정하길 바랍니다.";
+			mes 3, "그리고 전직에도 많은 경험치와 기준이 있으니 자격이 안되면 신청하지 마시기 바랍니다.";
+			mes 3, "전직을 하게되면 레벨이 1이되며 특성치도 초기화 됩니다.";
+			mes 3, "또한 체력과 마력도 초기화됩니다.";
+			mes 3, "그리고 당신이 가지고 있던 모든 경험치도 사라집니다.";
+			if(@class==1){
+				mes 3, "당신은 전사로써 전직 조건은, 체력 14000 마력 3500입니다.";
+				if(@HP < 14000||@MP < 3500){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+				goto go5;
+			}
+			if(@class==2){
+				mes 3, "당신은 도적으로써 전직 조건은, 체력 11000 마력 6000입니다.";
+				if(@HP < 11000||@MP < 6000){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+				goto go5;
+			}
+			if(@class==3){
+				mes 3, "당신은 마법사로써 전직 조건은, 체력 10000 마력 11000입니다.";
+				if(@HP < 10000||@MP < 11000){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+				goto go5;
+			}
+			if(@class==4){
+				mes 3, "당신은 성직자로써 전직 조건은, 체력 11000 마력 12000입니다.";
+				if(@HP < 11000||@MP < 12000){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+				goto go5;
+			}
+			if(@class==5){
+				mes 3, "당신은 무도가로써 환골탈퇴 조건은, 체력 14000 마력 6000입니다.";
+				if(@HP < 14000||@MP < 6000){mes 0, "당신은 아직 환골탈퇴를 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+				goto go6;
+			}
+		end;
+		go5:
+			mes 3, "그럼 이제 전직에 관한 절차를 시작합니다.";
+			mes 3, "전직에 필요한 체력 마력을 체크합니다.";
+			mes 3, "그럼 이제 전직시 필요한 경험치를 체크합니다.";
+			mes 3, "당신은 이제 전직을 할수 있습니다.";
+			re3:
+			set @select2, menu(1, "직업을 선택해주십시오.", "전사", "도적", "마법사", "성직자");
+			if(@select2==0){goto re3;}
+			if(@select2==1){
+				re4:
+				set @select3, menu(1, "강인한 체력과 강력함을 지닌 전사로서 다시 태워 나시겠습니까?", "네, 전사로 선택했습니다.", "다시 선택하겠습니다.");
+				if(@select3==0){goto re4;}
+				if(@select3==1){
+					if(@class==1){set_son 1;}else{set_son 0;}
+					set_class 1;
+					legend_add 7, 88, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 전사로 전직하다.";
+					broadcast 3, "{=u[[ {=c" + get_name() +"{=s님이 전사로 전직하셨습니다. 축하 드립니다 !! {=u]]";
+					skill_add "숏블레이드";
+					goto go7;
+				}else if(@select3==2){
+					mes 3, "신중히 골라주시길 바랍니다.";
+					goto re3;
+				}
+			}
+			if(@select2==2){
+				re5:
+				set @select3, menu(1, "뛰어난 스피드와 치명적인 매력을 지닌 도적으로서 다시 태워 나시겠습니까?", "네, 도적으로 선택했습니다.", "다시 선택하겠습니다.");
+				if(@select3==0){goto re5;}
+				if(@select3==1){
+					if(@class==2){set_son 1;}else{set_son 0;}
+					set_class 2;
+					legend_add 7, 88, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 도적으로 전직하다.";
+					broadcast 3, "{=u[[ {=c" + get_name() +"{=s님이 도적으로 전직하셨습니다. 축하 드립니다 !! {=u]]";
+					skill_add "찌르기";
+					goto go7;
+				}else if(@select3==2){
+					mes 3, "신중히 골라주시길 바랍니다.";
+					goto re3;
+				}
+			}	
+			if(@select2==3){
+				re6:
+				set @select3, menu(1, "뛰어난정식력과 강력한 마법공격력을 지닌 마법사로서 다시 태워 나시겠습니까?", "네, 마법사로 선택했습니다.", "다시 선택하겠습니다.");
+				if(@select3==0){goto re6;}
+				if(@select3==1){
+					if(@class==3){set_son 1;}else{set_son 0;}
+					set_class 3;
+					legend_add 7, 88, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 마법사로 전직하다.";
+					broadcast 3, "{=u[[ {=c" + get_name() +"{=s님이 마법사로 전직하셨습니다. 축하 드립니다 !! {=u]]";
+					spell_add "마레노";
+					goto go7;
+				}else if(@select3==2){
+					mes 3, "신중히 골라주시길 바랍니다.";
+					goto re3;
+				}
+			}
+			if(@select2==4){
+				re7:
+				set @select3, menu(1, "뛰어난신성력과 강력한 회복력을 지닌 성직자로서 다시 태워 나시겠습니까?", "네, 성직자로 선택했습니다.", "다시 선택하겠습니다.");
+				if(@select3==0){goto re7;}
+				if(@select3==1){
+					if(@class==4){set_son 1;}else{set_son 0;}
+					set_class 4;
+					legend_add 7, 88, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 성직자로 전직하다.";
+					broadcast 3, "{=u[[ {=c" + get_name() +"{=s님이 성직자로 전직하셨습니다. 축하 드립니다 !! {=u]]";
+					spell_add "홀리볼트";
+					spell_add "쿠로";
+					goto go7;
+				}else if(@select3==2){
+					mes 3, "신중히 골라주시길 바랍니다.";
+					goto re3;
+				}
+			}
+			end;
+			go6:
+			mes 3, "당신은 충분히 환골탈퇴를할수 있는 체력과 마력을 지니셧군요.";
+			re8:
+			set @select2, menu(1, "환골탈퇴를 하시겠습니까? 신중히 선택해 주시길 바랍니다.", "환골탈퇴를 한다.", "환골탈퇴를 하지 않는다.");
+			if(@select2==0){goto re8;}
+			if(@select2==1){
+				legend_add 7, 88, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 환골탈태.";
+				broadcast 3, "{=u[[ {=c" + get_name() +"{=s님이 환골탈태를 하셨습니다.. 축하 드립니다 !! {=u]]";
+				goto go7;
+			}else if(@select2==2){
+				mes 4, "환골탈퇴에 신중을 기울여주세요. 승급만 하지 않는다면 언재든지 환골탈퇴가 가능하답니다.";
+				end;
+			}
+			end;
+			go7:
+			set_basevita 100;
+			set_basemana 100;
+			set_level "2";
+			set_point "2";
+			exp_del "4300000000";
+			set_str "3";
+			set_int "3";
+			set_wis "3";
+			set_dex "3";
+			set_con "3";
+			set #classchange, 1;
+			exp_add 1;
+			warp "노비스마을", 31,9;
+		}
+		end;
+	}
+	if(instr(last_say(@myid), "잡아왔습니다")){
+		if(get_mapname(@myid)=="오렌군주의저택" && #EestQuest005==1){
+			npc_look @myid, 0, 39;
+			mes 3, "오오..다녀왔는가? 그럼 어디 한번 자네의 성과를 보지..";
+			if(#ono < 1||#jun < 1||#anton < 1){mes 2, "한놈을 아직 잡지 못했거나..시간이 너무 많이 흘렀군..";}
+			mes 3, "오오..정말 대단하군!! 고맙네..이건 내가 주는 선물일세..뭐..해적들 옷이긴 하지만 이쁘지 않나? 하.하.하..";
+			if(get_sex()==1){item_add "해적옷1", 1;}
+			if(get_sex()==2){item_add "해적옷2", 1;}
+			item_add "해적모자", 1;
+			legend_add 7, 254, "오렌 해적들을 용감하게 무찌르다.";
+			set #EestQuest005, 2;
+			broadcast 0,"[" + get_name() + "]님이 오렌마을의 해적을 소탕하셨습니다.";
+			mes 2, "정말 수고 많았네..잘가게나..!!!";			
+		end;
+		}
+		if(get_mapname(@myid)=="그린혼학원식당"){
+			npc_look @myid, 0, 24;
+			if(#Quest001==1){
+				set @say$, last_say(@myid);
+				if(#Questmonster001 < 10){goto go3;}
+				mes 3, "아이고 고마워요~ 그런데 한번 더 도와 줄 수 있어요? 쥐를 잡아줘서 한시름 덜었는데, 거미도 와글와글 하지 않수?\\n 덕분에 지하 창고에 갈 때마다 깜짝 놀란다우.";
+				set @select, menu(1, "내가 이리 뚱뚱해 보여도 나름 심약해서 호호호. 다시 한번 내려가서 거미 15마리만 잡아와요.\\n 어때요?", "그러죠, 뭐", "음.. 바빠서 안되겠어요");
+				if(@select==1){
+					set #Quest001, 2;
+					mes 4, "아 그럼 한번더 수고해줘요.. 아까처럼  {=c잡아왔습니다{=a라고 말하면된다우.";
+				}else if(@select==2){
+					mes 3, "아 그래요? 그럼 어쩔수 없죠. 그래도 도와줬으니 고마워요";
+					mes 3, "음..이건 뭐 얼마 안되지만 용돈이라고 생각하고 받아줘요. 호호호호\\n마을로 나가서 방패랑 무기등을 사는데 조금이라도 도움이 될거예요.";
+					mes 3, "그리고 먹을걸 좀 챙겨줄테니 필요할때 먹어요.음식은 체력을 회복시켜주니 사냥에도 도움이 될거예요\\n호호호호~~~";
+					item_add "치즈", 10;
+					item_add "소고기스테이크", 10;
+					item_add "샌드위치", 10;
+					money_add "1500000";
+					exp_add 200;
+					set #Quest001, 3;
+					mes 4, "아참~~~ 꼭 시험장에 가서 시험을 보시구랴.. 휴식스킬은 꼭 필요하다우";
+				}
+				end;
+			}
+			if(#Quest001==2){
+				set @say$, last_say(@myid);
+				if(#Questmonster002 < 15){goto go3;}
+				mes 3, "아 너무 고마워요.. 두 가지 일이나 해주다니! 자 날 도와줬으니 경험치하고 돈.. 그리고 먹을껄 좀 더 챙겨 줄께요..";
+				mes 3, "음..이건 뭐 얼마 안되지만 용돈이라고 생각하고 받아줘요. 호호호호\\n마을로 나가서 방패랑 무기등을 사는데 조금이라도 도움이 될거예요.";
+				mes 3, "음식은 체력을 회복시켜주니 사냥에도 도움이 될거예요 호호호호~~~";
+				mes 3, "흠.. 그리고 남쪽 빨간집에 있는 시약사가 뭔가 시킬 일이 있는 것 같은데, 믿을 만한 사람을\\n찾아달라고 했거든!\\n 내가 말해놓을 테니, 가서 이런 저런 대화를 해봐요.";
+				message 3, "경험치 500, 금전 20000을 획득";
+				item_add "치즈", 10;
+				item_add "소고기스테이크", 10;
+				item_add "샌드위치", 10;
+				money_add "2000000";
+				exp_add 500;
+				set #Quest001, 3;
+				mes 4, "만약에 시약사에게 안 갈거면 꼭 시험장에 들러서 휴식 스킬을 받도록해요!";
+				end;
+			}
+			go3:
+			set @select, menu(1, "어머..생각보다 힘드나 보네요…음..무리할 필요는 없는데.. 그래도 계속 해볼래요?", "물론이지요", "아니요 그만할래요");
+			if(@select==1){
+				if(#Quest001==1){mes 4, "10마리면 그리 많지 않으니 금방 잡을 수 있을 거라우. 수고해 줘요~ 호호호";}
+				if(#Quest001==2){mes 4, "쥐도 10마리잡았으니까.. 거미도 15마리 금방잡을꺼라우~ 수고해 줘요 호호호";}
+			}else if(@select==2){
+				mes 4, "으음..그래요? 그렇다면 어쩔 수 없죠 뭐..다음에 또 들려요~";
+			}
+		}
+		end;
+	}
+	if(pet_user(@myid) == 1){
+		if(group_count(@myid, 0) >= 2){
+			pet_say @myid, "다음에 또 뵙겠습니다";
+			sleep 500;
+			pet_position @myid, 3;		
+			message 3,"그룹이 존재하면 사용하실 수 없습니다.";
+		}else{
+			if(get_mapname(@myid)=="[뮤레칸]피에트던전(1)"||get_mapname(@myid)=="[뮤레칸]피에트던전(2)"||get_mapname(@myid)=="[뮤레칸]뤼케시온던전(1)"||get_mapname(@myid)=="[뮤레칸]뤼케시온던전(2)"||get_mapname(@myid)=="[뮤레칸]밀레스던전(1)"||get_mapname(@myid)=="[뮤레칸]밀레스던전(2)"||get_mapname(@myid)=="[뮤레칸]루어스던전(1)"||get_mapname(@myid)=="[뮤레칸]루어스던전(2)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(1)"||get_mapname(@myid)=="[뮤레칸]홀리루딘던전(2)"){
+				message 3,"이 곳에선 사용이 불가능합니다.";
+				pet_say @myid, "다음에 또 뵙겠습니다";
+				sleep 500;
+				pet_position @myid, 3;
+			}
+			if(@say$ == "119"){
+				if(get_state1(@myid) == 1 && get_coma(@myid) == 1){
+					set_state1 @myid, 0;
+					set_coma @myid, 0;
+					coma_delay @myid, 0;
+					set_vita @myid, 1000;
+					del_coma @myid;
+					effect @myid, 5, 0, 75;
+				}
+			}
+			if(instr(last_say(@myid), "ㅈ")){
+				set@x1,get_xs();
+				set@y1,get_ys();
+				set@side,get_side(@myid);
+				if(@side==0){
+					set@mob,get_mobxy(@x1,(@y1)-1);set@type1,istype(@mob);
+					if(@type1==1){
+						if(!magic_exist(1,@mob,1)){
+							magic 1,@mob,"프라보",120,35,@myid;
+							effect@mob,0,257,140;
+						}
+					}
+				}if(@side==1){
+					set@mob1,get_mobxy(@x1+1,(@y1));set@type1,istype(@mob1);
+					if(@type1==1){
+						if(!magic_exist(1,@mob1,1)){
+							magic 1,@mob1,"프라보",120,35,@myid;
+							effect@mob1,0,257,140;
+						}
+					}
+				}if(@side==2){
+					set@mob2,get_mobxy(@x1,(@y1)+1);set@type1,istype(@mob2);
+					if(@type1==1){
+						if(!magic_exist(1,@mob2,1)){
+							magic 1,@mob2,"프라보",120,35,@myid;
+							effect@mob2,0,257,140;
+						}
+					}
+				}if(@side==3){
+					set@mob3,get_mobxy(@x1-1,(@y1));set@type1,istype(@mob3);
+					if(@type1==1){
+						if(!magic_exist(1,@mob3,1)){
+							magic 1,@mob3,"프라보",120,35,@myid;
+							effect@mob3,0,257,140;
+						}
+					}
+				}
+				game_sound 8,0;
+			}
+			if(@say$ == "ㅎ"){
+				set@hill,get_basevita(@myid)/100*10;
+				effect@target,71,0,75;
+				game_sound 38 ,0;
+				message 3,"Comtuter님이 홀리쿠라노를 외워주셨습니다.";
+				heal@myid,@hill;
+			}
+			if(@say$ == "ㄷㅅ"){
+				message 3,"Comtuter님이 디소루마를 시전해주셨습니다.";
+				effect @myid, 282, 0, 100;
+				mobsor_end @myid;
+				game_sound 8, 0;
+			}
+			if(@say$ == "ㄷㄴ"){
+				message 3,"Comtuter님이 디나르콜리를 시전해주셨습니다.";
+				effect @myid, 280, 0, 100;
+				mobnar_end @myid;
+				game_sound 8, 0;
+			}
+		}
+	}
+}
+
+0	__GAME_SCRIPT__	{
+	set @myid, get_myid();
+	set @game, game_get(@myid, 1);
+	set @yes, game_get(@myid, 2);
+	switch(@game){
+	case 5:
+		item_del "실지렁이", 1;
+		if(@yes == 1){
+			if(rand2(1,100) > 85){
+				message 3, "미끼만 날렸습니다.";
+			}else{
+				re:
+				set @rand, rand2(1,3);
+				if(@rand < 1 || @rand > 3){goto re;}
+				switch(@rand){
+					case 1: set @item$, "골든레드피쉬"; break;
+					case 2: set @item$, "네기피쉬"; break;
+					case 3: set @item$, "트로피칼테트라"; break;
+				}
+				item_add @item$, 1;
+				message 3, "" + @item$ + "를 잡았습니다.";
+				end;
+			}
+		}else{
+			message 3, "미끼만 날렸습니다.";
+		}
+		break;
+	}
+	end;
+}
+
+0	__ATTACK_SCRIPT__	{
+	set @myid, get_myid();
+	set @target, get_frontobj(@myid);
+	set @target2, get_front_char(@myid);
+	effect @target, 0, 268, 100;
+	effect @target2, 0, 268, 100;
+	if(get_baseexp(@myid) == -1){
+		if(#exppoint>=20){mes 3,"경험치 축적은 20회 이상 초과하실 수 없습니다. 경험치 포인트를 소모하신 후 다시 시도해주세요.";goto exp;}
+		exp_del get_baseexp(@myid);
+		set #exppoint, #exppoint+1;
+		message 3,"{=u경험치가 {=q4,294,967,295 {=u잃었습니다.";
+		message 3,"경험치가 축적되었습니다.";
+	}
+	if(get_mapname(@myid)=="아만마을"){
+		set @side, get_side(@myid);
+		if(get_xs(@myid)==21 && get_ys(@myid)==2 && @side==2){
+			Hiyat:
+			if($WestHiyate==1){sleep 300; message 3, "히야트 던전을 초기화 하고 있습니다. 대기 해주세요."; end;}
+			//if(!group_exist(@myid)){sleep 300; message 3, "히야트의 힘에 의해 밀려났다. 그룹을 모아오자"; end;}
+			//if(group_count(@myid, 0) < 2){sleep 300; message 3, "히야트의 힘에 의해 밀려났다. 그륩이 더 필요하다."; end;}
+			mob_clear "히야트던전F-1";
+			mob_clear "히야트던전F-2";
+			mob_clear "히야트던전F-3";
+			mob_clear "히야트던전F-4";
+			mob_clear "히야트던전F-5";
+			mob_clear "히야트던전F-6";
+			mob_clear "히야트던전F-7";
+			mob_clear "히야트던전F-8";
+			mob_clear "히야트던전F-9";
+			mob_clear "히야트던전F-10";
+			mob_clear "히야트던전F-11";
+			set $HiyateBoss,0;
+			set $WestHiyate, 1;
+			set $Hiyate, 0;
+			group_val "#Hiyateon", 1, 1;
+			set #Hiyateon, 1;
+			group_warp "히야트던전F-1", 30, 58;
+			mob_spawn "식인식물", 41, 50, 2;
+			mob_spawn "아만족전사", 39, 50, 2;
+			mob_spawn "아만족전사", 40, 49, 2;
+			mob_spawn "아만족궁사", 23, 46, 2;
+			mob_spawn "아만족궁사", 24, 45, 2;
+			mob_spawn "식인식물", 25, 46, 2;
+			mob_spawn "롤라", 43, 24, 2;
+			mob_spawn "아만족전사", 45, 24, 2;
+			mob_spawn "식인식물", 44, 23, 2;
+			mob_spawn "롤라", 29, 42, 2;
+			mob_spawn "아만족전사", 31, 42, 2;
+			mob_spawn "식인식물", 30, 41, 2;
+			mob_spawn "아만족궁사", 51, 28, 2;
+			mob_spawn "아만족전사", 50, 27, 2;
+			mob_spawn "아만족여전사", 49, 28, 2;
+			mob_spawn "아만족전사", 47, 11, 2;
+			mob_spawn "아만족전사", 46, 12, 2;
+			mob_spawn "아만족전사", 48, 12, 2;
+			mob_spawn "식인식물", 13, 10, 2;
+			mob_spawn "아만족궁사", 15, 10, 2;
+			mob_spawn "아만족궁사", 14, 11, 2;
+			if($HiyateBoss == 0){
+				set $HiyateBoss, 1;
+				mob_spawn4 "케라코라","히야트던전F-11",33,33,2;
+			}
+		}
+		if(get_xs(@myid)==20 && get_ys(@myid)==3 && @side==1){goto Hiyat;}
+		if(get_xs(@myid)==21 && get_ys(@myid)==4 && @side==0){goto Hiyat;}
+		if(get_xs(@myid)==22 && get_ys(@myid)==3 && @side==3){goto Hiyat;}
+	}
+	end;
+}
+
+0	__TIME_SCRIPT__	{
+	if($expevent1==0&&localtime(4)==20&&localtime(5)==0){
+		set $expevent1, 1;
+		exp_rate 2;
+		broadcast 8, "2배이벤트 시작 [1시간 00분]";
+	}
+	if($expevent1==1&&localtime(4)==21&&localtime(5)==0){
+		set $expevent1, 0;
+		exp_rate 1;
+		broadcast 8, "2배이벤트 종료";
+	}
+	if($Guildwar==0&&localtime(7)==0&&localtime(4)==21&&localtime(5)==5){
+		set $Guildwar,1;
+		broadcast 0,"수오미공식길드선발전이 시작되었습니다.";
+		set_map_bgm "수오미길드성-외각",38;
+		set_map_pk "수오미길드성-외각",1;
+		set_map_bgm "수오미길드성-내각",38;
+		set_map_pk "수오미길드성-내각",1;
+		set_map_bgm "수오미길드성-1층로비",38;
+		set_map_pk "수오미길드성-1층로비",1;
+		set_map_bgm "수오미길드성-2층로비",38;
+		set_map_pk "수오미길드성-2층로비",1;
+		set_map_bgm "수오미길드성-알현실",38;
+		set_map_pk "수오미길드성-알현실",1;
+	}
+	if($Guildwar>=1&&localtime(4)==22&&localtime(5)==5){
+		set $Guildwar,0;
+		mob_clear "수오미길드성-외각";
+		mob_clear "수오미길드성-내각";
+		mob_clear "수오미길드성-알현실";
+		set_map_bgm "수오미길드성-외각",34;
+		set_map_pk "수오미길드성-외각",0;
+		set_map_bgm "수오미길드성-내각",34;
+		set_map_pk "수오미길드성-내각",0;
+		set_map_bgm "수오미길드성-1층로비",34;
+		set_map_pk "수오미길드성-1층로비",0;
+		set_map_bgm "수오미길드성-2층로비",34;
+		set_map_pk "수오미길드성-2층로비",0;
+		set_map_bgm "수오미길드성-알현실",34;
+		set_map_pk "수오미길드성-알현실",0;
+		broadcast 0, "공성전이 끝났습니다.";
+	}
+	if(localtime(4)==0||localtime(4)==1||localtime(4)==2){
+		set $ship, 3;
+	}
+	if(localtime(4)==3||localtime(4)==4||localtime(4)==5){
+		set $ship, 6;
+	}
+	if(localtime(4)==6||localtime(4)==7){
+		set $ship, 8;
+	}
+	if(localtime(4)==8||localtime(4)==9){
+		set $ship, 10;
+	}
+	if(localtime(4)==10||localtime(4)==11){
+		set $ship, 12;
+	}
+	if(localtime(4)==12||localtime(4)==13||localtime(4)==14){
+		set $ship, 15;
+	}
+	if(localtime(4)==15||localtime(4)==16){
+		set $ship, 17;
+	}
+	if(localtime(4)==17||localtime(4)==18){
+		set $ship, 19;
+	}
+	if(localtime(4)==19||localtime(4)==20){
+		set $ship, 21;
+	}
+	if(localtime(4)==21||localtime(4)==22||localtime(4)==23){
+		set $ship, 0;
+	}
+	if($계절==1 && localtime(7)==1){
+		set $계절, 2;
+		set $계절$, "여름";
+		broadcast 5, "보호";
+	}
+	if($계절==2 && localtime(7)==3){
+		set $계절, 3;
+		set $계절$, "가을";
+		broadcast 5, "보호";
+	}
+	if($계절==3 && localtime(7)==4){
+		set $계절, 4;
+		set $계절$, "겨울";
+		broadcast 5, "보호";
+	}
+	if($계절==4 && localtime(7)==6){
+		set $계절, 1;
+		set $계절$, "봄";
+		set $년도, $년도 + 1;
+		broadcast 5, "보호";
+	}
+}
+
+0	__COMA_END__	{
+	set @myid, get_myid();
+	set #coma, 0;
+	message 3, "끝";
+	call_func @myid, "__SCRIPT_DEAD2__";
+}
+
+0	Dungeon__Script	{
+	set @myid, get_myid();
+	if(get_map_stage(@myid)==1){
+
+	}
+}

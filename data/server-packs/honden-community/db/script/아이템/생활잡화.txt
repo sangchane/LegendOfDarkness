@@ -1,0 +1,520 @@
+0,0,0,0,0,0,0	세오의깃털	{
+	set@myid,get_myid();
+	if(get_mapname(@myid) == "감옥"){end;}
+	if(get_mapname(@myid)=="알세이드스-화론마을"){
+		if(get_xs(@myid)>= 8 && get_ys(@myid)<= 90 && get_xs(@myid)<= 89 && get_ys(@myid)>= 9){
+			if(get_xs(@myid)>= 15 && get_xs(@myid)<= 81 && get_ys(@myid)<= 82 && get_ys(@myid)>= 16){goto sw1;}
+		end;
+		}
+	}
+	if(get_mapname(@myid)=="물의신전1"||get_mapname(@myid)=="밀레스대련장"||get_mapname(@myid)=="불의사막1"||get_mapname(@myid)=="불의사막2"||#GostHouse==1){message 3,"이 곳에선 사용이 불가능합니다.";end;}
+	sw:
+ 	set@side,get_side(@myid);
+	if(!get_gm(@myid)){
+		set@time,1-(time()-#teleport);
+		if(time()-#teleport<1){end;}
+		set#teleport,time();
+	}
+	if(@side==0){
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-1)||get_mobxy(get_xs(@myid),get_ys(@myid)-1)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-1)){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-2)||get_mobxy(get_xs(@myid),get_ys(@myid)-2)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-2)){set_ys(get_ys(@myid)-1);effect2 get_xs(myid),get_ys(myid)+1,9,60;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-3)||get_mobxy(get_xs(@myid),get_ys(@myid)-3)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-3)){set_ys(get_ys(@myid)-2);effect2 get_xs(myid),get_ys(myid)+1,9,60;effect2 get_xs(myid),get_ys(myid)+2,9,54;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-4)||get_mobxy(get_xs(@myid),get_ys(@myid)-4)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-4)){set_ys(get_ys(@myid)-3);effect2 get_xs(myid),get_ys(myid)+1,9,60;effect2 get_xs(myid),get_ys(myid)+2,9,54;effect2 get_xs(myid),get_ys(myid)+3,9,45;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-5)||get_mobxy(get_xs(@myid),get_ys(@myid)-5)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-5)){set_ys(get_ys(@myid)-4);effect2 get_xs(myid),get_ys(myid)+1,9,60;effect2 get_xs(myid),get_ys(myid)+2,9,54;effect2 get_xs(myid),get_ys(myid)+3,9,45;effect2 get_xs(myid),get_ys(myid)+4,9,13;goto go;}
+		set_ys(get_ys(@myid)-5);
+		effect2 get_xs(myid),get_ys(myid)+1,9,80;effect2 get_xs(myid),get_ys(myid)+2,9,74;effect2 get_xs(myid),get_ys(myid)+3,9,65;effect2 get_xs(myid),get_ys(myid)+4,9,55;effect2 get_xs(myid),get_ys(myid)+5,9,48;
+	}
+	if(@side==1){
+		if(get_xy_block(@myid,get_xs(@myid)+1,get_ys(@myid))||get_mobxy(get_xs(@myid)+1,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+1,get_ys(@myid))){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)+2,get_ys(@myid))||get_mobxy(get_xs(@myid)+2,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+2,get_ys(@myid))){set_xs(get_xs(@myid)+1);effect2 get_xs(myid)-1,get_ys(myid),9,60;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)+3,get_ys(@myid))||get_mobxy(get_xs(@myid)+3,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+3,get_ys(@myid))){set_xs(get_xs(@myid)+2);effect2 get_xs(myid)-1,get_ys(myid),9,60;effect2 get_xs(myid)-2,get_ys(myid),9,54;goto go;}	
+		if(get_xy_block(@myid,get_xs(@myid)+4,get_ys(@myid))||get_mobxy(get_xs(@myid)+4,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+4,get_ys(@myid))){set_xs(get_xs(@myid)+3);effect2 get_xs(myid)-1,get_ys(myid),9,60;effect2 get_xs(myid)-2,get_ys(myid),9,54;effect2 get_xs(myid)- 3,get_ys(myid),9,45;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)+5,get_ys(@myid))||get_mobxy(get_xs(@myid)+5,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)+5,get_ys(@myid))){set_xs(get_xs(@myid)+4);effect2 get_xs(myid)-1,get_ys(myid),9,60;effect2 get_xs(myid)-2,get_ys(myid),9,54;effect2 get_xs(myid)- 3,get_ys(myid),9,45;effect2 get_xs(myid)-4,get_ys(myid),9,35;goto go;}
+		set_xs(get_xs(@myid)+5);
+		effect2 get_xs(myid)- 1,get_ys(myid),9,80;effect2 get_xs(myid)- 2,get_ys(myid),9,74;effect2 get_xs(myid)- 3,get_ys(myid),9,65;effect2 get_xs(myid)- 4,get_ys(myid),9,55;effect2 get_xs(myid)- 5,get_ys(myid),9,48;
+	}
+	if(@side==2){
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+1)||get_mobxy(get_xs(@myid),get_ys(@myid)+1)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+1)){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+2)||get_mobxy(get_xs(@myid),get_ys(@myid)+2)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+2)){set_ys(get_ys(@myid)+1);effect2 get_xs(myid),get_ys(myid)-1,9,60;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+3)||get_mobxy(get_xs(@myid),get_ys(@myid)+3)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+3)){set_ys(get_ys(@myid)+2);effect2 get_xs(myid),get_ys(myid)-1,9,60;effect2 get_xs(myid),get_ys(myid)-2,9,54;goto go;}	
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+4)||get_mobxy(get_xs(@myid),get_ys(@myid)+4)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+4)){set_ys(get_ys(@myid)+3);effect2 get_xs(myid),get_ys(myid)-1,9,60;effect2 get_xs(myid),get_ys(myid)-2,9,54;effect2 get_xs(myid),get_ys(myid)- 3,9,45;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+5)||get_mobxy(get_xs(@myid),get_ys(@myid)+5)||get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+5)){set_ys(get_ys(@myid)+4);effect2 get_xs(myid),get_ys(myid)-1,9,60;effect2 get_xs(myid),get_ys(myid)-2,9,54;effect2 get_xs(myid),get_ys(myid)- 3,9,45;effect2 get_xs(myid),get_ys(myid)-4,9,35;goto go;}
+		set_ys(get_ys(@myid)+5);
+		effect2 get_xs(myid),get_ys(myid)- 1,9,80;effect2 get_xs(myid),get_ys(myid)- 2,9,74;effect2 get_xs(myid),get_ys(myid)- 3,9,65;effect2 get_xs(myid),get_ys(myid)- 4,9,55;effect2 get_xs(myid),get_ys(myid)- 5,9,48;
+	}
+	if(@side==3){
+		if(get_xy_block(@myid,get_xs(@myid)-1,get_ys(@myid))||get_mobxy(get_xs(@myid)-1,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-1,get_ys(@myid))){goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)-2,get_ys(@myid))||get_mobxy(get_xs(@myid)-2,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-2,get_ys(@myid))){set_xs(get_xs(@myid)-1);effect2 get_xs(myid)+1,get_ys(myid),9,60;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)-3,get_ys(@myid))||get_mobxy(get_xs(@myid)-3,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-3,get_ys(@myid))){set_xs(get_xs(@myid)-2);effect2 get_xs(myid)+1,get_ys(myid),9,60;effect2 get_xs(myid)+2,get_ys(myid),9,54;goto go;}	
+		if(get_xy_block(@myid,get_xs(@myid)-4,get_ys(@myid))||get_mobxy(get_xs(@myid)-4,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-4,get_ys(@myid))){set_xs(get_xs(@myid)-3);effect2 get_xs(myid)+1,get_ys(myid),9,60;effect2 get_xs(myid)+2,get_ys(myid),9,54;effect2 get_xs(myid)+ 3,get_ys(myid),9,45;goto go;}
+		if(get_xy_block(@myid,get_xs(@myid)-5,get_ys(@myid))||get_mobxy(get_xs(@myid)-5,get_ys(@myid))||get_char_serial(@myid,get_xs(@myid)-5,get_ys(@myid))){set_xs(get_xs(@myid)-4);effect2 get_xs(myid)+1,get_ys(myid),9,60;effect2 get_xs(myid)+2,get_ys(myid),9,54;effect2 get_xs(myid)+ 3,get_ys(myid),9,45;effect2 get_xs(myid)+4,get_ys(myid),9,35;goto go;}
+		set_xs(get_xs(@myid)-5);
+		effect2 get_xs(myid)+ 1,get_ys(myid),9,80;effect2 get_xs(myid)+ 2,get_ys(myid),9,74;effect2 get_xs(myid)+ 3,get_ys(myid),9,65;effect2 get_xs(myid)+ 4,get_ys(myid),9,55;effect2 get_xs(myid)+ 5,get_ys(myid),9,48;
+	}
+	go:
+	save_user @myid;
+	if(!get_gm(@myid)){
+		un_hide @myid;
+	}
+	del@side;
+	end;
+}
+
+Item	텔리포트의깃털	{
+	set@myid,get_myid();
+	if(get_mapname(@myid) == "히야트던전F-1"||get_mapname(@myid) == "히야트던전F-2"||get_mapname(@myid) == "히야트던전F-3"||get_mapname(@myid) == "히야트던전F-4"||get_mapname(@myid) == "히야트던전F-6"||get_mapname(@myid) == "히야트던전F-8"||get_mapname(@myid) == "히야트던전F-9"||get_mapname(@myid) == "히야트던전F-10"){
+		set@time,time() - #hiyatwarp;
+		if(@time<5){
+			set@time2,5 -@time;message 3,@time2+" 초후에 쓸 수 있습니다";
+			end;
+		}
+		if(#guide==1){
+			set #hiyatwarp,time();
+			if(get_mapname(@myid) == "히야트던전F-1"){
+				set_side 3;
+				warp "히야트던전F-1",2,4;
+				effect2 get_xs(@myid)+4, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+3, get_ys(@myid), 92, 15;
+				effect2 get_xs(@myid)+2, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+1, get_ys(@myid), 92, 15;
+				game_sound 67,0;
+				end;
+			}
+			if(get_mapname(@myid) == "히야트던전F-2"){
+				set_side 3;
+				warp "히야트던전F-2",3,46;
+				effect2 get_xs(@myid)+4, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+3, get_ys(@myid), 92, 15;
+				effect2 get_xs(@myid)+2, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+1, get_ys(@myid), 92, 15;
+				game_sound 67,0;
+				end;
+			}
+			if(get_mapname(@myid) == "히야트던전F-3"){
+				set_side 3;
+				warp "히야트던전F-3",2,56;
+				effect2 get_xs(@myid)+4, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+3, get_ys(@myid), 92, 15;
+				effect2 get_xs(@myid)+2, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+1, get_ys(@myid), 92, 15;
+				game_sound 67,0;
+				end;
+			}
+			if(get_mapname(@myid) == "히야트던전F-4"){
+				set_side 3;
+				warp "히야트던전F-4",2,55;
+				effect2 get_xs(@myid)+4, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+3, get_ys(@myid), 92, 15;
+				effect2 get_xs(@myid)+2, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+1, get_ys(@myid), 92, 15;
+				game_sound 67,0;
+				end;
+			}
+			if(get_mapname(@myid) == "히야트던전F-6"){
+				if($HiyateBoss==2){
+					set_side 2;
+					warp "히야트던전F-6",28,57;
+					effect2 get_xs(@myid), get_ys(@myid)-1, 92, 10;
+					effect2 get_xs(@myid), get_ys(@myid)-2, 92, 15;
+					effect2 get_xs(@myid), get_ys(@myid)-3, 92, 10;
+					effect2 get_xs(@myid), get_ys(@myid)-4, 92, 15;
+				}else{
+					set_side 0;
+					warp "히야트던전F-6",15,2;
+					effect2 get_xs(@myid), get_ys(@myid)+1, 92, 10;
+					effect2 get_xs(@myid), get_ys(@myid)+2, 92, 15;
+					effect2 get_xs(@myid), get_ys(@myid)+3, 92, 10;
+					effect2 get_xs(@myid), get_ys(@myid)+4, 92, 15;
+				}
+				game_sound 67,0;
+				end;
+			}
+			if(get_mapname(@myid) == "히야트던전F-8"){
+				set_side 3;
+				warp "히야트던전F-8",2,10;
+				effect2 get_xs(@myid)+4, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+3, get_ys(@myid), 92, 15;
+				effect2 get_xs(@myid)+2, get_ys(@myid), 92, 10;
+				effect2 get_xs(@myid)+1, get_ys(@myid), 92, 15;
+				game_sound 67,0;
+				end;
+			}
+			if(get_mapname(@myid) == "히야트던전F-9"){
+				set_side 2;
+				warp "히야트던전F-9",16,56;
+				effect2 get_xs(@myid), get_ys(@myid)-4, 92, 10;
+				effect2 get_xs(@myid), get_ys(@myid)-3, 92, 15;
+				effect2 get_xs(@myid), get_ys(@myid)-2, 92, 10;
+				effect2 get_xs(@myid), get_ys(@myid)-1, 92, 15;
+				game_sound 67,0;
+				end;
+			}
+			if(get_mapname(@myid) == "히야트던전F-10"){
+				set_side 2;
+				warp "히야트던전F-10",32,57;
+				effect2 get_xs(@myid), get_ys(@myid)-4, 92, 10;
+				effect2 get_xs(@myid), get_ys(@myid)-3, 92, 15;
+				effect2 get_xs(@myid), get_ys(@myid)-2, 92, 10;
+				effect2 get_xs(@myid), get_ys(@myid)-1, 92, 15;
+				game_sound 67,0;
+				end;
+			}
+		}
+	}
+	if(get_mapname(@myid)=="알세이드스-화론마을"){
+		if(get_xs(@myid)>= 8 && get_ys(@myid)<= 90 && get_xs(@myid)<= 89 && get_ys(@myid)>= 9){
+			if(get_xs(@myid)>= 15 && get_xs(@myid)<= 81 && get_ys(@myid)<= 82 && get_ys(@myid)>= 16){goto tw1;}
+		end;
+		}
+	}
+	tw1:
+	teleport @myid,7;
+	end;
+}
+
+item	가방열쇠	{
+	set@myid,get_myid();
+	if(bag_slot_get(@myid)==5){
+		bag_slot_set@myid,10;
+		message 3,"가방슬롯이 성공적으로 확장되었습니다.(30칸->60칸)";
+	}
+	if(bag_slot_get(@myid)==1){
+		bag_slot_set@myid,5;
+		message 3,"가방슬롯이 성공적으로 확장되었습니다.(6칸->30칸)";
+	}
+	item_del"가방열쇠",1;
+}
+
+item	낚시입문서	{
+	set@myid,get_myid();
+	mes 1,"---낚시입문서---\\n지은이: 피셔";
+	mes 1,"낚시스킬을 배우셨습니까? 그럼 이제부터 당신은 낚시를 즐기실 수 있습니다.\\n마을과 해안등의 물가에서 낚시를 즐겨보세요.";
+	mes 1,"준비물:낚시대,실지렁이\\n 낚시대와 미끼는 {=c마을 잡화상점{=a에서 구입하실 수 있습니다. 준비물을 챙기신 후 낚시대를 착용하고\\n낚시터로 떠나볼까요?";
+	mes 1,"낚시대를 착용하시고 낚시스킬을 사용하시면 낚시전용 창이 뜹니다.\\n{=c스페이스바{=a를 눌러 낚시바늘을 원하는 위치까지 내린 후,물고기가 걸릴때 까지 기다려주세요.\\n물고기가 걸렸다면 좌우로 움직이는 바가 보여집니다.";
+	mes 1,"검은색으로 보여지는 칸에 좌우로 움직이는 붉은색 바를 멈추시면 됩니다. 하지만 낚시가\\n미숙하다면 낚아올리는 도중 물고기가 도망가거나,잡을 줄 알았는데 빈 낚시바늘뿐이라거나 하는\\n일이 많이 있을 것입니다.";
+	mes 1,"당신이 가지고 있는 낚시레벨을 올려 좀더 다양한 물고기를 낚고 싶으시다면,저 {=c피셔{=a를\\n찾아주세요. 저는 {=c서뤼케시온 여관{=a에서 여러분들을 기다리고 있습니다.";
+	mes 0,"단 낚시레벨을 올려드리는 퀘스트는  스킬레벨을 100까지 올리신 분들만 대상으로 하고 있습니다.\\n언제나 여러분들을 기다리고 있겠습니다.\\n낚시는 끈기와 기다림으로 완성되는 기술이라는 것을 잊지 마세요.\\n피셔---------";
+	}
+}
+
+item	길드초대장	{
+	set@myid,get_myid();
+	set@guilditemmenu,menu(0,"{=g" + get_guild_master(@myid)+"님으로부터 길드초대장이 도착했습니다. 초대에 응하시겠습니까?","수락","거절");
+	if(@guilditemmenu==1){
+		if(get_guild_state(@myid)!= 0){ item_del"길드초대장",1;mes 1,"당신은 이미 길드가있습니다.";end;}
+		if(!get_user(get_guild_master(@myid))){message 3,"길드의 길드마스터가 접속중이 아닙니다.";item_del"길드초대장",1;end;}
+		set_guild_state @myid,1;
+		set_guild_title @myid,get_guild_title(get_user(get_guild_master(@myid)));
+		message1 @myid,3,"{=g" + get_guild_title(@myid)+"길드에 가입했습니다.";
+		if(!get_user(get_guild_master(@myid))){item_del"길드초대장",1;end;}
+		message1 get_user(get_guild_master(@myid)),3,"{=g" + get_name1(@myid)+"님께서 초대를 수락하셨습니다.";
+		item_del"길드초대장",1;
+		end;
+	}else if(@guilditemmenu==2){
+ 		item_del"길드초대장",1;
+		end;
+	}
+}
+
+item	신병더블백	{
+	set@myid,get_myid();
+	set@select,menu(0,"더블백을 열어 초보자용품을 소지창으로 꺼내오시겠습니까?\\n{=c[※인벤토리창을 4개이상 비우지 않으면 아이템을 떨어뜨리거나 못받을수있습니다.]","예","아니오");
+	if(@select==1){
+		item_add_term @myid,"초보자브로치", 1, 604800;
+		item_add"텔리포트의깃털",1;
+		item_add"세오의깃털",1;
+		item_add_term @myid,"마법의리콜", 1, 8640000;
+		item_del"신병더블백",1;
+	}
+	end;
+}
+
+item	신규지원백	{
+	set@myid,get_myid();
+	set@select,menu(0,"신규지원백을 열어 초보자장비를 소지창으로 꺼내오시겠습니까?\\n{=c[※인벤토리창을 7개이상 비우지 않으면 아이템을 떨어뜨리거나 못받을수있습니다.]","예","아니오");
+	if(@select==1){
+		set@select2,menu(0,"받으실 아이템을 선택해주세요.","전사흑갑+퀸셰+듀얼목+루딘블레이드+흑요석","도적흑갑+퀸셰+듀얼목+루딘블레이드]+흑요석","마법사흑갑+퀸셰+듀얼목+루딘블레이드+흑요석","성직자흑갑+퀸셰+듀얼목+루딘블레이드+흑요석","무도가흑갑+퀸셰+듀얼목+루딘블레이드+흑요석");
+		if(@select2==1){
+			if(get_sex(@myid)==1){
+				item_add_term @myid,"[10일]흑비화무갑주(남)", 1, 864000;
+				item_add_term @myid,"[10일]흑비화무투구(남)", 1, 864000;
+				item_add_term @myid,"흑요석워리어장갑", 1, 864000;
+				item_add_term @myid,"흑요석워리어장갑", 1, 864000;
+				item_add_term @myid,"흑요석워리어반지", 1, 864000;
+				item_add_term @myid,"흑요석워리어반지", 1, 864000;
+				item_add_term @myid,"흑요석워리어각반", 1, 864000;
+			}else{
+				item_add_term @myid,"[10일]흑비화무갑주(여)", 1, 864000;
+				item_add_term @myid,"[10일]흑비화무투구(여)", 1, 864000;
+				item_add_term @myid,"흑요석워리어장갑", 1, 864000;
+				item_add_term @myid,"흑요석워리어장갑", 1, 864000;
+				item_add_term @myid,"흑요석워리어반지", 1, 864000;
+				item_add_term @myid,"흑요석워리어반지", 1, 864000;
+				item_add_term @myid,"흑요석워리어각반", 1, 864000;
+			}
+			goto go1;
+		}else if(@select2==2){
+			if(get_sex(@myid)==1){
+				item_add_term @myid,"[10일]흑비현진의(남)", 1, 864000;
+				item_add_term @myid,"[10일]흑비현진건(남)", 1, 864000;
+				item_add_term @myid,"흑요석로그장갑", 1, 864000;
+				item_add_term @myid,"흑요석로그장갑", 1, 864000;
+				item_add_term @myid,"흑요석로그반지", 1, 864000;
+				item_add_term @myid,"흑요석로그반지", 1, 864000;
+				item_add_term @myid,"흑요석로그각반", 1, 864000;
+			}else{
+				item_add_term @myid,"[10일]흑비현진의(여)", 1, 864000;
+				item_add_term @myid,"[10일]흑비현진건(여)", 1, 864000;
+				item_add_term @myid,"흑요석로그장갑", 1, 864000;
+				item_add_term @myid,"흑요석로그장갑", 1, 864000;
+				item_add_term @myid,"흑요석로그반지", 1, 864000;
+				item_add_term @myid,"흑요석로그반지", 1, 864000;
+				item_add_term @myid,"흑요석로그각반", 1, 864000;
+			}
+			goto go1;
+		}else if(@select2==3){
+			if(get_sex(@myid)==1){
+				item_add_term @myid,"[10일]흑비화후의(남)", 1, 864000;
+				item_add_term @myid,"[10일]흑비화후관(남)", 1, 864000;
+				item_add_term @myid,"흑요석소서러장갑", 1, 864000;
+				item_add_term @myid,"흑요석소서러장갑", 1, 864000;
+				item_add_term @myid,"흑요석소서러반지", 1, 864000;
+				item_add_term @myid,"흑요석소서러반지", 1, 864000;
+				item_add_term @myid,"흑요석소서러각반", 1, 864000;
+			}else{
+				item_add_term @myid,"[10일]흑비화후의(여)", 1, 864000;
+				item_add_term @myid,"[10일]흑비화후관(여)", 1, 864000;
+				item_add_term @myid,"흑요석소서러장갑", 1, 864000;
+				item_add_term @myid,"흑요석소서러장갑", 1, 864000;
+				item_add_term @myid,"흑요석소서러반지", 1, 864000;
+				item_add_term @myid,"흑요석소서러반지", 1, 864000;
+				item_add_term @myid,"흑요석소서러각반", 1, 864000;
+			}
+			goto go1;
+		}else if(@select2==4){
+			if(get_sex(@myid)==1){
+				item_add_term @myid,"[10일]흑비류선의(남)", 1, 864000;
+				item_add_term @myid,"[10일]흑비류선후(남)", 1, 864000;
+				item_add_term @myid,"흑요석프리스트장갑", 1, 864000;
+				item_add_term @myid,"흑요석프리스트장갑", 1, 864000;
+				item_add_term @myid,"흑요석프리스트반지", 1, 864000;
+				item_add_term @myid,"흑요석프리스트반지", 1, 864000;
+				item_add_term @myid,"흑요석프리스트각반", 1, 864000;
+			}else{
+				item_add_term @myid,"[10일]흑비류선의(여)", 1, 864000;
+				item_add_term @myid,"[10일]흑비류선후(여)", 1, 864000;
+				item_add_term @myid,"흑요석프리스트장갑", 1, 864000;
+				item_add_term @myid,"흑요석프리스트장갑", 1, 864000;
+				item_add_term @myid,"흑요석프리스트반지", 1, 864000;
+				item_add_term @myid,"흑요석프리스트반지", 1, 864000;
+				item_add_term @myid,"흑요석프리스트각반", 1, 864000;
+			}
+			goto go1;
+		}else if(@select2==5){
+			if(get_sex(@myid)==1){
+				item_add_term @myid,"[10일]흑태극의(남)", 1, 864000;
+				item_add_term @myid,"[10일]흑태극현(남)", 1, 864000;
+				item_add_term @myid,"흑요석몽크장갑", 1, 864000;
+				item_add_term @myid,"흑요석몽크장갑", 1, 864000;
+				item_add_term @myid,"흑요석몽크반지", 1, 864000;
+				item_add_term @myid,"흑요석몽크반지", 1, 864000;
+				item_add_term @myid,"흑요석몽크각반", 1, 864000;
+			}else{
+				item_add_term @myid,"[10일]흑태극의(여)", 1, 864000;
+				item_add_term @myid,"[10일]흑태극현(여)", 1, 864000;
+				item_add_term @myid,"흑요석몽크장갑", 1, 864000;
+				item_add_term @myid,"흑요석몽크장갑", 1, 864000;
+				item_add_term @myid,"흑요석몽크반지", 1, 864000;
+				item_add_term @myid,"흑요석몽크반지", 1, 864000;
+				item_add_term @myid,"흑요석몽크각반", 1, 864000;
+			}
+			goto go1;
+		}
+	}
+	end;
+	go1:
+		item_add_term @myid,"[11일]퀸셰어의귀걸이", 1, 950400;
+		item_add_term @myid,"[10일]암흑의목걸이", 1, 864000;
+		item_add_term @myid,"[10일]생명의목걸이", 1, 864000;
+		item_add_term @myid,"[10일]암흑의벨트", 1, 864000;
+		item_add_term @myid,"[10일]생명의벨트", 1, 864000;
+		item_add_term @myid,"[10일]루딘블레이드", 1, 864000;
+		item_add "세오의가호(SLev1)",10;
+                            item_add "크리스마스가호(lev1)",5;
+                            item_add "리턴스피릿",77;
+                            item_add "악세사리무지개상자",1;
+                            item_add "라이온방패",1;  
+		item_del "신규지원백",1;
+	end;
+}
+
+item	럭셔리프린스박스	{
+	set@myid,get_myid();
+	item_del"럭셔리프린스박스",1;
+	item_add"프린스더블렛",1;
+	item_add"프린스깃털바이콘",1;
+	end;
+}
+
+item	럭셔리프린세스박스	{
+	set@myid,get_myid();
+	item_del"럭셔리프린세스박스",1;
+	item_add"프린세스드레스",1;
+	item_add"프린세스깃털보닛",1;
+	end;
+}
+
+item	리턴스피릿	{
+	set@myid,get_myid();
+	set@return,menu(0,"{=c리턴스피릿 사용시 자신이 죽은곳으로 바로 이동됩니다. 리턴스피릿을 사용하시겠습니까?","예","아니오");
+	if(@return==1){
+		if(#returnc==0){mes 0,"기억하지 못했습니다.";}
+		item_del"리턴스피릿",1;
+		warp@returnname$,#returnx,#returny;
+		set#returnc,0;
+		mes 0,"이동되었습니다.";
+	}
+	end;
+}
+
+item	퀸셰어의상자	{
+	set@myid,get_myid();
+	item_del"퀸셰어의상자",1;
+	item_add"[2일]퀸셰어의귀걸이",1;
+	item_add"500게임포인트쿠폰",1;
+	end;
+}
+
+0,0,0,0,0,0,0	테슬러의깃털	{
+	set @myid, get_myid(@myid);
+ 	if(get_name(@myid) == "리치"){
+		set @side, get_side(@myid);
+		for(set @i, 1; @i <= 5; set @i, @i +1){
+			if(@side == 0){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_ys(get_ys(@myid)-1);
+				effect @target, 184, 0, 30;
+			}
+			if(@side == 1){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_xs(get_xs(@myid)+1);
+				effect @target, 184, 0, 30;
+			}
+			if(@side == 2){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_ys(get_ys(@myid)+1);
+				effect @target, 184, 0, 30;
+			}
+			if(@side == 3){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_xs(get_xs(@myid)-1);
+				effect @target, 184, 0, 30;
+			}
+		}
+		end;
+	}
+	if(get_mapname(@myid) == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(get_map_pk()){message 3, "사용이불가능합니다."; end;}
+ 	set @side, get_side(@myid);
+	for(set @i, 1; @i <= 5; set @i, @i +1){
+		if(@side == 0){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_ys(get_ys(@myid)-1);
+			effect @target, 184, 0, 30;
+		}
+		if(@side == 1){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_xs(get_xs(@myid)+1);
+			effect @target, 184, 0, 30;
+		}
+		if(@side == 2){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_ys(get_ys(@myid)+1);
+			effect @target, 184, 0, 30;
+		}
+		if(@side == 3){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_xs(get_xs(@myid)-1);
+			effect @target, 184, 0, 30;
+		}
+	}
+	del @myid;
+	del @side;
+	del @xs;
+	del @ys;
+}
+
+0,0,0,0,0,0,0	랜박	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @int, 0;
+	set @val, menu("자 한번 흔들어봅시다!", "이아를 처치하셨군요 동쪽대륙의정복자님!! 보상리스트는 [이아의반지] ,[이아블레이드] ,[향상된세오의깃털] ,[동쪽대륙정복자의귀걸이] 입니다 . 꽝도있으니 행운을빕니다 ","개봉한다.");
+	if(@val == 1){
+		RE:
+		set @int, rand(1,13);
+		if(@int < 1 || @int > 13){goto RE;}
+		if(@int == 1){item_del "이아의상자",1; mes 1, "꽝"; end;}
+		if(@int == 2){item_add "이아의반지",1; item_del "이아의상자",1; mes 1, "이아의반지 당첨!!!!"; end;}
+		if(@int == 3){item_del "이아의상자",1; mes 1, "꽝"; end;}
+		if(@int == 4){item_del "이아의상자",1; mes 1, "꽝"; end;}
+		if(@int == 5){item_add "이아블레이드",1; item_del "이아의상자",1; mes 1, "이아블레이드 당첨!!!!"; end;}
+		if(@int == 6){item_add "향상된세오의깃털",1; item_del "이아의상자",1; mes 1, "향상된세오의깃털 당첨!!!!"; end;}
+		if(@int == 7){item_del "이아의상자",1; mes 1, "꽝"; end;}
+		if(@int == 8){item_del "이아의상자",1; mes 1, "꽝"; end;}
+		if(@int == 9){item_del "이아의상자",1; mes 1, "꽝"; end;}
+		if(@int == 10){item_del "이아의상자",1; mes 1, "꽝"; end;}
+                         if(@int == 11){item_del "이아의상자",1; mes 1, "꽝"; end;}
+                         if(@int == 12){item_del "이아의상자",1; mes 1, "꽝"; end;}
+                         if(@int == 13){item_add "동쪽대륙정복자의귀걸이",1; item_del "이아의상자",1; mes 1, "동쪽대륙정복자의귀걸이 당첨!!!!"; end;}
+	}
+}
+
+0,0,0,0,0,0,0	차원의틈클리어보상상자	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @int, 0;
+	set @val, menu("자 한번 흔들어봅시다!", "차원의틈을 클리어하셨군요! 보상리스트는 [차원의투구] ,[차원의각반] ,[차원의방패] 입니다 . 꽝도있으니 행운을빕니다 ","개봉한다.");
+	if(@val == 1){
+		RE:
+		set @int, rand(1,13);
+		if(@int < 1 || @int > 13){goto RE;}
+		if(@int == 1){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+		if(@int == 2){item_add "차원의투구",1; item_del "차원의틈클리어보상상자",1; mes 1, "차원의투구 당첨!!!!"; end;}
+		if(@int == 3){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+		if(@int == 4){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+		if(@int == 5){item_add "차원의각반",1; item_del "차원의틈클리어보상상자",1; mes 1, "차원의각반 당첨!!!!"; end;}
+		if(@int == 6){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+		if(@int == 7){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+		if(@int == 8){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+		if(@int == 9){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+		if(@int == 10){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+                         if(@int == 11){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+                         if(@int == 12){item_del "차원의틈클리어보상상자",1; mes 1, "꽝"; end;}
+                         if(@int == 13){item_add "차원의방패",1; item_del "차원의틈클리어보상상자",1; mes 1, "차원의방패 당첨!!!!"; end;}
+	}
+}
+
+0,0,0,0,0,0,0	아캐른의유물함	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @int, 0;
+	set @val, menu("자 한번 흔들어봅시다!", "아캐른의유물함  ","개봉한다.");
+	if(@val == 1){
+		RE:
+		set @int, rand(1,5);
+		if(@int < 1 || @int > 5){goto RE;}
+		if(@int == 1){item_add "크리샤오르",1; item_del "아캐른의유물함",1; mes 1, "크리샤오르 당첨!!!!"; end;}
+		if(@int == 2){item_add "다크디아나",1; item_del "아캐른의유물함",1; mes 1, "다크디아나 당첨!!!!"; end;}
+		if(@int == 3){item_add "미스릴배틀핸드",1; item_del "아캐른의유물함",1; mes 1, "미스릴배틀핸드 당첨!!!!"; end;}
+		if(@int == 4){item_add "홀리디아나",1; item_del "아캐른의유물함",1; mes 1, "홀리디아나 당첨!!!!"; end;}
+		if(@int == 5){item_add "앵거바딜",1; item_del "아캐른의유물함",1; mes 1, "앵거바딜 당첨!!!!"; end;}
+	}
+}

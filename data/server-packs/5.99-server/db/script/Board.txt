@@ -1,0 +1,975 @@
+0,0,0,0,0,0,0	Board	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("어느 게시판을 고르시겠습니까? \\n(채팅창에 @게시판으로도 입장가능)", "1서클 게시판", "2서클 게시판", "3서클 게시판", "4서클 게시판", "지존 게시판", "승급 게시판", "2차전직 게시판", "거래 게시판", "자유 게시판");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		call_func @myid, "Board1";
+	}
+	if(@select == 2){
+		call_func @myid, "Board2";
+	}
+	if(@select == 3){
+		call_func @myid, "Board3";
+	}
+	if(@select == 4){
+		call_func @myid, "Board4";
+	}
+	if(@select == 5){
+		call_func @myid, "Board5";
+	}
+	if(@select == 6){
+		call_func @myid, "Board6";
+	}
+	if(@select == 7){
+		call_func @myid, "Board7";
+	}
+	if(@select == 8){
+		call_func @myid, "Board8";
+	}
+	if(@select == 9){
+		call_func @myid, "Board9";
+	}
+}
+
+0,0,0,0,0,0,0	Board1	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("1서클 게시판 입니다.", $board1title1$, $board1title2$, $board1title3$, $board1title4$, $board1title5$, $board1title6$, $board1title7$, $board1title8$, $board1title9$, $board1title10$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board1title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board1title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board1title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board1title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board1title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board1title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board1title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board1title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board1title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board1title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board1sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if(get_level(@myid) > 21){mes 1, "1서클만 작성할수 있습니다."; goto re;}
+		input @board1title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board1sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board1title10$, $board1title9$;
+			set $board1sub10$, $board1sub9$;
+			set $board1title9$, $board1title8$;
+			set $board1sub9$, $board1sub8$;
+			set $board1title8$, $board1title7$;
+			set $board1sub8$, $board1sub7$;
+			set $board1title7$, $board1title6$;
+			set $board1sub7$, $board1sub6$;
+			set $board1title6$, $board1title5$;
+			set $board1sub6$, $board1sub5$;
+			set $board1title5$, $board1title4$;
+			set $board1sub5$, $board1sub4$;
+			set $board1title4$, $board1title3$;
+			set $board1sub4$, $board1sub3$;
+			set $board1title3$, $board1title2$;
+			set $board1sub3$, $board1sub2$;
+			set $board1title2$, $board1title1$;
+			set $board1sub2$, $board1sub1$;
+			set $board1title1$, @board1title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board1sub1$, @board1sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 12){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board2	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("2서클 게시판 입니다.", $board2title1$, $board2title2$, $board2title3$, $board2title4$, $board2title5$, $board2title6$, $board2title7$, $board2title8$, $board2title9$, $board2title10$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board2title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board2title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board2title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board2title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board2title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board2title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board2title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board2title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board2title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board2title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board2sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if(get_level(@myid) < 21 || get_level(@myid) > 51){mes 1, "2서클만 작성할수 있습니다."; goto re;}
+		input @board2title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board2sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board2title10$, $board2title9$;
+			set $board2sub10$, $board2sub9$;
+			set $board2title9$, $board2title8$;
+			set $board2sub9$, $board2sub8$;
+			set $board2title8$, $board2title7$;
+			set $board2sub8$, $board2sub7$;
+			set $board2title7$, $board2title6$;
+			set $board2sub7$, $board2sub6$;
+			set $board2title6$, $board2title5$;
+			set $board2sub6$, $board2sub5$;
+			set $board2title5$, $board2title4$;
+			set $board2sub5$, $board2sub4$;
+			set $board2title4$, $board2title3$;
+			set $board2sub4$, $board2sub3$;
+			set $board2title3$, $board2title2$;
+			set $board2sub3$, $board2sub2$;
+			set $board2title2$, $board2title1$;
+			set $board2sub2$, $board2sub1$;
+			set $board2title1$, @board2title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board2sub1$, @board2sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 12){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board3	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("3서클 게시판 입니다.", $board3title1$, $board3title2$, $board3title3$, $board3title4$, $board3title5$, $board3title6$, $board3title7$, $board3title8$, $board3title9$, $board3title10$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board3title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board3title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board3title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board3title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board3title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board3title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board3title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board3title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board3title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board3title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board3sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if(get_level(@myid) < 51 || get_level(@myid) > 81){mes 1, "3서클만 작성할수 있습니다."; goto re;}
+		input @board3title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board3sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board3title10$, $board3title9$;
+			set $board3sub10$, $board3sub9$;
+			set $board3title9$, $board3title8$;
+			set $board3sub9$, $board3sub8$;
+			set $board3title8$, $board3title7$;
+			set $board3sub8$, $board3sub7$;
+			set $board3title7$, $board3title6$;
+			set $board3sub7$, $board3sub6$;
+			set $board3title6$, $board3title5$;
+			set $board3sub6$, $board3sub5$;
+			set $board3title5$, $board3title4$;
+			set $board3sub5$, $board3sub4$;
+			set $board3title4$, $board3title3$;
+			set $board3sub4$, $board3sub3$;
+			set $board3title3$, $board3title2$;
+			set $board3sub3$, $board3sub2$;
+			set $board3title2$, $board3title1$;
+			set $board3sub2$, $board3sub1$;
+			set $board3title1$, @board3title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board3sub1$, @board3sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 12){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board4	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("4서클 게시판 입니다.", $board4title1$, $board4title2$, $board4title3$, $board4title4$, $board4title5$, $board4title6$, $board4title7$, $board4title8$, $board4title9$, $board4title10$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board4title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board4title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board4title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board4title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board4title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board4title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board4title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board4title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board4title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board4title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board4sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if(get_level(@myid) < 81 || get_level(@myid) > 98){mes 1, "4서클만 작성할수 있습니다."; goto re;}
+		input @board4title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board4sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board4title10$, $board4title9$;
+			set $board4sub10$, $board4sub9$;
+			set $board4title9$, $board4title8$;
+			set $board4sub9$, $board4sub8$;
+			set $board4title8$, $board4title7$;
+			set $board4sub8$, $board4sub7$;
+			set $board4title7$, $board4title6$;
+			set $board4sub7$, $board4sub6$;
+			set $board4title6$, $board4title5$;
+			set $board4sub6$, $board4sub5$;
+			set $board4title5$, $board4title4$;
+			set $board4sub5$, $board4sub4$;
+			set $board4title4$, $board4title3$;
+			set $board4sub4$, $board4sub3$;
+			set $board4title3$, $board4title2$;
+			set $board4sub3$, $board4sub2$;
+			set $board4title2$, $board4title1$;
+			set $board4sub2$, $board4sub1$;
+			set $board4title1$, @board4title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board4sub1$, @board4sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 12){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board5	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("지존 게시판 입니다.", $board5title1$, $board5title2$, $board5title3$, $board5title4$, $board5title5$, $board5title6$, $board5title7$, $board5title8$, $board5title9$, $board5title10$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board5title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board5title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board5title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board5title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board5title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board5title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board5title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board5title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board5title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board5title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board5sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if(get_level(@myid) != 99){mes 1, "지존만 작성할수 있습니다."; goto re;}
+		input @board5title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board5sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board5title10$, $board5title9$;
+			set $board5sub10$, $board5sub9$;
+			set $board5title9$, $board5title8$;
+			set $board5sub9$, $board5sub8$;
+			set $board5title8$, $board5title7$;
+			set $board5sub8$, $board5sub7$;
+			set $board5title7$, $board5title6$;
+			set $board5sub7$, $board5sub6$;
+			set $board5title6$, $board5title5$;
+			set $board5sub6$, $board5sub5$;
+			set $board5title5$, $board5title4$;
+			set $board5sub5$, $board5sub4$;
+			set $board5title4$, $board5title3$;
+			set $board5sub4$, $board5sub3$;
+			set $board5title3$, $board5title2$;
+			set $board5sub3$, $board5sub2$;
+			set $board5title2$, $board5title1$;
+			set $board5sub2$, $board5sub1$;
+			set $board5title1$, @board5title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board5sub1$, @board5sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 12){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board6	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("승급 게시판 입니다.", $board6title1$, $board6title2$, $board6title3$, $board6title4$, $board6title5$, $board6title6$, $board6title7$, $board6title8$, $board6title9$, $board6title10$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board6title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board6title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board6title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board6title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board6title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board6title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board6title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board6title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board6title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board6title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board6sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if(get_class_sub(@myid) != 1){mes 1, "1차승급만 작성할수 있습니다."; goto re;}
+		input @board6title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board6sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board6title10$, $board6title9$;
+			set $board6sub10$, $board6sub9$;
+			set $board6title9$, $board6title8$;
+			set $board6sub9$, $board6sub8$;
+			set $board6title8$, $board6title7$;
+			set $board6sub8$, $board6sub7$;
+			set $board6title7$, $board6title6$;
+			set $board6sub7$, $board6sub6$;
+			set $board6title6$, $board6title5$;
+			set $board6sub6$, $board6sub5$;
+			set $board6title5$, $board6title4$;
+			set $board6sub5$, $board6sub4$;
+			set $board6title4$, $board6title3$;
+			set $board6sub4$, $board6sub3$;
+			set $board6title3$, $board6title2$;
+			set $board6sub3$, $board6sub2$;
+			set $board6title2$, $board6title1$;
+			set $board6sub2$, $board6sub1$;
+			set $board6title1$, @board6title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board6sub1$, @board6sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 12){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board7	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("2차전직 게시판 입니다.", $board7title1$, $board7title2$, $board7title3$, $board7title4$, $board7title5$, $board7title6$, $board7title7$, $board7title8$, $board7title9$, $board7title10$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board7title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board7title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board7title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board7title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board7title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board7title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board7title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board7title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board7title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board7title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board7sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if(get_class_sub(@myid) != 2){mes 1, "2차전직만 작성할수 있습니다."; goto re;}
+		input @board7title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board7sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board7title10$, $board7title9$;
+			set $board7sub10$, $board7sub9$;
+			set $board7title9$, $board7title8$;
+			set $board7sub9$, $board7sub8$;
+			set $board7title8$, $board7title7$;
+			set $board7sub8$, $board7sub7$;
+			set $board7title7$, $board7title6$;
+			set $board7sub7$, $board7sub6$;
+			set $board7title6$, $board7title5$;
+			set $board7sub6$, $board7sub5$;
+			set $board7title5$, $board7title4$;
+			set $board7sub5$, $board7sub4$;
+			set $board7title4$, $board7title3$;
+			set $board7sub4$, $board7sub3$;
+			set $board7title3$, $board7title2$;
+			set $board7sub3$, $board7sub2$;
+			set $board7title2$, $board7title1$;
+			set $board7sub2$, $board7sub1$;
+			set $board7title1$, @board7title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board7sub1$, @board7sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 12){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board8	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("거래 게시판 입니다.", $board8title1$, $board8title2$, $board8title3$, $board8title4$, $board8title5$, $board8title6$, $board8title7$, $board8title8$, $board8title9$, $board8title10$, $board8title11$, $board8title12$, $board8title13$, $board8title14$, $board8title15$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board8title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board8title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board8title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board8title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board8title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board8title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board8title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board8title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board8title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board8title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if($board8title11$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub11$ + " ";
+		goto re;
+	}
+	if(@select == 12){
+		if($board8title12$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub12$ + " ";
+		goto re;
+	}
+	if(@select == 13){
+		if($board8title13$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub13$ + " ";
+		goto re;
+	}
+	if(@select == 14){
+		if($board8title14$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub14$ + " ";
+		goto re;
+	}
+	if(@select == 15){
+		if($board8title15$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board8sub15$ + " ";
+		goto re;
+	}
+	if(@select == 16){
+		input @board8title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board8sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board8title15$, $board8title14$;
+			set $board8sub15$, $board8sub14$;
+			set $board8title14$, $board8title13$;
+			set $board8sub14$, $board8sub13$;
+			set $board8title13$, $board8title12$;
+			set $board8sub13$, $board8sub12$;
+			set $board8title12$, $board8title11$;
+			set $board8sub12$, $board8sub11$;
+			set $board8title11$, $board8title10$;
+			set $board8sub11$, $board8sub10$;
+			set $board8title10$, $board8title9$;
+			set $board8sub10$, $board8sub9$;
+			set $board8title9$, $board8title8$;
+			set $board8sub9$, $board8sub8$;
+			set $board8title8$, $board8title7$;
+			set $board8sub8$, $board8sub7$;
+			set $board8title7$, $board8title6$;
+			set $board8sub7$, $board8sub6$;
+			set $board8title6$, $board8title5$;
+			set $board8sub6$, $board8sub5$;
+			set $board8title5$, $board8title4$;
+			set $board8sub5$, $board8sub4$;
+			set $board8title4$, $board8title3$;
+			set $board8sub4$, $board8sub3$;
+			set $board8title3$, $board8title2$;
+			set $board8sub3$, $board8sub2$;
+			set $board8title2$, $board8title1$;
+			set $board8sub2$, $board8sub1$;
+			set $board8title1$, @board8title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board8sub1$, @board8sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 17){
+		goto re;
+	}
+}
+
+0,0,0,0,0,0,0	Board9	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @select2, 0;
+	re:
+	set @select, menu("자유 게시판 입니다.", $board9title1$, $board9title2$, $board9title3$, $board9title4$, $board9title5$, $board9title6$, $board9title7$, $board9title8$, $board9title9$, $board9title10$, $board9title11$, $board9title12$, $board9title13$, $board9title14$, $board9title15$, "::게시글작성하기::", "::새로고침::");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if($board9title1$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub1$ + " ";
+		goto re;
+	}
+	if(@select == 2){
+		if($board9title2$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub2$ + " ";
+		goto re;
+	}
+	if(@select == 3){
+		if($board9title3$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub3$ + " ";
+		goto re;
+	}
+	if(@select == 4){
+		if($board9title4$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub4$ + " ";
+		goto re;
+	}
+	if(@select == 5){
+		if($board9title5$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub5$ + " ";
+		goto re;
+	}
+	if(@select == 6){
+		if($board9title6$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub6$ + " ";
+		goto re;
+	}
+	if(@select == 7){
+		if($board9title7$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub7$ + " ";
+		goto re;
+	}
+	if(@select == 8){
+		if($board9title8$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub8$ + " ";
+		goto re;
+	}
+	if(@select == 9){
+		if($board9title9$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub9$ + " ";
+		goto re;
+	}
+	if(@select == 10){
+		if($board9title10$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub10$ + " ";
+		goto re;
+	}
+	if(@select == 11){
+		if($board9title11$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub11$ + " ";
+		goto re;
+	}
+	if(@select == 12){
+		if($board9title12$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub12$ + " ";
+		goto re;
+	}
+	if(@select == 13){
+		if($board9title13$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub13$ + " ";
+		goto re;
+	}
+	if(@select == 14){
+		if($board9title14$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub14$ + " ";
+		goto re;
+	}
+	if(@select == 15){
+		if($board9title15$ == "게시글없음"){mes 1, "게시글이 존재하지 않습니다."; goto re;}
+		mes 1, $board9sub15$ + " ";
+		goto re;
+	}
+	if(@select == 16){
+		input @board9title1$, 1, "게시글 제목을 입력해 주세요.", "", "", 10;
+		input @board9sub1$, 1, "게시글 내용을 입력해 주세요.", "", "", 100;
+		re2:
+		set @select2, menu(@board1title1$ + "게시글을 등록하시 겠습니까?", "등록", "안함");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			set $board9title15$, $board9title14$;
+			set $board9sub15$, $board9sub14$;
+			set $board9title14$, $board9title13$;
+			set $board9sub14$, $board9sub13$;
+			set $board9title13$, $board9title12$;
+			set $board9sub13$, $board9sub12$;
+			set $board9title12$, $board9title11$;
+			set $board9sub12$, $board9sub11$;
+			set $board9title11$, $board9title10$;
+			set $board9sub11$, $board9sub10$;
+			set $board9title10$, $board9title9$;
+			set $board9sub10$, $board9sub9$;
+			set $board9title9$, $board9title8$;
+			set $board9sub9$, $board9sub8$;
+			set $board9title8$, $board9title7$;
+			set $board9sub8$, $board9sub7$;
+			set $board9title7$, $board9title6$;
+			set $board9sub7$, $board9sub6$;
+			set $board9title6$, $board9title5$;
+			set $board9sub6$, $board9sub5$;
+			set $board9title5$, $board9title4$;
+			set $board9sub5$, $board9sub4$;
+			set $board9title4$, $board9title3$;
+			set $board9sub4$, $board9sub3$;
+			set $board9title3$, $board9title2$;
+			set $board9sub3$, $board9sub2$;
+			set $board9title2$, $board9title1$;
+			set $board9sub2$, $board9sub1$;
+			set $board9title1$, @board9title1$ + "(" + get_name(@myid) + "/" + localtime(1) + "년" + localtime(2) + "월" + localtime(3) + "일" + localtime(4) + "시" + localtime(5) + "분)";
+			set $board9sub1$, @board9sub1$;
+			mes 1, "게시글 등록이 완료되었습니다.";
+			goto re;
+		}else{
+			goto re;
+		}
+
+	}
+	if(@select == 17){
+		goto re;
+	}
+}

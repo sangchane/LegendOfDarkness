@@ -1,0 +1,160 @@
+0	베크나탑	{
+	set @myid,get_myid();
+}
+
+0	베크나탑R	{
+	set @myid,get_myid();
+	if(get_mapname(@myid)=="베크나탑통합대기실"){
+		if($beknatop==1){message 3,"베크나 탑을 초기화 하고 있습니다. 대기 해주세요.";goto go2;}
+		set $beknatop, 1;
+		set #beknatop, 1;
+		mob_clear "베크나탑-1층";
+		mob_clear "베크나탑-2층";
+		mob_clear "베크나탑-3층";
+		mob_clear "베크나탑-4층";
+		mob_clear "베크나탑-5층";
+		mob_clear "베크나탑-6층";
+		mob_clear "베크나탑-7층";
+		mob_clear "베크나탑-8층";
+		mob_clear "베크나탑-최상층";
+		sleep 400;
+		group_message 3, "3초뒤 베크나 탑을 시작합니다.";
+		message 3, "3초뒤 베크나 탑을 시작합니다.";
+		sleep 1000;
+		group_message 3, "2초뒤 베크나 탑을 시작합니다.";
+		message 3, "2초뒤 베크나 탑을 시작합니다.";
+		sleep 1000;
+		group_message 3, "1초뒤 베크나 탑을 시작합니다.";
+		message 3, "1초뒤 베크나 탑을 시작합니다.";
+		sleep 1000;
+		group_warp "베크나탑-1층", 8,14;
+		mob_spawn4 "마호르", "베크나탑-1층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-1층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-1층", 7, 8, 2;
+		mob_spawn4 "카탄", "베크나탑-1층", 9, 8, 2;
+
+		mob_spawn4 "마호르", "베크나탑-2층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-2층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-2층", 7, 8, 2;
+		mob_spawn4 "카탄", "베크나탑-2층", 9, 8, 2;
+
+		mob_spawn4 "마호르", "베크나탑-3층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-3층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-3층", 7, 8, 2;
+		mob_spawn4 "크샤프", "베크나탑-3층", 9, 8, 2;
+
+		mob_spawn4 "마호르", "베크나탑-4층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-4층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-4층", 7, 8, 2;
+		mob_spawn4 "크샤프", "베크나탑-4층", 9, 8, 2;
+
+		mob_spawn4 "마호르", "베크나탑-5층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-5층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-5층", 7, 8, 2;
+		mob_spawn4 "마드", "베크나탑-5층", 9, 8, 2;
+
+		mob_spawn4 "마호르", "베크나탑-6층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-6층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-6층", 7, 8, 2;
+		mob_spawn4 "마드", "베크나탑-6층", 9, 8, 2;
+
+		mob_spawn4 "마호르", "베크나탑-7층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-7층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-7층", 7, 8, 2;
+		mob_spawn4 "크샤프", "베크나탑-7층", 9, 8, 2;
+		mob_spawn4 "마드", "베크나탑-7층", 8, 7, 2;
+
+		mob_spawn4 "마호르", "베크나탑-8층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-8층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-8층", 7, 8, 2;
+		mob_spawn4 "크샤프", "베크나탑-8층", 9, 8, 2;
+		mob_spawn4 "마드", "베크나탑-8층", 8, 7, 2;
+
+		mob_spawn4 "용마기사", "베크나탑-최상층", 7, 4, 2;
+		mob_spawn4 "마호르", "베크나탑-최상층", 7, 6, 2;
+		mob_spawn4 "마호르", "베크나탑-최상층", 9, 6, 2;
+		mob_spawn4 "힐람", "베크나탑-최상층", 7, 8, 2;
+		mob_spawn4 "크샤프", "베크나탑-최상층", 9, 8, 2;
+		mob_spawn4 "마드", "베크나탑-최상층", 8, 7, 2;
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-1층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-2층", 8,14;
+		}else{
+			go1:
+			message 3,"몬스터를 모두 다 처치하셔야 이동 됩니다.";
+			go2:
+			sleep 400;
+			set_ys(get_ys(@myid)+1);
+			end;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-2층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-3층", 8,14;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-3층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-4층", 8,14;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-4층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-5층", 8,14;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-5층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-6층", 8,14;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-6층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-7층", 8,14;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-7층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-8층", 8,14;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-8층"){
+		if(map_objmob(@myid)==0){
+			group_warp "베크나탑-최상층", 7,9;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="베크나탑-최상층"){
+		if(map_objmob(@myid)==0){
+			set $beknatop,0;
+			set#beknatop,0;
+			group_warp "베크나탑통합대기실", 7,9;
+		}else{
+			goto go1;
+		}
+	end;
+	}
+}

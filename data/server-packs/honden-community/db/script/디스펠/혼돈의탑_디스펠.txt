@@ -1,0 +1,83 @@
+Spell	혼돈의탑_노말	{
+	set @myid, get_myid();
+	if(magic_protection(@myid)){effect @myid, 33, 0, 130; end;}
+	set @rand, rand2(1,4);
+	if(@rand < 1 || @rand > 4){goto re;}
+	switch(@rand){
+		case 1:
+			group_reberato @myid, 232;
+			game_sound 8,0;
+			message 3, object_name() + "가 리베라토를 가합니다.";
+			group_message 3, object_name() + "가 리베라토를 가합니다.";
+		break;
+		case 2:
+			group_hill 0, 89;
+			effect @myid, 89, 0, 100;
+			group_damaged2 @myid, 1000000;
+			game_sound 63, 0;
+			message 3, object_name() + "가 홀리드래곤을 가합니다.";
+		break;
+		case 3:
+			set_group_spellban @myid, 7, 88;
+			game_sound 63, 0;
+			message 3, object_name() + "가 그룹스펠금지을 가합니다.";
+			group_message 3, object_name() + "가 그룹스펠금지을 가합니다.";
+		break;
+		case 4:
+			group_hill 0, 89;
+			effect @myid, 89, 0, 100;
+			group_damaged2 @myid, 1000000;
+			game_sound 63, 0;
+			message 3, object_name() + "가 홀리드래곤을 가합니다.";
+		break;
+	}
+	del @rand;
+	del @xs;
+	del @ys;
+	del @mob;
+	del @myid;
+}
+
+Monster	혼돈의탑_하드	{
+	set @myid, get_myid();
+	if(get_last_object_xs(@myid) == 1000 || get_last_object_ys(@myid) == 1000){end;}
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	if(!@mob){end;}
+	effect @mob, 0, 6, 100;
+	game_sound 8, 0;
+	magic 10,@mob,"어둠의각인", 17, 0,@myid;
+	set @rand, rand2(1,4);
+	if(@rand < 1 || @rand > 4){goto re;}
+	switch(@rand){
+		case 1:
+			group_reberato @myid, 232;
+			game_sound 8,0;
+			message 3, object_name() + "가 리베라토를 가합니다.";
+			group_message 3, object_name() + "가 리베라토를 가합니다.";
+		break;
+		case 2:
+			mob_say2 @mob, 0, 0, "코메트!";
+			group_hill 0, 217;
+			effect @myid, 217, 0, 100;
+			group_damaged2 @myid, 10000000;
+			game_sound 63, 0;
+			message 3, object_name() + "가 코메트를 가합니다.";
+		break;
+		case 3:
+			set_group_spellban @myid, 30, 376;
+			message 3, object_name() + "가 그룹스펠금지을 가합니다.";
+			group_message 3, object_name() + "가 그룹스펠금지을 가합니다.";
+		break;
+		case 4:
+			mob_say2 @mob, 0, 0, "코메트!";
+			group_hill 0, 217;
+			effect @myid, 217, 0, 100;
+			group_damaged2 @myid, 10000000;
+			game_sound 63, 0;
+			message 3, object_name() + "가 코메트를 가합니다.";
+		break;
+	}
+	del @mob;
+	del @rand;
+	del @myid;
+}

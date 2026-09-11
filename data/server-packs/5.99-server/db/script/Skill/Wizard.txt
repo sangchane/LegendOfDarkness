@@ -1,0 +1,477 @@
+0,0,0,0,0,0,0	SPELL_메테오	{
+	set @myid, get_myid();
+	if(get_solo(@myid)){message 3, "사용불가 지역입니다."; end;}
+	if(get_mana(@myid) < 20000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 20000이상]"; del @myid; end;}
+	message 3, "메테오를 외웠습니다.";
+   	game_sound 63, 0;
+	set @damage, get_mana(@myid) / 4 * 10;
+	set @x1, get_xs(@myid)-7;
+	set @x2, get_xs(@myid)+7;
+	set @y1, get_ys(@myid)-7;
+	set @y2, get_ys(@myid)+7;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				effect @mob, 0, 72, 100;
+				effect @mob, 0, 72, 100;
+				damaged @mob, @damage;
+			}else{
+			go:
+				if(get_map_pk() && istype(get_char_serial(@myid,@i,@j)) == 3){
+					set @damage, get_mana(@myid);
+					set @mob, get_char_serial(@myid,@i,@j);
+					if(@myid != @mob){
+						effect @mob, 0, 72, 100;
+						char_damaged2 @mob, @damage,@damage;
+					}
+				}
+			}
+		}
+	}
+	set_manal 0;
+}
+0,0,0,0,0,0,0	SPELL_블랙메테오	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 20000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 20000이상]"; del @myid; end;}
+	message 3, "블랙메테오를 외웠습니다.";
+   	game_sound 63, 0;
+	set @damage, get_mana(@myid) / 4 * 7;
+	set @x1, get_xs(@myid)-9;
+	set @x2, get_xs(@myid)+9;
+	set @y1, get_ys(@myid)-9;
+	set @y2, get_ys(@myid)+9;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				effect @mob, 0, 72, 100;
+				effect @mob, 0, 72, 100;
+				damaged @mob, @damage;
+			}else{
+			go:
+				if(get_map_pk() && istype(get_char_serial(@myid,@i,@j)) == 3){
+					set @damage, get_mana(@myid);
+					set @mob, get_char_serial(@myid,@i,@j);
+					if(@myid != @mob){
+						effect @mob, 0, 72, 100;
+						char_damaged2 @mob, @damage,@damage;
+					}
+				}
+			}
+		}
+	}
+	set_manal 0;
+}
+
+0,0,0,0,0,0,0	SPELL_클레쉬스톰	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 620){message 3, "사용하기에 마력량이적습니다. [필요마나 : 620이상]"; del @myid; end;}
+	manal_del "620";
+	set @damage, get_mgc_damage(@myid) * 4;
+	set @damage, @damage / 2 * 3;
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@target && @type == 1 && get_mobdie){end;}
+	if(@type == 1){
+		effect @target, 0, 97, 75;
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+			if(@target != @myid){message1 @target, 3, get_name() + "님께서 클레쉬스톰을 가합니다.";}
+		}
+	}
+	effect @target, 0, 97, 75;
+	message 3, "클레쉬스톰을 외웠습니다.";
+	motion 136, 75;
+	game_sound 78,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_퀘이크	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 620){message 3, "사용하기에 마력량이적습니다. [필요마나 : 620이상]"; del @myid; end;}
+	manal_del "620";
+	set @damage, get_mgc_damage(@myid) * 4;
+	set @damage, @damage / 2 * 3;
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@target && @type == 1 && get_mobdie){end;}
+	if(@type == 1){
+		effect @target, 0, 103, 75;
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+			if(@target != @myid){message1 @target, 3, get_name() + "님께서 퀘이크를 가합니다.";}
+		}
+	}
+	effect @target, 0, 103, 75;
+	message 3, "퀘이크를 외웠습니다.";
+	motion 136, 75;
+	game_sound 76,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_아이스블러스트	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 620){message 3, "사용하기에 마력량이적습니다. [필요마나 : 620이상]"; del @myid; end;}
+	manal_del "620";
+	set @damage, get_mgc_damage(@myid) * 4;
+	set @damage, @damage / 2 * 3;
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@target && @type == 1 && get_mobdie){end;}
+	if(@type == 1){
+		effect @target, 0, 101, 75;
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+			if(@target != @myid){message1 @target, 3, get_name() + "님께서 아이스블러스트를 가합니다.";}
+		}
+	}
+	effect @target, 0, 101, 75;
+	message 3, "아이스블러스트를 외웠습니다.";
+	motion 136, 75;
+	game_sound 77,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_플레어	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 620){message 3, "사용하기에 마력량이적습니다. [필요마나 : 620이상]"; del @myid; end;}
+	manal_del "620";
+	set @damage, get_mgc_damage(@myid) * 4;
+	set @damage, @damage / 2 * 3;
+	if(get_critical(@myid)){set @damage, @damage * 2;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@target && @type == 1 && get_mobdie){end;}
+	if(@type == 1){
+		effect @target, 0, 102, 75;
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+			if(@target != @myid){message1 @target, 3, get_name() + "님께서 플레어를 가합니다.";}
+		}
+	}
+	effect @target, 0, 102, 75;
+	message 3, "플레어를 외웠습니다.";
+	motion 136, 75;
+	game_sound 75,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_속성강화	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 320){message 3, "사용하기에 마력량이적습니다. [필요마나 : 320이상]"; del @myid; end;}
+	manal_del "320";
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@myid == @target){sokup_delay @target, 3000; message 3, "속성강화를 외었다!"; effect @target, 0, 263, 100; end;}
+	if(@type == 3){sokup_delay @target, 3000; message 3, "속성강화를 외었다!"; effect @target, 0, 263, 100; message1 @target, 3, get_name() + "님께서 속성강화를 외워주셨습니다."; end;}
+}
+
+0,0,0,0,0,0,0	SPELL_어둠의각인	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@target && @type == 1 && get_mobdie){end;}
+	if(get_mana(@myid) < 310){message 3, "마력이 부족합니다. [필요마나 : 310]"; del @myid; end;}
+	manal_del "310";
+	if(@type != 1){end;}
+	if(magic_exist(1,@target,1)){end;}
+	magic 1,@target,"어둠의각인", 120, 60,@myid;
+	message 3, "어둠의각인을 외웠습니다.";
+	effect @target, 0, 104, 140;
+	game_sound 27,0;
+}
+
+
+0,0,0,0,0,0,0	SPELL_프라베라	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 3000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 3000 이상]"; del @myid; end;}
+	manal_del "3000";
+	set @x1, get_xs(@myid)-8;
+	set @x2, get_xs(@myid)+8;
+	set @y1, get_ys(@myid)-8;
+	set @y2, get_ys(@myid)+8;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				set @rnd, rand(1,10);
+    				if(!magic_exist(1,@mob, 0)){
+					if(@rnd < 6){
+	    					magic 1,@mob,"프라베라", 120, 45,@myid;
+	    					effect @mob, 0, 257, 100;
+					}else{effect @mob, 0, 33, 130;}
+				}
+			}
+		go:
+		}
+	}
+	message 3, "프라베라를 외웠습니다.";
+    	game_sound 27,0;
+}
+
+0,0,0,0,0,0,0	SPELL_프라베라M	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 310){message 3, "마력이 부족합니다. [필요마나 : 310]"; del @myid; end;}
+	manal_del "310";
+	set @x1, get_xs(@myid)-12;
+	set @x2, get_xs(@myid)+12;
+	set @y1, get_ys(@myid)-12;
+	set @y2, get_ys(@myid)+12;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				set @rnd, rand(1,10);
+    				if(!magic_exist(1,@mob, 0)){
+					if(@rnd < 6){
+	    					magic 1,@mob,"프라베라", 120, 45,@myid;
+	    					effect @mob, 0, 257, 100;
+					}else{effect @mob, 0, 33, 130;}
+				}
+			}
+		go:
+		}
+	}
+	message 3, "프라베라를 외웠습니다.";
+    	game_sound 27,0;
+}
+0,0,0,0,0,0,0	SPELL_포트리스	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 350){message 3, "마력이 부족합니다. [필요마나 : 350]"; del @myid; end;}
+	manal_del "350";
+	set @target, spell_target();
+	RE:
+	set @rnd, rand(1,10);
+	if(@rnd <= 0){goto RE;}
+	if(@rnd <= 8){
+		if(portris(@myid, 10) == 1){
+			effect @myid, 91,0,100;
+			game_sound 8,0;
+			message 3, "포트리스를 외웠습니다.";
+			del @myid;
+		}
+		end;
+	}
+	message 3, "실패했습니다.";
+}
+
+0,0,0,0,0,0,0	SPELL_델리스펠라스	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 350){message 3, "마력이 부족합니다. [필요마나 : 350]"; del @myid; end;}
+	manal_del "350";
+	re:
+	set @rnd, rand(1,10);
+	if(@rnd < 1 || @rnd > 10){goto re;}
+	if(@rnd <= 5){motion 1, 75; dell @myid, 17; effect @myid, 157,0,100; game_sound 8,0; message 3, "델리스펠라스를 외웠습니다."; end;}
+	message 3, "실패했습니다.";
+}
+
+0,0,0,0,0,0,0	SPELL_세오의손길	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 3000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 3000이상]"; del @myid; end;}
+	manal_del "3000";
+	set @target, spell_target();
+	set @type, istype(@target);
+	set @rnd, rand(1,10);
+	if(@rnd <= 8){
+		if(@type != 1) {end;}
+		if(magic_exist(5,@target,1)) {end;}
+		magic 5,@target,"칸의눈(Lev1)", 30, 5,@myid;
+		message 3, "세오의손길을 외웠습니다.";
+		effect @target, 0, 383, 130;
+		game_sound 8,0;
+	}else{
+		effect @target, 0, 33, 130;
+		message 3, "몬스터가 마법을 피했다!";
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_매직프로텍션	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else{
+ set @target, spell_target();
+	set @rnd, rand(1,10);
+if(@rnd <= 2){
+ //set @type, istype(@target);
+ //if(@type != 3) {end;}
+ immortal @myid, 10;
+ effect @myid, 87,0,100;
+ game_sound 8,0;
+	message 3, "메직프로텍션을 외웠습니다.";
+	}else{
+	 message 3, "실패했습니다.";
+}
+}
+}
+
+0,0,0,0,0,0,0	SPELL_화이라소환(Lev1)	{
+	set @myid, get_myid();
+	if(get_map_pk(@myid)){message 3, "PK맵에서는 사용할수 없는기술 입니다."; end;}
+	if(@type != 1 && get_mana(@myid) < 2500){message 3, "마력이 부족합니다."; del @type; del @myid; end;}
+	manal_del "2500";
+	set @damage, ((get_basemana(@myid)/2));
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+		}
+	}
+	message 3, "화이라소환(Lev1)를 외웠습니다.";
+	effect @target, 146, 138, 75;
+	motion 136, 75;
+	game_sound 47,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_화이라소환(Lev2)	{
+	set @myid, get_myid();
+	if(get_map_pk(@myid)){message 3, "PK맵에서는 사용할수 없는기술 입니다."; end;}
+	if(@type != 1 && get_mana(@myid) < 2500){message 3, "마력이 부족합니다."; del @type; del @myid; end;}
+	manal_del "1000";
+	set @damage, ((get_basemana(@myid)*1));
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+		}
+	}
+	message 3, "화이라소환(Lev2)를 외웠습니다.";
+	effect @target, 146, 138, 75;
+	motion 136, 75;
+	game_sound 47,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_화이라소환(Lev3)	{
+	set @myid, get_myid();
+	if(get_map_pk(@myid)){message 3, "PK맵에서는 사용할수 없는기술 입니다."; end;}
+	if(@type != 1 && get_mana(@myid) < 2500){message 3, "마력이 부족합니다."; del @type; del @myid; end;}
+	manal_del "1000";
+	set @damage, ((get_basemana(@myid)*2));
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+		}
+	}
+	message 3, "화이라소환(Lev3)를 외웠습니다.";
+	effect @target, 146, 138, 75;
+	motion 136, 75;
+	game_sound 47,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_나르콜룸	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < get_basemana(@myid)/100*10){message 3, "마력이 부족합니다. [필요마나 : 10%]"; del @myid; end;}
+	set_manal get_mana(@myid) - get_basemana(@myid)/100*10;
+	set @x1, get_xs(@myid)-8;
+	set @x2, get_xs(@myid)+8;
+	set @y1, get_ys(@myid)-8;
+	set @y2, get_ys(@myid)+8;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mobnar, get_mobxy(@i, @j);
+			if(!@mobnar){goto go;}
+			set @type, istype(@mobnar);
+			if(@mobnar && @type == 1){
+				set @rnd, rand(1,10);
+				if(!magic_exist(2,@mobnar, 0)){
+					if(@rnd < 7){
+						magic 2,@mobnar,"나르콜룸", 120, 45,@myid;
+						effect @mobnar, 0, 20, 0;
+					}else{effect @mobnar, 0, 33, 130;}
+				}
+			}
+		go:
+		}
+	}
+	message 3, "나르콜룸을 외웠습니다.";
+	game_sound 47,0;
+}
+
+0,0,0,0,0,0,0	SPELL_어각베라	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 7000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 3000 이상]"; del @myid; end;}
+	manal_del "7000";
+	set @x1, get_xs(@myid)-8;
+	set @x2, get_xs(@myid)+8;
+	set @y1, get_ys(@myid)-8;
+	set @y2, get_ys(@myid)+8;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				set @rnd, rand(1,10);
+    				if(!magic_exist(1,@mob, 0)){
+					if(@rnd < 6){
+	    					magic 1,@mob,"어각베라", 120, 60,@myid;
+	    					effect @mob, 0, 104, 140;
+					}else{effect @mob, 0, 33, 130;}
+				}
+			}
+		go:
+		}
+	}
+	message 3, "어각베라를 외웠습니다.";
+    	game_sound 27,0;
+}

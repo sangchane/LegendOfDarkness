@@ -1,0 +1,1815 @@
+1	SP	{
+	set@myid,get_myid();
+	set@npc$,last_npc();
+	set@hi$,"안녕하세요. 무엇을 도와드릴까요?";
+	set@ex$,"이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 ";
+	set@ex2$,". 이 기술을 언제나 좋은 일에만 쓸 것을 약속하겠느냐?";
+	set@ex3$," 기술이니라. 배워보겠느냐?";
+	set@ex4$," 마법이니라. 배워보겠느냐?";
+	set@ex5$,"이렇게 나를 찾아온 것을 보니 또 무슨 부탁이 있는 것 같군. 그래 이번에는 무슨 부탁을 하러 왔나?";
+	set@ex6$,"이곳을 더 어둡게 만들려고 하는군. 더 어두워지면 안될텐데... 그래도 이곳까지 왔으니 필요한 것이 있으면 배워가게나.";
+	set@pn$,"음... 그 마법을 배울 수 있는 레벨은 되었지만, 아직 다른 능력이 조금 모자라는구나. 그 마법을\\n배우기 위해서는 힘 ";
+	set@sn$,"음... 그 기술을 배울 수 있는 레벨은 되었지만, 아직 다른 능력이 조금 모자라는구나. 그 기술을\\n배우기 위해서는 힘 ";
+	set@piif$," 배우기 위해서는 금전 5000 전을 나에게 바쳐야 하느니라. 이 모든 제물을 기쁜 마음으로 바치겠느냐?";
+	if(@npc$=="프리크"){
+		set@prik,menu(0,"안녕하세요. 무엇을 도와드릴까요?","대화하기","마법 지우기","기술 지우기");
+		if(@prik==1){
+			if(rand2(1,3)>1){
+				if(rand2(1,2)>1){mes 0,"기초기술은 이후 특성치를 맞추어 각각의 직업별 기본기술-윈드블레이드,찔러휘기비,단각으로\\n업그레이드할 수 있습니다. 일기장을 열어 기술표를 확인해주세요";}
+				mes 0,"전 기초기술마법을 가르쳐드리는 프리크라고 합니다. 직업신전에서 기초기술을 배우지 못한분들에게\\n기초기술을 알려드리는 일을 하고있습니다";
+			}
+			mes 0,"기초기술마법은 각 직업의 가장 기초적인 기술마법을 기본으로 하는 것들을 말합니다.";
+		}else if(@prik==2){goto pdel;}
+		else if(@prik==3){goto spno;}
+	end;
+	}
+	if(@npc$=="승급세토아"){
+		if(get_class_sub(@myid)==0){end;}
+		set@sub1,menu(0,@hi$,"마법 배우기","마법 지우기","기술 배우기","기술 지우기");
+		if(@sub1==1){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 31;
+		}else if(@sub1==2){
+			goto pdel;
+		}else if(@sub1==3){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 30;
+		}else if(@sub1==4){
+			goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="승급셔스"){
+		if(get_class_sub(@myid)==0){end;}
+		set@sub2,menu(0,"안녕하세요. 무엇을 도와드릴까요?","마법 배우기","마법 지우기","기술 배우기","기술 지우기");
+		if(@sub2==1){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 33;
+		}else if(@sub2==2){
+			goto pdel;
+		}else if(@sub2==3){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 32;
+		}else if(@sub2==4){
+			goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="승급로오"){
+		if(get_class_sub(@myid)==0){end;}
+		set@sub3,menu(0,"안녕하세요. 무엇을 도와드릴까요?","마법 배우기","마법 지우기","기술 지우기");
+		if(@sub3==1){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 34;
+		}else if(@sub3==2){
+			goto pdel;
+		}else if(@sub3==3){
+			goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="승급이아"){
+		if(get_class_sub(@myid)==0){end;}
+		set@sub4,menu(0,"안녕하세요. 무엇을 도와드릴까요?","마법 배우기","마법 지우기","기술 지우기");
+		if(@sub4==1){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 35;
+		}else if(@sub4==2){
+			goto pdel;
+		}else if(@sub4==3){
+			goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="승급메투스"){
+		if(get_class_sub(@myid)==0){end;}
+		set@sub5,menu(0,"안녕하세요. 무엇을 도와드릴까요?","마법 배우기","마법 지우기","기술 배우기","기술 지우기");
+		if(@sub5==1){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 37;
+		}else if(@sub5==2){
+			goto pdel;
+		}else if(@sub5==3){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 36;
+		}else if(@sub5==4){
+			goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="세토아"){
+		set @if1$,"자네가 갖추어야할 조건은 {=b힘 ";
+		set @if2$,"{=a이상이어야 하며, 정말 진정한 용기가 있는 지를 판단하기 위해서 몇가지 재물을 준비하도록 해라.";
+		set @if3$,"적룡굴에서 나타나는 몬스터들을 처단하여, 그증표를 가지고 오되, 자네는 {=v";
+		set @if4$,"그럼 네가 기술을 습득할 수 있는 능력이 되는지 체크하도록 하겠다.";
+		set @if5$,"너의 능력은 충분하구나. 그렇다면 이제 재물들이 모두 있는지 확인하고 가지러 가겠다.";
+		if(#classskillupgrad1==2||#classskillupgrad2==2||#classskillupgrad31==2){end;}
+		mes 1,"하.하.하.하.하.하...오랫만에 보는 얼굴이군..음..자네는 처음인가? 흠흠..뭐 어찌되었던, 나를 찾아오다니 뭔가 원하는게 있는거 같은데...";
+	 	mes 1,"응? 더 강한 힘을 원한다고? 흠...역시 그렇구만.. 그렇다면 당연히 위대한 나, 세토아를 찾아오는게 당연하지. 하. 하. 하 . 하 . 하 .";
+	 	mes 1,"하지만..그런 힘을 아무나에게 주진 않아. 나는 강한 자들을 좋아하지.";
+		set@setoaskillmenu,menu(0,"질문 있는가?","자격을 알고 싶습니다.","모든 준비가 끝났습니다.");
+		if(@setoaskillmenu==1){
+			if(get_class()==1){
+				mes 1,@if1$+"150,지식10,지혜10,지구력92,민첩성20"+@if2$;
+	 			mes 0,@if3$+"데스나이트의칼1개, 안크본드라곤의갈비뼈 1개, 브론즈오피온의비늘 1개{=a를 준비해 오도록 해라.";
+			}
+			if(get_class()==2){
+				mes 1,@if1$+"98 ,지식 39, 지혜 40, 지구력20, 민첩성 142"+@if2$;
+	 			mes 0,@if3$+"베레스의발톱1개, 포보스의글러브 1개, 브론즈오피온의비늘 1개{=a를 준비해 오도록 해라.";
+			}
+			if(get_class()==5){
+				mes 1,@if1$+"90, 지식 63, 지혜 63 지구력72, 민첩성 20"+@if2$;
+ 				mes 0,@if3$+"러스터데몬의꼬리\\n1개,고렘의돌조각1개,브론즈오피온의비늘1개{=a를 준비해 오도록 해라.";
+			}
+		}else if(@setoaskillmenu==2){
+			if(get_class()==1){
+	 			mes 1,"나의 힘과 용기를 받은 자여, 자네가 가진 기술중 윈드블레이드와 메가블레이드에 은총을 내리겠다.";
+				set@setoaskillmenu2,menu(0,"모든 준비가 되었는가?","네","아뇨");
+				if(@setoaskillmenu2==1){
+	 				mes 1,@if4$;
+					if(get_class(@myid) != 1||get_str() < 150||get_int() < 10||get_wis() < 10||get_con() < 92||get_dex() < 20){if4:mes 0,"스텟이모자르구나";}
+					mes 1,@if5$;
+					//if(!item_exist(@myid,"브론즈오피온의비늘")||!item_exist(@myid,"안크본의갈비뼈")||!item_exist(@myid,"데스나이트의칼")){if5:mes 0,"재물을 모두 모으지 않았구나....";}
+					set #classskillupgrad1, 2;
+					skill_del "윈드블레이드";
+					skill_del "메가블레이드";
+					skill_add "룬블레이드";
+					skill_add "스톰블레이드";
+					item_del "브론즈오피온의비늘",1;
+					item_del "안크본의갈비뼈",1;
+					item_del "데스나이트의칼",1;
+				}
+			}
+			if(get_class()==2){
+				mes 1,"도적인 당신은 찔러휘비기와 두번찌르기를 업그레이드 하게됩니다.";
+				set@setoaskillmenu2,menu(0,"모든 준비가 되었는가?","네","아뇨");
+				if(@setoaskillmenu2==1){
+	 				mes 1,@if4$;
+					if(get_class() != 2||get_str() < 98||get_int() < 39||get_wis() < 40||get_con() < 20||get_dex() < 142){goto if4;}
+					mes 1,@if5$;
+					//if(!item_exist(@myid,"베레스의발톱")||!item_exist(@myid,"포보스의글러브")||!item_exist(@myid,"브론즈오피온의비늘")){goto if5;}
+					set #classskillupgrad2, 2;
+					skill_del "찔러휘비기";
+					skill_del "두번찌르기";
+					skill_add "슬레쉬";
+					skill_add "마구찌르기";
+					item_del "브론즈오피온의비늘",1;
+					item_del "베레스의발톱",1;
+					item_del "포보스의글러브",1;
+				}
+			}
+			if(get_class()==5){
+ 				mes 1,"무도가인 당신은 단각과 붕각,선풍각을 업그레이드 하게됩니다.";
+				set@setoaskillmenu2,menu(0,"준비가 되셨습니까?","네","아뇨");
+				if(@setoaskillmenu2==1){
+ 					mes 1,@if4$;
+					if(get_class() != 5||get_str() < 90||get_int() < 63||get_wis() < 63||get_con() < 72||get_dex() < 20){goto if4;}
+					mes 1,@if5$;
+					//if(!item_exist(@myid,"러스터데몬의꼬리")||!item_exist(@myid,"고렘의돌조각")|| !item_exist(@myid,"브론즈오피온의비늘")){goto if5;}
+					set #classskillupgrad31, 2;
+					skill_del "선풍각";
+					skill_del "붕각";
+					skill_del "단각";
+					skill_add "파천각";
+					skill_add "붕신선각";
+					skill_add "연천단각";
+					item_del "브론즈오피온의비늘",1;
+					item_del "러스터데몬의꼬리",1;
+					item_del "고렘의돌조각",1;
+				}
+			}
+			mes 0,"기술을 배웠습니다.";
+		}
+	end;
+	}
+	if(@npc$=="로오"){
+		set @rh1$,"{=a이상이어야 하며, 당신이 진정한 용기를 가진자인지를 판단하기 위한 몇가지 재물을 준비해오시기 바랍니다.";
+		set @rh2$,"적룡굴에서 나타나는 몬스터를 잡아 그 증표를모아오되, 당신은 {=v";
+		set @rh3$,"";
+		mes 1,"저는 마력을 관장하는 신 로오입니다. 당신의 마법에 은총을 내려 더욱 강력하게 해드릴수 있습니다..";
+ 		mes 1,"단, 그렇게 하기 위해서 당신에게 몇가지 필요한것과 시련이 있습니다. 그것을 통과하면 마법을 더욱 강하게 해드리죠.";
+		set@rs,menu(0,"질문이 있으십니까?","자격을 알고 싶습니다.","모든 준비가 끝났습니다.");
+		if(@rs==1){
+			if(get_class()==3){
+				mes 1,"당신의 능력은 {=b힘 10,지력133,지혜133,지구력14,민첩성20"+@rh1$;
+ 				mes 0,@rh2$+"다크틸의지팡이 2개, 오피온의뿔2개, 레드오피온의비늘1개{=a를 준비해오시기 바랍니다";
+			}
+			if(get_class()==4){
+				mes 1,"당신의 능력은 {=b힘6 ,지력130,지혜140,지구력8,민첩성15"+@rh1$;
+ 				mes 0,@rh2$+"카벙클의꼬리 1개, 성스러운반지1개, 레드오피온의비늘1개{=a를 준비해오시기 바랍니다";
+			}
+		}else if(@rs==2){
+			if(get_class()==3){
+ 				mes 1,"마법사인 당신은 4써클때 배웠던 4대 원소 공격들을 업그레이드 하게 됩니다.";
+				set@rs3,menu(0,"준비가 되셨습니까?","네","아뇨");
+				if(@rs3==1){
+					mes 1,"그럼 네가 기술을 습득할 수 있는 능력이 되는지 체크하도록 하겠다.";
+					if(get_class(@myid) != 3||get_str() < 10||get_int() < 133||get_wis() < 133||get_con() < 14||get_dex() < 20){mes 0,"민첩성이 모자르구나..";}
+					mes 1,"너의 능력은 충분하구나. 그렇다면 이제 재물들이 모두 있는지 확인하고 가지러 가겠다.";
+					//if(item_exist(@myid,"다크틸의지팡이") < 2 ||item_exist(@myid,"오피온의뿔") < 2||!item_exist(@myid,"레드오피온의비늘")){mes 0,"재물을 모두 모으지 않았구나....";}
+					spell_del "마레네라";
+					spell_del "테라미에라";
+					spell_del "플라메라";
+					spell_del "아듀레나";
+					spell_add "아이스블러스트";
+					spell_add "퀘이크";
+					spell_add "플레쉬스톰";
+					spell_add "플레어";
+					item_del "레드오피온의비늘",1;
+					item_del "다크틸의지팡이",2;
+					item_del "오피온의뿔",2;
+				}
+			}
+			if(get_class()==4){
+ 				mes 1,"성직자인 당신은 수페라벨라르모와 에나르마를 업그레이드 하게 됩니다.";
+				set@rs2,menu(0,"준비가 되셨습니까?","네","아뇨");
+				if(@rs2==1){
+ 					mes 1,"그럼 네가 기술을 습득할 수 있는 능력이 되는지 체크하도록 하겠다.";
+					if(get_class(@myid) != 4||get_str() < 6||get_int() < 130||get_wis() < 140||get_con() < 8||get_dex() < 15){mes 0,"지식이 모자르구나..";}
+					mes 1,"너의 능력은 충분하구나. 그렇다면 이제 재물들이 모두 있는지 확인하고 가지러 가겠다.";
+					//if(item_exist(@myid,"카벙클의꼬리") < 1 ||item_exist(@myid,"성스러운은반지") < 1||!item_exist(@myid,"레드오피온의비늘")){mes 0,"재물을 모두 모으지 않았구나....";}
+					spell_del "수페라벨라르모";
+					spell_del "에나르마";
+					spell_add "엑스벨라룸";
+					spell_add "수페라에나르마";
+					item_del "레드오피온의비늘",1;
+					item_del "성스러운은반지",1;
+					item_del "카벙클의꼬리",1;
+				}
+			}
+			mes 0,"마법을 배웠습니다.";
+		}
+	end;
+	}
+	if(@npc$=="라멜라"){
+		if(get_class()==1){
+			set@aon1,menu(0,@hi$,"마법 지우기","기술 지우기","크래셔업그레이드","암살격업그레이드");
+			if(@aon1==1){goto pdel;}
+			else if(@aon1==2){goto sdel;}
+			else if(@aon1==3){
+				if(get_class() != 1){mes 0,"승급전사분들을 위한 업그레이드입니다.";}
+				if(skill_exist("데빌크래셔")||skill_exist("데빌크래셔(세트효과)")){mes 0,"이미 업그레이드된 기술을 가지고 있습니다";end;}
+	 			mes 1,"크래셔를 업그레이드 하고 싶나요? 호호... 그러나 그냥 해드릴순 없죠...";
+	 			mes 1,"{=c[브론즈오피온의비늘,안크본의갈비뼈]{=a 를 하나가져오시면 업그레이드를 해드리지요...";
+	 			mes 1,"{=a이 일을 맡기 위해선 {=c[str]{=a215{=c[int]{=a20{=c[wis]{=a25{=c[con]{=a180{=c[dex]{=a20 이상은 되어야 해요 호호호";
+				if(get_str() < 215||get_int() < 20||get_wis() < 25||get_con() < 180||get_dex() < 20){mes 0,"str 이 215 이상은 되어야 기술 업그레이드를 하실수가있죠~ 노력하세요";}
+					//if(!item_exist(@myid,"브론즈오피온의비늘")||!item_exist(@myid,"안크본의갈비뼈")){mes 0,"재료를 모두 모아와주세요~ 호호..";}
+					set #classskillupgrad12,1;
+					skill_del "크래셔";
+					item_del "브론즈오피온의비늘",1;
+					item_del "안크본의갈비뼈",1;
+					skill_add "데빌크래셔";
+                                                                     item_add "순수의증표(전사)",50;
+					set@sari5,menu(0,"크래셔을 데빌크래셔로 업그레이드 하셨습니다.");
+					end;
+			}else if(@aon1==4){goto sn2;}
+		end;
+		}
+		if(get_class()==2){
+			set@cp2,menu(0,@hi$,"마법 지우기","기술 지우기","크래셔업그레이드","암살격업그레이드");
+			if(@cp2==1){goto pdel;}
+			else if(@cp2==2){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 42;}
+			else if(@cp2==3){goto sdel;}
+			else if(@cp2==4){goto sn;}
+			else if(@cp2==5){
+ 				mes 1,"암살격을 업그레이드 하고 싶나요? 호호... 그러나 그냥 해드릴순 없죠...";
+ 				mes 1,"블러.. 블러조?... 그 뭐였더라...\\n아.. 생각났다.. 블러드조나단백작이라고 아시나요?";
+				mes 1,"그 백작에게서 {=c조나단백작의문장{=a을 얻어다 주세요... 뭐에 쓸거냐고요?";
+				mes 1,"요 근래 자주보이는 로봇들이 그러는데 자기들 대장이 그걸 가져오면 황금을 준다나?? 어쩐대나..";
+				mes 1,"어머 주책.. 호호호~ 어째뜬 {=c조나단백작의문장{=a을 가져오면 업그레이드 해드리죠...\\n그전엔 어림없어요";
+ 				mes 1,"그나저나 이 일을 맡기 위해선 {=c[str]{=a115 {=c[int]{=a20 {=c[wis]{=a25 {=c[con]{=a20 {=c[dex]{=a175 이상은 되어야 해요 호호호";
+				set@cp2C,menu(0,"어때요? 조나단 백작의 문장을 가져다 줄래요?","좋아요...","어쩌죠 싫은데요");
+				if(@cp2C==1){
+					if(get_class() != 2){mes 0,"{=c암살격진{=a 는 순수 도적만이 습득할 수 있답니다";}
+ 					if(get_str() < 115||get_int() < 20||get_wis() < 25||get_con() < 20||get_dex() < 175){mes 0,"str 이 115 이상은 되어야 믿고 맡기죠~ 노력하세요";}
+					set #classskillupgrad21,1;
+					skill_del "암살격";
+					//item_del "조나단백작의문장",1;
+					skill_add "암살격진";
+                                                                     item_add "순수의증표(도적)",50;
+					set@sari5,menu(0,"암살격을 암살격진으로 업그레이드 하셨습니다.");
+				}else if(@cp2C==2){
+					mes 0,"흥!! 어쩔수 없죠...";
+				}
+			}
+		end;
+		}
+		if(get_class()==3){
+			set@aon3,menu(0,@hi$,"마법 배우기","마법 지우기","기술 지우기","크래셔업그레이드","암살격업그레이드");
+			if(@aon3==1){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 43;}
+			else if(@aon3==2){goto pdel;}
+			else if(@aon3==3){goto sdel;}
+			else if(@aon3==4){goto sn;}
+			else if(@aon3==5){goto sn2;}
+		end;
+		}
+		if(get_class()==4){
+			set@aon4,menu(0,@hi$,"마법 배우기","마법 지우기","기술 지우기","크래셔업그레이드","암살격업그레이드");
+			if(@aon4==1){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 44;}
+			else if(@aon4==2){goto pdel;}
+			else if(@aon4==3){goto sdel;}
+			else if(@aon4==4){sn:mes 0,"승급전사분들을 위한 업그레이드입니다.";}
+			else if(@aon4==5){sn2:mes 0,"{=c암살격진{=a 는 순수 도적만이 습득할 수 있답니다";}
+		end;
+		}
+	end;
+	}
+	if(@npc$=="사리"){
+		if(get_class()==2||get_class()==4||get_class()==5){
+			set@sari,menu(0,"이곳까지 오시느라 고생하셨습니다. 제가 필요하시다면 언제라도 저를 찾아주시기 바랍니다. 언제라도 당신을 돕고 싶습니다.","마법 배우기","마법 지우기","데포이의서신");
+			if(@sari==1){
+				if(get_class()==2){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 21;
+				end;
+				}
+				if(get_class()==5){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 16;
+				end;
+				}
+				skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 15;
+			}else if(@sari==2){
+				goto pdel;
+			}else if(@sari==3){
+				mes 0,"데포이님을 아시나보네요.. 그래도 저한테 볼일은 없어보이는데요?";
+			}
+		end;
+		}
+		set@sari,menu(0,"이곳까지 오시느라 고생하셨습니다. 제가 필요하시다면 언제라도 저를 찾아주시기 바랍니다. 언제라도 당신을 돕고 싶습니다.","마법 지우기","데포이의서신");
+		if(@sari==1){
+			goto pdel;
+		}else if(@sari==2){
+			mes 0,"데포이님을 아시나보네요.. 그래도 저한테 볼일은 없어보이는데요?";
+		}
+	end;
+	}
+	if(@npc$=="백마법사범"){
+		mes 1,"반가워요. 전 백 마법을 가르치는 백마법사범입니다.\\n마법의 힘을 사용하는 기술 중 저희 백마법은 남을 해하는 마법보다 사람들을 보호하고 치료하는 능력을 배우게 됩니다.";
+		set@tipclass4,menu(0,"무엇을 알려드릴까요?","누구나 배울 수 있는 백마법","성직자의 백마법");
+		if(@tipclass4==1){
+			mes 1,"<쿠로토>는 누구나 배울 수 있는 백마법으로, 스스로 자신의 체력을 100씩\\n회복시켜주는 마법입니다.";
+			mes 1,"밀레스 마을의 백마법사를 찾아가시면 간단하게 배우실 수 있는 기초적인\\n백마법이니 꼭 습득하도록 하세요.";
+			spelltip1:
+			mes 1,"모든 마법에는 시전시간이라고 하는 딜레이 타임이 있습니다.";
+			mes 1,"이 딜레이타임은 각 마법의 아이콘을 오른쪽버튼으로 클릭해서 살펴보면\\n알 수 있지요. 이런 딜레이 타임은 마법을 사용하는데 있어서 매우 중요한데,\\n공격수들이 무기를 들고 싸워 공격력을 높이는 것 처럼 마법계열의 직업을 가진 사람들은 스태프 같은\\n마법무기등을 소지한다면 각 스태프의 성질에 따라 마법의 딜레이가 조금씩 변화됩니다.";
+			mes 0,"공격마법을 더 알고 싶다면 옆에계신 흑마법사범님을 만나보는게 어떨가요?";
+		}else if(@tipclass4==2){
+			mes 1,"성직자는 그야말로 백마법을 위해서 존재하는 직업이라고 할 수 있습니다.";
+			mes 1,"성직자는 공격적인 마법대신 치유의 쿠로계마법, 축복의 벨라계마법, 보호의 호르계마법, 응원의 에나계마법 외에도 팀원의 소환등 보호와 지원의 마법들을 배우게 됩니다.";
+			mes 1,"그렇다고 공격마법이 하나도 없는 것은 아닙니다. 성스러운 번개마법인 홀리볼트,\\n전제차법인 홀리드래곤등 성직자만이 가질 수 있는 공격마법들도 흑마법사범을 통해서 배울 수 있게 되는 것이지요.";
+			goto spelltip1;
+		}
+	end;
+	}
+	if(@npc$=="코시리크"){
+		if(get_class()==3||get_class()==4){
+			set@umbarak,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","기술 지우기");
+			if(@umbarak==1){
+				goto Technicaldeleted3;
+			}
+		}else{
+			set@kosirik,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","기술 배우기","기술 지우기","기초공격기술배우기");
+			if(@kosirik==1){
+				if(get_class(@myid)==1){skill_learn "당신이 배울 수 있는 기술은 다음과 같습니다.", 1;end;}
+				if(get_class(@myid)==2){skill_learn "당신이 배울 수 있는 기술은 다음과 같습니다.", 3;end;}
+				if(get_class(@myid)==5){skill_learn "당신이 배울 수 있는 기술은 다음과 같습니다.", 5;end;}
+			}else if(@kosirik==2){
+				goto sdel;
+			}else if(@kosirik==3){
+				if(get_class(@myid)==1){
+					if(#classskillupgrad1 !=0){ko1:set@pik,menu(0,"당신은 이미 업그레이드 할 기술을 갖고 있습니다.","나가기");if(@pik>=0){end;}}
+					set@kosirik1,menu(0,"5000전을 내시고, 숏블레이드를 윈드블레이드로 업그레이드 하시겠습니까?","네","아니요");
+					if(@kosirik1==1){
+						if(get_level(myid)<11){goto spno3;}
+						if(get_money(@myid)<5000){goto spno4;}
+						set #classskillupgrad1,1;
+						money_del 5000;
+						skill_del"숏블레이드";
+						skill_add"윈드블레이드";
+						set@kosiriks1,menu(0,"숏블레이드를 윈드블레이드로 업그레이드 하였습니다.","나가기");
+					}
+				end;
+				}
+				if(get_class(@myid)==2){
+					if(#classskillupgrad2 !=0){goto ko1;}
+					set@kosirik2,menu(0,"5000전을 내시고, 찌르기를 찔러휘비기로 업그레이드 하시겠습니까?","네","아니요");
+					if(@kosirik2==1){
+						if(get_level(myid)<11){goto spno3;}
+						if(get_money(@myid)<5000){goto spno4;}
+						set #classskillupgrad2,1;
+						money_del 5000;
+						skill_del"찌르기";
+						skill_add"찔러휘비기";
+						set@kosiriks1,menu(0,"찌르기를 찔러휘비기로 업그레이드 하였습니다.","나가기");
+					}
+				end;
+				}
+				if(get_class(@myid)==5){
+					if(#classskillupgrad31 !=0){goto ko1;}
+					set@kosirik3,menu(0,"5000전을 내시고, 정권을 단각으로 업그레이드 하시겠습니까?","네","아니요");
+					if(@kosirik3==1){
+						if(get_level(myid)<11){goto spno3;}
+						if(get_money(@myid)<5000){goto spno4;}
+						set #classskillupgrad31,1;
+						money_del 5000;
+						skill_del"정권";
+						skill_add"단각";
+						set@kosiriks1,menu(0,"정권을 단각으로 업그레이드 하였습니다.","나가기");
+					}
+				end;
+				}
+			}
+		}
+	end;
+	}
+	if(@npc$=="메사라"){
+		if(get_class()==3){
+			set@mesara,menu(0,"험난한 길을 걷는 수행자여 또 하나의 모험에 도전할 각오가 되었느냐?","마법 배우기","마법 지우기","히네스유적발굴");
+			if(@mesara==1){
+				skill_learn "지금 네가 배울 수 있는 마법은 다음과 같단다. 다시 한 번 심사 숙고 하고 배우도록 하여라", 20;
+			}else if(@mesara==2){
+				goto pdel;
+			}else if(@mesara==3){
+				mes 0,"응? 자넨 뭔가? 크크크. 난 바쁨 몸이네.";
+			}
+		end;
+		}
+		set@mesara,menu(0,"험난한 길을 걷는 수행자여 또 하나의 모험에 도전할 각오가 되었느냐?","마법 지우기","히네스유적발굴");
+		if(@mesara==1){
+			goto pdel;
+		}else if(@mesara==2){
+			mes 0,"응? 자넨 뭔가? 크크크. 난 바쁨 몸이네.";
+		}
+	end;
+	}
+	if(@npc$=="아레스"){
+		if(get_class()==1){
+			set@aresw,menu(0,@ex5$,"마법 지우기","기술 배우기","기술 지우기");
+			if(@aresw==1){
+				goto pdel;
+			}else if(@aresw==2){
+				set@aresw2,menu(0,@ex6$,"완전방어","매드소울");
+				if(@aresw2==1){
+					set@umbaraks,menu(0,"완전방어는 몸에 보호막을 쳐서 기술을 방어 하는"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"완전방어를"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_add"완전방어";
+							if(#class1skilllegend1 == 0){legend_add 0, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 완전방어 배움";}
+							set #class1skilllegend1,1;
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}else if(@aresw2==2){
+					if(skill_exist("매드소울진")){set@kosirik1,menu(0,"당신은 이미 업그레이드 할 기술을 갖고 있습니다.","나가기");end;}
+					set@umbaraks,menu(0,"매드소울은 강한 기를 내뿜어 적을 공격 하는"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"매드소울을"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_add"매드소울";
+							if(#class1skilllegend2 == 0){legend_add 0, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 매드소울 배움";}
+							set #class1skilllegend2,1;
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}
+			}else if(@aresw==3){
+				goto sdel;
+			}
+			end;
+		}
+		if(get_class()==2){
+			set@aresr,menu(0,@ex5$,"기술 배우기","마법 지우기","기술 지우기");
+			if(@aresr==1){
+				set@aresr2,menu(0,@ex6$,"암살격");
+				if(@aresr2==1){
+					if(skill_exist("암살격진")){mes 0,"이미 업그레이드된 기술을 가지고 있습니다";end;}
+					set@umbaraks,menu(0,"암살격은 체력을 소모하여 불시에 공격 하는"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"암살격을"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_del"암살격진";
+							skill_add"암살격";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}
+			}else if(@aresr==2){
+				goto pdel;
+			}else if(@aresr==3){
+				goto sdel;
+			}
+			end;
+		}
+		if(get_class()==5){
+			set@aresm,menu(0,@ex5$,"마법 배우기","마법 지우기","기술 배우기","기술 지우기");
+			if(@aresm==1){
+				set@aresm2,menu(0,@ex6$,"반탄신공","다라밀공");
+				if(@aresm2==1){
+					set@umbaraks,menu(0,"반탄신공은 자신에게 행애지는 모든 기술을 적에게 되돌리는"+@ex4$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"반탄신공을"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							spell_add"반탄신공";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}else if(@aresm2==2){
+					set@umbaraks,menu(0,"다라밀공은 내공을 모두 모아 쏘는"+@ex4$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"다라밀공을"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							spell_add"다라밀공";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}	
+			}else if(@aresm==2){
+				goto pdel;
+			}else if(@aresm==3){
+				set@aresm2,menu(0,@ex6$,"달마신공","구양신공");
+				if(@aresm2==1){
+					set@umbaraks,menu(0,"달마신공은 체력을 소모하여 공격하는 필살기"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"달마신공을"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_add"달마신공";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}else if(@aresm2==2){
+					set@umbaraks,menu(0,"구양신공은 사방의 적을 대상으로 하는 필살기"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"구양신공을"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_add"구양신공";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}
+			}else if(@aresm==4){
+				goto sdel;
+			}
+			end;
+		}
+		set@ares,menu(0,@ex5$,"마법 지우기","기술 지우기");
+		if(@ares==1){
+			goto pdel;
+		}else if(@ares==2){
+			goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="페이"){
+		if(get_class()==1){
+			set@pei,menu(0,"이렇게 저를 찾아주셔서 감사합니다. 제가 무슨 도움을 드릴 수 있을까요?","마법 배우기","마법 지우기","기술 배우기","기술 지우기","페이와대화하기");
+			if(@pei==1){
+				skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 45;
+			}else if(@pei==2){
+				goto pdel;
+			}else if(@pei==3){
+				set@pei2,menu(0,"당신이 배울 수 있는 기술은 다음과 같습니다.","크래셔","피닉스모드");
+				if(@pei2==1){
+					set@umbaraks,menu(0,"크래셔는 마지막 남은 기력으로 공격하는"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"크래셔를"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(skill_exist("데빌크래셔")){set@kosirik1,menu(0,"당신은 이미 업그레이드 할 기술을 갖고 있습니다.","나가기");end;}
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_add"크래셔";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}else if(@pei2==2){
+					set@umbaraks,menu(0,"피닉스모드는 검에 피닉스의힘을 빌어 파괴력을 높히는"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"피닉스모드를"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_level(myid)<99){goto spno3;}
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_add"피닉스모드";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}
+			}else if(@pei==4){
+				goto sdel;
+			}else if(@pei==5){
+				mes 0,"기술이라는 것은 항상 열심히 연마할수록 느는 법이지...";
+			}
+			end;
+		}
+		if(get_class()==2){
+			set@pei,menu(0,"이렇게 저를 찾아주셔서 감사합니다. 제가 무슨 도움을 드릴 수 있을까요?","마법 배우기","마법 지우기","기술 배우기","기술 지우기","페이와대화하기");
+			if(@pei==1){
+				skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 45;
+			}else if(@pei==2){
+				goto pdel;
+			}else if(@pei==3){
+				set@pei2,menu(0,"당신이 배울 수 있는 기술은 다음과 같습니다.","적갑옷해체");
+				if(@pei2==1){
+					if(get_level(myid)<99){goto spno3;}
+					set@umbaraks,menu(0,"적갑옷해체는 대상의 갑옷을 벗겨 내는"+@ex3$,"예","아니오");
+					if(@umbaraks==1){
+						set@umbarakss,menu(0,"적갑옷해체를"+@piif$,"예","아니오");
+						if(@umbarakss==1){
+							if(get_money(@myid)<5000){goto spno4;}
+							skill_add"적갑옷해체";
+							goto spadd2;
+						}else if(@umbarakss==2){
+							goto spno2;
+						}
+					}else if(@umbaraks==2){
+						goto spno2;
+					}
+				}
+			}else if(@pei==4){
+				goto sdel;
+			}else if(@pei==5){
+				mes 0,"기술이라는 것은 항상 열심히 연마할수록 느는 법이지...";
+			}
+			end;
+		}
+		set@pei,menu(0,"이렇게 저를 찾아주셔서 감사합니다. 제가 무슨 도움을 드릴 수 있을까요?","마법 배우기","마법 지우기","기술 지우기","페이와대화하기");
+		if(@pei==1){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 45;
+		}else if(@pei==2){
+			goto pdel;
+		}else if(@pei==3){
+			goto sdel;
+		}else if(@pei==4){
+			mes 0,"기술이라는 것은 항상 열심히 연마할수록 느는 법이지...";
+		}
+	end;
+	}
+	if(@npc$=="아이작"){
+		if(get_class()==1||get_class()==2||get_class()==5){
+			set@ijag,menu(0,"험남한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","기술 배우기","기술 지우기");
+			if(@ijag==1){
+				if(get_class()==1){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 22;end;}
+				if(get_class()==2){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 23;end;}
+				if(get_class()==5){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 24;end;}
+			}else if(@ijag==2){
+				goto sdel;
+			}
+			end;
+		}
+		set@ijag,menu(0,"험남한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","기술 지우기");
+		if(@ijag==1){
+			goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="윈슬렛"){
+		if(get_class()==3||get_class()==4||get_class()==5){
+			set@winslret,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","마법 배우기","마법 지우기");
+			if(@winslret==1){
+				if(get_class()==3){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 17;
+				end;
+				}
+				if(get_class()==4){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 18;
+				end;
+				}
+				if(get_class()==5){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 19;
+				end;
+				}
+			}else if(@winslret==2){
+				goto pdel;
+			}
+			end;
+		}
+		set@winslret,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","마법 지우기");
+		if(@winslret==1){
+			goto pdel;
+		}
+	end;
+	}
+	if(@npc$=="키튼"){
+		if(get_class()==1){
+			set@kitn,menu(0,"이곳까지 오시느라 고생하셨습니다. 제가 필요하시다면 언제라도 저를 찾아주시기 바랍니다. 언제라도 당신을 돕고 싶습니다.","기술 배우기","기술 지우기");
+			if(@kitn==1){
+				skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 기술은 다음과 같단다.", 25;
+			}else if(@kitn==2){
+				goto sdel;
+			}
+			end;
+		}
+			set@kitn,menu(0,"이곳까지 오시느라 고생하셨습니다. 제가 필요하시다면 언제라도 저를 찾아주시기 바랍니다. 언제라도 당신을 돕고 싶습니다.","기술 지우기");
+			if(@kitn==1){
+				goto sdel;
+		}
+	end;
+	}
+	if(@npc$=="시나"){
+		if(get_class()==2||get_class()==4||get_class()==5){
+			set@sina,menu(0,"이렇게 저를 찾아주셔서 감사합니다. 제가 무슨 도움을 드릴 수 있을까요?","마법 배우기","마법 지우기","마법효모구하기");
+			if(@sina==1){
+				if(get_class()==2){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 11;
+				end;
+				}
+				if(get_class()==5){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 13;
+				end;
+				}
+				if(get_class()==4){
+					skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 12;
+				end;
+				}
+			}else if(@sina==2){
+				goto pdel;
+			}else if(@sina==3){
+				end;
+			}
+		end;		
+		}
+		set@sina,menu(0,"이렇게 저를 찾아주셔서 감사합니다. 제가 무슨 도움을 드릴 수 있을까요?","마법 지우기","마법효모구하기");
+		if(@sina==1){
+			goto pdel;
+		}else if(@sina==2){
+			end;
+		}
+	end;
+	}
+	if(@npc$=="움바라크"){
+		if(get_class()==3||get_class()==4){
+			set@umbarak,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","기술 지우기");
+			if(@umbarak==1){
+				goto sdel;
+			}
+		}
+		set@umbarak,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","기술 배우기","기술 지우기");
+		if(@umbarak==1){
+			if(get_class()==1){skill_learn "자네 수준이라면 이런 기술들을 배울 수 있겠군.", 2;end;}
+			if(get_class()==2){skill_learn "자네 수준이라면 이런 기술들을 배울 수 있겠군.", 4;end;}
+			if(get_class()==5){skill_learn "자네 수준이라면 이런 기술들을 배울 수 있겠군.", 6;end;}
+		}else if(@umbarak==2){
+			goto sdel;
+		}	
+	end;
+	}
+	if(@npc$=="로오스롬"){
+		if(get_class()==3||get_class()==4||get_class()==5){
+			set@rohosrom,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 외었느냐?","마법 배우기","마법 지우기");
+			if(@rohosrom==1){
+				if(get_class()==3){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 9;end;}
+				if(get_class()==4){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 10;end;}
+				if(get_class()==5){skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 7;end;}
+			}else if(@rohosrom==2){
+				goto pdel;
+			}
+		end;
+		}
+		set@rohosrom,menu(0,"험난한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 외었느냐?","마법 배우기","마법 지우기");
+		if(@rohosrom==1){
+			skill_learn "이렇게 늘 배우려고 하는 자세를 유지하도록 하여라. 지금 네가 배울 수 있는 마법은 다음과 같단다.", 8;
+		}else if(@rohosrom==2){
+			goto pdel;
+		}
+	end;
+	}
+	if(@npc$=="전투기술사범"){
+		mes 1,"어서오게. 나를 찾아온걸 보니 어지간히 싸우는 걸 좋아하는가 보군.";
+		mes 1,"나는 전투기술사범이다. 전투에 필요한 기술들을 가르치는 역할을 하지.\\n만약 어린애들처럼 뒤에 숨어있으면서 지팡이나 휘두르고 싶다면 이층에 있는\\n마법사범들에게나 가보게나.";
+		replay:
+		set@menu,menu(0,"그래 어떤것에 관심이 있나?","전사의전투기술","도적의전투기술","무도가의전투기술");
+		if(@menu==1){
+			mes 1,"전사의전투기술은 대부분 검기를 사용해서 적을 공격하는 기술들이지.\\n검을 들고 있을 때 비로소 그 위력이 제대로 발휘한다는 뜻이야.\\n전방 3칸앞까지 자신의 검기를 날릴 수도 있고, 사방을 둘러싸고 있는\\n적들을 검기로 날려버릴 수도 있지.";
+			mes 1,"다른 직업과는 달리 다양한 칼과 검을 사용할 수 도 있고, 특히 투핸드어택을 배우고 나면 큰칼들도 거뜬히 사용할 수 있게 된다고!!!";
+			mes 1,"뭐 점점 강해지다보면 기사단장으로부터 꽤 멋진 필살기도 배울 수 있어.\\n상상해보라고, 네 포효에 꿈쩍못하고 벌벌떠는 몬스터들을 말이야\\n으하하핫!!!";
+			goto replay;
+		}else if(@menu==2){
+			mes 1,"도적이란 말이야..기습적인 공격, 뭐 간단하게 말해서 상대방이 나를 눈치채지 못할 때\\n뒤에서 확!!...음..비겁해보인다고? 상대방이 눈치채지 못하게 하는 것이 얼마나\\n고난이도의 기술인지 모르는가보군.";
+			mes 1,"도적은 주로 단검을 사용해서 찌르는 공격을 하는데, 표창이라던가 단검은\\n표창날리기라는 기술을 사용해서 조금 멀리 떨어져 있는 몬스터를 공격할 수 도 있어.";
+			mes 1,"도적은 초반에 전사나 무도가에 비해서 그 힘이 약해보일지 몰라도 전투기술과\\n특수기술을 모두 습득하다보면 몬스터나 적에게 가장 큰 위협이 되는 직업이지.\\n최고의 어쌔씬을 꿈꿔보는 것도 괜찮을거야.";
+			mes 1,"도적 기술중에는 특수기술도 많이 있으니 도적에 관심이 있다면\\n특수기술사범에게 좀 더 이야기를 들어보는게 어때?";
+			goto replay;
+		}else if(@menu==3){
+			mes 1,"무도가야 말로 맨주먹 맨다리를 단련하여 순수하게 기술로만 승부하는\\n멋진 직업이라고 할 수 있지.";
+			mes 1,"무도가도 마법을 사용하지만 그건 위층에 있는 흑,백마법들하고는 차원이 틀린\\n기를 이용한 공격이라고!";
+			mes 1,"사실 무도가의 길은 멀고도 험하지만, 무도가로써 진정한 강자가 되었을 때 \\n그 위력은 정말 어마어마 하다네";
+			mes 1,"무도가의 필살기는 백마법사들의 두터운 방어막조차도 뚫어버릴 만큼 강력하니\\n배틀에 있어서 이보다 더 강한 직업이 또 어디있겠는가?! 하하하하";
+			mes 0,"무도가 기술중에는 특수기술이 여러가지가 있다네, 무도가에 관심이 있다면\\n특수기술사범에게 좀 더 이야기를 들어보는게 어때?";
+		}
+	end;
+	}
+	if(@npc$=="메라사아"){
+		if(get_class()==3||get_class()==4){
+			set@merasia,menu(0,"험남한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","마법 배우기","마법 지우기");
+			if(@merasia==1){
+				if(get_class()==3){skill_learn "지금 네가 배울 수 있는 마법은 다음과 같단다. 다시 한 번 심사 숙고 하고 배우도록 하여라.", 14;end;}
+				if(get_class()==4){skill_learn "지금 네가 배울 수 있는 마법은 다음과 같단다. 다시 한 번 심사 숙고 하고 배우도록 하여라.", 26;end;}
+			}else if(@merasia==2){goto pdel;}
+		end;
+		}
+		set@merasia,menu(0,"험남한 길을 걷는 수행자여, 또 하나의 모험에 도전할 각오가 되었느냐?","마법 지우기");
+		if(@merasia==1){goto pdel;}
+	end;
+	}
+	if(@npc$=="흑마법사범"){
+		mes 1,"크크크크 흑마법에 관심이 많으신가? 얼굴을 보아하니 마력이 철철 넘치게 생겼구만..";
+		mes 1,"흑마법은 말이지 자신의 마나와 마력을 이용해서 적을 공격하는 마법들이 대부분이지\\n이런것에 관심이 많다면 마법사의 길을 걸어보는건 어때?";
+		set@tipclass3,menu(0,"뭘 알고 싶은거냐?","누구나 배울 수 있는 흑마법","마법사의 흑마법");
+		if(@tipclass3==1){
+			mes 1,"뭐? 누구나 배울 수 있는 흑마법이 있냐고?? 크크크크 장난해?";
+			mes 0,"… 꼭 마법사가 아니더라도 흑마법계의 마법을 배울 수 있는 직업이 있긴하지만 쿠로토 처럼 모두가 똑같이 쓸 수 있는 흑마법이란건 없어! 흑마법은 …흑마법은….고귀한 것이란 말이다!!";
+		}else if(@tipclass3==2){
+			mes 1,"마법사는 흑마법을 사용하는 대표적인 직업이라고 할 수 있지\\n마법사의 흑마법이야 말로 이 세계의 꽃 같은 존재라고나 할까…\\n불,물,바람,대지의 힘을 받아 사용하는 각가지 공격마법들 외에도";
+			mes 1,"상대방의 방어력을 낮춰버리는 저주계열의 마법들, 그리고 각가지 상태이상 마법..\\n크크크크…생각만해도 온몸이 짜릿해지지 않아?";
+			mes 1,"물론 이런 마법들이 마치 활을 쏘듯 팍팍 나가주면 얼마나 좋겠는가만은\\n신의 시기때문인지 모든 마법에는 시전시간이라는 딜레이가 붙어있다네\\n마법아이콘을 마우스오른쪽 버튼으로 확인해보면 그 딜레이가 몇초인지 알수 있는데.. 각 초에";
+			mes 1,"해당하는 칸에 자신의 마법주문도 써둘 수 있으니 뭐 즐겨보라고\\n딜레이를 줄이는 법?? 그거야 당연히 마법지팡이를 드는 거지.\\n고대부터 마법사들이 맨손으로 마법쓰는거 봤어?? 지팡이는 폼이 아니라고,\\n전략도구지..크크크크크";
+			mes 0,"뭐? 이런거 별로 재미없어? 그럼 다른 사범들을 찾아가 얘기를 나눠보라고!";
+		}
+	end;
+	}
+	if(@npc$=="특수기술사범"){
+		mes 1,"어서오십시요. 전 전투에 도움이 되는 여러가지 특수 기술을 알려드리는 기술사범입니다.";
+		mes 1,"직업별로 많은 특수기술들이 있지요. 이것들은 전투나 생활에 직접, 혹은 간접적으로 영향을 끼치게 됩니다.";
+		replay2:
+		set@menu2,menu(0,"무엇을 알려드릴까요","도적의 특수기술","무도가의 특수기술","누구나 배울 수 있는 특수기술");
+		if(@menu2==1){
+			mes 1,"도적의 특수기술 중 가장 대표적인 것은 역시 센스계열이 아닌가 싶습니다.";
+			mes 1,"특히 센스몬스터의 경우에는 몬스터의 체력과 마력 경험치를 확인할 수 있을 뿐만 아니라,\\n스킬레벨이 올라가면 몬스터의 방어와 공격속성을 알 수 있기도 하지요.";
+			mes 1,"이런 속성들은 공격과 방어에 엄청난 효과를 일으키키 때문에 매우 중요합니다.\\n그만큼 그룹에서 도적의 위치는 꽤 비중이 크다고 할 수 있겠습니다.";
+			mes 1,"속성에 대해서는 {=c용자의공원의 도서관{=a에서 책을 찾아서 읽어보시는게 도움이 될 것 입니다.";
+			mes 1,"만약 공격기술에 대해서 알고 싶으시다면 옆에 계시는 전투기술사범님에게\\n자문을 구해보세요. 분명 도움이 될 것 입니다.";
+			goto replay2;
+		}else if(@menu2==2){
+			mes 1,"무도가의 특수기술 중 대표적인 것으로는 이형환위를 들 수 있겠군요.";
+			mes 1,"이형이란 다른 유저나 몬스터를 뛰어넘어 후.측면포지션을 차지할 수 있게 해줍니다.";
+			mes 1,"단순히 사냥 때 뿐만 아니라 복잡한 마을에서 이동이 편리할 수도 있으니\\n일석이조라고 할 수 있겠지요";
+			mes 1,"이런 기술들을 활용해 공격기술과 함께 사용함으로써 더더욱 큰 공격효과와\\n멋진 공격컨트롤을 선보일 수 있습니다.";
+			mes 1,"만약 공격기술에 대해서 알고 싶으시다면 옆에 계시는 전투기술사범에게\\n자문을 구해보세요. 분명 도움이 될 것 입니다.";
+			goto replay2;
+		}else if(@menu2==3){
+			mes 1,"누구나 배울 수 있는 특수기술로는 아이템 고치기라던가 제조등이 있습니다.";
+			mes 1,"특히 아이템고치기의 경우에는 수리점에서 수리해주지 않는 아이템이나, 수리점이 없는\\n사냥터에서 수리를 할 수 있어 교힌하게 쓸 수 있지만…만약 수리에 실패하게 되면\\n오히려 아이템을 깨트릴 수 있어서 조심해야지요.";
+			mes 1,"그 외 제조라던가 수영, 낚시등의 특수 기술들은 당신의 일상생활이나 생산활동에 도움을 주는 것들입니다.";
+			mes 1,"이런 스킬대해서는 일기장의 스킬란을 확인해보시면 배울 수 있는 조건과 장소를 알 수 있을 것입니다.";
+			mes 0,"만약 공격기술에 대해서 알고 싶으시다면 옆에 계시는 전투기술사범님에게\\n자문을 구해보세요. 분명 도움이 될 것 입니다.";
+		}
+	end;
+	}
+	end;
+	pdel:spell_del_menu@myid,"지금 네가 지울 수 있는 마법은 다음과 같단다. 다시 한 번 심사 숙고 하고 지우도록 하여라",5000;
+	end;
+	sdel:skill_del_menu@myid,"지금 네가 지울 수 있는 기술은 다음과 같단다. 다시 한 번 심사 숙고 하고 지우도록 하여라",5000;
+	end;
+	spadd:set@skilladd,menu(0,"수행의 길은 끝이 없는 법. 언제라도 어려운 일이 있으면 나를 찾아오도록 하게..");
+	end;
+	spno:set@spno,menu(0,"배움의 길은 늘 멀고 험난한 법이니 더더욱 노력하는 자세를 갖도록 하거라.");
+	end;
+	spno3:mes 0,"무엇이든 쉽게 얻을 수는 없단다. 다음에 이 곳을 올 때는 더 굳은 각오를 가지고 오도록 하거라..";
+	end;
+	spno4:set@spno4,menu(0,"수련료는 준비해 왔어야지. 이 작은 도장도 유지하려면 적지 않은 돈이 필요하거든.");
+	end;
+	spno2:set@spno2,menu(0,"이 모든 것은 네 탓이니, 다음에 이 곳을 올 때는 더 굳은 각오를 가지고 오도록 하거라.");
+	end;
+	spadd2:
+	money_del 5000;
+	set@spadd2,menu(0,"수행의 길은 끝이 없는 법. 언제라도 어려운 일이 있으면 나를 찾아오도록 하게..");
+	del@myid;
+}
+
+0	세오	{
+	set@myid,get_myid();
+	set@hn$, "흠... 아직 자넨 경험이 부족하구만. 좀더 경험을 쌓은뒤 오게나";
+	set@hc$, "경험치를 파셔서 체력을살횟수를 적어주세요.";
+	seore:
+	set #auto_hp,0;
+	mes 1,"호... 자네가 내 곁을 떠난지 얼마 안된듯 한데, 벌써 이렇게 성장햇다니...";
+	mes 1,"그동안 자네의 활약상은 내가 잘 알지...믈론...난 신이니까...하하";
+	if(#auto_hp==1){mes 0,"이미 경험치를 팔고 있습니다.";end;}
+	set@seohp,menu(0,"그건 그렇고 무슨 일로 내게 찾아왔나?.","체력이 더 필요합니다.","단지 신을 만나고 싶었어요.");
+	if(@seohp==0){goto seore;}
+	if(@seohp==1){
+		if(get_class_sub()==0){
+			if(get_basevita2(@myid) >= 120000){goto vita1;}
+		}
+		if(get_basevita2(@myid) >= 500000){goto vita1;}
+		input@auto_cnt,1,@hc$+"\\n{=q당신은 현재 체력구입 1회당 1000씩 사실수 있습니다. \\n전직을 하실때 잘 계산하셔서 마력을 사시길 바랍니다.","","",255;
+		if(@auto_cnt <= 0){mes 0,"제대로 입력해 주세요.";
+		}else{
+			set #auto_hp,1;
+			while(@auto_cnt){
+				set_sdsdsd 1;
+				if(get_class_sub()==0&&get_basevita(@myid) > 119999){
+					set #auto_hp,0;
+					del@auto_cnt;
+					save_user@myid;
+					set_sdsdsd 0;
+				 	mes 0,@hn$;
+					break;
+				}
+				if(get_basevita2(@myid) >= 499999){
+					set #auto_hp,0;
+					del@auto_cnt;
+					save_user@myid;
+					set_sdsdsd 0;
+				 	mes 0,@hn$;
+					break;
+				}
+				if(get_baseexp(@myid) >= (get_basevita2(@myid) * 50)||get_baseexp(@myid) < 0&&get_baseexp(@myid) <= -2147483648){	
+					exp_del get_basevita2(@myid) * 100;
+					set_basevita get_basevita2(@myid) + 1000;
+					message 3,"[현제 체력: " + get_basevita2(@myid) + "]";
+				}
+				else
+				{
+					set #auto_hp,0;
+					del@auto_cnt;
+					save_user@myid;
+					set_sdsdsd 0;
+				 	mes 0,@hn$;
+					break;
+				}
+			sleep(1);
+			set@auto_cnt,@auto_cnt-1;
+			}
+		}
+		set #auto_hp,0;
+		set_sdsdsd 0;
+		del@auto_cnt;
+		save_user@myid;
+		end;
+	}
+	end;
+	vita1:
+	if(get_class_sub()==0){
+		if(get_baseexp(@myid) != -1){
+			mes 0, "체력 12만 이상 부터는 경험치가 풀이여야 구매가 가능합니다.";
+			end;
+		}
+		if(get_basevita2(@myid) >= 139999){
+			set_basevita get_basevita2(@myid) + 100;
+			goto vita2;
+		}
+		if(get_basevita2(@myid) >= 119999){
+			set_basevita get_basevita2(@myid) + 500;
+			goto vita2;
+		}
+	}else{
+		if(get_baseexp(@myid) != -1){
+			mes 0, "체력 50만 이상 부터는 경험치가 풀이여야 구매가 가능합니다.";
+			end;
+		}
+		if(get_basevita2(@myid) >= 1999999){
+			set_basevita get_basevita2(@myid) + 150;
+			goto vita2;
+		}
+		if(get_basevita2(@myid) >= 1799999){
+			set_basevita get_basevita2(@myid) + 200;
+			goto vita2;
+		}
+		if(get_basevita2(@myid) >= 1749999){
+			set_basevita get_basevita2(@myid) + 250;
+			goto vita2;
+		}
+		if(get_basevita2(@myid) >= 1499999){
+			set_basevita get_basevita2(@myid) + 500;
+			goto vita2;
+		}
+		if(get_basevita2(@myid) >= 999999){
+			set_basevita get_basevita2(@myid) + 1000;
+			goto vita2;
+		}
+		if(get_basevita2(@myid) >= 699999){
+			set_basevita get_basevita2(@myid) + 4000;
+			goto vita2;
+		}
+		if(get_basevita2(@myid) >= 299999){
+			set_basevita get_basevita2(@myid) + 5000;
+			goto vita2;
+		}
+	}
+	vita2:
+	set #auto_hp, 0;
+	del @auto_cnt;
+	exp_del get_baseexp(@myid);
+	message 3,"[현제 체력: " + get_basevita2(@myid) + "]";
+	mes 0,@hn$;
+	end;
+}
+
+0	칸	{
+	set@myid,get_myid();
+	seore2:
+	set #auto_mp,0;
+ 	mes 1,"날 받드는 이여... 그대에게 축복을 내리니...";
+  	mes 1,"그대가 이 어둠과 혼란의 세상을 구하길 간절히 바라네...";
+	if(#auto_mp==1){mes 0,"이미 경험치를 팔고 있습니다.";end;}
+	set@khanmp,menu(0,"자네는 내 도움이 필요한가?","마력이 더 필요합니다.","단지 신을 만나고 싶었어요.");
+	if(@khanmp==0){goto seore2;}
+	if(@khanmp==1){
+		if(get_class_sub()==0){
+			if(get_basemana2(@myid) >= 100000){goto mana1;}
+		}
+		if(get_basemana2(@myid) >= 300000){goto mana1;}
+		input@auto_cnt,1,"경험치를 파셔서 마력을살횟수를 적어주세요.\\n{=q당신은 현재 마력구입 1회당 1000씩 사실수 있습니다. \\n전직을 하실때 잘 계산하셔서 마력을 사시길 바랍니다.","","",255;
+		if(@auto_cnt <= 0){mes 0,"제대로 입력해 주세요.";
+		}else{
+			set #auto_mp,1;
+			while(@auto_cnt){
+				set_sdsdsd 1;
+				if(get_class_sub()==0&&get_basemana(@myid) > 99999){
+					set #auto_mp,0;
+					del@auto_cnt;
+					save_user@myid;
+					set_sdsdsd 0;
+				 	mes 0,"경험치가 부족합니다.";
+					break;
+				}
+				if(get_basemana2(@myid) >= 299999){
+					set #auto_mp,0;
+					del@auto_cnt;
+					save_user@myid;
+					set_sdsdsd 0;
+				 	mes 0,"경험치가 부족합니다.";
+					break;
+				}
+				if(get_baseexp(@myid) >= (get_basemana2(@myid) * 50)||get_baseexp(@myid) < 0&&get_baseexp(@myid) <= -2147483648){	
+					exp_del get_basemana2(@myid) * 175;
+					set_basemana get_basemana2(@myid) + 1000;
+					message 3,"[현제 마력: " + get_basemana2(@myid) + "]";
+				}else{
+					set #auto_mp,0;
+					del@auto_cnt;
+					save_user@myid;
+					set_sdsdsd 0;
+				 	mes 0,"경험치가 부족합니다.";
+					break;
+				}
+			sleep(1);
+			set@auto_cnt,@auto_cnt-1;
+			}
+		}
+		set #auto_mp,0;
+		set_sdsdsd 0;
+		del@auto_cnt;
+		save_user@myid;
+	end;
+	}
+	end;
+	mana1:
+	if(get_class_sub()==0){
+		if(get_baseexp(@myid) != -1){mes 0, "마력 10만 이상 부터는 경험치가 풀이여야 구매가 가능합니다.";end;}
+		if(get_basemana2(@myid) >= 119999){
+			set_basemana get_basemana2(@myid) + 100;
+			goto mana2;
+		}
+		if(get_basemana2(@myid) >= 99999){
+			set_basemana get_basemana2(@myid) + 500;
+			goto mana2;
+		}
+	}else{
+		if(get_baseexp(@myid) != -1){mes 0, "마력 30만이상은 경험치가 풀이여야 구매가 가능합니다.";end;}
+		if(get_basemana2(@myid) >= 1249999){
+			set_basemana get_basemana2(@myid) + 200;
+			goto mana2;
+		}
+		if(get_basemana2(@myid) >= 999999){
+			set_basemana get_basemana2(@myid) + 250;
+			goto mana2;
+		}
+		if(get_basemana2(@myid) >= 749999){
+			set_basemana get_basemana2(@myid) + 500;
+			goto mana2;
+		}
+		if(get_basemana2(@myid) >= 599999){
+			set_basemana get_basemana2(@myid) + 1000;
+			goto mana2;
+		}
+		if(get_basemana2(@myid) >= 399999){
+			set_basemana get_basemana2(@myid) + 4000;
+			goto mana2;
+		}
+		if(get_basemana2(@myid) >= 299999){
+			set_basemana get_basemana2(@myid) + 5000;
+			goto mana2;
+		}
+	}
+	mana2:
+	set #auto_hp, 0;
+	del @auto_cnt;
+	exp_del get_baseexp(@myid);
+	message 3,"[현제 마력: " + get_basemana2(@myid) + "]";
+	mes 0,"경험치가 부족합니다.";
+	end;
+}
+
+
+0	승급도우미세토아	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "스킬배우기", "옷업");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 1){mes 0, "당신은 전사가 아닙니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아닙니다."; end;}
+		set @select, menu(0, "배우실 기술을 선택해주세요.", "기술업그레이드", "포효", "집중", "데빌크래셔(순수)", "매드소울진(순수)");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+			mes 1, "기술업그레이드를 하기 위한 필요특성치는 힘 152 인트 10 위즈 10 콘 92 덱스 20 입니다.";
+			if(get_str() < 150 || get_int() < 10 || get_wis() < 10 || get_con() < 92 || get_dex() < 20){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(skill_exist("룬블레이드") || skill_exist("스톰블레이드")){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			if(!skill_exist("윈드블레이드") || !skill_exist("메가블레이드")){mes 1, "이스킬의 하위스킬이 없어 배울수 없습니다."; goto re;}
+			skill_add "룬블레이드";
+			skill_add "스톰블레이드";
+			skill_del "윈드블레이드";
+			skill_del "메가블레이드";
+			mes 1, "기술업그레이드에 성공했습니다.";
+			goto re;
+		}
+		if(@select == 2){
+			mes 1, "포효를 배우기 위한 필요특성치는 힘 152 인트 16 위즈 14 콘 90 덱스 14 입니다.";
+			if(get_str() < 152 || get_int() < 16 || get_wis() < 14 || get_con() < 90 || get_dex() < 14){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(skill_exist("포효") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			skill_add "포효";
+			mes 1, "포효를 배웠습니다.";
+			goto re;
+		}
+		if(@select == 3){
+			mes 1, "집중을 배우기 위한 필요특성치는 힘 148 인트 12 위즈 8 콘 80 덱스 10 입니다.";
+			if(get_str() < 148 || get_int() < 12 || get_wis() < 8 || get_con() < 80 || get_dex() < 10){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(spell_exist("집중") ){mes 1, "이미 습득하신 마법입니다."; goto re;}
+			spell_add "집중";
+			mes 1, "집중을 배웠습니다.";
+			goto re;
+		}
+		if(@select == 4){
+                                      if(get_class() != 1){mes 0,"{=c데빌크래셔는{=a 은 순수 전사만이 습득할 수 있답니다";}
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "데빌크래셔를 배우기 위해서는 비전직자여야 합니다.";
+			if(skill_exist("데빌크래셔") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+                                      if(!skill_exist("크래셔") ){mes 1, "이 스킬의 하위스킬이 없어 배울수 없습니다."; goto re;}
+			skill_add "데빌크래셔";
+                                     skill_del "크래셔";
+                                     item_add "순수의증표(전사)",1;
+			mes 1, "데빌크래셔를 배웠습니다.";
+			goto re;
+}
+		if(@select == 5){
+                                      if(get_class() != 1){mes 0,"{=c매드소울진은{=a 은 순수 전사만이 습득할 수 있답니다";}
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "매드소울진을 배우기 위해서는 비전직자여야 합니다.";
+			if(skill_exist("매드소울진") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+                                      if(!skill_exist("매드소울") ){mes 1, "이 스킬의 하위스킬이 없어 배울수 없습니다."; goto re;}
+			skill_add "매드소울진";
+                                     skill_del "매드소울";
+                                     item_add "순수의증표(전사)",1;
+			mes 1, "매드소울진을 배웠습니다.";
+			goto re;
+                          }
+	}else if(@menu == 2){
+		set @select, menu(0, "어느 옷업을 하시고 싶습니까?", "암업", "빛업");
+		if(@select == 1){
+			mes 1, "암업의 재료는 암흑의목걸이, 암흑의벨트 입니다.";
+			set @select2, menu(0, "암흑의목걸이, 암흑의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+			if(@select2 == 1){
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "암흑의벨트") || !item_exist(@myid, "암흑의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "암흑의벨트", 1;
+				item_del "암흑의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "레오파드1", 1; item_add "헬름1", 1;}
+				if(get_sex(@myid) == 2){item_add "아레스1", 1; item_add "살렛1", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}else if(@select == 2){
+			mes 1, "빛업의 재료는 생명의목걸이, 생명의벨트 입니다.";
+			set @select2, menu(0, "생명의목걸이, 생명의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "생명의벨트") || !item_exist(@myid, "생명의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "생명의벨트", 1;
+				item_del "생명의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "레오파드2", 1; item_add "헬름2", 1;}
+				if(get_sex(@myid) == 2){item_add "아레스2", 1; item_add "살렛2", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}
+	}
+}
+0	승급도우미셔스	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "스킬배우기", "옷업");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 2){mes 0, "당신은 도적 마스터가 아니라서 저의 가르침을 받을수 없습니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아니군요.."; end;}
+		set @select, menu(0, "배우실 기술을 선택해주세요.", "기술업그레이드", "백스탭(순수)", "암살격진(순수)", "습격진(순수)", "하이더", "백슬레쉬");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+			mes 1, "기술업그레이드를 하기 위한 필요특성치는 힘 92 인트 24 위즈 27 콘 15 덱스 130 입니다.";
+			if(get_str() < 92 || get_int() < 24 || get_wis() < 27 || get_con() < 15 || get_dex() < 130){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(skill_exist("마구찌르기") || skill_exist("슬래쉬")){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			if(!skill_exist("찔러휘비기") || !skill_exist("두번찌르기")){mes 1, "이스킬의 하위스킬이 없어 배울수 없습니다."; goto re;}
+			skill_add "마구찌르기";
+			skill_add "슬래쉬";
+			skill_del "찔러휘비기";
+			skill_del "두번찌르기";
+			mes 1, "기술업그레이드에 성공했습니다.";
+			goto re;
+		}
+		if(@select == 2){
+			mes 1, "백스탭을 배우기 위해서는 순수도적이여야 하며\\n필요특성치는 힘 110 인트 15 위즈 20 콘 15 덱스 165 입니다.";
+			if(get_str() < 110 || get_int() < 15 || get_wis() < 20 || get_con() < 15 || get_dex() < 165){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(get_son() == 0){mes 1, "순수도적이 아닌자는 배울수없습니다."; goto re;}
+                                         if(skill_exist("백스탭") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			skill_add "백스탭";
+                                      item_add "순수의증표(도적)",1;
+			mes 1, "백스탭을 배웠습니다.";
+			goto re;
+		}
+		if(@select == 3){
+			mes 1, "암살격진을 배우기 위해서는 순수도적이여야 합니다.";
+			if(get_son() == 0){mes 1, "순수도적이 아닌자는 배울수없습니다."; goto re;}
+			if(skill_exist("암살격진") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			if(!skill_exist("암살격") ){mes 1, "이 스킬의 하위스킬이 없어 배울수 없습니다."; goto re;}
+			skill_add "암살격진";
+			skill_del "암살격";
+                                     item_add "순수의증표(도적)",1;
+			mes 1, "암살격진을 배웠습니다.";
+			goto re;
+		}
+		if(@select == 4){
+			mes 1, "습격진을 배우기 위해서는 순수도적이여야 합니다.";
+			if(get_son() == 0){mes 1, "순수도적이 아닌자는 배울수없습니다."; goto re;}
+			if(skill_exist("습격진") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			if(!skill_exist("습격") ){mes 1, "이 스킬의 하위스킬이 없어 배울수 없습니다."; goto re;}
+			skill_add "습격진";
+			skill_del "습격";
+                                      item_add "순수의증표(도적)",1;
+			mes 1, "습격진을 배웠습니다.";
+			goto re;
+		}
+		if(@select == 5){
+			mes 1, "하이더를 배우기시겠습니까?.";
+			if(spell_exist("하이더") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			spell_add "하이더";
+			mes 1, "하이더를 배웠습니다.";
+			goto re;
+		}
+                         if(@select == 6){
+			mes 1, "백슬레쉬를 배우기 위해서는 순수도적이여야 합니다.";
+			if(get_son() == 0){mes 1, "순수도적이 아닌자는 배울수없습니다."; goto re;}
+			if(skill_exist("백슬레쉬") ){mes 1, "이미 습득하신 기술입니다."; goto re;}
+			skill_add "백슬레쉬";
+                                      item_add "순수의증표(도적)",1;
+			mes 1, "백슬레쉬를 배웠습니다.";
+			goto re;
+		}
+	}else if(@menu == 2){
+		set @select, menu(0, "어느 옷업을 하시고 싶습니까?", "암업", "빛업");
+		if(@select == 1){
+			mes 1, "암업의 재료는 암흑의목걸이, 암흑의벨트 입니다.";
+			set @select2, menu(0, "암흑의목걸이, 암흑의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+			if(@select2 == 1){
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "암흑의벨트") || !item_exist(@myid, "암흑의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "암흑의벨트", 1;
+				item_del "암흑의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "아비스1", 1; item_add "루크1", 1;}
+				if(get_sex(@myid) == 2){item_add "레일라1", 1; item_add "라멜1", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}else if(@select == 2){
+			mes 1, "빛업의 재료는 생명의목걸이, 생명의벨트 입니다.";
+			set @select2, menu(0, "생명의목걸이, 생명의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "생명의벨트") || !item_exist(@myid, "생명의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "생명의벨트", 1;
+				item_del "생명의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "아비스2", 1; item_add "루크2", 1;}
+				if(get_sex(@myid) == 2){item_add "레일라2", 1; item_add "라멜2", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}
+	}
+}
+
+0	승급도우미로오	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "스킬배우기", "옷업");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 3){mes 0, "당신은 마법사 마스터가 아니라서 저의 가르침을 받을수 없습니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아니군요.."; end;}
+		set @select, menu(0, "배우실 마법을 선택해주세요.", "속성강화", "마법업그레이드", "매직프로텍션", "어둠의각인(순수)", "프라베라(순수)", "포트리스(순수)", "델리스펠라스(순수)", "메테오");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+			mes 1, "속성강화를 배우기위한 특성치는 힘 10 인트 115 위즈 120 콘 8 덱스 12 입니다.";
+			if(get_str() < 10 || get_int() < 115 || get_wis() < 120 || get_con() < 8 || get_dex() < 12){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(spell_exist("속성강화")){mes 1, "이미 이 마법을 습득 하셨습니다."; goto re;}
+			spell_add "속성강화";
+			mes 1, "속성강화를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 2){
+			mes 1, "다음을 누르면 기술을 배웁니다.";
+			if(spell_exist("플레어") || spell_exist("플레쉬스톰") || spell_exist("퀘이크") || spell_exist("아이스블러스트")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			re2:
+			set @menu, menu(0, "어느 것을 배우시겠습니까? 한개밖에 못배우니 신중히 선택해주세요.\\n(속성 상관 없음)", "플레어", "플레쉬스톰", "퀘이크", "아이스블러스트");
+			if(@menu == 0){goto re2;}
+			if(@menu == 1){
+				spell_add "플레어";
+				mes 1, "플레어를 습득하셨습니다.";
+				goto re2;
+			}
+			if(@menu == 2){
+				spell_add "플레쉬스톰";
+				mes 1, "플레쉬스톰를 습득하셨습니다.";
+				goto re2;
+			}
+			if(@menu == 3){
+				spell_add "퀘이크";
+				mes 1, "퀘이크를 습득하셨습니다.";
+				goto re2;
+			}
+			if(@menu == 4){
+				spell_add "아이스블러스트";
+				mes 1, "아이스블러스트를 습득하셨습니다.";
+				goto re2;
+			}
+		}
+		if(@select == 3){
+			mes 1, "매직프로텍션을 배우기위한 특성치는 힘 14 인트 122 위즈 130 콘 12 덱스 16 입니다.";
+			if(get_str() < 14 || get_int() < 122 || get_wis() < 130 || get_con() < 12 || get_dex() < 16){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(spell_exist("매직프로텍션")){mes 1, "이미 이 마법을 습득 하셨습니다."; goto re;}
+			spell_add "매직프로텍션";
+			mes 1, "매직프로텍션을 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 4){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "이 마법을 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("어둠의각인")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "어둠의각인";
+                                         item_add "순수의증표(마법사)", 1;
+			mes 1, "어둠의각인을 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 5){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "이 마법을 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("프라베라")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "프라베라";
+                                      item_add "순수의증표(마법사)", 1;
+			mes 1, "프라베라를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 6){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "이 마법을 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("포트리스")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "포트리스";
+                                      item_add "순수의증표(마법사)", 1;
+			mes 1, "포트리스를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 7){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "이 마법을 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("델리스펠라스")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "델리스펠라스";
+                                      item_add "순수의증표(마법사)", 1;
+			mes 1, "델리스펠라스를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 8){
+			mes 1, "이 마법을 배우기 위해서는 승급 마법사여야합니다.";
+			if(spell_exist("메테오")){mes 1, "이미 이 마법을 습득 하셨습니다."; goto re;}
+			spell_add "메테오";
+			mes 1, "메테오를 습득하셨습니다.";
+			goto re;
+                           }
+	}else if(@menu == 2){
+		set @select, menu(0, "어느 옷업을 하시고 싶습니까?", "암업", "빛업");
+		if(@select == 1){
+			mes 1, "암업의 재료는 암흑의목걸이, 암흑의벨트 입니다.";
+			set @select2, menu(0, "암흑의목걸이, 암흑의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+			if(@select2 == 1){
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "암흑의벨트") || !item_exist(@myid, "암흑의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "암흑의벨트", 1;
+				item_del "암흑의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "솔라레스1", 1; item_add "마르두크1", 1;}
+				if(get_sex(@myid) == 2){item_add "세르네티1", 1; item_add "마아트1", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}else if(@select == 2){
+			mes 1, "빛업의 재료는 생명의목걸이, 생명의벨트 입니다.";
+			set @select2, menu(0, "생명의목걸이, 생명의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "생명의벨트") || !item_exist(@myid, "생명의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "생명의벨트", 1;
+				item_del "생명의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "솔라레스2", 1; item_add "마르두크2", 1;}
+				if(get_sex(@myid) == 2){item_add "세르네티2", 1; item_add "마아트2", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}
+	}
+}
+
+0	승급도우미이아	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "스킬배우기", "옷업");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 4){mes 0, "당신은 성직자 마스터가 아니라서 저의 가르침을 받을수 없습니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아니군요.."; end;}
+		set @select, menu(0, "배우실 마법을 선택해주세요.", "신의축복", "디나르콜룸(순수)", "디소루메라(순수)", "홀리드래곤(순수)", "홀리쿠라노", "디프라베라(순수)", "홀리큐레스(순수)", "홀리큐어");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+			mes 1, "신의축복을 배우기 위해선 힘 14 인트 120 위즈 132 콘 16 덱스 14가 되어야합니다.";
+			if(get_str() < 14 || get_int() < 120 || get_wis() < 132 || get_con() < 16 || get_dex() < 14){mes 1, "능력치가 충분치 않습니다."; goto re;}
+			if(spell_exist("신의축복")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "신의축복";
+			mes 1, "신의축복을 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 2){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "디나르콜룸을 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("디나르콜룸")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "디나르콜룸";
+                                      item_add "순수의증표(성직자)", 1;
+			mes 1, "디나르콜룸을 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 3){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "디소루메라를 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("디소루메라")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "디소루메라";
+                                      item_add "순수의증표(성직자)", 1;
+			mes 1, "디소루메라를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 4){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+                                      if(get_class() != 4){mes 0,"{=c홀리드래곤은{=a 은 순수 성직자만이 습득할 수 있답니다";}
+			mes 1, "홀리드래곤을 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("홀리드래곤")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "홀리드래곤";
+                                         item_add "순수의증표(성직자)", 1;
+			mes 1, "홀리드래곤을 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 5){
+			mes 1, "이 마법을 배우기 위해서는 승급 성직자여야합니다.";
+			if(spell_exist("홀리쿠라노")){mes 1, "이미 이 마법을 습득 하셨습니다."; goto re;}
+			spell_add "홀리쿠라노";
+			mes 1, "홀리쿠라노를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 6){
+                                      if(get_class() != 4){mes 0,"{=c디프라베라는{=a 은 순수 성직자만이 습득할 수 있답니다";}
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+			mes 1, "디프라베라를 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("디프라베라")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "디프라베라";
+                                         item_add "순수의증표(성직자)", 1;
+			mes 1, "디프라베라를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 7){
+			if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+                                      if(get_class() != 4){mes 0,"{=c홀리큐레스는{=a 은 순수 성직자만이 습득할 수 있답니다";}
+			mes 1, "홀리큐레스를 배우기 위해서는 비전직자여야 합니다.";
+			if(spell_exist("홀리큐레스")){mes 1, "이미 이 스킬을 습득 하셨습니다."; goto re;}
+			spell_add "홀리큐레스";
+                                         item_add "순수의증표(성직자)", 1;
+			mes 1, "홀리큐레스를 습득하셨습니다.";
+			goto re;
+		}
+		if(@select == 8){
+			mes 1, "이 마법을 배우기 위해서는 승급 성직자여야합니다.";
+			if(spell_exist("홀리큐어")){mes 1, "이미 이 마법을 습득 하셨습니다."; goto re;}
+			spell_add "홀리큐어";
+			mes 1, "홀리큐어를 습득하셨습니다.";
+			goto re;
+                           }
+		}else if(@select == 2){
+		set @select, menu(0, "어느 옷업을 하시고 싶습니까?", "암업", "빛업");
+		if(@select == 1){
+			mes 1, "암업의 재료는 암흑의목걸이, 암흑의벨트 입니다.";
+			set @select2, menu(0, "암흑의목걸이, 암흑의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+			if(@select2 == 1){
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "암흑의벨트") || !item_exist(@myid, "암흑의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "암흑의벨트", 1;
+				item_del "암흑의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "데메테르1", 1; item_add "아가트1", 1;}
+				if(get_sex(@myid) == 2){item_add "라피스라즐리1", 1; item_add "큐이레스1", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}else if(@select == 2){
+			mes 1, "빛업의 재료는 생명의목걸이, 생명의벨트 입니다.";
+			set @select2, menu(0, "생명의목걸이, 생명의벨트를 재료로 진행 하시겠습니까?", "진행한다.", "진행하지 않는다.");
+				mes 1, "재료를 확인하겠습니다.";
+				if(!item_exist(@myid, "생명의벨트") || !item_exist(@myid, "생명의목걸이")){mes 0, "당신에게는 옷업을 할 재료가 없는걸요?"; end;}
+				mes 1, "재료를 확인하였습니다. 제조를 시작합니다.";
+				item_del "생명의벨트", 1;
+				item_del "생명의목걸이", 1;
+				if(get_sex(@myid) == 1){item_add "데메테르2", 1; item_add "아가트2", 1;}
+				if(get_sex(@myid) == 2){item_add "라피스라즐리2", 1; item_add "큐이레스2", 1;}
+				mes 0, "성공적으로 옷업을 해드렸습니다. 확인 해보세요.";
+				end;
+			}else{
+				mes 0, "재료가 없나 보군요";
+				end;
+			}
+		}
+	}
+}
+
+0	고대검투사	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "스킬배우기");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 1){mes 0, "당신은 전사가 아닙니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아닙니다."; end;}
+		set @select, menu(0, "배우실 기술을 선택해주세요.", "바람의상처(순수)", "검신(檢身)(순수)");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+				mes 1,"바람의상처"+@r1$;
+				mes 1,"바람의상처는 순수전사만 배울수있는 데빌크래셔 상위기술이야...배우려면 <순수의정기(전사)>랑<정화된뮤레칸블레이드"+@r2$;
+				if(!item_exist(@myid,"순수의증표(전사)")||!item_exist(@myid,"정화된뮤레칸블레이드")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"순수의증표(전사)",1;
+				item_del"정화된뮤레칸블레이드",1;
+                                                  skill_del"데빌크래셔",;
+                                                  skill_del"데빌크래셔(세트효과)",;
+				skill_add2"바람의상처",;
+				mes 1,"기술을 확인해보게나..";
+		}
+		if(@select == 2){
+				mes 1,"검신(檢身)"+@r1$;
+				mes 1,"검신(檢身)은 순수전사만 배울수있다네 배우려면 <달의정기(전사)>랑<순수의증표(전사)"+@r2$;
+				if(!item_exist(@myid,"달의정기(전사)")||!item_exist(@myid,"순수의증표(전사)")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"달의정기(전사)",1;
+				item_del"순수의증표(전사)",1;
+				skill_add"검신(檢身)",;
+				mes 1,"기술을 확인해보게나..";
+		}
+				end;
+			}
+		}
+	}
+}
+
+0	고대도적	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "스킬배우기");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 2){mes 0, "당신은 도적 마스터가 아니라서 저의 가르침을 받을수 없습니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아니군요.."; end;}
+		set @select, menu(0, "배우실 기술을 선택해주세요.", "저격준비(순수)", "백발백중");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+		mes 1,"저격준비(순수)"+@r1$;
+		mes 1,"라이트닝트랩 상위트랩기술인 저격준비를 배울꺼야?  재료는 <생명의목걸이>이랑<정화된뮤레칸디그"+@r2$;
+		if(!item_exist(@myid,"생명의목걸이")||!item_exist(@myid,"정화된뮤레칸디그")){goto rug;}
+		mes 1,@r3$;
+		mes 1,@r4$;
+		item_del"생명의목걸이",1;
+		item_del"정화된뮤레칸디그",1;
+		skill_add2"저격준비",;
+		mes 1,"기술을 확인해보게나..";
+	}
+	if(@select == 2){
+		mes 1,"백발백중"+@r1$;
+		mes 1," 저격 상위기술 백발백중을 배울꺼야? 재료는 <생명의목걸이>이랑<정화된뮤레칸디그"+@r2$;
+		if(!item_exist(@myid,"생명의목걸이")||!item_exist(@myid,"정화된뮤레칸디그")){goto rug;}
+		mes 1,@r3$;
+		mes 1,@r4$;
+		item_del"생명의목걸이",1;
+		item_del"정화된뮤레칸디그",1;
+		skill_add2"백발백중",;
+		mes 1,"기술을 확인해보게나..";
+              }
+				end;
+			}
+		}
+	}
+}
+
+0	고대마법사	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "마법배우기");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 3){mes 0, "당신은 마법사 마스터가 아니라서 저의 가르침을 받을수 없습니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아니군요.."; end;}
+		set @select, menu(0, "배우실 마법을 선택해주세요.", "신의파멸", "어각베라(순수)", "나르콜룸(순수)");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+				mes 1,"신의파멸"+@r1$;
+				mes 1,"메테오마법을 신의파멸로 업그레이드할려고?  재료는 <생명의목걸이>이랑<정화된뮤레칸마법가지"+@r2$;
+				if(!item_exist(@myid,"생명의목걸이")||!item_exist(@myid,"정화된뮤레칸마법가지")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"생명의목걸이",1;
+				item_del"정화된뮤레칸마법가지",1;
+				spell_add2"신의파멸",;
+				mes 1,"기술을 확인해보게나..";
+	}
+	if(@select == 2){
+				mes 1,"어각베라"+@r1$;
+				mes 1,"어각베라는 순수마법사만 배울수있어... <순수의증표(마법사)>랑<생명의목걸이"+@r2$;
+				if(!item_exist(@myid,"순수의증표(마법사)")||!item_exist(@myid,"생명의목걸이")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"순수의증표(마법사)",1;
+				item_del"생명의목걸이",1;
+				spell_add2"어각베라",;
+				mes 1,"기술을 확인해보게나..";
+	}
+	if(@select == 3){
+                                                  mes 1,"나르콜룸"+@r1$;
+				mes 1,"나르콜룸은 순수마법사만 배울수있어... <순수의증표(마법사)>랑<생명의벨트"+@r2$;
+				if(!item_exist(@myid,"순수의증표(마법사)")||!item_exist(@myid,"생명의벨트")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"순수의증표(마법사)",1;
+				item_del"생명의벨트",1;
+				spell_add2"나르콜룸",;
+				mes 1,"기술을 확인해보게나..";
+              }
+				end;
+			}
+		}
+	}
+}
+
+0	고대성직자	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "마법배우기");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 4){mes 0, "당신은 성직자 마스터가 아니라서 저의 가르침을 받을수 없습니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아니군요.."; end;}
+		set @select, menu(0, "어느것의 가르침을 받겠습니까?\\n기본제물 : 1만골드", "리베라룸(순수)", "세오의비명");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+				mes 1,"리베라룸"+@r1$;
+				mes 1,"리베라룸을 배우려면 <순수의증표(성직자)>랑<생명의목걸이"+@r2$;
+				if(!item_exist(@myid,"순수의증표(성직자)")||!item_exist(@myid,"생명의목걸이")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"순수의증표(성직자)",1;
+				item_del"생명의목걸이",1;
+				spell_add2"리베라룸",;
+				mes 1,"기술을 확인해보게나..";
+	}
+	if(@select == 2){
+				mes 1,"세오의비명"+@r1$;
+				mes 1,"세오의비명은 연주공격 상위기술이야.. 배우려면 <생명의목걸이>이랑<정화된뮤레칸스태프"+@r2$;
+				if(!item_exist(@myid,"생명의목걸이")||!item_exist(@myid,"정화된뮤레칸스태프")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"생명의목걸이",1;
+				item_del"정화된뮤레칸스태프",1;
+				skill_add2"세오의비명",;
+				mes 1,"기술을 확인해보게나..";
+ }
+				end;
+			}
+		}
+	}
+}
+
+0	고대무도가	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @menu, 0;
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "스킬배우기");
+	if(@menu == 1){
+	re:
+		if(get_class(@myid) != 5){mes 0, "당신은 무도가 마스터가 아니라서 저의 가르침을 받을수 없습니다."; end;}
+		if(get_class_sub(@myid) == 0){mes 1, "당신은 승급자가 아니군요.."; end;}
+		set @select, menu(0, "어느것의 가르침을 받겠습니까?\\n기본제물 : 1만골드", "원기옥", "메투스의깨달음");
+		if(@select == 0){goto re;}
+		if(@select == 1){
+                                                  mes 1,"원기옥"+@r1$;
+				mes 1,"원기옥을 배우려면 <달의정기(무도가)>랑<암흑의벨트"+@r2$;
+				if(!item_exist(@myid,"달의정기(무도가)")||!item_exist(@myid,"암흑의벨트")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"달의정기(무도가)",1;
+				item_del"암흑의벨트",1;
+				spell_add2"원기옥",;
+				mes 1,"기술을 확인해보게나..";
+	}
+	if(@select == 2){
+				mes 1,"메투스의깨달음"+@r1$;
+				mes 1,"메투스의깨달음을 배우려면 <달의정기(무도가)>랑<생명의목걸이"+@r2$;
+				if(!item_exist(@myid,"달의정기(무도가)")||!item_exist(@myid,"생명의목걸이")){goto rug;}
+				mes 1,@r3$;
+				mes 1,@r4$;
+				item_del"달의정기(무도가)",1;
+				item_del"생명의목걸이",1;
+                                                  skill_add2"메투스의깨달음",;
+				mes 1,"기술을 확인해보게나..";
+ }
+				end;
+			}
+		}
+	}
+}

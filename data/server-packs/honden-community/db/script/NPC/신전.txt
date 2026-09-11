@@ -1,0 +1,446 @@
+3	승급기본장비복구도우미	{
+	set @myid, get_myid();
+	set @c,get_class(@myid);
+	mes 3, "나의 제자여..보아하니 그대는 내가 준 물건들을 소중히 하지 않았구나. 하지만 나는 아직 나의 제자들이 힘들어 하는것을 보고싶지는 않다.";
+	set @subitem, menu(1, "그대, 강한자여- 그대가 원하는 것은 무엇인가?", "제게 주셨던 무기를 다시 받고자 합니다.", "제게 주셨던 방어구를 다시 받고자 합니다.");
+	if(@subitem == 1){
+		mes 3, "그대가 원하는것을 주마.";
+		mes 3, "그렇다면 재료를 모두 가지고 있는지 확인하겠다.";
+		if(@c == 1){
+			if(item_exist(@myid, "데스나이트의투구") < 3){mes 2, "재료가 모자라는구나."; end;}
+			item_del "데스나이트의투구",1;
+			item_del "데스나이트의투구",1;
+			item_del "데스나이트의투구",1;
+			item_add "아스카론",1;
+		}
+		if(@c == 2){
+			if(item_exist(@myid, "드라코의눈") < 3){mes 2, "재료가 모자라는구나."; end;}
+			item_del "드라코의눈",1;
+			item_del "드라코의눈",1;
+			item_del "드라코의눈",1;
+			item_add "아조스",1;
+		}
+		if(@c == 3){
+			if(item_exist(@myid, "유물반지") < 3){mes 2, "재료가 모자라는구나."; end;}
+			item_del "유물반지",1;
+			item_del "유물반지",1;
+			item_del "유물반지",1;
+			item_add "로오의은총",1;
+		}
+		if(@c == 4){
+			if(item_exist(@myid, "생명의구슬") < 3){mes 2, "재료가 모자라는구나."; end;}
+			item_del "생명의구슬",1;
+			item_del "생명의구슬",1;
+			item_del "생명의구슬",1;
+			item_add "이아의은총",1;
+		}
+		if(@c == 5){
+			if(item_exist(@myid, "데몬의턱뼈") < 3){mes 2, "재료가 모자라는구나."; end;}
+			item_del "데몬의턱뼈",1;
+			item_del "데몬의턱뼈",1;
+			item_del "데몬의턱뼈",1;
+			item_add "하이브레이질배틀핸드",1;
+		}
+		mes 2,"소중히 사용해주길 바란다.";
+	}if(@subitem == 2){
+		mes 3, "그대가 원하는것을 주마.";
+		mes 3, "그렇다면 재료를 모두 가지고 있는지 확인하겠다.";
+		if(@c == 1){
+			if(item_exist(@myid, "데스나이트의투구") < 3){mes 2, "재료가 모자라는구나."; end;}
+		}
+		if(@c == 2){
+			if(item_exist(@myid, "드라코의눈") < 3){mes 2, "재료가 모자라는구나."; end;}
+		}
+		if(@c == 3){
+			if(item_exist(@myid, "유물반지") < 3){mes 2, "재료가 모자라는구나."; end;}
+		}
+		if(@c == 4){
+			if(item_exist(@myid, "생명의구슬") < 3){mes 2, "재료가 모자라는구나."; end;}
+		}
+		if(@c == 5){
+			if(item_exist(@myid, "데몬의턱뼈") < 3){mes 2, "재료가 모자라는구나."; end;}
+		}
+		if(get_sex() == 1){
+			if(@c == 1){
+				item_del "데스나이트의투구",1;
+				item_del "데스나이트의투구",1;
+				item_del "데스나이트의투구",1;
+				item_add "전승",1;
+			}
+			if(@c == 2){
+				item_del "드라코의눈",1;
+				item_del "드라코의눈",1;
+				item_del "드라코의눈",1;
+				item_add "도승",1;
+			}
+			if(@c == 3){
+				item_del "유물반지",1;
+				item_del "유물반지",1;
+				item_del "유물반지",1;
+				item_add "마승",1;
+			}
+			if(@c == 4){
+				item_del "생명의구슬",1;
+				item_del "생명의구슬",1;
+				item_del "생명의구슬",1;
+				item_add "성승",1;
+			}
+			if(@c == 5){
+				item_del "데몬의턱뼈",1;
+				item_del "데몬의턱뼈",1;
+				item_del "데몬의턱뼈",1;
+				item_add "무승",1;
+			}
+			mes 2,"소중히 사용해주길 바란다.";
+		}
+		if(get_sex() == 2){
+			if(@c == 1){
+				item_del "데스나이트의투구",1;
+				item_del "데스나이트의투구",1;
+				item_del "데스나이트의투구",1;
+				item_add "여전승",1;
+			}
+			if(@c == 2){
+				item_del "드라코의눈",1;
+				item_del "드라코의눈",1;
+				item_del "드라코의눈",1;
+				item_add "여도승",1;
+			}
+			if(@c == 3){
+				item_del "유물반지",1;
+				item_del "유물반지",1;
+				item_del "유물반지",1;
+				item_add "여마승",1;
+			}
+			if(@c == 4){
+				item_del "생명의구슬",1;
+				item_del "생명의구슬",1;
+				item_del "생명의구슬",1;
+				item_add "여성승",1;
+			}
+			if(@c == 5){
+				item_del "데몬의턱뼈",1;
+				item_del "데몬의턱뼈",1;
+				item_del "데몬의턱뼈",1;
+				item_add "여무승",1;
+			}
+			mes 2,"소중히 사용해주길 바란다.";
+		}
+	}
+}
+
+3	승급장비업그레이드	{
+	set @myid, get_myid();
+	set @c,get_class(@myid);
+	set@up1$,"여. 그대가 여기까지 성장한것에 대해서 정말 기쁘게 생각한다. 그 보상으로 너의 갑옷을 더욱 강하게 해주마.";
+	mes 3, "단, 몇가지 재료가 필요한데..그것은 그대가 직접 구해와야 한다. 빛의 갑옷은 빛의 아이템이 필요하고, 암흑의 갑옷은 암흑속성의 아이템이필요하단다.";
+	set @itemupgrad1, menu(1, "그래, 네가 원하는것이 무엇이냐?", "빛의 갑옷이 원합니다.", "암흑의 갑옷을 원합니다.", "아니오. 필요하지 않습니다.");
+	if(@itemupgrad1 == 1){
+		set @itemupgrad2, menu(1, "빛의 갑옷은 빛의 아이템이 필요하다. 바로 생명의 목걸이와 생명의벨트를 말하는 것이지...정말로 갑옷을 성장시키겠는가?", "네, 그리 하여주십시요", "아니오, 그만두겠습니다.");
+		if(@itemupgrad2 == 1){
+			mes 3, "그렇다면 재료를 모두 가지고 있는지 확인하겠다.";
+			if(!item_exist(@myid, "생명의목걸이")||!item_exist(@myid, "생명의벨트")){mes 0, "재료가 모자라는구나.";end;}
+			mes 3,"역시 나에게 제작을 의뢰할 자격이있어! 빠르게 만들어 줌세";
+			item_del "생명의목걸이",1;
+			item_del "생명의벨트",1;
+			if(get_sex() == 1){
+				if(@c==1){
+					item_del "전승",1;
+					item_del "전승모",1;
+					item_add "레오파드2", 1;
+					item_add "헬름2", 1;
+				}
+				if(@c==2){
+					item_del "도승",1;
+					item_del "도승모",1;
+					item_add "아비스2", 1;
+					item_add "루크2", 1;
+				}
+				if(@c==3){
+					item_del "마승",1;
+					item_del "마승모",1;
+					item_add "솔라레스2", 1;
+					item_add "마르두크2", 1;
+				}
+				if(@c==4){
+					item_del "성승",1;
+					item_del "성승모",1;
+					item_add "데메테르2", 1;
+					item_add "아가트2", 1;
+				}
+				if(@c==5){
+					item_del "무승",1;
+					item_del "무승모",1;
+					item_add "위타천2", 1;
+					item_add "투신의머리띠2", 1;
+				}
+			}else{
+				if(@c==1){
+					item_del "여전승",1;
+					item_del "여전승모",1;
+					item_add "아레스2", 1;
+					item_add "살렛2", 1;
+				}
+				if(@c==2){
+					item_del "여도승",1;
+					item_del "도승모",1;
+					item_add "레일라2", 1;
+					item_add "라멜2", 1;
+				}
+				if(@c==3){
+					item_del "여마승",1;
+					item_del "여마승모",1;
+					item_add "세르네티2", 1;
+					item_add "마아트2", 1;
+				}
+				if(@c==4){
+					item_del "여성승",1;
+					item_del "여성승모",1;
+					item_add "라피스라즐리2", 1;
+					item_add "큐이레스2", 1;
+				}
+				if(@c==5){
+					item_del "여무승",1;
+					item_del "여무승모",1;
+					item_add "가릉비가2", 1;
+					item_add "화영잠2", 1;
+				}
+			}
+			mes 2,"잘 사용해주길 바란다. 언제나 너의 활약을 지켜보고 있단다.";
+		}else if(@itemupgrad2 == 2){
+			mes 2, "호오~ 그러한가? 언제든지 다시 찾아오거라..";
+		}
+	}else if(@itemupgrad1 == 2){
+		set @itemupgrad2, menu(1, "이 갑옷은 암흑의 아이템이 필요하다. 바로 암흑의 목걸이와 암흑의벨트를 말하는 것이지...정말로 갑옷을 성장시키겠는가?", "네, 그리 하여주십시요", "아니오, 그만두겠습니다.");
+		if(@itemupgrad2 == 1){
+			mes 3, "그렇다면 재료를 모두 가지고 있는지 확인하겠다.";
+			if(!item_exist(@myid, "암흑의목걸이")||!item_exist(@myid, "암흑의벨트")){mes 0, "재료가 모자라는구나.";end;}
+			mes 3,"역시 나에게 제작을 의뢰할 자격이있어! 빠르게 만들어 줌세";
+			item_del "암흑의목걸이",1;
+			item_del "암흑의벨트",1; 
+			if(get_sex() == 1){
+				if(@c==1){
+					item_del "전승",1;
+					item_del "전승모",1;
+					item_add "레오파드1", 1;
+					item_add "헬름1", 1;
+				}
+				if(@c==2){
+					item_del "도승",1;
+					item_del "도승모",1;
+					item_add "아비스1", 1;
+					item_add "루크1", 1;
+				}
+				if(@c==3){
+					item_del "마승",1;
+					item_del "마승모",1;
+					item_add "솔라레스1", 1;
+					item_add "마르두크1", 1;
+				}
+				if(@c==4){
+					item_del "성승",1;
+					item_del "성승모",1;
+					item_add "데메테르1", 1;
+					item_add "아가트1", 1;
+				}
+				if(@c==5){
+					item_del "무승",1;
+					item_del "무승모",1;
+					item_add "위타천1", 1;
+					item_add "투신의머리띠1", 1;
+				}
+			}else{
+				if(@c==1){
+					item_del "여전승",1;
+					item_del "여전승모",1;
+					item_add "아레스1", 1;
+					item_add "살렛1", 1;
+				}
+				if(@c==2){
+					item_del "여도승",1;
+					item_del "도승모",1;
+					item_add "레일라1", 1;
+					item_add "라멜1", 1;
+				}
+				if(@c==3){
+					item_del "여마승",1;
+					item_del "여마승모",1;
+					item_add "세르네티1", 1;
+					item_add "마아트1", 1;
+				}
+				if(@c==4){
+					item_del "여성승",1;
+					item_del "여성승모",1;
+					item_add "라피스라즐리1", 1;
+					item_add "큐이레스1", 1;
+				}
+				if(@c==5){
+					item_del "여무승",1;
+					item_del "여무승모",1;
+					item_add "가릉비가1", 1;
+					item_add "화영잠1", 1;
+				}
+			}
+			mes 2,"잘 사용해주길 바란다. 언제나 너의 활약을 지켜보고 있단다.";
+		}else if(@itemupgrad2 == 2){
+			mes 2, "호오~ 그러한가? 언제든지 다시 찾아오거라..";
+		}
+	}else if(@itemupgrad1 == 3){
+		mes 2, "호오~ 그러한가? 언제든지 다시 찾아오거라..";
+	}
+}
+
+3	승급도우미	{
+	set @myid, get_myid();
+	set @c,get_class(@myid);
+	if(get_point(@myid) >= 1){mes 2, "욕심을 부리면 안되지.. 준비가 되거든 언제든지 다시 찾아오거라..";}
+	if(get_class_sub() != 0){mes 2, "승급은 오직 한번 뿐이네.";}
+	mes 3, "승급에는 여러가지 조건이 있습니다.";
+	set @sub1, menu(1, "당신은 진정으로 승급가능 합니까?", "예", "아니오");
+	if(@sub1 == 1){
+		mes 3, "그럼 이제부터 자격을 심사합니다.";
+		mes 3, "혹시라도 중간에 그만두시면 피해를 입을수 있으니";
+		mes 3, "이제 승급에 필요한 경험치를 체크합니다.";
+		mes 3, "이제 승급에 필요한 아이템을 체크합니다.";
+		mes 3, "승급아이템을 잘 받았네.";
+		mes 3, "자네는 이제 승급할 준비가 다 되었군.";
+		set_class_sub 1;
+		if(@c==1){
+			mes 3, "이제 승급전사 기술을 두가지 주겠네.";
+			skill_add "돌진";
+			skill_add "메가어택";
+		}
+		if(@c==2){
+			mes 3, "이제 승급도적 기술을 두가지 주겠네.";
+			skill_add "기습";
+			skill_add "트리플어택";
+		}
+		if(@c==3){
+			mes 3, "이제 승급마법사 마법을 한가지 주겠네.";
+			mes 3, "운석을 소환하여 적을 공격하는 마법을 주었네..";
+			spell_add "메테오";
+		}
+		if(@c==4){
+			mes 3, "이제 승급성직자 마법을 한가지 주겠네.";
+			spell_add "홀리쿠라노";
+		}
+		if(@c==5){
+			mes 3, "이제 승급무도가 기술을 한가지 주겠네.";
+			skill_add "허공답보";
+		}
+		mes 3, "승급자용 무기와 옷을 주었네.";
+		if(get_sex() == 1){
+			if(@c==1){item_add "전승모", 1; item_add "전승", 1; item_add "아스카론", 1;}
+			if(@c==2){item_add "도승모", 1; item_add "도승", 1; item_add "아조스", 1;}
+			if(@c==3){item_add "마승모", 1; item_add "마승", 1; item_add "로오의은총", 1;}
+			if(@c==4){item_add "성승모", 1; item_add "성승", 1; item_add "이아의은총", 1;}
+			if(@c==5){item_add "무승모", 1; item_add "무승", 1; item_add "하이브레이질배틀핸드", 1;}
+		}else{
+			if(@c==1){item_add "여전승모", 1; item_add "여전승", 1; item_add "아스카론", 1;}
+			if(@c==2){item_add "도승모", 1; item_add "여도승", 1; item_add "아조스", 1;}
+			if(@c==3){item_add "여마승모", 1; item_add "여마승", 1; item_add "로오의은총", 1;}
+			if(@c==4){item_add "여성승모", 1; item_add "여성승", 1; item_add "이아의은총", 1;}
+			if(@c==5){item_add "여무승모", 1; item_add "여무승", 1; item_add "하이브레이질배틀핸드", 1;}
+		}
+		exp_add 1000000000;
+		broadcast 5, "[[" + get_name() +"님이 승급하셨습니다. 축하 드립니다. ]]";
+		legend_add 0, 255, "뮤레칸 " + $년도 + "년 " + $계절$ + " 부모가 되다";
+		legend_add 7, 254, "뮤레칸 " + $년도 + "년 " + $계절$ + ", 승급하다.";
+		message 3, "{=q경험치 10억을 지급해드렸습니다. 2차승급 하실때 사용하시길 바랍니다.";
+		mes 0, "승급한것을 축하 드립니다.";
+	}
+}
+
+3	능력치도우미	{
+	set@myid,get_myid();
+	set@c,get_class(@myid);
+	mes 3, "특성치를 올리기 위해서는 당신의 체력을 바쳐야만 합니다.";
+	mes 3, "그리고 무한이 팔수 있는것이 아니고 승급시 기준이된 체력까지";
+	mes 3, "팔수 있습니다. 그 이하로는 팔수 없습니다.";
+	mes 3, "그리고 아이템을 착용하고서는 신을 만날수 없습니다.";
+	mes 3, "모든 아이템의 장착을 해제하시기 바랍니다.";
+	if(get_ac(@myid) <= 66){set #auto_hp, 0; del @auto_cnt; mes 2,"아이템을 착용하고서는 신을 만날수 없습니다.";}
+	re:
+	set@str,get_str(@myid);
+	set@int,get_int(@myid);
+	set@wis,get_wis(@myid);
+	set@con,get_con(@myid);
+	set@dex,get_dex(@myid);
+	set @val, menu(1, "어느 특성치를 사기겠습니까?", "힘", "인트", "위즈", "콘", "덱스");
+	if(@val == 1){
+		str:
+		input @strsell, 3, "힘을 몇 개 구입하시겠습니까?", "", "", 255;
+		if(@strsell <= 0){goto strsell;}
+		if(@c==1){if(get_basevita2(@myid) - (@strsell * 300) < 17000||@str + @strsell > 215){mes 2, "체력이 17000이하이거나 살려는 능력치가 215이상입니다.";}}
+		if(@c==2){if(get_basevita2(@myid) - (@strsell * 300) < 13000||@str + @strsell > 180){mes 2, "체력이 13000이하이거나 살려는 능력치가 180이상입니다.";}}
+		if(@c==3){if(get_basevita2(@myid) - (@strsell * 300) < 12000||@str + @strsell > 100){mes 2, "체력이 12000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==4){if(get_basevita2(@myid) - (@strsell * 300) < 13000||@str + @strsell > 100){mes 2, "체력이 13000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==5){if(get_basevita2(@myid) - (@strsell * 300) < 16000||@str + @strsell > 180){mes 2, "체력이 16000이하이거나 살려는 능력치가 180이상입니다.";}}
+		set_basevita get_basevita2(@myid) - (@strsell * 300);
+		set_str get_str(@myid) + @strsell;
+		save_user @myid;
+		mes 3, "힘을 "+@strsell+"올랐습니다.";
+		del @strsell;
+		goto re;
+	}else if(@val == 2){
+		int:
+		input @intsell, 3, "인트를 몇 개 구입하시겠습니까?", "", "", 255;
+		if(@intsell <= 0){goto intsell;}
+		if(@c==1){if(get_basevita2(@myid) - (@intsell * 300) < 17000||@int + @intsell > 100){mes 2, "체력이 17000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==2){if(get_basevita2(@myid) - (@intsell * 300) < 13000||@int + @intsell > 100){mes 2, "체력이 13000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==3){if(get_basevita2(@myid) - (@intsell * 300) < 12000||@int + @intsell > 215){mes 2, "체력이 12000이하이거나 살려는 능력치가 215이상입니다.";}}
+		if(@c==4){if(get_basevita2(@myid) - (@intsell * 300) < 13000||@int + @intsell > 180){mes 2, "체력이 13000이하이거나 살려는 능력치가 180이상입니다.";}}
+		if(@c==5){if(get_basevita2(@myid) - (@intsell * 300) < 16000||@int + @intsell > 150){mes 2, "체력이 16000이하이거나 살려는 능력치가 150이상입니다.";}}
+		set_basevita get_basevita2(@myid) - (@intsell * 300);
+		set_int get_int(@myid) + @intsell;
+		save_user @myid;
+		mes 3, "인트가 "+@intsell+"올랐습니다.";
+		del @intsell;
+		goto re;
+	}else if(@val == 3){
+		wis:
+		input @wissell, 3, "위즈를 몇 개 구입하시겠습니까?", "", "", 255;
+		if(@wissell <= 0){goto wissell;}
+		if(@c==1){if(get_basevita2(@myid) - (@wissell * 300) < 17000||@wis + @wissell > 100){mes 2, "체력이 17000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==2){if(get_basevita2(@myid) - (@wissell * 300) < 13000||@wis + @wissell > 100){mes 2, "체력이 13000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==3){if(get_basevita2(@myid) - (@wissell * 300) < 12000||@wis + @wissell > 180){mes 2, "체력이 12000이하이거나 살려는 능력치가 180이상입니다.";}}
+		if(@c==4){if(get_basevita2(@myid) - (@wissell * 300) < 13000||@wis + @wissell > 215){mes 2, "체력이 13000이하이거나 살려는 능력치가 215이상입니다.";}}
+		if(@c==5){if(get_basevita2(@myid) - (@wissell * 300) < 16000||@wis + @wissell > 100){mes 2, "체력이 16000이하이거나 살려는 능력치가 100이상입니다.";}}
+		set_basevita get_basevita2(@myid) - (@wissell * 300);
+		set_wis get_wis(@myid) + @wissell;
+		save_user @myid;
+		mes 3, "위즈가 "+@wissell+"올랐습니다.";
+		del @wissell;
+		goto re;
+	}else if(@val == 4){
+		con:
+		input @consell, 3, "콘을 몇 개 구입하시겠습니까?", "", "", 255;
+		if(@consell <= 0){goto consell;}
+		if(@c==1){if(get_basevita2(@myid) - (@consell * 300) < 17000||@con + @consell > 180){mes 2, "체력이 17000이하이거나 살려는 능력치가 180이상입니다.";}}
+		if(@c==2){if(get_basevita2(@myid) - (@consell * 300) < 13000||@con + @consell > 150){mes 2, "체력이 13000이하이거나 살려는 능력치가 150이상입니다.";}}
+		if(@c==3){if(get_basevita2(@myid) - (@consell * 300) < 12000||@con + @consell > 150){mes 2, "체력이 12000이하이거나 살려는 능력치가 150이상입니다.";}}
+		if(@c==4){if(get_basevita2(@myid) - (@consell * 300) < 13000||@con + @consell > 150){mes 2, "체력이 13000이하이거나 살려는 능력치가 150이상입니다.";}}
+		if(@c==5){if(get_basevita2(@myid) - (@consell * 300) < 16000||@con + @consell > 215){mes 2, "체력이 16000이하이거나 살려는 능력치가 215이상입니다.";}}
+		set_basevita get_basevita2(@myid) - (@consell * 300);
+		set_con get_con(@myid) + @consell;
+		save_user @myid;
+		mes 3, "콘을 "+@consell+"올랐습니다.";
+		del @consell;
+		goto re;
+	}else if(@val == 5){
+		dex:
+		input @dexsell, 3, "덱스를 몇 개 구입하시겠습니까?", "", "", 255;
+		if(@dexsell <= 0){goto dexsell;}
+		if(@c==1){if(get_basevita2(@myid) - (@dexsell * 300) < 17000||@dex + @dexsell > 150){mes 2, "체력이 17000이하이거나 살려는 능력치가 150이상입니다.";}}
+		if(@c==2){if(get_basevita2(@myid) - (@dexsell * 300) < 13000||@dex + @dexsell > 215){mes 2, "체력이 13000이하이거나 살려는 능력치가 215이상입니다.";}}
+		if(@c==3){if(get_basevita2(@myid) - (@dexsell * 300) < 12000||@dex + @dexsell > 100){mes 2, "체력이 12000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==4){if(get_basevita2(@myid) - (@dexsell * 300) < 13000||@dex + @dexsell > 100){mes 2, "체력이 13000이하이거나 살려는 능력치가 100이상입니다.";}}
+		if(@c==5){if(get_basevita2(@myid) - (@dexsell * 300) < 16000||@dex + @dexsell > 100){mes 2, "체력이 16000이하이거나 살려는 능력치가 100이상입니다.";}}
+		set_basevita get_basevita2(@myid) - (@dexsell * 300);
+		set_dex get_dex(@myid) + @dexsell;
+		save_user @myid;
+		mes 3, "덱스가 "+@dexsell+"올랐습니다.";
+		del @dexsell;
+		goto re;
+	}
+}

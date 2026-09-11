@@ -1,0 +1,116 @@
+0	아만	{
+	set@myid,get_myid();
+	set@npc$,last_npc();
+	if(@npc$=="케이셔"){
+		set @kesyer,menu(0,"안녕하세요. 무엇을 도와드릴까요?","케이셔와 대화하기","셀라임의 수련법");
+		if(@kesyer==2){
+			set @kesyer2,menu(0,"신의 힘을 빌지 않고 인간이 가진 능력을 올리기 위해서는 자아에 대한 깊은 이해와 탐구가\\n필요하지.\\n{=q자아의조각 30개{=a를 가지고 왔는가?","네, 능력을 올리고 싶습니다.","아니오");
+			if(@kesyer2==1){
+				if(item_exist(@myid, "자아의조각") >= 30){
+					set@str,get_str(@myid);
+					set@int,get_int(@myid);
+					set@wis,get_wis(@myid);
+					set@con,get_con(@myid);
+					set@dex,get_dex(@myid);
+					set @kesyer3, menu(0, "올리고 싶은 능력치를 말해주게.\\n{=q자아의조각 30개{=a가 필요하네.", "힘(STR)", "지구력(CON)", "지식(INT)", "지혜(WIS)", "민첩(DEX)");
+					if(@kesyer3 == 1){
+						if(get_class(@myid)==1){if(get_basevita(@myid) < 17000 || @str > 219){mes 0, "살려는 능력치가 220이상입니다.";}}
+ 						if(get_class(@myid)==2){if(get_basevita(@myid) < 13000 || @str > 184){mes 0, "살려는 능력치가 185이상입니다.";}}
+						if(get_class(@myid)==3){if(get_basevita(@myid) < 12000 || @str > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						if(get_class(@myid)==4){if(get_basevita(@myid) < 13000 || @str > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						if(get_class(@myid)==5){if(get_basevita(@myid) < 16000 || @str > 184){mes 0, "살려는 능력치가 185이상입니다.";}}
+						item_del "자아의조각", 30;
+						set_str get_str(@myid)+1;
+						mes 0,"힘이 증가했습니다.";
+					}else if(@kesyer3 == 2){
+						if(get_class(@myid)==1){if(get_basevita(@myid) < 17000 || @con > 184){mes 0, "살려는 능력치가 185이상입니다.";}}
+ 						if(get_class(@myid)==2){if(get_basevita(@myid) < 13000 || @con > 104){mes 0, "살려는 능력치가 155이상입니다.";}}
+						if(get_class(@myid)==3){if(get_basevita(@myid) < 12000 || @con > 104){mes 0, "살려는 능력치가 155이상입니다.";}}
+						if(get_class(@myid)==4){if(get_basevita(@myid) < 13000 || @con > 154){mes 0, "살려는 능력치가 155이상입니다.";}}
+						if(get_class(@myid)==5){if(get_basevita(@myid) < 16000 || @con > 219){mes 0, "살려는 능력치가 220이상입니다.";}}
+						item_del "자아의조각", 30;
+						set_con get_con(@myid)+1;
+						mes 0,"콘이 증가했습니다.";
+					}else if(@kesyer3 == 3){
+						if(get_class(@myid)==1){if(get_basevita(@myid) < 17000 || @int > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+ 						if(get_class(@myid)==2){if(get_basevita(@myid) < 13000 || @int > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						if(get_class(@myid)==3){if(get_basevita(@myid) < 12000 || @int > 219){mes 0, "살려는 능력치가 220이상입니다.";}}
+						if(get_class(@myid)==4){if(get_basevita(@myid) < 13000 || @int > 184){mes 0, "살려는 능력치가 185이상입니다.";}}
+						if(get_class(@myid)==5){if(get_basevita(@myid) < 16000 || @int > 154){mes 0, "살려는 능력치가 155이상입니다.";}}
+						item_del "자아의조각", 30;
+						set_int get_int(@myid)+1;
+						mes 0,"인트가 증가했습니다.";
+					}else if(@kesyer3 == 4){
+						if(get_class(@myid)==1){if(get_basevita(@myid) < 17000 || @wis > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+ 						if(get_class(@myid)==2){if(get_basevita(@myid) < 13000 || @wis > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						if(get_class(@myid)==3){if(get_basevita(@myid) < 12000 || @wis > 184){mes 0, "살려는 능력치가 185이상입니다.";}}
+						if(get_class(@myid)==4){if(get_basevita(@myid) < 13000 || @wis > 219){mes 0, "살려는 능력치가 220이상입니다.";}}
+						if(get_class(@myid)==5){if(get_basevita(@myid) < 16000 || @wis > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						item_del "자아의조각", 30;
+						set_wis get_wis(@myid)+1;
+						mes 0,"위즈가 증가했습니다.";
+					}else if(@kesyer3 == 5){
+						if(get_class(@myid)==1){if(get_basevita(@myid) < 17000 || @dex > 154){mes 0, "살려는 능력치가 155이상입니다.";}}
+ 						if(get_class(@myid)==2){if(get_basevita(@myid) < 13000 || @dex > 219){mes 0, "살려는 능력치가 220이상입니다.";}}
+						if(get_class(@myid)==3){if(get_basevita(@myid) < 12000 || @dex > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						if(get_class(@myid)==4){if(get_basevita(@myid) < 13000 || @dex > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						if(get_class(@myid)==5){if(get_basevita(@myid) < 16000 || @dex > 104){mes 0, "살려는 능력치가 105이상입니다.";}}
+						item_del "자아의조각", 30;
+						set_dex get_dex(@myid)+1;
+						mes 0,"덱스가 증가했습니다.";
+					}
+				}else{
+					mes 0,"재료가 부족하는군.";
+				}
+			}else{
+				mes 0,"다음에 또 찾아와 주게.";
+			}
+		}
+	del @kesyer;
+	del @kesyer2;
+	del @kesyer3;
+	}
+	if(@npc$=="몰트"){
+		mes 1,"히이이익~! 인간이잖아~! 얼마만해 보는 인간이야. 나도 한때는 인간이였어. 지금은 이렇게 해골 머리 밖에 없지만~! 난 죽었지만, 히야트의 미묘한 힘에 의해서 죽지 못하고 이렇게 살아있지.";
+		mes 1,"원래 {=c셀라임{=a에서 엄청나게 유명한 마법의 대장장이 였는데 말이지.. 히야트의 힘에 이끌려 왔다가 이렇게 되어버린거야. 해골이 되서 슬프지만, 온몸에는 알 수 없는 힘이 흐르고 있다고!";
+		mes 1,"흠흠. 옛날 생각 나는데? 어때? 난 이렇게 해골이지만 새로운 힘을 얻었고, 그걸 실험해보고 싶어. {=c리젠트다디아귀걸이{=a를 업그레이드 해주거나, {=c저주받은루딘블레이드{=a의 저주를 풀어줄께! 물론 재료는 있어야겠지?!";
+		molt1:
+		set @molt, menu(0,"뭘 하고 싶어?","리젠트다이아귀걸이 내구도 업그레이드","리젠트다이아귀걸이 성능 업그레이드","저주받은루딘블레이드 저주풀기");
+		if(@molt==1){
+			mes 1,"{=c리젠트다이아귀걸이{=a는 착용만 하고 있어도 자꾸 내구도가 달아버리니 너무 귀찮지? 그렇다고 내구도가 다는 특성을 없앨 순 없지만, 지금보다 내구도를 훨씬 높일 순 있어.";
+			mes 1,"필요한 재료는 {=q그린엑스토닉 1개, 케라코라보석 1개, 엑스매직히야트스톤 1개, 리젠트다이아귀걸이 1개 {=a가 필요해. 물론 실패 할 수도 있어!\\n 그래도 중요한 리젠트다이아귀걸이는 없어지지 않으니까 너무 걱정말라고!";
+			set @molt2, menu(0,"업그레이드 할꺼야?","응!","아니 겁난다.");
+			if(@molt2==1){
+				if(!item_exist(@myid,"그린엑스토닉")||!item_exist(@myid,"케라코라보석")||!item_exist(@myid,"엑스매직히야트스톤")||!item_exist(@myid,"리젠트다이아귀걸이")){mes 0,"재료가 없는걸?";end;}
+				item_del "그린엑스토닉",1;
+				item_del "케라코라보석",1;
+				item_del "엑스매직히야트스톤",1;
+				if(rand2(1,10)>1){message 3,"에구구 미안! 실패 했다~! 다음에 또보자구!";end;}
+				item_del "리젠트다이아귀걸이",1;
+				item_add "강화된리젠트다이아귀걸이",1;
+				message 3,"{=c강화된리젠트다이아귀걸이{=u를 획득했다!";
+			}else{
+				goto molt1;
+			}
+		}else if(@molt==2){
+			mes 1,"리젠트다이아를 업그레이드 할 수 있어! 물론 재료를 구하긴 정말 어렵겠지만!!!  거기다가 내구도도 떨어지지만!!! 충분히 가치가 있지. 경험치 보너스가 {=c45%{=a가 되니까!! 내구도야 살살 사용하면되지 뭐~!";
+			mes 1,"필요한 재료는 {=q자아의조각 1개, 하이매직히야트스톤 5개, 나겔링의스타 5개, 나겔링파워 1개 {=a가 필요해. 특이한 재료는 {=q나겔링파워{=a 인데, 다른 나겔링의 힘을 궁극으로 가지고 있는 케라코라나, 다른 보스들이 가지고 있지 않을까?";
+			mes 1,"물론 실패 할 수도 있어. 그래도 중요한 리젠트다이아귀걸이는 없어지지 않으니까 너무 걱정말라고!";
+			set @molt2, menu(0,"업그레이드 할꺼야?","응!","아니 겁난다.");
+			if(@molt2==1){
+				if(!item_exist(@myid,"자아의조각")||item_exist(@myid,"하이매직히야트스톤")<5||item_exist(@myid,"나겔링의스타")<5||!item_exist(@myid,"나겔링파워")||!item_exist(@myid,"리젠트다이아귀걸이")){mes 0,"재료가 없는걸?";end;}
+				item_del "자아의조각",1;
+				item_del "하이매직히야트스톤",5;
+				item_del "나겔링의스타",5;
+				item_del "나겔링파워",1;
+				if(rand2(1,10)>1){message 3,"에구구 미안! 실패 했다~! 다음에 또보자구!";end;}
+				item_del "리젠트다이아귀걸이",1;
+				item_add "향상된리젠트다이아귀걸이",1;
+				message 3,"오 성공햇어! {=q향상된리젠트다이아귀걸이{=u야. 축하해! 다음에 또 보자구!";
+			}else{
+				goto molt1;
+			}
+		}
+	}
+	del @npc$;
+}

@@ -1,0 +1,153 @@
+0,0,0,0,0,0,0	연갈색염색약	{
+	set @myid, get_myid();
+	set_haircolor 14;
+	item_del "연갈색염색약", 1;
+}
+0,0,0,0,0,0,0	흰색염색약	{
+	set @myid, get_myid();
+	set_haircolor 15;
+	item_del "흰색염색약", 1;
+}
+0,0,0,0,0,0,0	분홍색염색약	{
+	set @myid, get_myid();
+	set_haircolor 16;
+	item_del "분홍색염색약", 1;
+}
+0,0,0,0,0,0,0	연두색염색약	{
+	set @myid, get_myid();
+	set_haircolor 17;
+	item_del "연두색염색약", 1;
+}
+0,0,0,0,0,0,0	진한노랑색염색약	{
+	set @myid, get_myid();
+	set_haircolor 18;
+	item_del "진한노랑색염색약", 1;
+}
+0,0,0,0,0,0,0	레몬색염색약	{
+	set @myid, get_myid();
+	set_haircolor 19;
+	item_del "레몬색염색약", 1;
+}
+0,0,0,0,0,0,0	블루블랙염색약	{
+	set @myid, get_myid();
+	set_haircolor 20;
+	item_del "블루블랙염색약", 1;
+}
+0,0,0,0,0,0,0	연하늘색염색약	{
+	set @myid, get_myid();
+	set_haircolor 21;
+	item_del "연하늘색염색약", 1;
+}
+0,0,0,0,0,0,0	연보라색염색약	{
+	set @myid, get_myid();
+	set_haircolor 22;
+	item_del "연보라색염색약", 1;
+}
+
+0,0,0,0,0,0,0	방송쿠폰	{
+	set @select, 0;
+	re:
+	set @select, menu("확성기입니다..\\n사용하시겠습니까?", "예", "아니오");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		input @msg$, 1, "확성할 말을 입력해 주세요", "", "", 255;
+		console_output "[방송말]###[" + get_name() + "]" + @msg$;
+		broadcast 0, "###[" + get_name() + "]>>" + @msg$;
+		item_del "확성기", 1;
+	}
+}
+
+0,0,0,0,0,0,0	크리스마스선물주머니	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("묵직한 선물이 들어있을것 같은 보따리다! 열어볼까?", "열어본다.", "나중에열자.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		re2:
+		set @rand, rand(0, 13);
+		if(@rand < 1 || @rand > 8){goto re2;}
+		item_del "크리스마스선물주머니", 1;
+		if(@rand == 1){mes 0, "보따리를 열어봤지만, 아무것도 들어있지 않다.. 하.."; end;}
+		if(@rand == 2){item_add "확성기", 3; mes 0, "보따리를 열어보니, 확성기 3개가 들어있다!"; end;}
+		if(@rand == 3){money_add "1000"; set #EG, #EG + 200; mes 0, "보따리를 열어보니, 1000골드와 200EG가 들어있다!"; end;}
+		if(@rand == 4){item_add "Effect-버블버블", 1; mes 0, "보따리를 열어보니, Effect-버블버블이 들어있다!"; end;}
+		if(@rand == 5){mes 0, "보따리를 열어봤지만, 아무것도 들어있지 않다.. 하.."; end;}
+		if(@rand == 6){money_add "5000"; mes 0, "보따리에서 5000골드가 나왔다!"; end;}
+		if(@rand == 7){set #EG, #EG + 500; mes 0, "보따리를 열어보니 500EG가 나왔다!"; end;}
+		if(@rand == 8){item_add "순록뿔장식", 1; mes 0, "보따리를 열어보니 순록뿔장식이 나왔다!"; end;}
+		goto re2;
+	}else if(@select == 2){
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	수상한버섯	{
+	set @myid, get_myid();
+	set_vital 1;
+	message 3, "체력이 1이 되었습니다.";
+}
+
+0,0,0,0,0,0,0	봉인의선물	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("묵직한 선물이 들어있을것 같은 선물박스다! 열어볼까?", "열어본다.", "나중에열자.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		re2:
+		set @rand, rand(0, 13);
+		if(@rand < 1 || @rand > 2){goto re2;}
+		item_del "봉인의선물", 1;
+		if(@rand == 1){money_add "15000"; mes 0, "선물박스에서 15000골드가 나왔다!"; end;}
+		if(@rand == 2){set #EG, #EG + 300; mes 0, "선물박스를 열어보니 300EG가 나왔다!"; end;}
+		goto re2;
+	}else if(@select == 2){
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	꼬끼오알	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @int, 0;
+	set @val, menu("자 한번 흔들어봅시다!", "사용한다.","다음에 사용한다.");
+	if(@val == 1){
+		RE:
+		set @int, rand(1,18);
+		if(@int < 1 || @int > 18){goto RE;}
+		if(@int == 1){money_add "50000"; item_del "꼬끼오알",1; mes 1, "5만gold 당첨!!!!"; end;}
+		if(@int == 2){money_add "7000000"; item_del "꼬끼오알",1; mes 1, "700만gold 당첨!!!!"; end;}
+		if(@int == 3){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 4){exp_add 100000000; item_del "꼬끼오알",1; mes 1, "1억exp 당첨!!!!"; end;}
+		if(@int == 5){exp_add 200000000; item_del "꼬끼오알",1; mes 1, "2억exp 당첨!!!!"; end;}
+		if(@int == 6){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 7){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 8){item_add "MP캅셀",1; item_del "꼬끼오알",1; mes 1, "MP캅셀 당첨!!!!"; end;}
+		if(@int == 9){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 10){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 11){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 12){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 13){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 14){set_eg @eg + 200; item_del "꼬끼오알",1; mes 1, "200EG당첨!"; end;}
+		if(@int == 15){set_eg @eg + 300; item_del "꼬끼오알",1; mes 1, "300EG당첨!"; end;}
+		if(@int == 16){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 17){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+		if(@int == 18){item_del "꼬끼오알",1; mes 1, "꽝"; end;}
+	}
+}
+
+0,0,0,0,0,0,0	스킬스펠지우기	{
+		set @myid, get_myid();
+		set @select, menu("[" + get_name() + "]님, 메뉴를 선택해주세요.", "스킬지우기", "스펠지우기");
+		if(@select == 1){
+		input @skill_del$, 1, "[" + get_name() + "]님, 제거하실 스킬이름을 정확히 입력해주세요.", "", "", 255;
+		skill_del @skill_del$;
+		mes 1, "["+ @skill_del$+"]스킬을 제거하셧습니다.";
+		}else if(@select == 2){
+		input @spell_del$, 1, "[" + get_name() + "]님, 제거하실 스펠이름을 정확히 입력해주세요.", "", "", 255;
+		spell_del @spell_del$;
+		mes 1, "["+ @spell_del$+"]스펠을 제거하셧습니다.";		
+}
+del @select;
+}

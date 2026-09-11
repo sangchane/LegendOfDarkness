@@ -1,0 +1,1690 @@
+0	SPELL_미종보법	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<100){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del "100";
+	alwhd @myid, 10;
+	message 3,"몸놀림이 빨라집니다";
+	message 3,"미종보법을 외웠습니다.";
+	game_sound 8 ,0;
+	effect@myid,6,0,100;
+}
+
+0	SPELL_경신공	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<100){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del "100";
+	rudtlsrhd @myid, 10;
+	game_sound 8 ,0;
+	effect@myid,5,0,100;
+	message 3,"경공";
+	message 3,"경신공을 외웠습니다.";
+}
+
+0,	SPELL_흡정신공	{
+	set@myid,get_myid();
+	if(get_mana(@myid)<100){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del"100";
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@side,get_side(@myid);
+	if(@side==0){
+		set@mob,get_mobxy(@x1,(@y1)-1);set@type1,istype(@mob);
+		if(@type1==1){
+			set@hill,get_basevita(@myid)/100*1;
+			heal@myid,@hill;
+			del @mob;
+		}
+	}if(@side==1){
+		set@mob1,get_mobxy(@x1+1,(@y1));set@type1,istype(@mob1);
+		if(@type1==1){
+			set@hill,get_basevita(@myid)/100*1;
+			heal@myid,@hill;
+			del @mob1;
+		}
+	}if(@side==2){
+		set@mob2,get_mobxy(@x1,(@y1)+1);set@type1,istype(@mob2);
+		if(@type1==1){
+			set@hill,get_basevita(@myid)/100*1;
+			heal@myid,@hill;
+			del @mob2;
+		}
+	}if(@side==3){
+		set@mob3,get_mobxy(@x1-1,(@y1));set@type1,istype(@mob3);
+		if(@type1==1){
+			set@hill,get_basevita(@myid)/100*1;
+			heal@myid,@hill;
+			del @mob3;
+		}
+	}
+	game_sound 8,0;
+	motion 6,40;
+	message 3,"흡정신공을 외웠습니다.";
+	end;
+}
+
+0	SPELL_철포삼	{
+	set@myid,get_myid();
+	if(antimagic(@myid,60)==1){
+		effect@myid,244,0,100;
+		game_sound 43,0;
+		motion 6,40;
+		message 3,"철포삼을 외웠습니다.";
+	}
+}
+
+2	SKILL_통배권	{
+	set@myid,get_myid();
+if(get_mapname(@myid)=="크리스마스선물공장"||get_mapname(@myid)=="수오미길드성-알현실"||get_mapname(@myid)=="수오미길드성-주방"||get_mapname(@myid)=="수오미길드성-식당"||get_mapname(@myid)=="수오미길드성-정원"||get_mapname(@myid)=="[Hard]혼돈의탑-15층"||get_mapname(@myid)=="[Hard]혼돈의탑-16층"||get_mapname(@myid)=="[Hard]혼돈의탑-17층"||get_mapname(@myid)=="[Hard]혼돈의탑-18층"||get_mapname(@myid)=="[Hard]혼돈의탑-19층"||get_mapname(@myid)=="[Hard]혼돈의탑-20층"||get_mapname(@myid)=="[Hard]혼돈의탑-21층"||get_mapname(@myid)=="[Hard]혼돈의탑-22층"||get_mapname(@myid)=="정화된뮤레칸던전"||get_mapname(@myid)=="차원의틈1-1"||get_mapname(@myid)=="차원의틈1-2"||get_mapname(@myid)=="차원의틈1-3"||get_mapname(@myid)=="차원의틈1-4"||get_mapname(@myid)=="차원의틈1-5"||get_mapname(@myid)=="차원의틈1-5"||get_mapname(@myid)=="망자의쉼터"||get_mapname(@myid)=="?????"||get_mapname(@myid)=="오염된우드랜드"||get_mapname(@myid)=="버려진제단1-1"||get_mapname(@myid)=="버려진제단1-2"||get_mapname(@myid)=="버려진제단1-3"||get_mapname(@myid)=="[우드랜드]아캐른작전회의실"||get_mapname(@myid)=="사이비성당"||get_mapname(@myid)=="이아길드성궁"||get_mapname(@myid)=="이아길드성궁왕의방"||get_mapname(@myid)=="이아길드성궁메인홀"||get_mapname(@myid)=="타락한이아의신전"){message 3,"이 곳에선 사용이 불가능합니다."; end;}
+	set@target,skill_target();
+	skill_delay 9;
+	if(get_wearitem_shield(@myid)==NULL){
+		set@damage,(get_att_damage(@myid)*2);
+		set@damage,@damage+(get_con(@myid)*10);
+		if(!@target){
+			if(istype(get_front_char(@myid))==3 && get_map_pk()){
+				set@target,get_front_char(@myid);
+				char_damaged@target,@damage,0,0;
+			}
+		}else{
+			damaged@target,@damage;
+			poison @target,5,247,1,0,0,@myid;
+		}
+		motion 132,20;
+		game_sound 1,100;
+ 		game_sound 16,100;
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_단각	{
+	set@myid,get_myid();
+	skill_delay 5;
+	if(get_wearitem_shield(@myid)==NULL){
+		set@target,skill_target();
+		if(#classskillupgrad31==2){
+			skill_del "단각";
+			set@damage,get_att_damage(@myid)*100;
+			set@damage,(get_con(@myid)+(get_str(@myid)+(get_dex(@myid)))*2000);
+			set @dam, @dam + (get_ability(@myid) * 400);
+			if(get_state(@myid)==4){
+				if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+				if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+				if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+			}
+		}else{
+			set@damage,get_att_damage(@myid)*4;
+			if(#classskillupgrad31==1){
+				set@damage,@damage+(get_con(@myid)*100);
+			}else{
+				set@damage,@damage+(get_con(@myid)*20);
+			}
+		}	
+		if(!@target){
+			if(istype(get_front_char(@myid))==3 && get_map_pk()){
+				set@target,get_front_char(@myid);
+				if(#classskillupgrad31==1){
+					char_damaged@target,@damage,249,100;
+					motion 131,20;
+					game_sound 14,0;
+				}else if(#classskillupgrad31==2){
+					char_damaged@target,@damage,265,100;
+					motion 131,20;
+	 				game_sound 53,0;
+				}else{
+					char_damaged@target,@damage,27,100;
+					motion 132,20;
+					game_sound 15,0;
+				}
+			}
+		}else{
+			damaged@target,@damage;
+			if(#classskillupgrad31==2){
+				effect@target,0,265,100;
+				motion 131,20;
+				game_sound 53,0;
+			}else if(#classskillupgrad31==1){
+				effect@target,0,249,100;
+				motion 131,20;
+ 				game_sound 14,100;
+			}else{
+				effect@target,0,27,100;
+				motion 131,20;
+				game_sound 15,0;
+			}
+			game_sound 1,100;
+		}
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_붕각	{
+	set@myid,get_myid();
+	skill_delay 10;
+	if(get_wearitem_shield(@myid)==NULL){
+		set@target,skill_target();
+		set@damage,get_att_damage(@myid)*100;
+		if(#classskillupgrad31==2){
+			skill_del "붕각";
+			set@damage,@damage+(get_con(@myid)*2500);
+			set @dam, @dam + (get_ability(@myid) * 400);
+			if(get_state(@myid)==4){
+				if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+				if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+				if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+			}
+		}else{
+			set@damage,@damage+(get_con(@myid)*100);
+		}
+		if(!@target){
+			if(istype(get_front_char(@myid))==3 && get_map_pk()){
+				set@target,get_front_char(@myid);
+				if(#classskillupgrad31==2){
+					char_damaged@target,@dam,265,100;
+					motion 133,20;
+ 					game_sound 53,0;
+					goto go2;
+				}else{
+					set@damage,(get_con(@myid)+(get_str(@myid)+(get_dex(@myid)))*8);
+					char_damaged@target,@damage,249,100;
+					motion 133,20;
+ 					game_sound 14,0;
+				}
+			}
+		}else{
+			damaged@target,@damage;
+			if(#classskillupgrad31==2){
+				effect@target,0,265,100;
+ 				game_sound 53,0;
+			}else{
+				effect@target,0,249,100;
+ 				game_sound 14,100;
+			}
+			motion 133,20;
+			game_sound 1,100;
+		}
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_선풍각	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	if(#classskillupgrad31==2){
+		skill_del "선풍각";
+		set@damage,get_att_damage(@myid)*70;
+		set@damage,@damage+(get_con(@myid)*2000);
+		set @dam, @dam + (get_ability(@myid) * 400);
+	}else{
+		set@damage,get_att_damage(@myid)*15;
+		set@damage,@damage+(get_con(@myid)*300);
+		if(get_state(@myid)==4){
+			if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+			if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+			if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+		}
+	}
+	set@type,istype(@target);
+	set@mob1,get_mobxy(@x1,(@y1)-1);
+	set@mob2,get_mobxy(@x1,(@y1)+1);
+	set@mob3,get_mobxy((@x1)-1,@y1);
+	set@mob4,get_mobxy((@x1)+1,@y1);
+	if(#classskillupgrad31==2){
+		if(istype(@mob1)==1){effect@mob1,0,265,100;damaged@mob1,@damage;}
+		if(istype(@mob2)==1){effect@mob2,0,265,100;damaged@mob2,@damage;}
+		if(istype(@mob3)==1){effect@mob3,0,265,100;damaged@mob3,@damage;}
+		if(istype(@mob4)==1){effect@mob4,0,265,100;damaged@mob4,@damage;}
+		if(get_map_pk()){
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@damage,265,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@damage,265,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@damage,265,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@damage,265,100;}
+		}
+		motion 133,20;
+		game_sound 53,0;
+	}else{
+		if(istype(@mob1)==1){effect@mob1,0,249,100;damaged@mob1,@damage;}
+		if(istype(@mob2)==1){effect@mob2,0,249,100;damaged@mob2,@damage;}
+		if(istype(@mob3)==1){effect@mob3,0,249,100;damaged@mob3,@damage;}
+		if(istype(@mob4)==1){effect@mob4,0,249,100;damaged@mob4,@damage;}
+		if(get_map_pk()){
+			set@damage,(get_con(@myid)+(get_str(@myid)+(get_dex(@myid)))*17);
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@damage,249,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@damage,249,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@damage,249,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@damage,249,100;}
+		}
+		motion 133,20;
+		game_sound 16,100;
+	}
+	game_sound 1,100;
+	skill_delay 15;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@mob4;
+	del@myid;
+	del@x1;
+	del@y1;
+}
+
+2	SKILL_백보신권	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@damage,(get_con(@myid)+(get_str(@myid)+(get_dex(@myid)))*9);
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+	}
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){	
+		switch(@side){
+		case 0:      
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@damage,249,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@damage,249,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@damage,249,100;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@damage,249,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@damage,249,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@damage,249,100;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@damage,249,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@damage,249,100;}
+		if(istype(@mob3)==3){char_damaged@mob2,@damage,249,100;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@damage,249,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@damage,249,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@damage,249,100;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@damage,249,100;
+	motion 132,40;
+	skill_delay 17;
+	game_sound 1,0;
+	game_sound 16,0;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@myid;
+	del@x1;
+	del@y1;
+	del@skill_delay;
+}
+
+2	SKILL_이형환위	{
+	set@myid,get_myid();
+	set@side,get_side(@myid);
+	set@xs,get_xs();
+	set@ys,get_ys();
+	set@mapxs,get_mapxs();
+	set@mapys,get_mapys();
+	set@target,skill_target(@myid);
+	if(@target && get_mobdie){end;}
+	set@target2,get_front_char(@myid);
+	switch(@side){
+		case 0:
+			set@target3,get_mobxy(get_xs(@myid),get_ys(@myid)-2);
+			set@target4,get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-2);
+			break;
+		case 1:
+			set@target3,get_mobxy(get_xs(@myid)+2,get_ys(@myid));
+			set@target4,get_char_serial(@myid,get_xs(@myid)+2,get_ys(@myid));
+			break;
+		case 2:
+			set@target3,get_mobxy(get_xs(@myid),get_ys(@myid)+2);
+			set@target4,get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+2);
+			break;
+		case 3:
+			set@target3,get_mobxy(get_xs(@myid)-2,get_ys(@myid));
+			set@target4,get_char_serial(@myid,get_xs(@myid)-2,get_ys(@myid));
+			break;
+	}
+	if(!@target && !@target2 && !@target3 && !@target4){del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;end;}
+	if(!@target && !@target2){
+		if(@side==0){
+			set@char,get_char_serial(@myid,@xs,(@ys)-2);
+			set@char2,get_char_serial(@myid,@xs,(@ys)-3);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)-3);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-3)==1||istype(@char3)==1){goto no;}
+			set_side 2;set_ys get_ys()-3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==1){
+			set@char,get_char_serial(@myid,(@xs)+2,@ys);
+			set@char2,get_char_serial(@myid,(@xs)+3,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid)+3,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)+3,get_ys(@myid))==1||istype(@char3)==1){goto no;}
+			set_side 3;set_xs get_xs()+3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==2){
+			set@char,get_char_serial(@myid,@xs,(@ys)+2);
+			set@char2,get_char_serial(@myid,@xs,(@ys)+3);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)+3);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+3)==1||istype(@char3)==1){goto no;}
+			set_side 0;set_ys get_ys()+3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==3){
+			set@char,get_char_serial(@myid,(@xs)-2,@ys);
+			set@char2,get_char_serial(@myid,(@xs)-3,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid)-3,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)-3,get_ys(@myid))==1||istype(@char3)==1){goto no;}
+			set_side 1;set_xs get_xs()-3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+	}else{
+		if(@side==0){
+			set@char,get_char_serial(@myid,@xs,(@ys)-1);
+			set@char2,get_char_serial(@myid,@xs,(@ys)-2);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)-2);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-2)==1||istype(@char3)==1){goto no;}
+			set_side 2;set_ys get_ys()-2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==1){
+			set@char,get_char_serial(@myid,(@xs)+1,@ys);
+			set@char2,get_char_serial(@myid,(@xs)+2,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid)+2,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)+2,get_ys(@myid))==1||istype(@char3)==1){goto no;}
+			set_side 3;set_xs get_xs()+2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==2){
+			set@char,get_char_serial(@myid,@xs,(@ys)+1);
+			set@char2,get_char_serial(@myid,@xs,(@ys)+2);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)+2);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+2)==1||istype(@char3)==1){goto no;}
+			set_side 0;set_ys get_ys()+2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==3){
+			set@char,get_char_serial(@myid,(@xs)-1,@ys);
+			set@char2,get_char_serial(@myid,(@xs)-2,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no;}
+			set@char3,get_mobxy(get_xs(@myid)-2,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)-2,get_ys(@myid))==1||istype(@char3)==1){goto no;}
+			set_side 1;set_xs get_xs()-2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+	}
+	go:
+	skill_delay 9;
+	end;
+	no:
+	message 3,"할 수 없습니다";
+	end;
+}
+
+2	SKILL_달마신공	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@damage,get_vita(@myid)*600/100;
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/1000*1100;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/1000*1200;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/1000*1300;}
+	}
+	skill_delay 15;
+	if(!@target){
+		if(get_front_char(@myid) && istype(get_front_char(@myid))==3 && get_map_pk()){
+			set@damage,get_vita(@myid) *50/100;
+			set@target,get_front_char(@myid);
+			char_damaged3@target,@damage,156,100;
+			motion 132,20;
+			set_vital get_vita(@myid) / 1000*600;
+			game_sound 17,0;
+		}		
+	}else{
+		damaged@target,@damage;
+		set_vital get_vita(@myid) / 100*60;
+		motion 132,20;
+		effect@target,0,156,100;
+		game_sound 17,0;
+	}
+}
+
+2	SKILL_구양신공	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,get_vita(@myid)*300/100;
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@dam,@dam/1000*1100;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@dam,@dam/1000*1200;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@dam,@dam/1000*1300;}
+	}
+	set_vital get_vita(@myid) / 1000*300;
+	set@type,istype(@target);
+	set@mob1,get_mobxy(@x1,(@y1)-1);
+	set@mob2,get_mobxy(@x1,(@y1)+1);
+	set@mob3,get_mobxy((@x1)-1,@y1);
+	set@mob4,get_mobxy((@x1)+1,@y1);
+	if(istype(@mob1)==1){effect@mob1,0,331,100;damaged@mob1,@dam;}
+	if(istype(@mob2)==1){effect@mob2,0,331,100;damaged@mob2,@dam;}
+	if(istype(@mob3)==1){effect@mob3,0,331,100;damaged@mob3,@dam;}
+	if(istype(@mob4)==1){effect@mob4,0,331,100;damaged@mob4,@dam;}
+	if(get_map_pk()){
+		set@dam,get_vita(@myid)*800/1000;
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,331,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,331,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,331,100;}
+		if(istype(@mob4)==3){char_damaged@mob4,@dam,331,100;}
+	}
+	motion 132,20;
+	game_sound 17,0;
+	skill_delay 34;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@mob4;
+	del@myid;
+	del@x1;
+	del@y1;
+}
+
+
+2	SKILL_소수신공	{
+	set@myid,get_myid();
+	skill_delay 52;
+	if(sosusin(@myid,120)==1){
+		message 3,"소수신공";
+		message 3,"소수공을 외웠습니다.";
+		effect@myid,260,260,100;
+		motion 132,60;
+	}
+	del@target;
+	del@type;
+}
+
+2	SKILL_일음지	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	skill_delay 17;
+	motion 132,20;
+	if(istype(@target)==1){
+		if(!mob_strabismus(@target,10)){
+			end;
+		}else{
+			game_sound 1,0;
+			game_sound 15,100;
+			message 3,"일음을 외웠습니다.";
+			effect@target,0,42 ,75;
+		}
+	}
+}
+
+2	SKILL_발경	{
+	set@myid,get_myid();
+	if(get_mapname(@myid)=="엔도르-여왕의거처"){message 3,"소루마를 외웠습니다.";end;}
+	set@target,skill_target();
+	skill_delay 26;
+	if(!@target){
+		if(istype(get_front_char(@myid))==3 && get_map_pk()){
+			set@target,get_front_char(@myid);
+			mobsor_delay@target,15;
+			motion 132,35;
+			game_sound 1,0;
+		}
+	}else{
+		if(magic_exist(7,@target,1)){message 3,"이미 걸려있습니다.";end;}
+		magic 7,@target,0,15,0,@myid;
+		motion 132,20;
+		game_sound 1,0;
+	}
+	message 3,"소루네아를 외웠습니다.";
+}
+
+2	SPELL_금강불괴	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 500){message 3,"마력이 부족합니다.";del@myid;end;}
+	if(rand2(1,10)>8){message 3,"실패했습니다.";end;}
+	if(immortal(@myid,999)==1){
+		manal_del "500";
+		effect@myid,6,0,100;
+		game_sound 8,0;
+		message 3,"금강불체";
+		message 3,"금강불괴를 외웠습니다.";
+	}
+}
+
+2	SPELL_일루메니	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 500){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del "500";
+	message 3,"일루메니를 외웠습니다.";
+	set_delstrabismus@myid;
+	effect@myid,281,0,75;
+}
+
+2	SPELL_반탄신공	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 500){message 3,"마력이 부족합니다.";del@myid;end;}
+	if(rand2(1,10)>8){message 3,"실패했습니다.";end;}
+	if(reply(@myid,999)==1){
+		manal_del "500";
+		effect@myid,66,0,75;
+		game_sound 8,0;
+		motion 6,30;
+		message 3,"반탄신공을 외웠습니다.";
+	}
+}
+
+2	SPELL_장풍	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 150){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del "150";
+	set@damage,(get_int(@myid))*174;
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+	}
+	set@target,spell_target();
+	set@type,istype(@target);
+	if(@type==1){
+		effect@target,0,249,100;
+		damaged@target,@damage;
+	}else{
+		if(@type==3 && get_map_pk()){
+			if(magic_protection(@target)){effect@target,0,33,130;end;}
+			char_damaged2@target,@damage,249,100;
+		}
+	}
+	message 3,"장풍을 외웠습니다.";
+	game_sound 15,0;
+	motion 132,50;
+	del@myid;
+	del@target;
+	del@type;
+}
+
+2	SPELL_다라밀공	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 1440){message 3,"마력이 부족합니다.";end;}
+	set@damage,get_vita(@myid)*3;
+	set@damage,@damage + (get_mana(@myid)*2);
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+	}
+	set@target,spell_target();
+	set@type,istype(@target);
+	if(@type==1){
+		effect@target,0,288,130;
+		damaged@target,@damage;
+		set_vital "1";
+		set_manal "0";
+	}else{
+		if(@type==3 && get_map_pk()){
+			set@damage,get_vita(@myid)*3;
+			set@damage,@damage + (get_mana(@myid)*2);
+			char_damaged2@target,@damage,288,100;
+			set_vital "1";
+			set_manal "0";
+		}
+	}
+	message 3,"다라밀공을 외웠습니다.";
+	game_sound 98,0;
+	motion 6, 30;
+	del@myid;
+	del@target;
+	del@type;
+}
+
+2	SPELL_자기보호	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 150){message 3,"마력이 부족합니다. [필요마나 : 150]";del@myid;end;}
+	manal_del "150";
+	motion 6, 30;
+	if(horrama2(@myid,60)==1){
+		game_sound 8,0;
+		effect@myid,262,0,100;
+		message1@myid,3,"자기보호를 외웠습니다.";
+	}
+}
+
+2	SPELL_무영신공	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < get_basemana(@myid)/100*21){message 3,"마력이 부족합니다.";del@myid;end;}
+	manal_del "2500";
+	set@x1,get_xs();
+	set@y1,get_ys();
+	set@dam,((get_mana(@myid))) / 100*125;
+	if(get_critical(@myid)){set@dam,@dam*2;}
+	set@type,istype(@target);
+	set@side,get_side(@myid);
+	if(get_map_pk()){	
+		switch(@side){
+		case 0:      
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,7,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,7,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,7,100;}
+		break;
+		case 1:
+		set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,7,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,7,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,7,100;}
+		break;
+		case 2:
+		set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,7,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,7,100;}
+		if(istype(@mob3)==3){char_damaged@mob2,@dam,7,100;}
+		break;
+		case 3:
+		set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,7,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,7,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,7,100;}
+		break;
+		}
+	}
+	direct_damage@myid,0,3,@dam,7,100;
+	motion 132,40;
+	game_sound 18,0;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@side;
+	del@effect;
+	del@myid;
+	del@x1;
+	del@y1;
+}
+
+2	SKILL_허공답보	{
+	set@myid,get_myid();
+	set@side,get_side(@myid);
+	set@xs,get_xs();
+	set@ys,get_ys();
+	set@mapxs,get_mapxs();
+	set@mapys,get_mapys();
+	set@target,skill_target(@myid);
+	if(@target && get_mobdie){end;}
+	set@target2,get_front_char(@myid);
+	set@dam,(get_att_damage(@myid)*15);
+	set@dam,@dam + (get_con(@myid)*200);
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@dam,@dam/100*110;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@dam,@dam/100*120;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@dam,@dam/100*130;}
+	}
+	switch(@side){
+		case 0:
+			set@target3,get_mobxy(get_xs(@myid),get_ys(@myid)-2);
+			set@target4,get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-2);
+			break;
+		case 1:
+			set@target3,get_mobxy(get_xs(@myid)+2,get_ys(@myid));
+			set@target4,get_char_serial(@myid,get_xs(@myid)+2,get_ys(@myid));
+			break;
+		case 2:
+			set@target3,get_mobxy(get_xs(@myid),get_ys(@myid)+2);
+			set@target4,get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+2);
+			break;
+		case 3:
+			set@target3,get_mobxy(get_xs(@myid)-2,get_ys(@myid));
+			set@target4,get_char_serial(@myid,get_xs(@myid)-2,get_ys(@myid));
+			break;
+	}
+	if(!@target && !@target2 && !@target3 && !@target4){del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;end;}
+	if(!@target && !@target2){
+		if(@side==0){
+			set@char,get_char_serial(@myid,@xs,(@ys)-2);
+			set@char2,get_char_serial(@myid,@xs,(@ys)-3);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)-3);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-3)==1||istype(@char3)==1){goto no2;}
+			set_side 2;set_ys get_ys()-3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==1){
+			set@char,get_char_serial(@myid,(@xs)+2,@ys);
+			set@char2,get_char_serial(@myid,(@xs)+3,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)+3,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)+3,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 3;set_xs get_xs()+3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==2){
+			set@char,get_char_serial(@myid,@xs,(@ys)+2);
+			set@char2,get_char_serial(@myid,@xs,(@ys)+3);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)+3);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+3)==1||istype(@char3)==1){goto no2;}
+			set_side 0;set_ys get_ys()+3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==3){
+			set@char,get_char_serial(@myid,(@xs)-2,@ys);
+			set@char2,get_char_serial(@myid,(@xs)-3,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)-3,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)-3,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 1;set_xs get_xs()-3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+	}else{
+		if(@side==0){
+			set@char,get_char_serial(@myid,@xs,(@ys)-1);
+			set@char2,get_char_serial(@myid,@xs,(@ys)-2);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)-2);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-2)==1||istype(@char3)==1){goto no2;}
+			set_side 2;set_ys get_ys()-2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==1){
+			set@char,get_char_serial(@myid,(@xs)+1,@ys);
+			set@char2,get_char_serial(@myid,(@xs)+2,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)+2,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)+2,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 3;set_xs get_xs()+2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==2){
+			set@char,get_char_serial(@myid,@xs,(@ys)+1);
+			set@char2,get_char_serial(@myid,@xs,(@ys)+2);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)+2);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+2)==1||istype(@char3)==1){goto no2;}
+			set_side 0;set_ys get_ys()+2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==3){
+			set@char,get_char_serial(@myid,(@xs)-1,@ys);
+			set@char2,get_char_serial(@myid,(@xs)-2,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)-2,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)-2,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 1;set_xs get_xs()-2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+	}
+	go:
+	if(@target){effect@target,0,68,75;damaged@target,@dam;}
+	if(@target3){effect@target3,0,68,75;damaged@target3,@dam;}
+	if(@target2 && get_map_pk(@myid)){char_damaged@target2,@dam,68,100;}
+	if(@target4 && get_map_pk(@myid)){char_damaged@target4,@dam,68,100;}
+	skill_delay 14;
+	end;
+	no2:
+	message 3,"할 수 없습니다";
+	end;
+}
+//수인
+2	SPELL_도가변신	{
+	set@myid,get_myid();
+	effect@myid,164,0,100;
+	game_sound 8,0;
+	if(#disguise==1){
+		if(#mammalia==1){message 3,"늑대변신(Lev1)";char_disguise 426,180,-2,183;end;}
+		if(#mammalia==2){message 3,"늑대변신(Lev2)";char_disguise 425,180,-3,183;end;}
+		if(#mammalia==3){message 3,"늑대변신(Lev3)";char_disguise 427,180,-4,183;end;}
+		if(#mammalia==4){message 3,"늑대변신(Master)";char_disguise 595,180,-5,183;end;}
+	}
+	if(#disguise==2){
+		if(#reptile==1){message 3,"파충류변신(Lev1)";char_disguise 428,180,-2,185;end;}
+		if(#reptile==2){message 3,"파충류변신(Lev2)";char_disguise 429,180,-3,185;end;}
+		if(#reptile==3){message 3,"파충류변신(Lev3)";char_disguise 430,180,-4,185;end;}
+		if(#reptile==4){message 3,"파충류변신(Master)";char_disguise 596,180,-5,185;end;}
+	}
+	if(#disguise==3){
+		if(#Birds==1){message 3,"조류변신(Lev1)";char_disguise 431,180,-2,184;end;}
+		if(#Birds==2){message 3,"조류변신(Lev2)";char_disguise 432,180,-3,184;end;}
+		if(#Birds==3){message 3,"조류변신(Lev3)";char_disguise 433,180,-4,184;end;}
+		if(#Birds==4){message 3,"조류변신(Master)";char_disguise 597,180,-5,184;end;}
+	}
+	end;
+}
+
+2	SKILL_마구때리기	{
+	set@myid,get_myid();
+	skill_delay 12;
+		set@target,skill_target();
+		if(#HarnessSpanking==1){
+			set@damage,(get_att_damage(@myid)*50);
+			set@damage,@damage+(get_con(@myid)*300);
+		}
+		if(#HarnessSpanking==2){
+			set@damage,(get_att_damage(@myid)*90);
+			set@damage,@damage+(get_con(@myid)*350);
+		}
+		if(#HarnessSpanking==3){
+			set@damage,(get_att_damage(@myid)*130);
+			set@damage,@damage+(get_con(@myid)*450);
+		}
+		if(#HarnessSpanking==4){
+			set@damage,(get_att_damage(@myid)*170);
+			set@damage,@damage+(get_con(@myid)*550);
+		}
+		if(!@target){
+			if(istype(get_front_char(@myid))==3 && get_map_pk()){
+				set@damage,@damage + (get_ability(@myid)*250);
+				set@target,get_front_char(@myid);
+				char_damaged@target,@damage,188,100;
+			}
+		}else{
+			effect@target,0,188,100;
+			damaged@target,@damage;
+		}
+		motion 387,20;
+		game_sound 1,100;
+ 		game_sound 52,100;
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_양손공격	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	skill_delay 13;
+		if(#Fistattack==1){
+			set@damage,(get_att_damage(@myid)*50);
+			set@damage,@damage+(get_con(@myid)*300);
+		}
+		if(#Fistattack==2){
+			set@damage,(get_att_damage(@myid)*90);
+			set@damage,@damage+(get_con(@myid)*350);
+		}
+		if(#Fistattack==3){
+			set@damage,(get_att_damage(@myid)*130);
+			set@damage,@damage+(get_con(@myid)*450);
+		}
+		if(#Fistattack==4){
+			set@damage,(get_att_damage(@myid)*170);
+			set@damage,@damage+(get_con(@myid)*550);
+		}
+		if(!@target){
+			if(istype(get_front_char(@myid))==3 && get_map_pk()){
+				set@damage,@damage + (get_ability(@myid)*250);
+				set@target,get_front_char(@myid);
+				char_damaged@target,@damage,158,100;
+			}
+		}else{
+			effect@target,0,158,100;
+			damaged@target,@damage;
+		}
+		motion 387,20;
+		game_sound 1,100;
+ 		game_sound 52,100;
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_지열참	{
+	set@myid,get_myid();
+	skill_delay 15;
+		set@target,skill_target();
+		set@x1,get_xs();
+		set@y1,get_ys();
+		if(#Earthquake==1){
+			set@dam,(get_con(@myid)*10500);
+			set @dam, @dam + (get_ability(@myid) * 500);
+		}
+		if(#Earthquake==2){
+			set@dam,(get_con(@myid)*11800);
+			set @dam, @dam + (get_ability(@myid) * 600);
+		}
+		if(#Earthquake==3){
+			set@dam,(get_con(@myid)*12100);
+			set @dam, @dam + (get_ability(@myid) * 1200);
+		}
+		if(#Earthquake==4){
+			set@dam,(get_con(@myid)*13400);
+			set @dam, @dam + (get_ability(@myid) * 2400);
+		}
+		if(#Earthquake==5){
+			set@dam,(get_con(@myid)*14700);
+			set @dam, @dam + (get_ability(@myid) * 4800);
+		}
+		set@type,istype(@target);
+		set@side,get_side(@myid);
+		if(get_map_pk()){	
+			switch(@side){
+			case 0:      
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+			set@mob4,get_char_serial(@myid,@x1,(@y1)-4);
+			set@mob5,get_char_serial(@myid,@x1,(@y1)-5);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,194,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,194,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,194,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,194,100;}
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,194,100;}
+			break;
+			case 1:
+			set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)+4,@y1);
+			set@mob5,get_char_serial(@myid,(@x1)+5,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,194,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,194,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,194,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,194,100;}
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,194,100;}
+			break;
+			case 2:
+			set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+			set@mob4,get_char_serial(@myid,@x1,(@y1)+4);
+			set@mob5,get_char_serial(@myid,@x1,(@y1)+5);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,194,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,194,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,194,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,194,100;}
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,194,100;}
+			break;
+			case 3:
+			set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)-4,@y1);
+			set@mob5,get_char_serial(@myid,(@x1)-5,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,194,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,194,100;}
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,194,100;}
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,194,100;}
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,194,100;}
+			break;
+			}
+		}
+		direct_damage@myid,0,5,@dam,194,100;
+		motion 133,25;
+		game_sound 53,0;
+		del@mob1;
+		del@mob2;
+		del@mob3;
+		del@mob4;
+		del@mob5;
+		del@side;
+		del@effect;
+		del@myid;
+		del@x1;
+		del@y1;
+		del@skill_delay;
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_꼬리치기	{
+	set@myid,get_myid();
+	skill_delay 14;
+		set@target,skill_target();
+		set@x1,get_xs();
+		set@y1,get_ys();
+		if(#HarnessSpanking==1){
+			set@dam,(get_att_damage(@myid)*20);
+			set@dam,@dam+(get_con(@myid)*500);
+			set @dam, @dam + (get_ability(@myid) * 400);
+		}
+		if(#HarnessSpanking==2){
+			set@dam,(get_att_damage(@myid)*50);
+			set@dam,@dam+(get_con(@myid)*600);
+			set @dam, @dam + (get_ability(@myid) * 500);
+		}
+		if(#HarnessSpanking==3){
+			set@dam,(get_att_damage(@myid)*70);
+			set@dam,@dam+(get_con(@myid)*900);
+			set @dam, @dam + (get_ability(@myid) * 600);
+		}
+		if(#HarnessSpanking==4){
+			set@dam,(get_att_damage(@myid)*90);
+			set@dam,@dam+(get_con(@myid)*1200);
+			set @dam, @dam + (get_ability(@myid) * 700);
+		}
+		if(get_state(@myid)==4){
+			if(#mammalia==2||#reptile==2||#Birds==2){set@dam,@dam/100*110;}
+			if(#mammalia==3||#reptile==3||#Birds==3){set@dam,@dam/100*120;}
+			if(#mammalia==4||#reptile==4||#Birds==4){set@dam,@dam/100*130;}
+		}
+		set@type,istype(@target);
+		set@side,get_side(@myid);
+		if(get_map_pk()){	
+			switch(@side){
+			case 0:      
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,158,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,158,100;}
+			break;
+			case 1:
+			set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,158,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,158,100;}
+			break;
+			case 2:
+			set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,158,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,158,100;}
+			break;
+			case 3:
+			set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,158,100;}
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,158,100;}
+			break;
+			}
+		}
+		direct_damage@myid,0,2,@dam,158,100;
+		motion 133,20;
+		game_sound 1,100;
+		game_sound 52,100;
+		del@mob1;
+		del@mob2;
+		del@side;
+		del@effect;
+		del@myid;
+		del@x1;
+		del@y1;
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_할퀴기	{
+	set@myid,get_myid();
+	skill_delay 18;
+		set@target,skill_target();
+		if(#Fistattack==1){
+			set@damage,(get_att_damage(@myid)*10);
+			set@damage,@damage+(get_con(@myid)*300);
+			set @dam, @dam + (get_ability(@myid) * 400);
+		}
+		if(#Fistattack==2){
+			set@damage,(get_att_damage(@myid)*30);
+			set@damage,@damage+(get_con(@myid)*700);
+			set @dam, @dam + (get_ability(@myid) * 800);
+		}
+		if(#Fistattack==3){
+			set@damage,(get_att_damage(@myid)*50);
+			set@damage,@damage+(get_con(@myid)*1200);
+			set @dam, @dam + (get_ability(@myid) * 1300);
+		}
+		if(#Fistattack==4){
+			set@damage,(get_att_damage(@myid)*70);
+			set@damage,@damage+(get_con(@myid)*1700);
+			set @dam, @dam + (get_ability(@myid) * 1800);
+		}
+		if(get_state(@myid)==4){
+			if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+			if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+			if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+		}
+		if(!@target){
+			if(istype(get_front_char(@myid))==3 && get_map_pk()){
+				set@damage,@damage + (get_ability(@myid)*100);
+				set@target,get_front_char(@myid);
+				char_damaged@target,@damage,158,100;
+			}
+		}else{
+			effect@target,0,158,100;
+			damaged@target,@damage;
+		}
+		motion 387,20;
+		game_sound 1,100;
+ 		game_sound 52,100;
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_포이즌어택	{
+	set@myid,get_myid();
+	skill_delay 9;
+		set@target,skill_target();
+		set@x1,get_xs();
+		set@y1,get_ys();
+		if(#Earthquake==1){
+			set@dam,(get_con(@myid)*10800);
+			set @dam, @dam + (get_ability(@myid) * 500);
+		}
+		if(#Earthquake==2){
+			set@dam,(get_con(@myid)*11800);
+			set @dam, @dam + (get_ability(@myid) * 600);
+		}
+		if(#Earthquake==3){
+			set@dam,(get_con(@myid)*12100);
+			set @dam, @dam + (get_ability(@myid) * 1200);
+		}
+		if(#Earthquake==4){
+			set@dam,(get_con(@myid)*13400);
+			set @dam, @dam + (get_ability(@myid) * 2400);
+		}
+		if(#Earthquake==5){
+			set@dam,(get_con(@myid)*14700);
+			set @dam, @dam + (get_ability(@myid) * 4800);
+		}
+		if(get_state(@myid)==4){
+			if(#mammalia==2||#reptile==2||#Birds==2){set@dam,@dam/1000*110;}
+			if(#mammalia==3||#reptile==3||#Birds==3){set@dam,@dam/1000*120;}
+			if(#mammalia==4||#reptile==4||#Birds==4){set@dam,@dam/1000*130;}
+		}
+		set@type,istype(@target);
+		set@side,get_side(@myid);
+		if(get_map_pk()){	
+			switch(@side){
+			case 0:      
+			set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)-2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)-3);
+			set@mob4,get_char_serial(@myid,@x1,(@y1)-4);
+			set@mob5,get_char_serial(@myid,@x1,(@y1)-5);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			break;
+			case 1:
+			set@mob1,get_char_serial(@myid,(@x1)+1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)+2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)+3,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)+4,@y1);
+			set@mob5,get_char_serial(@myid,(@x1)+5,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			break;
+			case 2:
+			set@mob1,get_char_serial(@myid,@x1,(@y1)+1);
+			set@mob2,get_char_serial(@myid,@x1,(@y1)+2);
+			set@mob3,get_char_serial(@myid,@x1,(@y1)+3);
+			set@mob4,get_char_serial(@myid,@x1,(@y1)+4);
+			set@mob5,get_char_serial(@myid,@x1,(@y1)+5);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			break;
+			case 3:
+			set@mob1,get_char_serial(@myid,(@x1)-1,@y1);
+			set@mob2,get_char_serial(@myid,(@x1)-2,@y1);
+			set@mob3,get_char_serial(@myid,(@x1)-3,@y1);
+			set@mob4,get_char_serial(@myid,(@x1)-4,@y1);
+			set@mob5,get_char_serial(@myid,(@x1)-5,@y1);
+			if(istype(@mob1)==3){char_damaged@mob1,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob2)==3){char_damaged@mob2,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob3)==3){char_damaged@mob3,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob4)==3){char_damaged@mob4,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			if(istype(@mob5)==3){char_damaged@mob5,@dam,132,100;}
+			poison @target,5,247,4,0,0,@myid;
+			break;
+			}
+		}
+		if(get_side(@myid)==0){
+			message 3,"앙><";
+			poison @mob1,20,247,2,0,0,@myid;
+			poison @mob2,20,247,2,0,0,@myid;
+			poison @mob3,20,247,2,0,0,@myid;
+			poison @mob4,20,247,2,0,0,@myid;
+			poison @mob5,20,247,2,0,0,@myid;
+		}
+
+		direct_damage@myid,0,5,@dam,132,100;
+		motion 133,20;
+		game_sound 1,100;
+		game_sound 0,100;
+		del@mob1;
+		del@mob2;
+		del@mob3;
+		del@mob4;
+		del@mob5;
+		del@side;
+		del@effect;
+		del@myid;
+		del@x1;
+		del@y1;
+	}else{
+		message 3,"몸이 부자연스럽습니다.";
+	}
+}
+
+2	SKILL_쪼기	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	if(#HarnessSpanking==1){
+		set@damage,(get_att_damage(@myid)*10);
+		set@damage,@damage+(get_con(@myid)*300);
+		set @dam, @dam + (get_ability(@myid) * 400);
+	}
+	if(#HarnessSpanking==2){
+		set@damage,(get_att_damage(@myid)*30);
+		set@damage,@damage+(get_con(@myid)*700);
+		set @dam, @dam + (get_ability(@myid) * 800);
+	}
+	if(#HarnessSpanking==3){
+		set@damage,(get_att_damage(@myid)*50);
+		set@damage,@damage+(get_con(@myid)*1200);
+		set @dam, @dam + (get_ability(@myid) * 1300);
+	}
+	if(#HarnessSpanking==4){
+		set@damage,(get_att_damage(@myid)*70);
+		set@damage,@damage+(get_con(@myid)*1700);
+		set @dam, @dam + (get_ability(@myid) * 1800);
+	}
+	if(!@target){
+		if(istype(get_front_char(@myid))==3 && get_map_pk()){
+			set@damage,@damage + (get_ability(@myid)*100);
+			set@target,get_front_char(@myid);
+			char_damaged@target,@damage,186,100;
+		}
+	}else{
+		effect@target,0,188,100;
+		damaged@target,@damage;
+	}
+	skill_delay 13;
+	motion 133,20;
+	game_sound 1,100;
+	game_sound 52,100;
+}
+
+2	SKILL_매의위상	{
+	set@myid,get_myid();
+	set@side,get_side(@myid);
+	set@xs,get_xs();
+	set@ys,get_ys();
+	set@mapxs,get_mapxs();
+	set@mapys,get_mapys();
+	set@target,skill_target(@myid);
+	if(@target && get_mobdie){end;}
+	set@target2,get_front_char(@myid);
+	if(#Fistattack==1){
+		set@dam,(get_att_damage(@myid)*25);
+		set@dam,@dam+(get_con(@myid)*400);
+		set @dam, @dam + (get_ability(@myid) * 500);
+	}
+	if(#Fistattack==2){
+		set@dam,(get_att_damage(@myid)*40);
+		set@dam,@dam+(get_con(@myid)*800);
+		set @dam, @dam + (get_ability(@myid) * 900);
+	}
+	if(#Fistattack==3){
+		set@dam,(get_att_damage(@myid)*55);
+		set@dam,@dam+(get_con(@myid)*1300);
+		set @dam, @dam + (get_ability(@myid) * 1400);
+	}
+	if(#Fistattack==4){
+		set@dam,(get_att_damage(@myid)*80);
+		set@dam,@dam+(get_con(@myid)*2100);
+		set @dam, @dam + (get_ability(@myid) * 2200);
+	}
+	switch(@side){
+		case 0:
+			set@target3,get_mobxy(get_xs(@myid),get_ys(@myid)-2);
+			set@target4,get_char_serial(@myid,get_xs(@myid),get_ys(@myid)-2);
+			break;
+		case 1:
+			set@target3,get_mobxy(get_xs(@myid)+2,get_ys(@myid));
+			set@target4,get_char_serial(@myid,get_xs(@myid)+2,get_ys(@myid));
+			break;
+		case 2:
+			set@target3,get_mobxy(get_xs(@myid),get_ys(@myid)+2);
+			set@target4,get_char_serial(@myid,get_xs(@myid),get_ys(@myid)+2);
+			break;
+		case 3:
+			set@target3,get_mobxy(get_xs(@myid)-2,get_ys(@myid));
+			set@target4,get_char_serial(@myid,get_xs(@myid)-2,get_ys(@myid));
+			break;
+	}
+	if(!@target && !@target2 && !@target3 && !@target4){del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;end;}
+	if(!@target && !@target2){
+		if(@side==0){
+			set@char,get_char_serial(@myid,@xs,(@ys)-2);
+			set@char2,get_char_serial(@myid,@xs,(@ys)-3);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)-3);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-3)==1||istype(@char3)==1){goto no2;}
+			set_side 2;set_ys get_ys()-3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==1){
+			set@char,get_char_serial(@myid,(@xs)+2,@ys);
+			set@char2,get_char_serial(@myid,(@xs)+3,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)+3,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)+3,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 3;set_xs get_xs()+3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==2){
+			set@char,get_char_serial(@myid,@xs,(@ys)+2);
+			set@char2,get_char_serial(@myid,@xs,(@ys)+3);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)+3);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+3)==1||istype(@char3)==1){goto no2;}
+			set_side 0;set_ys get_ys()+3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==3){
+			set@char,get_char_serial(@myid,(@xs)-2,@ys);
+			set@char2,get_char_serial(@myid,(@xs)-3,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)-3,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)-3,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 1;set_xs get_xs()-3;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+	}else{
+		if(@side==0){
+			set@char,get_char_serial(@myid,@xs,(@ys)-1);
+			set@char2,get_char_serial(@myid,@xs,(@ys)-2);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)-2);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)-2)==1||istype(@char3)==1){goto no2;}
+			set_side 2;set_ys get_ys()-2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==1){
+			set@char,get_char_serial(@myid,(@xs)+1,@ys);
+			set@char2,get_char_serial(@myid,(@xs)+2,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)+2,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)+2,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 3;set_xs get_xs()+2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==2){
+			set@char,get_char_serial(@myid,@xs,(@ys)+1);
+			set@char2,get_char_serial(@myid,@xs,(@ys)+2);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid),get_ys(@myid)+2);
+			if(get_xy_block(@myid,get_xs(@myid),get_ys(@myid)+2)==1||istype(@char3)==1){goto no2;}
+			set_side 0;set_ys get_ys()+2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+		if(@side==3){
+			set@char,get_char_serial(@myid,(@xs)-1,@ys);
+			set@char2,get_char_serial(@myid,(@xs)-2,@ys);
+			if(istype(@char)==3&&istype(@char2)==3){goto no2;}
+			set@char3,get_mobxy(get_xs(@myid)-2,get_ys(@myid));
+			if(get_xy_block(@myid,get_xs(@myid)-2,get_ys(@myid))==1||istype(@char3)==1){goto no2;}
+			set_side 1;set_xs get_xs()-2;del@myid;del@side;del@xs;del@ys;del@mapxs;del@mapys;goto go;
+		}
+	}
+	go:
+	if(@target){effect@target,0,186,75;damaged@target,@dam;}
+	if(@target3){effect@target3,0,186,75;damaged@target3,@dam;}
+	if(@target2 && get_map_pk(@myid)){char_damaged@target2,@dam,186,75;}
+	if(@target4 && get_map_pk(@myid)){char_damaged@target4,@dam,186,75;}
+	skill_delay 14;
+	end;
+	no2:
+	end;
+}
+
+0	SKILL_윈드쉐이커	{
+	set@myid,get_myid();
+	set@target,skill_target();
+	set@x1,get_xs();
+	set@y1,get_ys();
+	if(#Earthquake==1){
+		set@dam,(get_con(@myid)*10157);
+		set @dam, @dam + (get_ability(@myid) * 500);
+	}
+	if(#Earthquake==2){
+		set@dam,(get_con(@myid)*11806);
+		set @dam, @dam + (get_ability(@myid) * 600);
+	}
+	if(#Earthquake==3){
+		set@dam,(get_con(@myid)*12100);
+		set @dam, @dam + (get_ability(@myid) * 1200);
+	}
+	if(#Earthquake==4){
+		set@dam,(get_con(@myid)*13400);
+		set @dam, @dam + (get_ability(@myid) * 2400);
+	}
+	if(#Earthquake==5){
+		set@dam,(get_con(@myid)*14700);
+		set @dam, @dam + (get_ability(@myid) * 4800);
+	}
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@dam,@dam/100*110;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@dam,@dam/100*120;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@dam,@dam/100*130;}
+	}
+	set@type,istype(@target);
+	set@mob1,get_mobxy(@x1,(@y1)-1);
+	set@mob2,get_mobxy(@x1,(@y1)+1);
+	set@mob3,get_mobxy((@x1)-1,@y1);
+	set@mob4,get_mobxy((@x1)+1,@y1);
+	set@mob5,get_mobxy(@x1,(@y1)-2);
+	set@mob6,get_mobxy(@x1,(@y1)+2);
+	set@mob7,get_mobxy((@x1)-2,@y1);
+	set@mob8,get_mobxy((@x1)+2,@y1);
+	if(istype(@mob1)==1){effect@mob1,0,185,100;damaged@mob1,@dam;}
+	if(istype(@mob2)==1){effect@mob2,0,185,100;damaged@mob2,@dam;}
+	if(istype(@mob3)==1){effect@mob3,0,185,100;damaged@mob3,@dam;}
+	if(istype(@mob4)==1){effect@mob4,0,185,100;damaged@mob4,@dam;}
+	if(istype(@mob5)==1){effect@mob5,0,185,100;damaged@mob5,@dam;}
+	if(istype(@mob6)==1){effect@mob6,0,185,100;damaged@mob6,@dam;}
+	if(istype(@mob7)==1){effect@mob7,0,185,100;damaged@mob7,@dam;}
+	if(istype(@mob8)==1){effect@mob8,0,185,100;damaged@mob8,@dam;}
+	if(get_map_pk()){
+		set@mob1,get_char_serial(@myid,@x1,(@y1)-1);
+		set@mob2,get_char_serial(@myid,@x1,(@y1)+1);
+		set@mob3,get_char_serial(@myid,(@x1)-1,@y1);
+		set@mob4,get_char_serial(@myid,(@x1)+1,@y1);
+		set@mob5,get_char_serial(@myid,@x1,(@y1)-2);
+		set@mob6,get_char_serial(@myid,@x1,(@y1)+2);
+		set@mob7,get_char_serial(@myid,(@x1)-2,@y1);
+		set@mob8,get_char_serial(@myid,(@x1)+2,@y1);
+		if(istype(@mob1)==3){char_damaged@mob1,@dam,185,100;}
+		if(istype(@mob2)==3){char_damaged@mob2,@dam,185,100;}
+		if(istype(@mob3)==3){char_damaged@mob3,@dam,185,100;}
+		if(istype(@mob4)==3){char_damaged@mob4,@dam,185,100;}
+		if(istype(@mob5)==3){char_damaged@mob5,@dam,185,100;}
+		if(istype(@mob6)==3){char_damaged@mob6,@dam,185,100;}
+		if(istype(@mob7)==3){char_damaged@mob7,@dam,185,100;}
+		if(istype(@mob8)==3){char_damaged@mob8,@dam,185,100;}
+	}
+	motion 387,25;
+	game_sound 1,100;
+	game_sound 53,0;
+	skill_delay 16;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@mob4;
+	del@mob5;
+	del@mob6;
+	del@mob7;
+	del@mob8;
+	del@myid;
+	del@x1;
+	del@y1;
+}
+
+2	SPELL_깃털날리기	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 2500){message 3,"마력이 부족합니다.";end;}
+	manal_del "2500";
+	if(#Feathersfly==1){set@dam,50000;}
+	if(#Feathersfly==2){set@dam,50000;}
+	if(#Feathersfly==3){set@dam,50000;}
+	if(#Feathersfly==4){set@dam,50000;}
+	set@target,spell_target();
+	set@type,istype(@target);
+	set@xs,get_mobxs(@target);
+	set@ys,get_mobys(@target);
+	set@mob1,get_mobxy((@xs)+1,@ys);
+	set@mob2,get_mobxy((@xs)-1,@ys);
+	set@mob3,get_mobxy(@xs,(@ys)+1);
+	set@mob4,get_mobxy(@xs,(@ys)-1);
+	set@mob5,get_mobxy((@xs)+2,@ys);
+	set@mob6,get_mobxy((@xs)-2,@ys);
+	set@mob7,get_mobxy(@xs,(@ys)+2);
+	set@mob8,get_mobxy(@xs,(@ys)-2);
+	set@type1,istype(@mob1);
+	set@type2,istype(@mob2);
+	set@type3,istype(@mob3);
+	set@type4,istype(@mob4);
+	set@type5,istype(@mob5);
+	set@type6,istype(@mob6);
+	set@type7,istype(@mob7);
+	set@type8,istype(@mob8);
+	if(@type==1){effect@target,0,137,100;damaged@target,@dam;}
+	if(@type1==1){effect@mob1,0,137,100;damaged@mob1,@dam;}
+	if(@type2==1){effect@mob2,0,137,100;damaged@mob2,@dam;}
+	if(@type3==1){effect@mob3,0,137,100;damaged@mob3,@dam;}
+	if(@type4==1){effect@mob4,0,137,100;damaged@mob4,@dam;}
+	if(@type5==1){effect@mob5,0,137,100;damaged@mob5,@dam;}
+	if(@type6==1){effect@mob6,0,137,100;damaged@mob6,@dam;}
+	if(@type7==1){effect@mob7,0,137,100;damaged@mob7,@dam;}
+	if(@type8==1){effect@mob8,0,137,100;damaged@mob8,@dam;}
+	if(#Feathersfly==1){message 3,"깃털날리기1을 외웠습니다.";}
+	if(#Feathersfly==2){message 3,"깃털날리기2을 외웠습니다.";}
+	if(#Feathersfly==3){message 3,"깃털날리기3을 외웠습니다.";}
+	if(#Feathersfly==4){message 3,"깃털날리기4을 외웠습니다.";}
+	motion 132,15;
+	game_sound 66,0;
+	del@mob1;
+	del@mob2;
+	del@mob3;
+	del@mob4;
+	del@type1;
+	del@type2;
+	del@type3;
+	del@type4;
+}
+
+2	SPELL_원기옥	{
+	set@myid,get_myid();
+	if(get_mana(@myid) < 1440){message 3,"마력이 부족합니다.";end;}
+	set@damage,get_vita(@myid)*17;
+	set@damage,@damage + (get_mana(@myid)*17);
+	if(get_state(@myid)==4){
+		if(#mammalia==2||#reptile==2||#Birds==2){set@damage,@damage/100*110;}
+		if(#mammalia==3||#reptile==3||#Birds==3){set@damage,@damage/100*120;}
+		if(#mammalia==4||#reptile==4||#Birds==4){set@damage,@damage/100*130;}
+	}
+	set@target,spell_target();
+	set@type,istype(@target);
+	if(@type==1){
+		effect@target,0,345,130;
+		damaged@target,@damage;
+		set_vital "1";
+		set_manal "0";
+	}else{
+		if(@type==3 && get_map_pk()){
+			set@damage,get_vita(@myid)*6;
+			set@damage,@damage + (get_mana(@myid)*6);
+			char_damaged2@target,@damage,345,100;
+			set_vital "1";
+			set_manal "0";
+		}
+	}
+	message 3,"원기옥을 외웠습니다.";
+	game_sound 98,0;
+	motion 6, 30;
+	del@myid;
+	del@target;
+	del@type;
+}
+
+0	SKILL_메투스의깨달음	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @dam, get_att_damage(@myid) * 50;
+	set @dam, @dam + (get_con(@myid) * 20);
+	set @dam, @dam * 4;
+	if(get_critical(@myid)){set @dam, @dam * 2;}
+	set @type, istype(@target);
+	set @mob1, get_mobxy(@x1, (@y1)-1);
+	set @mob2, get_mobxy(@x1, (@y1)+1);
+	set @mob3, get_mobxy((@x1)-1, @y1);
+	set @mob4, get_mobxy((@x1)+1, @y1);
+	if(istype(@mob1) == 1){effect @mob1, 0, 384,100; damaged @mob1, @dam;}
+	if(istype(@mob2) == 1){effect @mob2, 0, 384,100; damaged @mob2, @dam;}
+	if(istype(@mob3) == 1){effect @mob3, 0, 384,100; damaged @mob3, @dam;}
+	if(istype(@mob4) == 1){effect @mob4, 0, 384,100; damaged @mob4, @dam;}
+	if(get_map_pk()){
+		set @mob1, get_char_serial(@myid, @x1, (@y1)-1);
+		set @mob2, get_char_serial(@myid, @x1, (@y1)+1);
+		set @mob3, get_char_serial(@myid, (@x1)-1, @y1);
+		set @mob4, get_char_serial(@myid, (@x1)+1, @y1);
+		if(istype(@mob1) == 3){char_damaged @mob1, @dam, 384, 100;}
+		if(istype(@mob2) == 3){char_damaged @mob2, @dam, 384, 100;}
+		if(istype(@mob3) == 3){char_damaged @mob3, @dam, 384, 100;}
+		if(istype(@mob4) == 3){char_damaged @mob4, @dam, 384, 100;}
+	}
+	motion 133, 20;
+	game_sound 53, 0;
+	skill_delay 4;
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @myid;
+	del @x1;
+	del @y1;
+}

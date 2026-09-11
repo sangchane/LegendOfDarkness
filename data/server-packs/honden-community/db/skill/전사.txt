@@ -1,0 +1,285 @@
+{
+번호	15
+이름	레스큐
+이미지	13
+script_do	SKILL_레스큐
+}
+
+{
+번호	16
+이름	바투
+이미지	38
+script_do	SKILL_바투
+}
+
+{
+번호	17
+이름	디바투
+이미지	39
+script_do	SKILL_디바투
+}
+
+{
+번호	18
+이름	숏블레이드
+이미지	1
+script_do	SKILL_블레이드
+}
+
+{
+번호	19
+이름	윈드블레이드
+이미지	15
+script_do	SKILL_블레이드
+}
+
+{
+번호	20
+이름	메가블레이드
+이미지	16
+script_do	SKILL_블레이드2
+}
+
+{
+번호	21
+이름	투핸드어택
+이미지	17
+script_do	SKILL_기본공격
+}
+
+{
+번호	22
+이름	완전방어
+이미지	19
+script_do	SKILL_완전방어
+}
+
+{
+번호	23
+이름	매드소울
+이미지	20
+script_do	SKILL_매드소울
+}
+
+{
+번호	24
+이름	드래곤모드
+이미지	40
+레벨	1
+script_do	SKILL_드래곤모드
+}
+
+{
+번호	25
+이름	피닉스모드
+이미지	40
+script_do	SKILL_피닉스모드
+}
+
+{
+번호	26
+이름	크래셔
+이미지	21
+script_do	SKILL_크래셔
+}
+
+{
+번호	26
+이름	크래셔(세트효과)
+이미지	21
+script_do	SKILL_크래셔
+}
+
+{
+번호	27
+이름	적무기쳐내기
+이미지	18
+script_do	SKILL_적무기해체
+}
+
+{
+번호	28
+이름	포효
+이미지	52
+script_do	SKILL_포효
+}
+
+{
+번호	29
+이름	돌진
+이미지	49
+script_do	SKILL_돌진
+}
+
+{
+번호	30
+이름	룬블레이드
+이미지	66
+script_do	SKILL_블레이드2
+}
+
+{
+번호	31
+이름	스톰블레이드
+이미지	65
+script_do	SKILL_블레이드
+}
+
+{
+번호	32
+이름	매드소울진
+이미지	20
+script_do	SKILL_매드소울진
+}
+
+{
+번호	33
+이름	데빌크래셔
+이미지	105
+script_do	SKILL_데빌크래셔
+}
+
+{
+번호	33
+이름	데빌크래셔(세트효과)
+이미지	105
+script_do	SKILL_데빌크래셔
+}
+//검투사
+{
+이름	검투술(Lev1)
+이미지	72
+레벨	1
+script_do	SKILL_검활소연비
+}
+
+{
+이름	검투술(Lev2)
+이미지	72
+레벨	1
+script_do	SKILL_검활소연비
+}
+
+{
+이름	검투술(Lev3)
+이미지	72
+레벨	1
+script_do	SKILL_검활소연비
+}
+
+{
+이름	검투술(Lev4)
+이미지	72
+레벨	1
+script_do	SKILL_검활소연비
+}
+
+{
+이름	퓨리소윌루(Lev1)
+이미지	75
+레벨	1
+script_do	SKILL_퓨리소윌루
+}
+
+{
+이름	퓨리소윌루(Lev2)
+이미지	75
+레벨	1
+script_do	SKILL_퓨리소윌루
+}
+
+{
+이름	퓨리소윌루(Lev3)
+이미지	75
+레벨	1
+script_do	SKILL_퓨리소윌루
+}
+
+{
+이름	퓨리소윌루(Lev4)
+이미지	75
+레벨	1
+script_do	SKILL_퓨리소윌루
+}
+
+{
+이름	퓨리소윌루(Lev5)
+이미지	75
+레벨	1
+script_do	SKILL_퓨리소윌루
+}
+
+{
+이름	퓨리소윌루(Lev6)
+이미지	75
+레벨	1
+script_do	SKILL_퓨리소윌루
+}
+
+{
+이름	내려치기(Lev1)
+이미지	73
+레벨	1
+script_do	SKILL_내려치기
+}
+
+{
+이름	내려치기(Lev2)
+이미지	73
+레벨	1
+script_do	SKILL_내려치기
+}
+
+{
+이름	내려치기(Lev3)
+이미지	73
+레벨	1
+script_do	SKILL_내려치기
+}
+
+{
+이름	내려치기(Lev4)
+이미지	73
+레벨	1
+script_do	SKILL_내려치기
+}
+
+{
+이름	사방치기(Lev1)
+이미지	74
+레벨	1
+script_do	SKILL_사방치기
+}
+
+{
+이름	사방치기(Lev2)
+이미지	74
+레벨	1
+script_do	SKILL_사방치기
+}
+
+{
+이름	사방치기(Lev3)
+이미지	74
+레벨	1
+script_do	SKILL_사방치기
+}
+
+{
+이름	사방치기(Lev4)
+이미지	74
+레벨	1
+script_do	SKILL_사방치기
+}
+
+{
+이름	바람의상처
+이미지	21
+script_do	SKILL_바람의상처
+}
+
+{
+이름	검신(檢身)
+이미지	21
+script_do	SKILL_검신(檢身)
+}

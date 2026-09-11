@@ -1,0 +1,384 @@
+{
+번호	56
+이름	정권
+이미지	1
+script_do	SKILL_단각
+}
+
+{
+번호	57
+이름	이형환위
+이미지	42
+script_do	SKILL_이형환위
+}
+
+{
+번호	58
+이름	단각
+이미지	2
+script_do	SKILL_단각
+}
+
+{
+번호	59
+이름	붕각
+이미지	3
+script_do	SKILL_붕각
+}
+
+{
+번호	60
+이름	선풍각
+이미지	34
+script_do	SKILL_선풍각
+}
+
+{
+번호	61
+이름	구양신공
+이미지	37
+script_do	SKILL_구양신공
+}
+
+{
+번호	62
+이름	소수신공
+이미지	43
+script_do	SKILL_소수신공
+}
+
+{
+번호	63
+이름	일음지
+이미지	33
+script_do	SKILL_일음지
+}
+
+{
+번호	64
+이름	백보신권
+이미지	4
+script_do	SKILL_백보신권
+}
+
+{
+번호	65
+이름	발경
+이미지	35
+script_do	SKILL_발경
+}
+
+{
+번호	66
+이름	달마신공
+이미지	36
+script_do	SKILL_달마신공
+}
+
+{
+번호	67
+이름	허공답보
+이미지	51
+script_do	SKILL_허공답보
+}
+
+{
+번호	68
+이름	연천단각
+이미지	67
+script_do	SKILL_단각
+}
+
+{
+번호	69
+이름	붕신선각
+이미지	68
+script_do	SKILL_붕각
+}
+
+{
+번호	70
+이름	파천각
+이미지	69
+script_do	SKILL_선풍각
+}
+
+{
+번호	71
+이름	통배권
+이미지	4
+script_do	SKILL_통배권
+}
+
+{
+이름	비스트어택(Lev1)
+이미지	88
+script_do	SKILL_기본공격
+}
+
+{
+이름	비스트어택(Lev2)
+이미지	88
+script_do	SKILL_기본공격
+}
+
+{
+이름	비스트어택(Lev3)
+이미지	88
+script_do	SKILL_기본공격
+}
+
+{
+이름	비스트어택(Lev4)
+이미지	88
+script_do	SKILL_기본공격
+}
+
+{
+이름	마구때리기(Lev1)
+이미지	85
+레벨	1
+script_do	SKILL_마구때리기
+}
+
+{
+이름	마구때리기(Lev2)
+이미지	85
+레벨	1
+script_do	SKILL_마구때리기
+}
+
+{
+이름	마구때리기(Lev3)
+이미지	85
+레벨	1
+script_do	SKILL_마구때리기
+}
+
+{
+이름	마구때리기(Lev4)
+이미지	85
+레벨	1
+script_do	SKILL_마구때리기
+}
+
+{
+이름	양손공격(Lev1)
+이미지	97
+레벨	1
+script_do	SKILL_양손공격
+}
+
+{
+이름	양손공격(Lev2)
+이미지	97
+레벨	1
+script_do	SKILL_양손공격
+}
+
+{
+이름	양손공격(Lev3)
+이미지	97
+레벨	1
+script_do	SKILL_양손공격
+}
+
+{
+이름	양손공격(Lev4)
+이미지	97
+레벨	1
+script_do	SKILL_양손공격
+}
+
+{
+이름	지열참(Lev1)
+이미지	87
+script_do	SKILL_지열참
+}
+
+{
+이름	지열참(Lev2)
+이미지	87
+script_do	SKILL_지열참
+}
+
+{
+이름	지열참(Lev3)
+이미지	87
+script_do	SKILL_지열참
+}
+
+{
+이름	지열참(Lev4)
+이미지	87
+script_do	SKILL_지열참
+}
+
+{
+이름	지열참(Lev5)
+이미지	87
+script_do	SKILL_지열참
+}
+
+{
+이름	꼬리치기(Lev1)
+이미지	85
+script_do	SKILL_꼬리치기
+}
+
+{
+이름	꼬리치기(Lev2)
+이미지	85
+script_do	SKILL_꼬리치기
+}
+
+{
+이름	꼬리치기(Lev3)
+이미지	85
+script_do	SKILL_꼬리치기
+}
+
+{
+이름	꼬리치기(Lev4)
+이미지	85
+script_do	SKILL_꼬리치기
+}
+
+{
+이름	할퀴기(Lev1)
+이미지	96
+script_do	SKILL_할퀴기
+}
+
+{
+이름	할퀴기(Lev2)
+이미지	96
+script_do	SKILL_할퀴기
+}
+
+{
+이름	할퀴기(Lev3)
+이미지	96
+script_do	SKILL_할퀴기
+}
+
+{
+이름	할퀴기(Lev4)
+이미지	96
+script_do	SKILL_할퀴기
+}
+
+{
+이름	포이즌어택(Lev1)
+이미지	95
+script_do	SKILL_포이즌어택
+}
+
+{
+이름	포이즌어택(Lev2)
+이미지	95
+script_do	SKILL_포이즌어택
+}
+
+{
+이름	포이즌어택(Lev3)
+이미지	95
+script_do	SKILL_포이즌어택
+}
+
+{
+이름	포이즌어택(Lev4)
+이미지	95
+script_do	SKILL_포이즌어택
+}
+
+{
+이름	포이즌어택(Lev5)
+이미지	95
+script_do	SKILL_포이즌어택
+}
+
+{
+이름	쪼기(Lev1)
+이미지	93
+script_do	SKILL_쪼기
+}
+
+{
+이름	쪼기(Lev2)
+이미지	93
+script_do	SKILL_쪼기
+}
+
+{
+이름	쪼기(Lev3)
+이미지	93
+script_do	SKILL_쪼기
+}
+
+{
+이름	쪼기(Lev4)
+이미지	93
+script_do	SKILL_쪼기
+}
+
+{
+이름	매의위상(Lev1)
+이미지	92
+script_do	SKILL_매의위상
+}
+
+{
+이름	매의위상(Lev2)
+이미지	92
+script_do	SKILL_매의위상
+}
+
+{
+이름	매의위상(Lev3)
+이미지	92
+script_do	SKILL_매의위상
+}
+
+{
+이름	매의위상(Lev4)
+이미지	92
+script_do	SKILL_매의위상
+}
+
+{
+이름	윈드쉐이커(Lev1)
+이미지	94
+script_do	SKILL_윈드쉐이커
+}
+
+{
+이름	윈드쉐이커(Lev2)
+이미지	94
+script_do	SKILL_윈드쉐이커
+}
+
+{
+이름	윈드쉐이커(Lev3)
+이미지	94
+script_do	SKILL_윈드쉐이커
+}
+
+{
+이름	윈드쉐이커(Lev4)
+이미지	94
+script_do	SKILL_윈드쉐이커
+}
+
+{
+이름	윈드쉐이커(Lev5)
+이미지	94
+script_do	SKILL_윈드쉐이커
+}
+
+{
+번호	70
+이름	메투스의깨달음
+이미지	69
+script_do	SKILL_메투스의깨달음
+}

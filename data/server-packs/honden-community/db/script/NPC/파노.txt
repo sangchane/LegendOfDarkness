@@ -1,0 +1,162 @@
+0	파노	{
+	set@myid,get_myid();
+	set@npc$,last_npc();
+	if(@npc$=="시리아"){
+		mes 0,"나한테 무슨 볼 일이라도 있나?";
+	}
+	if(@npc$=="베이셔"){
+		besye:
+		set @besye,menu(0,"안녕하세요. 무엇을 도와드릴까요?","일일퀘스트 2","아이템 교환하기");
+		if(@besye==1){
+			re1:
+			set @besye2,menu(0,"일일퀘스트 목록 2", "[{=e파노 숲{=a]주걱프란츠 소탕", "[{=e파노 숲{=a]머시 소탕      ", "[{=e파노 숲{=a]끈끈프란츠 소탕", "[{=e파노 숲{=a]무우프란츠 소탕", "[{=e파노 숲{=a]꼬마머시 소탕  ");
+			if(@besye2==1){
+				set @dailyab$,"[{=e파노 숲{=a]주걱프란츠 소탕";
+				if(#dailyab1A==1){
+					if(#dailyab1B>=20){
+						mes 1, "퀘스트를 완료하셨군요. 이 퀘스트는 하루에 한번씩 도전이 가능합니다. 약속대로 보상을 지급해드리도록 하겠습니다.";
+						message 3,"어빌리티가 {=c10000 {=u가 상승했습니다.";
+						message 3, "메데니아에서 신망이 {=c2 {=u상승했습니다.";
+						set #dailyab1T, localtime(3);
+						set #dailyab1A, 0;
+						set #pointM, #pointM + 2;
+						ability_exp_add 10000;
+						goto re2;
+					}
+					dailyab1:mes 0, "진행중인 "+@dailyab$+" 퀘스트를 완료 조건에 충족하신 뒤 저한테 오십시오.\\n보상을 지급해드리도록 하겠습니다.";
+				}
+				if(#dailyab1T != localtime(3)){
+					set @kwin4, menu(0, "파노 숲에 서식하고 있는 주걱프란츠 20마리를 잡으시고 저한테 다시 오십시오.\\n{=wAP 10000, 메데니아신망 2포인트{=a를 지급해드리겠습니다.", "예", "아니오");
+					if(@kwin4==1){
+						set #dailyab1A, 1;//퀘스트 완료,비완료 체크 변수
+						set #dailyab1B, 0;
+						mes 0, "[{=e파노 숲{=a]주걱프란츠 소탕 퀘스트가 갱신되었습니다.";
+					}else{goto re1;}
+				}else{
+					dailyab2:mes 0, "오늘은 이미 퀘스트를 완료해서.. 내일이 되어야 퀘스트를 진행하실 수 있습니다.";
+				}
+			}else if(@besye2==2){
+				set @dailyab$,"[{=e파노 숲{=a]머시 소탕";
+				if(#dailyab2A==1){
+					if(#dailyab2B>=20){
+						mes 1, "퀘스트를 완료하셨군요. 이 퀘스트는 하루에 한번씩 도전이 가능합니다. 약속대로 보상을 지급해드리도록 하겠습니다.";
+						message 3,"어빌리티가 {=c10000 {=u가 상승했습니다.";
+						message 3, "메데니아에서 신망이 {=c2 {=u상승했습니다.";
+						set #dailyab2T, localtime(3);
+						set #dailyab2A, 0;
+						set #pointM, #pointM + 2;
+						ability_exp_add 10000;
+						goto re2;
+					}
+					goto dailyab1;
+				}
+				if(#dailyab2T != localtime(3)){
+					set @kwin4, menu(0, "파노 숲에 서식하고 있는 머시를 20마리를 잡으시고 저한테 다시 오십시오.\\n{=wAP 10000, 메데니아신망 2포인트{=a를 지급해드리겠습니다.", "예", "아니오");
+					if(@kwin4==1){
+						set #dailyab2A, 1;//퀘스트 완료,비완료 체크 변수
+						set #dailyab2B, 0;
+						mes 0, "[{=e파노 숲{=a]머시 소탕 퀘스트가 갱신되었습니다.";
+					}else{goto re1;}
+				}else{
+					goto dailyab2;
+				}
+			}else if(@besye2==3){
+				set @dailyab$,"[{=e파노 숲{=a]끈끈프란츠 소탕";
+				if(#dailyab3A==1){
+					if(#dailyab3B>=20){
+						mes 1, "퀘스트를 완료하셨군요. 이 퀘스트는 하루에 한번씩 도전이 가능합니다. 약속대로 보상을 지급해드리도록 하겠습니다.";
+						message 3,"어빌리티가 {=c10000 {=u가 상승했습니다.";
+						message 3, "메데니아에서 신망이 {=c2 {=u상승했습니다.";
+						set #dailyab3T, localtime(3);
+						set #dailyab3A, 0;
+						set #pointM, #pointM + 2;
+						ability_exp_add 10000;
+						goto re2;
+					}
+					goto dailyab1;
+				}
+				if(#dailyab3T != localtime(3)){
+					set @kwin4, menu(0, "파노 숲에 서식하고 있는 끈끈프란츠를 20마리를 잡으시고 저한테 다시 오십시오.\\n{=wAP 10000, 메데니아신망 2포인트{=a를 지급해드리겠습니다.", "예", "아니오");
+					if(@kwin4==1){
+						set #dailyab3A, 1;//퀘스트 완료,비완료 체크 변수
+						set #dailyab3B, 0;
+						mes 0, "[{=e파노 숲{=a]끈끈프란츠 소탕 퀘스트가 갱신되었습니다.";
+					}else{goto re1;}
+				}else{
+					goto dailyab2;
+				}
+			}else if(@besye2==4){
+				set @dailyab$,"[{=e파노 숲{=a]무우프란츠 소탕";
+				if(#dailyab4A==1){
+					if(#dailyab4B>=20){
+						mes 1, "퀘스트를 완료하셨군요. 이 퀘스트는 하루에 한번씩 도전이 가능합니다. 약속대로 보상을 지급해드리도록 하겠습니다.";
+						message 3,"어빌리티가 {=c10000 {=u가 상승했습니다.";
+						message 3, "메데니아에서 신망이 {=c2 {=u상승했습니다.";
+						set #dailyab4T, localtime(3);
+						set #dailyab4A, 0;
+						set #pointM, #pointM + 2;
+						ability_exp_add 10000;
+						goto re2;
+					}
+					goto dailyab1;
+				}
+				if(#dailyab4T != localtime(3)){
+					set @kwin4, menu(0, "파노 숲에 서식하고 있는 무우프란츠를 20마리를 잡으시고 저한테 다시 오십시오.\\n{=wAP 10000, 메데니아신망 2포인트{=a를 지급해드리겠습니다.", "예", "아니오");
+					if(@kwin4==1){
+						set #dailyab4A, 1;//퀘스트 완료,비완료 체크 변수
+						set #dailyab4B, 0;
+						mes 0, "[{=e파노 숲{=a]무우프란츠 소탕 퀘스트가 갱신되었습니다.";
+					}else{goto re1;}
+				}else{
+					goto dailyab2;
+				}
+			}else if(@besye2==5){
+				set @dailyab$,"[{=e파노 숲{=a]꼬마머시 소탕";
+				if(#dailyab5A==1){
+					if(#dailyab5B>=20){
+						mes 1, "퀘스트를 완료하셨군요. 이 퀘스트는 하루에 한번씩 도전이 가능합니다. 약속대로 보상을 지급해드리도록 하겠습니다.";
+						message 3,"어빌리티가 {=c10000 {=u가 상승했습니다.";
+						message 3, "메데니아에서 신망이 {=c2 {=u상승했습니다.";
+						set #dailyab5T, localtime(3);
+						set #dailyab5A, 0;
+						set #pointM, #pointM + 2;
+						ability_exp_add 10000;
+						goto re2;
+					}
+					goto dailyab1;
+				}
+				if(#dailyab5T != localtime(3)){
+					set @kwin4, menu(0, "파노 숲에 서식하고 있는 꼬마머시를 20마리를 잡으시고 저한테 다시 오십시오.\\n{=wAP 10000, 메데니아신망 2포인트{=a를 지급해드리겠습니다.", "예", "아니오");
+					if(@kwin4==1){
+						set #dailyab5A, 1;//퀘스트 완료,비완료 체크 변수
+						set #dailyab5B, 0;
+						mes 0, "[{=e파노 숲{=a]꼬마머시 소탕 퀘스트가 갱신되었습니다.";
+					}else{goto re1;}
+				}else{
+					goto dailyab2;
+				}
+			}
+		}else if(@besye==2){
+			set @besye2,menu(0,"교환하실 아이템을 선택해주세요.\\n{=q현재 보유 메데니아신망 : [" + #pointM + "]","루딘의귀걸이(1일) : 10", "메데니아마법의리콜(3개) : 1");
+			if(@besye2==1){
+				set @menu, menu(1, "{=c루딘의귀걸이(1일) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+				if(@menu == 1){
+					if(#pointM < 10){mes 3, "메데니아신망이 부족해서 아이템을 교환할 수 없습니다."; goto besye;}
+					set #pointM, #pointM - 10;
+					item_add_term @myid,"루딘의귀걸이", 1, 86400;
+					message 8, "루딘의귀걸이(1일)을 구입하셧습니다.\\n[" + #pointM + "]메데니아신망이 남았습니다.";
+					goto besye;
+				}
+			}else if(@besye2==2){
+				set @menu, menu(1, "{=c메데니아마법의리콜(3개) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+				if(@menu == 1){
+					if(#pointM < 1){mes 3, "메데니아신망이 부족해서 아이템을 교환할 수 없습니다."; goto besye;}
+					set #pointM, #pointM - 1;
+					item_add "메데니아마법의리콜",3;
+					message 8, "메데니아마법의리콜(3개)를 구입하셧습니다.\\n[" + #pointM + "]메데니아신망이 남았습니다.";
+					goto besye;
+				}
+			}
+		}
+	}
+}

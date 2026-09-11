@@ -1,0 +1,139 @@
+npc	혼돈의탑	{
+	set @myid, get_myid();
+	set@npc$,last_npc();
+	if(@npc$=="혼돈의탑도우미"){
+		set @honmenu$, "무엇을 사시게요?\\n{=c현제 보유 보스기여도 : " + #bosspoint;
+		set @hon, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기", "혼돈의탑대기실입장", "혼돈의탑설명듣기");
+		if(@hon==1){
+			honshop:
+			set @hon2, menu(0, "혼돈의 탑에서 얻으신 보스기여도로 아이템을 구매하실 수 있습니다.", "장비류", "생활잡화");
+			if(@hon2==1){
+				set @sel3, menu(0, @honmenu$, "혼돈의갑주(3일) : 보스기여도 : 100", "혼돈의투구(3일) : 보스기여도 : 100");
+				if(@sel3 == 1){
+					set @menu, menu(1, "{=c혼돈의갑주(3일) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(#bosspoint < 100){mes 0, "보스기여도가 부족합니다.";}
+						set #bosspoint, #bosspoint - 100;
+						if(get_class(@myid)==1){item_add_term @myid,"혼돈의갑주(승급-전사)", 1, 259200;}
+						if(get_class(@myid)==2){item_add_term @myid,"혼돈의갑주(승급-도적)", 1, 259200;}
+						if(get_class(@myid)==3){item_add_term @myid,"혼돈의갑주(승급-마법사)", 1, 259200;}
+						if(get_class(@myid)==4){item_add_term @myid,"혼돈의갑주(승급-성직자)", 1, 259200;}
+						if(get_class(@myid)==5){item_add_term @myid,"혼돈의갑주(승급-무도가)", 1, 259200;}
+						message 8, "혼돈의갑주(3일)을 구입하셧습니다.\\n[" + #bosspoin + "]보스기여도가 남았습니다.";
+						goto honshop;
+					}else{goto honshop;}
+				}else if(@sel3 == 2){
+					set @menu, menu(1, "{=c혼돈의투구(3일) {=q구입 하시겠습니까?", "구입한다.", "구입하지 않는다.");
+					if(@menu == 1){
+						if(#bosspoint < 100){mes 0, "보스기여도가 부족합니다.";}
+						set #bosspoint, #bosspoint - 100;
+						if(get_class(@myid)==1){item_add_term @myid,"혼돈의투구(승급-전사)", 1, 259200;}
+						if(get_class(@myid)==2){item_add_term @myid,"혼돈의투구(승급-도적)", 1, 259200;}
+						if(get_class(@myid)==3){item_add_term @myid,"혼돈의투구(승급-마법사)", 1, 259200;}
+						if(get_class(@myid)==4){item_add_term @myid,"혼돈의투구(승급-성직자)", 1, 259200;}
+						if(get_class(@myid)==5){item_add_term @myid,"혼돈의투구(승급-무도가)", 1, 259200;}
+						message 8, "혼돈의투구(3일)을 구입하셧습니다.\\n[" + #bosspoin + "]보스기여도가 남았습니다.";
+						goto honshop;
+					}else{goto honshop;}
+				}
+			}
+		}else if(@hon==2){
+
+		}else if(@hon==3){
+			if(get_basevita2(@myid)<=249999&&get_basemana2(@myid)<=249999){mes 0,"체력 마력 조건에 충족되지 않아 들어갈 수 없습니다.\\n체력 30만 이상 혹은 마력 30만 이상인 사람들만 입장할 수 있습니다.";end;}
+			warp "혼돈의탑통합대기실", 7,7;
+			mes 0,"이동되었습니다.";
+		}else if(@hon==4){
+			mes 1,"어서 오세요. 혼돈의 탑에 대해 간략하게 안내해드리도록 하겠습니다.";
+			mes 1,"혼돈의 탑은 어둠의 전설의 모든 보스 몬스터를 라운드식으로 잡을 수 있는 {=c보스 콘텐츠{=a입니다.";
+			mes 1,"혼돈의 탑은 총 20층으로 구성되있으므로. 난이도는 {=q이지(Easy) {=c노말(Normal) {=b하드(Hard) {=a이렇게\\n총 세 가지 난이도가 존재합니다. 난이도마다 보상이 다른 점도 알아두시길 바랍니다.";
+			mes 1,"{=c보스 몬스터{=a를 잡을 때마다 {=c기여도{=a를 얻으실 수 있는데, 이 기여도를 이용하여 혼돈의 갑옷 및 투구를 구입하실 수도 있으며. {=c추가 대미지 {=a도 올리실 수 있습니다. {=c추가 대미지{=a를 올리시면 지정된 기술 마법 대미지가 증가합니다.";
+			mes 1,"혼돈의 탑의 시간당 1회씩 입장하실 수 있습니다. 입장하시는 분의 횟수만 줅어드는데. 예로 들어 그룹원이 두 명이시면 혼돈의 탑을 두 번 입장하실 수 있습니다.";
+			mes 0,"이상 여기까지 혼돈의 탑 기초 설명이었습니다. 즐거운 게임 플레이 되시길 바랍니다.";
+		}
+	}
+	if(@npc$=="혼돈의탑게시판"){
+		bossrank:
+		set @bossrank,menu(0,"혼돈의탑 게시판 입니다. 무엇을 도와드릴까요?\\n{=q현재 내 보스기여도 : [" + #bosspoint + "]", "혼돈의탑 기여도 랭킹반영", "혼돈의탑 기여도 랭킹 알아보기");
+		if(@bossrank==1){
+			if(#bosspoint>=$bosspoint){
+				set $bosspoint, #bosspoint;
+				set $bossrank$, get_name(@myid);
+				message 3, "{=q"+get_name(@myid)+"님께서 보스랭킹 1위를 탈환 하셨습니다.";
+			}else{
+				if(#bosspoint>=$bosspoint2){
+					set $bosspoint2, #bosspoint;
+					set $bossrank2$, get_name(@myid);
+					message 3, "{=q"+get_name(@myid)+"님께서 보스랭킹 2위를 탈환 하셨습니다.";
+				}else{
+					if(#bosspoint>=$bosspoint3){
+						set $bosspoint3, #bosspoint;
+						set $bossrank3$, get_name(@myid);
+						message 3, "{=q"+get_name(@myid)+"님께서 보스랭킹 3위를 탈환 하셨습니다.";
+					}else{
+							
+					}
+				}
+			}
+			goto bossrank;
+		}else if(@bossrank==2){
+			message 8, "{=u보스컨텐츠 기여도 랭킹\\n1위 "+$bossrank$+"님 [기여도:"+$bosspoint+"]\\n2위 "+$bossrank2$+"님 [기여도:"+$bosspoint2+"]\\n3위 "+$bossrank3$+"님 [기여도:"+$bosspoint3+"]";
+			goto bossrank;
+		}
+	end;
+	}
+	if(@npc$=="보스컨텐츠입장도우미"){
+		npc_look @myid, 0, 0;
+		boss:
+		set @bosswarp, menu(0,"{=w혼돈의탑-보스콘텐츠{=a를 방문해주셔서 감사합니다! 난이도를 선택해주십시오.\\n{=c난이도마다 보상이 틀립니다. 어려운 난이도일수록 보상이 푸짐하고 다양합니다.\\n{=e1회 입장 시 한 시간 동안 입장 제한이 걸리니 신중하게 난이도를 선택해주세요.","{=q이지(Easy)","{=c노말(Normal)","{=b하드(Hard)");
+		if(@bosswarp==0){goto boss;}
+		if(@bosswarp==1){
+			if($bosseasy==1){message 3, "혼돈의 탑을 초기화 하고 있습니다. 대기 해주세요."; goto boss;}
+			set $bosseasy, 1;
+			set #bosseasy, 1;
+			group_warp "[Easy]혼돈의탑-1층", 7,12;
+			mob_clear "[Easy]혼돈의탑-1층";
+			mob_clear "[Easy]혼돈의탑-2층";
+			mob_clear "[Easy]혼돈의탑-3층";
+			mob_clear "[Easy]혼돈의탑-4층";
+			mob_clear "[Easy]혼돈의탑-5층";
+			mob_clear "[Easy]혼돈의탑-6층";
+			mob_spawn "보스큐르페이", 7, 7, 2;
+			message 3,"이지단계 첫 번째 보스는 {=c큐르페이{=u 입니다.";
+			end;
+		}else if(@bosswarp==2){
+			if($bossnormal==1){message 3, "혼돈의 탑을 초기화 하고 있습니다. 대기 해주세요."; goto boss;}
+			set $bossnormal, 1;
+			set #bossnormal, 1;
+			group_warp "[Normal]혼돈의탑-7층", 7,12;
+			mob_clear "[Normal]혼돈의탑-7층";
+			mob_clear "[Normal]혼돈의탑-8층";
+			mob_clear "[Normal]혼돈의탑-9층";
+			mob_clear "[Normal]혼돈의탑-10층";
+			mob_clear "[Normal]혼돈의탑-11층";
+			mob_clear "[Normal]혼돈의탑-12층";
+			mob_clear "[Normal]혼돈의탑-13층";
+			mob_clear "[Normal]혼돈의탑-14층";
+			mob_spawn "보스켄토라우스", 7, 7, 2;
+			message 3,"노말단계 첫 번째 보스는 {=c켄토라우스{=u 입니다.";
+			end;
+		}else if(@bosswarp==3){
+			if($bosshard==1){message 3, "혼돈의 탑을 초기화 하고 있습니다. 대기 해주세요."; goto boss;}
+			set $bosshard, 1;
+			set #bosshard, 1;
+			group_warp "[Hard]혼돈의탑-15층", 7,12;
+			mob_clear "[Hard]혼돈의탑-15층";
+			mob_clear "[Hard]혼돈의탑-16층";
+			mob_clear "[Hard]혼돈의탑-17층";
+			mob_clear "[Hard]혼돈의탑-18층";
+			mob_clear "[Hard]혼돈의탑-19층";
+			mob_clear "[Hard]혼돈의탑-20층";
+			mob_clear "[Hard]혼돈의탑-21층";
+			mob_clear "[Hard]혼돈의탑-22층";
+			mob_spawn "보스드래곤뉴트", 7, 7, 2;
+			message 3,"하드단계 첫 번째 보스는 {=c드래곤뉴트{=u 입니다.";
+			end;
+		}
+	end;
+	}
+}

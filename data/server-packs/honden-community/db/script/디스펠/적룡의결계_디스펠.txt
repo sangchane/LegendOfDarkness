@@ -1,0 +1,46 @@
+Spell	엘리멘탈룸	{
+	set @myid,get_myid();
+	set @mob, get_mobxy(get_last_object_xs(@myid), get_last_object_ys(@myid));
+	if(!@mob){end;}
+	if(get_mapname(@myid)=="화염의엘리멘탈룸"){
+		if(rand2(1,10)>5){
+			if(rand2(1,10)>5){mob_say2 @mob, 0, 0, "매스 데미지";}else{mob_say2 @mob, 0, 0, "얼티밋 데미지";}
+			group_hill 0, 138;
+			effect @myid, 138, 0, 100;
+			group_damaged2 @myid, 17000;
+		}else{
+			group_hill 0, 102;
+			effect @myid, 102, 0, 100;
+			group_damaged2 @myid, 17000;
+			game_sound 75, 0;
+			message 3, "화염의엘리멘탈이 플레어를 가합니다.";
+		}
+	}
+	if(get_mapname(@myid)=="대지의엘리멘탈룸"){
+		if(rand2(1,10)>5){
+			if(rand2(1,10)>5){mob_say2 @mob, 0, 0, "매스 데미지";}else{mob_say2 @mob, 0, 0, "얼티밋 데미지";}
+			group_hill 0, 130;
+			effect @myid, 130, 0, 100;
+			group_damaged2 @myid, 17000;
+		}else{
+			group_hill 0, 252;
+			effect @myid, 252, 0, 100;
+			group_damaged2 @myid, 17000;
+			game_sound 76, 0;
+			message 3, "대지의엘리멘탈이 테라미칼로2를 가합니다.";
+		}
+	}
+	if(get_mapname(@myid)=="바람의엘리멘탈룸"){
+		if(rand2(1,10)>5){mob_say2 @mob, 0, 0, "매스 데미지";}else{mob_say2 @mob, 0, 0, "얼티밋 데미지";}
+		group_hill 0, 137;
+		effect @myid, 137, 0, 100;
+		group_damaged2 @myid, 17000;
+	}
+	if(get_mapname(@myid)=="바다의엘리멘탈룸"){
+		group_hill 0, 101;
+		effect @myid, 101, 0, 100;
+		group_damaged2 @myid, 17000;
+		game_sound 77, 0;
+		message 3, "바다의엘리멘탈이 아이스블러스트를 가합니다.";
+	}
+}

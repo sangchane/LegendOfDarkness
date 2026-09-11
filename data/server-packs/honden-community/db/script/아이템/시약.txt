@@ -1,0 +1,16 @@
+1	코마디움	{
+	set@myid,get_myid();
+	if(get_state(@myid) != 0 && get_state(@myid) != 2 && get_state(@myid) != 4){end;}
+	item_del "코마디움", 1;
+	set @target, get_front_char(@myid);
+	if(!@target){end;}
+	if(get_state1(@target) != 1 && get_coma(@target) == 0){end;}
+	set_state1 @target, 0;
+	set_coma @target, 0;
+	coma_delay @target, 0;
+	del_coma @target;
+	set_vita @target, 1000;
+	game_sound 8,0;
+	effect @target, 0, 5, 75;
+	if(get_sex(@myid) == 1) { set_body @myid, 16; }
+}

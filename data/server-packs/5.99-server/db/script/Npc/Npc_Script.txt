@@ -1,0 +1,675 @@
+0,0,0,0,0,0,0	인셉션	{
+	set @myid, get_myid();
+	mes 1, "당신이 존재해야할 공간으로 보내드리겠습니다.";
+	if(#realmap == 2){
+		set @name2$ , "사냥터" + get_name() + "튜토리얼의장2";
+		set @name3$ , "사냥터" + get_name() + "튜토리얼의장3";
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name2$, "튜토리얼의장2", 22, 20, 140, 1, 2, "db/maps/던전/lod002.map";
+		npc_spawn "초보자도우미2", "사냥터" + get_name() + "튜토리얼의장2", 5, 4, 2;
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name3$, "튜토리얼의장3", 22, 25, 140, 1, 3, "db/maps/던전/lod004.map";
+		warp @name2$, 3, 5;
+		set_hair #hair;
+		set_sex #sex;
+		end;
+	}
+	if(#realmap == 3){
+		set @name3$ , "사냥터" + get_name() + "튜토리얼의장3";
+		set $map_num, $map_num + 1;
+		map_create $map_num, @name3$, "튜토리얼의장3", 22, 25, 140, 1, 3, "db/maps/던전/lod004.map";
+		warp @name3$, 3, 19;
+		mob_spawn3 "(튜토리얼)팜팻", "사냥터" + get_name() + "튜토리얼의장3", 1, 2, 100,9;
+		mob_spawn3 "(튜토리얼)좀비", "사냥터" + get_name() + "튜토리얼의장3", 1, 2, 500,1;
+		set_hair #hair;
+		set_sex #sex;
+		end;
+	}
+	warp "노비스마을", 37, 29;
+}
+
+0,0,0,0,0,0,0	뮤레칸	{
+	set @myid, get_myid();
+	mes 1, "생명의 소중함을 그렇게 일러왔거늘... 앞으로도 사소한 일에 목숨을 걸지 않으리라고 내가 어떻게 믿을 수 있게느냐? 또 생명을 잃고 나를 찾아오지 않겠다고 맹세할 수 있겠느냐?";
+	mes 1, "싸움은 싸움을 부르고, 피는 반드시 피를 보게 되느니라. 이번의 죽음도 네 책임이라는 것을 진심으로 느끼고 반성하고 있으냐?";
+	mes 1, "그렇다면 잃은 물건과 경험치도 다 네 욕심에서 비롯되었음을 인정하겠느냐?";
+	mes 1, "네가 새로 생명을 얻게 되더라도 절대로 무고한 생명을 해치지 않을 것을 맹세하느냐?";
+	message 3, "뮤레칸님이 신의기원을 외워주셨습니다.";
+	set_vita @myid, 1000;
+	set_state 0,0;
+	if(get_sex(@myid) == 1){set_body @myid, 16;}else{set_body @myid, 32;}
+	if(get_level(@myid) < 21){warp "노비스마을", 37, 29;}
+	if(get_level (@myid) > 20 && get_level(@myid) < 51){warp "수오미마을", 39, 19;}
+	if(get_level (@myid) > 50 && get_level(@myid) < 81){warp "아벨마을", 57, 24;}
+	if(get_level (@myid) > 80 && get_level(@myid) < 99){warp "로톤마을", 33, 8;}
+	if(get_level(@myid) >= 99){warp "마인여관", 7, 11;}
+	mes 0, "너의 각오를 믿고, 다시 새로운 생명을 부여해주니 앞으로 보는일은 없도록 하여라.";
+}
+
+0,0,0,0,0,0,0	멜로린	{
+	set @myid, get_myid();
+	set @select, 0;
+	mes 1, "여기는 노비스마을, 초보자들의 공간입니다.";
+	re:
+	set @select, menu("어느것을 도와드릴까요??", "기본적인 명령어를 보여줘.", "노비스 마을에 대해 설명해줘.", "기본적인 시스템을 설명해줘.", "나는 무엇부터 해야하지?(주점이동)", "능력치설명");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		mes 1, "기본적인 명령어를 보여드리겠습니다.";
+		message 8, "{=u＊기본적인 명령어＊\\n\\n1. /내정보 -> 자신의 정보를 본다.\\n\\n2. /그룹 -> 자신의 그룹정보를 본다.\\n\\n＊사용자 명령어＊\\n\\n1. @명령어 -> 명령어 목록을 본다.\\n\\n2. @접속시간 -> 현재 접속한시간을 출력한다.\\n\\n3. @탈출 -> 던전에서 탈출한다.";
+	}
+	if(@select == 2){
+		mes 1, "노비스 마을은 처음하는 초보자들부터 21까지의 유저들이 머무는 마을입니다.\\n그렇다고, 21이상의 유저들이 못오는건 아닙니다.";
+		mes 1, "노비스마을에는 총 6가지의 공간이있습니다.\\n노비스잡화상점 : 체력&마력물약등을 판매하고 있습니다.\\n노비스무기방어구상점 : 무기&방어구를 판매하고 있습니다.";
+		mes 1, "노비스민가1 : 각 직업 승급자들이 자리잡고있습니다, 스킬&스펠을 배울수 있는 장소입니다.\\n노비스민가2 : 서브퀘스트를 받을 수 있는 공간입니다.";
+		mes 1, "노비스주점 : 메인퀘스트를 받을수 있는 공간입니다.\\n노비스마을식당 : 음식들을 구매할수있습니다.";
+		mes 1, "지금까지 노비스 마을에 대해 설명을 들어주셔서 감사합니다.";
+		goto re;
+	}
+	if(@select == 3){
+		mes 1, "기본적인 시스템을 설명해드리겠습니다.";
+		mes 1, "블랙팜온라인은 필드사냥을 지향합니다.";
+		mes 1, "물약은 체력물약을 쓰든 마력물약을 쓰든 쿨타임이 중복됩니다.";
+		mes 1, "EG샵에서는 특수기능 아이템들을 구매하실수 있습니다.";
+		mes 1, "던전을 이용시, 던전마다 클리어 방식이 틀립니다. ex)모든 몬스터 처치, 특정 몬스터 처치";
+		mes 1, "저희 블랙팜온라인에서는 배고픔 시스템이 구현되있습니다.";
+		mes 1, "배고픔수치는 최대 100, 최소 0입니다. 이 수치에 따라 게임에 패널티를 받게됩니다.";
+		mes 1, "배고픔수치 확인법은 상태창(G)의 GP수치를 보시면 됩니다.";
+		mes 1, "배고픔수치가 50이하일시 물리,마법공격력이 1단계로 약해집니다.";
+		mes 1, "다음으로 25이하일시 물리,마법공격력이 2단계로 약해집니다.";
+		mes 1, "마지막으로 배고픔수치가 0이 될시, 체력과 마력 틱이 차지 않으며, 약 2분마다 최대체력의 5%에 해당하는 체력이 소모됩니다.";
+		mes 1, "이때 배고픔으로 소모된 체력은 0이 될수 없습니다.(즉 1에서 더내려가지 않습니다.)";
+		mes 1, "배고픔수치는 음식을 먹음으로써 채울수 있습니다.\\n(음식섭취시 즉시 소량의 체,마회복)";
+		mes 1, "지금까지 기본적인 시스템에 대해 설명을 들어주셔서 감사합니다.";
+		goto re;
+	}
+	if(@select == 4){
+		mes 1, "당신이 처음오는 모험가이시라면,\\n우선 퀘스트를 클리어 하면서 레벨을 올리시는걸 추천합니다.";
+		mes 1, "노비스마을에서는 레벨 21까지 육성하게 될것이며 그이후에는 새로운 마을로 가실수있습니다.\\n(다시 노비스마을로 올수있다.)";
+		mes 1, "노비스마을의 퀘스트를 받으실려면 주점으로 이동하셔야합니다.";
+		set @select, menu("원하신다면 지금바로 이동시켜 드리겠습니다.", "이동한다", "이동하지 않는다");
+		if(@select == 1){
+			warp "노비스주점", 7, 9;
+			mes 0, "이동이 완료되었습니다.";
+		}else if(@select == 2){
+			mes 1, "노비스주점은 좌표(32,42)로 가시면 됩니다.\\n(탐색기술로 좌표를 볼수있습니다.)";
+			goto re;
+		}
+	}
+	if(@select == 5){
+		message 8, "{=u＊능력치에 대한 고찰＊\\n\\n힘 : 1당 10의 물리공격력이 올라간다.\\n인트 : 1당 10의 마법공격력이 올라간다.\\n위즈 : 레벨업시 올라가는 마나최대치에 위즈만큼 + 해준다. (25 + 위즈)\\n콘 : 레벨업시 올라가는 체력최대치에 콘만큼 + 해준다. (30 + 콘)\\n덱스 : 크리티컬 확률을 결정해준다.\\n\\n물리공격력 : 기본공격대미지와 스킬공격대미지를 정해준다. \\n마법공격력 : 스펠공격대미지를 정해준다.";
+	}
+}
+
+0,0,0,0,0,0,0	유령하녀	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("어서오세요, 손님. 이곳은 블러드백작의성입니다.", "드라큐라백작의성 설명", "블러드백작", "흑요석아이템 파괴");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		mes 1, "드라큐라백작의성은, 동쪽, 서쪽 구간이 있습니다.";
+		mes 1, "동, 서쪽 구간에는 각각 16개의 방이 존재하며, 가운대 다시 만나는 방이 존재합니다.(응접실2)";
+		mes 1, "동쪽 구간은 비승급자전용 사냥터로써, 5층까지는 저층으로 성에 처음으로 오신분들에게 적절합니다.";
+		mes 1, "6층부터 10층까지는 사냥에 숙련된 분들에게 적절한 중층입니다.";
+		mes 1, "그리고 11층부터 16층까지는 지존(99)에게 어울리는 사냥터입니다.";
+		mes 1, "서쪽도 마찬가지로 5, 10, 16으로 저, 중, 고 층으로 분류되며 이곳은 승급자이상분들이 이용하시기에 적절합니다.";
+		mes 1, "이곳 백작의성에 존재하는 몬스터들은 장비 아이템을 드랍합니다. 동쪽 몬스터들은 흑요석아이템을 떨구며, 교환이 불가능하고, 서쪽 몬스터들은 별아이템을 떨구며 교환이 가능합니다.";
+		mes 1, "이로써 블러드백작의성 설명을 끝내겠습니다.";
+		goto re;
+	}else if(@select == 2){
+		mes 1, "블러드 백작님께서는 조용하신것을 좋아하시기에 저를 제외한 하녀 3명분하고만 성의 제일 깊은 방에서 머무십니다.";
+		mes 1, "블러드 백작님은 자신의 상태를 적의 상태에 비례하여 조절하는 능력이 있으십니다. 강한적이 올수록 더욱더 강해지는 셈이죠.";
+		mes 1, "참고로 블러드 백작님의 방에는, 승급자, 비승급자가 같이 입장할수 있으며, 그룹상태여야 합니다.";
+		mes 1, "더이상 블러드백작님에 대해서 해줄말이 없네요.";
+		goto re;
+	}else if(@select == 3){
+		mes 1, "파괴하실 흑요석 아이템을 첫번째 아이템 칸에 올려놔 주세요. 참고로 파괴비는 10만골드 입니다.";
+		set @select2, 0;
+		re2:
+		set @select2, menu("첫번째 칸에있는 흑요석 아이템을 파괴하시겠습니까?", "파괴한다.", "파괴하지 않는다.");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			if(get_money(@myid) < 100000){mes 0, "골드가 부족하여 흑요석 아이템을 파괴해드릴수 없습니다."; end;}
+			if(item_one_check(@myid) != "흑요석워리어귀걸이" && item_one_check(@myid) != "흑요석로그귀걸이" &&  item_one_check(@myid) != "흑요석소서러귀걸이" &&  item_one_check(@myid) != "흑요석프리스트귀걸이" &&  item_one_check(@myid) != "흑요석몽크귀걸이" && item_one_check(@myid) != "흑요석워리어벨트" && item_one_check(@myid) != "흑요석로그벨트" && item_one_check(@myid) != "흑요석소서러벨트" && item_one_check(@myid) != "흑요석프리스트벨트" && item_one_check(@myid) != "흑요석몽크벨트" && item_one_check(@myid) != "흑요석워리어장갑" && item_one_check(@myid) != "흑요석로그장갑" && item_one_check(@myid) != "흑요석소서러장갑" && item_one_check(@myid) != "흑요석프리스트장갑" && item_one_check(@myid) != "흑요석몽크팔찌" && item_one_check(@myid) != "흑요석워리어반지" && item_one_check(@myid) != "흑요석로그반지" && item_one_check(@myid) != "흑요석소서러반지" && item_one_check(@myid) != "흑요석프리스트반지" && item_one_check(@myid) != "흑요석몽크반지" && item_one_check(@myid) != "흑요석워리어목걸이" && item_one_check(@myid) != "흑요석로그목걸이" && item_one_check(@myid) != "흑요석소서러목걸이" && item_one_check(@myid) != "흑요석프리스트목걸이" && item_one_check(@myid) != "흑요석몽크목걸이"){
+				if(item_one_check(@myid) != "흑요석워리어각반" && item_one_check(@myid) != "흑요석로그각반" && item_one_check(@myid) != "흑요석소서러각반" && item_one_check(@myid) != "흑요석프리스트각반" && item_one_check(@myid) != "흑요석몽크각반"){
+					mes 0, "첫번째 칸에 있는 아이템이 흑요석 아이템이 아니라서 파괴가 불가능합니다.";
+					end;
+				}
+			}
+			if(item_one_check(@myid) == 0){mes 0, "첫번째 칸에 있는 아이템이 흑요석 아이템이 아니라서 파괴가 불가능합니다."; end;}
+			//output item_one_check(@myid);
+			mes 1, "첫번째 칸에있는 아이템이 흑요석 아이템이 맞습니다. 다음을 누르시면 파괴합니다.";
+			item_del item_one_check(@myid), 1;
+			money_del 100000;
+			mes 0, "성공적으로 파괴가 완료되었습니다.";
+			end;
+		}else if(@select2 == 2){
+			mes 0, "흑요석 아이템을 파괴하지 않습니다.";
+			end;
+		}
+	}
+}
+
+0,0,0,0,0,0,0	미용사	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("안녕하십니까? 멋진 헤어스타일을 원하십니까??\\n어떤 가위로 자르시겠습니까?\\n(요금5000GOLD)", "가위", "금가위", "가위머리보기(새창)");
+	if(get_money(@myid) < 5000){mes 0, "요금이 부족합니다."; end;}
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(!item_exist(@myid, "가위")){mes 0, "소지하신 가위가 없으십니다."; end;}
+		re2:
+		input @hair, 1, "어떤 헤어스타일로 해드릴까요?\\n(0~25번중, 0은 빠박이)", "제가 원하는 헤어스타일 번호는", "번 입니다.", 2;
+		if(@hair < 1 || @hair > 25){mes 1, "일반 가위로 해드릴수 있는 머리범위 밖입니다."; goto re2;}
+		set_hair @hair; money_del 5000; item_del "가위", 1;
+		mes 0, "자, 머리가 완성되었습니다!? 어떠십니까!";
+		end;
+	}else if(@select == 2){
+		if(!item_exist(@myid, "금가위")){mes 0, "소지하신 금가위가 없으십니다."; end;}
+		re3:
+		input @hair, 1, "어떤 헤어스타일로 해드릴까요?\\n(27~47번중)", "제가 원하는 헤어스타일 번호는", "번 입니다.", 2;
+		if(@hair < 27 || @hair > 47){mes 1, "금가위로 해드릴수 있는 머리범위 밖입니다."; goto re3;}
+		set_hair @hair; money_del 5000; item_del "금가위", 1;
+		mes 0, "자, 머리가 완성되었습니다!? 어떠십니까!";
+		end;
+	}else if(@select == 3){
+		mes 1, "다음을 누르시면 새로운 웹창으로 이미지를 보여드립니다.";
+		game_web @myid, "http://novaonline.woobi.co.kr/Novaonline/img/scissors.gif";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	유령하녀2	{
+	set @myid, get_myid();
+	mes 0, "물러서세요. 더이상 접근은 금지합니다.";
+}
+
+0,0,0,0,0,0,0	유령하녀3	{
+	set @myid, get_myid();
+	mes 0, "이곳에 들어가면 위험해요....";
+}
+
+0,0,0,0,0,0,0	산타클로스	{
+	set @myid, get_myid();
+	set @select, 0;
+	if(#santaclos == 1){goto go;}
+	mes 1, "콜록, 콜록..";
+	mes 1, "콜록... 어험.. 모험가님 어서오시오.";
+	mes 1, "크리스마스 마을에 오신것을 환영하오..";
+	mes 1, "이마을은 365일 24시간 겨울이며, 눈이 온다오. 콜록.";
+	mes 1, "얼마전부터 이 평화롭던 크리스마스마을에 이상한 병이 퍼지길 시작했소.\\n내 예상에는 마운틴메리에 있는 얼음에서부터 시작된것같은대..";
+	mes 1, "현재 그 얼음들은 직접 채집할수는 없고, 그얼음들을 먹고 병에걸려 변해버린 동물들에게서 얻을수 있을것이오.";
+	mes 1, "내 좀만 젊었다면 직접가서 얻어 왔을터인대.. 너무 늙어버려 몬스터로 변해버린 동물들을 상대할수가 없구려.";
+	mes 1, "모험가분 께서 가서 나대신 구해와 준다면, 선물보따리를 드리겠소.";
+	set #santaclos, 1;
+go:
+	set @select, menu("크리스마스얼음 10개를 구해올때마다 1개의 선물보따리를 드리겠소. 교환하겠소?", "교환한다.", "하지않는다.");
+	if(@select == 0){goto go;}
+	if(@select == 1){
+		if(item_exist(@myid, "크리스마스얼음") < 10){mes 0, "보유하고 있는 크리스마스얼음이 없거나 10개 미만이오."; end;}
+		item_del "크리스마스얼음", 10;
+		item_add "크리스마스선물주머니", 1;
+		mes 0, "성공적으로 크리스마스얼음과 선물주머니교환이 이루어졌소. 앞으로도 계속 가져와주시오.";
+		end;
+	}else{
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	크리스마스트리	{
+	set @myid, get_myid();
+	mes 0, "엄청큰 크리스마스 트리이다.";
+}
+
+0,0,0,0,0,0,0	리프트도우미	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	set @select, menu("무엇을 도와드릴까요!?", "마을로귀환", "스키장이동");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		mes 1, "NEXT를 누르시면 마을로 귀환시켜 드리겠습니다!";
+		warp "밀레스마을", 49, 45;
+		mes 0, "이동이 완료되었습니다.";
+		end;
+	}else if(@select == 2){
+		mes 0, "현재 입장이 불가능합니다.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	세오	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	if(get_level() != 99){mes 1, "능력치를 사기에는 어립니다."; end;}
+	if(get_class_sub() == 0 && get_basevita(@myid) > 120000){mes 1, "승급을 하셔야 체력을 사실수있습니다."; end;}
+	if(#auto_hp == 1){mes 1, "이미 경험치를 팔고 있습니다."; end;}
+	set @select, menu("체력을 사시겠습니까? 체력을 살때는 경험치가 필요합니다.", "체력을 산다.", "나중에 산다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		input @auto_cnt, 1, "경험치를 파셔서 체력을살횟수를 적어주세요.", "", "", 255;
+		if(@auto_cnt <= 0){
+			mes 1, "제대로 입력해 주세요.";
+			end;
+		} else {
+			set #auto_hp, 1;
+			while(@auto_cnt){
+				if(get_ac(@myid) != 100){set #auto_hp, 0; del @auto_cnt; mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+				if(get_baseexp(@myid) >= get_basevita2(@myid) || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+					exp_del get_basevita2(@myid) * 500;
+					set_basevita get_basevita2(@myid) + 50;
+				} else {
+					set #auto_hp, 0;
+					del @auto_cnt;
+				 	mes 1,"경험치가 부족합니다.";
+					break;
+				}
+				sleep(1);
+				set @auto_cnt, @auto_cnt-1;
+			}
+		}
+		set #auto_hp, 0;
+		del @auto_cnt;
+		end;
+	}else if(@select == 2){
+		end;
+	}
+}
+0,0,0,0,0,0,0	칸	{
+	set @myid, get_myid();
+	set @select, 0;
+	re:
+	if(get_level() != 99){mes 1, "능력치를 사기에는 어립니다."; end;}
+	if(get_class_sub() == 0 && get_basemana(@myid) > 100000){mes 1, "승급을 하셔야 마력을 사실수있습니다."; end;}
+	if(@auto_hp == 1){mes 1, "이미 경험치를 팔고 있습니다."; end;}
+	set @select, menu("마력을 사시겠습니까? 마력을 살때는 경험치가 필요합니다.", "마력을 산다.", "나중에 산다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		input @auto_cnt, 1, "경험치를 파셔서 마력을살 횟수를 적어주세요.", "", "", 255;
+		if(@auto_cnt <= 0){
+			mes 1, "제대로 입력해 주세요.";
+			end;
+		}else{
+			set #auto_hp, 1;
+			while(@auto_cnt){
+		 		if(get_ac(@myid) != 100){set #auto_hp, 0; del @auto_cnt; mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+				if(get_baseexp(@myid) >= get_basemana2(@myid) || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+ 					exp_del get_basemana2(@myid) * 500;
+			 		set_basemana get_basemana2(@myid) + 25;
+	 			}else{
+					set #auto_hp, 0;
+					del @auto_cnt;
+	 				mes 1,"경험치가 부족합니다.";
+					break;
+				}
+				sleep(1);
+				set @auto_cnt, @auto_cnt-1;
+			}
+		}
+		set #auto_hp, 0;
+		del @auto_cnt;
+		end;
+	}else if(@select == 2){
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	선진	{
+	set @myid, get_myid();
+	set @class, get_class(@myid);
+	set @HP, get_basevita2(@myid);
+	set @MP, get_basemana2(@myid);
+	set @select, 0;
+	set @select2, 0;
+	set @select3, 0;
+	mes 1, "신들과 통하는 공간인 신전에 오신것을 환영합니다.";
+	re:
+	set @select, menu("어떤일을 하시겠습니까?", "전직하기", "신들의세계", "승급투구", "대장장이신전");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		mes 1, "당신이 지존에 도달하였다면, 한번의 전직 기회가 찾아옵니다.\\n(무도가는 환골탈퇴)";
+		mes 1, "전직(환골탈퇴)을 할수있는 조건은 체력과 마력이 일정수준 이상으로 도달하였다면, 전직(환골탈퇴)을 할수 있습니다.";
+		mes 1, "전직시에는 무장을 해체하실 필요가 없습니다. 착용하실 아이템이 있으시다면 착용하고 다시 말을 걸어주세요.";
+		if(get_class_sub() != 0){mes 0, "승급자는 전직 또는 환골탈퇴를 할수없습니다."; end;}
+		if(get_level(myid) < 99){mes 0, "당신은 아직 전직을 할만큼의 모험을 해오지 않았군요."; end;}
+		if(#classchange == 1){mes 0, "당신은 이미 전직(환골탈퇴)하신 몸이시군요. 욕심은 신들께서 싫어하십니다."; end;}
+		if(@class == 1){
+			mes 1, "당신은 전사로써 전직 조건은, 체력 16000 마력 5000입니다.";
+			if(@HP < 16000 || @MP < 5000){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+			goto go;
+		}
+		if(@class == 2){
+			mes 1, "당신은 도적으로써 전직 조건은, 체력 13000 마력 7500입니다.";
+			if(@HP < 13000 || @MP < 7500){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+			goto go;
+		}
+		if(@class == 3){
+			mes 1, "당신은 마법사로써 전직 조건은, 체력 12000 마력 12500입니다.";
+			if(@HP < 12000 || @MP < 12500){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+			goto go;
+		}
+		if(@class == 4){
+			mes 1, "당신은 성직자로써 전직 조건은, 체력 13000 마력 13500입니다.";
+			if(@HP < 13000 || @MP < 13500){mes 0, "당신은 아직 전직을 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+			goto go;
+		}
+		if(@class == 5){
+			mes 1, "당신은 무도가로써 환골탈퇴 조건은, 체력 16000 마력 6000입니다.";
+			if(@HP < 16000 || @MP < 6000){mes 0, "당신은 아직 환골탈퇴를 하실수가 없습니다. 체력마력 기준치를 달성한뒤 와주세요."; end;}
+			goto go2;
+		}
+	}else if(@select == 2){
+		mes 1, "신들의 세계에서는 당신의 체력과 마력 최대치를 경험치를 팔아 상승 시킬수 있습니다.";
+		mes 1, "신들의 세계로 가실려면, 신들에게 제물로 엑스쿠라눔 1개를 바치셔야 합니다.";
+		re2:
+		set @select2, menu("제물 1개를 바치시고 신들의 세계로 가시겠습니까?", "이동한다.", "이동하지 않는다.");
+		if(@select2 == 0){goto re2;}
+		if(@select2 == 1){
+			if(item_exist(@myid, "엑스쿠라눔") == 0){mes 0, "엑스쿠라눔이 없습니다.";}
+			item_del "엑스쿠라눔", 1;
+			warp "신들의세계", 23, 21;
+			mes 0, "성공적으로 신들의 세계로 이동되었습니다.";
+			end;
+		}else{
+			mes 0, "신들의세계로 가실때에는 신중히 생각하시고 결정해주세요.";
+			end;
+		}
+	}else if(@select == 3){
+		if(#masterud == 1){mes 0, "당신은 이미 승급투구를 지급받으셧습니다."; end;}
+		if(get_class_sub() == 0){mes 0, "비승급자는 투구를 받으실수 없습니다."; end;}
+		mes 1, "승급의 증표와도같은 승급투구를 구하시고 싶으십니까?";
+		mes 1, "승급투구를 받으실려면 그 자격을 증명하기위해 좀비의살 20개, 고사목뿌리10개를 가져오셔야합니다.";
+		masterud:
+		set @select2, menu("승급투구를 받겠습니까?", "네, 자격을 증명할수 있습니다.", "아직 재물이 부족합니다.");
+		if(@select2 == 0){goto masterud;}
+		if(@select2 == 1){
+			if(item_exist(@myid, "좀비의살") < 20 || item_exist(@myid, "고사목뿌리") < 10){mes 0, "당신은 아직 승급의 자격을 증명할수 없으시군요."; end;}
+			item_del "좀비의살", 20;
+			item_del "고사목뿌리", 10;
+			set #masterud, 1;
+			if(get_class(@myid) == 1 && get_sex(@myid) == 1){item_add "마스터투구1", 1;}
+			if(get_class(@myid) == 1 && get_sex(@myid) == 2){item_add "마스터투구2", 1;}
+			if(get_class(@myid) == 2){item_add "웨스턴", 1;}
+			if(get_class(@myid) == 3 && get_sex(@myid) == 1){item_add "다크홀", 1;}
+			if(get_class(@myid) == 3 && get_sex(@myid) == 2){item_add "다크베일", 1;}
+			if(get_class(@myid) == 4 && get_sex(@myid) == 1){item_add "세인트홀", 1;}
+			if(get_class(@myid) == 4 && get_sex(@myid) == 2){item_add "세인트베일", 1;}
+			if(get_class(@myid) == 5 && get_sex(@myid) == 1){item_add "무상관", 1;}
+			if(get_class(@myid) == 5 && get_sex(@myid) == 2){item_add "월영관", 1;}
+			mes 0, "성공적으로 승급투구를 지급해 드렸습니다.";
+			end;
+		}else{
+			mes 0, "자격을 증명할수 있을때 와주세요.";
+			end;
+		}
+	}else if(@select == 4){
+		mes 1, "대장장이의 신전으로 가시겠습니까?Next를 누르면 보내드리도록 해드리죠.";
+		warp "대장장이신전", 7, 6;
+		mes 0, "대장장이신전으로 이동이 완료되었습니다.";
+		end;
+	}
+end;
+go:
+	mes 1, "당신은 충분히 전직할수 있는 체력과 마력을 지니셧군요.";
+	mes 1, "Next를 누르시면 당신이 전직할수있는 직업 목록표를 보여드리도록 하겠습니다.";
+	re3:
+	set @select2, menu("어느 직업으로 전직 하시겠습니까?\\n(전직시에 보유기술, 스펠은 보존됩니다.)", "전사", "도적", "마법사", "성직자");
+	if(@select2 == 0){goto re3;}
+	if(@select2 == 1){
+		re4:
+		set @select3, menu("강인한 체력과 강력함을 지닌 전사로서 다시 태워 나시겠습니까?", "네, 전사로 선택했습니다.", "다시 선택하겠습니다.");
+		if(@select3 == 0){goto re4;}
+		if(@select3 == 1){
+			if(@class == 1){set_son 1;}else{set_son 0;}
+			set_class 1;
+			legend_add 0, 255, "어둠의전설, 전사로 전직하다.";
+			message 3, "{=q전사[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!";
+			skill_add "숏블레이드";
+			goto go3;
+		}else if(@select3 == 2){
+			mes 1, "신중히 골라주시길 바랍니다.";
+			goto re3;
+		}
+	}
+	if(@select2 == 2){
+		re5:
+		set @select3, menu("뛰어난 스피드와 치명적인 매력을 지닌 도적으로서 다시 태워 나시겠습니까?", "네, 도적으로 선택했습니다.", "다시 선택하겠습니다.");
+		if(@select3 == 0){goto re5;}
+		if(@select3 == 1){
+			if(@class == 2){set_son 1;}else{set_son 0;}
+			set_class 2;
+			legend_add 0, 255, "어둠의전설, 도적로 전직하다.";
+			message 3, "{=q도적[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!";
+			skill_add "찌르기";
+			goto go3;
+		}else if(@select3 == 2){
+			mes 1, "신중히 골라주시길 바랍니다.";
+			goto re3;
+		}
+	}
+	if(@select2 == 3){
+		re6:
+		set @select3, menu("뛰어난정식력과 강력한 마법공격력을 지닌 마법사로서 다시 태워 나시겠습니까?", "네, 마법사로 선택했습니다.", "다시 선택하겠습니다.");
+		if(@select3 == 0){goto re6;}
+		if(@select3 == 1){
+			if(@class == 3){set_son 1;}else{set_son 0;}
+			set_class 3;
+			legend_add 0, 255, "어둠의전설, 마법사로 전직하다.";
+			message 3, "{=q마법사[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!";
+			spell_add "마레노";
+			goto go3;
+		}else if(@select3 == 2){
+			mes 1, "신중히 골라주시길 바랍니다.";
+			goto re3;
+		}
+	}
+	if(@select2 == 4){
+		re7:
+		set @select3, menu("뛰어난신성력과 강력한 회복력을 지닌 성직자로서 다시 태워 나시겠습니까?", "네, 성직자로 선택했습니다.", "다시 선택하겠습니다.");
+		if(@select3 == 0){goto re7;}
+		if(@select3 == 1){
+			if(@class == 4){set_son 1;}else{set_son 0;}
+			set_class 4;
+			legend_add 0, 255, "어둠의전설, 성직자로 전직하다.";
+			message 3, "{=q성직자[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!";
+			spell_add "홀리볼트";
+			spell_add "쿠로";
+			goto go3;
+		}else if(@select3 == 2){
+			mes 1, "신중히 골라주시길 바랍니다.";
+			goto re3;
+		}
+	}
+	end;
+go2:
+	mes 1, "당신은 충분히 환골탈퇴를할수 있는 체력과 마력을 지니셧군요.";
+	re8:
+	set @select2, menu("환골탈퇴를 하시겠습니까? 신중히 선택해 주시길 바랍니다.", "환골탈퇴를 한다.", "환골탈퇴를 하지 않는다.");
+	if(@select2 == 0){goto re8;}
+	if(@select2 == 1){
+		legend_add 0, 255, "어둠의전설, 환골탈퇴를 하다.";
+		message 3, "{=q무도가[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!";
+		goto go3;
+	}else if(@select2 == 2){
+		mes 0, "환골탈퇴에 신중을 기울여주세요. 승급만 하지 않는다면 언재든지 환골탈퇴가 가능하답니다.";
+		end;
+	}
+end;
+go3:
+	set #pointmap1$, "지정된위치없음";
+	set #pointmap2$, "지정된위치없음";
+	set #pointmap3$, "지정된위치없음";
+	set #pointmap4$, "지정된위치없음";
+	set #pointmap5$, "지정된위치없음";
+	set_basevita 100;
+	set_basemana 100;
+	set_level "1";
+	set_point "0";
+	exp_del "4200000000";
+	set_str "4";
+	set_int "4";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+	set #bounsexpadd, 0;
+	set #classchange, 1;
+	warp "노비스마을", 31,9;
+end;
+}
+
+0,0,0,0,0,0,0	승급의빛	{
+	set @myid, get_myid();
+	set #clsck, 2;
+	set_delstrabismus @myid;
+	effect @myid, 280, 0, 75;
+	mob_clear get_mapname(@myid);
+	set_delstrabismus @myid;
+	mes 0, "빛이 확장되더니 이내 모든공간을 밝혔다. 이곳에서 빠져나가보자.";
+}
+
+0,0,0,0,0,0,0	승급이아	{
+	set @myid, get_myid();
+	set @select, 0;
+	mes 1, "더욱더 강해지기를 원하는 자여, 모든 역경과 고난을 깨뚫고 오신 자여, 그대에게 더욱더 전진할수 있는 기회를 주겠어요.";
+	re:
+	set @select, menu("승급을 원하십니까?", "승급을 원합니다.");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		if(get_class_sub(@myid) != 0){mes 1, "당신은 이미 승급을 하셧습니다."; end;}
+		set_class_sub 1;
+		legend_add 0, 176, "블랙팜의서, 승급을 하다.";
+		item_del "잉크병", 99;
+		if(get_class() == 1 && get_sex() == 1){item_add "마스터아머1", 1; item_add "아스카론", 1; skill_add "M포효";}
+		if(get_class() == 1 && get_sex() == 2){item_add "마스터아머2", 1; item_add "아스카론", 1; skill_add "M포효";}
+		if(get_class() == 2 && get_sex() == 1){item_add "스카우트아머", 1; item_add "아조스", 1; skill_add "기습";}
+		if(get_class() == 2 && get_sex() == 2){item_add "레인저아머", 1; item_add "아조스", 1; skill_add "기습";}
+		if(get_class() == 3 && get_sex() == 1){item_add "다크후드", 1; item_add "로오의은총", 1; spell_add "메테오";}
+		if(get_class() == 3 && get_sex() == 2){item_add "다크로브", 1; item_add "로오의은총", 1; spell_add "메테오";}
+		if(get_class() == 4 && get_sex() == 1){item_add "세인트후드", 1; item_add "이아의은총", 1; spell_add "홀리쿠라노";}
+		if(get_class() == 4 && get_sex() == 2){item_add "세인트로브", 1; item_add "이아의은총", 1; spell_add "홀리쿠라노";}
+		if(get_class() == 5 && get_sex() == 1){item_add "무상도복", 1; item_add "하이브레이질배틀핸드", 1; skill_add "허공답보";}
+		if(get_class() == 5 && get_sex() == 2){item_add "월영도복", 1; item_add "하이브레이질배틀핸드", 1; skill_add "허공답보";}
+		warp "신들의세계", 15, 15;
+		broadcast 5, "[" + get_name() + "]님이 승급하셨습니다. 다같이 축하해줍시다!";
+		effect @myid, 90, 90, 100;
+		game_sound 47, 0;
+		mes 0,"승급이 완료됬습니다. 추가로, 승급옷과, 승급무기를 지급해드렸습니다.";
+		end;
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	포인트신	{
+	set @myid, get_myid();
+	set @select, 0;
+	set @point, 0;
+	if(get_ac(@myid) != 100){mes 0,"가리지 않은 모습으로 말을 걸어주게나..."; end;}
+	if(get_class_sub(@myid) == 0){mes 1, "당신은 아직 포인트를 구매할수 없습니다."; end;}
+	re:
+	set @select, menu("어느 포인트를 올리겠습니까.. (포인트 1개당 400체력이 소모됩니다.)", "힘(STR)", "인트(INT)", "위즈(WIS)", "콘(CON)", "덱스(DEX)");
+	if(@select == 0){goto re;}
+	if(@select == 1){
+		re2:
+		input @point, 1, "힘을 몇개 올리시겠습니까??", "", "", 255;
+		if(@point <= 0){mes 1, "똑바로 입력해 주게나..."; goto re2;}
+		if(get_basevita2(@myid) - (@point * 400) < 25000){mes 1, "당신이 살려는 포인트의 양과, 체력수치를 비교한결과 25000이하가 되버려서 사실수가 없습니다."; goto re2;}
+		if(get_class(@myid) == 1 && get_str(@myid) + @point > 215 || get_class(@myid) == 2 && get_str(@myid) + @point > 180 || get_class(@myid) == 3 && get_str(@myid) + @point > 120 || get_class(@myid) == 4 && get_str(@myid) + @point > 120 || get_class(@myid) == 5 && get_str(@myid) + @point > 180){mes 1, "사실려는 포인트가 올포를 넘어버립니다."; goto re2;}
+		set_basevita get_basevita2(@myid) - (@point * 400);
+		set_str get_str(@myid) + @point;
+		mes 0, "성공적으로 포인트구매가 이루어졌습니다.";
+		end;
+	}
+	if(@select == 2){
+		re3:
+		input @point, 1, "인트를 몇개 올리시겠습니까??", "", "", 255;
+		if(@point <= 0){mes 1, "똑바로 입력해 주게나..."; goto re3;}
+		if(get_basevita2(@myid) - (@point * 400) < 25000){mes 1, "당신이 살려는 포인트의 양과, 체력수치를 비교한결과 25000이하가 되버려서 사실수가 없습니다."; goto re3;}
+		if(get_class(@myid) == 1 && get_int(@myid) + @point > 120 || get_class(@myid) == 2 && get_int(@myid) + @point > 120 || get_class(@myid) == 3 && get_int(@myid) + @point > 215 || get_class(@myid) == 4 && get_int(@myid) + @point > 180 || get_class(@myid) == 5 && get_int(@myid) + @point > 120){mes 1, "사실려는 포인트가 올포를 넘어버립니다."; goto re3;}
+		set_basevita get_basevita2(@myid) - (@point * 400);
+		set_int get_int(@myid) + @point;
+		mes 0, "성공적으로 포인트구매가 이루어졌습니다.";
+		end;
+	}
+	if(@select == 3){
+		re4:
+		input @point, 1, "위즈를 몇개 올리시겠습니까??", "", "", 255;
+		if(@point <= 0){mes 1, "똑바로 입력해 주게나..."; goto re4;}
+		if(get_basevita2(@myid) - (@point * 400) < 25000){mes 1, "당신이 살려는 포인트의 양과, 체력수치를 비교한결과 25000이하가 되버려서 사실수가 없습니다."; goto re4;}
+		if(get_class(@myid) == 1 && get_wis(@myid) + @point > 120 || get_class(@myid) == 2 && get_wis(@myid) + @point > 120 || get_class(@myid) == 3 && get_wis(@myid) + @point > 180 || get_class(@myid) == 4 && get_wis(@myid) + @point > 215 || get_class(@myid) == 5 && get_wis(@myid) + @point > 120){mes 1, "사실려는 포인트가 올포를 넘어버립니다."; goto re4;}
+		set_basevita get_basevita2(@myid) - (@point * 400);
+		set_wis get_wis(@myid) + @point;
+		mes 0, "성공적으로 포인트구매가 이루어졌습니다.";
+		end;
+	}
+	if(@select == 4){
+		re5:
+		input @point, 1, "콘을 몇개 올리시겠습니까??", "", "", 255;
+		if(@point <= 0){mes 1, "똑바로 입력해 주게나..."; goto re5;}
+		if(get_basevita2(@myid) - (@point * 400) < 25000){mes 1, "당신이 살려는 포인트의 양과, 체력수치를 비교한결과 25000이하가 되버려서 사실수가 없습니다."; goto re5;}
+		if(get_class(@myid) == 1 && get_con(@myid) + @point > 180 || get_class(@myid) == 2 && get_con(@myid) + @point > 180 || get_class(@myid) == 3 && get_con(@myid) + @point > 120 || get_class(@myid) == 4 && get_con(@myid) + @point > 120 || get_class(@myid) == 5 && get_con(@myid) + @point > 215){mes 1, "사실려는 포인트가 올포를 넘어버립니다."; goto re5;}
+		set_basevita get_basevita2(@myid) - (@point * 400);
+		set_con get_con(@myid) + @point;
+		mes 0, "성공적으로 포인트구매가 이루어졌습니다.";
+		end;
+	}
+	if(@select == 5){
+		re6:
+		input @point, 1, "덱스를 몇개 올리시겠습니까??", "", "", 255;
+		if(@point <= 0){mes 1, "똑바로 입력해 주게나..."; goto re6;}
+		if(get_basevita2(@myid) - (@point * 400) < 25000){mes 1, "당신이 살려는 포인트의 양과, 체력수치를 비교한결과 25000이하가 되버려서 사실수가 없습니다."; goto re6;}
+		if(get_class(@myid) == 1 && get_dex(@myid) + @point > 180 || get_class(@myid) == 2 && get_dex(@myid) + @point > 215 || get_class(@myid) == 3 && get_dex(@myid) + @point > 120 || get_class(@myid) == 4 && get_dex(@myid) + @point > 120 || get_class(@myid) == 5 && get_dex(@myid) + @point > 180){mes 1, "사실려는 포인트가 올포를 넘어버립니다."; goto re6;}
+		set_basevita get_basevita2(@myid) - (@point * 400);
+		set_dex get_dex(@myid) + @point;
+		mes 0, "성공적으로 포인트구매가 이루어졌습니다.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	게시판알리미	{
+	set @myid, get_myid();
+	if(get_name(@myid) == "순삭"){message 3, "게시판 차단당함."; end;}
+	call_func @myid, "Board";
+	sleep 100;
+}
+
+0,0,0,0,0,0,0	봉인의주인	{
+	set @myid, get_myid();
+	mes 1, "봉인의 주인을 깨울려면 4속성의 씰이 필요합니다.";
+	if(item_exist(@myid, "바다의씰") == 0 || item_exist(@myid, "화염의씰") == 0 || item_exist(@myid, "대지의씰") == 0 || item_exist(@myid, "바람의씰") == 0){mes 0, "4속성의 씰을 보유하고 있지 않습니다."; end;}
+	item_del "바다의씰", 100;
+	item_del "화염의씰", 100;
+	item_del "대지의씰", 100;
+	item_del "바람의씰", 100;
+	mob_clear get_mapname(@myid);
+	mob_spawn2 "봉인의주인", 20, 16, 1, group_bighp() * 30;
+	group_val "#jobquest6", 1, 1;
+}
+
+0,0,0,0,0,0,0	아만마을	{
+	set @myid, get_myid();
+	set @select, 0;
+	if(#santaclos == 1){goto go;}
+	mes 1, "콜록, 콜록..";
+	mes 1, "콜록... 어험.. 모험가님 어서오시오.";
+	mes 1, "아만마을 에 오신것을 환영하오..";
+	mes 1, "이마을은 365일 24시간오픈이며, 재미 있다오. 콜록.";
+	mes 1, "얼마전부터 이 평화롭던 아만마을에 이상한 병이 퍼지길 시작했소.\\n내 예상에는 아만정글 과 동굴에 있는 몹에서부터 시작된것같은대..";
+	mes 1, "현재 그 증표들은 직접 채집할수는 없고, 그얼음들을 먹고 병에걸려 변해버린 동물들에게서 얻을수 있을것이오.";
+	mes 1, "내 좀만 젊었다면 직접가서 얻어 왔을터인대.. 너무 늙어버려 몬스터로 변해버린 동물들을 상대할수가 없구려.";
+	mes 1, "모험가분 께서 가서 나대신 구해와 준다면, 악어악세를 드리겠소.";
+	set #santaclos, 1;
+go:
+	set @select, menu("아만의증표 5개를 구해온다면 악어악세 를 드리겠소. 교환하겠소?", "교환한다.", "하지않는다.");
+	if(@select == 0){goto go;}
+	if(@select == 1){
+		if(item_exist(@myid, "아만의증표") < 5){mes 0, "보유하고 있는 아만의증표가 없거나 5개 미만이오."; end;}
+		item_del "아만의증표", 5;
+		item_add "악어악세", 1;
+		mes 0, "성공적으로 아만의증표와 악어악세교환이 이루어졌소. 앞으로도 수고 하시오.";
+		end;
+	}else{
+		end;
+	}
+}

@@ -1,0 +1,155 @@
+0	길드성	{
+	set @myid, get_myid();
+	set@npc$,last_npc();
+	if(@npc$=="수오미길드관리원"){
+		if(get_guild_title(@myid)==$Guildname$ && get_guild_state(@myid)==3){
+			name:
+			input @name$, 1, "길드마스터 " + get_name() + "님, 닉네임을 달아줄 유저이름을 적어주세요.", "", "", 10;
+			set @target, get_user(@name$);
+			if(!@target){goto name;}
+			input @set_user_title$, 1, "길드마스터 " + get_name() + "님, [" + @name$ + "]님에게 달아줄 닉네임을 적어주세요.\\n색깔표시(예 : { = l)금지.", "", "", 255;
+			set_user_title @target, @set_user_title$;
+			mes 0, "정상적으로 닉네임을 달아주셨습니다.";
+		}else{
+			mes 0, "공식길드의 길드마스터가 아닙니다. target.offiaialid:4";
+		}
+	}
+	if(@npc$=="서플라이"){
+		mes 1, "안녕하세요. 전 서플라이입니다. 공식길드의 길드마스터들에게 길드물품을 나누어 드리는 일을 하고 있습니다.";
+		if(get_guild_title(@myid)==$Guildname$ && get_guild_state(@myid)==3){
+			mes 0, "아쉽지만 아직 길드물품 지급 컨텐츠는 미구현이에요~ 호호";
+		}else{
+			mes 0, "길드마스터만이 길드물품을 받아가실 수 있습니다.";
+		}
+	}
+}
+
+Script	퇴장도우미	{
+	set @myid, get_myid();
+	if(get_mapname(@myid) == "스키장리프트대기실"){set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "마을로돌아간다", "스키장입장");}
+	if(get_mapname(@myid) == "수오미길드성-내각"){
+	mes 1, "길드성을 나갑니다.";
+	set @menu, menu(0, "안녕하세요. 무엇을 도와드릴까요?", "마을로돌아간다");
+	}
+	if(@menu==1){
+		set @val,menu(0, "어느 마을로 가시겠습니까?","밀레스  마을","피에트  마을", "아벨   마을", "수오미  마을", "운디네  마을", "뤼케시온마을", "루어스  마을", "마인   마을");
+		if(@val==1){warp "밀레스마을",84,22;}
+		else if(@val==2){warp"피에트마을",57,30;}
+		else if(@val==3){warp"아벨마을",53,21;}
+		else if(@val==4){warp"수오미마을",67,32;}
+		else if(@val==5){warp"운디네마을",65,47;}
+		else if(@val==6){warp"뤼케시온마을",23,14;}
+		else if(@val==7){warp"루어스마을",49,55;}
+		else if(@val==8){warp"마인마을",33,30;}
+	}else if(@menu==2){
+		set @ro,menu(0, "어서오세요. 저는 스키장 입장 도우미입니다. 스키장에 대한 도움말을 듣고싶으세요?", "도움말을 들려주세요", "입장시켜주세요");
+		if(@ro==1){
+			mes 1, "스키장은 겨울에만 개장하는 어둠의 전설의 특별한 곳입니다. 입장을 하기 위해서는 레벨제한이 있는데, 레벨 41 이상이 되어야만 들어가실 수 있구요";
+			mes 1, "3써클용, 4써클용, 5써클용, 승급용 스키장이 별도로 준비되어있어 각기 써클에 맞는 스키장으로 입장하시게 됩니다.";
+			mes 1, "입장을 위해서는 [스키복]을 착용하고 계셔야해요. 여러분의 안전을 위해서 스키복을 착용하지 않은 분은 스키장에 입장하실 수 없답니다.";
+			mes 1, "최근에는 야간개장하는 스키장이 추가되었어요. 오후 7시부터 다음날 오전 8시까지는, 야간스키장으로 가시게됩니다.";
+			mes 0, "그럼 어둠의 전설 스키장에서 재미있고 유익한 시간 보내세요 ~";
+		}else if(@ro==2){
+			mes 1, "그럼 스키장에 입장합니다. 즐거운 시간 보내세요. 아참, 스키복은 챙기셨나요?";
+			mes 0, "앗 !! 이런 .. 스키복과 스키모자를 착용하지 않으셨군요. 아쉽지만 입장하실 수 없습니다. 반드시 스키복과 스키모자를 착용하고 와주세요.특히 스키장내에서 스키모자를 벗으면 추위에 얼어죽을수도 있습니다. 모자를 벗지않도록 해주세요.";
+		}
+	}
+}
+
+Script	길드성입장도우미	{
+	set @myid,get_myid();
+	if(get_mapname(@myid)=="수오미마을"){
+		set @gm$,"수오미길드성-";
+		if($Guildwar>=1){
+			if(get_guild_title(@myid)==$Guildname$){mes 1,"길드성으로 이동합니다.";warp@gm$+"내각",42,58;end;}
+			input@guildname,2,"당신의 길드명을 적어주십시오","","",10;
+			if(@guildname<""||get_guild_state(@myid)){
+				mes 1,"공성전중이므로 언제든 입장이 가능합니다.";
+				warp@gm$+"외각",32,41;
+				if($Guildwar==1){
+					mob_spawn"성문",31,23,1;
+					mob_spawn"벽",30,23,2;
+					mob_spawn"벽",29,23,2;
+					mob_spawn"벽",32,23,2;
+					mob_spawn"벽",33,23,2;
+					mob_spawn"벽",29,22,2;
+					mob_spawn"벽",30,22,2;
+					mob_spawn"벽",31,22,2;
+					mob_spawn"벽",32,22,2;
+					mob_spawn"벽",21,21,2;
+					mob_spawn"벽",22,21,2;
+					mob_spawn"벽",23,21,2;
+					set $Guildwar,2;
+				}
+			end;
+			}
+		}
+		if(get_guild_state(@myid)>=1){
+			if(get_guild_title(@myid)==$Guildname$){
+				mes 1,"길드성으로 이동합니다.";
+				warp@gm$+"내각",42,58;
+			}else{
+				mes 0, "동맹길드가 아니므로 입장하실수 없습니다.";
+			}
+		}else{
+			mes 0, "동맹길드가 아니므로 입장하실수 없습니다.";
+		}
+	}
+	if(get_mapname(@myid)=="홀리루딘성"){
+		mes 0, "동맹길드가 아니므로 입장하실수 없습니다.";
+	}
+	del @gm$;
+	end;
+}
+
+Warp	공식길드선발전	{
+	set@myid,get_myid();
+	set@gm$,"수오미길드성-";
+	if(get_mapname(@myid)==@gm$+"외각"){
+		warp@gm$+"내각",32,74;
+		if($Guildwar==2){
+			mob_spawn"길드성문지기",29,36,2;
+			set $Guildwar,3;
+		}
+	end;
+	}
+	if(get_mapname(@myid)==@gm$+"2층로비"){
+		warp@gm$+"알현실",9,16;
+		if($Guildwar==4){
+			mob_spawn"수오미엘리멘탈스톤",7,4,2;
+			set $Guildwar,5;
+		}
+	end;
+	}
+	if(get_mapname(@myid)==@gm$+"내각"){
+		if(get_guild_title(@myid)==$Guildname$){goto gw;}
+		if($Guildwar==0){goto gw;}
+		if($Guildwar>=4){
+			gw:
+			set@rand1,rand2(1,9);
+			if(@rand1<1||@rand1>9){goto gw;}
+			switch(@rand1){
+				case 1:warp"수오미길드성-1층로비",13,25; break;
+				case 2:warp"수오미길드성-1층로비",14,25;break;
+				case 3:warp"수오미길드성-1층로비",15,25;break;
+				case 4:warp"수오미길드성-1층로비",13,26;break;
+				case 5:warp"수오미길드성-1층로비",14,26;break;
+				case 6:warp"수오미길드성-1층로비",15,26;break;
+				case 7:warp"수오미길드성-1층로비",13,27;break;
+				case 8:warp"수오미길드성-1층로비",14,27;break;
+				case 9:warp"수오미길드성-1층로비",15,27;break;
+			}
+		}
+	end;
+	}
+}
+
+Warp	길드성이동R	{
+	set @myid, get_myid();
+	if(get_guild_title(@myid)==$Guildname$){
+		warp "수오미길드성-직무실", 16,9; 
+	}else{
+		sleep 200;
+		set_xs(get_xs(@myid)+1);
+	}
+}

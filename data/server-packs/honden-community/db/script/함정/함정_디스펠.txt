@@ -1,0 +1,58 @@
+/*
+지하묘지, 우드랜드 15존에서 부터 나오는 함정
+*/
+Trap	체력마력_함정	{
+	set @myid,get_myid();
+	if(rand2(1,10)>5){
+		if(get_vita(@myid) < 70001){end;}
+		message 3,"바보...함정에 빠지다니...(체력70000)";
+		effect @myid,18,0,100;
+		game_sound 8,0;
+		set_vital get_vita(@myid) -70000;
+	}else{
+		if(get_mana(@myid) < 70001){end;}
+		message 3,"바보...함정에 빠지다니...(마력70000)";
+		effect @myid,61,0,100;
+		game_sound 8,0;
+		set_manal get_mana(@myid) - 70000;
+	}
+	end;
+}
+
+Trap	마비_함정	{
+	set @myid,get_myid();
+	if(get_ac(@myid) >= 10){
+		if(rand2(1,10)>3){
+			mobsor_delay @myid,8;
+		}else{
+			batu_delay @myid, 8;
+		}
+	}
+	game_sound 8,0;
+	message 3,"이 자리에서 움직일 수 없습니다";
+}
+
+/*
+적룡굴 등 상위 사냥터에 깔려있는 함정이다. 밟으면 그냥 죽는다고 보면된다.
+*/
+Trap	뮤레칸의지배영역	{
+	set @myid,get_myid();
+	char_damaged4 @myid, 3000000,3000000;
+	effect @myid,52,0,100;
+	game_sound 25,0;
+	message 3,"뮤레칸의 지배영역에 발을 딛었습니다";
+	end;
+}
+
+/*
+블랙오피온의굴 28,29,30 함정
+*/
+Trap	블랙오피온의굴_함정	{
+	set @myid,get_myid();
+	if(get_mana(@myid) < 1001){end;}
+	message 3,"바보...함정에 빠지다니...(마력10%)";
+	effect @myid,61,0,100;
+	game_sound 8,0;
+	set_manal get_mana(@myid)-get_basemana(@myid)/100*10;
+	end;
+}

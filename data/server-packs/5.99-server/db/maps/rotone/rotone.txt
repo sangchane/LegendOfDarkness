@@ -1,0 +1,82 @@
+{
+번호	665
+이름	로톤마을
+너비	100
+높이	100
+배경음	155
+맵파일	db/maps/rotone/maps/lod665.map
+}
+
+{
+번호	136
+이름	로톤여관
+너비	20
+높이	20
+배경음	155
+맵파일	db/maps/mileth/maps/lod136.map
+}
+
+{
+번호	132
+이름	로톤음식점
+너비	15
+높이	15
+배경음	155
+맵파일	db/maps/mileth/maps/lod129.map
+}
+
+{
+번호	112
+이름	로톤주점
+너비	15
+높이	15
+배경음	155
+맵파일	db/maps/mileth/maps/lod134.map
+}
+
+{
+번호	135
+이름	로톤은행
+너비	20
+높이	20
+배경음	155
+맵파일	db/maps/rucesion/maps/lod135.map
+}
+
+
+{
+번호	130
+이름	로톤장비상점
+너비	15
+높이	15
+배경음	155
+맵파일	db/maps/mileth/maps/lod130.map
+}
+
+{
+번호	717
+이름	로톤사범의집
+너비	12
+높이	12
+배경음	155
+맵파일	db/maps/mileth/maps/lod717.map
+}
+
+{
+번호	2651
+이름	로톤미용실
+너비	20
+높이	20
+배경음	155
+맵파일	db/maps/default/maps/lod2651.map
+}
+
+{
+번호	401
+이름	로톤미션의집
+너비	15
+높이	15
+배경음	155
+CRC	29186
+맵파일	db/maps/mileth/maps/lod401.map
+}

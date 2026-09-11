@@ -1,0 +1,22 @@
+/*
+알세이드스 국적퀘스트 도장줍는 단계에서 사용되는 스크립트
+*/
+Trap	도장줍기R	{
+	set @myid,get_myid();
+	npc_look @myid, 0, 0;
+	if(#WestQuest008 == 22){
+		set @westevent, menu(1, "무언가 떨어져있다.", "줍는다", "줍지 않는다.");
+		if(@westevent == 1){
+			rer:
+			set @rand, rand2(1, 125);
+			if(@rand < 1 || @rand > 5){goto rer;}
+			set @type, 0;
+			if(@rand <= 1){item_add "쓰레기", 1; mes 2, "쓰레기를 얻었다.";}
+			if(@rand <= 2){item_add "쓰레기", 1; mes 2, "쓰레기를 얻었다.";}
+			if(@rand <= 2){item_add "쓰레기", 1; mes 2, "쓰레기를 얻었다.";}
+			if(@rand <= 4){item_add "쓰레기", 1; mes 2, "쓰레기를 얻었다.";}
+			if(@rand <= 5){item_add "인증도장", 1; set #westevent, 30; mes 2, "도장을 얻었다.";}
+		}
+	}
+	end;
+}

@@ -1,0 +1,190 @@
+{
+번호	500
+이름	밀레스마을
+너비	100
+높이	100
+배경음	151
+배경	151
+CRC	151
+맵파일	db/maps/mileth/maps/lod500.map
+}
+
+{
+번호	127
+이름	밀레스시약상점
+너비	15
+높이	15
+배경음	151
+CRC	18992
+맵파일	db/maps/mileth/maps/lod127.map
+}
+
+{
+번호	717
+이름	밀레스훈련소
+너비	12
+높이	12
+배경음	151
+CRC	18992
+맵파일	db/maps/mileth/maps/lod717.map
+}
+
+{
+번호	128
+이름	밀레스우체국
+너비	15
+높이	15
+배경음	151
+CRC	47997
+맵파일	db/maps/mileth/maps/lod128.map
+}
+
+{
+번호	129
+이름	밀레스음식점
+너비	15
+높이	15
+배경음	151
+CRC	53270
+맵파일	db/maps/mileth/maps/lod129.map
+}
+
+{
+번호	130
+이름	밀레스리콜상점
+너비	15
+높이	15
+배경음	151
+CRC	29186
+맵파일	db/maps/mileth/maps/lod130.map
+}
+
+{
+번호	401
+이름	밀레스특수스킬의집
+너비	15
+높이	15
+배경음	151
+CRC	29186
+맵파일	db/maps/mileth/maps/lod401.map
+}
+
+{
+번호	132
+이름	밀레스무기점
+너비	15
+높이	15
+배경음	151
+CRC	54397
+맵파일	db/maps/mileth/maps/lod132.map
+}
+
+{
+번호	133
+이름	밀레스방어구점
+너비	12
+높이	12
+배경음	151
+CRC	16963
+맵파일	db/maps/mileth/maps/lod133.map
+}
+
+{
+번호	134
+이름	밀레스주점
+너비	15
+높이	15
+배경음	151
+CRC	22982
+맵파일	db/maps/mileth/maps/lod134.map
+}
+
+{
+번호	135
+이름	밀레스은행
+너비	20
+높이	20
+배경음	151
+CRC	22022
+맵파일	db/maps/mileth/maps/lod135.map
+}
+
+{
+번호	136
+이름	밀레스여관
+너비	20
+높이	20
+배경음	151
+CRC	8902
+맵파일	db/maps/mileth/maps/lod136.map
+}
+
+{
+번호	137
+이름	밀레스교회
+너비	18
+높이	25
+배경음	151
+CRC	151
+맵파일	db/maps/mileth/maps/lod137.map
+}
+
+{
+번호	393
+이름	밀레스신전
+너비	12
+높이	12
+배경음	151
+CRC	62321
+맵파일	db/maps/mileth/maps/lod393.map
+}
+
+{
+번호	206
+이름	신들의세계
+너비	30
+높이	30
+배경음	151
+CRC	62321
+맵파일	db/maps/mileth/maps/lod206.map
+}
+
+{
+번호	213
+이름	세오신전
+너비	13
+높이	13
+배경음	151
+CRC	62321
+맵파일	db/maps/mileth/maps/lod213.map
+}
+
+{
+번호	211
+이름	칸신전
+너비	13
+높이	13
+배경음	151
+CRC	62321
+맵파일	db/maps/mileth/maps/lod211.map
+}
+
+{
+번호	212
+이름	로오신전
+너비	13
+높이	13
+배경음	151
+CRC	62321
+맵파일	db/maps/mileth/maps/lod212.map
+}
+
+{
+번호	186
+이름	세토아신전
+너비	13
+높이	13
+배경음	151
+CRC	62321
+맵파일	db/maps/mileth/maps/lod186.map
+}

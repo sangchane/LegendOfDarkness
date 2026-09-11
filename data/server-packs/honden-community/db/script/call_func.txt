@@ -1,0 +1,61 @@
+0	도움말	{
+	set@myid,get_myid();
+	key:
+	npc_look @myid, 0, 0;
+	set @keytip,menu(1,"게임 내 모든 시스템\\n모든 유저들이 몬스터 잡은 횟수: "+$Totalkill, "{=u사냥터이동", "{=u경험치 축적", "{=u기능성 돌돌이", "{=u포인트 선물", "{=u블랙세트 효과 부여", "{=b2차 비밀번호 재설정", "{=u각종 명령어 알아보기","이전으로");
+	if(@keytip==0){goto key;}
+	if(@keytip==1){
+		call_func @myid, "이동명령R";
+	}else if(@keytip==2){
+		call_func @myid, "경험치축적";
+	}else if(@keytip==3){
+		call_func @myid, "돌돌이";
+	}else if(@keytip==4){
+		call_func @myid, "선물";
+	}else if(@keytip==5){
+		call_func @myid, "블랙세트효과부여";
+	}else if(@keytip==6){
+		set @rebirthday,menu(1,"2차 비밀번호를 재설정 하시겠습니까? 재설정 비용은 {=c10,000,000골드(Gold){=a 입니다. 진행하시겠습니까?", "예", "이전으로");
+		if(@rebirthday==1){
+			if(get_money(@myid)<10000000){mes 3,"골드(Gold)가 부족합니다.";goto key;}
+			birthday1:
+			input @birthday, 3, "자신의 생년월일을 입력해 주세요.", "저의 생년월일은", "입니다.", 6;
+			if(@birthday <= 99999){goto birthday2;}
+			if(@birthday==0){
+				birthday2:
+				mes 3,"두번째 비밀번호를 정하지 않으면 게임을 할 수 없습니다. 반드시 해주세요.";
+				goto birthday1;
+			}
+			money_del 10000000;
+			set_birthday @birthday;
+			mes 3, "2차 비밀번호가 {=c"+@birthday+"{=a로 설정되었습니다.";
+			del @birthday;
+			del @ret;
+			goto key;
+		}else{goto key;}
+	}else if(@keytip==7){
+		keysay:
+		set @keysay,menu(1,"명령어 선택시 자세한 안내 문구를 확인하실 수 있습니다. 무엇을 도와드릴까요?","{=u#사냥터이동", "{=u#방송", "{=u#삭제", "{=u#표정", "{=u#풀경", "이전으로");
+		if(@keysay==1){
+			message 8,"{=c[#사냥터이동]{=a\\n게임 내 원하시는 필드 사냥터로 이동이 가능한\\n편의 메뉴가 제공됩니다.\\n{=uex)\\n"+get_name(@myid)+": #사냥터이동";
+			goto keysay;
+		}else if(@keysay==2){
+			message 8,"{=c[#방송]{=a\\n게임 내 전체말이 등록됩니다.\\n모든 유저분들이 확인하실 수 있습니다.\\n{=uex)\\n"+get_name(@myid)+": #방송 안녕하세요.\\n{=a위 내용 입력시 게임 내 전체 말로 {=u안녕하세요. {=a출력";
+			goto keysay;
+		}else if(@keysay==3){
+			message 8,"{=c[#삭제]{=a\\n인벤토리 첫 번째 슬롯에 있는 아이템을\\n삭제하실 수 있습니다.\\n{=uex)\\n"+get_name(@myid)+": #삭제\\n{=b※반드시 삭제하실 아이템을 두셔야 합니다.\\n본인 부주의로 삭제된 아이템은 복구가 안됩니다.";
+			goto keysay;
+		}else if(@keysay==4){
+			message 8,"{=c[#표정]{=a\\n캐릭터 얼굴을 성형하실 수 있습니다.\\n{=uex)\\n"+get_name(@myid)+": #표정 1\\n{=a위 내용 입력시 캐릭터 얼굴이 {=u1{=a번 얼굴로 변경됩니다.\\n{=e※표정은 18번 까지 이용 가능합니다.";
+			goto keysay;
+		}else if(@keysay==5){
+			message 8,"{=c[#풀경]{=a\\n경험치 4,294,967,295(풀경) 달성시,\\n경험치 포인트로 누적시킬 수 있는 시스템입니다.\\n체력, 마력을 사실 때 다시 경험치로\\n반환할 수 있습니다.\\n{=uex)\\n"+get_name(@myid)+": #풀경";
+			goto keysay;
+		}else{
+			goto key;
+		}
+	}else{
+		call_func @myid, "__Shop_Script__";
+	}
+	end;
+}

@@ -1,0 +1,6 @@
+skill:db/skill/공통기술.txt
+skill:db/skill/전사.txt
+skill:db/skill/도적.txt
+skill:db/skill/마법사.txt
+skill:db/skill/성직자.txt
+skill:db/skill/무도가.txt

@@ -1,0 +1,376 @@
+0	casswarp	{
+	set@myid, get_myid();
+	npc_look @myid, 0,0;
+	set@side, get_side(@myid);
+	set@cass1$,"카스마늄제1광산";
+	set@cass11$,"카스마늄제1-1갱도";
+	set@cass12$,"카스마늄제1-2갱도";
+	set@cass13$,"카스마늄제1-3갱도";
+	set@cass2$,"카스마늄제2광산";
+	set@cass21$,"카스마늄제2-1갱도";
+	set@cass22$,"카스마늄제2-2갱도";
+	set@cass23$,"카스마늄제2-3갱도";
+	set@cass3$,"카스마늄제3광산입구";
+	set@cass31$,"카스마늄제3광산입구1";
+	if(get_mapname(@myid)==@cass1$){
+		if(get_ys(@myid)==3){
+			goto cass;
+		}
+		if(get_xs(@myid)==3){
+			if(!item_exist(@myid,"2갱도열쇠")){warp@cass1$, 9,16;message 3,"2갱도열쇠(이/가)  필요합니다.";end;}
+			goto cass;
+		}
+		if(get_ys(@myid)==32){
+			if(!item_exist(@myid,"3갱도열쇠")){warp"+@cass1$+",15,23;message 3,"3갱도열쇠(이/가)  필요합니다.";end;}
+			goto cass;
+		}
+	end;
+	}
+	if(get_mapname(@myid)==@cass2$){
+		if(get_ys(@myid)==3){
+			goto cass;
+		}
+		if(get_xs(@myid)==3){
+			if(!item_exist(@myid,"2갱도열쇠")){warp@cass1$, 9,16;message 3,"2갱도열쇠(이/가)  필요합니다.";end;}
+			goto cass;
+		}
+		if(get_ys(@myid)==32){
+			if(!item_exist(@myid,"3갱도열쇠")){warp@cass1$,15,23;message 3,"3갱도열쇠(이/가)  필요합니다.";end;}
+			goto cass;
+		}
+	end;
+	}
+	cass:
+	if(@side==1){set_xs(get_xs(@myid)-3);}
+	if(@side==2){set_ys(get_ys(@myid)-3);}
+	if(@side==3){set_xs(get_xs(@myid)+3);}
+	if(@side==0){set_ys(get_ys(@myid)+3);}
+	if(get_mapname(@myid)==@cass3$){warp@cass3$,11,10;}
+	set@zone,menu(1,"당신의 팀과 함께 이동하시겠습니까?","팀 전체이동","혼자만 이동","그만둔다");
+	if(@zone==1){
+		if(group_count(@myid, 0) < 1){mes 2,"당신과 같은 지역에 있는 그룹원이 한명도 없습니다.";end;}
+		if(get_mapname(@myid)==@cass1$&&get_ys(@myid)==6){group_warp@cass11$, 65,95;end;}
+		if(get_mapname(@myid)==@cass1$&&get_xs(@myid)==6){item_del "2갱도열쇠",1;group_warp@cass12$, 27,34;end;}
+		if(get_mapname(@myid)==@cass1$&&get_ys(@myid)==32){item_del "3갱도열쇠",1;group_warp@cass13$, 4,53;end;}
+		if(get_mapname(@myid)==@cass2$&&get_ys(@myid)==6){group_warp@cass21$, 65,95;end;}
+		if(get_mapname(@myid)==@cass2$&&get_xs(@myid)==6){item_del "2갱도열쇠",1;group_warp@cass22$, 27,34;end;}
+		if(get_mapname(@myid)==@cass2$&&get_ys(@myid)==32){item_del "3갱도열쇠",1;group_warp@cass23$, 4,53;end;}
+		if(get_mapname(@myid)==@cass3$){group_warp"+@cass31$+",17,43;end;}
+	}else if(@zone==2){
+		if(get_mapname(@myid)==@cass1$&&get_ys(@myid)==6){warp@cass11$, 65,95;end;}
+		if(get_mapname(@myid)==@cass1$&&get_xs(@myid)==6){item_del "2갱도열쇠",1;warp@cass12$, 27,34;end;}
+		if(get_mapname(@myid)==@cass1$&&get_ys(@myid)==29){item_del "3갱도열쇠",1;warp@cass13$, 4,53;end;}
+		if(get_mapname(@myid)==@cass2$&&get_ys(@myid)==6){warp@cass21$, 65,95;end;}
+		if(get_mapname(@myid)==@cass2$&&get_xs(@myid)==6){item_del "2갱도열쇠",1;warp@cass22$, 27,34;end;}
+		if(get_mapname(@myid)==@cass2$&&get_ys(@myid)==29){item_del "3갱도열쇠",1;warp@cass23$, 4,53;end;}
+		if(get_mapname(@myid)==@cass3$){warp"+@cass3-1$+",17,43;end;}
+	}
+}
+
+0	warpB	{
+	set@myid, get_myid();
+	set@side,get_side(@myid);
+	set@lv,get_level(@myid);
+	if(get_mapname(@myid)=="동의우드랜드입구"){
+		sleep 200;
+		if(@side==1){set_xs(get_xs(@myid)-1);}
+		if(@side==2){set_ys(get_ys(@myid)-1);}
+		if(@side==3){set_xs(get_xs(@myid)+1);}
+		if(@side==0){set_ys(get_ys(@myid)+1);}
+		message 3,"뮤레칸이 분노중입니다. 잠시만 기다려 주십시오";
+		end;
+	}
+	if(get_mapname(@myid)=="지하수로C-1"||get_mapname(@myid)=="지하수로D-1"||get_mapname(@myid)=="지하수로S-1"){
+		warp"밀레스마을",95,106;
+		goto go1;
+	}
+	if(get_mapname(@myid)=="지하수로C-2"||get_mapname(@myid)=="지하수로D-2"||get_mapname(@myid)=="지하수로S-2"){
+		warp"운디네마을",46,11;
+		goto go1;
+	}
+	if(get_mapname(@myid)=="지하수로C-3"||get_mapname(@myid)=="지하수로D-3"||get_mapname(@myid)=="지하수로S-3"){
+		warp"호엔마을",98,123;
+		goto go1;
+	}
+	if(get_mapname(@myid)=="지하수로C-5"||get_mapname(@myid)=="지하수로D-5"||get_mapname(@myid)=="지하수로S-5"){
+		warp"마인마을",37,88;
+		goto go1;
+	}
+	if(!group_exist(@myid)){
+		message 3,"던전으로 이동합니다.";
+		if(get_mapname(@myid)=="밀레스마을"){
+				if(@lv >= 99){set #underpassS, 1;warp"지하수로S-1",8,5;end;}
+				if(@lv >= 71){set #underpassD, 1;warp"지하수로D-1",8,5;end;}
+				if(@lv >= 41){set #underpassC, 1;warp"지하수로C-1",8,5;end;}
+		}
+		if(get_mapname(@myid)=="운디네마을"){
+				if(@lv >= 99){set #underpassS, 1;warp"지하수로S-2",37,18;end;}
+				if(@lv >= 71){set #underpassD, 1;warp"지하수로D-2",37,18;end;}
+				if(@lv >= 41){set #underpassC, 1;warp"지하수로C-2",37,18;end;}
+		}
+		if(get_mapname(@myid)=="호엔마을"){
+				if(@lv >= 99){set #underpassS, 1;warp"지하수로S-3",13,15;end;}
+				if(@lv >= 71){set #underpassD, 1;warp"지하수로D-3",13,15;end;}
+				if(@lv >= 41){set #underpassC, 1;warp"지하수로C-3",13,15;end;}
+		}
+		if(get_mapname(@myid)=="마인마을"){
+				if(@lv >= 99){set #underpassS, 1;warp"지하수로S-5",20,7;end;}
+				if(@lv >= 71){set #underpassD, 1;warp"지하수로D-5",20,7;end;}
+				if(@lv >= 41){set #underpassC, 1;warp"지하수로C-5",20,7;end;}
+		}
+	}
+	end;
+	go1:
+	set #underpassS,0;
+	set #underpassD,0;
+	set #underpassC,0;
+	end;
+}
+
+0	가상계	{
+	set@myid,get_myid();
+	set@npc$,last_npc();
+	if(get_mapname(@myid)=="오렌"||get_mapname(@myid)=="라미아의숲대기실"){
+		mes 1,"오렌마을의 곳곳으로 이동시켜 드립니다.마을을 이동하는데 1000전이 필요합니다.";
+		set@or,menu(0,"어디로 이동하시겠습니까?","오렌광장","오렌시장","오렌마을","오렌항구","오렌 라미아의숲 대기실","오렌 미궁입구","그만둔다.");
+		if(@or==1){
+			if(get_money(@myid) < 1000){goto orno1;}
+			money_del 1000;
+			warp"오렌",54,56;
+		}else if(@or==2){
+			if(get_money(@myid) < 1000){goto orno1;}
+			money_del 1000;
+			warp"오렌",88,94;
+		}else if(@or==3){
+			if(get_money(@myid) < 1000){goto orno1;}
+			money_del 1000;
+			warp"오렌",35,103;
+		}else if(@or==4){
+			if(get_money(@myid) < 1000){goto orno1;}
+			money_del 1000;
+			warp"오렌",55,166;
+		}else if(@or==5){
+			if(get_money(@myid) < 1000){goto orno1;}
+			money_del 1000;
+			warp"라미아의숲대기실",10,16;	
+		}else if(@or==6){
+			mes 1,"오렌 미궁은 5서클이상인분들만 보내드립니다. 이동료는 100만전입니다.";
+			if(get_money(@myid) < 1000000){orno1:mes 0,"돈이 모자라시는 군요.";end;}
+			money_del 1000000;
+			warp"오렌미궁입구",31,43;
+		}
+
+	end;
+	}
+	if(get_mapname(@myid)=="빛의신전001"){
+		mes 1,"황폐해진 영혼이여...안심하세요...여기는 빛의 신전...저는 빛과 치유의 여신 이아입니다.";
+		mes 1,"험한 싸움에서 패배하셧다고 너무 낙심하지 마세요. 제가 당신을 위해 해드릴 수있는 것은 영혼을 새롭게 해드리는 것 뿐이지만, 그것으로 당신이 새롭게 도전할수 있길 바랍니다.";
+		mes 1,"자 일어나세요...신의 축복이 당신에게 가득하기를...";
+ 		set_state 0,0;
+ 		if(get_sex(@myid)==1){set_body@myid,16;}
+ 		else{set_body@myid, 32;}
+		set_ys(get_ys(@myid)-0);
+		effect@myid,1, 0,100;
+		set@ia001,menu(0,"당신이 돌아가야 할 곳이 있나요?","마을로 가길 원합니다.","밀레스대련장으로 가길 원합니다.","수오미대련장으로 가길 원합니다.","루어스대련장으로 가길 원합니다.");
+		if(@ia001==1){
+			goto warpsystem1;
+		}else if(@ia001==2){
+			warp"밀레스대련장",4, 4,;
+			goto iag;
+		}else if(@ia001==3){
+			warp"수오미대련장",4, 4,;
+			goto iag;
+		}else if(@ia001==4){
+			warp"루어스대련장",4, 4,;
+			iag:
+			set_vita@myid,100000000;
+			message 3,"이아님이 천국부활을 외워주셨습니다.";
+			end;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="마인마을"||get_mapname(@myid)=="시장2"){
+		re100:
+		set@100npc,menu(0,"오늘부터 우린 자유~! 길막 방지위원회에서 출동한 백원만 입니다.\\n이동을 원하시는 곳을 골라주세요~! 백원이 지불됩니다.","죽음의마을대기실","호러캐슬","시장은행");
+		if(@100npc==0){goto re100;}
+		if(get_money(@myid) < 100){mes 0,"백원이 없어요??";end;}
+		money_del 100;
+		mes 1,"백원 잘 받았습니다~ 그럼 이동합니다.^^";
+		if(@100npc==1){
+			if(get_level(@myid) < 99){mes 0,"아직 어리다네..";end;}
+			warp"죽음의마을입구5",17,5;
+			end;
+		}else if(@100npc==2){
+			if(get_class_sub(@myid) != 0){mes 0,"승급자는 입장할 수 없다네..";end;}
+			if(get_level(@myid) < 99){mes 0,"아직 어리다네..";end;}
+			warp"호러캐슬메인홀",23,15;
+			end;
+		}else if(@100npc==3){
+			warp"시장은행",11,10;
+			end;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="하데스의방001"){
+		mes 1,"이런 쓸데 없는 인간...";
+		mes 1,"다시는 보기도 싫은 인간...";
+		mes 1,"어쩌다 내가 이런 일을 맡아서...";
+		mes 1,"보내주면, 또 날라오고, 또 보내주면 또 날라오고...";
+		mes 1,"지겹다. 아!!! 지겹다. 그대가 원하는 곳으로 보내주겠으니, 제발...";
+		mes 1,"제발 다시는 이곳으로 날라오지 않도록...";
+		set@Hades,menu(0,"그래. 어디로 돌아가길 원하는고?","마을로","원래 있던 곳으로");
+		if(@Hades==1){
+			goto warpsystem1;
+		}else if(@Hades==2){
+			warp@rename$,#rex,#rey;
+			set#rec,0;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="뮤레칸의방001"||get_mapname(@myid)=="뮤레칸의방002"||get_mapname(@myid)=="뮤레칸의방003" ||get_mapname(@myid)=="뮤레칸의방004"){
+ 		mes 1,"크~하하하하! 어둠의 땅에 잘 왔다!! 내 이름은 뮤레칸 어둠과 생명을 앗아가는 것들의 왕이다.";
+ 		mes 1,"어리석은 인간아! 살아나길 원하는가? 아니, 네가 여기서 할 수 있는 일이라고는 내게 생명을 갈구하는 것 뿐이지만...크크크크";
+ 		mes 1,"물론 살려주는건 어렵지 않지, 하지만, 네가 가지고 있는 여러가지의 것들을 댓가로 받아가겠다. 싫다고? 크크크크...네 녀석따위에게 선택할 수 있느느 자유가 있을 것이라고 생각하느냐!!";
+ 		mes 1,"네 녀석이 내게 뭐라 하던 난 상관없다. 오히려 니가 원망하여 속에 악을 쌓아갈 수록 나와 더욱 가까워 질테니까...크하하하하!! 그것은 그것대로 또 재미있겠군!!!";
+		goto warpsystem1;
+	end;
+	}
+	if(#underpassC==1||#underpassD==1||#underpassS==1){
+		set@Cshop,menu(0,"안녕하세요. 무엇을 도와드릴까요?","물건 사기","물건 팔기");
+		if(@Cshop==1){
+			if(#underpassC==1){shop 0,"지하수로C도우미","원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";}else{
+				shop 0,"지하수로D도우미","원하시는 것을 골라보세요. 원하시는 것을 클릭하면 구입하실 수 있습니다.";
+			}
+		}else if(@Cshop==2){
+			shop 1,"지하수로C도우미","무엇을 파시게요?";
+		}
+	end;
+	}
+	if(@npc$=="메투스"){
+		mes 0,"모험가 여러분에게 저의 축복이 있을겁니다.";
+	}
+	end;
+	warpsystem1:
+	set_state 0,0;
+	if(get_sex(@myid)==1) {set_body@myid,16;}
+	else{set_body@myid, 32;}
+	if(get_nation (@myid)==5){
+		set@rand, rand2(1,10);
+		if(@rand <= 4){
+			warp"노엠여관",12, 8;
+		}else{
+			warp"아슬론여관",6, 5;
+		}
+	end;
+	}
+	if(get_nation (@myid)==6){
+		set@rand, rand2(1,10);
+		if(@rand <= 3){
+			warp"화염의세계수의사당",12, 17;
+			end;
+		}if(@rand <= 6){
+			warp"여관-금화장",19, 28;
+		}else{
+			warp"알세이드스-화론마을",88, 49;
+		}
+	end;
+	}
+	if(get_nation (@myid)==8){
+		set@rand, rand2(1,10);
+		if(@rand <= 3){
+			warp"아만마을",41, 40;
+		}else{
+			warp"아만여관",10, 20;
+		}
+	end;
+	}
+	if(get_mapname(@myid)=="빛의신전001"){message 3,"이아님이 천국부활을 외워주셨습니다.";}
+	if(get_level()<=11){warp"노비스마을",37,29;end;}
+	set@rand, rand2(1,10);
+	if(@rand<=1){warp"아벨여관",15,6;end;}
+	if(@rand<=2){warp"밀레스여관",15,6;end;}
+	if(@rand<=3){warp"뤼케시온여관",15,6;end;}
+	if(@rand<=4){warp"운디네여관",15,6;end;}
+	if(@rand<=5){warp"수오미여관",15,6;end;}
+	if(@rand<=6){warp"피에트여관",15,6;end;}
+	if(@rand<=7){warp"루어스여관",15,6;end;}
+	if(@rand<=8){warp"로톤여관",15,6;end;}
+	if(@rand<=9){warp"마인여관",15,6;end;}
+	if(@rand<=10){warp"호엔여관",15,6;end;}
+}
+
+0	사냥터이동	{
+	set@myid,get_myid();
+	if(get_mapname(@myid)=="해저던전대기실"){
+		set@hi,menu(0,"어서오세요. 물고기비늘을 교환해드립니다. 무엇으로 교환하시겠습니까?","썬글래스 ( 비늘 50개 )","바람개비 ( 비늘 100개 )");
+		if(@hi==1){
+			if(item_exist(@myid,"물고기비늘") < 50){mes 0,"아쉽지만 비늘 50개를 가져오지 않으셨군요. 썬글래스를 가지기 위해서는 물고기비늘 50개가 필요합니다";}
+			item_del"물고기비늘",50;
+			item_add"썬글라스",1;
+			mes 0,"물고기 비늘 50 개를 썬글래스로 바꿔드렸습니다. 안녕히 가세요";
+		}else if(@hi==2){
+			if(item_exist(@myid,"물고기비늘") < 100){mes 0,"아쉽지만 비늘 50개를 가져오지 않으셨군요. 바람개비를 가지기 위해서는 물고기비늘 100개가 필요합니다";}
+			item_del"물고기비늘",100;
+			item_add"바람개비",1;
+			mes 0,"물고기 비늘 100 개를 바람개비로 바꿔드렸습니다. 안녕히 가세요";
+		}
+	end;
+	}
+	set@Dungeon,menu(0,"몬스터가 우글거리는 존으로 바로 가시고 싶으세요? 호호. 전 많은걸 바라지 않아요. 단돈 1000골드에 당신이 선택하신 곳으로 보내드릴께요. 돈을 내실건가요?","예","아니오");
+	if(@Dungeon==1){
+		mes 1,"1000골드면 싼거에요. 호호호";
+		if(get_mapname(@myid)=="아벨해안"){
+			set@A,menu(0,"어느 곳으로 가고 싶으세요?","아벨던젼5층","아벨던젼8층");
+			mes 1,"이제 보내드릴께요. 그러나 조심하세요. 어디서 어느순간 몬스터가 덮칠지 몰라요.";
+			if(@A==1){
+ 				warp"아벨던젼 5-1",1, 33;
+			}else if(@A==2){
+  				warp"아벨던젼 8-1",1,5;
+			}
+		}
+		if(get_mapname(@myid)=="지하묘지대기실"){
+			set@B,menu(0,"어느 곳으로 가고 싶으세요?","지하묘지3층","지하묘지6층","지하묘지9층","지하묘지13층","지하묘지19층","지하묘지25층");
+			mes 1,"이제 보내드릴께요. 그러나 조심하세요. 어디서 어느순간 몬스터가 덮칠지 몰라요.";
+			if(@B== 1){
+				warp"지하묘지3-1",1, 31;
+			}else if(@B==2){
+				warp"지하묘지6-1",43,10;
+			}else if(@B==3){
+				warp"지하묘지9-1",21,1;
+			}else if(@B==4){
+		 		warp"지하묘지13-1",24, 27;
+			}else if(@B==5){
+				warp"지하묘지19-1",22,1;
+			}else if(@B==6){
+				warp"지하묘지25-1",43,1;
+			}
+		}
+		if(get_mapname(@myid)=="피에트던전대기실"){
+			set@C,menu(0,"어느 곳으로 가고 싶으세요?","피에트던젼4층","피에트던젼7층","피에트던젼10층","피에트던젼13층","피에트던젼15층");
+			mes 1,"이제 보내드릴께요. 그러나 조심하세요. 어디서 어느순간 몬스터가 덮칠지 몰라요.";
+			if(@C==1){
+				warp"피에트던전4-2",2,7;
+			}else if(@C==2){
+				warp"피에트던전7-2",7,13;
+			}else if(@C==3){
+				warp"피에트던전10-2",13,6;
+			}else if(@C==4){
+				warp"피에트던전13-1",13,6;
+			}else if(@C==5){
+				warp"피에트던전15-3",7,13;
+			}
+		}
+	}else if(@Dungeon==2){
+		mes 1,"호호... 당신은 걷는걸 좋아하시나 보군요.";
+		mes 0,"다음에 또 이용해 주세요";
+	}
+	end;
+}
+
+Script	정화된루딘	{
+	set @myid, get_myid();
+	mes 1, "정화된뮤레칸던전으로 이동시켜주겠네. ";
+             if(get_ability()<45){MWNO4:mes 0," 어빌리티 45가 되지 않아 들어갈 수 없네!";end;}
+	warp "정화된뮤레칸던전", 97, 50;
+	mes 0, "이동되었습니다.";
+}
