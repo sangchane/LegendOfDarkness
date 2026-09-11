@@ -2,13 +2,8 @@
   "use strict";
   var data = window.LOD_DASHBOARD_DATA;
   var model = window.LodDashboardModel;
-  function isValidSnapshot(value) {
-    if (!value || value.schemaVersion !== 1) { return false; }
-    if (!value.roadmap || !Array.isArray(value.roadmap.current) || value.roadmap.current.length === 0) { return false; }
-    return Boolean(value.git && typeof value.git.branch === "string" && typeof value.generatedAt === "string");
-  }
-  var snapshot = isValidSnapshot(window.LOD_DASHBOARD_SNAPSHOT) ? window.LOD_DASHBOARD_SNAPSHOT : null;
-  var labels = { overview: "대시보드", system: "시스템 지도", flows: "기능 흐름", delivery: "개발·Graphite", knowledge: "게임 데이터", operations: "운영·유지보수", prototypes: "화면 실험실" };
+  var snapshot = model.isValidDashboardSnapshot(window.LOD_DASHBOARD_SNAPSHOT) ? window.LOD_DASHBOARD_SNAPSHOT : null;
+  var labels = { overview: "대시보드", system: "시스템 지도", flows: "기능 흐름", delivery: "개발·지식 그래프", knowledge: "게임 데이터", operations: "운영·유지보수", prototypes: "화면 실험실" };
   var category = "all";
   var searchQuery = "";
   function select(selector, host) { return (host || document).querySelector(selector); }
@@ -42,22 +37,6 @@
     });
     select("#knowledge-count").textContent = "총 " + entries.length + "개 항목"; select("#knowledge-empty").hidden = entries.length !== 0;
   }
-  function renderStack() {
-    var host = select("#stack-list");
-    var entries = data.graphite.stack;
-    if (snapshot && snapshot.graphite.status === "available" && snapshot.graphite.stack.length) {
-      entries = snapshot.graphite.stack.map(function (branch) {
-        var known = data.graphite.stack.find(function (entry) { return entry.branch === branch; });
-        return { branch: branch, purpose: known ? known.purpose : "Graphite 추적 브랜치" };
-      });
-    }
-    host.replaceChildren();
-    entries.forEach(function (entry, index) {
-      var item = document.createElement("li"); item.className = index === 0 ? "stack-item stack-head" : "stack-item";
-      var body = document.createElement("div"); body.append(createTextElement("code", "", entry.branch), createTextElement("p", "", entry.purpose));
-      item.append(createTextElement("span", "stack-node", index === 0 ? "TOP" : String(index + 1).padStart(2, "0")), body); host.appendChild(item);
-    });
-  }
   function renderSnapshot() {
     if (!snapshot) { return; }
     var current = snapshot.roadmap.current[0];
@@ -67,9 +46,7 @@
     select("#snapshot-board-title").textContent = current.title;
     select("#snapshot-board-detail").textContent = current.detail || "현재 NEXT-ACTION";
     select("#snapshot-generated-date").textContent = snapshot.generatedAt.slice(0, 10);
-    select("#snapshot-graphite-date").textContent = snapshot.generatedAt.slice(0, 10) + " 생성";
     select("#snapshot-branch").textContent = snapshot.git.branch;
-    select("#snapshot-branch-detail").textContent = snapshot.git.branch + " · " + snapshot.git.sha;
 
     var verification = snapshot.verification;
     var verificationTitle = verification.status === "passed"
@@ -78,14 +55,33 @@
     select("#snapshot-verification-title").textContent = verificationTitle;
     select("#snapshot-verification-detail").textContent = verification.command || "스냅샷 생성 시 --verify로 갱신";
 
-    var graphiteAvailable = snapshot.graphite.status === "available";
-    var tracked = graphiteAvailable && snapshot.graphite.stack.includes(snapshot.git.branch);
-    var branchState = select("#snapshot-branch-state");
-    branchState.textContent = graphiteAvailable ? (tracked ? "Graphite 추적 중" : "Graphite 추적 밖") : "Graphite 조회 불가";
-    branchState.className = "badge " + (tracked ? "badge-done" : "badge-risk");
-    select("#snapshot-branch-summary").textContent = graphiteAvailable ? (tracked ? "추적 중" : "추적 밖") : "조회 불가";
-    select("#snapshot-stack-count").textContent = graphiteAvailable ? String(snapshot.graphite.stack.length) : "미확인";
-    select("#snapshot-branch-description").textContent = (graphiteAvailable ? "Graphite CLI 조회가 반영됐습니다. " : "정적 Graphite 목록을 표시합니다. ") + (snapshot.git.dirty ? "공유 작업 트리에 커밋되지 않은 변경이 있습니다." : "공유 작업 트리가 깨끗합니다.");
+    var graphify = snapshot.graphify;
+    var formatCount = function (value) { return Number.isInteger(value) ? value.toLocaleString("ko-KR") : "미확인"; };
+    select("#snapshot-graphify-nodes").textContent = formatCount(graphify.nodes);
+    select("#snapshot-graphify-links").textContent = formatCount(graphify.links);
+    select("#snapshot-graphify-communities").textContent = formatCount(graphify.communities);
+    select("#snapshot-obsidian-notes").textContent = formatCount(graphify.obsidian.notes);
+    select("#snapshot-graphify-date").textContent = snapshot.generatedAt.slice(0, 10) + " 스냅샷";
+    select("#snapshot-graphify-mode").textContent = graphify.nodes > 5000 ? "대시보드: 커뮤니티 집약 뷰 · 전체 노드: Obsidian" : "대시보드: 전체 노드 뷰";
+    var graphState = select("#snapshot-graphify-state");
+    var graphReady = graphify.status === "available" && graphify.graphHtml;
+    graphState.textContent = graphReady ? "그래프 연결됨" : "생성 결과 없음";
+    graphState.className = "badge " + (graphReady ? "badge-done" : "badge-risk");
+  }
+  function showGraphUnavailable() {
+    select("#graphify-frame-shell").hidden = true;
+    select("#graphify-unavailable").hidden = false;
+    ["#snapshot-graphify-nodes", "#snapshot-graphify-links", "#snapshot-graphify-communities", "#snapshot-obsidian-notes"].forEach(function (selector) { select(selector).textContent = "미확인"; });
+    var graphState = select("#snapshot-graphify-state");
+    graphState.textContent = "그래프 파일 없음";
+    graphState.className = "badge badge-risk";
+  }
+  function verifyGraphAsset() {
+    if (!snapshot || !snapshot.graphify.graphHtml) { showGraphUnavailable(); return; }
+    if (window.location.protocol === "file:") { return; }
+    window.fetch(new URL("../graphify-out/graph.html", window.location.href), { method: "HEAD", cache: "no-store" })
+      .then(function (response) { if (!response.ok) { showGraphUnavailable(); } })
+      .catch(showGraphUnavailable);
   }
   function renderComponents() {
     var host = select("#component-catalog");
@@ -146,7 +142,8 @@
   select("#flow-tabs").addEventListener("keydown", function (event) { if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") { return; } var tabs = selectAll("[data-flow]"); var current = tabs.indexOf(document.activeElement); var offset = event.key === "ArrowRight" ? 1 : -1; var next = tabs[(current + offset + tabs.length) % tabs.length]; event.preventDefault(); showFlow(next.getAttribute("data-flow")); next.focus(); });
   select("#menu-toggle").addEventListener("click", function (event) { var open = !document.body.classList.contains("menu-open"); document.body.classList.toggle("menu-open", open); event.currentTarget.setAttribute("aria-expanded", String(open)); event.currentTarget.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기"); if (open) { select(".primary-nav .nav-item.is-active").focus(); } else { event.currentTarget.focus(); } });
   selectAll("[data-copy-command]").forEach(function (button) { button.addEventListener("click", function () { copyText(button.getAttribute("data-copy-command")).then(function () { showToast("명령을 복사했습니다."); }, function () { showToast("복사 기능을 쓸 수 없습니다. 명령을 직접 선택해 주세요."); }); }); });
+  select("#graphify-frame").addEventListener("error", showGraphUnavailable);
   window.addEventListener("popstate", function () { showView(currentViewFromUrl(), false); });
   document.addEventListener("keydown", function (event) { if (event.key === "Escape" && document.body.classList.contains("menu-open")) { document.body.classList.remove("menu-open"); select("#menu-toggle").setAttribute("aria-expanded", "false"); select("#menu-toggle").setAttribute("aria-label", "메뉴 열기"); select("#menu-toggle").focus(); } });
-  renderSnapshot(); renderKnowledge(); renderStack(); renderComponents(); renderFlowTabs(); showFlow(data.flows[0].id); showView(currentViewFromUrl(), false);
+  renderSnapshot(); verifyGraphAsset(); renderKnowledge(); renderComponents(); renderFlowTabs(); showFlow(data.flows[0].id); showView(currentViewFromUrl(), false);
 })();

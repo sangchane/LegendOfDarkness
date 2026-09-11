@@ -60,7 +60,11 @@ test('dashboard applies the Toss-inspired light design token system', () => {
 test('screen experiments render directly inside the dashboard', () => {
   const html = read('docs/index.html');
 
-  assert.doesNotMatch(html, /<dialog|<iframe|data-preview=/);
+  assert.doesNotMatch(html, /<dialog|data-preview=/);
+  assert.equal((html.match(/<iframe/g) || []).length, 1);
+  assert.match(html, /id="graphify-frame"/);
+  assert.match(html, /sandbox="allow-scripts"/);
+  assert.match(html, /aria-describedby="graphify-description"/);
   assert.equal((html.match(/data-demo-screen=/g) || []).length, 6);
   assert.match(html, /id="inline-game-preview"/);
   assert.match(html, /data-hud-toggle="touch"/);
@@ -159,13 +163,15 @@ test('operations workspace links every runbook and separates documented standard
   assert.match(deploymentStep.evidence, /자동화 미구현/);
 });
 
-test('Graphite panel distinguishes the tracked stack from the current branch', () => {
-  const data = require('../docs/dashboard-data.js');
+test('knowledge graph panel exposes Graphify and Obsidian without obsolete stacked-PR UI', () => {
+  const html = read('docs/index.html');
+  const sources = html + read('docs/dashboard.js') + read('docs/dashboard-data.js') + read('scripts/generate-dashboard-snapshot.js');
 
-  assert.equal(data.graphite.currentBranch, 'test/hades-characterization');
-  assert.equal(data.graphite.currentBranchTracked, false);
-  assert.equal(data.graphite.stack.at(-1).branch, 'main');
-  assert.ok(data.graphite.stack.some((entry) => entry.branch === 'chore/graphite-workflow'));
+  assert.match(html, /Graphify 지식 그래프/);
+  assert.match(html, /Obsidian vault/);
+  assert.match(html, /Obsidian에서 열기/);
+  assert.match(html, /graphify-out\/GRAPH_REPORT\.md/);
+  assert.doesNotMatch(sources, /Graphite|gt\.ps1/i);
 });
 
 test('dashboard model normalizes views and filters knowledge without mutating data', () => {

@@ -17,7 +17,7 @@
       <button type="button" class="nav-item is-active" data-view-target="overview" aria-current="page"><span aria-hidden="true">◈</span>대시보드</button>
       <button type="button" class="nav-item" data-view-target="system"><span aria-hidden="true">⌘</span>시스템 지도</button>
       <button type="button" class="nav-item" data-view-target="flows"><span aria-hidden="true">⇢</span>기능 흐름</button>
-      <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>개발·Graphite</button>
+      <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>개발·지식 그래프</button>
       <button type="button" class="nav-item" data-view-target="knowledge"><span aria-hidden="true">▤</span>게임 데이터</button>
       <button type="button" class="nav-item" data-view-target="operations"><span aria-hidden="true">◎</span>운영·유지보수</button>
       <button type="button" class="nav-item" data-view-target="prototypes"><span aria-hidden="true">▣</span>화면 실험실</button>
@@ -59,6 +59,30 @@
             <div class="panel-heading"><div><p class="eyebrow">Original assets</p><h2>원작 자산 파이프라인</h2></div><button type="button" class="text-button" data-view-jump="knowledge">데이터 보드 →</button></div>
             <img src="ui/assets/mob-gallery.png" alt="원작 데이터에서 추출한 괴물 스프라이트 모음" width="1488" height="486"><p>캐릭터·괴물은 읽힘. 벽 타일, 아이템 아이콘, 대화·효과·음악은 다음 변환 대상입니다.</p>
           </article>
+          <article class="panel art-panel equip-panel">
+            <div class="panel-heading"><div><p class="eyebrow">Original UI</p><h2>원작 장비창 — 구형과 신형</h2></div><a class="quiet-link" href="original-equipment-window.md">좌표 표 →</a></div>
+            <div class="equip-pair">
+              <figure>
+                <img src="ui/assets/equip-window-old.png" alt="setoa.dat 에서 복원한 원작 구형 장비창" width="270" height="302">
+                <figcaption><b>구형</b> · <code>lequip.txt</code> + <code>equip01.epf</code> · <b>266×298</b> · 칸 <b>14</b>개, 각 <b>33×33</b>. 장비만 있는 거의 정사각 창이라 세로 폰에 그대로 들어갑니다. 장신구·겉투구 자리는 없습니다.</figcaption>
+              </figure>
+              <figure>
+                <img src="ui/assets/equip-window.png" alt="setoa.dat 에서 복원한 원작 신형 장비창" width="603" height="310">
+                <figcaption><b>신형</b> · <code>_nui_eq.txt</code> + <code>_nui_eq.spf</code> · <b>599×306</b> · 칸 <b>18</b>개, 각 <b>32×32</b>. 책 두 쪽이라 왼쪽이 장비, 오른쪽이 이름·직업·무리·칭호·초상·능력치입니다. 18칸이 서버의 자리 번호와 그대로 맞습니다.</figcaption>
+              </figure>
+            </div>
+            <div class="equip-pair">
+              <figure>
+                <img src="ui/assets/equip-slots-old.png" alt="구형 장비창의 빈 칸 그림 14종" width="252" height="72">
+                <figcaption><b>구형</b> 빈 칸 그림 · <code>equip07.epf</code> <b>14</b>종</figcaption>
+              </figure>
+              <figure>
+                <img src="ui/assets/equip-slots.png" alt="신형 장비창의 빈 칸 그림 14종" width="252" height="72">
+                <figcaption><b>신형</b> 빈 칸 그림 · <code>_nui_eqi.spf</code> <b>14</b>종 — 같은 부위, 같은 차례</figcaption>
+              </figure>
+            </div>
+            <p>종이인형은 두 세대 모두 <b>110×84</b> 로 같습니다. 신형은 <code>.spf</code> 라 색표를 파일 안에 들고 있고, 구형은 <code>.epf</code> + <code>gui00.pal</code> 입니다 — <code>setoa.dat</code> 의 색표 18개 중 맞는 것은 그 하나뿐입니다.</p>
+          </article>
         </div>
       </section>
 
@@ -80,7 +104,7 @@
       </section>
 
       <section class="view" data-view="delivery" aria-labelledby="delivery-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Delivery map</p><h1 id="delivery-title">개발 흐름과 Graphite</h1><p>로드맵, 통과 근거, 변경 스택을 한 화면에서 연결합니다.</p></div><a class="quiet-link" href="hades-p0-stabilization-plan.md">계획 원문 →</a></div>
+        <div class="page-heading"><div><p class="eyebrow">Delivery map</p><h1 id="delivery-title">개발 흐름과 지식 그래프</h1><p>로드맵과 검증 근거, 코드·문서의 연결을 한 화면에서 함께 봅니다.</p></div><a class="quiet-link" href="hades-p0-stabilization-plan.md">계획 원문 →</a></div>
         <div class="phase-track" aria-label="개발 단계">
           <article class="phase is-done"><span>S0</span><h2>현행 고정</h2><p>로그인→월드 입장과 초기 상태 기록</p><strong>통과</strong></article>
           <article class="phase is-current"><span>S1</span><h2>연동 안전선</h2><p>네트워크·저장·전투 안정화</p><strong>4 / 8</strong></article>
@@ -93,9 +117,12 @@
           <article class="board-column is-current"><header><h2>진행 중</h2><span>2</span></header><div class="task-card"><small id="snapshot-current-area">M1-01</small><strong id="snapshot-board-title">월드 패킷과 화면 좌표 연결</strong><p id="snapshot-board-detail">현재 NEXT-ACTION</p><span class="badge badge-now">작업 중</span></div><div class="task-card"><small>ASSET</small><strong>아이템·벽 자산 해석</strong><p>원본 자료만 사용</p><span class="badge badge-now">분석 중</span></div></article>
           <article class="board-column"><header><h2>다음</h2><span>4</span></header><div class="task-card"><small>P0-14</small><strong>송신 큐·완전 전송</strong><span class="badge">대기</span></div><div class="task-card"><small>P0-15</small><strong>원자 저장·복구</strong><span class="badge">대기</span></div><div class="task-card"><small>P0-16</small><strong>기본 전투 정확성</strong><span class="badge">대기</span></div><div class="task-card"><small>P0-17</small><strong>주소·포트 설정화</strong><span class="badge">대기</span></div></article>
         </div>
-        <div class="section-heading"><div><p class="eyebrow">Stacked delivery</p><h2>Graphite 작업 스택</h2></div><a class="quiet-link" href="../WORKFLOW.md">작업 규칙 →</a></div>
-        <div class="graphite-summary"><article><span>Graphite CLI</span><strong>1.8.6</strong></article><article><span>추적 브랜치</span><strong id="snapshot-stack-count">7</strong></article><article class="warning"><span>현재 브랜치</span><strong id="snapshot-branch-summary">추적 밖</strong></article><article class="warning"><span>데이터 성격</span><strong>생성 스냅샷</strong></article></div>
-        <div class="graphite-layout"><article class="panel"><div class="panel-heading"><div><p class="eyebrow">gt log short</p><h2>추적 중인 stack</h2></div><span class="snapshot" id="snapshot-graphite-date">2026-09-10 확인</span></div><ol class="stack-list" id="stack-list"></ol></article><aside class="panel branch-panel"><p class="eyebrow">Current checkout</p><h2><code id="snapshot-branch-detail">test/hades-characterization</code></h2><span class="badge badge-risk" id="snapshot-branch-state">Graphite 추적 밖</span><p id="snapshot-branch-description">Graphite는 적용되어 있습니다. 현재 체크아웃만 아직 stack에 등록되지 않았습니다.</p><div class="branch-meta"><span>확인</span><strong><code>.\scripts\gt.ps1 log short</code></strong><span>주의</span><strong>공유 작업 트리 상태를 특정 작업자의 변경으로 해석하지 않음</strong></div></aside></div>
+        <div class="section-heading"><div><p class="eyebrow">Connected knowledge</p><h2>Graphify 지식 그래프</h2></div><div class="section-actions"><a class="quiet-link" href="../graphify-out/GRAPH_REPORT.md">분석 보고서 →</a><a class="quiet-link" href="../graphify-out/graph.html">전체 화면 →</a></div></div>
+        <div class="graphify-summary" aria-label="Graphify 생성 현황"><article><span>노드</span><strong id="snapshot-graphify-nodes">미확인</strong></article><article><span>관계</span><strong id="snapshot-graphify-links">미확인</strong></article><article><span>커뮤니티</span><strong id="snapshot-graphify-communities">미확인</strong></article><article><span>Obsidian 노트</span><strong id="snapshot-obsidian-notes">미확인</strong></article></div>
+        <div class="graphify-layout">
+          <article class="panel graph-panel"><div class="panel-heading"><div><p class="eyebrow">Interactive map</p><h2>프로젝트 연결망을 여기서 탐색</h2><p class="snapshot" id="snapshot-graphify-mode">표시 방식 확인 중</p></div><span class="badge badge-partial" id="snapshot-graphify-state" role="status">생성 결과 확인 중</span></div><p class="graph-intro" id="graphify-description">확대·이동·노드 선택으로 구현 위치와 문서 근거를 탐색합니다. 현재 작업 검색에서 월드, 대상 선택, 전투, 인벤토리 구현 단위가 함께 발견됐습니다. 작은 화면에서는 그래프 안을 가로로 움직여 전체 작업면을 볼 수 있습니다. 생성 시각화는 마우스 중심이므로 키보드 사용자는 위 분석 보고서와 오른쪽 구현 위치 목록을 이용해 주세요.</p><div class="graph-frame-scroll" id="graphify-frame-shell"><iframe id="graphify-frame" title="LOD Graphify 지식 그래프" src="../graphify-out/graph.html" sandbox="allow-scripts" loading="lazy" tabindex="-1" aria-describedby="graphify-description"></iframe></div><p class="graph-unavailable" id="graphify-unavailable" role="status" hidden>이 환경에는 생성된 그래프 파일이 없습니다. 프로젝트에서 Graphify를 갱신한 뒤 스냅샷을 다시 생성해 주세요.</p></article>
+          <aside class="panel obsidian-panel"><p class="eyebrow">Linked notes</p><h2>Obsidian vault</h2><p>Graphify의 노드와 커뮤니티를 노트와 Canvas로 내보냈습니다. 처음에는 <code>graphify-out/obsidian</code> 폴더를 이름이 <code>obsidian</code>인 vault로 등록하면 양방향 링크로 탐색할 수 있습니다.</p><div class="obsidian-links"><a class="primary-button" href="obsidian://open?vault=obsidian&amp;file=graph.canvas">Obsidian에서 열기</a><a class="quiet-link" href="../graphify-out/obsidian/graph.canvas">Canvas 원본 →</a><a class="quiet-link" href="../graphify-out/obsidian/">vault 폴더 →</a></div><dl class="graph-sources" aria-label="현재 작업과 함께 발견된 구현 위치"><dt>월드 세션</dt><dd><code>mobile/src/Lod.Mobile.Core/World/WorldClient.cs:22</code></dd><dt>화면·대상</dt><dd><code>mobile/client/src/WorldView.cs:14, 522</code></dd><dt>전투 표현</dt><dd><code>mobile/client/src/Actor.cs:11, 134</code></dd><dt>인벤토리</dt><dd><code>mobile/client/src/PackPanel.cs:15</code></dd></dl><p class="snapshot" id="snapshot-graphify-date">생성 시각 미확인</p></aside>
+        </div>
         <article class="command-box"><div><p class="eyebrow">Snapshot</p><h2>대시보드 상태 갱신</h2></div><code>node scripts/generate-dashboard-snapshot.js --verify</code><button type="button" data-copy-command="node scripts/generate-dashboard-snapshot.js --verify">복사</button></article>
       </section>
 
@@ -123,7 +150,7 @@
           <div class="readiness-row" role="row"><strong role="cell">장애 대응</strong><span role="cell"><a href="operations/incident-response.md">SEV·역할·대응 기준</a></span><span role="cell">호출 체계·훈련·사후 검토 근거</span><span role="cell" class="badge badge-partial">실행 미검증</span></div>
           <div class="readiness-row" role="row"><strong role="cell">복구</strong><span role="cell"><a href="operations/backup-restore.md">RPO/RTO·불변 백업 기준</a></span><span role="cell">자동 백업·복원 리허설·삭제 내성</span><span role="cell" class="badge badge-risk">통제 미구현</span></div>
           <div class="readiness-row" role="row"><strong role="cell">유지보수</strong><span role="cell"><a href="operations/security-maintenance.md">보안·의존성 기준</a></span><span role="cell">지원 버전·SBOM·취약점·감사 로그</span><span role="cell" class="badge badge-risk">전환 필요</span></div>
-          <div class="readiness-row" role="row"><strong role="cell">릴리스</strong><span role="cell"><a href="operations/release-rollback.md">Graphite·릴리스 기준</a></span><span role="cell">CI·신뢰된 빌드·서명·롤백 실행</span><span role="cell" class="badge badge-risk">자동화 미구현</span></div>
+          <div class="readiness-row" role="row"><strong role="cell">릴리스</strong><span role="cell"><a href="operations/release-rollback.md">릴리스·롤백 기준</a></span><span role="cell">CI·신뢰된 빌드·서명·롤백 실행</span><span role="cell" class="badge badge-risk">자동화 미구현</span></div>
         </div>
         <div class="maintenance-grid"><article class="panel"><p class="eyebrow">Maintenance queue</p><h2>기술 부채를 기능처럼 관리</h2><ul><li>.NET 5 지원 종료와 이전 목표 버전</li><li>직접·전이 의존성, 라이선스, 알려진 취약점</li><li>원작 자산의 출처·권리·변환 재현성</li><li>삭제·마이그레이션·호환 중단 결정 기록</li></ul></article><article class="panel"><p class="eyebrow">Activation gate</p><h2>언제 실시간 화면을 붙일까</h2><p>공개 테스트 서버가 생기면 로그인·월드 입장·이동·전투에 trace를 연결하고, 사용자 관점 SLI와 알림을 이 화면에 붙입니다. 지금은 허위 숫자 대신 <strong>미계측</strong>으로 둡니다.</p></article></div>
         <aside class="notice"><strong>운영 준비도는 아직 낮습니다.</strong><p>현재는 실행·연동 검증 단계입니다. <a href="operations/service-readiness.md">서비스 준비도 게이트</a>에서 공개 테스트 금지 조건과 단계별 판정 근거를 확인할 수 있습니다.</p></aside>
@@ -136,7 +163,7 @@
           <div class="game-preview" id="inline-game-preview" data-screen="login">
             <img class="world-art" src="ui/assets/world-safehouse.png" alt="원작 자산으로 구성한 게임 월드 배경">
             <div class="world-hud" aria-hidden="true"><span>HP 100</span><span>MP 80</span><i></i><b>공격</b></div>
-            <div id="screen-layer-login" class="screen-layer login-layer" role="tabpanel" aria-labelledby="screen-tab-login" data-screen-layer="login"><div class="demo-window"><small>DARK AGES</small><strong>어둠의 전설</strong><label>아이디<input type="text" value="test" readonly></label><button type="button">로그인</button></div></div>
+            <div id="screen-layer-login" class="screen-layer login-layer" role="tabpanel" aria-labelledby="screen-tab-login" data-screen-layer="login"><div class="demo-window"><small>DARK AGES</small><strong>어둠의 전설</strong><label for="demo-login-id">아이디</label><input id="demo-login-id" type="text" value="test" readonly><button type="button">로그인</button></div></div>
             <div id="screen-layer-character" class="screen-layer" role="tabpanel" aria-labelledby="screen-tab-character" data-screen-layer="character" hidden><div class="demo-window"><small>CHARACTER</small><strong>테스트 캐릭터</strong><p>레벨 1 · 밀레스 여관</p><button type="button">게임 입장</button></div></div>
             <div id="screen-layer-world" class="screen-layer screen-caption" role="tabpanel" aria-labelledby="screen-tab-world" data-screen-layer="world" hidden><strong>기본 게임</strong><span>맵·캐릭터·이동 패킷 연동 화면</span></div>
             <div id="screen-layer-npc" class="screen-layer" role="tabpanel" aria-labelledby="screen-tab-npc" data-screen-layer="npc" hidden><div class="dialogue-box"><strong>여관 주인</strong><p>어서 오세요. 무엇을 도와드릴까요?</p><button type="button">대화 계속</button></div></div>
