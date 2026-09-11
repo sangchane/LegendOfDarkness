@@ -6,15 +6,19 @@
     Every picture under mobile/client/assets comes from here, so nothing is hand-edited and nothing is
     carried in from a restored copy made elsewhere. Re-run after changing tools/dat-extract.
 
+    The archives are the submodule's own, not the sources/Dark-Ages-Private-Server-master/ copy that used
+    to be read here: that copy is in .gitignore, so on any other machine this script had nothing to read.
+    Six of the nine archives are byte-identical between the two; hades, roh and setoa are not, and the
+    submodule's are the larger ones. Everything this script draws comes out byte-identical either way —
+    docs/where-the-answers-are.md 4절.
+
     The frame layout these sheets rely on — two drawings per action, the other two directions mirrored —
     is written down in docs/original-sprite-animation.md.
 #>
 [CmdletBinding()]
 param(
-    [string] $Game = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/game",
-    [string] $Maps = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/database/server/maps",
-    [string] $Archives = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/database/archives",
-    [string] $Items = "$PSScriptRoot/../sources/Dark-Ages-Private-Server-master/database/server/templates/items",
+    [string] $Archives = "$PSScriptRoot/../sources/wren11/Dark-Ages-Private-Server/database/archives",
+    [string] $Server = "$PSScriptRoot/../sources/wren11/Dark-Ages-Private-Server/database/server",
     [string] $Output = "$PSScriptRoot/../mobile/client/assets"
 )
 
@@ -42,7 +46,7 @@ function Invoke-Extract {
 New-Item -ItemType Directory -Force -Path "$Output/world", "$Output/actor" | Out-Null
 
 Write-Output 'Drawing the safe house floor...'
-Invoke-Extract @('map', "$Game/seo.dat", "$Maps/lod1.map", '30', '31', "$Output/world/safehouse.png")
+Invoke-Extract @('map', "$Archives/seo/seo.dat", "$Server/maps/lod1.map", '30', '31', "$Output/world/safehouse.png")
 
 # Every figure and every piece is cut on the same cell, wide enough for a weapon held out to the side.
 # A piece that does not fit stops the run rather than being quietly clipped.
@@ -50,9 +54,9 @@ $cell = '80x88'
 
 Write-Output 'Stacking the wardrobe into figures...'
 # Body, then what it wears, then what it wears on its head — the order the original draws them in.
-Invoke-Extract @('pose', "$Game/khan.dat", 'mb00101,mi00101,MH28501', "$Output/actor/hero-walk.png", '0,1,2,3,4,5,6,7,8,9', '1', $cell)
-Invoke-Extract @('pose', "$Game/khan.dat", 'mb00102,mi00102,MH28502', "$Output/actor/hero-attack.png", '0,1,2,3', '1', $cell)
-Invoke-Extract @('pose', "$Game/khan.dat", 'mb00101,MU06101,MH28501', "$Output/actor/npc-walk.png", '0,1,2,3,4,5,6,7,8,9', '1', $cell)
+Invoke-Extract @('pose', "$Archives/khan/khan.dat", 'mb00101,mi00101,MH28501', "$Output/actor/hero-walk.png", '0,1,2,3,4,5,6,7,8,9', '1', $cell)
+Invoke-Extract @('pose', "$Archives/khan/khan.dat", 'mb00102,mi00102,MH28502', "$Output/actor/hero-attack.png", '0,1,2,3', '1', $cell)
+Invoke-Extract @('pose', "$Archives/khan/khan.dat", 'mb00101,MU06101,MH28501', "$Output/actor/npc-walk.png", '0,1,2,3,4,5,6,7,8,9', '1', $cell)
 
 Write-Output 'Cutting the wardrobe into single pieces...'
 # One file per piece, so the client can dress each person in whatever the server says they are wearing.
@@ -70,7 +74,7 @@ New-Item -ItemType Directory -Force -Path "$Output/actor/parts" | Out-Null
 $ErrorActionPreference = 'Continue'
 
 foreach ($gender in @('m', 'w')) {
-    $archive = if ($gender -eq 'm') { "$Game/khan.dat" } else { "$Game/khan2.dat" }
+    $archive = if ($gender -eq 'm') { "$Archives/khan/khan.dat" } else { "$Archives/khan2/khan2.dat" }
 
     foreach ($piece in $wardrobe) {
         $name = "$gender$piece"
@@ -104,18 +108,24 @@ Copy-Item "$PSScriptRoot/../data/legend-tables/color0.tbl" "$Output/actor/parts/
 Write-Output 'Drawing a creature...'
 # 'transparent' rather than the Korean spelling: an argument in Hangul does not survive PowerShell's
 # hand-off to a native executable on this machine, and the sheet comes out with its background filled in.
-Invoke-Extract @('mpf', "$Game/hades.dat", 'MNS001.MPF', "$Output/actor/wasp.png", '1', 'transparent')
+Invoke-Extract @('mpf', "$Archives/hades/hades.dat", 'MNS001.MPF', "$Output/actor/wasp.png", '1', 'transparent')
 
 # 같은 그림을 서버가 부르는 번호로도 둔다. 서버는 16385 라고 하고, 그림은 MNS001 이다 — 0x4000 을 뺀다.
 New-Item -ItemType Directory -Force -Path "$Output/actor/creature" | Out-Null
-Invoke-Extract @('mpf', "$Game/hades.dat", 'MNS001.MPF', "$Output/actor/creature/mns001.png", '1', 'transparent')
+Invoke-Extract @('mpf', "$Archives/hades/hades.dat", 'MNS001.MPF', "$Output/actor/creature/mns001.png", '1', 'transparent')
+
+Write-Output 'Drawing the empty equipment places...'
+# 원작 신형 장비창의 빈 칸 그림 열넷. 'tight': 칸 사이를 띄우지 않아야 클라이언트가 frame*32 로 자른다.
+# 어느 자리가 어느 칸을 쓰는지는 GearLayout 이 안다 (원작 _nui_eq.txt 가 자리마다 적어 둔 번호).
+New-Item -ItemType Directory -Force -Path "$Output/ui" | Out-Null
+Invoke-Extract @('spf', "$Archives/setoa/setoa.dat", '_nui_eqi', "$Output/ui/gear-slots.png", '14', '1', 'tight')
 
 Write-Output 'Drawing item icons...'
 # 서버는 아이템마다 DisplayImage 한 개를 준다. 0x8000 을 빼면 1부터 세는 칸 번호이고,
 # 그 칸은 Legend.dat 의 item###.epf 안에 있다 (한 파일에 266칸). 서버가 가진 템플릿만 뽑는다.
 New-Item -ItemType Directory -Force -Path "$Output/item" | Out-Null
 
-Get-ChildItem -Path $Items -Filter *.json | ForEach-Object {
+Get-ChildItem -Path "$Server/templates/items" -Filter *.json | ForEach-Object {
     $display = (Get-Content $_.FullName -Raw | ConvertFrom-Json).DisplayImage
 
     if (-not $display) {

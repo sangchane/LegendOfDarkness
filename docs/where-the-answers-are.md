@@ -59,6 +59,13 @@
 (원작은 2바이트), 장신구 색·장신구 셋째·도포 색·몸 색·투명·얼굴형·무리 이름을 아예 안 보낸다.
 원작 형식으로 읽으면 자리가 어긋난다. **우리 클라이언트는 Hades 기준으로 맞춘다.**
 
+**`.dat` 이 두 벌 있고 서로 다르다.** 같은 이름의 아카이브가 두 곳에 있다 —
+`sources/wren11/Dark-Ages-Private-Server/database/archives/`(저장소 안, 커밋돼 있다)와
+`sources/Dark-Ages-Private-Server-master/`(`.gitignore`, 로컬에만 있다). **다른 클라이언트 빌드다.**
+`setoa.dat` 은 731 대 733 항목이고 `gui00.pal` 의 내용이 서로 다르다 — gitignore된 쪽 색표로 구형
+장비창을 그리면 노이즈가 된다. **저장소 안의 것을 써라.** 다른 PC에서 되는 쪽도 그쪽뿐이다.
+(`scripts/build-client-assets.ps1` 의 기본 경로는 아직 gitignore된 쪽을 가리킨다.)
+
 **`sources/FallenDev/DAGL` 은 근거로 쓰지 않는다.** 7.41 클라이언트를 옮긴 것처럼 보이지만
 README 가 스스로 AI 로 대량 생성한 것이라고 밝히고 있고, 실제로 사람 그리는 코드에 무기가 없다.
 이름만 그럴듯한 파일이 많다.

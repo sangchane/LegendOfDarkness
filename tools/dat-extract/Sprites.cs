@@ -143,16 +143,21 @@ internal static class Sprites
         }
     }
 
-    /// <summary>Lays frames out in a grid on a dark ground and scales the result so it is legible on screen.</summary>
+    /// <summary>
+    /// Lays frames out in a grid on a dark ground and scales the result so it is legible on screen. The
+    /// gap between cells is there so a person can tell them apart; a sheet the client slices by
+    /// <c>frame * cellWidth</c> asks for none, and then every cell is exactly the frame.
+    /// </summary>
     public static async Task Save(
         string output,
         List<(byte[] Data, int Width, int Height, Palette Palette)> cells,
         int columns,
         int zoom,
-        bool transparent = false)
+        bool transparent = false,
+        int padding = 4)
     {
-        int cellWidth = cells.Max(cell => cell.Width) + 4;
-        int cellHeight = cells.Max(cell => cell.Height) + 4;
+        int cellWidth = cells.Max(cell => cell.Width) + padding;
+        int cellHeight = cells.Max(cell => cell.Height) + padding;
         int rows = (int)Math.Ceiling(cells.Count / (double)columns);
 
         using Image<Rgba32> sheet = new(columns * cellWidth, rows * cellHeight);
@@ -165,7 +170,7 @@ internal static class Sprites
         {
             (byte[] data, int width, int height, Palette palette) = cells[index];
             int originX = ((index % columns) * cellWidth) + ((cellWidth - width) / 2);
-            int originY = ((index / columns) * cellHeight) + cellHeight - 2 - height;
+            int originY = ((index / columns) * cellHeight) + cellHeight - (padding / 2) - height;
 
             Blit(sheet, data, width, height, palette, originX, originY);
         }

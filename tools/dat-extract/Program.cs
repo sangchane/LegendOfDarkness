@@ -73,6 +73,7 @@ internal static class Program
             "map" => await RenderMap(entries, args),
             "sprite" => await RenderSprite(entries, args),
             "epf" => await RenderEpf(entries, args),
+            "spf" => await RenderSpf(entries, args),
             "mpf" => await RenderMpf(entries, args),
             "pose" => await RenderPose(entries, args),
             "icon" => await RenderIcon(entries, args),
@@ -403,8 +404,16 @@ internal static class Program
         int columns = args.Length > 4 ? int.Parse(args[4]) : 12;
         int zoom = args.Length > 5 ? int.Parse(args[5]) : 3;
 
-        // khan2.dat carries the women's pieces but no palettes of its own; they live in khan.dat.
-        List<ArchivedItem> palettes = args.Length > 6 ? await ReadEntries(Path.GetFullPath(args[6])) : entries;
+        // khan2.dat carries the women's pieces but no palettes of its own; they live in khan.dat. Interface
+        // art has no slot table to look a palette up in, so there the same argument names one outright.
+        string? named = args.Length > 6 && args[6].EndsWith(".pal", StringComparison.OrdinalIgnoreCase)
+            ? args[6]
+            : null;
+
+        List<ArchivedItem> palettes = args.Length > 6 && named is null
+            ? await ReadEntries(Path.GetFullPath(args[6]))
+            : entries;
+
         bool female = Path.GetFileName(args[1]).StartsWith("khan2", StringComparison.OrdinalIgnoreCase);
 
         string[] wanted = filter.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -425,8 +434,15 @@ internal static class Program
 
         foreach (ArchivedItem item in chosen)
         {
-            Palette palette = Sprites.ForWardrobe(palettes, item.Name, female)
-                              ?? Sprites.Named(palettes, "palb000.pal")!;
+            Palette? palette = named is not null
+                ? Sprites.Named(palettes, named)
+                : Sprites.ForWardrobe(palettes, item.Name, female) ?? Sprites.Named(palettes, "palb000.pal");
+
+            if (palette is null)
+            {
+                Console.Error.WriteLine($"{item.Name} 의 색표를 찾지 못했습니다. 색표 이름을 일곱째 인자로 주세요.");
+                return 2;
+            }
 
             Epf.Sheet sheet = Epf.Read(item.Data);
             List<Epf.Frame> frames = sheet.Frames;
@@ -445,6 +461,57 @@ internal static class Program
         }
 
         await Sprites.Save(output, cells, columns, zoom);
+        Console.WriteLine($"{chosen.Count}개 파일 · 프레임 {cells.Count}개를 {output} 에 그렸습니다.");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Draws SPF pictures. An SPF brings its own palette, so unlike <c>epf</c> this needs nothing else —
+    /// which is the whole reason the newer interface art is kept in that format.
+    /// </summary>
+    private static async Task<int> RenderSpf(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("spf 에는 이름 조각과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string filter = args[2];
+        string output = Path.GetFullPath(args[3]);
+        int columns = args.Length > 4 ? int.Parse(args[4]) : 1;
+        int zoom = args.Length > 5 ? int.Parse(args[5]) : 1;
+
+        // 'tight': no gap between cells, so the client can slice the sheet by frame * width.
+        bool tight = args.Length > 6 && args[6].Equals("tight", StringComparison.OrdinalIgnoreCase);
+
+        List<ArchivedItem> chosen = entries
+            .Where(entry => entry.Name.EndsWith(".spf", StringComparison.OrdinalIgnoreCase)
+                         && entry.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (chosen.Count == 0)
+        {
+            Console.Error.WriteLine($"{filter} 에 맞는 .spf 가 없습니다.");
+            return 2;
+        }
+
+        List<(byte[] Data, int Width, int Height, Palette Palette)> cells = [];
+
+        foreach (ArchivedItem item in chosen)
+        {
+            Spf.Sheet sheet = Spf.Read(item.Data);
+            Console.WriteLine($"  {item.Name}: 프레임 {sheet.Frames.Count}개");
+
+            foreach (Spf.Frame frame in sheet.Frames)
+            {
+                cells.Add((frame.Data, frame.Width, frame.Height, sheet.Palette));
+            }
+        }
+
+        await Sprites.Save(output, cells, columns, zoom, transparent: true, padding: tight ? 0 : 4);
         Console.WriteLine($"{chosen.Count}개 파일 · 프레임 {cells.Count}개를 {output} 에 그렸습니다.");
 
         return 0;
