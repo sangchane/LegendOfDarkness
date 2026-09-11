@@ -28,7 +28,7 @@ internal static class Program
         {
             Console.Error.WriteLine("사용법: dat-extract list <아카이브.dat>");
             Console.Error.WriteLine("        dat-extract dump <아카이브.dat> <출력 폴더> [이름 조각]");
-            Console.Error.WriteLine("        dat-extract tiles <seo.dat> <출력.png> <시작> <개수> [가로칸]");
+            Console.Error.WriteLine("        dat-extract tiles <seo.dat> <출력.png> <시작> <개수> [가로칸] [눈|snow]");
             Console.Error.WriteLine("        dat-extract map <seo.dat> <맵파일.map> <가로칸> <세로칸> <출력.png> [잘라낼 x y 폭 높이]");
             Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
             Console.Error.WriteLine("        dat-extract list <아카이브.dat> [이름조각]");
@@ -174,12 +174,19 @@ internal static class Program
         const int tileWidth = 56;
         const int tileHeight = 27;
 
+        // TILEAS is the same tile set in snow — the S is for snow, not for anything structural. The map
+        // editor picks between the two exactly this way. Both hold fixed 56x27 cells.
+        bool snow = args.Any(word =>
+            word.Equals("눈", StringComparison.Ordinal) || word.Equals("snow", StringComparison.OrdinalIgnoreCase));
+
+        string wanted = snow ? "TILEAS.BMP" : "TILEA.BMP";
+
         ArchivedItem? tileSet = entries.FirstOrDefault(entry =>
-            entry.Name.Equals("TILEA.BMP", StringComparison.OrdinalIgnoreCase));
+            entry.Name.Equals(wanted, StringComparison.OrdinalIgnoreCase));
 
         if (tileSet is null)
         {
-            Console.Error.WriteLine("TILEA.BMP 를 찾지 못했습니다.");
+            Console.Error.WriteLine($"{wanted} 를 찾지 못했습니다.");
             return 2;
         }
 
@@ -201,7 +208,7 @@ internal static class Program
         string output = Path.GetFullPath(args[2]);
         int start = int.Parse(args[3]);
         int count = Math.Min(int.Parse(args[4]), tiles.Count - start);
-        int columns = args.Length > 5 ? int.Parse(args[5]) : 16;
+        int columns = args.Length > 5 && int.TryParse(args[5], out int given) ? given : 16;
         int rows = (int)Math.Ceiling(count / (double)columns);
 
         using Image<Rgba32> sheet = new(columns * tileWidth, rows * tileHeight);
