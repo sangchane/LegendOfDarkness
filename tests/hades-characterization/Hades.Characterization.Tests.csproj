@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <!-- The server's own cipher is the oracle; its 9x256 substitution tables must not be retyped here. -->
-    <HadesServerAssembly>$(MSBuildThisFileDirectory)../../sources/wren11/Dark-Ages-Private-Server/Staging/net5.0/Darkages.dll</HadesServerAssembly>
+    <HadesServerAssembly>$(MSBuildThisFileDirectory)../../sources/wren11/Dark-Ages-Private-Server/Staging/net9.0/Darkages.dll</HadesServerAssembly>
   </PropertyGroup>
 
   <Target Name="RequireBuiltHadesServer" BeforeTargets="ResolveAssemblyReferences">

@@ -19,7 +19,7 @@ public static class HadesWorkspace
         Path.Combine(RepositoryRoot, "sources", "wren11", "Dark-Ages-Private-Server");
 
     /// <summary>Build output of <c>dotnet build src/Hades.sln -c Debug</c>.</summary>
-    public static string StagingDirectory { get; } = Path.Combine(HadesRoot, "Staging", "net5.0");
+    public static string StagingDirectory { get; } = Path.Combine(HadesRoot, "Staging", "net9.0");
 
     /// <summary>Server content the running server rewrites in place, so tests only ever use a copy.</summary>
     public static string ServerDataDirectory { get; } = Path.Combine(HadesRoot, "database", "server");
