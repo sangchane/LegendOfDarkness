@@ -25,6 +25,12 @@ public partial class Main : Control
     /// <summary>Where the login server is, unless --server says otherwise.</summary>
     private const string DefaultServer = "127.0.0.1:2610";
 
+    // 실기기에서는 아이콘을 탭해 여는 것이 전부라 --server 를 넘길 방법이 없다. 그리고 거기서
+    // 127.0.0.1 은 기기 자신이라 아무것도 없다. 그래서 시험 중에 붙을 서버를 여기 적어 둔다.
+    // 데스크톱은 그대로 로컬이다 — 개발 중 띄우는 서버가 거기 있다.
+    // 시험용 값이므로 붙을 Mac·PC 가 바뀌면 이 줄을 고치고 다시 올린다.
+    private const string MobileTestServer = "192.168.0.8:2610";
+
     /// <summary>Logical size of a portrait screen. One unit is one dp here too.</summary>
     private static readonly Vector2I PortraitSize = new(360, 780);
 
@@ -268,14 +274,15 @@ public partial class Main : Control
     /// <summary>Reads <c>host:port</c>, falling back to the local server the run scripts start.</summary>
     private static void ReadServer(string value)
     {
-        string[] parts = (value.Length > 0 ? value : DefaultServer).Split(':');
+        string fallback = OS.HasFeature("mobile") ? MobileTestServer : DefaultServer;
+        string[] parts = (value.Length > 0 ? value : fallback).Split(':');
 
         if (parts.Length != 2
             || !System.Net.IPAddress.TryParse(parts[0], out System.Net.IPAddress? address)
             || !int.TryParse(parts[1], out int port))
         {
-            GD.PushWarning($"--server 를 읽을 수 없어 {DefaultServer} 을 씁니다: {value}");
-            parts = DefaultServer.Split(':');
+            GD.PushWarning($"--server 를 읽을 수 없어 {fallback} 을 씁니다: {value}");
+            parts = fallback.Split(':');
             address = System.Net.IPAddress.Parse(parts[0]);
             port = int.Parse(parts[1]);
         }
