@@ -9,6 +9,11 @@
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-11 — **Hades 서버가 Mac 에서 돈다.** 2610·2615 가 열리고 맵 4·아이템 3·괴물 3·워프 4·팝업 3·월드맵 1·국가 1·기술 1 이 실린다. fork 브랜치 `fix/run-on-macos`, 절차는 `docs/run-procedure.md` 0.5절.
+  - **막은 것은 둘뿐이었다.** .NET 5 는 Apple Silicon 런타임이 없어 서버 프로젝트 넷을 `net9.0` 으로 올렸다(Windows 전용 편집기·도구는 그대로 뒀다 — 서버를 돌리는 데 필요 없다). 그리고 .NET 6 이 `Enumerable.DistinctBy` 를 들여와 자체 구현과 이름이 겹쳤다 — 동작이 같으므로 자체 것을 걷어냈다.
+  - **진짜 문제는 경로 구분자였다.** 저장 경로가 전부 `\` 로 이어져 있다. Unix 에서 그것은 경로가 아니라 백슬래시가 든 파일 이름 하나다 — 서버가 `server\templates` 라는 **이름의** 폴더를 만들어 놓고 템플릿을 전부 0개로 보고했다. 오류는 없다. 열두 군데를 `/` 로 바꾸니 다 실렸다(Windows 의 .NET 은 `/` 를 그대로 받는다).
+  - **0개는 조용하다.** "Templates Loaded: 0" 이 열한 줄 찍히는데 그것이 유일한 신호다. 예전에 스크립트가 컴파일되지 않아 세계가 비었던 것과 같은 모양이다 — 비어 있음을 실패로 알리는 것이 없다.
+  - 남은 것: 아이패드에서 붙으려면 서버 주소를 바꿀 수 있어야 한다(`NEXT.md` [다음/클라이언트]). 그리고 서버가 실행 중에 `database/server/areas/*.json` 을 다시 쓴다 — 런타임 산출물이라 커밋하지 않았다.
 - 2026-09-11 — **클라이언트가 아이패드에서 떴다 — 로그인 화면까지.** 그전까지 기기에 올린 것은 스모크 껍데기뿐이었다.
   - **`EXPORT SUCCEEDED` 가 거짓말을 한다.** iOS 는 AOT 게시인데 ILC 의 트림·AOT 분석 경고가 수십 개 나온다 — 전부 GodotSharp 안이라 우리가 못 없앤다. 작업공간의 `TreatWarningsAsErrors` 가 그걸 오류로 올려 .NET 게시를 죽이고, **Godot 은 그 실패를 삼킨 채 .ipa 를 만든다**(C# 프레임워크가 빠진 채로). 서명·설치 다 되고 기기에서 엔진이 올라온 직후에 죽는다. 로그에 남는 것은 `Failed to build project. Check MSBuild panel for details.` 한 줄뿐이다. `LodClient.csproj` 가 iOS RID 일 때만 `IlcTreatWarningsAsErrors` 를 끈다 — 데스크톱은 엄격 그대로.
   - **크기로 확인하면 속는다.** C# 이 빠진 빌드와 제대로 된 빌드가 둘 다 23MB 였다. `unzip -l … | grep LodClient.framework` 로 봐야 한다. 스모크 앱과 나란히 놓고 `Frameworks/` 를 비교해서 찾았다.

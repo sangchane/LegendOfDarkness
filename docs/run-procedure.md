@@ -26,6 +26,35 @@
 
 ---
 
+## 0.5 macOS 에서 서버 돌리기 (2026-09-11 확인)
+
+이 문서 윗부분은 Windows PC 기준이다. **Mac(Apple M2, macOS 26.5)에서도 서버가 돈다** — 포트 2610·2615
+가 열리고 맵 4·아이템 3·괴물 3·워프 4·팝업 3·월드맵 1·국가 1·기술 1 이 실린다.
+
+.NET 5 는 Apple Silicon 런타임이 없어서 서버 프로젝트 넷을 `net9.0` 으로 올렸다. 그 김에 드러난 것이
+**모든 저장 경로가 `\` 로 이어져 있다는 것**이다 — Unix 에서 그것은 경로가 아니라 백슬래시가 든 파일
+이름 하나라서, 서버가 `server\templates` 라는 이름의 폴더를 만들어 놓고 템플릿을 0개로 보고한다.
+열두 군데를 `/` 로 바꿨다(Windows 의 .NET 은 `/` 를 그대로 받으므로 저쪽은 그대로 돈다).
+fork 브랜치 `fix/run-on-macos`.
+
+```bash
+export DOTNET_ROOT="$PWD/.tools/dotnet-9.0.317"; export PATH="$DOTNET_ROOT:$PATH"
+dotnet build sources/wren11/Dark-Ages-Private-Server/src/Lorule.GameServer/Lorule.GameServer.csproj
+# Staging/net9.0/LoruleConfig.json 의 절대경로 셋을 이 저장소 안으로 돌리고,
+# ServerIP 를 붙을 기기가 닿는 주소로 바꾼다(같은 Wi-Fi 면 Mac 의 LAN IP)
+cd sources/wren11/Dark-Ages-Private-Server/Staging/net9.0 && dotnet Lorule.GameServer.dll
+```
+
+**빌드하면 설정이 덮어써진다.** `LoruleConfig.json` 은 빌드 출력에 복사되므로 다시 고쳐야 한다.
+
+**서버가 실행 중에 `database/server/areas/*.json` 을 다시 쓴다.** 기록된 `FilePath` 의 구분자가 바뀐다 —
+런타임 산출물이지 소스가 아니고, 플랫폼을 오가면 왔다 갔다 한다.
+
+**아직 아이패드에서 붙지는 못한다.** 클라이언트 기본 주소가 `127.0.0.1` 인데 실기기에서는 인자를 넘길
+방법이 없다(`NEXT.md` 의 [다음/클라이언트]).
+
+---
+
 ## 1. 필요한 개발 도구와 버전
 
 | 도구 | 필요한 것 | 근거 | 이 PC (2026-09-08 확인) | 판정 |
