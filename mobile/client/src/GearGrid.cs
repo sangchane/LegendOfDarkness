@@ -137,7 +137,7 @@ public sealed partial class GearGrid : Control
             return;
         }
 
-        _figure = new Actor(string.Empty, WorldView.Dress(who));
+        _figure = new Actor("PaperDoll", WorldView.Dress(who));
         _stage.AddChild(_figure);
 
         // 발이 무대 아래쪽에 닿게. 칸 높이가 원작 종이인형보다 커서 남는 만큼만 내린다.

@@ -19,8 +19,8 @@ param(
 $ErrorActionPreference = 'Continue'
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 
-$godot = Resolve-Path $Godot
-$client = Resolve-Path "$PSScriptRoot/../mobile/client"
+$godot = Resolve-Path $Godot -ErrorAction Stop
+$client = Resolve-Path "$PSScriptRoot/../mobile/client" -ErrorAction Stop
 
 # 시안이 정한 두 기준, 그리고 그 양옆 — 16:9 에서 20:9 까지.
 $screens = @(
@@ -43,14 +43,19 @@ foreach ($screen in $screens) {
         if ($pack) { $arguments += '--pack' }
 
         $output = & $godot @arguments 2>&1
+        $godotExit = $LASTEXITCODE
         $bad = $output | Select-String 'GREYBOX_LAYOUT_BAD'
+        $completed = $output | Select-String '^GREYBOX_LAYOUT_OK$'
         $runtimeErrors = $output |
-            Select-String '^ERROR:' |
+            Select-String '^(ERROR|SCRIPT ERROR):' |
             Where-Object { $_.Line -notmatch 'were leaked at exit' }
+        $executionFailed = $godotExit -ne 0 -or -not $completed
 
-        if ($bad -or $runtimeErrors) {
+        if ($bad -or $runtimeErrors -or $executionFailed) {
             $failed++
             Write-Output "실패  $label"
+            if ($godotExit -ne 0) { Write-Output "      Godot exit code: $godotExit" }
+            if (-not $completed) { Write-Output '      GREYBOX_LAYOUT_OK missing' }
             $bad | ForEach-Object { Write-Output "      $_" }
             $runtimeErrors | ForEach-Object { Write-Output "      $_" }
             $output | Select-String 'GREYBOX_LAYOUT ' | ForEach-Object { Write-Output "      $_" }
