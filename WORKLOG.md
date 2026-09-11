@@ -9,6 +9,10 @@
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-11 — **실기기에서 떴다. Mac·iOS 게이트를 닫는다.** iPad 9세대(iPad12,2, iPadOS 26.5.2)에 설치해 실행까지 확인했다. `UIDeviceFamily [1,2]` 라 iPhone·iPad 둘 다 받는다.
+  - **Godot 의 iOS export 는 기기를 등록하지 못한다.** `xcodebuild` 를 부르면서 `-allowProvisioningDeviceRegistration` 을 주지 않아, 프로파일에 없는 기기는 설치에서 `0xe8008012` 로 막힌다 — **다시 export 해도 소용없다.** 같은 프로파일을 계속 쓰기 때문이다. 생성된 `.xcodeproj` 를 그 플래그와 함께 **한 번** 직접 빌드하면 프로파일이 그 기기로 다시 발급되고, DerivedData 의 `.app` 을 `xcrun devicectl device install app` 으로 넣으면 된다.
+  - **확인은 프로파일을 직접 읽어서 한다** — `security cms -D -i <app>/embedded.mobileprovision` 의 `ProvisionedDevices` 에 UDID 가 있는지. 막혔을 때 이걸 먼저 봤어야 했다. 서명 오류가 사실 하나로 바뀐다.
+  - 잔 함정 둘. 개발자 모드는 **재시동 뒤 잠금 해제할 때 뜨는 알림까지 수락해야** 켜진다. 그리고 `Failed to allocate RSD device` 는 케이블이 아니라 맥의 CoreDevice 계층이다 — Xcode 를 한 번 열자 풀렸다.
 - 2026-09-11 — **서명된 arm64 .ipa 가 나왔다.** 실기기 설치만 남았다. 게이트는 `experiments/godot-csharp-mobile-smoke` 이고 결과는 그 README.
   - Godot 4.6 Mono · .NET 9.0.317 · `4.6.stable.mono` export templates · Xcode 26.5(iOS 26.5 SDK)로 31MB `MobileSmoke.ipa`. arm64, `iPhoneOS`, Apple Development 서명, 팀 프로비저닝 프로파일 자동 발급. `--import`·`--build-solutions`·`dotnet_publish_project`·`generate_xcframework`·xcodebuild archive/export 전부 headless 로 통과했다.
   - **Xcode 는 처음부터 있었다.** `xcodebuild` 가 "requires Xcode" 라고 거부하길래 없는 줄 알았는데, `xcode-select` 가 Command Line Tools 를 가리키고 있었을 뿐이다. `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer` 면 sudo 없이 쓴다.

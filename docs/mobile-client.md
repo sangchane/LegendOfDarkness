@@ -112,7 +112,7 @@ GODOT="$PWD/.tools/godot-4.6-mono/Godot_mono.app/Contents/MacOS/Godot"   # 4.6-s
 **iOS 는 .ipa 까지 됐다**(2026-09-11). Xcode 26.5 · iOS 26.5 SDK 가 이 Mac 에 이미 있었다 — `xcode-select` 가
 Command Line Tools 를 가리켜 `xcodebuild` 가 거부했을 뿐이라, `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`
 를 주면 sudo 없이 쓴다. 게이트 프로젝트와 결과는 `experiments/godot-csharp-mobile-smoke/README.md`.
-**남은 것은 실기기 설치뿐이고 iPhone 을 꽂아야 한다.**
+**실기기에서도 떴다** — iPad 9세대(iPad12,2, iPadOS 26.5.2)에서 실행 확인했다(2026-09-11).
 
 ### 화면이 들어맞는지
 

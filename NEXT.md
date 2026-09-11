@@ -7,7 +7,6 @@
 - **[다음/서버]** **전역 잠금 범위 줄이기.** 읽지 않는 클라이언트 하나가 다른 클라이언트를 30초 넘게 굶기는 것이 세 번에 한 번꼴로 재현된다(계획서 2.3절 "관측된 한계"). P0 범위 밖이라 남겨 뒀다 — 지인 테스트에서 사람이 몇 명 붙는지 보고 우선순위를 정한다
 - **[다음/자산]** 벽 타일(`TILEAS.BMP`는 고정 크기 아님)
 - **[다음/도구]** `tools/` 에는 시험 프로젝트가 없다. `IconPalettes.PaletteFor`(세 갈래 파싱)와 `icon` 명령의 칸 계산은 지금 눈으로만 확인했다 — 도구 시험 자리를 만들 때 여기부터 덮는다
-- **[대기/Mac]** **macOS 실행도, 서명된 arm64 .ipa 도 됐다**(2026-09-11). 남은 것은 **실기기 설치 하나뿐** — iPhone 을 꽂고 `MobileSmoke.ipa` 를 올려 `MOBILE_SMOKE_OK` 를 확인한다. 절차는 `experiments/godot-csharp-mobile-smoke/README.md`, Mac 쪽 도구는 `docs/mobile-client.md` 3절
 
 <!-- NEXT-ACTION:END -->
 
