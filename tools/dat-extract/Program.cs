@@ -190,6 +190,26 @@ internal static class Program
             return 2;
         }
 
+        // The palette table numbers tiles across both sets appended together — da-lib's Tileset docs say so
+        // outright ("Ensure the tile ids you add to the PaletteTable are based on appending to the existing
+        // tileset"). So a snow tile's palette is looked up at TILEA's count plus its own index; asking at
+        // its own index alone lands in TILEA's rows and paints some of them from the wrong palette.
+        int paletteOffset = 0;
+
+        if (snow)
+        {
+            ArchivedItem? plain = entries.FirstOrDefault(entry =>
+                entry.Name.Equals("TILEA.BMP", StringComparison.OrdinalIgnoreCase));
+
+            if (plain is null)
+            {
+                Console.Error.WriteLine("TILEA.BMP 가 없어 눈 타일의 팔레트 번호를 셀 수 없습니다.");
+                return 2;
+            }
+
+            paletteOffset = plain.Data.Length / (tileWidth * tileHeight);
+        }
+
         List<Tile> tiles = new TileCollection(tileSet).Load();
         List<Palette> palettes = Palette.FromArchive(
             entries.Where(e => e.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase)
@@ -216,7 +236,7 @@ internal static class Program
         for (int offset = 0; offset < count; offset++)
         {
             int index = start + offset;
-            Palette palette = PaletteFor(index, tables, palettes);
+            Palette palette = PaletteFor(index + paletteOffset, tables, palettes);
             byte[] data = tiles[index].Data;
             int originX = (offset % columns) * tileWidth;
             int originY = (offset / columns) * tileHeight;
