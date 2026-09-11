@@ -28,11 +28,11 @@ VAULT_ROOT = ROOT / "data" / "server-packs" / "vault"
 # 폴더이름 -> (json 파일, 사람이 읽을 이름)
 CATS = [("맵", "maps"), ("괴물", "mobs"), ("아이템", "items"), ("NPC", "npcs"),
         ("마법", "spells"), ("기술", "skills"), ("상점", "shops"), ("스크립트", "scripts"),
-        ("퀘스트", "quests"), ("이벤트", "events")]
+        ("퀘스트", "quests"), ("이벤트", "events"), ("명령", "commands")]
 
 # 퀘스트와 이벤트는 생김새가 다르다. 퀘스트의 이름은 스크립트 변수 이름이고
 # (자료에 사람이 읽을 이름이 없다), 이벤트의 이름은 아이템을 담은 폴더 이름이다.
-NAME_KEY = {"quests": "변수", "events": "묶음"}
+NAME_KEY = {"quests": "변수", "events": "묶음", "commands": "이름"}
 
 # Obsidian 과 파일시스템이 싫어하는 글자. 이름 자체는 frontmatter 에 그대로 남긴다.
 BAD = re.compile(r'[\\/:*?"<>|\[\]#^]')
@@ -96,6 +96,16 @@ def build(pack):
         assert out.parent == VAULT_ROOT, out      # vault/<팩> 밖은 건드리지 않는다
         shutil.rmtree(out)
     data = {key: load(pack, key) for _, key in CATS}
+    # 명령은 실행파일에서 나온 둘을 합친 것이다: 표(이름·인자서명)와 기계어 증거.
+    cmd_tbl = load(pack, "script-commands")
+    ev = load(pack, "script-command-evidence")
+    if isinstance(cmd_tbl, dict) and isinstance(ev, dict):
+        evd = {r["이름"]: r for r in ev.get("명령", [])}
+        data["commands"] = [dict(c, 증거=evd.get(c["이름"], {}),
+                                 출처=ev.get("출처실행파일", ""))
+                            for c in cmd_tbl.get("명령", [])]
+    else:
+        data["commands"] = []
     for key, nk in NAME_KEY.items():
         for e in data.get(key, []):
             e["이름"] = e[nk]
@@ -134,6 +144,13 @@ def build(pack):
         for group in ("요구아이템", "회수아이템", "보상아이템"):
             for it, _cnt in q[group]:
                 item_quests[it].add(q["이름"])
+    known_cmds = {c["이름"] for c in data["commands"]}
+    script_cmds, cmd_scripts = defaultdict(set), defaultdict(set)
+    for sc in data["scripts"]:
+        for n in sc.get("부르는이름", []):
+            if n in known_cmds:
+                script_cmds[sc["이름"]].add(n)
+                cmd_scripts[n].add(sc["이름"])
     event_items = defaultdict(set)
     for ev in data["events"]:
         for it in ev["아이템"]:
@@ -148,6 +165,8 @@ def build(pack):
     referred["NPC"] |= set(npc_maps)
     referred["아이템"] |= set(item_shops) | set(item_quests) | set(event_items)
     referred["NPC"] |= set(npc_quests)
+    referred["명령"] |= set(cmd_scripts)
+    referred["스크립트"] |= set(script_cmds)
     # 어디서 불렸는지 거꾸로 찾아 둔다 — 정의 없는 쪽지에 적는다
     back = {cat: defaultdict(set) for cat, _ in CATS}
     for sc in data["scripts"]:
@@ -175,6 +194,9 @@ def build(pack):
     for it, ee in event_items.items():
         for e in ee:
             back["아이템"][it].add(("이벤트", e))
+    for c, ss in cmd_scripts.items():
+        for x in ss:
+            back["명령"][c].add(("스크립트", x))
     known = {cat: defined[cat] | referred[cat] for cat, _ in CATS}
     slugs = {cat: resolve_slugs(known[cat]) for cat, _ in CATS}
 
@@ -270,6 +292,32 @@ def build(pack):
                                  ", ".join(f"`{x}`" for x in q["정수아닌값"][:10]), ""]
                     body += [f"출처: " + ", ".join(f"`db/{x}`" for x in
                                                   (q.get("출처전체") or [q["출처"]])), ""]
+            elif cat == "명령":
+                c = entries[0] if entries else None
+                if c:
+                    e = c.get("증거") or {}
+                    head = [f"- 인자서명 `{c['인자서명']}`"
+                            + (f" (인자 {c['인자수']}개)" if c.get("인자수") is not None else "")]
+                    if e.get("함수주소"):
+                        head.append(f"- 함수 `{e['함수주소']}` · 명령어 {e.get('명령어수', '?')}개")
+                    body += head + [""]
+                    if e.get("참조문자열"):
+                        body += ["## 참조하는 문자열", ""] + \
+                                [f"> {t}" for t in e["참조문자열"][:8]] + [""]
+                    for label, key in (("이 명령만 쓰는 자리", "고유쓰기"),
+                                       ("이 명령만 읽는 자리", "고유읽기")):
+                        if e.get(key):
+                            body += [f"## {label}", ", ".join(f"`{o}`" for o in e[key][:10]), ""]
+                    if e.get("가르는helper"):
+                        body += ["## 갈래를 가르는 helper",
+                                 ", ".join(f"`{h}`" for h in e["가르는helper"][:10]), ""]
+                if cmd_scripts.get(name):
+                    ss = sorted(cmd_scripts[name])
+                    body += [f"## 이 명령을 쓰는 스크립트 ({len(ss)})",
+                             ", ".join(maybe("스크립트", x) for x in ss[:60])
+                             + (f" … 외 {len(ss)-60}" if len(ss) > 60 else ""), ""]
+                elif c:
+                    body += ["> 엔진에는 있지만 이 팩의 스크립트는 쓰지 않는다.", ""]
             elif cat == "이벤트":
                 ev = entries[0] if entries else None
                 if ev and ev["아이템"]:
@@ -286,18 +334,22 @@ def build(pack):
                         if names:
                             body += [f"## 부르는 {target} ({len(names)})",
                                      ", ".join(maybe(target, n) for n in names), ""]
+                    if script_cmds.get(name):
+                        cs = sorted(script_cmds[name])
+                        body += [f"## 쓰는 엔진 명령 ({len(cs)})",
+                                 ", ".join(maybe("명령", c) for c in cs), ""]
                     if e.get("머리말"):
                         body += [f"머리말: `{e['머리말']}`", ""]
                     body += [f"줄수: {e['줄수']}", ""]
 
             for e in entries:
-                if "fields" in e and cat not in ("퀘스트", "이벤트"):
+                if "fields" in e and cat not in ("퀘스트", "이벤트", "명령"):
                     t = field_table(e["fields"])
                     if t:
                         if len(entries) > 1:
                             body.append(f"### `{e['출처']}`")
                         body += [t, ""]
-            if entries and cat not in ("퀘스트", "이벤트"):
+            if entries and cat not in ("퀘스트", "이벤트", "명령"):
                 body += ["", f"원본: `db/{entries[0]['출처']}`"]
             (out / cat / f"{slugs[cat][name]}.md").write_text("\n".join(body), encoding="utf-8")
             written += 1
@@ -317,7 +369,8 @@ def build(pack):
                f"- 상점 {len(data['shops'])}곳이 아이템 {len(item_shops)}종을 판다",
                f"- 함정 {len(traps)}개",
                f"- 퀘스트 {len(data['quests'])}종 — NPC {len(npc_quests)}명이 주고 아이템 {len(item_quests)}종이 걸린다",
-               f"- 이벤트 {len(data['events'])}묶음 — 아이템 {len(event_items)}종", "",
+               f"- 이벤트 {len(data['events'])}묶음 — 아이템 {len(event_items)}종",
+               f"- 엔진 명령 {len(data['commands'])}개 — 스크립트 {len(script_cmds)}개가 그중 {len(cmd_scripts)}개를 쓴다", "",
                "## 믿을 수 있는 만큼만", "",
                "칸 이름은 원본 db 에 적힌 그대로다. 뜻을 짐작해 붙인 이름은 없다.",
                "링크는 워프·젠·상점·스크립트 호출에서 그대로 나온 것이고, 이름이 자료에 없으면",

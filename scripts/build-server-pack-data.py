@@ -127,6 +127,21 @@ def parse_scripts(text):
     return out
 
 
+# 스크립트가 부르는 이름. @name·#name 은 변수지 명령이 아니고, 문자열·주석은 코드가 아니다.
+# classify-script-names.py 와 같은 잣대다 — 느슨하게 세면 if(@type1==3) 의 type1 까지 잡힌다.
+_N = r'[a-z_][a-z0-9_]{1,30}'
+CALL_PAREN = re.compile(rf'(?<![@#$\w]){_N}(?=\s*\()')
+CALL_STMT = re.compile(rf'(?:^|[;{{}}])\s*({_N})\s+(?=["@#\d\-])')
+
+
+def called_names(body):
+    code = re.sub(r'"[^"]*"', '""', body)
+    code = re.sub(r'//[^\n]*', '', code)
+    code = re.sub(r'/\*.*?\*/', '', code, flags=re.S)
+    return sorted(set(m.group(0) for m in CALL_PAREN.finditer(code))
+                  | set(CALL_STMT.findall(code)))
+
+
 CALLS = {
     "맵":     re.compile(r'\bwarp\s+"([^"]+)"'),
     "아이템": re.compile(r'\b(?:item_add|item_del|item_one_check)\s*[ (]\s*"([^"]+)"'),
@@ -196,7 +211,9 @@ def load_pack(db):
             for s in parse_scripts(text):
                 out["scripts"].append({"이름": s["이름"], "머리말": s["머리말"],
                                        "줄수": len(s["본문"].splitlines()),
-                                       "부름": script_calls(s["본문"]), "출처": src})
+                                       "부름": script_calls(s["본문"]),
+                                       "부르는이름": called_names(s["본문"]),
+                                       "출처": src})
 
     # 매니페스트가 가리키지 않는 db 최상위 표 — 혼든의 Learn_db / Trap_db
     for name, key in (("Learn_db.txt", "learns"), ("Trap_db.txt", "traps")):
@@ -233,8 +250,11 @@ def main():
         data = load_pack(pack / "db")
         outd = OUT_DIR / pack.name
         outd.mkdir(parents=True, exist_ok=True)
-        for stale in outd.glob("*.json"):        # 갈래 이름이 바뀌면 옛 파일이 남는다
-            if stale.stem not in data:
+        # 갈래 이름이 바뀌면 옛 파일이 남는다. 다만 지울 것은 **내가 쓴 것만** 이다 —
+        # 같은 폴더에 quests.json·script-commands.json 처럼 다른 스크립트의 산출물이 있다.
+        owned = set(KEYS) | {"manifests", "선언했지만_없는파일", "매니페스트에없는파일"}
+        for stale in outd.glob("*.json"):
+            if stale.stem in owned and stale.stem not in data:
                 stale.unlink()
         for k, v in data.items():
             (outd / f"{k}.json").write_text(

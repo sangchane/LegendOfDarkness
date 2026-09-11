@@ -107,6 +107,31 @@ def extraction_for(pack):
                 edge(a, node("아이템", it, src), rel, src)
         for m in q["워프"]:
             edge(a, node("맵", m, src), "보낸다", src)
+    # 엔진 명령 — 실행파일에서 나온 것. 스크립트가 쓰는 것으로 이어진다.
+    tbl = load(pack, "script-commands")
+    ev_d = load(pack, "script-command-evidence")
+    cmds = {c["이름"] for c in tbl["명령"]} if isinstance(tbl, dict) else set()
+    evd = {r["이름"]: r for r in ev_d["명령"]} if isinstance(ev_d, dict) else {}
+    exe = tbl.get("출처실행파일", "exe") if isinstance(tbl, dict) else "exe"
+    for c in sorted(cmds):
+        node("명령", c, exe)
+    for sc in load(pack, "scripts"):
+        a = node("스크립트", sc["이름"], sc["출처"])
+        for n in sc.get("부르는이름", []):
+            if n in cmds:
+                edge(a, node("명령", n, exe), "쓴다", sc["출처"])
+    # 같은 오류 문자열을 쓰는 명령끼리 — 하는 일이 닮았다는 자료의 증언
+    if isinstance(ev_d, dict):
+        for g in ev_d.get("같은문자열을쓰는무리", []):
+            t = node("문자열", g["문자열"][:40], exe)
+            for n in g["명령"]:
+                if n in cmds:
+                    edge(node("명령", n, exe), t, "같은말", exe)
+        for g in ev_d.get("같은자리에쓰는무리", []):
+            t = node("자리", g["쓰는자리"], exe)
+            for n in g["명령"]:
+                if n in cmds:
+                    edge(node("명령", n, exe), t, "같은자리", exe)
     for ev in load(pack, "events"):
         src = ev["출처"][0] if ev["출처"] else "events"
         a = node("이벤트", ev["묶음"], src)

@@ -264,6 +264,76 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "ability_exp_add",
+   "blessing_check",
+   "broadcast",
+   "case",
+   "char_disguise",
+   "del",
+   "exp_add",
+   "get_ability",
+   "get_ac",
+   "get_basemana2",
+   "get_basevita",
+   "get_basevita2",
+   "get_body",
+   "get_class",
+   "get_love",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "get_nation",
+   "get_sex",
+   "get_side",
+   "get_vita",
+   "get_wearitem_armor",
+   "get_wearitem_gaiter",
+   "get_wearitem_glove1",
+   "get_wearitem_glove2",
+   "get_wearitem_helmet",
+   "get_wearitem_weapon",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "item_add",
+   "item_add_term",
+   "item_del",
+   "item_exist",
+   "item_one_check",
+   "last_item",
+   "magic",
+   "magic_exist",
+   "menu",
+   "mes",
+   "message",
+   "money_add",
+   "motion",
+   "npc_look",
+   "rand2",
+   "save_user",
+   "set",
+   "set_body",
+   "set_hair",
+   "set_haircolor",
+   "set_sex",
+   "set_vital",
+   "set_ys",
+   "skill_add",
+   "skill_del",
+   "skill_exist",
+   "slot_skill_add",
+   "slot_skill_exist",
+   "spell_add",
+   "spell_del",
+   "spell_exist",
+   "switch",
+   "time",
+   "warp"
+  ],
   "출처": "script/ITEM/ITEM_SCRIPT.txt"
  },
  {
@@ -278,6 +348,29 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "del",
+   "get_guild_state",
+   "get_guild_title",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_user",
+   "get_xs",
+   "if",
+   "input",
+   "last_npc",
+   "menu",
+   "mes",
+   "rand2",
+   "set",
+   "set_user_title",
+   "set_xs",
+   "sleep",
+   "switch",
+   "warp"
+  ],
   "출처": "script/NPC/길드.txt"
  },
  {
@@ -310,6 +403,18 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_class",
+   "get_myid",
+   "get_sex",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
   "출처": "script/NPC/신전.txt"
  },
  {
@@ -385,6 +490,18 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_class",
+   "get_myid",
+   "get_sex",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
   "출처": "script/NPC/신전.txt"
  },
  {
@@ -421,6 +538,35 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "exp_add",
+   "get_ac",
+   "get_basevita2",
+   "get_class",
+   "get_class_sub",
+   "get_con",
+   "get_dex",
+   "get_int",
+   "get_myid",
+   "get_name",
+   "get_point",
+   "get_sex",
+   "get_str",
+   "get_wis",
+   "if",
+   "item_add",
+   "legend_add",
+   "menu",
+   "mes",
+   "message",
+   "save_user",
+   "set",
+   "set_class_sub",
+   "skill_add",
+   "spell_add"
+  ],
   "출처": "script/NPC/신전.txt"
  },
  {
@@ -443,6 +589,27 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_basevita",
+   "get_class",
+   "get_con",
+   "get_dex",
+   "get_int",
+   "get_myid",
+   "get_str",
+   "get_wis",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "last_npc",
+   "menu",
+   "mes",
+   "message",
+   "rand2",
+   "set"
+  ],
   "출처": "script/NPC/아만.txt"
  },
  {
@@ -460,6 +627,32 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_xs",
+   "get_ys",
+   "group_count",
+   "group_message",
+   "group_warp",
+   "if",
+   "item_del",
+   "item_exist",
+   "last_npc",
+   "localtime",
+   "map_objmob",
+   "menu",
+   "mes",
+   "message",
+   "mob_clear",
+   "mob_spawn4",
+   "money_del",
+   "set",
+   "sleep",
+   "warp"
+  ],
   "출처": "script/NPC/오렌.txt"
  },
  {
@@ -478,6 +671,25 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "del",
+   "get_money",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_one_check",
+   "last_item",
+   "last_npc",
+   "menu",
+   "mes",
+   "money_del",
+   "npc_look",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/NPC/용자의공원.txt"
  },
  {
@@ -495,6 +707,34 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "ability_exp_add",
+   "del",
+   "exp_add",
+   "get_ability",
+   "get_baseexp",
+   "get_mapname",
+   "get_myid",
+   "get_ys",
+   "group_message",
+   "group_warp",
+   "if",
+   "item_del",
+   "item_exist",
+   "last_npc",
+   "legend_add",
+   "menu",
+   "mes",
+   "message",
+   "mob_clear",
+   "mob_spawn4",
+   "npc_spawn",
+   "set",
+   "set_nation",
+   "set_ys",
+   "sleep",
+   "warp"
+  ],
   "출처": "script/NPC/타바리.txt"
  },
  {
@@ -508,6 +748,19 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "ability_exp_add",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_add_term",
+   "last_npc",
+   "localtime",
+   "menu",
+   "mes",
+   "message",
+   "set"
+  ],
   "출처": "script/NPC/파노.txt"
  },
  {
@@ -521,6 +774,18 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_class",
+   "get_int",
+   "get_myid",
+   "if",
+   "item_add",
+   "last_npc",
+   "localtime",
+   "menu",
+   "mes",
+   "set"
+  ],
   "출처": "script/QUEST/Quest_Script.txt"
  },
  {
@@ -546,6 +811,39 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "exp_add",
+   "get_level",
+   "get_mapname",
+   "get_mobxy",
+   "get_money",
+   "get_myid",
+   "get_revival_mob",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_count",
+   "group_val",
+   "group_warp",
+   "if",
+   "istype",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "last_npc",
+   "map_objmob",
+   "menu",
+   "mes",
+   "message",
+   "money_del",
+   "npc_look",
+   "object_del",
+   "set",
+   "set_ys",
+   "sleep",
+   "warp"
+  ],
   "출처": "script/QUEST/대평원던전퀘스트.txt"
  },
  {
@@ -557,6 +855,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "if",
+   "localtime",
+   "menu",
+   "mes",
+   "message",
+   "set"
+  ],
   "출처": "script/QUEST/일일퀘스트.txt"
  },
  {
@@ -624,6 +930,33 @@
     "엔도르퀸길목몬"
    ]
   },
+  "부르는이름": [
+   "del",
+   "get_ability",
+   "get_class",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_sex",
+   "get_wearitem_helmet",
+   "group_message",
+   "group_warp",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "last_item",
+   "last_say",
+   "legend_add",
+   "localtime",
+   "menu",
+   "mes",
+   "message",
+   "mob_clear",
+   "mob_spawn",
+   "npc_look",
+   "set"
+  ],
   "출처": "script/QUEST/진정한강자.txt"
  },
  {
@@ -817,6 +1150,23 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_ability",
+   "get_basemana2",
+   "get_basevita2",
+   "get_myid",
+   "get_son",
+   "get_trans",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "message",
+   "rand2",
+   "set",
+   "skill_exist",
+   "spell_exist"
+  ],
   "출처": "script/Trans_forms.txt"
  },
  {
@@ -828,6 +1178,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_side",
+   "if",
+   "item_exist",
+   "message",
+   "vendor_create"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -839,6 +1197,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_wearitem_weapon",
+   "if",
+   "item_exist",
+   "message",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -853,6 +1219,27 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "del",
+   "game_sound",
+   "get_myid",
+   "get_side",
+   "get_wearitem_weapon",
+   "get_xs",
+   "get_xy_block",
+   "get_ys",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "message",
+   "rand2",
+   "set",
+   "skill_delay",
+   "switch",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -864,6 +1251,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "attack_skill",
+   "get_myid"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -875,6 +1266,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "discovery_skill",
+   "get_myid"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -886,6 +1281,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "item_info"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -897,6 +1296,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -908,6 +1316,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -919,6 +1337,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -930,6 +1358,13 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "attack_skill",
+   "get_class",
+   "get_myid",
+   "if",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -943,6 +1378,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_mapname",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "message",
+   "money_del",
+   "set",
+   "time",
+   "warp"
+  ],
   "출처": "script/[Skill,Spell]/공통기술.txt"
  },
  {
@@ -954,6 +1402,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "motion",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -965,6 +1425,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "motion",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -976,6 +1448,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "trap_sensor"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -987,6 +1470,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "trap_sensor"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -998,6 +1492,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_class",
+   "get_critical",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "motion",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1009,6 +1518,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_class",
+   "get_critical",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "motion",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1020,6 +1544,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_critical",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1031,6 +1570,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1042,6 +1591,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_class",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_str",
+   "if",
+   "istype",
+   "motion",
+   "rand2",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1053,6 +1619,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_class",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_str",
+   "if",
+   "istype",
+   "motion",
+   "rand2",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1064,6 +1647,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_name1",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "rand2",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1075,6 +1676,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_name1",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "rand2",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1086,6 +1705,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "fkdlxmsld",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1097,6 +1726,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_gm",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1108,6 +1746,11 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "sense_item",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1119,6 +1762,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "sense_monster",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1130,6 +1777,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "sense_user"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1141,6 +1792,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "rand2",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1154,6 +1817,21 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "item_del",
+   "item_exist",
+   "magic",
+   "message",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1165,6 +1843,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "get_char_serial",
+   "get_front_char",
+   "get_mapname",
+   "get_mapname1",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_xs1",
+   "get_xy_block",
+   "get_ys",
+   "get_ys1",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1176,6 +1876,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1187,6 +1897,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "sensor"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1198,6 +1917,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_str",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1209,6 +1944,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_basevita",
+   "get_critical",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1220,6 +1970,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_critical",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1231,6 +1995,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1242,6 +2015,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_dex",
+   "get_map_pk",
+   "get_myid",
+   "get_name1",
+   "get_side",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "rand2",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1253,6 +2047,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1264,6 +2070,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_basevita2",
+   "get_gm",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mob_basevita",
+   "get_myid",
+   "get_name",
+   "get_name1",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "rand2",
+   "set",
+   "spell_target",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1275,6 +2102,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mobxs",
+   "get_mobxy",
+   "get_mobys",
+   "get_myid",
+   "if",
+   "istype",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1286,6 +2124,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_dex",
+   "get_map_pk",
+   "get_myid",
+   "get_name1",
+   "get_side",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "rand2",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1297,6 +2156,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1308,6 +2176,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1319,6 +2207,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/도적기술.txt"
  },
  {
@@ -1330,6 +2238,52 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_char_serial",
+   "get_class",
+   "get_critical",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_mobx",
+   "get_mobxs",
+   "get_mobxy",
+   "get_moby",
+   "get_mobys",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "get_xs",
+   "get_xs1",
+   "get_ys",
+   "get_ys1",
+   "group_exist",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "rand",
+   "rand2",
+   "set",
+   "set_manal",
+   "sokup_all_delay",
+   "spell_del2",
+   "spell_target",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/마법사/소환사.txt"
  },
  {
@@ -1341,6 +2295,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1352,6 +2321,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1363,6 +2347,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1374,6 +2373,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1385,6 +2399,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1396,6 +2430,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1407,6 +2444,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1418,6 +2467,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_gm",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "message",
+   "motion",
+   "rand",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1429,6 +2496,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_gm",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "message",
+   "motion",
+   "rand",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1440,6 +2524,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "magic_exist",
+   "message",
+   "motion",
+   "poison",
+   "rand",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1453,6 +2551,25 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "item_del",
+   "item_exist",
+   "magic_exist",
+   "message",
+   "motion",
+   "poison",
+   "rand",
+   "rand2",
+   "set_manal",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1464,6 +2581,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1475,6 +2612,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_basemana",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1486,6 +2639,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_basemana",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1497,6 +2666,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "set_manal",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1508,6 +2690,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "manal_del",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1519,6 +2720,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_critical",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1530,6 +2749,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mgc_damage",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1541,6 +2778,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mgc_damage",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1552,6 +2807,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mgc_damage",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1563,6 +2836,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "manal_del",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1574,6 +2866,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_int",
+   "get_mana",
+   "get_map_abilitys",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "set_manal"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1585,6 +2897,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "mob_strabismus",
+   "rand",
+   "set_strabismus",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1596,6 +2922,30 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "message1",
+   "set",
+   "set_manal"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1607,6 +2957,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1618,6 +2983,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1629,6 +3009,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1640,6 +3035,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1651,6 +3061,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1662,6 +3082,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "get_name1",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "magic_protection",
+   "message",
+   "motion",
+   "rand",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1673,6 +3114,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "motion",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1684,6 +3141,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "motion",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1695,6 +3168,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1706,6 +3188,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1717,6 +3208,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1728,6 +3228,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1739,6 +3252,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "motion",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/마법사기술.txt"
  },
  {
@@ -1750,6 +3279,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "alwhd",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1761,6 +3299,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message",
+   "rudtlsrhd"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1772,6 +3319,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_basevita",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1783,6 +3345,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "antimagic",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1794,6 +3364,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_con",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_wearitem_shield",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "poison",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1805,6 +3392,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_con",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_state",
+   "get_str",
+   "get_wearitem_shield",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1816,6 +3424,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_con",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_state",
+   "get_str",
+   "get_wearitem_shield",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1827,6 +3456,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_dex",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_state",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1838,6 +3489,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_char_serial",
+   "get_con",
+   "get_dex",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_state",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1849,6 +3520,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "get_char_serial",
+   "get_front_char",
+   "get_mapxs",
+   "get_mapys",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_xy_block",
+   "get_ys",
+   "if",
+   "istype",
+   "set_side",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1860,6 +3549,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_state",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1871,6 +3573,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_state",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1882,6 +3600,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "skill_delay",
+   "sosusin"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1893,6 +3619,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "mob_strabismus",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1904,6 +3641,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1915,6 +3667,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "immortal",
+   "manal_del",
+   "message",
+   "rand2"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1926,6 +3688,13 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1937,6 +3706,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "rand2",
+   "reply"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1948,6 +3728,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_state",
+   "if",
+   "istype",
+   "magic_protection",
+   "manal_del",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1959,6 +3754,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_state",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set_manal",
+   "set_vital",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1970,6 +3780,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "horrama2",
+   "if",
+   "manal_del",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1981,6 +3801,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_basemana",
+   "get_char_serial",
+   "get_critical",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -1992,6 +3831,29 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapxs",
+   "get_mapys",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_state",
+   "get_xs",
+   "get_xy_block",
+   "get_ys",
+   "if",
+   "istype",
+   "set_side",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2003,6 +3865,13 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_disguise",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2014,6 +3883,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_con",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2025,6 +3909,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_con",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2036,6 +3935,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_ability",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2047,6 +3966,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_state",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2058,6 +3999,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_con",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_state",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2069,6 +4027,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_ability",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_state",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "poison",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2080,6 +4060,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_att_damage",
+   "get_con",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2091,6 +4086,30 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "get_ability",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapxs",
+   "get_mapys",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_xy_block",
+   "get_ys",
+   "if",
+   "istype",
+   "set",
+   "set_side",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2102,6 +4121,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_ability",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_state",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2113,6 +4150,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_mobxs",
+   "get_mobxy",
+   "get_mobys",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2124,6 +4175,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_state",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set_manal",
+   "set_vital",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2135,6 +4201,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_critical",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/무도가기술.txt"
  },
  {
@@ -2146,6 +4234,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2157,6 +4267,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2168,6 +4300,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2179,6 +4333,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2190,6 +4366,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2201,6 +4399,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2212,6 +4432,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2223,6 +4465,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_hill",
+   "group_message",
+   "heal",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2234,6 +4489,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_hill",
+   "group_message",
+   "heal",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2245,6 +4513,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_hill",
+   "group_message",
+   "heal",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2256,6 +4537,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_hill",
+   "group_message",
+   "heal",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2267,6 +4561,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_basevita2",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2278,6 +4584,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "group_exist",
+   "iaum_delay",
+   "if",
+   "message",
+   "set",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2289,6 +4606,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_basemana2",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/성직자/바드.txt"
  },
  {
@@ -2300,6 +4639,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "group_curse_end",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2311,6 +4665,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "group_curse_end",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2322,6 +4691,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "group_curse_end",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2333,6 +4717,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "group_curse_end",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2344,6 +4743,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "group_curse_end",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2355,6 +4769,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_level",
+   "get_mapname",
+   "get_myid",
+   "get_nation",
+   "if",
+   "istype",
+   "message",
+   "rand2",
+   "set",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2366,6 +4793,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2377,6 +4816,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2388,6 +4839,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2399,6 +4862,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2410,6 +4885,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2421,6 +4908,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_message",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2432,6 +4930,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_message",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2443,6 +4952,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_message",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2454,6 +4974,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "group_message",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2465,6 +4996,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2476,6 +5013,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "antimagic",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2487,6 +5035,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "horrama",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2498,6 +5057,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2509,6 +5078,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "enare",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2520,6 +5101,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "qpffk",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2531,6 +5122,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "qpffk",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2542,6 +5143,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "message",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2553,6 +5162,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "immortal",
+   "message",
+   "motion",
+   "rand"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2564,6 +5183,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse_end",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2575,6 +5205,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse_end",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2586,6 +5227,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse_end",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2597,6 +5249,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse_end",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2608,6 +5271,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "group_exist",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2619,6 +5294,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2630,6 +5315,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2641,6 +5336,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2652,6 +5358,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2663,6 +5379,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_coma",
+   "get_front_char",
+   "get_mana",
+   "get_myid",
+   "get_state1",
+   "if",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2674,6 +5401,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_name1",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "rand2",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2685,6 +5426,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_map_pk",
+   "get_mgc_damage",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2696,6 +5452,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2707,6 +5475,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse_end",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2718,6 +5497,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "group_message",
+   "group_mobnar_end",
+   "if",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2729,6 +5518,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "group_message",
+   "group_mobsor_end",
+   "if",
+   "message"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2740,6 +5539,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "antimagic",
+   "del",
+   "enare",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "god_bless",
+   "group_exist",
+   "group_hill",
+   "group_message",
+   "horrama",
+   "if",
+   "message",
+   "sleep"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2751,6 +5567,29 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_solo",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "set",
+   "set_manal"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2762,6 +5601,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "enare",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2773,6 +5624,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "qpffk",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2784,6 +5645,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "spell_target"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2795,6 +5668,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_class",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "mob_reberato",
+   "rand",
+   "set",
+   "spell_del2"
+  ],
   "출처": "script/[Skill,Spell]/성직자기술.txt"
  },
  {
@@ -2806,6 +5699,29 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_class",
+   "get_critical",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "skill_del",
+   "skill_delay",
+   "skill_exist",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2817,6 +5733,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_class",
+   "get_critical",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "skill_del",
+   "skill_delay",
+   "skill_exist",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2828,6 +5763,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "manal_del",
+   "message",
+   "motion"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2839,6 +5784,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2850,6 +5804,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "batu_delay",
+   "game_sound",
+   "get_class",
+   "get_front_char",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2861,6 +5831,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_class",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2872,6 +5851,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_class",
+   "get_myid",
+   "get_vita",
+   "if",
+   "message",
+   "motion",
+   "phoenix",
+   "skill_delay",
+   "sleep"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2883,6 +5874,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2894,6 +5895,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_class",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "rand2",
+   "skill_delay",
+   "sleep"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2905,6 +5917,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2916,6 +5943,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "skill_del",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2927,6 +5970,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_basevita2",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_del",
+   "skill_delay",
+   "skill_target",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2938,6 +6000,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_basevita2",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_del",
+   "skill_delay",
+   "skill_target",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2949,6 +6030,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_class",
+   "get_myid",
+   "get_vita",
+   "if",
+   "message",
+   "motion",
+   "phoenix",
+   "skill_delay",
+   "sleep"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2960,6 +6053,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "del",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "message",
+   "skill_delay",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2971,6 +6084,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_xy_block",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "set_xs",
+   "set_ys",
+   "skill_delay"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2982,6 +6114,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -2993,6 +6143,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_att_damage",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -3004,6 +6170,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_char_serial",
+   "get_con",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "skill_delay",
+   "skill_target"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -3015,6 +6196,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_basevita2",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -3026,6 +6225,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_basevita2",
+   "get_class",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "time"
+  ],
   "출처": "script/[Skill,Spell]/전사기술.txt"
  },
  {
@@ -3037,6 +6254,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "call_func",
+   "del",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "menu",
+   "mes",
+   "message",
+   "money_del",
+   "set",
+   "set_birthday"
+  ],
   "출처": "script/call_func.txt"
  },
  {
@@ -3087,6 +6318,41 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "add_pet",
+   "call_func",
+   "del",
+   "exp_add",
+   "get_baseexp",
+   "get_class",
+   "get_class_sub",
+   "get_love",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_name1",
+   "get_son",
+   "get_state",
+   "get_user",
+   "group_count",
+   "if",
+   "item_del",
+   "item_exist",
+   "love_add",
+   "menu",
+   "mes",
+   "message",
+   "message1",
+   "npc_look",
+   "pet_position",
+   "pet_say",
+   "pet_user",
+   "set",
+   "skill_del",
+   "sleep",
+   "spell_del",
+   "warp"
+  ],
   "출처": "script/call_func3.txt"
  },
  {
@@ -3207,6 +6473,144 @@
     "허름한성문"
    ]
   },
+  "부르는이름": [
+   "bag_slot_get",
+   "bag_slot_set",
+   "batu_end",
+   "broadcast",
+   "call_func",
+   "case",
+   "char_dead",
+   "coma_delay",
+   "del",
+   "del_coma",
+   "effect",
+   "effect2",
+   "exp_add",
+   "exp_del",
+   "exp_rate",
+   "game_get",
+   "game_sound",
+   "get_ac",
+   "get_baseexp",
+   "get_basemana2",
+   "get_basevita",
+   "get_basevita2",
+   "get_birthday",
+   "get_class",
+   "get_class_sub",
+   "get_coma",
+   "get_front_char",
+   "get_frontobj",
+   "get_gm",
+   "get_guild_title",
+   "get_level",
+   "get_map_expother",
+   "get_map_somer",
+   "get_map_stage",
+   "get_mapname",
+   "get_mobxy",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_sex",
+   "get_side",
+   "get_son",
+   "get_state",
+   "get_state1",
+   "get_user",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "group_count",
+   "group_exist",
+   "group_item_add",
+   "group_message",
+   "group_val",
+   "group_val2",
+   "group_warp",
+   "if",
+   "input",
+   "instr",
+   "istype",
+   "item_add",
+   "item_add1",
+   "item_add_term",
+   "item_del",
+   "item_del1",
+   "item_exist",
+   "item_one_check",
+   "item_spawn",
+   "last_object",
+   "last_say",
+   "legend_add",
+   "localtime",
+   "magic",
+   "magic_exist",
+   "map_objmob",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "message",
+   "message1",
+   "mob_clear",
+   "mob_spawn",
+   "mob_spawn4",
+   "mobnar_end",
+   "mobsor_end",
+   "money_add",
+   "money_del",
+   "newtypeset",
+   "npc_look",
+   "object_del",
+   "pet_position",
+   "pet_say",
+   "pet_user",
+   "rand2",
+   "reberato",
+   "reberato2",
+   "set",
+   "set_basemana",
+   "set_basevita",
+   "set_birthday",
+   "set_body",
+   "set_class",
+   "set_coma",
+   "set_con",
+   "set_dex",
+   "set_exp",
+   "set_guild_state",
+   "set_guild_title",
+   "set_int",
+   "set_level",
+   "set_map_bgm",
+   "set_map_pk",
+   "set_nation",
+   "set_point",
+   "set_son",
+   "set_state",
+   "set_state1",
+   "set_str",
+   "set_vita",
+   "set_wis",
+   "set_xs",
+   "set_ys",
+   "skill_add",
+   "skill_del2",
+   "skill_exist",
+   "sleep",
+   "slot_skill_add",
+   "slot_skill_exist",
+   "slot_spell_add",
+   "spell_add",
+   "spell_del",
+   "spell_exist",
+   "split",
+   "switch",
+   "time",
+   "un_hide",
+   "warp"
+  ],
   "출처": "script/script.txt"
  },
  {
@@ -3267,6 +6671,21 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "call_func",
+   "cash_shop",
+   "get_love",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_add_term",
+   "item_exist",
+   "menu",
+   "mes",
+   "message",
+   "set",
+   "shop"
+  ],
   "출처": "script/shop_script.txt"
  },
  {
@@ -3286,6 +6705,19 @@
     "뤼케시온관리자의분신"
    ]
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "mes",
+   "mob_clear",
+   "mob_spawn",
+   "set",
+   "set_xs",
+   "warp"
+  ],
   "출처": "script/던전/뮤레칸의역습던전_Warp.txt"
  },
  {
@@ -3305,6 +6737,19 @@
     "밀레스관리자의분신"
    ]
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "mes",
+   "mob_clear",
+   "mob_spawn",
+   "set",
+   "set_ys",
+   "warp"
+  ],
   "출처": "script/던전/뮤레칸의역습던전_Warp.txt"
  },
  {
@@ -3323,6 +6768,19 @@
     "루어스관리자의분신"
    ]
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "mes",
+   "mob_clear",
+   "mob_spawn",
+   "set",
+   "set_xs",
+   "warp"
+  ],
   "출처": "script/던전/뮤레칸의역습던전_Warp.txt"
  },
  {
@@ -3341,6 +6799,19 @@
     "홀리루딘관리자의분신"
    ]
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "mes",
+   "mob_clear",
+   "mob_spawn",
+   "set",
+   "set_xs",
+   "warp"
+  ],
   "출처": "script/던전/뮤레칸의역습던전_Warp.txt"
  },
  {
@@ -3392,6 +6863,36 @@
     "헤브렐리우스"
    ]
   },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_class",
+   "get_class_sub",
+   "get_mapname",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_bighp",
+   "group_exist",
+   "group_val",
+   "group_warp",
+   "if",
+   "map_objmob",
+   "mes",
+   "message",
+   "mob_clear",
+   "mob_spawn",
+   "mob_spawn2",
+   "npc_look",
+   "npc_spawn",
+   "rand",
+   "set",
+   "set_xs",
+   "set_ys",
+   "sleep",
+   "warp"
+  ],
   "출처": "script/던전/죽음의마을_Warp.txt"
  },
  {
@@ -3403,6 +6904,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3414,6 +6931,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3425,6 +6958,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged4",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "object_name",
+   "set"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3436,6 +6980,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic",
+   "set"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3447,6 +7001,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "mob_say2",
+   "set"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3458,6 +7023,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "group_damaged2",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3469,6 +7051,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3480,6 +7074,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "mob_say2",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3491,6 +7104,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobpoison_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3502,6 +7136,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "mob_say2",
+   "set"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3513,6 +7157,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobpoison_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3524,6 +7189,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "message",
+   "mobnar_delay",
+   "mobpoison_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "set_strabismus",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3539,6 +7225,28 @@
     "케르베로스(초월)"
    ]
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mob_vita",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "message",
+   "mob_say2",
+   "mob_spawn",
+   "mobnar_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3554,6 +7262,29 @@
     "케르베로스(초월)"
    ]
   },
+  "부르는이름": [
+   "case",
+   "char_curse",
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mob_vita",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "message",
+   "mob_say2",
+   "mob_spawn",
+   "mobnar_delay",
+   "mobpoison_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/공통_디스펠.txt"
  },
  {
@@ -3567,6 +7298,20 @@
     "식인악마"
    ]
   },
+  "부르는이름": [
+   "exp_add",
+   "get_myid",
+   "get_revival_mob",
+   "if",
+   "message",
+   "mob_say2",
+   "mob_spawn",
+   "mob_strabismus",
+   "object_del",
+   "rand2",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3580,6 +7325,19 @@
     "밀레스좀비"
    ]
   },
+  "부르는이름": [
+   "exp_add",
+   "get_myid",
+   "get_revival_mob",
+   "if",
+   "message",
+   "mob_say2",
+   "mob_spawn",
+   "object_del",
+   "rand2",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3591,6 +7349,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "message",
+   "mob_say2",
+   "object_name",
+   "rand2",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3602,6 +7375,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3613,6 +7398,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3624,6 +7421,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged4",
+   "effect",
+   "effect2",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "object_name",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3635,6 +7444,11 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect2",
+   "get_myid",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3659,6 +7473,21 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "mob_clear",
+   "set",
+   "skill_target"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3670,6 +7499,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic",
+   "mob_say2",
+   "rand",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3683,6 +7527,17 @@
     "아만족전사"
    ]
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_myid",
+   "get_revival_mob",
+   "if",
+   "mob_say2",
+   "mob_spawn",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3694,6 +7549,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "get_revival_mob",
+   "if",
+   "item_spawn",
+   "magic",
+   "mob_clear",
+   "mob_say2",
+   "mob_spawn4",
+   "rand2",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3705,6 +7574,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "get_revival_mob",
+   "if",
+   "mob_say2",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3716,6 +7596,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "del",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3727,6 +7622,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "get_revival_mob",
+   "if",
+   "mob_say2",
+   "mob_strabismus",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3740,6 +7645,25 @@
     "라미아2"
    ]
   },
+  "부르는이름": [
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "if",
+   "map_objmob",
+   "mob_say2",
+   "mob_spawn",
+   "rand",
+   "set",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3751,6 +7675,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mob_say2",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3762,6 +7706,30 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana2",
+   "get_basevita2",
+   "get_class_sub",
+   "get_gm",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "reberato",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3773,6 +7741,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged4",
+   "effect",
+   "game_sound",
+   "get_basemana2",
+   "get_basevita2",
+   "get_class_sub",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "object_name",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3784,6 +7767,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3795,6 +7794,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "set_manal",
+   "skill_target"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3806,6 +7827,27 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_damaged_per",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "skill_target"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3817,6 +7859,28 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged4",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_damaged_per",
+   "group_hill",
+   "if",
+   "istype",
+   "magic_protection",
+   "message",
+   "object_name",
+   "rand",
+   "set",
+   "skill_target"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3828,6 +7892,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_basevita",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_damaged_per",
+   "group_hill",
+   "if",
+   "istype",
+   "set",
+   "skill_target"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3839,6 +7918,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_ac",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic",
+   "magic_protection",
+   "message",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3850,6 +7946,25 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_ac",
+   "get_basevita",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3861,6 +7976,18 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged4",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "mob_say2",
+   "sleep"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3872,6 +7999,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3883,6 +8021,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_ac",
+   "get_basevita",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "if",
+   "magic_protection",
+   "message",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3894,6 +8050,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "set",
+   "set_manal",
+   "skill_target"
+  ],
   "출처": "script/디스펠/몬스터기술.txt"
  },
  {
@@ -3905,6 +8076,24 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_ability",
+   "get_basemana2",
+   "get_basevita2",
+   "get_myid",
+   "group_warp",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/뮤레칸의역습_디스펠.txt"
  },
  {
@@ -3916,6 +8105,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "set"
+  ],
   "출처": "script/디스펠/뮤레칸의역습_디스펠.txt"
  },
  {
@@ -3927,6 +8120,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_ability",
+   "get_basemana2",
+   "get_basevita2",
+   "get_myid",
+   "group_warp",
+   "if",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/뮤레칸의역습_디스펠.txt"
  },
  {
@@ -3938,6 +8148,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "effect",
+   "game_sound",
+   "get_ability",
+   "get_basemana2",
+   "get_basevita2",
+   "get_myid",
+   "group_warp",
+   "if",
+   "magic_protection",
+   "message",
+   "object_name",
+   "set"
+  ],
   "출처": "script/디스펠/뮤레칸의역습_디스펠.txt"
  },
  {
@@ -3949,6 +8174,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "set"
+  ],
   "출처": "script/디스펠/뮤레칸의역습_디스펠.txt"
  },
  {
@@ -3960,6 +8189,38 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_curse",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_basevita",
+   "get_class",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_damaged_per",
+   "group_hill",
+   "if",
+   "istype",
+   "magic",
+   "magic_protection",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "object_name",
+   "rand2",
+   "set",
+   "set_manal",
+   "skill_target"
+  ],
   "출처": "script/디스펠/뮤레칸의역습_디스펠.txt"
  },
  {
@@ -3971,6 +8232,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "group_damaged2",
+   "group_hill",
+   "if",
+   "message",
+   "mob_say2",
+   "rand2",
+   "set"
+  ],
   "출처": "script/디스펠/적룡의결계_디스펠.txt"
  },
  {
@@ -3982,6 +8259,22 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "del",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "group_damaged2",
+   "group_message",
+   "if",
+   "magic_protection",
+   "message",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/혼돈의탑_디스펠.txt"
  },
  {
@@ -3993,6 +8286,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "case",
+   "del",
+   "effect",
+   "game_sound",
+   "get_last_object_xs",
+   "get_last_object_ys",
+   "get_mobxy",
+   "get_myid",
+   "group_damaged2",
+   "group_hill",
+   "group_message",
+   "if",
+   "magic",
+   "message",
+   "object_name",
+   "rand2",
+   "set",
+   "switch"
+  ],
   "출처": "script/디스펠/혼돈의탑_디스펠.txt"
  },
  {
@@ -4058,6 +8371,48 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_baseexp",
+   "get_basemana",
+   "get_basemana2",
+   "get_basevita",
+   "get_basevita2",
+   "get_class",
+   "get_class_sub",
+   "get_con",
+   "get_dex",
+   "get_int",
+   "get_level",
+   "get_money",
+   "get_myid",
+   "get_sex",
+   "get_son",
+   "get_str",
+   "get_wis",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "last_npc",
+   "legend_add",
+   "menu",
+   "mes",
+   "message",
+   "money_del",
+   "rand2",
+   "set",
+   "set_sdsdsd",
+   "skill_add",
+   "skill_del",
+   "skill_exist",
+   "skill_learn",
+   "sleep",
+   "spell_add",
+   "spell_del",
+   "spell_exist",
+   "while"
+  ],
   "출처": "script/마을서버/마을서버1.txt"
  },
  {
@@ -4183,6 +8538,29 @@
     "피에트관리자의분신"
    ]
   },
+  "부르는이름": [
+   "get_ability",
+   "get_basemana2",
+   "get_basevita2",
+   "get_level",
+   "get_mapname",
+   "get_myid",
+   "group_count",
+   "group_val",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "item_one_check",
+   "last_npc",
+   "menu",
+   "mes",
+   "message",
+   "mob_clear",
+   "mob_spawn",
+   "rand2",
+   "set"
+  ],
   "출처": "script/마을서버/마을서버2.txt"
  },
  {
@@ -4194,6 +8572,20 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "deposit_item",
+   "deposit_money",
+   "get_myid",
+   "if",
+   "item_exist",
+   "last_npc",
+   "menu",
+   "mes",
+   "rand2",
+   "shop",
+   "withdraw_item",
+   "withdraw_money"
+  ],
   "출처": "script/마을서버/마을서버3.txt"
  },
  {
@@ -4250,6 +8642,23 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set"
+  ],
   "출처": "script/마을서버/마을서버3.txt"
  },
  {
@@ -4317,6 +8726,53 @@
     "시련의폰"
    ]
   },
+  "부르는이름": [
+   "broadcast",
+   "coma_delay",
+   "del",
+   "exp_add",
+   "for",
+   "get_class",
+   "get_eg",
+   "get_level",
+   "get_mapname",
+   "get_mapxs",
+   "get_mapys",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "group_bighp",
+   "group_count",
+   "group_exist",
+   "group_message",
+   "group_val",
+   "group_warp",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "map_objmob",
+   "map_objmob2",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "mob_spawn2",
+   "mobnar_delay",
+   "mobsor_delay",
+   "money_add",
+   "money_del",
+   "output",
+   "rand",
+   "set",
+   "set_coma",
+   "set_eg",
+   "set_state1",
+   "set_vital",
+   "warp"
+  ],
   "출처": "script/마을서버/마을서버4.txt"
  },
  {
@@ -4328,6 +8784,10 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "set"
+  ],
   "출처": "script/베크나탑.txt"
  },
  {
@@ -4339,6 +8799,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_ys",
+   "group_message",
+   "group_warp",
+   "if",
+   "map_objmob",
+   "message",
+   "mob_clear",
+   "mob_spawn4",
+   "set",
+   "set_ys",
+   "sleep"
+  ],
   "출처": "script/베크나탑.txt"
  },
  {
@@ -4350,6 +8825,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/갑옷.txt"
  },
  {
@@ -4361,6 +8839,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/갑옷.txt"
  },
  {
@@ -4372,6 +8853,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4383,6 +8867,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4394,6 +8881,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4405,6 +8895,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4416,6 +8909,11 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_gm",
+   "get_myid",
+   "if"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4427,6 +8925,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4438,6 +8939,11 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_gm",
+   "get_myid",
+   "if"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4449,6 +8955,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4460,6 +8969,9 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4471,6 +8983,11 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_gm",
+   "get_myid",
+   "if"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4482,6 +8999,11 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_gm",
+   "get_myid",
+   "if"
+  ],
   "출처": "script/아이템/무기.txt"
  },
  {
@@ -4493,6 +9015,23 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_char_serial",
+   "get_gm",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_xy_block",
+   "get_ys",
+   "if",
+   "message",
+   "set_xs",
+   "set_ys",
+   "time",
+   "un_hide"
+  ],
   "출처": "script/아이템/생활잡화.txt"
  },
  {
@@ -4513,6 +9052,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "set",
+   "set_side",
+   "time",
+   "warp"
+  ],
   "출처": "script/아이템/생활잡화.txt"
  },
  {
@@ -4524,6 +9076,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "bag_slot_get",
+   "get_myid",
+   "if",
+   "message"
+  ],
   "출처": "script/아이템/생활잡화.txt"
  },
  {
@@ -4557,6 +9115,41 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "get_eg",
+   "get_front_block",
+   "get_front_char",
+   "get_guild_master",
+   "get_guild_state",
+   "get_guild_title",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_name1",
+   "get_sex",
+   "get_side",
+   "get_user",
+   "get_xs",
+   "get_ys",
+   "if",
+   "item_add",
+   "item_add_term",
+   "item_del",
+   "menu",
+   "mes",
+   "message",
+   "message1",
+   "rand",
+   "set",
+   "set_guild_state",
+   "set_guild_title",
+   "set_xs",
+   "set_ys"
+  ],
   "출처": "script/아이템/생활잡화.txt"
  },
  {
@@ -4570,6 +9163,25 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "coma_delay",
+   "del_coma",
+   "effect",
+   "game_sound",
+   "get_coma",
+   "get_front_char",
+   "get_myid",
+   "get_sex",
+   "get_state",
+   "get_state1",
+   "if",
+   "item_del",
+   "set",
+   "set_body",
+   "set_coma",
+   "set_state1",
+   "set_vita"
+  ],
   "출처": "script/아이템/시약.txt"
  },
  {
@@ -4586,6 +9198,18 @@
     "엔도르킹"
    ]
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "mes",
+   "message",
+   "mob_spawn",
+   "set"
+  ],
   "출처": "script/아이템/퀘스트.txt"
  },
  {
@@ -4601,6 +9225,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "group_warp",
+   "if",
+   "item_del",
+   "menu",
+   "set",
+   "warp"
+  ],
   "출처": "script/아이템/퀘스트.txt"
  },
  {
@@ -4614,6 +9248,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4627,6 +9267,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4640,6 +9286,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4653,6 +9305,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4666,6 +9324,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4679,6 +9343,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4692,6 +9362,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4705,6 +9381,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4718,6 +9400,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4731,6 +9419,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4744,6 +9438,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4757,6 +9457,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4770,6 +9476,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4783,6 +9495,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4796,6 +9514,12 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "item_del",
+   "set"
+  ],
   "출처": "script/아이템/폭죽.txt"
  },
  {
@@ -4807,6 +9531,19 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "exp_add",
+   "get_level",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_exist",
+   "mes",
+   "message",
+   "money_add",
+   "set"
+  ],
   "출처": "script/엔피씨/신망퀘스트.txt"
  },
  {
@@ -4818,6 +9555,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_nation",
+   "if",
+   "menu",
+   "mes",
+   "set"
+  ],
   "출처": "script/엔피씨/알세이드스-화론마을.txt"
  },
  {
@@ -4836,6 +9581,18 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_nation",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "rand2",
+   "set"
+  ],
   "출처": "script/엔피씨/알세이드스-화론마을.txt"
  },
  {
@@ -4854,6 +9611,19 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "rand",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/알세이드스-화론마을.txt"
  },
  {
@@ -4872,6 +9642,17 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "rand2",
+   "set"
+  ],
   "출처": "script/엔피씨/알세이드스-화론마을.txt"
  },
  {
@@ -4927,6 +9708,17 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set",
+   "skill_exist"
+  ],
   "출처": "script/엔피씨/알세이드스-화론마을.txt"
  },
  {
@@ -4941,6 +9733,23 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_count",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "message",
+   "npc_look",
+   "set_xs",
+   "set_ys"
+  ],
   "출처": "script/엔피씨/엔피씨001.txt"
  },
  {
@@ -4952,6 +9761,21 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_level",
+   "get_mapname",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "group_exist",
+   "if",
+   "message",
+   "set",
+   "set_xs",
+   "set_ys",
+   "sleep"
+  ],
   "출처": "script/엔피씨/엔피씨001.txt"
  },
  {
@@ -4963,6 +9787,26 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_class_sub",
+   "get_level",
+   "get_mapname",
+   "get_money",
+   "get_myid",
+   "get_nation",
+   "get_sex",
+   "get_ys",
+   "if",
+   "last_npc",
+   "menu",
+   "mes",
+   "message",
+   "money_del",
+   "rand2",
+   "set_state",
+   "set_ys",
+   "shop"
+  ],
   "출처": "script/엔피씨/엔피씨001.txt"
  },
  {
@@ -4974,6 +9818,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "if",
+   "item_exist",
+   "menu",
+   "mes"
+  ],
   "출처": "script/엔피씨/엔피씨001.txt"
  },
  {
@@ -4987,6 +9839,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_ability",
+   "get_myid",
+   "if",
+   "mes",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/엔피씨001.txt"
  },
  {
@@ -5034,6 +9894,58 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "deposit_item",
+   "deposit_money",
+   "exp_add",
+   "for",
+   "get_class",
+   "get_class_sub",
+   "get_guild_master",
+   "get_guild_state",
+   "get_guild_title",
+   "get_mapname",
+   "get_mapname1",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_name1",
+   "get_sex",
+   "get_son",
+   "get_state",
+   "get_user",
+   "get_vita",
+   "get_wearitem_armor",
+   "get_ys",
+   "guild_banish",
+   "guild_check",
+   "guild_count",
+   "guild_list",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "localtime",
+   "menu",
+   "mes",
+   "message",
+   "money_add",
+   "money_del",
+   "rand",
+   "rand2",
+   "set",
+   "set_class",
+   "set_state",
+   "set_user_title",
+   "set_ys",
+   "shop",
+   "skill_exist",
+   "skill_learn",
+   "spell_exist",
+   "withdraw_item",
+   "withdraw_money"
+  ],
   "출처": "script/엔피씨/엔피씨002.txt"
  },
  {
@@ -5078,6 +9990,36 @@
     "켄토라우스"
    ]
   },
+  "부르는이름": [
+   "deposit_item",
+   "deposit_money",
+   "get_class",
+   "get_class_sub",
+   "get_mapname",
+   "get_money",
+   "get_myid",
+   "get_xs",
+   "group_warp",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "item_one_check",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "money_del",
+   "npc_look",
+   "npc_spawn",
+   "repair_item",
+   "repair_item_all",
+   "set",
+   "set_xs",
+   "skill_del_menu",
+   "warp",
+   "withdraw_item"
+  ],
   "출처": "script/엔피씨/엔피씨003.txt"
  },
  {
@@ -5151,6 +10093,54 @@
     "켈라D"
    ]
   },
+  "부르는이름": [
+   "ability_exp_add",
+   "del",
+   "deposit_item",
+   "deposit_money",
+   "exp_del",
+   "get_ability",
+   "get_baseexp",
+   "get_basemana2",
+   "get_basevita2",
+   "get_class",
+   "get_class_sub",
+   "get_mapname",
+   "get_money",
+   "get_myid",
+   "get_nation",
+   "get_xs",
+   "get_ys",
+   "group_exist",
+   "if",
+   "input",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "money_add",
+   "money_del",
+   "npc_look",
+   "repair_item",
+   "repair_item_all",
+   "set",
+   "set_class_sub",
+   "set_nation",
+   "set_xs",
+   "set_ys",
+   "shop",
+   "sleep",
+   "spell_add2",
+   "spell_del_menu",
+   "spell_exist",
+   "warp",
+   "withdraw_item",
+   "withdraw_money"
+  ],
   "출처": "script/엔피씨/엔피씨004.txt"
  },
  {
@@ -5164,6 +10154,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "if",
+   "item_exist",
+   "mes",
+   "npc_look",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5179,6 +10179,17 @@
     "흉가링"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_exist",
+   "menu",
+   "mes",
+   "mob_spawn",
+   "npc_look",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5194,6 +10205,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "mes",
+   "mob_clear",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5207,6 +10228,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "mob_clear",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5220,6 +10247,13 @@
     "유령"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_exist",
+   "mob_spawn",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5233,6 +10267,13 @@
     "유령"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_exist",
+   "mob_spawn",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5246,6 +10287,13 @@
     "유령"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_exist",
+   "mob_spawn",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5259,6 +10307,11 @@
     "유령"
    ]
   },
+  "부르는이름": [
+   "if",
+   "item_exist",
+   "mob_spawn"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5272,6 +10325,13 @@
     "유령"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_exist",
+   "mob_spawn",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5285,6 +10345,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "mob_clear",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5300,6 +10366,17 @@
     "흉가링"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_exist",
+   "menu",
+   "mes",
+   "mob_spawn",
+   "npc_look",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5313,6 +10390,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_exist",
+   "menu",
+   "mes",
+   "npc_look",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5328,6 +10415,20 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_ys",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "mes",
+   "message",
+   "npc_look",
+   "set",
+   "set_ys"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5339,6 +10440,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "message",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5354,6 +10461,17 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_xs",
+   "if",
+   "item_del",
+   "item_exist",
+   "message",
+   "set",
+   "set_xs",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5365,6 +10483,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "message",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5378,6 +10502,19 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_ys",
+   "if",
+   "item_del",
+   "item_exist",
+   "mes",
+   "message",
+   "npc_look",
+   "set",
+   "set_ys"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5393,6 +10530,15 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "message",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5406,6 +10552,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "mob_clear",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5419,6 +10571,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_exist",
+   "menu",
+   "mes",
+   "npc_look",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5438,6 +10600,13 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "if",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5451,6 +10620,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_exist",
+   "menu",
+   "mes",
+   "npc_look",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5462,6 +10641,15 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_xs",
+   "if",
+   "item_exist",
+   "message",
+   "set",
+   "set_xs"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5475,6 +10663,11 @@
     "유령2"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "mob_spawn",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5490,6 +10683,12 @@
     "유령2"
    ]
   },
+  "부르는이름": [
+   "get_myid",
+   "mob_spawn",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5503,6 +10702,12 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "mob_clear",
+   "set",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5518,6 +10723,19 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "get_xs",
+   "if",
+   "input",
+   "item_del",
+   "item_exist",
+   "message",
+   "mob_clear",
+   "set",
+   "set_xs",
+   "warp"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5532,6 +10750,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "message",
+   "set",
+   "sleep"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5545,6 +10773,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_exist",
+   "menu",
+   "mes",
+   "npc_look",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5558,6 +10796,14 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "if",
+   "item_del",
+   "menu",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5572,6 +10818,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "message",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5587,6 +10843,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5601,6 +10867,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "message",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5616,6 +10892,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5630,6 +10916,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "message",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5645,6 +10941,17 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5659,6 +10966,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "message",
+   "set",
+   "sleep"
+  ],
   "출처": "script/엔피씨/흉가.txt"
  },
  {
@@ -5670,6 +10987,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_vita",
+   "if",
+   "message",
+   "rand2",
+   "set"
+  ],
   "출처": "script/함정/함정_디스펠.txt"
  },
  {
@@ -5681,6 +11009,17 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "batu_delay",
+   "game_sound",
+   "get_ac",
+   "get_myid",
+   "if",
+   "message",
+   "mobsor_delay",
+   "rand2",
+   "set"
+  ],
   "출처": "script/함정/함정_디스펠.txt"
  },
  {
@@ -5692,6 +11031,14 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "char_damaged4",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "message",
+   "set"
+  ],
   "출처": "script/함정/함정_디스펠.txt"
  },
  {
@@ -5703,6 +11050,16 @@
    "아이템": [],
    "괴물": []
   },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_myid",
+   "if",
+   "message",
+   "set"
+  ],
   "출처": "script/함정/함정_디스펠.txt"
  },
  {
@@ -5717,6 +11074,16 @@
    ],
    "괴물": []
   },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "menu",
+   "mes",
+   "npc_look",
+   "rand2",
+   "set"
+  ],
   "출처": "script/함정/함정_퀘스트.txt"
  },
  {
@@ -5734,6 +11101,25 @@
     "보스큐르페이"
    ]
   },
+  "부르는이름": [
+   "get_basemana2",
+   "get_basevita2",
+   "get_class",
+   "get_myid",
+   "get_name",
+   "group_warp",
+   "if",
+   "item_add_term",
+   "last_npc",
+   "menu",
+   "mes",
+   "message",
+   "mob_clear",
+   "mob_spawn",
+   "npc_look",
+   "set",
+   "warp"
+  ],
   "출처": "script/혼돈의탑.txt"
  }
 ]
