@@ -171,84 +171,27 @@ internal static class Program
             return 2;
         }
 
-        const int tileWidth = 56;
-        const int tileHeight = 27;
+        TileSource? source = TileSource.From(entries, WantsSnow(args));
 
-        // TILEAS is the same tile set in snow — the S is for snow, not for anything structural. The map
-        // editor picks between the two exactly this way. Both hold fixed 56x27 cells.
-        bool snow = args.Any(word =>
-            word.Equals("눈", StringComparison.Ordinal) || word.Equals("snow", StringComparison.OrdinalIgnoreCase));
-
-        string wanted = snow ? "TILEAS.BMP" : "TILEA.BMP";
-
-        ArchivedItem? tileSet = entries.FirstOrDefault(entry =>
-            entry.Name.Equals(wanted, StringComparison.OrdinalIgnoreCase));
-
-        if (tileSet is null)
+        if (source is null)
         {
-            Console.Error.WriteLine($"{wanted} 를 찾지 못했습니다.");
             return 2;
         }
 
-        // The palette table numbers tiles across both sets appended together — da-lib's Tileset docs say so
-        // outright ("Ensure the tile ids you add to the PaletteTable are based on appending to the existing
-        // tileset"). So a snow tile's palette is looked up at TILEA's count plus its own index; asking at
-        // its own index alone lands in TILEA's rows and paints some of them from the wrong palette.
-        int paletteOffset = 0;
-
-        if (snow)
-        {
-            ArchivedItem? plain = entries.FirstOrDefault(entry =>
-                entry.Name.Equals("TILEA.BMP", StringComparison.OrdinalIgnoreCase));
-
-            if (plain is null)
-            {
-                Console.Error.WriteLine("TILEA.BMP 가 없어 눈 타일의 팔레트 번호를 셀 수 없습니다.");
-                return 2;
-            }
-
-            paletteOffset = plain.Data.Length / (tileWidth * tileHeight);
-        }
-
-        List<Tile> tiles = new TileCollection(tileSet).Load();
-        List<Palette> palettes = Palette.FromArchive(
-            entries.Where(e => e.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase)
-                            && e.Name.StartsWith("mpt", StringComparison.OrdinalIgnoreCase))
-                   .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase));
-
-        List<PaletteTable> tables = await PaletteTable.FromArchive(
-            entries.Where(e => e.Name.EndsWith(".tbl", StringComparison.OrdinalIgnoreCase)
-                            && e.Name.StartsWith("mpt", StringComparison.OrdinalIgnoreCase))
-                   .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase),
-            "mpt",
-            _ => { });
-
-        Console.WriteLine($"타일 {tiles.Count}개 · 팔레트 {palettes.Count}개 · 표 {tables.Count}개");
+        Console.WriteLine(
+            $"타일 {source.Tiles.Count}개 · 팔레트 {source.Palettes.Count}개 · 표 {source.Tables.Count}개");
 
         string output = Path.GetFullPath(args[2]);
         int start = int.Parse(args[3]);
-        int count = Math.Min(int.Parse(args[4]), tiles.Count - start);
+        int count = Math.Min(int.Parse(args[4]), source.Tiles.Count - start);
         int columns = args.Length > 5 && int.TryParse(args[5], out int given) ? given : 16;
         int rows = (int)Math.Ceiling(count / (double)columns);
 
-        using Image<Rgba32> sheet = new(columns * tileWidth, rows * tileHeight);
+        using Image<Rgba32> sheet = new(columns * TileWidth, rows * TileHeight);
 
         for (int offset = 0; offset < count; offset++)
         {
-            int index = start + offset;
-            Palette palette = PaletteFor(index + paletteOffset, tables, palettes);
-            byte[] data = tiles[index].Data;
-            int originX = (offset % columns) * tileWidth;
-            int originY = (offset / columns) * tileHeight;
-
-            for (int y = 0; y < tileHeight; y++)
-            {
-                for (int x = 0; x < tileWidth; x++)
-                {
-                    System.Drawing.Color colour = palette[data[(y * tileWidth) + x]];
-                    sheet[originX + x, originY + y] = new Rgba32(colour.R, colour.G, colour.B, 255);
-                }
-            }
+            source.Draw(sheet, start + offset, (offset % columns) * TileWidth, (offset / columns) * TileHeight);
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);
@@ -281,7 +224,10 @@ internal static class Program
             return 2;
         }
 
-        TileSource source = TileSource.From(entries);
+        // 눈은 여기 붙이지 않는다. 맵의 바닥 번호는 TILEA 의 19,243칸 공간을 가리키는데 TILEAS 는
+        // 2,805칸뿐이라 그대로 대면 전부 범위 밖이 되어 한 칸도 그리지 못한다. 원작이 눈 맵을
+        // 어떻게 그리는지는 아직 모른다 — NEXT.md 참고.
+        TileSource? source = TileSource.From(entries);
         if (source is null)
         {
             return 2;
@@ -986,6 +932,14 @@ internal static class Program
             + $"attack {sheet.AttackStart} {sheet.AttackCount}\n");
     }
 
+    /// <summary>
+    /// Whether this run wants the snow ground set. The server says so with MapFlags.SnowTileset (128), but
+    /// a .map file carries only tile numbers, so the word has to come from the command line.
+    /// </summary>
+    private static bool WantsSnow(string[] args) => args.Any(word =>
+        word.Equals("눈", StringComparison.Ordinal)
+        || word.Equals("snow", StringComparison.OrdinalIgnoreCase));
+
     private const int TileWidth = 56;
     private const int TileHeight = 27;
 
@@ -996,22 +950,52 @@ internal static class Program
         public required List<Palette> Palettes { get; init; }
         public required List<PaletteTable> Tables { get; init; }
 
-        public static TileSource From(List<ArchivedItem> entries)
+        /// <summary>How far into the palette table this set's own tile 0 sits.</summary>
+        public required int PaletteOffset { get; init; }
+
+        /// <summary>
+        /// TILEAS is the same ground set in snow — the S is for snow, not for anything structural, and the
+        /// map editor picks between the two exactly this way. The palette table numbers tiles across both
+        /// sets appended together, which da-lib's Tileset docs say outright ("Ensure the tile ids you add
+        /// to the PaletteTable are based on appending to the existing tileset"), so a snow tile's palette
+        /// is found at TILEA's count plus its own index. Asking at its own index lands in TILEA's rows and
+        /// paints some tiles from the wrong palette.
+        /// </summary>
+        public static TileSource? From(List<ArchivedItem> entries, bool snow = false)
         {
-            ArchivedItem tileSet = entries.FirstOrDefault(entry =>
-                entry.Name.Equals("TILEA.BMP", StringComparison.OrdinalIgnoreCase));
+            string wanted = snow ? "TILEAS.BMP" : "TILEA.BMP";
+
+            ArchivedItem? tileSet = entries.FirstOrDefault(entry =>
+                entry.Name.Equals(wanted, StringComparison.OrdinalIgnoreCase));
 
             if (tileSet is null)
             {
-                Console.Error.WriteLine("TILEA.BMP 를 찾지 못했습니다.");
+                Console.Error.WriteLine($"{wanted} 를 찾지 못했습니다.");
                 return null;
+            }
+
+            int offset = 0;
+
+            if (snow)
+            {
+                ArchivedItem? plain = entries.FirstOrDefault(entry =>
+                    entry.Name.Equals("TILEA.BMP", StringComparison.OrdinalIgnoreCase));
+
+                if (plain is null)
+                {
+                    Console.Error.WriteLine("TILEA.BMP 가 없어 눈 타일의 팔레트 번호를 셀 수 없습니다.");
+                    return null;
+                }
+
+                offset = plain.Data.Length / (TileWidth * TileHeight);
             }
 
             return new TileSource
             {
                 Tiles = new TileCollection(tileSet).Load(),
                 Palettes = Palette.FromArchive(Matching(entries, ".pal")),
-                Tables = PaletteTable.FromArchive(Matching(entries, ".tbl"), "mpt", _ => { }).Result
+                Tables = PaletteTable.FromArchive(Matching(entries, ".tbl"), "mpt", _ => { }).Result,
+                PaletteOffset = offset
             };
         }
 
@@ -1022,7 +1006,7 @@ internal static class Program
 
         public void Draw(Image<Rgba32> canvas, int index, int originX, int originY)
         {
-            Palette palette = PaletteFor(index, Tables, Palettes);
+            Palette palette = PaletteFor(index + PaletteOffset, Tables, Palettes);
             byte[] data = Tiles[index].Data;
 
             for (int y = 0; y < TileHeight; y++)

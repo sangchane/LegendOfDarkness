@@ -2,7 +2,7 @@
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
 - **[참고]** 격리 시험을 돌리기 전에 `database/server/aislings/` 를 비운다. 시험이 그 폴더가 비어 있기를 요구하는데, 손으로 만든 계정과 서버가 만드는 `.backup` 이 거기 쌓인다
-- **[다음/도구]** **`map` 명령은 눈 깃발을 따르지 않는다.** 바닥을 언제나 `TILEA` 로 그린다 — 서버가 `MapFlags.SnowTileset`(128)로 눈 타일셋을 지시하는데(`dark-ages-ts/packages/network/src/entities/map-flags.ts`) 도구는 그것을 보지 않는다. `tiles` 는 이제 `눈|snow` 로 고를 수 있다
+- **[다음/자산]** **눈 맵을 어떻게 그리는지 모른다.** `tiles` 는 이제 `눈|snow` 로 눈 타일셋을 뽑지만, `map` 에는 붙이지 못했다 — **맵의 바닥 번호는 `TILEA` 의 19,243칸 공간을 가리키는데 `TILEAS` 는 2,805칸뿐이라 그대로 대면 한 칸도 안 그려진다.** 서버는 `MapFlags.SnowTileset`(128)로 눈을 지시하는데(`dark-ages-ts`), 그 깃발이 켜졌을 때 원작이 번호를 어떻게 바꿔 읽는지가 빠진 조각이다
 - **[다음/자산]** **벽 타일은 `TILEA*` 에 없다.** `TILEAS` 의 S 는 눈(snow)이다 — 맵 에디터가 `snow ? TILEAS : TILEA` 로 고른다. 벽·구조물이 어느 파일에 있는지는 아직 모른다
 
 <!-- NEXT-ACTION:END -->
