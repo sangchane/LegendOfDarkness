@@ -63,6 +63,50 @@ $env:DOTNET_ROOT = 'D:\_personal\LOD\.tools\dotnet-9.0.317'
 $dotnet = "$env:DOTNET_ROOT\dotnet.exe"
 ```
 
+### macOS (2026-09-11 확인)
+
+같은 커밋을 Mac(Apple M2, macOS 26.5)에서 열어 **빌드·실행·촬영까지 확인했다.** 도구는 윈도우와 같은
+버전을 작업공간 안에 둔다(`.tools/`, 커밋되지 않는다).
+
+```bash
+export DOTNET_ROOT="$PWD/.tools/dotnet-9.0.317"     # 윈도우와 같은 SDK 버전
+export PATH="$DOTNET_ROOT:$PATH"
+GODOT="$PWD/.tools/godot-4.6-mono/Godot_mono.app/Contents/MacOS/Godot"   # 4.6-stable mono, 윈도우와 같음
+```
+
+처음 한 번은 그림을 들여와야 한다 — `"$GODOT" --headless --path mobile/client --import`.
+
+| | 결과 |
+|---|---|
+| `Lod.Mobile.Core` 빌드·시험 | **통과** — 경고 0, 시험 123개 |
+| `LodClient` 빌드 | **통과** — 경고 0 |
+| 게임 화면 실행·촬영 | **됨** — OpenGL 4.1 Metal(GL Compatibility), Apple M2 |
+| 레이아웃 12화면 | **통과** — 어긋난 줄 없음 |
+
+**Mac 에서 다르게 나오는 것 셋:**
+
+1. **한글은 멀쩡한데 화면은 깨진다고 말한다.** `Main.BuildTheme` 이 `C:/Windows/Fonts/malgun.ttf` 가
+   있는지만 보고 없으면 "글꼴 없음 — 한글이 깨집니다"라고 적는다. 그런데 macOS 에서는 Godot 이 시스템
+   글꼴로 대신 그려 한글이 전부 제대로 나온다 — 로그인 화면이 그 문장을 한글로 또렷이 띄운다. 검사가
+   **글꼴이 그려지는지**가 아니라 **윈도우 글꼴 파일이 있는지**를 보고 있어 생기는 거짓 경고다.
+   글꼴을 프로젝트에 넣어야 한다는 결론 자체는 그대로다 — iOS·Android 에는 기댈 시스템 글꼴이 없다.
+2. **세로 화면에서만 GL 텍스처가 샌다.** 끝날 때 `Texture with GL ID of 31: leaked 131072 bytes` 가
+   뜨고, 인벤토리를 연 판에서는 하나 더 샌다(ID 58). 가로 여섯 번은 깨끗하다. 레이아웃 자체는 통과하니
+   화면이 어긋난 것은 아니다. **원인은 아직 못 찾았다.**
+3. **`--screen login` 이 매 프레임 경고를 쏟는다.** `LoginScreen._Process` 가
+   `DisplayServer.VirtualKeyboardGetHeight()` 를 무조건 부르는데 데스크톱 display server 에는 화상
+   자판이 없다 — 2초에 191줄. 윈도우 데스크톱도 같을 것으로 **추정**하나 거기서는 확인하지 않았다.
+
+**`scripts/check-layout.ps1` 은 Mac 에서 못 돈다** — PowerShell 이 없고 기본 경로가 윈도우 exe 다.
+위 12번은 같은 내용을 bash 로 옮겨 돌린 것이며 저장소에는 넣지 않았다.
+
+그 검사기를 시험하는 `tests/check-layout-script.test.js` 도 `powershell.exe` 를 부른다. Mac 에서 이 파일은
+**둘이 실패하고 셋은 거짓으로 통과한다** — 셋은 `status !== 0` 이면 되는데, 실행 자체가 안 되면 `status`
+가 `null` 이라 그 조건이 그냥 맞아 버린다. 못 돈 시험이 초록으로 보이는 쪽이 못 도는 것보다 나쁘다.
+나머지는 성하다: `node --test tests/*.test.js` 가 37개 중 그 둘만 빼고 통과한다.
+
+**아직 못 한 것 — iOS.** Xcode 가 없어(Command Line Tools 만 있다) export 와 실기기 설치는 손대지 못했다.
+
 ### 화면이 들어맞는지
 
 ```powershell

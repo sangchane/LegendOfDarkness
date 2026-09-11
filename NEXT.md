@@ -7,7 +7,7 @@
 - **[다음/서버]** **전역 잠금 범위 줄이기.** 읽지 않는 클라이언트 하나가 다른 클라이언트를 30초 넘게 굶기는 것이 세 번에 한 번꼴로 재현된다(계획서 2.3절 "관측된 한계"). P0 범위 밖이라 남겨 뒀다 — 지인 테스트에서 사람이 몇 명 붙는지 보고 우선순위를 정한다
 - **[다음/자산]** 벽 타일(`TILEAS.BMP`는 고정 크기 아님)
 - **[다음/도구]** `tools/` 에는 시험 프로젝트가 없다. `IconPalettes.PaletteFor`(세 갈래 파싱)와 `icon` 명령의 칸 계산은 지금 눈으로만 확인했다 — 도구 시험 자리를 만들 때 여기부터 덮는다
-- **[대기/Mac]** 같은 커밋을 Mac에서 Godot 4.6 .NET + .NET 9로 열어 macOS 실행 후 Xcode export·arm64 iPhone 실기기 설치를 확인한다. iOS C# 지원은 experimental이며 서명 Team ID와 기준 iPhone/OS는 그때 지정한다
+- **[대기/Mac]** **macOS 실행까지는 됐다**(2026-09-11, `docs/mobile-client.md` 3절 macOS). 남은 것은 **Xcode export·arm64 iPhone 실기기 설치** — Xcode 가 설치돼 있지 않아 손대지 못했다. iOS C# 지원은 experimental 이며 서명 Team ID 와 기준 iPhone/OS 는 그때 지정한다
 
 <!-- NEXT-ACTION:END -->
 

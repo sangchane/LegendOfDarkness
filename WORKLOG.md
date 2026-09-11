@@ -9,6 +9,15 @@
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-11 — **Mac 에서도 돈다.** 같은 커밋을 Apple M2(macOS 26.5)에서 열어 빌드·시험·실행·촬영까지 확인했다. 절차는 `docs/mobile-client.md` 3절 "macOS".
+  - **도구는 윈도우와 같은 버전으로 맞췄다** — .NET SDK 9.0.317(osx-arm64), Godot 4.6-stable **mono**. 버전을 맞춰야 다르게 나오는 것이 곧 플랫폼 차이가 된다. 둘 다 `.tools/` 라 커밋되지 않는다.
+  - 결과: 코어 시험 **123개 통과**(38ms), `LodClient` 빌드 경고 0, 게임 화면이 OpenGL 4.1 Metal(GL Compatibility)로 그려지고 촬영도 된다. 레이아웃 12화면 전부 통과.
+  - **한글이 멀쩡한데 화면은 깨진다고 말한다.** `Main.BuildTheme` 이 `C:/Windows/Fonts/malgun.ttf` 가 있는지만 본다 — macOS 는 Godot 이 시스템 글꼴로 대신 그려 한글이 전부 나오는데도 "글꼴 없음 — 한글이 깨집니다"가 뜬다. 검사가 **그려지는지**가 아니라 **윈도우 글꼴 파일이 있는지**를 보고 있다. 글꼴을 넣어야 한다는 결론 자체는 그대로다(iOS·Android 에는 기댈 시스템 글꼴이 없다).
+  - **세로에서만 GL 텍스처가 샌다** — `Texture with GL ID of 31: leaked 131072 bytes`, 인벤토리를 연 판은 하나 더(ID 58). 가로 여섯 번은 깨끗하다. 레이아웃은 통과하므로 화면이 어긋난 건 아니다. **원인 못 찾음.**
+  - **`--screen login` 이 매 프레임 경고를 쏟는다** — `LoginScreen._Process` 가 `DisplayServer.VirtualKeyboardGetHeight()` 를 무조건 부르는데 데스크톱엔 화상 자판이 없다(2초에 191줄). 윈도우도 같을 것으로 추정하나 확인 안 했다.
+  - **못 돈 시험이 초록으로 보인다.** `tests/check-layout-script.test.js` 는 `powershell.exe` 를 부른다 — Mac 에서 둘은 실패하고 **셋은 거짓으로 통과한다**(`status !== 0` 이면 되는데 실행이 안 되면 `status` 가 `null` 이라 조건이 그냥 맞는다). 나머지는 성하다: `node --test tests/*.test.js` 37개 중 그 둘만 실패.
+  - **못 한 것.** iOS export·실기기는 Xcode 가 없어 손대지 못했다. `scripts/check-layout.ps1` 은 PowerShell 이 없어 Mac 에서 못 돈다 — 같은 12번을 bash 로 옮겨 돌렸고 저장소에는 넣지 않았다.
+  - **훅이 Mac 에서 죽는다.** `.claude/settings.json` 의 훅 다섯이 전부 `python` 을 부르는데 이 Mac 에는 `python3` 만 있다. 이번에는 고치지 않았다.
 - 2026-09-10 — **잡으면 바닥에 떨어진다.** 괴물 → 전투 → 처치 → 떨어진 물건까지 한 줄로 이어졌다.
   - **서버를 고쳤다.** 바닥 물건만 네 바이트 짧게(방향도 종류도 없이) 쓰고 있었고, 기록 안에 그렇다는 표시가 없었다 — 바닥에 뭐라도 있으면 **그 뒤 기록이 전부 어긋난다.** 원작 형식엔 없는 구멍이라 다른 것과 같은 17바이트로 맞췄다(종류 = 밟고 지나가는 것). fork 에 push.
   - 클라이언트는 그림이 없어 **자리 표식**으로 그린다(시안 8절의 "자리 표시"). 아이콘 아카이브에서 아직 아무것도 안 뽑았다.
