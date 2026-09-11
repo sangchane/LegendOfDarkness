@@ -36,6 +36,7 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명|transparent]");
             Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율] [칸] [색번호|marker] [색표]");
             Console.Error.WriteLine("        dat-extract icon <Legend.dat> <번호들> <출력.png> [배율]");
+            Console.Error.WriteLine("        dat-extract walls <맵파일.map> <sotp.dat> [가로칸]");
             Console.Error.WriteLine("        dat-extract dyeslots <출력.txt>");
             Console.Error.WriteLine("        dat-extract metafile <database/server/metafile/ItemInfo8> [찾을 말]");
             return 2;
@@ -52,6 +53,11 @@ internal static class Program
         if (command == "metafile")
         {
             return ShowMetaFile(args);
+        }
+
+        if (command == "walls")
+        {
+            return ShowWalls(args);
         }
 
         string archivePath = Path.GetFullPath(args[1]);
@@ -1049,6 +1055,67 @@ internal static class Program
         }
 
         return palettes[Math.Clamp(chosen, 0, palettes.Count - 1)];
+    }
+
+    /// <summary>
+    /// Says which cells of a map block. Walls are not pictures of their own — the map's two wall numbers
+    /// point into sotp.dat, one flag byte per tile, and 0x0F means wall. This reads no archive: a .map and
+    /// sotp.dat are the whole story.
+    /// </summary>
+    private static int ShowWalls(string[] args)
+    {
+        if (args.Length < 3)
+        {
+            Console.Error.WriteLine("walls 에는 맵 파일과 sotp.dat 이 필요합니다.");
+            return 2;
+        }
+
+        string mapPath = Path.GetFullPath(args[1]);
+        string sotpPath = Path.GetFullPath(args[2]);
+
+        foreach (string needed in new[] { mapPath, sotpPath })
+        {
+            if (!File.Exists(needed))
+            {
+                Console.Error.WriteLine($"파일을 찾을 수 없습니다: {needed}");
+                return 2;
+            }
+        }
+
+        byte[] sotp = File.ReadAllBytes(sotpPath);
+        List<Walls.Cell> cells = Walls.Read(File.ReadAllBytes(mapPath));
+
+        int blocked = cells.Count(cell => Walls.Blocks(sotp, cell.Left, cell.Right));
+        int walled = cells.Count(cell => cell.Left != 0 || cell.Right != 0);
+
+        Console.WriteLine($"{Path.GetFileName(mapPath)} — 칸 {cells.Count}개");
+        Console.WriteLine($"  벽 번호가 붙은 칸 {walled}개 · 그중 막는 칸 {blocked}개");
+        Console.WriteLine($"  sotp.dat {sotp.Length}바이트 (타일 한 칸당 한 바이트)");
+
+        int columns = args.Length > 3 && int.TryParse(args[3], out int given) ? given : 0;
+
+        if (columns <= 0)
+        {
+            return 0;
+        }
+
+        // 그림으로 보면 방 모양이 바로 드러난다. 막는 칸은 #, 지나갈 수 있으면 · 다.
+        Console.WriteLine();
+
+        for (int row = 0; row * columns < cells.Count; row++)
+        {
+            char[] line = new char[Math.Min(columns, cells.Count - (row * columns))];
+
+            for (int column = 0; column < line.Length; column++)
+            {
+                Walls.Cell cell = cells[(row * columns) + column];
+                line[column] = Walls.Blocks(sotp, cell.Left, cell.Right) ? '#' : '.';
+            }
+
+            Console.WriteLine(new string(line));
+        }
+
+        return 0;
     }
 
     private static int Unknown(string command)
