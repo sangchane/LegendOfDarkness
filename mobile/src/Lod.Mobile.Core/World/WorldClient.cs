@@ -38,6 +38,7 @@ public sealed class WorldClient(WorldSession session)
     private const byte TalkCommand = 0x0E;
     private const byte UseCommand = 0x1C;
     private const byte DropCommand = 0x08;
+    private const byte DropGoldCommand = 0x24;
     private const byte TakeFromPackCommand = 0x10;
     private const byte MoveCommand = 0x30;
 
@@ -337,6 +338,21 @@ public sealed class WorldClient(WorldSession session)
                 (byte)(where.X >> 8), (byte)where.X,
                 (byte)(where.Y >> 8), (byte)where.Y,
                 (byte)(amount >> 24), (byte)(amount >> 16), (byte)(amount >> 8), (byte)amount
+            ],
+            cancellationToken);
+
+    /// <summary>
+    /// Throws gold on the floor. Gold is not a pack slot — the server takes the amount straight off the
+    /// character — so this says only how much and where. The original merges what lands where gold already
+    /// lies, so two throws on one tile leave one larger pile rather than two.
+    /// </summary>
+    public Task DropGoldAsync(int amount, Tile where, CancellationToken cancellationToken) =>
+        Send(
+            DropGoldCommand,
+            [
+                (byte)(amount >> 24), (byte)(amount >> 16), (byte)(amount >> 8), (byte)amount,
+                (byte)(where.X >> 8), (byte)where.X,
+                (byte)(where.Y >> 8), (byte)where.Y
             ],
             cancellationToken);
 
