@@ -31,6 +31,7 @@
 | 부위가 **화면 어디에 놓이나** | `sources/FallenDev/dark-ages-ts/apps/client/public/aislings/<이름>/<이름>.atlas` | 조각마다 `bounds`(그림 자리)와 `offsets`(놓을 자리 + **바탕 크기**) |
 | **원작 서버가 보내는 패킷**의 진짜 생김새 | `sources/FallenDev/dark-ages-ts/packages/network/src/packets/` | 필드 이름·크기·차례. **우리 서버(Hades)와 다르다** — 4절 |
 | 우리 서버가 보내는 것 | `sources/wren11/Dark-Ages-Private-Server/src/.../Network/ServerFormats/` | 실제로 우리 클라이언트가 받는 바이트 |
+| **괴물 선공·이동·공격 규칙** | `docs/monster-behaviour.md` | 값은 템플릿, 이름표는 `EnumReference.txt`, 판정은 `scripts/` |
 | 동작 구간·몬스터 행동·색표 | `data/legend-tables/` (원본은 아래 4절) | `skill.tbl` `MobTile.tbl` `color.tbl` `color0.tbl` `itempal.tbl` … |
 | **원작 게임 자료표** — 아이템·기술·퀘스트·NPC 초상 | `sources/.../database/server/metafile/` | 아래 4.6절. **.dat 이 아니라 서버 데이터베이스 폴더에 있다** |
 | 그림·소리 원본 | `sources/Dark-Ages-Private-Server-master/game/*.dat` | `khan`(남) `khan2`(여) `hades`(몬스터) `roh`(효과) `seo`(타일) `ia`(아이콘) `setoa`(화면 배치) `national`(이야기) `cious`(던전) |
