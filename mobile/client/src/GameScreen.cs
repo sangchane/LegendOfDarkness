@@ -73,6 +73,8 @@ public partial class GameScreen : Control
         _pack = new PackPanel();
         _pack.Close.Pressed += () => Carrying(false);
         _pack.Used += slot => _ = _server?.UseAsync(slot, System.Threading.CancellationToken.None);
+        _pack.Dropped += slot => _ = Throw(slot);
+        _pack.Tidy.Pressed += () => _ = Straighten();
 
         if (Main.Portrait)
         {
@@ -88,6 +90,8 @@ public partial class GameScreen : Control
             rows.AddChild(_packRow = BuildPackRow());
             rows.AddChild(BuildLog());
             rows.AddChild(_controlRow);
+
+            Cover(hud);
         }
         else
         {
@@ -102,22 +106,34 @@ public partial class GameScreen : Control
             rows.AddChild(_packRow = BuildPackRow());
             rows.AddChild(_controlRow);
 
-            // 가로에서는 위 줄과 조작 줄 사이에 남는 높이가 아이콘 한 칸도 안 된다. 시안대로
-            // 모달이니 조작 줄 위로 덮게 두고(열려 있는 동안 이동·공격은 어차피 막힌다),
-            // 줄 자체는 빈자리로 남겨 조작 줄이 위로 올라오지 않게 한다.
-            // MarginContainer 는 자식을 꽉 채우므로 닻이 먹지 않는다. 그냥 Control 을 한 겹 두면
-            // 그 안에서는 닻이 그대로 듣는다.
-            Control over = new() { MouseFilter = MouseFilterEnum.Ignore };
-            hud.AddChild(over);
-            over.AddChild(_pack);
-
-            _pack.SetAnchorsPreset(LayoutPreset.FullRect);
-            _pack.AnchorLeft = 0.6f;
-            _pack.OffsetLeft = 0;
-            _pack.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
-            _pack.OffsetRight = 0;
-            _pack.OffsetBottom = 0;
+            Cover(hud);
         }
+    }
+
+    /// <summary>
+    /// Lays the pack over the screen rather than in a row of its own. Neither shape leaves a row tall
+    /// enough for a grid of pictures — landscape leaves less than one cell — and the wireframes already
+    /// call it a modal, so covering the control row costs nothing: it is dead while the pack is open.
+    /// </summary>
+    /// <remarks>
+    /// A MarginContainer stretches its children to fill it, which throws away anchors. One plain Control
+    /// in between restores them.
+    /// </remarks>
+    private void Cover(Control hud)
+    {
+        Control over = new() { MouseFilter = MouseFilterEnum.Ignore };
+
+        hud.AddChild(over);
+        over.AddChild(_pack);
+
+        _pack.SetAnchorsPreset(LayoutPreset.FullRect);
+
+        // 가로는 오른쪽 기둥, 세로는 전폭. 위 줄만 남겨 두어 이름과 체력은 계속 보인다.
+        _pack.AnchorLeft = Main.Portrait ? 0 : 0.6f;
+        _pack.OffsetLeft = 0;
+        _pack.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
+        _pack.OffsetRight = 0;
+        _pack.OffsetBottom = 0;
     }
 
     /// <summary>
@@ -148,12 +164,10 @@ public partial class GameScreen : Control
             });
 
             _pack.SizeFlagsStretchRatio = 38;
-
-            // 가로에서는 패널을 이 줄이 아니라 HUD 위에 덮어 놓는다. 줄은 빈자리로만 남는다.
-            return row;
         }
 
-        row.AddChild(_pack);
+        // 패널은 이 줄이 아니라 HUD 위에 덮어 놓는다(Cover). 줄은 조작 줄이 올라오지 않게
+        // 자리만 지킨다.
 
         // 세로에서는 시안대로 월드 아래 전폭이고, 닫혀 있으면 줄째로 사라져 월드에 자리를 돌려준다.
         row.Visible = !Main.Portrait;
@@ -318,6 +332,34 @@ public partial class GameScreen : Control
                 _worn = true;
                 GD.Print("GREYBOX_WORE 첫 줄을 눌렀다");
             }
+        }
+    }
+
+    /// <summary>Throws one slot on the floor, at our own feet — the only tile we can be sure of.</summary>
+    private async Task Throw(int slot)
+    {
+        if (_server is not { State: { } standing } server)
+        {
+            return;
+        }
+
+        await server.DropAsync(slot, 1, standing.Where, System.Threading.CancellationToken.None);
+    }
+
+    /// <summary>
+    /// Pulls everything to the front of the pack. The server only swaps two slots at a time, so this is a
+    /// run of swaps; it is worked out in one go from what we are holding now, before any of them land.
+    /// </summary>
+    private async Task Straighten()
+    {
+        if (_server is not { } server)
+        {
+            return;
+        }
+
+        foreach ((int from, int to) in PackOrder.Tidy(server.Pack))
+        {
+            await server.MoveAsync(from, to, System.Threading.CancellationToken.None);
         }
     }
 

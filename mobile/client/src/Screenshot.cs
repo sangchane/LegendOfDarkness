@@ -20,7 +20,20 @@ public static class Screenshot
             return;
         }
 
+        StayOutOfTheWay();
+
         _ = SaveAfterFirstFrames(host, path, SecondsFromCommandLine());
+    }
+
+    /// <summary>
+    /// A run that takes its own picture is not for looking at. It still has to draw — a headless
+    /// window renders nothing — so the window is moved off the screen and told not to take the
+    /// keyboard, rather than popping up over whatever somebody is doing.
+    /// </summary>
+    private static void StayOutOfTheWay()
+    {
+        DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.NoFocus, true);
+        DisplayServer.WindowSetPosition(new Vector2I(-4000, -4000));
     }
 
     private static string? PathFromCommandLine()

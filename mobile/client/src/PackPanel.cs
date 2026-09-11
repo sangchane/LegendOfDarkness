@@ -23,6 +23,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly GridContainer _rows = new() { Name = "Items" };
     private readonly Label _chosenName = new();
     private readonly Button _use = new() { Text = "착용" };
+    private readonly Button _drop = new() { Text = "버리기" };
 
     // 무엇을 고쳐 그렸는지. 고른 것이 바뀌어도 테두리가 옮겨 가야 하므로 함께 센다.
     private string? _showing;
@@ -43,6 +44,9 @@ public sealed partial class PackPanel : PanelContainer
         head.AddThemeConstantOverride("separation", Main.Gutter);
         head.AddChild(new Label { Text = "인벤토리", SizeFlagsVertical = SizeFlags.ShrinkCenter });
         head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+
+        Tidy = new Button { Text = "정렬", CustomMinimumSize = Cell };
+        head.AddChild(Tidy);
 
         Close = new Button { Text = "닫기", CustomMinimumSize = Cell };
         head.AddChild(Close);
@@ -84,10 +88,22 @@ public sealed partial class PackPanel : PanelContainer
             }
         };
 
+        _drop.CustomMinimumSize = Cell;
+        _drop.Visible = false;
+
+        _drop.Pressed += () =>
+        {
+            if (_chosen > 0)
+            {
+                Dropped?.Invoke(_chosen);
+            }
+        };
+
         HBoxContainer foot = new();
         foot.AddThemeConstantOverride("separation", Main.Gutter);
         foot.AddChild(_chosenName);
         foot.AddChild(_use);
+        foot.AddChild(_drop);
 
         body.AddChild(head);
         body.AddChild(scroll);
@@ -101,6 +117,12 @@ public sealed partial class PackPanel : PanelContainer
 
     /// <summary>Somebody asked to use a carried thing. The slot is what the server wants.</summary>
     public event System.Action<int>? Used;
+
+    /// <summary>Somebody asked to throw a carried thing away. The server decides whether it may be.</summary>
+    public event System.Action<int>? Dropped;
+
+    /// <summary>The button that pulls everything to the front of the pack.</summary>
+    public Button Tidy { get; }
 
     /// <summary>Shows what is worn and what is carried, and says plainly when there is nothing.</summary>
     public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn)
@@ -196,6 +218,7 @@ public sealed partial class PackPanel : PanelContainer
         {
             _chosenName.Text = held.Stacks > 1 ? $"{held.Name} ×{held.Stacks}" : held.Name;
             _use.Visible = true;
+            _drop.Visible = true;
 
             return;
         }
@@ -206,6 +229,7 @@ public sealed partial class PackPanel : PanelContainer
         {
             _chosenName.Text = $"{WornPlace.Of(gear.Slot)} · {gear.Called}";
             _use.Visible = false;
+            _drop.Visible = false;
 
             return;
         }
@@ -216,6 +240,7 @@ public sealed partial class PackPanel : PanelContainer
 
         _chosenName.AddThemeColorOverride("font_color", Greybox.Muted);
         _use.Visible = false;
+        _drop.Visible = false;
     }
 
     private string Describe(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn) =>

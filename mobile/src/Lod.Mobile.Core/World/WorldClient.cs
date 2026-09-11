@@ -37,6 +37,12 @@ public sealed class WorldClient(WorldSession session)
     private const byte BodyMotionCommand = 0x1A;
     private const byte TalkCommand = 0x0E;
     private const byte UseCommand = 0x1C;
+    private const byte DropCommand = 0x08;
+    private const byte TakeFromPackCommand = 0x10;
+    private const byte MoveCommand = 0x30;
+
+    /// <summary>소지품 칸을 가리키는 번호. 주문·기술 칸도 같은 명령을 쓴다.</summary>
+    private const byte InventoryPane = 0x00;
     private const byte WornCommand = 0x37;
     private const byte TookOffCommand = 0x38;
 
@@ -213,6 +219,18 @@ public sealed class WorldClient(WorldSession session)
 
                     continue;
 
+                case TakeFromPackCommand:
+                {
+                    ReadOnlySpan<byte> gone = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                    if (gone.Length >= 1)
+                    {
+                        _pack.TryRemove(gone[0], out _);
+                    }
+                }
+
+                    continue;
+
                 case WornCommand:
                 {
                     WornItem gear = ReadWorn(HadesCipher.DecodeSecured(frame, session.Parameters));
@@ -293,6 +311,28 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public Task UseAsync(int slot, CancellationToken cancellationToken) =>
         Send(UseCommand, [(byte)slot], cancellationToken);
+
+    /// <summary>
+    /// Throws one pack slot on the floor. The server decides whether it may be thrown at all — some things
+    /// are not — and it lands on the tile we name, which is our own.
+    /// </summary>
+    public Task DropAsync(int slot, int amount, Tile where, CancellationToken cancellationToken) =>
+        Send(
+            DropCommand,
+            [
+                (byte)slot,
+                (byte)(where.X >> 8), (byte)where.X,
+                (byte)(where.Y >> 8), (byte)where.Y,
+                (byte)(amount >> 24), (byte)(amount >> 16), (byte)(amount >> 8), (byte)amount
+            ],
+            cancellationToken);
+
+    /// <summary>
+    /// Swaps two pack slots. Tidying the pack is a run of these — the server keeps no order of its own, so
+    /// whatever order there is, the player made it.
+    /// </summary>
+    public Task MoveAsync(int from, int to, CancellationToken cancellationToken) =>
+        Send(MoveCommand, [InventoryPane, (byte)from, (byte)to], cancellationToken);
 
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>

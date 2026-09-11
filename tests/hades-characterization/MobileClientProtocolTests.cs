@@ -135,6 +135,43 @@ public sealed class MobileClientProtocolTests
     }
 
     [Fact]
+    public async Task Tidying_closes_the_gaps_and_throwing_something_away_empties_its_slot()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+
+        // 세 칸 건너뛰어 넣어 둔다. 정렬이 할 일이 있어야 한다.
+        PutBootsInThePack(server, MobileName, slot: 3);
+
+        using WorldSession session = await LoginAsync(server);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        WorldEntry standing = await Settled(world, seen => seen is not null);
+
+        InventoryItem away = await Carried(world, "Shagreen Boots");
+
+        Assert.Equal(3, away.Slot);
+
+        // 입장 직후에는 서버가 칸 옮기기를 조용히 버린다 — Format30Handler 가 IsRefreshing 이면
+        // 아무 말 없이 돌아선다. 한 번 보내고 기다렸다 다시 보내면 받아 준다(2026-09-11 확인).
+        await world.MoveAsync(away.Slot, 1, _deadline.Token);
+        await Task.Delay(2000, _deadline.Token);
+        await world.MoveAsync(away.Slot, 1, _deadline.Token);
+
+        InventoryItem moved = await Slotted(world, 1);
+
+        Assert.Equal("Shagreen Boots", moved.Name);
+
+        await world.DropAsync(moved.Slot, 1, standing.Where, _deadline.Token);
+
+        await Emptied(world);
+    }
+
+    [Fact]
     public async Task The_world_tells_us_our_own_name()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
@@ -305,7 +342,7 @@ public sealed class MobileClientProtocolTests
     /// to the level the boots ask for. The server fills in the rest of the template by name when it loads
     /// the character, so only the name and the slot matter.
     /// </summary>
-    private static void PutBootsInThePack(IsolatedHadesServer server, string name)
+    private static void PutBootsInThePack(IsolatedHadesServer server, string name, int slot = 1)
     {
         string path = Path.Combine(server.ContentLocation, "aislings", $"{name}.json");
         JsonNode saved = JsonNode.Parse(File.ReadAllText(path))!;
@@ -313,10 +350,10 @@ public sealed class MobileClientProtocolTests
         // 이 신발은 33레벨을 요구한다(GameClient.CheckReqs). 새 계정은 1레벨이라 그대로면 못 신는다.
         saved["ExpLevel"] = 33;
 
-        saved["Inventory"]!["Items"]!["1"] = new JsonObject
+        saved["Inventory"]!["Items"]![slot.ToString()] = new JsonObject
         {
             ["Template"] = new JsonObject { ["Name"] = "Shagreen Boots" },
-            ["Slot"] = 1,
+            ["Slot"] = slot,
             ["Image"] = 1,
             ["DisplayImage"] = 32882,
             ["Color"] = 1,
@@ -326,6 +363,47 @@ public sealed class MobileClientProtocolTests
 
         File.WriteAllText(path, saved.ToJsonString());
     }
+
+    /// <summary>Waits until one particular slot holds something.</summary>
+    private async Task<InventoryItem> Slotted(WorldClient world, int slot)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            InventoryItem? found = world.Pack.FirstOrDefault(item => item.Slot == slot);
+
+            if (found is not null)
+            {
+                return found;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"{slot}번 칸이 차지 않았습니다. 든 것: {Listed(world)}");
+    }
+
+    /// <summary>Waits until the pack has nothing left in it.</summary>
+    private async Task Emptied(WorldClient world)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            if (world.Pack.Count == 0)
+            {
+                return;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"소지품이 비지 않았습니다. 남은 것: {Listed(world)}");
+    }
+
+    private static string Listed(WorldClient world) =>
+        string.Join(", ", world.Pack.Select(item => $"{item.Slot}:{item.Name}"));
 
     /// <summary>Waits until something by that name is in the pack.</summary>
     private async Task<InventoryItem> Carried(WorldClient world, string called)
