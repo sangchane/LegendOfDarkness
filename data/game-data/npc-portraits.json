@@ -1,0 +1,682 @@
+﻿[
+    {
+        "name":  "Aoife",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Dee",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Vivianne",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Meaveeen",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Evania",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Gabriela",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Camille",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Audny",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Erika",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Blanchefleur",
+        "portrait":  "shaman.spf"
+    },
+    {
+        "name":  "Fair Ticket Seller",
+        "portrait":  "white.spf"
+    },
+    {
+        "name":  "Moire",
+        "portrait":  "white.spf"
+    },
+    {
+        "name":  "Rowena",
+        "portrait":  "white.spf"
+    },
+    {
+        "name":  "Devlin",
+        "portrait":  "white.spf"
+    },
+    {
+        "name":  "Narve",
+        "portrait":  "white.spf"
+    },
+    {
+        "name":  "Bertil",
+        "portrait":  "white.spf"
+    },
+    {
+        "name":  "Nulonna",
+        "portrait":  "west1.spf"
+    },
+    {
+        "name":  "Kelan",
+        "portrait":  "west1.spf"
+    },
+    {
+        "name":  "Sewerman",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Fish Merchant",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Theomar",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Cassidy",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Brody",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Balsamo",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Deleon",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Franchesco",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Jilt",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Lamont",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Arnljot",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Cecil",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Argus",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Hali",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Antonio",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Angelo",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Huberto",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Braz",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "StageHand",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Lalerid",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Armando",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasuma",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumb",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumc",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumd",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasume",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumf",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumg",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumh",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumi",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumj",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumk",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasuml",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumm",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumn",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Kasumo",
+        "portrait":  "bank.spf"
+    },
+    {
+        "name":  "Hadrian",
+        "portrait":  "black.spf"
+    },
+    {
+        "name":  "Kiril",
+        "portrait":  "black.spf"
+    },
+    {
+        "name":  "Dar",
+        "portrait":  "black.spf"
+    },
+    {
+        "name":  "Oona",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Alleen",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Aud",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Gudny",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Tereza",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Damara",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Anara",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Cirassa",
+        "portrait":  "hof.spf"
+    },
+    {
+        "name":  "Riona",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Aingeal",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Lia",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Saskia",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Frida",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Runa",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Viveka",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Elena",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Dorina",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Chloe",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Maria",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Cecilla",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Eeva",
+        "portrait":  "inn.spf"
+    },
+    {
+        "name":  "Seanan",
+        "portrait":  "seaus.spf"
+    },
+    {
+        "name":  "Keefe",
+        "portrait":  "seaus.spf"
+    },
+    {
+        "name":  "Daithi",
+        "portrait":  "spskill.spf"
+    },
+    {
+        "name":  "Fisk",
+        "portrait":  "spskill.spf"
+    },
+    {
+        "name":  "Baltasar",
+        "portrait":  "spskill.spf"
+    },
+    {
+        "name":  "Baltasar",
+        "portrait":  "spskill.spf"
+    },
+    {
+        "name":  "Ceres",
+        "portrait":  "helper.spf"
+    },
+    {
+        "name":  "Ase",
+        "portrait":  "helper.spf"
+    },
+    {
+        "name":  "Asea도우미",
+        "portrait":  "helper.spf"
+    },
+    {
+        "name":  "Bastill",
+        "portrait":  "helper.spf"
+    },
+    {
+        "name":  "Bastilla",
+        "portrait":  "helper.spf"
+    },
+    {
+        "name":  "Bastille",
+        "portrait":  "helper.spf"
+    },
+    {
+        "name":  "Bastilli",
+        "portrait":  "helper.spf"
+    },
+    {
+        "name":  "Gerard",
+        "portrait":  "boy.spf"
+    },
+    {
+        "name":  "Narducio",
+        "portrait":  "boy.spf"
+    },
+    {
+        "name":  "Hauk",
+        "portrait":  "boy.spf"
+    },
+    {
+        "name":  "Evan",
+        "portrait":  "boy.spf"
+    },
+    {
+        "name":  "Mireh",
+        "portrait":  "boy.spf"
+    },
+    {
+        "name":  "Tealor",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Callough",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Torrance",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Vidar",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Steinar",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Gunnar",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Leo",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Torbjorn",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Valdemar",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Petru",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Alexios",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Marcelo",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Carlos",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Marlon",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Lowell",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Marlon",
+        "portrait":  "buls.spf"
+    },
+    {
+        "name":  "Paulin",
+        "portrait":  "ed.spf"
+    },
+    {
+        "name":  "Brato",
+        "portrait":  "ed1.spf"
+    },
+    {
+        "name":  "Jasmine",
+        "portrait":  "girl.spf"
+    },
+    {
+        "name":  "Kalliope",
+        "portrait":  "girl.spf"
+    },
+    {
+        "name":  "Erin",
+        "portrait":  "ia.spf"
+    },
+    {
+        "name":  "Richael",
+        "portrait":  "ia.spf"
+    },
+    {
+        "name":  "Gramail",
+        "portrait":  "kan.spf"
+    },
+    {
+        "name":  "Raghnall",
+        "portrait":  "knight.spf"
+    },
+    {
+        "name":  "Deos",
+        "portrait":  "knight.spf"
+    },
+    {
+        "name":  "Stefan",
+        "portrait":  "knight.spf"
+    },
+    {
+        "name":  "Thibault",
+        "portrait":  "knight.spf"
+    },
+    {
+        "name":  "Drave",
+        "portrait":  "knight.spf"
+    },
+    {
+        "name":  "CaistealGuard",
+        "portrait":  "knight.spf"
+    },
+    {
+        "name":  "CaistealRaider",
+        "portrait":  "knight.spf"
+    },
+    {
+        "name":  "Dealos",
+        "portrait":  "knight1.spf"
+    },
+    {
+        "name":  "Grouw",
+        "portrait":  "knight1.spf"
+    },
+    {
+        "name":  "Bilge",
+        "portrait":  "knight1.spf"
+    },
+    {
+        "name":  "Uistean",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Conn",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Myles",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Cian",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Appie",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Egil",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Matei",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Jean",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Blaise",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Marlin",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Reto",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Bartender",
+        "portrait":  "mage.spf"
+    },
+    {
+        "name":  "Keallach",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "Bodil",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "Monitor",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "Berg",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "ColiseumTir",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "ColiseumTor",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "ColiseumTyr",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "ColiseumTur",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "Husbander",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "Colan",
+        "portrait":  "man1.spf"
+    },
+    {
+        "name":  "Filippo",
+        "portrait":  "nori.spf"
+    },
+    {
+        "name":  "Courtney",
+        "portrait":  "nori.spf"
+    },
+    {
+        "name":  "Jay",
+        "portrait":  "nori.spf"
+    },
+    {
+        "name":  "Eston",
+        "portrait":  "nori.spf"
+    },
+    {
+        "name":  "Scribe",
+        "portrait":  "saser.spf"
+    },
+    {
+        "name":  "Aliran",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Connlaoi",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Eduardo",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Ramiro",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Rory",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Mitrick",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Odhran",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Octavio",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Ceannard",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Aricin",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Thycan",
+        "portrait":  "seba.spf"
+    },
+    {
+        "name":  "Deoch",
+        "portrait":  "seoj.spf"
+    },
+    {
+        "name":  "Neal",
+        "portrait":  "setoa.spf"
+    },
+    {
+        "name":  "Oscar",
+        "portrait":  "setoa.spf"
+    }
+]
