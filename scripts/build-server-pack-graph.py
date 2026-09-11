@@ -44,6 +44,8 @@ from graphify.report import generate                          # noqa: E402
 
 CATS = [("맵", "maps"), ("괴물", "mobs"), ("아이템", "items"), ("NPC", "npcs"),
         ("마법", "spells"), ("기술", "skills"), ("상점", "shops"), ("스크립트", "scripts")]
+# 퀘스트의 이름은 스크립트 변수 이름, 이벤트의 이름은 아이템을 담은 폴더 이름이다
+EXTRA = [("퀘스트", "quests", "변수"), ("이벤트", "events", "묶음")]
 
 
 def load(pack, key):
@@ -71,6 +73,10 @@ def extraction_for(pack):
     for cat, key in CATS:
         for e in load(pack, key):
             node(cat, e["이름"], e["출처"])
+    for cat, key, namekey in EXTRA:
+        for e in load(pack, key):
+            src = e["출처"][0] if isinstance(e["출처"], list) and e["출처"] else key
+            node(cat, e[namekey], src)
 
     for w in load(pack, "warps"):
         if w["출발맵"] != w["도착맵"]:
@@ -91,6 +97,21 @@ def extraction_for(pack):
         for cat, names in sc["부름"].items():
             for n in names:
                 edge(a, node(cat, n, sc["출처"]), "부른다", sc["출처"])
+    for q in load(pack, "quests"):
+        src = q["출처"][0] if q["출처"] else "quests"
+        a = node("퀘스트", q["변수"], src)
+        for n in q["NPC"]:
+            edge(node("NPC", n, src), a, "준다", src)
+        for key, rel in (("요구아이템", "가져오라"), ("회수아이템", "거둔다"), ("보상아이템", "보상")):
+            for it, _c in q[key]:
+                edge(a, node("아이템", it, src), rel, src)
+        for m in q["워프"]:
+            edge(a, node("맵", m, src), "보낸다", src)
+    for ev in load(pack, "events"):
+        src = ev["출처"][0] if ev["출처"] else "events"
+        a = node("이벤트", ev["묶음"], src)
+        for it in ev["아이템"]:
+            edge(a, node("아이템", it, src), "묶음", src)
     for t in load(pack, "traps"):
         edge(node("맵", t["맵"], t["출처"]), node("스크립트", t["스크립트"], t["출처"]),
              "함정", t["출처"])
