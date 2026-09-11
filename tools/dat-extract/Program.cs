@@ -695,11 +695,12 @@ internal static class Program
         bool female = Path.GetFileName(args[1]).StartsWith("khan2", StringComparison.OrdinalIgnoreCase);
 
         // The women's archive carries no palettes of its own and shares the men's, so colours are looked
-        // up next door.
+        // up next door. Where "next door" is depends on how the archives are laid out: loose in one folder,
+        // or each in a folder of its own under database/archives — try the first, then the second.
         List<ArchivedItem> palettes =
             entries.Any(entry => entry.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase))
                 ? entries
-                : await ReadEntries(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "khan.dat"));
+                : await ReadEntries(MensArchive(Path.GetFullPath(args[1])));
 
         List<(Epf.Frame Frame, Palette Palette, int ShiftX, int ShiftY)>[] stacks =
             new List<(Epf.Frame, Palette, int, int)>[poses.Length];
@@ -855,6 +856,11 @@ internal static class Program
         // Both spellings: a Korean argument does not always survive the hand-off from a shell.
         bool transparent = args.Length > 5 && args[5] is "투명" or "transparent";
 
+        // 'strip': one row of square cells, edge to edge, plus a text file naming the motion segments.
+        // That is the only shape the client can read — it works the frame size out from the sheet alone
+        // (width / height), and it needs the segments because every creature numbers its own differently.
+        bool strip = args.Length > 6 && args[6].Equals("strip", StringComparison.OrdinalIgnoreCase);
+
         string[] names = entryName.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         List<(byte[] Data, int Width, int Height, Palette Palette)> cells = [];
 
@@ -882,6 +888,11 @@ internal static class Program
                 : sheet.Frames.Skip(sheet.StandStart).Take(1);
 
             cells.AddRange(wanted.Select(frame => (frame.Data, frame.Width, frame.Height, palette)));
+
+            if (strip && names.Length == 1)
+            {
+                await WriteMotion(output, sheet);
+            }
         }
 
         if (cells.Count == 0)
@@ -890,10 +901,53 @@ internal static class Program
             return 2;
         }
 
-        await Sprites.Save(output, cells, Math.Min(cells.Count, 8), zoom, transparent);
+        await Sprites.Save(
+            output,
+            cells,
+            strip ? cells.Count : Math.Min(cells.Count, 8),
+            zoom,
+            transparent,
+            padding: strip ? 0 : 4,
+            square: strip);
+
         Console.WriteLine($"프레임 {cells.Count}개를 {output} 에 그렸습니다.");
 
         return 0;
+    }
+
+    /// <summary>Where the men's archive is, given the women's. It holds the palettes both share.</summary>
+    private static string MensArchive(string womens)
+    {
+        string folder = Path.GetDirectoryName(womens)!;
+        string beside = Path.Combine(folder, "khan.dat");
+
+        if (File.Exists(beside))
+        {
+            return beside;
+        }
+
+        // database/archives/khan2/khan2.dat → database/archives/khan/khan.dat
+        string sibling = Path.Combine(Path.GetDirectoryName(folder)!, "khan", "khan.dat");
+
+        return File.Exists(sibling) ? sibling : beside;
+    }
+
+    /// <summary>
+    /// Writes a creature's motion segments beside its sheet. Every creature numbers its own frames — one
+    /// walks on 0..2 and swings on 6, the next walks on 0..4 and swings on 10 — so a reader that guesses
+    /// plays the wrong drawings. A count of zero means the creature has no such motion: the original's
+    /// <c>fStop</c> says a wasp may not stand still, and its file gives it no standing frames to stand on.
+    /// </summary>
+    private static async Task WriteMotion(string output, Mpf.Sheet sheet)
+    {
+        string beside = Path.ChangeExtension(output, ".txt");
+
+        await File.WriteAllTextAsync(
+            beside,
+            $"frames {sheet.Frames.Count}\n"
+            + $"stand {sheet.StandStart} {sheet.StandCount}\n"
+            + $"walk {sheet.WalkStart} {sheet.WalkCount}\n"
+            + $"attack {sheet.AttackStart} {sheet.AttackCount}\n");
     }
 
     private const int TileWidth = 56;

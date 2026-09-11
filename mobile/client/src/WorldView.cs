@@ -142,7 +142,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             // Nobody to ask, so stand a couple of figures up to look at.
             Add(new Actor("주모", Actor.Sheet.Walk(OtherSheet)), Ground(new Tile(6, 4))).Face(Direction.South);
-            Add(new Actor("말벌", Actor.Sheet.Creature("res://assets/actor/wasp.png", 59)), Ground(new Tile(3, 6)));
+            Add(new Actor("말벌", CreatureSheet($"{CreatureFolder}mns001.png")), Ground(new Tile(3, 6)));
         }
         else
         {
@@ -243,6 +243,25 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         Mark();
+    }
+
+    /// <summary>
+    /// One creature's sheet and the numbering that goes with it. The frames lie side by side in square
+    /// cells, so a cell is as tall as the sheet and as wide as it is tall — that is the whole reason the
+    /// extractor squares them. The numbering comes out of the archive too, in a text file beside the
+    /// picture: every creature walks and swings on frames of its own choosing, and a creature played with
+    /// the person's numbering asks for frames that are not there (docs/original-sprite-animation.md 4절).
+    /// </summary>
+    private static Actor.Sheet CreatureSheet(string path)
+    {
+        int size = GD.Load<Texture2D>(path).GetHeight();
+        string beside = System.IO.Path.ChangeExtension(path, ".txt");
+
+        CreatureMotion? motion = Godot.FileAccess.FileExists(beside)
+            ? CreatureMotion.Read(Godot.FileAccess.GetFileAsString(beside))
+            : null;
+
+        return Actor.Sheet.Creature(path, size, motion);
     }
 
     /// <summary>
@@ -616,11 +635,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                     continue;
                 }
 
-                // Frames lie side by side, so a cell is as tall as the sheet and as wide as it is tall.
-                int size = GD.Load<Texture2D>(path).GetHeight();
                 string called = one.Name.Length > 0 ? one.Name : one.Serial.ToString();
 
-                actor = Add(new Actor(called, Actor.Sheet.Creature(path, size)), Ground(one.Where));
+                actor = Add(new Actor(called, CreatureSheet(path)), Ground(one.Where));
                 _herd[one.Serial] = actor;
             }
 

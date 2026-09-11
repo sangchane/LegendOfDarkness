@@ -154,10 +154,16 @@ internal static class Sprites
         int columns,
         int zoom,
         bool transparent = false,
-        int padding = 4)
+        int padding = 4,
+        bool square = false)
     {
-        int cellWidth = cells.Max(cell => cell.Width) + padding;
-        int cellHeight = cells.Max(cell => cell.Height) + padding;
+        // A square cell lets the reader work the frame size out from the sheet alone: one row of cells as
+        // tall as they are wide means width / height is the frame count. Without it a sheet has to carry
+        // its cell size some other way, and a creature whose drawing is wider than it is tall slices wrong.
+        int side = Math.Max(cells.Max(cell => cell.Width), cells.Max(cell => cell.Height));
+
+        int cellWidth = (square ? side : cells.Max(cell => cell.Width)) + padding;
+        int cellHeight = (square ? side : cells.Max(cell => cell.Height)) + padding;
         int rows = (int)Math.Ceiling(cells.Count / (double)columns);
 
         using Image<Rgba32> sheet = new(columns * cellWidth, rows * cellHeight);

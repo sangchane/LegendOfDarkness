@@ -105,14 +105,42 @@ $ErrorActionPreference = 'Stop'
 Invoke-Extract @('dyeslots', "$Output/actor/parts/dye-slots.txt")
 Copy-Item "$PSScriptRoot/../data/legend-tables/color0.tbl" "$Output/actor/parts/dye-colours.txt" -Force
 
-Write-Output 'Drawing a creature...'
+Write-Output 'Drawing creatures...'
+# 서버가 부르는 번호로 둔다. 서버는 16385 라고 하고 그림은 MNS001 이다 — 0x4000 을 뺀다.
+# 어느 괴물을 뽑을지는 서버의 몬스터 템플릿이 정한다(아이템 아이콘과 같은 방식). 목록을 손으로 적어
+# 두면 서버가 괴물을 늘릴 때 조용히 어긋난다.
+#
+# 'strip': 정사각 칸 한 줄로 뽑고 구간을 적은 .txt 를 옆에 남긴다. 둘 다 필요하다 — 칸이 정사각이라야
+# 클라이언트가 시트만 보고 프레임 크기를 알고, 구간이 있어야 그 괴물의 걷기·공격 프레임을 안다.
+# 사람 번호로 재생하면 없는 프레임을 달라고 해 빈 화면이 나온다 (docs/original-sprite-animation.md 4절).
 # 'transparent' rather than the Korean spelling: an argument in Hangul does not survive PowerShell's
 # hand-off to a native executable on this machine, and the sheet comes out with its background filled in.
-Invoke-Extract @('mpf', "$Archives/hades/hades.dat", 'MNS001.MPF', "$Output/actor/wasp.png", '1', 'transparent')
-
-# 같은 그림을 서버가 부르는 번호로도 둔다. 서버는 16385 라고 하고, 그림은 MNS001 이다 — 0x4000 을 뺀다.
 New-Item -ItemType Directory -Force -Path "$Output/actor/creature" | Out-Null
-Invoke-Extract @('mpf', "$Archives/hades/hades.dat", 'MNS001.MPF', "$Output/actor/creature/mns001.png", '1', 'transparent')
+
+# JSON 으로 읽지 않는다. 이 템플릿들은 서버의 너그러운 파서에 맞춰 쓰여 있어서 — 목록 끝에 남은
+# 쉼표(Spider 5s), 따옴표 없는 16진수(0x40C5) — PowerShell 의 ConvertFrom-Json 이 거부한다.
+# 필요한 것은 Image 한 값뿐이므로 그 줄만 집는다.
+$creatures = Get-ChildItem -Path "$Server/templates/monsters" -Filter *.json -Recurse |
+    ForEach-Object {
+        $found = [regex]::Match((Get-Content $_.FullName -Raw), '"Image"\s*:\s*"?(0x[0-9A-Fa-f]+|\d+)"?')
+
+        if (-not $found.Success) { return }
+
+        $written = $found.Groups[1].Value
+
+        if ($written.StartsWith('0x')) { [Convert]::ToInt32($written, 16) } else { [int] $written }
+    } |
+    ForEach-Object { $_ - 0x4000 } |
+    Where-Object { $_ -gt 0 } |
+    Sort-Object -Unique
+
+foreach ($number in $creatures) {
+    $name = 'MNS{0:000}' -f $number
+    Invoke-Extract @('mpf', "$Archives/hades/hades.dat", "$name.MPF",
+        "$Output/actor/creature/$($name.ToLower()).png", '1', 'transparent', 'strip')
+}
+
+Write-Output "  $($creatures.Count) creatures: $($creatures -join ', ')"
 
 Write-Output 'Drawing the empty equipment places...'
 # 원작 신형 장비창의 빈 칸 그림 열넷. 'tight': 칸 사이를 띄우지 않아야 클라이언트가 frame*32 로 자른다.

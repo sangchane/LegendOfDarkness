@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4hvnocyhb0aj"
-path="res://.godot/imported/wasp.png-21d55a3cceb7ab0caed5fbdb6166d9e6.ctex"
+uid="uid://cyn5nq83i3lrn"
+path="res://.godot/imported/mns053.png-0dfc799e28286a30300011314089d27f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/actor/wasp.png"
-dest_files=["res://.godot/imported/wasp.png-21d55a3cceb7ab0caed5fbdb6166d9e6.ctex"]
+source_file="res://assets/actor/creature/mns053.png"
+dest_files=["res://.godot/imported/mns053.png-0dfc799e28286a30300011314089d27f.ctex"]
 
 [params]
 

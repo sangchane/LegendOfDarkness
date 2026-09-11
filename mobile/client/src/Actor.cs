@@ -35,7 +35,8 @@ public sealed partial class Actor : Node2D
         int CellHeight,
         float FeetX,
         float FeetY,
-        IReadOnlyList<string> StrikePaths)
+        IReadOnlyList<string> StrikePaths,
+        CreatureMotion? Motion = null)
     {
         public static Sheet Walk(params string[] paths) => Walk(paths, new int[paths.Length], []);
 
@@ -45,8 +46,13 @@ public sealed partial class Actor : Node2D
             IReadOnlyList<string> striking) =>
             new(paths, colours, 80, 88, 31.5f, 83f, striking);
 
-        public static Sheet Creature(string path, int size) =>
-            new([path], [0], size, size, size / 2f, size, []);
+        /// <summary>
+        /// A creature draws from one sheet and numbers its own frames. Its <paramref name="motion" /> comes
+        /// out of the archive beside the picture — without it the person's numbering would be used, which
+        /// asks for frames a creature's sheet does not have.
+        /// </summary>
+        public static Sheet Creature(string path, int size, CreatureMotion? motion = null) =>
+            new([path], [0], size, size, size / 2f, size, [], motion);
     }
 
     private readonly List<Sprite2D> _sprites = [];
@@ -112,19 +118,21 @@ public sealed partial class Actor : Node2D
         // Mirroring about this node's origin keeps the feet where they were.
         Scale = new Vector2(facing.Mirror ? -1 : 1, 1);
 
-        ShowFrame(WalkMotion.Stand(facing.Side));
+        ShowFrame(_sheet.Motion?.Stand() ?? WalkMotion.Stand(facing.Side));
     }
 
     /// <summary>Advances the walk by one frame in the direction already faced.</summary>
     public void Stride()
     {
-        ShowFrame(WalkMotion.Walk(Facing.Of(_direction).Side, _step++));
+        ShowFrame(_sheet.Motion is { } motion
+            ? motion.Walk(_step++)
+            : WalkMotion.Walk(Facing.Of(_direction).Side, _step++));
     }
 
     public void Rest()
     {
         _step = 0;
-        ShowFrame(WalkMotion.Stand(Facing.Of(_direction).Side));
+        ShowFrame(_sheet.Motion?.Stand() ?? WalkMotion.Stand(Facing.Of(_direction).Side));
     }
 
     /// <summary>
@@ -133,14 +141,16 @@ public sealed partial class Actor : Node2D
     /// </summary>
     public void Strike()
     {
-        if (_struck >= 0 || _sheet.StrikePaths.Count == 0)
+        // 사람은 평타를 다른 파일에 들고 있고, 괴물은 같은 시트 안에 들고 있다. 둘 중 아무것도 없으면
+        // 휘두르는 그림이 없다는 뜻이므로 가만히 둔다.
+        if (_struck >= 0 || (_sheet.StrikePaths.Count == 0 && _sheet.Motion is null))
         {
             return;
         }
 
         _struck = 0;
         Wear(_swinging);
-        ShowFrame(WalkMotion.Strike(Facing.Of(_direction).Side, 0));
+        ShowFrame(_sheet.Motion?.Strike(0) ?? WalkMotion.Strike(Facing.Of(_direction).Side, 0));
     }
 
     public override void _Process(double delta)
@@ -153,8 +163,9 @@ public sealed partial class Actor : Node2D
         _struck += delta;
 
         int frame = (int)(_struck / SecondsPerStrikeFrame);
+        int swings = _sheet.Motion?.AttackCount ?? WalkMotion.StrikeFrames;
 
-        if (frame >= WalkMotion.StrikeFrames)
+        if (frame >= swings)
         {
             _struck = -1;
             Wear(_standing);
@@ -163,7 +174,7 @@ public sealed partial class Actor : Node2D
             return;
         }
 
-        ShowFrame(WalkMotion.Strike(Facing.Of(_direction).Side, frame));
+        ShowFrame(_sheet.Motion?.Strike(frame) ?? WalkMotion.Strike(Facing.Of(_direction).Side, frame));
     }
 
     /// <summary>Swaps every layer between the sheets it stands in and the ones it swings in.</summary>
