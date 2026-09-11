@@ -1,0 +1,513 @@
+﻿[
+    {
+        "file":  "Aoife.cs",
+        "key":  "Aoife",
+        "npc":  "Aoife",
+        "inOriginal":  true,
+        "bare":  "Aoife",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "ArenaMaster.cs",
+        "key":  "Arena Master",
+        "npc":  "Arena Master",
+        "inOriginal":  false,
+        "bare":  "Arena Master",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "Banker.cs",
+        "key":  "Banker",
+        "npc":  "Banker",
+        "inOriginal":  false,
+        "bare":  "Banker",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "BarrenLord.cs",
+        "key":  "Barren Lord",
+        "npc":  "Barren Lord",
+        "inOriginal":  false,
+        "bare":  "Barren Lord",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "Benson.cs",
+        "key":  "Benson",
+        "npc":  "Benson",
+        "inOriginal":  false,
+        "bare":  "Benson",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "Benson_quest",
+                       "Quest"
+                   ]
+    },
+    {
+        "file":  "ClassChooser.cs",
+        "key":  "Class Chooser",
+        "npc":  "Class Chooser",
+        "inOriginal":  false,
+        "bare":  "Class Chooser",
+        "items":  [
+                      {
+                          "name":  "Eppe",
+                          "inOriginal":  true
+                      },
+                      {
+                          "name":  "Magic Jade Ring",
+                          "inOriginal":  true
+                      },
+                      {
+                          "name":  "Magus Kronos",
+                          "inOriginal":  true
+                      },
+                      {
+                          "name":  "Snow Secret",
+                          "inOriginal":  true
+                      },
+                      {
+                          "name":  "Torn Leather Tunic",
+                          "inOriginal":  false
+                      },
+                      {
+                          "name":  "Used Boots",
+                          "inOriginal":  false
+                      },
+                      {
+                          "name":  "Wooden Shield 2",
+                          "inOriginal":  false
+                      }
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "Delta.cs",
+        "key":  "Delta",
+        "npc":  "Delta",
+        "inOriginal":  false,
+        "bare":  "Delta",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "delta_quest",
+                       "Quest"
+                   ]
+    },
+    {
+        "file":  "gos.cs",
+        "key":  "gos",
+        "npc":  "gos",
+        "inOriginal":  false,
+        "bare":  "gos",
+        "items":  [
+                      {
+                          "name":  "rat shit",
+                          "inOriginal":  false
+                      }
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "Benson_quest",
+                       "gos_quest",
+                       "Quest"
+                   ]
+    },
+    {
+        "file":  "GrandMaster01.cs",
+        "key":  "The Grand Master",
+        "npc":  "The Grand Master",
+        "inOriginal":  false,
+        "bare":  "The Grand Master",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "LearnSkills.cs",
+        "key":  "combat trainer 1",
+        "npc":  "combat trainer 1",
+        "inOriginal":  false,
+        "bare":  "combat trainer 1",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "Macronator.cs",
+        "key":  "macronator",
+        "npc":  "macronator",
+        "inOriginal":  false,
+        "bare":  "macronator",
+        "items":  [
+                      {
+                          "name":  "Training Staff",
+                          "inOriginal":  false
+                      }
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "macronator_quest",
+                       "Quest"
+                   ]
+    },
+    {
+        "file":  "Mileth_Erin.cs",
+        "key":  "Erin\u0027s Script",
+        "npc":  "Erin\u0027s Script",
+        "inOriginal":  true,
+        "bare":  "Erin",
+        "items":  [
+                      {
+                          "name":  "Silver Earrings",
+                          "inOriginal":  true
+                      },
+                      {
+                          "name":  "Wolf\u0027s Teeth",
+                          "inOriginal":  false
+                      }
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "MonkForms.cs",
+        "key":  "monk/forms",
+        "npc":  "monk/forms",
+        "inOriginal":  false,
+        "bare":  "forms",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "QuestCompleted"
+                   ]
+    },
+    {
+        "file":  "MunedaneReactorExample.cs",
+        "key":  "Mundane Reactor Example",
+        "npc":  "Mundane Reactor Example",
+        "inOriginal":  false,
+        "bare":  "Mundane Reactor Example",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "Quest"
+                   ]
+    },
+    {
+        "file":  "OldMan.cs",
+        "key":  "tut/OldMan",
+        "npc":  "tut/OldMan",
+        "inOriginal":  false,
+        "bare":  "OldMan",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "QuestCompleted"
+                   ]
+    },
+    {
+        "file":  "Raghnall.cs",
+        "key":  "tut/Raghnall",
+        "npc":  "tut/Raghnall",
+        "inOriginal":  true,
+        "bare":  "Raghnall",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "shop1.cs",
+        "key":  "shop1",
+        "npc":  "Dean",
+        "inOriginal":  false,
+        "bare":  "Dean",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+                       {
+                           "name":  "beag cradh",
+                           "inOriginal":  true
+                       }
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "shop2.cs",
+        "key":  "shop2",
+        "npc":  "Dean",
+        "inOriginal":  false,
+        "bare":  "Dean",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+                       {
+                           "name":  "ard cradh",
+                           "inOriginal":  true
+                       }
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "simple_generic_npc.cs",
+        "key":  "simple_generic",
+        "npc":  "simple_generic",
+        "inOriginal":  false,
+        "bare":  "simple_generic",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "StateExample.cs",
+        "key":  "some example",
+        "npc":  "some example",
+        "inOriginal":  false,
+        "bare":  "some example",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "sunup.cs",
+        "key":  "sunup",
+        "npc":  "sunup",
+        "inOriginal":  false,
+        "bare":  "sunup",
+        "items":  [
+                      {
+                          "name":  "Sunup\u0027s Lost Sachel",
+                          "inOriginal":  false
+                      }
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+                       "Quest",
+                       "sunup_quest"
+                   ]
+    },
+    {
+        "file":  "test.cs",
+        "key":  "test",
+        "npc":  "test",
+        "inOriginal":  false,
+        "bare":  "test",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "TowerDefenseHandler.cs",
+        "key":  "TowerDefenseHandler",
+        "npc":  "TowerDefenseHandler",
+        "inOriginal":  false,
+        "bare":  "TowerDefenseHandler",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    },
+    {
+        "file":  "UserHelper.cs",
+        "key":  "User Helper Menu",
+        "npc":  "User Helper Menu",
+        "inOriginal":  false,
+        "bare":  "User Helper Menu",
+        "items":  [
+
+                  ],
+        "skills":  [
+
+                   ],
+        "spells":  [
+
+                   ],
+        "quests":  [
+
+                   ]
+    }
+]

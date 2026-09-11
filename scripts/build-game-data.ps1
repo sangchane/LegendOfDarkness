@@ -89,7 +89,9 @@ foreach ($number in 1..5) {
         if ($fields.Count -lt 4) { continue }
 
         $needs = $fields[3] -split '/'
-        $requires = if ($needs.Count -eq 2 -and $needs[0] -ne '0') { $needs[0] } else { $null }
+        # 0 은 "선행 없음", ? 는 원작이 비워 둔 칸이다(Sacrifice 가 그렇다). 둘 다 이름이 아니다.
+        $requires = if ($needs.Count -eq 2 -and $needs[0] -ne '0' -and $needs[0] -ne '?') { $needs[0] } else { $null }
+        $unknownPrereq = $needs.Count -eq 2 -and $needs[0] -eq '?' 
         $atLevel = if ($requires) { [int] $needs[1] } else { 0 }
 
         $abilities.Add([pscustomobject]@{
@@ -99,6 +101,7 @@ foreach ($number in 1..5) {
             # 다섯 숫자가 능력치 요구다. 어느 자리가 어느 능력치인지는 확인하지 못했다.
             statCosts  = @($fields[2] -split '/' | ForEach-Object { [int] $_ })
             requires   = $requires
+            unknownPrereq = $unknownPrereq
             atLevel    = $atLevel
             raw        = $fields
         })
@@ -182,6 +185,63 @@ Write-Output "  npc-portraits.json — $($portraits.Count)"
 Write-Output ''
 Write-Output "Wrote to $((Resolve-Path $Output).Path)"
 
+# ── NPC 스크립트 ──────────────────────────────────────────────────────────────
+# scripts/Mundanes/ 의 25개. 여기 있는 것은 NPC 의 **행동**이고, 무엇을 파는지·어느 퀘스트를 거는지는
+# templates/mundanes/ 의 인스턴스가 정하도록 돼 있다 — 그런데 그 폴더가 비어 있다. 그래서 이을 수 있는
+# 것은 스크립트가 이름으로 직접 부르는 것뿐이다: GlobalItemTemplateCache["Eppe"] 같은 줄.
+#
+# 그 이름이 원작 자료표에 있는지 없는지가 그대로 "원작인가 Hades 가 만든 것인가"를 가른다.
+Write-Output ''
+Write-Output 'Reading NPC scripts...'
+
+$mundanes = Join-Path (Split-Path $Metafile) 'scripts/Mundanes'
+$originalItems = @{}; $items | ForEach-Object { $originalItems[$_.name] = $true }
+$originalAbilities = @{}; $abilities | ForEach-Object { $originalAbilities[$_.name.ToLower()] = $true }
+$originalNpcs = @{}; $portraits | ForEach-Object { $originalNpcs[$_.name] = $true }
+
+$npcScripts = [System.Collections.Generic.List[object]]::new()
+
+foreach ($file in Get-ChildItem -Path $mundanes -Filter *.cs) {
+    $text = Get-Content $file.FullName -Raw
+
+    $declared = [regex]::Match($text, '\[Script\("([^"]+)"(?:\s*,\s*"([^"]+)")?\)\]')
+    if (-not $declared.Success) { continue }
+
+    $named = @{}
+    foreach ($kind in 'Item', 'Skill', 'Spell') {
+        $named[$kind] = @([regex]::Matches($text, "Global${kind}TemplateCache\[`"([^`"]+)`"\]") |
+            ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+    }
+
+    $questKeys = @([regex]::Matches($text, '"([A-Za-z0-9_'']*[Qq]uest[A-Za-z0-9_'']*)"') |
+        ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+
+    # 둘째 인자가 있으면 그것이 NPC 이름이고, 없으면 스크립트 이름이 곧 NPC 이름이다.
+    $npcName = if ($declared.Groups[2].Success) { $declared.Groups[2].Value } else { $declared.Groups[1].Value }
+
+    # 스크립트 이름에는 사람 이름이 아닌 것이 붙어 있다 — "tut/Raghnall", "Erin's Script".
+    # 원작 초상 목록과 맞춰 보려면 그것을 떼어 낸다.
+    $bare = ($npcName -replace '^.*/', '') -replace "'s Script$", ''
+    $bare = $bare.Trim()
+
+    $npcScripts.Add([pscustomobject]@{
+        file    = $file.Name
+        key     = $declared.Groups[1].Value
+        npc     = $npcName
+        # 원작 초상 목록에 이름이 있으면 원작 NPC, 없으면 Hades 가 만든 것이다.
+        inOriginal = $originalNpcs.ContainsKey($bare)
+        bare       = $bare
+        items   = @($named['Item']  | ForEach-Object { [pscustomobject]@{ name = $_; inOriginal = $originalItems.ContainsKey($_) } })
+        skills  = @($named['Skill'] | ForEach-Object { [pscustomobject]@{ name = $_; inOriginal = $originalAbilities.ContainsKey($_.ToLower()) } })
+        spells  = @($named['Spell'] | ForEach-Object { [pscustomobject]@{ name = $_; inOriginal = $originalAbilities.ContainsKey($_.ToLower()) } })
+        quests  = $questKeys
+    })
+}
+
+$npcScripts | ConvertTo-Json -Depth 6 | Set-Content "$Output/npc-scripts.json" -Encoding utf8
+$named = ($npcScripts | Where-Object { $_.items.Count + $_.spells.Count + $_.skills.Count -gt 0 }).Count
+Write-Output "  npc-scripts.json — $($npcScripts.Count) (이름을 직접 부르는 것 $named)"
+
 # ── Obsidian 노트 ─────────────────────────────────────────────────────────────
 # 표를 그래프로 만드는 마지막 걸음. 간선이 자료 안에 이미 또렷하게 있으므로(선행 기술, 퀘스트 글 속의
 # NPC 이름) LLM 으로 짐작할 것이 없다 — 그대로 [[링크]] 로 옮긴다. 짐작이 없으니 틀릴 일도 없다.
@@ -235,6 +295,8 @@ foreach ($sameName in $abilities | Group-Object name) {
     $lines.Add('')
     if ($one.requires) {
         $lines.Add("**선행** — [[$(Get-SafeName $one.requires)]] 를 $($one.atLevel) 단계까지 올려야 배운다.")
+    } elseif ($one.unknownPrereq) {
+        $lines.Add('**선행** — 원작이 이 칸을 `?` 로 비워 두었다. 무엇이 필요한지 자료에 없다.')
     } else {
         $lines.Add('**선행** — 없다. 처음부터 배울 수 있다.')
     }
@@ -301,7 +363,25 @@ foreach ($quest in $quests) {
 
 Write-Output "  quests/ — $($quests.Count)"
 
-# 아이템은 2,110개라 한 장씩 만들면 읽을 수가 없다. 종류별로 한 장에 모은다.
+# 아이템은 한 장씩 만든다 — NPC 스크립트와 퀘스트가 이름으로 부르므로, 한 장씩 있어야 링크가
+# 실제로 이어진다. 그리고 종류마다 목차를 한 장 더 둔다(2,110장을 그냥 늘어놓으면 못 읽는다).
+New-Item -ItemType Directory -Force -Path (Join-Path $vault 'items/_kinds') | Out-Null
+
+foreach ($one in $items) {
+    Write-Note (Join-Path $vault "items/$(Get-SafeName $one.name).md") @(
+        '---'
+        'kind: item'
+        "itemKind: $($one.kind)"
+        "level: $($one.level)"
+        '---'
+        "# $($one.name)"
+        ''
+        "[[$(Get-SafeName $one.kind)]] · 레벨 $($one.level) · 무게 $($one.weight)"
+        ''
+        $one.describes
+    )
+}
+
 foreach ($group in $items | Group-Object kind) {
     $safe = Get-SafeName $group.Name
     $lines = [System.Collections.Generic.List[string]]::new()
@@ -313,13 +393,63 @@ foreach ($group in $items | Group-Object kind) {
     $lines.Add('| 이름 | 레벨 | 무게 | 설명 |')
     $lines.Add('|---|---|---|---|')
     foreach ($it in $group.Group | Sort-Object level, name) {
-        $lines.Add("| $($it.name) | $($it.level) | $($it.weight) | $($it.describes) |")
+        $lines.Add("| [[$(Get-SafeName $it.name)]] | $($it.level) | $($it.weight) | $($it.describes) |")
     }
 
-    Write-Note (Join-Path $vault "items/$safe.md") $lines
+    Write-Note (Join-Path $vault "items/_kinds/$safe.md") $lines
 }
 
 Write-Output "  items/ — $(($items | Group-Object kind).Count) 종류, $($items.Count)개"
+
+# NPC 스크립트 노트 — 여기서 아이템·마법·퀘스트로 링크가 나간다.
+New-Item -ItemType Directory -Force -Path (Join-Path $vault 'npc-scripts') | Out-Null
+
+foreach ($one in $npcScripts) {
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $lines.Add('---')
+    $lines.Add('kind: npc-script')
+    $lines.Add("original: $($one.inOriginal)")
+    $lines.Add('---')
+    $lines.Add("# $($one.npc)")
+    $lines.Add('')
+    if ($one.inOriginal) {
+        $lines.Add("원작 NPC 다 — 초상 목록에 [[$(Get-SafeName $one.bare)]] 로 있다.")
+    } else {
+        $lines.Add('**원작 초상 목록에 없다.** Hades 가 만든 NPC 이거나, 이름이 원작과 다르게 붙어 있다.')
+    }
+    $lines.Add('')
+    $lines.Add("스크립트: ``$($one.file)``")
+    $lines.Add('')
+
+    foreach ($pair in @(
+        @{ Label = '부르는 아이템'; Rows = $one.items },
+        @{ Label = '부르는 기술';   Rows = $one.skills },
+        @{ Label = '부르는 마법';   Rows = $one.spells })) {
+
+        if ($pair.Rows.Count -eq 0) { continue }
+
+        $lines.Add("**$($pair.Label)**")
+        foreach ($r in $pair.Rows) {
+            # 원작 자료표에 있으면 노트가 있으니 링크로, 없으면 Hades 가 만든 것이라 그대로 적는다.
+            if ($r.inOriginal) {
+                $lines.Add("- [[$(Get-SafeName $r.name)]]")
+            } else {
+                $lines.Add("- $($r.name) — 원작 자료표에 없다 (Hades 가 만든 것)")
+            }
+        }
+        $lines.Add('')
+    }
+
+    if ($one.quests.Count -gt 0) {
+        $lines.Add("**퀘스트 열쇠** — $($one.quests -join ' · ')")
+        $lines.Add('')
+        $lines.Add('이 열쇠는 사람이 가진 깃발 이름이다. 원작 퀘스트 제목(`quests/`)과는 이어지지 않는다.')
+    }
+
+    Write-Note (Join-Path $vault "npc-scripts/$(Get-SafeName $one.npc).md") $lines
+}
+
+Write-Output "  npc-scripts/ — $($npcScripts.Count)"
 
 $tick = [char] 96
 
@@ -332,7 +462,8 @@ $tick = [char] 96
     "- **기술·마법** $($abilities.Count)개 — ${tick}abilities/${tick}. 선행 관계가 링크로 걸려 있다."
     "- **퀘스트** $($quests.Count)개 — ${tick}quests/${tick}. 글에 이름이 나오는 사람에게 링크가 걸린다."
     "- **NPC** $($portraits.Count)명 — ${tick}npcs/${tick}."
-    "- **아이템** $($items.Count)개 — ${tick}items/${tick}, 종류 $(($items | Group-Object kind).Count)가지로 묶었다."
+    "- **아이템** $($items.Count)개 — ${tick}items/${tick}, 종류 목차는 ${tick}items/_kinds/${tick} 에 $(($items | Group-Object kind).Count)장."
+    "- **NPC 스크립트** $($npcScripts.Count)개 — ${tick}npc-scripts/${tick}. 부르는 아이템·마법과 퀘스트 열쇠."
 )
 
 Write-Note (Join-Path $vault 'index.md') $indexLines

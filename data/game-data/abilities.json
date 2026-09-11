@@ -11,6 +11,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -32,6 +33,7 @@
                           9
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  1,
         "raw":  [
                     "2/0/0",
@@ -53,6 +55,7 @@
                           5
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "2/0/0",
@@ -74,6 +77,7 @@
                           3
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  20,
         "raw":  [
                     "3/0/0",
@@ -95,6 +99,7 @@
                           25
                       ],
         "requires":  "Rescue",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "4/0/0",
@@ -116,6 +121,7 @@
                           5
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "4/0/0",
@@ -137,6 +143,7 @@
                           35
                       ],
         "requires":  "Wallop",
+        "unknownPrereq":  false,
         "atLevel":  20,
         "raw":  [
                     "4/0/0",
@@ -158,6 +165,7 @@
                           15
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -179,6 +187,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -200,6 +209,7 @@
                           8
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -221,6 +231,7 @@
                           5
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  20,
         "raw":  [
                     "5/0/0",
@@ -242,6 +253,7 @@
                           7
                       ],
         "requires":  "Clobber",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "14/0/0",
@@ -263,6 +275,7 @@
                           13
                       ],
         "requires":  "Rescue",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "21/0/0",
@@ -284,6 +297,7 @@
                           28
                       ],
         "requires":  "Wallop",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "25/0/0",
@@ -305,6 +319,7 @@
                           18
                       ],
         "requires":  "Wallop",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "17/0/0",
@@ -325,7 +340,8 @@
                           150,
                           100
                       ],
-        "requires":  "?",
+        "requires":  null,
+        "unknownPrereq":  true,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -347,6 +363,7 @@
                           3
                       ],
         "requires":  "Thrash",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/0",
@@ -367,6 +384,7 @@
                           100
                       ],
         "requires":  "beag suain",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/0",
@@ -388,6 +406,7 @@
                           50
                       ],
         "requires":  "asgall faileas",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "99/1/0",
@@ -409,6 +428,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -430,6 +450,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -451,6 +472,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -472,6 +494,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -493,6 +516,7 @@
                           180
                       ],
         "requires":  "Charge",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/0",
@@ -514,6 +538,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -536,6 +561,7 @@
                           3
                       ],
         "requires":  "Thrust Attack 1",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/8",
@@ -558,6 +584,7 @@
                           3
                       ],
         "requires":  "Thrust Attack 2",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/15",
@@ -580,6 +607,7 @@
                           3
                       ],
         "requires":  "Thrust Attack 3",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/22",
@@ -602,6 +630,7 @@
                           3
                       ],
         "requires":  "Thrust Attack 4",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/29",
@@ -624,6 +653,7 @@
                           3
                       ],
         "requires":  "Thrust Attack 5",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/55",
@@ -647,6 +677,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -669,6 +700,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -691,6 +723,7 @@
                           3
                       ],
         "requires":  "Strikedown 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/12",
@@ -713,6 +746,7 @@
                           3
                       ],
         "requires":  "Strikedown 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/24",
@@ -735,6 +769,7 @@
                           3
                       ],
         "requires":  "Strikedown 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/36",
@@ -757,6 +792,7 @@
                           3
                       ],
         "requires":  "Strikedown 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/48",
@@ -779,6 +815,7 @@
                           3
                       ],
         "requires":  "Strikedown 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -801,6 +838,7 @@
                           3
                       ],
         "requires":  "Strikedown 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -823,6 +861,7 @@
                           3
                       ],
         "requires":  "Strikedown 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -845,6 +884,7 @@
                           3
                       ],
         "requires":  "Strikedown 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -867,6 +907,7 @@
                           3
                       ],
         "requires":  "Strikedown 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -889,6 +930,7 @@
                           3
                       ],
         "requires":  "Strikedown 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -911,6 +953,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -933,6 +976,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/15",
@@ -955,6 +999,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -977,6 +1022,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/45",
@@ -999,6 +1045,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -1021,6 +1068,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -1043,6 +1091,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -1065,6 +1114,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -1087,6 +1137,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -1109,6 +1160,7 @@
                           3
                       ],
         "requires":  "Dune Swipe 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -1131,6 +1183,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/20",
@@ -1153,6 +1206,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -1175,6 +1229,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -1197,6 +1252,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/50",
@@ -1219,6 +1275,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -1241,6 +1298,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -1263,6 +1321,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -1285,6 +1344,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -1307,6 +1367,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -1329,6 +1390,7 @@
                           3
                       ],
         "requires":  "Wheel Kick 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -1351,6 +1413,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -1372,6 +1435,7 @@
                           20
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "15/0/0",
@@ -1393,6 +1457,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -1414,6 +1479,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -1435,6 +1501,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -1456,6 +1523,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -1477,6 +1545,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -1498,6 +1567,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -1519,6 +1589,7 @@
                           10
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "3/0/0",
@@ -1540,6 +1611,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -1561,6 +1633,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "2/0/0",
@@ -1582,6 +1655,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -1603,6 +1677,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -1624,6 +1699,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -1645,6 +1721,7 @@
                           8
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -1666,6 +1743,7 @@
                           3
                       ],
         "requires":  "Throw Surigum",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "5/0/0",
@@ -1687,6 +1765,7 @@
                           3
                       ],
         "requires":  "Study Creature",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "15/0/0",
@@ -1708,6 +1787,7 @@
                           3
                       ],
         "requires":  "Study Creature",
+        "unknownPrereq":  false,
         "atLevel":  20,
         "raw":  [
                     "21/0/0",
@@ -1729,6 +1809,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -1750,6 +1831,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -1771,6 +1853,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -1792,6 +1875,7 @@
                           4
                       ],
         "requires":  "Throw Surigum",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "3/0/0",
@@ -1813,6 +1897,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -1834,6 +1919,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "2/0/0",
@@ -1855,6 +1941,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -1876,6 +1963,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -1897,6 +1985,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -1918,6 +2007,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -1939,6 +2029,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -1960,6 +2051,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -1982,6 +2074,7 @@
                           3
                       ],
         "requires":  "Archery 1",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/8",
@@ -2004,6 +2097,7 @@
                           3
                       ],
         "requires":  "Archery 2",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/15",
@@ -2026,6 +2120,7 @@
                           3
                       ],
         "requires":  "Archery 3",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/22",
@@ -2048,6 +2143,7 @@
                           3
                       ],
         "requires":  "Archery 4",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/45",
@@ -2070,6 +2166,7 @@
                           3
                       ],
         "requires":  "Archery 5",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/55",
@@ -2092,6 +2189,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -2114,6 +2212,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/12",
@@ -2136,6 +2235,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/25",
@@ -2158,6 +2258,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/33",
@@ -2180,6 +2281,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/42",
@@ -2202,6 +2304,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -2224,6 +2327,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -2246,6 +2350,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -2268,6 +2373,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -2290,6 +2396,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -2312,6 +2419,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -2334,6 +2442,7 @@
                           3
                       ],
         "requires":  "Arrow Shot 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -2356,6 +2465,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/20",
@@ -2378,6 +2488,7 @@
                           3
                       ],
         "requires":  "Rear Strike 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -2400,6 +2511,7 @@
                           3
                       ],
         "requires":  "Rear Strike 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -2422,6 +2534,7 @@
                           3
                       ],
         "requires":  "Rear Strike 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -2444,6 +2557,7 @@
                           3
                       ],
         "requires":  "Rear Strike 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -2466,6 +2580,7 @@
                           3
                       ],
         "requires":  "Rear Strike 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -2488,6 +2603,7 @@
                           3
                       ],
         "requires":  "Rear Strike 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -2510,6 +2626,7 @@
                           3
                       ],
         "requires":  "Rear Strike 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -2532,6 +2649,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -2553,6 +2671,7 @@
                           8
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -2574,6 +2693,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "7/0/0",
@@ -2595,6 +2715,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "8/0/0",
@@ -2616,6 +2737,7 @@
                           4
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "15/0/0",
@@ -2637,6 +2759,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "15/0/0",
@@ -2658,6 +2781,7 @@
                           8
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "15/0/0",
@@ -2679,6 +2803,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -2700,6 +2825,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "2/0/0",
@@ -2721,6 +2847,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -2742,6 +2869,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "11/0/0",
@@ -2763,6 +2891,7 @@
                           18
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "9/0/0",
@@ -2784,6 +2913,7 @@
                           22
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "9/0/0",
@@ -2805,6 +2935,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -2826,6 +2957,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -2847,6 +2979,7 @@
                           3
                       ],
         "requires":  "Hide",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "31/0/0",
@@ -2868,6 +3001,7 @@
                           10
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "7/0/0",
@@ -2889,6 +3023,7 @@
                           12
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "9/0/0",
@@ -2910,6 +3045,7 @@
                           20
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "14/0/0",
@@ -2931,6 +3067,7 @@
                           22
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "18/0/0",
@@ -2952,6 +3089,7 @@
                           18
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "25/0/0",
@@ -2973,6 +3111,7 @@
                           4
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "7/0/0",
@@ -2994,6 +3133,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "11/0/0",
@@ -3015,6 +3155,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "13/0/0",
@@ -3036,6 +3177,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -3058,6 +3200,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/10",
@@ -3080,6 +3223,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -3102,6 +3246,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/15",
@@ -3124,6 +3269,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/35",
@@ -3146,6 +3292,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -3168,6 +3315,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -3190,6 +3338,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -3212,6 +3361,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -3234,6 +3384,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -3256,6 +3407,7 @@
                           3
                       ],
         "requires":  "Frost Arrow 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -3278,6 +3430,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -3300,6 +3453,7 @@
                           3
                       ],
         "requires":  "Star Arrow 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -3322,6 +3476,7 @@
                           3
                       ],
         "requires":  "Star Arrow 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -3344,6 +3499,7 @@
                           3
                       ],
         "requires":  "Star Arrow 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -3366,6 +3522,7 @@
                           3
                       ],
         "requires":  "Star Arrow 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/50",
@@ -3388,6 +3545,7 @@
                           3
                       ],
         "requires":  "Star Arrow 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -3410,6 +3568,7 @@
                           3
                       ],
         "requires":  "Star Arrow 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -3432,6 +3591,7 @@
                           3
                       ],
         "requires":  "Star Arrow 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -3454,6 +3614,7 @@
                           3
                       ],
         "requires":  "Star Arrow 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -3476,6 +3637,7 @@
                           3
                       ],
         "requires":  "Star Arrow 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -3498,6 +3660,7 @@
                           3
                       ],
         "requires":  "Star Arrow 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -3520,6 +3683,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -3542,6 +3706,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -3564,6 +3729,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -3585,6 +3751,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -3606,6 +3773,7 @@
                           7
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -3627,6 +3795,7 @@
                           7
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -3648,6 +3817,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -3669,6 +3839,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -3690,6 +3861,7 @@
                           20
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "20/0/0",
@@ -3711,6 +3883,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -3733,6 +3906,7 @@
                           3
                       ],
         "requires":  "Elemental Bless 1",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/8",
@@ -3755,6 +3929,7 @@
                           3
                       ],
         "requires":  "Elemental Bless 2",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/15",
@@ -3777,6 +3952,7 @@
                           3
                       ],
         "requires":  "Elemental Bless 3",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/22",
@@ -3799,6 +3975,7 @@
                           3
                       ],
         "requires":  "Elemental Bless 4",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/55",
@@ -3821,6 +3998,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -3842,6 +4020,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -3863,6 +4042,7 @@
                           7
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -3884,6 +4064,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -3905,6 +4086,7 @@
                           4
                       ],
         "requires":  "beag srad",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "2/0/0",
@@ -3926,6 +4108,7 @@
                           3
                       ],
         "requires":  "beag athar",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "2/0/0",
@@ -3947,6 +4130,7 @@
                           12
                       ],
         "requires":  "beag creag",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "2/0/0",
@@ -3968,6 +4152,7 @@
                           4
                       ],
         "requires":  "beag sal",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "2/0/0",
@@ -3989,6 +4174,7 @@
                           6
                       ],
         "requires":  "beag srad",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "4/0/0",
@@ -4010,6 +4196,7 @@
                           3
                       ],
         "requires":  "beag athar",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "4/0/0",
@@ -4031,6 +4218,7 @@
                           20
                       ],
         "requires":  "beag creag",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "4/0/0",
@@ -4052,6 +4240,7 @@
                           5
                       ],
         "requires":  "beag sal",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "4/0/0",
@@ -4073,6 +4262,7 @@
                           4
                       ],
         "requires":  "beag srad",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "4/0/0",
@@ -4094,6 +4284,7 @@
                           3
                       ],
         "requires":  "beag athar",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "4/0/0",
@@ -4115,6 +4306,7 @@
                           7
                       ],
         "requires":  "srad",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "5/0/0",
@@ -4136,6 +4328,7 @@
                           3
                       ],
         "requires":  "athar",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "5/0/0",
@@ -4157,6 +4350,7 @@
                           24
                       ],
         "requires":  "creag",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "5/0/0",
@@ -4178,6 +4372,7 @@
                           5
                       ],
         "requires":  "sal",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "5/0/0",
@@ -4199,6 +4394,7 @@
                           14
                       ],
         "requires":  "beag creag",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "5/0/0",
@@ -4220,6 +4416,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -4241,6 +4438,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -4262,6 +4460,7 @@
                           4
                       ],
         "requires":  "beag sal",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "8/0/0",
@@ -4283,6 +4482,7 @@
                           10
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -4304,6 +4504,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -4325,6 +4526,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -4346,6 +4548,7 @@
                           10
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -4367,6 +4570,7 @@
                           14
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -4388,6 +4592,7 @@
                           6
                       ],
         "requires":  "srad",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "10/0/0",
@@ -4409,6 +4614,7 @@
                           3
                       ],
         "requires":  "beag srad",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "10/0/0",
@@ -4430,6 +4636,7 @@
                           3
                       ],
         "requires":  "athar",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "12/0/0",
@@ -4451,6 +4658,7 @@
                           7
                       ],
         "requires":  "beag creag",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "12/0/0",
@@ -4472,6 +4680,7 @@
                           3
                       ],
         "requires":  "beag athar",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "12/0/0",
@@ -4493,6 +4702,7 @@
                           3
                       ],
         "requires":  "beag sal",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "15/0/0",
@@ -4514,6 +4724,7 @@
                           20
                       ],
         "requires":  "creag",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "15/0/0",
@@ -4535,6 +4746,7 @@
                           10
                       ],
         "requires":  "srad",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "15/0/0",
@@ -4556,6 +4768,7 @@
                           31
                       ],
         "requires":  "creag",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "15/0/0",
@@ -4577,6 +4790,7 @@
                           6
                       ],
         "requires":  "athar",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "16/0/0",
@@ -4598,6 +4812,7 @@
                           14
                       ],
         "requires":  "srad",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "18/0/0",
@@ -4619,6 +4834,7 @@
                           44
                       ],
         "requires":  "creag",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "18/0/0",
@@ -4640,6 +4856,7 @@
                           8
                       ],
         "requires":  "athar",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "18/0/0",
@@ -4661,6 +4878,7 @@
                           10
                       ],
         "requires":  "sal",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "20/0/0",
@@ -4682,6 +4900,7 @@
                           15
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "20/0/0",
@@ -4703,6 +4922,7 @@
                           14
                       ],
         "requires":  "srad",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "20/0/0",
@@ -4724,6 +4944,7 @@
                           8
                       ],
         "requires":  "athar",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "20/0/0",
@@ -4745,6 +4966,7 @@
                           44
                       ],
         "requires":  "creag",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "20/0/0",
@@ -4766,6 +4988,7 @@
                           10
                       ],
         "requires":  "sal",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "20/0/0",
@@ -4787,6 +5010,7 @@
                           5
                       ],
         "requires":  "sal",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "20/0/0",
@@ -4808,6 +5032,7 @@
                           68
                       ],
         "requires":  "creag",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "22/0/0",
@@ -4829,6 +5054,7 @@
                           12
                       ],
         "requires":  "athar",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "22/0/0",
@@ -4850,6 +5076,7 @@
                           18
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "25/0/0",
@@ -4871,6 +5098,7 @@
                           7
                       ],
         "requires":  "sal",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "25/0/0",
@@ -4892,6 +5120,7 @@
                           15
                       ],
         "requires":  "srad lamh",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "25/0/0",
@@ -4913,6 +5142,7 @@
                           9
                       ],
         "requires":  "athar lamh",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "25/0/0",
@@ -4934,6 +5164,7 @@
                           51
                       ],
         "requires":  "creag lamh",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "25/0/0",
@@ -4955,6 +5186,7 @@
                           11
                       ],
         "requires":  "sal lamh",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "25/0/0",
@@ -4976,6 +5208,7 @@
                           19
                       ],
         "requires":  "srad",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "25/0/0",
@@ -4997,6 +5230,7 @@
                           25
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "26/0/0",
@@ -5018,6 +5252,7 @@
                           16
                       ],
         "requires":  "sal",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "28/0/0",
@@ -5039,6 +5274,7 @@
                           48
                       ],
         "requires":  "mor creag",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "28/0/0",
@@ -5060,6 +5296,7 @@
                           20
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "30/0/0",
@@ -5081,6 +5318,7 @@
                           21
                       ],
         "requires":  "srad meall",
+        "unknownPrereq":  false,
         "atLevel":  90,
         "raw":  [
                     "30/0/0",
@@ -5102,6 +5340,7 @@
                           14
                       ],
         "requires":  "athar meall",
+        "unknownPrereq":  false,
         "atLevel":  90,
         "raw":  [
                     "30/0/0",
@@ -5123,6 +5362,7 @@
                           84
                       ],
         "requires":  "creag meall",
+        "unknownPrereq":  false,
         "atLevel":  90,
         "raw":  [
                     "30/0/0",
@@ -5144,6 +5384,7 @@
                           22
                       ],
         "requires":  "sal meall",
+        "unknownPrereq":  false,
         "atLevel":  90,
         "raw":  [
                     "30/0/0",
@@ -5165,6 +5406,7 @@
                           13
                       ],
         "requires":  "mor srad",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "30/0/0",
@@ -5186,6 +5428,7 @@
                           8
                       ],
         "requires":  "mor athar",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "30/0/0",
@@ -5207,6 +5450,7 @@
                           19
                       ],
         "requires":  "mor srad",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "34/0/0",
@@ -5228,6 +5472,7 @@
                           12
                       ],
         "requires":  "mor athar",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "34/0/0",
@@ -5249,6 +5494,7 @@
                           68
                       ],
         "requires":  "mor creag",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "34/0/0",
@@ -5270,6 +5516,7 @@
                           16
                       ],
         "requires":  "mor sal",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "34/0/0",
@@ -5291,6 +5538,7 @@
                           11
                       ],
         "requires":  "mor sal",
+        "unknownPrereq":  false,
         "atLevel":  50,
         "raw":  [
                     "35/0/0",
@@ -5312,6 +5560,7 @@
                           30
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "36/0/0",
@@ -5333,6 +5582,7 @@
                           35
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "46/0/0",
@@ -5354,6 +5604,7 @@
                           40
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "56/0/0",
@@ -5375,6 +5626,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -5396,6 +5648,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -5417,6 +5670,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -5438,6 +5692,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -5460,6 +5715,7 @@
                           3
                       ],
         "requires":  "Torch 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/6",
@@ -5482,6 +5738,7 @@
                           3
                       ],
         "requires":  "Torch 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/12",
@@ -5504,6 +5761,7 @@
                           3
                       ],
         "requires":  "Torch 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/18",
@@ -5526,6 +5784,7 @@
                           3
                       ],
         "requires":  "Torch 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/24",
@@ -5548,6 +5807,7 @@
                           3
                       ],
         "requires":  "Torch 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -5570,6 +5830,7 @@
                           3
                       ],
         "requires":  "Torch 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/42",
@@ -5593,6 +5854,7 @@
                           3
                       ],
         "requires":  "Torch 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/48",
@@ -5615,6 +5877,7 @@
                           3
                       ],
         "requires":  "Torch 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/54",
@@ -5637,6 +5900,7 @@
                           3
                       ],
         "requires":  "Torch 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -5659,6 +5923,7 @@
                           3
                       ],
         "requires":  "Torch 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -5681,6 +5946,7 @@
                           3
                       ],
         "requires":  "Torch 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -5703,6 +5969,7 @@
                           3
                       ],
         "requires":  "Torch 12",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -5725,6 +5992,7 @@
                           3
                       ],
         "requires":  "Torch 13",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -5747,6 +6015,7 @@
                           3
                       ],
         "requires":  "Torch 14",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -5769,6 +6038,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -5791,6 +6061,7 @@
                           3
                       ],
         "requires":  "Mermaid 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/6",
@@ -5813,6 +6084,7 @@
                           3
                       ],
         "requires":  "Mermaid 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/12",
@@ -5835,6 +6107,7 @@
                           3
                       ],
         "requires":  "Mermaid 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/18",
@@ -5857,6 +6130,7 @@
                           3
                       ],
         "requires":  "Mermaid 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/24",
@@ -5879,6 +6153,7 @@
                           3
                       ],
         "requires":  "Mermaid 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -5901,6 +6176,7 @@
                           3
                       ],
         "requires":  "Mermaid 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/42",
@@ -5923,6 +6199,7 @@
                           3
                       ],
         "requires":  "Mermaid 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/48",
@@ -5945,6 +6222,7 @@
                           3
                       ],
         "requires":  "Mermaid 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/54",
@@ -5967,6 +6245,7 @@
                           3
                       ],
         "requires":  "Mermaid 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -5989,6 +6268,7 @@
                           3
                       ],
         "requires":  "Mermaid 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -6011,6 +6291,7 @@
                           3
                       ],
         "requires":  "Mermaid 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -6033,6 +6314,7 @@
                           3
                       ],
         "requires":  "Mermaid 12",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -6055,6 +6337,7 @@
                           3
                       ],
         "requires":  "Mermaid 13",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -6077,6 +6360,7 @@
                           3
                       ],
         "requires":  "Mermaid 14",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -6099,6 +6383,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -6121,6 +6406,7 @@
                           3
                       ],
         "requires":  "Keeter 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/6",
@@ -6143,6 +6429,7 @@
                           3
                       ],
         "requires":  "Keeter 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/12",
@@ -6165,6 +6452,7 @@
                           3
                       ],
         "requires":  "Keeter 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/18",
@@ -6187,6 +6475,7 @@
                           3
                       ],
         "requires":  "Keeter 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/24",
@@ -6209,6 +6498,7 @@
                           3
                       ],
         "requires":  "Keeter 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -6231,6 +6521,7 @@
                           3
                       ],
         "requires":  "Keeter 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/42",
@@ -6253,6 +6544,7 @@
                           3
                       ],
         "requires":  "Keeter 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/48",
@@ -6275,6 +6567,7 @@
                           3
                       ],
         "requires":  "Keeter 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/54",
@@ -6297,6 +6590,7 @@
                           3
                       ],
         "requires":  "Keeter 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -6319,6 +6613,7 @@
                           3
                       ],
         "requires":  "Keeter 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -6341,6 +6636,7 @@
                           3
                       ],
         "requires":  "Keeter 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -6363,6 +6659,7 @@
                           3
                       ],
         "requires":  "Keeter 12",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -6385,6 +6682,7 @@
                           3
                       ],
         "requires":  "Keeter 13",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -6407,6 +6705,7 @@
                           3
                       ],
         "requires":  "Keeter 14",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -6429,6 +6728,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -6451,6 +6751,7 @@
                           3
                       ],
         "requires":  "Groo 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/6",
@@ -6473,6 +6774,7 @@
                           3
                       ],
         "requires":  "Groo 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/12",
@@ -6495,6 +6797,7 @@
                           3
                       ],
         "requires":  "Groo 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/18",
@@ -6517,6 +6820,7 @@
                           3
                       ],
         "requires":  "Groo 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/24",
@@ -6539,6 +6843,7 @@
                           3
                       ],
         "requires":  "Groo 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -6561,6 +6866,7 @@
                           3
                       ],
         "requires":  "Groo 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/42",
@@ -6583,6 +6889,7 @@
                           3
                       ],
         "requires":  "Groo 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/48",
@@ -6605,6 +6912,7 @@
                           3
                       ],
         "requires":  "Groo 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/54",
@@ -6627,6 +6935,7 @@
                           3
                       ],
         "requires":  "Groo 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -6649,6 +6958,7 @@
                           3
                       ],
         "requires":  "Groo 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -6671,6 +6981,7 @@
                           3
                       ],
         "requires":  "Groo 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -6693,6 +7004,7 @@
                           3
                       ],
         "requires":  "Groo 12",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -6715,6 +7027,7 @@
                           3
                       ],
         "requires":  "Groo 13",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -6737,6 +7050,7 @@
                           3
                       ],
         "requires":  "Groo 14",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -6759,6 +7073,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -6781,6 +7096,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/12",
@@ -6803,6 +7119,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/12",
@@ -6825,6 +7142,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/15",
@@ -6847,6 +7165,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/15",
@@ -6869,6 +7188,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/18",
@@ -6891,6 +7211,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -6912,6 +7233,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -6933,6 +7255,7 @@
                           8
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "2/0/0",
@@ -6954,6 +7277,7 @@
                           7
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -6975,6 +7299,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -6996,6 +7321,7 @@
                           7
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -7017,6 +7343,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -7038,6 +7365,7 @@
                           10
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "8/0/0",
@@ -7059,6 +7387,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -7081,6 +7410,7 @@
                           3
                       ],
         "requires":  "Instrumental 1",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/8",
@@ -7103,6 +7433,7 @@
                           3
                       ],
         "requires":  "Instrumental 2",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/15",
@@ -7125,6 +7456,7 @@
                           3
                       ],
         "requires":  "Instrumental 3",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/22",
@@ -7147,6 +7479,7 @@
                           3
                       ],
         "requires":  "Instrumental 4",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/29",
@@ -7169,6 +7502,7 @@
                           3
                       ],
         "requires":  "Instrumental 5",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/55",
@@ -7191,6 +7525,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -7213,6 +7548,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/8",
@@ -7235,6 +7571,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -7257,6 +7594,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -7279,6 +7617,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -7301,6 +7640,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -7323,6 +7663,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -7345,6 +7686,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -7367,6 +7709,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -7389,6 +7732,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -7411,6 +7755,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -7433,6 +7778,7 @@
                           3
                       ],
         "requires":  "Instrumental Attack 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -7455,6 +7801,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -7476,6 +7823,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -7497,6 +7845,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -7518,6 +7867,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "2/0/0",
@@ -7539,6 +7889,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "2/0/0",
@@ -7560,6 +7911,7 @@
                           3
                       ],
         "requires":  "beag ioc",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "2/0/0",
@@ -7581,6 +7933,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -7602,6 +7955,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -7623,6 +7977,7 @@
                           3
                       ],
         "requires":  "beannaich",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "3/0/0",
@@ -7644,6 +7999,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -7665,6 +8021,7 @@
                           4
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -7686,6 +8043,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -7707,6 +8065,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "4/0/0",
@@ -7728,6 +8087,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -7749,6 +8109,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -7770,6 +8131,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -7791,6 +8153,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -7812,6 +8175,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -7833,6 +8197,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -7854,6 +8219,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -7875,6 +8241,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -7896,6 +8263,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -7917,6 +8285,7 @@
                           3
                       ],
         "requires":  "beag ioc",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "8/0/0",
@@ -7938,6 +8307,7 @@
                           3
                       ],
         "requires":  "beag ioc",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "10/0/0",
@@ -7959,6 +8329,7 @@
                           4
                       ],
         "requires":  "beannaich",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "10/0/0",
@@ -7980,6 +8351,7 @@
                           4
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "11/0/0",
@@ -8001,6 +8373,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "12/0/0",
@@ -8022,6 +8395,7 @@
                           3
                       ],
         "requires":  "beag seun",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "12/0/0",
@@ -8043,6 +8417,7 @@
                           3
                       ],
         "requires":  "ao beag cradh",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "12/0/0",
@@ -8064,6 +8439,7 @@
                           5
                       ],
         "requires":  "seun",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "13/0/0",
@@ -8085,6 +8461,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "14/0/0",
@@ -8106,6 +8483,7 @@
                           4
                       ],
         "requires":  "beag ioc comlha",
+        "unknownPrereq":  false,
         "atLevel":  20,
         "raw":  [
                     "15/0/0",
@@ -8127,6 +8505,7 @@
                           16
                       ],
         "requires":  "beag slan",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "15/0/0",
@@ -8148,6 +8527,7 @@
                           15
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "18/0/0",
@@ -8169,6 +8549,7 @@
                           3
                       ],
         "requires":  "armachd",
+        "unknownPrereq":  false,
         "atLevel":  20,
         "raw":  [
                     "18/0/0",
@@ -8190,6 +8571,7 @@
                           10
                       ],
         "requires":  "beag cradh",
+        "unknownPrereq":  false,
         "atLevel":  30,
         "raw":  [
                     "20/0/0",
@@ -8211,6 +8593,7 @@
                           12
                       ],
         "requires":  "beag puinsein",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "24/0/0",
@@ -8232,6 +8615,7 @@
                           3
                       ],
         "requires":  "ioc",
+        "unknownPrereq":  false,
         "atLevel":  45,
         "raw":  [
                     "28/0/0",
@@ -8253,6 +8637,7 @@
                           30
                       ],
         "requires":  "beag puinsein",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "30/0/0",
@@ -8274,6 +8659,7 @@
                           8
                       ],
         "requires":  "ao dall",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "30/0/0",
@@ -8295,6 +8681,7 @@
                           13
                       ],
         "requires":  "deo saighead",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "31/0/0",
@@ -8316,6 +8703,7 @@
                           3
                       ],
         "requires":  "ao cradh",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "33/0/0",
@@ -8337,6 +8725,7 @@
                           13
                       ],
         "requires":  "ioc",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "33/0/0",
@@ -8358,6 +8747,7 @@
                           13
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "35/0/0",
@@ -8379,6 +8769,7 @@
                           3
                       ],
         "requires":  "puinsein",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "38/0/0",
@@ -8400,6 +8791,7 @@
                           6
                       ],
         "requires":  "breisleich",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "40/0/0",
@@ -8421,6 +8813,7 @@
                           8
                       ],
         "requires":  "mor seun",
+        "unknownPrereq":  false,
         "atLevel":  40,
         "raw":  [
                     "40/0/0",
@@ -8442,6 +8835,7 @@
                           13
                       ],
         "requires":  "cradh",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "42/0/0",
@@ -8463,6 +8857,7 @@
                           3
                       ],
         "requires":  "ao mor cradh",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "43/0/0",
@@ -8484,6 +8879,7 @@
                           23
                       ],
         "requires":  "dall",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "44/0/0",
@@ -8505,6 +8901,7 @@
                           23
                       ],
         "requires":  "mor cradh",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "45/0/0",
@@ -8526,6 +8923,7 @@
                           7
                       ],
         "requires":  "armachd",
+        "unknownPrereq":  false,
         "atLevel":  70,
         "raw":  [
                     "45/0/0",
@@ -8547,6 +8945,7 @@
                           3
                       ],
         "requires":  "ioc comlha",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "46/0/0",
@@ -8568,6 +8967,7 @@
                           3
                       ],
         "requires":  "seun",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "50/0/0",
@@ -8589,6 +8989,7 @@
                           3
                       ],
         "requires":  "mor ioc",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "53/0/0",
@@ -8610,6 +9011,7 @@
                           55
                       ],
         "requires":  "slan",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "55/0/0",
@@ -8631,6 +9033,7 @@
                           3
                       ],
         "requires":  "armachd",
+        "unknownPrereq":  false,
         "atLevel":  75,
         "raw":  [
                     "59/0/0",
@@ -8652,6 +9055,7 @@
                           8
                       ],
         "requires":  "spion beathach",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "60/0/0",
@@ -8673,6 +9077,7 @@
                           13
                       ],
         "requires":  "armachd",
+        "unknownPrereq":  false,
         "atLevel":  80,
         "raw":  [
                     "62/0/0",
@@ -8694,6 +9099,7 @@
                           10
                       ],
         "requires":  "ard ioc",
+        "unknownPrereq":  false,
         "atLevel":  90,
         "raw":  [
                     "65/0/0",
@@ -8715,6 +9121,7 @@
                           33
                       ],
         "requires":  "mor dion",
+        "unknownPrereq":  false,
         "atLevel":  90,
         "raw":  [
                     "69/0/0",
@@ -8736,6 +9143,7 @@
                           1
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "20/0/0",
@@ -8757,6 +9165,7 @@
                           1
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "11/0/0",
@@ -8778,6 +9187,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -8799,6 +9209,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -8820,6 +9231,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -8841,6 +9253,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -8863,6 +9276,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -8885,6 +9299,7 @@
                           3
                       ],
         "requires":  "Regeneration 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/15",
@@ -8907,6 +9322,7 @@
                           3
                       ],
         "requires":  "Regeneration 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -8929,6 +9345,7 @@
                           3
                       ],
         "requires":  "Regeneration 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/45",
@@ -8951,6 +9368,7 @@
                           3
                       ],
         "requires":  "Regeneration 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -8973,6 +9391,7 @@
                           3
                       ],
         "requires":  "Regeneration 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -8995,6 +9414,7 @@
                           3
                       ],
         "requires":  "Regeneration 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -9017,6 +9437,7 @@
                           3
                       ],
         "requires":  "Regeneration 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -9039,6 +9460,7 @@
                           3
                       ],
         "requires":  "Regeneration 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -9061,6 +9483,7 @@
                           3
                       ],
         "requires":  "Regeneration 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -9083,6 +9506,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -9105,6 +9529,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/15",
@@ -9127,6 +9552,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/25",
@@ -9149,6 +9575,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/35",
@@ -9171,6 +9598,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/45",
@@ -9193,6 +9621,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -9215,6 +9644,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -9237,6 +9667,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -9259,6 +9690,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -9281,6 +9713,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -9303,6 +9736,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -9325,6 +9759,7 @@
                           3
                       ],
         "requires":  "Cursed Tune 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -9347,6 +9782,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/18",
@@ -9369,6 +9805,7 @@
                           3
                       ],
         "requires":  "Counter Attack 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/25",
@@ -9391,6 +9828,7 @@
                           3
                       ],
         "requires":  "Counter Attack 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/38",
@@ -9413,6 +9851,7 @@
                           3
                       ],
         "requires":  "Counter Attack 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/44",
@@ -9435,6 +9874,7 @@
                           3
                       ],
         "requires":  "Counter Attack 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -9457,6 +9897,7 @@
                           3
                       ],
         "requires":  "Counter Attack 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -9479,6 +9920,7 @@
                           3
                       ],
         "requires":  "Counter Attack 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -9501,6 +9943,7 @@
                           3
                       ],
         "requires":  "Counter Attack 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -9523,6 +9966,7 @@
                           3
                       ],
         "requires":  "Counter Attack 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -9545,6 +9989,7 @@
                           3
                       ],
         "requires":  "Counter Attack 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -9567,6 +10012,7 @@
                           3
                       ],
         "requires":  "Counter Attack 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -9589,6 +10035,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -9610,6 +10057,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -9631,6 +10079,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -9652,6 +10101,7 @@
                           4
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -9673,6 +10123,7 @@
                           13
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -9694,6 +10145,7 @@
                           10
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "3/0/0",
@@ -9715,6 +10167,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -9736,6 +10189,7 @@
                           3
                       ],
         "requires":  "Assail",
+        "unknownPrereq":  false,
         "atLevel":  10,
         "raw":  [
                     "10/0/0",
@@ -9757,6 +10211,7 @@
                           7
                       ],
         "requires":  "Kick",
+        "unknownPrereq":  false,
         "atLevel":  5,
         "raw":  [
                     "4/0/0",
@@ -9778,6 +10233,7 @@
                           10
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "6/0/0",
@@ -9799,6 +10255,7 @@
                           16
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "10/0/0",
@@ -9820,6 +10277,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "20/0/0",
@@ -9841,6 +10299,7 @@
                           32
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "33/0/0",
@@ -9862,6 +10321,7 @@
                           30
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "44/0/0",
@@ -9883,6 +10343,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "55/0/0",
@@ -9904,6 +10365,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "55/0/0",
@@ -9925,6 +10387,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "66/0/0",
@@ -9946,6 +10409,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "77/0/0",
@@ -9967,6 +10431,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -9988,6 +10453,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -10009,6 +10475,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -10030,6 +10497,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -10051,6 +10519,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -10072,6 +10541,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -10093,6 +10563,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -10114,6 +10585,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/10",
@@ -10136,6 +10608,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -10158,6 +10631,7 @@
                           3
                       ],
         "requires":  "Inner Beast 1",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/8",
@@ -10180,6 +10654,7 @@
                           3
                       ],
         "requires":  "Inner Beast 2",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/16",
@@ -10202,6 +10677,7 @@
                           3
                       ],
         "requires":  "Inner Beast 3",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/28",
@@ -10224,6 +10700,7 @@
                           3
                       ],
         "requires":  "Inner Beast 4",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/36",
@@ -10246,6 +10723,7 @@
                           3
                       ],
         "requires":  "Inner Beast 5",
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/55",
@@ -10268,6 +10746,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -10290,6 +10769,7 @@
                           3
                       ],
         "requires":  "Mass Strike 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -10312,6 +10792,7 @@
                           3
                       ],
         "requires":  "Mass Strike 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -10334,6 +10815,7 @@
                           3
                       ],
         "requires":  "Mass Strike 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -10356,6 +10838,7 @@
                           3
                       ],
         "requires":  "Mass Strike 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/50",
@@ -10378,6 +10861,7 @@
                           3
                       ],
         "requires":  "Mass Strike 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -10400,6 +10884,7 @@
                           3
                       ],
         "requires":  "Mass Strike 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -10422,6 +10907,7 @@
                           3
                       ],
         "requires":  "Mass Strike 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -10444,6 +10930,7 @@
                           3
                       ],
         "requires":  "Mass Strike 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -10466,6 +10953,7 @@
                           3
                       ],
         "requires":  "Mass Strike 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -10488,6 +10976,7 @@
                           3
                       ],
         "requires":  "Mass Strike 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -10510,6 +10999,7 @@
                           3
                       ],
         "requires":  "Mass Strike 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -10532,6 +11022,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -10554,6 +11045,7 @@
                           3
                       ],
         "requires":  "Double Rake 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/23",
@@ -10576,6 +11068,7 @@
                           3
                       ],
         "requires":  "Double Rake 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/35",
@@ -10598,6 +11091,7 @@
                           3
                       ],
         "requires":  "Double Rake 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/47",
@@ -10620,6 +11114,7 @@
                           3
                       ],
         "requires":  "Double Rake 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -10642,6 +11137,7 @@
                           3
                       ],
         "requires":  "Double Rake 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -10664,6 +11160,7 @@
                           3
                       ],
         "requires":  "Double Rake 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -10686,6 +11183,7 @@
                           3
                       ],
         "requires":  "Double Rake 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -10708,6 +11206,7 @@
                           3
                       ],
         "requires":  "Double Rake 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -10730,6 +11229,7 @@
                           3
                       ],
         "requires":  "Double Rake 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -10752,6 +11252,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/20",
@@ -10774,6 +11275,7 @@
                           3
                       ],
         "requires":  "Pounce 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/35",
@@ -10796,6 +11298,7 @@
                           3
                       ],
         "requires":  "Pounce 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/50",
@@ -10818,6 +11321,7 @@
                           3
                       ],
         "requires":  "Pounce 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -10840,6 +11344,7 @@
                           3
                       ],
         "requires":  "Pounce 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -10862,6 +11367,7 @@
                           3
                       ],
         "requires":  "Pounce 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -10884,6 +11390,7 @@
                           3
                       ],
         "requires":  "Pounce 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -10906,6 +11413,7 @@
                           3
                       ],
         "requires":  "Pounce 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -10928,6 +11436,7 @@
                           3
                       ],
         "requires":  "Pounce 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -10950,6 +11459,7 @@
                           3
                       ],
         "requires":  "Pounce 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -10972,6 +11482,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -10994,6 +11505,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -11016,6 +11528,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -11038,6 +11551,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -11060,6 +11574,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -11082,6 +11597,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/50",
@@ -11104,6 +11620,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -11126,6 +11643,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -11148,6 +11666,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -11170,6 +11689,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -11192,6 +11712,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -11214,6 +11735,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -11236,6 +11758,7 @@
                           3
                       ],
         "requires":  "Tail Sweep 11",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -11258,6 +11781,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -11280,6 +11804,7 @@
                           3
                       ],
         "requires":  "Claw Slash 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/23",
@@ -11302,6 +11827,7 @@
                           3
                       ],
         "requires":  "Claw Slash 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/35",
@@ -11324,6 +11850,7 @@
                           3
                       ],
         "requires":  "Claw Slash 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/47",
@@ -11346,6 +11873,7 @@
                           3
                       ],
         "requires":  "Claw Slash 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -11368,6 +11896,7 @@
                           3
                       ],
         "requires":  "Claw Slash 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -11390,6 +11919,7 @@
                           3
                       ],
         "requires":  "Claw Slash 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -11412,6 +11942,7 @@
                           3
                       ],
         "requires":  "Claw Slash 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -11434,6 +11965,7 @@
                           3
                       ],
         "requires":  "Claw Slash 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -11456,6 +11988,7 @@
                           3
                       ],
         "requires":  "Claw Slash 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -11478,6 +12011,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/20",
@@ -11500,6 +12034,7 @@
                           3
                       ],
         "requires":  "Venom Attack 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -11522,6 +12057,7 @@
                           3
                       ],
         "requires":  "Venom Attack 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -11544,6 +12080,7 @@
                           3
                       ],
         "requires":  "Venom Attack 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -11566,6 +12103,7 @@
                           3
                       ],
         "requires":  "Venom Attack 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -11588,6 +12126,7 @@
                           3
                       ],
         "requires":  "Venom Attack 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -11610,6 +12149,7 @@
                           3
                       ],
         "requires":  "Venom Attack 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -11632,6 +12172,7 @@
                           3
                       ],
         "requires":  "Venom Attack 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -11654,6 +12195,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -11676,6 +12218,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -11698,6 +12241,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/30",
@@ -11720,6 +12264,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -11742,6 +12287,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/55",
@@ -11764,6 +12310,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -11786,6 +12333,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -11808,6 +12356,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -11830,6 +12379,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -11852,6 +12402,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -11874,6 +12425,7 @@
                           3
                       ],
         "requires":  "Beak Pierce 10",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -11896,6 +12448,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/10",
@@ -11918,6 +12471,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/23",
@@ -11940,6 +12494,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/35",
@@ -11962,6 +12517,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/47",
@@ -11984,6 +12540,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -12006,6 +12563,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -12028,6 +12586,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -12050,6 +12609,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -12072,6 +12632,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -12094,6 +12655,7 @@
                           3
                       ],
         "requires":  "Sneak Flight 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -12116,6 +12678,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/20",
@@ -12138,6 +12701,7 @@
                           3
                       ],
         "requires":  "Talon Kick 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/40",
@@ -12160,6 +12724,7 @@
                           3
                       ],
         "requires":  "Talon Kick 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -12182,6 +12747,7 @@
                           3
                       ],
         "requires":  "Talon Kick 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -12204,6 +12770,7 @@
                           3
                       ],
         "requires":  "Talon Kick 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -12226,6 +12793,7 @@
                           3
                       ],
         "requires":  "Talon Kick 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -12248,6 +12816,7 @@
                           3
                       ],
         "requires":  "Talon Kick 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -12270,6 +12839,7 @@
                           3
                       ],
         "requires":  "Talon Kick 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
@@ -12292,6 +12862,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "1/0/0",
@@ -12313,6 +12884,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "3/0/0",
@@ -12334,6 +12906,7 @@
                           13
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "5/0/0",
@@ -12355,6 +12928,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "11/0/0",
@@ -12376,6 +12950,7 @@
                           6
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "13/0/0",
@@ -12397,6 +12972,7 @@
                           18
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "22/0/0",
@@ -12418,6 +12994,7 @@
                           19
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "22/0/0",
@@ -12439,6 +13016,7 @@
                           13
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "30/0/0",
@@ -12460,6 +13038,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "44/0/0",
@@ -12481,6 +13060,7 @@
                           48
                       ],
         "requires":  "Mist",
+        "unknownPrereq":  false,
         "atLevel":  60,
         "raw":  [
                     "54/0/0",
@@ -12502,6 +13082,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "77/0/0",
@@ -12523,6 +13104,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "88/0/0",
@@ -12544,6 +13126,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -12565,6 +13148,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -12586,6 +13170,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -12607,6 +13192,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -12628,6 +13214,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -12649,6 +13236,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -12670,6 +13258,7 @@
                           5
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "0/0/0",
@@ -12691,6 +13280,7 @@
                           0
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/0",
@@ -12712,6 +13302,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -12734,6 +13325,7 @@
                           3
                       ],
         "requires":  "Feral Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/10",
@@ -12756,6 +13348,7 @@
                           3
                       ],
         "requires":  "Wild Feral Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -12778,6 +13371,7 @@
                           3
                       ],
         "requires":  "Fierce Feral Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/45",
@@ -12800,6 +13394,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -12822,6 +13417,7 @@
                           3
                       ],
         "requires":  "Komodas Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/10",
@@ -12844,6 +13440,7 @@
                           3
                       ],
         "requires":  "Wild Komodas Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -12866,6 +13463,7 @@
                           3
                       ],
         "requires":  "Fierce Komodas Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/45",
@@ -12888,6 +13486,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -12910,6 +13509,7 @@
                           3
                       ],
         "requires":  "Karura Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/10",
@@ -12932,6 +13532,7 @@
                           3
                       ],
         "requires":  "Wild Karura Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/20",
@@ -12954,6 +13555,7 @@
                           3
                       ],
         "requires":  "Fierce Karura Form",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/45",
@@ -12976,6 +13578,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/10",
@@ -12997,6 +13600,7 @@
                           3
                       ],
         "requires":  null,
+        "unknownPrereq":  false,
         "atLevel":  0,
         "raw":  [
                     "99/1/1",
@@ -13019,6 +13623,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 1",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/23",
@@ -13041,6 +13646,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 2",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/35",
@@ -13063,6 +13669,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 3",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/47",
@@ -13085,6 +13692,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 4",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/60",
@@ -13107,6 +13715,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 5",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/65",
@@ -13129,6 +13738,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 6",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/70",
@@ -13151,6 +13761,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 7",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/80",
@@ -13173,6 +13784,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 8",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/95",
@@ -13195,6 +13807,7 @@
                           3
                       ],
         "requires":  "Hail of Feathers 9",
+        "unknownPrereq":  false,
         "atLevel":  100,
         "raw":  [
                     "99/1/99",
