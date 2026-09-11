@@ -2,6 +2,7 @@
 
 - 기준일: 2026-09-12
 - 만드는 법: `python3 scripts/build-server-pack-data.py` → `build-server-pack-quests.py` → `build-server-pack-vault.py` → `build-server-pack-graph.py`
+- 명령표(선택): `python3 scripts/extract-script-commands.py <서버.exe> <팩이름>` — exe 는 저장소 밖에 둔다
 - 단일 출처: `data/server-packs/extracted/<팩>/*.json` (커밋됨) · 노트와 그래프는 거기서 나므로 커밋하지 않는다
 
 원작 자료(`docs/game-data.md`)와는 **다른 것**이다. 그쪽은 원작이 배포한 표이고,
@@ -101,6 +102,48 @@ if(@npc$=="구피"){                                    ← 누가 주나
 | 퀘스트 ─가져오라/거둔다/보상→ 아이템 | `item_exist` · `item_del` · `item_add` | 12 | 640 |
 | 이벤트 ─묶음→ 아이템 | `item/Event/<묶음>/` | 0 | 528 |
 
+## 3.6 스크립트를 실행하는 로직은 실행파일 안에 있다
+
+`item_add "…",1` 이 무엇을 하고 인자를 몇 개 받는지는 db 어디에도 없다. 뜻은 서버가 쥐고 있다.
+`sources/` 의 저장소 16개에는 없다 — 거기서 `item_add`·`get_myid`·`buildin_` 을 찾으면 0건이다.
+그쪽은 Dark Ages(미국) 계열이라 혈통이 다르다. 소스도 없다. 팩에 든 것은 PE 실행파일뿐이다.
+
+길은 혼든의 `Trap_db.txt` 주석이 알려 준다.
+
+```
+//{ buildin_trap_set, "trap_set", "siisiii" },  // 맵이름, x, y, 스크립트이름, 써클, 이펙트, 지속시간
+```
+
+**eAthena 계열 스크립트 엔진의 함수 등록표 생김새다.** 그 표는 컴파일된 뒤에도
+`{ 함수포인터, 이름, 인자서명 }` 12바이트 한 칸으로 `.rdata` 에 남는다. PE 를 열어
+`.text` 를 가리키는 포인터 + 식별자 꼴 이름 + 서명 꼴 문자열이 나란한 자리를 찾으면
+명령표가 통째로 나온다 (`scripts/extract-script-commands.py`). `i`=정수, `s`=문자열.
+
+| | 5.99 (`Novaonline.exe`) | 혼든 (`Yuki.exe`) |
+|---|---|---|
+| 엔진이 가진 명령 | 401 | 500 |
+| 그중 이 팩이 쓰는 것 | 262 | 292 |
+
+뽑은 것이 맞는지는 자료가 스스로 확인해 준다. `trap_set` 의 서명이 `siisiii` 로 나오는데,
+이는 위 주석에 적힌 것과 **글자 하나까지 같다**. `item_add`→`si`, `item_exist`→`is`,
+`warp`→`sii`, `mes`→`is` 도 스크립트에서 쓰이는 모양 그대로다.
+
+### 두 팩은 엔진부터 다르다
+
+`last_npc` 와 `rand2` 는 **`Novaonline.exe` 에 아예 없다**(문자열조차 없다. Nova 에는 `rand` 만 있다).
+그래서 5.99 의 스크립트는 `@npc$=="…"` 로 상대를 확인하는 일이 한 번도 없다 —
+쓸 수가 없기 때문이다. 대신 스크립트 이름 자체가 NPC 이름이다. 앞 절에서 5.99 의
+퀘스트-NPC 를 이름이 같을 때만 이은 것은 이 때문이다.
+
+### 여기서 멈춘 곳
+
+**각 명령이 무엇을 하는지는 적지 않았다.** 이름과 인자 개수는 바이너리에 적힌 사실이지만,
+동작은 기계어를 읽어야 알 수 있고 그건 하지 않았다. `set_map_pk` 가 PK 를 켠다는 것은
+이름에서 짐작될 뿐 확인된 것이 아니다. 짐작을 적으면 다음 사람이 그것을 근거로 삼는다.
+
+스크립트가 부르는 이름 중 표에 없는 것이 5.99 는 93개, 혼든은 185개다. 제어문(`if`·`goto`),
+사용자가 정의한 함수, 그리고 잘못 잡힌 것이 섞여 있다 — 아직 갈라 보지 않았다.
+
 ## 4. 믿을 수 있는 만큼만
 
 - **칸 이름은 원본 그대로다.** `내구력`·`방어력`·`콘변화` 는 db 에 그렇게 적혀 있다.
@@ -126,6 +169,7 @@ if(@npc$=="구피"){                                    ← 누가 주나
 data/server-packs/
 ├── <팩>/db/**            원본 (CP949 → UTF-8, 텍스트만). 커밋됨
 ├── extracted/<팩>/*.json 단일 출처. 커밋됨
+│                          (script-commands.json 은 서버 exe 에서 뽑은 것 — exe 는 저장소 밖)
 ├── vault/<팩>/           Obsidian. 커밋 안 함 — 다시 만든다
 └── graph/<팩>/           graph.html · graph.json · GRAPH_REPORT.md. 커밋 안 함
 ```
