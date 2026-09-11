@@ -40,3 +40,4 @@ data/game-data/vault/
 # 서버팩 자료 노트 — data/server-packs/extracted/*.json 에서 언제든 다시 만든다
 # (scripts/build-server-pack-vault.py)
 data/server-packs/vault/
+data/server-packs/graph/

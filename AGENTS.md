@@ -30,6 +30,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - 원작 스프라이트 방향·프레임 구간: `docs/original-sprite-animation.md`
 - **괴물이 어떻게 움직이고 싸우나(선공·이동·공격): `docs/monster-behaviour.md`**
 - **원작 기술·마법·퀘스트·아이템(선행 관계 그래프): `docs/game-data.md`** (`data/game-data/*.json`, Obsidian 노트 2,969장 — 맵·워프·NPC까지)
+- **서버팩(5.99·혼든) db 자료 — 팩별 JSON·Obsidian·그래프: `docs/server-pack-data.md`** (원작 자료와 별개)
 - 화면 배치(세로·가로): `docs/mobile-test-v1-wireframes.md` · 눌러볼 화면: `docs/index.html` (그림은 `docs/ui/assets/`)
 - 서버 안정화 계획과 결과: `docs/hades-p0-stabilization-plan.md`
 - 스코프 규칙(온디맨드): `sources/CLAUDE.md`
