@@ -114,6 +114,43 @@ Command Line Tools 를 가리켜 `xcodebuild` 가 거부했을 뿐이라, `DEVEL
 를 주면 sudo 없이 쓴다. 게이트 프로젝트와 결과는 `experiments/godot-csharp-mobile-smoke/README.md`.
 **실기기에서도 떴다** — iPad 9세대(iPad12,2, iPadOS 26.5.2)에서 실행 확인했다(2026-09-11).
 
+### iPad·iPhone 에 클라이언트 올리기 (2026-09-11 확인)
+
+로그인 화면까지 iPad 9세대에서 확인했다. 준비물은 위 macOS 절과 같고, 여기에 `DEVELOPER_DIR` 이 필요하다.
+
+```bash
+export DOTNET_ROOT="$PWD/.tools/dotnet-9.0.317"; export PATH="$DOTNET_ROOT:$PATH"
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+# export_presets.cfg 의 application/app_store_team_id 에 Team ID 를 넣고 — 끝나면 반드시 되돌린다
+"$GODOT" --headless --path mobile/client --export-debug "iOS"
+xcrun devicectl device install app --device <기기> mobile/client/build/ios/LodClient.ipa
+```
+
+**`EXPORT SUCCEEDED` 를 믿지 마라.** 이것이 오늘 제일 비싸게 배운 것이다. iOS 는 AOT 로 게시되는데,
+그때 ILC 가 내는 트림·AOT 분석 경고가 수십 개 나온다 — **전부 GodotSharp 안에서** 나오는 것이라 우리
+코드로는 없앨 수 없다. 작업공간의 `TreatWarningsAsErrors` 가 그것을 오류로 올려 .NET 게시를 실패시키고,
+**Godot 은 그 실패를 삼킨 채 `.ipa` 를 만든다** — C# 프레임워크가 통째로 빠진 채로. 서명도 정상이고
+설치도 되고, 기기에서 엔진이 올라온 **직후에** 죽는다. 로그에 남는 것은
+`Failed to build project. Check MSBuild panel for details.` 한 줄뿐이고 진짜 이유는 보여 주지 않는다.
+
+그래서 `LodClient.csproj` 는 iOS RID 일 때만 `IlcTreatWarningsAsErrors` 를 끈다. 데스크톱 빌드의
+엄격함은 그대로다. 그리고 **.ipa 가 제대로 됐는지는 크기가 아니라 프레임워크로 확인한다** — 빠진
+빌드와 제대로 된 빌드가 둘 다 23MB 였다:
+
+```bash
+unzip -l mobile/client/build/ios/LodClient.ipa | grep LodClient.framework   # 없으면 C# 이 빠진 것
+```
+
+`mobile/client/LodClient.sln` 이 필요한 이유도 같은 종류다 — 없으면 Godot 이 "no solution file exists"
+라고 적고 **C# 을 아예 게시하지 않은 채** 역시 성공으로 끝낸다. 윈도우에서는 `dotnet build` 를 csproj 로
+직접 부르므로 이 구멍이 드러나지 않는다.
+
+**smoke 게이트 통과가 클라이언트를 보장하지 않는다.** `experiments/godot-csharp-mobile-smoke` 는
+`mobile/` 밖이라 `mobile/Directory.Build.props` 를 물려받지 않는다. smoke 는 처음부터 잘 나갔고
+클라이언트만 죽었다.
+
+기기 등록·개발자 모드 같은 iOS 쪽 함정은 `experiments/godot-csharp-mobile-smoke/README.md` 에 있다.
+
 ### 화면이 들어맞는지
 
 ```powershell

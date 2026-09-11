@@ -9,6 +9,12 @@
 - Last updated: 2026-09-09
 
 ## History (append; 최신이 위)
+- 2026-09-11 — **클라이언트가 아이패드에서 떴다 — 로그인 화면까지.** 그전까지 기기에 올린 것은 스모크 껍데기뿐이었다.
+  - **`EXPORT SUCCEEDED` 가 거짓말을 한다.** iOS 는 AOT 게시인데 ILC 의 트림·AOT 분석 경고가 수십 개 나온다 — 전부 GodotSharp 안이라 우리가 못 없앤다. 작업공간의 `TreatWarningsAsErrors` 가 그걸 오류로 올려 .NET 게시를 죽이고, **Godot 은 그 실패를 삼킨 채 .ipa 를 만든다**(C# 프레임워크가 빠진 채로). 서명·설치 다 되고 기기에서 엔진이 올라온 직후에 죽는다. 로그에 남는 것은 `Failed to build project. Check MSBuild panel for details.` 한 줄뿐이다. `LodClient.csproj` 가 iOS RID 일 때만 `IlcTreatWarningsAsErrors` 를 끈다 — 데스크톱은 엄격 그대로.
+  - **크기로 확인하면 속는다.** C# 이 빠진 빌드와 제대로 된 빌드가 둘 다 23MB 였다. `unzip -l … | grep LodClient.framework` 로 봐야 한다. 스모크 앱과 나란히 놓고 `Frameworks/` 를 비교해서 찾았다.
+  - **`.sln` 이 없으면 C# 을 아예 게시하지 않는다.** `mobile/client` 에 없었다 — Godot 이 "no solution file exists" 라고 적고 역시 성공으로 끝낸다. 윈도우에서는 `dotnet build` 를 csproj 로 직접 부르므로 드러나지 않던 구멍이다.
+  - **smoke 게이트 통과가 클라이언트를 보장하지 않는다.** `experiments/` 는 `mobile/Directory.Build.props` 를 물려받지 않아 smoke 는 처음부터 잘 나갔고 클라이언트만 죽었다.
+  - 새로 넣은 것: `mobile/client/export_presets.cfg`(iOS 프리셋, Team ID 는 비움), `mobile/client/LodClient.sln`.
 - 2026-09-11 — **실기기에서 떴다. Mac·iOS 게이트를 닫는다.** iPad 9세대(iPad12,2, iPadOS 26.5.2)에 설치해 실행까지 확인했다. `UIDeviceFamily [1,2]` 라 iPhone·iPad 둘 다 받는다.
   - **Godot 의 iOS export 는 기기를 등록하지 못한다.** `xcodebuild` 를 부르면서 `-allowProvisioningDeviceRegistration` 을 주지 않아, 프로파일에 없는 기기는 설치에서 `0xe8008012` 로 막힌다 — **다시 export 해도 소용없다.** 같은 프로파일을 계속 쓰기 때문이다. 생성된 `.xcodeproj` 를 그 플래그와 함께 **한 번** 직접 빌드하면 프로파일이 그 기기로 다시 발급되고, DerivedData 의 `.app` 을 `xcrun devicectl device install app` 으로 넣으면 된다.
   - **확인은 프로파일을 직접 읽어서 한다** — `security cms -D -i <app>/embedded.mobileprovision` 의 `ProvisionedDevices` 에 UDID 가 있는지. 막혔을 때 이걸 먼저 봤어야 했다. 서명 오류가 사실 하나로 바뀐다.
