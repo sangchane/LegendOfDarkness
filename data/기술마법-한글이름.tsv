@@ -1,0 +1,597 @@
+# 기술·마법 한글 이름 — 사람이 채운다.
+# 구조(선행·직업·갈래)는 원작 영문 표가 정답지다: data/game-data/abilities.json
+# 팩(5.99)의 82·71 은 운영자가 손댄 사본이라 쓰지 않는다. 이름만 필요하다.
+#
+# 마지막 칸 `한글이름` 만 채우면 된다. 비워 두면 영문 이름을 그대로 쓴다.
+# 배치: 직업 → 갈래 → 선행 사슬. 들여쓰기(`·`)가 깊을수록 나중에 배우는 것이다.
+# 다시 만들어도 채운 칸은 지켜진다: python3 scripts/build-ability-nametable.py
+#
+갈래	직업	영문이름	선행	레벨	한글이름
+
+기술	전사	Armor Lore		0	
+기술	전사	Assail		0	
+기술	전사	· Assault	Assail	1	
+기술	전사	· Clobber	Assail	10	
+기술	전사	·· Wallop	Clobber	10	
+기술	전사	··· Crasher	Wallop	10	
+기술	전사	··· Long Strike	Wallop	20	
+기술	전사	··· Two-handed Attack	Wallop	10	
+기술	전사	· Melee Lore	Assail	20	
+기술	전사	· Rescue	Assail	10	
+기술	전사	·· ao beag suain	Rescue	60	
+기술	전사	·· beag suain	Rescue	70	
+기술	전사	··· Paralyze Force	beag suain	100	
+기술	전사	· Wind Blade	Assail	20	
+기술	전사	Charge		0	
+기술	전사	· Sever	Charge	100	
+기술	전사	Combat Senses		0	
+기술	전사	Cyclone Blade		0	
+기술	전사	Dune Swipe 1		0	
+기술	전사	· Dune Swipe 2	Dune Swipe 1	100	
+기술	전사	·· Dune Swipe 3	Dune Swipe 2	100	
+기술	전사	··· Dune Swipe 4	Dune Swipe 3	100	
+기술	전사	···· Dune Swipe 5	Dune Swipe 4	100	
+기술	전사	····· Dune Swipe 6	Dune Swipe 5	100	
+기술	전사	······ Dune Swipe 7	Dune Swipe 6	100	
+기술	전사	······· Dune Swipe 8	Dune Swipe 7	100	
+기술	전사	········ Dune Swipe 9	Dune Swipe 8	100	
+기술	전사	········· Dune Swipe 10	Dune Swipe 9	100	
+기술	전사	Intimidate		0	
+기술	전사	Mad Soul		0	
+기술	전사	Missile Lore		0	
+기술	전사	Sacrifice		0	
+기술	전사	Strikedown 1		0	
+기술	전사	· Strikedown 2	Strikedown 1	100	
+기술	전사	·· Strikedown 3	Strikedown 2	100	
+기술	전사	··· Strikedown 4	Strikedown 3	100	
+기술	전사	···· Strikedown 5	Strikedown 4	100	
+기술	전사	····· Strikedown 6	Strikedown 5	100	
+기술	전사	······ Strikedown 7	Strikedown 6	100	
+기술	전사	······· Strikedown 8	Strikedown 7	100	
+기술	전사	········ Strikedown 9	Strikedown 8	100	
+기술	전사	········· Strikedown 10	Strikedown 9	100	
+기술	전사	·········· Strikedown 11	Strikedown 10	100	
+기술	전사	Thrash		0	
+기술	전사	· Sneak Attack	Thrash	100	
+기술	전사	Thrust Attack 1		0	
+기술	전사	· Thrust Attack 2	Thrust Attack 1	0	
+기술	전사	·· Thrust Attack 3	Thrust Attack 2	0	
+기술	전사	··· Thrust Attack 4	Thrust Attack 3	0	
+기술	전사	···· Thrust Attack 5	Thrust Attack 4	0	
+기술	전사	····· Thrust Attack 6	Thrust Attack 5	0	
+기술	전사	Wheel Kick 1		0	
+기술	전사	· Wheel Kick 2	Wheel Kick 1	100	
+기술	전사	·· Wheel Kick 3	Wheel Kick 2	100	
+기술	전사	··· Wheel Kick 4	Wheel Kick 3	100	
+기술	전사	···· Wheel Kick 5	Wheel Kick 4	100	
+기술	전사	····· Wheel Kick 6	Wheel Kick 5	100	
+기술	전사	······ Wheel Kick 7	Wheel Kick 6	100	
+기술	전사	······· Wheel Kick 8	Wheel Kick 7	100	
+기술	전사	········ Wheel Kick 9	Wheel Kick 8	100	
+기술	전사	········· Wheel Kick 10	Wheel Kick 9	100	
+기술	전사	Perfect Defense	asgall faileas	70	
+마법	전사	Insult		0	
+마법	전사	Spit		0	
+마법	전사	Taunt		0	
+마법	전사	asgall faileas		0	
+기술	도적	Appraise		0	
+기술	도적	Archery 1		0	
+기술	도적	· Archery 2	Archery 1	0	
+기술	도적	·· Archery 3	Archery 2	0	
+기술	도적	··· Archery 4	Archery 3	0	
+기술	도적	···· Archery 5	Archery 4	0	
+기술	도적	····· Archery 6	Archery 5	0	
+기술	도적	Arrow Shot 1		0	
+기술	도적	· Arrow Shot 2	Arrow Shot 1	100	
+기술	도적	·· Arrow Shot 3	Arrow Shot 2	100	
+기술	도적	··· Arrow Shot 4	Arrow Shot 3	100	
+기술	도적	···· Arrow Shot 5	Arrow Shot 4	100	
+기술	도적	····· Arrow Shot 6	Arrow Shot 5	100	
+기술	도적	······ Arrow Shot 7	Arrow Shot 6	100	
+기술	도적	······· Arrow Shot 8	Arrow Shot 7	100	
+기술	도적	········ Arrow Shot 9	Arrow Shot 8	100	
+기술	도적	········· Arrow Shot 10	Arrow Shot 9	100	
+기술	도적	·········· Arrow Shot 11	Arrow Shot 10	100	
+기술	도적	··········· Arrow Shot 12	Arrow Shot 11	100	
+기술	도적	Assassin Strike		0	
+기술	도적	Evaluate Item		0	
+기술	도적	Food Lore		0	
+기술	도적	Hairstyle		0	
+기술	도적	Mend Garment		0	
+기술	도적	Mend Soori		0	
+기술	도적	Mend Weapon		0	
+기술	도적	Midnight Slash		0	
+기술	도적	Potion Lore		0	
+기술	도적	Rear Strike 1		0	
+기술	도적	· Rear Strike 2	Rear Strike 1	100	
+기술	도적	·· Rear Strike 3	Rear Strike 2	100	
+기술	도적	··· Rear Strike 4	Rear Strike 3	100	
+기술	도적	···· Rear Strike 5	Rear Strike 4	100	
+기술	도적	····· Rear Strike 6	Rear Strike 5	100	
+기술	도적	······ Rear Strike 7	Rear Strike 6	100	
+기술	도적	······· Rear Strike 8	Rear Strike 7	100	
+기술	도적	Shadow Figure		0	
+기술	도적	Stab Twice		0	
+기술	도적	Stab and Twist		0	
+기술	도적	Study Creature		0	
+기술	도적	· Peek	Study Creature	20	
+기술	도적	· Sense	Study Creature	30	
+기술	도적	Tailoring		0	
+기술	도적	Throw Surigum		0	
+기술	도적	· Amnesia	Throw Surigum	10	
+기술	도적	· Throw Smoke Bomb	Throw Surigum	30	
+기술	도적	Unlock		0	
+기술	도적	Throw	Assail	10	
+마법	도적	Blind Snare		0	
+마법	도적	Blind Trap		0	
+마법	도적	Bolt Trap		0	
+마법	도적	Coiled Bolt Trap		0	
+마법	도적	Frost Arrow 1		0	
+마법	도적	· Frost Arrow 2	Frost Arrow 1	100	
+마법	도적	·· Frost Arrow 3	Frost Arrow 2	100	
+마법	도적	··· Frost Arrow 4	Frost Arrow 3	100	
+마법	도적	···· Frost Arrow 5	Frost Arrow 4	100	
+마법	도적	····· Frost Arrow 6	Frost Arrow 5	100	
+마법	도적	······ Frost Arrow 7	Frost Arrow 6	100	
+마법	도적	······· Frost Arrow 8	Frost Arrow 7	100	
+마법	도적	········ Frost Arrow 9	Frost Arrow 8	100	
+마법	도적	Gem Polishing		0	
+마법	도적	Great Blind Snare		0	
+마법	도적	Great Poison Snare		0	
+마법	도적	Great Sleep Snare		0	
+마법	도적	Greater Blind Snare		0	
+마법	도적	Greater Poison Snare		0	
+마법	도적	Greater Sleep Snare		0	
+마법	도적	Hide		0	
+마법	도적	· eisd creutair	Hide	30	
+마법	도적	Life Arrow		0	
+마법	도적	Maiden Trap		0	
+마법	도적	Needle Trap		0	
+마법	도적	Poison Snare		0	
+마법	도적	Poison Trap		0	
+마법	도적	Set Volley		0	
+마법	도적	Shock Arrow		0	
+마법	도적	Sleep Snare		0	
+마법	도적	Sleep Trap		0	
+마법	도적	Spring Trap		0	
+마법	도적	Star Arrow 1		0	
+마법	도적	· Star Arrow 2	Star Arrow 1	100	
+마법	도적	·· Star Arrow 3	Star Arrow 2	100	
+마법	도적	··· Star Arrow 4	Star Arrow 3	100	
+마법	도적	···· Star Arrow 5	Star Arrow 4	100	
+마법	도적	····· Star Arrow 6	Star Arrow 5	100	
+마법	도적	······ Star Arrow 7	Star Arrow 6	100	
+마법	도적	······· Star Arrow 8	Star Arrow 7	100	
+마법	도적	········ Star Arrow 9	Star Arrow 8	100	
+마법	도적	········· Star Arrow 10	Star Arrow 9	100	
+마법	도적	·········· Star Arrow 11	Star Arrow 10	100	
+마법	도적	Stiletto Trap		0	
+마법	도적	Volley		0	
+마법	도적	beag breisleich		0	
+마법	도적	breisleich		0	
+기술	마법사	Analyze Item		0	
+기술	마법사	Elemental Bless 1		0	
+기술	마법사	· Elemental Bless 2	Elemental Bless 1	0	
+기술	마법사	·· Elemental Bless 3	Elemental Bless 2	0	
+기술	마법사	··· Elemental Bless 4	Elemental Bless 3	0	
+기술	마법사	···· Elemental Bless 5	Elemental Bless 4	0	
+기술	마법사	Herbal Lore		0	
+기술	마법사	Magic Lore		0	
+기술	마법사	Mend Staff		0	
+기술	마법사	Wield Staff		0	
+마법	마법사	Bubble Block		0	
+마법	마법사	Cyclone		0	
+마법	마법사	Disenchanter		0	
+마법	마법사	Elements Lecture		0	
+마법	마법사	Fiery Defender		0	
+마법	마법사	Graymayre Lecture		0	
+마법	마법사	Groo 1		0	
+마법	마법사	· Groo 2	Groo 1	100	
+마법	마법사	·· Groo 3	Groo 2	100	
+마법	마법사	··· Groo 4	Groo 3	100	
+마법	마법사	···· Groo 5	Groo 4	100	
+마법	마법사	····· Groo 6	Groo 5	100	
+마법	마법사	······ Groo 7	Groo 6	100	
+마법	마법사	······· Groo 8	Groo 7	100	
+마법	마법사	········ Groo 9	Groo 8	100	
+마법	마법사	········· Groo 10	Groo 9	100	
+마법	마법사	·········· Groo 11	Groo 10	100	
+마법	마법사	··········· Groo 12	Groo 11	100	
+마법	마법사	············ Groo 13	Groo 12	100	
+마법	마법사	············· Groo 14	Groo 13	100	
+마법	마법사	·············· Groo 15	Groo 14	100	
+마법	마법사	Keeter 1		0	
+마법	마법사	· Keeter 2	Keeter 1	100	
+마법	마법사	·· Keeter 3	Keeter 2	100	
+마법	마법사	··· Keeter 4	Keeter 3	100	
+마법	마법사	···· Keeter 5	Keeter 4	100	
+마법	마법사	····· Keeter 6	Keeter 5	100	
+마법	마법사	······ Keeter 7	Keeter 6	100	
+마법	마법사	······· Keeter 8	Keeter 7	100	
+마법	마법사	········ Keeter 9	Keeter 8	100	
+마법	마법사	········· Keeter 10	Keeter 9	100	
+마법	마법사	·········· Keeter 11	Keeter 10	100	
+마법	마법사	··········· Keeter 12	Keeter 11	100	
+마법	마법사	············ Keeter 13	Keeter 12	100	
+마법	마법사	············· Keeter 14	Keeter 13	100	
+마법	마법사	·············· Keeter 15	Keeter 14	100	
+마법	마법사	Mana Ward		0	
+마법	마법사	Mermaid 1		0	
+마법	마법사	· Mermaid 2	Mermaid 1	100	
+마법	마법사	·· Mermaid 3	Mermaid 2	100	
+마법	마법사	··· Mermaid 4	Mermaid 3	100	
+마법	마법사	···· Mermaid 5	Mermaid 4	100	
+마법	마법사	····· Mermaid 6	Mermaid 5	100	
+마법	마법사	······ Mermaid 7	Mermaid 6	100	
+마법	마법사	······· Mermaid 8	Mermaid 7	100	
+마법	마법사	········ Mermaid 9	Mermaid 8	100	
+마법	마법사	········· Mermaid 10	Mermaid 9	100	
+마법	마법사	·········· Mermaid 11	Mermaid 10	100	
+마법	마법사	··········· Mermaid 12	Mermaid 11	100	
+마법	마법사	············ Mermaid 13	Mermaid 12	100	
+마법	마법사	············· Mermaid 14	Mermaid 13	100	
+마법	마법사	·············· Mermaid 15	Mermaid 14	100	
+마법	마법사	Mud Wall		0	
+마법	마법사	Torch 1		0	
+마법	마법사	· Torch 2	Torch 1	100	
+마법	마법사	·· Torch 3	Torch 2	100	
+마법	마법사	··· Torch 4	Torch 3	100	
+마법	마법사	···· Torch 5	Torch 4	100	
+마법	마법사	····· Torch 6	Torch 5	100	
+마법	마법사	······ Torch 7	Torch 6	100	
+마법	마법사	······· Torch 8	Torch 7	100	
+마법	마법사	········ Torch 9	Torch 8	100	
+마법	마법사	········· Torch 10	Torch 9	100	
+마법	마법사	·········· Torch 11	Torch 10	100	
+마법	마법사	··········· Torch 12	Torch 11	100	
+마법	마법사	············ Torch 13	Torch 12	100	
+마법	마법사	············· Torch 14	Torch 13	100	
+마법	마법사	·············· Torch 15	Torch 14	100	
+마법	마법사	Wings of Protection		0	
+마법	마법사	ard puinneag spiorad		0	
+마법	마법사	beag athar		0	
+마법	마법사	· athar	beag athar	30	
+마법	마법사	·· ard leasaich athar	athar	70	
+마법	마법사	·· athar lamh	athar	60	
+마법	마법사	··· athar meall	athar lamh	75	
+마법	마법사	···· athar gar	athar meall	90	
+마법	마법사	·· leasaich athar	athar	30	
+마법	마법사	·· mor athar	athar	60	
+마법	마법사	··· ard athar	mor athar	75	
+마법	마법사	··· ard creag nadur	mor athar	50	
+마법	마법사	·· mor creag nadur	athar	50	
+마법	마법사	·· mor leasaich athar	athar	50	
+마법	마법사	· beag athar lamh	beag athar	10	
+마법	마법사	· beag leasaich athar	beag athar	30	
+마법	마법사	· creag nadur	beag athar	30	
+마법	마법사	beag creag		0	
+마법	마법사	· beag creag lamh	beag creag	10	
+마법	마법사	· beag leasaich creag	beag creag	30	
+마법	마법사	· creag	beag creag	30	
+마법	마법사	·· ard leasaich creag	creag	70	
+마법	마법사	·· creag lamh	creag	60	
+마법	마법사	··· creag meall	creag lamh	75	
+마법	마법사	···· creag gar	creag meall	90	
+마법	마법사	·· leasaich creag	creag	30	
+마법	마법사	·· mor creag	creag	60	
+마법	마법사	··· ard creag	mor creag	75	
+마법	마법사	··· ard sal nadur	mor creag	50	
+마법	마법사	·· mor leasaich creag	creag	50	
+마법	마법사	·· mor sal nadur	creag	50	
+마법	마법사	· sal nadur	beag creag	30	
+마법	마법사	beag fas nadur		0	
+마법	마법사	beag puinneag spiorad		0	
+마법	마법사	beag sal		0	
+마법	마법사	· beag leasaich sal	beag sal	30	
+마법	마법사	· beag sal lamh	beag sal	10	
+마법	마법사	· sal	beag sal	30	
+마법	마법사	·· ard leasaich sal	sal	70	
+마법	마법사	·· leasaich sal	sal	30	
+마법	마법사	·· mor leasaich sal	sal	30	
+마법	마법사	·· mor sal	sal	60	
+마법	마법사	··· ard sal	mor sal	75	
+마법	마법사	··· ard srad nadur	mor sal	50	
+마법	마법사	·· mor srad nadur	sal	50	
+마법	마법사	·· sal lamh	sal	60	
+마법	마법사	··· sal meall	sal lamh	75	
+마법	마법사	···· sal gar	sal meall	90	
+마법	마법사	· srad nadur	beag sal	30	
+마법	마법사	beag srad		0	
+마법	마법사	· athar nadur	beag srad	30	
+마법	마법사	· beag leasaich srad	beag srad	30	
+마법	마법사	· beag srad lamh	beag srad	10	
+마법	마법사	· srad	beag srad	30	
+마법	마법사	·· ard leasaich srad	srad	70	
+마법	마법사	·· leasaich srad	srad	30	
+마법	마법사	·· mor athar nadur	srad	50	
+마법	마법사	·· mor leasaich srad	srad	50	
+마법	마법사	·· mor srad	srad	60	
+마법	마법사	··· ard athar nadur	mor srad	50	
+마법	마법사	··· ard srad	mor srad	75	
+마법	마법사	·· srad lamh	srad	60	
+마법	마법사	··· srad meall	srad lamh	75	
+마법	마법사	···· srad gar	srad meall	90	
+마법	마법사	dachaidh		0	
+마법	마법사	fas nadur		0	
+마법	마법사	fas spiorad		0	
+마법	마법사	mor fas nadur		0	
+마법	마법사	mor puinneag spiorad		0	
+마법	마법사	mor strioch bais		0	
+마법	마법사	mor strioch bais lamh		0	
+마법	마법사	mor strioch bais meall		0	
+마법	마법사	mor strioch pian gar		0	
+마법	마법사	pian na dion		0	
+마법	마법사	puinneag spiorad		0	
+기술	사제	Instrumental 1		0	
+기술	사제	· Instrumental 2	Instrumental 1	0	
+기술	사제	·· Instrumental 3	Instrumental 2	0	
+기술	사제	··· Instrumental 4	Instrumental 3	0	
+기술	사제	···· Instrumental 5	Instrumental 4	0	
+기술	사제	····· Instrumental 6	Instrumental 5	0	
+기술	사제	Instrumental Attack 1		0	
+기술	사제	· Instrumental Attack 2	Instrumental Attack 1	100	
+기술	사제	·· Instrumental Attack 3	Instrumental Attack 2	100	
+기술	사제	··· Instrumental Attack 4	Instrumental Attack 3	100	
+기술	사제	···· Instrumental Attack 5	Instrumental Attack 4	100	
+기술	사제	····· Instrumental Attack 6	Instrumental Attack 5	100	
+기술	사제	······ Instrumental Attack 7	Instrumental Attack 6	100	
+기술	사제	······· Instrumental Attack 8	Instrumental Attack 7	100	
+기술	사제	········ Instrumental Attack 9	Instrumental Attack 8	100	
+기술	사제	········· Instrumental Attack 10	Instrumental Attack 9	100	
+기술	사제	·········· Instrumental Attack 11	Instrumental Attack 10	100	
+기술	사제	··········· Instrumental Attack 12	Instrumental Attack 11	100	
+기술	사제	Perish Lore		0	
+기술	사제	TransferBlood		0	
+마법	사제	Altar Lecture		0	
+마법	사제	Beothaich Lecture		0	
+마법	사제	Counter Attack 1		0	
+마법	사제	· Counter Attack 2	Counter Attack 1	100	
+마법	사제	·· Counter Attack 3	Counter Attack 2	100	
+마법	사제	··· Counter Attack 4	Counter Attack 3	100	
+마법	사제	···· Counter Attack 5	Counter Attack 4	100	
+마법	사제	····· Counter Attack 6	Counter Attack 5	100	
+마법	사제	······ Counter Attack 7	Counter Attack 6	100	
+마법	사제	······· Counter Attack 8	Counter Attack 7	100	
+마법	사제	········ Counter Attack 9	Counter Attack 8	100	
+마법	사제	········· Counter Attack 10	Counter Attack 9	100	
+마법	사제	·········· Counter Attack 11	Counter Attack 10	100	
+마법	사제	Cursed Tune 1		0	
+마법	사제	· Cursed Tune 2	Cursed Tune 1	100	
+마법	사제	·· Cursed Tune 3	Cursed Tune 2	100	
+마법	사제	··· Cursed Tune 4	Cursed Tune 3	100	
+마법	사제	···· Cursed Tune 5	Cursed Tune 4	100	
+마법	사제	····· Cursed Tune 6	Cursed Tune 5	100	
+마법	사제	······ Cursed Tune 7	Cursed Tune 6	100	
+마법	사제	······· Cursed Tune 8	Cursed Tune 7	100	
+마법	사제	········ Cursed Tune 9	Cursed Tune 8	100	
+마법	사제	········· Cursed Tune 10	Cursed Tune 9	100	
+마법	사제	·········· Cursed Tune 11	Cursed Tune 10	100	
+마법	사제	··········· Cursed Tune 12	Cursed Tune 11	100	
+마법	사제	Entreaties Lecture		0	
+마법	사제	Faerie Love Lecture		0	
+마법	사제	Gods Lecture		0	
+마법	사제	Guide Lecture		0	
+마법	사제	Regeneration 1		0	
+마법	사제	· Regeneration 2	Regeneration 1	100	
+마법	사제	·· Regeneration 3	Regeneration 2	100	
+마법	사제	··· Regeneration 4	Regeneration 3	100	
+마법	사제	···· Regeneration 5	Regeneration 4	100	
+마법	사제	····· Regeneration 6	Regeneration 5	100	
+마법	사제	······ Regeneration 7	Regeneration 6	100	
+마법	사제	······· Regeneration 8	Regeneration 7	100	
+마법	사제	········ Regeneration 9	Regeneration 8	100	
+마법	사제	········· Regeneration 10	Regeneration 9	100	
+마법	사제	Salvation		0	
+마법	사제	Woods Lecture		0	
+마법	사제	ao beag cradh		0	
+마법	사제	· ao cradh	ao beag cradh	30	
+마법	사제	·· ao mor cradh	ao cradh	60	
+마법	사제	··· ao ard cradh	ao mor cradh	75	
+마법	사제	ao dall		0	
+마법	사제	· ao suain	ao dall	75	
+마법	사제	ao puinsein		0	
+마법	사제	armachd		0	
+마법	사제	· ard naomh aite	armachd	80	
+마법	사제	· beag naomh aite	armachd	20	
+마법	사제	· mor dion	armachd	75	
+마법	사제	·· deireas faileas	mor dion	90	
+마법	사제	· mor naomh aite	armachd	70	
+마법	사제	armachd fein		0	
+마법	사제	beag cradh		0	
+마법	사제	· cradh	beag cradh	30	
+마법	사제	·· mor cradh	cradh	75	
+마법	사제	··· ard cradh	mor cradh	70	
+마법	사제	beag ioc		0	
+마법	사제	· beag ioc comlha	beag ioc	30	
+마법	사제	·· ioc comlha	beag ioc comlha	20	
+마법	사제	··· mor ioc comlha	ioc comlha	75	
+마법	사제	· beothaichdeum	beag ioc	10	
+마법	사제	· ioc	beag ioc	30	
+마법	사제	·· deo saighead	ioc	45	
+마법	사제	·· mor ioc	ioc	75	
+마법	사제	··· ard ioc	mor ioc	75	
+마법	사제	···· nuadhaich	ard ioc	90	
+마법	사제	beag ioc fein		0	
+마법	사제	beag puinsein		0	
+마법	사제	· beag pramh	beag puinsein	10	
+마법	사제	· puinsein	beag puinsein	10	
+마법	사제	·· pramh	puinsein	60	
+마법	사제	beag seun		0	
+마법	사제	· seun	beag seun	10	
+마법	사제	·· mor seun	seun	30	
+마법	사제	··· ard seun	mor seun	40	
+마법	사제	·· spion beathach	seun	10	
+마법	사제	··· sonruich nadur	spion beathach	10	
+마법	사제	beag slan		0	
+마법	사제	· slan	beag slan	10	
+마법	사제	·· mor slan	slan	10	
+마법	사제	beannaich		0	
+마법	사제	· fas deireas	beannaich	30	
+마법	사제	· mor beannaich	beannaich	10	
+마법	사제	creag neart		0	
+마법	사제	deo lamh		0	
+마법	사제	deo searg		0	
+마법	사제	deo searg gar		0	
+마법	사제	mor breisleich		0	
+마법	사제	mor dion comlha		0	
+마법	사제	naomh aite		0	
+마법	사제	dall	breisleich	75	
+마법	사제	· suain	dall	70	
+기술	수도사	Ambush		0	
+기술	수도사	Beak Pierce 1		0	
+기술	수도사	· Beak Pierce 2	Beak Pierce 1	100	
+기술	수도사	·· Beak Pierce 3	Beak Pierce 2	100	
+기술	수도사	··· Beak Pierce 4	Beak Pierce 3	100	
+기술	수도사	···· Beak Pierce 5	Beak Pierce 4	100	
+기술	수도사	····· Beak Pierce 6	Beak Pierce 5	100	
+기술	수도사	······ Beak Pierce 7	Beak Pierce 6	100	
+기술	수도사	······· Beak Pierce 8	Beak Pierce 7	100	
+기술	수도사	········ Beak Pierce 9	Beak Pierce 8	100	
+기술	수도사	········· Beak Pierce 10	Beak Pierce 9	100	
+기술	수도사	·········· Beak Pierce 11	Beak Pierce 10	100	
+기술	수도사	Claw Fist		0	
+기술	수도사	Claw Slash 1		0	
+기술	수도사	· Claw Slash 2	Claw Slash 1	100	
+기술	수도사	·· Claw Slash 3	Claw Slash 2	100	
+기술	수도사	··· Claw Slash 4	Claw Slash 3	100	
+기술	수도사	···· Claw Slash 5	Claw Slash 4	100	
+기술	수도사	····· Claw Slash 6	Claw Slash 5	100	
+기술	수도사	······ Claw Slash 7	Claw Slash 6	100	
+기술	수도사	······· Claw Slash 8	Claw Slash 7	100	
+기술	수도사	········ Claw Slash 9	Claw Slash 8	100	
+기술	수도사	········· Claw Slash 10	Claw Slash 9	100	
+기술	수도사	Dark Spear		0	
+기술	수도사	Double Punch		0	
+기술	수도사	Double Rake 1		0	
+기술	수도사	· Double Rake 2	Double Rake 1	100	
+기술	수도사	·· Double Rake 3	Double Rake 2	100	
+기술	수도사	··· Double Rake 4	Double Rake 3	100	
+기술	수도사	···· Double Rake 5	Double Rake 4	100	
+기술	수도사	····· Double Rake 6	Double Rake 5	100	
+기술	수도사	······ Double Rake 7	Double Rake 6	100	
+기술	수도사	······· Double Rake 8	Double Rake 7	100	
+기술	수도사	········ Double Rake 9	Double Rake 8	100	
+기술	수도사	········· Double Rake 10	Double Rake 9	100	
+기술	수도사	Draco Tail Kick		0	
+기술	수도사	Eagle Strike		0	
+기술	수도사	Echo Sense		0	
+기술	수도사	Inner Beast 1		0	
+기술	수도사	· Inner Beast 2	Inner Beast 1	0	
+기술	수도사	·· Inner Beast 3	Inner Beast 2	0	
+기술	수도사	··· Inner Beast 4	Inner Beast 3	0	
+기술	수도사	···· Inner Beast 5	Inner Beast 4	0	
+기술	수도사	····· Inner Beast 6	Inner Beast 5	0	
+기술	수도사	Kelberoth Strike		0	
+기술	수도사	Kick		0	
+기술	수도사	· High Kick	Kick	5	
+기술	수도사	Lucky Hand		0	
+기술	수도사	Mantis Kick		0	
+기술	수도사	Mass Strike 1		0	
+기술	수도사	· Mass Strike 2	Mass Strike 1	100	
+기술	수도사	·· Mass Strike 3	Mass Strike 2	100	
+기술	수도사	··· Mass Strike 4	Mass Strike 3	100	
+기술	수도사	···· Mass Strike 5	Mass Strike 4	100	
+기술	수도사	····· Mass Strike 6	Mass Strike 5	100	
+기술	수도사	······ Mass Strike 7	Mass Strike 6	100	
+기술	수도사	······· Mass Strike 8	Mass Strike 7	100	
+기술	수도사	········ Mass Strike 9	Mass Strike 8	100	
+기술	수도사	········· Mass Strike 10	Mass Strike 9	100	
+기술	수도사	·········· Mass Strike 11	Mass Strike 10	100	
+기술	수도사	··········· Mass Strike 12	Mass Strike 11	100	
+기술	수도사	Poison Punch		0	
+기술	수도사	Pounce 1		0	
+기술	수도사	· Pounce 2	Pounce 1	100	
+기술	수도사	·· Pounce 3	Pounce 2	100	
+기술	수도사	··· Pounce 4	Pounce 3	100	
+기술	수도사	···· Pounce 5	Pounce 4	100	
+기술	수도사	····· Pounce 6	Pounce 5	100	
+기술	수도사	······ Pounce 7	Pounce 6	100	
+기술	수도사	······· Pounce 8	Pounce 7	100	
+기술	수도사	········ Pounce 9	Pounce 8	100	
+기술	수도사	········· Pounce 10	Pounce 9	100	
+기술	수도사	Puncture		0	
+기술	수도사	Sneak Flight 1		0	
+기술	수도사	· Sneak Flight 2	Sneak Flight 1	100	
+기술	수도사	·· Sneak Flight 3	Sneak Flight 2	100	
+기술	수도사	··· Sneak Flight 4	Sneak Flight 3	100	
+기술	수도사	···· Sneak Flight 5	Sneak Flight 4	100	
+기술	수도사	····· Sneak Flight 6	Sneak Flight 5	100	
+기술	수도사	······ Sneak Flight 7	Sneak Flight 6	100	
+기술	수도사	······· Sneak Flight 8	Sneak Flight 7	100	
+기술	수도사	········ Sneak Flight 9	Sneak Flight 8	100	
+기술	수도사	········· Sneak Flight 10	Sneak Flight 9	100	
+기술	수도사	Sting		0	
+기술	수도사	Tail Slam		0	
+기술	수도사	Tail Sweep 1		0	
+기술	수도사	· Tail Sweep 2	Tail Sweep 1	100	
+기술	수도사	·· Tail Sweep 3	Tail Sweep 2	100	
+기술	수도사	··· Tail Sweep 4	Tail Sweep 3	100	
+기술	수도사	···· Tail Sweep 5	Tail Sweep 4	100	
+기술	수도사	····· Tail Sweep 6	Tail Sweep 5	100	
+기술	수도사	······ Tail Sweep 7	Tail Sweep 6	100	
+기술	수도사	······· Tail Sweep 8	Tail Sweep 7	100	
+기술	수도사	········ Tail Sweep 9	Tail Sweep 8	100	
+기술	수도사	········· Tail Sweep 10	Tail Sweep 9	100	
+기술	수도사	·········· Tail Sweep 11	Tail Sweep 10	100	
+기술	수도사	··········· Tail Sweep 12	Tail Sweep 11	100	
+기술	수도사	Talon Kick 1		0	
+기술	수도사	· Talon Kick 2	Talon Kick 1	100	
+기술	수도사	·· Talon Kick 3	Talon Kick 2	100	
+기술	수도사	··· Talon Kick 4	Talon Kick 3	100	
+기술	수도사	···· Talon Kick 5	Talon Kick 4	100	
+기술	수도사	····· Talon Kick 6	Talon Kick 5	100	
+기술	수도사	······ Talon Kick 7	Talon Kick 6	100	
+기술	수도사	······· Talon Kick 8	Talon Kick 7	100	
+기술	수도사	Triple Kick		0	
+기술	수도사	Venom Attack 1		0	
+기술	수도사	· Venom Attack 2	Venom Attack 1	100	
+기술	수도사	·· Venom Attack 3	Venom Attack 2	100	
+기술	수도사	··· Venom Attack 4	Venom Attack 3	100	
+기술	수도사	···· Venom Attack 5	Venom Attack 4	100	
+기술	수도사	····· Venom Attack 6	Venom Attack 5	100	
+기술	수도사	······ Venom Attack 7	Venom Attack 6	100	
+기술	수도사	······· Venom Attack 8	Venom Attack 7	100	
+기술	수도사	Whirlwind Attack		0	
+기술	수도사	Wise Touch		0	
+기술	수도사	Wolf Fang Fist		0	
+기술	수도사	Martial Awareness	Assail	10	
+마법	수도사	Cat's Hearing		0	
+마법	수도사	Cold Blood		0	
+마법	수도사	Draco Stance		0	
+마법	수도사	Feral Form		0	
+마법	수도사	· Wild Feral Form	Feral Form	100	
+마법	수도사	·· Fierce Feral Form	Wild Feral Form	100	
+마법	수도사	··· Master Feral Form	Fierce Feral Form	100	
+마법	수도사	Gentle Touch		0	
+마법	수도사	Hail of Feathers 1		0	
+마법	수도사	· Hail of Feathers 2	Hail of Feathers 1	100	
+마법	수도사	·· Hail of Feathers 3	Hail of Feathers 2	100	
+마법	수도사	··· Hail of Feathers 4	Hail of Feathers 3	100	
+마법	수도사	···· Hail of Feathers 5	Hail of Feathers 4	100	
+마법	수도사	····· Hail of Feathers 6	Hail of Feathers 5	100	
+마법	수도사	······ Hail of Feathers 7	Hail of Feathers 6	100	
+마법	수도사	······· Hail of Feathers 8	Hail of Feathers 7	100	
+마법	수도사	········ Hail of Feathers 9	Hail of Feathers 8	100	
+마법	수도사	········· Hail of Feathers 10	Hail of Feathers 9	100	
+마법	수도사	Howl		0	
+마법	수도사	Inner Fire		0	
+마법	수도사	Iron Skin		0	
+마법	수도사	Karura Form		0	
+마법	수도사	· Wild Karura Form	Karura Form	100	
+마법	수도사	·· Fierce Karura Form	Wild Karura Form	100	
+마법	수도사	··· Master Karura Form	Fierce Karura Form	100	
+마법	수도사	Kelberoth Stance		0	
+마법	수도사	Komodas Form		0	
+마법	수도사	· Wild Komodas Form	Komodas Form	100	
+마법	수도사	·· Fierce Komodas Form	Wild Komodas Form	100	
+마법	수도사	··· Master Komodas Form	Fierce Komodas Form	100	
+마법	수도사	Mist		0	
+마법	수도사	· dion	Mist	60	
+마법	수도사	Roar		0	
+마법	수도사	Scorpion Stance		0	
+마법	수도사	Snort		0	
+마법	수도사	Trance		0	
+마법	수도사	White Bat Stance		0	
+마법	수도사	Wraith Touch		0	
+마법	수도사	beag nochd		0	
+마법	수도사	puinneag beatha		0	

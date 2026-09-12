@@ -492,7 +492,27 @@ def write_mundanes(keep):
 # 능력치 요구 다섯 칸은 **옮기지 않는다.** 값은 알지만 어느 자리가 어느 능력치인지 모른다
 # (docs/game-data.md 137행). 모르는 채 옮기면 다음 사람이 그것을 근거로 삼는다.
 ABILITIES = ROOT / "data" / "game-data" / "abilities.json"
+NAMETABLE = ROOT / "data" / "기술마법-한글이름.tsv"
+ABILITY_MARK = "원작표"      # 우리가 쓴 것이라는 표. 없으면 Hades 가 손으로 넣은 것이다
 SCRIPTS = SERVER / "scripts"
+
+
+def korean_names():
+    """사람이 채운 한글 이름. 비어 있으면 영문 이름을 그대로 쓴다.
+
+    팩의 82·71 로 바꾸지 않는다 - 운영자가 손댄 사본이라 수치를 믿을 수 없고, 무엇보다
+    무엇을 배워야 무엇이 열리는지가 팩에는 없다. 구조는 원작, 이름만 사람이 준다.
+    """
+    if not NAMETABLE.exists():
+        return {}
+    out = {}
+    for line in NAMETABLE.read_text(encoding="utf-8").splitlines():
+        if not line or line.startswith("#") or line.startswith("갈래\t"):
+            continue
+        c = line.split("\t")
+        if len(c) >= 6 and c[5].strip():
+            out[c[2].lstrip("· ").strip()] = c[5].strip()
+    return out
 
 
 def script_names():
@@ -503,23 +523,29 @@ def script_names():
     return out
 
 
-def ability_json(r, kind_of, scripts):
+def ability_json(r, kind_of, scripts, korean):
     need = r.get("requires")
     pre = None
     if need or r.get("atLevel") or r.get("class"):
         pre = {"Class_Required": r.get("class") or 0,
                "ExpLevel_Required": r.get("atLevel") or 0}
         if need:
-            pre["Skill_Required" if kind_of.get(need) == "skill" else "Spell_Required"] = need
+            # 선행도 캐시에 들어간 이름으로 불러야 한다 - 이름을 바꾸면 여기도 같이 바뀐다.
+            pre["Skill_Required" if kind_of.get(need) == "skill" else "Spell_Required"] = \
+                korean.get(need, need)
 
     return {
-        "Name": r["name"],
+        "Name": korean.get(r["name"], r["name"]),
         # Hades 가 들고 있는 Assail 이 이름을 그대로 ScriptName 으로 쓴다. 없는 이름을 넣으면
         # 붙지 않고 조용히 아무 일도 안 하므로, 실제로 있는 것만 적는다.
         "ScriptName": r["name"] if r["name"] in scripts else None,
         "Prerequisites": pre,
         "MaxLevel": 100,
-        "ID": 0, "Group": None, "Description": None,
+        "ID": 0, "Description": None,
+        # 이 표가 없으면 Hades 가 손으로 넣은 것이다 — Assail 에는 Buff 와 Icon 이 들어 있는데
+        # 원작 표에는 그 값이 없으므로 덮으면 잃는다. 이름을 바꾸면 옛 파일이 남으니,
+        # 다시 쓸 때 표가 붙은 것만 먼저 지운다.
+        "Group": ABILITY_MARK,
     }
 
 
@@ -527,11 +553,21 @@ def write_abilities(kind):
     rows = json.loads(ABILITIES.read_text(encoding="utf-8-sig"))
     kind_of = {r["name"]: r["kind"] for r in rows}
     scripts = script_names()
+    korean = korean_names()
     want = "skill" if kind == "skills" else "spell"
     out = SERVER / "templates" / kind
     out.mkdir(parents=True, exist_ok=True)
 
-    shipped = {f.stem.lower() for f in out.glob("*.json")}
+    shipped = set()
+    for f in out.glob("*.json"):
+        try:
+            mine = json.loads(f.read_text(encoding="utf-8-sig")).get("Group") == ABILITY_MARK
+        except Exception:
+            mine = False
+        if mine:
+            f.unlink()
+        else:
+            shipped.add(f.stem.lower())
     seen, wrote, kept, scripted = set(), 0, 0, 0
     for r in rows:
         if r["kind"] != want or r["name"] in seen:
@@ -540,12 +576,12 @@ def write_abilities(kind):
         if safe_name(r["name"]).lower() in shipped:      # Hades 가 이미 들고 있는 것은 그대로 둔다
             kept += 1
             continue
-        j = ability_json(r, kind_of, scripts)
+        j = ability_json(r, kind_of, scripts, korean)
         scripted += j["ScriptName"] is not None
-        (out / f'{safe_name(r["name"]).lower()}.json').write_text(
+        (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
             json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
         wrote += 1
-    return wrote, kept, len(seen), scripted
+    return wrote, kept, len(seen), scripted, sum(1 for n in seen if n in korean)
 
 
 # ── 월드맵 ───────────────────────────────────────────────────────────────
@@ -733,9 +769,10 @@ def main():
             if a.write:
                 print(f"     넣음 {write_maps(rows)}장 → areas/ · maps/")
         elif kind in ("skills", "spells") and a.write:
-            wrote, kept, distinct, scripted = write_abilities(kind)
+            wrote, kept, distinct, scripted, named = write_abilities(kind)
             print(f"     넣음 {wrote}장 → templates/{kind}/  "
-                  f"(서로 다른 이름 {distinct} · Hades 것 그대로 둠 {kept} · 스크립트 붙은 것 {scripted})")
+                  f"(서로 다른 이름 {distinct} · Hades 것 그대로 둠 {kept} · "
+                  f"스크립트 붙은 것 {scripted} · 한글 이름 {named})")
         elif kind == "worldmaps" and a.write:
             got, missing = write_worldmaps(keep)
             files, cells = write_world_warps()
