@@ -147,11 +147,12 @@ RULES = {
     "items":     lambda _: eligible_plain("items"),
     "doors":     lambda _: eligible_plain("doors"),
     "shops":     lambda _: eligible_plain("shops"),
+    "quests":    lambda _: (json.loads(QUESTS.read_text(encoding="utf-8-sig")), []),
 }
 
 # 계획의 실측 표. 여기서 벗어나면 표가 틀렸거나 적재기가 틀렸다 — 진행 전에 가린다.
 # 기술·마법은 원작(abilities.json) 기준이다 — 팩의 82·71 이 아니다.
-EXPECTED = {"shops": 47, "maps": 797, "warps": 886, "items": 989, "monsters": 565,
+EXPECTED = {"quests": 38, "shops": 47, "maps": 797, "warps": 886, "items": 989, "monsters": 565,
             "mundanes": 84, "skills": 275, "spells": 338, "worldmaps": 1, "doors": 1}
 
 
@@ -585,6 +586,61 @@ def write_abilities(kind):
     return wrote, kept, len(seen), scripted, sum(1 for n in seen if n in korean)
 
 
+# ── 퀘스트 ──────────────────────────────────────────────────────────────
+# **원작이 먼저다.** 팩의 quests.json 60건은 퀘스트 정의가 아니라 추출기가 스크립트에서
+# 긁은 **변수 목록**이다 — 팩의 퀘스트는 스크립트 안에 코드로 있다. 원작은 metafile
+# SEvent1~7 에서 38건이 표로 나와 있고(data/game-data/quests.json), Hades 가 그중 한 건
+# (Mother's Love)을 static/meta/quests/ 에 실어 형식까지 보여 준다.
+#
+# 그 한 건을 그대로 다시 만들어 원본과 같은지 보고, 같으면 나머지를 같은 꼴로 만든다.
+# 형식을 짐작하지 않고 **있는 것으로 확인한다.**
+QUESTS = ROOT / "data" / "game-data" / "quests.json"
+QUESTDIR = SERVER / "static" / "meta" / "quests"
+QUEST_FIELDS = ["start", "title", "id", "qual", "sum", "result", "sub", "reward", "end"]
+
+
+def quest_atoms(q, field):
+    """조각을 끊는 것은 `|` 가 아니라 **` | `**(공백-막대-공백)다.
+
+    그냥 `|` 로 끊으면 `1 | 12345` 가 `"1 "`, `" 12345"` 가 되어 Hades 가 들고 있는 것과
+    다르다. 안쪽 공백은 뜻이 있으므로(설명이 칸 맞춰 적혀 있다) 다듬지 않는다.
+    start 와 end 는 비어 있으면 조각이 없다.
+    """
+    v = q.get(field) or ""
+    if field in ("start", "end"):
+        return [] if not v.strip() else [v]
+    return v.split(" | ") if v else [""]
+
+
+def quest_json(q):
+    n = q["key"].split("-")[-1]
+    return [{"Atoms": quest_atoms(q, f), "Name": f"{n}_{f}"} for f in QUEST_FIELDS]
+
+
+def write_quests(_keep):
+    QUESTDIR.mkdir(parents=True, exist_ok=True)
+    rows = json.loads(QUESTS.read_text(encoding="utf-8-sig"))
+
+    # 먼저 Hades 가 들고 있는 것으로 형식을 확인한다. 다르면 만들지 않는다.
+    shipped = QUESTDIR / "Mother's Love.txt"
+    same = None
+    if shipped.exists():
+        want = [q for q in rows if q["title"] == "Mother's Love"]
+        if want:
+            mine = json.dumps(quest_json(want[0]), ensure_ascii=False, indent=2)
+            same = json.loads(mine) == json.loads(shipped.read_text(encoding="utf-8-sig"))
+
+    if same is False:
+        raise SystemExit("Hades 가 들고 있는 퀘스트와 모양이 다르다 — 형식을 다시 본다")
+
+    n = 0
+    for q in rows:
+        (QUESTDIR / f"{safe_name(q['title'])}.txt").write_text(
+            json.dumps(quest_json(q), ensure_ascii=False, indent=2), encoding="utf-8")
+        n += 1
+    return n, same
+
+
 # ── 상점 ────────────────────────────────────────────────────────────────
 # 상점은 만드는 게 아니다. shop1.cs 가 사기·팔기·수리를 다 하고 DefaultMerchantStock 만
 # 읽는다. 문제는 **어느 NPC 가 어느 목록을 여느냐** 였고, 그건 팩 스크립트의 shop 호출에
@@ -836,6 +892,10 @@ def main():
             print(f"     넣음 {wrote}장 → templates/{kind}/  "
                   f"(서로 다른 이름 {distinct} · Hades 것 그대로 둠 {kept} · "
                   f"스크립트 붙은 것 {scripted} · 한글 이름 {named})")
+        elif kind == "quests" and a.write:
+            n, same = write_quests(keep)
+            print(f"     넣음 {n}장 → static/meta/quests/  "
+                  f"(Hades 가 든 한 건과 모양 {'같다' if same else '대조 못 함'})")
         elif kind == "shops" and a.write:
             n, goods, sells = write_shops(keep)
             print(f"     상점 NPC {n}명 → templates/mundanes/  (파는 물건 {goods}개 · 사 주는 목록 {sells}자리)")

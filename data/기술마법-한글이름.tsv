@@ -13,19 +13,19 @@
 기술	전사	· Assault	Assail	1	
 기술	전사	· Clobber	Assail	10	
 기술	전사	·· Wallop	Clobber	10	
-기술	전사	··· Crasher	Wallop	10	
+기술	전사	··· Crasher	Wallop	10	크래셔
 기술	전사	··· Long Strike	Wallop	20	
-기술	전사	··· Two-handed Attack	Wallop	10	
+기술	전사	··· Two-handed Attack	Wallop	10	투핸드어택
 기술	전사	· Melee Lore	Assail	20	
 기술	전사	· Rescue	Assail	10	
-기술	전사	·· ao beag suain	Rescue	60	
+기술	전사	·· ao beag suain	Rescue	60	타겟어택
 기술	전사	·· beag suain	Rescue	70	
-기술	전사	··· Paralyze Force	beag suain	100	
-기술	전사	· Wind Blade	Assail	20	
-기술	전사	Charge		0	
+기술	전사	··· Paralyze Force	beag suain	100	M포효
+기술	전사	· Wind Blade	Assail	20	윈드블레이드
+기술	전사	Charge		0	질주
 기술	전사	· Sever	Charge	100	
 기술	전사	Combat Senses		0	
-기술	전사	Cyclone Blade		0	
+기술	전사	Cyclone Blade		0	메가블레이드
 기술	전사	Dune Swipe 1		0	
 기술	전사	· Dune Swipe 2	Dune Swipe 1	100	
 기술	전사	·· Dune Swipe 3	Dune Swipe 2	100	
@@ -111,14 +111,14 @@
 기술	도적	······ Rear Strike 7	Rear Strike 6	100	
 기술	도적	······· Rear Strike 8	Rear Strike 7	100	
 기술	도적	Shadow Figure		0	
-기술	도적	Stab Twice		0	
-기술	도적	Stab and Twist		0	
+기술	도적	Stab Twice		0	슬레쉬
+기술	도적	Stab and Twist		0	찌르기
 기술	도적	Study Creature		0	
-기술	도적	· Peek	Study Creature	20	
-기술	도적	· Sense	Study Creature	30	
+기술	도적	· Peek	Study Creature	20	품뒤져보기
+기술	도적	· Sense	Study Creature	30	센스
 기술	도적	Tailoring		0	
-기술	도적	Throw Surigum		0	
-기술	도적	· Amnesia	Throw Surigum	10	
+기술	도적	Throw Surigum		0	표창던지기
+기술	도적	· Amnesia	Throw Surigum	10	아무네지아
 기술	도적	· Throw Smoke Bomb	Throw Surigum	30	
 기술	도적	Unlock		0	
 기술	도적	Throw	Assail	10	
@@ -254,7 +254,7 @@
 마법	마법사	·· ard leasaich athar	athar	70	
 마법	마법사	·· athar lamh	athar	60	
 마법	마법사	··· athar meall	athar lamh	75	
-마법	마법사	···· athar gar	athar meall	90	
+마법	마법사	···· athar gar	athar meall	90	마네나로
 마법	마법사	·· leasaich athar	athar	30	
 마법	마법사	·· mor athar	athar	60	
 마법	마법사	··· ard athar	mor athar	75	
@@ -288,7 +288,7 @@
 마법	마법사	·· ard leasaich sal	sal	70	
 마법	마법사	·· leasaich sal	sal	30	
 마법	마법사	·· mor leasaich sal	sal	30	
-마법	마법사	·· mor sal	sal	60	
+마법	마법사	·· mor sal	sal	60	마레누스
 마법	마법사	··· ard sal	mor sal	75	
 마법	마법사	··· ard srad nadur	mor sal	50	
 마법	마법사	·· mor srad nadur	sal	50	
@@ -316,10 +316,10 @@
 마법	마법사	fas spiorad		0	
 마법	마법사	mor fas nadur		0	
 마법	마법사	mor puinneag spiorad		0	
-마법	마법사	mor strioch bais		0	
+마법	마법사	mor strioch bais		0	세멜리아
 마법	마법사	mor strioch bais lamh		0	
 마법	마법사	mor strioch bais meall		0	
-마법	마법사	mor strioch pian gar		0	
+마법	마법사	mor strioch pian gar		0	라그나로크
 마법	마법사	pian na dion		0	
 마법	마법사	puinneag spiorad		0	
 기술	사제	Instrumental 1		0	
@@ -381,14 +381,14 @@
 마법	사제	······· Regeneration 8	Regeneration 7	100	
 마법	사제	········ Regeneration 9	Regeneration 8	100	
 마법	사제	········· Regeneration 10	Regeneration 9	100	
-마법	사제	Salvation		0	
+마법	사제	Salvation		0	홀리쿠라네라
 마법	사제	Woods Lecture		0	
 마법	사제	ao beag cradh		0	
 마법	사제	· ao cradh	ao beag cradh	30	
 마법	사제	·· ao mor cradh	ao cradh	60	
 마법	사제	··· ao ard cradh	ao mor cradh	75	
 마법	사제	ao dall		0	
-마법	사제	· ao suain	ao dall	75	
+마법	사제	· ao suain	ao dall	75	디소루마
 마법	사제	ao puinsein		0	
 마법	사제	armachd		0	
 마법	사제	· ard naomh aite	armachd	80	
@@ -397,20 +397,20 @@
 마법	사제	·· deireas faileas	mor dion	90	
 마법	사제	· mor naomh aite	armachd	70	
 마법	사제	armachd fein		0	
-마법	사제	beag cradh		0	
-마법	사제	· cradh	beag cradh	30	
-마법	사제	·· mor cradh	cradh	75	
-마법	사제	··· ard cradh	mor cradh	70	
-마법	사제	beag ioc		0	
-마법	사제	· beag ioc comlha	beag ioc	30	
-마법	사제	·· ioc comlha	beag ioc comlha	20	
-마법	사제	··· mor ioc comlha	ioc comlha	75	
+마법	사제	beag cradh		0	렌토
+마법	사제	· cradh	beag cradh	30	바르도
+마법	사제	·· mor cradh	cradh	75	데프레코
+마법	사제	··· ard cradh	mor cradh	70	프라보
+마법	사제	beag ioc		0	쿠로
+마법	사제	· beag ioc comlha	beag ioc	30	쿠러스
+마법	사제	·· ioc comlha	beag ioc comlha	20	쿠라누스
+마법	사제	··· mor ioc comlha	ioc comlha	75	쿠라네라
 마법	사제	· beothaichdeum	beag ioc	10	
-마법	사제	· ioc	beag ioc	30	
+마법	사제	· ioc	beag ioc	30	쿠라노
 마법	사제	·· deo saighead	ioc	45	
-마법	사제	·· mor ioc	ioc	75	
-마법	사제	··· ard ioc	mor ioc	75	
-마법	사제	···· nuadhaich	ard ioc	90	
+마법	사제	·· mor ioc	ioc	75	쿠라노소
+마법	사제	··· ard ioc	mor ioc	75	수페라쿠라노
+마법	사제	···· nuadhaich	ard ioc	90	엑스쿠라노
 마법	사제	beag ioc fein		0	
 마법	사제	beag puinsein		0	
 마법	사제	· beag pramh	beag puinsein	10	
@@ -437,7 +437,7 @@
 마법	사제	naomh aite		0	
 마법	사제	dall	breisleich	75	
 마법	사제	· suain	dall	70	
-기술	수도사	Ambush		0	
+기술	수도사	Ambush		0	이형환위
 기술	수도사	Beak Pierce 1		0	
 기술	수도사	· Beak Pierce 2	Beak Pierce 1	100	
 기술	수도사	·· Beak Pierce 3	Beak Pierce 2	100	
@@ -460,7 +460,7 @@
 기술	수도사	······· Claw Slash 8	Claw Slash 7	100	
 기술	수도사	········ Claw Slash 9	Claw Slash 8	100	
 기술	수도사	········· Claw Slash 10	Claw Slash 9	100	
-기술	수도사	Dark Spear		0	
+기술	수도사	Dark Spear		0	일음지
 기술	수도사	Double Punch		0	
 기술	수도사	Double Rake 1		0	
 기술	수도사	· Double Rake 2	Double Rake 1	100	
@@ -472,8 +472,8 @@
 기술	수도사	······· Double Rake 8	Double Rake 7	100	
 기술	수도사	········ Double Rake 9	Double Rake 8	100	
 기술	수도사	········· Double Rake 10	Double Rake 9	100	
-기술	수도사	Draco Tail Kick		0	
-기술	수도사	Eagle Strike		0	
+기술	수도사	Draco Tail Kick		0	선풍각
+기술	수도사	Eagle Strike		0	연환포
 기술	수도사	Echo Sense		0	
 기술	수도사	Inner Beast 1		0	
 기술	수도사	· Inner Beast 2	Inner Beast 1	0	
@@ -481,7 +481,7 @@
 기술	수도사	··· Inner Beast 4	Inner Beast 3	0	
 기술	수도사	···· Inner Beast 5	Inner Beast 4	0	
 기술	수도사	····· Inner Beast 6	Inner Beast 5	0	
-기술	수도사	Kelberoth Strike		0	
+기술	수도사	Kelberoth Strike		0	달마신공
 기술	수도사	Kick		0	
 기술	수도사	· High Kick	Kick	5	
 기술	수도사	Lucky Hand		0	
@@ -551,11 +551,11 @@
 기술	수도사	····· Venom Attack 6	Venom Attack 5	100	
 기술	수도사	······ Venom Attack 7	Venom Attack 6	100	
 기술	수도사	······· Venom Attack 8	Venom Attack 7	100	
-기술	수도사	Whirlwind Attack		0	
+기술	수도사	Whirlwind Attack		0	구양신공
 기술	수도사	Wise Touch		0	
 기술	수도사	Wolf Fang Fist		0	
 기술	수도사	Martial Awareness	Assail	10	
-마법	수도사	Cat's Hearing		0	
+마법	수도사	Cat's Hearing		0	세오의손길
 마법	수도사	Cold Blood		0	
 마법	수도사	Draco Stance		0	
 마법	수도사	Feral Form		0	
@@ -592,6 +592,6 @@
 마법	수도사	Snort		0	
 마법	수도사	Trance		0	
 마법	수도사	White Bat Stance		0	
-마법	수도사	Wraith Touch		0	
-마법	수도사	beag nochd		0	
+마법	수도사	Wraith Touch		0	홀리드래곤
+마법	수도사	beag nochd		0	장풍
 마법	수도사	puinneag beatha		0	

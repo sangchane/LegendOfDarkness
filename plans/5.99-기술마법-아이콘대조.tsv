@@ -1,0 +1,303 @@
+# 아이콘 번호로 맞대 본 한글↔영문 이름. **짐작이다** — 사람이 확인해야 한다.
+# 한 아이콘을 여럿이 나눠 쓰므로, 양쪽 다 하나뿐일 때만 '확실' 로 적었다.
+# 팩 아이콘 = skills/spells.json 의 `이미지`, 원작 = abilities.json 의 raw[1] 첫 값.
+#
+# 칸: 갈래 / 아이콘 / 직업 / 영문이름 / 한글후보 / 판정
+
+기술	1	전사	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	1	전사	Assault	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	1	전사	Long Strike	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	1	도적	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	1	마법사	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	1	사제	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	1	수도사	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	2	수도사	Kick	아들레스투 | 단각	후보 2×2
+기술	2	수도사	High Kick	아들레스투 | 단각	후보 2×2
+기술	3	수도사	Martial Awareness	붕각 | 전체암살격진	후보 2×1
+기술	4	수도사	Double Punch	정권 | 양의신권 | 백보신권	후보 3×3
+기술	4	수도사	Poison Punch	정권 | 양의신권 | 백보신권	후보 3×3
+기술	4	수도사	Sting	정권 | 양의신권 | 백보신권	후보 3×3
+기술	5	도적	Stab and Twist	찌르기	확실
+기술	6	도적	Stab Twice	슬레쉬	확실
+기술	8	전사	Sneak Attack	탐색	후보 1×2
+기술	8	도적	Shadow Figure	탐색	후보 1×2
+기술	9	도적	Sense	센스	확실
+기술	10	전사	Combat Senses	센스몬스터	후보 1×3
+기술	10	도적	Study Creature	센스몬스터	후보 1×3
+기술	10	수도사	Echo Sense	센스몬스터	후보 1×3
+기술	11	전사	Wallop	트리플어택	후보 1×3
+기술	11	도적	Midnight Slash	트리플어택	후보 1×3
+기술	11	수도사	Triple Kick	트리플어택	후보 1×3
+기술	12	도적	Throw Surigum	표창던지기	확실
+기술	15	전사	Wind Blade	윈드블레이드	확실
+기술	16	전사	Cyclone Blade	메가블레이드	확실
+기술	17	전사	Two-handed Attack	투핸드어택	확실
+기술	19	전사	Perfect Defense	완전방어	후보 1×3
+기술	19	도적	Throw	완전방어	후보 1×3
+기술	19	수도사	Throw	완전방어	후보 1×3
+기술	20	전사	Sacrifice	매드소울 | 매드소울진	후보 2×2
+기술	20	전사	Mad Soul	매드소울 | 매드소울진	후보 2×2
+기술	21	전사	Crasher	크래셔	확실
+기술	26	도적	Peek	품뒤져보기	확실
+기술	33	수도사	Dark Spear	일음지	확실
+기술	34	수도사	Draco Tail Kick	선풍각	확실
+기술	36	수도사	Kelberoth Strike	달마신공	확실
+기술	37	수도사	Whirlwind Attack	구양신공	확실
+기술	39	전사	ao beag suain	타겟어택	확실
+기술	42	수도사	Ambush	이형환위	확실
+기술	44	도적	Amnesia	아무네지아	확실
+기술	49	전사	Charge	질주	확실
+기술	50	도적	Assassin Strike	기습 | 블랙기습	후보 2×1
+기술	52	전사	Paralyze Force	M포효	확실
+기술	58	수도사	Eagle Strike	연환포	확실
+기술	65	전사	Sever	룬블레이드 | 스톰블레이드	후보 2×1
+기술	72	전사	Thrust Attack 1	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	후보 3×6
+기술	72	전사	Thrust Attack 2	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	후보 3×6
+기술	72	전사	Thrust Attack 3	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	후보 3×6
+기술	72	전사	Thrust Attack 4	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	후보 3×6
+기술	72	전사	Thrust Attack 5	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	후보 3×6
+기술	72	전사	Thrust Attack 6	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	후보 3×6
+기술	73	전사	Strikedown 1	내려치기	후보 1×11
+기술	73	전사	Strikedown 2	내려치기	후보 1×11
+기술	73	전사	Strikedown 3	내려치기	후보 1×11
+기술	73	전사	Strikedown 4	내려치기	후보 1×11
+기술	73	전사	Strikedown 5	내려치기	후보 1×11
+기술	73	전사	Strikedown 6	내려치기	후보 1×11
+기술	73	전사	Strikedown 7	내려치기	후보 1×11
+기술	73	전사	Strikedown 8	내려치기	후보 1×11
+기술	73	전사	Strikedown 9	내려치기	후보 1×11
+기술	73	전사	Strikedown 10	내려치기	후보 1×11
+기술	73	전사	Strikedown 11	내려치기	후보 1×11
+기술	74	전사	Dune Swipe 1	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 2	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 3	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 4	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 5	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 6	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 7	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 8	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 9	사방치기(Lev1)	후보 1×10
+기술	74	전사	Dune Swipe 10	사방치기(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 1	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 2	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 3	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 4	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 5	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 6	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 7	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 8	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 9	퓨리소월루(Lev1)	후보 1×10
+기술	75	전사	Wheel Kick 10	퓨리소월루(Lev1)	후보 1×10
+기술	77	도적	Rear Strike 1	만개표창 | 저격(Lev1)	후보 2×8
+기술	77	도적	Rear Strike 2	만개표창 | 저격(Lev1)	후보 2×8
+기술	77	도적	Rear Strike 3	만개표창 | 저격(Lev1)	후보 2×8
+기술	77	도적	Rear Strike 4	만개표창 | 저격(Lev1)	후보 2×8
+기술	77	도적	Rear Strike 5	만개표창 | 저격(Lev1)	후보 2×8
+기술	77	도적	Rear Strike 6	만개표창 | 저격(Lev1)	후보 2×8
+기술	77	도적	Rear Strike 7	만개표창 | 저격(Lev1)	후보 2×8
+기술	77	도적	Rear Strike 8	만개표창 | 저격(Lev1)	후보 2×8
+기술	79	도적	Archery 1	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Archery 2	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Archery 3	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Archery 4	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Archery 5	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Archery 6	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 1	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 2	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 3	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 4	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 5	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 6	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 7	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 8	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 9	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 10	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 11	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	79	도적	Arrow Shot 12	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	후보 3×18
+기술	85	수도사	Mass Strike 1	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 2	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 3	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 4	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 5	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 6	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 7	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 8	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 9	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 10	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 11	휘두르기	후보 1×24
+기술	85	수도사	Mass Strike 12	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 1	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 2	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 3	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 4	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 5	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 6	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 7	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 8	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 9	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 10	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 11	휘두르기	후보 1×24
+기술	85	수도사	Tail Sweep 12	휘두르기	후보 1×24
+기술	92	수도사	Sneak Flight 1	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 2	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 3	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 4	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 5	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 6	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 7	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 8	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 9	차크라어택	후보 1×10
+기술	92	수도사	Sneak Flight 10	차크라어택	후보 1×10
+기술	95	수도사	Venom Attack 1	파이어트랩	후보 1×8
+기술	95	수도사	Venom Attack 2	파이어트랩	후보 1×8
+기술	95	수도사	Venom Attack 3	파이어트랩	후보 1×8
+기술	95	수도사	Venom Attack 4	파이어트랩	후보 1×8
+기술	95	수도사	Venom Attack 5	파이어트랩	후보 1×8
+기술	95	수도사	Venom Attack 6	파이어트랩	후보 1×8
+기술	95	수도사	Venom Attack 7	파이어트랩	후보 1×8
+기술	95	수도사	Venom Attack 8	파이어트랩	후보 1×8
+기술	96	수도사	Claw Slash 1	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 2	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 3	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 4	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 5	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 6	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 7	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 8	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 9	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	96	수도사	Claw Slash 10	할퀴기(Lev1) | 늑대의위상	후보 2×10
+기술	98	사제	Instrumental 1	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental 2	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental 3	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental 4	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental 5	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental 6	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 1	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 2	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 3	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 4	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 5	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 6	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 7	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 8	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 9	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 10	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 11	연주공격(Lev3)	후보 1×18
+기술	98	사제	Instrumental Attack 12	연주공격(Lev3)	후보 1×18
+마법	3	마법사	Graymayre Lecture	딜루메니	후보 1×11
+마법	3	마법사	Elements Lecture	딜루메니	후보 1×11
+마법	3	사제	Woods Lecture	딜루메니	후보 1×11
+마법	3	사제	Altar Lecture	딜루메니	후보 1×11
+마법	3	사제	Gods Lecture	딜루메니	후보 1×11
+마법	3	사제	Faerie Love Lecture	딜루메니	후보 1×11
+마법	3	사제	Graymayre Lecture	딜루메니	후보 1×11
+마법	3	사제	Beothaich Lecture	딜루메니	후보 1×11
+마법	3	사제	Entreaties Lecture	딜루메니	후보 1×11
+마법	3	사제	Guide Lecture	딜루메니	후보 1×11
+마법	3	사제	dall	딜루메니	후보 1×11
+마법	5	사제	beag cradh	렌토	확실
+마법	10	도적	Hide	하이드	후보 1×2
+마법	10	수도사	White Bat Stance	하이드	후보 1×2
+마법	11	사제	beag naomh aite	호르라마 | 안티매직	후보 2×4
+마법	11	사제	naomh aite	호르라마 | 안티매직	후보 2×4
+마법	11	사제	mor naomh aite	호르라마 | 안티매직	후보 2×4
+마법	11	사제	ard naomh aite	호르라마 | 안티매직	후보 2×4
+마법	16	도적	Needle Trap	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
+마법	16	도적	Stiletto Trap	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
+마법	16	사제	beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
+마법	16	사제	mor beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
+마법	20	도적	beag breisleich	콘푸지오	후보 1×5
+마법	20	도적	breisleich	콘푸지오	후보 1×5
+마법	20	사제	beag breisleich	콘푸지오	후보 1×5
+마법	20	사제	breisleich	콘푸지오	후보 1×5
+마법	20	사제	mor breisleich	콘푸지오	후보 1×5
+마법	25	사제	ao dall	일루메나	후보 1×2
+마법	25	수도사	ao dall	일루메나	후보 1×2
+마법	27	수도사	beag nochd	장풍	확실
+마법	28	사제	beag ioc	쿠로	확실
+마법	29	사제	ioc	쿠라노	확실
+마법	30	사제	mor ioc	쿠라노소	확실
+마법	31	사제	ard ioc	수페라쿠라노	확실
+마법	32	사제	beag ioc comlha	쿠러스	확실
+마법	33	사제	ioc comlha	쿠라누스	확실
+마법	34	사제	mor ioc comlha	쿠라네라	확실
+마법	46	마법사	beag sal	마레노	후보 1×6
+마법	46	마법사	sal	마레노	후보 1×6
+마법	46	마법사	beag leasaich sal	마레노	후보 1×6
+마법	46	마법사	mor leasaich sal	마레노	후보 1×6
+마법	46	마법사	leasaich sal	마레노	후보 1×6
+마법	46	마법사	ard leasaich sal	마레노	후보 1×6
+마법	47	마법사	mor sal	마레누스	확실
+마법	51	사제	ao suain	디소루마	확실
+마법	52	도적	Coiled Bolt Trap	에나르마	후보 1×5
+마법	52	도적	Bolt Trap	에나르마	후보 1×5
+마법	52	도적	Spring Trap	에나르마	후보 1×5
+마법	52	도적	Maiden Trap	에나르마	후보 1×5
+마법	52	사제	fas deireas	에나르마	후보 1×5
+마법	53	마법사	beag fas nadur	이모탈	후보 1×9
+마법	53	마법사	fas nadur	이모탈	후보 1×9
+마법	53	마법사	mor fas nadur	이모탈	후보 1×9
+마법	53	마법사	Wings of Protection	이모탈	후보 1×9
+마법	53	사제	mor dion	이모탈	후보 1×9
+마법	53	사제	mor dion comlha	이모탈	후보 1×9
+마법	53	수도사	dion	이모탈	후보 1×9
+마법	53	수도사	Draco Stance	이모탈	후보 1×9
+마법	53	수도사	Iron Skin	이모탈	후보 1×9
+마법	54	전사	asgall faileas	리플렉토	후보 1×2
+마법	54	사제	deireas faileas	리플렉토	후보 1×2
+마법	63	마법사	beag sal lamh	수페라마레나	후보 1×2
+마법	63	마법사	sal lamh	수페라마레나	후보 1×2
+마법	68	마법사	athar gar	마네나로	확실
+마법	71	사제	deo saighead	홀리볼트 | 홀리랜서	후보 2×1
+마법	72	마법사	mor strioch bais	세멜리아	확실
+마법	75	마법사	mor strioch pian gar	라그나로크	확실
+마법	77	사제	nuadhaich	엑스쿠라노	확실
+마법	82	사제	cradh	바르도	확실
+마법	83	사제	mor cradh	데프레코	확실
+마법	84	사제	ard cradh	프라보	확실
+마법	86	도적	Life Arrow	코마디아	후보 1×2
+마법	86	사제	beothaichdeum	코마디아	후보 1×2
+마법	90	사제	beag pramh	나르콜리	후보 1×2
+마법	90	사제	pramh	나르콜리	후보 1×2
+마법	94	사제	armachd fein	콜라마	후보 1×3
+마법	94	사제	armachd	콜라마	후보 1×3
+마법	94	수도사	Scorpion Stance	콜라마	후보 1×3
+마법	107	사제	Salvation	홀리쿠라네라	확실
+마법	122	수도사	Wraith Touch	홀리드래곤	확실
+마법	124	수도사	Cat's Hearing	세오의손길	확실
+마법	150	마법사	Disenchanter	속성강화	후보 1×12
+마법	150	사제	Counter Attack 1	속성강화	후보 1×12
+마법	150	사제	Counter Attack 2	속성강화	후보 1×12
+마법	150	사제	Counter Attack 3	속성강화	후보 1×12
+마법	150	사제	Counter Attack 4	속성강화	후보 1×12
+마법	150	사제	Counter Attack 5	속성강화	후보 1×12
+마법	150	사제	Counter Attack 6	속성강화	후보 1×12
+마법	150	사제	Counter Attack 7	속성강화	후보 1×12
+마법	150	사제	Counter Attack 8	속성강화	후보 1×12
+마법	150	사제	Counter Attack 9	속성강화	후보 1×12
+마법	150	사제	Counter Attack 10	속성강화	후보 1×12
+마법	150	사제	Counter Attack 11	속성강화	후보 1×12
+마법	151	도적	Frost Arrow 1	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 2	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 3	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 4	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 5	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 6	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 7	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 8	포트리스	후보 1×9
+마법	151	도적	Frost Arrow 9	포트리스	후보 1×9
+마법	154	마법사	Torch 1	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 2	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 3	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 4	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 5	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 6	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 7	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 8	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 9	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 10	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 11	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 12	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 13	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 14	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
+마법	154	마법사	Torch 15	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)	후보 3×15
