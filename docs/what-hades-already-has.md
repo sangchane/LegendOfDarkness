@@ -8,6 +8,32 @@
 **Hades 는 규칙이 있고 내용이 없다. 서버팩은 내용이 있고 규칙이 남의 것이다.**
 그래서 이식은 "시스템을 만드는 일"이 아니라 **"도는 시스템에 자료를 붓는 일"** 이다.
 
+## 순서 — Hades 부터 본다
+
+**팩부터 뒤지지 마라.** 팩은 운영자가 손댄 사본이고 Hades 쪽에 원작이 남아 있는 일이 잦다.
+확인하지 않고 팩을 쓰면 원작 복원이 아니라 **그 팩 복원**이 된다.
+
+  1. `database/server/` — 이미 들어간 자료·스크립트
+  2. `database/archives/*.dat` — **원작 표가 여기 들어 있다** (아래)
+  3. `data/game-data/` — 원작에서 뽑아 둔 것
+  4. 그래도 없으면 `data/server-packs/` — 그때도 **출처를 남긴다**
+
+### 아카이브 안의 원작 표 (자주 잊는다)
+
+| 어디 | 무엇 |
+|---|---|
+| `national.dat` `_tcoord.txt` | **맵 번호·한글명·영문명·월드맵 위치·크기** 27개. 팩 번호와 일치한다(밀레스 500·마인 666·아벨 502) |
+| `national.dat` `_tncoord.txt` | 같은 꼴 2줄 (대평원 10009 Noam) |
+| `Legend.dat` `field001~010.txt` | **원작 월드맵 노드** — 이름·그림키·좌표. field001 만 24개 |
+| `Legend.dat` `field00N.epf` + `.pal` | **월드맵 그림** |
+| `national.dat` `story1/2.tbl`, `msg.tbl`, `staff.tbl` | 이야기·메시지 |
+| `setoa.dat` `_narti.txt` `_narlist.txt` `_nagree.txt` | 아직 안 봄 |
+| `cious.dat` `lpz_dlg.txt` `lpz_lev1/2.txt` | 아직 안 봄 |
+| `seo2.dat` | **5.99 계보 타일 아카이브** (`mpspal.tbl`). 저장소에 이미 있다 |
+
+읽는 법: `dotnet run --project tools/dat-extract -c Release -- list <아카이브.dat>`
+꺼내는 법: `… -- dump <아카이브.dat> <폴더> <이름조각>` · 내용은 **CP949** 다(`iconv -f CP949`)
+
 ## 어디에 물어야 하나
 
 | 묻는 것 | 어디 | 어떻게 |

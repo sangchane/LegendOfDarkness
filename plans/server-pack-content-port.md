@@ -9,6 +9,22 @@
 
 ---
 
+## 순서를 지킨다 — Hades 부터
+
+**팩부터 뒤지지 않는다.** 팩(5.99)은 운영자가 자기 콘텐츠를 얹은 사본이고, Hades 쪽에
+원작이 남아 있는 일이 잦다. 확인 없이 팩을 쓰면 원작 복원이 아니라 **그 팩 복원**이 된다.
+
+  `database/server/` → `database/archives/*.dat` → `data/game-data/` → 그래도 없으면 팩
+
+실제로 겪었다. 8단계에서 NPC 대사를 팩에서 가져왔는데 `가렌: 전사 사범담당 가렌입니다.
+데마시아!` 는 리그 오브 레전드다. 그리고 5b(월드맵)를 팩의 `마이소시아`로 넣을 뻔했는데
+**원작 월드맵이 `Legend.dat` 의 `field001~010.txt` 에 노드 24개와 그림까지 들어 있었다.**
+
+아카이브 목록은 `docs/what-hades-already-has.md` 의 "아카이브 안의 원작 표".
+팩에서 가져온 것은 **출처를 남긴다** — 나중에 갈아끼울 수 있어야 한다.
+
+---
+
 ## 한 줄
 
 **Hades 는 규칙이 있고 내용이 없다.** C# 스크립트 115장이 이미 돈다. 이 작업은 시스템을
@@ -343,7 +359,15 @@ Hades 는 월드맵 워프를 이미 지원한다 — `WarpTemplate.WorldResetWa
 기존 `warp from 2 to world map..json`, `GlobalWorldMapTemplateCache`(열쇠는 `FieldNumber`).
 
 ### 할 일
-`--kind worldmaps --write` · `--kind doors --write`
+**팩의 `마이소시아`(27노드)를 쓰기 전에 원작을 먼저 본다.**
+`Legend.dat` 에 `field001~010.txt`(노드 24개 — 아벨·밀레스·동의우드랜드·피에트·수오미·
+운디네·루어스마을·뤼케시온·드라큐라의성·마인 …)와 `field00N.epf`+`.pal`(그림)이 있고,
+`national.dat` 의 `_tcoord.txt` 가 맵 번호·이름·월드맵 위치·크기 27개를 준다.
+**맵 번호가 팩과 일치한다**(밀레스 500 · 마인 666 · 아벨 502).
+
+1. `_tcoord.txt` 와 `field00N.txt` 를 표로 뽑는다
+2. 그것으로 `templates/worldmaps/` 를 만든다. 팩 것은 원작에 없는 노드를 채울 때만 쓴다
+3. `--kind doors --write`
 
 ### 완료 기준
 - `World Map Templates Loaded: 2` (팩 1 + 기존 1)
