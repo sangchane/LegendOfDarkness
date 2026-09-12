@@ -21,7 +21,7 @@
     python3 tools/pack-import/import.py --kind maps --write        # 실제로 넣는다
     python3 tools/pack-import/import.py --kind all                 # 아홉 갈래를 다 센다
 """
-import argparse, json, re, shutil, sys
+import argparse, collections, json, re, shutil, sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -134,6 +134,7 @@ def eligible_plain(kind):
 
 
 RULES = {
+    "worldmaps": lambda _: eligible_plain("worldmaps"),
     "maps":      eligible_maps,
     "warps":     eligible_warps,
     "monsters":  eligible_monsters,
@@ -141,7 +142,6 @@ RULES = {
     "items":     lambda _: eligible_plain("items"),
     "skills":    lambda _: eligible_plain("skills"),
     "spells":    lambda _: eligible_plain("spells"),
-    "worldmaps": lambda _: eligible_plain("worldmaps"),
     "doors":     lambda _: eligible_plain("doors"),
 }
 
@@ -480,6 +480,100 @@ def write_mundanes(keep):
     return n, mute
 
 
+# ── 월드맵 ───────────────────────────────────────────────────────────────
+# **원작이 먼저다.** 노드 이름·화면 위치·그림은 Legend.dat 의 field001.txt 에서 온다
+# (25개. 열 장이 같은 목록의 다른 판이다). 팩의 마이소시아는 그 위에 4개를 더하고 3개를
+# 뺀 운영자 판이라, 목록은 원작을 쓰고 **어디로 가는지만** 팩에서 가져온다 — 원작 표에
+# 목적지가 없기 때문이다. 어느 쪽에서 왔는지는 노트에 남긴다.
+ORIGINAL_FIELD = ROOT / "data" / "archives-vault" / "표" / "Legend — field001.txt.md"
+WORLD_FIELD_NUMBER = 1               # Hades 의 Temuair. fieldmaps/field001.png 가 그 그림이다
+
+
+def original_nodes():
+    """볼트 노트에 옮겨 둔 field001.txt 를 읽는다. `이름 그림키 x y [EX …]`."""
+    if not ORIGINAL_FIELD.exists():
+        raise SystemExit("원작 월드맵 노트가 없다 — python3 scripts/build-archive-vault.py 를 먼저 돌려라")
+    body = ORIGINAL_FIELD.read_text(encoding="utf-8").split("```")[1]
+    out = []
+    for line in body.splitlines()[2:]:
+        col = re.split(r"\s+", line.strip())
+        if len(col) >= 4 and re.fullmatch(r"f\d+", col[1]) and col[2].lstrip("-").isdigit():
+            out.append((col[0], int(col[2]), int(col[3])))
+    return out
+
+
+def write_worldmaps(_keep):
+    ids = name_to_id()
+    pack = {}
+    for wm in load("worldmaps"):
+        for row in wm["fields"].get("추가", []):
+            c = [x.strip() for x in row.split(",")]
+            if len(c) >= 7:
+                pack[c[1]] = (c[4], int(c[5]), int(c[6]))     # 노드이름 → (도착맵, x, y)
+
+    # Hades 가 원래 들고 있던 노드 둘. 같은 그림(field001.png) 위의 자리이고 가리키는 맵도
+    # 살아 있으므로 지우지 않는다 — 원작 목록을 얹는 것이지 있던 것을 없애는 일이 아니다.
+    portals = [
+        {"Destination": {"AreaID": 2, "Location": {"X": 66, "Y": 35}, "PortalKey": 0},
+         "DisplayName": "Refugee Camp", "PointX": 442, "PointY": 225},
+        {"Destination": {"AreaID": 3, "Location": {"X": 95, "Y": 50}, "PortalKey": 0},
+         "DisplayName": "Lost Woods", "PointX": 417, "PointY": 50},
+    ]
+    missing = []
+    for name, px, py in original_nodes():
+        where = pack.get(name)
+        if where is None or where[0] not in ids:
+            missing.append(name)
+            continue
+        portals.append({
+            "Destination": {"AreaID": ids[where[0]],
+                            "Location": {"X": where[1], "Y": where[2]}, "PortalKey": 0},
+            "DisplayName": name, "PointX": px, "PointY": py,
+        })
+
+    out = SERVER / "templates" / "worldmaps"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "temuair.json").write_text(json.dumps({
+        "Portals": portals,
+        "FieldNumber": WORLD_FIELD_NUMBER,
+        "Description": "원작 월드맵 — 노드는 Legend.dat field001.txt, 목적지는 5.99 팩",
+        "Group": "WorldMaps", "Name": "Temuair",
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+    return len(portals), missing
+
+
+def world_warp_json(rows, ids):
+    """종류 2 는 월드맵으로 나가는 문이다. 같은 맵의 칸들을 한 장에 모은다."""
+    src = ids[rows[0]["출발맵"]]
+    return {
+        "ActivationMapId": src,
+        "Activations": [{"AreaID": src,
+                         "Location": {"X": int(r["출발"][0]), "Y": int(r["출발"][1])},
+                         "PortalKey": 0} for r in rows],
+        "LevelRequired": 1,
+        "To": {"AreaID": 0, "Location": None, "PortalKey": 1},
+        "WarpRadius": 0, "WarpType": "World",
+        "WorldResetWarpId": 0, "WorldTransionWarpId": 0,
+        "Description": None, "Group": None,
+        "Name": f'warp {rows[0]["출발맵"]} to world map',
+    }
+
+
+def write_world_warps():
+    ids = name_to_id()
+    by_map = collections.defaultdict(list)
+    for x in load("warps"):
+        if x["raw"][0] == "2" and x["출발맵"] in ids:
+            by_map[x["출발맵"]].append(x)
+    out = SERVER / "templates" / "warps"
+    out.mkdir(parents=True, exist_ok=True)
+    for rows in by_map.values():
+        j = world_warp_json(rows, ids)
+        (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+    return len(by_map), sum(len(v) for v in by_map.values())
+
+
 def warp_json(x, ids):
     """Hades 의 워프. 맵을 **이름이 아니라 번호**로 가리킨다 — 그래서 번호표가 먼저다.
 
@@ -570,6 +664,12 @@ def main():
             print(f"     번호표 {len(rows)}줄 → {IDTABLE.relative_to(ROOT)}")
             if a.write:
                 print(f"     넣음 {write_maps(rows)}장 → areas/ · maps/")
+        elif kind == "worldmaps" and a.write:
+            got, missing = write_worldmaps(keep)
+            files, cells = write_world_warps()
+            print(f"     월드맵 노드 {got}개 → templates/worldmaps/temuair.json")
+            print(f"     목적지를 못 찾은 원작 노드 {len(missing)}: {', '.join(missing)}")
+            print(f"     월드맵으로 나가는 문 {files}장 ({cells}칸) → templates/warps/")
         elif kind == "mundanes" and a.write:
             n, mute = write_mundanes(keep)
             print(f"     넣음 {n}장 → templates/mundanes/  (할 말이 없는 NPC {mute}명)")
