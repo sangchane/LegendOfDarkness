@@ -218,6 +218,92 @@ def area_json(m):
     }
 
 
+# ── 아이템 ────────────────────────────────────────────────────────────────
+# 뜻이 확인된 칸만 적는다. 확인 못 한 칸(타입.속성.떨굼여부.사운드.공격모션.
+# 어빌제한.수리가격 …)은 옮기지 않고 보고서에만 남긴다 — 근거 없이 옮기면
+# 다음 사람이 그것을 근거로 삼는다.
+ITEM_STATS = {                      # 팩 칸 → Hades 의 StatusOperator 칸
+    "방어력": "AcModifer", "체력변화": "HealthModifer", "마력변화": "ManaModifer",
+    "힘변화": "StrModifer", "덱스변화": "DexModifer", "인트변화": "IntModifer",
+    "위즈변화": "WisModifer", "콘변화": "ConModifer", "재생력": "RegenModifer",
+    "명중수정": "HitModifer", "공격수정": "DmgModifer", "마법방어": "MrModifer",
+}
+ITEM_PLAIN = {                      # 팩 칸 → Hades 의 숫자 칸, 최대값
+    "내구력": ("MaxDurability", 2**31 - 1), "판매가격": ("Value", 2**31 - 1),
+    "무게": ("CarryWeight", 255), "레벨제한": ("LevelRequired", 255),
+    "최소공격력1": ("DmgMin", 2**31 - 1), "최대공격력1": ("DmgMax", 2**31 - 1),
+}
+# 성별제한 0 은 "제한 없음" 이다. Hades 는 그것을 Both(255) 로 쓴다.
+ITEM_GENDER = {"0": 255, "1": 1, "2": 2}
+TYPED = "Darkages.Types.{0}, Darkages.Server"
+
+
+def whole(v, cap=None):
+    """팩 값에는 '04' 나 '0.' 이나 목록이 섞여 있다. 숫자로 못 읽으면 없는 칸이다."""
+    if isinstance(v, list):
+        v = v[0] if v else ""
+    try:
+        n = int(float(str(v).strip()))
+    except (TypeError, ValueError):
+        return None
+    return max(0, min(n, cap)) if cap is not None else n
+
+
+def operator(n):
+    """Add=0 / Remove=1. 팩은 부호로 적는다 — -65 는 65를 빼라는 뜻이다."""
+    return {"$type": TYPED.format("StatusOperator"),
+            "Option": 0 if n >= 0 else 1, "Value": abs(n)}
+
+
+def item_json(rec, skipped):
+    f = rec["fields"]
+    out = {"$type": TYPED.format("ItemTemplate"), "Name": rec["이름"]}
+
+    for pack, (field, cap) in ITEM_PLAIN.items():
+        n = whole(f.get(pack), cap)
+        if n is not None:
+            out[field] = n
+
+    for pack, field in ITEM_STATS.items():
+        n = whole(f.get(pack))
+        if n:                                   # 0 은 굳이 적지 않는다
+            out[field] = operator(n)
+
+    for pack, field, cap in (("이미지", "Image", 65535), ("착용이미지", "DisplayImage", 65535)):
+        n = whole(f.get(pack), cap)
+        if n is not None:
+            out[field] = n
+
+    g = ITEM_GENDER.get(str(f.get("성별제한", "")).strip())
+    if g is not None:
+        out["Gender"] = g
+
+    cls = whole(f.get("직업제한"))               # 0~5 가 Hades 의 Class 와 곧바로 맞는다
+    if cls is not None and 0 <= cls <= 5:
+        out["Class"] = cls
+
+    stage = whole(f.get("승급제한"))             # 0~2 가 ClassStage 의 Class/Master/Dedicated
+    if stage is not None and 0 <= stage <= 4:
+        out["StageRequired"] = stage
+
+    for k in f:
+        if k not in ITEM_STATS and k not in ITEM_PLAIN and k not in (
+                "이름", "이미지", "착용이미지", "성별제한", "직업제한", "승급제한"):
+            skipped[k] += 1
+    return out
+
+
+def write_items(keep):
+    out = SERVER / "templates" / "items"
+    out.mkdir(parents=True, exist_ok=True)
+    skipped = Counter()
+    for rec in keep:
+        j = item_json(rec, skipped)
+        (out / f"{safe_name(rec['이름']).lower()}.json").write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+    return len(keep), skipped
+
+
 def warp_json(x, ids):
     """Hades 의 워프. 맵을 **이름이 아니라 번호**로 가리킨다 — 그래서 번호표가 먼저다.
 
@@ -308,6 +394,11 @@ def main():
             print(f"     번호표 {len(rows)}줄 → {IDTABLE.relative_to(ROOT)}")
             if a.write:
                 print(f"     넣음 {write_maps(rows)}장 → areas/ · maps/")
+        elif kind == "items" and a.write:
+            n, skipped = write_items(keep)
+            print(f"     넣음 {n}장 → templates/items/")
+            print(f"     옮기지 않은 칸(뜻 미확인): " +
+                  ", ".join(f"{k}×{v}" for k, v in skipped.most_common(10)))
         elif kind == "warps" and a.write:
             if not IDTABLE.exists():
                 print("     번호표가 없다 — 먼저 --kind maps 를 돌려라"); return 1
