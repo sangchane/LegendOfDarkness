@@ -996,18 +996,36 @@ internal static class Program
                 offset = plain.Data.Length / (TileWidth * TileHeight);
             }
 
+            string prefix = TilePalettePrefix(entries);
+
             return new TileSource
             {
                 Tiles = new TileCollection(tileSet).Load(),
-                Palettes = Palette.FromArchive(Matching(entries, ".pal")),
-                Tables = PaletteTable.FromArchive(Matching(entries, ".tbl"), "mpt", _ => { }).Result,
+                Palettes = Palette.FromArchive(Matching(entries, ".pal", prefix)),
+                Tables = PaletteTable.FromArchive(Matching(entries, ".tbl", prefix), prefix, _ => { }).Result,
                 PaletteOffset = offset
             };
         }
 
-        private static IEnumerable<ArchivedItem> Matching(List<ArchivedItem> entries, string extension) =>
+        /// <summary>
+        /// Which family of tile palettes this archive keeps. 7.18 names them mpt0000.pal with mpt0018.tbl
+        /// beside them; 5.99 names them mps0000.pal with mpspal.tbl — and ships a handful of mpt palettes
+        /// too, so picking the wrong family is not an error, it is a picture in the wrong colours. The
+        /// table is what decides: it is the file that says which palette each tile takes, so the palettes
+        /// it means are the ones named like it.
+        /// </summary>
+        internal static string TilePalettePrefix(List<ArchivedItem> entries)
+        {
+            bool Has(string name) =>
+                entries.Any(e => e.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            return Has("mpspal.tbl") ? "mps" : "mpt";
+        }
+
+        private static IEnumerable<ArchivedItem> Matching(
+            List<ArchivedItem> entries, string extension, string prefix) =>
             entries.Where(e => e.Name.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
-                            && e.Name.StartsWith("mpt", StringComparison.OrdinalIgnoreCase))
+                            && e.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                    .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase);
 
         public void Draw(Image<Rgba32> canvas, int index, int originX, int originY)

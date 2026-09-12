@@ -101,7 +101,9 @@
       '<div class="map-canvas"><img src="' + m["그림"] + '" alt="' + hit + ' 지형" loading="lazy">' +
       pins + "</div>" +
       '<p class="map-hint">점이 워프가 있는 칸이다. 올려 두면 어디로 가는지 나온다. ' +
-      "<strong>색은 아직 틀렸다</strong> — dat-extract 가 5.99 의 색표(mpspal.tbl)를 안 읽는다. 지형 모양은 맞다.</p>" +
+      "<strong>바닥만 그린 그림이다</strong> — 건물·상점 같은 오브젝트는 맵의 벽 두 칸과 " +
+      "seo.dat 안 맵별 <code>000666.hea</code> 파일에 들어 있고, 그걸 읽는 코드가 아직 없다. " +
+      "흰 사각형이 건물이 놓인 자리다.</p>" +
       "</figure>";
   }
 
