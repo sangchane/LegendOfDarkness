@@ -118,6 +118,28 @@ public sealed class IsolatedHadesServer : IDisposable
         }
     }
 
+    /// <summary>
+    /// How many OS threads the server is running. A connection that ends must leave this where it found it;
+    /// a per-connection thread that outlives its connection is invisible to a socket count but ends the
+    /// server just as surely, once there is no thread left to answer with.
+    /// </summary>
+    public int ThreadCount
+    {
+        get
+        {
+            Process? process = _process;
+
+            if (process == null || process.HasExited)
+            {
+                return 0;
+            }
+
+            process.Refresh();
+
+            return process.Threads.Count;
+        }
+    }
+
     public void Dispose()
     {
         StopProcess();
