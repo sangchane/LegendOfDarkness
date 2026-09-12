@@ -79,6 +79,32 @@
     return rows;
   }
 
+  /* 이 덩어리에 그림이 있는 맵이 있으면 그 위에 워프 칸을 찍는다.
+   * 트리는 "이어져 있다"까지만 말해 준다 — 문이 문 자리에 있는지는 그림을 봐야 안다. */
+  function picture(ids) {
+    var imgs = window.MAP_IMAGES || {};
+    var hit = null;
+    ids.some(function (id) { var n = name(id); if (imgs[n]) { hit = n; return true; } return false; });
+    if (!hit) return "";
+
+    var m = imgs[hit];
+    var pins = m["표시"].map(function (p) {
+      var to = p["도착"].join(", ");
+      return '<a class="map-pin" style="left:' + (p.x / m["폭"] * 100).toFixed(3) + "%;top:" +
+        (p.y / m["높이"] * 100).toFixed(3) + '%" title="' + hit + " (" + p["칸"][0] + "," + p["칸"][1] +
+        ") → " + to + '"><span>' + to + "</span></a>";
+    }).join("");
+
+    return '<figure class="map-figure">' +
+      '<figcaption>' + hit + " — " + m["칸"][0] + "×" + m["칸"][1] + " 칸 · 워프 " +
+      m["표시"].length + "칸 · 1/" + m["배율"] + " 축소</figcaption>" +
+      '<div class="map-canvas"><img src="' + m["그림"] + '" alt="' + hit + ' 지형" loading="lazy">' +
+      pins + "</div>" +
+      '<p class="map-hint">점이 워프가 있는 칸이다. 올려 두면 어디로 가는지 나온다. ' +
+      "<strong>색은 아직 틀렸다</strong> — dat-extract 가 5.99 의 색표(mpspal.tbl)를 안 읽는다. 지형 모양은 맞다.</p>" +
+      "</figure>";
+  }
+
   function select(key) {
     var e = entries.filter(function (x) { return x.key === key; })[0];
     if (!e) return;
@@ -100,6 +126,7 @@
       '<p class="world-meta">맵 ' + e.ids.length + "개 · " +
       DATA["간선"].filter(function (g) { return e.ids.indexOf(g[0]) >= 0; })
         .reduce(function (a, g) { return a + g[2]; }, 0) + "줄의 워프</p>" +
+      picture(e.ids) +
       '<ol class="world-tree">' + rows.map(function (r) {
         var m = maps[r.id];
         var links = r.links.map(function (l) {
