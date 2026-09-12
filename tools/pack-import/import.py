@@ -340,6 +340,92 @@ def write_items(keep):
     return len(keep), skipped
 
 
+# ── 괴물 ────────────────────────────────────────────────────────────────
+# 젠 표는 `맵, 괴물, 마리수` 세 칸뿐이다 — **좌표가 없다.** 일반 사냥터 괴물은 자리를
+# 고정하지 않고 맵 안에 흩어 놓는 것이 원작 방식이고, 자료도 그렇게 말한다.
+# 그래서 SpawnType 은 Random 이고 DefinedX/Y 는 쓰지 않는다. (좌표를 주는 젠은
+# 스크립트의 mob_spawn2 "결계남도가", 4, 7, … 쪽이고 그건 결계 같은 특수 이벤트다.)
+SPAWN_RANDOM = 1 << 1            # SpawnQualifer.Random
+LOOT_RANDOM, LOOT_TABLE, LOOT_GOLD, LOOT_NONE = 1 << 1, 1 << 2, 1 << 5, 256
+MONSTER_IMAGE_BASE = 0x4000      # bees 의 16385 = 0x4000 + 1
+MONSTER_SCRIPT = "Common Monster"
+
+
+def first(v):
+    return (v[0] if v else None) if isinstance(v, list) else v
+
+
+def monster_json(spawn, mob, area_id, items):
+    f = mob["fields"]
+    speed = whole(f.get("속도"), 2**31 - 1) or 1000
+
+    # 드롭 목록은 ["확률", "아이템이름"] 꼴이다. 없는 아이템은 넣지 않는다.
+    drops = []
+    d = f.get("드롭아이템")
+    for chunk in (d if d and isinstance(d[0], list) else [d] if d else []):
+        name = chunk[1] if isinstance(chunk, list) and len(chunk) > 1 else None
+        if name in items:
+            drops.append(name)
+
+    # LootType 에 Random 을 켜면서 Drops 를 비우면 잡을 때마다 터진다 —
+    # Formulas/monsterexp.cs 가 빈 목록에 Drops[0] 을 한다. 있는 것만 켠다.
+    loot = 0
+    if drops:
+        loot |= LOOT_TABLE
+    if f.get("골드"):
+        loot |= LOOT_GOLD
+    if not loot:
+        loot = LOOT_NONE
+
+    return {
+        "Name": mob["이름"], "BaseName": mob["이름"],
+        "AreaID": area_id,
+        "SpawnMax": whole(spawn.get("마리수")) or 1,
+        "SpawnType": SPAWN_RANDOM,
+        "SpawnRate": whole(f.get("젠타임"), 2**31 - 1) or 30,
+        "SpawnSize": 0,
+        "SpawnOnlyOnActiveMaps": False,
+        "Image": (whole(f.get("이미지")) or 0) + MONSTER_IMAGE_BASE,
+        "ImageVarience": whole(f.get("이미지염색")) or 0,
+        # Int32 를 넘는 체력이 실제로 있다(42억). 한 장이 넘치면 Newtonsoft 가 던지고
+        # 괴물 적재가 통째로 멎는다 — "Monster Templates Loaded" 줄 자체가 안 찍힌다.
+        "MaximumHP": whole(f.get("체력"), 2**31 - 1) or 1,
+        "MaximumMP": 0,
+        "Level": 1,                      # 팩에 레벨 칸이 없다. bees 와 같게 둔다
+        "MovementSpeed": speed, "EngagedWalkingSpeed": speed,
+        "AttackSpeed": 1000, "CastSpeed": 8000,
+        "MoodType": 4, "PathQualifer": 1,
+        "LootType": loot,
+        "Drops": {"$values": drops},
+        "ScriptName": MONSTER_SCRIPT,
+        "UpdateMapWide": True, "UpdateRate": 1000.0,
+        "Grow": False, "IgnoreCollision": False,
+    }
+
+
+def write_monsters(keep):
+    out = SERVER / "templates" / "monsters" / "5.99"
+    out.mkdir(parents=True, exist_ok=True)
+    ids = name_to_id()
+    mobs = {m["이름"]: m for m in load("mobs")}
+    items = {i["이름"] for i in load("items")}
+    skipped = Counter()
+    n = 0
+    for sp in keep:
+        area = ids.get(sp["맵"])
+        if area is None:
+            continue
+        j = monster_json(sp, mobs[sp["괴물"]], area, items)
+        (out / f'{safe_name(sp["괴물"] + "@" + sp["맵"]).lower()}.json').write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+        n += 1
+        for k in mobs[sp["괴물"]]["fields"]:
+            if k not in ("이름", "속도", "이미지", "이미지염색", "체력", "젠타임",
+                         "드롭아이템", "골드"):
+                skipped[k] += 1
+    return n, skipped
+
+
 def warp_json(x, ids):
     """Hades 의 워프. 맵을 **이름이 아니라 번호**로 가리킨다 — 그래서 번호표가 먼저다.
 
@@ -430,6 +516,10 @@ def main():
             print(f"     번호표 {len(rows)}줄 → {IDTABLE.relative_to(ROOT)}")
             if a.write:
                 print(f"     넣음 {write_maps(rows)}장 → areas/ · maps/")
+        elif kind == "monsters" and a.write:
+            n, skipped = write_monsters(keep)
+            print(f"     넣음 {n}장 → templates/monsters/5.99/")
+            print("     옮기지 않은 칸: " + ", ".join(f"{k}×{v}" for k, v in skipped.most_common(8)))
         elif kind == "items" and a.write:
             n, skipped = write_items(keep)
             print(f"     넣음 {n}장 → templates/items/")

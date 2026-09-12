@@ -45,4 +45,12 @@
     </PackageReference>
   </ItemGroup>
 
+
+  <ItemGroup>
+    <!-- 시험 하나가 서버 한 대를 띄우고, 그 서버는 이제 맵 801개와 14MB 의 지형을 읽는다.
+         병렬을 끄면 다시 느려지고(3분), 상한이 없으면 서버들이 서로 굶어 준비 시간을 넘긴다.
+         넷이면 둘 다 피한다. -->
+    <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
