@@ -146,11 +146,12 @@ RULES = {
     "mundanes":  eligible_mundanes,
     "items":     lambda _: eligible_plain("items"),
     "doors":     lambda _: eligible_plain("doors"),
+    "shops":     lambda _: eligible_plain("shops"),
 }
 
 # 계획의 실측 표. 여기서 벗어나면 표가 틀렸거나 적재기가 틀렸다 — 진행 전에 가린다.
 # 기술·마법은 원작(abilities.json) 기준이다 — 팩의 82·71 이 아니다.
-EXPECTED = {"maps": 797, "warps": 886, "items": 989, "monsters": 565,
+EXPECTED = {"shops": 47, "maps": 797, "warps": 886, "items": 989, "monsters": 565,
             "mundanes": 84, "skills": 275, "spells": 338, "worldmaps": 1, "doors": 1}
 
 
@@ -584,6 +585,68 @@ def write_abilities(kind):
     return wrote, kept, len(seen), scripted, sum(1 for n in seen if n in korean)
 
 
+# ── 상점 ────────────────────────────────────────────────────────────────
+# 상점은 만드는 게 아니다. shop1.cs 가 사기·팔기·수리를 다 하고 DefaultMerchantStock 만
+# 읽는다. 문제는 **어느 NPC 가 어느 목록을 여느냐** 였고, 그건 팩 스크립트의 shop 호출에
+# 있었다(scripts/build-shop-binding.py 가 표로 뽑아 둔다).
+#
+# 이 NPC 들은 팩 npc/Npc.txt 에 정의가 없다 — 스크립트가 만드는 NPC 라 8단계에서 놓지
+# 못한 95건 쪽이다. 상점을 여는 13명은 여기서 놓는다.
+SHOPBIND = ROOT / "plans" / "5.99-상점결합.tsv"
+SHOP_SCRIPT = "shop1"           # scripts/Mundanes/shop1.cs
+SHOP_IMAGE = 1                  # 팩에 그림 번호가 없다. 보이긴 해야 하므로 1 로 둔다
+
+
+def write_shops(_keep):
+    if not SHOPBIND.exists():
+        raise SystemExit("상점 결합표가 없다 — python3 scripts/build-shop-binding.py 를 먼저 돌려라")
+    ids = name_to_id()
+    stock = {s["이름"]: s["아이템"] for s in load("shops")}
+    items = {i["이름"] for i in load("items")}
+
+    # 한 NPC 가 여러 목록을 열기도 한다. 파는 목록만 모은다 —
+    # 사 주는 목록(물건팔기)은 DefaultMerchantStock 이 아니다. shop1.cs 의 사는 쪽은
+    # 목록을 안 쓰고 인벤토리를 받는다. 넣으면 뜻이 뒤집힌다.
+    goods, spots, sells = collections.defaultdict(list), {}, collections.defaultdict(list)
+    for line in SHOPBIND.read_text(encoding="utf-8").splitlines():
+        if not line or line.startswith("#"):
+            continue
+        c = line.split("\t")
+        if len(c) < 6:
+            continue
+        npc, mp, x, y, kind, shop = c[0], c[1], int(c[2]), int(c[3]), c[4], c[5]
+        if mp not in ids:
+            continue
+        key = (npc, mp, x, y)
+        spots[key] = (npc, mp, x, y)
+        (goods if kind == "물건사기" else sells)[key] += [
+            g for g in stock.get(shop, []) if g in items]
+
+    out = SERVER / "templates" / "mundanes"
+    out.mkdir(parents=True, exist_ok=True)
+    n = 0
+    for key, (npc, mp, x, y) in sorted(spots.items()):
+        seen, keep = set(), []
+        for g in goods.get(key, []):
+            if g not in seen:
+                seen.add(g); keep.append(g)
+        j = {
+            "Name": f"{npc}@{mp}#{x},{y}",
+            "AreaID": ids[mp], "X": x, "Y": y, "Direction": 0,
+            "Image": SHOP_IMAGE, "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
+            "Speech": [], "ScriptKey": SHOP_SCRIPT,
+            "DefaultMerchantStock": keep,
+            "EnableWalking": False, "EnableTurning": False,
+            "EnableAttacking": False, "EnableCasting": False,
+            "WalkRate": 0, "TurnRate": 0, "CastRate": 0, "ChatRate": 0,
+            "PathQualifer": 1, "ViewingQualifer": 1,
+        }
+        (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+        n += 1
+    return n, sum(len(v) for v in goods.values()), len(sells)
+
+
 # ── 월드맵 ───────────────────────────────────────────────────────────────
 # **원작이 먼저다.** 노드 이름·화면 위치·그림은 Legend.dat 의 field001.txt 에서 온다
 # (25개. 열 장이 같은 목록의 다른 판이다). 팩의 마이소시아는 그 위에 4개를 더하고 3개를
@@ -773,6 +836,9 @@ def main():
             print(f"     넣음 {wrote}장 → templates/{kind}/  "
                   f"(서로 다른 이름 {distinct} · Hades 것 그대로 둠 {kept} · "
                   f"스크립트 붙은 것 {scripted} · 한글 이름 {named})")
+        elif kind == "shops" and a.write:
+            n, goods, sells = write_shops(keep)
+            print(f"     상점 NPC {n}명 → templates/mundanes/  (파는 물건 {goods}개 · 사 주는 목록 {sells}자리)")
         elif kind == "worldmaps" and a.write:
             got, missing = write_worldmaps(keep)
             files, cells = write_world_warps()
