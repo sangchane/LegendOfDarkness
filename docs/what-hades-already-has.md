@@ -31,7 +31,10 @@
 | `cious.dat` `lpz_dlg.txt` `lpz_lev1/2.txt` | 아직 안 봄 |
 | `seo2.dat` | **5.99 계보 타일 아카이브** (`mpspal.tbl`). 저장소에 이미 있다 |
 
-읽는 법: `dotnet run --project tools/dat-extract -c Release -- list <아카이브.dat>`
+**목록을 통째로 만들어 두었다**: `python3 scripts/build-archive-vault.py` → `data/archives-vault/`
+(Obsidian 으로 연다. `.dat` 11개 · 읽을 수 있는 표 **503개** · 내용과 꺼내는 법까지 노트마다 적혀 있다.)
+
+한 개만 볼 때: `dotnet run --project tools/dat-extract -c Release -- list <아카이브.dat>`
 꺼내는 법: `… -- dump <아카이브.dat> <폴더> <이름조각>` · 내용은 **CP949** 다(`iconv -f CP949`)
 
 ## 어디에 물어야 하나
