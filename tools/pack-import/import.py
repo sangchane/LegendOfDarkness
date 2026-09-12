@@ -33,7 +33,8 @@ SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 IDTABLE = ROOT / "plans" / "5.99-맵번호표.tsv"
 
 BYTES_PER_TILE = 6          # 바닥 + 왼벽 + 오른벽, 각 ushort
-FIRST_MAP_ID = 100_000      # 1~99999 는 Hades 것 (safe house=1, refugee camp=2, lost woods=3, hades=99999)
+FIRST_MAP_ID = 20_000        # 1~65535 만 쓸 수 있다 — 맵 번호는 전선에서 16비트다(0x15).
+                             # 10만번대는 100287 이 34751 로 잘려 클라이언트가 다른 맵이라고 믿는다.
 
 # 맵 파일 크기로 확인된 정정. 팩의 선언이 틀렸고 파일이 맞다.
 #   흉가2층 은 두 파일 사이에 값이 뒤바뀌어 있었다 — lod10293 이 29x50 이다.
@@ -168,6 +169,8 @@ def map_ids(keep):
             table[(c[0], c[1], c[3])] = int(c[2])
 
     nxt = max(table.values(), default=FIRST_MAP_ID - 1) + 1
+    if nxt + len(keep) > 65535:
+        raise SystemExit("맵 번호가 65535 를 넘는다 — 전선에서 잘린다")
     rows = []
     for m in sorted(keep, key=lambda x: (x["출처"], x["이름"], x["fields"]["맵파일"])):
         key = (m["출처"], m["이름"], m["fields"]["맵파일"])
@@ -426,6 +429,57 @@ def write_monsters(keep):
     return n, skipped
 
 
+# ── NPC ─────────────────────────────────────────────────────────────────
+# 캐시가 `Name` 열쇠라(GlobalMundaneTemplateCache) 31종을 그대로 쓰면 179배치가
+# 31개로 뭉갠다. 배치마다 이름을 새로 짓는다 — 화면에 뜨는 이름이 아니라 열쇠다.
+NPC_SCRIPT = "pack_speaker"          # scripts/Mundanes/PackSpeaker.cs
+
+
+def flatten(v):
+    """말하기는 같은 키가 되풀이돼 ["0","말", ["0","말2"]] 처럼 겹쳐 있다. 글만 꺼낸다."""
+    if isinstance(v, list):
+        return [x for e in v for x in flatten(e)]
+    t = str(v).strip() if v is not None else ""
+    return [t] if t and not t.isdigit() else []
+
+
+def mundane_json(sp, npc, area_id):
+    f = npc["fields"]
+    x, y = int(sp["좌표"][0]), int(sp["좌표"][1])
+    return {
+        "Name": f'{npc["이름"]}@{sp["맵"]}#{x},{y}',
+        "AreaID": area_id, "X": x, "Y": y,
+        "Direction": whole(sp["raw"][3], 3) if len(sp.get("raw", [])) > 3 else 0,
+        "Image": whole(f.get("이미지"), 32767) or 0,
+        "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
+        "Speech": flatten(f.get("말하기")),
+        "ScriptKey": NPC_SCRIPT,
+        "DefaultMerchantStock": [],
+        "EnableWalking": False, "EnableTurning": False,
+        "EnableAttacking": False, "EnableCasting": False,
+        "WalkRate": 0, "TurnRate": 0, "CastRate": 0, "ChatRate": 0,
+        "PathQualifer": 1, "ViewingQualifer": 1,
+    }
+
+
+def write_mundanes(keep):
+    out = SERVER / "templates" / "mundanes"
+    out.mkdir(parents=True, exist_ok=True)
+    ids = name_to_id()
+    npcs = {n["이름"]: n for n in load("npcs")}
+    n = mute = 0
+    for sp in keep:
+        area = ids.get(sp["맵"])
+        if area is None:
+            continue
+        j = mundane_json(sp, npcs[sp["NPC"]], area)
+        mute += not j["Speech"]
+        (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+        n += 1
+    return n, mute
+
+
 def warp_json(x, ids):
     """Hades 의 워프. 맵을 **이름이 아니라 번호**로 가리킨다 — 그래서 번호표가 먼저다.
 
@@ -516,6 +570,9 @@ def main():
             print(f"     번호표 {len(rows)}줄 → {IDTABLE.relative_to(ROOT)}")
             if a.write:
                 print(f"     넣음 {write_maps(rows)}장 → areas/ · maps/")
+        elif kind == "mundanes" and a.write:
+            n, mute = write_mundanes(keep)
+            print(f"     넣음 {n}장 → templates/mundanes/  (할 말이 없는 NPC {mute}명)")
         elif kind == "monsters" and a.write:
             n, skipped = write_monsters(keep)
             print(f"     넣음 {n}장 → templates/monsters/5.99/")

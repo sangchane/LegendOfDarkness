@@ -51,7 +51,11 @@ public sealed class IsolatedHadesServer : IDisposable
     /// <summary>The object server's port for this run. Its own, so two runs do not collide.</summary>
     public int ObjectPort { get; }
 
-    public static IsolatedHadesServer Prepare()
+    /// <param name="startTogether">
+    /// Where a new character wakes up, when the test needs somewhere other than the shipped safe house —
+    /// standing next to the thing under test beats walking there through ported warps.
+    /// </param>
+    public static IsolatedHadesServer Prepare((int Map, int X, int Y)? startTogether = null)
     {
         string runRoot = Path.Combine(Path.GetTempPath(), "lod-hades-harness", Guid.NewGuid().ToString("N"));
         string contentLocation = Path.Combine(runRoot, "database", "server");
@@ -63,7 +67,7 @@ public sealed class IsolatedHadesServer : IDisposable
         Directory.CreateDirectory(Path.Combine(runRoot, "game"));
 
         (int loginPort, int gamePort, int objectPort) = ReserveFreePorts();
-        WriteIsolatedConfig(runRoot, contentLocation, loginPort, gamePort);
+        WriteIsolatedConfig(runRoot, contentLocation, loginPort, gamePort, startTogether);
         WriteIsolatedRedirectTable(runRoot, loginPort);
 
         return new IsolatedHadesServer(runRoot, contentLocation, loginPort, gamePort, objectPort);
@@ -209,7 +213,8 @@ public sealed class IsolatedHadesServer : IDisposable
         }
     }
 
-    private static void WriteIsolatedConfig(string runRoot, string contentLocation, int loginPort, int gamePort)
+    private static void WriteIsolatedConfig(
+        string runRoot, string contentLocation, int loginPort, int gamePort, (int Map, int X, int Y)? start)
     {
         string configPath = Path.Combine(runRoot, HadesWorkspace.ConfigFileName);
         JsonDocumentOptions options = new()
@@ -228,6 +233,13 @@ public sealed class IsolatedHadesServer : IDisposable
         config["ServerConfig"]!["IncompleteFrameTimeoutSeconds"] = IncompleteFrameTimeoutSeconds;
         config["ServerConfig"]!["LOGIN_PORT"] = loginPort;
         config["ServerConfig"]!["SERVER_PORT"] = gamePort;
+
+        if (start is { } where)
+        {
+            config["ServerConfig"]!["StartingMap"] = where.Map;
+            config["ServerConfig"]!["StartingPosition"]!["X"] = where.X;
+            config["ServerConfig"]!["StartingPosition"]!["Y"] = where.Y;
+        }
 
         File.WriteAllText(configPath, config.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
     }

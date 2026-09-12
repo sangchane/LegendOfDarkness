@@ -123,3 +123,10 @@ public sealed record Character(
     Art.Direction Facing,
     Appearance? Wearing = null,
     string Name = "");
+
+/// <summary>
+/// One window of NPC speech. <paramref name="Who"/> is the template's own name, which for ported content
+/// carries the placement (<c>가렌@밀레스마을#52,43</c>) because the server keys its NPCs by name — the
+/// screen shows <paramref name="What"/>.
+/// </summary>
+public sealed record Dialogue(uint Serial, string Who, string What);

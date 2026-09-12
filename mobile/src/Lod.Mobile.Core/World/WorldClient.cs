@@ -44,6 +44,9 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>Taking something off. One byte: the worn place, the same number 0x37 names.</summary>
     private const byte TakeOffCommand = 0x44;
+    private const byte ClickCommand = 0x43;
+    private const byte DialogueCommand = 0x2F;
+    private const byte ClickBySerial = 0x01;
 
     /// <summary>Picking something up off the floor. A pack slot to aim at, then the tile.</summary>
     private const byte PickUpCommand = 0x07;
@@ -138,6 +141,10 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>Monsters and merchants the server has shown us, by serial.</summary>
     public IReadOnlyCollection<Creature> Creatures => (IReadOnlyCollection<Creature>)_creatures.Values;
+
+    /// <summary>The window the last tapped NPC opened, or null if none has. (Not <c>Said</c> — that is
+    /// chat overheard in the map; this is a conversation we started by tapping.)</summary>
+    public Dialogue? Talking { get; private set; }
 
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
@@ -288,6 +295,10 @@ public sealed class WorldClient(WorldSession session)
 
                     continue;
 
+                case DialogueCommand:
+                    Talking = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    continue;
+
                 default:
                     continue;
             }
@@ -363,6 +374,21 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public Task TakeOffAsync(int place, CancellationToken cancellationToken) =>
         Send(TakeOffCommand, [(byte)place], cancellationToken);
+
+    /// <summary>
+    /// Taps someone. This is how a conversation starts: the server finds whatever carries that serial and
+    /// hands it the tap, and an NPC with a script answers with a dialogue window. Tapping a monster or a
+    /// player does something else or nothing, which is the server's business, not ours — we only say what
+    /// was tapped. The first byte picks how we name it; one means by serial.
+    /// </summary>
+    public Task ClickAsync(uint serial, CancellationToken cancellationToken) =>
+        Send(
+            ClickCommand,
+            [
+                ClickBySerial,
+                (byte)(serial >> 24), (byte)(serial >> 16), (byte)(serial >> 8), (byte)serial
+            ],
+            cancellationToken);
 
     /// <summary>
     /// Picks up whatever lies on one tile. The original has no automatic looting — walking over a thing
@@ -648,6 +674,29 @@ public sealed class WorldClient(WorldSession session)
     }
 
     /// <summary>The name, if the server got as far as writing one.</summary>
+    /// <summary>
+    /// What an NPC answered when tapped. The head is fixed — a kind byte, the NPC's serial and picture,
+    /// and five bytes the original client reads and ignores — and then two strings: who is speaking and
+    /// what they said. Both are length-prefixed the long way round (a big-endian ushort), unlike almost
+    /// everything else in this protocol, which is why this reads them with DecodeStringB.
+    /// </summary>
+    public static Dialogue ReadDialogue(ReadOnlySpan<byte> body)
+    {
+        const int beforeName = 14;
+
+        if (body.Length <= beforeName)
+        {
+            return new Dialogue(0, string.Empty, string.Empty);
+        }
+
+        uint serial = (uint)((body[2] << 24) | (body[3] << 16) | (body[4] << 8) | body[5]);
+        string who = LegacyKoreanEncoding.DecodeStringB(body[beforeName..], out int consumed);
+        ReadOnlySpan<byte> rest = body[(beforeName + consumed)..];
+        string what = rest.Length > 0 ? LegacyKoreanEncoding.DecodeStringB(rest, out _) : string.Empty;
+
+        return new Dialogue(serial, who, what);
+    }
+
     private static string ReadName(ReadOnlySpan<byte> body, int at) =>
         body.Length > at ? LegacyKoreanEncoding.DecodeStringA(body[at..], out _) : string.Empty;
 
