@@ -19,6 +19,7 @@
       <button type="button" class="nav-item" data-view-target="flows"><span aria-hidden="true">⇢</span>기능 흐름</button>
       <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>개발·지식 그래프</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">✦</span>월드 지도</button>
+      <button type="button" class="nav-item" data-view-target="abilities"><span aria-hidden="true">✧</span>기술·마법</button>
       <button type="button" class="nav-item" data-view-target="knowledge"><span aria-hidden="true">▤</span>게임 데이터</button>
       <button type="button" class="nav-item" data-view-target="operations"><span aria-hidden="true">◎</span>운영·유지보수</button>
       <button type="button" class="nav-item" data-view-target="prototypes"><span aria-hidden="true">▣</span>화면 실험실</button>
@@ -148,6 +149,25 @@
           </article>
         </div>
       </section>
+      <section class="view" data-view="abilities" aria-labelledby="abilities-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Skills and spells</p>
+            <h1 id="abilities-title">무엇을 배워야 무엇이 열리나</h1>
+            <p>원작 표(<code>metafile/SClass1~5</code>) 613개를 직업별로, 배우는 차례대로 늘어놓았습니다. 팩(5.99)의 82·71 은 운영자가 손댄 사본이라 쓰지 않습니다 — <strong>구조는 원작, 한글 이름은 사람이 채웁니다</strong>.</p>
+          </div>
+          <a class="quiet-link" href="../data/기술마법-한글이름.tsv">이름표 →</a>
+        </div>
+        <div id="ability-summary" class="world-summary"></div>
+        <div class="world-body">
+          <aside class="world-side">
+            <label class="world-search-label" for="ability-search">기술·마법 찾기</label>
+            <input id="ability-search" type="search" placeholder="예: Assail" autocomplete="off">
+            <div id="ability-list" class="world-list" role="listbox" aria-label="직업별 묶음"></div>
+          </aside>
+          <article class="panel world-panel"><div id="ability-detail" aria-live="polite"></div></article>
+        </div>
+      </section>
       <section class="view" data-view="knowledge" aria-labelledby="knowledge-title" hidden>
         <div class="page-heading"><div><p class="eyebrow">Game knowledge</p><h1 id="knowledge-title">게임 데이터 게시판</h1><p>스킬·마법·캐릭터·퀘스트와 월드 데이터를 출처·확인 수준과 함께 관리합니다.</p></div><a class="quiet-link" href="current-system-analysis/05-game-data-locations.md">분석 원문 →</a></div>
         <div class="filterbar" role="search"><label for="knowledge-search">게시판 검색</label><input id="knowledge-search" type="search" placeholder="이름, 설명, 소스 경로 검색" autocomplete="off"><div class="filter-chips" aria-label="분류 필터"><button type="button" class="chip is-active" data-category="all" aria-pressed="true">전체</button><button type="button" class="chip" data-category="characters" aria-pressed="false">캐릭터</button><button type="button" class="chip" data-category="skills" aria-pressed="false">스킬</button><button type="button" class="chip" data-category="spells" aria-pressed="false">마법</button><button type="button" class="chip" data-category="quests" aria-pressed="false">퀘스트</button><button type="button" class="chip" data-category="world" aria-pressed="false">월드</button><button type="button" class="chip" data-category="operations" aria-pressed="false">운영</button></div></div>
@@ -202,6 +222,6 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="dashboard.js"></script><script src="world-map.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="dashboard.js"></script><script src="world-map.js"></script><script src="abilities.js"></script>
 </body>
 </html>

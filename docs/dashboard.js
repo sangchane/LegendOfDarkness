@@ -3,7 +3,7 @@
   var data = window.LOD_DASHBOARD_DATA;
   var model = window.LodDashboardModel;
   var snapshot = model.isValidDashboardSnapshot(window.LOD_DASHBOARD_SNAPSHOT) ? window.LOD_DASHBOARD_SNAPSHOT : null;
-  var labels = { overview: "대시보드", system: "시스템 지도", flows: "기능 흐름", delivery: "개발·지식 그래프", world: "월드 지도", knowledge: "게임 데이터", operations: "운영·유지보수", prototypes: "화면 실험실" };
+  var labels = { overview: "대시보드", system: "시스템 지도", flows: "기능 흐름", delivery: "개발·지식 그래프", world: "월드 지도", abilities: "기술·마법", knowledge: "게임 데이터", operations: "운영·유지보수", prototypes: "화면 실험실" };
   var category = "all";
   var searchQuery = "";
   function select(selector, host) { return (host || document).querySelector(selector); }
