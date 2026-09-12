@@ -14,10 +14,22 @@ test('dashboard exposes one in-page application shell for every primary workspac
   assert.match(html, /data-view-target="system"/);
   assert.match(html, /data-view-target="flows"/);
   assert.match(html, /data-view-target="delivery"/);
+  assert.match(html, /data-view-target="world"/);
   assert.match(html, /data-view-target="knowledge"/);
   assert.match(html, /data-view-target="operations"/);
   assert.match(html, /data-view-target="prototypes"/);
-  assert.equal((html.match(/<section[^>]+data-view=/g) || []).length, 7);
+
+  // 버튼 하나에 화면 하나. 개수를 적어 두면 화면을 더할 때마다 고쳐야 하고, 그것은 검사를
+  // 하지 않는 것과 같다. 둘을 맞대 보고, 버튼이 가리키는 화면이 실제로 있는지 본다.
+  const buttons = [...html.matchAll(/data-view-target="([a-z]+)"/g)].map((m) => m[1]);
+  const sections = [...html.matchAll(/<section[^>]+data-view="([a-z]+)"/g)].map((m) => m[1]);
+  assert.deepEqual([...buttons].sort(), [...sections].sort());
+
+  // 목록에 없는 화면은 열리지 않는다 — normalizeView 가 overview 로 돌려보낸다.
+  const model = read('docs/dashboard-model.js');
+  for (const view of sections) {
+    assert.ok(model.includes(`"${view}"`), `dashboard-model.js 의 views 에 ${view} 가 없다`);
+  }
 });
 
 test('dashboard maps features to components, evidence, tests, and operational signals', () => {

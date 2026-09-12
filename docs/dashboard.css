@@ -26,3 +26,44 @@
 
 /* 원작 UI 그림은 잘리면 칸 배치를 못 읽으므로 art-panel 의 고정 높이·crop 을 되돌린다. */
 .equip-pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;align-items:start}.equip-panel figure{margin:0 0 14px}.equip-panel img{width:auto;max-width:100%;height:auto;object-fit:contain}.equip-panel figcaption{margin-top:8px;color:var(--muted);font-size:11px}.equip-panel figcaption b,.equip-panel figcaption code{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ── 월드 지도 ───────────────────────────────────────────────────────────── */
+.world-summary { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; }
+.world-stat { background: var(--panel, #fff); border: 1px solid rgba(0,0,0,.08);
+  border-radius: 10px; padding: 10px 16px; min-width: 92px; }
+.world-stat span { display: block; font-size: .72rem; letter-spacing: .04em;
+  text-transform: uppercase; opacity: .6; }
+.world-stat strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.world-note { flex: 1 1 100%; margin: 4px 0 0; font-size: .82rem; opacity: .75; line-height: 1.6; }
+
+.world-body { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 18px; align-items: start; }
+@media (max-width: 860px) { .world-body { grid-template-columns: 1fr; } }
+
+.world-side { position: sticky; top: 12px; }
+.world-search-label { display: block; font-size: .75rem; opacity: .65; margin-bottom: 6px; }
+#world-search { width: 100%; padding: 8px 10px; border: 1px solid rgba(0,0,0,.16);
+  border-radius: 8px; font: inherit; margin-bottom: 10px; }
+.world-list { max-height: 62vh; overflow-y: auto; border: 1px solid rgba(0,0,0,.08);
+  border-radius: 10px; background: var(--panel, #fff); }
+.world-item { display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  width: 100%; padding: 9px 12px; border: 0; border-bottom: 1px solid rgba(0,0,0,.05);
+  background: none; font: inherit; text-align: left; cursor: pointer; }
+.world-item:hover { background: rgba(0,0,0,.035); }
+.world-item.is-active { background: rgba(64,120,255,.12); font-weight: 600; }
+.world-item.is-lone span { opacity: .55; }
+.world-item em { font-style: normal; font-size: .76rem; opacity: .6; white-space: nowrap; }
+.world-empty { padding: 14px; opacity: .6; }
+
+.world-panel { padding: 18px 20px; }
+.world-detail h2 { margin: 0 0 4px; }
+.world-meta { margin: 0 0 14px; font-size: .82rem; opacity: .65; }
+.world-warn { padding: 10px 12px; border-left: 3px solid #d08b2c;
+  background: rgba(208,139,44,.08); font-size: .88rem; }
+
+.world-tree { list-style: none; margin: 0; padding: 0; max-height: 62vh; overflow-y: auto; }
+.world-tree li { padding: 6px 0 6px calc(var(--depth) * 18px + 4px); border-bottom: 1px solid rgba(0,0,0,.045); }
+.world-tree li b { font-weight: 600; }
+.world-tree li em { font-style: normal; font-size: .74rem; opacity: .5; margin-left: 8px; }
+.world-links { margin-top: 3px; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.world-link { font-size: .78rem; opacity: .72; }
+.world-oneway { margin-left: 8px; font-size: .72rem; color: #b4690e; }

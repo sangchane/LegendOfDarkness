@@ -218,6 +218,55 @@ def area_json(m):
     }
 
 
+def warp_json(x, ids):
+    """Hades 의 워프. 맵을 **이름이 아니라 번호**로 가리킨다 — 그래서 번호표가 먼저다.
+
+    팩 워프는 한 줄이 한 방향이다(출발 칸을 밟으면 도착 칸으로). Hades 의 `Activations` 는
+    같은 목적지로 보내는 **밟는 칸 목록**이라, 한 줄이 칸 하나짜리 워프 한 장이 된다.
+    """
+    fx, fy = int(x["출발"][0]), int(x["출발"][1])
+    tx, ty = int(x["도착"][0]), int(x["도착"][1])
+    src, dst = ids[x["출발맵"]], ids[x["도착맵"]]
+    return {
+        "ActivationMapId": src,
+        "Activations": [{"AreaID": src, "Location": {"X": fx, "Y": fy}, "PortalKey": 0}],
+        "LevelRequired": 1,
+        "To": {"AreaID": dst, "Location": {"X": tx, "Y": ty}, "PortalKey": 0},
+        "WarpRadius": 0,
+        "WarpType": "Map",
+        "WorldResetWarpId": 0,
+        "WorldTransionWarpId": 0,
+        "Description": None,
+        "Group": None,
+        # 파일은 Name.ToLower() 로 쓰인다(WarpStorage.Save). 이름이 겹치면 덮이므로
+        # 출발 칸까지 넣어 유일하게 만든다.
+        "Name": f'warp {x["출발맵"]}({fx},{fy}) to {x["도착맵"]}({tx},{ty})',
+    }
+
+
+def name_to_id():
+    """팩 맵 이름 → 전역 번호. 이름이 겹친 맵은 번호표에 두 줄이지만 워프가 안 부르므로 상관없다."""
+    ids = {}
+    for line in IDTABLE.read_text(encoding="utf-8").splitlines():
+        if line and not line.startswith("#"):
+            c = line.split("\t")
+            ids.setdefault(c[1], int(c[2]))
+    return ids
+
+
+def write_warps(keep):
+    out = SERVER / "templates" / "warps"
+    out.mkdir(parents=True, exist_ok=True)
+    ids = name_to_id()
+    n = 0
+    for x in keep:
+        j = warp_json(x, ids)
+        (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+        n += 1
+    return n
+
+
 def write_maps(rows):
     areas, maps = SERVER / "areas", SERVER / "maps"
     areas.mkdir(parents=True, exist_ok=True); maps.mkdir(parents=True, exist_ok=True)
@@ -259,6 +308,10 @@ def main():
             print(f"     번호표 {len(rows)}줄 → {IDTABLE.relative_to(ROOT)}")
             if a.write:
                 print(f"     넣음 {write_maps(rows)}장 → areas/ · maps/")
+        elif kind == "warps" and a.write:
+            if not IDTABLE.exists():
+                print("     번호표가 없다 — 먼저 --kind maps 를 돌려라"); return 1
+            print(f"     넣음 {write_warps(keep)}장 → templates/warps/")
         elif a.write:
             print("     (이 갈래는 칸 대응이 아직 없다 — 자기 단계에서 붙인다)")
 
