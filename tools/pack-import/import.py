@@ -235,6 +235,18 @@ ITEM_PLAIN = {                      # 팩 칸 → Hades 의 숫자 칸, 최대�
 }
 # 성별제한 0 은 "제한 없음" 이다. Hades 는 그것을 Both(255) 로 쓴다.
 ITEM_GENDER = {"0": 255, "1": 1, "2": 2}
+
+# `속성` 은 원소가 아니라 **착용 부위**다. 다만 장비에서만 그렇다 — 타입 1(음식)·2(소모품)의
+# 속성은 0~3 에 몰려 있고 부위와 맞지 않으므로 건드리지 않는다.
+#   확인: 타입 0 과 타입 없음(=장비) 754개의 속성이 이름과 정확히 갈린다.
+#   0 길드칼 · 1 아머 · 2 방패 · 3 투구/홀 · 4 귀걸이 · 5 목걸이 · 6 반지 · 7 장갑
+#   8 벨트 · 9 각반 · 10 신발 · 11 장식(펫·썬글라스) · 12 양손무기 · 13 지팡이
+# Hades 는 반지와 장갑을 좌우로 나누므로 왼쪽을 기본으로 준다.
+ITEM_SLOT = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 9,
+             8: 11, 9: 12, 10: 13, 11: 14, 12: 1, 13: 1}
+
+EQUIPABLE, PERISHABLE, REPAIRABLE, STACKABLE, CONSUMABLE, TWO_HANDED = (
+    1, 1 << 1, 1 << 6, 1 << 7, 1 << 8, 1 << 13)
 TYPED = "Darkages.Types.{0}, Darkages.Server"
 
 
@@ -286,9 +298,33 @@ def item_json(rec, skipped):
     if stage is not None and 0 <= stage <= 4:
         out["StageRequired"] = stage
 
+    # 타입 0 이거나 타입 칸이 없으면 장비다(타입 없는 98개는 전부 방패·갑옷·투구였다).
+    kind = whole(f.get("타입"))
+    slot = whole(f.get("속성"))
+    flags = 0
+
+    if kind in (0, None):
+        flags |= EQUIPABLE
+        if slot in ITEM_SLOT:
+            out["EquipSlot"] = ITEM_SLOT[slot]
+            out["EquipmentSlot"] = ITEM_SLOT[slot]
+        if slot == 12:                           # 투핸드크레이모어 따위가 여기 있다
+            flags |= TWO_HANDED
+        if whole(f.get("수리여부")) == 1:
+            flags |= REPAIRABLE
+        if whole(f.get("떨굼여부")) == 1:        # 죽으면 잃는 것. 989개 중 47개뿐이다
+            flags |= PERISHABLE
+    else:
+        flags |= CONSUMABLE | STACKABLE
+        out["CanStack"] = True
+
+    out["Flags"] = flags
+
+    handled = set(ITEM_STATS) | set(ITEM_PLAIN) | {
+        "이름", "이미지", "착용이미지", "성별제한", "직업제한", "승급제한",
+        "타입", "속성", "수리여부", "떨굼여부"}
     for k in f:
-        if k not in ITEM_STATS and k not in ITEM_PLAIN and k not in (
-                "이름", "이미지", "착용이미지", "성별제한", "직업제한", "승급제한"):
+        if k not in handled:
             skipped[k] += 1
     return out
 
