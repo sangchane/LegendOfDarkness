@@ -36,10 +36,9 @@
         }).join("") +
       '<p class="world-note">한글 이름 칸에 적으면 이 브라우저에 남습니다. 다 적은 뒤 <b>표로 내보내기</b>를 눌러 ' +
       "<code>data/기술마법-한글이름.tsv</code> 에 붙여 넣으세요. " +
-      "<strong>아이콘은 아직 못 붙였습니다.</strong> 그림은 <code>skill001.epf</code>(266장)·" +
-      "<code>spell001.epf</code> 에 있지만 제 색으로 그릴 색표를 못 찾았고, 어느 그림이 어느 기술인지도 " +
-      "아직 모릅니다 — <code>원문</code> 은 자료의 둘째 칸 첫 값일 뿐이고 Assail 과 Assault 가 둘 다 1 이라 " +
-      "아이콘 번호가 아닙니다.</p>" +
+      "아이콘은 <code>Legend.dat</code> 의 <code>skill001.epf</code>·<code>spell001.epf</code> 를 " +
+      "<code>item007.pal</code> 로 그린 것입니다. <strong>색표는 짐작입니다</strong> — 기술용 색표가 " +
+      "아카이브에 없어 56개를 다 그려 보고 가장 매끄러운 것을 골랐습니다. 모양은 맞고 색은 다를 수 있습니다.</p>" +
       '<button type="button" id="ability-export" class="quiet-link">표로 내보내기</button>';
     var b = document.getElementById("ability-export");
     if (b) b.addEventListener("click", exportTsv);
@@ -58,6 +57,18 @@
       '<pre class="ability-export">' + text.replace(/[&<]/g, function (c) {
         return c === "&" ? "&amp;" : "&lt;";
       }) + "</pre>");
+  }
+
+  /* 아이콘은 한 장짜리 시트를 잘라 쓴다. 번호는 자료의 raw[1] 첫 값이고, Hades 가 손으로
+   * 넣어 둔 assail.json 의 Icon 과 맞는다. 여러 기술이 한 아이콘을 함께 쓰는 일은 흔하다
+   * (Assail 과 Assault 가 둘 다 1 이다). 시트는 16칸씩 · 한 칸 35x35. */
+  var CELL = 35, COLS = 16;
+
+  function icon(kind, n) {
+    var sheet = kind === "기술" ? "skill" : "spell";
+    var x = (n % COLS) * CELL, y = Math.floor(n / COLS) * CELL;
+    return '<i class="ability-icon" title="' + n + '" style="background-image:url(ability-icons/' +
+      sheet + '.png);background-position:-' + x + "px -" + y + 'px"></i>';
   }
 
   function renderList(filter) {
@@ -87,8 +98,9 @@
       '<ol class="world-tree ability-tree">' + g["목록"].map(function (a) {
         var hit = q && a["이름"].toLowerCase().indexOf(q) >= 0;
         return '<li style="--depth:' + a["깊이"] + '"' + (hit ? ' class="is-hit"' : "") + ">" +
+          icon(g["갈래"], a["아이콘"]) +
           '<b>' + a["이름"] + "</b>" +
-          '<em>원문 ' + a["아이콘"] + (a["레벨"] ? " · 레벨 " + a["레벨"] : "") +
+          '<em>' + (a["레벨"] ? "레벨 " + a["레벨"] : "") +
           (a["스크립트"] ? " · 스크립트 있음" : "") + "</em>" +
           '<input class="ability-name" data-for="' + a["이름"] + '" type="text" placeholder="한글 이름" value="' +
           (typed[a["이름"]] || a["한글"] || "") + '">' +
