@@ -13,7 +13,12 @@ public sealed class MapIntegrityTests
     /// <summary>Refugee Camp: 70x70, so 29,400 bytes.</summary>
     private const int RefugeeCampId = 2;
 
-    private const int AreasShipped = 4;
+    /// <summary>
+    /// Counted, not written down. The server ships four areas today and hundreds once the content port
+    /// lands, and a number in here would have to be edited every time — which is the same as not checking.
+    /// </summary>
+    private static int AreasShipped(IsolatedHadesServer server) =>
+        Directory.GetFiles(Path.Combine(server.ContentLocation, "areas"), "*.json").Length;
 
     [Fact]
     public void A_map_that_is_not_its_declared_size_is_refused_and_named()
@@ -23,6 +28,8 @@ public sealed class MapIntegrityTests
         string map = Path.Combine(server.ContentLocation, "maps", $"lod{RefugeeCampId}.map");
 
         Assert.True(File.Exists(map), $"{map} is not where this test expects the map files to be.");
+
+        int shipped = AreasShipped(server);
 
         File.WriteAllBytes(map, []);
 
@@ -34,16 +41,18 @@ public sealed class MapIntegrityTests
         Assert.Contains("Not loaded", server.ConsoleOutput);
 
         // And left out of the world rather than cached as a room made of wall.
-        Assert.Contains($"Map Templates Loaded: {AreasShipped - 1}", server.ConsoleOutput);
+        Assert.Contains($"Map Templates Loaded: {shipped - 1}", server.ConsoleOutput);
     }
 
     [Fact]
     public void The_maps_that_ship_are_all_their_declared_size()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+
+        int shipped = AreasShipped(server);
         server.Start(TimeSpan.FromMinutes(2));
 
         Assert.DoesNotContain("Not loaded", server.ConsoleOutput);
-        Assert.Contains($"Map Templates Loaded: {AreasShipped}", server.ConsoleOutput);
+        Assert.Contains($"Map Templates Loaded: {shipped}", server.ConsoleOutput);
     }
 }
