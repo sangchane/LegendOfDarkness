@@ -134,20 +134,24 @@ def eligible_plain(kind):
 
 
 RULES = {
+    "skills":    lambda _: [json.loads(ABILITIES.read_text(encoding="utf-8-sig"))] and (
+                     [r for r in json.loads(ABILITIES.read_text(encoding="utf-8-sig"))
+                      if r["kind"] == "skill"], []),
+    "spells":    lambda _: ([r for r in json.loads(ABILITIES.read_text(encoding="utf-8-sig"))
+                             if r["kind"] == "spell"], []),
     "worldmaps": lambda _: eligible_plain("worldmaps"),
     "maps":      eligible_maps,
     "warps":     eligible_warps,
     "monsters":  eligible_monsters,
     "mundanes":  eligible_mundanes,
     "items":     lambda _: eligible_plain("items"),
-    "skills":    lambda _: eligible_plain("skills"),
-    "spells":    lambda _: eligible_plain("spells"),
     "doors":     lambda _: eligible_plain("doors"),
 }
 
 # 계획의 실측 표. 여기서 벗어나면 표가 틀렸거나 적재기가 틀렸다 — 진행 전에 가린다.
+# 기술·마법은 원작(abilities.json) 기준이다 — 팩의 82·71 이 아니다.
 EXPECTED = {"maps": 797, "warps": 886, "items": 989, "monsters": 565,
-            "mundanes": 84, "skills": 82, "spells": 71, "worldmaps": 1, "doors": 1}
+            "mundanes": 84, "skills": 275, "spells": 338, "worldmaps": 1, "doors": 1}
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -480,6 +484,70 @@ def write_mundanes(keep):
     return n, mute
 
 
+# ── 기술·마법 ────────────────────────────────────────────────────────────
+# **원작이 먼저다.** 팩은 기술 82·마법 71 이지만, Hades 의 metafile/SClass1~5 에서 뽑아 둔
+# data/game-data/abilities.json 이 613개(기술 275 · 마법 338)이고 **무엇을 배워야 무엇을
+# 배우는지**까지 들어 있다. 팩에는 그 관계가 없다.
+#
+# 능력치 요구 다섯 칸은 **옮기지 않는다.** 값은 알지만 어느 자리가 어느 능력치인지 모른다
+# (docs/game-data.md 137행). 모르는 채 옮기면 다음 사람이 그것을 근거로 삼는다.
+ABILITIES = ROOT / "data" / "game-data" / "abilities.json"
+SCRIPTS = SERVER / "scripts"
+
+
+def script_names():
+    """[Script("이름")] 로 등록된 것. 없는 이름을 ScriptName 에 넣으면 붙지 않는다."""
+    out = set()
+    for f in SCRIPTS.rglob("*.cs"):
+        out |= set(re.findall(r'\[Script\("([^"]+)"', f.read_text(encoding="utf-8", errors="replace")))
+    return out
+
+
+def ability_json(r, kind_of, scripts):
+    need = r.get("requires")
+    pre = None
+    if need or r.get("atLevel") or r.get("class"):
+        pre = {"Class_Required": r.get("class") or 0,
+               "ExpLevel_Required": r.get("atLevel") or 0}
+        if need:
+            pre["Skill_Required" if kind_of.get(need) == "skill" else "Spell_Required"] = need
+
+    return {
+        "Name": r["name"],
+        # Hades 가 들고 있는 Assail 이 이름을 그대로 ScriptName 으로 쓴다. 없는 이름을 넣으면
+        # 붙지 않고 조용히 아무 일도 안 하므로, 실제로 있는 것만 적는다.
+        "ScriptName": r["name"] if r["name"] in scripts else None,
+        "Prerequisites": pre,
+        "MaxLevel": 100,
+        "ID": 0, "Group": None, "Description": None,
+    }
+
+
+def write_abilities(kind):
+    rows = json.loads(ABILITIES.read_text(encoding="utf-8-sig"))
+    kind_of = {r["name"]: r["kind"] for r in rows}
+    scripts = script_names()
+    want = "skill" if kind == "skills" else "spell"
+    out = SERVER / "templates" / kind
+    out.mkdir(parents=True, exist_ok=True)
+
+    shipped = {f.stem.lower() for f in out.glob("*.json")}
+    seen, wrote, kept, scripted = set(), 0, 0, 0
+    for r in rows:
+        if r["kind"] != want or r["name"] in seen:
+            continue
+        seen.add(r["name"])
+        if safe_name(r["name"]).lower() in shipped:      # Hades 가 이미 들고 있는 것은 그대로 둔다
+            kept += 1
+            continue
+        j = ability_json(r, kind_of, scripts)
+        scripted += j["ScriptName"] is not None
+        (out / f'{safe_name(r["name"]).lower()}.json').write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+        wrote += 1
+    return wrote, kept, len(seen), scripted
+
+
 # ── 월드맵 ───────────────────────────────────────────────────────────────
 # **원작이 먼저다.** 노드 이름·화면 위치·그림은 Legend.dat 의 field001.txt 에서 온다
 # (25개. 열 장이 같은 목록의 다른 판이다). 팩의 마이소시아는 그 위에 4개를 더하고 3개를
@@ -664,6 +732,10 @@ def main():
             print(f"     번호표 {len(rows)}줄 → {IDTABLE.relative_to(ROOT)}")
             if a.write:
                 print(f"     넣음 {write_maps(rows)}장 → areas/ · maps/")
+        elif kind in ("skills", "spells") and a.write:
+            wrote, kept, distinct, scripted = write_abilities(kind)
+            print(f"     넣음 {wrote}장 → templates/{kind}/  "
+                  f"(서로 다른 이름 {distinct} · Hades 것 그대로 둠 {kept} · 스크립트 붙은 것 {scripted})")
         elif kind == "worldmaps" and a.write:
             got, missing = write_worldmaps(keep)
             files, cells = write_world_warps()

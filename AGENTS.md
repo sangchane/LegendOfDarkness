@@ -31,6 +31,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - **괴물이 어떻게 움직이고 싸우나(선공·이동·공격): `docs/monster-behaviour.md`**
 - **원작 기술·마법·퀘스트·아이템(선행 관계 그래프): `docs/game-data.md`** (`data/game-data/*.json`, Obsidian 노트 2,969장 — 맵·워프·NPC까지)
 - **Hades 에 뭐가 이미 있나(만들 것 vs 채울 것): `docs/what-hades-already-has.md`** — 콘텐츠를 이식하기 전에 **여기부터**. 그래프·볼트에 묻는 법도 여기 있다
+- **원작 기술·마법 613개(선행 관계 포함): `python3 scripts/build-ability-vault.py` → `data/game-data/vault-abilities/`** (Obsidian). 팩의 153개와 다른 계보
 - **원작 아카이브에 뭐가 들었나: `python3 scripts/build-archive-vault.py` → `data/archives-vault/`** (Obsidian). `.dat` 11개 안의 읽을 수 있는 표 503개. **팩을 뒤지기 전에 여기부터**
 - **서버팩 자료 — 방법·공통 규칙: `docs/server-pack-data.md`** (원작 자료와 별개)
   - 팩별 내용: `docs/server-packs/5.99-server.md` · `docs/server-packs/honden-community.md`
