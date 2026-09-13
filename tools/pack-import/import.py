@@ -498,6 +498,19 @@ NAMETABLE = ROOT / "data" / "기술마법-한글이름.tsv"
 ABILITY_MARK = "원작표"      # 우리가 쓴 것이라는 표. 없으면 Hades 가 손으로 넣은 것이다
 SCRIPTS = SERVER / "scripts"
 
+# 첫 플레이 가능한 세로 조각. 대상 방식은 실제 스크립트(beagiocfein.cs)가 자신에게 쓰는 것으로
+# 확인했고, 21은 원작 SClass 표 raw[1]의 첫 값이다. 나머지 328개는 뜻을 확정하기 전까지 꾸며 넣지 않는다.
+ABILITY_RUNTIME_OVERRIDES = {
+    ("spell", "beag ioc fein"): {
+        "Icon": 21,
+        "TargetType": 5,       # SpellUseType.NoTarget
+        "Pane": 1,             # Pane.Spells
+        "Text": "자신의 체력을 회복합니다.",
+        "ManaCost": 1,
+        "BaseLines": 0,
+    },
+}
+
 
 def korean_names():
     """사람이 채운 한글 이름. 비어 있으면 영문 이름을 그대로 쓴다.
@@ -518,7 +531,7 @@ def korean_names():
 
 
 def script_names():
-    """[Script("이름")] 로 등록된 것. 없는 이름을 ScriptName 에 넣으면 붙지 않는다."""
+    """[Script("이름")] 로 등록된 것. 없는 이름을 런타임 열쇠에 넣으면 붙지 않는다."""
     out = set()
     for f in SCRIPTS.rglob("*.cs"):
         out |= set(re.findall(r'\[Script\("([^"]+)"', f.read_text(encoding="utf-8", errors="replace")))
@@ -536,11 +549,21 @@ def ability_json(r, kind_of, scripts, korean):
             pre["Skill_Required" if kind_of.get(need) == "skill" else "Spell_Required"] = \
                 korean.get(need, need)
 
-    return {
-        "Name": korean.get(r["name"], r["name"]),
-        # Hades 가 들고 있는 Assail 이 이름을 그대로 ScriptName 으로 쓴다. 없는 이름을 넣으면
-        # 붙지 않고 조용히 아무 일도 안 하므로, 실제로 있는 것만 적는다.
-        "ScriptName": r["name"] if r["name"] in scripts else None,
+    kind = kind_of[r["name"]]
+    script = r["name"] if r["name"] in scripts else None
+
+    result = {"Name": korean.get(r["name"], r["name"])}
+    # 둘은 같은 Template 기반이지만 런타임 열쇠가 다르다. 기술은 ScriptName, 마법은
+    # Spell.AttachScript 가 ScriptKey 를 읽는다. 마법에 ScriptName 을 썼던 이식본은 목록만
+    # 보이고 눌러도 실행되지 않았다(격리 Hades 실동작 시험으로 확인).
+    if kind == "skill" or script is None:
+        # Null ScriptName is the old generated shape; keep it for unscripted spells to avoid rewriting
+        # hundreds of otherwise unchanged templates.
+        result["ScriptName"] = script
+    else:
+        result["ScriptKey"] = script
+
+    result.update({
         "Prerequisites": pre,
         "MaxLevel": 100,
         "ID": 0, "Description": None,
@@ -548,7 +571,9 @@ def ability_json(r, kind_of, scripts, korean):
         # 원작 표에는 그 값이 없으므로 덮으면 잃는다. 이름을 바꾸면 옛 파일이 남으니,
         # 다시 쓸 때 표가 붙은 것만 먼저 지운다.
         "Group": ABILITY_MARK,
-    }
+    })
+    result.update(ABILITY_RUNTIME_OVERRIDES.get((kind, r["name"]), {}))
+    return result
 
 
 def write_abilities(kind):
@@ -579,7 +604,7 @@ def write_abilities(kind):
             kept += 1
             continue
         j = ability_json(r, kind_of, scripts, korean)
-        scripted += j["ScriptName"] is not None
+        scripted += (j.get("ScriptName") if want == "skill" else j.get("ScriptKey")) is not None
         (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
             json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
         wrote += 1

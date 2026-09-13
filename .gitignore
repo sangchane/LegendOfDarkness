@@ -47,3 +47,6 @@ data/archives-vault/
 
 # 기술·마법 노트는 생성물이다 — scripts/build-ability-vault.py 로 다시 만든다.
 data/game-data/vault-abilities/
+
+# 식 볼트는 생성물이다 — scripts/build-formula-vault.py 로 다시 만든다.
+data/formula-vault/
