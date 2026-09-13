@@ -45,6 +45,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 
 ## 규약
 - 각 작업과 주요 단계 시작 시 `$adaptive-model-router`가 사용자 요청·`NEXT.md` 현재 블록·관련 변경 파일·실패 이력을 보고 모델과 추론 강도를 정한다. 전환 기능이 있으면 확인 없이 바꾸고, 같은 파일을 고치는 작업은 동시에 분산하지 않는다.
+- **볼트는 저장소에 들어 있다 — 생성기를 돌리지 않고 그냥 Obsidian 으로 연다.** `data/truth-vault/`(자료 출처) · `data/formula-vault/`(식) · `data/archives-vault/`(아카이브 503표) · `data/game-data/vault-abilities/`(원작 기술·마법 613). 낡았으면 해당 생성기로 다시 만든다. 팩 볼트(`data/server-packs/vault/`, 43MB)만 무시 목록에 있다
 - **자료가 어디서 오나 (갈래별 셈): `python3 scripts/build-truth-vault.py` → `data/truth-vault/`** (Obsidian). **`database/assets/MetaFiles/` 를 먼저 본다** — 아이템 2,110·기술마법 613·퀘스트 38 이 거기서 나온다. 손으로 적은 표는 틀렸었다
 - **자료 출처 우선순위** (위에서부터 찾고, 있으면 아래를 보지 않는다):
   1. **Hades 자기 자료** — `database/server/` · `database/assets/MetaFiles/` · `database/server/metafile/`(+`more`)

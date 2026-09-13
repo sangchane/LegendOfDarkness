@@ -40,16 +40,14 @@ data/game-data/vault/
 # 서버팩 자료 노트 — data/server-packs/extracted/*.json 에서 언제든 다시 만든다
 # (scripts/build-server-pack-vault.py)
 data/server-packs/vault/
+# ↑ 이것만 무시한다. 43MB · 파일 11,015개로 커서 저장소에 올리지 않는다.
+#
+# **나머지 볼트는 올린다.** 생성물이지만 볼트는 **읽으려고 만든 것**이고, 다른 기기에서
+# 다시 만들려면 포크 submodule·dotnet·PowerShell 이 필요하다 — 그걸 안 하려고 만든 것이
+# 볼트다. 합쳐 4.5MB · 파일 1,131개다:
+#   data/truth-vault/               자료가 어디서 오는가 (scripts/build-truth-vault.py)
+#   data/formula-vault/             세계가 굴러가는 식   (scripts/build-formula-vault.py)
+#   data/archives-vault/            아카이브 503표      (scripts/build-archive-vault.py)
+#   data/game-data/vault-abilities/ 원작 기술·마법 613   (scripts/build-ability-vault.py)
 data/server-packs/graph/
 
-# 아카이브 볼트는 생성물이다 — scripts/build-archive-vault.py 로 다시 만든다.
-data/archives-vault/
-
-# 기술·마법 노트는 생성물이다 — scripts/build-ability-vault.py 로 다시 만든다.
-data/game-data/vault-abilities/
-
-# 식 볼트는 생성물이다 — scripts/build-formula-vault.py 로 다시 만든다.
-data/formula-vault/
-
-# 자료 출처 볼트는 생성물이다 — scripts/build-truth-vault.py 로 다시 만든다.
-data/truth-vault/
