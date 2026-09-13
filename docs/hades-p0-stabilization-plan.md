@@ -116,7 +116,7 @@ P0-02 완료 — 갓 생성된 캐릭터의 최소 상태를 `Fixtures/hades-718
 | P0-16 | 기본 전투 정확성 | P0-10 | 공격 간격 경계가 결정적으로 동작하고 잘못된 cast가 갱신 루프를 막지 않음 |
 | P0-17 | 하드코딩 상수 설정화 | P0-10 | 2.3 표의 값이 설정 키로 분리되고 환경변수로 덮어써지며, harness가 객체 서버 포트까지 격리해 병렬 실행됨 |
 
-**진행 상황 (2026-09-09):** fork `kimsangchan/Dark-Ages-Private-Server`를 만들고 `upstream`/`origin`을 나눴다. root의 `.gitmodules`도 fork를 가리킨다.
+**진행 상황 (2026-09-09):** fork `sangchane/Dark-Ages-Private-Server`(옛 주소 `kimsangchan/…`, 지금은 리다이렉트)를 만들고 `upstream`/`origin`을 나눴다. root의 `.gitmodules`도 fork를 가리킨다.
 
 P0-14 완료 — **송신이 서로 다른 세 갈래였고 각자 다르게 패킷을 잃었다.** `FlushAndSend`는 다른 송신이 진행 중이면 **아무 말 없이 보내지 않고 돌아왔다**. 비동기 송신을 시작하고 끝내지 않아 실제로 나간 바이트 수를 본 적이 없고, 완료 핸들에 잠금 안에서 대기해 사실상 동기 송신이었다. 나머지 두 갈래는 `Socket.Send`의 반환값을 버렸다 — 소켓은 자리가 있는 만큼만 받으므로 바쁜 연결에서는 **패킷이 반만 나가고**, 받는 쪽은 길이를 읽고 그만큼 기다리므로 스트림이 영영 어긋난다. 게다가 그 둘은 전역 잠금 아래에서, `FlushAndSend`는 바깥에서 써서 두 패킷이 섞일 수 있었다. 이제 연결마다 쓰는 스레드가 하나뿐이고, 받아주지 않은 나머지를 다 나갈 때까지 다시 내민다. 대기 한도(`SendQueueDepth`, 기본 512)를 넘기면 그 연결을 포기한다.
 
@@ -266,7 +266,7 @@ P0 서버 suite는 Godot 표시 품질, 모바일 조작성, safe area, NPC 대�
 
 - `sources/`의 원본 submodule은 읽기 전용 기준선으로 유지한다.
 - S0 특성화 harness는 원본을 수정하지 않으므로 root 저장소 `tests/hades-characterization/`에 두고, fork는 서버 코드를 실제로 고치는 S1 시점에 만든다.
-- 서버 변경은 `kimsangchan/Dark-Ages-Private-Server` fork를 만들거나 확인한 뒤 그 저장소에서 수행한다.
+- 서버 변경은 `sangchane/Dark-Ages-Private-Server` fork를 만들거나 확인한 뒤 그 저장소에서 수행한다.
 - 원본 저장소는 `upstream`, 개인 fork는 `origin`으로 구분한다.
 - root 저장소에는 검증된 Hades fork의 submodule commit 포인터만 반영한다.
 
