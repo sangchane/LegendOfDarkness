@@ -398,19 +398,18 @@ def monster_json(spawn, mob, area_id, items):
         "ImageVarience": whole(f.get("이미지염색")) or 0,
         # Int32 를 넘는 체력이 실제로 있다(42억). 한 장이 넘치면 Newtonsoft 가 던지고
         # 괴물 적재가 통째로 멎는다 — "Monster Templates Loaded" 줄 자체가 안 찍힌다.
-        "MaximumHP": whole(f.get("체력"), 2**31 - 1) or 1,
+        "MaximumHP": 0,     # 0 = "레벨에서 만들어라" (하데스 bees·minion 과 같은 관례)
         "MaximumMP": 0,
-        # 팩에 레벨 칸이 없다. 그런데 243마리 전부가 체력·최소·최대공격력·방어력·경험치를
-        # 갖고 있어서 레벨로 짚을 필요가 없다 — 레벨은 하데스가 그 넷을 못 가져서 쓰는 대용품이다.
-        # 서버는 이 칸들이 있으면 그걸 쓰고 없으면 레벨로 계산한다(Creations/monsters.cs ·
-        # Formulas/damage.cs · Formulas/monsterexp.cs).
+        # **수치는 넣지 않는다.** 체력·최소·최대공격력·방어력·경험치가 팩에 다 있지만 5.99 **단독**
+        # 이다. 규칙은 하데스가 베이스이고 팩은 두 쪽이 일치할 때만 후보인데, 괴물 수치는 두 팩에서
+        # 이름이 겹치는 35마리조차 **전부 어긋난다**(체력 35/35 불일치 · 공격력 31 · 경험치 30).
+        # 교차 검증이 불가능하므로 후보가 아니다.
+        #
+        # 원작 아카이브에도 없다 — 아카이브는 클라이언트 자료이고 괴물 수치는 서버가 갖는 값이다.
+        # 그래서 근거 있는 값이 없고, 체력 0 을 두어 **하데스 식이 레벨에서 만들게** 한다
+        # (Creations/monsters.cs 가 0 이면 계산한다). 서버는 적혀 있으면 읽으므로, 근거 있는
+        # 자료가 생기면 여기만 채우면 된다.
         "Level": 1,
-        "DmgMin": whole(f.get("최소공격력"), 2**31 - 1),
-        "DmgMax": whole(f.get("최대공격력"), 2**31 - 1),
-        # 방어는 낮을수록 좋고 팩도 같은 규약이다(-80~0). 0 도 적어 둔 값이므로 그대로 넣는다 —
-        # "없음" 은 칸 자체가 없는 것이고, 그때만 서버가 레벨로 만든다.
-        "Ac": whole(f.get("방어력")),
-        "Exp": whole(f.get("경험치"), 2**31 - 1),
         "MovementSpeed": speed, "EngagedWalkingSpeed": speed,
         "AttackSpeed": 1000, "CastSpeed": 8000,
         "MoodType": 4, "PathQualifer": 1,
@@ -439,8 +438,7 @@ def write_monsters(keep):
             json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
         n += 1
         for k in mobs[sp["괴물"]]["fields"]:
-            if k not in ("이름", "속도", "이미지", "이미지염색", "체력", "젠타임",
-                         "드롭아이템", "골드", "최소공격력", "최대공격력", "방어력", "경험치"):
+            if k not in ("이름", "속도", "이미지", "이미지염색", "젠타임", "드롭아이템", "골드"):
                 skipped[k] += 1
     return n, skipped
 
@@ -501,8 +499,16 @@ def write_mundanes(keep):
 # data/game-data/abilities.json 이 613개(기술 275 · 마법 338)이고 **무엇을 배워야 무엇을
 # 배우는지**까지 들어 있다. 팩에는 그 관계가 없다.
 #
-# 능력치 요구 다섯 칸은 **옮기지 않는다.** 값은 알지만 어느 자리가 어느 능력치인지 모른다
-# (docs/game-data.md 137행). 모르는 채 옮기면 다음 사람이 그것을 근거로 삼는다.
+# 능력치 요구 다섯 칸의 순서는 **힘 / 지력 / 지혜 / 체력 / 민첩** 이다. 2026-09-13 에 세 직업이
+# 서로 독립적으로 증명했다 — 성직자 126개의 자리2(지혜) 중간값이 5, 마법사 155개의 자리1(지력)이 4,
+# 전사의 자리0(힘) 최대가 215. 나머지 자리는 전부 중간값 3(기본값)이다.
+#
+# `raw[0]` 은 `요구레벨 / 2차여부 / 요구 어빌리티레벨` 이다. 자리1 이 1 인 356개는 **전부** 자리0 이
+# 99 이고 자리2 가 0~99 다 — 99레벨 2차 직업(어빌리티) 능력이라는 뜻이다. 1차에서 배울 수 있는 것은
+# 257개뿐이다.
+#
+# `atLevel` 은 캐릭터 레벨이 아니다. `raw[3]` 의 `Assail/10` 에서 온 **선행 기술의 레벨**이라
+# `Skill_Level_Required` 쪽이다. 캐릭터 레벨은 `raw[0]` 첫 자리다.
 ABILITIES = ROOT / "data" / "game-data" / "abilities.json"
 NAMETABLE = ROOT / "data" / "기술마법-한글이름.tsv"
 ABILITY_MARK = "원작표"      # 우리가 쓴 것이라는 표. 없으면 Hades 가 손으로 넣은 것이다
@@ -548,16 +554,51 @@ def script_names():
     return out
 
 
+def requirement(raw):
+    """`raw[0]` 의 `요구레벨 / 2차여부 / 요구 어빌리티레벨` 을 숫자 셋으로 읽는다."""
+    parts = (str((raw or [""])[0]) + "/0/0").split("/")
+    out = []
+    for one in parts[:3]:
+        out.append(int(one) if one.isdigit() else 0)
+    return out
+
+
 def ability_json(r, kind_of, scripts, korean):
+    raw = r.get("raw") or []
+    level, advanced, ability_level = requirement(raw)
+    stats = r.get("statCosts") or []
     need = r.get("requires")
-    pre = None
-    if need or r.get("atLevel") or r.get("class"):
-        pre = {"Class_Required": r.get("class") or 0,
-               "ExpLevel_Required": r.get("atLevel") or 0}
-        if need:
-            # 선행도 캐시에 들어간 이름으로 불러야 한다 - 이름을 바꾸면 여기도 같이 바뀐다.
-            pre["Skill_Required" if kind_of.get(need) == "skill" else "Spell_Required"] = \
-                korean.get(need, need)
+
+    # `0/0/0` 에 `5/5/5/5/5` 는 **원작 표가 비워 둔 행**이다. 정확히 12개이고 전부 수도사다.
+    # 조건을 적으면 없는 근거를 만드는 것이고, 실제로 그중 `Kelberoth Strike` 는 사람이 아는 바로
+    # 99레벨 기술인데 표에는 레벨 0 으로 보인다. 그래서 조건 없이 두고 Group 에 표시만 남긴다.
+    empty = level == 0 and not advanced and list(stats) == [5, 5, 5, 5, 5]
+
+    pre = {"Class_Required": r.get("class") or 0}
+
+    if not empty:
+        pre["ExpLevel_Required"] = level
+
+        # 기본값 3 은 "요구 없음" 이다(613개 중 대부분이 3 이다). 3 을 적어 두면 새 캐릭터가
+        # 힘 10·나머지 5 라서 지혜·체력·민첩에서 걸린다 — 원작에서 걸리지 않는 것이 걸린다.
+        for field, value in zip(("Str_Required", "Int_Required", "Wis_Required",
+                                 "Con_Required", "Dex_Required"), stats):
+            if value and value > 3:
+                pre[field] = value
+
+    if advanced:
+        # 2차 직업 능력이다. Hades 에는 어빌리티 레벨을 보는 칸이 없어 여기서는 기록만 하고
+        # (ExpLevel_Required 99 로 걸린다) 분류는 Group 표에 남긴다.
+        pre["Stage_Required"] = 1
+
+    if need:
+        # 선행도 캐시에 들어간 이름으로 불러야 한다 - 이름을 바꾸면 여기도 같이 바뀐다.
+        pre["Skill_Required" if kind_of.get(need) == "skill" else "Spell_Required"] = \
+            korean.get(need, need)
+        # `Assail/10` 의 10 은 그 선행 기술의 레벨이다. 캐릭터 레벨과 섞지 않는다.
+        if r.get("atLevel"):
+            pre["Skill_Level_Required" if kind_of.get(need) == "skill"
+                else "Spell_Level_Required"] = r["atLevel"]
 
     kind = kind_of[r["name"]]
     script = r["name"] if r["name"] in scripts else None
@@ -580,7 +621,9 @@ def ability_json(r, kind_of, scripts, korean):
         # 이 표가 없으면 Hades 가 손으로 넣은 것이다 — Assail 에는 Buff 와 Icon 이 들어 있는데
         # 원작 표에는 그 값이 없으므로 덮으면 잃는다. 이름을 바꾸면 옛 파일이 남으니,
         # 다시 쓸 때 표가 붙은 것만 먼저 지운다.
-        "Group": ABILITY_MARK,
+        # 2차 직업(어빌리티) 능력은 따로 가려야 한다 — 613개 중 356개가 그렇다.
+        "Group": (f"{ABILITY_MARK}/2차{ability_level}" if advanced
+                  else f"{ABILITY_MARK}/조건없음" if empty else ABILITY_MARK),
     })
     result.update(ABILITY_RUNTIME_OVERRIDES.get((kind, r["name"]), {}))
     return result
@@ -598,7 +641,10 @@ def write_abilities(kind):
     shipped = set()
     for f in out.glob("*.json"):
         try:
-            mine = json.loads(f.read_text(encoding="utf-8-sig")).get("Group") == ABILITY_MARK
+            # 2차 능력은 `원작표/2차NN` 이라 같음 비교로는 안 걸린다 — 안 걸리면 지우지 못해
+            # 옛 파일이 남고, 그러면 다음 실행이 그것을 "Hades 것" 으로 보고 비켜 간다.
+            mine = str(json.loads(f.read_text(encoding="utf-8-sig")).get("Group") or "") \
+                .startswith(ABILITY_MARK)
         except Exception:
             mine = False
         if mine:
