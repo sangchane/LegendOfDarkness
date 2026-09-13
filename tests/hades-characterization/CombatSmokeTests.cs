@@ -18,9 +18,9 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// It is a characterization test, so where the server's arithmetic reads backwards this follows it rather
-/// than correcting it. There are two of those and both matter: <see cref="Landed" /> on armour, and
-/// <see cref="LevelOnUse" /> on training.
+/// It is a characterization test, so where the server's arithmetic reads oddly but deliberately this
+/// follows it rather than correcting it. <see cref="LevelOnUse" /> is the one that matters most: the skill
+/// levels on every swing, so no two swings in a row are worth the same.
 /// </para>
 /// <para>
 /// Both directions are here because the numbers come from opposite places. Ours come from the five
@@ -315,17 +315,18 @@ public sealed class CombatSmokeTests : IDisposable
 
     /// <summary>The two things every blow goes through on the way in: the target's armour, then elements.</summary>
     /// <remarks>
-    /// <b>Armour never subtracts here.</b> <c>scripts/Formulas/ac.cs</c> returns
-    /// <c>armoured + |raw - armoured|</c>, which is whichever of the two is larger — so armour above -2 only
-    /// ever makes a blow hurt more. A level-one monster's +69 multiplies it by about two and a half, and a
-    /// fresh character's is worse still: <c>GameClient.SetAislingStartupVariables</c> hands out
-    /// <c>100 - Level / 3</c>, so a new character stands there wearing +100. That reads backwards, and it is
-    /// what the server does; this test is what would fail if it were ever put right.
+    /// <c>scripts/Formulas/ac.cs</c>. Armour above -2 still makes a blow hurt more, and nobody starts below
+    /// that: <c>GameClient.SetAislingStartupVariables</c> hands a new character <c>100 - Level / 3</c>, so it
+    /// stands there wearing +100 and takes about twice what it would at -2; a level-one monster's +69 is
+    /// about 1.7 times. Armour only begins to help once gear takes it under -2, down to the -70 floor.
+    ///
+    /// That much is the design. What was a bug, and is now fixed, is that the script used to end by
+    /// returning the larger of the raw and the armoured blow — so every reduction it worked out was handed
+    /// straight back, and the best armour in the game took exactly what no armour took.
     /// </remarks>
     private static int Landed(int dmg, int armor)
     {
-        int armored = dmg * Math.Abs(armor + 101) / 99;
-        armored += Math.Abs(dmg - armored);
+        int armored = Math.Max(1, dmg * (armor + 101) / 99);
 
         return (int)Math.Abs(armored * NoElementEither);
     }
