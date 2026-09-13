@@ -50,3 +50,6 @@ data/game-data/vault-abilities/
 
 # 식 볼트는 생성물이다 — scripts/build-formula-vault.py 로 다시 만든다.
 data/formula-vault/
+
+# 자료 출처 볼트는 생성물이다 — scripts/build-truth-vault.py 로 다시 만든다.
+data/truth-vault/
