@@ -1,155 +1,236 @@
-/* 월드 지도 — 워프가 맵을 어떻게 잇는지 눈으로 본다.
- *
- * 개수 검사로는 세계가 이어졌는지 알 수 없다. 워프 890장이 다 실렸다는 말은 "파일 890개를
- * 읽었다"는 뜻이지 "갈 수 있다"는 뜻이 아니다. 그래서 덩어리로 묶어 보여 준다 —
- * 이어진 것끼리 한 덩어리, 아무 데도 안 이어진 맵은 따로. */
+/* 월드 지도 — 연결 구역, 현재 맵, 워프 방향을 초보자도 순서대로 읽는다. */
 (function () {
   "use strict";
 
   var DATA = window.WORLD_MAP_DATA;
-  if (!DATA) return;
+  var MODEL = window.LODWorldMapModel;
+  if (!DATA || !MODEL) return;
 
-  var listEl = document.getElementById("world-list");
-  var detailEl = document.getElementById("world-detail");
-  var searchEl = document.getElementById("world-search");
+  var model = MODEL.create(DATA);
+  var images = window.MAP_IMAGES || {};
   var summaryEl = document.getElementById("world-summary");
-  if (!listEl || !detailEl) return;
+  var regionsEl = document.getElementById("world-regions");
+  var detailEl = document.getElementById("world-detail");
+  var listEl = document.getElementById("world-list");
+  var countEl = document.getElementById("world-result-count");
+  var searchEl = document.getElementById("world-search");
+  var filtersEl = document.getElementById("world-filters");
+  if (!summaryEl || !regionsEl || !detailEl || !listEl) return;
 
-  var maps = DATA["맵"];
-  var name = function (id) { return (maps[id] && maps[id]["이름"]) || ("#" + id); };
+  var state = { selectedId: null, filter: "connected", query: "" };
+  var statusCopy = {
+    both: ["양방향 연결", "들어오는 길과 나가는 길이 모두 있습니다."],
+    incoming: ["진입 전용", "들어올 수 있지만 이 데이터에는 나가는 워프가 없습니다."],
+    outgoing: ["출발 전용", "나갈 수 있지만 이 데이터에는 들어오는 워프가 없습니다."],
+    isolated: ["미연결", "현재 서버 데이터에서 들어오거나 나가는 워프를 찾지 못했습니다."]
+  };
 
-  // 이웃 목록. 방향을 살려 둔다 — 한쪽으로만 난 길이 실제로 있다.
-  var out = {}, inn = {};
-  DATA["간선"].forEach(function (e) {
-    (out[e[0]] = out[e[0]] || []).push({ to: e[1], n: e[2] });
-    (inn[e[1]] = inn[e[1]] || []).push({ to: e[0], n: e[2] });
-  });
+  function esc(value) {
+    return String(value).replace(/[&<>"']/g, function (char) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char];
+    });
+  }
 
-  function summary() {
+  function mapName(id) {
+    return model.byId[String(id)] ? model.byId[String(id)].name : "#" + id;
+  }
+
+  function routeCount(routes) {
+    return routes.reduce(function (sum, route) { return sum + route.count; }, 0);
+  }
+
+  function representative(cluster) {
+    return cluster.ids.slice().sort(function (a, b) {
+      var ai = images[mapName(a)] ? 10000 : 0;
+      var bi = images[mapName(b)] ? 10000 : 0;
+      var ac = model.connections(a), bc = model.connections(b);
+      return (bi + routeCount(bc.incoming) + routeCount(bc.outgoing)) -
+        (ai + routeCount(ac.incoming) + routeCount(ac.outgoing));
+    })[0];
+  }
+
+  function renderSummary() {
     var s = DATA["요약"];
-    summaryEl.innerHTML =
-      [["맵", s["맵"]], ["워프", s["워프"]], ["이어진 맵", s["이어진맵"]],
-       ["혼자인 맵", s["혼자인맵"]], ["덩어리", s["덩어리"]]]
-        .map(function (p) {
-          return '<div class="world-stat"><span>' + p[0] + '</span><strong>' + p[1] + "</strong></div>";
-        }).join("") +
-      '<p class="world-note">혼자인 맵 ' + s["혼자인맵"] + "개는 고장이 아니다 — 팩의 <code>warp_db.txt</code> 가 " +
-      "워프 파일 17개 중 10개만 싣는다. 빠진 것: " + DATA["안싣는워프파일"].join(", ") + ".</p>";
+    var values = [
+      ["전체 맵", s["맵"], "서버 areas"],
+      ["연결된 맵", s["이어진맵"], "워프 1개 이상"],
+      ["연결 구역", s["덩어리"], "서로 닿는 묶음"],
+      ["미연결 맵", s["혼자인맵"], "현재 워프 없음"]
+    ];
+    summaryEl.innerHTML = values.map(function (value) {
+      return '<div class="world-stat"><span>' + value[0] + '</span><strong>' + value[1] +
+        '</strong><small>' + value[2] + '</small></div>';
+    }).join("") +
+      '<p class="world-note"><strong>모두 Hades 기준입니다.</strong> 연결과 방향은 Hades 서버의 ' +
+      '<code>areas/</code>·<code>templates/warps/</code>, 지형 그림은 Hades의 <code>server/maps/</code>와 <code>archives/seo/seo.dat</code>입니다. ' +
+      '미연결은 곧 고장이라는 뜻이 아니라, 현재 로드된 워프 자료에서 연결을 확인하지 못했다는 뜻입니다.</p>';
   }
 
-  var entries = [];   // 왼쪽 목록 한 줄 = 덩어리 하나 또는 혼자인 맵 하나
-  DATA["덩어리"].forEach(function (ids, i) {
-    entries.push({ key: "c" + i, label: name(ids[0]) + " 일대", count: ids.length, ids: ids, lone: false });
-  });
-  DATA["혼자"].forEach(function (id) {
-    entries.push({ key: "s" + id, label: name(id), count: 1, ids: [id], lone: true });
-  });
+  function regionLabel(cluster) {
+    var id = representative(cluster);
+    return mapName(id) + " 일대";
+  }
 
-  function renderList(filter) {
-    var q = (filter || "").trim().toLowerCase();
-    var shown = entries.filter(function (e) {
-      if (!q) return true;
-      return e.ids.some(function (id) { return name(id).toLowerCase().indexOf(q) >= 0; });
+  function renderRegions() {
+    var selectedCluster = state.selectedId == null ? null : model.clusterById[state.selectedId];
+    var ordered = model.clusters.slice().sort(function (a, b) { return b.mapCount - a.mapCount; });
+    regionsEl.innerHTML = ordered.map(function (cluster) {
+      var current = selectedCluster === cluster.index;
+      return '<button type="button" class="world-region" data-region="' + cluster.index +
+        '" aria-pressed="' + current + '"><span class="world-region-mark" aria-hidden="true"></span>' +
+        '<strong>' + esc(regionLabel(cluster)) + '</strong><small>맵 ' + cluster.mapCount +
+        '개 · 워프 칸 ' + cluster.warpCount + '</small></button>';
+    }).join("") +
+      '<button type="button" class="world-region is-isolated" data-filter-region="isolated" ' +
+      'aria-pressed="' + (state.filter === "isolated") + '"><span class="world-region-mark" aria-hidden="true"></span>' +
+      '<strong>미연결 보관함</strong><small>맵 ' + DATA["요약"]["혼자인맵"] + '개 · 검색 권장</small></button>';
+  }
+
+  function filteredMaps() {
+    return model.search(state.query).filter(function (map) {
+      var connected = model.status(map.id) !== "isolated";
+      if (state.filter === "connected") return connected;
+      if (state.filter === "isolated") return !connected;
+      if (state.filter === "image") return Boolean(images[map.name]);
+      return true;
     });
-    listEl.innerHTML = shown.length
-      ? shown.map(function (e) {
-          return '<button type="button" class="world-item' + (e.lone ? " is-lone" : "") +
-            '" data-key="' + e.key + '"><span>' + e.label + "</span><em>" +
-            (e.lone ? "혼자" : e.count + "개") + "</em></button>";
-        }).join("")
-      : '<p class="world-empty">그런 이름의 맵이 없습니다.</p>';
-    if (shown.length) select(shown[0].key);
   }
 
-  function tree(rootId, ids) {
-    // 가장 많이 이어진 맵에서 시작해 너비 우선으로 펼친다 — 세계를 걸어 들어가는 순서다.
-    var inSet = {}; ids.forEach(function (i) { inSet[i] = true; });
-    var seen = {}, rows = [], queue = [[rootId, 0]];
-    seen[rootId] = true;
-    while (queue.length) {
-      var cur = queue.shift(), id = cur[0], depth = cur[1];
-      var links = (out[id] || []).filter(function (l) { return inSet[l.to]; });
-      rows.push({ id: id, depth: depth, links: links });
-      links.forEach(function (l) {
-        if (!seen[l.to]) { seen[l.to] = true; queue.push([l.to, depth + 1]); }
-      });
+  function renderList(selectFirst) {
+    var matches = filteredMaps();
+    matches.sort(function (a, b) {
+      return Number(b.id === state.selectedId) - Number(a.id === state.selectedId);
+    });
+    var shown = matches.slice(0, 160);
+    countEl.textContent = matches.length + "개" + (matches.length > shown.length ? " · 앞 160개 표시" : "");
+    listEl.innerHTML = shown.length ? shown.map(function (map) {
+      var links = model.connections(map.id);
+      var active = map.id === state.selectedId;
+      return '<button type="button" class="world-item" data-map-id="' + esc(map.id) +
+        '" aria-current="' + (active ? "true" : "false") + '"><span><strong>' + esc(map.name) +
+        '</strong><small>#' + esc(map.id) + ' · ' + map.width + '×' + map.height + '</small></span><em>' +
+        (images[map.name] ? '<i title="지형 그림 있음">▧</i> ' : '') +
+        (links.incoming.length + links.outgoing.length) + '방향</em></button>';
+    }).join("") : '<p class="world-empty"><strong>조건에 맞는 맵이 없습니다.</strong><span>검색어를 줄이거나 표시 범위를 바꿔 보세요.</span></p>';
+
+    if (selectFirst && shown.length) selectMap(shown[0].id, false);
+  }
+
+  function routeButtons(routes, kind) {
+    if (!routes.length) {
+      return '<p class="world-route-empty">' + (kind === "incoming" ? "들어오는 워프 없음" : "나가는 워프 없음") + '</p>';
     }
-    // 한 방향으로만 이어져 BFS 가 못 닿은 맵도 빠뜨리지 않는다
-    ids.forEach(function (i) { if (!seen[i]) rows.push({ id: i, depth: 0, links: [], orphan: true }); });
-    return rows;
+    return routes.slice().sort(function (a, b) { return mapName(a.id).localeCompare(mapName(b.id), "ko"); })
+      .map(function (route) {
+        return '<button type="button" class="world-route" data-map-id="' + esc(route.id) + '"><span>' +
+          esc(mapName(route.id)) + '</span><small>워프 칸 ' + route.count +
+          (route.reciprocal ? ' · <b>왕복</b>' : ' · 편도') + '</small></button>';
+      }).join("");
   }
 
-  /* 이 덩어리에 그림이 있는 맵이 있으면 그 위에 워프 칸을 찍는다.
-   * 트리는 "이어져 있다"까지만 말해 준다 — 문이 문 자리에 있는지는 그림을 봐야 안다. */
-  function picture(ids) {
-    var imgs = window.MAP_IMAGES || {};
-    var hit = null;
-    ids.some(function (id) { var n = name(id); if (imgs[n]) { hit = n; return true; } return false; });
-    if (!hit) return "";
-
-    var m = imgs[hit];
-    var pins = m["표시"].map(function (p) {
-      var to = p["도착"].join(", ");
-      return '<a class="map-pin" style="left:' + (p.x / m["폭"] * 100).toFixed(3) + "%;top:" +
-        (p.y / m["높이"] * 100).toFixed(3) + '%" title="' + hit + " (" + p["칸"][0] + "," + p["칸"][1] +
-        ") → " + to + '"><span>' + to + "</span></a>";
+  function renderPicture(map) {
+    var image = images[map.name];
+    if (!image) {
+      return '<section class="world-terrain"><div class="world-terrain-heading"><div><p class="eyebrow">Terrain</p>' +
+        '<h3>지형 그림</h3></div><span class="badge">미추출</span></div>' +
+        '<div class="world-terrain-empty"><strong>이 맵의 지형 그림은 아직 없습니다.</strong>' +
+        '<p>워프 연결은 위 구조도에서 확인할 수 있습니다. 실제 지형 그림은 지역별 검토가 끝난 것부터 추가합니다.</p></div></section>';
+    }
+    var pins = image["표시"].map(function (pin, index) {
+      var destinations = pin["도착"].join(", ");
+      var label = map.name + " " + pin["칸"][0] + "," + pin["칸"][1] + "에서 " + destinations + "(으)로";
+      return '<button type="button" class="map-pin" data-map-pin="' + index + '" style="left:' +
+        (pin.x / image["폭"] * 100).toFixed(3) + '%;top:' + (pin.y / image["높이"] * 100).toFixed(3) +
+        '%" aria-label="' + esc(label) + '"><span>' + esc(destinations) + '</span></button>';
     }).join("");
-
-    return '<figure class="map-figure">' +
-      '<figcaption>' + hit + " — " + m["칸"][0] + "×" + m["칸"][1] + " 칸 · 워프 " +
-      m["표시"].length + "칸 · 1/" + m["배율"] + " 축소</figcaption>" +
-      '<div class="map-canvas"><img src="' + m["그림"] + '" alt="' + hit + ' 지형" loading="lazy">' +
-      pins + "</div>" +
-      '<p class="map-hint">점이 워프가 있는 칸이다. 올려 두면 어디로 가는지 나온다. ' +
-      "<strong>바닥만 그린 그림이다</strong> — 건물·상점 같은 오브젝트는 맵의 벽 두 칸과 " +
-      "seo.dat 안 맵별 <code>000666.hea</code> 파일에 들어 있고, 그걸 읽는 코드가 아직 없다. " +
-      "흰 사각형이 건물이 놓인 자리다.</p>" +
-      "</figure>";
+    return '<section class="world-terrain"><div class="world-terrain-heading"><div><p class="eyebrow">Terrain</p>' +
+      '<h3>지형과 워프 칸</h3></div><span class="badge badge-verified">Hades 실제 맵</span></div>' +
+      '<figure class="map-figure"><figcaption>' + esc(map.name) + ' · ' + image["칸"][0] + '×' + image["칸"][1] +
+      '칸 · 노란 점 ' + image["표시"].length + '개</figcaption><div class="map-canvas"><img src="' +
+      esc(image["그림"]) + '" alt="' + esc(map.name) + ' 바닥 지형" loading="eager">' + pins + '</div>' +
+      '<p class="map-hint">노란 점을 누르거나 키보드로 선택하면 도착지가 보입니다. 바닥 지형만 표시하며 건물·상점 오브젝트는 아직 포함하지 않습니다.</p></figure></section>';
   }
 
-  function select(key) {
-    var e = entries.filter(function (x) { return x.key === key; })[0];
-    if (!e) return;
-    Array.prototype.forEach.call(listEl.querySelectorAll(".world-item"), function (b) {
-      b.classList.toggle("is-active", b.getAttribute("data-key") === key);
-    });
+  function renderDetail() {
+    var map = model.byId[state.selectedId];
+    if (!map) return;
+    var links = model.connections(map.id);
+    var status = model.status(map.id);
+    var copy = statusCopy[status];
+    var clusterIndex = model.clusterById[map.id];
+    var cluster = clusterIndex == null ? null : model.clusters[clusterIndex];
+    detailEl.innerHTML = '<header class="world-map-heading"><div><p class="eyebrow">Selected map</p><h2>' +
+      esc(map.name) + '</h2><p class="world-meta">맵 #' + esc(map.id) + ' · ' + map.width + '×' + map.height +
+      (cluster ? ' · ' + esc(regionLabel(cluster)) : ' · 연결 구역 없음') + '</p></div><span class="world-status is-' +
+      status + '">' + copy[0] + '</span></header>' +
+      '<p class="world-status-help">' + copy[1] + '</p>' +
+      '<section class="world-route-section" aria-labelledby="world-route-title"><div class="world-terrain-heading"><div>' +
+      '<p class="eyebrow">Warp directions</p><h3 id="world-route-title">현재 맵 기준 워프 구조도</h3></div>' +
+      '<div class="world-legend"><span><i class="is-round"></i>왕복</span><span><i></i>편도</span></div></div>' +
+      '<div class="world-route-flow"><div class="world-route-column"><h4>들어오는 맵 <b>' + links.incoming.length +
+      '</b></h4>' + routeButtons(links.incoming, "incoming") + '</div><div class="world-current-map"><small>현재 위치</small>' +
+      '<strong>' + esc(map.name) + '</strong><span>#' + esc(map.id) + '</span></div><div class="world-route-column"><h4>나가는 맵 <b>' +
+      links.outgoing.length + '</b></h4>' + routeButtons(links.outgoing, "outgoing") + '</div></div></section>' + renderPicture(map);
+  }
 
-    if (e.lone) {
-      var id = e.ids[0], m = maps[id];
-      detailEl.innerHTML = '<h2>' + m["이름"] + "</h2>" +
-        '<p class="world-meta">' + m["가로"] + "×" + m["세로"] + " · 번호 " + id + "</p>" +
-        '<p class="world-warn">이 맵으로 들어오거나 나가는 워프가 <strong>없다.</strong> ' +
-        "맵은 실렸지만 걸어서 갈 수 없다.</p>";
+  function selectMap(id, updateList) {
+    id = String(id);
+    if (!model.byId[id]) return;
+    state.selectedId = id;
+    renderRegions();
+    renderDetail();
+    if (updateList !== false) renderList(false);
+  }
+
+  function setFilter(filter, selectFirst) {
+    state.filter = filter;
+    Array.prototype.forEach.call(filtersEl.querySelectorAll("[data-world-filter]"), function (button) {
+      button.setAttribute("aria-pressed", String(button.getAttribute("data-world-filter") === filter));
+    });
+    renderRegions();
+    renderList(selectFirst);
+  }
+
+  regionsEl.addEventListener("click", function (event) {
+    var button = event.target.closest("button");
+    if (!button) return;
+    if (button.hasAttribute("data-filter-region")) {
+      state.query = ""; searchEl.value = ""; setFilter("isolated", true); return;
+    }
+    var cluster = model.clusters[Number(button.getAttribute("data-region"))];
+    if (!cluster) return;
+    state.query = ""; searchEl.value = ""; setFilter("connected", false);
+    selectMap(representative(cluster), true);
+  });
+
+  listEl.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-map-id]");
+    if (button) selectMap(button.getAttribute("data-map-id"), true);
+  });
+  detailEl.addEventListener("click", function (event) {
+    var route = event.target.closest("[data-map-id]");
+    if (route) {
+      state.query = ""; searchEl.value = ""; setFilter(model.status(route.getAttribute("data-map-id")) === "isolated" ? "isolated" : "connected", false);
+      selectMap(route.getAttribute("data-map-id"), true);
+      detailEl.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
-
-    var rows = tree(e.ids[0], e.ids);
-    detailEl.innerHTML = "<h2>" + e.label + "</h2>" +
-      '<p class="world-meta">맵 ' + e.ids.length + "개 · " +
-      DATA["간선"].filter(function (g) { return e.ids.indexOf(g[0]) >= 0; })
-        .reduce(function (a, g) { return a + g[2]; }, 0) + "줄의 워프</p>" +
-      picture(e.ids) +
-      '<ol class="world-tree">' + rows.map(function (r) {
-        var m = maps[r.id];
-        var links = r.links.map(function (l) {
-          return '<span class="world-link">→ ' + name(l.to) + (l.n > 1 ? " ×" + l.n : "") + "</span>";
-        }).join("");
-        return '<li style="--depth:' + r.depth + '">' +
-          '<b>' + m["이름"] + "</b>" +
-          '<em>' + m["가로"] + "×" + m["세로"] + "</em>" +
-          (r.orphan ? '<span class="world-oneway">들어오기만 한다</span>' : "") +
-          (links ? '<div class="world-links">' + links + "</div>" : "") + "</li>";
-      }).join("") + "</ol>";
-  }
-
-  listEl.addEventListener("click", function (ev) {
-    var b = ev.target.closest ? ev.target.closest(".world-item") : null;
-    if (b) select(b.getAttribute("data-key"));
+    var pin = event.target.closest("[data-map-pin]");
+    if (pin) pin.classList.toggle("is-open");
   });
-  if (searchEl) {
-    searchEl.addEventListener("input", function () { renderList(searchEl.value); });
-  }
+  searchEl.addEventListener("input", function () {
+    state.query = searchEl.value;
+    renderList(Boolean(state.query.trim()));
+  });
+  filtersEl.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-world-filter]");
+    if (button) setFilter(button.getAttribute("data-world-filter"), true);
+  });
 
-  summary();
-  renderList("");
+  renderSummary();
+  var preferred = model.maps.filter(function (map) { return map.name === "포테의숲1존"; })[0];
+  state.selectedId = preferred ? preferred.id : representative(model.clusters[0]);
+  renderRegions();
+  renderList(false);
+  renderDetail();
 })();

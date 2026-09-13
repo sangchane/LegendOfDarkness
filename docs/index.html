@@ -132,40 +132,69 @@
         <div class="page-heading">
           <div>
             <p class="eyebrow">World connectivity</p>
-            <h1 id="world-title">워프가 맵을 어떻게 잇는가</h1>
-            <p>서버에 실제로 들어간 <code>areas/</code> 와 <code>templates/warps/</code> 를 그대로 읽어 그렸습니다. 개수가 맞는 것과 갈 수 있는 것은 다릅니다 — 여기서는 <strong>눈으로</strong> 봅니다.</p>
+            <h1 id="world-title">Hades 포테의숲 실제 맵·워프</h1>
+            <p>Hades의 실제 맵 이미지를 먼저 보여주고, 이미지 위 워프 좌표와 다른 맵으로 이어지는 관계를 같은 화면에서 확인합니다. 없는 연결은 추측하지 않습니다.</p>
           </div>
           <a class="quiet-link" href="../plans/server-pack-content-port.md">이식 계획 →</a>
         </div>
+        <div id="porte-forest-focus" class="forest-focus" aria-live="polite"></div>
+        <details class="world-draft">
+          <summary>전체 월드 탐색기 초안 보기</summary>
+          <div class="world-draft-body">
+        <ol class="world-reading" aria-label="지도 읽는 순서">
+          <li><span>1</span><div><strong>연결 구역</strong><small>서로 오갈 수 있는 맵 묶음</small></div></li>
+          <li><span>2</span><div><strong>현재 맵</strong><small>가운데에서 출발점을 확인</small></div></li>
+          <li><span>3</span><div><strong>워프 방향</strong><small>들어오는 길과 나가는 길을 구분</small></div></li>
+        </ol>
         <div id="world-summary" class="world-summary"></div>
+        <section class="world-regions-panel" aria-labelledby="world-regions-title">
+          <div class="world-section-heading">
+            <div><p class="eyebrow">Connected regions</p><h2 id="world-regions-title">연결 구역 구조도</h2></div>
+            <p>각 구역은 다른 구역과 끊겨 있습니다. 구역을 누르면 대표 맵부터 살펴봅니다.</p>
+          </div>
+          <div id="world-regions" class="world-regions" role="group" aria-label="연결 구역 선택"></div>
+        </section>
+        <div class="world-controls">
+          <div class="world-search-field">
+            <label class="world-search-label" for="world-search">맵 이름 또는 번호로 찾기</label>
+            <input id="world-search" type="search" placeholder="예: 밀레스마을, 20287" autocomplete="off">
+          </div>
+          <div id="world-filters" class="world-filters" aria-label="맵 표시 범위">
+            <button type="button" data-world-filter="connected" aria-pressed="true">연결된 맵</button>
+            <button type="button" data-world-filter="image" aria-pressed="false">지형 그림 있음</button>
+            <button type="button" data-world-filter="isolated" aria-pressed="false">미연결 맵</button>
+            <button type="button" data-world-filter="all" aria-pressed="false">전체</button>
+          </div>
+        </div>
         <div class="world-body">
-          <aside class="world-side">
-            <label class="world-search-label" for="world-search">맵 찾기</label>
-            <input id="world-search" type="search" placeholder="예: 밀레스마을" autocomplete="off">
-            <div id="world-list" class="world-list" role="listbox" aria-label="맵 덩어리"></div>
-          </aside>
           <article class="panel world-panel">
             <div id="world-detail" class="world-detail" aria-live="polite"></div>
           </article>
+          <aside class="world-side" aria-labelledby="world-results-title">
+            <div class="world-results-heading"><h2 id="world-results-title">맵 목록</h2><span id="world-result-count"></span></div>
+            <div id="world-list" class="world-list" role="group" aria-label="검색된 맵 선택"></div>
+          </aside>
         </div>
+          </div>
+        </details>
       </section>
       <section class="view" data-view="abilities" aria-labelledby="abilities-title" hidden>
         <div class="page-heading">
           <div>
             <p class="eyebrow">Skills and spells</p>
             <h1 id="abilities-title">무엇을 배워야 무엇이 열리나</h1>
-            <p>원작 표(<code>metafile/SClass1~5</code>) 613개를 직업별로, 배우는 차례대로 늘어놓았습니다. 팩(5.99)의 82·71 은 운영자가 손댄 사본이라 쓰지 않습니다 — <strong>구조는 원작, 한글 이름은 사람이 채웁니다</strong>.</p>
+            <p>Hades 표(<code>metafile/SClass1~5</code>) 613개를 직업별·선행 사슬 순서로 정렬했습니다. 한글 이름은 <strong>5.99와 혼든이 같은 갈래·아이콘에서 완전히 일치할 때만</strong> 자동 표기하며, 틀린 이름은 입력칸에서 바로 고쳐 내보낼 수 있습니다.</p>
           </div>
           <a class="quiet-link" href="../data/기술마법-한글이름.tsv">이름표 →</a>
         </div>
         <div id="ability-summary" class="world-summary"></div>
-        <div class="world-body">
-          <aside class="world-side">
+        <div class="world-body ability-workspace">
+          <aside class="world-side ability-groups">
             <label class="world-search-label" for="ability-search">기술·마법 찾기</label>
             <input id="ability-search" type="search" placeholder="예: Assail" autocomplete="off">
             <div id="ability-list" class="world-list" role="listbox" aria-label="직업별 묶음"></div>
           </aside>
-          <article class="panel world-panel"><div id="ability-detail" aria-live="polite"></div></article>
+          <article class="panel world-panel ability-panel"><div id="ability-detail" aria-live="polite"></div></article>
         </div>
       </section>
       <section class="view" data-view="knowledge" aria-labelledby="knowledge-title" hidden>
@@ -222,6 +251,6 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="dashboard.js"></script><script src="world-map.js"></script><script src="abilities.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="porte-forest.js"></script><script src="world-map.js"></script><script src="abilities.js"></script>
 </body>
 </html>

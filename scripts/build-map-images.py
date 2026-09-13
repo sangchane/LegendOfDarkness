@@ -10,17 +10,22 @@
   가운데는 거기에 (+28, +13).
 
   쓰는 법: python3 scripts/build-map-images.py 마인마을 [더 그릴 맵 이름...]
+
+맵·타일과 워프는 Hades 서버 저장소를 우선한다. 맵마다 Hades 출발 좌표가 하나도 없을 때만
+5.99와 혼든 서버팩의 출발·도착 좌표가 모두 같은 워프를 ``참고표시``로 넣는다.
 """
-import json, subprocess, sys, collections
+import json, subprocess, sys, collections, shutil, struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PACK = "5.99-server"
-EXTRACTED = ROOT / "data" / "server-packs" / "extracted" / PACK
-MAPSRC = ROOT / "data" / "map-source" / PACK
-SEO = Path.home() / "Downloads" / "5.99 클라이언트" / "seo.dat"
+SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
+SEO = SERVER.parent / "archives" / "seo" / "seo.dat"
 OUTDIR = ROOT / "docs" / "map-images"
 DATA = ROOT / "docs" / "map-images-data.js"
+PACK_WARPS = {
+    "5.99-server": ROOT / "data" / "server-packs" / "extracted" / "5.99-server" / "warps.json",
+    "honden-community": ROOT / "data" / "server-packs" / "extracted" / "honden-community" / "warps.json",
+}
 
 HALF_W, HALF_H = 28, 13
 SCALE = 4                      # 5600px 는 브라우저에 너무 크다. 1/4 로 줄여 쓴다.
@@ -31,29 +36,139 @@ def pixel(col, row, rows):
     return (rows * HALF_W + (col - row) * HALF_W, (col + row) * HALF_H + HALF_H)
 
 
+def agreed_pack_warps():
+    """두 서버팩의 출발/도착 맵과 좌표가 전부 같은 워프만 fallback 후보로 돌려준다."""
+    per_pack = {}
+    for pack, path in PACK_WARPS.items():
+        if not path.exists():
+            return []
+        packed = {}
+        for row in json.loads(path.read_text(encoding="utf-8-sig")):
+            try:
+                key = (
+                    str(row["출발맵"]).strip(), int(row["출발"][0]), int(row["출발"][1]),
+                    str(row["도착맵"]).strip(), int(row["도착"][0]), int(row["도착"][1]),
+                )
+            except (KeyError, IndexError, TypeError, ValueError):
+                continue
+            packed[key] = str(row.get("출처") or path.name)
+        per_pack[pack] = packed
+
+    five, honden = per_pack["5.99-server"], per_pack["honden-community"]
+    return [
+        {"from": key[0], "x": key[1], "y": key[2], "to": key[3],
+         "to_x": key[4], "to_y": key[5],
+         "sources": {"5.99-server": five[key], "honden-community": honden[key]}}
+        for key in sorted(set(five) & set(honden))
+    ]
+
+
+def archive_entries(path):
+    """Hades Archive.UnpackArchive와 같은 17바이트 목차를 읽는다."""
+    raw = path.read_bytes()
+    count = struct.unpack_from("<I", raw, 0)[0]
+    entries = {}
+    for index in range(count - 1):
+        offset = 4 + index * 17
+        start = struct.unpack_from("<I", raw, offset)[0]
+        name = raw[offset + 4:offset + 17].split(b"\0", 1)[0].decode("ascii")
+        end = struct.unpack_from("<I", raw, offset + 17)[0]
+        entries[name] = raw[start:end]
+    return entries
+
+
+def render_map_without_dotnet(archive, map_path, columns, rows, output):
+    """dotnet이 없는 환경에서 tools/dat-extract RenderMap과 같은 결과를 만든다."""
+    from PIL import Image
+
+    entries = archive_entries(archive)
+    tile_data = entries["TILEA.BMP"]
+    tiles = [tile_data[i:i + 1512] for i in range(0, len(tile_data), 1512)]
+    palette_names = sorted(name for name in entries if name.lower().startswith("mpt") and name.lower().endswith(".pal"))
+    palettes = [entries[name] for name in palette_names]
+    tables = []
+    for name, data in entries.items():
+        stem = Path(name).stem
+        if not (name.lower().startswith("mpt") and name.lower().endswith(".tbl")):
+            continue
+        if stem[3:].isdigit() or "ani" in stem.lower():
+            continue
+        for line in data.decode("ascii").splitlines():
+            parts = line.split()
+            if len(parts) == 3:
+                tables.append(tuple(map(int, parts)))
+            elif len(parts) == 2:
+                minimum, palette = map(int, parts)
+                tables.append((minimum - 1, minimum, palette))
+
+    def palette_for(index):
+        chosen = 0
+        for minimum, maximum, palette in tables:
+            if minimum <= index <= maximum:
+                chosen = palette
+        return palettes[max(0, min(chosen, len(palettes) - 1))]
+
+    width = (columns + rows) * HALF_W
+    height = ((columns + rows) * HALF_H) + 27
+    canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    cells = map_path.read_bytes()
+    tile_cache = {}
+    for row in range(rows):
+        for column in range(columns):
+            offset = (row * columns + column) * 6
+            if offset + 2 > len(cells):
+                continue
+            floor = struct.unpack_from("<H", cells, offset)[0]
+            if floor <= 0 or floor > len(tiles):
+                continue
+            index = floor - 1
+            if index not in tile_cache:
+                palette = palette_for(index)
+                rgba = bytearray()
+                for code in tiles[index]:
+                    if code == 0:
+                        rgba.extend((0, 0, 0, 0))
+                    else:
+                        rgba.extend((palette[code * 3], palette[code * 3 + 1], palette[code * 3 + 2], 255))
+                tile_cache[index] = Image.frombytes("RGBA", (56, 27), bytes(rgba))
+            x = rows * HALF_W + (column - row) * HALF_W - HALF_W
+            y = (column + row) * HALF_H
+            canvas.alpha_composite(tile_cache[index], (x, y))
+    canvas.save(output)
+
+
 def main(names):
     from PIL import Image
 
-    maps = json.loads((EXTRACTED / "maps.json").read_text(encoding="utf-8"))
-    warps = json.loads((EXTRACTED / "warps.json").read_text(encoding="utf-8"))
+    maps = {}
+    for path in (SERVER / "areas").glob("*.json"):
+        area = json.loads(path.read_text(encoding="utf-8-sig"))
+        maps[area["Name"]] = area
+    warps = []
+    for path in (SERVER / "templates" / "warps").glob("*.json"):
+        warps.append(json.loads(path.read_text(encoding="utf-8-sig")))
+    names_by_id = {area["Id"]: area["Name"] for area in maps.values()}
+    reference_rows = agreed_pack_warps()
     OUTDIR.mkdir(parents=True, exist_ok=True)
 
     out = {}
     for name in names:
-        hit = [m for m in maps if m["이름"] == name]
-        if not hit:
-            print(f"  {name}: maps.json 에 없다"); continue
-        f = hit[0]["fields"]
-        cols, rows = int(f["너비"]), int(f["높이"])
-        src = MAPSRC / f["맵파일"]
+        area = maps.get(name)
+        if not area:
+            print(f"  {name}: Hades areas/ 에 없다"); continue
+        cols, rows = int(area["Cols"]), int(area["Rows"])
+        src = SERVER / "maps" / Path(area["FilePath"]).name
         if not src.exists():
-            print(f"  {name}: 맵 파일이 없다 {f['맵파일']}"); continue
+            print(f"  {name}: Hades 맵 파일이 없다 {src.name}"); continue
 
         big = OUTDIR / f"{name}.full.png"
-        subprocess.run(
-            ["dotnet", "run", "--project", str(ROOT / "tools/dat-extract"), "-c", "Release", "--",
-             "map", str(SEO), str(src), str(cols), str(rows), str(big)],
-            check=True, capture_output=True, cwd=ROOT)
+        if shutil.which("dotnet"):
+            subprocess.run(
+                ["dotnet", "run", "--project", str(ROOT / "tools/dat-extract"), "-c", "Release", "--",
+                 "map", str(SEO), str(src), str(cols), str(rows), str(big)],
+                check=True, capture_output=True, cwd=ROOT)
+        else:
+            render_map_without_dotnet(SEO, src, cols, rows, big)
 
         im = Image.open(big)
         small = im.resize((im.width // SCALE, im.height // SCALE), Image.LANCZOS)
@@ -64,11 +179,14 @@ def main(names):
         # 같은 곳으로 가는 칸이 여럿인 것은 흔하다(문이 두 칸 넓이다).
         marks = collections.defaultdict(list)
         for w in warps:
-            if w["출발맵"] != name:
+            if w["ActivationMapId"] != area["Id"]:
                 continue
-            cx, cy = int(w["출발"][0]), int(w["출발"][1])
-            px, py = pixel(cx, cy, rows)
-            marks[(cx, cy)].append(w["도착맵"])
+            destination = names_by_id.get(w["To"]["AreaID"], "맵 #" + str(w["To"]["AreaID"]))
+            for activation in w.get("Activations", []):
+                if activation.get("AreaID") != area["Id"]:
+                    continue
+                cx, cy = int(activation["Location"]["X"]), int(activation["Location"]["Y"])
+                marks[(cx, cy)].append(destination)
 
         out[name] = {
             "그림": f"map-images/{name}.png",
@@ -84,7 +202,30 @@ def main(names):
             ],
         }
         n_to = len({d for v in marks.values() for d in v})
-        print(f"  {name}: {small.width}x{small.height} · 워프 칸 {len(marks)}개 → {n_to}곳 · "
+        reference_marks = collections.defaultdict(list)
+        if not marks:
+            for row in reference_rows:
+                if row["from"] != name:
+                    continue
+                reference_marks[(row["x"], row["y"])].append(row)
+
+        out[name]["참고표시"] = [
+            {"칸": [cx, cy],
+             "x": round(pixel(cx, cy, rows)[0] / SCALE, 1),
+             "y": round(pixel(cx, cy, rows)[1] / SCALE, 1),
+             "도착": sorted({entry["to"] for entry in entries}),
+             "도착칸": sorted({f'{entry["to_x"]},{entry["to_y"]}' for entry in entries}),
+             "근거": [entry["sources"] for entry in entries]}
+            for (cx, cy), entries in sorted(reference_marks.items())
+        ]
+        out[name]["참고출처"] = "5.99-server + honden-community 완전 일치"
+        out[name]["워프출처"] = (
+            "Hades templates/warps" if marks else
+            "서버팩 2개 일치" if reference_marks else
+            "없음"
+        )
+        print(f"  {name}: Hades · {small.width}x{small.height} · 워프 칸 {len(marks)}개 → {n_to}곳 · "
+              f"서버팩 합의 칸 {len(reference_marks)}개 · "
               f"{(OUTDIR / (name + '.png')).stat().st_size // 1024} KB")
 
     DATA.write_text("window.MAP_IMAGES = " + json.dumps(out, ensure_ascii=False) + ";\n", encoding="utf-8")

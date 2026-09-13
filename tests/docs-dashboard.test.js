@@ -6,6 +6,13 @@ const test = require('node:test');
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
 
+const readBrowserGlobal = (relativePath, globalName) => {
+  const vm = require('node:vm');
+  const context = { window: {} };
+  vm.runInNewContext(read(relativePath), context);
+  return context.window[globalName];
+};
+
 test('dashboard exposes one in-page application shell for every primary workspace', () => {
   const html = read('docs/index.html');
 
@@ -125,6 +132,8 @@ test('knowledge board covers game content and live-operation concerns', () => {
 test('ability workspace uses the original gui06 palette and complete icon sheets', () => {
   const html = read('docs/index.html');
   const script = read('docs/abilities.js');
+  const css = read('docs/dashboard.css');
+  const data = readBrowserGlobal('docs/abilities-data.js', 'ABILITY_DATA');
   const pngSize = (relativePath) => {
     const png = fs.readFileSync(path.join(root, relativePath));
     assert.equal(png.subarray(1, 4).toString('ascii'), 'PNG');
@@ -133,11 +142,101 @@ test('ability workspace uses the original gui06 palette and complete icon sheets
 
   assert.match(html, /data-view-target="abilities"/);
   assert.match(html, /data-view="abilities"/);
+  assert.match(html, /class="world-body ability-workspace"/);
+  assert.match(css, /\.ability-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(220px,260px\)\s+minmax\(0,1fr\)/s);
+  assert.match(css, /\.ability-tree\s*\{[^}]*overflow-y:\s*auto/s);
+  assert.match(css, /\.ability-panel\s*\{[^}]*overflow:\s*hidden/s);
   assert.match(script, /setoa\.dat/);
   assert.match(script, /gui06\.pal/);
+  assert.match(html, /5\.99와 혼든/);
+  assert.match(script, /브라우저 수정/);
+  assert.equal(data['요약']['전체'], 613);
+  assert.equal(data['요약']['자동확정'], 29);
+  assert.equal(data['요약']['사용자수정'], 12);
+  const abilities = data['묶음'].flatMap((group) => group['목록']);
+  const aoDall = abilities.find((ability) => ability['이름'] === 'ao dall');
+  const crasher = abilities.find((ability) => ability['이름'] === 'Crasher');
+  assert.equal(aoDall['한글'], '일루메나');
+  assert.equal(aoDall['이름출처'], '서버팩 2개 일치');
+  assert.equal(crasher['이름출처'], '사용자 수정');
+  for (const group of data['묶음']) {
+    const position = new Map(group['목록'].map((ability, index) => [ability['이름'], index]));
+    for (const ability of group['목록']) {
+      if (position.has(ability['선행'])) {
+        assert.ok(position.get(ability['선행']) < position.get(ability['이름']),
+          `${group['직업']} ${group['갈래']}: ${ability['선행']} must precede ${ability['이름']}`);
+      }
+    }
+  }
   assert.doesNotMatch(script, /item007\.pal|색표는 짐작/);
   assert.deepEqual(pngSize('docs/ability-icons/skill.png'), [560, 280]);
   assert.deepEqual(pngSize('docs/ability-icons/spell.png'), [560, 595]);
+});
+
+test('world map separates regions, exact map search, and directional warps', () => {
+  const html = read('docs/index.html');
+  const data = readBrowserGlobal('docs/world-map-data.js', 'WORLD_MAP_DATA');
+  const world = require('../docs/world-map-model.js').create(data);
+
+  assert.match(html, /id="world-regions"/);
+  assert.match(html, /data-world-filter="isolated"/);
+  assert.match(html, /들어오는 길과 나가는 길/);
+  assert.equal(world.clusters.length, data['요약']['덩어리']);
+  assert.equal(world.search('죽음의마을1')[0].name, '죽음의마을1');
+
+  const deathVillage = world.maps.find((map) => map.name === '죽음의마을1');
+  const links = world.connections(deathVillage.id);
+  assert.ok(links.incoming.length > 0);
+  assert.ok(links.outgoing.length > 0);
+  assert.equal(world.status(deathVillage.id), 'both');
+});
+
+test('world map pins are touch and keyboard operable and data sources are labelled', () => {
+  const script = read('docs/world-map.js');
+
+  assert.match(script, /<button type="button" class="map-pin"/);
+  assert.match(script, /data-map-pin/);
+  assert.match(script, /Hades 서버/);
+  assert.match(script, /Hades 실제 맵/);
+  assert.doesNotMatch(script, /5\.99 팩 추출본/);
+  assert.doesNotMatch(script, /들어오기만 한다/);
+});
+
+test('world map opens with one Hades Porte Forest artifact before the full draft', () => {
+  const html = read('docs/index.html');
+  const forest = read('docs/porte-forest.js');
+  const images = readBrowserGlobal('docs/map-images-data.js', 'MAP_IMAGES');
+  const builder = read('scripts/build-map-images.py');
+
+  assert.match(html, /id="porte-forest-focus"/);
+  assert.match(html, /<details class="world-draft">/);
+  assert.match(html, /Hades 포테의숲 실제 맵·워프/);
+  assert.match(forest, /기준 · Hades/);
+  assert.match(forest, /Hades → 서버팩 2개 합의/);
+  assert.match(forest, /if \(hades\.length\)/);
+  assert.match(forest, /map-pin-reference/);
+  assert.match(forest, /map-pin-hades/);
+  assert.doesNotMatch(forest, /3갈래/);
+  assert.equal(Object.keys(images).filter((name) => name.startsWith('포테의숲')).length, 7);
+  assert.ok(Object.values(images).every((image) => image['표시'].length === 0));
+  assert.equal(images['포테의숲1존']['참고표시'].length, 0);
+  assert.equal(images['포테의숲1존']['워프출처'], '없음');
+  assert.equal(images['포테의숲4존']['참고표시'].length, 0);
+  assert.equal(images['포테의숲보스존']['참고표시'].length, 0);
+  assert.equal(images['포테의숲보스존']['워프출처'], '없음');
+  assert.equal(
+    Object.values(images).reduce((sum, image) => sum + image['참고표시'].length, 0),
+    0,
+  );
+  assert.match(builder, /database.+server/);
+  assert.match(builder, /archives.+seo/);
+  assert.match(builder, /if not marks/);
+  assert.match(builder, /Hades templates\/warps/);
+  assert.match(builder, /agreed_pack_warps/);
+  assert.match(builder, /5\.99-server/);
+  assert.match(builder, /honden-community/);
+  assert.match(builder, /set\(five\) & set\(honden\)/);
+  assert.doesNotMatch(builder, /Downloads/);
 });
 
 test('operations workspace links every runbook and separates documented standards from implementation', () => {
