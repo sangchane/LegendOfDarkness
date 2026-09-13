@@ -8,12 +8,20 @@
 **Hades 는 규칙이 있고 내용이 없다. 서버팩은 내용이 있고 규칙이 남의 것이다.**
 그래서 이식은 "시스템을 만드는 일"이 아니라 **"도는 시스템에 자료를 붓는 일"** 이다.
 
-## 판단 절차 — 이것부터
+## 자료 출처 우선순위 — 이것부터
 
-1. **Hades 에 답이 있으면 Hades 다.** 팩 자료로 **덮지 않는다.** 자료 파일이든, 식이든, 기본값이든.
-2. **Hades 에 없을 때만** 팩을 본다.
-3. **그때도 팩 2개(5.99 · 혼든)가 일치할 때만 후보다.** 불일치하면 **버린다** —
-   사람에게 물어 고르는 것이 아니다.
+위에서부터 찾고, **있으면 아래를 보지 않는다.** 위쪽을 팩으로 **덮지 않는다.**
+
+| | 어디 | 무엇이 있나 |
+|---|---|---|
+| 1 | **Hades 자기 자료** | `database/server/` · `database/assets/MetaFiles/` · `database/server/metafile/`(+`more`·`backup`) |
+| 2 | **원작 아카이브** | `ItemInfo0~11` 아이템 **6,199** · `SClass1~5` 기술·마법 613 · `SEvent1~7` 퀘스트 38 · `NPCIllust` 170 · `.dat` 11개(표 503) |
+| 3 | **참고 저장소 16개** | 원작을 관찰해 사람이 적은 것. `ETDA/BotCore/Shared/Collections.cs` 에 기술·마법의 직업·요구레벨(`Kelberoth Strike` = Monk 23), `SleepHunter4/data/Skills.xml`·`Spells.xml`·`Staves.xml` |
+| 4 | **서버팩** | **2개가 일치할 때만** 후보. 불일치하면 **버린다** — 사람에게 묻지 않는다 |
+
+3번을 빼먹어서 "자료에 없다" 고 단정한 적이 있다. 원작 `SClass` 에서 `0/0/0` 으로 비어 있던
+12개 중 `Kelberoth Strike`(23) · `Kelberoth Stance`(30) · `Dark Spear`(7) 의 레벨이 `ETDA` 에 있다.
+`docs/where-the-answers-are.md` 가 그 저장소들을 위해 있는 문서다.
 
 1번이 가장 자주 어겨진다. 괴물 체력·공격력·방어력·경험치는 Hades 가 이미 답을 갖고 있다
 (`Creations/monsters.cs` 가 레벨에서 만든다). 그것을 5.99 값으로 덮었던 것을 되돌렸다 —

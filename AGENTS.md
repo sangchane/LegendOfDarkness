@@ -46,7 +46,12 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 ## 규약
 - 각 작업과 주요 단계 시작 시 `$adaptive-model-router`가 사용자 요청·`NEXT.md` 현재 블록·관련 변경 파일·실패 이력을 보고 모델과 추론 강도를 정한다. 전환 기능이 있으면 확인 없이 바꾸고, 같은 파일을 고치는 작업은 동시에 분산하지 않는다.
 - **자료가 어디서 오나 (갈래별 셈): `python3 scripts/build-truth-vault.py` → `data/truth-vault/`** (Obsidian). **`database/assets/MetaFiles/` 를 먼저 본다** — 아이템 2,110·기술마법 613·퀘스트 38 이 거기서 나온다. 손으로 적은 표는 틀렸었다
-- **자료 판단 절차**: ① Hades 에 답이 있으면 Hades 다(팩으로 **덮지 않는다** — 파일·식·기본값 전부) ② 없을 때만 팩을 본다 ③ 그때도 팩 2개가 **일치할 때만** 후보이고 불일치하면 버린다. 자세히: `docs/what-hades-already-has.md`
+- **자료 출처 우선순위** (위에서부터 찾고, 있으면 아래를 보지 않는다):
+  1. **Hades 자기 자료** — `database/server/` · `database/assets/MetaFiles/` · `database/server/metafile/`(+`more`)
+  2. **원작 아카이브** — `ItemInfo0~11`(아이템 6,199) · `SClass1~5`(기술·마법 613) · `SEvent1~7`(퀘스트 38) · `.dat` 11개
+  3. **참고 저장소 16개** — 원작을 관찰해 사람이 적은 것. `ETDA/BotCore/Shared/Collections.cs` 에 기술·마법의 직업·요구레벨이, `SleepHunter4/data/*.xml` 에 같은 성격의 표가 있다 (`docs/where-the-answers-are.md`)
+  4. **서버팩** — **2개(5.99 · 혼든)가 일치할 때만** 후보. 불일치하면 **버린다**(사람에게 묻지 않는다)
+  위쪽을 팩으로 **덮지 않는다.** 갈래별 셈: `python3 scripts/build-truth-vault.py`
 - `sources/` 아래는 외부 원본 submodule. 직접 push 금지. 수정이 필요하면 fork 뒤 submodule 포인터만 갱신한다 (`WORKFLOW.md`).
 - 저장소 전체 읽기 스윕 금지. 구조는 분석서로 파악하고, 코드는 작업에 필요한 파일만 연다.
 - 원본에 비밀값이 들어 있다(경로만 기록): `sources/wren11/da/credentials.conf`, `sources/FallenDev/Decipher` 안의 Sentry DSN. 복사·재사용·커밋 금지.

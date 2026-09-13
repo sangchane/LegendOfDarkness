@@ -7,10 +7,11 @@
 
 그래서 글로 적지 않고 **센다.**
 
-판단 절차(AGENTS.md 규약과 같다):
-  1. 하데스에 데이터가 있으면 하데스다. 팩으로 **덮지 않는다**.
-  2. 없을 때만 팩을 본다.
-  3. 그때도 팩 2개가 **일치할 때만** 후보다. 불일치하면 버린다.
+자료 출처 우선순위(AGENTS.md 규약과 같다). 위에서부터 찾고, 있으면 아래를 보지 않는다:
+  1. 하데스 자기 자료 — database/server · assets/MetaFiles · server/metafile(+more·backup)
+  2. 원작 아카이브 — ItemInfo0~11 · SClass1~5 · SEvent1~7 · NPCIllust · .dat 11개
+  3. 참고 저장소 16개 — 원작을 관찰해 사람이 적은 것(ETDA · SleepHunter4 …)
+  4. 서버팩 — 2개가 **일치할 때만** 후보. 불일치하면 버린다.
 
   쓰는 법: python3 scripts/build-truth-vault.py   → data/truth-vault/
 """
@@ -139,6 +140,38 @@ def main():
     ours = {n for n, g in now_mobs.items() if n not in ("bees", "spider", "minion")}
     mp = pack("mobs")
     mag = agreement(mp, ["체력", "최소공격력", "최대공격력", "방어력", "경험치", "이미지"])
+    # 사냥터별로 팩 2개가 일치하는 수치가 있는지. "그럼 우드랜드·포테의숲 것으로 하자" 는
+    # 물음에 매번 다시 세지 않도록 여기서 답을 만든다.
+    hunt = []
+    area_of = {}
+    for f in sorted((FORK / "database/server/areas").glob("*.json")):
+        try:
+            d = json.loads(f.read_text(encoding="utf-8-sig"))
+            area_of[d["Id"]] = d["Name"]
+        except Exception:
+            pass
+    for keyword in ("우드랜드", "포테의숲", "노비스"):
+        kinds = set()
+        for f in sorted((TPL / "monsters").rglob("*.json")):
+            try:
+                d = json.loads(f.read_text(encoding="utf-8-sig"))
+            except Exception:
+                continue
+            if keyword in area_of.get(d.get("AreaID"), ""):
+                kinds.add(d.get("Name"))
+        ps = list(mp.values())
+        if len(ps) < 2:
+            continue
+        both2 = sorted(k for k in kinds if k in ps[0] and k in ps[1])
+        same = collections.Counter()
+        for k in both2:
+            for fld in ("체력", "최소공격력", "최대공격력", "방어력", "경험치"):
+                x, y = one(ps[0][k].get(fld)), one(ps[1][k].get(fld))
+                same[fld] += x is not None and x == y
+        hunt.append(f"**{keyword}** — 괴물 {len(kinds)}종 · 두 팩에 다 있는 것 {len(both2)}종 · "
+                    + ("칸별 일치 " + " · ".join(f"{k} {v}" for k, v in same.items())
+                       if both2 else "겹치는 것이 없다"))
+
     index.append(note(
         "괴물",
         ["`templates/monsters/insight_1` · `minions` — **3마리**(bees · spider · minion). 그게 전부다",
@@ -151,8 +184,9 @@ def main():
         [f"`templates/monsters/` **{len(now_mobs)}장** (하데스 3 + 우리가 넣은 {len(ours)})",
          "**수치는 비어 있다** — `MaximumHP: 0` 이라 하데스 식이 레벨에서 만든다. "
          "5.99 수치를 넣었다가 되돌렸다(`444b7f5`)"],
-        [f"쪽수 {mag['쪽수']} · 이름 겹침 {mag['겹침']} · 검사한 칸이 **전부 일치 {mag['전부일치']}**",
-         "칸별: " + " · ".join(f"{k} {v}" for k, v in sorted(mag["칸별"].items()))] if mag else [],
+        ([f"쪽수 {mag['쪽수']} · 이름 겹침 {mag['겹침']} · 검사한 칸이 **전부 일치 {mag['전부일치']}**",
+          "칸별: " + " · ".join(f"{k} {v}" for k, v in sorted(mag["칸별"].items())),
+          "", "**사냥터별로 본 것** (쓸 수 있는 수치가 있는지):"] + hunt) if mag else [],
         ("**수치는 후보가 없다.** 하데스에 데이터가 없고(규칙 2번), 팩 2개는 "
          f"이름이 겹치는 {mag['겹침']}마리조차 검사한 칸이 전부 일치하는 것이 {mag['전부일치']}개다(규칙 3번). "
          "그래서 하데스 식이 유일한 근거다. 이름·그림·젠 설정은 5.99 단독이라 교차 검증이 안 된다"
@@ -175,7 +209,12 @@ def main():
         [f"`templates/skills/` {len(sk)}장 · `templates/spells/` {len(sp)}장",
          f"우리가 쓴 표(`원작표`)가 붙은 것 기술 {sum(1 for g in sk.values() if g.startswith('원작표'))} · "
          f"마법 {sum(1 for g in sp.values() if g.startswith('원작표'))}"],
-        ["**안 본다.** 하데스+원작으로 끝난다. 팩은 한글 이름이라 하데스 스크립트(영문)와 붙지도 않는다"],
+        ["**팩은 안 본다.** 하데스+원작으로 끝난다 — 팩은 한글 이름이라 하데스 스크립트(영문)와 "
+         "붙지도 않는다.",
+         "**3번 출처가 있다**: `sources/wren11/ETDA/BotCore/Shared/Collections.cs` 가 기술·마법의 "
+         "직업과 요구레벨을 코드에 갖고 있다 — `Kelberoth Strike` = Monk 23 · `Kelberoth Stance` = "
+         "Monk 30 · `Dark Spear` = Monk 7. 원작 `SClass` 에서 `0/0/0` 으로 비어 있던 12개의 답이 "
+         "거기 있다. `sources/FallenDev/SleepHunter4/data/Skills.xml`·`Spells.xml`·`Staves.xml` 도 같다"],
         "규칙대로다. 베이스가 하데스 스크립트 66개 + 원작 `SClass` 613개이고 팩을 보지 않는다.",
         ["`data/formula-vault/구현/기술·마법이 실제로 도는가` — 몇 개가 실제로 도는지"]))
 
