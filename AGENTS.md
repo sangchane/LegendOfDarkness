@@ -45,6 +45,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 
 ## 규약
 - 각 작업과 주요 단계 시작 시 `$adaptive-model-router`가 사용자 요청·`NEXT.md` 현재 블록·관련 변경 파일·실패 이력을 보고 모델과 추론 강도를 정한다. 전환 기능이 있으면 확인 없이 바꾸고, 같은 파일을 고치는 작업은 동시에 분산하지 않는다.
+- **자료 판단 절차**: ① Hades 에 답이 있으면 Hades 다(팩으로 **덮지 않는다** — 파일·식·기본값 전부) ② 없을 때만 팩을 본다 ③ 그때도 팩 2개가 **일치할 때만** 후보이고 불일치하면 버린다. 자세히: `docs/what-hades-already-has.md`
 - `sources/` 아래는 외부 원본 submodule. 직접 push 금지. 수정이 필요하면 fork 뒤 submodule 포인터만 갱신한다 (`WORKFLOW.md`).
 - 저장소 전체 읽기 스윕 금지. 구조는 분석서로 파악하고, 코드는 작업에 필요한 파일만 연다.
 - 원본에 비밀값이 들어 있다(경로만 기록): `sources/wren11/da/credentials.conf`, `sources/FallenDev/Decipher` 안의 Sentry DSN. 복사·재사용·커밋 금지.
