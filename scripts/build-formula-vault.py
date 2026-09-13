@@ -118,6 +118,22 @@ FINDINGS = [
       "`AssemblyName.GetAssemblyName` 으로 걸러 내는 코드가 이미 있다 — 같은 함정이 전에도 있었다."],
      "tests/hades-characterization/IsolatedHadesServer.cs (RequireCompiledScripts)"),
 
+    ("장비는 방어를 100 에서 -70 까지 내린다 — 그래서 배수가 0.31 까지 떨어진다",
+     "맨몸은 `100 - 수준/3` 이라 1수준이 +100 이고 피해를 2.03배로 받는다. 장비가 그것을 내리는 유일한 "
+     "수단이고, 실을 것은 이미 실려 있다.",
+     [(SRC / "Hades.Server.Base/Types/Item.cs", r"AcModifer\.Value"),
+      (SRC / "Hades.Server.Base/Types/Sprite.cs", r"BonusAc < -70|public int Ac"),
+      (SRC / "Hades.Server.Base/Network/Game/GameClient.cs", r"BonusAc = \(100|ExpLevel < item\.Template\.LevelRequired")],
+     ["아이템의 `AcModifer` 가 `Operator.Remove` 면 걸칠 때 `BonusAc` 를 그만큼 **내린다**. 자리별 최고를 "
+      "다 갖추면 -245 가 되고 `Sprite.Ac` 의 바닥 -70 에 걸린다 → 배수 `(Ac+101)/99` 가 **0.31**. "
+      "맨몸 2.03배와 6.5배 차이다.",
+      "**착용은 조건을 검사한다.** `GameClient.CheckReqs` 가 요구 레벨·직업·성별·내구도를 본다(GM 과 "
+      "Developer 는 통과). 그래서 상위 장비를 끼려면 수준과 직업을 맞춰야 한다 — 1수준 무직이 낄 수 있는 "
+      "것은 착용 가능한 757개 중 293개이고, 그것만으로도 방어가 100 → **7** 까지 내려간다.",
+      "적용 순서가 맞게 되어 있다. 로그인 때 `SetAislingStartupVariables` 가 `BonusAc` 를 먼저 정하고 "
+      "그 **뒤에** `LoadEquipment` 가 장비 보정을 얹는다 — 순서가 반대면 장비가 지워질 것이다."],
+     "(아직 지키는 시험이 없다 — 장비를 갖춘 캐릭터로 재는 시험이 없다)"),
+
     ("새 캐릭터는 가득 차 있지 않다",
      "150 중 60, 200 중 30 으로 깨어난다. 40% 다.",
      [(SRC / "Hades.Server.Base/Types/Aisling.cs", r"CurrentHp = 60|CurrentMp = 30|_MaximumHp = 150|_MaximumMp = 200|_Str = 10|_Dex = 5")],
@@ -199,6 +215,74 @@ def main():
         (VAULT / "식" / f"{BANNED.sub('_', title)}.md").write_text("\n".join(body), encoding="utf-8")
         index.append((title, len(found)))
 
+    # ── 기술·마법이 실제로 도는가 ────────────────────────────────────────
+    # **하데스 먼저, 원작 다음, 팩은 안 본다.** 이 함수는 팩 자료를 읽지 않는다 — 규칙을 글로만
+    # 적어 두면 다음 사람이 또 팩부터 뒤진다.
+    skill_scripts, spell_scripts = set(), set()
+    for f in sorted(SCRIPTS.rglob("*.cs")):
+        t = f.read_text(encoding="utf-8-sig", errors="replace")
+        found = re.findall(r'\[Script\("([^"]+)"', t)
+        if re.search(r":\s*SkillScript\b", t):
+            skill_scripts.update(found)
+        if re.search(r":\s*SpellScript\b", t):
+            spell_scripts.update(found)
+
+    def bound(kind, field):
+        got = empty = 0
+        names = skill_scripts if kind == "skills" else spell_scripts
+        low = {n.lower() for n in names}
+        for f in sorted((FORK / "database/server/templates" / kind).glob("*.json")):
+            v = json.loads(f.read_text(encoding="utf-8-sig")).get(field)
+            if v and v.lower() in low:
+                got += 1
+            else:
+                empty += 1
+        return got, empty
+
+    skills_on, skills_off = bound("skills", "ScriptName")
+    spells_on, spells_off = bound("spells", "ScriptKey")
+
+    orig = json.loads((ROOT / "data/game-data/abilities.json").read_text(encoding="utf-8-sig"))
+    matched = {"skill": 0, "spell": 0}
+    total = {"skill": 0, "spell": 0}
+    for a in orig:
+        k = a["kind"]
+        total[k] = total.get(k, 0) + 1
+        pool = {n.lower() for n in (skill_scripts if k == "skill" else spell_scripts)}
+        if a["name"].lower() in pool:
+            matched[k] += 1
+
+    spare_skill = sorted(s for s in skill_scripts if s.lower() not in {a["name"].lower() for a in orig})
+    spare_spell = sorted(s for s in spell_scripts if s.lower() not in {a["name"].lower() for a in orig})
+
+    (VAULT / "구현").mkdir(parents=True)
+    (VAULT / "구현" / "기술·마법이 실제로 도는가.md").write_text(
+        "---\n이름: \"기술·마법이 실제로 도는가\"\n갈래: 구현\n---\n\n"
+        "# 기술·마법이 실제로 도는가\n\n"
+        "**실린 것과 도는 것은 다르다.** 이름과 아이콘만 있으면 눌러도 아무 일이 없고, 그래도 개수는 맞는다.\n\n"
+        f"| | 실린 것 | 스크립트 붙음 | 빈 껍데기 |\n|---|---|---|---|\n"
+        f"| 기술 | {skills_on + skills_off} | **{skills_on}** | {skills_off} |\n"
+        f"| 마법 | {spells_on + spells_off} | **{spells_on}** | {spells_off} |\n\n"
+        "## 순서 — 하데스 먼저, 원작 다음, 팩은 안 본다\n\n"
+        f"하데스는 기술 스크립트 **{len(skill_scripts)}개** · 마법 스크립트 **{len(spell_scripts)}개** 를 이미 갖고 있다.\n"
+        "이름은 영문이고, `data/game-data/abilities.json` 의 원작 목록도 영문이다 — **같은 체계다.**\n"
+        "(팩은 한글 이름이고 5.99 운영자 사본이다. 팩 이름으로 실으면 이 스크립트들과 안 붙는다.)\n\n"
+        f"| | 원작 목록 | 이름이 그대로 붙는 것 |\n|---|---|---|\n"
+        f"| 기술 | {total.get('skill', 0)} | **{matched['skill']}** |\n"
+        f"| 마법 | {total.get('spell', 0)} | **{matched['spell']}** |\n\n"
+        "## 원작 목록에 없는 하데스 스크립트\n\n"
+        "이름이 안 맞는다고 쓸 수 없는 것이 아니다. **공용 스크립트**가 여기 있다 —\n"
+        "`Generic Elemental Single` 과 `Generic Elemental Mass` 는 속성 공격 마법 전부를 덮을 수 있다.\n"
+        "587개를 하나씩 쓰는 일이 아니라, 이미 있는 것에 **붙이는** 일이다.\n\n"
+        f"- 기술 {len(spare_skill)}개: {', '.join(f'`{n}`' for n in spare_skill)}\n"
+        f"- 마법 {len(spare_spell)}개: {', '.join(f'`{n}`' for n in spare_spell)}\n\n"
+        "## 확인된 것은 둘뿐이다\n\n"
+        "`Assail` 이 식대로 피해를 주는 것과 `beag ioc fein` 이 회복 메시지를 보내는 것.\n"
+        f"붙어 있는 {skills_on + spells_on}개 중 나머지는 눌러 본 적이 없다.\n"
+        "지키는 시험: `tests/hades-characterization/CombatSmokeTests.cs` ·\n"
+        "`tests/hades-characterization/MobileClientProtocolTests.cs`\n",
+        encoding="utf-8")
+
     checked = []
     for title, claim, evidence, notes, pinned in FINDINGS:
         rows = [(w, p, hits(w, p)) for w, p in evidence]
@@ -253,7 +337,10 @@ def main():
           "지키는 시험이 노트마다 적혀 있다.\n\n"
           "| 무엇 | 근거 줄 |\n|---|---|\n"
         + "\n".join(f"| [[확인/{BANNED.sub('_', t)}\\|{t}]] | {n} |" for t, n in checked)
-        + "\n\n[[설정/LoruleConfig|식이 읽는 설정값]]\n\n"
+        + "\n\n## 실린 것과 도는 것은 다르다\n\n"
+          "[[구현/기술·마법이 실제로 도는가|기술·마법이 실제로 도는가]] — 개수는 맞는데 눌러도 아무 일이\n"
+          "없는 것이 대부분이다. **하데스 먼저, 원작 다음, 팩은 안 본다.**\n\n"
+          "[[설정/LoruleConfig|식이 읽는 설정값]]\n\n"
           "`python3 scripts/build-formula-vault.py` 로 다시 만든다.\n",
         encoding="utf-8")
     for t, n in index:
