@@ -224,6 +224,23 @@ dat-extract metafile sources/wren11/Dark-Ages-Private-Server/database/server/met
 뽑는 명령: `dat-extract icon <Legend.dat> <번호들> <출력.png> [배율]`.
 `build-client-assets.ps1` 이 서버의 아이템 템플릿을 읽어 번호마다 한 장씩 `assets/item/<번호>.png` 로 둔다.
 
+## 4.9 기술·마법 아이콘 — `setoa.dat`의 `gui06.pal`
+
+기술·마법 아이콘은 **`setoa.dat` 한 벌 안에서 끝난다.** 그림은 `skill001.epf`·`spell001.epf`,
+색표는 `gui06.pal`이다. `DADataViewer/SkillsForm.cs:66-70`이 기술과 마법 창 모두 이 세 파일을 같은
+`setoa.dat`에서 읽는다. 예전에 `Legend.dat`의 그림을 `item007.pal`로 그린 것은 56개 색표 중 픽셀 차가
+작은 것을 고른 추정이었고, 이 근거를 찾은 뒤 폐기했다.
+
+저장소 안의 아카이브로 다시 만드는 명령:
+
+```powershell
+dat-extract epf sources/wren11/Dark-Ages-Private-Server/database/archives/setoa/setoa.dat skill001 docs/ability-icons/skill.png 16 1 gui06.pal
+dat-extract epf sources/wren11/Dark-Ages-Private-Server/database/archives/setoa/setoa.dat spell001 docs/ability-icons/spell.png 16 1 gui06.pal
+```
+
+이 판본의 기술 그림은 114칸, 마법 그림은 266칸이다. 현재 원작 메타파일에서 쓰는 아이콘 번호 범위는
+기술 0~98, 마법 3~186이라 모두 들어간다. 대시보드는 35×35칸, 한 줄 16칸으로 이 시트를 자른다.
+
 ---
 
 ## 5. 자동으로 막아 주는 것들 (훅)

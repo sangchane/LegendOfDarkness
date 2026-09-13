@@ -84,6 +84,13 @@ public static class LayoutCheck
             100))]
         : [];
 
+    /// <summary>Representative pane entries so layout and screenshots exercise the restored icon sheets.</summary>
+    public static IReadOnlyList<LearnedSkill> PretendSkills { get; } =
+        [new LearnedSkill(1, 1, "Assail")];
+
+    public static IReadOnlyList<LearnedSpell> PretendSpells { get; } =
+        [new LearnedSpell(1, 21, SpellTargetType.ChooseTarget, "beag ioc", "Target", 2)];
+
     /// <summary>
     /// Somebody to stand in the middle of the equipment ring while nothing is connected. The numbers are
     /// wardrobe pieces that have actually been cut — head 1, body 1, boots 1, shield 6 — so the figure that

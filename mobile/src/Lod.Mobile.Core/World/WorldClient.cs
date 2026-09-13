@@ -38,6 +38,12 @@ public sealed class WorldClient(WorldSession session)
     private const byte TalkCommand = 0x0E;
     private const byte UseCommand = 0x1C;
     private const byte DropCommand = 0x08;
+
+    /// <summary>
+    /// Our own numbers coming back. The same number as <see cref="DropCommand" /> — which way it is going
+    /// is the only thing that tells them apart.
+    /// </summary>
+    private const byte VitalsCommand = 0x08;
     private const byte DropGoldCommand = 0x24;
     private const byte TakeFromPackCommand = 0x10;
     private const byte MoveCommand = 0x30;
@@ -62,6 +68,12 @@ public sealed class WorldClient(WorldSession session)
     private const byte InventoryPane = 0x00;
     private const byte WornCommand = 0x37;
     private const byte TookOffCommand = 0x38;
+    private const byte AddSkillCommand = 0x2C;
+    private const byte AddSpellCommand = 0x17;
+    private const byte RemoveSkillCommand = 0x2D;
+    private const byte RemoveSpellCommand = 0x18;
+    private const byte UseSkillCommand = 0x3E;
+    private const byte UseSpellCommand = 0x0F;
 
     private byte _ordinal;
     private byte _step;
@@ -83,11 +95,21 @@ public sealed class WorldClient(WorldSession session)
     /// <summary>무엇을 걸치고 있는지, 걸친 자리 번호를 열쇠로.</summary>
     private readonly ConcurrentDictionary<int, WornItem> _worn = new();
 
+    // Learned abilities arrive one at a time on entry, just like carried and worn items.
+    private readonly ConcurrentDictionary<int, LearnedSkill> _skills = new();
+    private readonly ConcurrentDictionary<int, LearnedSpell> _spells = new();
+
     // Everything on the floor that is not a player, by the same serial the server removes them by.
     private readonly ConcurrentDictionary<uint, Creature> _creatures = new();
 
     // How hurt each of them is, out of a hundred. The server never says more than that about somebody else.
     private readonly ConcurrentDictionary<uint, int> _health = new();
+
+    // Every report in the order it came, because the latest one is not enough to check a blow against a
+    // formula: two blows landing between two reads would leave only the second one's figure behind.
+    private readonly ConcurrentQueue<(uint Serial, int Left)> _hurts = new();
+
+    private volatile Vitals? _vitals;
 
     // Drained by whoever is drawing, because a motion is a moment rather than a state.
     private readonly ConcurrentQueue<uint> _motions = new();
@@ -123,6 +145,18 @@ public sealed class WorldClient(WorldSession session)
     public int? Health(uint serial) => _health.TryGetValue(serial, out int left) ? left : null;
 
     /// <summary>
+    /// Every health report the server has sent, oldest first. One report is one blow landing, so this is
+    /// the record a test needs when the question is how much a single blow took off.
+    /// </summary>
+    public IReadOnlyList<(uint Serial, int Left)> Hurts => [.. _hurts];
+
+    /// <summary>
+    /// Our own character's numbers, or nothing until the server has stated them — which it does once, in
+    /// full, as the character enters, and in pieces after that.
+    /// </summary>
+    public Vitals? Vitals => _vitals;
+
+    /// <summary>
     /// Takes the next figure the server said had moved its body, if any. The server tells everyone nearby
     /// when somebody swings, and this is how that reaches whatever is drawing them.
     /// </summary>
@@ -151,6 +185,12 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>What the character has on, in the order the places are numbered.</summary>
     public IReadOnlyList<WornItem> Worn => [.. _worn.Values.OrderBy(item => item.Slot)];
+
+    /// <summary>Learned techniques, in the pane order the server owns.</summary>
+    public IReadOnlyList<LearnedSkill> Skills => [.. _skills.Values.OrderBy(skill => skill.Slot)];
+
+    /// <summary>Learned spells, in the pane order the server owns.</summary>
+    public IReadOnlyList<LearnedSpell> Spells => [.. _spells.Values.OrderBy(spell => spell.Slot)];
 
     /// <summary>Everyone else the server has shown us, by serial. Our own character is not in here.</summary>
     public IReadOnlyCollection<Character> Others => (IReadOnlyCollection<Character>)_others.Values;
@@ -218,6 +258,10 @@ public sealed class WorldClient(WorldSession session)
                     ReadHealth(HadesCipher.DecodeSecured(frame, session.Parameters));
                     continue;
 
+                case VitalsCommand:
+                    _vitals = ReadVitals(HadesCipher.DecodeSecured(frame, session.Parameters), _vitals);
+                    continue;
+
                 case SpokenCommand:
                 {
                     ReadOnlySpan<byte> spoken = HadesCipher.DecodeSecured(frame, session.Parameters);
@@ -270,6 +314,30 @@ public sealed class WorldClient(WorldSession session)
                     }
                 }
 
+                    continue;
+
+                case AddSkillCommand:
+                {
+                    LearnedSkill skill = ReadSkill(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    _skills[skill.Slot] = skill;
+                }
+
+                    continue;
+
+                case AddSpellCommand:
+                {
+                    LearnedSpell spell = ReadSpell(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    _spells[spell.Slot] = spell;
+                }
+
+                    continue;
+
+                case RemoveSkillCommand:
+                    _skills.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
+                    continue;
+
+                case RemoveSpellCommand:
+                    _spells.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
                     continue;
 
                 case AddToPackCommand:
@@ -328,6 +396,21 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public Task AttackAsync(CancellationToken cancellationToken) =>
         Send(AttackCommand, [], cancellationToken);
+
+    /// <summary>Activates one learned technique by its server-owned pane slot.</summary>
+    public Task UseSkillAsync(int slot, CancellationToken cancellationToken) =>
+        Send(UseSkillCommand, [(byte)slot], cancellationToken);
+
+    /// <summary>
+    /// Casts one learned spell. Hades reads the four bytes following the slot as the target serial; zero
+    /// means the caster, which is also the safe answer for a spell that does not ask for a target.
+    /// The final zero terminates the legacy argument field read by the same packet parser.
+    /// </summary>
+    public Task UseSpellAsync(int slot, uint target, CancellationToken cancellationToken) =>
+        Send(
+            UseSpellCommand,
+            [(byte)slot, (byte)(target >> 24), (byte)(target >> 16), (byte)(target >> 8), (byte)target, 0],
+            cancellationToken);
 
     /// <summary>
     /// Uses what is in one pack slot. What that means is the item's own business — boots are worn,
@@ -546,7 +629,127 @@ public sealed class WorldClient(WorldSession session)
             return;
         }
 
-        _health[BinaryPrimitives.ReadUInt32BigEndian(body)] = left;
+        uint serial = BinaryPrimitives.ReadUInt32BigEndian(body);
+
+        _health[serial] = left;
+        _hurts.Enqueue((serial, left));
+    }
+
+    /// <summary>
+    /// Our own numbers. The server sends them in four pieces and a leading flag byte says which of them
+    /// came, so a piece left out of this packet keeps whatever it said last time — which is what
+    /// <paramref name="before" /> is for. It sends all four as the character enters and single pieces
+    /// afterwards: what is left of health and mana every time anything is struck, for instance.
+    /// </summary>
+    /// <remarks>
+    /// The pieces are fixed width and always in this order: the standing figures (28 bytes), what is left
+    /// of health and mana (8), what has been earned (24), and the fighting figures (13). Two flags the
+    /// server always sets, 0x40 and 0x80, say nothing about the body and are passed over.
+    /// </remarks>
+    public static Vitals ReadVitals(ReadOnlySpan<byte> body, Vitals? before = null)
+    {
+        const byte Standing = 0x20;
+        const byte Remaining = 0x10;
+        const byte Earned = 0x08;
+        const byte Fighting = 0x04;
+
+        if (body.Length < 1)
+        {
+            throw new ProtocolException("몸 상태 안내에 조각 표가 없습니다 (0바이트).");
+        }
+
+        byte pieces = body[0];
+        int at = 1;
+
+        // Static because a local function may not reach a span, and the span is the one thing it does not
+        // need: the length is enough to say the piece is not all there.
+        static void Require(int have, int wanted, byte pieces)
+        {
+            if (have < wanted)
+            {
+                throw new ProtocolException(
+                    $"몸 상태 안내가 {wanted}바이트보다 짧습니다 ({have}바이트, 조각 표 0x{pieces:X2}).");
+            }
+        }
+
+        Vitals now = before ?? Vitals.Unknown;
+
+        if ((pieces & Standing) != 0)
+        {
+            Require(body.Length, at + 28, pieces);
+
+            now = now with
+            {
+                // Three bytes the server always writes as 1, 0, 0 come first.
+                Level = body[at + 3],
+                AbilityLevel = body[at + 4],
+                MaximumHealth = (int)BinaryPrimitives.ReadUInt32BigEndian(body[(at + 5)..]),
+                MaximumMana = (int)BinaryPrimitives.ReadUInt32BigEndian(body[(at + 9)..]),
+                Str = body[at + 13],
+                Int = body[at + 14],
+                Wis = body[at + 15],
+                Con = body[at + 16],
+                Dex = body[at + 17],
+
+                // A flag saying there is something to spend, then how much.
+                Unspent = body[at + 18] == 0 ? 0 : body[at + 19],
+                MaximumWeight = BinaryPrimitives.ReadUInt16BigEndian(body[(at + 20)..]),
+                Weight = BinaryPrimitives.ReadUInt16BigEndian(body[(at + 22)..]),
+            };
+
+            at += 28;
+        }
+
+        if ((pieces & Remaining) != 0)
+        {
+            Require(body.Length, at + 8, pieces);
+
+            now = now with
+            {
+                Health = (int)BinaryPrimitives.ReadUInt32BigEndian(body[at..]),
+                Mana = (int)BinaryPrimitives.ReadUInt32BigEndian(body[(at + 4)..]),
+            };
+
+            at += 8;
+        }
+
+        if ((pieces & Earned) != 0)
+        {
+            Require(body.Length, at + 24, pieces);
+
+            now = now with
+            {
+                Experience = BinaryPrimitives.ReadUInt32BigEndian(body[at..]),
+                ExperienceToGo = BinaryPrimitives.ReadUInt32BigEndian(body[(at + 4)..]),
+                AbilityExperience = BinaryPrimitives.ReadUInt32BigEndian(body[(at + 8)..]),
+                AbilityExperienceToGo = BinaryPrimitives.ReadUInt32BigEndian(body[(at + 12)..]),
+                GamePoints = BinaryPrimitives.ReadUInt32BigEndian(body[(at + 16)..]),
+                Gold = BinaryPrimitives.ReadUInt32BigEndian(body[(at + 20)..]),
+            };
+
+            at += 24;
+        }
+
+        if ((pieces & Fighting) != 0)
+        {
+            Require(body.Length, at + 13, pieces);
+
+            now = now with
+            {
+                // Four bytes of nothing, then blindness, then another byte of nothing.
+                Blind = body[at + 4] != 0,
+                Offense = (Element)body[at + 6],
+                Defense = (Element)body[at + 7],
+                MagicResistance = body[at + 8],
+
+                // Signed, because armour worth having is below zero.
+                Armor = (sbyte)body[at + 10],
+                Damage = body[at + 11],
+                Hit = body[at + 12],
+            };
+        }
+
+        return now;
     }
 
     /// <summary>
@@ -671,6 +874,68 @@ public sealed class WorldClient(WorldSession session)
             called,
             BinaryPrimitives.ReadUInt32BigEndian(wear),
             BinaryPrimitives.ReadUInt32BigEndian(wear[4..]));
+    }
+
+    /// <summary>A skill pane row: slot, icon, then its display name as a short string.</summary>
+    public static LearnedSkill ReadSkill(ReadOnlySpan<byte> body)
+    {
+        const int beforeName = 3;
+
+        if (body.Length < beforeName + 1)
+        {
+            throw new ProtocolException($"기술 안내가 {beforeName + 1}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        return new LearnedSkill(
+            body[0],
+            BinaryPrimitives.ReadUInt16BigEndian(body[1..]),
+            LegacyKoreanEncoding.DecodeStringA(body[beforeName..], out _));
+    }
+
+    /// <summary>A spell pane row, including how it obtains a target and how many chant lines it uses.</summary>
+    public static LearnedSpell ReadSpell(ReadOnlySpan<byte> body)
+    {
+        const int beforeName = 4;
+
+        if (body.Length < beforeName + 1)
+        {
+            throw new ProtocolException($"마법 안내가 {beforeName + 1}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        string name = LegacyKoreanEncoding.DecodeStringA(body[beforeName..], out int nameBytes);
+        ReadOnlySpan<byte> afterName = body[(beforeName + nameBytes)..];
+
+        if (afterName.Length < 1)
+        {
+            throw new ProtocolException("마법 안내에 설명이 없습니다.");
+        }
+
+        string prompt = LegacyKoreanEncoding.DecodeStringA(afterName, out int promptBytes);
+        ReadOnlySpan<byte> afterPrompt = afterName[promptBytes..];
+
+        if (afterPrompt.Length < 1)
+        {
+            throw new ProtocolException("마법 안내에 시전 줄 수가 없습니다.");
+        }
+
+        return new LearnedSpell(
+            body[0],
+            BinaryPrimitives.ReadUInt16BigEndian(body[1..]),
+            (SpellTargetType)body[3],
+            name,
+            prompt,
+            afterPrompt[0]);
+    }
+
+    /// <summary>The server removes a learned skill or spell by pane slot alone.</summary>
+    public static int ReadAbilitySlot(ReadOnlySpan<byte> body)
+    {
+        if (body.Length < 1)
+        {
+            throw new ProtocolException("기술·마법 칸 삭제 안내가 비어 있습니다.");
+        }
+
+        return body[0];
     }
 
     /// <summary>The name, if the server got as far as writing one.</summary>

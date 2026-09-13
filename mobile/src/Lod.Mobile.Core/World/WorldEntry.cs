@@ -38,6 +38,77 @@ public sealed record Appearance(
     int Resting,
     int OverCoat);
 
+/// <summary>
+/// The six attacking and defending kinds. A blow carries the attacker's and meets the defender's, and the
+/// pair decides how much of it lands — the table is <c>scripts/Formulas/elements.cs</c>. Two Nones are
+/// worth a half, which is the pair every fresh character and every ported monster starts with.
+/// </summary>
+public enum Element : byte
+{
+    None = 0,
+    Fire = 1,
+    Water = 2,
+    Wind = 3,
+    Earth = 4,
+    Light = 5,
+    Dark = 6,
+
+    /// <summary>Rolled fresh every time it is read, so a sprite holding this is never the same twice.</summary>
+    Random = 7
+}
+
+/// <summary>
+/// Our own character's numbers, as the server states them. Nobody else's — the server says only how hurt
+/// other people are, out of a hundred.
+/// </summary>
+/// <remarks>
+/// The server sends this in four independent pieces and includes only the ones that changed, so these
+/// fields are the newest value it has stated for each: the standing figures (level, the five attributes,
+/// the maxima), what is left of health and mana, what has been earned, and the fighting figures. A field
+/// the server has not spoken about yet is zero.
+/// </remarks>
+/// <param name="Armor">
+/// Lower is better, and negative is normal once gear is on. It does not subtract from a blow in this
+/// server — <c>scripts/Formulas/ac.cs</c> returns the larger of the blow and the armoured blow — so a
+/// monster's +69 makes it take about two and a half times what it otherwise would.
+/// </param>
+/// <param name="MagicResistance">Already divided by ten on the wire, which is how the pane shows it.</param>
+/// <param name="Unspent">Attribute points waiting to be spent. Zero unless the server said otherwise.</param>
+public sealed record Vitals(
+    int Level,
+    int AbilityLevel,
+    int Health,
+    int MaximumHealth,
+    int Mana,
+    int MaximumMana,
+    int Str,
+    int Int,
+    int Wis,
+    int Con,
+    int Dex,
+    int Unspent,
+    int Weight,
+    int MaximumWeight,
+    long Experience,
+    long ExperienceToGo,
+    long AbilityExperience,
+    long AbilityExperienceToGo,
+    long GamePoints,
+    long Gold,
+    Element Offense,
+    Element Defense,
+    int MagicResistance,
+    int Armor,
+    int Damage,
+    int Hit,
+    bool Blind)
+{
+    /// <summary>What we hold before the server has said anything at all.</summary>
+    public static readonly Vitals Unknown = new(
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        Element.None, Element.None, 0, 0, 0, 0, false);
+}
+
 /// <summary>What kind of thing the server is showing, which decides how the rest of it is read.</summary>
 public enum CreatureKind
 {
@@ -80,6 +151,35 @@ public sealed record InventoryItem(
     int Stacks,
     int Durability,
     int MaxDurability);
+
+/// <summary>One learned technique in the character's skill pane.</summary>
+/// <param name="Slot">The server-owned pane slot used again when the skill is activated.</param>
+/// <param name="Icon">A zero-based frame in <c>skill001.epf</c>.</param>
+public sealed record LearnedSkill(int Slot, int Icon, string Name);
+
+/// <summary>How the original client asks for the argument to a learned spell.</summary>
+public enum SpellTargetType : byte
+{
+    Unusable = 0,
+    Prompt = 1,
+    ChooseTarget = 2,
+    FourDigit = 3,
+    ThreeDigit = 4,
+    NoTarget = 5,
+    TwoDigit = 6,
+    OneDigit = 7
+}
+
+/// <summary>One learned spell in the character's spell pane.</summary>
+/// <param name="Icon">A zero-based frame in <c>spell001.epf</c>.</param>
+/// <param name="Prompt">The server-provided hint shown when the spell needs typed data.</param>
+public sealed record LearnedSpell(
+    int Slot,
+    int Icon,
+    SpellTargetType TargetType,
+    string Name,
+    string Prompt,
+    int Lines);
 
 /// <summary>
 /// A piece of gear the character has on. The server names the place it sits by number — the same numbers

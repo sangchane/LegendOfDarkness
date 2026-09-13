@@ -100,6 +100,36 @@ public sealed class MobileClientProtocolTests
     }
 
     [Fact]
+    public async Task Mobile_client_receives_and_uses_the_starter_skill_and_a_real_spell()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+
+        using WorldSession session = await LoginAsync(server);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Settled(world, seen => seen is not null);
+
+        LearnedSkill skill = await Learned(world, "Assail");
+        LearnedSpell spell = await LearnedSpell(world, "beag ioc fein");
+
+        Assert.Equal(1, skill.Icon);
+        Assert.Equal(21, spell.Icon);
+        Assert.Equal(SpellTargetType.NoTarget, spell.TargetType);
+
+        // Assail executes its real script and broadcasts our body motion back through the same client.
+        await world.UseSkillAsync(skill.Slot, _deadline.Token);
+        await MovedBody(world);
+
+        // The healing spell executes its real script and confirms the cast in a server message.
+        await world.UseSpellAsync(spell.Slot, 0, _deadline.Token);
+        await ServerSaid(world, "you cast beag ioc fein");
+    }
+
+    [Fact]
     public async Task Wearing_something_changes_how_the_server_describes_us()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
@@ -118,18 +148,18 @@ public sealed class MobileClientProtocolTests
 
         await Settled(world, seen => seen is not null);
 
-        Character before = (await Mine(world))!;
+        // Boot.cs sets Aisling.Boots to the item template's Image, and this template's is 1 — so bare feet
+        // are 0 and these boots are 1, which is what each wait below is waiting for.
+        Character before = await Dressed(world, seen => seen.Boots == 0);
 
         InventoryItem boots = await Carried(world, "Shagreen Boots");
 
         await world.UseAsync(boots.Slot, _deadline.Token);
 
         // The server answers a piece of clothing by describing us again — that is what redraws the figure.
-        Character after = await Changed(world, before.Wearing);
+        Character after = await Dressed(world, seen => seen.Boots == 1);
 
         Assert.NotEqual(before.Wearing, after.Wearing);
-
-        // Boot.cs sets Aisling.Boots to the item template's Image, and this template's is 1.
         Assert.Equal(0, before.Wearing!.Boots);
         Assert.Equal(1, after.Wearing!.Boots);
     }
@@ -150,12 +180,12 @@ public sealed class MobileClientProtocolTests
 
         await Settled(world, seen => seen is not null);
 
-        Character before = (await Mine(world))!;
+        await Dressed(world, seen => seen.Boots == 0);
         InventoryItem boots = await Carried(world, "Shagreen Boots");
 
         await world.UseAsync(boots.Slot, _deadline.Token);
 
-        Character dressed = await Changed(world, before.Wearing);
+        Character dressed = await Dressed(world, seen => seen.Boots == 1);
         Assert.Equal(1, dressed.Wearing!.Boots);
 
         // 서버는 걸친 자리를 0x37 로 따로 알려준다. 어느 자리에 갔는지는 그것으로만 안다.
@@ -164,7 +194,7 @@ public sealed class MobileClientProtocolTests
         await world.TakeOffAsync(worn.Slot, _deadline.Token);
 
         // 벗는 것도 입는 것과 같다 — 서버가 우리를 다시 묘사하는 것이 그림을 고쳐 그리게 한다.
-        Character bare = await Changed(world, dressed.Wearing);
+        Character bare = await Dressed(world, seen => seen.Boots == 0);
 
         Assert.Equal(0, bare.Wearing!.Boots);
         Assert.DoesNotContain(world.Worn, one => one.Slot == worn.Slot);
@@ -434,6 +464,78 @@ public sealed class MobileClientProtocolTests
         File.WriteAllText(path, saved.ToJsonString());
     }
 
+    private async Task<LearnedSkill> Learned(WorldClient world, string name)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            LearnedSkill? found = world.Skills.FirstOrDefault(one => one.Name.StartsWith(name, StringComparison.Ordinal));
+
+            if (found is not null)
+            {
+                return found;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"기술 창에 {name} 이 오지 않았습니다.");
+    }
+
+    private async Task<LearnedSpell> LearnedSpell(WorldClient world, string name)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            LearnedSpell? found = world.Spells.FirstOrDefault(one => one.Name.StartsWith(name, StringComparison.Ordinal));
+
+            if (found is not null)
+            {
+                return found;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"마법 창에 {name} 이 오지 않았습니다.");
+    }
+
+    private async Task MovedBody(WorldClient world)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            if (world.TakeMotion(out uint serial) && serial == world.Serial)
+            {
+                return;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException("Assail 뒤 서버가 몸동작을 돌려주지 않았습니다.");
+    }
+
+    private async Task ServerSaid(WorldClient world, string words)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            if (world.Said.Contains(words, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException($"서버가 '{words}'라고 말하지 않았습니다. 마지막 말: {world.Said}");
+    }
+
     /// <summary>Waits until one particular slot holds something.</summary>
     private async Task<InventoryItem> Slotted(WorldClient world, int slot)
     {
@@ -541,13 +643,20 @@ public sealed class MobileClientProtocolTests
     }
 
     /// <summary>Waits until the server describes us as wearing something other than this.</summary>
-    private async Task<Character> Changed(WorldClient world, Appearance? before)
+    /// <summary>Waits until the server describes us wearing something that answers <paramref name="wanted" />.</summary>
+    /// <remarks>
+    /// Waiting for "anything different" is not enough, and that was a flake for a while. The description we
+    /// are given first can arrive with no wardrobe at all, and then the plain unbooted one counts as the
+    /// change and the test measures that instead of the boots. Waiting for the thing we came to see cannot
+    /// be fooled that way.
+    /// </remarks>
+    private async Task<Character> Dressed(WorldClient world, Func<Appearance, bool> wanted)
     {
         DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
 
         while (DateTime.UtcNow < giveUp)
         {
-            if (world.Self is { Wearing: not null } now && now.Wearing != before)
+            if (world.Self is { Wearing: not null } now && wanted(now.Wearing))
             {
                 return now;
             }
@@ -555,7 +664,7 @@ public sealed class MobileClientProtocolTests
             await Task.Delay(50, _deadline.Token);
         }
 
-        throw new TimeoutException($"서버가 겉모습을 다시 알려주지 않았습니다. 마지막: {world.Self?.Wearing}");
+        throw new TimeoutException($"서버가 찾던 겉모습을 알려주지 않았습니다. 마지막: {world.Self?.Wearing}");
     }
 
     /// <summary>Waits until the server has said which character is ours.</summary>

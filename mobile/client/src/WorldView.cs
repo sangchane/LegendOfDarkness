@@ -679,6 +679,29 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _ = server?.AttackAsync(_leaving.Token);
     }
 
+    /// <summary>Uses a learned skill and gives an immediate swing cue, as ordinary attacks do.</summary>
+    public void UseSkill(int slot)
+    {
+        if (Frozen)
+        {
+            return;
+        }
+
+        _player.Strike();
+        _ = server?.UseSkillAsync(slot, _leaving.Token);
+    }
+
+    /// <summary>Casts a learned spell at a chosen serial, or at self when target is zero.</summary>
+    public void UseSpell(int slot, uint target)
+    {
+        if (Frozen)
+        {
+            return;
+        }
+
+        _ = server?.UseSpellAsync(slot, target, _leaving.Token);
+    }
+
     /// <summary>
     /// Draws whoever the server says has swung. Our own blow is drawn as it is asked for rather than here,
     /// so a swing of ours that comes back is left alone.

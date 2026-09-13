@@ -122,6 +122,24 @@ test('knowledge board covers game content and live-operation concerns', () => {
   }
 });
 
+test('ability workspace uses the original gui06 palette and complete icon sheets', () => {
+  const html = read('docs/index.html');
+  const script = read('docs/abilities.js');
+  const pngSize = (relativePath) => {
+    const png = fs.readFileSync(path.join(root, relativePath));
+    assert.equal(png.subarray(1, 4).toString('ascii'), 'PNG');
+    return [png.readUInt32BE(16), png.readUInt32BE(20)];
+  };
+
+  assert.match(html, /data-view-target="abilities"/);
+  assert.match(html, /data-view="abilities"/);
+  assert.match(script, /setoa\.dat/);
+  assert.match(script, /gui06\.pal/);
+  assert.doesNotMatch(script, /item007\.pal|색표는 짐작/);
+  assert.deepEqual(pngSize('docs/ability-icons/skill.png'), [560, 280]);
+  assert.deepEqual(pngSize('docs/ability-icons/spell.png'), [560, 595]);
+});
+
 test('operations workspace links every runbook and separates documented standards from implementation', () => {
   const html = read('docs/index.html');
   const data = require('../docs/dashboard-data.js');

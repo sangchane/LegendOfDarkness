@@ -41,6 +41,87 @@ KNOBS = ["HpGainFactor", "MpGainFactor", "StatsPerLevel", "MinimumHp", "MaxHP",
 
 BANNED = re.compile(r'[\\/:*?"<>|#\[\]^]')
 
+# 서버를 돌려 보고 알아낸 것. 그래서 앞의 HUNTS 와 성격이 다르다 — 여기 있는 것은 "이 줄이 있다" 가
+# 아니라 "이 줄이 이런 결과를 낸다" 이고, 숫자는 실제로 재 본 값이다. 재 본 것을 지키는 시험을 함께
+# 적어 둔다. 근거 줄이 안 걸리면 노트가 "못 찾았다" 로 바뀌므로, 코드가 움직이면 여기가 먼저 안다.
+FINDINGS = [
+    ("방어는 피해를 줄이지 않는다",
+     "`ac.cs` 는 맨 피해와 방어를 거친 피해 중 **큰 쪽**을 돌려준다. 그래서 방어가 -2 보다 크면 "
+     "언제나 피해가 **늘어난다**.",
+     [(SCRIPTS / "Formulas/ac.cs", r"armor|calculatedDmg|diff|return"),
+      (SRC / "Hades.Server.Base/Network/Game/GameClient.cs", r"BonusAc = \(100"),
+      (SCRIPTS / "Creations/monsters.cs", r"BonusAc = \(int\)\(70")],
+     ["`calculatedDmg + |value - calculatedDmg|` 은 `max(value, calculatedDmg)` 와 같다. "
+      "`|Ac+101|/99` 가 1 보다 크면(즉 Ac > -2) 방어를 거친 쪽이 커지고, 그쪽이 채택된다.",
+      "그리고 아무도 -2 아래에서 시작하지 않는다. 새 캐릭터는 `100 - 수준/3` 을 받아 **+100** 이고, "
+      "1수준 괴물은 `70 - 수준×0.5` 로 **+69** 다. 둘 다 맞을 때 더 아프다.",
+      "재 본 값: 55점짜리 한 방이 방어 69 를 지나 133 이 되고, 속성 절반을 거쳐 66점이 박힌다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (Landed)"),
+
+    ("기술은 휘두를 때마다 한 단계 오른다",
+     "`toImprove = (int)(0.10 / LevelRate)` 가 **0** 이 되어 `Uses++ >= 0` 이 언제나 참이다. "
+     "백 번 써야 오르도록 만든 값이 한 번마다 오르게 만든다.",
+     [(SRC / "Hades.Server.Base/Network/Game/GameClient.cs", r"toImprove|Uses\+\+|skill\.Level\+\+"),
+      (FORK / "database/server/templates/skills/Assail.json", r"LevelRate|MaxLevel")],
+     ["0.10 / 0.5 = 0.2 이고 `(int)` 가 0 으로 깎는다. 그래서 Assail 은 첫 휘두름에 2수준이 되고, "
+      "k번째 휘두름의 수준은 1+k 다(MaxLevel 100 에서 멎는다).",
+      "수준은 피해에 들어간다 — `imp = 10 + 수준`. 그래서 **연속으로 휘두르면 매번 더 아프다**. "
+      "예측값을 맞춰 보려면 몇 번째 휘두름인지를 알아야 한다.",
+      "서버는 오를 때마다 `\"Assail has improved. (Lv. N)\"` 이라고 말한다. 그 말이 유일한 표시다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (LevelOnUse)"),
+
+    ("괴물 템플릿의 체력은 버려진다",
+     "젠할 때 `obj.Template.MaximumHP` 를 **레벨로 다시 계산해 덮어쓴다.** 팩이 적어 준 수치는 "
+     "읽히지도 않는다.",
+     [(SCRIPTS / "Creations/monsters.cs", r"var hp =|var mp =|Template\.MaximumHP|Template\.MaximumMP|CurrentHp ="),
+      (SCRIPTS / "Formulas/damage.cs", r"obj\.Level|mod =|diff =")],
+     ["`hp = (수준+1)×0.01 + 50 + 수준×(수준+40)` → 1수준이면 **91**. 서버팩 `가스` 는 17,550 을 "
+      "적어 두었는데 91 로 선다. 565개 배치가 전부 1수준이므로 **전부 91** 이다.",
+      "공격력도 같다. 표가 없고 `damage.cs` 가 레벨과 사람의 레벨 차이만 읽는다 — "
+      "1수준 괴물의 한 방은 맨 7점이고, 사람의 방어 +100 을 지나 21, 속성 절반으로 **10점**이다.",
+      "덮어쓰는 것이 **템플릿**이라 값이 젠 사이에 남는다. 그래서 `MaximumMP` 를 읽는 `CastEnabled` 는 "
+      "첫 젠에서는 꺼지고 두 번째부터는 켜진다 — 같은 정의인데 결과가 다르다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (MonsterHealth · MonsterDamage)"),
+
+    ("새 캐릭터는 가득 차 있지 않다",
+     "150 중 60, 200 중 30 으로 깨어난다. 40% 다.",
+     [(SRC / "Hades.Server.Base/Types/Aisling.cs", r"CurrentHp = 60|CurrentMp = 30|_MaximumHp = 150|_MaximumMp = 200|_Str = 10|_Dex = 5")],
+     ["체력이 얼마나 깎였는지 재려면 최대 체력이 아니라 **그때 체력**을 기준으로 잡아야 한다. "
+      "그리고 재생이 그 값을 계속 밀어 올린다.",
+      "괴물을 죽이면 경험치가 들어와 수준이 오르고 최대 체력이 바뀐다. 시험은 그 둘을 만나면 "
+      "기준만 새로 잡고 계속 본다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (HitBack)"),
+
+    ("젠은 벽에 걸린 시도도 한 번으로 센다",
+     "자리를 무작위로 골라 벽이면 아무것도 안 세우는데, 그 정의는 이미 `SpawnRate` 만큼 쉬러 들어간다.",
+     [(SRC / "Hades.Server.Base/Templates/MonsterTemplate.cs", r"NextAvailableSpawn|ReadyToSpawn|Ready"),
+      (SRC / "Hades.Server.Base/Network/Game/Components/MonolithComponent.cs", r"ReadyToSpawn|SpawnMax|Rows == 0|return;"),
+      (SCRIPTS / "Creations/monsters.cs", r"IsWall|SpawnQualifer\.Random")],
+     ["`ReadyToSpawn()` 이 **먼저** 다음 시각을 20초 뒤로 밀고 참을 돌려준다. 그 뒤 "
+      "`FindBestMonsterMapSlot` 이 벽을 골라 `Create` 가 null 을 내면 그 20초는 그냥 날아간다.",
+      "그래서 정의가 둘뿐인 방은 1분에 여섯 번만 굴리고, 집 안은 대부분 벽이라 몇 분을 기다려도 "
+      "빈 방일 수 있다. 시험이 `지하수로D-2`(정의 7개, 20×20)를 쓰는 이유가 이것이다.",
+      "그리고 훑는 고리가 `continue` 대신 **`return`** 이다 — 크기가 0 인 맵 하나를 만나면 그 뒤 "
+      "모든 맵의 젠이 그 회차에 멎는다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (MonsterRoom · AnyMonster)"),
+
+    ("헛친 것도 서버가 알려준다",
+     "아무것도 닿지 않으면 **serial 0 의 체력 0** 이라는 체력 보고가 온다.",
+     [(SCRIPTS / "Skills/Assail.cs", r"ServerFormat13\(0, 0")],
+     ["그래서 체력 보고를 세면 몇 번 휘둘렀는지가 그대로 나온다 — 맞으면 그 놈의 체력, 헛치면 0. "
+      "기술 수준이 휘두름마다 오르므로(위) 이 셈이 예측에 그대로 쓰인다.",
+      "반대로, serial 0 을 괴물로 세면 '체력 0% = 한 방에 죽었다' 로 잘못 읽는다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (NothingWasHit)"),
+
+    ("속성이 없는 쪽끼리는 절반",
+     "때리는 쪽도 맞는 쪽도 속성이 None 이면 피해가 **0.50** 배다. 새 캐릭터와 이식한 괴물이 바로 그 짝이다.",
+     [(SCRIPTS / "Formulas/elements.cs", r"None && element == ElementManager\.Element\.None|return 0\.50|return 1\.00")],
+     ["맞는 쪽만 None 이고 때리는 쪽에 속성이 있으면 1.00 배다 — 속성을 붙이는 것이 두 배로 때리는 "
+      "일이 된다. 이식한 괴물 565개는 `ElementType` 이 없어 전부 None 이다.",
+      "`Element.Random` 은 읽을 때마다 다시 굴린다. 그런 놈이 섞이면 같은 한 방이 두 번 다르다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (NoElementEither)"),
+]
+
 
 def hits(where, pattern):
     """파일이든 폴더든 훑어 걸리는 줄을 근거와 함께 모은다."""
@@ -59,6 +140,8 @@ def main():
         shutil.rmtree(VAULT)
     (VAULT / "식").mkdir(parents=True)
     (VAULT / "설정").mkdir(parents=True)
+
+    (VAULT / "확인").mkdir(parents=True)
 
     index = []
     for title, where, pattern in HUNTS:
@@ -81,6 +164,34 @@ def main():
         (VAULT / "식" / f"{BANNED.sub('_', title)}.md").write_text("\n".join(body), encoding="utf-8")
         index.append((title, len(found)))
 
+    checked = []
+    for title, claim, evidence, notes, pinned in FINDINGS:
+        rows = [(w, p, hits(w, p)) for w, p in evidence]
+        total = sum(len(f) for _, _, f in rows)
+        body = [
+            "---", f'이름: "{title}"', "갈래: 확인",
+            f"근거수: {total}", f'지키는시험: "{pinned}"', "---", "",
+            f"# {title}", "", claim, "",
+        ]
+        for note in notes:
+            body += [note, ""]
+        body += ["## 근거", ""]
+        for where, pattern, found in rows:
+            rel = where.relative_to(FORK).as_posix()
+            if not found:
+                body += [f"- `{rel}` — **못 찾았다.** 줄이 움직였다. 이 노트를 다시 본다.", ""]
+                continue
+            body += [f"`{rel}`", "", "```csharp"]
+            body += [f"{p}:{n}  {ln}" for p, n, ln in found[:14]]
+            body += ["```", ""]
+            if len(found) > 14:
+                body += [f"…그 밖 {len(found) - 14}줄.", ""]
+        body += ["## 이걸 지키는 시험", "", f"`{pinned}`", "",
+                 "식대로인지는 눈으로 못 본다. 그래서 값을 먼저 계산하고 서버에 실제로 때려 본다 —",
+                 "\"체력이 좀 깎였다\" 로는 한 대에 1% 가 깎이든 90% 가 깎이든 똑같이 통과한다.", ""]
+        (VAULT / "확인" / f"{BANNED.sub('_', title)}.md").write_text("\n".join(body), encoding="utf-8")
+        checked.append((title, total))
+
     raw = CONFIG.read_text(encoding="utf-8-sig")
     rows = []
     for k in KNOBS:
@@ -102,11 +213,19 @@ def main():
         "`plans/server-pack-content-port.md` 참고.)\n\n"
         "| 무엇 | 근거 줄 |\n|---|---|\n"
         + "\n".join(f"| [[식/{BANNED.sub('_', t)}\\|{t}]] | {n} |" for t, n in index)
+        + "\n\n## 돌려 보고 알아낸 것\n\n"
+          "아래는 \"이 줄이 있다\" 가 아니라 \"이 줄이 이런 결과를 낸다\" 다. 숫자는 실제로 재 본 값이고,\n"
+          "지키는 시험이 노트마다 적혀 있다.\n\n"
+          "| 무엇 | 근거 줄 |\n|---|---|\n"
+        + "\n".join(f"| [[확인/{BANNED.sub('_', t)}\\|{t}]] | {n} |" for t, n in checked)
         + "\n\n[[설정/LoruleConfig|식이 읽는 설정값]]\n\n"
           "`python3 scripts/build-formula-vault.py` 로 다시 만든다.\n",
         encoding="utf-8")
     for t, n in index:
         print(f"  {t:24} 근거 {n}줄")
+    print()
+    for t, n in checked:
+        print(f"  확인: {t:26} 근거 {n}줄")
     print(f"\n→ {VAULT.relative_to(ROOT)}/  (Obsidian 으로 연다)")
 
 

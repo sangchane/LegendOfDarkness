@@ -25,6 +25,7 @@ public partial class GameScreen : Control
     private PackPanel _pack = null!;
     private Label _notice = null!;
     private ProgressBar _targetHealth = null!;
+    private AbilityBar _abilities = null!;
 
     // 서버가 말한 횟수. 같은 말을 다시 하는 것과 새로 하는 것을 가르려고 센다.
     private int _heard = -1;
@@ -319,6 +320,9 @@ public partial class GameScreen : Control
         }
 
         ShowTarget();
+        _abilities.Show(
+            _server?.Skills ?? LayoutCheck.PretendSkills,
+            _server?.Spells ?? LayoutCheck.PretendSpells);
 
         if (_server is { } server && server.SaidCount != _heard)
         {
@@ -476,9 +480,28 @@ public partial class GameScreen : Control
         notice.AddChild(_notice);
 
         row.AddChild(BuildMovementPad());
-        row.AddChild(Main.Portrait
-            ? new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill }
-            : notice);
+
+        VBoxContainer middle = new()
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ShrinkEnd,
+            Alignment = BoxContainer.AlignmentMode.End
+        };
+
+        if (!Main.Portrait)
+        {
+            middle.AddChild(notice);
+        }
+
+        _abilities = new AbilityBar
+        {
+            Alignment = BoxContainer.AlignmentMode.Center,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        _abilities.SkillUsed += slot => _world.UseSkill(slot);
+        _abilities.SpellUsed += slot => UseSpell(slot);
+        middle.AddChild(_abilities);
+        row.AddChild(middle);
         Button strike = new()
         {
             Text = "공격",
@@ -492,6 +515,35 @@ public partial class GameScreen : Control
         row.AddChild(strike);
 
         return Main.Capped(row, Main.ThumbSpanMaximum);
+    }
+
+    /// <summary>
+    /// Targeted spells use the figure selected in the world. Everything else sends zero, which Hades
+    /// deliberately turns into the caster. Typed-input spells need their prompt UI before they are usable.
+    /// </summary>
+    private void UseSpell(int slot)
+    {
+        LearnedSpell? spell = _server?.Spells.FirstOrDefault(one => one.Slot == slot);
+
+        if (spell is null)
+        {
+            return;
+        }
+
+        if (spell.TargetType == SpellTargetType.ChooseTarget && _world.Target == 0)
+        {
+            _notice.Text = "마법 대상을 먼저 누르세요.";
+            return;
+        }
+
+        if (spell.TargetType is SpellTargetType.Prompt or SpellTargetType.FourDigit
+            or SpellTargetType.ThreeDigit or SpellTargetType.TwoDigit or SpellTargetType.OneDigit)
+        {
+            _notice.Text = $"{spell.Name}: 입력 창이 필요한 마법입니다.";
+            return;
+        }
+
+        _world.UseSpell(spell.Slot, spell.TargetType == SpellTargetType.ChooseTarget ? _world.Target : 0);
     }
 
     /// <summary>

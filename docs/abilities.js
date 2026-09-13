@@ -36,9 +36,9 @@
         }).join("") +
       '<p class="world-note">한글 이름 칸에 적으면 이 브라우저에 남습니다. 다 적은 뒤 <b>표로 내보내기</b>를 눌러 ' +
       "<code>data/기술마법-한글이름.tsv</code> 에 붙여 넣으세요. " +
-      "아이콘은 <code>Legend.dat</code> 의 <code>skill001.epf</code>·<code>spell001.epf</code> 를 " +
-      "<code>item007.pal</code> 로 그린 것입니다. <strong>색표는 짐작입니다</strong> — 기술용 색표가 " +
-      "아카이브에 없어 56개를 다 그려 보고 가장 매끄러운 것을 골랐습니다. 모양은 맞고 색은 다를 수 있습니다.</p>" +
+      "아이콘은 <code>setoa.dat</code> 의 <code>skill001.epf</code>·<code>spell001.epf</code> 를 " +
+      "같은 아카이브의 <code>gui06.pal</code> 로 그렸습니다. 원작 자료 뷰어가 두 아이콘 창에 " +
+      "지정한 색표를 그대로 썼습니다.</p>" +
       '<button type="button" id="ability-export" class="quiet-link">표로 내보내기</button>';
     var b = document.getElementById("ability-export");
     if (b) b.addEventListener("click", exportTsv);
