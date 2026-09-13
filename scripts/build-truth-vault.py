@@ -113,6 +113,9 @@ def main():
     index = []
 
     # ── 아이템 ─────────────────────────────────────────────────────────
+    # 하데스가 싣는 영문 아이템 템플릿. `origin/Zolian` 브랜치에 있고 **이미지 번호를 갖는다** —
+    # 클라이언트가 받는 `ItemInfo` 에는 이미지가 없다(서버가 보내는 값이라 들어갈 이유가 없다).
+    hades_items = rows(ORIG / "items-hades.json")
     orig_items = names(ORIG / "items.json", "name")
     now_items = templates("items")
     ip = pack("items")
@@ -121,19 +124,33 @@ def main():
     ag = agreement(ip, ["레벨제한", "방어력", "직업제한", "위즈변화", "콘변화", "힘변화", "덱스변화"])
     index.append(note(
         "아이템",
-        [f"**`database/assets/MetaFiles/ItemInfo0~3`** — 원본 클라이언트가 읽는 아이템 표. "
-         f"뽑아 둔 것이 `data/game-data/items.json` **{len(orig_items)}개**",
-         "가진 칸: 이름 · 등급(book) · 요구레벨 · 무게 · 종류 · 설명. "
-         "**방어력·피해·능력치 보정은 없다** — 그건 서버 값이라 클라이언트 표에 들어갈 수 없다"],
+         [f"**`origin/Zolian` 브랜치의 `templates/Items/`** — 영문 아이템 **{len(hades_items)}장**. "
+          f"이미지 {sum(1 for r in hades_items if r.get('Image'))} · 방어력 "
+          f"{sum(1 for r in hades_items if r.get('AcModifer'))} · 착용자리·직업·성별·요구레벨·스크립트까지 "
+          f"완전하다. 뽑아 둔 것이 `data/game-data/items-hades.json` (`scripts/build-item-base-hades.py`)",
+          "`origin/master` 는 **3장**만 싣는다. 그 셋만 보고 \"하데스에 아이템이 없다\" 고 판단해 "
+          "팩을 베이스로 삼은 적이 있다",
+          f"**`MetaFiles/ItemInfo`** — 클라이언트가 받는 표. 여섯 폴더에 흩어져 있고 합쳐 "
+          f"`data/game-data/items.json` **{len(orig_items)}개**. 이름·요구레벨·직업번호·무게·종류·설명. "
+          "**이미지 번호는 없다** — 서버가 보내는 값이다"],
         [f"`data/game-data/items.json` {len(orig_items)}개 (영문 이름)"],
         [f"`templates/items/` **{len(now_items)}장**",
          f"그중 원작 이름과 겹치는 것 **{from_orig}개** · 팩 이름과 겹치는 것 **{from_pack}개**"],
         [f"쪽수 {ag['쪽수']} · 이름 겹침 {ag['겹침']} · 검사한 칸이 **전부 일치 {ag['전부일치']}**",
          "칸별: " + " · ".join(f"{k} {v}" for k, v in sorted(ag["칸별"].items()))] if ag else [],
-        ("**규칙 1번 위반.** 하데스에 아이템 표가 있는데 서버에는 팩 것이 실려 있다. "
-         f"원작 {len(orig_items)}개와 지금 실린 것의 이름 교집합이 {from_orig}개다 — 계보가 다르다"
-         f"(원작은 영문판, 팩은 한국어판)."
-         if from_pack > from_orig else "규칙대로다."),
+         ("**규칙 1번 위반 — 영문 쪽을 베이스로 간다.** 하데스가 영문 아이템 "
+          f"{len(hades_items)}장을 완전한 스펙으로 싣는데 서버에는 팩 것이 실려 있다"
+          f"(이름 교집합 {from_orig}개, 계보가 다르다).\n\n"
+          "**그림 번호가 두 체계다.** 하데스 영문은 대부분 1~300, 팩 한글은 13000번대가 많다. "
+          "500 이하에서 자리·이미지 묶음 289가지 중 양쪽 다 있는 것이 **27가지**뿐이고 낮은 번호가 "
+          "원작 그림이다.\n\n"
+          "**같은 이미지는 형용사만 다른 같은 아이템이다.** 영문 `Abundance Bronze Shield` · "
+          "`Blessed Bronze Shield` · `Bronze Shield` 가 한 그림을 쓰고, 한글도 `흑요석로그반지` 와 "
+          "`뮤레칸의로그반지+1` 이 그림 13385 를 같이 쓴다. 1:1 을 요구하면 안 되고 묶음끼리 맞춘다.\n\n"
+          "이미지+착용자리로 뜻까지 맞은 짝: `Earth/Wind/Sea Necklace` ↔ `대지/바람/바다의목걸이` · "
+          "`Leather Greaves` ↔ `가죽각반` · `Silver Earrings` ↔ `쌍은귀걸이` · `Monk Mantle` ↔ "
+          "`풍전도복`. 안 맞는 것도 있다(`Earth Garb` ↔ `턱시도`) — 팩이 그림을 재배치했다."
+          if from_pack > from_orig else "규칙대로다."),
         ["`docs/game-data.md` · `data/archives-vault/` · `tools/dat-extract`"]))
 
     # ── 괴물 ───────────────────────────────────────────────────────────
@@ -254,13 +271,14 @@ def main():
         [f"`templates/skills/` {len(sk)}장 · `templates/spells/` {len(sp)}장",
          f"우리가 쓴 표(`원작표`)가 붙은 것 기술 {sum(1 for g in sk.values() if g.startswith('원작표'))} · "
          f"마법 {sum(1 for g in sp.values() if g.startswith('원작표'))}"],
-        ["**팩은 안 본다.** 하데스+원작으로 끝난다 — 팩은 한글 이름이라 하데스 스크립트(영문)와 "
-         "붙지도 않는다.",
+        ["**구조·수치는 팩을 안 본다.** 하데스+원작으로 끝난다. 화면의 한글 이름만 5.99·혼든이 "
+         "같은 갈래·아이콘에서 같은 이름일 때 후보로 쓰며, 불일치는 버린다. 이름표에서 사람이 "
+         "고친 값은 별도 수정값으로 남긴다.",
          "**3번 출처가 있다**: `sources/wren11/ETDA/BotCore/Shared/Collections.cs` 가 기술·마법의 "
          "직업과 요구레벨을 코드에 갖고 있다 — `Kelberoth Strike` = Monk 23 · `Kelberoth Stance` = "
          "Monk 30 · `Dark Spear` = Monk 7. 원작 `SClass` 에서 `0/0/0` 으로 비어 있던 12개의 답이 "
          "거기 있다. `sources/FallenDev/SleepHunter4/data/Skills.xml`·`Spells.xml`·`Staves.xml` 도 같다"],
-        "규칙대로다. 베이스가 하데스 스크립트 66개 + 원작 `SClass` 613개이고 팩을 보지 않는다.",
+        "규칙대로다. 구조는 하데스 스크립트 66개 + 원작 `SClass` 613개이고, 팩 2개 합의는 한글 표시만 보조한다.",
         ["`data/formula-vault/구현/기술·마법이 실제로 도는가` — 몇 개가 실제로 도는지"]))
 
     # ── 퀘스트 · NPC 초상 ──────────────────────────────────────────────
