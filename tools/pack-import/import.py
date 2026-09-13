@@ -400,7 +400,17 @@ def monster_json(spawn, mob, area_id, items):
         # 괴물 적재가 통째로 멎는다 — "Monster Templates Loaded" 줄 자체가 안 찍힌다.
         "MaximumHP": whole(f.get("체력"), 2**31 - 1) or 1,
         "MaximumMP": 0,
-        "Level": 1,                      # 팩에 레벨 칸이 없다. bees 와 같게 둔다
+        # 팩에 레벨 칸이 없다. 그런데 243마리 전부가 체력·최소·최대공격력·방어력·경험치를
+        # 갖고 있어서 레벨로 짚을 필요가 없다 — 레벨은 하데스가 그 넷을 못 가져서 쓰는 대용품이다.
+        # 서버는 이 칸들이 있으면 그걸 쓰고 없으면 레벨로 계산한다(Creations/monsters.cs ·
+        # Formulas/damage.cs · Formulas/monsterexp.cs).
+        "Level": 1,
+        "DmgMin": whole(f.get("최소공격력"), 2**31 - 1),
+        "DmgMax": whole(f.get("최대공격력"), 2**31 - 1),
+        # 방어는 낮을수록 좋고 팩도 같은 규약이다(-80~0). 0 도 적어 둔 값이므로 그대로 넣는다 —
+        # "없음" 은 칸 자체가 없는 것이고, 그때만 서버가 레벨로 만든다.
+        "Ac": whole(f.get("방어력")),
+        "Exp": whole(f.get("경험치"), 2**31 - 1),
         "MovementSpeed": speed, "EngagedWalkingSpeed": speed,
         "AttackSpeed": 1000, "CastSpeed": 8000,
         "MoodType": 4, "PathQualifer": 1,
@@ -430,7 +440,7 @@ def write_monsters(keep):
         n += 1
         for k in mobs[sp["괴물"]]["fields"]:
             if k not in ("이름", "속도", "이미지", "이미지염색", "체력", "젠타임",
-                         "드롭아이템", "골드"):
+                         "드롭아이템", "골드", "최소공격력", "최대공격력", "방어력", "경험치"):
                 skipped[k] += 1
     return n, skipped
 

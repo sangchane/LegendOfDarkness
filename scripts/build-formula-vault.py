@@ -79,18 +79,44 @@ FINDINGS = [
       "서버는 오를 때마다 `\"Assail has improved. (Lv. N)\"` 이라고 말한다. 그 말이 유일한 표시다."],
      "tests/hades-characterization/CombatSmokeTests.cs (LevelOnUse)"),
 
-    ("괴물 템플릿의 체력은 버려진다",
-     "젠할 때 `obj.Template.MaximumHP` 를 **레벨로 다시 계산해 덮어쓴다.** 팩이 적어 준 수치는 "
-     "읽히지도 않는다.",
-     [(SCRIPTS / "Creations/monsters.cs", r"var hp =|var mp =|Template\.MaximumHP|Template\.MaximumMP|CurrentHp ="),
-      (SCRIPTS / "Formulas/damage.cs", r"obj\.Level|mod =|diff =")],
-     ["`hp = (수준+1)×0.01 + 50 + 수준×(수준+40)` → 1수준이면 **91**. 서버팩 `가스` 는 17,550 을 "
-      "적어 두었는데 91 로 선다. 565개 배치가 전부 1수준이므로 **전부 91** 이다.",
-      "공격력도 같다. 표가 없고 `damage.cs` 가 레벨과 사람의 레벨 차이만 읽는다 — "
-      "1수준 괴물의 한 방은 맨 7점이고, 사람의 방어 +100 을 지나 21, 속성 절반으로 **10점**이다.",
-      "덮어쓰는 것이 **템플릿**이라 값이 젠 사이에 남는다. 그래서 `MaximumMP` 를 읽는 `CastEnabled` 는 "
-      "첫 젠에서는 꺼지고 두 번째부터는 켜진다 — 같은 정의인데 결과가 다르다."],
-     "tests/hades-characterization/CombatSmokeTests.cs (MonsterHealth · MonsterDamage)"),
+    ("괴물의 수치는 정의 파일에서 온다 — 전에는 레벨로 덮어썼다",
+     "괴물 정의 파일이 적어 둔 체력·공격력·방어력·경험치를 서버가 이제 읽는다. 전에는 네 가지를 모두 "
+     "`Level` 하나에서 만들고 **그 값을 파일 위에 덮어썼다.**",
+     [(SRC / "Hades.Server.Base/Templates/MonsterTemplate.cs", r"int\? (Ac|DmgMin|DmgMax|Exp)"),
+      (SCRIPTS / "Creations/monsters.cs", r"MaximumHP <= 0|Template\.MaximumHP|Template\.Ac|CastEnabled"),
+      (SCRIPTS / "Formulas/damage.cs", r"DmgMin|DmgMax|Random\.Next"),
+      (SCRIPTS / "Formulas/monsterexp.cs", r"Template\.Exp")],
+     ["덮어쓰던 줄은 `obj.Template.MaximumHP = (int)hp` 였다. `obj.Template` 은 사본이 아니라 템플릿 "
+      "캐시에 있는 **그 객체**라서, 한 번 젠하면 파일에 적힌 숫자가 메모리에서도 사라졌다.",
+      "팩 자료 형식 문제가 아니었다. 하데스가 싣는 `spider.json` 도 `Level 5 · 체력 680` 인데 275 로 "
+      "덮였다. 반대로 `bees`·`minion` 은 체력을 **0** 으로 적어 둔다 — 그것이 '레벨로 만들어라' 라는 "
+      "뜻이고, 지금은 그 관례를 그대로 따른다(0 이거나 Grow 면 계산, 아니면 적힌 값).",
+      "레벨은 필요 없었다. 팩 괴물 **243마리 전부**가 체력·최소공격력·최대공격력·방어력·경험치를 "
+      "갖고 있다. 레벨은 하데스가 그 넷을 못 가져서 쓰는 대용품일 뿐이다. (체력에서 레벨을 역산하면 "
+      "103마리가 300 이상이 된다 — 척도가 다르다. 하데스는 1~99레벨 전체가 체력 91~13,812 인데 팩 "
+      "괴물의 중간값이 60,000 이다.)",
+      "그 숫자들이 실제로 난이도 사다리를 만든다. 1수준 캐릭터(한 방 약 24점·체력 150) 기준으로 "
+      "`(튜토리얼)팜팻`(체력 10·공격 1~2)은 한 대에 죽고 나를 2점 때린다. `노비스풀뱀`(130·1~2)은 "
+      "6대. `그린팜팻`(1,950·80~88)부터 위험하고 `좀비`(70,000·1600~1650)는 나를 한 방에 죽인다. "
+      "전에는 243마리가 전부 체력 91·한 방 7점이라 **모든 사냥터가 똑같이 쉬웠다.**",
+      "방어는 팩도 낮을수록 좋다는 같은 규약이다(-80~0). 0 도 적어 둔 값일 수 있어서 '없음' 은 null "
+      "로 가린다 — 초보 사냥터 괴물이 정확히 0 이다.",
+      "마법 켜짐(`CastEnabled`)도 같이 고쳤다. 마력을 정하기 **전에** 읽고 있어서, 같은 정의인데 첫 "
+      "젠은 꺼지고 두 번째부터 켜졌다."],
+     "tests/hades-characterization/CombatSmokeTests.cs (KindsInTheRoom · Landings)"),
+
+    ("스크립트 하나가 어긋나면 전부 사라지고, 서버는 아무 일 없는 듯 뜬다",
+     "`scripts/` 아래 C# 은 **한 덩어리로** 컴파일된다. 한 곳이 안 되면 115장이 다 사라지는데 서버는 "
+     "그대로 켜지고 포트를 연다 — 괴물도 안 서고 기술도 안 돌지만 로그 한 줄만 남는다.",
+     [(SRC / "Hades.Server.Base/Scripting/ScriptManager.cs", r"Compiling all scripts|result\.Success|Diagnostic|LoadFromAssembly")],
+     ["실제로 겪었다. `damage.cs` 에 쓴 변수 이름이 아래쪽 `target is Monster monster` 와 겹쳐(CS0136) "
+      "스크립트가 0개가 됐고, 서버는 정상으로 보였다. 시험은 '괴물이 안 선다' 며 2분을 기다린 뒤 "
+      "엉뚱한 것을 신고했다.",
+      "찍히는 줄은 `Scripts Loaded and Compiled: 0` 하나다. 그래서 격리 서버 하네스가 그 줄을 보고 "
+      "**바로 멈추고 컴파일러가 한 말을 보여준다** — 같은 실수가 2분이 아니라 14초에 드러났다.",
+      "`tools/` 나 원본 게임 파일이 옆에 있으면 관리 어셈블리가 아닌 DLL 도 후보로 들어간다. "
+      "`AssemblyName.GetAssemblyName` 으로 걸러 내는 코드가 이미 있다 — 같은 함정이 전에도 있었다."],
+     "tests/hades-characterization/IsolatedHadesServer.cs (RequireCompiledScripts)"),
 
     ("새 캐릭터는 가득 차 있지 않다",
      "150 중 60, 200 중 30 으로 깨어난다. 40% 다.",

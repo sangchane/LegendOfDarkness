@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace Lod.Hades.Characterization;
@@ -108,6 +109,51 @@ public sealed class IsolatedHadesServer : IDisposable
                 $"The isolated Hades server did not report both listeners online within {readinessTimeout}." +
                 $"{Environment.NewLine}{ConsoleOutput}");
         }
+
+        RequireCompiledScripts();
+    }
+
+    /// <summary>
+    /// Refuses a server whose scripts did not compile. One bad script loses every script — they are compiled
+    /// as one assembly — and the server then starts and listens as though nothing happened: no monster ever
+    /// spawns, no merchant appears, no skill does anything, and the only sign is one line logged at
+    /// information level. A test that waits for a monster in that world waits out its whole timeout and
+    /// reports the wrong thing.
+    /// </summary>
+    private void RequireCompiledScripts()
+    {
+        const string counted = "Scripts Loaded and Compiled: ";
+
+        string console = ConsoleOutput;
+        int at = console.IndexOf(counted, StringComparison.Ordinal);
+
+        if (at < 0)
+        {
+            return;
+        }
+
+        string tail = console[(at + counted.Length)..];
+        string digits = new(tail.TakeWhile(char.IsAsciiDigit).ToArray());
+
+        if (digits.Length > 0 && digits != "0")
+        {
+            return;
+        }
+
+        // The compiler's own diagnostics are in the log, each prefixed with its CS number.
+        string[] complaints = [.. console
+            .Split('\n')
+            .Select(line => line.Trim())
+            .Where(line => Regex.IsMatch(line, @"\bCS\d{4}\b"))
+            .Distinct()
+            .Take(20)];
+
+        throw new InvalidOperationException(
+            "The isolated server compiled no scripts, so nothing a script drives will happen — monsters do "
+            + "not spawn and skills do nothing. The compiler said:" + Environment.NewLine
+            + (complaints.Length > 0
+                ? string.Join(Environment.NewLine, complaints)
+                : "(no CS diagnostics in the log)" + Environment.NewLine + ConsoleOutput));
     }
 
     /// <summary>Everything the server wrote to stdout and stderr so far.</summary>
