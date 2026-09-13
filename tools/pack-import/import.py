@@ -339,6 +339,19 @@ def item_json(rec, skipped):
 
 
 def write_items(keep):
+    """**쓰지 않는다.** 아이템의 베이스는 하데스 것이다.
+
+    `origin/Zolian` 브랜치가 아이템 템플릿 978장을 이미지·방어력·능력치·착용자리·직업·
+    성별·요구레벨·스크립트까지 갖춰 싣는다(`scripts/write-hades-items.py` 가 얹는다).
+    규칙 1번대로 하데스에 있으면 하데스 것을 쓰고 팩으로 덮지 않는다.
+
+    전에는 `master` 브랜치가 3장만 싣는 것을 보고 "하데스에 아이템이 없다" 고 판단해 팩
+    989개를 넣었다. 그것을 빼면서 이 함수도 멈춘다 — 안 멈추면 다음 `--write` 가 되살린다.
+    """
+    raise SystemExit(
+        "아이템은 하데스 것을 쓴다(scripts/write-hades-items.py). "
+        "팩 아이템은 넣지 않는다 — 위 주석 참고.")
+
     out = SERVER / "templates" / "items"
     out.mkdir(parents=True, exist_ok=True)
     skipped = Counter()
