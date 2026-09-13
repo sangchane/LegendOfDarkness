@@ -11,6 +11,7 @@
     "Created": "account creation timestamp",
     "LastLogged": "login timestamp",
     "SkillBook": "the skill granted by GiveAssailOnCreate carries a randomly generated ID; every other field of the book is identical between runs",
+    "SpellBook": "the spell granted by StarterSpellOnCreate carries a randomly generated ID, exactly as the skill does; every other field of the book is identical between runs",
     "Password": "stored as PBKDF2 over a random salt, so the same password hashes to a different string every time; that difference is the point — two accounts sharing a password must not look alike in the files"
   }
 }
