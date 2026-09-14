@@ -16,7 +16,7 @@
 |---|---|---|
 | 1 | **Hades 자기 자료** | `database/server/` · `database/assets/MetaFiles/` · `database/server/metafile/`(+`more`·`backup`) |
 | 2 | **원작 아카이브** | `ItemInfo0~11` 아이템 **6,199** · `SClass1~5` 기술·마법 613 · `SEvent1~7` 퀘스트 38 · `NPCIllust` 170 · `.dat` 11개(표 503) |
-| 3 | **참고 저장소 16개** | 원작을 관찰해 사람이 적은 것. `ETDA/BotCore/Shared/Collections.cs` 에 기술·마법의 직업·요구레벨(`Kelberoth Strike` = Monk 23), `SleepHunter4/data/Skills.xml`·`Spells.xml`·`Staves.xml` |
+| 3 | **참고 저장소 16개** | 원작을 관찰해 사람이 적은 것. `ETDA/BotCore/Shared/Collections.cs` 에 기술·마법의 직업과 **쿨다운**(`BaseSkillInformation(이름, 직업, 동작, cooldown)` — `Kelberoth Strike` 의 23 은 레벨이 아니라 23초다), `SleepHunter4/data/Skills.xml`·`Spells.xml`·`Staves.xml` |
 | 4 | **서버팩** | **2개가 일치할 때만** 후보. 불일치하면 **버린다** — 사람에게 묻지 않는다 |
 
 3번을 빼먹어서 "자료에 없다" 고 단정한 적이 있다. 원작 `SClass` 에서 `0/0/0` 으로 비어 있던
@@ -139,7 +139,49 @@ JSON 한 장을 넣으면 붙는다 — 그게 NPC 대화를 여는 가장 짧�
 | | 실린 것 | 스크립트 붙음 | 빈 껍데기 |
 |---|---|---|---|
 | 기술 | 258 | **13** | 245 |
-| 마법 | 329 | **25** | 304 |
+| 마법 | 329 | **42** | 287 |
+
+**엔진은 돈다. 내용이 없는 것이다.** 스크립트 파일은 116장 있고(기술 25 · 마법 43 · NPC 26 ·
+아이템 11 · 괴물 4 · 공식 4 …), `Double Punch` 는 실제로 피해가 들어가고 모션도 나온다.
+587개 중 **55개**만 그 스크립트에 이어져 있을 뿐이다.
+
+### 기술 한 장이 무엇으로 되어 있나
+
+동작은 자료가 아니라 **C# 스크립트 한 장**이다 (`database/server/scripts/Skills/DoublePunch.cs`).
+그 안에 네 가지가 다 들어 있다.
+
+| | `DoublePunch.cs` 의 예 |
+|---|---|
+| 대상 | `client.Aisling.GetInfront()` — **보는 방향 앞칸** (칸수를 주면 사거리가 된다) |
+| 피해 | `Str*4 + Con*2`, 여기에 `(20 + Skill.Level)%` 증폭 |
+| 적용 | `i.ApplyDamage(sprite, dmg, Skill.Template.Sound)` |
+| 모션 | `ServerFormat1A`(무도가면 `0x84` 주먹) · 피격 `ServerFormat29` · 빗나감은 `OnFailed` |
+
+다른 기술의 식도 같은 꼴이다: `Assail` Str×4+Dex×2 · `Clobber` +20% · `Wallop` Str×5+Dex×3 ·
+`Wind Blade` Str×10+Dex×5 **사거리 4칸** · `Crasher` 내 최대체력×3 · `Kelberoth Strike` 내 현재체력÷3.
+
+**템플릿에는 그런 칸이 없다.** `TargetAnimation`·`Sound`·`Icon` 조차 258장 중 1장만 값이 있다.
+
+### 배우는 조건은 이미 다 있다
+
+껍데기라는 말은 **동작**에 대한 것이다. 배우는 조건은 템플릿의 `Prerequisites` 에 들어 있고
+서버가 그대로 읽는다 — 직업 257/258 · 요구레벨 252 · 선행기술 184.
+
+```json
+"Kick":         {"Class_Required": 5, "ExpLevel_Required": 1, "Con_Required": 5, "Dex_Required": 4}
+"High Kick":    {"Class_Required": 5, "ExpLevel_Required": 4, "Dex_Required": 7,
+                 "Skill_Required": "Kick", "Skill_Level_Required": 5}
+```
+
+`Class_Required` 5 = 무도가다. **최상위 `Class` 칸이 아니라 여기를 봐야 한다** — 그걸 보고
+"직업이 전부 없다" 고 잘못 읽은 적이 있다.
+
+### 스크립트는 런타임에 컴파일된다 — 그리고 한 장이 깨지면 전부 사라진다
+
+`ScriptManager.LoadAndCacheScripts()` 가 서버를 띄울 때 `scripts/**/*.cs` 를 Roslyn 으로 통째로
+컴파일한다. **.cs 파일만 넣으면 되고 빌드가 필요 없다.** 대신 컴파일이 한 번 실패하면
+**모든 스크립트가 조용히 사라진다** — 괴물도 안 뜨고 NPC 도 말을 안 하며, 로그 한 줄만 남는다.
+새 스크립트를 넣었으면 서버를 띄워 그 줄을 반드시 확인한다.
 
 ### 순서 — 하데스 먼저, 원작 다음, 팩은 안 본다
 
