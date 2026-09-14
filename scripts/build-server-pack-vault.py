@@ -87,6 +87,26 @@ def field_table(fields):
     return "| 칸 | 값 |\n|---|---|\n" + "\n".join(rows)
 
 
+def merge_command_records(command_table, evidence):
+    """명령표를 vault 기록으로 만들고, 있으면 기계어 증거를 덧붙인다."""
+    if not isinstance(command_table, dict):
+        return []
+
+    evidence_data = evidence if isinstance(evidence, dict) else {}
+    evidence_by_name = {
+        record["이름"]: record
+        for record in evidence_data.get("명령", [])
+    }
+    source = (
+        evidence_data.get("출처실행파일")
+        or command_table.get("출처실행파일", "")
+    )
+    return [
+        dict(command, 증거=evidence_by_name.get(command["이름"], {}), 출처=source)
+        for command in command_table.get("명령", [])
+    ]
+
+
 def build(pack):
     out = VAULT_ROOT / pack
     # 자기 출력만 먼저 비운다. macOS 는 파일이름의 대소문자를 보존만 하고 구분하지 않아서,
@@ -99,13 +119,7 @@ def build(pack):
     # 명령은 실행파일에서 나온 둘을 합친 것이다: 표(이름·인자서명)와 기계어 증거.
     cmd_tbl = load(pack, "script-commands")
     ev = load(pack, "script-command-evidence")
-    if isinstance(cmd_tbl, dict) and isinstance(ev, dict):
-        evd = {r["이름"]: r for r in ev.get("명령", [])}
-        data["commands"] = [dict(c, 증거=evd.get(c["이름"], {}),
-                                 출처=ev.get("출처실행파일", ""))
-                            for c in cmd_tbl.get("명령", [])]
-    else:
-        data["commands"] = []
+    data["commands"] = merge_command_records(cmd_tbl, ev)
     for key, nk in NAME_KEY.items():
         for e in data.get(key, []):
             e["이름"] = e[nk]

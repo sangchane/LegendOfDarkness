@@ -24,9 +24,13 @@
 import json, re, sys
 from pathlib import Path
 
+from graphify_runtime import configure_utf8_stdio
+
 ROOT = Path(__file__).resolve().parent.parent
 PACKS_DIR = ROOT / "data" / "server-packs"
 OUT_DIR = PACKS_DIR / "extracted"
+
+configure_utf8_stdio(sys.stdout, sys.stderr)
 
 KEYS = ("items", "mobs", "npcs", "spells", "skills", "maps", "worldmaps",
         "doors", "warps", "mob_spawns", "npc_spawns", "shops", "scripts",
@@ -96,6 +100,8 @@ def parse_manifest(text):
     out = []
     for line in content_lines(text):
         line = line.strip()
+        if line.startswith("#"):
+            continue
         if ":" not in line:
             continue
         kind, path = line.split(":", 1)
@@ -156,7 +162,8 @@ def script_calls(body):
 def load_pack(db):
     """매니페스트가 선언한 것만 읽는다. 무엇이 무엇을 선언했는지도 남긴다."""
     declared, manifests = {}, {}
-    for mf in sorted(db.rglob("*_db.txt")):
+    # Path 끼리 비교는 Windows 에서 대소문자를 구분하지 않아 줄 순서가 기계마다 달라진다 — 글자로 정렬한다
+    for mf in sorted(db.rglob("*_db.txt"), key=lambda f: f.relative_to(db).as_posix()):
         rel_mf = mf.relative_to(db).as_posix()
         entries = parse_manifest(read(mf))
         manifests[rel_mf] = [{"갈래": k, "경로": p} for k, p in entries]

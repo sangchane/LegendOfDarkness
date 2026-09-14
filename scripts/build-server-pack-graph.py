@@ -9,12 +9,20 @@ graphify 는 .txt 를 산문으로 보고 LLM 으로 뜻을 뽑는다. 그런데
   쓰는 법: python3 scripts/build-server-pack-graph.py
   (graphify 가 깔린 파이썬으로 자동으로 다시 실행한다)
 """
-import json, os, subprocess, sys
+import json, sys
 from pathlib import Path
+
+from graphify_runtime import (
+    configure_utf8_stdio,
+    execute_graphify_script,
+    find_graphify_python,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 EXTRACTED = ROOT / "data" / "server-packs" / "extracted"
 GRAPH_ROOT = ROOT / "data" / "server-packs" / "graph"
+
+configure_utf8_stdio(sys.stdout, sys.stderr)
 
 
 def ensure_graphify_python():
@@ -24,14 +32,12 @@ def ensure_graphify_python():
         return
     except ImportError:
         pass
-    import shutil
-    exe = shutil.which("graphify")
-    if not exe:
-        sys.exit("graphify 가 없다: uv tool install graphifyy")
-    py = Path(exe).read_text(encoding="utf-8", errors="replace").splitlines()[0].lstrip("#!").strip()
-    if not Path(py).exists():
-        sys.exit(f"graphify 의 파이썬을 못 찾았다: {py}")
-    os.execv(py, [py, __file__, *sys.argv[1:]])
+    try:
+        py = find_graphify_python()
+    except RuntimeError as exc:
+        sys.exit(str(exc))
+    status = execute_graphify_script(py, Path(__file__).resolve(), sys.argv[1:])
+    raise SystemExit(status)
 
 
 ensure_graphify_python()
