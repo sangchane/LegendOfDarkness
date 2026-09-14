@@ -36,6 +36,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - **원작 아카이브에 뭐가 들었나: `python3 scripts/build-archive-vault.py` → `data/archives-vault/`** (Obsidian). `.dat` 11개 안의 읽을 수 있는 표 503개. **팩을 뒤지기 전에 여기부터**
 - **서버팩 자료 — 방법·공통 규칙: `docs/server-pack-data.md`** (원작 자료와 별개)
   - 팩별 내용: `docs/server-packs/5.99-server.md` · `docs/server-packs/honden-community.md` · `docs/server-packs/novaonline.md`
+  - **팩 3개와 Hades 를 나란히 놓고 본 것: `docs/pack-comparison.md`** — 무엇을 팩에서 가져오고 무엇을 가져오면 안 되는가 (`python3 scripts/compare-packs.py`)
 - 화면 배치(세로·가로): `docs/mobile-test-v1-wireframes.md` · 눌러볼 화면: `docs/index.html` (그림은 `docs/ui/assets/`)
 - 서버 안정화 계획과 결과: `docs/hades-p0-stabilization-plan.md`
 - 스코프 규칙(온디맨드): `sources/CLAUDE.md`
@@ -44,7 +45,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - Git/Graphite 작업 규칙: `WORKFLOW.md` · 처음 받기: `README.md`
 
 ## 규약
-- 각 작업과 주요 단계 시작 시 `$adaptive-model-router`가 사용자 요청·`NEXT.md` 현재 블록·관련 변경 파일·실패 이력을 보고 모델과 추론 강도를 정한다. 전환 기능이 있으면 확인 없이 바꾸고, 같은 파일을 고치는 작업은 동시에 분산하지 않는다.
+- 구현·검증·리뷰·커밋 요청에는 `$service-prompt-workflow`가 자동 적용된다. 사용자 요청·`NEXT.md` 현재 블록·관련 변경 파일·실패 이력을 기준으로 내장 모델 라우팅을 적용하며, 같은 파일을 고치는 작업은 동시에 분산하지 않는다.
 - **볼트는 저장소에 들어 있다 — 생성기를 돌리지 않고 그냥 Obsidian 으로 연다.** `data/truth-vault/`(자료 출처) · `data/formula-vault/`(식) · `data/archives-vault/`(아카이브 503표) · `data/game-data/vault-abilities/`(원작 기술·마법 613). 낡았으면 해당 생성기로 다시 만든다. 팩 볼트(`data/server-packs/vault/`, 43MB)만 무시 목록에 있다
 - **자료가 어디서 오나 (갈래별 셈): `python3 scripts/build-truth-vault.py` → `data/truth-vault/`** (Obsidian). **`database/assets/MetaFiles/` 를 먼저 본다** — 아이템 2,110·기술마법 613·퀘스트 38 이 거기서 나온다. 손으로 적은 표는 틀렸었다
 - **자료 출처 우선순위** (위에서부터 찾고, 있으면 아래를 보지 않는다):
