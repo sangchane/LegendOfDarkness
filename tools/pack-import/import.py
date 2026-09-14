@@ -338,28 +338,55 @@ def item_json(rec, skipped):
     return out
 
 
+def drop_names():
+    """괴물이 실제로 떨구려는 아이템 이름. 팩 아이템 989장 중 여기 드는 것만 넣는다."""
+    want = set()
+    for m in load("mobs"):
+        d = m["fields"].get("드롭아이템")
+        for x in flatten_drop(d):
+            want.add(x)
+    return want
+
+
+def flatten_drop(v):
+    """["확률", "이름", ["확률", "이름"], ...] 꼴이라 숫자를 빼고 이름만 꺼낸다."""
+    if isinstance(v, list):
+        return [x for e in v for x in flatten_drop(e)]
+    s = str(v).strip() if v is not None else ""
+    return [s] if s and not s.isdigit() else []
+
+
 def write_items(keep):
-    """**쓰지 않는다.** 아이템의 베이스는 하데스 것이다.
+    """**아이템의 베이스는 하데스 것이다.** 여기서는 괴물이 떨구는 잡템만 채운다.
 
-    `origin/Zolian` 브랜치가 아이템 템플릿 978장을 이미지·방어력·능력치·착용자리·직업·
-    성별·요구레벨·스크립트까지 갖춰 싣는다(`scripts/write-hades-items.py` 가 얹는다).
-    규칙 1번대로 하데스에 있으면 하데스 것을 쓰고 팩으로 덮지 않는다.
+    `origin/Zolian` 브랜치가 아이템 템플릿 978장을 갖춰 싣고(`scripts/write-hades-items.py`),
+    규칙 1번대로 하데스에 있으면 하데스 것을 쓴다. 전에 팩 989개를 통째로 넣었다가 뺐다.
 
-    전에는 `master` 브랜치가 3장만 싣는 것을 보고 "하데스에 아이템이 없다" 고 판단해 팩
-    989개를 넣었다. 그것을 빼면서 이 함수도 멈춘다 — 안 멈추면 다음 `--write` 가 되살린다.
+    그런데 괴물 드롭이 부르는 40종(`뱀고기`·`벌꿀`·`독거미알` …)은 **하데스에도 원작에도 없다** —
+    영문 표에 `Meat`·`Egg`·`Snake` 가 0개다. 한국판 고유 잡템이라 옮길 대상이 없다. 이것을
+    안 넣으면 드롭이 통째로 죽는다. 그래서 **드롭이 부르는 것만** 넣고, 하데스가 이미 가진
+    이름은 건드리지 않는다. 표는 `Group` 이 `팩드롭` 이라 나중에 이것만 골라 뺄 수 있다.
     """
-    raise SystemExit(
-        "아이템은 하데스 것을 쓴다(scripts/write-hades-items.py). "
-        "팩 아이템은 넣지 않는다 — 위 주석 참고.")
-
     out = SERVER / "templates" / "items"
     out.mkdir(parents=True, exist_ok=True)
+    have = {f.stem for f in out.glob("*.json")}
+    want = drop_names()
     skipped = Counter()
+    n = 0
     for rec in keep:
+        if rec["이름"] not in want:
+            skipped["드롭이 안 부른다"] += 1
+            continue
+        stem = safe_name(rec["이름"]).lower()
+        if stem in have:
+            skipped["하데스가 이미 갖고 있다"] += 1
+            continue
         j = item_json(rec, skipped)
-        (out / f"{safe_name(rec['이름']).lower()}.json").write_text(
+        j["Group"] = "팩드롭"
+        (out / f"{stem}.json").write_text(
             json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
-    return len(keep), skipped
+        n += 1
+    return n, skipped
 
 
 # ── 괴물 ────────────────────────────────────────────────────────────────
@@ -411,17 +438,22 @@ def monster_json(spawn, mob, area_id, items):
         "ImageVarience": whole(f.get("이미지염색")) or 0,
         # Int32 를 넘는 체력이 실제로 있다(42억). 한 장이 넘치면 Newtonsoft 가 던지고
         # 괴물 적재가 통째로 멎는다 — "Monster Templates Loaded" 줄 자체가 안 찍힌다.
-        "MaximumHP": 0,     # 0 = "레벨에서 만들어라" (하데스 bees·minion 과 같은 관례)
-        "MaximumMP": 0,
-        # **수치는 넣지 않는다.** 체력·최소·최대공격력·방어력·경험치가 팩에 다 있지만 5.99 **단독**
-        # 이다. 규칙은 하데스가 베이스이고 팩은 두 쪽이 일치할 때만 후보인데, 괴물 수치는 두 팩에서
-        # 이름이 겹치는 35마리조차 **전부 어긋난다**(체력 35/35 불일치 · 공격력 31 · 경험치 30).
-        # 교차 검증이 불가능하므로 후보가 아니다.
+        # **수치를 팩에서 넣는다.** 2026-09-14 사용자 결정 — 하데스에는 괴물이 3마리뿐이고
+        # 원작 아카이브에도 괴물 수치가 없다(아카이브는 클라이언트 자료다). 팩 3개는 이름이
+        # 겹치는 22마리조차 체력·공격력·경험치가 0/22 로 어긋나 교차 검증이 불가능하지만,
+        # 값이 없으면 사냥 자체가 성립하지 않는다. 그래서 **한 팩(5.99)을 통째로** 쓴다 —
+        # 칸별로 팩을 섞으면 어느 서버의 균형도 아닌 것이 된다.
         #
-        # 원작 아카이브에도 없다 — 아카이브는 클라이언트 자료이고 괴물 수치는 서버가 갖는 값이다.
-        # 그래서 근거 있는 값이 없고, 체력 0 을 두어 **하데스 식이 레벨에서 만들게** 한다
-        # (Creations/monsters.cs 가 0 이면 계산한다). 서버는 적혀 있으면 읽으므로, 근거 있는
-        # 자료가 생기면 여기만 채우면 된다.
+        # Int32 를 넘는 체력이 실제로 있다(42억). 한 장이 넘치면 Newtonsoft 가 던지고 괴물
+        # 적재가 통째로 멎는다 — "Monster Templates Loaded" 줄 자체가 안 찍힌다. 그래서 자른다.
+        "MaximumHP": whole(f.get("체력"), 2**31 - 1) or 0,
+        "MaximumMP": 0,     # 팩에 마력 칸이 없다. 0 이면 마법을 안 쓴다 (CastEnabled)
+        "Exp": whole(f.get("경험치"), 2**31 - 1),
+        "DmgMin": whole(f.get("최소공격력"), 2**31 - 1),
+        "DmgMax": whole(f.get("최대공격력"), 2**31 - 1),
+        # 방어는 음수가 낮을수록 단단하다. 0 도 적어 둔 값이라 없을 때만 None 으로 둔다
+        # (하데스는 Ac 가 null 이면 레벨에서 만든다).
+        "Ac": whole(f.get("방어력") if f.get("방어력") is not None else f.get("방어")),
         "Level": 1,
         "MovementSpeed": speed, "EngagedWalkingSpeed": speed,
         "AttackSpeed": 1000, "CastSpeed": 8000,
@@ -451,7 +483,8 @@ def write_monsters(keep):
             json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
         n += 1
         for k in mobs[sp["괴물"]]["fields"]:
-            if k not in ("이름", "속도", "이미지", "이미지염색", "젠타임", "드롭아이템", "골드"):
+            if k not in ("이름", "속도", "이미지", "이미지염색", "젠타임", "드롭아이템", "골드",
+                         "체력", "최소공격력", "최대공격력", "방어력", "방어", "경험치"):
                 skipped[k] += 1
     return n, skipped
 
