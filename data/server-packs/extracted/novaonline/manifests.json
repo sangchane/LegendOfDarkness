@@ -1,0 +1,1068 @@
+{
+ "door/door_db.txt": [
+  {
+   "갈래": "door",
+   "경로": "db/door/undine.txt"
+  }
+ ],
+ "item/item_db.txt": [
+  {
+   "갈래": "item",
+   "경로": "db/item/item_cash.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/weapon/sword.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/weapon/axe.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/weapon/dagger.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/weapon/staff.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/weapon/glove.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/weapon/whip.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/weapon/event.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/gaiter.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/armor.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/dev.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/LCT.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/Ring.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/novice.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/text1.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/leecall/mix.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/orjen.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/Abill.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/MasterUD.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/master.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/Nomus.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/armor/test.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/gad.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/recoll.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/test3.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/블랙세트.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/신버전아템들.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/적흑갑.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/노비스드랍.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/아이템이미지(작성).txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/염색약.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/목도.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/강화석.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/채집.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/용병.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/속성.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/리치성숙의물약.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/어빌무기.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/조합관련.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/별세트.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/주작.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/캐시샵.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/어설픈.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/종족의옷.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/가호.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/다크.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/어둠의전설.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/캐쉬옷.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/잡것.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/레전드.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/흑요석.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/개인사냥터.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/전문기술/전문기술.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/영월무기업그레이드.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/new/전사무기.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/new/도적무기.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/new/마법사무기.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/new/성직자무기.txt"
+  },
+  {
+   "갈래": "item",
+   "경로": "db/item/new/무도가무기.txt"
+  }
+ ],
+ "maps/map_db.txt": [
+  {
+   "갈래": "maps",
+   "경로": "db/maps/default/default.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/undine/undine.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/suomi/suomi.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/tagore/tagore.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/mileth/mileth.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/abel/abel.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/mine/mine.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/piet/piet.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/roues/roues.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/rucesion/rucesion.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/rotone/rotone.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/rucesionfield/rucesionfield.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/초보자마을/초보자마을.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/채집/채집장.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/노비스마을/노비스마을.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/아슬론마을/아슬론마을.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/PK/PK.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/시장/시장.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/리치의신전/리치의신전.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/리치길드성/리치길드성.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/길드성쟁탈전1/길드성쟁탈전1.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/결계/결계.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/hoyen/hoyen.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/woodland/west.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/woodland/east.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/woodland/north.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/승급호러캐슬/승급호러캐슬.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/혼돈의탑/혼돈의탑.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/호러캐슬/호러캐슬.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/아벨해안/아벨해안.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/뤼케해안/뤼케해안.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/죽음의마을/죽음의마을.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/리치성/리치성.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/개인사냥터/개인사냥터.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/레전드호/레전드호.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/테스트/테스트.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/뮤레칸의역습/뮤레칸의역습.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/newworldmap.txt"
+  },
+  {
+   "갈래": "worldmap",
+   "경로": "db/maps/worldmap.txt"
+  },
+  {
+   "갈래": "maps",
+   "경로": "db/maps/abelfield/abelfield.txt"
+  }
+ ],
+ "mob/mob_db.txt": [
+  {
+   "갈래": "mob",
+   "경로": "db/mob/개인사냥터/개인사냥터.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/개인사냥터/개인사냥터스팬.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/woodland1.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/lcmob.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/castle.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/deadhole.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/iceworld.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/milethdon.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/fieldmob.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/fortat.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/mine.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/hometer.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/연습장.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/Jug/Redmob.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/Jug/Bluemob.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/Jug/Blonzmob.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/부엉이/2차레드.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/노비스/몬스터.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/뮤레칸의역습/뮤레칸의역습.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/뮤레칸의역습/spawn.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/부엉이/미궁몹.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/이벤트사냥터/초보자전용이벤트.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/이벤트사냥터/승급자전용이벤트.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/money/money.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/money/moneyspawn.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/전문기술/전문기술.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/용병/용병.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/용병/용병스팬.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/spawn.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/Jug/spawn1.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/Jug/spawn2.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/Jug/spawn3.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/hometerspawn.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/calsespawn.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/자작.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/결계/결계.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/결계/결계스팬.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/자작스팬.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/노비스/spawn.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/이벤트사냥터/spawn1.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/해안/해안몬스터.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/해안/해안스팬.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/이벤트사냥터/spawn2.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/부엉이/spawn1.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/개발자/Good.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/어빌몹/어빌몹.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/길드성쟁탈전/길드성쟁탈전.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/어빌몹/Spawn.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/길드성쟁탈전/길드성스팬.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/호러캐슬/호러캐슬.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/아벨해안/아벨해안.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/아벨해안/아벨해안스폰.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/뤼케해안/뤼케해안.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/뤼케해안/뤼케해안스폰.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/죽음의마을/죽음의마을.txt"
+  },
+  {
+   "갈래": "mob",
+   "경로": "db/mob/혼돈의탑/혼돈의탑.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/mob/죽음의마을/죽음의마을스팬.txt"
+  }
+ ],
+ "npc/npc_db.txt": [
+  {
+   "갈래": "npc",
+   "경로": "db/npc/mileth.txt"
+  },
+  {
+   "갈래": "npc",
+   "경로": "db/npc/dev.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/npc/spawn.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/npc/devspawn.txt"
+  },
+  {
+   "갈래": "shop",
+   "경로": "db/npc/admin_shop.txt"
+  },
+  {
+   "갈래": "shop",
+   "경로": "db/npc/노비스샾.txt"
+  },
+  {
+   "갈래": "shop",
+   "경로": "db/npc/멤버쉽샵.txt"
+  },
+  {
+   "갈래": "npc",
+   "경로": "db/npc/begin.txt"
+  },
+  {
+   "갈래": "spawn",
+   "경로": "db/npc/beginspawn.txt"
+  }
+ ],
+ "script/script_db.txt": [
+  {
+   "갈래": "script",
+   "경로": "db/script/script.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/mob.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/npc_script.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill_script.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/npc2_script.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/spell_script.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/staff_script.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/test.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/스킬배우기.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/이동npc.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/이아의천상계.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/승급.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/캐시샵.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/월드맵.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/샵/샵.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/전사(비전직).txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/Warrior.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/Rogue.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/도적(비전직).txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/성직자(비전직).txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/법사(비전직).txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/무도가(비전직).txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/Wizard.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/Monk.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/Monk(조류).txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/Jigja.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/skill/공통스킬.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/제조하자.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/제조2.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/제조3.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/제조4.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/리젠제작.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/적갑흑갑.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/로열.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/로열2.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/ammor.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/블랙.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/길드제조.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/다크.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/생셋암셋업.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/제조/제조의책.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/세피라링업글.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/별의눈물.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/선상퀘스트.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/선상2.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/목도업그레이드.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/팬던트.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/노비스마을.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/begin.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/용병.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/1서클.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/2서클.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/3서클.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/죽음의마을던전.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/퀘스트/혼돈의탑.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/자동/못지나가.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/자동/채집.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/자동/함정.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/자동/노비스마을.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/길드/길드.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/길드/길드성.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/길드/길드성쟁탈전.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/아이템/아이템.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/아이템/캐시템.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/아이템/염색약.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/아이템/텔깃.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/아이템/캐쉬.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/아이템/맴버쉽.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/운영자/운영자.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/도박/도박.txt"
+  },
+  {
+   "갈래": "script",
+   "경로": "db/script/전문기술/전문기술광물.txt"
+  }
+ ],
+ "skill/skill_db.txt": [
+  {
+   "갈래": "skill",
+   "경로": "db/skill/default.txt"
+  }
+ ],
+ "spell/spell_db.txt": [
+  {
+   "갈래": "spell",
+   "경로": "db/spell/spell.txt"
+  }
+ ],
+ "warp/warp_db.txt": [
+  {
+   "갈래": "warp",
+   "경로": "db/warp/Titan.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/woodland.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/worldmap.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/warp_script.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/혼돈의탑함정.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/blonz.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/dev.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/아슬론마을.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/용자의공원.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/미궁.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/초보자마을.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/노비스마을.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/아침호.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/아슬론마을버그.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/아이스월드워프.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/리치의신전.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/리치길드성.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/begin.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/아벨해안.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/뤼케해안.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/죽음의마을.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/리치성.txt"
+  },
+  {
+   "갈래": "warp",
+   "경로": "db/warp/레전드호.txt"
+  }
+ ]
+}

@@ -1,0 +1,661 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+//마법사
+//////////////////////////////////////////////////////////////////////////////////////////
+0,0,0,0,0,0,0	staff_매직루나1	{
+ spell_sleep "마레노", 0;
+ spell_sleep "베노미", 0;
+ spell_sleep "수페라마레나", 0;
+}
+
+0,0,0,0,0,0,0	staff_매직루나2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "수페라마레나", 2;
+}
+
+0,0,0,0,0,0,0	staff_매직파나1	{
+ spell_sleep "마레노", 0;
+ spell_sleep "베노미", 0;
+ spell_sleep "렌토", 1;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "나르콜리", 1;
+ spell_sleep "바르도", 1;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "데프레코", 1;
+ spell_sleep "마레네라", 1;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 1;
+ spell_sleep "쿠라노", 0;
+ spell_sleep "쿠러스", 1;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 1;
+ spell_sleep "디나르콜리", 0;
+ spell_sleep "디소루마", 0;
+ spell_sleep "디베노모", 0;
+ spell_sleep "리베라토", 1;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "홀리볼트(Lev2)", 2;
+ spell_sleep "수페라쿠라노", 1;
+ spell_sleep "엑스쿠라노", 1;
+ spell_sleep "쿠라네라", 1;
+ spell_sleep "엑스쿠라네라", 1;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 1;
+}
+
+0,0,0,0,0,0,0	staff_매직파나2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 2;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "바르도", 2;
+ spell_sleep "데프레코", 2;
+ spell_sleep "나르콜리", 3;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 2;
+ spell_sleep "디나르콜리", 2;
+ spell_sleep "디소루마", 2;
+ spell_sleep "디베노모", 2;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "홀리볼트(Lev2)", 2;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "리베라토", 3;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 2;
+}
+
+0,0,0,0,0,0,0	staff_매직세페우스1	{
+ spell_sleep "마레노", 0;
+ spell_sleep "베노미", 0;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "나르콜리", 0;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "마레네라", 2;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 0;
+}
+
+0,0,0,0,0,0,0	staff_매직세페우스2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "나르콜리", 1;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+}
+
+0,0,0,0,0,0,0	staff_로오의은총1	{
+ spell_sleep "마레노", 0;
+ spell_sleep "베노미", 0;
+ spell_sleep "렌토", 0;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "나르콜리", 0;
+ spell_sleep "바르도", 0;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "데프레코", 0;
+ spell_sleep "마레네라", 1;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 0;
+ spell_sleep "매직프로텍션", 0;
+ spell_sleep "아이스블러스트", 1;
+ spell_sleep "어둠의각인", 1;
+ spell_sleep "메테오", 2;
+ spell_sleep "포트리스", 0;
+ spell_sleep "델리스펠라스", 0;
+ spell_sleep "프라베라", 2;
+ spell_sleep "화이라소환(Lev1)", 0;
+ spell_sleep "화이라소환(Lev2)", 1;
+ spell_sleep "화이라소환(Lev3)", 0;
+ spell_sleep "속성강화", 1;
+ spell_sleep "칸의눈(Lev1)", 0;
+ spell_sleep "쿠라노", 0;
+ spell_sleep "쿠러스", 1;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 1;
+ spell_sleep "디나르콜리", 0;
+ spell_sleep "디소루마", 0;
+ spell_sleep "디베노모", 0;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "수페라쿠라노", 1;
+ spell_sleep "엑스쿠라노", 1;
+ spell_sleep "쿠라네라", 1;
+ spell_sleep "리베라토", 1;
+ spell_sleep "엑스쿠라네라", 1;
+ spell_sleep "이모탈", 0;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 1;
+}
+
+0,0,0,0,0,0,0	staff_로오의은총2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 2;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "바르도", 2;
+ spell_sleep "데프레코", 2;
+ spell_sleep "나르콜리", 3;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+ spell_sleep "매직프로텍션", 4;
+ spell_sleep "아이스블러스트", 3;
+ spell_sleep "어둠의각인", 3;
+ spell_sleep "메테오", 5;
+ spell_sleep "포트리스", 3;
+ spell_sleep "델리스펠라스", 3;
+ spell_sleep "프라베라", 5;
+ spell_sleep "화이라소환(Lev1)", 3;
+ spell_sleep "화이라소환(Lev2)", 3;
+ spell_sleep "화이라소환(Lev3)", 3;
+ spell_sleep "속성강화", 3;
+ spell_sleep "칸의눈(Lev1)", 3;
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 2;
+ spell_sleep "디나르콜리", 2;
+ spell_sleep "디소루마", 2;
+ spell_sleep "디베노모", 2;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "리베라토", 3;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 2;
+}
+
+0,0,0,0,0,0,0	staff_영월충1	{
+ spell_sleep "마레노", 0;
+ spell_sleep "베노미", 0;
+ spell_sleep "렌토", 0;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "나르콜리", 0;
+ spell_sleep "바르도", 0;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "데프레코", 0;
+ spell_sleep "마레네라", 1;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 0;
+ spell_sleep "매직프로텍션", 0;
+ spell_sleep "아이스블러스트", 1;
+ spell_sleep "어둠의각인", 0;
+ spell_sleep "메테오", 2;
+ spell_sleep "포트리스", 0;
+ spell_sleep "델리스펠라스", 0;
+ spell_sleep "프라베라", 1;
+ spell_sleep "화이라소환(Lev1)", 0;
+ spell_sleep "화이라소환(Lev2)", 1;
+ spell_sleep "화이라소환(Lev3)", 0;
+ spell_sleep "속성강화", 1;
+ spell_sleep "칸의눈(Lev1)", 0;
+ spell_sleep "쿠라노", 0;
+ spell_sleep "쿠러스", 1;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 1;
+ spell_sleep "디나르콜리", 0;
+ spell_sleep "디소루마", 0;
+ spell_sleep "디베노모", 0;
+ spell_sleep "리베라토", 0;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "수페라쿠라노", 1;
+ spell_sleep "엑스쿠라노", 1;
+ spell_sleep "쿠라네라", 1;
+ spell_sleep "엑스쿠라네라", 1;
+ spell_sleep "이모탈", 0;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 1;
+}
+
+0,0,0,0,0,0,0	staff_영월충2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 2;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "바르도", 2;
+ spell_sleep "데프레코", 2;
+ spell_sleep "나르콜리", 3;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+ spell_sleep "매직프로텍션", 4;
+ spell_sleep "아이스블러스트", 3;
+ spell_sleep "어둠의각인", 3;
+ spell_sleep "메테오", 5;
+ spell_sleep "포트리스", 3;
+ spell_sleep "델리스펠라스", 3;
+ spell_sleep "프라베라", 5;
+ spell_sleep "화이라소환(Lev1)", 3;
+ spell_sleep "화이라소환(Lev2)", 3;
+ spell_sleep "화이라소환(Lev3)", 3;
+ spell_sleep "속성강화", 3;
+ spell_sleep "칸의눈(Lev1)", 3;
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "리베라토", 3;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 2;
+ spell_sleep "디나르콜리", 2;
+ spell_sleep "디소루마", 2;
+ spell_sleep "디베노모", 2;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 2;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//성직자
+//////////////////////////////////////////////////////////////////////////////////////////
+0,0,0,0,0,0,0	staff_홀리루나1	{
+ spell_sleep "쿠라노", 0;
+ spell_sleep "쿠러스", 0;
+ spell_sleep "홀리볼트(Lev1)", 0;
+}
+
+0,0,0,0,0,0,0	staff_홀리루나2	{
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "홀리볼트(Lev1)", 1;
+}
+
+0,0,0,0,0,0,0	staff_홀리파나1	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 1;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "나르콜리", 1;
+ spell_sleep "바르도", 1;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "데프레코", 1;
+ spell_sleep "마레네라", 1;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 1;
+ spell_sleep "쿠라노", 0;
+ spell_sleep "벨라르모", 0;
+ spell_sleep "수페라벨라르모", 0;
+ spell_sleep "에네르마", 0;
+ spell_sleep "홀리볼트", 0;
+ spell_sleep "디나르콜리", 0;
+ spell_sleep "디소루마", 0;
+ spell_sleep "디베노모", 0;
+ spell_sleep "쿠러스", 0;
+ spell_sleep "쿠라노소", 0;
+ spell_sleep "쿠라누스", 0;
+ spell_sleep "수페라쿠라노", 0;
+ spell_sleep "엑스쿠라노", 0;
+ spell_sleep "쿠라네라", 0;
+ spell_sleep "리베라토", 1;
+ spell_sleep "엑스쿠라네라", 0;
+ spell_sleep "이모탈", 0;
+ spell_sleep "호르라마", 0;
+ spell_sleep "코마디아", 0;
+}
+
+0,0,0,0,0,0,0	staff_홀리파나2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 2;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "바르도", 2;
+ spell_sleep "데프레코", 2;
+ spell_sleep "나르콜리", 3;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 2;
+ spell_sleep "디나르콜리", 2;
+ spell_sleep "디소루마", 2;
+ spell_sleep "디베노모", 2;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "리베라토", 3;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 2;
+}
+
+0,0,0,0,0,0,0	staff_홀리세페우스1	{
+ spell_sleep "쿠라노", 0;
+ spell_sleep "쿠러스", 0;
+ spell_sleep "홀리볼트(Lev1)", 0;
+ spell_sleep "쿠라노소", 0;
+ spell_sleep "쿠라누스", 0;
+ spell_sleep "홀리볼트(Lev2)", 1;
+ spell_sleep "수페라쿠라노", 0;
+ spell_sleep "엑스쿠라노", 0;
+ spell_sleep "쿠라네라", 0;
+ spell_sleep "엑스쿠라네라", 0;
+ spell_sleep "이모탈", 0;
+ spell_sleep "호르라마", 0;
+}
+
+0,0,0,0,0,0,0	staff_홀리세페우스2	{
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "홀리볼트(Lev1)", 1;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "홀리볼트(Lev2)", 2;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+}
+
+0,0,0,0,0,0,0	staff_이아의은총1	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 1;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "나르콜리", 0;
+ spell_sleep "바르도", 1;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "데프레코", 1;
+ spell_sleep "마레네라", 1;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 1;
+ spell_sleep "쿠라노", 0;
+ spell_sleep "벨라르모", 0;
+ spell_sleep "수페라벨라르모", 0;
+ spell_sleep "에네르마", 0;
+ spell_sleep "홀리볼트", 0;
+ spell_sleep "디나르콜리", 0;
+ spell_sleep "디소루마", 0;
+ spell_sleep "디베노모", 0;
+ spell_sleep "쿠러스", 0;
+ spell_sleep "쿠라노소", 0;
+ spell_sleep "쿠라누스", 0;
+ spell_sleep "수페라쿠라노", 0;
+ spell_sleep "엑스쿠라노", 0;
+ spell_sleep "쿠라네라", 0;
+ spell_sleep "리베라토", 0;
+ spell_sleep "엑스쿠라네라", 0;
+ spell_sleep "홀리쿠라네라", 0;
+ spell_sleep "이모탈", 0;
+ spell_sleep "호르라마", 0;
+ spell_sleep "코마디아", 0;
+ spell_sleep "홀리쿠라노", 0;
+ spell_sleep "엑스벨라룸", 0;
+ spell_sleep "홀리드래곤", 3;
+ spell_sleep "리젠(Lev1)", 1;
+ spell_sleep "홀리쿠라노M(Lev1)", 0;
+}
+
+0,0,0,0,0,0,0	staff_이아의은총2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 2;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "바르도", 2;
+ spell_sleep "데프레코", 2;
+ spell_sleep "나르콜리", 3;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 2;
+ spell_sleep "디나르콜리", 2;
+ spell_sleep "디소루마", 2;
+ spell_sleep "디베노모", 2;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "리베라토", 3;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "홀리쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 2;
+ spell_sleep "홀리쿠라노", 3;
+ spell_sleep "엑스벨라룸", 3;
+ spell_sleep "홀리드래곤", 5;
+ spell_sleep "리젠(Lev1)", 3;
+ spell_sleep "홀리쿠라노M(Lev1)", 3;
+}
+
+0,0,0,0,0,0,0	staff_비파1	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 1;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "나르콜리", 0;
+ spell_sleep "바르도", 1;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "데프레코", 1;
+ spell_sleep "마레네라", 1;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 1;
+ spell_sleep "쿠라노", 0;
+ spell_sleep "벨라르모", 0;
+ spell_sleep "수페라벨라르모", 0;
+ spell_sleep "에네르마", 0;
+ spell_sleep "홀리볼트", 0;
+ spell_sleep "디나르콜리", 0;
+ spell_sleep "디소루마", 0;
+ spell_sleep "디베노모", 0;
+ spell_sleep "쿠러스", 0;
+ spell_sleep "쿠라노소", 0;
+ spell_sleep "쿠라누스", 0;
+ spell_sleep "수페라쿠라노", 0;
+ spell_sleep "엑스쿠라노", 0;
+ spell_sleep "쿠라네라", 0;
+ spell_sleep "리베라토", 0;
+ spell_sleep "엑스쿠라네라", 0;
+ spell_sleep "이모탈", 0;
+ spell_sleep "호르라마", 0;
+ spell_sleep "코마디아", 0;
+ spell_sleep "홀리쿠라노", 0;
+ spell_sleep "엑스벨라룸", 0;
+ spell_sleep "홀리드래곤", 3;
+ spell_sleep "리젠(Lev1)", 1;
+ spell_sleep "홀리쿠라노M(Lev1)", 0;
+ spell_sleep "홀리쿠라네라", 0;
+}
+
+0,0,0,0,0,0,0	staff_비파2	{
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "렌토", 2;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "바르도", 2;
+ spell_sleep "데프레코", 2;
+ spell_sleep "나르콜리", 3;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "벨라르모", 2;
+ spell_sleep "수페라벨라르모", 3;
+ spell_sleep "에네르마", 2;
+ spell_sleep "홀리볼트", 2;
+ spell_sleep "디나르콜리", 2;
+ spell_sleep "디소루마", 2;
+ spell_sleep "디베노모", 2;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "리베라토", 3;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "호르라마", 1;
+ spell_sleep "코마디아", 2;
+ spell_sleep "홀리쿠라노", 3;
+ spell_sleep "엑스벨라룸", 3;
+ spell_sleep "홀리드래곤", 5;
+ spell_sleep "리젠(Lev1)", 3;
+ spell_sleep "홀리쿠라노M(Lev1)", 3;
+ spell_sleep "홀리쿠라네라", 3;
+}
+
+//기타직업
+
+0,0,0,0,0,0,0	staff_기타1	{
+ spell_sleep "쿠라노", 0;
+ spell_sleep "쿠러스", 0;
+ spell_sleep "홀리볼트(Lev1)", 1;
+ spell_sleep "쿠라노소", 0;
+ spell_sleep "쿠라누스", 0;
+ spell_sleep "홀리볼트(Lev2)", 1;
+ spell_sleep "수페라쿠라노", 0;
+ spell_sleep "엑스쿠라노", 0;
+ spell_sleep "쿠라네라", 0;
+ spell_sleep "엑스쿠라네라", 0;
+ spell_sleep "이모탈", 0;
+ spell_sleep "홀리쿠라노", 0;
+ spell_sleep "홀리쿠라노M", 0;
+ spell_sleep "메가홀리쿠라노", 0;
+ spell_sleep "압록지정", 1;
+ spell_sleep "홀리드래곤", 2;
+ spell_sleep "리젠(Lev1)", 1;
+ spell_sleep "리젠(Lev2)", 1;
+ spell_sleep "리젠(Lev3)", 1;
+ spell_sleep "리젠(Lev4)", 1;
+ spell_sleep "마레노", 0;
+ spell_sleep "베노미", 1;
+ spell_sleep "수페라마레나", 1;
+ spell_sleep "마레누스", 1;
+ spell_sleep "엑스마레나", 1;
+ spell_sleep "마레네라", 2;
+ spell_sleep "리베라토", 1;
+ spell_sleep "마네나로", 2;
+ spell_sleep "프라보", 1;
+ spell_sleep "화이라소환", 1;
+ spell_sleep "화이라소환(Lev2)", 1;
+ spell_sleep "화이라소환(Lev3)", 1;
+ spell_sleep "화이라소환(Lev4)", 1;
+ spell_sleep "라이트닝", 1;
+ spell_sleep "메테오", 1;
+ spell_sleep "메테오M", 1;
+ spell_sleep "프라베라", 1;
+ spell_sleep "어각베라", 1;
+ spell_sleep "데스베라", 1; 
+ spell_sleep "퀘이크", 1;
+ spell_sleep "클레쉬스톰", 1;
+ spell_sleep "아이스블러스트", 1;
+ spell_sleep "플레어", 1;
+ spell_sleep "매직프로텍션", 0;
+}
+
+0,0,0,0,0,0,0	staff_기타2	{
+ spell_sleep "쿠라노", 1;
+ spell_sleep "쿠러스", 2;
+ spell_sleep "홀리볼트(Lev1)", 1;
+ spell_sleep "쿠라노소", 1;
+ spell_sleep "쿠라누스", 1;
+ spell_sleep "홀리볼트(Lev2)", 2;
+ spell_sleep "수페라쿠라노", 2;
+ spell_sleep "엑스쿠라노", 3;
+ spell_sleep "쿠라네라", 2;
+ spell_sleep "엑스쿠라네라", 3;
+ spell_sleep "이모탈", 1;
+ spell_sleep "홀리쿠라노", 2;
+ spell_sleep "홀리쿠라노M", 2;
+ spell_sleep "메가홀리쿠라노", 3;
+ spell_sleep "압록지정", 3;
+ spell_sleep "홀리드래곤", 3;
+ spell_sleep "리젠(Lev1)", 3;
+ spell_sleep "리젠(Lev2)", 3;
+ spell_sleep "리젠(Lev3)", 3;
+ spell_sleep "리젠(Lev4)", 3;
+ spell_sleep "마레노", 1;
+ spell_sleep "베노미", 1;
+ spell_sleep "리베라토", 3;
+ spell_sleep "수페라마레나", 2;
+ spell_sleep "마레누스", 2;
+ spell_sleep "엑스마레나", 3;
+ spell_sleep "마레네라", 3;
+ spell_sleep "마네나로", 3;
+ spell_sleep "프라보", 2;
+ spell_sleep "화이라소환", 3;
+ spell_sleep "화이라소환(Lev2)", 3;
+ spell_sleep "화이라소환(Lev3)", 3;
+ spell_sleep "화이라소환(Lev4)", 3;
+ spell_sleep "라이트닝", 3;
+ spell_sleep "메테오", 3;
+ spell_sleep "메테오M", 3;
+ spell_sleep "프라베라", 3;
+ spell_sleep "어각베라", 3;
+ spell_sleep "데스베라", 3; 
+ spell_sleep "퀘이크", 1;
+ spell_sleep "클레쉬스톰", 1;
+ spell_sleep "아이스블러스트", 1;
+ spell_sleep "플레어", 1;
+ spell_sleep "매직프로텍션", 1;
+}

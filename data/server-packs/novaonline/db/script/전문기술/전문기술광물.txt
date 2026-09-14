@@ -1,0 +1,12 @@
+0,0,0,0,0,0,0	메이런허브	{
+	set @myid, get_myid();
+	if(get_wearitem_weapon(@myid) != "초급삽" || get_wearitem_weapon(@myid) != "중급삽" || get_wearitem_weapon(@myid) != "고급삽" || get_wearitem_weapon(@myid) != "전설급삽"){message 3, "[채집실패]삽종류를 장착하고있어야, 약초채집을 할수있습니다."; end;}
+	re:
+	set @rand, rand(1,11);
+	if(@rand < 1 || @rand > 5){goto re;}
+	if(get_wearitem_weapon(@myid) == "초급삽"){
+	if(@rand == 11){set_herb get_herb() + 5; message 3, "[채집실패]약초채집 숙련도가 5 올랐습니다."; effect @myid, 33,0,100; end;}
+	if(@rand <= 5)set_herb get_herb() + 10; item_add "메이런허브잎", 1; message 3, "[채집성공:메이런허브잎]약초채집 숙련도가 10 올랐습니다."; effect @myid, 35,0,100; end;}
+	if(@rand <= 10)set_herb get_herb() + 10; item_add "메이런허브뿌리", 1; message 3, "[채집성공:메이런허브뿌리]약초채집 숙련도가 10 올랐습니다."; effect @myid, 35,0,100; end;}
+	end;
+}

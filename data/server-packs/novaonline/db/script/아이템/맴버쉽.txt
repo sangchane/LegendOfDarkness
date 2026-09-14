@@ -1,0 +1,23 @@
+0,0,0,0,0,0,0	member	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "리치멤버쉽") == 0){mes 1, "당신은 멤버쉽 회원이 아닙니다."; end;}
+	set @member_title$, "[" + get_name() + "]멤버쉽회원님! 안녕하세요? 메뉴를 선택해 주십시오!";
+	set @member_menu, menu(@member_title$, "원격체마사기", "뽀대아이템사기", "멤버전용물약사기", "사냥터집합소워프");
+	if(@member_menu == 1){
+	mes 1, "채팅창에 /체력 & /마력을 통해 경험치를 팔수있습니다.";
+	end;
+	}
+	if(@member_menu == 2){
+ 	shop 0, "뽀대아이템샵", "뽀대아이템판매!";
+	end;
+	}
+	if(@member_menu == 3){
+ 	shop 0, "멤버물약샵", "초콜릿 : 체마 3십만회복\\n밤 : 체마 6십만회복\\n빼빼로 : 체마9십만회복";
+	end;
+	}
+	if(@member_menu == 4){
+ 	if(get_level() == 99 && get_class_sub() >= 2){warp "사냥터워프", 8,8; end;}
+	mes 1, "아직 가기에 약하십니다.";
+	end;
+	}
+}

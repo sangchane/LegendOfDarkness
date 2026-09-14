@@ -1,0 +1,359 @@
+0,0,0,0,0,0,0	스킬스펠지우기	{
+		set @myid, get_myid();
+		set @select, menu("[" + get_name() + "]님, 메뉴를 선택해주세요.", "스킬지우기", "스펠지우기");
+		if(@select == 1){
+		input @skill_del$, 1, "[" + get_name() + "]님, 제거하실 스킬이름을 정확히 입력해주세요.", "", "", 255;
+		skill_del @skill_del$;
+		mes 1, "["+ @skill_del$+"]스킬을 제거하셧습니다.";
+		}else if(@select == 2){
+		input @spell_del$, 1, "[" + get_name() + "]님, 제거하실 스펠이름을 정확히 입력해주세요.", "", "", 255;
+		spell_del @spell_del$;
+		mes 1, "["+ @spell_del$+"]스펠을 제거하셧습니다.";		
+}
+del @select;
+}
+0,0,0,0,0,0,0	코마디움	{
+	set @myid, get_myid();
+	if(get_state(@myid) != 0){end;}
+	item_del "코마디움", 1;
+	set @target, get_front_char(@myid);
+	if(!@target) {end;}
+	if(get_state1(@target) != 1 && get_coma(@target) == 0){end;}
+	set_state1 @target, 0;
+	set_coma @target, 0;
+	coma_delay @target, 0;
+	del_coma @target;
+	set_vita @target, 1000;
+	set_mana @target, 1000;
+	effect @target, 0, 5, 75;
+	game_sound 8,0;
+}
+
+0,0,0,0,0,0,0	엑스코마디움	{
+ set @myid, get_myid();
+ item_del "엑스코마디움", 1;
+	if(get_state1(@myid) == 1&& get_coma(@myid) == 1){
+	set_state1 @myid, 0;
+	set_coma @myid, 0;
+	coma_delay @myid, 0;
+	set_vita @myid, 1000;
+	set_mana @myid, 1000;
+	del_coma @myid;
+	effect @myid, 5, 0, 75;
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	템삭제	{
+del @val;
+ set @val, menu("인벤토리에 있는 아이템중 원하시는것을 삭제합니다.", "네", "취소");
+		if(@val==1){
+			input @del$, 1, "삭제하실 아이템이름을 정확히 입력해주세요.", "", "", 255;
+			item_del @del$, 1;
+			del @del$;
+			item_del "템삭제", 1;
+		}
+	del @val;
+}
+
+0,0,0,0,0,0,0	방송쿠폰	{
+	set @val, 0;
+	del @val;
+	re:
+	set @val, menu("방송쿠폰입니다..\\n사용하시겠습니까?", "예", "아니오");
+	if(!@val || @val == 0){goto re;}
+	if(@val==1){
+		input @msg$, 1, "방송할 말을 입력해 주세요", "", "", 255;
+		console_output "[방송말]###[" + get_name() + "]" + @msg$;
+		broadcast 0, "###[" + get_name() + "]>>" + @msg$;
+		item_del "방송쿠폰", 1;
+		del @msg$;
+	}
+del @val;
+}
+
+0,0,0,0,0,0,0	하트초콜렛	{
+ set @myid, get_myid();
+ set_vita @myid, get_vita(@myid)+get_basevita(@myid);
+ set_mana @myid, get_mana(@myid)+get_basemana(@myid);
+ message 3, "당신의 체력이 모두 찼습니다.";
+ item_del "하트초콜렛",1;
+}
+
+0,0,0,0,0,0,0	초급포션	{
+	set @myid, get_myid();
+	if(get_mapname() == "3서클개인사냥터1" || get_mapname() == "3서클개인사냥터2" || get_mapname() == "3서클개인사냥터3" || get_mapname() == "3서클개인사냥터4" || get_mapname() == "3서클개인사냥터5"){
+		set @vita, get_basevita(@myid)/100*40;
+		set @mana, get_basemana(@myid)/100*40;
+		set_vita @myid, get_vita(@myid)+@vita;
+		set_mana @myid, get_mana(@myid)+@mana;
+		set @user, ((get_body()+1))+1;
+		char_damaged @myid, @user,@user;
+		message 3, "초급포션을 사용하셧습니다.";
+		end;
+	}
+	mes 1, "3서클개인사냥터에서만 사용가능합니다.";
+	end;
+}
+
+0,0,0,0,0,0,0	중급포션	{
+	set @myid, get_myid();
+	if(get_mapname() == "4서클개인사냥터1" || get_mapname() == "4서클개인사냥터2" || get_mapname() == "4서클개인사냥터3" || get_mapname() == "4서클개인사냥터4" || get_mapname() == "4서클개인사냥터5"){
+		set @vita, get_basevita(@myid)/100*30;
+		set @mana, get_basemana(@myid)/100*30;
+		set_vita @myid, get_vita(@myid)+@vita;
+		set_mana @myid, get_mana(@myid)+@mana;
+		set @user, ((get_body()+1))+1;
+		char_damaged @myid, @user,@user;
+		message 3, "중급포션을 사용하셧습니다.";
+		end;
+	}
+	mes 1, "4서클개인사냥터에서만 사용가능합니다.";
+	end;
+}
+
+0,0,0,0,0,0,0	고급포션	{
+	set @myid, get_myid();
+	if(get_mapname() == "지존개인사냥터1" || get_mapname() == "지존개인사냥터2" || get_mapname() == "지존개인사냥터3" || get_mapname() == "지존개인사냥터4" || get_mapname() == "지존개인사냥터5"){
+		set @vita, get_basevita(@myid)/100*20;
+		set @mana, get_basemana(@myid)/100*20;
+		set_vita @myid, get_vita(@myid)+@vita;
+		set_mana @myid, get_mana(@myid)+@mana;
+		set @user, ((get_body()+1))+1;
+		char_damaged @myid, @user,@user;
+		message 3, "고급포션을 사용하셧습니다.";
+		end;
+	}
+	mes 1, "지존개인사냥터에서만 사용가능합니다.";
+	end;
+}
+
+0,0,0,0,0,0,0	최고급포션	{
+	set @myid, get_myid();
+	if(get_mapname() == "승급개인사냥터1" || get_mapname() == "승급개인사냥터2" || get_mapname() == "승급개인사냥터3"){
+		set @vita, get_basevita(@myid)/100*20;
+		set @mana, get_basemana(@myid)/100*20;
+		set_vita @myid, get_vita(@myid)+@vita;
+		set_mana @myid, get_mana(@myid)+@mana;
+		set @user, ((get_body()+1))+1;
+		char_damaged @myid, @user,@user;
+		message 3, "최고급포션을 사용하셧습니다.";
+		end;
+	}
+	mes 1, "승급개인사냥터에서만 사용가능합니다.";
+	end;
+}
+
+0,0,0,0,0,0,0	수상한버섯	{
+ set @myid, get_myid();
+ set_vital "1";
+ message 1, "당신의 체력이 1이 됐습니다.";
+ item_del "수상한버섯",1;
+}
+
+0,0,0,0,0,0,0	승급수상한버섯	{
+ set @myid, get_myid();
+ set_vital "45000";
+ message 1, "당신의 체력이 45000이 됐습니다.";
+ item_del "승급수상한버섯",1;
+}
+
+0,0,0,0,0,0,0	뮤레칸의눈물	{
+ set @myid, get_myid();
+ set_manal "1";
+ message 1, "당신의 마력이 1이 됐습니다.";
+ item_del "뮤레칸의눈물",1;
+}
+
+0,0,0,0,0,0,0	선물상자	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @int, 0;
+	set @val, menu("자 한번 흔들어봅시다!", "사용한다.","다음에 사용한다.");
+	if(@val == 1){
+		RE:
+		set @int, rand(1,18);
+		if(@int < 1 || @int > 18){goto RE;}
+		if(@int == 1){money_add "50000"; item_del "선물상자",1; mes 1, "5만gold 당첨!!!!"; end;}
+		if(@int == 2){money_add "70000"; item_del "선물상자",1; mes 1, "7만gold 당첨!!!!"; end;}
+		if(@int == 3){money_add "60000"; item_del "선물상자",1; mes 1, "6만gold 당첨!!!!"; end;}
+		if(@int == 4){exp_add 10000000; item_del "선물상자",1; mes 1, "1억exp 당첨!!!!"; end;}
+		if(@int == 5){exp_add 20000000; item_del "선물상자",1; mes 1, "2억exp 당첨!!!!"; end;}
+		if(@int == 6){exp_add 30000000; item_del "선물상자",1; mes 1, "3억exp 당첨!!!!"; end;}
+		if(@int == 7){item_del "선물상자",1; mes 1, "꽝"; end;}
+		if(@int == 8){item_del "선물상자",1; mes 1, "꽝"; end;}
+		if(@int == 9){item_add "어설픈생명의목걸이",1; item_del "선물상자",1; mes 1, "어설픈생명의목걸이 당첨!!!!"; end;}
+		if(@int == 10){item_add "어설픈암흑의목걸이",1; item_del "선물상자",1; mes 1, "어설픈암흑의목걸이 당첨!!!!"; end;}
+		if(@int == 11){item_add "어설픈생명의벨트",1; item_del "선물상자",1; mes 1, "어설픈생명의벨트 당첨!!!!"; end;}
+		if(@int == 12){item_add "어설픈암흑의벨트",1; item_del "선물상자",1; mes 1, "어설픈암흑의벨트 당첨!!!!"; end;}
+		if(@int == 13){item_del "선물상자",1; mes 1, "꽝"; end;}
+		if(@int == 14){set_eg @eg + 200; item_del "선물상자",1; mes 1, "200EG당첨!"; end;}
+		if(@int == 15){set_eg @eg + 300; item_del "선물상자",1; mes 1, "300EG당첨!"; end;}
+		if(@int == 16){item_del "선물상자",1; mes 1, "꽝"; end;}
+		if(@int == 17){item_del "선물상자",1; mes 1, "꽝"; end;}
+		if(@int == 18){set_eg @eg + 500; item_del "선물상자",1; mes 1, "500EG당첨!"; end;}
+	}
+}
+
+0,0,0,0,0,0,0	리치의심장	{
+ set @val, menu("심장에서 피가 흐르고있다.", "피를 담는다.");
+ if(@val == 1){
+  set @val, rand(1,3);
+  if(@val == 1){
+   message 1, "{=q피를 담기시작하자 갈색으로변하였다.";
+   item_add "썩은리치의피",1;
+   item_del "리치의심장",1;
+
+  }else if(@val == 2){
+   message 1, "{=o피에서 이상한 냄새가올라온다.";
+   item_add "리치의피",1;
+   item_del "리치의심장",1;
+
+  }else if(@val == 3){
+   message 1, "{=o심장이굳어서 깨지더니 골드가 떨어졌다";
+   item_add "오십만골드",1;
+   item_del "리치의심장",1;
+	}
+}
+}
+
+0,0,0,0,0,0,0	천만골드	{
+	if(get_body() == 16) {
+money_add "+10000000";
+message 1, "금전10000000이올랐습니다.."; 
+}
+		else
+		{
+	if(get_body() == 32) {
+money_add "+10000000";
+message 1, "금전10000000이올랐습니다.."; 
+}
+		else
+		{message 1, "유령은 아이템을 사용할수없습니다."; 
+		}
+}
+		}
+}
+}
+
+0,0,0,0,0,0,0	풀억경	{
+	if(get_body() != 16 && get_body() != 32){message 1, "유령은 아이템을 사용할수없습니다."; end;}
+	set @val, menu("풀억경을 사용하시겠습니까?", "사용한다.");
+	if(@val == 1){exp_add 420000000; item_del "풀억경", 1; mes 1, "풀억경을 사용하셧습니다."; end;}
+	end;
+}
+
+
+0,0,0,0,0,0,0	3천골드	{
+	if(get_body() == 16 || get_body() == 32){money_add "+3000"; message 1, "금전3000골드가 올랐습니다."; end;}
+}
+
+0,0,0,0,0,0,0	5천골드	{
+	if(get_body() == 16 || get_body() == 32){money_add "+5000"; message 1, "금전5000골드가 올랐습니다."; end;}
+}
+
+0,0,0,0,0,0,0	1만골드	{
+	if(get_body() == 16) {
+money_add "+10000";
+message 1, "금전10000이올랐습니다.."; 
+}
+		else
+		{
+	if(get_body() == 32) {
+money_add "+10000";
+message 1, "금전10000이올랐습니다.."; 
+}
+		else
+		{message 1, "유령은 아이템을 사용할수없습니다."; 
+		}
+}
+		}
+}
+}
+0,0,0,0,0,0,0	십만골드	{
+	if(get_body() == 16) {
+money_add "+100000";
+message 1, "금전100000이올랐습니다.."; 
+}
+		else
+		{
+	if(get_body() == 32) {
+money_add "+100000";
+message 1, "금전100000이올랐습니다.."; 
+}
+		else
+		{message 1, "유령은 아이템을 사용할수없습니다."; 
+		}
+}
+		}
+}
+}
+0,0,0,0,0,0,0	오십만골드	{
+	if(get_body() == 16) {
+money_add "+500000";
+message 1, "금전500000이올랐습니다.."; 
+}
+		else
+		{
+	if(get_body() == 32) {
+money_add "+500000";
+message 1, "금전500000이올랐습니다.."; 
+}
+		else
+		{message 1, "유령은 아이템을 사용할수없습니다."; 
+		}
+}
+		}
+}
+}
+0,0,0,0,0,0,0	5백만골드	{
+item_del "5백만골드", 1;
+money_add "+5000000";
+message 1, "금전5000000이올랐습니다.."; 
+}
+0,0,0,0,0,0,0	3백만골드	{
+item_del "3백만골드", 1;
+money_add "+3000000";
+message 1, "금전3000000이올랐습니다.."; 
+}
+0,0,0,0,0,0,0	6천만골드	{
+item_del "6천만골드", 1;
+money_add "+60000000";
+message 1, "금전60000000이올랐습니다.."; 
+}
+0,0,0,0,0,0,0	3천만골드	{
+item_del "3천만골드", 1;
+money_add "+30000000";
+message 1, "금전30000000이올랐습니다.."; 
+}
+
+
+0,0,0,0,0,0,0	길드의가호	{
+ set @myid, get_myid();
+ exp_per @myid,180,2,3;
+ item_del "길드의가호", 1;
+ message 1, "경험치가 3분동안 2배가 됩니다."; 
+}
+//exp_rate 2; 서버경험치를 2배로 설정한다.
+//exp_per @myid, 시간(초), 배율, 옵션;
+//옵션  = 1 경험치, 2 어빌리티, 3 둘다
+
+0,0,0,0,0,0,0	타이틀달기	{
+	input_ok;
+	del @set_guild_title$;
+	input @set_guild_title$, 1, "[" + get_name() + "]님, 원하는 칭호를 써주십시오.", "", "", 255;
+  	set_guild_title @set_guild_title$;
+	item_del "칭호의인장", 1;
+	broadcast 5, "{=w[" + get_name() + "]님이 [" + @set_guild_title$ + "]칭호를 다셧습니다!!";
+	mes 1, "[" + @set_guild_title$ + "]칭호를 다셧습니다.";
+}
+
+0,0,0,0,0,0,0	이펙트팩토리	{
+	set @myid, get_myid();
+	re:
+	del @effect;
+	input @effect, 1, "이펙트를 몇번으로 하시겠습니까? {=c0번은 해제, 최대 10번까지 가능합니다", "", "", 2;
+	if(@effect < 0 || @effect > 10){mes 1, "이펙트는 최소 0번부터 최대 10번까지만 가능합니다."; goto re;}
+	set_jj @effect;
+	mes 0, "이펙트번호가 [" + @effect + "]번으로 변경되었습니다.";
+}

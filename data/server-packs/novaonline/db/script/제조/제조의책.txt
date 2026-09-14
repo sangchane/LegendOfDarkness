@@ -1,0 +1,242 @@
+0,0,0,0,0,0,0	제조의책	{
+	set @jejo, 0;
+	del @jejo;
+	re:
+	set @myid, get_myid();
+	set @jejo, menu("제작할것을 선택하세요", "생명의시약", "암흑의시약", "생명의목걸이", "생명의벨트", "암흑의목걸이", "암흑의벨트", "영월무기업그레이드");
+	if(@jejo == 0 || !@jejo){goto re;}
+	if(@jejo == 1){
+		mes 1, "생명의시약을 제작합니다.";
+		mes 1, "{=c재료는 여의주5개, 다이아몬드10개, 레드오피온의수염15개, 블루오피온의수염15개, 브론즈오피온의수염15개, 레드오피온의등껍질20개, 블루오피온의등껍질20개, 브론즈오피온의등껍질20개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "여의주") >= 5 && item_exist(@myid, "다이아몬드") >= 10 && item_exist(@myid, "레드오피온의수염") >=15 && item_exist(@myid, "블루오피온의수염") >=15 && item_exist(@myid, "브론즈오피온의수염") >=15 && item_exist(@myid, "레드오피온의등껍질") >=20 && item_exist(@myid, "블루오피온의등껍질") >=20 && item_exist(@myid, "브론즈오피온의등껍질") >=20){
+			item_del "여의주", 5;
+			item_del "다이아몬드", 10;
+			item_del "레드오피온의수염", 15;
+			item_del "블루오피온의수염", 15;
+			item_del "브론즈오피온의수염", 15;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_add "생명의시약", 1;
+			mes 1, "생명의시약 제작이 완료되었습니다.";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 2){
+		mes 1, "암흑의시약을 제작합니다.";
+		mes 1, "{=c재료는 여의주5개, 다이아몬드10개, 레드오피온의수염15개, 블루오피온의수염15개, 브론즈오피온의수염15개, 레드오피온의등껍질20개, 블루오피온의등껍질20개, 브론즈오피온의등껍질20개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "여의주") >= 5 && item_exist(@myid, "다이아몬드") >= 10 && item_exist(@myid, "레드오피온의수염") >=15 && item_exist(@myid, "블루오피온의수염") >=15 && item_exist(@myid, "브론즈오피온의수염") >=15 && item_exist(@myid, "레드오피온의등껍질") >=20 && item_exist(@myid, "블루오피온의등껍질") >=20 && item_exist(@myid, "브론즈오피온의등껍질") >=20){
+			item_del "여의주", 5;
+			item_del "다이아몬드", 10;
+			item_del "레드오피온의수염", 15;
+			item_del "블루오피온의수염", 15;
+			item_del "브론즈오피온의수염", 15;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_add "암흑의시약", 1;
+			mes 1, "암흑의시약 제작이 완료되었습니다.";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 3){
+		mes 1, "생명의목걸이를 제작합니다";
+		mes 1, "{=c재료는 생명의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+			item_del "생명의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			item_add "생명의목걸이", 1;
+			mes 1, "생명의목걸이 제작에 성공하셨습니다!!";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 4){
+		mes 1, "생명의벨트를 제작합니다";
+		mes 1, "{=c재료는 생명의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+			item_del "생명의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			item_add "생명의벨트", 1;
+			mes 1, "생명의벨트 제작에 성공하셨습니다!!";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 5){
+		mes 1, "암흑의목걸이를 제작합니다";
+		mes 1, "{=c재료는 암흑의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+			item_del "암흑의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			item_add "암흑의목걸이", 1;
+			mes 1, "암흑의목걸이 제작에 성공하셨습니다!!";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 6){
+		mes 1, "암흑의벨트를 제작합니다";
+		mes 1, "{=c재료는 암흑의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "다음을 눌르시면 제작이 시작됩니다.";
+		if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+			item_del "암흑의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			item_add "암흑의벨트", 1;
+			mes 1, "암흑의벨트 제작에 성공하셨습니다!!";
+		}else{mes 1, "재료가 부족합니다."; goto re;}
+	}
+	if(@jejo == 7){
+		mes 1, "영월무기 강화를 시작합니다.";
+		set @jejo2, 0;
+		del @jejo2;
+		re2:
+		set @myid, get_myid();
+		set @jejo2, menu("어느 영월무기를 강화합니까?", "영월도", "영월궁", "영월충", "비파", "돈파");
+		if(@jejo == 0 || !@jejo2){goto re2;}
+		if(@jejo2 == 1){
+			mes 1, "영월도를 강화합니다. \\n{=q강화할 영월도는 아이템창 첫번째칸에 있어야합니다!";
+			if(item_one_check(@myid) != "영월도" && item_one_check(@myid) != "영월도+2" && item_one_check(@myid) != "영월도+3" && item_one_check(@myid) != "영월도+4"){mes 0, "당신의 첫번째 아이템칸에는 [" + item_one_check(@myid) + "]가 있습니다.";}
+			if(item_one_check(@myid) == "영월도"){
+				mes 1, "영월도를 강화합니다. \\n{=c영월도 강화재료는 서큐버스의머리칼7개, 달의기운3개, 다크젬3개, 나겔링스타1개, 무기의봉인키1개";
+				mes 1, "재료를 확인합니다.";
+				if(item_exist(@myid, "서큐버스의머리칼") >= 7 && item_exist(@myid, "달의기운") >= 3 && item_exist(@myid, "다크젬") >= 3 && item_exist(@myid, "나겔링스타") >= 1 && item_exist(@myid, "무기의봉인키") >= 1){
+					mes 1, "재료가 확인됬습니다. \\n{=c제조를 시작합니다.";
+					item_del "서큐버스의머리칼", 7;
+					item_del "달의기운", 3;
+					item_del "다크젬", 3;
+					item_del "나겔링스타", 1;
+					item_del "무기의봉인키", 1;
+					do:
+					set @dorand, rand(1,100);
+					if(@dorand < 1 || @dorand > 100){goto do;}
+					if(@dorand < 35){mes 0, "{=c영월도 강화에 실패하셧습니다."; end;}
+					item_del "영월도", 1;
+					item_add "영월도+2", 1;
+					broadcast 5, "{=c[" + get_name() + "]님께서 영월도+2 제조에 성공하셧습니다.";
+					mes 0, "영월도 강화에 성공하셧습니다. \\n{=c영월도+2제조에 성공하셧습니다. \\n축하드립니다.";
+				}else{mes 0, "재료가 부족하여 강화진행이 취소되었습니다.";}
+			}
+			if(item_one_check(@myid) == "영월도+2"){mes 0, "아직 영월도+3제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "영월도+3"){mes 0, "아직 영월도+4제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "영월도+4"){mes 0, "더이상 영월도를 강화할수 없습니다.";}
+		}
+		if(@jejo2 == 2){
+			mes 1, "영월궁을 강화합니다. \\n{=q강화할 영월궁은 아이템창 첫번째칸에 있어야합니다!";
+			if(item_one_check(@myid) != "영월궁" && item_one_check(@myid) != "영월궁+2" && item_one_check(@myid) != "영월궁+3" && item_one_check(@myid) != "영월궁+4"){mes 0, "당신의 첫번째 아이템칸에는 [" + item_one_check(@myid) + "]가 있습니다.";}
+			if(item_one_check(@myid) == "영월궁"){
+				mes 1, "영월궁을 강화합니다. \\n{=c영월궁 강화재료는 서큐버스의머리칼7개, 달의기운3개, 다크젬3개, 나겔링스타1개, 무기의봉인키1개";
+				mes 1, "재료를 확인합니다.";
+				if(item_exist(@myid, "서큐버스의머리칼") >= 7 && item_exist(@myid, "달의기운") >= 3 && item_exist(@myid, "다크젬") >= 3 && item_exist(@myid, "나겔링스타") >= 1 && item_exist(@myid, "무기의봉인키") >= 1){
+					mes 1, "재료가 확인됬습니다. \\n{=c제조를 시작합니다.";
+					item_del "서큐버스의머리칼", 7;
+					item_del "달의기운", 3;
+					item_del "다크젬", 3;
+					item_del "나겔링스타", 1;
+					item_del "무기의봉인키", 1;
+					gung:
+					set @gungrand, rand(1,100);
+					if(@gungrand < 1 || @gungrand > 100){goto gung;}
+					if(@gungrand < 35){mes 0, "{=c영월궁 강화에 실패하셧습니다."; end;}
+					item_del "영월궁", 1;
+					item_add "영월궁+2", 1;
+					broadcast 5, "{=c[" + get_name() + "]님께서 영월궁+2 제조에 성공하셧습니다.";
+					mes 0, "영월궁 강화에 성공하셧습니다. \\n{=c영월궁+2제조에 성공하셧습니다. \\n축하드립니다.";
+				}else{mes 0, "재료가 부족하여 강화진행이 취소되었습니다.";}
+			}
+			if(item_one_check(@myid) == "영월궁+2"){mes 0, "아직 영월궁+3제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "영월궁+3"){mes 0, "아직 영월궁+4제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "영월궁+4"){mes 0, "더이상 영월궁을 강화할수 없습니다.";}
+		}
+		if(@jejo2 == 3){
+			mes 1, "영월충을 강화합니다. \\n{=q강화할 영월충은 아이템창 첫번째칸에 있어야합니다!";
+			if(item_one_check(@myid) != "영월충" && item_one_check(@myid) != "영월충+2" && item_one_check(@myid) != "영월충+3" && item_one_check(@myid) != "영월충+4"){mes 0, "당신의 첫번째 아이템칸에는 [" + item_one_check(@myid) + "]가 있습니다.";}
+			if(item_one_check(@myid) == "영월충"){
+				mes 1, "영월충을 강화합니다. \\n{=c영월충 강화재료는 서큐버스의머리칼7개, 달의기운3개, 다크젬3개, 나겔링스타1개, 무기의봉인키1개";
+				mes 1, "재료를 확인합니다.";
+				if(item_exist(@myid, "서큐버스의머리칼") >= 7 && item_exist(@myid, "달의기운") >= 3 && item_exist(@myid, "다크젬") >= 3 && item_exist(@myid, "나겔링스타") >= 1 && item_exist(@myid, "무기의봉인키") >= 1){
+					mes 1, "재료가 확인됬습니다. \\n{=c제조를 시작합니다.";
+					item_del "서큐버스의머리칼", 7;
+					item_del "달의기운", 3;
+					item_del "다크젬", 3;
+					item_del "나겔링스타", 1;
+					item_del "무기의봉인키", 1;
+					cung:
+					set @cungrand, rand(1,100);
+					if(@cungrand < 1 || @cungrand > 100){goto cung;}
+					if(@cungrand < 35){mes 0, "{=c영월충 강화에 실패하셧습니다."; end;}
+					item_del "영월충", 1;
+					item_add "영월충+2", 1;
+					broadcast 5, "{=c[" + get_name() + "]님께서 영월충+2 제조에 성공하셧습니다.";
+					mes 0, "영월충 강화에 성공하셧습니다. \\n{=c영월충+2제조에 성공하셧습니다. \\n축하드립니다.";
+				}else{mes 0, "재료가 부족하여 강화진행이 취소되었습니다.";}
+			}
+			if(item_one_check(@myid) == "영월충+2"){mes 0, "아직 영월충+3제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "영월충+3"){mes 0, "아직 영월충+4제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "영월충+4"){mes 0, "더이상 영월충을 강화할수 없습니다.";}
+		}
+		if(@jejo2 == 4){
+			mes 1, "비파를 강화합니다. \\n{=q강화할 비파는 아이템창 첫번째칸에 있어야합니다!";
+			if(item_one_check(@myid) != "비파" && item_one_check(@myid) != "비파+2" && item_one_check(@myid) != "비파+3" && item_one_check(@myid) != "비파+4"){mes 0, "당신의 첫번째 아이템칸에는 [" + item_one_check(@myid) + "]가 있습니다.";}
+			if(item_one_check(@myid) == "비파"){
+				mes 1, "비파를 강화합니다. \\n{=c비파 강화재료는 서큐버스의머리칼7개, 달의기운3개, 다크젬3개, 나겔링스타1개, 무기의봉인키1개";
+				mes 1, "재료를 확인합니다.";
+				if(item_exist(@myid, "서큐버스의머리칼") >= 7 && item_exist(@myid, "달의기운") >= 3 && item_exist(@myid, "다크젬") >= 3 && item_exist(@myid, "나겔링스타") >= 1 && item_exist(@myid, "무기의봉인키") >= 1){
+					mes 1, "재료가 확인됬습니다. \\n{=c제조를 시작합니다.";
+					item_del "서큐버스의머리칼", 7;
+					item_del "달의기운", 3;
+					item_del "다크젬", 3;
+					item_del "나겔링스타", 1;
+					item_del "무기의봉인키", 1;
+					be:
+					set @berand, rand(1,100);
+					if(@berand < 1 || @berand > 100){goto be;}
+					if(@berand < 35){mes 0, "{=c비파 강화에 실패하셧습니다."; end;}
+					item_del "비파", 1;
+					item_add "비파+2", 1;
+					broadcast 5, "{=c[" + get_name() + "]님께서 비파+2 제조에 성공하셧습니다.";
+					mes 0, "비파 강화에 성공하셧습니다. \\n{=c비파+2제조에 성공하셧습니다. \\n축하드립니다.";
+				}else{mes 0, "재료가 부족하여 강화진행이 취소되었습니다.";}
+			}
+			if(item_one_check(@myid) == "비파+2"){mes 0, "아직 비파+3제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "비파+3"){mes 0, "아직 비파+4제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "비파+4"){mes 0, "더이상 비파를 강화할수 없습니다.";}
+		}
+		if(@jejo2 == 5){
+			mes 1, "돈파를 강화합니다. \\n{=q강화할 돈파는 아이템창 첫번째칸에 있어야합니다!";
+			if(item_one_check(@myid) != "돈파" && item_one_check(@myid) != "돈파+2" && item_one_check(@myid) != "돈파+3" && item_one_check(@myid) != "돈파+4"){mes 0, "당신의 첫번째 아이템칸에는 [" + item_one_check(@myid) + "]가 있습니다.";}
+			if(item_one_check(@myid) == "돈파"){
+				mes 1, "돈파를 강화합니다. \\n{=c돈파 강화재료는 서큐버스의머리칼7개, 달의기운3개, 다크젬3개, 나겔링스타1개, 무기의봉인키1개";
+				mes 1, "재료를 확인합니다.";
+				if(item_exist(@myid, "서큐버스의머리칼") >= 7 && item_exist(@myid, "달의기운") >= 3 && item_exist(@myid, "다크젬") >= 3 && item_exist(@myid, "나겔링스타") >= 1 && item_exist(@myid, "무기의봉인키") >= 1){
+					mes 1, "재료가 확인됬습니다. \\n{=c제조를 시작합니다.";
+					item_del "서큐버스의머리칼", 7;
+					item_del "달의기운", 3;
+					item_del "다크젬", 3;
+					item_del "나겔링스타", 1;
+					item_del "무기의봉인키", 1;
+					don:
+					set @donrand, rand(1,100);
+					if(@donrand < 1 || @donrand > 100){goto don;}
+					if(@donrand < 35){mes 0, "{=c돈파 강화에 실패하셧습니다."; end;}
+					item_del "돈파", 1;
+					item_add "돈파+2", 1;
+					broadcast 5, "{=c[" + get_name() + "]님께서 돈파+2 제조에 성공하셧습니다.";
+					mes 0, "돈파 강화에 성공하셧습니다. \\n{=c돈파+2제조에 성공하셧습니다. \\n축하드립니다.";
+				}else{mes 0, "재료가 부족하여 강화진행이 취소되었습니다.";}
+			}
+			if(item_one_check(@myid) == "돈파+2"){mes 0, "아직 돈파+3제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "돈파+3"){mes 0, "아직 돈파+4제조가 나오지 않앗습니다.";}
+			if(item_one_check(@myid) == "돈파+4"){mes 0, "더이상 돈파를 강화할수 없습니다.";}
+		}
+	}
+}

@@ -1,0 +1,447 @@
+0,0,0,0,0,0,0	적흑갑	{
+	mes 1, "안녕하세요? 저는 흑갑,흑갑을 만들어주는 npc 입니다!!";
+	mes 1, "흑갑은 어빌 28  ,  흑갑은 어빌 30에 낄수있답니다";
+	set @select, menu("무엇을 만드시겠습니까?", "남전사(적갑)", "남도적(적갑)", "남도가(적갑)", "남법사(적갑)", "남사제(적갑)", "남전사(흑갑)", "남도적(흑갑)", "남도가(흑갑)", "남법사(흑갑)", "남사제(흑갑)", "여전사(적갑)", "여도적(적갑)", "여도가(적갑)", "여법사(적갑)", "여사제(적갑)", "여전사(흑갑)", "여도적(흑갑)", "여도가(흑갑)", "여법사(흑갑)", "여사제(흑갑)");
+	if(@select == 1)
+	{
+		mes 1, "남 전사 적갑을 만듭니다.";
+		mes 1, "재료는 전사생업.암업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("레오파드2") == 0x01 && pc_itemcheck("헬름2") == 0x01 && pc_itemcheck("헬름1") == 0x01 && pc_itemcheck("레오파드1") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "레오파드1", 1;
+			item_del "헬름1", 1;
+			item_del "레오파드2", 1;
+			item_del "헬름2", 1;
+			item_add "적비화무갑주", 1;
+			item_add "적비화무투구", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 2)
+	{
+		mes 1, "남 도적 적갑을 만듭니다.";
+		mes 1, "재료는 도적생업 .암업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("아비스1") == 0x01 && pc_itemcheck("루크1") == 0x01 && pc_itemcheck("루크2") == 0x01 && pc_itemcheck("아비스2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "아비스1", 1;
+			item_del "아비스1", 1;
+			item_del "아비스2", 1;
+			item_del "루크2", 1;
+			item_add "적비현진의", 1;
+			item_add "적비현진건", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 3)
+	{
+		mes 1, "남 도가 적갑을 만듭니다.";
+		mes 1, "재료는 도가생업,암업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("위타천1") == 0x01 && pc_itemcheck("투신의머리띠1") == 0x01 && pc_itemcheck("투신의머리띠2") == 0x01 && pc_itemcheck("위타천2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "위타천1", 1;
+			item_del "투신의머리띠1", 1;
+			item_del "위타천2", 1;
+			item_del "투신의머리띠2", 1;
+			item_add "적태극의", 1;
+			item_add "적태극현", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 4)
+	{
+		mes 1, "남 법사 적갑을 만듭니다.";
+		mes 1, "재료는 남법사생업,암업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("마르두크1") == 0x01 && pc_itemcheck("솔라레스1") == 0x01 && pc_itemcheck("솔라레스2") == 0x01 && pc_itemcheck("마르두크2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "솔라레스1", 1;
+			item_del "마르두크2", 1;
+			item_del "마르두크2", 1;
+			item_del "솔라레스2", 1;
+			item_add "적비화후의", 1;
+			item_add "적비화후관", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 5)
+	{
+		mes 1, "남 직자 적갑을 만듭니다.";
+		mes 1, "재료는 직자 생업,암업 입니다..";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("데메테르1") == 0x01 && pc_itemcheck("아가트1") == 0x01 && pc_itemcheck("아가트2") == 0x01 && pc_itemcheck("데메테르2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "아가트1", 1;
+			item_del "데메테르1", 1;
+			item_del "데메테르2", 1;
+			item_del "아가트2", 1;
+			item_add "적비류선의", 1;
+			item_add "적비류선후", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 6)
+	{
+		mes 1, "남 남전사 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비화무갑주") == 0x01 && pc_itemcheck("적비화무투구") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비화무갑주", 1;
+			item_del "적비화무투구", 1;
+			item_add "흑비화무갑주", 1;
+			item_add "흑비화무투구", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 7)
+	{
+		mes 1, "남 도적 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비현진의") == 0x01 && pc_itemcheck("적비현진건") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비현진의", 1;
+			item_del "적비현진건", 1;
+			item_add "흑비현진의", 1;
+			item_add "흑비현진건", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 8)
+	{
+		mes 1, "남 도가 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적태극의") == 0x01 && pc_itemcheck("적태극현") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적태극의", 1;
+			item_del "적태극현", 1;
+			item_add "흑태극의", 1;
+			item_add "흑태극현", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 9)
+	{
+		mes 1, "남 법사 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비화후관") == 0x01 && pc_itemcheck("적비화후의") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비화후의", 1;
+			item_del "적비화후관", 1;
+			item_add "흑비화후의", 1;
+			item_add "흑비화후관", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 10)
+	{
+		mes 1, "남 직자 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비류선의") == 0x01 && pc_itemcheck("적비류선후") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비류선의", 1;
+			item_del "적비류선후", 1;
+			item_add "흑비류선의", 1;
+			item_add "흑비류선후", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 11)
+	{
+		mes 1, "여 전사 적갑을 만듭니다.";
+		mes 1, "재료는 각직업암업, 빛업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("살렛1") == 0x01 && pc_itemcheck("아레스1") == 0x01 && pc_itemcheck("살렛2") == 0x01 && pc_itemcheck("아레스2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "샬렛1", 1;
+			item_del "아레스1", 1;
+			item_del "살렛2", 1;
+			item_del "아레스2", 1;
+			item_add "적비화무갑주", 1;
+			item_add "적비화무투구", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 12)
+	{
+		mes 1, "여 도적 적갑을 만듭니다.";
+		mes 1, "재료는 각직업암업, 빛업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("레일라1") == 0x01 && pc_itemcheck("라멜1") == 0x01 && pc_itemcheck("라멜2") == 0x01 && pc_itemcheck("레일라2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "레일라1", 1;
+			item_del "라멜1", 1;
+			item_del "레일라2", 1;
+			item_del "라멜2", 1;
+			item_add "적비현진의", 1;
+			item_add "적비현진건", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 13)
+	{
+		mes 1, "여  도가적갑을 만듭니다.";
+		mes 1, "재료는 각직업암업, 빛업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("화영잠1") == 0x01 && pc_itemcheck("가릉비가1") == 0x01 && pc_itemcheck("화영잠2") == 0x01 && pc_itemcheck("가릉비가2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "화영잠1", 1;
+			item_del "가릉비가1", 1;
+			item_del "화영잠2", 1;
+			item_del "가릉비가2", 1;
+			item_add "적태극의", 1;
+			item_add "적태극현", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 14)
+	{
+		mes 1, "여 법사적갑을 만듭니다.";
+		mes 1, "재료는 각직업암업, 빛업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("마아트1") == 0x01 && pc_itemcheck("세르네티1") == 0x01 && pc_itemcheck("마아트2") == 0x01 && pc_itemcheck("세르네티2") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "마아트1", 1;
+			item_del "세르네티1", 1;
+			item_del "마아트2", 1;
+			item_del "세르네티2", 1;
+			item_add "적비화후의", 1;
+			item_add "적비화후관", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+		mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 15)
+	{
+		mes 1, "여 직자 적갑을 만듭니다.";
+		mes 1, "재료는 각직업암업, 빛업입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("큐이레스1") == 0x01 && pc_itemcheck("큐이레스2") == 0x01 && pc_itemcheck("라피스라즐리2") == 0x01 && pc_itemcheck("라피스라즐리1") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "큐이레스1", 1;
+			item_del "라피스라즐리1", 1;
+			item_del "큐이레스2", 1;
+			item_del "라피스라즐리2", 1;
+			item_add "적비류선의", 1;
+			item_add "적비류선후", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 16)
+	{
+		mes 1, "여 여전사 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비화무갑주") == 0x01 && pc_itemcheck("적비화무투구") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비화무갑주", 1;
+			item_del "적비화무투구", 1;
+			item_add "흑비화무갑주", 1;
+			item_add "흑비화무투구", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 17)
+	{
+		mes 1, "여 도적 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비현진의") == 0x01 && pc_itemcheck("적비현진건") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비현진의", 1;
+			item_del "적비현진건", 1;
+			item_add "흑비현진의", 1;
+			item_add "흑비현진건", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 18)
+	{
+		mes 1, "여 도가 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적태극의") == 0x01 && pc_itemcheck("적태극현") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적태극의", 1;
+			item_del "적태극현", 1;
+			item_add "흑태극의", 1;
+			item_add "흑태극현", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}
+	if(@select == 19)
+	{
+		mes 1, "여  법사흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비화후의") == 0x01 && pc_itemcheck("적비화후관") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의벨트", 1;
+			item_del "암흑의목걸이", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비화후의", 1;
+			item_del "적비화후관", 1;
+			item_add "흑비화후의", 1;
+			item_add "흑비화후관", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+	}	
+	if(@select == 20)
+	{
+		mes 1, "여 직자 흑갑을 만듭니다.";
+		mes 1, "재료는 적갑과, 생셋,암셋 입니다.";
+		mes 1, "진행합니다.";
+		if(pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("적비류선의") == 0x01 && pc_itemcheck("적비류선후") == 0x01)
+		{
+			mes 1, "제작중입니다.";
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "적비류선의", 1;
+			item_del "적비류선후", 1;
+			item_add "흑비류선의", 1;
+			item_add "흑비류선후", 1;
+		mes 1, "제작이 완료되었습니다!";
+		}
+		else
+		{
+			mes 1, "재료가 부족 합니다.";
+		}
+
+	}
+	del @select;
+	}

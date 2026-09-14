@@ -1,0 +1,83 @@
+0,0,0,0,0,0,0	리젠제작	{
+RE:
+ set @rand, rand(1,100);
+ if(@rand <0) goto RE;
+		mes 1, "리젠트 귀걸이를 만들고싶은건가요?";
+		set @select, menu("제작할것을 선택하세요", "리젠트다이아귀걸이", "강화된리젠트다이아귀걸이");
+		if(@select == 1)
+		{
+		mes 1, "리젠트다이아귀걸이를 만들겠습니다";
+		mes 1, "{=c생명의시약2개,암흑의시약2개,홀리팬플롯15개,레드오피온의비늘15개,뉴트의뿔15개,금전 5000만원";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+		if(item_exist(@myid, "생명의시약") >= 2 && item_exist(@myid, "암흑의시약") >= 2 && item_exist(@myid, "홀리팬플롯") >=15 && item_exist(@myid, "레드오피온의비늘") >=15 && item_exist(@myid, "뉴트의뿔") >= 15){
+		if(get_money() >= 50000000) {
+			money_del "50000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 30)	{
+			item_del "생명의시약", 2;
+			item_del "암흑의시약", 2;
+			item_del "홀리팬플롯", 15;
+			item_del "레드오피온의비늘", 15;
+			item_del "뉴트의뿔", 15;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "리젠트다이아귀걸이", 1;
+			broadcast 5, "[" + get_name() + "]{=c님이 리젠트다이어귀걸이 제작에 성공하셨습니다!!";
+ 			legend_add 1,255, "리치 1년, 여름 리젠트다이아귀걸이 제작에 성공하다!!";
+		}else{
+			item_del "생명의시약", 2;
+			item_del "암흑의시약", 2;
+			item_del "홀리팬플롯", 15;
+			item_del "레드오피온의비늘", 15;
+			item_del "뉴트의뿔", 15;
+			mes 1, "{=q 제작을 실패하셨습니다ㅠㅠ";
+			broadcast 5, "[" + get_name() + "]{=c님이 리젠트다이아귀걸이 제작에 실패하셨습니다ㅠ";
+ 			legend_add 1, 246, "리치 1년, 여름 리젠트다이아귀걸이 제작에 실패하다ㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 2)
+		{
+		mes 1, "강화된리젠트다이아귀걸이를 만들겠습니다";
+		mes 1, "{=c생명의시약4개,암흑의시약4개,홀리팬플롯25개,레드오피온의비늘25개,뉴트의뿔25개,금전7천만원";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+		if(item_exist(@myid, "생명의시약") >= 4 && item_exist(@myid, "암흑의시약") >= 4 && item_exist(@myid, "홀리팬플롯") >=25 && item_exist(@myid, "레드오피온의비늘") >=25 && item_exist(@myid, "뉴트의뿔") >= 25){
+		if(get_money() >= 70000000) {
+			money_del "70000000";
+		}else{
+			mes 1, "{= 돈이 부족합니다...";
+			end;
+		}
+		if(@rand <= 20)	{
+			item_del "생명의시약", 4;
+			item_del "암흑의시약", 4;
+			item_del "홀리팬플롯", 25;
+			item_del "레드오피온의비늘", 25;
+			item_del "뉴트의뿔", 25;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "강화된리젠트다이아귀걸이", 1;
+			broadcast 5, "[" + get_name() + "]{=c님이 강화된리젠트다이어귀걸이 제작에 성공하셨습니다!!";
+ 			legend_add 1,255, "리치 1년, 여름 강회된리젠트다이아귀걸이 제작에 성공하다!!";
+		}else{
+			item_del "생명의시약", 4;
+			item_del "암흑의시약", 4;
+			item_del "홀리팬플롯", 25;
+			item_del "레드오피온의비늘", 25;
+			item_del "뉴트의뿔", 25;
+			mes 1, "{=q 제작을 실패하셨습니다ㅠㅠ";
+			broadcast 5, "[" + get_name() + "]{=c님이 강화된리젠트다이아귀걸이 제작에 실패하셨습니다ㅠ";
+ 			legend_add 1, 246, "리치 1년, 여름 강화된리젠트다이아귀걸이 제작에 실패하다ㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+}
+	del @select;
+}

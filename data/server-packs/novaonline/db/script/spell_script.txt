@@ -1,0 +1,167 @@
+0,0,0,0,0,0,0	SPELL_아이템생성LCIA	{
+ spell_create();
+ effect @target, 86, 86, 35;
+ game_sound 31, 0;
+}
+
+0,0,0,0,0,0,0	SPELL_귀환:기술사범의집	{
+ set @myid, get_myid();
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ else if(@myid != @target) {
+ warp "기술사범의집", 5, 5;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "## Warp in 기술사범의집 ##";
+ del @myid;
+ del @target;
+}
+
+0,0,0,0,0,0,0	SPELL_길드성	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장" && $evant == 1){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+}else{
+	if(get_user_title() == "빛의기사단") {
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ else if(@myid != @target) {
+ warp "리치길드성", 50, 50;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "## Warp in 리치길드성 ##";
+	}else{
+ message 3, "현재 당신의 길드는 길드성의 주인이 아닙니다.";	
+ del @myid;
+ del @target;
+}
+}
+}
+
+0,0,0,0,0,0,0	SPELL_귀환:마을	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장" && $evant == 1){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+}else{
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ else if(@myid != @target) {
+ warp "용자의공원", 49,63;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "마을로 이동되었습니다";
+ del @myid;
+ del @target;
+}
+}
+
+0,0,0,0,0,0,0	SPELL_승급자의공간	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장" && $evant == 1){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+}else{
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ else if(@myid != @target) {
+ warp "승급자의공간", 5,5;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "승급자의공간으로 이동되었습니다";
+ del @myid;
+ del @target;
+}
+}
+
+0,0,0,0,0,0,0	SPELL_운영자의방	{
+ set @myid, get_myid();
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ else if(@myid != @target) {
+ warp "운영자의공간", 5,5;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "운영자의방으로 이동됩니다.";
+ del @myid;
+ del @target;
+}
+
+0,0,0,0,0,0,0	SPELL_천족의성	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장" && $evant == 1){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else{
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ else if(@myid != @target) {
+ warp "천족의성", 20,20;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "천족의성으로 이동되었습니다";
+ del @myid;
+ del @target;
+}
+}
+
+0,0,0,0,0,0,0	SPELL_마족의성	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장" && $evant == 1){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else{
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ else if(@myid != @target) {
+ warp "마족의성", 14,26;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "마족의성으로 이동되었습니다";
+ del @myid;
+ del @target;
+}
+}
+
+0,0,0,0,0,0,0	SPELL_귀환:신의영역	{
+ set @myid, get_myid();
+ set @target, spell_target();
+ motion 136, 75;
+ if(@myid == @target) { effect 0, 10, 0, 10; }
+ }else{
+ warp "신의영역", 20, 15;
+ effect @target, 0, 0, 20;
+ game_sound 10, 0;
+ }
+ message 3, "신전으로 이동했다!";
+ del @myid;
+ del @target;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠로토	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 50){message 3, "마력이 부족합니다. [필요마나 : 50]"; del @myid; end;}
+	manal_del "50";
+	RE:
+	set @rand, rand(1,100);
+	if(@rand < 1 || @rand > 100){Goto RE;}
+	set @hill, 100 + @rand;
+	set @type, istype(@myid);
+	motion 136, 75;
+	effect @target, 4, 0, 75;
+	game_sound 8 ,0;
+	set_vita @myid, get_vita(@myid)+@hill;
+	del @myid;
+	del @type;
+	del @target;
+}

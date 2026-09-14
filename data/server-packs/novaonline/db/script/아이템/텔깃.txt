@@ -1,0 +1,106 @@
+0,0,0,0,0,0,0	텔깃	{
+	set @myid, get_myid(@myid);
+ 	if(get_name(@myid) == "리치"){
+		set @side, get_side(@myid);
+		for(set @i, 1; @i <= 5; set @i, @i +1){
+			if(@side == 0){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_ys(get_ys(@myid)-1);
+				effect @target, 91, 0, 30;
+			}
+			if(@side == 1){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_xs(get_xs(@myid)+1);
+				effect @target, 91, 0, 30;
+			}
+			if(@side == 2){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_ys(get_ys(@myid)+1);
+				effect @target, 91, 0, 30;
+			}
+			if(@side == 3){
+				if(get_front_block(@myid) == 1){end;}
+				if(get_front_char(@myid)){end;}
+				set_xs(get_xs(@myid)-1);
+				effect @target, 91, 0, 30;
+			}
+		}
+		end;
+	}
+	if(get_mapname(@myid) == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(get_map_pk()){message 3, "사용이불가능합니다."; end;}
+ 	set @side, get_side(@myid);
+	for(set @i, 1; @i <= 5; set @i, @i +1){
+		if(@side == 0){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_ys(get_ys(@myid)-1);
+			effect @target, 91, 0, 30;
+		}
+		if(@side == 1){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_xs(get_xs(@myid)+1);
+			effect @target, 91, 0, 30;
+		}
+		if(@side == 2){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_ys(get_ys(@myid)+1);
+			effect @target, 91, 0, 30;
+		}
+		if(@side == 3){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_xs(get_xs(@myid)-1);
+			effect @target, 91, 0, 30;
+		}
+	}
+	del @myid;
+	del @side;
+	del @xs;
+	del @ys;
+}
+
+0,0,0,0,0,0,0	(초보)텔깃	{
+	set @myid, get_myid(@myid);
+	if(get_mapname(@myid) == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(get_map_pk()){message 3, "사용이불가능합니다."; end;}
+	if(#btp >= 199){mes 1, "초보자용 텔깃이 다달았습니다. 일반텔깃은 전방 5칸이동, 사용제한이없는 프리아이템으로 EG샵에서 구할수있습니다."; item_del "초보텔레포트깃털", 1;}
+	set #btp, #btp+1;
+	message 3, "초보자용텔레포트깃털을 " + #btp + "번 사용하셧습니다.[최대 200번까지사용가능]";
+ 	set @side, get_side(@myid);
+	for(set @i, 1; @i <= 3; set @i, @i +1){
+		if(@side == 0){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_ys(get_ys(@myid)-1);
+			effect @target, 91, 0, 30;
+		}
+		if(@side == 1){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_xs(get_xs(@myid)+1);
+			effect @target, 91, 0, 30;
+		}
+		if(@side == 2){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_ys(get_ys(@myid)+1);
+			effect @target, 91, 0, 30;
+		}
+		if(@side == 3){
+			if(get_front_block(@myid) == 1){end;}
+			if(get_front_char(@myid)){end;}
+			set_xs(get_xs(@myid)-1);
+			effect @target, 91, 0, 30;
+		}
+	}
+	del @myid;
+	del @side;
+	del @xs;
+	del @ys;
+}

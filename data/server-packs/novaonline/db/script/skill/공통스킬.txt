@@ -1,0 +1,151 @@
+0,0,0,0,0,0,0	SKILL_하트	{
+	set @myid, get_myid();
+	set @target, get_front_char(@myid);
+	if(!@target) {end;}
+	effect @target, 36, 36, 100;
+	game_sound 31, 0;
+}
+
+0,0,0,0,0,0,0	SKILL_더블어택	{
+	attack_skill();
+	sleep 100;
+	attack_skill();
+}
+0,0,0,0,0,0,0	SPELL_리치의기원	{
+ set @myid, get_myid();
+ set @target, spell_target();
+ set @type, istype(@target);
+
+ motion 128, 55;
+ if(@type == 3) {
+ set_vita @target, get_vita(@target)+999999999;
+ set_mana @target, get_mana(@target)+999999999;
+ set @user, ((get_body()+1))+1;
+ char_damaged @target, @user,@user;
+ message 3, "리치의기원를 외웠습니다.";
+ effect @target, 21, 21, 120;
+ game_sound 35,0;
+ message1 @target, 3, get_name() + "님께서 리치의기원를 외워주셨습니다.";
+} else if(@type == 1 || @type == 2){
+ }
+ del @myid;
+ del @target;
+ del @type;
+}
+
+
+0,0,0,0,0,0,0	SPELL_운명	{
+ set @myid, get_myid();
+ //set @mapxs, get_mapxx()-1;
+ //set @mapys, get_mapyy()-1;
+ set @x1, get_xs(@myid)-8;
+ set @x2, get_xs(@myid)+8;
+ set @y1, get_ys(@myid)-8;
+ set @y2, get_ys(@myid)+8;
+ set @damage, ((get_mana(@myid)+100))*5;
+ //if(@x1 < 0) { set @x1, 0; }
+ //if(@x2 > @mapxs) { set @x2, @mapxs; }
+ //if(@y1 < 0) { set @y1, 0; }
+ //if(@y2 > @mapys) { set @y2, @mapys; }
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @type, istype(@mob);
+   set @rnd, rand(1,10);
+   if(@rnd <= 10){
+   if(@mob && @type == 1) {
+     if(!magic_exist(1,@mob, 0)) {
+    magic 1,@mob,"프라베라", 60, 40,@myid;
+ message 3, "운명을 외웠습니다.";
+    effect @mob, 0, 43, 130;
+     game_sound 8,0;
+	}else{
+    effect @target, 0, 33, 130;
+	 message 3, "몬스터가 마법을 피했다!";
+}
+    }
+   }   
+  }
+ }
+del @val;
+}
+
+0,0,0,0,0,0,0	SPELL_봉인	{
+ set @myid, get_myid();
+ //set @mapxs, get_mapxx()-1;
+ //set @mapys, get_mapyy()-1;
+ set @x1, get_xs(@myid)-8;
+ set @x2, get_xs(@myid)+8;
+ set @y1, get_ys(@myid)-8;
+ set @y2, get_ys(@myid)+8;
+ set @damage, ((get_mana(@myid)+100))*5;
+ //if(@x1 < 0) { set @x1, 0; }
+ //if(@x2 > @mapxs) { set @x2, @mapxs; }
+ //if(@y1 < 0) { set @y1, 0; }
+ //if(@y2 > @mapys) { set @y2, @mapys; }
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @type, istype(@mob);
+   set @rnd, rand(1,10);
+   if(@rnd <= 10){
+   if(@mob && @type == 1) {
+     if(!magic_exist(1,@mob, 0)) {
+ magic 2,@mob, 0, 60, 0,@myid;
+ message 3, "봉인을 외웠습니다.";
+    effect @mob, 0, 43, 130;
+     game_sound 8,0;
+	}else{
+    effect @target, 0, 33, 130;
+	 message 3, "몬스터가 마법을 피했다!";
+}
+    }
+   }   
+  }
+ }
+del @val;
+}
+
+0,0,0,0,0,0,0	SPELL_스피드업	{
+ 	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	input @second, 1, "몇초 버프를 걸어주시겠습니까?.","","", 25;
+	if(@second <= 0){mes 1, "시간이 0이거나 숫자가 아닙니다."; end;}
+	if(@type == 3){speedup_delay @target, @second; message 3, "스피드업을 외웠다!"; message1 @target, 3, get_name() + "님께서 스피드업을 외워주셨습니다."; end;}
+	message 3, "대상을 확인해 주세요!";
+	effect @target, 21, 36, 120;
+}
+
+0,0,0,0,0,0,0	SPELL_유저나르	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	input @second, 1, "몇초 나르를 걸어주시겠습니까?.","","", 25;
+	if(@second <= 0){mes 1, "시간이 0이거나 숫자가 아닙니다."; end;}
+	if(@type == 3){mobnar_delay @target, @second; message 3, "나르콜리를 외웠습니다."; message1 @target, 3, get_name() + "님께서 나르콜리를 시전하셧습니다."; end;}
+}
+
+0,0,0,0,0,0,0	SPELL_유저소루	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	input @second, 1, "몇초 소루를 걸어주시겠습니까?.","","", 25;
+	if(@second <= 0){mes 1, "시간이 0이거나 숫자가 아닙니다."; end;}
+	if(@type == 3){mobsor_delay @target, @second; message 3, "소루마를 외웠습니다."; message1 @target, 3, get_name() + "님께서 소루마를 시전하셧습니다."; end;}
+}
+
+0,0,0,0,0,0,0	SPELL_코마	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	input @second, 1, "몇초 코마를 걸어주시겠습니까?.","","", 25;
+	if(@second <= 0){mes 1, "시간이 0이거나 숫자가 아닙니다."; end;}
+	if(@type == 3){set_coma @target, 1; set_state1 @target, 1; coma_delay @target, @second; message 3, "코마를 외웠습니다."; message1 @target, 3, get_name() + "님께서 코마를 시전하셧습니다."; end;}
+}
+0,0,0,0,0,0,0	SPELL_그룹탈퇴	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 3){group_end @target; message 3, "그룹탈퇴를 외웠습니다."; end;}
+}

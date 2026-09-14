@@ -1,0 +1,94 @@
+0,0,0,0,0,0,0	목걸이합성	{
+	set @myid, get_myid();
+	re:
+	del @select;
+	set @select, menu("생셋과 암셋을 합성하겠냐!?", "합성재료", "목걸이를합성하겠습니다.", "벨트를합성하겠습니다.");
+	if(@select == 1){
+		mes 1, "생셋과 암셋을 합성할려면, 생명,암흑의목걸이 1개씩 생샥, 암샥 2개씩이 필요하다!(벨트)";
+		mes 1, "만약 합성실패시 생명,암흑의목걸이중 한개만남고 생샥, 암샥중 한개를 1개만 남겨진다!(벨트)";
+		mes 1, "합성을할시 신중하게 해주길 바란다!";
+		goto re;
+	}
+	if(@select == 2){
+		mes 1, "재료를 확인 하겠당!";
+		if(item_exist(@myid, "생명의시약") < 2 || item_exist(@myid, "암흑의시약") < 2 || item_exist(@myid, "암흑의목걸이") < 1 || item_exist(@myid, "생명의목걸이") < 1){mes 1, "{=q재료가 부족하여 합성을 실행할수 없습니다."; goto re;}
+		if(get_money() < 1000000){mes 1, "골드가 부족하여 진행할수 없다!"; goto re;}
+		mes 1, "재료가 충족되어 합성을 진행할수 있엉!";
+		mes 1, "다음을 눌르면 합성이 시작된다!";
+		re2:
+		set @rand, rand(1,3);
+		if(@rand < 1 || @rand > 3){goto re2;}
+		money_del "1000000";
+		if(@rand == 1){
+			item_del "생명의목걸이", 1;
+			item_del "생명의시약", 2;
+			item_del "암흑의시약", 1;
+		}
+		if(@rand >= 2){
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의시약", 2;
+			item_del "생명의시약", 1;
+		}
+		re3:
+		set @rand2, rand(1,100);
+		if(@rand2 < 1 || @rand2 > 100){goto re3;}
+		if(@rand2 > 70){mes 1, "{=a목걸이 합성이 실패했다!!"; goto re;}
+		if(@rand == 1){
+			item_del "암흑의목걸이", 1;
+			item_add "폭풍의목걸이(생)", 1;
+			goto go;
+		}
+		if(@rand == 2){
+			item_del "생명의목걸이", 1;
+			item_add "폭풍의목걸이(암)", 1;
+			goto go;
+		}
+		mes 1, "{=a목걸이 합성이 실패했습니다.";
+		end;
+		go:
+		broadcast 5, "{=q[" + get_name() + "]님이 속성목걸이 합성에 성공하셨습니다!!";
+		mes 1,"{=q속성목걸이 합성에 성공하였다!!\\n축하한다!";
+		goto re;
+	}
+	if(@select == 3){
+		mes 1, "재료를 확인 하겠당!";
+		if(item_exist(@myid, "생명의시약") < 2 || item_exist(@myid, "암흑의시약") < 2 || item_exist(@myid, "암흑의벨트") < 1 || item_exist(@myid, "생명의벨트") < 1){mes 1, "{=q재료가 부족하여 합성을 실행할수 없습니다."; goto re;}
+		if(get_money() < 1000000){mes 1, "골드가 부족하여 진행할수 없다!"; goto re;}
+		mes 1, "재료가 충족되어 합성을 진행할수 있엉!";
+		mes 1, "다음을 눌르면 합성이 시작된다!";
+		re4:
+		set @rand, rand(1,3);
+		if(@rand < 1 || @rand > 3){goto re4;}
+		money_del "1000000";
+		if(@rand == 1){
+			item_del "생명의벨트", 1;
+			item_del "생명의시약", 2;
+			item_del "암흑의시약", 1;
+		}
+		if(@rand >= 2){
+			item_del "암흑의벨트", 1;
+			item_del "암흑의시약", 2;
+			item_del "생명의시약", 1;
+		}
+		re5:
+		set @rand2, rand(1,100);
+		if(@rand2 < 1 || @rand2 > 100){goto re5;}
+		if(@rand2 > 70){mes 1, "{=a벨트 합성이 실패했다!!"; goto re;}
+		if(@rand == 1){
+			item_del "암흑의벨트", 1;
+			item_add "폭풍의벨트(생)", 1;
+			goto go2;
+		}
+		if(@rand == 2){
+			item_del "생명의벨트", 1;
+			item_add "폭풍의벨트(암)", 1;
+			goto go2;
+		}
+		mes 1, "{=a벨트 합성이 실패했습니다.";
+		end;
+		go2:
+		broadcast 5, "{=q[" + get_name() + "]님이 속성벨트 합성에 성공하셨습니다!!";
+		mes 1,"{=q속성벨트 합성에 성공하였다!!\\n축하한다!";
+		goto re;
+	}
+}

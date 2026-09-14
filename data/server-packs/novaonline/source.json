@@ -1,0 +1,15 @@
+{
+  "source": "sources/novaonline",
+  "encoding": {
+    "input": {
+      "cp949": 334,
+      "utf-8-sig": 16
+    },
+    "output": "utf-8"
+  },
+  "copied_text_files": 350,
+  "top_level_exe": {
+    "name": "Legend.exe",
+    "sha256": "be1f768676c258d668ac8bae640da87fcf45bbfb7a14c2e0b34315d76aeb39d8"
+  }
+}

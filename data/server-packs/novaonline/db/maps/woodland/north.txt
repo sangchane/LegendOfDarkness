@@ -1,0 +1,215 @@
+{
+번호	700
+이름	북의우드랜드입구
+너비	25
+높이	25
+CRC	30757
+맵파일	db/maps/woodland/maps/lod700.map
+}
+
+{
+번호	723
+이름	북의우드랜드 1-1
+너비	100
+높이	100
+CRC	48176
+맵파일	db/maps/woodland/maps/lod723.map
+}
+
+{
+번호	722
+이름	북의우드랜드 2-1
+너비	100
+높이	100
+CRC	29124
+맵파일	db/maps/woodland/maps/lod722.map
+}
+
+{
+번호	701
+이름	북의우드랜드 3-1
+너비	100
+높이	100
+CRC	64126
+맵파일	db/maps/woodland/maps/lod701.map
+}
+
+{
+번호	702
+이름	북의우드랜드 4-1
+너비	100
+높이	100
+CRC	54754
+맵파일	db/maps/woodland/maps/lod702.map
+}
+
+{
+번호	703
+이름	북의우드랜드 5-1
+너비	100
+높이	100
+CRC	2335
+맵파일	db/maps/woodland/maps/lod703.map
+}
+
+{
+번호	704
+이름	북의우드랜드 6-1
+너비	50
+높이	50
+CRC	45009
+맵파일	db/maps/woodland/maps/lod704.map
+}
+
+{
+번호	705
+이름	북의우드랜드 7-1
+너비	50
+높이	50
+CRC	43443
+맵파일	db/maps/woodland/maps/lod705.map
+}
+
+{
+번호	706
+이름	북의우드랜드 8-1
+너비	50
+높이	50
+CRC	31526
+맵파일	db/maps/woodland/maps/lod706.map
+}
+
+{
+번호	707
+이름	북의우드랜드 9-1
+너비	50
+높이	50
+CRC	36176
+맵파일	db/maps/woodland/maps/lod707.map
+}
+
+{
+번호	708
+이름	북의우드랜드 9-2
+너비	50
+높이	50
+CRC	5078
+맵파일	db/maps/woodland/maps/lod708.map
+}
+
+{
+번호	709
+이름	북의우드랜드 10-1
+너비	50
+높이	50
+CRC	26956
+맵파일	db/maps/woodland/maps/lod709.map
+}
+
+{
+번호	710
+이름	북의우드랜드 11-1
+너비	50
+높이	50
+CRC	7831
+맵파일	db/maps/woodland/maps/lod710.map
+}
+
+{
+번호	711
+이름	북의우드랜드 12-1
+너비	50
+높이	50
+CRC	13423
+맵파일	db/maps/woodland/maps/lod711.map
+}
+
+{
+번호	712
+이름	북의우드랜드 13-1
+너비	50
+높이	50
+CRC	21890
+맵파일	db/maps/woodland/maps/lod712.map
+}
+
+{
+번호	713
+이름	북의우드랜드 14-1
+너비	50
+높이	50
+CRC	6102
+맵파일	db/maps/woodland/maps/lod713.map
+}
+
+{
+번호	714
+이름	북의우드랜드 15-1
+너비	50
+높이	50
+CRC	59500
+맵파일	db/maps/woodland/maps/lod714.map
+}
+
+{
+번호	715
+이름	북의우드랜드 16-1
+너비	50
+높이	50
+CRC	3262
+맵파일	db/maps/woodland/maps/lod715.map
+}
+
+{
+번호	716
+이름	북의우드랜드 17-1
+너비	50
+높이	50
+CRC	35545
+맵파일	db/maps/woodland/maps/lod716.map
+}
+
+{
+번호	717
+이름	북의우드랜드 17-2
+너비	50
+높이	50
+CRC	1983
+맵파일	db/maps/woodland/maps/lod717.map
+}
+
+{
+번호	718
+이름	북의우드랜드 18-1
+너비	50
+높이	50
+CRC	38425
+맵파일	db/maps/woodland/maps/lod718.map
+}
+
+{
+번호	719
+이름	북의우드랜드 19-1
+너비	50
+높이	50
+CRC	58241
+맵파일	db/maps/woodland/maps/lod719.map
+}
+
+{
+번호	720
+이름	북의우드랜드 19-2
+너비	50
+높이	50
+CRC	62666
+맵파일	db/maps/woodland/maps/lod720.map
+}
+
+{
+번호	721
+이름	북의우드랜드 20-1
+너비	50
+높이	50
+CRC	35701
+맵파일	db/maps/woodland/maps/lod721.map
+}

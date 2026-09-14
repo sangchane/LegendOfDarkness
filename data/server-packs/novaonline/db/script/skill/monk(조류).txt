@@ -1,0 +1,94 @@
+0,0,0,0,0,0,0 	SPELL_깃털날리기(Lev2)	{
+ 	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	if(get_mana(@myid) < 4000){message 3, "마력이 부족합니다."; del @myid; end;}
+ 	set @x1, get_xs()-1;
+ 	set @x2, get_xs()+1;
+ 	set @y1, get_ys()-1;
+ 	set @y2, get_ys()+1;
+	for(set @i, @x1; @i <= @x2; set @i, @i+1){
+	for(set @j, @y1; @j <= @y2; set @j, @j+1){
+	set @mob, get_mobxy(@i, @j); 
+	set @damage, ((get_basevita(@myid)/10));
+   	set @type, istype(@mob);
+   	if(@mob && @type == 1) {motion 136, 75; effect @mob, 0, 15, 75; game_sound 61, 0; damaged @mob, @damage;}
+  		}
+ 	}
+	del @myid;
+	del @x1;
+	del @x2;
+	del @y1;
+	del @y2;
+	del @mob;
+	del @type;
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_깃털날리기(Lev3)	{
+	set @myid, get_myid();
+ 	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	if(get_mana(@myid) < 3000){message 3, "마력이 부족합니다."; del @myid; end;}
+	set @target, spell_target();
+ 	set @mobx, get_mobx(@target);
+ 	set @moby, get_moby(@target);
+ 	set @mob, get_mobxy(@mobx,@moby);
+	set @dam, ((get_basemana()+8))*3;
+	manal_del "3000";
+	set @type, istype(@target);
+
+	set @mob1, get_mobxy(@mobx,@moby-1);
+	set @mob2, get_mobxy(@mobx+1,@moby);
+	set @mob3, get_mobxy(@mobx,@moby+1);
+	set @mob4, get_mobxy(@mobx-1,@moby);
+	set @mob5, get_mobxy(@mobx,@moby-2);
+	set @mob6, get_mobxy(@mobx+2,@moby);
+	set @mob7, get_mobxy(@mobx,@moby+2);
+	set @mob8, get_mobxy(@mobx-2,@moby);
+	set @mob9, get_mobxy(@mobx-1,@moby-1);
+	set @mob10, get_mobxy(@mobx+1,@moby+1);
+	set @mob11, get_mobxy(@mobx-1,@moby+1);
+	set @mob12, get_mobxy(@mobx+1,@moby-1);
+
+	if(@mob && istype(@mob) == 1){effect @mob, 0, 137, 100; damaged @mob, @dam; game_sound 78,0; del @mob;}
+	if(@mob1 && istype(@mob1) == 1){effect @mob1, 0, 137, 100; damaged @mob1, @dam; game_sound 78,0; del @mob1;}
+	if(@mob2 && istype(@mob2) == 1){effect @mob2, 0, 137, 100; damaged @mob2, @dam; game_sound 78,0; del @mob2;}
+	if(@mob3 && istype(@mob3) == 1){effect @mob3, 0, 137, 100; damaged @mob3, @dam; game_sound 78,0; del @mob3;}
+	if(@mob4 && istype(@mob4) == 1){effect @mob4, 0, 137, 100; damaged @mob4, @dam; game_sound 78,0; del @mob4;}
+	if(@mob5 && istype(@mob5) == 1){effect @mob5, 0, 137, 100; damaged @mob5, @dam; game_sound 78,0; del @mob5;}
+	if(@mob6 && istype(@mob6) == 1){effect @mob6, 0, 137, 100; damaged @mob6, @dam; game_sound 78,0; del @mob6;}
+	if(@mob7 && istype(@mob7) == 1){effect @mob7, 0, 137, 100; damaged @mob7, @dam; game_sound 78,0; del @mob7;}
+	if(@mob8 && istype(@mob8) == 1){effect @mob8, 0, 137, 100; damaged @mob8, @dam; game_sound 78,0; del @mob8;}
+	if(@mob9 && istype(@mob9) == 1){effect @mob9, 0, 137, 100; damaged @mob9, @dam; game_sound 78,0; del @mob9;}
+	if(@mob10 && istype(@mob10) == 1){effect @mob10, 0, 137, 100; damaged @mob10, @dam; game_sound 78,0; del @mob10;}
+	if(@mob11 && istype(@mob11) == 1){effect @mob11, 0, 137, 100; damaged @mob11, @dam; game_sound 78,0; del @mob11;}
+	if(@mob12 && istype(@mob12) == 1){effect @mob12, 0, 137, 100; damaged @mob12, @dam; game_sound 78,0; del @mob12;}
+	del @target;
+	del @dam;
+}
+
+0,0,0,0,0,0,0	SPELL_매의위상	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else{
+ set @x1, get_xs()-9;
+ set @x2, get_xs()+9;
+ set @y1, get_ys()-9;
+ set @y2, get_ys()+9;       //가로세로범위입니다 8이 화면에 꽉차는거같아보여서..
+ set @mana, get_vita(@myid);
+
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @damage, ((get_basevita(@myid)+5))*6; //데미지 공식이에요
+   set @type, istype(@mob);
+   if(@mob && @type == 1 && get_mana(@myid) >= 15500) {                        //타입이 몹이라면
+   manal_del "15500";
+    effect @mob, 0, 69, 100;
+    game_sound 78, 0;
+    damaged @mob, @damage;
+   }
+  }
+}
+}
+}

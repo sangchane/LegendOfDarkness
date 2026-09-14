@@ -1,0 +1,6387 @@
+0,0,0,0,0,0,0	정보	{
+ set @select, menu("{=c안녕..", "NPC위치정보", "퀘스트정보", "사냥터정보", "승급전직정보");
+ if(@select == 1){
+mes 1, "{=q타고르마을에선 이벤트옷제작npc를보실수있습니다 건물안에있음";
+mes 1, "{=q아벨마을상점에선 골드아이템과 시약상점이 존재합니다..기타템등등";
+mes 1, "{=q홀리루딘성에는 꼬마가존재합니다 퀘스트npc";
+mes 1, "{=q수오미마을에는 무기업할수있는npc가존재합니다";
+mes 1, "{=q서아벨,서밀레스에선 보석상인npc가존재합니다 속성홀디,속성크리스탈목걸이제조가능";
+}else if(@select == 2){
+mes 1, "{=c무기업하는방법은 죽음의마을에가시면 미궁도우미2마리가있습니다 쿄npc를클릭하면됩니다(검정의상)";
+mes 1, "{=c이오리npc는 2차승급자만가능합니다";
+}else if(@select == 3){
+mes 1, "{=w해안가위치는 아벨마을서쪽아래끝 배가보이는맵쪽에있습니다..";
+mes 1, "{=w집털이는 죽마필드에서 바로 왼쪽 오른쪽 집으로 들어가시면됩니다";
+mes 1, "{=w루어스배타는곳으로가시면 바다괴물들이 보이실겁니다 여기서 금가위,염색약드랍합니다";
+mes 1, "{=w죽음의마을던전은 죽마대기실에서 입장하시면됩니다";
+}else if(@select == 4){
+mes 1, "{=w전직은체력:80000 마력:50000 입니다 신전가서 서쪽아래에서하시면됩니다..";
+mes 1, "{=w승급은체력:200000 마력:160000 입니다 승급길리콜이나 죽음의마을던전npc에서승급길가시면됨";
+mes 1, "{=w재료는 던전팬던트,본드라곤의구슬입니다";
+ del @val;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	루크	{
+ set @select, menu("던전상점", "물건 사기");
+ if(@select == 1){
+  shop 0, "루크", "포션과 리콜을 판매합니다.";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	해변상품	{
+ set @select, menu("{=o해변상품점", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "해변상품", "바캉스전문입니다^ㅡ^.";
+ }else if(@select == 2){
+  shop 1, "해변상품1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	아이스월드상점1	{
+ set @select, menu("던전상점", "물건 사기");
+ if(@select == 1){
+  shop 0, "아이스월드상점1", "특수염색약,특수조합서를팝니다.";
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	아이스월드상점2	{
+ set @select, menu("던전상점", "물건 사기");
+ if(@select == 1){
+  shop 0, "아이스월드상점2", "이벤트옷,이벤트무기를판매중.";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	아벨시약	{
+ set @select, menu("물약상인", "물건 사기");
+ if(@select == 1){
+  shop 0, "아벨시약", "물약,리콜을 판매합니다.";
+}
+ del @select;
+}
+
+0,0,0,0,0,0,0	마을귀환스킬	{
+ set @select, menu("귀환:마을 스킬이 사라지셧나요? 제가 가르쳐드리겠습니다.", "배우기");
+ if(@select == 1){
+ 		mes 1, "마을 귀환스킬을 지급해 드렸습니다.";
+			spell_add "귀환:마을";
+ }
+ del @select;
+}
+
+
+0,0,0,0,0,0,0	승급귀환스킬	{
+ set @select, menu("승급자의공간 스킬이 사라지셧나요? 제가 가르쳐드리겠습니다.", "배우기");
+ if(@select == 1){
+ 		if(get_level() == 99 && get_class_sub() >= 1){
+ 		mes 1, "승급자의공간을 지급해 드렸습니다.";
+			spell_add "승급자의공간";
+		}
+		else
+		{
+		mes 1, "아직 승급을 안했잖아!";
+	}
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	아벨리콜	{
+ set @select, menu("리콜상인", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "아벨리콜", "리콜과 그외 잡화 판매합니다.";
+ }else if(@select == 2){
+  shop 1, "아벨리콜1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	배상인	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "배상인", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "배상인1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	시장잡화	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "시장잡화", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "시장잡화1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	밀레스식당아줌마	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "밀레스식당아줌마", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "밀레스식당아줌마1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	오렌옷	{
+ set @select, menu("오렌옷", "물건 사기");
+ if(@select == 1){
+  shop 0, "오렌옷", "아이템팝니다.";
+ }
+ del @select;
+}
+}
+0,0,0,0,0,0,0	아벨무기상인	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "아벨무기상인", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "아벨무기상인1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	아벨방어구	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "아벨방어구", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "아벨방어구1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	호러캐슬이동	{
+	mes 1, "호러캐슬로 이동시켜드립니다.승급자이동불가능 레벨은 99여야합니다";
+	set @select, menu("이동?", "호러캐슬 이동");
+	if(@select == 1)
+	{
+ 	if(get_level() == 99 && get_class_sub() <= 0){
+		warp "호러캐슬대기실", 14,2;
+	}else{
+		mes 1, "레벨이 99가 아니시거나 승급이십니다 ";
+	}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	테스트	{
+ set @select, menu("오렌옷", "물건 사기");
+ if(get_deposit_money >= 3);
+ if(@select == 1){
+  shop 3, "오렌옷", "아이템팝니다.";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	전직도우미	{
+ set @select, menu("전직리콜은3.5억", "물건 사기");
+ if(@select == 1){
+  shop 0, "전직도우미", "전직리콜 ㅍㅍㅍ";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	마을상점	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "마을상점", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "마을상점1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	멀린	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "멀린", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "마을상점1", "무엇을 파시게요?";
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	크린	{
+ set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "아이템구매", "리콜&물약");
+ if(@select == 1){
+  shop 0, "크린", "노비스셋트 입니다~>ㅁ,";
+ }else if(@select == 2){
+  shop 0, "크린2", "물약과 리콜";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	직업선택2	{  // GM
+ set @select, menu("직업을 선택하시기 바랍니다.", "직자", "법사");
+ set @class, get_class();
+ if(@select == 1){
+  set_class 4;
+
+  legend_add 1, 128, "리치 1년, 봄 직자의 길로";
+  mes 4, "직자가 되엇습니다.";
+ }else if(@select == 2){
+  set_class 3;
+  warp "로톤마을", 75,65;
+  legend_add 2, 128, "리치 1년, 봄 법사의 길로";
+  mes 4, "법사 ㅊㅊㅊ.";
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	연말이벤트	{  // GM
+		mes 1, "한번만누르세요 두번이상 누르시면 일기장이 더럽혀집니다!!!!";
+		mes 1, "한번만누르세요 두번이상 누르시면 일기장이 더럽혀집니다!!!!";
+		mes 1, "한번만누르세요 두번이상 누르시면 일기장이 더럽혀집니다!!!!";
+		mes 1, "한번만누르세요 두번이상 누르시면 일기장이 더럽혀집니다!!!!";
+
+ set @select, menu("연말 이벤트 참여!!!!!경험치2배!!!!!!!!!!!!.", "연말이벤트를 시작한다");
+ set @class, get_class();
+ if(@select == 1){
+
+  legend_add 1, 128, "2009년 12월31일 연말 경험치 드랍율2배 이벤트에 참여하다";
+ legend_del 1, 128, "2009년 12월31일 연말 경험치 드랍율2배 이벤트에 참여하다";
+  mes 4, "활기찬 하루 되세요.";
+  warp "로톤마을", 75,65;
+ }else if(@select == 2){
+  warp "로톤마을", 75,65;
+  mes 4, "법사 ㅊㅊㅊ.";
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	시즈	{
+	mes 1, "안녕하세요 전직 도우미 입니다.";
+	set @select1, menu("선택하세요", "전사", "도적", "마법사", "성직자", "환골탈태");
+	if(@select1 == 1 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 1){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,전사로 전직하다. ";
+	}
+	if(@select1 == 2 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 1){
+	set_class 2;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+	set_son 1;
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,도적으로 전직하다. ";
+	}
+	if(@select1 == 3 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 1){
+	set_class 3;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+	set_son 1;
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,마법사로 전직하다. ";
+	}
+	if(@select1 == 4 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 1){
+	set_class 4;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+	set_son 1;
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,성직자로 전직하다. ";
+	}
+
+	if(@select1 == 1 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 2){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+	set_son 1;
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,전사로 전직하다. ";
+	}
+	if(@select1 == 2 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 2){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+	set_son 1;
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,도적으로 전직하다. ";
+	}
+	if(@select1 == 3 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 2){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+	set_son 1;
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,마법사로 전직하다. ";
+	}
+	if(@select1 == 4 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 2){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_son 1;
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,성직자로 전직하다. ";
+	}
+
+	if(@select1 == 1 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 3){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_son 1;
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,성직자로 전직하다. ";
+	}
+	if(@select1 == 2 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 3){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_son 1;
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,성직자로 전직하다. ";
+	}
+	if(@select1 == 3 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 3){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,성직자로 전직하다. ";
+	}
+	if(@select1 == 4 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 3){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,성직자로 전직하다. ";
+	}
+
+	if(@select1 == 1 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 4){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_son 1;
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,전사로 전직하다. ";
+	}
+	if(@select1 == 2 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 4){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_son 1;
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,도적으로 전직하다. ";
+	}
+	if(@select1 == 3 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 4){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_son 1;
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,마법사로 전직하다. ";
+	}
+	if(@select1 == 4 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 4){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,성직자로 전직하다. ";
+	}
+	if(@select1 == 5 && get_basevita() >= 17000 && get_basemana() >= 17000 && get_level() == 99 && get_class() == 5){
+	set_class 1;
+	set_level "1";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ 	warp "밀레스마을", 50,50;
+	game_sound 42, 0;
+ 	effect @target, 78, 78, 100;
+ 	legend_add 1, 88, "세오1년,환골탈태.";
+	}
+	del @select;
+	}
+}
+
+0,0,0,0,0,0,0	직업선택하장	{
+	if(get_class() != 0){mes 1, "당신은 이미 직업을 가지고 있습니다."; end;}
+	mes 1, "마이소시아의 정식적인 모험가가 되시는것을 환영합니다.";
+	mes 1, "비록 힘든 모험이되겠지만, 그대의 앞날에는 축복이 가득할것이라 밑습니다...";
+	mes 1, "퀘스트를 진행하면서 즐기신다면, 무지 쉽게하실수 있을겁니다.[퀘스트는 멜로린에게..]";
+	set @select, menu("자 그럼 직업을 선택하시기 바랍니다.", "전사", "도적", "마법사", "성직자", "무도가");
+	if(@select == 1){set_class 1; item_add "리콜", 10; item_add "전직서", 1; legend_add 0, 255, "리치 1년, 봄 전사의 길로"; skill_add "숏블레이드"; message 3, "{=q전사[" + get_name() +"]님. 축하드립니다! 멋진 모험되시기를 바랍니다!"; warp "노비스마을", 31,9; end;}
+	if(@select == 2){set_class 2; item_add "리콜", 10; item_add "전직서", 1; legend_add 0, 255, "리치 1년, 봄 도적의 길로"; skill_add "찌르기"; message 3, "{=q도적[" + get_name() +"]님. 축하드립니다! 멋진 모험되시기를 바랍니다!"; warp "노비스마을", 31,9; end;}
+	if(@select == 3){set_class 3; item_add "매직파나", 1; item_add "전직서", 1; item_add "리콜", 10; legend_add 0, 255, "리치 1년, 봄 마법사의 길로"; spell_add "마레노"; message 3, "{=q마법사[" + get_name() +"]님. 축하드립니다! 멋진 모험되시기를 바랍니다!"; warp "노비스마을", 31,9; end;}
+	if(@select == 4){set_class 4; item_add "홀리파나", 1; item_add "전직서", 1; item_add "리콜", 10; legend_add 0, 255, "리치 1년, 봄 성직자의 길로"; spell_add "쿠로"; message 3, "{=q성직자[" + get_name() +"]님. 축하드립니다! 멋진 모험되시기를 바랍니다!"; warp "노비스마을", 31,9; end;}
+	if(@select == 5){set_class 5; item_add "리콜", 10; item_add "전직서", 1; legend_add 0, 255, "리치 1년, 봄 무도가의 길로"; skill_add "정권"; message 3, "{=q무도가[" + get_name() +"]님. 축하드립니다! 멋진 모험되시기를 바랍니다!"; warp "노비스마을", 31,9; end;}
+}
+
+0,0,0,0,0,0,0	전직직업선택	{
+	set @myid, get_myid();
+	set @class, get_class();
+	if(get_class_sub() != 0){mes 1, "승급자는 전직을 할수없습니다."; end;}
+	if(item_exist(@myid, "전직서") == 0){mes 1, "당신은 이미 전직을 했습니다."; end;}
+	if(get_level() < 99){mes 1, "당신은 아직 전직을 할만큼의 모험을 해오지 않았군요."; end;}
+	if(get_class() == 1 && get_basevita() < 14000 && get_basemana() < 3500){mes 1, "당신은 아직 전직하기에 어립니다. 전사 전직조건은 체력 : 14000 마력 : 3500 입니다."; end;}
+	if(get_class() == 2 && get_basevita() < 11000 && get_basemana() < 6000){mes 1, "당신은 아직 전직하기에 어립니다. 도적 전직조건은 체력 : 11000 마력 : 6000 입니다."; end;}
+	if(get_class() == 3 && get_basevita() < 10000 && get_basemana() < 11000){mes 1, "당신은 아직 전직하기에 어립니다. 마법사 전직조건은 체력 : 10000 마력 : 11000 입니다."; end;}
+	if(get_class() == 4 && get_basevita() < 11000 && get_basemana() < 12000){mes 1, "당신은 아직 전직하기에 어립니다. 성직자 전직조건은 체력 : 11000 마력 : 12000 입니다."; end;}
+	if(get_class() == 5 && get_basevita() < 14000 && get_basemana() < 6000){mes 1, "당신은 아직 환골탈태하기에 어립니다. 무도가 환골탈태는 체력 : 14000 마력 : 6000 입니다."; end;}
+	if(get_class() == 5){goto class;}
+	mes 1, "모험가여, 당신의 모험담을 잘보아왔습니다.";
+	mes 1, "당신에게는 전직을하여 더멋진 모험을 할 자격이있습니다.";
+	mes 1, "전직할 직업을 선택해주세요.";
+	mes 1, "*주의*전직을 하게되면 레벨이 1이되고 모든능력치가 3이되며, 체력과 마력이 100으로 돌아갑니다.";
+	set @select, menu("직업을 선택하시기 바랍니다.", "전사", "도적", "성직자", "마법사");
+	if(@select == 1){item_del "전직서", 1; set_basevita 100; set_basemana 100; set_class 1; set_level "1"; set_point "0"; exp_del "4200000000"; set_str "4"; set_int "4"; set_wis "3"; set_dex "3"; set_con "3"; legend_add 0, 255, "리치 1년, 봄 전사로 전직하다."; message 3, "{=q전사[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!"; skill_add "숏블레이드"; warp "노비스마을", 31,9; goto zzz;}
+	if(@select == 2){item_del "전직서", 1; set_basevita 100; set_basemana 100; set_class 2; set_level "1"; set_point "0"; exp_del "4200000000"; set_str "4"; set_int "4"; set_wis "3"; set_dex "3"; set_con "3"; legend_add 0, 255, "리치 1년, 봄 도적으로 전직하다."; message 3, "{=q도적[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!"; skill_add "찌르기"; warp "노비스마을", 31,9; goto zzz;}
+	if(@select == 3){item_del "전직서", 1; set_basevita 100; set_basemana 100; set_class 4; set_level "1"; set_point "0"; exp_del "4200000000"; set_str "4"; set_int "4"; set_wis "3"; set_dex "3"; set_con "3"; legend_add 0, 255, "리치 1년, 봄 성직자로 전직하다."; message 3, "{=q성직자[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!"; spell_add "쿠로"; warp "노비스마을", 31,9; goto zzz;}
+	if(@select == 4){item_del "전직서", 1; set_basevita 100; set_basemana 100; set_class 3; set_level "1"; set_point "0"; exp_del "4200000000"; set_str "4"; set_int "4"; set_wis "3"; set_dex "3"; set_con "3"; legend_add 0, 255, "리치 1년, 봄 마법사로 전직하다."; message 3, "{=q마법사[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!"; spell_add "마레노"; warp "노비스마을", 31,9; goto zzz;}
+	end;
+	zzz:
+	sleep 900;
+	if(@class == get_class()) set_son 1;
+	if(@class != get_class()) set_son 0;
+	if(get_class() == 1){set @job$, "전사";}
+	if(get_class() == 2){set @job$, "도적";}
+	if(get_class() == 3){set @job$, "마법사";}
+	if(get_class() == 4){set @job$, "성직자";}
+	broadcast 5, "[" + get_name() + "]{=w님이 [" + @job$ + "]로 전직하셧습니다. 모두 축하해주세요!";
+	end;
+	class:
+	mes 1, "모험가여, 당신의 모험담을 잘보아왔습니다.";
+	mes 1, "당신에게는 환골탈태를 하여 더멋진 모험을 할 자격이있습니다.";
+	set @select, menu("환골탈태를 하시겠습니까?", "환골탈태를 합니다.");
+	if(@select == 1){goto monkz;}
+	end;
+	monkz:
+	mes 1, "환골탈태를 진행합니다.(다음을 눌른다면 돌아올수없습니다.)"; item_del "전직서", 1; set_basevita 100; set_basemana 100; set_level "1"; set_point "0"; exp_del "4200000000"; set_str "4"; set_int "4"; set_wis "3"; set_dex "3"; set_con "3"; legend_add 0, 255, "리치 1년, 봄 환골탈태를 하다."; message 3, "{=q무도가[" + get_name() +"]님. 축하드립니다! 멋진 두번째 모험되시기를 바랍니다!"; warp "노비스마을", 31,9;
+	broadcast 5, "[" + get_name() + "]{=w님이 환골탈태를 하셧습니다. 모두 축하해주세요!";
+	end;
+}
+
+0,0,0,0,0,0,0	이안	{ // 뤼케필드
+ mes 1, "안녕하세요 뤼케시온필드 이동도우미 (이안)입니다.";
+ mes 1, "뤼케시온필드는 그리 만만한곳이 아닙니다.";
+ mes 1, "특히 뤼케보를 조심하셔야 합니다.";
+ set @select, menu("이동하시겠습니까?", "이동하기");
+ set @class, get_class();
+
+ if(@select == 1){
+  warp "뤼케시온field대기실", 6, 13;
+  mes 1, "이곳부터 뤼케시온필드 입니다.";
+  mes 1, "이곳에서는 목걸이,벨트,지존헬옷을 얻을수있습니다.";
+  mes 1, "그럼 몸조심 하시길....";
+  warp "뤼케시온field대기실", 6, 13;
+  del @val;
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	로이	{ // 뤼케필드
+ set @select, menu("돌아갈껀가요?", "이동하기");
+ set @class, get_class();
+
+ if(@select == 1){
+  warp "용자의공원", 49,63;
+  del @val;
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	이린(주석)	{ // 아벨필드
+ mes 1, "안녕하세요 아벨필드 이동도우미 (이린)입니다.";
+ mes 1, "아벨필드는 4서유저를 위한 사냥터입니다.";
+ set @select, menu("이동하시겠습니까?", "이동하기");
+ set @class, get_class();
+
+ if(@select == 1){
+  warp "아벨마을field", 50, 50;
+  mes 1, "이곳부터 아벨필드 입니다.";
+  mes 1, "그럼 몸조심 하시길....";
+  message 3, " 아벨필드로 이동완료 ㅇㅅㅇ..";
+  del @val;
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	해리슨	{ //아벨무기점
+ set @select, menu(" 무엇을 사시겠습니까?", "전사무기", "도적무기", "법사무기", "직자무기", "도가무기");
+ if(@select == 1){
+  shop 0, "해리슨", "전사도적전용 무기입니다.";
+ }else if(@select == 2){
+  shop 0, "해리슨2", "도적전용 무기입니다^^";
+ }else if(@select == 3){
+  shop 0, "해리슨3", "밥사전용 무기입니다^^";
+ }else if(@select == 4){
+  shop 0, "해리슨4", "직자전용 무기입니다^^";
+ }else if(@select == 5){
+  shop 0, "해리슨5", "도가전용 무기입니다^^";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	피어스	{ // 아벨방어구점
+ set @select, menu("무엇을 사시겠습니까?", "갑옷", "귀걸이", "벨트", "장갑", "각반", "목걸이", "반지", "방패");
+ if(@select == 1){
+  shop 0, "피어스", "갑옷";
+ }else if(@select == 2){
+  shop 0, "피어스2", "귀걸이";
+ }else if(@select == 3){
+  shop 0, "피어스3", "벨트";
+ }else if(@select == 4){
+  shop 0, "피어스4", "장갑";
+ }else if(@select == 5){
+  shop 0, "피어스5", "각반";
+ }else if(@select == 6){
+  shop 0, "피어스6", "목걸이";
+ }else if(@select == 7){
+  shop 0, "피어스7", "반지";
+ }else if(@select == 8){
+  shop 0, "피어스8", "방패";
+}
+ del @select;
+}
+0,0,0,0,0,0,0	세어	{ // 아벨여관
+ mes 1, "어서오세요 " + get_name(@myid) + "님 반가워요~";
+ mes 1, "저는 당신을 연습장으로 이동시켜드릴수 있습니다~^^";
+ set @select, menu("이동할껀가요?", "이동하기");
+
+ if(@select == 1){
+  warp "연습장", 5, 5;
+  item_add "아벨리콜", 1;
+ mes 1, "열씸히 연습하세요^^";
+ del @val;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	치이	{ // 리파이동
+ mes 1, "어서오세요 " + get_name(@myid) + "님 반가워요~";
+ mes 1, "저는 리파이너의던전 이동도우미 (치이)라고 합니다^^";
+ mes 1, "이곳은 레벨99가 사냥하기 딱좋은! 사냥터에요^ㅡ^";
+ set @select, menu("이동할껀가요?", "이동하기");
+
+ if(@select == 1){
+  warp "리파이너의던전대기실", 35, 15;
+  item_add "밀레스리콜", 1;
+  message 3, " 리파이너의던전대기실 이동완료!";
+ del @val;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	스잔나	{ // 밀레스여관
+ mes 1, "어서오세요 " + get_name(@myid) + "님 반가워요~";
+ mes 1, "저는 당신을 연습장으로 이동시켜드릴수 있습니다~^^";
+ set @select, menu("이동할껀가요?", "이동하기");
+
+ if(@select == 1){
+  warp "연습장", 5, 5;
+  item_add "밀레스리콜", 1;
+ mes 1, "열씸히 연습하세요^^";
+ del @val;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	루이	{ // 아벨필드
+ set @select, menu("돌아갈껀가요?", "이동하기");
+ set @class, get_class();
+
+ if(@select == 1){
+  warp "로톤마을", 75,65;
+  del @val;
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	로즈마리(은행)	{
+ set @my, get_myid();
+ set @val, menu("안녕하세요. 어떻게 오셨나요?", "금전 맡기기", "금전 찾기","아이템맡기","아이템찾기");
+ 	if(@val == 1){ deposit_money();
+	}else if(@val == 2){
+		withdraw_money();
+	}else if(@val == 3){
+		deposit_item();
+	}else if(@val == 4){
+		withdraw_item();
+	}
+ del @val;
+}
+
+0,0,0,0,0,0,0	길레노아(금전)	{
+ mes 1, "안녕하세요 금전지급 NPC길레노아 입니다..";
+ mes 1, "저는 아이템을 받고 금전을 지급해드리지요";
+	
+	set @select, menu("금전교환", "500만골드(10000000GOLD)", "1000만골드(15000000GOLD)" ,"6000만골드(60000000GOLD)" ,"1억골드", "3억골드", "15억골드");
+	
+	if(@select == 1)
+	{
+		if(pc_itemcheck("500만골드") == 0x01)
+		{
+			item_del "500만골드", 1;
+			money_add "+10000000";
+		}
+		else
+		{
+			mes 1, "실패! 돈이 충분하지않습니다";
+		}
+	}
+	else if(@select == 2)
+	{
+		if(pc_itemcheck("1000만골드") == 0x01)
+		{
+			item_del "1000만골드", 1;
+			money_add "+15000000";
+		}
+		else
+		{
+			mes 1, "실패! 돈이 충분하지않습니다";
+		}
+	}
+	else if(@select == 3)
+	{
+		if(pc_itemcheck("6000만골드") == 0x01)
+		{
+			item_del "6000만골드", 1;
+			money_add "+60000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지않습니다";
+		}
+	}	
+	else if(@select == 4)
+	{
+		if(pc_itemcheck("1억골드") == 0x01)
+		{
+			item_del "1억골드", 1;
+			money_add "+100000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지않습니다";
+		}
+	}
+	else if(@select == 5)
+	{
+		if(pc_itemcheck("3억골드") == 0x01)
+		{
+			item_del "3억골드", 1;
+			money_add "+300000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 6)
+	{
+		if(pc_itemcheck("15억골드") == 0x01)
+		{
+			item_del "15억골드", 1;
+			money_add "+1500000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	경험치교환	{
+ mes 1, "안녕하세요 경험치아이템을 경험치로 바꿔드립니다..";
+ mes 1, "자꾸 서버리붓때문에 사라지는경험치들을 위해서입니다.";
+	
+	set @select, menu("경험치교환", "1천만경험치" ,"3천만경험치" ,"6천만경험치", "1억경험치", "1억5천만경험치", "2억경험치", "4억경험치", "6억경험치", "8억경험치");
+	 set @myid, get_myid();
+	if(@select == 1)
+	{
+		if(pc_itemcheck("1천만경험치") == 0x01)
+		{
+			item_del "1천만경험치", 1;
+			exp_add "10000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+	else if(@select == 2)
+	{
+		if(pc_itemcheck("3천만경험치") == 0x01)
+		{
+			item_del "3천만경험치", 1;
+			exp_add "30000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}	
+	else if(@select == 3)
+	{
+		if(pc_itemcheck("6천만경험치") == 0x01)
+		{
+			item_del "6천만경험치", 1;
+			exp_add "60000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+
+	else if(@select == 4)
+	{
+		if(pc_itemcheck("1억경험치") == 0x01)
+		{
+			item_del "1억경험치", 1;
+			exp_add "100000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+	else if(@select == 5)
+	{
+		if(pc_itemcheck("1억5천경험치") == 0x01)
+		{
+			item_del "1억5천경험치", 1;
+			exp_add "150000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+	else if(@select == 6)
+	{
+		if(pc_itemcheck("2억경험치") == 0x01)
+		{
+			item_del "2억경험치", 1;
+			exp_add "200000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+	else if(@select == 7)
+	{
+		if(pc_itemcheck("4억경험치") == 0x01)
+		{
+			item_del "4억경험치", 1;
+			exp_add "400000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+
+	else if(@select == 8)
+	{
+		if(pc_itemcheck("6억경험치") == 0x01)
+		{
+			item_del "6억경험치", 1;
+			exp_add "600000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+	else if(@select == 9)
+	{
+		if(pc_itemcheck("8억경험치") == 0x01)
+		{
+			item_del "8억경험치", 1;
+			exp_add "800000000";
+		}
+		else
+		{
+			mes 1, "실패! 아이템이없습니다";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	루	{
+	mes 1, "안녕하세요 전직리콜 조합사입니다,";
+	mes 1, "전직리콜을 조합하실수있습니다";
+	mes 1, "전직리콜 ->이동석,파란종이,잉크,1000만골드(item)";
+
+	set @select, menu("조합하시겠습니까?", "전직리콜");
+
+	if(@select == 1){
+	if(pc_itemcheck("이동석") == 0x01 && pc_itemcheck("파란종이") == 0x01 && pc_itemcheck("잉크") == 0x01 && pc_itemcheck("1000만골드") == 0x01)
+	{
+		item_del "이동석", 1;
+		item_del "파란종이", 1;
+		item_del "잉크", 1;
+		item_del "1000만골드", 1;
+		item_add "전직리콜", 1;
+		mes 1, "축하드립니다 성공하셨습니다";
+	}
+	else
+	{
+		mes 1, "실패! 아이템이 충분하지않습니다";
+	}
+	}else if(@select == 2){
+	if(pc_itemcheck("이동석") == 0x01 && pc_itemcheck("파란종이") == 0x01 && pc_itemcheck("잉크") == 0x01 && pc_itemcheck("비밀의황금열쇠") == 0x01)
+	{
+		item_del "이동석", 1;
+		item_del "파란종이", 1;
+		item_del "잉크", 1;
+		item_del "비밀의황금열쇠", 1;
+		item_add "승급리콜", 1;
+		mes 1, "축하드립니다 성공하셨습니다";
+	}
+	else
+	{
+		mes 1, "실패! 아이템이 충분하지않습니다";
+	}
+	}
+	del @select;
+	}
+
+
+0,0,0,0,0,0,0	조합	{ 
+ 	mes 1, "안녕하세요? 신 조합사입니다";
+	mes 1, "각종 아이템을 조합하실수있습니다";
+	mes 1, "체력물약99개는 전사의무기,도적의무기";
+	mes 1, "지존의무기는 각직업별 숙련무기 +2아이템과";
+	mes 1, "혼합물약 입니다";
+	
+	
+	set @select, menu("어떤 조합을 하시겠습니까?", "체력물약99개", "전사지존무기", "도적지존무기", "무도가지존무기");
+
+	if(@select == 1)
+	{
+		if(pc_itemcheck("전사의무기") == 0x01 && pc_itemcheck("도적의무기") == 0x01)
+		{
+			item_del "전사의무기", 1;
+			item_del "도적의무기", 1;
+			item_del "무도가의무기", 1;
+			item_add "체력물약", 99;
+			mes 1, "성공";
+		}
+		else
+		{
+		mes 1, "아이템이 없습니다";
+		}
+	}
+	else if(@select == 2)
+	{
+		if(pc_itemcheck("숙련자의검+2") == 0x01 && pc_itemcheck("혼합물약") == 0x01)
+		{
+			item_del "숙련자의검+2", 1;
+			item_del "혼합물약", 1;
+			item_add "지존의검", 1;
+			mes 1, "성공입니다";
+		}
+		else
+		{
+			mes 1, "아이템이 없습니다";
+		}
+	}
+	else if(@select == 3)
+	{
+		if(pc_itemcheck("숙련자의단검+2") == 0x01 && pc_itemcheck("혼합물약") == 0x01)
+		{
+			item_del "숙련자의단검+2", 1;
+			item_del "혼합물약", 1;
+			item_add "지존의단검", 1;
+			mes 1, "성공입니다";
+		}
+		else
+		{
+			mes 1, "아이템이 없습니다";
+		}
+	}
+	else if(@select == 4)
+	{
+		if(pc_itemcheck("숙련자의글러브+2") == 0x01 && pc_itemcheck("혼합물약") == 0x01)
+		{
+			item_del "숙련자의글러브+2", 1;
+			item_del "혼합물약", 1;
+			item_add "지존의글러브", 1;
+			mes 1, "성공입니다";
+		}
+		else
+		{
+			mes 1, "아이템이 없습니다";
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	라미2	{
+	mes 1, "기술을 가르쳐드립니다";
+	mes 1, "목록을 선택하세요";
+
+	set @select, menu("어떤 기술을 배우시겠습니까", "단각", "파천각", "붕신선각");
+
+	if(@select == 1){
+	skill_add "단각";
+	mes 1, "단각을 익혔습니다";
+	}
+	else if(@select == 2)
+	{
+	skill_add "파천각";
+	mes 1, "파천각을 익혔습니다";
+	}
+	else if(@select == 3)
+	{
+	skill_add "붕신선각";
+	}
+	del @select;
+	}
+
+
+
+0,0,0,0,0,0,0	노아	{ // 기초1
+ mes 1, "어머, 처음시작하시는 유저시군요..";
+ mes 1, "저는 초보마을의 마스코트 노아라구해요!>ㅁ<";
+ mes 1, "지금부터 약간의? 설명을 해드리도록할께요!";
+ mes 1, "저희 리치서버는 어떠한 경우에도 유저분들에게 금전을 바라지않습니다.!";
+ mes 1, "또한!, 언제나 친절한미소! 친절한상담! 고민거리가 있다면 이아로 귓주세요 훗..";
+ mes 1, "아참! 지금제가 바뻐서 그런데! 이위로 쭈욱 올라가시면 오두막이 하나있어요!";
+ mes 1, "이 사과좀 젝슨 아저시한테 전해주겠어요?";
+ set @select, menu("노아", "알았습니다.");
+
+ if(@select == 1){
+  item_add "사과",1;
+  item_add "로오의반지", 1;
+  item_add "로오의반지", 1;
+  mes 1, "고마워요! 보답으로 로오의반지를 드릴께요!";
+  del @val;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	젝슨	{ 
+ 	mes 1, "안녕하시오 난 젝슨이라하오";
+	
+	
+	set @select, menu("용건이 뭐인가?", "노아의심부름",);
+
+	if(@select == 1){
+	mes 1, "음? 노아가?.. 웬일이지 --;;;;";
+	mes 1, "아무튼 가져다줘서 고맙군.. 고맙다는 의미로 이걸주지.";
+	if(pc_itemcheck("사과") == 0x01)
+	{
+		item_del "사과", 1;
+		item_add "셔스의목걸이", 1;
+		item_add "목도", 1;
+		item_add "블라우스", 1;
+		item_add "셔츠", 1;
+		mes 1, "이벤트 완료!";
+		legend_add 5, 128, "노아의 심부름을 완수하다.";
+	}
+	else
+	{
+		mes 1, "이봐?... 설마 니가먹은건 아니겟지?..";
+	}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	스텟초기화	{ 
+	
+	set @select, menu("ㅇㅇ", "스텟,레벨초기화");
+
+	if(@select == 1){
+		set_str "3";
+		set_int "3";
+		set_wis "3";
+		set_dex "3";
+		set_con "3";
+		set_level "1";
+	}
+	else
+	{
+		mes 1, "이봐?... 설마 니가먹은건 아니겟지?..";
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	밀던	{
+	mes 1, "안녕하세요 밀레스던전 이동도우미입니다";
+	mes 1, "밀레스던전은 1~5써클전용 던전입니다";
+	
+	set @select, menu("이동하시겠습니까?", "이동하기");
+
+	if(@select == 1)
+	{
+		warp "지하던전대기실", 5, 5;
+		mes 1, "도착했습니다";
+	}
+	del @select;
+	}
+
+
+0,0,0,0,0,0,0	죽대	{
+	mes 1, "안녕하세요 죽대 이동도우미입니다";
+	mes 1, "죽음의마을은 5써클~이상 전용던전입니다";
+	mes 1, "각종 승급환생용 아이템을 습득하실수있습니다";
+
+	set @select, menu("이동하시겠습니까?", "이동하기");
+	
+	if(@select == 1)
+	{
+		warp "죽대", 5, 5;
+		mes 1, "도착했습니다";
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	귀환1	{
+	
+	set @select, menu("귀환하시겠습니까?", "귀환");
+	
+	if(@select == 1)
+	{
+		warp "용자의공원", 49, 63;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	죽마2	{
+	mes 1, "안녕하세요 죽음의마을2존 이동도우미입니다";
+	
+	set @select, menu("이동하시겠습니까?", "이동하기");
+
+	if(@select == 1)
+	{
+		warp "죽마2", 50, 50;
+		mes 1, "도착했습니다";
+		item_add "노말포션", 99;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	귀환2	{
+	
+	set @select, menu("귀환하시겠습니까?", "귀환");
+	
+	if(@select == 1)
+	{
+		warp "용자의공원", 49, 63;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	죽마3	{
+	mes 1, "안녕하세요 죽음의마을3존 이동도우미입니다";
+
+	set @select, menu("이동하시겠습니까?", "이동하기");
+
+	if(@select == 1)
+	{
+		warp "죽마3", 50, 50;
+		mes 1, "도착했습니다";
+		item_add "노말포션", 99;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	귀환3	{
+	
+	set @select, menu("귀환하시겠습니까?", "귀환");
+	
+	if(@select == 1)
+	{
+		warp "용자의공원", 49, 63;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	죽마4	{
+	mes 1, "안녕하세요 죽음의마을4존 이동도우미입니다";
+
+	set @select, menu("이동하시겠습니까?", "이동하기");
+	
+	if(@select == 1)
+	{
+		warp "죽마4", 50, 50;
+		mes 1, "도착했습니다";
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	귀환4	{
+
+	set @select, menu("귀환하시겠습니까?", "귀환");
+
+	if(@select == 1)
+	{
+		warp "용자의공원", 49, 63;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	아이스	{
+	mes 1, "안녕하세요 아이스월드 이동도우미입니다";
+	mes 1, "아이스 월드는 현재 지존사냥터중 최강의사냥터입니다";
+	mes 1, "체력 20만 이하는 이동을 자제해주십시오";
+	
+	set @select, menu("이동하시겠습니까?", "이동하기");
+
+	if(@select == 1)
+	{
+		warp "아이스월드", 5, 5;
+		mes 1, "조심하시기 바랍니다";
+		
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	아이스상점	{
+
+	set @select, menu("무엇을 사시겠습니까?", "물약류", "리콜류");
+
+	if(@select == 1)
+	{
+		shop 0, "아이스상점", "물약류입니다";
+	}
+	else if(@select ==2)
+	{
+		shop 0, "아이스상점2", "리콜류입니다";
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	죽대상점	{
+	
+	set @select, menu("무엇을 사시겠습니까?", "물약류", "리콜류");
+
+	if(@select == 1)
+	{
+		shop 0, "죽대상점", "물약류입니다";
+	}
+	else if(@select == 2)
+	{
+		shop 0, "죽대상점2", "리콜류입니다";
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	유링	{
+
+	mes 1, "아이스월드,죽음의마을에서 드랍되는";
+	mes 1, "차가운팬던트(A.B.C),화려한귀걸이로 퀸셰어의 귀걸이를 제조하실수있으며,";
+	mes 1, "{=q1000만골드,화려한귀걸이,퀸셰어의귀걸이로 리젠트다이아귀걸이를 제조하실수 있습니다.";
+
+	set @select, menu("조합하시겠습니까?", "퀸셰어의귀걸이", "리젠트다이아귀걸이");
+
+	if(@select == 1)
+	{
+	if(pc_itemcheck("차가운팬던트A") == 0x01 && pc_itemcheck("차가운팬던트B") == 0x01 && pc_itemcheck("차가운팬던트C") == 0x01 && pc_itemcheck("화려한귀걸이") == 0x01)
+	{
+		item_del "차가운팬던트A", 1;
+		item_del "차가운팬던트C", 1;
+		item_del "차가운팬던트B", 1;
+		item_del "화려한귀걸이", 1;
+		item_add "퀸셰어의귀걸이", 1;
+		mes 1, "축하드립니다!! 조합에성공했습니다";
+	}
+	else
+	{
+		mes 1, "아이템이 충분하지않습니다";
+		}
+	}
+
+	if(@select == 2)
+	{
+	if(pc_itemcheck("1000만골드") == 0x01 && pc_itemcheck("퀸셰어의귀걸이") == 0x01 && pc_itemcheck("화려한귀걸이") == 0x01)
+	{
+		item_del "1000만골드", 1;
+		item_del "화려한귀걸이", 1;
+		item_del "퀸셰어의귀걸이", 1;
+		item_add "리젠트다이아귀걸이", 1;
+		mes 1, "축하드립니다!! 조합에성공했습니다";
+	}
+	else
+	{
+		mes 1, "아이템이 충분하지않습니다";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	아룬조합ㅁㄴ	{
+	
+	mes 1, "뤼케시온보스,죽음의마을에서 드랍되는";
+	mes 1, "노란보석,마그마열매,그레이트헬피닉스크로어,신월도";
+	mes 1, "로 아룬다이트,프람베르그 를 조합하실수있습니다";
+
+	set @select, menu("조합하시겠습니까?", "아룬다이트", "프람베르그");
+	
+	if(@select == 1)
+	{
+	if(pc_itemcheck("그레이트헬피닉스크로어") == 0x01 && pc_itemcheck("노란보석") == 0x01 && pc_itemcheck("마그마열매") == 0x01)
+	{
+		item_del "그레이트헬피닉스크로어", 1;
+		item_del "마그마열매", 1;
+		item_del "노란보석", 1;
+		item_add "아룬다이트", 1;
+		mes 1, "축하합니다 성공했습니다";
+	}
+	else
+	{
+		mes 1, "아이템이 충분하지 않습니다";
+	}
+	}
+	else if(@select == 2)
+	{
+	if(pc_itemcheck("신월도") == 0x01 && pc_itemcheck("노란보석") == 0x01 && pc_itemcheck("마그마열매") == 0x01)
+	{
+		item_del "신월도", 1;
+		item_del "마그마열매", 1;
+		item_del "노란보석", 1;
+		item_add "프람베르그", 1;
+	}
+	else
+	{
+		mes 1, "아이템이 충분하지 않습니다";
+	}
+	}	
+	del @select;
+	}
+
+0,0,0,0,0,0,0	리치성인용품	{ 
+ set @select, menu(" 19세만 구입하세요", "물건사기");
+ if(@select == 1){
+  shop 0, "리치성인용품", "리치서버의 정통아이템! SM놀이셋트!";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	리치펫상점	{ 
+ set @select, menu("귀여운 애완동물 판매", "물건사기");
+ if(@select == 1){
+  shop 0, "리치펫상점", "귀여운 펫입니다.^^";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	리치고급의류	{ 
+ set @select, menu("고급의류점", "물건사기");
+ if(@select == 1){
+  shop 0, "리치고급의류", "비싼만큼 제질은 최고!";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	리치방어구	{ //밀레스무기상점
+ set @select, menu(" 무엇을 사시겠습니까?", "전사무기", "도적무기", "법사무기", "직자무기", "도가무기");
+ if(@select == 1){
+  shop 0, "리치방어구", "전사도적전용 무기입니다.";
+ }else if(@select == 2){
+  shop 0, "리치방어구2", "도적전용 무기입니다^^";
+ }else if(@select == 3){
+  shop 0, "리치방어구3", "밥사전용 무기입니다^^";
+ }else if(@select == 4){
+  shop 0, "리치방어구4", "직자전용 무기입니다^^";
+ }else if(@select == 5){
+  shop 0, "리치방어구5", "도가전용 무기입니다^^";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	리치무기	{ // 밀레스방어구상점
+ set @select, menu("무엇을 사시겠습니까?", "갑옷", "귀걸이", "벨트", "장갑", "각반", "목걸이", "반지", "방패");
+ if(@select == 1){
+  shop 0, "리치무기", "갑옷";
+ }else if(@select == 2){
+  shop 0, "리치무기2", "귀걸이";
+ }else if(@select == 3){
+  shop 0, "리치무기3", "벨트";
+ }else if(@select == 4){
+  shop 0, "리치무기4", "장갑";
+ }else if(@select == 5){
+  shop 0, "리치무기5", "각반";
+ }else if(@select == 6){
+  shop 0, "리치무기6", "목걸이";
+ }else if(@select == 7){
+  shop 0, "리치무기7", "반지";
+ }else if(@select == 8){
+  shop 0, "리치무기8", "방패";
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	밀던이동	{
+	
+	mes 1, "밀레스던전으로 이동시켜드립니다";
+	mes 1, "밀레스던전은 레벨 1~99까지 다양한경험치를얻을수있습니다";
+
+	set @select, menu("이동하시겠습니까?", "이동한다");
+
+	if(@select == 1)
+	{
+		warp "지하묘지대기실", 5, 5;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	무기업	{
+	
+	mes 1, "앵거바딜과 크리샤오르 1차조합사입니다";
+	mes 1, "홀리코로나를 조합해드립니다";
+	mes 1, "홀리코로나의 조합재료는";
+	mes 1, "이아,로오,하데스의열매와 노란보석입니다";
+	
+	set @select, menu("조합하시겠습니까", "조합");
+	
+	if(@select == 1)
+	{
+		if(pc_itemcheck("노란보석") == 0x01 && pc_itemcheck("이아의열매") == 0x01 && pc_itemcheck("로오의열매") == 0x01 && pc_itemcheck("하데스의열매") == 0x01)
+		{
+			item_del "노란보석", 1;
+			item_del "아이의열매", 1;
+			item_del "로오의열매", 1;
+			item_del "하데스의열매", 1;
+			item_add "홀리코로나", 1;
+			item_add "아벨리콜", 1;
+			mes 1, "성공";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+
+
+0,0,0,0,0,0,0	크리2	{
+	mes 1, "크리샤오르 2차조합사입니다";
+	mes 1, "프람베그르와 홀리코로나를";
+	mes 1, "크리샤오르로 조합해드립니다";
+
+	set @select, menu("조합하시겠습니까?", "조합한다");
+	if(@select == 1)
+	{
+		if(pc_itemcheck("프람베르그") == 0x01 && pc_itemcheck("홀리코로나") == 0x01)
+		{
+			item_del "프람베르그", 1;
+			item_del "홀리코로나", 1;
+			item_add "크리샤오르", 1;
+			mes 1, "축하드립니다 성공했습니다";
+			item_add "아벨리콜", 1;
+		}
+		else
+		{
+			mes 1, "아이템이 충분하지않습니다";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	앵거2	{
+	mes 1, "앵거바딜 2차조합사입니다";
+	mes 1, "아룬다이트와 홀리코로나를";
+	mes 1, "앵거바딜로 조합해드립니다";
+
+	set @select, menu("조합하시겠습니까?", "조합한다");
+	if(@select == 1)
+	{
+		if(pc_itemcheck("아룬다이트") == 0x01 && pc_itemcheck("홀리코로나") == 0x01)
+		{
+			item_del "아룬다이트", 1;
+			item_del "홀리코로나", 1;
+			item_add "앵거바딜", 1;
+			item_add "아벨리콜", 1;
+			mes 1, "축하드립니다 성공했습니다";
+		}
+		else
+		{
+			mes 1, "아이템이 충분하지않습니다";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	조합상점	{ 
+ set @select, menu("무엇을 사시겠습니까?", "조합아이템");
+ if(@select == 1){
+  shop 0, "조합상점", "조합상점";
+ }
+del @select;
+}
+
+
+0,0,0,0,0,0,0	쿄	{
+
+	mes 1, "고급아이템전문제조가입니다..";
+	mes 1, " " + get_name(@myid) + " 음?... 나는 자네가";
+	mes 1, "재료를가져오면 원하는템을만들어드리죠";
+	mes 1, "테네즈의각반:: 뉴트의목걸이,암흑의목걸이,생명의목걸이,금가위";
+	mes 1, "테네즈의방패:: 생명셋트,암흑셋트,뉴트의목걸이,테네즈의각반";
+	mes 1, "그무엇을 할텐가?";
+
+	set @select, menu("선택하게나..", "테네즈의각반제조", "테네즈의방패");
+
+
+	if(@select == 1)
+	{
+		mes 1, "..흠.. 제조아이템이 3번째줄에있음 제조를 할수없다는걸 명심하게나";
+		mes 1, "일단 아이템을 이리줘보게나..";
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("금가위") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("뉴트의목걸이") == 0x01)
+		{
+			item_del "생명의목걸이", 1;
+			item_del "금가위", 1;
+			item_del "암흑의목걸이", 1;
+			item_del "뉴트의목걸이" ,1; 
+			mes 1, "제조할 준비가 되었군..";
+			item_add "테네즈의각반", 1;
+			broadcast 5, "[" + get_name() + "]{=w님이 테네즈의각반을 제조성공 하였습니다";
+			mes 1, "제조성공!!!";
+		}
+		else
+		{
+			mes 1, "? 꺼져";
+		}
+	}
+	if(@select == 2)
+	{
+		mes 1, "..흠.. 제조아이템이 3번째줄에있음 제조를 할수없다는걸 명심하게나";
+		mes 1, "테네즈의방패을 제조하겟다고 했지?";
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && pc_itemcheck("뉴트의목걸이") == 0x01 && pc_itemcheck("테네즈의각반") == 0x01)
+		{
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "뉴트의목걸이" ,1;
+			item_del "테네즈의각반" ,1;
+			mes 1, "제조할 준비가 되었군..";
+			item_add "테네즈의방패", 1;
+			broadcast 5, "[" + get_name() + "]{=w님이 테네즈의방패을 제조성공 하였습니다";
+			mes 1, "제조성공!!!";
+		}
+		else
+		{
+			mes 1, "? 꺼져";
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	멜로린	{ //노비스
+ mes 1, "안녕하세요? " + get_name(@myid) + "님^^ 저는 노비스마을의 안내를 담담하고 있는 멜로린이라고 합니다. 마을 시설들 전반에 대한 사항과, 주변지리등에 대해서 말씀드리고 있습니다.";
+ set @select, menu("무엇을 알고 싶으세요?", "생활필수품 지급받기(무료)", "아이템은 어디서 구매하나요?", "직업은 어디서 얻을수 있나요?", "사냥은 어디서 하나요?", "노비스 바깥세상으로 이동하구싶어요");
+ set @class, get_class();
+
+	if(@select == 1){
+	if(pc_itemcheck("초보자셋트지급") == 0x01)
+	{
+		money_add "+5000000";
+	}
+	else
+	{
+		mes 1, "이미받으셧습니다";
+	}
+ }if(@select == 2){
+  mes 1, "아이템은 각마을의 방어구점.무기상점.리콜상점,잡화점 에서 구매하실수 있습니다^^";
+  mes 1, "즐거운시간되세요~^^";
+  del @val;
+ }if(@select == 3){
+  mes 1, " 직업은 (직업신전)에서 선택하실수 있답니다!";
+  mes 1, " 위로 쭈욱~ 올라가시면 직업신전이 있답니다^^"; 
+  del @val;
+ }if(@select == 4){
+  mes 1, "사냥터는 월드맵에서 이동이 가능합니다.";
+  mes 1, "오른쪽으로 쭈욱~가시면 노비스 사냥터가 나오지요 여기서 레벨6찍으세요 그래야직업구할수있음~";
+  del @val;
+ }if(@select == 5){
+  mes 1, " " + get_name(@myid) + "님 벌써 노비스를 떠나실려구요?ㅜㅜ";
+  mes 1, "부디 몸조심하세요";
+  warp "노비스", 46,36;
+ }
+  del @val;
+ }
+if(@select == 6){
+  mes 1, " 귀환 스킬은 리콜과 같은 용도로 사용되는 스펠입니다.";
+ }
+ del @select;
+ del @class;
+}
+
+0,0,0,0,0,0,0	승급	{
+	mes 1, "승급하기 위해서는 앞서 2가지의 제물이 필요하지..";
+	mes 1, "승급던전에서 드랍되는 본드라곤의구슬,던전팬던트가  필요하지..";
+	mes 1, "승급하기전에 체력이 20만 마력이 16만 이상되셔야합니다. (무장체력,무장마력)";
+	set @select, menu("승급하겟나?", "남전", "여전", "남도", "여도", "남도가", "여도가", "남법사", "여법사", "남직자", "여직자", "노머시(미구현)", "남평민", "여평민");
+	if(@select == 1)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 1)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		item_del "전직서", 1;
+ 		set_class_sub 1;
+  		item_add "마스터투구1", 1;
+  		item_add "마스터아머1", 1;
+  		item_add "아스카론", 1;
+ 		warp "뤼케시온마을", 21, 11;
+		game_sound 47, 0;
+ 		effect @target, 90, 90, 100;
+ 		legend_add 7, 90, "세오1년,전사로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 전사로 승급하셨습니다 축하드립니다";
+ 		effect @target, 90, 90, 100;
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 2)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 1)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+ 		set_class_sub 1;
+		item_del "전직서", 1;
+ 		item_add "마스터투구2", 1;
+ 		item_add "마스터아머2", 1;
+ 		item_add "아스카론", 1;
+ 		warp "뤼케시온마을", 21, 11;
+		game_sound 47, 0;
+ 		effect @target, 90, 90, 100;
+ 		legend_add 7, 90, "세오1년,전사로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 전사로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 3)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 2)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		item_del "전직서", 1;
+ 		set_class_sub 1;
+ 		item_add "스카우트아머", 1;
+ 		item_add "웨스턴", 1;
+ 		item_add "아조스", 1;
+ 		warp "뤼케시온마을", 21, 11;
+		game_sound 47, 0;
+ 		effect @target, 90, 90, 100;
+ 		legend_add 7, 90, "세오1년,도적으로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 도적으로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 4)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 2)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		item_del "전직서", 1;
+		set_class_sub 1;
+ 		item_add "레인저아머", 1;
+ 		item_add "웨스턴", 1;
+ 		item_add "아조스", 1;
+		item_del "던전팬던트", 1;
+  		warp "뤼케시온마을", 21, 11;
+		game_sound 47, 0;
+ 		effect @target, 90, 90, 100;
+ 		legend_add 7, 90, "세오1년,도적으로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 도적으로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 5)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 5)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		item_del "전직서", 1;
+ 		set_class_sub 1;
+ 		item_add "무상도복", 1;
+ 		item_add "무상관", 1;	
+ 		item_add "하이브레이질배틀핸드", 1;
+  		warp "뤼케시온마을", 21, 11;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+		legend_add 7, 90, "세오1년,무도가로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 무도가로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 6)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 5)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		item_del "전직서", 1;
+		set_class_sub 1;
+		item_add "월영관", 1;
+ 		item_add "월영도복", 1;
+  		warp "뤼케시온마을", 21, 11;
+ 		item_add "하이브레이질배틀핸드", 1;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+ 		legend_add 7, 90, "세오1년,무도가로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 무도가로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 7)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 3)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		set_class_sub 1;
+		item_del "전직서", 1;
+		item_add "다크홀", 1;
+  		warp "뤼케시온마을", 21, 11;
+		item_add "다크후드", 1;
+ 		item_add "로오의은총", 1;
+		item_del "던전팬던트", 1;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+ 		legend_add 7, 90, "세오1년,마법사로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 마법사로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 8)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 3)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "전직서", 1;
+		item_del "던전팬던트", 1;
+		set_class_sub 1;
+		item_add "다크베일", 1;
+ 		item_add "다크로브", 1;
+  		warp "뤼케시온마을", 21, 11;
+ 		item_add "로오의은총", 1;
+		item_del "전직(마법사)의증표", 1;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+ 		legend_add 7, 90, "세오1년,마법사로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 마법사로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 9)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 4)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		set_class_sub 1;
+		item_add "세인트홀", 1;
+ 		item_add "세인트후드", 1;
+  		warp "뤼케시온마을", 21, 11;
+		item_del "전직서", 1;
+ 		item_add "이아의은총", 1;
+		item_del "전직(성직자)의증표", 1;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+ 		legend_add 7, 90, "세오1년,성직자로 승급하다.";
+		broadcast 5, "[" + get_name() + "]님이 성직자로 승급하셨습니다 축하드립니다";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 10)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 4)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		set_class_sub 1;
+		item_add "세인트베일", 1;
+ 		item_add "세인트로브", 1;
+  		warp "뤼케시온마을", 21, 11;
+		item_del "전직서", 1;
+ 		item_add "이아의은총", 1;
+		item_del "전직(성직자)의증표", 1;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+		broadcast 5, "[" + get_name() + "]님이 성직자로 승급하셨습니다 축하드립니다";
+ 		legend_add 7, 90, "세오1년,성직자로 승급하다.";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 11)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000 && get_class() == 3)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		set_class_sub 1;
+		item_add "프레이트메일", 1;
+ 		item_add "프레이트투구", 1;
+  		warp "뤼케시온마을", 21, 11;
+ 		item_add "고급글러브", 1;
+		item_del "전직서", 1;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+ 		legend_add 7, 89, "노머시로 승급하다.";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 12)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		set_class_sub 1;
+		item_add "업그레이드셔츠", 1;
+		item_add "업그레이드목도", 1;
+		item_del "전직서", 1;
+  		warp "뤼케시온마을", 21, 11;
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+		broadcast 5, "[" + get_name() + "]님이 평민으로 승급하셨습니다 축하드립니다";
+ 		legend_add 7, 90, "세오1년,평민으로 승급하다.";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	if(@select == 13)
+	{
+		if(pc_itemcheck("본드라곤의구슬") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && pc_itemcheck("던전팬던트") == 0x01 && get_basevita() >= 200000 && get_basemana() >= 160000)
+		{
+		item_del "본드라곤의구슬", 1;
+		item_del "던전팬던트", 1;
+		item_del "전직서", 1;
+		set_class_sub 1;
+		item_add "업그레이드블라우스", 1;
+  		warp "뤼케시온마을", 21, 11;
+		item_add "업그레이드목도", 1;
+		broadcast 5, "[" + get_name() + "]님이 평민으로 승급하셨습니다 축하드립니다";
+ 		effect @target, 90, 90, 100;
+		game_sound 47, 0;
+ 		legend_add 7, 90, "세오1년,평민으로 승급하다.";
+		}
+		else
+		{
+		mes 1, "승급실패 재료가 부족합니다.,";
+ 		item_add "밀레스리콜", 1;
+ 		effect @target, 90, 90, 100;
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	농부부인	{
+
+	set @select, menu("ㅇㅅㅇ;;", "안녕하세요");
+	if(@select == 1)
+	{
+		if(get_str() >= 1)
+		{
+		mes 1, "안녕하세요? " + get_name(@myid) + "님>ㅁ<";
+		mes 1, "신규계정 이군요~ 그렇다면 제가 선물을 드리지요~";
+		item_add "슈퍼포션", 1;
+		mes 1, "포션을얻었다?!";
+		mes 1, "헑!!!! 잘못드렸어요!! ㅜㅜ ㅈㅅㅈㅅ 돌려주실래연? ㅜㅜ";
+		}
+		else
+		{
+		mes 1, "??... 장난??";
+			}
+		}
+		set @select, menu("뉴뉴 ㅜㅜ","돌려주기");
+		if(@select == 1)
+		{
+		if(pc_itemcheck("슈퍼포션") == 0x01)
+		{
+		item_del "슈퍼포션", 99;
+ 		mes 1, "엉엉 고마워요 ㅜㅜ..";
+ 		mes 1, "음... 그리고 한가지더 부탁이있어요 ㅇㅅㅇ...";
+ 		mes 1, "이사과를 제 남편에게 전해주시겠어요?...";
+ 		mes 1, "오홍! 들어주신다구요!? 감사~ 언넝전해주세요~";
+		mes 1, "길따라 쭉가시면 집하나 보이실겁니다";
+		item_add "사과", 1;
+		item_add "조금쌘목도", 1;
+		}
+		else
+		{
+		mes 1, "? 뒈질래 썅숑키야!! 빨리안내놔!?";
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	농부	{
+	mes 1, "음?.... 나는 오두막의 농부이라고 하지,...";
+	mes 1, "자네가 나를 무슨용건으로 불럿을까나~?";
+
+	set @select, menu("ㅇㅅㅇ;;", "부인의심부름", "보리단모아왔쬬요");
+	if(@select == 1)
+	{
+		if(pc_itemcheck("사과") == 0x01)
+		{
+		item_del "사과", 1;
+ 		mes 1, "음?... 부인이?.. -ㅅ-!?;;;;";
+ 		mes 1, "고...고맙네... (ㅅㅂ... 또 독이든건 아니겟지?...)";
+ 		mes 1, "농부: 사각";
+ 		mes 1, "농부:......흡!!!!!";
+ 		mes 1, "농부: 캭! 퀡뷀쉛뤲쉛 라똬뚜윍 부렉!!퀙....";
+ 		mes 1, "이....이바... 보리단을좀 구해다 주지 않겟나? 흙!!";
+ 		mes 1, "이독은 보ㄹ..단을 쓉어..먹으면 해독할수있지 ..쿨럭..!";
+ 		mes 1, "그..그럼 부탁하네..뷁.....";
+		}
+		else
+		{
+		mes 1, "??..";
+		}
+	}
+	else if(@select == 2)
+	{
+		if(pc_itemcheck("보리단") == 0x01)
+		{
+		item_del "보리단", 10;
+ 		mes 1, "헠헠 고맙군...";
+ 		mes 1, "답례로 1천만골드를 주지...";
+		money_add "+10000000";
+		warp "직업신전3", 5,5;
+		}
+		else
+		{
+		mes 1, "헑... 사..살..ㄹ..ㅈ..";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	초성이동	{
+ set @select, menu("이동하실래요 ㅇㅅㅇ?", "이동할꺼얌!", "퇴장하기");
+ if(@select == 1){
+ message 3, " 이동완료...";
+ warp "뤼케시온마을", 28, 9;
+ }if(@select == 2){
+ message 3, " 이동완료...";
+ warp "뤼케시온마을", 23, 9;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	사량	{
+	mes 1, " " + get_name(@myid) + "님 반가워요!! 저는 환생NPC 사량입니다!!>3<";
+	mes 1, "환생을 하기 앞서 몇가지 말씀드리겠습니다.";
+	mes 1, "환생은 Lv.1/Lv2/lv3/lv4/lv5가 있답니다,";
+	mes 1, "환생레벨Lv1을 하셧을때, 다음레벨인 lv2로 환생이 가능합니다, ";
+	mes 1, "또한 각 환생레벨마다 재료가 달라지며, 능력치배분도 변경됩니다,";
+
+	set @select, menu("환생하시겠습니까?", "환생Lv1", "환생Lv2", "환생Lv3", "환생Lv4", "환생Lv5", "사제");
+	set @class, get_class();
+ 	set @myid, get_myid();
+	
+	if(@select == 1)
+	{
+		
+		mes 1, "환생Lv1 재료 : 생명의목걸이,6000만골드(item)";
+		mes 1, "변경사항:: 콘:180 위즈:180 덱스:180 힘:180 인트:180 Level: 99 ";
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("6000만골드") == 0x01)
+		{
+			set_level "99";
+			set_con "180";
+			set_wis "175";
+			set_str "175";
+			set_dex "175";
+			set_int "175";
+			item_del "6000만골드", 1;
+			item_del "생명의목걸이", 1;
+			item_add "환생의증표(Lev1)", 1;
+ 			legend_add 1, 32, "1차환생을 하다";
+			message 5, " 환생(Lv1)하셧습니다,";
+	 		warp "뤼케시온마을", 21, 11;
+			game_sound 42, 0;
+ 			effect @target, 78, 78, 100;
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 2)
+	{
+		
+		mes 1, "환생Lv2 재료 : 암흑의목걸이,6000만골드(item), 환생의증표(Lev1)";
+		mes 1, "변경사항:: 콘:190 위즈:190 덱스:190힘:190 인트:190 Level: 99";
+		if(pc_itemcheck("6000만골드") == 0x01 && pc_itemcheck("환생의증표(Lev1)") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01)
+		{
+			item_del "암흑의목걸이", 1;
+			set_level "99";
+			set_con "180";
+			set_wis "180";
+			set_str "180";
+			set_dex "180";
+			set_int "180";
+			item_del "1000만골드", 1;
+			item_add "환생의증표(Lev2)", 1;
+			item_del "환생의증표(Lev1)", 1;
+ 			legend_add 1, 33, "2차환생을 하다";
+			message 5, " 환생(Lv2)하셧습니다,";
+	 		warp "뤼케시온마을", 21, 11;
+			game_sound 42, 0;
+ 			effect @target, 78, 78, 100;
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 3)
+	{
+		
+		mes 1, "환생Lv3 재료 : 생명의목걸이,1000만골드(item), 환생의증표(Lev2),암흑의목걸이";
+		mes 1, "변경사항:: 콘:200 위즈:200 덱스:200힘:200인트:200 Level: 99 ";
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("6000만골드") == 0x01 && pc_itemcheck("환생의증표(Lev2)") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01)
+		{
+			item_del "생명의목걸이", 1;
+			item_del "암흑의목걸이", 1;	
+			item_del "환생의증표(Lev2)", 1;
+			set_level "99";
+			set_con "185";
+			set_wis "185";
+			set_str "185";
+			set_dex "185";
+			set_int "185";
+			item_del "6000만골드", 1;
+			item_add "환생의증표(Lev3)", 1;
+ 			legend_add 1, 34, "3차환생을 하다";
+			message 5, " 환생(Lv3)하셧습니다,";
+	 		warp "뤼케시온마을", 21, 11;
+			game_sound 42, 0;
+ 			effect @target, 78, 78, 100;
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 4)
+	{
+		
+		mes 1, "환생Lv4 재료 : 생명의목걸이,6000만골드(item), 환생의증표(Lev3),암흑의목걸이";
+		mes 1, "변경사항:: 콘:210 위즈:220 덱스:220 힘:220 인트:220 Level: 99";
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("6000만골드") == 0x01 && pc_itemcheck("환생의증표(Lev3)") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01)
+		{
+			item_del "생명의목걸이", 1;
+			item_del "암흑의목걸이", 1;
+			set_level "99";
+			set_con "190";
+			set_wis "190";
+			set_str "190";
+			set_dex "190";
+			set_int "190";
+			item_del "6000만골드", 1;
+			item_add "환생의증표(Lev4)", 1;
+			item_del "환생의증표(Lev3)", 1;
+ 			legend_add 1, 35, "4차환생을 하다";
+			message 5, " 환생(Lv4)하셧습니다,";
+	 		warp "뤼케시온마을", 21, 11;
+			game_sound 42, 0;
+ 			effect @target, 78, 78, 100;
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 5)
+	{
+		
+		mes 1, "환생Lv5 재료 : 생명의목걸이,6000만골드(item), 환생의증표(Lev4),생명의벨트,암흑의목걸이,생명의벨트";
+		mes 1, "변경사항:: 콘:200 위즈:200 덱스:200 힘:200인트:200 Level: 99";
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("6000만골드") == 0x01 && pc_itemcheck("환생의증표(Lev4)") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01)
+		{
+			item_del "생명의목걸이", 1;
+			item_del "암흑의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "암흑의벨트", 1;
+			set_level "99";
+			set_con "200";
+			set_wis "200";
+			set_str "200";
+			set_dex "200";
+			set_int "200";
+			item_del "6000만골드", 1;
+			item_del "환생의증표(Lev4)", 1;
+			item_add "환생의증표(Lev5)", 1;
+ 			legend_add 1, 36, "5차환생을 하다";
+			message 5, " 환생(Lv5)하셧습니다,";
+	 		warp "뤼케시온마을", 21, 11;
+			game_sound 42, 0;
+ 			effect @target, 78, 78, 100;
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 6)
+	{
+		
+		mes 1, "{=c재료 : 생명의목걸이,생명의벨트,암흑의목걸이,암흑의벨트,환생의증표(Lev5),15억골드, 체력마력150만이상만가능합니다";
+		mes 1, "변경사항:: 콘:215 위즈:215 덱스:215 힘:215 인트:215 HP:200000,mp:300000, Level: 1 ";
+		mes 1, "{=w체력마력 !30만으로변경되니 주의바랍니다..";
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("15억골드") == 0x01 && pc_itemcheck("환생의증표(Lev5)") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("암흑의목걸이") == 0x01 && pc_itemcheck("암흑의벨트") == 0x01 && get_class() == 3 && get_basevita() >= 1500000 && get_basemana() >= 1500000 && get_class_sub() == 2)
+		{
+			item_del "생명의목걸이", 1;
+			item_del "생명의벨트", 1;
+			item_del "암흑의목걸이", 1;
+			item_del "암흑의벨트", 1;
+			item_del "환생의스크롤", 1;
+			item_add "마법사모자", 1;
+			item_add "홀리디아나", 1;
+			item_add "사제의상", 1;
+			set_level "1";
+			set_con "215";
+			set_wis "215";
+			set_str "215";
+			set_dex "215";
+			set_int "215";
+ 			set_basevita "200000";
+			set_basemana "300000";
+			set_class "4";
+			set_class_sub 2;
+			item_del "15억골드", 1;
+			item_del "환생의증표(Lev5)", 1;
+ 			legend_add 1, 37, "모든재물을받치고환생을완료하였습니다";
+			broadcast 5, "[" + get_name() + "]{=q님이 사제로 전직하셨습니다 축하드립니다";
+			money_add "+50000000";
+	 		warp "시장", 16, 2;
+			game_sound 42, 0;
+ 			effect @target, 78, 78, 100;
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 7)
+	{
+		
+		mes 1, "변생재료 : 변생의스크룰,1000골드(Item)";
+		mes 1, "변경사항:: 콘:3 위즈:3 덱스:50 힘:50 인트:50 Level: 1, 500만골드 ";
+		if(pc_itemcheck("변생의스크룰") == 0x01 && pc_itemcheck("1000만골드") == 0x01)
+		{
+			item_del "변생의스크룰", 1;
+			item_del "1000만골드", 1;
+			set_level "1";
+			set_con "3";
+			set_wis "3";
+			set_str "50";
+			set_dex "50";
+			set_int "50";
+			item_del "변생의증표", 1;
+			message 5, " 무로 돌아가셧습니다,";
+			money_add "+5000000";
+	 		warp "뤼케시온마을", 21, 11;
+			game_sound 42, 0;
+ 			effect @target, 78, 78, 100;
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	del @select;
+	}
+}
+0,0,0,0,0,0,0	루네	{
+	mes 1, "안녕하세요? 저는 환생제물 제조 NPC 루네 라고 합니다,";
+	mes 1, "제조품목은, 환생의스크룰,변생의스크룰 입니다,";
+	mes 1, "환생의스크룰: 크리스탈,룬스톤,홀디트석,빈종이,환생석이  필요합니다.";
+	mes 1, "변생의스크룰: 환생의스크룰,빈종이,변생석이 필요합니다.";
+	mes 1, "환생리콜 구매하기, 500만골드(item)";
+
+	set @select, menu("제조하시겠습니까?", "환생의스크룰", "변생의스크룰", "환생리콜구매");
+	
+	if(@select == 1)
+	{
+		if(pc_itemcheck("빈종이") == 0x01 && pc_itemcheck("크리스탈") == 0x01 && pc_itemcheck("홀디트석") == 0x01 && pc_itemcheck("룬스톤") == 0x01 && pc_itemcheck("환생석") == 0x01)
+		{
+			item_del "1000만골드", 1;
+			item_del "빈종이", 1;
+			item_del "크리스탈", 1;
+			item_del "룬스톤", 1;
+			item_del "홀디트석", 1;
+			item_del "환생석", 1;
+			item_add "환생의스크룰", 1;
+			message 3, " 제조완료,";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+		}
+	}
+	if(@select == 2)
+	{
+		if(pc_itemcheck("환생의스크룰") == 0x01 && pc_itemcheck("빈종이") == 0x01 && pc_itemcheck("변생석") == 0x01)
+		{
+			item_del "환생의스크룰", 1;
+			item_del "1000만골드", 1;
+			item_add "변생의스크룰", 1;
+			item_del "변생석", 1;
+			message 3, " 제조완료,";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+		}
+	}
+	if(@select == 3)
+	{
+		if(pc_itemcheck("500만골드") == 0x01)
+		{
+			item_del "500만골드", 1;
+			item_add "환생리콜", 1;
+			message 3, " 재료가 부족해요~";
+		}
+		else
+		{
+			mes 1, "{=q500만골드 아이템이 없습니다.!";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	트린	{
+
+	mes 1, "어서오세요.";
+	mes 1, "저는 전사.도적.도가의 헬무기를 업그레이드 시켜드릴수 있습니다";
+
+	set @select, menu("무엇을 만드시겠습니까?", "헬브레이질레이업배틀액스","하이브레이질그레이트배틀액스", "피닉스소울크로어", "피닉스레이업크로어", "헬피닉스크로어", "그레이트헬피닉스크로어", "카타르", "신월도", "아수라");
+
+	if(@select == 1)
+	{
+		mes 1, "헬브레이질레이업배틀액스를 제조하시겠습니까?";
+		mes 1, "재료는 500만골드,하이브레이질배틀액스 입니다.";
+		if(pc_itemcheck("하이브레이질배틀액스") == 0x01 && pc_itemcheck("500만골드") == 0x01)
+		{			
+			
+			item_add "헬브레이질레이업배틀액스", 1;
+			item_del "500만골드", 1;
+			item_del "하이브레이질배틀액스", 1;
+			mes 3, "제조완료";
+
+		}
+		else
+		{
+			mes 1, "재료가 없습니다.";
+		}
+	}
+	if(@select == 2)
+	{
+		mes 1, "하이브레이질그레이트배틀액스를 제조하시겠습니까?";
+		mes 1, "재료는 500만골드,헬브레이질레이업배틀액스,하이브레이질배틀액스 입니다..";
+		if(pc_itemcheck("500만골드") == 0x01 && pc_itemcheck("하이브레이질배틀액스") == 0x01 && pc_itemcheck("헬브레이질레이업배틀액스") == 0x01) 
+		{			
+			
+			item_add "하이브레이질그레이트배틀액스", 1;
+			item_del "500만골드",1;
+			item_del "하이브레이질배틀액스", 1;
+			item_del "헬브레이질레이업배틀액스", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "{=w재료가 없습니다.";
+		}
+
+	}
+	if(@select == 3)
+	{
+		mes 1, "피닉스소울크로어를 제조하시겠습니까?";
+		mes 1, "재료 :: 피닉스크로어,1000만골드.";
+		if(pc_itemcheck("피닉스크로어") == 0x01 && pc_itemcheck("1000만골드") == 0x01)
+		{			
+			
+			item_del "1000만골드", 1;
+			item_del "피닉스크로어", 1;
+			item_add "피1", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 없습니다";
+		}
+
+	}
+	if(@select == 4)
+	{
+		mes 1, "피닉스레이업크로어를 제조할래여?";
+		mes 1, "재료 :: 피닉스소울크로어,피닉스크로어,1000만골드";
+		if(pc_itemcheck("피1") == 0x01 && pc_itemcheck("피닉스크로어") == 0x01 && pc_itemcheck("1000만골드") == 0x01)
+		{			
+			
+			item_del "1000만골드", 1;
+			item_del "피닉스크로어", 1;
+			item_del "피1", 1;
+			item_add "피2", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 없습니다";
+		}
+	}
+	if(@select == 5)
+	{
+		mes 1, "헬피닉스크로어를 배울래요?";
+		mes 1, "재료:: 피닉스크로어,피닉스소울크로어,피닉스레이업크로어,1000만골드";
+		if(pc_itemcheck("피닉스크로어") == 0x01 && pc_itemcheck("피2") == 0x01 && pc_itemcheck("피1") == 0x01 && pc_itemcheck("1000만골드") == 0x01)
+		{			
+			
+			item_del "1000만골드", 1;
+			item_del "피닉스크로어", 1;
+			item_del "피1", 1;
+			item_del "피2", 1;
+			item_add "피3", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 없습니다";
+		}
+
+	}
+	if(@select == 6)
+	{
+		mes 1, "그레이트헬피닉스크로어";
+		mes 1, "재료:: 피닉스크로어,피닉스소울크로어,피닉스레이업크로어,1000만골드,헬피닉스크로어,헬브레이질레이업배틀액스";
+		if(pc_itemcheck("피닉스크로어") == 0x01 && pc_itemcheck("피2") == 0x01 && pc_itemcheck("피1") == 0x01 && pc_itemcheck("1000만골드") == 0x01 && pc_itemcheck("피3") == 0x01 && pc_itemcheck("헬브레이질레이업배틀액스") == 0x01)
+		{			
+			
+			item_del "1000만골드", 1;
+			item_del "피닉스크로어", 1;
+			item_del "피1", 1;
+			item_del "피2", 1;
+			item_del "피3", 1;
+			item_del "헬브레이질레이업배틀액스", 1;
+			item_add "피4", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 없습니다";
+		}
+
+	}
+	if(@select == 7)
+	{
+		mes 1, "카타르를 제조하시겠습니까??";
+		mes 1, "재료는 곡단도,1000만골드";
+		if(pc_itemcheck("곡단도") == 0x01 && pc_itemcheck("1000만골드") == 0x01)
+		{			
+			
+			item_add "카타르", 1;
+			item_del "곡단도", 1;
+			item_del "1000만골드" ,1;
+			mes 3, "제조완료!";
+		}
+		else
+		{
+			mes 1, "재료 ㅇㄸ?";
+		}
+
+	}
+	if(@select == 8)
+	{
+		mes 1, "신월도를 제조하시겠습니까??";
+		mes 1, "재료는 곡단도,1000만골드,카타르";
+		if(pc_itemcheck("곡단도") == 0x01 && pc_itemcheck("카타르") == 0x01 && pc_itemcheck("1000만골드") == 0x01)
+		{			
+			
+			item_del "카타르", 1;
+			item_del "곡단도", 1;
+			item_del "1000만골드" ,1;
+			item_add "신월도" ,1;
+			mes 3, "제조완료!";
+		}
+		else
+		{
+			mes 1, "재료 ㅇㄸ?";
+		}
+
+	}
+	if(@select == 9)
+	{
+		mes 1, "아수라를 제조하시겠습니까??";
+		mes 1, "재료는 곡단도,카타르,1000만골드 입니다.";
+		if(pc_itemcheck("곡단도") == 0x01 && pc_itemcheck("카타르") == 0x01)
+		{			
+			
+			item_del "카타르", 1;
+			item_del "곡단도", 1;
+			item_del "1000만골드" ,1;
+			item_add "아수라" ,1;
+			mes 3, "제조완료!";
+		}
+		else
+		{
+			mes 1, "재료 ㅇㄸ?";
+		}
+
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	길드성	{
+
+	mes 1, "저는 유저분들께 1000만전을받고";
+	mes 1, "아벨성으로 이동시켜드립니다.";
+
+	set @select, menu("어떤것을 하시겠어요 ?", "이동하기");
+
+	if(@select == 1)
+	{
+		mes 1, "그럼 시작하도록하겠습니다";
+		mes 1, "금전 1000만전 체크중입니다";
+
+			money_del "10000000";
+			mes 1, "네 아이템 인계받았습니다";
+			mes 1, "이동시켜드리겠습니다.";
+			warp "아벨성", 36, 16;
+
+		}
+		else
+		{
+			mes 1, "{=q돈이 없네요";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	레드굴	{
+mes 1, "체력이 40만 이하가 되시면 엔피시를 누르실수 없습니다..";
+ if(get_basevita() >= 400000){
+ set @select, menu("레드굴리콜상점", "물건 사기");
+ if(@select == 1){
+  shop 0, "레드굴", "아이템팝니다.";
+ }
+ else
+{
+mes 1, "체력이 40만 이하시어 레드굴에 접근할 수 없습니다.";
+end;
+}
+}
+ del @select;
+}
+0,0,0,0,0,0,0	블루굴	{
+mes 1, "체력이 20만 이하가 되시면 엔피시를 누르실수 없습니다..";
+ if(get_basevita() >= 200000){
+ set @select, menu("블루굴리콜상점", "물건 사기");
+ if(@select == 1){
+  shop 0, "블루굴", "아이템팝니다.";
+ }
+ else
+{
+mes 1, "체력이 20만 이하시어 블루굴에 접근할 수 없습니다.";
+end;
+}
+}
+ del @select;
+}
+0,0,0,0,0,0,0	브론즈굴	{
+mes 1, "체력이 15만 이하가 되시면 엔피시를 누르실수 없습니다..";
+ if(get_basevita() >= 150000){
+ set @select, menu("브론즈굴리콜상점", "물건 사기");
+ if(@select == 1){
+  shop 0, "브론즈굴", "아이템팝니다.";
+ }
+ else
+{
+mes 1, "체력이 15만 이하시어 브론즈굴에 접근할 수 없습니다.";
+end;
+}
+}
+ del @select;
+}
+0,0,0,0,0,0,0	2차레드굴	{
+mes 1, "닥사~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~..";
+ set @select, menu("레드굴리콜상점", "물건 사기", "퀘스트??", "아이템제작");
+ if(@select == 1){
+  shop 0, "2차레드굴", "아이템팝니다.";
+}
+
+	else if(@select == 2){
+
+		mes 1, "거시기뭐냐지금레드굴에몹을너무많이풀어놔서말이지";
+		mes 1, "그몹들을소탕좀해줄래?";
+		mes 1, "거기서나오는아이템들을구해다주면 내좋은걸주지";
+		mes 1, "{=c일단 뉴트3,오피온1두,오피온2두,오피온3두를잡으면될거야";
+		mes 1, "{=w다녀와 !";
+
+	}else if(@select == 3){
+
+		mes 1, "{=c벌써뽑아왓어 ?";
+		mes 1, "{=c좋아 줘봐 한번";
+
+		mes 1, "{=c이열~ 멋진데? 고마워";
+		mes 1, "{=c갖고싶은거골라봐";
+		set @select, menu("-_-", "프람베르그", "아룬다이트", "미스릴부츠", "워리어워커", "배틀부츠", "발찌");
+
+		if(@select == 1){
+		
+		if(pc_itemcheck("무기조각1") == 0x01 && pc_itemcheck("무기조각2") == 0x01 && pc_itemcheck("무기조각3") == 0x01 && pc_itemcheck("무기조각4") == 0x01)
+		{
+			
+			item_del "무기조각1", 1;
+			item_del "무기조각2", 1;
+			item_del "무기조각3", 1;
+			item_del "무기조각4", 1;
+			item_add "프람베르그", 1;
+		}
+		else
+		{
+			mes 1, "{=c장난하냐 없잖아";
+		}
+
+		}else if(@select == 2){
+
+		if(pc_itemcheck("무기조각1") == 0x01 && pc_itemcheck("무기조각2") == 0x01 && pc_itemcheck("무기조각3") == 0x01 && pc_itemcheck("무기조각4") == 0x01)
+		{
+
+			item_del "무기조각1", 1;
+			item_del "무기조각2", 1;
+			item_del "무기조각3", 1;
+			item_del "무기조각4", 1;
+			item_add "아룬다이트", 1;
+		}
+		else
+		{
+			mes 1, "{=c장난하냐 없잖아";
+		}
+
+		}else if(@select == 3){
+
+		if(pc_itemcheck("신발조각1") == 0x01 && pc_itemcheck("신발조각2") == 0x01 && pc_itemcheck("신발조각3") == 0x01 && pc_itemcheck("신발조각4") == 0x01)
+		{
+
+			item_del "신발조각1", 1;
+			item_del "신발조각2", 1;
+			item_del "신발조각3", 1;
+			item_del "신발조각4", 1;
+			item_add "미스릴부츠", 1;
+		}
+		else
+		{
+			mes 1, "{=c장난하냐 없잖아";
+		}
+
+		}else if(@select == 4){
+
+		mes 1, "{=w 배틀부츠필요합니다";
+
+		if(pc_itemcheck("신발조각1") == 0x01 && pc_itemcheck("신발조각2") == 0x01 && pc_itemcheck("신발조각3") == 0x01 && pc_itemcheck("신발조각4") == 0x01 && pc_itemcheck("배틀부츠") == 0x01)
+		{
+
+			item_del "신발조각1", 1;
+			item_del "신발조각2", 1;
+			item_del "신발조각3", 1;
+			item_del "신발조각4", 1;
+			item_del "배틀부츠", 1;
+			item_add "워리어워커", 1;
+		}
+		else
+		{
+			mes 1, "{=c장난하냐 없잖아";
+		}
+
+		}else if(@select == 5){
+
+		if(pc_itemcheck("신발조각1") == 0x01 && pc_itemcheck("신발조각2") == 0x01 && pc_itemcheck("신발조각3") == 0x01 && pc_itemcheck("신발조각4") == 0x01)
+		{
+
+			item_del "신발조각1", 1;
+			item_del "신발조각2", 1;
+			item_del "신발조각3", 1;
+			item_del "신발조각4", 1;
+			item_add "배틀부츠", 1;
+		}
+		else
+		{
+			mes 1, "{=c장난하냐 없잖아";
+		}
+
+		}else if(@select == 6){
+
+		if(pc_itemcheck("신발조각1") == 0x01 && pc_itemcheck("신발조각2") == 0x01 && pc_itemcheck("신발조각3") == 0x01 && pc_itemcheck("신발조각4") == 0x01)
+		{
+
+			item_del "신발조각1", 1;
+			item_del "신발조각2", 1;
+			item_del "신발조각3", 1;
+			item_del "신발조각4", 1;
+			item_add "발찌", 1;
+		}
+		else
+		{
+			mes 1, "{=c장난하냐 없잖아";
+		}
+}
+}
+del @select;
+}
+0,0,0,0,0,0,0	30퀘스트	{
+	mes 1, "저는 리치의하데스악동";
+	mes 1, "하데스의수족입니다";
+	mes 1, "무엇을 도와드릴까요?";
+	
+	set @select, menu("무엇을 도와드릴까요?", "악동의장난", "퀘스트완료");
+	
+	if(@select == 1)
+	{
+		mes 1, "아 요즘 진짜 몸이근질근질해서말이야";
+		mes 1, "이번에 내가 마을에 몹을 풀었거든";
+		mes 1, "근데 아자꾸 옆에 영감이 방해를하자나";
+		mes 1, "짜증나게 .. 그래서말인데..";
+		mes 1, "니가 가서 대리인의수염 좀 뽑아와라";
+		mes 1, "뽑아오면 좋은걸 줄테니";
+		mes 1, "다녀와 !";
+	}
+	else if(@select == 2)
+	{
+		mes 1, "벌써뽑아왓어 ?";
+		mes 1, "알아채진 못했겠지 ?";
+		mes 1, "좋아 줘봐 한번";
+		if(pc_itemcheck("대리인의수염") == 0x01)
+		{
+			mes 1, "이열~ 멋진데? 고마워";
+			mes 1, "앞으로도 종종부탁하지 ㅋㅋㅋ";
+			item_del "대리인의수염", 1;
+			legend_add 7, 16, "리치 1년, 봄 리치마을 하데스악동을돕다";
+			item_add "파란종이", 1;
+		}
+		else
+		{
+			mes 1, "장난하냐 없잖아";
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	40퀘스트	{
+	mes 1, "저는 리치의하데스집의관리자";
+	mes 1, "하데스 대리인입니다";
+	mes 1, "무엇을 도와드릴까요 ?";
+	
+	set @select, menu("무엇을 도와드릴까요?", "리치마을이란?", "대리인의고민", "퀘스트완료");
+
+	if(@select == 1)
+	{
+		mes 1, "네 리치마을이 궁금하시군요";
+		mes 1, "저희 리치 마을에서는 일반마을에서는 판매하지않는";
+		mes 1, "물건들이나 옷등을 판매하고있습니다";
+		mes 1, "{=c리치마을에서는각종 퀘스트를 받을수있습니다";
+		mes 1, "아무튼 방문해주셔서 감사합니다";
+	}
+	else if(@select == 2)
+	{
+		mes 1, "아아 안그래도 요즘 고민거리가생겨서말이야..";
+		mes 1, "우리마을에 좀비들이 돌아다닌 소문이있어";
+		mes 1, "그소문이맞다면.... 아아 비극이지";
+		mes 1, "그래서 그들을 연구해볼참인데 내힘이 딸려서말이야";
+		mes 1, "자네가 좀비살점을좀 구해다주겠나";
+		mes 1, "고맙네 그럼 기다리겠네";
+	
+	}
+	else if(@select == 3)
+	{
+		mes 1, "오오 다녀왔는가 ?어디보세";
+		if(pc_itemcheck("좀비의살") == 0x01)
+		{
+			mes 1, "아아 고맙네 정말고마워";
+			item_del "좀비의살", 1;
+			mes 1, "이건내 작은보답이니 그리알고받아주게";
+			legend_add 7, 16, "리치 1년, 봄 리치마을 하데스의대리인을돕다";
+			item_add "비밀의황금열쇠", 1;
+			
+		}
+		else
+		{
+			mes 1, "나랑 농담따먹기하잔거냐 ?";
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	ia	{
+	mes 1, "안녕하세요? "+ get_name(@myid) + "님^^ ";
+	mes 1, "저는 리치서버의 마스코트 이아 입니다..";
+
+	
+	set @select, menu("무엇을 도와드릴까요?", "리치마을이란?");
+
+	if(@select == 1)
+	{
+		mes 1, "네 리치마을이 궁금하시군요";
+		mes 1, "저희 리치 마을에서는 일반마을에서는 판매하지않는";
+		mes 1, "물건들이나 옷등을 판매하고있습니다";
+		mes 1, "{=c리치마을에서는각종 퀘스트를 받을수있습니다";
+		mes 1, "아무튼 방문해주셔서 감사합니다";
+	}
+	else if(@select == 2)
+	{
+		mes 1, "에휴.. 요즘 고민거리가 하나있답니다..";
+		mes 1, "제가 아끼는 팬던트를 이아의숲에서 잊어버렷답니다..ㅜ";
+		mes 1, "응? 내가가서 찾으면 되지 않냐구요??";
+		mes 1, "아낰... 이양반아 내가 찾으면 퀘스트가 진행이 되질 않자나 콱!";
+		mes 1, "그리고 저는 요즘 너무 바빠서 좀처럼 시간이 나질않고있답니다,";
+		mes 1, " "+ get_name(@myid) + " 님이 저대신 찾아주실수는 없나요?..";
+		mes 1, "응? 처리하면 뭘주냐구요~? 음.. 아주이쁜 이아의반지 를 드리지요!";
+		mes 1, "ㅜㅜ 취소누르지마세요 히끅..";
+		mes 1, " "+ get_name(@myid) + "님 저희 부탁을 들어주실꺼죠?^^a";
+		mes 1, "정말감사해요! 그럼 이아의숲에서 숲의파수꾼을 잡으시면 이아의팬던트를 찾으실수있어요!";
+		warp "이아의숲", 15,15;
+		item_add "이아네집", 1;
+	
+	}
+	else if(@select == 3)
+	{
+		mes 1, "벌써 찾으셧나요!?";
+		if(pc_itemcheck("이아의팬던트") == 0x01)
+		{
+			mes 1, "우와~ 정말고마워요!";
+			item_del "이아의팬던트", 1;
+			mes 1, "이건 아까 약속했던 이아의반지에요! 고마워요!";
+			legend_add 7, 35, "리치 1년, 봄 이아의 노예가 되다♥";
+			item_add "이아의반지2", 1;
+
+		}
+		else
+		{
+			mes 1, "아놔 이쉬키가 이아라고 무시하나??";
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	미루	{
+	
+	mes 1, "안녕하세요 무기업그레이드 담당 NPC 미루입니다.";
+	mes 1, "저는 다크코로나,홀리코로나를 제조해드리면서 무기업까지 해드립니다.";
+	mes 1, "홀리코로나 :: 바다의엠버,화염의엠버,대지의엠버,백의엠버,코로나";
+	mes 1, "다크코로나 :: 바다의엠버,화염의엠버,대지의엠버,흑의엠버,코로나";
+	mes 1, "앵거바딜 :: 다크코로나,아스카론";
+	mes 1, "크리샤오르 :: 다크코로나,아조스";
+	mes 1, "미스릴배틀핸드 :: 다크코로나,하이브래이질배틀핸드";
+	mes 1, "다크디아나 :: 다크코로나,로오의은총";
+	mes 1, "홀리디아나 :: 홀리코로나,이아의은총";
+	
+	set @select, menu("조합하시겠습니까", "앵거바딜", "크리샤오르", "미스릴배틀핸드", "다크디아나", "이아의은총");
+	
+	if(@select == 1)
+	{
+		if(pc_itemcheck("아스카론") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "아스카룬", 1;
+			item_del "다크코로나", 1;
+			item_add "앵거바딜", 1;
+			mes 1, "앵거바딜 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 2)
+	{
+		if(pc_itemcheck("아조스") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "아조스", 1;
+			item_del "다크코로나", 1;
+			item_add "크리샤오르", 1;
+			mes 1, "크리샤오르 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 3)
+	{
+		if(pc_itemcheck("하이브레이질배틀핸드") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "하이브레이질배틀핸드", 1;
+			item_del "다크코로나", 1;
+			item_add "미스릴배틀핸드", 1;
+			mes 1, "미스릴배틀핸드 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 4)
+	{
+		if(pc_itemcheck("로오의은총") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "로오의은총", 1;
+			item_del "다크코로나", 1;
+			item_add "다크디아나", 1;
+			mes 1, "다크디아나 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 5)
+	{
+		if(pc_itemcheck("이아의은총") == 0x01 && pc_itemcheck("홀리코로나") == 0x01)
+		{
+			item_del "이아의은총", 1;
+			item_del "홀리코로나", 1;
+			item_add "홀리디아나", 1;
+			mes 1, "홀리디아나 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	승급이동	{
+	mes 1, "승급길,승급사냥터로 이동시켜드립니다.레벨은 99여야합니다";
+	set @select, menu("이동?", "승급길이동", "죽음의마을던전대기실", "적룡굴이동", "2차적룡굴이동");
+	
+	if(@select == 1)
+	{
+		if(get_str() >= 1)
+ 		if(get_level() == 99 && get_class_sub() == 0){
+			item_del "본드라곤의구슬", 1;
+			item_del "던전팬던트", 1;
+			warp "승급던전 6층", 5,5;
+		}
+		else
+		{
+			mes 1, "레벨이 99가 아니시거나 승급하셨습니다~";
+		}
+	}
+	else if(@select == 2)
+	{
+		mes 1, "확인합니다";
+		if(get_class_sub() >= 1)
+		{
+			warp "죽음의마을던전30", 24,19;
+			mes 1, "이동되었습니다.";
+		}
+		else
+		{
+			mes 1, "승급이 아니십니다.";
+		}
+	}
+	else if(@select == 3)
+	{
+		mes 1, "확인합니다";
+		if(get_class_sub() >= 1)
+		{
+			warp "적룡굴대기실", 16,11;
+			mes 1, "이동되었습니다.";
+		}
+		else
+		{
+			mes 1, "승급이 아니십니다.";
+		}
+	}
+	else if(@select == 4)
+	{
+		mes 1, "2차승급 체력마력 80/50 이상만입장가능합니다";
+		mes 1, "확인합니다";
+		if(get_basevita() >= 800000 && get_basemana() >= 500000 && get_class_sub() == 2){
+			warp "2차승급자대기실", 16,11;
+			mes 1, "이동되었습니다.";
+		}
+		else
+		{
+			mes 1, "2차승급이 아니십니다.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	아이템상점	{ // 아벨방어구점
+ set @select, menu("무엇을 사시겠습니까?", "갑옷", "귀걸이", "벨트", "장갑", "각반", "목걸이", "반지", "방패", "기타아이템", "리콜");
+ if(get_deposit_money >= 3);
+ if(@select == 1){
+  shop 0, "아이템상점1", "갑옷";
+ }else if(@select == 2){
+  shop 0, "아이템상점2", "귀걸이";
+ }else if(@select == 3){
+  shop 0, "아이템상점3", "벨트";
+ }else if(@select == 4){
+  shop 0, "아이템상점4", "장갑";
+ }else if(@select == 5){
+  shop 0, "아이템상점5", "각반";
+ }else if(@select == 6){
+  shop 0, "아이템상점6", "목걸이";
+ }else if(@select == 7){
+  shop 0, "아이템상점7", "반지";
+ }else if(@select == 8){
+  shop 0, "아이템상점8", "방패";
+ }else if(@select == 9){
+  shop 0, "아이템상점9", "기타아이템";
+ }else if(@select == 10){
+  shop 0, "아이템상점10", "리콜";
+}
+ del @select;
+}
+0,0,0,0,0,0,0	보상이아	{
+	
+	mes 1, "안녕하세요 이아입니다.";
+	mes 1, "이번에 초기화 정말로 죄송합니다.";
+	mes 1, "미리준비한 백업본으로 어떡게든 복구를 해봣지만 실패하고 말았습니다.";
+	mes 1, "정말 죄송합니다.";	
+	set @select, menu("복구받으시겠습니까?", "네!");
+	
+	if(@select == 1)
+	{
+		mes 1, "복구 보상을 시작합니다 보상을 받으시기전에 보상을 받기위해서는 (보상)이라는 아이템이 있어야합니다.";
+			
+		if(pc_itemcheck("보상") == 0x01)
+		{
+			item_del "보상", 1;
+			item_add "세피라링(Lev5)", 1;
+			item_add "세피라링(Lev5)", 1;
+			item_add "실크부츠", 1;
+			item_add "파파야방패", 1;
+			item_add "퀸셰어의귀걸이", 1;
+			money_add "+50000000";
+  	 		warp "뤼케시온마을", 21, 11;
+			legend_add 7, 35, "리치 1년, 봄 초기화 보상을 받다...";
+		}
+		else
+		{
+			mes 1, "이미받으셧으셧습니다.";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	이린2	{ // 아벨필드
+ mes 1, "안녕하세요 아벨필드 이동도우미 (이린)입니다.";
+ mes 1, "아벨필드는 4서유저를 위한 사냥터입니다.";
+ set @select, menu("이동하시겠습니까?", "이동하기");
+ set @class, get_class();
+
+ if(@select == 1){
+  warp "아벨마을field", 50, 50;
+  mes 1, "이곳부터 아벨필드field 입니다.";
+  mes 1, "그럼 몸조심 하시길....";
+  warp "밀레스마을field", 50, 50;
+  del @val;
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	미루2	{
+	
+	mes 1, "안녕하세요 무기업그레이드 담당 NPC 미루입니다.";
+	mes 1, "저는 다크코로나,홀리코로나를 제조해드리면서 무기업까지 해드립니다.";
+	mes 1, "홀리코로나 :: 바다의엠버,화염의엠버,대지의엠버,백의엠버,코로나";
+	mes 1, "다크코로나 :: 바다의엠버,화염의엠버,대지의엠버,흑의엠버,코로나";
+	mes 1, "앵거바딜 :: 다크코로나,아스카론";
+	mes 1, "크리샤오르 :: 다크코로나,아조스";
+	mes 1, "미스릴배틀핸드 :: 다크코로나,하이브래이질배틀핸드";
+	mes 1, "홀리디아나 :: 홀리코로나,이아의은총";
+	mes 1, "최상급글러브 :: 홀리코로나,고급글러브";
+	mes 1, "다크디아나 :: 다크코로나,로오의은총";
+	mes 1, "티타늄목도 :: 홀리코로나,업그레이드목도";
+	
+	set @select, menu("조합하시겠습니까", "앵거바딜", "크리샤오르", "미스릴배틀핸드","홀리디아나","최상급글러브","다크디아나","티타늄목도");
+	
+	if(@select == 1)
+	{
+		if(pc_itemcheck("아스카론") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "아스카룬", 1;
+			item_del "다크코로나", 1;
+			item_add "앵거바딜", 1;
+			mes 1, "앵거바딜 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 2)
+	{
+		if(pc_itemcheck("아조스") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "아조스", 1;
+			item_del "다크코로나", 1;
+			item_add "크리샤오르", 1;
+			mes 1, "크리샤오르 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 3)
+	{
+		if(pc_itemcheck("하이브레이질배틀핸드") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "하이브레이질배틀핸드", 1;
+			item_del "다크코로나", 1;
+			item_add "미스릴배틀핸드", 1;
+			mes 1, "미스릴배틀핸드 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 4)
+	{
+		if(pc_itemcheck("이아의은총") == 0x01 && pc_itemcheck("홀리코로나") == 0x01)
+		{
+			item_del "이아의은총", 1;
+			item_del "홀리코로나", 1;
+			item_add "홀리디아나", 1;
+			mes 1, "홀리디아나 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 5)
+	{
+		if(pc_itemcheck("고급글러브") == 0x01 && pc_itemcheck("홀리코로나") == 0x01)
+		{
+			item_del "고급글러브", 1;
+			item_del "홀리코로나", 1;
+			item_add "최상급글러브", 1;
+			mes 1, "최상급글러브 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 6)
+	{
+		if(pc_itemcheck("로오의은총") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "로오의은총", 1;
+			item_del "다크코로나", 1;
+			item_add "다크디아나", 1;
+			mes 1, "다크디아나 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 7)
+	{
+		if(pc_itemcheck("업그레이드목도") == 0x01 && pc_itemcheck("홀리코로나") == 0x01)
+		{
+			item_del "업그레이드목도", 1;
+			item_del "홀리코로나", 1;
+			item_add "티타늄목도", 1;
+			mes 1, "티타늄목도 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	이안2	{ // 뤼케필드
+ mes 1, "안녕하세요 뤼케시온필드 이동도우미 (이안)입니다.";
+ mes 1, "뤼케시온필드는 그리 만만한곳이 아닙니다.";
+ mes 1, "특히 뤼케보를 조심하셔야 합니다.";
+ set @select, menu("이동하시겠습니까?", "이동하기");
+ set @class, get_class();
+
+ if(@select == 1){
+  warp "뤼케시온field대기실", 44, 49;
+  mes 1, "이곳부터 뤼케시온필드 입니다.";
+  mes 1, "이곳에서는 목걸이,벨트,지존헬옷을 얻을수있습니다.";
+  mes 1, "그럼 몸조심 하시길....";
+  warp "뤼케시온field대기실", 44, 49;
+  del @val;
+ }
+ del @select;
+ del @class;
+}
+0,0,0,0,0,0,0	아이스2	{
+	mes 1, "안녕하세요 아이스월드 이동도우미입니다";
+	mes 1, "아이스 월드는 현재 지존사냥터중 최강의사냥터입니다";
+	mes 1, "체력 20만 이하는 이동을 자제해주십시오";
+	
+	set @select, menu("이동하시겠습니까?", "이동하기");
+
+	if(@select == 1)
+	{
+		warp "아이스월드", 5, 5;
+		mes 1, "조심하시기 바랍니다";
+		
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	밀던이동2	{
+	
+	mes 1, "밀레스던전으로 이동시켜드립니다";
+	mes 1, "밀레스던전은 레벨 1~99까지 다양한경험치를얻을수있습니다";
+
+	set @select, menu("이동하시겠습니까?", "이동한다");
+
+	if(@select == 1)
+	{
+		warp "지하묘지대기실", 5, 5;
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	죽대2	{
+	mes 1, "안녕하세요 죽대 이동도우미입니다";
+	mes 1, "죽음의마을은 5써클~이상 전용던전입니다";
+	mes 1, "각종 승급환생용 아이템을 습득하실수있습니다";
+
+	set @select, menu("이동하시겠습니까?", "이동하기");
+	
+	if(@select == 1)
+	{
+		warp "죽대", 5, 5;
+		mes 1, "도착했습니다";
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	메린	{
+	
+	mes 1, "안녕하세요? 목걸이 제조 npc 메린 이에요~";
+	mes 1, "저는 속성별 크리스탈목걸이,속성별 룬스톤목걸이를 만들어드릴수가 있지요~^^";
+	mes 1, "골라보세요";
+
+	set @select, menu("고르기","화염의크리스탈목걸이", "대지의크리스탈목걸이", "바람의크리스탈목걸이", "바다의크리스탈목걸이", "화염의룬스톤목걸이", "대지의룬스톤목걸이", "바람의룬스톤목걸이", "바다의룬스톤목걸이");
+
+	if(@select == 1)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("크리스탈목걸이") == 0x01 && pc_itemcheck("루비") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "화염의크리스탈목걸이", 1;
+			item_del "루비", 1;
+			item_del "크리스탈목걸이", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	if(@select == 2)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("크리스탈목걸이") == 0x01 && pc_itemcheck("진주") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "대지의크리스탈목걸이", 1;
+			item_del "진주", 1;
+			item_del "크리스탈목걸이", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	if(@select == 3)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("크리스탈목걸이") == 0x01 && pc_itemcheck("에메랄드") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "바람의크리스탈목걸이", 1;
+			item_del "에메랄드", 1;
+			item_del "크리스탈목걸이", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	if(@select == 4)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("크리스탈목걸이") == 0x01 && pc_itemcheck("사파이어") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "바다의크리스탈목걸이", 1;
+			item_del "사파이어", 1;
+			item_del "크리스탈목걸이", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	if(@select == 5)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("화염의크리스탈목걸이") == 0x01 && pc_itemcheck("룬스톤") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "화염의룬스톤목걸이", 1;
+			item_del "화염의크리스탈목걸이", 1;
+			item_del "룬스톤", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	if(@select == 6)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("대지의크리스탈목걸이") == 0x01 && pc_itemcheck("룬스톤") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "대지의룬스톤목걸이", 1;
+			item_del "대지의크리스탈목걸이", 1;
+			item_del "룬스톤", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	if(@select == 7)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("바람의크리스탈목걸이") == 0x01 && pc_itemcheck("룬스톤") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "바람의룬스톤목걸이", 1;
+			item_del "바람의크리스탈목걸이", 1;
+			item_del "룬스톤", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	if(@select == 8)
+	{
+		mes 1, "재물을 확인합니다.";
+		if(pc_itemcheck("바다의크리스탈목걸이") == 0x01 && pc_itemcheck("룬스톤") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "바다의룬스톤목걸이", 1;
+			item_del "바다의크리스탈목걸이", 1;
+			item_del "룬스톤", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재물이 부족합니다.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	유메	{
+	
+	mes 1, "안녕하세요? 홀디트링제조 npc 유메 가에요~";
+	mes 1, "저는 속성별 홀디트링을 만들어드릴수가 있지요~^^";
+	mes 1, "레드자스퍼5개,젤리오팔5개,페리도트5개,꿈의바다5개,무속성홀디트링으로 조합하실수있습니다";
+	mes 1, "골라보세요";
+
+	set @select, menu("고르기","화염의홀디트링", "대지의홀디트링", "바람의홀디트링", "바다의홀디트링");
+
+	if(@select == 1)
+	{
+		mes 1, "레드자스퍼5개,무속성홀디트링입니다";
+		mes 1, "재료를 확인합니다.";
+		if(pc_itemcheck("홀디트링") == 0x01 && pc_itemcheck("레드자스퍼") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "화염의홀디트링", 1;
+			item_del "레드자스퍼", 1;
+			item_del "홀디트링", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 제료가 부족합니다.";
+		}
+	}
+	if(@select == 2)
+	{
+		mes 1, "젤리오팔5개,무속성홀디트링입니다";
+		mes 1, "재료을 확인합니다.";
+		if(pc_itemcheck("홀디트링") == 0x01 && pc_itemcheck("젤리오팔") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "대지의홀디트링", 1;
+			item_del "젤리오팔", 1;
+			item_del "홀디트링", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재료가 부족합니다.";
+		}
+	}
+	if(@select == 3)
+	{
+		mes 1, "페리도트5개,무속성홀디트링입니다";
+		mes 1, "재료을 확인합니다.";
+		if(pc_itemcheck("홀디트링") == 0x01 && pc_itemcheck("페리도트") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "바람의홀디트링", 1;
+			item_del "페리도트", 1;
+			item_del "홀디트링", 1;
+			mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재료가 부족합니다.";
+		}
+	}
+	if(@select == 4)
+	{
+		mes 1, "꿈의바다5개,무속성홀디트링입니다";
+		mes 1, "재료을 확인합니다.";
+		if(pc_itemcheck("홀디트링") == 0x01 && pc_itemcheck("꿈의바다") == 0x01)
+		{
+			mes 1, "제조중...";
+			item_add "바다의홀디트링", 1;
+			item_del "꿈의바다", 1;
+			item_del "홀디트링", 1;
+		mes 1, "##### 제조성공 #####";
+		}
+		else
+		{
+			mes 1, "제조실패 재료가 부족합니다.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	리로	{
+	mes 1, "{=c리치서버 처음 접속하시는건 가요?...";
+	mes 1, "아니면 기존 유저이신가요?...";
+
+	set @select, menu("", "리치서버 신규유저 입니다.!", "아닙니다, 기존 유저입니다");
+	
+	if(@select == 1)
+	{
+		item_add "리치초보자", 1;
+		if(pc_itemcheck("리치초보자") == 0x01)
+		{
+		mes 1, "{=c리치서버를 처음 접속하시는 유저시군요!!";
+		mes 1, "그렇다면  " + get_name(@myid) + "님을 위해 리치서버에 대한 설명을 해드리겠습니다, ";
+		}
+		else
+		{
+			mes 1, "";
+		}
+	}
+	if(@select == 2)
+	{
+		item_add "리치초보자", 1;
+		if(pc_itemcheck("리치초보자") == 0x01)
+		{
+		mes 1, "그럼바로 견습사냥터로 보내드리지요";
+		legend_add 1, 32, "리치의 소중한 유저가되다.";
+		money_add "+10000000";
+  		warp "견습사냥터", 5, 5;
+		}
+		else
+		{
+			mes 1, "";
+		}
+	}
+	set @select, menu("설명들으실래요?", "네, 저는 리치에대해 알고싶습니다.",  "아뇨, 저는 설명따위 필요없습니다.", );
+	
+	if(@select == 1)
+	{
+		if(pc_itemcheck("리치초보자") == 0x01)
+		{
+		mes 1, "{=c리치서버는 어둠의전설 구버전(5.01)으로 개발된 프리서버로서",;
+		mes 1, "캐시템이 절대 구현불가능합니다,";
+		mes 1, "또한 아직 개발단계(테스트)이며, 불편한사항이 많습니다.";
+		mes 1, "{=c리치서버는 어둠의전설 본섭과는 다른 시스템체계를 사용하고 있으며,";
+		mes 1, "본섭과는 다르게, 환생제도가 존재합니다.!";
+		mes 1, "또한 경험치배율은 일절 알려드리지 않습니다.";
+		mes 1, "다만 한가지 알려드리겠습니다";
+		mes 1, "{=c리치서버는 99퍼 노가다 1퍼 놀자라는것을..";
+		mes 1, "{=c리치서버는 모든 프리섭이 쉽다고만 생각하는 유저에게는 독이되고,";
+		mes 1, "프리섭또한 키우기 어렵다는 사실을 아는 유저에겐 약이될것을 약속드립니다.";
+		mes 1, "{=c리치서버 서버규칙";
+		mes 1, "{=c1.유저는 결코 운영진에게 서버파일배포 요청을 하지 않습니다.";
+		mes 1, "#이를 어길시 경고없이 계정삭제 및 영구추방";
+		mes 1, "{=c2.운영진의 운영방식이 맘에 들지않아도 욕을 하지 않습니다.";
+		mes 1, "#이를 어길시 1차경고후 2차시 계정블럭";
+		mes 1, "{=c3.유저간의 경쟁은 좋으나 스틸은 절대 자제합니다. ";
+		mes 1, "#이를 어길시 1차경고후 3차시 계정삭제";
+		mes 1, "{=c4.유저간의 다툼은 절대 금지";
+		mes 1, "#이를 어길시 1차경고후 2차시 추방 ";
+		mes 1, "{=c5.절대 욕을하지 않습니다.";
+		mes 1, "#이를 어길시 이유불문 계정삭제";
+		mes 1, "{=c6.어떠한 경우에두 GM에게 욕을하지 않는다.";
+		mes 1, "#이를 어길시 1차경고후 2차시 추방";
+		mes 1, "{=c7.이벤트 도중 질문은 삼가합니다. (질문은 질문시간에)  ";
+		mes 1, "#이를 어길시 때찌합니다.";
+		mes 1, "{=c8.유저는 절대 리치서버를 신고하지 않습니다.";
+		mes 1, "#이를 어길시 리치서버또한 유저분들을 버리겠습니다.";
+		mes 1, "{=c9.유저는 GM에게 절대 아이템을 요구하지 않습니다.";
+		mes 1, "#이를 어길시 1차경고후 2차시 때찌합니다.";
+		mes 1, "{=c10.유저는 항상 즐거운 게임을 하셔야합니다.";
+		mes 1, "#이를 어길시 게임이 재미없어집니다.";
+		mes 1, "{=c11.끝단어를 싸가지없게 짤라먹지 말아주세요.";
+		mes 1, "#이를 어길시 저두 싸가지없게 말합니다.";
+		mes 1, "위 11가지의 규칙을 지켜줄 유저가 되신다면 리치서버는 어떤 유저라도 환영합니다.!";
+		mes 1, "긴글 읽어주셧으니~ 500만골드를 드리지요!";
+		money_add "+5000000";
+		mes 1, "{=c500만골드 획득!";
+		mes 1, "아차!! 리치서버서버 소개와 규칙을 다들으셧으니!";
+		mes 1, "초보사냥터로 이동시켜드려야 겟네요!!";
+		mes 1, "{=cNever Say Good Bye~";
+  		warp "견습사냥터", 5, 5;
+		legend_add 1, 32, "리치서버의 소중한 유저가되다.";
+		}
+		else
+		{
+			mes 1, "";
+		}
+	}
+	if(@select == 2)
+	{
+		if(pc_itemcheck("리치초보자") == 0x01)
+		{
+		mes 1, "흠?.. 듣기싫다구? 뒈질래 ?";
+		mes 1, "뭐 안들어봤자 당신손해니깐 ㅅㄱ..,";
+		}
+		else
+		{
+			mes 1, "";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	루리	{
+	mes 1, "어서오세요~>ㅁ<" + get_name(@myid) + "님!!";
+	mes 1, "저는 이곳*견습사냥터*를 지키고있는 루리라고 해요~~";
+	mes 1, "그나저나~ 제가요즘 고민거리가있는데... 들어주실래요?..";
+
+	set @select, menu("ㅜ_ㅜ..", "듣는다", "내고민아님 ㅅㄱ", "개고기 모아왔습니다.");
+	
+	if(@select == 1)
+	{
+		if(pc_itemcheck("리치초보자") == 0x01)
+		{
+		mes 1, "뉴뉴... 요즘제가 *개고기*를 먹고싶은데... 차마 복실이들은 못죽이겟어서요...";
+		mes 1, "" + get_name(@myid) + "님이 저대신 복실이들을 죽여주실수 있으세요?...";
+		mes 1, "어머!! 죽여주신다구요!! 에구국 고마워라>ㅁ< (너에겐 거부권따윈 없다 크크크..)";
+		mes 1, "음 제가좀 많이먹어서요.... 개고기 1개만 구해다 주세요!!";
+		mes 1, "구해다 주시면 제가 500만골드를 드릴께요!!>ㅁ<";
+		item_add "체력포션", 100;
+		item_add "에페", 100;
+		mes 1, "아참! 복실이들은 누가 공격하면 미쳐서 같이 공격하니깐 조심하세요~크크크..";
+		}
+		else
+		{
+			mes 1, "";
+		}
+	}
+	if(@select == 2)
+	{
+		if(pc_itemcheck("리치초보자") == 0x01)
+		{
+		mes 1, "ㅆㅂㄻ..";
+		legend_add 1, 32, "루리의부탁을 거절하다";
+  		warp "초보자1", 5, 5;
+		}
+		else
+		{
+			mes 1, "";
+		}
+	}
+	if(@select == 3)
+	{
+		mes 1, "오홍 모아오셧군요~";
+		mes 1, "{=c1개가 맞나 확인을~";
+		if(pc_itemcheck("개고기") == 0x01)
+		{
+		mes 1, "와우~ 정말고마워요~ 여기 500만골드 받으세요!";
+		legend_add 1, 32, "견습사냥터의 복실이들을 몰살하다.";
+  		warp "초보자1", 5, 5;
+		money_add "+5000000";
+		}
+		else
+		{
+			mes 1, "?? 5개가 안되는데? 쳐맞을래여";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	Regis	{
+	mes 1, " " + get_name(@myid) + "님 반갑습니다.";
+	mes 1, "{=cRegis의증표가 있다면 레지스셋트를 지급해드립니다,";
+
+	set @select, menu("환생하시겠습니까?", "남전사", "여전사", "남도적", "여도적", "남법사", "여법사", "남도가", "여도가");
+	
+	if(@select == 1)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷전사(남)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의칼", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	if(@select == 2)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷전사(여)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의칼", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	if(@select == 3)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷도적(남)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의단검", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	if(@select == 4)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷도적(여)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의단검", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	if(@select == 5)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷마법사(남)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의소환수", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	if(@select == 6)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷마법사(여)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의소환수", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	if(@select == 7)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷도가(남)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의배틀핸드", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	if(@select == 8)
+	{
+		
+		if(pc_itemcheck("Regis의증표") == 0x01)
+		{
+			item_del "Regis의증표", 1;
+			item_add "레지스의갑옷도가(여)", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의반지", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의장갑", 1;
+			item_add "레지스의신발", 1;
+			item_add "레지스의벨트", 1;
+			item_add "레지스의투구", 1;
+			item_add "레지스의배틀핸드", 1;
+			item_add "레지스의방패", 1;
+			item_add "레지스의각반", 1;
+			item_add "레지스의목걸이", 1;
+			item_add "레지스의귀걸이", 1;
+ 			legend_add 1, 32, "리치 1년, 봄 Regis셋트를 지급받다";
+	 		warp "뤼케시온마을", 21, 11;
+		}
+		else
+		{
+			mes 1, "증표가 없습니다.";
+			}
+		}
+	del @select;
+	}
+}
+0,0,0,0,0,0,0	리핑	{
+	mes 1, " " + get_name(@myid) + "님 반가워요!!";
+	mes 1, "{=c1000만골드가 있다면 선택하신 귀환스펠을 지급해드립니다.";
+
+	set @select, menu("구매할래요?", "귀환밀레스", "귀환아벨", "귀환수오미", "귀환뤼케시온", "귀환리치");
+	
+	if(@select == 1)
+	{
+		
+		if(pc_itemcheck("1000만골드") == 0x01)
+		{
+			item_del"1000만골드", 1;
+		}
+		else
+		{
+			mes 1, "{=c1000만골드 아이템이 없습니다.";
+			}
+		}
+	if(@select == 2)
+	{
+		
+		if(pc_itemcheck("1000만골드") == 0x01)
+		{
+			item_del"1000만골드", 1;
+		}
+		else
+		{
+			mes 1, "{=c1000만골드 아이템이 없습니다.";
+			}
+		}
+	if(@select == 3)
+	{
+		
+		if(pc_itemcheck("1000만골드") == 0x01)
+		{
+			item_del"1000만골드", 1;
+		}
+		else
+		{
+			mes 1, "{=c1000만골드 아이템이 없습니다.";
+			}
+		}
+	if(@select == 4)
+	{
+		
+		if(pc_itemcheck("1000만골드") == 0x01)
+		{
+			item_del"1000만골드", 1;
+		}
+		else
+		{
+			mes 1, "{=c1000만골드 아이템이 없습니다.";
+			}
+		}
+	if(@select == 5)
+	{
+		
+		if(pc_itemcheck("1000만골드") == 0x01)
+		{
+			item_del"1000만골드", 1;
+
+		}
+		else
+		{
+			mes 1, "{=c1000만골드 아이템이 없습니다.";
+			}
+		}
+	del @select;
+	}
+}
+0,0,0,0,0,0,0	세링	{
+	mes 1, "안녕하세요? 세피라링 제조전문 NPC 세링입니다!";
+	mes 1, "저는 세피라링 Lev1~10까지 제조시켜드릴수 있으며,";
+	mes 1, "각레벨마다 요구제물이 변경됩니다.";
+
+	set @select, menu("제조하시겠습니까?", "{=qLEV1", "{=qLEV2", "LEV3", "LEV4", "LEV5", "LEV6", "LEV7", "LEV8", "LEV9", "LEV10", "강화된세피라링");
+	
+	if(@select == 1)
+	{
+		mes 1, "세피라링(Lev1) 제조 제물은,실버아쿠아링(쌍) 입니다.";
+		if(pc_itemcheck("실버아쿠아링") == 0x01 && pc_itemcheck("실버아쿠아링") == 0x01)
+		{
+
+			item_del "실버아쿠아링", 1;
+			item_del "실버아쿠아링", 1;
+			item_add "세피라링(Lev1)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 2)
+	{
+		mes 1, "세피라링(Lev2) 제조 제물은 골드아쿠아링(쌍),세피라링(Lev1) 입니다.";
+		if(pc_itemcheck("골드아쿠아링") == 0x01 && pc_itemcheck("골드아쿠아링") == 0x01 && pc_itemcheck("세피라링(Lev1)") == 0x01)
+		{
+			item_del "골드아쿠아링", 1;
+			item_del "골드아쿠아링", 1;
+			item_add "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev1)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 3)
+	{
+		mes 1, "세피라링(Lev3) 제조 제물은 골드아쿠아링(쌍),실버아쿠아링(쌍),세피라링(Lev2) 입니다.";
+		if(pc_itemcheck("실버아쿠아링") == 0x01 && pc_itemcheck("실버아쿠아링") == 0x01 && pc_itemcheck("골드아쿠아링") == 0x01 && pc_itemcheck("골드아쿠아링") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01)
+		{
+			item_del "골드아쿠아링", 1;
+			item_del "골드아쿠아링", 1;
+			item_del "실버아쿠아링", 1;
+			item_del "실버아쿠아링", 1;
+			item_add "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev2)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 4)
+	{
+		mes 1, "세피라링(Lev4) 제조 제물은 골드아쿠아링(쌍),실버드아쿠아링(쌍)1000만골드(Item),세피라링(Lev3) 입니다";
+		if(pc_itemcheck("실버아쿠아링") == 0x01 && pc_itemcheck("실버아쿠아링") == 0x01 && pc_itemcheck("골드아쿠아링") == 0x01 && pc_itemcheck("골드아쿠아링") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01)
+		{
+			item_del "골드아쿠아링", 1;
+			item_del "골드아쿠아링", 1;
+			item_del "실버아쿠아링", 1;
+			item_del "실버아쿠아링", 1;
+			item_add "세피라링(Lev4)", 1;
+			item_del "세피라링(Lev3)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+		}
+	}
+	if(@select == 5)
+	{
+		mes 1, "세피라링(Lev5) 제조 제물은,세피라링(Lev4),세피라링(Lev3),세피라링(Lev2),세피라링(Lev1)입니다.";
+		if(pc_itemcheck("세피라링(Lev1)") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01 && pc_itemcheck("세피라링(Lev4)") == 0x01)
+		{
+			item_del "세피라링(Lev1)", 1;
+			item_del "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev4)", 1;
+			item_add "세피라링(Lev5)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 6)
+	{
+		mes 1, "세피라링(Lev6) 제조 제물은,세피라링(Lev5)세피라링(Lev4),세피라링(Lev3),세피라링(Lev2),세피라링(Lev1)입니다";
+		if(pc_itemcheck("세피라링(Lev1)") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01 && pc_itemcheck("세피라링(Lev4)") == 0x01 && pc_itemcheck("세피라링(Lev5)") == 0x01)
+		{
+			item_del "세피라링(Lev1)", 1;
+			item_del "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev4)", 1;
+			item_del "세피라링(Lev5)", 1;
+			item_add "세피라링(Lev6)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 7)
+	{
+		mes 1, "세피라링(Lev7) 제조 제물은,세피라링(Lev6),세피라링(Lev5),세피라링(Lev4),세피라링(Lev3),세피라링(Lev2),세피라링(Lev1)입니다";
+		if(pc_itemcheck("세피라링(Lev1)") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01 && pc_itemcheck("세피라링(Lev4)") == 0x01 && pc_itemcheck("세피라링(Lev5)") == 0x01 && pc_itemcheck("세피라링(Lev6)") == 0x01)
+		{
+			item_del "세피라링(Lev1)", 1;
+			item_del "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev4)", 1;
+			item_del "세피라링(Lev5)", 1;
+			item_del "세피라링(Lev6)", 1;
+			item_add "세피라링(Lev7)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 8)
+	{
+		mes 1, "세피라링(Lev8) 제조 제물은,세피라링(Lev7),세피라링(Lev6),세피라링(Lev5)세피라링(Lev4),세피라링(Lev3),세피라링(Lev2),세피라링(Lev1)입니다";
+		if(pc_itemcheck("세피라링(Lev1)") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01 && pc_itemcheck("세피라링(Lev4)") == 0x01 && pc_itemcheck("세피라링(Lev5)") == 0x01 && pc_itemcheck("세피라링(Lev6)") == 0x01 && pc_itemcheck("세피라링(Lev7)") == 0x01)
+		{
+			item_del "세피라링(Lev1)", 1;
+			item_del "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev4)", 1;
+			item_del "세피라링(Lev5)", 1;
+			item_del "세피라링(Lev6)", 1;
+			item_del "세피라링(Lev7)", 1;
+			item_add "세피라링(Lev8)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 9)
+	{
+		mes 1, "세피라링(Lev9) 제조 제물은,세피라링(Lev8),세피라링(Lev7),세피라링(Lev6),세피라링(Lev5),세피라링(Lev4),세피라링(Lev3),세피라링(Lev2),세피라링(Lev1)입니다";
+		if(pc_itemcheck("세피라링(Lev1)") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01 && pc_itemcheck("세피라링(Lev4)") == 0x01 && pc_itemcheck("세피라링(Lev5)") == 0x01 && pc_itemcheck("세피라링(Lev6)") == 0x01 && pc_itemcheck("세피라링(Lev7)") == 0x01 && pc_itemcheck("세피라링(Lev8)") == 0x01)
+		{
+			item_del "세피라링(Lev1)", 1;
+			item_del "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev4)", 1;
+			item_del "세피라링(Lev5)", 1;
+			item_del "세피라링(Lev6)", 1;
+			item_del "세피라링(Lev7)", 1;
+			item_del "세피라링(Lev8)", 1;
+			item_add "세피라링(Lev9)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 10)
+	{
+		mes 1, "세피라링(Lev10) 제조 제물은,세피라링(Lev9),세피라링(Lev8)세피라링(Lev7),세피라링(Lev6),세피라링(Lev5),세피라링(Lev4),세피라링(Lev3),세피라링(Lev2),세피라링(Lev1)입니다";
+		if(pc_itemcheck("세피라링(Lev1)") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01 && pc_itemcheck("세피라링(Lev4)") == 0x01 && pc_itemcheck("세피라링(Lev5)") == 0x01 && pc_itemcheck("세피라링(Lev6)") == 0x01 && pc_itemcheck("세피라링(Lev7)") == 0x01 && pc_itemcheck("세피라링(Lev8)") == 0x01 && pc_itemcheck("세피라링(Lev9)") == 0x01)
+		{
+			item_del "세피라링(Lev1)", 1;
+			item_del "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev4)", 1;
+			item_del "세피라링(Lev5)", 1;
+			item_del "세피라링(Lev6)", 1;
+			item_del "세피라링(Lev7)", 1;
+			item_del "세피라링(Lev8)", 1;
+			item_del "세피라링(Lev9)", 1;
+			item_add "세피라링(Lev10)", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	if(@select == 11)
+	{
+		mes 1, "강화된세피라링 제조 제물은,세피라링(Lev10),세피라링(Lev9),세피라링(Lev8)세피라링(Lev7),세피라링(Lev6),세피라링(Lev5),세피라링(Lev4),세피라링(Lev3),세피라링(Lev2),세피라링(Lev1)입니다";
+		if(pc_itemcheck("세피라링(Lev1)") == 0x01 && pc_itemcheck("세피라링(Lev2)") == 0x01 && pc_itemcheck("세피라링(Lev3)") == 0x01 && pc_itemcheck("세피라링(Lev4)") == 0x01 && pc_itemcheck("세피라링(Lev5)") == 0x01 && pc_itemcheck("세피라링(Lev6)") == 0x01 && pc_itemcheck("세피라링(Lev7)") == 0x01 && pc_itemcheck("세피라링(Lev8)") == 0x01 && pc_itemcheck("세피라링(Lev9)") == 0x01 && pc_itemcheck("세피라링(Lev10)") ==0x01)
+		{
+			item_del "세피라링(Lev1)", 1;
+			item_del "세피라링(Lev2)", 1;
+			item_del "세피라링(Lev3)", 1;
+			item_del "세피라링(Lev4)", 1;
+			item_del "세피라링(Lev5)", 1;
+			item_del "세피라링(Lev6)", 1;
+			item_del "세피라링(Lev7)", 1;
+			item_del "세피라링(Lev8)", 1;
+			item_del "세피라링(Lev9)", 1;
+			item_del "세피라링(Lev10)", 1;
+			item_add "강화된세피라링", 1;
+			mes 3, "제조완료";
+		}
+		else
+		{
+			mes 1, "재료가 부족해요~";
+			}
+		}
+	del @select;
+	}
+}
+0,0,0,0,0,0,0	결계도우미1	{
+	mes 1, "저는 결계퀘스트 재료를 드리는 엔피시 입니다.";
+	mes 1, "우선 체력90만,마나90만이하는 진행이안됩니다";
+	mes 1, "무엇을 도와드릴까요?";
+	
+	set @select, menu("무엇을 도와드릴까요?", "퀘스트조건", "90만이상이다");
+	
+	if(@select == 1)
+	{
+		mes 1, "체력마나가90만인지확인해주세요";
+		mes 1, "체력마나가된다면 90만이상을 눌러주세요..";
+	}
+	else if(@select == 2)
+	{
+		mes 1, "확인합니다";
+		if(get_basevita() >= 900000 && get_basemana() >= 900000)
+		{
+			item_add "보상얻기", 1;
+			mes 1, "보상얻기 아이템을 얻었다!!";
+			mes 1, "이 아이템은 결계보스를 잡으신후 보상을 받을때 꼭필요하니 챙겨두세요.";
+			mes 1, "이것이 없으시면 결계보스를 잡아도 보상을 받으실수 없습니다..";
+		}
+		else
+		{
+			mes 1, "없으십니다. 다시한번확인해주세요.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	자이언트맨티스	{
+	mes 1, "저는 던전 으로 이동시켜드립니다.";
+	mes 1, "하는방법은 각직업별보스를 퇴치하여 아이템을얻으시면 됩니다.";
+	mes 1, "옆에 엔피시에게 보상얻기 라는 아이템을 얻으셨습니까?";
+	
+	set @select, menu("무엇을 도와드릴까요?", "아직안얻었다", "얻었다.");
+	
+	if(@select == 1)
+	{
+		mes 1, "옆에 엔피시 에게 보상 얻기라는아이템을 받으세요.";
+
+	}
+	else if(@select == 2)
+	{
+		mes 1, "확인합니다";
+		if(pc_itemcheck("보상얻기") == 0x01)
+		{
+			group_warp "결계대기실", 5,5;
+			mes 1, "이동되었습니다(그륩이없으면 이동되지않습니다).";
+		}
+		else
+		{
+			mes 1, "없으십니다. 다시한번확인해주세요.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	유저구출	{
+	mes 1, "저는 그륩원들은 전부 밀레스마을로 이동시켜드립니다";
+	
+	set @select, menu("무엇을 도와드릴까요?", "이동안한다", "이동");
+	
+	if(@select == 1)
+	{
+		mes 1, "옆에 엔피시 에게 보상 얻기라는아이템을 받으세요.";
+
+	}
+	else if(@select == 2)
+	{
+		mes 1, "확인합니다";
+		if(get_str() >= 1)
+		{
+			group_warp "로톤마을", 75,65;
+			mes 1, "이동되었습니다(그륩이없으면 이동되지않습니다).";
+		}
+		else
+		{
+			mes 1, "없으십니다. 다시한번확인해주세요.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	자맨보상	{
+	
+	mes 1, "모든보스를잡으셨군요....";
+	mes 1, "보상얻기 라는 아이템이 있으셔야 이동됩니다.";
+	
+	set @select, menu("무엇을 도와드릴까요?", "없다", "아이템얻기.");
+	
+	if(@select == 1)
+	{
+		mes 1, "다시하실려면 캐릭터를 다시 만드셔야합니다..";
+
+	}
+	else if(@select == 2)
+	{
+		mes 1, "확인합니다";
+		if(pc_itemcheck("전사의원혼") == 0x01 && pc_itemcheck("도적의원혼") == 0x01 && pc_itemcheck("법사의원혼") == 0x01 && pc_itemcheck("직자의원혼") == 0x01 && pc_itemcheck("무도가의원혼") == 0x01 && pc_itemcheck("결계퀘스트도우미") == 0x01)
+		{
+			item_del "보상얻기", 1;
+			item_del "결계퀘스트도우미", 1;
+			item_del "전사의원혼", 1;
+			item_del "도적의원혼", 1;
+			item_del "법사의원혼", 1;
+			item_del "직자의원혼", 1;
+			item_del "무도가의원혼", 1;
+			item_add "퀸셰어의귀걸이", 1;
+			item_add "선물상자", 1;
+	 		warp "루어스마을", 50, 77;
+			mes 1, "퀘스트를 완료하셨습니다!.";
+		}
+		else
+		{
+			mes 1, "없으십니다. 다시한번확인해주세요.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	2차승급이동	{
+	
+	mes 1, "저는 2차승급사냥터대기실로 이동시켜드립니다..";
+	mes 1, "2차승급자만  이동이 가능하십니다..";
+	
+	set @select, menu("무엇을 도와드릴까요?", "승급이아니다.", "2차승급사냥터대기실 이동.");
+	
+	if(@select == 1)
+	{
+		mes 1, "뒤질래?.";
+
+	}
+	else if(@select == 2)
+	{
+		mes 1, "확인합니다";
+		if(get_class_sub() >= 2)
+		{
+			warp "2차승급자대기실", 15,15;
+			spell_add "귀환:2차승급사냥터대기실";
+			mes 1, "이동되었습니다.";
+		}
+		else
+		{
+			mes 1, "승급이 아니십니다.";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	굴도우미	{
+	
+	mes 1, "저는 굴도우미입니다..";
+	mes 1, "굴에대해서 가르쳐드립니다.";
+	
+	set @select, menu("무엇을 도와드릴까요?", "재료는몇층에서?.", "권장체력.");
+	
+	if(@select == 1)
+	{
+		mes 1, "브론즈굴은1프로,블루는2프로,레드는3프로의드랍율을가지고있습니다";
+		mes 1, "브론즈오피온이 비늘을드랍합니다 (14층)이상";
+		mes 1, "블루오피온듀스가 블루오피온의등껍질을 드랍합니다..(14층이상)";
+		mes 1, "레드굴1층에서장갑재료를,모든굴8층에서생셋재료나옵니다...(8층이상)";
+		mes 1, "드래곤뉴트1(혀),드래곤뉴트2(뉴트의뿔)...(18층이상)";
+		mes 1, "스톤골렘이 고렘의돌조각을 드랍합니다....(3층이상)";
+		mes 1, "나머지 블루 브론즈는 앞에 이름만다르고 재료는 똑같이뜹니다.";
+
+	}
+	else if(@select == 2)
+	{
+		mes 1, "권장체력은 10만이상입니다.";
+		if(pc_itemcheck("Master(Tong)") == 0x01)
+		{
+		mes 1, "당신은 굴 잡을수있는 능력이 있습니다.";
+		}
+		else
+		{
+			mes 1, "당신아직 굴잡을수있는 능력이 되질않군요...";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	서버도우미	{
+	mes 1, "저는 리치서버의의 도우미 입니다";
+	
+	set @select, menu("무엇을 도와드릴까요?", "스킬은어디서?", "사냥터", "99스킬", "승급이상스킬은?", "달마신공은 어떻게 배우는가?");
+
+	if(@select == 1)
+	{
+		mes 1, "스킬은 밀레스마을 쭉내려가시면 전투기술사범의 집에서 가르쳐줍니다. ";
+	}
+	else if(@select == 2)
+	{
+		mes 1, "레벨 11이하=밀레스던전.";
+		mes 1, "레벨 11이상=포테의숲.";
+		mes 1, "레벨 41이상=뤼케시온마을.";
+		mes 1, "레벨 99이상=호러캐슬.";
+		mes 1, "체력 20만이하 집털.";
+		mes 1, "체력 30만이상 굴..";
+		mes 1, "리콜전부팝니다. 위에텐트에.";
+	
+	}
+	else if(@select == 3)
+	{
+		if(pc_itemcheck("이아의반지") == 0x01)
+		{
+		mes 1, "아벨귀환쓰셔서 옆으로좀가보시면 엔피시가있는데 1000만골드주고 엔피시클릭해서 쭉가보시면 아벨왕있는데 퀘스트깨셔서 재료얻으시면됩니다.";
+			
+		}
+		else
+		{
+		mes 1, "아벨귀환쓰셔서 옆으로좀가보시면 엔피시가있는데 1000만골드주고 엔피시클릭해서 쭉가보시면 아벨왕있는데 퀘스트깨셔서 재료얻으시면됩니다.";
+		}
+	}
+	else if(@select == 4)
+	{
+		if(pc_itemcheck("이아의반지") == 0x01)
+		{
+		mes 1, "밀레스마을에서 승급사냥터대기실로 이동하시면 스킬배워주는 NPC가있습니다..";
+			
+		}
+		else
+		{
+		mes 1, "밀레스마을에서 승급사냥터대기실로 이동하시면 스킬배워주는 NPC가있습니다..";
+		}
+	}
+	else if(@select == 5)
+	{
+		if(pc_itemcheck("이아의반지") == 0x01)
+		{
+		mes 1, "환골탈태 하셔야지 달마신공을 배우실 수 있습니다...";
+			
+		}
+		else
+		{
+		mes 1, "환골탈태 하셔야지 달마신공을 배우실 수 있습니다...";
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	도가조합	{
+	
+	mes 1, "안녕하세요 브레이사 ,로오의빛을 만들어드립니다.";
+	mes 1, "안녕하세요 로오의빛 효과는 다라 2초로 변합니다.";
+	mes 1, "덤으로 {=c도박용아들레스투를 가르쳐 드립니다";
+	set @select, menu("조합하시겠습니까", "로오의빛", "브레이사", "도박용아들레스투");
+	
+	if(@select == 1)
+	{
+	mes 1, "재료는 브론즈오피온의비늘 레드오피온의수염 고렘의돌조각 2개입니다...";
+		if(pc_itemcheck("브론즈오피온의비늘") == 0x01 && pc_itemcheck("레드오피온의수염") == 0x01 && pc_itemcheck("고렘의돌조각") == 0x01 && pc_itemcheck("고렘의돌조각") == 0x01 && pc_itemcheck("고렘의돌조각") == 0x01)
+		{
+			item_del "브론즈오피온의비늘", 1;
+			item_del "레드오피온의수염", 1;
+			item_del "고렘의돌조각", 1;
+			item_del "고렘의돌조각", 1;
+			item_del "고렘의돌조각", 1;
+			item_add "로오의빛", 1;
+			mes 1, "로오의빛 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+		}
+	}
+	if(@select == 2)
+	{
+	mes 1, "재료는 브론즈오피온의수염 레드오피온의수염 입니다....";
+		if(pc_itemcheck("브론즈오피온의수염") == 0x01 && pc_itemcheck("레드오피온의수염") == 0x01)
+		{
+			item_del "브론즈오피온의수염", 1;
+			item_del "레드오피온의수염", 1;
+			item_add "브레이사", 1;
+			mes 1, "다크코로나 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 3)
+	{
+		if(get_money() >= 0)
+		{
+			spell_add "도박용아들레스투";
+			mes 1, "도박용아들레스투를 배웠습니다 이걸로 감맘 도박하세요";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 4)
+	{
+		if(pc_itemcheck("아조스") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "아조스", 1;
+			item_del "다크코로나", 1;
+			item_add "크리샤오르", 1;
+			mes 1, "크리샤오르 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 5)
+	{
+		if(pc_itemcheck("하이브레이질배틀핸드") == 0x01 && pc_itemcheck("다크코로나") == 0x01)
+		{
+			item_del "하이브레이질배틀핸드", 1;
+			item_del "다크코로나", 1;
+			item_add "미스릴배틀핸드", 1;
+			mes 1, "미스릴배틀핸드 제조성공!";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	체력1ㅇㅇ	{
+	set @myid, get_myid();
+
+	if($auto_hp == 1 || $auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+
+	mes 1, "경험치를 팔아서 체력을 사실 수 있습니다.";
+	{
+		set $auto_hp, 1;
+
+		while(1){
+			if(get_ac(@myid) != 100) {
+				set $auto_hp, 0;
+				mes 1," 무장해제하시고 다시시도 해주세요.";
+				end;
+			}
+			if(get_baseexp(@myid) >= get_basevita(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+				exp_del (get_basevita())*15;
+		 		set_basevita get_basevita(@myid) + 40;
+			} else {
+				set $auto_hp, 0;
+			 	mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+		}
+	}
+
+	set $auto_hp, 0;
+
+	end;
+}
+0,0,0,0,0,0,0	마력1ㅇㅇ	{
+	set @myid, get_myid();
+
+	if($auto_hp == 1 || $auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+
+
+	mes 1, "경험치를 팔아서 마력을 사실 수 있습니다.";
+	{
+		set $auto_mp, 1;
+
+		while(1){
+	 		if(get_ac(@myid) != 100) {
+				set $auto_mp, 0;
+	 			mes 1," 무장해제하시고 다시시도 해주세요.";
+		 		end;
+		 	}
+			if(get_baseexp(@myid) >= get_basemana(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+ 				exp_del (get_basemana())*15;
+	 			set_basemana get_basemana(@myid) + 30;
+	 		} else {
+				set $auto_mp, 0;
+	 			mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+		}
+	}
+
+	set $auto_mp, 0;
+
+	end;
+}
+
+0,0,0,0,0,0,0	체력1	{
+	set @myid, get_myid();
+	if(get_level() != 99){mes 1, "능력치를 사기에는 어립니다."; end;}
+	if(get_class_sub() == 0 && get_basevita(@myid) > 120000){mes 1, "승급을 하셔야 체력을 사실수있습니다."; end;}
+	if(@auto_hp == 1 || @auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+
+	input @auto_cnt, 1, "경험치를 파셔서 체력을살횟수를 적어주세요.", "", "", 255;
+
+	if(@auto_cnt <= 0){
+		mes 1, "제대로 입력해 주세요.";
+		end;
+	} else {
+		set @auto_hp, 1;
+
+		while(@auto_cnt){
+			if(get_ac(@myid) != 100) {
+				set @auto_hp, 0;
+				del @auto_cnt;
+				mes 1," 무장해제하시고 다시시도 해주세요.";
+				end;
+			}
+
+			if(get_baseexp(@myid) >= get_basevita(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+				exp_del (get_basevita())*500;
+				set_basevita get_basevita(@myid) + 50;
+			} else {
+				set @auto_hp, 0;
+				del @auto_cnt;
+			 	mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+			set @auto_cnt, @auto_cnt-1;
+		}
+	}
+
+	set @auto_hp, 0;
+	del @auto_cnt;
+	end;
+}
+0,0,0,0,0,0,0	마력1	{
+	set @myid, get_myid();
+	if(get_level() != 99){mes 1, "능력치를 사기에는 어립니다."; end;}
+	if(get_class_sub() == 0 && get_basemana(@myid) > 100000){mes 1, "승급을 하셔야 마력을 사실수있습니다."; end;}
+	if(@auto_hp == 1 || @auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+
+
+	input @auto_cnt, 1, "경험치를 파셔서 마력을살 횟수를 적어주세요.", "", "", 255;
+
+	if(@auto_cnt <= 0){
+		mes 1, "제대로 입력해 주세요.";
+		end;
+	} else {
+		set @auto_mp, 1;
+
+		while(@auto_cnt){
+	 		if(get_ac(@myid) != 100) {
+				set @auto_mp, 0;
+				del @auto_cnt;
+	 			mes 1," 무장해제하시고 다시시도 해주세요.";
+		 		end;
+		 	}
+			if(get_baseexp(@myid) >= get_basemana(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+ 				exp_del (get_basemana())*500;
+		 		set_basemana get_basemana(@myid) + 25;
+	 		} else {
+				set @auto_mp, 0;
+				del @auto_cnt;
+	 			mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+			set @auto_cnt, @auto_cnt-1;
+		}
+	}
+
+	set @auto_mp, 0;
+	del @auto_cnt;
+	end;
+}
+
+0,0,0,0,0,0,0	방어력초기화	{
+	mes 1, "방어력을 초기화해드립니다.";
+	mes 1, "무장을 다 해체했는데도, 방어력이 100이아닌분만 사용해주세요.";
+	set @select, menu("자 방어력을 초기화 하시겠나요?", "초기화");
+	if(@select == 1){
+		if(get_ac() != 100){set_ac 100;}
+	}
+}
+
+0,0,0,0,0,0,0	체력1m	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "리치멤버쉽") == 0){mes 1, "당신은 멤버쉽 회원이 아닙니다."; end;}
+	if(@auto_hp == 1 || @auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+
+	input @auto_cnt, 1, "경험치를 파셔서 체력을살횟수를 적어주세요.", "", "", 255;
+
+	if(@auto_cnt <= 0){
+		mes 1, "제대로 입력해 주세요.";
+		end;
+	} else {
+		set @auto_hp, 1;
+
+		while(@auto_cnt){
+			if(get_ac(@myid) != 100) {
+				set @auto_hp, 0;
+				mes 1," 무장해제하시고 다시시도 해주세요.";
+				end;
+			}
+			if(get_baseexp(@myid) >= get_basevita(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+				exp_del (get_basevita())*15;
+		 		set_basevita get_basevita(@myid) + 40;
+			} else {
+				set @auto_hp, 0;
+			 	mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+			set @auto_cnt, @auto_cnt-1;
+		}
+	}
+
+	set @auto_hp, 0;
+
+	end;
+}
+0,0,0,0,0,0,0	마력1m	{
+	set @myid, get_myid();
+	if(item_exist(@myid, "리치멤버쉽") == 0){mes 1, "당신은 멤버쉽 회원이 아닙니다."; end;}
+	if(@auto_hp == 1 || @auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+
+
+	input @auto_cnt, 1, "경험치를 파셔서 마력을살 횟수를 적어주세요.", "", "", 255;
+
+	if(@auto_cnt <= 0){
+		mes 1, "제대로 입력해 주세요.";
+		end;
+	} else {
+		set @auto_mp, 1;
+
+		while(@auto_cnt){
+	 		if(get_ac(@myid) != 100) {
+				set @auto_mp, 0;
+	 			mes 1," 무장해제하시고 다시시도 해주세요.";
+		 		end;
+		 	}
+			if(get_baseexp(@myid) >= get_basemana(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+ 				exp_del (get_basemana())*15;
+	 			set_basemana get_basemana(@myid) + 30;
+	 		} else {
+				set @auto_mp, 0;
+	 			mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+			set @auto_cnt, @auto_cnt-1;
+		}
+	}
+
+	set @auto_mp, 0;
+
+	end;
+}
+
+0,0,0,0,0,0,0	포인트(힘)	{
+	set @select, menu("체 4백당 포인트1개.", "힘", "주의사항");
+	set @myid, get_myid(@myid);
+
+ 	if(@select == 1){
+ 		if(get_ac() != 100){
+ 			mes 1," 무장해제하시고 다시시도 해주세요.";
+	 		end;
+		}
+		if(get_basevita(@myid) >= 32000){
+			if(get_class(@myid) == 1 && get_str(@myid) <= 215){
+				set_basevita get_basevita(@myid) - 400;
+				set_str get_str(@myid)+1;
+			} else if(get_class(@myid) == 2 && get_str(@myid) <= 180){
+				set_basevita get_basevita(@myid) - 400;
+				set_str get_str(@myid)+1;
+			} else if(get_class(@myid) == 3 && get_str(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_str get_str(@myid)+1;
+			} else if(get_class(@myid) == 4 && get_str(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_str get_str(@myid)+1;
+			} else if(get_class(@myid) == 5 && get_str(@myid) <= 180){
+				set_basevita get_basevita(@myid) - 400;
+				set_str get_str(@myid)+1;
+			} else {
+				mes 1, "올포입니다.";
+				end;
+			}
+		} else {
+			mes 1, "체력이 32000이하입니다.";
+			end;
+		}
+	} else if(@select == 2){
+ 		mes 1," 포인트살때 주의사항.";
+ 		mes 1," 옷을 다벗으셔야하는데 팅길위험이있으니.옷을다벗어도 아이템이3번째줄 3번째칸이상 나가게 놔두지마세요 팅기면 사라지기때문에요..";
+	} else {
+		mes 1, "체력이 32000이하이거나 살려는 능력치가 220이상입니다.";
+	}
+
+	del @select;
+}
+
+0,0,0,0,0,0,0	포인트(인트)	{
+	set @select, menu("체 4백당 포인트1개.", "인트", "주의사항");
+	set @myid, get_myid(@myid);
+
+ 	if(@select == 1){
+ 		if(get_ac() != 100){
+ 			mes 1," 무장해제하시고 다시시도 해주세요.";
+	 		end;
+		}
+		if(get_basevita(@myid) >= 32000){
+			if(get_class(@myid) == 1 && get_int(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_int get_int(@myid)+1;
+			} else if(get_class(@myid) == 2 && get_int(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_int get_int(@myid)+1;
+			} else if(get_class(@myid) == 3 && get_int(@myid) <= 215){
+				set_basevita get_basevita(@myid) - 400;
+				set_int get_int(@myid)+1;
+			} else if(get_class(@myid) == 4 && get_int(@myid) <= 215){
+				set_basevita get_basevita(@myid) - 400;
+				set_int get_int(@myid)+1;
+			} else if(get_class(@myid) == 5 && get_int(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_int get_int(@myid)+1;
+			} else {
+				mes 1, "올포입니다.";
+				end;
+			}
+		} else {
+			mes 1, "체력이 32000이하입니다.";
+			end;
+		}
+	} else if(@select == 2){
+ 		mes 1," 포인트살때 주의사항.";
+ 		mes 1," 옷을 다벗으셔야하는데 팅길위험이있으니.옷을다벗어도 아이템이3번째줄 3번째칸이상 나가게 놔두지마세요 팅기면 사라지기때문에요..";
+	} else {
+		mes 1, "체력이 32000이하이거나 살려는 능력치가 220이상입니다.";
+	}
+
+	del @select;
+}
+
+0,0,0,0,0,0,0	포인트(위즈)	{
+	set @select, menu("체 4백당 포인트1개.", "위즈", "주의사항");
+	set @myid, get_myid(@myid);
+
+ 	if(@select == 1){
+ 		if(get_ac() != 100){
+ 			mes 1," 무장해제하시고 다시시도 해주세요.";
+	 		end;
+		}
+		if(get_basevita(@myid) >= 32000){
+			if(get_class(@myid) == 1 && get_wis(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_wis get_wis(@myid)+1;
+			} else if(get_class(@myid) == 2 && get_wis(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_wis get_wis(@myid)+1;
+			} else if(get_class(@myid) == 3 && get_wis(@myid) <= 180){
+				set_basevita get_basevita(@myid) - 400;
+				set_wis get_wis(@myid)+1;
+			} else if(get_class(@myid) == 4 && get_wis(@myid) <= 180){
+				set_basevita get_basevita(@myid) - 400;
+				set_wis get_wis(@myid)+1;
+			} else if(get_class(@myid) == 5 && get_wis(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_wis get_wis(@myid)+1;
+			} else {
+				mes 1, "올포입니다.";
+				end;
+			}
+		} else {
+			mes 1, "체력이 32000이하입니다.";
+			end;
+		}
+	} else if(@select == 2){
+ 		mes 1," 포인트살때 주의사항.";
+ 		mes 1," 옷을 다벗으셔야하는데 팅길위험이있으니.옷을다벗어도 아이템이3번째줄 3번째칸이상 나가게 놔두지마세요 팅기면 사라지기때문에요..";
+	} else {
+		mes 1, "체력이 32000이하이거나 살려는 능력치가 220이상입니다.";
+	}
+
+	del @select;
+}
+
+0,0,0,0,0,0,0	포인트(콘)	{
+	set @select, menu("체 4백당 포인트1개.", "콘", "주의사항");
+	set @myid, get_myid(@myid);
+
+ 	if(@select == 1){
+ 		if(get_ac() != 100){
+ 			mes 1," 무장해제하시고 다시시도 해주세요.";
+	 		end;
+		}
+		if(get_basevita(@myid) >= 32000){
+			if(get_class(@myid) == 1 && get_con(@myid) <= 180){
+				set_basevita get_basevita(@myid) - 400;
+				set_con get_con(@myid)+1;
+			} else if(get_class(@myid) == 2 && get_con(@myid) <= 150){
+				set_basevita get_basevita(@myid) - 400;
+				set_con get_con(@myid)+1;
+			} else if(get_class(@myid) == 3 && get_con(@myid) <= 150){
+				set_basevita get_basevita(@myid) - 400;
+				set_con get_con(@myid)+1;
+			} else if(get_class(@myid) == 4 && get_con(@myid) <= 150){
+				set_basevita get_basevita(@myid) - 400;
+				set_con get_con(@myid)+1;
+			} else if(get_class(@myid) == 5 && get_con(@myid) <= 215){
+				set_basevita get_basevita(@myid) - 400;
+				set_con get_con(@myid)+1;
+			} else {
+				mes 1, "올포입니다.";
+				end;
+			}
+		} else {
+			mes 1, "체력이 32000이하입니다.";
+			end;
+		}
+	} else if(@select == 2){
+ 		mes 1," 포인트살때 주의사항.";
+ 		mes 1," 옷을 다벗으셔야하는데 팅길위험이있으니.옷을다벗어도 아이템이3번째줄 3번째칸이상 나가게 놔두지마세요 팅기면 사라지기때문에요..";
+	} else {
+		mes 1, "체력이 32000이하이거나 살려는 능력치가 220이상입니다.";
+	}
+
+	del @select;
+}
+
+0,0,0,0,0,0,0	포인트(덱스)	{
+	set @select, menu("체 4백당 포인트1개.", "덱스", "주의사항");
+	set @myid, get_myid(@myid);
+
+ 	if(@select == 1){
+ 		if(get_ac() != 100){
+ 			mes 1," 무장해제하시고 다시시도 해주세요.";
+	 		end;
+		}
+		if(get_basevita(@myid) >= 32000){
+			if(get_class(@myid) == 1 && get_dex(@myid) <= 150){
+				set_basevita get_basevita(@myid) - 400;
+				set_dex get_dex(@myid)+1;
+			} else if(get_class(@myid) == 2 && get_dex(@myid) <= 215){
+				set_basevita get_basevita(@myid) - 400;
+				set_dex get_dex(@myid)+1;
+			} else if(get_class(@myid) == 3 && get_dex(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_dex get_dex(@myid)+1;
+			} else if(get_class(@myid) == 4 && get_dex(@myid) <= 100){
+				set_basevita get_basevita(@myid) - 400;
+				set_dex get_dex(@myid)+1;
+			} else if(get_class(@myid) == 5 && get_dex(@myid) <= 150){
+				set_basevita get_basevita(@myid) - 400;
+				set_dex get_dex(@myid)+1;
+			} else {
+				mes 1, "올포입니다.";
+				end;
+			}
+		} else {
+			mes 1, "체력이 32000이하입니다.";
+			end;
+		}
+	} else if(@select == 2){
+ 		mes 1," 포인트살때 주의사항.";
+ 		mes 1," 옷을 다벗으셔야하는데 팅길위험이있으니.옷을다벗어도 아이템이3번째줄 3번째칸이상 나가게 놔두지마세요 팅기면 사라지기때문에요..";
+	} else {
+		mes 1, "체력이 32000이하이거나 살려는 능력치가 220이상입니다.";
+	}
+
+	del @select;
+}
+
+0,0,0,0,0,0,0	실험	{
+mes 1, "체력안사지는분 상태 0으로 만드시고 경험치를 0으로 리셋시키세요.";
+ set @select, menu(".", "상태를0으로만들기(귀신상태->사람상태)","경험치0으로되돌리기(체안사지면필수)");
+ set @myid, get_myid();
+  if(@select == 1){
+  set_state 0, 0;
+   mes 1," 적용완료 ";
+npc_say 0,0,"경험치초기화: 적용이완료되었습니다^^~";
+   end;
+ }else if(@select == 2){
+   exp_del "4200000000";
+   mes 1," 경험치가 리셋이 되었습니다.";
+   end;
+  }
+ del @select;
+}
+
+0,0,0,0,0,0,0	경치아이템교환	{
+ set @select, menu("경험치로 경험치아이템을 살수있습니다. 이경치아이템으로 다시 경험치로 전환할수있습니다..", "1천만경험치아이템.", "3천만경험치아이템.","6천만경험치아이템.", "1억경험치아이템", "1억5천만경험치아이템", "2억경험치아이템", "4억경험치아이템", "6억경험치아이템");
+ set @myid, get_myid();
+ 	if(@select == 1){
+ 		if(get_baseexp(@myid) >= 10000000){
+ 			exp_del "10000000";
+			item_add "1천만경험치", 1;
+		}else{
+}
+	}else if(@select == 2){
+ 		if(get_baseexp(@myid) >= 30000000){
+ 			exp_del "30000000";
+			item_add "3천만경험치", 1;
+		}else{
+}
+		}else if(@select == 3){
+ 		if(get_baseexp(@myid) >= 60000000){
+ 			exp_del "60000000";
+			item_add "6천만경험치", 1;
+		}else{
+}
+		}else if(@select == 4){
+ 		if(get_baseexp(@myid) >= 100000000){
+ 			exp_del "100000000";
+			item_add "1억경험치", 1;
+		}else{
+}
+		}else if(@select == 5){
+ 		if(get_baseexp(@myid) >= 150000000){
+ 			exp_del "150000000";
+			item_add "1억5천경험치", 1;
+		}else{
+}
+
+		}else if(@select == 6){
+ 		if(get_baseexp(@myid) >= 200000000){
+ 			exp_del "200000000";
+			item_add "2억경험치", 1;
+		}else{
+}
+		}else if(@select == 7){
+ 		if(get_baseexp(@myid) >= 400000000){
+ 			exp_del "400000000";
+			item_add "4억경험치", 1;
+		}else{
+}
+		}else if(@select == 8){
+ 		if(get_baseexp(@myid) >= 600000000){
+ 			exp_del "600000000";
+			item_add "6억경험치", 1;
+		}else{
+}
+
+
+
+		}
+ del @select;
+
+}
+0,0,0,0,0,0,0	세바스촨	{
+	
+	mes 1, "현재 길드에 오류가있어 고치는중입니다..";
+	end;
+	set @select, menu("어떤걸 하시겠어요?", "아이유 길드마스터 신청", "파워렌져 길드마스터 신청", "필살기 길드마스터 신청", "아이유 길드원 신청", "파워렌져 길드원 신청", "필살기 길드원 신청", "길드원자격증 공급받기(길드마스터만)");
+	
+	if(@select == 1)
+	{
+	mes 1, "길드마스터 자격증이 있으셔야 합니다 [영자한테 받으실수가 있음]..";
+		if(pc_itemcheck("길드마스터자격증") == 0x01)
+		{
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_del "길드마스터자격증", 1;
+			item_add "길드마스터", 1;
+  			legend_add 75, 128, "아이유 길드의 길드마스터로 인정받다";
+			mes 1, "길드가 생성됬습니다 ! 아이템창의 길드원마스터 이걸로 길드원자격증을 무한공급 할수있으니 버리지마세요";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+		}
+	}
+	if(@select == 2)
+	{
+	mes 1, "길드마스터 자격증이 있으셔야 합니다 [영자한테 받으실수가 있음]..";
+		if(pc_itemcheck("길드마스터자격증") == 0x01)
+		{
+
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_del "길드마스터자격증", 1;
+			mes 1, "길드가 생성됬습니다 ! 아이템창의 길드원마스터 이걸로 길드원자격증을 무한공급 할수있으니 버리지마세요";
+  			legend_add 75, 128, "파워레인져 길드의 길드마스터로 인정받다";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 3)
+	{
+	mes 1, "길드마스터 자격증이 있으셔야 합니다 [영자한테 받으실수가 있음]..";
+		if(pc_itemcheck("길드마스터자격증") == 0x01)
+		{
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_add "길드원자격증", 1;
+			item_del "길드마스터자격증", 1;
+			mes 1, "길드가 생성됬습니다 ! 아이템창의 길드원마스터 이걸로 길드원자격증을 무한공급 할수있으니 버리지마세요";
+  			legend_add 75, 128, "필살기 길드의 길드마스터로 인정받다";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 4)
+	{
+	mes 1, "길드마스터 자격증이 있으셔야 합니다 [영자한테 받으실수가 있음]..";
+		if(pc_itemcheck("길드원자격증") == 0x01)
+		{
+			item_del "길드원자격증", 1;
+  			legend_add 75, 128, "아이유 길드의 길드원으로 인정받다";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 5)
+	{
+	mes 1, "길드마스터 자격증이 있으셔야 합니다 [영자한테 받으실수가 있음]..";
+		if(pc_itemcheck("길드원자격증") == 0x01)
+		{
+			item_del "길드원자격증", 1;
+  			legend_add 75, 128, "파워레인져 길드의 길드원으로 인정받다";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 6)
+	{
+	mes 1, "길드마스터 자격증이 있으셔야 합니다 [영자한테 받으실수가 있음]..";
+		if(pc_itemcheck("길드원자격증") == 0x01)
+		{
+			item_del "길드원자격증", 1;
+  			legend_add 75, 128, "필살기 길드의 길드원으로 인정받다";
+		}
+		else
+		{
+			mes 1, "실패 아이템이 부족합니다 !";
+			item_add "아벨리콜", 1;
+		}
+	}
+	if(@select == 7)
+	{
+	mes 1, "(길드마스터)아이템이 있으셔야 합니다..";
+		if(pc_itemcheck("길드마스터") == 0x01)
+		{
+			item_add "길드원자격증", 1;
+		}
+		else
+		{
+			mes 1, "길드마스터가 아니시네요!";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	초보자도우미	{
+
+	mes 1, "저는 초보자도우미입니다..";
+	
+	set @select, menu("무엇을 도와드릴까요?", "1~99까지 사냥은 어떻게?", "스킬은?", "99스킬은?", "전직은?", "승급은?", "체력,마력 사는방법", "순수 직업에 대해", "초보자도우미 아이템삭제 하고 승급자도우미 아이템 얻기(초보자셋트아이템삭제)");
+	
+	if(@select == 1)
+	{
+		if(get_str() >= 1)
+		{
+		mes 1, "레벨 99까지 밀던or우드랜드마리당1업씩올라요";
+		}
+		else
+		{
+			mes 1, "실패! 돈이 충분하지않습니다";
+		}
+	}
+	else if(@select == 2)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "마법창을 보시면 기술사범의집 귀환 마법이 있습니다 그것을 사용하세요.";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지않습니다";
+		}
+	}	
+	else if(@select == 3)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "호러캐슬에서 화염의엠버를 득템합니다. 그리고 1000만골드(아이템)을 들고 아벨에 갑니다 아벨에가면 왼쪽으로 가시다보면 아벨성으로 워프해주는 엔피시가있는데 그것을통해 아벨성으로 가신후 길따라쭉가시면 아벨왕이있습니다 거기서 스킬을 습득하시면 됩니다.";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지않습니다";
+		}
+	}
+
+	else if(@select == 4)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "체력을 8만 마력을 5만 (무장체력)을 맞추시고.";
+			mes 1, "아이템상점에서 전직리콜을 구입합니다.";
+			mes 1, "구입하셨으면 사용을하시고. 할걸정합니다";
+			mes 1, "필요한아이템은 각직업의증표,전직서 입니다. 있는데도 안되시면 전직서,각직업의증표를 첫번째칸으로 올려주세요";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 5)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "체력 20만 마력 16만을 맞추시고 (무장체,마)";
+			mes 1, "아이템상점 사냥터리콜 쪽에서 승급길리콜을 삽니다. 그리고 승급던전으로 이동하신 뒤 몹을잡아 본드라곤의구슬, 던전팬던트를 드랍하신후 승급하시면 됩니다";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 6)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "옷을 모두 벗으신후 체력신전을 갑니다";
+			mes 1, "옷을 모두 벗을려고하는데 아이템창이 부족하신분들 땅에 아이템버리는데 서버가 팅겨버릴경우 사라지며 복구가 불가능하오니, 이점유의하시고 체력올려주세요";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 7)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "순수 직업에 관해 설명 해드리겠습니다.";
+			mes 1, "전사,도적,법사,직자에서 전직안하고 바로 승급하는경우는 순수직업이 취급되지않습니다";
+			mes 1, "순수 직업을 원하시는 분 들은 전-전 도-도 직-직 법-법 이런식으로 전직을 하시고 승급을 하셔야 합니다.";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 8)
+	{
+		if(pc_itemcheck("초보자도우미") == 0x01)
+		{
+			item_del "초보자도우미", 1;
+			item_add "승급자도우미", 1;
+			item_del "조금쌘목도", 1;
+			item_del "초보자각반", 1;
+			item_del "초보자갑옷", 1;
+			item_del "초보자귀걸이", 1;
+			item_del "초보자장갑", 1;
+			item_del "초보자장갑", 1;
+			item_del "초보자반지", 1;
+			item_del "초보자반지", 1;
+			item_del "초보자방패", 1;
+			item_del "초보자투구", 1;
+			item_del "초보자벨트", 1;
+			item_del "초보자목걸이", 1;
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 9)
+	{
+		if(pc_itemcheck("2000만골드") == 0x01)
+		{
+			item_del "2000만골드", 1;
+			money_add "+20000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	승급자도우미	{
+
+	set @select, menu("무엇을 도와드릴까요?", "사냥은어디?", "레드굴드랍정보");
+	
+	if(@select == 1)
+	{
+		if(get_str() >= 1)
+		{
+		mes 1, "{=w호러캐슬이나집털이추천합니다";
+		mes 1, "{=w호러캐슬은 죽대에서이동가능하면 마을 리콜구입하셔도 됩니다 집털이는 죽마필드들가자마자 왼쪽오른쪽집들어가면되요";
+		}
+		else
+		{
+			mes 1, "실패! 돈이 충분하지않습니다";
+		}
+	}
+	else if(@select == 2)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "{=w일단체력40만이상만입장가능,레드굴8,17층에서생셋암셋재료다나옵니다";
+			mes 1, "{=w레드굴1층에서는 장갑재료드랍되고 16~20층에서 브론비늘,블루비늘,등껍,뉴트뿔,뉴트혀 드랍됩니다 확률은 1%입니다";
+			mes 1, "{=b제조방법은 마을 제조책구입하셔서 사용하시면되겠습니다";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지않습니다";
+		}
+	}	
+	else if(@select == 3)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "호러캐슬에서 화염의엠버를 득템합니다. 그리고 1000만골드(아이템)을 들고 아벨에 갑니다 아벨에가면 왼쪽으로 가시다보면 아벨성으로 워프해주는 엔피시가있는데 그것을통해 아벨성으로 가신후 길따라쭉가시면 아벨왕이있습니다 거기서 스킬을 습득하시면 됩니다.";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지않습니다";
+		}
+	}
+
+	else if(@select == 4)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "체력을 15만 마력을 10만 (무장체력)을 맞추시고.";
+			mes 1, "아이템상점에서 전직리콜을 구입합니다.";
+			mes 1, "구입하셨으면 사용을하시고. 할걸정합니다";
+			mes 1, "필요한아이템은 각직업의증표,전직서 입니다. 있는데도 안되시면 전직서,각직업의증표를 첫번째칸으로 올려주세요";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 5)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "체력 30만 마력 15만을 맞추시고 (무장체,마)";
+			mes 1, "아이템상점 사냥터리콜 쪽에서 승급길리콜을 삽니다. 그리고 승급던전으로 이동하신 뒤 몹을잡아 본드라곤의구슬, 던전팬던트를 드랍하신후 승급하시면 됩니다";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 6)
+	{
+		if(get_str() >= 1)
+		{
+			mes 1, "옷을 모두 벗으신후 체력신전을 갑니다";
+			mes 1, "옷을 모두 벗을려고하는데 아이템창이 부족하신분들 땅에 아이템버리는데 서버가 팅겨버릴경우 사라지며 복구가 불가능하오니, 이점유의하시고 체력올려주세요";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 7)
+	{
+		if(get_str() >= 1 && get_class_sub() >= 1)
+		{
+			mes 1, "수고하셨습니다!!!!!!!";
+			item_del "초보자도우미", 1;
+			item_add "승급자도우미", 1;
+			money_add "+100000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+
+	else if(@select == 8)
+	{
+		if(pc_itemcheck("1억골드") == 0x01)
+		{
+			item_del "1억골드", 1;
+			money_add "+100000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	else if(@select == 9)
+	{
+		if(pc_itemcheck("2000만골드") == 0x01)
+		{
+			item_del "2000만골드", 1;
+			money_add "+20000000";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0	염색엔피시	{ 
+ mes 1, "염색을 시켜드립니다";
+ mes 1, "염색을 하실때 아이템이 필요할수도 있습니다";
+ set @select, menu("색상 선택", "연분홍", "흰색", "레몬색");
+
+ 		if(@select == 1){
+ 		mes 1, "염색하시는데 15억골드와 분홍색염색약이 필요합니다";
+ 		if(pc_itemcheck("분홍색염색약") == 0x01 && pc_itemcheck("15억골드") == 0x01)
+		{
+
+			item_del "분홍색염색약", 1;
+			item_del "15억골드", 1;
+ 			set_haircolor "16";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	        	
+		}if(@select == 2)
+		{
+		mes 1, "염색하시는데 15억골드와 흰색염색약이 필요합니다";
+		if(pc_itemcheck("흰색염색약") == 0x01 && pc_itemcheck("15억골드") == 0x01)
+		{
+			item_del "흰색염색약", 1;
+			item_del "15억골드", 1;
+ 			set_haircolor "15";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+
+		}if(@select == 3)
+		{
+		mes 1, "염색하시는데 15억골드와 레몬색염색약이 필요합니다";
+		if(pc_itemcheck("레몬색염색약") == 0x01 && pc_itemcheck("15억골드") == 0x01)
+		{
+			item_del "레몬색염색약", 1;
+			item_del "15억골드", 1;
+ 			set_haircolor "19";
+		}
+		else
+		{
+			mes 1, "실패 돈이 충분하지 않습니다";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	염색	{
+ mes 1, "{=q머리염색시켜드립니다";
+ mes 1, "{=q기본머리 염색은 (무료) 입니다.";
+ mes 1, "{=q원하시는색상을 선택해주세요";
+
+ set @select, menu("{=c색상 선택", "검은색", "빨간색", "주황색", "노랑색", "청록색", "파랑색", "보라색", "연두색", "초록색", "연하늘색");
+ set @class, get_class();
+ set @myid, get_myid();
+
+ if(@select == 1){
+ set_haircolor "1";
+ mes 1, "{=q염색완료!";
+ }if(@select == 2){
+ set_haircolor "2";
+ mes 1, "{=q염색완료!";
+ }if(@select == 3){
+ set_haircolor "3";
+ mes 1, "{=q염색완료!";
+ }if(@select == 4){
+ set_haircolor "4";
+ mes 1, "{=q염색완료!";
+ }if(@select == 5){
+ set_haircolor "5";
+ mes 1, "{=q염색완료!";
+ }if(@select == 6){
+ set_haircolor "6";
+ mes 1, "{=q염색완료!";
+ }if(@select == 7){
+ set_haircolor "7";
+ mes 1, "{=q염색완료!";
+ }if(@select == 8){
+ set_haircolor "8";
+ mes 1, "{=q염색완료!";
+ }if(@select == 9){
+ set_haircolor "9";
+ mes 1, "{=q염색완료!";
+ }if(@select == 10){
+ set_haircolor "21";
+ mes 1, "{=q염색완료!";
+ }
+ del @select;
+}
+0,0,0,0,0,0	가위손	{ 
+ mes 1, "나는 당신의 머리를 바꿔주겠네..머리를 바꿀려면, 가위가 필요하다네.";
+ set @select, menu("{=c머리 선택", "기본머리1", "기본머리2", "기본머리3", "기본머리4", "기본머리5", "기본머리6", "기본머리7", "기본머리8", "기본머리9", "기본머리10", "기본머리11", "기본머리12", "기본머리13", "기본머리14", "기본머리15", "기본머리16", "기본머리17", "기본머리18", "기본머리19", "대머리");
+ set @myid, get_myid();
+
+ if(@select == 1){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "1";
+set #hair, 1;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 2){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "2";
+set #hair, 2;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 3){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "3";
+set #hair, 3;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 4){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "4";
+set #hair, 4;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 5){
+ if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "5";
+set #hair, 5;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 6){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "6";
+set #hair, 6;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 7){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "7";
+set #hair, 7;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 8){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "8";
+set #hair, 8;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 9){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "9";
+set #hair, 9;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 10){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "10";
+set #hair, 10;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 11){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "11";
+set #hair, 11;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 12){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "12";
+set #hair, 12;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 13){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "13";
+set #hair, 13;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 14){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "14";
+set #hair, 14;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 15){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "15";
+set #hair, 15;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 16){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "16";
+set #hair, 16;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 17){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "17";
+set #hair, 17;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 18){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "18";
+set #hair, 18;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 19){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "19";
+set #hair, 19;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }if(@select == 20){
+if(pc_itemcheck("가위") == 0x01)
+		{
+item_del "가위", 1;
+set_hair "70";
+set #hair, 70;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "가위를 가져오게나^^.";
+		} 
+ }
+ del @select;
+}
+
+0,0,0,0,0,0	금가위손	{ 
+ mes 1, "나는 당신의 머리를 가위머리보다 더욱화려하게 바꿔주겠네. 금가위가 필요하다네.";
+ set @select, menu("{=c머리 선택", "금가위머리1", "금가위머리2", "금가위머리3", "금가위머리4", "금가위머리5", "금가위머리6", "금가위머리7", "금가위머리8", "금가위머리9", "금가위머리10", "금가위머리11", "금가위머리12", "금가위머리13", "금가위머리14", "금가위머리15", "금가위머리16", "금가위머리17", "금가위머리18", "금가위머리19", "금가위머리20", "금가위머리21", "금가위머리22", "금가위머리23", "금가위머리24", "금가위머리25", "금가위머리26", "금가위머리27", "금가위머리28", "금가위머리29");
+ set @myid, get_myid();
+
+ if(@select == 1){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "20";
+set #hair, 20;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 2){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "21";
+set #hair, 21;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 3){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "22";
+set #hair, 22;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 4){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "23";
+set #hair, 23;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 5){
+ if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "24";
+set #hair, 24;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 6){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "25";
+set #hair, 25;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 7){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "27";
+set #hair, 27;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 8){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "28";
+set #hair, 28;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 9){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "29";
+set #hair, 29;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 10){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "30";
+set #hair, 30;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 11){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "36";
+set #hair, 36;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 12){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "37";
+set #hair, 37;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 13){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "38";
+set #hair, 38;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 14){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "39";
+set #hair, 39;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 15){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "41";
+set #hair, 41;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 16){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "42";
+set #hair, 42;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 17){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "43";
+set #hair, 43;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 18){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "44";
+set #hair, 44;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 19){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "45";
+set #hair, 45;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 20){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "56";
+set #hair, 56;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }
+ if(@select == 21){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "46";
+set #hair, 46;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 22){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "47";
+set #hair, 47;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }
+ if(@select == 23){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "48";
+set #hair, 48;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }
+ if(@select == 24){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "52";
+set #hair, 52;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 25){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "53";
+set #hair, 53;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 26){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "55";
+set #hair, 55;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 27){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "58";
+set #hair, 58;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 28){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "59";
+set #hair, 59;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }if(@select == 29){
+if(pc_itemcheck("금가위") == 0x01)
+		{
+item_del "금가위", 1;
+set_hair "60";
+set #hair, 60;
+mes 1, "{=q머리손질완료!";
+		}
+		else
+		{
+mes 1, "금가위를 가져오게나^^.";
+		} 
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	해안가도우미	{
+ set @select, menu("해안가 1층으로 가시겠습니까?", "다음층으로올려주어~.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "해안가 1", 5, 5;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	해안가 2이동	{
+ set @select, menu("해안가 2층으로 가시겠습니까?", "다음층으로올려주어~.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "해안가 2", 19, 9;
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	해안가 3이동	{
+ set @select, menu("해안가 3층으로 가시겠습니까?", "다음층으로올려주어~.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "해안가 3", 22, 31;
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	해안가 4이동	{
+ set @select, menu("해안가 4층으로 가시겠습니까?", "대기실로이동시켜줘.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "아벨해안대기실", 10, 29;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	포테의숲1이동	{
+ set @select, menu("포테의숲 1층으로 가시겠습니까?", "다음층으로올려주어~.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "포테의 숲2존", 5, 5;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	포테의숲2이동	{
+ set @select, menu("해안가 2층으로 가시겠습니까?", "다음층으로올려주어~.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "포테의 숲3존", 5, 5;
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	포테의숲3이동	{
+ set @select, menu("해안가 3층으로 가시겠습니까?", "다음층으로올려주어~.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "포테의 숲4존", 5, 5;
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	포테의숲4이동	{
+ set @select, menu("해안가 4층으로 가시겠습니까?", "대기실로이동시켜줘.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "포테의 숲5존", 5, 5;
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	포테의숲5이동	{
+ set @select, menu("해안가 4층으로 가시겠습니까?", "대기실로이동시켜줘.", "난 여기가 좋소.");
+ if(@select == 1){
+ message 3, "다음 번에도 찾아주세요 ^^";
+ warp "포테의 숲6존", 5, 5;
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	이벤트상점	{
+ set @select, menu("인생은한방?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "이벤트상점", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "이벤트상점", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0,0	이벤트상점2	{
+ set @select, menu("인생은한방?", "물건 사기", "물건 팔기");
+ if(@select == 1){
+  shop 0, "이벤트상점2", "원하시는 것을 골라보세요. 원하시는 것을 클릭하시면 구입하실 수 있습니다.";
+ }else if(@select == 2){
+  shop 1, "이벤트상점2", "무엇을 파시게요?";
+ }
+ del @select;
+}
+0,0,0,0,0,0	미용사2(금가위)	{ 
+ 	mes 1, "머리를 손질해드립니다";
+	mes 1, "머리손질을 위해서는 가위가필요합니다";
+	mes 1, "금가위가 준비되셨으면 원하는 머리를선택하세요";
+	
+	set @select, menu("어떤머리를 원하십니까 ", "41", "42", "43", "44", "45", "46", "48", "49", "51", "52", "54", "55", "56", "57", "58", "59", "60");
+	
+
+	if(@select == 1){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "41";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 2){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "42";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 3){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "43";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 4){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "44";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 5){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "45";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 6){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "46";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 7){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "48";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 8){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "49";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 9){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "51";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 10){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "52";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 11){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "54";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 12){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "55";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 13){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "56";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 14){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "57";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 15){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "58";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 16){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "59";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+	}
+	if(@select == 17){
+	mes 1, "머리를 손질하기 위해서는 금가위가 필요해";
+	mes 1, "없다면 손질할수없어 ";
+	if(pc_itemcheck("금가위") == 0x01)
+	{
+		item_del "금가위", 1;
+		set_hair "60";
+		mes 1, "손질완료!";
+	}
+	else
+	{
+		mes 1, "금가위를 들고오세요";
+	}
+
+	}
+	del @select;
+}
+
+0,0,0,0,0,0,0	결계도우미	{
+	set @myid, get_myid();
+	del @select;
+	set @select, menu("어느 작업을 하시겠습니까?", "몬스터 스폰", "퇴장하기");
+	if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		mob_spawn3 "파파라치", get_mapname(@myid), 3200, 3520, 37000,8;
+		mob_spawn3 "노출증환자", get_mapname(@myid), 3200, 3520, 37000,8;
+		message 3, "몬스터 스폰이 완료되었습니다.";
+	}else if(@select == 2){warp "결계대기실", 8,8;}
+}
+
+0,0,0,0,0,0,0	엘리멘탈도우미	{
+	set @myid, get_myid();
+	del @select;
+	set @select, menu("어느 작업을 하시겠습니까?", "몬스터 스폰", "퇴장하기");
+	if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		mob_spawn3 "각성한권상우", get_mapname(@myid), 6200, 6520, 157000,15;
+		mob_spawn3 "각성한김경진", get_mapname(@myid), 6200, 6520, 157000,15;
+		mob_spawn3 "각성한악령", get_mapname(@myid), 10200, 10520, 237000,1;
+		message 3, "몬스터 스폰이 완료되었습니다.";
+	}else if(@select == 2){warp "엘리멘탈대기실", 8,8;}
+}

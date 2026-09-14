@@ -1,0 +1,224 @@
+{
+번호	441
+이름	우드랜드입구
+너비	25
+높이	25
+CRC	40727
+맵파일	db/maps/woodland/maps/lod441.map
+}
+
+{
+번호	441
+이름	우드랜드대기실
+너비	25
+높이	25
+CRC	40727
+맵파일	db/maps/woodland/maps/lod441.map
+}
+
+{
+번호	442
+이름	우드랜드 1-1
+너비	100
+높이	100
+CRC	38824
+맵파일	db/maps/woodland/maps/lod442.map
+}
+
+{
+번호	443
+이름	우드랜드 2-1
+너비	100
+높이	100
+CRC	44100
+맵파일	db/maps/woodland/maps/lod443.map
+}
+
+{
+번호	444
+이름	우드랜드 3-1
+너비	100
+높이	100
+CRC	57882
+맵파일	db/maps/woodland/maps/lod444.map
+}
+
+{
+번호	445
+이름	우드랜드 4-1
+너비	100
+높이	100
+CRC	65080
+맵파일	db/maps/woodland/maps/lod445.map
+}
+
+{
+번호	446
+이름	우드랜드 5-1
+너비	100
+높이	100
+CRC	18443
+맵파일	db/maps/woodland/maps/lod446.map
+}
+
+{
+번호	447
+이름	우드랜드 6-1
+너비	50
+높이	50
+CRC	23248
+맵파일	db/maps/woodland/maps/lod447.map
+}
+
+{
+번호	448
+이름	우드랜드 7-1
+너비	50
+높이	50
+CRC	64320
+맵파일	db/maps/woodland/maps/lod448.map
+}
+
+{
+번호	449
+이름	우드랜드 8-1
+너비	50
+높이	50
+CRC	2211
+맵파일	db/maps/woodland/maps/lod449.map
+}
+
+{
+번호	450
+이름	우드랜드 9-1
+너비	50
+높이	50
+CRC	42506
+맵파일	db/maps/woodland/maps/lod450.map
+}
+
+{
+번호	451
+이름	우드랜드 9-2
+너비	50
+높이	50
+CRC	64539
+맵파일	db/maps/woodland/maps/lod451.map
+}
+
+{
+번호	452
+이름	우드랜드 10-1
+너비	50
+높이	50
+CRC	51701
+맵파일	db/maps/woodland/maps/lod452.map
+}
+
+{
+번호	453
+이름	우드랜드 11-1
+너비	50
+높이	50
+CRC	7404
+맵파일	db/maps/woodland/maps/lod453.map
+}
+
+{
+번호	454
+이름	우드랜드 12-1
+너비	50
+높이	50
+CRC	5824
+맵파일	db/maps/woodland/maps/lod454.map
+}
+
+{
+번호	455
+이름	우드랜드 13-1
+너비	50
+높이	50
+CRC	30731
+맵파일	db/maps/woodland/maps/lod455.map
+}
+
+{
+번호	456
+이름	우드랜드 14-1
+너비	50
+높이	50
+CRC	65110
+맵파일	db/maps/woodland/maps/lod456.map
+}
+
+{
+번호	457
+이름	우드랜드 15-1
+너비	50
+높이	50
+CRC	4801
+맵파일	db/maps/woodland/maps/lod457.map
+}
+
+{
+번호	458
+이름	우드랜드 16-1
+너비	50
+높이	50
+CRC	7854
+맵파일	db/maps/woodland/maps/lod458.map
+}
+
+{
+번호	459
+이름	우드랜드 17-1
+너비	50
+높이	50
+CRC	42506
+맵파일	db/maps/woodland/maps/lod459.map
+}
+
+{
+번호	460
+이름	우드랜드 17-2
+너비	50
+높이	50
+CRC	42506
+맵파일	db/maps/woodland/maps/lod460.map
+}
+
+{
+번호	461
+이름	우드랜드 18-1
+너비	50
+높이	50
+CRC	23248
+맵파일	db/maps/woodland/maps/lod461.map
+}
+
+{
+번호	462
+이름	우드랜드 19-1
+너비	50
+높이	50
+CRC	38715
+맵파일	db/maps/woodland/maps/lod462.map
+}
+
+{
+번호	463
+이름	우드랜드 19-2
+너비	50
+높이	50
+CRC	59803
+맵파일	db/maps/woodland/maps/lod463.map
+}
+
+{
+번호	464
+이름	우드랜드 20-1
+너비	50
+높이	50
+CRC	4404
+맵파일	db/maps/woodland/maps/lod464.map
+}

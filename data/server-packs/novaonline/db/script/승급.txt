@@ -1,0 +1,185 @@
+0,0,0,0,0,0,0	승급하장	{
+	set @myid, get_myid();
+	if(get_class_sub() != 0){mes 1, "당신은 이미 승급을 하셧습니다."; end;}
+	if(get_ac(@myid) != 100){mes 1, "무장을 해체하고 시도해주세요."; end;}
+	if(get_class() == 1){if(get_basevita() < 51000 || get_basemana() < 15000){mes 1, "당신은 아직 승급하기에 어립니다. 전사 승급조건은 체력 : 51000 마력 : 15000 입니다."; end;}}
+	if(get_class() == 2){if(get_basevita() < 39000 || get_basemana() < 21000){mes 1, "당신은 아직 승급하기에 어립니다. 도적 승급조건은 체력 : 39000 마력 : 21000 입니다."; end;}}
+	if(get_class() == 3){if(get_basevita() < 36000 || get_basemana() < 39000){mes 1, "당신은 아직 승급하기에 어립니다. 마법사 승급조건은 체력 : 36000 마력 : 39000 입니다."; end;}}
+	if(get_class() == 4){if(get_basevita() < 39000 || get_basemana() < 42000){mes 1, "당신은 아직 승급하기에 어립니다. 성직자 승급조건은 체력 : 39000 마력 : 42000 입니다."; end;}}
+	if(get_class() == 5){if(get_basevita() < 48000 || get_basemana() < 21000){mes 1, "당신은 아직 승급하기에 어립니다. 무도가 승급조건은 체력 : 48000 마력 : 21000 입니다."; end;}}
+	mes 1, "승급을 할려면, 승급의증표가 필요합니다.";
+	mes 1, "이아이템을 얻을려면, 용자의공원분수대 뒤쪽의 건물에서 몬스터를통해 승급의팬던트, 승급의구슬을 조합하여, 승급의증표로 만들어오시면됩니다.";
+	set @select, menu("승급을 하겠습니까?", "승급을한다");
+	if(@select == 1){
+		if(item_exist(@myid, "승급의증표") == 0){mes 1, "재료가 부족합니다.";end;}
+		item_del "승급의증표", 1;
+		set_class_sub 1;
+		legend_add 7, 90, "리치1년, 멋지게 승급을 하다.";
+		if(get_class() == 1 && get_sex() == 1){item_add "마스터아머1", 1; item_add "아스카론", 1;}
+		if(get_class() == 1 && get_sex() == 2){item_add "마스터아머2", 1; item_add "아스카론", 1;}
+		if(get_class() == 1 && get_son() == 1){skill_add "완전방어(UP)"; skill_del "완전방어";}
+		if(get_class() == 2 && get_sex() == 1){item_add "스카우트아머", 1; item_add "아조스", 1; skill_add "기습";}
+		if(get_class() == 2 && get_sex() == 2){item_add "레인저아머", 1; item_add "아조스", 1; skill_add "기습";}
+		if(get_class() == 3 && get_sex() == 1){item_add "다크후드", 1; item_add "로오의은총", 1; spell_add "메테오";}
+		if(get_class() == 3 && get_sex() == 2){item_add "다크로브", 1; item_add "로오의은총", 1; spell_add "메테오";}
+		if(get_class() == 4 && get_sex() == 1){item_add "세인트후드", 1; item_add "이아의은총", 1; spell_add "홀리쿠라노";}
+		if(get_class() == 4 && get_sex() == 2){item_add "세인트로브", 1; item_add "이아의은총", 1; spell_add "홀리쿠라노";}
+		if(get_class() == 5 && get_sex() == 1){item_add "무상도복", 1; item_add "하이브레이질배틀핸드", 1; skill_add "허공답보";}
+		if(get_class() == 5 && get_sex() == 2){item_add "월영도복", 1; item_add "하이브레이질배틀핸드", 1; skill_add "허공답보";}
+		broadcast 5, "[" + get_name() + "]님이 승급하셨습니다. 다같이 축하해줍시다!";
+		item_add "승뚜교환권", 1;
+		mes 1,"승급이 완료됬습니다. 추가로, 승급옷과, 승급무기를 지급해드렸습니다.";
+		effect @myid, 90, 90, 100;
+		game_sound 47, 0;
+	}
+}
+
+0,0,0,0,0,0,0	승급의증표	{
+	set @myid, get_myid();
+	RE:
+	set @srand, rand(1,10);
+	if(@srand < 1 || @srand > 10){goto RE;}	
+	RE2:
+	set @srand2, rand(1,5);
+	if(@srand2 < 1 || @srand2 > 5){goto RE2;}
+	mes 1, "승급의팬던트와 승급의구슬을 승급의증표로 조합해주겠네.\\n단! 100%성공은 보장못한다네.";
+	set @select, menu("자 조합하시겠소?", "조합한다.", "나중에..");
+	if(@select == 1){
+		if(item_exist(@myid, "승급의팬던트") == 0 || item_exist(@myid, "승급의구슬") == 0){mes 1, "재료가 없지 않은가.";end;}
+		mes 1, "지금부터 조합에들어가겠네. 조합결과에대한 일체 불만은 받지않지만, 감사는 받을준비가 되있다네.";
+		if(@srand > 3){item_del "승급의팬던트", 1; item_del "승급의구슬", 1; item_add "승급의증표", 1; mes 1, "순간 엄청난 빛이 눈앞을 가리더니, 승급의증표가 완성되었다!"; mes 1, "후. 수고좀했다네. 이정도면 만족하겠지?"; end;}
+		item_del "승급의팬던트", 1; item_del "승급의구슬", 1;
+		mes 1, "쨍그랑 소리가 나더니, 재료가 산산조각나버렸다.";
+		mes 1, "이게어찌된일이요!! 의사양반!!\\n(NPC는 이상한소리를 짓거리더니 말을했다.)";
+		if(@srand2 == 4){item_add "승급의팬던트", 1; mes 1, "다행히 승급의팬던트가 살아남았소.. 이거라도가져가시오."; end;}
+		if(@srand2 == 5){item_add "승급의구슬", 1; mes 1, "다행히 승급의구슬이 살아남았소.. 이거라도가져가시오."; end;}
+		mes 1, "잘...잘가시오...!";
+		end;
+	}
+	if(@select == 2){mes 1, "잘가시오."; end;}
+}
+
+0,0,0,0,0,0,0	승급투구얻자	{
+	set @myid, get_myid();
+	mes 1,"일정 능력치에 충족된다면, 자네에게 승급투구를 주겠네.";
+	set @select, menu("승급의투구를 얻어가겠나?", "받는다.", "나중에..");
+	if(@select == 1){
+	if(get_class() == 1 && get_str() < 150 && get_con() < 120){mes 1, "당신은 아직 승급투구를 얻기에 어립니다. 전사 승뚜조건은 힘150이상, 콘120이상 입니다."; end;}
+	if(get_class() == 2 && get_dex() < 150 && get_con() < 120){mes 1, "당신은 아직 승급투구를 얻기에 어립니다. 도적 승뚜조건은 덱스150이상, 콘120이상 입니다."; end;}
+	if(get_class() == 3 && get_int() < 150 && get_wis() < 120){mes 1, "당신은 아직 승급투구를 얻기에 어립니다. 마법사 승뚜조건은 인트150이상, 위즈120이상 입니다."; end;}
+	if(get_class() == 4 && get_int() < 150 && get_wis() < 120){mes 1, "당신은 아직 승급투구를 얻기에 어립니다. 성직자 승뚜조건은 인트150이상, 위즈120이상 입니다."; end;}
+	if(get_class() == 5 && get_str() < 150 && get_con() < 120){mes 1, "당신은 아직 승급투구를 얻기에 어립니다. 무도가 승뚜조건은 힘150이상, 콘120이상 입니다."; end;}
+	if(item_exist(@myid, "좀비의살") < 15){mes 1, "재료중 좀비의살 15개가 없습니다. 좀비의살은 죽음의마을에서 구할수 있습니다."; end;}
+	if(item_exist(@myid, "승뚜교환권") < 1){mes 1, "당신은 이미교환을 하셧습니다."; end;}
+	if(get_class() == 1 && get_sex() == 1){item_add "마스터투구1", 1;}
+	if(get_class() == 1 && get_sex() == 2){item_add "마스터투구2", 1;}
+	if(get_class() == 2){item_add "웨스턴", 1;}
+	if(get_class() == 3 && get_sex() == 1){item_add "다크홀", 1;}
+	if(get_class() == 3 && get_sex() == 2){item_add "다크베일", 1;}
+	if(get_class() == 4 && get_sex() == 1){item_add "세인트홀", 1;}
+	if(get_class() == 4 && get_sex() == 2){item_add "세인트베일", 1;}
+	if(get_class() == 5 && get_sex() == 1){item_add "무상관", 1;}
+	if(get_class() == 5 && get_sex() == 2){item_add "월영관", 1;}
+	item_del "승뚜교환권", 1;
+	item_del "좀비의살", 15;
+	mes 1, "승급의투구를 주었다네. 잘가게나.";
+	end;
+	}
+}
+	
+0,0,0,0,0,0,0	승급할아범2	{
+	set @myid, get_myid();
+	if(get_class_sub() < 1){mes 1, "비승급자는 2차전직을 할수 없습니다."; end;}
+	if(get_class_sub() > 1){mes 1, "당신은 이미 2차전직을 하셧습니다."; end;}
+	if(get_ac(@myid) != 100){mes 1, "무장을 해체하고 시도해주세요."; end;}
+	if(get_class() == 1 || get_class() == 2 || get_class() == 5){if(get_basevita() < 70000 || get_basemana() < 40000){mes 1, "당신은 아직 2차전직을하기에 어립니다. 격수 2차전직조건은 체력 : 70000 마력 : 40000 입니다."; end;}}
+	if(get_class() == 3 || get_class() == 4){if(get_basevita() < 50000 || get_basemana() < 60000){mes 1, "당신은 아직 2차전직을하기에 어립니다. 비격수 2차전직조건은 체력 : 50000 마력 : 60000 입니다."; end;}}
+	mes 1, "2차전직을 할려면 제물로 체력과 마력을 15000씩 받쳐야 합니다.";
+	set @select, menu("그래도 2차전직을 하시겠습니까?", "2차전직", "나중에..");
+	if(@select == 1){
+		set_basevita get_basevita(@myid) - 15000;
+		set_basemana get_basemana(@myid) - 15000;
+		set_class_sub 2;
+		game_sound 47, 0;
+ 		effect @myid, 90, 90, 100;
+ 		legend_add 7, 90, "리치1년, 2차승급을 하다.";
+		broadcast 5, "[" + get_name() + "]님이 2차승급하셨습니다 축하드립니다";
+		end;
+	}
+	if(@select == 2){
+		mes 1, "잘 생각하시고 2차전직을 실행하십시오.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	종족선택	{
+		mes 1, "자네는 선한가 악한가..";
+		mes 1, "자네의 어빌리티레벨이 {=w50정도라면..";
+		mes 1, "자네의 마음에따라 종족을 선택할수 있다네.";
+		mes 1, "종족을 선택할건가?";
+	set @select, menu("선택하시오.", "천족", "마족");
+ 	if(@select == 1){
+	if(get_ability() >= 50 && get_jj() == 0)
+		{
+		set_jj 1;
+		game_sound 47, 0;
+ 		effect @target, 90, 90, 100;
+ 		legend_add 7, 90, "리치1년, 천족으로 종족을선택하다.";
+			spell_add "천족의성";
+		broadcast 5, "[" + get_name() + "]님이 천족에 몸을 가담하셧습니다.";
+ 		effect @target, 90, 90, 100;
+		}
+		else
+		{	
+		mes 1, "종족선택실패, 어빌리티레벨이 50이상이아니거나 이미종족이있습니다.";
+		}
+}
+ 	if(@select == 2){
+	if(get_ability() >= 50 && get_jj() == 0)
+		{
+		set_jj 2;
+		game_sound 47, 0;
+ 		effect @target, 90, 90, 100;
+ 		legend_add 7, 90, "리치1년, 마족으로 종족을선택하다.";
+			spell_add "마족의성";
+		broadcast 5, "[" + get_name() + "]님이 마족에 몸을 가담하셧습니다.";
+ 		effect @target, 90, 90, 100;
+		}
+		else
+		{
+		mes 1, "종족선택실패, 어빌리티레벨이 50이상이아니거나 이미종족이있습니다.";
+		}	
+	}
+ del @val;
+ }
+ del @select;
+}
+
+
+0,0,0,0,0,0,0	종족귀환스펠	{
+		mes 1, "종족 귀환스펠이 사라지셧다구요!?";
+		mes 1, "제가 복구해드릴께요!";
+		set @select, menu("선택하시오.", "천족", "마족");
+ 		if(@select == 1){
+		if(get_ability() >= 50 && get_jj() == 1)
+		{
+		mes 1, "당신은 천족이시군요! 천족의성귀환마법을 지급해드렸습니다!";
+		spell_add "천족의성";
+		}
+		else
+		{
+		mes 1, "당신은 종족이 없거나, 천족이아닙니다.";
+		}
+}
+ 		if(@select == 2){
+		if(get_ability() >= 50 && get_jj() == 2)
+		{
+		mes 1, "당신은 마족이시군요! 마족의성귀환마법을 지급해드렸습니다!";
+		spell_add "마족의성";
+		}
+		else	
+		{
+		mes 1, "당신은 종족이 없거나, 천족이아닙니다.";
+		}
+	}		
+}	

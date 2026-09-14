@@ -1,0 +1,34 @@
+0,0,0,0,0,0,0	500EG	{
+	set @eg, get_eg();
+	mes 1, "5백EG를 충전합니다.";
+	if(get_body() == 16) {mes 1, "5백EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요."; item_del "500EG", 1; set_eg @eg + 500; end;}
+	if(get_body() == 32) {mes 1, "5백EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요."; item_del "500EG", 1; set_eg @eg + 500; end;}
+}
+
+0,0,0,0,0,0,0	1000EG	{
+	set @eg, get_eg();
+	mes 1, "1천EG를 충전합니다.";
+	if(get_body() == 16) {mes 1, "1천EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요."; item_del "1000EG", 1; set_eg @eg + 1000; end;}
+	if(get_body() == 32) {mes 1, "1천EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요."; item_del "1000EG", 1; set_eg @eg + 1000; end;}
+}
+
+0,0,0,0,0,0,0	3000EG	{
+	set @eg, get_eg();
+	mes 1, "3천EG를 충전합니다.";
+	if(get_body() == 16) {mes 1, "3천EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요."; item_del "3000EG", 1;	set_eg @eg + 3000; end;}
+	if(get_body() == 32) {mes 1, "3천EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요."; item_del "3000EG", 1;	set_eg @eg + 3000; end;}
+}
+
+0,0,0,0,0,0,0	5000EG	{
+	set @eg, get_eg();
+	mes 1, "5천EG를 충전합니다.";
+	if(get_body() == 16) {mes 1, "5천EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요.";	item_del "5000EG", 1; set_eg @eg + 5000; end;}
+	if(get_body() == 32) {mes 1, "5천EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요.";	item_del "5000EG", 1; set_eg @eg + 5000; end;}
+}
+
+0,0,0,0,0,0,0	10000EG	{
+	set @eg, get_eg();
+	mes 1, "1만EG를 충전합니다.";
+	if(get_body() == 16) {mes 1, "1만EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요.";	item_del "10000EG", 1; set_eg @eg + 10000; end;}
+	if(get_body() == 32) {mes 1, "1만EG충전이 완료되었습니다.\\nEG샵이용방법은 채팅창에 /EG이라 쳐주세요.";	item_del "10000EG", 1; set_eg @eg + 10000; end;}
+}

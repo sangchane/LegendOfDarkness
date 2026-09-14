@@ -1,0 +1,305 @@
+0,0,0,0,0,0,0	채집	{
+		set @myid, get_myid();
+		re: set @rand, rand(1,3); if(@rand < 1 || @rand > 3){goto re;}
+		re2: set @rand2, rand(1,18); if(@rand2 < 1 || @rand2 > 18){goto re2;}
+		re3: set @rand3, rand(1,10); if(@rand3 < 1 || @rand3 > 5){goto re3;}
+		re4: set @rand4, rand(1,4); if(@rand4 < 1 || @rand4 > 4){goto re4;}		
+		if(get_wearitem_weapon(@myid) != "채집망" || pc_itemcheck("설탕") != 0x01){end;}
+		if(#cccc >= 20){warp "용자의공원", 49,63; set #cccc, 0; mes 1, "채집을 20번하셧군요. 매크로방지를위해 마을로돌아갑니다."; end;}
+		set #cccc, #cccc+1;
+		mes 1, "채집을 실행합니다.";
+		sleep 100;
+		motion 1, 75;
+	 	game_sound 1,0;
+		item_del "설탕", 1;
+		sleep 300;
+		if(@rand == 3){mes 1, "채집에 실패했습니다."; end;}
+		mes 1, "채집에 성공하셧습니다!";
+		if(@rand2 <= 3){item_add "개미", 1; message 3, "개미를(을) 포획했다!"; goto go;}
+		if(@rand2 > 3 && @rnad2 <= 7){item_add "나비", 1; message 3, "나비를(을) 포획했다!"; goto go;}
+		if(@rand2 > 7 && @rand2 <= 9){item_add "장수풍뎅이", 1; message 3, "장수풍뎅이를(을) 포획했다!"; goto go;}
+		if(@rand2 > 9 && @rand2 <= 12){item_add "벌", 1; message 3, "벌를(을) 포획했다!"; goto go;}
+		if(@rand2 > 13 && @rand2 <= 18){item_add "곤충똥", 1; message 3, "곤충똥를(을) 획득했다!"; goto go;}
+		if(@rand2 == 13){item_add "황금개미", 1; message 3, "황금개미를(을) 획득했다!"; goto go;}
+		end;
+		go:
+		if(@rand3 > 3 && @rand3 < 5){money_add 20000; mes 1, "오옷! 골드가 떳다!"; end;}
+		if(@rand3 <= 8){end;}
+		if(@rand4 == 1){item_add "어설픈생명의목걸이",1; goto go2;}
+		if(@rand4 == 2){item_add "어설픈생명의벨트",1; goto go2;}
+		if(@rand4 == 3){item_add "어설픈암흑의목걸이",1; goto go2;}
+		if(@rand4 == 4){item_add "어설픈암흑의벨트",1; goto go2;}
+		end;
+		go2:
+		mes 1, "오옷! 어설픈 아이템이 떳다!";
+		end;
+}
+
+
+0,0,0,0,0,0,0	채집곤충	{
+	 set @myid, get_myid();
+	mes 1, "채집중 나온 곤충들을 매입합니다!";
+	set @select, menu("어떤곤충이있습니까?", "개미", "나비", "장수풍뎅이", "벌", "황금개미", "곤충똥");
+	if(@select == 1){
+	input @bugking, 1, "개미를 몇마리 파시겠습니까?.","","", 25;
+	if(@bugking <= 0){mes 1, "갯수가 0이거나 숫자가 아닙니다."; end;}
+	if(item_exist(@myid, "개미") >= @bugking){mes 1, "개미 " + @bugking + "마리를팔았습니다."; money_add 5500 * @bugking; item_del "개미", @bugking; end;}
+	mes 1, "갯수가 부족한데요?";
+	end;
+	}
+	if(@select == 2){
+	input @bugking, 1, "나비를 몇마리 파시겠습니까?.","","", 25;
+	if(@bugking <= 0){mes 1, "갯수가 0이거나 숫자가 아닙니다."; end;}
+	if(item_exist(@myid, "나비") >= @bugking){mes 1, "나비 " + @bugking + "마리를팔았습니다."; money_add 6600 * @bugking; item_del "나비", @bugking; end;}
+	mes 1, "갯수가 부족한데요?";
+	end;
+	}
+	if(@select == 3){
+	input @bugking, 1, "장수풍뎅이를 몇마리 파시겠습니까?.","","", 25;
+	if(@bugking <= 0){mes 1, "갯수가 0이거나 숫자가 아닙니다."; end;}
+	if(item_exist(@myid, "장수풍뎅이") >= @bugking){mes 1, "장수풍뎅이 " + @bugking + "마리를팔았습니다."; money_add 8140 * @bugking; item_del "장수풍뎅이", @bugking; end;}
+	mes 1, "갯수가 부족한데요?";
+	end;
+	}
+	if(@select == 4){
+	input @bugking, 1, "벌을 몇마리 파시겠습니까?.","","", 25;
+	if(@bugking <= 0){mes 1, "갯수가 0이거나 숫자가 아닙니다."; end;}
+	if(item_exist(@myid, "벌") >= @bugking){mes 1, "벌 " + @bugking + "마리를팔았습니다."; money_add 7040 * @bugking; item_del "벌", @bugking; end;}
+	mes 1, "갯수가 부족한데요?";
+	end;
+	}
+	if(@select == 5){
+	input @bugking, 1, "황금개미를 몇마리 파시겠습니까?.","","", 25;
+	if(@bugking <= 0){mes 1, "갯수가 0이거나 숫자가 아닙니다."; end;}
+	if(item_exist(@myid, "황금개미") >= @bugking){mes 1, "황금개미 " + @bugking + "마리를팔았습니다."; money_add 13200 * @bugking; item_del "황금개미", @bugking; end;}
+	mes 1, "갯수가 부족한데요?";
+	end;
+	}
+	if(@select == 6){
+	input @bugking, 1, "곤충똥를 몇개를 파시겠습니까?.","","", 25;
+	if(@bugking <= 0){mes 1, "갯수가 0이거나 숫자가 아닙니다."; end;}
+	if(item_exist(@myid, "곤충똥") >= @bugking){mes 1, "곤충똥 " + @bugking + "개를팔았습니다."; money_add 3300 * @bugking; item_del "곤충똥", @bugking; end;}
+	mes 1, "갯수가 부족한데요?";
+	end;
+	}
+ del @val;
+ }
+ del @select;
+
+0,0,0,0,0,0,0	채집재료판매	{
+ set @select, menu("채집재료를 판매합니다!", "물건사기");
+ if(@select == 1){
+  shop 0, "채집", "채집재료 를팝니다.";
+ }
+ del @select;
+}
+
+0,0,0,0,0,0,0	채집장이동	{
+	set @select, menu("채집장으로 이동시켜드립니다. 입장료 골드 5000골드.", "이동하기");
+	if(@select == 1){
+		set @myid, get_myid();
+		if(get_money() >= 5000) {
+		money_del "5000";
+		warp "설탕채집장", 5,5; 
+	}else{
+		mes 1, "{=q 돈이 부족합니다...";
+end;
+		}
+	}
+ del @select;
+}
+
+0,0,0,0,0,0,0	어설픈다이아몬드뭉치	{
+		mes 1, "{=q어설픈다이아몬드뭉치를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,10);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 1)	{
+		item_del "어설픈다이아몬드뭉치", 1;
+		mes 1, "다이아몬드 3개가 나왔다!";
+		item_add "다이아몬드", 3;
+		}else{
+		item_del "어설픈다이아몬드뭉치", 1;
+		mes 1, "어설픈다이아몬드뭉치가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈이벤트귀걸이	{
+		mes 1, "{=q어설픈이벤트귀걸이를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,60);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 1)	{
+		item_del "어설픈이벤트귀걸이", 1;
+		mes 1, "이벤트귀걸이가 나왔다!";
+		item_add "이벤트귀걸이", 1;
+		}else{
+		item_del "어설픈이벤트귀걸이", 1;
+		mes 1, "어설픈이벤트귀걸이가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈막대사탕	{
+		mes 1, "{=q어설픈막대사탕를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,20);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 1)	{
+		item_del "어설픈막대사탕", 1;
+		mes 1, "막대사탕 나왔다!";
+		item_add "막대사탕", 1;
+		}else{
+		item_del "어설픈막대사탕", 1;
+		mes 1, "어설픈막대사탕가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈빼빼로	{
+		mes 1, "{=q어설픈빼빼로를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,20);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 1)	{
+		item_del "어설픈빼빼로", 1;
+		mes 1, "빼빼로 나왔다!";
+		item_add "빼빼로", 1;
+		}else{
+		item_del "어설픈빼빼로", 1;
+		mes 1, "어설픈빼빼로가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈뿅망치	{
+		mes 1, "{=q어설픈뿅망치를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,20);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 1)	{
+		item_del "어설픈뿅망치", 1;
+		mes 1, "뿅망치 나왔다!";
+		item_add "뿅망치", 1;
+		}else{
+		item_del "어설픈뿅망치", 1;
+		mes 1, "어설픈뿅망치가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈주작의목걸이	{
+		mes 1, "{=q어설픈주작의목걸이를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,55);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 1)	{
+		item_del "어설픈주작의목걸이", 1;
+		mes 1, "주작의목걸이 나왔다!";
+			broadcast 5, "[" + get_name() + "]{=c님이 어설픈주작의목걸이재련을 성공하셧습니다!";
+ 			legend_add 1,255, "리치 1년, 여름 주작의목걸이를 재련하다. (채집)";
+		item_add "주작의목걸이", 1;
+		}else{
+		item_del "어설픈주작의목걸이", 1;
+		mes 1, "어설픈주작의목걸이가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈주작의반지	{
+		mes 1, "{=q어설픈주작의반지를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,50);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 1)	{
+		item_del "어설픈주작의반지", 1;
+		mes 1, "주작의반지 나왔다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 어설픈주작의반지재련을 성공하셧습니다!";
+ 		legend_add 1,255, "리치 1년, 여름 주작의반지를 재련하다. (채집)";
+		item_add "주작의반지", 1;
+		}else{
+		item_del "어설픈주작의반지", 1;
+		mes 1, "어설픈주작의반지가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈생명의목걸이	{
+		mes 1, "{=q어설픈생명의목걸이를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,100);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 77 || @rnad == 52){
+		item_del "어설픈생명의목걸이", 1;
+		mes 1, "생명의목걸이가 나왔다!";
+		item_add "생명의목걸이", 1;
+		broadcast 5, "[" + get_name() + "]{=c님이 어설픈생명의목걸이재련을 성공하셧습니다!";
+		}else{
+		item_del "어설픈생명의목걸이", 1;
+		mes 1, "어설픈생명의목걸이가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈암흑의목걸이	{
+		mes 1, "{=q어설픈암흑의목걸이를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,100);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 77 || @rnad == 52){
+		item_del "어설픈암흑의목걸이", 1;
+		item_add "암흑의목걸이", 1;
+		mes 1, "암흑의목걸이가 나왔다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 어설픈암흑의목걸이재련을 성공하셧습니다!";
+		}else{
+		item_del "어설픈암흑의목걸이", 1;
+		mes 1, "어설픈암흑의목걸이가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈암흑의벨트	{
+		mes 1, "{=q어설픈암흑의벨트를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,100);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 77 || @rnad == 52){
+		item_del "어설픈암흑의벨트", 1;
+		item_add "암흑의벨트", 1;
+		mes 1, "암흑의벨트가 나왔다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 어설픈암흑의벨트재련을 성공하셧습니다!";
+		}else{
+		item_del "어설픈암흑의벨트", 1;
+		mes 1, "어설픈암흑의벨트가 깨졌다.";		
+		}
+	}
+}
+
+0,0,0,0,0,0,0	어설픈생명의벨트	{
+		mes 1, "{=q어설픈생명의벨트를 재련합니다.";
+		set @myid, get_myid();
+		RE1:
+ 		set @rand, rand(1,100);
+ 		if(@rand <0) goto RE1;
+		if(@rand == 77 || @rnad == 52){
+		item_del "어설픈생명의벨트", 1;
+		item_add "생명의벨트", 1;
+		mes 1, "생명의벨트가 나왔다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 어설픈생명의벨트재련을 성공하셧습니다!";
+		}else{
+		item_del "어설픈생명의벨트", 1;
+		mes 1, "어설픈생명의벨트가 깨졌다.";		
+		}
+	}
+}

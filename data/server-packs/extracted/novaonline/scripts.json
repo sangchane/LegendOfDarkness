@@ -1,0 +1,13210 @@
+[
+ {
+  "이름": "MOB_1서클스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/mob.txt"
+ },
+ {
+  "이름": "MOB_2서클스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/mob.txt"
+ },
+ {
+  "이름": "MOB_3서클스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/mob.txt"
+ },
+ {
+  "이름": "MOB_4서클스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/mob.txt"
+ },
+ {
+  "이름": "MOB_5서클스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_class",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/mob.txt"
+ },
+ {
+  "이름": "MOB_죽던스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 59,
+  "부름": {
+   "맵": [
+    "죽음의마을입구"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_basevita",
+   "get_class_sub",
+   "get_myid",
+   "if",
+   "message",
+   "mobsor_delay2",
+   "poisen",
+   "poisenc",
+   "rand",
+   "reberato",
+   "set",
+   "sormac",
+   "warp"
+  ],
+  "출처": "script/mob.txt"
+ },
+ {
+  "이름": "기술사범1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1688,
+  "부름": {
+   "맵": [
+    "농부의집",
+    "루그의방",
+    "루어스마을",
+    "루어스배틀대련장",
+    "밀레스배틀대련장",
+    "수오미배틀대련장",
+    "통합대련장"
+   ],
+   "아이템": [
+    "10억경험치쿠폰",
+    "1천만골드",
+    "경험치누적쿠폰",
+    "그레이트헬피닉스크로어",
+    "뉴트의뿔",
+    "뉴트의혀",
+    "다이아몬드",
+    "레드오피온의수염",
+    "로오의가죽각반",
+    "마그마바룬스의머리",
+    "매직리스트",
+    "매직파나",
+    "바크",
+    "별의눈물",
+    "브레이스글러브",
+    "블러드스톤",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "비밀의황금열쇠",
+    "생명의목걸이",
+    "생명의벨트",
+    "생명의시약",
+    "서펜트바룬스의머리",
+    "선물상자",
+    "소원을말해바",
+    "수호자의장갑",
+    "슈타르백금의아머",
+    "슈타르백금의아머(봉인)",
+    "슈타르백금의투구",
+    "슈타르백금의투구(봉인)",
+    "슈타르백금의팔찌",
+    "슈타르백금의팔찌(봉인)",
+    "슈타르봉인해제",
+    "슈타르제조책",
+    "스킬삭제",
+    "신월도",
+    "아벨리콜",
+    "아이템생성",
+    "안크본드라곤의머리",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "암흑의시약",
+    "엑스쿠라눔",
+    "여의주",
+    "용2",
+    "운챠챠",
+    "이벤트복권",
+    "이스빌",
+    "이스빌모자",
+    "적룡플라밋의방패",
+    "제조책",
+    "조금쌘목도",
+    "조커의귀걸이",
+    "조커의반지",
+    "조커의팬던트",
+    "챰릴리",
+    "초보자각반",
+    "초보자갑옷",
+    "초보자귀걸이",
+    "초보자목걸이",
+    "초보자반지",
+    "초보자방패",
+    "초보자벨트",
+    "초보자장갑",
+    "초보자투구",
+    "퀼트",
+    "퀼트모자",
+    "파괴자의장갑",
+    "파워리스트",
+    "피4",
+    "홀리파나",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "exp_add",
+   "exp_del",
+   "get_ac",
+   "get_baseexp",
+   "get_class",
+   "get_class_son",
+   "get_class_sub",
+   "get_con",
+   "get_dex",
+   "get_int",
+   "get_level",
+   "get_money",
+   "get_name",
+   "get_str",
+   "get_wis",
+   "if",
+   "input",
+   "item_add",
+   "item_count",
+   "item_del",
+   "menu",
+   "mes",
+   "message",
+   "money_del",
+   "pc_itemcheck",
+   "rand",
+   "set",
+   "skill_add",
+   "skill_del",
+   "spell_add",
+   "spell_del",
+   "warp"
+  ],
+  "출처": "script/npc2_script.txt"
+ },
+ {
+  "이름": "정보",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6386,
+  "부름": {
+   "맵": [
+    "2차승급자대기실",
+    "견습사냥터",
+    "결계대기실",
+    "노비스",
+    "노비스마을",
+    "로톤마을",
+    "루어스마을",
+    "뤼케시온field대기실",
+    "뤼케시온마을",
+    "리파이너의던전대기실",
+    "밀레스마을",
+    "밀레스마을field",
+    "승급던전 6층",
+    "시장",
+    "아벨마을field",
+    "아벨성",
+    "아벨해안대기실",
+    "아이스월드",
+    "엘리멘탈대기실",
+    "연습장",
+    "용자의공원",
+    "이아의숲",
+    "적룡굴대기실",
+    "죽대",
+    "죽마2",
+    "죽마3",
+    "죽마4",
+    "죽음의마을던전30",
+    "지하던전대기실",
+    "지하묘지대기실",
+    "직업신전3",
+    "초보자1",
+    "포테의 숲2존",
+    "포테의 숲3존",
+    "포테의 숲4존",
+    "포테의 숲5존",
+    "포테의 숲6존",
+    "해안가 1",
+    "해안가 2",
+    "해안가 3",
+    "호러캐슬대기실"
+   ],
+   "아이템": [
+    "1000만골드",
+    "15억골드",
+    "1억5천경험치",
+    "1억경험치",
+    "1억골드",
+    "1천만경험치",
+    "2000만골드",
+    "2억경험치",
+    "3억골드",
+    "3천만경험치",
+    "4억경험치",
+    "500만골드",
+    "6000만골드",
+    "6억경험치",
+    "6천만경험치",
+    "8억경험치",
+    "Regis의증표",
+    "가위",
+    "강화된세피라링",
+    "결계퀘스트도우미",
+    "고급글러브",
+    "고렘의돌조각",
+    "곡단도",
+    "골드아쿠아링",
+    "그레이트헬피닉스크로어",
+    "금가위",
+    "길드마스터",
+    "길드마스터자격증",
+    "길드원자격증",
+    "꿈의바다",
+    "노란보석",
+    "노말포션",
+    "뉴트의목걸이",
+    "다크디아나",
+    "다크로브",
+    "다크베일",
+    "다크코로나",
+    "다크홀",
+    "다크후드",
+    "대리인의수염",
+    "대지의룬스톤목걸이",
+    "대지의크리스탈목걸이",
+    "대지의홀디트링",
+    "던전팬던트",
+    "도적의무기",
+    "도적의원혼",
+    "레드오피온의수염",
+    "레드자스퍼",
+    "레몬색염색약",
+    "레인저아머",
+    "레지스의각반",
+    "레지스의갑옷도가(남)",
+    "레지스의갑옷도가(여)",
+    "레지스의갑옷도적(남)",
+    "레지스의갑옷도적(여)",
+    "레지스의갑옷마법사(남)",
+    "레지스의갑옷마법사(여)",
+    "레지스의갑옷전사(남)",
+    "레지스의갑옷전사(여)",
+    "레지스의귀걸이",
+    "레지스의단검",
+    "레지스의목걸이",
+    "레지스의반지",
+    "레지스의방패",
+    "레지스의배틀핸드",
+    "레지스의벨트",
+    "레지스의소환수",
+    "레지스의신발",
+    "레지스의장갑",
+    "레지스의칼",
+    "레지스의투구",
+    "로오의반지",
+    "로오의빛",
+    "로오의열매",
+    "로오의은총",
+    "루비",
+    "룬스톤",
+    "리젠트다이아귀걸이",
+    "리치초보자",
+    "리콜",
+    "마그마열매",
+    "마법사모자",
+    "마스터아머1",
+    "마스터아머2",
+    "마스터투구1",
+    "마스터투구2",
+    "매직파나",
+    "목도",
+    "무기조각1",
+    "무기조각2",
+    "무기조각3",
+    "무기조각4",
+    "무도가의무기",
+    "무도가의원혼",
+    "무상관",
+    "무상도복",
+    "미스릴배틀핸드",
+    "미스릴부츠",
+    "밀레스리콜",
+    "바다의룬스톤목걸이",
+    "바다의크리스탈목걸이",
+    "바다의홀디트링",
+    "바람의룬스톤목걸이",
+    "바람의크리스탈목걸이",
+    "바람의홀디트링",
+    "발찌",
+    "배틀부츠",
+    "법사의원혼",
+    "변생석",
+    "변생의스크룰",
+    "변생의증표",
+    "보리단",
+    "보상",
+    "보상얻기",
+    "본드라곤의구슬",
+    "분홍색염색약",
+    "브레이사",
+    "브론즈오피온의비늘",
+    "브론즈오피온의수염",
+    "블라우스",
+    "비밀의황금열쇠",
+    "빈종이",
+    "사과",
+    "사제의상",
+    "사파이어",
+    "생명의목걸이",
+    "생명의벨트",
+    "선물상자",
+    "세인트로브",
+    "세인트베일",
+    "세인트홀",
+    "세인트후드",
+    "세피라링(Lev1)",
+    "세피라링(Lev10)",
+    "세피라링(Lev2)",
+    "세피라링(Lev3)",
+    "세피라링(Lev4)",
+    "세피라링(Lev5)",
+    "세피라링(Lev6)",
+    "세피라링(Lev7)",
+    "세피라링(Lev8)",
+    "세피라링(Lev9)",
+    "셔스의목걸이",
+    "셔츠",
+    "숙련자의검+2",
+    "숙련자의글러브+2",
+    "숙련자의단검+2",
+    "슈퍼포션",
+    "스카우트아머",
+    "승급리콜",
+    "승급자도우미",
+    "신발조각1",
+    "신발조각2",
+    "신발조각3",
+    "신발조각4",
+    "신월도",
+    "실버아쿠아링",
+    "실크부츠",
+    "아룬다이트",
+    "아벨리콜",
+    "아수라",
+    "아스카론",
+    "아스카룬",
+    "아이의열매",
+    "아조스",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "앵거바딜",
+    "업그레이드목도",
+    "업그레이드블라우스",
+    "업그레이드셔츠",
+    "에메랄드",
+    "에페",
+    "워리어워커",
+    "월영관",
+    "월영도복",
+    "웨스턴",
+    "이동석",
+    "이아네집",
+    "이아의반지2",
+    "이아의은총",
+    "이아의팬던트",
+    "잉크",
+    "전사의무기",
+    "전사의원혼",
+    "전직(마법사)의증표",
+    "전직(성직자)의증표",
+    "전직리콜",
+    "전직서",
+    "젤리오팔",
+    "조금쌘목도",
+    "좀비의살",
+    "지존의검",
+    "지존의글러브",
+    "지존의단검",
+    "직자의원혼",
+    "진주",
+    "차가운팬던트A",
+    "차가운팬던트B",
+    "차가운팬던트C",
+    "체력물약",
+    "체력포션",
+    "초보자각반",
+    "초보자갑옷",
+    "초보자귀걸이",
+    "초보자도우미",
+    "초보자목걸이",
+    "초보자반지",
+    "초보자방패",
+    "초보자벨트",
+    "초보자장갑",
+    "초보자투구",
+    "최상급글러브",
+    "카타르",
+    "퀸셰어의귀걸이",
+    "크리샤오르",
+    "크리스탈",
+    "크리스탈목걸이",
+    "테네즈의각반",
+    "테네즈의방패",
+    "티타늄목도",
+    "파란종이",
+    "파파야방패",
+    "페리도트",
+    "프람베르그",
+    "프레이트메일",
+    "프레이트투구",
+    "피1",
+    "피2",
+    "피3",
+    "피4",
+    "피닉스크로어",
+    "하데스의열매",
+    "하이브레이질그레이트배틀액스",
+    "하이브레이질배틀액스",
+    "하이브레이질배틀핸드",
+    "헬브레이질레이업배틀액스",
+    "혼합물약",
+    "홀디트링",
+    "홀디트석",
+    "홀리디아나",
+    "홀리코로나",
+    "홀리파나",
+    "화려한귀걸이",
+    "화염의룬스톤목걸이",
+    "화염의크리스탈목걸이",
+    "화염의홀디트링",
+    "환생리콜",
+    "환생석",
+    "환생의스크롤",
+    "환생의스크룰",
+    "환생의증표(Lev1)",
+    "환생의증표(Lev2)",
+    "환생의증표(Lev3)",
+    "환생의증표(Lev4)",
+    "환생의증표(Lev5)",
+    "흰색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "deposit_item",
+   "deposit_money",
+   "effect",
+   "exp_add",
+   "exp_del",
+   "game_sound",
+   "get_ac",
+   "get_baseexp",
+   "get_basemana",
+   "get_basevita",
+   "get_class",
+   "get_class_sub",
+   "get_con",
+   "get_dex",
+   "get_int",
+   "get_level",
+   "get_mapname",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_str",
+   "get_wis",
+   "group_warp",
+   "if",
+   "input",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "legend_del",
+   "map_objmob",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn3",
+   "money_add",
+   "money_del",
+   "npc_say",
+   "pc_itemcheck",
+   "set",
+   "set_ac",
+   "set_basemana",
+   "set_basevita",
+   "set_class",
+   "set_class_sub",
+   "set_con",
+   "set_dex",
+   "set_hair",
+   "set_haircolor",
+   "set_int",
+   "set_level",
+   "set_point",
+   "set_son",
+   "set_state",
+   "set_str",
+   "set_wis",
+   "shop",
+   "skill_add",
+   "sleep",
+   "spell_add",
+   "warp",
+   "while",
+   "withdraw_item",
+   "withdraw_money"
+  ],
+  "출처": "script/npc_script.txt"
+ },
+ {
+  "이름": "__SCRIPT_LOGIN__",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 52,
+  "부름": {
+   "맵": [
+    "용자의공원"
+   ],
+   "아이템": [
+    "길드초대장"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "exp_add",
+   "exp_per",
+   "get_birthday",
+   "get_class",
+   "get_class_sub",
+   "get_level",
+   "get_map_back",
+   "get_map_somer",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_sex",
+   "get_son",
+   "if",
+   "item_del",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "set",
+   "set_birthday",
+   "set_body",
+   "set_image",
+   "set_state",
+   "skill_add",
+   "skill_del",
+   "skill_exist",
+   "warp"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "__SCRIPT_LOGOUT__",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "종합책"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "get_myid",
+   "get_name",
+   "item_del",
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "__SCRIPT_DEAD__",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [
+    "뮤레칸의방"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_dead",
+   "coma_delay",
+   "get_map_somer",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "group_exist",
+   "if",
+   "map_objmob",
+   "map_user_exist",
+   "reberato",
+   "set",
+   "set_body",
+   "set_coma",
+   "set_state",
+   "warp"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "__SAY_SCRIPT__",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "mes",
+   "output",
+   "say_last",
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "잘가세요",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [
+    "뮤레칸의방"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_dead",
+   "get_coma",
+   "get_map_somer",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "if",
+   "map_objmob",
+   "map_user_exist",
+   "reberato",
+   "set",
+   "set_body",
+   "set_state",
+   "warp"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "코마시간",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "하이드머리",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "set_hair"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "워프백",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "set",
+   "warp"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "스피드업",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "get_coma",
+   "get_mapxs",
+   "get_mapys",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "set",
+   "set_xs",
+   "set_ys",
+   "sleep"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "뮤레칸",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [
+    "이아의천상계"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "get_sex",
+   "if",
+   "mes",
+   "message",
+   "set",
+   "set_body",
+   "set_state",
+   "set_vita",
+   "user_say",
+   "warp"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "_SCRIPT_ITEM_",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "message",
+   "set",
+   "set_vita"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "_MOB_ATTACK_",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "지존축하경험치",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "exp_add",
+   "get_class",
+   "get_myid",
+   "if",
+   "mes",
+   "set",
+   "set_con",
+   "set_dex",
+   "set_int",
+   "set_point",
+   "set_str",
+   "set_wis",
+   "sleep"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "그룹원보기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "group_exist",
+   "if",
+   "message",
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "가호타임셋",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "가호타임",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "크리스마스이벤트",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "get_name",
+   "if",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "능력치초기화",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 60,
+  "부름": {
+   "맵": [
+    "1차승급PK",
+    "2차승급PK",
+    "비승급PK",
+    "통합PK"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "all_messege",
+   "del",
+   "get_ac",
+   "get_class_sub",
+   "get_level",
+   "get_myid",
+   "if",
+   "input",
+   "menu",
+   "mes",
+   "set",
+   "set_basemana",
+   "set_basevita",
+   "set_con",
+   "set_dex",
+   "set_int",
+   "set_point",
+   "set_str",
+   "set_wis",
+   "warp"
+  ],
+  "출처": "script/script.txt"
+ },
+ {
+  "이름": "SPELL_홀리쿠라네라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "group_hill",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_홀리쿠라노",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_엑스벨라룸",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "belra",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_홀리쿠라노M",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_메가홀리쿠라노",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SKILL_슈페이아움(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_mana",
+   "get_myid",
+   "group_exist",
+   "iaum_delay",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "skill_delay",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_영자홀리쿠라노",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_홀리드래곤",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 32,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "set",
+   "set_manal"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SKILL_연주공격(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 163,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basemana",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SKILL_연주공격(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 164,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basemana",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SKILL_연주공격(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 164,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basemana",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_부활",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_myid",
+   "get_sex",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "set_body",
+   "set_state",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_압록지정",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 11,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mapname",
+   "get_myid",
+   "group_hill",
+   "if",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_리젠(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 11,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_basemana",
+   "get_basevita2",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "hprecovery",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_리젠2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "hprecovery",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_리젠3",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "hprecovery",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_리젠4",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "hprecovery",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_마리젠1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "mprecovery",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Jigja.txt"
+ },
+ {
+  "이름": "SPELL_깃털날리기(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Monk(조류).txt"
+ },
+ {
+  "이름": "SPELL_깃털날리기(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 39,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mapname",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Monk(조류).txt"
+ },
+ {
+  "이름": "SPELL_매의위상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set"
+  ],
+  "출처": "script/skill/Monk(조류).txt"
+ },
+ {
+  "이름": "SPELL_자기보호",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "immortal",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_연천단각",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_붕신선각",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_파천각",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 68,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_dex",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_매의위상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_con",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_마구때리기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_con",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_허공답보",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "enare",
+   "get_dex",
+   "get_front_char",
+   "get_mapxs",
+   "get_mapys",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "set",
+   "set_side",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_폭풍",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 35,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SPELL_깃털날리기(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_할퀴기(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_할퀴기M",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 27,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SPELL_무영신공",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 483,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_con",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_비스트어택(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_비스트어택(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_비스트어택(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 67,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SPELL_디스가드어택",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "disregard",
+   "effect",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/Monk.txt"
+ },
+ {
+  "이름": "SKILL_급소노리기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_라이트닝트랩",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basevita",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_암살격진",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_hide",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_기습",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_front_char",
+   "get_hide",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_습격진",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_hide",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_무영단무",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_dex",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_슬레쉬",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_마구찌르기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_백스텝",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 34,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_mapname",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "set_xs",
+   "set_ys",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_회심의저격(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "get_basemana",
+   "get_basevita",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SPELL_챠지(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 40,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mapname",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_이동스킬",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 32,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_mapname",
+   "get_mapxs",
+   "get_mapys",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "set",
+   "set_xs",
+   "set_ys"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_사격(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 161,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_사격(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 162,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_사격(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 162,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_활쏘기1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 455,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_활쏘기2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 455,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_저격",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 455,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_dex",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_습격(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 73,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_dex",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_str",
+   "get_vita",
+   "get_wearitem_armor",
+   "get_wearitem_gaiter",
+   "get_wearitem_helmet",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_차크라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 35,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_회심의저격",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 455,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_활쏘기3",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 455,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_연사1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 455,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SKILL_연사M",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 455,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Rogue.txt"
+ },
+ {
+  "이름": "SPELL_집중",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "focus",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_완전방어(UP)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "defens",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "spell_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_매드소울진",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_스톰블레이드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 68,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_룬블레이드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 161,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_데빌크래셔",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_퓨리소월루(Lev1)",
+  "머리말": "`0,0,0,0,0,0,0",
+  "줄수": 68,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_검투술(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_검투술(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_검투술(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_사방치기(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 43,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_검투술2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_con",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_검투술3",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_con",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_검투술4",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_con",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_포효",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 26,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "message",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_전체도발",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 35,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_퓨리소월루(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 269,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_퓨리소월루M",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 269,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SPELL_ㅇ포효",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 32,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_내려치기(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 44,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basevita",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "manal_del",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "set_side",
+   "set_xs",
+   "set_ys",
+   "skill_delay"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SKILL_공격력강화",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damage_per_delay",
+   "effect",
+   "get_myid",
+   "set"
+  ],
+  "출처": "script/skill/Warrior.txt"
+ },
+ {
+  "이름": "SPELL_어둠의각인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_칸의눈(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "manal_del",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_메테오",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 32,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "set",
+   "set_manal"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_플라미칼로",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_아듀랄로",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_테라미칼로",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_수페라아듀라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_int",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_수페라테라미카",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_int",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_수페라플라미카",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 31,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_엑스아듀라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_int",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_wis",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_엑스테라미카",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_int",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_wis",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_엑스플라미카",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 26,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_테라미코",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_아듀로",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_아듀로스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_아듀레나",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_플라모",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_플라무스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_플라메라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_테라미쿠스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_테라미에라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_마법생성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_making"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_스킬생성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "skill_making"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_도박용아들레스투",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "message"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_라세소환",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_일리안소환",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_윌리아소환",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_화이라소환(Lev1)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_화이라소환(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 67,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_화이라소환(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_플레어",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_아이스블러스트",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_클레쉬스톰",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_퀘이크",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_세멜리아(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "set_manal",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_라세소환(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 304,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_윌리아소환(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 304,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_일리안소환(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 305,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_라세소환(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 306,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_윌리아소환(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 304,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_일리안소환(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 305,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_라이트닝",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 328,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobx",
+   "get_mobxy",
+   "get_moby",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_데스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 29,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "set_manal",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_매직프로텍션",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "immortal",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_포트리스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "portris",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_델리스펠라스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "dell",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_프라베라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 29,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_어각베라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 33,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SKILL_마력리젠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 11,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_basemana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "mprecovery",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_데스베라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 33,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_메테오M",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 25,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SPELL_속성강화",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "set",
+   "sokup_delay",
+   "spell_target"
+  ],
+  "출처": "script/skill/Wizard.txt"
+ },
+ {
+  "이름": "SKILL_하트",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_front_char",
+   "get_myid",
+   "if",
+   "set"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SKILL_더블어택",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "attack_skill",
+   "sleep"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_리치의기원",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_mana",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_운명",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 33,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_봉인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 33,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_mana",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_스피드업",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_name",
+   "if",
+   "input",
+   "istype",
+   "mes",
+   "message",
+   "message1",
+   "set",
+   "speedup_delay",
+   "spell_target"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_유저나르",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "get_name",
+   "if",
+   "input",
+   "istype",
+   "mes",
+   "message",
+   "message1",
+   "mobnar_delay",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_유저소루",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "get_name",
+   "if",
+   "input",
+   "istype",
+   "mes",
+   "message",
+   "message1",
+   "mobsor_delay",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_코마",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "coma_delay",
+   "get_myid",
+   "get_name",
+   "if",
+   "input",
+   "istype",
+   "mes",
+   "message",
+   "message1",
+   "set",
+   "set_coma",
+   "set_state1",
+   "spell_target"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SPELL_그룹탈퇴",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "group_end",
+   "if",
+   "istype",
+   "message",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/공통스킬.txt"
+ },
+ {
+  "이름": "SKILL_찌르기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SPELL_하이드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "hide",
+   "if",
+   "message",
+   "set",
+   "sleep",
+   "warp"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SPELL_하이드1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_mapname",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "hide",
+   "set",
+   "sleep",
+   "warp"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_찔러휘비기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_두번찌르기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_습격",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_dex",
+   "get_front_char",
+   "get_hide",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_암살격",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_hide",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_센스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_mapname",
+   "if",
+   "message",
+   "sense_user"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_센스몬스터",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_mapname",
+   "if",
+   "message",
+   "sense_monster"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_품뒤져보기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_mapname",
+   "if",
+   "message",
+   "sense_item"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SPELL_아들레스투",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_mapname",
+   "if",
+   "item_info",
+   "message"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_적갑옷해체",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "arm_del",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/도적(비전직).txt"
+ },
+ {
+  "이름": "SKILL_정권",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_단각",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_통배권1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 16,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_이형환위",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 35,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_front_char",
+   "get_mapxs",
+   "get_mapys",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "set",
+   "set_side",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_붕각",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_선풍각",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 68,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SPELL_장풍",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_발경",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 18,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "mobsor_delay",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_달마신공",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged3",
+   "damaged",
+   "effect",
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SPELL_다라밀공",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 25,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "set_manal",
+   "set_vital",
+   "spell_target",
+   "user_say"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SKILL_구양신공",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 68,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basevita",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_vita",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SPELL_금강불괴",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "immortal",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SPELL_리플렉토",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "rand",
+   "reply",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/무도가(비전직).txt"
+ },
+ {
+  "이름": "SPELL_마레노",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_int",
+   "get_level",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_수페라마레나",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 67,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_렌토",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "manal_del",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_엑스마레나",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 67,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_바르도",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "manal_del",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_나르콜리",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "manal_del",
+   "message",
+   "message1",
+   "mobnar_delay",
+   "motion",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_베노미",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 16,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "manal_del",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_마레누스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_마레네라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_마네나로",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 33,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_int",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "set"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_데프레코",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "manal_del",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_세멜리아",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_basemana",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "set_manal",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_라그나로크",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 32,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "for",
+   "game_sound",
+   "get_char_serial",
+   "get_mana",
+   "get_map_pk",
+   "get_mobxy",
+   "get_myid",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "set",
+   "set_manal"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_프라보",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/법사(비전직).txt"
+ },
+ {
+  "이름": "SPELL_쿠로",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_이모탈",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "immortal",
+   "manal_del",
+   "message",
+   "rand",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_벨라르모",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "belra",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_에나르마",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_쿠라노",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_쿠러스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "group_hill",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_쿠라노소",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_쿠라누스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "group_hill",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_콜라마",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 11,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_int",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "hprecovery",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_수페라벨라르모",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "belra",
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_홀리볼트",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 26,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged2",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_int",
+   "get_level",
+   "get_mana",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_디나르콜리",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "mobnar_end",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_디소루마",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "mobsor_end",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_디베노모",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "poisen_end",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_수페라쿠라노",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_쿠라네라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "group_hill",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_호르라마",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 11,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "horrama",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_홀리볼트(Lev2)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_홀리볼트(Lev3)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_홀리볼트(Lev4)",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 24,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_wis",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_엑스쿠라노",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "del",
+   "effect",
+   "game_sound",
+   "get_body",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "message1",
+   "motion",
+   "set",
+   "set_vita",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_엑스쿠라네라",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "game_sound",
+   "get_int",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "group_hill",
+   "group_message",
+   "if",
+   "manal_del",
+   "message",
+   "motion",
+   "set"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_코마디아",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "coma_delay",
+   "del_coma",
+   "effect",
+   "game_sound",
+   "get_coma",
+   "get_front_char",
+   "get_myid",
+   "get_state1",
+   "if",
+   "set",
+   "set_coma",
+   "set_mana",
+   "set_state1",
+   "set_vita"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SPELL_리베라토",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "get_myid",
+   "get_name",
+   "if",
+   "istype",
+   "message",
+   "message1",
+   "rand",
+   "reberato",
+   "reberato2",
+   "set",
+   "spell_target"
+  ],
+  "출처": "script/skill/성직자(비전직).txt"
+ },
+ {
+  "이름": "SKILL_숏블레이드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_str",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_바투",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "if",
+   "istype",
+   "magic",
+   "magic_exist",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_윈드블레이드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 161,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "case",
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_side",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target",
+   "switch"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_메가블레이드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 68,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "del",
+   "effect",
+   "enare",
+   "game_sound",
+   "get_char_serial",
+   "get_map_pk",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_str",
+   "get_xs",
+   "get_ys",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_투핸드어택",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "motion"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_매드소울",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_크래셔",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "damaged",
+   "effect",
+   "focus",
+   "game_sound",
+   "get_basevita",
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "skill_target"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_완전방어",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "defens",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "skill_delay"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_적무기해체",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_front_char",
+   "get_map_pk",
+   "get_myid",
+   "if",
+   "istype",
+   "message",
+   "motion",
+   "set",
+   "skill_delay",
+   "weapon_del"
+  ],
+  "출처": "script/skill/전사(비전직).txt"
+ },
+ {
+  "이름": "SKILL_기본공격",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "attack_skill",
+   "if",
+   "rand",
+   "skill_exist"
+  ],
+  "출처": "script/skill_script.txt"
+ },
+ {
+  "이름": "SKILL_탐색",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "discovery_skill"
+  ],
+  "출처": "script/skill_script.txt"
+ },
+ {
+  "이름": "SPELL_아이템생성LCIA",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "spell_create"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_귀환:기술사범의집",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [
+    "기술사범의집"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_길드성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [
+    "리치길드성"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "get_user_title",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_귀환:마을",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 16,
+  "부름": {
+   "맵": [
+    "용자의공원"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_승급자의공간",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 16,
+  "부름": {
+   "맵": [
+    "승급자의공간"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_운영자의방",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [
+    "운영자의공간"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_천족의성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 16,
+  "부름": {
+   "맵": [
+    "천족의성"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_마족의성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 16,
+  "부름": {
+   "맵": [
+    "마족의성"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "message",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_귀환:신의영역",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [
+    "신의영역"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "game_sound",
+   "get_myid",
+   "if",
+   "motion",
+   "set",
+   "spell_target",
+   "warp"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "SPELL_쿠로토",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "game_sound",
+   "get_mana",
+   "get_myid",
+   "get_vita",
+   "if",
+   "istype",
+   "manal_del",
+   "message",
+   "motion",
+   "rand",
+   "set",
+   "set_vita"
+  ],
+  "출처": "script/spell_script.txt"
+ },
+ {
+  "이름": "staff_매직루나1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_매직루나2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_매직파나1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 32,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_매직파나2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 32,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_매직세페우스1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_매직세페우스2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_로오의은총1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 43,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_로오의은총2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 43,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_영월충1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 43,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_영월충2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 43,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_홀리루나1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_홀리루나2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_홀리파나1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 31,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_홀리파나2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 31,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_홀리세페우스1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_홀리세페우스2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_이아의은총1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_이아의은총2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_비파1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_비파2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_기타1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 44,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "staff_기타2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 44,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "spell_sleep"
+  ],
+  "출처": "script/staff_script.txt"
+ },
+ {
+  "이름": "미궁이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [
+    "미궁대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class_sub",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/test.txt"
+ },
+ {
+  "이름": "미궁보스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2090,
+  "부름": {
+   "맵": [
+    "미궁대기실1",
+    "미궁스킬방",
+    "미궁스킬방1",
+    "시장",
+    "아이스월드1",
+    "해안"
+   ],
+   "아이템": [
+    "1천만골드",
+    "3천만골드",
+    "6천만골드",
+    "가릉비가1",
+    "가릉비가2",
+    "골드네일",
+    "구정표의편지",
+    "그녀의편지",
+    "금가위",
+    "뉴트의매직장갑",
+    "뉴트의목걸이",
+    "뉴트의뿔",
+    "뉴트의조각1",
+    "뉴트의조각2",
+    "뉴트의조각3",
+    "뉴트의파워장갑",
+    "뉴트의팔찌",
+    "뉴트의혀",
+    "다크코로나",
+    "다크틸의지팡이",
+    "닭고기",
+    "데메테르1",
+    "데메테르2",
+    "데스나이트의칼",
+    "라멜1",
+    "라멜2",
+    "라피스라즐리1",
+    "라피스라즐리2",
+    "락스퍼",
+    "레몬색염색약",
+    "레오파드1",
+    "레오파드2",
+    "레이헌트아머",
+    "레이헌트장갑",
+    "레이헌트투구",
+    "레일라1",
+    "레일라2",
+    "루크1",
+    "루크2",
+    "마르두크1",
+    "마르두크2",
+    "마아트1",
+    "마아트2",
+    "마이소시아정식",
+    "매직리스트",
+    "맥주",
+    "미궁도우미1",
+    "바베큐",
+    "베네티미스릴각반",
+    "베레스의발톱",
+    "봉인된레이헌트아머",
+    "봉인된레이헌트장갑",
+    "봉인된레이헌트투구",
+    "봉인된브릴윙아머",
+    "봉인된브릴윙장갑",
+    "봉인된브릴윙투구",
+    "봉인된월화이어아머B",
+    "봉인된월화이어장갑B",
+    "봉인된월화이어투구B",
+    "브레이사",
+    "브릴윙아머",
+    "브릴윙장갑",
+    "브릴윙투구",
+    "블랙셋제조책",
+    "블랙오피온의등껍질",
+    "블랙오피온의수염",
+    "블루사파이어",
+    "블루오팔",
+    "블루오피온의수염",
+    "빨간점액",
+    "사랑의꽃다발",
+    "사랑의증표",
+    "살렛1",
+    "살렛2",
+    "생명의구슬",
+    "생명의목걸이",
+    "생명의벨트",
+    "선물상자",
+    "세르네티1",
+    "세르네티2",
+    "세피라링(Lev2)",
+    "솔라레스1",
+    "솔라레스2",
+    "슈퍼포션",
+    "아가트1",
+    "아가트2",
+    "아레스1",
+    "아레스2",
+    "아비스1",
+    "아비스2",
+    "아침님의꼬추",
+    "아침님의꼬추2",
+    "아칸더스",
+    "암흑의목걸이",
+    "오팔조각",
+    "옷업키트",
+    "와인",
+    "용팔찌",
+    "월화이어아머B",
+    "월화이어장갑B",
+    "월화이어투구B",
+    "위타천1",
+    "위타천2",
+    "유물반지",
+    "이미지1",
+    "제조책",
+    "천만골드",
+    "큐이레스1",
+    "큐이레스2",
+    "테네즈의방패",
+    "투신의머리띠1",
+    "투신의머리띠2",
+    "파워리스트",
+    "펭귄가죽",
+    "펭귄옷",
+    "필살기습득자격",
+    "하트링",
+    "헬름1",
+    "헬름2",
+    "홀리코로나",
+    "화영잠1",
+    "화영잠2",
+    "후치의술통"
+   ],
+   "괴물": [
+    "펭귄1"
+   ]
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_ability",
+   "get_class",
+   "get_class_son",
+   "get_class_sub",
+   "get_level",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "get_side",
+   "get_son",
+   "get_xs",
+   "get_ys",
+   "group_warp",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "money_add",
+   "pc_itemcheck",
+   "rand",
+   "set",
+   "skill_add",
+   "spell_add",
+   "spell_del",
+   "warp"
+  ],
+  "출처": "script/test.txt"
+ },
+ {
+  "이름": "리치길드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 132,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "길드초대장",
+    "왕의문장"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "for",
+   "get_guild_master",
+   "get_guild_state",
+   "get_mapname1",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_name1",
+   "get_title1",
+   "get_user",
+   "guild_check",
+   "guild_count",
+   "guild_list",
+   "if",
+   "input",
+   "item_add1",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "message1",
+   "money_del",
+   "set",
+   "set_guild_master",
+   "set_guild_state",
+   "set_title1",
+   "spell_add"
+  ],
+  "출처": "script/길드/길드.txt"
+ },
+ {
+  "이름": "리치길드성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [
+    "리치길드성궁"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/길드/길드성.txt"
+ },
+ {
+  "이름": "리치길드성스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_gd",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "spell_add"
+  ],
+  "출처": "script/길드/길드성.txt"
+ },
+ {
+  "이름": "리치길드성시약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "shop"
+  ],
+  "출처": "script/길드/길드성.txt"
+ },
+ {
+  "이름": "리치길드성마스터",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_name",
+   "if",
+   "mes",
+   "shop"
+  ],
+  "출처": "script/길드/길드성.txt"
+ },
+ {
+  "이름": "리치길드성쟁탈",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 69,
+  "부름": {
+   "맵": [
+    "길드성쟁탈전보스맵1",
+    "길드성쟁탈전보스맵2",
+    "축구장야배"
+   ],
+   "아이템": [
+    "보스소환의증표",
+    "보스잡았넹",
+    "악령의증오"
+   ],
+   "괴물": [
+    "길드보스"
+   ]
+  },
+  "부르는이름": [
+   "broadcast",
+   "get_myid",
+   "get_name",
+   "get_user_title",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "mob_spawn",
+   "set",
+   "warp"
+  ],
+  "출처": "script/길드/길드성쟁탈전.txt"
+ },
+ {
+  "이름": "감맘보",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 38,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_money",
+   "get_name",
+   "if",
+   "input",
+   "menu",
+   "mes",
+   "money_add",
+   "money_del",
+   "npc_say",
+   "rand",
+   "set"
+  ],
+  "출처": "script/도박/도박.txt"
+ },
+ {
+  "이름": "초보자속성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "천족의옷",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "마족의옷",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "종합상점",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "개인물약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "mes",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "개인물약2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 1,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "2차전직옷",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "재료사냥터리콜",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_class_sub",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "분수대",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/샵/샵.txt"
+ },
+ {
+  "이름": "전사스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 58,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basevita",
+   "get_class",
+   "get_con",
+   "get_level",
+   "get_myid",
+   "get_name",
+   "get_str",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "skill_add",
+   "skill_exist",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "도적스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 61,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basevita",
+   "get_class",
+   "get_con",
+   "get_dex",
+   "get_level",
+   "get_myid",
+   "get_name",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "skill_add",
+   "skill_exist",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "마법사스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 81,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_class",
+   "get_int",
+   "get_level",
+   "get_mana",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "성직자스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 126,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_class",
+   "get_int",
+   "get_level",
+   "get_myid",
+   "get_name",
+   "get_wis",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "무도가스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 88,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basemana",
+   "get_basevita",
+   "get_class",
+   "get_con",
+   "get_level",
+   "get_myid",
+   "get_name",
+   "get_str",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "skill_add",
+   "skill_exist",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "2전사스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 58,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "암흑의시약",
+    "좀비의막대기",
+    "좀비의살"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basevita",
+   "get_class",
+   "get_class_sub",
+   "get_con",
+   "get_dex",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "get_str",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "skill_add",
+   "skill_del",
+   "skill_exist",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "2도적스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 45,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "좀비의막대기",
+    "좀비의살"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basevita",
+   "get_class",
+   "get_class_sub",
+   "get_con",
+   "get_dex",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "skill_add",
+   "skill_del",
+   "skill_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "2마법사스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 47,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "좀비의살",
+    "좀비지팡이"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basemana",
+   "get_class",
+   "get_class_sub",
+   "get_int",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "get_wis",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "2성직자스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 27,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "좀비의살",
+    "좀비지팡이"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basemana",
+   "get_class",
+   "get_class_sub",
+   "get_int",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_son",
+   "get_wis",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "2무도가스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 43,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "좀비의막대기",
+    "좀비의살"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_ac",
+   "get_basevita",
+   "get_class",
+   "get_class_sub",
+   "get_con",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "get_str",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "skill_add",
+   "skill_del",
+   "skill_exist",
+   "spell_add",
+   "spell_del",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "3전사스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 44,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고렘의돌조각",
+    "다이아몬드",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "브론즈베레스의발톱",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "여의주",
+    "챰릴리"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_ability",
+   "get_class",
+   "get_class_sub",
+   "get_money",
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "skill_add",
+   "skill_del",
+   "skill_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "3도적스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고렘의돌조각",
+    "다이아몬드",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "브론즈베레스의발톱",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "여의주",
+    "챰릴리"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_ability",
+   "get_class",
+   "get_class_sub",
+   "get_money",
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "skill_add",
+   "skill_del",
+   "skill_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "3마법사스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "다이아몬드",
+    "다크틸의지팡이",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "별의눈물",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "암흑의시약",
+    "챰릴리",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_ability",
+   "get_class",
+   "get_class_sub",
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set",
+   "spell_add",
+   "spell_del",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "3성직자스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 44,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "다이아몬드",
+    "다크틸의지팡이",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "별의눈물",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "생명의시약",
+    "챰릴리",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_ability",
+   "get_class",
+   "get_class_sub",
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set",
+   "skill_add",
+   "skill_del",
+   "skill_exist",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "3무도가스킬상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 44,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고렘의돌조각",
+    "다이아몬드",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "브론즈베레스의발톱",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "여의주",
+    "챰릴리"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_ability",
+   "get_class",
+   "get_class_sub",
+   "get_money",
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "skill_add",
+   "skill_del",
+   "skill_exist",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "전직스킬배우기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 53,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "input",
+   "mes",
+   "set",
+   "skill_add",
+   "skill_exist",
+   "spell_add",
+   "spell_exist"
+  ],
+  "출처": "script/스킬배우기.txt"
+ },
+ {
+  "이름": "승급하장",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 33,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "다크로브",
+    "다크후드",
+    "레인저아머",
+    "로오의은총",
+    "마스터아머1",
+    "마스터아머2",
+    "무상도복",
+    "세인트로브",
+    "세인트후드",
+    "스카우트아머",
+    "승급의증표",
+    "승뚜교환권",
+    "아스카론",
+    "아조스",
+    "월영도복",
+    "이아의은총",
+    "하이브레이질배틀핸드"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "effect",
+   "game_sound",
+   "get_ac",
+   "get_basemana",
+   "get_basevita",
+   "get_class",
+   "get_class_sub",
+   "get_myid",
+   "get_name",
+   "get_sex",
+   "get_son",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "set",
+   "set_class_sub",
+   "skill_add",
+   "skill_del",
+   "spell_add"
+  ],
+  "출처": "script/승급.txt"
+ },
+ {
+  "이름": "승급의증표",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "승급의구슬",
+    "승급의증표",
+    "승급의팬던트"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "rand",
+   "set"
+  ],
+  "출처": "script/승급.txt"
+ },
+ {
+  "이름": "승급투구얻자",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 25,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "다크베일",
+    "다크홀",
+    "마스터투구1",
+    "마스터투구2",
+    "무상관",
+    "세인트베일",
+    "세인트홀",
+    "승뚜교환권",
+    "월영관",
+    "웨스턴",
+    "좀비의살"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class",
+   "get_con",
+   "get_dex",
+   "get_int",
+   "get_myid",
+   "get_sex",
+   "get_str",
+   "get_wis",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/승급.txt"
+ },
+ {
+  "이름": "승급할아범2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "effect",
+   "game_sound",
+   "get_ac",
+   "get_basemana",
+   "get_basevita",
+   "get_class",
+   "get_class_sub",
+   "get_myid",
+   "get_name",
+   "if",
+   "legend_add",
+   "menu",
+   "mes",
+   "set",
+   "set_class_sub"
+  ],
+  "출처": "script/승급.txt"
+ },
+ {
+  "이름": "종족선택",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 40,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "effect",
+   "game_sound",
+   "get_ability",
+   "get_jj",
+   "get_name",
+   "if",
+   "legend_add",
+   "menu",
+   "mes",
+   "set",
+   "set_jj",
+   "spell_add"
+  ],
+  "출처": "script/승급.txt"
+ },
+ {
+  "이름": "종족귀환스펠",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 25,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_ability",
+   "get_jj",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "spell_add"
+  ],
+  "출처": "script/승급.txt"
+ },
+ {
+  "이름": "member",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [
+    "사냥터워프"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class_sub",
+   "get_level",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_exist",
+   "menu",
+   "mes",
+   "set",
+   "shop",
+   "warp"
+  ],
+  "출처": "script/아이템/맴버쉽.txt"
+ },
+ {
+  "이름": "스킬스펠지우기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "get_name",
+   "if",
+   "input",
+   "menu",
+   "mes",
+   "set",
+   "skill_del",
+   "spell_del"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "코마디움",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "코마디움"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "coma_delay",
+   "del_coma",
+   "effect",
+   "game_sound",
+   "get_coma",
+   "get_front_char",
+   "get_myid",
+   "get_state",
+   "get_state1",
+   "if",
+   "item_del",
+   "set",
+   "set_coma",
+   "set_mana",
+   "set_state1",
+   "set_vita"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "엑스코마디움",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "엑스코마디움"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "coma_delay",
+   "del_coma",
+   "effect",
+   "get_coma",
+   "get_myid",
+   "get_state1",
+   "if",
+   "item_del",
+   "set",
+   "set_coma",
+   "set_mana",
+   "set_state1",
+   "set_vita"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "템삭제",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "템삭제"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "input",
+   "item_del",
+   "menu",
+   "set"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "방송쿠폰",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "방송쿠폰"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "console_output",
+   "del",
+   "get_name",
+   "if",
+   "input",
+   "item_del",
+   "menu",
+   "set"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "하트초콜렛",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "하트초콜렛"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_mana",
+   "get_myid",
+   "get_vita",
+   "item_del",
+   "message",
+   "set",
+   "set_mana",
+   "set_vita"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "초급포션",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "get_basemana",
+   "get_basevita",
+   "get_body",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "if",
+   "mes",
+   "message",
+   "set",
+   "set_mana",
+   "set_vita"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "중급포션",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "get_basemana",
+   "get_basevita",
+   "get_body",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "if",
+   "mes",
+   "message",
+   "set",
+   "set_mana",
+   "set_vita"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "고급포션",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "get_basemana",
+   "get_basevita",
+   "get_body",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "if",
+   "mes",
+   "message",
+   "set",
+   "set_mana",
+   "set_vita"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "최고급포션",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "char_damaged",
+   "get_basemana",
+   "get_basevita",
+   "get_body",
+   "get_mana",
+   "get_mapname",
+   "get_myid",
+   "get_vita",
+   "if",
+   "mes",
+   "message",
+   "set",
+   "set_mana",
+   "set_vita"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "수상한버섯",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "수상한버섯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "message",
+   "set",
+   "set_vital"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "승급수상한버섯",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "승급수상한버섯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "message",
+   "set",
+   "set_vital"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "뮤레칸의눈물",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "뮤레칸의눈물"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "message",
+   "set",
+   "set_manal"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "선물상자",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 27,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "선물상자",
+    "어설픈생명의목걸이",
+    "어설픈생명의벨트",
+    "어설픈암흑의목걸이",
+    "어설픈암흑의벨트"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "exp_add",
+   "get_eg",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "money_add",
+   "rand",
+   "set",
+   "set_eg"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "리치의심장",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 72,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "리치의심장",
+    "리치의피",
+    "썩은리치의피",
+    "오십만골드",
+    "풀억경"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "exp_add",
+   "get_body",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "message",
+   "money_add",
+   "rand",
+   "set"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "십만골드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_body",
+   "if",
+   "message",
+   "money_add"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "오십만골드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_body",
+   "if",
+   "message",
+   "money_add"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "5백만골드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "5백만골드"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "item_del",
+   "message",
+   "money_add"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "3백만골드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "3백만골드"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "item_del",
+   "message",
+   "money_add"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "6천만골드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "6천만골드"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "item_del",
+   "message",
+   "money_add"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "3천만골드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "3천만골드"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "item_del",
+   "message",
+   "money_add"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "길드의가호",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "길드의가호"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "exp_per",
+   "get_myid",
+   "item_del",
+   "message",
+   "set"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "타이틀달기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 18,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "칭호의인장"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_myid",
+   "get_name",
+   "if",
+   "input",
+   "item_del",
+   "mes",
+   "set",
+   "set_guild_title",
+   "set_jj"
+  ],
+  "출처": "script/아이템/아이템.txt"
+ },
+ {
+  "이름": "연갈색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "연갈색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "흰색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "흰색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "분홍색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "분홍색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "연두색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "연두색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "진한노랑색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "진한노랑색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "레몬색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "레몬색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "블루블랙염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "블루블랙염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "연하늘색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "연하늘색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "연보라색염색약",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "연보라색염색약"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "item_del",
+   "set",
+   "set_haircolor"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "염색략",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "shop"
+  ],
+  "출처": "script/아이템/염색약.txt"
+ },
+ {
+  "이름": "500EG",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "500EG"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_body",
+   "get_eg",
+   "if",
+   "item_del",
+   "mes",
+   "set",
+   "set_eg"
+  ],
+  "출처": "script/아이템/캐쉬.txt"
+ },
+ {
+  "이름": "1000EG",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "1000EG"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_body",
+   "get_eg",
+   "if",
+   "item_del",
+   "mes",
+   "set",
+   "set_eg"
+  ],
+  "출처": "script/아이템/캐쉬.txt"
+ },
+ {
+  "이름": "3000EG",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "3000EG"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_body",
+   "get_eg",
+   "if",
+   "item_del",
+   "mes",
+   "set",
+   "set_eg"
+  ],
+  "출처": "script/아이템/캐쉬.txt"
+ },
+ {
+  "이름": "5000EG",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "5000EG"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_body",
+   "get_eg",
+   "if",
+   "item_del",
+   "mes",
+   "set",
+   "set_eg"
+  ],
+  "출처": "script/아이템/캐쉬.txt"
+ },
+ {
+  "이름": "10000EG",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "10000EG"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_body",
+   "get_eg",
+   "if",
+   "item_del",
+   "mes",
+   "set",
+   "set_eg"
+  ],
+  "출처": "script/아이템/캐쉬.txt"
+ },
+ {
+  "이름": "성별전환스크롤",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 515,
+  "부름": {
+   "맵": [
+    "용자의공원"
+   ],
+   "아이템": [
+    "HP캅셀",
+    "MP캅셀",
+    "간지의가호",
+    "강화된리젠트다이아귀걸이",
+    "강화의장갑",
+    "그레이조각",
+    "대지의엠버",
+    "돈파",
+    "드래곤무기교환권",
+    "드래곤스태프",
+    "드래곤슬레이어",
+    "리젠트다이아귀걸이",
+    "리치의가호",
+    "리턴스크롤",
+    "바다의엠버",
+    "바람의엠버",
+    "비파",
+    "생명의목걸이",
+    "생명의벨트",
+    "생명의시약",
+    "성별전환스크롤",
+    "아기별의눈물",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "암흑의시약",
+    "어둠의결정",
+    "영월궁",
+    "영월도",
+    "영월무기교환권",
+    "영월충",
+    "원격체마사기",
+    "전직의책",
+    "택배서비스",
+    "팜팻전용풀",
+    "화염의엠버"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "damaged",
+   "del",
+   "effect",
+   "exp_del",
+   "exp_per",
+   "for",
+   "game_sound",
+   "get_ac",
+   "get_baseexp",
+   "get_basemana",
+   "get_basevita",
+   "get_body",
+   "get_class",
+   "get_eg",
+   "get_mapname",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "get_user",
+   "get_wearitem_glove1",
+   "get_wearitem_glove2",
+   "get_xs",
+   "get_ys",
+   "hprecovery",
+   "if",
+   "input",
+   "istype",
+   "item_add",
+   "item_add1",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "message",
+   "message1",
+   "money_add",
+   "rand",
+   "set",
+   "set_ability",
+   "set_basemana",
+   "set_basevita",
+   "set_body",
+   "set_class",
+   "set_con",
+   "set_dex",
+   "set_int",
+   "set_level",
+   "set_sex",
+   "set_str",
+   "set_wis",
+   "sleep",
+   "warp",
+   "while"
+  ],
+  "출처": "script/아이템/캐시템.txt"
+ },
+ {
+  "이름": "텔깃",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 64,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "get_front_block",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_name",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "message",
+   "set",
+   "set_xs",
+   "set_ys"
+  ],
+  "출처": "script/아이템/텔깃.txt"
+ },
+ {
+  "이름": "(초보)텔깃",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "초보텔레포트깃털"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "effect",
+   "for",
+   "get_front_block",
+   "get_front_char",
+   "get_map_pk",
+   "get_mapname",
+   "get_myid",
+   "get_side",
+   "get_xs",
+   "get_ys",
+   "if",
+   "item_del",
+   "mes",
+   "message",
+   "set",
+   "set_xs",
+   "set_ys"
+  ],
+  "출처": "script/아이템/텔깃.txt"
+ },
+ {
+  "이름": "이벤트입장",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [
+    "OX퀴즈장",
+    "축구장야배"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/운영자/운영자.txt"
+ },
+ {
+  "이름": "서버메뉴관리",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 278,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": [
+    "경험치이벤트",
+    "어빌이벤트"
+   ]
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "disconnect",
+   "effect",
+   "get_mapname",
+   "get_mapname1",
+   "get_mobxy",
+   "get_myid",
+   "get_name",
+   "get_side",
+   "get_user",
+   "get_xs",
+   "get_xs1",
+   "get_ys",
+   "get_ys1",
+   "if",
+   "input",
+   "item_add",
+   "item_add1",
+   "item_del",
+   "item_del1",
+   "menu",
+   "mes",
+   "message",
+   "message1",
+   "mob_spawn",
+   "motion",
+   "set",
+   "set_basemana",
+   "set_basevita",
+   "set_class",
+   "set_guild_title",
+   "set_level",
+   "set_user_title",
+   "skill_add",
+   "skill_del",
+   "spell_add",
+   "spell_del",
+   "warp3"
+  ],
+  "출처": "script/운영자/운영자.txt"
+ },
+ {
+  "이름": "WORLD_노비스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [
+    "노비스마을"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_level",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_용자의공원",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 4,
+  "부름": {
+   "맵": [
+    "용자의공원"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_포테의숲",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [
+    "포테의숲대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_level",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_포테의숲입장",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [
+    "포테의 숲1존"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_level",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_아벨해안",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [
+    "아벨해안대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_level",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_뤼케해안",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [
+    "뤼케시온해안대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_level",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_스킬사범",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [
+    "격수사범의집",
+    "비격수사범의집"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_밀레스신전",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [
+    "밀레스신전"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_level",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_아이스월드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 16,
+  "부름": {
+   "맵": [
+    "아이스월드"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_level",
+   "get_mapxs",
+   "get_mapys",
+   "get_money",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set",
+   "sleep",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_죽음의마을",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [
+    "죽음의마을입구"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_level",
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_개인사냥터",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [
+    "개인사냥터대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_승급자의공간",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [
+    "승급자의공간"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class_sub",
+   "get_level",
+   "get_money",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_혼돈의탑",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 121,
+  "부름": {
+   "맵": [
+    "혼돈의탑대기실"
+   ],
+   "아이템": [
+    "혼돈의열쇠1",
+    "혼돈의열쇠2",
+    "혼돈의탑입장티켓",
+    "흑요석로그각반",
+    "흑요석로그귀걸이",
+    "흑요석로그목걸이",
+    "흑요석로그반지",
+    "흑요석로그벨트",
+    "흑요석로그장갑",
+    "흑요석몽크각반",
+    "흑요석몽크귀걸이",
+    "흑요석몽크목걸이",
+    "흑요석몽크반지",
+    "흑요석몽크벨트",
+    "흑요석몽크팔찌",
+    "흑요석소서러각반",
+    "흑요석소서러귀걸이",
+    "흑요석소서러목걸이",
+    "흑요석소서러반지",
+    "흑요석소서러벨트",
+    "흑요석소서러장갑",
+    "흑요석워리어각반",
+    "흑요석워리어귀걸이",
+    "흑요석워리어목걸이",
+    "흑요석워리어반지",
+    "흑요석워리어벨트",
+    "흑요석워리어장갑",
+    "흑요석프리스트각반",
+    "흑요석프리스트귀걸이",
+    "흑요석프리스트목걸이",
+    "흑요석프리스트반지",
+    "흑요석프리스트벨트",
+    "흑요석프리스트장갑"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "exp_add",
+   "get_class",
+   "get_eg",
+   "get_level",
+   "get_money",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_add",
+   "money_del",
+   "rand",
+   "set",
+   "set_eg",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_개인사냥터2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [
+    "승개인사냥터대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_결계사냥터",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 9,
+  "부름": {
+   "맵": [
+    "결계대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_class_sub",
+   "get_money",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_엘리멘탈잉잉",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [
+    "엘리멘탈대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_money",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_엘리멘탈",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "group_warp",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "npc_spawn",
+   "set"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_브론즈굴",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [
+    "브론즈오피온의굴 7층",
+    "블루오피온의굴 7층"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_class_sub",
+   "get_money",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_길드성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [
+    "리치성1층홀"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "WORLD_제조의신전",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [
+    "제조의신전"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/월드맵.txt"
+ },
+ {
+  "이름": "리콜입니다",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [
+    "노비스마을",
+    "용자의공원"
+   ],
+   "아이템": [
+    "리콜"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_level",
+   "get_map_somer",
+   "get_mapname",
+   "get_myid",
+   "if",
+   "item_del",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "월드맵가자",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 7,
+  "부름": {
+   "맵": [
+    "승월드맵",
+    "시장",
+    "월드맵"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class_sub",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "월드맵바로이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [
+    "승월드맵",
+    "시장",
+    "월드맵"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class_sub",
+   "get_money",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "호러캐슬",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 27,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "group_exist",
+   "group_warp",
+   "if",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "message",
+   "set"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "호러캐슬대기실1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 54,
+  "부름": {
+   "맵": [
+    "호러캐슬대기실"
+   ],
+   "아이템": [],
+   "괴물": [
+    "바클라시우스",
+    "바탈리우스",
+    "슈크래시우스",
+    "타클라시우스",
+    "헤라시우스",
+    "헤브렐리우스"
+   ]
+  },
+  "부르는이름": [
+   "del",
+   "for",
+   "get_mapname",
+   "get_mapxs",
+   "get_mapys",
+   "get_myid",
+   "group_exist",
+   "group_warp",
+   "if",
+   "map_objmob",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "호러캐슬담방",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 38,
+  "부름": {
+   "맵": [
+    "호러캐슬대기실"
+   ],
+   "아이템": [],
+   "괴물": [
+    "바클라시우스",
+    "바탈리우스",
+    "슈크래시우스",
+    "타클라시우스",
+    "헤라시우스",
+    "헤브렐리우스"
+   ]
+  },
+  "부르는이름": [
+   "del",
+   "for",
+   "get_mapname",
+   "get_mapxs",
+   "get_mapys",
+   "get_myid",
+   "group_exist",
+   "group_warp",
+   "if",
+   "map_objmob",
+   "map_user_exist",
+   "menu",
+   "message",
+   "mob_spawn",
+   "rand",
+   "set",
+   "sleep",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "ed호러캐슬",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [
+    "호러캐슬대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_class_sub",
+   "get_level",
+   "get_money",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "개인사냥터",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 37,
+  "부름": {
+   "맵": [
+    "3서클개인사냥터1",
+    "3서클개인사냥터2",
+    "3서클개인사냥터3",
+    "3서클개인사냥터4",
+    "3서클개인사냥터5",
+    "4서클개인사냥터1",
+    "4서클개인사냥터2",
+    "4서클개인사냥터3",
+    "4서클개인사냥터4",
+    "4서클개인사냥터5",
+    "지존개인사냥터1",
+    "지존개인사냥터2",
+    "지존개인사냥터3",
+    "지존개인사냥터4",
+    "지존개인사냥터5"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class_sub",
+   "get_level",
+   "get_myid",
+   "if",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "개인사냥터2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [
+    "승급개인사냥터1",
+    "승급개인사냥터2",
+    "승급개인사냥터3"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_class_sub",
+   "get_myid",
+   "if",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "유린",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_money",
+   "get_myid",
+   "group_warp",
+   "if",
+   "menu",
+   "mes",
+   "money_del",
+   "set"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "결계이동도우미",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_myid",
+   "get_name",
+   "group_warp",
+   "if",
+   "menu",
+   "mes",
+   "npc_spawn",
+   "set",
+   "sleep"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "결계대기실이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [
+    "결계대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "엘멘대기실이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [
+    "엘리멘탈대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "뮤레칸역습이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [
+    "뮤레칸의역습::아벨"
+   ],
+   "아이템": [
+    "뮤레칸입장티켓"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_basemana",
+   "get_basevita",
+   "get_myid",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "결계2이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [
+    "결계2대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_myid",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "결계2이동도우미",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 11,
+  "부름": {
+   "맵": [
+    "결계2-1",
+    "결계2-2",
+    "결계2-3",
+    "결계2-4",
+    "결계2-5",
+    "결계2-6"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "결계2대기실이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [
+    "결계2대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "menu",
+   "set",
+   "warp"
+  ],
+  "출처": "script/이동npc.txt"
+ },
+ {
+  "이름": "천상의이아",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [
+    "노비스마을",
+    "용자의공원"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_class_sub",
+   "get_level",
+   "if",
+   "mes",
+   "warp"
+  ],
+  "출처": "script/이아의천상계.txt"
+ },
+ {
+  "이름": "노비스설명",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_myid",
+   "if",
+   "mes",
+   "set"
+  ],
+  "출처": "script/자동/노비스마을.txt"
+ },
+ {
+  "이름": "노비스설명2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "mes",
+   "set"
+  ],
+  "출처": "script/자동/노비스마을.txt"
+ },
+ {
+  "이름": "노비스설명3",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "mes",
+   "set"
+  ],
+  "출처": "script/자동/노비스마을.txt"
+ },
+ {
+  "이름": "노비스설명4",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "mes",
+   "set"
+  ],
+  "출처": "script/자동/노비스마을.txt"
+ },
+ {
+  "이름": "못지나가",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [
+    "박물관1층1",
+    "박물관1층2"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_class_sub",
+   "get_level",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/자동/못지나가.txt"
+ },
+ {
+  "이름": "채집",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 34,
+  "부름": {
+   "맵": [
+    "용자의공원"
+   ],
+   "아이템": [
+    "개미",
+    "곤충똥",
+    "나비",
+    "벌",
+    "설탕",
+    "어설픈생명의목걸이",
+    "어설픈생명의벨트",
+    "어설픈암흑의목걸이",
+    "어설픈암흑의벨트",
+    "장수풍뎅이",
+    "황금개미"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "game_sound",
+   "get_myid",
+   "get_wearitem_weapon",
+   "if",
+   "item_add",
+   "item_del",
+   "mes",
+   "message",
+   "money_add",
+   "motion",
+   "pc_itemcheck",
+   "rand",
+   "set",
+   "sleep",
+   "warp"
+  ],
+  "출처": "script/자동/채집.txt"
+ },
+ {
+  "이름": "채집곤충",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 46,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "개미",
+    "곤충똥",
+    "나비",
+    "벌",
+    "장수풍뎅이",
+    "황금개미"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "input",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_add",
+   "set"
+  ],
+  "출처": "script/자동/채집.txt"
+ },
+ {
+  "이름": "채집재료판매",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/자동/채집.txt"
+ },
+ {
+  "이름": "채집장이동",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 208,
+  "부름": {
+   "맵": [
+    "설탕채집장"
+   ],
+   "아이템": [
+    "다이아몬드",
+    "막대사탕",
+    "빼빼로",
+    "뿅망치",
+    "생명의목걸이",
+    "생명의벨트",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "어설픈다이아몬드뭉치",
+    "어설픈막대사탕",
+    "어설픈빼빼로",
+    "어설픈뿅망치",
+    "어설픈생명의목걸이",
+    "어설픈생명의벨트",
+    "어설픈암흑의목걸이",
+    "어설픈암흑의벨트",
+    "어설픈이벤트귀걸이",
+    "어설픈주작의목걸이",
+    "어설픈주작의반지",
+    "이벤트귀걸이",
+    "주작의목걸이",
+    "주작의반지"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "legend_add",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/자동/채집.txt"
+ },
+ {
+  "이름": "로열함정",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [
+    "리치의신전대기실"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "message",
+   "warp"
+  ],
+  "출처": "script/자동/함정.txt"
+ },
+ {
+  "이름": "메이런허브",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 8,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "메이런허브잎"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "effect",
+   "get_herb",
+   "get_myid",
+   "get_wearitem_weapon",
+   "if",
+   "item_add",
+   "message",
+   "rand",
+   "set"
+  ],
+  "출처": "script/전문기술/전문기술광물.txt"
+ },
+ {
+  "이름": "미량",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 388,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "가릉비가1",
+    "가릉비가2",
+    "데메테르1",
+    "데메테르2",
+    "라멜1",
+    "라멜2",
+    "라피스라즐리1",
+    "라피스라즐리2",
+    "레오파드1",
+    "레오파드2",
+    "레일라1",
+    "레일라2",
+    "루크1",
+    "루크2",
+    "마르두크1",
+    "마르두크2",
+    "마아트1",
+    "마아트2",
+    "살렛1",
+    "살렛2",
+    "생명의목걸이",
+    "생명의벨트",
+    "세르네티1",
+    "세르네티2",
+    "솔라레스1",
+    "솔라레스2",
+    "아가트1",
+    "아가트2",
+    "아레스1",
+    "아레스2",
+    "아비스1",
+    "아비스2",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "위타천1",
+    "위타천2",
+    "큐이레스1",
+    "큐이레스2",
+    "투신의머리띠1",
+    "투신의머리띠2",
+    "헬름1",
+    "헬름2",
+    "화영잠1",
+    "화영잠2"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "pc_itemcheck",
+   "set"
+  ],
+  "출처": "script/제조/ammor.txt"
+ },
+ {
+  "이름": "리젠제작[길드]",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 596,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "강화된리젠트다이아귀걸이",
+    "고렘의돌조각",
+    "괴물방패",
+    "날개방패",
+    "뉴트의뿔",
+    "뉴트의혀",
+    "다이아몬드",
+    "데스나이트의방패",
+    "돈파",
+    "라이언방패",
+    "레드오피온의등껍질",
+    "레드오피온의비늘",
+    "레드오피온의수염",
+    "레드플라밋의방패",
+    "리젠트다이아귀걸이",
+    "브론즈오피온의등껍질",
+    "브론즈오피온의수염",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "비파",
+    "생명의목걸이",
+    "생명의벨트",
+    "생명의시약",
+    "스컬나이트방패",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "암흑의시약",
+    "여의주",
+    "연방패",
+    "영월궁",
+    "영월도",
+    "영월충",
+    "적룡플라밋의방패",
+    "포보스방패",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/길드제조.txt"
+ },
+ {
+  "이름": "다크세트제작",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 150,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "그레이조각",
+    "다크그레이각반",
+    "다크그레이건틀릿",
+    "다크그레이네클리스",
+    "다크그레이링",
+    "다크그레이벨트",
+    "다크그레이이어링",
+    "대지의엠버",
+    "바다의엠버",
+    "바람의엠버",
+    "어둠의결정",
+    "화염의엠버"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/다크.txt"
+ },
+ {
+  "이름": "로열",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 239,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "다이아몬드",
+    "별의눈물",
+    "생명의구슬",
+    "썩은로열복(남도가)",
+    "썩은로열복(남도적)",
+    "썩은로열복(남법사)",
+    "썩은로열복(남전사)",
+    "썩은로열복(남직자)",
+    "썩은로열복(여도가)",
+    "썩은로열복(여도적)",
+    "썩은로열복(여법사)",
+    "썩은로열복(여전사)",
+    "썩은로열복(여직자)",
+    "썩은리치의피",
+    "여의주"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/제조/로열.txt"
+ },
+ {
+  "이름": "로열2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 219,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "금",
+    "로열가드복(남도가)",
+    "로열가드복(남도적)",
+    "로열가드복(남법사)",
+    "로열가드복(남전사)",
+    "로열가드복(남직자)",
+    "로열가드복(여도가)",
+    "로열가드복(여도적)",
+    "로열가드복(여법사)",
+    "로열가드복(여전사)",
+    "로열가드복(여직자)",
+    "리치의피",
+    "철"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/제조/로열2.txt"
+ },
+ {
+  "이름": "리젠제작",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 82,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "강화된리젠트다이아귀걸이",
+    "뉴트의뿔",
+    "레드오피온의비늘",
+    "리젠트다이아귀걸이",
+    "생명의시약",
+    "암흑의시약",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/리젠제작.txt"
+ },
+ {
+  "이름": "블랙셋",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 236,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "대지의엠버",
+    "레인헌트아머",
+    "레인헌트투구",
+    "바다의엠버",
+    "바람의엠버",
+    "브레스럭아머",
+    "브레스럭투구",
+    "브릴윙아머",
+    "브릴윙투구",
+    "월화이어아머",
+    "월화이어투구",
+    "페이로브아머",
+    "페이로브투구",
+    "화염의엠버",
+    "흑비류선의",
+    "흑비류선후",
+    "흑비현진건",
+    "흑비현진의",
+    "흑비화무갑주",
+    "흑비화무투구",
+    "흑비화후관",
+    "흑비화후의",
+    "흑태극의",
+    "흑태극현"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/블랙.txt"
+ },
+ {
+  "이름": "목걸이합성",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 93,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "생명의목걸이",
+    "생명의벨트",
+    "생명의시약",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "암흑의시약",
+    "폭풍의목걸이(생)",
+    "폭풍의목걸이(암)",
+    "폭풍의벨트(생)",
+    "폭풍의벨트(암)"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_money",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_del",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/생셋암셋업.txt"
+ },
+ {
+  "이름": "적흑갑",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 445,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "가릉비가1",
+    "가릉비가2",
+    "데메테르1",
+    "데메테르2",
+    "라멜1",
+    "라멜2",
+    "라피스라즐리1",
+    "라피스라즐리2",
+    "레오파드1",
+    "레오파드2",
+    "레일라1",
+    "레일라2",
+    "루크2",
+    "마르두크2",
+    "마아트1",
+    "마아트2",
+    "살렛2",
+    "생명의목걸이",
+    "생명의벨트",
+    "샬렛1",
+    "세르네티1",
+    "세르네티2",
+    "솔라레스1",
+    "솔라레스2",
+    "아가트1",
+    "아가트2",
+    "아레스1",
+    "아레스2",
+    "아비스1",
+    "아비스2",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "위타천1",
+    "위타천2",
+    "적비류선의",
+    "적비류선후",
+    "적비현진건",
+    "적비현진의",
+    "적비화무갑주",
+    "적비화무투구",
+    "적비화후관",
+    "적비화후의",
+    "적태극의",
+    "적태극현",
+    "큐이레스1",
+    "큐이레스2",
+    "투신의머리띠1",
+    "투신의머리띠2",
+    "헬름1",
+    "헬름2",
+    "화영잠1",
+    "화영잠2",
+    "흑비류선의",
+    "흑비류선후",
+    "흑비현진건",
+    "흑비현진의",
+    "흑비화무갑주",
+    "흑비화무투구",
+    "흑비화후관",
+    "흑비화후의",
+    "흑태극의",
+    "흑태극현"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "pc_itemcheck",
+   "set"
+  ],
+  "출처": "script/제조/적갑흑갑.txt"
+ },
+ {
+  "이름": "제조2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 271,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "뉴트의뿔",
+    "뉴트의혀",
+    "돈파",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "브론즈오피온의등껍질",
+    "브론즈오피온의수염",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "비파",
+    "생명의목걸이",
+    "생명의벨트",
+    "생명의시약",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "암흑의시약",
+    "여의주",
+    "영월궁",
+    "영월도",
+    "영월충",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/제조2.txt"
+ },
+ {
+  "이름": "제조3",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 228,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고렘의돌조각",
+    "괴물방패",
+    "날개방패",
+    "뉴트의뿔",
+    "뉴트의혀",
+    "다이아몬드",
+    "데스나이트의방패",
+    "라이언방패",
+    "레드오피온의비늘",
+    "레드플라밋의방패",
+    "생명의시약",
+    "스컬나이트방패",
+    "암흑의시약",
+    "여의주",
+    "연방패",
+    "적룡플라밋의방패",
+    "포보스방패",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/제조3.txt"
+ },
+ {
+  "이름": "제조4",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 86,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고무장갑",
+    "레드오피온의등껍질",
+    "마법의돌",
+    "마타룸장갑",
+    "매직리스트",
+    "베가리스트",
+    "베네티가죽클립",
+    "별의눈물",
+    "여의주",
+    "용각반",
+    "쥬얼리스트",
+    "테네즈의각반",
+    "파워리스트",
+    "힘의돌"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/제조/제조4.txt"
+ },
+ {
+  "이름": "제조의책",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 241,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "나겔링스타",
+    "뉴트의뿔",
+    "뉴트의혀",
+    "다이아몬드",
+    "다크젬",
+    "달의기운",
+    "돈파",
+    "돈파+2",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "무기의봉인키",
+    "브론즈오피온의등껍질",
+    "브론즈오피온의수염",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "비파",
+    "비파+2",
+    "생명의목걸이",
+    "생명의벨트",
+    "생명의시약",
+    "서큐버스의머리칼",
+    "암흑의목걸이",
+    "암흑의벨트",
+    "암흑의시약",
+    "여의주",
+    "영월궁",
+    "영월궁+2",
+    "영월도",
+    "영월도+2",
+    "영월충",
+    "영월충+2",
+    "홀리팬플롯"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "item_one_check",
+   "menu",
+   "mes",
+   "rand",
+   "set"
+  ],
+  "출처": "script/제조/제조의책.txt"
+ },
+ {
+  "이름": "제조하자",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 168,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고렘의돌조각",
+    "다이아몬드",
+    "대지의엠버",
+    "레드오피온의등껍질",
+    "레드오피온의수염",
+    "리치의황금열쇠",
+    "바다의엠버",
+    "바람의엠버",
+    "브레이스글러브",
+    "브론즈오피온의등껍질",
+    "브론즈오피온의수염",
+    "블루오피온의등껍질",
+    "블루오피온의수염",
+    "생명의구슬",
+    "생명의시약",
+    "신월도",
+    "암흑의시약",
+    "여의주",
+    "피4",
+    "헬나이트아머",
+    "헬나이트투구",
+    "헬몽크아머",
+    "헬소서러로브",
+    "헬소서러후드",
+    "헬소서리스로브",
+    "헬씨프아머",
+    "헬씨프투구",
+    "헬클레릭로브",
+    "헬클레릭후드",
+    "헬프리스트로브",
+    "화염의엠버"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/제조/제조하자.txt"
+ },
+ {
+  "이름": "EG",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 125,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_eg",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "menu",
+   "mes",
+   "message",
+   "set"
+  ],
+  "출처": "script/캐시샵.txt"
+ },
+ {
+  "이름": "필립",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 62,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고대좀비의심장",
+    "리치의가호",
+    "멜로더의정수",
+    "빼빼로",
+    "카디의정수",
+    "팜팻의정수"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "exp_add",
+   "get_level",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "money_add",
+   "set"
+  ],
+  "출처": "script/퀘스트/1서클.txt"
+ },
+ {
+  "이름": "무릅통증",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 23,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "별의귀걸이",
+    "엔트자이언트의몸통"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_level",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/퀘스트/1서클.txt"
+ },
+ {
+  "이름": "팔립",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 81,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "사슴의정수",
+    "울프의단검",
+    "은빛늑대의갈기털",
+    "트랜트의뿌리",
+    "팜팻의알"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "exp_add",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_add",
+   "set"
+  ],
+  "출처": "script/퀘스트/2서클.txt"
+ },
+ {
+  "이름": "펄립",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 28,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "애완용바크",
+    "애완용터틀",
+    "애완용퐁퐁이"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "del",
+   "exp_add",
+   "get_myid",
+   "get_name",
+   "if",
+   "input",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "money_add",
+   "set"
+  ],
+  "출처": "script/퀘스트/3서클.txt"
+ },
+ {
+  "이름": "칼립",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/퀘스트/3서클.txt"
+ },
+ {
+  "이름": "이아",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [
+    "기본의장",
+    "기숙사1호실"
+   ],
+   "아이템": [
+    "리치교복",
+    "목도",
+    "초보텔레포트깃털"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "del",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "legend_add",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "거지",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [
+    "직업의장"
+   ],
+   "아이템": [
+    "리치교복",
+    "목도",
+    "사과"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "exp_add",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "포기",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 14,
+  "부름": {
+   "맵": [
+    "기숙사1호실"
+   ],
+   "아이템": [
+    "리치교복",
+    "목도",
+    "사과"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "del",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "세토아신상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "mes"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "셔스신상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "mes"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "로오신상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "mes"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "이아신상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "mes"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "메투스신상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 2,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "mes"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "도사",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [
+    "수련의장"
+   ],
+   "아이템": [
+    "초보자화염의벨트"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "del",
+   "get_name",
+   "if",
+   "item_add",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "사범",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 22,
+  "부름": {
+   "맵": [
+    "근성의장"
+   ],
+   "아이템": [
+    "불씨",
+    "코마디움"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "exp_add",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "농부님하",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 18,
+  "부름": {
+   "맵": [
+    "기숙사1호실"
+   ],
+   "아이템": [
+    "벼",
+    "초보자화염의목걸이"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_myid",
+   "get_name",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "legend_add",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "앤디",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 3,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "mes"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "알프레드",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 26,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "del",
+   "get_name",
+   "if",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/퀘스트/begin.txt"
+ },
+ {
+  "이름": "멜로린1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 17,
+  "부름": {
+   "맵": [
+    "노비스마을",
+    "노비스주점"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "get_name",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/노비스마을.txt"
+ },
+ {
+  "이름": "마라메",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "팜팻의알"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "item_del",
+   "mes",
+   "money_add",
+   "pc_itemcheck"
+  ],
+  "출처": "script/퀘스트/노비스마을.txt"
+ },
+ {
+  "이름": "음식점아줌마",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 6,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "console_output",
+   "del",
+   "get_name",
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/퀘스트/노비스마을.txt"
+ },
+ {
+  "이름": "물약상인",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 5,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "menu",
+   "set",
+   "shop"
+  ],
+  "출처": "script/퀘스트/노비스마을.txt"
+ },
+ {
+  "이름": "초보자의북",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 50,
+  "부름": {
+   "맵": [
+    "노비스마을"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_class_sub",
+   "get_level",
+   "if",
+   "menu",
+   "mes",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/노비스마을.txt"
+ },
+ {
+  "이름": "알폰스",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 10,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "mes"
+  ],
+  "출처": "script/퀘스트/노비스마을.txt"
+ },
+ {
+  "이름": "업그레이더1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "1차강화석",
+    "목도+1",
+    "목도+2"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "item_add",
+   "item_del",
+   "mes",
+   "pc_itemcheck"
+  ],
+  "출처": "script/퀘스트/목도업그레이드.txt"
+ },
+ {
+  "이름": "업그레이더2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "2차강화석",
+    "목도+2",
+    "목도+3"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "item_add",
+   "item_del",
+   "mes",
+   "pc_itemcheck"
+  ],
+  "출처": "script/퀘스트/목도업그레이드.txt"
+ },
+ {
+  "이름": "업그레이더3",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 21,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "3차강화석",
+    "목도+3",
+    "목도+M"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "item_add",
+   "item_del",
+   "mes",
+   "pc_itemcheck"
+  ],
+  "출처": "script/퀘스트/목도업그레이드.txt"
+ },
+ {
+  "이름": "눈물교환",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 83,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "별각반",
+    "별귀걸이",
+    "별목걸이",
+    "별반지",
+    "별벨트",
+    "별장갑",
+    "아기별의눈물"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/퀘스트/별의눈물.txt"
+ },
+ {
+  "이름": "엘리멘탈선물줘용",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "선물상자",
+    "속성의보석"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/퀘스트/선상2.txt"
+ },
+ {
+  "이름": "선상퀘스트",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 28,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "노출증환자의비키니",
+    "선물상자",
+    "파파라치의사진집"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "item_exist",
+   "menu",
+   "mes",
+   "set"
+  ],
+  "출처": "script/퀘스트/선상퀘스트.txt"
+ },
+ {
+  "이름": "세피라링업글",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 165,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "1차마법의돌",
+    "2차마법의돌",
+    "3차마법의돌",
+    "4차마법의돌",
+    "5차마법의돌",
+    "6차마법의돌",
+    "7차마법의돌",
+    "8차마법의돌",
+    "9차마법의돌",
+    "세피라링(Lev1)",
+    "세피라링(Lev10)",
+    "세피라링(Lev2)",
+    "세피라링(Lev3)",
+    "세피라링(Lev4)",
+    "세피라링(Lev5)",
+    "세피라링(Lev6)",
+    "세피라링(Lev7)",
+    "세피라링(Lev8)",
+    "세피라링(Lev9)"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "item_add",
+   "item_del",
+   "mes",
+   "pc_itemcheck"
+  ],
+  "출처": "script/퀘스트/세피라링업글.txt"
+ },
+ {
+  "이름": "용병가입",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 72,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "A등급용병",
+    "B등급용병",
+    "C등급용병",
+    "S등급용병"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_basemana",
+   "get_basevita",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "pc_itemcheck",
+   "set"
+  ],
+  "출처": "script/퀘스트/용병.txt"
+ },
+ {
+  "이름": "용병퀘스트",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 42,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "고대의조각",
+    "도둑의물품"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "get_ac",
+   "get_basemana",
+   "get_basevita",
+   "get_myid",
+   "if",
+   "item_del",
+   "menu",
+   "mes",
+   "money_add",
+   "pc_itemcheck",
+   "set"
+  ],
+  "출처": "script/퀘스트/용병.txt"
+ },
+ {
+  "이름": "죽음의마을던전",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 30,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": [
+    "도깨비불",
+    "블랙캣"
+   ]
+  },
+  "부르는이름": [
+   "del",
+   "for",
+   "get_basemana",
+   "get_basevita",
+   "get_class_sub",
+   "get_level",
+   "get_mapxs",
+   "get_mapys",
+   "get_myid",
+   "group_exist",
+   "group_warp",
+   "if",
+   "map_objmob",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "rand",
+   "set"
+  ],
+  "출처": "script/퀘스트/죽음의마을던전.txt"
+ },
+ {
+  "이름": "죽음의마을던전다음",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 33,
+  "부름": {
+   "맵": [
+    "죽음의마을입구"
+   ],
+   "아이템": [],
+   "괴물": [
+    "도깨비불",
+    "블랙캣"
+   ]
+  },
+  "부르는이름": [
+   "for",
+   "get_mapname",
+   "get_mapxs",
+   "get_mapys",
+   "group_exist",
+   "group_warp",
+   "if",
+   "map_objmob",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/죽음의마을던전.txt"
+ },
+ {
+  "이름": "죽음의마을보상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 15,
+  "부름": {
+   "맵": [
+    "죽음의마을입구"
+   ],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "exp_add",
+   "if",
+   "menu",
+   "mes",
+   "money_add",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/죽음의마을던전.txt"
+ },
+ {
+  "이름": "팬던트1",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 12,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "세피라링(Lev1)",
+    "킹아크퍼스의팬던트"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "if",
+   "item_add",
+   "item_del",
+   "mes",
+   "pc_itemcheck"
+  ],
+  "출처": "script/퀘스트/팬던트.txt"
+ },
+ {
+  "이름": "팬던트2",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 215,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "브레이스글러브",
+    "아수라",
+    "에리얼의팬던트",
+    "피4",
+    "헬나이트아머",
+    "헬나이트투구",
+    "헬몽크아머",
+    "헬소서러로브",
+    "헬소서러후드",
+    "헬소서리스로브",
+    "헬씨프아머",
+    "헬씨프투구",
+    "헬클레릭로브",
+    "헬클레릭후드",
+    "헬프리스트로브"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "pc_itemcheck",
+   "set"
+  ],
+  "출처": "script/퀘스트/팬던트.txt"
+ },
+ {
+  "이름": "타이틀",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 13,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "get_money",
+   "get_name",
+   "if",
+   "input",
+   "mes",
+   "money_del",
+   "set_guild_title"
+  ],
+  "출처": "script/퀘스트/팬던트.txt"
+ },
+ {
+  "이름": "혼돈의탑보상",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 20,
+  "부름": {
+   "맵": [
+    "용자의공원"
+   ],
+   "아이템": [
+    "풀억경"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "get_eg",
+   "get_myid",
+   "if",
+   "item_add",
+   "menu",
+   "mes",
+   "money_add",
+   "set",
+   "set_eg",
+   "warp"
+  ],
+  "출처": "script/퀘스트/혼돈의탑.txt"
+ },
+ {
+  "이름": "혼탑안내npc",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 108,
+  "부름": {
+   "맵": [],
+   "아이템": [
+    "혼돈의열쇠1",
+    "혼돈의열쇠2",
+    "흑요석로그각반",
+    "흑요석로그귀걸이",
+    "흑요석로그목걸이",
+    "흑요석로그반지",
+    "흑요석로그벨트",
+    "흑요석로그장갑",
+    "흑요석몽크각반",
+    "흑요석몽크귀걸이",
+    "흑요석몽크목걸이",
+    "흑요석몽크반지",
+    "흑요석몽크벨트",
+    "흑요석몽크팔찌",
+    "흑요석소서러각반",
+    "흑요석소서러귀걸이",
+    "흑요석소서러목걸이",
+    "흑요석소서러반지",
+    "흑요석소서러벨트",
+    "흑요석소서러장갑",
+    "흑요석워리어각반",
+    "흑요석워리어귀걸이",
+    "흑요석워리어목걸이",
+    "흑요석워리어반지",
+    "흑요석워리어벨트",
+    "흑요석워리어장갑",
+    "흑요석프리스트각반",
+    "흑요석프리스트귀걸이",
+    "흑요석프리스트목걸이",
+    "흑요석프리스트반지",
+    "흑요석프리스트벨트",
+    "흑요석프리스트장갑"
+   ],
+   "괴물": []
+  },
+  "부르는이름": [
+   "del",
+   "exp_add",
+   "get_class",
+   "get_eg",
+   "get_myid",
+   "if",
+   "item_add",
+   "item_del",
+   "menu",
+   "mes",
+   "money_add",
+   "set",
+   "set_eg"
+  ],
+  "출처": "script/퀘스트/혼돈의탑.txt"
+ },
+ {
+  "이름": "혼돈의탑함정",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 19,
+  "부름": {
+   "맵": [],
+   "아이템": [],
+   "괴물": []
+  },
+  "부르는이름": [
+   "coma_delay",
+   "del",
+   "get_myid",
+   "if",
+   "message",
+   "mobnar_delay",
+   "mobsor_delay",
+   "rand",
+   "set",
+   "set_coma",
+   "set_state1",
+   "set_vital"
+  ],
+  "출처": "script/퀘스트/혼돈의탑.txt"
+ },
+ {
+  "이름": "혼돈의탑입장",
+  "머리말": "0,0,0,0,0,0,0",
+  "줄수": 661,
+  "부름": {
+   "맵": [
+    "용자의공원"
+   ],
+   "아이템": [
+    "혼돈의다이아몬드",
+    "혼돈의열쇠1",
+    "혼돈의열쇠2"
+   ],
+   "괴물": [
+    "혼돈의폰"
+   ]
+  },
+  "부르는이름": [
+   "broadcast",
+   "del",
+   "for",
+   "get_mapname",
+   "get_mapxs",
+   "get_mapys",
+   "get_myid",
+   "get_name",
+   "group_bighp",
+   "group_class_sub",
+   "group_count",
+   "group_exist",
+   "group_job",
+   "group_message",
+   "group_val",
+   "group_warp",
+   "if",
+   "item_del",
+   "item_exist",
+   "map_objmob",
+   "map_objmob2",
+   "map_user_exist",
+   "menu",
+   "mes",
+   "message",
+   "mob_spawn",
+   "mob_spawn2",
+   "output",
+   "rand",
+   "set",
+   "warp"
+  ],
+  "출처": "script/퀘스트/혼돈의탑.txt"
+ }
+]

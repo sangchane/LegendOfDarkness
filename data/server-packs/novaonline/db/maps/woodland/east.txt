@@ -1,0 +1,215 @@
+{
+번호	600
+이름	동의우드랜드입구
+너비	25
+높이	25
+CRC	40727
+맵파일	db/maps/woodland/maps/lod600.map
+}
+
+{
+번호	623
+이름	동의우드랜드 1-1
+너비	100
+높이	100
+CRC	38824
+맵파일	db/maps/woodland/maps/lod623.map
+}
+
+{
+번호	622
+이름	동의우드랜드 2-1
+너비	100
+높이	100
+CRC	44100
+맵파일	db/maps/woodland/maps/lod622.map
+}
+
+{
+번호	601
+이름	동의우드랜드 3-1
+너비	100
+높이	100
+CRC	57882
+맵파일	db/maps/woodland/maps/lod601.map
+}
+
+{
+번호	602
+이름	동의우드랜드 4-1
+너비	100
+높이	100
+CRC	65080
+맵파일	db/maps/woodland/maps/lod602.map
+}
+
+{
+번호	603
+이름	동의우드랜드 5-1
+너비	100
+높이	100
+CRC	18443
+맵파일	db/maps/woodland/maps/lod603.map
+}
+
+{
+번호	604
+이름	동의우드랜드 6-1
+너비	50
+높이	50
+CRC	23248
+맵파일	db/maps/woodland/maps/lod604.map
+}
+
+{
+번호	605
+이름	동의우드랜드 7-1
+너비	50
+높이	50
+CRC	64320
+맵파일	db/maps/woodland/maps/lod605.map
+}
+
+{
+번호	606
+이름	동의우드랜드 8-1
+너비	50
+높이	50
+CRC	2211
+맵파일	db/maps/woodland/maps/lod606.map
+}
+
+{
+번호	607
+이름	동의우드랜드 9-1
+너비	50
+높이	50
+CRC	42506
+맵파일	db/maps/woodland/maps/lod607.map
+}
+
+{
+번호	608
+이름	동의우드랜드 9-2
+너비	50
+높이	50
+CRC	64539
+맵파일	db/maps/woodland/maps/lod608.map
+}
+
+{
+번호	609
+이름	동의우드랜드 10-1
+너비	50
+높이	50
+CRC	51701
+맵파일	db/maps/woodland/maps/lod609.map
+}
+
+{
+번호	610
+이름	동의우드랜드 11-1
+너비	50
+높이	50
+CRC	7404
+맵파일	db/maps/woodland/maps/lod610.map
+}
+
+{
+번호	611
+이름	동의우드랜드 12-1
+너비	50
+높이	50
+CRC	5824
+맵파일	db/maps/woodland/maps/lod611.map
+}
+
+{
+번호	612
+이름	동의우드랜드 13-1
+너비	50
+높이	50
+CRC	30731
+맵파일	db/maps/woodland/maps/lod612.map
+}
+
+{
+번호	613
+이름	동의우드랜드 14-1
+너비	50
+높이	50
+CRC	65110
+맵파일	db/maps/woodland/maps/lod613.map
+}
+
+{
+번호	614
+이름	동의우드랜드 15-1
+너비	50
+높이	50
+CRC	4801
+맵파일	db/maps/woodland/maps/lod614.map
+}
+
+{
+번호	615
+이름	동의우드랜드 16-1
+너비	50
+높이	50
+CRC	7854
+맵파일	db/maps/woodland/maps/lod615.map
+}
+
+{
+번호	616
+이름	동의우드랜드 17-1
+너비	50
+높이	50
+CRC	42506
+맵파일	db/maps/woodland/maps/lod616.map
+}
+
+{
+번호	617
+이름	동의우드랜드 17-2
+너비	50
+높이	50
+CRC	42506
+맵파일	db/maps/woodland/maps/lod617.map
+}
+
+{
+번호	618
+이름	동의우드랜드 18-1
+너비	50
+높이	50
+CRC	23248
+맵파일	db/maps/woodland/maps/lod618.map
+}
+
+{
+번호	619
+이름	동의우드랜드 19-1
+너비	50
+높이	50
+CRC	38715
+맵파일	db/maps/woodland/maps/lod619.map
+}
+
+{
+번호	620
+이름	동의우드랜드 19-2
+너비	50
+높이	50
+CRC	59803
+맵파일	db/maps/woodland/maps/lod620.map
+}
+
+{
+번호	621
+이름	동의우드랜드 20-1
+너비	50
+높이	50
+CRC	4404
+맵파일	db/maps/woodland/maps/lod621.map
+}

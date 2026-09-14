@@ -1,0 +1,87 @@
+0,0,0,0,0,0,0	제조4	{
+		
+		mes 1, "장갑 또는 각반을 만들고싶으신건가요?";
+
+		set @select, menu("제작할것을 선택하세요", "매직리스트", "파워리스트", "베네티가죽클립", "테네즈의각반");
+		if(@select == 1)
+		{
+		mes 1, "매직리스트를 제작합니다";
+		mes 1, "{=c쥬얼리스트1개,마법의돌1개,고무장갑1개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "쥬얼리스트") >= 1 && item_exist(@myid, "마법의돌") >= 1 && item_exist(@myid, "고무장갑") >=1){
+
+			item_del "쥬얼리스트", 1;
+			item_del "마법의돌", 1;
+			item_del "고무장갑", 1;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "매직리스트", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+
+	}else if(@select == 2)
+		{
+		mes 1, "파워리스트를 제작합니다";
+		mes 1, "{=c베가리스트1개,힘의돌1개,마타룸장갑1개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "베가리스트") >= 1 && item_exist(@myid, "힘의돌") >= 1 && item_exist(@myid, "마타룸장갑") >=1){
+
+			item_del "베가리스트", 1;
+			item_del "힘의돌", 1;
+			item_del "마타룸장갑", 1;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "파워리스트", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+
+	}else if(@select == 3)
+		{
+		mes 1, "베네티가죽클립을 제작합니다";
+		mes 1, "{=c용각반1개,여의주5개,레드오피온의등껍질5개,별의눈물10개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "용각반") >= 1 && item_exist(@myid, "여의주") >= 5 && item_exist(@myid, "레드오피온의등껍질") >=5 && item_exist(@myid, "별의눈물") >= 10){
+
+			item_del "용각반", 1;
+			item_del "여의주", 5;
+			item_del "레드오피온의등껍질", 5;
+			item_del "별의눈물", 10;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "베네티가죽클립", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+	}else if(@select == 4){
+		mes 1, "테네즈의각반을 제작합니다";
+		mes 1, "{=c베네티가죽클립1개,여의주15개,레드오피온의등껍질15개,별의눈물30개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "베네티가죽클립") >= 1 && item_exist(@myid, "여의주") >= 15 && item_exist(@myid, "레드오피온의등껍질") >=15 && item_exist(@myid, "별의눈물") >= 30){
+
+			item_del "베네티가죽클립", 1;
+			item_del "여의주", 15;
+			item_del "레드오피온의등껍질", 15;
+			item_del "별의눈물", 30;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "테네즈의각반", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+}
+ del @select;
+}

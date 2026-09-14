@@ -1,0 +1,258 @@
+0,0,0,0,0,0,0	SKILL_숏블레이드	{
+	set @target, skill_target();
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(!@target){skill_delay 2; end;}
+	set @damage, ((get_str(@myid))) + 52;
+	if(enare(@myid,1)) set @damage, @damage + 8;
+	damaged @target, @damage;
+	motion 129, 20;
+	effect @target, 0, 166, 100;
+	game_sound 7, 0;
+	skill_delay 2;
+}
+
+0,0,0,0,0,0,0	SKILL_바투	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @type, istype(@target);
+	if(@type != 1) {end;}
+	if(magic_exist(6,@target,1)) {message 3,"이미 걸려있습니다."; end;}
+	magic 6,@target, 0, 15, 0,@myid;
+	message 3, "바투를 외웠습니다.";
+	motion 129, 20;
+	game_sound 8,0;
+	skill_delay 20;
+}
+
+0,0,0,0,0,0,0	SKILL_윈드블레이드	{
+	set @myid, get_myid();
+ 	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @dam, ((get_str(@myid))) + 63;
+	if(enare(@myid,1)) set @dam, @dam + 11;
+	set @type, istype(@target);
+	set @side, get_side(@myid);
+	switch(@side){ 
+	case 0:			
+		set @mob11, get_mobxy(@x1, (@y1)-1);
+		set @mob12, get_mobxy(@x1, (@y1)-2);
+		set @mob13, get_mobxy(@x1, (@y1)-3);
+		set @type11, istype(@mob11);
+		set @type12, istype(@mob12);
+		set @type13, istype(@mob13);
+if((@type11 == 1 && @type12 == 1) && @type13 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob11, 0, 166, 75; effect @mob12, 0, 166, 75; effect @mob13, 0, 166, 75; damaged @mob11, @dam; damaged @mob12, @dam; damaged @mob13, @dam;}
+else if((@type11 == 1 && @type12 != 1) && @type13 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob11, 0, 166, 75; damaged @mob11, @dam;}
+else if((@type11 != 1 && @type12 == 1) && @type13 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob12, 0, 166, 75; effect @mob13, 0, 166, 75; damaged @mob12, @dam; damaged @mob13, @dam;}
+else if((@type11 == 1 && @type12 != 1) && @type13 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob11, 0, 166, 75; effect @mob13, 0, 166, 75; damaged @mob11, @dam; damaged @mob13, @dam;}
+else if((@type11 == 1 && @type12 == 1) && @type13 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob11, 0, 166, 75; effect @mob12, 0, 166, 75; damaged @mob11, @dam; damaged @mob12, @dam;}
+else if((@type11 != 1 && @type12 != 1) && @type13 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob13, 0, 166, 75; damaged @mob13, @dam;}
+else if((@type11 != 1 && @type12 == 1) && @type13 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob12, 0, 166, 75; damaged @mob12, @dam;}break;
+	case 1:
+		set @mob41, get_mobxy((@x1)+1, @y1);
+		set @mob42, get_mobxy((@x1)+2, @y1);
+		set @mob43, get_mobxy((@x1)+3, @y1);
+		set @type41, istype(@mob41);
+		set @type42, istype(@mob42);
+		set @type43, istype(@mob43);
+if((@type41 == 1 && @type42 == 1) && @type43 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob41, 0, 166, 75; effect @mob42, 0, 166, 75; effect @mob43, 0, 166, 75; damaged @mob41, @dam; damaged @mob42, @dam; damaged @mob43, @dam;}
+else if((@type41 == 1 && @type42 != 1) && @type43 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob41, 0, 166, 75; damaged @mob41, @dam;}
+else if((@type41 != 1 && @type42 == 1) && @type43 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob42, 0, 166, 75; effect @mob43, 0, 166, 75; damaged @mob42, @dam; damaged @mob43, @dam;}
+else if((@type41 == 1 && @type42 != 1) && @type43 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob41, 0, 166, 75; effect @mob43, 0, 166, 75; damaged @mob41, @dam; damaged @mob43, @dam;}
+else if((@type41 == 1 && @type42 == 1) && @type43 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob41, 0, 166, 75; effect @mob42, 0, 166, 75; damaged @mob41, @dam; damaged @mob42, @dam;}
+else if((@type41 != 1 && @type42 != 1) && @type43 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob43, 0, 166, 75; damaged @mob43, @dam;}
+else if((@type41 != 1 && @type42 == 1) && @type43 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob42, 0, 166, 75; damaged @mob42, @dam;}break;
+	case 2:
+		set @mob21, get_mobxy(@x1, (@y1)+1);
+		set @mob22, get_mobxy(@x1, (@y1)+2);
+		set @mob23, get_mobxy(@x1, (@y1)+3);
+		set @type21, istype(@mob21);
+		set @type22, istype(@mob22);
+		set @type23, istype(@mob23);
+if((@type21 == 1 && @type22 == 1) && @type23 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob21, 0, 166, 75; effect @mob22, 0, 166, 75; effect @mob23, 0, 166, 75; damaged @mob21, @dam; damaged @mob22, @dam; damaged @mob23, @dam;}
+else if((@type21 == 1 && @type22 != 1) && @type23 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob21, 0, 166, 75; damaged @mob21, @dam;}
+else if((@type21 != 1 && @type22 == 1) && @type23 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob22, 0, 166, 75; effect @mob23, 0, 166, 75; damaged @mob22, @dam; damaged @mob23, @dam;}
+else if((@type21 == 1 && @type22 != 1) && @type23 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob21, 0, 166, 75; effect @mob23, 0, 166, 75; damaged @mob21, @dam; damaged @mob23, @dam;}
+else if((@type21 == 1 && @type22 == 1) && @type23 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob21, 0, 166, 75; effect @mob22, 0, 166, 75; damaged @mob21, @dam; damaged @mob22, @dam;}
+else if((@type21 != 1 && @type22 != 1) && @type23 == 1){motion 129, 20;	game_sound 18, 0; skill_delay 3; effect @mob23, 0, 166, 75; damaged @mob23, @dam;}
+else if((@type21 != 1 && @type22 == 1) && @type23 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob22, 0, 166, 75; damaged @mob22, @dam;}break;
+	case 3:
+		set @mob31, get_mobxy((@x1)-1, @y1);
+		set @mob32, get_mobxy((@x1)-2, @y1);
+		set @mob33, get_mobxy((@x1)-3, @y1);
+		set @type31, istype(@mob31);
+		set @type32, istype(@mob32);
+		set @type33, istype(@mob33);
+if((@type31 == 1 && @type32 == 1) && @type33 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob31, 0, 166, 75; effect @mob32, 0, 166, 75; effect @mob33, 0, 166, 75; damaged @mob31, @dam; damaged @mob32, @dam; damaged @mob33, @dam;}
+else if((@type31 == 1 && @type32 != 1) && @type33 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob31, 0, 166, 75; damaged @mob31, @dam;}
+else if((@type31 != 1 && @type32 == 1) && @type33 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob32, 0, 166, 75; effect @mob33, 0, 166, 75; damaged @mob32, @dam; damaged @mob33, @dam;}
+else if((@type31 == 1 && @type32 != 1) && @type33 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob31, 0, 166, 75; effect @mob33, 0, 166, 75; damaged @mob31, @dam; damaged @mob33, @dam;}
+else if((@type31 == 1 && @type32 == 1) && @type33 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob31, 0, 166, 75; effect @mob32, 0, 166, 75; damaged @mob31, @dam; damaged @mob32, @dam;}
+else if((@type31 != 1 && @type32 != 1) && @type33 == 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob33, 0, 166, 75; damaged @mob33, @dam;}
+else if((@type31 != 1 && @type32 == 1) && @type33 != 1){motion 129, 20; game_sound 18, 0; skill_delay 3; effect @mob32, 0, 166, 75; damaged @mob32, @dam;}break;
+}
+
+			del @mob11;
+			del @mob12;
+			del @mob13;
+			del @mob21;
+			del @mob22;
+			del @mob23;
+			del @mob31;
+			del @mob32;
+			del @mob33;
+			del @mob41;
+			del @mob42;
+			del @mob43;
+			del @type11;
+			del @type12;
+			del @type13;
+			del @type21;
+			del @type22;
+			del @type23;
+			del @type31;
+			del @type32;
+			del @type33;
+			del @type41;
+			del @type42;
+			del @type43;
+			del @side;
+			del @myid;
+			del @x1;
+			del @y1;
+			del @skill_delay;
+
+		}
+}
+
+0,0,0,0,0,0,0	SKILL_메가블레이드	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @target, skill_target();
+	set @x1, get_xs();
+	set @y1, get_ys();
+	set @dam, ((get_str(@myid))) + 134;
+	if(enare(@myid,1)) set @dam, @dam + 28;
+	skill_delay 4;
+	set @type, istype(@target);
+		set @mob1, get_mobxy(@x1, (@y1)-1);
+		set @mob2, get_mobxy(@x1, (@y1)+1);
+		set @mob3, get_mobxy((@x1)-1, @y1);
+		set @mob4, get_mobxy((@x1)+1, @y1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+if((@type1 == 1 && @type2 == 1) && (@type3 == 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; effect @mob2, 0, 100, 75; effect @mob3, 0, 100, 75; effect @mob4, 0, 100, 75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+else if((@type1 != 1 && @type2 == 1) && (@type3 == 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob2, 0, 100, 75; effect @mob3, 0, 100, 75; effect @mob4, 0, 100, 75; damaged @mob2, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+else if((@type1 == 1 && @type2 != 1) && (@type3 == 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; effect @mob3, 0, 100, 75; effect @mob4, 0, 100, 75; damaged @mob1, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+else if((@type1 == 1 && @type2 == 1) && (@type3 != 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; effect @mob2, 0, 100, 75; effect @mob4, 0, 100, 75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob4, @dam;}
+else if((@type1 == 1 && @type2 == 1) && (@type3 == 1 && @type4 != 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; effect @mob2, 0, 100, 75; effect @mob3, 0, 100, 75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob3, @dam;}
+else if((@type1 != 1 && @type2 != 1) && (@type3 == 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob3, 0, 100, 75; effect @mob4, 0, 100, 75; damaged @mob3, @dam; damaged @mob4, @dam;}
+else if((@type1 != 1 && @type2 == 1) && (@type3 != 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob2, 0, 100, 75; effect @mob4, 0, 100, 75; damaged @mob2, @dam; damaged @mob4, @dam;}
+else if((@type1 != 1 && @type2 == 1) && (@type3 == 1 && @type4 != 1)){motion 129, 20; game_sound 18, 0; effect @mob2, 0, 100, 75; effect @mob3, 0, 100, 75; damaged @mob2, @dam; damaged @mob3, @dam;}
+else if((@type1 == 1 && @type2 != 1) && (@type3 != 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; effect @mob4, 0, 100, 75; damaged @mob1, @dam; damaged @mob4, @dam;}
+else if((@type1 == 1 && @type2 != 1) && (@type3 == 1 && @type4 != 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; effect @mob3, 0, 100, 75; damaged @mob1, @dam; damaged @mob3, @dam;}
+else if((@type1 == 1 && @type2 == 1) && (@type3 != 1 && @type4 != 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; effect @mob2, 0, 100, 75; damaged @mob1, @dam; damaged @mob2, @dam;}
+else if((@type1 != 1 && @type2 != 1) && (@type3 != 1 && @type4 == 1)){motion 129, 20; game_sound 18, 0; effect @mob4, 0, 100, 75; damaged @mob4, @dam;}
+else if((@type1 != 1 && @type2 != 1) && (@type3 == 1 && @type4 != 1)){motion 129, 20; game_sound 18, 0; effect @mob3, 0, 100, 75; damaged @mob3, @dam;}
+else if((@type1 != 1 && @type2 == 1) && (@type3 != 1 && @type4 != 1)){motion 129, 20; game_sound 18, 0; effect @mob2, 0, 100, 75; damaged @mob2, @dam;}
+else if((@type1 == 1 && @type2 != 1) && (@type3 != 1 && @type4 != 1)){motion 129, 20; game_sound 18, 0; effect @mob1, 0, 100, 75; damaged @mob1, @dam;}
+			del @mob1;
+			del @mob2;
+			del @mob3;
+			del @mob4;
+			del @type1;
+			del @type2;
+			del @type3;
+			del @type4;
+			del @myid;
+			del @x1;
+			del @y1;
+}
+
+0,0,0,0,0,0,0	SKILL_투핸드어택	{
+ motion 129, 20;
+}
+
+0,0,0,0,0,0,0	SKILL_매드소울	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @target, skill_target();
+	set @damage, ((get_vita(@myid))) * 3;
+	if(focus(@myid,1)) set @damage, @damage * 2;
+	if(!@target){message 3, "대상이 없습니다."; end;}
+ 	set_vital get_basevita(@myid)/100*2;
+	damaged @target, @damage;
+	motion 130, 20;
+	effect @target, 0, 53, 75;
+	game_sound 17, 0;
+	skill_delay 14;
+	del @target;
+	del @myid;
+	del @skill_delay;
+}
+
+0,0,0,0,0,0,0	SKILL_크래셔	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(get_vita(@myid) > get_basevita(@myid)/100*2){message 3, "체력이 너무많습니다."; end;}
+	set @target, skill_target();
+	if(!@target){message 3, "대상이 없습니다."; end;}
+	set @damage, ((get_basevita(@myid))) * 7;
+	if(focus(@myid,1)) set @damage, @damage * 2;
+	damaged @target, @damage;
+	motion 130, 60;
+	effect @target, 50, 50, 70;
+	game_sound 44, 0;
+	skill_delay 11;
+	} 
+	del @target;
+	del @myid;
+	del @skill_delay;
+}
+
+0,0,0,0,0,0,0	SKILL_진크래셔	{
+	set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else{
+	set @target, skill_target();
+	set @damage, ((get_basevita(@myid)+1))*7;
+		damaged @target, @damage;
+ 		set_vita @myid, get_vita(@myid)/10 * 1; 
+		motion 130, 20;
+		effect @target, 50, 50, 65;
+		game_sound 44, 0;
+		skill_delay 2;
+
+		if(get_wearitem_necklace(@myid) == "생명의목걸이" && get_wearitem_belt(@myid) == "생명의벨트"){
+ 		set @damage, ((get_vita(@myid)+4))*10;
+		damaged @target, @damage;
+ 		motion 130,20;
+ 		effect @target, 50, 50, 65;
+ 		game_sound 44, 0;
+		skill_delay 1;
+		message 3, "생명셋 세트효과를 사용하였습니다~!.";
+		end;
+	}
+		del @target;
+		del @myid;
+		del @skill_delay;
+	}
+}
+}
+
+0,0,0,0,0,0,0	SKILL_완전방어	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @target, spell_target();
+	defens @myid, 15;
+	effect @myid, 64,0,100;
+	motion 130, 60;
+	game_sound 8,0;
+ 	skill_delay 20;
+	message 3, "완전방어를 외웠습니다.";
+}

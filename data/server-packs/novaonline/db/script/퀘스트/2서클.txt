@@ -1,0 +1,83 @@
+0,0,0,0,0,0,0	팔립	{
+	console_output "[시스템]" + get_name() + "님이 2서클퀘스트 [팔립] 실행";
+	set @myid, get_myid();
+	re:
+	if(#forteq == 1){goto forteq1;}
+	if(#forteq == 2){goto forteq2;}
+	if(#forteq == 3){goto forteq3;}
+	if(#forteq == 4){goto forteq4;}
+	if(#forteq == 5){goto forteq5;}
+	set @selectq, menu("선택형 퀘스트![모두수행, 무한반복가능]", "팜팻의알", "트랜트의뿌리", "울프의단검", "은빛늑대의갈기털", "사슴의정수");
+	if(@selectq == 1){
+		set @menu, menu("팜팻의알을 10개 구해오자.\\n[보상 : 골드 10000G 경험치 : 70000exp]", "진행한다.", "돌아간다.");
+		if(@menu == 1){mes 1, "팜팻의알 퀘스트를 시작합니다."; set #forteq, 1; end;}
+		if(@menu == 2){goto re;}
+		end;
+		}
+	if(@selectq == 2){
+		set @menu, menu("트랜트의뿌리를 10개 구해오자.\\n[보상 : 골드 15000G 경험치 : 100000exp]", "진행한다.", "돌아간다.");
+		if(@menu == 1){mes 1, "트랜트의뿌리 퀘스트를 시작합니다."; set #forteq, 2; end;}
+		if(@menu == 2){goto re;}
+		end;
+		}
+	if(@selectq == 3){
+		set @menu, menu("울프의단검을 10개 구해오자.\\n[보상 : 골드 20000G 경험치 : 150000exp]", "진행한다.", "돌아간다.");
+		if(@menu == 1){mes 1, "울프의단검 퀘스트를 시작합니다."; set #forteq, 3; end;}
+		if(@menu == 2){goto re;}
+		end;
+		}
+	if(@selectq == 4){
+		set @menu, menu("은빛늑대의갈기털을 5개 구해오자.\\n[보상 : 골드 25000G 경험치 : 310000exp]", "진행한다.", "돌아간다.");
+		if(@menu == 1){mes 1, "은빛늑대의갈기털 퀘스트를 시작합니다."; set #forteq, 4; end;}
+		if(@menu == 2){goto re;}
+		end;
+		}
+	if(@selectq == 5){
+		set @menu, menu("사슴의정수를 3개 구해오자.\\n[보상 : 골드 30000G 경험치 : 550000exp]", "진행한다.", "돌아간다.");
+		if(@menu == 1){mes 1, "사슴의정수 퀘스트를 시작합니다."; set #forteq, 5; end;}
+		if(@menu == 2){goto re;}
+		end;
+		}
+		end;
+					///////////////////////////여기는 퀘스트부분/////////////////////////////
+		forteq1:
+		if(item_exist(@myid, "팜팻의알") < 10){
+			set @menu2, menu("팜팻의알을 10개 구해오자.\\n[보상 : 골드 10000G 경험치 : 70000exp]", "계속한다.", "포기한다."); 
+			if(@menu2 == 1){mes 1, "어서 구해와 주십시오."; end;}
+			if(@menu2 == 2){mes 1, "퀘스트를 포기합니다."; set #forteq, 0; goto re;}
+			end;
+		}if(item_exist(@myid, "팜팻의알") >= 10){mes 1,"팜팻의알을 구해와주셧군요."; item_del "팜팻의알", 10; exp_add 7000; money_add "10000"; set #forteq, 0; goto re;}
+		end;
+		forteq2:
+		if(item_exist(@myid, "트랜트의뿌리") < 10){
+			set @menu2, menu("트랜트의뿌리을 10개 구해오자.\\n[보상 : 골드 15000G 경험치 : 100000exp]", "계속한다.", "포기한다."); 
+			if(@menu2 == 1){mes 1, "어서 구해와 주십시오."; end;}
+			if(@menu2 == 2){mes 1, "퀘스트를 포기합니다."; set #forteq, 0; goto re;}
+			end;
+		}if(item_exist(@myid, "트랜트의뿌리") >= 10){mes 1,"트랜트의뿌리을 구해와주셧군요."; item_del "트랜트의뿌리", 10; exp_add 10000; money_add "15000"; set #forteq, 0; goto re;}
+		end;
+		forteq3:
+		if(item_exist(@myid, "울프의단검") < 10){
+			set @menu2, menu("울프의단검을 10개 구해오자.\\n[보상 : 골드 20000G 경험치 : 150000exp]", "계속한다.", "포기한다."); 
+			if(@menu2 == 1){mes 1, "어서 구해와 주십시오."; end;}
+			if(@menu2 == 2){mes 1, "퀘스트를 포기합니다."; set #forteq, 0; goto re;}
+			end;
+		}if(item_exist(@myid, "울프의단검") >= 10){mes 1,"울프의단검을 구해와주셧군요."; item_del "울프의단검", 10; exp_add 15000; money_add "20000"; set #forteq, 0; goto re;}
+		end;
+		forteq4:
+		if(item_exist(@myid, "은빛늑대의갈기털") < 5){
+			set @menu2, menu("은빛늑대의갈기털을 5개 구해오자.\\n[보상 : 골드 25000G 경험치 : 310000exp]", "계속한다.", "포기한다."); 
+			if(@menu2 == 1){mes 1, "어서 구해와 주십시오."; end;}
+			if(@menu2 == 2){mes 1, "퀘스트를 포기합니다."; set #forteq, 0; goto re;}
+			end;
+		}if(item_exist(@myid, "은빛늑대의갈기털") >= 5){mes 1,"은빛늑대의갈기털을 구해와주셧군요."; item_del "은빛늑대의갈기털", 5; exp_add 31000; money_add "25000"; set #forteq, 0; goto re;}
+		end;
+		forteq5:
+		if(item_exist(@myid, "사슴의정수") < 3){
+			set @menu2, menu("사슴의정수을 3개 구해오자.\\n[보상 : 골드 30000G 경험치 : 550000exp]", "계속한다.", "포기한다."); 
+			if(@menu2 == 1){mes 1, "어서 구해와 주십시오."; end;}
+			if(@menu2 == 2){mes 1, "퀘스트를 포기합니다."; set #forteq, 0; goto re;}
+			end;
+		}if(item_exist(@myid, "사슴의정수") >= 3){mes 1,"사슴의정수을 구해와주셧군요."; item_del "사슴의정수", 3; exp_add 55000; money_add "30000"; set #forteq, 0; goto re;}
+		end;
+}

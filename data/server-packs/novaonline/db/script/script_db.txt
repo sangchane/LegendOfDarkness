@@ -1,0 +1,81 @@
+script:db/script/script.txt
+script:db/script/mob.txt
+script:db/script/npc_script.txt
+script:db/script/skill_script.txt
+script:db/script/npc2_script.txt
+script:db/script/spell_script.txt
+script:db/script/staff_script.txt
+script:db/script/test.txt
+script:db/script/스킬배우기.txt
+script:db/script/이동npc.txt
+script:db/script/이아의천상계.txt
+script:db/script/승급.txt
+script:db/script/캐시샵.txt
+script:db/script/월드맵.txt
+//샵관련 스크립트
+script:db/script/샵/샵.txt
+//스킬관련 스크립트
+script:db/script/skill/전사(비전직).txt
+script:db/script/skill/Warrior.txt
+script:db/script/skill/Rogue.txt
+script:db/script/skill/도적(비전직).txt
+script:db/script/skill/성직자(비전직).txt
+script:db/script/skill/법사(비전직).txt
+script:db/script/skill/무도가(비전직).txt
+script:db/script/skill/Wizard.txt
+script:db/script/skill/Monk.txt
+script:db/script/skill/Monk(조류).txt
+script:db/script/skill/Jigja.txt
+script:db/script/skill/공통스킬.txt
+//제조관련 스크립트
+script:db/script/제조/제조하자.txt
+script:db/script/제조/제조2.txt
+script:db/script/제조/제조3.txt
+script:db/script/제조/제조4.txt
+script:db/script/제조/리젠제작.txt
+script:db/script/제조/적갑흑갑.txt
+script:db/script/제조/로열.txt
+script:db/script/제조/로열2.txt
+script:db/script/제조/ammor.txt
+script:db/script/제조/블랙.txt
+script:db/script/제조/길드제조.txt
+script:db/script/제조/다크.txt
+script:db/script/제조/생셋암셋업.txt
+script:db/script/제조/제조의책.txt
+//퀘스트관련 스크립트
+script:db/script/퀘스트/세피라링업글.txt
+script:db/script/퀘스트/별의눈물.txt
+script:db/script/퀘스트/선상퀘스트.txt
+script:db/script/퀘스트/선상2.txt
+script:db/script/퀘스트/목도업그레이드.txt
+script:db/script/퀘스트/팬던트.txt
+script:db/script/퀘스트/노비스마을.txt
+script:db/script/퀘스트/begin.txt
+script:db/script/퀘스트/용병.txt
+script:db/script/퀘스트/1서클.txt
+script:db/script/퀘스트/2서클.txt
+script:db/script/퀘스트/3서클.txt
+script:db/script/퀘스트/죽음의마을던전.txt
+script:db/script/퀘스트/혼돈의탑.txt
+//자동실행 스크립트
+script:db/script/자동/못지나가.txt
+script:db/script/자동/채집.txt
+script:db/script/자동/함정.txt
+script:db/script/자동/노비스마을.txt
+//길드관련 스크립트
+script:db/script/길드/길드.txt
+script:db/script/길드/길드성.txt
+script:db/script/길드/길드성쟁탈전.txt
+//아이템관련 스크립트
+script:db/script/아이템/아이템.txt
+script:db/script/아이템/캐시템.txt
+script:db/script/아이템/염색약.txt
+script:db/script/아이템/텔깃.txt
+script:db/script/아이템/캐쉬.txt
+script:db/script/아이템/맴버쉽.txt
+//운영자관련 스크립트
+script:db/script/운영자/운영자.txt
+//도박관련 스크립트
+script:db/script/도박/도박.txt
+//전문기술 스크립트
+script:db/script/전문기술/전문기술광물.txt

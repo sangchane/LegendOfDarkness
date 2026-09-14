@@ -1,0 +1,39 @@
+0,0,0,0,0,0,0	감맘보	{
+		mes 1, "신세대 감맘보 시스템!";
+		mes 1, "당신이 돈을 걸어, 나와의 감맘보에서 이기면 돈을 배로지급합니다!";
+		mes 1, "묵을 내서 이긴다면 2배 찌를내서 이긴다면 3배 빠를내서 이긴다면 4배!!";
+		set @select, menu("[" + get_name() + "]님, 도전하겠습니까?", "도전", "안해");
+		if(@select == 1){
+		input @money, 1, "얼마를 거시겠습니까?", "", "", 255;
+		if(@money <= 0) {mes 1, "제대로 입력해 주세요."; end;}
+		if(get_money() <= @money) {mes 1, "돈이부족하거나, 올인은불가능합니다."; end;}
+		money_del @money;
+		RE2:
+		input @dobak$, 1, "어떤것을 내시겠습니까?(묵,찌,빠)", "", "", 255;
+		RE:
+		set @rand, rand(1,101);
+		if(@dobak$ == "묵"){
+		if(@rand <= 1)	{goto RE;}
+		if(@rand >=2 && @rand <= 45){mes 1, "이겼습니다!";  money_add @money; mes 1, "우선 원금을 지급했습니다.";  money_add @money; mes 1, "이긴금액지급이 완료됬습니다."; npc_say 0,0,"" + get_name() + "님이이기셧군요..흠흠.. 돈을드리지요."; end;}
+		if(@rand >= 46){mes 1, "졌습니다ㅠ.ㅠ 안타깝네요."; npc_say 0,0,"" + get_name() + "님이 지셧군요ㅋ"; end;}
+		}else{
+		if(@dobak$ == "찌"){
+		if(@rand <= 1)	{goto RE;}
+		if(@rand >=2 && @rand <= 30){mes 1, "이겼습니다!";  money_add @money; mes 1, "우선 원금을 지급했습니다.";  money_add @money; mes 1, "이긴금액지급이 완료됬습니다."; money_add @money; npc_say 0,0,"" + get_name() + "님이이기셧군요..흠흠.. 돈을드리지요."; end;}
+		if(@rand >= 31){mes 1, "졌습니다ㅠ.ㅠ 안타깝네요."; npc_say 0,0,"" + get_name() + "님이 지셧군요ㅋ"; end;}
+		}else{
+		if(@dobak$ == "빠"){
+		if(@rand <= 1)	{goto RE;}
+		if(@rand >=2 && @rand <= 17){mes 1, "이겼습니다!";  money_add @money; mes 1, "우선 원금을 지급했습니다.";  money_add @money; mes 1, "이긴금액1차지급이 완료됬습니다."; money_add @money; mes 1, "이긴금액2차지급이 완료됬습니다."; npc_say 0,0,"" + get_name() + "님이이기셧군요..흠흠.. 돈을드리지요."; money_add @money; end;}
+		if(@rand >= 18){mes 1, "졌습니다ㅠ.ㅠ 안타깝네요."; npc_say 0,0,"" + get_name() + "님이 지셧군요ㅋ"; end;}
+		}else{
+		mes 1, "똑바로 내실것을 적어주십시오.";
+		goto RE2;
+		}
+	del @rnad;
+	del @money;
+	del @dobak$;
+	del @select;
+	}
+}
+}

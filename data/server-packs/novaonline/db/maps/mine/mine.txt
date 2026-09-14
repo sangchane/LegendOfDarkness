@@ -1,0 +1,17 @@
+{
+번호	666
+이름	마인마을
+너비	100
+높이	100
+CRC	38930
+맵파일	db/maps/mine/maps/lod666.map
+}
+{
+번호	1969
+이름	마인제조상점
+너비	15
+높이	15
+배경	0
+CRC	0
+맵파일	db/maps/default/maps/lod1969.map
+}

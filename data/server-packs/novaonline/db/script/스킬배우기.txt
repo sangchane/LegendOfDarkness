@@ -1,0 +1,940 @@
+0,0,0,0,0,0,0	전사스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [전사스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 1){mes 1, "전사가 아닙니다."; end;}
+	set @select, menu("자 배울기술을 선택해주세요.", "쿠로토11" , "윈드블레이드11", "메가블레이드41", "바투41", "투핸드어택71", "완전방어99", "매드소울99", "크래셔99");
+	if(@select == 1){
+	if(spell_exist("쿠로토") == 1){mes 1, "당신은 이미 쿠로토를 배웠습니다."; goto re;}
+	mes 1, "쿠로토를 배울때 최소레벨은 11입니다."; spell_add "쿠로토"; mes 1, "쿠로토 스펠을 익혔습니다."; goto re;}
+	if(@select == 2){
+	if(skill_exist("룬블레이드") == 1){mes 1, "당신은 이미 윈드블레이드상위단계인 룬블레이드를 배웠습니다."; goto re;}
+	if(skill_exist("윈드블레이드") == 1){mes 1, "당신은 이미 윈드블레이드를 배웠습니다."; goto re;}
+	mes 1, "윈드블레이드를 배울때 최소레벨은 11, 필요능력치는 힘 13 콘 10 이상이여야합니다.";
+	if(get_class(@myid) == 1 && get_level(@myid) >= 11 && get_str(@myid) >= 13 && get_con(@myid) >= 10){skill_add "윈드블레이드"; mes 1, "윈드블레이드 기술을 익혔습니다."; goto re;}
+	mes 1, "윈드블레이드를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(skill_exist("스톰블레이드") == 1){mes 1, "당신은 이미 메가블레이드상위단계인 스톰블레이드를 배웠습니다."; goto re;}
+	if(skill_exist("메가블레이드") == 1){mes 1, "당신은 이미 메가블레이드를 배웠습니다."; goto re;}
+	mes 1, "메가블레이드를 배울때 최소레벨은 41, 필요능력치는 힘 63 콘 23 이상이여야합니다.";
+	if(get_class(@myid) == 1 && get_level(@myid) >= 41 && get_str(@myid) >= 63 && get_con(@myid) >= 23){skill_add "메가블레이드"; mes 1, "메가블레이드 기술을 익혔습니다."; goto re;}
+	mes 1, "메가블레이드를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(skill_exist("바투") == 1){mes 1, "당신은 이미 바트를 배웠습니다."; goto re;}
+	mes 1, "바투를 배울때 최소레벨은 41, 필요능력치는 힘 63 콘 23 이상이여야합니다.";
+	if(get_class(@myid) == 1 && get_level(@myid) >= 41 && get_str(@myid) >= 63 && get_con(@myid) >= 23){skill_add "바투"; mes 1, "바투 기술을 익혔습니다."; goto re;}
+	mes 1, "바투를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(skill_exist("투핸드어택") == 1){mes 1, "당신은 이미 투핸드어택를 배웠습니다."; goto re;}
+	mes 1, "투핸드어택를 배울때 최소레벨은 71, 필요능력치는 힘 94 콘 53 이상이여야합니다.";
+	if(get_class(@myid) == 1 && get_level(@myid) >= 71 && get_str(@myid) >= 94 && get_con(@myid) >= 53){skill_add "투핸드어택"; mes 1, "투핸드어택 기술을 익혔습니다."; goto re;}
+	mes 1, "투핸드어택를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 6){
+	if(skill_exist("완전방어") == 1){mes 1, "당신은 이미 완전방어를 배웠습니다."; goto re;}
+	if(skill_exist("완전방어(UP)") == 1){mes 1, "당신은 이미 완전방어상위단계를 배웠습니다."; goto re;}
+	mes 1, "완전방어를 배울때 최소레벨은 99, 필요능력치는 힘 120 콘 83 이상이여야합니다.";
+	if(get_class(@myid) == 1 && get_level(@myid) >= 99 && get_str(@myid) >= 120 && get_con(@myid) >= 83){skill_add "완전방어"; mes 1, "완전방어 스펠을 익혔습니다."; goto re;}
+	mes 1, "완전방어를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 7){
+	if(skill_exist("매드소울진") == 1){mes 1, "당신은 이미 매드소울진를 배웠습니다."; goto re;}
+	if(skill_exist("매드소울") == 1){mes 1, "당신은 이미 매드소울를 배웠습니다."; goto re;}
+	mes 1, "매드소울을 배울때 최소레벨은 99, 필요능력치는 체력 : 8000 이상이여야합니다.";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 1 && get_level(@myid) >= 99 && get_basevita(@myid) >= 8000){skill_add "매드소울"; mes 1, "매드소울 기술을 익혔습니다."; goto re;}
+	mes 1, "매드소울를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 8){
+	if(skill_exist("데빌크래셔") == 1){mes 1, "당신은 이미 데빌크래셔를 배웠습니다."; goto re;}
+	if(skill_exist("크래셔") == 1){mes 1, "당신은 이미 크래셔를 배웠습니다."; goto re;}
+	mes 1, "크래셔를 배울때 최소레벨은 99, 필요능력치는 체력 : 9000 이상이여야합니다.";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 1 && get_level(@myid) >= 99 && get_basevita(@myid) >= 9000){skill_add "크래셔"; mes 1, "크래셔 기술을 익혔습니다."; goto re;}
+	mes 1, "크래셔를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	도적스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [도적스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 2){mes 1, "도적이 아닙니다."; end;}
+	set @select, menu("자 배울기술을 선택해주세요.", "쿠로토11", "찔러휘비기11", "센스몬스터11", "두번찌르기41", "하이드41", "품뒤져보기41", "센스41", "습격71", "암살격99");
+	if(@select == 1){
+	if(spell_exist("쿠로토") == 1){mes 1, "당신은 이미 쿠로토를 배웠습니다."; goto re;}
+	mes 1, "쿠로토를 배울때 최소레벨은 11입니다."; spell_add "쿠로토"; mes 1, "쿠로토 스펠을 익혔습니다."; goto re;}
+	if(@select == 2){
+	if(skill_exist("마구찌르기") == 1){mes 1, "당신은 이미 찔러휘비기상위단계인 마구찌르기를 배웠습니다."; goto re;}
+	if(skill_exist("찔러휘비기") == 1){mes 1, "당신은 이미 찔러휘비기를 배웠습니다."; goto re;}
+	mes 1, "찔러휘비기를 배울때 최소레벨은 11, 필요능력치는 덱스 13 콘 10 이상이여야합니다.";
+	if(get_class(@myid) == 2 && get_level(@myid) >= 11 && get_dex(@myid) >= 13 && get_con(@myid) >= 10){skill_add "찔러휘비기"; mes 1, "찔러휘비기 기술을 익혔습니다."; goto re;}
+	mes 1, "찔러휘비기를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(skill_exist("센스몬스터") == 1){mes 1, "당신은 이미 센스몬스터를 배웠습니다."; goto re;}
+	mes 1, "센스몬스터를 배울때 최소레벨은 11, 필요능력치는 덱스 13 콘 10 이상이여야합니다.";
+	if(get_class(@myid) == 2 && get_level(@myid) >= 11 && get_dex(@myid) >= 13 && get_con(@myid) >= 10){skill_add "센스몬스터"; mes 1, "센스몬스터 기술을 익혔습니다."; goto re;}
+	mes 1, "센스몬스터를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(skill_exist("슬레쉬") == 1){mes 1, "당신은 이미 찔러휘비기상위단계인 슬레쉬를 배웠습니다."; goto re;}
+	if(skill_exist("두번찌르기") == 1){mes 1, "당신은 이미 두번찌르기를 배웠습니다."; goto re;}
+	mes 1, "두번찌르기를 배울때 최소레벨은 41, 필요능력치는 덱스 63 콘 23 이상이여야합니다.";
+	if(get_class(@myid) == 2 && get_level(@myid) >= 41 && get_dex(@myid) >= 63 && get_con(@myid) >= 23){skill_add "두번찌르기"; mes 1, "두번찌르기 기술을 익혔습니다."; goto re;}
+	mes 1, "두번찌르기를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(spell_exist("하이드") == 1){mes 1, "당신은 이미 하이드를 배웠습니다."; goto re;}
+	mes 1, "하이드를 배울때 최소레벨은 41, 필요능력치는 덱스 78 콘 26 이상이여야합니다.";
+	if(get_class(@myid) == 2 && get_level(@myid) >= 41 && get_dex(@myid) >= 78 && get_con(@myid) >= 26){spell_add "하이드"; mes 1, "하이드 스펠을 익혔습니다."; goto re;}
+	mes 1, "하이드를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 6){
+	mes 1, "품뒤져보기를 배울때 최소레벨은 41, 필요능력치는 덱스 78 콘 26 이상이여야합니다.";
+	if(get_class(@myid) == 2 && get_level(@myid) >= 41 && get_dex(@myid) >= 78 && get_con(@myid) >= 26){skill_add "품뒤져보기"; mes 1, "품뒤져보기 스킬을 익혔습니다."; goto re;}
+	mes 1, "품뒤져보기를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 7){
+	if(skill_exist("센스") == 1){mes 1, "당신은 이미 센스를 배웠습니다."; goto re;}
+	mes 1, "센스를 배울때 최소레벨은 41, 필요능력치는 덱스 78 콘 26 이상이여야합니다.";
+	if(get_class(@myid) == 2 && get_level(@myid) >= 41 && get_dex(@myid) >= 78 && get_con(@myid) >= 26){skill_add "센스"; mes 1, "센스 스킬을 익혔습니다."; goto re;}
+	mes 1, "센스를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 8){
+	if(skill_exist("습격진") == 1){mes 1, "당신은 이미 습격상위단계인 습격진을 배웠습니다."; goto re;}
+	if(skill_exist("습격") == 1){mes 1, "당신은 이미 습격을 배웠습니다."; goto re;}
+	mes 1, "습격을 배울때 최소레벨은 71, 필요능력치는 덱스 93 콘 53 이상이여야합니다.";
+	if(get_class(@myid) == 2 && get_level(@myid) >= 71 && get_dex(@myid) >= 93 && get_con(@myid) >= 53){skill_add "습격"; mes 1, "습격 스킬을 익혔습니다."; goto re;}
+	mes 1, "습격을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 9){
+	if(skill_exist("암살격진") == 1){mes 1, "당신은 이미 암살격진을 배웠습니다."; goto re;}
+	if(skill_exist("암살격") == 1){mes 1, "당신은 이미 암살격를 배웠습니다."; goto re;}
+	mes 1, "암살격을 배울때 최소레벨은 99, 필요능력치는 체력 : 9000 이상이여야합니다.";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 2 && get_level(@myid) >= 99 && get_basevita(@myid) >= 9000){skill_add "암살격"; mes 1, "암살격 기술을 익혔습니다."; goto re;}
+	mes 1, "암살격를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	마법사스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [마법사스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 3){mes 1, "마법사가 아닙니다."; end;}
+	set @select, menu("자 배울기술을 선택해주세요.", "쿠로토11", "수페라마레나11", "렌토11", "마레누스41", "바르도41", "엑스마레나41", "나르콜리41", "마레네라71", "데프레코71", "마네나로71", "프라보99", "세멜리아99", "라그나로크99");
+	if(@select == 1){
+	if(spell_exist("쿠로토") == 1){mes 1, "당신은 이미 쿠로토를 배웠습니다."; goto re;}
+	mes 1, "쿠로토를 배울때 최소레벨은 11입니다."; spell_add "쿠로토"; mes 1, "쿠로토 스펠을 익혔습니다."; goto re;}
+	if(@select == 2){
+	if(spell_exist("수페라마레나") == 1){mes 1, "당신은 이미 수페라마레나를 배웠습니다."; goto re;}
+	mes 1, "수페라마레나를 배울때 최소레벨은 11, 필요능력치는 인트 13 위즈 10 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 11 && get_int(@myid) >= 13 && get_wis(@myid) >= 10){spell_add "수페라마레나"; mes 1, "수페라마레나 스펠을 익혔습니다."; goto re;}
+	mes 1, "수페라마레나를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(spell_exist("렌토") == 1){mes 1, "당신은 이미 렌토를 배웠습니다."; goto re;}
+	mes 1, "렌토를 배울때 최소레벨은 11, 필요능력치는 인트 23 위즈 15 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 11 && get_int(@myid) >= 23 && get_wis(@myid) >= 15){spell_add "렌토"; mes 1, "렌토 스펠을 익혔습니다."; goto re;}
+	mes 1, "렌토를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(spell_exist("마레누스") == 1){mes 1, "당신은 이미 마레누스를 배웠습니다."; goto re;}
+	mes 1, "마레누스를 배울때 최소레벨은 41, 필요능력치는 인트 63 위즈 23 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 41 && get_int(@myid) >= 63 && get_wis(@myid) >= 23){spell_add "마레누스"; mes 1, "마레누스 스펠을 익혔습니다."; goto re;}
+	mes 1, "마레누스를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(spell_exist("바르도") == 1){mes 1, "당신은 이미 바르도를 배웠습니다."; goto re;}
+	mes 1, "바르도를 배울때 최소레벨은 41, 필요능력치는 인트 63 위즈 23 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 41 && get_int(@myid) >= 63 && get_wis(@myid) >= 23){spell_add "바르도"; mes 1, "바르도 스펠을 익혔습니다."; goto re;}
+	mes 1, "바르도를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 6){
+	if(spell_exist("엑스마레나") == 1){mes 1, "당신은 이미 엑스마레나를 배웠습니다."; goto re;}
+	mes 1, "엑스마레나를 배울때 최소레벨은 41, 필요능력치는 인트 78 위즈 26 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 41 && get_int(@myid) >= 78 && get_wis(@myid) >= 26){spell_add "엑스마레나"; mes 1, "엑스마레나 스펠을 익혔습니다."; goto re;}
+	mes 1, "엑스마레나를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 7){
+	if(spell_exist("나르콜리") == 1){mes 1, "당신은 이미 나르콜리를 배웠습니다."; goto re;}
+	mes 1, "나르콜리를 배울때 최소레벨은 41, 필요능력치는 인트 78 위즈 26 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 41 && get_int(@myid) >= 78 && get_wis(@myid) >= 26){spell_add "나르콜리"; mes 1, "나르콜리 스펠을 익혔습니다."; goto re;}
+	mes 1, "나르콜리를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 8){
+	if(spell_exist("마레네라") == 1){mes 1, "당신은 이미 마레네라를 배웠습니다."; goto re;}
+	mes 1, "마레네라를 배울때 최소레벨은 71, 필요능력치는 인트 93 위즈 53 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 71 && get_int(@myid) >= 93 && get_wis(@myid) >= 53){spell_add "마레네라"; mes 1, "마레네라 스펠을 익혔습니다."; goto re;}
+	mes 1, "마레네라를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 9){
+	if(spell_exist("데프레코") == 1){mes 1, "당신은 이미 데프레코를 배웠습니다."; goto re;}
+	mes 1, "데프레코를 배울때 최소레벨은 71, 필요능력치는 인트 93 위즈 53 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 71 && get_int(@myid) >= 93 && get_wis(@myid) >= 53){spell_add "데프레코"; mes 1, "데프레코 스펠을 익혔습니다."; goto re;}
+	mes 1, "데프레코를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 10){
+	if(spell_exist("마네나로") == 1){mes 1, "당신은 이미 마네나로를 배웠습니다."; goto re;}
+	mes 1, "마네나로를 배울때 최소레벨은 71, 필요능력치는 인트 102 위즈 83 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 71 && get_int(@myid) >= 102 && get_wis(@myid) >= 83){spell_add "마네나로"; mes 1, "마네나로 스펠을 익혔습니다."; goto re;}
+	mes 1, "마네나로를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 11){
+	if(spell_exist("프라보") == 1){mes 1, "당신은 이미 프라보를 배웠습니다."; goto re;}
+	mes 1, "프라보를 배울때 최소레벨은 99, 필요능력치는 인트 115 위즈 83 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 99 && get_int(@myid) >= 115 && get_wis(@myid) >= 83){spell_add "프라보"; mes 1, "프라보 스펠을 익혔습니다."; goto re;}
+	mes 1, "프라보를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 12){
+	if(spell_exist("세멜리아") == 1){mes 1, "당신은 이미 세멜리아를 배웠습니다."; goto re;}
+	mes 1, "세멜리아를 배울때 최소레벨은 99, 필요능력치는 마나 9000 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 99 && get_mana(@myid) >= 9000){spell_add "세멜리아"; mes 1, "세멜리아 스펠을 익혔습니다."; goto re;}
+	mes 1, "세멜리아를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 13){
+	if(spell_exist("라그나로크") == 1){mes 1, "당신은 이미 라그나로크를 배웠습니다."; goto re;}
+	mes 1, "라그나로크를 배울때 최소레벨은 99, 필요능력치는 마나 15000 이상이여야합니다.";
+	if(get_class(@myid) == 3 && get_level(@myid) >= 99 && get_mana(@myid) >= 15000){spell_add "라그나로크"; mes 1, "라그나로크 스펠을 익혔습니다."; goto re;}
+	mes 1, "라그나로크를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	성직자스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [성직자스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 4){mes 1, "성직자가 아닙니다."; end;}
+	set @select, menu("자 배울기술을 선택해주세요.", "이모탈11", "홀리볼트11", "쿠라노11", "쿠러스11", "벨라르모11", "에나르마11", "쿠라노소41", "디나르콜리41", "디소루마41", "디베노모41", "쿠라누스41", "콜라마41", "수페라벨라르모41", "수페라쿠라노71", "호르라마71", "쿠라네라71", "리베라토71", "엑스쿠라노99", "엑스쿠라네라99", "코마디아99");
+	if(@select == 1){
+	if(spell_exist("이모탈") == 1){mes 1, "당신은 이미 이모탈를 배웠습니다."; goto re;}
+	mes 1, "이모탈을 배울때 최소레벨은 11, 필요능력치는 인트 13 위즈 10 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 11 && get_int(@myid) >= 13 && get_wis(@myid) >= 10){spell_add "이모탈"; mes 1, "이모탈 스펠을 익혔습니다."; goto re;}
+	mes 1, "이모탈을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 2){
+	if(spell_exist("홀리볼트") == 1){mes 1, "당신은 이미 홀리볼트를 배웠습니다."; goto re;}
+	mes 1, "홀리볼트를 배울때 최소레벨은 11, 필요능력치는 인트 13 위즈 10 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 11 && get_int(@myid) >= 13 && get_wis(@myid) >= 10){spell_add "홀리볼트"; mes 1, "홀리볼트 스펠을 익혔습니다."; goto re;}
+	mes 1, "홀리볼트를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(spell_exist("쿠라노") == 1){mes 1, "당신은 이미 쿠라노를 배웠습니다."; goto re;}
+	mes 1, "쿠라노를 배울때 최소레벨은 11, 필요능력치는 인트 13 위즈 10 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 11 && get_int(@myid) >= 13 && get_wis(@myid) >= 10){spell_add "쿠라노"; mes 1, "쿠라노 스펠을 익혔습니다."; goto re;}
+	mes 1, "쿠라노를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(spell_exist("쿠러스") == 1){mes 1, "당신은 이미 쿠러스를 배웠습니다."; goto re;}
+	mes 1, "쿠러스를 배울때 최소레벨은 11, 필요능력치는 인트 23 위즈 15 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 11 && get_int(@myid) >= 23 && get_wis(@myid) >= 15){spell_add "쿠러스"; mes 1, "쿠러스 스펠을 익혔습니다."; goto re;}
+	mes 1, "쿠러스를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	//if(spell_exist("벨라르모") == 1){mes 1, "당신은 이미 벨라르모를 배웠습니다."; goto re;}
+	mes 1, "벨라르모를 배울때 최소레벨은 11, 필요능력치는 인트 23 위즈 15 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 11 && get_int(@myid) >= 23 && get_wis(@myid) >= 15){spell_add "벨라르모"; mes 1, "벨라르모 스펠을 익혔습니다."; goto re;}
+	mes 1, "벨라르모를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 6){
+	if(spell_exist("에나르마") == 1){mes 1, "당신은 이미 에나르마를 배웠습니다."; goto re;}
+	mes 1, "에나르마를 배울때 최소레벨은 11, 필요능력치는 인트 23 위즈 15 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 11 && get_int(@myid) >= 23 && get_wis(@myid) >= 15){spell_add "에나르마"; mes 1, "에나르마 스펠을 익혔습니다."; goto re;}
+	mes 1, "에나르마를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 7){
+	if(spell_exist("쿠라노소") == 1){mes 1, "당신은 이미 쿠라노소를 배웠습니다."; goto re;}
+	mes 1, "쿠라노소를 배울때 최소레벨은 41, 필요능력치는 인트 63 위즈 23 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 41 && get_int(@myid) >= 63 && get_wis(@myid) >= 23){spell_add "쿠라노소"; mes 1, "쿠라노소 스펠을 익혔습니다."; goto re;}
+	mes 1, "쿠라노소를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 8){
+	if(spell_exist("디나르콜리") == 1){mes 1, "당신은 이미 디나르콜리를 배웠습니다."; goto re;}
+	mes 1, "디나르콜리를 배울때 최소레벨은 41, 필요능력치는 인트 63 위즈 23 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 41 && get_int(@myid) >= 63 && get_wis(@myid) >= 23){spell_add "디나르콜리"; mes 1, "디나르콜리 스펠을 익혔습니다."; goto re;}
+	mes 1, "디나르콜리를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 9){
+	if(spell_exist("디소루마") == 1){mes 1, "당신은 이미 디소루마를 배웠습니다."; goto re;}
+	mes 1, "디소루마를 배울때 최소레벨은 41, 필요능력치는 인트 63 위즈 23 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 41 && get_int(@myid) >= 63 && get_wis(@myid) >= 23){spell_add "디소루마"; mes 1, "디소루마 스펠을 익혔습니다."; goto re;}
+	mes 1, "디소루마를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 10){
+	if(spell_exist("디베노모") == 1){mes 1, "당신은 이미 디베노모를 배웠습니다."; goto re;}
+	mes 1, "디베노모를 배울때 최소레벨은 41, 필요능력치는 인트 63 위즈 23 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 41 && get_int(@myid) >= 63 && get_wis(@myid) >= 23){spell_add "디베노모"; mes 1, "디베노모 스펠을 익혔습니다."; goto re;}
+	mes 1, "디베노모를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 11){
+	if(spell_exist("쿠라누스") == 1){mes 1, "당신은 이미 쿠라누스를 배웠습니다."; goto re;}
+	mes 1, "쿠라누스를 배울때 최소레벨은 41, 필요능력치는 인트 67 위즈 25 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 41 && get_int(@myid) >= 67 && get_wis(@myid) >= 25){spell_add "쿠라누스"; mes 1, "쿠라누스 스펠을 익혔습니다."; goto re;}
+	mes 1, "쿠라누스를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 12){
+	if(spell_exist("콜라마") == 1){mes 1, "당신은 이미 콜라마를 배웠습니다."; goto re;}
+	mes 1, "콜라마를 배울때 최소레벨은 41, 필요능력치는 인트 67 위즈 25 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 41 && get_int(@myid) >= 67 && get_wis(@myid) >= 25){spell_add "콜라마"; mes 1, "콜라마 스펠을 익혔습니다."; goto re;}
+	mes 1, "콜라마를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 13){
+	//if(spell_exist("수페라벨라르모") == 1){mes 1, "당신은 이미 수페라벨라르모를 배웠습니다."; goto re;}
+	mes 1, "수페라벨라르모를 배울때 최소레벨은 41, 필요능력치는 인트 67 위즈 25 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 41 && get_int(@myid) >= 67 && get_wis(@myid) >= 25){spell_add "수페라벨라르모"; mes 1, "수페라벨라르모 스펠을 익혔습니다."; goto re;}
+	mes 1, "수페라벨라르모를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 14){
+	if(spell_exist("수페라쿠라노") == 1){mes 1, "당신은 이미 수페라쿠라노를 배웠습니다."; goto re;}
+	mes 1, "수페라쿠라노를 배울때 최소레벨은 71, 필요능력치는 인트 93 위즈 53 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 71 && get_int(@myid) >= 93 && get_wis(@myid) >= 53){spell_add "수페라쿠라노"; mes 1, "수페라쿠라노 스펠을 익혔습니다."; goto re;}
+	mes 1, "수페라쿠라노를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 15){
+	if(spell_exist("호르라마") == 1){mes 1, "당신은 이미 호르라마를 배웠습니다."; goto re;}
+	mes 1, "호르라마를 배울때 최소레벨은 71, 필요능력치는 인트 96 위즈 56 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 71 && get_int(@myid) >= 96 && get_wis(@myid) >= 56){spell_add "호르라마"; mes 1, "호르라마 스펠을 익혔습니다."; goto re;}
+	mes 1, "호르라마를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 16){
+	if(spell_exist("쿠라네라") == 1){mes 1, "당신은 이미 쿠라네라를 배웠습니다."; goto re;}
+	mes 1, "쿠라네라를 배울때 최소레벨은 71, 필요능력치는 인트 99 위즈 59 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 71 && get_int(@myid) >= 99 && get_wis(@myid) >= 59){spell_add "쿠라네라"; mes 1, "쿠라네라 스펠을 익혔습니다."; goto re;}
+	mes 1, "쿠라네라를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 17){
+	if(spell_exist("리베라토") == 1){mes 1, "당신은 이미 리베라토를 배웠습니다."; goto re;}
+	mes 1, "리베라토를 배울때 최소레벨은 71, 필요능력치는 인트 99 위즈 59 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 71 && get_int(@myid) >= 99 && get_wis(@myid) >= 59){spell_add "리베라토"; mes 1, "리베라토 스펠을 익혔습니다."; goto re;}
+	mes 1, "리베라토를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 18){
+	if(spell_exist("엑스쿠라노") == 1){mes 1, "당신은 이미 엑스쿠라노를 배웠습니다."; goto re;}
+	mes 1, "엑스쿠라노를 배울때 최소레벨은 99, 필요능력치는 인트 115 위즈 83 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 99 && get_int(@myid) >= 115 && get_wis(@myid) >= 83){spell_add "엑스쿠라노"; mes 1, "엑스쿠라노 스펠을 익혔습니다."; goto re;}
+	mes 1, "엑스쿠라노를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 19){
+	if(spell_exist("엑스쿠라네라") == 1){mes 1, "당신은 이미 엑스쿠라네라를 배웠습니다."; goto re;}
+	mes 1, "엑스쿠라네라를 배울때 최소레벨은 99, 필요능력치는 인트 115 위즈 83 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 99 && get_int(@myid) >= 115 && get_wis(@myid) >= 83){spell_add "엑스쿠라네라"; mes 1, "엑스쿠라네라 스펠을 익혔습니다."; goto re;}
+	mes 1, "엑스쿠라네라를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 20){
+	if(spell_exist("코마디아") == 1){mes 1, "당신은 이미 코마디아를 배웠습니다."; goto re;}
+	mes 1, "코마디아를 배울때 최소레벨은 99, 필요능력치는 인트 115 위즈 83 이상이여야합니다.";
+	if(get_class(@myid) == 4 && get_level(@myid) >= 99 && get_int(@myid) >= 115 && get_wis(@myid) >= 83){spell_add "코마디아"; mes 1, "코마디아 스펠을 익혔습니다."; goto re;}
+	mes 1, "코마디아를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	무도가스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [무도가스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 5){mes 1, "무도가가 아닙니다."; end;}
+	set @select, menu("자 배울기술을 선택해주세요.", "쿠로토11", "단각11", "통배권11", "이형환위11", "붕각41", "일음지41", "선풍각71", "금강불괴71", "장풍71", "발경71", "다라밀공99", "구양신공99", "달마신공99");
+	if(@select == 1){
+	if(spell_exist("쿠로토") == 1){mes 1, "당신은 이미 쿠로토를 배웠습니다."; goto re;}
+	mes 1, "쿠로토를 배울때 최소레벨은 11입니다."; spell_add "쿠로토"; mes 1, "쿠로토 스펠을 익혔습니다."; goto re;}
+	if(@select == 2){
+	if(skill_exist("연천단각") == 1){mes 1, "당신은 이미 단각상위단계인 연천단각을 배웠습니다."; goto re;}
+	if(skill_exist("단각") == 1){mes 1, "당신은 이미 단각를 배웠습니다."; goto re;}
+	mes 1, "단각를 배울때 최소레벨은 11, 필요능력치는 힘 13 콘 10 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 11 && get_str(@myid) >= 13 && get_con(@myid) >= 10){skill_add "단각"; mes 1, "단각 기술을 익혔습니다."; goto re;}
+	mes 1, "단각를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(skill_exist("통배권") == 1){mes 1, "당신은 이미 통배권를 배웠습니다."; goto re;}
+	mes 1, "통배권를 배울때 최소레벨은 11, 필요능력치는 힘 21 콘 13 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 11 && get_str(@myid) >= 21 && get_con(@myid) >= 13){skill_add "통배권"; mes 1, "통배권 기술을 익혔습니다."; goto re;}
+	mes 1, "통배권를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(skill_exist("이형환위") == 1){mes 1, "당신은 이미 이형환위를 배웠습니다."; goto re;}
+	mes 1, "이형환위를 배울때 최소레벨은 11, 필요능력치는 힘 21 콘 13 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 11 && get_str(@myid) >= 21 && get_con(@myid) >= 13){skill_add "이형환위"; mes 1, "이형환위 기술을 익혔습니다."; goto re;}
+	mes 1, "이형환위를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(skill_exist("붕신선각") == 1){mes 1, "당신은 이미 붕각상위단계인 붕신선각을 배웠습니다."; goto re;}
+	if(skill_exist("붕각") == 1){mes 1, "당신은 이미 붕각를 배웠습니다."; goto re;}
+	mes 1, "붕각을 배울때 최소레벨은 41, 필요능력치는 힘 63 콘 23 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 41 && get_str(@myid) >= 63 && get_con(@myid) >= 23){skill_add "붕각"; mes 1, "붕각 스킬을 익혔습니다."; goto re;}
+	mes 1, "붕각를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 6){
+	if(skill_exist("일음지") == 1){mes 1, "당신은 이미 일음지를 배웠습니다."; goto re;}
+	mes 1, "일음지를 배울때 최소레벨은 41, 필요능력치는 힘 78 콘 26 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 41 && get_str(@myid) >= 78 && get_con(@myid) >= 26){skill_add "일음지"; mes 1, "일음지 스킬을 익혔습니다."; goto re;}
+	mes 1, "일음지를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 7){
+	if(skill_exist("파천각") == 1){mes 1, "당신은 이미 선풍각상위단계인 파천각을 배웠습니다."; goto re;}
+	if(skill_exist("선풍각") == 1){mes 1, "당신은 이미 선풍각를 배웠습니다."; goto re;}
+	mes 1, "선풍각를 배울때 최소레벨은 71, 필요능력치는 힘 93 콘 53 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 71 && get_str(@myid) >= 93 && get_con(@myid) >= 53){skill_add "선풍각"; mes 1, "선풍각 스킬을 익혔습니다."; goto re;}
+	mes 1, "선풍각를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 8){
+	if(spell_exist("자기보호") == 1){mes 1, "당신은 이미 금강불괴상위단계인 자기보호을 배웠습니다."; goto re;}
+	if(spell_exist("금강불괴") == 1){mes 1, "당신은 이미 금강불괴를 배웠습니다."; goto re;}
+	mes 1, "금강불괴를 배울때 최소레벨은 71, 필요능력치는 힘 93 콘 53 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 71 && get_str(@myid) >= 93 && get_con(@myid) >= 53){spell_add "금강불괴"; mes 1, "금강불괴 스펠을 익혔습니다."; goto re;}
+	mes 1, "금강불괴를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 9){
+	if(spell_exist("장풍") == 1){mes 1, "당신은 이미 장풍를 배웠습니다."; goto re;}
+	mes 1, "장풍을 배울때 최소레벨은 71, 필요능력치는 힘 93 콘 53 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 71 && get_str(@myid) >= 93 && get_con(@myid) >= 53){spell_add "장풍"; mes 1, "장풍 스펠을 익혔습니다."; goto re;}
+	mes 1, "장풍을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 10){
+	if(skill_exist("발경") == 1){mes 1, "당신은 이미 발경을 배웠습니다."; goto re;}
+	mes 1, "발경을 배울때 최소레벨은 71, 필요능력치는 힘 93 콘 53 이상이여야합니다.";
+	if(get_class(@myid) == 5 && get_level(@myid) >= 71 && get_str(@myid) >= 93 && get_con(@myid) >= 53){skill_add "발경"; mes 1, "발경 스킬을 익혔습니다."; goto re;}
+	mes 1, "발경을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 11){
+	if(spell_exist("다라밀공") == 1){mes 1, "당신은 이미 다라밀공를 배웠습니다."; goto re;}
+	mes 1, "다라밀공을 배울때 최소레벨은 99, 필요능력치는 힘 115 콘 83 마력 8000 이상이여야합니다.";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 5 && get_level(@myid) >= 99 && get_basemana(@myid) >= 8000 && get_str(@myid) >= 115 && get_con(@myid) >= 83){spell_add "다라밀공"; mes 1, "다라밀공 스펠을 익혔습니다."; goto re;}
+	mes 1, "다라밀공를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 12){
+	if(skill_exist("구양신공") == 1){mes 1, "당신은 이미 구양신공를 배웠습니다."; goto re;}
+	mes 1, "구양신공을 배울때 최소레벨은 99, 필요능력치는 힘 115 콘 83 체력 9000 이상이여야합니다.";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 5 && get_level(@myid) >= 99 && get_basevita(@myid) >= 9000 && get_str(@myid) >= 115 && get_con(@myid) >= 83){skill_add "구양신공"; mes 1, "구양신공 스킬을 익혔습니다."; goto re;}
+	mes 1, "구양신공를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 13){
+	if(skill_exist("달마신공") == 1){mes 1, "당신은 이미 달마신공를 배웠습니다."; goto re;}
+	mes 1, "달마신공을 배울때 최소레벨은 99, 필요능력치는 힘 115 콘 83 체력 9000 이상이여야합니다.";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 5 && get_level(@myid) >= 99 && get_basevita(@myid) >= 9000 && get_str(@myid) >= 115 && get_con(@myid) >= 83){skill_add "달마신공"; mes 1, "달마신공 스킬을 익혔습니다."; goto re;}
+	mes 1, "달마신공를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	2전사스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [2전사스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 1){mes 1, "승급전사가 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "스톰블레이드", "룬블레이드", "집중", "포효", "(순수)매드소울진", "(순수)데빌크래셔", "(순수)공격력강화");
+	if(@select == 1){
+	if(skill_exist("스톰블레이드") == 1){mes 1, "당신은 이미 스톰블레이드를 배웠습니다."; goto re;}
+	if(skill_exist("메가블레이드") == 0){mes 1, "하위 스킬인, 메가블레이드가 있어야 배울수있습니다."; goto re;}
+	mes 1, "스톰블레이드 조건 : 힘140이상, 콘110이상 체력55000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 1 && get_class_sub() != 0 && get_str(@myid) >= 140 && get_con(@myid) >= 110 && get_basevita(@myid) >= 55000){skill_add "스톰블레이드"; skill_del "메가블레이드"; mes 1, "스톰블레이드 스킬을 익혔습니다."; goto re;}
+	mes 1, "스톰블레이드를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 2){
+	if(skill_exist("룬블레이드") == 1){mes 1, "당신은 이미 룬블레이드를 배웠습니다."; goto re;}
+	if(skill_exist("윈드블레이드") == 0){mes 1, "하위 스킬인, 윈드블레이드가 있어야 배울수있습니다."; goto re;}
+	mes 1, "룬블레이드 조건 : 힘140이상, 콘110이상 체력55000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 1 && get_class_sub() != 0 && get_str(@myid) >= 140 && get_con(@myid) >= 110 && get_basevita(@myid) >= 55000){skill_add "룬블레이드"; skill_del "윈드블레이드"; mes 1, "룬블레이드 스킬을 익혔습니다."; goto re;}
+	mes 1, "룬블레이드를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(spell_exist("집중") == 1){mes 1, "당신은 이미 집중을 배웠습니다."; goto re;}
+	mes 1, "집중 조건 : 힘145이상, 콘115이상 체력60000이상 제물 : 30만골드";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 1 && get_class_sub() != 0 && get_str(@myid) >= 145 && get_con(@myid) >= 115 && get_basevita(@myid) >= 60000 && get_money() >= 300000){spell_add "집중"; money_del 300000; mes 1, "집중 스펠을 익혔습니다."; goto re;}
+	mes 1, "집중을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(skill_exist("포효") == 1){mes 1, "당신은 이미 포효를 배웠습니다."; goto re;}
+	mes 1, "포효 조건 : 힘130이상, 콘130이상, 덱스70이상 제물 : 암흑의시약";
+	if(get_class(@myid) == 1 && get_class_sub() != 0 && get_str(@myid) >= 130 && get_con(@myid) >= 130 && get_dex(@myid) >= 70 && item_exist(@myid, "암흑의시약") >= 1){skill_add "포효"; item_del "암흑의시약", 1; mes 1, "포효 스킬을 익혔습니다."; goto re;}
+	mes 1, "포효를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(skill_exist("매드소울진") == 1){mes 1, "당신은 이미 매드소울진을 배웠습니다."; goto re;}
+	if(skill_exist("매드소울") == 0){mes 1, "하위 스킬인, 매드소울이 있어야 배울수있습니다."; goto re;}
+	mes 1, "매드소울진 조건 : 힘150이상, 콘120이상 제물 : 30만골드, 좀비의살20개, 좀비의막대기10개";
+	if(get_class(@myid) == 1 && get_class_sub() != 0 && get_str(@myid) >= 150 && get_con(@myid) >= 120 && get_money() >= 300000 && item_exist(@myid, "좀비의살") >= 20 && item_exist(@myid, "좀비의막대기") >= 10){skill_add "매드소울진"; skill_del "매드소울"; money_del 300000; item_del "좀비의살", 20; item_del "좀비의막대기", 10; mes 1, "매드소울진 스킬을 익혔습니다."; goto re;}
+	mes 1, "매드소울진을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 6){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(skill_exist("데빌크래셔") == 1){mes 1, "당신은 이미 데빌크래셔을 배웠습니다."; goto re;}
+	if(skill_exist("크래셔") == 0){mes 1, "하위 스킬인, 크래셔가 있어야 배울수있습니다."; goto re;}
+	mes 1, "데빌크래셔 조건 : 힘155이상, 콘125이상 제물 : 40만골드, 좀비의살30개, 좀비의막대기20개";
+	if(get_class(@myid) == 1 && get_class_sub() != 0 && get_str(@myid) >= 155 && get_con(@myid) >= 125 && get_money() >= 400000 && item_exist(@myid, "좀비의살") >= 30 && item_exist(@myid, "좀비의막대기") >= 20){skill_add "데빌크래셔"; skill_del "크래셔"; money_del 400000; item_del "좀비의살", 30; item_del "좀비의막대기", 20; mes 1, "데빌크래셔 스킬을 익혔습니다."; goto re;}
+	mes 1, "데빌크래셔을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 7){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(skill_exist("공격력강화") == 1){mes 1, "당신은 이미 공격력강화를 배웠습니다."; goto re;}
+	mes 1, "공격력강화 조건 : 힘155이상, 콘125이상 제물 : 1백만골드";
+	if(get_class(@myid) == 1 && get_class_sub() != 0 && get_str(@myid) >= 155 && get_con(@myid) >= 125 && get_money() >= 1000000){skill_add "공격력강화"; money_del 1000000; mes 1, "공격력강화 스킬을 익혔습니다."; goto re;}
+	mes 1, "공격력강화를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	2도적스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [2도적스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 2){mes 1, "승급도적이 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "마구찌르기", "슬레쉬", "(순수)습격진", "(순수)암살격진", "(순수)백스텝");
+	if(@select == 1){
+	if(skill_exist("마구찌르기") == 1){mes 1, "당신은 이미 마구찌르기를 배웠습니다."; goto re;}
+	if(skill_exist("찔러휘비기") == 0){mes 1, "하위 스킬인, 찔러휘비기가 있어야 배울수있습니다."; goto re;}
+	mes 1, "마구찌르기 조건 : 덱스140이상, 콘110이상 체력44000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 2 && get_class_sub() != 0 && get_dex(@myid) >= 140 && get_con(@myid) >= 110 && get_basevita(@myid) >= 44000){skill_add "마구찌르기"; skill_del "찔러휘비기"; mes 1, "마구찌르기 스킬을 익혔습니다."; goto re;}
+	mes 1, "마구찌르기를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 2){
+	if(skill_exist("슬레쉬") == 1){mes 1, "당신은 이미 슬레쉬를 배웠습니다."; goto re;}
+	if(skill_exist("두번찌르기") == 0){mes 1, "하위 스킬인, 두번찌르기가 있어야 배울수있습니다."; goto re;}
+	mes 1, "슬레쉬 조건 : 덱스140이상, 콘110이상 체력44000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 2 && get_class_sub() != 0 && get_dex(@myid) >= 140 && get_con(@myid) >= 110 && get_basevita(@myid) >= 44000){skill_add "슬레쉬"; skill_del "두번찌르기"; mes 1, "슬레쉬 스킬을 익혔습니다."; goto re;}
+	mes 1, "슬레쉬를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(skill_exist("습격진") == 1){mes 1, "당신은 이미 습격진을 배웠습니다."; goto re;}
+	if(skill_exist("습격") == 0){mes 1, "하위 스킬인, 습격이 있어야 배울수있습니다."; goto re;}
+	mes 1, "습격진 조건 : 덱스150이상, 콘120이상 제물 : 30만골드, 좀비의살20개, 좀비의막대기10개";
+	if(get_class(@myid) == 2 && get_class_sub() != 0 && get_dex(@myid) >= 150 && get_con(@myid) >= 120 && get_money() >= 300000 && item_exist(@myid, "좀비의살") >= 20 && item_exist(@myid, "좀비의막대기") >= 10){skill_add "습격진"; skill_del "습격"; money_del 300000; item_del "좀비의살", 20; item_del "좀비의막대기", 10; mes 1, "습격진 스킬을 익혔습니다."; goto re;}
+	mes 1, "습격진을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(skill_exist("암살격진") == 1){mes 1, "당신은 이미 암살격진을 배웠습니다."; goto re;}
+	if(skill_exist("암살격") == 0){mes 1, "하위 스킬인, 암살격이 있어야 배울수있습니다."; goto re;}
+	mes 1, "암살격진 조건 : 덱스155이상, 콘125이상 제물 : 40만골드, 좀비의살30개, 좀비의막대기20개";
+	if(get_class(@myid) == 2 && get_class_sub() != 0 && get_dex(@myid) >= 155 && get_con(@myid) >= 125 && get_money() >= 400000 && item_exist(@myid, "좀비의살") >= 30 && item_exist(@myid, "좀비의막대기") >= 20){skill_add "암살격진"; skill_del "암살격"; money_del 400000; item_del "좀비의살", 30; item_del "좀비의막대기", 20; mes 1, "암살격진 스킬을 익혔습니다."; goto re;}
+	mes 1, "암살격진을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(skill_exist("백스텝") == 1){mes 1, "당신은 이미 백스텝을 배웠습니다."; goto re;}
+	mes 1, "백스텝 조건 : 100만골드";
+	if(get_class(@myid) == 2 && get_class_sub() != 0 && get_money() >= 1000000){skill_add "백스텝"; money_del 1000000; mes 1, "백스텝 스킬을 익혔습니다."; goto re;}
+	mes 1, "백스텝을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	2마법사스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [2마법사스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 3){mes 1, "승급마법사가 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "아이스블러스트", "(순수)어둠의각인", "(순수)포트리스", "(순수)델리스펠라스", "(순수)프라베라", "속성강화");
+	if(@select == 1){
+	if(spell_exist("아이스블러스트") == 1){mes 1, "당신은 이미 아이스블러스트를 배웠습니다."; goto re;}
+	mes 1, "아이스블러스트 조건 : 인트140이상, 위즈110이상 마력42000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 3 && get_class_sub() != 0 && get_int(@myid) >= 140 && get_wis(@myid) >= 110 && get_basemana(@myid) >= 42000){spell_add "아이스블러스트"; mes 1, "아이스블러스트 스펠을 익혔습니다."; goto re;}
+	mes 1, "아이스블러스트를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 2){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(spell_exist("어둠의각인") == 1){mes 1, "당신은 이미 어둠의각인을 배웠습니다."; goto re;}
+	mes 1, "어둠의각인 조건 : 인트150이상, 위즈120이상 제물 : 30만골드, 좀비의살20개, 좀비지팡이10개";
+	if(get_class(@myid) == 3 && get_class_sub() != 0 && get_int(@myid) >= 150 && get_wis(@myid) >= 120 && get_money() >= 300000 && item_exist(@myid, "좀비의살") >= 20 && item_exist(@myid, "좀비지팡이") >= 10){spell_add "어둠의각인"; money_del 300000; item_del "좀비의살", 20; item_del "좀비지팡이", 10; mes 1, "어둠의각인 스펠을 익혔습니다."; goto re;}
+	mes 1, "어둠의각인을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(spell_exist("포트리스") == 1){mes 1, "당신은 이미 포트리스을 배웠습니다."; goto re;}
+	mes 1, "포트리스 조건 : 인트150이상, 위즈120이상 제물 : 30만골드, 좀비의살10개, 좀비지팡이5개";
+	if(get_class(@myid) == 3 && get_class_sub() != 0 && get_int(@myid) >= 150 && get_wis(@myid) >= 120 && get_money() >= 300000 && item_exist(@myid, "좀비의살") >= 10 && item_exist(@myid, "좀비지팡이") >= 5){spell_add "포트리스"; money_del 300000; item_del "좀비의살", 10; item_del "좀비지팡이", 5; mes 1, "포트리스 스펠을 익혔습니다."; goto re;}
+	mes 1, "포트리스를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(spell_exist("델리스펠라스") == 1){mes 1, "당신은 이미 델리스펠라스을 배웠습니다."; goto re;}
+	mes 1, "델리스펠라스 조건 : 인트150이상, 위즈120이상 제물 : 30만골드, 좀비의살10개, 좀비지팡이5개";
+	if(get_class(@myid) == 3 && get_class_sub() != 0 && get_int(@myid) >= 150 && get_wis(@myid) >= 120 && get_money() >= 300000 && item_exist(@myid, "좀비의살") >= 10 && item_exist(@myid, "좀비지팡이") >= 5){spell_add "델리스펠라스"; money_del 300000; item_del "좀비의살", 10; item_del "좀비지팡이", 5; mes 1, "델리스펠라스 스펠을 익혔습니다."; goto re;}
+	mes 1, "델리스펠라스를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(spell_exist("프라베라") == 1){mes 1, "당신은 이미 프라베라을 배웠습니다."; goto re;}
+	mes 1, "프라베라 조건 : 인트160이상, 위즈130이상 제물 : 40만골드, 좀비의살30개, 좀비지팡이20개";
+	if(get_class(@myid) == 3 && get_class_sub() != 0 && get_int(@myid) >= 160 && get_wis(@myid) >= 130 && get_money() >= 400000 && item_exist(@myid, "좀비의살") >= 30 && item_exist(@myid, "좀비지팡이") >= 20){spell_add "프라베라"; money_del 400000; item_del "좀비의살", 30; item_del "좀비지팡이", 20; mes 1, "프라베라 스펠을 익혔습니다."; goto re;}
+	mes 1, "프라베라을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 6){
+	if(spell_exist("속성강화") == 1){mes 1, "당신은 이미 속성강화를 배웠습니다."; goto re;}
+	mes 1, "속성강화 조건 : 인트160이상, 위즈130이상 제물 : 40만골드, 좀비의살20개, 좀비지팡이10개";
+	if(get_class(@myid) == 3 && get_class_sub() != 0 && get_int(@myid) >= 160 && get_wis(@myid) >= 130 && get_money() >= 400000 && item_exist(@myid, "좀비의살") >= 20 && item_exist(@myid, "좀비지팡이") >= 10){spell_add "속성강화"; money_del 400000; item_del "좀비의살", 20; item_del "좀비지팡이", 10; mes 1, "속성강화 스펠을 익혔습니다."; goto re;}
+	mes 1, "속성강화을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	2성직자스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [2성직자스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 4){mes 1, "승급성직자가 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "엑스벨라룸", "홀리쿠라네라", "(순수)홀리드래곤");
+	if(@select == 1){
+	//if(spell_exist("엑스벨라룸") == 1){mes 1, "당신은 이미 엑스벨라룸을 배웠습니다."; goto re;}
+	mes 1, "엑스벨라룸 조건 : 인트140이상, 위즈110이상 마력45000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 4 && get_class_sub() != 0 && get_int(@myid) >= 140 && get_wis(@myid) >= 110 && get_basemana(@myid) >= 45000){spell_add "엑스벨라룸"; mes 1, "엑스벨라룸 스펠을 익혔습니다."; goto re;}
+	mes 1, "엑스벨라룸를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 2){
+	if(spell_exist("홀리쿠라네라") == 1){mes 1, "당신은 이미 아이스블러스트를 배웠습니다."; goto re;}
+	mes 1, "홀리쿠라네라 조건 : 인트140이상, 위즈110이상 마력45000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 4 && get_class_sub() != 0 && get_int(@myid) >= 140 && get_wis(@myid) >= 110 && get_basemana(@myid) >= 45000){spell_add "홀리쿠라네라"; mes 1, "홀리쿠라네라 스펠을 익혔습니다."; goto re;}
+	mes 1, "홀리쿠라네라를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(get_son() == 0){mes 1, "순수가 아닌자는 배울수없습니다."; goto re;}
+	if(spell_exist("홀리드래곤") == 1){mes 1, "당신은 이미 어둠의각인을 배웠습니다."; goto re;}
+	mes 1, "홀리드래곤 조건 : 인트150이상, 위즈120이상 제물 : 30만골드, 좀비의살20개, 좀비지팡이10개";
+	if(get_class(@myid) == 4 && get_class_sub() != 0 && get_int(@myid) >= 150 && get_wis(@myid) >= 120 && get_money() >= 300000 && item_exist(@myid, "좀비의살") >= 20 && item_exist(@myid, "좀비지팡이") >= 10){spell_add "홀리드래곤"; money_del 300000; item_del "좀비의살", 20; item_del "좀비지팡이", 10; mes 1, "홀리드래곤 스펠을 익혔습니다."; goto re;}
+	mes 1, "홀리드래곤을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	2무도가스킬상인	{
+	console_output "[시스템]" + get_name() + "님이 NPC [2무도가스킬상인] 실행";
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 5){mes 1, "승급무도가이 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "연천단각", "붕신선각", "파천각", "자기보호", "디스가드어택");
+	if(@select == 1){
+	if(skill_exist("연천단각") == 1){mes 1, "당신은 이미 연천단각를 배웠습니다."; goto re;}
+	if(skill_exist("단각") == 0){mes 1, "하위 스킬인, 단각이 있어야 배울수있습니다."; goto re;}
+	mes 1, "연천단각 조건 : 힘140이상, 콘110이상 체력52000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 5 && get_class_sub() != 0 && get_str(@myid) >= 140 && get_con(@myid) >= 110 && get_basevita(@myid) >= 52000){skill_add "연천단각"; skill_del "단각"; mes 1, "연천단각 스킬을 익혔습니다."; goto re;}
+	mes 1, "연천단각를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 2){
+	if(skill_exist("붕신선각") == 1){mes 1, "당신은 이미 붕신선각를 배웠습니다."; goto re;}
+	if(skill_exist("붕각") == 0){mes 1, "하위 스킬인, 붕각이 있어야 배울수있습니다."; goto re;}
+	mes 1, "붕신선각 조건 : 힘140이상, 콘110이상 체력52000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 5 && get_class_sub() != 0 && get_str(@myid) >= 140 && get_con(@myid) >= 110 && get_basevita(@myid) >= 52000){skill_add "붕신선각"; skill_del "붕각"; mes 1, "붕신선각 스킬을 익혔습니다."; goto re;}
+	mes 1, "붕신선각를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 3){
+	if(skill_exist("파천각") == 1){mes 1, "당신은 이미 파천각을 배웠습니다."; goto re;}
+	if(skill_exist("선풍각") == 0){mes 1, "하위 스킬인, 선풍각이 있어야 배울수있습니다."; goto re;}
+	mes 1, "파천각 조건 : 힘140이상, 콘110이상 체력52000이상";
+	if(get_ac(@myid) != 100){mes 1," 무장해제하시고 다시시도 해주세요."; end;}
+	if(get_class(@myid) == 5 && get_class_sub() != 0 && get_str(@myid) >= 140 && get_con(@myid) >= 110 && get_basevita(@myid) >= 52000){skill_add "파천각"; skill_del "선풍각"; mes 1, "파천각 스킬을 익혔습니다."; goto re;}
+	mes 1, "파천각을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 4){
+	if(spell_exist("자기보호") == 1){mes 1, "당신은 이미 자기보호를 배웠습니다."; goto re;}
+	if(spell_exist("금강불괴") == 0){mes 1, "하위 스킬인, 금강불괴가 있어야 배울수있습니다."; goto re;}
+	mes 1, "자기보호 조건 : 힘155이상, 콘125이상 제물 : 40만골드, 좀비의살30개, 좀비의막대기20개";
+	if(get_class(@myid) == 5 && get_class_sub() != 0 && get_str(@myid) >= 155 && get_con(@myid) >= 125 && get_money() >= 400000 && item_exist(@myid, "좀비의살") >= 30 && item_exist(@myid, "좀비의막대기") >= 20){spell_add "자기보호"; spell_del "금강불괴"; money_del 400000; item_del "좀비의살", 30; item_del "좀비의막대기", 20; mes 1, "자기보호 스펠을 익혔습니다."; goto re;}
+	mes 1, "자기보호을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}if(@select == 5){
+	if(spell_exist("디스가드어택") == 1){mes 1, "당신은 이미 디스가드어택를 배웠습니다."; goto re;}
+	mes 1, "디스가드어택 조건 : 힘155이상, 콘125이상 제물 : 40만골드, 좀비의살30개, 좀비의막대기20개";
+	if(get_class(@myid) == 5 && get_class_sub() != 0 && get_str(@myid) >= 155 && get_con(@myid) >= 125 && get_money() >= 400000 && item_exist(@myid, "좀비의살") >= 30 && item_exist(@myid, "좀비의막대기") >= 20){spell_add "디스가드어택"; money_del 400000; item_del "좀비의살", 30; item_del "좀비의막대기", 20; mes 1, "자기보호 스펠을 익혔습니다."; goto re;}
+	mes 1, "디스가드어택을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	3전사스킬상인	{
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 1 || get_class_sub() != 2){mes 1, "검투사가 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "검투술(Lev1)", "검투술(Lev2)", "검투술(Lev3)", "퓨리소월루(Lev1)", "전체도발");
+	if(@select == 1){
+	if(skill_exist("검투술(Lev1)") == 1){mes 1, "당신은 이미 검투술(Lev1)를 배웠습니다."; goto re;}
+	if(skill_exist("검투술(Lev2)") == 1){mes 1, "당신은 이미 검투술(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("검투술(Lev3)") == 1){mes 1, "당신은 이미 검투술(Lev3)를 배웠습니다."; goto re;}
+	mes 1, "검투술(Lev1) 조건 : 2차승급";
+	if(get_class(@myid) == 1 && get_class_sub() == 2){skill_add "검투술(Lev1)"; mes 1, "검투술(Lev1) 스킬을 익혔습니다."; goto re;}
+	mes 1, "검투술(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 2){
+	if(skill_exist("검투술(Lev2)") == 1){mes 1, "당신은 이미 검투술(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("검투술(Lev3)") == 1){mes 1, "당신은 이미 검투술(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("검투술(Lev1)") != 1){mes 1, "검투술(Lev1)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "검투술(Lev2) 조건 : 2차승급 어빌리티레벨 8 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개";
+	if(get_class(@myid) == 1 && get_class_sub() == 2 && get_ability() >= 8 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "브론즈베레스의발톱") >= 10){skill_add "검투술(Lev2)"; skill_del "검투술(Lev1)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; mes 1, "검투술(Lev2) 스킬을 익혔습니다."; goto re;}
+	mes 1, "검투술(Lev2)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 3){
+	if(skill_exist("검투술(Lev3)") == 1){mes 1, "당신은 이미 검투술(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("검투술(Lev2)") != 1){mes 1, "검투술(Lev2)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "검투술(Lev3) 조건 : 2차승급 어빌리티레벨 13 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개 다이아몬드 10개 레드오피온의수염 10개 블루오피온의수염 10개 레드오피온의등껍질 15개 블루오피온의등껍질 15개 여의주 10개";
+	if(get_class(@myid) == 1 && get_class_sub() == 2 && get_ability() >= 13 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "여의주") >= 10 && item_exist(@myid, "브론즈베레스의발톱") >= 10 && item_exist(@myid, "다이아몬드") >= 10 && item_exist(@myid, "레드오피온의수염") >= 10 && item_exist(@myid, "블루오피온의수염") >= 10 && item_exist(@myid, "레드오피온의등껍질") >= 15 && item_exist(@myid, "블루오피온의등껍질") >= 15){skill_add "검투술(Lev3)"; skill_del "검투술(Lev2)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; item_del "다이아몬드", 10; item_del "여의주", 10; item_del "레드오피온의수염", 10; item_del "블루오피온의수염", 10; item_del "레드오피온의등껍질", 15; item_del "블루오피온의등껍질", 15; mes 1, "검투술(Lev3) 스킬을 익혔습니다."; goto re;}
+	mes 1, "검투술(Lev3)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 4){
+	if(skill_exist("퓨리소월루(Lev1)") == 1){mes 1, "당신은 이미 퓨리소월루(Lev1)를 배웠습니다."; goto re;}
+	mes 1, "퓨리소월루(Lev1) 조건 : 2차승급 어빌리티레벨 15 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개 다이아몬드 20개 레드오피온의수염 20개 블루오피온의수염 20개 레드오피온의등껍질 15개 블루오피온의등껍질 15개 여의주 20개";
+	if(get_class(@myid) == 1 && get_class_sub() == 2 && get_ability() >= 15 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "여의주") >= 20 && item_exist(@myid, "브론즈베레스의발톱") >= 10 && item_exist(@myid, "다이아몬드") >= 20 && item_exist(@myid, "레드오피온의수염") >= 20 && item_exist(@myid, "블루오피온의수염") >= 20 && item_exist(@myid, "레드오피온의등껍질") >= 15 && item_exist(@myid, "블루오피온의등껍질") >= 15){skill_add "퓨리소월루(Lev1)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; item_del "다이아몬드", 20; item_del "여의주", 20; item_del "레드오피온의수염", 20; item_del "블루오피온의수염", 20; item_del "레드오피온의등껍질", 15; item_del "블루오피온의등껍질", 15; mes 1, "퓨리소월루(Lev1) 스킬을 익혔습니다."; goto re;}
+	mes 1, "퓨리소월루(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 5){
+	if(skill_exist("전체도발") == 1){mes 1, "당신은 이미 전체도발을 배웠습니다."; goto re;}
+	mes 1, "전체도발 조건 : 2차승급 어빌리티레벨 15 재료 : 챰릴리 20개 고렘의돌조각 20개 브론즈베레스의발톱 20개 돈 2백만";
+	if(get_class(@myid) == 1 && get_class_sub() == 2 && get_ability() >= 15 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 20 && item_exist(@myid, "브론즈베레스의발톱") >= 20 && get_money(@myid) >= 2000000){skill_add "전체도발"; money_del 2000000; item_del "챰릴리", 20; item_del "고렘의돌조각", 20; item_del "브론즈베레스의발톱", 20; mes 1, "전체도발 스킬을 익혔습니다."; goto re;}
+	mes 1, "전체도발를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	3도적스킬상인	{
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 2 || get_class_sub() != 2){mes 1, "궁사가 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "사격(Lev1)", "사격(Lev2)", "사격(Lev3)", "차크라");
+	if(@select == 1){
+	if(skill_exist("사격(Lev1)") == 1){mes 1, "당신은 이미 사격(Lev1)를 배웠습니다."; goto re;}
+	if(skill_exist("사격(Lev2)") == 1){mes 1, "당신은 이미 사격(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("사격(Lev3)") == 1){mes 1, "당신은 이미 사격(Lev3)를 배웠습니다."; goto re;}
+	mes 1, "사격(Lev1) 조건 : 2차승급";
+	if(get_class(@myid) == 2 && get_class_sub() == 2){skill_add "사격(Lev1)"; mes 1, "사격(Lev1) 스킬을 익혔습니다."; goto re;}
+	mes 1, "사격(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 2){
+	if(skill_exist("사격(Lev2)") == 1){mes 1, "당신은 이미 사격(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("사격(Lev3)") == 1){mes 1, "당신은 이미 사격(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("사격(Lev1)") != 1){mes 1, "사격(Lev1)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "사격(Lev2) 조건 : 2차승급 어빌리티레벨 8 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개";
+	if(get_class(@myid) == 2 && get_class_sub() == 2 && get_ability() >= 8 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "브론즈베레스의발톱") >= 10){skill_add "사격(Lev2)"; skill_del "사격(Lev1)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; mes 1, "사격(Lev2) 스킬을 익혔습니다."; goto re;}
+	mes 1, "사격(Lev2)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 3){
+	if(skill_exist("사격(Lev3)") == 1){mes 1, "당신은 이미 사격(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("사격(Lev2)") != 1){mes 1, "사격(Lev2)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "사격(Lev3) 조건 : 2차승급 어빌리티레벨 13 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개 다이아몬드 10개 레드오피온의수염 10개 블루오피온의수염 10개 레드오피온의등껍질 15개 블루오피온의등껍질 15개 여의주 10개";
+	if(get_class(@myid) == 2 && get_class_sub() == 2 && get_ability() >= 13 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "여의주") >= 10 && item_exist(@myid, "브론즈베레스의발톱") >= 10 && item_exist(@myid, "다이아몬드") >= 10 && item_exist(@myid, "레드오피온의수염") >= 10 && item_exist(@myid, "블루오피온의수염") >= 10 && item_exist(@myid, "레드오피온의등껍질") >= 15 && item_exist(@myid, "블루오피온의등껍질") >= 15){skill_add "사격(Lev3)"; skill_del "사격(Lev2)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; item_del "다이아몬드", 10; item_del "여의주", 10; item_del "레드오피온의수염", 10; item_del "블루오피온의수염", 10; item_del "레드오피온의등껍질", 15; item_del "블루오피온의등껍질", 15; mes 1, "사격(Lev3) 스킬을 익혔습니다."; goto re;}
+	mes 1, "사격(Lev3)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 4){
+	if(skill_exist("차크라") == 1){mes 1, "당신은 이미 차크라를 배웠습니다."; goto re;}
+	mes 1, "차크라 조건 : 2차승급 어빌리티레벨 15 재료 : 챰릴리 20개 고렘의돌조각 20개 브론즈베레스의발톱 20개 돈 2백만";
+	if(get_class(@myid) == 2 && get_class_sub() == 2 && get_ability() >= 15 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 20 && item_exist(@myid, "브론즈베레스의발톱") >= 20 && get_money(@myid) >= 2000000){skill_add "차크라"; money_del 2000000; item_del "챰릴리", 20; item_del "고렘의돌조각", 20; item_del "브론즈베레스의발톱", 20; mes 1, "차크라 스킬을 익혔습니다."; goto re;}
+	mes 1, "사격(Lev2)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	3마법사스킬상인	{
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 3 || get_class_sub() != 2){mes 1, "소환사가 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "화이라소환(Lev1)", "화이라소환(Lev2)", "화이라소환(Lev3)", "칸의눈(Lev1)");
+	if(@select == 1){
+	if(spell_exist("화이라소환(Lev1)") == 1){mes 1, "당신은 이미 화이라소환(Lev1)를 배웠습니다."; goto re;}
+	if(spell_exist("화이라소환(Lev2)") == 1){mes 1, "당신은 이미 화이라소환(Lev2)를 배웠습니다."; goto re;}
+	if(spell_exist("화이라소환(Lev3)") == 1){mes 1, "당신은 이미 화이라소환(Lev3)를 배웠습니다."; goto re;}
+	mes 1, "화이라소환(Lev1) 조건 : 2차승급";
+	if(get_class(@myid) == 3 && get_class_sub() == 2){spell_add "화이라소환(Lev1)"; mes 1, "화이라소환(Lev1) 스킬을 익혔습니다."; goto re;}
+	mes 1, "화이라소환(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 2){
+	if(spell_exist("화이라소환(Lev2)") == 1){mes 1, "당신은 이미 화이라소환(Lev2)를 배웠습니다."; goto re;}
+	if(spell_exist("화이라소환(Lev3)") == 1){mes 1, "당신은 이미 화이라소환(Lev3)를 배웠습니다."; goto re;}
+	if(spell_exist("화이라소환(Lev1)") != 1){mes 1, "화이라소환(Lev1)을 먼저 익혀야 합니다."; goto re;}
+	mes 1, "화이라소환(Lev2) 조건 : 2차승급 어빌리티레벨 6 재료 : 챰릴리 30개 별의눈물 20개  다크틸의지팡이20개";
+	if(get_class(@myid) == 3 && get_class_sub() == 2 && get_ability() >= 6 && item_exist(@myid, "챰릴리") >= 30 && item_exist(@myid, "다크틸의지팡이") >= 15 && item_exist(@myid, "별의눈물") >= 20){spell_add "화이라소환(Lev2)"; spell_del "화이라소환(Lev1)"; item_del "챰릴리", 30; item_del "다크틸의지팡이", 15; item_del "별의눈물", 20; mes 1, "화이라소환(Lev2) 스킬을 익혔습니다."; goto re;}
+	mes 1, "화이라소환(Lev2)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 3){
+	if(spell_exist("화이라소환(Lev3)") == 1){mes 1, "당신은 이미 화이라소환(Lev3)를 배웠습니다."; goto re;}
+	if(spell_exist("화이라소환(Lev2)") != 1){mes 1, "화이라소환(Lev2)을 먼저 익혀야 합니다."; goto re;}
+	mes 1, "화이라소환(Lev3) 조건 : 2차승급 어빌리티레벨 13 재료 : 챰릴리 20개 별의눈물 20개 다크틸의지팡이20개 다이아몬드 10개 레드오피온의수염 10개 블루오피온의수염 10개 레드오피온의등껍질 15개 블루오피온의등껍질 15개 홀리팬플롯 7개";
+	if(get_class(@myid) == 3 && get_class_sub() == 2 && get_ability() >= 13 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "별의눈물") >= 20 && item_exist(@myid, "홀리팬플롯") >= 7 && item_exist(@myid, "다크틸의지팡이") >= 20 && item_exist(@myid, "다이아몬드") >= 10 && item_exist(@myid, "레드오피온의수염") >= 10 && item_exist(@myid, "블루오피온의수염") >= 10 && item_exist(@myid, "레드오피온의등껍질") >= 15 && item_exist(@myid, "블루오피온의등껍질") >= 15){spell_add "화이라소환(Lev3)"; spell_del "화이라소환(Lev2)"; item_del "챰릴리", 20; item_del "별의눈물", 20; item_del "다크틸의지팡이", 20; item_del "다이아몬드", 10; item_del "홀리팬플롯", 7; item_del "레드오피온의수염", 10; item_del "블루오피온의수염", 10; item_del "레드오피온의등껍질", 15; item_del "블루오피온의등껍질", 15; mes 1, "화이라소환(Lev3) 스펠을 익혔습니다."; goto re;}
+	mes 1, "화이라소환(Lev3)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 4){
+	if(spell_exist("칸의눈(Lev1)") == 1){mes 1, "당신은 이미 칸의눈(Lev1)를 배웠습니다."; goto re;}
+	mes 1, "칸의눈(Lev1) 조건 : 2차승급 어빌리티레벨 20 재료 : 암흑의시약";
+	if(get_class(@myid) == 3 && get_class_sub() == 2 && get_ability() >= 20 && item_exist(@myid, "암흑의시약") >= 1){spell_add "칸의눈(Lev1)"; item_del "암흑의시약", 1; mes 1, "칸의눈(Lev1) 스펠을 익혔습니다."; goto re;}
+	mes 1, "칸의눈(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	3성직자스킬상인	{
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 4 || get_class_sub() != 2){mes 1, "바드가 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "연주공격(Lev1)", "연주공격(Lev2)", "연주공격(Lev3)", "리젠(Lev1)", "슈페이아움(Lev1)");
+	if(@select == 1){
+	if(skill_exist("연주공격(Lev1)") == 1){mes 1, "당신은 이미 연주공격(Lev1)를 배웠습니다."; goto re;}
+	if(skill_exist("연주공격(Lev2)") == 1){mes 1, "당신은 이미 연주공격(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("연주공격(Lev3)") == 1){mes 1, "당신은 이미 연주공격(Lev3)를 배웠습니다."; goto re;}
+	mes 1, "연주공격(Lev1) 조건 : 2차승급";
+	if(get_class(@myid) == 4 && get_class_sub() == 2){skill_add "연주공격(Lev1)"; mes 1, "연주공격(Lev1) 스킬을 익혔습니다."; goto re;}
+	mes 1, "연주공격(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 2){
+	if(skill_exist("연주공격(Lev2)") == 1){mes 1, "당신은 이미 연주공격(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("연주공격(Lev3)") == 1){mes 1, "당신은 이미 연주공격(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("연주공격(Lev1)") != 1){mes 1, "연주공격(Lev1)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "연주공격(Lev2) 조건 : 2차승급 어빌리티레벨 8 재료 : 챰릴리 30개 별의눈물 20개  다크틸의지팡이20개";
+	if(get_class(@myid) == 4 && get_class_sub() == 2 && get_ability() >= 6 && item_exist(@myid, "챰릴리") >= 30 && item_exist(@myid, "다크틸의지팡이") >= 15 && item_exist(@myid, "별의눈물") >= 20){skill_add "연주공격(Lev2)"; skill_del "연주공격(Lev1)"; item_del "챰릴리", 30; item_del "다크틸의지팡이", 15; item_del "별의눈물", 20; mes 1, "연주공격(Lev2) 스킬을 익혔습니다."; goto re;}
+	mes 1, "연주공격(Lev2)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 3){
+	if(skill_exist("연주공격(Lev3)") == 1){mes 1, "당신은 이미 연주공격(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("연주공격(Lev2)") != 1){mes 1, "연주공격(Lev2)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "연주공격(Lev3) 조건 : 2차승급 어빌리티레벨 13 재료 : 챰릴리 20개 별의눈물 20개 다크틸의지팡이20개 다이아몬드 10개 레드오피온의수염 10개 블루오피온의수염 10개 레드오피온의등껍질 15개 블루오피온의등껍질 15개 홀리팬플롯 7개";
+	if(get_class(@myid) == 4 && get_class_sub() == 2 && get_ability() >= 13 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "별의눈물") >= 20 && item_exist(@myid, "홀리팬플롯") >= 7 && item_exist(@myid, "다크틸의지팡이") >= 20 && item_exist(@myid, "다이아몬드") >= 10 && item_exist(@myid, "레드오피온의수염") >= 10 && item_exist(@myid, "블루오피온의수염") >= 10 && item_exist(@myid, "레드오피온의등껍질") >= 15 && item_exist(@myid, "블루오피온의등껍질") >= 15){skill_add "연주공격(Lev3)"; skill_del "연주공격(Lev2)"; item_del "챰릴리", 20; item_del "별의눈물", 20; item_del "다크틸의지팡이", 20; item_del "다이아몬드", 10; item_del "홀리팬플롯", 7; item_del "레드오피온의수염", 10; item_del "블루오피온의수염", 10; item_del "레드오피온의등껍질", 15; item_del "블루오피온의등껍질", 15; mes 1, "연주공격(Lev3) 스펠을 익혔습니다."; goto re;}
+	mes 1, "연주공격(Lev3)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 4){
+	if(spell_exist("리젠(Lev1)") == 1){mes 1, "당신은 이미 리젠(Lev1)를 배웠습니다."; goto re;}
+	mes 1, "리젠(Lev1) 조건 : 2차승급 어빌리티레벨 15 재료 : 챰릴리 20개 별의눈물 20개 다크틸의지팡이 20개 다이아몬드 20개 레드오피온의수염 20개 블루오피온의수염 20개 레드오피온의등껍질 15개 블루오피온의등껍질 15개 홀리팬플롯 14개";
+	if(get_class(@myid) == 4 && get_class_sub() == 2 && get_ability() >= 15 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "별의눈물") >= 20 && item_exist(@myid, "홀리팬플롯") >= 14 && item_exist(@myid, "다크틸의지팡이") >= 20 && item_exist(@myid, "다이아몬드") >= 20 && item_exist(@myid, "레드오피온의수염") >= 20 && item_exist(@myid, "블루오피온의수염") >= 20 && item_exist(@myid, "레드오피온의등껍질") >= 15 && item_exist(@myid, "블루오피온의등껍질") >= 15){spell_add "리젠(Lev1)"; item_del "챰릴리", 20; item_del "별의눈물", 20; item_del "다크틸의지팡이", 20; item_del "다이아몬드", 20; item_del "홀리팬플롯", 14; item_del "레드오피온의수염", 20; item_del "블루오피온의수염", 20; item_del "레드오피온의등껍질", 15; item_del "블루오피온의등껍질", 15; mes 1, "리젠(Lev1) 스킬을 익혔습니다."; goto re;}
+	mes 1, "리젠(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 5){
+	if(skill_exist("슈페이아움(Lev1)") == 1){mes 1, "당신은 이미 슈페이아움(Lev1)를 배웠습니다."; goto re;}
+	mes 1, "슈페이아움(Lev1) 조건 : 2차승급 어빌리티레벨 20 재료 : 생명의시약";
+	if(get_class(@myid) == 4 && get_class_sub() == 2 && get_ability() >= 20 && item_exist(@myid, "생명의시약") >= 1){skill_add "슈페이아움(Lev1)"; item_del "생명의시약", 1; mes 1, "슈페이아움(Lev1) 스펠을 익혔습니다."; goto re;}
+	mes 1, "슈페이아움(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	3무도가스킬상인	{
+	re:
+	set @myid, get_myid();
+	if(get_class(@myid) != 5 || get_class_sub() != 2){mes 1, "수인이 아닙니다."; end;}
+	set @select, menu("2차승급기술을 가르쳐드립니다.", "비스트어택(Lev1)", "비스트어택(Lev2)", "비스트어택(Lev3)", "깃털날리기(Lev1)", "폭풍");
+	if(@select == 1){
+	if(skill_exist("비스트어택(Lev1)") == 1){mes 1, "당신은 이미 비스트어택(Lev1)를 배웠습니다."; goto re;}
+	if(skill_exist("비스트어택(Lev2)") == 1){mes 1, "당신은 이미 비스트어택(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("비스트어택(Lev3)") == 1){mes 1, "당신은 이미 비스트어택(Lev3)를 배웠습니다."; goto re;}
+	mes 1, "비스트어택(Lev1) 조건 : 2차승급";
+	if(get_class(@myid) == 5 && get_class_sub() == 2){skill_add "비스트어택(Lev1)"; mes 1, "비스트어택(Lev1) 스킬을 익혔습니다."; goto re;}
+	mes 1, "비스트어택(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 2){
+	if(skill_exist("비스트어택(Lev2)") == 1){mes 1, "당신은 이미 비스트어택(Lev2)를 배웠습니다."; goto re;}
+	if(skill_exist("비스트어택(Lev3)") == 1){mes 1, "당신은 이미 비스트어택(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("비스트어택(Lev1)") != 1){mes 1, "비스트어택(Lev1)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "비스트어택(Lev2) 조건 : 2차승급 어빌리티레벨 8 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개";
+	if(get_class(@myid) == 5 && get_class_sub() == 2 && get_ability() >= 8 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "브론즈베레스의발톱") >= 10){skill_add "비스트어택(Lev2)"; skill_del "비스트어택(Lev1)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; mes 1, "비스트어택(Lev2) 스킬을 익혔습니다."; goto re;}
+	mes 1, "비스트어택(Lev2)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 3){
+	if(skill_exist("비스트어택(Lev3)") == 1){mes 1, "당신은 이미 비스트어택(Lev3)를 배웠습니다."; goto re;}
+	if(skill_exist("비스트어택(Lev2)") != 1){mes 1, "비스트어택(Lev2)를 먼저 익혀야합니다."; goto re;}
+	mes 1, "비스트어택(Lev3) 조건 : 2차승급 어빌리티레벨 13 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개 다이아몬드 10개 레드오피온의수염 10개 블루오피온의수염 10개 레드오피온의등껍질 15개 블루오피온의등껍질 15개 여의주 10개";
+	if(get_class(@myid) == 5 && get_class_sub() == 2 && get_ability() >= 13 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "여의주") >= 10 && item_exist(@myid, "브론즈베레스의발톱") >= 10 && item_exist(@myid, "다이아몬드") >= 10 && item_exist(@myid, "레드오피온의수염") >= 10 && item_exist(@myid, "블루오피온의수염") >= 10 && item_exist(@myid, "레드오피온의등껍질") >= 15 && item_exist(@myid, "블루오피온의등껍질") >= 15){skill_add "비스트어택(Lev3)"; skill_del "비스트어택(Lev2)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; item_del "다이아몬드", 10; item_del "여의주", 10; item_del "레드오피온의수염", 10; item_del "블루오피온의수염", 10; item_del "레드오피온의등껍질", 15; item_del "블루오피온의등껍질", 15; mes 1, "비스트어택(Lev3) 스킬을 익혔습니다."; goto re;}
+	mes 1, "비스트어택(Lev3)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 4){
+	if(spell_exist("깃털날리기(Lev1)") == 1){mes 1, "당신은 이미 깃털날리기(Lev1)를 배웠습니다."; goto re;}
+	mes 1, "깃털날리기(Lev1) 조건 : 2차승급 어빌리티레벨 13 재료 : 챰릴리 20개 고렘의돌조각 10개 브론즈베레스의발톱 10개 다이아몬드 10개";
+	if(get_class(@myid) == 5 && get_class_sub() == 2 && get_ability() >= 9 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 10 && item_exist(@myid, "브론즈베레스의발톱") >= 10 && item_exist(@myid, "다이아몬드") >= 10){spell_add "깃털날리기(Lev1)"; item_del "챰릴리", 20; item_del "고렘의돌조각", 10; item_del "브론즈베레스의발톱", 10; item_del "다이아몬드", 10; mes 1, "깃털날리기(Lev1) 스펠을 익혔습니다."; goto re;}
+	mes 1, "깃털날리기(Lev1)를 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+	if(@select == 5){
+	if(skill_exist("폭풍") == 1){mes 1, "당신은 이미 폭풍을 배웠습니다."; goto re;}
+	mes 1, "폭풍 조건 : 2차승급 어빌리티레벨 15 재료 : 챰릴리 20개 고렘의돌조각 20개 브론즈베레스의발톱 20개 돈 2백만";
+	if(get_class(@myid) == 5 && get_class_sub() == 2 && get_ability() >= 15 && item_exist(@myid, "챰릴리") >= 20 && item_exist(@myid, "고렘의돌조각") >= 20 && item_exist(@myid, "브론즈베레스의발톱") >= 20 && get_money(@myid) >= 2000000){skill_add "폭풍"; money_del 2000000; item_del "챰릴리", 20; item_del "고렘의돌조각", 20; item_del "브론즈베레스의발톱", 20; mes 1, "폭풍 스킬을 익혔습니다."; goto re;}
+	mes 1, "폭풍을 배우기에는 능력치가 충족되지 않습니다.";
+	goto re;
+	}
+}
+
+0,0,0,0,0,0,0	전직스킬배우기	{
+	set @myid, get_myid();
+	mes 1, "전직으로 인해 새로운스킬을 배우지 못하신분들에게 새로운스킬을 배울수있게해드립니다.";
+	mes 1, "전사전직자는 크래셔, 매드소울, 완전방어중 한스킬이 있어야 인정됩니다.";
+	mes 1, "도적전직자는 습격, 암살격중 한스킬이 있어야 인정됩니다.";
+	mes 1, "마법사전직자는 세멜리아, 라그나로크중 한스펠이 있어야 인정됩니다.";
+	mes 1, "성직자전직자는 엑스쿠라네라, 코마디아중 한스펠이 있어야 인정됩니다.";
+	mes 1, "위기준은 복구받으실 스킬&스펠의 맞는 직업에 해당됩니다.";
+	input @input$, 1, "배우실 스킬이름을 적어주세요.\\n[바투, 나르콜리, 디베노모, 리베라토]", "", "", 255;
+	if(@input$ == "바투"){
+		mes 1, "바투를 배우기압서 당신이 전사전직자인지 확인합니다.";
+		if(skill_exist("크래셔") == 1){goto go;}
+		if(skill_exist("매드소울") == 1){goto go;}
+		if(skill_exist("완전방어") == 1){goto go;}
+		mes 1, "당신은 전사전직자가 아닙니다.";
+		end;
+		go:
+		if(skill_exist("바투") == 1){mes 1, "당신은 이미 바투를 배우셧습니다."; end;}
+		skill_add "바투";
+		mes 1, "당신은 전사 전직자가 맞습니다. 스킬을 지급해드렸습니다.";
+	}
+	if(@input$ == "나르콜리"){
+		mes 1, "나르콜리를 배우기압서 당신이 마법사전직자인지 확인합니다.";
+		if(spell_exist("세멜리아") == 1){goto go2;}
+		if(spell_exist("라그나로크") == 1){goto go2;}
+		mes 1, "당신은 마법사전직자가 아닙니다.";
+		end;
+		go2:
+		if(spell_exist("나르콜리") == 1){mes 1, "당신은 이미 나르콜리를 배우셧습니다."; end;}
+		spell_add "나르콜리";
+		mes 1, "당신은 마법사 전직자가 맞습니다. 스펠을 지급해드렸습니다.";
+	}
+	if(@input$ == "디베노모"){
+		mes 1, "디베노모를 배우기압서 당신이 성직자전직자인지 확인합니다.";
+		if(spell_exist("엑스쿠라네라") == 1){goto go3;}
+		if(spell_exist("코마디아") == 1){goto go3;}
+		mes 1, "당신은 성직자전직자가 아닙니다.";
+		end;
+		go3:
+		if(spell_exist("디베노모") == 1){mes 1, "당신은 이미 디베노모를 배우셧습니다."; end;}
+		spell_add "디베노모";
+		mes 1, "당신은 성직자 전직자가 맞습니다. 스펠을 지급해드렸습니다.";
+	}
+	if(@input$ == "리베라토"){
+		mes 1, "리베라토를 배우기압서 당신이 성직자전직자인지 확인합니다.";
+		if(spell_exist("엑스쿠라네라") == 1){goto go4;}
+		if(spell_exist("코마디아") == 1){goto go4;}
+		mes 1, "당신은 성직자전직자가 아닙니다.";
+		end;
+		go4:
+		if(spell_exist("리베라토") == 1){mes 1, "당신은 이미 리베라토를 배우셧습니다."; end;}
+		spell_add "리베라토";
+		mes 1, "당신은 성직자 전직자가 맞습니다. 스펠을 지급해드렸습니다.";
+	}
+}

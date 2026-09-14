@@ -1,0 +1,172 @@
+{
+번호	500
+이름	밀레스마을
+너비	100
+높이	100
+배경음	151
+배경	151
+CRC	151
+가장자리	1
+맵파일	db/maps/mileth/maps/lod500.map
+}
+
+{
+번호	127
+이름	밀레스시약상점
+너비	15
+높이	15
+배경	0
+CRC	18992
+맵파일	db/maps/mileth/maps/lod127.map
+}
+
+{
+번호	128
+이름	밀레스우체국
+너비	15
+높이	15
+배경	0
+CRC	47997
+맵파일	db/maps/mileth/maps/lod128.map
+}
+
+{
+번호	129
+이름	밀레스음식점
+너비	15
+높이	15
+배경	0
+CRC	53270
+맵파일	db/maps/mileth/maps/lod129.map
+}
+
+{
+번호	130
+이름	밀레스리콜상점
+너비	15
+높이	15
+배경	0
+CRC	29186
+맵파일	db/maps/mileth/maps/lod130.map
+}
+
+{
+번호	132
+이름	밀레스무기점
+너비	15
+높이	15
+배경	0
+CRC	54397
+맵파일	db/maps/mileth/maps/lod132.map
+}
+
+{
+번호	133
+이름	밀레스방어구점
+너비	12
+높이	12
+배경	0
+CRC	16963
+맵파일	db/maps/mileth/maps/lod133.map
+}
+
+{
+번호	134
+이름	밀레스주점
+너비	15
+높이	15
+배경	0
+CRC	22982
+맵파일	db/maps/mileth/maps/lod134.map
+}
+
+{
+번호	135
+이름	밀레스은행
+너비	20
+높이	20
+배경	0
+CRC	22022
+맵파일	db/maps/mileth/maps/lod135.map
+}
+
+{
+번호	136
+이름	밀레스여관
+너비	20
+높이	20
+배경	0
+CRC	8902
+맵파일	db/maps/mileth/maps/lod136.map
+}
+
+{
+번호	137
+이름	밀레스교회
+너비	18
+높이	25
+배경음	151
+배경	0
+CRC	151
+맵파일	db/maps/mileth/maps/lod137.map
+}
+
+{
+번호	403
+이름	시작의방
+너비	12
+높이	12
+배경	0
+CRC	62321
+맵파일	db/maps/mileth/maps/lod403.map
+}
+
+{
+번호	403
+이름	전직의방
+너비	12
+높이	12
+배경	0
+CRC	62321
+맵파일	db/maps/mileth/maps/lod403.map
+}
+
+{
+번호	403
+이름	승급의방
+너비	12
+높이	12
+배경	0
+CRC	62321
+맵파일	db/maps/mileth/maps/lod403.map
+}
+
+{
+번호	403
+이름	GM의방
+너비	12
+높이	12
+배경	0
+CRC	62321
+맵파일	db/maps/mileth/maps/lod403.map
+}
+
+{
+번호	403
+이름	조합의방
+너비	12
+높이	12
+배경	0
+CRC	62321
+맵파일	db/maps/mileth/maps/lod403.map
+}
+
+{
+번호	403
+이름	환생의방
+너비	12
+높이	12
+배경	0
+CRC	62321
+맵파일	db/maps/mileth/maps/lod403.map
+}

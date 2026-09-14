@@ -1,0 +1,126 @@
+0,0,0,0,0,0,0	EG	{
+	console_output "[시스템]" + get_name() + "님이 EGShop 실행";
+ set @myid, get_myid();
+ //목록
+ set @item1$, "텔레포트깃털";
+ set @item2$, "성별전환스크롤";
+ set @item3$, "리치의가호";
+ set @item4$, "간지의가호";
+ set @item5$, "원격체마사기";
+ set @item6$, "금가위";
+ set @item7$, "왕의문장";
+ set @item8$, "택배서비스";
+ //가격
+ set @item1_price, 10000;
+ set @item2_price, 1000;
+ set @item3_price, 6000;
+ set @item4_price, 8000;
+ set @item5_price, 4000;
+ set @item6_price, 1000;
+ set @item7_price, 5000;
+ set @item8_price, 500;
+ //합체
+ set @item1_menu$, @item1$ + "     " + @item1_price + " EG";
+ set @item2_menu$, @item2$ + "     " + @item2_price + " EG";
+ set @item3_menu$, @item3$ + "     " + @item3_price + " EG";
+ set @item4_menu$, @item4$ + "     " + @item4_price + " EG";
+ set @item5_menu$, @item5$ + "     " + @item5_price + " EG";
+ set @item6_menu$, @item6$ + "     " + @item6_price + " EG";
+ set @item7_menu$, @item7$ + "     " + @item7_price + " EG";
+ set @item8_menu$, @item8$ + "     " + @item8_price + " EG";
+OPEN:
+ 
+ set @title$, "{=c" + get_name(@myid) + " 님반갑습니다. 리치온라인 EG샵에 오신걸 환영합니다.\\n현재 " + get_eg() + " EG 보유하고 계십니다.";
+ set @menu, menu(@title$,@item1_menu$,@item2_menu$,@item3_menu$,@item4_menu$,@item5_menu$,@item6_menu$,@item7_menu$,@item8_menu$);
+ 
+ if(@menu == 1){
+	mes 1, "{=c" + @item1$ + " : 자신이 바라보고있는 방향으로 5칸 이동합니다.";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item1_price) {mes 0, "{=c" + @item1_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item1$, 1;
+		set_eg get_eg() - @item1_price;
+		message 8, "{=c\\n\\n구매완료!!\\n\\n구매아이템 : " + @item1$ + "\\n구매가격 : " + @item1_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+ }else if(@menu == 2){
+	mes 1, "{=c" + @item2$ + " : 성별을 전환시켜줍니다.";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item2_price) {mes 0, "{=c" + @item2_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item2$, 1;
+		set_eg get_eg() - @item2_price;
+		message 8, "{=u\\n구매완료!!\\n\\n아이템 : " + @item2$ + "\\n가격 : " + @item2_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+ }else if(@menu == 3){
+	mes 1, "{=c" + @item3$ + " : 30분동안 경험치. 어빌리티경험치를 2배획득하게해줍니다.[5개묶음]";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item3_price) {mes 0, "{=c" + @item3_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item3$, 5;
+		set_eg get_eg() - @item3_price;
+		message 8, "{=u\\n구매완료!!\\n\\n아이템 : " + @item3$ + "\\n가격 : " + @item3_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+ }else if(@menu == 4){
+	mes 1, "{=c" + @item4$ + " : 30분동안 경험치. 어빌리티경험치를 3배획득하게해줍니다.[5개묶음]";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item4_price) {mes 0, "{=c" + @item4_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item4$, 5;
+		set_eg get_eg() - @item4_price;
+		message 8, "{=u\\n구매완료!!\\n\\n아이템 : " + @item4$ + "\\n가격 : " + @item4_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+ }else if(@menu == 5){
+	mes 1, "{=c" + @item5$ + " : 어디서든 체력과 마력을 살수있습니다.[50개묶음]";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item5_price) {mes 0, "{=c" + @item5_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item5$, 50;
+		set_eg get_eg() - @item5_price;
+		message 8, "{=u\\n구매완료!!\\n\\n아이템 : " + @item5$ + "\\n가격 : " + @item5_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+ }else if(@menu == 6){
+	mes 1, "{=c" + @item6$ + " : 더멋진 머리를 해주는 가위입니다.";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item6_price) {mes 0, "{=c" + @item6_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item6$, 1;
+		set_eg get_eg() - @item6_price;
+		message 8, "{=u\\n구매완료!!\\n\\n아이템 : " + @item6$ + "\\n가격 : " + @item6_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+ }else if(@menu == 7){
+	mes 1, "{=c" + @item7$ + " : 리치온라인의 길드를 만들수있습니다.";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item7_price) {mes 0, "{=c" + @item7_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item7$, 1;
+		set_eg get_eg() - @item7_price;
+		message 8, "{=u\\n구매완료!!\\n\\n아이템 : " + @item7$ + "\\n가격 : " + @item7_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+
+ }else if(@menu == 8){
+	mes 1, "{=c" + @item8$ + " : 다른사람에게 아이템을 선물할수있습니다.";
+	set @pay, menu("구매하시겠습니까?", "예","아니오");
+	if(@pay == 1) {
+		if(get_eg() < @item8_price) {mes 0, "{=c" + @item8_price - get_eg() + " EG 부족합니다. 잔액 확인 후 다시 시도해주세요."; goto OPEN;}
+		item_add @item8$, 1;
+		set_eg get_eg() - @item8_price;
+		message 8, "{=u\\n구매완료!!\\n\\n아이템 : " + @item8$ + "\\n가격 : " + @item8_price + "\\n\\n구매 후 잔액 : " + get_eg();
+	}else {
+		goto OPEN;
+	}
+ }
+}

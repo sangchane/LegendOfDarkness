@@ -1,0 +1,132 @@
+{
+번호	505
+이름	뤼케시온마을
+너비	50
+높이	50
+CRC	10731
+맵파일	db/maps/rucesion/maps/lod505.map
+}
+
+{
+번호	135
+이름	뤼케시온은행
+너비	20
+높이	20
+배경	0
+CRC	22022
+맵파일	db/maps/rucesion/maps/lod135.map
+}
+
+{
+번호	136
+이름	뤼케시온여관
+너비	20
+높이	20
+배경	0
+CRC	8902
+맵파일	db/maps/rucesion/maps/lod136.map
+}
+
+{
+번호	132
+이름	뤼케시온무기점
+너비	15
+높이	15
+배경	0
+CRC	54397
+맵파일	db/maps/rucesion/maps/lod132.map
+}
+
+{
+번호	133
+이름	뤼케시온방어구점
+너비	12
+높이	12
+배경	0
+CRC	16963
+맵파일	db/maps/rucesion/maps/lod133.map
+}
+
+{
+번호	164
+이름	뤼케시온리콜상점
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/rucesion/maps/lod164.map
+}
+
+{
+번호	505
+이름	뤼케시온필드
+너비	50
+높이	50
+CRC	10731
+맵파일	db/maps/rucesion/maps/lod505.map
+}
+{
+번호	598
+이름	뤼케시온성
+너비	50
+높이	50
+배경	0
+CRC	0
+맵파일	db/maps/default/maps/lod598.map
+}
+{
+번호	598
+이름	퀘스트뤼케시온성
+너비	50
+높이	50
+배경	0
+CRC	0
+맵파일	db/maps/default/maps/lod598.map
+}
+
+{
+번호	136
+이름	용병캠프
+너비	20
+높이	20
+배경	0
+CRC	8902
+맵파일	db/maps/rucesion/maps/lod136.map
+}
+{
+번호	119
+이름	(뤼케)성메인홀
+너비	16
+높이	16
+배경	4
+CRC	0
+맵파일	db/maps/default/maps/lod119.map
+}
+
+{
+번호	120
+이름	(뤼케)성식당
+너비	10
+높이	10
+배경	4
+CRC	62321
+맵파일	db/maps/default/maps/lod120.map
+}
+{
+번호	126
+이름	(뤼케)성복도
+너비	5
+높이	33
+배경	4
+CRC	62321
+맵파일	db/maps/default/maps/lod126.map
+}
+
+{
+번호	115
+이름	(뤼케)알현실
+너비	16
+높이	16
+배경	4
+CRC	62321
+맵파일	db/maps/default/maps/lod115.map
+}

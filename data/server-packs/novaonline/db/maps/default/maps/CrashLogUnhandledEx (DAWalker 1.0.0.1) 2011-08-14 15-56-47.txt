@@ -1,0 +1,12 @@
+System.IO.FileNotFoundException: Could not load file or assembly 'System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089' or one of its dependencies. 지정된 파일을 찾을 수 없습니다.
+File name: 'System.Xml.Linq, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+   at DAMover.Mover..ctor(DAWalkerStart MainF)
+   at DAWalkerProg.DAWalkerStart..ctor(DAWalker_form parent)
+   at DAWalkerProg.DAWalker_form..ctor()
+   at DAWalkerProg.DAWalker.Main()
+
+WRN: Assembly binding logging is turned OFF.
+To enable assembly bind failure logging, set the registry value [HKLM\Software\Microsoft\Fusion!EnableLog] (DWORD) to 1.
+Note: There is some performance penalty associated with assembly bind failure logging.
+To turn this feature off, remove the registry value [HKLM\Software\Microsoft\Fusion!EnableLog].
+

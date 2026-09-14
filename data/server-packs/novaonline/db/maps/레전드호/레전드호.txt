@@ -1,0 +1,90 @@
+{
+번호	6542
+이름	레전드호
+너비	50
+높이	30
+CRC	0
+맵파일	db/maps/default/maps/lod6542.map
+}
+{
+번호	6549
+이름	선장실
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/default/maps/lod6549.map
+}
+{
+번호	6543
+이름	레전드호내부
+너비	50
+높이	20
+CRC	0
+배경음	162
+맵파일	db/maps/default/maps/lod6543.map
+}
+{
+번호	6544
+이름	레전드호선실5
+너비	20
+높이	20
+CRC	0
+맵파일	db/maps/default/maps/lod6544.map
+}
+{
+번호	6545
+이름	레전드호선실6
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/default/maps/lod6545.map
+}
+{
+번호	6546
+이름	레전드호선실7
+너비	15
+높이	15
+CRC	0
+맵파일	db/maps/default/maps/lod6546.map
+}
+{
+번호	6547
+이름	레전드호선실1
+너비	20
+높이	20
+CRC	0
+맵파일	db/maps/default/maps/lod6547.map
+}
+{
+번호	6548
+이름	레전드호선실2
+너비	20
+높이	20
+CRC	0
+맵파일	db/maps/default/maps/lod6548.map
+}
+{
+번호	6550
+이름	레전드호선실3
+너비	25
+높이	25
+CRC	0
+배경음	161
+맵파일	db/maps/default/maps/lod6550.map
+}
+{
+번호	6551
+이름	레전드호선실4
+너비	40
+높이	40
+CRC	0
+맵파일	db/maps/default/maps/lod6551.map
+}
+{
+번호	6552
+이름	레전드호선실8
+너비	40
+높이	40
+CRC	0
+맵파일	db/maps/default/maps/lod6552.map
+}

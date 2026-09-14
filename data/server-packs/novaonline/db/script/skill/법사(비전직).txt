@@ -1,0 +1,429 @@
+0,0,0,0,0,0,0	SPELL_마레노	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 40){message 3, "마력이 부족합니다. [필요마나 : 40]"; del @myid; end;}
+	manal_del "40";
+	set @damage, ((get_int(@myid))) + 31;
+	if(enare(@myid,1)) set @damage, @damage + 8;
+	if(get_level(@myid) >= 11){set @damage, ((get_int(@myid))) + 40;} 
+	if(get_level(@myid) >= 11 && enare(@myid,1)){set @damage, @damage + 14;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+		}
+	}
+	message 3, "마레노를 외웠습니다.";
+	effect @target, 0, 10, 75;
+	motion 136, 75;
+	game_sound 47,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_수페라마레나	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 80){message 3, "마력이 부족합니다."; del @type; del @myid; end;}
+	manal_del "80";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @x1, get_xs();
+	set @y1, get_ys();
+ 	set @dam, ((get_int(@myid))) + 40;   //데미지 공식
+	if(enare(@myid,1)) set @dam, @dam + 15;
+	set @mob1, get_mobxy(@x1, (@y1)-1);
+	set @mob2, get_mobxy(@x1, (@y1)+1);
+	set @mob3, get_mobxy((@x1)-1, @y1);
+	set @mob4, get_mobxy((@x1)+1, @y1);
+	set @type1, istype(@mob1);
+	set @type2, istype(@mob2);
+	set @type3, istype(@mob3);
+	set @type4, istype(@mob4);
+	if((@type1 == 1 && @type2 == 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob2, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 == 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 == 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob3, @dam;}
+	else if((@type1 != 1 && @type2 != 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob2, @dam; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; damaged @mob2, @dam; damaged @mob3, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; damaged @mob1, @dam; damaged @mob3, @dam;}	
+	else if((@type1 == 1 && @type2 == 1) && (@type3 != 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam;}
+	else if((@type1 != 1 && @type2 != 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob4, 0, 10,75; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 != 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; damaged @mob3, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 != 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; damaged @mob2, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 != 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; damaged @mob1, @dam;}
+	if(get_map_pk()){
+		set @mob1, get_char_serial(@myid, @x1, (@y1)-1);
+		set @mob2, get_char_serial(@myid, @x1, (@y1)+1);
+		set @mob3, get_char_serial(@myid, (@x1)-1, @y1);
+		set @mob4, get_char_serial(@myid, (@x1)+1, @y1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+		if((@type1 == 3 && @type2 == 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 == 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 == 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam;}
+		else if((@type1 != 3 && @type2 != 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob2, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob3, @dam, @dam;}	
+		else if((@type1 == 3 && @type2 == 3) && (@type3 != 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam;}
+		else if((@type1 != 3 && @type2 != 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob4, 0, 10,75; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 != 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; char_damaged @mob3, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 != 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; char_damaged @mob2, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 != 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; char_damaged @mob1, @dam, @dam;}
+	}
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @type1;
+	del @type2;
+	del @type3;
+	del @type4;
+	del @myid;
+	del @x1;
+	del @y1;
+}
+
+0,0,0,0,0,0,0	SPELL_렌토	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(get_mana(@myid) < 45){message 3, "마력이 부족합니다. [필요마나 : 45]"; del @myid; end;}
+	manal_del "45";
+	set @rnd, rand(1,10);
+	if(@rnd <= 6){
+	if(@type != 1) {end;}
+	if(magic_exist(1,@target,1)) {end;}
+	magic 1,@target,"렌토", 120, 15,@myid;
+	message 3, "렌토를 외웠습니다.";
+	effect @target, 0, 45, 130;
+	game_sound 8,0;
+	}else{
+	effect @target, 0, 33, 130;
+	message 3, "몬스터가 마법을 피했다!";
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_엑스마레나	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 80){message 3, "마력이 부족합니다."; del @type; del @myid; end;}
+	manal_del "80";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @x1, get_xs();
+	set @y1, get_ys();
+ 	set @dam, ((get_int(@myid))) + 67;   //데미지 공식
+	if(enare(@myid,1)) set @dam, @dam + 30;
+	set @mob1, get_mobxy(@x1, (@y1)-1);
+	set @mob2, get_mobxy(@x1, (@y1)+1);
+	set @mob3, get_mobxy((@x1)-1, @y1);
+	set @mob4, get_mobxy((@x1)+1, @y1);
+	set @type1, istype(@mob1);
+	set @type2, istype(@mob2);
+	set @type3, istype(@mob3);
+	set @type4, istype(@mob4);
+	if((@type1 == 1 && @type2 == 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob2, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 == 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 == 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam; damaged @mob3, @dam;}
+	else if((@type1 != 1 && @type2 != 1) && (@type3 == 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob3, @dam; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob2, @dam; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; damaged @mob2, @dam; damaged @mob3, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob4, 0, 10,75; damaged @mob1, @dam; damaged @mob4, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; damaged @mob1, @dam; damaged @mob3, @dam;}	
+	else if((@type1 == 1 && @type2 == 1) && (@type3 != 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; damaged @mob1, @dam; damaged @mob2, @dam;}
+	else if((@type1 != 1 && @type2 != 1) && (@type3 != 1 && @type4 == 1)){motion 136, 20; game_sound 47,0; effect @mob4, 0, 10,75; damaged @mob4, @dam;}
+	else if((@type1 != 1 && @type2 != 1) && (@type3 == 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; damaged @mob3, @dam;}
+	else if((@type1 != 1 && @type2 == 1) && (@type3 != 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; damaged @mob2, @dam;}
+	else if((@type1 == 1 && @type2 != 1) && (@type3 != 1 && @type4 != 1)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; damaged @mob1, @dam;}
+	if(get_map_pk()){
+		set @mob1, get_char_serial(@myid, @x1, (@y1)-1);
+		set @mob2, get_char_serial(@myid, @x1, (@y1)+1);
+		set @mob3, get_char_serial(@myid, (@x1)-1, @y1);
+		set @mob4, get_char_serial(@myid, (@x1)+1, @y1);
+		set @type1, istype(@mob1);
+		set @type2, istype(@mob2);
+		set @type3, istype(@mob3);
+		set @type4, istype(@mob4);
+		if((@type1 == 3 && @type2 == 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 == 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 == 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam;}
+		else if((@type1 != 3 && @type2 != 3) && (@type3 == 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob3, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob2, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; effect @mob3, 0, 10,75; char_damaged @mob2, @dam, @dam; char_damaged @mob3, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob4, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob3, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob3, @dam, @dam;}	
+		else if((@type1 == 3 && @type2 == 3) && (@type3 != 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; effect @mob2, 0, 10,75; char_damaged @mob1, @dam, @dam; char_damaged @mob2, @dam, @dam;}
+		else if((@type1 != 3 && @type2 != 3) && (@type3 != 3 && @type4 == 3)){motion 136, 20; game_sound 47,0; effect @mob4, 0, 10,75; char_damaged @mob4, @dam, @dam;}
+		else if((@type1 != 3 && @type2 != 3) && (@type3 == 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob3, 0, 10,75; char_damaged @mob3, @dam, @dam;}
+		else if((@type1 != 3 && @type2 == 3) && (@type3 != 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob2, 0, 10,75; char_damaged @mob2, @dam, @dam;}
+		else if((@type1 == 3 && @type2 != 3) && (@type3 != 3 && @type4 != 3)){motion 136, 20; game_sound 47,0; effect @mob1, 0, 10,75; char_damaged @mob1, @dam, @dam;}
+	}
+	del @mob1;
+	del @mob2;
+	del @mob3;
+	del @mob4;
+	del @type1;
+	del @type2;
+	del @type3;
+	del @type4;
+	del @myid;
+	del @x1;
+	del @y1;
+}
+
+0,0,0,0,0,0,0	SPELL_바르도	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(get_mana(@myid) < 120){message 3, "마력이 부족합니다. [필요마나 : 120]"; del @myid; end;}
+	manal_del "120";
+	set @rnd, rand(1,10);
+	if(@rnd <= 6){
+	if(@type != 1) {end;}
+	if(magic_exist(1,@target,1)) {end;}
+	magic 1,@target,"바르도", 120, 25,@myid;
+	message 3, "바르도를 외웠습니다.";
+	effect @target, 0, 44, 130;
+	game_sound 8,0;
+	}else{
+	effect @target, 0, 33, 130;
+	message 3, "몬스터가 마법을 피했다!";
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_나르콜리	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 150){message 3, "마력이 부족합니다. [필요마나 : 150]"; del @myid; end;}
+	manal_del "150";
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(rand(1,10) > 8){effect @target, 0, 33, 130; message 3, "대상이 마법을 피했다!"; end;}
+	if(@type == 1){
+		if(magic_exist(2,@target,1)){message 3,"이미 걸려있습니다."; end;}
+		magic 2,@target, 0, 20, 0,@myid;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			mobnar_delay @target, 15;
+			message1 @target, 3, get_name() + "님께서 나르콜리를 시전하셧습니다.";
+		}else{end;}
+	}
+	message 3, "나르콜리를 외웠습니다.";
+	motion 136, 75;
+	game_sound 47,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_베노미	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type != 1) {end;}
+	if(get_mana(@myid) < 50){message 3, "마력이 부족합니다. [필요마나 : 50]"; del @myid; end;}
+	manal_del "50";
+	if(magic_exist(3,@target,1)) {message 3,"이미 걸려있습니다."; end;}
+	set @rnd, rand(1,10);
+	if(@rnd <= 6){
+	magic 3,@target,0, 10, 1,@myid;
+	message 3, "베노미를 외웠습니다.";
+	game_sound 8,0;
+	}else{
+	effect @target, 0, 33, 130;
+	message 3, "몬스터가 마법을 피했다!";
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_마레누스	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 100){message 3, "마력이 부족합니다. [필요마나 : 100]"; del @myid; end;}
+	manal_del "100";
+	set @damage, ((get_int(@myid))) + 117;
+	if(enare(@myid,1)) set @damage, @damage + 12;
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+		}
+	}
+	message 3, "마레누스를 외웠습니다.";
+	effect @target, 0, 10, 75;
+	motion 136, 75;
+	game_sound 47,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_마레네라	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 320){message 3, "마력이 부족합니다. [필요마나 : 320]"; del @myid; end;}
+	manal_del "320";
+	set @damage, ((get_int(@myid))) + 116;
+	if(enare(@myid,1)) set @damage, @damage + 34;
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+		}
+	}
+	message 3, "마레네라를 외웠습니다.";
+	effect @target, 0, 104, 75;
+	motion 136, 75;
+	game_sound 47,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_마네나로	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 1000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 1000이상]"; del @myid; end;}
+	manal_del "1000";
+	message 3, "마네나로를 외웠습니다.";
+   	game_sound 63, 0;
+	set @damage, ((get_int(@myid))) + 133;
+	if(enare(@myid,1)) set @damage, @damage + 50;
+	set @x1, get_xs(@myid)-9;
+	set @x2, get_xs(@myid)+9;
+	set @y1, get_ys(@myid)-9;
+	set @y2, get_ys(@myid)+9;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				damaged @mob, @damage;
+    				effect @mob, 0, 10, 75;
+			}else{
+			go:
+				if(get_map_pk() && istype(get_char_serial(@myid,@i,@j)) == 3){
+					set @mob, get_char_serial(@myid,@i,@j);
+					if(@myid != @mob){
+						char_damaged2 @mob, @damage,@damage;
+						effect @mob, 0, 10, 75;
+					}
+				}
+			}
+		}
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_데프레코	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(get_mana(@myid) < 200){message 3, "마력이 부족합니다. [필요마나 : 200]"; del @myid; end;}
+	manal_del "200";
+	set @rnd, rand(1,10);
+	if(@rnd <= 6){
+	if(@type != 1) {end;}
+	if(magic_exist(1,@target,1)) {end;}
+	magic 1,@target,"데프레코", 120, 35,@myid;
+	message 3, "데프레코를 외웠습니다.";
+	effect @target, 0, 18,130;
+	game_sound 8,0;
+	}else{
+	effect @target, 0, 33, 130;
+	message 3, "몬스터가 마법을 피했다!";
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_세멜리아	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 9000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 9000이상]"; del @myid; end;}
+	set @damage, ((get_mana(@myid))) * 2;
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+		set_manal 0;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+			set_manal get_basemana(@myid)/100*2;
+		}
+	}
+	message 3, "세멜리아를 외웠습니다.";
+	effect @target, 0, 52, 100;
+	motion 136, 75;
+	game_sound 63,0;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_라그나로크	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 15000){message 3, "사용하기에 마력량이적습니다. [필요마나 : 15000이상]"; del @myid; end;}
+	message 3, "라그나로크를 외웠습니다.";
+   	game_sound 63, 0;
+	set @damage, ((get_mana(@myid)))/2;
+	set_manal 0;
+	set @x1, get_xs(@myid)-9;
+	set @x2, get_xs(@myid)+9;
+	set @y1, get_ys(@myid)-9;
+	set @y2, get_ys(@myid)+9;
+	for(set @i, @x1; @i <= @x2; set @i, @i +1){
+		for(set @j, @y1; @j <= @y2; set @j, @j+1){
+			del @mob;
+			del @type;
+			set @mob, get_mobxy(@i, @j);
+			if(!@mob){goto go;}
+			set @type, istype(@mob);
+			if(@mob && @type == 1){
+				damaged @mob, @damage;
+    				effect @mob, 0, 52, 75;
+			}else{
+			go:
+				if(get_map_pk() && istype(get_char_serial(@myid,@i,@j)) == 3){
+					set @mob, get_char_serial(@myid,@i,@j);
+					if(@myid != @mob){
+						char_damaged2 @mob, @damage,@damage;
+						effect @mob, 0, 52, 75;
+					}
+				}
+			}
+		}
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_프라보	{
+ set @myid, get_myid();
+ set @target, spell_target();
+ set @type, istype(@target);
+	set @rnd, rand(1,10);
+if(@rnd <= 6){
+ if(@type != 1) {end;}
+ if(magic_exist(1,@target,1)) {end;}
+ magic 1,@target,"프라보", 120, 45,@myid;
+ message 3, "프라보를 외웠습니다.";
+ effect @target, 0, 43, 130;
+ game_sound 8,0;
+	}else{
+    effect @target, 0, 33, 130;
+	 message 3, "몬스터가 마법을 피했다!";
+}
+}

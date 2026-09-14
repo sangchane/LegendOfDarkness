@@ -1,0 +1,178 @@
+0,0,0,0,0,0,0	MOB_1서클스펠	{
+	set @myid, get_myid();
+	RE:
+	set @rand, rand(1,100);
+	RE2:
+	set @rand2, rand(2,5);
+	RE3:
+	set @rand3, rand(1,5);
+	if(@rand <= 0 || @rand >= 101){Goto RE;}
+	if(@rand2 <= 1 || @rand2 >= 6){Goto RE2;}
+	if(@rnad3 < 1 || @rand3 > 5){Goto RE3;}
+	if(@rand >= 98){
+	if(@rand3 >= 4){end;}
+	if(@rand2 == 2 || @rand2 == 3){effect @myid, 10, 0, 75; game_sound 47,0; message 3, "몬스터가 마레노를 가합니다.";}
+	if(@rand2 == 4 || @rand2 == 5){effect @myid, 12, 0, 75; game_sound 10,0; message 3, "몬스터가 플라모를 가합니다.";}
+	set @myid, get_myid();
+ 	char_damaged2 @myid, 40,40;
+	}
+}
+
+0,0,0,0,0,0,0	MOB_2서클스펠	{
+	set @myid, get_myid();
+	RE:
+	set @rand, rand(1,100);
+	RE2:
+	set @rand2, rand(2,4);
+	RE3:
+	set @rand3, rand(30,35);
+	if(@rand <= 0 || @rand >= 101){Goto RE;}
+	if(@rand2 <= 1 || @rand2 >= 6){Goto RE2;}
+	if(@rand3 <= 29 || @rand3 >= 36){Goto RE3;}
+	if(@rand >= 95){
+	if(@rand3 == 30){set @damaged, 60;}
+	if(@rand3 == 31){set @damaged, 70;}
+	if(@rand3 == 32){set @damaged, 80;}
+	if(@rand3 == 33){set @damaged, 65;}
+	if(@rand3 == 34){set @damaged, 75;}
+	if(@rand3 == 35){set @damaged, 67;}
+	if(@rand2 == 2){effect @myid, 10, 0, 75; game_sound 47,0; message 3, "몬스터가 마레노를 가합니다.";}
+	if(@rand2 == 3){effect @myid, 14, 0, 75; game_sound 63, 0; message 3, "몬스터가 플라미칼로를 가합니다.";}
+	if(@rand2 == 4){effect @myid, 16, 0, 75; game_sound 61,0; message 3, "몬스터가 아듀라를 가합니다.";}
+	set @myid, get_myid();
+ 	char_damaged2 @myid, @damaged,@damaged;
+	}
+}
+
+0,0,0,0,0,0,0	MOB_3서클스펠	{
+	set @myid, get_myid();
+	RE:
+	set @rand, rand(1,100);
+	RE2:
+	set @rand2, rand(2,4);
+	RE3:
+	set @rand3, rand(30,35);
+	if(@rand <= 0 || @rand >= 101){Goto RE;}
+	if(@rand2 <= 1 || @rand2 >= 6){Goto RE2;}
+	if(@rand3 <= 29 || @rand3 >= 36){Goto RE3;}
+	if(@rand >= 97){
+	if(@rand3 == 30){set @damaged, 250;}
+	if(@rand3 == 31){set @damaged, 300;}
+	if(@rand3 == 32){set @damaged, 257;}
+	if(@rand3 == 33){set @damaged, 275;}
+	if(@rand3 == 34){set @damaged, 285;}
+	if(@rand3 == 35){set @damaged, 297;}
+	if(@rand2 == 2){effect @myid, 10, 0, 75; game_sound 47,0; message 3, "몬스터가 마레노를 가합니다.";}
+	if(@rand2 == 3){effect @myid, 14, 0, 75; game_sound 63, 0; message 3, "몬스터가 플라미칼로를 가합니다.";}
+	if(@rand2 == 4){effect @myid, 12, 0, 75; game_sound 10,0; message 3, "몬스터가 플라모를 가합니다.";}
+	set @myid, get_myid();
+ 	char_damaged2 @myid, @damaged,@damaged;
+	}
+}
+
+0,0,0,0,0,0,0	MOB_4서클스펠	{
+	set @myid, get_myid();
+	RE:
+	set @rand, rand(1,100);
+	RE2:
+	set @rand2, rand(2,4);
+	RE3:
+	set @rand3, rand(30,35);
+	if(@rand <= 0 || @rand >= 101){Goto RE;}
+	if(@rand2 <= 1 || @rand2 >= 6){Goto RE2;}
+	if(@rand3 <= 29 || @rand3 >= 36){Goto RE3;}
+	if(@rand >= 98){
+	if(@rand3 == 30){set @damaged, 600;}
+	if(@rand3 == 31){set @damaged, 650;}
+	if(@rand3 == 32){set @damaged, 700;}
+	if(@rand3 == 33){set @damaged, 635;}
+	if(@rand3 == 34){set @damaged, 675;}
+	if(@rand3 == 35){set @damaged, 697;}
+	if(@rand2 == 2){effect @myid, 10, 0, 75; game_sound 47,0; message 3, "몬스터가 마레노를 가합니다.";}
+	if(@rand2 == 3){effect @myid, 14, 0, 75; game_sound 63, 0; message 3, "몬스터가 플라미칼로를 가합니다.";}
+	if(@rand2 == 4){effect @myid, 12, 0, 75; game_sound 10,0; message 3, "몬스터가 플라모를 가합니다.";}
+	set @myid, get_myid();
+ 	char_damaged2 @myid, @damaged,@damaged;
+	}
+}
+
+0,0,0,0,0,0,0	MOB_5서클스펠	{
+	set @myid, get_myid();
+	if(get_class() == 1 && get_basevita(@myid) < 52000){end;}
+	if(get_class() == 2 && get_basevita(@myid) < 40000){end;}
+	if(get_class() == 3 && get_basevita(@myid) < 37000){end;}
+	if(get_class() == 4 && get_basevita(@myid) < 40000){end;}
+	if(get_class() == 5 && get_basevita(@myid) < 49000){end;}
+	set @damaged, get_basevita(@myid)/100*20;
+	RE:
+	set @rand, rand(1,100);
+	RE2:
+	set @rand2, rand(2,4);
+	if(@rand <= 0 || @rand >= 101){Goto RE;}
+	if(@rand2 <= 1 || @rand2 >= 6){Goto RE2;}
+	if(@rand >= 98){
+	if(@rand2 == 2){char_damaged2 @myid, @damaged,@damaged; effect @myid, 89, 0, 100; game_sound 63,0; message 3, "몬스터가 홀리드래곤을 가합니다.";}
+	set @myid, get_myid();
+	}
+}
+
+0,0,0,0,0,0,0	MOB_죽던스펠	{
+	set @myid, get_myid();
+	if(get_basevita() > 90000 || get_basemana() > 75000){message 3, "{=q늙은 인간아! 나가버렷!"; warp "죽음의마을입구",10,4; end;}
+	if(get_class_sub() == 0){message 3, "{=q어린노무시키가! 여기 왜들어왔어!."; warp "죽음의마을입구",10,4; end;}
+	RE:
+	set @rand, rand(1,100);
+	RE2:
+	set @rand2, rand(2,4);
+	if(@rand <= 0 || @rand >= 101){Goto RE;}
+	if(@rand2 <= 1 || @rand2 >= 6){Goto RE2;}
+	if(@rand >= 98){
+	set @damaged, 2500;
+	if(@rand2 == 2){char_damaged2 @myid, @damaged,@damaged; effect @myid, 89, 0, 100; game_sound 63,0; message 3, "몬스터가 홀리드래곤을 가합니다.";}
+	}
+}
+
+0,0,0,0,0,0,0	MOB_결계스펠	{
+	set @myid, get_myid();
+	set @damaged, 3500;
+	char_damaged2 @myid, @damaged,@damaged; effect @myid, 89, 0, 100; game_sound 63,0; message 3, "몬스터가 홀리드래곤을 가합니다.";
+}
+
+
+0,0,0,0,0,0,0	MOB_뮤레칸의던전	{
+	set @myid, get_myid();
+	re:
+	set @rand, rand(1,100);
+	if(@rand < 1 || @rand > 100){goto re;}
+	if(@rand > 97){reberato @myid; effect @myid, 57, 0, 100; message 3, "서큐버스가 리베라토를 가합니다."; end;}
+	if(get_basevita(@myid) >= 3000000){
+		if(@rand < 95){end;}
+		set @damaged, get_basevita(@myid)/100*30;
+		char_damaged2 @myid, @damaged,@damaged; effect @myid, 89, 0, 100; game_sound 63,0; message 3, "서큐버스가 홀리드래곤을 가합니다.";
+	}
+}
+
+0,0,0,0,0,0,0	MOB_뮤레칸의던전2	{
+	set @myid, get_myid();
+	re:
+	set @rand, rand(1,100);
+	if(@rand < 1 || @rand > 100){goto re;}
+	if(@rand < 99){goto go;}
+	if(sormac(@myid)){end;}
+	mobsor_delay2 @myid, 12;
+	message 3, "베레스가 소루마를 가합니다.";
+	end;
+	go:
+	if(@rand < 97){end;}
+	if(poisenc(@myid)){end;}
+	set @damaged, get_basevita(@myid)/100*2;
+	poisen @myid, 15, @damaged;
+	message 3, "베레스가 중독을 가합니다.";
+	end;
+}
+
+0,0,0,0,0,0,0	MOB_뮤레칸의던전3	{
+	set @myid, get_myid();
+	set @damaged, get_basevita(@myid)/100*10;
+	char_damaged2 @myid, @damaged,@damaged; effect @myid, 162, 0, 100; game_sound 63,0; message 3, "베리얼이 체력흡수를 가합니다.";
+}

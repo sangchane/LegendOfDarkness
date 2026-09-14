@@ -1,6 +1,6 @@
 # server-packs — 원작 계열 서버·클라이언트 팩 (UTF-8 변환본)
 
-배포된 어둠의 전설 계열 팩 3개에서 **텍스트 파일만** 꺼내 CP949 → UTF-8 로 바꾼 것.
+배포된 어둠의 전설 계열 팩에서 **텍스트 파일만** 꺼내 CP949 → UTF-8 로 바꾼 것.
 원작이 아이템·기술·맵을 어떤 수치로 굴렸는지 찾을 때 읽는다.
 
 | 폴더 | 출처 zip | 텍스트 |
@@ -8,6 +8,18 @@
 | `5.99-server/` | `5.99 서버팩.zip` (3,270 엔트리) | 238 |
 | `5.99-client/` | `5.99 클라이언트.zip` (594 엔트리) | 8 |
 | `honden-community/` | `혼든커뮤니티팩2.zip` (3,193 엔트리) | 1,143 |
+| `novaonline/` | `sources/novaonline/` (`Legend.exe`, 네이티브 서버팩) | 350 |
+
+## novaonline 다시 가져오기
+`db/` 아래 `.txt`만 UTF-8로 변환한다. 기본 실행은 검사만 하는 dry-run이고, 실제 갱신에는 `--write`가 필요하다.
+
+```powershell
+python scripts/import-server-pack-text.py sources/novaonline novaonline
+python scripts/import-server-pack-text.py sources/novaonline novaonline --write
+```
+
+쓰기 전 모든 텍스트를 UTF-8-sig 디코더(일반 UTF-8과 BOM 포함 UTF-8), CP949 순서로 엄격하게 검사한다. 쓰기 시 `data/server-packs/novaonline/db/`만 비운 뒤 다시 만들며,
+실행 파일·DLL·맵·세이브·로그는 복사하지 않는다. 출처와 입력 인코딩별 수, 복사 수, 최상위 실행 파일이 정확히 하나일 때 그 SHA-256은 `source.json`에 기록된다.
 
 ## 알아둘 것
 - **텍스트만 있다.** 바이너리(`.map` 5,017개, `.dat` 532MB, `.mus`, `.exe`, `.dll`)는 옮기지 않았다.

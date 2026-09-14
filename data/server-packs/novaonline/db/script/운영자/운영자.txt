@@ -1,0 +1,289 @@
+0,0,0,0,0,0,0	이벤트입장	{
+		set @myid, get_myid();
+		if($evant == 1){mes 1, "현재 [이벤트활성]상태 입니다."; warp "OX퀴즈장", 5,5; end;}
+		mes 1, "현재 [이벤트비활성]상태 입니다.";
+		//warp "축구장야배", 20,30;
+		end;
+	}
+
+
+0,0,0,0,0,0,0	서버메뉴관리	{
+		set @myid, get_myid();
+		set @select, menu("[" + get_name() + "]운영자님, 어떤메뉴를 설정하시겠습니까?", "이벤트관련", "타이틀관련", "아이템관련", "스킬&스펠관련", "공지날리기");
+		if(@select == 1){
+		set @select, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","이벤트시작", "이벤트종료", "이벤트알림", "몬스터이벤트");
+		if(@select == 1){
+		if($evant == 0){
+		mes 1, "이벤트장 입장이 활성화되었습니다.";
+		broadcast 5, "{=w이벤트가 시작되었습니다! 이벤트참여는 '/입장'";
+		set $evant, 1;
+		}else{
+		mes 1, "{=q이미 이벤트입장이 활성화되어있습니다.(또는 서버운영자가아닙니다.)";
+		}
+}
+		if(@select == 2){
+		if($evant == 1){
+		mes 1, "이벤트장 입장이 비활성화되었습니다.";
+		broadcast 5, "{=w리치온라인의 이벤트입장이 종료되었습니다.";
+		set $evant, 0;
+		}else{
+		mes 1, "{=q서버 이벤트입장이 활성화되있지않습니다.(또는 서버운영자가아닙니다.)";
+		}
+}
+		if(@select == 3){
+		if($evant == 1){
+		broadcast 5, "{=w리치온라인의 이벤트입장이 시작되었습니다!!";
+		}else{
+		mes 1, "{=q서버 이벤트입장이 활성화되있지않습니다.(또는 서버운영자가아닙니다.)";
+		}
+}
+		if(@select == 4){
+		set @select, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","경험치몬스터", "어빌리티몬스터");
+		if(@select == 1){
+		mes 1, "[" + get_name() + "]운영자님, 경험치몬스터를 소환하겠습니다.";
+		set @my, get_myid();
+ 		set @x1, get_xs()-30;
+ 		set @x2, get_xs()+30;
+ 		set @y1, get_ys()-30;
+ 		set @y2, get_ys()+30;
+   		set @mob, get_mobxy(@i, @j);  
+  		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+  		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+  		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+  		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+  		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mob_spawn "경험치이벤트", get_xs(@my), get_ys(@my), get_side(@my);
+		mes 1, "[" + get_name() + "]운영자님, 경험치몬스터를 소환에 성공하였습니다.";
+}
+		if(@select == 2){
+		mes 1, "[" + get_name() + "]운영자님, 어빌리티몬스터를 소환하겠습니다.";
+		set @my, get_myid();
+ 		set @x1, get_xs()-30;
+ 		set @x2, get_xs()+30;
+ 		set @y1, get_ys()-30;
+ 		set @y2, get_ys()+30;
+   		set @mob, get_mobxy(@i, @j);  
+  		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+  		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x1), get_ys(@y1), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+  		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mob_spawn "어빌이벤트", get_xs(@x2), get_ys(@y2), get_side(@my);
+		mes 1, "[" + get_name() + "]운영자님, 어빌리티몬스터를 소환에 성공하였습니다.";
+	}
+}
+		}else if(@select == 2){
+		set @select, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","길드타이틀", "유저타이틀");
+		if(@select == 1){
+		input @set_user_title$, 1, "[" + get_name() + "]운영자님, 원하는 길드타이틀을 써주십시오.", "", "", 255;
+  		set_user_title @set_user_title$;
+		mes 1, "["+ @set_user_title$+"]길드타이틀을 다셧습니다.";
+}
+		if(@select == 2){
+		input @set_guild_title$, 1, "[" + get_name() + "]운영자님, 원하는 유저타이틀을 써주십시오.", "", "", 255;
+  		set_guild_title @set_guild_title$;
+		mes 1, "["+ @set_guild_title$+"]유저타이틀을 다셧습니다.";
+}
+		}else if(@select == 3){
+		set @select, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","아이템생성", "아이템제거");
+		if(@select == 1){
+			input @add$, 1, "[" + get_name() + "]운영자님, 생성하실 아이템이름을 정확히 입력해주세요.", "", "", 255;
+			item_add @add$, 1;
+		mes 1, "["+ @add$+"]아이템을 생성하셧습니다.";
+			del @add$;
+}
+		if(@select == 2){
+			input @del$, 1, "[" + get_name() + "]운영자님, 삭제하실 아이템이름을 정확히 입력해주세요.", "", "", 255;
+			item_del @del$, 1;
+		mes 1, "["+ @del$+"]아이템을 제거하셧습니다.";
+			del @del$;
+}
+		}else if(@select == 4){
+		set @select, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","스킬생성", "스킬지우기", "스펠생성", "스펠지우기");
+		if(@select == 1){
+		input @skill_add$, 1, "[" + get_name() + "]운영자님, 생성하실 스킬이름을 정확히 입력해주세요.", "", "", 255;
+		skill_add @skill_add$;
+		mes 1, "["+ @skill_add$+"]스킬을 생성하셧습니다.";
+}		
+		if(@select == 2){
+		input @skill_del$, 1, "[" + get_name() + "]운영자님, 제거하실 스킬이름을 정확히 입력해주세요.", "", "", 255;
+		skill_del @skill_del$;
+		mes 1, "["+ @skill_del$+"]스킬을 제거하셧습니다.";
+}		
+		if(@select == 3){
+		input @spell_add$, 1, "[" + get_name() + "]운영자님, 생성하실 스펠이름을 정확히 입력해주세요.", "", "", 255;
+		spell_add @spell_add$;
+		mes 1, "["+ @spell_add$+"]스펠을 생성하셧습니다.";
+}		
+		if(@select == 4){
+		input @spell_del$, 1, "[" + get_name() + "]운영자님, 제거하실 스펠이름을 정확히 입력해주세요.", "", "", 255;
+		spell_del @spell_del$;
+		mes 1, "["+ @spell_del$+"]스펠을 제거하셧습니다.";
+}		
+		}else if(@select == 5){
+		input @broadcast$, 1, "[" + get_name() + "]운영자님, 공지하실 내용을 정확히 입력해주세요.", "", "", 255;
+		broadcast 0, "{=g[" + get_name() + "]"+  @broadcast$+"";
+}
+}
+del @select;
+}
+
+0,0,0,0,0,0,0	서버메뉴관리2	{
+		set @myid, get_myid();
+		set @select, menu("[" + get_name() + "]운영자님, 어떤메뉴를 설정하시겠습니까?", "몬스터소환", "유저튕구기", "길드쟁탈전", "맵클리닝", "아이템지급", "유저아이템삭제", "유저소환출두", "계정관련", "테스트");
+		if(@select == 1){
+		input @mob$, 1, "[" + get_name() + "]운영자님, 소환하실 몬스터이름을 정확히 입력해주세요.", "", "", 255; mob_spawn "" + @mob$ + "", get_xs(@myid), get_ys(@myid), get_side(@myid);}
+		if(@select == 2){input @dis$, 1, "[" + get_name() + "]운영자님, 튕구실 유저이름을 정확히 입력해주세요.", "", "", 255; disconnect @dis$;}
+		if(@select == 3){set @select, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","길드성쟁탈이동시작", "쟁탈이동종료");
+			if(@select == 1){
+			if($gdia == 0){
+				mes 1, "쟁탈장 입장이 활성화되었습니다.";
+				broadcast 5, "{=w리치온라인의 길드성 쟁탈전이 시작되었습니다!!";
+				set $gdia, 1;
+				}else{
+				mes 1, "{=q이미 쟁탈장입장이 활성화되어있습니다.(또는 서버운영자가아닙니다.)";
+				}
+			}
+			if(@select == 2){
+			if($gdia == 1){
+				mes 1, "쟁탈장 입장이 비활성화되었습니다.";
+				set $gdia, 0;
+				}else{
+				mes 1, "{=q서버 쟁탈장입장이 활성화되있지않습니다.(또는 서버운영자가아닙니다.)";
+				}
+			}
+		}
+		if(@select == 4){
+		set @select1, menu("[" + get_name() + "]운영자님, 현재맵클리닝을 정말로 하겠습니까?","예", "아니오");
+		if(@select1 == 1){item_clear get_mapname(); mes 1, "맵클리닝이 완료되었습니다."; end;}
+		if(@select1 == 2){mes 1, "신중하게 생각하신뒤 클리닝을 이루어 주십시오."; end;}
+		}
+		if(@select == 5){
+ 		set @myid, get_myid();
+		input @name1$, 1, "아이템을 지급할 유저를 입력해주세요", "", "", 10;
+		set @target, get_user(@name1$);
+		if(!@target) {mes 1,"{=g" +  "존재하지 않는 유저입니다."; goto EXIT;}
+		if(@target == @myid) {mes 1,"{=g" +  "자신에게는 지급할수 없습니다.[생성을 이용]."; end;}
+		input @itemji$, 1, "지급할 아이템이름을 말해주세요.", "", "", 10;
+		input @setitem, 1, "아이템을 지급할 갯수를 설정해주십시오", "", "", 10;
+		if(@setitem <= 0){mes 1, "제대로 입력해주세요."; end;}
+		message1 @target ,3,"[" + get_name() + "]운영자 님께서" + @itemji$ + "아이템을 지급해주셧습니다.";
+		item_add1 @target, @itemji$, @setitem;
+		mes 1, "아이템 지급이 완료됬습니다.";
+		}
+		if(@select == 6){
+ 		set @myid, get_myid();
+		input @name1$, 1, "아이템을 삭제할 유저를 입력해주세요", "", "", 10;
+		set @target, get_user(@name1$);
+		if(!@target) {mes 1,"{=g" +  "존재하지 않는 유저입니다."; goto EXIT;}
+		if(@target == @myid) {mes 1,"{=g" +  "자신의아이템은 직접 없에시지요.[템삭제을 이용]."; end;}
+		input @itemji$, 1, "삭제할 아이템이름을 말해주세요.", "", "", 10;
+		input @setitem, 1, "아이템을 삭제할 갯수를 설정해주십시오", "", "", 10;
+		if(@setitem <= 0){mes 1, "제대로 입력해주세요."; end;}
+		message1 @target ,3,"[" + get_name() + "]운영자 님께서" + @itemji$ + "아이템을 삭제했습니다.";
+		item_del1 @target, @itemji$, @setitem;
+		mes 1, "아이템 삭제가 완료됬습니다.";
+		}
+		if(@select == 7){
+		set @select1, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","유저소환", "유저출두");
+		if(@select1 == 1){
+		set @myid, get_myid();
+		input @name$, 1, "소환할 유저 아이디 입력해주세요", "", "", 10;
+		set @target, get_user(@name$);
+		if(!@target){ message 3, "{=e" + @name$ +"님은 마이소시아에 없습니다."; end;}
+		if(@target == @myid) { message 3, "{=c자기 자신은 소환할 수 없습니다."; end;}
+		warp3 @target, get_mapname1(@myid), get_xs1(@myid) , get_ys1(@myid);
+		effect @myid, 1,0,75;
+		message 3, "소환을 외웠습니다.";
+		message1 @target, 3, get_name() +"님께서 소환을 하셨습니다.";
+		end;
+		}
+		if(@select1 == 2){	
+		set @myid, get_myid();			
+		input @name$, 1, "출두할 유저 아이디 입력해주세요", "", "", 10;
+		set @target, get_user(@name$);
+		if(!@target){message 3, "{=e" +  @name$ + "님은 마이소시아에 없습니다."; end;} 
+		if(@target == @myid) { message 3, "{=c자기 자신은 출두할 수 없습니다."; end;}
+		warp3 @myid, get_mapname1(@target), get_xs1(@target) , get_ys1(@target);
+		effect @myid, 1,0,75;
+		message 3, "출두를 외웠습니다.";
+		} 
+	}
+		if(@select == 8){
+			set @select1, menu("[" + get_name() + "]운영자님, 메뉴를 선택해주세요.","레벨", "최대체력", "최대마력", "모션", "직업바꾸기", "테스트", "테스트2");
+			if(@select1 == 1){
+				levelre:
+				input @level, 1, "자신의 레벨을 몇으로 바꾸겠습니까?", "", "", 2;
+				if(@level <= 0){mes 1, "제대로 입력해 주세여."; goto levelre;}
+				set_level @level;
+				mes 1, "레벨 변경이 완료되었습니다.";
+				end;
+			}
+			if(@select1 == 2){
+				hpre:
+				input @hp, 1, "자신의 체력을 몇으로 바꾸겠습니까?", "", "", 9;
+				if(@hp <= 0){mes 1, "제대로 입력해 주세여."; goto hpre;}
+				set_basevita @hp;
+				mes 1, "최대체력 변경이 완료되었습니다.";
+				end;
+			}
+			if(@select1 == 3){
+				mpre:
+				input @mp, 1, "자신의 마력을 몇으로 바꾸겠습니까?", "", "", 9;
+				if(@mp <= 0){mes 1, "제대로 입력해 주세여."; goto mpre;}
+				set_basemana @mp;
+				mes 1, "최대마력 변경이 완료되었습니다.";
+				end;
+			}
+			if(@select1 == 4){
+				mtre:
+				input @mt, 1, "어떤모션을 취하겠습니까?", "", "", 9;
+				if(@mt <= 0){mes 1, "제대로 입력해 주세여."; goto mtre;}
+				motion @mt, 30;
+				end;
+			}
+			if(@select1 == 5){
+				job:
+				input @job, 1, "어떤직업으로 바꾸겠습니까?\n 1 = 전사 2 = 도적 3 = 마법사 4 = 성직자 5 = 무도가", "", "", 9;
+				if(@job <= 0 || @job>5){mes 1, "숫자로 1~5까지만 입력해주세요."; goto job;}
+				set_class @job;
+				end;
+			}
+			if(@select1 == 6){
+				trap_spawn get_xs(@my), get_ys(@my), 15, 15;
+			}
+			if(@select1 == 7){
+				effect2 get_xs(@myid)+1, get_ys(@myid)+1, 10, 10, 100;
+			}
+del @select;
+	}
+}
+

@@ -1,0 +1,86 @@
+0,0,0,0,0,0,0	죽음의마을던전	{
+	set @i, 1;
+	set @myid, get_myid();
+	set @select, menu("죽음의마을던전으로 입장하겠습니까?[그룹이 있어야 이동됩니다.]","이동");
+	if(@select == 1){
+	if(get_level(@myid) != 99 && get_class_sub() == 0){message 3, "당신은 들어갈수 없습니다."; end;}
+	if(get_basevita() > 90000 || get_basemana() > 75000){message 3, "들어가기에 창피한걸."; end;}
+	if(group_exist() == 0){message 3, "그룹이 없습니다.";end;}
+	if(map_user_exist("신죽마집안21-1-1") == 0 || map_user_exist("신죽마집안21-2-1") == 0 || map_user_exist("신죽마집안21-3-1") == 0 || map_user_exist("신죽마집안21-4-1") == 0){group_warp "신죽마집안21-1-1", 10,17; goto go;}
+	if(map_user_exist("신죽마집안21-1-2") == 0 || map_user_exist("신죽마집안21-2-2") == 0 || map_user_exist("신죽마집안21-3-2") == 0 || map_user_exist("신죽마집안21-4-2") == 0){group_warp "신죽마집안21-1-2", 10,17; goto go;}
+	if(map_user_exist("신죽마집안21-1-3") == 0 || map_user_exist("신죽마집안21-2-3") == 0 || map_user_exist("신죽마집안21-3-3") == 0 || map_user_exist("신죽마집안21-4-3") == 0){group_warp "신죽마집안21-1-3", 10,17; goto go;}
+	mes 1, "죽음의마을던전에 비어있는 방이없습니다. 다른파티가 나올때까지 기다려주세요.";
+	end;
+	go:
+	sleep 700;
+	if(map_objmob()>=1){end;}
+	for(set @i, 1;@i <= 15; set @i, @i +1){
+		AA:
+		set @rand1, rand(1,get_mapxs(@myid)-3);
+		if(@rand1 <= 0){goto AA;}
+		BB:
+		set @rand2, rand(1,get_mapys(@myid)-3);
+		if(@rand2 <= 0){goto BB;}
+		mob_spawn "도깨비불", @rand1, @rand2, 1;
+		mob_spawn "블랙캣", @rand1, @rand2, 1;
+		}
+	}
+ del @rand1;
+ del @rand2;
+ del @rand3;
+ del @select;
+}
+
+0,0,0,0,0,0,0	죽음의마을던전다음	{
+	set @i, 1;
+	set @select, menu("다음층으로 이동하겠습니까?", "다음층으로", "포기");
+	if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		if(map_user_exist(get_mapname()) == 1){message 3, "그룹원이 같은맵에없습니다."; item_clear get_mapname(); warp "죽음의마을입구",10,4; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "죽음의마을입구",10,4; item_clear get_mapname(); end;}
+		item_clear get_mapname();
+		if(get_mapname() == "신죽마집안21-1-1"){group_warp "신죽마집안21-2-1", 13,2; goto Go;}
+		if(get_mapname() == "신죽마집안21-2-1"){group_warp "신죽마집안21-3-1", 13,2; goto Go;}
+		if(get_mapname() == "신죽마집안21-3-1"){group_warp "신죽마집안21-4-1", 13,9; goto Go;}
+		if(get_mapname() == "신죽마집안21-1-2"){group_warp "신죽마집안21-2-2", 13,2; goto Go;}
+		if(get_mapname() == "신죽마집안21-2-2"){group_warp "신죽마집안21-3-2", 13,2; goto Go;}
+		if(get_mapname() == "신죽마집안21-3-2"){group_warp "신죽마집안21-4-2", 13,9; goto Go;}
+		if(get_mapname() == "신죽마집안21-1-3"){group_warp "신죽마집안21-2-3", 13,2; goto Go;}
+		if(get_mapname() == "신죽마집안21-2-3"){group_warp "신죽마집안21-3-3", 13,2; goto Go;}
+		if(get_mapname() == "신죽마집안21-3-3"){group_warp "신죽마집안21-4-3", 13,9; goto Go;}
+		Go:
+		sleep 700;
+		if(map_objmob()>=1){end;}
+		if(get_mapname() == "신죽마집안21-4-1" || get_mapname() == "신죽마집안21-4-2" || get_mapname() == "신죽마집안21-4-3"){end;}
+		for(set @i, 1;@i <= 15; set @i, @i +1){
+		AA:
+		set @rand1, rand(1,get_mapxs(@myid)-3);
+		if(@rand1 <= 0){goto AA;}
+		BB:
+		set @rand2, rand(1,get_mapys(@myid)-3);
+		if(@rand2 <= 0){goto BB;}
+		mob_spawn "도깨비불", @rand1, @rand2, 1;
+		mob_spawn "블랙캣", @rand1, @rand2, 1;
+		}
+	}
+	if(@select == 2){mes 1, "포기합니다."; group_warp "죽음의마을입구",10,4; end;}
+	end;
+}
+
+0,0,0,0,0,0,0	죽음의마을보상	{
+	mes 1, "던전을 클리어하셧습니다.";
+	re:
+	set @bosang, rand(1,3);
+	if(@bosang < 1 || @bosang > 3){goto re;}
+	set @select, menu("보상을 선택해주십시오.", "골드", "경험치");
+	if(@select == 1){
+		money_add @bosang*200000;
+		warp "죽음의마을입구",10,4;
+		mes 1, "골드" + @bosang*200000 + "G를 보상으로 받았습니다.";
+	}
+	if(@select == 2){
+		exp_add @bosang*10000000;
+		warp "죽음의마을입구",10,4;
+		mes 1, "경험치" + @bosang*100000000 + "EXP를 보상으로 받았습니다.";
+	}
+}

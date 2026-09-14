@@ -1,0 +1,237 @@
+0,0,0,0,0,0,0	블랙셋	{
+		set @myid, get_myid();
+		mes 1, "블랙셋트를 만들어드립니다. 재료는 모든종류의 엠버 30개씩, 그직업에맞는 흑갑입니다. 성공확률은 50% 입니다. 그리고 골드 3백만골드.";
+		set @select, menu("제작할것을 선택하세요", "브릴윙아머[도가]", "브릴윙투구[도가]", "레인헌트아머[도적]", "레인헌트투구[도적]", "월화이어아머[전사]", "월화이어투구[전사]", "브레스럭아머[법사]", "브레스럭투구[법사]", "페이로브투구[직자]", "페이로브아머[직자]");
+		if(@select == 1){
+		mes 1, "브릴윙아머를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 &&  item_exist(@myid, "흑태극의") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "브릴윙아머", 1;
+		item_del "흑태극의", 1;
+		mes 1, "{=q브릴윙아머제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 브릴윙아머제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 브릴윙아머제작에 성공하다.";
+		}else{
+		mes 1, "{=q브릴윙아머제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 브릴윙아머제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 2){
+		mes 1, "브릴윙투구를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑태극현") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "브릴윙투구", 1;
+		item_del "흑태극현", 1;
+		mes 1, "{=q브릴윙투구제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 브릴윙투구제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 브릴윙투구제작에 성공하다.";
+		}else{
+		mes 1, "{=q브릴윙투구제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 브릴윙투구제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 3){
+		mes 1, "레인헌트아머를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑비현진의") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "레인헌트아머", 1;
+		item_del "흑비현진의", 1;
+		mes 1, "{=q레인헌트아머제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 레인헌트아머제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 레인헌트아머제작에 성공하다.";
+		}else{
+		mes 1, "{=q레인헌트아머제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 레인헌트아머제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 4){
+		mes 1, "레인헌트투구를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑비현진건") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "레인헌트투구", 1;
+		item_del "흑비현진건", 1;
+		mes 1, "{=q레인헌트투구제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 레인헌트투구제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 레인헌트투구제작에 성공하다.";
+		}else{
+		mes 1, "{=q레인헌트투구제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 레인헌트투구제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 5){
+		mes 1, "월화이어아머를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑비화무갑주") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "월화이어아머", 1;
+		item_del "흑비화무갑주", 1;
+		mes 1, "{=q월화이어아머제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 월화이어아머제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 월화이어아머제작에 성공하다.";
+		}else{
+		mes 1, "{=q월화이어아머제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 월화이어아머제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 6){
+		mes 1, "월화이어투구를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑비화무투구") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "월화이어투구", 1;
+		item_del "흑비화무투구", 1;
+		mes 1, "{=q월화이어투구제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 월화이어투구제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 월화이어투구제작에 성공하다.";
+		}else{
+		mes 1, "{=q월화이어투구제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 월화이어투구제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 7){
+		mes 1, "브레스럭아머를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑비화후의") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "브레스럭아머", 1;
+		item_del "흑비화후의", 1;
+		mes 1, "{=q브레스럭아머제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 브레스럭아머제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 브레스럭아머제작에 성공하다.";
+		}else{
+		mes 1, "{=q브레스럭아머제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 브레스럭아머제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 8){
+		mes 1, "브레스럭투구를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "흑비화후관") >=1 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "브레스럭투구", 1;
+		item_del "흑비화후관", 1;
+		mes 1, "{=q브레스럭투구제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 브레스럭투구제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 브레스럭투구제작에 성공하다.";
+		}else{
+		mes 1, "{=q브레스럭투구제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 브레스럭투구제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 9){
+		mes 1, "페이로브투구를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑비류선후") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "페이로브투구", 1;
+		item_del "흑비류선후", 1;
+		mes 1, "{=q페이로브투구제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 페이로브투구제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 페이로브투구제작에 성공하다.";
+		}else{
+		mes 1, "{=q페이로브투구제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 페이로브투구제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+
+		}else if(@select == 10){
+		mes 1, "페이로브아머를 제조합니다. 아이템을 확인합니다.";
+		if(item_exist(@myid, "바다의엠버") >=30 && item_exist(@myid, "대지의엠버") >=30 && item_exist(@myid, "흑비류선의") >=1 && item_exist(@myid, "바람의엠버") >=30 && item_exist(@myid, "화염의엠버") >= 30 && get_money() >= 3000000){
+		money_del "3000000";
+		item_del "바다의엠버", 30;
+		item_del "화염의엠버", 30;
+		item_del "대지의엠버", 30;
+		item_del "바람의엠버", 30;
+		set @rand, rand(1,3);
+		if(@rand >= 2)	{
+		item_add "페이로브아머", 1;
+		item_del "흑비류선의", 1;
+		mes 1, "{=q페이로브아머제작에 성공하셧습니다!";
+		broadcast 5, "[" + get_name() + "]{=c님이 페이로브아머제작에 성공하셧습니다.";
+ 		legend_add 1,255, "리치 1년, 여름 페이로브아머제작에 성공하다.";
+		}else{
+		mes 1, "{=q페이로브아머제작에 실패하셧습니다.";
+		broadcast 5, "[" + get_name() + "]{=c님이 페이로브아머제작에 실패하셧습니다.";
+		}
+		}else{
+			mes 1, "{=q재료가 부족하거나, 돈이 모자릅니다.";
+		}
+}
+	del @select;
+	del @rand;
+}

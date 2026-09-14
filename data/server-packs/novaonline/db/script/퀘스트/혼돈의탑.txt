@@ -1,0 +1,818 @@
+0,0,0,0,0,0,0	혼돈의탑보상	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	del @menu;
+	mes 1, "혼돈의탑 최상층을 클리어하신것을 축하드립니다.";
+	mes 1, "혼돈의탑 클리어 보상으로, 풀억경2개, 2000EG, 3000000GOLD, 혼돈포인트 20을 드리겠습니다.";
+	set @menu, menu("클리어 보상을 받겠습니까??", "받는다.", "안받는다.");
+	if(@menu == 1){
+		set #hondon, 0;
+		item_add "풀억경", 2;
+		set_eg 2000 + @eg;
+		money_add 3000000;
+		set #honpoint, #honpoint + 20;
+		mes 1, "보상지급이 완료되었습니다. 대기실로 귀환됩니다.";
+		warp "용자의공원", 20, 57;
+		end;
+	}
+	if(@menu == 2){
+		mes 1, "여기서 안받으면, 대기실에서 기본 보상으로 대처됩니다.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	혼탑안내npc	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @hondone, #hondon * 150000000;
+	set @hondong, #hondon * 100;
+	set @hondonm, #hondon * 100000;
+	del @menu;
+	item_del "혼돈의열쇠1", 90;
+	item_del "혼돈의열쇠2", 90;
+	mes 1, "혼돈의탑에 오신것을환영합니다.";
+	re:
+	set @menu, menu("원하시는메뉴를 선택해주세요.", "혼돈의탑이란..?", "각층격파법", "보상관련", "보상받기", "흑요석교환");
+	if(@menu == 1){
+		mes 1, "혼돈의탑이란, 5명이상의 승급파티원들과 함께 할수있는 파티퀘스트입니다.";
+		mes 1, "파티원구성에는 무조건 5직업이 모두 존재해야합니다.";
+		mes 1, "다른승급과는 입장할수 없습니다.";
+		mes 1, "몬스터의 체력은 자신파티구성원중에 체력이 제일높은사람을 기준으로 지정됩니다.";
+		goto re;
+	}if(@menu == 2){
+		mes 1, "각층격파법을 설명해드리겠습니다.";
+		mes 1, "1,4,5,7,9,10,12층은 모든몬스터를 잡는 올킬모드입니다.";
+		mes 1, "3,8,13층은 폰3마리를 없애는 인내모드입니다.";
+		mes 1, "2,6,11층은 특정몬스터를 잡고 특정제물을 얻어 다음방으로 가는 조건모드입니다.";
+		mes 1, "14층은 보스몬스터를 처리하는 피니쉬모드입니다.";
+		goto re;
+	}if(@menu == 3){
+		mes 1, "보상은 어느층까지 격파했냐에 따라 다르게 지급됩니다.";
+		mes 1, "격파하는도중에 실패를 하였다면, 저한테서 보상을 받을수있습니다.";
+		mes 1, "참고로, 보상은 5층이상 격파하신분들만 받으실수있습니다.";
+		mes 1, "만약 피니쉬모드를 깨고 보상의방으로 가신다면, 저에게서 받는것보다 훨씬좋은보상이 기다리고있습니다.";
+		mes 1, "＊참고＊보상은 골드 : 십만원 x 올라간탑층, 경험치 : 3억 x 올라간탑층, EG : 100 x 올라간탑층\n[중도 포기및 실패시에만 해당]";
+		goto re;
+	}if(@menu == 4){
+		mes 1, "보상을 지급해드리겠습니다.";
+		if(#hondon < 5){mes 1, "당신은 보상을 받을수없습니다. \n보상은 5층이상부터..."; end;}
+		mes 1, "현재 당신의 마지막 혼돈의탑기록은" + #hondon + "층까지입니다.";
+		set #honpoint, #honpoint + #hondon;
+		exp_add @hondone;
+		set_eg @hondong + @eg;
+		money_add @hondonm;
+		set #hondon, 0;
+		mes 1, "보상 골드 : [" + @hondonm + "], 경험치 : [" + @hondone + "], EG : [" + @hondong + "]을 얻었습니다.";
+		goto re;
+	}if(@menu == 5){
+		mes 1, "흑요석 아이템은 혼돈포인트 100당 한부위로 교환이 가능합니다.";
+		mes 1, "교환하기에 앞서, 아이템창에 빈공간이 없다면 공간을 확보해주세요.\n만약 아이템창자리가 없어서 증발시 복구불가능합니다.";
+		re2:
+		del @select;	
+		del @select2;
+		set @select, menu("어느직업으로 교환하시겠습니까?\n현재소유포인트 [" + #honpoint + "]", "전사", "도적", "마법사", "성직자", "무도가");
+		if(@select == 1){
+			if(get_class(@myid) != 1){mes 1, "당신은 전사가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석워리어귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석워리어목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석워리어장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석워리어반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석워리어벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석워리어각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 2){
+			if(get_class(@myid) != 2){mes 1, "당신은 도적이 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석로그귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석로그목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석로그장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석로그반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석로그벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석로그각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 3){
+			if(get_class(@myid) != 3){mes 1, "당신은 마법사가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석소서러귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석소서러목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석소서러장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석소서러반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석소서러벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석소서러각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 4){
+			if(get_class(@myid) != 4){mes 1, "당신은 성직자가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석프리스트귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석프리스트목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석프리스트장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석프리스트반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석프리스트벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석프리스트각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 5){
+			if(get_class(@myid) != 5){mes 1, "당신은 무도가가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "팔찌", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석몽크귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석몽크목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석몽크팔찌", 1; mes 1, "팔찌교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석몽크반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석몽크벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석몽크각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		del @select;	
+		del @select2;
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	혼돈의탑함정	{
+	set @myid, get_myid();
+	re2:
+	set @rand2, rand(1,10);
+	if(@rand2 < 1 || @rand > 10){goto re;}
+	if(@rand2 <= 7){del @rand2; end;}
+	re:
+	set @rand, rand(1,6);
+	if(@rand < 1 || @rand > 6){goto re;}
+	del @rand2;
+	if(@rand <=4){end;}
+	if(@rand < 4){mobnar_delay @myid, 15; message 3, "함정에 빠졌습니다."; end;}
+	if(@rand == 4){mobsor_delay @myid, 10; message 3, "함정에 빠졌습니다."; end;}
+	if(@rand == 5){set_vital "1"; message 3, "함정에 빠졌습니다."; end;}
+	if(@rand == 6){
+		go:
+		set @rand, rand(1,3);
+		if(@rand < 1 || @rand > 3){goto go;}	
+		if(@rand == 2){set_coma @myid, 1; set_state1 @myid, 1; coma_delay @myid, 15;}
+	}
+}
+
+0,0,0,0,0,0,0	혼돈의탑입장	{
+	set @select, 0;
+	set @i, 1;
+	set @myid, get_myid();
+	item_del "혼돈의열쇠1", 90;
+	item_del "혼돈의열쇠2", 90;
+	set @select, menu("혼돈의탑으로 입장하겠습니까?[그룹원중 5직업이 모두 있어야 입장가능.]","이동");
+	if(group_exist() == 0){message 3, "그룹이 없습니다.";end;}
+	if(group_count(@myid, 0) < 5){mes 1, "같은맵에 그룹원이 5명이상존재하지 않습니다."; end;}
+	if(group_class_sub() == 1){mes 1, "그룹원중 승급차수가 다른사람이 있습니다."; end;}
+	if(group_job() == 1){goto gogo;}
+	mes 1, "그룹안에 5직업이 존재하지 않습니다."; end;
+	gogo:
+	if(map_user_exist("혼돈의탑1층1") == 0 || map_user_exist("혼돈의탑2층1") == 0 || map_user_exist("혼돈의탑3층1") == 0 || map_user_exist("혼돈의탑4층1") == 0 || map_user_exist("혼돈의탑5층1") == 0 || map_user_exist("혼돈의탑6층1") == 0 || map_user_exist("혼돈의탑7층1") == 0 || map_user_exist("혼돈의탑8층1") == 0 || map_user_exist("혼돈의탑9층1") == 0 || map_user_exist("혼돈의탑10층1") == 0 || map_user_exist("혼돈의탑11층1") == 0 || map_user_exist("혼돈의탑12층1") == 0 || map_user_exist("혼돈의탑13층1") == 0 || map_user_exist("혼돈의탑14층1") == 0){group_warp "혼돈의탑1층1", 15,27; goto go;}
+	if(map_user_exist("혼돈의탑1층2") == 0 || map_user_exist("혼돈의탑2층2") == 0 || map_user_exist("혼돈의탑3층2") == 0 || map_user_exist("혼돈의탑4층2") == 0 || map_user_exist("혼돈의탑5층2") == 0 || map_user_exist("혼돈의탑6층2") == 0 || map_user_exist("혼돈의탑7층2") == 0 || map_user_exist("혼돈의탑8층2") == 0 || map_user_exist("혼돈의탑9층2") == 0 || map_user_exist("혼돈의탑10층2") == 0 || map_user_exist("혼돈의탑11층2") == 0 || map_user_exist("혼돈의탑12층2") == 0 || map_user_exist("혼돈의탑13층2") == 0 || map_user_exist("혼돈의탑14층2") == 0){group_warp "혼돈의탑1층2", 15,27; goto go;}
+	if(map_user_exist("혼돈의탑1층3") == 0 || map_user_exist("혼돈의탑2층3") == 0 || map_user_exist("혼돈의탑3층3") == 0 || map_user_exist("혼돈의탑4층3") == 0 || map_user_exist("혼돈의탑5층3") == 0 || map_user_exist("혼돈의탑6층3") == 0 || map_user_exist("혼돈의탑7층3") == 0 || map_user_exist("혼돈의탑8층3") == 0 || map_user_exist("혼돈의탑9층3") == 0 || map_user_exist("혼돈의탑10층3") == 0 || map_user_exist("혼돈의탑11층3") == 0 || map_user_exist("혼돈의탑12층3") == 0 || map_user_exist("혼돈의탑13층3") == 0 || map_user_exist("혼돈의탑14층3") == 0){group_warp "혼돈의탑1층3", 15,27; goto go;}
+	if(map_user_exist("혼돈의탑1층4") == 0 || map_user_exist("혼돈의탑2층4") == 0 || map_user_exist("혼돈의탑3층4") == 0 || map_user_exist("혼돈의탑4층4") == 0 || map_user_exist("혼돈의탑5층4") == 0 || map_user_exist("혼돈의탑6층4") == 0 || map_user_exist("혼돈의탑7층4") == 0 || map_user_exist("혼돈의탑8층4") == 0 || map_user_exist("혼돈의탑9층4") == 0 || map_user_exist("혼돈의탑10층4") == 0 || map_user_exist("혼돈의탑11층4") == 0 || map_user_exist("혼돈의탑12층4") == 0 || map_user_exist("혼돈의탑13층4") == 0 || map_user_exist("혼돈의탑14층4") == 0){group_warp "혼돈의탑1층4", 15,27; goto go;}
+	if(map_user_exist("혼돈의탑1층5") == 0 || map_user_exist("혼돈의탑2층5") == 0 || map_user_exist("혼돈의탑3층5") == 0 || map_user_exist("혼돈의탑4층5") == 0 || map_user_exist("혼돈의탑5층5") == 0 || map_user_exist("혼돈의탑6층5") == 0 || map_user_exist("혼돈의탑7층5") == 0 || map_user_exist("혼돈의탑8층5") == 0 || map_user_exist("혼돈의탑9층5") == 0 || map_user_exist("혼돈의탑10층5") == 0 || map_user_exist("혼돈의탑11층5") == 0 || map_user_exist("혼돈의탑12층5") == 0 || map_user_exist("혼돈의탑13층5") == 0 || map_user_exist("혼돈의탑14층5") == 0){group_warp "혼돈의탑1층5", 15,27; goto go;}
+	mes 1, "혼돈의탑에 비어있는 방이없습니다. 다른파티가 나올때까지 기다려주세요.";
+	end;
+	go:
+	sleep 700;
+	mob_clear get_mapname();
+output "001";
+	group_message 3, "{=q혼돈의탑 1단계. 모든몬스터를잡아라!";
+output "002";
+	message 3, "{=q혼돈의탑 1단계. 모든몬스터를잡아라!";
+	if(map_objmob()>=1){end;}
+	mob_spawn2 "혼돈의관리자", 15, 15, 1, group_bighp() * 16;
+output "003";
+	for(set @i, 1;@i <= 13; set @i, @i +1){
+		AA:
+		set @rand1, rand(1,get_mapxs(@myid));
+		if(@rand1 <= 0){goto AA;}
+		BB:
+		set @rand2, rand(1,get_mapys(@myid)-6);
+		if(@rand2 <= 0){goto BB;}
+		mob_spawn2 "혼돈의슬라임1", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "혼돈의슬라임2", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "혼돈의엘리자베스", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}
+ del @rand1;
+ del @rand2;
+ del @rand3;
+ del @select;
+}
+
+0,0,0,0,0,0,0	혼돈의탑2층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		item_clear get_mapname();
+		if(get_mapname() == "혼돈의탑1층1"){group_warp "혼돈의탑2층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑1층2"){group_warp "혼돈의탑2층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑1층3"){group_warp "혼돈의탑2층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑1층4"){group_warp "혼돈의탑2층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑1층5"){group_warp "혼돈의탑2층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "혼돈의정령", @rand1, @rand2, 1, group_bighp() * 12;
+		group_message 3, "{=q혼돈의탑 2단계. 혼돈의정령을 잡고, 열쇠를 획득하라!";
+		message 3, "{=q혼돈의탑 2단계. 혼돈의정령을 잡고, 열쇠를 획득하라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+		mob_spawn2 "혼돈의슬라임1", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "혼돈의슬라임2", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "혼돈의엘리자베스", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+		group_val "#hondon", 1,1;
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑3층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(item_exist(@myid, "혼돈의열쇠1") < 1){mes 1, "다음층으로 갈수있는 열쇠가 없습니다."; end;}
+		item_del "혼돈의열쇠1", 90;
+		item_del "혼돈의열쇠2", 90;
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 2,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑2층1"){group_warp "혼돈의탑3층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑2층2"){group_warp "혼돈의탑3층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑2층3"){group_warp "혼돈의탑3층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑2층4"){group_warp "혼돈의탑3층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑2층5"){group_warp "혼돈의탑3층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		CC:
+		set @rand3, rand(1,get_mapxs(@myid)-3);
+		if(@rand3 <= 0){goto CC;}
+		DD:
+		set @rand4, rand(1,get_mapys(@myid)-3);
+		if(@rand4 <= 0){goto DD;}
+		mob_spawn "혼돈의폰", @rand3, @rand4, 1;
+		EE:
+		set @rand5, rand(1,get_mapxs(@myid)-3);
+		if(@rand5 <= 0){goto EE;}
+		FF:
+		set @rand6, rand(1,get_mapys(@myid)-3);
+		if(@rand6 <= 0){goto FF;}
+		mob_spawn "혼돈의폰", @rand5, @rand6, 1;
+		GG:
+		set @rand7, rand(1,get_mapxs(@myid)-3);
+		if(@rand7 <= 0){goto GG;}
+		HH:
+		set @rand8, rand(1,get_mapys(@myid)-3);
+		if(@rand8 <= 0){goto HH;}
+		mob_spawn "혼돈의폰", @rand7, @rand8, 1;
+		group_message 3, "{=q혼돈의탑 3단계. 폰 3개를 모두 없애라!";
+		message 3, "{=q혼돈의탑 3단계. 폰 3개를 모두 없애라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+		mob_spawn2 "혼돈의슬라임1", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "혼돈의슬라임2", @rand1, @rand2, 1, group_bighp() * 8;
+		mob_spawn2 "혼돈의엘리자베스", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑4층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob2("혼돈의폰") >= 1){message 3, "폰을 모두 잡아주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 3,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑3층1"){group_warp "혼돈의탑4층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑3층2"){group_warp "혼돈의탑4층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑3층3"){group_warp "혼돈의탑4층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑3층4"){group_warp "혼돈의탑4층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑3층5"){group_warp "혼돈의탑4층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "혼돈의관리자", 15, 15, 1, group_bighp() * 17;
+		group_message 3, "{=q혼돈의탑 4단계. 모든몬스터를잡아라!";
+		message 3, "{=q혼돈의탑 4단계. 모든몬스터를잡아라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의도깨비불", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "혼돈의블랙캣", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "혼돈의독거미", @rand1, @rand2, 1, group_bighp() * 7;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑5층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 4,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑4층1"){group_warp "혼돈의탑5층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑4층2"){group_warp "혼돈의탑5층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑4층3"){group_warp "혼돈의탑5층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑4층4"){group_warp "혼돈의탑5층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑4층5"){group_warp "혼돈의탑5층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q혼돈의탑 5단계. 모든몬스터를잡아라!";
+		message 3, "{=q혼돈의탑 5단계. 모든몬스터를잡아라!";
+		mob_spawn2 "혼돈의관리자", 15, 15, 1, group_bighp() * 17;
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의도깨비불", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "혼돈의블랙캣", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "혼돈의독거미", @rand1, @rand2, 1, group_bighp() * 7;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑6층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 5,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑5층1"){group_warp "혼돈의탑6층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑5층2"){group_warp "혼돈의탑6층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑5층3"){group_warp "혼돈의탑6층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑5층4"){group_warp "혼돈의탑6층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑5층5"){group_warp "혼돈의탑6층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "혼돈의유니콘", 15, 15, 1, group_bighp() * 14;
+		group_message 3, "{=q혼돈의탑 6단계. 유니콘을잡고 다이아몬드를 획득하라!";
+		message 3, "{=q혼돈의탑 6단계. 유니콘을잡고 다이아몬드를 획득하라!";
+		for(set @i, 1;@i <= 13; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의도깨비불", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "혼돈의블랙캣", @rand1, @rand2, 1, group_bighp() * 7;
+			mob_spawn2 "혼돈의독거미", @rand1, @rand2, 1, group_bighp() * 7;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑7층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(item_exist(@myid, "혼돈의다이아몬드") < 1){mes 1, "다음층으로 갈수있는 다이아몬드가 없습니다."; end;}
+		item_del "혼돈의다이아몬드", 90;
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 6,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑6층1"){group_warp "혼돈의탑7층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑6층2"){group_warp "혼돈의탑7층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑6층3"){group_warp "혼돈의탑7층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑6층4"){group_warp "혼돈의탑7층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑6층5"){group_warp "혼돈의탑7층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q혼돈의탑 7단계. 모든몬스터를잡아라!";
+		message 3, "{=q혼돈의탑 7단계. 모든몬스터를잡아라!";
+		mob_spawn2 "혼돈의관리자", 15, 15, 1, group_bighp() * 18;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn "", @rand1, @rand2, 1;
+			mob_spawn2 "혼돈의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑8층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 7,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑7층1"){group_warp "혼돈의탑8층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑7층2"){group_warp "혼돈의탑8층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑7층3"){group_warp "혼돈의탑8층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑7층4"){group_warp "혼돈의탑8층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑7층5"){group_warp "혼돈의탑8층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		CC:
+		set @rand3, rand(1,get_mapxs(@myid)-3);
+		if(@rand3 <= 0){goto CC;}
+		DD:
+		set @rand4, rand(1,get_mapys(@myid)-3);
+		if(@rand4 <= 0){goto DD;}
+		mob_spawn "혼돈의폰", @rand3, @rand4, 1;
+		EE:
+		set @rand5, rand(1,get_mapxs(@myid)-3);
+		if(@rand5 <= 0){goto EE;}
+		FF:
+		set @rand6, rand(1,get_mapys(@myid)-3);
+		if(@rand6 <= 0){goto FF;}
+		mob_spawn "혼돈의폰", @rand5, @rand6, 1;
+		GG:
+		set @rand7, rand(1,get_mapxs(@myid)-3);
+		if(@rand7 <= 0){goto GG;}
+		HH:
+		set @rand8, rand(1,get_mapys(@myid)-3);
+		if(@rand8 <= 0){goto HH;}
+		mob_spawn "혼돈의폰", @rand7, @rand8, 1;
+		group_message 3, "{=q혼돈의탑 8단계. 폰 3개를 모두 없애라!";
+		message 3, "{=q혼돈의탑 8단계. 폰 3개를 모두 없애라!";
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑9층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob2("혼돈의폰") >= 1){message 3, "폰을 모두 잡아주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 8,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑8층1"){group_warp "혼돈의탑9층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑8층2"){group_warp "혼돈의탑9층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑8층3"){group_warp "혼돈의탑9층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑8층4"){group_warp "혼돈의탑9층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑8층5"){group_warp "혼돈의탑9층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q혼돈의탑 9단계. 모든몬스터를잡아라!";
+		message 3, "{=q혼돈의탑 9단계. 모든몬스터를잡아라!";
+		mob_spawn2 "혼돈의관리자", 15, 15, 1, group_bighp() * 18;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑10층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 9,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑9층1"){group_warp "혼돈의탑10층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑9층2"){group_warp "혼돈의탑10층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑9층3"){group_warp "혼돈의탑10층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑9층4"){group_warp "혼돈의탑10층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑9층5"){group_warp "혼돈의탑10층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q혼돈의탑 10단계. 모든몬스터를잡아라!";
+		message 3, "{=q혼돈의탑 10단계. 모든몬스터를잡아라!";
+		mob_spawn2 "혼돈의관리자", 15, 15, 1, group_bighp() * 24;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑11층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 10,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑10층1"){group_warp "혼돈의탑11층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑10층2"){group_warp "혼돈의탑11층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑10층3"){group_warp "혼돈의탑11층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑10층4"){group_warp "혼돈의탑11층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑10층5"){group_warp "혼돈의탑11층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q혼돈의탑 11단계. 혼돈의악충이5를 잡고, 열쇠를 획득하라!";
+		message 3, "{=q혼돈의탑 11단계. 혼돈의악충이5를 잡고, 열쇠를 획득하라!";
+			mob_spawn2 "혼돈의악충이5", @rand1, @rand2, 1, group_bighp() * 17;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의악충이1", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이2", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이3", @rand1, @rand2, 1, group_bighp() * 8;
+			mob_spawn2 "혼돈의악충이4", @rand1, @rand2, 1, group_bighp() * 8;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑12층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(item_exist(@myid, "혼돈의열쇠2") < 1){mes 1, "다음층으로 갈수있는 열쇠가 없습니다."; end;}
+		item_del "혼돈의열쇠1", 90;
+		item_del "혼돈의열쇠2", 90;
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 11,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑11층1"){group_warp "혼돈의탑12층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑11층2"){group_warp "혼돈의탑12층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑11층3"){group_warp "혼돈의탑12층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑11층4"){group_warp "혼돈의탑12층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑11층5"){group_warp "혼돈의탑12층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		group_message 3, "{=q혼돈의탑 12단계. 모든몬스터를잡아라!";
+		message 3, "{=q혼돈의탑 12단계. 모든몬스터를잡아라!";
+		mob_spawn2 "혼돈의관리자", 15, 15, 1, group_bighp() * 28;
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의그림록", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록병사", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록근위병", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록퀸", @rand1, @rand2, 1, group_bighp() * 10;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑13층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 12,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑12층1"){group_warp "혼돈의탑13층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑12층2"){group_warp "혼돈의탑13층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑12층3"){group_warp "혼돈의탑13층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑12층4"){group_warp "혼돈의탑13층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑12층5"){group_warp "혼돈의탑13층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		CC:
+		set @rand3, rand(1,get_mapxs(@myid)-3);
+		if(@rand3 <= 0){goto CC;}
+		DD:
+		set @rand4, rand(1,get_mapys(@myid)-3);
+		if(@rand4 <= 0){goto DD;}
+		mob_spawn "혼돈의폰", @rand3, @rand4, 1;
+		EE:
+		set @rand5, rand(1,get_mapxs(@myid)-3);
+		if(@rand5 <= 0){goto EE;}
+		FF:
+		set @rand6, rand(1,get_mapys(@myid)-3);
+		if(@rand6 <= 0){goto FF;}
+		mob_spawn "혼돈의폰", @rand5, @rand6, 1;
+		GG:
+		set @rand7, rand(1,get_mapxs(@myid)-3);
+		if(@rand7 <= 0){goto GG;}
+		HH:
+		set @rand8, rand(1,get_mapys(@myid)-3);
+		if(@rand8 <= 0){goto HH;}
+		mob_spawn "혼돈의폰", @rand7, @rand8, 1;
+		group_message 3, "{=q혼돈의탑 13단계. 폰 3개를 모두 없애라!";
+		message 3, "{=q혼돈의탑 13단계. 폰 3개를 모두 없애라!";
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의그림록", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록병사", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록근위병", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록퀸", @rand1, @rand2, 1, group_bighp() * 10;
+		}
+	}	
+		if(@select == 2){
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑14층가기	{
+		set @i, 1;
+		set @myid, get_myid();
+		set @select, menu("다음방으로 이동하겠습니까?","이동하기[그룹]","포기하기[개인]");
+		if(@select == 1){
+		if(map_objmob2("혼돈의폰") >= 1){message 3, "폰을 모두 잡아주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		group_val "#hondon", 13,1;
+		if(group_job() != 1){group_message 3, "같은맵에 5직업의 그룹원이 없습니다."; item_clear get_mapname(); group_warp "용자의공원", 20, 57; end;}
+		if(group_exist() == 0) {message 3, "그룹이 없습니다."; warp "용자의공원", 20, 57; item_clear get_mapname(); end;}
+		if(get_mapname() == "혼돈의탑13층1"){group_warp "혼돈의탑14층1", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑13층2"){group_warp "혼돈의탑14층2", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑13층3"){group_warp "혼돈의탑14층3", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑13층4"){group_warp "혼돈의탑14층4", 15,27; goto Go;}
+		if(get_mapname() == "혼돈의탑13층5"){group_warp "혼돈의탑14층5", 15,27; goto Go;}
+		end;
+		Go:
+		sleep 700;
+		mob_clear get_mapname();
+		if(map_objmob()>=1){end;}
+		mob_spawn2 "혼돈의제왕", @rand1, @rand2, 1, group_bighp() * 40;
+		group_message 3, "{=q혼돈의탑 14단계. 혼돈의제왕을 잡아라!";
+		message 3, "{=q혼돈의탑 14단계. 혼돈의제왕을 잡아라!";
+		for(set @i, 1;@i <= 10; set @i, @i +1){
+			AA:
+			set @rand1, rand(1,get_mapxs(@myid)-3);
+			if(@rand1 <= 0){goto AA;}
+			BB:
+			set @rand2, rand(1,get_mapys(@myid)-3);
+			if(@rand2 <= 0){goto BB;}
+			mob_spawn2 "혼돈의그림록", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록병사", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록근위병", @rand1, @rand2, 1, group_bighp() * 10;
+			mob_spawn2 "혼돈의그림록퀸", @rand1, @rand2, 1, group_bighp() * 10;
+		}
+	}	
+			if(map_user_exist(get_mapname()) == 1){mob_clear get_mapname(); item_clear get_mapname(); group_message 3, "{=q[" + get_name() + "]님이 포기하셧습니다."; warp "용자의공원", 20, 57; end;}
+		}
+}
+
+0,0,0,0,0,0,0	혼돈의탑보상층가기	{
+	set @myid, get_myid();
+	set @select, menu("보상방으로 이동하겠습니까?","이동하기[그룹]");
+	if(@select == 1){
+	if(map_objmob2("혼돈의제왕") >= 1){message 3, "혼돈의제왕 을 물리쳐 주세요."; end;}
+		item_clear get_mapname();
+		mob_clear get_mapname();
+		broadcast 5, "[" + get_name() + "]님의 파티가 혼돈의탑을 격파하였습니다!";
+		group_val "#hondon", 14,1;
+		group_warp "혼돈의탑보상의방", 5,5;
+	}
+}

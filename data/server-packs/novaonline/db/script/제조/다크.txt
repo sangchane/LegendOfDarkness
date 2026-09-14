@@ -1,0 +1,151 @@
+0,0,0,0,0,0,0	다크세트제작	{
+	RE:
+	set @rand, rand(1,11);
+	if(@rand <= 1) Goto RE;
+	mes 1, "안녕하십니까? 저는 다크그레이 세트를 제조해드립니다.";
+	mes 1, "재료는, 부위당 모든엠버종류 20개, 결계2에서 나오는 어둠의결정10개, 그레이조각10개, 돈 1백만골드 입니다.";
+	mes 1, "성공확률은 40% 입니다.";
+	set @myid, get_myid();
+	set @select, menu("제작할것을 선택하십시오.", "다크그레이이어링", "다크그레이벨트", "다크그레이네클리스", "다크그레이건틀릿", "다크그레이링", "다크그레이각반");
+	if(@select == 1){
+	mes 1, "다크그레이이어링을 만듭니다.";
+	mes 1, "재료를 확인합니다.";
+	if(item_exist(@myid, "바다의엠버") >= 20 && item_exist(@myid, "바람의엠버") >= 20 && item_exist(@myid, "화염의엠버") >= 20 && item_exist(@myid, "대지의엠버") >= 20 && item_exist(@myid, "어둠의결정") >= 10 && item_exist(@myid, "그레이조각") >= 10 && get_money() >= 1000000){
+	mes 1, "재료가 확인됬습니다.";
+	item_del "바다의엠버", 20;
+	item_del "바람의엠버", 20;
+	item_del "대지의엠버", 20;
+	item_del "화염의엠버", 20;
+	item_del "어둠의결정", 10;
+	item_del "그레이조각", 10;
+	mes 1, "제조를 시작합니다.";
+	if(@rand <= 5){
+	item_add "다크그레이이어링", 1;
+	mes 1, "제조가 성공했습니다!";
+	legend_add 1,255, "리치 1년, 겨울 다크그레이이어링제작에 성공하다.";
+	broadcast 5, "{=c[" + get_name() + "]님이 다크그레이이어링 제작에 성공했습니다!";
+	}else{
+	mes 1, "제조가 실패했습니다ㅠ.ㅠ";
+	}
+	}else{
+	mes 1, "재료가 부족하거나, 돈이 부족합니다.";
+	}
+	}else if(@select == 2){
+	mes 1, "다크그레이벨트를 만듭니다.";
+	mes 1, "재료를 확인합니다.";
+	if(item_exist(@myid, "바다의엠버") >= 20 && item_exist(@myid, "바람의엠버") >= 20 && item_exist(@myid, "화염의엠버") >= 20 && item_exist(@myid, "대지의엠버") >= 20 && item_exist(@myid, "어둠의결정") >= 10 && item_exist(@myid, "그레이조각") >= 10 && get_money() >= 1000000){
+	mes 1, "재료가 확인됬습니다.";
+	item_del "바다의엠버", 20;
+	item_del "바람의엠버", 20;
+	item_del "대지의엠버", 20;
+	item_del "화염의엠버", 20;
+	item_del "어둠의결정", 10;
+	item_del "그레이조각", 10;
+	mes 1, "제조를 시작합니다.";
+	if(@rand <= 5){
+	item_add "다크그레이벨트", 1;
+	mes 1, "제조가 성공했습니다!";
+	legend_add 1,255, "리치 1년, 겨울 다크그레이벨트제작에 성공하다.";
+	broadcast 5, "{=c[" + get_name() + "]님이 다크그레이벨트 제작에 성공했습니다!";
+	}else{
+	mes 1, "제조가 실패했습니다ㅠ.ㅠ";
+	}
+	}else{
+	mes 1, "재료가 부족하거나, 돈이 부족합니다.";
+	}
+	}else if(@select == 3){
+	mes 1, "다크그레이네클리스를 만듭니다.";
+	mes 1, "재료를 확인합니다.";
+	if(item_exist(@myid, "바다의엠버") >= 20 && item_exist(@myid, "바람의엠버") >= 20 && item_exist(@myid, "화염의엠버") >= 20 && item_exist(@myid, "대지의엠버") >= 20 && item_exist(@myid, "어둠의결정") >= 10 && item_exist(@myid, "그레이조각") >= 10 && get_money() >= 1000000){
+	mes 1, "재료가 확인됬습니다.";
+	item_del "바다의엠버", 20;
+	item_del "바람의엠버", 20;
+	item_del "대지의엠버", 20;
+	item_del "화염의엠버", 20;
+	item_del "어둠의결정", 10;
+	item_del "그레이조각", 10;
+	mes 1, "제조를 시작합니다.";
+	if(@rand <= 5){
+	item_add "다크그레이네클리스", 1;
+	mes 1, "제조가 성공했습니다!";
+	legend_add 1,255, "리치 1년, 겨울 다크그레이네클리스제작에 성공하다.";
+	broadcast 5, "{=c[" + get_name() + "]님이 다크그레이네클리스 제작에 성공했습니다!";
+	}else{
+	mes 1, "제조가 실패했습니다ㅠ.ㅠ";
+	}
+	}else{
+	mes 1, "재료가 부족하거나, 돈이 부족합니다.";
+	}
+	}else if(@select == 4){
+	mes 1, "다크그레이건틀릿을 만듭니다.";
+	mes 1, "재료를 확인합니다.";
+	if(item_exist(@myid, "바다의엠버") >= 20 && item_exist(@myid, "바람의엠버") >= 20 && item_exist(@myid, "화염의엠버") >= 20 && item_exist(@myid, "대지의엠버") >= 20 && item_exist(@myid, "어둠의결정") >= 10 && item_exist(@myid, "그레이조각") >= 10 && get_money() >= 1000000){
+	mes 1, "재료가 확인됬습니다.";
+	item_del "바다의엠버", 20;
+	item_del "바람의엠버", 20;
+	item_del "대지의엠버", 20;
+	item_del "화염의엠버", 20;
+	item_del "어둠의결정", 10;
+	item_del "그레이조각", 10;
+	mes 1, "제조를 시작합니다.";
+	if(@rand <= 5){
+	item_add "다크그레이건틀릿", 1;
+	mes 1, "제조가 성공했습니다!";
+	legend_add 1,255, "리치 1년, 겨울 다크그레이건틀릿제작에 성공하다.";
+	broadcast 5, "{=c[" + get_name() + "]님이 다크그레이건틀릿 제작에 성공했습니다!";
+	}else{
+	mes 1, "제조가 실패했습니다ㅠ.ㅠ";
+	}
+	}else{
+	mes 1, "재료가 부족하거나, 돈이 부족합니다.";
+	}
+	}else if(@select == 5){
+	mes 1, "다크그레이링을 만듭니다.";
+	mes 1, "재료를 확인합니다.";
+	if(item_exist(@myid, "바다의엠버") >= 20 && item_exist(@myid, "바람의엠버") >= 20 && item_exist(@myid, "화염의엠버") >= 20 && item_exist(@myid, "대지의엠버") >= 20 && item_exist(@myid, "어둠의결정") >= 10 && item_exist(@myid, "그레이조각") >= 10 && get_money() >= 1000000){
+	mes 1, "재료가 확인됬습니다.";
+	item_del "바다의엠버", 20;
+	item_del "바람의엠버", 20;
+	item_del "대지의엠버", 20;
+	item_del "화염의엠버", 20;
+	item_del "어둠의결정", 10;
+	item_del "그레이조각", 10;
+	mes 1, "제조를 시작합니다.";
+	if(@rand <= 5){
+	item_add "다크그레이링", 1;
+	mes 1, "제조가 성공했습니다!";
+	legend_add 1,255, "리치 1년, 겨울 다크그레이링제작에 성공하다.";
+	broadcast 5, "{=c[" + get_name() + "]님이 다크그레이링 제작에 성공했습니다!";
+	}else{
+	mes 1, "제조가 실패했습니다ㅠ.ㅠ";
+	}
+	}else{
+	mes 1, "재료가 부족하거나, 돈이 부족합니다.";
+	}
+	}else if(@select == 6){
+	mes 1, "다크그레이각반을 만듭니다.";
+	mes 1, "재료를 확인합니다.";
+	if(item_exist(@myid, "바다의엠버") >= 20 && item_exist(@myid, "바람의엠버") >= 20 && item_exist(@myid, "화염의엠버") >= 20 && item_exist(@myid, "대지의엠버") >= 20 && item_exist(@myid, "어둠의결정") >= 10 && item_exist(@myid, "그레이조각") >= 10 && get_money() >= 1000000){
+	mes 1, "재료가 확인됬습니다.";
+	item_del "바다의엠버", 20;
+	item_del "바람의엠버", 20;
+	item_del "대지의엠버", 20;
+	item_del "화염의엠버", 20;
+	item_del "어둠의결정", 10;
+	item_del "그레이조각", 10;
+	mes 1, "제조를 시작합니다.";
+	if(@rand <= 5){
+	item_add "다크그레이각반", 1;
+	mes 1, "제조가 성공했습니다!";
+	legend_add 1,255, "리치 1년, 겨울 다크그레이각반제작에 성공하다.";
+	broadcast 5, "{=c[" + get_name() + "]님이 다크그레이각반 제작에 성공했습니다!";
+	}else{
+	mes 1, "제조가 실패했습니다ㅠ.ㅠ";
+	}
+	}else{
+	mes 1, "재료가 부족하거나, 돈이 부족합니다.";
+	}
+	}
+	del @select;
+	del @rand;
+}

@@ -1,0 +1,55 @@
+//천족 스킬이펙트 156
+0,0,0,0,0,0,0	SPELL_소멸의빛	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else{
+ set @x1, get_xs()-12;
+ set @x2, get_xs()+12;
+ set @y1, get_ys()-12;
+ set @y2, get_ys()+12;       //가로세로범위입니다 8이 화면에 꽉차는거같아보여서..
+ set @mana, get_mana(@myid);
+ set @vita, get_vita(@myid);
+ set @del, (get_mana(@myid)-500);
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @damage, ((get_mana(@myid)+(get_vita(@myid)))*2; //데미지 공식이에요
+   set @type, istype(@mob);
+   if((@mob && @type == 1) && @mana > 500) {
+    effect @mob, 0, 156, 100;
+    game_sound 63, 0;
+    damaged @mob, @damage;
+   }
+  }
+ }manal_del @del;
+}
+}
+
+
+//마족 스킬이펙트 82
+0,0,0,0,0,0,0	SPELL_데스라이트	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else{
+ set @x1, get_xs()-12;
+ set @x2, get_xs()+12;
+ set @y1, get_ys()-12;
+ set @y2, get_ys()+12;       //가로세로범위입니다 8이 화면에 꽉차는거같아보여서..
+ set @mana, get_mana(@myid);
+ set @del, (get_mana(@myid)-500);
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @damage, ((get_mana(@myid)+3))*4; //데미지 공식이에요
+   set @type, istype(@mob);
+   if((@mob && @type == 1) && @mana > 500) {
+    effect @mob, 0, 82, 100;
+    game_sound 63, 0;
+    damaged @mob, @damage;
+   }
+  }
+ }manal_del @del;
+}
+}

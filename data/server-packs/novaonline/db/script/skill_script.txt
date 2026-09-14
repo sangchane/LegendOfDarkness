@@ -1,0 +1,14 @@
+0,0,0,0,0,0,0	SKILL_기본공격	{
+	attack_skill();
+	if(skill_exist("더블어택") == 1){
+		re:
+		set @rand, rand(1,10);
+		if(@rand < 1 || @rand >10){goto re;}
+		if(@rand > 8){attack_skill();}
+	attack_skill();
+	}
+}
+
+0,0,0,0,0,0,0	SKILL_탐색	{
+ discovery_skill();
+}

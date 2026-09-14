@@ -1,0 +1,89 @@
+### 타입 & 속성 #########################
+#                                       #
+# 타입[0]: 장비 아이템 & 소비 아이템    #
+#  -속성[0]: 무기    -속성[1]: 갑옷     #
+#  -속성[2]: 방패    -속성[3]: 투구     #
+#  -속성[4]: 반지    -속성[5]: 보조     #
+#  -속성[6]: 장신구  -속성[7]: 양손무기 #
+#  -속성[8]: 활(궁)  -속성[9]: 석궁(노) #
+#  -속성[10]: 화살통                    #
+#  -속성[11]: 1개인데 개수있는 소비템   #
+#    (동동주 [200 잔] <-이런 식의 템들) #
+#                                       #
+# 타입[1]: 소비 아이템                  #
+#  -속성[0]: 평범한 아이템(도토리,웅담) #
+#  -속성[1]: 산해진미같은 아이템        #
+#    (무조건 개수 1, 영구적 체마 변화)  #
+#  -속성[2]: 귀환비서 (오직 귀환만됨)   #
+#  -속성[3]: 이동비서                   #
+#                                       #
+# 타입[2]: 기타 아이템                  #
+#  -속성[0]: 개수가 있고 사용 못함      #
+#  -속성[1]: 개수가 없고 사용 못함      #
+#  -속성[2]: 돈                         #
+#  -속성[3]: 스크립트호출               #
+#                                       #
+#########################################
+
+item:db/item/item_cash.txt
+item:db/item/weapon/sword.txt
+item:db/item/weapon/axe.txt
+item:db/item/weapon/dagger.txt
+item:db/item/weapon/staff.txt
+item:db/item/weapon/glove.txt
+item:db/item/weapon/whip.txt
+item:db/item/weapon/event.txt
+
+item:db/item/armor/gaiter.txt
+item:db/item/armor/armor.txt
+item:db/item/armor/dev.txt
+item:db/item/armor/LCT.txt
+item:db/item/armor/Ring.txt
+item:db/item/armor/novice.txt
+item:db/item/armor/text1.txt
+item:db/item/leecall/mix.txt
+item:db/item/armor/orjen.txt
+item:db/item/armor/Abill.txt
+item:db/item/armor/MasterUD.txt
+item:db/item/armor/master.txt
+item:db/item/armor/Nomus.txt
+item:db/item/armor/test.txt
+item:db/item/gad.txt
+item:db/item/recoll.txt
+item:db/item/test3.txt
+item:db/item/블랙세트.txt
+item:db/item/신버전아템들.txt
+item:db/item/적흑갑.txt
+item:db/item/노비스드랍.txt
+item:db/item/아이템이미지(작성).txt
+item:db/item/염색약.txt
+item:db/item/목도.txt
+item:db/item/강화석.txt
+item:db/item/채집.txt
+item:db/item/용병.txt
+item:db/item/속성.txt
+item:db/item/리치성숙의물약.txt
+item:db/item/어빌무기.txt
+item:db/item/조합관련.txt
+item:db/item/별세트.txt
+item:db/item/주작.txt
+item:db/item/캐시샵.txt
+item:db/item/어설픈.txt
+item:db/item/종족의옷.txt
+item:db/item/가호.txt
+item:db/item/다크.txt
+item:db/item/어둠의전설.txt
+item:db/item/캐쉬옷.txt
+item:db/item/잡것.txt
+item:db/item/레전드.txt
+item:db/item/흑요석.txt
+item:db/item/개인사냥터.txt
+item:db/item/전문기술/전문기술.txt
+item:db/item/영월무기업그레이드.txt
+
+//진짜
+item:db/item/new/전사무기.txt
+item:db/item/new/도적무기.txt
+item:db/item/new/마법사무기.txt
+item:db/item/new/성직자무기.txt
+item:db/item/new/무도가무기.txt

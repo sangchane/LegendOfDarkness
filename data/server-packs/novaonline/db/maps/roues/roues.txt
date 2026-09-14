@@ -1,0 +1,16 @@
+{
+번호	664
+이름	루어스마을
+너비	100
+높이	100
+CRC	2618
+맵파일	db/maps/roues/maps/lod664.map
+}
+{
+번호	664
+이름	루어스필드
+너비	100
+높이	100
+CRC	2618
+맵파일	db/maps/roues/maps/lod664.map
+}

@@ -25,6 +25,8 @@ Thumbs.db
 sources/*.zip
 sources/*.exe
 sources/Dark-Ages-Private-Server-master/
+sources/novaonline/
+# ↑ 서버팩 zip 을 푼 것 195MB. 필요한 텍스트는 data/server-packs/novaonline/ 에 있다
 .playwright-mcp/
 
 # .NET build output

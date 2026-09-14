@@ -7,7 +7,7 @@
 아이템·맵·퀘스트·엔진 명령이 한 장씩 있고 서로 이어져 있다. 여기 있는 것은 그것을 어떻게
 만들었고 무엇을 믿을 수 있는가다.
 
-- 팩별 요약: **[5.99 서버팩](server-packs/5.99-server.md)** · **[혼든커뮤니티팩2](server-packs/honden-community.md)**
+- 팩별 요약: **[5.99 서버팩](server-packs/5.99-server.md)** · **[혼든커뮤니티팩2](server-packs/honden-community.md)** · **[NovaOnline 서버팩](server-packs/novaonline.md)**
 - 단일 출처: `data/server-packs/extracted/<팩>/*.json` (커밋됨). vault·graph 는 커밋하지 않는다
 
 ## 만드는 순서
@@ -19,7 +19,7 @@ python3 scripts/extract-script-commands.py <서버.exe> <팩>        # 실행파
 python3 scripts/classify-script-names.py                         # 부르는 이름 갈래짓기
 .venv/bin/python scripts/disasm-script-commands.py <서버.exe> <팩>  # 기계어 → 증거
 python3 scripts/build-server-pack-vault.py                       # → Obsidian (팩마다 따로)
-python3 scripts/build-server-pack-graph.py                       # → 지식 그래프
+python3 scripts/build-server-pack-graph.py                       # → 지식 그래프 (Windows도 자동 탐지)
 ```
 
 마지막 증거 단계만 `capstone`·`pefile` 이 필요하다 (시스템 파이썬 금지, PEP 668):
@@ -27,7 +27,8 @@ python3 scripts/build-server-pack-graph.py                       # → 지식 �
 
 ## 팩마다 따로 두는 이유
 
-괴물이 242종과 821종인데 **이름이 겹치는 것이 35종뿐**이다. 아이템도 989 대 3,138 에 겹침 449.
+세 서버팩은 따로 둔다. 5.99와 혼든만 보아도 괴물이 242종과 821종인데 **이름이 겹치는 것이
+35종뿐**이다. 아이템도 989 대 3,138 에 겹침 449.
 엔진까지 다르다 — `Novaonline.exe` 401개 명령, `Yuki.exe` 500개. `last_npc` 는 Nova 에 아예 없다.
 묶으면 어느 쪽 수치인지 알 수 없게 된다.
 

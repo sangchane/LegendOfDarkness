@@ -1,0 +1,275 @@
+0,0,0,0,0,0,0	__SCRIPT_LOGIN__	{
+	set @myid, get_myid();
+	broadcast 5, "[" + get_name() + "]님께서 리치온라인에 접속 하였습니다.";
+	skill_add "기본공격";
+	skill_add "탐색";
+	item_del "길드초대장", 99;
+	set_image 4,3,0;
+	set_state 0, 0;
+	if(get_map_back() || get_map_somer()){
+		if(map_user_exist(get_mapname()) <= 1){warp "용자의공원", 49,63;}
+	}
+	if(get_class() == 1 && get_son() == 1 &&  get_class_sub() >= 1){skill_add "완전방어(UP)"; skill_del "완전방어";}
+	if(skill_exist("완전방어(UP)") == 1 && get_class() != 1 && get_level() >= 99){skill_add "완전방어"; skill_del "완전방어(UP)";}
+	if(skill_exist("완전방어(UP)") == 1 && get_class() != 1 && get_level() < 99){skill_del "완전방어(UP)";}
+	if(get_level(@myid) == 1 && #newbie != 1){exp_add 1; set #newbie, 1;}
+	if(#exptime > 0){exp_per @myid,#exptime,#expba,3;}
+	if(get_sex() == 1){
+		set_body @myid, 16;
+	} else {
+		set_body @myid, 32;
+	}
+
+	if(#auto_hp != 0 || #auto_mp != 0){
+		set #auto_hp, 0;
+		set #auto_mp, 0;
+	}
+ if(get_birthday(@myid) == 0){
+
+  mes 1,"대단히 중요하니 끝까지 읽어주세요! 빈번히 발생하는 아이디 해킹을 미연에 방지하기 위해 또 하나의 2차 비밀번호를 정해야 합니다.";
+  mes 1,"이 2차 비밀번호는 한번 결정을 하시면 변경이 불가능 합니다. 이 2차 비밀번호는 자신의 게임 접속 비밀번호를 바꿀 때에만 사용합니다.";
+  mes 1,"이 2차 비밀번호는 자신의 생년월일로 해주세요. 예를 들면 자신의 생일이 92년 04월 17일이면, 920417으로 입력해주세요. (반드시 6자리)";
+  mes 1,"이 2차 비밀번호는 분실하실 이유가 없기 때문에(자신의 생년월일이므로) 이 2차 비밀번호를 모르시는 분은 해당 아이디에 대한 소유권을 박탈 합니다.";
+  mes 1,"이 2차 비밀번호를 모르시고 처음의 비밀번호 분실신고를 하셔도 저희는 가르쳐 드릴수가 없습니다. 그 만큼 중요한 것이오니 신중히 그리고 정확히 입력해 주세요.";
+  mes 1,"또한 이 두번째 비밀번호(생년월일)를 입력하지 않으시고 다음에 비밀번호 분실신고를 하셔도 저희는 해 드릴수가 없으니 반드시 두번째 비번을 입력하시기 바랍니다.";
+}else if(get_birthday(@myid) != 0){
+end;
+}
+LOOP:
+ input @birthday, 1, "자신의 생년월일을 입력해 주세요.", "저의 생년월일은", "입니다.", 6;
+
+ if(@birthday == 0){
+INVALID:
+   mes 1,"두번째 비밀번호를 정하지 않으면 게임을 할 수 없습니다. 반드시 해주세요.";
+  goto LOOP;
+ }
+
+ set @ret, menu("당신의 생년월일이 " + @birthday + "가 맞습니까?", "예", "아니오");
+ if(@ret != 1){ goto INVALID; }
+
+ set_birthday @birthday;
+
+ del @birthday;
+ del @ret;
+}
+
+0,0,0,0,0,0,0	__SCRIPT_LOGOUT__	{
+ set @myid, get_myid();
+item_del "종합책", 1;
+broadcast 5, "[" + get_name() + "]님께서접속해제하였습니다";
+}
+
+0,0,0,0,0,0,0	__SCRIPT_DEAD__	{
+  set @myid, get_myid();
+ if(group_exist(@myid) == 1){set_coma @myid, 1; set_state 1,1; coma_delay @myid, 15; end;}
+ //item_drop;
+ 	if(get_map_somer()){
+		if(map_user_exist(get_mapname()) == 1){
+			if(map_objmob()>=1){
+				mob_clear get_mapname();
+				item_clear get_mapname();
+			}
+		}
+	}
+	reberato @myid;
+	warp "뮤레칸의방", 10, 9;
+	if(get_vita(@myid) != 0) set_vita @myid, 1000;
+	char_dead();
+	set_body @myid, 64;
+	set_state 1, 1;
+}
+
+0,0,0,0,0,0,0	__SAY_SCRIPT__	{
+	set @myid, get_myid();
+	set @say, say_last();
+	output @say;
+	if(@say == "ㅎㅇ"){
+		mes 1, "ㅇㅇㅇ";
+	}
+}
+
+0,0,0,0,0,0,0	잘가세요	{
+	set @myid, get_myid();
+	set #coma, 0;
+	if(get_coma(@myid) == 0){end;}
+ 	if(get_map_somer()){
+		if(map_user_exist(get_mapname()) == 1){
+			if(map_objmob()>=1){
+				mob_clear get_mapname();
+				item_clear get_mapname();
+			}
+		}
+	}
+	reberato @myid;
+	warp "뮤레칸의방", 10, 9;
+	if(get_vita(@myid) != 0) set_vita @myid, 1000;
+	char_dead();
+	set_body @myid, 64;
+	set_state 1, 1;
+}
+ 
+0,0,0,0,0,0,0	코마시간	{
+	set #coma, #coma + 1;
+}
+ 
+0,0,0,0,0,0,0	하이드머리	{
+	if(#hair != 0){set_hair #hair;}
+}
+
+0,0,0,0,0,0,0	워프백	{
+  set @myid, get_myid();
+  set @warp_map$, get_mapname(); set @warp_xs, get_xs(); set @warp_ys, get_ys();
+  warp @warp_map$, @warp_xs,@warp_ys;
+  end;
+}
+
+0,0,0,0,0,0,0	스피드업	{
+	set @myid, get_myid();
+	if(get_coma(@myid) == 1){end;}
+ 	set @side, get_side(@myid);
+	if(@side == 0){set @ys, get_ys()-1; set_ys(@ys); effect @target, 91, 91, 100;}
+	if(@side == 1){set @xs, get_xs()+1; set_xs(@xs); effect @target, 91, 91, 100;}
+	if(@side == 2){set @ys, get_ys()+1; set_ys(@ys); effect @target, 91, 91, 100;}
+	if(@side == 3){set @xs, get_xs()-1; set_xs(@xs); effect @target, 91, 91, 100;}
+	sleep 20;
+	set @myid, get_myid();
+	set @now_xs, get_xs(@myid);
+	set @now_ys, get_ys(@myid);
+	if(@now_xs > 60000 && @now_ys > 60000){set_ys(0); set_xs(0); goto TP;}
+	if(@now_xs > 60000){set_xs(0);goto TP;}
+	if(@now_ys > 60000){set_ys(0);goto TP;}
+	if(@now_xs >= get_mapxs(@myid) && @now_ys >= get_mapys(@myid)){set_xs get_mapxs(@myid) - 1; set_ys get_mapys(@myid) - 1; goto TP;}
+	if(@now_xs >= get_mapxs(@myid)){set_xs get_mapxs(@myid) - 1;goto TP;}
+	if(@now_ys >= get_mapys(@myid)){set_ys get_mapys(@myid) - 1;goto TP;}
+	TP:
+	del @myid;
+	del @side;
+	del @xs;
+	del @ys;
+}
+
+0,0,0,0,0,0,0	뮤레칸	{
+ set @myid, get_myid(); 
+ mes 1, "생명의 소중함을 그렇게 일러왔거늘... 앞으로도 사소한 일에 목숨을 걸지 않으리라고 내가 어떻게 믿을 수 있게느냐? 또 생명을 잃고 나를 찾아오지 않겠다고 맹세할 수 있겠느냐?";
+ mes 1, "싸움은 싸움을 부르고, 피는 반드시 피를 보게 되느니라. 이번의 죽음도 네 책임이라는 것을 진심으로 느끼고 반성하고 있으냐?";
+ mes 1, "그렇다면 잃은 물건과 경험치도 다 네 욕심에서 비롯되었음을 인정하겠느냐?";
+ mes 1, "네가 새로 생명을 얻게 되더라도 절대로 무고한 생명을 해치지 않을 것을 맹세하느냐?";
+ message 3, "뮤레칸님이 신의기원을 외워주셨습니다.";
+ set_vita @myid, 1000;
+set_state 0,0;
+if(get_sex(@myid) == 1) { set_body @myid, 16; }
+else { set_body @myid, 32; }
+ warp "이아의천상계", 5, 5;
+ mes 0, "너의 각오를 믿고, 이아가 너를 부른다. 너를 이아에게 보내주겠다.";
+ mes 0, "그리고 항상 서버를 유지시켜주시는 리치온라인님에게 경의를 표하도록하여라.";
+ user_say 3, "뮤레칸님! 감사합니다.";
+del @val;
+}
+
+
+0,0,0,0,0,0,0	_SCRIPT_ITEM_	{
+  set @myid, get_myid(); 
+ set_vita @myid, 1;
+ message 3, "당신의 체력은 1이 되었습니다.";
+}
+
+0,0,0,0,0,0,0	_MOB_ATTACK_	{
+ set @myid, get_myid();
+ char_damaged @myid, 0, 1000;
+ effect @myid, 50, 50, 75;
+ game_sound 44, 0;
+}
+
+0,0,0,0,0,0,0	지존축하경험치	{
+	sleep 1000;
+	set @myid, get_myid();
+	if(get_class(@myid) == 5){set_str "4"; set_int "4"; set_wis "3"; set_dex "3"; set_con "3"; set_point "196";}
+	exp_add 50000000;
+	mes 1, "드디어 지존을 찍으셧습니다! 축하한다는 의미에서, 경험치 5억을 지급해드렸습니다!";
+}
+
+0,0,0,0,0,0,0	그룹원보기	{
+	set @myid, get_myid();
+	if(group_exist(@myid) == 0){message 3, "당신은 그룹이 없습니다."; end;}
+	group_list;
+}
+0,0,0,0,0,0,0	가호타임셋	{
+	if(#exptime > 0){end;}
+	set #exptime, 1800;
+}
+0,0,0,0,0,0,0	가호타임	{
+	if(#exptime <= 10){set #exptime, 0; end;}
+	if(#exptime == 0){end;}
+	set #exptime, #exptime - 1;
+}
+
+0,0,0,0,0,0,0	크리스마스이벤트	{
+	set @myid, get_myid();
+	set @select, menu("[" + get_name() + "]님 행복하신가요?","재오픈관련보상대상보상지급안내");
+	if(@select == 1){
+		mes 1, "재오픈시 약속한 특정사람들의 보상을 지급해드리고있습니다.\n지급은 1월3일까지만 진행합니다.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	능력치초기화	{
+	set @myid, get_myid();
+	if(#pointreset == 1){mes 1, "당신은 이미 능력치를 초기화 받으셧습니다."; end;}
+	set @select, menu("레벨 98이하이신분의 능력치를 초기화시켜드립니다.\n{=q체력과 마력이 100으로 초기화됩니다.\n{=a능력치 초기화는 1회만가능 합니다.", "능력치초기화", "ㅇㅅㅇ??");
+	if(@select == 1){
+		if(get_level() >= 99){mes 1, "{=q당신은 레벨이 99라서 능력치를 초기화가 불가능합니다."; del @select; end;}
+		if(get_ac(@myid) != 100){mes 1, "{=q모든 장비템을 벗어주세요."; del @select; end;}
+		mes 1, "능력치를 초기화하면 다시 되돌릴수 없습니다.";
+		set @select1, menu("정말로 초기화를 하시겠습니까?", "네", "ㅇㄴㅁ");
+		if(@select1 == 1){
+			set @base, get_level() - 1;
+			set @base, @base * 50;
+			set @base, @base + 100;
+			set_basevita @base;
+			set_basemana @base;
+			set_str 4;
+			set_int 4;
+			set_wis 3;
+			set_dex 3;
+			set_con 3;
+			set_point (get_level(@myid) - 1) * 2;
+			set #pointreset, 1;
+			mes 1, "능력치를 초기화해드렸습니다.";
+		}
+	if(@select1 == 2){mes 1, "{=q어쩌라고??"; del @select; end;}
+	}
+	if(@select == 2){mes 1, "{=q어쩌라고??"; del @select; end;}
+}
+
+0,0,0,0,0,0,0	전체공지	{
+	input @notic$, 1, "뭐라고 공지를 날릴까여??", "ㅇ", "ㅇ", 255;
+	all_messege @notic$;
+}
+
+0,0,0,0,0,0,0	길막	{
+	mes 0, "이상한 기운이 길목을 막고있다.";
+	end;
+}
+0,0,0,0,0,0,0	피케이입장	{
+	set @myid, get_myid();
+	set @pk, 0;
+	del @pk;
+	re:
+	set @pk, menu("어느 피케이장으로 입장하겠습니까?", "비승급", "1차승급", "2차승급", "통합");
+	if(@pk == 0 || !@pk){goto re;}
+	if(@pk == 1){
+		if(get_class_sub() != 0){mes 0, "당신은 비승급자가 아닙니다."; end;}
+		warp "비승급PK", 5, 5;
+	}
+	if(@pk == 2){
+		if(get_class_sub() != 1){mes 0, "당신은 1차승급자가 아닙니다."; end;}
+		warp "1차승급PK", 5, 5;
+	}
+	if(@pk == 3){
+		if(get_class_sub() != 2){mes 0, "당신은 2차승급자가 아닙니다."; end;}
+		warp "2차승급PK", 5, 5;
+	}
+	if(@pk == 4){
+		warp "통합PK", 5, 5;
+	}
+}

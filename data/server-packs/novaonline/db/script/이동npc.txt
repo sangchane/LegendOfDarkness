@@ -1,0 +1,331 @@
+0,0,0,0,0,0,0	리콜입니다	{
+	set @myid, get_myid();
+	if(get_mapname() == "뮤레칸의방"){mes 3, "뮤레칸의 방에서는 사용할수 없습니다."; end;}
+	if(get_map_somer()){mes 1, "파티퀘스트맵에서는 사용할수 없습니다."; end;}
+	item_del "리콜", 1;
+	if(get_level(@myid) < 11){warp "노비스마을",39,30; mes 3, "노비스마을로 귀환하셧습니다."; end;}
+	warp "용자의공원", 49,63;
+	mes 1, "용자의공원으로 귀환하셧습니다.";
+	end;
+}
+
+0,0,0,0,0,0,0	월드맵가자	{
+	set @myid, get_myid();
+	set @select, menu("어느 월드맵으로 가겠습니까?","비승용월드맵&밀레스신전", "승급용월드맵", "시장");
+	if(@select == 1){warp "월드맵", 4,4; end;}
+	if(@select == 2){if(get_class_sub() > 0){warp "승월드맵", 4,4; end;}}
+	if(@select == 3){warp "시장", 12,11; end;}
+	mes 1,"비승급자는 이용할수없습니다.";
+	end;
+}
+		
+0,0,0,0,0,0,0	월드맵바로이동	{
+	set @myid, get_myid();
+	set @select, menu("월드맵으로 바로 보내드려요!(이용비용 : 1000G).","이동한다.", "걸어간다.");
+	if(@select == 1){
+		set @select2, menu("어느 월드맵으로?", "월드맵1", "승급월드맵", "시장");
+		if(@select2 == 1){
+			if(get_money() >= 1000){warp "월드맵", 4,4; money_del 1000; mes 1, "이동됬습니다."; end;}
+			mes 1, "금전이 부족합니다.[필요금전 : 1000G]";
+			end;
+		}
+		if(@select2 == 2){
+			if(get_money() >= 1000 && get_class_sub() > 0){warp "승월드맵", 4,4; money_del 1000; mes 1, "이동됬습니다."; end;}
+			mes 1, "아직 승급을 안하셧거나, 금전이 부족합니다.[필요금전 : 1000G]";
+			end;
+		}
+		if(@select2 == 3){
+			if(get_money() >= 1000){warp "시장", 12,11; money_del 1000; mes 1, "이동됬습니다."; end;}
+			mes 1, "금전이 부족합니다.[필요금전 : 1000G]";
+			end;
+		}
+	}	
+	if(@select == 2){mes 1, "안녕히 가세요!"; end;}
+}
+
+0,0,0,0,0,0,0	호러캐슬	{
+		set @myid, get_myid();
+		set @select, menu("호러캐슬대기실로 입장하겠습니까?[그룹이 있어야 이동됩니다.]","이동");
+		if(@select == 1){
+		if(group_exist() == 0){message 3, "그룹이 없습니다.";end;}
+		if(map_user_exist("캐슬대기실1") == 0){group_warp "캐슬대기실1", 4,4; end;}
+		if(map_user_exist("캐슬대기실2") == 0){group_warp "캐슬대기실2", 4,4; end;}
+		if(map_user_exist("캐슬대기실3") == 0){group_warp "캐슬대기실3", 4,4; end;}
+		if(map_user_exist("캐슬대기실4") == 0){group_warp "캐슬대기실4", 4,4; end;}
+		if(map_user_exist("캐슬대기실5") == 0){group_warp "캐슬대기실5", 4,4; end;}
+		if(map_user_exist("캐슬대기실6") == 0){group_warp "캐슬대기실6", 4,4; end;}
+		if(map_user_exist("캐슬대기실7") == 0){group_warp "캐슬대기실7", 4,4; end;}
+		if(map_user_exist("캐슬대기실8") == 0){group_warp "캐슬대기실8", 4,4; end;}
+		if(map_user_exist("캐슬대기실9") == 0){group_warp "캐슬대기실9", 4,4; end;}
+		if(map_user_exist("캐슬대기실10") == 0){group_warp "캐슬대기실10", 4,4; end;}
+		if(map_user_exist("캐슬대기실11") == 0){group_warp "캐슬대기실11", 4,4; end;}
+		if(map_user_exist("캐슬대기실12") == 0){group_warp "캐슬대기실12", 4,4; end;}
+		if(map_user_exist("캐슬대기실13") == 0){group_warp "캐슬대기실13", 4,4; end;}
+		if(map_user_exist("캐슬대기실14") == 0){group_warp "캐슬대기실14", 4,4; end;}
+		if(map_user_exist("캐슬대기실15") == 0){group_warp "캐슬대기실15", 4,4; end;}
+		if(map_user_exist("캐슬대기실16") == 0){group_warp "캐슬대기실16", 4,4; end;}
+		if(map_user_exist("캐슬대기실17") == 0){group_warp "캐슬대기실17", 4,4; end;}
+		if(map_user_exist("캐슬대기실18") == 0){group_warp "캐슬대기실18", 4,4; end;}
+		if(map_user_exist("캐슬대기실19") == 0){group_warp "캐슬대기실19", 4,4; end;}
+		if(map_user_exist("캐슬대기실20") == 0){group_warp "캐슬대기실20", 4,4; end;}
+		mes 1, "호러캐슬대기실에 비어있는 방이없습니다. 다른파티가 나올때까지 기다려주세요.";
+		end;
+		}
+}
+
+0,0,0,0,0,0,0	호러캐슬대기실1	{
+	set @myid, get_myid();
+	set @select, menu("호러캐슬로 입장하겠습니까?[그룹이 있어야 이동됩니다.]","이동","대기실퇴장");
+	if(@select == 1){
+		if(group_exist() == 0){message 3, "그룹이 없습니다."; warp "호러캐슬대기실", 27,14; end;}
+		if(map_user_exist(get_mapname()) == 1){message 3, "그룹원이 같은맵에없습니다."; warp "호러캐슬대기실", 27,14; end;}
+		if(map_user_exist("캐슬1") == 0){group_warp "캐슬1", 9,2; goto Go;}
+		if(map_user_exist("캐슬2") == 0){group_warp "캐슬2", 9,2; goto Go;}
+		if(map_user_exist("캐슬3") == 0){group_warp "캐슬3", 9,2; goto Go;}
+		if(map_user_exist("캐슬4") == 0){group_warp "캐슬4", 9,2; goto Go;}
+		if(map_user_exist("캐슬5") == 0){group_warp "캐슬5", 9,2; goto Go;}
+		if(map_user_exist("캐슬6") == 0){group_warp "캐슬6", 9,2; goto Go;}
+		if(map_user_exist("캐슬7") == 0){group_warp "캐슬7", 9,2; goto Go;}
+		if(map_user_exist("캐슬8") == 0){group_warp "캐슬8", 9,2; goto Go;}
+		if(map_user_exist("캐슬9") == 0){group_warp "캐슬9", 9,2; goto Go;}
+		if(map_user_exist("캐슬10") == 0){group_warp "캐슬10", 9,2; goto Go;}
+		if(map_user_exist("캐슬11") == 0){group_warp "캐슬11", 9,2; goto Go;}
+		if(map_user_exist("캐슬12") == 0){group_warp "캐슬12", 9,2; goto Go;}
+		if(map_user_exist("캐슬13") == 0){group_warp "캐슬13", 9,2; goto Go;}
+		if(map_user_exist("캐슬14") == 0){group_warp "캐슬14", 9,2; goto Go;}
+		if(map_user_exist("캐슬15") == 0){group_warp "캐슬15", 9,2; goto Go;}
+		if(map_user_exist("캐슬16") == 0){group_warp "캐슬16", 9,2; goto Go;}
+		if(map_user_exist("캐슬17") == 0){group_warp "캐슬17", 9,2; goto Go;}
+		if(map_user_exist("캐슬18") == 0){group_warp "캐슬18", 9,2; goto Go;}
+		if(map_user_exist("캐슬19") == 0){group_warp "캐슬19", 9,2; goto Go;}
+		if(map_user_exist("캐슬20") == 0){group_warp "캐슬20", 9,2; goto Go;}
+		end;
+		mes 1, "호러캐슬에 비어있는 방이 없습니다. 다른파티가 나올때까지 대기해주세요.";
+		end;
+		Go:
+		sleep 1000;
+		if(map_objmob()>=1){end;}
+		for(set @i, 1;@i <= 30; set @i, @i +1){
+		AA:
+			set @rand1, rand(1,get_mapxs(@myid)-8);
+			if(@rand1 <= 0){goto AA;}
+		BB:
+			set @rand2, rand(1,get_mapys(@myid)-1);
+			if(@rand2 <= 0){goto BB;}
+		CC:
+			set @rand3, rand(1,7);
+			if(@rand3 <= 0){goto CC;}
+			if(@rand3 == 1){mob_spawn "바탈리우스", @rand1, @rand2, 1;}
+			if(@rand3 == 2){mob_spawn "헤라시우스", @rand1, @rand2, 2;}
+			if(@rand3 == 3){mob_spawn "헤라시우스", @rand1, @rand2, 3;}
+			if(@rand3 == 4){mob_spawn "헤브렐리우스", @rand1, @rand2, 1;}
+			if(@rand3 == 5){mob_spawn "바클라시우스", @rand1, @rand2, 2;}
+			if(@rand3 == 6){mob_spawn "슈크래시우스", @rand1, @rand2, 3;}
+			if(@rand3 == 7){mob_spawn "타클라시우스", @rand1, @rand2, 1;}
+		}
+	}
+ del @rand1;
+ del @rand2;
+ del @rand3;
+ del @select;
+}
+
+0,0,0,0,0,0,0	호러캐슬담방	{
+	set @myid, get_myid();
+	set @select, menu("다음방으로 이동하겠습니까?", "다음방으로", "대기실로");
+	if(@select == 1){
+		if(map_objmob()>=1){message 3, "몬스터가 남아있습니다."; end;}
+		if(map_user_exist(get_mapname()) == 1){message 3, "그룹원이 같은맵에없습니다."; item_clear get_mapname(); warp "호러캐슬대기실", 27,14; end;}
+		if(group_exist() == 0) {warp "호러캐슬대기실", 27,14; item_clear get_mapname(); end;}
+		group_warp get_mapname(),9,2;
+		item_clear get_mapname();
+		sleep 1000;
+		for(set @i, 1;@i <= 30; set @i, @i +1){
+		AA:
+		set @rand1, rand(1,get_mapxs(@myid)-8);
+		if(@rand1 <= 0){goto AA;}
+		BB:
+		set @rand2, rand(1,get_mapys(@myid)-1);
+		if(@rand2 <= 0){goto BB;}
+		CC:
+		set @rand3, rand(1,7);
+		if(@rand3 <= 0) {goto CC;}
+		if(@rand3 == 1) {mob_spawn "바탈리우스", @rand1, @rand2, 1;}
+		if(@rand3 == 2) {mob_spawn "헤라시우스", @rand1, @rand2, 2;}
+		if(@rand3 == 3) {mob_spawn "헤라시우스", @rand1, @rand2, 3;}
+		if(@rand3 == 4) {mob_spawn "헤브렐리우스", @rand1, @rand2, 1;}
+		if(@rand3 == 5) {mob_spawn "바클라시우스", @rand1, @rand2, 2;}
+		if(@rand3 == 6) {mob_spawn "슈크래시우스", @rand1, @rand2, 3;}
+		if(@rand3 == 7) {mob_spawn "타클라시우스", @rand1, @rand2, 1;}
+		}
+	}
+	if(@select == 2){
+		if(map_objmob()>=1) {message 3, "몬스터가 남아있습니다."; end;}
+		item_clear get_mapname();
+		if(group_exist() == 0){warp "호러캐슬대기실", 27,14; end;}
+		if(map_user_exist(get_mapname()) == 1) {warp "호러캐슬대기실", 27,14; end;}
+		group_warp "호러캐슬대기실", 27,14;
+	}
+ del @rand1;
+ del @rand2;
+ del @rand3;
+}
+
+0,0,0,0,0,0,0	ed호러캐슬	{
+	set @myid, get_myid();
+	re:
+	set @rand, rand(1,2);
+	set @menu, menu("호러캐슬로 가겠습니까?\\n[골드 : 10000 필요]", "예", "아니오");
+	if(@menu == 1){
+	if(get_level(@myid) < 99 || get_money(@myid) < 10000 || get_class_sub() != 0){mes 1, "호러케슬에 가기엔, 레벨이 안맞거나, 골드가 부족합니다."; del @myid; end;}
+	money_del 10000;
+	mes 1, "호러캐슬로 이동합니다.";
+	if(@rand < 1){goto re;}
+	if(@rand == 1){warp "호러캐슬대기실", 27,14;}
+	if(@rand == 2){warp "호러캐슬대기실", 28,14;}
+	mes 3, "호러캐슬로 귀환하셧습니다.";
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	개인사냥터	{
+	set @myid, get_myid();
+	set @menuc, menu("개인사냥터로 가겠습니까?\\n개인사냥터는 서클별로 이동이 됩니다.", "예", "아니오");
+		if(@menuc == 1){
+			if(get_level(@myid) < 41){mes 1, "3서클 부터 개인사냥터를 이용할수있습니다."; end;}
+			if(get_class_sub() != 0){mes 1, "승급자는 개인사냥터를 이용할수없습니다."; end;}
+			mes 1, "개인사냥터로 입장합니다. 빈방을 찾겠습니다.";
+			if(get_level(@myid) >= 41 && get_level(@myid) < 71){
+				if(map_user_exist("3서클개인사냥터1") == 0){warp "3서클개인사냥터1", 11,11; goto Go;}
+				if(map_user_exist("3서클개인사냥터2") == 0){warp "3서클개인사냥터2", 11,11; goto Go;}
+				if(map_user_exist("3서클개인사냥터3") == 0){warp "3서클개인사냥터3", 11,11; goto Go;}
+				if(map_user_exist("3서클개인사냥터4") == 0){warp "3서클개인사냥터4", 11,11; goto Go;}
+				if(map_user_exist("3서클개인사냥터5") == 0){warp "3서클개인사냥터5", 11,11; goto Go;}
+				mes 1, "죄송합니다. 빈방이 존재하지 않습니다.";
+				end;
+			}
+			if(get_level(@myid) >= 71 && get_level(@myid) < 99){
+				if(map_user_exist("4서클개인사냥터1") == 0){warp "4서클개인사냥터1", 11,11; goto Go;}
+				if(map_user_exist("4서클개인사냥터2") == 0){warp "4서클개인사냥터2", 11,11; goto Go;}
+				if(map_user_exist("4서클개인사냥터3") == 0){warp "4서클개인사냥터3", 11,11; goto Go;}
+				if(map_user_exist("4서클개인사냥터4") == 0){warp "4서클개인사냥터4", 11,11; goto Go;}
+				if(map_user_exist("4서클개인사냥터5") == 0){warp "4서클개인사냥터5", 11,11; goto Go;}
+				mes 1, "죄송합니다. 빈방이 존재하지 않습니다.";
+				end;
+			}
+			if(get_level(@myid) == 99){
+				if(map_user_exist("지존개인사냥터1") == 0){warp "지존개인사냥터1", 11,11; goto Go;}
+				if(map_user_exist("지존개인사냥터2") == 0){warp "지존개인사냥터2", 11,11; goto Go;}
+				if(map_user_exist("지존개인사냥터3") == 0){warp "지존개인사냥터3", 11,11; goto Go;}
+				if(map_user_exist("지존개인사냥터4") == 0){warp "지존개인사냥터4", 11,11; goto Go;}
+				if(map_user_exist("지존개인사냥터5") == 0){warp "지존개인사냥터5", 11,11; goto Go;}
+				mes 1, "죄송합니다. 빈방이 존재하지 않습니다.";
+				end;
+			}
+			end;
+			Go:
+			end;
+	}
+}
+
+0,0,0,0,0,0,0	개인사냥터2	{
+	set @myid, get_myid();
+	set @menuc, menu("승급 개인사냥터로 가겠습니까?", "예", "아니오");
+		if(@menuc == 1){
+			if(get_basevita(@myid) >= 90000 || get_basemana(@myid) >= 90000){mes 1, "체력과 마력중 하나라도 9만이 넘으면 입장이 불가합니다."; end;}
+			if(get_class_sub() == 2){mes 1, "2차승급자는 개인사냥터를 이용할수없습니다."; end;}
+			mes 1, "개인사냥터로 입장합니다. 빈방을 찾겠습니다.";
+				if(map_user_exist("승급개인사냥터1") == 0){warp "승급개인사냥터1", 11,11; goto Go;}
+				if(map_user_exist("승급개인사냥터2") == 0){warp "승급개인사냥터2", 11,11; goto Go;}
+				if(map_user_exist("승급개인사냥터3") == 0){warp "승급개인사냥터3", 11,11; goto Go;}
+				mes 1, "죄송합니다. 빈방이 존재하지 않습니다.";
+				end;
+				Go:
+				end;
+		}
+}
+
+0,0,0,0,0,0,0	유린	{
+	set @myid, get_myid();
+	mes 1, "쩔전용맵인 지하묘지로 보내드립니다. ";
+	mes 1, "쩔을 해주실 분과, 받으실분이 같이 그룹이 되있어야 합니다.";
+	mes 1, "입장료는 20만골드입니다.";
+	mes 1, "그룹도 없는데, 괞히 입장할려하면 돈만 날라갑니다.";
+	if(get_money(@myid) < 200000){mes 1, "골드가 부족합니다. 골드를 가져와주세요."; end;}
+	set @select, menu("이동할껀가요?", "6층", "8층", "20층", "25층", "30층");
+	if(@select == 1){group_warp "지하묘지6층", 37, 6; money_del 200000;}
+	if(@select == 2){group_warp "지하묘지8층", 35, 5; money_del 200000;}
+	if(@select == 3){group_warp "지하묘지20층", 15, 16; money_del 200000;}
+	if(@select == 4){group_warp "지하묘지25층", 25, 14; money_del 200000;}
+	if(@select == 5){group_warp "지하묘지30층", 15, 18; money_del 200000;}
+ del @select;
+}
+
+0,0,0,0,0,0,0	결계이동도우미	{
+	set @myid, get_myid();
+	set @select, menu("결계 사냥터로 이동할껀가요?", "예", "아니오");
+	if(@select == 1){
+		if(get_basevita(@myid) + get_basemana(@myid) >= 300000){mes 1, "체력과 마력을 합쳐 30만이 넘습니다."; end;}
+		set $map_num, $map_num + 1;
+		set @name1$ , "사냥터" + get_name() + "결계";
+		npc_spawn "결계도우미", @name1$, 4, 2, 2;
+		sleep 600;
+		group_warp "사냥터" + get_name() + "결계", 5, 6;
+	}
+}
+
+0,0,0,0,0,0,0	결계대기실이동	{
+	set @myid, get_myid();
+	set @selectz, menu("결계 대기실로 이동할껀가요?", "예", "아니오");
+	if(@selectz == 1){warp "결계대기실", 8,8;}
+}
+
+0,0,0,0,0,0,0	엘멘대기실이동	{
+	set @myid, get_myid();
+	set @selectz, menu("엘리멘탈 대기실로 이동할껀가요?", "예", "아니오");
+	if(@selectz == 1){warp "엘리멘탈대기실", 8,8;}
+}
+
+0,0,0,0,0,0,0	뮤레칸역습이동	{
+	set @myid, get_myid();
+	set @selectz, 0;
+	del @selectz;
+	re:
+	if(get_basevita(@myid) < 1000000 && get_basemana(@myid) < 1000000){mes 0, "오직 강한자만...";}
+	set @selectz, menu("뮤레칸의역습맵으로 이동하시겠습니까?\\n[체력 120만이상 || 마력 140만이상입장가능]", "아벨");
+	if(@selectz == 0 || !@selectz){goto re;}
+	if(@selectz == 1){
+		if(item_exist(@myid, "뮤레칸입장티켓") == 0){mes 0, "뮤레칸입장티켓이 없습니다.";}
+		item_del "뮤레칸입장티켓", 1;
+		warp "뮤레칸의역습::아벨", 67,23;
+		mes 1, "뮤레칸입장티켓을 받았습니다.\\n[이동이 완료되었습니다.]";
+	}
+}
+
+0,0,0,0,0,0,0	결계2이동	{
+	set @myid, get_myid();
+	set @select, menu("결계2 대기실로이동하겠습니까?", "예", "아니오");
+	if(@select == 1){
+		if(get_basevita(@myid) < 1000000 && get_basemana(@myid) < 1000000){mes 0, "오직 강한자만...";}
+		warp "결계2대기실", 8,8;
+	}
+}
+0,0,0,0,0,0,0	결계2이동도우미	{
+	set @myid, get_myid();
+	set @select, menu("결계2 사냥터로 이동할껀가요?", "예", "아니오");
+	if(@select == 1){
+		set @select2, menu("몇번째 방으로 이동하겠습니까?\\n[이동하는 방에 사람이있다면, 나와주는게 매너입니다.]", "1번째", "2번째", "3번째", "4번째", "5번째", "6번째");
+			if(@select2 == 1){warp "결계2-1", 5, 6; end;}
+			if(@select2 == 2){warp "결계2-2", 7, 5; end;}
+			if(@select2 == 3){warp "결계2-3", 5, 6; end;}
+			if(@select2 == 4){warp "결계2-4", 7, 5; end;}
+			if(@select2 == 5){warp "결계2-5", 5, 6; end;}
+			if(@select2 == 6){warp "결계2-6", 7, 5; end;}
+	}
+}
+
+0,0,0,0,0,0,0	결계2대기실이동	{
+	set @myid, get_myid();
+	set @selectz, menu("결계2 대기실로 이동할껀가요?", "예", "아니오");
+	if(@selectz == 1){warp "결계2대기실", 8,8;}
+}

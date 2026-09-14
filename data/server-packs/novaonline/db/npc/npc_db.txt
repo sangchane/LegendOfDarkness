@@ -1,0 +1,17 @@
+npc:db/npc/mileth.txt
+
+npc:db/npc/dev.txt
+
+spawn:db/npc/spawn.txt
+
+spawn:db/npc/devspawn.txt
+
+shop:db/npc/admin_shop.txt
+
+shop:db/npc/노비스샾.txt
+
+shop:db/npc/멤버쉽샵.txt
+
+npc:db/npc/begin.txt
+
+spawn:db/npc/beginspawn.txt

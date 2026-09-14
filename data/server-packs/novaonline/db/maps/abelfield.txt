@@ -1,0 +1,8 @@
+{
+번호	502
+이름	아벨필드
+너비	70
+높이	78
+CRC	37864
+맵파일	db/maps/abelfield/maps/lod502.map
+}

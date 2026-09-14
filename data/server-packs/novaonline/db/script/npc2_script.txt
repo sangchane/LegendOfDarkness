@@ -1,0 +1,1689 @@
+0,0,0,0,0,0,0	기술사범1	{
+
+	mes 1, "{=c어서오세요. 모든직업스킬을 가르쳐주는 기술사범 입니다.";
+
+	set @select, menu("어떤직업 이십니까?", "전사", "도적", "마법사", "성직자", "무도가", "평민", "쿠로토");
+
+	if(@select == 1) 
+	{
+		mes 1, "{=c전사스킬통합입니다.";
+		mes 1, "{=c레벨은 11이상입니다";
+		mes 1, "또 배우시는데에서 {=c 힘 32 콘 24 이상이 되셔야 합니다";
+		if(get_class() == 1 && get_level() >= 11 && get_con() >= 24 && get_str() >= 32)
+		{			
+			
+			skill_add "윈드블레이드";
+			skill_add "마비";
+			skill_add "투핸드어택";
+			skill_add "메가블레이드";
+			skill_add "통합기술";
+			skill_add "이기어검";
+			mes 3, "스킬을 배웟다!";
+
+		}
+		else
+		{
+			mes 1, "{=c전사가 아닌데...";
+		}
+	}
+	if(@select == 2)
+	{
+		mes 1, "{=c도적스킬통합입니다?";
+		mes 1, "{=c레벨은 11이상이여야됩니다";
+		mes 1, "또 배우시는데에서 {=c 힘 18 덱스 12 이상이 되셔야 합니다";
+		if(get_class() == 2 && get_level() >= 11 && get_dex() >= 12 && get_str() >= 18)
+		{			
+			
+			skill_add "찔러휘비기";
+			skill_add "두번찌르기";
+			skill_add "무영단무";
+			skill_add "통합기술";
+			skill_add "이기어검";
+			mes 3, "스킬을 배웟다";
+		}
+		else
+		{
+			mes 1, "{=c도적이 아닌데...";
+		}
+
+	}
+	if(@select == 3)
+	{
+		mes 1, "{=c마법사통합입니다";
+		mes 1, "{=c레벨은 11이상이여야됩니다.";
+		mes 1, "또 배우시는데에서 {=c 위즈 17 인트 24 이상이 되셔야 합니다";
+		if(get_class() == 3 && get_level() >= 11 && get_wis() >= 17 && get_int() >= 24)
+		{			
+			
+			spell_add "마레네라";
+			spell_add "마레노";
+			spell_add "세멜리아";
+			skill_add "통합기술";
+			skill_add "이기어검";
+			skill_add "라이트닝쉐이커";
+
+			mes 3, "스킬을배웠다";
+		}
+		else
+		{
+			mes 1, "{=c마법사가아닌데?..";
+		}
+
+	}
+	if(@select == 4)
+	{
+		mes 1, "{=c성직자통합입니다";
+		mes 1, "{=c레벨은 11이상이여야됩니다.";
+		mes 1, "또 배우시는데에서 {=c 위즈 24 인트 17 이상이 되셔야 합니다";
+		if(get_class() == 4 && get_level() >= 11  && get_wis() >= 24 && get_int() >= 17)
+		{			
+			
+			spell_add "엑스쿠라노";
+			spell_add "쿠라네라";
+			skill_add "통합기술";
+			skill_add "이기어검";
+			skill_add "라이트닝쉐이커";
+			mes 3, "스킬완료!";
+		}
+		else
+		{
+			mes 1, "{=c성직자가 아닌데...";
+		}
+	}
+	if(@select == 5)
+	{
+		mes 1, "{=c무도가통합입니다";
+		mes 1, "{=c레벨은 11이상이여야됩니다.";
+		mes 1, "또 배우시는데에서 {=c 힘 15 콘 30 이상이 되셔야 합니다";
+		if(get_class() == 5 && get_level() >= 11 && get_str() >= 15 && get_con() >= 30)
+		{			
+			
+			skill_add "발경";
+			skill_add "붕각";
+			skill_add "선풍각";
+			skill_add "단각";
+			skill_add "일음지";
+			skill_add "통합기술";
+			skill_add "라이트닝쉐이커";
+			skill_add "이기어검";
+			mes 3, "스킬완료!";
+		}
+		else
+		{
+			mes 1, "{=c무도가가 아닌데...";
+		}
+
+	}
+	if(@select == 6)
+	{
+		mes 1, "{=c평민통합입니다";
+		mes 1, "{=c레벨은 11이상이여야됩니다.";
+		mes 1, "또 배우시는데에서 {=c 힘 23 콘 19 이상이 되셔야 합니다";
+		if(get_class() == 0 && get_level() >= 41 && get_str() >= 23 && get_con() >= 19)
+		{			
+			
+			skill_add "평민크래셔";
+			skill_add "통합기술";
+			skill_add "이기어검";
+			skill_add "라이트닝쉐이커";
+			spell_add "쿠로토";
+			mes 3, "스킬완료!!";
+		}
+		else
+		{
+			mes 1, "{=c평민이 아닌데..";
+		}
+
+	}
+	if(@select == 7)
+	{
+		mes 1, "{=c쿠로토를배웁니다..";
+		mes 1, "{=c배우는데 위즈 10 인트 15, 레벨11이상입니다,재료는:로오의가죽각반..";
+
+		if(get_level() >= 11 && get_int() >= 15 && get_wis() >= 10 && pc_itemcheck("로오의가죽각반") == 0x01)
+		{
+			
+			spell_add "쿠로토";
+			item_del "로오의가죽각반", 1;
+		}
+		{
+			mes 1, "{=c아이템가져와!";
+		}
+	}
+	del @select; 
+	}
+0,0,0,0,0,0,0	아벨왕	{
+	 set @class, get_class();
+	mes 1, "{=q알다시피 나는 이곳아벨을 다스리고있지..";
+	mes 1, "{=여긴전직자를위한곳이니 순수직업은 딴데가서 알아봐!!..";
+	set @select, menu("너에게 틀별히 스킬을 지급해주지...", "달마신공(Lev2)", "파워메테오", "구양신공(Lev2)", "금강불체");
+
+	if(@select == 1)
+	{
+		mes 1, "필요재물,생명의시약,암흑의시약";
+		if(pc_itemcheck("생명의시약") == 0x01 && pc_itemcheck("암흑의시약") == 0x01 && get_class_sub() >= 1 && get_class() == 5)
+		{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			skill_add "달마신공(Lev2)";
+			mes 1, "{=q축하합니다 달마신공을배웠습니다";
+		}
+		else 
+		{
+			mes 1, "{=q이놈!! 감히 어디서 구라인것이냐!!";
+		}
+	}
+	else if(@select ==2)
+	{
+		mes 1, "필요재물,생명의시약,암흑의시약";
+		if(pc_itemcheck("생명의시약") == 0x01 && pc_itemcheck("암흑의시약") == 0x01 && get_class_sub() >= 1 && get_class() == 3 && get_class_son() == 1)
+		{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			spell_add "파워메테오";
+			mes 1, "{=q축하합니다 파워메테오를 배웠습니다";
+		}
+		else
+		{
+			mes 1, "{=q이놈!! 감히 어디서 구라인것이냐!!";
+		}
+	}
+	else if(@select == 3)
+	{
+		mes 1, "필요재물,생명의시약,암흑의시약";
+		if(pc_itemcheck("생명의시약") == 0x01 && pc_itemcheck("암흑의시약") == 0x01 && get_class_sub() >= 1 && get_class() == 5)
+		{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			skill_add "구양신공(Lev2)";
+			mes 1, "{=q축하합니다 구양신공을배웠습니다";
+		}
+		else
+		{
+			mes 1, "{=q이놈!! 감히 어디서 구라인것이냐!!";
+		}
+	}
+	else if(@select == 4)
+	{
+		mes 1, "필요재물,생명의시약,암흑의시약";
+		if(pc_itemcheck("생명의시약") == 0x01 && pc_itemcheck("암흑의시약") == 0x01 && get_class() == 5)
+		{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			skill_add "금강불체";
+			mes 1, "{=q금강불체를배웠습니다";
+		}
+		else
+		{
+			mes 1, "{=q이놈!! 감히 어디서 구라인것이냐!!";
+		}
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	조커	{
+	
+	mes 1, "{=c안녕하세요 저는 조커입니다.";
+	mes 1, "{=c저는 당신에게 필살기를 배울수 있는 기회를 제공해드리려 합니다.";
+	mes 1, "{=c난 당신을 결코 배려하지 않습니다.";
+	mes 1, "{=c사냥터에서 죽던 말든 제가 알빠가 아니기때문이지요";
+	mes 1, "{=c물론! 죽엇다고 GM보고 복구해달라고 하면 싸맞습니다.";
+	mes 1, "{=c자, 그럼 퀘스트를 진행하시겠습니까?";
+	
+	set @select, menu("진행하시곘습니까?", "네!", "완료!");
+	
+	if(@select == 1)
+	{
+		mes 1, "{=c좋습니다,";
+		mes 1, "{=c그럼제가 제안을하죠 ";
+		mes 1, "{=c당신은 호러캐슬에서 조커의(귀걸이,반지(쌍))을 구해야합니다.";
+		mes 1, "{=c당신이 위 조건을 클리어하면 저는 당신에게 (조커의팬던트)를 드릴것을 약속하지요";
+		mes 1, "{=c하지만 당신이 위조건을 만족시키지 못하고 (완료)를 클릭하면 난 당신의 딸랑이를 가져가겟소";
+		}
+		else
+		{
+	}
+	if(@select == 2)
+	{
+		mes 1, "{=c흠.. 생각보다는 빨리왔군..";
+		mes 1, "{=c확실히 가져왔나 확인을 해봐야겟군";
+		mes 1, "{=c이거하나 명심하게나.. 혹여나 아이템이 모자르거나 다르다면 난 자네의 딸랑이를 가져가겟어";
+			
+		if(pc_itemcheck("조커의귀걸이") == 0x01 && pc_itemcheck("조커의반지") == 0x01 && pc_itemcheck("조커의반지") == 0x01)
+		{
+			item_del "조커의반지", 1;
+			item_del "조커의반지", 1;
+			item_del "조커의귀걸이", 1;
+			item_add "조커의팬던트", 1;
+			mes 1, "{=c조커로부터 조커의팬던트를 입수했다!";
+		}
+		else
+		{
+			mes 1, "{=c.... 씁헐러마 불알내놔";
+			item_add "아벨리콜", 1;
+		}
+	}
+	del @select;
+	}
+
+
+0,0,0,0,0,0,0	스킬삭제	{
+ set @val, menu("원하시는스킬을  삭제합니다.", "네", "취소");
+		if(@val==1){
+			input @del$, 1, "삭제하실 스킬이름을 정확히 입력해주세요.", "", "", 255;
+			skill_del @del$;
+			spell_del @del$;
+			del @del$;
+		item_del "스킬삭제", 1;
+		}
+	del @val;
+}
+0,0,0,0,0,0,0	소원을말해바	{
+ set @val, menu("아이템중원하는것을생각해서말해바요 실패도합니다ㅋㅋㅋ.", "네", "취소");
+ set @rnd, rand(1,4);
+ set @rnd1,rand(1,10);
+
+		if(@val==1){
+			input @add$, 1, "생성하실 아이템이름을 정확히 입력해주세요.", "", "", 255;
+		if(pc_itemcheck("소원을말해바") == 0x01){
+		
+		if(@rnd == 1){
+			item_add @add$, 1;
+			message 1, "와우성공!!";
+			item_del "소원을말해바", 1;
+			broadcast 5, "[" + get_name() + "]님이 소원을 이루셨네요 축하드려영~~~^ ^";
+			end;
+		}else{
+			message 1, "실패으앜ㅠ!!";
+			item_del "소원을말해바", 1;
+			goto FAIL;
+		}
+}
+FAIL:
+ del @rnd;
+ del @rnd1;
+ del @val;
+}
+}
+
+0,0,0,0,0,0,0	아이템생성	{
+ set @val, menu("아이템을생성합니다.", "네", "취소");
+		if(@val==1){
+			input @add$, 1, "생성하실 아이템이름을 정확히 입력해주세요.", "", "", 255;
+			item_add @add$, 1;
+			message 1, "와우성공!!";
+			item_del "아이템생성", 1;
+			broadcast 5, "[" + get_name() + "]님이 [" + @add$ + "]을 생성하셧습니다.";
+			end;
+		}
+ del @val;
+}
+
+
+0,0,0,0,0,0,0	경험치누적쿠폰	{ 
+ if(get_baseexp(@myid) >= 1100000000){    //중괄호 
+ message 1, "경험치쿠폰생성"; 
+ item_add "10억경험치쿠폰",1;
+ item_del "경험치누적쿠폰",1; 
+ exp_del "1100000000"; 
+ }else{    //중괄호 
+ message 3, "경험치가 부족합니다.";    //세미콜론 
+} 
+}
+0,0,0,0,0,0,0	10억경험치쿠폰	{ 
+
+ if(pc_itemcheck("10억경험치쿠폰") ==0x01){
+ exp_add "965147080";
+ item_del "10억경험치쿠폰",1;
+ }
+ del @val;
+}
+0,0,0,0,0,0,0	제조책	{
+ set @val, menu("다음과같은 아이템을 제조합니다.\\n 제조하기를 원하시는것을 선택해주세요.","레드오피온의수염","블루오피온의수염","여의주","홀리팬플롯","암흑의시약","생명의시약","뉴트의뿔","파괴자의장갑","수호자의장갑","비밀의황금열쇠");
+ set @rnd, rand(1,4);
+ set @rnd1,rand(1,10);
+
+ 
+ // 아시발 아템 체크 안넣었었네 젤 늦게넣음
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+	if(@val == 1){
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "레드오피온의수염",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 2){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "블루오피온의수염",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 3){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "여의주",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 4){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "홀리팬플롯",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 5){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "암흑의시약",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 6){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "생명의시약",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 7){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "뉴트의뿔",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 8){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "파괴자의장갑",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 9){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "수호자의장갑",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}else if(@val == 10){
+	mes 1,"재료::다이아몬드,블루오피온의등껍질,챰릴리,운챠챠,블러드스톤,별의눈물,안크본드라곤의머리,서펜트바룬스의머리,마그마바룬스의머리,뉴트의혀";
+		if(pc_itemcheck("다이아몬드") == 0x01 && pc_itemcheck("블루오피온의등껍질") == 0x01 && pc_itemcheck("챰릴리") == 0x01 && pc_itemcheck("운챠챠") == 0x01 && pc_itemcheck("안크본드라곤의머리") == 0x01 && pc_itemcheck("서펜트바룬스의머리") == 0x01 && pc_itemcheck("마그마바룬스의머리") == 0x01 && pc_itemcheck("뉴트의혀") == 0x01 && pc_itemcheck("별의눈물") == 0x01 && pc_itemcheck("블러드스톤") == 0x01){
+		if(@rnd == 1){
+			message 1, "제조성공!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			item_add "비밀의황금열쇠",1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "다이아몬드",1;
+			item_del "블루오피온의등껍질", 1;
+			item_del "챰릴리",1;
+			item_del "운챠챠",1;
+			item_del "마그마바룬스의머리",1;
+			item_del "안크본드라곤의머리",1;
+			item_del "뉴트의혀",1;
+			item_del "블러드스톤",1;
+			item_del "별의눈물",1;
+			item_del "서펜트바룬스의머리",1;
+			item_del "제조책",1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	}
+
+FAIL:
+ del @rnd;
+ del @rnd1;
+ del @val;
+}
+0,0,0,0,0,0,0	슈타르제조책	{
+ set @val, menu("다음과같은 아이템을 제조합니다.\\n 제조하기를 원하시는것을 선택해주세요.","슈타르백금아머(봉인)","슈타르백금투구(봉인)","슈타르백금팔찌(봉인)");
+ set @rnd, rand(1,7);
+ set @rnd1,rand(1,10);
+
+ 
+ // 아시발 아템 체크 안넣었었네 젤 늦게넣음
+	if(@val == 1){
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("퀼트모자") == 0x01 && pc_itemcheck("퀼트") == 0x01 && pc_itemcheck("이스빌") == 0x01 && pc_itemcheck("이스빌모자") == 0x01){
+		
+		if(@rnd == 1){
+			mes 1,"생명의목걸이10개,돈40억,생명의벨트10개,퀼트,퀼트모자,이스빌옷,이스빌모자";
+			message 1, "제조성공!!";
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "퀼트",1;
+			item_del "퀼트모자",1;
+			item_del "이스빌",1;
+			item_del "이스빌모자",1;
+			item_add "슈타르백금의아머(봉인)", 1;
+			item_del "슈타르제조책", 1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "퀼트",1;
+			item_del "퀼트모자",1;
+			item_del "이스빌",1;
+			item_del "이스빌모자",1;
+			item_del "슈타르제조책", 1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	if(@val == 2){
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("퀼트모자") == 0x01 && pc_itemcheck("퀼트") == 0x01 && pc_itemcheck("이스빌") == 0x01 && pc_itemcheck("이스빌모자") == 0x01){
+		
+		if(@rnd == 1){
+			mes 1,"생명의목걸이10개,돈40억,생명의벨트10개,퀼트,퀼트모자,이스빌옷,이스빌모자";
+			message 1, "제조성공!!";
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "퀼트",1;
+			item_del "퀼트모자",1;
+			item_del "이스빌",1;
+			item_del "이스빌모자",1;
+			item_add "슈타르백금의투구(봉인)", 1;
+			item_del "슈타르제조책", 1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "퀼트",1;
+			item_del "퀼트모자",1;
+			item_del "이스빌",1;
+			item_del "이스빌모자",1;
+			item_del "슈타르제조책", 1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	if(@val == 3){
+		if(pc_itemcheck("생명의목걸이") == 0x01 && pc_itemcheck("생명의벨트") == 0x01 && pc_itemcheck("퀼트모자") == 0x01 && pc_itemcheck("퀼트") == 0x01 && pc_itemcheck("이스빌") == 0x01 && pc_itemcheck("이스빌모자") == 0x01){
+		
+		if(@rnd == 1){
+			mes 1,"생명의목걸이10개,돈40억,생명의벨트10개,퀼트,퀼트모자,이스빌옷,이스빌모자";
+			message 1, "제조성공!!";
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "퀼트",1;
+			item_del "퀼트모자",1;
+			item_del "이스빌",1;
+			item_del "이스빌모자",1;
+			item_add "슈타르백금의팔찌(봉인)", 1;
+			item_del "슈타르제조책", 1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의목걸이",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "생명의벨트",1;
+			item_del "퀼트",1;
+			item_del "퀼트모자",1;
+			item_del "이스빌",1;
+			item_del "이스빌모자",1;
+			item_del "슈타르제조책", 1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+}
+FAIL:
+ del @rnd;
+ del @rnd1;
+ del @val;
+}
+}
+}
+
+
+0,0,0,0,0,0,0	이벤트복권	{
+ set @val, menu("자 한번 흔들어봅시다!", "사용한다.","다음에 사용한다.");
+ if(get_money() >= 50000000){
+ if(@val == 1){
+  set @val, rand(1,59);
+  if(@val == 1){
+   message 1, "이게나왔습니다!!";
+   item_add "선물상자",1;
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 2){
+   message 1, "이게나왔습니다!!";
+   item_add "매직리스트",1;
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 3){
+   message 1, "아쉽네요. ㅠㅠ 꽝입니다.";
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 4){
+   message 1, "이게나왔습니다!!";
+   item_add "엑스쿠라눔",1;
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 5){
+   message 1, "이게나왔습니다!!";
+   item_add "바크",1;
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 6){
+   message 1, "이게나왔습니다!!";
+   item_add "파워리스트",1;
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 7){
+   message 1, "이게나왔습니다!!";
+   item_add "1천만골드",1;
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 8){
+   message 1, "아쉽네요. ㅠㅠ 꽝입니다.";
+   item_del "이벤트복권",1;
+   money_del "50000000";
+  }else if(@val == 0){
+   message 1, "다시시도해주세요.";
+  }
+  }else if(@val == 2){
+  goto EXIT; 
+ }
+EXIT:
+ del @val;
+}
+}
+0,0,0,0,0,0,0	로톤대장장이	{
+set @s1, menu("오우.. 이런 누추한곳에는 어쩐일인가??","루그라는 사람을 아십니까?","아 그냥 인사차들렀습니다.");
+	if(@s1 == 2) {
+	mes 0,"아하 .. 온김에 여기저기 둘러보시다 가시죠.";
+	end;
+	}
+mes 1, "헉..그분을 어떻게 알고계시죠? 아.. 그분은.. 저희마을의 장인으로써.. 일찍이 왕궁의 전속 대장장이로 일하시면서 훌륭한 무기와 아이템들을 만들어내셨지요.";
+mes 1, "하지만 그분의 작품을 헛되게 사용하는 사람들이 능러나면서, 그분은 은둔생활을 시작하셨습니다. 그리고 어떤 누구도 만나려고 하지 않으셨죠.";
+mes 1, "그분이 계시는 작업장에는 특수한 자물쇠가 걸려있어서 그것을 열기위해서는 신비한 힘을 가진 황금의만능열쇠가 필요하다고 합니다.";
+mes 1, "그것은 아마도 적룡굴에서 구할수 있다고 들었습니다만... 그분은 굉장히 까다로운분이라서..";
+
+set @s2, menu("그런데.. 무엇때문에 그러시죠?","루그가 만드는아이템에 관심이있어서요.. 직접만나고싶습니다.","아.. 아무것도아닙니다...");
+	if(@s2 == 2) {
+	mes 0,"아. 그러십니까... 그러시군요..그럼 다음에도 뵙죠.";
+	end;
+	}
+
+set @s3, menu("루그님께 가고 싶으시다고요? 열쇠가 필요한것은 아시겠죠? 혹시, 열쇠를 가지고 오셨습니까?","네. 구해왔습니다.","아뇨.. 아직구하지못했습니다.");
+	if(@s3 == 1){
+		if(pc_itemcheck("비밀의황금열쇠") == 0x01){
+			mes 1, "가지고 오셨군요.. 자 그럼 저를 따라오세요.";
+			item_del "비밀의황금열쇠",1;
+			warp "루그의방",7,7;
+			end ;
+		}
+	}else{
+		mes 0,"으음.. 열쇠가 있어야 자물쇠를 열수 있습니다. 열쇠를 구해오시면 언제든지 안내해드리겠습니다.";
+		end;
+	}
+
+del @s1;
+del @s2;
+del @s3;
+}
+
+0,0,0,0,0,0,0	루그	{
+mes 1,"읭? 누구인가? 여긴 어떻게 들어온겐가 ?";
+mes 1,"하.. 그녀석이 데려다 줬다고? 참 쓸데없는짓을 했구만..";
+set @sel, menu("그래도 일부러 문까지 따고 온 손님을 그냥 보낼순없지..오랜만에 내 실력 한번 발휘해볼까?\\n 자 어느것이 필요한가?","생명의목걸이","암흑의목걸이","생명의벨트","암흑의벨트");
+	if(@sel == 1) {
+		mes 1,"좋아! 재료는 준비해왔겠지?";
+			if(pc_itemcheck("블루오피온의수염") == 0x01 && pc_itemcheck("홀리팬플롯") == 0x01){
+				mes 1,"역시 나에게 제작을 의뢰할 자격이있어! 빠르게 만들어 줌세";
+				item_del "블루오피온의수염",1;
+				item_del "홀리팬플롯",1;
+				item_add "생명의목걸이",1;
+				message 1,"{=q생명의목걸이 제조에 성공했습니다!!";
+			}else{
+				mes 0,"나에게오면서 이런것하나 준비하지 못하나!";
+			}
+	}else if(@sel == 2) {
+		mes 1,"좋아! 재료는 준비해왔겠지?";
+			if(pc_itemcheck("레드오피온의수염") == 0x01 && pc_itemcheck("여의주") == 0x01){
+				mes 1,"역시 나에게 제작을 의뢰할 자격이있어! 빠르게 만들어 줌세";
+				item_del "레드오피온의수염",1;
+				item_del "여의주",1;
+				item_add "암흑의목걸이",1;
+				message 1,"{=q암흑의목걸이 제조에 성공했습니다!!";
+			}else{
+				mes 0,"나에게오면서 이런것하나 준비하지 못하나!";
+			}
+	}else if(@sel == 3) {
+		mes 1,"좋아! 재료는 준비해왔겠지?";
+			if(pc_itemcheck("뉴트의뿔") == 0x01 && pc_itemcheck("생명의시약") == 0x01){
+				mes 1,"역시 나에게 제작을 의뢰할 자격이있어! 빠르게 만들어 줌세";
+				item_del "뉴트의뿔",1;
+				item_del "생명의시약",1;
+				item_add "생명의벨트",1;
+				message 1,"{=q생명의벨트 제조에 성공했습니다!!";
+			}else{
+				mes 0,"나에게오면서 이런것하나 준비하지 못하나!";
+			}
+	}else if(@sel == 4) {
+		mes 1,"좋아! 재료는 준비해왔겠지?";
+			if(pc_itemcheck("뉴트의뿔") == 0x01 && pc_itemcheck("암흑의시약") == 0x01){
+				mes 1,"역시 나에게 제작을 의뢰할 자격이있어! 빠르게 만들어 줌세";
+				item_del "뉴트의뿔",1;
+				item_del "암흑의시약",1;
+				item_add "암흑의벨트",1;
+				message 1,"{=q암흑의벨트 제조에 성공했습니다!!";
+			}else{
+				mes 0,"나에게오면서 이런것하나 준비하지 못하나!";
+			}
+	}
+del @sel;	
+}
+0,0,0,0,0,0,0	빛의여신	{
+	
+	mes 1, "황폐해진 영혼이여... 안심하세요... 여기는 빛의 신전... 저는 빛과 치유의 여신 이아입니다.";
+	mes 1, "험한 싸움에서 패배하셨다고 너무 낙심하지 마세요. 제가 당신을 위해 해드릴 수 있는 것은 영혼을 새롭게 해드리는 것 뿐이지만, 그것으로 당신이 새롭게 도전할 수 있길 바랍니다.";
+	mes 1, "자 일어나세요... 신의 축복이 당신에게 가득하기를...";
+	set @select, menu("당신이 돌아가야 할 곳이 있나요?", "마을로 가길 원합니다", "밀레스대련장으로 가길 원합니다.", "수오미대련장으로 가길 원합니다.", "루어스대련장으로 가길 원합니다.");
+
+	if(@select == 1)
+	{
+		warp "루어스마을", 54, 43;
+	}
+	if(@select == 2)
+	{
+		warp "밀레스배틀대련장", 5, 5;
+	}
+	if(@select == 3)
+	{
+		warp "수오미배틀대련장", 5, 5;
+	}
+	if(@select == 4)
+	{
+		warp "루어스배틀대련장", 5, 5;
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	통대이동	{
+	
+	set @select, menu("야배로이동할래?", "이동");
+
+	if(@select == 1)
+	{
+		warp "통합대련장", 6, 6;
+	}
+	if(@select == 2)
+	{
+		warp "통합대련장", 6, 6;
+	}
+	if(@select == 3)
+	{
+		warp "통합대련장", 6, 6;
+	}
+	if(@select == 4)
+	{
+		warp "통합대련장", 6, 6;
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	밀레스북팀도우미	{
+	
+	set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 고치기", "모두 고치기", "밀레스팀배틀장진지로", "밀레스팀배틀장대기석으로", "배틀링으로", "부활신전으로", "팀배틀퇴장");
+
+	if(@select == 1)
+	{
+	mes 1, "미구현.";
+	}
+	if(@select == 2)
+	{
+	mes 1, "미구현.";
+	}
+	if(@select == 3)
+	{
+	set @val, menu("당신은 팀배틀 선수이십니까? 아니면 관람객이십니까?", "전 참가 선수입니다.", "전 구경하길 원합니다.");
+	if(@val == 1)
+	{
+	set @val1, menu("어느 진지로 이동하길 원하십니까?", "동팀 진지로", "서팀 진지로", "남팀 진지로", "북팀 진지로");
+	if(@val1 == 1)
+	{
+		warp "밀레스배틀대련장", 38, 18;
+	}
+	if(@val1 == 2)
+	{
+		warp "밀레스배틀대련장", 18, 39;
+	}
+	if(@val1 == 3)
+	{
+		warp "밀레스배틀대련장", 38, 38;
+	}
+	if(@val1 == 4)
+	{
+		warp "밀레스배틀대련장", 17, 18;
+	}
+	}
+	}
+	if(@select == 4)
+	{
+			mes 1, "미구현.";
+	}
+	if(@select == 5)
+	{
+			mes 1, "미구현.";
+	}
+	if(@select == 6)
+	{
+			mes 1, "신전으로 바로 보내드리겠습니다.";
+			warp "통합대련장", 6, 6;
+	}
+	if(@select == 7)
+	{
+			mes 1, "팀배틀은 즐거우셨습니까?";
+			mes 1, "거친 배틀에 피로하실텐데 푹 쉬세요. 앞날의 행운이 따르길 빌겠습니다.";
+			warp "통합대련장", 6, 6;
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	수오미북팀도우미	{
+	
+	set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 고치기", "모두 고치기", "수오미팀배틀장진지로", "수오미팀배틀장대기석으로", "배틀링으로", "부활신전으로", "팀배틀퇴장");
+
+	if(@select == 1)
+	{
+	mes 1, "미구현.";
+	}
+	if(@select == 2)
+	{
+	mes 1, "미구현.";
+	}
+	if(@select == 3)
+	{
+	set @val, menu("당신은 팀배틀 선수이십니까? 아니면 관람객이십니까?", "전 참가 선수입니다.", "전 구경하길 원합니다.");
+	if(@val == 1)
+	{
+	set @val1, menu("어느 진지로 이동하길 원하십니까?", "동팀 진지로", "서팀 진지로", "남팀 진지로", "북팀 진지로");
+	if(@val1 == 1)
+	{
+		warp "수오미배틀대련장", 38, 18;
+	}
+	if(@val1 == 2)
+	{
+		warp "수오미배틀대련장", 18, 39;
+	}
+	if(@val1 == 3)
+	{
+		warp "수오미배틀대련장", 38, 38;
+	}
+	if(@val1 == 4)
+	{
+		warp "수오미배틀대련장", 17, 18;
+	}
+	}
+	}
+	if(@select == 4)
+	{
+			mes 1, "미구현.";
+	}
+	if(@select == 5)
+	{
+			mes 1, "미구현.";
+	}
+	if(@select == 6)
+	{
+			mes 1, "신전으로 바로 보내드리겠습니다.";
+			warp "통합대련장", 6, 6;
+	}
+	if(@select == 7)
+	{
+			mes 1, "팀배틀은 즐거우셨습니까?";
+			mes 1, "거친 배틀에 피로하실텐데 푹 쉬세요. 앞날의 행운이 따르길 빌겠습니다.";
+			warp "통합대련장", 6, 6;
+	}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	루어스북팀도우미	{
+	
+	set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "물건 고치기", "모두 고치기", "루어스팀배틀장진지로", "루어스팀배틀장대기석으로", "배틀링으로", "부활신전으로", "팀배틀퇴장");
+
+	if(@select == 1)
+	{
+	mes 1, "미구현.";
+	}
+	if(@select == 2)
+	{
+	mes 1, "미구현.";
+	}
+	if(@select == 3)
+	{
+	set @val, menu("당신은 팀배틀 선수이십니까? 아니면 관람객이십니까?", "전 참가 선수입니다.", "전 구경하길 원합니다.");
+	if(@val == 1)
+	{
+	set @val1, menu("어느 진지로 이동하길 원하십니까?", "동팀 진지로", "서팀 진지로", "남팀 진지로", "북팀 진지로");
+	if(@val1 == 1)
+	{
+		warp "루어스배틀대련장", 38, 18;
+	}
+	if(@val1 == 2)
+	{
+		warp "루어스배틀대련장", 18, 39;
+	}
+	if(@val1 == 3)
+	{
+		warp "루어스배틀대련장", 38, 38;
+	}
+	if(@val1 == 4)
+	{
+		warp "루어스배틀대련장", 17, 18;
+	}
+	}
+	}
+	if(@select == 4)
+	{
+			mes 1, "미구현.";
+	}
+	if(@select == 5)
+	{
+			mes 1, "미구현.";
+	}
+	if(@select == 6)
+	{
+			mes 1, "신전으로 바로 보내드리겠습니다.";
+			warp "통합대련장", 6, 6;
+	}
+	if(@select == 7)
+	{
+			mes 1, "팀배틀은 즐거우셨습니까?";
+			mes 1, "거친 배틀에 피로하실텐데 푹 쉬세요. 앞날의 행운이 따르길 빌겠습니다.";
+			warp "통합대련장", 6, 6;
+	}
+	del @select;
+	}
+0,0,0,0,0,0,0	섭도미	{
+	
+	set @select, menu("안녕하세요. 무엇을 도와드릴까요?", "스텟은 어떻게 찍나요?", "사냥터는 어디인가요?", "승급 기술 재료는 어디서 드랍되나요?", "본섭처럼 정석대로 찍지 않으면 어떻게되나요?", "퀴즈 맞히기");
+
+	if(@select == 1)
+	{
+	mes 1, "스텟은 본섭과 동일하게 찍습니다. 예를들어봅시다.";
+	mes 1, "본섭 직자는 위즈 108찍고 올인트찍는거죠. 이와같이찍어야됩니다. 아니면 기술또는 마법을 배우실수 없습니다.";
+	mes 1, "로오템 같은경우는 우드랜드 아무데서나 쉽게 드랍되니까 셋트맞춰서 기술배우시면 되겟습니다.";
+	}
+	if(@select == 2)
+	{
+	mes 1, "본섭과똑같습니다. 밀레스 지하묘지 1층에서 레벨 11까지노시고";
+	mes 1, "{=c 포테의숲에서 99까지 찍으셔도되고 아벨필드가서 사냥하시면됩니다. 레벨 71되면 뤼케시온 필드로 가시구요.";
+	}
+	if(@select == 3)
+	{
+	mes 1, "굴재료 챰릴리 운챠챠 이런건 말그대로 레드~브론즈 굴에서 드롭이 됩니다 각층마다 재료가 달라집니다~";
+	mes 1, "{=c판티카,네레이스의홀씨 같은경우 집털에서 드롭됩니다.";
+	}
+	if(@select == 4)
+	{
+	mes 1, "말그대로 좆  됩니다 스킬 또는 마법 배우지 못합니다.";
+	}
+	if(@select == 6)
+	{
+	mes 1, "말그대로 좆  됩니다 스킬 또는 마법 배우지 못합니다.";
+	}
+	if(@select == 5)
+	{
+	mes 1, "스텟은 어떻게 찍어야됩니까?";
+	set @val1, menu("맞춰보세요. 틀릴시 다시 확인해 해주세요.", "본섭 처럼.", "프리서버 (자기마음대로)");
+	if(@val1 == 1)
+	{
+	mes 1, "네 정답입니다~ 다음으로 넘어가보죠~";
+	mes 1, "{=c 다음 문제 입니다.";
+	mes 1, "로오셋,세토아셋은 어디서 드랍되는지 맞춰보세요.";
+	set @val2, menu("맞춰보세요. 틀릴시 다시 확인해 해주세요.", "밀레스던전의각층", "우드랜드 여러 존.");
+	if(@val2 == 1)
+	{
+	mes 1, "땡이군요. 다시문제를풀어보세요.";
+	}
+	if(@val2 == 2)
+	{
+	mes 1, "정답입니다....그럼 농부의방으로 보내드리겠습니다 뿅~";
+ 	warp "농부의집", 7,7;
+	item_add "조금쌘목도", 1;
+	item_add "초보자각반", 1;
+	item_add "초보자갑옷", 1;
+	item_add "초보자귀걸이", 1;
+	item_add "초보자장갑", 1;
+	item_add "초보자장갑", 1;
+	item_add "초보자반지", 1;
+	item_add "초보자반지", 1;
+	item_add "초보자방패", 1;
+	item_add "초보자투구", 1;
+	item_add "초보자벨트", 1;
+	item_add "초보자목걸이", 1;
+	}
+	}
+	if(@val1 == 2)
+	{
+	mes 1, "땡이군요 -_- 본섭처럼 직자는 위즈108찍고 올인트 이런식으로 찍어야합니다...안그러면 스킬을 못배우거든요..";
+	}
+	}
+	if(@select == 7)
+	{
+			mes 1, "팀배틀은 즐거우셨습니까?";
+			mes 1, "거친 배틀에 피로하실텐데 푹 쉬세요. 앞날의 행운이 따르길 빌겠습니다.";
+			warp "통합대련장", 6, 6;
+	}
+	del @select;
+	}
+
+
+0,0,0,0,0,0,0	정석지급	{
+	 set @class, get_class();
+	mes 1, "스텟을 본섭처럼 정석대로 찍으신 분들을 위해 아이템 돈 지급을 해드립니다.";
+	mes 1, "기준은 성천직자 카페의 육성법 기준으로 합니다..";
+	set @select, menu("선택해 주세요.", "전사", "도적", "마법사", "성직자", "무도가");
+
+	if(@select == 1)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		mes 1, "콘전사인가요? 아니면 힘전사인가요?";
+		mes 1, "{=c콘전사는 콘64 힘 138 입니다.";
+		mes 1, "{=c힘전사는 콘80 힘 122 입니다.";
+		set @val1, menu("뭘로 찍으셧나요.", "힘전사", "콘전사");
+	if(@val1 == 1)
+	{
+		if(get_str() == 138 && get_con() == 64 && get_class() == 1)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "피4", 1;
+		}
+		else 
+		{
+			mes 1, "{=q이놈!! 감히 어디서 구라인것이냐!!";
+		}
+	}
+}
+	if(@val1 == 2)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_str() == 122 && get_con() == 80 && get_class() == 1)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "피4", 1;
+			item_add "그레이트헬피닉스크로어", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+	if(@select == 2)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		mes 1, "힘도적인가요 아니면 덱도적인가요";
+		mes 1, "{=c힘도적은 위즈13 인트 10 덱스55 힘43 입니다.";
+		mes 1, "{=c덱도적는 힘70 덱115 인트10 위즈13 입니다.";
+		set @val1, menu("뭘로 찍으셧나요.", "힘도적", "덱도적");
+	if(@val1 == 1)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_int() == 10 && get_wis() == 13 && get_dex() == 55 && get_str() == 43 && get_class() == 2)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "신월도", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+}
+	if(@val1 == 2)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_str() == 70 && get_dex() == 115 && get_int() == 10 && get_wis() == 13 && get_class() == 2)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "신월도", 1;
+
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+	if(@select == 3)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		mes 1, "인트법사인가요 아니면 위즈법사인가요";
+		mes 1, "{=c인트법사는 인트80 위즈 122 입니다.";
+		mes 1, "{=c위즈법사는 인트94 위즈 108 입니다.";
+		set @val1, menu("뭘로 찍으셧나요.", "인트법사", "위즈법사");
+	if(@val1 == 1)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_int() == 80 && get_wis() == 122 && get_class() == 3)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "매직파나", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+}
+	if(@val1 == 2)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_int() == 94 && get_wis() == 108 && get_class() == 3)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "매직파나", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+	if(@select == 4)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		mes 1, "인트직자인가요 아니면 위즈직자인가요";
+		mes 1, "{=c인트직자는 인트80 위즈 122 입니다.";
+		mes 1, "{=c위즈직자는 인트94 위즈 108 입니다.";
+		set @val1, menu("뭘로 찍으셧나요.", "인트직자", "위즈직자");
+	if(@val1 == 1)
+	{
+		if(get_int() == 80 && get_wis() == 122 && get_class() == 4)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "홀리파나", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+}
+	if(@val1 == 2)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_int() == 94 && get_wis() == 108 && get_class() == 4)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "홀리파나", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+	if(@select == 5)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		mes 1, "힘도가인가요 콘도가인가요";
+		mes 1, "{=c힘도가는 힘30 콘 172 입니다.";
+		mes 1, "{=c파도가는 힘101 콘 101 입니다.";
+		mes 1, "{=c힘노멀은 힘99 콘 30 입니다 위즈36 인트 43입니다..";
+		mes 1, "{=c파노멀은 힘64 콘 65 입니다 위즈36 인트 43입니다..";
+		set @val1, menu("뭘로 찍으셧나요.", "힘도가", "파도가", "힘노멀", "파노멀");
+	if(@val1 == 1)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_str() == 30 && get_con() == 172 && get_class() == 5)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "용2", 1;
+			item_add "브레이스글러브", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+}
+	if(@val1 == 2)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_str() == 101 && get_con() == 101 && get_class() == 5)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "용2", 1;
+			item_add "브레이스글러브", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+}
+	if(@val1 == 3)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_str() == 99 && get_wis() == 36 && get_con() == 30 && get_int() == 43 && get_class() == 5)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "용2", 1;
+			item_add "브레이스글러브", 1;
+		}
+		else 
+		{
+			mes 1, "옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+}
+	if(@val1 == 4)
+	{
+ 		if(get_ac() != 100) {
+ 		mes 1," 무장해제하시고 다시시도 해주세요.";
+ 		end;
+ 	}
+		if(get_str() == 64 && get_wis() == 36 && get_con() == 65 && get_int() == 43 && get_class() == 5)
+		{
+			item_add "적룡플라밋의방패", 1;
+			item_add "용2", 1;
+			item_add "브레이스글러브", 1;
+		}
+		else 
+		{
+			mes 1, "{=q옷을 해제하지않았거나 정석대로 찍지않았음. 하나라도빗겨가면 안됨.";
+		}
+	}
+}
+	del @select;
+	}
+
+0,0,0,0,0,0,0	슈타르봉인해제	{
+ set @val, menu("슈타르봉인해제를 합니다..\\n 제조하기를 원하시는것을 선택해주세요.","슈타르백금세트");
+ set @rnd, rand(1,5);
+ set @rnd1,rand(1,10);
+
+ 
+ // 아시발 아템 체크 안넣었었네 젤 늦게넣음
+	if(@val == 1){
+	mes 1, "슈타르백금의아머(봉인) 슈타르백금의투구(봉인) 슈타르백금의팔찌(봉인)을 아이템창에 놔두세요.";
+		if(item_count("슈타르백금의아머(봉인)") && item_count("슈타르백금의투구(봉인)") && item_count("슈타르백금의팔찌(봉인)")){
+		
+		if(@rnd == 1){
+			item_add "슈타르백금의아머", 1;
+			item_add "슈타르백금의투구", 1;
+			item_add "슈타르백금의팔찌", 1;
+			message 1, "제조성공!!";
+			item_del "슈타르봉인해제", 1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "슈타르봉인해제", 1;
+			item_del "슈타르백금의아머(봉인)", 1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	if(@val == 2){
+	mes 1, "슈타르백금의투구(봉인)을 아이템창에 놔두세요.";
+		if(item_count("슈타르백금의투구(봉인)")){
+		
+		if(@rnd == 1){
+			item_add "슈타르백금의투구", 1;
+			message 1, "제조성공!!";
+			item_del "슈타르봉인해제", 1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "슈타르봉인해제", 1;
+			item_del "슈타르백금의투구(봉인)", 1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+	if(@val == 3){
+	mes 1, "슈타르백금의팔찌(봉인)을 아이템창에 놔두세요.";
+		if(item_count("슈타르백금의팔찌(봉인)")){
+		
+		if(@rnd == 1){
+			item_add "슈타르백금의팔찌", 1;
+			message 1, "제조성공!!";
+			item_del "슈타르봉인해제", 1;
+			end;
+		}else{
+			message 1, "제조실패!!";
+			item_del "슈타르봉인해제", 1;
+			item_del "슈타르백금의팔찌(봉인)", 1;
+			goto FAIL;
+		}
+		}else{
+			mes 0, "재료가 부족합니다.";
+		}
+FAIL:
+ del @rnd;
+ del @rnd1;
+ del @val;
+}
+}
+}
+}

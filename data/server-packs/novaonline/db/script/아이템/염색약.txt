@@ -1,0 +1,54 @@
+0,0,0,0,0,0,0	연갈색염색약	{
+ set @myid, get_myid();
+ set_haircolor 14;
+ item_del "연갈색염색약", 1;
+}
+0,0,0,0,0,0,0	흰색염색약	{
+ set @myid, get_myid();
+ set_haircolor 15;
+ item_del "흰색염색약", 1;
+}
+0,0,0,0,0,0,0	분홍색염색약	{
+ set @myid, get_myid();
+ set_haircolor 16;
+ item_del "분홍색염색약", 1;
+}
+0,0,0,0,0,0,0	연두색염색약	{
+ set @myid, get_myid();
+ set_haircolor 17;
+ item_del "연두색염색약", 1;
+}
+0,0,0,0,0,0,0	진한노랑색염색약	{
+ set @myid, get_myid();
+ set_haircolor 18;
+ item_del "진한노랑색염색약", 1;
+}
+0,0,0,0,0,0,0	레몬색염색약	{
+ set @myid, get_myid();
+ set_haircolor 19;
+ item_del "레몬색염색약", 1;
+}
+0,0,0,0,0,0,0	블루블랙염색약	{
+ set @myid, get_myid();
+ set_haircolor 20;
+ item_del "블루블랙염색약", 1;
+}
+0,0,0,0,0,0,0	연하늘색염색약	{
+ set @myid, get_myid();
+ set_haircolor 21;
+ item_del "연하늘색염색약", 1;
+}
+0,0,0,0,0,0,0	연보라색염색약	{
+ set @myid, get_myid();
+ set_haircolor 22;
+ item_del "연보라색염색약", 1;
+}
+
+0,0,0,0,0,0,0	염색략	{
+	mes 1, "머리를 염색할수있는 염색약을 팝니다.";
+	set @select, menu("염색약구입하겠소?", "구입하기");
+ if(@select == 1){
+  shop 0, "염색약", "염색약을골라보세요";
+ }
+ del @select;
+}

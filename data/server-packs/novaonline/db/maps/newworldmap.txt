@@ -1,0 +1,26 @@
+{
+번호	1
+이름	월드맵
+너비	9
+높이	9
+CRC	0
+맵파일	db/maps/default/maps/lod1200.map
+}
+
+{
+번호	2
+이름	승월드맵
+너비	9
+높이	9
+CRC	0
+맵파일	db/maps/default/maps/lod1200.map
+}
+
+{
+번호	3
+이름	포테의숲대기실
+너비	9
+높이	9
+CRC	0
+맵파일	db/maps/default/maps/lod1200.map
+}

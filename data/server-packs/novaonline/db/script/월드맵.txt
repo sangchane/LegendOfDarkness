@@ -1,0 +1,340 @@
+0,0,0,0,0,0,0	WORLD_노비스	{
+	set @myid, get_myid();
+	set @menu, menu("노비스로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+	if(get_level(@myid) >= 41){mes 1, "노비스에 가기엔, 레벨이 높습니다."; del @myid; end;}
+	mes 1, "노비스로 이동합니다.";
+	warp "노비스마을",39,30;
+	mes 3, "노비스마을로 귀환하셧습니다.";
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	WORLD_용자의공원	{
+	set @myid, get_myid();
+	set @menu, menu("용자의공원으로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){mes 1, "용자의공원으로 이동합니다."; warp "용자의공원", 49,63; mes 3, "용자의공원으로 귀환하셧습니다."; end;}
+	end;
+}
+
+0,0,0,0,0,0,0	WORLD_포테의숲	{
+	set @myid, get_myid();
+	set @menu, menu("포테의숲대기실로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+	if(get_level(@myid) <= 10 || get_level(@myid) >= 71){mes 1, "포테의숲에 가기엔, 레벨이 안맞습니다."; del @myid; end;}
+	mes 1, "포테의숲으로 이동합니다.";
+	warp "포테의숲대기실",4,4;
+	mes 3, "포테의숲으로 귀환하셧습니다.";
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	WORLD_포테의숲입장	{
+	set @myid, get_myid();
+	set @menu, menu("포테의숲으로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+	if(get_level(@myid) <= 10 || get_level(@myid) >= 41){mes 1, "포테의숲에 가기엔, 레벨이 안맞습니다."; del @myid; end;}
+	mes 1, "포테의숲으로 이동합니다.";
+	warp "포테의 숲1존",33,47;
+	mes 3, "포테의숲으로 귀환하셧습니다.";
+	}
+	end;
+}
+0,0,0,0,0,0,0	WORLD_아벨해안	{
+	set @myid, get_myid();
+	re:
+	set @rand, rand(1,2);
+	set @menu, menu("아벨해안으로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+	if(get_level(@myid) <= 40 || get_level(@myid) >= 99){mes 1, "아벨해안에 가기엔, 레벨이 안맞습니다."; del @myid; end;}
+	mes 1, "아벨해안으로 이동합니다.";
+	if(@rand < 1){goto re;}
+	if(@rand == 1){warp "아벨해안대기실", 38,42;}
+	if(@rand == 2){warp "아벨해안대기실", 38,41;}
+	mes 3, "아벨해안으로 귀환하셧습니다.";
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	WORLD_뤼케해안	{
+	set @myid, get_myid();
+	re:
+	set @rand, rand(1,2);
+	set @menu, menu("뤼케시온해안으로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+	if(get_level(@myid) <= 70 || get_level(@myid) >= 99){mes 1, "뤼케시온해안에 가기엔, 레벨이 안맞습니다."; del @myid; end;}
+	mes 1, "뤼케시온해안으로 이동합니다.";
+	if(@rand < 1){goto re;}
+	if(@rand == 1){warp "뤼케시온해안대기실", 38,42;}
+	if(@rand == 2){warp "뤼케시온해안대기실", 38,41;}
+	mes 3, "뤼케시온해안으로 귀환하셧습니다.";
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	WORLD_스킬사범	{
+	set @myid, get_myid();
+	set @menu, menu("스킬사범의집으로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+	mes 1, "스킬사범의집으로 이동합니다.";
+	if(get_class(@myid) <= 2 || get_class(@myid) == 5){warp "격수사범의집", 8,9; mes 3, "스킬사범의집으로 귀환하셧습니다."; end;}
+	warp "비격수사범의집", 5,11;
+	mes 3, "스킬사범의집으로 귀환하셧습니다.";
+	}
+	end;
+}
+
+0,0,0,0,0,0,0	WORLD_밀레스신전	{
+	set @myid, get_myid();
+	set @menu, menu("밀레스신전으로 가겠습니까?[제한레벨 : 99]", "예", "아니오");
+	if(@menu == 1){
+	if(get_level() == 99){warp "밀레스신전", 5,5; end;}
+	mes 1, "아직 레벨이 99가 이니십니다.";
+	end;
+	}
+}
+
+0,0,0,0,0,0,0	WORLD_아이스월드	{
+	set @myid, get_myid();
+	set @menu, menu("아이스월드(돈사냥터)로 가겠습니까?[제한레벨 : 99 골드 : 5000 필요]", "예", "아니오");
+	if(@menu == 1){
+	if(get_money(@myid) < 5000){mes 1, "골드가 부족합니다."; end;}
+	if(get_level() == 99){money_del 5000; warp "아이스월드", 1,1;}
+	sleep 1000;
+	AA:
+	set @rand1, rand(1,get_mapxs(@myid)-1);
+	if(@rand1 <= 0){goto AA;}
+	BB:
+	set @rand2, rand(1,get_mapys(@myid)-1);
+	if(@rand2 <= 0){goto BB;}
+	if(get_level() == 99){warp "아이스월드", @rand1,@rnad2; end;}
+	mes 1, "아직 레벨이 99가 이니십니다.";
+	end;
+	}
+}
+
+0,0,0,0,0,0,0	WORLD_죽음의마을	{
+	set @myid, get_myid();
+	set @menu, menu("죽음의마을입구로 가겠습니까?[제한레벨 : 99]", "예", "아니오");
+	if(@menu == 1){
+		if(get_level() == 99){warp "죽음의마을입구", 14,15;}
+	}
+}
+
+0,0,0,0,0,0,0	WORLD_개인사냥터	{
+	set @myid, get_myid();
+	set @menu, menu("개인사냥터대기실로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){warp "개인사냥터대기실", 4,4;}
+}
+//승급월드맵
+
+0,0,0,0,0,0,0	WORLD_승급자의공간	{
+	set @myid, get_myid();
+	set @menu, menu("승급자의공간으로 가겠습니까?[제한레벨 : 99 1차승급이상 입장료 2만골드]", "예", "아니오");
+	if(@menu == 1){
+		if(get_level() == 99 && get_money(@myid) > 20000 && get_class_sub() != 0){money_del 50000; warp "승급자의공간", 5,5; mes 1, "이동되습니다."; end;}
+		mes 1, "아직 입장할 능력이 안되거나, 골드가 부족합니다.";
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	WORLD_혼돈의탑	{
+	set @myid, get_myid();
+	set @eg, get_eg();
+	set @hondone, #hondon * 150000000;
+	set @hondong, #hondon * 100;
+	set @hondonm, #hondon * 100000;
+	del @menu;
+	item_del "혼돈의열쇠1", 90;
+	item_del "혼돈의열쇠2", 90;
+	re:
+	set @rand, rand(1,4);
+	set @menu, menu("혼돈의탑대기실로 가겠습니까?\\n[혼돈의탑입장티켓필요]", "예", "아니오", "보상받기", "흑요석교환");
+	if(@menu == 1){
+	if(get_level(@myid) < 99){mes 1, "레벨이 99미만이라 입장이 불가능합니다."; end;}
+	if(item_exist(@myid, "혼돈의탑입장티켓") == 0){
+		mes 1, "혼돈의탑입장티켓이 없습니다.";
+		mes 1, "즉석입장은 혼돈의탑입장티켓가격에 50%를 더한 150만원입니다.";
+		set @menu, menu("즉석입장을 하시겠습니까?\\n[150만골드소모]", "예", "아니오");
+		if(@menu == 1){
+			if(get_money(@myid) < 1500000){mes 1, "돈이 부족합니다."; end;}
+			mes 1, "혼돈의탑대기실로 이동합니다.";
+			if(@rand < 1 || @rnad > 4){goto re;}
+			if(@rand == 1){warp "혼돈의탑대기실", 14,14;}
+			if(@rand == 2){warp "혼돈의탑대기실", 15,14;}
+			if(@rand == 3){warp "혼돈의탑대기실", 14,15;}
+			if(@rand == 4){warp "혼돈의탑대기실", 15,15;}
+			money_del 1500000;
+			mes 3, "혼돈의탑대기실로 귀환하셧습니다.";		
+			del @myid;
+			end;
+		}
+		if(@menu == 2){mes 1, "안녕히 가십시오."; end;}
+	}
+	mes 1, "혼돈의탑입장티켓을 받았습니다.";
+	mes 1, "혼돈의탑대기실로 이동합니다.";
+	if(@rand < 1 || @rnad > 4){goto re;}
+	if(@rand == 1){warp "혼돈의탑대기실", 14,14;}
+	if(@rand == 2){warp "혼돈의탑대기실", 15,14;}
+	if(@rand == 3){warp "혼돈의탑대기실", 14,15;}
+	if(@rand == 4){warp "혼돈의탑대기실", 15,15;}
+	item_del "혼돈의탑입장티켓", 1;
+	mes 3, "혼돈의탑대기실로 귀환하셧습니다.";
+	end;
+	}
+	if(@menu == 3){
+		mes 1, "보상을 지급해드리겠습니다.";
+		if(#hondon < 5){mes 1, "당신은 보상을 받을수없습니다. \n보상은 5층이상부터..."; end;}
+		mes 1, "현재 당신의 마지막 혼돈의탑기록은" + #hondon + "층까지입니다.";
+		set #honpoint, #honpoint + #hondon;
+		exp_add @hondone;
+		set_eg @hondong + @eg;
+		money_add @hondonm;
+		set #hondon, 0;
+		mes 1, "보상 골드 : [" + @hondonm + "], 경험치 : [" + @hondone + "], EG : [" + @hondong + "]을 얻었습니다.";
+		goto re;
+	}
+	if(@menu == 4){
+		mes 1, "흑요석 아이템은 혼돈포인트 100당 한부위로 교환이 가능합니다.";
+		mes 1, "교환하기에 앞서, 아이템창에 빈공간이 없다면 공간을 확보해주세요.\n만약 아이템창자리가 없어서 증발시 복구불가능합니다.";
+		re2:
+		del @select;	
+		del @select2;
+		set @select, menu("어느직업으로 교환하시겠습니까?\n현재소유포인트 [" + #honpoint + "]", "전사", "도적", "마법사", "성직자", "무도가");
+		if(@select == 1){
+			if(get_class(@myid) != 1){mes 1, "당신은 전사가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석워리어귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석워리어목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석워리어장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석워리어반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석워리어벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석워리어각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 2){
+			if(get_class(@myid) != 2){mes 1, "당신은 도적이 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석로그귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석로그목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석로그장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석로그반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석로그벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석로그각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 3){
+			if(get_class(@myid) != 3){mes 1, "당신은 마법사가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석소서러귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석소서러목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석소서러장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석소서러반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석소서러벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석소서러각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 4){
+			if(get_class(@myid) != 4){mes 1, "당신은 성직자가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "장갑", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석프리스트귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석프리스트목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석프리스트장갑", 1; mes 1, "장갑교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석프리스트반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석프리스트벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석프리스트각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		if(@select == 5){
+			if(get_class(@myid) != 5){mes 1, "당신은 무도가가 아닙니다."; goto re;}
+			set @select2, menu("어느 부위로 교환하시겠습니까?", "귀걸이", "목걸이", "팔찌", "반지", "벨트", "각반");
+			if(#honpoint < 100){mes 1, "포인트가 부족하여 아이템을 교환할수 없습니다."; goto re;}
+			if(@select2 == 1){set #honpoint, #honpoint - 100; item_add "흑요석몽크귀걸이", 1; mes 1, "귀걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 2){set #honpoint, #honpoint - 100; item_add "흑요석몽크목걸이", 1; mes 1, "목걸이교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 3){set #honpoint, #honpoint - 100; item_add "흑요석몽크팔찌", 1; mes 1, "팔찌교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 4){set #honpoint, #honpoint - 100; item_add "흑요석몽크반지", 1; mes 1, "반지교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 5){set #honpoint, #honpoint - 100; item_add "흑요석몽크벨트", 1; mes 1, "벨트교환이 완료됬습니다."; goto re2;}
+			if(@select2 == 6){set #honpoint, #honpoint - 100; item_add "흑요석몽크각반", 1; mes 1, "각반교환이 완료됬습니다."; goto re2;}
+		}
+		del @select;	
+		del @select2;
+		end;
+	}
+}
+
+0,0,0,0,0,0,0	WORLD_개인사냥터2	{
+	set @myid, get_myid();
+	set @menu, menu("승개인사냥터대기실로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){warp "승개인사냥터대기실", 4,4;}
+}
+
+0,0,0,0,0,0,0	WORLD_결계사냥터	{
+	set @myid, get_myid();
+	set @menu, menu("결계사냥터대기실로 가겠습니까?\\n입장료 : 10만골드\\n체력마력합쳐서 30만이상이면 입장불가", "예", "아니오");
+	if(@menu == 1){
+		if(get_basevita(@myid) + get_basemana(@myid) >= 300000){mes 1, "체력과 마력을 합쳐 30만이 넘습니다."; end;}
+		if(get_money(@myid) < 100000){mes 1, "돈이 부족하잖아! 돈을 가져왕!"; end;}
+		if(get_class_sub() != 2){mes 1, "아직 2차승급을 안했자나! 2차승급하고왕!"; end;}
+		money_del 100000;
+		warp "결계대기실", 8,8;
+		}
+}
+
+0,0,0,0,0,0,0	WORLD_엘리멘탈잉잉	{
+	set @myid, get_myid();
+	if(get_basevita(@myid) + get_basemana(@myid) < 300000){mes 1, "체력과 마력을 합쳐 30만이 넘은 사람만 입장할수 있습니다."; end;}
+	if(get_basevita(@myid) >= 1200000 || get_basemana(@myid) >= 1400000){mes 0, "당신은 이동하기에 창피합니다.";}
+	set @menu, menu("엘리멘탈로 가겠습니까?\\n입장료 : 20만골드", "네", "아니");
+		if(@menu == 1){if(get_money(@myid) < 200000){mes 1, "돈이 부족하잖아! 돈을 가져왕!"; end;}money_del 200000; warp "엘리멘탈대기실", 4,3;}
+	}
+}
+
+0,0,0,0,0,0,0	WORLD_엘리멘탈	{
+	set @myid, get_myid();
+	if(get_basevita(@myid) + get_basemana(@myid) < 300000){mes 1, "체력과 마력을 합쳐 30만이 넘은 사람만 입장할수 있습니다."; end;}
+	if(get_basevita(@myid) >= 1200000 || get_basemana(@myid) >= 1400000){mes 0, "당신은 이동하기에 창피합니다.";}
+	set @menu, menu("엘리멘탈에 입장하시겠습니까?\\n입장료 : 1만골드", "네", "아니요");
+	if(@menu == 1){
+		if(get_money(@myid) < 10000){mes 1, "돈이 부족하잖아! 돈을 가져왕!"; end;}
+		money_del 10000;
+		set $map_num, $map_num + 1;
+		set @name1$ , "사냥터" + get_name() + "엘리멘탈";
+		npc_spawn "엘리멘탈도우미", @name1$, 8, 5, 2;
+		group_warp "사냥터" + get_name() + "엘리멘탈", 8, 9;
+	}
+}	
+
+
+0,0,0,0,0,0,0	WORLD_브론즈굴	{
+	set @myid, get_myid();
+	del @menu;
+	set @menu, menu("어느굴로 가겠습니까?\\n입장료[순서대로] : 3만골드, 4만골드", "브론즈", "블루");
+	if(@menu == 1){
+		if(get_money(@myid) < 30000){mes 1, "돈이 부족하잖아! 돈을 가져왕!"; end;}
+		if(get_class_sub() < 1){mes 1, "아직 승급을 안했자나! 승급하고왕!"; end;}
+		money_del 30000;
+		warp "브론즈오피온의굴 7층", 63,18;
+		}
+	if(@menu == 2){
+		if(get_money(@myid) < 40000){mes 1, "돈이 부족하잖아! 돈을 가져왕!"; end;}
+		if(get_class_sub() < 1){mes 1, "아직 승급을 안했자나! 승급하고왕!"; end;}
+		money_del 40000;
+		warp "블루오피온의굴 7층", 63,18;
+		}
+}
+
+0,0,0,0,0,0,0	WORLD_길드성	{
+	set @myid, get_myid();
+	set @menu, menu("길드성으로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+		warp "리치성1층홀", 5,13;
+	}
+}
+
+0,0,0,0,0,0,0	WORLD_제조의신전	{
+	set @myid, get_myid();
+	set @menu, menu("제조의신전으로 가겠습니까?", "예", "아니오");
+	if(@menu == 1){
+		warp "제조의신전", 5,5;
+	}
+}

@@ -1,0 +1,435 @@
+0,0,0,0,0,0,0	SPELL_쿠로	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 30){message 3, "마력이 부족합니다. [필요마나 : 30]"; del @myid; end;}
+	manal_del "30";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	motion 128, 55;
+	if(@type == 3){
+	set @hill2, (get_int(@myid)*10);
+	if(@hill2 < 70){set @hill2, 70;}
+	if(@hill2 > 180){set @hill2, 180;}
+	set @hill, get_vita(@target)+@hill2;
+	set_vita @target, @hill;
+	set @user, ((get_body()+1))+1;
+	char_damaged @target, @user,@user; message 3, "쿠로를 외웠습니다."; 
+	if(@target != @myid){message1 @target, 3, get_name() + "님께서 쿠로를 외워주셨습니다.";}
+	effect @target, 21, 21, 120; game_sound 35,0;}
+	del @myid;
+	del @target;
+	del @hill;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_이모탈	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	if(get_mana(@myid) < 80){message 3, "마력이 부족합니다. [필요마나 : 80]"; del @myid; end;}
+	manal_del "80";
+	set @target, spell_target();
+	RE:
+	set @rnd, rand(1,10);
+	if(@rnd <= 0){goto RE;}
+	if(@rnd <= 3){immortal @myid, 15; effect @myid, 6,0,100; game_sound 8,0; message 3, "이모탈을 외웠습니다."; del @myid; end;}
+	message 3, "실패했습니다.";
+}
+
+0,0,0,0,0,0,0	SPELL_벨라르모	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(get_mana(@myid) < 50){message 3, "마력이 부족합니다. [필요마나 : 50]"; del @myid; end;}
+	manal_del "50";
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type != 3) {end;}
+	belra @target, 120, 7;
+	//초, 방어력량(자동-)
+	game_sound 8,0;
+	message 3, "벨라르모를 외웠습니다.";
+	effect @target, 93, 93, 100;
+	if(@target == @myid){end;}
+	message1 @target, 3, get_name() + "님께서 벨라르모를 외워주셨습니다.";
+}
+
+0,0,0,0,0,0,0	SPELL_에나르마	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(get_mana(@myid) < 50){message 3, "마력이 부족합니다. [필요마나 : 50]"; del @myid; end;}
+	manal_del "50";
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type != 3) {del @target; del @type; end;}
+	if(enare(@target, 60)){end;}
+	effect @target, 195,195,100;
+	game_sound 81,0;
+	message 3, "에나르마를 외웠습니다.";
+	if(@target == @myid){del @target; del @type; end;}
+	message1 @target, 3, get_name() + "님께서 에나르마를 외워주셨습니다.";
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠라노	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 45){message 3, "마력이 부족합니다. [필요마나 : 45]"; del @myid; end;}
+	manal_del "45";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	motion 128, 55;
+	if(@type == 3){
+	set @hill2, (get_int(@myid)*10);
+	if(@hill2 < 300){set @hill2, 300;}
+	if(@hill2 > 930){set @hill2, 930;}
+	set @hill, get_vita(@target)+@hill2;
+	set_vita @target, @hill;
+	set @user, ((get_body()+1))+1;
+	char_damaged @target, @user,@user; message 3, "쿠라노를 외웠습니다."; 
+	if(@target != @myid){message1 @target, 3, get_name() + "님께서 쿠라노를 외워주셨습니다.";}
+	effect @target, 21, 21, 120; game_sound 35,0;}
+	del @myid;
+	del @target;
+	del @hill;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠러스	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 50){message 3, "마력이 부족합니다. [필요마나 : 50]"; del @myid; end;}
+	manal_del "50";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @hill, (get_int(@myid)*10);
+	if(@hill < 300){set @hill, 300;}
+	if(@hill > 930){set @hill, 930;}
+	group_hill @hill, 21;
+	message 3, "쿠러스를 외웠습니다.";
+	group_message 3, get_name() + "님께서 쿠러스를 외워주셧습니다.";
+	motion 128, 55;
+	game_sound 35,0;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠라노소	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 100){message 3, "마력이 부족합니다. [필요마나 : 100]"; del @myid; end;}
+	manal_del "100";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	motion 128, 55;
+	if(@type == 3){
+	set @hill2, (get_int(@myid)*10);
+	if(@hill2 < 500){set @hill2, 500;}
+	if(@hill2 > 1380){set @hill2, 1380;}
+	set @hill, get_vita(@target)+@hill2;
+	set_vita @target, @hill;
+	set @user, ((get_body()+1))+1;
+	char_damaged @target, @user,@user; message 3, "쿠라노소를 외웠습니다."; 
+	if(@target != @myid){message1 @target, 3, get_name() + "님께서 쿠라노소를 외워주셨습니다.";}
+	effect @target, 21, 21, 120; game_sound 35,0;}
+	del @myid;
+	del @target;
+	del @hill;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠라누스	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 150){message 3, "마력이 부족합니다. [필요마나 : 150]"; del @myid; end;}
+	manal_del "150";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @hill, (get_int(@myid)*10);
+	if(@hill < 500){set @hill, 500;}
+	if(@hill > 1380){set @hill, 1380;}
+	group_hill @hill, 184;
+	message 3, "쿠라누스를 외웠습니다.";
+	group_message 3, get_name() + "님께서 쿠라누스를 외워주셧습니다.";
+	motion 128, 55;
+	game_sound 35,0;
+}
+
+0,0,0,0,0,0,0	SPELL_콜라마	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type != 3) {end;}
+	set @hill, (get_int(@myid)+400);
+	if(@hill > 1500){set @hill, 1500;}
+	hprecovery @target, 10,@hill;
+	message 3, "콜라마를 외웠습니다.";
+	message1 @target, 3, get_name() + "님께서 콜라마를 외워주셨습니다.";
+	game_sound 8,0;
+}
+0,0,0,0,0,0,0	SPELL_수페라벨라르모	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(get_mana(@myid) < 120){message 3, "마력이 부족합니다. [필요마나 : 120]"; del @myid; end;}
+	manal_del "120";
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type != 3) {end;}
+	belra @target, 120, 14;
+	//초, 방어력량(자동-)
+	game_sound 8,0;
+	message 3, "수페라벨라르모를 외웠습니다.";
+	effect @target, 93, 93, 100;
+	if(@target == @myid){end;}
+	message1 @target, 3, get_name() + "님께서 수페라벨라르모를 외워주셨습니다.";
+}
+
+0,0,0,0,0,0,0	SPELL_홀리볼트	{
+	set @myid, get_myid();
+	if(get_level(@myid) >= 11 && get_level(@myid) < 41 && get_mana(@myid) < 40){message 3, "마력이 부족합니다. [필요마나 : 40]"; del @myid; end;}
+	if(get_level(@myid) >= 41 && get_level(@myid) < 71 && get_mana(@myid) < 100){message 3, "마력이 부족합니다. [필요마나 : 100]"; del @myid; end;}
+	if(get_level(@myid) >= 71 && get_level(@myid) < 98 && get_mana(@myid) < 320){message 3, "마력이 부족합니다. [필요마나 : 320]"; del @myid; end;}
+	if(get_level(@myid) == 99 && get_mana(@myid) < 550){message 3, "마력이 부족합니다. [필요마나 : 550]"; del @myid; end;}
+	if(get_level(@myid) >= 11 && get_level(@myid) < 41){manal_del "40"; set @damage, ((get_int(@myid))) + 60;}
+	if(get_level(@myid) >= 41 && get_level(@myid) < 71){manal_del "100"; set @damage, ((get_int(@myid))) + 97;}
+	if(get_level(@myid) >= 71 && get_level(@myid) < 98){manal_del "320"; set @damage, ((get_int(@myid))) + 170;}
+	if(get_level(@myid) == 99){manal_del "550"; set @damage, ((get_int(@myid))) + 250;}
+	if(enare(@myid,1)) set @damage, @damage + 20;
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 1){
+		damaged @target, @damage;
+	}else{
+		if(@type == 3 && get_map_pk()){
+			char_damaged2 @target, @damage,@damage;
+		}
+	}
+	message 3, "홀리볼트를 외웠습니다.";
+	effect @target, 0, 23, 75;
+	game_sound 26,0;
+	motion 136, 75;
+	del @myid;
+	del @target;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_디나르콜리	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 3){mobnar_end @target; message 3, "디나르콜리를 외웠습니다."; effect @target, 0, 200, 100; message1 @target, 3, get_name() + "님께서 디나르콜리를 시전해주셧습니다."; end;}
+}
+
+0,0,0,0,0,0,0	SPELL_디소루마	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 3){mobsor_end @target; message 3, "디소루마를 외웠습니다."; effect @target, 0, 200, 100; message1 @target, 3, get_name() + "님께서 디소르마를 시전해주셧습니다."; end;}
+}
+
+0,0,0,0,0,0,0	SPELL_디베노모	{
+	set @myid, get_myid();
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type == 3){poisen_end @target; message 3, "디베노모를 외웠습니다."; effect @target, 0, 200, 100; message1 @target, 3, get_name() + "님께서 디베노모를 시전해주셧습니다."; end;}
+}
+
+0,0,0,0,0,0,0	SPELL_수페라쿠라노	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 200){message 3, "마력이 부족합니다. [필요마나 : 200]"; del @myid; end;}
+	manal_del "200";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	motion 128, 55;
+	if(@type == 3){
+	set @hill2, (get_int(@myid)*15);
+	if(@hill2 < 650){set @hill2, 650;}
+	if(@hill2 > 1710){set @hill2, 1710;}
+	set @hill, get_vita(@target)+@hill2;
+	set_vita @target, @hill;
+	set @user, ((get_body()+1))+1;
+	char_damaged @target, @user,@user; message 3, "수페라쿠라노를 외웠습니다."; 
+	if(@target != @myid){message1 @target, 3, get_name() + "님께서 수페라쿠라노를 외워주셨습니다.";}
+	effect @target, 21, 21, 120; game_sound 35,0;}
+	del @myid;
+	del @target;
+	del @hill;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_쿠라네라	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 350){message 3, "마력이 부족합니다. [필요마나 : 350]"; del @myid; end;}
+	manal_del "350";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @hill, (get_int(@myid)*15);
+	if(@hill < 650){set @hill, 650;}
+	if(@hill > 1710){set @hill, 1710;}
+	group_hill @hill, 184;
+	message 3, "쿠라네라를 외웠습니다.";
+	group_message 3, get_name() + "님께서 쿠라네라를 외워주셧습니다.";
+	motion 128, 55;
+	game_sound 35,0;
+}
+
+0,0,0,0,0,0,0	SPELL_호르라마	{
+	set @myid, get_myid();
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	if(@type != 3) {end;}
+	horrama @target, 30;
+	game_sound 8,0;
+	if(@target == @myid) {effect @myid, 93,0,100; end;}
+	effect @target, 0, 93, 100;
+	message 3, "호르라마를 외웠습니다.";
+	message1 @target, 3, get_name() + "님께서 호르라마를 외워주셨습니다.";
+}
+
+
+0,0,0,0,0,0,0	SPELL_홀리볼트(Lev2)	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else if(get_mapname() != "OX퀴즈장"){
+ set @target, spell_target();
+ set @type, istype(@target);
+ motion 128, 55;
+ if(@type == 3 && get_mana(@myid) >= 100) {
+ //set @user, ((get_int()+20)+(get_wis()+25))*29;
+ //char_damaged @target, 0,0;
+ manal_del "1000";
+ //effect @target, 0, 23, 23;
+ //game_sound 26,0;
+} else if(@type == 1 || @type == 2 && get_mana(@myid) >= 100){
+ set @damage, ((get_int()+20)+(get_wis()+25))*29;
+ damaged @target, @damage;
+ manal_del "1000";
+ effect @target, 0, 23, 23;
+ game_sound 26,0;
+}
+ del @myid;
+ del @target;
+ del @type;
+}
+}
+
+0,0,0,0,0,0,0	SPELL_홀리볼트(Lev3)	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else if(get_mapname() != "OX퀴즈장"){
+ set @target, spell_target();
+ set @type, istype(@target);
+ motion 128, 55;
+ if(@type == 3 && get_mana(@myid) >= 100) {
+ //set @user, ((get_int()+20)+(get_wis()+25))*29;
+ //char_damaged @target, 0,0;
+ manal_del "1000";
+ //effect @target, 0, 23, 23;
+ //game_sound 26,0;
+} else if(@type == 1 || @type == 2 && get_mana(@myid) >= 100){
+ set @damage, ((get_int()+20)+(get_wis()+25))*69;
+ damaged @target, @damage;
+ manal_del "1000";
+ effect @target, 0, 23, 23;
+ game_sound 26,0;
+}
+ del @myid;
+ del @target;
+ del @type;
+}
+}
+
+0,0,0,0,0,0,0	SPELL_홀리볼트(Lev4)	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){
+ message 3, "이벤트공간에서는 사용이불가능합니다.";	
+ }else if(get_mapname() != "OX퀴즈장"){
+ set @target, spell_target();
+ set @type, istype(@target);
+ motion 128, 55;
+ if(@type == 3 && get_mana(@myid) >= 100) {
+ //set @user, ((get_int()+20)+(get_wis()+25))*15;
+ //char_damaged @target, 0,0;
+ manal_del "1000";
+ //effect @target, 0, 23, 23;
+ //game_sound 26,0;
+} else if(@type == 1 || @type == 2 && get_mana(@myid) >= 100){
+ set @damage, ((get_int()+20)+(get_wis()+25))*500;
+ damaged @target, @damage;
+ manal_del "3000";
+ effect @target, 0, 23, 23;
+ game_sound 26,0;
+}
+ del @myid;
+ del @target;
+ del @type;
+}
+}
+
+0,0,0,0,0,0,0	SPELL_엑스쿠라노	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 350){message 3, "마력이 부족합니다. [필요마나 : 350]"; del @myid; end;}
+	manal_del "350";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; del @myid; end;}
+	set @target, spell_target();
+	set @type, istype(@target);
+	motion 128, 55;
+	if(@type == 3){
+	set @hill2, (get_int(@myid)*15);
+	if(@hill2 < 1500){set @hill2, 1500;}
+	if(@hill2 > 7500){set @hill2, 7500;}
+	set @hill, get_vita(@target)+@hill2;
+	set_vita @target, @hill;
+	set @user, ((get_body()+1))+1;
+	char_damaged @target, @user,@user; message 3, "엑스쿠라노를 외웠습니다."; 
+	if(@target != @myid){message1 @target, 3, get_name() + "님께서 엑스쿠라노를 외워주셨습니다.";}
+	effect @target, 21, 21, 120; game_sound 35,0;}
+	del @myid;
+	del @target;
+	del @hill;
+	del @type;
+}
+
+0,0,0,0,0,0,0	SPELL_엑스쿠라네라	{
+	set @myid, get_myid();
+	if(get_mana(@myid) < 500){message 3, "마력이 부족합니다. [필요마나 : 500]"; del @myid; end;}
+	manal_del "500";
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	set @hill, (get_int(@myid)*15);
+	if(@hill < 1500){set @hill, 1500;}
+	if(@hill > 7500){set @hill, 7500;}
+	group_hill @hill, 184;
+	message 3, "엑스쿠라네라를 외웠습니다.";
+	group_message 3, get_name() + "님께서 엑스쿠라네라를 외워주셧습니다.";
+	motion 128, 55;
+	game_sound 35,0;
+}
+
+0,0,0,0,0,0,0	SPELL_코마디아	{
+	set @myid, get_myid();
+	set @target, get_front_char(@myid);
+	if(!@target) {end;}
+	if(get_state1(@target) != 1 && get_coma(@target) == 0){end;}
+	set_state1 @target, 0;
+	set_coma @target, 0;
+	coma_delay @target, 0;
+	del_coma @target;
+	set_vita @target, 1000;
+	set_mana @target, 1000;
+	effect @target, 0, 5, 75;
+	game_sound 8,0;
+}
+
+0,0,0,0,0,0,0	SPELL_리베라토	{
+	set @myid, get_myid(); 
+	set @target, spell_target(); 
+	set @type, istype(@target); 
+	RE: 
+	set @rnd, rand(1,10); 
+	if(@rnd <= 0){goto RE;} 
+	if(@rnd <= 2){message 3, "실패하셧습니다."; end;} 
+	if(@type != 3){end;}
+	reberato @target;
+	reberato2 @target;
+	message 3, "리베라토를 외웠습니다."; 
+	if(@target == @myid){effect @myid, 57,0,100; end;} 
+	effect @target, 0, 57, 100;
+	message1 @target, 3, get_name() + "님께서 리베라토를 시전하셧습니다."; 
+} 

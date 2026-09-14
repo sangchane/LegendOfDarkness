@@ -1,0 +1,516 @@
+0,0,0,0,0,0,0	성별전환스크롤	{
+	mes 1, "{=w남여성별전환시켜드립니다,성별바꾼뒤에갑옷해제하시면 바디도변합니다.";
+	mes 1, "{=w사용후 꼭 착용중인 아이템들을 벗었다 다시껴주세요!";
+	set @select, menu("어떤것을 하시겠어요 ?", "남자", "여자");
+	if(@select == 1)
+	{
+		mes 1, "그럼 시작하도록하겠습니다";
+  			set @myid, get_myid(); 
+			item_del "성별전환스크롤", 1;
+			mes 1, "남자가 됬습니다.";
+			set_body @myid,"16";
+			set_sex "1";
+	}if(@select == 2){
+		mes 1, "그럼 시작하도록하겠습니다";
+			set @myid, get_myid(); 
+			item_del "성별전환스크롤", 1;
+			mes 1, "여자가 됬습니다.";
+			set_body @myid,"32";
+			set_sex "2";	
+		}
+	del @select;
+}
+0,0,0,0,0,0,0	골드도박	{
+	mes 1, "골드를 5천만골드에서 5억사이로 뽑기(도박)합니다.";
+	set @select, menu("운을 밑겠습니까?", "뽑는다", "안뽑는다");
+	if(@select == 2){mes 1, "겁쟁인겁니까?"; end;}
+	set @rand,rand(50000000,500000000);
+	money_add @rnad;
+	mes 1, "" + @rand + "골드가 나왔습니다!!";
+}
+0,0,0,0,0,0,0	리치의가호	{
+	set @myid, get_myid();
+	if(#exptime > 0){message 1, "이미 가호를 받고있습니다."; end;}
+	exp_per @myid,1800,2,3;
+	set #expba, 2;
+ 	item_del "리치의가호", 1;
+	message 1, "경험치가 30분동안 2배가 됩니다."; 
+}
+
+
+0,0,0,0,0,0,0	간지의가호	{
+	set @myid, get_myid();
+	if(#exptime > 0){message 1, "이미 가호를 받고있습니다."; end;}
+	exp_per @myid,1800,3,3;
+	set #expba, 3;
+	item_del "간지의가호", 1;
+	message 1, "경험치가 30분동안 3배가 됩니다."; 
+}
+
+//exp_rate 2; 서버경험치를 2배로 설정한다.
+//exp_per @myid, 시간(초), 배율, 옵션;
+//옵션  = 1 경험치, 2 어빌리티, 3 둘다
+
+0,0,0,0,0,0,0	리치의리젠시작	{
+	set #richr, 1;
+	NR:
+	set @myid, get_myid();
+	if(#richr == 0){del @myid; del @heal; del @type; end;}
+	if(get_body() == 16){
+	set @type, istype(@myid);
+ 	set @heal, get_basevita(@myid)/10;
+ 	hprecovery @myid, 1,@heal;
+	sleep 1000;
+	goto NR;
+	}else{
+	if(get_body() == 32){
+	set @type, istype(@myid);
+ 	set @heal, get_basevita(@myid)/10;
+ 	hprecovery @myid, 1,@heal;
+	sleep 1000;
+	goto NR;
+	}else{
+	goto NR;
+	}
+}
+}
+0,0,0,0,0,0,0	리치의리젠종료	{
+	set #richr, 0;
+	del @heal;
+	del @myid;
+}
+
+0,0,0,0,0,0,0	샤이니이펙트시작	{
+	set #riche, 1;
+	NE:
+	set @myid, get_myid();
+	if(#riche == 0){del @myid; end;}
+	if(get_body() == 16){effect @target, 125, 0, 75; sleep 600; goto NE;}
+	if(get_body() == 32){ effect @target, 126, 0, 75; sleep 600; goto NE;}
+	goto NE;
+}
+
+
+0,0,0,0,0,0,0	샤이니이펙트종료	{
+	set #riche, 0;
+	del @myid;
+}
+
+
+0,0,0,0,0,0,0	드래곤슬레이어시작	{
+ set #dragonslyar, 1;
+ DE:
+ console_output "[시스템]드래곤효과 : " + get_name() + "";
+ if(#dragonslyar == 0){del @myid; del @type; del @x1; del @x2; del @y1; del @y2; del @mob; del @damage;  end;}
+ set @myid, get_myid();
+ if(get_mapname() == "뮤레칸의방"){goto DE;}
+ set @x1, get_xs()-8;
+ set @x2, get_xs()+8;
+ set @y1, get_ys()-8;
+ set @y2, get_ys()+8;
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @damage, ((get_basevita(@myid)+1))*2;
+   set @type, istype(@mob);
+   if(@mob && @type == 1) {
+    effect @mob, 0, 137, 100;
+    game_sound 78, 0;
+    damaged @mob, @damage;
+   }
+  }
+}
+    sleep 1000;
+    goto DE;
+}
+
+
+0,0,0,0,0,0,0	드래곤슬레이어종료	{
+	set #dragonslyar, 0;
+	del @myid;
+	del @type;
+	del @x1;
+	del @x2;
+	del @y1;
+	del @y2;
+	del @mob;
+	del @damage;
+}
+
+0,0,0,0,0,0,0	드래곤스태프시작	{
+ set #dragonstaff, 1;
+ DE:
+ console_output "[시스템]드래곤효과 : " + get_name() + "";
+ if(#dragonstaff == 0){del @myid; del @type; del @x1; del @x2; del @y1; del @y2; del @mob; del @damage;  end;}
+ set @myid, get_myid();
+ if(get_mapname() == "뮤레칸의방"){goto DE;}
+ set @x1, get_xs()-8;
+ set @x2, get_xs()+8;
+ set @y1, get_ys()-8;
+ set @y2, get_ys()+8;
+ for(set @i, @x1; @i <= @x2; set @i, @i +1){
+  for(set @j, @y1; @j <= @y2; set @j, @j+1){
+   set @mob, get_mobxy(@i, @j);
+   set @damage, ((get_basemana(@myid)+1))*2;
+   set @type, istype(@mob);
+   if(@mob && @type == 1) {
+    effect @mob, 0, 72, 100;
+    game_sound 63, 0;
+    damaged @mob, @damage;
+   }
+  }
+}
+    sleep 1000;
+    goto DE;
+}
+
+
+0,0,0,0,0,0,0	드래곤스태프종료	{
+	set #dragonstaff, 0;
+	del @myid;
+	del @type;
+	del @x1;
+	del @x2;
+	del @y1;
+	del @y2;
+	del @mob;
+	del @damage;
+}
+
+0,0,0,0,0,0,0	HP캅셀	{
+	set @myid, get_myid();
+	mes 1, "사용하시면, 체력을 최대체력 1~10%를 올려드립니다. [체력이 3천만 이상이면 1~5% 4천만이상이면 사용불가능]";
+	mes 1, "사용하시기전 *주의사항*\\n1. 장착아이템들을 모두벋고한다.\\n2. 강화의장갑 착용도 불가능.\\n3. 환불불가능";
+	set @select, menu("HP캅셀을 사용하시겠습니까?", "사용한다", "사용하지않는다.");
+	if(@select == 1){
+	RE:
+	if(get_ac(@myid) != 100){mes 1, "무장을 해체하고 사용해주십시오."; end;}
+	if(get_wearitem_glove1(@myid) == "강화의장갑"){mes 1, "강화의장갑을 해제하십시오."; end;}
+	if(get_wearitem_glove2(@myid) == "강화의장갑"){mes 1, "강화의장갑을 해제하십시오."; end;}
+	if(get_basevita() >= 40000000){mes 1, "더이상 캅셀로 체력을 살수없습니다."; mes 1, "EG로 환불해드리겠습니다."; item_del "HP캅셀", 1; set_eg get_eg()+8000; end;}
+	if(get_basevita() >= 30000000){mes 1, "체력이 3천만 이상이십니다. 1~5%로 바뀝니다."; GE: set @rand, rand(1,5); if(@rand <= 0){GOTO GE;} set @hpup, get_basevita(@myid) / 100 * @rand; mes 1, "HP캅셀을 사용합니다..."; item_del "HP캅셀", 1;
+	mes 1, "체력이 " + @rand + "%만큼 올랐습니다."; set_basevita get_basevita(@myid) + @hpup; end;}
+	set @rand, rand(1,10);
+	if(@rand <= 0){GOTO RE;}
+	set @hpup, get_basevita(@myid) / 100 * @rand;
+	mes 1, "HP캅셀을 사용합니다...";
+	item_del "HP캅셀", 1;
+	mes 1, "체력이 " + @rand + "%만큼 올랐습니다.";
+	set_basevita get_basevita(@myid) + @hpup;
+	}else if(@select == 2){
+	mes 1, "다음에 이용해주십시오.";
+	}
+}
+
+0,0,0,0,0,0,0	MP캅셀	{
+	set @myid, get_myid();
+	mes 1, "사용하시면, 마력을 최대마력 1~10%를 올려드립니다. [마력이 3천만 이상이면 1~5% 4천만이상이면 사용불가능]";
+	mes 1, "사용하시기전 *주의사항*\\n1. 장착아이템들을 모두벋고한다.\\n2. 강화의장갑 착용도 불가능.\\n3. 환불불가능";
+	set @select, menu("MP캅셀을 사용하시겠습니까?", "사용한다", "사용하지않는다.");
+	if(@select == 1){
+	RE:
+	if(get_ac(@myid) != 100){mes 1, "무장을 해체하고 사용해주십시오."; end;}
+	if(get_wearitem_glove1(@myid) == "강화의장갑"){mes 1, "강화의장갑을 해제하십시오."; end;}
+	if(get_wearitem_glove2(@myid) == "강화의장갑"){mes 1, "강화의장갑을 해제하십시오."; end;}
+	if(get_basemana() >= 40000000){mes 1, "더이상 캅셀로 마력을 살수없습니다."; mes 1, "EG로 환불해드리겠습니다."; item_del "MP캅셀", 1; set_eg get_eg()+8000; end;}
+	if(get_basemana() >= 30000000){mes 1, "마력이 3천만 이상이십니다. 1~5%로 바뀝니다."; GE: set @rand, rand(1,5); if(@rand <= 0){GOTO GE;} set @mpup, get_basemana(@myid) / 100 * @rand; mes 1, "MP캅셀을 사용합니다..."; item_del "MP캅셀", 1;
+	mes 1, "마력이 " + @rand + "%만큼 올랐습니다."; set_basemana get_basemana(@myid) + @mpup; end;}
+	set @rand, rand(1,10);
+	if(@rand <= 0){GOTO RE;}
+	set @mpup, get_basemana(@myid) / 100 * @rand;
+	mes 1, "MP캅셀을 사용합니다...";
+	item_del "MP캅셀", 1;
+	mes 1, "마력이 " + @rand + "%만큼 올랐습니다.";
+	set_basemana get_basemana(@myid) + @mpup;
+	}else if(@select == 2){
+	mes 1, "다음에 이용해주십시오.";
+	}
+}
+
+0,0,0,0,0,0,0	전직의책	{ 
+ set @select, menu("직업을 선택하시기 바랍니다.", "전사", "도적", "무도가", "성직자", "마법사");
+ set @class, get_class();
+ if(@select == 1){
+ warp "용자의공원", 49,63; 
+ item_del "전직의책", 1;
+  set_class 1;
+	set_level "12";
+	set_ability "50";
+   exp_del "4200000000";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+  legend_add 0, 255, "리치 1년, 봄 전직의책으로 전사로 전직하다.";
+  message 3, " {=q축하드립니다. 전사가 되셨습니다.";
+ }else if(@select == 2){
+  set_class 2;
+	set_level "12";
+	set_ability "50";
+   exp_del "4200000000";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ warp "용자의공원", 49,63; 
+ item_del "전직의책", 1;
+  legend_add 0, 255, "리치 1년, 봄 전직의책으로 도적으로 전직하다.";
+  message 3, " {=q축하드립니다. 도적이 되셨습니다.";
+ }else if(@select == 3){
+  set_class 5;
+	set_level "12";
+	set_ability "50";
+   exp_del "4200000000";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ warp "용자의공원", 49,63;
+ item_del "전직의책", 1;
+  legend_add 0, 255, "리치 1년, 봄 전직의책으로 무도가로 전직하다.";
+  message 3, " 축하드립니다.무도가가 되셨습니다.";
+ }else if(@select == 4){
+  set_class 4;
+	set_level "12";
+	set_ability "50";
+   exp_del "4200000000";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ warp "용자의공원", 49,63; 
+ item_del "전직의책", 1;
+  legend_add 0, 255, "리치 1년, 봄 전직의책으로 성직자로 전직하다.";
+  message 3, " 축하드립니다.성직자가 되셨습니다.";
+}else if(@select == 5){
+  set_class 3;
+	set_level "12";
+	set_ability "50";
+   exp_del "4200000000";
+	set_str "3";
+	set_int "3";
+	set_wis "3";
+	set_dex "3";
+	set_con "3";
+ warp "용자의공원", 49,63; 
+ item_del "전직의책", 1;
+  legend_add 0, 255, "리치 1년, 봄 전직의책으로 마법사로 전직하다.";
+  message 3, " 축하드립니다.마법사가 되셨습니다.";
+ }
+ del @select;
+ del @class;
+}
+
+0,0,0,0,0,0,0	리턴스크롤	{
+	if(#now_map1$ == 0){set #now_map1$, "미저장됨";}
+	if(#now_map2$ == 0){set #now_map2$, "미저장됨";}
+	if(#now_map3$ == 0){set #now_map3$, "미저장됨";}
+	mes 1, "※리턴스크롤 안내이용※\\n현재 자신이있는맵을 저장하여 언재든지 오갈수있게해주는 특수기능 캐쉬아이템!";
+	mes 1, "총 100번 사용 가능합니다. 현재까지 ["+ #return +"]번 사용하셧습니다.";
+	set @select, menu("메뉴를 선택하십시오.", "현재위치저장", "위치로가기");
+	if(@select == 1){
+	set @val, menu("저장할위치를 선택해주세요.", #now_map1$ , #now_map2$ , #now_map3$);
+	if(@val == 1){mes 1, "첫번째슬롯에 저장합니다.\\n(원래있던맵정보는 사라집니다.)"; set #now_map1$, get_mapname(); set #now_xs1, get_xs(); set #now_ys1, get_ys(); mes 1, "첫번째 슬롯에 저장되었습니다.";}
+	if(@val == 2){mes 1, "두번째슬롯에 저장합니다.\\n(원래있던맵정보는 사라집니다.)"; set #now_map2$, get_mapname(); set #now_xs2, get_xs(); set #now_ys2, get_ys(); mes 1, "두번째 슬롯에 저장되었습니다.";}
+	if(@val == 3){mes 1, "세번째슬롯에 저장합니다.\\n(원래있던맵정보는 사라집니다.)"; set #now_map3$, get_mapname(); set #now_xs3, get_xs(); set #now_ys3, get_ys(); mes 1, "세번째 슬롯에 저장되었습니다.";}
+	end;
+	}else if(@select == 2){
+	set @val, menu("이동하실맵을 선택해주세요.", #now_map1$ , #now_map2$ , #now_map3$);
+	if(@val == 1){
+	if(#now_map1$ == 0){mes 1, "맵지정이 안되있습니다."; end;}
+	set #return, #return+1;
+	warp #now_map1$, #now_xs1,#now_ys1;
+	if(#return >= 100){ item_del "리턴스크롤", 1; set #return, 0; mes 1, "리턴스크롤 100회를 다쓰셧습니다."; end;}
+	mes 1, "맵이동이 완료되었습니다.";
+	end;
+	}else if(@val == 2){
+	if(#now_map2$ == 0){mes 1, "맵지정이 안되있습니다."; end;}
+	set #return, #return+1;
+	warp #now_map2$, #now_xs2,#now_ys2;
+	if(#return >= 100){ item_del "리턴스크롤", 1; set #return, 0; mes 1, "리턴스크롤 100회를 다쓰셧습니다."; end;}
+	mes 1, "맵이동이 완료되었습니다.";
+	end;
+	}else if(@val == 3){
+	if(#now_map3$ == 0){mes 1, "맵지정이 안되있습니다."; end;}
+	set #return, #return+1;
+	warp #now_map3$, #now_xs3,#now_ys3;
+	if(#return >= 100){ item_del "리턴스크롤", 1; set #return, 0; mes 1, "리턴스크롤 100회를 다쓰셧습니다."; end;}
+	mes 1, "맵이동이 완료되었습니다.";
+	end;
+		}
+	}
+}
+
+0,0,0,0,0,0,0	원격체마사기	{
+	mes 1, "어디서든 체력&마력 을 사실수있습니다!";
+	set @select, menu("메뉴를 선택하십시오.", "체력사기", "마력사기");
+	if(@select == 1){
+		set @myid, get_myid();
+	if(#auto_hp == 1 || #auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+	input @auto_cnt, 1, "경험치를 파셔서 체력을살횟수를 적어주세요.", "", "", 255;
+	if(@auto_cnt <= 0){
+		mes 1, "제대로 입력해 주세요.";
+		end;
+	} else {
+		set #auto_hp, 1;
+		item_del "원격체마사기", 1;
+		while(@auto_cnt){
+			if(get_ac(@myid) != 100) {
+				set #auto_hp, 0;
+				mes 1," 무장해제하시고 다시시도 해주세요.";
+				end;
+			}
+			if(get_baseexp(@myid) >= get_basevita(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+				exp_del (get_basevita())*500;
+				set_basevita get_basevita(@myid) + 50;
+			} else {
+				set #auto_hp, 0;
+			 	mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+			set @auto_cnt, @auto_cnt-1;
+		}
+	}
+	set #auto_hp, 0;
+	end;
+	}else if(@select == 2){
+		set @myid, get_myid();
+	if(#auto_hp == 1 || #auto_mp == 1){
+		mes 1, "이미 경험치를 팔고 있습니다.";
+		end;
+	}
+	input @auto_cnt, 1, "경험치를 파셔서 마력을살 횟수를 적어주세요.", "", "", 255;
+	if(@auto_cnt <= 0){
+		mes 1, "제대로 입력해 주세요.";
+		end;
+	} else {
+		set #auto_mp, 1;
+		item_del "원격체마사기", 1;
+		while(@auto_cnt){
+	 		if(get_ac(@myid) != 100) {
+				set #auto_mp, 0;
+	 			mes 1," 무장해제하시고 다시시도 해주세요.";
+		 		end;
+		 	}
+			if(get_baseexp(@myid) >= get_basemana(@myid)*1 || get_baseexp(@myid) < 0 && get_baseexp(@myid) <= -2147483648){
+ 				exp_del (get_basemana())*500;
+		 		set_basemana get_basemana(@myid) + 25;
+	 		} else {
+				set #auto_mp, 0;
+	 			mes 1,"경험치가 부족합니다.";
+				break;
+			}
+			sleep(1);
+			set @auto_cnt, @auto_cnt-1;
+		}
+	}
+	set #auto_mp, 0;
+	end;
+	}
+}
+
+0,0,0,0,0,0,0	영월무기교환권	{
+	mes 1, "영월무기로 교환해드리겠습니다.";
+	set @select, menu("메뉴를 선택하십시오.", "영월도", "영월궁", "영월충", "비파", "돈파");
+	if(@select == 1){item_add "영월도", 1; item_del "영월무기교환권", 1; mes 1, "영월도로 교환해드렸습니다."; end;}
+	if(@select == 2){item_add "영월궁", 1; item_del "영월무기교환권", 1; mes 1, "영월궁으로 교환해드렸습니다."; end;}
+	if(@select == 3){item_add "영월충", 1; item_del "영월무기교환권", 1; mes 1, "영월충으로 교환해드렸습니다."; end;}
+	if(@select == 4){item_add "비파", 1; item_del "영월무기교환권", 1; mes 1, "비파로 교환해드렸습니다."; end;}
+	if(@select == 5){item_add "돈파", 1; item_del "영월무기교환권", 1; mes 1, "돈파로 교환해드렸습니다."; end;}
+}
+
+0,0,0,0,0,0,0	드래곤무기교환권	{
+	mes 1, "사기급무기인 드래곤무기로 교환해드립니다.";
+	mes 1, "{=q#경고#슬레이어는 격수용이고, 스태프는 비격수용입니다.\\n착오없이 직업에 맞게 사주셔야합니다.\\n만약잘못구입해도, 교환안해드립니다.";
+	set @select, menu("어느걸로 교환하시겠습니까?", "드래곤슬레이어(격수용)", "드래곤스태프(비격수용)");
+	if(@select == 1){item_add "드래곤슬레이어", 1; item_del "드래곤무기교환권", 1; mes 1, "드래곤슬레이어로 교환해드렸습니다."; end;}
+	if(@select == 2){item_add "드래곤스태프", 1; item_del "드래곤무기교환권", 1; mes 1, "드래곤스태프로 교환해드렸습니다."; end;}
+}
+
+0,0,0,0,0,0,0	팜팻토끼돋네	{
+	set @myid, get_myid();
+	set @title$, "팜팻이 무지 배고파보입니다.";
+	OPEN:
+	set @selec, menu(@title$, "너에게줄 풀은 어디서 구하니?", "풀을준다.");
+	if(@selec == 1){mes 1, "제가 먹을수있는 풀은 EG샵에서 파는 팜팻전용풀이예요!"; GOTO OPEN;}
+	if(@selec == 2){
+	if(item_exist(@myid, "팜팻전용풀") == 0){mes 1, "풀도 없으면서 ㅠ.ㅠ 배고파ㅠ.ㅠ"; GOTO OPEN;}
+	mes 1, "와우! 이건 귀하다는 풀아니예요! 감사합니다! 선물을 드릴게요!";
+	//나오는 템목록 생명의벨트, 생명의목걸이, 암흑의벨트, 암흑의목걸이, 생명의시약, 암흑의시약
+	//모든엠버종류 60개씩, 아기별의눈물 30개, 그레이조각, 어둠의결정20개씩,리젠트다이아귀걸이,강화된리젠트다이아귀걸이
+	//강화의장갑짝
+	RE:
+	set @rand, rand(1,16);
+	if(@rand <= 1){goto RE;}
+	if(@rand <= 8){mes 1, "생명의벨트가 나왔습니다!";item_add "생명의벨트", 1; item_del "팜팻전용풀", 1; broadcast 5, "{=c[" + get_name() + "]님이 팜펫에게 생명의벨트를 받았습니다!"; end;}
+	if(@rand <= 9){mes 1, "생명의목걸이가 나왔습니다!";item_add "생명의목걸이", 1; item_del "팜팻전용풀", 1; broadcast 5, "{=c[" + get_name() + "]님이 팜펫에게 생명의목걸이를 받았습니다!"; end;}
+	if(@rand <= 10){mes 1, "암흑의벨트가 나왔습니다!";item_add "암흑의벨트", 1; item_del "팜팻전용풀", 1; broadcast 5, "{=c[" + get_name() + "]님이 팜펫에게 암흑의벨트를 받았습니다!"; end;}
+	if(@rand <= 11){mes 1, "암흑의목걸이가 나왔습니다!";item_add "암흑의목걸이", 1; item_del "팜팻전용풀", 1; broadcast 5, "{=c[" + get_name() + "]님이 팜펫에게 암흑의목걸이를 받았습니다!"; end;}
+	if(@rand <= 3){mes 1, "아기별의눈물 30개가 나왔습니다!"; item_add "아기별의눈물", 30; item_del "팜팻전용풀", 1; end;}
+	if(@rand <= 4){mes 1, "바다,바람의엠버60개가 나왔습니다!";item_add "바람의엠버", 60; item_add "바다의엠버", 60; item_del "팜팻전용풀", 1; end;}
+	if(@rand <= 5){mes 1, "화염,대지의엠버60개가 나왔습니다!";item_add "대지의엠버", 60; item_add "화염의엠버", 60; item_del "팜팻전용풀", 1; end;}
+	if(@rand <= 7){mes 1, "그레이조각,어둠의결정60개가 나왔습니다!";item_add "그레이조각", 60; item_add "어둠의결정", 20; item_del "팜팻전용풀", 1; end;}
+	if(@rand <= 13){mes 1, "생명의시약1개가 나왔습니다!";item_add "생명의시약", 1; item_del "팜팻전용풀", 1; end;}
+	if(@rand <= 15){mes 1, "암흑의시약1개가 나왔습니다!";item_add "암흑의시약", 1; item_del "팜팻전용풀", 1; end;}
+	if(@rand <= 16){
+	RE2:
+	set @rand2, rand(1,15);
+	if(@rand2 <= 1){goto RE2;}
+	if(@rand2 == 15){mes 1, "리젠트다이아귀걸이가 나왔습니다!"; item_add "리젠트다이아귀걸이", 1; item_del "팜팻전용풀", 1; broadcast 5, "{=c[" + get_name() + "]님이 팜펫에게 리젠트다이아귀걸이를 받았습니다!"; end;}
+	if(@rand2 == 14){mes 1, "강화된리젠트다이아귀걸이가 나왔습니다!"; item_add "강화된리젠트다이아귀걸이", 1; item_del "팜팻전용풀", 1; broadcast 5, "{=c[" + get_name() + "]님이 팜펫에게 강화된리젠트다이아귀걸이를 받았습니다!"; end;}
+	if(@rand2 == 13){mes 1, "강화의장갑이 나왔습니다!"; item_add "강화의장갑", 1; item_del "팜팻전용풀", 1; broadcast 5, "{=c[" + get_name() + "]님이 팜펫에게 강화의장갑(짝)를 받았습니다!"; end;}
+	if(@rand2 <= 12){GOTO RE;}
+		}
+	}
+}
+
+0,0,0,0,0,0,0	택배서비스	{
+	set @myid, get_myid();
+	mes 1, "리치온라인 택배서비스 입니다.";
+	EXIT:
+	input @takba$, 1, "선물할 아이템이름을 써주세요.","","", 25;
+	if(@takba$ == "패스티발왕관"){mes 1, "왕관은 선물할수 없습니다."; end;}
+	if(@takba$ == "전직서"){mes 1, "전직서는 선물할수 없습니다."; end;}
+	if(@takba$ == "풀억경"){mes 1, "풀억경은 선물할수 없습니다."; end;}
+	if(item_exist(@myid, @takba$) == 0){mes 1, "" + @takba$ + "아이템을 소지하고있지 않으십니다."; goto EXIT;}
+	EXIT1:
+	input @name1$, 1, "아이템을 받을 유저이름을 써주세요.", "", "", 20;
+	set @target, get_user(@name1$);
+	if(!@target) {mes 1,"{=g" +  "존재하지 않는 유저입니다."; goto EXIT1;}
+	if(@target == @myid) {mes 1,"{=g" +  "자신에게는 택배를 보낼수 없습니다."; goto EXIT1;}
+	item_del "택배서비스", 1;
+	item_del @takba$, 1;	
+	item_add1 @target, @takba$, 1;
+	message1 @target ,3,"[" + get_name() + "]님께서" + @takba$ + "아이템을 보냈습니다.";
+	mes 1, "택배 보내기가 완료되었습니다.";
+	del @takba$;
+	del @target;
+}
+
+0,0,0,0,0,0,0	비파2	{
+	set @myid, get_myid();
+	set @select, menu("메뉴를 선택하십시오.", "사기체마", "그냥체마", "체마셋팅(필수)");
+	if(@select == 1){
+	set_basevita get_basevita(@myid) + "500000000";
+	set_basemana get_basemana(@myid) + "500000000";
+	mes 1, "사기세팅이 완료되었습니다.";
+	}
+	if(@select == 2){
+	set_basevita #myhps;
+	set_basemana #mymps;
+	mes 1, "기본세팅이 완료되었습니다.";
+	}
+	if(@select == 3){
+	set #myhps, get_basevita();
+	set #mymps, get_basemana();
+	mes 1, "체마세팅이 완료되었습니다.";
+	}
+}

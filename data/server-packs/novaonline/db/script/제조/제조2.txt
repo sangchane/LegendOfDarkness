@@ -1,0 +1,272 @@
+0,0,0,0,0,0,0	제조2	{
+RE:
+ set @rand, rand(1,100);
+ if(@rand <0) goto RE;
+		mes 1, "제작을 하고싶으신건가요?";
+
+		set @select, menu("제작할것을 선택하세요", "생명의벨트", "생명의목걸이", "암흑의벨트", "암흑의목걸이", "영월도[전사]", "영월궁[도적]", "영월충[법사]", "비파[직자]", "돈파[도가]");
+		if(@select == 1)
+		{
+		mes 1, "생명의벨트";
+		mes 1, "{=c생명의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+
+			item_del "생명의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "생명의벨트", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+
+	}else if(@select == 2){
+		mes 1, "생명의목걸이를 제작합니다";
+		mes 1, "{=c생명의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+
+			item_del "생명의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "생명의목걸이", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+	}else if(@select == 3){
+		mes 1, "암흑의벨트를 제작합니다";
+		mes 1, "{=c암흑의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+
+			item_del "암흑의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "암흑의벨트", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+	}else if(@select == 4){
+		mes 1, "암흑의목걸이를 제작합니다";
+		mes 1, "{=c암흑의시약1개,홀리팬플롯10개,뉴트의혀10개,뉴트의뿔10개,여의주20개";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "홀리팬플롯") >= 10 && item_exist(@myid, "뉴트의혀") >=10 && item_exist(@myid, "뉴트의뿔") >=10 && item_exist(@myid, "여의주") >= 20){
+
+			item_del "암흑의시약", 1;
+			item_del "홀리팬플롯", 10;
+			item_del "뉴트의혀", 10;
+			item_del "뉴트의뿔", 10;
+			item_del "여의주", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "암흑의목걸이", 1;
+		}
+		else
+		{
+			mes 1, "{=q 재료가 부족하네요";
+		}
+	}else if(@select == 5){
+		mes 1, "영월도를 제작합니다";
+		mes 1, "{=c암흑의시약1개,생명의시약1개,레드,블루,브론즈오피온의등껍질 각각20개,레드,블루,브론즈오피온의수염 각각20개 필요";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "레드오피온의등껍질") >=20 && item_exist(@myid, "블루오피온의등껍질") >=20 && item_exist(@myid, "브론즈오피온의등껍질") >=20 && item_exist(@myid, "레드오피온의수염") >=20 && item_exist(@myid, "블루오피온의수염") >=20 && item_exist(@myid, "브론즈오피온의수염") >=20){
+		if(@rand <= 30)	{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "영월도", 1;
+			broadcast 5, "[" + get_name() + "]{=c님이 영월도 제작에 성공하셨습니다!!";
+ 		legend_add 1, 145, "리치 1년, 여름 영월도 제작에 성공하다!!";
+		}else{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "{=q 제작을 실패하셨습니다ㅠㅠ";
+			broadcast 5, "[" + get_name() + "]{=q님이 영월도 제작을 실패하셨습니다ㅠㅠ";
+ 		legend_add 1, 246, "리치 1년, 여름 영월도를 제작에 실패하다ㅠㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 6){
+		mes 1, "영월궁을 제작합니다";
+		mes 1, "{=c암흑의시약1개,생명의시약1개,레드,블루,브론즈오피온의등껍질 각각20개,레드,블루,브론즈오피온의수염 각각20개 필요";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "레드오피온의등껍질") >=20 && item_exist(@myid, "블루오피온의등껍질") >=20 && item_exist(@myid, "브론즈오피온의등껍질") >=20 && item_exist(@myid, "레드오피온의수염") >=20 && item_exist(@myid, "블루오피온의수염") >=20 && item_exist(@myid, "브론즈오피온의수염") >=20){
+		if(@rand <= 30)	{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "영월궁", 1;
+			broadcast 5, "[" + get_name() + "]{=c님이 영월궁 제작에 성공하셨습니다!!";
+ 		legend_add 1, 145, "리치 1년, 여름 영월궁 제작에 성공하다!!";
+		}else{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "{=q 제작을 실패하셨습니다ㅠㅠ";
+			broadcast 5, "[" + get_name() + "]{=q님이 영월궁 제작을 실패하셨습니다ㅠㅠ";
+ 		legend_add 1, 246, "리치 1년, 여름 영월궁 제작에 실패하다ㅠㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 7){
+		mes 1, "영월충을 제작합니다";
+		mes 1, "{=c암흑의시약1개,생명의시약1개,레드,블루,브론즈오피온의등껍질 각각20개,레드,블루,브론즈오피온의수염 각각20개 필요";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "레드오피온의등껍질") >=20 && item_exist(@myid, "블루오피온의등껍질") >=20 && item_exist(@myid, "브론즈오피온의등껍질") >=20 && item_exist(@myid, "레드오피온의수염") >=20 && item_exist(@myid, "블루오피온의수염") >=20 && item_exist(@myid, "브론즈오피온의수염") >=20){
+		if(@rand <= 30)	{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "영월충", 1;
+			broadcast 5, "[" + get_name() + "]{=c님이 영월충 제작에 성공하셨습니다!!";
+ 		legend_add 1, 145, "리치 1년, 여름 영월충 제작에 성공하다!!";
+		}else{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "{=q 제작을 실패하셨습니다ㅠㅠ";
+			broadcast 5, "[" + get_name() + "]{=q님이 영월충 제작을 실패하셨습니다ㅠㅠ";
+ 		legend_add 1, 246, "리치 1년, 여름 영월충 제작에 실패하다ㅠㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 8){
+		mes 1, "비파를 제작합니다";
+		mes 1, "{=c암흑의시약1개,생명의시약1개,레드,블루,브론즈오피온의등껍질 각각20개,레드,블루,브론즈오피온의수염 각각20개 필요";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "레드오피온의등껍질") >=20 && item_exist(@myid, "블루오피온의등껍질") >=20 && item_exist(@myid, "브론즈오피온의등껍질") >=20 && item_exist(@myid, "레드오피온의수염") >=20 && item_exist(@myid, "블루오피온의수염") >=20 && item_exist(@myid, "브론즈오피온의수염") >=20){
+		if(@rand <= 30)	{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "비파", 1;
+			broadcast 5, "[" + get_name() + "]{=c님이 비파 제작에 성공하셨습니다!!";
+ 		legend_add 1, 145, "리치 1년, 여름 비파 제작에 성공하다!!";
+		}else{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "{=q 제작을 실패하셨습니다ㅠㅠ";
+			broadcast 5, "[" + get_name() + "]{=q님이 비파 제작을 실패하셨습니다ㅠㅠ";
+ 		legend_add 1, 246, "리치 1년, 여름 비파 제작에 실패하다ㅠㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+	}else if(@select == 9){
+		mes 1, "돈파를 제작합니다";
+		mes 1, "{=c암흑의시약1개,생명의시약1개,레드,블루,브론즈오피온의등껍질 각각20개,레드,블루,브론즈오피온의수염 각각20개 필요";
+		mes 1, "재료를 확인중입니다";
+		set @myid, get_myid();
+if(item_exist(@myid, "암흑의시약") >= 1 && item_exist(@myid, "생명의시약") >= 1 && item_exist(@myid, "레드오피온의등껍질") >=20 && item_exist(@myid, "블루오피온의등껍질") >=20 && item_exist(@myid, "브론즈오피온의등껍질") >=20 && item_exist(@myid, "레드오피온의수염") >=20 && item_exist(@myid, "블루오피온의수염") >=20 && item_exist(@myid, "브론즈오피온의수염") >=20){
+		if(@rand <= 30)	{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "제작중";
+			mes 1, "{=c제작을 성공하셨습니다!!";
+			item_add "돈파", 1;
+			broadcast 5, "[" + get_name() + "]{=c님이 돈파 제작을 성공하셨습니다!!";
+ 		legend_add 1, 145, "리치 1년, 여름 돈파 제작에 성공하다!!";
+		}else{
+			item_del "암흑의시약", 1;
+			item_del "생명의시약", 1;
+			item_del "레드오피온의등껍질", 20;
+			item_del "블루오피온의등껍질", 20;
+			item_del "브론즈오피온의등껍질", 20;
+			item_del "레드오피온의수염", 20;
+			item_del "블루오피온의수염", 20;
+			item_del "브론즈오피온의수염", 20;
+			mes 1, "{=q 제작을 실패하셨습니다ㅠㅠ";
+			broadcast 5, "[" + get_name() + "]{=q님이 돈파 제작에 실패하셨습니다ㅠㅠ";
+ 		legend_add 1, 246, "리치 1년, 여름 돈파 제작에 실패하다ㅠㅠ";
+		}
+		}else{
+			mes 1, "{=q 재료가 부족하네요...";
+		}
+}
+	del @select;
+}

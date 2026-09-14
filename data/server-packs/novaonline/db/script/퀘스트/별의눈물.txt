@@ -1,0 +1,84 @@
+0,0,0,0,0,0,0	눈물교환	{
+	mes 1, "저는 아기별의눈물을 별셋아이템의 한부위로 교환해드리고있습니다.";
+	mes 1, "{=q아기별의눈물 10개로 한부위를 교환할수있습니다.";
+		set @select, menu("뭐로교환하시겠습니까?","별귀걸이", "별목걸이", "별각반", "별벨트", "별장갑", "별반지");
+		if(@select == 1){
+		set @myid, get_myid();
+		if(item_exist(@myid, "아기별의눈물") >= 10){
+			item_del "아기별의눈물", 10;
+			mes 1, "아기별의눈물이 확인됬습니다.";
+			item_add "별귀걸이", 1;
+			mes 1, "별귀걸이가 완성되었습니다.";
+		}
+		else
+		{
+		mes 1, "아기별의눈물이 없습니다.";
+		}
+}
+		if(@select == 2){
+		set @myid, get_myid();
+		if(item_exist(@myid, "아기별의눈물") >= 10){
+			item_del "아기별의눈물", 10;
+			mes 1, "아기별의눈물이 확인됬습니다.";
+			item_add "별목걸이", 1;
+			mes 1, "별목걸이가 완성되었습니다.";
+		}
+		else
+		{
+		mes 1, "아기별의눈물이 없습니다.";
+		}
+}
+		if(@select == 3){
+		set @myid, get_myid();
+		if(item_exist(@myid, "아기별의눈물") >= 10){
+			item_del "아기별의눈물", 10;
+			mes 1, "아기별의눈물이 확인됬습니다.";
+			item_add "별각반", 1;
+			mes 1, "별귀걸이가 완성되었습니다.";
+		}
+		else
+		{
+		mes 1, "아기별의눈물이 없습니다.";
+		}
+}
+		if(@select == 4){
+		set @myid, get_myid();
+		if(item_exist(@myid, "아기별의눈물") >= 10){
+			item_del "아기별의눈물", 10;
+			mes 1, "아기별의눈물이 확인됬습니다.";
+			item_add "별벨트", 1;
+			mes 1, "별귀걸이가 완성되었습니다.";
+		}
+		else
+		{
+		mes 1, "아기별의눈물이 없습니다.";
+		}
+}
+		if(@select == 5){
+		set @myid, get_myid();
+		if(item_exist(@myid, "아기별의눈물") >= 10){
+			item_del "아기별의눈물", 10;
+			mes 1, "아기별의눈물이 확인됬습니다.";
+			item_add "별장갑", 1;
+			mes 1, "별귀걸이가 완성되었습니다.";
+		}
+		else
+		{
+		mes 1, "아기별의눈물이 없습니다.";
+		}
+}
+		if(@select == 6){
+		set @myid, get_myid();
+		if(item_exist(@myid, "아기별의눈물") >= 10){
+			item_del "아기별의눈물", 10;
+			mes 1, "아기별의눈물이 확인됬습니다.";
+			item_add "별반지", 1;
+			mes 1, "별귀걸이가 완성되었습니다.";
+		}
+		else
+		{
+		mes 1, "아기별의눈물이 없습니다.";
+		}
+}
+	del @select;
+}

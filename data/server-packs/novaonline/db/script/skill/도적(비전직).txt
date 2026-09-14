@@ -1,0 +1,177 @@
+0,0,0,0,0,0,0	SKILL_찌르기	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @damage, ((get_dex(@myid))) + 51;
+	if(enare(@myid,1)) set @damage, @damage + 8;
+	skill_delay 2;
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(!@target){
+		if(istype(get_front_char(@myid)) == 3 && get_map_pk()){
+			set @target, get_front_char(@myid);
+			char_damaged @target, @damage, @damage;
+			motion 135, 20;
+			effect @target, 0, 26, 100;
+			game_sound 7, 0;
+		}
+	}else{
+		damaged @target, @damage;
+		motion 135, 20;
+		effect @target, 0, 26, 100;
+		game_sound 7, 0;
+	}
+}
+
+0,0,0,0,0,0,0	SPELL_하이드	{
+ set @myid, get_myid();
+ if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다.";end;}
+ hide @myid, 20;
+ set #now_map5$, get_mapname();
+ sleep 1000;
+ set #now_xs5, get_xs();
+ set #now_ys5, get_ys();
+ warp #now_map5$, #now_xs5,#now_ys5;
+}
+
+0,0,0,0,0,0,0	SPELL_하이드1	{
+ set @myid, get_myid();
+ hide @myid, 20;
+ set #now_map5$, get_mapname();
+ sleep 1000;
+ set #now_xs5, get_xs();
+ set #now_ys5, get_ys();
+ warp #now_map5$, #now_xs5,#now_ys5;
+}
+
+0,0,0,0,0,0,0	SKILL_찔러휘비기	{	
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @damage, ((get_dex(@myid))) + 69;
+	if(enare(@myid,1)) set @damage, @damage + 18;
+	skill_delay 3;
+	if(!@target) {
+		if(istype(get_front_char(@myid)) == 3 && get_map_pk()) {
+			set @target, get_front_char(@myid);
+			char_damaged @target, @damage, @damage;
+			motion 135, 20;
+			effect @target, 0, 119, 50;
+			game_sound 69, 0;
+			end;
+		} else {
+			message 3, "실패했습니다.";
+			end;
+		}
+	} else {
+		damaged @target, @damage;
+			motion 135, 20;
+			effect @target, 0, 119, 50;
+			game_sound 69, 0;
+		end;
+	}
+}
+
+
+0,0,0,0,0,0,0	SKILL_두번찌르기	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @damage, ((get_dex(@myid))) + 157;
+	if(enare(@myid,1)) set @damage, @damage + 24;
+	skill_delay 4;
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(!@target){
+		if(istype(get_front_char(@myid)) == 3 && get_map_pk()){
+			set @target, get_front_char(@myid);
+			char_damaged @target, @damage, @damage;
+			motion 135, 20;
+			effect @target, 0, 120, 85;
+			game_sound 69, 0;
+		}
+	}else{
+		damaged @target, @damage;
+		motion 135, 20;
+		effect @target, 0, 120, 85;
+		game_sound 69, 0;
+	}
+}
+
+
+0,0,0,0,0,0,0	SKILL_습격	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @damage, ((get_dex(@myid))) * 200;
+	if(get_hide(@myid)) set @damage, @damage * 2;
+	if(enare(@myid,1)) set @damage, @damage + 53;
+	if(rand(1,100) > 75){set @damage, @damage * 10; message 3, "크리티컬!";}
+	skill_delay 8;
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	if(!@target){
+		if(istype(get_front_char(@myid)) == 3 && get_map_pk()){
+			set @target, get_front_char(@myid);
+			char_damaged @target, @damage, @damage;
+			motion 135, 20;
+ 			effect @target, 0, 15, 100;
+			game_sound 70, 0;
+		}
+	}else{
+		damaged @target, @damage;
+		motion 135, 20;
+ 		effect @target, 0, 15, 100;
+		game_sound 70, 0;
+	}
+}
+
+0,0,0,0,0,0,0	SKILL_암살격	{
+	set @myid, get_myid();
+	set @target, skill_target();
+	set @damage, ((get_vita(@myid))) * 3;
+	if(get_hide(@myid)) set @damage, @damage * 2;
+	skill_delay 7;
+	if(!@target){
+		if(istype(get_front_char(@myid)) == 3 && get_map_pk()){
+			set @target, get_front_char(@myid);
+			char_damaged @target, @damage, @damage;
+			set_vital get_basevita(@myid)/100*2;
+			motion 135, 20;
+			effect @target, 0, 53, 75;
+			game_sound 17, 0;
+		}
+	}else{
+		damaged @target, @damage;
+		set_vital get_basevita(@myid)/100*2;
+		motion 135, 20;
+		effect @target, 0, 53, 75;
+		game_sound 17, 0;
+	}
+}
+
+0,0,0,0,0,0,0	SKILL_센스	{
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	sense_user();
+}
+
+0,0,0,0,0,0,0	SKILL_센스몬스터	{
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	sense_monster();
+	}
+
+0,0,0,0,0,0,0	SKILL_품뒤져보기	{
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	sense_item();
+}
+
+0,0,0,0,0,0,0	SPELL_아들레스투	{
+	if(get_mapname() == "OX퀴즈장"){message 3, "이벤트공간에서는 사용이불가능합니다."; end;}
+	item_info();
+}
+
+0,0,0,0,0,0,0	SKILL_적갑옷해체	{
+	skill_delay 13;
+	set @myid, get_myid();
+	if(!get_map_pk()){message 3, "PK가 가능한 장소에서만 시전가능합니다."; end;}
+	set @target, get_front_char(@myid);
+	set @type, istype(@target);
+	if(@type == 3){
+		message 3, "적갑옷해체를 시전하셧습니다.";
+		arm_del @target;
+		motion 129, 20;
+	}
+}
