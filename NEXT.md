@@ -1,7 +1,7 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[지금/한글화]** **아이템 한글 이름 — 규칙이 섰고 136개가 정해졌다.** `docs/pack-comparison.md` · 후보 전체 `data/pack-compare/item-korean-names.json`(`한글이름` 칸이 채워진 것). 규칙 셋: 그림 번호는 **부위마다 따로** 매겨지니 부위가 같을 때만 잇고, 장비/소모품은 **내구력**으로 가르고, 접사는 **무엇을 올려 주는가**로 짝짓는다(로오=Luathas · 이아=Glioca · 세토아=Ceannlaidir · 메투스=Cail · 셔스=Fiosachd · **칸=Gramail**, 축복/풍요/체력/마법=Blessed/Abundance/Might/Magic). **막힌 둘**: `세오`·`뮤레칸` ↔ `Deoch`·`Sgrios` 를 못 가렸고, 방패(slot 3)가 팩의 어느 속성인지 모른다. `CONFLICT` 291 은 대부분 재질만 다른 같은 그림이라 **묶음 이름**으로 봐야 한다. **괴물 수치는 팩에서 못 가져온다**(이름이 셋 다 같은 22마리의 체력·공격력·경험치 0/22 일치)
+- **[지금/한글화]** **아이템 한글 이름 — 규칙은 섰지만 자동으로 붙이면 안 된다.** `docs/pack-comparison.md`. 규칙 셋(부위별 그림 번호 · 내구력으로 장비 가르기 · 접사는 효과로 짝짓기)으로 136개가 좁혀졌는데, **이름이 겹치지 않는 것은 10개뿐**이고(템플릿은 이름이 열쇠라 겹치면 아이템이 사라진다) 그 10개도 넣어 보니 절반이 틀렸다(`Loures Signet Ring→로오의반지`). 되돌렸다. **다음은 사람이 고르는 일이다** — `data/pack-compare/한글이름-검토.tsv` 426줄에서 `제안` 을 확인/수정한 뒤 `python3 scripts/write-hades-items.py --write --korean`. 접사 짝: 로오=Luathas · 이아=Glioca · 세토아=Ceannlaidir · 메투스=Cail · 셔스=Fiosachd · **칸=Gramail** · 축복/풍요/체력/마법=Blessed/Abundance/Might/Magic. `세오`·`뮤레칸`(↔Deoch·Sgrios)은 가릴 근거가 없어 비워 뒀다
 - **[지금/이식]** **10단계 스모크 — 사람이 한 번 돌아본다.** 0~9 가 다 끝났다: 맵 801 · 워프 909 · 아이템 992 · 괴물 568 · NPC 94(상점 10 포함) · 기술 258 · 마법 329 · 월드맵 24노드, 오류 0, 시험 70개(전투 2개 포함). 접속 → 워프 두 번 → 월드맵 → 사냥 한 마리 → NPC 대화 → **상점에서 하나 사기** → 기술 쓰기 → 재접속해 소지품 확인
 
 - **[지금/이름]** **기술·마법 한글 이름.** 인덱스 "기술·마법" 탭에서 직업별로 보며 채우면 된다(아이콘 붙어 있음). 채운 뒤 **표로 내보내기** → `data/기술마법-한글이름.tsv` 에 붙여 넣고 `python3 tools/pack-import/import.py --kind skills --write`(그리고 `--kind spells`)

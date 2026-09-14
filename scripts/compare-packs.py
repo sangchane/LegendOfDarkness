@@ -255,6 +255,23 @@ def hades_item_korean_names():
     return rows, dict(tally)
 
 
+def write_review_sheet(rows):
+    """사람이 고르는 자리. 그림으로 이은 짝은 뜻이 틀릴 수 있어 **눈으로 한 번** 봐야 한다.
+
+    `제안` 은 규칙이 하나로 좁힌 것이고, `후보` 는 같은 그림·같은 부위에 있던 다른 이름이다.
+    맞으면 그대로 두고, 틀리면 `후보` 에서 골라 `제안` 자리에 적는다.
+    """
+    head = ["영문", "부위", "요구레벨", "제안", "후보", "등급"]
+    lines = ["\t".join(head)]
+    for r in sorted(rows, key=lambda x: (not x["한글이름"], str(x["착용자리"]), x["영문"])):
+        if r["등급"] == "NONE":
+            continue
+        cand = sorted({n for v in r["한글후보"].values() for n in v} - {r["한글이름"]})
+        lines.append("\t".join([r["영문"], str(r["착용자리"]), str(r["요구레벨"]),
+                                r["한글이름"] or "", " · ".join(cand[:12]), r["등급"]]))
+    (OUT / "한글이름-검토.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     summary = {"팩": packs(),
@@ -265,6 +282,7 @@ def main():
     summary["Hades 아이템 한글 이름"] = tally
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
     (OUT / "item-korean-names.json").write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
+    write_review_sheet(rows)
 
     print(f"팩 {len(packs())}개: {' · '.join(packs())}")
     for kind, o in summary["갈래별 겹침"].items():
