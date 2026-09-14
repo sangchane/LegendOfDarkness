@@ -56,3 +56,41 @@ class PlaceholderNameTest(unittest.TestCase):
     def test_real_item_names_survive(self):
         self.assertFalse(MODULE.is_placeholder("가죽각반"))
         self.assertFalse(MODULE.is_placeholder("가죽각반(Lev3)"))
+
+
+class AffixNarrowingTest(unittest.TestCase):
+    def test_english_affix_vocabulary_comes_from_the_data(self):
+        items = [{"Name": "Iron Greaves", "Image": 250},
+                 {"Name": "Cail Iron Greaves", "Image": 250},
+                 {"Name": "Deoch Iron Greaves", "Image": 250},
+                 {"Name": "Cail Leather Greaves", "Image": 250},
+                 {"Name": "Leather Greaves", "Image": 250},
+                 {"Name": "Cail Bracer", "Image": 227},
+                 {"Name": "Bracer", "Image": 227}]
+        self.assertEqual(MODULE.english_affixes(items), {"Cail"})
+
+    def test_korean_affix_needs_its_base_on_the_same_image(self):
+        siblings = {"동각반", "칸의동각반", "정의의검"}
+        self.assertEqual(MODULE.split_ko("칸의동각반", siblings), ("칸", "동각반"))
+        self.assertEqual(MODULE.split_ko("정의의검", siblings), (None, "정의의검"))
+
+    def test_unmapped_english_affix_gets_no_korean_name(self):
+        # Deoch·Sgrios 는 아직 한글 짝을 모른다. \"접사 없는 이름\" 으로 떨어뜨리면 틀린 짝이 된다.
+        cand = {"novaonline": ["동각반", "칸의동각반"]}
+        self.assertEqual(MODULE.narrow_by_affix(cand, "Deoch Iron Greaves", {"Deoch", "Gramail"}), {})
+
+    def test_plain_english_name_keeps_only_the_plain_korean_name(self):
+        cand = {"novaonline": ["동각반", "칸의동각반"]}
+        self.assertEqual(MODULE.narrow_by_affix(cand, "Iron Greaves", {"Gramail"}),
+                         {"novaonline": ["동각반"]})
+
+    def test_mapped_affix_keeps_only_that_variant(self):
+        cand = {"novaonline": ["동각반", "칸의동각반"]}
+        self.assertEqual(MODULE.narrow_by_affix(cand, "Gramail Iron Greaves", {"Gramail"}),
+                         {"novaonline": ["칸의동각반"]})
+
+    def test_durability_separates_gear_from_supplies(self):
+        self.assertTrue(MODULE.wearable_pack({"내구력": "6000"}))
+        self.assertFalse(MODULE.wearable_pack({}))              # 동전·설탕에는 내구력이 없다
+        self.assertTrue(MODULE.wearable_hades({"MaxDurability": 3000}))
+        self.assertFalse(MODULE.wearable_hades({"MaxDurability": 0}))

@@ -128,10 +128,10 @@
   }
  },
  "Hades 아이템 한글 이름": {
-  "EXTRACTED_SINGLE": 52,
-  "NONE": 139,
-  "PACK_CONSENSUS": 215,
-  "CONFLICT": 571,
-  "SAME_LINEAGE": 1
+  "NONE": 551,
+  "CONFLICT": 291,
+  "EXTRACTED_SINGLE": 67,
+  "PACK_CONSENSUS": 69,
+  "한글 이름이 하나로 정해졌다": 136
  }
 }
