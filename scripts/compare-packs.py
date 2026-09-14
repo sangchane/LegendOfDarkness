@@ -192,6 +192,39 @@ def overlap(key):
             "이름만 같고 그림이 다르다": sorted(common - same_image)[:20]}
 
 
+# 운영자가 만지는 칸과 안 만지는 칸은 갈린다. 이름이 같은 것끼리 칸을 맞춰 보면 드러난다 —
+# 정체성(그림·부위·직업·성별)은 그대로 두고 균형(공격력·방어력·스탯·가격)만 고친다.
+IDENTITY = ("이미지", "착용이미지", "타입", "속성", "직업제한", "성별제한", "공격모션", "수리여부")
+
+
+def field_agreement(key="items"):
+    """같은 이름끼리 칸별로 몇 개나 값이 같은지. 무엇을 팩에서 가져와도 되는지가 여기서 갈린다."""
+    per = {}
+    for pack in packs():
+        d = {}
+        for e in load(pack, key):
+            d.setdefault(e["이름"], e.get("fields", {}))
+        per[pack] = d
+    if not per:
+        return {}, []
+    common = sorted(set.intersection(*(set(v) for v in per.values())))
+    have, same = defaultdict(int), defaultdict(int)
+    pure = []
+    for n in common:
+        fs = [per[p][n] for p in per]
+        for k in {k for f in fs for k in f} - {"이름"}:
+            if all(k in f for f in fs):
+                have[k] += 1
+                if len({str(f[k]) for f in fs}) == 1:
+                    same[k] += 1
+        ident = [k for k in IDENTITY if all(k in f for f in fs)]
+        if ident and all(len({str(f[k]) for f in fs}) == 1 for k in ident):
+            pure.append(n)
+    rate = {k: {"맞은 수": same[k], "견줄 수": have[k]} for k in have if have[k] >= 20}
+    return {"이름이 모두 겹친다": len(common), "칸별": rate,
+            "정체성 칸이 모두 같다": len(pure)}, sorted(pure)
+
+
 def map_overlap():
     """맵은 이름이 아니라 맵파일 번호가 신원이다. 팩마다 제 맵을 만들어 넣어서 겹치는 것이 적다."""
     per = defaultdict(lambda: defaultdict(set))
@@ -278,6 +311,9 @@ def main():
                "갈래별 겹침": {k: overlap(k) for k in ("mobs", "items", "npcs", "skills", "spells")},
                "맵 겹침": map_overlap(),
                "괴물 수치 합의": mob_stat_agreement()}
+    agreement, pure = field_agreement()
+    summary["아이템 칸별 합의"] = agreement
+    (OUT / "순정후보-아이템.json").write_text(json.dumps(pure, ensure_ascii=False, indent=1), encoding="utf-8")
     rows, tally = hades_item_korean_names()
     summary["Hades 아이템 한글 이름"] = tally
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -295,6 +331,16 @@ def main():
     print(f"\n괴물 {m['이름이 모두 겹치는 괴물']}마리는 이름이 모두 겹친다. 그런데 수치는:")
     for f, n in m["칸별 일치"].items():
         print(f"  {f:8s} {n:3d}/{m['이름이 모두 겹치는 괴물']} 일치")
+    a = summary["아이템 칸별 합의"]
+    print("")
+    print(f"이름이 같은 아이템 {a['이름이 모두 겹친다']}개 — 칸이 실제로 맞는 비율")
+    ranked = sorted(a["칸별"].items(), key=lambda kv: kv[1]["맞은 수"] / kv[1]["견줄 수"])
+    for k, v in ranked[-6:][::-1]:
+        print(f"   믿을 만 {k:8s} {v['맞은 수']:4d}/{v['견줄 수']:4d}")
+    for k, v in ranked[:6]:
+        print(f"   못 믿을 {k:8s} {v['맞은 수']:4d}/{v['견줄 수']:4d}")
+    print(f"   정체성 칸이 셋 다 같은 것 {a['정체성 칸이 모두 같다']}개"
+          " → data/pack-compare/순정후보-아이템.json")
     print("\nHades 아이템에 붙일 한글 이름:")
     for g, n in sorted(tally.items(), key=lambda kv: -kv[1]):
         print(f"  {g:17s} {n:4d}")
