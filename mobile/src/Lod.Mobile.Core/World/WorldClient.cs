@@ -54,6 +54,9 @@ public sealed class WorldClient(WorldSession session)
     private const byte DialogueCommand = 0x2F;
     private const byte ClickBySerial = 0x01;
 
+    /// <summary>Spending one of the points a level handed out. One byte: which attribute.</summary>
+    private const byte RaiseCommand = 0x47;
+
     /// <summary>Picking something up off the floor. A pack slot to aim at, then the tile.</summary>
     private const byte PickUpCommand = 0x07;
 
@@ -495,6 +498,17 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public Task MoveAsync(int from, int to, CancellationToken cancellationToken) =>
         Send(MoveCommand, [InventoryPane, (byte)from, (byte)to], cancellationToken);
+
+    /// <summary>
+    /// Spends one of the points a level handed out, on one attribute.
+    /// </summary>
+    /// <remarks>
+    /// The server refuses with a message and changes nothing when there are no points left
+    /// (<c>Format47Handler</c>), so asking too often costs nothing but the packet. It answers a successful
+    /// spend with the whole of our numbers, which is how the new maximum health arrives.
+    /// </remarks>
+    public Task RaiseAsync(Stat which, CancellationToken cancellationToken) =>
+        Send(RaiseCommand, [(byte)which], cancellationToken);
 
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>

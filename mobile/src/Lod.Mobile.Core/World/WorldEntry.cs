@@ -110,6 +110,38 @@ public sealed record Vitals(
 }
 
 /// <summary>What kind of thing the server is showing, which decides how the rest of it is read.</summary>
+/// <summary>
+/// One of the five attributes, numbered the way the raise-a-stat packet numbers them.
+/// </summary>
+/// <remarks>
+/// Named <c>Stat</c> rather than <c>Attribute</c>, which is what the server calls it: an enum called
+/// <c>Attribute</c> collides with <c>System.Attribute</c> in every file that has both namespaces open,
+/// and the error it gives is about ambiguity rather than about the collision.
+/// </remarks>
+/// <remarks>
+/// A level hands out <c>StatsPerLevel</c> points and each of these spends one. The numbers are flags in
+/// the original and the server tests them as flags (<c>Format47Handler</c>), but it only ever spends one
+/// point per packet, so sending two at once raises two attributes for the price of one — which is why
+/// nothing here combines them.
+/// </remarks>
+public enum Stat : byte
+{
+    /// <summary>Strength. Most of what a blow is worth comes from here.</summary>
+    Str = 0x01,
+
+    /// <summary>Dexterity.</summary>
+    Dex = 0x02,
+
+    /// <summary>Intelligence.</summary>
+    Int = 0x04,
+
+    /// <summary>Wisdom. Maximum mana grows by this at every level.</summary>
+    Wis = 0x08,
+
+    /// <summary>Constitution. Maximum health grows by this at every level.</summary>
+    Con = 0x10,
+}
+
 public enum CreatureKind
 {
     /// <summary>A monster. It fights.</summary>

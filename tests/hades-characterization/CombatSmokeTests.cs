@@ -24,35 +24,47 @@ namespace Lod.Hades.Characterization.Tests;
 /// </para>
 /// <para>
 /// Both directions are here because the numbers come from opposite places. Ours come from the five
-/// attributes (<c>scripts/Skills/Assail.cs</c>); a monster's come from its level and nothing else
-/// (<c>scripts/Formulas/damage.cs</c>) — its template says nothing about how hard it hits, and the health
-/// written in its template is thrown away on the way in.
+/// attributes (<c>scripts/Skills/Assail.cs</c>); a monster's come out of its definition file. The health
+/// and armour it stands up with are the <c>MaximumHP</c> and <c>Ac</c> written there
+/// (<c>scripts/Creations/monsters.cs</c>), and its blow is rolled between the <c>DmgMin</c> and
+/// <c>DmgMax</c> written there (<c>scripts/Formulas/damage.cs</c>) — the level formulas only fill in a
+/// definition that left those out, or one that grows — so the prediction reads the file rather than
+/// working anything out.
 /// </para>
 /// </remarks>
 public sealed class CombatSmokeTests : IDisposable
 {
     /// <summary>
-    /// 지하수로D-2 — 20x20 with seven monster definitions on it, all of level one.
+    /// 우드랜드1-1 — five monster definitions, all of level one, with 115 to 240 health and blows of one to
+    /// seven. The ground a fresh character is meant to start on.
     /// </summary>
     /// <remarks>
-    /// Chosen for the spawner rather than for the scenery. It tries each definition once and then makes
-    /// that definition wait out its twenty-second <c>SpawnRate</c> — <b>even when the attempt failed</b>,
-    /// because it picks the tile at random and spends the attempt whether or not the tile is wall. So a room
-    /// with two definitions offers two tries a minute and often stands empty; seven on a map small enough
-    /// that everything is in sight fills up in seconds. All seven are level one, which
-    /// <see cref="LevelInTheRoom" /> insists on: the prediction is worked out from the level.
+    /// Chosen because it is the one place the numbers can be measured. This used to be 지하수로D-2, whose
+    /// seven definitions were all level one too, back when the server made a monster's health and blows out
+    /// of its level and threw the file's numbers away. Now the file wins, and those seven are written with
+    /// 17,550 health and blows of 170 to 210 — a character with 150 health dies to the first one, and our
+    /// own blow moves a bar that size by one per cent. Here a blow takes off a quarter of the smallest
+    /// definition and the monster's answer leaves us standing. The zone is sixty by sixty, so rather than
+    /// wait for something to wander into sight <see cref="StandOneAtTheDoor" /> puts one definition on the
+    /// tile ahead of us and lets nothing else stand up.
     /// </remarks>
-    private const int MonsterRoom = 20686;
+    private const int MonsterRoom = 20015;
+
+    /// <summary>The entrance of 우드랜드1-1, and the tile it faces — where the one monster is stood.</summary>
+    private static readonly Tile Start = new(2, 35);
+
+    private static readonly Tile TargetTile = new(2, 34);
+
+    /// <summary><c>SpawnQualifer.Defined</c> — stand where the definition says, not on a random tile.</summary>
+    private const int SpawnDefined = 4;
 
     private const string Name = "smokefight";
 
     /// <summary>
-    /// Numbers out of <c>LoruleConfig.json</c> that the formulas read. Changing one of these changes what
-    /// every blow in the world is worth, and this test is what says so out loud.
+    /// A number out of <c>LoruleConfig.json</c> that the formulas read. Changing it changes what every blow
+    /// from behind in the world is worth, and this test is what says so out loud.
     /// </summary>
     private const double BehindDamageMod = 0.45;
-
-    private const double BaseDamageMod = 60;
 
     /// <summary>What neither side having an element is worth (<c>scripts/Formulas/elements.cs</c>).</summary>
     private const double NoElementEither = 0.50;
@@ -106,12 +118,10 @@ public sealed class CombatSmokeTests : IDisposable
         Assert.Equal(Element.None, me.Defense);
         Assert.Empty(world.Worn);
 
-        int level = LevelInTheRoom(server);
-        int health = MonsterHealth(level);
-        int armor = MonsterArmor(level);
+        (int level, int health, int armor) = TheOnlyMonsterInTheRoom(server);
 
         // 등 뒤에서 때렸는지는 서버가 정한다(괴물이 나와 같은 쪽을 볼 때). 우리는 고를 수 없으니 둘 다
-        // 세워 두고, 앞에서 때린 값이 한 번은 나올 때까지 때린다 — 등 뒤는 1레벨 괴물을 한 방에 죽인다.
+        // 세워 두고, 앞에서 때린 값이 한 번은 나올 때까지 때린다.
         await SwingUntil(world, enough: () => FirstBlows(world, me, health, armor)
             .Any(blow => blow.Left == blow.InFront));
 
@@ -146,7 +156,7 @@ public sealed class CombatSmokeTests : IDisposable
         Assert.Equal(Element.None, me.Defense);
         Assert.True(me.MaximumHealth > 0, "서버가 내 최대 체력을 0 이라고 합니다.");
 
-        int level = LevelInTheRoom(server);
+        (int least, int most) = TheOnlyMonstersBlow(server);
 
         (int Drop, Vitals Then)? hit = await HitBack(world);
 
@@ -155,11 +165,18 @@ public sealed class CombatSmokeTests : IDisposable
             $"않고는 괴물의 공격력을 확인할 수 없습니다.{Environment.NewLine}{Said(world)}");
 
         (int drop, Vitals then) = hit.Value;
+        int[] possible = MonsterBlows(least, most, then.Armor);
 
-        Assert.True(MonsterDamage(level, then) == drop,
-            $"괴물에게 한 대 맞고 체력이 {drop}점 깎였습니다. 식대로라면 {MonsterDamage(level, then)}점 " +
-            $"입니다 (맞기 전 {then.Health}/{then.MaximumHealth}, 괴물 수준 {level}, 내 수준 {then.Level}, " +
-            $"내 방어 {then.Armor}, 내 방어속성 {then.Defense}).{Environment.NewLine}{Said(world)}");
+        // 죽는 한 방은 남아 있던 체력만큼만 깎는다 — 그 값은 한 방의 값이 아니라 남은 체력이다.
+        // 지하수로D-2 에서 관측된 80점이 그것이었다 (81/150 에서 170~210짜리를 맞았다).
+        Assert.True(then.Health >= possible[^1],
+            $"맞기 전 체력이 {then.Health}점이라 가장 센 한 방({possible[^1]}점)에 죽습니다 — 깎인 점수가 남은 " +
+            $"체력에서 잘려 한 방의 값을 잴 수 없습니다.{Environment.NewLine}{Said(world)}");
+
+        Assert.True(possible.Contains(drop),
+            $"괴물에게 한 대 맞고 체력이 {drop}점 깎였습니다. 식대로라면 {string.Join(", ", possible)}점 " +
+            $"가운데 하나입니다 (정의의 한 방 {least}~{most}, 맞기 전 {then.Health}/{then.MaximumHealth}, " +
+            $"내 수준 {then.Level}, 내 방어 {then.Armor}, 내 방어속성 {then.Defense}).{Environment.NewLine}{Said(world)}");
     }
 
     /// <summary>
@@ -171,8 +188,9 @@ public sealed class CombatSmokeTests : IDisposable
     /// Standing still does not work on its own: half of what spawns is aggressive (<c>MoodType 4</c> is
     /// <c>Unpredicable</c>, which is a coin toss per monster) and the aggressive half only picks a target
     /// once we are within range of it. So this provokes one — <c>CommonMonster.OnDamaged</c> turns whatever
-    /// we hit aggressive and points it at us — and waits; a blow from behind kills the monster outright, so
-    /// some provocations are wasted and it tries again.
+    /// we hit aggressive and points it at us — and waits; the one at the door outlives a blow from behind now,
+    /// but a few provocations kill it, and whatever stands up in its place a second later has not been
+    /// provoked, so it tries again.
     /// </para>
     /// <para>
     /// Points, not the percentage, because two other things move our health and the percentage cannot tell
@@ -299,19 +317,18 @@ public sealed class CombatSmokeTests : IDisposable
     }
 
     /// <summary>
-    /// What one of a monster's swings must take off us. It swings the same Assail script we do, but through
-    /// the other half of it: a monster's blow comes out of <c>scripts/Formulas/damage.cs</c>, which reads
-    /// its level and the gap between that and ours — and nothing from its own template.
+    /// Everything one of a monster's swings can take off us. It swings the same Assail script we do, but
+    /// through the other half of it: a monster's blow comes out of <c>scripts/Formulas/damage.cs</c>, which
+    /// rolls a whole number between the <c>DmgMin</c> and <c>DmgMax</c> its definition writes — both ends
+    /// included, never below one — and only falls back to its level and the gap between that and ours for a
+    /// definition that wrote neither. The roll is the server's, so the answer is every value the roll can
+    /// reach through our armour rather than one.
     /// </summary>
-    private static int MonsterDamage(int monsterLevel, Vitals me)
-    {
-        int ahead = monsterLevel + 1 - me.Level;
-        double mod = ahead <= 0
-            ? monsterLevel * 0.1 * BaseDamageMod
-            : monsterLevel * 0.1 * (BaseDamageMod * ahead);
-
-        return Landed(Math.Max(1, Math.Abs((int)(mod + 1))), me.Armor);
-    }
+    private static int[] MonsterBlows(int least, int most, int myArmor) =>
+        [.. Enumerable.Range(least, most - least + 1)
+            .Select(raw => Landed(Math.Max(1, raw), myArmor))
+            .Distinct()
+            .Order()];
 
     /// <summary>The two things every blow goes through on the way in: the target's armour, then elements.</summary>
     /// <remarks>
@@ -338,22 +355,100 @@ public sealed class CombatSmokeTests : IDisposable
     private static int PercentLeft(int maximum, int taken) => PercentOf(maximum, maximum - taken);
 
     /// <summary>
-    /// <c>scripts/Creations/monsters.cs</c> — a monster's health is worked out from its level and nothing
-    /// else. Its template's own <c>MaximumHP</c> is overwritten on the way in, which is why a monster the
-    /// pack gave 17,550 health stands up with ninety-one.
+    /// The one monster the room is allowed to stand up, as its definition writes it — level, health and
+    /// armour read from the file rather than worked out, because the file is where the server reads them
+    /// from too. <c>scripts/Creations/monsters.cs</c> keeps a written <c>MaximumHP</c> and a written
+    /// <c>Ac</c>; the level formula only fills in a definition that left the health at zero, or one that
+    /// grows and so answers differently every time it spawns. Both are refused here rather than predicted.
     /// </summary>
-    private static int MonsterHealth(int level) => (int)((level + 1) * 0.01 + 50 + level * (level + 40));
+    private static (int Level, int Health, int Armor) TheOnlyMonsterInTheRoom(IsolatedHadesServer server)
+    {
+        JsonNode only = TheOnlyDefinitionInTheRoom(server);
 
-    /// <summary>Same file: armour starts at +70 and only improves with level, so low monsters are bare.</summary>
-    private static int MonsterArmor(int level) => (int)(70 - level * 0.5 / 1.0);
+        Assert.False((bool?)only["Grow"] ?? false, "자라는 정의는 설 때마다 수준이 올라 예측이 매번 달라집니다.");
+
+        int health = (int?)only["MaximumHP"] ?? 0;
+        Assert.True(health > 0, "체력이 안 적힌 정의는 서버가 수준으로 체력을 만듭니다 — 이 시험은 적힌 값을 봅니다.");
+
+        int? armor = (int?)only["Ac"];
+        Assert.True(armor is not null, "방어가 안 적힌 정의는 서버가 수준으로 방어를 만듭니다 — 이 시험은 적힌 값을 봅니다.");
+
+        return ((int?)only["Level"] ?? 1, health, armor.Value);
+    }
 
     /// <summary>
-    /// The level the monsters in the test room have, read from their templates rather than written down —
-    /// health, armour and how hard they hit all come out of it. Two levels in one room would make the
-    /// prediction ambiguous, and a growing template answers differently every time it spawns, so both are
-    /// refused here rather than quietly averaged.
+    /// The least and the most one swing of the only monster is written to be worth, before our armour: its
+    /// <c>DmgMin</c> and <c>DmgMax</c>, the smaller first whichever way round the file has them, which is
+    /// how <c>damage.cs</c> takes them. A definition that leaves them out is refused rather than predicted,
+    /// because the server would then make the blow out of the level instead.
     /// </summary>
-    private static int LevelInTheRoom(IsolatedHadesServer server)
+    private static (int Least, int Most) TheOnlyMonstersBlow(IsolatedHadesServer server)
+    {
+        JsonNode only = TheOnlyDefinitionInTheRoom(server);
+
+        int? least = (int?)only["DmgMin"];
+        int? most = (int?)only["DmgMax"];
+        Assert.True(least is not null && most is not null,
+            "한 방의 세기가 안 적힌 정의는 서버가 수준으로 피해를 만듭니다 — 이 시험은 적힌 값을 봅니다.");
+
+        return (Math.Min(least.Value, most.Value), Math.Max(least.Value, most.Value));
+    }
+
+    /// <summary>
+    /// The one definition the room is allowed to stand up. The room's five differ in health and in what a
+    /// blow is worth, so which one we hit decides the prediction. Only the definition
+    /// <see cref="StandOneAtTheDoor" /> made can spawn — the rest are left with <c>SpawnMax</c> zero — and
+    /// finding two that can is refused rather than quietly averaged.
+    /// </summary>
+    private static JsonNode TheOnlyDefinitionInTheRoom(IsolatedHadesServer server) =>
+        Assert.Single(
+            DefinitionsInTheRoom(server).Select(definition => definition.Template),
+            template => ((int?)template["SpawnMax"] ?? 0) > 0);
+
+    /// <summary>
+    /// Stands one of the zone's own monsters on the tile ahead of where we come in, and lets nothing else
+    /// in the zone stand up — so the body we hit is the definition the numbers were read from, and it is
+    /// there before we are.
+    /// </summary>
+    /// <remarks>
+    /// Left alone the zone is sixty by sixty and its five definitions differ in health, so whichever
+    /// wandered into us first would decide the prediction. The copy keeps every number this test is about
+    /// — health, armour, level — and changes only where and when it appears: <c>Defined</c> at
+    /// <see cref="TargetTile" />, one at a time, tried every second. The smallest of the five is the one
+    /// copied, so a blow moves its bar the most and even a blow from behind leaves it standing to be hit
+    /// again. The originals stay in place with <c>SpawnMax</c> zero rather than being deleted, so the room
+    /// is still made of the zone's own definitions. Same shape as <c>WoodlandHuntTests</c>.
+    /// </remarks>
+    private static void StandOneAtTheDoor(IsolatedHadesServer server)
+    {
+        JsonSerializerOptions indented = new() { WriteIndented = true };
+        (string Path, JsonNode Template)[] room = [.. DefinitionsInTheRoom(server)];
+
+        Assert.NotEmpty(room);
+
+        JsonNode target = room.MinBy(definition => (int?)definition.Template["MaximumHP"] ?? 0).Template.DeepClone();
+
+        foreach ((string path, JsonNode template) in room)
+        {
+            template["SpawnMax"] = 0;
+            File.WriteAllText(path, template.ToJsonString(indented));
+        }
+
+        // The name is changed so the spawner counts this one separately from the definition it was copied from.
+        target["Name"] = "전투시험표적";
+        target["SpawnType"] = SpawnDefined;
+        target["SpawnRate"] = 1;
+        target["SpawnMax"] = 1;
+        target["DefinedX"] = TargetTile.X;
+        target["DefinedY"] = TargetTile.Y;
+
+        string testFolder = Path.Combine(server.ContentLocation, "templates", "monsters", "characterization");
+        Directory.CreateDirectory(testFolder);
+        File.WriteAllText(Path.Combine(testFolder, "combat-smoke-target.json"), target.ToJsonString(indented));
+    }
+
+    /// <summary>Every monster definition the server will read for the test room, and where it lives.</summary>
+    private static IEnumerable<(string Path, JsonNode Template)> DefinitionsInTheRoom(IsolatedHadesServer server)
     {
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
 
@@ -363,21 +458,15 @@ public sealed class CombatSmokeTests : IDisposable
         Regex thisRoom = new($"\"AreaID\"\\s*:\\s*{MonsterRoom}\\b");
         JsonDocumentOptions lenient = new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip };
 
-        (int Level, bool Grows)[] kinds =
-        [
-            .. Directory.EnumerateFiles(folder, "*.json", SearchOption.AllDirectories)
-                .Select(File.ReadAllText)
-                .Where(text => thisRoom.IsMatch(text))
-                .Select(text => JsonNode.Parse(text, documentOptions: lenient)!)
-                .Select(template => ((int?)template["Level"] ?? 1, (bool?)template["Grow"] ?? false))
-                .Distinct()
-        ];
+        foreach (string path in Directory.EnumerateFiles(folder, "*.json", SearchOption.AllDirectories))
+        {
+            string text = File.ReadAllText(path);
 
-        Assert.NotEmpty(kinds);
-        Assert.Single(kinds.Select(kind => kind.Level).Distinct());
-        Assert.DoesNotContain(true, kinds.Select(kind => kind.Grows));
-
-        return kinds[0].Level;
+            if (thisRoom.IsMatch(text))
+            {
+                yield return (path, JsonNode.Parse(text, documentOptions: lenient)!);
+            }
+        }
     }
 
     /// <summary>
@@ -440,8 +529,9 @@ public sealed class CombatSmokeTests : IDisposable
 
     private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter()
     {
-        IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MonsterRoom, 10, 10));
+        IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MonsterRoom, Start.X, Start.Y));
         _servers.Add(server);
+        StandOneAtTheDoor(server);
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, Name);
 
