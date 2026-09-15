@@ -285,6 +285,59 @@ def hades_image(h):
     return (d & 0x7FFF) if d else h.get("Image")
 
 
+# 부위 이름만 남은 것은 물건 이름이 아니다 (`로오의반지` → `반지`).
+BODY_PART_WORDS = frozenset({"반지", "목걸이", "귀걸이", "팔찌", "장갑", "각반", "신발", "벨트",
+                             "방패", "모자", "투구", "옷", "갑옷", "무기", "검", "단검"})
+
+KO_ELEMENT_TAIL = "수토풍화"          # 속성 변종 꼬리 (라비린스메일수·토·풍·화)
+
+
+def ko_base(name, siblings=()):
+    """한글 변종의 껍질을 벗겨 밑말만 남긴다.
+
+    한 그림에 한글 이름이 여럿인 것은 **한 물건의 변종**이다 (그림 250 의 13개가 전부 `동각반`).
+    껍질을 벗겨 모으면 그림마다 밑말이 하나로 모인다 — 실측 825 → 1147 개.
+    `은팔찌` 처럼 밑말이 단독으로는 팩에 없는 것도 이렇게 얻어진다.
+
+    속성 꼬리(수·토·풍·화)는 **벗긴 것이 같은 그림에 실제로 있을 때만** 벗긴다. 이름이 그 글자로
+    끝나는 멀쩡한 아이템을 망치지 않기 위해서다.
+    """
+    s = re.sub(r"^(?:\[속\]|초보자)", "", name)
+    m = re.match(r"^(.+?)의(.+)$", s)
+    if m and m.group(1) in AFFIX:
+        s = m.group(2)
+    s = re.sub(r"(?:\(Lev\d+\)|\(x\)|\+\d+)$", "", s)
+    if len(s) > 3 and s[-1] in KO_ELEMENT_TAIL and s[:-1] in siblings:
+        s = s[:-1]
+    return s
+
+
+def collapse_ko_base(rows, affixes):
+    """접사 없는 영문에, 그림 후보의 껍질을 벗겨 모은 밑말을 준다 — 하나로 모일 때만.
+
+    지금까지는 접사 없는 한글 이름이 **그대로 있어야** 짝이 됐다. 그림 225 처럼 8개가 전부
+    접사투성이면 밑말(`은팔찌`)이 없어 아무것도 못 정했다. 벗겨 모으면 정해진다.
+    """
+    won = 0
+    for r in rows:
+        if r["한글이름"] or split_en(r["영문"], affixes)[0]:
+            continue                   # 이미 정해졌거나, 접사 붙은 영문은 여기 몫이 아니다
+        names = {n for v in (r["한글후보"] or {}).values() for n in v}
+        if not names:
+            continue
+        bases = {ko_base(n, names) for n in names}
+        if len(bases) != 1:
+            continue
+        got = bases.pop()
+        # 껍질만 남은 밑말은 쓰지 않는다. `로오의반지` 를 벗기면 `반지` 가 되는데, 그것은
+        # 물건 이름이 아니라 부위 이름이다 — 후보가 전부 접사투성이일 때만 이런 일이 난다.
+        if got in BODY_PART_WORDS or all(ko_base(n, names) != n for n in names) and len(got) <= 3:
+            continue
+        r["한글이름"], r["등급"] = got, "KO_BASE_COLLAPSED"
+        won += 1
+    return won
+
+
 def pack_item_names():
     """팩에 실제로 있는 아이템 이름 전부. 지어낸 이름을 걸러 내는 체다."""
     return {e["이름"] for pack in packs() for e in load(pack, "items")
@@ -354,6 +407,7 @@ def hades_item_korean_names():
                      "한글이름": settled,
                      "접사맞춤": kept, "한글후보": cand,
                      "등급": grade(kept) if settled else ("NONE" if not cand else "CONFLICT")})
+    collapse_ko_base(rows, affixes)
     compose_affixed(rows, affixes, pack_item_names())
     tally = defaultdict(int)
     for r in rows:

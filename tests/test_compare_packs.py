@@ -75,9 +75,59 @@ class AffixNarrowingTest(unittest.TestCase):
         self.assertEqual(MODULE.split_ko("정의의검", siblings), (None, "정의의검"))
 
     def test_unmapped_english_affix_gets_no_korean_name(self):
-        # Deoch·Sgrios 는 아직 한글 짝을 모른다. \"접사 없는 이름\" 으로 떨어뜨리면 틀린 짝이 된다.
+        # 짝을 모르는 접사는 \"접사 없는 이름\" 으로 떨어뜨리면 안 된다 — 틀린 짝이 된다.
+        # (Deoch·Sgrios 는 카페 520 으로 짝을 찾았다. 아직 모르는 것만 여기 남는다.)
+        unknown = "Zzz"
+        self.assertNotIn(unknown, MODULE.EN_TO_KO)
         cand = {"novaonline": ["동각반", "칸의동각반"]}
-        self.assertEqual(MODULE.narrow_by_affix(cand, "Deoch Iron Greaves", {"Deoch", "Gramail"}), {})
+        self.assertEqual(MODULE.narrow_by_affix(cand, f"{unknown} Iron Greaves", {unknown, "Gramail"}), {})
+
+    def test_cafe_520_affixes_are_mapped(self):
+        # 카페 `【item】 520` 이 적어 둔 한↔영 접사. 수치 칸으로는 못 가리던 둘이 여기 있다.
+        self.assertEqual(MODULE.AFFIX["세오"], "Deoch")
+        self.assertEqual(MODULE.AFFIX["뮤레칸"], "Sgrios")
+        self.assertEqual(MODULE.EN_TO_KO["Magic"], {"마법", "마력"})   # 한 영문에 한글 둘
+        cand = {"novaonline": ["가죽각반", "세오의가죽각반"]}
+        self.assertEqual(MODULE.narrow_by_affix(cand, "Deoch Leather Greaves", {"Deoch"}),
+                         {"novaonline": ["세오의가죽각반"]})
+
+    def test_display_image_is_the_key_not_image(self):
+        # `Image` 는 인벤토리 아이콘이라 여럿이 나눠 쓴다. 갈리는 값은 `DisplayImage` 다.
+        self.assertEqual(MODULE.hades_image({"Image": 210, "DisplayImage": 32974}), 206)
+        self.assertEqual(MODULE.hades_image({"Image": 238}), 238)      # 없으면 Image 로 돌아간다
+
+    def test_ko_base_strips_variant_shells(self):
+        siblings = {"라비린스메일", "동각반"}
+        self.assertEqual(MODULE.ko_base("로오의동각반", siblings), "동각반")
+        self.assertEqual(MODULE.ko_base("[속]화염의목걸이", siblings), "목걸이")
+        self.assertEqual(MODULE.ko_base("라비린스메일수", siblings), "라비린스메일")
+        self.assertEqual(MODULE.ko_base("설단검(x)", siblings), "설단검")
+        # `의` 가 없으면 접사가 아니다 — `뮤레칸가면` 은 뮤레칸을 본뜬 가면이다.
+        self.assertEqual(MODULE.ko_base("뮤레칸글러브+1", siblings), "뮤레칸글러브")
+        # 속성 꼬리는 벗긴 것이 실제로 있을 때만 벗긴다.
+        self.assertEqual(MODULE.ko_base("유황화", siblings), "유황화")
+
+    def test_collapse_keeps_body_part_words_out(self):
+        # 후보가 전부 접사투성이면 밑말이 부위 이름만 남는다. 그것은 물건 이름이 아니다.
+        rows = [{"영문": "Loures Signet Ring", "한글이름": None, "등급": "CONFLICT",
+                 "한글후보": {"honden-community": ["로오의반지"]}}]
+        MODULE.collapse_ko_base(rows, set())
+        self.assertIsNone(rows[0]["한글이름"])
+
+    def test_collapse_settles_when_variants_agree(self):
+        rows = [{"영문": "Iron Greaves", "한글이름": None, "등급": "CONFLICT",
+                 "한글후보": {"novaonline": ["로오의동각반", "칸의동각반", "동각반"]}}]
+        self.assertEqual(MODULE.collapse_ko_base(rows, set()), 1)
+        self.assertEqual(rows[0]["한글이름"], "동각반")
+
+    def test_compose_only_uses_names_the_packs_have(self):
+        rows = [{"영문": "Leather Greaves", "한글이름": "가죽각반", "등급": "PACK_CONSENSUS", "접사맞춤": {}},
+                {"영문": "Deoch Leather Greaves", "한글이름": None, "등급": "CONFLICT", "접사맞춤": {}}]
+        MODULE.compose_affixed(rows, {"Deoch"}, {"세오의가죽각반"})
+        self.assertEqual(rows[1]["한글이름"], "세오의가죽각반")
+        rows[1]["한글이름"] = None
+        MODULE.compose_affixed(rows, {"Deoch"}, set())          # 팩에 없으면 짓지 않는다
+        self.assertIsNone(rows[1]["한글이름"])
 
     def test_plain_english_name_keeps_only_the_plain_korean_name(self):
         cand = {"novaonline": ["동각반", "칸의동각반"]}

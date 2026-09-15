@@ -8,16 +8,40 @@ Talos Fragment	0	3	쇠조각		EXTRACTED_SINGLE
 Talos Ore	0	1	쇠조각		EXTRACTED_SINGLE
 beag ioc deum	0	30	중급마력포션		EXTRACTED_SINGLE
 mor ioc deum	0	30	쿠라눔		EXTRACTED_SINGLE
+Battle Sword	1	26	배틀소드	배틀소드수 · 배틀소드토 · 배틀소드풍 · 배틀소드화	KO_BASE_COLLAPSED
 Blazed Veltain Sword	1	99	피닉스크로어		PACK_CONSENSUS
+Broad Sword	1	17	그라디우스	그라디우스수 · 그라디우스토 · 그라디우스풍 · 그라디우스화	KO_BASE_COLLAPSED
+Broad Sword	1	17	매스케이드	매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	KO_BASE_COLLAPSED
+Broad Sword	1	17	매스케이드	매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	KO_BASE_COLLAPSED
+Claidheamh	1	14	세이버	세이버수 · 세이버토 · 세이버풍 · 세이버화	KO_BASE_COLLAPSED
+Claidheamh	1	14	세이버	세이버수 · 세이버토 · 세이버풍 · 세이버화	KO_BASE_COLLAPSED
 Durimis	1	99	히야트홀리스태프		PACK_CONSENSUS
 Empowered Holy Gnarl	1	99	홀리디아나		EXTRACTED_SINGLE
 Enchanted Magus Orb	1	99	다크디아나		EXTRACTED_SINGLE
+Eppe	1	2	에페	에페(x)	KO_BASE_COLLAPSED
+Eppe	1	2	에페	에페(x)	KO_BASE_COLLAPSED
+Fine Light Dagger	1	40	광단검	광단검수 · 광단검토 · 광단검풍 · 광단검화	KO_BASE_COLLAPSED
+Fine Sun Dagger	1	66	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
 Giant Club	1	75	자이언트클럽		EXTRACTED_SINGLE
+Good Sun Dagger	1	64	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
+Grand Sun Dagger	1	68	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
+Great Sun Dagger	1	70	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
 Hatchet	1	13	토마호크		SAME_LINEAGE
+Light Dagger	1	42	광단검	광단검수 · 광단검토 · 광단검풍 · 광단검화	KO_BASE_COLLAPSED
+Long Sword	1	56	롱소드	롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	KO_BASE_COLLAPSED
+Long Sword	1	56	롱소드	롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	KO_BASE_COLLAPSED
+Lotus Dagger	1	30	월단검	월단검수 · 월단검토 · 월단검풍 · 월단검화	KO_BASE_COLLAPSED
+Loures Saber	1	7	커틀라스	커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	KO_BASE_COLLAPSED
+Loures Saber	1	7	커틀라스	커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	KO_BASE_COLLAPSED
+Masquerade	1	31	매스케이드	매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	KO_BASE_COLLAPSED
+Moon Dagger	1	30	월단검	월단검수 · 월단검토 · 월단검풍 · 월단검화	KO_BASE_COLLAPSED
 Scythe	1	94	낫		EXTRACTED_SINGLE
 Spiked Club	1	66	스파이크클럽		EXTRACTED_SINGLE
+Stilla	1	61	스틸라	스틸라수 · 스틸라토 · 스틸라풍 · 스틸라화	KO_BASE_COLLAPSED
 Sun Dagger	1	30	곡단도		PACK_CONSENSUS
 Talgonite Axe	1	81	타고나이트액스		PACK_CONSENSUS
+Templar	1	29	매스커레이드	매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	KO_BASE_COLLAPSED
+Templar	1	29	매스커레이드	매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	KO_BASE_COLLAPSED
 The Untamed	1	99	라이트닝액스		EXTRACTED_SINGLE
 Training Staff	1	1	홀리머큐리아		PACK_CONSENSUS
 Wooden Club	1	50	우든클럽		EXTRACTED_SINGLE
@@ -157,9 +181,28 @@ Luathas Boots	13	1	로오의신발	신발	AFFIX_COMPOSED
 Magma Boots	13	82	마그마부츠		EXTRACTED_SINGLE
 Saffian Boots	13	66	바이올렛티		EXTRACTED_SINGLE
 Shagreen Boots	13	33	녹색신발	풍요의녹색신발	EXTRACTED_SINGLE
+1	2	0	밀레스선풍도복	밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	KO_BASE_COLLAPSED
+Abel Dwarvish Leather	2	11	루어스노미쉬레더	루어스노미쉬레더수 · 루어스노미쉬레더토 · 루어스노미쉬레더풍 · 루어스노미쉬레더화	KO_BASE_COLLAPSED
+Bangasart	2	97	매직로브	매직로브수 · 매직로브토 · 매직로브풍 · 매직로브화	KO_BASE_COLLAPSED
+Bardocle	2	97	바르도클	바르도클수 · 바르도클토 · 바르도클풍 · 바르도클화	KO_BASE_COLLAPSED
+Benusta	2	11	베누스타	베누스타수 · 베누스타토 · 베누스타풍 · 베누스타화	KO_BASE_COLLAPSED
+Brigadine	2	11	브리간딘	브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	KO_BASE_COLLAPSED
 Carnun Plate	2	80	헬나이트아머		PACK_CONSENSUS
+Chainmail	2	56	체인메일	체인메일수 · 체인메일토 · 체인메일풍 · 체인메일화	KO_BASE_COLLAPSED
+Clamyth	2	97	클라미스	클라미스수 · 클라미스토 · 클라미스풍 · 클라미스화	KO_BASE_COLLAPSED
+Clymouth	2	71	클리머스	클리머스수 · 클리머스토 · 클리머스풍 · 클리머스화	KO_BASE_COLLAPSED
+Corsette	2	41	브리간딘	브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	KO_BASE_COLLAPSED
+Cotehardie	2	26	미스티플레이트	미스티플레이트수 · 미스티플레이트토 · 미스티플레이트풍 · 미스티플레이트화	KO_BASE_COLLAPSED
+Cullote	2	11	단도복	단도복수 · 단도복토 · 단도복풍 · 단도복화	KO_BASE_COLLAPSED
 Dark Cleric Gown	2	60	클레릭의상2		EXTRACTED_SINGLE
+Dolman	2	71	홀리로브	홀리로브수 · 홀리로브토 · 홀리로브풍 · 홀리로브화	KO_BASE_COLLAPSED
+Duin-Uasal	2	97	다크로럼	다크로럼수 · 다크로럼토 · 다크로럼풍 · 다크로럼화	KO_BASE_COLLAPSED
+Dwarvish Leather	2	11	노미쉬레더	노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	KO_BASE_COLLAPSED
+Earth's Bodice	2	1	연무복	연무복수 · 연무복토 · 연무복풍 · 연무복화	KO_BASE_COLLAPSED
+Elle	2	41	엘레맨틀	엘레맨틀수 · 엘레맨틀토 · 엘레맨틀풍 · 엘레맨틀화	KO_BASE_COLLAPSED
 Formal Coat	2	0	망토		EXTRACTED_SINGLE
+Galuchat	2	11	레더로브	레더로브수 · 레더로브토 · 레더로브풍 · 레더로브화	KO_BASE_COLLAPSED
+Gardcorp	2	1	후드로브	후드로브수 · 후드로브토 · 후드로브풍 · 후드로브화	KO_BASE_COLLAPSED
 Grand Master Celestial Gown	2	99	라피스라즐리2		PACK_CONSENSUS
 Grand Master Celestial Robes	2	99	데메테르2		PACK_CONSENSUS
 Grand Master Combat Armor	2	99	위타천2		PACK_CONSENSUS
@@ -181,9 +224,53 @@ Grand Master War Armor	2	99	레오파드1		PACK_CONSENSUS
 Grand Master War Guard	2	99	아레스2		PACK_CONSENSUS
 Grand Master War Plate	2	99	레오파드2		PACK_CONSENSUS
 Grand Master War Sheath	2	99	아레스1		PACK_CONSENSUS
+Hierophant	2	71	위저드로브	위저드로브수 · 위저드로브토 · 위저드로브풍 · 위저드로브화	KO_BASE_COLLAPSED
+Hy-Brasyl Armor	2	3	세인트아머	세인트아머수 · 세인트아머토 · 세인트아머풍 · 세인트아머화	KO_BASE_COLLAPSED
+Hy-Brasyl Plate	2	3	골든플레이트	골든플레이트수 · 골든플레이트토 · 골든플레이트풍 · 골든플레이트화	KO_BASE_COLLAPSED
+Iplet Mail	2	60	이프리트메일	이프리트메일수 · 이프리트메일토 · 이프리트메일풍 · 이프리트메일화	KO_BASE_COLLAPSED
+Journeyman	2	11	달마티카	달마티카수 · 달마티카토 · 달마티카풍 · 달마티카화	KO_BASE_COLLAPSED
+Kasmanium Armor	2	41	카스뮴아머	카스뮴아머수 · 카스뮴아머토 · 카스뮴아머풍 · 카스뮴아머화	KO_BASE_COLLAPSED
+Kasmanium Hauberk	2	41	카스뮴플레이트	카스뮴플레이트수 · 카스뮴플레이트토 · 카스뮴플레이트풍 · 카스뮴플레이트화	KO_BASE_COLLAPSED
+Labyrinth Mail	2	60	라비린스메일	라비린스메일수 · 라비린스메일토 · 라비린스메일풍 · 라비린스메일화	KO_BASE_COLLAPSED
+Leather Tunic	2	1	레더튜닉	레더튜닉수 · 레더튜닉토 · 레더튜닉풍 · 레더튜닉화	KO_BASE_COLLAPSED
+Lightning Garb	2	71	풍전도복	풍전도복수 · 풍전도복토 · 풍전도복풍 · 풍전도복화	KO_BASE_COLLAPSED
+Lorica	2	26	하프플레이트	하프플레이트수 · 하프플레이트토 · 하프플레이트풍 · 하프플레이트화	KO_BASE_COLLAPSED
+Lotus Bodice	2	11	연무도복	연무도복수 · 연무도복토 · 연무도복풍 · 연무도복화	KO_BASE_COLLAPSED
+Loures Cotte	2	1	루어스연무도복	루어스연무도복수 · 루어스연무도복토 · 루어스연무도복풍 · 루어스연무도복화	KO_BASE_COLLAPSED
+Magi Skirt	2	1	매직스커트	매직스커트수 · 매직스커트토 · 매직스커트풍 · 매직스커트화	KO_BASE_COLLAPSED
 Marauder Hide	2	80	헬씨프아머		PACK_CONSENSUS
+Mileth Cotte	2	1	밀레스연무도복	밀레스연무도복수 · 밀레스연무도복토 · 밀레스연무도복풍 · 밀레스연무도복화	KO_BASE_COLLAPSED
+Mileth Cowl	2	1	밀레스셍즈	밀레스셍즈수 · 밀레스셍즈토 · 밀레스셍즈풍 · 밀레스셍즈화	KO_BASE_COLLAPSED
+Mileth Dwarvish Leather	2	11	밀레스노미쉬레더	밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	KO_BASE_COLLAPSED
+Mileth Jupe	2	11	밀레스지폰	밀레스지폰수 · 밀레스지폰토 · 밀레스지폰풍 · 밀레스지폰화	KO_BASE_COLLAPSED
+Mileth Scout Leather	2	1	밀레스스카웃튜닉	밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	KO_BASE_COLLAPSED
+Moon Bodice	2	41	풍월도복	풍월도복수 · 풍월도복토 · 풍월도복풍 · 풍월도복화	KO_BASE_COLLAPSED
+Mountain Garb	2	97	태산도복	태산도복수 · 태산도복토 · 태산도복풍 · 태산도복화	KO_BASE_COLLAPSED
+Mystic Gown	2	11	미스틱로브	미스틱로브수 · 미스틱로브토 · 미스틱로브풍 · 미스틱로브화	KO_BASE_COLLAPSED
+Oren Dwarvish Leather	2	11	밀레스팔루텐	밀레스팔루텐수 · 밀레스팔루텐토 · 밀레스팔루텐풍 · 밀레스팔루텐화	KO_BASE_COLLAPSED
+Oren Jupe	2	11	루어스지폰	루어스지폰수 · 루어스지폰토 · 루어스지폰풍 · 루어스지폰화	KO_BASE_COLLAPSED
+Paluten	2	41	노미쉬레더	노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	KO_BASE_COLLAPSED
+Pebble Rose	2	71	페플로스	페플로스수 · 페플로스토 · 페플로스풍 · 페플로스화	KO_BASE_COLLAPSED
+Phoenix Mail	2	86	수오미라비린스메일	수오미라비린스메일수 · 수오미라비린스메일토 · 수오미라비린스메일풍 · 수오미라비린스메일화	KO_BASE_COLLAPSED
+Piet Cowl	2	1	수오미셍즈	수오미셍즈수 · 수오미셍즈토 · 수오미셍즈풍 · 수오미셍즈화	KO_BASE_COLLAPSED
+Platemail	2	86	풀플레이트	풀플레이트수 · 풀플레이트토 · 풀플레이트풍 · 풀플레이트화	KO_BASE_COLLAPSED
+Platemail	2	86	수오미풀플레이트	수오미풀플레이트수 · 수오미풀플레이트토 · 수오미풀플레이트풍 · 수오미풀플레이트화	KO_BASE_COLLAPSED
 Reiter Mail	2	60	듈라한의상		EXTRACTED_SINGLE
+Rucesion Cotte	2	1	수오미연무도복	수오미연무도복수 · 수오미연무도복토 · 수오미연무도복풍 · 수오미연무도복화	KO_BASE_COLLAPSED
+Rucesion Cowl	2	1	루어스셍즈	루어스셍즈수 · 루어스셍즈토 · 루어스셍즈풍 · 루어스셍즈화	KO_BASE_COLLAPSED
+Rucesion Dwarvish Leather	2	11	밀레스노미쉬레더	밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	KO_BASE_COLLAPSED
+Rucesion Jupe	2	11	수오미지폰	수오미지폰수 · 수오미지폰토 · 수오미지폰풍 · 수오미지폰화	KO_BASE_COLLAPSED
+Rucesion Scout Leather	2	1	뤼케시온스카웃튜닉	뤼케시온스카웃튜닉수 · 뤼케시온스카웃튜닉토 · 뤼케시온스카웃튜닉풍 · 뤼케시온스카웃튜닉화	KO_BASE_COLLAPSED
+Scout Leather	2	1	스카웃튜닉	스카웃튜닉수 · 스카웃튜닉토 · 스카웃튜닉풍 · 스카웃튜닉화	KO_BASE_COLLAPSED
+Soumi Cotte	2	1	뤼케시온연무도복	뤼케시온연무도복수 · 뤼케시온연무도복토 · 뤼케시온연무도복풍 · 뤼케시온연무도복화	KO_BASE_COLLAPSED
+Soumi Cowl	2	1	뤼케시온셍즈	뤼케시온셍즈수 · 뤼케시온셍즈토 · 뤼케시온셍즈풍 · 뤼케시온셍즈화	KO_BASE_COLLAPSED
+Soumi Scout Leather	2	1	밀레스스카웃튜닉	밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	KO_BASE_COLLAPSED
+Stoller	2	11	스톨라	스톨라수 · 스톨라토 · 스톨라풍 · 스톨라화	KO_BASE_COLLAPSED
 Suomi Guard Uniform	2	0	초보자갑옷		EXTRACTED_SINGLE
+Suplice Blouse	2	56	아마존아머	아마존아머수 · 아마존아머토 · 아마존아머풍 · 아마존아머화	KO_BASE_COLLAPSED
+Tagor Jupe	2	11	뤼케시온지폰	뤼케시온지폰수 · 뤼케시온지폰토 · 뤼케시온지폰풍 · 뤼케시온지폰화	KO_BASE_COLLAPSED
+Undine Scout Leather	2	1	루어스스카웃튜닉	루어스스카웃튜닉수 · 루어스스카웃튜닉토 · 루어스스카웃튜닉풍 · 루어스스카웃튜닉화	KO_BASE_COLLAPSED
+Undine Wind Garb	2	71	밀레스선풍도복	밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	KO_BASE_COLLAPSED
 White Tuxedo	2	0	턱시도		EXTRACTED_SINGLE
 Abundance Talos Shield	3	90	풍요의플라늄방패	플라늄방패	EXTRACTED_SINGLE
 Bronze Shield	3	31	구리방패		EXTRACTED_SINGLE
@@ -240,18 +327,31 @@ Bone Necklace	6	6	마기아목걸이		PACK_CONSENSUS
 Dark Bone Necklace	6	6	마기아목걸이		PACK_CONSENSUS
 Dark Bone Necklace	6	6	마기아목걸이		PACK_CONSENSUS
 Dark Necklace	6	6	해골목걸이		EXTRACTED_SINGLE
+Dark Pearl Necklace	6	6	진주목걸이	대지의진주목걸이	KO_BASE_COLLAPSED
 Earth Bone Necklace	6	6	대지의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
+Earth Gold Jade Necklace	6	14	대지의금옥목걸이	화염의자수정목걸이	AFFIX_COMPOSED
 Earth Gold Jade Necklace	6	6	대지의금옥목걸이		PACK_CONSENSUS
 Earth Necklace	6	6	대지의목걸이	[속]대지의목걸이 · 초보자대지의목걸이	PACK_CONSENSUS
 Earth Pearl Necklace	6	6	대지의진주목걸이		PACK_CONSENSUS
 Fire Bone Necklace	6	6	화염의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
 Fire Gold Jade Necklace	6	14	화염의자수정목걸이		PACK_CONSENSUS
+Fire Gold Jade Necklace	6	6	화염의금옥목걸이	대지의금옥목걸이	AFFIX_COMPOSED
 Fire Necklace	6	6	화염의목걸이	[속]화염의목걸이 · 초보자화염의목걸이	PACK_CONSENSUS
+Fire Pearl Necklace	6	6	화염의진주목걸이	대지의진주목걸이	AFFIX_COMPOSED
+Gold Jade Necklace	6	6	금옥목걸이	대지의금옥목걸이	KO_BASE_COLLAPSED
 Light Coral Necklace	6	1	진주목걸이		EXTRACTED_SINGLE
+Pearl Necklace	6	6	진주목걸이	대지의진주목걸이	KO_BASE_COLLAPSED
 Sea Bone Necklace	6	6	바다의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
+Sea Gold Jade Necklace	6	14	바다의금옥목걸이	화염의자수정목걸이	AFFIX_COMPOSED
+Sea Gold Jade Necklace	6	6	바다의금옥목걸이	대지의금옥목걸이	AFFIX_COMPOSED
 Sea Necklace	6	6	바다의목걸이	[속]바다의목걸이 · 초보자바다의목걸이	PACK_CONSENSUS
+Sea Pearl Necklace	6	6	바다의진주목걸이	대지의진주목걸이	AFFIX_COMPOSED
+Tadghain's Light Pearl Necklace	6	6	진주목걸이	대지의진주목걸이	KO_BASE_COLLAPSED
 Wind Bone Necklace	6	6	바람의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
+Wind Gold Jade Necklace	6	14	바람의금옥목걸이	화염의자수정목걸이	AFFIX_COMPOSED
+Wind Gold Jade Necklace	6	6	바람의금옥목걸이	대지의금옥목걸이	AFFIX_COMPOSED
 Wind Necklace	6	6	바람의목걸이	[속]바람의목걸이 · 초보자바람의목걸이	PACK_CONSENSUS
+Wind Pearl Necklace	6	6	바람의진주목걸이	대지의진주목걸이	AFFIX_COMPOSED
 Small Emerald Ring	7	1	사파이어반지		PACK_CONSENSUS
 Abundance Jade Ring	8	16	풍요의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지	EXTRACTED_SINGLE
 Beryl Ring	8	5	금반지		PACK_CONSENSUS
@@ -326,17 +426,11 @@ ard spiorad deum	0	60		고급포션 · 리치중급포션 · 마라디움 · 메
 beag spiorad deum	0	1		고급포션 · 리치중급포션 · 마라디움 · 메가포션 · 최고급포션	CONFLICT
 beothaich deum	0	30		리치고급포션 · 리치의피 · 체력물약	CONFLICT
 mor spiorad deum	0	30		고급포션 · 리치중급포션 · 마라디움 · 메가포션 · 최고급포션	CONFLICT
-Battle Sword	1	26		배틀소드 · 배틀소드수 · 배틀소드토 · 배틀소드풍 · 배틀소드화	CONFLICT
 Black Death	1	45		블랙데쓰 · 블랙데쓰수 · 블랙데쓰토 · 블랙데쓰풍 · 블랙데쓰화 · 잊혀진칼	CONFLICT
 Black Death	1	45		블랙데쓰 · 블랙데쓰수 · 블랙데쓰토 · 블랙데쓰풍 · 블랙데쓰화 · 잊혀진칼	CONFLICT
 Blood Dagger	1	89		견습자의단검 · 견습자의단검+1 · 견습자의단검+2 · 혈단검 · 혈단검수 · 혈단검토 · 혈단검풍 · 혈단검화	CONFLICT
 Blossom Dagger	1	14		매단검 · 매단검수 · 매단검토 · 매단검풍 · 매단검화 · 일단검 · 중단검	CONFLICT
 Bramble	1	41		프럼벨 · 프럼벨수 · 프럼벨토 · 프럼벨풍 · 프럼벨화 · 프렘벨 · 프렘벨수 · 프렘벨토 · 프렘벨풍 · 프렘벨화	CONFLICT
-Broad Sword	1	17		그라디우스 · 그라디우스수 · 그라디우스토 · 그라디우스풍 · 그라디우스화	CONFLICT
-Broad Sword	1	17		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	CONFLICT
-Broad Sword	1	17		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	CONFLICT
-Claidheamh	1	14		세이버 · 세이버수 · 세이버토 · 세이버풍 · 세이버화	CONFLICT
-Claidheamh	1	14		세이버 · 세이버수 · 세이버토 · 세이버풍 · 세이버화	CONFLICT
 Dragon Scale Sword	1	20		피4 · 피닉스크로어4	CONFLICT
 Dragon Slayer	1	80		견습자의검 · 견습자의검+1 · 견습자의검+2 · 드래곤크로어 · 드래곤크로어수 · 드래곤크로어토 · 드래곤크로어풍 · 드래곤크로어화 · 투핸드드래곤크로어 · 투핸드드래곤크로어수 · 투핸드드래곤크로어토 · 투핸드드래곤크로어풍	CONFLICT
 Empowered Azoth	1	99		곡단도 · 도적의무기 · 도적의무기+1 · 도적의무기+2 · 인월도	CONFLICT
@@ -345,22 +439,15 @@ Empowered Holy Hy-Brasyl Gnarl	1	99		이아의빛	CONFLICT
 Empowered Magus Orb	1	99		로오의빛	CONFLICT
 Enchanted Azoth	1	99		곡단도 · 도적의무기 · 도적의무기+1 · 도적의무기+2 · 인월도	CONFLICT
 Enchanted Kalkuri	1	99		노머시의빅글러브 · 미스릴배틀핸드 · 배틀핸드(Lev15) · 배틀핸드(Lev3) · 배틀핸드(Lev30)	CONFLICT
-Eppe	1	2		에페 · 에페(x)	CONFLICT
-Eppe	1	2		에페 · 에페(x)	CONFLICT
 Fine Claidhmore	1	75		크레이모어 · 크레이모어수 · 크레이모어토 · 크레이모어풍 · 크레이모어화 · 투핸드크레이모어 · 투핸드크레이모어수 · 투핸드크레이모어토 · 투핸드크레이모어풍 · 투핸드크레이모어화	CONFLICT
-Fine Light Dagger	1	40		광단검 · 광단검수 · 광단검토 · 광단검풍 · 광단검화	CONFLICT
 Fine Snow Secret	1	7		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Fine Sun Dagger	1	66		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	CONFLICT
 Fine Sun Secret	1	75		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Good Snow Secret	1	5		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Good Sun Dagger	1	64		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	CONFLICT
 Good Sun Secret	1	73		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Grand Snow Secret	1	9		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Grand Sun Dagger	1	68		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	CONFLICT
 Grand Sun Secret	1	77		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Great Emerald Sword	1	85		에메랄드소드 · 에메랄드소드수 · 에메랄드소드토 · 에메랄드소드풍 · 에메랄드소드화 · 투핸드에메랄드소드 · 투핸드에메랄드소드수 · 투핸드에메랄드소드토 · 투핸드에메랄드소드풍 · 투핸드에메랄드소드화	CONFLICT
 Great Snow Secret	1	11		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Great Sun Dagger	1	70		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	CONFLICT
 Great Sun Secret	1	79		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Harpoon	1	11		니크르창 · 작살	CONFLICT
 Holy Apollo	1	11		매직솔라 · 홀리솔라	CONFLICT
@@ -370,22 +457,14 @@ Holy Hy-Brasyl Gnarl	1	99		이아의은총	CONFLICT
 Holy Kronos	1	11		매직새티아 · 홀리새티아	CONFLICT
 Holy Zeus	1	11		매직쥬피티아 · 홀리쥬피티아	CONFLICT
 Hy-Brasyl Battle Axe	1	95		하이브레이질그레이트배틀액스 · 헬2	CONFLICT
-Light Dagger	1	42		광단검 · 광단검수 · 광단검토 · 광단검풍 · 광단검화	CONFLICT
 Light Secret	1	7		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Long Sword	1	56		롱소드 · 롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	CONFLICT
-Long Sword	1	56		롱소드 · 롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	CONFLICT
-Lotus Dagger	1	30		월단검 · 월단검수 · 월단검토 · 월단검풍 · 월단검화	CONFLICT
 Lotus Secret	1	21		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
-Loures Saber	1	7		커틀라스 · 커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	CONFLICT
-Loures Saber	1	7		커틀라스 · 커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	CONFLICT
 Magus Apollo	1	11		매직솔라 · 홀리솔라	CONFLICT
 Magus Diana	1	6		매직루나 · 홀리루나	CONFLICT
 Magus Hy-Brasyl Orb	1	99		로오의은총	CONFLICT
-Masquerade	1	31		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	CONFLICT
 Master Celestial Staff	1	99		매직세페우스 · 매직스태프 · 홀리세페우스 · 홀리스태프	CONFLICT
 Master Divine Staff	1	99		매직세페우스 · 매직스태프 · 홀리세페우스 · 홀리스태프	CONFLICT
 Might and Power	1	99		[성직자]뮤레칸의스태프(+1) · [성직자]뮤레칸의스태프(+2) · [성직자]뮤레칸의스태프(+3) · [성직자]뮤레칸의스태프(+4) · [성직자]뮤레칸의스태프(+5)	CONFLICT
-Moon Dagger	1	30		월단검 · 월단검수 · 월단검토 · 월단검풍 · 월단검화	CONFLICT
 Moon Secret	1	1		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
 Nagetier Dagger	1	79		강력한단검 · 워어렛단검	CONFLICT
 Oak Stick	1	1		목도 · 목도+1 · 목도+2 · 목도+3 · 목도+M · 쌍절권 · 조금쌘목도	CONFLICT
@@ -394,12 +473,9 @@ Primitive Spear	1	49		니크르창 · 작살	CONFLICT
 Shovel	1	41		고급삽 · 삽 · 중급삽 · 초급삽	CONFLICT
 Snow Secret	1	3		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
 Stick	1	1		목도 · 목도+1 · 목도+2 · 목도+3 · 목도+M · 쌍절권 · 조금쌘목도	CONFLICT
-Stilla	1	61		스틸라 · 스틸라수 · 스틸라토 · 스틸라풍 · 스틸라화	CONFLICT
 Stone Axe	1	95		돌괭이 · 스톤액스	CONFLICT
 Stone Cross	1	98		다크클레릭십자가 · 십자가	CONFLICT
 Sun Secret	1	21		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Templar	1	29		매스커레이드 · 매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	CONFLICT
-Templar	1	29		매스커레이드 · 매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	CONFLICT
 Tilian Claw	1	50		견습자의글러브 · 견습자의글러브+1 · 견습자의글러브+2 · 고급글러브 · 고양이손 · 글러브1 · 글러브2 · 노머시의글러브 · 무도가의무기 · 무도가의무기+1 · 무도가의무기+2 · 용의발톱	CONFLICT
 Abundance Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
 Abundance Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
@@ -532,104 +608,41 @@ Sgrios Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
 Sgrios Magma Boots	13	82		마그마부츠	CONFLICT
 Sgrios Saffian Boots	13	66		바이올렛티	CONFLICT
 Sgrios Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-1	2	0		밀레스선풍도복 · 밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	CONFLICT
-Abel Dwarvish Leather	2	11		루어스노미쉬레더 · 루어스노미쉬레더수 · 루어스노미쉬레더토 · 루어스노미쉬레더풍 · 루어스노미쉬레더화	CONFLICT
 Aosdic Pattern Walker	2	80		헬소서러로브 · 헬소서리스로브 · 헬클레릭로브 · 헬프리스트로브	CONFLICT
-Bangasart	2	97		매직로브 · 매직로브수 · 매직로브토 · 매직로브풍 · 매직로브화	CONFLICT
-Bardocle	2	97		바르도클 · 바르도클수 · 바르도클토 · 바르도클풍 · 바르도클화	CONFLICT
-Benusta	2	11		베누스타 · 베누스타수 · 베누스타토 · 베누스타풍 · 베누스타화	CONFLICT
-Brigadine	2	11		브리간딘 · 브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	CONFLICT
-Chainmail	2	56		체인메일 · 체인메일수 · 체인메일토 · 체인메일풍 · 체인메일화	CONFLICT
-Clamyth	2	97		클라미스 · 클라미스수 · 클라미스토 · 클라미스풍 · 클라미스화	CONFLICT
-Clymouth	2	71		클리머스 · 클리머스수 · 클리머스토 · 클리머스풍 · 클리머스화	CONFLICT
-Corsette	2	41		브리간딘 · 브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	CONFLICT
-Cotehardie	2	26		미스티플레이트 · 미스티플레이트수 · 미스티플레이트토 · 미스티플레이트풍 · 미스티플레이트화	CONFLICT
 Cotte	2	1		꼬뜨 · 꼬뜨수 · 꼬뜨토 · 꼬뜨풍 · 꼬뜨화	CONFLICT
 Cowl	2	1		셍즈 · 셍즈수 · 셍즈토 · 셍즈풍 · 셍즈화	CONFLICT
 Cthonic Magus Robes	2	80		헬소서러로브 · 헬소서리스로브 · 헬클레릭로브 · 헬프리스트로브	CONFLICT
 Cuirass	2	11		레더메일 · 레더메일수 · 레더메일토 · 레더메일풍 · 레더메일화 · 레데메일 · 레데메일수 · 레데메일토 · 레데메일풍 · 레데메일화	CONFLICT
-Cullote	2	11		단도복 · 단도복수 · 단도복토 · 단도복풍 · 단도복화	CONFLICT
 Dalmatica	2	97		네크로브 · 네크로브수 · 네크로브토 · 네크로브풍 · 네크로브화 · 뤼케시온네크로브	CONFLICT
 Dark Cleric Robes	2	60		다크클레릭의상 · 클레릭의상1	CONFLICT
 Dobok	2	1		도복 · 도복수 · 도복토 · 도복풍 · 도복화	CONFLICT
-Dolman	2	71		홀리로브 · 홀리로브수 · 홀리로브토 · 홀리로브풍 · 홀리로브화	CONFLICT
-Duin-Uasal	2	97		다크로럼 · 다크로럼수 · 다크로럼토 · 다크로럼풍 · 다크로럼화	CONFLICT
 Dummy	2	0		가드아머1 · 호버크	CONFLICT
-Dwarvish Leather	2	11		노미쉬레더 · 노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	CONFLICT
 Earth Bodice	2	1		연무복 · 연무복수 · 연무복토 · 연무복풍 · 연무복화	CONFLICT
 Earth Garb	2	41		천지도복 · 천지도복수 · 천지도복토 · 천지도복풍 · 천지도복화	CONFLICT
-Earth's Bodice	2	1		연무복 · 연무복수 · 연무복토 · 연무복풍 · 연무복화	CONFLICT
-Elle	2	41		엘레맨틀 · 엘레맨틀수 · 엘레맨틀토 · 엘레맨틀풍 · 엘레맨틀화	CONFLICT
 Enchanted Mantle	2	99		다크로브 · 여마승	CONFLICT
-Galuchat	2	11		레더로브 · 레더로브수 · 레더로브토 · 레더로브풍 · 레더로브화	CONFLICT
-Gardcorp	2	1		후드로브 · 후드로브수 · 후드로브토 · 후드로브풍 · 후드로브화	CONFLICT
 Gorget	2	1		로브 · 로브수 · 로브토 · 로브풍 · 로브화	CONFLICT
 Gorget Gown	2	1		로브 · 로브수 · 로브토 · 로브풍 · 로브화	CONFLICT
-Hierophant	2	71		위저드로브 · 위저드로브수 · 위저드로브토 · 위저드로브풍 · 위저드로브화	CONFLICT
-Hy-Brasyl Armor	2	3		세인트아머 · 세인트아머수 · 세인트아머토 · 세인트아머풍 · 세인트아머화	CONFLICT
-Hy-Brasyl Plate	2	3		골든플레이트 · 골든플레이트수 · 골든플레이트토 · 골든플레이트풍 · 골든플레이트화	CONFLICT
-Iplet Mail	2	60		이프리트메일 · 이프리트메일수 · 이프리트메일토 · 이프리트메일풍 · 이프리트메일화	CONFLICT
-Journeyman	2	11		달마티카 · 달마티카수 · 달마티카토 · 달마티카풍 · 달마티카화	CONFLICT
 Jupe	2	11		지폰 · 지폰수 · 지폰토 · 지폰풍 · 지폰화	CONFLICT
 Kagum	2	97		카쿰 · 카쿰수 · 카쿰토 · 카쿰풍 · 카쿰화	CONFLICT
-Kasmanium Armor	2	41		카스뮴아머 · 카스뮴아머수 · 카스뮴아머토 · 카스뮴아머풍 · 카스뮴아머화	CONFLICT
-Kasmanium Hauberk	2	41		카스뮴플레이트 · 카스뮴플레이트수 · 카스뮴플레이트토 · 카스뮴플레이트풍 · 카스뮴플레이트화	CONFLICT
 Keaton	2	71		키톤 · 키톤수 · 키톤토 · 키톤풍 · 키톤화	CONFLICT
-Labyrinth Mail	2	60		라비린스메일 · 라비린스메일수 · 라비린스메일토 · 라비린스메일풍 · 라비린스메일화	CONFLICT
 Leather Bliaut	2	1		튜닉 · 튜닉수 · 튜닉토 · 튜닉풍 · 튜닉화	CONFLICT
-Leather Tunic	2	1		레더튜닉 · 레더튜닉수 · 레더튜닉토 · 레더튜닉풍 · 레더튜닉화	CONFLICT
 Lich Robe	2	60		마법좀비의상 · 마법좀비의상1	CONFLICT
-Lightning Garb	2	71		풍전도복 · 풍전도복수 · 풍전도복토 · 풍전도복풍 · 풍전도복화	CONFLICT
-Lorica	2	26		하프플레이트 · 하프플레이트수 · 하프플레이트토 · 하프플레이트풍 · 하프플레이트화	CONFLICT
 Lorum	2	11		로럼 · 로럼수 · 로럼토 · 로럼풍 · 로럼화	CONFLICT
-Lotus Bodice	2	11		연무도복 · 연무도복수 · 연무도복토 · 연무도복풍 · 연무도복화	CONFLICT
-Loures Cotte	2	1		루어스연무도복 · 루어스연무도복수 · 루어스연무도복토 · 루어스연무도복풍 · 루어스연무도복화	CONFLICT
-Magi Skirt	2	1		매직스커트 · 매직스커트수 · 매직스커트토 · 매직스커트풍 · 매직스커트화	CONFLICT
 Mane	2	71		마법좀비의상 · 마법좀비의상1	CONFLICT
 Mantle	2	41		맨틀 · 맨틀수 · 맨틀토 · 맨틀풍 · 맨틀화	CONFLICT
-Mileth Cotte	2	1		밀레스연무도복 · 밀레스연무도복수 · 밀레스연무도복토 · 밀레스연무도복풍 · 밀레스연무도복화	CONFLICT
-Mileth Cowl	2	1		밀레스셍즈 · 밀레스셍즈수 · 밀레스셍즈토 · 밀레스셍즈풍 · 밀레스셍즈화	CONFLICT
-Mileth Dwarvish Leather	2	11		밀레스노미쉬레더 · 밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	CONFLICT
-Mileth Jupe	2	11		밀레스지폰 · 밀레스지폰수 · 밀레스지폰토 · 밀레스지폰풍 · 밀레스지폰화	CONFLICT
-Mileth Scout Leather	2	1		밀레스스카웃튜닉 · 밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	CONFLICT
 Monk Mantle	2	99		무상도복 · 무승	CONFLICT
 Monk Master Mantle	2	99		여무승 · 월영도복	CONFLICT
-Moon Bodice	2	41		풍월도복 · 풍월도복수 · 풍월도복토 · 풍월도복풍 · 풍월도복화	CONFLICT
 Morrigu Disciple Pellison	2	80		헬소서리스로브 · 헬프리스트로브	CONFLICT
 Morrigu Magus Pellison	2	80		헬소서리스로브 · 헬프리스트로브	CONFLICT
-Mountain Garb	2	97		태산도복 · 태산도복수 · 태산도복토 · 태산도복풍 · 태산도복화	CONFLICT
-Mystic Gown	2	11		미스틱로브 · 미스틱로브수 · 미스틱로브토 · 미스틱로브풍 · 미스틱로브화	CONFLICT
-Oren Dwarvish Leather	2	11		밀레스팔루텐 · 밀레스팔루텐수 · 밀레스팔루텐토 · 밀레스팔루텐풍 · 밀레스팔루텐화	CONFLICT
-Oren Jupe	2	11		루어스지폰 · 루어스지폰수 · 루어스지폰토 · 루어스지폰풍 · 루어스지폰화	CONFLICT
-Paluten	2	41		노미쉬레더 · 노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	CONFLICT
-Pebble Rose	2	71		페플로스 · 페플로스수 · 페플로스토 · 페플로스풍 · 페플로스화	CONFLICT
-Phoenix Mail	2	86		수오미라비린스메일 · 수오미라비린스메일수 · 수오미라비린스메일토 · 수오미라비린스메일풍 · 수오미라비린스메일화	CONFLICT
-Piet Cowl	2	1		수오미셍즈 · 수오미셍즈수 · 수오미셍즈토 · 수오미셍즈풍 · 수오미셍즈화	CONFLICT
-Platemail	2	86		풀플레이트 · 풀플레이트수 · 풀플레이트토 · 풀플레이트풍 · 풀플레이트화	CONFLICT
-Platemail	2	86		수오미풀플레이트 · 수오미풀플레이트수 · 수오미풀플레이트토 · 수오미풀플레이트풍 · 수오미풀플레이트화	CONFLICT
 Ranger Uniform	2	0		가드아머2 · 컴포지트	CONFLICT
-Rucesion Cotte	2	1		수오미연무도복 · 수오미연무도복수 · 수오미연무도복토 · 수오미연무도복풍 · 수오미연무도복화	CONFLICT
-Rucesion Cowl	2	1		루어스셍즈 · 루어스셍즈수 · 루어스셍즈토 · 루어스셍즈풍 · 루어스셍즈화	CONFLICT
-Rucesion Dwarvish Leather	2	11		밀레스노미쉬레더 · 밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	CONFLICT
 Rucesion Guard Uniform	2	0		가드아머1 · 호버크	CONFLICT
-Rucesion Jupe	2	11		수오미지폰 · 수오미지폰수 · 수오미지폰토 · 수오미지폰풍 · 수오미지폰화	CONFLICT
-Rucesion Scout Leather	2	1		뤼케시온스카웃튜닉 · 뤼케시온스카웃튜닉수 · 뤼케시온스카웃튜닉토 · 뤼케시온스카웃튜닉풍 · 뤼케시온스카웃튜닉화	CONFLICT
 Sacred Gown	2	99		세인트로브 · 여성승	CONFLICT
 Sacred Mantle	2	99		성승 · 세인트후드	CONFLICT
 Scarlet Carapace	2	60		잊혀진갑옷2 · 테네즈의갑옷2	CONFLICT
 Scarlet Carapace Mail	2	60		잊혀진갑옷1 · 테네즈의갑옷1	CONFLICT
-Scout Leather	2	1		스카웃튜닉 · 스카웃튜닉수 · 스카웃튜닉토 · 스카웃튜닉풍 · 스카웃튜닉화	CONFLICT
 Sea Garb	2	3		밀레스대양도복 · 밀레스대양도복수 · 밀레스대양도복토 · 밀레스대양도복풍 · 밀레스대양도복화	CONFLICT
 Shadow Mantle	2	99		도승 · 스카우트아머	CONFLICT
-Soumi Cotte	2	1		뤼케시온연무도복 · 뤼케시온연무도복수 · 뤼케시온연무도복토 · 뤼케시온연무도복풍 · 뤼케시온연무도복화	CONFLICT
-Soumi Cowl	2	1		뤼케시온셍즈 · 뤼케시온셍즈수 · 뤼케시온셍즈토 · 뤼케시온셍즈풍 · 뤼케시온셍즈화	CONFLICT
-Soumi Scout Leather	2	1		밀레스스카웃튜닉 · 밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	CONFLICT
-Stoller	2	11		스톨라 · 스톨라수 · 스톨라토 · 스톨라풍 · 스톨라화	CONFLICT
-Suplice Blouse	2	56		아마존아머 · 아마존아머수 · 아마존아머토 · 아마존아머풍 · 아마존아머화	CONFLICT
-Tagor Jupe	2	11		뤼케시온지폰 · 뤼케시온지폰수 · 뤼케시온지폰토 · 뤼케시온지폰풍 · 뤼케시온지폰화	CONFLICT
 Tard	2	0		네크로브 · 네크로브수 · 네크로브토 · 네크로브풍 · 네크로브화 · 뤼케시온네크로브	CONFLICT
-Undine Scout Leather	2	1		루어스스카웃튜닉 · 루어스스카웃튜닉수 · 루어스스카웃튜닉토 · 루어스스카웃튜닉풍 · 루어스스카웃튜닉화	CONFLICT
-Undine Wind Garb	2	71		밀레스선풍도복 · 밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	CONFLICT
 Valkyrie Mantle	2	99		마스터아머2 · 여전승	CONFLICT
 War Mantle	2	99		마스터아머1 · 전승	CONFLICT
 Wind Garb	2	71		선풍도복 · 선풍도복수 · 선풍도복토 · 선풍도복풍 · 선풍도복화	CONFLICT
@@ -760,19 +773,6 @@ Sgrios Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Sgrios Ruby Earrings	5	8		루비귀걸이	CONFLICT
 Sgrios Silver Earrings	5	8		쌍은귀걸이	CONFLICT
 Band of Destruction	6	1		흑요석몽크목걸이 · 흑요석몽크목걸이(수) · 흑요석몽크목걸이(토) · 흑요석몽크목걸이(풍) · 흑요석몽크목걸이(화)	CONFLICT
-Dark Pearl Necklace	6	6		대지의진주목걸이	CONFLICT
-Earth Gold Jade Necklace	6	14		화염의자수정목걸이	CONFLICT
-Fire Gold Jade Necklace	6	6		대지의금옥목걸이	CONFLICT
-Fire Pearl Necklace	6	6		대지의진주목걸이	CONFLICT
-Gold Jade Necklace	6	6		대지의금옥목걸이	CONFLICT
-Pearl Necklace	6	6		대지의진주목걸이	CONFLICT
-Sea Gold Jade Necklace	6	14		화염의자수정목걸이	CONFLICT
-Sea Gold Jade Necklace	6	6		대지의금옥목걸이	CONFLICT
-Sea Pearl Necklace	6	6		대지의진주목걸이	CONFLICT
-Tadghain's Light Pearl Necklace	6	6		대지의진주목걸이	CONFLICT
-Wind Gold Jade Necklace	6	14		화염의자수정목걸이	CONFLICT
-Wind Gold Jade Necklace	6	6		대지의금옥목걸이	CONFLICT
-Wind Pearl Necklace	6	6		대지의진주목걸이	CONFLICT
 Black Stone Ring	7	99		바이런의반지 · 조커의반지1	CONFLICT
 Eternal Love Ring	7	21		노머시의반지 · 토파즈반지	CONFLICT
 Loures Signet Ring	7	1		로오의반지	CONFLICT
