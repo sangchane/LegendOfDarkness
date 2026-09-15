@@ -513,12 +513,15 @@ def hades_item_korean_names():
                      "한글이름": settled,
                      "접사맞춤": kept, "한글후보": cand,
                      "등급": grade(kept) if settled else ("NONE" if not cand else "CONFLICT")})
+    # 순서가 중요하다. 이름 다툼을 먼저 내려야 뒤의 것들이 그 자리를 본다 — 다투는 동안에는
+    # "이미 정해진 행" 으로 보여 건너뛰기 때문이다. 내린 뒤에 지어 넣고, 마지막에 다시 한 번
+    # 훑어 새로 생긴 다툼을 거른다.
     collapse_ko_base(rows, affixes)
     compose_affixed(rows, affixes, pack_item_names())
-    derive_affixed(rows)
-    # 이름 다툼을 먼저 내려야 등급 짝짓기가 그 자리를 볼 수 있다.
     drop_name_clashes(rows)
+    derive_affixed(rows)
     match_weapon_tiers(rows)
+    drop_name_clashes(rows)
     tally = defaultdict(int)
     for r in rows:
         tally[r["등급"]] += 1
