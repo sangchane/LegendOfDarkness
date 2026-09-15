@@ -85,7 +85,12 @@ public sealed class CombatSmokeTests : IDisposable
     /// </summary>
     private const int MostSwings = 80;
 
-    private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(5));
+    /// <summary>
+    /// 한 시험이 쓸 수 있는 시간. 다섯 분으로는 모자랐다 — <see cref="HitBack" /> 은 괴물이 되받아칠
+    /// 때까지 도발과 기다림을 되풀이하는데, 문 앞 놈은 우리 손에 먼저 죽어 그 도발이 버려진다.
+    /// 조용한 기계에서는 삼 분이면 끝나고 바쁜 기계에서는 그렇지 않다. 재는 값은 그대로다.
+    /// </summary>
+    private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(9));
     private readonly List<IsolatedHadesServer> _servers = [];
 
     public void Dispose()
