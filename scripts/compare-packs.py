@@ -497,7 +497,8 @@ def hades_item_korean_names():
     for h in hades:
         if wearable_hades(h):
             cand = {}
-            for attr in SLOT_TO_ATTR.get(h.get("EquipmentSlot"), ()):
+            # 정렬해서 돈다 — 집합을 그냥 돌면 순회 순서가 실행마다 달라져 후보 목록 차례가 흔들린다.
+            for attr in sorted(SLOT_TO_ATTR.get(h.get("EquipmentSlot"), ())):
                 for pack, names in worn.get((hades_image(h), attr), {}).items():
                     cand.setdefault(pack, []).extend(names)
         else:

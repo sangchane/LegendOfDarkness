@@ -12965,18 +12965,18 @@
   "요구레벨": 99,
   "한글이름": "피닉스크로어",
   "접사맞춤": {
-   "honden-community": [
+   "novaonline": [
     "피닉스크로어"
    ],
-   "novaonline": [
+   "honden-community": [
     "피닉스크로어"
    ]
   },
   "한글후보": {
-   "honden-community": [
+   "novaonline": [
     "피닉스크로어"
    ],
-   "novaonline": [
+   "honden-community": [
     "피닉스크로어"
    ]
   },
@@ -19580,25 +19580,25 @@
   "요구레벨": 20,
   "한글이름": null,
   "접사맞춤": {
+   "novaonline": [
+    "피4"
+   ],
    "5.99-server": [
     "피4"
    ],
    "honden-community": [
     "피닉스크로어4"
-   ],
-   "novaonline": [
-    "피4"
    ]
   },
   "한글후보": {
+   "novaonline": [
+    "피4"
+   ],
    "5.99-server": [
     "피4"
    ],
    "honden-community": [
     "피닉스크로어4"
-   ],
-   "novaonline": [
-    "피4"
    ]
   },
   "등급": "CONFLICT"
@@ -22845,19 +22845,19 @@
   "요구레벨": 95,
   "한글이름": null,
   "접사맞춤": {
-   "5.99-server": [
-    "헬2"
-   ],
    "novaonline": [
     "하이브레이질그레이트배틀액스"
+   ],
+   "5.99-server": [
+    "헬2"
    ]
   },
   "한글후보": {
-   "5.99-server": [
-    "헬2"
-   ],
    "novaonline": [
     "하이브레이질그레이트배틀액스"
+   ],
+   "5.99-server": [
+    "헬2"
    ]
   },
   "등급": "CONFLICT"
