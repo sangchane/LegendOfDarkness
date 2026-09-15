@@ -40,10 +40,19 @@ AFFIX = {"로오": "Luathas",   # 인트변화  ↔ IntModifer
          "풍요": "Abundance", # 공격수정+1 ↔ DmgModifer 1
          "체력": "Might",     # 체력변화+100 ↔ HealthModifer
          "마법": "Magic",     # 마력변화+100 ↔ ManaModifer
+         # 아래 셋은 칸으로 못 가린 것이다 (팩에서 효과가 바뀌어 있다). 자료가 직접 말해 준다:
+         # 카페 `【item】 520 아이템 속성에 관하여` 가 한↔영 접사를 12개 다 적어 두었다.
+         # docs/darkages-cafe/item/520-아이템-속성에-관하여..-(-완료-).md
+         "세오": "Deoch",     # 재생력 10   — 카페 520
+         "뮤레칸": "Sgrios",   # 내구력 10배 — 카페 520
+         "마력": "Magic",     # 카페 520 은 `마력`(DA 에서 MP 50) 이라 적었다. 팩에 둘 다 있다.
          "화염": "Fire", "대지": "Earth", "바다": "Sea", "바람": "Wind"}  # 방어속성
-# 아직 못 가린 둘: 세오(재생력) · 뮤레칸(내구력 10배) ↔ Deoch · Sgrios.
-# 팩에서 효과가 바뀌어 있어 칸으로 가릴 수 없다 — 억지로 짝짓지 않는다.
-EN_TO_KO = {v: k for k, v in AFFIX.items()}
+
+# 한 영문 접사에 한글 표기가 둘인 것이 있다 (Magic ← 마법·마력). 그래서 집합으로 담는다.
+EN_TO_KO = {}
+for _ko, _en in AFFIX.items():
+    EN_TO_KO.setdefault(_en, set()).add(_ko)
+EN_TO_KO["Fioschad"] = EN_TO_KO["Fiosachd"]   # 자료에 있는 오타. 접사로 잡히니 짝도 준다.
 
 # 그림 번호는 **착용 부위마다 따로 매겨진다** — 그림 113 이 Hades 에서는 투구이고 팩에서는
 # 부츠다. 그래서 부위가 같을 때만 잇는다. ★ 표는 신 이름이 붙은 확실한 짝에서 자료가 직접
@@ -102,19 +111,28 @@ def english_affixes(items):
     """
     by_img = defaultdict(set)
     for h in items:
-        by_img[h.get("Image")].add(h["Name"])
+        by_img[hades_image(h)].add(h["Name"])
     found = defaultdict(set)
     for h in items:
         head, _, rest = h["Name"].partition(" ")
-        if rest and rest in by_img[h.get("Image")]:
+        if rest and rest in by_img[hades_image(h)]:
             found[head].add(rest)
     return {a for a, bases in found.items() if len(bases) >= 3}
 
 
 def split_ko(name, siblings):
-    """'<접사>의<밑말>' — 밑말이 같은 그림에 실제로 있을 때만 접사로 본다."""
+    """'<접사>의<밑말>' — 밑말이 같은 그림에 있거나, 앞말이 아는 접사일 때 접사로 본다.
+
+    밑말만 보면 `로오의반지` 가 통짜 이름으로 새어 나간다 — `반지` 가 그 그림 후보에 없어서다.
+    그러면 접사가 없는 영문(`Loures Signet Ring`)에 붙어 **도시 Loures 를 신 로오로** 읽는다.
+    사전(AFFIX)이 12개를 다 갖춘 뒤부터는 앞말만 보고도 접사인 줄 안다.
+    """
     m = re.match(r"^(.+?)의(.+)$", name)
-    return (m.group(1), m.group(2)) if m and m.group(2) in siblings else (None, name)
+    if not m:
+        return (None, name)
+    if m.group(2) in siblings or m.group(1) in AFFIX:
+        return (m.group(1), m.group(2))
+    return (None, name)
 
 
 def split_en(name, affixes):
@@ -132,9 +150,10 @@ def narrow_by_affix(by_pack, en_name, affixes):
     siblings = {n for v in by_pack.values() for n in v}
     en_aff = split_en(en_name, affixes)[0]
     if en_aff is not None and en_aff not in EN_TO_KO:
-        return {}                      # 짝을 아직 모르는 접사다 (세오·뮤레칸 쪽) — 억지로 붙이지 않는다
-    want = EN_TO_KO.get(en_aff)
-    out = {p: [n for n in names if split_ko(n, siblings)[0] == want] for p, names in by_pack.items()}
+        return {}                      # 짝을 아직 모르는 접사다 — 억지로 붙이지 않는다
+    # 접사가 없는 영문 이름은 접사가 없는 한글 이름(밑말 쪽이 None)만 남긴다.
+    want = EN_TO_KO[en_aff] if en_aff is not None else {None}
+    out = {p: [n for n in names if split_ko(n, siblings)[0] in want] for p, names in by_pack.items()}
     return {p: v for p, v in out.items() if v}
 
 
@@ -251,10 +270,64 @@ def mob_stat_agreement():
     return out
 
 
+def hades_image(h):
+    """팩의 `이미지` 와 이을 번호. **`Image` 가 아니라 `DisplayImage` 다.**
+
+    Hades 는 그림 번호를 둘 들고 있다. `Image` 는 **인벤토리 칸에 보이는 아이콘**이라 여럿이
+    나눠 쓴다 — 보석 반지 12종이 전부 210 이고, 210 한 칸에 122장이 몰린다. `DisplayImage`
+    가 실제로 갈리는 값이다 (Beryl 206 · Red Jade 208 · Amethyst 209 · Ruby 210 …).
+    `0x8000` 이 얹혀 있어 떼고 쓴다.
+
+    대부분은 둘이 같다 (Leather Greaves 238 = 238 · Loures Signet Ring 207 = 207). 몰리는
+    자리에서만 갈린다. 실측: 팩과 이어진 것 882 → 933 장, 후보가 하나뿐인 것 258 → 322 장.
+    """
+    d = h.get("DisplayImage")
+    return (d & 0x7FFF) if d else h.get("Image")
+
+
+def pack_item_names():
+    """팩에 실제로 있는 아이템 이름 전부. 지어낸 이름을 걸러 내는 체다."""
+    return {e["이름"] for pack in packs() for e in load(pack, "items")
+            if not is_placeholder(e["이름"])}
+
+
+def compose_affixed(rows, affixes, universe):
+    """밑말이 정해진 것에 접사를 붙여 변종을 짓는다 — **지어낸 이름은 쓰지 않는다.**
+
+    `Deoch Leather Greaves` 의 후보로 `세오의가죽각반` 과 `세오의각반` 이 같이 남는다. 접사만
+    보면 둘 다 세오라 못 가린다. 그런데 `Leather Greaves → 가죽각반` 은 이미 정해져 있으니,
+    `세오` + `의` + `가죽각반` 을 지어 **팩에 그 이름이 실제로 있을 때만** 고른다. 없으면 그냥
+    둔다 — 팩에 없는 이름을 만들어 넣으면 템플릿이 조용히 덮인다.
+
+    찾는 자리는 그림 후보가 아니라 팩 전체다. 변종은 밑말과 같은 물건인데 팩이 그것을 다른
+    그림에 두는 일이 있어, 그림으로 막으면 거의 다 놓친다 (실측: 후보 안에서만 보면 1건).
+    밑말 쪽이 이미 그림으로 검증된 짝이라 그것이 증거 노릇을 한다.
+
+    한 영문 접사에 한글 표기가 둘인 것(Magic ← 마법·마력)은 둘 다 넣어 본다.
+    """
+    settled = {r["영문"]: r["한글이름"] for r in rows if r["한글이름"]}
+    won = 0
+    for r in rows:
+        if r["한글이름"]:
+            continue
+        en_aff, base = split_en(r["영문"], affixes)
+        ko_base = settled.get(base) if en_aff else None
+        if not ko_base:
+            continue
+        made = [ko_aff + joiner + ko_base
+                for ko_aff in EN_TO_KO.get(en_aff, ())
+                for joiner in ("의", "")]
+        hit = [n for n in made if n in universe]
+        if len(hit) == 1:
+            r["한글이름"], r["등급"] = hit[0], "AFFIX_COMPOSED"
+            won += 1
+    return won
+
+
 def hades_item_korean_names():
     """Hades 의 영문 아이템에 팩의 한글 이름을 잇는다 — 그림 번호가 같으면 같은 그림이다.
 
-    Hades 의 `Image` 와 팩의 `이미지` 는 같은 번호 체계다 (Leather Greaves 238 = 가죽각반 238).
+    번호는 `hades_image()` 가 고른다 (`Image` 가 아니라 `DisplayImage`, 까닭은 그쪽 주석).
     다만 **같은 그림에 이름이 여럿** 인 일이 흔하다 — 형용사만 다른 변종이라 사람이 고른다.
     """
     if not HADES_ITEMS.exists():
@@ -268,19 +341,20 @@ def hades_item_korean_names():
         if wearable_hades(h):
             cand = {}
             for attr in SLOT_TO_ATTR.get(h.get("EquipmentSlot"), ()):
-                for pack, names in worn.get((h.get("Image"), attr), {}).items():
+                for pack, names in worn.get((hades_image(h), attr), {}).items():
                     cand.setdefault(pack, []).extend(names)
         else:
-            cand = rest.get((h.get("Image"), None), {})
+            cand = rest.get((hades_image(h), None), {})
         kept = narrow_by_affix(cand, h["Name"], affixes)
         names = {n for v in kept.values() for n in v}
         # 접사까지 맞춘 뒤에도 이름이 하나여야 정해진 것이다. 여럿이면 사람이 고른다.
         settled = names.pop() if len(names) == 1 else None
-        rows.append({"영문": h["Name"], "그림": h.get("Image"),
+        rows.append({"영문": h["Name"], "그림": hades_image(h),
                      "착용자리": h.get("EquipmentSlot"), "요구레벨": h.get("LevelRequired"),
                      "한글이름": settled,
                      "접사맞춤": kept, "한글후보": cand,
                      "등급": grade(kept) if settled else ("NONE" if not cand else "CONFLICT")})
+    compose_affixed(rows, affixes, pack_item_names())
     tally = defaultdict(int)
     for r in rows:
         tally[r["등급"]] += 1
