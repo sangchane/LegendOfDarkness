@@ -1,101 +1,117 @@
 영문	부위	요구레벨	제안	후보	등급
-Apple	0	1	사과		SAME_LINEAGE
-Apple	0	1	사과		SAME_LINEAGE
 Forsaken Jewel	0	1	드라코의눈		PACK_CONSENSUS
 Hag's Replica Girdle	0	3	바크의척추뼈		EXTRACTED_SINGLE
 Secret Canal's Key	0	3	2갱도열쇠		EXTRACTED_SINGLE
-Talos Fragment	0	3	쇠조각		EXTRACTED_SINGLE
-Talos Ore	0	1	쇠조각		EXTRACTED_SINGLE
 beag ioc deum	0	30	중급마력포션		EXTRACTED_SINGLE
 mor ioc deum	0	30	쿠라눔		EXTRACTED_SINGLE
 Battle Sword	1	26	배틀소드	배틀소드수 · 배틀소드토 · 배틀소드풍 · 배틀소드화	KO_BASE_COLLAPSED
 Blazed Veltain Sword	1	99	피닉스크로어		PACK_CONSENSUS
 Broad Sword	1	17	그라디우스	그라디우스수 · 그라디우스토 · 그라디우스풍 · 그라디우스화	KO_BASE_COLLAPSED
-Broad Sword	1	17	매스케이드	매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	KO_BASE_COLLAPSED
-Broad Sword	1	17	매스케이드	매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	KO_BASE_COLLAPSED
-Claidheamh	1	14	세이버	세이버수 · 세이버토 · 세이버풍 · 세이버화	KO_BASE_COLLAPSED
-Claidheamh	1	14	세이버	세이버수 · 세이버토 · 세이버풍 · 세이버화	KO_BASE_COLLAPSED
 Durimis	1	99	히야트홀리스태프		PACK_CONSENSUS
 Empowered Holy Gnarl	1	99	홀리디아나		EXTRACTED_SINGLE
 Enchanted Magus Orb	1	99	다크디아나		EXTRACTED_SINGLE
-Eppe	1	2	에페	에페(x)	KO_BASE_COLLAPSED
-Eppe	1	2	에페	에페(x)	KO_BASE_COLLAPSED
-Fine Light Dagger	1	40	광단검	광단검수 · 광단검토 · 광단검풍 · 광단검화	KO_BASE_COLLAPSED
-Fine Sun Dagger	1	66	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
 Giant Club	1	75	자이언트클럽		EXTRACTED_SINGLE
-Good Sun Dagger	1	64	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
-Grand Sun Dagger	1	68	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
-Great Sun Dagger	1	70	일단검	일단검수 · 일단검토 · 일단검풍 · 일단검화	KO_BASE_COLLAPSED
 Hatchet	1	13	토마호크		SAME_LINEAGE
-Light Dagger	1	42	광단검	광단검수 · 광단검토 · 광단검풍 · 광단검화	KO_BASE_COLLAPSED
-Long Sword	1	56	롱소드	롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	KO_BASE_COLLAPSED
-Long Sword	1	56	롱소드	롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	KO_BASE_COLLAPSED
-Lotus Dagger	1	30	월단검	월단검수 · 월단검토 · 월단검풍 · 월단검화	KO_BASE_COLLAPSED
-Loures Saber	1	7	커틀라스	커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	KO_BASE_COLLAPSED
-Loures Saber	1	7	커틀라스	커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	KO_BASE_COLLAPSED
-Masquerade	1	31	매스케이드	매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	KO_BASE_COLLAPSED
-Moon Dagger	1	30	월단검	월단검수 · 월단검토 · 월단검풍 · 월단검화	KO_BASE_COLLAPSED
 Scythe	1	94	낫		EXTRACTED_SINGLE
 Spiked Club	1	66	스파이크클럽		EXTRACTED_SINGLE
 Stilla	1	61	스틸라	스틸라수 · 스틸라토 · 스틸라풍 · 스틸라화	KO_BASE_COLLAPSED
 Sun Dagger	1	30	곡단도		PACK_CONSENSUS
 Talgonite Axe	1	81	타고나이트액스		PACK_CONSENSUS
-Templar	1	29	매스커레이드	매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	KO_BASE_COLLAPSED
-Templar	1	29	매스커레이드	매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	KO_BASE_COLLAPSED
 The Untamed	1	99	라이트닝액스		EXTRACTED_SINGLE
 Training Staff	1	1	홀리머큐리아		PACK_CONSENSUS
 Wooden Club	1	50	우든클럽		EXTRACTED_SINGLE
+Abundance Hy-Brasyl Bracer	10	95	풍요의금팔찌	금팔찌	AFFIX_DERIVED
+Abundance Hy-Brasyl Gauntlet	10	95	풍요의금장갑	금장갑	AFFIX_DERIVED
 Abundance Iron Bracer	10	33	풍요의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌	EXTRACTED_SINGLE
 Abundance Iron Gauntlet	10	33	풍요의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑	EXTRACTED_SINGLE
 Abundance Leather Bracer	10	9	풍요의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌	EXTRACTED_SINGLE
 Abundance Leather Gauntlet	10	9	풍요의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑	EXTRACTED_SINGLE
 Abundance Mythril Bracer	10	63	풍요의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌	EXTRACTED_SINGLE
 Abundance Mythril Gauntlet	10	63	풍요의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑	EXTRACTED_SINGLE
+Blessed Hy-Brasyl Bracer	10	95	축복의금팔찌	금팔찌	AFFIX_DERIVED
+Blessed Hy-Brasyl Gauntlet	10	95	축복의금장갑	금장갑	AFFIX_DERIVED
+Blessed Iron Bracer	10	33	축복의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	AFFIX_DERIVED
+Blessed Iron Gauntlet	10	33	축복의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	AFFIX_DERIVED
+Blessed Leather Bracer	10	9	축복의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	AFFIX_DERIVED
+Blessed Leather Gauntlet	10	9	축복의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	AFFIX_DERIVED
+Blessed Mythril Bracer	10	63	축복의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	AFFIX_DERIVED
+Blessed Mythril Gauntlet	10	63	축복의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	AFFIX_DERIVED
+Cail Hy-Brasyl Bracer	10	95	메투스의금팔찌	금팔찌	AFFIX_DERIVED
+Cail Hy-Brasyl Gauntlet	10	95	메투스의금장갑	금장갑	AFFIX_DERIVED
 Cail Iron Bracer	10	33	메투스의동팔찌	동팔찌 · 로오의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Cail Iron Gauntlet	10	33	메투스의동장갑	동장갑 · 로오의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	EXTRACTED_SINGLE
 Cail Leather Bracer	10	9	메투스의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	EXTRACTED_SINGLE
 Cail Leather Gauntlet	10	9	메투스의가죽장갑	가죽장갑 · 로오의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	PACK_CONSENSUS
 Cail Mythril Bracer	10	63	메투스의은팔찌	로오의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	EXTRACTED_SINGLE
 Cail Mythril Gauntlet	10	63	메투스의은장갑	로오의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	EXTRACTED_SINGLE
+Ceannlaidir Hy-Brasyl Bracer	10	95	세토아의금팔찌	금팔찌	AFFIX_DERIVED
+Ceannlaidir Hy-Brasyl Gauntlet	10	95	세토아의금장갑	금장갑	AFFIX_DERIVED
 Ceannlaidir Iron Bracer	10	33	세토아의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Ceannlaidir Iron Gauntlet	10	33	세토아의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	EXTRACTED_SINGLE
 Ceannlaidir Leather Bracer	10	9	세토아의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	EXTRACTED_SINGLE
 Ceannlaidir Leather Gauntlet	10	9	세토아의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	PACK_CONSENSUS
 Ceannlaidir Mythril Bracer	10	63	세토아의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	EXTRACTED_SINGLE
 Ceannlaidir Mythril Gauntlet	10	63	세토아의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	EXTRACTED_SINGLE
+Deoch Hy-Brasyl Bracer	10	95	세오의금팔찌	금팔찌	AFFIX_DERIVED
+Deoch Hy-Brasyl Gauntlet	10	95	세오의금장갑	금장갑	AFFIX_DERIVED
 Deoch Iron Bracer	10	33	세오의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Deoch Leather Bracer	10	9	세오의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	EXTRACTED_SINGLE
 Deoch Leather Gauntlet	10	9	세오의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	EXTRACTED_SINGLE
 Deoch Mythril Bracer	10	63	세오의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	EXTRACTED_SINGLE
 Deoch Mythril Gauntlet	10	63	세오의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	EXTRACTED_SINGLE
+Fiosachd Hy-Brasyl Bracer	10	95	셔스의금팔찌	금팔찌	AFFIX_DERIVED
+Fiosachd Hy-Brasyl Gauntlet	10	95	셔스의금장갑	금장갑	AFFIX_DERIVED
 Fiosachd Iron Bracer	10	33	셔스의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Fiosachd Iron Gauntlet	10	33	셔스의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 이아의동장갑 · 풍요의동장갑	EXTRACTED_SINGLE
 Fiosachd Leather Bracer	10	9	셔스의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	EXTRACTED_SINGLE
 Fiosachd Leather Gauntlet	10	9	셔스의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	EXTRACTED_SINGLE
 Fiosachd Mythril Bracer	10	63	셔스의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	EXTRACTED_SINGLE
 Fiosachd Mythril Gauntlet	10	63	셔스의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	EXTRACTED_SINGLE
+Glioca Hy-Brasyl Bracer	10	95	이아의금팔찌	금팔찌	AFFIX_DERIVED
+Glioca Hy-Brasyl Gauntlet	10	95	이아의금장갑	금장갑	AFFIX_DERIVED
 Glioca Iron Bracer	10	33	이아의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Glioca Iron Gauntlet	10	33	이아의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 풍요의동장갑	EXTRACTED_SINGLE
 Glioca Leather Bracer	10	9	이아의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 풍요의가죽팔찌	EXTRACTED_SINGLE
-Glioca Leather Gauntlet	10	9	이아의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 풍요의가죽장갑	EXTRACTED_SINGLE
-Glioca Leather Gauntlet	10	9	이아의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 풍요의가죽장갑	EXTRACTED_SINGLE
 Glioca Mythril Bracer	10	63	이아의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 풍요의은팔찌	EXTRACTED_SINGLE
 Glioca Mythril Gauntlet	10	63	이아의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 풍요의은장갑	EXTRACTED_SINGLE
+Gramail Hy-Brasyl Bracer	10	95	칸의금팔찌	금팔찌	AFFIX_DERIVED
+Gramail Hy-Brasyl Gauntlet	10	95	칸의금장갑	금장갑	AFFIX_DERIVED
+Gramail Iron Bracer	10	33	칸의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	AFFIX_DERIVED
+Gramail Iron Gauntlet	10	33	칸의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	AFFIX_DERIVED
+Gramail Leather Bracer	10	9	칸의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	AFFIX_DERIVED
+Gramail Leather Gauntlet	10	9	칸의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	AFFIX_DERIVED
+Gramail Mythril Bracer	10	63	칸의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	AFFIX_DERIVED
+Gramail Mythril Gauntlet	10	63	칸의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	AFFIX_DERIVED
 Hy-Brasyl Bracer	10	95	금팔찌		PACK_CONSENSUS
 Hy-Brasyl Gauntlet	10	95	금장갑		PACK_CONSENSUS
 Iron Bracer	10	33	동팔찌	로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Leather Bracer	10	9	가죽팔찌	로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	EXTRACTED_SINGLE
 Leather Gauntlet	10	9	가죽장갑	로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	PACK_CONSENSUS
+Luathas Hy-Brasyl Bracer	10	95	로오의금팔찌	금팔찌	AFFIX_DERIVED
+Luathas Hy-Brasyl Gauntlet	10	95	로오의금장갑	금장갑	AFFIX_DERIVED
 Luathas Iron Bracer	10	33	로오의동팔찌	동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Luathas Iron Gauntlet	10	33	로오의동장갑	동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	EXTRACTED_SINGLE
 Luathas Leather Bracer	10	9	로오의가죽팔찌	가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	EXTRACTED_SINGLE
 Luathas Leather Gauntlet	10	9	로오의가죽장갑	가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	PACK_CONSENSUS
 Luathas Mythril Bracer	10	63	로오의은팔찌	메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	EXTRACTED_SINGLE
 Luathas Mythril Gauntlet	10	63	로오의은장갑	메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	EXTRACTED_SINGLE
+Might Hy-Brasyl Bracer	10	95	체력의금팔찌	금팔찌	AFFIX_DERIVED
+Might Hy-Brasyl Gauntlet	10	95	체력의금장갑	금장갑	AFFIX_DERIVED
+Might Iron Bracer	10	33	체력의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	AFFIX_DERIVED
+Might Iron Gauntlet	10	33	체력의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	AFFIX_DERIVED
+Might Leather Bracer	10	9	체력의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	AFFIX_DERIVED
+Might Leather Gauntlet	10	9	체력의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	AFFIX_DERIVED
+Might Mythril Bracer	10	63	체력의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	AFFIX_DERIVED
+Might Mythril Gauntlet	10	63	체력의은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	AFFIX_DERIVED
 Mythril Bracer	10	63	은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 이아의은팔찌 · 풍요의은팔찌	EXTRACTED_SINGLE
 Mythril Gauntlet	10	63	은장갑	로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 이아의은장갑 · 풍요의은장갑	PACK_CONSENSUS
+Sgrios Hy-Brasyl Bracer	10	95	뮤레칸의금팔찌	금팔찌	AFFIX_DERIVED
+Sgrios Hy-Brasyl Gauntlet	10	95	뮤레칸의금장갑	금장갑	AFFIX_DERIVED
 Sgrios Iron Bracer	10	33	뮤레칸의동팔찌	동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	EXTRACTED_SINGLE
 Sgrios Iron Gauntlet	10	33	뮤레칸의동장갑	동장갑 · 로오의동장갑 · 메투스의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	EXTRACTED_SINGLE
+Sgrios Leather Bracer	10	9	뮤레칸의가죽팔찌	가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	AFFIX_DERIVED
+Sgrios Leather Gauntlet	10	9	뮤레칸의가죽장갑	가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	AFFIX_DERIVED
+Sgrios Mythril Bracer	10	63	뮤레칸의은팔찌	로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	AFFIX_DERIVED
 Sgrios Mythril Gauntlet	10	63	뮤레칸의은장갑	로오의은장갑 · 메투스의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	EXTRACTED_SINGLE
 Dark Belt	11	11	해골벨트		EXTRACTED_SINGLE
 Dark Hy-Brasyl Belt	11	12	금벨트	대지의금벨트 · 바다의금벨트 · 바람의금벨트 · 화염의금벨트	PACK_CONSENSUS
@@ -166,38 +182,93 @@ Sgrios Hy-Brasyl Greaves	12	93	뮤레칸의금각반	금각반 · 뉴트의매�
 Sgrios Iron Greaves	12	20	뮤레칸의동각반	동각반 · 로오의동각반 · 마법의동각반 · 메투스의동각반 · 세오의동각반 · 세토아의동각반 · 셔스의동각반 · 이아의동각반 · 체력의동각반 · 축복의동각반 · 칸의동각반 · 풍요의동각반	EXTRACTED_SINGLE
 Sgrios Leather Greaves	12	6	뮤레칸의가죽각반	가죽각반 · 로오의가죽각반 · 마법의가죽각반 · 메투스의가죽각반 · 세오의가죽각반 · 세오의각반 · 세토아의가죽각반 · 셔스의가죽각반 · 이아의가죽각반 · 체력의가죽각반 · 축복의가죽각반 · 칸의가죽각반	EXTRACTED_SINGLE
 Sgrios Mythril Greaves	12	59	뮤레칸의은각반	로오의은각반 · 마법의은각반 · 메투스의은각반 · 산호각반 · 세오의은각반 · 세토아의은각반 · 셔스의은각반 · 은각반 · 이아의은각반 · 체력의은각반 · 축복의은각반 · 칸의은각반	EXTRACTED_SINGLE
+Abundance Boots	13	1	풍요의신발	신발	AFFIX_DERIVED
 Abundance Cordovan Boots	13	50	풍요의레더부츠	레더부츠 · 셔스의레더부츠	EXTRACTED_SINGLE
-Abundance Grey Boots	13	11	풍요의녹색신발	녹색신발	EXTRACTED_SINGLE
-Abundance Shagreen Boots	13	33	풍요의녹색신발	녹색신발	EXTRACTED_SINGLE
+Abundance Enchanted Boots	13	96	풍요의매직부츠	매직부츠	AFFIX_DERIVED
+Abundance Magma Boots	13	82	풍요의마그마부츠	마그마부츠	AFFIX_DERIVED
+Abundance Saffian Boots	13	66	풍요의바이올렛티	바이올렛티	AFFIX_DERIVED
+Blessed Boots	13	1	축복의신발	신발	AFFIX_DERIVED
+Blessed Cordovan Boots	13	50	축복의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Blessed Enchanted Boots	13	96	축복의매직부츠	매직부츠	AFFIX_DERIVED
+Blessed Grey Boots	13	11	축복의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Blessed Magma Boots	13	82	축복의마그마부츠	마그마부츠	AFFIX_DERIVED
+Blessed Saffian Boots	13	66	축복의바이올렛티	바이올렛티	AFFIX_DERIVED
+Blessed Shagreen Boots	13	33	축복의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
 Boots	13	1	신발		EXTRACTED_SINGLE
+Cail Boots	13	1	메투스의신발	신발	AFFIX_DERIVED
+Cail Cordovan Boots	13	50	메투스의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Cail Enchanted Boots	13	96	메투스의매직부츠	매직부츠	AFFIX_DERIVED
+Cail Grey Boots	13	11	메투스의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Cail Magma Boots	13	82	메투스의마그마부츠	마그마부츠	AFFIX_DERIVED
+Cail Saffian Boots	13	66	메투스의바이올렛티	바이올렛티	AFFIX_DERIVED
+Cail Shagreen Boots	13	33	메투스의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
 Ceannlaidir Boots	13	1	세토아의신발	신발	AFFIX_COMPOSED
+Ceannlaidir Cordovan Boots	13	50	세토아의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Ceannlaidir Enchanted Boots	13	96	세토아의매직부츠	매직부츠	AFFIX_DERIVED
+Ceannlaidir Grey Boots	13	11	세토아의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Ceannlaidir Magma Boots	13	82	세토아의마그마부츠	마그마부츠	AFFIX_DERIVED
+Ceannlaidir Saffian Boots	13	66	세토아의바이올렛티	바이올렛티	AFFIX_DERIVED
+Ceannlaidir Shagreen Boots	13	33	세토아의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
 Cordovan Boots	13	50	레더부츠	셔스의레더부츠 · 풍요의레더부츠	EXTRACTED_SINGLE
+Deoch Cordovan Boots	13	50	세오의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Deoch Enchanted Boots	13	96	세오의매직부츠	매직부츠	AFFIX_DERIVED
+Deoch Grey Boots	13	11	세오의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Deoch Magma Boots	13	82	세오의마그마부츠	마그마부츠	AFFIX_DERIVED
+Deoch Saffian Boots	13	66	세오의바이올렛티	바이올렛티	AFFIX_DERIVED
+Deoch Shagreen Boots	13	33	세오의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
 Enchanted Boots	13	96	매직부츠		EXTRACTED_SINGLE
 Fiosachd Cordovan Boots	13	50	셔스의레더부츠	레더부츠 · 풍요의레더부츠	EXTRACTED_SINGLE
+Fiosachd Enchanted Boots	13	96	셔스의매직부츠	매직부츠	AFFIX_DERIVED
+Fiosachd Grey Boots	13	11	셔스의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Fiosachd Magma Boots	13	82	셔스의마그마부츠	마그마부츠	AFFIX_DERIVED
+Fiosachd Saffian Boots	13	66	셔스의바이올렛티	바이올렛티	AFFIX_DERIVED
+Fiosachd Shagreen Boots	13	33	셔스의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Fioschad Boots	13	1	셔스의신발	신발	AFFIX_DERIVED
+Glioca Boots	13	1	이아의신발	신발	AFFIX_DERIVED
+Glioca Cordovan Boots	13	50	이아의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Glioca Enchanted Boots	13	96	이아의매직부츠	매직부츠	AFFIX_DERIVED
+Glioca Grey Boots	13	11	이아의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Glioca Magma Boots	13	82	이아의마그마부츠	마그마부츠	AFFIX_DERIVED
+Glioca Saffian Boots	13	66	이아의바이올렛티	바이올렛티	AFFIX_DERIVED
+Glioca Shagreen Boots	13	33	이아의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Gramail Boots	13	1	칸의신발	신발	AFFIX_DERIVED
+Gramail Cordovan Boots	13	50	칸의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Gramail Enchanted Boots	13	96	칸의매직부츠	매직부츠	AFFIX_DERIVED
+Gramail Grey Boots	13	11	칸의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Gramail Magma Boots	13	82	칸의마그마부츠	마그마부츠	AFFIX_DERIVED
+Gramail Saffian Boots	13	66	칸의바이올렛티	바이올렛티	AFFIX_DERIVED
+Gramail Shagreen Boots	13	33	칸의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
 Grey Boots	13	11	회색신발		EXTRACTED_SINGLE
 Hy-Brasyl Boots	13	1	배틀부츠		EXTRACTED_SINGLE
-Lapis Boots	13	56	녹색신발	풍요의녹색신발	EXTRACTED_SINGLE
 Luathas Boots	13	1	로오의신발	신발	AFFIX_COMPOSED
 Magma Boots	13	82	마그마부츠		EXTRACTED_SINGLE
+Might Boots	13	1	체력의신발	신발	AFFIX_DERIVED
+Might Cordovan Boots	13	50	체력의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Might Enchanted Boots	13	96	체력의매직부츠	매직부츠	AFFIX_DERIVED
+Might Grey Boots	13	11	체력의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Might Magma Boots	13	82	체력의마그마부츠	마그마부츠	AFFIX_DERIVED
+Might Saffian Boots	13	66	체력의바이올렛티	바이올렛티	AFFIX_DERIVED
+Might Shagreen Boots	13	33	체력의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
 Saffian Boots	13	66	바이올렛티		EXTRACTED_SINGLE
-Shagreen Boots	13	33	녹색신발	풍요의녹색신발	EXTRACTED_SINGLE
-1	2	0	밀레스선풍도복	밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	KO_BASE_COLLAPSED
+Sgrios Cordovan Boots	13	50	뮤레칸의레더부츠	레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	AFFIX_DERIVED
+Sgrios Enchanted Boots	13	96	뮤레칸의매직부츠	매직부츠	AFFIX_DERIVED
+Sgrios Grey Boots	13	11	뮤레칸의회색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
+Sgrios Magma Boots	13	82	뮤레칸의마그마부츠	마그마부츠	AFFIX_DERIVED
+Sgrios Saffian Boots	13	66	뮤레칸의바이올렛티	바이올렛티	AFFIX_DERIVED
+Sgrios Shagreen Boots	13	33	뮤레칸의녹색신발	녹색신발 · 풍요의녹색신발	AFFIX_DERIVED
 Abel Dwarvish Leather	2	11	루어스노미쉬레더	루어스노미쉬레더수 · 루어스노미쉬레더토 · 루어스노미쉬레더풍 · 루어스노미쉬레더화	KO_BASE_COLLAPSED
 Bangasart	2	97	매직로브	매직로브수 · 매직로브토 · 매직로브풍 · 매직로브화	KO_BASE_COLLAPSED
 Bardocle	2	97	바르도클	바르도클수 · 바르도클토 · 바르도클풍 · 바르도클화	KO_BASE_COLLAPSED
 Benusta	2	11	베누스타	베누스타수 · 베누스타토 · 베누스타풍 · 베누스타화	KO_BASE_COLLAPSED
-Brigadine	2	11	브리간딘	브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	KO_BASE_COLLAPSED
 Carnun Plate	2	80	헬나이트아머		PACK_CONSENSUS
 Chainmail	2	56	체인메일	체인메일수 · 체인메일토 · 체인메일풍 · 체인메일화	KO_BASE_COLLAPSED
 Clamyth	2	97	클라미스	클라미스수 · 클라미스토 · 클라미스풍 · 클라미스화	KO_BASE_COLLAPSED
 Clymouth	2	71	클리머스	클리머스수 · 클리머스토 · 클리머스풍 · 클리머스화	KO_BASE_COLLAPSED
-Corsette	2	41	브리간딘	브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	KO_BASE_COLLAPSED
 Cotehardie	2	26	미스티플레이트	미스티플레이트수 · 미스티플레이트토 · 미스티플레이트풍 · 미스티플레이트화	KO_BASE_COLLAPSED
 Cullote	2	11	단도복	단도복수 · 단도복토 · 단도복풍 · 단도복화	KO_BASE_COLLAPSED
 Dark Cleric Gown	2	60	클레릭의상2		EXTRACTED_SINGLE
 Dolman	2	71	홀리로브	홀리로브수 · 홀리로브토 · 홀리로브풍 · 홀리로브화	KO_BASE_COLLAPSED
 Duin-Uasal	2	97	다크로럼	다크로럼수 · 다크로럼토 · 다크로럼풍 · 다크로럼화	KO_BASE_COLLAPSED
-Dwarvish Leather	2	11	노미쉬레더	노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	KO_BASE_COLLAPSED
 Earth's Bodice	2	1	연무복	연무복수 · 연무복토 · 연무복풍 · 연무복화	KO_BASE_COLLAPSED
 Elle	2	41	엘레맨틀	엘레맨틀수 · 엘레맨틀토 · 엘레맨틀풍 · 엘레맨틀화	KO_BASE_COLLAPSED
 Formal Coat	2	0	망토		EXTRACTED_SINGLE
@@ -205,18 +276,14 @@ Galuchat	2	11	레더로브	레더로브수 · 레더로브토 · 레더로브풍
 Gardcorp	2	1	후드로브	후드로브수 · 후드로브토 · 후드로브풍 · 후드로브화	KO_BASE_COLLAPSED
 Grand Master Celestial Gown	2	99	라피스라즐리2		PACK_CONSENSUS
 Grand Master Celestial Robes	2	99	데메테르2		PACK_CONSENSUS
-Grand Master Combat Armor	2	99	위타천2		PACK_CONSENSUS
-Grand Master Combat Armor	2	99	위타천2		PACK_CONSENSUS
 Grand Master Combat Robe	2	99	가릉비가2		PACK_CONSENSUS
 Grand Master Divine Gown	2	99	라피스라즐리1		PACK_CONSENSUS
 Grand Master Divine Robes	2	99	데메테르1		PACK_CONSENSUS
 Grand Master Magic Gown	2	99	세르네티2		PACK_CONSENSUS
-Grand Master Mail	2	99	아비스2		PACK_CONSENSUS
 Grand Master Mantle	2	99	아비스1		PACK_CONSENSUS
 Grand Master Mystic Gown	2	99	세르네티1		PACK_CONSENSUS
 Grand Master Mystic Robe	2	99	솔라레스2		PACK_CONSENSUS
 Grand Master Plate	2	99	레일라1		PACK_CONSENSUS
-Grand Master Shadow Mail	2	99	아비스2		PACK_CONSENSUS
 Grand Master Shadow Plate	2	99	레일라2		PACK_CONSENSUS
 Grand Master Virtue Armor	2	99	위타천1		PACK_CONSENSUS
 Grand Master Virtue Robe	2	99	가릉비가1		PACK_CONSENSUS
@@ -241,15 +308,12 @@ Magi Skirt	2	1	매직스커트	매직스커트수 · 매직스커트토 · 매�
 Marauder Hide	2	80	헬씨프아머		PACK_CONSENSUS
 Mileth Cotte	2	1	밀레스연무도복	밀레스연무도복수 · 밀레스연무도복토 · 밀레스연무도복풍 · 밀레스연무도복화	KO_BASE_COLLAPSED
 Mileth Cowl	2	1	밀레스셍즈	밀레스셍즈수 · 밀레스셍즈토 · 밀레스셍즈풍 · 밀레스셍즈화	KO_BASE_COLLAPSED
-Mileth Dwarvish Leather	2	11	밀레스노미쉬레더	밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	KO_BASE_COLLAPSED
 Mileth Jupe	2	11	밀레스지폰	밀레스지폰수 · 밀레스지폰토 · 밀레스지폰풍 · 밀레스지폰화	KO_BASE_COLLAPSED
-Mileth Scout Leather	2	1	밀레스스카웃튜닉	밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	KO_BASE_COLLAPSED
 Moon Bodice	2	41	풍월도복	풍월도복수 · 풍월도복토 · 풍월도복풍 · 풍월도복화	KO_BASE_COLLAPSED
 Mountain Garb	2	97	태산도복	태산도복수 · 태산도복토 · 태산도복풍 · 태산도복화	KO_BASE_COLLAPSED
 Mystic Gown	2	11	미스틱로브	미스틱로브수 · 미스틱로브토 · 미스틱로브풍 · 미스틱로브화	KO_BASE_COLLAPSED
 Oren Dwarvish Leather	2	11	밀레스팔루텐	밀레스팔루텐수 · 밀레스팔루텐토 · 밀레스팔루텐풍 · 밀레스팔루텐화	KO_BASE_COLLAPSED
 Oren Jupe	2	11	루어스지폰	루어스지폰수 · 루어스지폰토 · 루어스지폰풍 · 루어스지폰화	KO_BASE_COLLAPSED
-Paluten	2	41	노미쉬레더	노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	KO_BASE_COLLAPSED
 Pebble Rose	2	71	페플로스	페플로스수 · 페플로스토 · 페플로스풍 · 페플로스화	KO_BASE_COLLAPSED
 Phoenix Mail	2	86	수오미라비린스메일	수오미라비린스메일수 · 수오미라비린스메일토 · 수오미라비린스메일풍 · 수오미라비린스메일화	KO_BASE_COLLAPSED
 Piet Cowl	2	1	수오미셍즈	수오미셍즈수 · 수오미셍즈토 · 수오미셍즈풍 · 수오미셍즈화	KO_BASE_COLLAPSED
@@ -258,34 +322,76 @@ Platemail	2	86	수오미풀플레이트	수오미풀플레이트수 · 수오미
 Reiter Mail	2	60	듈라한의상		EXTRACTED_SINGLE
 Rucesion Cotte	2	1	수오미연무도복	수오미연무도복수 · 수오미연무도복토 · 수오미연무도복풍 · 수오미연무도복화	KO_BASE_COLLAPSED
 Rucesion Cowl	2	1	루어스셍즈	루어스셍즈수 · 루어스셍즈토 · 루어스셍즈풍 · 루어스셍즈화	KO_BASE_COLLAPSED
-Rucesion Dwarvish Leather	2	11	밀레스노미쉬레더	밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	KO_BASE_COLLAPSED
 Rucesion Jupe	2	11	수오미지폰	수오미지폰수 · 수오미지폰토 · 수오미지폰풍 · 수오미지폰화	KO_BASE_COLLAPSED
 Rucesion Scout Leather	2	1	뤼케시온스카웃튜닉	뤼케시온스카웃튜닉수 · 뤼케시온스카웃튜닉토 · 뤼케시온스카웃튜닉풍 · 뤼케시온스카웃튜닉화	KO_BASE_COLLAPSED
 Scout Leather	2	1	스카웃튜닉	스카웃튜닉수 · 스카웃튜닉토 · 스카웃튜닉풍 · 스카웃튜닉화	KO_BASE_COLLAPSED
 Soumi Cotte	2	1	뤼케시온연무도복	뤼케시온연무도복수 · 뤼케시온연무도복토 · 뤼케시온연무도복풍 · 뤼케시온연무도복화	KO_BASE_COLLAPSED
 Soumi Cowl	2	1	뤼케시온셍즈	뤼케시온셍즈수 · 뤼케시온셍즈토 · 뤼케시온셍즈풍 · 뤼케시온셍즈화	KO_BASE_COLLAPSED
-Soumi Scout Leather	2	1	밀레스스카웃튜닉	밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	KO_BASE_COLLAPSED
 Stoller	2	11	스톨라	스톨라수 · 스톨라토 · 스톨라풍 · 스톨라화	KO_BASE_COLLAPSED
 Suomi Guard Uniform	2	0	초보자갑옷		EXTRACTED_SINGLE
 Suplice Blouse	2	56	아마존아머	아마존아머수 · 아마존아머토 · 아마존아머풍 · 아마존아머화	KO_BASE_COLLAPSED
 Tagor Jupe	2	11	뤼케시온지폰	뤼케시온지폰수 · 뤼케시온지폰토 · 뤼케시온지폰풍 · 뤼케시온지폰화	KO_BASE_COLLAPSED
 Undine Scout Leather	2	1	루어스스카웃튜닉	루어스스카웃튜닉수 · 루어스스카웃튜닉토 · 루어스스카웃튜닉풍 · 루어스스카웃튜닉화	KO_BASE_COLLAPSED
-Undine Wind Garb	2	71	밀레스선풍도복	밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	KO_BASE_COLLAPSED
 White Tuxedo	2	0	턱시도		EXTRACTED_SINGLE
+Abundance Bronze Shield	3	31	풍요의구리방패	구리방패	AFFIX_DERIVED
+Abundance Hy-Brasyl Shield	3	77	풍요의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
+Abundance Leather Shield	3	15	풍요의가죽방패	가죽방패	AFFIX_DERIVED
+Abundance Mythril Shield	3	61	풍요의은제방패	은제방패	AFFIX_DERIVED
 Abundance Talos Shield	3	90	풍요의플라늄방패	플라늄방패	EXTRACTED_SINGLE
+Blessed Bronze Shield	3	31	축복의구리방패	구리방패	AFFIX_DERIVED
+Blessed Hy-Brasyl Shield	3	77	축복의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
+Blessed Leather Shield	3	15	축복의가죽방패	가죽방패	AFFIX_DERIVED
+Blessed Mythril Shield	3	61	축복의은제방패	은제방패	AFFIX_DERIVED
+Blessed Talos Shield	3	90	축복의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
 Bronze Shield	3	31	구리방패		EXTRACTED_SINGLE
+Cail Bronze Shield	3	31	메투스의구리방패	구리방패	AFFIX_DERIVED
+Cail Hy-Brasyl Shield	3	77	메투스의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
 Cail Leather Shield	3	15	메투스의가죽방패	가죽방패	AFFIX_COMPOSED
+Cail Mythril Shield	3	61	메투스의은제방패	은제방패	AFFIX_DERIVED
+Cail Talos Shield	3	90	메투스의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
+Ceannlaidir Bronze Shield	3	31	세토아의구리방패	구리방패	AFFIX_DERIVED
+Ceannlaidir Hy-Brasyl Shield	3	77	세토아의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
 Ceannlaidir Leather Shield	3	15	세토아의가죽방패	가죽방패	AFFIX_COMPOSED
+Ceannlaidir Mythril Shield	3	61	세토아의은제방패	은제방패	AFFIX_DERIVED
+Ceannlaidir Talos Shield	3	90	세토아의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
+Deoch Bronze Shield	3	31	세오의구리방패	구리방패	AFFIX_DERIVED
+Deoch Hy-Brasyl Shield	3	77	세오의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
+Deoch Leather Shield	3	15	세오의가죽방패	가죽방패	AFFIX_DERIVED
+Deoch Mythril Shield	3	61	세오의은제방패	은제방패	AFFIX_DERIVED
+Deoch Talos Shield	3	90	세오의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
+Fiosachd Bronze Shield	3	31	셔스의구리방패	구리방패	AFFIX_DERIVED
 Fiosachd Hy-Brasyl Shield	3	77	셔스의금제방패	금제방패	EXTRACTED_SINGLE
+Fiosachd Leather Shield	3	15	셔스의가죽방패	가죽방패	AFFIX_DERIVED
+Fiosachd Mythril Shield	3	61	셔스의은제방패	은제방패	AFFIX_DERIVED
+Fiosachd Talos Shield	3	90	셔스의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
+Glioca Bronze Shield	3	31	이아의구리방패	구리방패	AFFIX_DERIVED
+Glioca Hy-Brasyl Shield	3	77	이아의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
 Glioca Leather Shield	3	15	이아의가죽방패	가죽방패	AFFIX_COMPOSED
+Glioca Mythril Shield	3	61	이아의은제방패	은제방패	AFFIX_DERIVED
+Glioca Talos Shield	3	90	이아의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
+Gramail Bronze Shield	3	31	칸의구리방패	구리방패	AFFIX_DERIVED
+Gramail Hy-Brasyl Shield	3	77	칸의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
+Gramail Leather Shield	3	15	칸의가죽방패	가죽방패	AFFIX_DERIVED
+Gramail Mythril Shield	3	61	칸의은제방패	은제방패	AFFIX_DERIVED
+Gramail Talgonite Shield	3	98	칸의기사단방패	기사단방패	AFFIX_DERIVED
+Gramail Talos Shield	3	90	칸의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
 Hy-Brasyl Shield	3	77	금제방패	셔스의금제방패	EXTRACTED_SINGLE
 Leather Shield	3	15	가죽방패		EXTRACTED_SINGLE
+Luathas Bronze Shield	3	31	로오의구리방패	구리방패	AFFIX_DERIVED
+Luathas Hy-Brasyl Shield	3	77	로오의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
 Luathas Leather Shield	3	15	로오의가죽방패	가죽방패	AFFIX_COMPOSED
+Luathas Mythril Shield	3	61	로오의은제방패	은제방패	AFFIX_DERIVED
+Luathas Talos Shield	3	90	로오의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
+Might Bronze Shield	3	31	체력의구리방패	구리방패	AFFIX_DERIVED
+Might Hy-Brasyl Shield	3	77	체력의금제방패	금제방패 · 셔스의금제방패	AFFIX_DERIVED
+Might Leather Shield	3	15	체력의가죽방패	가죽방패	AFFIX_DERIVED
+Might Mythril Shield	3	61	체력의은제방패	은제방패	AFFIX_DERIVED
+Might Talos Shield	3	90	체력의플라늄방패	풍요의플라늄방패 · 플라늄방패	AFFIX_DERIVED
 Mythril Shield	3	61	은제방패		EXTRACTED_SINGLE
+Sgrios Bronze Shield	3	31	뮤레칸의구리방패	구리방패	AFFIX_DERIVED
+Sgrios Leather Shield	3	15	뮤레칸의가죽방패	가죽방패	AFFIX_DERIVED
 Talgonite Shield	3	98	기사단방패		EXTRACTED_SINGLE
 Talos Shield	3	90	플라늄방패	풍요의플라늄방패	EXTRACTED_SINGLE
-Wooden Shield	3	1	나무방패		EXTRACTED_SINGLE
-Wooden Shield 2	3	1	나무방패		EXTRACTED_SINGLE
 Grand Master Celestial Crown	4	99	큐이레스2		PACK_CONSENSUS
 Grand Master Celestial Mitre F	4	99	아가트2		PACK_CONSENSUS
 Grand Master Divine Crown	4	99	큐이레스1		PACK_CONSENSUS
@@ -301,36 +407,65 @@ Grand Master War Helmet	4	99	헬름1		PACK_CONSENSUS
 Grand Shadow Band	4	99	루크2		PACK_CONSENSUS
 Grand Shadow Hood	4	99	라멜2		PACK_CONSENSUS
 Grand Shadow Mask	4	99	루크1		PACK_CONSENSUS
-Holy Cap	4	11	세인트홀		SAME_LINEAGE
 Holy Conical	4	21	홀리코니칼		EXTRACTED_SINGLE
-Hy-Brasyl Helm	4	97	세인트투구		PACK_CONSENSUS
-Hy-Brasyl Helmet	4	97	골든플레이트투구		PACK_CONSENSUS
-Hy-Brasyl Helmet	4	97	골든플레이트투구		PACK_CONSENSUS
-Hy-Brasyl Plated Helmet	4	97	세인트투구		PACK_CONSENSUS
 Iplet Helm	4	71	이프리트투구		PACK_CONSENSUS
 Kopfloser Mask	4	60	듈라한모자		EXTRACTED_SINGLE
 Labyrinth Helmet	4	71	라비린스투구		EXTRACTED_SINGLE
 Lich Hood	4	60	마법좀비모자		PACK_CONSENSUS
-Magus Cap	4	11	세인트홀		SAME_LINEAGE
 Phoenix Helmet	4	86	피닉스투구		EXTRACTED_SINGLE
 Platemail Helm	4	86	풀플레이트투구		PACK_CONSENSUS
 Sacred Chief	4	99	성승모		EXTRACTED_SINGLE
+Abundance Beryl Earrings	5	8	풍요의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Abundance Beryl Ring	5	9	풍요의금반지		AFFIX_DERIVED
+Abundance Gold Earrings	5	8	풍요의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Abundance Silver Earrings	5	8	풍요의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
 Beryl Earrings	5	8	순옥귀걸이		PACK_CONSENSUS
+Blessed Beryl Earrings	5	8	축복의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Blessed Beryl Ring	5	9	축복의금반지		AFFIX_DERIVED
+Blessed Gold Earrings	5	8	축복의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Blessed Silver Earrings	5	8	축복의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Cail Beryl Earrings	5	8	메투스의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Cail Beryl Ring	5	9	메투스의금반지		AFFIX_DERIVED
 Cail Coral Earrings	5	8	메투스의산호귀걸이	가죽팔찌 · 로오의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	EXTRACTED_SINGLE
+Cail Gold Earrings	5	8	메투스의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Cail Silver Earrings	5	8	메투스의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Ceannlaidir Beryl Earrings	5	8	세토아의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Ceannlaidir Beryl Ring	5	9	세토아의금반지		AFFIX_DERIVED
 Ceannlaidir Coral Earrings	5	8	세토아의산호귀걸이	가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이	EXTRACTED_SINGLE
+Ceannlaidir Gold Earrings	5	8	세토아의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Ceannlaidir Silver Earrings	5	8	세토아의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Deoch Beryl Earrings	5	8	세오의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Deoch Beryl Ring	5	9	세오의금반지		AFFIX_DERIVED
+Deoch Gold Earrings	5	8	세오의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Deoch Silver Earrings	5	8	세오의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Fiosachd Beryl Ring	5	9	셔스의금반지		AFFIX_DERIVED
+Fiosachd Gold Earrings	5	8	셔스의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Fiosachd Silver Earrings	5	8	셔스의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Fioschad Beryl Earrings	5	8	셔스의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Glioca Beryl Earrings	5	8	이아의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Glioca Beryl Ring	5	9	이아의금반지		AFFIX_DERIVED
+Glioca Gold Earrings	5	8	이아의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Glioca Silver Earrings	5	8	이아의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
 Gold Earrings	5	8	쌍금귀걸이		PACK_CONSENSUS
+Gramail Beryl Earrings	5	8	칸의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Gramail Beryl Ring	5	9	칸의금반지		AFFIX_DERIVED
+Gramail Gold Earrings	5	8	칸의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Gramail Silver Earrings	5	8	칸의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Luathas Beryl Earrings	5	8	로오의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Luathas Beryl Ring	5	9	로오의금반지		AFFIX_DERIVED
 Luathas Coral Earrings	5	8	로오의산호귀걸이	가죽팔찌 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	EXTRACTED_SINGLE
-Silver Earrings	5	8	쌍은귀걸이		PACK_CONSENSUS
-Wolf Earrings	5	1	쌍은귀걸이		PACK_CONSENSUS
-Wolf Earrings	5	1	쌍은귀걸이		PACK_CONSENSUS
-Bone Necklace	6	6	마기아목걸이		PACK_CONSENSUS
-Dark Bone Necklace	6	6	마기아목걸이		PACK_CONSENSUS
-Dark Bone Necklace	6	6	마기아목걸이		PACK_CONSENSUS
+Luathas Gold Earrings	5	8	로오의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Luathas Silver Earrings	5	8	로오의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Might Beryl Earrings	5	8	체력의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Might Beryl Ring	5	9	체력의금반지		AFFIX_DERIVED
+Might Gold Earrings	5	8	체력의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Might Silver Earrings	5	8	체력의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
+Sgrios Beryl Earrings	5	8	뮤레칸의순옥귀걸이	순옥귀걸이	AFFIX_DERIVED
+Sgrios Beryl Ring	5	9	뮤레칸의금반지		AFFIX_DERIVED
+Sgrios Gold Earrings	5	8	뮤레칸의쌍금귀걸이	쌍금귀걸이	AFFIX_DERIVED
+Sgrios Silver Earrings	5	8	뮤레칸의쌍은귀걸이	쌍은귀걸이	AFFIX_DERIVED
 Dark Necklace	6	6	해골목걸이		EXTRACTED_SINGLE
-Dark Pearl Necklace	6	6	진주목걸이	대지의진주목걸이	KO_BASE_COLLAPSED
 Earth Bone Necklace	6	6	대지의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
-Earth Gold Jade Necklace	6	14	대지의금옥목걸이	화염의자수정목걸이	AFFIX_COMPOSED
-Earth Gold Jade Necklace	6	6	대지의금옥목걸이		PACK_CONSENSUS
 Earth Necklace	6	6	대지의목걸이	[속]대지의목걸이 · 초보자대지의목걸이	PACK_CONSENSUS
 Earth Pearl Necklace	6	6	대지의진주목걸이		PACK_CONSENSUS
 Fire Bone Necklace	6	6	화염의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
@@ -339,40 +474,72 @@ Fire Gold Jade Necklace	6	6	화염의금옥목걸이	대지의금옥목걸이	AF
 Fire Necklace	6	6	화염의목걸이	[속]화염의목걸이 · 초보자화염의목걸이	PACK_CONSENSUS
 Fire Pearl Necklace	6	6	화염의진주목걸이	대지의진주목걸이	AFFIX_COMPOSED
 Gold Jade Necklace	6	6	금옥목걸이	대지의금옥목걸이	KO_BASE_COLLAPSED
-Light Coral Necklace	6	1	진주목걸이		EXTRACTED_SINGLE
-Pearl Necklace	6	6	진주목걸이	대지의진주목걸이	KO_BASE_COLLAPSED
 Sea Bone Necklace	6	6	바다의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
-Sea Gold Jade Necklace	6	14	바다의금옥목걸이	화염의자수정목걸이	AFFIX_COMPOSED
-Sea Gold Jade Necklace	6	6	바다의금옥목걸이	대지의금옥목걸이	AFFIX_COMPOSED
 Sea Necklace	6	6	바다의목걸이	[속]바다의목걸이 · 초보자바다의목걸이	PACK_CONSENSUS
 Sea Pearl Necklace	6	6	바다의진주목걸이	대지의진주목걸이	AFFIX_COMPOSED
-Tadghain's Light Pearl Necklace	6	6	진주목걸이	대지의진주목걸이	KO_BASE_COLLAPSED
 Wind Bone Necklace	6	6	바람의마기아목걸이	마기아목걸이	AFFIX_COMPOSED
-Wind Gold Jade Necklace	6	14	바람의금옥목걸이	화염의자수정목걸이	AFFIX_COMPOSED
-Wind Gold Jade Necklace	6	6	바람의금옥목걸이	대지의금옥목걸이	AFFIX_COMPOSED
 Wind Necklace	6	6	바람의목걸이	[속]바람의목걸이 · 초보자바람의목걸이	PACK_CONSENSUS
 Wind Pearl Necklace	6	6	바람의진주목걸이	대지의진주목걸이	AFFIX_COMPOSED
-Small Emerald Ring	7	1	사파이어반지		PACK_CONSENSUS
+Abundance Coral Ring	8	7	풍요의산호반지	산호반지	AFFIX_DERIVED
 Abundance Jade Ring	8	16	풍요의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지	EXTRACTED_SINGLE
+Abundance Lapis Ring	8	6	풍요의사파이어반지	사파이어반지	AFFIX_DERIVED
+Abundance Red Jade Ring	8	10	풍요의홍옥반지	홍옥반지	AFFIX_DERIVED
+Abundance Ruby Ring	8	6	풍요의자수정반지	자수정반지	AFFIX_DERIVED
 Beryl Ring	8	5	금반지		PACK_CONSENSUS
+Blessed Coral Ring	8	7	축복의산호반지	산호반지	AFFIX_DERIVED
 Blessed Jade Ring	8	16	축복의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 풍요의녹옥반지	EXTRACTED_SINGLE
+Blessed Lapis Ring	8	6	축복의사파이어반지	사파이어반지	AFFIX_DERIVED
+Blessed Red Jade Ring	8	10	축복의홍옥반지	홍옥반지	AFFIX_DERIVED
+Blessed Ruby Ring	8	6	축복의자수정반지	자수정반지	AFFIX_DERIVED
+Cail Coral Ring	8	7	메투스의산호반지	산호반지	AFFIX_DERIVED
 Cail Jade Ring	8	16	메투스의녹옥반지	녹옥반지 · 로오의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
+Cail Lapis Ring	8	6	메투스의사파이어반지	사파이어반지	AFFIX_DERIVED
+Cail Red Jade Ring	8	10	메투스의홍옥반지	홍옥반지	AFFIX_DERIVED
+Cail Ruby Ring	8	6	메투스의자수정반지	자수정반지	AFFIX_DERIVED
+Ceannlaidir Coral Ring	8	7	세토아의산호반지	산호반지	AFFIX_DERIVED
 Ceannlaidir Jade Ring	8	16	세토아의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
-Coral Ring	8	7	산호반지		PACK_CONSENSUS
-Coral Ring	8	7	산호반지		PACK_CONSENSUS
-Emerald Ring	8	12	사파이어반지		PACK_CONSENSUS
+Ceannlaidir Lapis Ring	8	6	세토아의사파이어반지	사파이어반지	AFFIX_DERIVED
+Ceannlaidir Red Jade Ring	8	10	세토아의홍옥반지	홍옥반지	AFFIX_DERIVED
+Ceannlaidir Ruby Ring	8	6	세토아의자수정반지	자수정반지	AFFIX_DERIVED
+Deoch Coral Ring	8	7	세오의산호반지	산호반지	AFFIX_DERIVED
+Deoch Jade Ring	8	16	세오의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	AFFIX_DERIVED
+Deoch Lapis Ring	8	6	세오의사파이어반지	사파이어반지	AFFIX_DERIVED
+Deoch Red Jade Ring	8	10	세오의홍옥반지	홍옥반지	AFFIX_DERIVED
+Deoch Ruby Ring	8	6	세오의자수정반지	자수정반지	AFFIX_DERIVED
+Fiosachd Coral Ring	8	7	셔스의산호반지	산호반지	AFFIX_DERIVED
+Fiosachd Lapis Ring	8	6	셔스의사파이어반지	사파이어반지	AFFIX_DERIVED
+Fiosachd Red Jade Ring	8	10	셔스의홍옥반지	홍옥반지	AFFIX_DERIVED
+Fiosachd Ruby Ring	8	6	셔스의자수정반지	자수정반지	AFFIX_DERIVED
 Fioschad Jade Ring	8	16	셔스의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	EXTRACTED_SINGLE
-Gloica Jade Ring	8	16	녹옥반지	로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
-Jade Ring	8	16	녹옥반지	로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
-Lapis Ring	8	12	사파이어반지		PACK_CONSENSUS
+Glioca Coral Ring	8	7	이아의산호반지	산호반지	AFFIX_DERIVED
+Glioca Lapis Ring	8	6	이아의사파이어반지	사파이어반지	AFFIX_DERIVED
+Glioca Red Jade Ring	8	10	이아의홍옥반지	홍옥반지	AFFIX_DERIVED
+Glioca Ruby Ring	8	6	이아의자수정반지	자수정반지	AFFIX_DERIVED
+Gramail Coral Ring	8	7	칸의산호반지	산호반지	AFFIX_DERIVED
+Gramail Jade Ring	8	16	칸의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	AFFIX_DERIVED
+Gramail Lapis Ring	8	6	칸의사파이어반지	사파이어반지	AFFIX_DERIVED
+Gramail Red Jade Ring	8	10	칸의홍옥반지	홍옥반지	AFFIX_DERIVED
+Gramail Ruby Ring	8	6	칸의자수정반지	자수정반지	AFFIX_DERIVED
+Luathas Coral Ring	8	7	로오의산호반지	산호반지	AFFIX_DERIVED
 Luathas Jade Ring	8	16	로오의녹옥반지	녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
+Luathas Lapis Ring	8	6	로오의사파이어반지	사파이어반지	AFFIX_DERIVED
+Luathas Red Jade Ring	8	10	로오의홍옥반지	홍옥반지	AFFIX_DERIVED
+Luathas Ruby Ring	8	6	로오의자수정반지	자수정반지	AFFIX_DERIVED
+Might Coral Ring	8	7	체력의산호반지	산호반지	AFFIX_DERIVED
+Might Jade Ring	8	16	체력의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	AFFIX_DERIVED
+Might Lapis Ring	8	6	체력의사파이어반지	사파이어반지	AFFIX_DERIVED
+Might Red Jade Ring	8	10	체력의홍옥반지	홍옥반지	AFFIX_DERIVED
+Might Ruby Ring	8	6	체력의자수정반지	자수정반지	AFFIX_DERIVED
 Red Jade Ring	8	10	홍옥반지		PACK_CONSENSUS
-Ruby Ring	8	6	자수정반지		PACK_CONSENSUS
-Small Spinal Ring	8	1	자수정반지		PACK_CONSENSUS
-Spinel Ring	8	11	자수정반지		PACK_CONSENSUS
+Sgrios Coral Ring	8	7	뮤레칸의산호반지	산호반지	AFFIX_DERIVED
+Sgrios Lapis Ring	8	6	뮤레칸의사파이어반지	사파이어반지	AFFIX_DERIVED
+Sgrios Red Jade Ring	8	10	뮤레칸의홍옥반지	홍옥반지	AFFIX_DERIVED
+Sgrios Ruby Ring	8	6	뮤레칸의자수정반지	자수정반지	AFFIX_DERIVED
 Iron Gauntlet	9	33	동장갑	로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	PACK_CONSENSUS
 Abel Song	0	1		2차레드굴1 · 2차레드굴16 · 2차레드굴17 · 2차레드굴19 · 2차레드굴20 · 2차레드굴8 · LC고급의류점 · LC무기점 · LC방어구점 · LC성인용품점 · LC펫상점 · OX퀴즈장	CONFLICT
 AbelDock	0	1		2차레드굴1 · 2차레드굴16 · 2차레드굴17 · 2차레드굴19 · 2차레드굴20 · 2차레드굴8 · LC고급의류점 · LC무기점 · LC방어구점 · LC성인용품점 · LC펫상점 · OX퀴즈장	CONFLICT
+Apple	0	1		사과	NAME_CLASH
+Apple	0	1		사과	NAME_CLASH
 Arena Scroll	0	1		밀레스리콜 · 밀레스마을리콜 · 밀레스음식	CONFLICT
 Bee's Wax	0	3		그레이조각 · 데몬의가죽	CONFLICT
 Centipede's Gland	0	1		동굴쥐의꼬리 · 쥐꼬리	CONFLICT
@@ -416,6 +583,8 @@ Scorpion's Sting	0	1		동굴쥐의꼬리 · 쥐꼬리	CONFLICT
 Soumi Song	0	1		2차레드굴1 · 2차레드굴16 · 2차레드굴17 · 2차레드굴19 · 2차레드굴20 · 2차레드굴8 · LC고급의류점 · LC무기점 · LC방어구점 · LC성인용품점 · LC펫상점 · OX퀴즈장	CONFLICT
 Sunup's Lost Sachel	0	0		곤충똥 · 그랑죠 · 나비 · 독수리날개 · 드래곤윙 · 똥먹어 · 레드아이가면 · 리본 · 몸통없는유령 · 백팩 · 불의장막+1 · 서큐버스윙	CONFLICT
 Tagor Song	0	1		2차레드굴1 · 2차레드굴16 · 2차레드굴17 · 2차레드굴19 · 2차레드굴20 · 2차레드굴8 · LC고급의류점 · LC무기점 · LC방어구점 · LC성인용품점 · LC펫상점 · OX퀴즈장	CONFLICT
+Talos Fragment	0	3		쇠조각	NAME_CLASH
+Talos Ore	0	1		쇠조각	NAME_CLASH
 Underground	0	1		2차레드굴1 · 2차레드굴16 · 2차레드굴17 · 2차레드굴19 · 2차레드굴20 · 2차레드굴8 · LC고급의류점 · LC무기점 · LC방어구점 · LC성인용품점 · LC펫상점 · OX퀴즈장	CONFLICT
 Undine Song	0	1		2차레드굴1 · 2차레드굴16 · 2차레드굴17 · 2차레드굴19 · 2차레드굴20 · 2차레드굴8 · LC고급의류점 · LC무기점 · LC방어구점 · LC성인용품점 · LC펫상점 · OX퀴즈장	CONFLICT
 Viper's Gland	0	3		동굴쥐의꼬리 · 쥐꼬리	CONFLICT
@@ -431,6 +600,10 @@ Black Death	1	45		블랙데쓰 · 블랙데쓰수 · 블랙데쓰토 · 블랙�
 Blood Dagger	1	89		견습자의단검 · 견습자의단검+1 · 견습자의단검+2 · 혈단검 · 혈단검수 · 혈단검토 · 혈단검풍 · 혈단검화	CONFLICT
 Blossom Dagger	1	14		매단검 · 매단검수 · 매단검토 · 매단검풍 · 매단검화 · 일단검 · 중단검	CONFLICT
 Bramble	1	41		프럼벨 · 프럼벨수 · 프럼벨토 · 프럼벨풍 · 프럼벨화 · 프렘벨 · 프렘벨수 · 프렘벨토 · 프렘벨풍 · 프렘벨화	CONFLICT
+Broad Sword	1	17		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	NAME_CLASH
+Broad Sword	1	17		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	NAME_CLASH
+Claidheamh	1	14		세이버 · 세이버수 · 세이버토 · 세이버풍 · 세이버화	NAME_CLASH
+Claidheamh	1	14		세이버 · 세이버수 · 세이버토 · 세이버풍 · 세이버화	NAME_CLASH
 Dragon Scale Sword	1	20		피4 · 피닉스크로어4	CONFLICT
 Dragon Slayer	1	80		견습자의검 · 견습자의검+1 · 견습자의검+2 · 드래곤크로어 · 드래곤크로어수 · 드래곤크로어토 · 드래곤크로어풍 · 드래곤크로어화 · 투핸드드래곤크로어 · 투핸드드래곤크로어수 · 투핸드드래곤크로어토 · 투핸드드래곤크로어풍	CONFLICT
 Empowered Azoth	1	99		곡단도 · 도적의무기 · 도적의무기+1 · 도적의무기+2 · 인월도	CONFLICT
@@ -439,15 +612,22 @@ Empowered Holy Hy-Brasyl Gnarl	1	99		이아의빛	CONFLICT
 Empowered Magus Orb	1	99		로오의빛	CONFLICT
 Enchanted Azoth	1	99		곡단도 · 도적의무기 · 도적의무기+1 · 도적의무기+2 · 인월도	CONFLICT
 Enchanted Kalkuri	1	99		노머시의빅글러브 · 미스릴배틀핸드 · 배틀핸드(Lev15) · 배틀핸드(Lev3) · 배틀핸드(Lev30)	CONFLICT
+Eppe	1	2		에페 · 에페(x)	NAME_CLASH
+Eppe	1	2		에페 · 에페(x)	NAME_CLASH
 Fine Claidhmore	1	75		크레이모어 · 크레이모어수 · 크레이모어토 · 크레이모어풍 · 크레이모어화 · 투핸드크레이모어 · 투핸드크레이모어수 · 투핸드크레이모어토 · 투핸드크레이모어풍 · 투핸드크레이모어화	CONFLICT
+Fine Light Dagger	1	40		광단검 · 광단검수 · 광단검토 · 광단검풍 · 광단검화	NAME_CLASH
 Fine Snow Secret	1	7		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
+Fine Sun Dagger	1	66		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Fine Sun Secret	1	75		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Good Snow Secret	1	5		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
+Good Sun Dagger	1	64		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Good Sun Secret	1	73		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Grand Snow Secret	1	9		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
+Grand Sun Dagger	1	68		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Grand Sun Secret	1	77		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Great Emerald Sword	1	85		에메랄드소드 · 에메랄드소드수 · 에메랄드소드토 · 에메랄드소드풍 · 에메랄드소드화 · 투핸드에메랄드소드 · 투핸드에메랄드소드수 · 투핸드에메랄드소드토 · 투핸드에메랄드소드풍 · 투핸드에메랄드소드화	CONFLICT
 Great Snow Secret	1	11		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
+Great Sun Dagger	1	70		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Great Sun Secret	1	79		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Harpoon	1	11		니크르창 · 작살	CONFLICT
 Holy Apollo	1	11		매직솔라 · 홀리솔라	CONFLICT
@@ -457,14 +637,22 @@ Holy Hy-Brasyl Gnarl	1	99		이아의은총	CONFLICT
 Holy Kronos	1	11		매직새티아 · 홀리새티아	CONFLICT
 Holy Zeus	1	11		매직쥬피티아 · 홀리쥬피티아	CONFLICT
 Hy-Brasyl Battle Axe	1	95		하이브레이질그레이트배틀액스 · 헬2	CONFLICT
+Light Dagger	1	42		광단검 · 광단검수 · 광단검토 · 광단검풍 · 광단검화	NAME_CLASH
 Light Secret	1	7		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
+Long Sword	1	56		롱소드 · 롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	NAME_CLASH
+Long Sword	1	56		롱소드 · 롱소드수 · 롱소드토 · 롱소드풍 · 롱소드화	NAME_CLASH
+Lotus Dagger	1	30		월단검 · 월단검수 · 월단검토 · 월단검풍 · 월단검화	NAME_CLASH
 Lotus Secret	1	21		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
+Loures Saber	1	7		커틀라스 · 커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	NAME_CLASH
+Loures Saber	1	7		커틀라스 · 커틀라스수 · 커틀라스토 · 커틀라스풍 · 커틀라스화	NAME_CLASH
 Magus Apollo	1	11		매직솔라 · 홀리솔라	CONFLICT
 Magus Diana	1	6		매직루나 · 홀리루나	CONFLICT
 Magus Hy-Brasyl Orb	1	99		로오의은총	CONFLICT
+Masquerade	1	31		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	NAME_CLASH
 Master Celestial Staff	1	99		매직세페우스 · 매직스태프 · 홀리세페우스 · 홀리스태프	CONFLICT
 Master Divine Staff	1	99		매직세페우스 · 매직스태프 · 홀리세페우스 · 홀리스태프	CONFLICT
 Might and Power	1	99		[성직자]뮤레칸의스태프(+1) · [성직자]뮤레칸의스태프(+2) · [성직자]뮤레칸의스태프(+3) · [성직자]뮤레칸의스태프(+4) · [성직자]뮤레칸의스태프(+5)	CONFLICT
+Moon Dagger	1	30		월단검 · 월단검수 · 월단검토 · 월단검풍 · 월단검화	NAME_CLASH
 Moon Secret	1	1		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
 Nagetier Dagger	1	79		강력한단검 · 워어렛단검	CONFLICT
 Oak Stick	1	1		목도 · 목도+1 · 목도+2 · 목도+3 · 목도+M · 쌍절권 · 조금쌘목도	CONFLICT
@@ -476,37 +664,11 @@ Stick	1	1		목도 · 목도+1 · 목도+2 · 목도+3 · 목도+M · 쌍절권 �
 Stone Axe	1	95		돌괭이 · 스톤액스	CONFLICT
 Stone Cross	1	98		다크클레릭십자가 · 십자가	CONFLICT
 Sun Secret	1	21		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
+Templar	1	29		매스커레이드 · 매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	NAME_CLASH
+Templar	1	29		매스커레이드 · 매스커레이드수 · 매스커레이드토 · 매스커레이드풍 · 매스커레이드화	NAME_CLASH
 Tilian Claw	1	50		견습자의글러브 · 견습자의글러브+1 · 견습자의글러브+2 · 고급글러브 · 고양이손 · 글러브1 · 글러브2 · 노머시의글러브 · 무도가의무기 · 무도가의무기+1 · 무도가의무기+2 · 용의발톱	CONFLICT
-Abundance Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Abundance Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Blessed Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Blessed Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Blessed Iron Bracer	10	33		동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	CONFLICT
-Blessed Iron Gauntlet	10	33		동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	CONFLICT
-Blessed Leather Bracer	10	9		가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	CONFLICT
-Blessed Leather Gauntlet	10	9		가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	CONFLICT
-Blessed Mythril Bracer	10	63		로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	CONFLICT
-Blessed Mythril Gauntlet	10	63		로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	CONFLICT
-Cail Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Cail Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Ceannlaidir Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Ceannlaidir Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Deoch Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Deoch Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Fiosachd Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Fiosachd Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Glioca Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Glioca Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Gramail Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Gramail Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Gramail Iron Bracer	10	33		동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	CONFLICT
-Gramail Iron Gauntlet	10	33		동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	CONFLICT
-Gramail Leather Bracer	10	9		가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	CONFLICT
-Gramail Leather Gauntlet	10	9		가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	CONFLICT
-Gramail Mythril Bracer	10	63		로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	CONFLICT
-Gramail Mythril Gauntlet	10	63		로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	CONFLICT
-Luathas Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Luathas Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
+Glioca Leather Gauntlet	10	9		가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	NAME_CLASH
+Glioca Leather Gauntlet	10	9		가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	NAME_CLASH
 Magic Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
 Magic Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
 Magic Iron Bracer	10	33		동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	CONFLICT
@@ -515,72 +677,12 @@ Magic Leather Bracer	10	9		가죽팔찌 · 로오의가죽팔찌 · 메투스의
 Magic Leather Gauntlet	10	9		가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	CONFLICT
 Magic Mythril Bracer	10	63		로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	CONFLICT
 Magic Mythril Gauntlet	10	63		로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	CONFLICT
-Might Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Might Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Might Iron Bracer	10	33		동팔찌 · 로오의동팔찌 · 메투스의동팔찌 · 뮤레칸의동팔찌 · 세오의동팔찌 · 세토아의동팔찌 · 셔스의동팔찌 · 이아의동팔찌 · 풍요의동팔찌	CONFLICT
-Might Iron Gauntlet	10	33		동장갑 · 로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	CONFLICT
-Might Leather Bracer	10	9		가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	CONFLICT
-Might Leather Gauntlet	10	9		가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	CONFLICT
-Might Mythril Bracer	10	63		로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	CONFLICT
-Might Mythril Gauntlet	10	63		로오의은장갑 · 메투스의은장갑 · 뮤레칸의은장갑 · 세오의은장갑 · 세토아의은장갑 · 셔스의은장갑 · 은장갑 · 이아의은장갑 · 풍요의은장갑	CONFLICT
-Sgrios Hy-Brasyl Bracer	10	95		금팔찌	CONFLICT
-Sgrios Hy-Brasyl Gauntlet	10	95		금장갑	CONFLICT
-Sgrios Leather Bracer	10	9		가죽팔찌 · 로오의가죽팔찌 · 메투스의가죽팔찌 · 세오의가죽팔찌 · 세토아의가죽팔찌 · 셔스의가죽팔찌 · 이아의가죽팔찌 · 풍요의가죽팔찌	CONFLICT
-Sgrios Leather Gauntlet	10	9		가죽장갑 · 로오의가죽장갑 · 메투스의가죽장갑 · 세오의가죽장갑 · 세토아의가죽장갑 · 셔스의가죽장갑 · 이아의가죽장갑 · 풍요의가죽장갑	CONFLICT
-Sgrios Mythril Bracer	10	63		로오의은팔찌 · 메투스의은팔찌 · 세오의은팔찌 · 세토아의은팔찌 · 셔스의은팔찌 · 은팔찌 · 이아의은팔찌 · 풍요의은팔찌	CONFLICT
 Light Belt	11	11		[10일]생명의벨트 · 뉴트의벨트 · 생명의벨트	CONFLICT
 Hy-Brasyl Greaves	12	93		금각반 · 뉴트의매직각반 · 뉴트의몽크각반 · 뉴트의파워각반 · 레드오피온의각반 · 로오의금각반 · 마력의금각반 · 메투스의금각반 · 뮤레칸의금각반 · 세오의금각반 · 세토아의금각반 · 셔스의금각반	CONFLICT
 Mythril Greaves	12	59		로오의은각반 · 마법의은각반 · 메투스의은각반 · 뮤레칸의은각반 · 산호각반 · 세오의은각반 · 세토아의은각반 · 셔스의은각반 · 은각반 · 이아의은각반 · 체력의은각반 · 축복의은각반	CONFLICT
-Abundance Boots	13	1		신발	CONFLICT
-Abundance Enchanted Boots	13	96		매직부츠	CONFLICT
-Abundance Magma Boots	13	82		마그마부츠	CONFLICT
-Abundance Saffian Boots	13	66		바이올렛티	CONFLICT
-Blessed Boots	13	1		신발	CONFLICT
-Blessed Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
-Blessed Enchanted Boots	13	96		매직부츠	CONFLICT
-Blessed Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Blessed Magma Boots	13	82		마그마부츠	CONFLICT
-Blessed Saffian Boots	13	66		바이올렛티	CONFLICT
-Blessed Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-Cail Boots	13	1		신발	CONFLICT
-Cail Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
-Cail Enchanted Boots	13	96		매직부츠	CONFLICT
-Cail Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Cail Magma Boots	13	82		마그마부츠	CONFLICT
-Cail Saffian Boots	13	66		바이올렛티	CONFLICT
-Cail Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-Ceannlaidir Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
-Ceannlaidir Enchanted Boots	13	96		매직부츠	CONFLICT
-Ceannlaidir Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Ceannlaidir Magma Boots	13	82		마그마부츠	CONFLICT
-Ceannlaidir Saffian Boots	13	66		바이올렛티	CONFLICT
-Ceannlaidir Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-Deoch Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
-Deoch Enchanted Boots	13	96		매직부츠	CONFLICT
-Deoch Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Deoch Magma Boots	13	82		마그마부츠	CONFLICT
-Deoch Saffian Boots	13	66		바이올렛티	CONFLICT
-Deoch Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-Fiosachd Enchanted Boots	13	96		매직부츠	CONFLICT
-Fiosachd Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Fiosachd Magma Boots	13	82		마그마부츠	CONFLICT
-Fiosachd Saffian Boots	13	66		바이올렛티	CONFLICT
-Fiosachd Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-Fioschad Boots	13	1		신발	CONFLICT
-Glioca Boots	13	1		신발	CONFLICT
-Glioca Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
-Glioca Enchanted Boots	13	96		매직부츠	CONFLICT
-Glioca Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Glioca Magma Boots	13	82		마그마부츠	CONFLICT
-Glioca Saffian Boots	13	66		바이올렛티	CONFLICT
-Glioca Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-Gramail Boots	13	1		신발	CONFLICT
-Gramail Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
-Gramail Enchanted Boots	13	96		매직부츠	CONFLICT
-Gramail Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Gramail Magma Boots	13	82		마그마부츠	CONFLICT
-Gramail Saffian Boots	13	66		바이올렛티	CONFLICT
-Gramail Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
+Abundance Grey Boots	13	11		녹색신발 · 풍요의녹색신발	NAME_CLASH
+Abundance Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	NAME_CLASH
+Lapis Boots	13	56		녹색신발 · 풍요의녹색신발	NAME_CLASH
 Magic Boots	13	1		신발	CONFLICT
 Magic Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
 Magic Enchanted Boots	13	96		매직부츠	CONFLICT
@@ -588,27 +690,18 @@ Magic Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
 Magic Magma Boots	13	82		마그마부츠	CONFLICT
 Magic Saffian Boots	13	66		바이올렛티	CONFLICT
 Magic Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
-Might Boots	13	1		신발	CONFLICT
-Might Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
 Might Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
 Might Enchanted Boots	13	96		매직부츠	CONFLICT
-Might Enchanted Boots	13	96		매직부츠	CONFLICT
-Might Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
 Might Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
 Might Magma Boots	13	82		마그마부츠	CONFLICT
-Might Magma Boots	13	82		마그마부츠	CONFLICT
 Might Saffian Boots	13	66		바이올렛티	CONFLICT
-Might Saffian Boots	13	66		바이올렛티	CONFLICT
-Might Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
 Might Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
 Mythril Boots	13	1		미스릴부츠 · 잊혀진신발	CONFLICT
-Sgrios Cordovan Boots	13	50		레더부츠 · 셔스의레더부츠 · 풍요의레더부츠	CONFLICT
-Sgrios Enchanted Boots	13	96		매직부츠	CONFLICT
-Sgrios Grey Boots	13	11		녹색신발 · 풍요의녹색신발	CONFLICT
-Sgrios Magma Boots	13	82		마그마부츠	CONFLICT
-Sgrios Saffian Boots	13	66		바이올렛티	CONFLICT
-Sgrios Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	CONFLICT
+Shagreen Boots	13	33		녹색신발 · 풍요의녹색신발	NAME_CLASH
+1	2	0		밀레스선풍도복 · 밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	NAME_CLASH
 Aosdic Pattern Walker	2	80		헬소서러로브 · 헬소서리스로브 · 헬클레릭로브 · 헬프리스트로브	CONFLICT
+Brigadine	2	11		브리간딘 · 브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	NAME_CLASH
+Corsette	2	41		브리간딘 · 브리간딘수 · 브리간딘토 · 브리간딘풍 · 브리간딘화	NAME_CLASH
 Cotte	2	1		꼬뜨 · 꼬뜨수 · 꼬뜨토 · 꼬뜨풍 · 꼬뜨화	CONFLICT
 Cowl	2	1		셍즈 · 셍즈수 · 셍즈토 · 셍즈풍 · 셍즈화	CONFLICT
 Cthonic Magus Robes	2	80		헬소서러로브 · 헬소서리스로브 · 헬클레릭로브 · 헬프리스트로브	CONFLICT
@@ -617,11 +710,16 @@ Dalmatica	2	97		네크로브 · 네크로브수 · 네크로브토 · 네크로�
 Dark Cleric Robes	2	60		다크클레릭의상 · 클레릭의상1	CONFLICT
 Dobok	2	1		도복 · 도복수 · 도복토 · 도복풍 · 도복화	CONFLICT
 Dummy	2	0		가드아머1 · 호버크	CONFLICT
+Dwarvish Leather	2	11		노미쉬레더 · 노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	NAME_CLASH
 Earth Bodice	2	1		연무복 · 연무복수 · 연무복토 · 연무복풍 · 연무복화	CONFLICT
 Earth Garb	2	41		천지도복 · 천지도복수 · 천지도복토 · 천지도복풍 · 천지도복화	CONFLICT
 Enchanted Mantle	2	99		다크로브 · 여마승	CONFLICT
 Gorget	2	1		로브 · 로브수 · 로브토 · 로브풍 · 로브화	CONFLICT
 Gorget Gown	2	1		로브 · 로브수 · 로브토 · 로브풍 · 로브화	CONFLICT
+Grand Master Combat Armor	2	99		위타천2	NAME_CLASH
+Grand Master Combat Armor	2	99		위타천2	NAME_CLASH
+Grand Master Mail	2	99		아비스2	NAME_CLASH
+Grand Master Shadow Mail	2	99		아비스2	NAME_CLASH
 Jupe	2	11		지폰 · 지폰수 · 지폰토 · 지폰풍 · 지폰화	CONFLICT
 Kagum	2	97		카쿰 · 카쿰수 · 카쿰토 · 카쿰풍 · 카쿰화	CONFLICT
 Keaton	2	71		키톤 · 키톤수 · 키톤토 · 키톤풍 · 키톤화	CONFLICT
@@ -630,11 +728,15 @@ Lich Robe	2	60		마법좀비의상 · 마법좀비의상1	CONFLICT
 Lorum	2	11		로럼 · 로럼수 · 로럼토 · 로럼풍 · 로럼화	CONFLICT
 Mane	2	71		마법좀비의상 · 마법좀비의상1	CONFLICT
 Mantle	2	41		맨틀 · 맨틀수 · 맨틀토 · 맨틀풍 · 맨틀화	CONFLICT
+Mileth Dwarvish Leather	2	11		밀레스노미쉬레더 · 밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	NAME_CLASH
+Mileth Scout Leather	2	1		밀레스스카웃튜닉 · 밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	NAME_CLASH
 Monk Mantle	2	99		무상도복 · 무승	CONFLICT
 Monk Master Mantle	2	99		여무승 · 월영도복	CONFLICT
 Morrigu Disciple Pellison	2	80		헬소서리스로브 · 헬프리스트로브	CONFLICT
 Morrigu Magus Pellison	2	80		헬소서리스로브 · 헬프리스트로브	CONFLICT
+Paluten	2	41		노미쉬레더 · 노미쉬레더수 · 노미쉬레더토 · 노미쉬레더풍 · 노미쉬레더화	NAME_CLASH
 Ranger Uniform	2	0		가드아머2 · 컴포지트	CONFLICT
+Rucesion Dwarvish Leather	2	11		밀레스노미쉬레더 · 밀레스노미쉬레더수 · 밀레스노미쉬레더토 · 밀레스노미쉬레더풍 · 밀레스노미쉬레더화	NAME_CLASH
 Rucesion Guard Uniform	2	0		가드아머1 · 호버크	CONFLICT
 Sacred Gown	2	99		세인트로브 · 여성승	CONFLICT
 Sacred Mantle	2	99		성승 · 세인트후드	CONFLICT
@@ -642,206 +744,121 @@ Scarlet Carapace	2	60		잊혀진갑옷2 · 테네즈의갑옷2	CONFLICT
 Scarlet Carapace Mail	2	60		잊혀진갑옷1 · 테네즈의갑옷1	CONFLICT
 Sea Garb	2	3		밀레스대양도복 · 밀레스대양도복수 · 밀레스대양도복토 · 밀레스대양도복풍 · 밀레스대양도복화	CONFLICT
 Shadow Mantle	2	99		도승 · 스카우트아머	CONFLICT
+Soumi Scout Leather	2	1		밀레스스카웃튜닉 · 밀레스스카웃튜닉수 · 밀레스스카웃튜닉토 · 밀레스스카웃튜닉풍 · 밀레스스카웃튜닉화	NAME_CLASH
 Tard	2	0		네크로브 · 네크로브수 · 네크로브토 · 네크로브풍 · 네크로브화 · 뤼케시온네크로브	CONFLICT
+Undine Wind Garb	2	71		밀레스선풍도복 · 밀레스선풍도복수 · 밀레스선풍도복토 · 밀레스선풍도복풍 · 밀레스선풍도복화	NAME_CLASH
 Valkyrie Mantle	2	99		마스터아머2 · 여전승	CONFLICT
 War Mantle	2	99		마스터아머1 · 전승	CONFLICT
 Wind Garb	2	71		선풍도복 · 선풍도복수 · 선풍도복토 · 선풍도복풍 · 선풍도복화	CONFLICT
 Wizard Mantle	2	99		다크후드 · 마승	CONFLICT
 Wizard Mantle	2	99		다크후드 · 마승	CONFLICT
-Abundance Bronze Shield	3	31		구리방패	CONFLICT
-Abundance Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Abundance Leather Shield	3	15		가죽방패	CONFLICT
-Abundance Mythril Shield	3	61		은제방패	CONFLICT
-Blessed Bronze Shield	3	31		구리방패	CONFLICT
-Blessed Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Blessed Leather Shield	3	15		가죽방패	CONFLICT
-Blessed Mythril Shield	3	61		은제방패	CONFLICT
-Blessed Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Cail Bronze Shield	3	31		구리방패	CONFLICT
-Cail Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Cail Mythril Shield	3	61		은제방패	CONFLICT
-Cail Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Ceannlaidir Bronze Shield	3	31		구리방패	CONFLICT
 Ceannlaidir Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Ceannlaidir Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Ceannlaidir Mythril Shield	3	61		은제방패	CONFLICT
-Ceannlaidir Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Deoch Bronze Shield	3	31		구리방패	CONFLICT
 Deoch Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Deoch Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Deoch Leather Shield	3	15		가죽방패	CONFLICT
-Deoch Mythril Shield	3	61		은제방패	CONFLICT
 Deoch Mythril Shield	3	61		은제방패	CONFLICT
 Deoch Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Deoch Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Fiosachd Bronze Shield	3	31		구리방패	CONFLICT
-Fiosachd Leather Shield	3	15		가죽방패	CONFLICT
-Fiosachd Mythril Shield	3	61		은제방패	CONFLICT
-Fiosachd Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Glioca Bronze Shield	3	31		구리방패	CONFLICT
-Glioca Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Glioca Mythril Shield	3	61		은제방패	CONFLICT
-Glioca Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Gramail Bronze Shield	3	31		구리방패	CONFLICT
-Gramail Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Gramail Leather Shield	3	15		가죽방패	CONFLICT
-Gramail Mythril Shield	3	61		은제방패	CONFLICT
-Gramail Talgonite Shield	3	98		기사단방패	CONFLICT
-Gramail Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Luathas Bronze Shield	3	31		구리방패	CONFLICT
-Luathas Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Luathas Mythril Shield	3	61		은제방패	CONFLICT
-Luathas Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
 Magic Bronze Shield	3	31		구리방패	CONFLICT
 Magic Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
 Magic Leather Shield	3	15		가죽방패	CONFLICT
 Magic Mythril Shield	3	61		은제방패	CONFLICT
 Magic Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Might Bronze Shield	3	31		구리방패	CONFLICT
-Might Hy-Brasyl Shield	3	77		금제방패 · 셔스의금제방패	CONFLICT
-Might Leather Shield	3	15		가죽방패	CONFLICT
-Might Mythril Shield	3	61		은제방패	CONFLICT
-Might Talos Shield	3	90		풍요의플라늄방패 · 플라늄방패	CONFLICT
-Sgrios Bronze Shield	3	31		구리방패	CONFLICT
-Sgrios Leather Shield	3	15		가죽방패	CONFLICT
+Wooden Shield	3	1		나무방패	NAME_CLASH
+Wooden Shield 2	3	1		나무방패	NAME_CLASH
 Cthonic Magus Caputium	4	80		헬소서러후드 · 헬클레릭후드	CONFLICT
 Dark Cleric Brim	4	60		듈라한모자 · 클레릭모자	CONFLICT
 Gnostic Hat	4	99		다크홀 · 마승모	CONFLICT
 Gnostic Umber	4	99		다크베일 · 여마승모	CONFLICT
+Holy Cap	4	11		세인트홀	NAME_CLASH
 Holy Wimple	4	11		매직베일 · 홀리베일	CONFLICT
+Hy-Brasyl Helm	4	97		세인트투구	NAME_CLASH
+Hy-Brasyl Helmet	4	97		골든플레이트투구	NAME_CLASH
+Hy-Brasyl Helmet	4	97		골든플레이트투구	NAME_CLASH
+Hy-Brasyl Plated Helmet	4	97		세인트투구	NAME_CLASH
+Magus Cap	4	11		세인트홀	NAME_CLASH
 Marauder Mask	4	80		초보자투구 · 헬씨프투구	CONFLICT
 Scarlet Chitin Helm	4	60		레드투구 · 잊혀진투구 · 차원의투구	CONFLICT
 Shadow Mask	4	99		도승모 · 웨스턴	CONFLICT
 War Clogaid	4	99		마스터투구2 · 여전승모	CONFLICT
 War Helmet	4	99		마스터투구1 · 전승모	CONFLICT
-Abundance Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Abundance Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Abundance Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Abundance Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Abundance Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Blessed Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Blessed Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Blessed Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Blessed Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Blessed Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Cail Beryl Earrings	5	8		순옥귀걸이	CONFLICT
-Cail Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Cail Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Cail Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Ceannlaidir Beryl Earrings	5	8		순옥귀걸이	CONFLICT
-Ceannlaidir Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Ceannlaidir Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Ceannlaidir Silver Earrings	5	8		쌍은귀걸이	CONFLICT
 Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Deoch Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Deoch Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Deoch Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Deoch Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Deoch Silver Earrings	5	8		쌍은귀걸이	CONFLICT
 Fiosachd Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Fiosachd Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Fiosachd Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Fiosachd Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Fioschad Beryl Earrings	5	8		순옥귀걸이	CONFLICT
-Glioca Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Glioca Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Glioca Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Glioca Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Glioca Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Gramail Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Gramail Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Gramail Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Gramail Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Gramail Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Luathas Beryl Earrings	5	8		순옥귀걸이	CONFLICT
-Luathas Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Luathas Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Luathas Silver Earrings	5	8		쌍은귀걸이	CONFLICT
 Magic Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Magic Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
 Magic Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Magic Ruby Earrings	5	8		루비귀걸이	CONFLICT
 Magic Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Might Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Might Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Might Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Might Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Might Silver Earrings	5	8		쌍은귀걸이	CONFLICT
-Sgrios Beryl Earrings	5	8		순옥귀걸이	CONFLICT
 Sgrios Coral Earrings	5	8		가죽팔찌 · 로오의산호귀걸이 · 메투스의산호귀걸이 · 산호귀걸이 · 세토아의산호귀걸이	CONFLICT
-Sgrios Gold Earrings	5	8		쌍금귀걸이	CONFLICT
 Sgrios Ruby Earrings	5	8		루비귀걸이	CONFLICT
-Sgrios Silver Earrings	5	8		쌍은귀걸이	CONFLICT
+Silver Earrings	5	8		쌍은귀걸이	NAME_CLASH
+Wolf Earrings	5	1		쌍은귀걸이	NAME_CLASH
+Wolf Earrings	5	1		쌍은귀걸이	NAME_CLASH
 Band of Destruction	6	1		흑요석몽크목걸이 · 흑요석몽크목걸이(수) · 흑요석몽크목걸이(토) · 흑요석몽크목걸이(풍) · 흑요석몽크목걸이(화)	CONFLICT
+Bone Necklace	6	6		마기아목걸이	NAME_CLASH
+Dark Bone Necklace	6	6		마기아목걸이	NAME_CLASH
+Dark Bone Necklace	6	6		마기아목걸이	NAME_CLASH
+Dark Pearl Necklace	6	6		대지의진주목걸이	NAME_CLASH
+Earth Gold Jade Necklace	6	14		화염의자수정목걸이	NAME_CLASH
+Earth Gold Jade Necklace	6	6		대지의금옥목걸이	NAME_CLASH
+Light Coral Necklace	6	1		진주목걸이	NAME_CLASH
+Pearl Necklace	6	6		대지의진주목걸이	NAME_CLASH
+Sea Gold Jade Necklace	6	14		화염의자수정목걸이	NAME_CLASH
+Sea Gold Jade Necklace	6	6		대지의금옥목걸이	NAME_CLASH
+Tadghain's Light Pearl Necklace	6	6		대지의진주목걸이	NAME_CLASH
+Wind Gold Jade Necklace	6	14		화염의자수정목걸이	NAME_CLASH
+Wind Gold Jade Necklace	6	6		대지의금옥목걸이	NAME_CLASH
 Black Stone Ring	7	99		바이런의반지 · 조커의반지1	CONFLICT
 Eternal Love Ring	7	21		노머시의반지 · 토파즈반지	CONFLICT
 Loures Signet Ring	7	1		로오의반지	CONFLICT
+Small Emerald Ring	7	1		사파이어반지	NAME_CLASH
 Abundance Amethyst Ring	8	12		호안석반지	CONFLICT
-Abundance Coral Ring	8	7		산호반지	CONFLICT
 Abundance Grave Ring	8	9		고루반지	CONFLICT
-Abundance Lapis Ring	8	6		사파이어반지	CONFLICT
-Abundance Red Jade Ring	8	10		홍옥반지	CONFLICT
-Abundance Ruby Ring	8	6		자수정반지	CONFLICT
 Abundance Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Blessed Amethyst Ring	8	12		호안석반지	CONFLICT
-Blessed Coral Ring	8	7		산호반지	CONFLICT
 Blessed Grave Ring	8	9		고루반지	CONFLICT
-Blessed Lapis Ring	8	6		사파이어반지	CONFLICT
-Blessed Red Jade Ring	8	10		홍옥반지	CONFLICT
-Blessed Ruby Ring	8	6		자수정반지	CONFLICT
 Blessed Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Cail Amethyst Ring	8	12		호안석반지	CONFLICT
-Cail Coral Ring	8	7		산호반지	CONFLICT
 Cail Grave Ring	8	9		고루반지	CONFLICT
-Cail Lapis Ring	8	6		사파이어반지	CONFLICT
-Cail Red Jade Ring	8	10		홍옥반지	CONFLICT
-Cail Ruby Ring	8	6		자수정반지	CONFLICT
 Cail Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Ceannlaidir Amethyst Ring	8	12		호안석반지	CONFLICT
 Ceannlaidir Coral Ring	8	7		산호반지	CONFLICT
-Ceannlaidir Coral Ring	8	7		산호반지	CONFLICT
 Ceannlaidir Grave Ring	8	9		고루반지	CONFLICT
-Ceannlaidir Lapis Ring	8	6		사파이어반지	CONFLICT
-Ceannlaidir Red Jade Ring	8	10		홍옥반지	CONFLICT
-Ceannlaidir Ruby Ring	8	6		자수정반지	CONFLICT
 Ceannlaidir Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
+Coral Ring	8	7		산호반지	NAME_CLASH
+Coral Ring	8	7		산호반지	NAME_CLASH
 Deoch Amethyst Ring	8	12		호안석반지	CONFLICT
-Deoch Coral Ring	8	7		산호반지	CONFLICT
 Deoch Grave Ring	8	9		고루반지	CONFLICT
 Deoch Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
-Deoch Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
-Deoch Lapis Ring	8	6		사파이어반지	CONFLICT
-Deoch Red Jade Ring	8	10		홍옥반지	CONFLICT
-Deoch Ruby Ring	8	6		자수정반지	CONFLICT
 Deoch Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
+Emerald Ring	8	12		사파이어반지	NAME_CLASH
 Fiosachd Amethyst Ring	8	12		호안석반지	CONFLICT
-Fiosachd Coral Ring	8	7		산호반지	CONFLICT
 Fiosachd Grave Ring	8	9		고루반지	CONFLICT
-Fiosachd Lapis Ring	8	6		사파이어반지	CONFLICT
-Fiosachd Red Jade Ring	8	10		홍옥반지	CONFLICT
-Fiosachd Ruby Ring	8	6		자수정반지	CONFLICT
 Fiosachd Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Glioca Amethyst Ring	8	12		호안석반지	CONFLICT
-Glioca Coral Ring	8	7		산호반지	CONFLICT
 Glioca Grave Ring	8	9		고루반지	CONFLICT
-Glioca Lapis Ring	8	6		사파이어반지	CONFLICT
-Glioca Red Jade Ring	8	10		홍옥반지	CONFLICT
-Glioca Ruby Ring	8	6		자수정반지	CONFLICT
 Glioca Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
+Gloica Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	NAME_CLASH
 Gramail Amethyst Ring	8	12		호안석반지	CONFLICT
-Gramail Coral Ring	8	7		산호반지	CONFLICT
 Gramail Grave Ring	8	9		고루반지	CONFLICT
-Gramail Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
-Gramail Lapis Ring	8	6		사파이어반지	CONFLICT
-Gramail Red Jade Ring	8	10		홍옥반지	CONFLICT
-Gramail Ruby Ring	8	6		자수정반지	CONFLICT
 Gramail Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
+Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	NAME_CLASH
+Lapis Ring	8	12		사파이어반지	NAME_CLASH
 Luathas Amethyst Ring	8	12		호안석반지	CONFLICT
-Luathas Coral Ring	8	7		산호반지	CONFLICT
 Luathas Grave Ring	8	9		고루반지	CONFLICT
-Luathas Lapis Ring	8	6		사파이어반지	CONFLICT
-Luathas Red Jade Ring	8	10		홍옥반지	CONFLICT
-Luathas Ruby Ring	8	6		자수정반지	CONFLICT
 Luathas Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Magic Amethyst Ring	8	12		호안석반지	CONFLICT
 Magic Coral Ring	8	7		산호반지	CONFLICT
@@ -852,18 +869,12 @@ Magic Red Jade Ring	8	10		홍옥반지	CONFLICT
 Magic Ruby Ring	8	6		자수정반지	CONFLICT
 Magic Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Might Amethyst Ring	8	12		호안석반지	CONFLICT
-Might Coral Ring	8	7		산호반지	CONFLICT
 Might Grave Ring	8	9		고루반지	CONFLICT
-Might Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
-Might Lapis Ring	8	6		사파이어반지	CONFLICT
-Might Red Jade Ring	8	10		홍옥반지	CONFLICT
-Might Ruby Ring	8	6		자수정반지	CONFLICT
 Might Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
+Ruby Ring	8	6		자수정반지	NAME_CLASH
 Sgrios Amethyst Ring	8	12		호안석반지	CONFLICT
-Sgrios Coral Ring	8	7		산호반지	CONFLICT
 Sgrios Grave Ring	8	9		고루반지	CONFLICT
-Sgrios Lapis Ring	8	6		사파이어반지	CONFLICT
-Sgrios Red Jade Ring	8	10		홍옥반지	CONFLICT
-Sgrios Ruby Ring	8	6		자수정반지	CONFLICT
 Sgrios Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
+Small Spinal Ring	8	1		자수정반지	NAME_CLASH
+Spinel Ring	8	11		자수정반지	NAME_CLASH
 Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT

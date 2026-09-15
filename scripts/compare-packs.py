@@ -338,6 +338,66 @@ def collapse_ko_base(rows, affixes):
     return won
 
 
+def derive_affixed(rows):
+    """밑말과 접사가 다 정해졌으면 팩에 없는 변종 이름도 짓는다 — `AFFIX_DERIVED`.
+
+    `compose_affixed` 는 팩에 있는 이름만 고른다. 그런데 한글팩은 신 변종을 거의 싣지 않는다 —
+    밑말이 정해진 273장을 재어 보니 지은 이름이 팩에 있는 것이 **하나도 없었다.** 그대로 두면
+    영문 이름으로 남는다.
+
+    그래서 여기서는 짓는다. 근거는 둘 다 검증된 것이다: 밑말은 그림으로 이어 정해졌고, 접사는
+    카페 520 이 적어 둔 한↔영 짝이다. 대신 조건을 둔다.
+
+    - 한 영문 접사에 한글 표기가 둘인 것(Magic ← 마법·마력)은 **짓지 않는다.** 어느 쪽인지
+      자료가 말해 주지 않는다 — 사람이 고를 자리로 남긴다.
+    - 이미 다른 아이템이 쓰는 이름이면 짓지 않는다. 템플릿은 이름이 열쇠라 덮어쓰면 사라진다.
+
+    등급을 따로 달아 두었으니 되돌리려면 이 등급만 걸러 내면 된다.
+    """
+    taken = {r["한글이름"] for r in rows if r["한글이름"]}
+    settled = {r["영문"]: r["한글이름"] for r in rows if r["한글이름"]}
+    won = 0
+    for r in rows:
+        if r["한글이름"] or not r.get("영문접사"):
+            continue
+        ko_affixes = EN_TO_KO.get(r["영문접사"], ())
+        if len(ko_affixes) != 1:
+            continue                   # 한글 표기가 둘이다 — 자료가 못 가린다
+        ko_base_name = settled.get(r["영문밑말"])
+        if not ko_base_name:
+            continue
+        made = next(iter(ko_affixes)) + "의" + ko_base_name
+        if made in taken:
+            continue
+        r["한글이름"], r["등급"] = made, "AFFIX_DERIVED"
+        taken.add(made)
+        won += 1
+    return won
+
+
+def drop_name_clashes(rows):
+    """한 한글 이름을 영문 여럿이 차지하면 **전부 도로 내린다** — `NAME_CLASH`.
+
+    템플릿은 이름이 열쇠다 (`GlobalItemTemplateCache[template.Name] = template`). 같은 이름이
+    둘이면 뒤엣것이 앞엣것을 덮어 아이템이 조용히 사라진다. 게다가 셋 중 맞는 것은 하나뿐인데
+    셋 다 "정해졌다" 고 적어 두면 검토하는 사람을 속인다.
+
+    어느 것이 맞는지는 자료가 말해 주지 않으므로 고르지 않는다. 사람이 고를 자리로 되돌린다.
+    """
+    claim = defaultdict(list)
+    for r in rows:
+        if r["한글이름"]:
+            claim[r["한글이름"]].append(r)
+    dropped = 0
+    for name, sharers in claim.items():
+        if len(sharers) < 2:
+            continue
+        for r in sharers:
+            r["한글이름"], r["등급"] = None, "NAME_CLASH"
+            dropped += 1
+    return dropped
+
+
 def pack_item_names():
     """팩에 실제로 있는 아이템 이름 전부. 지어낸 이름을 걸러 내는 체다."""
     return {e["이름"] for pack in packs() for e in load(pack, "items")
@@ -402,13 +462,17 @@ def hades_item_korean_names():
         names = {n for v in kept.values() for n in v}
         # 접사까지 맞춘 뒤에도 이름이 하나여야 정해진 것이다. 여럿이면 사람이 고른다.
         settled = names.pop() if len(names) == 1 else None
+        en_aff, en_base = split_en(h["Name"], affixes)
         rows.append({"영문": h["Name"], "그림": hades_image(h),
+                     "영문접사": en_aff, "영문밑말": en_base,
                      "착용자리": h.get("EquipmentSlot"), "요구레벨": h.get("LevelRequired"),
                      "한글이름": settled,
                      "접사맞춤": kept, "한글후보": cand,
                      "등급": grade(kept) if settled else ("NONE" if not cand else "CONFLICT")})
     collapse_ko_base(rows, affixes)
     compose_affixed(rows, affixes, pack_item_names())
+    derive_affixed(rows)
+    drop_name_clashes(rows)
     tally = defaultdict(int)
     for r in rows:
         tally[r["등급"]] += 1

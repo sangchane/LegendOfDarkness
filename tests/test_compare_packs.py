@@ -120,6 +120,28 @@ class AffixNarrowingTest(unittest.TestCase):
         self.assertEqual(MODULE.collapse_ko_base(rows, set()), 1)
         self.assertEqual(rows[0]["한글이름"], "동각반")
 
+    def test_derive_invents_only_when_the_affix_is_unambiguous(self):
+        rows = [{"영문": "Leather Greaves", "한글이름": "가죽각반", "등급": "PACK_CONSENSUS",
+                 "영문접사": None, "영문밑말": "Leather Greaves"},
+                {"영문": "Deoch Leather Greaves", "한글이름": None, "등급": "CONFLICT",
+                 "영문접사": "Deoch", "영문밑말": "Leather Greaves"},
+                {"영문": "Magic Leather Greaves", "한글이름": None, "등급": "CONFLICT",
+                 "영문접사": "Magic", "영문밑말": "Leather Greaves"}]
+        self.assertEqual(MODULE.derive_affixed(rows), 1)
+        self.assertEqual(rows[1]["한글이름"], "세오의가죽각반")
+        self.assertIsNone(rows[2]["한글이름"])       # Magic 은 마법·마력 둘이라 짓지 않는다
+
+    def test_name_clash_drops_every_claimant(self):
+        # 템플릿은 이름이 열쇠다. 셋이 한 이름을 차지하면 둘이 조용히 사라진다.
+        rows = [{"영문": "Pearl Necklace", "한글이름": "진주목걸이", "등급": "PACK_CONSENSUS"},
+                {"영문": "Dark Pearl Necklace", "한글이름": "진주목걸이", "등급": "KO_BASE_COLLAPSED"},
+                {"영문": "Wooden Shield", "한글이름": "나무방패", "등급": "PACK_CONSENSUS"}]
+        self.assertEqual(MODULE.drop_name_clashes(rows), 2)
+        self.assertIsNone(rows[0]["한글이름"])
+        self.assertIsNone(rows[1]["한글이름"])
+        self.assertEqual(rows[0]["등급"], "NAME_CLASH")
+        self.assertEqual(rows[2]["한글이름"], "나무방패")   # 혼자 쓰는 이름은 그대로 둔다
+
     def test_compose_only_uses_names_the_packs_have(self):
         rows = [{"영문": "Leather Greaves", "한글이름": "가죽각반", "등급": "PACK_CONSENSUS", "접사맞춤": {}},
                 {"영문": "Deoch Leather Greaves", "한글이름": None, "등급": "CONFLICT", "접사맞춤": {}}]
