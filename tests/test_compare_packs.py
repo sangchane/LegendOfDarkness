@@ -120,16 +120,26 @@ class AffixNarrowingTest(unittest.TestCase):
         self.assertEqual(MODULE.collapse_ko_base(rows, set()), 1)
         self.assertEqual(rows[0]["한글이름"], "동각반")
 
-    def test_derive_invents_only_when_the_affix_is_unambiguous(self):
+    def test_derive_uses_the_preferred_spelling_when_korean_has_two(self):
+        # Magic 은 팩에 마법·마력이 다 있다. 지을 때는 `마력의가죽각반` 으로 적는다 (카페 520).
         rows = [{"영문": "Leather Greaves", "한글이름": "가죽각반", "등급": "PACK_CONSENSUS",
                  "영문접사": None, "영문밑말": "Leather Greaves"},
                 {"영문": "Deoch Leather Greaves", "한글이름": None, "등급": "CONFLICT",
                  "영문접사": "Deoch", "영문밑말": "Leather Greaves"},
                 {"영문": "Magic Leather Greaves", "한글이름": None, "등급": "CONFLICT",
                  "영문접사": "Magic", "영문밑말": "Leather Greaves"}]
-        self.assertEqual(MODULE.derive_affixed(rows), 1)
+        self.assertEqual(MODULE.derive_affixed(rows), 2)
         self.assertEqual(rows[1]["한글이름"], "세오의가죽각반")
-        self.assertIsNone(rows[2]["한글이름"])       # Magic 은 마법·마력 둘이라 짓지 않는다
+        self.assertEqual(rows[2]["한글이름"], "마력의가죽각반")
+        # 고를 근거가 없는 접사는 그대로 짓지 않는다.
+        self.assertNotIn("Fire", MODULE.PREFERRED_KO)
+
+    def test_both_magic_spellings_still_match(self):
+        # 이름을 지을 때만 마력을 고른다. 짝을 찾을 때는 팩에 있는 둘 다 받는다.
+        self.assertEqual(MODULE.EN_TO_KO["Magic"], {"마법", "마력"})
+        cand = {"novaonline": ["마법의가죽각반"]}
+        self.assertEqual(MODULE.narrow_by_affix(cand, "Magic Leather Greaves", {"Magic"}),
+                         {"novaonline": ["마법의가죽각반"]})
 
     def test_name_clash_drops_every_claimant(self):
         # 템플릿은 이름이 열쇠다. 셋이 한 이름을 차지하면 둘이 조용히 사라진다.

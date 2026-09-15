@@ -54,6 +54,10 @@ for _ko, _en in AFFIX.items():
     EN_TO_KO.setdefault(_en, set()).add(_ko)
 EN_TO_KO["Fioschad"] = EN_TO_KO["Fiosachd"]   # 자료에 있는 오타. 접사로 잡히니 짝도 준다.
 
+# 한글 표기가 둘일 때 **이름을 지을 때** 쓸 쪽. 짝을 찾을 때는 둘 다 받는다 (팩에 둘 다 있다).
+# Magic 은 `마력의가죽각반` 으로 적는다 — 카페 520 과 게임을 해 본 사람이 같은 말을 한다.
+PREFERRED_KO = {"Magic": "마력"}
+
 # 그림 번호는 **착용 부위마다 따로 매겨진다** — 그림 113 이 Hades 에서는 투구이고 팩에서는
 # 부츠다. 그래서 부위가 같을 때만 잇는다. ★ 표는 신 이름이 붙은 확실한 짝에서 자료가 직접
 # 말한 것이고(각각 49·40·8쌍, 다른 값이 하나도 안 섞인다), 나머지는 양쪽 이름을 읽어 맞춘 것이다.
@@ -361,12 +365,15 @@ def derive_affixed(rows):
         if r["한글이름"] or not r.get("영문접사"):
             continue
         ko_affixes = EN_TO_KO.get(r["영문접사"], ())
-        if len(ko_affixes) != 1:
-            continue                   # 한글 표기가 둘이다 — 자료가 못 가린다
+        picked = PREFERRED_KO.get(r["영문접사"])
+        if picked is None:
+            if len(ko_affixes) != 1:
+                continue               # 한글 표기가 둘인데 고를 근거가 없다
+            picked = next(iter(ko_affixes))
         ko_base_name = settled.get(r["영문밑말"])
         if not ko_base_name:
             continue
-        made = next(iter(ko_affixes)) + "의" + ko_base_name
+        made = picked + "의" + ko_base_name
         if made in taken:
             continue
         r["한글이름"], r["등급"] = made, "AFFIX_DERIVED"
