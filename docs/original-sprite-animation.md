@@ -219,12 +219,17 @@ dat-extract mpf <hades.dat> MNS001.MPF out.png 1 transparent strip
 | 대상 | 어디에 | 형식 |
 |---|---|---|
 | 몸 동작 | `khan.dat` / `khan2.dat` 의 `b`~`f` | EPF + `skill.tbl` |
-| 효과 그림 | `roh.dat` 의 `efct###.epf` 257개 · `efct###.efa` 100개 | EPF / EFA |
-| 효과 재생 순서 | `roh.dat` 의 `efct###.tbl` 261개 | 한 줄에 칸 번호를 나열한 글자 파일 |
+| 효과 그림 | `roh.dat` 의 `efct###.epf` 278개 · `efct###.efa` 133개 | EPF / EFA |
+| 효과 재생 순서 | `roh.dat` 의 **단일 `effect.tbl`** | 첫 줄은 항목 수, 이후 한 줄마다 효과 하나의 칸 번호 나열 |
+| 효과별 바이너리 메타데이터 | `roh.dat` 의 `efct###.tbl`을 포함한 `.tbl` 282개 | 재생 순서가 아닌 바이너리 값. 아직 의미 미확인 |
 
-효과 표 형식은 `sources/wren11/da-lib/DALib/Drawing/EffectTable.cs` 가 이미 읽는다 — 첫 줄이 개수,
-이후 각 줄이 **그 효과가 재생할 칸 번호의 나열**이다. 몸 동작과 달리 **효과는 재생 순서가 그림 옆에
-적혀 있어** 따로 표를 만들 필요가 없다.
+효과 표 형식은 `sources/wren11/da-lib/DALib/Drawing/EffectTable.cs` 가 이미 읽는다 — `roh.dat`의
+**`effect.tbl` 하나**를 열어 첫 줄을 개수로, 이후 각 줄을 **그 효과가 재생할 칸 번호의 나열**로
+읽는다. ID는 1부터 시작해 표의 `ID - 1`번째 줄을 고른다. 예를 들어 효과 203의 순서는 `0 1 1`이다.
+
+**개별 `efct203.tbl`을 글자 표로 읽으면 안 된다.** 실제 파일은 8바이트
+`1C 00 46 00 1C 00 FF FF`인 바이너리 메타데이터다. 몸 동작의 `SI/FC`와 마찬가지로 효과도 파일을
+보고 임의로 반분하거나 순차 재생하지 않고, 반드시 전역 `effect.tbl`의 순서를 사용한다.
 
 ---
 
