@@ -141,6 +141,24 @@ class AffixNarrowingTest(unittest.TestCase):
         self.assertEqual(MODULE.narrow_by_affix(cand, "Magic Leather Greaves", {"Magic"}),
                          {"novaonline": ["마법의가죽각반"]})
 
+    def test_weapon_tiers_line_up_by_rank(self):
+        # 영문은 품질로, 한글은 속성 글자로 쪼갰지만 둘 다 데미지 사다리다 (자료에서 28 : 3 군).
+        self.assertEqual(MODULE.EN_TIER_TO_KO["Good"], "수")
+        self.assertEqual(MODULE.EN_TIER_TO_KO["Great"], "화")
+        cand = {"novaonline": ["일단검", "일단검수", "일단검토", "일단검풍", "일단검화"]}
+        rows = [{"영문": "Good Sun Dagger", "한글이름": None, "등급": "NAME_CLASH", "한글후보": cand},
+                {"영문": "Great Sun Dagger", "한글이름": None, "등급": "NAME_CLASH", "한글후보": cand}]
+        self.assertEqual(MODULE.match_weapon_tiers(rows), 2)
+        self.assertEqual(rows[0]["한글이름"], "일단검수")
+        self.assertEqual(rows[1]["한글이름"], "일단검화")
+
+    def test_weapon_tier_never_invents_a_missing_rung(self):
+        # 그 칸이 후보에 없으면 짓지 않는다.
+        rows = [{"영문": "Great Sun Dagger", "한글이름": None, "등급": "NAME_CLASH",
+                 "한글후보": {"novaonline": ["일단검", "일단검수"]}}]
+        self.assertEqual(MODULE.match_weapon_tiers(rows), 0)
+        self.assertIsNone(rows[0]["한글이름"])
+
     def test_name_clash_drops_every_claimant(self):
         # 템플릿은 이름이 열쇠다. 셋이 한 이름을 차지하면 둘이 조용히 사라진다.
         rows = [{"영문": "Pearl Necklace", "한글이름": "진주목걸이", "등급": "PACK_CONSENSUS"},

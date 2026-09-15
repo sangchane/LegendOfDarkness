@@ -382,6 +382,43 @@ def derive_affixed(rows):
     return won
 
 
+# 무기 등급 사다리. 양쪽 다 네 칸이고 순서가 자료에서 일관되게 나온다.
+#   한글 수 < 토 < 풍 < 화          novaonline 무기군 28개가 전부 이 순서다 (+2 데미지 간격)
+#   영문 Good < Fine < Grand < Great 하데스 무기군 3개가 전부 이 순서다 (+3 간격)
+# 값도 거의 겹친다 (Sun Dagger Good 73~98 ↔ 일단검수 77~97). 그래서 칸끼리 잇는다.
+WEAPON_TIERS_EN = ("Good", "Fine", "Grand", "Great")
+WEAPON_TIERS_KO = ("수", "토", "풍", "화")
+EN_TIER_TO_KO = dict(zip(WEAPON_TIERS_EN, WEAPON_TIERS_KO))
+
+
+def match_weapon_tiers(rows):
+    """`Good/Fine/Grand/Great <밑말>` 을 `<한글밑말><수/토/풍/화>` 에 잇는다 — `WEAPON_TIER`.
+
+    같은 그림에 영문 넷과 한글 다섯(밑말 + 속성 넷)이 몰려 이름 하나를 다투던 자리다. 영문은
+    품질로, 한글은 속성 글자로 쪼갰지만 **둘 다 데미지 사다리**라 칸 순서가 짝이 된다.
+
+    한글 후보에 그 칸이 실제로 있을 때만 잇는다. 지어내지 않는다.
+    """
+    settled = {r["영문"]: r["한글이름"] for r in rows if r["한글이름"]}
+    taken = set(settled.values())
+    won = 0
+    for r in rows:
+        if r["한글이름"]:
+            continue
+        head, _, base = r["영문"].partition(" ")
+        tail = EN_TIER_TO_KO.get(head)
+        if not tail or not base:
+            continue
+        here = {n for v in (r["한글후보"] or {}).values() for n in v}
+        stems = {n[:-1] for n in here if n and n[-1] in WEAPON_TIERS_KO}
+        made = {stem + tail for stem in stems} & here - taken
+        if len(made) == 1:
+            r["한글이름"], r["등급"] = made.pop(), "WEAPON_TIER"
+            taken.add(r["한글이름"])
+            won += 1
+    return won
+
+
 def drop_name_clashes(rows):
     """한 한글 이름을 영문 여럿이 차지하면 **전부 도로 내린다** — `NAME_CLASH`.
 
@@ -479,7 +516,9 @@ def hades_item_korean_names():
     collapse_ko_base(rows, affixes)
     compose_affixed(rows, affixes, pack_item_names())
     derive_affixed(rows)
+    # 이름 다툼을 먼저 내려야 등급 짝짓기가 그 자리를 볼 수 있다.
     drop_name_clashes(rows)
+    match_weapon_tiers(rows)
     tally = defaultdict(int)
     for r in rows:
         tally[r["등급"]] += 1

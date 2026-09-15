@@ -10,7 +10,12 @@ Broad Sword	1	17	그라디우스	그라디우스수 · 그라디우스토 · 그
 Durimis	1	99	히야트홀리스태프		PACK_CONSENSUS
 Empowered Holy Gnarl	1	99	홀리디아나		EXTRACTED_SINGLE
 Enchanted Magus Orb	1	99	다크디아나		EXTRACTED_SINGLE
+Fine Light Dagger	1	40	광단검토	광단검 · 광단검수 · 광단검풍 · 광단검화	WEAPON_TIER
+Fine Sun Dagger	1	66	일단검토	일단검 · 일단검수 · 일단검풍 · 일단검화	WEAPON_TIER
 Giant Club	1	75	자이언트클럽		EXTRACTED_SINGLE
+Good Sun Dagger	1	64	일단검수	일단검 · 일단검토 · 일단검풍 · 일단검화	WEAPON_TIER
+Grand Sun Dagger	1	68	일단검풍	일단검 · 일단검수 · 일단검토 · 일단검화	WEAPON_TIER
+Great Sun Dagger	1	70	일단검화	일단검 · 일단검수 · 일단검토 · 일단검풍	WEAPON_TIER
 Hatchet	1	13	토마호크		SAME_LINEAGE
 Scythe	1	94	낫		EXTRACTED_SINGLE
 Spiked Club	1	66	스파이크클럽		EXTRACTED_SINGLE
@@ -644,19 +649,14 @@ Enchanted Kalkuri	1	99		노머시의빅글러브 · 미스릴배틀핸드 · 배
 Eppe	1	2		에페 · 에페(x)	NAME_CLASH
 Eppe	1	2		에페 · 에페(x)	NAME_CLASH
 Fine Claidhmore	1	75		크레이모어 · 크레이모어수 · 크레이모어토 · 크레이모어풍 · 크레이모어화 · 투핸드크레이모어 · 투핸드크레이모어수 · 투핸드크레이모어토 · 투핸드크레이모어풍 · 투핸드크레이모어화	CONFLICT
-Fine Light Dagger	1	40		광단검 · 광단검수 · 광단검토 · 광단검풍 · 광단검화	NAME_CLASH
 Fine Snow Secret	1	7		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Fine Sun Dagger	1	66		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Fine Sun Secret	1	75		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Good Snow Secret	1	5		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Good Sun Dagger	1	64		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Good Sun Secret	1	73		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Grand Snow Secret	1	9		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Grand Sun Dagger	1	68		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Grand Sun Secret	1	77		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Great Emerald Sword	1	85		에메랄드소드 · 에메랄드소드수 · 에메랄드소드토 · 에메랄드소드풍 · 에메랄드소드화 · 투핸드에메랄드소드 · 투핸드에메랄드소드수 · 투핸드에메랄드소드토 · 투핸드에메랄드소드풍 · 투핸드에메랄드소드화	CONFLICT
 Great Snow Secret	1	11		비매표 · 비매표수 · 비매표토 · 비매표풍 · 비매표화 · 비설표 · 비중표 · 비중표수 · 비중표토 · 비중표풍 · 비중표화	CONFLICT
-Great Sun Dagger	1	70		일단검 · 일단검수 · 일단검토 · 일단검풍 · 일단검화	NAME_CLASH
 Great Sun Secret	1	79		비광표 · 비광표수 · 비광표토 · 비광표풍 · 비광표화 · 비월표 · 비월표수 · 비월표토 · 비월표풍 · 비월표화 · 비일표 · 비일표수	CONFLICT
 Harpoon	1	11		니크르창 · 작살	CONFLICT
 Holy Apollo	1	11		매직솔라 · 홀리솔라	CONFLICT
