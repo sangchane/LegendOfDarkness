@@ -48,6 +48,10 @@ SIZE_FIXES = {
 # 눈 비트(128) 를 비롯해 뜻을 모르는 채 바꾸지 않는다.
 DEFAULT_MAP_FLAGS = 106240
 
+# 괴물 경험치를 원작 비율로 낮추는 나눗수. 노바 실측(1→2 에 1.5 마리, 9→10 에 25.6 마리)에
+# 가장 가까운 값이다. 자세한 것은 experience() 와 docs/monster-experience-rescale.md.
+EXPERIENCE_DIVISOR = 7.3
+
 BANNED = re.compile(r'[:\\/*?"<>|]')
 
 
@@ -270,6 +274,34 @@ def whole(v, cap=None):
     return max(0, min(n, cap)) if cap is not None else n
 
 
+def experience(raw):
+    """괴물이 주는 경험치. 팩 값을 원작 비율로 낮춘다.
+
+    5.99 와 NovaOnline 은 **레벨 요구치 표가 완전히 같은데**(`db/server/experience.txt`) 괴물
+    경험치만 다르다. 그 표 위에서 재 보면 5.99 는 1→2 레벨에 0.18 마리, 노바는 1.5 마리다 —
+    5.99 가 제 곡선 대비 부풀린 쪽이고 노바가 원작 비율이다.
+
+    노바 값을 그대로 옮기지 않는 까닭: 이름이 166 종 중 73 종은 대응이 없고, 5.99 가 존마다
+    나눠 둔 단계(`녹색말벌1~4`)가 노바에서는 하나로 접혀 존 계단이 무너지며, 노바에는 장치용
+    쓰레기가 섞여 있다(`맨티스` 체력 604 만). 비율도 하나가 아니다 — 97 종 실측 중앙값이
+    1/7.0 인데 사분위가 0.062~1.071 이다.
+
+    그래서 **계수 하나를 5.99 값 전체에 곱한다.** 존 계단과 괴물 사이 상대 순서가 그대로 남고,
+    대응이 없는 73 종도 같이 처리된다. 마릿수가 레벨에 따라 오르는 모양은 곡선이 정하므로
+    여기서 정하는 것은 초반 높이뿐이다.
+
+    근거와 계수를 고른 이유: `docs/monster-experience-rescale.md`
+    """
+    n = whole(raw, 2**31 - 1)
+
+    if n is None:
+        return None
+
+    # 0 은 적어 둔 값이다 — 낮춰도 0 이다. 1 이상은 0 으로 내려보내지 않는다(0 이면 하데스가
+    # 레벨에서 만들어 버린다).
+    return max(1, round(n / EXPERIENCE_DIVISOR)) if n > 0 else n
+
+
 def operator(n):
     """Add=0 / Remove=1. 팩은 부호로 적는다 — -65 는 65를 빼라는 뜻이다."""
     return {"$type": TYPED.format("StatusOperator"),
@@ -448,7 +480,7 @@ def monster_json(spawn, mob, area_id, items):
         # 적재가 통째로 멎는다 — "Monster Templates Loaded" 줄 자체가 안 찍힌다. 그래서 자른다.
         "MaximumHP": whole(f.get("체력"), 2**31 - 1) or 0,
         "MaximumMP": 0,     # 팩에 마력 칸이 없다. 0 이면 마법을 안 쓴다 (CastEnabled)
-        "Exp": whole(f.get("경험치"), 2**31 - 1),
+        "Exp": experience(f.get("경험치")),
         "DmgMin": whole(f.get("최소공격력"), 2**31 - 1),
         "DmgMax": whole(f.get("최대공격력"), 2**31 - 1),
         # 방어는 음수가 낮을수록 단단하다. 0 도 적어 둔 값이라 없을 때만 None 으로 둔다
