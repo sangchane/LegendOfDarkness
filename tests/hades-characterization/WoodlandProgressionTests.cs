@@ -114,6 +114,10 @@ public sealed class WoodlandProgressionTests : IDisposable
 
         int perLevel = gained / levels;
 
+        // 레벨이 오르면 서버가 다음 목표를 새로 준다. 그 값이 원작 표와 같아야 한다 — 하데스가
+        // 쓰던 식은 이것의 다섯 배였다.
+        AssertNextMatchesTheOriginal(grown);
+
         // 레벨 하나에 점수가 몇 개 들어오는지. 이것이 성장의 화폐다.
         Assert.True(
             grown.Unspent > 0,
@@ -141,6 +145,8 @@ public sealed class WoodlandProgressionTests : IDisposable
             moreGained == Health(spent.Con) * moreLevels,
             $"레벨이 {moreLevels} 올랐는데 최대 체력이 {moreGained} 늘었습니다. Con {spent.Con} 이면 " +
             $"레벨당 {Health(spent.Con)}, 모두 {Health(spent.Con) * moreLevels} 이어야 합니다.");
+
+        AssertNextMatchesTheOriginal(again);
 
         Assert.True(
             moreGained / moreLevels > perLevel,
@@ -178,6 +184,73 @@ public sealed class WoodlandProgressionTests : IDisposable
 
         // 그리고 첫 점수는 힘으로 간다 — 77 까지 67 이 모자라 Con 의 60 보다 멀다.
         Assert.Equal(Stat.Str, NextToRaise(born.Str, born.Int, born.Wis, born.Con, born.Dex));
+    }
+
+    /// <summary>
+    /// What the server says is left to the next level has to be what the original asked for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The original's requirement is a table the packs ship — <c>db/server/experience.txt</c>, and 5.99
+    /// and NovaOnline carry the same one to the digit, which is why it is taken as the original's. Hades
+    /// used to compute its own instead, about five times steeper; the tell was that a new character woke
+    /// with <c>ExpNext = 600</c>, the table's own 1→2 value, and then every level after that disagreed.
+    /// </para>
+    /// <para>
+    /// What is checked is a ceiling, not an equality, because what the server reports is what is
+    /// <em>left</em>: a kill worth more than the level needed carries its remainder straight into the next
+    /// one, so the figure is the requirement minus whatever came over. The ceiling is still enough to
+    /// catch the old curve, which asked 12,000 at level three where the original asks 3,000.
+    /// </para>
+    /// <para>
+    /// Three per cent of slack on the ceiling because the server works the number out from a formula
+    /// fitted to that table rather than reading the table. Fifty of the ninety-seven levels come out
+    /// exactly; the worst is level 56 at 2.94 %.
+    /// </para>
+    /// </remarks>
+    private static void AssertNextMatchesTheOriginal(Vitals me)
+    {
+        long asked = OriginalRequirement(me.Level + 1);
+        long ceiling = asked + asked * 3 / 100;
+
+        Assert.True(
+            me.ExperienceToGo > 0 && me.ExperienceToGo <= ceiling,
+            $"{me.Level} 레벨이 되고 나서 서버가 다음 레벨까지 {me.ExperienceToGo:N0} 이 남았다고 " +
+            $"합니다. 원작 표는 {me.Level}→{me.Level + 1} 에 {asked:N0} 을 요구하므로 그보다 클 수 " +
+            $"없습니다 (넘겨받은 경험치가 있으면 그만큼 적다).");
+    }
+
+    /// <summary>
+    /// What the original asked to go from <paramref name="level" /> minus one up to it, read from the
+    /// pack's own table rather than written down here.
+    /// </summary>
+    private static long OriginalRequirement(int level)
+    {
+        string path = Path.Combine(
+            HadesWorkspace.RepositoryRoot,
+            "data", "server-packs", "5.99-server", "db", "server", "experience.txt");
+
+        Dictionary<int, long> total = [];
+
+        foreach (string line in File.ReadAllLines(path, System.Text.Encoding.GetEncoding(949)))
+        {
+            string[] parts = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length < 4
+                || !int.TryParse(parts[0], out int kind) || kind != 0
+                || !int.TryParse(parts[1], out int at)
+                || !long.TryParse(parts[3], out long cumulative))
+            {
+                continue;
+            }
+
+            total.TryAdd(at, cumulative);
+        }
+
+        Assert.True(total.ContainsKey(level) && total.ContainsKey(level - 1),
+            $"원작 표에 {level} 레벨이 없습니다.");
+
+        return total[level] - total[level - 1];
     }
 
     /// <summary>
