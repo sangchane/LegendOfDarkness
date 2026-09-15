@@ -139,9 +139,9 @@ public sealed class WoodlandHuntTests : IDisposable
     /// <c>Dropable</c> 검사(<c>GameServerHandlers</c>)는 괴물이 떨어뜨리는 길과 상관이 없다.
     /// </para>
     /// <para>
-    /// <b>팩드롭 72 장이 전부 같은 모양이므로, 그것들은 지금 어느 괴물도 떨어뜨리지 못한다.</b>
-    /// 여기서 영문을 쓰는 것은 그 편이 맞기 때문이기도 하다 — 아이템은 하데스 표를 기준으로 가기로
-    /// 되어 있다.
+    /// <b>드롭 기능이 고장난 것은 아니다.</b> 팩드롭 쪽은 한글 이름을 붙이는 작업이 아직 진행 중이라
+    /// 정의가 덜 채워진 상태였다(2026-09-15 확인). 여기서 영문을 쓰는 것은 그 편이 맞기 때문이기도
+    /// 하다 — 아이템은 하데스 표를 기준으로 가기로 되어 있다.
     /// </para>
     /// </remarks>
     private static readonly string[] FirstCircleDrops =
