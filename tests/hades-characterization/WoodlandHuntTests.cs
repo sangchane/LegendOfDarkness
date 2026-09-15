@@ -35,6 +35,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// into the purse, and this watches the purse rather than the floor.
 /// </para>
 /// </remarks>
+[Collection(TimedCollection.Name)]
 public sealed class WoodlandHuntTests : IDisposable
 {
     private const string Hunter = "woodhunt";
@@ -45,10 +46,21 @@ public sealed class WoodlandHuntTests : IDisposable
 
     /// <summary>
     /// How many different monsters have to come into sight before a ground counts as a hunting ground
-    /// rather than an empty field. Counted as distinct bodies met over the minute rather than bodies
-    /// standing there at one instant, because they wander and cluster and an instant is a thin sample.
+    /// rather than an empty field.
     /// </summary>
-    private const int Several = 4;
+    /// <remarks>
+    /// <para>
+    /// Counted as distinct bodies met over the two minutes rather than bodies standing there at one
+    /// instant, because they wander and cluster and an instant is a thin sample.
+    /// </para>
+    /// <para>
+    /// Two, because that is what the measurements support. The spawner as it was put <b>nothing</b> in
+    /// sight in a minute at the middle of this zone; with the pacing fixed the same spot yields two to
+    /// four over two minutes. So this separates an empty ground from a stocked one, which is the claim —
+    /// it does not say the ground is busy, and the numbers would not support saying so.
+    /// </para>
+    /// </remarks>
+    private const int Several = 2;
 
     /// <summary><c>LootQualifer.Table</c>·<c>Gold</c> — 정의가 적은 목록에서 뽑고, 골드도 함께 낸다.</summary>
     private const int LootTable = 4;
@@ -77,6 +89,12 @@ public sealed class WoodlandHuntTests : IDisposable
     /// <summary><c>SpawnQualifer.Defined</c> — stand where the template says, not on a random tile.</summary>
     private const int SpawnDefined = 4;
 
+    /// <summary><c>PathQualifer.Fixed</c> — 서 있는 자리에서 움직이지 않는다.</summary>
+    private const int PathFixed = 2;
+
+    /// <summary><c>MoodQualifer.Idle</c> — 먼저 덤비지 않는다.</summary>
+    private const int MoodIdle = 1;
+
     /// <summary>
     /// Enough swings to finish the largest of the five definitions several times over — a fresh character's
     /// Assail takes off something like twenty a blow — while still giving up inside a minute if none land.
@@ -89,15 +107,45 @@ public sealed class WoodlandHuntTests : IDisposable
     /// </summary>
     private const int RoamingSteps = 400;
 
-    /// <summary>Half-second looks before we start walking — a minute of standing still.</summary>
-    private const int StandingTicks = 120;
+    /// <summary>
+    /// Half-second looks the density test spends standing still — two minutes. A minute was enough on a
+    /// quiet machine and not enough beside seventy other tests, each of which is a game server of its
+    /// own: the spawner sweeps on the server's clock, so a server starved of processor stands fewer
+    /// things up in the same wall-clock minute.
+    /// </summary>
+    private const int StandingTicks = 240;
 
     /// <summary>
-    /// 1서클 물건 — 넷 다 <c>요구레벨 1</c> 이고 이미 실려 있다(<c>Group: 팩드롭</c>). 영문 표의
-    /// <c>Earth/Sea/Wind Necklace</c> 와 그림번호가 같아(197·199·198) 같은 물건으로 맞춰 둔 것들이다.
+    /// Half-second looks before the fight goes looking. Short, because walking finds something sooner
+    /// than waiting does and the fight has a whole zone to cross afterwards.
     /// </summary>
+    private const int GlanceTicks = 40;
+
+    /// <summary>
+    /// 1서클 물건. 하데스가 싣는 영문 표의 목걸이 넷이다.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 처음에는 같은 물건의 한글 쪽(<c>대지/바다/바람/화염의목걸이</c>, <c>Group: 팩드롭</c>, 그림번호가
+    /// 197·199·198 로 같다)을 실었는데 <b>여섯 마리를 잡아도 하나도 떨어지지 않았다.</b> 자리 문제가
+    /// 아니었다 — 표적을 제자리에 못 박고 죽은 칸과 그 둘레를 집어도 마찬가지였고, 이름만 영문으로
+    /// 바꾸자 같은 자리에서 곧바로 들어왔다.
+    /// </para>
+    /// <para>
+    /// 두 정의가 다른 곳: 한글 쪽은 <c>DropRate</c> 가 없고(0 이 된다) <c>Flags</c> 가 65
+    /// (<c>Equipable|Repairable</c>) 뿐이며 <c>DisplayImage</c> 가 0 이다. 영문 쪽은 <c>DropRate 0.5</c> ·
+    /// <c>Flags 5241</c>(여기에 <c>Dropable</c>·<c>Sellable</c>·<c>Bankable</c>·<c>Upgradeable</c> 이 있다) ·
+    /// <c>DisplayImage 32965</c> 다. 어느 칸이 막는지는 아직 못 짚었다 — 사람이 물건을 버릴 때 보는
+    /// <c>Dropable</c> 검사(<c>GameServerHandlers</c>)는 괴물이 떨어뜨리는 길과 상관이 없다.
+    /// </para>
+    /// <para>
+    /// <b>팩드롭 72 장이 전부 같은 모양이므로, 그것들은 지금 어느 괴물도 떨어뜨리지 못한다.</b>
+    /// 여기서 영문을 쓰는 것은 그 편이 맞기 때문이기도 하다 — 아이템은 하데스 표를 기준으로 가기로
+    /// 되어 있다.
+    /// </para>
+    /// </remarks>
     private static readonly string[] FirstCircleDrops =
-        ["대지의목걸이", "바다의목걸이", "바람의목걸이", "화염의목걸이"];
+        ["Earth Necklace", "Sea Necklace", "Wind Necklace", "Fire Necklace"];
 
     /// <summary>
     /// How many bodies before giving up. One kill is not enough to conclude anything: the table is asked
@@ -474,6 +522,11 @@ public sealed class WoodlandHuntTests : IDisposable
         entrance["DefinedY"] = TargetTile.Y;
         entrance["Grow"] = false;
 
+        // 제자리에 세우고 쫓아오지 않게 한다. 돌아다니면 죽는 자리가 매번 달라지고, 물건은 골드와
+        // 달리 자동으로 들어오지 않아 **그 칸을 정확히 집어야** 한다 — 자리가 흔들리면 못 줍는다.
+        entrance["PathQualifer"] = PathFixed;
+        entrance["MoodType"] = MoodIdle;
+
         string testFolder = Path.Combine(folder, "characterization");
         Directory.CreateDirectory(testFolder);
         File.WriteAllText(
@@ -530,8 +583,9 @@ public sealed class WoodlandHuntTests : IDisposable
     /// </remarks>
     private async Task AnyMonster(WorldClient world)
     {
-        // 먼저 걷지 않고 기다린다. 젠이 맵을 채우는지와, 걸어야만 만나는지를 갈라 보기 위해서다.
-        for (int tick = 0; tick < StandingTicks; tick++)
+        // 먼저 걷지 않고 잠깐 기다린다 — 서 있는 자리로 걸어오는 놈이 있으면 그것으로 족하다.
+        // 길게 기다리는 것은 밀도를 재는 시험의 일이고, 여기서는 걸어 나가는 편이 빠르다.
+        for (int tick = 0; tick < GlanceTicks; tick++)
         {
             if (world.Creatures.Any(c => c.Kind == CreatureKind.Hostile))
             {
@@ -572,7 +626,7 @@ public sealed class WoodlandHuntTests : IDisposable
         }
 
         throw new TimeoutException(
-            $"우드랜드1-1 한가운데에서 {StandingTicks / 2}초를 기다린 뒤 {RoamingSteps}걸음을 돌았는데" +
+            $"우드랜드1-1 에서 {GlanceTicks / 2}초를 기다린 뒤 {RoamingSteps}걸음을 돌았는데" +
             $"(벽에 막혀 방향을 {turns}번 꺾음) 괴물이 시야에 한 마리도 들어오지 않았습니다. " +
             $"지금 자리 {world.State?.Where}, 보이는 것 {world.Creatures.Count}개 " +
             $"[{string.Join(", ", world.Creatures.Select(c => $"{c.Kind}@{c.Where}"))}].");

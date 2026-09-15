@@ -42,6 +42,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// hands out and checks that spending works, so it goes on holding whichever start is settled on.
 /// </para>
 /// </remarks>
+[Collection(TimedCollection.Name)]
 public sealed class WoodlandProgressionTests : IDisposable
 {
     private const string Name = "woodgrow";
