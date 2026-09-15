@@ -48,6 +48,27 @@ ExpNext = 레벨 × (레벨 × 0.1 + 0.5) × 5000
 
 곁가지로 확인된 것: 능력치 점수 칸이 전 구간 **2** 다. `LoruleConfig.json` 의 `StatsPerLevel: 2` 가 맞다.
 
+### 하데스는 표를 읽지 않는다 — 그리고 식이 두 군데에 있다
+
+원작(과 팩)은 표를 읽는데 하데스는 식을 코드에 박아 뒀다. **같은 식이 두 곳에 복사돼 있다:**
+
+| 어디 | 무엇 |
+|---|---|
+| `database/server/scripts/Formulas/monsterexp.cs:60` | 런타임에 컴파일되는 보상 스크립트 |
+| `src/Hades.Server.Base/Types/Monster.cs:170` | 서버 본체. 같은 줄이 그대로 다시 있다 |
+
+```csharp
+player.ExpNext = (uint) (player.ExpLevel * seed * 5000);
+```
+
+**한 쪽만 고치면 다른 쪽이 그대로 돈다.** 곡선을 바꾸기로 하면 두 군데를 같이 고쳐야 한다.
+
+### 시작값만 원작이고 그 뒤가 어긋나 있다
+
+`src/Hades.Server.Base/Types/Aisling.cs:208` 이 새 캐릭터에게 `ExpNext = 600` 을 준다.
+**600 은 원작 표의 1→2 값**이다 — 하데스 식으로는 3,000 이어야 한다. 시작값만 원작에서 따오고
+첫 레벨업부터 다섯 배짜리 제 식으로 넘어간다. 1 레벨 구간만 원작이고 그 뒤가 전부 어긋나 있다.
+
 ---
 
 ## 3. 노바가 기준인 근거
@@ -194,8 +215,10 @@ ExpNext = 레벨 × (레벨 × 0.1 + 0.5) × 5000
 4. **시험으로 확인한다.**
    - `WoodlandHuntTests` — 한 마리가 정의대로의 경험치를 주는지
    - `WoodlandProgressionTests` — 레벨당 마릿수가 목표와 맞는지 (지금은 한 마리에 두 레벨)
-5. **곡선을 바꾸기로 했다면** `monsterexp.cs` 의 `ExpNext` 식을 `experience.txt` 표를 읽는 것으로
-   바꾼다. 표는 603 줄, 0~98 레벨.
+5. **곡선을 바꾸기로 했다면** `ExpNext` 식을 `experience.txt` 표를 읽는 것으로 바꾼다. 표는 603 줄,
+   0~98 레벨. **두 군데다** — `monsterexp.cs:60` 과 `Monster.cs:170`. 표를 어디에 둘지도 정해야 한다
+   (`database/server/static/` 이 이미 `sotp.dat` 같은 원작 표를 담는 자리다).
+   `Aisling.cs:208` 의 시작값 600 은 그때 표의 1→2 값과 같아지므로 그대로 두면 된다.
 
 ### 건드리지 않을 것
 
