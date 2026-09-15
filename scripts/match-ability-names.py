@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""두 서버팩이 합의한 기술·마법 한글 이름을 대조하고 감사표를 만든다.
+"""세 서버팩이 합의한 기술·마법 한글 이름을 대조하고 감사표를 만든다.
 
-Hades의 갈래·아이콘별 영문 이름이 하나이고, 5.99와 혼든도 같은 갈래·아이콘에서
+Hades의 갈래·아이콘별 영문 이름이 하나이고, 5.99·혼든·Novaonline도 같은 갈래·아이콘에서
 각각 하나의 동일한 한글 이름을 가질 때만 자동 확정한다. ``--write``는 이름표의 빈칸만
 채우며 사용자가 고친 기존 값은 절대 덮지 않는다.
 """
@@ -22,16 +22,16 @@ def joined(values):
 def main(write=False):
     accepted, audit = load_consensus()
     lines = [
-        "# Hades 아이콘과 서버팩 2개의 한글 이름을 맞댄 감사표.",
-        "# 5.99·혼든이 같은 이름이며 세 자료 모두 아이콘당 이름이 하나일 때만 `채택`한다.",
+        "# Hades 아이콘과 서버팩 3개의 한글 이름을 맞댄 감사표.",
+        "# 5.99·혼든·Novaonline이 같은 이름이며 네 자료 모두 아이콘당 이름이 하나일 때만 `채택`한다.",
         "# 구조·정렬·영문 이름은 Hades가 기준이고 서버팩은 한글 표시 후보로만 사용한다.",
-        "# 칸: 갈래 / 아이콘 / Hades 영문 / 5.99 한글 / 혼든 한글 / 판정",
+        "# 칸: 갈래 / 아이콘 / Hades 영문 / 5.99 한글 / 혼든 한글 / Novaonline 한글 / 판정",
         "",
     ]
     for row in audit:
         lines.append("\t".join([
             LABELS[row["kind"]], str(row["icon"]), joined(row["english"]),
-            joined(row["5.99-server"]), joined(row["honden-community"]), row["reason"],
+            joined(row["5.99-server"]), joined(row["honden-community"]), joined(row["novaonline"]), row["reason"],
         ]))
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

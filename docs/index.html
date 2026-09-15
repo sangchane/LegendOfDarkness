@@ -132,12 +132,19 @@
         <div class="page-heading">
           <div>
             <p class="eyebrow">World connectivity</p>
-            <h1 id="world-title">Hades 포테의숲 실제 맵·워프</h1>
-            <p>Hades의 실제 맵 이미지를 먼저 보여주고, 이미지 위 워프 좌표와 다른 맵으로 이어지는 관계를 같은 화면에서 확인합니다. 없는 연결은 추측하지 않습니다.</p>
+            <h1 id="world-title">Hades 지역 실제 맵·워프</h1>
+            <p>노비스 마을·포테의 숲·우드랜드를 전환해 Hades 실제 맵, 이미지 위 워프 좌표와 다음 목적지를 함께 확인합니다. 없는 연결은 추측하지 않습니다.</p>
           </div>
           <a class="quiet-link" href="../plans/server-pack-content-port.md">이식 계획 →</a>
         </div>
-        <div id="porte-forest-focus" class="forest-focus" aria-live="polite"></div>
+        <div class="map-focus-tabs" role="tablist" aria-label="검토할 지역">
+          <button id="map-focus-tab-novice" type="button" role="tab" data-map-focus-target="novice" aria-controls="novice-village-focus" aria-selected="true">노비스 마을</button>
+          <button id="map-focus-tab-porte" type="button" role="tab" data-map-focus-target="porte" aria-controls="porte-forest-focus" aria-selected="false" tabindex="-1">포테의 숲</button>
+          <button id="map-focus-tab-woodland" type="button" role="tab" data-map-focus-target="woodland" aria-controls="woodland-focus" aria-selected="false" tabindex="-1">우드랜드</button>
+        </div>
+        <div id="novice-village-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-novice" aria-live="polite"></div>
+        <div id="porte-forest-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-porte" aria-live="polite" hidden></div>
+        <div id="woodland-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-woodland" aria-live="polite" hidden></div>
         <details class="world-draft">
           <summary>전체 월드 탐색기 초안 보기</summary>
           <div class="world-draft-body">
@@ -183,7 +190,7 @@
           <div>
             <p class="eyebrow">Skills and spells</p>
             <h1 id="abilities-title">무엇을 배워야 무엇이 열리나</h1>
-            <p>Hades 표(<code>metafile/SClass1~5</code>) 613개를 직업별·선행 사슬 순서로 정렬했습니다. 한글 이름은 <strong>5.99와 혼든이 같은 갈래·아이콘에서 완전히 일치할 때만</strong> 자동 표기하며, 틀린 이름은 입력칸에서 바로 고쳐 내보낼 수 있습니다.</p>
+            <p>Hades 표(<code>metafile/SClass1~5</code>) 613개를 직업별·선행 사슬 순서로 정렬했습니다. 한글 이름은 <strong>5.99·혼든·Novaonline이 같은 갈래·아이콘에서 완전히 일치할 때만</strong> 자동 표기하며, 틀린 이름은 입력칸에서 바로 고쳐 내보낼 수 있습니다.</p>
           </div>
           <a class="quiet-link" href="../data/기술마법-한글이름.tsv">이름표 →</a>
         </div>
@@ -251,6 +258,6 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="porte-forest.js"></script><script src="world-map.js"></script><script src="abilities.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script>
 </body>
 </html>

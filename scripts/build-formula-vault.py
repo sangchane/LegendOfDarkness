@@ -276,11 +276,13 @@ def main():
         "587개를 하나씩 쓰는 일이 아니라, 이미 있는 것에 **붙이는** 일이다.\n\n"
         f"- 기술 {len(spare_skill)}개: {', '.join(f'`{n}`' for n in spare_skill)}\n"
         f"- 마법 {len(spare_spell)}개: {', '.join(f'`{n}`' for n in spare_spell)}\n\n"
-        "## 확인된 것은 둘뿐이다\n\n"
-        "`Assail` 이 식대로 피해를 주는 것과 `beag ioc fein` 이 회복 메시지를 보내는 것.\n"
+        "## 실제 서버에서 확인된 것\n\n"
+        "`Assail` · `Kick` · `High Kick` · `Double Punch` · `Poison Punch` · `Sting` 이 피해를 주고, "
+        "`beag ioc fein` 이 회복 메시지를 보내는 것까지 **7개**를 직접 확인했다.\n"
         f"붙어 있는 {skills_on + spells_on}개 중 나머지는 눌러 본 적이 없다.\n"
         "지키는 시험: `tests/hades-characterization/CombatSmokeTests.cs` ·\n"
-        "`tests/hades-characterization/MobileClientProtocolTests.cs`\n",
+        "`tests/hades-characterization/MobileClientProtocolTests.cs` ·\n"
+        "`tests/hades-characterization/MonkLevelTenSkillTests.cs`\n",
         encoding="utf-8")
 
     checked = []

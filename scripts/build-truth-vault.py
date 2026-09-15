@@ -271,7 +271,7 @@ def main():
         [f"`templates/skills/` {len(sk)}장 · `templates/spells/` {len(sp)}장",
          f"우리가 쓴 표(`원작표`)가 붙은 것 기술 {sum(1 for g in sk.values() if g.startswith('원작표'))} · "
          f"마법 {sum(1 for g in sp.values() if g.startswith('원작표'))}"],
-        ["**구조·수치는 팩을 안 본다.** 하데스+원작으로 끝난다. 화면의 한글 이름만 5.99·혼든이 "
+        ["**구조·수치는 팩을 안 본다.** 하데스+원작으로 끝난다. 화면의 한글 이름만 5.99·혼든·Novaonline이 "
          "같은 갈래·아이콘에서 같은 이름일 때 후보로 쓰며, 불일치는 버린다. 이름표에서 사람이 "
          "고친 값은 별도 수정값으로 남긴다.",
          "**3번 출처가 있다**: `sources/wren11/ETDA/BotCore/Shared/Collections.cs` 가 기술·마법의 "

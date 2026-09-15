@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Hades 기술·마법과 두 서버팩의 한글 이름이 안전하게 합의되는 항목만 고른다.
+"""Hades 기술·마법과 세 서버팩의 한글 이름이 안전하게 합의되는 항목만 고른다.
 
 구조와 정렬의 기준은 언제나 Hades ``abilities.json`` 이다. 서버팩은 번역 후보일 뿐이며,
-5.99와 혼든이 같은 갈래·같은 아이콘에서 정확히 하나의 같은 이름을 가질 때만 채택한다.
+5.99·혼든·Novaonline이 같은 갈래·같은 아이콘에서 정확히 하나의 같은 이름을 가질 때만 채택한다.
 Hades 쪽도 그 아이콘에 영문 이름이 하나뿐이어야 한다(직업별 중복 행은 한 이름으로 센다).
 """
 import json
@@ -14,6 +14,7 @@ HADES = ROOT / "data/game-data/abilities.json"
 PACKS = {
     "5.99-server": ROOT / "data/server-packs/extracted/5.99-server",
     "honden-community": ROOT / "data/server-packs/extracted/honden-community",
+    "novaonline": ROOT / "data/server-packs/extracted/novaonline",
 }
 KINDS = {"skill": "skills", "spell": "spells"}
 LABELS = {"skill": "기술", "spell": "마법"}
@@ -54,26 +55,26 @@ def build_consensus(hades_rows, pack_rows):
                     by_icon[icon].add(name)
             names_by_pack[pack] = by_icon
 
-        icons = sorted(set(hades_by_icon) | set(names_by_pack["5.99-server"]) |
-                       set(names_by_pack["honden-community"]))
+        icons = sorted(set(hades_by_icon).union(*(set(rows) for rows in names_by_pack.values())))
         for icon in icons:
             english = sorted(hades_by_icon.get(icon, set()))
-            five = sorted(names_by_pack["5.99-server"].get(icon, set()))
-            honden = sorted(names_by_pack["honden-community"].get(icon, set()))
-            okay = len(english) == len(five) == len(honden) == 1 and five == honden
-            reason = "채택" if okay else (
-                "Hades 영문 다중" if len(english) > 1 else
-                "5.99 이름 없음/다중" if len(five) != 1 else
-                "혼든 이름 없음/다중" if len(honden) != 1 else
-                "두 팩 이름 불일치"
-            )
+            candidates = {pack: sorted(by_icon.get(icon, set())) for pack, by_icon in names_by_pack.items()}
+            single_pack_names = [values[0] for values in candidates.values() if len(values) == 1]
+            okay = (len(english) == 1 and all(len(values) == 1 for values in candidates.values())
+                    and len(set(single_pack_names)) == 1)
+            if okay:
+                reason = "채택"
+            elif len(english) != 1:
+                reason = "Hades 영문 없음/다중"
+            else:
+                invalid_pack = next((pack for pack, values in candidates.items() if len(values) != 1), None)
+                reason = f"{invalid_pack} 이름 없음/다중" if invalid_pack else "세 팩 이름 불일치"
             audit.append({"kind": kind, "icon": icon, "english": english,
-                          "5.99-server": five, "honden-community": honden,
-                          "accepted": okay, "reason": reason})
+                          **candidates, "accepted": okay, "reason": reason})
             if okay:
                 accepted[english[0]] = {
-                    "korean": five[0], "kind": kind, "icon": icon,
-                    "source": "서버팩 2개 일치",
+                    "korean": single_pack_names[0], "kind": kind, "icon": icon,
+                    "source": "서버팩 3개 일치",
                 }
     return accepted, audit
 

@@ -12,7 +12,7 @@
   쓰는 법: python3 scripts/build-map-images.py 마인마을 [더 그릴 맵 이름...]
 
 맵·타일과 워프는 Hades 서버 저장소를 우선한다. 맵마다 Hades 출발 좌표가 하나도 없을 때만
-5.99와 혼든 서버팩의 출발·도착 좌표가 모두 같은 워프를 ``참고표시``로 넣는다.
+5.99·혼든·Novaonline 서버팩의 출발·도착 좌표가 모두 같은 워프를 ``참고표시``로 넣는다.
 """
 import json, subprocess, sys, collections, shutil, struct
 from pathlib import Path
@@ -25,10 +25,19 @@ DATA = ROOT / "docs" / "map-images-data.js"
 PACK_WARPS = {
     "5.99-server": ROOT / "data" / "server-packs" / "extracted" / "5.99-server" / "warps.json",
     "honden-community": ROOT / "data" / "server-packs" / "extracted" / "honden-community" / "warps.json",
+    "novaonline": ROOT / "data" / "server-packs" / "extracted" / "novaonline" / "warps.json",
 }
 
 HALF_W, HALF_H = 28, 13
 SCALE = 4                      # 5600px 는 브라우저에 너무 크다. 1/4 로 줄여 쓴다.
+DEFAULT_NAMES = [
+    "노비스마을", "노비스마을식당", "노비스무기방어구상점", "노비스민가1", "노비스민가2",
+    "노비스잡화상점", "노비스주점", "노비스평원A", "노비스평원B",
+    "포테의숲1존", "포테의숲2존", "포테의숲3존", "포테의숲4존", "포테의숲5존", "포테의숲6존",
+    "포테의숲보스존",
+    "우드랜드입구", "우드랜드1-1", "우드랜드1-2", "우드랜드1-3", "우드랜드2-1",
+    "우드랜드3-1", "우드랜드4-1", "우드랜드5-1", "우드랜드6-1", "우드랜드14-1",
+]
 
 
 def pixel(col, row, rows):
@@ -37,7 +46,7 @@ def pixel(col, row, rows):
 
 
 def agreed_pack_warps():
-    """두 서버팩의 출발/도착 맵과 좌표가 전부 같은 워프만 fallback 후보로 돌려준다."""
+    """세 서버팩의 출발/도착 맵과 좌표가 전부 같은 워프만 fallback 후보로 돌려준다."""
     per_pack = {}
     for pack, path in PACK_WARPS.items():
         if not path.exists():
@@ -54,12 +63,12 @@ def agreed_pack_warps():
             packed[key] = str(row.get("출처") or path.name)
         per_pack[pack] = packed
 
-    five, honden = per_pack["5.99-server"], per_pack["honden-community"]
+    shared = set.intersection(*(set(rows) for rows in per_pack.values()))
     return [
         {"from": key[0], "x": key[1], "y": key[2], "to": key[3],
          "to_x": key[4], "to_y": key[5],
-         "sources": {"5.99-server": five[key], "honden-community": honden[key]}}
-        for key in sorted(set(five) & set(honden))
+         "sources": {pack: rows[key] for pack, rows in per_pack.items()}}
+        for key in sorted(shared)
     ]
 
 
@@ -181,7 +190,8 @@ def main(names):
         for w in warps:
             if w["ActivationMapId"] != area["Id"]:
                 continue
-            destination = names_by_id.get(w["To"]["AreaID"], "맵 #" + str(w["To"]["AreaID"]))
+            destination_id = w["To"]["AreaID"]
+            destination = "월드맵" if destination_id == 0 else names_by_id.get(destination_id, "맵 #" + str(destination_id))
             for activation in w.get("Activations", []):
                 if activation.get("AreaID") != area["Id"]:
                     continue
@@ -218,10 +228,10 @@ def main(names):
              "근거": [entry["sources"] for entry in entries]}
             for (cx, cy), entries in sorted(reference_marks.items())
         ]
-        out[name]["참고출처"] = "5.99-server + honden-community 완전 일치"
+        out[name]["참고출처"] = "5.99-server + honden-community + novaonline 완전 일치"
         out[name]["워프출처"] = (
             "Hades templates/warps" if marks else
-            "서버팩 2개 일치" if reference_marks else
+            "서버팩 3개 일치" if reference_marks else
             "없음"
         )
         print(f"  {name}: Hades · {small.width}x{small.height} · 워프 칸 {len(marks)}개 → {n_to}곳 · "
@@ -233,4 +243,4 @@ def main(names):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:] or ["마인마을"])
+    main(sys.argv[1:] or DEFAULT_NAMES)

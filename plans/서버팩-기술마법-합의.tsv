@@ -1,254 +1,268 @@
-# Hades 아이콘과 서버팩 2개의 한글 이름을 맞댄 감사표.
-# 5.99·혼든이 같은 이름이며 세 자료 모두 아이콘당 이름이 하나일 때만 `채택`한다.
+# Hades 아이콘과 서버팩 3개의 한글 이름을 맞댄 감사표.
+# 5.99·혼든·Novaonline이 같은 이름이며 네 자료 모두 아이콘당 이름이 하나일 때만 `채택`한다.
 # 구조·정렬·영문 이름은 Hades가 기준이고 서버팩은 한글 표시 후보로만 사용한다.
-# 칸: 갈래 / 아이콘 / Hades 영문 / 5.99 한글 / 혼든 한글 / 판정
+# 칸: 갈래 / 아이콘 / Hades 영문 / 5.99 한글 / 혼든 한글 / Novaonline 한글 / 판정
 
-기술	0	Clobber		더블어택	5.99 이름 없음/다중
-기술	1	Assail | Assault | Long Strike	기본공격 | 더블어택 | 숏블레이드	기본공격 | 숏블레이드 | 정권 | 찌르기	Hades 영문 다중
-기술	2	High Kick | Kick	단각 | 아들레스투	단각	Hades 영문 다중
-기술	3	Martial Awareness	붕각 | 전체암살격진	붕각	5.99 이름 없음/다중
-기술	4	Double Punch | Poison Punch | Sting	백보신권 | 양의신권 | 정권	백보신권 | 양의신권 | 통배권	Hades 영문 다중
-기술	5	Stab and Twist	찌르기	찔러휘비기	두 팩 이름 불일치
-기술	6	Stab Twice	슬레쉬	두번찌르기	두 팩 이름 불일치
-기술	7		문열기		혼든 이름 없음/다중
-기술	8	Shadow Figure | Sneak Attack	탐색	탐색	Hades 영문 다중
-기술	9	Sense	센스	센스	채택
-기술	10	Combat Senses | Echo Sense | Study Creature	센스몬스터	센스몬스터	Hades 영문 다중
-기술	11	Midnight Slash | Triple Kick | Wallop	트리플어택	트리플어택	Hades 영문 다중
-기술	12	Throw Surigum	표창던지기	표창날리기	두 팩 이름 불일치
-기술	13	Rescue		레스큐	5.99 이름 없음/다중
-기술	14	Elemental Bless 1 | Elemental Bless 2 | Elemental Bless 3 | Elemental Bless 4 | Elemental Bless 5 | Wield Staff		소환술(Lev1) | 소환술(Lev2) | 소환술(Lev3) | 소환술(Lev4) | 소환술(Lev5)	Hades 영문 다중
-기술	15	Wind Blade	윈드블레이드	GM전체공격 | 백슬레쉬 | 윈드블레이드	혼든 이름 없음/다중
-기술	16	Cyclone Blade	메가블레이드	메가블레이드	채택
-기술	17	Two-handed Attack	투핸드어택	투핸드어택	채택
-기술	18		적무기해체	적무기쳐내기	두 팩 이름 불일치
-기술	19	Perfect Defense | Throw	완전방어	완전방어	Hades 영문 다중
-기술	20	Mad Soul | Sacrifice	매드소울 | 매드소울진	매드소울 | 매드소울진	Hades 영문 다중
-기술	21	Crasher	크래셔	검신(檢身) | 바람의상처 | 크래셔 | 크래셔(세트효과)	혼든 이름 없음/다중
-기술	22	Unlock			5.99 이름 없음/다중
-기술	23		소매치기	일반제조	두 팩 이름 불일치
-기술	24	Throw Smoke Bomb		연막탄터뜨리기	5.99 이름 없음/다중
-기술	25			함정해체	5.99 이름 없음/다중
-기술	26	Peek	품뒤져보기	품뒤져보기	채택
-기술	27	Analyze Item | Appraise | Armor Lore | Evaluate Item | Food Lore | Herbal Lore | Magic Lore | Melee Lore | Missile Lore | Perish Lore | Potion Lore			Hades 영문 다중
-기술	28			함정파기	5.99 이름 없음/다중
-기술	29		습격 | 습격진	습격 | 습격진	5.99 이름 없음/다중
-기술	30		적갑옷해체	적갑옷해체	두 팩 이름 불일치
-기술	31		암살격 | 암살격진	암살격 | 암살격진 | 전체암살격진	5.99 이름 없음/다중
-기술	32	Mend Garment | Mend Soori | Mend Staff | Mend Weapon | Tailoring			Hades 영문 다중
-기술	33	Dark Spear	일음지	일음지	채택
-기술	34	Draco Tail Kick	선풍각	선풍각	채택
-기술	35		발경	발경	두 팩 이름 불일치
-기술	36	Kelberoth Strike	달마신공	달마신공	채택
-기술	37	Whirlwind Attack	구양신공	구양신공	채택
-기술	38	Hairstyle | beag suain		바투	Hades 영문 다중
-기술	39	ao beag suain	타겟어택	디바투	두 팩 이름 불일치
-기술	40		피닉스모드	드래곤모드 | 피닉스모드	혼든 이름 없음/다중
-기술	42	Ambush	이형환위	이형환위	채택
-기술	43		소수신공	소수신공	두 팩 이름 불일치
-기술	44	Amnesia	아무네지아	아무네지아	채택
-기술	45	TransferBlood			5.99 이름 없음/다중
-기술	46			밀기	5.99 이름 없음/다중
-기술	48	Thrash		메가어택	5.99 이름 없음/다중
-기술	49	Charge	질주	돌진	두 팩 이름 불일치
-기술	50	Assassin Strike	기습 | 블랙기습	기습 | 기습(세트효과)	5.99 이름 없음/다중
-기술	51		허공답보	허공답보	두 팩 이름 불일치
-기술	52	Paralyze Force	M포효	포효	두 팩 이름 불일치
-기술	54		찔러휘비기		혼든 이름 없음/다중
-기술	56		슈페이아움(Lev1)		혼든 이름 없음/다중
-기술	57	Mantis Kick			5.99 이름 없음/다중
-기술	58	Eagle Strike	연환포		혼든 이름 없음/다중
-기술	59	Claw Fist		트리플펀치	5.99 이름 없음/다중
-기술	60	Wolf Fang Fist			5.99 이름 없음/다중
-기술	61	Wise Touch			5.99 이름 없음/다중
-기술	62	Lucky Hand			5.99 이름 없음/다중
-기술	63		후벼쑤시기	마구찌르기	두 팩 이름 불일치
-기술	64		블로우	슬레쉬	두 팩 이름 불일치
-기술	65	Sever	룬블레이드 | 스톰블레이드	스톰블레이드	5.99 이름 없음/다중
-기술	66			룬블레이드	5.99 이름 없음/다중
-기술	67		연천단각	연천단각	두 팩 이름 불일치
-기술	68		붕신선각	붕신선각	두 팩 이름 불일치
-기술	69		파천각	메투스의깨달음 | 파천각	혼든 이름 없음/다중
-기술	70		무영신공 | 원기지옥	고대의인장 | 화룡의인장	5.99 이름 없음/다중
-기술	72	Thrust Attack 1 | Thrust Attack 2 | Thrust Attack 3 | Thrust Attack 4 | Thrust Attack 5 | Thrust Attack 6	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3) | 검투술(Lev4)	Hades 영문 다중
-기술	73	Strikedown 1 | Strikedown 10 | Strikedown 11 | Strikedown 2 | Strikedown 3 | Strikedown 4 | Strikedown 5 | Strikedown 6 | Strikedown 7 | Strikedown 8 | Strikedown 9	내려치기	내려치기(Lev1) | 내려치기(Lev2) | 내려치기(Lev3) | 내려치기(Lev4)	Hades 영문 다중
-기술	74	Dune Swipe 1 | Dune Swipe 10 | Dune Swipe 2 | Dune Swipe 3 | Dune Swipe 4 | Dune Swipe 5 | Dune Swipe 6 | Dune Swipe 7 | Dune Swipe 8 | Dune Swipe 9	사방치기(Lev1)	사방치기(Lev1) | 사방치기(Lev2) | 사방치기(Lev3) | 사방치기(Lev4)	Hades 영문 다중
-기술	75	Wheel Kick 1 | Wheel Kick 10 | Wheel Kick 2 | Wheel Kick 3 | Wheel Kick 4 | Wheel Kick 5 | Wheel Kick 6 | Wheel Kick 7 | Wheel Kick 8 | Wheel Kick 9	퓨리소월루(Lev1)	퓨리소윌루(Lev1) | 퓨리소윌루(Lev2) | 퓨리소윌루(Lev3) | 퓨리소윌루(Lev4) | 퓨리소윌루(Lev5) | 퓨리소윌루(Lev6)	Hades 영문 다중
-기술	77	Rear Strike 1 | Rear Strike 2 | Rear Strike 3 | Rear Strike 4 | Rear Strike 5 | Rear Strike 6 | Rear Strike 7 | Rear Strike 8	만개표창 | 저격(Lev1)	백발백중 | 저격(Lev1) | 저격(Lev2) | 저격(Lev3) | 저격(Lev4) | 저격(Lev5) | 저격(Lev6)	Hades 영문 다중
-기술	79	Archery 1 | Archery 2 | Archery 3 | Archery 4 | Archery 5 | Archery 6 | Arrow Shot 1 | Arrow Shot 10 | Arrow Shot 11 | Arrow Shot 12 | Arrow Shot 2 | Arrow Shot 3 | Arrow Shot 4 | Arrow Shot 5 | Arrow Shot 6 | Arrow Shot 7 | Arrow Shot 8 | Arrow Shot 9	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	사격(Lev1) | 사격(Lev2) | 사격(Lev3) | 사격(Lev4) | 활쏘기(Lev1) | 활쏘기(Lev2) | 활쏘기(Lev3) | 활쏘기(Lev4)	Hades 영문 다중
-기술	84		비스트어택(Lev3)		혼든 이름 없음/다중
-기술	85	Mass Strike 1 | Mass Strike 10 | Mass Strike 11 | Mass Strike 12 | Mass Strike 2 | Mass Strike 3 | Mass Strike 4 | Mass Strike 5 | Mass Strike 6 | Mass Strike 7 | Mass Strike 8 | Mass Strike 9 | Tail Sweep 1 | Tail Sweep 10 | Tail Sweep 11 | Tail Sweep 12 | Tail Sweep 2 | Tail Sweep 3 | Tail Sweep 4 | Tail Sweep 5 | Tail Sweep 6 | Tail Sweep 7 | Tail Sweep 8 | Tail Sweep 9	휘두르기	꼬리치기(Lev1) | 꼬리치기(Lev2) | 꼬리치기(Lev3) | 꼬리치기(Lev4) | 마구때리기(Lev1) | 마구때리기(Lev2) | 마구때리기(Lev3) | 마구때리기(Lev4)	Hades 영문 다중
-기술	86	Intimidate			5.99 이름 없음/다중
-기술	87	Inner Beast 1 | Inner Beast 2 | Inner Beast 3 | Inner Beast 4 | Inner Beast 5 | Inner Beast 6		지열참(Lev1) | 지열참(Lev2) | 지열참(Lev3) | 지열참(Lev4) | 지열참(Lev5)	Hades 영문 다중
-기술	88	Pounce 1 | Pounce 10 | Pounce 2 | Pounce 3 | Pounce 4 | Pounce 5 | Pounce 6 | Pounce 7 | Pounce 8 | Pounce 9		비스트어택(Lev1) | 비스트어택(Lev2) | 비스트어택(Lev3) | 비스트어택(Lev4)	Hades 영문 다중
-기술	91	Puncture			5.99 이름 없음/다중
-기술	92	Sneak Flight 1 | Sneak Flight 10 | Sneak Flight 2 | Sneak Flight 3 | Sneak Flight 4 | Sneak Flight 5 | Sneak Flight 6 | Sneak Flight 7 | Sneak Flight 8 | Sneak Flight 9	차크라어택	매의위상(Lev1) | 매의위상(Lev2) | 매의위상(Lev3) | 매의위상(Lev4)	Hades 영문 다중
-기술	93	Beak Pierce 1 | Beak Pierce 10 | Beak Pierce 11 | Beak Pierce 2 | Beak Pierce 3 | Beak Pierce 4 | Beak Pierce 5 | Beak Pierce 6 | Beak Pierce 7 | Beak Pierce 8 | Beak Pierce 9		쪼기(Lev1) | 쪼기(Lev2) | 쪼기(Lev3) | 쪼기(Lev4) | 칸의눈동자(Lev1) | 칸의눈동자(Lev2) | 칸의눈동자(Lev3) | 칸의눈동자(Lev4) | 칸의눈동자(Lev5)	Hades 영문 다중
-기술	94	Tail Slam | Talon Kick 1 | Talon Kick 2 | Talon Kick 3 | Talon Kick 4 | Talon Kick 5 | Talon Kick 6 | Talon Kick 7 | Talon Kick 8		윈드쉐이커(Lev1) | 윈드쉐이커(Lev2) | 윈드쉐이커(Lev3) | 윈드쉐이커(Lev4) | 윈드쉐이커(Lev5)	Hades 영문 다중
-기술	95	Venom Attack 1 | Venom Attack 2 | Venom Attack 3 | Venom Attack 4 | Venom Attack 5 | Venom Attack 6 | Venom Attack 7 | Venom Attack 8	파이어트랩	포이즌어택(Lev1) | 포이즌어택(Lev2) | 포이즌어택(Lev3) | 포이즌어택(Lev4) | 포이즌어택(Lev5)	Hades 영문 다중
-기술	96	Claw Slash 1 | Claw Slash 10 | Claw Slash 2 | Claw Slash 3 | Claw Slash 4 | Claw Slash 5 | Claw Slash 6 | Claw Slash 7 | Claw Slash 8 | Claw Slash 9	늑대의위상 | 할퀴기(Lev1)	할퀴기(Lev1) | 할퀴기(Lev2) | 할퀴기(Lev3) | 할퀴기(Lev4)	Hades 영문 다중
-기술	97	Double Rake 1 | Double Rake 10 | Double Rake 2 | Double Rake 3 | Double Rake 4 | Double Rake 5 | Double Rake 6 | Double Rake 7 | Double Rake 8 | Double Rake 9		양손공격(Lev1) | 양손공격(Lev2) | 양손공격(Lev3) | 양손공격(Lev4)	Hades 영문 다중
-기술	98	Instrumental 1 | Instrumental 2 | Instrumental 3 | Instrumental 4 | Instrumental 5 | Instrumental 6 | Instrumental Attack 1 | Instrumental Attack 10 | Instrumental Attack 11 | Instrumental Attack 12 | Instrumental Attack 2 | Instrumental Attack 3 | Instrumental Attack 4 | Instrumental Attack 5 | Instrumental Attack 6 | Instrumental Attack 7 | Instrumental Attack 8 | Instrumental Attack 9	연주공격(Lev3)	세오의비명 | 연주(Lev1) | 연주(Lev2) | 연주(Lev3) | 연주(Lev4) | 연주공격(Lev1) | 연주공격(Lev2) | 연주공격(Lev3) | 연주공격(Lev4) | 연주공격(Lev5) | 연주공격(Lev6) | 연주공격(Lev7)	Hades 영문 다중
-기술	105		데빌크래셔 | 블랙크래셔	데빌크래셔 | 데빌크래셔(세트효과)	5.99 이름 없음/다중
-기술	106		백스텝	백스탭	두 팩 이름 불일치
-기술	110		수영	수영	두 팩 이름 불일치
-기술	111			노점개설	5.99 이름 없음/다중
-기술	113			낚시(Lev1)	5.99 이름 없음/다중
-기술	117			채집	5.99 이름 없음/다중
-기술	118			라이트닝트랩(Lev1) | 라이트닝트랩(Lev2) | 라이트닝트랩(Lev3) | 저격준비	5.99 이름 없음/다중
-기술	119			아머크래쉬(Lev1) | 아머크래쉬(Lev2) | 아머크래쉬(Lev3)	5.99 이름 없음/다중
-마법	1		원소이해력		혼든 이름 없음/다중
-마법	2		서버관리 | 서버관리2		5.99 이름 없음/다중
-마법	3	Altar Lecture | Beothaich Lecture | Elements Lecture | Entreaties Lecture | Faerie Love Lecture | Gods Lecture | Graymayre Lecture | Guide Lecture | Woods Lecture | dall	딜루메니	딜루메니	Hades 영문 다중
-마법	4			로카테오	5.99 이름 없음/다중
-마법	5	beag cradh	렌토	렌토	채택
-마법	6			성장(검투사) | 성장(궁수) | 성장(바드) | 성장(소환사) | 성장(조류) | 성장(파충류) | 성장(포유류) | 소환술1 | 소환술2 | 소환술3 | 소환술4 | 소환술5 | 소환술6 | 소환술7 | 제조	5.99 이름 없음/다중
-마법	7	eisd creutair		센서스	5.99 이름 없음/다중
-마법	8		리베라토	리베라룸 | 리베라토 | 리베라토(세트효과)	혼든 이름 없음/다중
-마법	9	puinneag beatha		흡정신공	5.99 이름 없음/다중
-마법	10	Hide | White Bat Stance	하이드	하이드	Hades 영문 다중
-마법	11	ard naomh aite | beag naomh aite | mor naomh aite | naomh aite	안티매직 | 호르라마	호르라마	Hades 영문 다중
-마법	13	Kelberoth Stance | creag neart			Hades 영문 다중
-마법	14	Insult | Snort | Spit | Taunt			Hades 영문 다중
-마법	15	dachaidh		아지토	5.99 이름 없음/다중
-마법	16	Needle Trap | Stiletto Trap | beannaich | mor beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	벨라르모 | 수페라벨라르모	Hades 영문 다중
-마법	17	Blind Snare | Blind Trap | Great Blind Snare | Greater Blind Snare			Hades 영문 다중
-마법	18	Gem Polishing			5.99 이름 없음/다중
-마법	20	beag breisleich | breisleich | mor breisleich	콘푸지오		Hades 영문 다중
-마법	21	beag ioc fein		쿠로토	5.99 이름 없음/다중
-마법	22			쿠라노토	5.99 이름 없음/다중
-마법	23	ao beag cradh		디렌토	5.99 이름 없음/다중
-마법	24	ao puinsein		디베노모	5.99 이름 없음/다중
-마법	25	ao dall	일루메나	일루메나	채택
-마법	26	beag slan | fas spiorad | mor slan | slan			Hades 영문 다중
-마법	27	beag nochd	장풍	장풍	채택
-마법	28	beag ioc	쿠로	쿠로	채택
-마법	29	ioc	쿠라노	쿠라노	채택
-마법	30	mor ioc	쿠라노소	쿠라노소	채택
-마법	31	ard ioc	수페라쿠라노	수페라쿠라노	채택
-마법	32	beag ioc comlha	쿠러스	쿠러스	채택
-마법	33	ioc comlha	쿠라누스	쿠라누스	채택
-마법	34	mor ioc comlha	쿠라네라	쿠라네라	채택
-마법	35	Great Poison Snare | Greater Poison Snare | Poison Snare | Poison Trap | beag puinsein | puinsein		베노미	Hades 영문 다중
-마법	36	ard creag			5.99 이름 없음/다중
-마법	38	Set Volley | Volley			Hades 영문 다중
-마법	39		다라밀공	다라밀공 | 다라밀공(세트효과) | 원기옥	혼든 이름 없음/다중
-마법	40	ard leasaich srad | beag leasaich srad | beag srad | leasaich srad | mor leasaich srad | srad		플라모	Hades 영문 다중
-마법	41	mor srad			5.99 이름 없음/다중
-마법	42	ard srad			5.99 이름 없음/다중
-마법	43	ard leasaich athar | athar | beag athar | beag leasaich athar | leasaich athar | mor leasaich athar		아듀로	Hades 영문 다중
-마법	44	mor athar			5.99 이름 없음/다중
-마법	45	ard athar | deo searg | deo searg gar			Hades 영문 다중
-마법	46	ard leasaich sal | beag leasaich sal | beag sal | leasaich sal | mor leasaich sal | sal	마레노	마레노	Hades 영문 다중
-마법	47	mor sal	마레누스	마레누스	채택
-마법	48	ard sal		마레네라	5.99 이름 없음/다중
-마법	49	spion beathach			5.99 이름 없음/다중
-마법	50	Great Sleep Snare | Greater Sleep Snare | Sleep Snare | Sleep Trap | suain		소루마	Hades 영문 다중
-마법	51	ao suain	디소루마	디소루마	채택
-마법	52	Bolt Trap | Coiled Bolt Trap | Maiden Trap | Spring Trap | fas deireas	에나르마	에나르마	Hades 영문 다중
-마법	53	Draco Stance | Iron Skin | Wings of Protection | beag fas nadur | dion | fas nadur | mor dion | mor dion comlha | mor fas nadur	이모탈	금강불괴 | 이모탈	Hades 영문 다중
-마법	54	asgall faileas | deireas faileas	리플렉토	리플렉토 | 반탄신공	Hades 영문 다중
-마법	55	Mist		라이트닝무브 | 미종보법	5.99 이름 없음/다중
-마법	57	ard leasaich creag | beag creag | beag leasaich creag | creag | leasaich creag | mor leasaich creag		테라미코	Hades 영문 다중
-마법	58	mor creag			5.99 이름 없음/다중
-마법	59	creag gar		테라미칼로	5.99 이름 없음/다중
-마법	60	beag srad lamh			5.99 이름 없음/다중
-마법	61	srad meall			5.99 이름 없음/다중
-마법	62	srad gar		플라미칼로	5.99 이름 없음/다중
-마법	63	beag sal lamh | sal lamh	수페라마레나		Hades 영문 다중
-마법	64	sal meall			5.99 이름 없음/다중
-마법	65	sal gar			5.99 이름 없음/다중
-마법	66	athar lamh | beag athar lamh			Hades 영문 다중
-마법	67	athar meall			5.99 이름 없음/다중
-마법	68	athar gar	마네나로	마네나로 | 아듀랄로	혼든 이름 없음/다중
-마법	69	beag creag lamh | creag lamh | srad lamh			Hades 영문 다중
-마법	70	creag meall			5.99 이름 없음/다중
-마법	71	deo saighead	홀리랜서 | 홀리볼트	홀리볼트	5.99 이름 없음/다중
-마법	72	mor strioch bais	세멜리아	세멜리아	채택
-마법	73	deo lamh | mor strioch bais lamh		아마게돈	Hades 영문 다중
-마법	74	mor strioch bais meall		숨마스텔라	5.99 이름 없음/다중
-마법	75	mor strioch pian gar	라그나로크	라그나로크	채택
-마법	76			아들레스투	5.99 이름 없음/다중
-마법	77	nuadhaich	엑스쿠라노	엑스쿠라노	채택
-마법	78		엑스쿠라네라	엑스쿠라네라	두 팩 이름 불일치
-마법	79	ao cradh		디바르도	5.99 이름 없음/다중
-마법	80	ao mor cradh		디데프레카	5.99 이름 없음/다중
-마법	81	ao ard cradh		디프라바	5.99 이름 없음/다중
-마법	82	cradh	바르도	바르도	채택
-마법	83	mor cradh	데프레코	데프레코	채택
-마법	84	ard cradh	프라보	프라보	채택
-마법	85		디나르콜리	디나르콜리	두 팩 이름 불일치
-마법	86	Life Arrow | beothaichdeum	코마디아	코마디아	Hades 영문 다중
-마법	88	Trance | ard seun | beag seun | mor seun | seun			Hades 영문 다중
-마법	89			데스	5.99 이름 없음/다중
-마법	90	beag pramh | pramh	나르콜리	나르콜룸 | 나르콜리 | 나르콜리(세트효과)	Hades 영문 다중
-마법	91			실드	5.99 이름 없음/다중
-마법	92			경신공	5.99 이름 없음/다중
-마법	93	ard athar nadur | ard creag nadur | ard sal nadur | ard srad nadur | athar nadur | creag nadur | mor athar nadur | mor creag nadur | mor sal nadur | mor srad nadur | sal nadur | sonruich nadur | srad nadur			Hades 영문 다중
-마법	94	Scorpion Stance | armachd | armachd fein	콜라마	철포삼 | 콜라마	Hades 영문 다중
-마법	96	pian na dion			5.99 이름 없음/다중
-마법	97	Roar			5.99 이름 없음/다중
-마법	99		파워단련		혼든 이름 없음/다중
-마법	102	ard puinneag spiorad | beag puinneag spiorad | mor puinneag spiorad | puinneag spiorad		리치마나	Hades 영문 다중
-마법	105			함정찾기1	5.99 이름 없음/다중
-마법	106			함정찾기2	5.99 이름 없음/다중
-마법	107	Salvation	홀리쿠라네라		혼든 이름 없음/다중
-마법	108		메테오	메테오 | 신의파멸	혼든 이름 없음/다중
-마법	109		집중	집중	두 팩 이름 불일치
-마법	111		침묵		혼든 이름 없음/다중
-마법	113		매직프로텍션	매직프로텍션	두 팩 이름 불일치
-마법	115		신성력강화	칸의축복	두 팩 이름 불일치
-마법	116	Mana Ward		신의축복	5.99 이름 없음/다중
-마법	118		자기보호	자기보호	두 팩 이름 불일치
-마법	119	Inner Fire		속성강화	5.99 이름 없음/다중
-마법	120	Gentle Touch			5.99 이름 없음/다중
-마법	122	Wraith Touch	홀리드래곤	홀리드래곤	채택
-마법	124	Cat's Hearing	세오의손길		혼든 이름 없음/다중
-마법	125	Howl			5.99 이름 없음/다중
-마법	128		회심(Lev1)		혼든 이름 없음/다중
-마법	129		홀리쿠라노	GM홀리쿠라노 | 홀리쿠라노	혼든 이름 없음/다중
-마법	131		하이더	하이더	두 팩 이름 불일치
-마법	133			무영신공 | 어둠의각인	5.99 이름 없음/다중
-마법	134		클레쉬스톰	플레쉬스톰	두 팩 이름 불일치
-마법	135		퀘이크	퀘이크	두 팩 이름 불일치
-마법	136			아이스블러스트	5.99 이름 없음/다중
-마법	137			플레어	5.99 이름 없음/다중
-마법	139			수페라에나르마	5.99 이름 없음/다중
-마법	140			엑스벨라룸	5.99 이름 없음/다중
-마법	142		마구찌르기		혼든 이름 없음/다중
-마법	146	Cursed Tune 1 | Cursed Tune 10 | Cursed Tune 11 | Cursed Tune 12 | Cursed Tune 2 | Cursed Tune 3 | Cursed Tune 4 | Cursed Tune 5 | Cursed Tune 6 | Cursed Tune 7 | Cursed Tune 8 | Cursed Tune 9 | Regeneration 1 | Regeneration 10 | Regeneration 2 | Regeneration 3 | Regeneration 4 | Regeneration 5 | Regeneration 6 | Regeneration 7 | Regeneration 8 | Regeneration 9			Hades 영문 다중
-마법	148			마나부스터 | 슈페이아움(Lev1) | 슈페이아움(Lev2) | 슈페이아움(Lev3) | 슈페이아움(Lev4)	5.99 이름 없음/다중
-마법	149		델리스펠라스	델리스펠라스	두 팩 이름 불일치
-마법	150	Counter Attack 1 | Counter Attack 10 | Counter Attack 11 | Counter Attack 2 | Counter Attack 3 | Counter Attack 4 | Counter Attack 5 | Counter Attack 6 | Counter Attack 7 | Counter Attack 8 | Counter Attack 9 | Disenchanter	속성강화		Hades 영문 다중
-마법	151	Frost Arrow 1 | Frost Arrow 2 | Frost Arrow 3 | Frost Arrow 4 | Frost Arrow 5 | Frost Arrow 6 | Frost Arrow 7 | Frost Arrow 8 | Frost Arrow 9	포트리스	포트리스	Hades 영문 다중
-마법	152			홀리쿠라네라(Lev1) | 홀리쿠라네라(Lev2) | 홀리쿠라네라(Lev3) | 홀리쿠라네라(Lev4)	5.99 이름 없음/다중
-마법	153	Keeter 1 | Keeter 10 | Keeter 11 | Keeter 12 | Keeter 13 | Keeter 14 | Keeter 15 | Keeter 2 | Keeter 3 | Keeter 4 | Keeter 5 | Keeter 6 | Keeter 7 | Keeter 8 | Keeter 9			Hades 영문 다중
-마법	154	Torch 1 | Torch 10 | Torch 11 | Torch 12 | Torch 13 | Torch 14 | Torch 15 | Torch 2 | Torch 3 | Torch 4 | Torch 5 | Torch 6 | Torch 7 | Torch 8 | Torch 9	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)		Hades 영문 다중
-마법	155	Mermaid 1 | Mermaid 10 | Mermaid 11 | Mermaid 12 | Mermaid 13 | Mermaid 14 | Mermaid 15 | Mermaid 2 | Mermaid 3 | Mermaid 4 | Mermaid 5 | Mermaid 6 | Mermaid 7 | Mermaid 8 | Mermaid 9			Hades 영문 다중
-마법	156	Groo 1 | Groo 10 | Groo 11 | Groo 12 | Groo 13 | Groo 14 | Groo 15 | Groo 2 | Groo 3 | Groo 4 | Groo 5 | Groo 6 | Groo 7 | Groo 8 | Groo 9			Hades 영문 다중
-마법	159	Star Arrow 1 | Star Arrow 10 | Star Arrow 11 | Star Arrow 2 | Star Arrow 3 | Star Arrow 4 | Star Arrow 5 | Star Arrow 6 | Star Arrow 7 | Star Arrow 8 | Star Arrow 9		Charge(Lev1) | Charge(Lev2) | Charge(Lev3) | Charge(Lev4)	Hades 영문 다중
-마법	161	Shock Arrow			5.99 이름 없음/다중
-마법	169		암살		혼든 이름 없음/다중
-마법	170	Cold Blood | Cyclone | Hail of Feathers 1 | Hail of Feathers 10 | Hail of Feathers 2 | Hail of Feathers 3 | Hail of Feathers 4 | Hail of Feathers 5 | Hail of Feathers 6 | Hail of Feathers 7 | Hail of Feathers 8 | Hail of Feathers 9		깃털날리기(Lev1) | 깃털날리기(Lev2) | 깃털날리기(Lev3) | 깃털날리기(Lev4)	Hades 영문 다중
-마법	173	Mud Wall			5.99 이름 없음/다중
-마법	178	Bubble Block			5.99 이름 없음/다중
-마법	180		메가홀리쿠라노 | 영자홀리쿠라노		5.99 이름 없음/다중
-마법	181		리젠(Lev1)	리젠(Lev1) | 리젠(Lev2) | 리젠(Lev3) | 리젠(Lev4) | 홀리큐어	혼든 이름 없음/다중
-마법	183	Feral Form | Fierce Feral Form | Master Feral Form | Wild Feral Form		늑대변신(Lev1) | 늑대변신(Lev2) | 늑대변신(Lev3) | 늑대변신(Master)	Hades 영문 다중
-마법	184	Fierce Karura Form | Karura Form | Master Karura Form | Wild Karura Form		독수리변신(Lev1) | 독수리변신(Lev2) | 독수리변신(Lev3) | 독수리변신(Master)	Hades 영문 다중
-마법	185	Fierce Komodas Form | Komodas Form | Master Komodas Form | Wild Komodas Form		엘리게이터변신(Lev1) | 엘리게이터변신(Lev2) | 엘리게이터변신(Lev3) | 엘리게이터변신(Master)	Hades 영문 다중
-마법	186	Fiery Defender			5.99 이름 없음/다중
-마법	190			렌티아	5.99 이름 없음/다중
-마법	191			바르데아	5.99 이름 없음/다중
-마법	192			데프레타	5.99 이름 없음/다중
-마법	193			어각베라 | 프라베라	5.99 이름 없음/다중
-마법	195			디렌타	5.99 이름 없음/다중
-마법	196			디바르디아	5.99 이름 없음/다중
-마법	197			디데프레타	5.99 이름 없음/다중
-마법	198			디프라베라	5.99 이름 없음/다중
-마법	199			홀리큐레스	5.99 이름 없음/다중
-마법	201		디나르콜룸	디나르콜룸	두 팩 이름 불일치
-마법	202			디소루메라	5.99 이름 없음/다중
-마법	203		휴식	휴식	두 팩 이름 불일치
-마법	209			회심의저격(Lev1) | 회심의저격(Lev2) | 회심의저격(Lev3)	5.99 이름 없음/다중
-마법	211			세오의손길1 | 세오의손길2 | 세오의손길3 | 세오의손길4	5.99 이름 없음/다중
+기술	0	Clobber		더블어택		5.99-server 이름 없음/다중
+기술	1	Assail | Assault | Long Strike	기본공격 | 더블어택 | 숏블레이드	기본공격 | 숏블레이드 | 정권 | 찌르기	기본공격 | 더블어택 | 숏블레이드 | 차페 | 테스트 | 테스트1	Hades 영문 없음/다중
+기술	2	High Kick | Kick	단각 | 아들레스투	단각	단각 | 정권	Hades 영문 없음/다중
+기술	3	Martial Awareness	붕각 | 전체암살격진	붕각	붕각	5.99-server 이름 없음/다중
+기술	4	Double Punch | Poison Punch | Sting	백보신권 | 양의신권 | 정권	백보신권 | 양의신권 | 통배권	통배권	Hades 영문 없음/다중
+기술	5	Stab and Twist	찌르기	찔러휘비기	찌르기	세 팩 이름 불일치
+기술	6	Stab Twice	슬레쉬	두번찌르기	두번찌르기 | 찔러휘비기	novaonline 이름 없음/다중
+기술	7		문열기			Hades 영문 없음/다중
+기술	8	Shadow Figure | Sneak Attack	탐색	탐색	탐색	Hades 영문 없음/다중
+기술	9	Sense	센스	센스	센스	채택
+기술	10	Combat Senses | Echo Sense | Study Creature	센스몬스터	센스몬스터	센스몬스터	Hades 영문 없음/다중
+기술	11	Midnight Slash | Triple Kick | Wallop	트리플어택	트리플어택		Hades 영문 없음/다중
+기술	12	Throw Surigum	표창던지기	표창날리기		novaonline 이름 없음/다중
+기술	13	Rescue		레스큐	표창날리기	5.99-server 이름 없음/다중
+기술	14	Elemental Bless 1 | Elemental Bless 2 | Elemental Bless 3 | Elemental Bless 4 | Elemental Bless 5 | Wield Staff		소환술(Lev1) | 소환술(Lev2) | 소환술(Lev3) | 소환술(Lev4) | 소환술(Lev5)		Hades 영문 없음/다중
+기술	15	Wind Blade	윈드블레이드	GM전체공격 | 백슬레쉬 | 윈드블레이드	윈드블레이드	honden-community 이름 없음/다중
+기술	16	Cyclone Blade	메가블레이드	메가블레이드	메가블레이드	채택
+기술	17	Two-handed Attack	투핸드어택	투핸드어택	투핸드어택	채택
+기술	18		적무기해체	적무기쳐내기	적무기해체	Hades 영문 없음/다중
+기술	19	Perfect Defense | Throw	완전방어	완전방어	완전방어 | 완전방어(UP)	Hades 영문 없음/다중
+기술	20	Mad Soul | Sacrifice	매드소울 | 매드소울진	매드소울 | 매드소울진	매드소울 | 매드소울진	Hades 영문 없음/다중
+기술	21	Crasher	크래셔	검신(檢身) | 바람의상처 | 크래셔 | 크래셔(세트효과)	데빌크래셔 | 데빌크래셔(Lev2) | 데빌크래셔(Lev4) | 크래셔	honden-community 이름 없음/다중
+기술	22	Unlock				5.99-server 이름 없음/다중
+기술	23		소매치기	일반제조		Hades 영문 없음/다중
+기술	24	Throw Smoke Bomb		연막탄터뜨리기		5.99-server 이름 없음/다중
+기술	25			함정해체		Hades 영문 없음/다중
+기술	26	Peek	품뒤져보기	품뒤져보기	품뒤져보기	채택
+기술	27	Analyze Item | Appraise | Armor Lore | Evaluate Item | Food Lore | Herbal Lore | Magic Lore | Melee Lore | Missile Lore | Perish Lore | Potion Lore				Hades 영문 없음/다중
+기술	28			함정파기		Hades 영문 없음/다중
+기술	29		습격 | 습격진	습격 | 습격진	습격 | 습격진	Hades 영문 없음/다중
+기술	30		적갑옷해체	적갑옷해체	적갑옷해체	Hades 영문 없음/다중
+기술	31		암살격 | 암살격진	암살격 | 암살격진 | 전체암살격진	데쓰 | 암살격 | 암살격진	Hades 영문 없음/다중
+기술	32	Mend Garment | Mend Soori | Mend Staff | Mend Weapon | Tailoring				Hades 영문 없음/다중
+기술	33	Dark Spear	일음지	일음지	일음지	채택
+기술	34	Draco Tail Kick	선풍각	선풍각	선풍각	채택
+기술	35		발경	발경	발경	Hades 영문 없음/다중
+기술	36	Kelberoth Strike	달마신공	달마신공	달마신공	채택
+기술	37	Whirlwind Attack	구양신공	구양신공	구양신공	채택
+기술	38	Hairstyle | beag suain		바투	바투	Hades 영문 없음/다중
+기술	39	ao beag suain	타겟어택	디바투		novaonline 이름 없음/다중
+기술	40		피닉스모드	드래곤모드 | 피닉스모드		Hades 영문 없음/다중
+기술	41				이아 | 폭발 | 하트	Hades 영문 없음/다중
+기술	42	Ambush	이형환위	이형환위	이형환위	채택
+기술	43		소수신공	소수신공		Hades 영문 없음/다중
+기술	44	Amnesia	아무네지아	아무네지아		novaonline 이름 없음/다중
+기술	45	TransferBlood			마력재생	5.99-server 이름 없음/다중
+기술	46			밀기		Hades 영문 없음/다중
+기술	48	Thrash		메가어택		5.99-server 이름 없음/다중
+기술	49	Charge	질주	돌진		novaonline 이름 없음/다중
+기술	50	Assassin Strike	기습 | 블랙기습	기습 | 기습(세트효과)	기습	5.99-server 이름 없음/다중
+기술	51		허공답보	허공답보	허공답보	Hades 영문 없음/다중
+기술	52	Paralyze Force	M포효	포효	전체도발 | 포효	novaonline 이름 없음/다중
+기술	53				공격력강화	Hades 영문 없음/다중
+기술	54		찔러휘비기		급소노리기 | 무영단무	Hades 영문 없음/다중
+기술	55				백스텝 | 화염어택	Hades 영문 없음/다중
+기술	56		슈페이아움(Lev1)		공간참 | 슈페이아움(Lev1) | 썬더라이트닝 | 통합기술	Hades 영문 없음/다중
+기술	57	Mantis Kick			이동스킬 | 환풍	5.99-server 이름 없음/다중
+기술	58	Eagle Strike	연환포		영참 | 천목살치선	honden-community 이름 없음/다중
+기술	59	Claw Fist		트리플펀치		5.99-server 이름 없음/다중
+기술	60	Wolf Fang Fist				5.99-server 이름 없음/다중
+기술	61	Wise Touch			쉐도우댄싱 | 쉐도우디스트로이	5.99-server 이름 없음/다중
+기술	62	Lucky Hand			홀리드래곤	5.99-server 이름 없음/다중
+기술	63		후벼쑤시기	마구찌르기	마구찌르기	Hades 영문 없음/다중
+기술	64		블로우	슬레쉬	슬레쉬	Hades 영문 없음/다중
+기술	65	Sever	룬블레이드 | 스톰블레이드	스톰블레이드	룬블레이드 | 암흑의스톰블레이드	5.99-server 이름 없음/다중
+기술	66			룬블레이드	다크 | 스톰블레이드 | 암흑의룬블레이드	Hades 영문 없음/다중
+기술	67		연천단각	연천단각	연천단각 | 연천단각(Lev2)	Hades 영문 없음/다중
+기술	68		붕신선각	붕신선각	붕선신각(Lev2) | 붕신선각	Hades 영문 없음/다중
+기술	69		파천각	메투스의깨달음 | 파천각	파천각 | 파천각(Lev2)	Hades 영문 없음/다중
+기술	70		무영신공 | 원기지옥	고대의인장 | 화룡의인장	매의위상 | 불꽃어택	Hades 영문 없음/다중
+기술	71				홀리볼트	Hades 영문 없음/다중
+기술	72	Thrust Attack 1 | Thrust Attack 2 | Thrust Attack 3 | Thrust Attack 4 | Thrust Attack 5 | Thrust Attack 6	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3)	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3) | 검투술(Lev4)	검투술(Lev1) | 검투술(Lev2) | 검투술(Lev3) | 사탄	Hades 영문 없음/다중
+기술	73	Strikedown 1 | Strikedown 10 | Strikedown 11 | Strikedown 2 | Strikedown 3 | Strikedown 4 | Strikedown 5 | Strikedown 6 | Strikedown 7 | Strikedown 8 | Strikedown 9	내려치기	내려치기(Lev1) | 내려치기(Lev2) | 내려치기(Lev3) | 내려치기(Lev4)	내려치기 | 내려치기(Lev1)	Hades 영문 없음/다중
+기술	74	Dune Swipe 1 | Dune Swipe 10 | Dune Swipe 2 | Dune Swipe 3 | Dune Swipe 4 | Dune Swipe 5 | Dune Swipe 6 | Dune Swipe 7 | Dune Swipe 8 | Dune Swipe 9	사방치기(Lev1)	사방치기(Lev1) | 사방치기(Lev2) | 사방치기(Lev3) | 사방치기(Lev4)	검투술3 | 검투술4 | 사방치기(Lev1)	Hades 영문 없음/다중
+기술	75	Wheel Kick 1 | Wheel Kick 10 | Wheel Kick 2 | Wheel Kick 3 | Wheel Kick 4 | Wheel Kick 5 | Wheel Kick 6 | Wheel Kick 7 | Wheel Kick 8 | Wheel Kick 9	퓨리소월루(Lev1)	퓨리소윌루(Lev1) | 퓨리소윌루(Lev2) | 퓨리소윌루(Lev3) | 퓨리소윌루(Lev4) | 퓨리소윌루(Lev5) | 퓨리소윌루(Lev6)	퓨리소월루(Lev1) | 퓨리소월루(Lev2) | 퓨리소월루2 | 퓨리소월루3 | 퓨리소월루4 | 퓨리소월루M	Hades 영문 없음/다중
+기술	76				지중	Hades 영문 없음/다중
+기술	77	Rear Strike 1 | Rear Strike 2 | Rear Strike 3 | Rear Strike 4 | Rear Strike 5 | Rear Strike 6 | Rear Strike 7 | Rear Strike 8	만개표창 | 저격(Lev1)	백발백중 | 저격(Lev1) | 저격(Lev2) | 저격(Lev3) | 저격(Lev4) | 저격(Lev5) | 저격(Lev6)	라이트닝쉐이커	Hades 영문 없음/다중
+기술	78				이기어검 | 전사필살기	Hades 영문 없음/다중
+기술	79	Archery 1 | Archery 2 | Archery 3 | Archery 4 | Archery 5 | Archery 6 | Arrow Shot 1 | Arrow Shot 10 | Arrow Shot 11 | Arrow Shot 12 | Arrow Shot 2 | Arrow Shot 3 | Arrow Shot 4 | Arrow Shot 5 | Arrow Shot 6 | Arrow Shot 7 | Arrow Shot 8 | Arrow Shot 9	사격(Lev1) | 사격(Lev2) | 사격(Lev3)	사격(Lev1) | 사격(Lev2) | 사격(Lev3) | 사격(Lev4) | 활쏘기(Lev1) | 활쏘기(Lev2) | 활쏘기(Lev3) | 활쏘기(Lev4)	사격(Lev1) | 사격(Lev2) | 사격(Lev3) | 연사1 | 연사M | 활쏘기1 | 활쏘기2 | 활쏘기3	Hades 영문 없음/다중
+기술	80				회심의저격(Lev1)	Hades 영문 없음/다중
+기술	82				비듬날리기 | 웨폰브레이커 | 차지 | 회심의저격	Hades 영문 없음/다중
+기술	84		비스트어택(Lev3)		라이트닝선더 | 비스트어택(Lev1) | 비스트어택(Lev2) | 비스트어택(Lev3)	Hades 영문 없음/다중
+기술	85	Mass Strike 1 | Mass Strike 10 | Mass Strike 11 | Mass Strike 12 | Mass Strike 2 | Mass Strike 3 | Mass Strike 4 | Mass Strike 5 | Mass Strike 6 | Mass Strike 7 | Mass Strike 8 | Mass Strike 9 | Tail Sweep 1 | Tail Sweep 10 | Tail Sweep 11 | Tail Sweep 12 | Tail Sweep 2 | Tail Sweep 3 | Tail Sweep 4 | Tail Sweep 5 | Tail Sweep 6 | Tail Sweep 7 | Tail Sweep 8 | Tail Sweep 9	휘두르기	꼬리치기(Lev1) | 꼬리치기(Lev2) | 꼬리치기(Lev3) | 꼬리치기(Lev4) | 마구때리기(Lev1) | 마구때리기(Lev2) | 마구때리기(Lev3) | 마구때리기(Lev4)	연수 | 차크라 | 폭풍	Hades 영문 없음/다중
+기술	86	Intimidate				5.99-server 이름 없음/다중
+기술	87	Inner Beast 1 | Inner Beast 2 | Inner Beast 3 | Inner Beast 4 | Inner Beast 5 | Inner Beast 6		지열참(Lev1) | 지열참(Lev2) | 지열참(Lev3) | 지열참(Lev4) | 지열참(Lev5)	금강불체 | 라이트닝트랩 | 워리어로써	Hades 영문 없음/다중
+기술	88	Pounce 1 | Pounce 10 | Pounce 2 | Pounce 3 | Pounce 4 | Pounce 5 | Pounce 6 | Pounce 7 | Pounce 8 | Pounce 9		비스트어택(Lev1) | 비스트어택(Lev2) | 비스트어택(Lev3) | 비스트어택(Lev4)		Hades 영문 없음/다중
+기술	91	Puncture				5.99-server 이름 없음/다중
+기술	92	Sneak Flight 1 | Sneak Flight 10 | Sneak Flight 2 | Sneak Flight 3 | Sneak Flight 4 | Sneak Flight 5 | Sneak Flight 6 | Sneak Flight 7 | Sneak Flight 8 | Sneak Flight 9	차크라어택	매의위상(Lev1) | 매의위상(Lev2) | 매의위상(Lev3) | 매의위상(Lev4)		Hades 영문 없음/다중
+기술	93	Beak Pierce 1 | Beak Pierce 10 | Beak Pierce 11 | Beak Pierce 2 | Beak Pierce 3 | Beak Pierce 4 | Beak Pierce 5 | Beak Pierce 6 | Beak Pierce 7 | Beak Pierce 8 | Beak Pierce 9		쪼기(Lev1) | 쪼기(Lev2) | 쪼기(Lev3) | 쪼기(Lev4) | 칸의눈동자(Lev1) | 칸의눈동자(Lev2) | 칸의눈동자(Lev3) | 칸의눈동자(Lev4) | 칸의눈동자(Lev5)	파천	Hades 영문 없음/다중
+기술	94	Tail Slam | Talon Kick 1 | Talon Kick 2 | Talon Kick 3 | Talon Kick 4 | Talon Kick 5 | Talon Kick 6 | Talon Kick 7 | Talon Kick 8		윈드쉐이커(Lev1) | 윈드쉐이커(Lev2) | 윈드쉐이커(Lev3) | 윈드쉐이커(Lev4) | 윈드쉐이커(Lev5)	용천권	Hades 영문 없음/다중
+기술	95	Venom Attack 1 | Venom Attack 2 | Venom Attack 3 | Venom Attack 4 | Venom Attack 5 | Venom Attack 6 | Venom Attack 7 | Venom Attack 8	파이어트랩	포이즌어택(Lev1) | 포이즌어택(Lev2) | 포이즌어택(Lev3) | 포이즌어택(Lev4) | 포이즌어택(Lev5)		Hades 영문 없음/다중
+기술	96	Claw Slash 1 | Claw Slash 10 | Claw Slash 2 | Claw Slash 3 | Claw Slash 4 | Claw Slash 5 | Claw Slash 6 | Claw Slash 7 | Claw Slash 8 | Claw Slash 9	늑대의위상 | 할퀴기(Lev1)	할퀴기(Lev1) | 할퀴기(Lev2) | 할퀴기(Lev3) | 할퀴기(Lev4)	깃털공격 | 늑대의위상 | 할퀴기(Lev1) | 할퀴기M	Hades 영문 없음/다중
+기술	97	Double Rake 1 | Double Rake 10 | Double Rake 2 | Double Rake 3 | Double Rake 4 | Double Rake 5 | Double Rake 6 | Double Rake 7 | Double Rake 8 | Double Rake 9		양손공격(Lev1) | 양손공격(Lev2) | 양손공격(Lev3) | 양손공격(Lev4)	마구때리기	Hades 영문 없음/다중
+기술	98	Instrumental 1 | Instrumental 2 | Instrumental 3 | Instrumental 4 | Instrumental 5 | Instrumental 6 | Instrumental Attack 1 | Instrumental Attack 10 | Instrumental Attack 11 | Instrumental Attack 12 | Instrumental Attack 2 | Instrumental Attack 3 | Instrumental Attack 4 | Instrumental Attack 5 | Instrumental Attack 6 | Instrumental Attack 7 | Instrumental Attack 8 | Instrumental Attack 9	연주공격(Lev3)	세오의비명 | 연주(Lev1) | 연주(Lev2) | 연주(Lev3) | 연주(Lev4) | 연주공격(Lev1) | 연주공격(Lev2) | 연주공격(Lev3) | 연주공격(Lev4) | 연주공격(Lev5) | 연주공격(Lev6) | 연주공격(Lev7)	연주공격(Lev1) | 연주공격(Lev2) | 연주공격(Lev3) | 연주공격(Lev4) | 연주공격(Lev5) | 연주공격(M)	Hades 영문 없음/다중
+기술	100				귀환1 | 다라밀공 | 라세소환 | 마레노 | 메테오 | 메테오진 | 아마겟돈 | 아마겟돈진 | 아이스블러스트 | 윌리아소환 | 일리안소환 | 천검 | 퀘이크 | 플래쉬스톰 | 플레어 | 화이라소환	Hades 영문 없음/다중
+기술	105		데빌크래셔 | 블랙크래셔	데빌크래셔 | 데빌크래셔(세트효과)		Hades 영문 없음/다중
+기술	106		백스텝	백스탭		Hades 영문 없음/다중
+기술	110		수영	수영		Hades 영문 없음/다중
+기술	111			노점개설		Hades 영문 없음/다중
+기술	113			낚시(Lev1)		Hades 영문 없음/다중
+기술	117			채집		Hades 영문 없음/다중
+기술	118			라이트닝트랩(Lev1) | 라이트닝트랩(Lev2) | 라이트닝트랩(Lev3) | 저격준비		Hades 영문 없음/다중
+기술	119			아머크래쉬(Lev1) | 아머크래쉬(Lev2) | 아머크래쉬(Lev3)		Hades 영문 없음/다중
+기술	177				전체크래셔	Hades 영문 없음/다중
+마법	1		원소이해력		마족의성 | 천족의성	Hades 영문 없음/다중
+마법	2		서버관리 | 서버관리2		마법생성 | 서버관리 | 서버관리2 | 스킬생성	Hades 영문 없음/다중
+마법	3	Altar Lecture | Beothaich Lecture | Elements Lecture | Entreaties Lecture | Faerie Love Lecture | Gods Lecture | Graymayre Lecture | Guide Lecture | Woods Lecture | dall	딜루메니	딜루메니		Hades 영문 없음/다중
+마법	4			로카테오		Hades 영문 없음/다중
+마법	5	beag cradh	렌토	렌토	렌토	채택
+마법	6			성장(검투사) | 성장(궁수) | 성장(바드) | 성장(소환사) | 성장(조류) | 성장(파충류) | 성장(포유류) | 소환술1 | 소환술2 | 소환술3 | 소환술4 | 소환술5 | 소환술6 | 소환술7 | 제조		Hades 영문 없음/다중
+마법	7	eisd creutair		센서스		5.99-server 이름 없음/다중
+마법	8		리베라토	리베라룸 | 리베라토 | 리베라토(세트효과)	리베라토 | 리치의기원	Hades 영문 없음/다중
+마법	9	puinneag beatha		흡정신공		5.99-server 이름 없음/다중
+마법	10	Hide | White Bat Stance	하이드	하이드	하이드	Hades 영문 없음/다중
+마법	11	ard naomh aite | beag naomh aite | mor naomh aite | naomh aite	안티매직 | 호르라마	호르라마	호르라마	Hades 영문 없음/다중
+마법	13	Kelberoth Stance | creag neart				Hades 영문 없음/다중
+마법	14	Insult | Snort | Spit | Taunt				Hades 영문 없음/다중
+마법	15	dachaidh		아지토	귀환:기술사범의집 | 귀환:마을 | 귀환:신의영역 | 길드성 | 승급자의공간	5.99-server 이름 없음/다중
+마법	16	Needle Trap | Stiletto Trap | beannaich | mor beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	벨라르모 | 수페라벨라르모	벨라르모 | 수페라벨라르모	Hades 영문 없음/다중
+마법	17	Blind Snare | Blind Trap | Great Blind Snare | Greater Blind Snare				Hades 영문 없음/다중
+마법	18	Gem Polishing				5.99-server 이름 없음/다중
+마법	20	beag breisleich | breisleich | mor breisleich	콘푸지오			Hades 영문 없음/다중
+마법	21	beag ioc fein		쿠로토	압록지정 | 쿠로토	5.99-server 이름 없음/다중
+마법	22			쿠라노토		Hades 영문 없음/다중
+마법	23	ao beag cradh		디렌토		5.99-server 이름 없음/다중
+마법	24	ao puinsein		디베노모	디베노모	5.99-server 이름 없음/다중
+마법	25	ao dall	일루메나	일루메나		novaonline 이름 없음/다중
+마법	26	beag slan | fas spiorad | mor slan | slan				Hades 영문 없음/다중
+마법	27	beag nochd	장풍	장풍	장풍	채택
+마법	28	beag ioc	쿠로	쿠로	쿠로	채택
+마법	29	ioc	쿠라노	쿠라노	쿠라노	채택
+마법	30	mor ioc	쿠라노소	쿠라노소	쿠라노소	채택
+마법	31	ard ioc	수페라쿠라노	수페라쿠라노	수페라쿠라노	채택
+마법	32	beag ioc comlha	쿠러스	쿠러스	쿠러스	채택
+마법	33	ioc comlha	쿠라누스	쿠라누스	쿠라누스	채택
+마법	34	mor ioc comlha	쿠라네라	쿠라네라	엑스쿠라네라 | 쿠라네라	novaonline 이름 없음/다중
+마법	35	Great Poison Snare | Greater Poison Snare | Poison Snare | Poison Trap | beag puinsein | puinsein		베노미	베노미	Hades 영문 없음/다중
+마법	36	ard creag			테라미에라	5.99-server 이름 없음/다중
+마법	38	Set Volley | Volley				Hades 영문 없음/다중
+마법	39		다라밀공	다라밀공 | 다라밀공(세트효과) | 원기옥	다라밀공 | 다라밀공(Lev2)	Hades 영문 없음/다중
+마법	40	ard leasaich srad | beag leasaich srad | beag srad | leasaich srad | mor leasaich srad | srad		플라모	플라모	Hades 영문 없음/다중
+마법	41	mor srad			플라무스	5.99-server 이름 없음/다중
+마법	42	ard srad			플라메라	5.99-server 이름 없음/다중
+마법	43	ard leasaich athar | athar | beag athar | beag leasaich athar | leasaich athar | mor leasaich athar		아듀로	아듀로	Hades 영문 없음/다중
+마법	44	mor athar			아듀로스	5.99-server 이름 없음/다중
+마법	45	ard athar | deo searg | deo searg gar			디스가드어택 | 아듀레나	Hades 영문 없음/다중
+마법	46	ard leasaich sal | beag leasaich sal | beag sal | leasaich sal | mor leasaich sal | sal	마레노	마레노	마레노	Hades 영문 없음/다중
+마법	47	mor sal	마레누스	마레누스	마레누스	채택
+마법	48	ard sal		마레네라	마레네라 | 어각인거임	5.99-server 이름 없음/다중
+마법	49	spion beathach				5.99-server 이름 없음/다중
+마법	50	Great Sleep Snare | Greater Sleep Snare | Sleep Snare | Sleep Trap | suain		소루마	디소루마	Hades 영문 없음/다중
+마법	51	ao suain	디소루마	디소루마		novaonline 이름 없음/다중
+마법	52	Bolt Trap | Coiled Bolt Trap | Maiden Trap | Spring Trap | fas deireas	에나르마	에나르마	에나르마 | 테스트마법	Hades 영문 없음/다중
+마법	53	Draco Stance | Iron Skin | Wings of Protection | beag fas nadur | dion | fas nadur | mor dion | mor dion comlha | mor fas nadur	이모탈	금강불괴 | 이모탈	금강불괴 | 이모탈 | 자기보호	Hades 영문 없음/다중
+마법	54	asgall faileas | deireas faileas	리플렉토	리플렉토 | 반탄신공	리플렉토	Hades 영문 없음/다중
+마법	55	Mist		라이트닝무브 | 미종보법		5.99-server 이름 없음/다중
+마법	56				도박용아들레스투	Hades 영문 없음/다중
+마법	57	ard leasaich creag | beag creag | beag leasaich creag | creag | leasaich creag | mor leasaich creag		테라미코	테라미코	Hades 영문 없음/다중
+마법	58	mor creag			테라미쿠스	5.99-server 이름 없음/다중
+마법	59	creag gar		테라미칼로	테라미칼로	5.99-server 이름 없음/다중
+마법	60	beag srad lamh			수페라플라미카	5.99-server 이름 없음/다중
+마법	61	srad meall			엑스플라미카	5.99-server 이름 없음/다중
+마법	62	srad gar		플라미칼로	플라미칼로	5.99-server 이름 없음/다중
+마법	63	beag sal lamh | sal lamh	수페라마레나		수페라마레나	Hades 영문 없음/다중
+마법	64	sal meall			엑스마레나	5.99-server 이름 없음/다중
+마법	65	sal gar				5.99-server 이름 없음/다중
+마법	66	athar lamh | beag athar lamh			수페라아듀라	Hades 영문 없음/다중
+마법	67	athar meall			엑스아듀라	5.99-server 이름 없음/다중
+마법	68	athar gar	마네나로	마네나로 | 아듀랄로	마네나로 | 아듀랄로	honden-community 이름 없음/다중
+마법	69	beag creag lamh | creag lamh | srad lamh			수페라테라미카	Hades 영문 없음/다중
+마법	70	creag meall			엑스테라미카	5.99-server 이름 없음/다중
+마법	71	deo saighead	홀리랜서 | 홀리볼트	홀리볼트	홀리볼트 | 홀리볼트(Lev1) | 홀리볼트(Lev2) | 홀리볼트(Lev3) | 홀리볼트(Lev4)	5.99-server 이름 없음/다중
+마법	72	mor strioch bais	세멜리아	세멜리아	세멜리아 | 세멜리아(Lev2)	novaonline 이름 없음/다중
+마법	73	deo lamh | mor strioch bais lamh		아마게돈		Hades 영문 없음/다중
+마법	74	mor strioch bais meall		숨마스텔라		5.99-server 이름 없음/다중
+마법	75	mor strioch pian gar	라그나로크	라그나로크	라그나로크	채택
+마법	76			아들레스투		Hades 영문 없음/다중
+마법	77	nuadhaich	엑스쿠라노	엑스쿠라노		novaonline 이름 없음/다중
+마법	78		엑스쿠라네라	엑스쿠라네라	홀리쿠라네라	Hades 영문 없음/다중
+마법	79	ao cradh		디바르도		5.99-server 이름 없음/다중
+마법	80	ao mor cradh		디데프레카		5.99-server 이름 없음/다중
+마법	81	ao ard cradh		디프라바		5.99-server 이름 없음/다중
+마법	82	cradh	바르도	바르도	바르도 | 프라베라	novaonline 이름 없음/다중
+마법	83	mor cradh	데프레코	데프레코	데프레코 | 어각베라	novaonline 이름 없음/다중
+마법	84	ard cradh	프라보	프라보	데스베라 | 프라보	novaonline 이름 없음/다중
+마법	85		디나르콜리	디나르콜리		Hades 영문 없음/다중
+마법	86	Life Arrow | beothaichdeum	코마디아	코마디아	부활 | 코마디아	Hades 영문 없음/다중
+마법	88	Trance | ard seun | beag seun | mor seun | seun			스피드업	Hades 영문 없음/다중
+마법	89			데스	그룹탈퇴 | 운명 | 코마	Hades 영문 없음/다중
+마법	90	beag pramh | pramh	나르콜리	나르콜룸 | 나르콜리 | 나르콜리(세트효과)	나르콜리 | 디나르콜리 | 봉인 | 유저나르	Hades 영문 없음/다중
+마법	91			실드		Hades 영문 없음/다중
+마법	92			경신공	화진연무	Hades 영문 없음/다중
+마법	93	ard athar nadur | ard creag nadur | ard sal nadur | ard srad nadur | athar nadur | creag nadur | mor athar nadur | mor creag nadur | mor sal nadur | mor srad nadur | sal nadur | sonruich nadur | srad nadur				Hades 영문 없음/다중
+마법	94	Scorpion Stance | armachd | armachd fein	콜라마	철포삼 | 콜라마	콜라마	Hades 영문 없음/다중
+마법	96	pian na dion				5.99-server 이름 없음/다중
+마법	97	Roar				5.99-server 이름 없음/다중
+마법	99		파워단련		파워단련(Lev1)	Hades 영문 없음/다중
+마법	101				유저소루	Hades 영문 없음/다중
+마법	102	ard puinneag spiorad | beag puinneag spiorad | mor puinneag spiorad | puinneag spiorad		리치마나		Hades 영문 없음/다중
+마법	105			함정찾기1		Hades 영문 없음/다중
+마법	106			함정찾기2		Hades 영문 없음/다중
+마법	107	Salvation	홀리쿠라네라		엑스쿠라노	honden-community 이름 없음/다중
+마법	108		메테오	메테오 | 신의파멸	메테오 | 메테오M | 파워메테오	Hades 영문 없음/다중
+마법	109		집중	집중	집중	Hades 영문 없음/다중
+마법	111		침묵			Hades 영문 없음/다중
+마법	113		매직프로텍션	매직프로텍션	매직프로텍션	Hades 영문 없음/다중
+마법	115		신성력강화	칸의축복		Hades 영문 없음/다중
+마법	116	Mana Ward		신의축복		5.99-server 이름 없음/다중
+마법	118		자기보호	자기보호	무영신공	Hades 영문 없음/다중
+마법	119	Inner Fire		속성강화		5.99-server 이름 없음/다중
+마법	120	Gentle Touch				5.99-server 이름 없음/다중
+마법	122	Wraith Touch	홀리드래곤	홀리드래곤	홀리드래곤 | 홀리드래곤(Lev2)	novaonline 이름 없음/다중
+마법	124	Cat's Hearing	세오의손길		칸의눈(Lev1)	honden-community 이름 없음/다중
+마법	125	Howl				5.99-server 이름 없음/다중
+마법	128		회심(Lev1)		라이트닝	Hades 영문 없음/다중
+마법	129		홀리쿠라노	GM홀리쿠라노 | 홀리쿠라노	홀리쿠라노 | 홀리쿠라노(Lev2)	Hades 영문 없음/다중
+마법	131		하이더	하이더	하이더	Hades 영문 없음/다중
+마법	133			무영신공 | 어둠의각인	어둠의각인	Hades 영문 없음/다중
+마법	134		클레쉬스톰	플레쉬스톰	클레쉬스톰 | 플래쉬스톰(Lev2)	Hades 영문 없음/다중
+마법	135		퀘이크	퀘이크	퀘이크 | 퀘이크(Lev2)	Hades 영문 없음/다중
+마법	136			아이스블러스트	아이스블러스트 | 아이스블러스트(Lev2)	Hades 영문 없음/다중
+마법	137			플레어	플레어 | 플레어(Lev2)	Hades 영문 없음/다중
+마법	139			수페라에나르마		Hades 영문 없음/다중
+마법	140			엑스벨라룸	엑스벨라룸	Hades 영문 없음/다중
+마법	142		마구찌르기			Hades 영문 없음/다중
+마법	146	Cursed Tune 1 | Cursed Tune 10 | Cursed Tune 11 | Cursed Tune 12 | Cursed Tune 2 | Cursed Tune 3 | Cursed Tune 4 | Cursed Tune 5 | Cursed Tune 6 | Cursed Tune 7 | Cursed Tune 8 | Cursed Tune 9 | Regeneration 1 | Regeneration 10 | Regeneration 2 | Regeneration 3 | Regeneration 4 | Regeneration 5 | Regeneration 6 | Regeneration 7 | Regeneration 8 | Regeneration 9				Hades 영문 없음/다중
+마법	148			마나부스터 | 슈페이아움(Lev1) | 슈페이아움(Lev2) | 슈페이아움(Lev3) | 슈페이아움(Lev4)		Hades 영문 없음/다중
+마법	149		델리스펠라스	델리스펠라스	델리스펠라스	Hades 영문 없음/다중
+마법	150	Counter Attack 1 | Counter Attack 10 | Counter Attack 11 | Counter Attack 2 | Counter Attack 3 | Counter Attack 4 | Counter Attack 5 | Counter Attack 6 | Counter Attack 7 | Counter Attack 8 | Counter Attack 9 | Disenchanter	속성강화		속성강화	Hades 영문 없음/다중
+마법	151	Frost Arrow 1 | Frost Arrow 2 | Frost Arrow 3 | Frost Arrow 4 | Frost Arrow 5 | Frost Arrow 6 | Frost Arrow 7 | Frost Arrow 8 | Frost Arrow 9	포트리스	포트리스	포트리스	Hades 영문 없음/다중
+마법	152			홀리쿠라네라(Lev1) | 홀리쿠라네라(Lev2) | 홀리쿠라네라(Lev3) | 홀리쿠라네라(Lev4)	홀리쿠라노M(Lev1)	Hades 영문 없음/다중
+마법	153	Keeter 1 | Keeter 10 | Keeter 11 | Keeter 12 | Keeter 13 | Keeter 14 | Keeter 15 | Keeter 2 | Keeter 3 | Keeter 4 | Keeter 5 | Keeter 6 | Keeter 7 | Keeter 8 | Keeter 9			윌리아소환 | 윌리아소환(Lev2) | 윌리아소환(Lev3)	Hades 영문 없음/다중
+마법	154	Torch 1 | Torch 10 | Torch 11 | Torch 12 | Torch 13 | Torch 14 | Torch 15 | Torch 2 | Torch 3 | Torch 4 | Torch 5 | Torch 6 | Torch 7 | Torch 8 | Torch 9	화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3)		화이라소환(Lev1) | 화이라소환(Lev2) | 화이라소환(Lev3) | 화이라소환(Lev4)	Hades 영문 없음/다중
+마법	155	Mermaid 1 | Mermaid 10 | Mermaid 11 | Mermaid 12 | Mermaid 13 | Mermaid 14 | Mermaid 15 | Mermaid 2 | Mermaid 3 | Mermaid 4 | Mermaid 5 | Mermaid 6 | Mermaid 7 | Mermaid 8 | Mermaid 9			일리안소환 | 일리안소환(Lev2) | 일리안소환(Lev3)	Hades 영문 없음/다중
+마법	156	Groo 1 | Groo 10 | Groo 11 | Groo 12 | Groo 13 | Groo 14 | Groo 15 | Groo 2 | Groo 3 | Groo 4 | Groo 5 | Groo 6 | Groo 7 | Groo 8 | Groo 9			라세소환 | 라세소환(Lev2) | 라세소환(Lev3)	Hades 영문 없음/다중
+마법	159	Star Arrow 1 | Star Arrow 10 | Star Arrow 11 | Star Arrow 2 | Star Arrow 3 | Star Arrow 4 | Star Arrow 5 | Star Arrow 6 | Star Arrow 7 | Star Arrow 8 | Star Arrow 9		Charge(Lev1) | Charge(Lev2) | Charge(Lev3) | Charge(Lev4)	챠지(Lev1)	Hades 영문 없음/다중
+마법	161	Shock Arrow				5.99-server 이름 없음/다중
+마법	162				데스	Hades 영문 없음/다중
+마법	169		암살			Hades 영문 없음/다중
+마법	170	Cold Blood | Cyclone | Hail of Feathers 1 | Hail of Feathers 10 | Hail of Feathers 2 | Hail of Feathers 3 | Hail of Feathers 4 | Hail of Feathers 5 | Hail of Feathers 6 | Hail of Feathers 7 | Hail of Feathers 8 | Hail of Feathers 9		깃털날리기(Lev1) | 깃털날리기(Lev2) | 깃털날리기(Lev3) | 깃털날리기(Lev4)	깃털날리기(Lev1) | 깃털날리기(Lev2) | 깃털날리기(Lev3) | 깃털날리기4 | 전채도발	Hades 영문 없음/다중
+마법	173	Mud Wall				5.99-server 이름 없음/다중
+마법	178	Bubble Block				5.99-server 이름 없음/다중
+마법	180		메가홀리쿠라노 | 영자홀리쿠라노		메가홀리쿠라노 | 영자홀리쿠라노	Hades 영문 없음/다중
+마법	181		리젠(Lev1)	리젠(Lev1) | 리젠(Lev2) | 리젠(Lev3) | 리젠(Lev4) | 홀리큐어	리젠(Lev1) | 리젠(Lev2) | 리젠(Lev3) | 리젠(Lev4) | 마리젠(Lev1)	Hades 영문 없음/다중
+마법	182				귀환:LC마을 | 귀환:뤼케시온마을 | 귀환:밀레스마을 | 귀환:수오미마을 | 귀환:아벨마을	Hades 영문 없음/다중
+마법	183	Feral Form | Fierce Feral Form | Master Feral Form | Wild Feral Form		늑대변신(Lev1) | 늑대변신(Lev2) | 늑대변신(Lev3) | 늑대변신(Master)		Hades 영문 없음/다중
+마법	184	Fierce Karura Form | Karura Form | Master Karura Form | Wild Karura Form		독수리변신(Lev1) | 독수리변신(Lev2) | 독수리변신(Lev3) | 독수리변신(Master)		Hades 영문 없음/다중
+마법	185	Fierce Komodas Form | Komodas Form | Master Komodas Form | Wild Komodas Form		엘리게이터변신(Lev1) | 엘리게이터변신(Lev2) | 엘리게이터변신(Lev3) | 엘리게이터변신(Master)		Hades 영문 없음/다중
+마법	186	Fiery Defender				5.99-server 이름 없음/다중
+마법	190			렌티아		Hades 영문 없음/다중
+마법	191			바르데아		Hades 영문 없음/다중
+마법	192			데프레타		Hades 영문 없음/다중
+마법	193			어각베라 | 프라베라		Hades 영문 없음/다중
+마법	195			디렌타		Hades 영문 없음/다중
+마법	196			디바르디아		Hades 영문 없음/다중
+마법	197			디데프레타		Hades 영문 없음/다중
+마법	198			디프라베라		Hades 영문 없음/다중
+마법	199			홀리큐레스		Hades 영문 없음/다중
+마법	201		디나르콜룸	디나르콜룸		Hades 영문 없음/다중
+마법	202			디소루메라		Hades 영문 없음/다중
+마법	203		휴식	휴식		Hades 영문 없음/다중
+마법	209			회심의저격(Lev1) | 회심의저격(Lev2) | 회심의저격(Lev3)		Hades 영문 없음/다중
+마법	211			세오의손길1 | 세오의손길2 | 세오의손길3 | 세오의손길4		Hades 영문 없음/다중

@@ -148,16 +148,16 @@ test('ability workspace uses the original gui06 palette and complete icon sheets
   assert.match(css, /\.ability-panel\s*\{[^}]*overflow:\s*hidden/s);
   assert.match(script, /setoa\.dat/);
   assert.match(script, /gui06\.pal/);
-  assert.match(html, /5\.99와 혼든/);
+  assert.match(html, /5\.99·혼든·Novaonline/);
   assert.match(script, /브라우저 수정/);
   assert.equal(data['요약']['전체'], 613);
-  assert.equal(data['요약']['자동확정'], 29);
-  assert.equal(data['요약']['사용자수정'], 12);
+  assert.equal(data['요약']['자동확정'], 19);
+  assert.equal(data['요약']['사용자수정'], 21);
   const abilities = data['묶음'].flatMap((group) => group['목록']);
-  const aoDall = abilities.find((ability) => ability['이름'] === 'ao dall');
+  const twoHanded = abilities.find((ability) => ability['이름'] === 'Two-handed Attack');
   const crasher = abilities.find((ability) => ability['이름'] === 'Crasher');
-  assert.equal(aoDall['한글'], '일루메나');
-  assert.equal(aoDall['이름출처'], '서버팩 2개 일치');
+  assert.equal(twoHanded['한글'], '투핸드어택');
+  assert.equal(twoHanded['이름출처'], '서버팩 3개 일치');
   assert.equal(crasher['이름출처'], '사용자 수정');
   for (const group of data['묶음']) {
     const position = new Map(group['목록'].map((ability, index) => [ability['이름'], index]));
@@ -202,23 +202,43 @@ test('world map pins are touch and keyboard operable and data sources are labell
   assert.doesNotMatch(script, /들어오기만 한다/);
 });
 
-test('world map opens with one Hades Porte Forest artifact before the full draft', () => {
+test('world map switches among Hades Novice, Porte, and Woodland before the full draft', () => {
   const html = read('docs/index.html');
-  const forest = read('docs/porte-forest.js');
+  const focus = read('docs/map-focus.js');
   const images = readBrowserGlobal('docs/map-images-data.js', 'MAP_IMAGES');
   const builder = read('scripts/build-map-images.py');
 
+  assert.match(html, /id="novice-village-focus"/);
   assert.match(html, /id="porte-forest-focus"/);
+  assert.match(html, /data-map-focus-target="novice"/);
+  assert.match(html, /data-map-focus-target="porte"/);
+  assert.match(html, /data-map-focus-target="woodland"/);
   assert.match(html, /<details class="world-draft">/);
-  assert.match(html, /Hades 포테의숲 실제 맵·워프/);
-  assert.match(forest, /기준 · Hades/);
-  assert.match(forest, /Hades → 서버팩 2개 합의/);
-  assert.match(forest, /if \(hades\.length\)/);
-  assert.match(forest, /map-pin-reference/);
-  assert.match(forest, /map-pin-hades/);
-  assert.doesNotMatch(forest, /3갈래/);
+  assert.match(html, /Hades 지역 실제 맵·워프/);
+  assert.match(focus, /기준 · Hades/);
+  assert.match(focus, /Hades → 서버팩 3개 합의/);
+  assert.match(focus, /if \(hades\.length\)/);
+  assert.match(focus, /map-pin-reference/);
+  assert.match(focus, /map-pin-hades/);
+  assert.match(focus, /노비스마을/);
+  assert.match(focus, /포테의숲/);
+  assert.match(focus, /우드랜드입구/);
+  assert.doesNotMatch(focus, /3갈래/);
   assert.equal(Object.keys(images).filter((name) => name.startsWith('포테의숲')).length, 7);
-  assert.ok(Object.values(images).every((image) => image['표시'].length === 0));
+  const noviceNames = ['노비스마을', '노비스마을식당', '노비스무기방어구상점', '노비스민가1',
+    '노비스민가2', '노비스잡화상점', '노비스주점', '노비스평원A', '노비스평원B'];
+  assert.equal(Object.keys(images).filter((name) => name.startsWith('노비스')).length, 9);
+  assert.ok(noviceNames.every((name) => images[name]), 'every directly connected Novice map has an image');
+  assert.equal(images['노비스마을']['표시'].length, 18);
+  assert.equal(images['노비스마을']['워프출처'], 'Hades templates/warps');
+  assert.ok(images['노비스마을']['표시'].some((pin) => pin['도착'].includes('월드맵')));
+  const woodlandNames = ['우드랜드입구', '우드랜드1-1', '우드랜드1-2', '우드랜드1-3', '우드랜드2-1',
+    '우드랜드3-1', '우드랜드4-1', '우드랜드5-1', '우드랜드6-1', '우드랜드14-1'];
+  assert.equal(Object.keys(images).filter((name) => name.startsWith('우드랜드')).length, 10);
+  assert.ok(woodlandNames.every((name) => images[name]), 'every map directly connected to Woodland entrance has an image');
+  assert.equal(images['우드랜드입구']['표시'].length, 31);
+  assert.equal(images['우드랜드입구']['워프출처'], 'Hades templates/warps');
+  assert.ok(images['우드랜드입구']['표시'].some((pin) => pin['도착'].includes('월드맵')));
   assert.equal(images['포테의숲1존']['참고표시'].length, 0);
   assert.equal(images['포테의숲1존']['워프출처'], '없음');
   assert.equal(images['포테의숲4존']['참고표시'].length, 0);
@@ -235,7 +255,8 @@ test('world map opens with one Hades Porte Forest artifact before the full draft
   assert.match(builder, /agreed_pack_warps/);
   assert.match(builder, /5\.99-server/);
   assert.match(builder, /honden-community/);
-  assert.match(builder, /set\(five\) & set\(honden\)/);
+  assert.match(builder, /novaonline/);
+  assert.match(builder, /set\.intersection/);
   assert.doesNotMatch(builder, /Downloads/);
 });
 

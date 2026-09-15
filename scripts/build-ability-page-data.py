@@ -2,7 +2,7 @@
 """기술·마법을 화면에서 볼 수 있게 한 덩어리로 뽑는다 — 직업별, 선행 사슬대로.
 
 613개를 표로 보면 무엇을 배워야 무엇이 열리는지가 안 보인다. 직업으로 나누고 사슬로
-들여 쓰면 보인다. 구조·정렬은 Hades가 기준이고, 한글 이름은 두 서버팩이 완전히 일치할 때
+들여 쓰면 보인다. 구조·정렬은 Hades가 기준이고, 한글 이름은 세 서버팩이 완전히 일치할 때
 자동 채택한다. `data/기술마법-한글이름.tsv`의 사람이 고친 값은 그보다 우선한다.
 
   쓰는 법: python3 scripts/build-ability-page-data.py   → docs/abilities-data.js
@@ -77,7 +77,7 @@ def main():
                 if corrected and corrected != automatic:
                     korean, source = corrected, "사용자 수정"
                 elif automatic:
-                    korean, source = automatic, "서버팩 2개 일치"
+                    korean, source = automatic, "서버팩 3개 일치"
                 elif corrected:
                     korean, source = corrected, "사용자 수정"
                 else:
@@ -110,7 +110,7 @@ def main():
             "묶음": groups}
     OUT.write_text("window.ABILITY_DATA = " + json.dumps(data, ensure_ascii=False) + ";\n", encoding="utf-8")
     s = data["요약"]
-    print(f"기술 {s['기술']} · 마법 {s['마법']} · 두 팩 합의 {s['자동확정']} · "
+    print(f"기술 {s['기술']} · 마법 {s['마법']} · 세 팩 합의 {s['자동확정']} · "
           f"사용자 수정 {s['사용자수정']} · 한글 표시 {s['한글채움']}")
     print(f"→ {OUT.relative_to(ROOT)}  ({OUT.stat().st_size//1024} KB)")
 
