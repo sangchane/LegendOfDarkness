@@ -1,29 +1,25 @@
-영문	그림	자리	하데스요구레벨	한글후보	팩요구레벨	그림일치	레벨차	판정
-Band of Destruction	13377	6	1	흑요석몽크목걸이	81/99	O	80	보통
-Earth Garb	103	2	41	천지도복	41/51	O	0	강함
-Empowered Holy Hy-Brasyl Gnarl	933	1	99	이아의빛	99	O	0	강함
-Empowered Magus Orb	931	1	99	로오의빛	99	O	0	강함
-Holy Hy-Brasyl Gnarl	876	1	99	이아의은총	1/99	O	0	강함
-Kagum	164	2	97	카쿰	99	O	2	강함
-Keaton	149	2	71	키톤	71/81	O	0	강함
-Magus Hy-Brasyl Orb	875	1	99	로오의은총	1/99	O	0	강함
-Mantle	110	2	41	맨틀	41/51	O	0	강함
-Mileth Armor Dye	58	0	0	뮤레칸의눈물	-	X		약함
-Wind Garb	148	2	71	선풍도복	71/81	O	0	강함
-Ceannlaidir Coral Ring	212	8	7	산호반지	11/51	O	4	강함
-Cotte	118	2	1	꼬뜨	1	O	0	강함
-Cowl	100	2	1	셍즈	1	O	0	강함
-Dobok	98	2	1	도복	1	O	0	강함
-Earth Bodice	117	2	1	연무복	1	O	0	강함
-Might Enchanted Boots	75	13	96	매직부츠	99	O	3	강함
-Jupe	102	2	11	지폰	11/21	O	0	강함
-Leather Bliaut	116	2	1	튜닉	1	O	0	강함
-Light Coral Necklace	951	6	1	진주목걸이	11	O	10	보통
-Light Dagger	254	1	42	광단검	56/99	O	14	보통
-Lorum	111	2	11	로럼	41/51	O	30	보통
-Loures Signet Ring	207	7	1	로오의반지	1/11	O	0	강함
-Might Magma Boots	113	13	82	마그마부츠	86	O	4	강함
-Might Saffian Boots	95	13	66	바이올렛티	71	O	5	강함
-Sea Garb	842	2	3	밀레스대양도복	99	O	96	보통
-Deoch Mythril Shield	93	3	61	은제방패	41/56	O	5	강함
-Small Emerald Ring	213	7	1	사파이어반지	11	O	10	보통
+영문	그림	자리	하데스요구레벨	한글후보	팩요구레벨	그림일치	레벨차	이미쓰임	판정
+Band of Destruction	13377	6	1	흑요석몽크목걸이	81/99	O	80		보통
+Grand Master Combat Armor	987	2	99	위타천2	99	O	0	쓰임	못씀
+Kagum	164	2	97	카쿰	99	O	2		강함
+Keaton	149	2	71	키톤	71/81	O	0		강함
+Mantle	110	2	41	맨틀	41/51	O	0		강함
+Apple	40	0	1	사과	-	O		쓰임	못씀
+Claidheamh	89	1	14	세이버	11	O	3	쓰임	못씀
+Ceannlaidir Coral Ring	212	8	7	산호반지	11/51	O	4	쓰임	못씀
+Cotte	118	2	1	꼬뜨	1	O	0		강함
+Cowl	100	2	1	셍즈	1	O	0		강함
+Dobok	98	2	1	도복	1	O	0		강함
+Earth Bodice	117	2	1	연무복	1	O	0	쓰임	못씀
+Might Enchanted Boots	75	13	96	매직부츠	99	O	3	쓰임	못씀
+Hy-Brasyl Helmet	18	4	97	골든플레이트투구	99	X	2	쓰임	못씀
+Jupe	102	2	11	지폰	11/21	O	0		강함
+Leather Bliaut	116	2	1	튜닉	1	O	0		강함
+Light Dagger	254	1	42	광단검	56/99	O	14		보통
+Long Sword	174	1	56	롱소드	56	O	0	쓰임	못씀
+Lorum	111	2	11	로럼	41/51	O	30		보통
+Loures Saber	88	1	7	커틀라스	11	O	4	쓰임	못씀
+Might Magma Boots	113	13	82	마그마부츠	86	O	4	쓰임	못씀
+Might Saffian Boots	95	13	66	바이올렛티	71	O	5	쓰임	못씀
+Deoch Mythril Shield	93	3	61	은제방패	41/56	O	5	쓰임	못씀
+Templar	169	1	29	매스커레이드	26/51	O	3	쓰임	못씀

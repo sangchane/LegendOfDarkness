@@ -296,7 +296,7 @@ BODY_PART_WORDS = frozenset({"반지", "목걸이", "귀걸이", "팔찌", "장�
 KO_ELEMENT_TAIL = "수토풍화"          # 속성 변종 꼬리 (라비린스메일수·토·풍·화)
 
 
-def ko_base(name, siblings=()):
+def ko_base(name, siblings=(), strip_affix=True):
     """한글 변종의 껍질을 벗겨 밑말만 남긴다.
 
     한 그림에 한글 이름이 여럿인 것은 **한 물건의 변종**이다 (그림 250 의 13개가 전부 `동각반`).
@@ -305,11 +305,16 @@ def ko_base(name, siblings=()):
 
     속성 꼬리(수·토·풍·화)는 **벗긴 것이 같은 그림에 실제로 있을 때만** 벗긴다. 이름이 그 글자로
     끝나는 멀쩡한 아이템을 망치지 않기 위해서다.
+
+    `strip_affix=False` 는 앞말이 접사처럼 생겼지만 접사가 아닐 때 쓴다. 영문 쪽에 접사가 하나도
+    없는 무리에서는 `이아의은총` 의 `이아` 가 신 이름이 아니라 **물건 이름의 일부**다 — 벗기면
+    `은총` 만 남아 엉뚱한 것이 된다.
     """
     s = re.sub(r"^(?:\[속\]|초보자)", "", name)
-    m = re.match(r"^(.+?)의(.+)$", s)
-    if m and m.group(1) in AFFIX:
-        s = m.group(2)
+    if strip_affix:
+        m = re.match(r"^(.+?)의(.+)$", s)
+        if m and m.group(1) in AFFIX:
+            s = m.group(2)
     s = re.sub(r"(?:\(Lev\d+\)|\(x\)|\+\d+)$", "", s)
     if len(s) > 3 and s[-1] in KO_ELEMENT_TAIL and s[:-1] in siblings:
         s = s[:-1]
@@ -342,6 +347,83 @@ def collapse_ko_base(rows, affixes):
     return won
 
 
+def base_from_icon(rows):
+    """접사 무리의 아이콘이 한글 이름 하나만 가리키면 그것을 밑말로 삼는다 — `KO_BASE_FROM_ICON`.
+
+    `derive_affixed` 는 **맨몸 영문이 먼저 정해져 있어야** 변종을 짓는다. 그런데 하데스는 접사가
+    붙은 것에 **다른 그림**을 준다 — `Ruby Earrings` 는 그림 533 인데 `Luathas Ruby Earrings` 를
+    비롯한 열둘은 그림 233 이다. 그래서 그림으로 묶으면 맨몸과 변종이 갈라지고, 맨몸 쪽이 후보를
+    못 얻으면 변종도 통째로 못 짓는다. `Amethyst Ring` · `Grave Ring` 처럼 맨몸이 영문 표에 아예
+    없는 것도 있다.
+
+    그런데 갈라진 그 무리 자체가 답을 들고 있다. 그림이 하나라는 것은 **같은 물건**이라는 뜻이고,
+    그 그림에 한글 이름이 하나뿐이면 그것이 밑말이다 — 팩이 신 변종을 안 싣기 때문에 맨몸 이름만
+    남아 있는 것이다.
+
+    억지로 잇지 않도록 셋을 다 요구한다.
+
+    - 그 그림·자리의 영문이 **밑말 하나**로 모일 것 (`Emerald Ring` 과 `Lapis Ring` 이 그림을
+      나눠 쓰는 자리에서는 어느 쪽 이름인지 알 수 없다)
+    - 한글 후보가 **속성 꼬리를 뗀 뒤 하나**로 모일 것
+    - 그 이름을 이미 쓰는 아이템이 없을 것
+
+    밑말을 세워 두기만 한다. 변종 이름을 짓는 것은 뒤따라 도는 `derive_affixed` 의 일이다.
+    """
+    taken = {r["한글이름"] for r in rows if r["한글이름"]}
+    groups = defaultdict(list)
+
+    for r in rows:
+        groups[(r["그림"], r["착용자리"])].append(r)
+
+    won = 0
+
+    for members in groups.values():
+        if any(r["한글이름"] for r in members):
+            continue                   # 이미 누가 이름을 가졌으면 그쪽 판단을 믿는다
+
+        if len({r.get("영문밑말") for r in members}) != 1:
+            continue
+
+        names = {n for r in members for ns in (r.get("한글후보") or {}).values() for n in ns}
+
+        # 영문 쪽에 접사가 있을 때만 한글 앞말을 접사로 본다. 없으면 `이아의은총` 의 `이아` 는
+        # 신 이름이 아니라 이름의 일부다.
+        affixed = any(r.get("영문접사") for r in members)
+        bases = {ko_base(n, names, strip_affix=affixed) for n in names}
+
+        if len(bases) != 1:
+            continue
+
+        base = next(iter(bases))
+
+        # 껍질만 남은 것은 물건 이름이 아니다 — `로오의반지` 를 벗기면 `반지` 가 된다.
+        if not base or base in taken or base in BODY_PART_WORDS:
+            continue
+
+        # 변종을 지을 때 쓰도록 밑말을 무리에 적어 둔다. 뒤따라 도는 `derive_affixed` 가 읽는다.
+        for r in members:
+            r["한글밑말"] = base
+
+        bare = [r for r in members if not r.get("영문접사")]
+
+        if not bare:
+            # 맨몸 영문이 이 무리에 없다. 같은 밑말의 맨몸 줄을 표 전체에서 찾는다.
+            bare = [r for r in rows
+                    if r.get("영문밑말") == members[0].get("영문밑말")
+                    and not r.get("영문접사") and not r["한글이름"]]
+
+        if not bare:
+            # 맨몸이 영문 표에 아예 없다 (`Amethyst Ring` · `Grave Ring`). 이름을 세울 자리는
+            # 없지만 밑말은 적어 두었으므로 변종은 지어진다.
+            continue
+
+        bare[0]["한글이름"], bare[0]["등급"] = base, "KO_BASE_FROM_ICON"
+        taken.add(base)
+        won += 1
+
+    return won
+
+
 def derive_affixed(rows):
     """밑말과 접사가 다 정해졌으면 팩에 없는 변종 이름도 짓는다 — `AFFIX_DERIVED`.
 
@@ -370,7 +452,9 @@ def derive_affixed(rows):
             if len(ko_affixes) != 1:
                 continue               # 한글 표기가 둘인데 고를 근거가 없다
             picked = next(iter(ko_affixes))
-        ko_base_name = settled.get(r["영문밑말"])
+        # 맨몸 영문이 정해졌으면 그것이 밑말이고, 없으면 그림이 일러 준 밑말을 쓴다
+        # (`base_from_icon` 이 적어 둔다 — 맨몸 영문이 표에 없는 무리가 있다).
+        ko_base_name = settled.get(r["영문밑말"]) or r.get("한글밑말")
         if not ko_base_name:
             continue
         made = picked + "의" + ko_base_name
@@ -560,6 +644,7 @@ def hades_item_korean_names():
     collapse_ko_base(rows, affixes)
     compose_affixed(rows, affixes, pack_item_names())
     drop_name_clashes(rows)
+    base_from_icon(rows)
     derive_affixed(rows)
     match_weapon_tiers(rows)
     apply_human_names(rows, human_names())   # 사람이 고른 것이 마지막에 이긴다
