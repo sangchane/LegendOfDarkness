@@ -22,6 +22,8 @@ namespace Lod.Mobile.Core.World;
 public sealed class WorldClient(WorldSession session)
 {
     private const byte WalkCommand = 0x06;
+    private const byte TurnCommand = 0x11;
+    private const byte AnswerCommand = 0x3A;
     private const byte RefreshCommand = 0x38;
     private const byte MapChangedCommand = 0x15;
     private const byte LocationCommand = 0x04;
@@ -386,6 +388,50 @@ public sealed class WorldClient(WorldSession session)
         Send(WalkCommand, [ToServer(direction), _step++], cancellationToken);
 
     /// <summary>
+    /// Turns on the spot, without claiming a step.
+    /// </summary>
+    /// <remarks>
+    /// A blow lands in the direction the server has us facing, and the only other thing that sets it is a
+    /// step. Walking into the tile a monster stands on to face it is refused — rightly, it is occupied —
+    /// and the refusal sends us back where we were, which on screen reads as being yanked a tile. This is
+    /// the packet the original client sends for that, so facing costs nothing.
+    /// </remarks>
+    public Task TurnAsync(Direction direction, CancellationToken cancellationToken) =>
+        Send(TurnCommand, [ToServer(direction)], cancellationToken);
+
+    /// <summary>
+    /// Picks one of the choices an NPC is offering. <paramref name="choice" /> is the number the server put
+    /// beside that line, counted from one.
+    /// </summary>
+    /// <remarks>
+    /// Reading a dialogue was all this client could do — it took <c>0x2F</c> and showed the words, and there
+    /// was no way to answer. That leaves every NPC that asks something unreachable, the class chooser
+    /// among them, so a character can never stop being a peasant.
+    /// <c>GameServerHandlers.Format3AHandler</c> reads a kind byte, the speaker's serial, a script number
+    /// and the choice. <b>Not <c>0x39</c></b> — that one answers a menu a script is walking somebody
+    /// through, and a choice sent there is looked up in a menu that is not open, so nothing happens at all
+    /// and nothing is logged. Numbers go out most significant byte first
+    /// (<c>NetworkPacketReader.ReadUInt16</c> shifts the first byte up).
+    /// </remarks>
+    public Task AnswerAsync(uint speaker, ushort choice, CancellationToken cancellationToken) =>
+        SendDialog(
+            AnswerCommand,
+            [
+                MundaneSpeaker,
+                (byte)(speaker >> 24), (byte)(speaker >> 16), (byte)(speaker >> 8), (byte)speaker,
+                0x00, 0x00,
+                (byte)(choice >> 8), (byte)choice,
+                NothingTyped
+            ],
+            cancellationToken);
+
+    /// <summary>The kind byte for a person standing in the world, as against a sign or a menu of our own.</summary>
+    private const byte MundaneSpeaker = 0x01;
+
+    /// <summary>Closes the packet where a typed line would go. <c>0x02</c> there means one follows.</summary>
+    private const byte NothingTyped = 0x01;
+
+    /// <summary>
     /// Says something out loud. The server treats a line beginning with a known word as a command when the
     /// speaker is allowed to give one, which is how a test gets an item into an empty pack.
     /// </summary>
@@ -513,6 +559,15 @@ public sealed class WorldClient(WorldSession session)
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>
         Send(RefreshCommand, [], cancellationToken);
+
+    /// <summary>
+    /// Sends one of the two answers an NPC takes. They go in a different envelope — six bytes of header and
+    /// a second layer of enciphering — which <see cref="HadesCipher.EncodeDialogSecured" /> explains.
+    /// </summary>
+    private Task SendDialog(byte command, byte[] fields, CancellationToken cancellationToken) =>
+        session.Connection.SendAsync(
+            HadesCipher.EncodeDialogSecured(command, _ordinal++, fields, session.Parameters),
+            cancellationToken);
 
     private Task Send(byte command, byte[] body, CancellationToken cancellationToken) =>
         session.Connection.SendAsync(
