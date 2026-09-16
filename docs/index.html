@@ -206,20 +206,16 @@
         </div>
       </section>
       <section class="view" data-view="items" aria-labelledby="items-title" hidden>
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">Item codex</p>
-            <h1 id="items-title">아이템 도감</h1>
-            <p>하데스가 싣는 장비와 물건을 슬롯·직업으로 나눠 봅니다. 한글 이름은 칸에 적으면 이 브라우저에 남고, <b>표로 내보내기</b>로 받아 <code>data/아이템-한글이름.tsv</code> 에 붙여 넣습니다.</p>
-          </div>
-          <a class="quiet-link" href="../data/pack-compare/한글이름-검토.tsv">검토표 원문 →</a>
-        </div>
-
-        <div class="signal-grid item-signals" aria-label="도감 현황">
-          <article class="signal signal-primary"><span>실린 아이템</span><strong id="item-total">—</strong><p>하데스 <code>origin/Zolian</code> 기준</p></article>
-          <article class="signal"><span>한글 이름 있음</span><strong id="item-named">—</strong><p id="item-named-rate">—</p></article>
-          <article class="signal"><span>아직 없음</span><strong id="item-unnamed">—</strong><p>필터에서 <b>한글 없는 것만</b> 으로 좁힐 수 있어요</p></article>
-          <article class="signal"><span>지금 보는 것</span><strong id="item-shown">—</strong><p id="item-page-info">—</p></article>
+        <div class="item-topbar">
+          <h1 id="items-title">아이템 도감</h1>
+          <dl class="item-tally">
+            <dt>전체</dt><dd id="item-total">—</dd>
+            <dt>한글</dt><dd id="item-named">—</dd>
+            <dt>남은 것</dt><dd id="item-unnamed">—</dd>
+            <dt>지금</dt><dd id="item-shown">—</dd>
+          </dl>
+          <p id="item-page-info">—</p>
+          <a class="quiet-link" href="../data/pack-compare/한글이름-검토.tsv">검토표 →</a>
         </div>
 
         <div class="filterbar item-filterbar">

@@ -21,6 +21,7 @@ from graphify_runtime import configure_utf8_stdio
 ROOT = Path(__file__).resolve().parent.parent
 HADES = ROOT / "data" / "game-data" / "items-hades.json"
 KOREAN = ROOT / "data" / "pack-compare" / "item-korean-names.json"
+ICONS = ROOT / "docs" / "ui" / "assets" / "item-icons.json"
 OUT = ROOT / "docs" / "items-data.js"
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
@@ -79,6 +80,9 @@ def main():
             if row.get("한글이름"):
                 korean[row["영문"]] = (row["한글이름"], row.get("등급") or "")
 
+    icons = json.loads(ICONS.read_text(encoding="utf-8")) if ICONS.exists() else {"자리": {}}
+    where = icons.get("자리", {})
+
     rows = []
     for it in items:
         name = it.get("Name")
@@ -97,6 +101,8 @@ def main():
             "lv": it.get("LevelRequired") or 0,
             "head": headline(it),
             "img": (it.get("DisplayImage") or 0) & 0x7FFF or it.get("Image") or 0,
+            # 아이콘 띠에서 몇 번째 칸인가. 아카이브에 없는 것은 -1 이라 카드가 빈 자리를 둔다.
+            "ic": where.get(str(it.get("DisplayImage")), -1),
             "val": it.get("Value") or 0,
             "dur": it.get("MaxDurability") or 0,
             "stats": stats,
@@ -113,6 +119,8 @@ def main():
         "생성": "scripts/build-item-page-data.py",
         "총": len(rows),
         "한글": sum(1 for r in rows if r["ko"]),
+        "아이콘": {"너비": icons.get("칸너비", 0), "높이": icons.get("칸높이", 0),
+                 "칸수": len(where)},
         "슬롯": [s for s in slot_order if any(r["slot"] == s for r in rows)],
         "직업": [c for c in cls_order if any(r["cls"] == c for r in rows)],
         "목록": rows,
@@ -120,7 +128,8 @@ def main():
     OUT.write_text("window.LOD_ITEMS = " + json.dumps(payload, ensure_ascii=False) + ";\n",
                    encoding="utf-8")
 
-    print(f"아이템 {len(rows)}장 · 한글 이름 {payload['한글']}장 → {OUT.relative_to(ROOT)}")
+    print(f"아이템 {len(rows)}장 · 한글 이름 {payload['한글']}장 "
+          f"· 아이콘 {sum(1 for r in rows if r['ic'] >= 0)}장 → {OUT.relative_to(ROOT)}")
     print("  슬롯별: " + " · ".join(f"{s} {c}" for s, c in
                                  sorted(Counter(r["slot"] for r in rows).items(),
                                         key=lambda kv: slot_order.get(kv[0], 99))))

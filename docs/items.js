@@ -62,8 +62,19 @@
   function openHover(row, anchor) {
     if (!hover) { return; }
     hover.replaceChildren();
-    hover.appendChild(el("b", "", nameOf(row) || row.en));
-    if (nameOf(row)) { hover.appendChild(el("em", "", row.en)); }
+    var top = el("div", "item-hover-top");
+    var big = el("i", "item-icon is-big");
+    if (row.ic >= 0) {
+      big.style.backgroundPosition = "-" + (row.ic * data.아이콘.너비 * 2) + "px 0";
+    } else {
+      big.classList.add("is-blank");
+    }
+    top.appendChild(big);
+    var title = el("div", "");
+    title.appendChild(el("b", "", nameOf(row) || row.en));
+    if (nameOf(row)) { title.appendChild(el("em", "", row.en)); }
+    top.appendChild(title);
+    hover.appendChild(top);
 
     var facts = el("dl", "item-hover-facts");
     function add(term, value) {
@@ -94,6 +105,15 @@
   function card(row) {
     var article = el("article", "item-card");
     if (!nameOf(row)) { article.classList.add("is-unnamed"); }
+
+    // 아이콘은 한 줄짜리 띠 한 장이라 칸만큼 밀어 쓴다. 아카이브에 없는 여섯 장은 빈 자리다.
+    var icon = el("i", "item-icon");
+    if (row.ic >= 0) {
+      icon.style.backgroundPosition = "-" + (row.ic * data.아이콘.너비) + "px 0";
+    } else {
+      icon.classList.add("is-blank");
+    }
+    article.appendChild(icon);
 
     var head = el("div", "item-card-head");
     head.appendChild(el("b", "", nameOf(row) || row.en));
@@ -157,12 +177,12 @@
 
     var named = data.목록.filter(function (r) { return nameOf(r); }).length;
     $("item-total").textContent = data.총.toLocaleString("ko-KR");
-    $("item-named").textContent = named.toLocaleString("ko-KR");
-    $("item-named-rate").textContent = Math.round((named / data.총) * 100) + "% 채웠어요";
+    $("item-named").textContent = named.toLocaleString("ko-KR")
+      + " (" + Math.round((named / data.총) * 100) + "%)";
     $("item-unnamed").textContent = (data.총 - named).toLocaleString("ko-KR");
     $("item-shown").textContent = rows.length.toLocaleString("ko-KR");
     $("item-page-info").textContent = rows.length
-      ? (page * PER_PAGE + 1) + "–" + (page * PER_PAGE + slice.length) + "번째를 보고 있어요"
+      ? (page * PER_PAGE + 1) + "–" + (page * PER_PAGE + slice.length) + "번째"
       : "조건에 맞는 것이 없어요";
 
     renderChips($("item-slots"), data.슬롯, slot, function (v) { slot = v; page = 0; render(); });
