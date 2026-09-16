@@ -85,6 +85,29 @@
   var SHOT_HEIGHT = 96;
 
   /**
+   * 시전자의 몸동작. `skill.tbl`(Legend.dat) 이 `번호 - 128` 로 (직업 파일, 시작칸, 칸수) 를 정하고,
+   * 한 동작은 **등 구간 다음에 앞 구간**이 이어진다. 화면에는 앞모습만 쓴다.
+   *
+   * 지금 있는 것은 무도가(`d`) 뿐이다. 시트는 그 세 동작의 앞 구간만 이어 붙인 아홉 칸이다:
+   *   dat-extract pose <khan.dat> mb001d,mi001d,MH285D <출력> 3,4,5,8,9,14,15,16,17 1 80x88
+   * 하데스도 같은 번호를 보낸다 — `Skills/DoublePunch.cs` 가 무도가일 때 `0x84`(132) 다.
+   */
+  var BODY = {
+    파일: "ui/assets/motion/monk-skill.png",
+    칸: 80, 높이: 88, 전체: 9,
+    동작: { 131: { 자리: 0, 칸수: 3 }, 132: { 자리: 3, 칸수: 2 }, 133: { 자리: 5, 칸수: 4 } }
+  };
+
+  /** 이 기술이 시키는 몸동작 중 그림이 있는 첫 번째. 없으면 null. */
+  function bodyOf(row) {
+    var numbers = row["모션"] || [];
+    for (var i = 0; i < numbers.length; i++) {
+      if (BODY["동작"][numbers[i]]) { return numbers[i]; }
+    }
+    return null;
+  }
+
+  /**
    * 한 연출을 그 자리에 세운다. 시트는 프레임이 한 줄로 늘어서 있고 칸 너비가 연출마다 다르므로,
    * 그림이 실제로 실린 뒤 자연 크기를 재서 픽셀로 정한다.
    *
@@ -146,7 +169,23 @@
     // 사람도 같이 움직여야 한다. 연출만 터지면 「무엇이 터졌나」는 보여도 「누가 무엇을 했나」는
     // 안 보인다. 원작 공격 시트의 앞모습 두 칸을 넘긴다.
     var hero = el("i", "hero");
-    if (motions.length) { hero.classList.add("striking"); }
+    var body = bodyOf(row);
+
+    if (body) {
+      var step = BODY["동작"][body];
+      hero.classList.add("acting");
+      hero.style.width = BODY["칸"] + "px";
+      hero.style.height = BODY["높이"] + "px";
+      hero.style.backgroundImage = "url(" + BODY["파일"] + ")";
+      hero.style.backgroundSize = (BODY["칸"] * BODY["전체"]) + "px " + BODY["높이"] + "px";
+      hero.style.setProperty("--frames", step["칸수"]);
+      hero.style.setProperty("--from", (-step["자리"] * BODY["칸"]) + "px");
+      hero.style.setProperty("--to", (-(step["자리"] + step["칸수"]) * BODY["칸"]) + "px");
+    } else if (motions.length) {
+      // 그림이 아직 없는 직업이다. 기본 공격 자세로 대신한다.
+      hero.classList.add("striking");
+    }
+
     caster.appendChild(hero);
 
     // 여기에 `efct<모션번호>` 를 그리면 안 된다. **`motion` 은 몸동작 번호이지 연출 그림이 아니다** —
@@ -173,8 +212,11 @@
     caption.appendChild(el("b", "", nameOf(row) || row["이름"]));
 
     var said = [];
-    // 몸동작은 아직 그리지 못하므로 번호로만 적는다. 그린 것처럼 보이면 안 된다.
-    if (motions.length) { said.push("몸동작 " + motions.join("·") + "(아직 못 그림)"); }
+    // 그림이 있는 직업(지금은 무도가)만 실제로 움직인다. 나머지는 번호만 적어, 그린 것처럼
+    // 보이지 않게 한다.
+    if (motions.length) {
+      said.push("몸동작 " + motions.join("·") + (bodyOf(row) ? "" : "(아직 못 그림)"));
+    }
     if (shots.length) { said.push("이펙트 " + shots.join("·")); }
     if ((row["소리"] || []).length) { said.push("소리 " + row["소리"].join("·")); }
 

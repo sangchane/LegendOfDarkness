@@ -170,6 +170,9 @@
 .hero{position:relative;z-index:3;width:47px;height:83px;background:url(ui/assets/hero-walk.png) -282px 0 no-repeat;image-rendering:pixelated}
 .hero.striking{width:53px;height:85px;background-image:url(ui/assets/hero-attack.png);background-position:-106px 0;animation:hero-strike .5s steps(2) 2 both}
 @keyframes hero-strike{from{background-position-x:-106px}to{background-position-x:-212px}}
+/* 기술이 시키는 몸동작. 시작 칸과 칸수는 skill.tbl 이 정하고 abilities.js 가 픽셀로 넣는다 */
+.hero.acting{background-repeat:no-repeat;background-position-x:var(--from);animation:hero-acting .55s steps(var(--frames)) 2 both}
+@keyframes hero-acting{from{background-position-x:var(--from)}to{background-position-x:var(--to)}}
 .sandbag{position:relative;z-index:1;width:34px;height:58px;margin-bottom:6px;border-radius:17px 17px 7px 7px;background:linear-gradient(#b98a52,#8a6238 62%,#6a4a2a);box-shadow:inset 0 -6px 10px #0006}
 .sandbag::after{content:"";position:absolute;inset:auto 0 12px;height:5px;background:#5a3f24}
 /* 연출. 자리·크기·프레임 수는 abilities.js 가 그림의 자연 크기를 재서 픽셀로 넣는다 */
@@ -179,5 +182,5 @@
 .sandbag-caption{margin-top:10px}
 .sandbag-caption b{display:block;color:#f3f4f6;font:700 13px var(--sans)}
 .sandbag-caption span{display:block;margin-top:2px;color:#9aa3b2;font:500 11px var(--mono)}
-@media(prefers-reduced-motion:reduce){.shot.playing,.hero.striking{animation:none}.shot.playing{opacity:1}}
+@media(prefers-reduced-motion:reduce){.shot.playing,.hero.striking,.hero.acting{animation:none}.shot.playing{opacity:1}}
 @media(max-width:780px){.ability-stage{left:50%;width:min(280px,92vw);transform:none!important;inset-block:auto 14px;margin-left:min(-140px,-46vw)}}
