@@ -5,7 +5,7 @@
   root.LodDashboardModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  var views = Object.freeze(["overview", "system", "flows", "delivery", "world", "abilities", "knowledge", "operations", "prototypes"]);
+  var views = Object.freeze(["overview", "system", "flows", "delivery", "world", "abilities", "items", "knowledge", "operations", "prototypes"]);
   function normalizeView(value) { return views.indexOf(value) >= 0 ? value : "overview"; }
   function isNullableBoolean(value) { return typeof value === "boolean" || value === null; }
   function isNullableCount(value) { return value === null || (Number.isInteger(value) && value >= 0); }

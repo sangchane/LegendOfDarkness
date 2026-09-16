@@ -20,6 +20,7 @@
       <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>개발·지식 그래프</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">✦</span>월드 지도</button>
       <button type="button" class="nav-item" data-view-target="abilities"><span aria-hidden="true">✧</span>기술·마법</button>
+      <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템 도감</button>
       <button type="button" class="nav-item" data-view-target="knowledge"><span aria-hidden="true">▤</span>게임 데이터</button>
       <button type="button" class="nav-item" data-view-target="operations"><span aria-hidden="true">◎</span>운영·유지보수</button>
       <button type="button" class="nav-item" data-view-target="prototypes"><span aria-hidden="true">▣</span>화면 실험실</button>
@@ -204,6 +205,48 @@
           <article class="panel world-panel ability-panel"><div id="ability-detail" aria-live="polite"></div></article>
         </div>
       </section>
+      <section class="view" data-view="items" aria-labelledby="items-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Item codex</p>
+            <h1 id="items-title">아이템 도감</h1>
+            <p>하데스가 싣는 장비와 물건을 슬롯·직업으로 나눠 봅니다. 한글 이름은 칸에 적으면 이 브라우저에 남고, <b>표로 내보내기</b>로 받아 <code>data/아이템-한글이름.tsv</code> 에 붙여 넣습니다.</p>
+          </div>
+          <a class="quiet-link" href="../data/pack-compare/한글이름-검토.tsv">검토표 원문 →</a>
+        </div>
+
+        <div class="signal-grid item-signals" aria-label="도감 현황">
+          <article class="signal signal-primary"><span>실린 아이템</span><strong id="item-total">—</strong><p>하데스 <code>origin/Zolian</code> 기준</p></article>
+          <article class="signal"><span>한글 이름 있음</span><strong id="item-named">—</strong><p id="item-named-rate">—</p></article>
+          <article class="signal"><span>아직 없음</span><strong id="item-unnamed">—</strong><p>필터에서 <b>한글 없는 것만</b> 으로 좁힐 수 있어요</p></article>
+          <article class="signal"><span>지금 보는 것</span><strong id="item-shown">—</strong><p id="item-page-info">—</p></article>
+        </div>
+
+        <div class="filterbar item-filterbar">
+          <label class="visually-hidden" for="item-search">아이템 검색</label>
+          <input id="item-search" type="search" placeholder="이름으로 찾기 — 한글·영문 모두" autocomplete="off">
+          <div class="item-filter-row" role="group" aria-label="슬롯"><span>슬롯</span><div class="item-chips" id="item-slots"></div></div>
+          <div class="item-filter-row" role="group" aria-label="직업"><span>직업</span><div class="item-chips" id="item-classes"></div></div>
+          <div class="item-filter-row"><span>보기</span><div class="item-chips">
+            <button type="button" class="chip" id="item-only-unnamed" aria-pressed="false">한글 없는 것만</button>
+            <button type="button" class="chip" id="item-export">표로 내보내기</button>
+          </div></div>
+        </div>
+
+        <div id="item-export-box" hidden></div>
+
+        <div class="item-grid" id="item-grid"></div>
+        <p class="empty-state" id="item-empty" hidden>조건에 맞는 아이템이 없어요. 필터를 지워 보세요.</p>
+
+        <nav class="item-pager" id="item-pager" aria-label="쪽 이동" hidden>
+          <button type="button" class="chip" data-page-step="-1">← 이전</button>
+          <span id="item-pager-label">—</span>
+          <button type="button" class="chip" data-page-step="1">다음 →</button>
+        </nav>
+
+        <div class="item-hover" id="item-hover" hidden aria-hidden="true"></div>
+      </section>
+
       <section class="view" data-view="knowledge" aria-labelledby="knowledge-title" hidden>
         <div class="page-heading"><div><p class="eyebrow">Game knowledge</p><h1 id="knowledge-title">게임 데이터 게시판</h1><p>스킬·마법·캐릭터·퀘스트와 월드 데이터를 출처·확인 수준과 함께 관리합니다.</p></div><a class="quiet-link" href="current-system-analysis/05-game-data-locations.md">분석 원문 →</a></div>
         <div class="filterbar" role="search"><label for="knowledge-search">게시판 검색</label><input id="knowledge-search" type="search" placeholder="이름, 설명, 소스 경로 검색" autocomplete="off"><div class="filter-chips" aria-label="분류 필터"><button type="button" class="chip is-active" data-category="all" aria-pressed="true">전체</button><button type="button" class="chip" data-category="characters" aria-pressed="false">캐릭터</button><button type="button" class="chip" data-category="skills" aria-pressed="false">스킬</button><button type="button" class="chip" data-category="spells" aria-pressed="false">마법</button><button type="button" class="chip" data-category="quests" aria-pressed="false">퀘스트</button><button type="button" class="chip" data-category="world" aria-pressed="false">월드</button><button type="button" class="chip" data-category="operations" aria-pressed="false">운영</button></div></div>
@@ -258,6 +301,6 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="items-data.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>

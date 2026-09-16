@@ -91,3 +91,41 @@
 @media(max-width:860px){.map-focus-tabs{display:grid;width:100%}.hades-evidence{align-items:flex-start;flex-direction:column;gap:7px}.hades-evidence p{text-align:left}.hades-map-layout{grid-template-columns:1fr}.hades-map-inspector{border-top:1px solid var(--edge)}}
 @media(max-width:620px){.hades-map-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.hades-evidence>div{align-items:flex-start;flex-wrap:wrap}.hades-relationship,.hades-map-stage,.hades-map-inspector{padding:16px}.hades-map-legend{align-items:flex-start;flex-direction:column;margin-top:8px}.hades-relationship .forest-heading{align-items:flex-start;flex-direction:column;gap:8px}.hades-map-stage figcaption{align-items:flex-start}}
+
+/* 아이템 도감 — 978장을 슬롯·직업으로 좁혀 본다. 밀도를 높게 잡되(관제 쪽), 카드에는
+   네 조각만 낸다. 나머지는 가리켰을 때 뜨는 패널로 민다. */
+.item-signals{grid-template-columns:repeat(4,1fr)}
+.item-filterbar{display:grid;gap:12px;margin-bottom:16px}
+.item-filter-row{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center}
+.item-filter-row>span{color:var(--muted);font:600 12px var(--sans)}
+.item-chips{display:flex;flex-wrap:wrap;gap:6px}
+.item-chips .chip{padding:0 12px;cursor:pointer}
+.item-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.item-card{display:grid;gap:7px;border-radius:14px;background:var(--panel);padding:13px 14px;cursor:default;transition:box-shadow 140ms ease}
+.item-card:hover{box-shadow:0 1px 2px #191f2814,0 6px 16px #191f2812}
+.item-card.is-unnamed{box-shadow:inset 3px 0 var(--brand)}
+.item-card-head{display:grid;gap:2px;min-width:0}
+.item-card-head b{font:700 14px/1.35 var(--sans);letter-spacing:-.01em;overflow-wrap:anywhere}
+.item-card-head em{color:var(--muted);font:500 11px/1.3 var(--sans);font-style:normal;overflow-wrap:anywhere}
+.item-card-meta{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.item-card-meta span{border-radius:var(--radius-pill);padding:2px 8px;background:var(--edge-soft);color:var(--muted);font:600 10px var(--sans)}
+.item-card-meta .item-lv,.item-card-meta .item-head{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.item-card-meta .item-slot{background:var(--brand-weak);color:var(--brand)}
+.item-card-meta .item-cls{background:#f4f0ff;color:#6b40c8}
+.item-card .item-name{width:100%;min-height:34px;border:0;border-radius:9px;background:var(--edge-soft);padding:0 9px;color:var(--text);font:600 12px var(--sans)}
+.item-card .item-name:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--brand);outline:0}
+.item-pager{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:18px}
+.item-pager .chip{cursor:pointer;padding:0 14px}
+.item-pager span{color:var(--muted);font:600 12px var(--mono);font-variant-numeric:tabular-nums}
+.item-hover{position:fixed;z-index:60;top:0;left:0;width:min(280px,86vw);border-radius:14px;background:#fff;padding:14px 16px;box-shadow:0 10px 30px #191f2824;pointer-events:none}
+.item-hover b{display:block;font:700 14px/1.35 var(--sans)}
+.item-hover em{display:block;margin-top:2px;color:var(--muted);font:500 11px var(--sans);font-style:normal}
+.item-hover-facts{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:10px 0 0}
+.item-hover-facts dt{color:var(--muted);font:500 11px var(--sans)}
+.item-hover-facts dd{margin:0;text-align:right;font:600 11px var(--mono);font-variant-numeric:tabular-nums}
+.item-export{overflow:auto;max-height:320px;border-radius:12px;background:var(--edge-soft);padding:12px;font:11px/1.6 var(--mono);white-space:pre}
+#item-export-box{margin-bottom:16px}
+#item-export-box>p{margin:0 0 8px;color:var(--muted);font-size:12px}
+.visually-hidden{position:absolute;overflow:hidden;clip-path:inset(50%);width:1px;height:1px;white-space:nowrap}
+@media(max-width:1050px){.item-signals{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.item-signals{grid-template-columns:1fr}.item-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.item-filter-row{grid-template-columns:1fr;gap:6px}.item-hover{left:50%;width:min(320px,92vw);transform:none!important;inset-block:auto 14px;margin-left:min(-160px,-46vw)}}

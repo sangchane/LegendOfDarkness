@@ -1,0 +1,8 @@
+# 아이템 한글 이름 — 사람이 채운다. 여기 적은 것이 가장 세다 (등급 HUMAN).
+# 기계가 짐작한 것은 data/pack-compare/item-korean-names.json 에 있고, 검토표
+# data/pack-compare/한글이름-검토.tsv 는 compare-packs.py 가 매번 새로 쓰는 출력이라
+# 거기 적으면 지워진다. 남기려면 이 파일에 적는다.
+#
+# 채우는 자리: 대시보드 → 아이템 도감 탭. 고친 뒤 [표로 내보내기] 로 받아 여기 붙여 넣는다.
+# 반영: python3 scripts/compare-packs.py && python3 scripts/build-item-page-data.py
+영문	한글

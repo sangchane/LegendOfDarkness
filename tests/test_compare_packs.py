@@ -141,6 +141,22 @@ class AffixNarrowingTest(unittest.TestCase):
         self.assertEqual(MODULE.narrow_by_affix(cand, "Magic Leather Greaves", {"Magic"}),
                          {"novaonline": ["마법의가죽각반"]})
 
+    def test_human_file_beats_every_machine_verdict(self):
+        # 사람이 고른 것이 가장 세다. 기계가 다른 이름을 정해 두었어도 덮어쓴다.
+        rows = [{"영문": "Wooden Shield", "한글이름": "나무방패", "등급": "PACK_CONSENSUS"},
+                {"영문": "Loures Signet Ring", "한글이름": None, "등급": "CONFLICT"}]
+        MODULE.apply_human_names(rows, {"Wooden Shield": "목방패",
+                                        "Loures Signet Ring": "루어스인장반지"})
+        self.assertEqual(rows[0]["한글이름"], "목방패")
+        self.assertEqual(rows[0]["등급"], "HUMAN")
+        self.assertEqual(rows[1]["한글이름"], "루어스인장반지")
+
+    def test_human_file_parses_two_columns_and_skips_comments(self):
+        text = "\n".join(["# 사람이 채운다", "영문\t한글", "Wooden Shield\t목방패",
+                          "Bare Name", "  ", "Iron Shield\t철방패\t군더더기"])
+        self.assertEqual(MODULE.parse_human_names(text),
+                         {"Wooden Shield": "목방패", "Iron Shield": "철방패"})
+
     def test_weapon_tiers_line_up_by_rank(self):
         # 영문은 품질로, 한글은 속성 글자로 쪼갰지만 둘 다 데미지 사다리다 (자료에서 28 : 3 군).
         self.assertEqual(MODULE.EN_TIER_TO_KO["Good"], "수")

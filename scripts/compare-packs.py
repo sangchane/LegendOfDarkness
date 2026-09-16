@@ -419,6 +419,46 @@ def match_weapon_tiers(rows):
     return won
 
 
+HUMAN_NAMES = ROOT / "data" / "아이템-한글이름.tsv"
+
+
+def parse_human_names(text):
+    """`영문 <탭> 한글` 두 칸. `#` 주석과 머리글, 빈 줄, 한 칸짜리는 건너뛴다."""
+    out = {}
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        parts = [c.strip() for c in line.split("	")]
+        if len(parts) < 2 or not parts[0] or not parts[1] or parts[0] == "영문":
+            continue
+        out[parts[0]] = parts[1]
+    return out
+
+
+def human_names():
+    return parse_human_names(HUMAN_NAMES.read_text(encoding="utf-8")) if HUMAN_NAMES.exists() else {}
+
+
+def apply_human_names(rows, chosen):
+    """사람이 고른 것이 가장 세다 — 기계가 뭐라 정했든 덮어쓴다.
+
+    `data/아이템-한글이름.tsv` 는 **사람이 소유한 입력 파일**이다. 검토표
+    (`한글이름-검토.tsv`)는 이 스크립트가 매번 새로 쓰는 출력이라 거기 적으면 지워진다.
+    기술·마법이 `data/기술마법-한글이름.tsv` 를 두는 것과 같은 자리다.
+
+    이름이 겹치는지는 보지 않는다. 사람이 그렇게 정했으면 그런 것이고, 겹치면 뒤의
+    `drop_name_clashes` 가 잡는다.
+    """
+    hit = 0
+    for r in rows:
+        picked = chosen.get(r["영문"])
+        if picked:
+            r["한글이름"], r["등급"] = picked, "HUMAN"
+            hit += 1
+    return hit
+
+
+
 def drop_name_clashes(rows):
     """한 한글 이름을 영문 여럿이 차지하면 **전부 도로 내린다** — `NAME_CLASH`.
 
@@ -522,6 +562,7 @@ def hades_item_korean_names():
     drop_name_clashes(rows)
     derive_affixed(rows)
     match_weapon_tiers(rows)
+    apply_human_names(rows, human_names())   # 사람이 고른 것이 마지막에 이긴다
     drop_name_clashes(rows)
     tally = defaultdict(int)
     for r in rows:
