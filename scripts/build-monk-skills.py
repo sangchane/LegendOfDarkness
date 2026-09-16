@@ -4,12 +4,14 @@
 하데스는 기술 258장 중 30장만 구현돼 있다. 나머지는 이름만 있고 눌러도 아무 일이 없다. 팩 쪽에는
 기술마다 피해식·모션·이펙트·소리·딜레이가 한 블록에 다 있으므로, 손으로 옮기지 말고 읽어서 만든다.
 
-**피해식은 한 모양으로 통일한다.**
+**피해식은 능력치 배율 하나로 통일한다.**
 
-    피해 = 평타 × 공격력배수 + 지구력 × 지구력배수
-    평타 = 힘 × 4 + 민첩성 × 2          (하데스 `Assail.cs:55` 가 쓰는 값)
+    피해 = (힘 × 힘배율 + 지구력 × 지구력배율 + 민첩성 × 민첩성배율) ÷ 100
 
-팩의 `get_att_damage` 가 그 평타 자리다. 5.99 는 기술마다 **두 계수만** 다르게 준다 — 단각 2.8배,
+팩은 기술을 「공격력의 몇 배」로 적는다. 그 `get_att_damage` 자리에 하데스의 평타
+(`Assail.cs:55` 의 `힘×4 + 민첩성×2`)를 놓고 펴면 능력치 배율이 된다 — 단각의 2.8배는
+`힘 ×11.2 + 민첩성 ×5.6` 이다. **그 자리 맞춤은 추측이다**: 팩 엔진의 `공격력` 이 무엇을 세는지
+우리 자료에는 없고(명령 문서에 옵코드 `0x8C` 뿐) 하데스 평타와 같다고 본 것이다. 5.99 는 기술마다 **두 계수만** 다르게 준다 — 단각 2.8배,
 붕각 3.5배 + 지구력 59, 선풍각 3.5배 + 지구력 66. Novaonline 은 같은 것을 `힘 + 상수`(단각 75 ·
 붕각 114 · 선풍각 184)로 적었는데 **순서가 5.99 와 같다.** 상수는 레벨이 올라도 안 커지므로 배율
 쪽을 쓴다. 혼든은 자릿수가 100배라(공격력×100 + 지구력×2500) 쓰지 않는다.
@@ -122,6 +124,18 @@ def klass(name):
     return "Monk" + "".join(f"{ord(letter):04X}" for letter in name)[:40]
 
 
+#: 하데스 평타가 능력치를 세는 비율. `Assail.cs:55` — `힘 × 4 + 민첩성 × 2`.
+BLOW_STRENGTH, BLOW_AGILITY = 4, 2
+
+
+def stat_percents(skill):
+    """팩의 「공격력 × n」을 능력치 배율로 편다. 백분율이라 100 이 1배다."""
+    attack = skill["공격력배수"] or 100
+    return (attack * BLOW_STRENGTH,
+            (skill["지구력배수"] or 0) * 100,
+            attack * BLOW_AGILITY)
+
+
 def csharp(skill):
     """하데스 스크립트 한 장. 이름은 팩의 한글 그대로 쓴다 — 영문 짝이 아직 없다."""
     name, motion = skill["이름"], skill["모션"] or 0x84
@@ -130,10 +144,13 @@ def csharp(skill):
         note.append(f"최대 체력의 {skill['체력분율']}%. 5.99 와 Novaonline 이 글자까지 같다.")
         call = f"MonkStrike.UseVitality(sprite, Skill, {skill['체력분율']}, 0x{motion:02X});"
     else:
-        attack = skill["공격력배수"] or 100
-        endurance = skill["지구력배수"] or 0
-        note.append(f"평타의 {attack / 100:g}배" + (f" + 지구력 × {endurance}" if endurance else ""))
-        call = f"MonkStrike.Use(sprite, Skill, {attack}, {endurance}, 0x{motion:02X});"
+        strength, endurance, agility = stat_percents(skill)
+        note.append(f"힘 ×{strength / 100:g}"
+                    + (f" + 지구력 ×{endurance / 100:g}" if endurance else "")
+                    + f" + 민첩성 ×{agility / 100:g}"
+                    + f"  (팩의 공격력 {(skill['공격력배수'] or 100) / 100:g}배를 편 것)")
+        call = (f"MonkStrike.Use(sprite, Skill, {strength}, {endurance}, {agility}, "
+                f"0x{motion:02X});")
 
     where = klass(name)
     return f"""using Darkages.Scripting;
@@ -189,10 +206,14 @@ def main():
 
     print(f"무도가 기술 {len(found)}개 중 옮길 수 있는 것 {len(made)}개")
     for skill in made:
-        shape = (f"체력 {skill['체력분율']}%" if skill["체력분율"] is not None
-                 else f"평타 ×{skill['공격력배수'] / 100:g}"
-                      + (f" + 지구력 ×{skill['지구력배수']}" if skill["지구력배수"] else ""))
-        print(f"  {skill['이름']:10} {shape:24} 모션 {skill['모션']} · 이펙트 {skill['이펙트']}"
+        if skill["체력분율"] is not None:
+            shape = f"최대체력 {skill['체력분율']}%"
+        else:
+            strength, endurance, agility = stat_percents(skill)
+            shape = (f"힘 ×{strength / 100:g}"
+                     + (f" 지구력 ×{endurance / 100:g}" if endurance else "")
+                     + f" 민첩성 ×{agility / 100:g}")
+        print(f"  {skill['이름']:10} {shape:34} 모션 {skill['모션']} · 이펙트 {skill['이펙트']}"
               f" · 소리 {skill['소리']} · 딜레이 {skill['딜레이']}")
     if skipped:
         print(f"  피해식이 없어 건너뜀 {len(skipped)}개: {', '.join(skipped)}")
