@@ -34,6 +34,9 @@ configure_utf8_stdio(sys.stdout, sys.stderr)
 MARK = "5.99표"
 EXCLUDED = {"정권"}  # 사용자 지시(2026-09-16)
 
+#: 옮기지 않고 하데스 스크립트를 그대로 붙이는 것. 기본공격은 하데스 `Assail` 이 바로 그것이다(사용자 확인).
+ALIASES = {"기본공격": "Assail"}
+
 #: 직업은 파일 이름 → 가르치는 NPC → 모션 순으로 정한다. 모션만으로는 못 정한다 — 파일로 직업이 나오는 130개 중
 #: 모션과 맞는 것 67 · 어긋나는 것 6(마법은 여러 직업이 마법사 시전 모션 136 을 같이 쓰고, 2차 기술은 다른 직업
 #: 모션을 빌린다) · 모션이 없는 것 57. `Jigja.txt` 는 NPC(성직자 7)와 모션(128·137)이 다 성직자다.
@@ -529,9 +532,12 @@ def main():
     taught = teachers()
     known = implemented()
 
-    made, failed, missing = [], [], Counter()
+    made, failed, missing, aliased = [], [], Counter(), []
     for (kind, name), (source, body) in sorted(found.items()):
         if name in EXCLUDED or (kind == "SKILL" and (MONK / f"{name}.cs").exists()):
+            continue
+        if name in ALIASES:
+            aliased.append((kind, name))
             continue
         try:
             code, variables, calls, flags = translate(body)
@@ -584,7 +590,14 @@ def main():
         template["ScriptName" if kind == "SKILL" else "ScriptKey"] = name
         template["Cooldown"] = delay
         path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
-    print(f"\n스크립트·템플릿 {len(made)}쌍을 만들었습니다.")
+    for kind, name in aliased:
+        folder = "skills" if kind == "SKILL" else "spells"
+        (OUT / folder.capitalize() / f"{name}.cs").unlink(missing_ok=True)
+        path = HADES / "templates" / folder / f"{name}.json"
+        template = json.loads(path.read_text(encoding="utf-8-sig"))
+        template["ScriptName" if kind == "SKILL" else "ScriptKey"] = ALIASES[name]
+        path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
+    print(f"\n스크립트·템플릿 {len(made)}쌍을 만들었습니다. 하데스 스크립트를 붙인 것 {len(aliased)}개.")
     return 0
 
 

@@ -53,8 +53,8 @@ public sealed class Pack599AbilityTests : IDisposable
             "우드랜드1-1 입구에 서지 못했습니다.");
         Creature target = await FindTarget(world);
 
-        // 전사 · 도적 — 앞칸 한 방.
-        foreach (string skill in new[] { "내려치기", "찌르기" })
+        // 공통 기본공격(= 하데스 Assail) · 전사 · 도적 — 앞칸 한 방.
+        foreach (string skill in new[] { "기본공격", "내려치기", "찌르기" })
         {
             await world.SayAsync($"/skill \"{skill}\" 1", _deadline.Token);
             int slot = await Slot(() => world.Skills.FirstOrDefault(s => s.Name.StartsWith(skill + " ("))?.Slot, skill);
