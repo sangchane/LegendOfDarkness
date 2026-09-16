@@ -156,6 +156,8 @@
 .ability-card-meta .ability-cls{background:#f4f0ff;color:#6b40c8}
 .ability-card-meta .ability-lv{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .ability-card-meta .ability-play{background:#e8f8f0;color:var(--green)}
+.ability-card-meta .ability-built{background:#e8f8f0;color:var(--green)}
+.ability-card-meta .ability-unbuilt{background:#fdecee;color:var(--red)}
 .ability-pre{grid-column:1/-1;grid-row:3;margin:0;color:var(--muted);font:500 10px var(--sans);overflow-wrap:anywhere}
 .ability-card .ability-name{grid-column:1/-1;grid-row:4;width:100%;min-height:30px;border:0;border-radius:8px;background:var(--edge-soft);padding:0 8px;color:var(--text);font:600 12px var(--sans)}
 .ability-card .ability-name:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--brand);outline:0}

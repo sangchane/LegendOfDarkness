@@ -42,6 +42,23 @@ def scripted():
     return out
 
 
+TEMPLATES = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates"
+
+
+def template_scripts():
+    """하데스 템플릿 이름 → 붙는 스크립트. 기술은 `ScriptName`(`Skill.cs:70`), 마법은 `ScriptKey`(`Spell.cs:37`)."""
+    out = {}
+    for folder, field in (("skills", "ScriptName"), ("spells", "ScriptKey")):
+        for f in (TEMPLATES / folder).glob("*.json"):
+            try:
+                t = json.loads(f.read_text(encoding="utf-8-sig"))
+            except ValueError:
+                continue
+            if t.get("Name"):
+                out[t["Name"]] = t.get(field) or ""
+    return out
+
+
 EFFECTS = ROOT / "data/game-data/ability-effects.json"
 EFFECT_TAIL = re.compile(r",\s*(\d+)\s*,\s*\d+\s*$")
 
@@ -59,7 +76,7 @@ def load_effects():
 
 def main():
     rows = json.loads(SRC.read_text(encoding="utf-8-sig"))
-    manual, has = manual_names(), scripted()
+    manual, has, script_of = manual_names(), scripted(), template_scripts()
     consensus, _ = load_consensus()
     effects = load_effects()
 
@@ -124,7 +141,10 @@ def main():
                     stage = 2 if first[1] != "0" else 1
                     ability = int(first[2]) if first[2].isdigit() else 0
 
-                listed.append({"모션": motions, "이펙트": shots, "소리": sounds,
+                # 구현 = 게임이 쓰는 템플릿이 가리키는 스크립트가 실제로 있다. 영문 이름에 스크립트가
+                # 있어도 템플릿이 다른 것을 가리키면(달마신공 → `달마신공`) 그쪽을 본다.
+                script = script_of.get(name) or script_of.get(korean) or ""
+                listed.append({"구현": script in has, "모션": motions, "이펙트": shots, "소리": sounds,
                                "차수": stage, "어빌리티": ability,
                                "이름": name, "한글": korean, "한글자동": automatic,
                                "한글수정": corrected if corrected != automatic else "",
@@ -150,12 +170,13 @@ def main():
                     "마법": sum(1 for r in rows if r["kind"] == "spell"),
                     "자동확정": len(automatic_names), "사용자수정": len(corrected_names),
                     "한글채움": sum(1 for r in rows if r["name"] in effective_names),
-                    "스크립트있음": sum(1 for r in rows if r["name"] in has)},
+                    "스크립트있음": sum(1 for r in rows if r["name"] in has),
+                    "구현": sum(1 for g in groups for r in g["목록"] if r["구현"])},
             "묶음": groups}
     OUT.write_text("window.ABILITY_DATA = " + json.dumps(data, ensure_ascii=False) + ";\n", encoding="utf-8")
     s = data["요약"]
     print(f"기술 {s['기술']} · 마법 {s['마법']} · 세 팩 합의 {s['자동확정']} · "
-          f"사용자 수정 {s['사용자수정']} · 한글 표시 {s['한글채움']}")
+          f"사용자 수정 {s['사용자수정']} · 한글 표시 {s['한글채움']} · 구현 {s['구현']}")
     print(f"→ {OUT.relative_to(ROOT)}  ({OUT.stat().st_size//1024} KB)")
 
 

@@ -32,7 +32,7 @@
 
   // 차수는 `raw[0]` 의 둘째 값이다 (1차 257 · 2차 356). 묶기는 켜 둔 채로 시작한다 — 613장을
   // 그대로 펼치면 같은 장면이 나오는 카드가 줄줄이라 무엇이 무엇인지 보이지 않는다.
-  var cls = "all", kind = "all", tier = "all", query = "";
+  var cls = "all", kind = "all", tier = "all", built = "all", query = "";
   var onlyUnnamed = false, onlyPlayable = false, folding = true, page = 0;
 
   function $(id) { return document.getElementById(id); }
@@ -70,6 +70,7 @@
     if (cls !== "all" && row["직업"] !== cls) { return false; }
     if (kind !== "all" && row["갈래"] !== kind) { return false; }
     if (tier !== "all" && ("" + row["차수"] + "차") !== tier) { return false; }
+    if (built !== "all" && (row["구현"] ? "구현" : "미구현") !== built) { return false; }
     if (onlyUnnamed && nameOf(row)) { return false; }
     if (onlyPlayable && !anyOf(row).length) { return false; }
     if (!query) { return true; }
@@ -254,6 +255,7 @@
     var meta = el("div", "ability-card-meta");
     meta.appendChild(el("span", "ability-kind", row["갈래"]));
     meta.appendChild(el("span", "ability-cls", row["직업"]));
+    meta.appendChild(el("span", row["구현"] ? "ability-built" : "ability-unbuilt", row["구현"] ? "구현" : "미구현"));
     if (row["레벨"]) { meta.appendChild(el("span", "ability-lv", "Lv" + row["레벨"])); }
     // 모션만 있고 이펙트가 없는 기술이 있다(투핸드어택). 이펙트만 세면 그런 것은 "연출 없음"으로
     // 보이는데 실제로는 시전자가 움직인다.
@@ -324,7 +326,7 @@
 
     var out = [], where = {};
     rows.forEach(function (row) {
-      var key = [row["직업"], row["갈래"], row["차수"], row["아이콘"], root(row["이름"]),
+      var key = [row["직업"], row["갈래"], row["차수"], row["구현"], row["아이콘"], root(row["이름"]),
                  (row["모션"] || []).join(","), (row["이펙트"] || []).join(","),
                  (row["소리"] || []).join(",")].join("|");
 
@@ -357,11 +359,13 @@
     $("ability-total").textContent = ALL.length.toLocaleString("ko-KR");
     $("ability-named").textContent = named + " (" + Math.round((named / ALL.length) * 100) + "%)";
     $("ability-playable").textContent = playable.toLocaleString("ko-KR");
+    $("ability-built-count").textContent = ALL.filter(function (r) { return r["구현"]; }).length.toLocaleString("ko-KR");
     $("ability-shown").textContent = rows.length.toLocaleString("ko-KR");
 
     chips($("ability-classes"), DATA["직업"] || uniq("직업"), cls, function (v) { cls = v; page = 0; render(); });
     chips($("ability-kinds"), ["기술", "마법"], kind, function (v) { kind = v; page = 0; render(); });
     chips($("ability-stages"), ["1차", "2차"], tier, function (v) { tier = v; page = 0; render(); });
+    chips($("ability-built"), ["구현", "미구현"], built, function (v) { built = v; page = 0; render(); });
     stopStage();
   }
 
