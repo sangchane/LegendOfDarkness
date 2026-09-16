@@ -179,6 +179,7 @@
 .shot{position:absolute;left:50%;bottom:10px;z-index:2;background-repeat:no-repeat;image-rendering:pixelated;transform:translateX(-50%);opacity:0}
 .shot.playing{animation:shot-frames .7s steps(var(--frames)) 2 both}
 @keyframes shot-frames{from{background-position-x:0;opacity:1}to{background-position-x:var(--sheet);opacity:1}}
+.ability-same{margin:4px 0 0;color:#8b93a3;font:500 11px var(--mono);line-height:1.5}
 .sandbag-caption{margin-top:10px}
 .sandbag-caption b{display:block;color:#f3f4f6;font:700 13px var(--sans)}
 .sandbag-caption span{display:block;margin-top:2px;color:#9aa3b2;font:500 11px var(--mono)}

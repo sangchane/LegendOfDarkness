@@ -116,7 +116,16 @@ def main():
                         for number in level["사운드"]:
                             if number not in sounds:
                                 sounds.append(number)
+                # `raw[0]` 은 `요구레벨/2차여부/요구어빌리티레벨` 이다. 613개가 1차 257 · 2차 356 으로
+                # 갈린다 — 한 화면에 다 놓으면 무엇이 무엇인지 안 보여서 갈래를 하나 더 둔다.
+                stage, ability = 1, 0
+                first = (r.get("raw") or [""])[0].split("/")
+                if len(first) >= 3:
+                    stage = 2 if first[1] != "0" else 1
+                    ability = int(first[2]) if first[2].isdigit() else 0
+
                 listed.append({"모션": motions, "이펙트": shots, "소리": sounds,
+                               "차수": stage, "어빌리티": ability,
                                "이름": name, "한글": korean, "한글자동": automatic,
                                "한글수정": corrected if corrected != automatic else "",
                                "이름출처": source, "선행": r.get("requires") or "",

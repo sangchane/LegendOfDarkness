@@ -30,7 +30,10 @@
   var typed = {};
   try { typed = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { typed = {}; }
 
-  var cls = "all", kind = "all", query = "", onlyUnnamed = false, onlyPlayable = false, page = 0;
+  // 차수는 `raw[0]` 의 둘째 값이다 (1차 257 · 2차 356). 묶기는 켜 둔 채로 시작한다 — 613장을
+  // 그대로 펼치면 같은 장면이 나오는 카드가 줄줄이라 무엇이 무엇인지 보이지 않는다.
+  var cls = "all", kind = "all", tier = "all", query = "";
+  var onlyUnnamed = false, onlyPlayable = false, folding = true, page = 0;
 
   function $(id) { return document.getElementById(id); }
   function el(tag, className, text) {
@@ -66,6 +69,7 @@
   function matches(row) {
     if (cls !== "all" && row["직업"] !== cls) { return false; }
     if (kind !== "all" && row["갈래"] !== kind) { return false; }
+    if (tier !== "all" && ("" + row["차수"] + "차") !== tier) { return false; }
     if (onlyUnnamed && nameOf(row)) { return false; }
     if (onlyPlayable && !anyOf(row).length) { return false; }
     if (!query) { return true; }
@@ -258,6 +262,16 @@
 
     if (row["선행"]) { article.appendChild(el("p", "ability-pre", "선행 " + row["선행"])); }
 
+    // 묶인 것들. 연출이 똑같아 한 장으로 모았으니, 이름과 요구 레벨만 적어 준다 — 가리켜 봐야
+    // 같은 장면이 나오므로 카드를 따로 둘 이유가 없다.
+    if ((row["같은것"] || []).length) {
+      var same = row["같은것"].map(function (one) {
+        return (nameOf(one) || one["이름"]) + (one["레벨"] ? " Lv" + one["레벨"] : "");
+      });
+      article.appendChild(el("p", "ability-same",
+        "연출이 같은 " + (same.length + 1) + "개 — " + same.join(" · ")));
+    }
+
     var input = el("input", "ability-name");
     input.type = "text";
     input.value = typed[row["이름"]] || row["한글"] || "";
@@ -290,8 +304,40 @@
     });
   }
 
+  /**
+   * 연출이 똑같은 것끼리 한 장으로 묶는다.
+   *
+   * 치유계열 여덟(쿠로·쿠라노·쿠라노소·수페라쿠라노…)은 아이콘도 요구레벨도 저마다 다른 별개
+   * 마법이지만 **연출은 모션 128 · 이펙트 21 · 소리 35 로 하나같이 같다.** 여덟 장을 따로 놓아도
+   * 가리킬 때마다 같은 장면이 나오므로, 한 장에 모으고 나머지는 카드 안에 이름만 적는다.
+   *
+   * 묶는 열쇠에 직업·갈래·차수를 함께 넣는다 — 연출이 우연히 겹치는 남의 직업 기술까지 삼키면
+   * 그건 묶은 것이 아니라 잃은 것이다. 연출이 없는 것은 묶지 않는다(전부 한 덩어리가 된다).
+   */
+  function fold(rows) {
+    if (!folding) { return rows; }
+
+    var out = [], where = {};
+    rows.forEach(function (row) {
+      var shots = anyOf(row);
+      if (!shots.length) { out.push(row); return; }
+
+      var key = [row["직업"], row["갈래"], row["차수"],
+                 (row["모션"] || []).join(","), (row["이펙트"] || []).join(","),
+                 (row["소리"] || []).join(",")].join("|");
+
+      if (where[key] === undefined) {
+        where[key] = out.length;
+        out.push(Object.assign({ 같은것: [] }, row));
+        return;
+      }
+      out[where[key]]["같은것"].push(row);
+    });
+    return out;
+  }
+
   function render() {
-    var rows = ALL.filter(matches);
+    var rows = fold(ALL.filter(matches));
     var pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
     if (page >= pages) { page = pages - 1; }
     var slice = rows.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
@@ -313,6 +359,7 @@
 
     chips($("ability-classes"), DATA["직업"] || uniq("직업"), cls, function (v) { cls = v; page = 0; render(); });
     chips($("ability-kinds"), ["기술", "마법"], kind, function (v) { kind = v; page = 0; render(); });
+    chips($("ability-stages"), ["1차", "2차"], tier, function (v) { tier = v; page = 0; render(); });
     stopStage();
   }
 
@@ -346,7 +393,8 @@
       query = event.target.value.trim().toLowerCase(); page = 0; render();
     });
     [["ability-only-unnamed", function () { onlyUnnamed = !onlyUnnamed; return onlyUnnamed; }],
-     ["ability-only-playable", function () { onlyPlayable = !onlyPlayable; return onlyPlayable; }]
+     ["ability-only-playable", function () { onlyPlayable = !onlyPlayable; return onlyPlayable; }],
+     ["ability-fold", function () { folding = !folding; return folding; }]
     ].forEach(function (pair) {
       $(pair[0]).addEventListener("click", function (event) {
         var on = pair[1]();
