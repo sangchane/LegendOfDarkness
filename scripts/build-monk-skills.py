@@ -129,11 +129,12 @@ BLOW_STRENGTH, BLOW_AGILITY = 4, 2
 
 
 def stat_percents(skill):
-    """팩의 「공격력 × n」을 능력치 배율로 편다. 백분율이라 100 이 1배다."""
-    attack = skill["공격력배수"] or 100
-    return (attack * BLOW_STRENGTH,
-            (skill["지구력배수"] or 0) * 100,
-            attack * BLOW_AGILITY)
+    """팩이 준 두 계수를 백분율로 돌려준다 — 100 이 1배다.
+
+    펴지 않는다. 팩의 `get_att_damage` 는 **무기까지 낀 평타 최종 공격력**이고, 하데스에서도
+    `Sprite.ApplyWeaponBonuses` 가 그 값을 만들 수 있다. 능력치로 펴면 무기가 빠진다.
+    """
+    return (skill["공격력배수"] or 100, (skill["지구력배수"] or 0) * 100)
 
 
 def csharp(skill):
@@ -144,13 +145,10 @@ def csharp(skill):
         note.append(f"최대 체력의 {skill['체력분율']}%. 5.99 와 Novaonline 이 글자까지 같다.")
         call = f"MonkStrike.UseVitality(sprite, Skill, {skill['체력분율']}, 0x{motion:02X});"
     else:
-        strength, endurance, agility = stat_percents(skill)
-        note.append(f"힘 ×{strength / 100:g}"
-                    + (f" + 지구력 ×{endurance / 100:g}" if endurance else "")
-                    + f" + 민첩성 ×{agility / 100:g}"
-                    + f"  (팩의 공격력 {(skill['공격력배수'] or 100) / 100:g}배를 편 것)")
-        call = (f"MonkStrike.Use(sprite, Skill, {strength}, {endurance}, {agility}, "
-                f"0x{motion:02X});")
+        attack, endurance = stat_percents(skill)
+        note.append(f"공격력 ×{attack / 100:g}"
+                    + (f" + 지구력 ×{endurance / 100:g}" if endurance else ""))
+        call = f"MonkStrike.Use(sprite, Skill, {attack}, {endurance}, 0x{motion:02X});"
 
     where = klass(name)
     return f"""using Darkages.Scripting;
@@ -209,10 +207,9 @@ def main():
         if skill["체력분율"] is not None:
             shape = f"최대체력 {skill['체력분율']}%"
         else:
-            strength, endurance, agility = stat_percents(skill)
-            shape = (f"힘 ×{strength / 100:g}"
-                     + (f" 지구력 ×{endurance / 100:g}" if endurance else "")
-                     + f" 민첩성 ×{agility / 100:g}")
+            attack, endurance = stat_percents(skill)
+            shape = (f"공격력 ×{attack / 100:g}"
+                     + (f" + 지구력 ×{endurance / 100:g}" if endurance else ""))
         print(f"  {skill['이름']:10} {shape:34} 모션 {skill['모션']} · 이펙트 {skill['이펙트']}"
               f" · 소리 {skill['소리']} · 딜레이 {skill['딜레이']}")
     if skipped:
