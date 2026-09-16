@@ -5,9 +5,13 @@
 `motion 136, 75` 와 `effect @mob, 0, 136, 75` 가 같은 136 을 가리키고, 그것이 `efct136.epf` 다.
 하데스도 같은 번호를 `SendAnimation(ushort)` 로 클라이언트에 보낸다.
 
-색표는 짝인 `efct###.tbl` 이 정한다. 프레임마다 두 값이 16진수로 적혀 있고 **둘째가 색표 번호**다 —
-`efct136.tbl` 의 `7 a` → `eff010.pal`. 이것을 안 보고 `eff000.pal` 로 그리면 불 연출이 흰색으로
-나온다(실제로 그렇게 나왔다).
+색표는 **`effpal.tbl`** 한 장이 정한다. `<이펙트번호> <색표번호>` 줄이고, 없는 번호는 `eff000.pal`
+이다 — 원작 코드(`DADataViewer/EffectsForm.cs` + `PaletteTable.cs`)가 그렇게 한다. 실제로 쓰는
+연출 82개 중 79개가 표에 없어 기본 색표를 쓴다.
+
+짝인 `efct###.tbl` 은 색표가 **아니다.** UTF-16 로 `7a` 가 프레임 수만큼 되풀이될 뿐이고 원작은
+읽지 않는다. 그것의 둘째 글자를 16진수로 보고 색표를 고른 적이 있는데, 그러면 크래셔의 참격이
+원작의 푸른색 대신 누렇게 나온다.
 
 394 번까지 있지만 기술이 실제로 부르는 것은 83 개뿐이라 그것만 뽑는다.
 
@@ -21,6 +25,7 @@
 import json
 import re
 import subprocess
+import tempfile
 import sys
 from pathlib import Path
 
@@ -53,19 +58,48 @@ def used_numbers():
     return sorted(n for n in found if n > 0)
 
 
-def palette_for(number):
-    """`efct###.tbl` 의 프레임마다 적힌 두 값 중 **둘째**가 색표 번호다 (16진수).
+def palette_table(scratch):
+    """색표를 정하는 표. 아카이브에 **`effpal.tbl` 한 장**뿐이다.
 
-    프레임마다 다를 수 있지만 자료에서는 한 연출이 한 색표를 쓴다. 첫 프레임 것을 쓴다.
-    표가 없으면 `eff000.pal` 로 돌아간다 — 모양은 맞고 색만 기본값이 된다.
+    줄 모양은 `<이펙트번호> <색표번호>` 이고, 셋째 값이 있으면 앞 둘이 범위다(셋째가 음수면 그것은
+    갈래 표시이고 둘째가 색표다). 원작이 읽는 방법이 그대로
+    `sources/wren11/DADataViewer/DADataViewer/PaletteTable.cs` 에 있고, `EffectsForm` 은 이 표
+    하나만 얹은 뒤 `GetPaletteNumber(파일번호)` 로 묻는다.
+
+    **`efct###.tbl` 은 색표가 아니다.** 예전 이 함수는 그것을 읽어 `7 a` 의 둘째 글자를 16진수로
+    보고 `eff010` 을 골랐다. 그 파일은 UTF-16 로 `7a` 가 프레임 수만큼 되풀이될 뿐이고 원작 코드는
+    쳐다보지도 않는다. 그래서 82개 중 79개가 원작과 다른 색으로 그려졌다 — 크래셔의 참격이 원작
+    에서는 푸른데 누렇게 나왔다.
     """
-    note = VAULT / f"roh — efct{number:03d}.tbl.md"
-    if note.exists():
-        body = note.read_text(encoding="utf-8")
-        inside = body.partition("## 내용")[2]
-        values = re.findall(r"\b([0-9a-fA-F]+)\b", inside.partition("```")[2].partition("```")[0])
-        if len(values) >= 2:
-            return int(values[1], 16)
+    subprocess.run(
+        ["dotnet", "run", "--project", str(ROOT / "tools" / "dat-extract"), "-c", "Release", "--",
+         "dump", str(ARCHIVE), scratch, "effpal"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
+
+    found = next(Path(scratch).rglob("effpal.tbl"), None)
+    table = []
+    if found is None:
+        return table
+
+    for line in found.read_text(encoding="cp949", errors="replace").splitlines():
+        parts = line.split()
+        if len(parts) < 2 or not all(p.lstrip("-").isdigit() for p in parts[:2]):
+            continue
+        low, second = int(parts[0]), int(parts[1])
+        if len(parts) == 2:
+            table.append((low, low, second))
+        elif parts[2].lstrip("-").isdigit():
+            third = int(parts[2])
+            table.append((low, low, second) if third < 0 else (low, second, third))
+    return table
+
+
+def palette_for(number, table):
+    """표에 없으면 0 이다 — 원작도 그렇게 하고(`GetPaletteNumber` 의 마지막 줄), 실제로 대부분이
+    표에 없다. 1000 이상은 1000 을 뺀다(`EffectsForm.cs` 가 그렇게 한다)."""
+    for low, high, palette in table:
+        if low <= number <= high:
+            return palette - 1000 if palette >= 1000 else palette
     return 0
 
 
@@ -76,10 +110,17 @@ def main():
 
     DEST.mkdir(parents=True, exist_ok=True)
     wanted = used_numbers()
+
+    with tempfile.TemporaryDirectory() as scratch:
+        table = palette_table(scratch)
+
+    if not table:
+        print("effpal.tbl 을 읽지 못했습니다 — 색이 전부 기본값이 됩니다.")
+
     drawn, missing = {}, []
     for number in wanted:
         name = f"efct{number:03d}"
-        palette = palette_for(number)
+        palette = palette_for(number, table)
         out = DEST / f"{name}.png"
         proc = subprocess.run(
             ["dotnet", "run", "--project", str(ROOT / "tools" / "dat-extract"), "-c", "Release", "--",
@@ -95,7 +136,7 @@ def main():
 
     INDEX.write_text(json.dumps({
         "생성": "scripts/build-ability-sprites.py",
-        "출처": "roh.dat — efct###.epf + eff###.pal (색표는 efct###.tbl 이 정한다)",
+        "출처": "roh.dat — efct###.epf + eff###.pal (색표는 effpal.tbl 이 정한다)",
         "연출": drawn,
     }, ensure_ascii=False, indent=1), encoding="utf-8")
 
