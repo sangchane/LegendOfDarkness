@@ -3002,6 +3002,64 @@
   }
  },
  {
+  "Name": "Grand Master Divine Mitre",
+  "Image": 162,
+  "DisplayImage": 33758,
+  "EquipmentSlot": 4,
+  "Class": 4,
+  "Gender": 255,
+  "LevelRequired": 99,
+  "ScriptName": "Helmet",
+  "Flags": 4189,
+  "CanStack": false,
+  "MaxStack": 0,
+  "Value": 1000,
+  "DmgMin": 0,
+  "DmgMax": 0,
+  "MaxDurability": 100000,
+  "DropRate": 27.0,
+  "AcModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 1,
+   "Value": 0
+  },
+  "StrModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 1,
+   "Value": 1
+  },
+  "IntModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 1,
+   "Value": 0
+  },
+  "WisModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 1,
+   "Value": 1
+  },
+  "DexModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 1,
+   "Value": 0
+  },
+  "HealthModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 0,
+   "Value": 500
+  },
+  "ManaModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 0,
+   "Value": 1500
+  },
+  "MrModifer": {
+   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
+   "Option": 0,
+   "Value": 20
+  }
+ },
+ {
   "Name": "Grand Master Divine Robes",
   "Image": 174,
   "DisplayImage": 33748,
@@ -15123,29 +15181,6 @@
   }
  },
  {
-  "Name": "Broad Sword",
-  "Image": 5,
-  "DisplayImage": 32938,
-  "EquipmentSlot": 1,
-  "Class": 1,
-  "Gender": 255,
-  "LevelRequired": 17,
-  "ScriptName": "Weapon",
-  "Flags": 4221,
-  "CanStack": false,
-  "MaxStack": 0,
-  "Value": 1700,
-  "DmgMin": 20,
-  "DmgMax": 30,
-  "MaxDurability": 8000,
-  "DropRate": 1.0,
-  "ManaModifer": {
-   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
-   "Option": 1,
-   "Value": "750"
-  }
- },
- {
   "Name": "Bronze Shield",
   "Image": 6,
   "DisplayImage": 32957,
@@ -16395,29 +16430,6 @@
    "$type": "Darkages.Types.StatusOperator, Darkages.Server",
    "Option": 0,
    "Value": 2
-  }
- },
- {
-  "Name": "Coral Ring",
-  "Image": 210,
-  "DisplayImage": 32980,
-  "EquipmentSlot": 8,
-  "Class": 0,
-  "Gender": 255,
-  "LevelRequired": 7,
-  "ScriptName": "Generic",
-  "Flags": 95,
-  "CanStack": false,
-  "MaxStack": 0,
-  "Value": 3000,
-  "DmgMin": 0,
-  "DmgMax": 0,
-  "MaxDurability": 2000,
-  "DropRate": 0.1,
-  "ManaModifer": {
-   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
-   "Option": 0,
-   "Value": 100
   }
  },
  {
@@ -30138,44 +30150,6 @@
   "DmgMax": 0,
   "MaxDurability": 0,
   "DropRate": 0.05
- },
- {
-  "Name": "Wolf Earrings",
-  "Image": 230,
-  "DisplayImage": 32998,
-  "EquipmentSlot": 5,
-  "Class": 5,
-  "Gender": 255,
-  "LevelRequired": 1,
-  "ScriptName": "Earring",
-  "Flags": 4189,
-  "CanStack": false,
-  "MaxStack": 0,
-  "Value": 500,
-  "DmgMin": 0,
-  "DmgMax": 0,
-  "MaxDurability": 6000,
-  "DropRate": 100.0,
-  "AcModifer": {
-   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
-   "Option": 0,
-   "Value": 1
-  },
-  "StrModifer": {
-   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
-   "Option": 0,
-   "Value": 3
-  },
-  "ConModifer": {
-   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
-   "Option": 0,
-   "Value": 2
-  },
-  "DmgModifer": {
-   "$type": "Darkages.Types.StatusOperator, Darkages.Server",
-   "Option": 0,
-   "Value": 3
-  }
  },
  {
   "Name": "Wolf Earrings",

@@ -18,8 +18,39 @@
     ZOLIAN_ITEMS=<임시폴더>/Data/LoruleData/templates/Items \\
         python3 scripts/build-item-base-hades.py --write
 """
-import collections, glob, json, os, sys
+import collections, glob, json, os, re, sys
 from pathlib import Path
+
+
+def loads_loose(text):
+    """하데스가 싣는 JSON 열한 장은 표준이 아니다. 고쳐서 읽는다 — 안 그러면 조용히 빠진다.
+
+    두 가지다.
+      1. 수를 16진수로 적는다 (`"DisplayImage": 0x83DE`). JSON 은 10진수만 안다.
+      2. 문자열 안에 줄바꿈을 그대로 넣는다 (`MiniScript` 의 여러 줄짜리 코드).
+
+    둘 다 자료가 아니라 적는 방식의 문제라 뜻이 바뀌지 않는다. 16진수는 같은 수의 10진수로,
+    문자열 안 줄바꿈은 `\\n` 으로 바꾼다.
+    """
+    text = re.sub(r":\s*0x([0-9a-fA-F]+)", lambda m: ": " + str(int(m.group(1), 16)), text)
+
+    out, inside, escaped = [], False, False
+    for ch in text:
+        if escaped:
+            out.append(ch)
+            escaped = False
+            continue
+        if ch == "\\":
+            out.append(ch)
+            escaped = True
+            continue
+        if ch == '"':
+            inside = not inside
+        if inside and ch in "\r\n\t":
+            out.append({"\r": "", "\n": "\\n", "\t": "\\t"}[ch])
+            continue
+        out.append(ch)
+    return json.loads("".join(out))
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data/game-data/items-hades.json"
@@ -42,17 +73,33 @@ def main():
     items, slots, withac = [], collections.Counter(), 0
     for f in files:
         try:
-            d = json.loads(Path(f).read_text(encoding="utf-8-sig"))
-        except Exception:
+            d = loads_loose(Path(f).read_text(encoding="utf-8-sig"))
+        except Exception as problem:
+            print(f"  읽지 못함: {Path(f).name} — {problem}")
             continue
         row = {k: d[k] for k in KEEP if k in d and d[k] is not None}
         row.setdefault("Name", Path(f).stem)
         items.append(row)
+
+    # 칸이 하나도 다르지 않은 행은 버린다. 같은 아이템을 파일 두 장이 싣는 일이 있다
+    # (`mileth_scroll.json` 과 그 짝). **이름만 같은 것은 남긴다** — `Broad Sword` 셋처럼
+    # 그림이 다르면 다른 아이템이다.
+    seen, unique = set(), []
+    for row in items:
+        key = json.dumps(row, sort_keys=True, ensure_ascii=False)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(row)
+    dropped = len(items) - len(unique)
+    items = unique
+
+    for row in items:
         slots[row.get("EquipmentSlot")] += 1
         if row.get("AcModifer"):
             withac += 1
 
-    print(f"하데스(Zolian) 아이템 **{len(items)}장**")
+    print(f"하데스(Zolian) 아이템 **{len(items)}장** (칸이 똑같아 버린 것 {dropped}장)")
     print(f"  이미지가 있는 것 {sum(1 for r in items if r.get('Image'))} · 방어력이 있는 것 {withac}")
     print("  착용 자리별: " + " · ".join(
         f"{k} {v}" for k, v in sorted(slots.items(), key=lambda x: (x[0] is None, x[0]))))

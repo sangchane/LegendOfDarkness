@@ -411,7 +411,6 @@ Talgonite Shield	3	98	기사단방패		EXTRACTED_SINGLE
 Talos Shield	3	90	플라늄방패	풍요의플라늄방패	EXTRACTED_SINGLE
 Grand Master Celestial Crown	4	99	큐이레스2		PACK_CONSENSUS
 Grand Master Celestial Mitre F	4	99	아가트2		PACK_CONSENSUS
-Grand Master Divine Crown	4	99	큐이레스1		PACK_CONSENSUS
 Grand Master Magic Cap	4	99	마아트1		PACK_CONSENSUS
 Grand Master Magic Helm	4	99	마르두크2		PACK_CONSENSUS
 Grand Master Mystic Cap	4	99	마아트2		PACK_CONSENSUS
@@ -492,25 +491,38 @@ Wind Bone Necklace	6	6	바람의마기아목걸이	마기아목걸이	AFFIX_COMP
 Wind Gold Jade Necklace	6	14	바람의금옥목걸이	화염의자수정목걸이	AFFIX_DERIVED
 Wind Necklace	6	6	바람의목걸이	[속]바람의목걸이 · 초보자바람의목걸이	PACK_CONSENSUS
 Wind Pearl Necklace	6	6	바람의진주목걸이	대지의진주목걸이	AFFIX_COMPOSED
+Abundance Coral Ring	8	7	풍요의산호반지	산호반지	AFFIX_DERIVED
 Abundance Jade Ring	8	16	풍요의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지	EXTRACTED_SINGLE
 Abundance Red Jade Ring	8	10	풍요의홍옥반지	홍옥반지	AFFIX_DERIVED
 Beryl Ring	8	5	금반지		PACK_CONSENSUS
+Blessed Coral Ring	8	7	축복의산호반지	산호반지	AFFIX_DERIVED
 Blessed Jade Ring	8	16	축복의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 풍요의녹옥반지	EXTRACTED_SINGLE
 Blessed Red Jade Ring	8	10	축복의홍옥반지	홍옥반지	AFFIX_DERIVED
+Cail Coral Ring	8	7	메투스의산호반지	산호반지	AFFIX_DERIVED
 Cail Jade Ring	8	16	메투스의녹옥반지	녹옥반지 · 로오의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
 Cail Red Jade Ring	8	10	메투스의홍옥반지	홍옥반지	AFFIX_DERIVED
+Ceannlaidir Coral Ring	8	7	세토아의산호반지	산호반지	AFFIX_DERIVED
 Ceannlaidir Jade Ring	8	16	세토아의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
 Ceannlaidir Red Jade Ring	8	10	세토아의홍옥반지	홍옥반지	AFFIX_DERIVED
+Coral Ring	8	7	산호반지		PACK_CONSENSUS
+Deoch Coral Ring	8	7	세오의산호반지	산호반지	AFFIX_DERIVED
 Deoch Red Jade Ring	8	10	세오의홍옥반지	홍옥반지	AFFIX_DERIVED
+Fiosachd Coral Ring	8	7	셔스의산호반지	산호반지	AFFIX_DERIVED
 Fiosachd Red Jade Ring	8	10	셔스의홍옥반지	홍옥반지	AFFIX_DERIVED
 Fioschad Jade Ring	8	16	셔스의녹옥반지	녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	EXTRACTED_SINGLE
+Glioca Coral Ring	8	7	이아의산호반지	산호반지	AFFIX_DERIVED
 Glioca Red Jade Ring	8	10	이아의홍옥반지	홍옥반지	AFFIX_DERIVED
+Gramail Coral Ring	8	7	칸의산호반지	산호반지	AFFIX_DERIVED
 Gramail Red Jade Ring	8	10	칸의홍옥반지	홍옥반지	AFFIX_DERIVED
+Luathas Coral Ring	8	7	로오의산호반지	산호반지	AFFIX_DERIVED
 Luathas Jade Ring	8	16	로오의녹옥반지	녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	PACK_CONSENSUS
 Luathas Red Jade Ring	8	10	로오의홍옥반지	홍옥반지	AFFIX_DERIVED
+Magic Coral Ring	8	7	마력의산호반지	산호반지	AFFIX_DERIVED
 Magic Red Jade Ring	8	10	마력의홍옥반지	홍옥반지	AFFIX_DERIVED
+Might Coral Ring	8	7	체력의산호반지	산호반지	AFFIX_DERIVED
 Might Red Jade Ring	8	10	체력의홍옥반지	홍옥반지	AFFIX_DERIVED
 Red Jade Ring	8	10	홍옥반지		PACK_CONSENSUS
+Sgrios Coral Ring	8	7	뮤레칸의산호반지	산호반지	AFFIX_DERIVED
 Sgrios Red Jade Ring	8	10	뮤레칸의홍옥반지	홍옥반지	AFFIX_DERIVED
 Iron Gauntlet	9	33	동장갑	로오의동장갑 · 메투스의동장갑 · 뮤레칸의동장갑 · 세오의동장갑 · 세토아의동장갑 · 셔스의동장갑 · 이아의동장갑 · 풍요의동장갑	PACK_CONSENSUS
 Abel Song	0	1		2차레드굴1 · 2차레드굴16 · 2차레드굴17 · 2차레드굴19 · 2차레드굴20 · 2차레드굴8 · LC고급의류점 · LC무기점 · LC방어구점 · LC성인용품점 · LC펫상점 · OX퀴즈장	CONFLICT
@@ -577,7 +589,6 @@ Black Death	1	45		블랙데쓰 · 블랙데쓰수 · 블랙데쓰토 · 블랙�
 Blood Dagger	1	89		견습자의단검 · 견습자의단검+1 · 견습자의단검+2 · 혈단검 · 혈단검수 · 혈단검토 · 혈단검풍 · 혈단검화	CONFLICT
 Blossom Dagger	1	14		매단검 · 매단검수 · 매단검토 · 매단검풍 · 매단검화 · 일단검 · 중단검	CONFLICT
 Bramble	1	41		프럼벨 · 프럼벨수 · 프럼벨토 · 프럼벨풍 · 프럼벨화 · 프렘벨 · 프렘벨수 · 프렘벨토 · 프렘벨풍 · 프렘벨화	CONFLICT
-Broad Sword	1	17		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	NAME_CLASH
 Broad Sword	1	17		매스케이드 · 매스케이드수 · 매스케이드토 · 매스케이드풍 · 매스케이드화	NAME_CLASH
 Claidheamh	1	14		세이버 · 세이버수 · 세이버토 · 세이버풍 · 세이버화	NAME_CLASH
 Claidheamh	1	14		세이버 · 세이버수 · 세이버토 · 세이버풍 · 세이버화	NAME_CLASH
@@ -727,6 +738,8 @@ Cthonic Magus Caputium	4	80		헬소서러후드 · 헬클레릭후드	CONFLICT
 Dark Cleric Brim	4	60		듈라한모자 · 클레릭모자	CONFLICT
 Gnostic Hat	4	99		다크홀 · 마승모	CONFLICT
 Gnostic Umber	4	99		다크베일 · 여마승모	CONFLICT
+Grand Master Divine Crown	4	99		큐이레스1	NAME_CLASH
+Grand Master Divine Mitre	4	99		큐이레스1	NAME_CLASH
 Holy Cap	4	11		세인트홀	NAME_CLASH
 Holy Wimple	4	11		매직베일 · 홀리베일	CONFLICT
 Hy-Brasyl Helm	4	97		세인트투구	NAME_CLASH
@@ -775,7 +788,6 @@ Sgrios Ruby Earrings	5	8		루비귀걸이	CONFLICT
 Sgrios Silver Earrings	5	8		쌍은귀걸이	CONFLICT
 Silver Earrings	5	8		쌍은귀걸이	NAME_CLASH
 Wolf Earrings	5	1		쌍은귀걸이	NAME_CLASH
-Wolf Earrings	5	1		쌍은귀걸이	NAME_CLASH
 Band of Destruction	6	1		흑요석몽크목걸이 · 흑요석몽크목걸이(수) · 흑요석몽크목걸이(토) · 흑요석몽크목걸이(풍) · 흑요석몽크목걸이(화)	CONFLICT
 Bone Necklace	6	6		마기아목걸이	NAME_CLASH
 Dark Bone Necklace	6	6		마기아목걸이	NAME_CLASH
@@ -792,34 +804,27 @@ Eternal Love Ring	7	21		노머시의반지 · 토파즈반지	CONFLICT
 Loures Signet Ring	7	1		로오의반지	CONFLICT
 Small Emerald Ring	7	1		사파이어반지	NAME_CLASH
 Abundance Amethyst Ring	8	12		호안석반지	CONFLICT
-Abundance Coral Ring	8	7		산호반지	CONFLICT
 Abundance Grave Ring	8	9		고루반지	CONFLICT
 Abundance Lapis Ring	8	6		사파이어반지	CONFLICT
 Abundance Ruby Ring	8	6		자수정반지	CONFLICT
 Abundance Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Blessed Amethyst Ring	8	12		호안석반지	CONFLICT
-Blessed Coral Ring	8	7		산호반지	CONFLICT
 Blessed Grave Ring	8	9		고루반지	CONFLICT
 Blessed Lapis Ring	8	6		사파이어반지	CONFLICT
 Blessed Ruby Ring	8	6		자수정반지	CONFLICT
 Blessed Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Cail Amethyst Ring	8	12		호안석반지	CONFLICT
-Cail Coral Ring	8	7		산호반지	CONFLICT
 Cail Grave Ring	8	9		고루반지	CONFLICT
 Cail Lapis Ring	8	6		사파이어반지	CONFLICT
 Cail Ruby Ring	8	6		자수정반지	CONFLICT
 Cail Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Ceannlaidir Amethyst Ring	8	12		호안석반지	CONFLICT
 Ceannlaidir Coral Ring	8	7		산호반지	CONFLICT
-Ceannlaidir Coral Ring	8	7		산호반지	CONFLICT
 Ceannlaidir Grave Ring	8	9		고루반지	CONFLICT
 Ceannlaidir Lapis Ring	8	6		사파이어반지	CONFLICT
 Ceannlaidir Ruby Ring	8	6		자수정반지	CONFLICT
 Ceannlaidir Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
-Coral Ring	8	7		산호반지	NAME_CLASH
-Coral Ring	8	7		산호반지	NAME_CLASH
 Deoch Amethyst Ring	8	12		호안석반지	CONFLICT
-Deoch Coral Ring	8	7		산호반지	CONFLICT
 Deoch Grave Ring	8	9		고루반지	CONFLICT
 Deoch Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
 Deoch Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
@@ -828,20 +833,17 @@ Deoch Ruby Ring	8	6		자수정반지	CONFLICT
 Deoch Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Emerald Ring	8	12		사파이어반지	NAME_CLASH
 Fiosachd Amethyst Ring	8	12		호안석반지	CONFLICT
-Fiosachd Coral Ring	8	7		산호반지	CONFLICT
 Fiosachd Grave Ring	8	9		고루반지	CONFLICT
 Fiosachd Lapis Ring	8	6		사파이어반지	CONFLICT
 Fiosachd Ruby Ring	8	6		자수정반지	CONFLICT
 Fiosachd Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Glioca Amethyst Ring	8	12		호안석반지	CONFLICT
-Glioca Coral Ring	8	7		산호반지	CONFLICT
 Glioca Grave Ring	8	9		고루반지	CONFLICT
 Glioca Lapis Ring	8	6		사파이어반지	CONFLICT
 Glioca Ruby Ring	8	6		자수정반지	CONFLICT
 Glioca Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Gloica Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	NAME_CLASH
 Gramail Amethyst Ring	8	12		호안석반지	CONFLICT
-Gramail Coral Ring	8	7		산호반지	CONFLICT
 Gramail Grave Ring	8	9		고루반지	CONFLICT
 Gramail Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
 Gramail Lapis Ring	8	6		사파이어반지	CONFLICT
@@ -850,20 +852,17 @@ Gramail Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	NAME_CLASH
 Lapis Ring	8	12		사파이어반지	NAME_CLASH
 Luathas Amethyst Ring	8	12		호안석반지	CONFLICT
-Luathas Coral Ring	8	7		산호반지	CONFLICT
 Luathas Grave Ring	8	9		고루반지	CONFLICT
 Luathas Lapis Ring	8	6		사파이어반지	CONFLICT
 Luathas Ruby Ring	8	6		자수정반지	CONFLICT
 Luathas Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Magic Amethyst Ring	8	12		호안석반지	CONFLICT
-Magic Coral Ring	8	7		산호반지	CONFLICT
 Magic Grave Ring	8	9		고루반지	CONFLICT
 Magic Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
 Magic Lapis Ring	8	6		사파이어반지	CONFLICT
 Magic Ruby Ring	8	6		자수정반지	CONFLICT
 Magic Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Might Amethyst Ring	8	12		호안석반지	CONFLICT
-Might Coral Ring	8	7		산호반지	CONFLICT
 Might Grave Ring	8	9		고루반지	CONFLICT
 Might Jade Ring	8	16		녹옥반지 · 로오의녹옥반지 · 메투스의녹옥반지 · 세토아의녹옥반지 · 셔스의녹옥반지 · 이아의녹옥반지 · 축복의녹옥반지 · 풍요의녹옥반지	CONFLICT
 Might Lapis Ring	8	6		사파이어반지	CONFLICT
@@ -871,7 +870,6 @@ Might Ruby Ring	8	6		자수정반지	CONFLICT
 Might Talos Ring	8	4		세피라링(Lev1) · 현철반지	CONFLICT
 Ruby Ring	8	6		자수정반지	NAME_CLASH
 Sgrios Amethyst Ring	8	12		호안석반지	CONFLICT
-Sgrios Coral Ring	8	7		산호반지	CONFLICT
 Sgrios Grave Ring	8	9		고루반지	CONFLICT
 Sgrios Lapis Ring	8	6		사파이어반지	CONFLICT
 Sgrios Ruby Ring	8	6		자수정반지	CONFLICT
