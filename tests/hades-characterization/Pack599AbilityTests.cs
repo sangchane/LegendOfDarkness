@@ -79,6 +79,30 @@ public sealed class Pack599AbilityTests : IDisposable
             await world.UseSpellAsync(slot, target.Serial, _deadline.Token);
             await Until(() => world.Hurts.Skip(before).Any(h => h.Serial == target.Serial),
                 "플레어가 고른 표적을 치지 않았습니다.");
+
+            // `effect @target, 0, 102, 75` · `game_sound 75` — 102 는 **맞는 쪽** 그림이다. 0x29 는 첫 그림을 첫
+            // 번호(맞는 쪽)에 그리므로, 거꾸로 보내면 시전자에게 그려진다.
+            List<Effect> flashes = [];
+            await Until(() =>
+            {
+                while (world.TakeEffect(out Effect? flash))
+                {
+                    flashes.Add(flash);
+                }
+
+                return flashes.Any(f => f.Target == target.Serial && f.TargetAnimation == 102);
+            }, $"플레어 그림(102)이 표적 위로 오지 않았습니다: {string.Join(", ", flashes)}");
+
+            List<int> sounds = [];
+            await Until(() =>
+            {
+                while (world.TakeSound(out int sound))
+                {
+                    sounds.Add(sound);
+                }
+
+                return sounds.Contains(75);
+            }, $"플레어 소리(75)가 오지 않았습니다: {string.Join(", ", sounds)}");
         }
 
         // 메테오 — 내 둘레 ±7 칸을 `for` 두 겹으로 돌며 치고, 마력을 비운다.

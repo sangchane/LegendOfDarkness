@@ -83,6 +83,7 @@ internal static class Program
             "mpf" => await RenderMpf(entries, args),
             "pose" => await RenderPose(entries, args),
             "icon" => await RenderIcon(entries, args),
+            "efa" => await RenderEfa(entries, args),
             _ => Unknown(command)
         };
     }
@@ -451,6 +452,127 @@ internal static class Program
         await Sprites.Save(output, cells, oneRow ? cells.Count : columns, zoom, transparent);
         Console.WriteLine($"{chosen.Count}개 파일 · 프레임 {cells.Count}개를 {output} 에 그렸습니다.");
 
+        return 0;
+    }
+
+    /// <summary>
+    /// Draws an EFA effect in one row. The newer effects (efct232 and up in the Korean 5.99 client) are kept this
+    /// way instead of as EPF: each frame is its own zlib stream of RGB565 pixels, and the client makes the dark
+    /// parts see-through by their brightness. Read the way <c>sources/wren11/da-lib/DALib/Drawing/EfaFile.cs</c>
+    /// and <c>Graphics.RenderImage(EfaFrame)</c> read it.
+    /// </summary>
+    /// <remarks><c>efa &lt;archive&gt; &lt;name&gt; &lt;output.png&gt; [zoom]</c></remarks>
+    private static async Task<int> RenderEfa(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("efa 에는 이름과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string name = args[2].EndsWith(".efa", StringComparison.OrdinalIgnoreCase) ? args[2] : args[2] + ".efa";
+        string output = Path.GetFullPath(args[3]);
+        int zoom = args.Length > 4 ? int.Parse(args[4]) : 1;
+
+        ArchivedItem? item = entries.FirstOrDefault(entry => entry.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (item is null)
+        {
+            Console.Error.WriteLine($"{name} 이 없습니다.");
+            return 2;
+        }
+
+        using var stream = new MemoryStream(item.Data);
+        using var reader = new BinaryReader(stream);
+        reader.ReadInt32();
+        int count = reader.ReadInt32();
+        reader.ReadInt32(); // 프레임 간격(ms)
+        byte blending = reader.ReadByte();
+        reader.ReadBytes(51);
+
+        var headers = new List<(int Offset, int Compressed, int Decompressed, int ByteWidth, int ByteCount,
+            int ImageWidth, int ImageHeight, int Left, int Top, int FrameWidth, int FrameHeight)>();
+        for (int i = 0; i < count; i++)
+        {
+            reader.ReadInt32();
+            int offset = reader.ReadInt32();
+            int compressed = reader.ReadInt32();
+            int decompressed = reader.ReadInt32();
+            reader.ReadInt32();
+            reader.ReadInt32();
+            int byteWidth = reader.ReadInt32();
+            reader.ReadInt32();
+            int byteCount = reader.ReadInt32();
+            reader.ReadInt32();
+            reader.ReadInt16(); // 가운데 x
+            reader.ReadInt16(); // 가운데 y
+            reader.ReadInt32();
+            int imageWidth = reader.ReadInt16();
+            int imageHeight = reader.ReadInt16();
+            int left = reader.ReadInt16();
+            int top = reader.ReadInt16();
+            int frameWidth = reader.ReadInt16();
+            int frameHeight = reader.ReadInt16();
+            reader.ReadInt32();
+            headers.Add((offset, compressed, decompressed, byteWidth, byteCount, imageWidth, imageHeight, left, top,
+                frameWidth, frameHeight));
+        }
+
+        long dataStart = stream.Position;
+        Console.WriteLine($"  {item.Name}: 프레임 {count}개");
+        if (count == 0)
+            return 2;
+
+        int cellWidth = Math.Max(1, headers.Max(frame => frame.ImageWidth));
+        int cellHeight = Math.Max(1, headers.Max(frame => frame.ImageHeight));
+
+        // 밝기를 투명도로 — 1 이 보통, 2 는 조금 덜 비친다. 3 은 원작도 몇 개만 제대로 그린다.
+        float coefficient = blending == 2 ? 1.25f : blending == 3 ? -1f : 1f;
+
+        using Image<Rgba32> canvas = new(cellWidth * zoom * count, cellHeight * zoom);
+        for (int index = 0; index < count; index++)
+        {
+            var frame = headers[index];
+            if (frame.ByteCount == 0 || frame.ByteWidth == 0)
+                continue;
+
+            byte[] raw = new byte[frame.Decompressed];
+            using (var packed = new MemoryStream(item.Data, (int)(dataStart + frame.Offset), frame.Compressed))
+            using (var inflater = new System.IO.Compression.ZLibStream(packed, System.IO.Compression.CompressionMode.Decompress))
+            {
+                inflater.ReadAtLeast(raw, frame.Decompressed, throwOnEndOfStream: false);
+            }
+
+            int dataWidth = frame.ByteWidth / 2;
+            int dataHeight = frame.ByteCount / frame.ByteWidth;
+            for (int y = 0; y < dataHeight; y++)
+            for (int x = 0; x < dataWidth; x++)
+            {
+                int xActual = x + frame.Left, yActual = y + frame.Top;
+                if (xActual >= frame.FrameWidth || yActual >= frame.FrameHeight ||
+                    xActual >= cellWidth || yActual >= cellHeight)
+                    continue;
+
+                ushort value = BitConverter.ToUInt16(raw, y * frame.ByteWidth + x * 2);
+                byte r = (byte)(((value >> 11) & 31) * 255 / 31);
+                byte g = (byte)(((value >> 5) & 63) * 255 / 63);
+                byte b = (byte)((value & 31) * 255 / 31);
+                byte alpha = 255;
+                if (coefficient > 0)
+                {
+                    float linear = 0.299f * MathF.Pow(r / 255f, 2) + 0.587f * MathF.Pow(g / 255f, 2) +
+                                   0.114f * MathF.Pow(b / 255f, 2);
+                    alpha = (byte)Math.Clamp(MathF.Round(MathF.Pow(linear, 0.5f) * 255f * coefficient), 0, 255);
+                }
+
+                var pixel = new Rgba32(r, g, b, alpha);
+                for (int dy = 0; dy < zoom; dy++)
+                for (int dx = 0; dx < zoom; dx++)
+                    canvas[(index * cellWidth + xActual) * zoom + dx, yActual * zoom + dy] = pixel;
+            }
+        }
+
+        await canvas.SaveAsPngAsync(output);
+        Console.WriteLine($"프레임 {count}개를 {output} 에 그렸습니다.");
         return 0;
     }
 

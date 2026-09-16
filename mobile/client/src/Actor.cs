@@ -69,6 +69,15 @@ public sealed partial class Actor : Node2D
     // Where we are in a swing, in seconds, or below zero when not swinging.
     private double _struck = -1;
 
+    // A step between two tiles: from where, to where, how long it takes and how far in we are (below zero when
+    // standing). The server only ever says which tile somebody is on now, so the walk in between is ours.
+    private Vector2 _stepFrom;
+    private Vector2 _stepTo;
+    private double _stepSeconds;
+    private double _stepped = -1;
+    private int _strideDrawn = -1;
+    private bool _placed;
+
     public string DisplayName { get; }
 
     /// <summary>Which way the figure is turned, so a replacement can be stood the same way.</summary>
@@ -121,6 +130,34 @@ public sealed partial class Actor : Node2D
         ShowFrame(_sheet.Motion?.Stand() ?? WalkMotion.Stand(facing.Side));
     }
 
+    /// <summary>
+    /// Goes to where the server now says this figure stands. A tile away, it walks there — sliding across the gap
+    /// and striding as it goes, the way our own figure does. Further than that (just arrived, pulled back) it is
+    /// simply there. Asking again for the place it is already going changes nothing, so this can be called on
+    /// every frame.
+    /// </summary>
+    public void GoTo(Vector2 there, float tile, double seconds)
+    {
+        if (_placed && there == (_stepped >= 0 ? _stepTo : Position))
+        {
+            return;
+        }
+
+        if (!_placed || Position.DistanceTo(there) > tile * 1.5f)
+        {
+            _placed = true;
+            _stepped = -1;
+            Position = there;
+            return;
+        }
+
+        _stepFrom = Position;
+        _stepTo = there;
+        _stepSeconds = seconds;
+        _stepped = 0;
+        _strideDrawn = -1;
+    }
+
     /// <summary>Advances the walk by one frame in the direction already faced.</summary>
     public void Stride()
     {
@@ -155,6 +192,29 @@ public sealed partial class Actor : Node2D
 
     public override void _Process(double delta)
     {
+        if (_stepped >= 0)
+        {
+            _stepped += delta;
+
+            double progress = Mathf.Min(1.0, _stepped / _stepSeconds);
+            Position = _stepFrom.Lerp(_stepTo, (float)progress);
+
+            if (progress >= 1.0)
+            {
+                _stepped = -1;
+
+                if (_struck < 0)
+                {
+                    Rest();
+                }
+            }
+            else if (_struck < 0 && (int)(progress * WalkMotion.WalkFrames) is int stride && stride != _strideDrawn)
+            {
+                _strideDrawn = stride;
+                Stride();
+            }
+        }
+
         if (_struck < 0)
         {
             return;

@@ -70,6 +70,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     // And what is lying on it. Marked rather than drawn: nothing has been cut out of the icon archive yet.
     private readonly Dictionary<uint, GroundMark> _dropped = [];
+    private readonly List<AudioStreamPlayer> _voices = [];
+
+    /// <summary>How high above the feet a flash on somebody bursts.</summary>
+    private const float BodyMiddle = 36;
 
     // Whoever is picked out, and the mark that says so. Zero is nobody.
     private readonly TargetMark _mark = new() { Name = "Target", Visible = false };
@@ -159,6 +163,15 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _floorSize = _floor.Texture.GetSize();
 
         AddChild(_camera);
+
+        // 한꺼번에 네 소리까지. 기술 하나가 맞는 소리와 휘두르는 소리를 겹쳐 낸다.
+        for (int voice = 0; voice < 4; voice++)
+        {
+            AudioStreamPlayer player = new() { VolumeDb = -6 };
+            _voices.Add(player);
+            AddChild(player);
+        }
+
         _camera.AddChild(_floor);
         _camera.AddChild(_mark);
 
@@ -189,6 +202,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         Look();
     }
+
+    /// <summary>How far one tile is on the drawn floor — a figure further than that is not walking but arriving.</summary>
+    private float TileStep => Ground(new Tile(1, 0)).DistanceTo(Ground(new Tile(0, 0)));
 
     /// <summary>Where a tile puts a pair of feet on the drawn floor.</summary>
     private Vector2 Ground(Tile tile)
@@ -422,8 +438,13 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 _worn[one.Serial] = one.Wearing;
             }
 
-            actor.Position = Ground(one.Where);
-            actor.Face(one.Facing);
+            actor.GoTo(Ground(one.Where), TileStep, StepSeconds);
+
+            // 매 프레임 돌려세우면 서 있는 그림으로 되돌아가 걷는 동작이 지워진다. 바뀔 때만.
+            if (actor.Looking != one.Facing)
+            {
+                actor.Face(one.Facing);
+            }
         }
 
         foreach (uint serial in _crowd.Keys.Where(known => !present.Contains(known)).ToList())
@@ -670,8 +691,13 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 _herd[one.Serial] = actor;
             }
 
-            actor.Position = Ground(one.Where);
-            actor.Face(one.Facing);
+            actor.GoTo(Ground(one.Where), TileStep, StepSeconds);
+
+            // 매 프레임 돌려세우면 서 있는 그림으로 되돌아가 걷는 동작이 지워진다. 바뀔 때만.
+            if (actor.Looking != one.Facing)
+            {
+                actor.Face(one.Facing);
+            }
         }
 
         foreach (uint serial in _herd.Keys.Where(known => !present.Contains(known)).ToList())
@@ -876,6 +902,74 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     }
 
     /// <summary>
+    /// Draws the flashes the server asked for (0x29). On somebody the first picture goes over whoever it lands
+    /// on and the second over whoever made it; on the ground it goes on the tile.
+    /// </summary>
+    private void Flashes()
+    {
+        while (server is { } world && world.TakeEffect(out Effect? effect))
+        {
+            if (effect.At is Tile at)
+            {
+                Show(effect.TargetAnimation, Ground(at), effect.Speed);
+                continue;
+            }
+
+            if (effect.TargetAnimation > 0 && Someone(world, effect.Target) is { } target)
+            {
+                Show(effect.TargetAnimation, target.Position, effect.Speed);
+            }
+
+            if (effect.SourceAnimation > 0 && Someone(world, effect.Source) is { } source)
+            {
+                Show(effect.SourceAnimation, source.Position, effect.Speed);
+            }
+        }
+    }
+
+    private Actor? Someone(WorldClient world, uint serial) =>
+        serial == world.Serial ? _player
+        : _crowd.TryGetValue(serial, out Actor? person) ? person
+        : _herd.TryGetValue(serial, out Actor? beast) ? beast
+        : null;
+
+    private void Show(int number, Vector2 feet, int speed)
+    {
+        if (number <= 0 || Flash.Make(number, speed) is not { } flash)
+        {
+            return;
+        }
+
+        // 발밑이 아니라 몸 한가운데쯤에 터진다.
+        flash.Position = feet + new Vector2(0, -BodyMiddle);
+        _camera.AddChild(flash);
+    }
+
+    /// <summary>Plays the sounds the server asked for (0x19). The number is the file's name.</summary>
+    private void Sounds()
+    {
+        while (server is { } world && world.TakeSound(out int number))
+        {
+            string path = $"res://assets/sound/{number}.mp3";
+
+            if (!ResourceLoader.Exists(path))
+            {
+                continue;
+            }
+
+            AudioStreamPlayer? free = _voices.Find(voice => !voice.Playing);
+
+            if (free is null)
+            {
+                continue;
+            }
+
+            free.Stream = GD.Load<AudioStream>(path);
+            free.Play();
+        }
+    }
+
+    /// <summary>
     /// Draws whoever the server says has swung. Our own blow is drawn as it is asked for rather than here,
     /// so a swing of ours that comes back is left alone.
     /// </summary>
@@ -964,6 +1058,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Crowd();
         Herd();
         Swings();
+        Flashes();
+        Sounds();
         RehearseAPick();
         HuntOnItsOwn();
 

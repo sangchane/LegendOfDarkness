@@ -169,6 +169,14 @@ public sealed record Creature(
     string Name);
 
 /// <summary>
+/// A skill's flash, as the server sends it (0x29). On somebody the first animation plays over
+/// <paramref name="Target" /> and the second over <paramref name="Source" />; on the ground both serials are zero
+/// and <paramref name="At" /> says where.
+/// </summary>
+/// <param name="Speed">How long each frame stays, in milliseconds as the original counts them.</param>
+public sealed record Effect(uint Target, uint Source, int TargetAnimation, int SourceAnimation, int Speed, Tile? At);
+
+/// <summary>
 /// One thing in a character's pack. The server sends these one at a time, both on the way in and whenever
 /// something is picked up.
 /// </summary>

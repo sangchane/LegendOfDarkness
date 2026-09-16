@@ -37,6 +37,8 @@ public sealed class WorldClient(WorldSession session)
     private const byte HealthCommand = 0x13;
     private const byte SpokenCommand = 0x0A;
     private const byte BodyMotionCommand = 0x1A;
+    private const byte AnimationCommand = 0x29;
+    private const byte SoundCommand = 0x19;
     private const byte TalkCommand = 0x0E;
     private const byte UseCommand = 0x1C;
     private const byte DropCommand = 0x08;
@@ -118,6 +120,8 @@ public sealed class WorldClient(WorldSession session)
 
     // Drained by whoever is drawing, because a motion is a moment rather than a state.
     private readonly ConcurrentQueue<uint> _motions = new();
+    private readonly ConcurrentQueue<Effect> _effects = new();
+    private readonly ConcurrentQueue<int> _sounds = new();
 
     private volatile string _said = string.Empty;
     private volatile int _saidCount;
@@ -171,6 +175,13 @@ public sealed class WorldClient(WorldSession session)
     /// motions apart needs skill.tbl, which is written up in docs/original-sprite-animation.md section 3.
     /// </remarks>
     public bool TakeMotion(out uint serial) => _motions.TryDequeue(out serial);
+
+    /// <summary>Takes the next flash the server asked to be drawn, if any. Like a motion, it is a moment.</summary>
+    public bool TakeEffect([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Effect? effect) =>
+        _effects.TryDequeue(out effect);
+
+    /// <summary>Takes the next sound the server asked to be played — the number is the file's name.</summary>
+    public bool TakeSound(out int sound) => _sounds.TryDequeue(out sound);
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
@@ -254,6 +265,30 @@ public sealed class WorldClient(WorldSession session)
                     if (motion.Length >= 4)
                     {
                         _motions.Enqueue(BinaryPrimitives.ReadUInt32BigEndian(motion));
+                    }
+                }
+
+                    continue;
+
+                case AnimationCommand:
+                {
+                    ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                    if (body.Length >= 12)
+                    {
+                        _effects.Enqueue(ReadEffect(body));
+                    }
+                }
+
+                    continue;
+
+                case SoundCommand:
+                {
+                    ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                    if (body.Length >= 3)
+                    {
+                        _sounds.Enqueue(ReadSound(body));
                     }
                 }
 
@@ -624,6 +659,40 @@ public sealed class WorldClient(WorldSession session)
             : new Character(serial, now, facing));
     }
 
+    /// <summary>
+    /// A flash (0x29). The server writes the one it lands on first, then whoever made it, then an animation for
+    /// each in that order — or, when the first serial is zero, one animation and a tile.
+    /// </summary>
+    public static Effect ReadEffect(ReadOnlySpan<byte> body)
+    {
+        uint target = BinaryPrimitives.ReadUInt32BigEndian(body);
+
+        if (target == 0)
+        {
+            return new Effect(0, 0, BinaryPrimitives.ReadUInt16BigEndian(body[4..]), 0, body[7],
+                new Tile(BinaryPrimitives.ReadUInt16BigEndian(body[8..]), BinaryPrimitives.ReadUInt16BigEndian(body[10..])));
+        }
+
+        return new Effect(
+            target,
+            BinaryPrimitives.ReadUInt32BigEndian(body[4..]),
+            BinaryPrimitives.ReadUInt16BigEndian(body[8..]),
+            BinaryPrimitives.ReadUInt16BigEndian(body[10..]),
+            body.Length >= 14 ? BinaryPrimitives.ReadUInt16BigEndian(body[12..]) : 100,
+            null);
+    }
+
+    /// <summary>A sound (0x19): an empty byte, then the number.</summary>
+    public static int ReadSound(ReadOnlySpan<byte> body) => BinaryPrimitives.ReadUInt16BigEndian(body[1..]);
+
+    /// <summary>
+    /// The sound a health bar (0x13) carries in its last byte — a blow lands with it, and a sound meant for
+    /// nobody's bar comes this way too, with the bar left at 255. Zero is what a template with no sound
+    /// writes, and 255 is the original's "none"; neither is played.
+    /// </summary>
+    public static int? ReadHealthSound(ReadOnlySpan<byte> body) =>
+        body.Length >= 7 && body[6] is not (0 or byte.MaxValue) ? body[6] : null;
+
     /// <summary>Somebody to draw: where they are, which way they face, what they wear, and their name.</summary>
     /// <remarks>
     /// Place, direction and serial take nine bytes; then twenty-one bytes of wardrobe, one byte saying
@@ -689,6 +758,11 @@ public sealed class WorldClient(WorldSession session)
         if (body.Length < fixedLength)
         {
             throw new ProtocolException($"체력 안내가 {fixedLength}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        if (ReadHealthSound(body) is int sound)
+        {
+            _sounds.Enqueue(sound);
         }
 
         int left = BinaryPrimitives.ReadUInt16BigEndian(body[4..]);
