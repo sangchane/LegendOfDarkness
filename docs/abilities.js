@@ -262,14 +262,13 @@
 
     if (row["선행"]) { article.appendChild(el("p", "ability-pre", "선행 " + row["선행"])); }
 
-    // 묶인 것들. 연출이 똑같아 한 장으로 모았으니, 이름과 요구 레벨만 적어 준다 — 가리켜 봐야
-    // 같은 장면이 나오므로 카드를 따로 둘 이유가 없다.
+    // 묶인 것들. 아이콘도 연출도 같고 세기만 다르니 이름과 요구 레벨만 적어 준다.
     if ((row["같은것"] || []).length) {
       var same = row["같은것"].map(function (one) {
         return (nameOf(one) || one["이름"]) + (one["레벨"] ? " Lv" + one["레벨"] : "");
       });
       article.appendChild(el("p", "ability-same",
-        "연출이 같은 " + (same.length + 1) + "개 — " + same.join(" · ")));
+        "같은 기술 " + (same.length + 1) + "단계 — " + same.join(" · ")));
     }
 
     var input = el("input", "ability-name");
@@ -305,24 +304,27 @@
   }
 
   /**
-   * 연출이 똑같은 것끼리 한 장으로 묶는다.
+   * 같은 기술의 레벨 변형을 한 장으로 묶는다.
    *
-   * 치유계열 여덟(쿠로·쿠라노·쿠라노소·수페라쿠라노…)은 아이콘도 요구레벨도 저마다 다른 별개
-   * 마법이지만 **연출은 모션 128 · 이펙트 21 · 소리 35 로 하나같이 같다.** 여덟 장을 따로 놓아도
-   * 가리킬 때마다 같은 장면이 나오므로, 한 장에 모으고 나머지는 카드 안에 이름만 적는다.
+   * 613장 중 402장이 `Mass Strike 1`~`6`, `Groo 1`~`11`, `Archery 1`~`6` 처럼 **이름 끝 숫자만
+   * 다른 것**이다. 아이콘도 연출도 같고 세기만 다르니, 카드를 열한 장 놓을 이유가 없다 — 한 장에
+   * 모으고 나머지는 카드 안에 이름과 요구 레벨만 적는다.
    *
-   * 묶는 열쇠에 직업·갈래·차수를 함께 넣는다 — 연출이 우연히 겹치는 남의 직업 기술까지 삼키면
-   * 그건 묶은 것이 아니라 잃은 것이다. 연출이 없는 것은 묶지 않는다(전부 한 덩어리가 된다).
+   * **아이콘까지 같아야 묶는다.** 아이콘이 다르면 화면에서 다른 기술로 보이고 실제로도 다른
+   * 기술이다 — 쿠라노(29)·쿠라노소(30)·수페라쿠라노(31)·엑스쿠라노(77)는 연출이 하나같이 같지만
+   * 아이콘이 저마다 달라 묶을 것이 아니다. 열쇠에 직업·갈래·차수·연출도 함께 넣는다.
    */
+  var TAIL = /\s+\d+$/;
+
+  /** 이름 끝의 세기 숫자를 뗀 밑말. `Mass Strike 3` → `Mass Strike`. */
+  function root(name) { return (name || "").replace(TAIL, ""); }
+
   function fold(rows) {
     if (!folding) { return rows; }
 
     var out = [], where = {};
     rows.forEach(function (row) {
-      var shots = anyOf(row);
-      if (!shots.length) { out.push(row); return; }
-
-      var key = [row["직업"], row["갈래"], row["차수"],
+      var key = [row["직업"], row["갈래"], row["차수"], row["아이콘"], root(row["이름"]),
                  (row["모션"] || []).join(","), (row["이펙트"] || []).join(","),
                  (row["소리"] || []).join(",")].join("|");
 
