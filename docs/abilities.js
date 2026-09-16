@@ -3,11 +3,16 @@
  * 613개를 선행 사슬 트리로 보면 "무엇이 있는지" 가 안 보인다. 아이템 도감과 같은 카드 격자로
  * 바꾸고, 사슬은 카드 안에 「선행」한 줄로 남긴다.
  *
- * 연출은 원작 `efct###.png`(프레임 여러 장이 한 줄) 를 `steps()` 로 넘긴다. 시전자 자세가 아니라
- * **기술이 부르는 연출**이라 기술마다 화면이 다르다. 한글 이름이 정해진 것만 이어져 있어
- * (하데스 쪽에는 이펙트가 없다) 나머지는 「연출 없음」으로 둔다.
+ * 무대에는 **둘**이 선다. 왼쪽이 시전자, 오른쪽이 맞는 쪽이다. 스크립트의 `motion` 은 시전자가
+ * 하는 것이고 `effect @target` 은 맞는 쪽에 걸리는 것이라, 각각 제 자리 위에 얹는다. 둘을 한
+ * 목록으로 합쳐 두었을 때는 전부 샌드백 위에 겹쳐 터져 무엇이 무엇인지 알 수 없었다.
  *
- * 소리는 번호만 안다 — 원작 음원을 아직 안 뽑았고, 자동 재생은 브라우저가 막는다. 번호만 적는다.
+ * 연출은 원작 `efct###.png`(프레임이 한 줄) 를 `steps()` 로 넘긴다. 칸 너비가 연출마다 다르므로
+ * 그림이 실린 뒤 자연 크기를 재서 픽셀로 정한다 — 퍼센트로 두면 시트가 아니라 바닥을 기준으로
+ * 재어 프레임과 어긋난다.
+ *
+ * 소리는 원작 `Legend.dat` 의 `<번호>.mp3` 를 그대로 튼다. 사람이 아직 아무것도 누르지 않은 창에서는
+ * 브라우저가 막으므로, 막히면 조용히 넘긴다.
  */
 (function () {
   "use strict";
@@ -40,7 +45,15 @@
   });
 
   function nameOf(row) { return (typed[row["이름"]] || row["한글"] || "").trim(); }
-  function shotsOf(row) { return (row["연출"] || []).filter(function (n) { return SHOTS["연출"][n]; }); }
+  function drawn(list) { return (list || []).filter(function (n) { return SHOTS["연출"][n]; }); }
+
+  /** 시전자가 하는 것. 캐릭터 위에 얹힌다. */
+  function motionsOf(row) { return drawn(row["모션"]); }
+
+  /** 맞는 쪽에 걸리는 것. 샌드백 위에 얹힌다. */
+  function shotsOf(row) { return drawn(row["이펙트"]); }
+
+  function anyOf(row) { return motionsOf(row).concat(shotsOf(row)); }
 
   function remember(name, value) {
     if (value) { typed[name] = value; } else { delete typed[name]; }
@@ -51,7 +64,7 @@
     if (cls !== "all" && row["직업"] !== cls) { return false; }
     if (kind !== "all" && row["갈래"] !== kind) { return false; }
     if (onlyUnnamed && nameOf(row)) { return false; }
-    if (onlyPlayable && !shotsOf(row).length) { return false; }
+    if (onlyPlayable && !anyOf(row).length) { return false; }
     if (!query) { return true; }
     return (row["이름"] + " " + (row["한글"] || "") + " " + (typed[row["이름"]] || ""))
       .toLowerCase().indexOf(query) >= 0;
@@ -65,28 +78,107 @@
     if (stage) { stage.hidden = true; stage.setAttribute("aria-hidden", "true"); }
   }
 
+  /** 맞는 쪽에 걸리는 연출의 높이. 저마다 크기가 달라 이 높이에 맞춰 줄인다. */
+  var SHOT_HEIGHT = 96;
+
+  /**
+   * 시전자가 하는 연출은 더 작게 둔다. 같은 크기로 두면 사람을 통째로 덮어 버려서, 무엇을 하는
+   * 사람인지가 화면에서 사라진다 — 원작은 사람 위에 그리는 것이 맞지만, 여기서 보려는 것은
+   * 「이 기술을 쓰면 시전자가 무엇을 하고 맞는 쪽에 무엇이 걸리나」 이다.
+   */
+  var MOTION_HEIGHT = 68;
+
+  /**
+   * 한 연출을 그 자리에 세운다. 시트는 프레임이 한 줄로 늘어서 있고 칸 너비가 연출마다 다르므로,
+   * 그림이 실제로 실린 뒤 자연 크기를 재서 픽셀로 정한다.
+   *
+   * 예전에는 칸 너비를 `100 / 프레임수` 퍼센트로 두었는데, 그 퍼센트는 시트가 아니라 **바닥**을
+   * 기준으로 재는 값이라 프레임과 아무 상관이 없었다. 게다가 시트 자체가 열여섯 칸 격자로 그려져
+   * 있어 뒤쪽 칸이 전부 비어 있었다 — 그래서 화면에서는 그냥 정지된 그림으로 보였다.
+   */
+  function shotOn(place, number, delay, height) {
+    var info = SHOTS["연출"][number];
+    if (!info) { return; }
+
+    var shot = el("i", "shot");
+    var sheet = new Image();
+
+    sheet.onload = function () {
+      var frames = info["프레임"];
+      var scale = height / sheet.naturalHeight;
+      var wide = sheet.naturalWidth * scale;
+
+      shot.style.width = (wide / frames) + "px";
+      shot.style.height = height + "px";
+      shot.style.backgroundImage = "url(" + sheet.src + ")";
+      shot.style.backgroundSize = wide + "px " + height + "px";
+      shot.style.setProperty("--frames", frames);
+      shot.style.setProperty("--sheet", (-wide) + "px");
+      shot.style.animationDelay = delay + "s";
+      shot.classList.add("playing");
+    };
+
+    sheet.src = "ui/assets/ability-effects/" + info["파일"];
+    place.appendChild(shot);
+  }
+
+  /**
+   * 기술이 부르는 소리. 번호가 그대로 `Legend.dat` 의 `<번호>.mp3` 다.
+   * 브라우저는 사람이 아직 아무것도 누르지 않은 창에서 소리를 막는다 — 막히면 조용히 넘긴다.
+   */
+  function playSound(row) {
+    var numbers = row["소리"] || [];
+    if (!numbers.length) { return; }
+
+    var sound = new Audio("ui/assets/ability-sounds/" + numbers[0] + ".mp3");
+    sound.volume = 0.5;
+    var played = sound.play();
+    if (played && played.catch) { played.catch(function () { /* 창이 아직 조용하다 */ }); }
+  }
+
   function playStage(row, anchor) {
     if (!stage) { return; }
-    var shots = shotsOf(row);
+    var motions = motionsOf(row), shots = shotsOf(row);
     stage.replaceChildren();
 
     var floor = el("div", "sandbag-floor");
-    floor.appendChild(el("i", "sandbag"));            // 맞는 쪽 — 연출이 이 위에 얹힌다
-    shots.forEach(function (number, index) {
-      var info = SHOTS["연출"][number];
-      var shot = el("i", "sandbag-shot");
-      shot.style.backgroundImage = "url(ui/assets/ability-effects/" + info["파일"] + ")";
-      shot.style.width = (100 / info["프레임"]) + "%";
-      shot.style.setProperty("--frames", info["프레임"]);
-      shot.style.setProperty("--delay", (index * 0.45) + "s");
-      floor.appendChild(shot);
+
+    // 왼쪽이 시전자, 오른쪽이 맞는 쪽. 모션은 시전자 위에, 이펙트는 샌드백 위에 얹는다 —
+    // 둘을 한 목록으로 합쳐 두었을 때는 전부 샌드백 위에 겹쳐 터져서 무엇이 무엇인지 알 수 없었다.
+    var caster = el("div", "stage-side caster");
+
+    // 사람도 같이 움직여야 한다. 연출만 터지면 「무엇이 터졌나」는 보여도 「누가 무엇을 했나」는
+    // 안 보인다. 원작 공격 시트의 앞모습 두 칸을 넘긴다.
+    var hero = el("i", "hero");
+    if (motions.length) { hero.classList.add("striking"); }
+    caster.appendChild(hero);
+
+    motions.forEach(function (number, index) {
+      shotOn(caster, number, index * 0.45, MOTION_HEIGHT);
     });
+
+    var target = el("div", "stage-side target");
+    target.appendChild(el("i", "sandbag"));
+    shots.forEach(function (number, index) {
+      shotOn(target, number, 0.15 + index * 0.45, SHOT_HEIGHT);
+    });
+
+    floor.appendChild(caster);
+    floor.appendChild(target);
     stage.appendChild(floor);
+
+    playSound(row);
 
     var caption = el("div", "sandbag-caption");
     caption.appendChild(el("b", "", nameOf(row) || row["이름"]));
-    caption.appendChild(el("span", "", shots.length
-      ? "연출 " + shots.join(" · ") + (row["소리"] && row["소리"].length ? " · 소리 " + row["소리"].join(",") : "")
+
+    var said = [];
+    if (motions.length) { said.push("모션 " + motions.join("·")); }
+    if (shots.length) { said.push("이펙트 " + shots.join("·")); }
+    if ((row["소리"] || []).length) { said.push("소리 " + row["소리"].join("·")); }
+
+    caption.appendChild(el("span", "", said.length
+      ? said.join(" · ")
       : "이 기술의 연출은 아직 이어지지 않았어요"));
     stage.appendChild(caption);
 
@@ -103,7 +195,7 @@
   function card(row) {
     var article = el("article", "ability-card");
     if (!nameOf(row)) { article.classList.add("is-unnamed"); }
-    if (shotsOf(row).length) { article.classList.add("is-playable"); }
+    if (anyOf(row).length) { article.classList.add("is-playable"); }
 
     var icon = el("i", "ability-icon");
     var sheet = row["갈래"] === "기술" ? "skill" : "spell";
@@ -121,7 +213,9 @@
     meta.appendChild(el("span", "ability-kind", row["갈래"]));
     meta.appendChild(el("span", "ability-cls", row["직업"]));
     if (row["레벨"]) { meta.appendChild(el("span", "ability-lv", "Lv" + row["레벨"])); }
-    if (shotsOf(row).length) { meta.appendChild(el("span", "ability-play", "연출 " + shotsOf(row).length)); }
+    // 모션만 있고 이펙트가 없는 기술이 있다(투핸드어택). 이펙트만 세면 그런 것은 "연출 없음"으로
+    // 보이는데 실제로는 시전자가 움직인다.
+    if (anyOf(row).length) { meta.appendChild(el("span", "ability-play", "연출 " + anyOf(row).length)); }
     article.appendChild(meta);
 
     if (row["선행"]) { article.appendChild(el("p", "ability-pre", "선행 " + row["선행"])); }
@@ -173,7 +267,7 @@
     $("ability-pager-label").textContent = (page + 1) + " / " + pages + " 쪽";
 
     var named = ALL.filter(function (r) { return nameOf(r); }).length;
-    var playable = ALL.filter(function (r) { return shotsOf(r).length; }).length;
+    var playable = ALL.filter(function (r) { return anyOf(r).length; }).length;
     $("ability-total").textContent = ALL.length.toLocaleString("ko-KR");
     $("ability-named").textContent = named + " (" + Math.round((named / ALL.length) * 100) + "%)";
     $("ability-playable").textContent = playable.toLocaleString("ko-KR");

@@ -99,7 +99,11 @@ def main():
                 else:
                     korean, source = "", "미확정"
                 media = effects.get(korean) if korean else None
-                shots, sounds = [], []
+                # 모션과 이펙트를 갈라 둔다. 둘은 같은 번호 공간을 쓰지만 **얹히는 데가 다르다** —
+                # 모션은 시전자가 하는 것이고 이펙트는 맞는 쪽에 걸리는 것이다. 한 목록으로 합쳐
+                # 두었더니 화면이 어느 것을 캐릭터에 두고 어느 것을 샌드백에 둘지 알 수가 없어
+                # 둘 다 샌드백 위에 겹쳐 터졌다.
+                motions, shots, sounds = [], [], []
                 if media:
                     for level in media["레벨"]:
                         for directive in level["이펙트"]:
@@ -107,12 +111,12 @@ def main():
                             if found and int(found.group(1)) not in shots:
                                 shots.append(int(found.group(1)))
                         for pair in level["모션"]:
-                            if pair[0] not in shots:
-                                shots.append(pair[0])
+                            if pair[0] not in motions:
+                                motions.append(pair[0])
                         for number in level["사운드"]:
                             if number not in sounds:
                                 sounds.append(number)
-                listed.append({"연출": shots, "소리": sounds,
+                listed.append({"모션": motions, "이펙트": shots, "소리": sounds,
                                "이름": name, "한글": korean, "한글자동": automatic,
                                "한글수정": corrected if corrected != automatic else "",
                                "이름출처": source, "선행": r.get("requires") or "",

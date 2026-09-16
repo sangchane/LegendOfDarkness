@@ -11,6 +11,10 @@
 
 394 번까지 있지만 기술이 실제로 부르는 것은 83 개뿐이라 그것만 뽑는다.
 
+`투명` 과 `row` 를 붙여야 한다. 바탕이 있으면 샌드백 위에 검은 네모가 얹히고, 격자로 두면 칸이
+남아 읽는 쪽이 `가로 ÷ 프레임수` 로 자를 때 빈 칸을 프레임으로 센다 — 네 프레임짜리가 열여섯 칸
+판에 그려져 첫 칸만 그림이고 나머지는 바탕뿐이었다. 화면에서는 「정지된 그림」으로 보인다.
+
   쓰는 법: python3 scripts/build-ability-sprites.py
   산출물:  docs/ui/assets/ability-effects/efct###.png · ability-effects.json
 """
@@ -79,7 +83,8 @@ def main():
         out = DEST / f"{name}.png"
         proc = subprocess.run(
             ["dotnet", "run", "--project", str(ROOT / "tools" / "dat-extract"), "-c", "Release", "--",
-             "epf", str(ARCHIVE), name, str(out), "16", "2", f"eff{palette:03d}.pal"],
+             "epf", str(ARCHIVE), name, str(out), "1", "2", f"eff{palette:03d}.pal",
+             "투명", "row"],
             capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
         frames = re.search(rf"{name}\.epf: 프레임 (\d+)개", proc.stdout)
         if not frames or not out.exists():

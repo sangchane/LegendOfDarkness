@@ -383,6 +383,15 @@ internal static class Program
         int columns = args.Length > 4 ? int.Parse(args[4]) : 12;
         int zoom = args.Length > 5 ? int.Parse(args[5]) : 3;
 
+        // 연출을 남의 그림 위에 얹으려면 바탕이 비어 있어야 한다. 기본은 어두운 판을 깔고 그리는데,
+        // 그러면 샌드백 위에 검은 네모가 얹힌다.
+        bool transparent = args.Any(given => given is "투명" or "transparent");
+
+        // 한 줄로, 프레임 수만큼만. 격자로 두면 칸이 남아, 읽는 쪽이 `가로 ÷ 프레임수` 로 자를 때 빈
+        // 칸을 프레임으로 센다 — 실제로 네 프레임짜리가 열여섯 칸 판에 그려져 첫 칸에만 그림이 있고
+        // 나머지 셋은 바탕뿐이었다. 화면에서는 「정지된 그림」으로 보인다.
+        bool oneRow = args.Any(given => given.Equals("row", StringComparison.OrdinalIgnoreCase));
+
         // khan2.dat carries the women's pieces but no palettes of its own; they live in khan.dat. Interface
         // art has no slot table to look a palette up in, so there the same argument names one outright.
         string? named = args.Length > 6 && args[6].EndsWith(".pal", StringComparison.OrdinalIgnoreCase)
@@ -439,7 +448,7 @@ internal static class Program
             return 2;
         }
 
-        await Sprites.Save(output, cells, columns, zoom);
+        await Sprites.Save(output, cells, oneRow ? cells.Count : columns, zoom, transparent);
         Console.WriteLine($"{chosen.Count}개 파일 · 프레임 {cells.Count}개를 {output} 에 그렸습니다.");
 
         return 0;

@@ -161,14 +161,23 @@
 .ability-card .ability-name:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--brand);outline:0}
 
 .ability-stage{position:fixed;z-index:60;top:0;left:0;width:228px;border-radius:16px;background:#101218;padding:14px;box-shadow:0 12px 34px #191f2833;pointer-events:none}
-.sandbag-floor{position:relative;height:132px;border-radius:12px;background:radial-gradient(120% 80% at 50% 100%,#232838,#141722);overflow:hidden}
-.sandbag{position:absolute;left:50%;bottom:16px;width:34px;height:58px;margin-left:-17px;border-radius:17px 17px 7px 7px;background:linear-gradient(#b98a52,#8a6238 62%,#6a4a2a);box-shadow:inset 0 -6px 10px #0006}
+.sandbag-floor{position:relative;display:flex;align-items:flex-end;justify-content:space-around;gap:8px;height:146px;padding:0 10px 16px;border-radius:12px;background:radial-gradient(120% 80% at 50% 100%,#232838,#141722);overflow:hidden}
+.stage-side{position:relative;display:flex;align-items:flex-end;justify-content:center;width:46%;height:100%}
+/* 그림자 — 둘이 같은 바닥에 서 있어 보이게 한다 */
+.stage-side::after{content:"";position:absolute;left:50%;bottom:6px;width:52px;height:9px;margin-left:-26px;border-radius:50%;background:#0006}
+/* 시전자. 원작 걷기 시트의 앞모습 한 칸으로 서 있다가, 기술을 쓰면 공격 시트 두 칸을 넘긴다.
+   공격 시트는 212x85 에 네 칸(뒤 둘·앞 둘)이라 앞모습은 -106px 부터다. */
+.hero{position:relative;z-index:3;width:47px;height:83px;background:url(ui/assets/hero-walk.png) -282px 0 no-repeat;image-rendering:pixelated}
+.hero.striking{width:53px;height:85px;background-image:url(ui/assets/hero-attack.png);background-position:-106px 0;animation:hero-strike .5s steps(2) 2 both}
+@keyframes hero-strike{from{background-position-x:-106px}to{background-position-x:-212px}}
+.sandbag{position:relative;z-index:1;width:34px;height:58px;margin-bottom:6px;border-radius:17px 17px 7px 7px;background:linear-gradient(#b98a52,#8a6238 62%,#6a4a2a);box-shadow:inset 0 -6px 10px #0006}
 .sandbag::after{content:"";position:absolute;inset:auto 0 12px;height:5px;background:#5a3f24}
-.sandbag-floor::after{content:"";position:absolute;left:50%;bottom:12px;width:58px;height:9px;margin-left:-29px;border-radius:50%;background:#0006}
-.sandbag-shot{position:absolute;left:50%;bottom:20px;height:100%;background-repeat:no-repeat;background-size:auto 100%;image-rendering:pixelated;transform:translateX(-50%);animation:sandbag-frames .6s steps(var(--frames)) var(--delay) 2 both}
-@keyframes sandbag-frames{from{background-position:0 0;opacity:1}to{background-position:-100% 0;opacity:1}}
+/* 연출. 자리·크기·프레임 수는 abilities.js 가 그림의 자연 크기를 재서 픽셀로 넣는다 */
+.shot{position:absolute;left:50%;bottom:10px;z-index:2;background-repeat:no-repeat;image-rendering:pixelated;transform:translateX(-50%);opacity:0}
+.shot.playing{animation:shot-frames .7s steps(var(--frames)) 2 both}
+@keyframes shot-frames{from{background-position-x:0;opacity:1}to{background-position-x:var(--sheet);opacity:1}}
 .sandbag-caption{margin-top:10px}
 .sandbag-caption b{display:block;color:#f3f4f6;font:700 13px var(--sans)}
 .sandbag-caption span{display:block;margin-top:2px;color:#9aa3b2;font:500 11px var(--mono)}
-@media(prefers-reduced-motion:reduce){.sandbag-shot{animation:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.shot.playing,.hero.striking{animation:none}.shot.playing{opacity:1}}
 @media(max-width:780px){.ability-stage{left:50%;width:min(280px,92vw);transform:none!important;inset-block:auto 14px;margin-left:min(-140px,-46vw)}}
