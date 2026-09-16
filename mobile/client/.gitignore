@@ -5,3 +5,5 @@ obj/
 build/
 android/
 server.cfg
+login.cfg
+hunt.cfg

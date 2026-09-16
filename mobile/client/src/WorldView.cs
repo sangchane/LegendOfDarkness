@@ -14,6 +14,9 @@ namespace LodClient;
 public sealed partial class WorldView(WorldClient? server = null) : Control
 {
     private const string FloorPath = "res://assets/world/safehouse.png";
+
+    /// <summary>Where the per-map floor pictures live, named <c>map&lt;번호&gt;.png</c>.</summary>
+    private const string FloorFolder = "res://assets/world/";
     private const string HeroSheet = "res://assets/actor/hero-walk.png";
     private const string HeroStrikeSheet = "res://assets/actor/hero-attack.png";
 
@@ -46,6 +49,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private bool _dressedOnce;
     private Vector2 _floorSize;
 
+    /// <summary>Which map's picture is down, so it is only swapped when the map actually changes.</summary>
+    private int _floored = -1;
+
     // The tile we believe we are on. A walk moves it straight away, because the server answers an allowed
     // step with silence; when it does speak, it wins.
     private Tile _tile;
@@ -73,6 +79,29 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private int _rehearsedStrike = -1;
 
     private Queue<Direction> _rehearsal = new();
+
+    /// <summary>Frames since the hunt started. Everything it does is paced off this rather than a timer.</summary>
+    private int _hunted;
+
+    /// <summary>Which way it walks while nothing is in sight.</summary>
+    private Direction _heading = Direction.North;
+
+    /// <summary>Where the last roaming step started, so a step that did not land can be noticed.</summary>
+    private Tile _roamedFrom;
+
+    /// <summary>한 번 휘두르는 간격(프레임). 60프레임이 1초다.</summary>
+    private const int SwingFrames = 40;
+
+    /// <summary>점수를 한 점 쓰는 간격(프레임).</summary>
+    private const int SpendFrames = 30;
+
+    /// <summary>쫓는 중에 자리가 이만큼 그대로면 그 괴물은 갈 수 없는 곳에 있다고 본다.</summary>
+    private const int StuckTicks = 40;
+
+    /// <summary>쫓기 시작한 자리. 서버가 말한 칸이다 — 이 클라이언트가 믿는 칸이 아니다.</summary>
+    private Tile _chasedFrom;
+
+    private int _stuck;
 
     private Vector2 _from;
     private Vector2 _to;
@@ -662,6 +691,150 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     public uint Target => _target;
 
     /// <summary>
+    /// Plays the character by itself: walks to the nearest monster, swings at it, and spends the points a
+    /// level hands out. Only runs when the build was told to (<c>--hunt</c>, or a shipped `hunt.cfg`).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Why it lives in the client and not outside it.</b> Skills, motion, sound and the flash a blow
+    /// makes are all drawn here. A character driven from another connection leaves this screen showing
+    /// somebody standing still, and then the only thing a run can check is the server's arithmetic.
+    /// </para>
+    /// <para>
+    /// It moves at the pace a thumb would. The server rejects steps sent faster than
+    /// <c>WalkingSpeedLimitFactor</c> and puts the character back where it was, which on screen reads as
+    /// teleporting, and a swing sent before the last one finished is refused in words.
+    /// </para>
+    /// <para>
+    /// 우드랜드1-1 은 60×60 — 3,600칸에 괴물이 50마리다. 화면에 보이는 것은 열두 칸 안이라, 서 있으면
+    /// 아무것도 지나가지 않는다. 그래서 보이지 않을 때는 걸어서 찾고, 벽에 막히면 방향을 튼다.
+    /// </para>
+    /// </remarks>
+    private void HuntOnItsOwn()
+    {
+        if (!Main.Hunting || server is null || Frozen || _walked >= 0)
+        {
+            return;
+        }
+
+        _hunted++;
+
+        SpendAPoint();
+
+        Tile standing = server.State?.Where ?? _tile;
+
+        if (Nearest() is not { } prey)
+        {
+            _stuck = 0;
+            Roam();
+            return;
+        }
+
+        int dx = prey.X - standing.X, dy = prey.Y - standing.Y;
+
+        if (Math.Abs(dx) + Math.Abs(dy) <= 1)
+        {
+            _stuck = 0;
+            Face(dx, dy);
+
+            // 한 번 휘두르고 서버가 허락하는 간격만큼 쉰다. GlobalBaseSkillDelay 가 500ms 다.
+            if (_hunted % SwingFrames == 0)
+            {
+                Strike();
+            }
+
+            return;
+        }
+
+        // 벽 너머의 괴물은 보이기는 해도 갈 수 없다. 가장 가까운 한 마리만 보고 걸으면 그 벽에 대고
+        // 영원히 걷게 된다 — 실제로 이것 때문에 (14,50) 에서 멈춰 있었다. 그래서 자리가 한참 그대로면
+        // 그 한 마리를 잊고 방향을 튼다.
+        _stuck = standing == _chasedFrom ? _stuck + 1 : 0;
+        _chasedFrom = standing;
+
+        if (_stuck > StuckTicks)
+        {
+            _stuck = 0;
+            _heading = (Direction)((((int)_heading) + 1) % 4);
+            Roam();
+            return;
+        }
+
+        Walk(Toward(dx, dy));
+    }
+
+    /// <summary>Faces the neighbouring tile without stepping onto it, so a swing lands the right way.</summary>
+    private void Face(int dx, int dy)
+    {
+        _player.Face(Toward(dx, dy));
+        _ = server?.TurnAsync(Toward(dx, dy), _leaving.Token);
+    }
+
+    private static Direction Toward(int dx, int dy) =>
+        Math.Abs(dx) >= Math.Abs(dy)
+            ? (dx >= 0 ? Direction.East : Direction.West)
+            : (dy >= 0 ? Direction.South : Direction.North);
+
+    /// <summary>The nearest monster's tile, or nothing when none is in sight.</summary>
+    private Tile? Nearest() =>
+        server?.Creatures
+            .Where(beast => beast.Kind == CreatureKind.Hostile)
+            .OrderBy(beast => Math.Abs(beast.Where.X - _tile.X) + Math.Abs(beast.Where.Y - _tile.Y))
+            .Select(beast => (Tile?)beast.Where)
+            .FirstOrDefault();
+
+    /// <summary>Walks on looking for something to fight, turning when the last step did not land.</summary>
+    /// <remarks>
+    /// Whether the step landed is asked of the <b>server</b>, not of what this client believes. A step is
+    /// drawn the moment it is asked for — that is what keeps walking from lagging a third of a second — so
+    /// the client's own tile moves even into a wall, and comparing against it says "we moved" every time.
+    /// The character then walks into the same wall for ever, which is exactly what it did.
+    /// </remarks>
+    private void Roam()
+    {
+        // 걸음 간격은 이미 _walked 가 잰다 — 한 걸음이 끝나기 전에는 여기 오지도 않는다. 그 위에 프레임
+        // 제동을 하나 더 걸었더니 막힌 자리에서 한 걸음에 13초가 걸렸다.
+        Tile standing = server?.State?.Where ?? _tile;
+
+        if (standing == _roamedFrom)
+        {
+            _heading = (Direction)((((int)_heading) + 1) % 4);
+        }
+
+        _roamedFrom = standing;
+        Walk(_heading);
+    }
+
+    /// <summary>
+    /// Puts one unspent point on whichever attribute is furthest from the Monk build. One point at a time,
+    /// because the server takes one per packet.
+    /// </summary>
+    private void SpendAPoint()
+    {
+        if (_hunted % SpendFrames != 0 || server?.Vitals is not { Unspent: > 0 } mine)
+        {
+            return;
+        }
+
+        (Stat Which, int Want, int Have)[] build =
+        [
+            (Stat.Con, 65, mine.Con), (Stat.Str, 77, mine.Str),
+            (Stat.Int, 43, mine.Int), (Stat.Wis, 36, mine.Wis)
+        ];
+
+        Stat? next = build
+            .Where(want => want.Want > want.Have)
+            .OrderByDescending(want => want.Want - want.Have)
+            .Select(want => (Stat?)want.Which)
+            .FirstOrDefault();
+
+        if (next is { } which)
+        {
+            _ = server.RaiseAsync(which, _leaving.Token);
+        }
+    }
+
+    /// <summary>
     /// Swings at whatever stands in front of us. Nothing is assumed about the result — the server knows
     /// where everyone is and how recently we last swung, and answers in words when it refuses.
     /// </summary>
@@ -722,6 +895,44 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
     }
 
+    /// <summary>
+    /// Puts the map we are standing on under our feet. One picture per map, drawn ahead of time from the
+    /// map file and the original tileset, and named by the map's own number.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The floor used to be one fixed picture — the safe house — whatever map the server said we were on.
+    /// On a 60×60 hunting zone that picture covers a corner and everything past it is black, which is what
+    /// made 우드랜드 look like the room a new character wakes in with a different name on it.
+    /// </para>
+    /// <para>
+    /// The pictures are drawn by <c>tools/dat-extract map &lt;seo.dat&gt; &lt;맵파일&gt; &lt;가로&gt;
+    /// &lt;세로&gt; &lt;출력&gt;</c>, which lays tiles out with exactly the arithmetic
+    /// <see cref="IsometricFloor" /> uses, so a tile in the picture sits where a figure standing on that
+    /// tile is drawn. A map with no picture keeps the old floor rather than showing nothing.
+    /// </para>
+    /// </remarks>
+    private void LayTheFloor(MapInfo map)
+    {
+        if (map.Id == _floored)
+        {
+            return;
+        }
+
+        _floored = map.Id;
+
+        string path = $"{FloorFolder}map{map.Id}.png";
+
+        if (!ResourceLoader.Exists(path))
+        {
+            GD.Print($"바닥 그림이 없습니다: {path} ({map.Name})");
+            return;
+        }
+
+        _floor.Texture = GD.Load<Texture2D>(path);
+        _floorSize = _floor.Texture.GetSize();
+    }
+
     /// <summary>Takes the server's word for where we are, whenever it gives one.</summary>
     private void Listen()
     {
@@ -732,6 +943,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         _heard = server.PositionReports;
         _rows = state.Map.Rows;
+        LayTheFloor(state.Map);
 
         if (state.Where == _tile)
         {
@@ -753,6 +965,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Herd();
         Swings();
         RehearseAPick();
+        HuntOnItsOwn();
 
         if (_walked < 0 && _rehearsal.Count > 0)
         {

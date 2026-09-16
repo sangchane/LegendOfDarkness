@@ -30,6 +30,12 @@ public partial class Main : Control
     // 고쳐야 한다. 그래서 빌드에 함께 실리는 이 파일에서 읽는다 — 커밋되지 않는다(.gitignore).
     private const string ServerFile = "res://server.cfg";
 
+    /// <summary>계정이 적혀 있으면 화면을 거치지 않고 바로 들어간다. `server.cfg` 와 같은 자리에 둔다.</summary>
+    private const string LoginFile = "res://login.cfg";
+
+    /// <summary>이 파일이 실려 있으면 캐릭터가 스스로 사냥한다. 실기기가 인자를 못 받아 파일로 켠다.</summary>
+    private const string HuntFile = "res://hunt.cfg";
+
     /// <summary>환경변수로도 준다. 데스크톱에서 인자 없이 다른 서버를 가리킬 때 쓴다.</summary>
     private const string ServerVariable = "LOD_SERVER";
 
@@ -95,6 +101,16 @@ public partial class Main : Control
     public static bool Striking { get; private set; }
 
     /// <summary>
+    /// Whether the character hunts on its own, as <c>--hunt</c> or by shipping a `hunt.cfg`. It walks the
+    /// zone, swings at what it meets and spends the points a level hands out.
+    /// </summary>
+    /// <remarks>
+    /// 이것이 있어야 기술·모션·소리·이펙트를 **실기기 화면에서** 확인할 수 있다. 밖에서 딴 연결로
+    /// 캐릭터를 굴리면 화면에 있는 캐릭터는 가만히 서 있고, 확인되는 것은 서버 수치뿐이다.
+    /// </remarks>
+    public static bool Hunting { get; private set; }
+
+    /// <summary>
     /// Whether to tap the nearest thing lying on the floor, as <c>--lift</c>. A real tap on its picture,
     /// so what it checks is the arithmetic a thumb goes through — not just the command underneath it.
     /// </summary>
@@ -126,6 +142,15 @@ public partial class Main : Control
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OnGear = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
+        Hunting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--hunt") >= 0
+            || Godot.FileAccess.FileExists(HuntFile);
+
+        // 사냥은 사람이 손대지 않는 채로 오래 돈다. iOS 는 화면이 꺼지면 앱을 재우고, 그러면 _Process 가
+        // 멈춰 캐릭터가 그 자리에 굳는다 — 접속은 살아 있어서 서버 쪽에서는 멀쩡해 보인다.
+        if (Hunting)
+        {
+            DisplayServer.ScreenSetKeepOn(true);
+        }
         Lifting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--lift") >= 0;
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
@@ -318,13 +343,32 @@ public partial class Main : Control
         return line.Length > 0 && !line.StartsWith('#') ? line : null;
     }
 
+    /// <summary>
+    /// 빌드에 함께 실리는 `login.cfg` 의 첫 줄(`name:secret`). `server.cfg` 와 같은 이유로 둔다 — 실기기는
+    /// 아이콘을 탭해 여는 것이 전부라 `--login` 을 줄 수 없고, 그러면 화면 앞에 사람이 없을 때 아무도
+    /// 들어갈 수 없다. 파일은 커밋하지 않으므로 저장소에 계정이 남지 않는다.
+    /// </summary>
+    private static string? LoginFromFile()
+    {
+        if (!Godot.FileAccess.FileExists(LoginFile))
+        {
+            return null;
+        }
+
+        using Godot.FileAccess file = Godot.FileAccess.Open(LoginFile, Godot.FileAccess.ModeFlags.Read);
+        string line = file?.GetLine().Trim() ?? string.Empty;
+
+        return line.Length > 0 && !line.StartsWith('#') ? line : null;
+    }
+
     private static void ReadRehearsal(string value)
     {
-        int split = value.IndexOf(':');
+        string given = value.Length > 0 ? value : LoginFromFile() ?? string.Empty;
+        int split = given.IndexOf(':');
 
-        if (split > 0 && split < value.Length - 1)
+        if (split > 0 && split < given.Length - 1)
         {
-            Rehearsal = (value[..split], value[(split + 1)..]);
+            Rehearsal = (given[..split], given[(split + 1)..]);
         }
     }
 
