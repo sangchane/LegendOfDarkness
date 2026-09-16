@@ -46,13 +46,20 @@ internal static class LoginFlow
     }
 
     /// <summary>Runs the handshake and the lobby redirect, and hands back the connection they lead to.</summary>
-    public static LoginSession OpenSession(IsolatedHadesServer server)
+    public static LoginSession OpenSession(IsolatedHadesServer server) => OpenSession(server.LoginPort);
+
+    /// <summary>
+    /// The same handshake against a login port named directly, for the server a person is looking at rather
+    /// than a throwaway one. The lobby sends the connection back to the port it came from either way, so the
+    /// guard below still holds.
+    /// </summary>
+    public static LoginSession OpenSession(int loginPort)
     {
         List<string> observed = [];
         PacketFrame parameters;
         RedirectTarget lobbyTarget;
 
-        using (Hades718TestClient lobby = Hades718TestClient.Connect(server.LoginPort))
+        using (Hades718TestClient lobby = Hades718TestClient.Connect(loginPort))
         {
             observed.Add(Describe("S2C", lobby.Receive().Command));
 
@@ -70,7 +77,7 @@ internal static class LoginFlow
             observed.Add(Describe("S2C", lobbyRedirect.Command));
 
             lobbyTarget = Hades718TestClient.ParseRedirect(lobbyRedirect);
-            RequireIsolatedPort(lobbyTarget.Port, server.LoginPort, "lobby");
+            RequireIsolatedPort(lobbyTarget.Port, loginPort, "lobby");
         }
 
         Hades718TestClient login = Hades718TestClient.Connect(lobbyTarget.Port);
@@ -89,13 +96,17 @@ internal static class LoginFlow
     /// Asks the server to create an account and character. Hanging up is a fine answer to a name the server
     /// dislikes, so a closed connection is not treated as a failure here.
     /// </summary>
-    public static void TryCreateAccount(IsolatedHadesServer server, string name)
+    public static void TryCreateAccount(IsolatedHadesServer server, string name) =>
+        TryCreateAccount(server.LoginPort, name, SyntheticSecret);
+
+    /// <summary>The same, against a login port named directly and with a secret a person can type.</summary>
+    public static void TryCreateAccount(int loginPort, string name, string secret)
     {
-        using LoginSession session = OpenSession(server);
+        using LoginSession session = OpenSession(loginPort);
 
         try
         {
-            session.Client.SendSecured(CreateAccountCommand, ordinal: 0, Credentials(name, SyntheticSecret));
+            session.Client.SendSecured(CreateAccountCommand, ordinal: 0, Credentials(name, secret));
             session.Client.Receive();
 
             session.Client.SendSecured(CreateCharacterCommand, ordinal: 0, 0x01, 0x01, 0x01);
