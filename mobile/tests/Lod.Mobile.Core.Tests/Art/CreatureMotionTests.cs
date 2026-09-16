@@ -28,23 +28,41 @@ public sealed class CreatureMotionTests
     [Fact]
     public void Walking_runs_through_that_creatures_own_frames_and_starts_again()
     {
-        Assert.Equal([0, 1, 0, 1], Steps(Wasp, walk: true, count: 4));
-        Assert.Equal([0, 1, 2, 0, 1, 2], Steps(Restless, walk: true, count: 6));
-        Assert.Equal([0, 1, 2, 3, 4, 0], Steps(Big, walk: true, count: 6));
+        Assert.Equal([0, 1, 0, 1], Steps(Wasp, Side.Back, walk: true, count: 4));
+        Assert.Equal([0, 1, 2, 0, 1, 2], Steps(Restless, Side.Back, walk: true, count: 6));
+        Assert.Equal([0, 1, 2, 3, 4, 0], Steps(Big, Side.Back, walk: true, count: 6));
     }
 
     [Fact]
     public void Swinging_starts_where_that_creatures_blow_starts()
     {
-        Assert.Equal([4, 5, 4], Steps(Wasp, walk: false, count: 3));
-        Assert.Equal([6, 6, 6], Steps(Restless, walk: false, count: 3));
-        Assert.Equal([10, 11, 10], Steps(Big, walk: false, count: 3));
+        Assert.Equal([4, 5, 4], Steps(Wasp, Side.Back, walk: false, count: 3));
+        Assert.Equal([6, 6, 6], Steps(Restless, Side.Back, walk: false, count: 3));
+        Assert.Equal([10, 11, 10], Steps(Big, Side.Back, walk: false, count: 3));
+    }
+
+    /// <summary>
+    /// Every stretch is drawn twice, back first and then front, the same count each — the header gives the
+    /// start and the count of one of them. That is why each sheet above holds exactly twice its walk and
+    /// blow: the wasp's 2 + 2 is 8, the big one's 5 + 2 is 14. A creature coming towards us is on the second.
+    /// </summary>
+    [Fact]
+    public void Seen_from_the_front_a_creature_uses_the_second_drawing_of_each_stretch()
+    {
+        Assert.Equal([2, 3, 2, 3], Steps(Wasp, Side.Front, walk: true, count: 4));
+        Assert.Equal([3, 4, 5, 3], Steps(Restless, Side.Front, walk: true, count: 4));
+        Assert.Equal([5, 6, 7, 8, 9, 5], Steps(Big, Side.Front, walk: true, count: 6));
+
+        Assert.Equal([6, 7, 6], Steps(Wasp, Side.Front, walk: false, count: 3));
+        Assert.Equal([7, 7, 7], Steps(Restless, Side.Front, walk: false, count: 3));
+        Assert.Equal([12, 13, 12], Steps(Big, Side.Front, walk: false, count: 3));
     }
 
     [Fact]
     public void Standing_shows_the_standing_frame_when_there_is_one()
     {
-        Assert.Equal(0, Wasp.Stand());
+        Assert.Equal(0, Wasp.Stand(Side.Back));
+        Assert.Equal(2, Wasp.Stand(Side.Front));
     }
 
     /// <summary>
@@ -55,8 +73,9 @@ public sealed class CreatureMotionTests
     [Fact]
     public void A_creature_that_cannot_stand_still_shows_its_first_walking_frame()
     {
-        Assert.Equal(0, Restless.Stand());
-        Assert.Equal(0, Big.Stand());
+        Assert.Equal(0, Restless.Stand(Side.Back));
+        Assert.Equal(0, Big.Stand(Side.Back));
+        Assert.Equal(5, Big.Stand(Side.Front));
     }
 
     [Fact]
@@ -64,12 +83,15 @@ public sealed class CreatureMotionTests
     {
         foreach (CreatureMotion one in new[] { Wasp, Restless, Big })
         {
-            Assert.InRange(one.Stand(), 0, one.Frames - 1);
-
-            for (int step = 0; step < 20; step++)
+            foreach (Side side in new[] { Side.Back, Side.Front })
             {
-                Assert.InRange(one.Walk(step), 0, one.Frames - 1);
-                Assert.InRange(one.Strike(step), 0, one.Frames - 1);
+                Assert.InRange(one.Stand(side), 0, one.Frames - 1);
+
+                for (int step = 0; step < 20; step++)
+                {
+                    Assert.InRange(one.Walk(side, step), 0, one.Frames - 1);
+                    Assert.InRange(one.Strike(side, step), 0, one.Frames - 1);
+                }
             }
         }
     }
@@ -78,8 +100,8 @@ public sealed class CreatureMotionTests
     [Fact]
     public void Walking_backwards_stays_inside_the_sheet()
     {
-        Assert.InRange(Wasp.Walk(-1), 0, Wasp.Frames - 1);
-        Assert.InRange(Big.Walk(-7), 0, Big.Frames - 1);
+        Assert.InRange(Wasp.Walk(Side.Back, -1), 0, Wasp.Frames - 1);
+        Assert.InRange(Big.Walk(Side.Front, -7), 0, Big.Frames - 1);
     }
 
     /// <summary>A creature whose file says nothing still has to draw something rather than nothing.</summary>
@@ -88,9 +110,12 @@ public sealed class CreatureMotionTests
     {
         CreatureMotion silent = CreatureMotion.Read("frames 1\nstand 0 0\nwalk 0 0\nattack 0 0\n")!;
 
-        Assert.Equal(0, silent.Stand());
-        Assert.Equal(0, silent.Walk(3));
-        Assert.Equal(0, silent.Strike(2));
+        foreach (Side side in new[] { Side.Back, Side.Front })
+        {
+            Assert.Equal(0, silent.Stand(side));
+            Assert.Equal(0, silent.Walk(side, 3));
+            Assert.Equal(0, silent.Strike(side, 2));
+        }
     }
 
     /// <summary>Nothing at all is not a creature. Better to say so than to draw an empty tile.</summary>
@@ -101,13 +126,13 @@ public sealed class CreatureMotionTests
         Assert.Null(CreatureMotion.Read("stand 0 2\n"));
     }
 
-    private static int[] Steps(CreatureMotion motion, bool walk, int count)
+    private static int[] Steps(CreatureMotion motion, Side side, bool walk, int count)
     {
         int[] frames = new int[count];
 
         for (int step = 0; step < count; step++)
         {
-            frames[step] = walk ? motion.Walk(step) : motion.Strike(step);
+            frames[step] = walk ? motion.Walk(side, step) : motion.Strike(side, step);
         }
 
         return frames;

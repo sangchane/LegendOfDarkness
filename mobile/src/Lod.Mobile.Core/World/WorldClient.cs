@@ -30,6 +30,9 @@ public sealed class WorldClient(WorldSession session)
     private const byte OwnSerialCommand = 0x05;
     private const byte DisplayCharacterCommand = 0x33;
     private const byte CreatureWalkedCommand = 0x0C;
+
+    /// <summary>Somebody turning on the spot. The same number as <see cref="TurnCommand" />, coming the other way.</summary>
+    private const byte TurnedCommand = 0x11;
     private const byte RemoveCommand = 0x0E;
     private const byte AddToPackCommand = 0x0F;
     private const byte ShowCreaturesCommand = 0x07;
@@ -392,6 +395,10 @@ public sealed class WorldClient(WorldSession session)
                     Moved(HadesCipher.DecodeSecured(frame, session.Parameters));
                     continue;
 
+                case TurnedCommand:
+                    Turned(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    continue;
+
                 case RemoveCommand:
                 {
                     uint gone = BinaryPrimitives.ReadUInt32BigEndian(
@@ -658,6 +665,35 @@ public sealed class WorldClient(WorldSession session)
             ? known with { Where = now, Facing = facing }
             : new Character(serial, now, facing));
     }
+
+    /// <summary>
+    /// Somebody turning where they stand. A monster does it right before it swings, so its blow is drawn
+    /// towards whoever it hits rather than wherever it last walked.
+    /// </summary>
+    private void Turned(ReadOnlySpan<byte> body)
+    {
+        if (body.Length < 5)
+        {
+            return;
+        }
+
+        (uint serial, Direction facing) = ReadTurn(body);
+
+        if (_creatures.TryGetValue(serial, out Creature? beast))
+        {
+            _creatures[serial] = beast with { Facing = facing };
+            return;
+        }
+
+        if (Known(serial) is { } known)
+        {
+            Show(known with { Facing = facing });
+        }
+    }
+
+    /// <summary>A turn (0x11): whose serial, then which way they now face.</summary>
+    public static (uint Serial, Direction Facing) ReadTurn(ReadOnlySpan<byte> body) =>
+        (BinaryPrimitives.ReadUInt32BigEndian(body), FromServer(body[4]));
 
     /// <summary>
     /// A flash (0x29). The server writes the one it lands on first, then whoever made it, then an animation for

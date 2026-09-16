@@ -67,13 +67,25 @@ public sealed record CreatureMotion(
     /// original's <c>fStop</c> is 0 for a wasp because its wings have to keep going — so it shows the first
     /// of its walking frames rather than a blank.
     /// </summary>
-    public int Stand() => Inside(StandCount > 0 ? StandStart : WalkStart);
+    public int Stand(Side side) => StandCount > 0 ? Pick(side, StandStart, StandCount, 0) : Pick(side, WalkStart, WalkCount, 0);
 
     /// <summary>One step of the walk, starting again at the beginning when it runs out.</summary>
-    public int Walk(int step) => WalkCount > 0 ? Inside(WalkStart + Cycle(step, WalkCount)) : Stand();
+    public int Walk(Side side, int step) => WalkCount > 0 ? Pick(side, WalkStart, WalkCount, step) : Stand(side);
 
     /// <summary>One step of a blow. A creature with none drawn simply stays as it was.</summary>
-    public int Strike(int step) => AttackCount > 0 ? Inside(AttackStart + Cycle(step, AttackCount)) : Stand();
+    public int Strike(Side side, int step) => AttackCount > 0 ? Pick(side, AttackStart, AttackCount, step) : Stand(side);
+
+    /// <summary>
+    /// A stretch is drawn from behind first and then, the same number of frames again, from the front
+    /// (docs/original-sprite-animation.md 2절). A sheet with no front drawing past the end keeps to the back one.
+    /// </summary>
+    private int Pick(Side side, int start, int count, int step)
+    {
+        int back = start + Cycle(step, Math.Max(1, count));
+        int front = back + count;
+
+        return Inside(side == Side.Front && count > 0 && front < Frames ? front : back);
+    }
 
     /// <summary>A step that has gone backwards still lands on a real frame.</summary>
     private static int Cycle(int step, int count) => ((step % count) + count) % count;

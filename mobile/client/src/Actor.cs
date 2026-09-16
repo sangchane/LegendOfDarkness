@@ -127,7 +127,7 @@ public sealed partial class Actor : Node2D
         // Mirroring about this node's origin keeps the feet where they were.
         Scale = new Vector2(facing.Mirror ? -1 : 1, 1);
 
-        ShowFrame(_sheet.Motion?.Stand() ?? WalkMotion.Stand(facing.Side));
+        ShowFrame(_sheet.Motion?.Stand(facing.Side) ?? WalkMotion.Stand(facing.Side));
     }
 
     /// <summary>
@@ -161,15 +161,15 @@ public sealed partial class Actor : Node2D
     /// <summary>Advances the walk by one frame in the direction already faced.</summary>
     public void Stride()
     {
-        ShowFrame(_sheet.Motion is { } motion
-            ? motion.Walk(_step++)
-            : WalkMotion.Walk(Facing.Of(_direction).Side, _step++));
+        Facing facing = Facing.Of(_direction);
+
+        ShowFrame(_sheet.Motion?.Walk(facing.Side, _step++) ?? WalkMotion.Walk(facing.Side, _step++));
     }
 
     public void Rest()
     {
         _step = 0;
-        ShowFrame(_sheet.Motion?.Stand() ?? WalkMotion.Stand(Facing.Of(_direction).Side));
+        ShowFrame(_sheet.Motion?.Stand(Facing.Of(_direction).Side) ?? WalkMotion.Stand(Facing.Of(_direction).Side));
     }
 
     /// <summary>
@@ -187,7 +187,7 @@ public sealed partial class Actor : Node2D
 
         _struck = 0;
         Wear(_swinging);
-        ShowFrame(_sheet.Motion?.Strike(0) ?? WalkMotion.Strike(Facing.Of(_direction).Side, 0));
+        ShowFrame(_sheet.Motion?.Strike(Facing.Of(_direction).Side, 0) ?? WalkMotion.Strike(Facing.Of(_direction).Side, 0));
     }
 
     public override void _Process(double delta)
@@ -234,7 +234,7 @@ public sealed partial class Actor : Node2D
             return;
         }
 
-        ShowFrame(_sheet.Motion?.Strike(frame) ?? WalkMotion.Strike(Facing.Of(_direction).Side, frame));
+        ShowFrame(_sheet.Motion?.Strike(Facing.Of(_direction).Side, frame) ?? WalkMotion.Strike(Facing.Of(_direction).Side, frame));
     }
 
     /// <summary>Swaps every layer between the sheets it stands in and the ones it swings in.</summary>
