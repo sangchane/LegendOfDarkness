@@ -142,14 +142,14 @@ test('ability workspace uses the original gui06 palette and complete icon sheets
 
   assert.match(html, /data-view-target="abilities"/);
   assert.match(html, /data-view="abilities"/);
-  assert.match(html, /class="world-body ability-workspace"/);
-  assert.match(css, /\.ability-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(220px,260px\)\s+minmax\(0,1fr\)/s);
-  assert.match(css, /\.ability-tree\s*\{[^}]*overflow-y:\s*auto/s);
-  assert.match(css, /\.ability-panel\s*\{[^}]*overflow:\s*hidden/s);
-  assert.match(script, /setoa\.dat/);
-  assert.match(script, /gui06\.pal/);
-  assert.match(html, /5\.99·혼든·Novaonline/);
-  assert.match(script, /브라우저 수정/);
+  // 선행 사슬 트리에서 카드 격자로 바꿨다 — 613개를 트리로 보면 "무엇이 있는지" 가 안 보인다.
+  // 사슬은 카드 안의 「선행」 한 줄로 남는다.
+  assert.match(html, /id="ability-grid"/);
+  assert.match(html, /id="ability-stage"/);                 // 샌드백 무대
+  assert.match(css, /\.ability-card\s*\{[^}]*grid-template-columns/s);
+  assert.match(css, /\.sandbag-shot\s*\{[^}]*steps\(var\(--frames\)\)/s);
+  assert.match(script, /ability-icons\//);                  // 아이콘 시트를 계속 쓴다
+  assert.match(script, /LOD_ABILITY_EFFECTS/);              // 연출 색인을 읽는다
   assert.equal(data['요약']['전체'], 613);
   assert.equal(data['요약']['자동확정'], 19);
   assert.equal(data['요약']['사용자수정'], 21);

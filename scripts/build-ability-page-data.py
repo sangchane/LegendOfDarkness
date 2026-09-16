@@ -42,10 +42,26 @@ def scripted():
     return out
 
 
+EFFECTS = ROOT / "data/game-data/ability-effects.json"
+EFFECT_TAIL = re.compile(r",\s*(\d+)\s*,\s*\d+\s*$")
+
+
+def load_effects():
+    """한글 밑말 → 연출·소리. 이펙트는 **한글 팩에만** 있어서 이 길밖에 없다.
+
+    하데스 기술에는 이펙트도 소리도 없다. 그래서 한글 이름이 정해진 것만 이어진다 —
+    안 정해진 것은 카드에 「연출 없음」으로 정직하게 나온다.
+    """
+    if not EFFECTS.exists():
+        return {}
+    return json.loads(EFFECTS.read_text(encoding="utf-8"))["밑말"]
+
+
 def main():
     rows = json.loads(SRC.read_text(encoding="utf-8-sig"))
     manual, has = manual_names(), scripted()
     consensus, _ = load_consensus()
+    effects = load_effects()
 
     unlocks = defaultdict(list)
     for r in rows:
@@ -82,7 +98,22 @@ def main():
                     korean, source = corrected, "사용자 수정"
                 else:
                     korean, source = "", "미확정"
-                listed.append({"이름": name, "한글": korean, "한글자동": automatic,
+                media = effects.get(korean) if korean else None
+                shots, sounds = [], []
+                if media:
+                    for level in media["레벨"]:
+                        for directive in level["이펙트"]:
+                            found = EFFECT_TAIL.search(directive)
+                            if found and int(found.group(1)) not in shots:
+                                shots.append(int(found.group(1)))
+                        for pair in level["모션"]:
+                            if pair[0] not in shots:
+                                shots.append(pair[0])
+                        for number in level["사운드"]:
+                            if number not in sounds:
+                                sounds.append(number)
+                listed.append({"연출": shots, "소리": sounds,
+                               "이름": name, "한글": korean, "한글자동": automatic,
                                "한글수정": corrected if corrected != automatic else "",
                                "이름출처": source, "선행": r.get("requires") or "",
                                "레벨": r.get("atLevel") or 0, "깊이": depth, "아이콘": icon,

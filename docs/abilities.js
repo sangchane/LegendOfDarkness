@@ -1,146 +1,245 @@
-/* 기술·마법 — 직업별로, 배우는 차례대로.
+/* 기술·마법 도감 — 직업·갈래로 좁혀 보고, 가리키면 샌드백에 연출을 터뜨린다.
  *
- * 613개를 표로 늘어놓으면 무엇을 배워야 무엇이 열리는지가 안 보인다. 직업으로 나누고
- * 선행 사슬대로 들여 쓰면 보인다. 자동 한글 이름은 서버팩 3개 합의에서 오고,
- * 프로젝트 이름표와 브라우저 입력으로 언제든 바로잡아 내보낼 수 있다. */
+ * 613개를 선행 사슬 트리로 보면 "무엇이 있는지" 가 안 보인다. 아이템 도감과 같은 카드 격자로
+ * 바꾸고, 사슬은 카드 안에 「선행」한 줄로 남긴다.
+ *
+ * 연출은 원작 `efct###.png`(프레임 여러 장이 한 줄) 를 `steps()` 로 넘긴다. 시전자 자세가 아니라
+ * **기술이 부르는 연출**이라 기술마다 화면이 다르다. 한글 이름이 정해진 것만 이어져 있어
+ * (하데스 쪽에는 이펙트가 없다) 나머지는 「연출 없음」으로 둔다.
+ *
+ * 소리는 번호만 안다 — 원작 음원을 아직 안 뽑았고, 자동 재생은 브라우저가 막는다. 번호만 적는다.
+ */
 (function () {
   "use strict";
+  var DATA = window.ABILITY_DATA;      // 생성기가 쓰는 이름 (`build-ability-page-data.py`)
+  var SHOTS = window.LOD_ABILITY_EFFECTS || { 연출: {} };
+  if (!DATA) { return; }
 
-  var DATA = window.ABILITY_DATA;
-  if (!DATA) return;
+  var STORE = "lod.ability.korean.v1";
+  var PER_PAGE = 60;
+  var CELL = 35, COLS = 16;          // 아이콘 시트: 한 칸 35x35, 한 줄 16칸
 
-  var listEl = document.getElementById("ability-list");
-  var detailEl = document.getElementById("ability-detail");
-  var searchEl = document.getElementById("ability-search");
-  var sumEl = document.getElementById("ability-summary");
-  if (!listEl || !detailEl) return;
-
-  var STORE = "lod-ability-names";
   var typed = {};
   try { typed = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { typed = {}; }
+
+  var cls = "all", kind = "all", query = "", onlyUnnamed = false, onlyPlayable = false, page = 0;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) { node.className = className; }
+    if (text != null) { node.textContent = text; }
+    return node;
+  }
+
+  var ALL = [];
+  DATA["묶음"].forEach(function (group) {
+    group["목록"].forEach(function (row) {
+      ALL.push(Object.assign({ 직업: group["직업"], 갈래: group["갈래"] }, row));
+    });
+  });
+
+  function nameOf(row) { return (typed[row["이름"]] || row["한글"] || "").trim(); }
+  function shotsOf(row) { return (row["연출"] || []).filter(function (n) { return SHOTS["연출"][n]; }); }
 
   function remember(name, value) {
     if (value) { typed[name] = value; } else { delete typed[name]; }
     try { localStorage.setItem(STORE, JSON.stringify(typed)); } catch (e) { /* 사생활 모드 */ }
-    paintSummary();
   }
 
-  function currentName(a) {
-    if (Object.prototype.hasOwnProperty.call(typed, a["이름"])) {
-      return { value: typed[a["이름"]], source: "브라우저 수정" };
-    }
-    return { value: a["한글"] || "", source: a["이름출처"] || "미확정" };
+  function matches(row) {
+    if (cls !== "all" && row["직업"] !== cls) { return false; }
+    if (kind !== "all" && row["갈래"] !== kind) { return false; }
+    if (onlyUnnamed && nameOf(row)) { return false; }
+    if (onlyPlayable && !shotsOf(row).length) { return false; }
+    if (!query) { return true; }
+    return (row["이름"] + " " + (row["한글"] || "") + " " + (typed[row["이름"]] || ""))
+      .toLowerCase().indexOf(query) >= 0;
   }
 
-  function escapeHtml(value) {
-    return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  /* ── 샌드백 무대 ───────────────────────────────────────────────────── */
+  var stage = null, timer = null;
+
+  function stopStage() {
+    if (timer) { window.clearTimeout(timer); timer = null; }
+    if (stage) { stage.hidden = true; stage.setAttribute("aria-hidden", "true"); }
+  }
+
+  function playStage(row, anchor) {
+    if (!stage) { return; }
+    var shots = shotsOf(row);
+    stage.replaceChildren();
+
+    var floor = el("div", "sandbag-floor");
+    floor.appendChild(el("i", "sandbag"));            // 맞는 쪽 — 연출이 이 위에 얹힌다
+    shots.forEach(function (number, index) {
+      var info = SHOTS["연출"][number];
+      var shot = el("i", "sandbag-shot");
+      shot.style.backgroundImage = "url(ui/assets/ability-effects/" + info["파일"] + ")";
+      shot.style.width = (100 / info["프레임"]) + "%";
+      shot.style.setProperty("--frames", info["프레임"]);
+      shot.style.setProperty("--delay", (index * 0.45) + "s");
+      floor.appendChild(shot);
+    });
+    stage.appendChild(floor);
+
+    var caption = el("div", "sandbag-caption");
+    caption.appendChild(el("b", "", nameOf(row) || row["이름"]));
+    caption.appendChild(el("span", "", shots.length
+      ? "연출 " + shots.join(" · ") + (row["소리"] && row["소리"].length ? " · 소리 " + row["소리"].join(",") : "")
+      : "이 기술의 연출은 아직 이어지지 않았어요"));
+    stage.appendChild(caption);
+
+    var box = anchor.getBoundingClientRect();
+    stage.hidden = false;
+    stage.setAttribute("aria-hidden", "false");
+    var own = stage.getBoundingClientRect();
+    var left = Math.min(box.right + 12, window.innerWidth - own.width - 12);
+    var top = Math.min(box.top, window.innerHeight - own.height - 12);
+    stage.style.transform = "translate(" + Math.max(12, left) + "px," + Math.max(12, top) + "px)";
+  }
+
+  /* ── 카드 ──────────────────────────────────────────────────────────── */
+  function card(row) {
+    var article = el("article", "ability-card");
+    if (!nameOf(row)) { article.classList.add("is-unnamed"); }
+    if (shotsOf(row).length) { article.classList.add("is-playable"); }
+
+    var icon = el("i", "ability-icon");
+    var sheet = row["갈래"] === "기술" ? "skill" : "spell";
+    icon.style.backgroundImage = "url(ability-icons/" + sheet + ".png)";
+    icon.style.backgroundPosition = "-" + (row["아이콘"] % COLS) * CELL + "px -" +
+      Math.floor(row["아이콘"] / COLS) * CELL + "px";
+    article.appendChild(icon);
+
+    var head = el("div", "ability-card-head");
+    head.appendChild(el("b", "", nameOf(row) || row["이름"]));
+    if (nameOf(row)) { head.appendChild(el("em", "", row["이름"])); }
+    article.appendChild(head);
+
+    var meta = el("div", "ability-card-meta");
+    meta.appendChild(el("span", "ability-kind", row["갈래"]));
+    meta.appendChild(el("span", "ability-cls", row["직업"]));
+    if (row["레벨"]) { meta.appendChild(el("span", "ability-lv", "Lv" + row["레벨"])); }
+    if (shotsOf(row).length) { meta.appendChild(el("span", "ability-play", "연출 " + shotsOf(row).length)); }
+    article.appendChild(meta);
+
+    if (row["선행"]) { article.appendChild(el("p", "ability-pre", "선행 " + row["선행"])); }
+
+    var input = el("input", "ability-name");
+    input.type = "text";
+    input.value = typed[row["이름"]] || row["한글"] || "";
+    input.placeholder = "한글 이름";
+    input.setAttribute("aria-label", row["이름"] + " 한글 이름");
+    input.addEventListener("change", function () {
+      remember(row["이름"], input.value.trim());
+      render();
+    });
+    article.appendChild(input);
+
+    article.addEventListener("mouseenter", function () { playStage(row, article); });
+    article.addEventListener("mouseleave", stopStage);
+    article.addEventListener("click", function (event) {
+      if (event.target !== input) { playStage(row, article); }
+    });
+    return article;
+  }
+
+  /* ── 그리기 ────────────────────────────────────────────────────────── */
+  function chips(host, values, current, onPick) {
+    host.replaceChildren();
+    ["all"].concat(values).forEach(function (value) {
+      var button = el("button", "chip", value === "all" ? "전체" : value);
+      button.type = "button";
+      if (value === current) { button.classList.add("is-active"); }
+      button.setAttribute("aria-pressed", value === current ? "true" : "false");
+      button.addEventListener("click", function () { onPick(value); });
+      host.appendChild(button);
     });
   }
 
-  function paintSummary() {
-    var s = DATA["요약"];
-    var mine = Object.keys(typed).length;
-    sumEl.innerHTML =
-      [["전체", s["전체"]], ["기술", s["기술"]], ["마법", s["마법"]],
-       ["세 팩 합의", s["자동확정"]], ["프로젝트 수정", s["사용자수정"]], ["브라우저 수정", mine]]
-        .map(function (p) {
-          return '<div class="world-stat"><span>' + p[0] + "</span><strong>" + p[1] + "</strong></div>";
-        }).join("") +
-      '<p class="world-note">정렬과 선행 관계는 Hades 기준입니다. <b>세 팩 합의</b>는 5.99·혼든·Novaonline의 이름이 모두 같은 경우만 뜻합니다. ' +
-      '한글 이름을 고치면 이 브라우저에 남고, <b>표로 내보내기</b>를 눌러 ' +
-      "<code>data/기술마법-한글이름.tsv</code> 에 붙여 넣으세요. " +
-      "아이콘은 <code>setoa.dat</code> 의 <code>skill001.epf</code>·<code>spell001.epf</code> 를 " +
-      "같은 아카이브의 <code>gui06.pal</code> 로 그렸습니다. 원작 자료 뷰어가 두 아이콘 창에 " +
-      "지정한 색표를 그대로 썼습니다.</p>" +
-      '<button type="button" id="ability-export" class="quiet-link">표로 내보내기</button>';
-    var b = document.getElementById("ability-export");
-    if (b) b.addEventListener("click", exportTsv);
+  function render() {
+    var rows = ALL.filter(matches);
+    var pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+    if (page >= pages) { page = pages - 1; }
+    var slice = rows.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE);
+
+    var grid = $("ability-grid");
+    grid.replaceChildren();
+    slice.forEach(function (row) { grid.appendChild(card(row)); });
+
+    $("ability-empty").hidden = rows.length !== 0;
+    $("ability-pager").hidden = pages < 2;
+    $("ability-pager-label").textContent = (page + 1) + " / " + pages + " 쪽";
+
+    var named = ALL.filter(function (r) { return nameOf(r); }).length;
+    var playable = ALL.filter(function (r) { return shotsOf(r).length; }).length;
+    $("ability-total").textContent = ALL.length.toLocaleString("ko-KR");
+    $("ability-named").textContent = named + " (" + Math.round((named / ALL.length) * 100) + "%)";
+    $("ability-playable").textContent = playable.toLocaleString("ko-KR");
+    $("ability-shown").textContent = rows.length.toLocaleString("ko-KR");
+
+    chips($("ability-classes"), DATA["직업"] || uniq("직업"), cls, function (v) { cls = v; page = 0; render(); });
+    chips($("ability-kinds"), ["기술", "마법"], kind, function (v) { kind = v; page = 0; render(); });
+    stopStage();
+  }
+
+  function uniq(key) {
+    var out = [];
+    ALL.forEach(function (r) { if (out.indexOf(r[key]) < 0) { out.push(r[key]); } });
+    return out;
   }
 
   function exportTsv() {
-    var lines = [];
-    DATA["묶음"].forEach(function (g) {
-      g["목록"].forEach(function (a) {
-        var ko = currentName(a).value;
-        if (ko) lines.push([g["갈래"], g["직업"], a["이름"], a["선행"], a["레벨"], ko].join("\t"));
+    var box = $("ability-export-box");
+    var lines = ["영문\t한글"];
+    ALL.forEach(function (row) {
+      if (typed[row["이름"]]) { lines.push(row["이름"] + "\t" + typed[row["이름"]]); }
+    });
+    box.replaceChildren();
+    if (lines.length === 1) {
+      box.appendChild(el("p", "notice", "이 브라우저에서 고친 이름이 아직 없어요."));
+    } else {
+      box.appendChild(el("p", "", "아래를 복사해 data/기술마법-한글이름.tsv 에 붙여 넣으세요 ("
+        + (lines.length - 1) + "줄). 반영: python3 scripts/build-ability-page-data.py"));
+      box.appendChild(el("pre", "ability-export", lines.join("\n")));
+    }
+    box.hidden = false;
+  }
+
+  function boot() {
+    stage = $("ability-stage");
+    if (!$("ability-grid")) { return; }
+    $("ability-search").addEventListener("input", function (event) {
+      query = event.target.value.trim().toLowerCase(); page = 0; render();
+    });
+    [["ability-only-unnamed", function () { onlyUnnamed = !onlyUnnamed; return onlyUnnamed; }],
+     ["ability-only-playable", function () { onlyPlayable = !onlyPlayable; return onlyPlayable; }]
+    ].forEach(function (pair) {
+      $(pair[0]).addEventListener("click", function (event) {
+        var on = pair[1]();
+        event.currentTarget.classList.toggle("is-active", on);
+        event.currentTarget.setAttribute("aria-pressed", on ? "true" : "false");
+        page = 0; render();
       });
     });
-    var text = lines.length ? lines.join("\n") : "아직 적은 이름이 없습니다.";
-    detailEl.insertAdjacentHTML("afterbegin",
-      '<pre class="ability-export">' + text.replace(/[&<]/g, function (c) {
-        return c === "&" ? "&amp;" : "&lt;";
-      }) + "</pre>");
-  }
-
-  /* 아이콘은 한 장짜리 시트를 잘라 쓴다. 번호는 자료의 raw[1] 첫 값이고, Hades 가 손으로
-   * 넣어 둔 assail.json 의 Icon 과 맞는다. 여러 기술이 한 아이콘을 함께 쓰는 일은 흔하다
-   * (Assail 과 Assault 가 둘 다 1 이다). 시트는 16칸씩 · 한 칸 35x35. */
-  var CELL = 35, COLS = 16;
-
-  function icon(kind, n) {
-    var sheet = kind === "기술" ? "skill" : "spell";
-    var x = (n % COLS) * CELL, y = Math.floor(n / COLS) * CELL;
-    return '<i class="ability-icon" title="' + n + '" style="background-image:url(ability-icons/' +
-      sheet + '.png);background-position:-' + x + "px -" + y + 'px"></i>';
-  }
-
-  function renderList(filter) {
-    var q = (filter || "").trim().toLowerCase();
-    var shown = DATA["묶음"].filter(function (g) {
-      return !q || g["목록"].some(function (a) {
-        return a["이름"].toLowerCase().indexOf(q) >= 0 ||
-               currentName(a).value.toLowerCase().indexOf(q) >= 0;
+    $("ability-export").addEventListener("click", exportTsv);
+    Array.prototype.forEach.call(document.querySelectorAll("[data-ability-page]"), function (button) {
+      button.addEventListener("click", function () {
+        page = Math.max(0, page + Number(button.getAttribute("data-ability-page")));
+        render();
+        $("ability-grid").scrollIntoView({ block: "start", behavior: "smooth" });
       });
     });
-    listEl.innerHTML = shown.map(function (g, i) {
-      return '<button type="button" class="world-item" data-key="' + DATA["묶음"].indexOf(g) +
-        '"><span>' + g["직업"] + " " + g["갈래"] + "</span><em>" + g["목록"].length + "개</em></button>";
-    }).join("") || '<p class="world-empty">그런 이름이 없습니다.</p>';
-    if (shown.length) select(DATA["묶음"].indexOf(shown[0]), q);
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") { stopStage(); }
+    });
+    render();
   }
 
-  function select(idx, q) {
-    var g = DATA["묶음"][idx];
-    if (!g) return;
-    Array.prototype.forEach.call(listEl.querySelectorAll(".world-item"), function (b) {
-      var active = b.getAttribute("data-key") === String(idx);
-      b.classList.toggle("is-active", active);
-      if (active) { b.setAttribute("aria-current", "true"); } else { b.removeAttribute("aria-current"); }
-    });
-
-    detailEl.innerHTML = "<h2>" + g["직업"] + " " + g["갈래"] + "</h2>" +
-      '<p class="world-meta">' + g["목록"].length + "개 · 들여쓰기가 깊을수록 나중에 배웁니다</p>" +
-      '<ol class="world-tree ability-tree">' + g["목록"].map(function (a) {
-        var named = currentName(a);
-        var hit = q && (a["이름"].toLowerCase().indexOf(q) >= 0 || named.value.toLowerCase().indexOf(q) >= 0);
-        var sourceClass = { "서버팩 3개 일치": "is-consensus", "사용자 수정": "is-manual",
-                            "브라우저 수정": "is-browser", "미확정": "is-empty" }[named.source] || "is-empty";
-        return '<li style="--depth:' + a["깊이"] + '"' + (hit ? ' class="is-hit"' : "") + ">" +
-          icon(g["갈래"], a["아이콘"]) +
-          '<b>' + escapeHtml(a["이름"]) + "</b>" +
-          '<em>' + (a["레벨"] ? "레벨 " + a["레벨"] : "") +
-          (a["스크립트"] ? " · 스크립트 있음" : "") + "</em>" +
-          '<span class="ability-name-source ' + sourceClass + '">' + escapeHtml(named.source) + '</span>' +
-          '<input class="ability-name" data-for="' + escapeHtml(a["이름"]) + '" type="text" placeholder="한글 이름" value="' +
-          escapeHtml(named.value) + '" aria-label="' + escapeHtml(a["이름"] + " 한글 이름") + '">' +
-          "</li>";
-      }).join("") + "</ol>";
-
-    Array.prototype.forEach.call(detailEl.querySelectorAll(".ability-name"), function (input) {
-      input.addEventListener("change", function () {
-        remember(input.getAttribute("data-for"), input.value.trim());
-        select(idx, q);
-      });
-    });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
   }
-
-  listEl.addEventListener("click", function (ev) {
-    var b = ev.target.closest ? ev.target.closest(".world-item") : null;
-    if (b) select(Number(b.getAttribute("data-key")), (searchEl && searchEl.value || "").trim().toLowerCase());
-  });
-  if (searchEl) searchEl.addEventListener("input", function () { renderList(searchEl.value); });
-
-  paintSummary();
-  renderList("");
 })();

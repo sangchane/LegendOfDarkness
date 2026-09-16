@@ -187,23 +187,42 @@
         </details>
       </section>
       <section class="view" data-view="abilities" aria-labelledby="abilities-title" hidden>
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">Skills and spells</p>
-            <h1 id="abilities-title">무엇을 배워야 무엇이 열리나</h1>
-            <p>Hades 표(<code>metafile/SClass1~5</code>) 613개를 직업별·선행 사슬 순서로 정렬했습니다. 한글 이름은 <strong>5.99·혼든·Novaonline이 같은 갈래·아이콘에서 완전히 일치할 때만</strong> 자동 표기하며, 틀린 이름은 입력칸에서 바로 고쳐 내보낼 수 있습니다.</p>
-          </div>
+        <div class="item-topbar">
+          <h1 id="abilities-title">기술·마법 도감</h1>
+          <dl class="item-tally">
+            <dt>전체</dt><dd id="ability-total">—</dd>
+            <dt>한글</dt><dd id="ability-named">—</dd>
+            <dt>연출 있음</dt><dd id="ability-playable">—</dd>
+            <dt>지금</dt><dd id="ability-shown">—</dd>
+          </dl>
+          <p>카드를 가리키면 샌드백에 그 기술의 연출이 재생됩니다</p>
           <a class="quiet-link" href="../data/기술마법-한글이름.tsv">이름표 →</a>
         </div>
-        <div id="ability-summary" class="world-summary"></div>
-        <div class="world-body ability-workspace">
-          <aside class="world-side ability-groups">
-            <label class="world-search-label" for="ability-search">기술·마법 찾기</label>
-            <input id="ability-search" type="search" placeholder="예: Assail" autocomplete="off">
-            <div id="ability-list" class="world-list" role="listbox" aria-label="직업별 묶음"></div>
-          </aside>
-          <article class="panel world-panel ability-panel"><div id="ability-detail" aria-live="polite"></div></article>
+
+        <div class="filterbar item-filterbar">
+          <label class="visually-hidden" for="ability-search">기술·마법 검색</label>
+          <input id="ability-search" type="search" placeholder="이름으로 찾기 — 한글·영문 모두" autocomplete="off">
+          <div class="item-filter-row" role="group" aria-label="직업"><span>직업</span><div class="item-chips" id="ability-classes"></div></div>
+          <div class="item-filter-row" role="group" aria-label="갈래"><span>갈래</span><div class="item-chips" id="ability-kinds"></div></div>
+          <div class="item-filter-row"><span>보기</span><div class="item-chips">
+            <button type="button" class="chip" id="ability-only-playable" aria-pressed="false">연출 있는 것만</button>
+            <button type="button" class="chip" id="ability-only-unnamed" aria-pressed="false">한글 없는 것만</button>
+            <button type="button" class="chip" id="ability-export">표로 내보내기</button>
+          </div></div>
         </div>
+
+        <div id="ability-export-box" hidden></div>
+
+        <div class="item-grid ability-grid" id="ability-grid"></div>
+        <p class="empty-state" id="ability-empty" hidden>조건에 맞는 기술이 없어요. 필터를 지워 보세요.</p>
+
+        <nav class="item-pager" id="ability-pager" aria-label="쪽 이동" hidden>
+          <button type="button" class="chip" data-ability-page="-1">← 이전</button>
+          <span id="ability-pager-label">—</span>
+          <button type="button" class="chip" data-ability-page="1">다음 →</button>
+        </nav>
+
+        <div class="ability-stage" id="ability-stage" hidden aria-hidden="true"></div>
       </section>
       <section class="view" data-view="items" aria-labelledby="items-title" hidden>
         <div class="item-topbar">
@@ -297,6 +316,6 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="items-data.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-effects-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="items-data.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>
