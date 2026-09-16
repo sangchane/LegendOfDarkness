@@ -93,6 +93,54 @@ public sealed class Pack599AbilityTests : IDisposable
         }
     }
 
+    /// <summary>
+    /// 5.99 괴물 마법(`Mob_Spell.txt` 의 `Monster_이름`). 괴물 템플릿의 `SpellScripts` 에 붙으면 하데스 괴물 AI 가
+    /// 표적에게 쓴다. 스크립트는 맞는 사람 쪽에서 돌고(`get_myid` = 맞는 사람), 괴물 이름은 `object_name` 이다.
+    /// </summary>
+    [Fact]
+    public async Task A_monster_casts_its_599_spell_on_whoever_it_is_fighting()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        MakeGameMaster(server);
+        PutStationaryTargetAhead(server, target =>
+        {
+            target["SpellScripts"] = new JsonArray("Monster_플라모");
+            // 하데스 괴물은 걷기 루틴(`CommonMonster.Walk`)에서 시전을 켠다 — 제자리 고정 괴물은 마법을 못 쓴다.
+            target["PathQualifer"] = 1;
+            target["MoodType"] = 2;
+            target["CastSpeed"] = 300;
+            target["MaximumMP"] = 100;
+        });
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        Save(server, saved =>
+        {
+            saved["_MaximumHp"] = 100000;
+            saved["CurrentHp"] = 100000;
+        });
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.State is { Map.Id: WoodlandOneOne, Where: var where } && where == Start,
+            "우드랜드1-1 입구에 서지 못했습니다.");
+        await FindTarget(world);
+
+        // 한 대 쳐서 괴물의 표적이 된다.
+        await world.SayAsync("/skill \"기본공격\" 1", _deadline.Token);
+        int slot = await Slot(() => world.Skills.FirstOrDefault(s => s.Name.StartsWith("기본공격 ("))?.Slot, "기본공격");
+        await world.UseSkillAsync(slot, _deadline.Token);
+
+        // `message 3, object_name() + "가(이) 플라모를 가합니다."` — 맞는 사람에게 온다. 글자 잇기(`+`)를 지나는
+        // 첫 시험이기도 하다 — 잘못 옮기면 끝없는 재귀로 서버가 죽는다.
+        await Until(() => world.Said.Contains("플라모를 가합니다"), $"괴물이 플라모를 쓰지 않았습니다: {world.Said}");
+    }
+
     private async Task<int> LearnSpell(WorldClient world, string spell)
     {
         await world.SayAsync($"/spell \"{spell}\" 1", _deadline.Token);
@@ -122,7 +170,7 @@ public sealed class Pack599AbilityTests : IDisposable
         File.WriteAllText(path, config.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    private static void PutStationaryTargetAhead(IsolatedHadesServer server)
+    private static void PutStationaryTargetAhead(IsolatedHadesServer server, Action<JsonNode>? change = null)
     {
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
         Regex woodland = new($"\"AreaID\"\\s*:\\s*{WoodlandOneOne}\\b");
@@ -144,6 +192,7 @@ public sealed class Pack599AbilityTests : IDisposable
         target["MoodType"] = 1;
         target["PathQualifer"] = 2;
         target["Grow"] = false;
+        change?.Invoke(target);
 
         string testFolder = Path.Combine(folder, "characterization");
         Directory.CreateDirectory(testFolder);

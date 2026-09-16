@@ -49,7 +49,7 @@ FILE_CLASS = [("전사", 1), ("Warrior", 1), ("도적", 2), ("Rogue", 2), ("법�
 MOTION_CLASS = {0: 4, 9: 4, 10: 4, 1: 1, 2: 1, 11: 1, 12: 1, 13: 1, 3: 5, 4: 5, 5: 5,
                 6: 2, 7: 2, 14: 2, 15: 2, 16: 2, 8: 3, 17: 3}
 
-HEADER = re.compile(r"^[\d,]*\s*(SKILL|SPELL)_([^\s{]+)\s*\{", re.M)
+HEADER = re.compile(r"^[\d,]*\s*(SKILL|SPELL|Monster)_([^\s{]+)\s*\{", re.M)
 
 
 def read(path):
@@ -67,7 +67,7 @@ def blocks():
     """블록은 괄호 짝으로 자른다. 5.99 원본은 줄 맨 앞에 `}` 를 두기도 하고(퓨리소월루) 닫는 괄호가
     하나 더 있기도 해서(전체크래셔) 줄 모양으로는 못 자른다. 짝이 안 맞으면 다음 블록 머리에서 멈춘다."""
     out = {}
-    for path in sorted((PACK / "script" / "Skill").glob("*.txt")):
+    for path in sorted((PACK / "script" / "Skill").glob("*.txt")) + [PACK / "script" / "Mob_Spell.txt"]:
         text = read(path)
         heads = list(HEADER.finditer(text))
         for n, head in enumerate(heads):
@@ -443,7 +443,18 @@ def translate(body):
 # ── 쓰기 ─────────────────────────────────────────────────────────────────────
 
 def klass(kind, name):
-    return ("Skill" if kind == "SKILL" else "Spell") + "".join(f"{ord(c):04X}" for c in name)
+    return {"SKILL": "Skill", "SPELL": "Spell", "Monster": "Monster"}[kind] + "".join(f"{ord(c):04X}" for c in name)
+
+
+def monster_spells():
+    """5.99 괴물 정의의 `스킬 Monster_이름 N` — 괴물 이름 → 괴물 마법 이름."""
+    out = {}
+    for path in (PACK / "mob").rglob("*.txt"):
+        for chunk in re.findall(r"\{(.*?)\}", read(path), re.S):
+            fields = dict(line.split("\t", 1) for line in chunk.strip().splitlines() if "\t" in line)
+            if "이름" in fields and "스킬" in fields:
+                out[fields["이름"].strip()] = fields["스킬"].split("\t")[0].strip()
+    return out
 
 
 def csharp(kind, name, source, code, variables, flags):
@@ -461,7 +472,33 @@ namespace Darkages.Storage.locales.Scripts.Pack599
     /// <remarks>
     /// 손으로 고치지 말 것. `scripts/build-pack-abilities.py` 가 다시 만든다.
     /// </remarks>
-    [Script("{name}", "{MARK}")]
+    [Script("{'Monster_' + name if kind == 'Monster' else name}", "{MARK}")]
+"""
+    if kind == "Monster":
+        return header + f"""    public class {where} : SpellScript
+    {{
+        public {where}(Spell spell) : base(spell)
+        {{
+        }}
+
+        public override void OnFailed(Sprite sprite, Sprite target)
+        {{
+        }}
+
+        public override void OnSuccess(Sprite sprite, Sprite target)
+        {{
+        }}
+
+        public override void OnUse(Sprite sprite, Sprite target)
+        {{
+            var p = Pack599.ForMonster(sprite, target);
+            if (!p.Ready)
+                return;
+{declare}
+{code}
+        }}
+    }}
+}}
 """
     if kind == "SKILL":
         return header + f"""    public class {where} : SkillScript
@@ -562,9 +599,17 @@ def main():
         return 0
 
     for kind, name, source, code, variables, flags, lacking, delay, cls in made:
-        folder = OUT / ("Skills" if kind == "SKILL" else "Spells")
+        folder = OUT / {"SKILL": "Skills", "SPELL": "Spells", "Monster": "Monsters"}[kind]
         folder.mkdir(parents=True, exist_ok=True)
         (folder / f"{name}.cs").write_text(csharp(kind, name, source, code, variables, flags), encoding="utf-8-sig")
+        if kind == "Monster":
+            # 하데스 괴물 AI 는 같은 이름의 마법 템플릿이 있어야 스크립트를 불러온다(`CommonMonster.cs:292`) —
+            # 없으면 말없이 건너뛴다. 가르치는 NPC 가 없으니 사람이 배울 길은 없다.
+            path = HADES / "templates" / "spells" / f"Monster_{name}.json"
+            path.write_text(json.dumps({"Name": f"Monster_{name}", "ScriptKey": f"Monster_{name}", "Prerequisites": {},
+                                        "MaxLevel": 100, "ID": 0, "Description": None, "TargetType": 2,
+                                        "Group": f"{MARK}/괴물마법"}, ensure_ascii=False, indent=2), encoding="utf-8-sig")
+            continue
 
         define = (skills if kind == "SKILL" else spells).get(name, {})
         level = taught.get(name, (None, None))[1]
@@ -597,7 +642,25 @@ def main():
         template = json.loads(path.read_text(encoding="utf-8-sig"))
         template["ScriptName" if kind == "SKILL" else "ScriptKey"] = ALIASES[name]
         path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
+    # 괴물 마법을 괴물 템플릿에 붙인다. 하데스 `CommonMonster` 가 `SpellScripts` 의 것을 표적에게 쓴다.
+    defined = {name for kind, name, *_ in made if kind == "Monster"}
+    wanted = monster_spells()
+    attached, undefined = 0, Counter()
+    for path in (HADES / "templates" / "monsters" / "5.99").glob("*.json"):
+        template = json.loads(path.read_text(encoding="utf-8-sig"))
+        spell = wanted.get(template.get("BaseName") or template.get("Name"))
+        if not spell:
+            continue
+        if spell[len("Monster_"):] not in defined:
+            undefined[spell] += 1
+            continue
+        template["SpellScripts"] = [spell]
+        path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
+        attached += 1
     print(f"\n스크립트·템플릿 {len(made)}쌍을 만들었습니다. 하데스 스크립트를 붙인 것 {len(aliased)}개.")
+    print(f"괴물 템플릿 {attached}장에 괴물 마법을 붙였습니다.")
+    if undefined:
+        print("5.99 에 정의가 없는 괴물 마법(템플릿 수): " + ", ".join(f"{k}({v})" for k, v in undefined.most_common()))
     return 0
 
 
