@@ -508,7 +508,7 @@ public sealed class MobileClientProtocolTests
 
         while (DateTime.UtcNow < giveUp)
         {
-            if (world.TakeMotion(out uint serial) && serial == world.Serial)
+            if (world.TakeMotion(out Motion? motion) && motion.Serial == world.Serial)
             {
                 return;
             }

@@ -488,8 +488,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             paths.Add(path);
             colours.Add(piece.Colour);
 
-            // A piece with no swing of its own keeps standing while the rest of the figure moves. That is
-            // how the original looks too — a hat does not swing.
+            // A piece with no swing of its own is left out while the rest of the figure swings (Actor.Play).
             string swung = $"{PartsFolder}{piece.Name}02.png";
             striking.Add(ResourceLoader.Exists(swung) ? swung : path);
         }
@@ -878,7 +877,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _ = server?.AttackAsync(_leaving.Token);
     }
 
-    /// <summary>Uses a learned skill and gives an immediate swing cue, as ordinary attacks do.</summary>
+    /// <summary>
+    /// Uses a learned skill. Unlike the plain blow nothing is drawn yet: which motion a skill makes (a kick, a
+    /// stab, a cast) only the server says, and it says so to us as well (0x1A) — <see cref="Swings" /> draws it.
+    /// </summary>
     public void UseSkill(int slot)
     {
         if (Frozen)
@@ -886,7 +888,6 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
-        _player.Strike();
         _ = server?.UseSkillAsync(slot, _leaving.Token);
     }
 
@@ -970,19 +971,24 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     }
 
     /// <summary>
-    /// Draws whoever the server says has swung. Our own blow is drawn as it is asked for rather than here,
-    /// so a swing of ours that comes back is left alone.
+    /// Draws the body motions the server names — anybody's, ours included, since a skill's motion is only known
+    /// from here. Our own plain blow is drawn as it is asked for, so that one coming back is left alone. A motion
+    /// with no drawing (a hands-up, an emote) moves nobody; a creature swings its own blow for any.
     /// </summary>
     private void Swings()
     {
-        while (server is { } world && world.TakeMotion(out uint serial))
+        while (server is { } world && world.TakeMotion(out Motion? motion))
         {
-            if (serial == world.Serial)
+            if ((motion.Serial == world.Serial && motion.Number == 1) || Someone(world, motion.Serial) is not { } actor)
             {
                 continue;
             }
 
-            if (_crowd.TryGetValue(serial, out Actor? actor) || _herd.TryGetValue(serial, out actor))
+            if (BodyMotion.Of(motion.Number) is { } body)
+            {
+                actor.Play(body, body.SecondsPerFrame(motion.Speed));
+            }
+            else if (_herd.ContainsKey(motion.Serial))
             {
                 actor.Strike();
             }

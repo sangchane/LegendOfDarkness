@@ -251,9 +251,9 @@ public sealed class MonkLevelTenSkillTests : IDisposable
 
     private static bool Swung(WorldClient world)
     {
-        while (world.TakeMotion(out uint who))
+        while (world.TakeMotion(out Motion? motion))
         {
-            if (who == world.Serial)
+            if (motion.Serial == world.Serial)
             {
                 return true;
             }

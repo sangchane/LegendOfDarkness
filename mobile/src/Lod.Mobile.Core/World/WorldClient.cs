@@ -122,7 +122,7 @@ public sealed class WorldClient(WorldSession session)
     private volatile Vitals? _vitals;
 
     // Drained by whoever is drawing, because a motion is a moment rather than a state.
-    private readonly ConcurrentQueue<uint> _motions = new();
+    private readonly ConcurrentQueue<Motion> _motions = new();
     private readonly ConcurrentQueue<Effect> _effects = new();
     private readonly ConcurrentQueue<int> _sounds = new();
 
@@ -173,11 +173,11 @@ public sealed class WorldClient(WorldSession session)
     /// when somebody swings, and this is how that reaches whatever is drawing them.
     /// </summary>
     /// <remarks>
-    /// It says which motion as well, and we ignore that: there is one motion we can draw. The reference
-    /// client does the same — every one of these plays its attack (map-scene.ts). Telling the skill
-    /// motions apart needs skill.tbl, which is written up in docs/original-sprite-animation.md section 3.
+    /// It says which motion as well, and how fast. The reference client ignores that and plays its attack for
+    /// every one (map-scene.ts); telling them apart is <see cref="Art.BodyMotion" />, out of skill.tbl.
     /// </remarks>
-    public bool TakeMotion(out uint serial) => _motions.TryDequeue(out serial);
+    public bool TakeMotion([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Motion? motion) =>
+        _motions.TryDequeue(out motion);
 
     /// <summary>Takes the next flash the server asked to be drawn, if any. Like a motion, it is a moment.</summary>
     public bool TakeEffect([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Effect? effect) =>
@@ -267,7 +267,7 @@ public sealed class WorldClient(WorldSession session)
 
                     if (motion.Length >= 4)
                     {
-                        _motions.Enqueue(BinaryPrimitives.ReadUInt32BigEndian(motion));
+                        _motions.Enqueue(ReadMotion(motion));
                     }
                 }
 
@@ -717,6 +717,12 @@ public sealed class WorldClient(WorldSession session)
             body.Length >= 14 ? BinaryPrimitives.ReadUInt16BigEndian(body[12..]) : 100,
             null);
     }
+
+    /// <summary>A body motion (0x1A): serial, motion number, speed. A short one still names who moved.</summary>
+    public static Motion ReadMotion(ReadOnlySpan<byte> body) => new(
+        BinaryPrimitives.ReadUInt32BigEndian(body),
+        body.Length >= 5 ? body[4] : 0,
+        body.Length >= 7 ? BinaryPrimitives.ReadUInt16BigEndian(body[5..]) : 0);
 
     /// <summary>A sound (0x19): an empty byte, then the number.</summary>
     public static int ReadSound(ReadOnlySpan<byte> body) => BinaryPrimitives.ReadUInt16BigEndian(body[1..]);

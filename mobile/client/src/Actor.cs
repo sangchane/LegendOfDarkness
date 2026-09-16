@@ -57,8 +57,12 @@ public sealed partial class Actor : Node2D
 
     private readonly List<Sprite2D> _sprites = [];
     private readonly List<Texture2D> _standing = [];
-    private readonly List<Texture2D> _swinging = [];
     private readonly Sheet _sheet;
+
+    // The motion under way, how long each drawing is held, and which pieces have no drawing for it.
+    private BodyMotion _playing = BodyMotion.Blow;
+    private double _perFrame = SecondsPerStrikeFrame;
+    private readonly List<bool> _still = [];
 
     /// <summary>How long one drawing of a swing is held. Two of them make a blow.</summary>
     private const double SecondsPerStrikeFrame = 0.14;
@@ -66,7 +70,7 @@ public sealed partial class Actor : Node2D
     private Direction _direction = Direction.South;
     private int _step;
 
-    // Where we are in a swing, in seconds, or below zero when not swinging.
+    // Where we are in a motion, in seconds, or below zero when not moving.
     private double _struck = -1;
 
     // A step between two tiles: from where, to where, how long it takes and how far in we are (below zero when
@@ -97,9 +101,7 @@ public sealed partial class Actor : Node2D
             Texture2D worn = Palettes.Load(_sheet.Paths[layer], _sheet.Colours[layer]);
 
             _standing.Add(worn);
-            _swinging.Add(layer < _sheet.StrikePaths.Count
-                ? Palettes.Load(_sheet.StrikePaths[layer], _sheet.Colours[layer])
-                : worn);
+            _still.Add(false);
 
             Sprite2D piece = new()
             {
@@ -178,16 +180,57 @@ public sealed partial class Actor : Node2D
     /// </summary>
     public void Strike()
     {
-        // 사람은 평타를 다른 파일에 들고 있고, 괴물은 같은 시트 안에 들고 있다. 둘 중 아무것도 없으면
-        // 휘두르는 그림이 없다는 뜻이므로 가만히 둔다.
-        if (_struck >= 0 || (_sheet.StrikePaths.Count == 0 && _sheet.Motion is null))
+        if (_struck < 0)
         {
-            return;
+            Play(BodyMotion.Blow, SecondsPerStrikeFrame);
+        }
+    }
+
+    /// <summary>
+    /// Plays a body motion the server named, towards the way the figure already faces — a spell does not turn
+    /// anybody round (user decision). Each piece plays it from its own file for that motion; a piece with no
+    /// such file is not drawn until the motion ends. A creature has one blow of its own and plays that whatever
+    /// the motion.
+    /// </summary>
+    /// <remarks>
+    /// A new motion takes over from one under way. The server sends several at once when one press sets off
+    /// more than one thing — Hades runs every learned skill of the blow kind with the plain blow (1, then 131,
+    /// then 133) — and the last is what the figure ends up doing.
+    /// <para>
+    /// A class motion is only drawn whole in that class's clothes: skill.tbl's ST column lists the clothes each
+    /// motion is for, and ordinary clothes have no file for it (trousers have none for a rogue, a shield none for
+    /// any skill), so the figure shows through. The original does the same (user).
+    /// </para>
+    /// </remarks>
+    public void Play(BodyMotion motion, double secondsPerFrame)
+    {
+        if (_sheet.Motion is null)
+        {
+            List<Texture2D?> sheets = [];
+
+            for (int layer = 0; layer < _sprites.Count; layer++)
+            {
+                sheets.Add(MotionSheet(layer, motion));
+            }
+
+            // 어느 부위에도 그 동작 그림이 없으면 그릴 것이 없다 — 가만히 둔다.
+            if (sheets.TrueForAll(sheet => sheet is null))
+            {
+                return;
+            }
+
+            for (int layer = 0; layer < _sprites.Count; layer++)
+            {
+                _still[layer] = sheets[layer] is null;
+                _sprites[layer].Texture = sheets[layer] ?? _standing[layer];
+                _sprites[layer].Visible = sheets[layer] is not null;
+            }
         }
 
+        _playing = motion;
+        _perFrame = secondsPerFrame;
         _struck = 0;
-        Wear(_swinging);
-        ShowFrame(_sheet.Motion?.Strike(Facing.Of(_direction).Side, 0) ?? WalkMotion.Strike(Facing.Of(_direction).Side, 0));
+        ShowPlaying(0);
     }
 
     public override void _Process(double delta)
@@ -222,10 +265,10 @@ public sealed partial class Actor : Node2D
 
         _struck += delta;
 
-        int frame = (int)(_struck / SecondsPerStrikeFrame);
-        int swings = _sheet.Motion?.AttackCount ?? WalkMotion.StrikeFrames;
+        int frame = (int)(_struck / _perFrame);
+        int frames = _sheet.Motion?.AttackCount ?? _playing.Count;
 
-        if (frame >= swings)
+        if (frame >= frames)
         {
             _struck = -1;
             Wear(_standing);
@@ -234,15 +277,50 @@ public sealed partial class Actor : Node2D
             return;
         }
 
-        ShowFrame(_sheet.Motion?.Strike(Facing.Of(_direction).Side, frame) ?? WalkMotion.Strike(Facing.Of(_direction).Side, frame));
+        ShowPlaying(frame);
     }
 
-    /// <summary>Swaps every layer between the sheets it stands in and the ones it swings in.</summary>
+    /// <summary>
+    /// The sheet one piece draws this motion from, or nothing when it has none. The blow is the separate file
+    /// the dresser found (ending 02); a skill is the same piece's file with the class letter on the end.
+    /// </summary>
+    private Texture2D? MotionSheet(int layer, BodyMotion motion)
+    {
+        string walk = _sheet.Paths[layer];
+        string? path = motion.File == BodyMotion.Blow.File
+            ? layer < _sheet.StrikePaths.Count && _sheet.StrikePaths[layer] != walk ? _sheet.StrikePaths[layer] : null
+            : walk.EndsWith(".png") ? $"{walk[..^4]}{motion.File}.png" : null;
+
+        return path is not null && ResourceLoader.Exists(path) ? Palettes.Load(path, _sheet.Colours[layer]) : null;
+    }
+
+    private void ShowPlaying(int step)
+    {
+        Facing facing = Facing.Of(_direction);
+
+        if (_sheet.Motion is { } creature)
+        {
+            ShowFrame(creature.Strike(facing.Side, step));
+            return;
+        }
+
+        for (int layer = 0; layer < _sprites.Count; layer++)
+        {
+            if (!_still[layer])
+            {
+                int frame = _playing.Frame(facing.Side, step);
+                _sprites[layer].RegionRect = new Rect2(frame * _sheet.CellWidth, 0, _sheet.CellWidth, _sheet.CellHeight);
+            }
+        }
+    }
+
+    /// <summary>Puts every layer back on the sheets it stands in, pieces a motion left out included.</summary>
     private void Wear(List<Texture2D> sheets)
     {
         for (int layer = 0; layer < _sprites.Count && layer < sheets.Count; layer++)
         {
             _sprites[layer].Texture = sheets[layer];
+            _sprites[layer].Visible = true;
         }
     }
 

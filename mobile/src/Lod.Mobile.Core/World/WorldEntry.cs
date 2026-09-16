@@ -174,6 +174,9 @@ public sealed record Creature(
 /// and <paramref name="At" /> says where.
 /// </summary>
 /// <param name="Speed">How long each frame stays, in milliseconds as the original counts them.</param>
+/// <summary>A body motion (0x1A): whose, which motion (see <c>Art.BodyMotion</c>) and how fast.</summary>
+public sealed record Motion(uint Serial, int Number, int Speed);
+
 public sealed record Effect(uint Target, uint Source, int TargetAnimation, int SourceAnimation, int Speed, Tile? At);
 
 /// <summary>
