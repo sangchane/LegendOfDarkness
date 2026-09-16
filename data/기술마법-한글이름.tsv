@@ -482,8 +482,8 @@
 기술	수도사	···· Inner Beast 5	Inner Beast 4	0	
 기술	수도사	····· Inner Beast 6	Inner Beast 5	0	
 기술	수도사	Kelberoth Strike		0	달마신공
-기술	수도사	Kick		0	
-기술	수도사	· High Kick	Kick	5	
+기술	수도사	Kick		0	단각
+기술	수도사	· High Kick	Kick	5	붕각
 기술	수도사	Lucky Hand		0	
 기술	수도사	Mantis Kick		0	
 기술	수도사	Mass Strike 1		0	
@@ -575,7 +575,7 @@
 마법	수도사	········· Hail of Feathers 10	Hail of Feathers 9	100	
 마법	수도사	Howl		0	
 마법	수도사	Inner Fire		0	
-마법	수도사	Iron Skin		0	
+마법	수도사	Iron Skin		0	금강불괴
 마법	수도사	Karura Form		0	
 마법	수도사	· Wild Karura Form	Karura Form	100	
 마법	수도사	·· Fierce Karura Form	Wild Karura Form	100	
