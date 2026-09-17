@@ -31,6 +31,8 @@ EXTRACTED = ROOT / "data" / "server-packs" / "extracted" / PACK
 MAPSRC = ROOT / "data" / "map-source" / PACK
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 IDTABLE = ROOT / "plans" / "5.99-맵번호표.tsv"
+# 5.99 의 워프 목록(warp_db.txt)이 싣지 않아 추출 자료에 없는 파일. 포테의숲 드나드는 줄이 여기에만 있다(docs/pote-forest.md).
+POTE_WARPS = ROOT / "data" / "server-packs" / PACK / "db" / "warp" / "Suomi_Warp.txt"
 
 BYTES_PER_TILE = 6          # 바닥 + 왼벽 + 오른벽, 각 ushort
 FIRST_MAP_ID = 20_000        # 1~65535 만 쓸 수 있다 — 맵 번호는 전선에서 16비트다(0x15).
@@ -93,10 +95,26 @@ def eligible_maps(_):
 
 
 def eligible_warps(_):
+    return known_warps(load("warps"))
+
+
+def eligible_pote_warps(_):
+    """포테의숲 워프 — `Suomi_Warp.txt` 에서 한쪽 끝이 포테의숲인 줄만. 수오미마을 안 건물 워프는 수오미 작업 때 들인다."""
+    rows = []
+    for line in POTE_WARPS.read_text(encoding="utf-8").splitlines():
+        c = [col.strip() for col in line.strip().split(",")]
+        if len(c) < 7 or line.strip().startswith("//") or not (c[1].startswith("포테의숲") or c[4].startswith("포테의숲")):
+            continue
+        rows.append({"출발맵": c[1], "출발": [c[2], c[3]], "도착맵": c[4], "도착": [c[5], c[6]],
+                     "출처": "warp/Suomi_Warp.txt", "raw": c})
+    return known_warps(rows)
+
+
+def known_warps(rows):
     """양 끝이 다 실재하는 맵이어야 번호로 바꿀 수 있다. 완전히 같은 줄은 하나만 남긴다."""
     names = {m["이름"] for m in load("maps")}
     keep, drop, seen = [], [], set()
-    for x in load("warps"):
+    for x in rows:
         miss = [k for k in ("출발맵", "도착맵") if x[k] not in names]
         if miss:
             drop.append((x, f"{'·'.join(miss)} 이 맵 목록에 없다: {x[miss[0]]}")); continue
@@ -146,6 +164,7 @@ RULES = {
     "worldmaps": lambda _: eligible_plain("worldmaps"),
     "maps":      eligible_maps,
     "warps":     eligible_warps,
+    "potewarps": eligible_pote_warps,
     "monsters":  eligible_monsters,
     "mundanes":  eligible_mundanes,
     "items":     lambda _: eligible_plain("items"),
@@ -156,7 +175,7 @@ RULES = {
 
 # 계획의 실측 표. 여기서 벗어나면 표가 틀렸거나 적재기가 틀렸다 — 진행 전에 가린다.
 # 기술·마법은 원작(abilities.json) 기준이다 — 팩의 82·71 이 아니다.
-EXPECTED = {"quests": 38, "shops": 47, "maps": 797, "warps": 886, "items": 989, "monsters": 565,
+EXPECTED = {"quests": 38, "shops": 47, "maps": 797, "warps": 886, "potewarps": 37, "items": 989, "monsters": 565,
             "mundanes": 84, "skills": 275, "spells": 338, "worldmaps": 1, "doors": 1}
 
 
@@ -1133,7 +1152,7 @@ def main():
             print(f"     넣음 {n}장 → templates/items/")
             print(f"     옮기지 않은 칸(뜻 미확인): " +
                   ", ".join(f"{k}×{v}" for k, v in skipped.most_common(10)))
-        elif kind == "warps" and a.write:
+        elif kind in ("warps", "potewarps") and a.write:
             if not IDTABLE.exists():
                 print("     번호표가 없다 — 먼저 --kind maps 를 돌려라"); return 1
             print(f"     넣음 {write_warps(keep)}장 → templates/warps/")
