@@ -94,11 +94,14 @@ public static class LayoutCheck
     };
 
     /// <summary>Representative pane entries so layout and screenshots exercise the restored icon sheets.</summary>
-    public static IReadOnlyList<LearnedSkill> PretendSkills { get; } =
-        [new LearnedSkill(1, 1, "Assail")];
+    /// <remarks>Filled past one page when stuffed, so the fan round the attack button is seen with a page to turn.</remarks>
+    public static IReadOnlyList<LearnedSkill> PretendSkills { get; } = Stuffed()
+        ? [.. Enumerable(1, 14, slot => new LearnedSkill(slot, slot, $"시험 기술 {slot}"))]
+        : [new LearnedSkill(1, 1, "Assail")];
 
-    public static IReadOnlyList<LearnedSpell> PretendSpells { get; } =
-        [new LearnedSpell(1, 21, SpellTargetType.ChooseTarget, "beag ioc", "Target", 2)];
+    public static IReadOnlyList<LearnedSpell> PretendSpells { get; } = Stuffed()
+        ? [.. Enumerable(1, 8, slot => new LearnedSpell(slot, 20 + slot, SpellTargetType.NoTarget, $"시험 마법 {slot}", string.Empty, 1))]
+        : [new LearnedSpell(1, 21, SpellTargetType.ChooseTarget, "beag ioc", "Target", 2)];
 
     /// <summary>
     /// Somebody to stand in the middle of the equipment ring while nothing is connected. The numbers are

@@ -82,6 +82,12 @@ public partial class Main : Control
     public static string Rehearse { get; private set; } = string.Empty;
 
     /// <summary>
+    /// A direction key to hold down on its own, as <c>--hold E</c> — pressed for a second and a half by a real press on
+    /// the key, to check that holding keeps walking and that the pad fades while it does.
+    /// </summary>
+    public static string Holding { get; private set; } = string.Empty;
+
+    /// <summary>
     /// Whether to tap the first other person the server shows us, as <c>--pick</c>. A real tap on their
     /// figure, so what it checks is the same path a thumb takes.
     /// </summary>
@@ -137,6 +143,7 @@ public partial class Main : Control
         ReadServer(Flag("--server"));
         ReadRehearsal(Flag("--login"));
         Rehearse = Flag("--walk");
+        Holding = Flag("--hold");
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;

@@ -11,7 +11,6 @@ namespace LodClient;
 public partial class GameScreen : Control
 {
     private const int AuxFontSize = 14;
-    private const int AttackSize = 64;
     private const int StatusBarWidth = 120;
     private const int PortraitStatusBarWidth = 96;
 
@@ -28,8 +27,25 @@ public partial class GameScreen : Control
     // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
     private int _talked;
     private Label _notice = null!;
+    private Control _noticePlate = null!;
+    private double _noticeLeft;
     private ProgressBar _targetHealth = null!;
+    private Control _targetPlate = null!;
+    private Control? _placePlate;
     private AbilityBar _abilities = null!;
+
+    /// <summary>How long a line the server said stays over the floor in landscape.</summary>
+    private const double NoticeSeconds = 4;
+
+    // 방향판. 걷는 동안 흐려져 그 밑의 바닥이 보인다 — 방향판은 가로에서 월드 왼쪽 아래를 덮는다.
+    private Control _pad = null!;
+    private readonly List<(ThumbButton Key, Direction Where)> _keys = [];
+    private double _stillFor = SettleSeconds;
+
+    /// <summary>How see-through the pad gets while walking, how long it waits after the last step, how fast it fades.</summary>
+    private const float WalkingAlpha = 0.35f;
+    private const double SettleSeconds = 0.25;
+    private const double FadeSeconds = 0.12;
 
     // 내 체력·마력. 서버가 준 값이 바뀔 때만 다시 쓴다.
     private ProgressBar _health = null!;
@@ -261,23 +277,24 @@ public partial class GameScreen : Control
         return frame;
     }
 
-    /// <summary>Name and health on the left, world state and inventory on the right, on a plate that keeps
-    /// them readable over the floor.</summary>
+    /// <summary>
+    /// Name and health on the left, whoever is picked out in the middle, world state and inventory on the right — each on
+    /// a plate of its own that keeps it readable over the floor, with the floor showing between them.
+    /// </summary>
     private Control BuildTopRow()
     {
-        PanelContainer plate = new();
-        plate.AddThemeStyleboxOverride("panel", Greybox.Plate());
-
-        HBoxContainer row = new();
+        HBoxContainer row = new() { MouseFilter = MouseFilterEnum.Ignore };
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
         // Empty until the server names us, in step with the place name below: a made-up name on the
         // HUD is worse than none, because there is no way to tell it from a real one.
         _who = Aux(string.Empty);
 
-        row.AddChild(_who);
-        row.AddChild(BuildVitals());
-        row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        HBoxContainer mine = new();
+        mine.AddThemeConstantOverride("separation", Main.Gutter);
+        mine.AddChild(_who);
+        mine.AddChild(BuildVitals());
+        row.AddChild(Plated(mine));
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
         _target = Aux(string.Empty);
@@ -298,8 +315,12 @@ public partial class GameScreen : Control
         picked.AddChild(_target);
         picked.AddChild(_targetHealth);
 
-        row.AddChild(picked);
-        row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        // 고른 이가 없으면 판째로 숨긴다 — 빈 판이 바닥 한가운데를 가린다.
+        CenterContainer middle = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
+        _targetPlate = Plated(picked);
+        _targetPlate.Visible = false;
+        middle.AddChild(_targetPlate);
+        row.AddChild(middle);
 
         // Where the server says we are. Offline it stays empty rather than claiming something untrue.
         _place = Aux(string.Empty);
@@ -307,7 +328,8 @@ public partial class GameScreen : Control
         // 360 across cannot hold this as well, so in portrait the log carries it instead.
         if (!Main.Portrait)
         {
-            row.AddChild(_place);
+            row.AddChild(_placePlate = Plated(_place));
+            _placePlate.Visible = false;
         }
 
         Button pack = new()
@@ -319,7 +341,14 @@ public partial class GameScreen : Control
         pack.Pressed += () => Carrying(true);
         row.AddChild(pack);
 
-        plate.AddChild(row);
+        return row;
+    }
+
+    private static Control Plated(Control inside)
+    {
+        PanelContainer plate = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+        plate.AddThemeStyleboxOverride("panel", Greybox.Plate());
+        plate.AddChild(inside);
 
         return plate;
     }
@@ -330,6 +359,12 @@ public partial class GameScreen : Control
         if (_world.PlaceName.Length > 0)
         {
             _place.Text = $"{_world.PlaceName} · {_world.Standing.X},{_world.Standing.Y}";
+        }
+
+        // 서버가 어디라고 말하기 전에는 빈 판이 오른쪽 위에 남는다.
+        if (_placePlate is not null)
+        {
+            _placePlate.Visible = _place.Text.Length > 0;
         }
 
         // The server names us in 0x33; nothing else on this screen knows who we are.
@@ -354,8 +389,16 @@ public partial class GameScreen : Control
         if (_server is { } server && server.SaidCount != _heard)
         {
             _heard = server.SaidCount;
-            _notice.Text = server.Said;
+            Notify(server.Said);
         }
+
+        if (_noticeLeft > 0 && (_noticeLeft -= delta) <= 0)
+        {
+            Notify(string.Empty);
+        }
+
+        KeepWalking(delta);
+        RehearseAHold(delta);
 
         // 레이아웃 검사는 세 프레임 만에 재고 끝난다. 90 프레임을 기다리면 닫힌 화면을 재게 되고,
         // 실제로 그래서 장비 칸이 넘쳤는데도 0 오류였다 — 검사 중에는 바로 연다.
@@ -427,11 +470,101 @@ public partial class GameScreen : Control
             : _world.TargetName;
 
         _targetHealth.Visible = left is not null;
+        _targetPlate.Visible = _target.Text.Length > 0;
 
         if (left is { } value)
         {
             _targetHealth.Value = value;
         }
+    }
+
+    // --hold 로 누르고 있는 시간. 음수면 아직 안 눌렀다.
+    private double _held = -1;
+    private int _holdWait;
+    private double _holdReported;
+
+    /// <summary>
+    /// Only when checking without a hand (<c>--hold E</c>): presses the key in the middle with a finger for a second and a
+    /// half, lets go, and says where the character stands and how see-through the pad is every quarter second.
+    /// </summary>
+    private void RehearseAHold(double delta)
+    {
+        // 접속 직후 서버가 화면을 새로 보내는 동안은 걸음을 버린다(CancelWalkingIfRefreshing) — 서버가 있으면 4초 남짓 기다린다.
+        if (Main.Holding.Length == 0 || _held > 3 || _holdWait++ < (_server is null ? 30 : 240))
+        {
+            return;
+        }
+
+        Button? key = _keys.FirstOrDefault(one => one.Where.ToString()[0] == char.ToUpperInvariant(Main.Holding[0])).Key;
+
+        if (key is null)
+        {
+            return;
+        }
+
+        if (_held < 0)
+        {
+            Press(key, true);
+            _held = 0;
+            GD.Print($"GREYBOX_HOLD 누름 칸 {_world.Standing.X},{_world.Standing.Y}");
+            return;
+        }
+
+        double before = _held;
+        _held += delta;
+
+        if (before < 1.5 && _held >= 1.5)
+        {
+            Press(key, false);
+            GD.Print($"GREYBOX_HOLD 뗌 칸 {_world.Standing.X},{_world.Standing.Y}");
+        }
+
+        if (_held - _holdReported >= 0.25)
+        {
+            _holdReported = _held;
+            GD.Print($"GREYBOX_HOLD {_held:0.00}초 칸 {_world.Standing.X},{_world.Standing.Y} 투명도 {_pad.Modulate.A:0.00}");
+        }
+    }
+
+    // 손가락으로 누른다 — 폰에서처럼 Godot 이 첫 손가락을 마우스로 바꿔 버튼에 준다. 마우스로 누르면 그다음 손가락이
+    // 첫 손가락으로 쳐져 폰과 다르게 돈다(두 손가락 시험에서 그랬다).
+    private static void Press(Button key, bool down) => Input.ParseInputEvent(
+        new InputEventScreenTouch { Index = 0, Pressed = down, Position = key.GetGlobalRect().GetCenter() });
+
+    /// <summary>
+    /// Shows a line under the world, and in landscape hides its plate again once it has been read — an empty plate is a
+    /// dark bar across the floor.
+    /// </summary>
+    private void Notify(string line)
+    {
+        _notice.Text = line;
+        _noticePlate.Visible = line.Length > 0;
+        _noticeLeft = line.Length > 0 ? NoticeSeconds : 0;
+    }
+
+    /// <summary>
+    /// Keeps stepping while a direction is held, and lets the pad fade while the character walks so the floor under it
+    /// shows. It comes back a moment after the last step, not between steps, or it would flicker.
+    /// </summary>
+    private void KeepWalking(double delta)
+    {
+        bool held = false;
+
+        foreach ((ThumbButton key, Direction where) in _keys)
+        {
+            if (key.Held)
+            {
+                held = true;
+                _world.Walk(where);
+            }
+        }
+
+        _stillFor = held || _world.Walking ? 0 : _stillFor + delta;
+
+        float wanted = _stillFor < SettleSeconds ? WalkingAlpha : 1f;
+        Color look = _pad.Modulate;
+        look.A = Mathf.MoveToward(look.A, wanted, (float)(delta / FadeSeconds));
+        _pad.Modulate = look;
     }
 
     /// <summary>
@@ -560,13 +693,20 @@ public partial class GameScreen : Control
     }
 
     /// <summary>
-    /// Movement on the left, attack on the right, status between them, inside a width capped so the two
-    /// clusters never drift further apart than a thumb can travel on a very wide screen.
+    /// Movement on the left, the attack button with the skills fanned round it on the right, status between them, inside
+    /// a width capped so the two clusters never drift further apart than a thumb can travel on a very wide screen.
     /// </summary>
+    /// <remarks>
+    /// In landscape the row lies over the floor, so nothing in it but the buttons and the notice takes a tap — a figure
+    /// standing between the pad and the fan must still be pickable.
+    /// </remarks>
     private Control BuildControlRow()
     {
-        HBoxContainer row = new();
-        row.AddThemeConstantOverride("separation", Main.Gutter);
+        HBoxContainer row = new() { MouseFilter = MouseFilterEnum.Ignore };
+
+        // 세로 360 폭은 방향판 152 + 틈 8 + 부채꼴 184 로 꼭 찬다. 칸 사이 틈을 두 번 두면 8 이 넘쳐,
+        // 세로에서는 가운데 칸 자체를 틈으로 쓴다.
+        row.AddThemeConstantOverride("separation", Main.Portrait ? 0 : Main.Gutter);
 
         _notice = new Label
         {
@@ -583,18 +723,22 @@ public partial class GameScreen : Control
         PanelContainer notice = new()
         {
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            SizeFlagsVertical = SizeFlags.ShrinkEnd
+            SizeFlagsVertical = SizeFlags.ShrinkEnd,
+            Visible = false
         };
         notice.AddThemeStyleboxOverride("panel", Greybox.Plate());
         notice.AddChild(_notice);
+        _noticePlate = notice;
 
-        row.AddChild(BuildMovementPad());
+        row.AddChild(_pad = BuildMovementPad());
 
         VBoxContainer middle = new()
         {
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ShrinkEnd,
-            Alignment = BoxContainer.AlignmentMode.End
+            Alignment = BoxContainer.AlignmentMode.End,
+            CustomMinimumSize = new Vector2(Main.Portrait ? Main.Gutter : 0, 0),
+            MouseFilter = MouseFilterEnum.Ignore
         };
 
         if (!Main.Portrait)
@@ -602,28 +746,21 @@ public partial class GameScreen : Control
             middle.AddChild(notice);
         }
 
-        _abilities = new AbilityBar
-        {
-            Alignment = BoxContainer.AlignmentMode.Center,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
+        row.AddChild(middle);
+
+        _abilities = new AbilityBar { SizeFlagsVertical = SizeFlags.ShrinkEnd };
         _abilities.SkillUsed += slot => _world.UseSkill(slot);
         _abilities.SpellUsed += slot => UseSpell(slot);
-        middle.AddChild(_abilities);
-        row.AddChild(middle);
-        Button strike = new()
-        {
-            Text = "공격",
-            CustomMinimumSize = new Vector2(AttackSize, AttackSize),
-            SizeFlagsVertical = SizeFlags.ShrinkEnd
-        };
 
         // One tap is one blow. It does not chase and it does not repeat — the server decides whether it
         // landed, and says so in words we show below rather than guessing at damage here.
-        strike.Pressed += () => _world.Strike();
-        row.AddChild(strike);
+        _abilities.Attack.Pressed += () => _world.Strike();
+        row.AddChild(_abilities);
 
-        return Main.Capped(row, Main.ThumbSpanMaximum);
+        MarginContainer capped = Main.Capped(row, Main.ThumbSpanMaximum);
+        capped.MouseFilter = MouseFilterEnum.Ignore;
+
+        return capped;
     }
 
     /// <summary>
@@ -641,14 +778,14 @@ public partial class GameScreen : Control
 
         if (spell.TargetType == SpellTargetType.ChooseTarget && _world.Target == 0)
         {
-            _notice.Text = "마법 대상을 먼저 누르세요.";
+            Notify("마법 대상을 먼저 누르세요.");
             return;
         }
 
         if (spell.TargetType is SpellTargetType.Prompt or SpellTargetType.FourDigit
             or SpellTargetType.ThreeDigit or SpellTargetType.TwoDigit or SpellTargetType.OneDigit)
         {
-            _notice.Text = $"{spell.Name}: 입력 창이 필요한 마법입니다.";
+            Notify($"{spell.Name}: 입력 창이 필요한 마법입니다.");
             return;
         }
 
@@ -656,12 +793,16 @@ public partial class GameScreen : Control
     }
 
     /// <summary>
-    /// Four directions, no diagonals: one tap is one tile, which is what this game is about. The floor is
-    /// laid in diamonds, so each of them moves diagonally on screen.
+    /// Four directions, no diagonals: one tap is one tile, which is what this game is about, and holding a direction keeps
+    /// walking (wireframes section 5). The floor is laid in diamonds, so each of them moves diagonally on screen.
     /// </summary>
+    /// <remarks>
+    /// A step starts the moment the key goes down rather than when it comes back up, and <see cref="KeepWalking" /> takes
+    /// the next one each time a step ends while it is still down.
+    /// </remarks>
     private Control BuildMovementPad()
     {
-        GridContainer pad = new() { Columns = 3, SizeFlagsVertical = SizeFlags.ShrinkEnd };
+        GridContainer pad = new() { Columns = 3, SizeFlagsVertical = SizeFlags.ShrinkEnd, MouseFilter = MouseFilterEnum.Ignore };
         pad.AddThemeConstantOverride("h_separation", Main.Gutter / 2);
         pad.AddThemeConstantOverride("v_separation", Main.Gutter / 2);
 
@@ -676,19 +817,25 @@ public partial class GameScreen : Control
         {
             if (key is null)
             {
-                pad.AddChild(new Control { CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) });
+                pad.AddChild(new Control
+                {
+                    CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
+                    MouseFilter = MouseFilterEnum.Ignore
+                });
                 continue;
             }
 
             Direction where = key.Value.Where;
 
-            Button button = new()
+            ThumbButton button = new()
             {
                 Text = key.Value.Glyph,
                 CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
             };
 
-            button.Pressed += () => _world.Walk(where);
+            Greybox.Disc(button);
+            button.ButtonDown += () => _world.Walk(where);
+            _keys.Add((button, where));
 
             pad.AddChild(button);
         }

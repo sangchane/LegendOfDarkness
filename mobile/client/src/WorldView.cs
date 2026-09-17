@@ -415,6 +415,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _mark.Visible = false;
     }
 
+    /// <summary>Whether a step is under way — the movement pad fades while it is.</summary>
+    public bool Walking => _walked >= 0;
+
     /// <summary>Starts a step. Ignored while one is still running, so a tile is never half walked.</summary>
     public void Walk(Direction direction)
     {
