@@ -19,6 +19,7 @@ public sealed partial class AbilityBar : Control
     internal const string SpellSheet = "res://assets/ability/spell.png";
 
     private readonly Button[] _slots = new Button[AbilityFan.PerPage];
+    private readonly Label[] _waits = new Label[AbilityFan.PerPage];
     private readonly Button _switch = Disc("기술", AbilityFan.ButtonSide);
     private readonly Button _next = Disc("1/1", AbilityFan.ButtonSide);
 
@@ -34,6 +35,9 @@ public sealed partial class AbilityBar : Control
 
     /// <summary>One tap is one blow — see <see cref="WorldView.Strike" />.</summary>
     public Button Attack { get; } = Disc("공격", AbilityFan.AttackSide);
+
+    /// <summary>How many seconds one slot still has to wait, asked of the server every frame.</summary>
+    public Func<bool, int, int>? Cooling { get; set; }
 
     public event Action<int>? SkillUsed;
     public event Action<int>? SpellUsed;
@@ -72,6 +76,44 @@ public sealed partial class AbilityBar : Control
 
             _slots[index] = slot;
             Place(slot, AbilityFan.Slots[index], AbilityFan.ButtonSide);
+
+            // 남은 초는 그림 위에 겹쳐 적는다. 칸이 48 이라 그림 옆에 글자를 둘 자리가 없다.
+            Label waiting = new()
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                MouseFilter = MouseFilterEnum.Ignore,
+                Visible = false
+            };
+            waiting.SetAnchorsPreset(LayoutPreset.FullRect);
+            waiting.AddThemeColorOverride("font_color", Colors.White);
+            waiting.AddThemeStyleboxOverride("normal", Greybox.Shade());
+
+            _waits[index] = waiting;
+            slot.AddChild(waiting);
+        }
+    }
+
+    /// <summary>
+    /// Counts down whatever is still cooling. The server says how long when a skill is used (0x3F); until it is ready the
+    /// slot says how many seconds are left and takes no press.
+    /// </summary>
+    public override void _Process(double delta)
+    {
+        for (int index = 0; index < _slots.Length; index++)
+        {
+            int slot = _drawn[index] switch
+            {
+                LearnedSkill skill => skill.Slot,
+                LearnedSpell spell => spell.Slot,
+                _ => 0
+            };
+
+            int left = slot > 0 && Cooling is { } ask ? ask(!_drawnSpells, slot) : 0;
+
+            _waits[index].Visible = left > 0;
+            _waits[index].Text = left > 0 ? left.ToString() : string.Empty;
+            _slots[index].Disabled = slot == 0 || left > 0;
         }
     }
 

@@ -76,6 +76,9 @@ public static class Greybox
         }
     }
 
+    /// <summary>Darkens what is under it, so a number written over a picture can be read.</summary>
+    public static StyleBoxFlat Shade() => new() { BgColor = new Color(0, 0, 0, 0.55f), CornerRadiusTopLeft = 23, CornerRadiusTopRight = 23, CornerRadiusBottomLeft = 23, CornerRadiusBottomRight = 23 };
+
     /// <summary>The play area behind the HUD. Flat on purpose: the map is not this stage's question.</summary>
     public static StyleBoxFlat World() => new() { BgColor = WorldFill };
 

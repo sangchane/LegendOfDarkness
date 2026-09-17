@@ -42,6 +42,9 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>What somebody near us said, as opposed to what the server itself says (<see cref="SpokenCommand" />).</summary>
     private const byte SpeechCommand = 0x0D;
+
+    /// <summary>How long until a skill or spell may be used again.</summary>
+    private const byte CooldownCommand = 0x3F;
     private const byte BodyMotionCommand = 0x1A;
     private const byte AnimationCommand = 0x29;
     private const byte SoundCommand = 0x19;
@@ -142,6 +145,9 @@ public sealed class WorldClient(WorldSession session)
     private const int HeardKept = 60;
 
     // 받는 쪽은 다른 실이다. 목록을 고치는 대신 새 목록으로 바꿔 끼워, 읽는 쪽이 훑는 도중에 바뀌지 않게 한다.
+    // 언제 다시 쓸 수 있나. 받는 쪽과 그리는 쪽이 다른 실이라 한꺼번에 읽고 쓰는 사전을 쓴다.
+    private readonly ConcurrentDictionary<(bool Skill, int Slot), DateTime> _cooling = new();
+
     private volatile IReadOnlyList<Spoken> _heard = [];
     private volatile int _heardTotal;
 
@@ -369,6 +375,15 @@ public sealed class WorldClient(WorldSession session)
                         _heard = [.. _heard.TakeLast(HeardKept - 1), spoken];
                         _heardTotal++;
                     }
+                }
+
+                    continue;
+
+                case CooldownCommand:
+                {
+                    Cooldown cooling = ReadCooldown(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                    _cooling[(cooling.Skill, cooling.Slot)] = DateTime.UtcNow.AddSeconds(cooling.Seconds);
                 }
 
                     continue;
@@ -1173,6 +1188,23 @@ public sealed class WorldClient(WorldSession session)
     }
 
     /// <summary>A skill pane row: slot, icon, then its display name as a short string.</summary>
+    /// <summary>Seconds left before one slot may be used again, or none when it is ready.</summary>
+    public int CoolingFor(bool skill, int slot) =>
+        _cooling.TryGetValue((skill, slot), out DateTime ready) ? Cooldown.Left(ready, DateTime.UtcNow) : 0;
+
+    /// <summary>Reads how long one slot must wait (0x3F).</summary>
+    public static Cooldown ReadCooldown(ReadOnlySpan<byte> body)
+    {
+        const int wanted = 6;
+
+        if (body.Length < wanted)
+        {
+            throw new ProtocolException($"다시 쓰기까지의 안내가 {wanted}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        return new Cooldown(body[0] == 1, body[1], (int)BinaryPrimitives.ReadUInt32BigEndian(body[2..]));
+    }
+
     /// <summary>Reads one line of speech (0x0D): how it was said, whose it is, and the words.</summary>
     public static Spoken ReadSpoken(ReadOnlySpan<byte> body)
     {

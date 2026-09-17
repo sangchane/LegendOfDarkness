@@ -193,6 +193,16 @@ public enum SpeechKind : byte
 public sealed record Spoken(SpeechKind Kind, uint Serial, string Text);
 
 /// <summary>
+/// How long until one skill or spell may be used again (0x3F). <paramref name="Skill" /> tells the two panes apart —
+/// both count their slots from one.
+/// </summary>
+public sealed record Cooldown(bool Skill, int Slot, int Seconds)
+{
+    /// <summary>Whole seconds left before <paramref name="ready" />, never less than none.</summary>
+    public static int Left(DateTime ready, DateTime now) => (int)Math.Max(0, Math.Ceiling((ready - now).TotalSeconds));
+}
+
+/// <summary>
 /// One thing in a character's pack. The server sends these one at a time, both on the way in and whenever
 /// something is picked up.
 /// </summary>

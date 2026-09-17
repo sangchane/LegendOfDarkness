@@ -56,6 +56,7 @@ public partial class GameScreen : Control
     private ProgressBar _mana = null!;
     private Label _healthText = null!;
     private Label _manaText = null!;
+    private Label _experience = null!;
     private Vitals? _shownVitals;
 
     // 서버가 말한 횟수. 같은 말을 다시 하는 것과 새로 하는 것을 가르려고 센다.
@@ -673,8 +674,13 @@ public partial class GameScreen : Control
         VBoxContainer vitals = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
         vitals.AddThemeConstantOverride("separation", 0);
 
+        // 경험치는 막대 없이 숫자만 둔다 — 서버는 다음 레벨까지 얼마 남았는지만 말하고 그 레벨에 얼마가 드는지는
+        // 말하지 않는다. 막대를 그리려면 길이를 지어내야 한다.
+        _experience = Aux(string.Empty);
+
         vitals.AddChild(Gauge("HP", out _health, out _healthText));
         vitals.AddChild(Gauge("MP", out _mana, out _manaText));
+        vitals.AddChild(_experience);
 
         return vitals;
     }
@@ -713,6 +719,10 @@ public partial class GameScreen : Control
         _shownVitals = mine;
         Fill(_health, _healthText, "HP", mine.Health, mine.MaximumHealth);
         Fill(_mana, _manaText, "MP", mine.Mana, mine.MaximumMana);
+
+        _experience.Text = mine.Level <= 0
+            ? string.Empty
+            : mine.ExperienceToGo <= 0 ? "EXP 다 올랐습니다" : $"EXP 다음까지 {mine.ExperienceToGo:N0}";
     }
 
     private static void Fill(ProgressBar bar, Label text, string name, int left, int most)
@@ -775,6 +785,7 @@ public partial class GameScreen : Control
         }
 
         _abilities = new AbilityBar { SizeFlagsVertical = SizeFlags.ShrinkEnd };
+        _abilities.Cooling = (skill, slot) => _server?.CoolingFor(skill, slot) ?? 0;
         _abilities.SkillUsed += slot => _world.UseSkill(slot);
         _abilities.SpellUsed += slot => UseSpell(slot);
 
