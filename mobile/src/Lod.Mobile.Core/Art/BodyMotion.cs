@@ -46,6 +46,53 @@ public sealed record BodyMotion(string File, int Start, int Count)
         : number >= 128 && number - 128 < Skills.Length ? Skills[number - 128]
         : null;
 
+    // skill.tbl 의 ST 칸 — 줄(NO)마다 그 기술 동작을 할 수 있는 옷(갑옷 U) 번호들. 처음 물을 때 한 번 읽는다.
+    private static IReadOnlyDictionary<int, HashSet<int>>? _clothes;
+
+    /// <summary>
+    /// Whether a figure wearing this armour plays this motion. The original client (Legend.exe 2005 = 5.99, 0x4e1124..
+    /// 0x4e1171; 4.51 0x4494b7) plays a skill motion only when the armour number is on that row's ST list in
+    /// skill.tbl, and plays nothing otherwise — it does not fall back to the blow. The blow is played whatever is worn.
+    /// </summary>
+    public static bool Fits(int number, int armour)
+    {
+        if (number < 128)
+        {
+            return true;
+        }
+
+        _clothes ??= ReadClothes();
+        return _clothes.TryGetValue(number - 128, out HashSet<int>? allowed) && allowed.Contains(armour);
+    }
+
+    /// <summary>skill.tbl rows are "NO FN SI FC ST…"; lines starting with ';' are the original developers' notes.</summary>
+    private static Dictionary<int, HashSet<int>> ReadClothes()
+    {
+        Dictionary<int, HashSet<int>> rows = [];
+        using Stream? stream = typeof(BodyMotion).Assembly.GetManifestResourceStream("skill.tbl");
+
+        if (stream is null)
+        {
+            return rows;
+        }
+
+        using StreamReader reader = new(stream, Protocol.LegacyKoreanEncoding.Encoding);
+
+        while (reader.ReadLine() is { } line)
+        {
+            string[] parts = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length < 4 || !int.TryParse(parts[0], out int no))
+            {
+                continue;
+            }
+
+            rows[no] = [.. parts.Skip(4).Select(part => int.TryParse(part, out int clothes) ? clothes : -1).Where(clothes => clothes >= 0)];
+        }
+
+        return rows;
+    }
+
     /// <summary>The drawing for this step, seen from this side. A step past the end holds the last drawing.</summary>
     public int Frame(Side side, int step) =>
         Start + (side == Side.Front ? Count : 0) + Math.Clamp(step, 0, Count - 1);

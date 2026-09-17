@@ -11,8 +11,11 @@
 
 소리는 165개 다 해도 2MB 남짓이라 전부 넣는다.
 
-캐릭터·괴물 그림과 같은 1배로 뽑는다(관리페이지는 2배). 색표는 `effpal.tbl` 이 정한다(자세한 까닭은 `build-ability-sprites.py`). 프레임 수는 괴물 그림처럼 옆
-글자 파일(`effects.txt`, `번호 프레임수` 줄)로 둔다 — 내보낼 때 이미 있는 `*.txt` 필터로 따라간다.
+캐릭터·괴물 그림과 같은 1배로 뽑는다(관리페이지는 2배). 색표는 `effpal.tbl` 이 정한다(자세한 까닭은 `build-ability-sprites.py`). 프레임 수와
+**틀 순서**는 옆 글자 파일(`effects.txt`, `번호 칸수 순서…` 줄)로 둔다 — 내보낼 때 이미 있는 `*.txt` 필터로 따라간다.
+틀 순서는 원작 2005(= 5.99 클라이언트) `roh.dat` 의 `effect.tbl` 이다 — 첫 줄이 개수, 그다음 줄마다 이펙트 번호
+차례로 칸 순서(203 = `0 1 1`). 원작 클라이언트가 이 순서로 튼다(docs/disassembly.md). 빈 칸도 번호를 차지하므로
+`dat-extract` 가 빈 칸을 자리표시로 남긴 뒤에 뽑아야 순서가 맞는다.
 
   쓰는 법: python3 scripts/build-client-effects.py
   산출물:  mobile/client/assets/effect/efct###.png · effects.txt · mobile/client/assets/sound/N.mp3
@@ -92,6 +95,21 @@ def palettes(scratch):
     return palette
 
 
+def effect_orders(scratch):
+    """이펙트 번호 → 칸 순서. 5.99 한국 클라이언트(= 원작 2005)의 `effect.tbl` 을 먼저, 없으면 하데스 것."""
+    for archive in (KOREAN_ROH, ROH):
+        if not archive.exists():
+            continue
+        folder = Path(scratch) / archive.parent.name
+        run("dump", archive, folder, "effect.tbl")
+        found = next((p for p in folder.rglob("*") if p.name.lower() == "effect.tbl"), None)
+        if not found:
+            continue
+        lines = found.read_text(encoding="cp949", errors="replace").splitlines()[1:]
+        return {number: [int(x) for x in line.split() if x.isdigit()] for number, line in enumerate(lines, start=1)}
+    return {}
+
+
 def main():
     if not TOOL.exists():
         print(f"도구가 없습니다. 먼저: {DOTNET} build tools/dat-extract/DatExtract.csproj -c Release")
@@ -101,9 +119,10 @@ def main():
     SOUNDS.mkdir(parents=True, exist_ok=True)
 
     wanted = effect_numbers()
-    drawn, missing = [], []
+    drawn, missing, efa = [], [], set()
     with tempfile.TemporaryDirectory() as scratch:
         palette = palettes(scratch)
+        orders = effect_orders(scratch)
         for number in wanted:
             name = f"efct{number:03d}"
             out = EFFECTS / f"{name}.png"
@@ -113,13 +132,16 @@ def main():
                 # 232 번부터는 한국 5.99 클라이언트에만 있고 형식도 EFA 다.
                 proc = run("efa", KOREAN_ROH, name, out, 1)
                 frames = re.search(rf"{name}\.efa: 프레임 (\d+)개", proc.stdout)
+                efa.add(number)
             if not frames or not out.exists():
                 missing.append(number)
                 continue
             drawn.append((number, int(frames.group(1))))
 
     (EFFECTS / "effects.txt").write_text(
-        "# 번호 프레임수 — scripts/build-client-effects.py\n" + "".join(f"{n} {f}\n" for n, f in drawn),
+        "# 번호 칸수 순서 — scripts/build-client-effects.py (순서는 effect.tbl)\n"
+        # EFA 는 자기 칸 수·간격을 파일에 갖고, effect.tbl 의 그 번호 줄은 "0" 한 칸뿐이다 — 순서를 적지 않고 차례로 튼다.
+        + "".join(f"{n} {f} {'' if n in efa else ' '.join(map(str, orders.get(n, [])))}".rstrip() + "\n" for n, f in drawn),
         encoding="utf-8")
     print(f"이펙트 {len(drawn)}개 → {EFFECTS.relative_to(ROOT)}")
     if missing:

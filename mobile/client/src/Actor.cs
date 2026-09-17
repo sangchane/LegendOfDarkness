@@ -198,13 +198,7 @@ public sealed partial class Actor : Node2D
     /// Swings once. Nothing follows from it here — whether it hit is the server's to say — and a swing
     /// already under way is left to finish rather than restarted.
     /// </summary>
-    public void Strike()
-    {
-        if (_struck < 0)
-        {
-            Play(BodyMotion.Blow, SecondsPerStrikeFrame);
-        }
-    }
+    public void Strike() => Play(BodyMotion.Blow, SecondsPerStrikeFrame);
 
     /// <summary>
     /// Plays a body motion the server named, towards the way the figure already faces — a spell does not turn
@@ -213,9 +207,10 @@ public sealed partial class Actor : Node2D
     /// the motion.
     /// </summary>
     /// <remarks>
-    /// A new motion takes over from one under way. The server sends several at once when one press sets off
-    /// more than one thing — Hades runs every learned skill of the blow kind with the plain blow (1, then 131,
-    /// then 133) — and the last is what the figure ends up doing.
+    /// A motion that arrives while another is under way is ignored, as the original client does (Legend.exe 2005
+    /// 0x4e1130: a busy figure keeps what it is doing). Hades sends several at once when one press sets off more than
+    /// one thing — every learned skill of the blow kind runs with the plain blow (1, then 131, then 133) — so only
+    /// the first of those is seen, the same as it would be in the original.
     /// <para>
     /// A class motion is only drawn whole in that class's clothes: skill.tbl's ST column lists the clothes each
     /// motion is for, and ordinary clothes have no file for it (trousers have none for a rogue, a shield none for
@@ -224,6 +219,11 @@ public sealed partial class Actor : Node2D
     /// </remarks>
     public void Play(BodyMotion motion, double secondsPerFrame)
     {
+        if (_struck >= 0)
+        {
+            return;
+        }
+
         if (_sheet.Motion is null)
         {
             List<Texture2D?> sheets = [];

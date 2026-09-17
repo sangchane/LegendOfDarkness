@@ -25,6 +25,35 @@ public sealed class BodyMotionTests
         Assert.Equal(new BodyMotion(file, start, count), BodyMotion.Of(number));
     }
 
+    /// <summary>
+    /// The original client plays a skill motion only when the armour worn is one skill.tbl lists for that row (the ST
+    /// column), and otherwise plays nothing at all — Legend.exe 2005 0x4e1161..0x4e1171, 4.51 0x4494b7. The table is
+    /// the 2005 (= 5.99) one: Hades' copy has one more number per class at the end (348~352), which the original lacks.
+    /// </summary>
+    [Theory]
+    [InlineData(133, 3, true)]    // 무도가 돌려차기 · 무도가 옷 3
+    [InlineData(133, 2, false)]   // 전사 옷으로는 안 한다
+    [InlineData(134, 4, true)]    // 도적 찌르기 · 도적 옷 4
+    [InlineData(129, 2, true)]    // 전사 양손 · 전사 옷 2
+    [InlineData(129, 4, false)]
+    [InlineData(139, 2, false)]   // 검투사 줄 — 전사 옷 목록이 아니다
+    [InlineData(139, 268, true)]
+    [InlineData(128, 348, false)] // 하데스 사본에만 있는 번호
+    [InlineData(128, 0, false)]   // 맨몸
+    public void A_skill_motion_plays_only_in_clothes_its_row_lists(int number, int armour, bool plays)
+    {
+        Assert.Equal(plays, BodyMotion.Fits(number, armour));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(2)]
+    [InlineData(4)]
+    public void The_plain_blow_does_not_care_what_is_worn(int armour)
+    {
+        Assert.True(BodyMotion.Fits(1, armour));
+    }
+
     [Fact]
     public void The_plain_blow_is_the_file_ending_02()
     {

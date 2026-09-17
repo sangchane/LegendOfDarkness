@@ -930,6 +930,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
     }
 
+    /// <summary>The armour number somebody is shown wearing, 0 when bare or not described.</summary>
+    private static int ArmourOf(WorldClient world, uint serial) =>
+        (serial == world.Serial ? world.Self : world.Others.FirstOrDefault(other => other.Serial == serial))?.Wearing?.Armor ?? 0;
+
     private Actor? Someone(WorldClient world, uint serial) =>
         serial == world.Serial ? _player
         : _crowd.TryGetValue(serial, out Actor? person) ? person
@@ -975,7 +979,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// <summary>
     /// Draws the body motions the server names — anybody's, ours included, since a skill's motion is only known
     /// from here. Our own plain blow is drawn as it is asked for, so that one coming back is left alone. A motion
-    /// with no drawing (a hands-up, an emote) moves nobody; a creature swings its own blow for any.
+    /// with no drawing (a hands-up, an emote) moves nobody; a creature swings its own blow for any. A skill motion
+    /// is drawn only in clothes skill.tbl lists for it — the original client does nothing otherwise
+    /// (<see cref="BodyMotion.Fits" />).
     /// </summary>
     private void Swings()
     {
@@ -986,7 +992,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 continue;
             }
 
-            if (BodyMotion.Of(motion.Number) is { } body)
+            if (BodyMotion.Of(motion.Number) is { } body
+                && (_herd.ContainsKey(motion.Serial) || BodyMotion.Fits(motion.Number, ArmourOf(world, motion.Serial))))
             {
                 actor.Play(body, body.SecondsPerFrame(motion.Speed));
             }

@@ -34,9 +34,9 @@
   (`scripts/build-client-wardrobe.py`, 칸 120x96). 5.99 무기 111종이 서버 템플릿으로 들어왔다(`build-pack-equipment.py`, 상점·드롭은 아직).
   겹치는 순서는 5.99 `Legend.exe` 표 그대로(`Wardrobe.Rank`). **평타 동작은 5.99 서버처럼 무기 → 갑옷의 `공격모션` 으로 고른다**
   (`ItemTemplate.AttackMotion`·`Assail.BlowMotion`). 5.99 갑옷 225종도 들어와 도복 주먹·신발 금지가 된다
-  (`build-pack-equipment.py`). **남은 것: 갑옷 번호의 옷장 그림·아이콘 뽑기, 상점·드롭.**
-  **역어셈블**: 정리 `docs/disassembly.md`, 원작 클라이언트는 윈도우 PC 에서 `docs/disassembly-work-order.md` 대로
-  → 브랜치 `docs/disassembly-original-client` 로 푸시되면 합친다. 남은 빈틈: **괴물 그림이 8종뿐**, 이펙트·괴물 그림도 빈 칸 번호 밀림을 다시 확인(`Epf.cs` 고침 뒤 이펙트는 아직 안 뽑음, `Mpf.cs` 미확인),
+  (`build-pack-equipment.py`), 옷장 그림·아이콘까지. **남은 것: 상점·드롭.**
+  **역어셈블**: 정리 `docs/disassembly.md`(5.99 서버·클라이언트 + 원작 4.51·2005, 합쳤다). 기술 동작 옷 목록·이펙트 칸 순서는
+  모바일에 옮겼다. 남은 것: 동작 6·21·22·감정 번호 구간, 5.99 무기·갑옷 상점·드롭. 남은 빈틈: **괴물 그림이 8종뿐**, 이펙트·괴물 그림도 빈 칸 번호 밀림을 다시 확인(`Epf.cs` 고침 뒤 이펙트는 아직 안 뽑음, `Mpf.cs` 미확인),
   하데스가 괴물 평타에도 그림 203 을 띄운다(5.99 기본공격은 그림 없음 — 괴물 쪽은 모름).
   2. 직업은 파일 이름 → 가르치는 NPC → 모션(`skill.tbl`) 순으로 정한다 — 공통스킬 8개만 공용
   3. `로카메아` 는 원본의 이름 없는 `$` 변수 때문에 못 옮겼다

@@ -1105,7 +1105,7 @@
         "0x455fe8",
         "0x456089"
       ],
-      "implemented": "옮기지 않음 — BodyMotion 은 옷을 보지 않는다"
+      "implemented": "BodyMotion.Fits(원작 2005 skill.tbl 내장) · WorldView.Swings — 2026-09-17"
     },
     {
       "id": "client-skill-armor-gate",
@@ -1118,7 +1118,7 @@
         "0x4e1171",
         "0x5210f0"
       ],
-      "implemented": "옮기지 않음 — BodyMotion 은 옷을 보지 않는다"
+      "implemented": "BodyMotion.Fits(원작 2005 skill.tbl 내장) · WorldView.Swings — 2026-09-17"
     },
     {
       "id": "client-disguise-motion",
@@ -1146,7 +1146,7 @@
         "0x4838ba",
         "0x4838cd"
       ],
-      "implemented": "아직 — 모바일 이펙트와 견주지 않았다"
+      "implemented": "EffectSheet · Flash — effects.txt 에 원작 2005 effect.tbl 칸 순서, 속도는 한 칸 간격(ms) — 2026-09-17"
     },
     {
       "id": "orig451-mpf-frames",
