@@ -31,6 +31,13 @@ public partial class GameScreen : Control
     private ProgressBar _targetHealth = null!;
     private AbilityBar _abilities = null!;
 
+    // 내 체력·마력. 서버가 준 값이 바뀔 때만 다시 쓴다.
+    private ProgressBar _health = null!;
+    private ProgressBar _mana = null!;
+    private Label _healthText = null!;
+    private Label _manaText = null!;
+    private Vitals? _shownVitals;
+
     // 서버가 말한 횟수. 같은 말을 다시 하는 것과 새로 하는 것을 가르려고 센다.
     private int _heard = -1;
     private Control _packRow = null!;
@@ -273,7 +280,7 @@ public partial class GameScreen : Control
         _who = Aux(string.Empty);
 
         row.AddChild(_who);
-        row.AddChild(BuildHealth());
+        row.AddChild(BuildVitals());
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
@@ -332,8 +339,10 @@ public partial class GameScreen : Control
         // The server names us in 0x33; nothing else on this screen knows who we are.
         if (_server?.Self?.Name is { Length: > 0 } called)
         {
-            _who.Text = called;
+            _who.Text = Mine.Level > 0 ? $"{called} Lv{Mine.Level}" : called;
         }
+
+        ShowVitals();
 
         ShowTarget();
         _abilities.Show(
@@ -363,7 +372,7 @@ public partial class GameScreen : Control
 
         if (_pack.Visible)
         {
-            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf);
+            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf, Mine.Gold);
 
             // 손 없이 확인할 때만. 목록이 채워진 다음 프레임에 첫 줄을 한 번 누른다.
             if ((Main.Wearing || Main.Throwing) && !_worn && _pack.PressFirst(Main.Throwing))
@@ -445,7 +454,7 @@ public partial class GameScreen : Control
 
         if (open)
         {
-            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf);
+            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf, Mine.Gold);
         }
     }
 
@@ -474,27 +483,65 @@ public partial class GameScreen : Control
         }
     }
 
-    /// <summary>Bar and numbers together: health must never be readable by colour alone.</summary>
-    private static Control BuildHealth()
-    {
-        HBoxContainer health = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
-        health.AddThemeConstantOverride("separation", Main.Gutter / 2);
+    /// <summary>Our own numbers as the server last gave them; made-up ones while nothing is connected.</summary>
+    private Vitals Mine => _server is null ? LayoutCheck.PretendVitals : _server.Vitals ?? Vitals.Unknown;
 
-        ProgressBar bar = new()
+    /// <summary>
+    /// Health over mana, each a bar with its numbers beside it: health must never be readable by colour alone, and
+    /// the two bars share a colour, so the words say which is which.
+    /// </summary>
+    private Control BuildVitals()
+    {
+        VBoxContainer vitals = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+        vitals.AddThemeConstantOverride("separation", 0);
+
+        vitals.AddChild(Gauge("HP", out _health, out _healthText));
+        vitals.AddChild(Gauge("MP", out _mana, out _manaText));
+
+        return vitals;
+    }
+
+    private static Control Gauge(string name, out ProgressBar bar, out Label text)
+    {
+        HBoxContainer row = new();
+        row.AddThemeConstantOverride("separation", Main.Gutter / 2);
+
+        bar = new ProgressBar
         {
-            CustomMinimumSize = new Vector2(Main.Portrait ? PortraitStatusBarWidth : StatusBarWidth, 12),
-            MaxValue = 250,
-            Value = 180,
+            CustomMinimumSize = new Vector2(Main.Portrait ? PortraitStatusBarWidth : StatusBarWidth, 10),
             ShowPercentage = false,
             SizeFlagsVertical = SizeFlags.ShrinkCenter
         };
         bar.AddThemeStyleboxOverride("background", Greybox.Surface());
         bar.AddThemeStyleboxOverride("fill", Greybox.Fill());
 
-        health.AddChild(bar);
-        health.AddChild(Aux(Main.Portrait ? "180 / 250" : "HP 180 / 250"));
+        text = Aux(name);
+        row.AddChild(bar);
+        row.AddChild(text);
 
-        return health;
+        return row;
+    }
+
+    /// <summary>Puts the newest health and mana on the bars, only when they have changed.</summary>
+    private void ShowVitals()
+    {
+        Vitals mine = Mine;
+
+        if (mine == _shownVitals)
+        {
+            return;
+        }
+
+        _shownVitals = mine;
+        Fill(_health, _healthText, "HP", mine.Health, mine.MaximumHealth);
+        Fill(_mana, _manaText, "MP", mine.Mana, mine.MaximumMana);
+    }
+
+    private static void Fill(ProgressBar bar, Label text, string name, int left, int most)
+    {
+        bar.MaxValue = Mathf.Max(1, most);
+        bar.Value = left;
+        text.Text = $"{name} {left}/{most}";
     }
 
     /// <summary>

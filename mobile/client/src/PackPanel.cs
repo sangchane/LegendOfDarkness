@@ -27,6 +27,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Button _gearTab = new() { Text = "장비", ToggleMode = true };
     private readonly Button _packTab = new() { Text = "소지품", ToggleMode = true };
     private readonly Label _chosenName = new();
+    private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right };
     private readonly Button _use = new() { Text = "입기" };
     private readonly Button _drop = new() { Text = "버리기" };
 
@@ -131,6 +132,10 @@ public sealed partial class PackPanel : PanelContainer
 
         body.AddChild(head);
         body.AddChild(scroll);
+
+        // 원작도 금화를 소지품 창에 적었다. 상점에서 사기 전에 볼 곳이 여기다. 머리 줄에 두면 세로 360 에서
+        // 탭·정렬·닫기와 함께 넘친다(한 번 그렇게 됐다) — 따로 한 줄.
+        body.AddChild(_gold);
         body.AddChild(foot);
 
         AddChild(body);
@@ -173,8 +178,10 @@ public sealed partial class PackPanel : PanelContainer
     public Button Tidy { get; }
 
     /// <summary>Shows what is worn and what is carried, and says plainly when there is nothing.</summary>
-    public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn, Character? self = null)
+    public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn, Character? self = null, long gold = 0)
     {
+        _gold.Text = $"금화 {gold:N0}";
+
         // 종이인형은 목록과 따로 갱신한다 — 차림이 바뀌는 것과 소지품이 바뀌는 것은 같은 일이 아니다.
         _gear.ShowDoll(self);
 

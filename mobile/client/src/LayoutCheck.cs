@@ -84,6 +84,15 @@ public static class LayoutCheck
             100))]
         : [];
 
+    /// <summary>
+    /// Our own numbers while nothing is connected. The widest the top row will ever have to hold — a level-99 character
+    /// with five-digit health and mana — so a check measures the row at its fullest, and a plain run still shows bars.
+    /// </summary>
+    public static Vitals PretendVitals { get; } = Vitals.Unknown with
+    {
+        Level = 99, Health = 99999, MaximumHealth = 99999, Mana = 99999, MaximumMana = 99999, Gold = 999_999_999
+    };
+
     /// <summary>Representative pane entries so layout and screenshots exercise the restored icon sheets.</summary>
     public static IReadOnlyList<LearnedSkill> PretendSkills { get; } =
         [new LearnedSkill(1, 1, "Assail")];
