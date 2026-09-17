@@ -59,6 +59,12 @@ public sealed class WorldClient(WorldSession session)
     private const byte TakeOffCommand = 0x44;
     private const byte ClickCommand = 0x43;
     private const byte DialogueCommand = 0x2F;
+
+    /// <summary>
+    /// A window the server walks somebody through, or the word that shuts any window. The same number as
+    /// <see cref="MoveCommand" />, coming the other way.
+    /// </summary>
+    private const byte SequenceCommand = 0x30;
     private const byte ClickBySerial = 0x01;
 
     /// <summary>Spending one of the points a level handed out. One byte: which attribute.</summary>
@@ -198,6 +204,11 @@ public sealed class WorldClient(WorldSession session)
     /// <summary>The window the last tapped NPC opened, or null if none has. (Not <c>Said</c> — that is
     /// chat overheard in the map; this is a conversation we started by tapping.)</summary>
     public Dialogue? Talking { get; private set; }
+
+    /// <summary>How many windows have opened or shut, so a reader can tell the same words again from nothing new.</summary>
+    public int TalkCount => _talkCount;
+
+    private volatile int _talkCount;
 
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
@@ -412,6 +423,16 @@ public sealed class WorldClient(WorldSession session)
 
                 case DialogueCommand:
                     Talking = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    _talkCount++;
+                    continue;
+
+                case SequenceCommand:
+                    if (ShutsDialogue(HadesCipher.DecodeSecured(frame, session.Parameters)))
+                    {
+                        Talking = null;
+                        _talkCount++;
+                    }
+
                     continue;
 
                 default:
@@ -456,14 +477,33 @@ public sealed class WorldClient(WorldSession session)
     /// (<c>NetworkPacketReader.ReadUInt16</c> shifts the first byte up).
     /// </remarks>
     public Task AnswerAsync(uint speaker, ushort choice, CancellationToken cancellationToken) =>
+        Answer(speaker, 0x0000, choice, [NothingTyped], cancellationToken);
+
+    /// <summary>
+    /// Answers with words as well — what was typed, or what the window asked to have handed back (the thing to buy,
+    /// the slot to sell). <b>Not <c>0x39</c></b> for this either: <c>ClientFormat39</c> reads its words as ASCII, so a
+    /// Korean item name arrives as question marks and the shop finds nothing by it. <c>ClientFormat3A</c> reads them
+    /// in the server's own code page.
+    /// </summary>
+    public Task AnswerAsync(uint speaker, ushort choice, string words, CancellationToken cancellationToken) =>
+        Answer(speaker, 0x0000, choice, [WordsTyped, .. LegacyKoreanEncoding.EncodeStringA(words)], cancellationToken);
+
+    /// <summary>
+    /// Says the window was shut from our side, so the server stops walking us through a menu
+    /// (<c>Format3AHandler</c>: step 0 with script 0xFFFF closes the dialog).
+    /// </summary>
+    public Task ShutDialogueAsync(CancellationToken cancellationToken) =>
+        Answer(0, 0xFFFF, 0x0000, [NothingTyped], cancellationToken);
+
+    private Task Answer(uint speaker, ushort script, ushort choice, byte[] tail, CancellationToken cancellationToken) =>
         SendDialog(
             AnswerCommand,
             [
                 MundaneSpeaker,
                 (byte)(speaker >> 24), (byte)(speaker >> 16), (byte)(speaker >> 8), (byte)speaker,
-                0x00, 0x00,
+                (byte)(script >> 8), (byte)script,
                 (byte)(choice >> 8), (byte)choice,
-                NothingTyped
+                .. tail
             ],
             cancellationToken);
 
@@ -472,6 +512,8 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>Closes the packet where a typed line would go. <c>0x02</c> there means one follows.</summary>
     private const byte NothingTyped = 0x01;
+
+    private const byte WordsTyped = 0x02;
 
     /// <summary>
     /// Says something out loud. The server treats a line beginning with a known word as a command when the
@@ -1142,9 +1184,121 @@ public sealed class WorldClient(WorldSession session)
         uint serial = (uint)((body[2] << 24) | (body[3] << 16) | (body[4] << 8) | body[5]);
         string who = LegacyKoreanEncoding.DecodeStringB(body[beforeName..], out int consumed);
         ReadOnlySpan<byte> rest = body[(beforeName + consumed)..];
-        string what = rest.Length > 0 ? LegacyKoreanEncoding.DecodeStringB(rest, out _) : string.Empty;
+        string what = rest.Length > 0 ? LegacyKoreanEncoding.DecodeStringB(rest, out consumed) : string.Empty;
 
-        return new Dialogue(serial, who, what);
+        Dialogue talk = new(serial, who, what) { Kind = (DialogueKind)body[0] };
+
+        try
+        {
+            return rest.Length > 0 ? WithWindowData(talk, rest[consumed..]) : talk;
+        }
+        catch (ProtocolException)
+        {
+            // The words are still worth showing when what follows them is cut short.
+            return talk;
+        }
+    }
+
+    /// <summary>
+    /// Reads what one kind of window carries under its words, the way each Hades <c>IDialogData</c> writes it.
+    /// </summary>
+    private static Dialogue WithWindowData(Dialogue talk, ReadOnlySpan<byte> data)
+    {
+        int at = 0;
+
+        switch (talk.Kind)
+        {
+            case DialogueKind.Options or DialogueKind.OptionsWithArgs:
+            {
+                string args = talk.Kind == DialogueKind.OptionsWithArgs ? Words(data, ref at) : string.Empty;
+                int count = Byte(data, ref at);
+                List<DialogueOption> options = [];
+
+                // OptionsData counts a choice with no words but writes nothing for it, so the bytes decide.
+                for (int i = 0; i < count && at < data.Length; i++)
+                {
+                    options.Add(new DialogueOption(Words(data, ref at), Word(data, ref at)));
+                }
+
+                return talk with { Args = args, Options = options };
+            }
+
+            case DialogueKind.TextInput or DialogueKind.ForgetSpell or DialogueKind.ForgetSkill:
+                return talk with { Step = Word(data, ref at) };
+
+            case DialogueKind.Goods:
+            {
+                ushort step = Word(data, ref at);
+                int count = Word(data, ref at);
+                List<DialogueGoods> goods = [];
+
+                for (int i = 0; i < count; i++)
+                {
+                    goods.Add(new DialogueGoods(Word(data, ref at), Byte(data, ref at), Long(data, ref at), Words(data, ref at)));
+
+                    // 직업 이름 — 원작 창은 쓰지 않는다.
+                    Words(data, ref at);
+                }
+
+                return talk with { Step = step, Goods = goods };
+            }
+
+            case DialogueKind.PackSlots:
+            {
+                // ItemSellData 는 번호를 한 바이트만 쓰고, shop1 은 그 바이트를 한 자리 올린 값(0x05 → 0x0500)을 기다린다.
+                ushort step = (ushort)(Byte(data, ref at) << 8);
+                int count = Word(data, ref at);
+                List<int> slots = [];
+
+                for (int i = 0; i < count; i++)
+                {
+                    slots.Add(Byte(data, ref at));
+                }
+
+                return talk with { Step = step, Slots = slots };
+            }
+
+            case DialogueKind.Spells or DialogueKind.Skills:
+            {
+                ushort step = Word(data, ref at);
+                int count = Word(data, ref at);
+                List<DialogueAbility> abilities = [];
+
+                for (int i = 0; i < count; i++)
+                {
+                    Byte(data, ref at); // 마법 2 · 기술 3
+                    int icon = Word(data, ref at);
+                    Byte(data, ref at);
+                    abilities.Add(new DialogueAbility(icon, Words(data, ref at)));
+                }
+
+                return talk with { Step = step, Abilities = abilities };
+            }
+
+            default:
+                return talk;
+        }
+    }
+
+    /// <summary>
+    /// <c>GameClient.CloseDialog</c> sends the raw bytes 0x30 0x00 0x0A 0x00; the 0x00 after the command goes for the
+    /// ordinal, so the body starts 0x0A. A sequence opening starts with its kind instead (0x00, or 0x04 for typing).
+    /// </summary>
+    public static bool ShutsDialogue(ReadOnlySpan<byte> body) => body.Length >= 1 && body[0] == 0x0A;
+
+    private static byte Byte(ReadOnlySpan<byte> data, ref int at) =>
+        at < data.Length ? data[at++] : throw new ProtocolException("대화창 자료가 중간에 끊겼습니다.");
+
+    private static ushort Word(ReadOnlySpan<byte> data, ref int at) => (ushort)((Byte(data, ref at) << 8) | Byte(data, ref at));
+
+    private static uint Long(ReadOnlySpan<byte> data, ref int at) => ((uint)Word(data, ref at) << 16) | Word(data, ref at);
+
+    private static string Words(ReadOnlySpan<byte> data, ref int at)
+    {
+        string words = LegacyKoreanEncoding.DecodeStringA(data[Math.Min(at, data.Length)..], out int consumed);
+        at += consumed;
+
+        return words;
     }
 
     private static string ReadName(ReadOnlySpan<byte> body, int at) =>
