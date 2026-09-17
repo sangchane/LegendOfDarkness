@@ -81,22 +81,7 @@ public sealed class Pack599TeacherTests : IDisposable
         Assert.Contains(heard, words => words.StartsWith("전사님, 어느 스킬을 원하십니까?"));
     }
 
-    private async Task Until(Func<bool> condition, string failure)
-    {
-        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(10);
-
-        while (DateTime.UtcNow < giveUp)
-        {
-            if (condition())
-            {
-                return;
-            }
-
-            await Task.Delay(50, _deadline.Token);
-        }
-
-        throw new TimeoutException(failure);
-    }
+    private Task Until(Func<bool> condition, string failure) => Waiting.Until(condition, failure, _deadline.Token, TimeSpan.FromSeconds(10));
 
     private async Task<Creature> Standing(WorldClient world, Tile where)
     {

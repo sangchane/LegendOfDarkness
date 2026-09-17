@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
@@ -102,27 +101,7 @@ public sealed class Pack599ConsumableTests : IDisposable
         File.WriteAllText(path, saved.ToJsonString());
     }
 
-    private static void MakeGameMaster(IsolatedHadesServer server)
-    {
-        string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
-        JsonNode config = JsonNode.Parse(File.ReadAllText(path))!;
-        config["ServerConfig"]!["GameMasters"] = new JsonArray(Name);
-        File.WriteAllText(path, config.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
-    }
+    private static void MakeGameMaster(IsolatedHadesServer server) => Waiting.MakeGameMaster(server, Name);
 
-    private async Task Until(Func<bool> condition, string failure)
-    {
-        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(30);
-        while (DateTime.UtcNow < giveUp)
-        {
-            if (condition())
-            {
-                return;
-            }
-
-            await Task.Delay(50, _deadline.Token);
-        }
-
-        throw new TimeoutException(failure);
-    }
+    private Task Until(Func<bool> condition, string failure) => Waiting.Until(condition, failure, _deadline.Token);
 }

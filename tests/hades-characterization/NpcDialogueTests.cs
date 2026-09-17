@@ -171,22 +171,7 @@ public sealed class NpcDialogueTests : IDisposable
         return world.Talking!;
     }
 
-    private async Task Until(Func<bool> condition, string failure)
-    {
-        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(30);
-
-        while (DateTime.UtcNow < giveUp)
-        {
-            if (condition())
-            {
-                return;
-            }
-
-            await Task.Delay(50, _deadline.Token);
-        }
-
-        throw new TimeoutException(failure);
-    }
+    private Task Until(Func<bool> condition, string failure) => Waiting.Until(condition, failure, _deadline.Token);
 
     private async Task<Creature> Standing(WorldClient world, Tile where)
     {

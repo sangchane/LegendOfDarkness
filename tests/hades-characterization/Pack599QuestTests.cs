@@ -1,6 +1,4 @@
 using System.Net;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
 using Xunit;
@@ -42,8 +40,8 @@ public sealed class Pack599QuestTests : IDisposable
             Assert.Contains(heard, words => words.StartsWith("자 가서 동굴지네의 껍질 3개와"));
         }
 
-        // 끊긴 뒤 곧바로는 저장을 건너뛴다 — 저장될 때까지 기다린다.
-        await Task.Delay(TimeSpan.FromSeconds(4), _deadline.Token);
+        // 끊긴 뒤 곧바로는 저장을 건너뛴다 — 진행값이 저장 파일에 실제로 적힐 때까지 기다린다.
+        await Until(() => Waiting.Saved(server, Name, "#gragas", "1"), "심부름 진행값(#gragas = 1)이 저장되지 않았습니다.");
 
         using WorldSession second = await HadesLoginClient.LoginAsync(
             IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
@@ -117,28 +115,7 @@ public sealed class Pack599QuestTests : IDisposable
         throw new TimeoutException($"{where} 에 아무도 없습니다.");
     }
 
-    private static void MakeGameMaster(IsolatedHadesServer server)
-    {
-        string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
-        JsonNode config = JsonNode.Parse(File.ReadAllText(path))!;
-        config["ServerConfig"]!["GameMasters"] = new JsonArray(Name);
-        File.WriteAllText(path, config.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
-    }
+    private static void MakeGameMaster(IsolatedHadesServer server) => Waiting.MakeGameMaster(server, Name);
 
-    private async Task Until(Func<bool> condition, string failure)
-    {
-        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(30);
-
-        while (DateTime.UtcNow < giveUp)
-        {
-            if (condition())
-            {
-                return;
-            }
-
-            await Task.Delay(50, _deadline.Token);
-        }
-
-        throw new TimeoutException(failure);
-    }
+    private Task Until(Func<bool> condition, string failure) => Waiting.Until(condition, failure, _deadline.Token);
 }
