@@ -9,6 +9,11 @@
 - Last updated: 2026-09-15
 
 ## History (append; 최신이 위)
+- 2026-09-17 — **5.99 장비 나머지 칸 416종을 들였다 — 상점에 없던 물건 103 → 17.** 사용자: "순수? … 하나씩 순서대로 진행하자".
+  - 순수(`get_son`)는 99레벨 전직 때 원래 직업을 다시 고른 표시다(`Npc_Script.txt` 선진: `if(@class == 새 직업){set_son 1;}`). 전직 스크립트가 없어 지금은 아무도 순수가 아니므로 0 이 맞다.
+  - `scripts/build-pack-equipment.py`: 무기·갑옷에 방패 Shield 3 · 투구 Helmet 4 · 귀걸이 Earring 5 · 목걸이 Necklace 6 · 반지 Generic 7 · 장갑 Generic 9 · 허리띠 Belt 11 · 각반 Generic 12 · 신발 Boot 13 · 장식 Generic 14(하데스표 템플릿의 ScriptName·EquipmentSlot 짝). 타입 0 만 장비로 본다(속성 3 에 염색약·두루마리가 섞여 있다). 그림이 일부러 안 보이는(안보이기 1) 무기 2종도. 장식은 7.18 겉모습의 OverCoat 를 채우는 스크립트가 없어 입은 모습으로 안 그린다.
+  - 시험 `Pack599ArmorTests`: 레벨 99 캐릭터가 대지의룬스톤목걸이를 걸면 목걸이 자리 6 · 최대 체력 +1000, 가죽장갑은 팔 자리. 무기·갑옷 시험도 통과.
+  - 아이콘 355개(13000번대 64개는 하데스 Legend.dat 에 없어 5.99 클라이언트 것). 방패·투구·신발 옷장 그림은 `build-client-wardrobe.py --새것만`.
 - 2026-09-17 — **기술 사범이 5.99 스크립트 그대로 가르친다.** NPC 95명 중 기술을 가르치는 스크립트가 붙은 NPC 가 없어 운영자 명령 없이는 배울 수 없었다.
   - 5.99 사범은 표가 아니라 대화 스크립트(`Npc_Skill.txt`: `mes` → `menu` → `get_level`·`get_class` 확인 → `skill_add`). 기술 변환기(`build-pack-abilities.py` `Translator`)를 이어 쓰고 기다리는 세 곳만 바꿨다 — `mes 1` 과 `set @x, menu(…)` 는 `yield return`, `end` 는 `yield break`. 서버 fork `scripts/Pack599/PackNpc.cs` 가 답이 오면 멈춘 자리에서 이어 간다(`mes 0` 은 기다리지 않음).
   - `scripts/build-pack-npcs.py`: 29개 모두 옮김(서버 컴파일 시험 통과). `Pack599.Call` 에 skill_add·spell_add·skill_exist·skill_del·spell_del(…2 는 2차 직업용이라 같은 것으로), get_money·money_del, get_class_sub(=ClassStage), get_ability(=AbpLevel). `get_son`(순수)은 뜻을 몰라 0.

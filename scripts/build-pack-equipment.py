@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""5.99 서버팩의 무기·갑옷을 하데스 아이템 템플릿으로 옮긴다.
+"""5.99 서버팩의 장비(무기·갑옷·방패·투구·장신구·장갑·허리띠·각반·신발·장식)를 하데스 아이템 템플릿으로 옮긴다.
+
+2026-09-17 무기·갑옷에 나머지 장비 칸을 더했다 — 상점 판매 목록 중 서버에 없던 103종의 대부분(장식 56 · 목걸이 8 …)이
+이 칸들이었다. 칸마다 하데스가 이미 쓰는 스크립트·자리를 따른다(하데스표 템플릿의 ScriptName·EquipmentSlot 짝):
+방패 Shield 3 · 투구 Helmet 4 · 귀걸이 Earring 5 · 목걸이 Necklace 6 · 반지 Generic 7(왼손, 차 있으면 오른손) ·
+장갑 Generic 9(왼팔, 차 있으면 오른팔) · 허리띠 Belt 11 · 각반 Generic 12 · 신발 Boot 13 · 장식 Generic 14.
+**장식은 입은 모습으로 그리지 않는다** — 7.18 겉모습(0x33)의 OverCoat 칸을 채우는 스크립트가 하데스에 없다. 능력치만 붙는다.
 
 사용자 결정(2026-09-17): 5.99 무기를, 이어서 갑옷을 서버에 들인다. 하데스 무기 템플릿은 남겨 둔다(사용자 결정). 상점·드롭은 나중에
 5.99 NPC·상점과 함께 옮긴다 — 이번에는 템플릿만.
@@ -48,6 +54,16 @@ configure_utf8_stdio(sys.stdout, sys.stderr)
 KINDS = {
     "무기": {"slots": {"0", "12", "13"}, "script": "Weapon", "equipment": 1},
     "갑옷": {"slots": {"1"}, "script": "Armor", "equipment": 2},
+    "방패": {"slots": {"2"}, "script": "Shield", "equipment": 3},
+    "투구": {"slots": {"3"}, "script": "Helmet", "equipment": 4},
+    "귀걸이": {"slots": {"4"}, "script": "Earring", "equipment": 5},
+    "목걸이": {"slots": {"5"}, "script": "Necklace", "equipment": 6},
+    "반지": {"slots": {"6"}, "script": "Generic", "equipment": 7},
+    "장갑": {"slots": {"7"}, "script": "Generic", "equipment": 9},
+    "허리띠": {"slots": {"8"}, "script": "Belt", "equipment": 11},
+    "각반": {"slots": {"9"}, "script": "Generic", "equipment": 12},
+    "신발": {"slots": {"10"}, "script": "Boot", "equipment": 13},
+    "장식": {"slots": {"11"}, "script": "Generic", "equipment": 14},
 }
 
 # ItemFlags (Types/ItemFlags.cs)
@@ -89,13 +105,19 @@ def number(fields, key, default=0):
 
 
 def kind_of(fields):
-    """무기·갑옷이면 그 갈래 이름, 아니면 None."""
-    if number(fields, "착용이미지") <= 0:
+    """장비면 그 갈래 이름, 아니면 None."""
+    # 타입 0(또는 칸 없음)만 장비다 — 속성 3 에는 염색약·퀘스트 두루마리(타입 2)·귀환 주문서(타입 1)도 있다.
+    if text(fields, "타입", "0") != "0":
         return None
     for kind, spec in KINDS.items():
         if text(fields, "속성") in spec["slots"]:
-            # 속성 0 에 섞인 재료는 공격력 칸이 없다.
-            if kind == "무기" and "최소공격력1" not in fields:
+            if kind == "무기":
+                # 속성 0 에 섞인 재료는 공격력 칸이 없다. 무기는 그림이 있거나 일부러 안 보이게(안보이기 1) 한 것만.
+                if "최소공격력1" not in fields:
+                    return None
+                if number(fields, "착용이미지") <= 0 and text(fields, "안보이기") != "1":
+                    return None
+            elif kind == "갑옷" and number(fields, "착용이미지") <= 0:
                 return None
             return kind
     return None
@@ -156,6 +178,9 @@ def main():
     items = json.loads(ITEMS.read_text(encoding="utf-8"))
     chosen = [item for item in items if kind_of(item["fields"])]
 
+    names = Counter(text(item["fields"], "이름") for item in chosen)
+    twice = sorted(name for name, count in names.items() if count > 1)
+
     replaced, made, unsendable = [], 0, []
     for item in chosen:
         body = template(item)
@@ -168,7 +193,9 @@ def main():
             path.write_text(json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         made += 1
 
-    print(f"무기·갑옷 {made}종 {'썼다' if write else '(미리보기 — --쓰기 로 쓴다)'} → {OUT.relative_to(ROOT)}")
+    print(f"장비 {made}종 {'썼다' if write else '(미리보기 — --쓰기 로 쓴다)'} → {OUT.relative_to(ROOT)}")
+    if twice:
+        print(f"  팩에 같은 이름이 둘 이상 — 나중 것이 남는다: {', '.join(twice)}")
     print("  갈래별", dict(Counter(kind_of(item["fields"]) for item in chosen)))
     print("  파일별", dict(Counter(Path(item["출처"]).stem for item in chosen)))
     if replaced:

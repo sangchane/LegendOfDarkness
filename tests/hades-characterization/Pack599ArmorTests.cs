@@ -59,6 +59,42 @@ public sealed class Pack599ArmorTests : IDisposable
         Assert.Equal(0, world.Self!.Wearing!.Boots);
     }
 
+    /// <summary>
+    /// 방패·투구·장신구·장갑·허리띠·각반·신발·장식도 같은 생성기로 들어왔다(상점 판매 목록에 없던 것 대부분). 칸마다 하데스
+    /// 스크립트·자리를 따른다 — 목걸이 Necklace 6, 장갑 Generic 9. 5.99 대지의룬스톤목걸이는 체력변화 +1000 · 레벨제한 11.
+    /// </summary>
+    [Fact]
+    public async Task A_599_necklace_and_gloves_go_on_and_the_necklace_adds_its_health()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        MakeGameMaster(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        Save(server, saved => saved["ExpLevel"] = 99);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.Vitals is { MaximumHealth: > 0 }, "처음 수치가 오지 않았습니다.");
+        int before = world.Vitals!.MaximumHealth;
+
+        InventoryItem necklace = await Given(world, "대지의룬스톤목걸이");
+        await world.UseAsync(necklace.Slot, _deadline.Token);
+        await Until(() => world.Worn.Any(worn => worn.Slot == 6 && worn.Called.StartsWith("대지의룬스톤목걸이")),
+            $"목걸이를 걸지 못했습니다. 걸친 것: {string.Join(", ", world.Worn.Select(worn => $"{worn.Slot}:{worn.Called}"))} · 서버가 한 말: {world.Said}");
+        await Until(() => world.Vitals?.MaximumHealth == before + 1000,
+            $"목걸이의 체력 +1000 이 붙지 않았습니다. 전 {before} · 지금 {world.Vitals?.MaximumHealth}");
+
+        InventoryItem gloves = await Given(world, "가죽장갑");
+        await world.UseAsync(gloves.Slot, _deadline.Token);
+        await Until(() => world.Worn.Any(worn => worn.Slot is 9 or 10 && worn.Called.StartsWith("가죽장갑")),
+            $"장갑을 끼지 못했습니다. 걸친 것: {string.Join(", ", world.Worn.Select(worn => $"{worn.Slot}:{worn.Called}"))} · 서버가 한 말: {world.Said}");
+    }
+
     private async Task<InventoryItem> Given(WorldClient world, string item)
     {
         await world.SayAsync($"/give \"{item}\" 1", _deadline.Token);
