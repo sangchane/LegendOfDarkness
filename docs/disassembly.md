@@ -108,7 +108,10 @@ objdump -d --x86-asm-syntax=intel Novaonline.exe > nova.asm     # 맥 기본 obj
   하데스 `skill.tbl` 사본은 줄마다 끝 번호 하나(348~352)가 더 있어 쓰지 않는다.
 - **동작 6·21·22 도 옮겼다:** 2005 `0x4e3657` 의 초기값과 `0x4e2383`~`0x4e2526` 의 칸 고르기 — `시작 + (칸 수 − 1) × 앞뒤 + 걸음 − 1`
   (저장된 칸 수는 그림 수 + 1). 6 손 들기 `03` 0 | 1 · 21 키스 2–3 | 4–5 · 22 손 흔들기 6–7 | 8–9, 22 만 속도 ÷3(`BodyMotion.Of`).
-  감정 말풍선(9~17·23~33)은 아직이다. 발췌 `original-2005-motion-frames-4e3657.asm`.
+  발췌 `original-2005-motion-frames-4e3657.asm` · `original-2005-emote-4e1226.asm`.
+- **감정표현도 옮겼다:** 표 `0x869880`(한 줄 64바이트 — 번호·첫 칸·칸 수·칸마다 ms·채팅 글)을 `0x4e1226` 이 앞 줄들을 더해 찾는다.
+  앞모습이고 하던 일이 없을 때만(`0x4e1104`). 그림 `emot01.epf`, 첫 H 앞에 그린다(`0x4e7ca7`). 9~15 → 칸 0~6 … 44 → 38~41
+  (`Emote.Of`, `docs/original-sprite-animation.md` 3.5절). 발췌 `original-2005-emote-4e1226.asm`.
 - **이펙트 칸 순서도 옮겼다:** `effects.txt` 에 `effect.tbl` 순서를 적고 `EffectSheet`·`Flash` 가 그대로 튼다(속도는 한 칸 간격).
 
 ### 아카이브를 맞대어 알게 된 것

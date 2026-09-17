@@ -10,7 +10,7 @@ namespace Lod.Mobile.Core.Art;
 /// <c>skill.tbl</c>, whose FN picks the class file (b priest · c warrior · d monk · e rogue · f wizard) and whose
 /// SI·FC are the start and count. Arbiter and ETDA name the same numbers (128 PriestCast … 145 Summon).
 /// The file ending 03 holds 6 hands up, 21 blowing a kiss and 22 waving (Legend.exe 2005 0x4e3657..0x4e36c9); the
-/// emote balloons (9~17, 23~33) are not body drawings and have none here. docs/original-sprite-animation.md 3절.
+/// emotes (9~17, 23~44) are drawn over the head instead (<see cref="Emote" />). docs/original-sprite-animation.md 3절.
 /// </remarks>
 /// <param name="Faster">How many times shorter each drawing is held than the speed says — the wave is 3.</param>
 public sealed record BodyMotion(string File, int Start, int Count, int Faster = 1)

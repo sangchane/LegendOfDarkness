@@ -76,6 +76,12 @@ public sealed partial class Actor : Node2D
     /// <summary>How long one drawing of a swing is held. Two of them make a blow.</summary>
     private const double SecondsPerStrikeFrame = 0.14;
 
+    // The emote over the head, how long it has been up (below zero when none) and the sprite it is drawn on.
+    private const string EmoteSheet = "res://assets/actor/emote.png";
+    private Emote? _emote;
+    private double _emoted = -1;
+    private Sprite2D? _balloon;
+
     private Direction _direction = Direction.South;
     private int _step;
 
@@ -149,6 +155,8 @@ public sealed partial class Actor : Node2D
             }
         }
 
+        StackBalloon();
+
         ShowFrame(_sheet.Motion?.Stand(facing.Side) ?? WalkMotion.Stand(facing.Side));
     }
 
@@ -219,7 +227,7 @@ public sealed partial class Actor : Node2D
     /// </remarks>
     public void Play(BodyMotion motion, double secondsPerFrame)
     {
-        if (_struck >= 0)
+        if (_struck >= 0 || _emoted >= 0)
         {
             return;
         }
@@ -253,6 +261,43 @@ public sealed partial class Actor : Node2D
         ShowPlaying(0);
     }
 
+    /// <summary>
+    /// Shows an emote over the head — a face drawn on the head, or a balloon above it with the face — while the body
+    /// stands.
+    /// </summary>
+    /// <remarks>
+    /// As the original does (Legend.exe 2005 0x4e1104): only a figure facing us shows one, and only when it is doing
+    /// nothing else; while it is up the figure is busy, so a motion that arrives meanwhile is ignored. It is drawn just
+    /// under the hair (0x4e7ca7, before the first H), so hair and a helmet cover the top of the bare head.
+    /// </remarks>
+    public void Show(Emote emote)
+    {
+        if (_sheet.Motion is not null || _struck >= 0 || _emoted >= 0 || Facing.Of(_direction).Side != Lod.Mobile.Core.Art.Side.Front)
+        {
+            return;
+        }
+
+        if (_balloon is null)
+        {
+            // The emote sheet is cut to the wardrobe's cells, so it stands on the same feet as the pieces.
+            _balloon = new Sprite2D
+            {
+                Centered = false,
+                Texture = GD.Load<Texture2D>(EmoteSheet),
+                RegionEnabled = true,
+                Offset = new Vector2(-_sheet.FeetX, -_sheet.FeetY)
+            };
+
+            AddChild(_balloon);
+        }
+
+        _emote = emote;
+        _emoted = 0;
+        _balloon.Visible = true;
+        StackBalloon();
+        ShowEmote();
+    }
+
     public override void _Process(double delta)
     {
         if (_stepped >= 0)
@@ -275,6 +320,21 @@ public sealed partial class Actor : Node2D
             {
                 _strideDrawn = stride;
                 Stride();
+            }
+        }
+
+        if (_emoted >= 0)
+        {
+            _emoted += delta;
+
+            if (_emoted >= _emote!.Seconds)
+            {
+                _emoted = -1;
+                _balloon!.Visible = false;
+            }
+            else
+            {
+                ShowEmote();
             }
         }
 
@@ -339,6 +399,21 @@ public sealed partial class Actor : Node2D
                 _sprites[layer].RegionRect = new Rect2(frame * _sheet.CellWidth, 0, _sheet.CellWidth, _sheet.CellHeight);
             }
         }
+    }
+
+    private void ShowEmote() =>
+        _balloon!.RegionRect = new Rect2(_emote!.FrameAt(_emoted) * _sheet.CellWidth, 0, _sheet.CellWidth, _sheet.CellHeight);
+
+    /// <summary>Puts the emote just under the hair — above everything below it in the order this side is stacked in.</summary>
+    private void StackBalloon()
+    {
+        if (_balloon is null || _sheet.Parts is not { } parts || parts.Count != _sprites.Count)
+        {
+            return;
+        }
+
+        var side = Facing.Of(_direction).Side;
+        MoveChild(_balloon, parts.Count(part => Wardrobe.Rank(part, side) < Wardrobe.Rank('h', side)));
     }
 
     /// <summary>Puts every layer back on the sheets it stands in, pieces a motion left out included.</summary>

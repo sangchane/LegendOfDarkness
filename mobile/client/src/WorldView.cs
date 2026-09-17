@@ -978,10 +978,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     /// <summary>
     /// Draws the body motions the server names — anybody's, ours included, since a skill's motion is only known
-    /// from here. Our own plain blow is drawn as it is asked for, so that one coming back is left alone. A motion
-    /// with no drawing (a hands-up, an emote) moves nobody; a creature swings its own blow for any. A skill motion
-    /// is drawn only in clothes skill.tbl lists for it — the original client does nothing otherwise
-    /// (<see cref="BodyMotion.Fits" />).
+    /// from here. Our own plain blow is drawn as it is asked for, so that one coming back is left alone. An emote
+    /// shows over a person's head (<see cref="Emote" />); a motion with no drawing moves nobody; a creature swings its
+    /// own blow for any. A skill motion is drawn only in clothes skill.tbl lists for it — the original client does
+    /// nothing otherwise (<see cref="BodyMotion.Fits" />).
     /// </summary>
     private void Swings()
     {
@@ -1000,6 +1000,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             else if (_herd.ContainsKey(motion.Serial))
             {
                 actor.Strike();
+            }
+            else if (Emote.Of(motion.Number) is { } emote)
+            {
+                actor.Show(emote);
             }
         }
     }
