@@ -40,6 +40,10 @@ OUT = abilities.OUT / "Npcs"
 FILES = ["Npc_Skill.txt", "Npc_Script.txt", "Npc_Quest.txt", "Npc_Making.txt", "Npc_Warp.txt"]
 ITEM_SCRIPTS = abilities.PACK / "script" / "Item"
 ITEM_OUT = abilities.OUT / "Items"
+# 1초마다 도는 스크립트(개인 던전 사본 안의 사람마다 — 서버 PackRoutine). 대화가 없어야 한다.
+ROUTINE_FILES = ["Dungeon.txt"]
+ROUTINE_SCRIPTS = abilities.PACK / "script"
+ROUTINE_OUT = abilities.OUT / "Routines"
 ITEM_FILES = ["E.T.C.txt", "Quest.txt", "Potion.txt", "Blessing.txt", "CashI.txt"]
 #: 플레이어를 기다리는 명령 — 아이템 스크립트에서는 아직 띄울 창이 없다.
 WAITS = {"mes", "menu", "input"}
@@ -208,6 +212,65 @@ namespace Darkages.Storage.locales.Scripts.Pack599
 """
 
 
+def csharp_routine(name, source, code, variables, flags):
+    declare = "".join(f"            V {v} = 0;\n" for v in variables)
+    declare += "".join(f"            bool {f} = false;\n" for f in flags)
+    where = "Routine" + "".join(f"{ord(c):04X}" for c in name)
+    return f"""using System.Collections.Generic;
+using Darkages.Scripting;
+using Darkages.Types;
+
+namespace Darkages.Storage.locales.Scripts.Pack599
+{{
+    /// <summary>
+    /// {name} — 5.99 `script/{source}` 를 그대로 옮긴 것. 개인 던전 사본 안의 사람마다 1초에 한 번 돈다(PackRoutine).
+    /// </summary>
+    /// <remarks>
+    /// 손으로 고치지 말 것. `scripts/build-pack-npcs.py` 가 다시 만든다.
+    /// </remarks>
+    [Script("PACK_{name}", "{abilities.MARK}")]
+    public class {where} : PackRoutine
+    {{
+        public {where}(Area area) : base(area)
+        {{
+        }}
+
+        protected override IEnumerable<int> Run(Pack599 p)
+        {{
+{declare}
+{code}
+            yield break;
+        }}
+    }}
+}}
+"""
+
+
+def routines(write):
+    """1초마다 도는 스크립트. 대화(mes·menu·input)가 있으면 옮기지 않는다 — 돌리는 쪽에 창이 없다."""
+    made, failed = [], []
+    for file in ROUTINE_FILES:
+        for name, body in blocks(ROUTINE_SCRIPTS / file).items():
+            translator = NpcTranslator(body)
+            try:
+                code = translator.program()
+            except abilities.Unsupported as why:
+                failed.append(f"{name}({why})")
+                continue
+            if WAITS & set(translator.calls):
+                failed.append(f"{name}(대화가 있다)")
+                continue
+            for label in sorted(translator.jumps - translator.labels - translator.entries):
+                code += f"\n            L_{label}: ;"
+            flags = [f"f_{label}" for label in sorted(translator.entries & translator.jumps)]
+            if write:
+                ROUTINE_OUT.mkdir(parents=True, exist_ok=True)
+                (ROUTINE_OUT / f"{name}.cs").write_text(
+                    csharp_routine(name, file, code, sorted(translator.vars), flags), encoding="utf-8-sig")
+            made.append(name)
+    return made, failed
+
+
 def items(write):
     """아이템 블록 중 기다리지 않는 것만. (옮긴 이름, 창이 필요해 남긴 이름)."""
     made, waiting = [], []
@@ -264,6 +327,11 @@ def main():
     done, waiting = items(write)
     print(f"아이템 스크립트 {len(done)}개 {'씀' if write else '(세어만 봄)'} → {ITEM_OUT.relative_to(ROOT)}: {', '.join(done)}")
     print(f"  창이 필요해 남긴 것 {len(waiting)}: {', '.join(waiting)}")
+
+    routine_made, routine_failed = routines(write)
+    print(f"1초마다 도는 스크립트 {len(routine_made)}개 {'씀' if write else '(세어만 봄)'} → {ROUTINE_OUT.relative_to(ROOT)}: {', '.join(routine_made)}")
+    if routine_failed:
+        print(f"  못 옮긴 것 {len(routine_failed)}: {', '.join(routine_failed)}")
 
     for what, found, expected in (("NPC", len(made) + len(failed), EXPECTED_NPC_BLOCKS),
                                   ("아이템", len(done) + len(waiting), EXPECTED_ITEM_BLOCKS)):

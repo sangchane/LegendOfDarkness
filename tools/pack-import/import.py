@@ -169,6 +169,8 @@ RULES = {
     "warps":     eligible_warps,
     "suomiwarps": eligible_suomi_warps,
     "droprates": lambda kind: eligible_drop_rates(kind),
+    "mapfiles": lambda kind: eligible_map_files(kind),
+    "potedungeon": lambda kind: eligible_pote_dungeon(kind),
     "monsters":  eligible_monsters,
     "mundanes":  eligible_mundanes,
     "items":     lambda _: eligible_plain("items"),
@@ -179,7 +181,7 @@ RULES = {
 
 # 계획의 실측 표. 여기서 벗어나면 표가 틀렸거나 적재기가 틀렸다 — 진행 전에 가린다.
 # 기술·마법은 원작(abilities.json) 기준이다 — 팩의 82·71 이 아니다.
-EXPECTED = {"quests": 38, "shops": 47, "maps": 797, "warps": 886, "suomiwarps": 80, "droprates": 55, "items": 989, "monsters": 565,
+EXPECTED = {"quests": 38, "shops": 47, "maps": 797, "warps": 886, "suomiwarps": 80, "droprates": 55, "potedungeon": 5, "items": 989, "monsters": 565,
             "mundanes": 84, "skills": 275, "spells": 338, "worldmaps": 1, "doors": 1}
 
 
@@ -490,6 +492,94 @@ def eligible_drop_rates(_):
             drop.append((path.name, f"같은 아이템에 다른 확률: {item} {per_item[item]}% · {pct}%")); continue
         keep.append((path, pct, item))
     return keep, drop
+
+
+def eligible_map_files(_):
+    """팩 스크립트가 적는 맵 파일 경로 → 서버 맵 번호. 5.99 `map_create` 가 파일로 원래 맵을 가리킨다(Pack599.PackMap)."""
+    rows = []
+    for line in IDTABLE.read_text(encoding="utf-8").splitlines():
+        c = line.split("\t")
+        if line and not line.startswith("#") and len(c) >= 4 and c[2].isdigit():
+            rows.append((c[3], int(c[2])))
+    return rows, []
+
+
+def write_map_files(rows):
+    path = SERVER / "static" / "pack599-mapfiles.tsv"
+    seen = {}
+    for file, number in rows:
+        seen.setdefault(file, number)                   # 같은 파일을 여러 맵이 나눠 쓰면 먼저 나온 맵
+    path.write_text("".join(f"{file}\t{number}\n" for file, number in seen.items()), encoding="utf-8")
+    return path
+
+
+def eligible_pote_dungeon(_):
+    """포테의숲 오솔길(개인 던전) — 5존 26·27,0 을 밟으면 입장 스크립트가 돈다(Warp_script.txt 종류 3). 들이는 것:
+    그 칸의 스크립트 워프 · 창을 띄울 NPC(스크립트 NPC 는 그림이 없어 표식으로 보인다) · 스크립트가 사본에 세우는 괴물(`mob_spawn3`)."""
+    ids = name_to_id()
+    keep, drop = [], []
+    triggers = [x for x in load("warps")
+                if x["raw"][0] == "3" and x["출발맵"].startswith("포테의숲") and (NPC_SCRIPTS / f'{x["도착맵"]}.cs').exists()]
+    for x in triggers:
+        keep.append(("warp", x))
+    if triggers:
+        host = max(triggers, key=lambda x: int(x["출발"][0]))
+        keep.append(("npc", {"스크립트": host["도착맵"], "맵": host["출발맵"],
+                             "좌표": [int(host["출발"][0]) + 1, int(host["출발"][1])]}))
+    mobs = {m["이름"]: m for m in load("mobs")}
+    npc_file = ROOT / "data" / "server-packs" / PACK / "db" / "script" / "Npc" / "Npc_Warp.txt"
+    text = npc_file.read_text(encoding="utf-8")
+    for name in sorted({x["도착맵"] for x in triggers}):
+        start = text.find(f"\t{name}\t")
+        end = text.find("\n}", start)
+        for mob in sorted(set(re.findall(r'mob_spawn3\s+"([^"]+)"', text[start:end]))):
+            if mob in mobs:
+                keep.append(("mob", mobs[mob]))
+            else:
+                drop.append((mob, f"괴물 정의가 없다: {mob}"))
+    if any(x["출발맵"] not in ids for x in triggers):
+        drop.append(("warp", "출발맵 번호가 없다"))
+    return keep, drop
+
+
+def write_pote_dungeon(rows):
+    ids = name_to_id()
+    items = {i["이름"] for i in load("items")}
+    n = 0
+    for kind, row in rows:
+        if kind == "warp":
+            src = ids[row["출발맵"]]
+            x, y = int(row["출발"][0]), int(row["출발"][1])
+            j = {"ActivationMapId": src,
+                 "Activations": [{"AreaID": src, "Location": {"X": x, "Y": y}, "PortalKey": 0}],
+                 "LevelRequired": max(1, int(row["raw"][7])),
+                 **({"LevelMaximum": int(row["raw"][8])} if int(row["raw"][8]) < 99 else {}),
+                 "ScriptNpc": f'NPC_{row["도착맵"]}',
+                 "To": {"AreaID": src, "Location": {"X": x, "Y": y}, "PortalKey": 0},
+                 "WarpRadius": 0, "WarpType": "Map", "WorldResetWarpId": 0, "WorldTransionWarpId": 0,
+                 "Description": None, "Group": None,
+                 "Name": f'warp {row["출발맵"]}({x},{y}) runs {row["도착맵"]}'}
+            path = SERVER / "templates" / "warps" / f'{safe_name(j["Name"]).lower()}.json'
+        elif kind == "npc":
+            x, y = row["좌표"]
+            j = {"Name": f'{row["스크립트"]}@{row["맵"]}#{x},{y}', "AreaID": ids[row["맵"]], "X": x, "Y": y,
+                 "Direction": 2, "Image": MONSTER_IMAGE_BASE, "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
+                 "Speech": [], "ScriptKey": f'NPC_{row["스크립트"]}', "DefaultMerchantStock": [],
+                 "EnableWalking": False, "EnableTurning": False, "EnableAttacking": False, "EnableCasting": False,
+                 "WalkRate": 0, "TurnRate": 0, "CastRate": 0, "ChatRate": 0, "PathQualifer": 1, "ViewingQualifer": 1}
+            path = SERVER / "templates" / "mundanes" / f'{safe_name(j["Name"]).lower()}.json'
+        else:
+            # 사본 전용 — AreaID 0 이라 젠 관리자가 어느 맵에도 세우지 않는다. 스크립트의 mob_spawn3 만 세운다.
+            j = monster_json({"맵": "사본", "괴물": row["이름"], "마리수": "0"}, row, 0, items)
+            spell = f'Monster_{flatten(row["fields"].get("스킬"))[0]}' if row["fields"].get("스킬") else None
+            if spell and spell.startswith("Monster_Monster_"):
+                spell = spell[len("Monster_"):]
+            if spell and (SERVER / "templates" / "spells" / f"{spell}.json").exists():
+                j["SpellScripts"] = [spell]
+            path = SERVER / "templates" / "monsters" / "5.99" / f'{safe_name(row["이름"] + "@사본").lower()}.json'
+        path.write_text(json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+        n += 1
+    return n
 
 
 def write_drop_rates(rows):
@@ -1221,6 +1311,11 @@ def main():
             print(f"     넣음 {n}장 → templates/items/")
             print(f"     옮기지 않은 칸(뜻 미확인): " +
                   ", ".join(f"{k}×{v}" for k, v in skipped.most_common(10)))
+        elif kind == "mapfiles" and a.write:
+            path = write_map_files(keep)
+            print(f"     {len(keep)}줄 → {path.relative_to(ROOT)}")
+        elif kind == "potedungeon" and a.write:
+            print(f"     {write_pote_dungeon(keep)}장 → templates/warps · mundanes · monsters/5.99")
         elif kind == "droprates" and a.write:
             monsters, items = write_drop_rates(keep)
             print(f"     괴물 {monsters}장 LootType → Random · 아이템 {items}장 DropRate")
