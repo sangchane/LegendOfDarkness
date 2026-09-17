@@ -23,8 +23,9 @@
     (부호가 같은 뜻이다 — 5.99 레더튜닉 방어력 −10 = 하데스 Leather Tunic `AcModifer` 빼기 10)
   Flags: 장착·거래·보관·판매 + 떨굼여부 0 이 아니면 버리기 + 수리여부 1 이면 수리 + 공격모션 129(양손 휘두르기)면 양손
 
-**옮기지 못한 칸:** 최소/최대공격력2(마법 공격력 — 하데스 템플릿에 칸이 없다), 공격모션(평타 몸 동작 — 하데스 평타는
-1 또는 양손 129 만 보낸다), 공격속도, 사운드1·2, 속성(원소), 어빌제한·전직제한, 장착펄숫·장착해제펄숫(끼고 벗을 때 스크립트).
+공격모션·공격속도 → AttackMotion·AttackSpeed(평타 몸 동작, `Assail.BlowMotion`)
+
+**옮기지 못한 칸:** 최소/최대공격력2(마법 공격력 — 하데스 템플릿에 칸이 없다), 공격속도가 뜻하는 평타 잠금(속도×10ms), 사운드1·2, 속성(원소), 어빌제한·전직제한, 장착펄숫·장착해제펄숫(끼고 벗을 때 스크립트).
 
   쓰는 법: python3 scripts/build-pack-weapons.py [--쓰기]
 """
@@ -116,6 +117,11 @@ def template(item):
     }
     if number(f, "승급제한") > 0:
         made["StageRequired"] = 1
+    # 평타 몸 동작 — 5.99 서버는 무기의 공격모션·공격속도를 그대로 보낸다(Assail.BlowMotion).
+    if number(f, "공격모션"):
+        made["AttackMotion"] = min(255, number(f, "공격모션"))
+    if number(f, "공격속도"):
+        made["AttackSpeed"] = min(255, number(f, "공격속도"))
     for key, field in MODIFIERS.items():
         value = number(f, key)
         if value:

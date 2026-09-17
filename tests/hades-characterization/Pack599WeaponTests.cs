@@ -53,6 +53,80 @@ public sealed class Pack599WeaponTests : IDisposable
             $"{Weapon}을 낀 겉모습이 오지 않았습니다. 마지막: {world.Self?.Wearing} · 서버가 한 말: {world.Said}");
     }
 
+    /// <summary>
+    /// 5.99 서버(Novaonline.exe 0x4160f7)는 평타의 몸 동작을 장비에서 고른다 — 무기를 꼈으면 무기의 공격모션·공격속도,
+    /// 아니면 갑옷의 것, 둘 다 없으면 (1, 20). 설단검은 도적 단검이라 찌르기(134)를 속도 18 로 보낸다.
+    /// </summary>
+    [Fact]
+    public async Task A_blow_with_a_599_weapon_moves_the_way_the_weapon_says()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        MakeGameMaster(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        Save(server, saved => saved["Path"] = "Rogue");
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.Self is { Wearing: not null }, "처음 겉모습이 오지 않았습니다.");
+
+        // 맨손: 기본 동작 1, 속도 20.
+        Motion bare = await Blow(world);
+        Assert.Equal((1, 20), (bare.Number, bare.Speed));
+
+        await world.SayAsync("/give \"설단검\" 1", _deadline.Token);
+        InventoryItem? dagger = null;
+        await Until(() => (dagger = world.Pack.FirstOrDefault(item => item.Name == "설단검")) is not null,
+            $"설단검이 소지품에 오지 않았습니다. 서버가 한 말: {world.Said}");
+        await world.UseAsync(dagger!.Slot, _deadline.Token);
+        await Until(() => world.Self?.Wearing?.Weapon == 6, $"설단검을 끼지 못했습니다. 서버가 한 말: {world.Said}");
+
+        Motion stab = await Blow(world);
+        Assert.Equal((134, 18), (stab.Number, stab.Speed));
+    }
+
+    /// <summary>평타를 치고 내 몸 동작이 오기를 기다린다. 평타 간격(450ms 남짓)을 넘기려고 여러 번 친다.</summary>
+    private async Task<Motion> Blow(WorldClient world)
+    {
+        while (world.TakeMotion(out _))
+        {
+        }
+
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
+        while (DateTime.UtcNow < giveUp)
+        {
+            await world.AttackAsync(_deadline.Token);
+
+            for (int wait = 0; wait < 12; wait++)
+            {
+                await Task.Delay(50, _deadline.Token);
+
+                while (world.TakeMotion(out Motion? motion))
+                {
+                    if (motion.Serial == world.Serial)
+                    {
+                        return motion;
+                    }
+                }
+            }
+        }
+
+        throw new TimeoutException($"평타 뒤 내 몸 동작이 오지 않았습니다. 서버가 한 말: {world.Said}");
+    }
+
+    private static void Save(IsolatedHadesServer server, Action<JsonNode> change)
+    {
+        string path = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
+        JsonNode saved = JsonNode.Parse(File.ReadAllText(path))!;
+        change(saved);
+        File.WriteAllText(path, saved.ToJsonString());
+    }
+
     private static void MakeGameMaster(IsolatedHadesServer server)
     {
         string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
