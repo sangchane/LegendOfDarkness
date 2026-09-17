@@ -1,0 +1,180 @@
+# lod20353 — tools/dat-extract layout 이 만든다. 손으로 고치지 말 것.
+size 15 15
+blocked
+###########.###
+##.#####.......
+##.............
+#...#..........
+#..............
+#..............
+#..............
+#..............
+##......#......
+##.............
+##.............
+##.............
+##.............
+##.............
+#..............
+floor
+260 262 258 264 260 314 315 315 316 262 262 263 261 263 263
+259 262 263 263 258 264 258 260 260 260 314 315 316 263 258
+259 258 259 258 258 260 261 260 261 260 320 321 322 261 260
+262 263 261 260 262 258 259 262 259 262 259 262 259 259 262
+261 260 260 261 314 315 315 316 314 315 315 316 259 259 258
+258 262 263 261 317 318 318 319 317 318 318 319 261 260 260
+260 262 263 261 317 318 318 319 317 318 318 319 263 258 258
+262 263 261 260 320 321 321 322 320 321 321 322 261 260 260
+264 260 259 258 314 315 315 316 314 315 315 316 261 260 260
+261 262 261 260 317 318 318 319 317 318 318 319 263 258 258
+259 258 263 258 317 318 318 319 317 318 318 319 261 260 260
+259 259 259 258 320 321 321 322 320 321 321 322 260 260 258
+262 259 261 260 262 258 264 260 261 260 258 263 258 258 260
+258 262 258 259 262 263 258 258 258 263 260 261 260 260 258
+260 262 258 259 258 259 314 315 315 316 260 263 258 258 260
+tile 258 0 0
+tile 259 56 0
+tile 260 112 0
+tile 261 168 0
+tile 262 0 27
+tile 263 56 27
+tile 264 112 27
+tile 314 168 27
+tile 315 0 54
+tile 316 56 54
+tile 317 112 54
+tile 318 168 54
+tile 319 0 81
+tile 320 56 81
+tile 321 112 81
+tile 322 168 81
+picture 81 112 893 65 0
+picture 82 112 546 71 0
+picture 315 84 281 92 0
+picture 316 84 373 92 0
+picture 320 28 0 97 0
+picture 449 84 823 84 0
+picture 450 84 738 85 0
+picture 451 84 465 92 0
+picture 452 84 188 93 0
+picture 453 84 649 89 0
+picture 454 84 557 92 0
+picture 455 84 0 94 0
+picture 456 84 94 94 0
+picture 716 112 958 56 0
+picture 717 140 0 56 0
+picture 931 28 97 97 0
+picture 933 28 194 97 0
+picture 934 28 291 97 0
+picture 935 0 0 111 0
+picture 936 28 388 97 0
+picture 937 28 485 97 0
+picture 938 0 111 111 0
+picture 939 28 582 97 0
+picture 940 28 679 97 0
+picture 944 0 222 111 0
+picture 945 28 776 97 0
+picture 947 0 333 111 0
+picture 948 28 873 97 0
+picture 949 56 0 97 0
+picture 950 0 444 111 0
+picture 951 56 97 97 0
+picture 952 56 194 97 0
+picture 953 0 555 111 0
+picture 954 56 291 97 0
+picture 955 56 388 97 0
+picture 956 0 666 111 0
+picture 957 56 485 97 0
+picture 958 56 582 97 0
+picture 959 0 777 111 0
+picture 960 56 679 97 0
+picture 967 56 776 97 0
+picture 968 0 888 111 0
+picture 2005 112 398 74 0
+picture 2006 112 84 82 0
+picture 2007 112 757 68 0
+picture 2008 112 248 75 0
+picture 2009 84 907 84 0
+picture 2010 112 617 70 0
+picture 2011 112 687 70 0
+picture 2012 112 0 84 0
+picture 2013 112 323 75 0
+picture 2014 112 825 68 0
+picture 2015 112 166 82 0
+picture 2016 112 472 74 0
+picture 2407 56 873 97 0
+object 0 0 left 958
+object 0 0 right 939
+object 1 0 left 931
+object 2 0 left 938
+object 2 0 right 933
+object 3 0 left 934
+object 4 0 left 935
+object 4 0 right 936
+object 5 0 left 935
+object 6 0 left 935
+object 6 0 right 939
+object 7 0 left 934
+object 8 0 left 938
+object 8 0 right 936
+object 9 0 left 937
+object 9 0 right 939
+object 10 0 left 940
+object 11 0 left 944
+object 11 0 right 945
+object 12 0 left 931
+object 12 0 right 945
+object 13 0 left 934
+object 14 0 left 947
+object 14 0 right 948
+object 0 1 right 951
+object 1 1 left 2407
+object 1 1 right 320
+object 3 1 left 2008
+object 4 1 left 2009
+object 4 1 right 2010
+object 5 1 left 81
+object 5 1 right 82
+object 6 1 left 2005
+object 7 1 left 2006
+object 7 1 right 2007
+object 0 2 left 952
+object 0 2 right 953
+object 1 2 left 315
+object 1 2 right 316
+object 0 3 right 960
+object 0 4 left 958
+object 0 4 right 959
+object 1 4 left 455
+object 1 4 right 456
+object 0 5 right 954
+object 1 5 left 453
+object 1 5 right 454
+object 0 6 right 953
+object 1 6 left 451
+object 1 6 right 452
+object 0 7 right 953
+object 1 7 left 449
+object 1 7 right 450
+object 0 8 left 949
+object 0 8 right 950
+object 1 8 left 716
+object 1 8 right 717
+object 0 9 right 957
+object 1 9 right 2016
+object 0 10 left 955
+object 0 10 right 956
+object 1 10 left 2014
+object 1 10 right 2015
+object 0 11 right 954
+object 1 11 left 716
+object 1 11 right 717
+object 0 12 left 955
+object 0 12 right 953
+object 1 12 left 716
+object 1 12 right 2013
+object 0 13 right 954
+object 1 13 left 2011
+object 1 13 right 2012
+object 0 14 left 967
+object 0 14 right 968

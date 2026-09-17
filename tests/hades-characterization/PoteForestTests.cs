@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json.Nodes;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
@@ -29,6 +30,12 @@ public sealed class PoteForestTests : IDisposable
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, Name);
 
+        // 수오미마을 → 1존은 5.99 에서 레벨 21~51 이다.
+        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
+        JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
+        character["ExpLevel"] = 21;
+        File.WriteAllText(saved, character.ToJsonString());
+
         using WorldSession session = await HadesLoginClient.LoginAsync(
             IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
 
@@ -37,12 +44,8 @@ public sealed class PoteForestTests : IDisposable
 
         await Waiting.Until(() => world.State is { } state && state.Map.Id == SuomiTown, "수오미마을에 들어가지 못했습니다.", _deadline.Token);
 
-        // 97 → 98 → 99(입구). 서버가 걸음 간격을 재므로 한 걸음씩 띄운다.
-        for (int step = 0; step < 4 && world.State?.Map.Id == SuomiTown; step++)
-        {
-            await world.WalkAsync(Direction.East, _deadline.Token);
-            await Task.Delay(600, _deadline.Token);
-        }
+        // 97 → 98 → 99(입구).
+        await Waiting.WalkUntil(world, Direction.East, () => world.State?.Map.Id == ForestOne, _deadline.Token);
 
         await Waiting.Until(() => world.State is { } state && state.Map.Id == ForestOne && state.Where == new Tile(33, 47),
             $"수오미마을 동쪽 입구를 밟았는데 포테의숲1존 33,47 로 가지 않았습니다. 마지막: {world.State}", _deadline.Token);

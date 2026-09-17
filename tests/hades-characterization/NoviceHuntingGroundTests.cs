@@ -1,4 +1,6 @@
 using System.Net;
+using System.Text.Json.Nodes;
+using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
 using Xunit;
@@ -30,16 +32,8 @@ public sealed class NoviceHuntingGroundTests : IDisposable
     public async Task Standing_in_the_novice_ground_puts_monsters_in_sight(int map, int x, int y, string name)
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (map, x, y));
-        server.Start(TimeSpan.FromMinutes(2));
-
-        string who = $"novice{map % 100}";
-        LoginFlow.TryCreateAccount(server, who);
-
-        using WorldSession session = await HadesLoginClient.LoginAsync(
-            IPAddress.Loopback, server.LoginPort, who, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
-
-        WorldClient world = new(session);
-        _ = world.PumpAsync(_deadline.Token);
+        (WorldSession session, WorldClient world) = await Enter(server, $"novice{map % 100}", level: 1);
+        using WorldSession _ = session;
 
         HashSet<uint> met = [];
 
@@ -61,5 +55,46 @@ public sealed class NoviceHuntingGroundTests : IDisposable
         Assert.True(world.State?.Map.Id == map, $"{name}({map}) 에 들어가지 못했습니다. 마지막: {world.State}");
         Assert.True(met.Count >= Several,
             $"{name} ({x},{y}) 에 {StandingTicks / 2}초 서 있는 동안 시야에 들어온 괴물이 {met.Count}마리입니다 ({Several}마리를 기대).");
+    }
+
+    /// <summary>
+    /// 5.99 `Novice_Warp.txt` 의 레벨 범위. 평원 → 지하던전은 5~22 라 레벨 1 은 못 내려가고, 마을 → 평원은 1~22 라 23 은 못 나간다.
+    /// 문구는 5.99 서버(Novaonline.exe) 그대로다.
+    /// </summary>
+    [Theory]
+    [InlineData(20393, 34, 9, 1, "아직 들어가기엔 레벨이 낮습니다.", "노비스평원A → 지하던전A1 (5~22)")]
+    [InlineData(20373, 67, 28, 23, "이곳에 들어가기엔 늙었습니다.", "노비스마을 → 평원A (1~22)")]
+    public async Task A_warp_outside_its_level_range_keeps_you_where_you_are(int map, int x, int y, int level, string refusal, string what)
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (map, x, y));
+        (WorldSession session, WorldClient world) = await Enter(server, $"noviceband{level}", level);
+        using WorldSession _ = session;
+
+        await Waiting.Until(() => world.State?.Map.Id == map, $"{map} 에 들어가지 못했습니다.", _deadline.Token);
+
+        // 동쪽으로 두 칸째가 워프다. 거절되면 그 자리에 머물고, 더 가도 맵 끝이라 막힌다.
+        await Waiting.WalkUntil(world, Direction.East, () => world.Said.Contains(refusal), _deadline.Token);
+
+        await Waiting.Until(() => world.Said.Contains(refusal),
+            $"{what}: 레벨 {level} 이 거절되지 않았습니다. 서버가 한 말: {world.Said} · 마지막: {world.State}", _deadline.Token);
+        Assert.Equal(map, world.State?.Map.Id);
+    }
+
+    private async Task<(WorldSession Session, WorldClient World)> Enter(IsolatedHadesServer server, string who, int level)
+    {
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, who);
+
+        string saved = Path.Combine(server.ContentLocation, "aislings", $"{who}.json");
+        JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
+        character["ExpLevel"] = level;
+        File.WriteAllText(saved, character.ToJsonString());
+
+        WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, who, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+        return (session, world);
     }
 }

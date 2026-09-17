@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.World;
 
 namespace Lod.Hades.Characterization.Tests;
 
@@ -25,6 +27,19 @@ internal static class Waiting
         }
 
         throw new TimeoutException(failure);
+    }
+
+    /// <summary>
+    /// <paramref name="arrived" /> 가 설 때까지 한 방향으로 걷는다. 접속 직후 서버가 화면을 새로 보내는 동안은 걸음을 버리므로
+    /// (<c>CancelWalkingIfRefreshing</c>) 정해진 걸음 수만 보내면 한 칸도 못 가는 수가 있다 — 그래서 될 때까지 보낸다.
+    /// </summary>
+    public static async Task WalkUntil(WorldClient world, Direction direction, Func<bool> arrived, CancellationToken token, int attempts = 10)
+    {
+        for (int step = 0; step < attempts && !arrived(); step++)
+        {
+            await world.WalkAsync(direction, token);
+            await Task.Delay(600, token);
+        }
     }
 
     /// <summary><c>/give</c> 같은 운영자 명령을 쓰도록 격리 서버 설정의 운영자 목록에 넣는다(서버를 켜기 전에).</summary>

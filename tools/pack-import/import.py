@@ -31,8 +31,11 @@ EXTRACTED = ROOT / "data" / "server-packs" / "extracted" / PACK
 MAPSRC = ROOT / "data" / "map-source" / PACK
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 IDTABLE = ROOT / "plans" / "5.99-맵번호표.tsv"
-# 5.99 의 워프 목록(warp_db.txt)이 싣지 않아 추출 자료에 없는 파일. 포테의숲 드나드는 줄이 여기에만 있다(docs/pote-forest.md).
-POTE_WARPS = ROOT / "data" / "server-packs" / PACK / "db" / "warp" / "Suomi_Warp.txt"
+# 5.99 의 워프 목록(warp_db.txt)이 싣지 않아 추출 자료에 없는 파일. 수오미마을 건물 문과 포테의숲 드나드는 줄이 여기에만 있다
+# (docs/pote-forest.md).
+SUOMI_WARPS = ROOT / "data" / "server-packs" / PACK / "db" / "warp" / "Suomi_Warp.txt"
+# 워프 줄의 레벨 범위를 옮기는 파일(warp_json).
+LEVEL_RANGE_SOURCES = {"warp/Novice_Warp.txt", "warp/Suomi_Warp.txt"}
 
 BYTES_PER_TILE = 6          # 바닥 + 왼벽 + 오른벽, 각 ushort
 FIRST_MAP_ID = 20_000        # 1~65535 만 쓸 수 있다 — 맵 번호는 전선에서 16비트다(0x15).
@@ -98,12 +101,12 @@ def eligible_warps(_):
     return known_warps(load("warps"))
 
 
-def eligible_pote_warps(_):
-    """포테의숲 워프 — `Suomi_Warp.txt` 에서 한쪽 끝이 포테의숲인 줄만. 수오미마을 안 건물 워프는 수오미 작업 때 들인다."""
+def eligible_suomi_warps(_):
+    """수오미마을 건물 문과 포테의숲 워프 — 5.99 가 목록에서 뺀 `Suomi_Warp.txt` 전부."""
     rows = []
-    for line in POTE_WARPS.read_text(encoding="utf-8").splitlines():
+    for line in SUOMI_WARPS.read_text(encoding="utf-8").splitlines():
         c = [col.strip() for col in line.strip().split(",")]
-        if len(c) < 7 or line.strip().startswith("//") or not (c[1].startswith("포테의숲") or c[4].startswith("포테의숲")):
+        if len(c) < 7 or line.strip().startswith("//"):
             continue
         rows.append({"출발맵": c[1], "출발": [c[2], c[3]], "도착맵": c[4], "도착": [c[5], c[6]],
                      "출처": "warp/Suomi_Warp.txt", "raw": c})
@@ -164,7 +167,8 @@ RULES = {
     "worldmaps": lambda _: eligible_plain("worldmaps"),
     "maps":      eligible_maps,
     "warps":     eligible_warps,
-    "potewarps": eligible_pote_warps,
+    "suomiwarps": eligible_suomi_warps,
+    "droprates": lambda kind: eligible_drop_rates(kind),
     "monsters":  eligible_monsters,
     "mundanes":  eligible_mundanes,
     "items":     lambda _: eligible_plain("items"),
@@ -175,7 +179,7 @@ RULES = {
 
 # 계획의 실측 표. 여기서 벗어나면 표가 틀렸거나 적재기가 틀렸다 — 진행 전에 가린다.
 # 기술·마법은 원작(abilities.json) 기준이다 — 팩의 82·71 이 아니다.
-EXPECTED = {"quests": 38, "shops": 47, "maps": 797, "warps": 886, "potewarps": 37, "items": 989, "monsters": 565,
+EXPECTED = {"quests": 38, "shops": 47, "maps": 797, "warps": 886, "suomiwarps": 80, "droprates": 55, "items": 989, "monsters": 565,
             "mundanes": 84, "skills": 275, "spells": 338, "worldmaps": 1, "doors": 1}
 
 
@@ -447,6 +451,65 @@ def write_items(keep):
 # 스크립트의 mob_spawn2 "결계남도가", 4, 7, … 쪽이고 그건 결계 같은 특수 이벤트다.)
 SPAWN_RANDOM = 1 << 1            # SpawnQualifer.Random
 LOOT_RANDOM, LOOT_TABLE, LOOT_GOLD, LOOT_NONE = 1 << 1, 1 << 2, 1 << 5, 256
+
+# 5.99 드롭 확률을 옮기는 맵 이름 앞머리 — 워프 레벨 범위(LEVEL_RANGE_SOURCES)와 같은 지역.
+DROP_RATE_MAPS = ("노비스", "수오미", "포테의숲")
+
+
+def eligible_drop_rates(_):
+    """5.99 는 괴물마다 드롭 한 줄(["50", "팜팻의정수"] — 죽을 때 한 번, 50%)이다. 하데스의 Table 뽑기는 아이템 DropRate 를
+    무게로 쓰고 전역 보정(여섯 번 빗나가면 다음엔 준다)이 붙어 5.99 확률과 상관없이 떨어진다. Random 뽑기가
+    `Formulas/monsterexp.cs DetermineRandomDrop` — 한 번, DropRate 확률 — 로 5.99 와 같다.
+
+    돌려주는 것: (괴물 템플릿 경로, 확률 %, 아이템 이름). 같은 아이템에 다른 확률이 붙으면 못 넣는다(DropRate 는 아이템 칸).
+    """
+    areas = {}
+    for path in (SERVER / "areas").glob("*.json"):
+        a = json.loads(path.read_text(encoding="utf-8-sig"))
+        areas[a["Id"]] = a["Name"]
+    rate = {}
+    for m in load("mobs"):
+        d = m["fields"].get("드롭아이템")
+        if isinstance(d, list) and len(d) >= 2 and str(d[0]).strip().isdigit():
+            rate[m["이름"]] = (int(d[0]), str(d[1]).strip())
+    keep, drop, per_item = [], [], {}
+    for path in sorted((SERVER / "templates" / "monsters" / "5.99").glob("*.json")):
+        text = path.read_text(encoding="utf-8-sig")
+        name = re.search(r'"Name"\s*:\s*"([^"]+)"', text)
+        area = re.search(r'"AreaID"\s*:\s*(\d+)', text)
+        if not name or not area or not areas.get(int(area.group(1)), "").startswith(DROP_RATE_MAPS):
+            continue
+        if name.group(1) not in rate:
+            continue                                    # 5.99 에 드롭이 없는 괴물(브라운맨티스 …)은 그대로
+        pct, item = rate[name.group(1)]
+        listed = re.search(r'"Drops"\s*:\s*\{[^}]*\}', text)
+        if not listed or f'"{item}"' not in listed.group(0):
+            continue                                    # 템플릿 드롭 목록에 없다(노비스주민 — 5.99 드롭 "1"). Random 은 빈 목록에서 터진다
+            drop.append((path.name, f"아이템 템플릿이 없다: {item}")); continue
+        if per_item.setdefault(item, pct) != pct:
+            drop.append((path.name, f"같은 아이템에 다른 확률: {item} {per_item[item]}% · {pct}%")); continue
+        keep.append((path, pct, item))
+    return keep, drop
+
+
+def write_drop_rates(rows):
+    """괴물은 LootType 의 Table 을 Random 으로(금화 칸은 그대로), 아이템은 DropRate = 확률/100. 괴물 템플릿은 그 한 칸만
+    고친다 — 통째로 다시 쓰면 build-pack-abilities.py 가 나중에 붙인 괴물 마법 칸이 지워진다."""
+    monsters = items = 0
+    for path, pct, item in rows:
+        text = path.read_text(encoding="utf-8-sig")
+        loot = int(re.search(r'"LootType"\s*:\s*(\d+)', text).group(1))
+        wanted = (loot & ~LOOT_TABLE) | LOOT_RANDOM
+        if wanted != loot:
+            path.write_text(re.sub(r'("LootType"\s*:\s*)\d+', rf"\g<1>{wanted}", text, count=1), encoding="utf-8")
+            monsters += 1
+        item_path = SERVER / "templates" / "items" / f"{item}.json"
+        template = json.loads(item_path.read_text(encoding="utf-8-sig"))
+        if template.get("DropRate") != pct / 100:
+            template["DropRate"] = pct / 100
+            item_path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8")
+            items += 1
+    return monsters, items
 MONSTER_IMAGE_BASE = 0x4000      # bees 의 16385 = 0x4000 + 1
 MONSTER_SCRIPT = "Common Monster"
 
@@ -1040,10 +1103,16 @@ def warp_json(x, ids):
     fx, fy = int(x["출발"][0]), int(x["출발"][1])
     tx, ty = int(x["도착"][0]), int(x["도착"][1])
     src, dst = ids[x["출발맵"]], ids[x["도착맵"]]
+    # 줄 끝 두 칸이 들어갈 수 있는 레벨 범위다(노비스 사냥터 1~22 · 지하던전 5~22 · 포테의숲 21~51). 99 는 제한 없음.
+    # 노비스·수오미(포테의숲) 파일에만 적용한다 — 다른 파일까지 쓰면 아벨 130장이 51~80, 밀레스·VOD·광산 등 137장이 99레벨
+    # 전용이 된다(2026-09-17 사용자가 정한 범위 밖, docs/pote-forest.md).
+    ranged = x["출처"] in LEVEL_RANGE_SOURCES and len(x["raw"]) >= 9
+    low, high = (int(x["raw"][7]), int(x["raw"][8])) if ranged else (1, 99)
     return {
         "ActivationMapId": src,
         "Activations": [{"AreaID": src, "Location": {"X": fx, "Y": fy}, "PortalKey": 0}],
-        "LevelRequired": 1,
+        "LevelRequired": max(1, low),
+        **({"LevelMaximum": high} if high < 99 else {}),
         "To": {"AreaID": dst, "Location": {"X": tx, "Y": ty}, "PortalKey": 0},
         "WarpRadius": 0,
         "WarpType": "Map",
@@ -1152,7 +1221,10 @@ def main():
             print(f"     넣음 {n}장 → templates/items/")
             print(f"     옮기지 않은 칸(뜻 미확인): " +
                   ", ".join(f"{k}×{v}" for k, v in skipped.most_common(10)))
-        elif kind in ("warps", "potewarps") and a.write:
+        elif kind == "droprates" and a.write:
+            monsters, items = write_drop_rates(keep)
+            print(f"     괴물 {monsters}장 LootType → Random · 아이템 {items}장 DropRate")
+        elif kind in ("warps", "suomiwarps") and a.write:
             if not IDTABLE.exists():
                 print("     번호표가 없다 — 먼저 --kind maps 를 돌려라"); return 1
             print(f"     넣음 {write_warps(keep)}장 → templates/warps/")
