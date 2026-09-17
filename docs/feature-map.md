@@ -67,7 +67,7 @@
 | 28 | 상점 | 돌아감 `S/Mundanes/shop1.cs:26-129` | 됨 — 사기 확인(`NpcDialogueTests`), 팔기·수리는 같은 창 | `HB/Network/ServerFormats/ServerFormat2F.cs:41-60` ItemSellData | 판매 목록 180종이 **모두 서버에 있다**(2026-09-17). 확성기·미션두루마리처럼 창을 띄우는 사용 스크립트 10개는 아직 못 돌려 사도 쓸 수 없다. 물약·음식·귀환 주문서 38종(`build-pack-consumables.py`)과 방패·투구·장신구·장갑·허리띠·각반·신발·장식 416종(`build-pack-equipment.py`)이 들어왔다(2026-09-17). 장식은 입은 모습으로 그리지 않는다. 문구가 영어 |
 | 29 | 은행 | 돌아감 `S/Mundanes/Banker.cs:168-248` | 없음 | `HB/Network/ServerFormats/ServerFormat2F.cs:16-27` | |
 | 30 | 사람끼리 교환 | 돌아감 `GSH:2146-2360` (아이템·금화·양쪽 확인) | 없음 | `HB/Network/ServerFormats/ServerFormat42.cs` · `TS` Exchange 74 | |
-| 31 | 퀘스트 | 부분 — 엔진 `HB/Types/Quest.cs:27-54`, 연결된 NPC 8개 | 없음 | 메타파일 `SEvent1~7` · 팩 퀘스트 스크립트 60 | 콘텐츠를 채울 일 |
+| 31 | 퀘스트 | 부분 — 하데스 엔진 `HB/Types/Quest.cs:27-54` 대신 5.99 NPC 스크립트를 그대로 돌린다(`S/Pack599/PackNpc.cs`, 84개 옮김, 진행값 `Aisling.PackVariables`, 2026-09-17) | 됨 — 대화창으로 | 팩 `Npc_Quest.txt`·`Npc_Script.txt` 등 · 메타파일 `SEvent1~7` | 스크립트가 붙은 NPC 는 아직 5곳(그라가스·멜로린·뮤레칸·인셉션 + 사범 23). 팩에 정의가 없는 스크립트 NPC 53곳(게시판알리미·워프할아버지·선진 …)은 서지 않았다. 개인 던전(`map_create`)·괴물 부르기·상점 `shop`·은행 명령은 아직 |
 | 38 | 금화 | 돌아감 — 버리기 `GSH:1009-1040`, 교환 `GSH:2272-2299` | 됨 — 버리기 `WC:534-542`, 소지품 창에 금화 | `TS:24` | |
 | **함께 하기** |||||
 | 32 | 채팅(말·외침·귓속말) | 돌아감 `GSH:609-684,827-864` | 일부 — 말하기만(종류 0 고정) `WC:480-481` | `TS:19` Whisper | |

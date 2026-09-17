@@ -11,7 +11,11 @@ NPC: 먼저 기술·마법을 가르치는 사범(`Npc/Npc_Skill.txt`). 아이�
 
   mes 1, "글";           → yield return Mes(1, "글");          ("다음"을 누를 때까지 멈춘다)
   set @고름, menu(…);    → yield return Menu(…); v_고름 = reply.Choice;
+  input @글$, 1, "물음"…;  → yield return Input("물음"); v_글_s = reply.Words;
   end;                   → yield break;
+
+NPC·아이템 스크립트의 `#이름`·`$이름` 은 캐릭터에 남는다(퀘스트 진행 `#gragas` 따위) — `p["#이름"]` 으로 옮겨
+`Aisling.PackVariables` 에 둔다. 기술 변환기는 그대로 블록 안에서만 쓴다.
 
 기다렸다 이어 가는 일은 `scripts/Pack599/PackNpc.cs` 가 한다. 명령(`skill_add`·`get_level` …)은 기술과 같은
 `Pack599.Call` 로 간다. 스크립트 이름마다 `[Script("NPC_이름")]` 클래스 하나 — NPC 템플릿의 `ScriptKey` 가 이것을
@@ -32,7 +36,8 @@ _spec.loader.exec_module(abilities)
 
 NPC_SCRIPTS = abilities.PACK / "script" / "Npc"
 OUT = abilities.OUT / "Npcs"
-FILES = ["Npc_Skill.txt"]
+#: 상점(`Npc_Shop.txt`)은 아직 뺀다 — `shop` 명령이 없고, 상점 NPC 는 하데스 shop1 로 이미 돈다.
+FILES = ["Npc_Skill.txt", "Npc_Script.txt", "Npc_Quest.txt", "Npc_Making.txt", "Npc_Warp.txt"]
 ITEM_SCRIPTS = abilities.PACK / "script" / "Item"
 ITEM_OUT = abilities.OUT / "Items"
 ITEM_FILES = ["E.T.C.txt", "Quest.txt", "Potion.txt", "Blessing.txt", "CashI.txt"]
@@ -73,11 +78,28 @@ class NpcTranslator(abilities.Translator):
             self.take(";")
             self.calls["menu"] += 1
             return f"{pad}yield return Menu({', '.join(args)});\n{pad}{name} = reply.Choice;"
+        if kind == "id" and word == "input":
+            self.take()
+            name = self.variable(self.take())
+            self.take(",")
+            self.expr()  # 입력 종류
+            self.take(",")
+            question = self.expr()
+            while not self.at(";"):
+                self.take()
+            self.take(";")
+            self.calls["input"] += 1
+            return f"{pad}yield return Input({question});\n{pad}{name} = reply.Words;"
         if kind == "id" and word == "end":
             self.take()
             self.take(";")
             return f"{pad}yield break;"
         return super().statement(depth)
+
+    def variable(self, raw):
+        if raw[:1] in ("#", "$"):
+            return f'p["{raw}"]'
+        return super().variable(raw)
 
 
 def blocks(path):
@@ -132,6 +154,8 @@ namespace Darkages.Storage.locales.Scripts.Pack599
         {{
 {declare}
 {code}
+            // 말도 메뉴도 없는 스크립트(적룡의결계 …)도 이터레이터여야 한다.
+            yield break;
         }}
     }}
 }}

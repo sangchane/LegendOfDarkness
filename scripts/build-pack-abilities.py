@@ -130,7 +130,7 @@ def class_of(name, source, body, taught):
 
 TOKEN = re.compile(r"""
     (?P<ws>\s+) | (?P<comment>//[^\n]*) |
-    (?P<str>"(?:[^"\\]|\\.)*") | (?P<var>[@$#][\w가-힣]+) | (?P<num>\d+) |
+    (?P<str>"(?:[^"\\]|\\.)*") | (?P<var>[@$#][\w가-힣]+\$?) | (?P<num>0x[0-9A-Fa-f]+|\d+) |
     (?P<id>[A-Za-z_가-힣][\w가-힣]*) |
     (?P<op>&&|\|\||==|!=|<=|>=|[-+*/%<>!=(){},;:.])
 """, re.X)
@@ -320,7 +320,8 @@ class Translator:
         if raw[0] not in "@$#":
             raise Unsupported(f"변수가 아님 {raw!r}")
         # `$`·`#` 은 캐릭터에 남는 값이다. 아직 남기지 않고 블록 안에서만 쓴다.
-        name = {"@": "v_", "$": "d_", "#": "h_"}[raw[0]] + re.sub(r"\W", "_", raw[1:])
+        # 끝의 `$` 는 글자 변수라는 표시다(`@msg$`) — 같은 이름의 수 변수와 섞이지 않게 `_s` 를 붙인다.
+        name = {"@": "v_", "$": "d_", "#": "h_"}[raw[0]] + re.sub(r"\W", "_", raw[1:].replace("$", "_s"))
         self.vars.add(name)
         return name
 
