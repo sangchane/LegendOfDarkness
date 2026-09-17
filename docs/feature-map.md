@@ -56,7 +56,7 @@
 | 19 | 상태 이상·버프 | 돌아감 — 독·수면·빙결·실명·저주… `HB/Storage/StorageManager.cs:271-292` | 없음 — 아이콘 패킷 0x3A 안 읽음, 실명 값만 받음 `WC:925` | `HB/Types/Buff.cs:45` | |
 | 20 | PvP·아레나 | 틀만 — 아레나 이동 NPC 뿐 `S/Mundanes/ArenaMaster.cs:21-50`, 동의 체계 없음 | 일부 — 사람도 때릴 수 있음 | `HB/Types/Sprite.cs:261-269` PlayerKill 맵 플래그 | 규칙부터 정해야 한다 |
 | **기술·마법** |||||
-| 21 | 배우기 | 돌아감 `S/Mundanes/LearnSkills.cs:45-151` | 없음 — 배운 목록만 받음(0x17·0x2C) | 메타파일 `SClass1~5` | 대화창이 막는다 |
+| 21 | 배우기 | 돌아감 — 5.99 사범 스크립트를 그대로 돌린다(`S/Pack599/PackNpc.cs`, 밀레스마을 직업 사범 20 · 달인 3, 2026-09-17). 하데스 `LearnSkills.cs` 는 붙은 NPC 가 없다 | 됨 — 대화창으로 "다음"·메뉴를 눌러 배운다 | 팩 `Npc_Skill.txt` · 메타파일 `SClass1~5` | 기술이 73번 칸(셋째 쪽)에 들어간다 — 기술 템플릿 311 중 310 에 `Pane` 이 비었다. `get_son`(순수) 뜻 모름 → 그 선택지 11곳 막힘 |
 | 22 | 쓰기·쿨다운 | 돌아감 `GSH:1787-1839` · 마법 `HB/Network/Game/GameClient.cs:1322-1350` | 일부 — 한 개씩 쓰기 `WC:492-504`, 쿨다운(0x3F) 안 읽음 | `TS` Cooldown 63 · `sources/wren11/ETDA/BotCore/Shared/Collections.cs` sCooldown | **587 중 42개만 효과가 난다**(`docs/what-hades-already-has.md`) |
 | 23 | 소모품 사용 | 돌아감 `GSH:896-974` | 됨 `WC:511-512` | `TS:21` | |
 | 24 | 장비 입고 벗기 | 돌아감 `HB/Network/Game/GameClient.cs:124-178` | 됨 `WC:549-550` · `mobile/client/src/GearGrid.cs` | 5.99 장착 규칙(`docs/disassembly.md`) | |

@@ -525,6 +525,9 @@ def write_monsters(keep):
 # 캐시가 `Name` 열쇠라(GlobalMundaneTemplateCache) 31종을 그대로 쓰면 179배치가
 # 31개로 뭉갠다. 배치마다 이름을 새로 짓는다 — 화면에 뜨는 이름이 아니라 열쇠다.
 NPC_SCRIPT = "pack_speaker"          # scripts/Mundanes/PackSpeaker.cs
+# 팩 npc/Spawn.txt 의 여섯째 칸이 그 자리 NPC 의 스크립트 이름이다(가렌@밀레스마을#52,45 → 가렌2). scripts/build-pack-npcs.py 가
+# 옮겨 둔 스크립트가 있으면 그것을(`NPC_이름`), 없으면 대사만 보여 주는 pack_speaker 를 붙인다.
+NPC_SCRIPTS = SERVER / "scripts" / "Pack599" / "Npcs"
 
 
 def flatten(v):
@@ -533,6 +536,12 @@ def flatten(v):
         return [x for e in v for x in flatten(e)]
     t = str(v).strip() if v is not None else ""
     return [t] if t and not t.isdigit() else []
+
+
+def npc_script(sp):
+    raw = sp.get("raw", [])
+    script = raw[5].strip() if len(raw) > 5 else ""
+    return f"NPC_{script}" if script and (NPC_SCRIPTS / f"{script}.cs").exists() else NPC_SCRIPT
 
 
 def mundane_json(sp, npc, area_id):
@@ -547,7 +556,7 @@ def mundane_json(sp, npc, area_id):
         "Image": MONSTER_IMAGE_BASE + (whole(f.get("이미지"), 32767) or 0),
         "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
         "Speech": flatten(f.get("말하기")),
-        "ScriptKey": NPC_SCRIPT,
+        "ScriptKey": npc_script(sp),
         "DefaultMerchantStock": [],
         "EnableWalking": False, "EnableTurning": False,
         "EnableAttacking": False, "EnableCasting": False,

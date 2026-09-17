@@ -13,11 +13,14 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 public sealed class NpcDialogueTests : IDisposable
 {
-    /// <summary>A ported NPC with a line of its own, and where it stands.</summary>
-    private const int MilethId = 20287;
+    /// <summary>
+    /// A ported NPC with a line of its own and no script, and where it stands. (It was 가렌 in 밀레스마을 until the
+    /// teachers got their 5.99 scripts — every NPC there teaches now, `Pack599TeacherTests`.)
+    /// </summary>
+    private const int NoviceTownId = 20373;
 
-    private const string Garen = "가렌@밀레스마을#52,43";
-    private const string GarenSays = "가렌: 전사 사범담당 가렌입니다. 데마시아!";
+    private const string Melorin = "멜로린@노비스마을#40,34";
+    private const string MelorinSays = "멜로린: 노비스마을에 오신것을 환영해요!";
     private const string Name = "npctalk";
 
     /// <summary>A ported shop (<c>shop1</c>) in the novice town's diner, and one of its goods the server has a template for.</summary>
@@ -37,10 +40,9 @@ public sealed class NpcDialogueTests : IDisposable
     [Fact]
     public async Task Tapping_a_ported_npc_opens_what_the_pack_said_it_says()
     {
-        // Standing beside Garen — the tile south of him holds another Garen, the pack puts four in a row.
-        // The tap carries a serial, not a direction, but being next to
-        // him is what a player would do and it keeps him inside the first creature list.
-        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MilethId, 53, 43));
+        // Standing beside her. The tap carries a serial, not a direction, but being next to her is what a player
+        // would do and it keeps her inside the first creature list.
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceTownId, 41, 34));
         server.Start(TimeSpan.FromMinutes(2));
 
         LoginFlow.TryCreateAccount(server, Name);
@@ -53,17 +55,18 @@ public sealed class NpcDialogueTests : IDisposable
         _ = world.PumpAsync(_deadline.Token);
 
         WorldEntry entry = await Settled(world, seen => seen is not null);
-        Assert.Equal(MilethId, entry.Map.Id);
+        Assert.Equal(NoviceTownId, entry.Map.Id);
 
-        Creature him = await Standing(world, new Tile(52, 43));
+        Creature her = await Standing(world, new Tile(40, 34));
 
-        await world.ClickAsync(him.Serial, _deadline.Token);
+        await world.ClickAsync(her.Serial, _deadline.Token);
 
         Dialogue talk = await Answered(world);
 
-        Assert.Equal(Garen, talk.Who);
-        Assert.Equal(GarenSays, talk.What);
-        Assert.Equal(him.Serial, talk.Serial);
+        Assert.Equal(Melorin, talk.Who);
+        // 대사가 여러 줄이라 한 창에 줄바꿈으로 이어 온다(PackSpeaker). 첫 줄로 시작하는지 본다.
+        Assert.StartsWith(MelorinSays, talk.What);
+        Assert.Equal(her.Serial, talk.Serial);
     }
 
     /// <summary>

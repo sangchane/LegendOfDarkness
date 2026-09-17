@@ -9,6 +9,12 @@
 - Last updated: 2026-09-15
 
 ## History (append; 최신이 위)
+- 2026-09-17 — **기술 사범이 5.99 스크립트 그대로 가르친다.** NPC 95명 중 기술을 가르치는 스크립트가 붙은 NPC 가 없어 운영자 명령 없이는 배울 수 없었다.
+  - 5.99 사범은 표가 아니라 대화 스크립트(`Npc_Skill.txt`: `mes` → `menu` → `get_level`·`get_class` 확인 → `skill_add`). 기술 변환기(`build-pack-abilities.py` `Translator`)를 이어 쓰고 기다리는 세 곳만 바꿨다 — `mes 1` 과 `set @x, menu(…)` 는 `yield return`, `end` 는 `yield break`. 서버 fork `scripts/Pack599/PackNpc.cs` 가 답이 오면 멈춘 자리에서 이어 간다(`mes 0` 은 기다리지 않음).
+  - `scripts/build-pack-npcs.py`: 29개 모두 옮김(서버 컴파일 시험 통과). `Pack599.Call` 에 skill_add·spell_add·skill_exist·skill_del·spell_del(…2 는 2차 직업용이라 같은 것으로), get_money·money_del, get_class_sub(=ClassStage), get_ability(=AbpLevel). `get_son`(순수)은 뜻을 몰라 0.
+  - `tools/pack-import/import.py`: 팩 Spawn.txt 여섯째 칸(스크립트 이름)에 옮긴 스크립트가 있으면 `ScriptKey NPC_<이름>`. **함정: `--kind mundanes --write` 만 돌리면 같은 자리 상점 NPC 14장이 pack_speaker 로 덮인다 — 곧이어 `--kind shops --write` 를 돌려야 한다.** 결과는 사범 23장의 ScriptKey 만 바뀜.
+  - 시험 `Pack599TeacherTests`: 레벨 11 전사가 가렌@밀레스마을#52,46 에게 "다음" 두 번 → 메뉴 숏블레이드 → 설명 두 번 → 배움(기술 이름은 `숏블레이드 (Lev:1/100)` 처럼 레벨이 붙어 온다). 대사 NPC 시험은 밀레스마을 NPC 가 모두 사범이 돼 노비스마을 멜로린으로 옮겼다.
+  - 남은 것: 기술이 73번 칸에 들어간다(템플릿 `Pane` 비어 있음), 승급의 공간·화론 사범 6(맵 없음), 나머지 NPC 스크립트.
 - 2026-09-17 — **5.99 물약·음식·귀환 주문서를 서버에 들여 쓸 수 있게 했다.** 상점 판매 목록 180종 중 131종이 서버에 없었고, 있던 뱀고기도 스크립트가 없어 "쓸 수 없다"였다.
   - 5.99 소모품은 칸으로 움직인다: `체력변화 +1000`(쓰면 회복) · `이동맵 노비스마을`+`이동좌표 40,33`(쓰면 이동). 서버 fork: `ItemTemplate` 에 `HealthRestore`·`ManaRestore`·`RecallArea/X/Y`(장비의 체력변화는 최대치 보너스라 칸을 나눔, `Item.ApplyQuality` 복사에도 더함), `scripts/Items/Consumable.cs`. 하나 줄이는 것은 기존 `Format1CHandler`.
   - `scripts/build-pack-consumables.py`: 물약 10 · 음식 7 · 귀환 21 = 38종(코마디움 둘은 부활 전용 스크립트, 아벨길드성은 맵 번호표에 없어 뺌). 쌓임 100. 아이콘 24가지(`dat-extract icon`).
