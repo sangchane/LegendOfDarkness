@@ -39,6 +39,7 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율] [칸] [색번호|marker] [색표]");
             Console.Error.WriteLine("        dat-extract icon <Legend.dat> <번호들> <출력.png> [배율]");
             Console.Error.WriteLine("        dat-extract walls <맵파일.map> <sotp.dat> [가로칸]");
+            Console.Error.WriteLine("        dat-extract layout <seo.dat> <ia.dat> <sotp.dat> <맵파일.map> <가로칸> <세로칸> <출력이름> [미리보기.png]");
             Console.Error.WriteLine("        dat-extract dyeslots <출력.txt>");
             Console.Error.WriteLine("        dat-extract metafile <database/server/metafile/ItemInfo8> [찾을 말]");
             return 2;
@@ -60,6 +61,11 @@ internal static class Program
         if (command == "walls")
         {
             return ShowWalls(args);
+        }
+
+        if (command == "layout")
+        {
+            return await RenderLayout(args);
         }
 
         string archivePath = Path.GetFullPath(args[1]);
@@ -289,6 +295,168 @@ internal static class Program
         Directory.CreateDirectory(Path.GetDirectoryName(output)!);
         await canvas.SaveAsPngAsync(output);
         Console.WriteLine($"바닥 {drawn}칸을 {width}x{height} 로 그려 {output} 에 저장했습니다.");
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Writes what the mobile client needs to put a map together itself: a sheet of the floor tiles the map uses, a
+    /// sheet of what stands on it (buildings, trees, fences) and a layout saying which tile and which picture go on
+    /// which cell and which cells block (<see cref="MapObjects" />). The standing pictures are kept apart from the
+    /// floor because a figure has to be able to walk behind them, and the floor is kept as tiles because a baked
+    /// 70x70 floor is 5.5MB where its tiles are a few hundred kilobytes.
+    /// </summary>
+    /// <remarks>
+    /// With a preview path it also draws the whole map the way da-lib does (floor, then row by row the left half's
+    /// picture before the right's), so the result can be looked at.
+    /// </remarks>
+    private static async Task<int> RenderLayout(string[] args)
+    {
+        if (args.Length < 8)
+        {
+            Console.Error.WriteLine("layout 에는 seo.dat, ia.dat, sotp.dat, 맵파일, 가로칸, 세로칸, 출력이름이 필요합니다.");
+            return 2;
+        }
+
+        string[] paths = [.. args[1..5].Select(Path.GetFullPath)];
+        int columns = int.Parse(args[5]);
+        int rows = int.Parse(args[6]);
+        string output = Path.GetFullPath(args[7]);
+
+        foreach (string needed in paths)
+        {
+            if (!File.Exists(needed))
+            {
+                Console.Error.WriteLine($"파일을 찾을 수 없습니다: {needed}");
+                return 2;
+            }
+        }
+
+        (string seoPath, string iaPath, string sotpPath, string mapPath) = (paths[0], paths[1], paths[2], paths[3]);
+
+        List<ArchivedItem> seo = await ReadEntries(seoPath);
+        List<ArchivedItem> ia = await ReadEntries(iaPath);
+        TileSource? tiles = TileSource.From(seo);
+        ArchivedItem? table = ia.FirstOrDefault(entry => entry.Name.Equals("stcpal.tbl", StringComparison.OrdinalIgnoreCase));
+
+        if (tiles is null || table is null)
+        {
+            Console.Error.WriteLine(tiles is null ? "바닥 타일을 읽지 못했습니다." : "stcpal.tbl 이 없습니다 — ia.dat 이 맞나요?");
+            return 2;
+        }
+
+        byte[] sotp = File.ReadAllBytes(sotpPath);
+        List<Walls.Cell> cells = Walls.Read(File.ReadAllBytes(mapPath));
+        MapObjects.PaletteChoice choice = MapObjects.PaletteChoice.Read(System.Text.Encoding.ASCII.GetString(table.Data));
+
+        // stc0000.pal … 의 순서가 곧 팔레트 번호다.
+        List<Palette> palettes = Palette.FromArchive(
+            ia.Where(entry => entry.Name.StartsWith("stc", StringComparison.OrdinalIgnoreCase)
+                              && entry.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase))
+              .OrderBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase));
+
+        Dictionary<int, MapObjects.Picture> pictures = [];
+        List<int> missing = [];
+
+        foreach (int number in cells.SelectMany(cell => new[] { cell.Left, cell.Right })
+                     .Where(MapObjects.IsDrawn)
+                     .Distinct()
+                     .Order())
+        {
+            if (MapObjects.Cut(ia, number, choice, palettes, sotp) is { } picture)
+            {
+                pictures[number] = picture;
+            }
+            else
+            {
+                missing.Add(number);
+            }
+        }
+
+        // 바닥 번호는 1부터 센다(0 은 아무것도 깔지 않음). 타일셋에 없는 번호는 그리지 않는다 — map 명령과 같다.
+        int[] floors = [.. cells.Select(cell => cell.Floor).Where(floor => floor > 0 && floor <= tiles.Tiles.Count).Distinct().Order()];
+        int across = Math.Max(1, (int)Math.Ceiling(Math.Sqrt(floors.Length)));
+        Dictionary<int, (int X, int Y)> tileAt = [];
+
+        using (Image<Rgba32> floorSheet = new(across * TileWidth, Math.Max(1, (int)Math.Ceiling(floors.Length / (double)across)) * TileHeight))
+        {
+            for (int at = 0; at < floors.Length; at++)
+            {
+                (int x, int y) = ((at % across) * TileWidth, (at / across) * TileHeight);
+                tiles.Draw(floorSheet, floors[at] - 1, x, y);
+                tileAt[floors[at]] = (x, y);
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+            await floorSheet.SaveAsPngAsync($"{output}-floor.png");
+        }
+
+        (Image<Rgba32> sheet, Dictionary<int, MapObjects.Placed> where) = MapObjects.Pack([.. pictures.Values], 1024);
+
+        using (sheet)
+        {
+            await sheet.SaveAsPngAsync($"{output}-objects.png");
+        }
+
+        await File.WriteAllTextAsync($"{output}.txt",
+            MapObjects.Describe(Path.GetFileNameWithoutExtension(mapPath), columns, rows, cells, sotp, tileAt, pictures, where));
+        Console.WriteLine($"{Path.GetFileName(mapPath)} — 바닥 타일 {floors.Length}종 · 세운 그림 {pictures.Count}장 → {output}.txt · -floor.png · -objects.png");
+
+        if (missing.Count > 0)
+        {
+            Console.WriteLine($"  아카이브에 없는 그림 번호 {missing.Count}개: {string.Join(", ", missing.Take(12))}");
+        }
+
+        if (args.Length < 9)
+        {
+            return 0;
+        }
+
+        const int halfWidth = TileWidth / 2;
+        const int halfHeight = 13;
+        using Image<Rgba32> canvas = new((columns + rows) * halfWidth, ((columns + rows) * halfHeight) + TileHeight + 400);
+        const int lift = 400;
+
+        foreach (bool standing in new[] { false, true })
+        {
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    int cell = (row * columns) + column;
+                    if (cell >= cells.Count)
+                    {
+                        continue;
+                    }
+
+                    int x = (rows * halfWidth) + ((column - row) * halfWidth) - halfWidth;
+                    int y = lift + ((column + row) * halfHeight);
+
+                    if (!standing)
+                    {
+                        if (tileAt.ContainsKey(cells[cell].Floor))
+                        {
+                            tiles.Draw(canvas, cells[cell].Floor - 1, x, y);
+                        }
+
+                        continue;
+                    }
+
+                    if (pictures.TryGetValue(cells[cell].Left, out MapObjects.Picture? left))
+                    {
+                        MapObjects.Paint(canvas, left, x, y + (2 * halfHeight) - left.Height, blend: true);
+                    }
+
+                    if (pictures.TryGetValue(cells[cell].Right, out MapObjects.Picture? right))
+                    {
+                        MapObjects.Paint(canvas, right, x + halfWidth, y + (2 * halfHeight) - right.Height, blend: true);
+                    }
+                }
+            }
+        }
+
+        await canvas.SaveAsPngAsync(Path.GetFullPath(args[8]));
+        Console.WriteLine($"  세워 본 모습: {Path.GetFullPath(args[8])}");
 
         return 0;
     }

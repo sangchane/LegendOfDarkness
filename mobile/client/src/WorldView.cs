@@ -38,6 +38,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private readonly Node2D _camera = new() { Name = "Camera", YSortEnabled = true };
     private readonly Sprite2D _floor = new() { Name = "Floor", Centered = false };
 
+    // 맵을 타일로 맞춰 까는 바닥(map<번호>.txt 가 있을 때). 한 번 그려 두면 Godot 가 명령을 들고 있다가 다시 쓴다.
+    private readonly Node2D _tiledFloor = new() { Name = "TiledFloor" };
+    private Texture2D? _floorSheet;
+
     private readonly CancellationTokenSource _leaving = new();
 
     private Actor _player = null!;
@@ -51,6 +55,15 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     /// <summary>Which map's picture is down, so it is only swapped when the map actually changes.</summary>
     private int _floored = -1;
+
+    /// <summary>The walls and what stands on this map, when its layout was drawn out (<see cref="StandObjects" />).</summary>
+    private MapLayout? _layout;
+
+    // 건물·나무 하나하나. 맵이 바뀌면 통째로 치운다.
+    private readonly List<Sprite2D> _objects = [];
+
+    // sotp.dat 에 투명 표시가 붙은 그림(샘물 반짝임 …)은 가리지 않고 빛을 더한다 — 맵 편집기가 그렇게 그린다.
+    private readonly CanvasItemMaterial _glow = new() { BlendMode = CanvasItemMaterial.BlendModeEnum.Add };
 
     // The tile we believe we are on. A walk moves it straight away, because the server answers an allowed
     // step with silence; when it does speak, it wins.
@@ -177,6 +190,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         _camera.AddChild(_floor);
+        _camera.AddChild(_tiledFloor);
+        _tiledFloor.Draw += LayTiles;
         _camera.AddChild(_mark);
 
         _tile = new Tile(4, 4);
@@ -407,10 +422,23 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
+        bool turned = _player.Looking != direction;
         _player.Face(direction);
 
         (int column, int row) = Facing.TileStep(direction);
         Tile next = new(_tile.X + column, _tile.Y + row);
+
+        // 벽이나 맵 밖으로는 내딛지 않고 돌아서기만 한다. 서버는 어차피 거절하는데, 먼저 걸어 들어갔다가
+        // 되돌려지면 맵 밖을 돌아다니는 것처럼 보였다.
+        if (_layout?.Blocks(next) == true)
+        {
+            if (turned)
+            {
+                _ = server?.TurnAsync(direction, _leaving.Token);
+            }
+
+            return;
+        }
 
         // Telling the server is enough — it only answers when it disagrees.
         _ = server?.WalkAsync(direction, _leaving.Token);
@@ -1065,7 +1093,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// The pictures are drawn by <c>tools/dat-extract map &lt;seo.dat&gt; &lt;맵파일&gt; &lt;가로&gt;
     /// &lt;세로&gt; &lt;출력&gt;</c>, which lays tiles out with exactly the arithmetic
     /// <see cref="IsometricFloor" /> uses, so a tile in the picture sits where a figure standing on that
-    /// tile is drawn. A map with no picture keeps the old floor rather than showing nothing.
+    /// tile is drawn. A map with no picture shows no floor: keeping the last map's floor drew people and NPCs
+    /// standing off its edge, since their tiles belong to a different map.
     /// </para>
     /// </remarks>
     private void LayTheFloor(MapInfo map)
@@ -1076,17 +1105,121 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         _floored = map.Id;
+        StandObjects(map);
+
+        if (_floorSheet is not null)
+        {
+            _floor.Texture = null;
+            return;
+        }
 
         string path = $"{FloorFolder}map{map.Id}.png";
 
         if (!ResourceLoader.Exists(path))
         {
             GD.Print($"바닥 그림이 없습니다: {path} ({map.Name})");
+            _floor.Texture = null;
             return;
         }
 
         _floor.Texture = GD.Load<Texture2D>(path);
         _floorSize = _floor.Texture.GetSize();
+    }
+
+    /// <summary>
+    /// Stands up the map's buildings, trees and lamps, each picture on its own so a figure behind one is drawn under
+    /// it and a figure in front over it — the camera sorts everything by height. Also takes the map's walls, so a
+    /// step into one is not taken, and its floor tiles (<see cref="LayTiles" />). All of it comes from
+    /// <c>map&lt;번호&gt;.txt</c>, <c>-floor.png</c> and <c>-objects.png</c>, which <c>scripts/build-client-maps.py</c>
+    /// draws out of the same .map file and sotp.dat the server reads.
+    /// </summary>
+    private void StandObjects(MapInfo map)
+    {
+        foreach (Sprite2D standing in _objects)
+        {
+            standing.QueueFree();
+        }
+
+        _objects.Clear();
+        _layout = null;
+        _floorSheet = null;
+        _tiledFloor.QueueRedraw();
+
+        string layoutPath = $"{FloorFolder}map{map.Id}.txt";
+        string sheetPath = $"{FloorFolder}map{map.Id}-objects.png";
+
+        if (!Godot.FileAccess.FileExists(layoutPath))
+        {
+            return;
+        }
+
+        _layout = MapLayout.Read(Godot.FileAccess.GetFileAsString(layoutPath));
+
+        string floorPath = $"{FloorFolder}map{map.Id}-floor.png";
+        _floorSheet = _layout.Tiles.Count > 0 && ResourceLoader.Exists(floorPath) ? GD.Load<Texture2D>(floorPath) : null;
+
+        if (!ResourceLoader.Exists(sheetPath))
+        {
+            return;
+        }
+
+        Texture2D sheet = GD.Load<Texture2D>(sheetPath);
+        Dictionary<int, AtlasTexture> cut = [];
+
+        foreach (MapObject standing in _layout.Objects)
+        {
+            if (!_layout.Pictures.TryGetValue(standing.Picture, out MapPicture picture))
+            {
+                continue;
+            }
+
+            if (!cut.TryGetValue(standing.Picture, out AtlasTexture? texture))
+            {
+                texture = new AtlasTexture { Atlas = sheet, Region = new Rect2(picture.X, picture.Y, MapPicture.Width, picture.Height) };
+                cut[standing.Picture] = texture;
+            }
+
+            (int x, int y) = IsometricFloor.ObjectFoot(standing.Column, standing.Row, _layout.Rows, standing.Right);
+            Sprite2D sprite = new()
+            {
+                Texture = texture,
+                Centered = false,
+                Offset = new Vector2(0, -picture.Height),
+                Position = new Vector2(x, y),
+                Material = picture.Glows ? _glow : null
+            };
+
+            _camera.AddChild(sprite);
+            _objects.Add(sprite);
+        }
+    }
+
+    /// <summary>
+    /// Lays the floor tile by tile, in the same order tools/dat-extract draws a floor picture (row by row), so a
+    /// tile's overlap onto its neighbour comes out the same.
+    /// </summary>
+    private void LayTiles()
+    {
+        if (_layout is not { } layout || _floorSheet is null)
+        {
+            return;
+        }
+
+        Vector2 size = new(IsometricFloor.TileWidth, IsometricFloor.TileHeight);
+
+        for (int row = 0; row < layout.Rows; row++)
+        {
+            for (int column = 0; column < layout.Columns; column++)
+            {
+                if (!layout.Tiles.TryGetValue(layout.Floor(column, row), out (int X, int Y) at))
+                {
+                    continue;
+                }
+
+                (int x, int y) = IsometricFloor.Corner(column, row, layout.Rows);
+                _tiledFloor.DrawTextureRectRegion(_floorSheet, new Rect2(new Vector2(x, y), size), new Rect2(new Vector2(at.X, at.Y), size));
+            }
+        }
     }
 
     /// <summary>Takes the server's word for where we are, whenever it gives one.</summary>

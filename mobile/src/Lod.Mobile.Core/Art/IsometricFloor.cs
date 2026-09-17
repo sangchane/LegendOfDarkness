@@ -32,4 +32,17 @@ public static class IsometricFloor
 
         return (x + HalfWidth, y + HalfHeight + 8);
     }
+
+    /// <summary>
+    /// The bottom-left corner of a picture standing on a cell (<see cref="MapObject" />): the left half's picture
+    /// starts at the cell's left corner, the right half's half a tile over, and both hang up from the cell's bottom
+    /// corner — da-lib Graphics.RenderMap. Sorting by this height puts whoever is behind the cell under the picture
+    /// and whoever is in front over it.
+    /// </summary>
+    public static (int X, int Y) ObjectFoot(int column, int row, int rows, bool right)
+    {
+        (int x, int y) = Corner(column, row, rows);
+
+        return (right ? x + HalfWidth : x, y + (2 * HalfHeight));
+    }
 }
