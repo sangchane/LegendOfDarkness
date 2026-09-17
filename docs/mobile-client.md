@@ -172,11 +172,16 @@ grep "Welcome to Lorule" <서버 로그>              # 월드에 들어왔나
 ./scripts/ios-build.sh watch-sign     # 날마다 오전 10시에 그 알림을 띄우게 등록
 ```
 
-**무료 애플 계정은 서명이 7일이면 끝나고, 명령줄로는 새로 받지 못한다**(2026-09-18 확인). 서명 파일을 치우고
-`xcodebuild -exportArchive … -allowProvisioningUpdates` 로 받아 보게 했더니 `No profiles for
-'com.fallendev.lod.client' were found` 로 실패한다 — 자동 발급은 유료 계정의 App Store Connect 키가 있어야 한다.
-그러니 **7일마다 Xcode 에서 기기에 한 번 실행해** 새 서명을 받아야 하고, 그 뒤 이 스크립트로 다시 만들어 넣는다.
-`watch-sign` 은 그 날짜를 놓치지 않게 알리는 것까지만 한다(갱신 자체는 사람이 한다).
+**무료 애플 계정은 서명이 7일이면 끝난다. 그 갱신을 명령줄로 할 수 있다**(2026-09-18 확인) — 무엇으로 하느냐가
+갈린다:
+
+| | 결과 |
+|---|---|
+| 보관본 다시 내보내기 `xcodebuild -exportArchive … -allowProvisioningUpdates` | **안 된다** — `No profiles for 'com.fallendev.lod.client' were found`. 기기가 보이는 상태에서도 같다 |
+| **Xcode 프로젝트를 기기 지정해 빌드** `xcodebuild -project build/ios/LodClient.xcodeproj -target LodClient -destination "id=<기기>" -allowProvisioningUpdates build` | **된다** — 서명 파일을 지운 상태에서 7일짜리가 새로 생겼다 |
+
+그래서 `renew` 가 뒤쪽을 한다. `watch-sign` 은 날마다 살펴 **이틀 이하로 남으면 스스로 갱신하고** 결과를 알린다 —
+그때 아이패드가 켜져 있고 같은 Wi-Fi 에 있어야 한다. 갱신에 쓰는 Xcode 프로젝트는 `build` 가 남겨 둔 것이다.
 
 **케이블은 기기를 처음 등록할 때 한 번만** 필요하다. Xcode 의 기기 창에서 "네트워크로 연결"을 켜 두면
 그다음부터 같은 Wi-Fi 에서 무선으로 넣는다(`xcrun devicectl device install app`).

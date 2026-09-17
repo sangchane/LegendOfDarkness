@@ -3,14 +3,16 @@
 #
 #   scripts/ios-build.sh build            .ipa 를 만든다
 #   scripts/ios-build.sh install          만들고 기기에 넣는다(기기 이름·번호는 --device 로)
-#   scripts/ios-build.sh check            서명이 며칠 남았나 — 이틀 이하면 알림을 띄운다
+#   scripts/ios-build.sh renew            서명을 새로 받는다(기기가 보여야 한다)
+#   scripts/ios-build.sh check            며칠 남았나 — 이틀 이하면 스스로 갱신한다
 #   scripts/ios-build.sh watch-sign       날마다 check 를 돌게 맥에 등록한다
 #   scripts/ios-build.sh unwatch-sign     그 등록을 지운다
 #
-# **무료 계정은 서명이 7일이면 끝나고, 명령줄로는 새로 받지 못한다** — 2026-09-18 확인: 서명 파일을
-# 치우고 `xcodebuild -allowProvisioningUpdates` 로 받아 보게 했더니 "No profiles for ... were found" 로
-# 실패한다(유료 계정의 App Store Connect 키가 있어야 자동으로 만든다). 끝나면 Xcode 에서 기기에 한 번
-# 실행해 새 서명을 받아야 한다 — 그 한 번만 케이블이 필요하고, 짝지은 뒤로는 무선으로 넣는다.
+# **무료 계정은 서명이 7일이면 끝난다.** 명령줄로 새로 받을 수 있다 — 2026-09-18 확인: 보관본을 다시
+# 내보내는 것(`-exportArchive -allowProvisioningUpdates`)으로는 안 되고("No profiles ... were found"),
+# **Xcode 프로젝트를 기기를 지정해 빌드**하면 만들어진다:
+#   xcodebuild -project …/LodClient.xcodeproj -target LodClient -destination "id=<기기>" -allowProvisioningUpdates build
+# 기기는 케이블로 한 번 짝지어 두면 같은 Wi-Fi 에서 보인다(`xcrun devicectl list devices`).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -80,14 +82,54 @@ check() {
     local left
     left="$(days_left)"
 
-    if [ "$left" -lt 0 ]; then
-        say "서명이 없습니다 — Xcode 에서 기기에 한 번 실행하십시오."
+    if [ "$left" -ge 0 ]; then
+        echo "서명이 ${left}일 남았습니다."
+        [ "$left" -gt 2 ] && return 0
+    fi
+
+    if renew; then
+        say "서명을 새로 받았습니다 — $(days_left)일 남았습니다."
+    else
+        say "서명을 새로 받지 못했습니다 — 아이패드를 켜고 같은 Wi-Fi 에 두십시오."
+    fi
+}
+
+# 기기 하나를 고른다. LOD_DEVICE_ID 가 있으면 그것을, 없으면 지금 붙어 있는(짝지은) 첫 기기를.
+device_id() {
+    if [ -n "${LOD_DEVICE_ID:-}" ]; then
+        echo "$LOD_DEVICE_ID"
         return
     fi
 
-    echo "서명이 ${left}일 남았습니다."
-    [ "$left" -le 2 ] && say "서명이 ${left}일 남았습니다 — Xcode 에서 기기에 한 번 실행해 새로 받으십시오."
-    return 0
+    # 상태 칸이 "available (paired)" 나 "connected" 인 것만. "unavailable" 도 available 을 품고 있다.
+    xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /^(available|connected)/ {print $3; exit}'
+}
+
+# 서명 새로 받기. 기기를 지정해 Xcode 프로젝트를 빌드하면 7일짜리 서명이 새로 만들어진다.
+renew() {
+    local project="$CLIENT/build/ios/LodClient.xcodeproj"
+
+    if [ ! -d "$project" ]; then
+        echo "Xcode 프로젝트가 없습니다 — 먼저 build 로 한 번 만드십시오." >&2
+        return 1
+    fi
+
+    local device
+    device="$(device_id)"
+
+    if [ -z "$device" ]; then
+        echo "기기가 보이지 않습니다 — 아이패드를 켜고 같은 Wi-Fi 에 두십시오." >&2
+        return 1
+    fi
+
+    echo "기기 $device 로 서명을 받습니다..."
+    xcodebuild -project "$project" -target LodClient -configuration Debug \
+        -destination "id=$device" -allowProvisioningUpdates build > "$LOGS/ios-renew.log" 2>&1 || {
+        echo "실패했습니다 — $LOGS/ios-renew.log" >&2
+        return 1
+    }
+
+    echo "서명을 새로 받았습니다 — $(days_left)일 남았습니다."
 }
 
 say() {
@@ -125,7 +167,7 @@ install_to() {
     local device="${1:-}"
 
     if [ -z "$device" ]; then
-        device="$(xcrun devicectl list devices 2>/dev/null | awk 'NR>2 && NF>3 {print $(NF-2); exit}' || true)"
+        device="$(device_id)"
     fi
 
     if [ -z "$device" ]; then
@@ -158,7 +200,7 @@ PLIST
 
     launchctl unload "$AGENTS/com.lod.iossign.plist" 2>/dev/null || true
     launchctl load "$AGENTS/com.lod.iossign.plist"
-    echo "등록했습니다 — 날마다 오전 10시에 서명이 얼마 남았는지 알립니다."
+    echo "등록했습니다 — 날마다 오전 10시에 살펴보고, 이틀 이하로 남으면 스스로 새로 받습니다."
 }
 
 unwatch_sign() {
@@ -167,11 +209,14 @@ unwatch_sign() {
     echo "지웠습니다 — com.lod.iossign"
 }
 
+mkdir -p "$LOGS"
+
 case "${1:-check}" in
     build) build ;;
     install) build; install_to "${2:-}" ;;
+    renew) renew ;;
     check) check ;;
     watch-sign) watch_sign ;;
     unwatch-sign) unwatch_sign ;;
-    *) echo "쓸 수 있는 것: build install [기기] check watch-sign unwatch-sign"; exit 2 ;;
+    *) echo "쓸 수 있는 것: build install [기기] renew check watch-sign unwatch-sign"; exit 2 ;;
 esac
