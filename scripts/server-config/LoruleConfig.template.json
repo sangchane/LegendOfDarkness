@@ -1,0 +1,218 @@
+﻿{
+	// Locales
+	"Content": {
+		"Location": "{{FORK}}/database/server",
+		"ServerIP": "{{SERVER_IP}}"
+	},
+	"Editor": {
+		"Location": "{{FORK}}/database",
+		"GameLocation": "{{FORK}}/game"
+	},
+
+
+	"ServerConfig": {
+		// Walking | F5 | Porting
+		"RefreshRate": 300,
+		"WalkingSpeedLimitFactor": 275, //275 prevents all movement hacks from working.
+		"RefreshOnWalkCollision": true,
+		"LimitWalkingSpeed": true,
+		"F5ReloadsPlayers": false,
+		"F5ReloadsMonsters": false,
+		"DontTurnDuringRefresh": false,
+		"CancelCastingWhenWalking": true,
+		"CancelWalkingIfRefreshing": true,
+
+		// Starting Zone
+		"NationReturnHours": 3,
+		"StartingMap": 20373,
+		"StartingPosition": {
+			"X": 37,
+			"Y": 29
+		},
+
+		// World Transitions
+		"TransitionPointX": 4,
+		"TransitionPointY": 4,
+		"TransitionZone": 0,
+
+		// Scripts
+		"MonsterCreationScript": "Create Monster",
+		"BaseDamageScript": "Base Damage",
+		"MonsterRewardScript": "Monster Exp 1x",
+		"ElementTableScript": "Elements 1.0",
+		"ACFormulaScript": "AC Formula",
+
+		// Offense
+		"BaseDamageMod": 60,
+		"AiteDamageReductionMod": 3,
+		"SleepProcsDoubleDmg": true,
+		"BehindDamageMod": 0.45,
+
+		// Defense
+		"BaseStatAttribute": 5,
+		"MinimumHp": 250,
+		"MaxHP": 999999,
+		"BaseAC": 0,
+		"MaxAC": 200,
+		"BaseMR": 70,
+		"RegenRate": 5000,
+
+		// Skills
+		"GiveAssailOnCreate": true,
+		"StarterSpellOnCreate": "beag ioc fein",
+		"ObjectServerPort": 2620,
+		"GlobalBaseSkillDelay": 500.0,
+		"AssailsCancelSpells": true,
+
+		// Spells
+		"FasNadurStrength": 1.5,
+		"MorFasNadurStrength": 2.0,
+
+		// Items
+		"ClickLootDistance": 10,
+		"DefaultItemColor": 13,
+		"DefaultItemDurability": 3000,
+		"DefaultItemValue": 1000,
+
+		// Death
+		"SkullLength": 19,
+		"DeathHPPenalty": 50,
+		"DeathMap": 99999,
+		"CanMoveDuringReap": false,
+		"DeathMapX": 9,
+		"DeathMapY": 15,
+
+		// Monsters | NPCs
+		"MundaneRespawnInterval": 10.0,
+		"GlobalSpawnTimer": 1000.0,
+		"MonsterSpellSuccessRate": 30,
+
+		// Players
+		// Character names: letters, digits and Hangul are allowed; these bound the length
+		// Seconds a half sent packet may sit before its connection is dropped
+		"IncompleteFrameTimeoutSeconds": 15,
+
+		"CharacterNameMinLength": 2,
+		"CharacterNameMaxLength": 12,
+
+		"PlayerLevelCap": 99,
+		"GroupExpBonus": 5.0,
+		"MaxCarryGold": 100000000,
+		"HpGainFactor": 5,
+		"MpGainFactor": 5,
+		"LootTableStackSize": 3,
+		"StatCap": 255,
+		"StatsPerLevel": 2,
+		"WeightIncreaseModifer": 3.5,
+
+		// Server Related Maintenance
+		"AppInsightsKey": "",
+		"DebugMode": false,
+		"DayTimeInterval": 30.0,
+		"ConnectionCapacity": 50,
+		"ERRORCAP": 15,
+		"HelperMenuId": -1,
+		"HelperMenuTemplateKey": "Wren",
+		"LogClientPackets": false,
+		"LogServerPackets": false,
+		"MultiUserLogin": false,
+		"BadRequestMessage": "(Invalid Request)",
+		"DefaultKey": "73F2BE80DDEB1BFDC887AB1C3CA18365",
+		"ServerDev": "wren",
+		"ProjectDev": "wren",
+		"LingerState": 1000.0,
+		"PingInterval": 10.0,
+		"SaveRate": 10.0,
+		"SERVER_PORT": 2615,
+		"LOGIN_PORT": 2610,
+		"SERVER_TITLE": "Hades",
+		"ServerWelcomeMessage": "Welcome to Lorule",
+		"GameMasters": [
+			"wren", "lol"
+		],
+		"DontSavePlayers": false,
+		"Settings": [
+			{
+				"SettingOn": "Loot Mode  :Single",
+				"SettingOff": "Loot Mode  :Multi",
+				"Enabled": false
+			},
+			{
+				"SettingOn": "PVP  :ON",
+				"SettingOff": "PVP  :OFF",
+				"Enabled": false
+			},
+			{
+				"SettingOn": "AUTO LOOT GOLD: Toggle",
+				"SettingOff": "AUTO LOOT GOLD: Toggle",
+				"Enabled": true
+			}
+		],
+		"DevModeExemptions": [
+			"quests",
+			"learning_predicates"
+		],
+		"UseLoruleVariants": false,
+		"UseLoruleItemRarity": false,
+		"ErrorReporting": true,
+		"DevMode": false,
+		"UseLobby": true,
+		"ClientVersion": 718,
+		"LogObjectsAdded": false,
+		"LogObjectsRemoved": false,
+		"PVPMap": 509,
+
+		// Messages
+		"MessageClearInterval": 12.0,
+		"CantAttack": "You can't attack that.",
+		"CantCarryMoreMsg": "You can't carry more.",
+		"CantDoThat": "You can't do that.",
+		"CantDropItemMsg": "You can't drop that.",
+		"CantEquipThatMessage": "You can't wear that.",
+		"CantUseThat": "You can't use that.",
+		"CantWearYetMessage": "You can't equip this yet.",
+		"ChantPrefix": "*",
+		"ChantSuffix": "*",
+		"StrAddedMessage": "Your muscles begin to build fibers.",
+		"IntAddedMessage": "Synapses in your mind expand.",
+		"WisAddedMessage": "You're becoming wise beyond your years.",
+		"ConAddedMessage": "You've become more fit.",
+		"DexAddedMessage": "You're starting to feel more flexible.",
+		"CursedItemMessage": "That does not belong to you... yet.",
+		"DoesNotFitMessage": "That does not fit you.",
+		"GroupRequestDeclinedMsg": "noname does not wish to join your group.",
+		"HandShakeMessage": "CAN WE ALL GET ALONG\n",
+		"LevelUpMessage": "Your insight has increased!",
+		"MerchantBuy": "Buy",
+		"MerchantBuyMessage": "What you looking for?",
+		"MerchantCancelMessage": "No Thanks.",
+		"MerchantConfirmMessage": "Yes Please!",
+		"MerchantDefaultMessage": "Ok, Good Bye then.",
+		"MerchantRefuseTradeMessage": "I don't want to buy that.",
+		"MerchantSell": "Sell",
+		"MerchantStackErrorMessage": "You don't even have that many.",
+		"MerchantTradeCompletedMessage": "Thanks.",
+		"MerchantTradeErrorMessage": "You should probably leave.",
+		"MerchantWarningMessage": "Hey you don't even have the money!! Don't waste my time.",
+		"NoManaMessage": "Your will is too weak.",
+		"NotEnoughGoldToDropMsg": "You don't have enough gold.",
+		"ReapMessage": "You are dying.|You cannot move nor raise your arms.|Barron is going to take your soul.|All things eventually come to an end.",
+		"ReapMessageDuringAction": "You can't do that, you are about to die!",
+		"RepairItemMessage": "You can't wear it anymore, it's Broken.",
+		"SomethingWentWrong": "Something went wrong.",
+		"SpellFailedMessage": "Something backfired!.",
+		"ToWeakToLift": "You are to weak and pathetic to lift it.",
+		"UserDroppedGoldMsg": "noname has dropped some money nearby.",
+		"WrongClassMessage": "This doesn't quite fit right.",
+		"YouDroppedGoldMsg": "you've dropped some gold.",
+		"ItemNotRequiredMsg": "Come back when you have the items required. \n{=q",
+		"DeathReepingMessage": "we can't go back now...",
+
+		// Warp 
+		"WarpCheckRate": 200,
+		"ShowWarpAnimation": true,
+		"WarpNumber": 295,
+		"VeryNearByProximity": 6,
+		"WithinRangeProximity": 12
+	}
+}

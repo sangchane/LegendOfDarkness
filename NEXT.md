@@ -94,6 +94,11 @@
   되돌려 두었다. 아이패드 빌드를 다시 구우려면 `HQC44HA87V` 를 넣고, **끝나면 다시 비운다**.
   `mobile/client/{server,login,hunt}.cfg` 는 커밋되지 않는다(`.gitignore`).
 
+- **[끝남/서비스 기반]** 서버를 손으로 켜고 끄던 것을 `scripts/lod-server.sh` 한 곳으로 모았다 — 상태·기록·설정 다시 깔기·캐릭터 백업,
+  그리고 맥 등록(`install-agents`): **꺼지면 3초 안에 다시 켜지고, 새벽 4시마다 백업한다**(`~/LOD-backups`, 30벌).
+  기록은 `~/Library/Logs/LOD/server.log` 한 곳. 설정 둘(`LoruleConfig.json`·`MServerTable.xml`)은 저장소의 틀에서 만들고 주소는 `LOD_SERVER_IP` 하나로 정한다.
+  **밖에서 접속하려면**(사용자 결정 대기): 공유기 포트 열기 + 따라가는 주소(DDNS), 또는 클라우드 서버로 옮기기. 둘 다 `LOD_SERVER_IP` 만 바꾸면 된다 — `docs/run-procedure.md` 0.4절.
+
 ### 맥에서 서버 띄우기
 
 ```bash

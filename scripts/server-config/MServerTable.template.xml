@@ -1,0 +1,12 @@
+﻿<MServerTable>
+  <Servers>
+    <MServer>
+      <Addr>{{SERVER_IP}}</Addr>
+      <Port>2610</Port>
+      <Guid>1</Guid>
+      <Name>Dark Ages</Name>
+      <Desc>Lorule Server</Desc>
+      <ID>1</ID>
+    </MServer>
+  </Servers>
+</MServerTable>

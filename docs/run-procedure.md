@@ -26,6 +26,31 @@
 
 ---
 
+## 0.4 서비스로 돌리기 — `scripts/lod-server.sh` (2026-09-18 확인)
+
+아래 0.5·0.6 절을 손으로 하지 않아도 되게 한 곳에 모았다. **날마다 백업하고, 꺼지면 스스로 다시 켜진다.**
+
+```bash
+./scripts/lod-server.sh status          # 켜졌나 · 주소 · 기록 · 마지막 백업
+./scripts/lod-server.sh start|stop|restart
+./scripts/lod-server.sh logs 60         # 기록 끝 60줄
+./scripts/lod-server.sh config          # 빌드가 덮어쓴 설정 둘을 다시 깐다
+./scripts/lod-server.sh backup          # 캐릭터 압축 + 기록 정리(자동으로도 돈다)
+./scripts/lod-server.sh install-agents  # 맥에 등록: 꺼지면 다시 켜기 + 새벽 4시 백업
+./scripts/lod-server.sh remove-agents   # 그 등록을 지운다
+```
+
+| 무엇 | 어디 |
+|---|---|
+| 설정 틀(저장소가 진실) | `scripts/server-config/LoruleConfig.template.json` · `MServerTable.template.xml` — 경로 `{{FORK}}`, 주소 `{{SERVER_IP}}` |
+| 접속 주소 | `LOD_SERVER_IP` 하나. 없으면 이 맥의 집 안 주소(`ipconfig getifaddr en0`). **두 파일에 같이 채운다**(0.6절) |
+| 기록 | `~/Library/Logs/LOD/server.log` (20MB 넘으면 날짜를 붙여 넘기고, 14일 지난 것은 지운다) |
+| 캐릭터 백업 | `~/LOD-backups/aislings-<날짜>-<시각>.tar.gz`, 30벌까지 |
+| 자동 실행 | `~/Library/LaunchAgents/com.lod.gameserver.plist`(맥이 서버를 직접 돌본다 — 죽으면 3초 안에 다시 켰다) · `com.lod.backup.plist`(새벽 4시) |
+
+**스크립트가 켠 서버는 스크립트가 끝나면 맥이 함께 정리해 버린다** — 그래서 자동 실행은 스크립트가 아니라
+서버를 직접 돌린다(`KeepAlive`). 등록해 두면 `start`·`stop` 도 그쪽에 맡긴다(`stop` 이 곧바로 되살아나지 않게).
+
 ## 0.5 macOS 에서 서버 돌리기 (2026-09-11 확인)
 
 이 문서 윗부분은 Windows PC 기준이다. **Mac(Apple M2, macOS 26.5)에서도 서버가 돈다** — 포트 2610·2615
