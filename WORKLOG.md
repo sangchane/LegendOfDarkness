@@ -9,6 +9,15 @@
 - Last updated: 2026-09-15
 
 ## History (append; 최신이 위)
+- 2026-09-18 — **포테의숲 보스존을 5.99 개인 던전 그대로 · 수오미 건물 문 · 레벨 범위 · 드롭 확률.** 사용자: "다시 켜고 남은 것 하자", 보스존 "5.99처럼 개인 사본", 수오미 건물 "지금 같이".
+  - 서버 본체: `Systems/Instances`(map_create 사본 — 원래 맵 파일·번호·보일 이름, 맵·워프·객체 목록은 사본으로 바꿔 끼움) · `WarpTemplate.LevelMaximum`·`RequiresClear`·`ScriptNpc` ·
+    `Area.ClientNumber`·`ClientName`·`Stage`·`SubStage`·`Kills` · `ObjectService.AddMap/RemoveMap` · 없어진 맵에 저장된 캐릭터는 시작 자리로.
+  - 스크립트: `Pack599` 명령 12개(map_create·warp_create·group_warp·mob_spawn3·mob_clear·item_clear·get_map_stage·get_map_sub_stage·map_objmob·get_clear_time·get_kill_mob·exp_add),
+    `PackRoutine`(1초마다 `Dungeon__Script`, `build-pack-npcs.py` 가 옮김). import.py `suomiwarps`·`potedungeon`·`mapfiles`·`droprates`.
+  - **함정 넷**: ① 5존 엔트자이언트 나르콜리에 잠들면 대화 대답이 무시된다(5.99 대로) ② 한꺼번에 지은 보스방을 "1분 빈 사본 정리"가 오솔길을 걷는 사이 지웠다 — 안 들어간 방은 30분
+    ③ 새 맵은 객체 목록이 없어 괴물·캐릭터 추가가 말없이 버려졌다 ④ 저장 파일 체력 100,000 으로 서버 스레드 풀이 막혔다(원인 미확인).
+  - 레벨 범위는 노비스·수오미 파일에만 — 전부 넣으면 아벨 130장 51~80, 밀레스·VOD·광산 등 137장 99 전용.
+  - 실제 서버를 여러 번 다시 켰다(스크립트 416 · 워프 991 · NPC 149). 한 번은 스크립트 컴파일이 깨진 채 떴다가(using 누락 둘) 바로 고쳐 다시 켰다.
 - 2026-09-17 — **포테의숲 1~6존을 열고 인덱스 페이지에 노비스 사냥터·포테의숲 상태를 반영.** 사용자: "그리고 포테의숲 진행", "인덱스 페이지에도 반영해".
   - `import.py --kind potewarps`: 저장소의 5.99 팩 사본 `Suomi_Warp.txt` 에서 한쪽 끝이 포테의숲인 37줄. `PoteForestTests`: 수오미마을 97,25 에서 동쪽으로 걸어 1존 33,47 도착 · 괴물 보임.
   - 모바일 맵 재료: 1~6존·보스존·수오미마을 바닥(건물 워프는 안 넣음 — 수오미는 추후).

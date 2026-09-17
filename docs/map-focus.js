@@ -176,18 +176,18 @@
       shortName: function (name) { return name.replace("노비스", "").replace(/^마을$/, "본마을"); },
       groupTitle: "노비스 마을과 사냥터(평원·지하던전)", statusLabel: "사냥터 괴물 확인",
       relationshipNote: "본마을·건물과 사냥터(평원 A·B, 지하던전 3×3)를 모았습니다. 카드의 화살표와 지도 점은 Hades 출구 좌표입니다.",
-      decisionTitle: "사냥터까지 걸어가 사냥할 수 있음 — 레벨 제한·드롭은 아직",
-      decisionText: "마을→평원→지하던전 워프가 Hades에 있고, 평원A·지하던전A1에 서면 괴물이 보이는 것을 실제 서버 시험(NoviceHuntingGroundTests)으로 확인했습니다. 모바일 맵(바닥·건물·벽)도 20곳 모두 있습니다. 남은 것: 5.99 입장 레벨(평원 1~22·지하던전 5~22·안쪽 10~22)이 Hades 워프에는 모두 1 이상으로만 들어가 있고, 괴물 드롭은 확인하지 않았습니다."
+      decisionTitle: "사냥터 구현 — 레벨 범위·드롭 확률까지 5.99대로",
+      decisionText: "마을→평원→지하던전 워프와 괴물이 Hades에 있고, 평원A·지하던전A1에 서면 괴물이 보이는 것을 실제 서버 시험(NoviceHuntingGroundTests)으로 확인했습니다. 입장 레벨은 5.99 범위(평원 1~22·지하던전 5~22·안쪽 10~22)로 막고 거절 문구도 5.99 서버 그대로입니다. 괴물 드롭은 5.99처럼 죽을 때 한 번 그 확률로(팜팻의정수 50% …) 떨어집니다. 모바일 맵(바닥·건물·벽)도 모두 있습니다."
     },
     {
       key: "porte", rootId: "porte-forest-focus", regionName: "포테의 숲", initialName: "포테의숲1존",
       maps: function () { return model.maps.filter(function (map) { return map.name.indexOf("포테의숲") === 0; })
         .sort(function (a, b) { return Number(a.id) - Number(b.id); }); },
       shortName: function (name) { return name.replace("포테의숲", ""); },
-      groupTitle: "포테의숲 전체 맵", statusLabel: "1~6존 연결 · 보스존 길 없음",
+      groupTitle: "포테의숲 전체 맵", statusLabel: "1~6존 연결 · 보스존은 개인 던전",
       relationshipNote: "모든 맵을 한 화면 안에서 줄바꿈해 보여줍니다. 카드의 화살표는 Hades 우선 규칙으로 선택된 실제 출구만 나타냅니다.",
-      decisionTitle: "수오미마을 입구와 1~6존 연결은 Hades에 들어감 — 보스존은 아직",
-      decisionText: "5.99 워프 목록이 싣지 않던 Suomi_Warp.txt 의 포테의숲 워프 37개를 들였습니다. 수오미마을 동쪽 끝(99,24~27)을 밟으면 1존에 도착하고 괴물이 보이는 것을 실제 서버 시험(PoteForestTests)으로 확인했습니다. 보스존은 5존 위 개인 던전(오솔길) 스크립트로만 가서 길이 없고, 입장 레벨 21~51 은 아직 적용하지 않았으며, 수오미마을 안 건물은 수오미 작업 때 합니다(docs/pote-forest.md)."
+      decisionTitle: "포테의숲 구현 — 1~6존 · 보스존(개인 던전)까지",
+      decisionText: "5.99 워프 목록이 싣지 않던 Suomi_Warp.txt 의 워프(포테의숲 37 · 수오미마을 건물 문 43)를 들였고 입장 레벨 21~51 을 적용했습니다. 보스존은 5.99처럼 개인 사본입니다 — 5존 위(26·27,0)를 밟아 입장하면 그 캐릭터 전용 오솔길 → 대기실(늑대 6마리를 다 잡아야 문이 열림) → 보스방이 지어지고, 보스방을 비우면 5초 뒤 경험치 20만과 함께 5존 16,16 으로 나옵니다. 실제 서버 시험 PoteForestTests · PoteDungeonTests 로 끝까지 확인했습니다(docs/pote-forest.md). 위 보스존 지도는 사본이 쓰는 원래 맵이라 고정 워프 점이 없습니다."
     },
     {
       key: "woodland", rootId: "woodland-focus", regionName: "우드랜드", initialName: "우드랜드입구",
