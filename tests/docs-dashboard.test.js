@@ -226,8 +226,9 @@ test('world map switches among Hades Novice, Porte, and Woodland before the full
   assert.doesNotMatch(focus, /3갈래/);
   assert.equal(Object.keys(images).filter((name) => name.startsWith('포테의숲')).length, 7);
   const noviceNames = ['노비스마을', '노비스마을식당', '노비스무기방어구상점', '노비스민가1',
-    '노비스민가2', '노비스잡화상점', '노비스주점', '노비스평원A', '노비스평원B'];
-  assert.equal(Object.keys(images).filter((name) => name.startsWith('노비스')).length, 9);
+    '노비스민가2', '노비스잡화상점', '노비스주점', '노비스평원A', '노비스평원B',
+    '노비스지하던전A1', '노비스지하던전B2', '노비스지하던전C3'];
+  assert.equal(Object.keys(images).filter((name) => name.startsWith('노비스')).length, 18);
   assert.ok(noviceNames.every((name) => images[name]), 'every directly connected Novice map has an image');
   assert.equal(images['노비스마을']['표시'].length, 18);
   assert.equal(images['노비스마을']['워프출처'], 'Hades templates/warps');
@@ -240,7 +241,8 @@ test('world map switches among Hades Novice, Porte, and Woodland before the full
   assert.equal(images['우드랜드입구']['워프출처'], 'Hades templates/warps');
   assert.ok(images['우드랜드입구']['표시'].some((pin) => pin['도착'].includes('월드맵')));
   assert.equal(images['포테의숲1존']['참고표시'].length, 0);
-  assert.equal(images['포테의숲1존']['워프출처'], '없음');
+  assert.equal(images['포테의숲1존']['워프출처'], 'Hades templates/warps');
+  assert.ok(images['포테의숲1존']['표시'].some((pin) => pin['도착'].includes('수오미마을')));
   assert.equal(images['포테의숲4존']['참고표시'].length, 0);
   assert.equal(images['포테의숲보스존']['참고표시'].length, 0);
   assert.equal(images['포테의숲보스존']['워프출처'], '없음');

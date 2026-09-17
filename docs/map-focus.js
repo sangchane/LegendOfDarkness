@@ -166,22 +166,28 @@
   var configs = [
     {
       key: "novice", rootId: "novice-village-focus", regionName: "노비스 마을", initialName: "노비스마을",
-      maps: function () { return directNeighborhood("노비스마을"); },
+      maps: function () {
+        var near = directNeighborhood("노비스마을");
+        var ids = {};
+        near.forEach(function (map) { ids[map.id] = true; });
+        return near.concat(model.maps.filter(function (map) { return map.name.indexOf("노비스지하던전") === 0 && !ids[map.id]; })
+          .sort(function (a, b) { return Number(a.id) - Number(b.id); }));
+      },
       shortName: function (name) { return name.replace("노비스", "").replace(/^마을$/, "본마을"); },
-      groupTitle: "노비스 마을과 바로 연결된 곳", statusLabel: "본마을 동선 확인",
-      relationshipNote: "본마을에서 한 번에 오갈 수 있는 건물과 두 평원만 모았습니다. 카드의 화살표와 지도 점은 Hades 출구 좌표입니다.",
-      decisionTitle: "마을 출입 동선은 Hades에서 확인됨",
-      decisionText: "식당·상점·민가·주점·두 평원과 월드맵으로 가는 출발 좌표가 Hades에 있습니다. 화면의 점을 눌러 칸과 목적지를 확인할 수 있습니다."
+      groupTitle: "노비스 마을과 사냥터(평원·지하던전)", statusLabel: "사냥터 괴물 확인",
+      relationshipNote: "본마을·건물과 사냥터(평원 A·B, 지하던전 3×3)를 모았습니다. 카드의 화살표와 지도 점은 Hades 출구 좌표입니다.",
+      decisionTitle: "사냥터까지 걸어가 사냥할 수 있음 — 레벨 제한·드롭은 아직",
+      decisionText: "마을→평원→지하던전 워프가 Hades에 있고, 평원A·지하던전A1에 서면 괴물이 보이는 것을 실제 서버 시험(NoviceHuntingGroundTests)으로 확인했습니다. 모바일 맵(바닥·건물·벽)도 20곳 모두 있습니다. 남은 것: 5.99 입장 레벨(평원 1~22·지하던전 5~22·안쪽 10~22)이 Hades 워프에는 모두 1 이상으로만 들어가 있고, 괴물 드롭은 확인하지 않았습니다."
     },
     {
       key: "porte", rootId: "porte-forest-focus", regionName: "포테의 숲", initialName: "포테의숲1존",
       maps: function () { return model.maps.filter(function (map) { return map.name.indexOf("포테의숲") === 0; })
         .sort(function (a, b) { return Number(a.id) - Number(b.id); }); },
       shortName: function (name) { return name.replace("포테의숲", ""); },
-      groupTitle: "포테의숲 전체 맵", statusLabel: "보스존 연결 미확인",
+      groupTitle: "포테의숲 전체 맵", statusLabel: "1~6존 연결 · 보스존 길 없음",
       relationshipNote: "모든 맵을 한 화면 안에서 줄바꿈해 보여줍니다. 카드의 화살표는 Hades 우선 규칙으로 선택된 실제 출구만 나타냅니다.",
-      decisionTitle: "보스존 길은 아직 미확인",
-      decisionText: "Hades에도 없고 5.99·혼든·Novaonline이 모두 일치하는 좌표도 없습니다. 근거가 생길 때까지 임의로 표시하지 않습니다."
+      decisionTitle: "수오미마을 입구와 1~6존 연결은 Hades에 들어감 — 보스존은 아직",
+      decisionText: "5.99 워프 목록이 싣지 않던 Suomi_Warp.txt 의 포테의숲 워프 37개를 들였습니다. 수오미마을 동쪽 끝(99,24~27)을 밟으면 1존에 도착하고 괴물이 보이는 것을 실제 서버 시험(PoteForestTests)으로 확인했습니다. 보스존은 5존 위 개인 던전(오솔길) 스크립트로만 가서 길이 없고, 입장 레벨 21~51 은 아직 적용하지 않았으며, 수오미마을 안 건물은 수오미 작업 때 합니다(docs/pote-forest.md)."
     },
     {
       key: "woodland", rootId: "woodland-focus", regionName: "우드랜드", initialName: "우드랜드입구",
