@@ -20,7 +20,8 @@
 그리지 않는다. **직업 동작은 그 직업 의상에서만 원작이 지원한다**(`skill.tbl` ST) — 기본 옷으로 깨져 보이는
 것은 원작도 그렇다. 그래서 동작 확인용으로 전사 옷 2번 · 도적 옷 4번을 함께 뽑는다.
 
-  쓰는 법: python3 scripts/build-client-wardrobe.py [--새것만] [이어서 시작할 부위, 예: mu156]
+  쓰는 법: python3 scripts/build-client-wardrobe.py [--새것만] [--끝=03] [이어서 시작할 부위, 예: mu156]
+          --끝 은 그 파일만 다시 뽑는다(쉼표로 여럿, 예: --끝=02,03).
   산출물:  mobile/client/assets/actor/parts/<부위>.png · <부위>02.png · <부위><글자>.png
 """
 import json
@@ -39,9 +40,11 @@ KOREAN = Path.home() / "Downloads" / "5.99 클라이언트"
 DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
 TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
 
-#: 파일마다 skill.tbl 이 빈틈없이 채우는 칸 수(3.2절). 01 서기·걷기 · 02 평타는 3.3절.
+#: 파일마다 skill.tbl 이 빈틈없이 채우는 칸 수(3.2절). 01 서기·걷기 · 02 평타 · 03 손 들기·키스·손 흔들기는 3.3절.
 MOTIONS = {"b": 14, "c": 30, "d": 18, "e": 36, "f": 12}
-STANDING = {"01": 10, "02": 4}
+STANDING = {"01": 10, "02": 4, "03": 10}
+#: 03 동작 동안 원작이 그리지 않는 부위 — 방패·무기·무기 앞 조각(Legend.exe 2005 0x4e84e0). 뽑지 않는다.
+EMPTY_HANDED = "swp"
 
 #: 모든 부위가 같은 칸이어야 겹친다. 무기가 몸 밖으로 뻗어 가로 114 · 세로 89 까지 그린다 — 80x88 에서는 무기
 #: 129 파일이 들어가지 않았다. 도구는 칸의 왼쪽 위에 맞춰 그리므로 칸을 키워도 발 자리는 그대로다.
@@ -130,6 +133,7 @@ def main():
     starts = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
     if starts:
         pieces = [piece for piece in pieces if piece >= starts[0]]
+    only = next((arg.removeprefix("--끝=").split(",") for arg in sys.argv if arg.startswith("--끝=")), None)
     made, missing, skipped = 0, [], []
     listed = {archive: entries(archive) for gender in "mw" for archive in archives(gender)}
     for piece in pieces:
@@ -144,6 +148,8 @@ def main():
         files = []
         for suffix, count in {**STANDING, **MOTIONS}.items():
             entry = f"{piece}{suffix}"
+            if only is not None and suffix not in only or suffix == "03" and piece[1] in EMPTY_HANDED:
+                continue
             # 동작 파일이 없는 것은 흔하다 — 직업 갑옷·무기는 자기 직업 동작만 갖는다.
             if entry not in listed[archive]:
                 continue

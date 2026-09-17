@@ -9,9 +9,11 @@ namespace Lod.Mobile.Core.Art;
 /// 1 is the plain blow, the whole of the file ending 02. From 128 the number is 128 + NO of the original's
 /// <c>skill.tbl</c>, whose FN picks the class file (b priest · c warrior · d monk · e rogue · f wizard) and whose
 /// SI·FC are the start and count. Arbiter and ETDA name the same numbers (128 PriestCast … 145 Summon).
-/// Anything else — a hands-up, the emotes — has no drawing here. docs/original-sprite-animation.md 3절.
+/// The file ending 03 holds 6 hands up, 21 blowing a kiss and 22 waving (Legend.exe 2005 0x4e3657..0x4e36c9); the
+/// emote balloons (9~17, 23~33) are not body drawings and have none here. docs/original-sprite-animation.md 3절.
 /// </remarks>
-public sealed record BodyMotion(string File, int Start, int Count)
+/// <param name="Faster">How many times shorter each drawing is held than the speed says — the wave is 3.</param>
+public sealed record BodyMotion(string File, int Start, int Count, int Faster = 1)
 {
     /// <summary>How long one drawing is held when the server gives no speed — the pace a blow was always drawn at.</summary>
     public const double DefaultSecondsPerFrame = 0.14;
@@ -42,9 +44,15 @@ public sealed record BodyMotion(string File, int Start, int Count)
     ];
 
     public static BodyMotion? Of(int number) =>
-        number == 1 ? Blow
-        : number >= 128 && number - 128 < Skills.Length ? Skills[number - 128]
-        : null;
+        number switch
+        {
+            1 => Blow,
+            6 => new BodyMotion("03", 0, 1),
+            21 => new BodyMotion("03", 2, 2),
+            22 => new BodyMotion("03", 6, 2, Faster: 3),
+            >= 128 when number - 128 < Skills.Length => Skills[number - 128],
+            _ => null
+        };
 
     // skill.tbl 의 ST 칸 — 줄(NO)마다 그 기술 동작을 할 수 있는 옷(갑옷 U) 번호들. 처음 물을 때 한 번 읽는다.
     private static IReadOnlyDictionary<int, HashSet<int>>? _clothes;
@@ -103,5 +111,5 @@ public sealed record BodyMotion(string File, int Start, int Count)
     /// slower one. No speed at all falls back to that pace.
     /// </summary>
     public double SecondsPerFrame(int speed) =>
-        speed > 0 ? speed / 100.0 / Count : DefaultSecondsPerFrame;
+        (speed > 0 ? speed / 100.0 / Count : DefaultSecondsPerFrame) / Faster;
 }

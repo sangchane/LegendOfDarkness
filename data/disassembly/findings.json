@@ -219,6 +219,13 @@
     },
     {
       "binary": "client",
+      "address": "0x4e2383",
+      "name": "사람 몸 동작 칸 고르기",
+      "role": "상태마다 [+540]·[+544]·[+650]·[+654] 시작과 칸 수로 칸 번호를 내고 [ebp] 에 파일 종류(0 01 · 2 03)를 적는다. 초기값은 0x4e3657",
+      "excerpt": "data/disassembly/excerpts/original-2005-motion-frames-4e3657.asm"
+    },
+    {
+      "binary": "client",
       "address": "0x5210f0",
       "name": "Skill.tbl 읽기",
       "role": "4.51 과 같은 읽기. 표 0x723200"
@@ -925,11 +932,12 @@
     {
       "id": "emote-strips",
       "binary": "client",
-      "statement": "감정표현(03 파일)을 할 때는 방패 둘·무기 W·P 를 그리지 않는다",
+      "statement": "03 파일 동작(손 들기 6 · 키스 21 · 손 흔들기 22)을 할 때는 방패 둘·무기 W·P 를 그리지 않는다",
       "evidence": [
-        "0x4e78f4"
+        "0x4e78f4",
+        "0x4e84e0"
       ],
-      "implemented": "옮기지 않음"
+      "implemented": "Actor.MotionSheet"
     },
     {
       "id": "mirror-after-compose",
@@ -1091,7 +1099,7 @@
         "0x449466",
         "0x449b64"
       ],
-      "implemented": "옮기지 않음"
+      "implemented": "BodyMotion.Of (1·6·21·22 — 감정 말풍선 9~17·23~33 은 안 옮김)"
     },
     {
       "id": "orig451-skill-armor-gate",
@@ -1119,6 +1127,21 @@
         "0x5210f0"
       ],
       "implemented": "BodyMotion.Fits(원작 2005 skill.tbl 내장) · WorldView.Swings — 2026-09-17"
+    },
+    {
+      "id": "client-motion-03-frames",
+      "binary": "client",
+      "statement": "동작 6·21·22 는 03 파일의 구간이다: 칸 = 시작 + (칸 수 − 1) × 앞뒤 + 걸음 − 1, 저장된 칸 수는 그림 수 + 1. 6 손 들기 0 | 1 · 21 키스 2–3 | 4–5 · 22 손 흔들기 6–7 | 8–9(속도 ÷3). 평타(02)도 같은 식으로 0–1 | 2–3. 걸음 0 은 01 파일 서기 칸",
+      "evidence": [
+        "0x4e1020",
+        "0x4e3657",
+        "0x4e36c9",
+        "0x4e2383",
+        "0x4e23e8",
+        "0x4e24c5",
+        "0x4e2526"
+      ],
+      "implemented": "BodyMotion.Of · BodyMotion.Faster"
     },
     {
       "id": "client-disguise-motion",

@@ -303,9 +303,16 @@ public sealed partial class Actor : Node2D
     /// <summary>
     /// The sheet one piece draws this motion from, or nothing when it has none. The blow is the separate file
     /// the dresser found (ending 02); a skill is the same piece's file with the class letter on the end.
+    /// Hands up, the kiss and the wave (ending 03) are drawn without the shield, the weapon or its front piece —
+    /// the original leaves those out of that file's motions (Legend.exe 2005 0x4e78f4 → 0x4e84e0).
     /// </summary>
     private Texture2D? MotionSheet(int layer, BodyMotion motion)
     {
+        if (motion.File == "03" && _sheet.Parts is { } parts && layer < parts.Count && parts[layer] is 's' or 'w' or 'p')
+        {
+            return null;
+        }
+
         string walk = _sheet.Paths[layer];
         string? path = motion.File == BodyMotion.Blow.File
             ? layer < _sheet.StrikePaths.Count && _sheet.StrikePaths[layer] != walk ? _sheet.StrikePaths[layer] : null

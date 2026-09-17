@@ -56,7 +56,7 @@ objdump -d --x86-asm-syntax=intel Novaonline.exe > nova.asm     # 맥 기본 obj
 | 그리는 순서 | 표 `0x69c200`(4×15) · `0x4e77e4` · `0x4e7c30` | 북·서 `S B N L U D F W A H E P C`, 동·남 `W F B N L H U D A E P S C`. **방향으로만** 정해진다 — 앞모습은 무기가 맨 아래 | `Wardrobe.Rank` · `Actor.Face` |
 | 방패 | `0x4e7a0d` `0x4e8430` | 뒷방패는 북·서만, 앞방패는 동·남만. 여자도 늘 `m` 방패 파일 | 순서만 옮김(여자 `m` 파일은 안 옮김) |
 | 파일 이름 | `0x4e8514` · 글자표 `0x86b614` `SBNLHUDHAWSCPEF` | 성별 + 부위 글자 + `%03d` + 기술 글자 또는 `%02d`. `A` 팔은 갑옷 번호, `P` 무기 앞 조각은 무기 번호, `E`·`F` 는 머리 번호. 도포 `i` 는 부르지 않는다 | `Wardrobe.Pieces` |
-| 감정표현 | `0x4e78f4` | 03 동작일 때는 방패·무기·P 를 빼고 그린다 | 안 옮김 |
+| 03 동작 | `0x4e78f4` → `0x4e84e0` | 손 들기·키스·손 흔들기(03 파일) 동안은 방패 둘·무기·P 를 빼고 그린다 | `Actor.MotionSheet` |
 | 좌우 뒤집기 | `0x4e2204` | 남=동, 서=북 그림을 다 겹친 뒤 통째로 뒤집는다 | `Actor.Face` |
 | EPF 읽기 | `0x4e8854` `0x4e88bc` | 칸 수와 표 위치만 읽는다 — **머리말 너비·높이는 안 쓴다** | `dat-extract` 바탕을 부위 글자로 |
 
@@ -105,7 +105,10 @@ objdump -d --x86-asm-syntax=intel Novaonline.exe > nova.asm     # 맥 기본 obj
 - 2005 판은 사람이 괴물 모습(`[+0x369]==0`)이면 동작을 `0x4e1314` 로 따로 보낸다. 4.51 에는 없다.
 - **옮겼다(2026-09-17):** `BodyMotion.Fits` 가 원작 2005 `skill.tbl`(알맹이에 내장)의 ST 로 거르고, `WorldView.Swings` 가
   옷이 맞지 않는 기술 동작을 그리지 않는다. 동작 중에 온 새 동작도 원작처럼 무시한다(`Actor.Play`, 2005 `0x4e1130`).
-  하데스 `skill.tbl` 사본은 줄마다 끝 번호 하나(348~352)가 더 있어 쓰지 않는다. 6·21·22·감정 번호는 칸 구간이 발췌에 없어 아직이다.
+  하데스 `skill.tbl` 사본은 줄마다 끝 번호 하나(348~352)가 더 있어 쓰지 않는다.
+- **동작 6·21·22 도 옮겼다:** 2005 `0x4e3657` 의 초기값과 `0x4e2383`~`0x4e2526` 의 칸 고르기 — `시작 + (칸 수 − 1) × 앞뒤 + 걸음 − 1`
+  (저장된 칸 수는 그림 수 + 1). 6 손 들기 `03` 0 | 1 · 21 키스 2–3 | 4–5 · 22 손 흔들기 6–7 | 8–9, 22 만 속도 ÷3(`BodyMotion.Of`).
+  감정 말풍선(9~17·23~33)은 아직이다. 발췌 `original-2005-motion-frames-4e3657.asm`.
 - **이펙트 칸 순서도 옮겼다:** `effects.txt` 에 `effect.tbl` 순서를 적고 `EffectSheet`·`Flash` 가 그대로 튼다(속도는 한 칸 간격).
 
 ### 아카이브를 맞대어 알게 된 것
@@ -116,7 +119,7 @@ objdump -d --x86-asm-syntax=intel Novaonline.exe > nova.asm     # 맥 기본 obj
 - `Skill.tbl` 은 4.51 이 0~8 줄(직업 5), 2005 는 2차 직업 줄이 늘었다. 0~8 줄의 NO·FN·SI·FC 는 같다.
 - 4.51 아카이브는 `Legend.dat`·`khan.dat`·`seo.dat` 셋이고 이펙트 표가 `Legend.dat` 에 있다. 2005 는 `roh.dat` 로 옮겨졌다.
 
-발췌: `data/disassembly/excerpts/original-451-*` · `original-2005-set-motion-4e1020.asm`. 그림으로 본 요약: `docs/disassembly-original-client.html`.
+발췌: `data/disassembly/excerpts/original-451-*` · `original-2005-set-motion-4e1020.asm` · `original-2005-motion-frames-4e3657.asm`. 그림으로 본 요약: `docs/disassembly-original-client.html`.
 
 ## 아직 모르는 것
 

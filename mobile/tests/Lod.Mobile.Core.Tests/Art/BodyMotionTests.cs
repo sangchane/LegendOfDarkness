@@ -60,10 +60,32 @@ public sealed class BodyMotionTests
         Assert.Equal(new BodyMotion("02", 0, 2), BodyMotion.Of(1));
     }
 
-    /// <summary>Nothing we know how to draw: no motion, a hands-up (6) and the emotes, and past the table.</summary>
+    /// <summary>
+    /// The file ending 03 holds three motions, one per side each: 6 hands up (0 · 1), 21 blowing a kiss (2~3 · 4~5) and
+    /// 22 waving (6~7 · 8~9), the last at a third of the interval. Legend.exe 2005 sets them up at 0x4e3657..0x4e36c9
+    /// (start, drawings + 1) and picks the drawing at 0x4e23e8 / 0x4e24c5 / 0x4e2526 as start + (count − 1) × side + step.
+    /// </summary>
+    [Theory]
+    [InlineData(6, 0, 1, 1)]
+    [InlineData(21, 2, 2, 1)]
+    [InlineData(22, 6, 2, 3)]
+    public void The_hands_up_the_kiss_and_the_wave_are_stretches_of_the_03_file(int number, int start, int count, int faster)
+    {
+        Assert.Equal(new BodyMotion("03", start, count, faster), BodyMotion.Of(number));
+    }
+
+    [Fact]
+    public void Waving_from_the_front_uses_the_last_two_drawings_at_a_third_of_the_interval()
+    {
+        BodyMotion wave = BodyMotion.Of(22)!;
+
+        Assert.Equal([8, 9], Enumerable.Range(0, 2).Select(step => wave.Frame(Side.Front, step)));
+        Assert.Equal(BodyMotion.Of(21)!.SecondsPerFrame(60) / 3, wave.SecondsPerFrame(60), 5);
+    }
+
+    /// <summary>Nothing we know how to draw: no motion, the emote balloons, and past the table.</summary>
     [Theory]
     [InlineData(0)]
-    [InlineData(6)]
     [InlineData(9)]
     [InlineData(146)]
     public void A_motion_with_no_drawing_is_nothing(int number)
