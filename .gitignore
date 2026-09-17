@@ -52,4 +52,6 @@ data/server-packs/vault/
 #   data/archives-vault/            아카이브 503표      (scripts/build-archive-vault.py)
 #   data/game-data/vault-abilities/ 원작 기술·마법 613   (scripts/build-ability-vault.py)
 data/server-packs/graph/
+# 역어셈블 그래프 — data/disassembly/findings.json 에서 언제든 다시 만든다 (scripts/build-disassembly-graph.py)
+data/disassembly/graph/
 

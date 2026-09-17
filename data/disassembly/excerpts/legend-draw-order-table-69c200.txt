@@ -1,0 +1,6 @@
+; 그리는 순서표 — Legend.exe 가상주소 0x69c200 (파일 위치 0x29c200), 방향마다 15바이트, ff = 빈 자리
+; 부위 글자표 "SBNLHUDHAWSCPEF" (가상주소 0x86b614) 의 번호다. 방향: 0 북 · 1 동 · 2 남 · 3 서
+dir 0  0x69c200: 00 01 02 03 05 06 0e 09 08 04 ff 0d 0c 0a 0b   → S B N L U D F W A H - E P S C
+dir 1  0x69c20f: 00 09 0e 01 02 03 04 05 06 ff 08 0d 0c 0a 0b   → S W F B N L H U D - A E P S C
+dir 2  0x69c21e: 00 09 0e 01 02 03 04 05 06 ff 08 0d 0c 0a 0b   → S W F B N L H U D - A E P S C
+dir 3  0x69c22d: 00 01 02 03 05 06 0e 09 08 04 ff 0d 0c 0a 0b   → S B N L U D F W A H - E P S C

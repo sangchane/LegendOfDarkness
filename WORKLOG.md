@@ -9,6 +9,11 @@
 - Last updated: 2026-09-15
 
 ## History (append; 최신이 위)
+- 2026-09-17 — **5.99 갑옷 225종을 서버 템플릿으로 들이고 도복 규칙 둘을 옮긴다. 역어셈블 작업지시서를 쓴다.** 사용자: "진행해" · "역어셈블 … 정리를 좀 해서 graphify해" · "일단 현재까지 작업 내용이랑 역어셈블 작업지시서 만들고 푸시해".
+  - `scripts/build-pack-weapons.py` → `build-pack-equipment.py`: 속성 1(갑옷)도 옮긴다(치장옷·드레스·길드옷 포함). `성별제한` 1 남 · 2 여(마스터아머1 ↔ 마스터아머2). 무기·갑옷 336종, 이미 있던 같은 이름 118개(앞서 넣은 무기와 팩드롭 갑옷 7종)는 덮었다.
+  - 도복(공격모션 132): 무기 없이 치면 주먹(`Assail.BlowMotion` 이 갑옷 칸을 본다), 신발과 함께 못 입는다 — `Armor.cs`·`Boot.cs`, 「신발이 불편하여 입을수가 없습니다.」(Novaonline.exe 0x41cc49·0x41d387). `Pack599ArmorTests` 통과 — 신발 검사를 빼면 "도복 차림에 신발을 막지 않았습니다" 로 실패한다.
+  - 아직: 5.99 갑옷 번호의 옷장 그림(갑옷·팔)과 아이콘을 안 뽑았다(`build-client-wardrobe.py --새것만`). 상점·드롭도 아직.
+  - 역어셈블 정리(`docs/disassembly.md` · `data/disassembly/`)와 그래프(`scripts/build-disassembly-graph.py`)는 에이전트가 만들었다. 원작 클라이언트 실행 파일은 윈도우 PC 에만 있어 **작업지시서 `docs/disassembly-work-order.md`** 를 남겼다 — 브랜치 `docs/disassembly-original-client` 로 푸시하게 했다.
 - 2026-09-17 — **평타 몸 동작을 5.99 서버 규칙대로 장비에서 고른다.** 사용자: "니가 말한 내용이 맞을거 같다" (기억한 "방패면 기본 모션·양의신권이면 주먹" 대신 역어셈블 결과를 따른다).
   - 하데스 `ItemTemplate` 에 `AttackMotion`·`AttackSpeed` 칸, `Item.ApplyQuality` 복사, `Assail.BlowMotion`: 무기 → 갑옷 → (1, 20), 갑옷만이고 둘 다 0 이면 속도 22. 공격모션이 없는 하데스 무기는 하데스가 하던 대로(전사 양손 0x81).
   - `build-pack-weapons.py` 가 5.99 무기에 두 칸을 채운다(설단검 134·18, 아스카론 129·37, 활 142 …).

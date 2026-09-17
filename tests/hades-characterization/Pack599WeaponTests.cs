@@ -8,7 +8,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 5.99 서버팩의 무기를 하데스 아이템 템플릿으로 옮긴 것(`scripts/build-pack-weapons.py`). 서버가 한글 이름 템플릿을
+/// 5.99 서버팩의 무기를 하데스 아이템 템플릿으로 옮긴 것(`scripts/build-pack-equipment.py`). 서버가 한글 이름 템플릿을
 /// 싣고, 운영자가 주면 소지품에 5.99 아이콘으로 들어오고, 끼면 겉모습의 무기 번호가 5.99 `착용이미지` 가 되는지 본다.
 /// </summary>
 public sealed class Pack599WeaponTests : IDisposable

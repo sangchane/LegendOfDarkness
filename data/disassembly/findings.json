@@ -1,0 +1,721 @@
+{
+  "설명": "5.99 서버팩·5.99 한국 클라이언트 실행 파일을 역어셈블해서 확인한 사실. 규칙마다 근거 주소가 있다. 그래프: python3 scripts/build-disassembly-graph.py",
+  "갱신": "2026-09-17",
+  "binaries": [
+    {
+      "id": "server",
+      "name": "Novaonline.exe",
+      "path": "~/Downloads/5.99 서버팩/Novaonline.exe",
+      "size": 614400,
+      "md5": "d36015ac761a4fd5caca357667bdaa71",
+      "format": "PE32 i386",
+      "role": "5.99 서버 — 전투 판정·능력치 계산·스크립트 명령·장착 규칙"
+    },
+    {
+      "id": "client",
+      "name": "Legend.exe",
+      "path": "~/Downloads/5.99 클라이언트/Legend.exe",
+      "size": 3555391,
+      "md5": "347dc3813e25d3daefdccfe2547dd128",
+      "format": "PE32 i386 GUI",
+      "role": "5.99 클라이언트 — 사람 그림 겹치기·파일 이름·EPF 읽기",
+      "sections": ".text 0x427000 · .rdata 0x680000 · .data 0x686000(파일 0x286000) · .data1 0x846000(파일 0x2c4000)"
+    }
+  ],
+  "functions": [
+    {
+      "binary": "server",
+      "address": "0x4160f7",
+      "name": "평타",
+      "role": "스페이스 평타(0x13, 0x4186cc)와 스크립트 attack_skill() 이 같이 부르는 공격 함수. 잠금·450ms·몸 동작·소리·피해",
+      "excerpt": "data/disassembly/excerpts/nova-basic-attack-4160f7.asm"
+    },
+    {
+      "binary": "server",
+      "address": "0x4499bf",
+      "name": "attack_skill 명령",
+      "role": "스크립트 명령. 0x4160f7 을 부른다(기본공격·양의신권·더블어택 모두 이 명령)"
+    },
+    {
+      "binary": "server",
+      "address": "0x407a2f",
+      "name": "아이템 로더",
+      "role": "HeapAlloc(ZERO_MEMORY, 0xC0) 로 아이템 칸을 만들고 키마다 오프셋에 적는다 — 없는 키는 0",
+      "excerpt": "data/disassembly/excerpts/nova-item-loader-407a2f.asm"
+    },
+    {
+      "binary": "server",
+      "address": "0x45d4be",
+      "name": "능력치 재계산",
+      "role": "장비 14칸을 돌며 공격력·마법 공격력·치명타를 캐릭터 칸에 적는다(0x45d4be~0x45de21)",
+      "excerpt": "data/disassembly/excerpts/nova-stat-recalc-45d4be.asm"
+    },
+    {
+      "binary": "server",
+      "address": "0x41c694",
+      "name": "장착",
+      "role": "직업·레벨·특수 조건 검사와 속성→장비 자리 점프(0x41cb3e, 표 0x41d581)",
+      "excerpt": "data/disassembly/excerpts/nova-equip-checks-41c694.asm"
+    },
+    {
+      "binary": "server",
+      "address": "0x4635ca",
+      "name": "0x1A 몸 동작 보내기",
+      "role": "(id, motion, speed) 로 0x1A 를 만든다. 소리 바이트 없음",
+      "excerpt": "data/disassembly/excerpts/nova-motion-packet-4635ca.asm"
+    },
+    {
+      "binary": "server",
+      "address": "0x45d363",
+      "name": "0x19 소리 보내기",
+      "role": "(id, sound, 0). 평타는 소리 1 고정(0x41688d · 0x416b06)"
+    },
+    {
+      "binary": "server",
+      "address": "0x415d86",
+      "name": "여러 대상 무기 공격",
+      "role": "[weapon+116] 으로 여러 대상을 친다. 무기 사운드2(item+0xAA), 0 이면 349(1바이트로 93)"
+    },
+    {
+      "binary": "server",
+      "address": "0x45c310",
+      "name": "앞의 사람 찾기",
+      "role": "평타가 괴물을 친 뒤 사람을 찾아 두 번째 동작·피해(0x416918)"
+    },
+    {
+      "binary": "server",
+      "address": "0x46d845",
+      "name": "10ms 타이머",
+      "role": "0x47669b 에서 주기 10 으로 등록. 캐릭터 +0x18 평타 잠금을 한 틱에 1 씩 줄인다"
+    },
+    {
+      "binary": "client",
+      "address": "0x4e2204",
+      "name": "세계 그리기 방향",
+      "role": "방향 바이트 [obj+0x204] 로 칸 묶음과 좌우 뒤집기를 정한다. 뒤집기는 다 겹친 뒤 통째로",
+      "excerpt": "data/disassembly/excerpts/legend-world-direction-4e2204.asm"
+    },
+    {
+      "binary": "client",
+      "address": "0x4e77e4",
+      "name": "사람 그림 겹치기",
+      "role": "첫 인자 방향. 순서표 한 줄을 0x736f98 로 옮기고 부위를 불러 쌓는다(감싸는 함수 0x4e7790, 부르는 곳 0x4e2692)",
+      "excerpt": "data/disassembly/excerpts/legend-compose-4e77e4.asm"
+    },
+    {
+      "binary": "client",
+      "address": "0x4e7c30",
+      "name": "그리기 순환",
+      "role": "0x736f98[0..14] 순서로 그린다. N L H E F(와 염색된 C)는 염색 블릿 0x494d20, 나머지 0x493a80. 칸 번호로는 순서가 안 바뀐다",
+      "excerpt": "data/disassembly/excerpts/legend-draw-loop-4e7c30.asm"
+    },
+    {
+      "binary": "client",
+      "address": "0x4e8514",
+      "name": "파일 이름 만들기",
+      "role": "성별 \"MW\"[app[0]] · 부위 글자 0x86b614 · 번호 점프표 0x86b5d8 · %03d · 기술이면 'a'+n, 아니면 %02d.epf(모션+1)",
+      "excerpt": "data/disassembly/excerpts/legend-name-builder-4e8514.asm"
+    },
+    {
+      "binary": "client",
+      "address": "0x4e8854",
+      "name": "EPF 읽기",
+      "role": "u16 칸 수를 읽고 6바이트 건너뛰고(0x4e88bc) u32 표 위치만 읽는다 — 바탕 크기 칸은 안 읽는다",
+      "excerpt": "data/disassembly/excerpts/legend-epf-loader-4e8854.asm"
+    }
+  ],
+  "offsets": [
+    {
+      "binary": "server",
+      "struct": "player",
+      "offset": "0x10",
+      "meaning": "캐릭터 칸 포인터(char = [player+0x10])"
+    },
+    {
+      "binary": "server",
+      "struct": "player",
+      "offset": "0x288",
+      "meaning": "마지막 평타 시각 — +450ms 안이면 평타를 건너뛴다(0x41629d)",
+      "read_by": [
+        "0x4160f7"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x18",
+      "meaning": "평타 잠금. 0 이 아니면 평타 안 함(0x4161e7). 보낸 속도를 적고(0x4163ee) 10ms 마다 1 씩 준다",
+      "read_by": [
+        "0x4160f7"
+      ],
+      "written_by": [
+        "0x4160f7",
+        "0x46d845"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0xF0",
+      "meaning": "상태 — 1 유령이면 평타 거절, 4 변장(char_disguise)이면 동작 1·속도 22"
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x7A",
+      "meaning": "피닉스모드 — 공격력 +30%",
+      "written_by": [
+        "phoenix 0x44cf27"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x7C",
+      "meaning": "소수신공 — 공격력 +40%",
+      "written_by": [
+        "sosusin 0x44d006"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x8C",
+      "meaning": "공격력(get_att_damage 0x444676 이 읽는다)",
+      "written_by": [
+        "0x45d4be"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x98",
+      "meaning": "마법 공격력(get_mgc_damage 0x4446f3)",
+      "written_by": [
+        "0x45d4be"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x9C",
+      "meaning": "치명타 확률(get_critical 0x444770)",
+      "written_by": [
+        "0x45d4be"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x156",
+      "meaning": "에나르마 — 공격력·마법 공격력 ×1.3",
+      "written_by": [
+        "enare 0x45083c"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x158",
+      "meaning": "수페라에나르마 — ×1.6",
+      "written_by": [
+        "suenare 0x450936"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x178",
+      "meaning": "장비 자리 0(무기). 자리 i 는 0x178+4*i",
+      "read_by": [
+        "0x4162cd"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x17C",
+      "meaning": "장비 자리 1(갑옷)",
+      "read_by": [
+        "0x4162dc",
+        "0x41d37c"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x180",
+      "meaning": "장비 자리 2(방패) — 평타는 읽지 않는다"
+    },
+    {
+      "binary": "server",
+      "struct": "character",
+      "offset": "0x1A8",
+      "meaning": "장비 자리 12(속성 10 신발)",
+      "read_by": [
+        "0x41cc38"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "item",
+      "offset": "0x11",
+      "meaning": "속성 — 장비 자리 번호(0·12·13 무기 · 1 갑옷 · 2 방패 · 3 투구 · 4 귀걸이 · 5 목걸이 · 6 반지 · 7 장갑 · 8 허리띠 · 9 각반 · 10 신발 · 11 장식)"
+    },
+    {
+      "binary": "server",
+      "struct": "item",
+      "offset": "0x1B",
+      "meaning": "공격모션(byte)",
+      "written_by": [
+        "0x408033"
+      ],
+      "read_by": [
+        "0x4163a9",
+        "0x416903",
+        "0x41c91c",
+        "0x41cc49",
+        "0x41d387"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "item",
+      "offset": "0x1C",
+      "meaning": "공격속도(byte)",
+      "written_by": [
+        "0x408064"
+      ],
+      "read_by": [
+        "0x4163c6",
+        "0x4163eb"
+      ]
+    },
+    {
+      "binary": "server",
+      "struct": "item",
+      "offset": "0xA8",
+      "meaning": "사운드1(word) — 적기만 하고 읽는 곳을 못 찾음"
+    },
+    {
+      "binary": "server",
+      "struct": "item",
+      "offset": "0xAA",
+      "meaning": "사운드2(word) — 0x415d86 만 읽는다"
+    },
+    {
+      "binary": "client",
+      "struct": "object",
+      "offset": "0x204",
+      "meaning": "방향 바이트(0 북 1 동 2 남 3 서)",
+      "read_by": [
+        "0x4e2204",
+        "0x4e2692"
+      ]
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x02",
+      "meaning": "머리 번호 — H·E·F 가 쓴다"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x06",
+      "meaning": "몸 번호 — B"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x08",
+      "meaning": "팔 번호 — A"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x0A",
+      "meaning": "신발 번호 — L"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x0E",
+      "meaning": "바지 번호 — N"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x12",
+      "meaning": "갑옷 번호 — U"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x14",
+      "meaning": "D 번호 — 이름은 만들지만 파일이 없다"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x16",
+      "meaning": "무기 번호 — W 와 P(몸 앞 무기 조각)"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x18",
+      "meaning": "장신구 번호 — C"
+    },
+    {
+      "binary": "client",
+      "struct": "appearance",
+      "offset": "0x1C",
+      "meaning": "방패 번호 — S. 255 면 방패 없음"
+    }
+  ],
+  "tables": [
+    {
+      "binary": "client",
+      "address": "0x69c200",
+      "file_offset": "0x29c200",
+      "name": "그리는 순서표",
+      "shape": "방향 4 × 15바이트, ff 빈 자리",
+      "rows": {
+        "북(0)": "S B N L U D F W A H - E P S C",
+        "동(1)": "S W F B N L H U D - A E P S C",
+        "남(2)": "S W F B N L H U D - A E P S C",
+        "서(3)": "S B N L U D F W A H - E P S C"
+      },
+      "note": "첫 S(뒷방패)는 북·서에서만, 끝 S(앞방패)는 동·남에서만 그린다",
+      "excerpt": "data/disassembly/excerpts/legend-draw-order-table-69c200.txt"
+    },
+    {
+      "binary": "client",
+      "address": "0x86b614",
+      "file_offset": "0x2e9614",
+      "name": "부위 글자표",
+      "content": "SBNLHUDHAWSCPEF — 부위 번호 0~14의 파일 이름 글자(7번째 H 는 순서표에 없어 안 그린다)"
+    },
+    {
+      "binary": "client",
+      "address": "0x86b5d8",
+      "name": "부위 번호 점프표",
+      "content": "부위마다 외형 기록의 어느 칸에서 번호를 읽나(appearance 오프셋 참조)"
+    },
+    {
+      "binary": "client",
+      "address": "0x736f98",
+      "name": "이번 방향 순서 버퍼",
+      "content": "0x4e78df 만 쓴다"
+    },
+    {
+      "binary": "server",
+      "address": "0x41d581",
+      "name": "속성→장비 자리 점프표",
+      "content": "속성 0·12·13 → 자리 0(+0x178) · 1 → 자리 1 · 2 → 자리 2 · 10 → 자리 12"
+    }
+  ],
+  "packets": [
+    {
+      "binary": "server",
+      "opcode": "0x1A",
+      "name": "몸 동작",
+      "builder": "0x4635ca",
+      "layout": "AA 00 09 1A 00 | 00 00 idHi idLo | motion | speedHi speedLo",
+      "note": "소리 바이트 없음. 속도는 16비트 빅엔디언",
+      "senders": [
+        "평타 0x4160f7",
+        "스크립트 motion 0x44810b(보내기 0x4481a3)",
+        "감정표현 +9·속도 78 0x4637e3",
+        "GM 채팅 '모션' 속도 100",
+        "주기 루틴 동작 16·속도 120 0x46cc4b"
+      ]
+    },
+    {
+      "binary": "server",
+      "opcode": "0x19",
+      "name": "소리",
+      "builder": "0x45d363",
+      "layout": "AA 00 06 19 00 <sound> C8 2A 3D",
+      "note": "평타는 sound 1 고정(0x41688d · 0x416b06)"
+    }
+  ],
+  "rules": [
+    {
+      "id": "basic-attack-motion",
+      "binary": "server",
+      "statement": "평타 몸 동작은 무기를 꼈으면 무기의 공격모션·공격속도, 무기가 없으면 갑옷의 것. 공격모션 0 이면 동작 1, 공격속도 0 이면 속도 20. 갑옷만 입고 둘 다 0 이면 (1, 22), 아무것도 없으면 (1, 20). 방패·직업·배운 기술은 보지 않는다",
+      "evidence": [
+        "0x4162cd",
+        "0x4162dc",
+        "0x4163a9",
+        "0x4163c6"
+      ],
+      "implemented": "Assail.BlowMotion · ItemTemplate.AttackMotion/AttackSpeed (서버 fork)"
+    },
+    {
+      "id": "attack-lock",
+      "binary": "server",
+      "statement": "보낸 속도를 캐릭터 +0x18 에 적고 10ms 마다 1 씩 줄인다 — 0 이 될 때까지 평타가 안 나간다. 그 위에 마지막 평타에서 450ms 가 지나야 한다",
+      "evidence": [
+        "0x4161e7",
+        "0x41629d",
+        "0x4163ee",
+        "0x46d845",
+        "0x47669b"
+      ],
+      "implemented": "옮기지 않음 — 하데스 평타 간격을 그대로 둔다"
+    },
+    {
+      "id": "disguise-blow",
+      "binary": "server",
+      "statement": "변장 상태(캐릭터 +0xF0 == 4)면 동작 1·속도 22 를 보내고 잠금은 적지 않는다",
+      "evidence": [
+        "0x4160f7"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "second-hit",
+      "binary": "server",
+      "statement": "평타가 괴물을 친 뒤 앞의 사람(0x45c310)이 있고 조건([[char+0x58]+0x26])이 맞으면 두 번째 동작(무기 공격모션, 없으면 1, 속도 20)과 피해를 준다. 갑옷은 안 본다",
+      "evidence": [
+        "0x416903",
+        "0x416918"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "double-attack-skills",
+      "binary": "server",
+      "statement": "양의신권·더블어택이라는 이름은 실행 파일에 없다. 두 기술의 스크립트는 attack_skill() 이라 평타 함수를 그대로 부르고, 잠금 때문에 곧바로 두 번은 안 나간다. '일정 확률로 2번'은 서버 코드에 없다",
+      "evidence": [
+        "0x4499bf",
+        "0x4160f7"
+      ],
+      "implemented": "해당 없음"
+    },
+    {
+      "id": "two-hand-equip",
+      "binary": "server",
+      "statement": "공격모션 129 무기는 투핸드어택 기술이 없으면 낄 수 없다(\"투핸드어택 스킬이 없으면 장착할 수 없습니다\")",
+      "evidence": [
+        "0x41c91c"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "dobok-no-boots",
+      "binary": "server",
+      "statement": "공격모션 132 갑옷(도복)은 속성 10 신발과 함께 입을 수 없다(\"신발이 불편하여 입을수가 없습니다\")",
+      "evidence": [
+        "0x41cc49",
+        "0x41d387"
+      ],
+      "implemented": "아직 — 5.99 갑옷을 들이는 일과 함께"
+    },
+    {
+      "id": "attack-power",
+      "binary": "server",
+      "statement": "공격력 = 장비마다 (최소공격력1+최대공격력1)/2 의 합 + 주먹단련(Lev1) 10 + 힘×10 + 무도가 레벨 보너스(≤20 25 · ≤50 70 · ≤80 210 · 그 위 260) → 포만도 50 이하 75% · 25 이하 50% → 에나르마 ×1.3 · 수페라에나르마 ×1.6 → 피닉스모드 +30% · 소수신공 +40%",
+      "evidence": [
+        "0x45d4be",
+        "0x444676"
+      ],
+      "implemented": "Pack599.AttackPower (포만도 보정은 하데스에 없어 뺐다)"
+    },
+    {
+      "id": "magic-power",
+      "binary": "server",
+      "statement": "마법 공격력 = 장비마다 (최소공격력2+최대공격력2)/2 의 합 + 지능×10 → 포만도 보정 → 에나르마 ×1.3 · 수페라에나르마 ×1.6",
+      "evidence": [
+        "0x45d4be",
+        "0x4446f3"
+      ],
+      "implemented": "Pack599.MagicPower (장비분은 하데스 칸이 없어 0)"
+    },
+    {
+      "id": "critical",
+      "binary": "server",
+      "statement": "치명타(%) = 장비 크리티컬 합 + 명중률향상(Lev1) 10 · (Lev2) 20, 100 에서 자르고 + 민첩÷11",
+      "evidence": [
+        "0x45d4be",
+        "0x444770"
+      ],
+      "implemented": "Pack599.Critical"
+    },
+    {
+      "id": "blow-sound",
+      "binary": "server",
+      "statement": "평타 소리는 0x19 로 소리 1 고정. 아이템 사운드1 은 읽는 곳이 없고, 사운드2 는 여러 대상 무기 공격(0x415d86)만 쓴다(0 이면 349 → 1바이트 93)",
+      "evidence": [
+        "0x41688d",
+        "0x416b06",
+        "0x4160a1"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "draw-order",
+      "binary": "client",
+      "statement": "사람 그림은 방향마다 순서표 한 줄대로 쌓는다. 앞모습(동·남)은 무기 W 가 맨 아래라 몸·팔이 덮고, 뒷모습(북·서)은 무기가 몸 위·팔 아래. 걷기·평타·기술 동작이나 칸 번호로는 안 바뀐다",
+      "evidence": [
+        "0x69c200",
+        "0x4e7852",
+        "0x4e78d8",
+        "0x4e78df",
+        "0x4e7c30"
+      ],
+      "implemented": "Wardrobe.Rank · Actor.Face (모바일)"
+    },
+    {
+      "id": "shield-sides",
+      "binary": "client",
+      "statement": "뒷방패(부위 0)는 북·서에서만, 앞방패(부위 10)는 동·남에서만 그린다. 둘 다 방패 번호가 255 가 아니어야 한다",
+      "evidence": [
+        "0x4e7a0d",
+        "0x4e8430"
+      ],
+      "implemented": "Wardrobe.Rank"
+    },
+    {
+      "id": "emote-strips",
+      "binary": "client",
+      "statement": "감정표현(03 파일)을 할 때는 방패 둘·무기 W·P 를 그리지 않는다",
+      "evidence": [
+        "0x4e78f4"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "mirror-after-compose",
+      "binary": "client",
+      "statement": "남쪽은 동쪽 그림, 서쪽은 북쪽 그림을 쓰고 다 겹친 뒤 통째로 좌우 뒤집는다",
+      "evidence": [
+        "0x4e2204",
+        "0x47a1e9"
+      ],
+      "implemented": "Actor.Face (Scale.X)"
+    },
+    {
+      "id": "shield-always-male",
+      "binary": "client",
+      "statement": "방패(부위 0·10)는 여자여도 늘 m 파일을 부른다 — khan2 에 ws 가 3개뿐인 까닭",
+      "evidence": [
+        "0x4e8514"
+      ],
+      "implemented": "옮기지 않음 — 우리 Wardrobe 는 여자에게 ws### 를 찾는다"
+    },
+    {
+      "id": "name-parts",
+      "binary": "client",
+      "statement": "파일 이름은 성별 + 부위 글자 + %03d + 기술 글자('a'+n) 또는 %02d.epf. 이 클라이언트는 i(도포)·g·j·o·m 을 부르지 않고, D 는 이름을 만들지만 파일이 없다. E·F 는 머리 번호, P 는 무기 번호",
+      "evidence": [
+        "0x4e8514",
+        "0x4e85ee",
+        "0x4e8822",
+        "0x86b614",
+        "0x86b5d8"
+      ],
+      "implemented": "Wardrobe.Pieces (a·p·e·f 추가)"
+    },
+    {
+      "id": "epf-header-unused",
+      "binary": "client",
+      "statement": "EPF 머리말의 너비·높이(+2..+7)는 읽지 않는다 — 조각은 칸 번호와 표 위치만으로 그린다. 부위 조각용 <이름>.tbl(칸별 x·y)은 찾아보지만 khan 에는 없다",
+      "evidence": [
+        "0x4e8854",
+        "0x4e88bc",
+        "0x4e86b5",
+        "0x4e89d5"
+      ],
+      "implemented": "dat-extract pose — 바탕은 머리말이 아니라 부위 글자로(w·c·p 111, 나머지 57)"
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "weapon-art-differs",
+      "statement": "우리 5.99 클라이언트 khan.dat 는 무기 27개 번호의 그림이 다른 무기다. 5.99 팩 아이템 이름에는 하데스(영문) 그림이 맞는다 — 3 커틀라스=칼(5.99 쪽 고리 철퇴) · 6 설단검 등 단검 4종=단검(가시 곤봉) · 7 마르시아·8 머큐리아=지팡이 · 11 매스케이드=Masquerade 칼",
+      "implemented": "build-client-wardrobe.py archives() — 무기·무기 앞 조각만 하데스 우선"
+    },
+    {
+      "id": "canvas-111",
+      "statement": "참고 클라이언트 아틀라스(dark-ages-ts)는 무기·장신구 조각을 모두 111×85, 나머지를 57×85 에 둔다. 무기 앞 조각 mp127 은 칸 위치가 mw127 과 같다 — 칼 mw002 머리말은 20×18 이라 머리말을 믿으면 27픽셀 어긋난다",
+      "implemented": "dat-extract ReachingWidth (w·c·p)"
+    },
+    {
+      "id": "epf-empty-frames",
+      "statement": "EPF 의 빈 칸(크기 0)도 번호를 차지한다 — 단검 mw028e 는 2·7번이 빈 칸. 버리면 뒤 칸이 하나씩 당겨진다",
+      "implemented": "dat-extract Epf.Read 자리표시"
+    },
+    {
+      "id": "skill-tbl-same",
+      "statement": "5.99 클라이언트 Legend.dat 의 skill.tbl 은 하데스 것과 18줄(NO·FN·SI·FC) 모두 같다",
+      "implemented": "BodyMotion 표 그대로"
+    },
+    {
+      "id": "armor-redrawn",
+      "statement": "머리·투구(40)·방패(7)·신발(3)·몸은 두 아카이브가 같은 파일이고, 갑옷 66개·바지는 파일이 달라도 같은 옷을 다시 그린 것이다 — 칸이 더 많은 5.99 쪽을 쓴다",
+      "implemented": "build-client-wardrobe.py archives() — 무기 밖은 5.99 우선"
+    }
+  ],
+  "script_command_evidence": {
+    "file": "data/server-packs/extracted/5.99-server/script-command-evidence.json",
+    "commands": 401,
+    "examples": [
+      {
+        "name": "sosusin",
+        "address": "0x44d006",
+        "writes": "0x7C"
+      },
+      {
+        "name": "phoenix",
+        "address": "0x44cf27",
+        "writes": "0x7A"
+      },
+      {
+        "name": "enare",
+        "address": "0x45083c",
+        "writes": "0x156"
+      },
+      {
+        "name": "suenare",
+        "address": "0x450936",
+        "writes": "0x158"
+      },
+      {
+        "name": "get_att_damage",
+        "address": "0x444676",
+        "reads": "0x8C"
+      },
+      {
+        "name": "get_mgc_damage",
+        "address": "0x4446f3",
+        "reads": "0x98"
+      },
+      {
+        "name": "get_critical",
+        "address": "0x444770",
+        "reads": "0x9C"
+      },
+      {
+        "name": "attack_skill",
+        "address": "0x4499bf",
+        "calls": "0x4160f7"
+      },
+      {
+        "name": "motion",
+        "address": "0x44810b",
+        "sends": "0x1A"
+      }
+    ]
+  },
+  "unknown": [
+    "클라이언트가 받은 몸 동작을 방패·배운 기술에 따라 바꿔 그리는지 — Legend.exe 의 0x1A 처리를 아직 안 봤다",
+    "아이템 사운드1(item+0xA8)을 읽는 곳",
+    "양의신권·더블어택의 '일정 확률로 2번' — 서버 코드에는 없다. 클라이언트 쪽은 모름",
+    "A(팔) 번호가 서버 외형 패킷의 어느 칸에서 오는지 — 하데스는 갑옷 번호를 두 번 보낸다",
+    "P(무기 앞 조각)가 없는 무기 번호가 많은 까닭(khan 남자 71개 중 22개만 mw 번호와 겹친다)"
+  ]
+}
