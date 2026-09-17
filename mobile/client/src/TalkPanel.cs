@@ -125,22 +125,6 @@ public sealed partial class TalkPanel : PanelContainer
         }
     }
 
-    /// <summary>
-    /// Presses the first answer on offer. Only for a run with no hand on it — it goes through the same button, so the
-    /// wiring is checked rather than bypassed.
-    /// </summary>
-    public bool PressFirst()
-    {
-        if (_offers.GetChildren().OfType<Button>().FirstOrDefault(button => !button.IsQueuedForDeletion()) is not { } first)
-        {
-            return false;
-        }
-
-        first.EmitSignal(BaseButton.SignalName.Pressed);
-
-        return true;
-    }
-
     private void Offer(string text, Texture2D? icon, System.Action pressed)
     {
         Button button = new()

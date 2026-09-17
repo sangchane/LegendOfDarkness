@@ -290,19 +290,20 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         const float reach = 34;
-        const float waist = 32;
+        const float figureWaist = 32;
 
         float nearest = reach * reach;
 
         _target = 0;
 
-        IEnumerable<(uint Serial, Vector2 Feet)> standing = _crowd.Concat(_herd)
-            .Select(one => (one.Key, one.Value.Position))
-            .Concat(_signs.Select(sign => (sign.Key, sign.Value.Position)));
+        // 사람·괴물은 허리를, 표식은 떠 있는 높이(NpcMark.Waist)를 겨눈다.
+        IEnumerable<(uint Serial, Vector2 Aim)> standing = _crowd.Concat(_herd)
+            .Select(one => (one.Key, one.Value.Position - new Vector2(0, figureWaist)))
+            .Concat(_signs.Select(sign => (sign.Key, sign.Value.Position - new Vector2(0, NpcMark.Waist))));
 
-        foreach ((uint serial, Vector2 feet) in standing)
+        foreach ((uint serial, Vector2 aim) in standing)
         {
-            float distance = (feet - new Vector2(0, waist)).DistanceSquaredTo(where);
+            float distance = aim.DistanceSquaredTo(where);
 
             if (distance < nearest)
             {

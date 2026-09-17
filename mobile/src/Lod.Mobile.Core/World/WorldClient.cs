@@ -210,6 +210,19 @@ public sealed class WorldClient(WorldSession session)
 
     private volatile int _talkCount;
 
+    /// <summary>
+    /// The last packet the pump knew but could not follow through — a window sequence this client does not draw yet,
+    /// or a window cut short under its words — and why, or empty while there has been none. Commands the pump does
+    /// not know at all are not noted here.
+    /// </summary>
+    public string Unread => _unread;
+
+    /// <summary>How many such packets there have been, so a reader can tell a repeat from a new one.</summary>
+    public int UnreadCount => _unreadCount;
+
+    private volatile string _unread = string.Empty;
+    private volatile int _unreadCount;
+
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
 
@@ -422,16 +435,35 @@ public sealed class WorldClient(WorldSession session)
                     continue;
 
                 case DialogueCommand:
-                    Talking = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
+                {
+                    Dialogue talk = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    Talking = talk;
                     _talkCount++;
+
+                    if (talk.Unread is { } cut)
+                    {
+                        NoteUnread($"0x2F: {cut}");
+                    }
+                }
+
                     continue;
 
                 case SequenceCommand:
-                    if (ShutsDialogue(HadesCipher.DecodeSecured(frame, session.Parameters)))
+                {
+                    byte[] sequence = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                    if (ShutsDialogue(sequence))
                     {
                         Talking = null;
                         _talkCount++;
                     }
+                    else
+                    {
+                        // 반응기 창(ReactorSequence·ReactorInputSequence)도 0x30 으로 온다. 아직 그리지 않지만 말없이 버리지는 않는다.
+                        string kind = sequence.Length > 0 ? $"0x{sequence[0]:X2}" : "없음";
+                        NoteUnread($"0x30: 닫기가 아닌 창 순서입니다 (첫 바이트 {kind}).");
+                    }
+                }
 
                     continue;
 
@@ -657,6 +689,13 @@ public sealed class WorldClient(WorldSession session)
         session.Connection.SendAsync(
             HadesCipher.EncodeSecured(command, _ordinal++, body, session.Parameters),
             cancellationToken);
+
+    /// <summary>Keeps a packet that was passed over where <see cref="Unread" /> can show it, rather than losing it without a trace.</summary>
+    private void NoteUnread(string why)
+    {
+        _unread = why;
+        _unreadCount++;
+    }
 
     /// <summary>Remembers somebody. The server shows us our own character too, and that one is kept apart.</summary>
     private void Show(Character character)
@@ -1192,10 +1231,10 @@ public sealed class WorldClient(WorldSession session)
         {
             return rest.Length > 0 ? WithWindowData(talk, rest[consumed..]) : talk;
         }
-        catch (ProtocolException)
+        catch (ProtocolException cut)
         {
-            // The words are still worth showing when what follows them is cut short.
-            return talk;
+            // The words are still worth showing when what follows them is cut short — but the window says so.
+            return talk with { Unread = cut.Message };
         }
     }
 
@@ -1234,7 +1273,11 @@ public sealed class WorldClient(WorldSession session)
 
                 for (int i = 0; i < count; i++)
                 {
-                    goods.Add(new DialogueGoods(Word(data, ref at), Byte(data, ref at), Long(data, ref at), Words(data, ref at)));
+                    goods.Add(new DialogueGoods(
+                        Icon: Word(data, ref at),
+                        Colour: Byte(data, ref at),
+                        Price: Long(data, ref at),
+                        Name: Words(data, ref at)));
 
                     // 직업 이름 — 원작 창은 쓰지 않는다.
                     Words(data, ref at);

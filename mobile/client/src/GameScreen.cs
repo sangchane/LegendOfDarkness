@@ -93,11 +93,7 @@ public partial class GameScreen : Control
         _pack.Tidy.Pressed += () => _ = Straighten();
 
         _talk = new TalkPanel();
-        _talk.Close.Pressed += () =>
-        {
-            Talk(null);
-            _ = _server?.ShutDialogueAsync(System.Threading.CancellationToken.None);
-        };
+        _talk.Close.Pressed += ShutTalk;
         _talk.Answered += (speaker, step, words) => _ = words is null
             ? _server?.AnswerAsync(speaker, step, System.Threading.CancellationToken.None)
             : _server?.AnswerAsync(speaker, step, words, System.Threading.CancellationToken.None);
@@ -440,10 +436,16 @@ public partial class GameScreen : Control
 
     /// <summary>
     /// Opens or shuts the pack. While it is open the world takes no taps and no steps — the panel lies over
-    /// it, and a thumb aimed at the list must not walk the character.
+    /// it, and a thumb aimed at the list must not walk the character. An NPC's window lies in the same place, so
+    /// opening the pack shuts it the way its own close button does.
     /// </summary>
     private void Carrying(bool open)
     {
+        if (open && _talk.Visible)
+        {
+            ShutTalk();
+        }
+
         _pack.Visible = open;
         _world.Frozen = open;
 
@@ -464,6 +466,12 @@ public partial class GameScreen : Control
     /// </summary>
     private void Talk(Dialogue? talk)
     {
+        // 우리가 닫기를 보내면 서버도 닫기(0x30)로 답한다. 그사이 소지품을 열었으면 그 화면을 건드리지 않는다.
+        if (talk is null && !_talk.Visible)
+        {
+            return;
+        }
+
         if (talk is not null && _pack.Visible)
         {
             Carrying(false);
@@ -481,6 +489,13 @@ public partial class GameScreen : Control
         {
             _talk.Show(talk, _server?.Pack ?? []);
         }
+    }
+
+    /// <summary>Shuts an NPC's window from our side and tells the server, so it stops walking us through a menu.</summary>
+    private void ShutTalk()
+    {
+        Talk(null);
+        _ = _server?.ShutDialogueAsync(System.Threading.CancellationToken.None);
     }
 
     /// <summary>Our own numbers as the server last gave them; made-up ones while nothing is connected.</summary>

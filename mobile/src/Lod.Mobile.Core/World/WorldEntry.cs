@@ -293,6 +293,9 @@ public sealed record Dialogue(uint Serial, string Who, string What)
     public IReadOnlyList<int> Slots { get; init; } = [];
 
     public IReadOnlyList<DialogueAbility> Abilities { get; init; } = [];
+
+    /// <summary>Why what the window carries under its words stops short, or null when it was read to the end.</summary>
+    public string? Unread { get; init; }
 }
 
 /// <summary>What an NPC's window holds under its words — the first byte of 0x2F (Hades <c>IDialogData.Type</c>).</summary>

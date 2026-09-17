@@ -1,4 +1,8 @@
+using System.Net;
+using System.Net.Sockets;
+using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.Protocol;
+using Lod.Mobile.Core.Protocol.Login;
 using Lod.Mobile.Core.World;
 
 namespace Lod.Mobile.Core.Tests.World;
@@ -102,6 +106,83 @@ public sealed class DialogueTests
         Assert.True(WorldClient.ShutsDialogue([0x0A, 0x00]));
         Assert.False(WorldClient.ShutsDialogue([0x00, 0x01, 0x00, 0x00, 0x03, 0x84]));
         Assert.False(WorldClient.ShutsDialogue([0x04, 0x01, 0x00, 0x00, 0x03, 0x84]));
+    }
+
+    /// <summary>
+    /// Goods that stop half way still leave the words to show, but the window says it was cut rather than passing for a
+    /// shop with less in it.
+    /// </summary>
+    [Fact]
+    public void A_window_cut_short_keeps_its_words_and_says_it_was_cut()
+    {
+        Dialogue whole = WorldClient.ReadDialogue(Window(0x00, "잘 가게.", [0x00]));
+        Dialogue cut = WorldClient.ReadDialogue(Window(0x04, "골라 보게.", [0x00, 0x04, 0x00, 0x02, 0x80]));
+
+        Assert.Null(whole.Unread);
+        Assert.Equal("골라 보게.", cut.What);
+        Assert.False(string.IsNullOrEmpty(cut.Unread));
+    }
+
+    /// <summary>
+    /// Hades sends 0x30 for more than shutting a window — a reactor's pages (<c>ReactorSequence</c>) and its typing box
+    /// (<c>ReactorInputSequence</c>) come the same way. This client draws neither yet, so such a packet is noted where a
+    /// reader can see it instead of vanishing, and the open window stays open; the shutting word still shuts it.
+    /// </summary>
+    [Fact]
+    public async Task A_sequence_that_is_not_a_close_is_noted_and_a_close_still_shuts_the_window()
+    {
+        using CancellationTokenSource deadline = new(TimeSpan.FromSeconds(10));
+        using TcpListener listener = new(IPAddress.Loopback, 0);
+        listener.Start();
+
+        IPEndPoint end = (IPEndPoint)listener.LocalEndpoint;
+        Task<TcpClient> accepting = listener.AcceptTcpClientAsync(deadline.Token).AsTask();
+        EncryptionParameters cipher = new(HadesCipher.SupportedSeed, "NexonInc."u8.ToArray(), 0);
+        HadesConnection connection = await HadesConnection.ConnectAsync(end.Address, end.Port, deadline.Token);
+
+        using WorldSession session = new(connection, new RedirectTarget(end.Address, end.Port, 0, cipher.Salt, "무도가", 1), cipher);
+        using TcpClient server = await accepting;
+
+        WorldClient world = new(session);
+        using CancellationTokenSource leaving = CancellationTokenSource.CreateLinkedTokenSource(deadline.Token);
+        Task pump = world.PumpAsync(leaving.Token);
+
+        async Task Send(byte command, byte[] body, Func<bool> arrived)
+        {
+            await server.GetStream().WriteAsync(HadesCipher.EncodeSecured(command, 0, body, cipher), deadline.Token);
+
+            while (!arrived())
+            {
+                if (pump.IsCompleted)
+                {
+                    await pump;
+                }
+
+                await Task.Delay(10, deadline.Token);
+            }
+        }
+
+        await Send(0x2F, Window(0x00, "무엇을 찾나?", [0x00]), () => world.TalkCount == 1);
+        await Send(0x30, [0x00, 0x01, 0x00, 0x00, 0x03, 0x84, 0x00, 0x03, 0x84], () => world.UnreadCount == 1);
+
+        Assert.StartsWith("0x30", world.Unread);
+        Assert.NotNull(world.Talking);
+
+        await Send(0x30, [0x0A, 0x00], () => world.TalkCount == 2);
+
+        Assert.Null(world.Talking);
+        Assert.Equal(1, world.UnreadCount);
+
+        leaving.Cancel();
+
+        try
+        {
+            await pump;
+        }
+        catch (OperationCanceledException)
+        {
+            // 멈추라고 했으니 멈춘 것이다.
+        }
     }
 
     private static byte[] Window(byte kind, string what, byte[] data) =>
