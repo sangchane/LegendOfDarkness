@@ -70,6 +70,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     // And what is lying on it. Marked rather than drawn: nothing has been cut out of the icon archive yet.
     private readonly Dictionary<uint, GroundMark> _dropped = [];
+
+    // 그림이 없는 NPC(팩의 스크립트 NPC)가 선 자리의 표식. 번호로 골라 말을 건다.
+    private readonly Dictionary<uint, NpcMark> _signs = [];
     private readonly List<AudioStreamPlayer> _voices = [];
 
     /// <summary>How high above the feet a flash on somebody bursts.</summary>
@@ -146,8 +149,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
             Creature? beast = server?.Creatures.FirstOrDefault(other => other.Serial == _target);
 
+            // 이식한 NPC 는 이름에 자리가 붙어 온다(카르마@노비스마을식당#3,10). 이름만 보인다.
             return beast is null ? string.Empty
-                : beast.Name.Length > 0 ? beast.Name
+                : beast.Name.Length > 0 ? beast.Name.Split('@')[0]
                 : $"괴물 {beast.Sprite - CreatureNumbering}";
         }
     }
@@ -277,9 +281,13 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         _target = 0;
 
-        foreach ((uint serial, Actor actor) in _crowd.Concat(_herd))
+        IEnumerable<(uint Serial, Vector2 Feet)> standing = _crowd.Concat(_herd)
+            .Select(one => (one.Key, one.Value.Position))
+            .Concat(_signs.Select(sign => (sign.Key, sign.Value.Position)));
+
+        foreach ((uint serial, Vector2 feet) in standing)
         {
-            float distance = (actor.Position - new Vector2(0, waist)).DistanceSquaredTo(where);
+            float distance = (feet - new Vector2(0, waist)).DistanceSquaredTo(where);
 
             if (distance < nearest)
             {
@@ -374,6 +382,14 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             // A hair above the figure so the ring sorts behind its feet rather than over them.
             _mark.Position = actor.Position - new Vector2(0, 1);
+            _mark.Visible = true;
+
+            return;
+        }
+
+        if (_target != 0 && _signs.TryGetValue(_target, out NpcMark? sign))
+        {
+            _mark.Position = sign.Position - new Vector2(0, 1);
             _mark.Visible = true;
 
             return;
@@ -689,7 +705,21 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
                 if (!ResourceLoader.Exists(path))
                 {
-                    // Nothing cut for this one yet. Better an empty tile than a wrong picture.
+                    // A merchant with no picture is one of the pack's script NPCs: it gets a sign so it can be found and
+                    // tapped (NpcMark). Anything else with nothing cut yet stays off the floor — better an empty tile
+                    // than a wrong picture.
+                    if (one.Kind == CreatureKind.Merchant)
+                    {
+                        if (!_signs.TryGetValue(one.Serial, out NpcMark? sign))
+                        {
+                            sign = new NpcMark { Name = $"Sign{one.Serial}" };
+                            _camera.AddChild(sign);
+                            _signs[one.Serial] = sign;
+                        }
+
+                        sign.Position = Ground(one.Where);
+                    }
+
                     continue;
                 }
 
@@ -718,6 +748,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             _dropped[serial].QueueFree();
             _dropped.Remove(serial);
+        }
+
+        foreach (uint serial in _signs.Keys.Where(known => !present.Contains(known)).ToList())
+        {
+            _signs[serial].QueueFree();
+            _signs.Remove(serial);
         }
     }
 

@@ -580,6 +580,31 @@ def write_mundanes(keep):
         (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
             json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
         n += 1
+
+    # 정의가 없는 NPC 중 스크립트가 옮겨진 것(게시판알리미·워프할아버지·선진 …). 5.99 는 그림 없이 세운다 — 맵 그림 위
+    # 보이지 않는 자리다. 그림 번호 0(0x4000)으로 두면 클라이언트가 표식을 그린다(사용자 결정 2026-09-17: 표식만).
+    for sp in load("npc_spawns"):
+        area = ids.get(sp["맵"])
+        if sp["NPC"] in npcs or area is None or npc_script(sp) == NPC_SCRIPT:
+            continue
+        x, y = int(sp["좌표"][0]), int(sp["좌표"][1])
+        j = {
+            "Name": f'{sp["NPC"]}@{sp["맵"]}#{x},{y}',
+            "AreaID": area, "X": x, "Y": y,
+            "Direction": whole(sp["raw"][3], 3) if len(sp.get("raw", [])) > 3 else 0,
+            "Image": MONSTER_IMAGE_BASE,
+            "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
+            "Speech": [],
+            "ScriptKey": npc_script(sp),
+            "DefaultMerchantStock": [],
+            "EnableWalking": False, "EnableTurning": False,
+            "EnableAttacking": False, "EnableCasting": False,
+            "WalkRate": 0, "TurnRate": 0, "CastRate": 0, "ChatRate": 0,
+            "PathQualifer": 1, "ViewingQualifer": 1,
+        }
+        (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
+            json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
+        n += 1
     return n, mute
 
 

@@ -121,6 +121,47 @@ public sealed class NpcDialogueTests : IDisposable
         await Until(() => world.Talking is null, $"창을 닫았는데 서버가 닫지 않았습니다. 마지막 창: {world.Talking?.What}");
     }
 
+    /// <summary>
+    /// The pack places script NPCs it gives no picture — here the ferry-man in 뤼케시온마을 who takes you to 노엠마을
+    /// (`Npc_Warp.txt` 노엠마을: ability 18 or more, one word, then `warp "노엠마을", 35, 27`). They come with picture number 0
+    /// (0x4000) — the client draws a sign there — and their script runs like any other.
+    /// </summary>
+    [Fact]
+    public async Task A_pictureless_pack_npc_answers_with_its_script_and_warps_you()
+    {
+        const int Lukesion = 20338;
+        const int Noem = 20087;
+        const string Traveller = "npcwarp";
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (Lukesion, 29, 13));
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Traveller);
+
+        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Traveller}.json");
+        JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
+        character["AbpLevel"] = 18;
+        File.WriteAllText(saved, character.ToJsonString());
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Traveller, LoginFlow.SyntheticSecret,
+            progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        Creature ferryman = await Standing(world, new Tile(29, 12));
+        Assert.Equal(0x4000, ferryman.Sprite);
+
+        await world.ClickAsync(ferryman.Serial, _deadline.Token);
+        Dialogue greeting = await Window(world, 0, talk => talk.What.StartsWith("안녕하세요 노엠마을로"));
+        DialogueOption next = Assert.Single(greeting.Options);
+
+        await world.AnswerAsync(ferryman.Serial, next.Step, _deadline.Token);
+        await Until(() => world.State is { } state && state.Map.Id == Noem && state.Where == new Tile(35, 27),
+            $"노엠마을 35,27 로 가지 않았습니다. 마지막: {world.State}");
+    }
+
     /// <summary>Waits for a window opened after the <paramref name="seen" />-th one that is the one wanted.</summary>
     private async Task<Dialogue> Window(WorldClient world, int seen, Func<Dialogue, bool> wanted)
     {
