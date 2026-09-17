@@ -415,6 +415,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _mark.Visible = false;
     }
 
+    /// <summary>
+    /// How far down this view the character stands, when not in the middle. In portrait the map runs under the controls,
+    /// and the character belongs in the middle of the part nothing covers.
+    /// </summary>
+    public float? FocusY { get; set; }
+
     /// <summary>Whether a step is under way — the movement pad fades while it is.</summary>
     public bool Walking => _walked >= 0;
 
@@ -1304,7 +1310,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         // The 20 keeps the character a little below the exact middle, where the original put it.
         float x = _player.Position.X - (window.X / 2);
-        float y = _player.Position.Y - (window.Y / 2) - 20;
+        float y = _player.Position.Y - (FocusY ?? (window.Y / 2)) - 20;
 
         _camera.Position = new Vector2(-Mathf.Round(x), -Mathf.Round(y));
     }

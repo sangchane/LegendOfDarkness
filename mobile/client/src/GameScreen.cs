@@ -57,6 +57,7 @@ public partial class GameScreen : Control
     // 서버가 말한 횟수. 같은 말을 다시 하는 것과 새로 하는 것을 가르려고 센다.
     private int _heard = -1;
     private Control _packRow = null!;
+    private Control? _log;
 
     // 손 없이 확인할 때 스스로 열어 보기 위한 것. 월드가 자리를 잡을 때까지 센다.
     private int _settling;
@@ -114,38 +115,28 @@ public partial class GameScreen : Control
             ? _server?.AnswerAsync(speaker, step, System.Threading.CancellationToken.None)
             : _server?.AnswerAsync(speaker, step, words, System.Threading.CancellationToken.None);
 
+        // The world fills the screen and the HUD floats over it, in both orientations. Portrait used to give the world a
+        // row of its own above the controls, which left a third of the screen black behind the buttons (사용자,
+        // 2026-09-18). Nothing the player aims at goes under a thumb all the same: the character stands in the middle of
+        // the part the controls leave uncovered (WorldView.FocusY).
+        BuildWorld();
+        _controlRow = BuildControlRow();
+
+        AddChild(_world);
+        AddChild(hud);
+        hud.AddChild(rows);
+        rows.AddChild(_topRow);
+        rows.AddChild(_packRow = BuildPackRow());
+
+        // 세로에만 있는 기록 줄. 가로에는 자리가 없어 지나가는 알림으로 대신한다.
         if (Main.Portrait)
         {
-            // Portrait has the height to give the world a row of its own, so nothing the player is aiming
-            // at sits under a thumb. That is the whole reason to hold the phone this way.
-            BuildWorld(fullBleed: false);
-            _controlRow = BuildControlRow();
-
-            AddChild(hud);
-            hud.AddChild(rows);
-            rows.AddChild(_topRow);
-            rows.AddChild(_world);
-            rows.AddChild(_packRow = BuildPackRow());
-            rows.AddChild(BuildLog());
-            rows.AddChild(_controlRow);
-
-            Cover(hud);
+            rows.AddChild(_log = BuildLog());
         }
-        else
-        {
-            // Landscape has no such room: the world fills the screen and the HUD floats over its corners.
-            BuildWorld(fullBleed: true);
-            _controlRow = BuildControlRow();
 
-            AddChild(_world);
-            AddChild(hud);
-            hud.AddChild(rows);
-            rows.AddChild(_topRow);
-            rows.AddChild(_packRow = BuildPackRow());
-            rows.AddChild(_controlRow);
+        rows.AddChild(_controlRow);
 
-            Cover(hud);
-        }
+        Cover(hud);
     }
 
     /// <summary>
@@ -214,33 +205,19 @@ public partial class GameScreen : Control
         // 패널은 이 줄이 아니라 HUD 위에 덮어 놓는다(Cover). 줄은 조작 줄이 올라오지 않게
         // 자리만 지킨다.
 
-        // 세로에서는 시안대로 월드 아래 전폭이고, 닫혀 있으면 줄째로 사라져 월드에 자리를 돌려준다.
-        row.Visible = !Main.Portrait;
-
         return row;
     }
 
-    /// <summary>
-    /// The world itself. In landscape it fills the screen and the HUD floats over it; in portrait it takes a
-    /// row of its own so nothing the player is aiming at sits under a thumb.
-    /// </summary>
-    private Control BuildWorld(bool fullBleed)
+    /// <summary>The world itself, filling the screen with the HUD floating over it.</summary>
+    private void BuildWorld()
     {
-        _world = new WorldView(_server);
-
-        if (fullBleed)
+        _world = new WorldView(_server)
         {
-            _world.AnchorRight = 1;
-            _world.AnchorBottom = 1;
-            _world.GrowHorizontal = GrowDirection.Both;
-            _world.GrowVertical = GrowDirection.Both;
-        }
-        else
-        {
-            _world.SizeFlagsVertical = SizeFlags.ExpandFill;
-        }
-
-        return _world;
+            AnchorRight = 1,
+            AnchorBottom = 1,
+            GrowHorizontal = GrowDirection.Both,
+            GrowVertical = GrowDirection.Both
+        };
     }
 
     /// <summary>
@@ -249,8 +226,9 @@ public partial class GameScreen : Control
     /// </summary>
     private static Control BuildLog()
     {
+        // 맵 위에 뜨므로 다른 판처럼 글자가 금색 바닥 위에서도 읽히는 판을 쓴다.
         Panel frame = new() { CustomMinimumSize = new Vector2(0, LogHeight) };
-        frame.AddThemeStyleboxOverride("panel", Greybox.Surface());
+        frame.AddThemeStyleboxOverride("panel", Greybox.Plate());
 
         MarginContainer inset = new()
         {
@@ -359,6 +337,13 @@ public partial class GameScreen : Control
         if (_world.PlaceName.Length > 0)
         {
             _place.Text = $"{_world.PlaceName} · {_world.Standing.X},{_world.Standing.Y}";
+        }
+
+        // 세로에서는 조작이 맵 아래쪽을 덮으니, 캐릭터를 위 줄과 기록 줄 사이 한가운데에 세운다.
+        if (_log is not null)
+        {
+            float middle = (_topRow.GetGlobalRect().End.Y + _log.GetGlobalRect().Position.Y) / 2;
+            _world.FocusY = middle - _world.GetGlobalRect().Position.Y;
         }
 
         // 서버가 어디라고 말하기 전에는 빈 판이 오른쪽 위에 남는다.
@@ -582,11 +567,6 @@ public partial class GameScreen : Control
         _pack.Visible = open;
         _world.Frozen = open;
 
-        if (Main.Portrait)
-        {
-            _packRow.Visible = open;
-        }
-
         if (open)
         {
             _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf, Mine.Gold);
@@ -612,11 +592,6 @@ public partial class GameScreen : Control
 
         _talk.Visible = talk is not null;
         _world.Frozen = talk is not null;
-
-        if (Main.Portrait)
-        {
-            _packRow.Visible = talk is not null;
-        }
 
         if (talk is not null)
         {

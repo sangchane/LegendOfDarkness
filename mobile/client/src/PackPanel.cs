@@ -44,7 +44,7 @@ public sealed partial class PackPanel : PanelContainer
     {
         Name = "Pack";
         Visible = false;
-        AddThemeStyleboxOverride("panel", Greybox.Plate());
+        AddThemeStyleboxOverride("panel", Greybox.Sheet());
 
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter);

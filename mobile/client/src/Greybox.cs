@@ -44,6 +44,18 @@ public static class Greybox
     };
 
     /// <summary>
+    /// A window laid over the screen — the pack, an NPC's talk. Fully opaque: since the map runs under the controls in
+    /// portrait too, the log and the buttons behind a see-through plate read through the window.
+    /// </summary>
+    public static StyleBoxFlat Sheet()
+    {
+        StyleBoxFlat sheet = Plate();
+        sheet.BgColor = sheet.BgColor with { A = 1 };
+
+        return sheet;
+    }
+
+    /// <summary>
     /// Rounds a thumb button — the movement pad and the fan round the attack — into a disc. The plates stay as opaque as
     /// every other button's, because the glyphs on them sit over gold floor tiles too.
     /// </summary>

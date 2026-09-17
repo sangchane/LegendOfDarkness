@@ -26,7 +26,7 @@ public sealed partial class TalkPanel : PanelContainer
     {
         Name = "Talk";
         Visible = false;
-        AddThemeStyleboxOverride("panel", Greybox.Plate());
+        AddThemeStyleboxOverride("panel", Greybox.Sheet());
 
         HBoxContainer head = new();
         head.AddThemeConstantOverride("separation", Main.Gutter);
