@@ -223,8 +223,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     }
 
     /// <summary>
-    /// A tap picks out whoever was tapped, and picks nobody when it lands on empty floor. Nothing follows
-    /// from that on its own — attacking and talking are separate asks — so a mistaken tap costs nothing.
+    /// A tap picks out whoever was tapped, and picks nobody when it lands on empty floor. Picking a monster or a
+    /// person is all it does — attacking is a separate ask, so a mistaken tap costs nothing — but an NPC is talked to,
+    /// as the original client talks to one it is clicked on.
     /// </summary>
     public override void _GuiInput(InputEvent @event)
     {
@@ -288,6 +289,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         Mark();
+
+        // 서버가 창을 보내 오면 화면이 연다(GameScreen). 여기서는 누른 것만 알린다.
+        if (server is { } world && world.Creatures.FirstOrDefault(one => one.Serial == _target) is { Kind: CreatureKind.Merchant })
+        {
+            _ = world.ClickAsync(_target, System.Threading.CancellationToken.None);
+        }
     }
 
     /// <summary>

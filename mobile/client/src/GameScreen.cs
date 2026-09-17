@@ -23,6 +23,10 @@ public partial class GameScreen : Control
     private Label _place = null!;
     private Label _target = null!;
     private PackPanel _pack = null!;
+    private TalkPanel _talk = null!;
+
+    // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
+    private int _talked;
     private Label _notice = null!;
     private ProgressBar _targetHealth = null!;
     private AbilityBar _abilities = null!;
@@ -81,6 +85,16 @@ public partial class GameScreen : Control
         _pack.Dropped += slot => _ = Throw(slot);
         _pack.Tidy.Pressed += () => _ = Straighten();
 
+        _talk = new TalkPanel();
+        _talk.Close.Pressed += () =>
+        {
+            Talk(null);
+            _ = _server?.ShutDialogueAsync(System.Threading.CancellationToken.None);
+        };
+        _talk.Answered += (speaker, step, words) => _ = words is null
+            ? _server?.AnswerAsync(speaker, step, System.Threading.CancellationToken.None)
+            : _server?.AnswerAsync(speaker, step, words, System.Threading.CancellationToken.None);
+
         if (Main.Portrait)
         {
             // Portrait has the height to give the world a row of its own, so nothing the player is aiming
@@ -116,9 +130,9 @@ public partial class GameScreen : Control
     }
 
     /// <summary>
-    /// Lays the pack over the screen rather than in a row of its own. Neither shape leaves a row tall
-    /// enough for a grid of pictures — landscape leaves less than one cell — and the wireframes already
-    /// call it a modal, so covering the control row costs nothing: it is dead while the pack is open.
+    /// Lays the pack — and an NPC's window, in the same place — over the screen rather than in a row of its own.
+    /// Neither shape leaves a row tall enough for a grid of pictures — landscape leaves less than one cell — and the
+    /// wireframes already call both modals, so covering the control row costs nothing: it is dead while one is open.
     /// </summary>
     /// <remarks>
     /// A MarginContainer stretches its children to fill it, which throws away anchors. One plain Control
@@ -129,9 +143,6 @@ public partial class GameScreen : Control
         Control over = new() { MouseFilter = MouseFilterEnum.Ignore };
 
         hud.AddChild(over);
-        over.AddChild(_pack);
-
-        _pack.SetAnchorsPreset(LayoutPreset.FullRect);
 
         // 가로는 오른쪽 기둥, 세로는 전폭. 위 줄만 남겨 두어 이름과 체력은 계속 보인다.
         // 기둥은 3분의 1 남짓이면 충분했지만 장비 탭의 고리는 그보다 넓다 — 좁은 화면에서는 고리가
@@ -139,11 +150,16 @@ public partial class GameScreen : Control
         float across = GetViewportRect().Size.X;
         float column = across > 0 ? 1f - (GearGrid.PanelWidth / across) : 0.6f;
 
-        _pack.AnchorLeft = Main.Portrait ? 0 : Mathf.Min(0.6f, column);
-        _pack.OffsetLeft = 0;
-        _pack.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
-        _pack.OffsetRight = 0;
-        _pack.OffsetBottom = 0;
+        foreach (Control panel in new Control[] { _pack, _talk })
+        {
+            over.AddChild(panel);
+            panel.SetAnchorsPreset(LayoutPreset.FullRect);
+            panel.AnchorLeft = Main.Portrait ? 0 : Mathf.Min(0.6f, column);
+            panel.OffsetLeft = 0;
+            panel.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
+            panel.OffsetRight = 0;
+            panel.OffsetBottom = 0;
+        }
     }
 
     /// <summary>
@@ -324,6 +340,12 @@ public partial class GameScreen : Control
             _server?.Skills ?? LayoutCheck.PretendSkills,
             _server?.Spells ?? LayoutCheck.PretendSpells);
 
+        if (_server is { } talking && talking.TalkCount != _talked)
+        {
+            _talked = talking.TalkCount;
+            Talk(talking.Talking);
+        }
+
         if (_server is { } server && server.SaidCount != _heard)
         {
             _heard = server.SaidCount;
@@ -424,6 +446,31 @@ public partial class GameScreen : Control
         if (open)
         {
             _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf);
+        }
+    }
+
+    /// <summary>
+    /// Opens the window an NPC sent, or shuts it when the server did. While it is open the world takes no taps or steps,
+    /// as with the pack, and the pack is put away so the two never lie on top of each other.
+    /// </summary>
+    private void Talk(Dialogue? talk)
+    {
+        if (talk is not null && _pack.Visible)
+        {
+            Carrying(false);
+        }
+
+        _talk.Visible = talk is not null;
+        _world.Frozen = talk is not null;
+
+        if (Main.Portrait)
+        {
+            _packRow.Visible = talk is not null;
+        }
+
+        if (talk is not null)
+        {
+            _talk.Show(talk, _server?.Pack ?? []);
         }
     }
 

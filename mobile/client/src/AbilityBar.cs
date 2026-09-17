@@ -11,8 +11,8 @@ public sealed partial class AbilityBar : HBoxContainer
 {
     private const int IconSide = 35;
     private const int SheetColumns = 16;
-    private const string SkillSheet = "res://assets/ability/skill.png";
-    private const string SpellSheet = "res://assets/ability/spell.png";
+    internal const string SkillSheet = "res://assets/ability/skill.png";
+    internal const string SpellSheet = "res://assets/ability/spell.png";
 
     private readonly Button _skill = Shortcut("기술");
     private readonly Button _spell = Shortcut("마법");
@@ -84,7 +84,7 @@ public sealed partial class AbilityBar : HBoxContainer
         button.Icon = icon is { } frame ? Frame(sheetPath, frame) : null;
     }
 
-    private static AtlasTexture Frame(string sheetPath, int frame)
+    internal static AtlasTexture Frame(string sheetPath, int frame)
     {
         int safe = Math.Max(0, frame);
 
