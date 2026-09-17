@@ -26,16 +26,11 @@ public partial class GameScreen : Control
 
     // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
     private int _talked;
-    private Label _notice = null!;
-    private Control _noticePlate = null!;
-    private double _noticeLeft;
+    private MessageLog _messages = null!;
     private ProgressBar _targetHealth = null!;
     private Control _targetPlate = null!;
     private Control? _placePlate;
     private AbilityBar _abilities = null!;
-
-    /// <summary>How long a line the server said stays over the floor in landscape.</summary>
-    private const double NoticeSeconds = 4;
 
     // 방향판. 걷는 동안 흐려져 그 밑의 바닥이 보인다 — 방향판은 가로에서 월드 왼쪽 아래를 덮는다.
     private Control _pad = null!;
@@ -128,10 +123,10 @@ public partial class GameScreen : Control
         rows.AddChild(_topRow);
         rows.AddChild(_packRow = BuildPackRow());
 
-        // 세로에만 있는 기록 줄. 가로에는 자리가 없어 지나가는 알림으로 대신한다.
+        // 세로에만 있는 기록 줄. 가로에는 자리가 없어 조작 줄 가운데에 두 줄만 둔다(BuildControlRow).
         if (Main.Portrait)
         {
-            rows.AddChild(_log = BuildLog());
+            rows.AddChild(_log = _messages = new MessageLog(3) { CustomMinimumSize = new Vector2(0, LogHeight) });
         }
 
         rows.AddChild(_controlRow);
@@ -218,41 +213,6 @@ public partial class GameScreen : Control
             GrowHorizontal = GrowDirection.Both,
             GrowVertical = GrowDirection.Both
         };
-    }
-
-    /// <summary>
-    /// What the original kept at the bottom of its screen. Portrait has the height to keep it, and it is
-    /// what replaces the passing notice landscape has to make do with.
-    /// </summary>
-    private static Control BuildLog()
-    {
-        // 맵 위에 뜨므로 다른 판처럼 글자가 금색 바닥 위에서도 읽히는 판을 쓴다.
-        Panel frame = new() { CustomMinimumSize = new Vector2(0, LogHeight) };
-        frame.AddThemeStyleboxOverride("panel", Greybox.Plate());
-
-        MarginContainer inset = new()
-        {
-            AnchorRight = 1,
-            AnchorBottom = 1,
-            GrowHorizontal = GrowDirection.Both,
-            GrowVertical = GrowDirection.Both
-        };
-        inset.AddThemeConstantOverride("margin_left", Main.Gutter);
-        inset.AddThemeConstantOverride("margin_right", Main.Gutter);
-        inset.AddThemeConstantOverride("margin_bottom", Main.Gutter / 2);
-        frame.AddChild(inset);
-
-        VBoxContainer lines = new() { Alignment = BoxContainer.AlignmentMode.End };
-        lines.AddThemeConstantOverride("separation", 2);
-
-        foreach (string line in new[] { "\uc548\uc804 \uac00\uc625\uc5d0 \ub4e4\uc5b4\uc654\uc2b5\ub2c8\ub2e4.", "\uc8fc\ubaa8: \uc5b4\uc11c \uc624\uc2dc\uac8c.", "\uac70\ubbf8\ub97c \uaca8\ub215\ub2c8\ub2e4." })
-        {
-            lines.AddChild(Aux(line));
-        }
-
-        inset.AddChild(lines);
-
-        return frame;
     }
 
     /// <summary>
@@ -375,11 +335,6 @@ public partial class GameScreen : Control
         {
             _heard = server.SaidCount;
             Notify(server.Said);
-        }
-
-        if (_noticeLeft > 0 && (_noticeLeft -= delta) <= 0)
-        {
-            Notify(string.Empty);
         }
 
         KeepWalking(delta);
@@ -516,16 +471,8 @@ public partial class GameScreen : Control
     private static void Press(Button key, bool down) => Input.ParseInputEvent(
         new InputEventScreenTouch { Index = 0, Pressed = down, Position = key.GetGlobalRect().GetCenter() });
 
-    /// <summary>
-    /// Shows a line under the world, and in landscape hides its plate again once it has been read — an empty plate is a
-    /// dark bar across the floor.
-    /// </summary>
-    private void Notify(string line)
-    {
-        _notice.Text = line;
-        _noticePlate.Visible = line.Length > 0;
-        _noticeLeft = line.Length > 0 ? NoticeSeconds : 0;
-    }
+    /// <summary>Adds a line to the messages, which fade on their own once read.</summary>
+    private void Notify(string line) => _messages.Add(line);
 
     /// <summary>
     /// Keeps stepping while a direction is held, and lets the pad fade while the character walks so the floor under it
@@ -683,28 +630,6 @@ public partial class GameScreen : Control
         // 세로에서는 가운데 칸 자체를 틈으로 쓴다.
         row.AddThemeConstantOverride("separation", Main.Portrait ? 0 : Main.Gutter);
 
-        _notice = new Label
-        {
-            Text = string.Empty,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart
-        };
-        _notice.AddThemeFontSizeOverride("font_size", AuxFontSize);
-        _notice.AddThemeColorOverride("font_color", Greybox.Muted);
-
-        // The notice floats over the floor in landscape, so it gets a plate of its own rather than an
-        // outline: a line of text on gold tiles is unreadable either way without one.
-        PanelContainer notice = new()
-        {
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            SizeFlagsVertical = SizeFlags.ShrinkEnd,
-            Visible = false
-        };
-        notice.AddThemeStyleboxOverride("panel", Greybox.Plate());
-        notice.AddChild(_notice);
-        _noticePlate = notice;
-
         row.AddChild(_pad = BuildMovementPad());
 
         VBoxContainer middle = new()
@@ -716,9 +641,15 @@ public partial class GameScreen : Control
             MouseFilter = MouseFilterEnum.Ignore
         };
 
+        // The messages float over the floor in landscape, on a plate of their own: a line of text on gold tiles is
+        // unreadable without one. Portrait keeps them in a row above the controls instead.
         if (!Main.Portrait)
         {
-            middle.AddChild(notice);
+            middle.AddChild(_messages = new MessageLog(2)
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsVertical = SizeFlags.ShrinkEnd
+            });
         }
 
         row.AddChild(middle);
