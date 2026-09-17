@@ -475,6 +475,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         List<string> paths = [];
         List<int> colours = [];
         List<string> striking = [];
+        int shield = -1;
 
         foreach (Piece piece in Wardrobe.Pieces(one.Wearing))
         {
@@ -485,6 +486,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 continue;
             }
 
+            if (piece.Name[1] == 's')
+            {
+                shield = paths.Count;
+            }
+
             paths.Add(path);
             colours.Add(piece.Colour);
 
@@ -493,7 +499,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             striking.Add(ResourceLoader.Exists(swung) ? swung : path);
         }
 
-        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, striking) : Actor.Sheet.Walk(OtherSheet);
+        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, striking, shield) : Actor.Sheet.Walk(OtherSheet);
     }
 
     /// <summary>

@@ -10,6 +10,8 @@ internal static class Epf
 
     internal sealed record Frame(int Left, int Top, int Width, int Height, byte[] Data);
 
+    private static readonly Frame Empty = new(0, 0, 0, 0, []);
+
     /// <summary>
     /// The frames and the canvas they are placed on. Every drawing sits somewhere inside that canvas, so two
     /// files only line up with each other when both are laid out on it rather than on their own contents.
@@ -49,8 +51,12 @@ internal static class Epf
             int width = right - left;
             int height = bottom - top;
 
+            // An empty frame still holds its place. Motions and effects ask for frames by number, and a
+            // file with a blank in the middle (a dagger's rogue motion has nothing drawn at 2 and 7) put every
+            // later drawing one number early when blanks were dropped — the blade left the hand.
             if (width <= 0 || height <= 0 || start >= blob.Length)
             {
+                frames.Add(Empty);
                 continue;
             }
 
@@ -60,6 +66,7 @@ internal static class Epf
 
             if (length < width * height)
             {
+                frames.Add(Empty);
                 continue;
             }
 

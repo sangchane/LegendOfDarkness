@@ -20,7 +20,9 @@ internal static class Program
     private const int ItemImageFlag = 0x8000;
 
     private const int WardrobeWidth = 57;
-    private const int WardrobeHeight = 85;
+
+    /// <summary>The canvas weapons and accessories are drawn on, wider than the body's so they can reach out.</summary>
+    private const int ReachingWidth = 111;
 
     private static async Task<int> Main(string[] args)
     {
@@ -816,8 +818,11 @@ internal static class Program
         // The women's archive carries no palettes of its own and shares the men's, so colours are looked
         // up next door. Where "next door" is depends on how the archives are laid out: loose in one folder,
         // or each in a folder of its own under database/archives — try the first, then the second.
-        List<ArchivedItem> palettes =
-            entries.Any(entry => entry.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase))
+        // The 5.99 Korean client's women's archive holds one stray palette (palb00) and none of the rest, so
+        // having a palette is not enough to stop looking — a woman's pieces always read the men's as well.
+        List<ArchivedItem> palettes = female
+            ? [.. entries, .. await ReadEntries(MensArchive(Path.GetFullPath(args[1])))]
+            : entries.Any(entry => entry.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase))
                 ? entries
                 : await ReadEntries(MensArchive(Path.GetFullPath(args[1])));
 
@@ -875,13 +880,18 @@ internal static class Program
                 $"  {item.Name}: 프레임 {frames.Count}개, 바탕 {sheet.Width}x{sheet.Height}, " +
                 $"첫 칸 {frames.FirstOrDefault()?.Left},{frames.FirstOrDefault()?.Top}");
 
-            // Every piece is centred on the canvas its own file declares, and the plain wardrobe canvas is
-            // 57x85. A weapon or an accessory declares a wider one so it can reach out past the body, and
-            // lining the two centres up is what puts the hilt in a hand instead of a stick beside it. The
-            // atlases the reference client ships agree piece for piece
-            // (sources/FallenDev/dark-ages-ts/apps/client/public/aislings/*.atlas).
-            int shiftX = (Math.Max(sheet.Width, WardrobeWidth) - WardrobeWidth) / 2;
-            int shiftY = (Math.Max(sheet.Height, WardrobeHeight) - WardrobeHeight) / 2;
+            // Every piece is centred on its canvas, and the plain wardrobe canvas is 57x85. Weapons and
+            // accessories are drawn on a wider 111x85 one so they can reach out past the body, and lining the
+            // two centres up is what puts the hilt in a hand instead of a stick beside it. Which canvas comes
+            // from what the piece is, not from its file's header: mw002's header says 20x18 while mw028's says
+            // 111x85, and trusting it left every such sword 27 pixels out of the hand. The atlases the
+            // reference client ships give all 9,962 men's weapon frames and every accessory 111x85, and every
+            // other piece 57x85 (sources/FallenDev/dark-ages-ts/apps/client/public/aislings/*/*.atlas).
+            int canvasWidth = layer.Length > 1 && char.ToLowerInvariant(layer[1]) is 'w' or 'c'
+                ? ReachingWidth
+                : WardrobeWidth;
+            int shiftX = (canvasWidth - WardrobeWidth) / 2;
+            int shiftY = 0;
 
             for (int slot = 0; slot < poses.Length; slot++)
             {

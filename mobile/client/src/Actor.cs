@@ -28,6 +28,10 @@ public sealed partial class Actor : Node2D
     /// file of its own rather than further along the walk, so this is a second set of sheets and not a
     /// range of frames. Empty for anything with no blow of its own to draw.
     /// </param>
+    /// <param name="Shield">
+    /// Which layer is a shield, or below zero for none. It goes behind the figure when its back is turned and in
+    /// front of everything when it faces us (docs/original-sprite-animation.md 2.1).
+    /// </param>
     public sealed record Sheet(
         IReadOnlyList<string> Paths,
         IReadOnlyList<int> Colours,
@@ -36,15 +40,17 @@ public sealed partial class Actor : Node2D
         float FeetX,
         float FeetY,
         IReadOnlyList<string> StrikePaths,
-        CreatureMotion? Motion = null)
+        CreatureMotion? Motion = null,
+        int Shield = -1)
     {
         public static Sheet Walk(params string[] paths) => Walk(paths, new int[paths.Length], []);
 
         public static Sheet Walk(
             IReadOnlyList<string> paths,
             IReadOnlyList<int> colours,
-            IReadOnlyList<string> striking) =>
-            new(paths, colours, 80, 88, 31.5f, 83f, striking);
+            IReadOnlyList<string> striking,
+            int shield = -1) =>
+            new(paths, colours, 120, 96, 31.5f, 83f, striking, Shield: shield);
 
         /// <summary>
         /// A creature draws from one sheet and numbers its own frames. Its <paramref name="motion" /> comes
@@ -128,6 +134,11 @@ public sealed partial class Actor : Node2D
 
         // Mirroring about this node's origin keeps the feet where they were.
         Scale = new Vector2(facing.Mirror ? -1 : 1, 1);
+
+        if (_sheet.Shield >= 0 && _sheet.Shield < _sprites.Count)
+        {
+            MoveChild(_sprites[_sheet.Shield], facing.Side == Lod.Mobile.Core.Art.Side.Back ? 0 : GetChildCount() - 1);
+        }
 
         ShowFrame(_sheet.Motion?.Stand(facing.Side) ?? WalkMotion.Stand(facing.Side));
     }

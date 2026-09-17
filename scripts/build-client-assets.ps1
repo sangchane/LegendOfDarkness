@@ -50,7 +50,8 @@ Invoke-Extract @('map', "$Archives/seo/seo.dat", "$Server/maps/lod1.map", '30', 
 
 # Every figure and every piece is cut on the same cell, wide enough for a weapon held out to the side.
 # A piece that does not fit stops the run rather than being quietly clipped.
-$cell = '80x88'
+# 무기가 가로 114 · 세로 89 까지 뻗는다(build-client-wardrobe.py). 도구가 왼쪽 위에 맞추므로 발 자리는 그대로다.
+$cell = '120x96'
 
 Write-Output 'Stacking the wardrobe into figures...'
 # Body, then what it wears, then what it wears on its head — the order the original draws them in.
