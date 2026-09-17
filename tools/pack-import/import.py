@@ -542,7 +542,9 @@ def mundane_json(sp, npc, area_id):
         "Name": f'{npc["이름"]}@{sp["맵"]}#{x},{y}',
         "AreaID": area_id, "X": x, "Y": y,
         "Direction": whole(sp["raw"][3], 3) if len(sp.get("raw", [])) > 3 else 0,
-        "Image": whole(f.get("이미지"), 32767) or 0,
+        # NPC 도 괴물과 같은 그림 파일(mns###)이고 서버는 템플릿 번호를 그대로 보낸다(ServerFormat07) —
+        # 괴물처럼 0x4000 을 더해 두지 않으면 클라이언트가 그림도 못 찾고 누를 수도 없다.
+        "Image": MONSTER_IMAGE_BASE + (whole(f.get("이미지"), 32767) or 0),
         "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
         "Speech": flatten(f.get("말하기")),
         "ScriptKey": NPC_SCRIPT,
@@ -809,13 +811,16 @@ def write_quests(_keep):
 # 못한 95건 쪽이다. 상점을 여는 13명은 여기서 놓는다.
 SHOPBIND = ROOT / "plans" / "5.99-상점결합.tsv"
 SHOP_SCRIPT = "shop1"           # scripts/Mundanes/shop1.cs
-SHOP_IMAGE = 1                  # 팩에 그림 번호가 없다. 보이긴 해야 하므로 1 로 둔다
+# 상점 NPC 13명 중 npc/Npc.txt 에 정의(그림 번호)가 있는 것은 셋뿐이다(베이가 35 · 시장마스터 31 · 카르마 31).
+# 나머지는 팩에도 그림이 없어, 보이고 눌리도록 팩의 상인 모습 31 을 쓴다. (예전 값 1 은 말벌 그림이었다.)
+SHOP_IMAGE = 31
 
 
 def write_shops(_keep):
     if not SHOPBIND.exists():
         raise SystemExit("상점 결합표가 없다 — python3 scripts/build-shop-binding.py 를 먼저 돌려라")
     ids = name_to_id()
+    npcs = {n["이름"]: n for n in load("npcs")}
     stock = {s["이름"]: s["아이템"] for s in load("shops")}
     items = {i["이름"] for i in load("items")}
 
@@ -848,7 +853,8 @@ def write_shops(_keep):
         j = {
             "Name": f"{npc}@{mp}#{x},{y}",
             "AreaID": ids[mp], "X": x, "Y": y, "Direction": 0,
-            "Image": SHOP_IMAGE, "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
+            "Image": MONSTER_IMAGE_BASE + (whole(npcs[npc]["fields"].get("이미지"), 32767) if npc in npcs else SHOP_IMAGE),
+            "Level": 1, "MaximumHp": 1000, "MaximumMp": 1000,
             "Speech": [], "ScriptKey": SHOP_SCRIPT,
             "DefaultMerchantStock": keep,
             "EnableWalking": False, "EnableTurning": False,

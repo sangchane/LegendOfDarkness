@@ -1,0 +1,4 @@
+frames 20
+stand 0 3
+walk 6 6
+attack 18 1

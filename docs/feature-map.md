@@ -63,7 +63,7 @@
 | 25 | 내구도·수리 | 돌아감 `HB/Types/EquipmentManager.cs:87-97` · 수리 `S/Mundanes/shop1.cs:113-129` | 없음 — 수치만 받음 `WC:1020-1061` | `HB/Types/Item.cs` Durability | |
 | 26 | 드롭·줍기·버리기 | 돌아감 `GSH:362-602` | 됨 `WC:518-581` | `TS:8-9` | **괴물 드롭 목록이 비었다**(NEXT) |
 | **NPC·경제** |||||
-| 27 | NPC 대화·메뉴 | 돌아감 `GSH:1348-1438,1991-2012` | **됨(2026-09-17)** — 여덟 모양 읽기·`0x3A` 답·닫기, 화면 `mobile/client/src/TalkPanel.cs`. 단 **그림 없는 NPC 는 화면에 없어 못 누른다** | `HB/Network/ServerFormats/ServerFormat2F.cs` | 막힘이 NPC 그림으로 옮겨 갔다 |
+| 27 | NPC 대화·메뉴 | 돌아감 `GSH:1348-1438,1991-2012` | **됨(2026-09-17)** — 여덟 모양 읽기·`0x3A` 답·닫기, 화면 `mobile/client/src/TalkPanel.cs`. NPC 그림(26종)도 뽑아 누르면 열린다 | `HB/Network/ServerFormats/ServerFormat2F.cs` | NPC 템플릿 그림 번호를 0x4000 체계로 고쳤다(`tools/pack-import/import.py`) |
 | 28 | 상점 | 돌아감 `S/Mundanes/shop1.cs:26-129` | 됨 — 사기 확인(`NpcDialogueTests`), 팔기·수리는 같은 창 | `HB/Network/ServerFormats/ServerFormat2F.cs:41-60` ItemSellData | **판매 목록 대부분이 서버에 없는 아이템**(노비스 잡화 21 중 2), 문구가 영어 |
 | 29 | 은행 | 돌아감 `S/Mundanes/Banker.cs:168-248` | 없음 | `HB/Network/ServerFormats/ServerFormat2F.cs:16-27` | |
 | 30 | 사람끼리 교환 | 돌아감 `GSH:2146-2360` (아이템·금화·양쪽 확인) | 없음 | `HB/Network/ServerFormats/ServerFormat42.cs` · `TS` Exchange 74 | |
@@ -151,7 +151,7 @@
 
 ## 빈틈 — 어디서부터 막히나
 
-1. ~~**NPC 대화창(모바일)**~~ — 됐다(2026-09-17). 대신 **NPC·괴물 그림**이 막는다 — 그림이 없으면 화면에 추가되지 않아 누를 수 없다(`WorldView.Herd`).
+1. ~~**NPC 대화창(모바일)**~~ — 됐다(2026-09-17). NPC·괴물 그림 112종도 뽑아 화면에 보이고 눌린다(`scripts/build-client-creatures.py`).
 2. **내 상태 표시(모바일)** — 체력·마력·경험치·레벨·금화를 이미 받는 값으로 바꾼다(`GS:439-448`).
 3. **콘텐츠(서버)** — 기술·마법 효과(42/587) · 괴물 드롭 · 상점 물건 · 퀘스트 연결 NPC 8개.
 4. **상태 이상 아이콘·쿨다운(모바일)** — 0x3A·0x3F 를 읽으면 된다.

@@ -25,6 +25,9 @@ public sealed class NpcDialogueTests : IDisposable
     private const string Diner = "카르마@노비스마을식당#3,10";
     private const string SnakeMeat = "뱀고기";
     private const uint SnakeMeatPrice = 350;
+
+    /// <summary>카르마's picture in the pack (npc/Npc.txt 이미지 31), sent the way monsters are — 0x4000 on top.</summary>
+    private const int KarmaSprite = 0x4000 + 31;
     private const string Shopper = "npcshop";
 
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(3));
@@ -90,6 +93,9 @@ public sealed class NpcDialogueTests : IDisposable
 
         await Settled(world, seen => seen?.Map.Id == NoviceDinerId);
         Creature keeper = await Standing(world, new Tile(3, 10));
+
+        // 그림 번호가 괴물과 같은 체계여야 클라이언트가 mns031 을 찾아 그리고 누를 수 있다.
+        Assert.Equal(KarmaSprite, keeper.Sprite);
 
         await world.ClickAsync(keeper.Serial, _deadline.Token);
         Dialogue menu = await Window(world, 0, talk => talk.Options.Count > 0);
