@@ -48,6 +48,7 @@ objdump -d --x86-asm-syntax=intel Novaonline.exe > nova.asm     # 맥 기본 obj
 | 마법 공격력 · 치명타 | `0x45d4be` → `+0x98` · `+0x9C` | 장비 공격력2 + 지능×10 / 장비 크리티컬 + 명중률향상 → 100 에서 자르고 + 민첩÷11 | `Pack599.MagicPower` · `Critical` |
 | 0x1A 몸 동작 | `0x4635ca` | `AA 00 09 1A 00 \| 00 00 idHi idLo \| motion \| speedHi speedLo` — **소리 바이트 없음** | 클라이언트 `WorldClient.ReadMotion` |
 | 평타 소리 | `0x45d363` (`0x41688d`) | 0x19 로 소리 1 고정. 사운드2 는 여러 대상 무기 공격(`0x415d86`)만 | 안 옮김 |
+| 혼수(빈사) | `set_coma 0x444bdf` · `coma_delay 0x4539ac` · `set_state 0x446e42` · 1초 처리 `0x46f5d3` | 혼수 `+0x6D`, 남은 초 `+0xF1`(1초마다 줄며 그림 24·아이콘 89), 보이는 상태 `+0xF0`(1 혼수 모습, `0x462ec1` 로 주변에 다시 보냄). 0 초가 되면 `__COMA_END__` — 죽음·뮤레칸의방. 포테의숲 오솔길 함정과 그룹 중 죽음이 쓴다 | `Pack599` 혼수 명령 → 하데스 빈사(`debuff_reeping`) |
 
 ### 클라이언트 (Legend.exe)
 

@@ -9,6 +9,12 @@
 - Last updated: 2026-09-15
 
 ## History (append; 최신이 위)
+- 2026-09-18 — **오솔길 "마비"는 혼수였다 — 5.99 서버 역어셈블.** 사용자: "오솔길 마비는 역어셈블리해서 찾아봐" · "다른지역은 테스트 끝나고".
+  - `set_state` 는 부른 캐릭터의 보이는 상태 칸(+0xF0)에 첫 인자를 쓰고 주변에 모습을 다시 보낸다. 짝인 `set_coma`(+0x6D)·`coma_delay`(+0xF1 남은 초)는 1초 처리(0x46f5d3)가
+    그림 24·아이콘 89 와 함께 세고, 0 이면 `__COMA_END__`(죽음·뮤레칸의방). 하데스 빈사 디버프가 아이콘 89·그림 24 로 같은 것이라 그것을 건다(`Pack599`).
+  - 하데스 `RemoveDebuff("skulled")` 는 취소 표시 없이는 지우지 않아 `del_coma`(코마디움 살리기)가 헛돌았다 — 고쳤다.
+  - 시험: 날개 없이 오솔길을 걷다 혼수("You are dying." 계열) → 12초 뒤 "You have died." — 통과. 보스존 전체·스크립트 컴파일도 통과.
+  - 발췌 `data/disassembly/excerpts/nova-coma-46f5d3.asm`, 근거 `findings.json` 함수 2 · 칸 4.
 - 2026-09-18 — **포테의숲 보스존을 5.99 개인 던전 그대로 · 수오미 건물 문 · 레벨 범위 · 드롭 확률.** 사용자: "다시 켜고 남은 것 하자", 보스존 "5.99처럼 개인 사본", 수오미 건물 "지금 같이".
   - 서버 본체: `Systems/Instances`(map_create 사본 — 원래 맵 파일·번호·보일 이름, 맵·워프·객체 목록은 사본으로 바꿔 끼움) · `WarpTemplate.LevelMaximum`·`RequiresClear`·`ScriptNpc` ·
     `Area.ClientNumber`·`ClientName`·`Stage`·`SubStage`·`Kills` · `ObjectService.AddMap/RemoveMap` · 없어진 맵에 저장된 캐릭터는 시작 자리로.

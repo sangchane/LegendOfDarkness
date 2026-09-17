@@ -1,6 +1,6 @@
 {
   "설명": "5.99 서버팩·5.99 한국 클라이언트·원작 4.51(2001) 클라이언트 실행 파일을 역어셈블해서 확인한 사실. 규칙마다 근거 주소가 있다. 그래프: python3 scripts/build-disassembly-graph.py",
-  "갱신": "2026-09-17",
+  "갱신": "2026-09-18",
   "binaries": [
     {
       "id": "server",
@@ -236,6 +236,20 @@
       "address": "0x5210f0",
       "name": "Skill.tbl 읽기",
       "role": "4.51 과 같은 읽기. 표 0x723200"
+    },
+    {
+      "binary": "server",
+      "address": "0x446e42",
+      "name": "set_state",
+      "role": "스크립트 set_state 값 — 부른 캐릭터의 보이는 상태 칸(+0xF0)에 첫 인자를 쓰고 0x462ec1 로 주변에 모습을 다시 보낸다. 둘째 인자는 읽지 않는다. 5.99 스크립트는 1(혼수 모습)·0(보통)만 쓴다",
+      "excerpt": "data/disassembly/excerpts/nova-coma-46f5d3.asm"
+    },
+    {
+      "binary": "server",
+      "address": "0x46f5d3",
+      "name": "혼수 1초 처리",
+      "role": "접속자마다 +0xF1(남은 초)을 1 줄이며 그림 24·아이콘 89 를 보내고, 0 이 되면 메시지 3 과 스크립트 __COMA_END__(죽음·뮤레칸의방)를 부른다. 하데스 빈사 디버프(debuff_reeping — 아이콘 89 · 그림 24)와 같다",
+      "excerpt": "data/disassembly/excerpts/nova-coma-46f5d3.asm"
     }
   ],
   "offsets": [
@@ -669,6 +683,30 @@
       "written_by": [
         "0x4e3285"
       ]
+    },
+    {
+      "binary": "server",
+      "struct": "char",
+      "offset": "0xF0",
+      "meaning": "보이는 상태 — set_state·set_state1 이 쓰고 get_state1 이 읽는다. 1 혼수 모습"
+    },
+    {
+      "binary": "server",
+      "struct": "char",
+      "offset": "0x6D",
+      "meaning": "혼수 여부 — set_coma 가 쓰고 get_coma 가 읽는다"
+    },
+    {
+      "binary": "server",
+      "struct": "char",
+      "offset": "0xF1",
+      "meaning": "혼수 남은 초 — coma_delay 가 쓰고 1초마다 줄어든다"
+    },
+    {
+      "binary": "server",
+      "struct": "char",
+      "offset": "0x15C",
+      "meaning": "혼수 시간 흐름 표시(word) — coma_delay 가 1, 끝나면 0"
     }
   ],
   "tables": [

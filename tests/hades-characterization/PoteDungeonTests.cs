@@ -34,51 +34,9 @@ public sealed class PoteDungeonTests : IDisposable
     [Fact]
     public async Task Entering_the_trail_builds_a_private_copy_whose_waiting_room_holds_the_way_until_the_wolves_are_gone()
     {
-        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (FifthZone, 26, 1));
-        _server = server;
-        Waiting.MakeGameMaster(server, Name);
-
-        // 5존 사냥터 괴물은 치운다 — 엔트자이언트의 나르콜리에 잠들면 서버가 대화 대답을 받지 않는다(자는 동안은 아무것도 못 한다).
-        foreach (string hunter in Directory.GetFiles(Path.Combine(server.ContentLocation, "templates", "monsters", "5.99"), "*@포테의숲5존.json"))
-        {
-            File.Delete(hunter);
-        }
-
-        // 던전 괴물 체력만 1 로 — 마릿수(대기실 늑대 6 · 보스방 늑대 8 · 자이언트맨티스 1)와 흐름은 그대로 두고 잡는 시간만 줄인다.
-        string entry = Path.Combine(server.ContentLocation, "scripts", "Pack599", "Npcs", "포테의숲오솔길입장.cs");
-        File.WriteAllText(entry, File.ReadAllText(entry).Replace("(V)4500L", "(V)1L").Replace("(V)15000L", "(V)1L"));
-        server.Start(TimeSpan.FromMinutes(2));
-        LoginFlow.TryCreateAccount(server, Name);
-
-        // 입장은 레벨 21~52. 대기실 늑대에 쓰러지지 않게 체력을 넉넉히.
-        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
-        JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
-        character["ExpLevel"] = 30;
-        character["_MaximumHp"] = 20000;
-        character["CurrentHp"] = 20000;
-        File.WriteAllText(saved, character.ToJsonString());
-
-        using WorldSession session = await HadesLoginClient.LoginAsync(
-            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
-
-        WorldClient world = new(session);
-        _ = world.PumpAsync(_deadline.Token);
-
-        await Waiting.Until(() => world.State?.Map.Id == FifthZone, "포테의숲5존에 들어가지 못했습니다.", _deadline.Token);
-
-        Creature host = null!;
-        await Waiting.Until(() => (host = world.Creatures.FirstOrDefault(c => c.Where == new Tile(28, 0))!) is not null,
-            "5존 28,0 에 입장 스크립트 NPC 가 없습니다.", _deadline.Token);
-
-        await Waiting.WalkUntil(world, Direction.North, () => world.Talking is not null, _deadline.Token);
-        await Waiting.Until(() => world.Talking?.What.Contains("포테의숲 오솔길로 입장") == true,
-            $"26,0 을 밟았는데 입장을 묻지 않았습니다. 마지막 창: {world.Talking?.What} · 서버가 한 말: {world.Said}", _deadline.Token);
-
-        DialogueOption enter = world.Talking!.Options.First(option => option.Text.StartsWith("입장한다"));
-        await world.AnswerAsync(world.Talking.Serial, enter.Step, _deadline.Token);
-
-        await Waiting.Until(() => world.State is { } state && state.Map.Id == Trail && state.Map.Name == "포테의숲오솔길" && state.Where == new Tile(9, 39),
-            $"오솔길 사본 9,39 로 가지 않았습니다. 마지막: {world.State} · 서버가 한 말: {world.Said} · 서버 기록: {PackLog(server)}", _deadline.Token);
+        (IsolatedHadesServer server, WorldSession session, WorldClient world) = await EnterTrail(Name, gameMaster: true);
+        using IsolatedHadesServer ownedServer = server;
+        using WorldSession ownedSession = session;
 
         // 오솔길은 걸을 때마다 1/5 로 마비된다 — 엔트자이언트의날개가 있으면 대신 하나 쓴다(Dungeon__Script).
         await world.SayAsync("/give \"엔트자이언트의날개\" 30", _deadline.Token);
@@ -110,6 +68,90 @@ public sealed class PoteDungeonTests : IDisposable
             _deadline.Token, TimeSpan.FromSeconds(40));
         Assert.True((world.Vitals?.Experience ?? 0) - before >= 200000,
             $"클리어 경험치 20만이 들어오지 않았습니다: {before} → {world.Vitals?.Experience}");
+    }
+
+    /// <summary>5존 26,1 에서 들어가 오솔길 사본 9,39 에 선다. 5존 사냥터 괴물은 치운다(나르콜리에 잠들면 대화 대답이 무시된다).</summary>
+    private async Task<(IsolatedHadesServer Server, WorldSession Session, WorldClient World)> EnterTrail(string who, bool gameMaster)
+    {
+        IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (FifthZone, 26, 1));
+        _server = server;
+        if (gameMaster)
+        {
+            Waiting.MakeGameMaster(server, who);
+        }
+
+        // 5존 사냥터 괴물은 치운다 — 엔트자이언트의 나르콜리에 잠들면 서버가 대화 대답을 받지 않는다(자는 동안은 아무것도 못 한다).
+        foreach (string hunter in Directory.GetFiles(Path.Combine(server.ContentLocation, "templates", "monsters", "5.99"), "*@포테의숲5존.json"))
+        {
+            File.Delete(hunter);
+        }
+
+        // 던전 괴물 체력만 1 로 — 마릿수(대기실 늑대 6 · 보스방 늑대 8 · 자이언트맨티스 1)와 흐름은 그대로 두고 잡는 시간만 줄인다.
+        string entry = Path.Combine(server.ContentLocation, "scripts", "Pack599", "Npcs", "포테의숲오솔길입장.cs");
+        File.WriteAllText(entry, File.ReadAllText(entry).Replace("(V)4500L", "(V)1L").Replace("(V)15000L", "(V)1L"));
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, who);
+
+        // 입장은 레벨 21~52. 대기실 늑대에 쓰러지지 않게 체력을 넉넉히.
+        string saved = Path.Combine(server.ContentLocation, "aislings", $"{who}.json");
+        JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
+        character["ExpLevel"] = 30;
+        character["_MaximumHp"] = 20000;
+        character["CurrentHp"] = 20000;
+        File.WriteAllText(saved, character.ToJsonString());
+
+        WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, who, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Waiting.Until(() => world.State?.Map.Id == FifthZone, "포테의숲5존에 들어가지 못했습니다.", _deadline.Token);
+
+        Creature host = null!;
+        await Waiting.Until(() => (host = world.Creatures.FirstOrDefault(c => c.Where == new Tile(28, 0))!) is not null,
+            "5존 28,0 에 입장 스크립트 NPC 가 없습니다.", _deadline.Token);
+
+        await Waiting.WalkUntil(world, Direction.North, () => world.Talking is not null, _deadline.Token);
+        await Waiting.Until(() => world.Talking?.What.Contains("포테의숲 오솔길로 입장") == true,
+            $"26,0 을 밟았는데 입장을 묻지 않았습니다. 마지막 창: {world.Talking?.What} · 서버가 한 말: {world.Said}", _deadline.Token);
+
+        DialogueOption enter = world.Talking!.Options.First(option => option.Text.StartsWith("입장한다"));
+        await world.AnswerAsync(world.Talking.Serial, enter.Step, _deadline.Token);
+
+        await Waiting.Until(() => world.State is { } state && state.Map.Id == Trail && state.Map.Name == "포테의숲오솔길" && state.Where == new Tile(9, 39),
+            $"오솔길 사본 9,39 로 가지 않았습니다. 마지막: {world.State} · 서버가 한 말: {world.Said} · 서버 기록: {PackLog(server)}", _deadline.Token);
+
+        return (server, session, world);
+    }
+
+    /// <summary>
+    /// 오솔길의 혼수 함정 — 5.99 `Dungeon__Script` 가 오솔길에서 움직인 사람을 1초마다 1/5 로 혼수에 빠뜨린다(`set_coma` · `set_state 1,1` ·
+    /// `coma_delay 12`). 엔트자이언트의날개가 없으면 그대로 빠지고, 12초 안에 누가 살리지 않으면 죽는다(`__COMA_END__`). 5.99 서버 역어셈블로
+    /// 확인한 혼수는 하데스 빈사(아이콘 89 · 그림 24)와 같아 그것을 건다. 운영자는 빈사에 걸리지 않으므로 보통 캐릭터로.
+    /// </summary>
+    [Fact]
+    public async Task Walking_the_trail_without_a_wing_drops_you_into_a_coma_that_ends_in_death()
+    {
+        (IsolatedHadesServer server, WorldSession session, WorldClient world) = await EnterTrail("potecoma", gameMaster: false);
+        using IsolatedHadesServer ownedServer = server;
+        using WorldSession ownedSession = session;
+
+        // 하데스 빈사 문구(LoruleConfig ReapMessage) 가운데 하나가 뜨면 혼수다. 오르내리며 자리를 바꿔야 함정이 돈다.
+        string[] dying = ["You are dying.", "You cannot move nor raise your arms.", "Barron is going to take your soul.", "All things eventually come to an end."];
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromMinutes(2);
+        Direction way = Direction.North;
+
+        while (DateTime.UtcNow < giveUp && !dying.Any(line => world.Said.Contains(line)))
+        {
+            await world.WalkAsync(way, _deadline.Token);
+            await Task.Delay(700, _deadline.Token);
+            way = way == Direction.North ? Direction.South : Direction.North;
+        }
+
+        Assert.True(dying.Any(line => world.Said.Contains(line)), $"오솔길을 2분 걸었는데 혼수에 빠지지 않았습니다. 서버가 한 말: {world.Said} · 서버 기록: {PackLog(server)}");
+        await Waiting.Until(() => world.Said.Contains("You have died."),
+            $"혼수 12초가 지나도 죽지 않았습니다. 서버가 한 말: {world.Said}", _deadline.Token, TimeSpan.FromSeconds(30));
     }
 
     /// <summary>
