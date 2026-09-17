@@ -163,9 +163,25 @@ lsof -nP -iTCP:2610 -iTCP:2615 | grep <기기 IP>   # 어디까지 닿았나
 grep "Welcome to Lorule" <서버 로그>              # 월드에 들어왔나
 ```
 
-### iPad·iPhone 에 클라이언트 올리기 (2026-09-11 확인)
+### iPad·iPhone 에 클라이언트 올리기 — `scripts/ios-build.sh` (2026-09-18)
 
-로그인 화면까지 iPad 9세대에서 확인했다. 준비물은 위 macOS 절과 같고, 여기에 `DEVELOPER_DIR` 이 필요하다.
+```bash
+./scripts/ios-build.sh build          # .ipa 를 만든다(팀 번호를 서명에서 읽어 넣었다가 다시 비운다)
+./scripts/ios-build.sh install [기기]  # 만들고 무선으로 넣는다
+./scripts/ios-build.sh check          # 서명이 며칠 남았나 · 이틀 이하면 알림
+./scripts/ios-build.sh watch-sign     # 날마다 오전 10시에 그 알림을 띄우게 등록
+```
+
+**무료 애플 계정은 서명이 7일이면 끝나고, 명령줄로는 새로 받지 못한다**(2026-09-18 확인). 서명 파일을 치우고
+`xcodebuild -exportArchive … -allowProvisioningUpdates` 로 받아 보게 했더니 `No profiles for
+'com.fallendev.lod.client' were found` 로 실패한다 — 자동 발급은 유료 계정의 App Store Connect 키가 있어야 한다.
+그러니 **7일마다 Xcode 에서 기기에 한 번 실행해** 새 서명을 받아야 하고, 그 뒤 이 스크립트로 다시 만들어 넣는다.
+`watch-sign` 은 그 날짜를 놓치지 않게 알리는 것까지만 한다(갱신 자체는 사람이 한다).
+
+**케이블은 기기를 처음 등록할 때 한 번만** 필요하다. Xcode 의 기기 창에서 "네트워크로 연결"을 켜 두면
+그다음부터 같은 Wi-Fi 에서 무선으로 넣는다(`xcrun devicectl device install app`).
+
+손으로 할 때의 절차(참고):
 
 ```bash
 export DOTNET_ROOT="$PWD/.tools/dotnet-9.0.317"; export PATH="$DOTNET_ROOT:$PATH"

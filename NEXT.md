@@ -90,6 +90,9 @@
   **미확정**: High Kick, 그리고 아이콘 4의 주먹 셋(`Double Punch`·`Poison Punch`·`Sting`)에
   양의신권·백보신권·통배권을 어떻게 짝짓나 — 아이콘 그림이 한 장뿐이라 눈으로는 못 가린다.
 
+- **[끝남/아이폰 올리기]** `scripts/ios-build.sh` 로 만들고 무선으로 넣는다(무료 계정). 서명은 7일마다 **Xcode 에서 기기에 한 번 실행**해야 새로 받는다 —
+  명령줄 자동 갱신은 무료 계정에서 안 되는 것을 확인했다. `watch-sign` 이 남은 날을 날마다 알린다. 케이블은 기기를 처음 등록할 때 한 번뿐.
+
 - **[남음/되돌릴 것]** `mobile/client/export_presets.cfg` 의 `application/app_store_team_id` 는 `""` 로
   되돌려 두었다. 아이패드 빌드를 다시 구우려면 `HQC44HA87V` 를 넣고, **끝나면 다시 비운다**.
   `mobile/client/{server,login,hunt}.cfg` 는 커밋되지 않는다(`.gitignore`).

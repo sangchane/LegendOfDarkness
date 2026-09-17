@@ -9,6 +9,12 @@
 - Last updated: 2026-09-15
 
 ## History (append; 최신이 위)
+- 2026-09-18 — **아이폰: 무료 계정으로 무선 설치, 서명 만료는 알림으로.** 사용자: "지금은 무료계정으로 진행하자" · "xcode 무선설치가 가장 간편하네? 프로비저닝 자동으로 갱신하는 방법 있으면 설정해".
+  - **명령줄 자동 갱신은 무료 계정에서 안 된다(직접 시험함)**: 서명 파일을 치우고 `xcodebuild -exportArchive … -allowProvisioningUpdates` 를 돌리니
+    `No profiles for 'com.fallendev.lod.client' were found` 로 실패. 치웠던 서명은 곧바로 되돌려 놓았고 다시 정상이다(자동 발급은 유료 계정 키가 필요).
+  - `scripts/ios-build.sh` (build · install · check · watch-sign · unwatch-sign): 팀 번호를 서명에서 읽어 넣었다가 **반드시 다시 비운다**,
+    `.ipa` 에 `LodClient.framework` 가 들었는지 확인(없으면 기기에서 곧 죽는 빌드), 무선 설치는 `devicectl`.
+  - 서명은 7일. `watch-sign` 이 날마다 오전 10시에 남은 날을 알리고 이틀 이하면 알림을 띄운다 — 지금 이 맥의 서명은 오늘 끝난다(0일).
 - 2026-09-18 — **서비스 기반: 백업 · 자동 재시작 · 기록 · 설정.** 사용자: "4번해" → "지금은 기반만 다지기".
   - `scripts/lod-server.sh` (status·start·stop·restart·logs·config·backup·install-agents·remove-agents)와 설정 틀 둘(`scripts/server-config/`).
   - 맥 등록: 서버는 `KeepAlive` 로 맥이 직접 돌본다 — **강제로 죽여 3초 만에 되살아남을 확인**. 처음엔 스크립트가 켜게 했더니 스크립트가 끝나며 함께 정리돼 안 살아났다.
