@@ -46,6 +46,9 @@ WAITS = {"mes", "menu", "input"}
 
 #: 블록 머리 — 줄 맨 앞의 `0,0,0,0,0,0,0` 다음 탭, 이름, `{`. 안쪽의 `if(…){` 줄은 탭으로 시작해 걸리지 않는다.
 HEADER = re.compile(r"^\d[\d,]*\t([^\t{]+?)\s*\{", re.M)
+#: 2026-09-17 에 센 블록 수. HEADER 는 줄 모양(숫자열 + 탭)에 기대므로 팩 파일 모양이 바뀌면 블록이 말없이 빠진다 — 적게 잡히면 알린다.
+EXPECTED_NPC_BLOCKS = 84
+EXPECTED_ITEM_BLOCKS = 26
 
 
 class NpcTranslator(abilities.Translator):
@@ -231,7 +234,7 @@ def items(write):
 
 
 def main():
-    write = "--쓰기" in sys.argv
+    write = "--쓰기" in sys.argv or "--write" in sys.argv
     made, failed, calls = [], [], {}
     for file in FILES:
         for name, body in blocks(NPC_SCRIPTS / file).items():
@@ -261,6 +264,11 @@ def main():
     done, waiting = items(write)
     print(f"아이템 스크립트 {len(done)}개 {'씀' if write else '(세어만 봄)'} → {ITEM_OUT.relative_to(ROOT)}: {', '.join(done)}")
     print(f"  창이 필요해 남긴 것 {len(waiting)}: {', '.join(waiting)}")
+
+    for what, found, expected in (("NPC", len(made) + len(failed), EXPECTED_NPC_BLOCKS),
+                                  ("아이템", len(done) + len(waiting), EXPECTED_ITEM_BLOCKS)):
+        if found < expected:
+            print(f"경고: {what} 블록이 {found}개뿐이다(전에는 {expected}개) — HEADER 가 블록 머리를 놓쳤는지 팩 파일을 확인하라.")
     return 0
 
 

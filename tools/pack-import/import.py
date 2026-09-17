@@ -570,10 +570,16 @@ def write_mundanes(keep):
     out.mkdir(parents=True, exist_ok=True)
     ids = name_to_id()
     npcs = {n["이름"]: n for n in load("npcs")}
-    n = mute = 0
+    # 상점 NPC(베이가·시장마스터·카르마 …)는 write_shops 가 같은 파일 이름으로 쓴다. 여기서 쓰면 도는 순서에 따라
+    # DefaultMerchantStock 이 말없이 사라지므로, 상점 결합표가 쓰는 자리는 비켜 간다.
+    shops = {row[:4] for row in shop_rows(ids)}
+    n = mute = shop = 0
     for sp in keep:
         area = ids.get(sp["맵"])
         if area is None:
+            continue
+        if (sp["NPC"], sp["맵"], int(sp["좌표"][0]), int(sp["좌표"][1])) in shops:
+            shop += 1
             continue
         j = mundane_json(sp, npcs[sp["NPC"]], area)
         mute += not j["Speech"]
@@ -588,6 +594,9 @@ def write_mundanes(keep):
         if sp["NPC"] in npcs or area is None or npc_script(sp) == NPC_SCRIPT:
             continue
         x, y = int(sp["좌표"][0]), int(sp["좌표"][1])
+        if (sp["NPC"], sp["맵"], x, y) in shops:
+            shop += 1
+            continue
         j = {
             "Name": f'{sp["NPC"]}@{sp["맵"]}#{x},{y}',
             "AreaID": area, "X": x, "Y": y,
@@ -605,7 +614,7 @@ def write_mundanes(keep):
         (out / f'{safe_name(j["Name"]).lower()}.json').write_text(
             json.dumps(j, ensure_ascii=False, indent=2), encoding="utf-8")
         n += 1
-    return n, mute
+    return n, mute, shop
 
 
 # ── 기술·마법 ────────────────────────────────────────────────────────────
@@ -850,6 +859,21 @@ SHOP_SCRIPT = "shop1"           # scripts/Mundanes/shop1.cs
 SHOP_IMAGE = 31
 
 
+def shop_rows(ids):
+    """상점 결합표의 줄 — (NPC, 맵, x, y, 갈래, 목록). 번호표에 없는 맵은 뺀다. 표가 없으면 빈 목록."""
+    if not SHOPBIND.exists():
+        return []
+    rows = []
+    for line in SHOPBIND.read_text(encoding="utf-8").splitlines():
+        if not line or line.startswith("#"):
+            continue
+        c = line.split("\t")
+        if len(c) < 6 or c[1] not in ids:
+            continue
+        rows.append((c[0], c[1], int(c[2]), int(c[3]), c[4], c[5]))
+    return rows
+
+
 def write_shops(_keep):
     if not SHOPBIND.exists():
         raise SystemExit("상점 결합표가 없다 — python3 scripts/build-shop-binding.py 를 먼저 돌려라")
@@ -862,15 +886,7 @@ def write_shops(_keep):
     # 사 주는 목록(물건팔기)은 DefaultMerchantStock 이 아니다. shop1.cs 의 사는 쪽은
     # 목록을 안 쓰고 인벤토리를 받는다. 넣으면 뜻이 뒤집힌다.
     goods, spots, sells = collections.defaultdict(list), {}, collections.defaultdict(list)
-    for line in SHOPBIND.read_text(encoding="utf-8").splitlines():
-        if not line or line.startswith("#"):
-            continue
-        c = line.split("\t")
-        if len(c) < 6:
-            continue
-        npc, mp, x, y, kind, shop = c[0], c[1], int(c[2]), int(c[3]), c[4], c[5]
-        if mp not in ids:
-            continue
+    for npc, mp, x, y, kind, shop in shop_rows(ids):
         key = (npc, mp, x, y)
         spots[key] = (npc, mp, x, y)
         (goods if kind == "물건사기" else sells)[key] += [
@@ -1105,8 +1121,9 @@ def main():
             print(f"     목적지를 못 찾은 원작 노드 {len(missing)}: {', '.join(missing)}")
             print(f"     월드맵으로 나가는 문 {files}장 ({cells}칸) → templates/warps/")
         elif kind == "mundanes" and a.write:
-            n, mute = write_mundanes(keep)
-            print(f"     넣음 {n}장 → templates/mundanes/  (할 말이 없는 NPC {mute}명)")
+            n, mute, shop = write_mundanes(keep)
+            print(f"     넣음 {n}장 → templates/mundanes/  (할 말이 없는 NPC {mute}명 · "
+                  f"상점이 쓰는 자리라 비켜 감 {shop}곳 — --kind shops 가 쓴다)")
         elif kind == "monsters" and a.write:
             n, skipped = write_monsters(keep)
             print(f"     넣음 {n}장 → templates/monsters/5.99/")

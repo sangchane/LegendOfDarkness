@@ -104,23 +104,28 @@ def number(fields, key, default=0):
     return int(digits) if digits not in ("", "-") else default
 
 
-def kind_of(fields):
-    """장비면 그 갈래 이름, 아니면 None."""
+def classify(fields):
+    """(갈래 이름, None) 또는 장비가 아니면 (None, 뺀 이유)."""
     # 타입 0(또는 칸 없음)만 장비다 — 속성 3 에는 염색약·퀘스트 두루마리(타입 2)·귀환 주문서(타입 1)도 있다.
     if text(fields, "타입", "0") != "0":
-        return None
+        return None, "타입이 0 이 아니다"
     for kind, spec in KINDS.items():
         if text(fields, "속성") in spec["slots"]:
             if kind == "무기":
                 # 속성 0 에 섞인 재료는 공격력 칸이 없다. 무기는 그림이 있거나 일부러 안 보이게(안보이기 1) 한 것만.
                 if "최소공격력1" not in fields:
-                    return None
+                    return None, "무기 자리인데 공격력 칸이 없다(재료)"
                 if number(fields, "착용이미지") <= 0 and text(fields, "안보이기") != "1":
-                    return None
+                    return None, "무기인데 착용 그림이 없다"
             elif kind == "갑옷" and number(fields, "착용이미지") <= 0:
-                return None
-            return kind
-    return None
+                return None, "갑옷인데 착용 그림이 없다"
+            return kind, None
+    return None, "속성이 장비 자리가 아니다"
+
+
+def kind_of(fields):
+    """장비면 그 갈래 이름, 아니면 None."""
+    return classify(fields)[0]
 
 
 def template(item):
@@ -176,10 +181,19 @@ def template(item):
 def main():
     write = "--쓰기" in sys.argv
     items = json.loads(ITEMS.read_text(encoding="utf-8"))
-    chosen = [item for item in items if kind_of(item["fields"])]
+    chosen, skipped = [], Counter()
+    for item in items:
+        kind, why = classify(item["fields"])
+        if kind:
+            chosen.append(item)
+        else:
+            skipped[why] += 1
 
+    # 파일 이름이 곧 이름이라 같은 이름이면 앞의 것이 말없이 사라진다. 지금 자료에는 없으니 생기면 멈춘다.
     names = Counter(text(item["fields"], "이름") for item in chosen)
     twice = sorted(name for name, count in names.items() if count > 1)
+    if twice:
+        raise SystemExit(f"팩에 같은 이름의 장비가 둘 이상이다 — 하나가 덮여 사라진다. 쓰기 전에 가려라: {', '.join(twice)}")
 
     replaced, made, unsendable = [], 0, []
     for item in chosen:
@@ -194,8 +208,8 @@ def main():
         made += 1
 
     print(f"장비 {made}종 {'썼다' if write else '(미리보기 — --쓰기 로 쓴다)'} → {OUT.relative_to(ROOT)}")
-    if twice:
-        print(f"  팩에 같은 이름이 둘 이상 — 나중 것이 남는다: {', '.join(twice)}")
+    if skipped:
+        print(f"  뺀 것 {sum(skipped.values())}: " + ", ".join(f"{why} {n}" for why, n in skipped.most_common()))
     print("  갈래별", dict(Counter(kind_of(item["fields"]) for item in chosen)))
     print("  파일별", dict(Counter(Path(item["출처"]).stem for item in chosen)))
     if replaced:

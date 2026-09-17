@@ -252,10 +252,9 @@ internal static class Program
         Console.WriteLine($"{Path.GetFileName(mapPath)} — 칸 {cells.Count}개 ({columns}x{rows} = {columns * rows})");
 
         const int halfWidth = TileWidth / 2;
-        const int halfHeight = 13;
 
         int width = (columns + rows) * halfWidth;
-        int height = ((columns + rows) * halfHeight) + TileHeight;
+        int height = ((columns + rows) * HalfHeight) + TileHeight;
         int originX = rows * halfWidth;
 
         using Image<Rgba32> canvas = new(width, height);
@@ -278,7 +277,7 @@ internal static class Program
                 }
 
                 int x = originX + ((column - row) * halfWidth) - halfWidth;
-                int y = (column + row) * halfHeight;
+                int y = (column + row) * HalfHeight;
                 source.Draw(canvas, floor - 1, x, y);
                 drawn++;
             }
@@ -413,8 +412,7 @@ internal static class Program
         }
 
         const int halfWidth = TileWidth / 2;
-        const int halfHeight = 13;
-        using Image<Rgba32> canvas = new((columns + rows) * halfWidth, ((columns + rows) * halfHeight) + TileHeight + 400);
+        using Image<Rgba32> canvas = new((columns + rows) * halfWidth, ((columns + rows) * HalfHeight) + TileHeight + 400);
         const int lift = 400;
 
         foreach (bool standing in new[] { false, true })
@@ -430,7 +428,7 @@ internal static class Program
                     }
 
                     int x = (rows * halfWidth) + ((column - row) * halfWidth) - halfWidth;
-                    int y = lift + ((column + row) * halfHeight);
+                    int y = lift + ((column + row) * HalfHeight);
 
                     if (!standing)
                     {
@@ -444,12 +442,12 @@ internal static class Program
 
                     if (pictures.TryGetValue(cells[cell].Left, out MapObjects.Picture? left))
                     {
-                        MapObjects.Paint(canvas, left, x, y + (2 * halfHeight) - left.Height, blend: true);
+                        MapObjects.Paint(canvas, left, x, y + (2 * HalfHeight) - left.Height, blend: true);
                     }
 
                     if (pictures.TryGetValue(cells[cell].Right, out MapObjects.Picture? right))
                     {
-                        MapObjects.Paint(canvas, right, x + halfWidth, y + (2 * halfHeight) - right.Height, blend: true);
+                        MapObjects.Paint(canvas, right, x + halfWidth, y + (2 * HalfHeight) - right.Height, blend: true);
                     }
                 }
             }
@@ -1259,6 +1257,8 @@ internal static class Program
 
     private const int TileWidth = 56;
     private const int TileHeight = 27;
+    // 한 칸이 아래로 내려가는 폭. mobile/src/Lod.Mobile.Core/Art/IsometricFloor.cs 의 HalfHeight 와 같아야 한다.
+    private const int HalfHeight = 13;
 
     /// <summary>The ground tile set and the palettes that colour it, read once and reused.</summary>
     private sealed class TileSource

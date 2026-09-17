@@ -12,6 +12,7 @@ NPC 를 같은 번호 체계로 보낸다(ServerFormat07, 0x4000 + 그림 번호
   쓰는 법: python3 scripts/build-client-creatures.py [--새것만]
   산출물:  mobile/client/assets/actor/creature/mns###.png · mns###.txt
 """
+import importlib.util
 import re
 import subprocess
 import sys
@@ -26,7 +27,11 @@ ARCHIVES = [SERVER / "archives" / "hades" / "hades.dat", Path.home() / "Download
 OUT = ROOT / "mobile" / "client" / "assets" / "actor" / "creature"
 DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
 TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
-CREATURE_BASE = 0x4000
+# 0x4000 은 서버 템플릿을 쓰는 쪽(import.py)이 정한다 — 두 곳에 따로 적으면 한쪽만 바뀐다.
+_spec = importlib.util.spec_from_file_location("pack_import", ROOT / "tools" / "pack-import" / "import.py")
+_pack_import = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_pack_import)
+CREATURE_BASE = _pack_import.MONSTER_IMAGE_BASE
 
 # 템플릿은 서버의 너그러운 파서에 맞춰 쓰여 있다(끝에 남은 쉼표, 따옴표 없는 16진수) — JSON 으로 읽지 않고 이 줄만 집는다.
 IMAGE = re.compile(r'"Image"\s*:\s*"?(0x[0-9A-Fa-f]+|\d+)"?')
