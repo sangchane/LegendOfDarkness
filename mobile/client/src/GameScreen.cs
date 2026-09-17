@@ -362,6 +362,7 @@ public partial class GameScreen : Control
         }
 
         Listen();
+        Dropped();
         KeepWalking(delta);
         RehearseAHold(delta);
 
@@ -530,6 +531,24 @@ public partial class GameScreen : Control
         {
             _history.RemoveRange(0, _history.Count - HistoryKept);
         }
+    }
+
+    // 듣기가 멈춘 것을 한 번만 알린다.
+    private bool _toldBroken;
+
+    /// <summary>
+    /// Says when the listening has stopped. It used to stop without a word — the character froze on screen while
+    /// everything else looked fine, and nothing said why (2026-09-18 조사).
+    /// </summary>
+    private void Dropped()
+    {
+        if (_toldBroken || _server?.Broke is not { } why)
+        {
+            return;
+        }
+
+        _toldBroken = true;
+        Notify($"연결이 끊겼습니다 — {why}");
     }
 
     /// <summary>
@@ -720,9 +739,11 @@ public partial class GameScreen : Control
         Fill(_health, _healthText, "HP", mine.Health, mine.MaximumHealth);
         Fill(_mana, _manaText, "MP", mine.Mana, mine.MaximumMana);
 
+        string points = mine.Unspent > 0 ? $" · 점수 {mine.Unspent}" : string.Empty;
+
         _experience.Text = mine.Level <= 0
             ? string.Empty
-            : mine.ExperienceToGo <= 0 ? "EXP 다 올랐습니다" : $"EXP 다음까지 {mine.ExperienceToGo:N0}";
+            : (mine.ExperienceToGo <= 0 ? "EXP 다 올랐습니다" : $"EXP 다음까지 {mine.ExperienceToGo:N0}") + points;
     }
 
     private static void Fill(ProgressBar bar, Label text, string name, int left, int most)

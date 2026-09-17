@@ -113,7 +113,6 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private const int SwingFrames = 40;
 
     /// <summary>점수를 한 점 쓰는 간격(프레임).</summary>
-    private const int SpendFrames = 30;
 
     /// <summary>쫓는 중에 자리가 이만큼 그대로면 그 괴물은 갈 수 없는 곳에 있다고 본다.</summary>
     private const int StuckTicks = 40;
@@ -827,8 +826,6 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         _hunted++;
 
-        SpendAPoint();
-
         Tile standing = server.State?.Where ?? _tile;
 
         if (Nearest() is not { } prey)
@@ -919,7 +916,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     private void SpendAPoint()
     {
-        if (_hunted % SpendFrames != 0 || server?.Vitals is not { Unspent: > 0 } mine)
+        // 레벨업이 준 점수를 스스로 찍는다. 예전에는 자동 사냥 중에만 돌아, 사람이 놀면 점수가 쌓이기만 했다
+        // (2026-09-18 조사). 서버는 한 번에 한 점씩 받으므로 프레임마다 한 점.
+        if (server?.Vitals is not { Unspent: > 0 } mine)
         {
             return;
         }
@@ -1021,10 +1020,27 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         : _herd.TryGetValue(serial, out Actor? beast) ? beast
         : null;
 
+    // 무엇이 없어서 안 보였는지 한 번씩만 적는다. 같은 번호로 계속 적으면 기록이 그것만 남는다(2026-09-18 조사).
+    private readonly HashSet<string> _toldAbout = [];
+
+    private void Told(string what)
+    {
+        if (_toldAbout.Add(what))
+        {
+            GD.Print($"GREYBOX_MISSING {what}");
+        }
+    }
+
     private void Show(int number, Vector2 feet, int speed)
     {
-        if (number <= 0 || Flash.Make(number, speed) is not { } flash)
+        if (number <= 0)
         {
+            return;
+        }
+
+        if (Flash.Make(number, speed) is not { } flash)
+        {
+            Told($"이펙트 {number} 그림이 없습니다");
             return;
         }
 
@@ -1042,6 +1058,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
             if (!ResourceLoader.Exists(path))
             {
+                Told($"소리 {number} 파일이 없습니다");
                 continue;
             }
 
@@ -1085,6 +1102,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             else if (Emote.Of(motion.Number) is { } emote)
             {
                 actor.Show(emote);
+            }
+            else
+            {
+                Told($"몸동작 {motion.Number} 을 모릅니다");
             }
         }
     }
@@ -1259,6 +1280,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     public override void _Process(double delta)
     {
         Listen();
+        SpendAPoint();
         Wear();
         Crowd();
         Herd();

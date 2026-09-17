@@ -138,6 +138,9 @@ public sealed class WorldClient(WorldSession session)
     private readonly ConcurrentQueue<Effect> _effects = new();
     private readonly ConcurrentQueue<int> _sounds = new();
 
+    private volatile string? _broke;
+    private volatile int _ignored;
+
     private volatile string _said = string.Empty;
     private volatile int _saidCount;
 
@@ -271,7 +274,33 @@ public sealed class WorldClient(WorldSession session)
     };
 
     /// <summary>Reads until the connection ends or the caller stops asking.</summary>
+    /// <summary>
+    /// Why the listening stopped, or nothing while it is still going. A screen shows this — a listener that dies
+    /// silently leaves the character frozen with everything else looking fine (2026-09-18 조사).
+    /// </summary>
+    public string? Broke => _broke;
+
+    /// <summary>How many packets were too short to read. A rise means the server and this client disagree.</summary>
+    public int Ignored => _ignored;
+
     public async Task PumpAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Listen(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // 나가는 길이다 — 알릴 것이 없다.
+        }
+        catch (Exception stopped)
+        {
+            _broke = stopped.Message;
+            throw;
+        }
+    }
+
+    private async Task Listen(CancellationToken cancellationToken)
     {
         MapInfo? map = null;
         Tile? where = null;
@@ -315,6 +344,10 @@ public sealed class WorldClient(WorldSession session)
                     {
                         _motions.Enqueue(ReadMotion(motion));
                     }
+                    else
+                    {
+                        _ignored++;
+                    }
                 }
 
                     continue;
@@ -327,6 +360,10 @@ public sealed class WorldClient(WorldSession session)
                     {
                         _effects.Enqueue(ReadEffect(body));
                     }
+                    else
+                    {
+                        _ignored++;
+                    }
                 }
 
                     continue;
@@ -338,6 +375,10 @@ public sealed class WorldClient(WorldSession session)
                     if (body.Length >= 3)
                     {
                         _sounds.Enqueue(ReadSound(body));
+                    }
+                    else
+                    {
+                        _ignored++;
                     }
                 }
 
