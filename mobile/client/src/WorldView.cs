@@ -1049,6 +1049,54 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _camera.AddChild(flash);
     }
 
+    // 배경음악은 효과음과 따로 한 대에서 돈다 — 맵을 옮기면 갈아 끼우고, 같은 곡이면 이어서 튼다.
+    private AudioStreamPlayer? _band;
+    private int _playing = -1;
+
+    /// <summary>
+    /// Plays the map's music (0x19 with a number of 128 or more). One song at a time, looping, and the same song is
+    /// left alone when the next map asks for it again.
+    /// </summary>
+    private void Band()
+    {
+        while (server is { } world && world.TakeMusic(out int song))
+        {
+            if (song == _playing)
+            {
+                continue;
+            }
+
+            if (song == Music.Silence)
+            {
+                _band?.Stop();
+                _playing = -1;
+                continue;
+            }
+
+            string path = $"res://assets/music/{song}.ogg";
+
+            if (!ResourceLoader.Exists(path))
+            {
+                Told($"곡 {song} 파일이 없습니다");
+                continue;
+            }
+
+            if (_band is null)
+            {
+                _band = new AudioStreamPlayer { Name = "Band" };
+                AddChild(_band);
+            }
+
+            if (GD.Load<AudioStream>(path) is AudioStreamOggVorbis stream)
+            {
+                stream.Loop = true;
+                _band.Stream = stream;
+                _band.Play();
+                _playing = song;
+            }
+        }
+    }
+
     /// <summary>Plays the sounds the server asked for (0x19). The number is the file's name.</summary>
     private void Sounds()
     {
@@ -1287,6 +1335,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Swings();
         Flashes();
         Sounds();
+        Band();
         RehearseAPick();
         HuntOnItsOwn();
 

@@ -137,6 +137,7 @@ public sealed class WorldClient(WorldSession session)
     private readonly ConcurrentQueue<Motion> _motions = new();
     private readonly ConcurrentQueue<Effect> _effects = new();
     private readonly ConcurrentQueue<int> _sounds = new();
+    private readonly ConcurrentQueue<int> _songs = new();
 
     private volatile string? _broke;
     private volatile int _ignored;
@@ -210,6 +211,9 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>Takes the next sound the server asked to be played — the number is the file's name.</summary>
     public bool TakeSound(out int sound) => _sounds.TryDequeue(out sound);
+
+    /// <summary>The next song the server asked for, if it asked. <see cref="Music.Silence" /> means stop.</summary>
+    public bool TakeMusic(out int song) => _songs.TryDequeue(out song);
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
@@ -374,7 +378,17 @@ public sealed class WorldClient(WorldSession session)
 
                     if (body.Length >= 3)
                     {
-                        _sounds.Enqueue(ReadSound(body));
+                        // 같은 패킷이 효과음과 배경음악을 함께 나른다 — 번호가 가른다(Music).
+                        int number = ReadSound(body);
+
+                        if (Music.Song(number) is { } song)
+                        {
+                            _songs.Enqueue(song);
+                        }
+                        else
+                        {
+                            _sounds.Enqueue(number);
+                        }
                     }
                     else
                     {
