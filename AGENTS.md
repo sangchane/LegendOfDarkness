@@ -26,6 +26,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - 다음 할 일(단일 출처): `NEXT.md`
 - 히스토리/핸드오프 로그: `WORKLOG.md`
 - **모바일 클라이언트 — 빌드·실행·인자·함정: `docs/mobile-client.md`** (클라이언트를 만지면 여기부터)
+- **기능 39개가 서버·모바일·원작 중 어디에 있나(패킷 골격 포함): `docs/feature-map.md`** — 새 기능을 만들기 전에 여기부터
 - **원작이 어떻게 했는지 막혔을 때 — 어디를 보나: `docs/where-the-answers-are.md`** (`scripts/find-in-sources.ps1` 한 줄로 참고 저장소 16개 검색)
 - 원작 스프라이트 방향·프레임 구간: `docs/original-sprite-animation.md`
 - 무도가 1~10 기술 모션·이펙트·사운드 근거와 구현 계약: `docs/martial-artist-skill-presentation.md`
