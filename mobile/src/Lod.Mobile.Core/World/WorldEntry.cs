@@ -179,6 +179,19 @@ public sealed record Motion(uint Serial, int Number, int Speed);
 
 public sealed record Effect(uint Target, uint Source, int TargetAnimation, int SourceAnimation, int Speed, Tile? At);
 
+/// <summary>How something was said (0x0D) — the numbers are Hades' own <c>ServerFormat0D.MsgType</c>.</summary>
+public enum SpeechKind : byte
+{
+    Normal = 0,
+    Shout = 1,
+
+    /// <summary>A spell said aloud as it is cast, not somebody talking.</summary>
+    Chant = 2
+}
+
+/// <summary>A line somebody near us said (0x0D). Who they are is looked up by <paramref name="Serial" />.</summary>
+public sealed record Spoken(SpeechKind Kind, uint Serial, string Text);
+
 /// <summary>
 /// One thing in a character's pack. The server sends these one at a time, both on the way in and whenever
 /// something is picked up.

@@ -39,6 +39,9 @@ public sealed class WorldClient(WorldSession session)
     private const byte AttackCommand = 0x13;
     private const byte HealthCommand = 0x13;
     private const byte SpokenCommand = 0x0A;
+
+    /// <summary>What somebody near us said, as opposed to what the server itself says (<see cref="SpokenCommand" />).</summary>
+    private const byte SpeechCommand = 0x0D;
     private const byte BodyMotionCommand = 0x1A;
     private const byte AnimationCommand = 0x29;
     private const byte SoundCommand = 0x19;
@@ -135,6 +138,13 @@ public sealed class WorldClient(WorldSession session)
     private volatile string _said = string.Empty;
     private volatile int _saidCount;
 
+    /// <summary>How many lines of what people said are kept for looking back at.</summary>
+    private const int HeardKept = 60;
+
+    // 받는 쪽은 다른 실이다. 목록을 고치는 대신 새 목록으로 바꿔 끼워, 읽는 쪽이 훑는 도중에 바뀌지 않게 한다.
+    private volatile IReadOnlyList<Spoken> _heard = [];
+    private volatile int _heardTotal;
+
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
     public WorldEntry? State => _state;
 
@@ -194,6 +204,12 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
+
+    /// <summary>The last lines anybody near us said, oldest first.</summary>
+    public IReadOnlyList<Spoken> Heard => _heard;
+
+    /// <summary>How many lines have been heard in all, so a screen can tell a new one from the same one again.</summary>
+    public int HeardCount => _heardTotal;
 
     /// <summary>How many times it has spoken, so a reader can tell a repeat from a new line.</summary>
     public int SaidCount => _saidCount;
@@ -338,6 +354,20 @@ public sealed class WorldClient(WorldSession session)
                     {
                         _said = LegacyKoreanEncoding.DecodeStringB(spoken[1..], out _);
                         _saidCount++;
+                    }
+                }
+
+                    continue;
+
+                case SpeechCommand:
+                {
+                    Spoken spoken = ReadSpoken(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                    // 지난 말은 다시 볼 수 있어야 하지만 접속해 있는 내내 쌓아 둘 것은 아니다.
+                    if (spoken.Text.Length > 0)
+                    {
+                        _heard = [.. _heard.TakeLast(HeardKept - 1), spoken];
+                        _heardTotal++;
                     }
                 }
 
@@ -1143,6 +1173,22 @@ public sealed class WorldClient(WorldSession session)
     }
 
     /// <summary>A skill pane row: slot, icon, then its display name as a short string.</summary>
+    /// <summary>Reads one line of speech (0x0D): how it was said, whose it is, and the words.</summary>
+    public static Spoken ReadSpoken(ReadOnlySpan<byte> body)
+    {
+        const int beforeText = 5;
+
+        if (body.Length < beforeText + 1)
+        {
+            throw new ProtocolException($"누가 한 말이 {beforeText + 1}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        return new Spoken(
+            (SpeechKind)body[0],
+            BinaryPrimitives.ReadUInt32BigEndian(body[1..]),
+            LegacyKoreanEncoding.DecodeStringA(body[beforeText..], out _));
+    }
+
     public static LearnedSkill ReadSkill(ReadOnlySpan<byte> body)
     {
         const int beforeName = 3;

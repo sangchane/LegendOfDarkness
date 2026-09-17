@@ -27,6 +27,14 @@ public partial class GameScreen : Control
     // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
     private int _talked;
     private MessageLog _messages = null!;
+    private ChatPanel _chat = null!;
+
+    /// <summary>What has been said, kept for reading back through — the same lines the log shows as they fade.</summary>
+    private readonly List<(bool Speech, string Text)> _history = [];
+    private const int HistoryKept = 60;
+
+    // 서버가 들려준 말이 몇 줄째인가. 새로 온 것만 적는다.
+    private int _heardSeen;
     private ProgressBar _targetHealth = null!;
     private Control _targetPlate = null!;
     private Control? _placePlate;
@@ -104,6 +112,9 @@ public partial class GameScreen : Control
         _pack.Dropped += slot => _ = Throw(slot);
         _pack.Tidy.Pressed += () => _ = Straighten();
 
+        _chat = new ChatPanel();
+        _chat.Close.Pressed += () => Chatting(false);
+
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
         _talk.Answered += (speaker, step, words) => _ = words is null
@@ -123,10 +134,11 @@ public partial class GameScreen : Control
         rows.AddChild(_topRow);
         rows.AddChild(_packRow = BuildPackRow());
 
-        // 세로에만 있는 기록 줄. 가로에는 자리가 없어 조작 줄 가운데에 두 줄만 둔다(BuildControlRow).
+        // 세로는 기록 줄이 조작 바로 위에 있다. 가로는 그 자리가 없어 방향판 위에 얹는다(BuildControlRow).
         if (Main.Portrait)
         {
-            rows.AddChild(_log = _messages = new MessageLog(3) { CustomMinimumSize = new Vector2(0, LogHeight) });
+            _messages = new MessageLog(3) { CustomMinimumSize = new Vector2(0, LogHeight) };
+            rows.AddChild(_log = BuildMessageRow());
         }
 
         rows.AddChild(_controlRow);
@@ -159,7 +171,10 @@ public partial class GameScreen : Control
         // 위쪽 맵을 남긴다(PackPanel.ShowTab 이 정한다).
         _talk.SizeFlagsVertical = SizeFlags.ExpandFill;
 
-        foreach (Control panel in new Control[] { _pack, _talk })
+        // 대화 창은 제 높이만큼만 아래에 붙는다 — 소지품 한 장과 같다. 긴 이야기는 창 안에서 굴린다.
+        _chat.SizeFlagsVertical = SizeFlags.ShrinkEnd;
+
+        foreach (Control panel in new Control[] { _pack, _talk, _chat })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -337,6 +352,7 @@ public partial class GameScreen : Control
             Notify(server.Said);
         }
 
+        Listen();
         KeepWalking(delta);
         RehearseAHold(delta);
 
@@ -347,6 +363,12 @@ public partial class GameScreen : Control
         if (Main.OpeningPack && !_pack.Visible && _settling++ == settle)
         {
             Carrying(true);
+        }
+
+        // 창이 열려 있는 동안은 새 줄과 탭을 따라간다.
+        if (_chat.Visible)
+        {
+            _chat.Show(_history);
         }
 
         if (_pack.Visible)
@@ -471,8 +493,75 @@ public partial class GameScreen : Control
     private static void Press(Button key, bool down) => Input.ParseInputEvent(
         new InputEventScreenTouch { Index = 0, Pressed = down, Position = key.GetGlobalRect().GetCenter() });
 
-    /// <summary>Adds a line to the messages, which fade on their own once read.</summary>
-    private void Notify(string line) => _messages.Add(line);
+    /// <summary>Adds a line to the messages, which fade on their own once read, and keeps it for reading back through.</summary>
+    private void Notify(string line, bool speech = false)
+    {
+        line = MessageLog.Clean(line);
+        _messages.Add(line);
+
+        if (line.Length == 0)
+        {
+            return;
+        }
+
+        _history.Add((speech, line));
+
+        if (_history.Count > HistoryKept)
+        {
+            _history.RemoveRange(0, _history.Count - HistoryKept);
+        }
+    }
+
+    /// <summary>
+    /// Puts what people nearby said (0x0D) with the rest of the messages. A chant is a spell being said aloud as it is
+    /// cast, not somebody talking, so it is left out.
+    /// </summary>
+    private void Listen()
+    {
+        if (_server is not { } server || server.HeardCount == _heardSeen)
+        {
+            return;
+        }
+
+        int missed = Math.Min(server.HeardCount - _heardSeen, server.Heard.Count);
+        _heardSeen = server.HeardCount;
+
+        foreach (Spoken spoken in server.Heard.TakeLast(missed))
+        {
+            if (spoken.Kind == SpeechKind.Chant)
+            {
+                continue;
+            }
+
+            // 서버가 이미 "이름: 말" 로 보낸다(Hades ServerFormat0D) — 이름을 한 번 더 붙이면 두 번 나온다.
+            Notify(spoken.Text, speech: true);
+        }
+    }
+
+    /// <summary>
+    /// Opens or shuts what has been said. Like the pack it lies over the world, so the world takes no taps or steps
+    /// while it is open, and the two never lie on top of each other.
+    /// </summary>
+    private void Chatting(bool open)
+    {
+        if (open)
+        {
+            if (_pack.Visible)
+            {
+                Carrying(false);
+            }
+
+            if (_talk.Visible)
+            {
+                ShutTalk();
+            }
+
+            _chat.Show(_history);
+        }
+
+        _chat.Visible = open;
+        _world.Frozen = open;
+    }
 
     /// <summary>
     /// Keeps stepping while a direction is held, and lets the pad fade while the character walks so the floor under it
@@ -630,29 +719,41 @@ public partial class GameScreen : Control
         // 세로에서는 가운데 칸 자체를 틈으로 쓴다.
         row.AddThemeConstantOverride("separation", Main.Portrait ? 0 : Main.Gutter);
 
-        row.AddChild(_pad = BuildMovementPad());
+        _pad = BuildMovementPad();
 
-        VBoxContainer middle = new()
+        if (Main.Portrait)
         {
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            SizeFlagsVertical = SizeFlags.ShrinkEnd,
-            Alignment = BoxContainer.AlignmentMode.End,
-            CustomMinimumSize = new Vector2(Main.Portrait ? Main.Gutter : 0, 0),
-            MouseFilter = MouseFilterEnum.Ignore
-        };
+            row.AddChild(_pad);
+        }
+        else
+        {
+            // 가로에는 기록 줄이 들어갈 자리가 없다 — 방향판 위에 얹는다(사용자, 2026-09-18). 판 하나에
+            // 사람들이 한 말과 서버가 한 말이 함께 오른다.
+            _messages = new MessageLog(2) { SizeFlagsHorizontal = SizeFlags.ExpandFill };
 
-        // The messages float over the floor in landscape, on a plate of their own: a line of text on gold tiles is
-        // unreadable without one. Portrait keeps them in a row above the controls instead.
-        if (!Main.Portrait)
-        {
-            middle.AddChild(_messages = new MessageLog(2)
+            VBoxContainer left = new()
             {
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ShrinkEnd
-            });
+                SizeFlagsVertical = SizeFlags.ShrinkEnd,
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            left.AddThemeConstantOverride("separation", Main.Gutter);
+            left.AddChild(BuildMessageRow());
+            left.AddChild(_pad);
+
+            row.AddChild(left);
         }
 
-        row.AddChild(middle);
+        // 세로는 방향판과 부채꼴 사이의 틈이 이 칸이다(360 폭에 152 + 8 + 184). 가로는 기록 줄이 방향판 위로
+        // 올라가 비었으므로 두지 않는다 — 두면 남는 폭을 반씩 가져가 기록 줄이 좁아진다.
+        if (Main.Portrait)
+        {
+            row.AddChild(new Control
+            {
+                CustomMinimumSize = new Vector2(Main.Gutter, 0),
+                MouseFilter = MouseFilterEnum.Ignore
+            });
+        }
 
         _abilities = new AbilityBar { SizeFlagsVertical = SizeFlags.ShrinkEnd };
         _abilities.SkillUsed += slot => _world.UseSkill(slot);
@@ -747,6 +848,27 @@ public partial class GameScreen : Control
         }
 
         return pad;
+    }
+
+    /// <summary>The messages with the button that opens what was said — the lines fade, this brings them back.</summary>
+    private Control BuildMessageRow()
+    {
+        HBoxContainer row = new() { MouseFilter = MouseFilterEnum.Ignore };
+        row.AddThemeConstantOverride("separation", Main.Gutter);
+
+        _messages.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        row.AddChild(_messages);
+
+        Button said = new()
+        {
+            Text = "대화",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
+            SizeFlagsVertical = SizeFlags.ShrinkEnd
+        };
+        said.Pressed += () => Chatting(true);
+        row.AddChild(said);
+
+        return row;
     }
 
     private static Label Aux(string text)

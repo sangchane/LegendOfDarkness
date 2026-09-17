@@ -36,6 +36,8 @@ public sealed partial class MessageLog : PanelContainer
 
     public void Add(string text)
     {
+        text = Clean(text);
+
         if (text.Length == 0)
         {
             return;
@@ -59,6 +61,12 @@ public sealed partial class MessageLog : PanelContainer
             _shown.RemoveAt(0);
         }
     }
+
+    /// <summary>
+    /// Throws away what cannot be read. The server sends lines that are a single zero byte, or a bare newline (실제
+    /// 서버에서 봤다) — as a line each of those is an empty plate lying over the map.
+    /// </summary>
+    public static string Clean(string text) => new string([.. text.Where(letter => !char.IsControl(letter))]).Trim();
 
     public override void _Process(double delta)
     {
