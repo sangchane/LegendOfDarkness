@@ -50,9 +50,17 @@ public static class Wardrobe
 
         Add('l', worn.Boots, worn.BootColor);
         Add('u', worn.Armor);
+
+        // The 5.99 client also asks for these, by the same numbers (Legend.exe 0x4e8514): the arms that go with
+        // an armour, a front piece of a weapon, and a front and a back piece of a head. Most numbers have none,
+        // and a piece with no drawing is simply left out by the caller.
+        Add('a', worn.Armor);
         Add('i', worn.OverCoat);
         Add('w', worn.Weapon);
+        Add('p', worn.Weapon);
         Add('h', worn.Head, worn.HairColor);
+        Add('e', worn.Head, worn.HairColor);
+        Add('f', worn.Head, worn.HairColor);
         Add('c', worn.HeadAccessory1);
         Add('c', worn.HeadAccessory2);
 
@@ -65,5 +73,19 @@ public static class Wardrobe
                 pieces.Add(new Piece($"{gender}{part}{number:000}", colour));
             }
         }
+    }
+
+    // Legend.exe 0x69c200: the order a figure is stacked in, bottom first, as part letters. Facing us (east, south)
+    // the weapon is lowest so the body and arms cover the hand that holds it; from behind (north, west) it goes over
+    // the body but under the arms and head. The shield is lowest from behind and near the top facing us. The table
+    // has no overcoat — that client never draws one — so it sits with the armour it is worn over.
+    private const string FromBehind = "sbnluidfwahepc";
+    private const string FacingUs = "wfbnlhuidaepsc";
+
+    /// <summary>Where a piece with this part letter goes in the stack, bottom first. Unknown letters go on top.</summary>
+    public static int Rank(char part, Art.Side side)
+    {
+        int at = (side == Art.Side.Back ? FromBehind : FacingUs).IndexOf(char.ToLowerInvariant(part));
+        return at < 0 ? int.MaxValue : at;
     }
 }

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
@@ -28,9 +30,10 @@ public sealed partial class Actor : Node2D
     /// file of its own rather than further along the walk, so this is a second set of sheets and not a
     /// range of frames. Empty for anything with no blow of its own to draw.
     /// </param>
-    /// <param name="Shield">
-    /// Which layer is a shield, or below zero for none. It goes behind the figure when its back is turned and in
-    /// front of everything when it faces us (docs/original-sprite-animation.md 2.1).
+    /// <param name="Parts">
+    /// The part letter of each layer (b body, w weapon, s shield …), one for one with <paramref name="Paths" />, so
+    /// the layers can be stacked in the order the original client stacks them for the way the figure faces
+    /// (<see cref="Wardrobe.Rank" />). Empty for a sheet drawn as one piece.
     /// </param>
     public sealed record Sheet(
         IReadOnlyList<string> Paths,
@@ -41,7 +44,7 @@ public sealed partial class Actor : Node2D
         float FeetY,
         IReadOnlyList<string> StrikePaths,
         CreatureMotion? Motion = null,
-        int Shield = -1)
+        IReadOnlyList<char>? Parts = null)
     {
         public static Sheet Walk(params string[] paths) => Walk(paths, new int[paths.Length], []);
 
@@ -49,8 +52,8 @@ public sealed partial class Actor : Node2D
             IReadOnlyList<string> paths,
             IReadOnlyList<int> colours,
             IReadOnlyList<string> striking,
-            int shield = -1) =>
-            new(paths, colours, 120, 96, 31.5f, 83f, striking, Shield: shield);
+            IReadOnlyList<char>? parts = null) =>
+            new(paths, colours, 120, 96, 31.5f, 83f, striking, Parts: parts);
 
         /// <summary>
         /// A creature draws from one sheet and numbers its own frames. Its <paramref name="motion" /> comes
@@ -135,9 +138,15 @@ public sealed partial class Actor : Node2D
         // Mirroring about this node's origin keeps the feet where they were.
         Scale = new Vector2(facing.Mirror ? -1 : 1, 1);
 
-        if (_sheet.Shield >= 0 && _sheet.Shield < _sprites.Count)
+        if (_sheet.Parts is { } parts && parts.Count == _sprites.Count)
         {
-            MoveChild(_sprites[_sheet.Shield], facing.Side == Lod.Mobile.Core.Art.Side.Back ? 0 : GetChildCount() - 1);
+            // Bottom first, as Legend.exe stacks a figure for this side — facing us the weapon goes under the body.
+            int place = 0;
+
+            foreach (int layer in Enumerable.Range(0, _sprites.Count).OrderBy(layer => Wardrobe.Rank(parts[layer], facing.Side)))
+            {
+                MoveChild(_sprites[layer], place++);
+            }
         }
 
         ShowFrame(_sheet.Motion?.Stand(facing.Side) ?? WalkMotion.Stand(facing.Side));

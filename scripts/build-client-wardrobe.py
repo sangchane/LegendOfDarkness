@@ -12,7 +12,7 @@
 이 손으로 적어 둔 부위(몸·바지·머리 모양)와 직업 의상을 더한다. 파일 이름은 `mb001.png`(01) · `mb00102.png`(02) ·
 `mb001d.png`(기술 동작). 칸·발 기준은 모두 같다(120x96, 표시색 염색).
 
-**부위마다 한 아카이브에서 전부 뽑는다 — 5.99 한국 클라이언트에 그 부위가 있으면 5.99.** 몸·신발·머리는 두
+**부위마다 한 아카이브에서 전부 뽑는다 — 5.99 한국 클라이언트에 그 부위가 있으면 5.99(무기·무기 앞 조각만 하데스 우선, `archives`).** 몸·신발·머리는 두
 아카이브가 같지만 바지·갑옷은 5.99 쪽 그림이 다르다(`mn00101` 하데스 6,071 · 5.99 4,716 바이트). 하데스
 바지는 동작 칸도 모자라(`mn001c` 14칸 · 5.99 30칸) 전사 139~141 에서 바지가 사라졌다. 걷기는 하데스, 기술은
 5.99 로 섞으면 옷이 동작마다 바뀌므로 그런 부위는 `01`·`02` 도 5.99 에서 다시 뽑는다.
@@ -20,7 +20,7 @@
 그리지 않는다. **직업 동작은 그 직업 의상에서만 원작이 지원한다**(`skill.tbl` ST) — 기본 옷으로 깨져 보이는
 것은 원작도 그렇다. 그래서 동작 확인용으로 전사 옷 2번 · 도적 옷 4번을 함께 뽑는다.
 
-  쓰는 법: python3 scripts/build-client-wardrobe.py [이어서 시작할 부위, 예: mu156]
+  쓰는 법: python3 scripts/build-client-wardrobe.py [--새것만] [이어서 시작할 부위, 예: mu156]
   산출물:  mobile/client/assets/actor/parts/<부위>.png · <부위>02.png · <부위><글자>.png
 """
 import json
@@ -54,12 +54,24 @@ ITEMS = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / 
 #: 아이템 스크립트 → 입은 그림의 부위 글자(docs/original-sprite-animation.md 7절).
 SLOTS = {"Armor": "u", "Weapon": "w", "Helmet": "h", "Shield": "s", "Boot": "l"}
 
+#: 5.99 클라이언트가 같은 번호로 함께 부르는 조각(Legend.exe 0x4e8514) — 갑옷의 팔(a), 무기의 앞 조각(p),
+#: 머리의 앞·뒤 조각(e·f). 번호 대부분은 조각이 없으므로 아카이브에 있는 것만 뽑는다.
+COMPANIONS = {"u": "a", "w": "p", "h": "ef"}
+
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
 
-def archives(gender):
+def archives(gender, part=""):
+    """찾아볼 아카이브 순서.
+
+    무기(w)·무기 앞 조각(p)만 하데스가 먼저다. 우리가 가진 5.99 한국 클라이언트는 무기 27개 번호의 그림이 다른
+    무기로 바뀌어 있는데, 5.99 팩 아이템 이름에 맞는 것은 하데스 쪽 그림이다 — 3 커틀라스(하데스 칼 ↔ 5.99 고리
+    철퇴), 6 설단검 등 단검 4종(단검 ↔ 가시 곤봉), 7 마르시아(지팡이 ↔ 사슬 낫), 11 매스케이드(Masquerade 칼 ↔
+    도리깨). 갑옷·투구·바지는 같은 옷을 다시 그린 것이라 칸이 더 많은 5.99 쪽을 먼저 본다.
+    """
     name = "khan.dat" if gender == "m" else "khan2.dat"
-    return [KOREAN / name, HADES / name.removesuffix(".dat") / name]
+    korean, hades = KOREAN / name, HADES / name.removesuffix(".dat") / name
+    return [hades, korean] if part in ("w", "p") else [korean, hades]
 
 
 def entries(archive):
@@ -86,7 +98,9 @@ def worn_by_items():
         if letter == "h" and image <= 100:
             continue
         genders = {1: "m", 2: "w"}.get(template.get("Gender"), "mw")
-        found.update(f"{gender}{letter}{image:03d}" for gender in genders)
+        for gender in genders:
+            for part in letter + COMPANIONS.get(letter, ""):
+                found.add(f"{gender}{part}{image:03d}")
     return found
 
 
@@ -109,16 +123,22 @@ def main():
 
     pieces = sorted({p.stem for p in PARTS.glob("*.png") if re.fullmatch(r"[mw][a-z]\d{3}", p.stem)}
                     | set(CLASS_CLOTHES) | worn_by_items())
+    # 새것만: 서기 그림이 아직 없는 부위만(옷장을 이미 최신 도구로 뽑아 둔 뒤 아이템이 늘었을 때).
+    if "--새것만" in sys.argv:
+        pieces = [piece for piece in pieces if not (PARTS / f"{piece}.png").exists()]
     # 이어서 돌릴 때: 그 부위부터(이름 순).
-    if len(sys.argv) > 1:
-        pieces = [piece for piece in pieces if piece >= sys.argv[1]]
+    starts = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
+    if starts:
+        pieces = [piece for piece in pieces if piece >= starts[0]]
     made, missing, skipped = 0, [], []
     listed = {archive: entries(archive) for gender in "mw" for archive in archives(gender)}
     for piece in pieces:
         # 그 부위의 서기·걷기가 있는 첫 아카이브(5.99 → 하데스).
-        archive = next((a for a in archives(piece[0]) if f"{piece}01" in listed[a]), None)
+        archive = next((a for a in archives(piece[0], piece[1]) if f"{piece}01" in listed[a]), None)
         if archive is None:
-            missing.append(piece)
+            # 딸린 조각(a·p·e·f)은 없는 번호가 대부분이라 없다고 적지 않는다.
+            if piece[1] not in "apef":
+                missing.append(piece)
             continue
         source = "5.99" if archive.is_relative_to(KOREAN) else "하데스"
         files = []

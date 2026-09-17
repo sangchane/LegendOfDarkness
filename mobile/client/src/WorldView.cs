@@ -475,7 +475,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         List<string> paths = [];
         List<int> colours = [];
         List<string> striking = [];
-        int shield = -1;
+        List<char> parts = [];
 
         foreach (Piece piece in Wardrobe.Pieces(one.Wearing))
         {
@@ -486,20 +486,16 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 continue;
             }
 
-            if (piece.Name[1] == 's')
-            {
-                shield = paths.Count;
-            }
-
             paths.Add(path);
             colours.Add(piece.Colour);
+            parts.Add(piece.Name[1]);
 
             // A piece with no swing of its own is left out while the rest of the figure swings (Actor.Play).
             string swung = $"{PartsFolder}{piece.Name}02.png";
             striking.Add(ResourceLoader.Exists(swung) ? swung : path);
         }
 
-        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, striking, shield) : Actor.Sheet.Walk(OtherSheet);
+        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, striking, parts) : Actor.Sheet.Walk(OtherSheet);
     }
 
     /// <summary>

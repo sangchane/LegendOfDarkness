@@ -887,7 +887,9 @@ internal static class Program
             // 111x85, and trusting it left every such sword 27 pixels out of the hand. The atlases the
             // reference client ships give all 9,962 men's weapon frames and every accessory 111x85, and every
             // other piece 57x85 (sources/FallenDev/dark-ages-ts/apps/client/public/aislings/*/*.atlas).
-            int canvasWidth = layer.Length > 1 && char.ToLowerInvariant(layer[1]) is 'w' or 'c'
+            // The front piece of a weapon (p, drawn over the body with the weapon's number) sits on the weapon's
+            // canvas too: mp127's frames are placed exactly where mw127's are.
+            int canvasWidth = layer.Length > 1 && char.ToLowerInvariant(layer[1]) is 'w' or 'c' or 'p'
                 ? ReachingWidth
                 : WardrobeWidth;
             int shiftX = (canvasWidth - WardrobeWidth) / 2;
