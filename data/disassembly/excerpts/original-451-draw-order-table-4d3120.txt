@@ -1,0 +1,7 @@
+; 그리는 순서표 — lodr4.51 Legend.exe 가상주소 0x4d3120 (파일 0xd3120), 방향마다 12바이트, ff = 빈 자리
+; 부위 글자표 "SBNLHUDCHAWS" (0x50ba64, 성별 "MW" 는 바로 뒤 0x50ba70) 의 번호다. 방향: 0 북 · 1 동 · 2 남 · 3 서
+; 5.99(2005) 의 15칸 표 0x69c200 과 달리 P·E·F 가 없고, 네 방향 모두 무기 W 가 팔 A 위다
+dir 0  0x4d3120: 00 01 02 03 04 05 06 07 08 09 0a 0b   → S B N L H U D C H A W S
+dir 1  0x4d312c: 00 01 02 03 04 05 06 07 ff 09 0a 0b   → S B N L H U D C - A W S
+dir 2  0x4d3138: 00 01 02 03 04 05 06 07 ff 09 0a 0b   → S B N L H U D C - A W S
+dir 3  0x4d3144: 00 01 02 03 04 05 06 07 08 09 0a 0b   → S B N L H U D C H A W S

@@ -1,0 +1,220 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "원작 게임 프로그램을 뜯어서 알게 된 것",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "external": {
+          "label": "원작 파일"
+        },
+        "backend": {
+          "label": "한 일"
+        },
+        "database": {
+          "label": "적어 둔 곳"
+        },
+        "frontend": {
+          "label": "찾아보는 곳"
+        },
+        "messagebus": {
+          "label": "파일을 견줘서 안 것"
+        },
+        "security": {
+          "label": "명령어를 읽어서 안 것"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "work",
+      "label": "한 일"
+    },
+    {
+      "id": "found",
+      "label": "알게 된 것"
+    }
+  ],
+  "mainPath": [
+    "installers",
+    "unpack",
+    "read",
+    "record",
+    "graph"
+  ],
+  "nodes": [
+    {
+      "id": "installers",
+      "lane": "work",
+      "col": 0,
+      "type": "external",
+      "label": "원작 설치 파일 2개",
+      "sublabel": "2001년판 · 2005년판",
+      "width": 180
+    },
+    {
+      "id": "unpack",
+      "lane": "work",
+      "col": 1,
+      "type": "backend",
+      "label": "상자 풀기",
+      "sublabel": "안에서 게임 프로그램 꺼내기",
+      "width": 180
+    },
+    {
+      "id": "read",
+      "lane": "work",
+      "col": 2,
+      "type": "backend",
+      "label": "명령어 읽기",
+      "sublabel": "프로그램을 사람 말로 옮기기",
+      "width": 180
+    },
+    {
+      "id": "record",
+      "lane": "work",
+      "col": 3,
+      "type": "database",
+      "label": "규칙 적기",
+      "sublabel": "근거 주소까지 함께",
+      "width": 180
+    },
+    {
+      "id": "graph",
+      "lane": "work",
+      "col": 4,
+      "type": "frontend",
+      "label": "지식 그래프",
+      "sublabel": "물어보면 근거가 나온다",
+      "width": 180
+    },
+    {
+      "id": "same-exe",
+      "lane": "found",
+      "col": 0,
+      "type": "messagebus",
+      "label": "2005년판 = 5.99판",
+      "sublabel": "똑같은 프로그램이었다",
+      "width": 180
+    },
+    {
+      "id": "weapon-art",
+      "lane": "found",
+      "col": 1,
+      "type": "messagebus",
+      "label": "무기 그림은 팩이 바꿨다",
+      "sublabel": "원작 197/200 = 하데스",
+      "width": 180
+    },
+    {
+      "id": "armor-gate",
+      "lane": "found",
+      "col": 2,
+      "type": "security",
+      "label": "기술 몸짓은 옷이 허락",
+      "sublabel": "옷이 표에 없으면 안 움직임",
+      "width": 180
+    },
+    {
+      "id": "draw-order",
+      "lane": "found",
+      "col": 3,
+      "type": "security",
+      "label": "옛날판 겹치는 순서",
+      "sublabel": "무기가 늘 팔 위에 그려짐",
+      "width": 180
+    },
+    {
+      "id": "effect-speed",
+      "lane": "found",
+      "col": 4,
+      "type": "security",
+      "label": "이펙트 속도 = 한 칸 시간",
+      "sublabel": "칸마다 다시 잰다",
+      "width": 180
+    }
+  ],
+  "edges": [
+    {
+      "id": "take-out",
+      "from": "installers",
+      "to": "unpack"
+    },
+    {
+      "id": "open-program",
+      "from": "unpack",
+      "to": "read",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "write-down",
+      "from": "read",
+      "to": "record"
+    },
+    {
+      "id": "make-graph",
+      "from": "record",
+      "to": "graph",
+      "label": "graphify",
+      "variant": "emphasis"
+    },
+    {
+      "id": "art-compare",
+      "from": "unpack",
+      "to": "weapon-art",
+      "label": "견줘 보기",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    {
+      "id": "find-armor",
+      "from": "read",
+      "to": "armor-gate",
+      "role": "branch",
+      "label": "읽어 보기",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "쉽게 말하면",
+      "items": [
+        "설치 파일을 풀어 게임 프로그램을 꺼냈다",
+        "프로그램 속 명령어를 읽어 숨은 규칙을 찾았다",
+        "규칙마다 어느 줄에서 봤는지 주소를 붙였다"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "그래서 우리 게임에는",
+      "items": [
+        "무기 그림은 하데스 것을 쓰는 게 맞다",
+        "기술 몸짓에 옷 검사를 넣을지 정할 차례다",
+        "궁금하면 그래프에 물어 근거를 바로 본다"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "id": "g-compare",
+      "label": "파일을 견줘서 안 것",
+      "lane": "found",
+      "fromCol": 0,
+      "toCol": 1,
+      "variant": "dashed"
+    },
+    {
+      "id": "g-code",
+      "label": "명령어를 읽어서 안 것",
+      "lane": "found",
+      "fromCol": 2,
+      "toCol": 4,
+      "variant": "dashed"
+    }
+  ]
+}

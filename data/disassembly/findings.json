@@ -1,5 +1,5 @@
 {
-  "설명": "5.99 서버팩·5.99 한국 클라이언트 실행 파일을 역어셈블해서 확인한 사실. 규칙마다 근거 주소가 있다. 그래프: python3 scripts/build-disassembly-graph.py",
+  "설명": "5.99 서버팩·5.99 한국 클라이언트·원작 4.51(2001) 클라이언트 실행 파일을 역어셈블해서 확인한 사실. 규칙마다 근거 주소가 있다. 그래프: python3 scripts/build-disassembly-graph.py",
   "갱신": "2026-09-17",
   "binaries": [
     {
@@ -19,7 +19,19 @@
       "md5": "347dc3813e25d3daefdccfe2547dd128",
       "format": "PE32 i386 GUI",
       "role": "5.99 클라이언트 — 사람 그림 겹치기·파일 이름·EPF 읽기",
-      "sections": ".text 0x427000 · .rdata 0x680000 · .data 0x686000(파일 0x286000) · .data1 0x846000(파일 0x2c4000)"
+      "sections": ".text 0x427000 · .rdata 0x680000 · .data 0x686000(파일 0x286000) · .data1 0x846000(파일 0x2c4000)",
+      "original": "원작 설치본 sources/lodr.exe(174,228,727 · InstallShield 6, 2005-03-18) 안의 Legend.exe 와 md5 가 같다 — 2005-03-17 빌드 그대로다"
+    },
+    {
+      "id": "original-451",
+      "name": "Legend.exe (lodr4.51)",
+      "path": "D:\\_personal\\LOD\\sources\\lodr4.51.exe → Program Executable Files\\Legend.exe",
+      "size": 1134661,
+      "md5": "eade71db31edbefd20e5ef22d455a078",
+      "format": "PE32 i386 GUI",
+      "role": "원작 한국 클라이언트 2001-12-07 빌드 — 사람 그림 12부위·동작 고르기·Skill.tbl·이펙트·괴물 그림",
+      "sections": ".text 0x40c000 · .rdata 0x4c6000 · .data 0x4c7000(파일 0xc7000) · .data1 0x4fd000(파일 0xe0000)",
+      "installer": "lodr4.51.exe 59,050,364 바이트 — InstallShield 6(data1.hdr·data1.cab·data2.cab). unshield x data1.cab 로 푼다"
     }
   ],
   "functions": [
@@ -122,6 +134,94 @@
       "name": "EPF 읽기",
       "role": "u16 칸 수를 읽고 6바이트 건너뛰고(0x4e88bc) u32 표 위치만 읽는다 — 바탕 크기 칸은 안 읽는다",
       "excerpt": "data/disassembly/excerpts/legend-epf-loader-4e8854.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x44a480",
+      "name": "겹치기 감싸는 함수",
+      "role": "인자: 방향 · 겉모습 · 동작 · 칸 · 출력 · 기술(없으면 -1) · 감정. 부르는 곳 0x449acc·0x449b07·0x449b42(세계), 0x45a6b9·0x47419e(창)"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x44a4c0",
+      "name": "사람 그림 겹치기",
+      "role": "방향*12 로 순서표 0x4d3120 을 읽어 부위 12개를 이름 짓고 111×85 바탕에 +27 옮겨 쌓는다",
+      "excerpt": "data/disassembly/excerpts/original-451-compose-44a4c0.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x4611b0",
+      "name": "패킷 디스패처",
+      "role": "버퍼[0] opcode 로 점프표 0x510a54(0x03~0x4B)",
+      "excerpt": "data/disassembly/excerpts/original-451-motion-packet-463824.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x463824",
+      "name": "0x1A 몸 동작 받기",
+      "role": "id·동작·속도를 읽고 속도×10 으로 객체 가상함수 +0x68 을 부른다",
+      "excerpt": "data/disassembly/excerpts/original-451-motion-packet-463824.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x449300",
+      "name": "사람 몸 동작 고르기",
+      "role": "사람 객체(vtable 0x50b844) +0x68. 동작 번호를 상태로 바꾸고, 기술 동작은 갑옷 번호로 거른다",
+      "excerpt": "data/disassembly/excerpts/original-451-set-motion-449300.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x449b64",
+      "name": "상태 → 파일·칸",
+      "role": "상태별로 01·02·03 파일과 칸 번호(시작 + 단계 + 방향×칸 수)를 고른다. 남=동·서=북 을 뒤집어 쓴다"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x455d90",
+      "name": "Skill.tbl 읽기",
+      "role": "줄마다 NO FN SI FC ST… 를 표 0x4de6e0 에 적는다",
+      "excerpt": "data/disassembly/excerpts/original-451-skill-tbl-loader-455d90.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x44ba04",
+      "name": "EPF 칸 읽기",
+      "role": "칸 수·표 위치만 읽고 16바이트 칸 사각형을 꺼낸다. Efct 이름이면 .tbl 의 x·y",
+      "excerpt": "data/disassembly/excerpts/original-451-epf-loader-44ba04.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x4638a4",
+      "name": "0x29 이펙트 받기",
+      "role": "대상 id·이펙트 번호(byte)·속도(·x·y). 0xfa~0xfd 는 화면 효과",
+      "excerpt": "data/disassembly/excerpts/original-451-effect-483870.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x483870",
+      "name": "이펙트 한 칸 넘기기",
+      "role": "Effect.tbl 줄에서 다음 칸, 0xff 면 끝. 칸마다 속도 간격 타이머",
+      "excerpt": "data/disassembly/excerpts/original-451-effect-483870.asm"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x44adb0",
+      "name": "괴물 MPF 칸 읽기",
+      "role": "mns%03d.mpf. 칸 = 시작 + 단계 % 칸 수",
+      "excerpt": "data/disassembly/excerpts/original-451-mpf-loader-44adb0.asm"
+    },
+    {
+      "binary": "client",
+      "address": "0x4e1020",
+      "name": "사람 몸 동작 고르기",
+      "role": "0x1A 가 부르는 사람 객체 함수. 4.51 과 같은 규칙에 괴물 모습([+0x369]==0) 갈래가 붙었다",
+      "excerpt": "data/disassembly/excerpts/original-2005-set-motion-4e1020.asm"
+    },
+    {
+      "binary": "client",
+      "address": "0x5210f0",
+      "name": "Skill.tbl 읽기",
+      "role": "4.51 과 같은 읽기. 표 0x723200"
     }
   ],
   "offsets": [
@@ -372,6 +472,189 @@
       "struct": "appearance",
       "offset": "0x1C",
       "meaning": "방패 번호 — S. 255 면 방패 없음"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x00",
+      "meaning": "성별 — \"MW\"(0x50ba70)[값]. 방패는 늘 M"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x01",
+      "meaning": "머리 번호(byte) — H(부위 4·8)"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x02",
+      "meaning": "머리를 그릴 때 0x442c20 에 함께 넘기는 byte(5.99 염색 자리로 보이나 확인 못 함)"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x03",
+      "meaning": "몸 번호(byte) — B"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x04",
+      "meaning": "팔 번호(word) — A"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x06",
+      "meaning": "신발 번호(byte) — L"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x07",
+      "meaning": "신발을 그릴 때 0x442c20 에 함께 넘기는 byte"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x08",
+      "meaning": "바지 번호(byte) — N"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x09",
+      "meaning": "바지를 그릴 때 0x442c20 에 함께 넘기는 byte"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x0A",
+      "meaning": "갑옷 번호(word) — U. 기술 동작을 허락할지 이 번호로 정한다"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x0C",
+      "meaning": "D 번호(byte)"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x0D",
+      "meaning": "무기 번호(byte) — W. 255 까지만"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x0E",
+      "meaning": "C 번호(byte)"
+    },
+    {
+      "binary": "original-451",
+      "struct": "appearance",
+      "offset": "0x0F",
+      "meaning": "방패 번호(byte) — S. 0xff 면 방패 없음",
+      "read_by": [
+        "0x44a5c1",
+        "0x44a7b2",
+        "0x44aadb"
+      ]
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x10C",
+      "meaning": "방향(0 북 1 동 2 남 3 서)"
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x110",
+      "meaning": "상태 — 0·1 서기·걷기 · 3 평타 · 4 동작 6 · 5 기술 · 6 감정 · 7 동작 21 · 8 동작 22",
+      "read_by": [
+        "0x449b9e"
+      ],
+      "written_by": [
+        "0x449333",
+        "0x4494ec"
+      ]
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x148",
+      "meaning": "겉모습 16바이트 시작(생성자 0x44912d 가 담는다)"
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x152",
+      "meaning": "갑옷 번호 = 겉모습+0x0A",
+      "read_by": [
+        "0x4494da"
+      ],
+      "written_by": [
+        "0x44912d"
+      ]
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x140",
+      "meaning": "기술 FN — 파일 이름 'a'+FN"
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x132",
+      "meaning": "기술 SI(시작 칸)"
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x13C",
+      "meaning": "기술 FC+1"
+    },
+    {
+      "binary": "original-451",
+      "struct": "human",
+      "offset": "0x142",
+      "meaning": "감정 번호 — emot01.epf 칸"
+    },
+    {
+      "binary": "client",
+      "struct": "human",
+      "offset": "0x268",
+      "meaning": "겉모습 기록 시작(0x4e266d)"
+    },
+    {
+      "binary": "client",
+      "struct": "human",
+      "offset": "0x27A",
+      "meaning": "갑옷 번호 = 겉모습+0x12 — 기술 동작 허락",
+      "read_by": [
+        "0x4e1161"
+      ]
+    },
+    {
+      "binary": "client",
+      "struct": "human",
+      "offset": "0x208",
+      "meaning": "상태(4.51 의 +0x110)"
+    },
+    {
+      "binary": "client",
+      "struct": "human",
+      "offset": "0x369",
+      "meaning": "0 이면 괴물 모습 — 0x4e3224 가 번호-0x4000 으로 mns 그림을 읽을 때 0 으로 둔다",
+      "read_by": [
+        "0x4e1040"
+      ],
+      "written_by": [
+        "0x4e3285"
+      ]
     }
   ],
   "tables": [
@@ -414,6 +697,66 @@
       "address": "0x41d581",
       "name": "속성→장비 자리 점프표",
       "content": "속성 0·12·13 → 자리 0(+0x178) · 1 → 자리 1 · 2 → 자리 2 · 10 → 자리 12"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x4d3120",
+      "file_offset": "0xd3120",
+      "name": "그리는 순서표(4.51)",
+      "shape": "방향 4 × 12바이트, ff 빈 자리",
+      "rows": {
+        "북(0)": "S B N L H U D C H A W S",
+        "동(1)": "S B N L H U D C - A W S",
+        "남(2)": "S B N L H U D C - A W S",
+        "서(3)": "S B N L H U D C H A W S"
+      },
+      "note": "P·E·F 가 없다. 네 방향 모두 무기 W 가 팔 A 위. 뒷모습은 머리 H 를 갑옷 아래·위 두 번 그린다",
+      "excerpt": "data/disassembly/excerpts/original-451-draw-order-table-4d3120.txt"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x50ba64",
+      "file_offset": "0xeea64",
+      "name": "부위 글자표(4.51)",
+      "content": "SBNLHUDCHAWS — 부위 0~11. 바로 뒤 0x50ba70 \"MW\" 성별"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x50ba34",
+      "name": "부위 번호 점프표(4.51)",
+      "content": "부위마다 겉모습 기록의 어느 칸에서 번호를 읽나(appearance 오프셋 참조)"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x50ba00",
+      "name": "부위 그리기 점프표(4.51)",
+      "content": "부위+1 로 뛴다. 0 뒷방패 · 2 N · 3 L · 4·8 H 는 0x442c20, 11 앞방패, 나머지 0x445b40"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x510a54",
+      "name": "패킷 opcode 점프표(4.51)",
+      "content": "0x03~0x4B. 0x1A → 0x463824 · 0x29 → 0x4638a4 · 0x33 → 0x462e40"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x50b4bc",
+      "name": "몸 동작 번호 점프표(4.51)",
+      "content": "1 → 상태 3 · 6 → 상태 4 · 9~17 → 감정(앞모습만) · 21 → 7 · 22 → 8 · 2~5·7·8·18~20 무시"
+    },
+    {
+      "binary": "original-451",
+      "address": "0x4de6e0",
+      "name": "기술 표(4.51, Skill.tbl)",
+      "shape": "기술당 0x20C: FN · SI · FC+1 · 옷 번호별 허용 512바이트",
+      "content": "0x455d90 이 채우고 0x449300 이 읽는다"
+    },
+    {
+      "binary": "client",
+      "address": "0x723200",
+      "name": "기술 표(2005, skill.tbl)",
+      "shape": "4.51 과 같은 모양",
+      "content": "0x5210f0 이 채우고 0x4e1020 이 읽는다"
     }
   ],
   "packets": [
@@ -631,6 +974,203 @@
         "0x4e89d5"
       ],
       "implemented": "dat-extract pose — 바탕은 머리말이 아니라 부위 글자로(w·c·p 111, 나머지 57)"
+    },
+    {
+      "id": "orig451-draw-order",
+      "binary": "original-451",
+      "statement": "사람 그림은 12부위 SBNLHUDCHAWS 를 순서표 0x4d3120 대로 쌓는다. 네 방향 모두 무기 W 가 팔 A 위이고 P(무기 앞 조각)·E·F 가 없다. 5.99(2005) 는 15부위이고 앞모습에서 무기가 맨 아래다 — 다르다",
+      "evidence": [
+        "0x4d3120",
+        "0x44a5a0",
+        "0x44a9eb"
+      ],
+      "implemented": "해당 없음 — 모바일은 5.99 순서(Wardrobe.Rank)를 쓴다"
+    },
+    {
+      "id": "orig451-hair-twice",
+      "binary": "original-451",
+      "statement": "뒷모습(북·서)은 머리 H 를 갑옷 아래(부위 4)와 C 위(부위 8)에 두 번 그리고, 앞모습은 부위 8 을 뺀다. 5.99 는 머리를 한 번 그린다 — 다르다",
+      "evidence": [
+        "0x4d3120",
+        "0x44a864",
+        "0x44a944"
+      ],
+      "implemented": "해당 없음"
+    },
+    {
+      "id": "orig451-shield-sides",
+      "binary": "original-451",
+      "statement": "뒷방패(부위 0)는 방향 0·3, 앞방패(부위 11)는 방향 1·2 에서만. 방패 번호 0xff 면 안 그린다 — 5.99 와 같다",
+      "evidence": [
+        "0x44a7a7",
+        "0x44a9ae",
+        "0x44aad8"
+      ],
+      "implemented": "Wardrobe.Rank"
+    },
+    {
+      "id": "orig451-shield-always-male",
+      "binary": "original-451",
+      "statement": "방패(부위 0·11)는 여자여도 늘 M 파일 — 5.99 와 같다",
+      "evidence": [
+        "0x44a5e3",
+        "0x44a5fd"
+      ],
+      "implemented": "옮기지 않음 — 우리 Wardrobe 는 여자에게 ws### 를 찾는다"
+    },
+    {
+      "id": "orig451-emote-strips",
+      "binary": "original-451",
+      "statement": "동작 2(03 파일)일 때 방패 둘과 무기 W 를 뺀다 — 5.99 와 같다(4.51 에는 P 가 없다)",
+      "evidence": [
+        "0x44a5ac",
+        "0x44ab1a"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "orig451-name-parts",
+      "binary": "original-451",
+      "statement": "파일 이름은 성별 + 부위 글자 + %03d + 기술 글자('a'+FN) 또는 %02d.epf(동작+1). 번호 0 이면 안 그린다 — 형식은 5.99 와 같고, 겉모습 칸 배치(16바이트, 무기 1바이트)는 다르다",
+      "evidence": [
+        "0x44a5f2",
+        "0x44a601",
+        "0x44a618",
+        "0x44a6ac",
+        "0x44a6f9",
+        "0x44aaa4"
+      ],
+      "implemented": "해당 없음"
+    },
+    {
+      "id": "orig451-canvas-27",
+      "binary": "original-451",
+      "statement": "바탕은 111×85(0..0x6e, 0..0x54)이고 모든 부위 조각의 EPF 칸 사각형을 x+27 옮긴다. 무기·장신구를 따로 가르지 않는다 — 조각 좌표는 57 폭 몸 기준이고 무기는 음수 x 로 삐져나온다",
+      "evidence": [
+        "0x44a556",
+        "0x44a779",
+        "0x44a8d1"
+      ],
+      "implemented": "dat-extract ReachingWidth (w·c·p) — 결과는 같은 자리"
+    },
+    {
+      "id": "orig451-epf-header-unused",
+      "binary": "original-451",
+      "statement": "EPF 머리말 너비·높이는 안 읽는다(칸 수 u16, 6바이트 건너뛰고 표 위치 u32). 칸 16바이트 = top·left·bottom·right(i16)·시작·끝(u32). 칸별 x·y 의 <이름>.tbl 은 이름에 Efct 가 있을 때만 찾는다 — 머리말은 5.99 와 같고 .tbl 은 이펙트만",
+      "evidence": [
+        "0x44ba57",
+        "0x44ba63",
+        "0x44bb07",
+        "0x44bb91",
+        "0x44bbd3"
+      ],
+      "implemented": "dat-extract Epf.Read"
+    },
+    {
+      "id": "orig451-motion-packet",
+      "binary": "original-451",
+      "statement": "0x1A 를 받으면 [1..4] id(빅엔디언) · [5] 동작 · [6..7] 속도를 읽고 속도×10 을 사람 객체에 넘긴다. 소리 바이트는 없다",
+      "evidence": [
+        "0x4611e2",
+        "0x463837",
+        "0x463844",
+        "0x463852",
+        "0x46385a",
+        "0x463887"
+      ],
+      "implemented": "WorldClient.ReadMotion (속도×10 은 안 옮김)"
+    },
+    {
+      "id": "orig451-motion-remap",
+      "binary": "original-451",
+      "statement": "받은 동작 번호를 그대로 그리지 않는다: 1 → 02 파일(평타) · 6 → 03 파일 · 21·22 → 03 파일의 다른 구간 · 9~17·23~33 → 앞모습(동·남)일 때만 감정(emot01.epf) · 2~5·7·8·18~20 은 무시. 방패·무기는 보지 않는다",
+      "evidence": [
+        "0x449313",
+        "0x44931c",
+        "0x4493b7",
+        "0x449466",
+        "0x449b64"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "orig451-skill-armor-gate",
+      "binary": "original-451",
+      "statement": "기술 동작(0x80+n)은 입은 갑옷(U) 번호가 Skill.tbl n 줄의 ST 목록에 있을 때만 재생한다. 없으면 아무 동작도 안 한다(평타 동작으로 바꾸지도 않는다). 방패·무기·직업은 보지 않는다. 칸은 SI + 방향×FC 부터 FC 칸",
+      "evidence": [
+        "0x4494b7",
+        "0x4494da",
+        "0x4494e1",
+        "0x4494ea",
+        "0x455fe8",
+        "0x456089"
+      ],
+      "implemented": "옮기지 않음 — BodyMotion 은 옷을 보지 않는다"
+    },
+    {
+      "id": "client-skill-armor-gate",
+      "binary": "client",
+      "statement": "2005(=5.99) 클라이언트도 기술 동작은 갑옷(U, 겉모습+0x12) 번호가 skill.tbl ST 에 있을 때만 재생한다 — 4.51 과 같다. '방패를 끼면 기본 동작' 같은 방패 검사는 이 길에 없다",
+      "evidence": [
+        "0x4e1124",
+        "0x4e1161",
+        "0x4e1168",
+        "0x4e1171",
+        "0x5210f0"
+      ],
+      "implemented": "옮기지 않음 — BodyMotion 은 옷을 보지 않는다"
+    },
+    {
+      "id": "client-disguise-motion",
+      "binary": "client",
+      "statement": "2005 클라이언트는 사람이 괴물 모습([+0x369]==0)이면 동작을 사람 규칙 대신 0x4e1314 로 보낸다. 4.51 에는 이 갈래가 없다",
+      "evidence": [
+        "0x4e1040",
+        "0x4e1048",
+        "0x4e1213",
+        "0x4e3285"
+      ],
+      "implemented": "옮기지 않음"
+    },
+    {
+      "id": "orig451-effect-playback",
+      "binary": "original-451",
+      "statement": "0x29 이펙트: 파일은 Efct%03d.epf(번호), 칸 순서는 Effect.tbl — 첫 줄이 개수, (번호-1) 번째 줄이 칸 번호 목록. 속도는 한 칸마다 다시 거는 타이머 간격이다(몸 동작처럼 ×10 하지 않는다). 대상 id 가 0 이면 x·y 자리에 튼다",
+      "evidence": [
+        "0x4638b7",
+        "0x4638c4",
+        "0x4638d3",
+        "0x463960",
+        "0x482f98",
+        "0x483881",
+        "0x4838ba",
+        "0x4838cd"
+      ],
+      "implemented": "아직 — 모바일 이펙트와 견주지 않았다"
+    },
+    {
+      "id": "orig451-mpf-frames",
+      "binary": "original-451",
+      "statement": "괴물 그림 mns%03d.mpf(번호-0x4000): 머리말 [+9]·[+0xA] 걷기 시작·칸 수, [+0xB]·[+0xC] 공격 시작·칸 수. 칸 = 시작 + 단계 % 칸 수이고 표를 칸번호×16 으로 바로 읽는다 — 빈 칸도 번호를 차지한다",
+      "evidence": [
+        "0x44aded",
+        "0x44aebd",
+        "0x44aec7",
+        "0x44aefb",
+        "0x44af75"
+      ],
+      "implemented": "dat-extract Epf.Read 자리표시(같은 원칙)"
+    },
+    {
+      "id": "orig451-mirror",
+      "binary": "original-451",
+      "statement": "남쪽은 동쪽 그림, 서쪽은 북쪽 그림을 뒤집어 쓴다 — 5.99 와 같다",
+      "evidence": [
+        "0x449b64",
+        "0x449b7e",
+        "0x449b8d"
+      ],
+      "implemented": "Actor.Face (Scale.X)"
     }
   ],
   "comparisons": [
@@ -658,6 +1198,31 @@
       "id": "armor-redrawn",
       "statement": "머리·투구(40)·방패(7)·신발(3)·몸은 두 아카이브가 같은 파일이고, 갑옷 66개·바지는 파일이 달라도 같은 옷을 다시 그린 것이다 — 칸이 더 많은 5.99 쪽을 쓴다",
       "implemented": "build-client-wardrobe.py archives() — 무기 밖은 5.99 우선"
+    },
+    {
+      "id": "client-exe-is-original",
+      "statement": "5.99 클라이언트 Legend.exe 는 원작 설치본 lodr.exe(2005-03-18) 안의 Legend.exe 와 md5 까지 같다(347dc381…d128). 5.99 실행 파일에서 찾은 규칙은 원작 2005 규칙이다",
+      "implemented": ""
+    },
+    {
+      "id": "weapon-art-original",
+      "statement": "원작 2005 khan.dat(28,630,160 · md5 24abcf73…5305) 의 무기 mw 200 번호 중 197 개가 하데스 game/khan.dat 와 바이트까지 같다(다른 것 200·201·202). 3·6·7·8·11 도 같다 — 무기 27개가 다른 것은 5.99 팩이 khan.dat 를 바꾼 것이다",
+      "implemented": "build-client-wardrobe.py archives() — 무기는 하데스 우선이 맞았다"
+    },
+    {
+      "id": "weapon-art-451",
+      "statement": "4.51 khan.dat(29,782,583) 의 무기는 130 번호, 그중 12 개(2·3·4·5·8·10·11·12·13·16·18·23)가 하데스와 다르다 — 초기 그림이다",
+      "implemented": ""
+    },
+    {
+      "id": "skill-tbl-grows",
+      "statement": "Skill.tbl 은 4.51 이 0~8 줄(직업 5), 2005 는 2차 직업(바드 9·10 · 검투사 11~13 · 궁수 14~16 · 소환사 …) 줄과 옷 번호가 늘었다. 0~8 줄의 NO·FN·SI·FC 는 같다",
+      "implemented": "BodyMotion 표"
+    },
+    {
+      "id": "archives-451",
+      "statement": "4.51 설치본 아카이브는 Legend.dat·khan.dat·seo.dat 셋. Legend.dat 에 Skill.tbl·Effect.tbl·efct###.epf/tbl 이 있다. 2005 는 이펙트 표가 roh.dat(effect.tbl·meffect.tbl·efct###)로 옮겨졌다",
+      "implemented": ""
     }
   ],
   "script_command_evidence": {
@@ -712,10 +1277,14 @@
     ]
   },
   "unknown": [
-    "클라이언트가 받은 몸 동작을 방패·배운 기술에 따라 바꿔 그리는지 — Legend.exe 의 0x1A 처리를 아직 안 봤다",
     "아이템 사운드1(item+0xA8)을 읽는 곳",
     "양의신권·더블어택의 '일정 확률로 2번' — 서버 코드에는 없다. 클라이언트 쪽은 모름",
     "A(팔) 번호가 서버 외형 패킷의 어느 칸에서 오는지 — 하데스는 갑옷 번호를 두 번 보낸다",
-    "P(무기 앞 조각)가 없는 무기 번호가 많은 까닭(khan 남자 71개 중 22개만 mw 번호와 겹친다)"
+    "P(무기 앞 조각)가 없는 무기 번호가 많은 까닭(khan 남자 71개 중 22개만 mw 번호와 겹친다)",
+    "4.51 몸 동작 속도×10 · 이펙트 속도의 단위(타이머 0x42e090 의 틱)",
+    "4.51 겉모습 +0x02·+0x07·+0x09 가 염색 번호인지 — 그리기 0x442c20 에 넘기는 값까지만 봤다",
+    "2005 클라이언트가 무기 조각을 111 바탕에 맞추는 계산 — 겹치기(0x4e7790~0x4e8a80)에 27 상수가 없다",
+    "2005 클라이언트의 이펙트 속도 뜻 — effect.tbl·meffect.tbl 을 읽는 곳(0x59f510)만 찾았다",
+    "2005 괴물 모습 동작 0x4e1314 의 규칙"
   ]
 }
