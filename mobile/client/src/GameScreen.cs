@@ -155,15 +155,21 @@ public partial class GameScreen : Control
         float across = GetViewportRect().Size.X;
         float column = across > 0 ? 1f - (GearGrid.PanelWidth / across) : 0.6f;
 
+        // 창은 아래에 붙는다. 대화 창과 장비 고리는 남는 높이를 다 쓰고, 소지품 한 장은 제 높이만큼만 올라와
+        // 위쪽 맵을 남긴다(PackPanel.ShowTab 이 정한다).
+        _talk.SizeFlagsVertical = SizeFlags.ExpandFill;
+
         foreach (Control panel in new Control[] { _pack, _talk })
         {
-            over.AddChild(panel);
-            panel.SetAnchorsPreset(LayoutPreset.FullRect);
-            panel.AnchorLeft = Main.Portrait ? 0 : Mathf.Min(0.6f, column);
-            panel.OffsetLeft = 0;
-            panel.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
-            panel.OffsetRight = 0;
-            panel.OffsetBottom = 0;
+            VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
+            over.AddChild(holder);
+            holder.AddChild(panel);
+            holder.SetAnchorsPreset(LayoutPreset.FullRect);
+            holder.AnchorLeft = Main.Portrait ? 0 : Mathf.Min(0.6f, column);
+            holder.OffsetLeft = 0;
+            holder.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
+            holder.OffsetRight = 0;
+            holder.OffsetBottom = 0;
         }
     }
 
@@ -179,10 +185,6 @@ public partial class GameScreen : Control
             MouseFilter = MouseFilterEnum.Ignore
         };
 
-        // 높이는 남는 만큼만 — 최소 높이를 박으면 위·아래 줄이 화면 밖으로 밀린다(한 번 그렇게 됐다).
-        _pack.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        _pack.SizeFlagsVertical = SizeFlags.ExpandFill;
-
         if (!Main.Portrait)
         {
             // 가로에서는 이 줄이 위 줄과 조작 줄 사이의 빈 자리이기도 하다. 닫혀 있어도 남아 있어야
@@ -193,8 +195,6 @@ public partial class GameScreen : Control
                 SizeFlagsStretchRatio = 62,
                 MouseFilter = MouseFilterEnum.Ignore
             });
-
-            _pack.SizeFlagsStretchRatio = 38;
         }
 
         // 패널은 이 줄이 아니라 HUD 위에 덮어 놓는다(Cover). 줄은 조작 줄이 올라오지 않게

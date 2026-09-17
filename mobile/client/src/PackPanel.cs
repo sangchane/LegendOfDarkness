@@ -16,11 +16,22 @@ namespace LodClient;
 /// the original's own ring of places (<see cref="GearGrid" />); the pack tab is a plain grid of pictures.
 /// Both are rebuilt only when what they would show changes, because they are asked every frame and a panel
 /// that throws its children away sixty times a second cannot be pressed.
+///
+/// The pack shows one page at a time and turns left and right — by a swipe across the pictures or by the arrows, since
+/// no action may need a swipe alone (wireframes 2.2). Sixty pictures in a scrolling list covered nearly the whole
+/// portrait screen (사용자, 2026-09-18); a page sits at the bottom and leaves the map above it.
 /// </remarks>
 public sealed partial class PackPanel : PanelContainer
 {
     // 원작은 33x36 칸이었다. 손가락은 그보다 커서 시안의 최소 터치 크기를 쓴다.
     private static readonly Vector2 Cell = new(Main.TouchMinimum, Main.TouchMinimum);
+
+    // 한 장에 6열. 세로는 네 줄, 가로는 높이가 없어 두 줄이다(머리·장 넘김·꼬리까지 280 안에 든다).
+    private const int Columns = 6;
+    private static readonly int PerPage = Columns * (Main.Portrait ? 4 : 2);
+
+    /// <summary>How far a finger has to travel across the pictures before it counts as turning the page.</summary>
+    private const float SwipeDistance = Main.TouchMinimum;
 
     private readonly GearGrid _gear = new();
     private readonly GridContainer _rows = new() { Name = "Items" };
@@ -30,6 +41,20 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right };
     private readonly Button _use = new() { Text = "입기" };
     private readonly Button _drop = new() { Text = "버리기" };
+    private readonly ScrollContainer _scroll = new()
+    {
+        SizeFlagsVertical = SizeFlags.ExpandFill,
+        SizeFlagsHorizontal = SizeFlags.ExpandFill,
+        HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
+    };
+    private readonly HBoxContainer _pager = new();
+    private readonly Label _pageNumber = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+
+    // 보이는 장, 그리고 손가락이 누른 자리. 밀어 넘긴 손은 그림을 고르지 않는다.
+    private int _page;
+    private float? _swipeFrom;
+    private bool _swiped;
+    private int _carriedCount;
 
     // 어느 탭이 보이나. 장비면 true.
     private bool _onGear;
@@ -67,8 +92,7 @@ public sealed partial class PackPanel : PanelContainer
         Close = new Button { Text = "닫기", CustomMinimumSize = Cell };
         head.AddChild(Close);
 
-        // 세로는 패널이 전폭이라 한 줄에 여섯, 가로는 오른쪽 3분의 1 남짓이라 넷이 들어간다.
-        _rows.Columns = Main.Portrait ? 6 : 4;
+        _rows.Columns = Columns;
 
         // 걸친 것을 고르는 것은 소지품과 같은 한 자리를 쓴다. 음수로 두어 칸 번호와 구별한다.
         _gear.Chosen += slot =>
@@ -77,23 +101,22 @@ public sealed partial class PackPanel : PanelContainer
             _showing = null;
         };
 
-        VBoxContainer inside = new();
-        inside.AddThemeConstantOverride("separation", Main.Gutter);
-        inside.AddChild(_gear);
-        inside.AddChild(_rows);
+        // 장비 고리는 장으로 나눌 수 없다. 가로에서는 여섯 줄이 패널보다 높아 스크롤로 둔다 — 넘치면 제목과
+        // 닫기 버튼이 밀려난다(한 번 그렇게 됐다).
+        _scroll.AddChild(_gear);
 
-        // 칸이 늘어 패널이 화면을 넘으면 제목과 닫기 버튼이 밀려난다(한 번 그렇게 됐다).
-        // 넘치는 것은 스크롤로 두고, 머리와 꼬리는 언제나 남긴다.
-        ScrollContainer scroll = new()
-        {
-            SizeFlagsVertical = SizeFlags.ExpandFill,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
-        };
-
-        scroll.AddChild(inside);
+        Button back = new() { Text = "◀", CustomMinimumSize = Cell };
+        Button forward = new() { Text = "▶", CustomMinimumSize = Cell };
+        back.Pressed += () => Turn(-1);
+        forward.Pressed += () => Turn(1);
+        _pageNumber.CustomMinimumSize = Cell;
+        _pager.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        _pager.AddChild(back);
+        _pager.AddChild(_pageNumber);
+        _pager.AddChild(forward);
 
         _chosenName.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        _chosenName.MaxLinesVisible = 2;
         _chosenName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
         _use.CustomMinimumSize = Cell;
@@ -131,11 +154,18 @@ public sealed partial class PackPanel : PanelContainer
         foot.AddChild(_drop);
 
         body.AddChild(head);
-        body.AddChild(scroll);
+        body.AddChild(_scroll);
+        body.AddChild(_rows);
 
         // 원작도 금화를 소지품 창에 적었다. 상점에서 사기 전에 볼 곳이 여기다. 머리 줄에 두면 세로 360 에서
-        // 탭·정렬·닫기와 함께 넘친다(한 번 그렇게 됐다) — 따로 한 줄.
-        body.AddChild(_gold);
+        // 탭·정렬·닫기와 함께 넘친다(한 번 그렇게 됐다) — 장 넘김과 한 줄.
+        HBoxContainer turning = new();
+        turning.AddChild(_pager);
+        _gold.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _gold.VerticalAlignment = VerticalAlignment.Center;
+        turning.AddChild(_gold);
+
+        body.AddChild(turning);
         body.AddChild(foot);
 
         AddChild(body);
@@ -151,8 +181,12 @@ public sealed partial class PackPanel : PanelContainer
     {
         _onGear = gear;
 
-        _gear.Visible = gear;
+        _scroll.Visible = gear;
         _rows.Visible = !gear;
+        _pager.Visible = !gear;
+
+        // 소지품 한 장은 제 높이만큼만 아래에 붙고, 장비 고리는 남는 높이를 다 쓴다(GameScreen.Cover).
+        SizeFlagsVertical = gear ? SizeFlags.ExpandFill : SizeFlags.ShrinkEnd;
         _gearTab.ButtonPressed = gear;
         _packTab.ButtonPressed = !gear;
         Tidy.Visible = !gear;
@@ -195,7 +229,10 @@ public sealed partial class PackPanel : PanelContainer
         _showing = wanted;
 
         _gear.Show(worn, _chosen);
-        Fill(_rows, carried.Select(item => (Key: item.Slot, item.Icon)));
+        _carriedCount = carried.Count;
+        _page = Paging.Kept(_page, carried.Count, PerPage);
+        _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, PerPage)}";
+        Fill(_rows, Paging.Page(carried, _page, PerPage));
 
         ShowChosen(carried, worn);
     }
@@ -221,30 +258,42 @@ public sealed partial class PackPanel : PanelContainer
         return false;
     }
 
-    /// <summary>Rebuilds one grid: one pressable picture per thing, and the picked one outlined.</summary>
-    private void Fill(GridContainer grid, IEnumerable<(int Key, int Icon)> things)
+    /// <summary>
+    /// Rebuilds the page: one pressable picture per thing, the picked one outlined, and empty places where the pack runs
+    /// out, so every page is the same height.
+    /// </summary>
+    private void Fill(GridContainer grid, IReadOnlyList<InventoryItem?> page)
     {
         foreach (Node cell in grid.GetChildren())
         {
             cell.QueueFree();
         }
 
-        bool any = false;
-
-        foreach ((int key, int icon) in things)
+        foreach (InventoryItem? item in page)
         {
-            any = true;
+            if (item is null)
+            {
+                grid.AddChild(new Control { CustomMinimumSize = Cell, MouseFilter = MouseFilterEnum.Ignore });
+                continue;
+            }
+
+            int key = item.Slot;
 
             Button cell = new()
             {
                 CustomMinimumSize = Cell,
-                Icon = ItemIcons.For(icon),
+                Icon = ItemIcons.For(item.Icon),
                 ExpandIcon = true,
                 Flat = key != _chosen
             };
 
             cell.Pressed += () =>
             {
+                if (_swiped)
+                {
+                    return;
+                }
+
                 _chosen = key;
 
                 // 테두리를 옮기려면 다시 그려야 한다. 다음 프레임의 Show 가 하도록 표시만 지운다.
@@ -253,11 +302,39 @@ public sealed partial class PackPanel : PanelContainer
 
             grid.AddChild(cell);
         }
+    }
 
-        if (!any)
+    private void Turn(int step)
+    {
+        _page = step > 0 ? Paging.After(_page, _carriedCount, PerPage) : Paging.Before(_page, _carriedCount, PerPage);
+        _showing = null;
+    }
+
+    /// <summary>
+    /// A swipe across the pictures turns the page. Watched before the pictures get the touch, so a finger that lands on
+    /// one and slides away turns the page without picking it.
+    /// </summary>
+    public override void _Input(InputEvent @event)
+    {
+        if (!IsVisibleInTree() || _onGear || @event is not InputEventMouseButton { ButtonIndex: MouseButton.Left } press)
         {
-            grid.AddChild(new Label { Text = "없음", CustomMinimumSize = Cell });
+            return;
         }
+
+        if (press.Pressed)
+        {
+            _swiped = false;
+            _swipeFrom = _rows.GetGlobalRect().HasPoint(press.Position) ? press.Position.X : null;
+            return;
+        }
+
+        if (_swipeFrom is { } from && Mathf.Abs(press.Position.X - from) >= SwipeDistance)
+        {
+            _swiped = true;
+            Turn(press.Position.X < from ? 1 : -1);
+        }
+
+        _swipeFrom = null;
     }
 
     /// <summary>Writes out whatever is picked, and offers to put it on when it is not on already.</summary>
@@ -299,7 +376,7 @@ public sealed partial class PackPanel : PanelContainer
     }
 
     private string Describe(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn) =>
-        $"{_chosen}|"
+        $"{_chosen}|{_page}|"
         + string.Join(";", carried.Select(item => $"{item.Slot}:{item.Icon}:{item.Stacks}"))
         + "|"
         + string.Join(";", worn.Select(gear => $"{gear.Slot}:{gear.Icon}"));

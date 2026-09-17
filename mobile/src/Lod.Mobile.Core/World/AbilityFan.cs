@@ -38,19 +38,15 @@ public static class AbilityFan
         (120, 96)
     ];
 
-    public static int Pages(int learned) => Math.Max(1, (learned + PerPage - 1) / PerPage);
+    public static int Pages(int learned) => Paging.Pages(learned, PerPage);
 
     /// <summary>The page after this one, back to the first after the last.</summary>
-    public static int After(int page, int learned) => (Kept(page, learned) + 1) % Pages(learned);
+    public static int After(int page, int learned) => Paging.After(page, learned, PerPage);
 
     /// <summary>The page still to show once some have gone — the last one left.</summary>
-    public static int Kept(int page, int learned) => Math.Clamp(page, 0, Pages(learned) - 1);
+    public static int Kept(int page, int learned) => Paging.Kept(page, learned, PerPage);
 
     /// <summary>The six on a page, in the server's order, with nothing where the learned ones run out.</summary>
-    public static IReadOnlyList<T?> Page<T>(IReadOnlyList<T> learned, int page) where T : class
-    {
-        int first = Kept(page, learned.Count) * PerPage;
-
-        return [.. Enumerable.Range(first, PerPage).Select(index => index < learned.Count ? learned[index] : null)];
-    }
+    public static IReadOnlyList<T?> Page<T>(IReadOnlyList<T> learned, int page) where T : class =>
+        Paging.Page(learned, page, PerPage);
 }
