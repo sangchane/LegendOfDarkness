@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""5.99 서버팩의 NPC 스크립트를 하데스에서 그대로 돌게 옮긴다 — 먼저 기술·마법을 가르치는 사범(`Npc_Skill.txt`).
+"""5.99 서버팩의 NPC 스크립트와 아이템 사용 스크립트를 하데스에서 그대로 돌게 옮긴다.
+
+NPC: 먼저 기술·마법을 가르치는 사범(`Npc/Npc_Skill.txt`). 아이템: `Item/*.txt` 의 블록 — 아이템의 `사용펄숫` 칸이 부르는
+이름이다(염색약 `set_haircolor 14; item_del …`). 아이템 블록은 NPC 가 없어 창을 띄울 곳이 없으므로, **기다리지 않는
+것만** 옮기고(`[Script("ITEM_이름")]` 아이템 스크립트, 쓰면 곧장 돈다) `mes`·`menu`·`input` 이 있는 것은 목록만 남긴다.
 
 서버 NPC 95명 중 기술을 가르치는 스크립트가 붙은 NPC 가 하나도 없어, 운영자 명령 없이는 기술을 배울 수 없었다.
 5.99 사범은 표가 아니라 대화 스크립트다(`menu` → 직업·레벨 확인 → `skill_add`). 기술·마법처럼 **문장을 C# 으로
@@ -29,6 +33,11 @@ _spec.loader.exec_module(abilities)
 NPC_SCRIPTS = abilities.PACK / "script" / "Npc"
 OUT = abilities.OUT / "Npcs"
 FILES = ["Npc_Skill.txt"]
+ITEM_SCRIPTS = abilities.PACK / "script" / "Item"
+ITEM_OUT = abilities.OUT / "Items"
+ITEM_FILES = ["E.T.C.txt", "Quest.txt", "Potion.txt", "Blessing.txt", "CashI.txt"]
+#: 플레이어를 기다리는 명령 — 아이템 스크립트에서는 아직 띄울 창이 없다.
+WAITS = {"mes", "menu", "input"}
 
 #: 블록 머리 — 줄 맨 앞의 `0,0,0,0,0,0,0` 다음 탭, 이름, `{`. 안쪽의 `if(…){` 줄은 탭으로 시작해 걸리지 않는다.
 HEADER = re.compile(r"^\d[\d,]*\t([^\t{]+?)\s*\{", re.M)
@@ -129,6 +138,74 @@ namespace Darkages.Storage.locales.Scripts.Pack599
 """
 
 
+def csharp_item(name, source, code, variables, flags):
+    declare = "".join(f"            V {v} = 0;\n" for v in variables)
+    declare += "".join(f"            bool {f} = false;\n" for f in flags)
+    where = "Item" + "".join(f"{ord(c):04X}" for c in name)
+    return f"""using Darkages.Scripting;
+using Darkages.Types;
+
+namespace Darkages.Storage.locales.Scripts.Pack599
+{{
+    /// <summary>
+    /// {name} — 5.99 `{source}` 의 아이템 사용 스크립트를 그대로 옮긴 것. 아이템이 스스로 지운다(`item_del`).
+    /// </summary>
+    /// <remarks>
+    /// 손으로 고치지 말 것. `scripts/build-pack-npcs.py` 가 다시 만든다.
+    /// </remarks>
+    [Script("ITEM_{name}", "{abilities.MARK}")]
+    public class {where} : ItemScript
+    {{
+        public {where}(Item item) : base(item)
+        {{
+        }}
+
+        public override void Equipped(Sprite sprite, byte displayslot)
+        {{
+        }}
+
+        public override void UnEquipped(Sprite sprite, byte displayslot)
+        {{
+        }}
+
+        public override void OnUse(Sprite sprite, byte slot)
+        {{
+            var p = new Pack599(sprite, null);
+            if (!p.Ready)
+                return;
+{declare}
+{code}
+        }}
+    }}
+}}
+"""
+
+
+def items(write):
+    """아이템 블록 중 기다리지 않는 것만. (옮긴 이름, 창이 필요해 남긴 이름)."""
+    made, waiting = [], []
+    for file in ITEM_FILES:
+        for name, body in blocks(ITEM_SCRIPTS / file).items():
+            try:
+                translator = abilities.Translator(body)
+                code = translator.program()
+            except abilities.Unsupported as why:
+                waiting.append(f"{name}(못 읽음: {why})")
+                continue
+            if WAITS & set(translator.calls):
+                waiting.append(name)
+                continue
+            for label in sorted(translator.jumps - translator.labels - translator.entries):
+                code += f"\n            L_{label}: ;"
+            flags = [f"f_{label}" for label in sorted(translator.entries & translator.jumps)]
+            if write:
+                ITEM_OUT.mkdir(parents=True, exist_ok=True)
+                (ITEM_OUT / f"{name}.cs").write_text(
+                    csharp_item(name, file, code, sorted(translator.vars), flags), encoding="utf-8-sig")
+            made.append(name)
+    return made, waiting
+
+
 def main():
     write = "--쓰기" in sys.argv
     made, failed, calls = [], [], {}
@@ -156,6 +233,10 @@ def main():
     if failed:
         print(f"  못 옮긴 것 {len(failed)}: {', '.join(failed)}")
     print("  부르는 명령: " + ", ".join(f"{k}×{v}" for k, v in sorted(calls.items(), key=lambda kv: -kv[1])))
+
+    done, waiting = items(write)
+    print(f"아이템 스크립트 {len(done)}개 {'씀' if write else '(세어만 봄)'} → {ITEM_OUT.relative_to(ROOT)}: {', '.join(done)}")
+    print(f"  창이 필요해 남긴 것 {len(waiting)}: {', '.join(waiting)}")
     return 0
 
 

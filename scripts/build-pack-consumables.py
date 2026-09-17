@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""5.99 서버팩의 소모품(물약·음식·귀환 주문서)을 하데스 아이템 템플릿으로 옮긴다.
+"""5.99 서버팩의 소모품(물약·음식·귀환 주문서)과 쓰는 물건·재료(염색약·기타·퀘스트·잡화)를 하데스 아이템 템플릿으로 옮긴다.
+
+**사용펄숫이 옮겨진 스크립트를 부르면** 그것을 붙인다 — `scripts/build-pack-npcs.py` 가 `Item/*.txt` 블록을
+`ITEM_이름` 아이템 스크립트로 옮겨 둔다(염색약 `set_haircolor`, 코마디움 부활 …). 그 스크립트는 스스로 `item_del` 하므로
+Consumable 깃발을 두지 않는다(두 번 줄지 않게). 회복·귀환 칸도 스크립트도 없는 것(재료·투척용표창)은 스크립트 없이 쌓이게만 둔다.
 
 상점 NPC 24곳의 판매 목록 180종 중 131종이 서버에 없었다 — 대화창으로 상점을 열어도 물약 하나 살 수 없었다. 그중
 플레이에 가장 급한 것부터(2026-09-17): `item/Potion.txt` · `item/Hungry.txt` · `item/Recoll.txt`.
@@ -11,8 +15,9 @@
   ScriptName Consumable(scripts/Items/Consumable.cs) · Flags 쌓임·소모·거래·보관·판매 + 떨굼여부 0 이 아니면 버리기
   MaxStack 100 — 하데스 소모품에서 가장 흔한 값이다(팩에는 한 칸에 겹치는 수가 따로 없다).
 
-**옮기지 않은 것:** 배고픔변화(하데스에 배고픔이 없다), 사용펄숫(부르는 스크립트가 팩에 없다 — 코마디움 둘만 있어
-그 둘은 전용 스크립트가 필요해 뺀다), 맵 번호표에 없는 맵으로 가는 귀환 주문서.
+**옮기지 않은 것:** 배고픔변화(하데스에 배고픔이 없다), 옮겨지지 않은 사용펄숫(물약의 `최하급체력포션` 따위는 팩에 블록이
+없고, 확성기·선물주머니처럼 창을 띄우는 블록은 아직 못 돌린다 — 그런 물건은 칸이 있으면 칸대로, 없으면 쓸 수 없게 둔다),
+맵 번호표에 없는 맵으로 가는 귀환 주문서.
 
   쓰는 법: python3 scripts/build-pack-consumables.py [--쓰기]
 """
@@ -27,10 +32,9 @@ ITEMS = ROOT / "data" / "server-packs" / "extracted" / "5.99-server" / "items.js
 MAP_IDS = ROOT / "plans" / "5.99-맵번호표.tsv"
 OUT = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "templates" / "items"
 
-SOURCES = {"Potion.txt": "물약", "Hungry.txt": "음식", "Recoll.txt": "귀환"}
-
-#: 사용펄숫이 실제 스크립트(부활)인 것 — 칸만으로는 할 수 없다.
-NEEDS_OWN_SCRIPT = {"코마디움", "엑스코마디움"}
+SOURCES = {"Potion.txt": "물약", "Hungry.txt": "음식", "Recoll.txt": "귀환",
+           "Dye.txt": "염색", "E.T.C.txt": "기타", "Quest.txt": "퀘스트", "Item.txt": "잡화"}
+ITEM_SCRIPTS = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "scripts" / "Pack599" / "Items"
 
 # ItemFlags (Types/ItemFlags.cs)
 TRADEABLE, DROPABLE, BANKABLE, SELLABLE, STACKABLE, CONSUMABLE = 4, 8, 16, 32, 1 << 7, 1 << 8
@@ -67,20 +71,31 @@ def map_ids():
 
 def template(item, kind, ids):
     f = item["fields"]
-    flags = STACKABLE | CONSUMABLE | TRADEABLE | BANKABLE | SELLABLE
+    flags = STACKABLE | TRADEABLE | BANKABLE | SELLABLE
     if text(f, "떨굼여부", "1") != "0":
         flags |= DROPABLE
+
+    use = text(f, "사용펄숫")
+    restores = number(f, "체력변화") or number(f, "마력변화") or text(f, "이동맵")
+    if use and (ITEM_SCRIPTS / f"{use}.cs").exists():
+        script = f"ITEM_{use}"
+    elif restores:
+        script = "Consumable"
+        flags |= CONSUMABLE
+    else:
+        script = None
 
     made = {
         "$type": "Darkages.Types.ItemTemplate, Darkages.Server",
         "Name": text(f, "이름"),
         "DisplayImage": 0x8000 + number(f, "이미지"),
-        "ScriptName": "Consumable",
         "Flags": flags,
         "CanStack": True,
         "MaxStack": 100,
         "Value": max(0, number(f, "판매가격")),
     }
+    if script:
+        made["ScriptName"] = script
     if number(f, "체력변화"):
         made["HealthRestore"] = number(f, "체력변화")
     if number(f, "마력변화"):
@@ -102,9 +117,6 @@ def main():
         if kind is None:
             continue
         name = item["이름"]
-        if name in NEEDS_OWN_SCRIPT:
-            skipped.append(f"{name}(전용 스크립트)")
-            continue
         where = text(item["fields"], "이동맵")
         if where and where not in ids:
             skipped.append(f"{name}(맵 {where} 이 번호표에 없다)")

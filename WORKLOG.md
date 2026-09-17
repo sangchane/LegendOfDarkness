@@ -9,6 +9,10 @@
 - Last updated: 2026-09-15
 
 ## History (append; 최신이 위)
+- 2026-09-17 — **상점 판매 목록 180종이 모두 서버에 들어왔다 — 남은 17종(염색약·기타·퀘스트·잡화).**
+  - 염색약은 칸이 아니라 아이템 사용 스크립트(`script/Item/E.T.C.txt`: `set_haircolor 16; item_del …`, 템플릿 `사용펄숫` 이 블록 이름). `build-pack-npcs.py` 가 `Item/*.txt` 블록 중 기다리지 않는 16개를 `ITEM_이름` 아이템 스크립트로 옮긴다(염색약 9 · 수상한버섯 · 코마디움 둘 · 가호 둘 · 텔레포트깃털 둘). `mes`·`menu`·`input` 이 있는 10개(확성기·선물주머니·꼬끼오알·스킬스펠지우기·미션두루마리 둘 …)는 NPC 없이 띄울 창이 필요해 남겼다. `Pack599.Call` 에 `set_haircolor`.
+  - `build-pack-consumables.py`: Dye·E.T.C·Quest·Item 파일도. 사용 스크립트가 옮겨져 있으면 `ITEM_이름`(스스로 지우므로 Consumable 깃발 없음), 회복·귀환 칸이면 `Consumable`, 둘 다 없으면 재료. 178종 — 드롭용으로 `DisplayImage` 없이(아이콘이 비었다) 들어와 있던 재료 49종을 덮었다. **남은 드롭 잡템도 아이콘 번호가 없다**(`tools/pack-import/import.py item_json` 이 이미지를 `Image` 에만 쓴다 — 괴물 드롭 때 고칠 것).
+  - 시험: `Pack599ConsumableTests` 분홍색염색약 → 머리색 16 · 한 개 줄어듦. 아이콘 137개.
 - 2026-09-17 — **5.99 장비 나머지 칸 416종을 들였다 — 상점에 없던 물건 103 → 17.** 사용자: "순수? … 하나씩 순서대로 진행하자".
   - 순수(`get_son`)는 99레벨 전직 때 원래 직업을 다시 고른 표시다(`Npc_Script.txt` 선진: `if(@class == 새 직업){set_son 1;}`). 전직 스크립트가 없어 지금은 아무도 순수가 아니므로 0 이 맞다.
   - `scripts/build-pack-equipment.py`: 무기·갑옷에 방패 Shield 3 · 투구 Helmet 4 · 귀걸이 Earring 5 · 목걸이 Necklace 6 · 반지 Generic 7 · 장갑 Generic 9 · 허리띠 Belt 11 · 각반 Generic 12 · 신발 Boot 13 · 장식 Generic 14(하데스표 템플릿의 ScriptName·EquipmentSlot 짝). 타입 0 만 장비로 본다(속성 3 에 염색약·두루마리가 섞여 있다). 그림이 일부러 안 보이는(안보이기 1) 무기 2종도. 장식은 7.18 겉모습의 OverCoat 를 채우는 스크립트가 없어 입은 모습으로 안 그린다.

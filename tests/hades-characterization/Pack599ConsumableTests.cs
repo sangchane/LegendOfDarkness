@@ -57,6 +57,34 @@ public sealed class Pack599ConsumableTests : IDisposable
             $"{Recall}을 썼는데 노비스마을 40,33 으로 가지 않았습니다. 마지막: {world.State} · 서버가 한 말: {world.Said}");
     }
 
+    /// <summary>
+    /// 염색약은 칸이 아니라 아이템 사용 스크립트다(`script/Item/E.T.C.txt`: `set_haircolor 16; item_del "분홍색염색약", 1;`).
+    /// `scripts/build-pack-npcs.py` 가 기다리지 않는 블록을 `ITEM_이름` 아이템 스크립트로 옮기고, 템플릿이 사용펄숫으로 그것을 부른다.
+    /// </summary>
+    [Fact]
+    public async Task A_hair_dye_colours_the_hair_and_takes_itself_away()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        MakeGameMaster(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.Self is { Wearing: not null }, "처음 겉모습이 오지 않았습니다.");
+
+        InventoryItem dye = await Given(world, "분홍색염색약");
+        await world.UseAsync(dye.Slot, _deadline.Token);
+        await Until(() => world.Self?.Wearing?.HairColor == 16,
+            $"분홍색염색약을 썼는데 머리색이 16 이 되지 않았습니다. 마지막: {world.Self?.Wearing} · 서버가 한 말: {world.Said}");
+        await Until(() => world.Pack.All(item => item.Name != "분홍색염색약"), "염색약이 줄지 않았습니다.");
+    }
+
     private async Task<InventoryItem> Given(WorldClient world, string item)
     {
         await world.SayAsync($"/give \"{item}\" 1", _deadline.Token);

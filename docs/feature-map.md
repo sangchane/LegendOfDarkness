@@ -64,7 +64,7 @@
 | 26 | 드롭·줍기·버리기 | 돌아감 `GSH:362-602` | 됨 `WC:518-581` | `TS:8-9` | **괴물 드롭 목록이 비었다**(NEXT) |
 | **NPC·경제** |||||
 | 27 | NPC 대화·메뉴 | 돌아감 `GSH:1348-1438,1991-2012` | **됨(2026-09-17)** — 여덟 모양 읽기·`0x3A` 답·닫기, 화면 `mobile/client/src/TalkPanel.cs`. NPC 그림(26종)도 뽑아 누르면 열린다 | `HB/Network/ServerFormats/ServerFormat2F.cs` | NPC 템플릿 그림 번호를 0x4000 체계로 고쳤다(`tools/pack-import/import.py`) |
-| 28 | 상점 | 돌아감 `S/Mundanes/shop1.cs:26-129` | 됨 — 사기 확인(`NpcDialogueTests`), 팔기·수리는 같은 창 | `HB/Network/ServerFormats/ServerFormat2F.cs:41-60` ItemSellData | 판매 목록 180종 중 **17종만 아직 서버에 없다**(염색약 9 · 기타 5 · 미션두루마리 2 · 확성기). 물약·음식·귀환 주문서 38종(`build-pack-consumables.py`)과 방패·투구·장신구·장갑·허리띠·각반·신발·장식 416종(`build-pack-equipment.py`)이 들어왔다(2026-09-17). 장식은 입은 모습으로 그리지 않는다. 문구가 영어 |
+| 28 | 상점 | 돌아감 `S/Mundanes/shop1.cs:26-129` | 됨 — 사기 확인(`NpcDialogueTests`), 팔기·수리는 같은 창 | `HB/Network/ServerFormats/ServerFormat2F.cs:41-60` ItemSellData | 판매 목록 180종이 **모두 서버에 있다**(2026-09-17). 확성기·미션두루마리처럼 창을 띄우는 사용 스크립트 10개는 아직 못 돌려 사도 쓸 수 없다. 물약·음식·귀환 주문서 38종(`build-pack-consumables.py`)과 방패·투구·장신구·장갑·허리띠·각반·신발·장식 416종(`build-pack-equipment.py`)이 들어왔다(2026-09-17). 장식은 입은 모습으로 그리지 않는다. 문구가 영어 |
 | 29 | 은행 | 돌아감 `S/Mundanes/Banker.cs:168-248` | 없음 | `HB/Network/ServerFormats/ServerFormat2F.cs:16-27` | |
 | 30 | 사람끼리 교환 | 돌아감 `GSH:2146-2360` (아이템·금화·양쪽 확인) | 없음 | `HB/Network/ServerFormats/ServerFormat42.cs` · `TS` Exchange 74 | |
 | 31 | 퀘스트 | 부분 — 엔진 `HB/Types/Quest.cs:27-54`, 연결된 NPC 8개 | 없음 | 메타파일 `SEvent1~7` · 팩 퀘스트 스크립트 60 | 콘텐츠를 채울 일 |
