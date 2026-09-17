@@ -28,6 +28,7 @@ public partial class GameScreen : Control
     private int _talked;
     private MessageLog _messages = null!;
     private ChatPanel _chat = null!;
+    private Control _chatHolder = null!;
 
     /// <summary>What has been said, kept for reading back through — the same lines the log shows as they fade.</summary>
     private readonly List<(bool Speech, string Text)> _history = [];
@@ -114,6 +115,7 @@ public partial class GameScreen : Control
 
         _chat = new ChatPanel();
         _chat.Close.Pressed += () => Chatting(false);
+        _chat.Sent += line => _ = _server?.SayAsync(line, System.Threading.CancellationToken.None);
 
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
@@ -179,6 +181,12 @@ public partial class GameScreen : Control
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
             holder.AddChild(panel);
+
+            if (panel == _chat)
+            {
+                _chatHolder = holder;
+            }
+
             holder.SetAnchorsPreset(LayoutPreset.FullRect);
             holder.AnchorLeft = Main.Portrait ? 0 : Mathf.Min(0.6f, column);
             holder.OffsetLeft = 0;
@@ -365,10 +373,12 @@ public partial class GameScreen : Control
             Carrying(true);
         }
 
-        // 창이 열려 있는 동안은 새 줄과 탭을 따라간다.
+        // 창이 열려 있는 동안은 새 줄과 탭을 따라가고, 글자를 치는 동안 화면 키보드에 가리지 않게 창을 들어 올린다
+        // (시안 2.1절 — 로그인 화면과 같은 방식).
         if (_chat.Visible)
         {
             _chat.Show(_history);
+            _chatHolder.OffsetBottom = -Lifted();
         }
 
         if (_pack.Visible)
@@ -417,6 +427,15 @@ public partial class GameScreen : Control
         {
             await server.MoveAsync(from, to, System.Threading.CancellationToken.None);
         }
+    }
+
+    /// <summary>How much of the screen the on-screen keyboard is taking, in this screen's own units.</summary>
+    private float Lifted()
+    {
+        int keyboard = DisplayServer.VirtualKeyboardGetHeight();
+        Vector2I screen = DisplayServer.ScreenGetSize();
+
+        return keyboard > 0 && screen.Y > 0 ? keyboard / (float)screen.Y * GetViewportRect().Size.Y : 0;
     }
 
     /// <summary>

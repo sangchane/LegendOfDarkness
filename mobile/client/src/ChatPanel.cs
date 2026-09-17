@@ -26,6 +26,17 @@ public sealed partial class ChatPanel : PanelContainer
         HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
     };
 
+    /// <summary>How long a line may be. The original counts bytes, and Korean takes two of them each.</summary>
+    private const int Longest = 60;
+
+    private readonly LineEdit _typed = new()
+    {
+        PlaceholderText = "할 말",
+        MaxLength = Longest,
+        SizeFlagsHorizontal = SizeFlags.ExpandFill,
+        CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+    };
+
     private readonly Button _all = Tab("전체");
     private readonly Button _speech = Tab("대화");
     private readonly Button _system = Tab("시스템");
@@ -63,8 +74,18 @@ public sealed partial class ChatPanel : PanelContainer
         _scroll.CustomMinimumSize = new Vector2(0, Tall);
         _scroll.AddChild(_lines);
 
+        Button send = new() { Text = "보내기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
+        send.Pressed += Say;
+        _typed.TextSubmitted += _ => Say();
+
+        HBoxContainer typing = new();
+        typing.AddThemeConstantOverride("separation", Main.Gutter);
+        typing.AddChild(_typed);
+        typing.AddChild(send);
+
         body.AddChild(head);
         body.AddChild(_scroll);
+        body.AddChild(typing);
         AddChild(body);
 
         Choose(speech: false, system: false);
@@ -72,6 +93,27 @@ public sealed partial class ChatPanel : PanelContainer
 
     /// <summary>The button that shuts the panel, so whoever opened it decides what that means.</summary>
     public Button Close { get; }
+
+    /// <summary>Somebody wrote a line and asked to say it. What comes of it is the server's to say.</summary>
+    public event Action<string>? Sent;
+
+    /// <summary>
+    /// Says what was written and empties the box, leaving the keyboard up so another line can follow. What was said comes
+    /// back from the server like anybody else's words — nothing is written here as if it had been.
+    /// </summary>
+    private void Say()
+    {
+        string line = _typed.Text.Trim();
+
+        if (line.Length == 0)
+        {
+            return;
+        }
+
+        Sent?.Invoke(line);
+        _typed.Clear();
+        _typed.GrabFocus();
+    }
 
     private static Button Tab(string name) => new()
     {
