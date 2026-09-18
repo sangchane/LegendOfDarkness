@@ -43,6 +43,8 @@ public sealed class WorldMapTests : IDisposable
 
         await Waiting.WalkUntil(world, Direction.South, () => world.Field is not null, _deadline.Token);
 
+        Assert.True(world.Field is not null, $"우드랜드 아래 가장자리를 밟았는데 월드맵이 오지 않았습니다. 마지막: {world.State}");
+
         WorldMapInfo field = world.Field!;
 
         Assert.Equal("field001", field.Field);
@@ -204,6 +206,11 @@ public sealed class WorldMapTests : IDisposable
     /// 칸마다 6바이트 — 앞 2바이트는 건너뛰고 short 둘을 작은 끝 먼저로 읽어 지형표(<c>static/sotp.dat</c>)를
     /// 찾는다. 파일이 모자라 못 읽은 칸과 맵 밖은 벽으로 친다(<see cref="Pathing" /> 이 그렇게 요구한다).
     /// </summary>
+    /// <remarks>
+    /// 맵 파일만 본다 — 서버가 그 위에 덮는 템플릿의 <c>Blocks</c> 와 남이 선 칸(`Sprite.Walk`)은 안 본다
+    /// (`Area.cs:205-207`). 지금 수오미마을에는 그것이 없어서 이 시험이 맞다 — NPC 가 하나 더 서거나
+    /// 운영자가 칸을 막으면 147칸 길이 <see cref="Assert.Fail" /> 로 죽을 수 있다.
+    /// </remarks>
     private static Func<Tile, bool> Walled(IsolatedHadesServer server, int mapId, int columns, int rows)
     {
         byte[] sotp = File.ReadAllBytes(Path.Combine(server.ContentLocation, "static", "sotp.dat"));

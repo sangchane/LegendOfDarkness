@@ -58,4 +58,26 @@ public sealed class WorldMapTests
     {
         Assert.Equal(new byte[] { 0x00, 0x00, 0x4F, 0x83 }, WorldClient.FieldChoice(20355));
     }
+
+    /// <summary>
+    /// 몸통이 둘째 노드 중간(이름 시작 전)에서 끊겨도, 이미 다 읽은 첫째 노드는 살려서 돌려준다 —
+    /// 하나라도 있으면 사람이 창을 보고 빠져나갈 수 있다. 개수(0x02)와 몸통이 어긋난 경우를 흉내낸다.
+    /// </summary>
+    [Fact]
+    public void A_cut_second_node_still_returns_the_first()
+    {
+        WorldMapInfo field = WorldClient.ReadWorldMap(
+        [
+            0x08, 0x66, 0x69, 0x65, 0x6C, 0x64, 0x30, 0x30, 0x31, // "field001"
+            0x02,                                                 // 노드 둘이라고 예고
+            0x01,
+            0x00, 0x70, 0x01, 0x59,
+            0x06, 0xBC, 0xF6, 0xBF, 0xC0, 0xB9, 0xCC,             // "수오미"
+            0x00, 0x00, 0x4F, 0x83, 0x00, 0x28, 0x00, 0x0B,
+            0x01, 0x0D, 0x01, 0x44                                // 둘째 노드 점만 있고 이름부터 끊겼다
+        ]);
+
+        Assert.Equal("field001", field.Field);
+        Assert.Equal(new WorldMapNode("수오미", 20355, 40, 11, 345, 112), Assert.Single(field.Nodes));
+    }
 }
