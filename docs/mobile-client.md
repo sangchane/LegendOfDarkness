@@ -482,6 +482,10 @@ insight_1/safehouse_wasp.json` — 저장소의 `sources/` 에는 없다. `AreaI
 - **시험이 스스로 통과하지 않는지 본다.** 이번에만 두 번 있었다 — 걷기 거절 시험이 걷기 전부터 기대값과
   같아 아무것도 검사하지 않았고, 그 다음 판은 "지도 끝"이라 써 놓고 실은 속도 제한을 재고 있었다.
   **고친 뒤에는 일부러 되돌려서 빨개지는지 확인한다.**
+- **`scripts/godot.sh` 에는 `--path` 를 주지 않는다.** 래퍼가 이미 `--path "<repo>/mobile/client"` 를
+  넣으므로 또 주면 "Invalid project path." 로 죽는다. 이 문서의 다른 예시가 `--path mobile/client` 를
+  달고 있는 것은 고도 실행 파일을 **직접** 부를 때의 형태다 — 래퍼를 쓸 때는 뺀다:
+  `./scripts/godot.sh -- --login watch:1234 --walk S --shot <파일> --shot-after 12`
 
 ---
 
