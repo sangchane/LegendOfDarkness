@@ -88,6 +88,7 @@ public sealed partial class PackPanel : PanelContainer
 
         // 창마다 확정 단추는 하나뿐이다 — 전부 돌로 하면 아무것도 돋보이지 않는다.
         Greybox.Commit(_use);
+        Greybox.Plain(_drop);
         _gearTab.Pressed += () => ShowTab(gear: true);
         _packTab.Pressed += () => ShowTab(gear: false);
 
@@ -96,9 +97,11 @@ public sealed partial class PackPanel : PanelContainer
         head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
         Tidy = new Button { Text = "정렬", CustomMinimumSize = Cell };
+        Greybox.Plain(Tidy);
         head.AddChild(Tidy);
 
         Close = new Button { Text = "닫기", CustomMinimumSize = Cell };
+        Greybox.Plain(Close);
         head.AddChild(Close);
 
         _rows.Columns = Columns;

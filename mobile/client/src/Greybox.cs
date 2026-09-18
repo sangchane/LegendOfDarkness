@@ -229,6 +229,30 @@ public static class Greybox
         }
     }
 
+    /// <summary>
+    /// An ordinary button — 대화, 닫기, 정렬. Dark and rounded, with a visible edge: these sit straight on the
+    /// map, and without an edge a dark button on a dark tile stops looking like a button at all.
+    /// </summary>
+    public static void Plain(Button button)
+    {
+        foreach (string state in new[] { "normal", "hover", "focus" })
+        {
+            StyleBoxFlat box = new() { BgColor = Inner with { A = 0.92f }, BorderColor = Deep };
+            box.SetBorderWidthAll(1);
+            box.SetCornerRadiusAll(Round);
+            button.AddThemeStyleboxOverride(state, box);
+        }
+
+        StyleBoxFlat down = new() { BgColor = Cell, BorderColor = Muted };
+        down.SetBorderWidthAll(1);
+        down.SetCornerRadiusAll(Round);
+        button.AddThemeStyleboxOverride("pressed", down);
+
+        button.AddThemeColorOverride("font_color", Title);
+        button.AddThemeColorOverride("font_hover_color", Text);
+        button.AddThemeColorOverride("font_pressed_color", Text);
+    }
+
     /// <summary>Darkens what is under it, so a number written over a picture can be read.</summary>
     public static StyleBoxFlat Shade() => new() { BgColor = new Color(0, 0, 0, 0.55f), CornerRadiusTopLeft = 23, CornerRadiusTopRight = 23, CornerRadiusBottomLeft = 23, CornerRadiusBottomRight = 23 };
 

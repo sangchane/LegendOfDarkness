@@ -298,6 +298,7 @@ public partial class GameScreen : Control
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
         };
 
+        Greybox.Plain(pack);
         pack.Pressed += () => Carrying(true);
         row.AddChild(pack);
 
@@ -958,6 +959,7 @@ public partial class GameScreen : Control
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
             SizeFlagsVertical = SizeFlags.ShrinkEnd
         };
+        Greybox.Plain(said);
         said.Pressed += () => Chatting(true);
         row.AddChild(said);
 
