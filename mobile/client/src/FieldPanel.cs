@@ -51,6 +51,7 @@ public sealed partial class FieldPanel : PanelContainer
     {
         foreach (Node old in _places.GetChildren())
         {
+            _places.RemoveChild(old);
             old.QueueFree();
         }
 

@@ -1016,14 +1016,24 @@ public sealed class WorldClient(WorldSession session)
 
         for (int index = 0; index < count; index++)
         {
-            int pointY = (short)Word(body, ref at);
-            int pointX = (short)Word(body, ref at);
-            string name = Words(body, ref at);
-            int area = (int)Long(body, ref at);
-            int x = (short)Word(body, ref at);
-            int y = (short)Word(body, ref at);
+            try
+            {
+                int pointY = (short)Word(body, ref at);
+                int pointX = (short)Word(body, ref at);
+                string name = Words(body, ref at);
+                int area = (int)Long(body, ref at);
+                int x = (short)Word(body, ref at);
+                int y = (short)Word(body, ref at);
 
-            nodes.Add(new WorldMapNode(name, area, x, y, pointX, pointY));
+                nodes.Add(new WorldMapNode(name, area, x, y, pointX, pointY));
+            }
+            catch (ProtocolException) when (nodes.Count > 0)
+            {
+                // 개수(0x02 등)와 몸통이 어긋나 중간에서 끊겨도, 이미 다 읽은 곳이 있으면 그것으로
+                // 돌려준다 — 사람이 창을 보고 빠져나갈 수 있다. 하나도 못 읽었으면(맨 처음이 끊기면)
+                // 아래에서 그대로 던진다 — 그건 어차피 못 빠져나온다.
+                break;
+            }
         }
 
         return new WorldMapInfo(picture, number, nodes);
