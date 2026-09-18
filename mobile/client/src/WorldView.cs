@@ -1153,6 +1153,44 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     /// <summary>Plays the sounds the server asked for (0x19). The number is the file's name.</summary>
     /// <summary>
+    /// Picks up whatever we are standing on. The only way to lift something was to tap it, and on a floor with
+    /// thirty monsters on it nobody finds a 20-pixel bundle to tap — a character fought all night and came home
+    /// with an empty bag (사용자, 2026-09-18). Stepping on it is what players expect now.
+    /// </summary>
+    /// <remarks>
+    /// The server decides whether it may be carried (weight, a full bag) and says so in words; this only asks.
+    /// Asking again while the answer is on its way would ask many times for the one bundle, so it waits.
+    /// </remarks>
+    private void Gather()
+    {
+        if (server is null || Frozen || _lifted > 0)
+        {
+            _lifted = Math.Max(0, _lifted - 1);
+            return;
+        }
+
+        Tile standing = server.State?.Where ?? _tile;
+
+        foreach (GroundMark mark in _dropped.Values)
+        {
+            if (mark.Where != standing)
+            {
+                continue;
+            }
+
+            _ = server.PickUpAsync(standing, _leaving.Token);
+            _lifted = LiftFrames;
+
+            return;
+        }
+    }
+
+    /// <summary>주운 뒤 다음으로 손을 뻗기까지 기다리는 프레임. 60프레임이 1초다.</summary>
+    private const int LiftFrames = 24;
+
+    private int _lifted;
+
+    /// <summary>
     /// Puts a bar over the head of whoever was just struck. The server tells us about every blow (0x13) with
     /// what is left as a percentage, and until now the screen only listened for the sound in it — so a fight
     /// showed no sign of how it was going, on a monster or on a person.
@@ -1431,6 +1469,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Herd();
         Swings();
         Wounds();
+        Gather();
         Flashes();
         Sounds();
         Band();
