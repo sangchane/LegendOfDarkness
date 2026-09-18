@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모바일 UI 시안 — 원작 4.51 테마 3안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 원작 4.51 에서 실제로 센 색 — docs/original-ui-451.md */
+  --stone-lit:#abab9f; --stone:#97978b; --stone-dim:#837b6f; --stone-deep:#636357;
+  --slate:#333333; --slate-deep:#1f1f1f; --ink:#0f0f0f; --ink-blue:#171723;
+  --edge:#434343; --edge-lit:#878787;
+  --page:#141720; --paper:#1b1d24;
+  --text:#d6d6cc; --muted:#97978b;
+  --sans:"Noto Sans KR",system-ui,sans-serif;
+  --serif:"Noto Serif KR",serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100dvh;background:var(--page);color:var(--text);font-family:var(--sans);
+     -webkit-font-smoothing:antialiased;padding:48px 16px 96px}
+.wrap{max-width:1180px;margin:0 auto}
+
+h1{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.lede{color:var(--muted);margin-top:10px;max-width:70ch;line-height:1.7;font-size:14px}
+.lede b{color:var(--text);font-weight:500}
+h2{font-size:15px;font-weight:700;margin:56px 0 4px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:20px}
+
+.row{display:grid;grid-template-columns:1fr;gap:28px}
+@media(min-width:900px){.row{grid-template-columns:repeat(3,1fr)}}
+
+.card{border-top:1px solid var(--edge);padding-top:16px}
+.tag{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.tag .n{font-family:var(--mono);font-size:12px;color:var(--stone-dim)}
+.tag h3{font-size:15px;font-weight:700}
+.card p{color:var(--muted);font-size:13px;line-height:1.65;margin-bottom:16px;min-height:44px}
+
+/* ── 기기 틀 ───────────────────────────────────────────── */
+.phone{width:360px;height:780px;margin:0 auto;position:relative;overflow:hidden;
+       border-radius:22px;border:1px solid var(--edge);
+       background:#0b0c10 url(assets/world.png) center/cover no-repeat;
+       font-size:13px;line-height:1.4}
+.phone *{position:relative}
+.hero{position:absolute;left:50%;top:46%;width:44px;height:74px;transform:translate(-50%,-50%);
+      background:url(../assets/hero-walk.png) 0 0/470px 83px no-repeat;
+      image-rendering:pixelated;pointer-events:none}
+
+/* 공통 배치 — 세 안 모두 같은 자리에 같은 것을 둔다. 다른 것은 재질뿐이다. */
+.top{position:absolute;left:10px;right:10px;top:10px}
+.msg{position:absolute;left:10px;right:10px;bottom:212px;display:flex;flex-direction:column;gap:4px}
+.pad{position:absolute;left:14px;bottom:24px;width:132px;height:132px}
+.fan{position:absolute;right:14px;bottom:24px;width:160px;height:160px}
+.pad b,.fan b{position:absolute;display:flex;align-items:center;justify-content:center;font-weight:500}
+.d-u{left:44px;top:0}.d-l{left:0;top:44px}.d-r{left:88px;top:44px}.d-d{left:44px;top:88px}
+.pad b{width:44px;height:44px;font-size:15px}
+.atk{right:0;bottom:0;width:78px;height:78px;font-size:15px;font-weight:700!important}
+.s1{right:82px;bottom:16px}.s2{right:66px;bottom:82px}.s3{right:6px;bottom:96px}
+.fan .sk{width:48px;height:48px;font-size:11px}
+.vit{display:flex;align-items:center;gap:8px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ── 안 A · 색만 빌린다 ────────────────────────────────── */
+.A .plate{background:rgba(31,31,31,.93);border:1px solid var(--edge);border-radius:14px;padding:12px 14px}
+.A .name{font-weight:700;font-size:15px;letter-spacing:-.01em}
+.A .lv{color:var(--stone-dim);font-size:12px;font-weight:500}
+.A .bar{flex:1;height:8px;border-radius:99px;background:var(--ink);overflow:hidden}
+.A .bar i{display:block;height:100%;border-radius:99px}
+.A .bar i.hp{background:var(--stone-lit)}
+.A .bar i.mp{background:var(--stone-deep)}
+.A .cap{width:26px;font-size:11px;color:var(--muted)}
+.A .val{font-size:12px;color:var(--text);min-width:64px;text-align:right}
+.A .exp{color:var(--muted);font-size:11px;margin-top:8px;display:flex;justify-content:space-between}
+.A .msg span{background:rgba(23,23,35,.92);border-radius:10px;padding:7px 12px;font-size:12.5px;
+             color:var(--text);align-self:flex-start;max-width:100%}
+.A .pad b,.A .fan b{background:rgba(31,31,31,.9);border:1px solid var(--edge);border-radius:14px;color:var(--text)}
+.A .pad b{border-radius:12px}
+.A .atk{border-radius:50%!important;background:rgba(131,123,111,.92)!important;border-color:var(--stone-lit)!important;color:#141720!important}
+.A .fan .sk{border-radius:50%}
+
+/* ── 안 B · 원작 그림 그대로 ──────────────────────────── */
+.B{font-family:var(--serif)}
+/* 음각 — 원작은 글자를 판에 파서 아래쪽에 빛이 걸린다. 밝은 돌 위라 글자는 거의 검정이어야 읽힌다. */
+.B .plate,.B .pad b,.B .fan b{background:url(assets/stone.png) repeat;
+  border-top:2px solid rgba(232,232,222,.65);border-left:2px solid rgba(232,232,222,.45);
+  border-right:2px solid rgba(0,0,0,.6);border-bottom:2px solid rgba(0,0,0,.65);
+  color:#100f0b;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.B .plate{padding:6px 8px}
+.B .name{font-weight:700;font-size:15px}
+.B .lv{font-size:12px;color:#2a2a22;font-weight:500}
+.B .orbs{display:flex;gap:6px;align-items:center;margin-top:4px}
+.B .orb{width:38px;height:38px;image-rendering:pixelated;background-size:contain;background-repeat:no-repeat}
+.B .orb.hp{background-image:url(assets/orb-hp-full.png)}
+.B .orb.mp{background-image:url(assets/orb-mp-full.png)}
+.B .read{flex:1;background:var(--ink);border:1px solid #000;
+         box-shadow:inset 1px 1px 2px rgba(0,0,0,.9);padding:3px 6px;color:var(--stone-lit);
+         text-shadow:none;font-family:var(--mono);font-size:11px;line-height:1.5}
+.B .msg span{background:url(assets/stone.png) repeat;border:2px outset rgba(232,232,222,.5);
+             padding:5px 9px;font-size:12.5px;font-weight:700;color:#100f0b;
+             text-shadow:0 1px 0 rgba(255,255,255,.6);align-self:flex-start}
+.B .pad b{font-size:20px;font-weight:700}
+.B .atk{font-size:14px}
+.B .fan .sk{font-size:10.5px;font-weight:700}
+
+/* ── 안 C · 틀은 원작, 속은 깨끗하게 ─────────────────── */
+.C .plate{background:url(assets/stone.png) repeat;padding:5px;
+  border-top:2px solid rgba(214,214,204,.5);border-left:2px solid rgba(214,214,204,.3);
+  border-right:2px solid rgba(0,0,0,.55);border-bottom:2px solid rgba(0,0,0,.6)}
+.C .inner{background:rgba(15,15,15,.96);padding:10px 12px}
+.C .name{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--stone-lit)}
+.C .lv{color:var(--stone-dim);font-size:12px}
+.C .orb{width:30px;height:30px;image-rendering:pixelated;background-size:contain;background-repeat:no-repeat;flex:none}
+.C .orb.hp{background-image:url(assets/orb-hp-full.png)}
+.C .orb.mp{background-image:url(assets/orb-mp-full.png)}
+.C .bar{flex:1;height:7px;border-radius:99px;background:#000;overflow:hidden}
+.C .bar i{display:block;height:100%;border-radius:99px}
+.C .bar i.hp{background:#c8783c}
+.C .bar i.mp{background:#5a6fa8}
+.C .val{font-size:12px;min-width:64px;text-align:right}
+.C .exp{color:var(--muted);font-size:11px;margin-top:8px;display:flex;justify-content:space-between}
+.C .msg span{background:rgba(15,15,15,.94);border-left:3px solid var(--stone-dim);
+             padding:6px 11px;font-size:12.5px;align-self:flex-start}
+.C .pad b,.C .fan b{background:rgba(15,15,15,.9);border:1px solid var(--stone-deep);border-radius:12px;color:var(--stone-lit)}
+.C .atk{border-radius:50%!important;background:url(assets/stone.png) repeat!important;
+        border:2px outset rgba(232,232,222,.55)!important;color:#100f0b!important;
+        font-family:var(--serif);text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.C .fan .sk{border-radius:50%}
+
+/* ── 창(소지품) ───────────────────────────────────────── */
+.win{width:360px;margin:0 auto;border-radius:14px;overflow:hidden;border:1px solid var(--edge)}
+.win .head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
+.win .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:14px}
+.win .cell{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.win .foot{display:flex;gap:8px;padding:0 14px 14px}
+.win .foot b{flex:1;text-align:center;padding:12px 0;border-radius:12px;font-size:13px;font-weight:500}
+
+.wA{background:#1b1d24}
+.wA .head{background:#1f1f1f;border-bottom:1px solid var(--edge);font-weight:700}
+.wA .cell{background:#26262b;border:1px solid #33333a}
+.wA .foot b{background:#2b2b31;border:1px solid var(--edge);color:var(--text)}
+.wA .foot b.go{background:var(--stone-dim);color:#141720;border-color:var(--stone-lit)}
+
+.wB{background:url(assets/wood.png) repeat;font-family:var(--serif)}
+.wB .head{background:url(assets/stone.png) repeat;color:#100f0b;font-weight:700;
+          text-shadow:0 1px 0 rgba(255,255,255,.6);border-bottom:2px solid rgba(0,0,0,.6)}
+.wB .grid{gap:4px;padding:8px}
+.wB .cell{border-radius:0;background:rgba(0,0,0,.45);border:2px inset rgba(214,214,204,.3)}
+.wB .foot{gap:4px;padding:0 8px 8px}
+.wB .foot b{border-radius:0;background:url(assets/stone.png) repeat;color:#100f0b;font-weight:700;
+            border:2px outset rgba(214,214,204,.4);text-shadow:0 1px 0 rgba(255,255,255,.6);padding:9px 0}
+
+.wC{background:#16161a}
+.wC .head{background:url(assets/stone.png) repeat;color:#20201c;font-family:var(--serif);font-weight:700;
+          text-shadow:0 1px 0 rgba(255,255,255,.6);border-bottom:2px solid rgba(0,0,0,.6)}
+.wC .cell{background:#1f1f24;border:1px solid #303036}
+.wC .foot b{background:#22222a;border:1px solid var(--stone-deep);color:var(--stone-lit)}
+.wC .foot b.go{background:url(assets/stone.png) repeat;color:#100f0b;font-weight:700;border:2px outset rgba(214,214,204,.45);
+               font-family:var(--serif);text-shadow:0 1px 0 rgba(255,255,255,.6)}
+
+/* ── 토큰 표 ──────────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #26262b;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:12px}
+td:first-child{color:var(--muted);width:120px}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:5px;border:1px solid rgba(255,255,255,.14)}
+code{font-family:var(--mono);font-size:11.5px;color:var(--stone-lit)}
+.note{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>모바일 UI 시안 — 원작 4.51 테마 3안</h1>
+  <p class="lede">
+    같은 화면을 재질만 바꿔 셋으로 그렸다. 배치·손 닿는 거리·글자 크기는 <b>세 안이 모두 같다</b> —
+    고르는 것은 <b>재질</b> 하나다. 바탕은 일부러 <b>금빛 바닥</b>이다. 지금 코드의 주석이
+    “이 바닥 위에서는 글자가 사라진다”고 적어 둔 바로 그 바닥이라, 읽히는지 여기서 판정된다.
+    색·돌 무늬·체력구슬은 전부 원작 4.51 <code>Legend.dat</code> 에서 뽑은 것이다.
+  </p>
+
+  <h2>세로 게임 화면</h2>
+  <p class="sub">무도가 10레벨 · 우드랜드 1-1 · 실제 서버 값(체력 342 · 마력 299 · 다음 레벨까지 4,032)</p>
+
+  <div class="row">
+
+    <!-- ── 안 A ─────────────────────────────────────── -->
+    <div class="card">
+      <div class="tag"><span class="n">안 A</span><h3>색만 빌린다</h3></div>
+      <p>원작 팔레트만 쓰고 무늬는 안 쓴다. 평평하고 여백이 넓다 — 토스 구조에 원작 색온도.</p>
+      <div class="phone A">
+        <div class="hero"></div>
+        <div class="top">
+          <div class="plate">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+              <span class="name">단하</span><span class="lv num">무도가 · Lv 10</span>
+            </div>
+            <div class="vit" style="margin-bottom:6px">
+              <span class="cap">체력</span><span class="bar"><i class="hp" style="width:100%"></i></span>
+              <span class="val num">342 / 342</span>
+            </div>
+            <div class="vit">
+              <span class="cap">마력</span><span class="bar"><i class="mp" style="width:100%"></i></span>
+              <span class="val num">299 / 299</span>
+            </div>
+            <div class="exp"><span>다음 레벨까지</span><span class="num">4,032</span></div>
+          </div>
+        </div>
+        <div class="msg">
+          <span>검은 곰이 당신을 공격합니다.</span>
+          <span>단각으로 68 을 입혔습니다.</span>
+        </div>
+        <div class="pad">
+          <b class="d-u">↑</b><b class="d-l">←</b><b class="d-r">→</b><b class="d-d">↓</b>
+        </div>
+        <div class="fan">
+          <b class="sk s1">단각</b><b class="sk s2">백보</b><b class="sk s3">금강</b>
+          <b class="atk">공격</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 안 B ─────────────────────────────────────── -->
+    <div class="card">
+      <div class="tag"><span class="n">안 B</span><h3>원작 그림 그대로</h3></div>
+      <p>돌 무늬·음각 세리프·체력구슬을 그대로 쓴다. 가장 ‘그 게임’이지만 틀이 두꺼워 여백을 못 둔다.</p>
+      <div class="phone B">
+        <div class="hero"></div>
+        <div class="top">
+          <div class="plate">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span class="name">단하</span><span class="lv">무도가 · 10</span>
+            </div>
+            <div class="orbs">
+              <span class="orb hp"></span>
+              <span class="read">체력 342 / 342<br>다음까지 4,032</span>
+              <span class="orb mp"></span>
+              <span class="read">마력 299 / 299<br>금화 12,480</span>
+            </div>
+          </div>
+        </div>
+        <div class="msg">
+          <span>검은 곰이 당신을 공격합니다.</span>
+          <span>단각으로 68 을 입혔습니다.</span>
+        </div>
+        <div class="pad">
+          <b class="d-u">↑</b><b class="d-l">←</b><b class="d-r">→</b><b class="d-d">↓</b>
+        </div>
+        <div class="fan">
+          <b class="sk s1">단각</b><b class="sk s2">백보</b><b class="sk s3">금강</b>
+          <b class="atk">공격</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 안 C ─────────────────────────────────────── -->
+    <div class="card">
+      <div class="tag"><span class="n">안 C</span><h3>틀은 원작, 속은 깨끗하게</h3></div>
+      <p>바깥 틀·구슬·공격 버튼만 돌이고, 읽고 누르는 속은 평평하다. 분위기와 읽힘을 둘 다 가진다.</p>
+      <div class="phone C">
+        <div class="hero"></div>
+        <div class="top">
+          <div class="plate"><div class="inner">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+              <span class="name">단하</span><span class="lv num">무도가 · Lv 10</span>
+            </div>
+            <div class="vit" style="margin-bottom:7px">
+              <span class="orb hp"></span><span class="bar"><i class="hp" style="width:100%"></i></span>
+              <span class="val num">342 / 342</span>
+            </div>
+            <div class="vit">
+              <span class="orb mp"></span><span class="bar"><i class="mp" style="width:100%"></i></span>
+              <span class="val num">299 / 299</span>
+            </div>
+            <div class="exp"><span>다음 레벨까지</span><span class="num">4,032</span></div>
+          </div></div>
+        </div>
+        <div class="msg">
+          <span>검은 곰이 당신을 공격합니다.</span>
+          <span>단각으로 68 을 입혔습니다.</span>
+        </div>
+        <div class="pad">
+          <b class="d-u">↑</b><b class="d-l">←</b><b class="d-r">→</b><b class="d-d">↓</b>
+        </div>
+        <div class="fan">
+          <b class="sk s1">단각</b><b class="sk s2">백보</b><b class="sk s3">금강</b>
+          <b class="atk">공격</b>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>소지품 창</h2>
+  <p class="sub">목록·칸·단추가 모이는 곳. 재질 차이가 읽힘에 가장 크게 나타나는 화면이다.</p>
+
+  <div class="row">
+    <div class="card">
+      <div class="tag"><span class="n">안 A</span><h3>색만 빌린다</h3></div>
+      <div class="win wA">
+        <div class="head"><span>소지품</span><span class="num" style="color:var(--muted);font-weight:400">금화 12,480</span></div>
+        <div class="grid">
+          <div class="cell">🗡</div><div class="cell">🛡</div><div class="cell">🧿</div>
+          <div class="cell">🍖</div><div class="cell">🧪</div><div class="cell"></div>
+          <div class="cell">📜</div><div class="cell">🔑</div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="foot"><b>버리기</b><b>정렬</b><b class="go">입기</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tag"><span class="n">안 B</span><h3>원작 그림 그대로</h3></div>
+      <div class="win wB">
+        <div class="head"><span>소지품</span><span>금화 12,480</span></div>
+        <div class="grid">
+          <div class="cell">🗡</div><div class="cell">🛡</div><div class="cell">🧿</div>
+          <div class="cell">🍖</div><div class="cell">🧪</div><div class="cell"></div>
+          <div class="cell">📜</div><div class="cell">🔑</div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="foot"><b>버리기</b><b>정렬</b><b>입기</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tag"><span class="n">안 C</span><h3>틀은 원작, 속은 깨끗하게</h3></div>
+      <div class="win wC">
+        <div class="head"><span>소지품</span><span class="num" style="font-family:var(--mono);font-size:12px">12,480</span></div>
+        <div class="grid">
+          <div class="cell">🗡</div><div class="cell">🛡</div><div class="cell">🧿</div>
+          <div class="cell">🍖</div><div class="cell">🧪</div><div class="cell"></div>
+          <div class="cell">📜</div><div class="cell">🔑</div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+        </div>
+        <div class="foot"><b>버리기</b><b>정렬</b><b class="go">입기</b></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>세 안이 실제로 다른 것</h2>
+  <table>
+    <tr><th></th><th>안 A · 색만</th><th>안 B · 그림 그대로</th><th>안 C · 섞기</th></tr>
+    <tr><td>판 재질</td>
+        <td><span class="sw" style="background:#1f1f1f"></span>단색 <code>#1f1f1f</code> 93%</td>
+        <td>원작 돌 무늬 <code>stone.png</code></td>
+        <td>틀만 돌, 속은 <code>#0f0f0f</code> 96%</td></tr>
+    <tr><td>테두리</td><td>1px <code>#434343</code>, 둥근 14</td><td>2px 돋을새김, 각짐</td><td>2px 돋을새김 + 속은 각짐</td></tr>
+    <tr><td>글꼴</td><td>산세리프 전부</td><td>세리프 전부 (음각 그림자)</td><td>제목만 세리프, 본문 산세리프</td></tr>
+    <tr><td>체력·마력</td><td>막대 + 숫자</td><td>원작 구슬 + 음각 숫자칸</td><td>구슬(작게) + 막대 + 숫자</td></tr>
+    <tr><td>여백</td><td>12–16</td><td>4–8</td><td>틀 5 · 속 10–12</td></tr>
+    <tr><td>강조색</td>
+        <td><span class="sw" style="background:#837b6f"></span><code>#837b6f</code> 흙빛 하나</td>
+        <td>구슬의 주황·파랑(원작 그대로)</td>
+        <td><span class="sw" style="background:#c8783c"></span><span class="sw" style="background:#5a6fa8"></span>구슬에서 뽑은 두 색</td></tr>
+    <tr><td>금빛 바닥 위</td><td>잘 읽힌다</td><td>돌과 바닥이 같은 밝기라 경계가 흐리다</td><td>잘 읽힌다 (속이 어둡다)</td></tr>
+    <tr><td>손 닿는 곳</td><td>44 이상 넉넉</td><td>틀이 두꺼워 누르는 면이 줄어든다</td><td>44 이상 넉넉</td></tr>
+    <tr><td>만드는 비용</td><td><code>Greybox.cs</code> 값만 교체</td><td>9조각 틀 + 글꼴 + 구슬 16단계</td><td>9조각 틀 2종 + 구슬</td></tr>
+  </table>
+
+  <p class="note">
+    셋 다 <b>배치는 건드리지 않았다</b> — 지금 클라이언트가 이미 잡아 둔 자리(위 상태판 · 기록 줄 ·
+    방향판 · 공격 둘레 부채꼴)를 그대로 쓴다. 그래서 어느 안을 고르든 바뀌는 파일은
+    <code>mobile/client/src/Greybox.cs</code> 와 그것을 부르는 곳들이다.
+    <br><br>
+    자료 출처: 원작 4.51 <code>Legend.dat</code>(<code>sources/lodr4.51.exe</code>) · 그림 92장은
+    <code>docs/ui/original-451/</code> · 근거는 <code>docs/original-ui-451.md</code>.
+  </p>
+
+</div>
+</body>
+</html>
