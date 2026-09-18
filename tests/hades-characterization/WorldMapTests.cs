@@ -48,7 +48,11 @@ public sealed class WorldMapTests : IDisposable
         WorldMapInfo field = world.Field!;
 
         Assert.Equal("field001", field.Field);
-        Assert.Equal(24, field.Nodes.Count);
+        Assert.Equal(2, field.Nodes.Count);
+
+        // 들어가면 못 나오는 곳은 목록에 두지 않는다 — 드라큐라의성(20399)·크리스마스마을(20711) 에는
+        // 밟을 수 있는 워프가 하나도 없어 걸어 나갈 수도 월드맵을 다시 열 수도 없다.
+        Assert.DoesNotContain(field.Nodes, node => node.AreaId is 20399 or 20711);
 
         WorldMapNode suomi = Assert.Single(field.Nodes, node => node.Name == "수오미");
 
