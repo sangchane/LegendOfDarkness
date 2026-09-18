@@ -44,6 +44,12 @@ public static class Greybox
     private static readonly Color CellEdge = new("#303036");
     private static readonly Color Deep = new("#636357");
 
+    /// <summary>
+    /// The light stone's own colour, for the places a texture cannot go. A round button is one: Godot's textured
+    /// box has no corners to round, and a square attack button among round ones reads as a mistake.
+    /// </summary>
+    public static readonly Color StoneLit = new("#7d776c");
+
     // ── 치수. data/ui-vault/치수/치수.md ─────────────────────────────────────
 
     /// <summary>The stone frame's thickness.</summary>

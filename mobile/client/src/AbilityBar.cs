@@ -201,11 +201,19 @@ public sealed partial class AbilityBar : Control
     {
         Button button = Disc(text, side);
 
-        StyleBoxTexture stone = Greybox.Lit();
-        stone.SetContentMarginAll(7);
-
         foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
         {
+            // 무늬가 아니라 밝은 돌의 색으로 칠한다 — 무늬를 쓰면 모서리를 둥글릴 수 없어 둥근 단추 사이에서
+            // 혼자 네모가 된다(2026-09-18 화면으로 확인).
+            StyleBoxFlat stone = new()
+            {
+                BgColor = state == "pressed" ? Greybox.StoneLit.Darkened(0.2f) : Greybox.StoneLit,
+                BorderColor = new Color(0, 0, 0, 0.55f)
+            };
+
+            stone.SetCornerRadiusAll(side / 2 - 1);
+            stone.SetBorderWidthAll(2);
+            stone.SetContentMarginAll(7);
             button.AddThemeStyleboxOverride(state, stone);
         }
 
