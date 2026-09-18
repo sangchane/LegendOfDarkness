@@ -196,31 +196,28 @@ public sealed partial class AbilityBar : Control
         AddChild(button);
     }
 
-    /// <summary>The attack button — a disc like the rest, but cut from the light stone and engraved.</summary>
+    /// <summary>The attack button — a disc like the rest, but the one wearing the accent.</summary>
     private static Button Struck(string text, int side)
     {
         Button button = Disc(text, side);
 
         foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
         {
-            // 무늬가 아니라 밝은 돌의 색으로 칠한다 — 무늬를 쓰면 모서리를 둥글릴 수 없어 둥근 단추 사이에서
-            // 혼자 네모가 된다(2026-09-18 화면으로 확인).
-            StyleBoxFlat stone = new()
+            // 화면에서 유일하게 색을 입은 조작이다 — 손가락이 먼저 가는 곳이라 눈도 먼저 가야 한다.
+            StyleBoxFlat filled = new()
             {
-                BgColor = state == "pressed" ? Greybox.StoneLit.Darkened(0.2f) : Greybox.StoneLit,
-                BorderColor = new Color(0, 0, 0, 0.55f)
+                BgColor = state == "pressed" ? Greybox.Accent.Darkened(0.18f) : Greybox.Accent
             };
 
-            stone.SetCornerRadiusAll(side / 2 - 1);
-            stone.SetBorderWidthAll(2);
-            stone.SetContentMarginAll(7);
-            button.AddThemeStyleboxOverride(state, stone);
+            filled.SetCornerRadiusAll(side / 2 - 1);
+            filled.SetContentMarginAll(7);
+            button.AddThemeStyleboxOverride(state, filled);
         }
 
-        button.AddThemeColorOverride("font_color", Greybox.Engrave);
-        button.AddThemeColorOverride("font_hover_color", Greybox.Engrave);
-        button.AddThemeColorOverride("font_pressed_color", Greybox.Engrave);
-        button.AddThemeColorOverride("font_focus_color", Greybox.Engrave);
+        foreach (string colour in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
+        {
+            button.AddThemeColorOverride(colour, Greybox.OnAccent);
+        }
 
         return button;
     }

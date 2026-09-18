@@ -7,13 +7,12 @@ namespace LodClient;
 /// it now carries the original 4.51 theme, worked out and written down in <c>data/ui-vault/</c>.
 /// </summary>
 /// <remarks>
-/// The rule the vault settles on is 안C — <b>the frame, the title strip and the one button that commits are
-/// stone; everything you read or choose from is flat</b>. There are two stones and which goes where matters:
-/// wide faces take the dark one, and only small buttons take the light one. Laying the light stone widely was
-/// tried first and the titles stopped being readable.
+/// The rule is 안A — <b>borrow the colours, not the stone</b>. Everything is flat, generously spaced and
+/// rounded; the original's palette is what carries the feel. 안C was built first, with the original stone
+/// under the frames and buttons, and put on a device: the texture reads as clutter at phone size, so the
+/// plainer one won (사용자, 2026-09-18).
 ///
-/// Nothing here moves anything. The vault is explicit about that — only the material changes, so the screens
-/// that call this were not touched.
+/// Nothing here moves anything. Only the material changes, so the screens that call this were not touched.
 /// </remarks>
 public static class Greybox
 {
@@ -45,10 +44,16 @@ public static class Greybox
     private static readonly Color Deep = new("#636357");
 
     /// <summary>
-    /// The light stone's own colour, for the places a texture cannot go. A round button is one: Godot's textured
-    /// box has no corners to round, and a square attack button among round ones reads as a mistake.
+    /// The one strong colour, borrowed from the original's health bead. Everything that finishes a job wears it
+    /// — the attack button, the button that commits, the line under the open tab.
     /// </summary>
-    public static readonly Color StoneLit = new("#7d776c");
+    public static readonly Color Accent = new("#c8783c");
+
+    /// <summary>Letters on the accent. Dark, because dark on that orange is what stays readable.</summary>
+    public static readonly Color OnAccent = new("#1a1208");
+
+    /// <summary>A window's own frame — one shade above its inside.</summary>
+    private static readonly Color Frame_ = new("#17171b");
 
     // ── 치수. data/ui-vault/치수/치수.md ─────────────────────────────────────
 
@@ -63,8 +68,6 @@ public static class Greybox
     /// <summary>Rounding. Only on the inside — a stone frame has to stay square to read as the original's.</summary>
     public const int Round = 12;
 
-    private const string DarkStone = "res://assets/ui/stone-dark.png";
-    private const string LitStone = "res://assets/ui/stone-lit.png";
 
     /// <summary>
     /// A cell in a grid, a row in a list, an input box. Flat and dark — the vault forbids stone here, because a
@@ -112,31 +115,97 @@ public static class Greybox
     }
 
     /// <summary>
-    /// The stone a window is framed in, and the strip its title sits on. Dark, because this is a wide face.
-    /// Square on purpose — the rounding belongs to whatever is inside it.
+    /// A window's frame. Flat and dark, a shade above what is inside it, so the window reads as one thing
+    /// without a pattern doing the work.
     /// </summary>
-    public static StyleBoxTexture Stone() => Rock(DarkStone, Frame);
+    public static StyleBoxFlat Stone()
+    {
+        StyleBoxFlat frame = new() { BgColor = Frame_, BorderColor = CellEdge };
+        frame.SetBorderWidthAll(1);
+        frame.SetCornerRadiusAll(Round + 4);
+        frame.SetContentMarginAll(1);
+
+        return frame;
+    }
+
+    /// <summary>The colour that means "this is the one" — the button that commits, the tab that is open.</summary>
+    public static StyleBoxFlat Lit()
+    {
+        StyleBoxFlat filled = new() { BgColor = Accent };
+        filled.SetCornerRadiusAll(Round);
+
+        return filled;
+    }
 
     /// <summary>
-    /// The lighter stone, for the one button that commits and for the attack button. Only ever small faces: the
-    /// pattern is what carries the original's feel, and that same pattern under a paragraph destroys it.
+    /// The one button that commits — 입기, 삽니다, 보내기. Filled in the accent with dark letters on it, which
+    /// is the plainest way to say which button finishes the job. Only one per window.
     /// </summary>
-    public static StyleBoxTexture Lit() => Rock(LitStone, 3);
-
-    private static StyleBoxTexture Rock(string path, int edge)
+    public static void Commit(Button button)
     {
-        StyleBoxTexture rock = new()
+        StyleBoxFlat pressed = Lit();
+        pressed.BgColor = Accent.Darkened(0.18f);
+
+        button.AddThemeStyleboxOverride("normal", Lit());
+        button.AddThemeStyleboxOverride("hover", Lit());
+        button.AddThemeStyleboxOverride("focus", Lit());
+        button.AddThemeStyleboxOverride("pressed", pressed);
+
+        StyleBoxFlat off = Surface();
+        off.SetCornerRadiusAll(Round);
+        button.AddThemeStyleboxOverride("disabled", off);
+
+        foreach (string colour in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
         {
-            Texture = GD.Load<Texture2D>(path),
+            button.AddThemeColorOverride(colour, OnAccent);
+        }
 
-            // 64x64 무늬를 늘리지 않고 되풀이해 깐다 — 늘리면 돌결이 뭉개진다.
-            AxisStretchHorizontal = StyleBoxTexture.AxisStretchMode.Tile,
-            AxisStretchVertical = StyleBoxTexture.AxisStretchMode.Tile
-        };
+        button.AddThemeColorOverride("font_disabled_color", Muted);
+    }
 
-        rock.SetContentMarginAll(edge);
+    /// <summary>
+    /// A tab. The open one is filled and its letters brighten; the others are bare. Filling rather than
+    /// underlining means it can be told apart without reading, and without a second colour.
+    /// </summary>
+    public static void Tab(Button button)
+    {
+        StyleBoxFlat quiet = new() { BgColor = new Color(0, 0, 0, 0) };
+        quiet.SetCornerRadiusAll(Round);
 
-        return rock;
+        StyleBoxFlat chosen = new() { BgColor = Cell };
+        chosen.SetCornerRadiusAll(Round);
+        chosen.BorderColor = Accent;
+        chosen.SetBorderWidthAll(0);
+        chosen.BorderWidthBottom = 2;
+
+        button.AddThemeStyleboxOverride("normal", quiet);
+        button.AddThemeStyleboxOverride("hover", quiet);
+        button.AddThemeStyleboxOverride("focus", quiet);
+        button.AddThemeStyleboxOverride("pressed", chosen);
+        button.AddThemeColorOverride("font_color", Muted);
+        button.AddThemeColorOverride("font_hover_color", Text);
+        button.AddThemeColorOverride("font_pressed_color", Text);
+        button.AddThemeColorOverride("font_focus_color", Muted);
+    }
+
+    /// <summary>
+    /// The strip a window's title sits on. No band of its own — a line under it is enough, which is what keeps
+    /// the window feeling light.
+    /// </summary>
+    public static Control Header(Control inside)
+    {
+        StyleBoxFlat strip = new() { BgColor = new Color(0, 0, 0, 0), BorderColor = CellEdge };
+        strip.BorderWidthBottom = 1;
+        strip.ContentMarginLeft = Pad / 2;
+        strip.ContentMarginRight = Pad / 2;
+        strip.ContentMarginTop = Pad / 2;
+        strip.ContentMarginBottom = Pad / 2;
+
+        PanelContainer head = new();
+        head.AddThemeStyleboxOverride("panel", strip);
+        head.AddChild(inside);
+
+        return head;
     }
 
     /// <summary>
@@ -158,57 +227,6 @@ public static class Greybox
             box.SetContentMarginAll(7);
             button.AddThemeStyleboxOverride(state, box);
         }
-    }
-
-    /// <summary>
-    /// The one button that commits — 입기, 삽니다, 보내기, 들어가기. Light stone with the words engraved into it,
-    /// which is how the original's own buttons are made. Only one per window: if everything is stone, nothing is.
-    /// </summary>
-    public static void Commit(Button button)
-    {
-        foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
-        {
-            button.AddThemeStyleboxOverride(state, Lit());
-        }
-
-        button.AddThemeStyleboxOverride("disabled", Surface());
-        button.AddThemeColorOverride("font_color", Engrave);
-        button.AddThemeColorOverride("font_hover_color", Engrave);
-        button.AddThemeColorOverride("font_pressed_color", Engrave);
-        button.AddThemeColorOverride("font_focus_color", Engrave);
-        button.AddThemeColorOverride("font_disabled_color", Muted);
-    }
-
-    /// <summary>
-    /// A tab. The chosen one is light stone and engraved; the others stay flat, so which one is open can be told
-    /// without reading the words.
-    /// </summary>
-    public static void Tab(Button button)
-    {
-        StyleBoxFlat quiet = Surface();
-        quiet.SetCornerRadiusAll(10);
-
-        button.AddThemeStyleboxOverride("normal", quiet);
-        button.AddThemeStyleboxOverride("hover", quiet);
-        button.AddThemeStyleboxOverride("focus", quiet);
-        button.AddThemeStyleboxOverride("pressed", Lit());
-        button.AddThemeColorOverride("font_color", Muted);
-        button.AddThemeColorOverride("font_hover_color", Title);
-        button.AddThemeColorOverride("font_pressed_color", Engrave);
-        button.AddThemeColorOverride("font_focus_color", Muted);
-    }
-
-    /// <summary>
-    /// The strip a window's title sits on — dark stone across the full width, with the title in light letters.
-    /// Never engraved: engraving needs the light stone under it or the words vanish.
-    /// </summary>
-    public static Control Header(Control inside)
-    {
-        PanelContainer strip = new();
-        strip.AddThemeStyleboxOverride("panel", Stone());
-        strip.AddChild(inside);
-
-        return strip;
     }
 
     /// <summary>Darkens what is under it, so a number written over a picture can be read.</summary>
