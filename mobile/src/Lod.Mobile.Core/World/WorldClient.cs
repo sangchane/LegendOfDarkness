@@ -26,6 +26,9 @@ public sealed class WorldClient(WorldSession session)
     private const byte AnswerCommand = 0x3A;
     private const byte RefreshCommand = 0x38;
     private const byte MapChangedCommand = 0x15;
+
+    /// <summary>월드맵 창이 열렸다는 알림(ServerFormat2E).</summary>
+    private const byte WorldMapCommand = 0x2E;
     private const byte LocationCommand = 0x04;
     private const byte OwnSerialCommand = 0x05;
     private const byte DisplayCharacterCommand = 0x33;
@@ -145,6 +148,8 @@ public sealed class WorldClient(WorldSession session)
     private readonly ConcurrentQueue<int> _sounds = new();
     private readonly ConcurrentQueue<int> _songs = new();
 
+    private WorldMapInfo? _field;
+
     private volatile string? _broke;
     private volatile int _ignored;
 
@@ -205,6 +210,12 @@ public sealed class WorldClient(WorldSession session)
     /// full, as the character enters, and in pieces after that.
     /// </summary>
     public Vitals? Vitals => _vitals;
+
+    /// <summary>
+    /// 월드맵 창이 열려 있으면 그 내용. 열려 있는 동안 서버는 <see cref="ChooseFieldAsync"/> 말고는
+    /// 이 접속의 패킷을 모두 버린다(`NetworkServer.cs:141`) — 걸음도 말도 닿지 않는다.
+    /// </summary>
+    public WorldMapInfo? Field => _field;
 
     /// <summary>
     /// Takes the next figure the server said had moved its body, if any. The server tells everyone nearby
@@ -346,7 +357,20 @@ public sealed class WorldClient(WorldSession session)
             {
                 case MapChangedCommand:
                     map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    _field = null;
                     break;
+
+                case WorldMapCommand:
+                    try
+                    {
+                        _field = ReadWorldMap(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    }
+                    catch (ProtocolException cut)
+                    {
+                        NoteUnread($"월드맵 안내를 읽다가 끊겼습니다: {cut.Message}");
+                    }
+
+                    continue;
 
                 case LocationCommand:
                     where = ReadLocation(HadesCipher.DecodeSecured(frame, session.Parameters));
@@ -950,6 +974,35 @@ public sealed class WorldClient(WorldSession session)
         BinaryPrimitives.ReadUInt32BigEndian(body),
         body.Length >= 5 ? body[4] : 0,
         body.Length >= 7 ? BinaryPrimitives.ReadUInt16BigEndian(body[5..]) : 0);
+
+    /// <summary>
+    /// 월드맵 창(ServerFormat2E): 그림 이름, 곳의 수, 마당 번호, 그리고 곳마다 점(Y 가 먼저다)·이름·
+    /// 갈 맵·그 맵에서 설 칸. 끝의 여섯 바이트는 서버가 채우는 아무 값이라 읽지 않는다.
+    /// </summary>
+    public static WorldMapInfo ReadWorldMap(ReadOnlySpan<byte> body)
+    {
+        int at = 0;
+
+        string picture = Words(body, ref at);
+        int count = Byte(body, ref at);
+        int number = Byte(body, ref at);
+
+        List<WorldMapNode> nodes = new(count);
+
+        for (int index = 0; index < count; index++)
+        {
+            int pointY = (short)Word(body, ref at);
+            int pointX = (short)Word(body, ref at);
+            string name = Words(body, ref at);
+            int area = (int)Long(body, ref at);
+            int x = (short)Word(body, ref at);
+            int y = (short)Word(body, ref at);
+
+            nodes.Add(new WorldMapNode(name, area, x, y, pointX, pointY));
+        }
+
+        return new WorldMapInfo(picture, number, nodes);
+    }
 
     /// <summary>A sound (0x19): an empty byte, then the number.</summary>
     public static int ReadSound(ReadOnlySpan<byte> body) => BinaryPrimitives.ReadUInt16BigEndian(body[1..]);
