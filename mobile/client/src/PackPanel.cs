@@ -38,6 +38,9 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Button _gearTab = new() { Text = "장비", ToggleMode = true };
     private readonly Button _packTab = new() { Text = "소지품", ToggleMode = true };
     private readonly Label _chosenName = new();
+
+    /// <summary>The name on the stone strip — which of the two tabs is open.</summary>
+    private Label _title = null!;
     private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right };
     private readonly Button _use = new() { Text = "입기" };
     private readonly Button _drop = new() { Text = "버리기" };
@@ -159,6 +162,19 @@ public sealed partial class PackPanel : PanelContainer
         foot.AddChild(_use);
         foot.AddChild(_drop);
 
+        // 돌 제목줄 — 어느 창인지와 지금 가진 금화를 늘 같은 자리에서 본다. 어두운 돌 위라 글자는 밝은 쪽이다.
+        HBoxContainer naming = new();
+        naming.AddThemeConstantOverride("separation", Main.Gutter);
+
+        _title = new Label { Text = "소지품" };
+        _title.AddThemeColorOverride("font_color", Greybox.Title);
+        naming.AddChild(_title);
+        naming.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+
+        _gold.AddThemeColorOverride("font_color", Greybox.Title);
+        naming.AddChild(_gold);
+
+        body.AddChild(Greybox.Header(naming));
         body.AddChild(head);
         body.AddChild(_scroll);
         body.AddChild(_rows);
@@ -167,9 +183,6 @@ public sealed partial class PackPanel : PanelContainer
         // 탭·정렬·닫기와 함께 넘친다(한 번 그렇게 됐다) — 장 넘김과 한 줄.
         HBoxContainer turning = new();
         turning.AddChild(_pager);
-        _gold.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        _gold.VerticalAlignment = VerticalAlignment.Center;
-        turning.AddChild(_gold);
 
         body.AddChild(turning);
         body.AddChild(foot);
@@ -200,6 +213,7 @@ public sealed partial class PackPanel : PanelContainer
         _gearTab.ButtonPressed = gear;
         _packTab.ButtonPressed = !gear;
         Tidy.Visible = !gear;
+        _title.Text = gear ? "장비" : "소지품";
 
         // 탭을 옮기면 고른 것이 다른 탭에 있을 수 있다. 놓고 다시 고르게 한다.
         _chosen = 0;

@@ -165,9 +165,24 @@ public sealed partial class GearGrid : Control
 
             cell.Icon = filled ? ItemIcons.For(gear!.Icon) ?? Empty(slot) : Empty(slot);
 
-            // 걸친 것은 또렷하게, 빈 자리는 흐리게. 고른 칸만 테두리가 남는다.
+            // 걸친 것은 또렷하게, 빈 자리는 흐리게 — 원작 빈자리 그림을 그대로 쓰되 눈에 덜 걸리게 한다.
             cell.Modulate = filled ? Colors.White : new Color(1, 1, 1, 0.35f);
-            cell.Flat = slot != -chosen;
+
+            // 걸친 칸과 고른 칸은 테두리가 밝아진다. 밝기만으로 말하지 않으려고 굵기도 함께 바꾼다.
+            StyleBoxFlat edge = Greybox.Surface();
+            edge.SetCornerRadiusAll(8);
+
+            if (slot == -chosen)
+            {
+                edge.BorderColor = Greybox.Title;
+                edge.SetBorderWidthAll(2);
+            }
+            else if (filled)
+            {
+                edge.BorderColor = Greybox.Muted;
+            }
+
+            cell.AddThemeStyleboxOverride("normal", edge);
             cell.TooltipText = filled ? gear!.Called : WornPlace.Of(slot);
         }
     }
@@ -215,9 +230,16 @@ public sealed partial class GearGrid : Control
         {
             Name = $"Slot{slot}",
             CustomMinimumSize = middle ? new Vector2(DollWidth, Main.TouchMinimum) : Cell,
-            ExpandIcon = true,
-            Flat = true
+            ExpandIcon = true
         };
+
+        // 칸은 평평한 어둠이다 — 돌은 틀과 확정 단추에만 쓴다(data/ui-vault 안C).
+        foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
+        {
+            StyleBoxFlat box = Greybox.Surface();
+            box.SetCornerRadiusAll(8);
+            cell.AddThemeStyleboxOverride(state, box);
+        }
 
         cell.Pressed += () => Chosen?.Invoke(slot);
         _cells[slot] = cell;
