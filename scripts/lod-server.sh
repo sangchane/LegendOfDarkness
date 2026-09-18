@@ -72,8 +72,36 @@ start() {
             >> "$LOGS/server.log" 2>&1 & disown)
     fi
 
-    sleep 3
-    echo "켰습니다 (프로세스 $(pid)). 기록: $LOGS/server.log"
+    listening || return 1
+
+    echo "켰습니다 (프로세스 $(pid)) · 로그인 2610 · 게임 2615. 기록: $LOGS/server.log"
+}
+
+# 두 포트가 실제로 열릴 때까지 기다린다. **프로세스가 살아 있는 것과 듣고 있는 것은 다르다** —
+# 설정 하나가 잘못돼 서버가 조용히 안 듣던 일이 있었고(2026-09-18 MaxStack), 그때는 켜졌다는 말만
+# 믿고 한참 헤맸다. 그래서 켤 때마다 여기서 확인한다.
+listening() {
+    local waited=0
+
+    while [ "$waited" -lt 30 ]; do
+        if lsof -nP -iTCP:2610 -sTCP:LISTEN >/dev/null 2>&1 \
+            && lsof -nP -iTCP:2615 -sTCP:LISTEN >/dev/null 2>&1; then
+            return 0
+        fi
+
+        if [ -z "$(pid)" ]; then
+            echo "서버가 떠 있지 않습니다. 기록을 보세요: $LOGS/server.log" >&2
+            tail -n 20 "$LOGS/server.log" >&2
+            return 1
+        fi
+
+        sleep 1
+        waited=$((waited + 1))
+    done
+
+    echo "서버는 떠 있는데 포트를 안 엽니다(2610·2615). 기록을 보세요: $LOGS/server.log" >&2
+    tail -n 20 "$LOGS/server.log" >&2
+    return 1
 }
 
 stop() {
