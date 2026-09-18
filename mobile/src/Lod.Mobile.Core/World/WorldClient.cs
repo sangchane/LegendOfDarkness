@@ -53,6 +53,11 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>How long until a skill or spell may be used again.</summary>
     private const byte CooldownCommand = 0x3F;
+
+    /// <summary>
+    /// 월드맵에서 곳을 고른다. 오는 <see cref="CooldownCommand" /> 와 번호가 같지만 나가는 것은 이쪽이다.
+    /// </summary>
+    private const byte ChooseFieldCommand = 0x3F;
     private const byte BodyMotionCommand = 0x1A;
     private const byte AnimationCommand = 0x29;
     private const byte SoundCommand = 0x19;
@@ -845,6 +850,26 @@ public sealed class WorldClient(WorldSession session)
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>
         Send(RefreshCommand, [], cancellationToken);
+
+    /// <summary>
+    /// 월드맵에서 고른 곳의 맵 번호. 서버는 이 번호로 자기 목록에서 곳을 찾는다
+    /// (`GameServerHandlers.cs:1853`) — 그림 위의 점이 아니라 갈 맵이 열쇠다.
+    /// </summary>
+    public static byte[] FieldChoice(int areaId)
+    {
+        byte[] body = new byte[4];
+
+        BinaryPrimitives.WriteInt32BigEndian(body, areaId);
+
+        return body;
+    }
+
+    /// <summary>
+    /// 월드맵에서 한 곳을 골라 보낸다. 창이 열려 있는 동안 서버는 이것 말고 이 접속의 패킷을 모두
+    /// 버리므로(`NetworkServer.cs:141`), 고르기 전에는 걷지도 말하지도 못한다 — 창에 닫기가 없는 까닭이다.
+    /// </summary>
+    public Task ChooseFieldAsync(int areaId, CancellationToken cancellationToken) =>
+        Send(ChooseFieldCommand, FieldChoice(areaId), cancellationToken);
 
     /// <summary>
     /// Sends one of the two answers an NPC takes. They go in a different envelope — six bytes of header and

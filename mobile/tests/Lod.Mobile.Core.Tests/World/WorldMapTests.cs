@@ -52,4 +52,10 @@ public sealed class WorldMapTests
         Assert.Equal(58, field.Nodes[1].X);
         Assert.Equal(22, field.Nodes[1].Y);
     }
+
+    [Fact]
+    public void Choosing_a_place_sends_its_map_number_in_four_bytes()
+    {
+        Assert.Equal(new byte[] { 0x00, 0x00, 0x4F, 0x83 }, WorldClient.FieldChoice(20355));
+    }
 }
