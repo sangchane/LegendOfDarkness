@@ -41,6 +41,12 @@ public sealed partial class PackPanel : PanelContainer
 
     /// <summary>The name on the stone strip — which of the two tabs is open.</summary>
     private Label _title = null!;
+
+    /// <summary>밟은 것을 알아서 줍는지 켜고 끄는 단추.</summary>
+    private Button _loot = null!;
+
+    private void ShowLoot() =>
+        _loot.Text = Main.AutoLoot ? "줍기 켬" : "줍기 끔";
     private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right };
     private readonly Button _use = new() { Text = "입기" };
     private readonly Button _drop = new() { Text = "버리기" };
@@ -95,6 +101,19 @@ public sealed partial class PackPanel : PanelContainer
         head.AddChild(_gearTab);
         head.AddChild(_packTab);
         head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+
+        // 밟은 것을 알아서 주울지. 원작에는 없던 것이라 끌 수 있어야 한다(사용자, 2026-09-19).
+        _loot = new Button { CustomMinimumSize = Cell, ToggleMode = true, ButtonPressed = Main.AutoLoot };
+        Greybox.Tab(_loot);
+        ShowLoot();
+
+        _loot.Pressed += () =>
+        {
+            Main.SetAutoLoot(_loot.ButtonPressed);
+            ShowLoot();
+        };
+
+        head.AddChild(_loot);
 
         Tidy = new Button { Text = "정렬", CustomMinimumSize = Cell };
         Greybox.Plain(Tidy);

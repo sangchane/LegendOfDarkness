@@ -36,6 +36,39 @@ public partial class Main : Control
     /// <summary>이 파일이 실려 있으면 캐릭터가 스스로 사냥한다. 실기기가 인자를 못 받아 파일로 켠다.</summary>
     private const string HuntFile = "res://hunt.cfg";
 
+    /// <summary>
+    /// 밟은 것을 알아서 줍나. 사람이 화면에서 켜고 끄며, 그 결정은 기기에 남는다(user:// — 저장소가
+    /// 아니라 기기 쪽이라 새로 설치해도 그 기기의 선택이 남는다). 처음에는 켜져 있다.
+    /// </summary>
+    private const string LootFile = "user://loot.cfg";
+
+    public static bool AutoLoot { get; private set; } = true;
+
+    /// <summary>Turns picking-up-as-you-walk on or off, and remembers which.</summary>
+    public static void SetAutoLoot(bool on)
+    {
+        AutoLoot = on;
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(LootFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            writing.StoreLine(on ? "on" : "off");
+            writing.Close();
+        }
+    }
+
+    private static void ReadAutoLoot()
+    {
+        Godot.FileAccess? reading = Godot.FileAccess.Open(LootFile, Godot.FileAccess.ModeFlags.Read);
+
+        if (reading is not null)
+        {
+            AutoLoot = reading.GetLine().Trim() != "off";
+            reading.Close();
+        }
+    }
+
     /// <summary>환경변수로도 준다. 데스크톱에서 인자 없이 다른 서버를 가리킬 때 쓴다.</summary>
     private const string ServerVariable = "LOD_SERVER";
 
@@ -167,6 +200,7 @@ public partial class Main : Control
         }
         Lifting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--lift") >= 0;
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
+        ReadAutoLoot();
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 
         // 입거나 버려 보려면 소지품이 열려 있어야 한다 — 따로 적게 하지 않는다.

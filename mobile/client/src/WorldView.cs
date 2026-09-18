@@ -1163,7 +1163,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </remarks>
     private void Gather()
     {
-        if (server is null || Frozen || _lifted > 0)
+        if (server is null || Frozen || !Main.AutoLoot || _lifted > 0)
         {
             _lifted = Math.Max(0, _lifted - 1);
             return;
