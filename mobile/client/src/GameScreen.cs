@@ -23,6 +23,7 @@ public partial class GameScreen : Control
     private Label _target = null!;
     private PackPanel _pack = null!;
     private TalkPanel _talk = null!;
+    private FieldPanel _field = null!;
 
     // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
     private int _talked;
@@ -116,6 +117,13 @@ public partial class GameScreen : Control
         _chat.Close.Pressed += () => Chatting(false);
         _chat.Sent += line => _ = _server?.SayAsync(line, System.Threading.CancellationToken.None);
 
+        _field = new FieldPanel();
+        _field.Chosen += area =>
+        {
+            _field.Visible = false;
+            _ = _server?.ChooseFieldAsync(area, System.Threading.CancellationToken.None);
+        };
+
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
         _talk.Answered += (speaker, step, words) => _ = words is null
@@ -172,10 +180,13 @@ public partial class GameScreen : Control
         // 위쪽 맵을 남긴다(PackPanel.ShowTab 이 정한다).
         _talk.SizeFlagsVertical = SizeFlags.ExpandFill;
 
+        // 곳이 스물넷이라 남는 높이를 다 쓴다 — 대화 창과 같다.
+        _field.SizeFlagsVertical = SizeFlags.ExpandFill;
+
         // 대화 창은 제 높이만큼만 아래에 붙는다 — 소지품 한 장과 같다. 긴 이야기는 창 안에서 굴린다.
         _chat.SizeFlagsVertical = SizeFlags.ShrinkEnd;
 
-        foreach (Control panel in new Control[] { _pack, _talk, _chat })
+        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -381,6 +392,16 @@ public partial class GameScreen : Control
         if (Main.OpeningPack && !_pack.Visible && _settling++ == settle)
         {
             Carrying(true);
+        }
+
+        // 월드맵은 서버가 띄우는 것이지 사람이 여는 것이 아니다. 온 것을 그대로 보여 준다.
+        if (_server?.Field is { } field && !_field.Visible)
+        {
+            _field.Show(field);
+        }
+        else if (_server?.Field is null && _field.Visible)
+        {
+            _field.Visible = false;
         }
 
         // 창이 열려 있는 동안은 새 줄과 탭을 따라가고, 글자를 치는 동안 화면 키보드에 가리지 않게 창을 들어 올린다
