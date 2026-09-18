@@ -95,8 +95,11 @@ public sealed class NovicePlay : IDisposable
 
                 if (kills % 10 == 0)
                 {
+                    int insight = world.Creatures.Count(one => one.Kind == CreatureKind.Hostile);
+
                     Say($"  {kills}마리 · 경험치 {now.Experience} (+{now.Experience - experience})"
-                        + $" · 금 {now.Gold} · 체력 {now.Health}/{now.MaximumHealth} · {_clock.Elapsed:hh\\:mm\\:ss}");
+                        + $" · 금 {now.Gold} · 체력 {now.Health}/{now.MaximumHealth}"
+                        + $" · 보이는 괴물 {insight} · {_clock.Elapsed:hh\\:mm\\:ss}");
                 }
             }
 
@@ -165,8 +168,38 @@ public sealed class NovicePlay : IDisposable
             return;
         }
 
+        // 같은 놈만 오래 붙들고 있으면 놓아 준다 — 한 번은 이것 때문에 20분을 한 자리에서 허공만 때렸다.
+        _swings = prey.Serial == _engaged ? _swings + 1 : 0;
+        _engaged = prey.Serial;
+
+        if (_swings > Patience)
+        {
+            // 서버에 그놈이 실제로 있는지 묻는다 — 괴물을 누르면 서버가 이름을 말해 준다(CommonMonster.OnClick).
+            // 대답이 없으면 클라이언트만 들고 있는 허깨비이고, 대답이 오면 있는데 맞지 않는 것이다.
+            int heard = world.SaidCount;
+            await world.ClickAsync(prey.Serial, _deadline.Token);
+            await Task.Delay(Step * 2, _deadline.Token);
+
+            Say($"안 죽는 괴물을 놓아 준다 — 그림 {prey.Sprite} · 남은 체력 {world.Health(prey.Serial)?.ToString() ?? "모름"}"
+                + $" · {prey.Where} 내 자리 {world.State?.Where} · #{prey.Serial}"
+                + $" · 눌러 본 대답 {(world.SaidCount > heard ? world.Said : "없음")}");
+            _shunned.Add(prey.Serial);
+            _swings = 0;
+            await Roam(world);
+            return;
+        }
+
         Tile standing = world.State?.Where ?? new Tile(0, 0);
         int dx = prey.Where.X - standing.X, dy = prey.Where.Y - standing.Y;
+
+        // 괴물이 내가 선 칸에 겹쳐 있으면 평타로는 영영 못 때린다 — 평타는 앞 칸만 훑는다(Sprite.GetInfront).
+        // 가장 가까운 놈은 늘 그놈(거리 0)이라 비켜서지 않으면 그 자리에서 허공만 친다. 실제로 20분을 그랬다.
+        if (dx == 0 && dy == 0)
+        {
+            await world.WalkAsync(_heading, _deadline.Token);
+            await Task.Delay(Step, _deadline.Token);
+            return;
+        }
 
         Direction towards = Math.Abs(dx) >= Math.Abs(dy)
             ? (dx >= 0 ? Direction.East : Direction.West)
@@ -194,7 +227,7 @@ public sealed class NovicePlay : IDisposable
         Tile here = world.State?.Where ?? new Tile(Middle, Middle);
 
         // 가장자리로 나가면 가운데로 돌아선다. 마을로 가는 워프가 가장자리에 있다.
-        if (here.X < Inside || here.X > Middle + Reach || here.Y < Inside || here.Y > Middle + Reach)
+        if (!InTheBox(here))
         {
             _heading = Math.Abs(here.X - Middle) >= Math.Abs(here.Y - Middle)
                 ? (here.X > Middle ? Direction.West : Direction.East)
@@ -216,6 +249,13 @@ public sealed class NovicePlay : IDisposable
 
     private Direction _heading = Direction.South;
 
+    /// <summary>How many swings at one monster before we decide it will not die (300ms each).</summary>
+    private const int Patience = 60;
+
+    private uint _engaged;
+    private int _swings;
+    private readonly HashSet<uint> _shunned = [];
+
     /// <summary>Whether we have walked off the map — a game master may, and then there is nothing out there.</summary>
     private static bool OffTheMap(WorldClient world) =>
         world.State is { } standing
@@ -224,9 +264,14 @@ public sealed class NovicePlay : IDisposable
             || (standing.Map.Columns > 0 && standing.Where.X >= standing.Map.Columns)
             || (standing.Map.Rows > 0 && standing.Where.Y >= standing.Map.Rows));
 
-    private static Creature? Nearest(WorldClient world) =>
+    /// <summary>Whether a tile is inside the hunting box. 사람도 마을 워프까지 쫓아가지는 않는다.</summary>
+    private static bool InTheBox(Tile where) =>
+        where.X >= Inside && where.X <= Middle + Reach && where.Y >= Inside && where.Y <= Middle + Reach;
+
+    private Creature? Nearest(WorldClient world) =>
         world.Creatures
-            .Where(one => one.Kind == CreatureKind.Hostile)
+            // 상자 밖의 괴물은 쫓지 않는다 — 쫓아가면 가장자리의 마을 워프를 밟는다(30초마다 마을로 끌려갔다).
+            .Where(one => one.Kind == CreatureKind.Hostile && InTheBox(one.Where) && !_shunned.Contains(one.Serial))
             .OrderBy(one => Math.Abs(one.Where.X - (world.State?.Where.X ?? 0))
                             + Math.Abs(one.Where.Y - (world.State?.Where.Y ?? 0)))
             .FirstOrDefault();
