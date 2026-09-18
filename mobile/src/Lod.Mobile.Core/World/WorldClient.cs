@@ -148,7 +148,7 @@ public sealed class WorldClient(WorldSession session)
     private readonly ConcurrentQueue<int> _sounds = new();
     private readonly ConcurrentQueue<int> _songs = new();
 
-    private WorldMapInfo? _field;
+    private volatile WorldMapInfo? _field;
 
     private volatile string? _broke;
     private volatile int _ignored;
