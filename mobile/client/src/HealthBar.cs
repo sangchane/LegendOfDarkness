@@ -27,13 +27,14 @@ public sealed partial class HealthBar : Node2D
     private static readonly Color Edge = new(0f, 0f, 0f, 0.9f);
 
     /// <summary>
-    /// Green while healthy, amber when worn down, red when nearly gone. Colour is never the only sign — the
-    /// length of the bar says the same thing, which is what a player who cannot tell the colours apart reads.
+    /// The theme's own health colour while healthy, amber when worn down, red when nearly gone — the values the
+    /// 4.51 mockup settles on (data/ui-vault). Colour is never the only sign: the length of the bar says the
+    /// same thing, and that is what somebody who cannot tell the colours apart reads.
     /// </summary>
-    private static readonly Color Hale = new(0.30f, 0.78f, 0.35f);
+    private static readonly Color Hale = new("#c8783c");
 
-    private static readonly Color Worn = new(0.92f, 0.70f, 0.20f);
-    private static readonly Color Dying = new(0.88f, 0.26f, 0.24f);
+    private static readonly Color Worn = new("#e0b336");
+    private static readonly Color Dying = new("#d24439");
 
     private int _left = 100;
     private double _shown = double.MaxValue;

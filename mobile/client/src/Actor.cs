@@ -145,12 +145,15 @@ public sealed partial class Actor : Node2D
             AddChild(piece);
         }
 
-        // 머리 위 체력바. 그림 꼭대기보다 조금 위에 둔다 — 그림에 겹치면 얼굴을 가린다.
-        _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, -_sheet.FeetY - 5) };
+        // 머리 위 체력바. 그림 칸이 아니라 **그려진 머리** 위에 둔다 — 칸은 옆으로 뻗은 무기까지 담느라
+        // 사람 기준 120x96 에 발이 83 이라, 칸 꼭대기에 붙이면 머리 위로 서른 칸쯤 떠 버린다.
+        float head = -_sheet.FeetY + HeadTop(_standing[0], _sheet);
+
+        _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, head - 7) };
         AddChild(_hurt);
 
         // 걸린 것들은 그 막대 바로 아래에 줄로 선다 — 눈이 이미 가 있는 자리라 따로 찾지 않아도 된다.
-        _ailing = new StatusRow { Name = "Status", Visible = false, Position = new Vector2(0, -_sheet.FeetY + 1) };
+        _ailing = new StatusRow { Name = "Status", Visible = false, Position = new Vector2(0, head - 5) };
         AddChild(_ailing);
 
         Face(_direction);
@@ -446,6 +449,49 @@ public sealed partial class Actor : Node2D
             _sprites[layer].Visible = true;
         }
     }
+
+    /// <summary>
+    /// How far down the cell the drawing actually starts — the first row with anything painted on it. A cell is
+    /// cut wide and tall enough for a weapon held out and for the tallest pose, so its top is nowhere near the
+    /// head; hanging a bar off the cell leaves it floating in the air.
+    /// </summary>
+    /// <remarks>Measured once per sheet, because reading a picture back is slow and thirty monsters share a few.</remarks>
+    private static float HeadTop(Texture2D sheet, Sheet cut)
+    {
+        string key = $"{sheet.ResourcePath}|{cut.CellWidth}x{cut.CellHeight}";
+
+        if (_heads.TryGetValue(key, out float known))
+        {
+            return known;
+        }
+
+        float top = 0;
+        Image drawn = sheet.GetImage();
+
+        if (drawn is not null)
+        {
+            int wide = Mathf.Min(cut.CellWidth, drawn.GetWidth());
+            int tall = Mathf.Min(cut.CellHeight, drawn.GetHeight());
+
+            for (int row = 0; row < tall && top == 0; row++)
+            {
+                for (int column = 0; column < wide; column++)
+                {
+                    if (drawn.GetPixel(column, row).A > 0.1f)
+                    {
+                        top = row;
+                        break;
+                    }
+                }
+            }
+        }
+
+        _heads[key] = top;
+        return top;
+    }
+
+    /// <summary>Where the drawing starts in each sheet we have measured.</summary>
+    private static readonly Dictionary<string, float> _heads = [];
 
     private void ShowFrame(int frame)
     {

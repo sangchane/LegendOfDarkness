@@ -11,8 +11,8 @@ namespace LodClient;
 public partial class GameScreen : Control
 {
     private const int AuxFontSize = 14;
-    private const int StatusBarWidth = 120;
-    private const int PortraitStatusBarWidth = 96;
+    /// <summary>체력·마력 구슬의 지름. 원작 구슬(86x85)을 이만큼으로 줄여 그림 없이 그린다.</summary>
+    private const int Pip = 18;
 
     /// <summary>Rows the chat and combat log keeps in portrait. Landscape has no room for it at all.</summary>
     private const int LogHeight = 76;
@@ -52,8 +52,6 @@ public partial class GameScreen : Control
     private const double FadeSeconds = 0.12;
 
     // 내 체력·마력. 서버가 준 값이 바뀔 때만 다시 쓴다.
-    private ProgressBar _health = null!;
-    private ProgressBar _mana = null!;
     private Label _healthText = null!;
     private Label _manaText = null!;
     private Label _experience = null!;
@@ -306,11 +304,19 @@ public partial class GameScreen : Control
         return row;
     }
 
+    /// <summary>
+    /// A panel over the world: an original stone frame with a dark, nearly opaque inside. The frame is what
+    /// carries the theme; the inside is flat, because a pattern under small text is the first thing to fail.
+    /// </summary>
     private static Control Plated(Control inside)
     {
+        PanelContainer inner = new();
+        inner.AddThemeStyleboxOverride("panel", Greybox.Plate());
+        inner.AddChild(inside);
+
         PanelContainer plate = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
-        plate.AddThemeStyleboxOverride("panel", Greybox.Plate());
-        plate.AddChild(inside);
+        plate.AddThemeStyleboxOverride("panel", Greybox.Stone());
+        plate.AddChild(inner);
 
         return plate;
     }
@@ -720,29 +726,36 @@ public partial class GameScreen : Control
         // 말하지 않는다. 막대를 그리려면 길이를 지어내야 한다.
         _experience = Aux(string.Empty);
 
-        vitals.AddChild(Gauge("HP", out _health, out _healthText));
-        vitals.AddChild(Gauge("MP", out _mana, out _manaText));
+        vitals.AddChild(Gauge(Greybox.Health, out _healthText));
+        vitals.AddChild(Gauge(Greybox.Mana, out _manaText));
         vitals.AddChild(_experience);
 
         return vitals;
     }
 
-    private static Control Gauge(string name, out ProgressBar bar, out Label text)
+    /// <summary>
+    /// One vital: the original's bead, shrunk to a flat disc, and the exact numbers beside it. No long bar —
+    /// how a fight is going is read over the head now (HealthBar), and the same thing is not drawn twice.
+    /// </summary>
+    private static Control Gauge(Color paint, out Label text)
     {
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        bar = new ProgressBar
+        StyleBoxFlat bead = new() { BgColor = paint, BorderColor = new Color(0, 0, 0, 0.55f) };
+        bead.SetCornerRadiusAll(Pip / 2);
+        bead.SetBorderWidthAll(2);
+
+        Panel pip = new()
         {
-            CustomMinimumSize = new Vector2(Main.Portrait ? PortraitStatusBarWidth : StatusBarWidth, 10),
-            ShowPercentage = false,
+            CustomMinimumSize = new Vector2(Pip, Pip),
             SizeFlagsVertical = SizeFlags.ShrinkCenter
         };
-        bar.AddThemeStyleboxOverride("background", Greybox.Surface());
-        bar.AddThemeStyleboxOverride("fill", Greybox.Fill());
 
-        text = Aux(name);
-        row.AddChild(bar);
+        pip.AddThemeStyleboxOverride("panel", bead);
+
+        text = Aux(string.Empty);
+        row.AddChild(pip);
         row.AddChild(text);
 
         return row;
@@ -759,8 +772,8 @@ public partial class GameScreen : Control
         }
 
         _shownVitals = mine;
-        Fill(_health, _healthText, "HP", mine.Health, mine.MaximumHealth);
-        Fill(_mana, _manaText, "MP", mine.Mana, mine.MaximumMana);
+        Fill(_healthText, mine.Health, mine.MaximumHealth);
+        Fill(_manaText, mine.Mana, mine.MaximumMana);
 
         string points = mine.Unspent > 0 ? $" · 점수 {mine.Unspent}" : string.Empty;
 
@@ -769,11 +782,17 @@ public partial class GameScreen : Control
             : (mine.ExperienceToGo <= 0 ? "EXP 다 올랐습니다" : $"EXP 다음까지 {mine.ExperienceToGo:N0}") + points;
     }
 
-    private static void Fill(ProgressBar bar, Label text, string name, int left, int most)
+    /// <summary>
+    /// Writes one vital. It turns colour as it falls — but the numbers themselves are the reading, so somebody
+    /// who cannot tell the colours apart loses nothing.
+    /// </summary>
+    private static void Fill(Label text, int left, int most)
     {
-        bar.MaxValue = Mathf.Max(1, most);
-        bar.Value = left;
-        text.Text = $"{name} {left}/{most}";
+        text.Text = $"{left} / {most}";
+
+        text.AddThemeColorOverride("font_color", most <= 0 || left > most * 0.5
+            ? Greybox.Text
+            : left > most * 0.15 ? Greybox.Health : Greybox.Gone);
     }
 
     /// <summary>

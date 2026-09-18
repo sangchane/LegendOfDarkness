@@ -3,22 +3,71 @@ using Godot;
 namespace LodClient;
 
 /// <summary>
-/// The greybox palette. Deliberately greyscale: this stage judges layout, reach and text, and colour would
-/// invite opinions on art that the wireframes put out of scope.
+/// The one place the screens get their look. It began as a deliberately grey placeholder for judging layout;
+/// it now carries the original 4.51 theme, worked out and written down in <c>data/ui-vault/</c>.
 /// </summary>
+/// <remarks>
+/// The rule the vault settles on is 안C — <b>the frame, the title strip and the one button that commits are
+/// stone; everything you read or choose from is flat</b>. There are two stones and which goes where matters:
+/// wide faces take the dark one, and only small buttons take the light one. Laying the light stone widely was
+/// tried first and the titles stopped being readable.
+///
+/// Nothing here moves anything. The vault is explicit about that — only the material changes, so the screens
+/// that call this were not touched.
+/// </remarks>
 public static class Greybox
 {
-    public static readonly Color Muted = new(0.62f, 0.62f, 0.64f);
+    // ── 색. data/ui-vault/색/ 의 값 그대로다. ────────────────────────────────
 
-    private static readonly Color SurfaceFill = new(0.16f, 0.16f, 0.18f);
-    private static readonly Color SurfaceEdge = new(0.30f, 0.30f, 0.33f);
-    private static readonly Color WorldFill = new(0.11f, 0.11f, 0.12f);
-    private static readonly Color BarFill = new(0.55f, 0.55f, 0.58f);
+    /// <summary>Faint text — a label beside a number, a page count.</summary>
+    public static readonly Color Muted = new("#97978b");
 
+    /// <summary>A title on dark stone. Never engraved: engraving only works on the light stone.</summary>
+    public static readonly Color Title = new("#abab9f");
+
+    /// <summary>Engraved text, for the light stone only, with a hairline of white under it.</summary>
+    public static readonly Color Engrave = new("#100f0b");
+
+    /// <summary>Health and mana. The windows carry no colour of their own, so these are the only accents.</summary>
+    public static readonly Color Health = new("#c8783c");
+
+    public static readonly Color Mana = new("#5a6fa8");
+
+    /// <summary>A number that has fallen far enough to act on — nearly dead, nearly out of mana.</summary>
+    public static readonly Color Gone = new("#a33f36");
+
+    /// <summary>Ordinary text on a dark inside.</summary>
+    public static readonly Color Text = new("#d6d6cc");
+
+    private static readonly Color Inner = new("#0f0f0f");
+    private static readonly Color Cell = new("#1f1f24");
+    private static readonly Color CellEdge = new("#303036");
+    private static readonly Color Deep = new("#636357");
+
+    // ── 치수. data/ui-vault/치수/치수.md ─────────────────────────────────────
+
+    /// <summary>The stone frame's thickness.</summary>
+    public const int Frame = 5;
+
+    /// <summary>Padding inside a window, and the gap between its parts.</summary>
+    public const int Pad = 12;
+
+    public const int Gap = 8;
+
+    /// <summary>Rounding. Only on the inside — a stone frame has to stay square to read as the original's.</summary>
+    public const int Round = 12;
+
+    private const string DarkStone = "res://assets/ui/stone-dark.png";
+    private const string LitStone = "res://assets/ui/stone-lit.png";
+
+    /// <summary>
+    /// A cell in a grid, a row in a list, an input box. Flat and dark — the vault forbids stone here, because a
+    /// pattern under small text is the first thing to fail on a phone.
+    /// </summary>
     public static StyleBoxFlat Surface() => new()
     {
-        BgColor = SurfaceFill,
-        BorderColor = SurfaceEdge,
+        BgColor = Cell,
+        BorderColor = CellEdge,
         BorderWidthLeft = 1,
         BorderWidthTop = 1,
         BorderWidthRight = 1,
@@ -26,13 +75,14 @@ public static class Greybox
     };
 
     /// <summary>
-    /// A panel that has to stay readable over the map. The greybox surface was made for a flat grey
-    /// background; over gold floor tiles its text disappears, so this one is nearly opaque.
+    /// A panel that has to stay readable over the map. The greybox surface was made for a flat grey background;
+    /// over gold floor tiles its text disappears, so this one is nearly opaque — 96%, the value the vault settles
+    /// on as the only one that survives that floor.
     /// </summary>
     public static StyleBoxFlat Plate() => new()
     {
-        BgColor = new Color(0.08f, 0.09f, 0.12f, 0.9f),
-        BorderColor = SurfaceEdge,
+        BgColor = Inner with { A = 0.96f },
+        BorderColor = CellEdge,
         BorderWidthLeft = 1,
         BorderWidthTop = 1,
         BorderWidthRight = 1,
@@ -44,20 +94,48 @@ public static class Greybox
     };
 
     /// <summary>
-    /// A window laid over the screen — the pack, an NPC's talk. Fully opaque: since the map runs under the controls in
-    /// portrait too, the log and the buttons behind a see-through plate read through the window.
+    /// A window laid over the screen — the pack, an NPC's talk. Fully opaque: since the map runs under the
+    /// controls in portrait too, the log and the buttons behind a see-through plate read through the window.
     /// </summary>
     public static StyleBoxFlat Sheet()
     {
         StyleBoxFlat sheet = Plate();
-        sheet.BgColor = sheet.BgColor with { A = 1 };
+        sheet.BgColor = Inner;
 
         return sheet;
     }
 
     /// <summary>
-    /// Rounds a thumb button — the movement pad and the fan round the attack — into a disc. The plates stay as opaque as
-    /// every other button's, because the glyphs on them sit over gold floor tiles too.
+    /// The stone a window is framed in, and the strip its title sits on. Dark, because this is a wide face.
+    /// Square on purpose — the rounding belongs to whatever is inside it.
+    /// </summary>
+    public static StyleBoxTexture Stone() => Rock(DarkStone, Frame);
+
+    /// <summary>
+    /// The lighter stone, for the one button that commits and for the attack button. Only ever small faces: the
+    /// pattern is what carries the original's feel, and that same pattern under a paragraph destroys it.
+    /// </summary>
+    public static StyleBoxTexture Lit() => Rock(LitStone, 3);
+
+    private static StyleBoxTexture Rock(string path, int edge)
+    {
+        StyleBoxTexture rock = new()
+        {
+            Texture = GD.Load<Texture2D>(path),
+
+            // 64x64 무늬를 늘리지 않고 되풀이해 깐다 — 늘리면 돌결이 뭉개진다.
+            AxisStretchHorizontal = StyleBoxTexture.AxisStretchMode.Tile,
+            AxisStretchVertical = StyleBoxTexture.AxisStretchMode.Tile
+        };
+
+        rock.SetContentMarginAll(edge);
+
+        return rock;
+    }
+
+    /// <summary>
+    /// Rounds a thumb button — the movement pad and the fan round the attack — into a disc. The plates stay as
+    /// opaque as every other button's, because the glyphs on them sit over gold floor tiles too.
     /// </summary>
     public static void Disc(Button button)
     {
@@ -79,20 +157,20 @@ public static class Greybox
     /// <summary>Darkens what is under it, so a number written over a picture can be read.</summary>
     public static StyleBoxFlat Shade() => new() { BgColor = new Color(0, 0, 0, 0.55f), CornerRadiusTopLeft = 23, CornerRadiusTopRight = 23, CornerRadiusBottomLeft = 23, CornerRadiusBottomRight = 23 };
 
-    /// <summary>The play area behind the HUD. Flat on purpose: the map is not this stage's question.</summary>
-    public static StyleBoxFlat World() => new() { BgColor = WorldFill };
+    /// <summary>The play area behind the HUD.</summary>
+    public static StyleBoxFlat World() => new() { BgColor = Inner };
 
     /// <summary>Filled portion of a bar. Always paired with numbers, never read by shade alone.</summary>
-    public static StyleBoxFlat Fill() => new() { BgColor = BarFill };
+    public static StyleBoxFlat Fill() => new() { BgColor = Health };
 
     /// <summary>
-    /// Marks a zone the layout has to respect. A greybox guide, not part of the game: it goes away once the
-    /// rule it shows has been checked on a device.
+    /// Marks a zone the layout has to respect. A guide, not part of the game: it goes away once the rule it
+    /// shows has been checked on a device.
     /// </summary>
     public static StyleBoxFlat Outline() => new()
     {
         BgColor = new Color(0, 0, 0, 0),
-        BorderColor = new Color(0.38f, 0.38f, 0.42f, 0.55f),
+        BorderColor = Deep with { A = 0.55f },
         BorderWidthLeft = 1,
         BorderWidthTop = 1,
         BorderWidthRight = 1,
