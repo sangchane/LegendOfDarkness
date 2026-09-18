@@ -26,6 +26,25 @@ public sealed class BodyMotionTests
     }
 
     /// <summary>
+    /// 무도가의 맨손 평타. 기기에서 일반 휘두르기가 나왔는데(사용자, 2026-09-18) 번호도 옷도 맞으므로,
+    /// 틀린 것은 서버 말을 듣기 전에 스스로 그리던 화면 쪽이었다. 여기 값이 그 근거다 — 도복은 갑옷
+    /// 번호 3 에 공격모션 132 이고, 132 는 skill.tbl 4번 줄(주먹)이며 그 줄은 3 을 허락한다.
+    /// </summary>
+    [Fact]
+    public void A_monk_in_the_robe_punches()
+    {
+        Assert.Equal(128, BodyMotion.FirstSkill);
+        Assert.True(BodyMotion.Fits(132, 3));
+
+        BodyMotion? fist = BodyMotion.Of(132);
+
+        Assert.NotNull(fist);
+        Assert.Equal("d", fist!.File);
+        Assert.Equal(6, fist.Start);
+        Assert.Equal(2, fist.Count);
+    }
+
+    /// <summary>
     /// The original client plays a skill motion only when the armour worn is one skill.tbl lists for that row (the ST
     /// column), and otherwise plays nothing at all — Legend.exe 2005 0x4e1161..0x4e1171, 4.51 0x4494b7. The table is
     /// the 2005 (= 5.99) one: Hades' copy has one more number per class at the end (348~352), which the original lacks.

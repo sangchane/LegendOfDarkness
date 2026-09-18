@@ -20,6 +20,9 @@ public sealed record BodyMotion(string File, int Start, int Count, int Faster = 
 
     public static readonly BodyMotion Blow = new("02", 0, 2);
 
+    /// <summary>직업 동작이 시작하는 번호. 이 아래는 일반 동작(휘두르기·손 들기 …)이다.</summary>
+    public const int FirstSkill = 128;
+
     // skill.tbl 의 NO 0~17 차례 그대로 (FN · SI · FC).
     private static readonly BodyMotion[] Skills =
     [

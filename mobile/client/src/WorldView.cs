@@ -100,6 +100,14 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     private Queue<Direction> _rehearsal = new();
 
+    /// <summary>
+    /// 내 평타를 어떤 몸 동작으로 그리나. 서버가 한 번 말해 주면 그 뒤로는 기다리지 않고 이것으로 그린다.
+    /// 아직 못 들었으면 일반 휘두르기다.
+    /// </summary>
+    private BodyMotion? _ownBlow;
+
+    private int _ownBlowSpeed = 20;
+
     /// <summary>Frames since the hunt started. Everything it does is paced off this rather than a timer.</summary>
     private int _hunted;
 
@@ -996,7 +1004,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         // Drawn straight away rather than waiting to be told: the server does not answer an allowed blow,
         // the same as a step, and a swing that lags a third of a second reads as a broken button.
-        _player.Strike();
+        //
+        // 무엇을 그릴지는 **서버가 지난번에 말해 준 것**을 쓴다. 평타 동작은 입은 것이 정하는데(무기의
+        // 공격모션, 없으면 갑옷의 것 — 도복은 주먹 132) 클라이언트는 그 칸을 모른다. 그래서 늘 일반
+        // 휘두르기만 그렸고, 무도가가 주먹을 안 쥐었다(사용자, 2026-09-18).
+        _player.Play(_ownBlow ?? BodyMotion.Blow, BodyMotion.Blow.SecondsPerFrame(_ownBlowSpeed));
 
         _ = server?.AttackAsync(_leaving.Token);
     }
@@ -1220,6 +1232,13 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 && (_herd.ContainsKey(motion.Serial) || BodyMotion.Fits(motion.Number, ArmourOf(world, motion.Serial))))
             {
                 actor.Play(body, body.SecondsPerFrame(motion.Speed));
+
+                // 내 평타가 무엇으로 그려지는지 기억해 둔다 — 다음 휘두름부터는 기다리지 않고 이것으로 그린다.
+                if (motion.Serial == world.Serial && motion.Number >= BodyMotion.FirstSkill)
+                {
+                    _ownBlow = body;
+                    _ownBlowSpeed = motion.Speed;
+                }
             }
             else if (_herd.ContainsKey(motion.Serial))
             {
