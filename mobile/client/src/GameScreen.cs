@@ -727,8 +727,8 @@ public partial class GameScreen : Control
         // 말하지 않는다. 막대를 그리려면 길이를 지어내야 한다.
         _experience = Aux(string.Empty);
 
-        vitals.AddChild(Gauge(Greybox.Health, out _healthText));
-        vitals.AddChild(Gauge(Greybox.Mana, out _manaText));
+        vitals.AddChild(Gauge("체력", Greybox.Health, out _healthText));
+        vitals.AddChild(Gauge("마력", Greybox.Mana, out _manaText));
         vitals.AddChild(_experience);
 
         return vitals;
@@ -738,7 +738,7 @@ public partial class GameScreen : Control
     /// One vital: the original's bead, shrunk to a flat disc, and the exact numbers beside it. No long bar —
     /// how a fight is going is read over the head now (HealthBar), and the same thing is not drawn twice.
     /// </summary>
-    private static Control Gauge(Color paint, out Label text)
+    private static Control Gauge(string name, Color paint, out Label text)
     {
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter / 2);
@@ -755,8 +755,13 @@ public partial class GameScreen : Control
 
         pip.AddThemeStyleboxOverride("panel", bead);
 
+        // 구슬만 두었더니 무엇을 뜻하는지 알 수 없다는 말을 들었다(사용자, 2026-09-18). 이름을 되살린다 —
+        // 색은 거드는 것이지 뜻을 나르는 것이 아니다.
+        Label named = Aux(name);
+
         text = Aux(string.Empty);
         row.AddChild(pip);
+        row.AddChild(named);
         row.AddChild(text);
 
         return row;
