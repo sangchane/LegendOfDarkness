@@ -88,6 +88,11 @@ md5 `347dc381…d128` 로 같은 파일 — `docs/disassembly.md`) 둘뿐이다.
 - **시안(눌러볼 것):** `docs/ui/mockups-451/index.html` — 세로 게임 화면 3상태 · 장비창 · 소지품 · NPC 대화 · 상점 · 대화 창 · 로그인
 - 3안 비교: `docs/ui/mockups-451/three-ways.html`
 - 사진: `docs/ui/assets/mockups-451-adopted.png`(전체) · `-three-ways.png`(3안) · `-fight.png` · `-gear.png` · `-pack.png`
+- **단일 출처: `data/original-ui/451.json`** — 판·아카이브·화면 92·재질·색·치수·규칙·시안·구현대상.
+  새로 알게 된 것은 여기에 적고 볼트·그래프를 다시 만든다
+- **볼트(Obsidian): `data/ui-vault/`** — `python scripts/build-ui-vault.py` (저장소에 들어 있다 — 그냥 연다)
+- **그래프: `python scripts/build-ui-graph.py`** → `data/original-ui/graph/graph.html` (무시 목록).
+  묻는 법: `graphify query "체력 마력 아이콘 왜 납작하게" --graph data/original-ui/graph/graph.json --budget 700`
 
 ### 규칙 (구현이 따를 것)
 

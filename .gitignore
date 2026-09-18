@@ -51,7 +51,10 @@ data/server-packs/vault/
 #   data/formula-vault/             세계가 굴러가는 식   (scripts/build-formula-vault.py)
 #   data/archives-vault/            아카이브 503표      (scripts/build-archive-vault.py)
 #   data/game-data/vault-abilities/ 원작 기술·마법 613   (scripts/build-ability-vault.py)
+#   data/ui-vault/                  원작 4.51 UI 와 테마 규칙 (scripts/build-ui-vault.py)
 data/server-packs/graph/
 # 역어셈블 그래프 — data/disassembly/findings.json 에서 언제든 다시 만든다 (scripts/build-disassembly-graph.py)
 data/disassembly/graph/
+# UI 테마 그래프 — data/original-ui/451.json 에서 언제든 다시 만든다 (scripts/build-ui-graph.py)
+data/original-ui/graph/
 
