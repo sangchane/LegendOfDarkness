@@ -69,7 +69,8 @@ public sealed partial class PackPanel : PanelContainer
     {
         Name = "Pack";
         Visible = false;
-        AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        // 틀은 원작 돌, 속은 평평한 어둠 — 무늬 위에 작은 글자를 얹으면 먼저 무너진다(data/ui-vault).
+        AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter);
@@ -79,6 +80,11 @@ public sealed partial class PackPanel : PanelContainer
 
         _gearTab.CustomMinimumSize = Cell;
         _packTab.CustomMinimumSize = Cell;
+        Greybox.Tab(_gearTab);
+        Greybox.Tab(_packTab);
+
+        // 창마다 확정 단추는 하나뿐이다 — 전부 돌로 하면 아무것도 돋보이지 않는다.
+        Greybox.Commit(_use);
         _gearTab.Pressed += () => ShowTab(gear: true);
         _packTab.Pressed += () => ShowTab(gear: false);
 
@@ -168,7 +174,11 @@ public sealed partial class PackPanel : PanelContainer
         body.AddChild(turning);
         body.AddChild(foot);
 
-        AddChild(body);
+        PanelContainer inside = new();
+        inside.AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        inside.AddChild(body);
+
+        AddChild(inside);
 
         ShowTab(Main.OnGear);
     }

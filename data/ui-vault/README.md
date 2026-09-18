@@ -42,7 +42,7 @@
 | [[구현대상/PackPanel.cs|mobile/client/src/PackPanel.cs]] | 소지품 격자에 테마 적용 | 아직 |
 | [[구현대상/TalkPanel.cs|mobile/client/src/TalkPanel.cs]] | NPC·상점 창에 테마 적용 | 아직 |
 | [[구현대상/ChatPanel.cs|mobile/client/src/ChatPanel.cs]] | 대화 창에 테마 적용 | 아직 |
-| [[구현대상/LoginScreen.cs|mobile/client/src/LoginScreen.cs]] | 로그인 화면에 테마 적용 | 아직 |
+| [[구현대상/LoginScreen.cs|mobile/client/src/LoginScreen.cs]] | **보류** — 사용자가 시안을 무르다(2026-09-18) | 보류 |
 | [[구현대상/HealthBar.cs|mobile/client/src/HealthBar.cs]] | 머리 위 막대 — 이미 있다. 색만 테마에 맞춘다 | 있음 |
 | [[구현대상/StatusRow.cs|mobile/client/src/StatusRow.cs]] | 상태 아이콘 줄 — 이미 있다 | 있음 |
 

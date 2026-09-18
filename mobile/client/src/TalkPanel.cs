@@ -26,7 +26,8 @@ public sealed partial class TalkPanel : PanelContainer
     {
         Name = "Talk";
         Visible = false;
-        AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        // 틀은 원작 돌, 속은 평평한 어둠 — 무늬 위에 작은 글자를 얹으면 먼저 무너진다(data/ui-vault).
+        AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         HBoxContainer head = new();
         head.AddThemeConstantOverride("separation", Main.Gutter);
@@ -54,7 +55,11 @@ public sealed partial class TalkPanel : PanelContainer
         body.AddChild(head);
         body.AddChild(scroll);
 
-        AddChild(body);
+        PanelContainer within = new();
+        within.AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        within.AddChild(body);
+
+        AddChild(within);
     }
 
     /// <summary>The button that shuts the window, so whoever opened it can decide what that means.</summary>

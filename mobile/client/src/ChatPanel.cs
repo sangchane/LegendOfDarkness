@@ -51,7 +51,8 @@ public sealed partial class ChatPanel : PanelContainer
     {
         Name = "Chat";
         Visible = false;
-        AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        // 틀은 원작 돌, 속은 평평한 어둠 — 무늬 위에 작은 글자를 얹으면 먼저 무너진다(data/ui-vault).
+        AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter);
@@ -75,6 +76,8 @@ public sealed partial class ChatPanel : PanelContainer
         _scroll.AddChild(_lines);
 
         Button send = new() { Text = "보내기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
+
+        Greybox.Commit(send);
         send.Pressed += Say;
         _typed.TextSubmitted += _ => Say();
 
@@ -86,7 +89,11 @@ public sealed partial class ChatPanel : PanelContainer
         body.AddChild(head);
         body.AddChild(_scroll);
         body.AddChild(typing);
-        AddChild(body);
+        PanelContainer inside = new();
+        inside.AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        inside.AddChild(body);
+
+        AddChild(inside);
 
         Choose(speech: false, system: false);
     }
@@ -115,12 +122,20 @@ public sealed partial class ChatPanel : PanelContainer
         _typed.GrabFocus();
     }
 
-    private static Button Tab(string name) => new()
+    private static Button Tab(string name)
     {
-        Text = name,
-        ToggleMode = true,
-        CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-    };
+        Button tab = new()
+        {
+            Text = name,
+            ToggleMode = true,
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        // 고른 탭만 밝은 돌에 음각 — 글자를 읽지 않고도 어느 쪽이 열려 있는지 보인다.
+        Greybox.Tab(tab);
+
+        return tab;
+    }
 
     /// <summary>Shows one kind of line, or all of them. The list is written again, because a different lot belongs in it.</summary>
     private void Choose(bool speech, bool system)

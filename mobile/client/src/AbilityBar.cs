@@ -34,7 +34,10 @@ public sealed partial class AbilityBar : Control
     private IReadOnlyList<LearnedSpell> _learnedSpells = [];
 
     /// <summary>One tap is one blow — see <see cref="WorldView.Strike" />.</summary>
-    public Button Attack { get; } = Disc("공격", AbilityFan.AttackSide);
+    /// <summary>
+    /// 공격 단추. 시안에서 유일하게 돌로 남긴 조작이다 — 창의 확정 단추와 같은 자리다(data/ui-vault 안C).
+    /// </summary>
+    public Button Attack { get; } = Struck("공격", AbilityFan.AttackSide);
 
     /// <summary>How many seconds one slot still has to wait, asked of the server every frame.</summary>
     public Func<bool, int, int>? Cooling { get; set; }
@@ -191,6 +194,27 @@ public sealed partial class AbilityBar : Control
         button.Position = new Vector2(centre.X - (side / 2), centre.Y - (side / 2));
         button.Size = new Vector2(side, side);
         AddChild(button);
+    }
+
+    /// <summary>The attack button — a disc like the rest, but cut from the light stone and engraved.</summary>
+    private static Button Struck(string text, int side)
+    {
+        Button button = Disc(text, side);
+
+        StyleBoxTexture stone = Greybox.Lit();
+        stone.SetContentMarginAll(7);
+
+        foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
+        {
+            button.AddThemeStyleboxOverride(state, stone);
+        }
+
+        button.AddThemeColorOverride("font_color", Greybox.Engrave);
+        button.AddThemeColorOverride("font_hover_color", Greybox.Engrave);
+        button.AddThemeColorOverride("font_pressed_color", Greybox.Engrave);
+        button.AddThemeColorOverride("font_focus_color", Greybox.Engrave);
+
+        return button;
     }
 
     private static Button Disc(string text, int side)

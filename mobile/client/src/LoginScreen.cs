@@ -16,6 +16,11 @@ namespace LodClient;
 public partial class LoginScreen : Control
 {
     private const int TitleFontSize = 22;
+
+    /// <summary>원작 문장. 그림 한 장이면 충분하다.</summary>
+    private const string Crest = "res://assets/ui/crest.png";
+
+    private const int CrestHeight = 68;
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
     private const int CaptionWidth = 72;
@@ -161,12 +166,23 @@ public partial class LoginScreen : Control
         VBoxContainer form = new();
         form.AddThemeConstantOverride("separation", Main.Gutter);
 
+        // 로고 하나와 이름뿐이다 — 돌 무늬는 쓰지 않는다(사용자, 2026-09-18). 처음 보는 화면이라
+        // 무엇을 하는 곳인지만 분명하면 된다.
+        TextureRect crest = new()
+        {
+            Texture = GD.Load<Texture2D>(Crest),
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            TextureFilter = TextureFilterEnum.Nearest,
+            CustomMinimumSize = new Vector2(0, CrestHeight)
+        };
+
         Label title = new()
         {
             Text = "어둠의 전설",
             HorizontalAlignment = HorizontalAlignment.Center
         };
         title.AddThemeFontSizeOverride("font_size", TitleFontSize);
+        title.AddThemeColorOverride("font_color", Greybox.Title);
 
         _username = Field(secret: false);
         _password = Field(secret: true);
@@ -186,6 +202,7 @@ public partial class LoginScreen : Control
 
         // Captions sit beside their fields rather than above them: in landscape the form has little height
         // to spare, and stacked captions pushed it into the space the on-screen keyboard takes.
+        form.AddChild(crest);
         form.AddChild(title);
         form.AddChild(FieldRow("사용자명", _username));
         form.AddChild(FieldRow("비밀번호", _password));

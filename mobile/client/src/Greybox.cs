@@ -154,6 +154,57 @@ public static class Greybox
         }
     }
 
+    /// <summary>
+    /// The one button that commits — 입기, 삽니다, 보내기, 들어가기. Light stone with the words engraved into it,
+    /// which is how the original's own buttons are made. Only one per window: if everything is stone, nothing is.
+    /// </summary>
+    public static void Commit(Button button)
+    {
+        foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
+        {
+            button.AddThemeStyleboxOverride(state, Lit());
+        }
+
+        button.AddThemeStyleboxOverride("disabled", Surface());
+        button.AddThemeColorOverride("font_color", Engrave);
+        button.AddThemeColorOverride("font_hover_color", Engrave);
+        button.AddThemeColorOverride("font_pressed_color", Engrave);
+        button.AddThemeColorOverride("font_focus_color", Engrave);
+        button.AddThemeColorOverride("font_disabled_color", Muted);
+    }
+
+    /// <summary>
+    /// A tab. The chosen one is light stone and engraved; the others stay flat, so which one is open can be told
+    /// without reading the words.
+    /// </summary>
+    public static void Tab(Button button)
+    {
+        StyleBoxFlat quiet = Surface();
+        quiet.SetCornerRadiusAll(10);
+
+        button.AddThemeStyleboxOverride("normal", quiet);
+        button.AddThemeStyleboxOverride("hover", quiet);
+        button.AddThemeStyleboxOverride("focus", quiet);
+        button.AddThemeStyleboxOverride("pressed", Lit());
+        button.AddThemeColorOverride("font_color", Muted);
+        button.AddThemeColorOverride("font_hover_color", Title);
+        button.AddThemeColorOverride("font_pressed_color", Engrave);
+        button.AddThemeColorOverride("font_focus_color", Muted);
+    }
+
+    /// <summary>
+    /// The strip a window's title sits on — dark stone across the full width, with the title in light letters.
+    /// Never engraved: engraving needs the light stone under it or the words vanish.
+    /// </summary>
+    public static Control Header(Control inside)
+    {
+        PanelContainer strip = new();
+        strip.AddThemeStyleboxOverride("panel", Stone());
+        strip.AddChild(inside);
+
+        return strip;
+    }
+
     /// <summary>Darkens what is under it, so a number written over a picture can be read.</summary>
     public static StyleBoxFlat Shade() => new() { BgColor = new Color(0, 0, 0, 0.55f), CornerRadiusTopLeft = 23, CornerRadiusTopRight = 23, CornerRadiusBottomLeft = 23, CornerRadiusBottomRight = 23 };
 
