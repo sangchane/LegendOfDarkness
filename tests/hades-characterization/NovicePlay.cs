@@ -124,7 +124,7 @@ public sealed class NovicePlay : IDisposable
     /// <summary>Asks to be put in the hunting ground. A game master may do that from anywhere.</summary>
     private async Task ToTheHuntingGround(WorldClient world)
     {
-        if (world.State?.Map.Id == PlainId)
+        if (world.State?.Map.Id == PlainId && !OffTheMap(world))
         {
             return;
         }
