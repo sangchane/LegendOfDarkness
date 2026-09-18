@@ -132,7 +132,7 @@ public sealed class WorldMapTests : IDisposable
         // reach 기본값 40 으로는 147칸 길에 null 이 돌아온다.
         IReadOnlyList<Tile>? way = Pathing.Way(entry.Where, goal, blocked, reach: 200);
 
-        Assert.NotNull(way);
+        Assert.True(way is not null, $"{entry.Where} 에서 {goal} 로 길을 못 찾았습니다.");
 
         await WalkTheWay(world, way, SuomiTown, deadline.Token);
 
@@ -189,6 +189,11 @@ public sealed class WorldMapTests : IDisposable
 
                 await world.WalkAsync(direction, token);
                 await Task.Delay(300, token);
+            }
+
+            if (world.State?.Map.Id == onMap && world.State?.Where != next)
+            {
+                Assert.Fail($"{next} 에 서지 못했습니다. 마지막: {world.State}");
             }
         }
     }
