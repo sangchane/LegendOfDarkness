@@ -851,9 +851,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
-        // 벽 너머의 괴물은 보이기는 해도 갈 수 없다. 가장 가까운 한 마리만 보고 걸으면 그 벽에 대고
-        // 영원히 걷게 된다 — 실제로 이것 때문에 (14,50) 에서 멈춰 있었다. 그래서 자리가 한참 그대로면
-        // 그 한 마리를 잊고 방향을 튼다.
+        // 자리가 한참 그대로면 그 한 마리를 잊는다. 길찾기가 벽은 돌아가 주지만, 사람이나 괴물이 길목에
+        // 서 있는 것까지는 모른다 — 그럴 때 빠져나오는 마지막 장치다.
         _stuck = standing == _chasedFrom ? _stuck + 1 : 0;
         _chasedFrom = standing;
 
@@ -865,7 +864,15 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
-        Walk(Toward(dx, dy));
+        // 벽을 뚫고 가려 하지 않는다 — 돌아가는 길의 첫 걸음을 딛는다. 길이 아예 없으면 다른 데를 본다.
+        if (Pathing.StepTowards(standing, prey, Walled, ChaseReach) is not { } step)
+        {
+            _stuck = 0;
+            Roam();
+            return;
+        }
+
+        Walk(step);
     }
 
     /// <summary>Faces the neighbouring tile without stepping onto it, so a swing lands the right way.</summary>
@@ -880,13 +887,48 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             ? (dx >= 0 ? Direction.East : Direction.West)
             : (dy >= 0 ? Direction.South : Direction.North);
 
-    /// <summary>The nearest monster's tile, or nothing when none is in sight.</summary>
-    private Tile? Nearest() =>
-        server?.Creatures
-            .Where(beast => beast.Kind == CreatureKind.Hostile)
-            .OrderBy(beast => Math.Abs(beast.Where.X - _tile.X) + Math.Abs(beast.Where.Y - _tile.Y))
-            .Select(beast => (Tile?)beast.Where)
-            .FirstOrDefault();
+    /// <summary>
+    /// The nearest monster's tile — nearest by <b>walking</b>, not by how the crow flies. One three tiles off
+    /// behind a wall is further away than one six tiles off down an open lane, and picking by the straight line
+    /// is what left a figure pressed against that wall for ever.
+    /// </summary>
+    private Tile? Nearest()
+    {
+        if (server is null)
+        {
+            return null;
+        }
+
+        Tile? best = null;
+        int shortest = int.MaxValue;
+
+        foreach (Creature beast in server.Creatures.Where(one => one.Kind == CreatureKind.Hostile))
+        {
+            // 멀리 있는 것부터 길을 재면 프레임이 녹는다 — 직선으로도 멀면 아예 보지 않는다.
+            if (Math.Abs(beast.Where.X - _tile.X) + Math.Abs(beast.Where.Y - _tile.Y) > ChaseReach)
+            {
+                continue;
+            }
+
+            if (Pathing.Steps(_tile, beast.Where, Walled, ChaseReach) is not { } steps || steps >= shortest)
+            {
+                continue;
+            }
+
+            shortest = steps;
+            best = beast.Where;
+        }
+
+        return best;
+    }
+
+    /// <summary>How far away a monster may be and still be worth walking to.</summary>
+    private const int ChaseReach = 20;
+
+    /// <summary>Whether a tile cannot be walked on — the walls this map was drawn with, and everything off it.</summary>
+    private bool Walled(Tile tile) =>
+        tile.X < 0 || tile.Y < 0
+        || (_layout is { } map && (tile.X >= map.Columns || tile.Y >= map.Rows || map.Blocks(tile)));
 
     /// <summary>Walks on looking for something to fight, turning when the last step did not land.</summary>
     /// <remarks>
