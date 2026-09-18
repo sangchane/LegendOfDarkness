@@ -154,7 +154,12 @@ build() {
     "$GODOT" --headless --path "$CLIENT" --export-debug "iOS" "$IPA"
 
     # EXPORT SUCCEEDED 를 믿지 않는다 — C# 이 빠진 채로도 성공으로 끝난다(docs/mobile-client.md).
-    if ! unzip -l "$IPA" | grep -q 'LodClient.framework'; then
+    # 목록을 먼저 받아 두고 본다. `unzip | grep -q` 로 이으면 grep 이 먼저 닫아 unzip 이 실패로 끝나고,
+    # set -o pipefail 때문에 멀쩡한 .ipa 도 빠진 것으로 읽힌다(2026-09-18).
+    local listing
+    listing="$(unzip -l "$IPA")"
+
+    if ! grep -q 'LodClient.framework' <<< "$listing"; then
         echo "C# 이 빠진 .ipa 입니다 — 기기에서 엔진이 뜬 직후 죽습니다." >&2
         exit 1
     fi
