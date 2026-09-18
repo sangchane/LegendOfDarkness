@@ -109,6 +109,19 @@ public sealed partial class Actor : Node2D
         Name = displayName;
     }
 
+    /// <summary>The bar over the head, made when the actor is put on the floor.</summary>
+    private HealthBar? _hurt;
+
+    /// <summary>Says this one was struck and this much of them is left, as a percentage the server sends (0x13).</summary>
+    public void Struck(int left) => _hurt?.Struck(left);
+
+    /// <summary>The badges under the bar — what is on this one now.</summary>
+    private StatusRow? _ailing;
+
+    /// <summary>Says what is on this one now (0x3A). An empty list clears the badges.</summary>
+    public void Ailing(System.Collections.Generic.IEnumerable<Lod.Mobile.Core.World.Ailment> ailments) =>
+        _ailing?.Show(ailments);
+
     public override void _Ready()
     {
         for (int layer = 0; layer < _sheet.Paths.Count; layer++)
@@ -131,6 +144,14 @@ public sealed partial class Actor : Node2D
             _sprites.Add(piece);
             AddChild(piece);
         }
+
+        // 머리 위 체력바. 그림 꼭대기보다 조금 위에 둔다 — 그림에 겹치면 얼굴을 가린다.
+        _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, -_sheet.FeetY - 5) };
+        AddChild(_hurt);
+
+        // 걸린 것들은 그 막대 바로 아래에 줄로 선다 — 눈이 이미 가 있는 자리라 따로 찾지 않아도 된다.
+        _ailing = new StatusRow { Name = "Status", Visible = false, Position = new Vector2(0, -_sheet.FeetY + 1) };
+        AddChild(_ailing);
 
         Face(_direction);
     }

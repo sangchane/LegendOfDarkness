@@ -142,6 +142,29 @@ public enum Stat : byte
     Con = 0x10,
 }
 
+/// <summary>
+/// Something that is on us — a curse, poison, sleep. The server names it by a picture number and grades how
+/// much longer it lasts rather than counting it down (<c>Debuff.Display</c>): 6 is over ninety seconds, 5 is
+/// sixty to ninety, 4 thirty to sixty, 3 twenty to thirty, 2 ten to twenty, 1 under ten. Zero means it is over.
+/// </summary>
+/// <param name="Left">
+/// That grade. It is not seconds — the original never sends seconds for these, only which band it is in.
+/// </param>
+public sealed record Ailment(int Icon, int Left)
+{
+    /// <summary>Roughly how many seconds are left, for showing. The band's own floor, which never overstates.</summary>
+    public int Seconds => Left switch
+    {
+        6 => 90,
+        5 => 60,
+        4 => 30,
+        3 => 20,
+        2 => 10,
+        1 => 1,
+        _ => 0
+    };
+}
+
 public enum CreatureKind
 {
     /// <summary>A monster. It fights.</summary>

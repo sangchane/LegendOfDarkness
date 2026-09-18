@@ -1098,6 +1098,42 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     }
 
     /// <summary>Plays the sounds the server asked for (0x19). The number is the file's name.</summary>
+    /// <summary>
+    /// Puts a bar over the head of whoever was just struck. The server tells us about every blow (0x13) with
+    /// what is left as a percentage, and until now the screen only listened for the sound in it — so a fight
+    /// showed no sign of how it was going, on a monster or on a person.
+    /// </summary>
+    private void Wounds()
+    {
+        while (server is { } world && world.TakeHurt(out uint serial, out int left))
+        {
+            // 번호 0 은 허공을 친 것이다 — 아무의 체력도 아니다.
+            if (serial == 0)
+            {
+                continue;
+            }
+
+            if (serial == world.Serial)
+            {
+                _player.Struck(left);
+            }
+            else if (_herd.TryGetValue(serial, out Actor? beast))
+            {
+                beast.Struck(left);
+            }
+            else if (_crowd.TryGetValue(serial, out Actor? person))
+            {
+                person.Struck(left);
+            }
+        }
+
+        // 걸린 것들은 나에게만 온다 — 서버가 당사자에게만 보낸다(Debuff.Display).
+        if (server is { } mine)
+        {
+            _player.Ailing(mine.Ailments);
+        }
+    }
+
     private void Sounds()
     {
         while (server is { } world && world.TakeSound(out int number))
@@ -1333,6 +1369,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Crowd();
         Herd();
         Swings();
+        Wounds();
         Flashes();
         Sounds();
         Band();

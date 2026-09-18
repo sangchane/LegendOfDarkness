@@ -36,6 +36,11 @@ public sealed class WorldClient(WorldSession session)
     private const byte RemoveCommand = 0x0E;
     private const byte AddToPackCommand = 0x0F;
     private const byte ShowCreaturesCommand = 0x07;
+
+    /// <summary>
+    /// 상태 이상 아이콘. 나가는 0x3A(대화 답장)와 번호가 같지만 오는 것은 이쪽이다 — 걸린 본인에게만 온다.
+    /// </summary>
+    private const byte StatusCommand = 0x3A;
     private const byte AttackCommand = 0x13;
     private const byte HealthCommand = 0x13;
     private const byte SpokenCommand = 0x0A;
@@ -126,6 +131,7 @@ public sealed class WorldClient(WorldSession session)
 
     // How hurt each of them is, out of a hundred. The server never says more than that about somebody else.
     private readonly ConcurrentDictionary<uint, int> _health = new();
+    private readonly ConcurrentDictionary<int, Ailment> _ailing = new();
 
     // Every report in the order it came, because the latest one is not enough to check a blow against a
     // formula: two blows landing between two reads would leave only the second one's figure behind.
@@ -183,6 +189,12 @@ public sealed class WorldClient(WorldSession session)
     public int? Health(uint serial) => _health.TryGetValue(serial, out int left) ? left : null;
 
     /// <summary>
+    /// What is on us right now — a curse, poison, sleep. The server names each with a picture number and says
+    /// roughly how long is left; it only ever tells the one afflicted, so this is our own list and nobody else's.
+    /// </summary>
+    public IReadOnlyCollection<Ailment> Ailments => (IReadOnlyCollection<Ailment>)_ailing.Values;
+
+    /// <summary>
     /// Every health report the server has sent, oldest first. One report is one blow landing, so this is
     /// the record a test needs when the question is how much a single blow took off.
     /// </summary>
@@ -214,6 +226,23 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>The next song the server asked for, if it asked. <see cref="Music.Silence" /> means stop.</summary>
     public bool TakeMusic(out int song) => _songs.TryDequeue(out song);
+
+    /// <summary>
+    /// The next blow the server told us about (0x13): whose it was and what percentage of them is left. A screen
+    /// takes these to put a bar over that one's head, which is the only place the original shows how a fight is
+    /// going. Serial zero is a swing that hit nothing.
+    /// </summary>
+    public bool TakeHurt(out uint serial, out int left)
+    {
+        if (_hurts.TryDequeue(out (uint Serial, int Left) hurt))
+        {
+            (serial, left) = hurt;
+            return true;
+        }
+
+        (serial, left) = (0, 0);
+        return false;
+    }
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
@@ -439,6 +468,23 @@ public sealed class WorldClient(WorldSession session)
                     Cooldown cooling = ReadCooldown(HadesCipher.DecodeSecured(frame, session.Parameters));
 
                     _cooling[(cooling.Skill, cooling.Slot)] = DateTime.UtcNow.AddSeconds(cooling.Seconds);
+                }
+
+                    continue;
+
+                case StatusCommand:
+                {
+                    Ailment told = ReadAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                    // 등급 0 은 풀렸다는 뜻이다(Debuff.OnEnded 가 0 을 보낸다).
+                    if (told.Left == 0)
+                    {
+                        _ailing.TryRemove(told.Icon, out _);
+                    }
+                    else
+                    {
+                        _ailing[told.Icon] = told;
+                    }
                 }
 
                     continue;
@@ -1132,6 +1178,20 @@ public sealed class WorldClient(WorldSession session)
     /// original format has no such gap; ours does. Nothing can be dropped here yet, and this is where to
     /// come back when it can be.
     /// </remarks>
+    /// <summary>
+    /// One status icon (0x3A): which picture, and a grade saying how much longer it lasts. The server works the
+    /// grade out in <c>Debuff.Display</c> — 6 is over ninety seconds, 1 is under ten, and 0 means it is over.
+    /// </summary>
+    public static Ailment ReadAilment(ReadOnlySpan<byte> body)
+    {
+        if (body.Length < 3)
+        {
+            throw new ProtocolException($"상태 안내가 3바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        return new Ailment(BinaryPrimitives.ReadUInt16BigEndian(body), body[2]);
+    }
+
     public static IReadOnlyList<Creature> ReadCreatures(ReadOnlySpan<byte> body)
     {
         const int recordLength = 17;
