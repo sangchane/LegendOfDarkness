@@ -88,6 +88,12 @@ public partial class Main : Control
     public static string Holding { get; private set; } = string.Empty;
 
     /// <summary>
+    /// A fan slot to press on its own, as <c>--skill 1</c>. For looking at what a technique draws — the motion and the
+    /// flash — without a hand on the screen.
+    /// </summary>
+    public static string Ability { get; private set; } = string.Empty;
+
+    /// <summary>
     /// Whether to tap the first other person the server shows us, as <c>--pick</c>. A real tap on their
     /// figure, so what it checks is the same path a thumb takes.
     /// </summary>
@@ -144,6 +150,7 @@ public partial class Main : Control
         ReadRehearsal(Flag("--login"));
         Rehearse = Flag("--walk");
         Holding = Flag("--hold");
+        Ability = Flag("--skill");
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;

@@ -164,6 +164,15 @@ public sealed partial class AbilityBar : Control
         }
     }
 
+    /// <summary>Presses one slot from outside — for a run with nobody watching (<c>--skill</c>).</summary>
+    public void Press(int index)
+    {
+        if (index >= 0 && index < _slots.Length && !_slots[index].Disabled)
+        {
+            Use(index);
+        }
+    }
+
     private void Use(int index)
     {
         switch (_drawn[index])

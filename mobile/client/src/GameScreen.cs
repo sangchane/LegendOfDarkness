@@ -365,6 +365,7 @@ public partial class GameScreen : Control
         Dropped();
         KeepWalking(delta);
         RehearseAHold(delta);
+        RehearseASkill(delta);
 
         // 레이아웃 검사는 세 프레임 만에 재고 끝난다. 90 프레임을 기다리면 닫힌 화면을 재게 되고,
         // 실제로 그래서 장비 칸이 넘쳤는데도 0 오류였다 — 검사 중에는 바로 연다.
@@ -459,6 +460,28 @@ public partial class GameScreen : Control
         {
             _targetHealth.Value = value;
         }
+    }
+
+    // --skill 로 기술을 누르는 사이. 손 없이 확인할 때만 돈다.
+    private double _skillWait;
+
+    /// <summary>Presses one fan slot every so often, so a run with nobody watching shows what a technique draws.</summary>
+    private void RehearseASkill(double delta)
+    {
+        if (Main.Ability.Length == 0 || !int.TryParse(Main.Ability, out int slot))
+        {
+            return;
+        }
+
+        _skillWait += delta;
+
+        if (_skillWait < 1.5)
+        {
+            return;
+        }
+
+        _skillWait = 0;
+        _abilities.Press(slot - 1);
     }
 
     // --hold 로 누르고 있는 시간. 음수면 아직 안 눌렀다.
