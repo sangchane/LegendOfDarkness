@@ -27,8 +27,11 @@ public sealed partial class CreateScreen : Control
     private const int ValueWidth = 40;
     private const int PreviewSize = 140;
 
-    /// <summary>지금 있는 걷기 그림. 진짜 머리·색은 Task C 가 입힌다.</summary>
+    /// <summary>맨몸·머리 그림이 하나도 없을 때만 쓰는 마지막 대안(있을 리 없음).</summary>
     private const string HeroSheet = "res://assets/actor/hero-walk.png";
+
+    /// <summary>겹쳐 입힐 그림들이 있는 자리 — <c>WorldView.Dress</c> 와 같은 값(부위별로 따로 못 나눈다).</summary>
+    private const string PartsFolder = "res://assets/actor/parts/";
 
     private readonly ConcurrentQueue<string> _reported = new();
     private readonly CancellationTokenSource _closing = new();
@@ -51,6 +54,7 @@ public sealed partial class CreateScreen : Control
     private Control _genderRow = null!;
 
     private Control _preview = null!;
+    private Control _stage = null!;
 
     private Label _hairValue = null!;
     private Control _hairRow = null!;
@@ -97,6 +101,7 @@ public sealed partial class CreateScreen : Control
         RefreshGender();
         RefreshHair();
         RefreshColor();
+        RefreshPreview();
         RefreshCreateState();
     }
 
@@ -209,25 +214,71 @@ public sealed partial class CreateScreen : Control
     }
 
     /// <summary>
-    /// 가운데 미리보기 자리. Task C 전이라 지금 있는 걷기 그림을 그대로 세워만 둔다 — 머리·색은
-    /// 아직 반영되지 않는다(plans/character-creation.md).
+    /// 가운데 미리보기 자리. 맨몸에 고른 머리·색만 얹는다 — 옷·모자·신발은 없다(사용자, 2026-09-19).
+    /// 실제 그림은 <see cref="RefreshPreview"/> 가 채운다.
     /// </summary>
     private Control BuildPreview()
     {
         PanelContainer box = new() { CustomMinimumSize = new Vector2(PreviewSize, PreviewSize) };
         box.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
-        Control stage = new() { ClipContents = true };
+        _stage = new Control { ClipContents = true };
 
-        Actor figure = new("미리보기", Actor.Sheet.Walk(HeroSheet))
+        box.AddChild(_stage);
+        _preview = box;
+        return box;
+    }
+
+    /// <summary>
+    /// 미리보기를 지금 고른 성별·머리·색으로 다시 그린다. 머리나 색을 넘길 때마다 다시 불린다 — 팔레트
+    /// 교체(<see cref="Palettes"/>)는 (그림, 색) 별로 캐시돼 있어 이미 그려 본 조합은 다시 읽지 않는다.
+    /// </summary>
+    private void RefreshPreview()
+    {
+        foreach (Node child in _stage.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        Actor figure = new("미리보기", BareBodySheet())
         {
             Position = new Vector2(PreviewSize / 2f, PreviewSize - Main.Gutter)
         };
-        stage.AddChild(figure);
+        _stage.AddChild(figure);
+    }
 
-        box.AddChild(stage);
-        _preview = box;
-        return box;
+    /// <summary>
+    /// 맨몸 + 고른 머리만 그리는 겹 목록. 실제 게임이 쓰는 <see cref="Wardrobe.Pieces"/> 를 그대로 쓴다 —
+    /// 갑옷·무기·신발·방패를 전부 0으로 주면 그 부위들은 스스로 빠진다(<c>Wardrobe.cs</c>). 그림이 없는
+    /// 겹은 <c>WorldView.Dress</c> 와 같은 규칙으로 건너뛴다. 머리색은 <see cref="Palettes"/> 가 팔레트
+    /// 98번부터 6칸을 갈아 끼워 그린다(plans/character-creation.md).
+    /// </summary>
+    private Actor.Sheet BareBodySheet()
+    {
+        Appearance appearance = new(
+            Head: _hairStyle, Body: _gender * 16, Armor: 0, Boots: 0, Shield: 0, Weapon: 0,
+            HairColor: _hairColor, BootColor: 0, HeadAccessory1: 0, Lantern: 0, HeadAccessory2: 0,
+            Resting: 0, OverCoat: 0);
+
+        List<string> paths = [];
+        List<int> colours = [];
+        List<char> parts = [];
+
+        foreach (Piece piece in Wardrobe.Pieces(appearance))
+        {
+            string path = $"{PartsFolder}{piece.Name}.png";
+
+            if (!ResourceLoader.Exists(path))
+            {
+                continue;
+            }
+
+            paths.Add(path);
+            colours.Add(piece.Colour);
+            parts.Add(piece.Name[1]);
+        }
+
+        return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, [], parts) : Actor.Sheet.Walk(HeroSheet);
     }
 
     private Control BuildHairRow()
@@ -308,6 +359,7 @@ public sealed partial class CreateScreen : Control
     {
         _hairStyle = HairStyles.Step(_hairStyle, _gender, direction);
         RefreshHair();
+        RefreshPreview();
     }
 
     private const int ColorCount = 72;
@@ -316,6 +368,7 @@ public sealed partial class CreateScreen : Control
     {
         _hairColor = ((_hairColor + direction) % ColorCount + ColorCount) % ColorCount;
         RefreshColor();
+        RefreshPreview();
     }
 
     /// <summary>
@@ -334,6 +387,7 @@ public sealed partial class CreateScreen : Control
 
         RefreshGender();
         RefreshHair();
+        RefreshPreview();
     }
 
     private void RefreshGender()
