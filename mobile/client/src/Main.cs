@@ -142,6 +142,9 @@ public partial class Main : Control
     /// <summary>Whether to open the pack on its own, as <c>--pack</c>. For checking it without a thumb.</summary>
     public static bool OpeningPack { get; private set; }
 
+    /// <summary>Whether to press the "지도" button on its own, as <c>--map</c>. For checking it without a thumb.</summary>
+    public static bool OpeningMap { get; private set; }
+
     /// <summary>Whether to swing once after picking somebody, as <c>--strike</c>.</summary>
     public static bool Striking { get; private set; }
 
@@ -187,6 +190,7 @@ public partial class Main : Control
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
+        OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0;
         OnGear = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
         Hunting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--hunt") >= 0

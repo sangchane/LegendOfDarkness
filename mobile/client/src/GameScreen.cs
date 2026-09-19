@@ -74,6 +74,16 @@ public partial class GameScreen : Control
     // 손 없이 확인할 때 스스로 열어 보기 위한 것. 월드가 자리를 잡을 때까지 센다.
     private int _settling;
 
+    // --map 을 따로 센다 — --pack 과 함께 주면 _settling 하나로는 둘 다 못 잰다.
+    private int _mapSettling;
+
+    // 지도가 뜬 뒤 사진 찍을 시간을 준 다음 닫기까지 눌러, 조작이 돌아오는 화면도 --map 하나로
+    // --shot-after 만 달리해 잡을 수 있게 한다. 프레임 수로 세면 기기마다 빠르기가 달라 몇 초인지
+    // 가늠이 안 된다 — 흐른 시간(초)으로 센다.
+    private double _mapOpenSeconds;
+    private const double MapCloseAfterSeconds = 5;
+    private Button _map = null!;
+
     // 리허설로 한 번만 입어 본다.
     private bool _worn;
     private Control _topRow = null!;
@@ -328,15 +338,15 @@ public partial class GameScreen : Control
         pack.Pressed += () => Carrying(true);
         row.AddChild(pack);
 
-        Button map = new()
+        _map = new Button
         {
             Text = "지도",
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
         };
 
-        Greybox.Plain(map);
-        map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
-        row.AddChild(map);
+        Greybox.Plain(_map);
+        _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
+        row.AddChild(_map);
 
         return row;
     }
@@ -417,6 +427,22 @@ public partial class GameScreen : Control
         if (Main.OpeningPack && !_pack.Visible && _settling++ == settle)
         {
             Carrying(true);
+        }
+
+        // 손 없이 확인할 때만. 같은 규칙 — 옆 단추(인벤토리)가 쓰는 것을 그대로 쓴다: 눌러 보는 것은
+        // 잇는 서버 말이 아니라 단추 자신의 눌림(EmitSignal) — 배선까지 확인된다. 뜬 것을 잠시 두었다가
+        // 닫기까지 눌러, 열린 화면과 닫아 조작이 돌아온 화면을 --shot-after 만 달리해 --map 하나로 잡는다.
+        if (Main.OpeningMap)
+        {
+            if (_server?.Field is null && !_closingField && _mapSettling++ == settle)
+            {
+                _map.EmitSignal(BaseButton.SignalName.Pressed);
+            }
+
+            if (_field.Visible && (_mapOpenSeconds += delta) >= MapCloseAfterSeconds)
+            {
+                _field.Close.EmitSignal(BaseButton.SignalName.Pressed);
+            }
         }
 
         // 월드맵은 서버가 띄우는 것이지 사람이 여는 것이 아니다. 온 것을 그대로 보여 준다.

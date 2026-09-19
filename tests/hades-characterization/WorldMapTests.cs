@@ -16,7 +16,6 @@ public sealed class WorldMapTests : IDisposable
 {
     private const int WoodlandGate = 20028;
     private const int SuomiTown = 20355;
-    private const int ForestOne = 20263;
 
     private const string Name = "mapwalker";
 
@@ -24,8 +23,13 @@ public sealed class WorldMapTests : IDisposable
 
     public void Dispose() => _deadline.Dispose();
 
+    /// <summary>
+    /// 우드랜드 아래 가장자리를 밟으면 창이 뜨고(수오미가 그 안에 있고) → 수오미를 고르면 실제로
+    /// 수오미마을에 내려놓는다. 두 가지 다 같은 접속으로 이어서 확인한다 — 창을 여는 것과 창에서
+    /// 고르는 것을 따로 서버를 띄워 두 번 볼 까닭이 없다(사용자 결정, 2026-09-19).
+    /// </summary>
     [Fact]
-    public async Task Stepping_onto_the_woodland_edge_opens_the_world_map_with_suomi_on_it()
+    public async Task Stepping_onto_the_woodland_edge_opens_the_world_map_and_suomi_takes_you_there()
     {
         // 20028 은 40x24 — (10,23) 이 아래 가장자리이고 월드맵을 여는 칸이다. (10,22) 도 (10,23) 도 길이다.
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (WoodlandGate, 10, 22));
@@ -59,25 +63,6 @@ public sealed class WorldMapTests : IDisposable
         Assert.Equal(SuomiTown, suomi.AreaId);
         Assert.Equal(40, suomi.X);
         Assert.Equal(11, suomi.Y);
-    }
-
-    [Fact]
-    public async Task Choosing_suomi_puts_the_character_down_in_suomi()
-    {
-        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (WoodlandGate, 10, 22));
-        server.Start(TimeSpan.FromMinutes(2));
-        LoginFlow.TryCreateAccount(server, Name);
-
-        using WorldSession session = await HadesLoginClient.LoginAsync(
-            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
-
-        WorldClient world = new(session);
-        _ = world.PumpAsync(_deadline.Token);
-
-        await Waiting.Until(() => world.State is { } state && state.Map.Id == WoodlandGate,
-            "우드랜드입구에 들어가지 못했습니다.", _deadline.Token);
-
-        await Waiting.WalkUntil(world, Direction.South, () => world.Field is not null, _deadline.Token);
 
         await world.ChooseFieldAsync(SuomiTown, _deadline.Token);
 
@@ -89,84 +74,11 @@ public sealed class WorldMapTests : IDisposable
     }
 
     /// <summary>
-    /// 우드랜드입구 → 월드맵 → 수오미마을 → (길찾기로) 포테의숲1존 입구 → 33,47 → 괴물 둘.
-    /// 이 시험 하나가 3~4분 걸릴 수 있어(147칸) 공용 <see cref="_deadline"/> 대신 저희만의 마감을 쓴다 —
-    /// 다른 시험의 마감은 그대로 5분으로 둔다.
-    /// </summary>
-    /// <remarks>
-    /// 월드맵이 내려놓는 (40,11) 에서 (99,25) 까지 남쪽·동쪽으로 곧장 걸으면 (40,25)→(45,25) 가 벽이라
-    /// 닿지 않는다(`lod20355.map` 을 서버 규칙대로 직접 읽어 확인함). 그래서 알맹이의 길찾기
-    /// (<see cref="Pathing.Way"/>) 로 147칸짜리 길을 구해 한 칸씩 걷는다. 자리는 걸을 때마다 서버에
-    /// 새로 물어야 안다 — 걷기가 성공했다는 말은 스스로 오지 않는다(`PoteDungeonTests.StepTo` 와 같은 까닭,
-    /// `Aisling.Walk` 가 걸음 알림을 자신을 뺀 근처에만 보낸다).
-    /// </remarks>
-    [Fact]
-    public async Task The_whole_way_from_woodland_to_the_first_zone_of_pote_forest()
-    {
-        using CancellationTokenSource deadline = new(TimeSpan.FromMinutes(8));
-
-        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (WoodlandGate, 10, 22));
-        server.Start(TimeSpan.FromMinutes(2));
-        LoginFlow.TryCreateAccount(server, Name);
-
-        // 수오미마을 → 포테의숲1존은 5.99 에서 레벨 21~51 이다(docs/pote-forest.md).
-        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
-        System.Text.Json.Nodes.JsonNode character = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(saved))!;
-        character["ExpLevel"] = 21;
-        File.WriteAllText(saved, character.ToJsonString());
-
-        using WorldSession session = await HadesLoginClient.LoginAsync(
-            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, deadline.Token);
-
-        WorldClient world = new(session);
-        _ = world.PumpAsync(deadline.Token);
-
-        await Waiting.Until(() => world.State is { } state && state.Map.Id == WoodlandGate,
-            "우드랜드입구에 들어가지 못했습니다.", deadline.Token);
-
-        await Waiting.WalkUntil(world, Direction.South, () => world.Field is not null, deadline.Token);
-        await world.ChooseFieldAsync(SuomiTown, deadline.Token);
-
-        await Waiting.Until(() => world.State is { } state && state.Map.Id == SuomiTown,
-            "수오미마을로 가지 않았습니다.", deadline.Token);
-
-        WorldEntry entry = world.State!;
-        Tile goal = new(99, 25);
-
-        Func<Tile, bool> blocked = Walled(server, SuomiTown, entry.Map.Columns, entry.Map.Rows);
-
-        // reach 기본값 40 으로는 147칸 길에 null 이 돌아온다.
-        IReadOnlyList<Tile>? way = Pathing.Way(entry.Where, goal, blocked, reach: 200);
-
-        Assert.True(way is not null, $"{entry.Where} 에서 {goal} 로 길을 못 찾았습니다.");
-
-        await WalkTheWay(world, way, SuomiTown, deadline.Token);
-
-        await Waiting.Until(() => world.State is { } state && state.Map.Id == ForestOne && state.Where == new Tile(33, 47),
-            $"포테의숲1존 33,47 로 가지 않았습니다. 마지막: {world.State}", deadline.Token);
-
-        HashSet<uint> met = [];
-
-        for (int tick = 0; tick < 120 && met.Count < 2; tick++)
-        {
-            foreach (Creature mob in world.Creatures.Where(c => c.Kind == CreatureKind.Hostile))
-            {
-                met.Add(mob.Serial);
-            }
-
-            await world.RefreshAsync(deadline.Token);
-            await Task.Delay(500, deadline.Token);
-        }
-
-        Assert.True(met.Count >= 2, $"포테의숲1존 입구에 1분 서 있는 동안 괴물이 {met.Count}마리만 보였습니다.");
-    }
-
-    /// <summary>
     /// 미리 구한 길을 한 칸씩 따라간다. 걸은 뒤 자리는 서버에 새로 물어야 안다 — 걷기 성공은 스스로 알려
     /// 오지 않는다. <paramref name="onMap" /> 을 벗어나면(동쪽 끝 99,24~27 을 밟아 포테의숲으로 넘어가면)
     /// 남은 길은 걷지 않고 곧바로 멈춘다 — 맵이 바뀐 뒤에도 수오미 기준 길을 계속 걸으면 엉뚱한 데로 간다.
     /// </summary>
-    private static async Task WalkTheWay(WorldClient world, IReadOnlyList<Tile> way, int onMap, CancellationToken token)
+    internal static async Task WalkTheWay(WorldClient world, IReadOnlyList<Tile> way, int onMap, CancellationToken token)
     {
         foreach (Tile next in way)
         {
@@ -215,7 +127,7 @@ public sealed class WorldMapTests : IDisposable
     /// (`Area.cs:205-207`). 지금 수오미마을에는 그것이 없어서 이 시험이 맞다 — NPC 가 하나 더 서거나
     /// 운영자가 칸을 막으면 147칸 길이 <see cref="Assert.Fail" /> 로 죽을 수 있다.
     /// </remarks>
-    private static Func<Tile, bool> Walled(IsolatedHadesServer server, int mapId, int columns, int rows)
+    internal static Func<Tile, bool> Walled(IsolatedHadesServer server, int mapId, int columns, int rows)
     {
         byte[] sotp = File.ReadAllBytes(Path.Combine(server.ContentLocation, "static", "sotp.dat"));
         byte[] map = File.ReadAllBytes(Path.Combine(server.ContentLocation, "maps", $"lod{mapId}.map"));
