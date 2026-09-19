@@ -9,8 +9,9 @@ namespace LodClient;
 /// 지금은 고를 수만 있으면 된다.
 /// </summary>
 /// <remarks>
-/// **닫기가 없다.** 이 창이 열려 있는 동안 서버는 고르기 말고 이 접속의 패킷을 모두 버리므로
-/// (`NetworkServer.cs:141`), 닫아 봐야 걸음도 말도 닿지 않는다. 한 곳을 골라야 빠져나온다.
+/// 닫을 수 있다(<see cref="Close"/>). 이 창이 열려 있는 동안 서버는 고르기 말고 이 접속의 패킷을 모두
+/// 버리므로(`NetworkServer.cs:141`), 화면만 숨기면 손이 묶인 채다 — 닫을 때 서버에 취소(0x3F, 맵 번호 0)를
+/// 보내야 조작이 돌아온다.
 /// </remarks>
 public sealed partial class FieldPanel : PanelContainer
 {
@@ -27,10 +28,18 @@ public sealed partial class FieldPanel : PanelContainer
         inside.AddThemeConstantOverride("separation", Main.Gutter);
         _places.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
+        HBoxContainer head = new();
+        head.AddThemeConstantOverride("separation", Main.Gutter);
+        _title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        head.AddChild(_title);
+
+        Close = new Button { Text = "닫기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
+        head.AddChild(Close);
+
         ScrollContainer scroll = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
         scroll.AddChild(_places);
 
-        inside.AddChild(_title);
+        inside.AddChild(head);
         inside.AddChild(scroll);
 
         MarginContainer margin = new();
@@ -42,6 +51,9 @@ public sealed partial class FieldPanel : PanelContainer
 
         AddChild(margin);
     }
+
+    /// <summary>창을 그냥 닫는다. 서버에 "취소"를 보내야 조작이 돌아온다 — 화면만 숨기면 손이 묶인 채다.</summary>
+    public Button Close { get; }
 
     /// <summary>고른 곳의 맵 번호.</summary>
     public event Action<int>? Chosen;

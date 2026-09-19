@@ -128,6 +128,11 @@ public partial class GameScreen : Control
             _chosenField = area;
             _ = _server?.ChooseFieldAsync(area, System.Threading.CancellationToken.None);
         };
+        _field.Close.Pressed += () =>
+        {
+            _field.Visible = false;
+            _ = _server?.CloseFieldAsync(System.Threading.CancellationToken.None);
+        };
 
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
@@ -317,6 +322,16 @@ public partial class GameScreen : Control
         Greybox.Plain(pack);
         pack.Pressed += () => Carrying(true);
         row.AddChild(pack);
+
+        Button map = new()
+        {
+            Text = "지도",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        Greybox.Plain(map);
+        map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
+        row.AddChild(map);
 
         return row;
     }
