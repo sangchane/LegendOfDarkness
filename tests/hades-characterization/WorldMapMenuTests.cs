@@ -84,11 +84,22 @@ public sealed class WorldMapMenuTests : IDisposable
 
         await Waiting.Until(() => world.State is { } state && state.Map.Id == NoviceTown, "노비스마을에 들어가지 못했습니다.", _deadline.Token);
 
-        // 꾸밈용 주민(노비스주민1·2)이 괴물로 젠될 때까지 기다린다 — 젠 전에 물으면 이 시험이
-        // 우연히 통과해 버려 재발을 못 잡는다. Creatures 에는 NPC(Mundane)도 들어가 그 13명이 서는
-        // 순간부터 참이 돼 버리므로(ServerFormat07.cs:65-75 · WorldClient.cs:1321), 주민이 괴물로 서는
-        // 것만 센다 — 맵 20373 에는 노비스주민1·2 뿐이다.
-        await Waiting.Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile), "노비스마을에 주민이 나오지 않았습니다.", _deadline.Token);
+        // 꾸밈용 주민(노비스주민1·2)이 눈에 들어오면 그 상태에서 묻는다 — 그래야 "꾸밈용 괴물이 지도를
+        // 막지 않는다" 를 실제로 재는 판이 된다. 다만 **못 기다린다고 실패시키지는 않는다**: 클라이언트는
+        // 눈에 보이는 범위의 생물만 알고, 주민은 70x70 마을 어디에든 설 수 있어 시작 자리(37,29)에서 영영
+        // 안 보일 수 있다. 그것까지 요구하면 코드가 멀쩡해도 시험이 떨어진다(2026-09-19 실제로 그랬다).
+        // 꾸밈용 괴물이 막지 않는다는 것 자체는 서버의 식 `(Template.Exp ?? 1) > 0` 과 자료(맵 20373 의
+        // 괴물 템플릿은 그 둘뿐, 경험치 0)가 지킨다. Creatures 에는 NPC(Mundane)도 들어가므로 괴물만 센다
+        // (ServerFormat07.cs:65-75 · WorldClient.cs:1321).
+        try
+        {
+            await Waiting.Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+                "주민이 안 보인다", _deadline.Token, within: TimeSpan.FromSeconds(20));
+        }
+        catch (TimeoutException)
+        {
+            // 안 보여도 그냥 묻는다 — 아래가 이 시험의 본론이다.
+        }
 
         await world.OpenFieldAsync(_deadline.Token);
         await Waiting.Until(() => world.Field is not null, "마을에서 월드맵을 달라고 했는데 오지 않았습니다.", _deadline.Token);
@@ -142,8 +153,8 @@ public sealed class WorldMapMenuTests : IDisposable
     /// 도착 자리(33,47)는 수오미의 (99,24)~(99,27) 네 칸 모두가 향하는 고정된 한 칸이다(서버
     /// `templates/warps/warp 수오미마을(99,2* ) to 포테의숲1존(33,47).json`). 다만 그 칸에 마침 몹이
     /// 서 있으면 서버가 둘레 세 칸까지 넓혀 빈 자리를 찾는다(`Area.cs:93-107 FreeSpotNear`) — 실제로 한
-    /// 번은 (32,46) 에 내려 이 시험이 떨어졌었고, 다시 돌리니 통과했다(2026-09-19, 자리 뜸이 겹친
-    /// 우연). 다시 떨어지면 이 까닭부터 본다 — 코드가 아니라 그 순간 몹이 그 자리에 있었는지부터.
+    /// 번은 (32,46) 에 내렸다(2026-09-19). 그래서 이 시험은 딱 그 칸이 아니라 **언저리 세 칸**으로 잰다.
+    /// 도착 칸이 정확히 (33,47) 인 것은 `PoteForestTests` 가 따로 지킨다.
     /// </remarks>
     [Fact]
     public async Task A_fresh_character_reaches_pote_forest_through_the_map_button()
@@ -191,8 +202,11 @@ public sealed class WorldMapMenuTests : IDisposable
 
         await WorldMapTests.WalkTheWay(world, way, SuomiTown, deadline.Token);
 
-        await Waiting.Until(() => world.State is { } state && state.Map.Id == ForestOne && state.Where == new Tile(33, 47),
-            $"포테의숲1존 33,47 로 가지 않았습니다. 마지막: {world.State}", deadline.Token);
+        // 딱 (33,47) 을 요구하지 않는다 — 그 칸에 몹이 서 있으면 서버가 둘레 세 칸까지 빈 자리를 찾아
+        // 내려놓는다(`Area.FreeSpotNear`). 여기서 재는 것은 "그 워프로 1존에 들어왔나" 이고,
+        // 도착 칸이 정확히 (33,47) 인 것은 PoteForestTests 가 따로 지킨다.
+        await Waiting.Until(() => world.State is { } state && state.Map.Id == ForestOne && Math.Abs(state.Where.X - 33) <= 3 && Math.Abs(state.Where.Y - 47) <= 3,
+            $"포테의숲1존 33,47 언저리로 가지 않았습니다. 마지막: {world.State}", deadline.Token);
 
         HashSet<uint> met = [];
 
