@@ -158,11 +158,17 @@ public sealed partial class CreateScreen : Control
         rows.AddChild(BuildForm());
 
         ApplyPickedLook();
+        ApplyRehearsal();
         RefreshGender();
         PopulateHairGrid();
         RefreshColorSelection();
         RefreshPreview();
         RefreshCreateState();
+
+        if (Main.CreateNow)
+        {
+            BeginCreate();
+        }
     }
 
     /// <summary>
@@ -179,6 +185,23 @@ public sealed partial class CreateScreen : Control
         _gender = look.Gender;
         _hairStyle = HairStyles.ClosestFor(look.HairStyle, _gender);
         _hairColor = look.HairColor;
+    }
+
+    /// <summary>
+    /// 손 없이 확인할 때 이름·비밀번호도 미리 채운다 — 새 인자를 만들지 않고 로그인 화면과 같은
+    /// <c>--login 이름:비밀번호</c>(<see cref="Main.Rehearsal"/>)를 그대로 쓴다. 계정 만들기도 이름·
+    /// 비밀번호가 필요하다는 점은 로그인과 같다.
+    /// </summary>
+    private void ApplyRehearsal()
+    {
+        if (Main.Rehearsal.Username.Length == 0)
+        {
+            return;
+        }
+
+        _username.Text = Main.Rehearsal.Username;
+        _password.Text = Main.Rehearsal.Password;
+        _confirm.Text = Main.Rehearsal.Password;
     }
 
     private Control BuildForm()

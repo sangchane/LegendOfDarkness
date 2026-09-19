@@ -22,9 +22,11 @@
   **2026-09-19(지도 단추)**: 위 줄 [지도] 단추로도 같은 창을 연다 — 마을에서만(사냥터에서 누르면 거절),
   닫기는 취소(`OpenFieldAsync`·`CloseFieldAsync`, `0xF0`은 우리가 만든 말, 원작에는 없다). 노비스마을
   시작 → 지도 단추 → 수오미 가로지르기(길찾기 147칸) → 포테의숲1존 도착까지 자동 시험 하나로 이었다
-  (`WorldMapMenuTests`). **남은 것**: 계정·캐릭터 만들기 화면이 없다 — 머리 모양·성별·머리색을 고르는
-  곳(서버는 `ClientFormat04` 로 그 세 바이트를 이미 받는다). 알맹이에도 계정·캐릭터 만들기를 보내는
-  길이 없어, 이 시험도 `LoginFlow.TryCreateAccount` 고정값(머리 1·성별 1·머리색 1)으로 우회한다.
+  (`WorldMapMenuTests`). **고침(Task D, 2026-09-19)**: 계정·캐릭터 만들기 화면이 생겼다
+  (`CreateScreen.cs`, `--screen create`) — 이름·비밀번호, 남/여, HAIR·COLOR 격자, 맨몸 미리보기를
+  거쳐 알맹이(`HadesLoginClient.CreateCharacterAsync`)로 만든다. 이 여정 시험도 이제 고른 값(성별
+  2·머리 31·색 40)으로 캐릭터를 만들고 `aislings/<이름>.json` 에 그대로 박혔는지 확인한다 —
+  `LoginFlow.TryCreateAccount` 의 `0x01,0x01,0x01` 고정값 우회는 더 가벼운 다른 시험에만 남았다.
   **고침(2026-09-19)**: 노비스마을에서는 지도 단추가 실제로 안 열렸다 — `FormatF0Handler`
   (`GameServerHandlers.cs:1859`, `sources/wren11`)가 "이 맵에 살아 있는 Monster 형이 하나라도 있으면
   거절"이었는데, 노비스마을에 놓아 둔 장식용 주민(`templates/monsters/5.99/노비스주민1·2@노비스마을.json`,

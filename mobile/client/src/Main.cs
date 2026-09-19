@@ -185,6 +185,13 @@ public partial class Main : Control
     /// </summary>
     public static (byte Gender, byte HairStyle, byte HairColor)? PickedLook { get; private set; }
 
+    /// <summary>
+    /// 만들기 화면에서 "만들기"를 손 없이 눌러 본다, as <c>--create-now</c>. 이름·비밀번호는 새 인자를
+    /// 만들지 않고 <see cref="Rehearsal"/>(<c>--login</c>)을 그대로 쓴다 — 로그인 화면이 같은 값으로
+    /// 자동 로그인하는 것과 같은 결이다.
+    /// </summary>
+    public static bool CreateNow { get; private set; }
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
@@ -195,6 +202,7 @@ public partial class Main : Control
         Ability = Flag("--skill");
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
         PickedLook = ReadPickedLook(Flag("--pick-look"));
+        CreateNow = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--create-now") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0;

@@ -139,11 +139,12 @@ public sealed class WorldMapMenuTests : IDisposable
     /// 않음): <see cref="WorldMapTests.Walled" />·<see cref="WorldMapTests.WalkTheWay" />.
     /// </summary>
     /// <remarks>
-    /// 계정·캐릭터는 <see cref="LoginFlow.TryCreateAccount" /> 가 고정값(머리 모양 1·성별 1·머리색 1,
-    /// `ClientFormat04` 세 바이트)으로 만든다 — 사람이 머리 모양·성별·머리색을 골라 만드는 화면은 모바일
-    /// 쪽에 아직 없고(`mobile/client/src/LoginScreen.cs` 는 계정·비밀번호 칸과 "로그인" 단추뿐이다),
-    /// 알맹이(<see cref="HadesLoginClient" />)도 로그인만 알아 계정·캐릭터 만들기를 보낼 길이 없다.
-    /// 그래서 이 시험이 실제로 덮는 것은 **계정이 이미 있는 다음부터**다.
+    /// 계정·캐릭터는 <see cref="HadesLoginClient.CreateCharacterAsync" /> 가 **고른 값**(성별 2(여)·머리
+    /// 31·색 40 — 기본값이 아닌 것으로 눈에 띄게 고름)으로 만든다. 머리 32 는 남자 전용
+    /// (`data/character-creation/hairstyles.json`)이라 여자로 만들면서 그 번호를 주면 원작에 없는 조합이
+    /// 된다 — 서버(`ClientFormat04`)는 이 조합을 검사하지 않으므로 고르는 쪽(여기)이 지켜 31을 쓴다.
+    /// 만들기 화면(<c>mobile/client/src/CreateScreen.cs</c>)이 사람 손으로 하는 것과 같은 일을 알맹이로
+    /// 한다. 고른 값이 그대로 저장됐는지는 아래에서 <c>aislings/&lt;이름&gt;.json</c> 을 읽어 확인한다.
     ///
     /// 수오미마을 → 포테의숲1존은 5.99 에서 레벨 21~51 이다(docs/pote-forest.md). 그 레벨도 실제로 싸워
     /// 올리는 것이 아니라 <see cref="WorldMapTests" /> 가 하는 그대로 저장 파일의 <c>ExpLevel</c> 을 그
@@ -164,13 +165,27 @@ public sealed class WorldMapMenuTests : IDisposable
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceTown, 37, 29));
         server.Start(TimeSpan.FromMinutes(2));
 
-        // 사람이 머리 모양·성별·머리색을 고르는 화면은 없다 — 고정값으로 계정과 캐릭터를 만든다.
-        LoginFlow.TryCreateAccount(server, Name);
+        // 기본값(0x01,0x01,0x01)이 아닌, 눈에 띄는 값으로 고른다 — 성별 2(여)·머리 31(여자에도 있는
+        // 번호, 32는 남자 전용)·색 40. 만들기 화면이 사람 손으로 누르는 것과 같은 길(Task A).
+        const byte hairStyle = 31;
+        const byte gender = 2;
+        const byte hairColor = 40;
+
+        await HadesLoginClient.CreateCharacterAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret,
+            hairStyle, gender, hairColor, progress: null, deadline.Token);
+
+        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
+        System.Text.Json.Nodes.JsonNode character = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(saved))!;
+
+        // 서버에 고른 값이 그대로 박혔는지 — Gender 는 enum 이름 문자열로, HairStyle·HairColor 는
+        // 숫자로 저장된다(MobileClientProtocolTests 와 같은 확인).
+        Assert.Equal(hairStyle, (byte)character["HairStyle"]!.GetValue<int>());
+        Assert.Equal(((Darkages.Types.Gender)gender).ToString(), character["Gender"]!.GetValue<string>());
+        Assert.Equal(hairColor, (byte)character["HairColor"]!.GetValue<int>());
 
         // 수오미마을 → 포테의숲1존은 레벨 21~51 이다. 실제로 싸워서 올리는 것이 아니라 WorldMapTests 와
         // 같은 방식으로 저장 파일의 레벨 값만 고친다.
-        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
-        System.Text.Json.Nodes.JsonNode character = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(saved))!;
         character["ExpLevel"] = 21;
         File.WriteAllText(saved, character.ToJsonString());
 
