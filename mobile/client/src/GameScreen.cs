@@ -29,15 +29,11 @@ public partial class GameScreen : Control
     // 그대로 남아 있어(WorldClient.cs:363), 창을 도로 띄워 두 번 고르게 하면 안 된다.
     private int? _chosenField;
 
-    // 닫기를 보냈다. 서버가 취소(0x3F)를 받아 창을 거두기까지(0x15, WorldClient.cs:368) 왕복 시간이 있어
-    // _server.Field 가 그대로 남는 사이 — 이 표시가 없으면 그새 되살리기가 다시 띄운다.
-    private bool _closingField;
-
-    // _closingField 가 true인 동안 흐른 시간. 0x15(닫힘)와 0x2E(새로 열림)가 한 프레임에 겹치면
-    // Field == null 인 순간을 놓쳐 이 표시가 영영 굳을 수 있다 — 그래도 "지도" 단추가 영구히
-    // 죽지는 않게, 확인을 이만큼 기다리고도 못 받으면 스스로 풀어 준다(GameScreen.cs:456 근처).
-    private double _closingFieldFor;
-    private const double CloseFieldConfirmTimeoutSeconds = 2;
+    // 닫기를 보냈을 때 알맹이의 FieldShown(WorldClient.cs 0x2E 셈)을 담아 둔다. 서버가 창을 거두면
+    // (0x15 → Field null) 또는 새 창을 보내면(FieldShown 이 오르면) 풀린다 — 둘 다 서버가 보낸
+    // 신호라 시간에 기대지 않는다. 취소가 영영 유실돼 서버가 창을 안 거두면 "지도" 단추가 계속
+    // 막힌다 — 닫았는데 도로 열리는 것보다 낫고, 그때는 사람이 다시 접속한다(사용자 결정).
+    private int? _closedAtFieldShown;
 
     // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
     private int _talked;
@@ -151,8 +147,7 @@ public partial class GameScreen : Control
         _field.Close.Pressed += () =>
         {
             _field.Visible = false;
-            _closingField = true;
-            _closingFieldFor = 0;
+            _closedAtFieldShown = _server?.FieldShown;
             _ = _server?.CloseFieldAsync(System.Threading.CancellationToken.None);
         };
 
@@ -441,7 +436,7 @@ public partial class GameScreen : Control
         // 닫기까지 눌러, 열린 화면과 닫아 조작이 돌아온 화면을 --shot-after 만 달리해 --map 하나로 잡는다.
         if (Main.OpeningMap)
         {
-            if (_server?.Field is null && !_closingField && _mapSettling++ == settle)
+            if (_server?.Field is null && _closedAtFieldShown is null && _mapSettling++ == settle)
             {
                 _map.EmitSignal(BaseButton.SignalName.Pressed);
             }
@@ -452,26 +447,21 @@ public partial class GameScreen : Control
             }
         }
 
-        // _closingField 가 굳지 않는지는 이 시간 재기와 아래 else-if 의 Field==null 관찰, 둘 중 하나로
-        // 푼다 — 바로 다음 줄이 닫는 동안 "지도"를 다시 못 누르게 막아 두면 새 0x2E 가 끼어들 길이
-        // 없어 Field==null 을 반드시 보게 되지만, 숨은 칸을 밟아 여는 원작 길
-        // (PortalSession.TransitionToMap)은 이 단추를 거치지 않으므로 시간 재기를 뒷막이로 남긴다.
-        if (_closingField && (_closingFieldFor += delta) >= CloseFieldConfirmTimeoutSeconds)
-        {
-            _closingField = false;
-        }
-
         // 닫는 동안(또는 창이 떠 있는 동안) "지도"를 다시 누르면 그 0xF0 이 닫기의 0x15 와 한 프레임에
         // 겹쳐 위 표시가 영영 굳을 수 있었다 — 막아서 그 경주 자체를 없앤다.
-        _map.Disabled = _closingField || _field.Visible;
+        _map.Disabled = _closedAtFieldShown is not null || _field.Visible;
 
         // 월드맵은 서버가 띄우는 것이지 사람이 여는 것이 아니다. 온 것을 그대로 보여 준다.
         // 한 곳을 고른 뒤(_chosenField)에는 0x15(맵 바뀜)로 알맹이가 비울 때까지 다시 띄우지 않는다 —
         // 서버가 맵을 새로 보내기까지 두 번의 0.5초를 거치는 동안(GameServerHandlers.cs:1885-1890)
-        // _server.Field 가 그대로 남아 있어, 그새 창을 도로 띄우면 두 번 고를 수 있었다.
-        if (_server?.Field is { } field && !_field.Visible && _chosenField is null && !_closingField)
+        // _server.Field 가 그대로 남아 있어, 그새 창을 도로 띄우면 두 번 고를 수 있었다. 닫기를
+        // 보낸 뒤에는(_closedAtFieldShown) FieldShown 이 그때와 달라졌을 때만 — 즉 서버가 새 창을
+        // 보냈을 때만 — 다시 띄운다.
+        if (_server?.Field is { } field && !_field.Visible && _chosenField is null &&
+            (_closedAtFieldShown is null || _server?.FieldShown != _closedAtFieldShown))
         {
             _field.Show(field);
+            _closedAtFieldShown = null;
         }
         else if (_server?.Field is null)
         {
@@ -479,7 +469,7 @@ public partial class GameScreen : Control
             // 이동하거나 닫았는데 도로 열리는 것보다 안 뜨는 편이 낫다고 보고, 그때는 사람이 다시 접속한다.
             _field.Visible = false;
             _chosenField = null;
-            _closingField = false;
+            _closedAtFieldShown = null;
         }
 
         // 창이 열려 있는 동안은 새 줄과 탭을 따라가고, 글자를 치는 동안 화면 키보드에 가리지 않게 창을 들어 올린다

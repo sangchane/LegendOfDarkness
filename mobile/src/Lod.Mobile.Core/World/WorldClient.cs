@@ -157,6 +157,7 @@ public sealed class WorldClient(WorldSession session)
     private readonly ConcurrentQueue<int> _songs = new();
 
     private volatile WorldMapInfo? _field;
+    private volatile int _fieldShown;
 
     private volatile string? _broke;
     private volatile int _ignored;
@@ -224,6 +225,9 @@ public sealed class WorldClient(WorldSession session)
     /// 이 접속의 패킷을 모두 버린다(`NetworkServer.cs:141`) — 걸음도 말도 닿지 않는다.
     /// </summary>
     public WorldMapInfo? Field => _field;
+
+    /// <summary>월드맵 안내가 몇 번 왔나. 늘어나면 서버가 <b>새</b> 창을 보낸 것이다 — 묵은 것과 가리는 데 쓴다.</summary>
+    public int FieldShown => _fieldShown;
 
     /// <summary>
     /// Takes the next figure the server said had moved its body, if any. The server tells everyone nearby
@@ -372,6 +376,7 @@ public sealed class WorldClient(WorldSession session)
                     try
                     {
                         _field = ReadWorldMap(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _fieldShown++;
                     }
                     catch (ProtocolException cut)
                     {
