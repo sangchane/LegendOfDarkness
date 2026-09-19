@@ -34,11 +34,15 @@ public partial class LoginScreen : Control
     /// <summary>Called on the main thread once the character is in the world.</summary>
     public Action<WorldSession>? Entered { get; set; }
 
+    /// <summary>계정이 없다 — 만들기 화면으로 가고 싶을 때(Main 이 화면을 바꿔 준다).</summary>
+    public Action? WantsToCreate { get; set; }
+
     private MarginContainer _safeArea = null!;
     private Label _status = null!;
     private LineEdit _username = null!;
     private LineEdit _password = null!;
     private Button _submit = null!;
+    private Button _create = null!;
 
     public LoginScreen()
     {
@@ -200,6 +204,13 @@ public partial class LoginScreen : Control
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
 
+        _create = new Button
+        {
+            Text = "계정 만들기",
+            CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+        };
+        Greybox.Plain(_create);
+
         // Captions sit beside their fields rather than above them: in landscape the form has little height
         // to spare, and stacked captions pushed it into the space the on-screen keyboard takes.
         form.AddChild(crest);
@@ -208,6 +219,7 @@ public partial class LoginScreen : Control
         form.AddChild(FieldRow("비밀번호", _password));
         form.AddChild(_status);
         form.AddChild(_submit);
+        form.AddChild(_create);
 
         padding.AddChild(form);
         panel.AddChild(padding);
@@ -216,6 +228,7 @@ public partial class LoginScreen : Control
         _username.TextChanged += _ => RefreshSubmitState();
         _password.TextChanged += _ => RefreshSubmitState();
         _submit.Pressed += BeginLogin;
+        _create.Pressed += () => WantsToCreate?.Invoke();
 
         return center;
     }

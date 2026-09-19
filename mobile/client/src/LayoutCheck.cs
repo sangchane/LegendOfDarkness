@@ -153,6 +153,65 @@ public static class LayoutCheck
         host.GetTree().Quit(wrong.Count == 0 ? 0 : 1);
     }
 
+    /// <summary>만들기 화면에는 소지품·장비 같은 탭이 없다 — 갈아 끼울 상태가 없으니 한 번만 잰다.</summary>
+    public static void RunIfRequested(Node host, CreateScreen screen)
+    {
+        if (Requested())
+        {
+            _ = ReportAfterLayout(host, screen.Parts);
+        }
+    }
+
+    private static async System.Threading.Tasks.Task ReportAfterLayout(
+        Node host,
+        IReadOnlyList<(string Name, Control Part)> parts)
+    {
+        // Containers settle over a couple of frames; asking before that reads sizes nobody will ever see.
+        await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
+        await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
+        await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
+
+        Vector2 screenSize = host.GetViewport().GetVisibleRect().Size;
+        List<string> wrong = [];
+
+        GD.Print($"GREYBOX_LAYOUT size {screenSize.X}x{screenSize.Y}");
+
+        foreach ((string name, Control part) in parts)
+        {
+            Rect2 where = part.GetGlobalRect();
+
+            GD.Print(
+                $"GREYBOX_LAYOUT {name} {where.Position.X:0},{where.Position.Y:0} "
+                + $"{where.Size.X:0}x{where.Size.Y:0}{(part.Visible ? string.Empty : " (숨김)")}");
+
+            if (!part.Visible)
+            {
+                continue;
+            }
+
+            if (where.Position.Y < -1 || where.End.Y > screenSize.Y + 1)
+            {
+                wrong.Add($"{name} 이(가) 화면 위아래를 벗어납니다");
+            }
+
+            if (where.Position.X < -1 || where.End.X > screenSize.X + 1)
+            {
+                wrong.Add($"{name} 이(가) 화면 좌우를 벗어납니다");
+            }
+        }
+
+        wrong.AddRange(Overlaps(parts));
+
+        foreach (string complaint in wrong)
+        {
+            GD.Print($"GREYBOX_LAYOUT_BAD {complaint}");
+        }
+
+        GD.Print(wrong.Count == 0 ? "GREYBOX_LAYOUT_OK" : $"GREYBOX_LAYOUT_BAD {wrong.Count}건");
+
+        host.GetTree().Quit(wrong.Count == 0 ? 0 : 1);
+    }
+
     private static async System.Threading.Tasks.Task<List<string>> Measure(
         Node host,
         GameScreen screen,

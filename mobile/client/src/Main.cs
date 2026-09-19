@@ -179,6 +179,12 @@ public partial class Main : Control
     /// </summary>
     public static bool OnGear { get; private set; }
 
+    /// <summary>
+    /// 만들기 화면을 손 없이 확인할 때 미리 고른 성별·머리·색, as <c>--pick-look 2,32,40</c>(성별 2 ·
+    /// 머리 32 · 색 40). --walk·--pick 과 같은 목적이다 — 손이 없어도 화면을 그 상태로 찍을 수 있게 한다.
+    /// </summary>
+    public static (byte Gender, byte HairStyle, byte HairColor)? PickedLook { get; private set; }
+
     public override void _Ready()
     {
         Portrait = Flag("--orient") == "portrait";
@@ -188,6 +194,7 @@ public partial class Main : Control
         Holding = Flag("--hold");
         Ability = Flag("--skill");
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
+        PickedLook = ReadPickedLook(Flag("--pick-look"));
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0;
@@ -242,15 +249,16 @@ public partial class Main : Control
             AddChild(game);
             LayoutCheck.RunIfRequested(this, game);
         }
+        else if (Flag("--screen") == "create")
+        {
+            CreateScreen create = BuildCreateScreen();
+
+            AddChild(create);
+            LayoutCheck.RunIfRequested(this, create);
+        }
         else
         {
-            LoginScreen login = new();
-
-            // Deferred, because this runs from the login screen's own frame and the tree may not be changed
-            // in the middle of one.
-            login.Entered = session => Callable.From(() => Enter(login, session)).CallDeferred();
-
-            AddChild(login);
+            AddChild(BuildLoginScreen());
         }
 
         Screenshot.CaptureIfRequested(this);
@@ -263,6 +271,45 @@ public partial class Main : Control
         login.QueueFree();
 
         AddChild(new GameScreen(new Lod.Mobile.Core.World.WorldClient(session)));
+    }
+
+    private LoginScreen BuildLoginScreen()
+    {
+        LoginScreen login = new();
+
+        // Deferred, because this runs from the login screen's own frame and the tree may not be changed
+        // in the middle of one.
+        login.Entered = session => Callable.From(() => Enter(login, session)).CallDeferred();
+        login.WantsToCreate = () => Callable.From(() => GoToCreate(login)).CallDeferred();
+
+        return login;
+    }
+
+    private CreateScreen BuildCreateScreen()
+    {
+        CreateScreen create = new();
+
+        create.Cancelled = () => Callable.From(() => BackToLogin(create)).CallDeferred();
+
+        return create;
+    }
+
+    /// <summary>계정이 없어 만들기로 간다.</summary>
+    private void GoToCreate(LoginScreen login)
+    {
+        RemoveChild(login);
+        login.QueueFree();
+
+        AddChild(BuildCreateScreen());
+    }
+
+    /// <summary>취소를 눌러 로그인 화면으로 돌아간다.</summary>
+    private void BackToLogin(CreateScreen create)
+    {
+        RemoveChild(create);
+        create.QueueFree();
+
+        AddChild(BuildLoginScreen());
     }
 
     private static void StayOutOfTheWay()
@@ -422,6 +469,19 @@ public partial class Main : Control
         {
             Rehearsal = (given[..split], given[(split + 1)..]);
         }
+    }
+
+    /// <summary>`gender,hairStyle,hairColor` — 셋 다 숫자가 아니면 아무것도 미리 고르지 않는다.</summary>
+    private static (byte, byte, byte)? ReadPickedLook(string value)
+    {
+        string[] parts = value.Split(',');
+
+        return parts.Length == 3
+               && byte.TryParse(parts[0], out byte gender)
+               && byte.TryParse(parts[1], out byte hairStyle)
+               && byte.TryParse(parts[2], out byte hairColor)
+            ? (gender, hairStyle, hairColor)
+            : null;
     }
 
     /// <summary>
