@@ -29,6 +29,10 @@ public partial class GameScreen : Control
     // 그대로 남아 있어(WorldClient.cs:363), 창을 도로 띄워 두 번 고르게 하면 안 된다.
     private int? _chosenField;
 
+    // 닫기를 보냈다. 서버가 취소(0x3F)를 받아 창을 거두기까지(0x15, WorldClient.cs:368) 왕복 시간이 있어
+    // _server.Field 가 그대로 남는 사이 — 이 표시가 없으면 그새 되살리기가 다시 띄운다.
+    private bool _closingField;
+
     // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
     private int _talked;
     private MessageLog _messages = null!;
@@ -131,6 +135,7 @@ public partial class GameScreen : Control
         _field.Close.Pressed += () =>
         {
             _field.Visible = false;
+            _closingField = true;
             _ = _server?.CloseFieldAsync(System.Threading.CancellationToken.None);
         };
 
@@ -418,16 +423,17 @@ public partial class GameScreen : Control
         // 한 곳을 고른 뒤(_chosenField)에는 0x15(맵 바뀜)로 알맹이가 비울 때까지 다시 띄우지 않는다 —
         // 서버가 맵을 새로 보내기까지 두 번의 0.5초를 거치는 동안(GameServerHandlers.cs:1885-1890)
         // _server.Field 가 그대로 남아 있어, 그새 창을 도로 띄우면 두 번 고를 수 있었다.
-        if (_server?.Field is { } field && !_field.Visible && _chosenField is null)
+        if (_server?.Field is { } field && !_field.Visible && _chosenField is null && !_closingField)
         {
             _field.Show(field);
         }
         else if (_server?.Field is null)
         {
-            // 보내기가 실패해 서버가 영영 맵을 안 바꾸면 창이 다시 안 뜬다 — 두 번 이동하는 것보다
-            // 안 뜨는 편이 낫다고 보고, 그때는 사람이 다시 접속한다.
+            // 보내기가 실패해 서버가 영영 맵을 안 바꾸면(고르기도, 닫기도) 창이 다시 안 뜬다 — 두 번
+            // 이동하거나 닫았는데 도로 열리는 것보다 안 뜨는 편이 낫다고 보고, 그때는 사람이 다시 접속한다.
             _field.Visible = false;
             _chosenField = null;
+            _closingField = false;
         }
 
         // 창이 열려 있는 동안은 새 줄과 탭을 따라가고, 글자를 치는 동안 화면 키보드에 가리지 않게 창을 들어 올린다
