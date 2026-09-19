@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot;
+using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
 
@@ -11,12 +12,14 @@ namespace LodClient;
 
 /// <summary>
 /// 캐릭터 만들기 화면, 원작 <c>dlgcre00.png</c> 의 배치를 세로 한 줄로 편다 — 이름·비밀번호·확인,
-/// 남/여, HAIR·COLOR 를 ◀ ▶ 로 하나씩 넘기는 것, 가운데 미리보기, 만들기/취소.
+/// 남/여, HAIR·COLOR 를 눈으로 보고 고르는 격자, 가운데 미리보기, 만들기/취소.
 /// </summary>
 /// <remarks>
 /// 원작의 E-MAIL 칸과 PHRASE MACRO 표는 뺐다 — 서버 프로토콜(<see cref="Hades718LoginProtocol"/> 의
-/// <c>CreateAccountRequest</c>)이 이름·비밀번호만 받는다. 미리보기는 아직 걷기 그림 그대로다 —
-/// 머리·색을 입히는 것은 Task C 몫이라 여기서는 자리만 잡는다(plans/character-creation.md).
+/// <c>CreateAccountRequest</c>)이 이름·비밀번호만 받는다. 원작은 HAIR·COLOR 를 ◀ ▶ 로 숫자를 하나씩
+/// 넘기게 했지만, 숫자만 보고는 무슨 모양·무슨 색인지 알 수 없다(사용자, 2026-09-19) — 그래서 여기서는
+/// 격자를 깔아 눈으로 보고 누르게 바꿨다. 화살표는 없앴다: 격자 하나로 고르고 확인까지 되므로 화살표가
+/// 하는 일이 남지 않고, 좁은 화면에서 화살표 두 줄(96px)을 없애야 격자가 앉을 자리가 난다.
 /// </remarks>
 public sealed partial class CreateScreen : Control
 {
@@ -24,14 +27,57 @@ public sealed partial class CreateScreen : Control
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
     private const int CaptionWidth = 72;
-    private const int ValueWidth = 40;
-    private const int PreviewSize = 140;
+
+    // 미리보기 칸. 세로가 가로보다 큰 것은 사람이 가로보다 세로로 긴 그림이기 때문이다.
+    private const int PreviewWidth = 140;
+    private const int PreviewHeight = 160;
+
+    // 정수 배율로 키운다 — 2배씩이면 원작 그림 한 칸(1px)이 화면에서도 칼같이 2px 로 남는다(흐려지지
+    // 않음). 고도 프로젝트 설정(project.godot: default_texture_filter=0=Nearest)이 이미 전역으로
+    // 이렇게 그리고 있어 Actor.cs·WorldView.cs 를 보니 텍스처마다 따로 필터를 거는 코드가 없었다 — 여기도
+    // 새로 걸지 않고 그 설정에 얹힌다. 3배는 재 보니 격자 둘이 한 줄도 못 앉을 만큼 미리보기 칸이 커져,
+    // 2배로 정했다(세로 780 예산 안에서 미리보기와 격자 둘을 나눠 가져야 하므로 — plans 사용자 지시).
+    private const int PreviewScale = 2;
+
+    // 원작 그림칸(120x96)의 발 기준점(FeetX=31.5, FeetY=83, Actor.cs)은 실제 그려진 그림의 한가운데가
+    // 아니다 — 옆으로는 무기를 휘두를 자리를, 위로는 머리 위 여백을 남겨 두기 때문이다. 몸(mb001·wb001)과
+    // 머리 그림 전부(서기 프레임: 뒷모습 0번 · 앞모습 5번, WalkMotion.Stand)를 실측한 테두리 한가운데는
+    // (약 29.25, 41) 이었다 — 기준점과의 차이만큼 미리보기를 옮겨 기준점이 아니라 실제 그림이 칸
+    // 한가운데 오게 한다. 뒷모습·앞모습이 이 차이가 서로 거의 같아(값이 다르지 않음) 방향이 바뀌어도
+    // 이 보정은 그대로 쓴다 — 그래서 돌아도 들썩이지 않는다.
+    private const float BodyCentreOffsetX = 2.25f;
+    private const float BodyCentreOffsetY = 42f;
+
+    /// <summary>사람이 한 바퀴 도는 데 걸리는, 한 방향을 보여 주는 시간.</summary>
+    private const float FacingSeconds = 1.2f;
 
     /// <summary>맨몸·머리 그림이 하나도 없을 때만 쓰는 마지막 대안(있을 리 없음).</summary>
     private const string HeroSheet = "res://assets/actor/hero-walk.png";
 
     /// <summary>겹쳐 입힐 그림들이 있는 자리 — <c>WorldView.Dress</c> 와 같은 값(부위별로 따로 못 나눈다).</summary>
     private const string PartsFolder = "res://assets/actor/parts/";
+
+    // 머리 그림 한 칸의 크기와, 미리 서 있는 자세(앞모습)가 있는 칸 — WalkMotion.Stand(Side.Front) 그대로.
+    private const int CellWidth = 120;
+    private const int CellHeight = 96;
+
+    // COLOR 조각 하나 — 원작 소지품 칸(PackPanel.cs)과 같은 최소 터치 크기를 그대로 쓴다. 새 치수를
+    // 만들지 않는다. 색은 판판한 사각형이라 이 크기로도 잘 보인다.
+    private static readonly Vector2 ColorTileSize = new(Main.TouchMinimum, Main.TouchMinimum);
+
+    // HAIR 조각은 그림(사람 머리)을 보여 줘야 해서 터치 최소보다 조금 더 준다 — 48x48 에 그대로 넣으면
+    // (칸이 좁아) 잘라 낸 그림이 원래 크기보다 작게 줄어 들어 모양을 알아보기 힘들었다(실제로 찍어 보고
+    // 확인함). 44x56 이면 잘라 낸 그림이 거의 원래 크기 그대로(줄어드는 비율 1 에 가깝게) 들어간다.
+    private static readonly Vector2 HairTileSize = new(44, 56);
+
+    private const int GridColumns = 4;
+    private const int ColorCount = 72;
+
+    // 머리 그림칸(120x96) 안에서 머리·얼굴이 있는 자리만 잘라 쓴다 — 전신을 다 보여 주면 칸 안에서
+    // 아주 작아져 모양을 알아볼 수 없다. 남 59 · 여 56 가지 전부(앞모습, 프레임 5)의 테두리를 실측하니
+    // x 는 17~41, y 는 4~60 사이였다 — 여유를 두고 x 12~48(36폭), y 0~60 을 자른다.
+    private static readonly Rect2 HairThumbRegion =
+        new(WalkMotion.Stand(Lod.Mobile.Core.Art.Side.Front) * CellWidth + 12, 0, 36, 60);
 
     private readonly ConcurrentQueue<string> _reported = new();
     private readonly CancellationTokenSource _closing = new();
@@ -55,12 +101,14 @@ public sealed partial class CreateScreen : Control
 
     private Control _preview = null!;
     private Control _stage = null!;
+    private Actor? _previewActor = null!;
 
-    private Label _hairValue = null!;
     private Control _hairRow = null!;
+    private GridContainer _hairGrid = null!;
+    private readonly Dictionary<int, Button> _hairTiles = new();
 
-    private Label _colorValue = null!;
     private Control _colorRow = null!;
+    private readonly Dictionary<int, Button> _colorTiles = new();
 
     private Control _buttonsRow = null!;
 
@@ -68,6 +116,11 @@ public sealed partial class CreateScreen : Control
     private byte _gender = 1;
     private int _hairStyle = 1;
     private int _hairColor;
+
+    // 미리보기가 스스로 도는 방향과, 지금 방향을 얼마나 오래 보여 줬나. 머리·색·성별을 바꿔도 이 둘은
+    // 그대로 둔다 — 돌던 것이 끊기지 않게(사용자, 2026-09-19).
+    private Direction _facing = Direction.South;
+    private double _facingElapsed;
 
     public CreateScreen()
     {
@@ -99,8 +152,8 @@ public sealed partial class CreateScreen : Control
 
         ApplyPickedLook();
         RefreshGender();
-        RefreshHair();
-        RefreshColor();
+        PopulateHairGrid();
+        RefreshColorSelection();
         RefreshPreview();
         RefreshCreateState();
     }
@@ -123,13 +176,15 @@ public sealed partial class CreateScreen : Control
 
     private Control BuildForm()
     {
-        CenterContainer center = new()
+        PanelContainer panel = new()
         {
-            Name = "FormCenter",
+            CustomMinimumSize = new Vector2(FormWidth, 0),
+            // 가로는 가운데(칸 너비가 300 으로 고정), 세로는 안전영역 전부를 받는다 — 격자 둘이 남는
+            // 세로를 나눠 가지려면 바깥 칸이 화면 높이만큼 커야 한다(CenterContainer 는 딱 필요한
+            // 만큼만 차지해 격자에 줄 것이 남지 않았다).
+            SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
             SizeFlagsVertical = SizeFlags.ExpandFill
         };
-
-        PanelContainer panel = new() { CustomMinimumSize = new Vector2(FormWidth, 0) };
         panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
         MarginContainer padding = new();
@@ -175,14 +230,13 @@ public sealed partial class CreateScreen : Control
         form.AddChild(FieldRow("확인", _confirm));
         form.AddChild(BuildGenderRow());
         form.AddChild(BuildPreview());
-        form.AddChild(BuildHairRow());
-        form.AddChild(BuildColorRow());
+        form.AddChild(BuildHairGrid());
+        form.AddChild(BuildColorGrid());
         form.AddChild(_status);
         form.AddChild(buttons);
 
         padding.AddChild(form);
         panel.AddChild(padding);
-        center.AddChild(panel);
 
         _username.TextChanged += _ => RefreshCreateState();
         _password.TextChanged += _ => RefreshCreateState();
@@ -190,7 +244,7 @@ public sealed partial class CreateScreen : Control
         _back.Pressed += () => Cancelled?.Invoke();
         _create.Pressed += BeginCreate;
 
-        return center;
+        return panel;
     }
 
     private Control BuildGenderRow()
@@ -219,7 +273,7 @@ public sealed partial class CreateScreen : Control
     /// </summary>
     private Control BuildPreview()
     {
-        PanelContainer box = new() { CustomMinimumSize = new Vector2(PreviewSize, PreviewSize) };
+        PanelContainer box = new() { CustomMinimumSize = new Vector2(PreviewWidth, PreviewHeight) };
         box.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
         _stage = new Control { ClipContents = true };
@@ -230,8 +284,9 @@ public sealed partial class CreateScreen : Control
     }
 
     /// <summary>
-    /// 미리보기를 지금 고른 성별·머리·색으로 다시 그린다. 머리나 색을 넘길 때마다 다시 불린다 — 팔레트
-    /// 교체(<see cref="Palettes"/>)는 (그림, 색) 별로 캐시돼 있어 이미 그려 본 조합은 다시 읽지 않는다.
+    /// 미리보기를 지금 고른 성별·머리·색으로, 지금 돌고 있는 방향으로 다시 그린다. 머리나 색을 넘길
+    /// 때마다 다시 불린다 — 팔레트 교체(<see cref="Palettes"/>)는 (그림, 색) 별로 캐시돼 있어 이미
+    /// 그려 본 조합은 다시 읽지 않는다.
     /// </summary>
     private void RefreshPreview()
     {
@@ -240,17 +295,32 @@ public sealed partial class CreateScreen : Control
             child.QueueFree();
         }
 
-        Actor figure = new("미리보기", BareBodySheet())
+        // 키우는 것과 가운데에 놓는 것은 Actor 가 아니라 이 겉 노드가 한다 — Actor.Face() 가 자기
+        // Scale.X 를 좌우 뒤집기(거울)에 쓰고 있어(Actor.cs), 거기 손대지 않고 배율을 얹으려면 한 칸
+        // 밖에서 씌워야 한다.
+        Node2D wrapper = new()
         {
-            Position = new Vector2(PreviewSize / 2f, PreviewSize - Main.Gutter)
+            Position = new Vector2(
+                PreviewWidth / 2f + BodyCentreOffsetX * PreviewScale,
+                PreviewHeight / 2f + BodyCentreOffsetY * PreviewScale),
+            Scale = new Vector2(PreviewScale, PreviewScale)
         };
-        _stage.AddChild(figure);
+
+        Actor figure = new("미리보기", BareBodySheet());
+        wrapper.AddChild(figure);
+        _stage.AddChild(wrapper);
+
+        figure.Face(_facing);
+        _previewActor = figure;
     }
 
     /// <summary>
     /// 맨몸 + 고른 머리만 그리는 겹 목록. 실제 게임이 쓰는 <see cref="Wardrobe.Pieces"/> 를 그대로 쓴다 —
-    /// 갑옷·무기·신발·방패를 전부 0으로 주면 그 부위들은 스스로 빠진다(<c>Wardrobe.cs</c>). 그림이 없는
-    /// 겹은 <c>WorldView.Dress</c> 와 같은 규칙으로 건너뛴다. 머리색은 <see cref="Palettes"/> 가 팔레트
+    /// 갑옷·무기·신발·방패를 전부 0으로 주면 그 부위들은 스스로 빠진다(<c>Wardrobe.cs</c>). 다만 바지
+    /// (part 'n')는 여기서 따로 뺀다: 몸 그림(mb001.png) 을 실제로 뽑아 보니 이미 흰/회색 팬티 차림의
+    /// 맨몸이었다 — 바지는 그 위에 게임 화면(WorldView)이 항상 덧입히는 것이라 미리보기에서는 필요
+    /// 없다(Wardrobe.cs 자체는 게임 화면도 같이 쓰므로 고치지 않는다). 그림이 없는 겹은
+    /// <c>WorldView.Dress</c> 와 같은 규칙으로 건너뛴다. 머리색은 <see cref="Palettes"/> 가 팔레트
     /// 98번부터 6칸을 갈아 끼워 그린다(plans/character-creation.md).
     /// </summary>
     private Actor.Sheet BareBodySheet()
@@ -266,6 +336,11 @@ public sealed partial class CreateScreen : Control
 
         foreach (Piece piece in Wardrobe.Pieces(appearance))
         {
+            if (piece.Name[1] == 'n')
+            {
+                continue;
+            }
+
             string path = $"{PartsFolder}{piece.Name}.png";
 
             if (!ResourceLoader.Exists(path))
@@ -281,99 +356,163 @@ public sealed partial class CreateScreen : Control
         return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, [], parts) : Actor.Sheet.Walk(HeroSheet);
     }
 
-    private Control BuildHairRow()
+    /// <summary>HAIR 격자의 틀 — 자리는 <see cref="PopulateHairGrid"/> 가 채운다(성별이 바뀔 때 다시).</summary>
+    private Control BuildHairGrid()
     {
-        HBoxContainer row = new();
-        row.AddThemeConstantOverride("separation", Main.Gutter);
+        VBoxContainer section = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+        section.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        section.AddChild(Aux("HAIR"));
 
-        Label caption = Aux("HAIR");
-        caption.CustomMinimumSize = new Vector2(CaptionWidth, 0);
-        caption.VerticalAlignment = VerticalAlignment.Center;
+        _hairGrid = new GridContainer { Columns = GridColumns };
+        _hairGrid.AddThemeConstantOverride("h_separation", Main.Gutter);
+        _hairGrid.AddThemeConstantOverride("v_separation", Main.Gutter);
 
-        Button prev = ArrowButton("◀");
-        Button next = ArrowButton("▶");
-
-        _hairValue = ValueLabel();
-
-        prev.Pressed += () => StepHair(-1);
-        next.Pressed += () => StepHair(1);
-
-        row.AddChild(caption);
-        row.AddChild(prev);
-        row.AddChild(_hairValue);
-        row.AddChild(next);
-
-        _hairRow = row;
-        return row;
-    }
-
-    private Control BuildColorRow()
-    {
-        HBoxContainer row = new();
-        row.AddThemeConstantOverride("separation", Main.Gutter);
-
-        Label caption = Aux("COLOR");
-        caption.CustomMinimumSize = new Vector2(CaptionWidth, 0);
-        caption.VerticalAlignment = VerticalAlignment.Center;
-
-        Button prev = ArrowButton("◀");
-        Button next = ArrowButton("▶");
-
-        _colorValue = ValueLabel();
-
-        prev.Pressed += () => StepColor(-1);
-        next.Pressed += () => StepColor(1);
-
-        row.AddChild(caption);
-        row.AddChild(prev);
-        row.AddChild(_colorValue);
-        row.AddChild(next);
-
-        _colorRow = row;
-        return row;
-    }
-
-    private static Button ArrowButton(string glyph)
-    {
-        Button button = new() { Text = glyph, CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
-        Greybox.Plain(button);
-
-        return button;
-    }
-
-    private static Label ValueLabel()
-    {
-        Label label = new()
+        ScrollContainer scroll = new()
         {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            CustomMinimumSize = new Vector2(ValueWidth, 0)
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            CustomMinimumSize = new Vector2(0, HairTileSize.Y),
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
-        label.AddThemeColorOverride("font_color", Greybox.Text);
+        scroll.AddChild(_hairGrid);
+        section.AddChild(scroll);
 
-        return label;
+        _hairRow = section;
+        return section;
     }
 
-    /// <summary>결번을 건너뛰며 넘긴다 — 목록은 지금 고른 성별의 것(data/character-creation/hairstyles.json).</summary>
-    private void StepHair(int direction)
+    /// <summary>
+    /// HAIR 격자를 지금 성별의 머리 번호로 다시 채운다. 그림 조각 하나가 곧 단추다 — 원작 소지품 칸
+    /// (PackPanel.cs)과 같은 방식으로, 고른 것만 <c>Flat=false</c> 를 둬 테두리가 남게 한다.
+    /// </summary>
+    private void PopulateHairGrid()
     {
-        _hairStyle = HairStyles.Step(_hairStyle, _gender, direction);
-        RefreshHair();
+        foreach (Node child in _hairGrid.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        _hairTiles.Clear();
+
+        char genderLetter = _gender == 2 ? 'w' : 'm';
+
+        foreach (int number in HairStyles.For(_gender))
+        {
+            string path = $"{PartsFolder}{genderLetter}h{number:000}.png";
+
+            // 색은 여기서 늘 0번으로 그린다(살아있는 반영이 아니다) — 이 격자는 모양을 고르는 곳이고
+            // 색은 COLOR 격자가 따로 맡는다. 색을 바꿀 때마다 최대 59장을 다시 물들이는 비용을 치르지
+            // 않기 위한 선택이다.
+            Texture2D? dyed = ResourceLoader.Exists(path) ? Palettes.Load(path, 0) : null;
+
+            Button tile = new()
+            {
+                CustomMinimumSize = HairTileSize,
+                Icon = dyed is null ? null : new AtlasTexture { Atlas = dyed, Region = HairThumbRegion },
+                ExpandIcon = true,
+                Flat = number != _hairStyle
+            };
+
+            int picked = number;
+            tile.Pressed += () => SelectHair(picked);
+
+            _hairTiles[number] = tile;
+            _hairGrid.AddChild(tile);
+        }
+    }
+
+    /// <summary>COLOR 격자 — 72가지 색 조각. 한 번만 짓는다(성별과 무관).</summary>
+    private Control BuildColorGrid()
+    {
+        VBoxContainer section = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+        section.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        section.AddChild(Aux("COLOR"));
+
+        GridContainer grid = new() { Columns = GridColumns };
+        grid.AddThemeConstantOverride("h_separation", Main.Gutter);
+        grid.AddThemeConstantOverride("v_separation", Main.Gutter);
+
+        IReadOnlyDictionary<int, IReadOnlyList<Colour>> table = Palettes.AllColours();
+
+        for (int number = 0; number < ColorCount; number++)
+        {
+            // 색 하나는 여섯 톤을 가진다(밝은 것부터 어두운 것까지, data/character-creation/hair-colours.json).
+            // 조각 하나로는 하나만 보여 줄 수 있으니 가운데 톤(6개 중 3번째, 0-기준 인덱스 2)을 쓴다 — 가장
+            // 밝은 톤은 바래 보이고 가장 어두운 톤은 칙칙해, 그 사이가 "이 색"이라고 봤을 때 가장 무난했다.
+            Colour shade = table.TryGetValue(number, out IReadOnlyList<Colour>? shades) && shades.Count > 0
+                ? shades[Mathf.Min(2, shades.Count - 1)]
+                : new Colour(120, 120, 120);
+
+            Button tile = new()
+            {
+                CustomMinimumSize = ColorTileSize,
+                Icon = SwatchIcon(shade),
+                ExpandIcon = true,
+                Flat = number != _hairColor
+            };
+
+            int picked = number;
+            tile.Pressed += () => SelectColor(picked);
+
+            _colorTiles[number] = tile;
+            grid.AddChild(tile);
+        }
+
+        ScrollContainer scroll = new()
+        {
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
+        };
+        scroll.AddChild(grid);
+        section.AddChild(scroll);
+
+        _colorRow = section;
+        return section;
+    }
+
+    /// <summary>한 색으로 칠한 1x1 그림 — 단추 안을 그 색으로 채우는 가장 짧은 길(ExpandIcon 이 늘려 준다).</summary>
+    private static ImageTexture SwatchIcon(Colour colour)
+    {
+        Image pixel = Image.CreateEmpty(1, 1, false, Image.Format.Rgb8);
+        pixel.SetPixel(0, 0, Color.Color8(colour.R, colour.G, colour.B));
+
+        return ImageTexture.CreateFromImage(pixel);
+    }
+
+    private void SelectHair(int number)
+    {
+        _hairStyle = number;
+        RefreshHairSelection();
         RefreshPreview();
     }
 
-    private const int ColorCount = 72;
-
-    private void StepColor(int direction)
+    private void SelectColor(int number)
     {
-        _hairColor = ((_hairColor + direction) % ColorCount + ColorCount) % ColorCount;
-        RefreshColor();
+        _hairColor = number;
+        RefreshColorSelection();
         RefreshPreview();
+    }
+
+    private void RefreshHairSelection()
+    {
+        foreach ((int number, Button tile) in _hairTiles)
+        {
+            tile.Flat = number != _hairStyle;
+        }
+    }
+
+    private void RefreshColorSelection()
+    {
+        foreach ((int number, Button tile) in _colorTiles)
+        {
+            tile.Flat = number != _hairColor;
+        }
     }
 
     /// <summary>
     /// 성별을 바꾼다. 지금 고른 머리 번호가 새 성별에 없으면(18·32·33 은 남자 전용) 가장 가까운
-    /// 번호로 스스로 옮긴다 — 묻지도, 경고하지도 않는다(2026-09-19 결정).
+    /// 번호로 스스로 옮긴다 — 묻지도, 경고하지도 않는다(2026-09-19 결정). HAIR 격자도 새 성별의
+    /// 목록으로 다시 짓는다.
     /// </summary>
     private void SelectGender(byte gender)
     {
@@ -386,7 +525,7 @@ public sealed partial class CreateScreen : Control
         _hairStyle = HairStyles.ClosestFor(_hairStyle, gender);
 
         RefreshGender();
-        RefreshHair();
+        PopulateHairGrid();
         RefreshPreview();
     }
 
@@ -395,10 +534,6 @@ public sealed partial class CreateScreen : Control
         _male.ButtonPressed = _gender == 1;
         _female.ButtonPressed = _gender == 2;
     }
-
-    private void RefreshHair() => _hairValue.Text = _hairStyle.ToString();
-
-    private void RefreshColor() => _colorValue.Text = _hairColor.ToString();
 
     /// <summary>
     /// 계정을 만들고, 같은 연결에서 지금 고른 성별·머리·색으로 캐릭터를 만든다
@@ -500,7 +635,18 @@ public sealed partial class CreateScreen : Control
         _status.Text = ready ? "만들 준비가 됐습니다." : "이름과 비밀번호(확인 포함)를 입력하세요.";
     }
 
-    /// <summary>로그인 화면과 같은 이유로 같은 방식으로 키보드를 피한다.</summary>
+    /// <summary>한 바퀴 도는 차례 — 북·동·남·서(시계 방향). 두 벌만 있는 그림을 돌아가며 거울에 비추므로
+    /// (Facing.Of, Wardrobe.Rank 와 같은 원작 규칙) 넷 다 자연스럽게 이어진다.</summary>
+    private static Direction NextFacing(Direction facing) => facing switch
+    {
+        Direction.North => Direction.East,
+        Direction.East => Direction.South,
+        Direction.South => Direction.West,
+        _ => Direction.North
+    };
+
+    /// <summary>로그인 화면과 같은 이유로 같은 방식으로 키보드를 피한다. 미리보기가 스스로 도는 것도
+    /// 여기서 잰다 — Actor 를 다시 짓지 않고 <see cref="Actor.Face"/> 만 불러 가볍다.</summary>
     public override void _Process(double delta)
     {
         int keyboard = DisplayServer.VirtualKeyboardGetHeight();
@@ -511,6 +657,15 @@ public sealed partial class CreateScreen : Control
             : 0;
 
         _safeArea.AddThemeConstantOverride("margin_bottom", Main.SafeInsets.Bottom + lift);
+
+        _facingElapsed += delta;
+
+        if (_facingElapsed >= FacingSeconds)
+        {
+            _facingElapsed -= FacingSeconds;
+            _facing = NextFacing(_facing);
+            _previewActor?.Face(_facing);
+        }
 
         DrainCreate();
     }

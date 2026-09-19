@@ -90,6 +90,9 @@ public static class Palettes
     private static IReadOnlyDictionary<int, IReadOnlyList<Colour>> Colours() =>
         _colours ??= DyeTable.Read(Read(ColourList));
 
+    /// <summary>Every dye number and its six shades, for showing a colour by its look rather than its number.</summary>
+    public static IReadOnlyDictionary<int, IReadOnlyList<Colour>> AllColours() => Colours();
+
     private static string Read(string path) =>
         Godot.FileAccess.FileExists(path) ? Godot.FileAccess.GetFileAsString(path) : string.Empty;
 }
