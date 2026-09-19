@@ -63,6 +63,12 @@ public sealed class WorldMapMenuTests : IDisposable
     /// 돌아온다. 여는 것과 닫는 것을 따로 서버를 띄워 두 번 볼 까닭이 없어 한 접속으로 잇는다
     /// (사용자 결정, 2026-09-19).
     /// </summary>
+    /// <remarks>
+    /// 노비스마을에는 노비스주민1·2 가 괴물로 서 있다(경험치 0·체력 2147483647, 꾸밈용). 지도를 달라고
+    /// 하기 전에 그 주민이 실제로 나타날 때까지 기다린다 — 젠 전에 물으면 이 시험이 우연히 통과한다
+    /// (실제로 그래서 한 번 그랬다, 2026-09-19). 노비스주민1·2 가 괴물로 서 있어도 지도가 열려야
+    /// 한다 — 꾸밈용(경험치 0)이기 때문이다(`GameServerHandlers.FormatF0Handler`).
+    /// </remarks>
     [Fact]
     public async Task Opening_the_world_map_from_the_menu_and_closing_it_gives_movement_back()
     {
@@ -77,6 +83,10 @@ public sealed class WorldMapMenuTests : IDisposable
         _ = world.PumpAsync(_deadline.Token);
 
         await Waiting.Until(() => world.State is { } state && state.Map.Id == NoviceTown, "노비스마을에 들어가지 못했습니다.", _deadline.Token);
+
+        // 꾸밈용 주민(노비스주민1·2)이 괴물로 젠될 때까지 기다린다 — 젠 전에 물으면 이 시험이
+        // 우연히 통과해 버려 재발을 못 잡는다.
+        await Waiting.Until(() => world.Creatures.Any(), "노비스마을에 주민이 나오지 않았습니다.", _deadline.Token);
 
         await world.OpenFieldAsync(_deadline.Token);
         await Waiting.Until(() => world.Field is not null, "마을에서 월드맵을 달라고 했는데 오지 않았습니다.", _deadline.Token);
