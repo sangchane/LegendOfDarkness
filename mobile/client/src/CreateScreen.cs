@@ -26,18 +26,19 @@ public sealed partial class CreateScreen : Control
     private const int TitleFontSize = 22;
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
-    private const int CaptionWidth = 72;
 
-    // 미리보기 칸. 세로가 가로보다 큰 것은 사람이 가로보다 세로로 긴 그림이기 때문이다.
-    private const int PreviewWidth = 140;
-    private const int PreviewHeight = 160;
+    // 미리보기 칸 — 이 화면의 주인공(사용자, 2026-09-19: "몸이 가운데·크게"). 세로가 가로보다 큰
+    // 것은 사람이 가로보다 세로로 긴 그림이기 때문이다. 이름·비밀번호·확인 세 칸을 한 줄로 모으고
+    // (아래 AuthRow) 옆 캡션을 힌트 글자로 바꿔 세로 96px 을 돌려받아, 그 값으로 배율을 3배까지
+    // 올렸다(예전엔 격자 둘 자리가 안 나 2배에 머물렀다).
+    private const int PreviewWidth = 168;
+    private const int PreviewHeight = 228;
 
-    // 정수 배율로 키운다 — 2배씩이면 원작 그림 한 칸(1px)이 화면에서도 칼같이 2px 로 남는다(흐려지지
+    // 정수 배율로 키운다 — 3배씩이면 원작 그림 한 칸(1px)이 화면에서도 칼같이 3px 로 남는다(흐려지지
     // 않음). 고도 프로젝트 설정(project.godot: default_texture_filter=0=Nearest)이 이미 전역으로
     // 이렇게 그리고 있어 Actor.cs·WorldView.cs 를 보니 텍스처마다 따로 필터를 거는 코드가 없었다 — 여기도
-    // 새로 걸지 않고 그 설정에 얹힌다. 3배는 재 보니 격자 둘이 한 줄도 못 앉을 만큼 미리보기 칸이 커져,
-    // 2배로 정했다(세로 780 예산 안에서 미리보기와 격자 둘을 나눠 가져야 하므로 — plans 사용자 지시).
-    private const int PreviewScale = 2;
+    // 새로 걸지 않고 그 설정에 얹힌다.
+    private const int PreviewScale = 3;
 
     // 원작 그림칸(120x96)의 발 기준점(FeetX=31.5, FeetY=83, Actor.cs)은 실제 그려진 그림의 한가운데가
     // 아니다 — 옆으로는 무기를 휘두를 자리를, 위로는 머리 위 여백을 남겨 두기 때문이다. 몸(mb001·wb001)과
@@ -64,20 +65,26 @@ public sealed partial class CreateScreen : Control
     // COLOR 조각 하나 — 원작 소지품 칸(PackPanel.cs)과 같은 최소 터치 크기를 그대로 쓴다. 새 치수를
     // 만들지 않는다. 색은 판판한 사각형이라 이 크기로도 잘 보인다.
     private static readonly Vector2 ColorTileSize = new(Main.TouchMinimum, Main.TouchMinimum);
+    private const int ColorGridColumns = 4;
 
-    // HAIR 조각은 그림(사람 머리)을 보여 줘야 해서 터치 최소보다 조금 더 준다 — 48x48 에 그대로 넣으면
-    // (칸이 좁아) 잘라 낸 그림이 원래 크기보다 작게 줄어 들어 모양을 알아보기 힘들었다(실제로 찍어 보고
-    // 확인함). 44x56 이면 잘라 낸 그림이 거의 원래 크기 그대로(줄어드는 비율 1 에 가깝게) 들어간다.
-    private static readonly Vector2 HairTileSize = new(44, 56);
+    // HAIR 조각은 44x56 으로는 부족했다 — 찍어 보니 작은 보라색 얼룩일 뿐 모양이 안 보였다(원인:
+    // 자른 그림(36x60)이 44x56 에 맞추려 오히려 0.93배로 더 줄어들었다 — 칸의 가로세로 비가 자른
+    // 그림과 달라, 짧은 쪽(세로)이 기준이 돼 버렸다). 자른 그림과 같은 비(34:58)로 54x92 를 줘
+    // 약 1.59배로 키운다(몸 미리보기를 키우고 두 줄을 다 보이게 하는 것과 세로를 나눠 가지느라
+    // 63x108·1.86배보다는 한 단 낮췄다 — 찍어서 제목이 안 잘리는 걸 확인하며 정함). 한 줄에 4개
+    // 대신 3개만 두는 것도 여기서 나온 자리다(칸이 커진 만큼).
+    private static readonly Vector2 HairTileSize = new(54, 92);
+    private const int HairGridColumns = 3;
 
-    private const int GridColumns = 4;
     private const int ColorCount = 72;
 
     // 머리 그림칸(120x96) 안에서 머리·얼굴이 있는 자리만 잘라 쓴다 — 전신을 다 보여 주면 칸 안에서
-    // 아주 작아져 모양을 알아볼 수 없다. 남 59 · 여 56 가지 전부(앞모습, 프레임 5)의 테두리를 실측하니
-    // x 는 17~41, y 는 4~60 사이였다 — 여유를 두고 x 12~48(36폭), y 0~60 을 자른다.
+    // 아주 작아져 모양을 알아볼 수 없다. 남 59·여 56 가지 전부(앞모습, 프레임 5)를 하나하나 실측하니
+    // (스크립트로 낱개 테두리를 다 짐) 대부분(특히 남자)은 x 18~41·y 18~42 안에 들지만, 여자 긴 머리
+    // 여럿(wh025·wh031·wh036 …)은 y 60 까지 내려온다 — 거기서 잘리면 그 머리가 "긴 머리"인 것 자체를
+    // 못 알아본다. 그래서 세로는 줄이지 않고 x 14~48(34폭)·y 0~58(58높이)을 쓴다.
     private static readonly Rect2 HairThumbRegion =
-        new(WalkMotion.Stand(Lod.Mobile.Core.Art.Side.Front) * CellWidth + 12, 0, 36, 60);
+        new(WalkMotion.Stand(Lod.Mobile.Core.Art.Side.Front) * CellWidth + 14, 0, 34, 58);
 
     private readonly ConcurrentQueue<string> _reported = new();
     private readonly CancellationTokenSource _closing = new();
@@ -194,7 +201,9 @@ public sealed partial class CreateScreen : Control
         padding.AddThemeConstantOverride("margin_bottom", Main.Gutter * 2);
 
         VBoxContainer form = new();
-        form.AddThemeConstantOverride("separation", Main.Gutter);
+        // 세로 예산이 빠듯해 줄 사이는 Gutter 의 절반으로 뒀다 — 이 값 자체는 새 것이 아니다
+        // (GameScreen.cs·PackPanel.cs·FieldPanel.cs·TalkPanel.cs·GearGrid.cs 가 이미 쓰는 값).
+        form.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
         Label title = new()
         {
@@ -204,9 +213,15 @@ public sealed partial class CreateScreen : Control
         title.AddThemeFontSizeOverride("font_size", TitleFontSize);
         title.AddThemeColorOverride("font_color", Greybox.Title);
 
-        _username = Field(secret: false);
-        _password = Field(secret: true);
-        _confirm = Field(secret: true);
+        _username = Field(secret: false, placeholder: "이름");
+        _password = Field(secret: true, placeholder: "비밀번호");
+        _confirm = Field(secret: true, placeholder: "확인");
+
+        HBoxContainer authRow = new();
+        authRow.AddThemeConstantOverride("separation", Main.Gutter);
+        authRow.AddChild(_username);
+        authRow.AddChild(_password);
+        authRow.AddChild(_confirm);
 
         _status = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
         _status.AddThemeFontSizeOverride("font_size", AuxFontSize);
@@ -225,11 +240,9 @@ public sealed partial class CreateScreen : Control
         _buttonsRow = buttons;
 
         form.AddChild(title);
-        form.AddChild(FieldRow("이름", _username));
-        form.AddChild(FieldRow("비밀번호", _password));
-        form.AddChild(FieldRow("확인", _confirm));
-        form.AddChild(BuildGenderRow());
+        form.AddChild(authRow);
         form.AddChild(BuildPreview());
+        form.AddChild(BuildGenderRow());
         form.AddChild(BuildHairGrid());
         form.AddChild(BuildColorGrid());
         form.AddChild(_status);
@@ -363,14 +376,17 @@ public sealed partial class CreateScreen : Control
         section.AddThemeConstantOverride("separation", Main.Gutter / 2);
         section.AddChild(Aux("HAIR"));
 
-        _hairGrid = new GridContainer { Columns = GridColumns };
+        _hairGrid = new GridContainer { Columns = HairGridColumns };
         _hairGrid.AddThemeConstantOverride("h_separation", Main.Gutter);
         _hairGrid.AddThemeConstantOverride("v_separation", Main.Gutter);
 
+        // 최소 두 줄은 보이게 한다(사용자, 2026-09-19) — 한 줄만 보이면 옆에 뭐가 더 있는지 스크롤바
+        // 손잡이로만 짐작해야 해서 고르기 나쁘다. (임시: 한 줄로 자리를 먼저 잡는다 — 다음 편집에서
+        // 실제 예산을 재고 두 줄 높이로 올린다.)
         ScrollContainer scroll = new()
         {
             SizeFlagsVertical = SizeFlags.ExpandFill,
-            CustomMinimumSize = new Vector2(0, HairTileSize.Y),
+            CustomMinimumSize = new Vector2(0, HairTileSize.Y * 2 + Main.Gutter),
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
         scroll.AddChild(_hairGrid);
@@ -381,8 +397,10 @@ public sealed partial class CreateScreen : Control
     }
 
     /// <summary>
-    /// HAIR 격자를 지금 성별의 머리 번호로 다시 채운다. 그림 조각 하나가 곧 단추다 — 원작 소지품 칸
-    /// (PackPanel.cs)과 같은 방식으로, 고른 것만 <c>Flat=false</c> 를 둬 테두리가 남게 한다.
+    /// HAIR 격자를 지금 성별의 머리 번호로, 지금 고른 COLOR 로 다시 채운다. 그림 조각 하나가 곧
+    /// 단추다 — 원작 소지품 칸(PackPanel.cs)과 같은 방식으로, 고른 것만 <c>Flat=false</c> 를 둬
+    /// 테두리가 남게 한다. COLOR 를 바꿀 때는 이 함수를 통째로 다시 부르지 않고
+    /// <see cref="RefreshHairIcons"/> 만 불러 그림만 새로 물들인다(단추를 다시 짓지 않음).
     /// </summary>
     private void PopulateHairGrid()
     {
@@ -393,21 +411,12 @@ public sealed partial class CreateScreen : Control
 
         _hairTiles.Clear();
 
-        char genderLetter = _gender == 2 ? 'w' : 'm';
-
         foreach (int number in HairStyles.For(_gender))
         {
-            string path = $"{PartsFolder}{genderLetter}h{number:000}.png";
-
-            // 색은 여기서 늘 0번으로 그린다(살아있는 반영이 아니다) — 이 격자는 모양을 고르는 곳이고
-            // 색은 COLOR 격자가 따로 맡는다. 색을 바꿀 때마다 최대 59장을 다시 물들이는 비용을 치르지
-            // 않기 위한 선택이다.
-            Texture2D? dyed = ResourceLoader.Exists(path) ? Palettes.Load(path, 0) : null;
-
             Button tile = new()
             {
                 CustomMinimumSize = HairTileSize,
-                Icon = dyed is null ? null : new AtlasTexture { Atlas = dyed, Region = HairThumbRegion },
+                Icon = HairIcon(number),
                 ExpandIcon = true,
                 Flat = number != _hairStyle
             };
@@ -420,6 +429,36 @@ public sealed partial class CreateScreen : Control
         }
     }
 
+    /// <summary>
+    /// 이 머리 번호를, 지금 성별·지금 고른 COLOR 로 물들여 자른 그림. 그림이 없으면(있을 리 없음) null.
+    /// </summary>
+    private AtlasTexture? HairIcon(int number)
+    {
+        char genderLetter = _gender == 2 ? 'w' : 'm';
+        string path = $"{PartsFolder}{genderLetter}h{number:000}.png";
+
+        if (!ResourceLoader.Exists(path))
+        {
+            return null;
+        }
+
+        Texture2D dyed = Palettes.Load(path, _hairColor);
+        return new AtlasTexture { Atlas = dyed, Region = HairThumbRegion };
+    }
+
+    /// <summary>
+    /// COLOR 를 바꿨을 때 HAIR 격자의 그림만 새로 물들인다 — 단추를 다시 짓지 않아 고른 표시
+    /// (Flat)가 흔들리지 않는다. <see cref="Palettes.Load"/> 가 (그림, 색) 별로 캐시하므로 같은
+    /// 색을 다시 고르면 다시 물들이지 않는다.
+    /// </summary>
+    private void RefreshHairIcons()
+    {
+        foreach ((int number, Button tile) in _hairTiles)
+        {
+            tile.Icon = HairIcon(number);
+        }
+    }
+
     /// <summary>COLOR 격자 — 72가지 색 조각. 한 번만 짓는다(성별과 무관).</summary>
     private Control BuildColorGrid()
     {
@@ -427,7 +466,7 @@ public sealed partial class CreateScreen : Control
         section.AddThemeConstantOverride("separation", Main.Gutter / 2);
         section.AddChild(Aux("COLOR"));
 
-        GridContainer grid = new() { Columns = GridColumns };
+        GridContainer grid = new() { Columns = ColorGridColumns };
         grid.AddThemeConstantOverride("h_separation", Main.Gutter);
         grid.AddThemeConstantOverride("v_separation", Main.Gutter);
 
@@ -490,6 +529,7 @@ public sealed partial class CreateScreen : Control
     {
         _hairColor = number;
         RefreshColorSelection();
+        RefreshHairIcons();
         RefreshPreview();
     }
 
@@ -589,28 +629,20 @@ public sealed partial class CreateScreen : Control
         _create.Disabled = false;
     }
 
-    private static LineEdit Field(bool secret) => new()
+    /// <summary>
+    /// 이름·비밀번호·확인 칸 하나. 옆에 따로 캡션을 두지 않고 칸 안 흐린 힌트 글자
+    /// (<c>PlaceholderText</c>)로 무슨 칸인지 알린다 — 몸 미리보기를 가운데·크게 두려고 세 칸을
+    /// 세로로 쌓지 않고 한 줄에 나란히 두기로 하면서(사용자, 2026-09-19), 옆 캡션까지 있으면 칸이
+    /// 너무 좁아져 뺐다. 높이는 그대로 <see cref="Main.TouchMinimum"/> — 터치 최소보다 낮추지
+    /// 않는다.
+    /// </summary>
+    private static LineEdit Field(bool secret, string placeholder) => new()
     {
         Secret = secret,
-        CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+        PlaceholderText = placeholder,
+        CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+        SizeFlagsHorizontal = SizeFlags.ExpandFill
     };
-
-    private static Control FieldRow(string caption, LineEdit field)
-    {
-        HBoxContainer row = new();
-        row.AddThemeConstantOverride("separation", Main.Gutter);
-
-        Label captionLabel = Aux(caption);
-        captionLabel.CustomMinimumSize = new Vector2(CaptionWidth, 0);
-        captionLabel.VerticalAlignment = VerticalAlignment.Center;
-
-        field.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-
-        row.AddChild(captionLabel);
-        row.AddChild(field);
-
-        return row;
-    }
 
     private static Label Aux(string text)
     {
