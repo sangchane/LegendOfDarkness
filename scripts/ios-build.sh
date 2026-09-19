@@ -3,7 +3,9 @@
 #
 #   scripts/ios-build.sh build            .ipa 를 만든다
 #   scripts/ios-build.sh install          만들고 기기에 넣는다(기기 이름·번호는 --device 로)
-#   scripts/ios-build.sh renew            서명을 새로 받는다(기기가 보여야 한다)
+#   scripts/ios-build.sh devices          지금 보이는 기기를 이름·번호로 보여 준다(아이패드·아이폰 따로)
+#   scripts/ios-build.sh renew            서명을 새로 받는다(LOD_DEVICE_ID 로 기기를 고른다 — 그 기기가
+#                                         프로필에 실제로 들어갔는지까지 확인한다)
 #   scripts/ios-build.sh check            며칠 남았나 — 이틀 이하면 스스로 갱신한다
 #   scripts/ios-build.sh watch-sign       날마다 check 를 돌게 맥에 등록한다
 #   scripts/ios-build.sh unwatch-sign     그 등록을 지운다
@@ -14,6 +16,12 @@
 #   xcodebuild -project …/LodClient.xcodeproj -target LodClient -destination "id=<기기>" -allowProvisioningUpdates build
 # 기기는 케이블로 한 번 짝지어 두면 같은 Wi-Fi 에서 보인다(`xcrun devicectl list devices`).
 set -euo pipefail
+
+# xcode-select 가 CommandLineTools 를 가리키면 `xcrun devicectl` 이 없다("not a developer tool").
+# sudo 없이 고치는 길 — 이 스크립트 안에서만 Xcode 를 보게 한다 (2026-09-19).
+if [ -z "${DEVELOPER_DIR:-}" ] && [ -d /Applications/Xcode.app/Contents/Developer ]; then
+    export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+fi
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLIENT="$ROOT/mobile/client"
@@ -105,6 +113,34 @@ device_id() {
     xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /^(available|connected)/ {print $3; exit}'
 }
 
+# 지금 보이는 기기를 이름·번호와 함께 보여 준다. 아이패드와 아이폰을 따로 다루려면 이것부터 본다.
+devices() {
+    printf '%-22s %s\n' "이름" "번호(UDID)"
+    xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /^(available|connected)/ {print $1 "\t" $3}' |
+    while IFS=$'\t' read -r name ident; do
+        [ -z "$ident" ] && continue
+        local udid
+        udid="$(xcrun devicectl device info details --device "$ident" 2>/dev/null | awk -F': ' '/• udid:/ {print $2; exit}')"
+        printf '%-22s %s\n' "$name" "${udid:-$ident}"
+    done
+}
+
+# 프로필에 든 기기 번호들. 없으면 아무것도 안 찍는다.
+profile_devices() {
+    local found
+    found="$(profile)"
+    [ -z "$found" ] && return
+    security cms -D -i "$found" 2>/dev/null |
+        plutil -extract ProvisionedDevices xml1 -o - - 2>/dev/null |
+        sed -n 's/.*<string>\(.*\)<\/string>.*/\1/p'
+}
+
+# 그 기기가 프로필에 들어 있나. **`renew` 는 이것으로 스스로를 검사한다.**
+profile_has_device() {
+    local want="$1"
+    profile_devices | grep -qxF "$want"
+}
+
 # 서명 새로 받기. 기기를 지정해 Xcode 프로젝트를 빌드하면 7일짜리 서명이 새로 만들어진다.
 renew() {
     local project="$CLIENT/build/ios/LodClient.xcodeproj"
@@ -123,11 +159,21 @@ renew() {
     fi
 
     echo "기기 $device 로 서명을 받습니다..."
-    xcodebuild -project "$project" -target LodClient -configuration Debug \
+    # **-scheme 이어야 한다.** -target 으로 부르면 xcodebuild 가 -destination 을 통째로 무시하고
+    # ("Ignoring provided run destination because no scheme was passed") 기기를 등록하지 않는다.
+    # 그래서 빌드는 성공하는데 프로필에는 옛 기기만 남아, 다른 기기에 넣으면 거절당했다 (2026-09-19).
+    xcodebuild -project "$project" -scheme LodClient -configuration Debug \
         -destination "id=$device" -allowProvisioningUpdates build > "$LOGS/ios-renew.log" 2>&1 || {
         echo "실패했습니다 — $LOGS/ios-renew.log" >&2
         return 1
     }
+
+    # 빌드가 성공해도 그 기기가 프로필에 들어갔는지는 별개다. 확인하지 않으면 "새로 받았습니다" 가 거짓말이 된다.
+    if ! profile_has_device "$device"; then
+        echo "빌드는 됐는데 기기 $device 가 프로필에 없습니다 — $LOGS/ios-renew.log" >&2
+        echo "프로필에 든 기기: $(profile_devices | tr '\n' ' ')" >&2
+        return 1
+    fi
 
     echo "서명을 새로 받았습니다 — $(days_left)일 남았습니다."
 }
@@ -220,8 +266,9 @@ case "${1:-check}" in
     build) build ;;
     install) build; install_to "${2:-}" ;;
     renew) renew ;;
+    devices) devices ;;
     check) check ;;
     watch-sign) watch_sign ;;
     unwatch-sign) unwatch_sign ;;
-    *) echo "쓸 수 있는 것: build install [기기] renew check watch-sign unwatch-sign"; exit 2 ;;
+    *) echo "쓸 수 있는 것: build install [기기] devices renew check watch-sign unwatch-sign"; exit 2 ;;
 esac
