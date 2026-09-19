@@ -1044,7 +1044,11 @@ public partial class GameScreen : Control
         HBoxContainer row = new() { MouseFilter = MouseFilterEnum.Ignore };
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
+        // 대화 단추는 손댈 자리를 지키려고 48 높이를 요구한다(TouchMinimum) — 여기서 ShrinkEnd 를 안 주면
+        // 줄이 한 줄뿐이어도 판이 그 48 높이까지 늘어나 아래에 빈 검정이 남는다. 세로는 이미 LogHeight 만큼
+        // 커스텀 최소 높이를 주므로(단추의 48보다 커) 줄지 않는다 — 그대로다.
         _messages.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _messages.SizeFlagsVertical = SizeFlags.ShrinkEnd;
         row.AddChild(_messages);
 
         Button said = new()
