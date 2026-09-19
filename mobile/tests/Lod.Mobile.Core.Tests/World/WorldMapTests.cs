@@ -59,6 +59,12 @@ public sealed class WorldMapTests
         Assert.Equal(new byte[] { 0x00, 0x00, 0x4F, 0x83 }, WorldClient.FieldChoice(20355));
     }
 
+    [Fact]
+    public void Closing_the_field_sends_a_map_number_of_zero()
+    {
+        Assert.Equal(new byte[] { 0x00, 0x00, 0x00, 0x00 }, WorldClient.FieldChoice(0));
+    }
+
     /// <summary>
     /// 몸통이 둘째 노드 중간(이름 시작 전)에서 끊겨도, 이미 다 읽은 첫째 노드는 살려서 돌려준다 —
     /// 하나라도 있으면 사람이 창을 보고 빠져나갈 수 있다. 개수(0x02)와 몸통이 어긋난 경우를 흉내낸다.

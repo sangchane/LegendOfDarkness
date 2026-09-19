@@ -58,6 +58,9 @@ public sealed class WorldClient(WorldSession session)
     /// 월드맵에서 곳을 고른다. 오는 <see cref="CooldownCommand" /> 와 번호가 같지만 나가는 것은 이쪽이다.
     /// </summary>
     private const byte ChooseFieldCommand = 0x3F;
+
+    /// <summary>월드맵을 열어 달라는 말. 원작 클라이언트는 0x80 넘는 명령을 보내지 않으므로 이 번호는 우리 것이다.</summary>
+    private const byte OpenFieldCommand = 0xF0;
     private const byte BodyMotionCommand = 0x1A;
     private const byte AnimationCommand = 0x29;
     private const byte SoundCommand = 0x19;
@@ -870,6 +873,19 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public Task ChooseFieldAsync(int areaId, CancellationToken cancellationToken) =>
         Send(ChooseFieldCommand, FieldChoice(areaId), cancellationToken);
+
+    /// <summary>
+    /// 월드맵을 열어 달라고 서버에 말한다. 원작에는 없는 말이다 — 원작은 바닥의 숨은 칸을 밟아야 열렸다.
+    /// 마을이 아니면 서버가 거절하고 말 한 줄만 돌려준다(싸우는 중에 열면 손이 묶이기 때문이다).
+    /// </summary>
+    public Task OpenFieldAsync(CancellationToken cancellationToken) =>
+        Send(OpenFieldCommand, [], cancellationToken);
+
+    /// <summary>
+    /// 월드맵을 그냥 닫는다. 갈 맵 번호 0 이 취소라고 서버와 약속했다 — 0 은 어느 맵의 번호도 아니다.
+    /// </summary>
+    public Task CloseFieldAsync(CancellationToken cancellationToken) =>
+        Send(ChooseFieldCommand, FieldChoice(0), cancellationToken);
 
     /// <summary>
     /// Sends one of the two answers an NPC takes. They go in a different envelope — six bytes of header and
