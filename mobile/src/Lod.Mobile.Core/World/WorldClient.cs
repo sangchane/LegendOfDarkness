@@ -869,7 +869,8 @@ public sealed class WorldClient(WorldSession session)
 
     /// <summary>
     /// 월드맵에서 한 곳을 골라 보낸다. 창이 열려 있는 동안 서버는 이것 말고 이 접속의 패킷을 모두
-    /// 버리므로(`NetworkServer.cs:141`), 고르기 전에는 걷지도 말하지도 못한다 — 창에 닫기가 없는 까닭이다.
+    /// 버리므로(`NetworkServer.cs:141`), 고르기 전에는 걷지도 말하지도 못한다 — 닫기로 취소(맵 번호 0)를
+    /// 보내면 조작이 돌아온다.
     /// </summary>
     public Task ChooseFieldAsync(int areaId, CancellationToken cancellationToken) =>
         Send(ChooseFieldCommand, FieldChoice(areaId), cancellationToken);

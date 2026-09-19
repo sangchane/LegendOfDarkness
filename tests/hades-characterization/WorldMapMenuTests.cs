@@ -85,8 +85,10 @@ public sealed class WorldMapMenuTests : IDisposable
         await Waiting.Until(() => world.State is { } state && state.Map.Id == NoviceTown, "노비스마을에 들어가지 못했습니다.", _deadline.Token);
 
         // 꾸밈용 주민(노비스주민1·2)이 괴물로 젠될 때까지 기다린다 — 젠 전에 물으면 이 시험이
-        // 우연히 통과해 버려 재발을 못 잡는다.
-        await Waiting.Until(() => world.Creatures.Any(), "노비스마을에 주민이 나오지 않았습니다.", _deadline.Token);
+        // 우연히 통과해 버려 재발을 못 잡는다. Creatures 에는 NPC(Mundane)도 들어가 그 13명이 서는
+        // 순간부터 참이 돼 버리므로(ServerFormat07.cs:65-75 · WorldClient.cs:1321), 주민이 괴물로 서는
+        // 것만 센다 — 맵 20373 에는 노비스주민1·2 뿐이다.
+        await Waiting.Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile), "노비스마을에 주민이 나오지 않았습니다.", _deadline.Token);
 
         await world.OpenFieldAsync(_deadline.Token);
         await Waiting.Until(() => world.Field is not null, "마을에서 월드맵을 달라고 했는데 오지 않았습니다.", _deadline.Token);
@@ -95,6 +97,15 @@ public sealed class WorldMapMenuTests : IDisposable
         await world.CloseFieldAsync(_deadline.Token);
 
         await Waiting.Until(() => world.Field is null, "닫았는데 월드맵이 그대로입니다.", _deadline.Token);
+
+        // 화면(GameScreen.cs:466)은 닫는 동안 "지도" 단추를 막아 이 조합을 못 보내지만, 알맹이로는
+        // 그대로 보낼 수 있다 — 닫은 직후 곧바로 다시 열어도(서버가 순서대로 처리해 재개장될 뿐,
+        // 갇히지는 않는다) 다시 닫으면 걸음은 그래도 닿아야 한다.
+        await world.OpenFieldAsync(_deadline.Token);
+        await Waiting.Until(() => world.Field is not null, "닫은 직후 다시 열었는데 월드맵이 오지 않았습니다.", _deadline.Token);
+
+        await world.CloseFieldAsync(_deadline.Token);
+        await Waiting.Until(() => world.Field is null, "다시 닫았는데 월드맵이 그대로입니다.", _deadline.Token);
 
         // 여기가 요점이다 — 닫은 뒤 걸음이 서버에 닿아야 한다.
         // 원작 걸음은 성공해도 자기에게는 아무 말도 오지 않는다(ServerFormat0C 는
