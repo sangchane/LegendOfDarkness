@@ -39,6 +39,67 @@ public static class HadesLoginClient
     /// </summary>
     private static readonly TimeSpan GraceAfterMessage = TimeSpan.FromSeconds(2);
 
+    /// <summary>
+    /// Creates an account and, on the same connection, the one character the server lets it hold
+    /// (<c>Format04Handler</c> only accepts a character right after a <c>Format02Handler</c> account on that
+    /// same client — it keeps the pending username and password in <c>client.CreateInfo</c>, not on the
+    /// wire). This does not log in; call <see cref="LoginAsync"/> afterward for that.
+    /// </summary>
+    public static async Task CreateCharacterAsync(
+        IPAddress address,
+        int loginPort,
+        string username,
+        string password,
+        byte hairStyle,
+        byte gender,
+        byte hairColor,
+        IProgress<string>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        progress?.Report("로그인 서버에 접속하는 중…");
+
+        EncryptionParameters parameters;
+        RedirectTarget lobby;
+
+        using (HadesConnection greeting = await HadesConnection.ConnectAsync(address, loginPort, cancellationToken))
+        {
+            await greeting.ReceiveAsync(cancellationToken);
+
+            await greeting.SendAsync(Hades718LoginProtocol.CreateVersionRequest(), cancellationToken);
+            parameters = Hades718LoginProtocol.ParseServerParameters(await greeting.ReceiveAsync(cancellationToken));
+
+            // Acknowledging the cipher is what makes the server hand out the lobby address.
+            await greeting.SendAsync(
+                HadesCipher.EncodeSecured(EncryptionReceivedCommand, ordinal: 0, [0x00], parameters),
+                cancellationToken);
+
+            lobby = Hades718LoginProtocol.ParseRedirect(await greeting.ReceiveAsync(cancellationToken));
+        }
+
+        progress?.Report("계정을 만드는 중…");
+
+        using HadesConnection login = await HadesConnection.ConnectAsync(lobby.Address, lobby.Port, cancellationToken);
+
+        await login.ReceiveAsync(cancellationToken);
+
+        await login.SendAsync(Hades718LoginProtocol.CreateGameEntryRequest(lobby), cancellationToken);
+        await login.ReceiveAsync(cancellationToken);
+
+        await login.SendAsync(
+            Hades718LoginProtocol.CreateAccountRequest(username, password, parameters, ordinal: 0),
+            cancellationToken);
+        await login.ReceiveAsync(cancellationToken);
+
+        progress?.Report("캐릭터를 만드는 중…");
+
+        await login.SendAsync(
+            Hades718LoginProtocol.CreateCharacterRequest(hairStyle, gender, hairColor, parameters, ordinal: 0),
+            cancellationToken);
+
+        // Reading the reply also waits for the save to finish before the connection closes.
+        await login.ReceiveAsync(cancellationToken);
+    }
+
     public static async Task<WorldSession> LoginAsync(
         IPAddress address,
         int loginPort,

@@ -45,6 +45,57 @@ public sealed class Hades718LoginProtocolTests
     }
 
     [Fact]
+    public void Account_request_frames_the_username_then_the_password()
+    {
+        EncryptionParameters parameters = new(0, "NexonInc."u8.ToArray(), 0);
+
+        byte[] request = Hades718LoginProtocol.CreateAccountRequest(
+            SyntheticUsername,
+            SyntheticPassword,
+            parameters,
+            ordinal: 0);
+
+        PacketFrame frame = DecodeFrame(request);
+        Assert.Equal((byte)0x02, frame.Command);
+
+        byte[] body = HadesCipher.DecodeSecured(frame, parameters);
+        byte[] expected =
+        [
+            .. LegacyKoreanEncoding.EncodeStringA(SyntheticUsername),
+            .. LegacyKoreanEncoding.EncodeStringA(SyntheticPassword)
+        ];
+
+        Assert.Equal(expected, body);
+    }
+
+    [Fact]
+    public void Character_request_sends_hair_style_then_gender_then_hair_color()
+    {
+        EncryptionParameters parameters = new(0, "NexonInc."u8.ToArray(), 0);
+
+        // Three different values in three different slots, so a swapped order in the implementation
+        // shows up as a value landing in the wrong slot rather than a coincidental pass.
+        const byte hairStyle = 0x0C;
+        const byte gender = 0x02;
+        const byte hairColor = 0x47;
+
+        byte[] request = Hades718LoginProtocol.CreateCharacterRequest(
+            hairStyle,
+            gender,
+            hairColor,
+            parameters,
+            ordinal: 0);
+
+        PacketFrame frame = DecodeFrame(request);
+        Assert.Equal((byte)0x04, frame.Command);
+
+        byte[] body = HadesCipher.DecodeSecured(frame, parameters);
+
+        // ClientFormat04.cs:17-20 reads HairStyle, then Gender, then HairColor, in that order.
+        Assert.Equal(new byte[] { hairStyle, gender, hairColor }, body);
+    }
+
+    [Fact]
     public void Login_request_errors_do_not_disclose_the_password()
     {
         EncryptionParameters invalid = new(10, "NexonInc."u8.ToArray(), 0);
@@ -82,12 +133,11 @@ public sealed class Hades718LoginProtocolTests
         Assert.Throws<ProtocolException>(() => Hades718LoginProtocol.ParseRedirect(frame));
     }
 
-    private static PacketFrame DecodeFixture(string hex)
+    private static PacketFrame DecodeFixture(string hex) => DecodeFrame(Convert.FromHexString(hex));
+
+    private static PacketFrame DecodeFrame(byte[] encoded)
     {
-        FrameReadStatus status = PacketFrameCodec.TryDecode(
-            Convert.FromHexString(hex),
-            out PacketFrame? frame,
-            out _);
+        FrameReadStatus status = PacketFrameCodec.TryDecode(encoded, out PacketFrame? frame, out _);
 
         Assert.Equal(FrameReadStatus.Complete, status);
         return frame!;

@@ -32,8 +32,10 @@ public static class Hades718LoginProtocol
     public const ushort ClientVersion = 718;
 
     private const byte VersionCommand = 0x00;
+    private const byte CreateAccountCommand = 0x02;
     private const byte LoginCommand = 0x03;
     private const byte RedirectCommand = 0x03;
+    private const byte CreateCharacterCommand = 0x04;
     private const byte GameEntryCommand = 0x10;
 
     // Two bytes the original client sends after its version. The server reads them and does not use them.
@@ -97,6 +99,43 @@ public static class Hades718LoginProtocol
         ];
 
         return HadesCipher.EncodeSecured(LoginCommand, ordinal, body, parameters);
+    }
+
+    /// <summary>Builds the account-creation message. The body is enciphered; the command and ordinal are not.</summary>
+    public static byte[] CreateAccountRequest(
+        string username,
+        string password,
+        EncryptionParameters parameters,
+        byte ordinal)
+    {
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        byte[] body =
+        [
+            .. LegacyKoreanEncoding.EncodeStringA(username),
+            .. LegacyKoreanEncoding.EncodeStringA(password)
+        ];
+
+        return HadesCipher.EncodeSecured(CreateAccountCommand, ordinal, body, parameters);
+    }
+
+    /// <summary>
+    /// Builds the character-creation message. The server reads the three bytes as hair style, then gender,
+    /// then hair color (<c>ClientFormat04.cs:17-20</c>), so the parameters here are ordered to match — not
+    /// alphabetically or by call-site convenience.
+    /// </summary>
+    public static byte[] CreateCharacterRequest(
+        byte hairStyle,
+        byte gender,
+        byte hairColor,
+        EncryptionParameters parameters,
+        byte ordinal)
+    {
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        byte[] body = [hairStyle, gender, hairColor];
+
+        return HadesCipher.EncodeSecured(CreateCharacterCommand, ordinal, body, parameters);
     }
 
     public static RedirectTarget ParseRedirect(PacketFrame frame)

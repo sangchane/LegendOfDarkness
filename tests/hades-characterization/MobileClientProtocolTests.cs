@@ -79,6 +79,45 @@ public sealed class MobileClientProtocolTests
     }
 
     [Fact]
+    public async Task Mobile_client_creates_an_account_and_character_with_the_chosen_appearance()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        // Three different values, none of them the placeholder 0x01,0x01,0x01 the old bypass sent, so a
+        // swapped HairStyle/Gender/HairColor order in the client would show up as a value in the wrong field.
+        const byte hairStyle = 0x0C;
+        const byte gender = 0x02;
+        const byte hairColor = 0x47;
+
+        await HadesLoginClient.CreateCharacterAsync(
+            IPAddress.Loopback,
+            server.LoginPort,
+            MobileName,
+            LoginFlow.SyntheticSecret,
+            hairStyle,
+            gender,
+            hairColor,
+            progress: null,
+            _deadline.Token);
+
+        using WorldSession session = await LoginAsync(server);
+
+        Assert.Equal(MobileName, session.Character.CharacterName);
+
+        // The server logs this line only once the character is standing in a map.
+        LoginFlow.WaitForLog(server, LoginFlow.WelcomeMessage(MobileName), TimeSpan.FromSeconds(30));
+
+        string path = Path.Combine(server.ContentLocation, "aislings", $"{MobileName}.json");
+        JsonNode saved = JsonNode.Parse(File.ReadAllText(path))!;
+
+        // Gender saves as its enum name, not the wire byte; HairStyle and HairColor save as the plain numbers.
+        Assert.Equal(hairStyle, (byte)saved["HairStyle"]!.GetValue<int>());
+        Assert.Equal(((Darkages.Types.Gender)gender).ToString(), saved["Gender"]!.GetValue<string>());
+        Assert.Equal(hairColor, (byte)saved["HairColor"]!.GetValue<int>());
+    }
+
+    [Fact]
     public async Task World_says_which_map_the_character_is_on_and_where()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
