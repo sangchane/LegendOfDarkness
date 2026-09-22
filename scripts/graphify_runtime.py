@@ -74,7 +74,10 @@ def _posix_tool_python(graphify_executable: Path | None) -> Path:
     python = first_line.removeprefix("#!").strip()
     if not first_line.startswith("#!") or not python:
         raise RuntimeError(f"graphify launcher has no shebang: {graphify_executable}")
-    return Path(python).expanduser().resolve()
+    # Do not resolve the uv environment's ``bin/python`` symlink.  Python uses
+    # the invoked venv path to select that environment's site-packages; resolving
+    # it to the Homebrew/system interpreter loses graphify itself.
+    return Path(python).expanduser().absolute()
 
 
 def find_graphify_python(

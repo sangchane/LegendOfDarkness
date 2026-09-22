@@ -94,11 +94,14 @@ class GraphifyRuntimeTest(unittest.TestCase):
                 [str(python.resolve()), "-c", "import graphify"],
             ])
 
-    def test_posix_keeps_graphify_launcher_shebang_behavior(self):
+    def test_posix_keeps_unresolved_venv_python_symlink(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            python = root / "python"
-            python.touch()
+            target = root / "system-python"
+            target.touch()
+            python = root / "venv" / "bin" / "python"
+            python.parent.mkdir(parents=True)
+            python.symlink_to(target)
             launcher = root / "graphify"
             launcher.write_text(f"#!{python}\n", encoding="utf-8")
 
@@ -109,7 +112,8 @@ class GraphifyRuntimeTest(unittest.TestCase):
                 platform="linux", graphify_executable=launcher, run=run
             )
 
-            self.assertEqual(result, python.resolve())
+            self.assertEqual(result, python.absolute())
+            self.assertNotEqual(result, python.resolve())
 
     def test_rejects_tool_python_that_cannot_import_graphify(self):
         with tempfile.TemporaryDirectory() as tmp:
