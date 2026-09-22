@@ -55,7 +55,8 @@
 		"BaseAC": 0,
 		"MaxAC": 200,
 		"BaseMR": 70,
-		"RegenRate": 5000,
+		// 저절로 차는 주기(ms). 5.99 서버는 21초다(Novaonline.exe 0x4766aa 의 21000) — 식은 GameClient.NaturalRecovery.
+		"RegenRate": 21000,
 
 		// Skills
 		"GiveAssailOnCreate": true,

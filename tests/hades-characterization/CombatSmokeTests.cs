@@ -67,7 +67,18 @@ public sealed class CombatSmokeTests : IDisposable
     private const double BehindDamageMod = 0.45;
 
     /// <summary>What neither side having an element is worth (<c>scripts/Formulas/elements.cs</c>).</summary>
-    private const double NoElementEither = 0.50;
+    /// <remarks>
+    /// 전에는 0.50 이었다 — 사람과 괴물 사이의 거의 모든 한 방이 반이 됐다. 5.99 서버(Novaonline.exe)의 피해
+    /// 함수에는 반으로 깎는 단계가 없어(괴물이 맞을 때 0x424215, 사람이 맞을 때 0x415341) 1.00 으로 고쳤다.
+    /// 이 값이 다시 0.50 이 되면 이 시험의 두 방향이 모두 어긋난다.
+    /// </remarks>
+    private const double NoElementEither = 1.00;
+
+    /// <summary>
+    /// 괴물 평타가 방어를 거친 뒤 한 번 더 곱해지는 값. 5.99 는 공격속성이 붙은 괴물의 평타를 ×1.3 하고
+    /// (0x425dc3 → 0x415cff), 속성이 안 적힌 괴물에게도 생길 때 속성을 붙이므로(0x422bc5) 늘 ×1.3 이다.
+    /// </summary>
+    private const double MonsterBlowElement = 1.3;
 
     /// <summary>
     /// A swing that reached nothing is still announced, as a health report about serial zero
@@ -331,11 +342,14 @@ public sealed class CombatSmokeTests : IDisposable
     /// </summary>
     private static int[] MonsterBlows(int least, int most, int myArmor) =>
         [.. Enumerable.Range(least, most - least + 1)
-            .Select(raw => Landed(Math.Max(1, raw), myArmor))
+            .Select(raw => Landed(Math.Max(1, raw), myArmor, MonsterBlowElement))
             .Distinct()
             .Order()];
 
-    /// <summary>The two things every blow goes through on the way in: the target's armour, then elements.</summary>
+    /// <summary>
+    /// The two things every blow goes through on the way in: the target's armour, then elements — and, for a
+    /// monster's blow, <see cref="MonsterBlowElement" /> in the same place as the elements.
+    /// </summary>
     /// <remarks>
     /// <c>scripts/Formulas/ac.cs</c>. Armour above -2 still makes a blow hurt more, and nobody starts below
     /// that: <c>GameClient.SetAislingStartupVariables</c> hands a new character <c>100 - Level / 3</c>, so it
@@ -346,11 +360,11 @@ public sealed class CombatSmokeTests : IDisposable
     /// returning the larger of the raw and the armoured blow — so every reduction it worked out was handed
     /// straight back, and the best armour in the game took exactly what no armour took.
     /// </remarks>
-    private static int Landed(int dmg, int armor)
+    private static int Landed(int dmg, int armor, double afterArmour = 1)
     {
         int armored = Math.Max(1, dmg * (armor + 101) / 99);
 
-        return (int)Math.Abs(armored * NoElementEither);
+        return (int)Math.Abs(armored * (NoElementEither * afterArmour));
     }
 
     /// <summary>How the server states health: a whole percentage of the maximum, with the rest cut off.</summary>
