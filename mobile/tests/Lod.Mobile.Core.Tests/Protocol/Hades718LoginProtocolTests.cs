@@ -69,7 +69,7 @@ public sealed class Hades718LoginProtocolTests
     }
 
     [Fact]
-    public void Character_request_sends_hair_style_then_gender_then_hair_color()
+    public void Character_request_sends_appearance_then_selected_class()
     {
         EncryptionParameters parameters = new(0, "NexonInc."u8.ToArray(), 0);
 
@@ -78,11 +78,13 @@ public sealed class Hades718LoginProtocolTests
         const byte hairStyle = 0x0C;
         const byte gender = 0x02;
         const byte hairColor = 0x47;
+        const byte path = 0x05;
 
         byte[] request = Hades718LoginProtocol.CreateCharacterRequest(
             hairStyle,
             gender,
             hairColor,
+            path,
             parameters,
             ordinal: 0);
 
@@ -91,8 +93,8 @@ public sealed class Hades718LoginProtocolTests
 
         byte[] body = HadesCipher.DecodeSecured(frame, parameters);
 
-        // ClientFormat04.cs:17-20 reads HairStyle, then Gender, then HairColor, in that order.
-        Assert.Equal(new byte[] { hairStyle, gender, hairColor }, body);
+        // ClientFormat04 reads HairStyle, Gender, HairColor, then Path, in that order.
+        Assert.Equal(new byte[] { hairStyle, gender, hairColor, path }, body);
     }
 
     [Fact]

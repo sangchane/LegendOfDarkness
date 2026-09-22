@@ -120,20 +120,22 @@ public static class Hades718LoginProtocol
     }
 
     /// <summary>
-    /// Builds the character-creation message. The server reads the three bytes as hair style, then gender,
-    /// then hair color (<c>ClientFormat04.cs:17-20</c>), so the parameters here are ordered to match — not
-    /// alphabetically or by call-site convenience.
+    /// Builds the character-creation message. The server reads the bytes as hair style, gender, hair color,
+    /// then the selected primary class (<c>ClientFormat04.cs</c>). The first three fields retain their
+    /// 7.18 order; the fourth is our mobile/server extension, so a class is chosen before the character is
+    /// persisted rather than through the later NPC-only class picker.
     /// </summary>
     public static byte[] CreateCharacterRequest(
         byte hairStyle,
         byte gender,
         byte hairColor,
+        byte path,
         EncryptionParameters parameters,
         byte ordinal)
     {
         ArgumentNullException.ThrowIfNull(parameters);
 
-        byte[] body = [hairStyle, gender, hairColor];
+        byte[] body = [hairStyle, gender, hairColor, path];
 
         return HadesCipher.EncodeSecured(CreateCharacterCommand, ordinal, body, parameters);
     }

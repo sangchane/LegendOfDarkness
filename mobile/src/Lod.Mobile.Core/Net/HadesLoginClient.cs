@@ -66,9 +66,10 @@ public static class HadesLoginClient
     /// Creates an account and, on the same connection, the one character the server lets it hold
     /// (<c>Format04Handler</c> only accepts a character right after a <c>Format02Handler</c> account on that
     /// same client — it keeps the pending username and password in <c>client.CreateInfo</c>, not on the
-    /// wire). This does not log in; call <see cref="LoginAsync"/> afterward for that.
+    /// wire). Once the save succeeds, the submitted credentials are used only in memory to follow the
+    /// ordinary login path and return its world connection. They are never retained by this client.
     /// </summary>
-    public static async Task CreateCharacterAsync(
+    public static async Task<WorldSession> CreateCharacterAsync(
         IPAddress address,
         int loginPort,
         string username,
@@ -76,6 +77,7 @@ public static class HadesLoginClient
         byte hairStyle,
         byte gender,
         byte hairColor,
+        byte path,
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -116,11 +118,14 @@ public static class HadesLoginClient
         progress?.Report("캐릭터를 만드는 중…");
 
         await login.SendAsync(
-            Hades718LoginProtocol.CreateCharacterRequest(hairStyle, gender, hairColor, parameters, ordinal: 0),
+            Hades718LoginProtocol.CreateCharacterRequest(hairStyle, gender, hairColor, path, parameters, ordinal: 0),
             cancellationToken);
 
         // Reading the reply also waits for the save to finish before the connection closes.
         await login.ReceiveAsync(cancellationToken);
+
+        progress?.Report("새 영웅으로 월드에 들어가는 중…");
+        return await LoginAsync(address, loginPort, username, password, progress, cancellationToken);
     }
 
     public static async Task<WorldSession> LoginAsync(
