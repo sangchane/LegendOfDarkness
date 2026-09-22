@@ -73,8 +73,9 @@ public sealed class OwnFacingTests
         HadesConnection connection = await HadesConnection.ConnectAsync(endpoint.Address, endpoint.Port, deadline.Token);
         using TcpClient server = await accepting;
         EncryptionParameters cipher = new(HadesCipher.SupportedSeed, "NexonInc."u8.ToArray(), 0);
-        using WorldClient world = new(new WorldSession(
-            connection, new RedirectTarget(IPAddress.Loopback, 0, cipher.Seed, cipher.Salt, "monk", 1), cipher));
+        using WorldSession session = new(
+            connection, new RedirectTarget(IPAddress.Loopback, 0, cipher.Seed, cipher.Salt, "monk", 1), cipher);
+        WorldClient world = new(session);
         _ = world.PumpAsync(deadline.Token);
 
         byte ordinal = 0;
