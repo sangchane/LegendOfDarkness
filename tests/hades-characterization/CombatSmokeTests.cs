@@ -58,13 +58,25 @@ public sealed class CombatSmokeTests : IDisposable
     /// <summary><c>SpawnQualifer.Defined</c> — stand where the definition says, not on a random tile.</summary>
     private const int SpawnDefined = 4;
 
+    /// <summary><c>MoodQualifer.Idle</c> — 먼저 덤비지 않는다.</summary>
+    private const int Idle = 1;
+
+    /// <summary><c>PathQualifer.Fixed</c> — 돌아다니지 않는다.</summary>
+    private const int Fixed = 2;
+
+    /// <summary>문 앞의 놈에게 주는 체력. 세 대를 다 재고도 살아 있을 만큼.</summary>
+    private const int TargetHealth = 600;
+
     private const string Name = "smokefight";
 
     /// <summary>
-    /// A number out of <c>LoruleConfig.json</c> that the formulas read. Changing it changes what every blow
-    /// from behind in the world is worth, and this test is what says so out loud.
+    /// 때린 자리에 따른 배수(<c>Sprite.BlowFacing</c>). 방어를 거친 뒤에 곱해지므로 <see cref="Landed" /> 의
+    /// 마지막 곱셈에 함께 들어간다. 세 각을 따로 재는 것은 <c>FacingDamageTests</c> 이고, 여기서는 문 앞의
+    /// 정해진 자리에서 나오는 두 가지만 쓴다.
     /// </summary>
-    private const double BehindDamageMod = 0.45;
+    private const double FromBehind = 2.0;
+
+    private const double FromInFront = 1.0;
 
     /// <summary>What neither side having an element is worth (<c>scripts/Formulas/elements.cs</c>).</summary>
     /// <remarks>
@@ -97,6 +109,11 @@ public sealed class CombatSmokeTests : IDisposable
     private const int MostSwings = 80;
 
     /// <summary>
+    /// 몇 대를 재고 그만두나. 셋이면 등 뒤 한 대와 돌아선 뒤의 두 대가 나오므로 배수와 돌아서기가 둘 다 보인다.
+    /// </summary>
+    private const int BlowsMeasured = 3;
+
+    /// <summary>
     /// 한 시험이 쓸 수 있는 시간. 다섯 분으로는 모자랐다 — <see cref="HitBack" /> 은 괴물이 되받아칠
     /// 때까지 도발과 기다림을 되풀이하는데, 문 앞 놈은 우리 손에 먼저 죽어 그 도발이 버려진다.
     /// 조용한 기계에서는 삼 분이면 끝나고 바쁜 기계에서는 그렇지 않다. 재는 값은 그대로다.
@@ -117,7 +134,7 @@ public sealed class CombatSmokeTests : IDisposable
     [Fact]
     public async Task Our_blow_takes_off_what_the_formula_says()
     {
-        (WorldClient world, IsolatedHadesServer server) = await Enter();
+        (WorldClient world, IsolatedHadesServer server) = await Enter(pinned: true);
 
         // 괴물이 서는 것부터가 이식의 약속이다. 안 서면 아래는 아무 의미가 없으므로 여기서 끝난다.
         Creature first = await AnyMonster(world);
@@ -132,32 +149,49 @@ public sealed class CombatSmokeTests : IDisposable
         // 예측이 성립하는 전제들. 무기를 들었거나 속성이 붙었으면 다른 식이 끼어든다.
         Assert.Equal(Element.None, me.Offense);
         Assert.Equal(Element.None, me.Defense);
-        Assert.Empty(world.Worn);
+
+        // 이제 새 캐릭터는 레더튜닉을 입고 시작한다(LoginServer.EquipStarterOutfit). 이 갑옷은
+        // AcModifer 뿐이고 AssailDamage 는 내 방어가 아니라 괴물의 방어만 보므로 셈에 끼어들지 않는다 —
+        // 끼어드는 것은 무기뿐이다(BlowMotion 이 무기가 있으면 그 동작·속도를 쓴다).
+        Assert.DoesNotContain(world.Worn, item => item.Slot == 1);
 
         (int level, int health, int armor) = TheOnlyMonsterInTheRoom(server);
 
-        // 등 뒤에서 때렸는지는 서버가 정한다(괴물이 나와 같은 쪽을 볼 때). 우리는 고를 수 없으니 둘 다
-        // 세워 두고, 앞에서 때린 값이 한 번은 나올 때까지 때린다.
-        await SwingUntil(world, enough: () => FirstBlows(world, me, health, armor)
-            .Any(blow => blow.Left == blow.InFront));
+        // 한 번 휘두르면 앞칸에 선 놈이 **모두** 맞는다 — `Assail.OnSuccess` 는 `GetInfront()` 가 내놓은
+        // 목록을 다 돈다. 그리고 정의 하나가 한 마리만 세우라고 적어도 젠은 넓이에 맞춰 늘린다
+        // (`MonolithComponent` — `SpawnMax × √(칸수/400)`, 우드랜드1-1 은 60x60 이라 ×3). 그래서 문 앞
+        // 한 칸에 세 마리가 겹쳐 서고, **보고 하나가 휘두름 하나가 아니다**. 한 놈에게 온 k 번째 보고가
+        // k 번째 휘두름이다(기술 수준은 휘두를 때마다 한 칸 오른다).
+        //
+        // 첫 휘두름 전에 이미 서 있던 놈만 센다 — 뒤늦게 선 놈은 첫 대가 몇 번째 휘두름인지 알 수 없다.
+        HashSet<uint> standing = [.. world.Creatures.Select(creature => creature.Serial)];
 
-        (int Left, int InFront, int Behind, int Use)[] blows = FirstBlows(world, me, health, armor);
-
-        Assert.True(blows.Length > 0,
-            $"{MostSwings}번 휘둘렀는데 어느 괴물도 체력이 깎이지 않았습니다 — 닿지 않았거나 기술 스크립트가 " +
-            $"안 돌았습니다.{Environment.NewLine}{Said(world)}");
-
-        foreach ((int left, int inFront, int behind, int use) in blows)
+        // 어느 각에서 때리는지가 이제는 정해져 있다. 놈은 방향 0(북)으로 서고 <see cref="StandOneAtTheDoor" />
+        // 가 제자리에 묶어 두므로, 남쪽 문에서 치는 첫 대는 반드시 등 뒤다. 그리고 맞은 놈은 때린 쪽을
+        // 바라보므로(Sprite.FaceWhoeverHit) 그 다음 대부터는 정면이다.
+        await SwingUntil(world, enough: () =>
         {
-            Assert.True(left == inFront || left == behind,
-                $"{use}번째 휘두름 뒤 괴물의 체력이 {left}% 입니다. 식대로라면 앞에서 {inFront}%, " +
-                $"등 뒤에서 {behind}% 입니다 (괴물 수준 {level}, 체력 {health}, 방어 {armor}, " +
-                $"기술 수준 {LevelOnUse(use)}, 힘 {me.Str}, 민첩 {me.Dex}).{Environment.NewLine}{Said(world)}");
+            (int Left, int Predicted, int Use, bool First)[] sofar = Blows(world, me, health, armor, standing);
+            return sofar.Length >= BlowsMeasured && sofar.Any(blow => !blow.First);
+        });
+
+        (int Left, int Predicted, int Use, bool First)[] blows = Blows(world, me, health, armor, standing);
+
+        Assert.True(blows.Length >= BlowsMeasured,
+            $"{MostSwings}번 휘둘렀는데 체력이 깎인 보고가 {blows.Length}번뿐입니다 — 닿지 않았거나 기술 " +
+            $"스크립트가 안 돌았습니다.{Environment.NewLine}{Said(world)}");
+
+        foreach ((int left, int predicted, int use, bool behind) in blows)
+        {
+            Assert.True(left == predicted,
+                $"{use}번째 휘두름 뒤 괴물의 체력이 {left}% 입니다. 식대로라면 {predicted}% 입니다 " +
+                $"({(behind ? "등 뒤에서 친 첫 대" : "돌아선 놈을 정면에서 친 대")}, 괴물 수준 {level}, " +
+                $"체력 {health}, 방어 {armor}, 기술 수준 {LevelOnUse(use)}, 힘 {me.Str}, " +
+                $"민첩 {me.Dex}).{Environment.NewLine}{Said(world)}");
         }
 
-        // 전부 0% 이면 "등 뒤" 쪽으로 통과해 버린다 — 피해가 열 배로 어긋나도 0% 이기 때문이다.
-        // 그래서 앞에서 때린 값이 적어도 한 번은 나와야 한다.
-        Assert.Contains(true, blows.Select(blow => blow.Left == blow.InFront));
+        // 첫 대만 보고 통과하면 돌아서기를 못 본다. 돌아선 뒤의 대가 적어도 하나는 있어야 한다.
+        Assert.Contains(false, blows.Select(blow => blow.First));
     }
 
     [Fact]
@@ -268,33 +302,35 @@ public sealed class CombatSmokeTests : IDisposable
     }
 
     /// <summary>
-    /// The first thing the server said about each monster's health, with what the formula says it should
-    /// have been. A report is one blow landing, so the first one about a body is one blow against full
-    /// health — the only kind of report a formula can be checked against without guessing what came before.
+    /// 서버가 말한 체력 보고 하나하나와, 식대로라면 그때 얼마가 남아 있어야 하는지.
     /// </summary>
-    private static (int Left, int InFront, int Behind, int Use)[] FirstBlows(
-        WorldClient world, Vitals me, int health, int armor)
+    /// <remarks>
+    /// 한 놈에게 온 k 번째 보고가 k 번째 휘두름이다 — 한 번 휘두르면 앞칸에 선 놈이 다 맞으므로 보고를
+    /// 통째로 세면 휘두른 횟수가 아니다(<see cref="Our_blow_takes_off_what_the_formula_says" />).
+    /// 한 놈을 여러 번 치므로 깎인 점수를 쌓아 가며 센다 — 괴물은 체력이 저절로 차지 않으므로(서버 어디에도
+    /// 괴물의 <c>CurrentHp +=</c> 가 없다) 쌓아 둔 값이 그대로 맞다. 그 놈에게 처음 들어간 대는 등 뒤,
+    /// 그 뒤로는 정면이다.
+    /// </remarks>
+    private static (int Left, int Predicted, int Use, bool First)[] Blows(
+        WorldClient world, Vitals me, int health, int armor, HashSet<uint> standing)
     {
-        List<(int, int, int, int)> blows = [];
-        HashSet<uint> already = [];
-        int use = 0;
+        List<(int, int, int, bool)> blows = [];
+        Dictionary<uint, int> taken = [];
+        Dictionary<uint, int> swings = [];
 
-        // 내 체력 보고는 괴물이 때린 것이므로 휘두른 횟수에 들지 않는다. 그 밖의 보고는 하나가 한 번의
-        // 휘두름이다 — 맞으면 그 놈의 체력, 헛치면 serial 0.
+        // 내 체력 보고는 괴물이 때린 것이므로 세지 않는다. 헛친 휘두름은 serial 0 으로 온다.
         foreach ((uint serial, int left) in world.Hurts.Where(hurt => hurt.Serial != world.Serial))
         {
-            use++;
-
-            if (serial == NothingWasHit || !already.Add(serial))
+            if (serial == NothingWasHit || !standing.Contains(serial))
             {
                 continue;
             }
 
-            blows.Add((
-                left,
-                PercentLeft(health, AssailDamage(me, LevelOnUse(use), armor, fromBehind: false)),
-                PercentLeft(health, AssailDamage(me, LevelOnUse(use), armor, fromBehind: true)),
-                use));
+            int swing = swings[serial] = swings.GetValueOrDefault(serial) + 1;
+            taken[serial] = taken.GetValueOrDefault(serial)
+                + AssailDamage(me, LevelOnUse(swing), armor, swing == 1 ? FromBehind : FromInFront);
+
+            blows.Add((left, PercentLeft(health, taken[serial]), swing, swing == 1));
         }
 
         return [.. blows];
@@ -317,19 +353,14 @@ public sealed class CombatSmokeTests : IDisposable
     /// What one Assail of ours must take off a monster. Every step is a step the server takes, named where
     /// it lives: a step here that the server does not take is a bug in this method, not in the server.
     /// </summary>
-    private static int AssailDamage(Vitals me, int skillLevel, int monsterArmor, bool fromBehind)
+    private static int AssailDamage(Vitals me, int skillLevel, int monsterArmor, double facing)
     {
         // scripts/Skills/Assail.cs — imp is ten plus the skill's level, and the division truncates.
         int dmg = me.Str * 4 + me.Dex * 2;
         dmg += dmg * (10 + skillLevel) / 100;
 
-        // Sprite.ApplyDamage — standing behind the target adds most of the blow again. Players only.
-        if (fromBehind)
-        {
-            dmg += (int)((dmg + BehindDamageMod) / 1.99);
-        }
-
-        return Landed(dmg, monsterArmor);
+        // 때린 자리 배수는 방어 뒤에 곱해진다 — Sprite.DamageTarget 의 amplifier 한 줄에 속성과 함께 있다.
+        return Landed(dmg, monsterArmor, facing);
     }
 
     /// <summary>
@@ -339,6 +370,9 @@ public sealed class CombatSmokeTests : IDisposable
     /// included, never below one — and only falls back to its level and the gap between that and ours for a
     /// definition that wrote neither. The roll is the server's, so the answer is every value the roll can
     /// reach through our armour rather than one.
+    ///
+    /// 때린 자리 배수는 여기 없다 — 괴물의 한 방에는 안 붙는다(<c>Sprite.BlowFacing</c> 은 때리는 쪽이
+    /// 사람일 때만 센다). 5.99 도 괴물이 사람을 치는 길에서는 사람 방향을 아예 읽지 않는다.
     /// </summary>
     private static int[] MonsterBlows(int least, int most, int myArmor) =>
         [.. Enumerable.Range(least, most - least + 1)
@@ -438,7 +472,7 @@ public sealed class CombatSmokeTests : IDisposable
     /// again. The originals stay in place with <c>SpawnMax</c> zero rather than being deleted, so the room
     /// is still made of the zone's own definitions. Same shape as <c>WoodlandHuntTests</c>.
     /// </remarks>
-    private static void StandOneAtTheDoor(IsolatedHadesServer server)
+    private static void StandOneAtTheDoor(IsolatedHadesServer server, bool pinned)
     {
         JsonSerializerOptions indented = new() { WriteIndented = true };
         (string Path, JsonNode Template)[] room = [.. DefinitionsInTheRoom(server)];
@@ -460,6 +494,20 @@ public sealed class CombatSmokeTests : IDisposable
         target["SpawnMax"] = 1;
         target["DefinedX"] = TargetTile.X;
         target["DefinedY"] = TargetTile.Y;
+
+        // 제자리에 묶고(Fixed), 먼저 덤비지 않게 둔다(Idle) — 그래야 우리가 치기 전까지 방향 0(북) 그대로
+        // 서 있고, 남쪽에서 치는 첫 대가 등 뒤라는 것이 매번 같다. 묶은 놈은 되받아치지 않으므로
+        // (Enter 의 pinned 설명) 되받아치는 것을 재는 시험은 정의 그대로 둔다.
+        if (pinned)
+        {
+            target["MoodType"] = Idle;
+            target["PathQualifer"] = Fixed;
+        }
+
+        // 정의의 115 로는 등 뒤 한 대에 1점만 남아 체력이 0% 로 보고된다 — 0% 는 피해가 열 배로 어긋나도
+        // 0% 라서 아무것도 재지 못한다. 세 대를 다 재고도 남을 만큼 올린다. 방어·한 방의 세기·수준은 정의
+        // 그대로이고, 예측도 이 파일에서 다시 읽는다.
+        target["MaximumHP"] = TargetHealth;
 
         string testFolder = Path.Combine(server.ContentLocation, "templates", "monsters", "characterization");
         Directory.CreateDirectory(testFolder);
@@ -546,11 +594,17 @@ public sealed class CombatSmokeTests : IDisposable
     private static bool IsThere(WorldClient world, Tile tile) =>
         world.Creatures.Any(c => c.Kind == CreatureKind.Hostile && c.Where == tile);
 
-    private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter()
+    /// <param name="pinned">
+    /// 문 앞의 놈을 제자리에 묶고 먼저 덤비지 않게 둘 것인가. 때린 자리를 재는 시험은 묶어야 첫 대가
+    /// 반드시 등 뒤가 되지만, <b>묶인 놈은 때리지 않는다</b> — <c>CommonMonster.Walk</c> 이 <c>BashEnabled</c>
+    /// 를 켜는데 그 함수는 <c>CanMove</c> 가 막으면 첫 줄에서 돌아선다. 그래서 되받아치는 것을 재는 시험은
+    /// 묶지 않는다.
+    /// </param>
+    private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter(bool pinned = false)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MonsterRoom, Start.X, Start.Y));
         _servers.Add(server);
-        StandOneAtTheDoor(server);
+        StandOneAtTheDoor(server, pinned);
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, Name);
 
