@@ -95,8 +95,13 @@ public partial class GameScreen : Control
     private bool _gearShown;
     private Control _topRow = null!;
     private Control _controlRow = null!;
+    private Button _logout = null!;
+    private bool _leaving;
 
     private readonly WorldClient? _server;
+
+    /// <summary>Asks the host to replace this disposed game screen with a fresh login screen.</summary>
+    public Action? LoggedOut { get; set; }
 
     public GameScreen(WorldClient? server = null)
     {
@@ -367,6 +372,14 @@ public partial class GameScreen : Control
             _placePlate.Visible = false;
         }
 
+        // A real portrait status plate can already use half the safe width once name, HP, MP and EXP arrive.
+        // Keep all three 48px actions in a second line of the same top status area instead of squeezing the
+        // last one beyond the right safe edge. Landscape has the width and keeps the established single row.
+        HBoxContainer actions = Main.Portrait
+            ? new HBoxContainer { MouseFilter = MouseFilterEnum.Ignore }
+            : row;
+        actions.AddThemeConstantOverride("separation", Main.Gutter);
+
         Button pack = new()
         {
             Text = "인벤토리",
@@ -375,7 +388,7 @@ public partial class GameScreen : Control
 
         Greybox.Plain(pack);
         pack.Pressed += () => Carrying(true);
-        row.AddChild(pack);
+        actions.AddChild(pack);
 
         _map = new Button
         {
@@ -385,10 +398,55 @@ public partial class GameScreen : Control
 
         Greybox.Plain(_map);
         _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
-        row.AddChild(_map);
+        actions.AddChild(_map);
+
+        _logout = new Button
+        {
+            Text = "로그아웃",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        Greybox.Plain(_logout);
+        _logout.Pressed += LogOut;
+        actions.AddChild(_logout);
+
+        if (Main.Portrait)
+        {
+            foreach (Button action in new[] { pack, _map, _logout })
+            {
+                action.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            }
+
+            VBoxContainer top = new() { MouseFilter = MouseFilterEnum.Ignore };
+            top.AddThemeConstantOverride("separation", Main.Gutter);
+            top.AddChild(row);
+            top.AddChild(actions);
+
+            return top;
+        }
 
         return row;
     }
+
+    /// <summary>
+    /// Closes the network before asking Main for a deferred tree change. The exit callback below is a
+    /// second safety net, so WorldClient and every owner beneath it make Dispose idempotent.
+    /// </summary>
+    private void LogOut()
+    {
+        if (_leaving)
+        {
+            return;
+        }
+
+        _leaving = true;
+        _logout.Disabled = true;
+        _world.Frozen = true;
+        _server?.Dispose();
+        LoggedOut?.Invoke();
+    }
+
+    public override void _ExitTree() => _server?.Dispose();
 
     /// <summary>
     /// A panel over the world: an original stone frame with a dark, nearly opaque inside. The frame is what
@@ -959,13 +1017,15 @@ public partial class GameScreen : Control
         }
         else
         {
-            // 가로에는 기록 줄이 들어갈 자리가 없다 — 방향판 위에 얹는다(사용자, 2026-09-18). 판 하나에
-            // 사람들이 한 말과 서버가 한 말이 함께 오른다.
-            _messages = new MessageLog(2) { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+            // 가로에는 기록 줄이 들어갈 자리가 없다 — 방향판 위에 얹는다(사용자, 2026-09-18). 이쪽은
+            // 기록판이 아니라 잠깐 뜨는 토스트다. 중앙의 캐릭터를 가리지 않도록, 세 칸 방향판 너비를
+            // 넘지 않는다. 긴 말은 그 안에서 줄바꿈하고 [대화]가 지난 말을 모두 다시 보여 준다.
+            int toastWidth = MessageToastLayout.DirectionPadWidth(Main.TouchMinimum, Main.Gutter / 2);
+            _messages = new MessageLog(2) { CustomMinimumSize = new Vector2(toastWidth, 0) };
 
             VBoxContainer left = new()
             {
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                CustomMinimumSize = new Vector2(toastWidth, 0),
                 SizeFlagsVertical = SizeFlags.ShrinkEnd,
                 MouseFilter = MouseFilterEnum.Ignore
             };
@@ -974,6 +1034,10 @@ public partial class GameScreen : Control
             left.AddChild(_pad);
 
             row.AddChild(left);
+
+            // The empty middle takes the extra width, not the toast. That keeps the two thumb clusters at
+            // opposite sides while leaving their play area clear.
+            row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
         }
 
         // 세로는 방향판과 부채꼴 사이의 틈이 이 칸이다(360 폭에 152 + 8 + 184). 가로는 기록 줄이 방향판 위로

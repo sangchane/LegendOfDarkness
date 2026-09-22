@@ -44,6 +44,10 @@ public partial class Main : Control
 
     public static bool AutoLoot { get; private set; } = true;
 
+    // Launch-time credentials may submit once. An explicit logout turns that convenience off for every
+    // login screen reached afterward, including a round trip through account creation.
+    private bool _automaticLogin = true;
+
     /// <summary>Turns picking-up-as-you-walk on or off, and remembers which.</summary>
     public static void SetAutoLoot(bool on)
     {
@@ -96,6 +100,9 @@ public partial class Main : Control
     /// controls out of the world, so the screens lay themselves out differently rather than scaling.
     /// </summary>
     public static bool Portrait { get; private set; }
+
+    public static event System.Action? LayoutChanged;
+    private bool _orientationWasForced;
 
     /// <summary>The login server this run talks to. Pass <c>--server host:port</c> to change it.</summary>
     public static System.Net.IPAddress ServerAddress { get; private set; } = System.Net.IPAddress.Loopback;
@@ -192,6 +199,9 @@ public partial class Main : Control
     /// </summary>
     public static (byte Gender, byte HairStyle, byte HairColor)? PickedLook { get; private set; }
 
+    /// <summary>Optional hand-free creation choice, as <c>--pick-job 1</c> through <c>5</c>.</summary>
+    public static byte? PickedPath { get; private set; }
+
     /// <summary>
     /// 만들기 화면에서 "만들기"를 손 없이 눌러 본다, as <c>--create-now</c>. 이름·비밀번호는 새 인자를
     /// 만들지 않고 <see cref="Rehearsal"/>(<c>--login</c>)을 그대로 쓴다 — 로그인 화면이 같은 값으로
@@ -201,6 +211,7 @@ public partial class Main : Control
 
     public override void _Ready()
     {
+        _orientationWasForced = Flag("--orient").Length > 0;
         Portrait = Flag("--orient") == "portrait";
         ReadServer(Flag("--server"));
         ReadRehearsal(Flag("--login"));
@@ -209,6 +220,7 @@ public partial class Main : Control
         Ability = Flag("--skill");
         Picking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick") >= 0;
         PickedLook = ReadPickedLook(Flag("--pick-look"));
+        PickedPath = ReadPickedPath(Flag("--pick-job"));
         CreateNow = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--create-now") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
@@ -256,7 +268,8 @@ public partial class Main : Control
         }
 
         Theme = BuildTheme();
-        SafeInsets = ComputeSafeInsets(GetViewportRect().Size);
+        GetWindow().SizeChanged += RefreshDrawableLayout;
+        RefreshDrawableLayout();
 
         if (Flag("--screen") == "game")
         {
@@ -280,18 +293,62 @@ public partial class Main : Control
         Screenshot.CaptureIfRequested(this);
     }
 
+    /// <summary>Re-reads the iOS drawable and safe area after every resize and foreground notification.</summary>
+    public override void _Notification(int what)
+    {
+        base._Notification(what);
+        // 1004 is Godot's NOTIFICATION_WM_WINDOW_FOCUS_IN; the C# binding exposes the application
+        // notification but not this window-only alias.
+        if (what == NotificationApplicationFocusIn || what == 1004)
+        {
+            RefreshDrawableLayout();
+        }
+    }
+
+    private void RefreshDrawableLayout()
+    {
+        if (!IsInsideTree()) return;
+        Vector2 viewport = GetViewport().GetVisibleRect().Size;
+        if (viewport.X <= 0 || viewport.Y <= 0) return;
+
+        bool oldPortrait = Portrait;
+        if (!_orientationWasForced) Portrait = viewport.Y >= viewport.X;
+        SafeInsets = ComputeSafeInsets(viewport);
+        ApplySafeInsets(this);
+        if (oldPortrait != Portrait) LayoutChanged?.Invoke();
+    }
+
+    /// <summary>Touches only SafeArea nodes which are still children of the live host.</summary>
+    private static void ApplySafeInsets(Node node)
+    {
+        foreach (Node child in node.GetChildren())
+        {
+            if (child is MarginContainer safe && safe.Name.ToString() == "SafeArea" && GodotObject.IsInstanceValid(safe))
+            {
+                safe.AddThemeConstantOverride("margin_left", SafeInsets.Left);
+                safe.AddThemeConstantOverride("margin_top", SafeInsets.Top);
+                safe.AddThemeConstantOverride("margin_right", SafeInsets.Right);
+                safe.AddThemeConstantOverride("margin_bottom", SafeInsets.Bottom);
+            }
+            ApplySafeInsets(child);
+        }
+    }
+
     /// <summary>Swaps the login screen for the world the connection leads to.</summary>
     private void Enter(LoginScreen login, Lod.Mobile.Core.Net.WorldSession session)
     {
         RemoveChild(login);
         login.QueueFree();
 
-        AddChild(new GameScreen(new Lod.Mobile.Core.World.WorldClient(session)));
+        GameScreen game = new(new Lod.Mobile.Core.World.WorldClient(session));
+
+        game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
+        AddChild(game);
     }
 
     private LoginScreen BuildLoginScreen()
     {
-        LoginScreen login = new();
+        LoginScreen login = new() { AutomaticLogin = _automaticLogin };
 
         // Deferred, because this runs from the login screen's own frame and the tree may not be changed
         // in the middle of one.
@@ -306,8 +363,26 @@ public partial class Main : Control
         CreateScreen create = new();
 
         create.Cancelled = () => Callable.From(() => BackToLogin(create)).CallDeferred();
+        create.Entered = session => Callable.From(() => Enter(create, session)).CallDeferred();
 
         return create;
+    }
+
+    /// <summary>Swaps a completed creation screen directly for its already authenticated game session.</summary>
+    private void Enter(CreateScreen create, Lod.Mobile.Core.Net.WorldSession session)
+    {
+        if (!GodotObject.IsInstanceValid(create) || create.GetParent() != this)
+        {
+            session.Dispose();
+            return;
+        }
+
+        RemoveChild(create);
+        create.QueueFree();
+
+        GameScreen game = new(new Lod.Mobile.Core.World.WorldClient(session));
+        game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
+        AddChild(game);
     }
 
     /// <summary>계정이 없어 만들기로 간다.</summary>
@@ -325,6 +400,23 @@ public partial class Main : Control
         RemoveChild(create);
         create.QueueFree();
 
+        AddChild(BuildLoginScreen());
+    }
+
+    /// <summary>The game has already released its connection; replace its node on the next safe tree turn.</summary>
+    private void BackToLogin(GameScreen game)
+    {
+        if (!GodotObject.IsInstanceValid(game) || game.GetParent() != this)
+        {
+            return;
+        }
+
+        RemoveChild(game);
+        game.QueueFree();
+
+        // login.cfg and --login are launch conveniences. An explicit logout must not consume them again
+        // and immediately put the same account back in the world.
+        _automaticLogin = false;
         AddChild(BuildLoginScreen());
     }
 
@@ -499,6 +591,9 @@ public partial class Main : Control
             ? (gender, hairStyle, hairColor)
             : null;
     }
+
+    private static byte? ReadPickedPath(string value) =>
+        byte.TryParse(value, out byte path) && path is >= 1 and <= 5 ? path : null;
 
     /// <summary>
     /// The first system face that actually carries Hangul, or null when this machine has none. Names are

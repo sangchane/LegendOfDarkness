@@ -23,6 +23,7 @@ public partial class LoginScreen : Control
     private const int CrestHeight = 68;
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
+    private const int LandscapeFormWidth = 560;
     private const int CaptionWidth = 72;
 
     private readonly ConcurrentQueue<string> _reported = new();
@@ -43,6 +44,10 @@ public partial class LoginScreen : Control
     private LineEdit _password = null!;
     private Button _submit = null!;
     private Button _create = null!;
+    private ScrollContainer? _formScroll;
+
+    /// <summary>Launch-time rehearsal may submit once; a screen reached by explicit logout only fills the fields.</summary>
+    public bool AutomaticLogin { get; init; } = true;
 
     public LoginScreen()
     {
@@ -74,7 +79,11 @@ public partial class LoginScreen : Control
         {
             _username.Text = Main.Rehearsal.Username;
             _password.Text = Main.Rehearsal.Password;
-            BeginLogin();
+
+            if (AutomaticLogin)
+            {
+                BeginLogin();
+            }
         }
     }
 
@@ -158,7 +167,10 @@ public partial class LoginScreen : Control
             SizeFlagsVertical = SizeFlags.ExpandFill
         };
 
-        PanelContainer panel = new() { CustomMinimumSize = new Vector2(FormWidth, 0) };
+        PanelContainer panel = new()
+        {
+            CustomMinimumSize = new Vector2(Main.Portrait ? FormWidth : LandscapeFormWidth, 0)
+        };
         panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
         MarginContainer padding = new();
@@ -166,9 +178,6 @@ public partial class LoginScreen : Control
         padding.AddThemeConstantOverride("margin_top", Main.Gutter * 2);
         padding.AddThemeConstantOverride("margin_right", Main.Gutter * 2);
         padding.AddThemeConstantOverride("margin_bottom", Main.Gutter * 2);
-
-        VBoxContainer form = new();
-        form.AddThemeConstantOverride("separation", Main.Gutter);
 
         // 로고 하나와 이름뿐이다 — 돌 무늬는 쓰지 않는다(사용자, 2026-09-18). 처음 보는 화면이라
         // 무엇을 하는 곳인지만 분명하면 된다.
@@ -211,15 +220,9 @@ public partial class LoginScreen : Control
         };
         Greybox.Plain(_create);
 
-        // Captions sit beside their fields rather than above them: in landscape the form has little height
-        // to spare, and stacked captions pushed it into the space the on-screen keyboard takes.
-        form.AddChild(crest);
-        form.AddChild(title);
-        form.AddChild(FieldRow("사용자명", _username));
-        form.AddChild(FieldRow("비밀번호", _password));
-        form.AddChild(_status);
-        form.AddChild(_submit);
-        form.AddChild(_create);
+        Control form = Main.Portrait
+            ? PortraitForm(crest, title)
+            : LandscapeForm(crest, title);
 
         padding.AddChild(form);
         panel.AddChild(padding);
@@ -230,7 +233,79 @@ public partial class LoginScreen : Control
         _submit.Pressed += BeginLogin;
         _create.Pressed += () => WantsToCreate?.Invoke();
 
-        return center;
+        if (Main.Portrait)
+        {
+            return center;
+        }
+
+        // A landscape keyboard can leave less height than four 48px controls need. Keep the controls at
+        // their accessible size and scroll the focused field into view instead of shrinking or clipping them.
+        _formScroll = new ScrollContainer
+        {
+            Name = "FormScroll",
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
+        };
+        _formScroll.AddChild(center);
+
+        return _formScroll;
+    }
+
+    /// <summary>The established phone flow stays one vertical column.</summary>
+    private Control PortraitForm(TextureRect crest, Label title)
+    {
+        VBoxContainer form = FormColumn();
+        form.AddChild(crest);
+        form.AddChild(title);
+        AddCredentials(form);
+
+        return form;
+    }
+
+    /// <summary>
+    /// A short, two-column version of the same form for landscape: identity on the left and the actual
+    /// task on the right. It removes two tall rows without shrinking fields or touch targets.
+    /// </summary>
+    private Control LandscapeForm(TextureRect crest, Label title)
+    {
+        HBoxContainer form = new();
+        form.AddThemeConstantOverride("separation", Main.Gutter * 2);
+
+        VBoxContainer identity = FormColumn();
+        identity.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        identity.SizeFlagsStretchRatio = 2;
+        identity.AddChild(crest);
+        identity.AddChild(title);
+
+        VBoxContainer credentials = FormColumn();
+        credentials.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        credentials.SizeFlagsStretchRatio = 3;
+        AddCredentials(credentials);
+
+        form.AddChild(identity);
+        form.AddChild(credentials);
+
+        return form;
+    }
+
+    private static VBoxContainer FormColumn()
+    {
+        VBoxContainer column = new();
+        column.AddThemeConstantOverride("separation", Main.Gutter);
+
+        return column;
+    }
+
+    private void AddCredentials(Container form)
+    {
+        // Captions sit beside their fields rather than above them, so the keyboard never turns each input
+        // into two rows. Both orientations use this same compact field treatment.
+        form.AddChild(FieldRow("사용자명", _username));
+        form.AddChild(FieldRow("비밀번호", _password));
+        form.AddChild(_status);
+        form.AddChild(_submit);
+        form.AddChild(_create);
     }
 
     private static Control FieldRow(string caption, LineEdit field)
@@ -285,6 +360,12 @@ public partial class LoginScreen : Control
             : 0;
 
         _safeArea.AddThemeConstantOverride("margin_bottom", Main.SafeInsets.Bottom + lift);
+
+        if (_formScroll is not null && GetViewport().GuiGetFocusOwner() is Control focused
+            && _formScroll.IsAncestorOf(focused))
+        {
+            _formScroll.EnsureControlVisible(focused);
+        }
 
         DrainLogin();
     }

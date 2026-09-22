@@ -23,6 +23,7 @@ window/size/window_width_override=1000
 window/size/window_height_override=450
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/stretch/scale_mode="integer"
 window/handheld/orientation=4
 
 [dotnet]

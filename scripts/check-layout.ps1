@@ -66,6 +66,14 @@ foreach ($screen in $screens) {
     }
 }
 
+$sequence = & $godot '--path' $client '--' '--screen' 'create' '--layout' '--resize-sequence' '--size' '393x852' 2>&1
+if ($LASTEXITCODE -ne 0 -or -not ($sequence | Select-String '^GREYBOX_LAYOUT_OK$')) {
+    $failed++
+    Write-Output '실패  iPhone 15 Pro 회전 7회 생성 화면'
+    $sequence | Select-String 'GREYBOX_LAYOUT(_BAD)?' | ForEach-Object { Write-Output "      $_" }
+}
+else { Write-Output '통과  iPhone 15 Pro 회전 7회 생성 화면' }
+
 Write-Output ''
 Write-Output "$failed 개 화면에서 어긋났습니다."
 exit $failed

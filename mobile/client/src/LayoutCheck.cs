@@ -22,7 +22,11 @@ public static class LayoutCheck
 
     private const string StuffFlag = "--stuff";
 
+    private const string ResizeSequenceFlag = "--resize-sequence";
+
     public static bool Requested() => System.Array.IndexOf(OS.GetCmdlineUserArgs(), Flag) >= 0;
+
+    public static bool ResizeSequenceRequested() => System.Array.IndexOf(OS.GetCmdlineUserArgs(), ResizeSequenceFlag) >= 0;
 
     /// <summary>
     /// Whether to fill the pack with pretend things while nothing is connected, as <c>--stuff</c>. The
@@ -158,8 +162,34 @@ public static class LayoutCheck
     {
         if (Requested())
         {
-            _ = ReportAfterLayout(host, screen.Parts);
+            _ = ResizeSequenceRequested() ? ReportResizeSequence(host, screen) : ReportAfterLayout(host, screen.Parts);
         }
+    }
+
+    /// <summary>Seven iPhone drawable replacements exercise portrait/landscape reflow without a timer.</summary>
+    private static async System.Threading.Tasks.Task ReportResizeSequence(Node host, CreateScreen screen)
+    {
+        Vector2I[] sizes = [new(393, 852), new(852, 393), new(360, 780), new(640, 360), new(360, 640), new(852, 393), new(393, 852)];
+        List<string> wrong = [];
+        foreach (Vector2I size in sizes)
+        {
+            host.GetWindow().ContentScaleSize = size;
+            DisplayServer.WindowSetSize(size);
+            await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
+            await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
+            Vector2 visible = host.GetViewport().GetVisibleRect().Size;
+            Vector2 scale = host.GetViewport().GetCanvasTransform().Scale;
+            if (!Mathf.IsEqualApprox(scale.X, scale.Y)) wrong.Add($"{size.X}x{size.Y} X/Y scale differs ({scale.X}/{scale.Y})");
+            foreach ((string name, Control part) in screen.Parts)
+            {
+                Rect2 where = part.GetGlobalRect();
+                if (part.Visible && (where.Position.X < -1 || where.Position.Y < -1 || where.End.X > visible.X + 1 || where.End.Y > visible.Y + 1))
+                    wrong.Add($"{size.X}x{size.Y} {name} out of bounds");
+            }
+        }
+        foreach (string complaint in wrong) GD.Print($"GREYBOX_LAYOUT_BAD {complaint}");
+        GD.Print(wrong.Count == 0 ? "GREYBOX_LAYOUT_OK" : $"GREYBOX_LAYOUT_BAD {wrong.Count}건");
+        host.GetTree().Quit(wrong.Count == 0 ? 0 : 1);
     }
 
     private static async System.Threading.Tasks.Task ReportAfterLayout(
