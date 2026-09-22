@@ -21,16 +21,16 @@ public sealed class WardrobeTests
     private static string[] Names(Appearance worn) => [.. Wardrobe.Pieces(worn).Select(piece => piece.Name)];
 
     [Fact]
-    public void A_man_in_nothing_is_still_a_body_and_a_pair_of_trousers()
+    public void A_man_in_nothing_is_still_a_body()
     {
-        Assert.Equal(["mb001", "mn001"], Names(Wearing()));
+        Assert.Equal(["mb001"], Names(Wearing()));
     }
 
     [Fact]
     public void Every_piece_the_server_names_is_asked_for()
     {
         Assert.Equal(
-            ["ms006", "mb001", "mn001", "ml001", "mu061", "ma061", "mi007", "mw020", "mp020", "mh003", "me003", "mf003", "mc009"],
+            ["ms006", "mb001", "ml001", "mu061", "ma061", "mi007", "mw020", "mp020", "mh003", "me003", "mf003", "mc009"],
             Names(Wearing(
                 head: 3, body: 16 + 2, armor: 61, boots: 1, shield: 6, overCoat: 7, weapon: 20,
                 accessory: 9)));
@@ -46,7 +46,7 @@ public sealed class WardrobeTests
     public void Facing_us_the_weapon_is_drawn_first_and_the_body_covers_the_hand()
     {
         Assert.Equal(
-            ["mw020", "mf003", "mb001", "mn001", "ml001", "mh003", "mu061", "ma061", "me003", "mp020", "ms006", "mc009"],
+            ["mw020", "mf003", "mb001", "ml001", "mh003", "mu061", "ma061", "me003", "mp020", "ms006", "mc009"],
             Stacked(Side.Front));
     }
 
@@ -54,7 +54,7 @@ public sealed class WardrobeTests
     public void From_behind_the_shield_is_first_and_the_weapon_goes_under_the_arms_and_head()
     {
         Assert.Equal(
-            ["ms006", "mb001", "mn001", "ml001", "mu061", "mf003", "mw020", "ma061", "mh003", "me003", "mp020", "mc009"],
+            ["ms006", "mb001", "ml001", "mu061", "mf003", "mw020", "ma061", "mh003", "me003", "mp020", "mc009"],
             Stacked(Side.Back));
     }
 
@@ -97,29 +97,25 @@ public sealed class WardrobeTests
     }
 
     /// <summary>
-    /// Only men are drawn with trousers, and always the same pair. The number in the bottom half of the
-    /// body byte says what colour to dye them, which is not a drawing.
+    /// Nobody is drawn with trousers. The reference client gives men mn001 dyed by the bottom half of the
+    /// body byte, but that hides the body's own underwear, so we leave the piece out for both genders.
     /// </summary>
     [Fact]
-    public void Trousers_are_one_drawing_for_men_and_none_for_women()
+    public void Nobody_is_drawn_with_trousers()
     {
-        Assert.Equal(["mb001", "mn001"], Names(Wearing(body: 16 + 5)));
+        Assert.Equal(["mb001"], Names(Wearing(body: 16 + 5)));
         Assert.Equal(["wb001"], Names(Wearing(body: 32 + 5)));
     }
 
-    /// <summary>
-    /// Only three pieces are dyed, and the trousers take their colour from the bottom half of the body
-    /// byte rather than from a colour of their own.
-    /// </summary>
+    /// <summary>Now that the trousers are gone, only the head and the boots are dyed.</summary>
     [Fact]
-    public void The_head_the_boots_and_the_trousers_carry_a_colour()
+    public void The_head_and_the_boots_carry_a_colour()
     {
         IReadOnlyList<Piece> pieces = Wardrobe.Pieces(
             Wearing(head: 3, body: 16 + 5, boots: 1, shield: 6, hairColour: 11, bootColour: 4));
 
         Assert.Equal(11, pieces.Single(piece => piece.Name == "mh003").Colour);
         Assert.Equal(4, pieces.Single(piece => piece.Name == "ml001").Colour);
-        Assert.Equal(5, pieces.Single(piece => piece.Name == "mn001").Colour);
         Assert.Equal(0, pieces.Single(piece => piece.Name == "ms006").Colour);
     }
 }

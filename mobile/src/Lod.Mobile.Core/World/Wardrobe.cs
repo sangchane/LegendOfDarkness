@@ -15,7 +15,6 @@ public static class Wardrobe
 {
     // The body byte holds the kind of body in its top half and the trousers' colour in its bottom half.
     private const int Kind = 0xF0;
-    private const int Trousers = 0x0F;
 
     // BodySprite on the server: 2 woman, 4 her ghost, 6 her unseen, 9 her head alone, 11 her blank.
     private static readonly int[] Women = [2, 4, 6, 9, 11];
@@ -39,14 +38,9 @@ public static class Wardrobe
         // The body is always the same drawing; which archive it comes out of is what the gender decides.
         pieces.Add(new Piece($"{gender}b001", 0));
 
-        // Trousers are always drawing 001, and only for men — the bottom half of the body byte is the
-        // colour they are dyed, not which pair they are. The reference client says so outright
-        // (map-scene.ts: setItemId(1) then setDye(79 + (bodyShape & 0x0f))), and the women's archive has
-        // no wn001 at all.
-        if (gender == 'm')
-        {
-            pieces.Add(new Piece("mn001", worn.Body & Trousers));
-        }
+        // No trousers piece. The reference client gives men drawing mn001 dyed by the bottom half of the
+        // body byte (map-scene.ts: setItemId(1) then setDye(79 + (bodyShape & 0x0f))), but that draws the
+        // purple tights over the body's own white underwear, so we leave it out and show the body as is.
 
         Add('l', worn.Boots, worn.BootColor);
         Add('u', worn.Armor);
