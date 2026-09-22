@@ -15,6 +15,13 @@ public static class Paging
     public static int Before(int page, int count, int perPage) =>
         (Kept(page, count, perPage) + Pages(count, perPage) - 1) % Pages(count, perPage);
 
+    /// <summary>
+    /// How many rows of places a page may have and still leave the whole window on the screen: as many as the room holds
+    /// once the rest of the window is laid, never more than the layout's own number, never none.
+    /// </summary>
+    public static int RowsThatFit(float room, float rest, float row, float gap, int most) =>
+        Math.Clamp((int)MathF.Floor((room - rest + gap) / (row + gap)), 1, most);
+
     /// <summary>What is on a page, in order, padded with nothing so every page has the same number of places.</summary>
     public static IReadOnlyList<T?> Page<T>(IReadOnlyList<T> all, int page, int perPage) where T : class
     {

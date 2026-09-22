@@ -63,4 +63,14 @@ public static class GearLayout
 
     /// <summary>Every place, so a panel can build its cells without knowing the numbers itself.</summary>
     public static IEnumerable<int> Slots => Places.Keys;
+
+    /// <summary>
+    /// The largest of the pressable cell sizes that stands the whole ring, all six rows, in the room with the rest of the
+    /// window; the smallest of them when none does, because a place has to be pressable before the ring has to fit.
+    /// </summary>
+    public static int CellThatFits(float room, float rest, float gap, IReadOnlyList<int> sizes) =>
+        sizes.OrderByDescending(size => size)
+            .Where(size => rest + (Rows * size) + ((Rows - 1) * gap) <= room)
+            .DefaultIfEmpty(sizes.Min())
+            .First();
 }

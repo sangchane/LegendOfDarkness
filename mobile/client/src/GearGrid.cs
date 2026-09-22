@@ -22,40 +22,7 @@ public sealed partial class GearGrid : Control
     public const int DollWidth = 120;
 
     // 원작은 칸이 붙어 있다. 가로에서는 여섯 줄에 머리말까지 넣으면 틈을 둘 높이가 없다.
-    private static readonly int Gap = Main.Portrait ? Main.Gutter / 2 : 0;
-
-    /// <summary>
-    /// The ring itself: four cells of places, the doll between them, and the four gaps in between. This is
-    /// the ring, not the panel — the panel adds its own plate margins on top (see <see cref="PanelWidth" />).
-    /// </summary>
-    public static int RingWidth => (Main.TouchMinimum * 4) + DollWidth + (Gap * 4);
-
-    /// <summary>
-    /// How wide a panel has to be to hold the ring: the ring, the plate's own margins, and the scroll bar.
-    /// A panel narrower than this cuts the outer column off the screen — which happened twice, first from
-    /// counting the gaps at the full gutter instead of the half the grid uses, then from forgetting the
-    /// bar. In landscape the six rows are taller than the panel, so the bar is always there.
-    /// </summary>
-    public static int PanelWidth => RingWidth + Plate() + ScrollBar();
-
-    private static int Plate()
-    {
-        StyleBox plate = Greybox.Plate();
-
-        return (int)(plate.ContentMarginLeft + plate.ContentMarginRight);
-    }
-
-    private static int ScrollBar()
-    {
-        VScrollBar bar = new();
-        int width = (int)bar.GetCombinedMinimumSize().X;
-
-        bar.Free();
-
-        return width;
-    }
-
-    private static readonly Vector2 Cell = new(Main.TouchMinimum, Main.TouchMinimum);
+    internal static readonly int Gap = Main.Portrait ? Main.Gutter / 2 : 0;
 
     private readonly GridContainer _ring = new() { Name = "Ring" };
 
@@ -82,6 +49,9 @@ public sealed partial class GearGrid : Control
 
     private Actor? _figure;
 
+    // 칸 한 변. 세로는 손가락 최소치 그대로, 가로는 고리 여섯 줄이 한 화면에 들도록 줄인다(PackPanel.FitRing).
+    private int _cell;
+
     public GearGrid()
     {
         Name = "Gear";
@@ -95,21 +65,48 @@ public sealed partial class GearGrid : Control
 
         AddChild(_ring);
 
-        // 종이인형은 가운데 세 줄을 한꺼번에 덮는다. GridContainer 에는 칸 합치기가 없으므로 격자 위에
-        // 따로 얹는다 — 격자 안에서 칸을 건너뛰면 그 뒤의 칸이 전부 한 자리씩 밀린다(실제로 그랬다).
-        _doll.Position = new Vector2(
-            (Main.TouchMinimum * 2) + (Gap * 2),
-            (Main.TouchMinimum * GearLayout.DollFirstRow) + (Gap * GearLayout.DollFirstRow));
-
-        _doll.Size = new Vector2(DollWidth, DollRows());
-        _stage.Size = new Vector2I(DollWidth, DollRows());
-
         _doll.AddChild(_stage);
         AddChild(_doll);
 
+        Lay(Main.TouchMinimum);
+    }
+
+    /// <summary>
+    /// Sets every cell to one size and lays the doll over the middle three rows to match. Nothing moves when the size is
+    /// the one already laid.
+    /// </summary>
+    public void Lay(int cell)
+    {
+        if (cell == _cell)
+        {
+            return;
+        }
+
+        _cell = cell;
+
+        // 가운데 열은 종이인형 폭을 지켜야 링이 원작처럼 벌어진다. 격자는 줄 순서로 차므로 몇 번째인지가 곧 열이다.
+        int index = 0;
+
+        foreach (Node node in _ring.GetChildren())
+        {
+            bool middle = index++ % GearLayout.Columns == GearLayout.DollColumn;
+            ((Control)node).CustomMinimumSize = new Vector2(middle ? DollWidth : cell, cell);
+        }
+
+        // 종이인형은 가운데 세 줄을 한꺼번에 덮는다. GridContainer 에는 칸 합치기가 없으므로 격자 위에
+        // 따로 얹는다 — 격자 안에서 칸을 건너뛰면 그 뒤의 칸이 전부 한 자리씩 밀린다(실제로 그랬다).
+        _doll.Position = new Vector2((cell * 2) + (Gap * 2), (cell + Gap) * GearLayout.DollFirstRow);
+        _doll.Size = new Vector2(DollWidth, DollRows());
+        _stage.Size = new Vector2I(DollWidth, DollRows());
+
+        if (_figure is not null)
+        {
+            _figure.Position = FigureAt();
+        }
+
         CustomMinimumSize = new Vector2(
-            RingWidth,
-            (Main.TouchMinimum * GearLayout.Rows) + (Gap * (GearLayout.Rows - 1)));
+            (cell * 4) + DollWidth + (Gap * 4),
+            (cell * GearLayout.Rows) + (Gap * (GearLayout.Rows - 1)));
     }
 
     /// <summary>Somebody asked about one of the places. The number is the server's own.</summary>
@@ -140,8 +137,7 @@ public sealed partial class GearGrid : Control
         _figure = new Actor("PaperDoll", WorldView.Dress(who));
         _stage.AddChild(_figure);
 
-        // 발이 무대 아래쪽에 닿게. 칸 높이가 원작 종이인형보다 커서 남는 만큼만 내린다.
-        _figure.Position = new Vector2(DollWidth / 2f, DollRows() - Main.Gutter);
+        _figure.Position = FigureAt();
         _figure.Face(Direction.South);
         _figure.Rest();
     }
@@ -193,12 +189,15 @@ public sealed partial class GearGrid : Control
     /// <summary>The drawing the original shows while a place is empty.</summary>
     private static Texture2D? Empty(int slot) => GearSlotArt.For(GearLayout.Of(slot).Drawing);
 
-    private static int DollRows()
+    private int DollRows()
     {
         int rows = (GearLayout.DollLastRow - GearLayout.DollFirstRow) + 1;
 
-        return (Main.TouchMinimum * rows) + (Gap * (rows - 1));
+        return (_cell * rows) + (Gap * (rows - 1));
     }
+
+    // 발이 무대 아래쪽에 닿게. 칸 높이가 원작 종이인형보다 커서 남는 만큼만 내린다.
+    private Vector2 FigureAt() => new(DollWidth / 2f, DollRows() - Main.Gutter);
 
     private void Build()
     {
@@ -215,21 +214,16 @@ public sealed partial class GearGrid : Control
         {
             for (int column = 0; column < GearLayout.Columns; column++)
             {
-                bool middle = column == GearLayout.DollColumn;
-
-                _ring.AddChild(byCell.TryGetValue((column, row), out int slot)
-                    ? MakeCell(slot, middle)
-                    : Blank(middle));
+                _ring.AddChild(byCell.TryGetValue((column, row), out int slot) ? MakeCell(slot) : new Control());
             }
         }
     }
 
-    private Button MakeCell(int slot, bool middle)
+    private Button MakeCell(int slot)
     {
         Button cell = new()
         {
             Name = $"Slot{slot}",
-            CustomMinimumSize = middle ? new Vector2(DollWidth, Main.TouchMinimum) : Cell,
             ExpandIcon = true
         };
 
@@ -246,10 +240,6 @@ public sealed partial class GearGrid : Control
 
         return cell;
     }
-
-    // 가운데 열은 종이인형 폭을 지켜야 링이 원작처럼 벌어진다.
-    private static Control Blank(bool middle) =>
-        new() { CustomMinimumSize = middle ? new Vector2(DollWidth, Main.TouchMinimum) : Cell };
 }
 
 /// <summary>

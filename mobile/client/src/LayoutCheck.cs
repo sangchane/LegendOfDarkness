@@ -256,16 +256,73 @@ public static class LayoutCheck
 
         wrong.AddRange(Overlaps(screen.Parts));
 
+        if (gear)
+        {
+            wrong.AddRange(GearCellsCut(screen, screenSize));
+        }
+
         return [.. wrong.ConvertAll(complaint => $"[{tab}] {complaint}")];
     }
 
     /// <summary>
-    /// The bars must not sit on top of each other. Two are left out: the world, because in landscape
-    /// everything is meant to float over it, and the pack, because it is a modal that runs from under the
-    /// top row to the bottom edge on purpose and nothing under it can be pressed while it is open
-    /// (docs/mobile-test-v1-wireframes.md 8절). Only a bar hiding another bar is a fault.
+    /// Every worn place has to be in full sight on the gear tab at once — inside the window, on the screen, and not cut
+    /// by anything that clips it. A ring that has to be scrolled to find the armour is one nobody uses (사용자, 2026-09-23:
+    /// 가로에서 장비창을 스크롤로 내리게 하는건 불편해서 못 쓴다).
     /// </summary>
-    private static readonly string[] MeantToCover = ["월드", "인벤토리"];
+    private static IEnumerable<string> GearCellsCut(Control screen, Vector2 screenSize)
+    {
+        // 창이 닫혀 있으면 볼 것이 없다.
+        if (screen.FindChild("Ring", true, false) is not Control { } ring || !ring.IsVisibleInTree())
+        {
+            yield break;
+        }
+
+        Rect2 whole = new(Vector2.Zero, screenSize);
+        int cut = 0;
+
+        foreach (Node node in ring.GetChildren())
+        {
+            if (node is not Button cell)
+            {
+                continue;
+            }
+
+            Rect2 where = cell.GetGlobalRect();
+            bool seen = whole.Encloses(where);
+
+            for (Node? up = cell.GetParent(); seen && up is not null && up != screen; up = up.GetParent())
+            {
+                if (up is Control { ClipContents: true } or PackPanel)
+                {
+                    seen = ((Control)up).GetGlobalRect().Encloses(where);
+                }
+            }
+
+            cut += seen ? 0 : 1;
+        }
+
+        if (cut > 0)
+        {
+            yield return $"장비 칸 {cut}개가 창 안에 다 보이지 않습니다";
+        }
+    }
+
+    /// <summary>
+    /// The bars must not sit on top of each other. The world is left out, because in landscape everything is meant to
+    /// float over it. The pack may cover the control row, because it is a modal that runs down to the bottom edge on
+    /// purpose and nothing under it can be pressed while it is open (docs/mobile-test-v1-wireframes.md 8절). Upright it
+    /// must leave the top row in sight; on its side it takes nearly the whole height, top row included, so the whole
+    /// gear ring stands on one screen. Only a bar hiding another bar is a fault.
+    /// </summary>
+    /// <remarks>
+    /// 전에는 소지품 창을 겹침 검사에서 통째로 뺐다. 그래서 세로 위 줄이 두 줄(120)이 된 뒤 장비 탭이 인벤토리·지도·
+    /// 로그아웃 단추를 덮어도 검사가 조용했다(2026-09-23).
+    /// </remarks>
+    private static readonly string[] MeantToCover = ["월드"];
+
+    private static bool MeantToLieOver(string one, string other) =>
+        (one, other) is ("인벤토리", "조작 줄") or ("조작 줄", "인벤토리")
+        || (!Main.Portrait && (one, other) is ("인벤토리", "위 줄") or ("위 줄", "인벤토리"));
 
     private static IEnumerable<string> Overlaps(IReadOnlyList<(string Name, Control Part)> parts)
     {
@@ -278,6 +335,7 @@ public static class LayoutCheck
 
                 if (System.Array.IndexOf(MeantToCover, oneName) >= 0
                     || System.Array.IndexOf(MeantToCover, otherName) >= 0
+                    || MeantToLieOver(oneName, otherName)
                     || !one.Visible
                     || !other.Visible)
                 {

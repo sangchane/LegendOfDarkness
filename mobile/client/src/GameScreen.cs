@@ -88,6 +88,11 @@ public partial class GameScreen : Control
 
     // 리허설로 한 번만 입어 본다.
     private bool _worn;
+
+    // --gear-after: 소지품을 연 뒤(--wear 면 입기를 누른 뒤) 얼마나 지났나, 그리고 장비 탭으로 넘겼나.
+    private const double GearAfterSeconds = 3;
+    private double _wornFor;
+    private bool _gearShown;
     private Control _topRow = null!;
     private Control _controlRow = null!;
 
@@ -197,12 +202,6 @@ public partial class GameScreen : Control
 
         hud.AddChild(over);
 
-        // 가로는 오른쪽 기둥, 세로는 전폭. 위 줄만 남겨 두어 이름과 체력은 계속 보인다.
-        // 기둥은 3분의 1 남짓이면 충분했지만 장비 탭의 고리는 그보다 넓다 — 좁은 화면에서는 고리가
-        // 들어갈 만큼 떼어 준다. 16:9 에서는 그게 화면의 절반 남짓이다(시안 8.1절).
-        float across = GetViewportRect().Size.X;
-        float column = across > 0 ? 1f - (GearGrid.PanelWidth / across) : 0.6f;
-
         // 창은 아래에 붙는다. 대화 창과 장비 고리는 남는 높이를 다 쓰고, 소지품 한 장은 제 높이만큼만 올라와
         // 위쪽 맵을 남긴다(PackPanel.ShowTab 이 정한다).
         _talk.SizeFlagsVertical = SizeFlags.ExpandFill;
@@ -213,11 +212,14 @@ public partial class GameScreen : Control
         // 대화 창은 제 높이만큼만 아래에 붙는다 — 소지품 한 장과 같다. 긴 이야기는 창 안에서 굴린다.
         _chat.SizeFlagsVertical = SizeFlags.ShrinkEnd;
 
+        List<VBoxContainer> holders = [];
+
         foreach (Control panel in new Control[] { _pack, _talk, _chat, _field })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
             holder.AddChild(panel);
+            holders.Add(holder);
 
             if (panel == _chat)
             {
@@ -225,11 +227,46 @@ public partial class GameScreen : Control
             }
 
             holder.SetAnchorsPreset(LayoutPreset.FullRect);
-            holder.AnchorLeft = Main.Portrait ? 0 : Mathf.Min(0.6f, column);
             holder.OffsetLeft = 0;
             holder.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
             holder.OffsetRight = 0;
             holder.OffsetBottom = 0;
+
+            // 가로 소지품·장비 창은 화면 높이를 거의 다 쓴다 — 위 줄 아래에서 시작하면 장비 고리 여섯 줄이 한 화면에 안
+            // 들어 굴려야 했고, 사용자가 그건 못 쓴다고 했다(2026-09-23). 열려 있는 동안 오른쪽 위 줄을 덮고, 닫기는 창 안에 있다.
+            if (panel == _pack && !Main.Portrait)
+            {
+                holder.OffsetTop = 0;
+                continue;
+            }
+
+            // 창은 위 줄이 실제로 끝나는 곳 아래에서 시작한다. 세로 위 줄은 단추 줄이 붙어 두 줄(120)이라, 가로 위 줄
+            // 높이로 박아 둔 자리(72)에서 시작하면 장비 탭이 인벤토리·지도·로그아웃을 덮었다.
+            _topRow.Resized += () => holder.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter;
+        }
+
+        PlaceColumn(holders);
+
+        // 창의 최소 폭은 글자를 잰 뒤에야 맞는다. 처음 잰 값이 모자랐다(314 — 창은 438) — 바뀔 때마다 다시 세운다.
+        _pack.MinimumSizeChanged += () => PlaceColumn(holders);
+    }
+
+    /// <summary>
+    /// Stands the windows in landscape in a column against the right edge, full width upright. The column is a bit over
+    /// a third of the width, more where the pack window needs more — on a 16:9 screen it is about half. The window's
+    /// width is its own minimum; the share is of the width inside the safe margins, not of the screen — counted from the
+    /// screen, the gear window came up 9 short and ran past the right edge of a 640 screen.
+    /// </summary>
+    private void PlaceColumn(IReadOnlyList<VBoxContainer> holders)
+    {
+        float across = GetViewportRect().Size.X;
+        float column = across > 0
+            ? SideColumn.LeftAnchor(across, Main.SafeInsets.Left, Main.SafeInsets.Right, _pack.GetCombinedMinimumSize().X, 0.6f)
+            : 0.6f;
+
+        foreach (VBoxContainer holder in holders)
+        {
+            holder.AnchorLeft = Main.Portrait ? 0 : column;
         }
     }
 
@@ -496,6 +533,14 @@ public partial class GameScreen : Control
                 {
                     Carrying(false);
                 }
+            }
+
+            // 손 없이 확인할 때만(--gear-after). 소지품 탭을 보인 뒤 — --wear 면 입기를 누르고 서버가 답할 틈을 둔 뒤 —
+            // 장비 탭으로 넘겨, 소지품에서 빠진 것이 장비 칸에 앉은 것까지 한 번에 찍는다.
+            if (Main.GearAfter && (_worn || !Main.Wearing) && !_gearShown && (_wornFor += delta) >= GearAfterSeconds)
+            {
+                _gearShown = true;
+                ShowGearTab(true);
             }
         }
     }

@@ -134,4 +134,40 @@ public sealed class GearLayoutTests
         Assert.Throws<KeyNotFoundException>(() => GearLayout.Of(0));
         Assert.Throws<KeyNotFoundException>(() => GearLayout.Of(19));
     }
+
+    // 가로 장비 창은 화면 높이를 거의 다 쓴다(위 여백 8 · 아래 여백 8). 고리 말고 창이 쓰는 높이는 틀 10 + 돌 제목줄 32 +
+    // 틈 8 = 50 — 탭과 입기 줄은 고리 옆 기둥에 있다. 칸은 44 를 먼저 노리고, 안 되면 40, 36 까지(사용자·조정자, 2026-09-23).
+    private static readonly int[] Pressable = [44, 40, 36];
+    private const float WindowRest = 50;
+
+    [Fact]
+    public void On_its_side_the_whole_ring_stands_on_one_screen_in_44_cells()
+    {
+        int cell = GearLayout.CellThatFits(room: 360 - 8 - 8, WindowRest, gap: 0, Pressable);
+
+        Assert.Equal(44, cell);
+        Assert.True(WindowRest + (GearLayout.Rows * cell) <= 344);
+    }
+
+    /// <summary>An iPhone on its side keeps 21 at the bottom for the home bar, on top of the gutter.</summary>
+    [Fact]
+    public void An_iphone_on_its_side_takes_44_cells_too()
+    {
+        Assert.Equal(44, GearLayout.CellThatFits(room: 393 - 8 - 29, WindowRest, gap: 0, Pressable));
+    }
+
+    [Theory]
+    [InlineData(300, 40)]
+    [InlineData(270, 36)]
+    public void A_lower_screen_steps_the_cells_down_one_size_at_a_time(float room, int cell)
+    {
+        Assert.Equal(cell, GearLayout.CellThatFits(room, WindowRest, gap: 0, Pressable));
+    }
+
+    /// <summary>A finger has to be able to press a place before the ring has to fit, so nothing goes below 36.</summary>
+    [Fact]
+    public void Nothing_goes_below_the_smallest_pressable_cell()
+    {
+        Assert.Equal(36, GearLayout.CellThatFits(room: 200, WindowRest, gap: 0, Pressable));
+    }
 }

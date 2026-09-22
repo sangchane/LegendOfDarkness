@@ -168,6 +168,13 @@ public partial class Main : Control
     public static bool Wearing { get; private set; }
 
     /// <summary>
+    /// Whether to turn to the gear tab a little after the pack opens — after <c>--wear</c> has pressed 입기, when given —
+    /// as <c>--gear-after</c>, so one run shows the pack tab and then the gear tab, or the thing leaving the pack and then
+    /// sitting in its worn place.
+    /// </summary>
+    public static bool GearAfter { get; private set; }
+
+    /// <summary>
     /// Whether to throw the first carried thing on the floor instead, as <c>--throw</c>. Together with
     /// <c>--lift</c> in a second run that closes the loop with no hand on it: down, then back up.
     /// </summary>
@@ -219,6 +226,7 @@ public partial class Main : Control
         }
         Lifting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--lift") >= 0;
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
+        GearAfter = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear-after") >= 0;
         ReadAutoLoot();
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 

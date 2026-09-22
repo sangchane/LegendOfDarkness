@@ -26,9 +26,14 @@ public sealed partial class PackPanel : PanelContainer
     // 원작은 33x36 칸이었다. 손가락은 그보다 커서 시안의 최소 터치 크기를 쓴다.
     private static readonly Vector2 Cell = new(Main.TouchMinimum, Main.TouchMinimum);
 
-    // 한 장에 6열. 세로는 네 줄, 가로는 높이가 없어 두 줄이다(머리·장 넘김·꼬리까지 280 안에 든다).
+    // 한 장에 6열, 네 줄까지. 창이 받은 높이에 들어가는 만큼만 둔다(FitRows) — 돌 제목줄이 붙은 뒤로 가로 360 에서
+    // 두 줄이면 입기 줄이 화면 밑으로 빠졌다. 가로 창이 화면 높이를 다 쓰게 된 뒤로는 가로에도 네 줄이 든다.
     private const int Columns = 6;
-    private static readonly int PerPage = Columns * (Main.Portrait ? 4 : 2);
+    private const int MostRows = 4;
+    private int _perPage = Columns * MostRows;
+
+    // 가로 장비 고리의 칸. 44 를 먼저 노리고, 안 되면 40, 36 까지 — 그 아래는 손가락이 못 누른다(사용자·조정자, 2026-09-23).
+    private static readonly int[] PressableCells = [44, 40, 36];
 
     /// <summary>How far a finger has to travel across the pictures before it counts as turning the page.</summary>
     private const float SwipeDistance = Main.TouchMinimum;
@@ -50,12 +55,15 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right };
     private readonly Button _use = new() { Text = "입기" };
     private readonly Button _drop = new() { Text = "버리기" };
-    private readonly ScrollContainer _scroll = new()
+
+    // 탭의 내용(장비 고리 또는 소지품 한 장과 장 넘김), 그리고 그것이 선 줄. 가로에서는 그 줄에 탭·입기 기둥이 옆에 선다.
+    private readonly VBoxContainer _content = new()
     {
-        SizeFlagsVertical = SizeFlags.ExpandFill,
         SizeFlagsHorizontal = SizeFlags.ExpandFill,
-        HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
+        SizeFlagsVertical = SizeFlags.ExpandFill
     };
+
+    private readonly HBoxContainer _main = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
     private readonly HBoxContainer _pager = new();
     private readonly Label _pageNumber = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
 
@@ -84,8 +92,11 @@ public sealed partial class PackPanel : PanelContainer
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter);
 
-        HBoxContainer head = new();
+        // 세로는 탭·줍기·정렬·닫기가 한 줄로 창 위에, 가로는 두 칸씩 고리 옆 기둥에 선다.
+        Container head = Main.Portrait ? new HBoxContainer() : new GridContainer { Columns = 2 };
         head.AddThemeConstantOverride("separation", Main.Gutter);
+        head.AddThemeConstantOverride("h_separation", Main.Gutter);
+        head.AddThemeConstantOverride("v_separation", Main.Gutter / 2);
 
         _gearTab.CustomMinimumSize = Cell;
         _packTab.CustomMinimumSize = Cell;
@@ -100,7 +111,11 @@ public sealed partial class PackPanel : PanelContainer
 
         head.AddChild(_gearTab);
         head.AddChild(_packTab);
-        head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+
+        if (Main.Portrait)
+        {
+            head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
+        }
 
         // 밟은 것을 알아서 주울지. 원작에는 없던 것이라 끌 수 있어야 한다(사용자, 2026-09-19).
         _loot = new Button { CustomMinimumSize = Cell, ToggleMode = true, ButtonPressed = Main.AutoLoot };
@@ -132,9 +147,9 @@ public sealed partial class PackPanel : PanelContainer
             _showing = null;
         };
 
-        // 장비 고리는 장으로 나눌 수 없다. 가로에서는 여섯 줄이 패널보다 높아 스크롤로 둔다 — 넘치면 제목과
-        // 닫기 버튼이 밀려난다(한 번 그렇게 됐다).
-        _scroll.AddChild(_gear);
+        // 장비 고리는 장으로 나눌 수도, 굴릴 수도 없다 — 가로에서 굴려 내리게 했더니 불편해서 못 쓴다고 했다(사용자,
+        // 2026-09-23). 가로는 칸을 줄여(FitRing) 여섯 줄을 한 화면에 세운다.
+        _gear.SizeFlagsVertical = SizeFlags.ExpandFill;
 
         Button back = new() { Text = "◀", CustomMinimumSize = Cell };
         Button forward = new() { Text = "▶", CustomMinimumSize = Cell };
@@ -178,11 +193,21 @@ public sealed partial class PackPanel : PanelContainer
             }
         };
 
-        HBoxContainer foot = new();
+        // 입기 단추가 뜨기 전에도 그 높이를 잡아 둔다. 안 그러면 고르는 순간 창이 28 자라 화면 밑으로 빠진다.
+        // 세로는 이름 옆에 단추, 가로는 좁은 기둥이라 이름 아래에 단추.
+        HBoxContainer buttons = new() { CustomMinimumSize = new Vector2(0, Cell.Y) };
+        buttons.AddThemeConstantOverride("separation", Main.Gutter);
+        BoxContainer foot = Main.Portrait ? buttons : new VBoxContainer();
         foot.AddThemeConstantOverride("separation", Main.Gutter);
         foot.AddChild(_chosenName);
-        foot.AddChild(_use);
-        foot.AddChild(_drop);
+
+        if (!Main.Portrait)
+        {
+            foot.AddChild(buttons);
+        }
+
+        buttons.AddChild(_use);
+        buttons.AddChild(_drop);
 
         // 돌 제목줄 — 어느 창인지와 지금 가진 금화를 늘 같은 자리에서 본다. 어두운 돌 위라 글자는 밝은 쪽이다.
         HBoxContainer naming = new();
@@ -196,18 +221,48 @@ public sealed partial class PackPanel : PanelContainer
         _gold.AddThemeColorOverride("font_color", Greybox.Title);
         naming.AddChild(_gold);
 
-        body.AddChild(Greybox.Header(naming));
-        body.AddChild(head);
-        body.AddChild(_scroll);
-        body.AddChild(_rows);
-
         // 원작도 금화를 소지품 창에 적었다. 상점에서 사기 전에 볼 곳이 여기다. 머리 줄에 두면 세로 360 에서
         // 탭·정렬·닫기와 함께 넘친다(한 번 그렇게 됐다) — 장 넘김과 한 줄.
         HBoxContainer turning = new();
         turning.AddChild(_pager);
 
-        body.AddChild(turning);
-        body.AddChild(foot);
+        _content.AddThemeConstantOverride("separation", Main.Gutter);
+        _content.AddChild(_gear);
+        _content.AddChild(_rows);
+        _content.AddChild(turning);
+
+        _main.AddThemeConstantOverride("separation", Main.Gutter);
+        _main.AddChild(_content);
+
+        body.AddChild(Greybox.Header(naming));
+
+        if (Main.Portrait)
+        {
+            body.AddChild(head);
+            body.AddChild(_main);
+            body.AddChild(foot);
+        }
+        else
+        {
+            // 가로 기둥: 위에 탭, 아래에 고른 것과 입기 — 고리가 창 높이를 다 쓰도록 머리 줄과 꼬리 줄을 옆으로 뺐다.
+            VBoxContainer side = new();
+            side.AddThemeConstantOverride("separation", Main.Gutter);
+            side.AddChild(head);
+            side.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
+            side.AddChild(foot);
+
+            foreach (Control button in new Control[] { _gearTab, _packTab, _loot, Tidy, Close, _use, _drop })
+            {
+                button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            }
+
+            _main.AddChild(side);
+            body.AddChild(_main);
+
+            // 두 탭이 같은 폭을 쓰게 — 소지품 한 장(308)과 줄인 고리가 다르면 탭을 바꿀 때마다 창이 옆으로 움직인다.
+            // 온 크기 고리(312)를 잡아 두면 둘 다 들어간다.
+            _content.CustomMinimumSize = new Vector2(_gear.CustomMinimumSize.X, 0);
+        }
 
         PanelContainer inside = new();
         inside.AddThemeStyleboxOverride("panel", Greybox.Sheet());
@@ -226,7 +281,7 @@ public sealed partial class PackPanel : PanelContainer
     {
         _onGear = gear;
 
-        _scroll.Visible = gear;
+        _gear.Visible = gear;
         _rows.Visible = !gear;
         _pager.Visible = !gear;
 
@@ -264,6 +319,8 @@ public sealed partial class PackPanel : PanelContainer
 
         // 종이인형은 목록과 따로 갱신한다 — 차림이 바뀌는 것과 소지품이 바뀌는 것은 같은 일이 아니다.
         _gear.ShowDoll(self);
+        FitRows();
+        FitRing();
 
         string wanted = Describe(carried, worn);
 
@@ -276,9 +333,9 @@ public sealed partial class PackPanel : PanelContainer
 
         _gear.Show(worn, _chosen);
         _carriedCount = carried.Count;
-        _page = Paging.Kept(_page, carried.Count, PerPage);
-        _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, PerPage)}";
-        Fill(_rows, Paging.Page(carried, _page, PerPage));
+        _page = Paging.Kept(_page, carried.Count, _perPage);
+        _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, _perPage)}";
+        Fill(_rows, Paging.Page(carried, _page, _perPage));
 
         ShowChosen(carried, worn);
     }
@@ -352,9 +409,56 @@ public sealed partial class PackPanel : PanelContainer
 
     private void Turn(int step)
     {
-        _page = step > 0 ? Paging.After(_page, _carriedCount, PerPage) : Paging.Before(_page, _carriedCount, PerPage);
+        _page = step > 0 ? Paging.After(_page, _carriedCount, _perPage) : Paging.Before(_page, _carriedCount, _perPage);
         _showing = null;
     }
+
+    /// <summary>
+    /// Counts again how many rows a page can hold in the room the panel is given. What is outside the row the page
+    /// stands in (the title strip, and upright the tab row and the 입기 row) and what stands under the page in it (the
+    /// page turner) are measured apart from the rows, so the count does not feed back on itself. Only the pack tab has rows.
+    /// </summary>
+    private void FitRows()
+    {
+        if (_onGear)
+        {
+            return;
+        }
+
+        float outside = GetCombinedMinimumSize().Y - _main.GetCombinedMinimumSize().Y;
+        float under = _content.GetCombinedMinimumSize().Y - _rows.GetCombinedMinimumSize().Y;
+        int rows = Paging.RowsThatFit(Room() - outside, under, Cell.Y, _rows.GetThemeConstant("v_separation"), MostRows);
+
+        if (Columns * rows != _perPage)
+        {
+            _perPage = Columns * rows;
+            _showing = null;
+        }
+    }
+
+    /// <summary>
+    /// On its side, sizes the ring's cells so all six rows stand in the window at once (GearLayout.CellThatFits). Upright
+    /// the ring keeps its full-size cells — it fits there already.
+    /// </summary>
+    private void FitRing()
+    {
+        if (Main.Portrait)
+        {
+            return;
+        }
+
+        float outside = GetCombinedMinimumSize().Y - _main.GetCombinedMinimumSize().Y;
+        _gear.Lay(GearLayout.CellThatFits(Room(), outside, GearGrid.Gap, PressableCells));
+    }
+
+    /// <summary>
+    /// The height the holder's anchors give the panel — not the holder's own size, which grows with whatever it holds
+    /// and so would always say there is room.
+    /// </summary>
+    private float Room() =>
+        GetParent() is Control holder
+            ? (holder.GetParentAreaSize().Y * (holder.AnchorBottom - holder.AnchorTop)) + holder.OffsetBottom - holder.OffsetTop
+            : GetViewportRect().Size.Y;
 
     /// <summary>
     /// A swipe across the pictures turns the page. Watched before the pictures get the touch, so a finger that lands on
