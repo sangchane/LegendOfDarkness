@@ -9,7 +9,8 @@ namespace Lod.Mobile.Core.Tests.Art;
 /// </summary>
 public sealed class EffectSheetTests
 {
-    private const string Written = "# 번호 칸수 순서 — scripts/build-client-effects.py\n203 2 0 1 1\n102 12\n7 4 0 0 1 1 2 2 3\n";
+    private const string Written = "# 번호 칸수 바탕가로 바탕세로 기준x 기준y 순서\n"
+                                 + "203 2 111 85 55 70 0 1 1\n102 12 111 85 55 70\n7 4 68 75 34 62 0 0 1 1 2 2 3\n";
 
     [Fact]
     public void An_effect_plays_in_the_order_its_row_gives()
@@ -32,9 +33,26 @@ public sealed class EffectSheetTests
     [Fact]
     public void A_drawing_the_order_names_past_the_sheet_is_held_inside_it()
     {
-        EffectSheet sheet = new(2, [0, 5]);
+        EffectSheet sheet = new(2, 111, 85, 55, 70, [0, 5]);
 
         Assert.Equal(1, sheet.FrameAt(1));
+    }
+
+    [Fact]
+    public void An_effect_carries_the_canvas_and_the_point_that_lands_on_the_target()
+    {
+        // 일음지. The sparkle is small and high on the canvas; anchored at the feet it plays above the head,
+        // which is what the original does and what cutting the drawing out on its own destroyed.
+        EffectSheet sheet = EffectSheet.Read(Written)[203];
+
+        Assert.Equal((111, 85), (sheet.Wide, sheet.Tall));
+        Assert.Equal((55, 70), (sheet.AnchorX, sheet.AnchorY));
+    }
+
+    [Fact]
+    public void A_row_without_a_canvas_is_passed_over_rather_than_placed_by_guess()
+    {
+        Assert.Empty(EffectSheet.Read("203 2 0 1 1\n"));
     }
 
     [Fact]

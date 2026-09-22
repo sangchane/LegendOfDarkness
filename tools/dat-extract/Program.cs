@@ -35,6 +35,7 @@ internal static class Program
             Console.Error.WriteLine("        dat-extract sprite <ia.dat> <항목이름> <출력.png> [가로폭] [머리말바이트]");
             Console.Error.WriteLine("        dat-extract list <아카이브.dat> [이름조각]");
             Console.Error.WriteLine("        dat-extract epf <khan.dat> <이름조각> <출력.png> [칸수] [배율] [팔레트.dat]");
+            Console.Error.WriteLine("        dat-extract efct <roh.dat> <efct042> <출력.png> [배율] [색표.pal]");
             Console.Error.WriteLine("        dat-extract mpf <hades.dat> <이름들> <출력.png> [배율] [투명|transparent]");
             Console.Error.WriteLine("        dat-extract pose <khan.dat> <겹칠이름들> <출력.png> [프레임들] [배율] [칸] [색번호|marker] [색표]");
             Console.Error.WriteLine("        dat-extract icon <Legend.dat> <번호들> <출력.png> [배율]");
@@ -91,6 +92,7 @@ internal static class Program
             "mpf" => await RenderMpf(entries, args),
             "pose" => await RenderPose(entries, args),
             "icon" => await RenderIcon(entries, args),
+            "efct" => await RenderEfct(entries, args),
             "efa" => await RenderEfa(entries, args),
             _ => Unknown(command)
         };
@@ -624,6 +626,128 @@ internal static class Program
     }
 
     /// <summary>
+    /// Draws one effect the way the original client places it: every frame on the file's own canvas at the
+    /// <c>Left/Top</c> its table of contents gives, and beside it the anchor that lands on whoever it is cast at.
+    /// </summary>
+    /// <remarks>
+    /// The <c>epf</c> command throws both away — it packs each frame into a cell the size of the biggest one,
+    /// centred and bottom-aligned. That is right for wardrobe pieces and wrong for effects: 일음지
+    /// (<c>efct042</c>) is a 13x13 sparkle at (48,10) on a 111x85 canvas, so packed on its own it became a
+    /// 13x13 picture that the screen then stretched over the whole body. Laid on the canvas it stays a
+    /// sparkle above the head, which is where the original puts it.
+    ///
+    /// The anchor is <c>efct###.tbl</c>: two 16-bit numbers per frame, x then y. 일음지 is 55,70 on that
+    /// 111x85 canvas — the middle across, and low enough to sit at the feet. The original reads it only for
+    /// names carrying <c>Efct</c> (4.51 <c>0x44ba04</c>, docs/disassembly.md). A note in
+    /// <c>build-ability-sprites.py</c> called this file meaningless because UTF-16 renders those bytes "7F";
+    /// it is not text.
+    /// </remarks>
+    /// <remarks><c>efct &lt;archive&gt; &lt;efct042&gt; &lt;output.png&gt; [zoom] [palette.pal]</c></remarks>
+    private static async Task<int> RenderEfct(List<ArchivedItem> entries, string[] args)
+    {
+        if (args.Length < 4)
+        {
+            Console.Error.WriteLine("efct 에는 이름과 출력 파일이 필요합니다.");
+            return 2;
+        }
+
+        string bare = Path.GetFileNameWithoutExtension(args[2]);
+        string output = Path.GetFullPath(args[3]);
+        int zoom = args.Length > 4 ? int.Parse(args[4]) : 1;
+        string paletteName = args.Length > 5 ? args[5] : "eff000.pal";
+
+        ArchivedItem? item = entries.FirstOrDefault(entry =>
+            entry.Name.Equals($"{bare}.epf", StringComparison.OrdinalIgnoreCase));
+
+        if (item is null)
+        {
+            Console.Error.WriteLine($"{bare}.epf 가 없습니다.");
+            return 2;
+        }
+
+        Palette? palette = Sprites.Named(entries, paletteName) ?? Sprites.Named(entries, "eff000.pal");
+
+        if (palette is null)
+        {
+            Console.Error.WriteLine($"{paletteName} 색표를 찾지 못했습니다.");
+            return 2;
+        }
+
+        Epf.Sheet sheet = Epf.Read(item.Data);
+        List<Epf.Frame> frames = sheet.Frames;
+
+        if (frames.Count == 0)
+        {
+            Console.Error.WriteLine($"{bare}.epf 에 프레임이 없습니다.");
+            return 2;
+        }
+
+        // A file with no canvas of its own still has to be drawn on something; the frames themselves say how big.
+        int wide = sheet.Width > 0 ? sheet.Width : frames.Max(frame => frame.Left + frame.Width);
+        int tall = sheet.Height > 0 ? sheet.Height : frames.Max(frame => frame.Top + frame.Height);
+        wide = Math.Max(1, wide);
+        tall = Math.Max(1, tall);
+
+        // Without the table the middle of the floor is the honest guess, and it is what the numbers that do
+        // exist come out near: x is the canvas midpoint every time.
+        int anchorX = wide / 2, anchorY = tall;
+        ArchivedItem? table = entries.FirstOrDefault(entry =>
+            entry.Name.Equals($"{bare}.tbl", StringComparison.OrdinalIgnoreCase));
+
+        if (table is not null && table.Data.Length >= 4)
+        {
+            anchorX = BitConverter.ToInt16(table.Data, 0);
+            anchorY = BitConverter.ToInt16(table.Data, 2);
+        }
+
+        using Image<Rgba32> canvas = new(wide * frames.Count, tall);
+
+        for (int index = 0; index < frames.Count; index++)
+        {
+            Epf.Frame frame = frames[index];
+
+            for (int y = 0; y < frame.Height; y++)
+            {
+                int top = frame.Top + y;
+
+                if (top < 0 || top >= tall)
+                {
+                    continue;
+                }
+
+                for (int x = 0; x < frame.Width; x++)
+                {
+                    int left = frame.Left + x;
+                    byte code = frame.Data[(y * frame.Width) + x];
+
+                    // Index 0 is see-through, and a drawing that reaches past its canvas is clipped rather
+                    // than allowed to spill into the next frame's cell.
+                    if (code == 0 || left < 0 || left >= wide)
+                    {
+                        continue;
+                    }
+
+                    System.Drawing.Color colour = palette[code];
+                    canvas[(index * wide) + left, top] = new Rgba32(colour.R, colour.G, colour.B, 255);
+                }
+            }
+        }
+
+        if (zoom > 1)
+        {
+            canvas.Mutate(context => context.Resize(
+                canvas.Width * zoom, canvas.Height * zoom, KnownResamplers.NearestNeighbor));
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+        await canvas.SaveAsPngAsync(output);
+        Console.WriteLine(
+            $"  {item.Name}: 프레임 {frames.Count}개 · 바탕 {wide}x{tall} · 기준 {anchorX},{anchorY}");
+
+        return 0;
+    }
+
+    /// <summary>
     /// Draws an EFA effect in one row. The newer effects (efct232 and up in the Korean 5.99 client) are kept this
     /// way instead of as EPF: each frame is its own zlib stream of RGB565 pixels, and the client makes the dark
     /// parts see-through by their brightness. Read the way <c>sources/wren11/da-lib/DALib/Drawing/EfaFile.cs</c>
@@ -657,6 +781,10 @@ internal static class Program
         byte blending = reader.ReadByte();
         reader.ReadBytes(51);
 
+        // Where the effect lands on whoever it was cast at. EPF effects keep this in efct###.tbl; EFA carries
+        // it per frame, and the first frame speaks for the file.
+        int anchorX = 0, anchorY = 0;
+
         var headers = new List<(int Offset, int Compressed, int Decompressed, int ByteWidth, int ByteCount,
             int ImageWidth, int ImageHeight, int Left, int Top, int FrameWidth, int FrameHeight)>();
         for (int i = 0; i < count; i++)
@@ -671,8 +799,13 @@ internal static class Program
             reader.ReadInt32();
             int byteCount = reader.ReadInt32();
             reader.ReadInt32();
-            reader.ReadInt16(); // 가운데 x
-            reader.ReadInt16(); // 가운데 y
+            short centreX = reader.ReadInt16();
+            short centreY = reader.ReadInt16();
+            if (i == 0)
+            {
+                (anchorX, anchorY) = (centreX, centreY);
+            }
+
             reader.ReadInt32();
             int imageWidth = reader.ReadInt16();
             int imageHeight = reader.ReadInt16();
@@ -692,6 +825,12 @@ internal static class Program
 
         int cellWidth = Math.Max(1, headers.Max(frame => frame.ImageWidth));
         int cellHeight = Math.Max(1, headers.Max(frame => frame.ImageHeight));
+
+        // A file that names no centre still has to be placed; the middle of the floor is the honest guess.
+        if (anchorX == 0 && anchorY == 0)
+        {
+            (anchorX, anchorY) = (cellWidth / 2, cellHeight);
+        }
 
         // 밝기를 투명도로 — 1 이 보통, 2 는 조금 덜 비친다. 3 은 원작도 몇 개만 제대로 그린다.
         float coefficient = blending == 2 ? 1.25f : blending == 3 ? -1f : 1f;
@@ -740,6 +879,8 @@ internal static class Program
         }
 
         await canvas.SaveAsPngAsync(output);
+        Console.WriteLine(
+            $"  {item.Name}: 프레임 {count}개 · 바탕 {cellWidth}x{cellHeight} · 기준 {anchorX},{anchorY}");
         Console.WriteLine($"프레임 {count}개를 {output} 에 그렸습니다.");
         return 0;
     }

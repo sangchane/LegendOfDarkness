@@ -11,8 +11,15 @@
 
 소리는 165개 다 해도 2MB 남짓이라 전부 넣는다.
 
-캐릭터·괴물 그림과 같은 1배로 뽑는다(관리페이지는 2배). 색표는 `effpal.tbl` 이 정한다(자세한 까닭은 `build-ability-sprites.py`). 프레임 수와
-**틀 순서**는 옆 글자 파일(`effects.txt`, `번호 칸수 순서…` 줄)로 둔다 — 내보낼 때 이미 있는 `*.txt` 필터로 따라간다.
+캐릭터·괴물 그림과 같은 1배로 뽑는다(관리페이지는 2배). 색표는 `effpal.tbl` 이 정한다(자세한 까닭은 `build-ability-sprites.py`).
+
+**`efct` 명령으로 자른다 — `epf` 가 아니다.** 연출은 제 바탕 위 어느 자리에 그려져 있고, 그 자리가 곧 어디에
+터지는지다. 일음지(`efct042`)는 111x85 바탕의 (48,10) 에 놓인 13x13 반짝임이라 발밑 기준에서 48~60px 위 —
+**머리 위**다. 조각만 떼면 13x13 그림이 되고, 그것을 몸통에 맞춰 늘리면 몸 전체를 덮는다.
+기준점은 `efct###.tbl`(프레임마다 16비트 x·y) 이고 EFA(232+)는 프레임 머리말의 가운데 x·y 다.
+
+프레임 수와 **바탕·기준점·틀 순서**는 옆 글자 파일(`effects.txt`, `번호 칸수 바탕가로 바탕세로 기준x 기준y 순서…` 줄)로
+둔다 — 내보낼 때 이미 있는 `*.txt` 필터로 따라간다.
 틀 순서는 원작 2005(= 5.99 클라이언트) `roh.dat` 의 `effect.tbl` 이다 — 첫 줄이 개수, 그다음 줄마다 이펙트 번호
 차례로 칸 순서(203 = `0 1 1`). 원작 클라이언트가 이 순서로 튼다(docs/disassembly.md). 빈 칸도 번호를 차지하므로
 `dat-extract` 가 빈 칸을 자리표시로 남긴 뒤에 뽑아야 순서가 맞는다.
@@ -43,6 +50,9 @@ DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
 TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
+
+#: `efct`·`efa` 가 적어 주는 줄: 프레임 수 · 바탕 크기 · 기준점.
+CUT = re.compile(r"프레임 (\d+)개 · 바탕 (\d+)x(\d+) · 기준 (-?\d+),(-?\d+)")
 
 
 def run(*args):
@@ -126,22 +136,24 @@ def main():
         for number in wanted:
             name = f"efct{number:03d}"
             out = EFFECTS / f"{name}.png"
-            proc = run("epf", ROH, name, out, 1, 1, f"eff{palette(number):03d}.pal", "transparent", "row")
-            frames = re.search(rf"{name}\.epf: 프레임 (\d+)개", proc.stdout)
-            if not frames and KOREAN_ROH.exists():
+            proc = run("efct", ROH, name, out, 1, f"eff{palette(number):03d}.pal")
+            cut = CUT.search(proc.stdout)
+            if not cut and KOREAN_ROH.exists():
                 # 232 번부터는 한국 5.99 클라이언트에만 있고 형식도 EFA 다.
                 proc = run("efa", KOREAN_ROH, name, out, 1)
-                frames = re.search(rf"{name}\.efa: 프레임 (\d+)개", proc.stdout)
+                cut = CUT.search(proc.stdout)
                 efa.add(number)
-            if not frames or not out.exists():
+            if not cut or not out.exists():
                 missing.append(number)
                 continue
-            drawn.append((number, int(frames.group(1))))
+            drawn.append((number, *(int(g) for g in cut.groups())))
 
     (EFFECTS / "effects.txt").write_text(
-        "# 번호 칸수 순서 — scripts/build-client-effects.py (순서는 effect.tbl)\n"
+        "# 번호 칸수 바탕가로 바탕세로 기준x 기준y 순서 — scripts/build-client-effects.py (순서는 effect.tbl)\n"
         # EFA 는 자기 칸 수·간격을 파일에 갖고, effect.tbl 의 그 번호 줄은 "0" 한 칸뿐이다 — 순서를 적지 않고 차례로 튼다.
-        + "".join(f"{n} {f} {'' if n in efa else ' '.join(map(str, orders.get(n, [])))}".rstrip() + "\n" for n, f in drawn),
+        + "".join(
+            f"{n} {f} {w} {h} {x} {y} {'' if n in efa else ' '.join(map(str, orders.get(n, [])))}".rstrip() + "\n"
+            for n, f, w, h, x, y in drawn),
         encoding="utf-8")
     print(f"이펙트 {len(drawn)}개 → {EFFECTS.relative_to(ROOT)}")
     if missing:
