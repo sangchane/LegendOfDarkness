@@ -2,6 +2,7 @@
 # 서버를 켜고 끄고 살피는 한 곳. 설정을 다시 깔고, 캐릭터를 백업하고, 기록을 정리한다.
 #
 #   scripts/lod-server.sh config          설정 두 개를 틀에서 다시 만든다(빌드하면 덮어써진다)
+#   scripts/lod-server.sh check-config    두 리다이렉트 주소가 같은지 검사한다
 #   scripts/lod-server.sh start|stop|restart|status
 #   scripts/lod-server.sh logs [줄수]     기록 끝을 본다
 #   scripts/lod-server.sh backup          캐릭터를 압축해 두고 오래된 것은 지운다
@@ -43,7 +44,12 @@ config() {
         sed -e "s|{{FORK}}|$FORK|g" -e "s|{{SERVER_IP}}|$ip|g" "$ROOT/scripts/server-config/$from" > "$STAGING/$to"
     done
 
+    "$ROOT/scripts/check-server-config.sh" "$STAGING"
     echo "설정을 다시 깔았습니다 — 주소 $ip"
+}
+
+verify_config() {
+    "$ROOT/scripts/check-server-config.sh" "$STAGING"
 }
 
 pid() {
@@ -63,6 +69,7 @@ start() {
     fi
 
     [ -f "$STAGING/LoruleConfig.json" ] || config
+    verify_config
     mkdir -p "$LOGS"
 
     if supervised; then
@@ -234,10 +241,11 @@ case "${1:-status}" in
     start) start ;;
     stop) stop ;;
     restart) stop; start ;;
+    check-config) verify_config ;;
     status) status ;;
     logs) logs "${2:-40}" ;;
     backup) backup ;;
     install-agents) install_agents ;;
     remove-agents) remove_agents ;;
-    *) echo "쓸 수 있는 것: config start stop restart status logs backup install-agents remove-agents"; exit 2 ;;
+    *) echo "쓸 수 있는 것: config check-config start stop restart status logs backup install-agents remove-agents"; exit 2 ;;
 esac

@@ -1,4 +1,5 @@
 ﻿<MServerTable>
+  <!-- Keep this token identical to LoruleConfig.template.json ServerIP. -->
   <Servers>
     <MServer>
       <Addr>{{SERVER_IP}}</Addr>

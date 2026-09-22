@@ -2,6 +2,7 @@
 	// Locales
 	"Content": {
 		"Location": "{{FORK}}/database/server",
+		// Must match MServerTable.template.xml: both redirect hops use one address.
 		"ServerIP": "{{SERVER_IP}}"
 	},
 	"Editor": {

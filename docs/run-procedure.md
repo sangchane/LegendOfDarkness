@@ -35,6 +35,7 @@
 ./scripts/lod-server.sh start|stop|restart
 ./scripts/lod-server.sh logs 60         # 기록 끝 60줄
 ./scripts/lod-server.sh config          # 빌드가 덮어쓴 설정 둘을 다시 깐다
+./scripts/lod-server.sh check-config    # 로비·게임 리다이렉트 주소가 같은지 검사
 ./scripts/lod-server.sh backup          # 캐릭터 압축 + 기록 정리(자동으로도 돈다)
 ./scripts/lod-server.sh install-agents  # 맥에 등록: 꺼지면 다시 켜기 + 새벽 4시 백업
 ./scripts/lod-server.sh remove-agents   # 그 등록을 지운다
