@@ -54,16 +54,6 @@
           }
         ]
       }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/check_hades_ports.py\""
-          }
-        ]
-      }
     ]
   }
 }
