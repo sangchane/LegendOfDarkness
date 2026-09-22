@@ -89,7 +89,7 @@ public sealed partial class CreateScreen : Control
     private readonly ConcurrentQueue<string> _reported = new();
     private readonly CancellationTokenSource _closing = new();
 
-    private Task? _attempt;
+    private Task<WorldSession>? _attempt;
 
     /// <summary>취소를 눌렀을 때. Main 이 로그인 화면으로 돌려보낸다.</summary>
     public Action? Cancelled { get; set; }
@@ -106,9 +106,13 @@ public sealed partial class CreateScreen : Control
     private Button _female = null!;
     private Control _genderRow = null!;
 
+    private Control _pathRow = null!;
+    private readonly Dictionary<byte, Button> _pathTiles = new();
+
     private Control _preview = null!;
     private Control _stage = null!;
     private Actor? _previewActor = null!;
+    private int _previewHeight = PreviewHeight;
 
     private Control _hairRow = null!;
     private GridContainer _hairGrid = null!;
@@ -123,6 +127,12 @@ public sealed partial class CreateScreen : Control
     private byte _gender = 1;
     private int _hairStyle = 1;
     private int _hairColor;
+    // 1=전사 · 2=도적 · 3=마법사 · 4=성직자 · 5=무도가. A new character must deliberately pick one;
+    // Peasant (0) is never silently persisted by this screen.
+    private byte? _path;
+
+    /// <summary>Called on the main thread when creation has already completed the normal login into the world.</summary>
+    public Action<WorldSession>? Entered { get; set; }
 
     // 미리보기가 스스로 도는 방향과, 지금 방향을 얼마나 오래 보여 줬나. 머리·색·성별을 바꿔도 이 둘은
     // 그대로 둔다 — 돌던 것이 끊기지 않게(사용자, 2026-09-19).
@@ -142,7 +152,7 @@ public sealed partial class CreateScreen : Control
     public IReadOnlyList<(string Name, Control Part)> Parts =>
     [
         ("이름", _username), ("비밀번호", _password), ("비밀번호 확인", _confirm),
-        ("성별", _genderRow), ("미리보기", _preview), ("머리", _hairRow), ("색", _colorRow),
+        ("성별", _genderRow), ("직업", _pathRow), ("미리보기", _preview), ("머리", _hairRow), ("색", _colorRow),
         ("단추 줄", _buttonsRow)
     ];
 
@@ -151,24 +161,46 @@ public sealed partial class CreateScreen : Control
         _safeArea = Main.SafeAreaContainer();
         AddChild(_safeArea);
 
-        VBoxContainer rows = new();
-        rows.AddThemeConstantOverride("separation", Main.Gutter);
-        _safeArea.AddChild(rows);
-
-        rows.AddChild(BuildForm());
+        _safeArea.AddChild(BuildForm());
 
         ApplyPickedLook();
+        ApplyPickedPath();
         ApplyRehearsal();
         RefreshGender();
+        RefreshPathSelection();
         PopulateHairGrid();
         RefreshColorSelection();
         RefreshPreview();
         RefreshCreateState();
+        Main.LayoutChanged += RebuildForOrientation;
 
         if (Main.CreateNow)
         {
             BeginCreate();
         }
+    }
+
+    /// <summary>Exchange the row/column shell after rotation without losing entered credentials or look.</summary>
+    private void RebuildForOrientation()
+    {
+        if (!IsInsideTree() || !GodotObject.IsInstanceValid(_safeArea)) return;
+        string username = _username.Text, password = _password.Text, confirm = _confirm.Text, status = _status.Text;
+        foreach (Node child in _safeArea.GetChildren())
+        {
+            _safeArea.RemoveChild(child);
+            child.QueueFree();
+        }
+        _safeArea.AddChild(BuildForm());
+        _username.Text = username;
+        _password.Text = password;
+        _confirm.Text = confirm;
+        _status.Text = status;
+        RefreshGender();
+        RefreshPathSelection();
+        PopulateHairGrid();
+        RefreshColorSelection();
+        RefreshPreview();
+        RefreshCreateState();
     }
 
     /// <summary>
@@ -208,11 +240,10 @@ public sealed partial class CreateScreen : Control
     {
         PanelContainer panel = new()
         {
-            CustomMinimumSize = new Vector2(FormWidth, 0),
-            // 가로는 가운데(칸 너비가 300 으로 고정), 세로는 안전영역 전부를 받는다 — 격자 둘이 남는
-            // 세로를 나눠 가지려면 바깥 칸이 화면 높이만큼 커야 한다(CenterContainer 는 딱 필요한
-            // 만큼만 차지해 격자에 줄 것이 남지 않았다).
-            SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
+            // 세로는 원래의 300px 한 열을 그대로 쓴다. 짧은 가로 화면은 그 한 열을 억지로 줄이지
+            // 않고, 안전영역 전체를 세 칸(입력 | 미리보기 | 꾸미기)에 준다.
+            CustomMinimumSize = new Vector2(Main.Portrait ? FormWidth : 0, 0),
+            SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ShrinkCenter : SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ExpandFill
         };
         panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
@@ -222,11 +253,6 @@ public sealed partial class CreateScreen : Control
         padding.AddThemeConstantOverride("margin_top", Main.Gutter * 2);
         padding.AddThemeConstantOverride("margin_right", Main.Gutter * 2);
         padding.AddThemeConstantOverride("margin_bottom", Main.Gutter * 2);
-
-        VBoxContainer form = new();
-        // 세로 예산이 빠듯해 줄 사이는 Gutter 의 절반으로 뒀다 — 이 값 자체는 새 것이 아니다
-        // (GameScreen.cs·PackPanel.cs·FieldPanel.cs·TalkPanel.cs·GearGrid.cs 가 이미 쓰는 값).
-        form.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
         Label title = new()
         {
@@ -262,14 +288,15 @@ public sealed partial class CreateScreen : Control
         buttons.AddChild(_create);
         _buttonsRow = buttons;
 
-        form.AddChild(title);
-        form.AddChild(authRow);
-        form.AddChild(BuildPreview());
-        form.AddChild(BuildGenderRow());
-        form.AddChild(BuildHairGrid());
-        form.AddChild(BuildColorGrid());
-        form.AddChild(_status);
-        form.AddChild(buttons);
+        Control preview = BuildPreview();
+        Control gender = BuildGenderRow();
+        Control path = BuildPathRow();
+        Control hair = BuildHairGrid();
+        Control color = BuildColorGrid();
+
+        Control form = Main.Portrait
+            ? BuildPortraitForm(title, authRow, preview, gender, path, hair, color, buttons)
+            : BuildLandscapeForm(title, authRow, preview, gender, path, hair, color, buttons);
 
         padding.AddChild(form);
         panel.AddChild(padding);
@@ -281,6 +308,65 @@ public sealed partial class CreateScreen : Control
         _create.Pressed += BeginCreate;
 
         return panel;
+    }
+
+    /// <summary>기존 세로 순서. 가로 전용 변경이 긴 세로 화면의 정보 흐름을 바꾸지 않게 따로 둔다.</summary>
+    private Control BuildPortraitForm(
+        Control title, Control auth, Control preview, Control gender, Control path, Control hair, Control color, Control buttons)
+    {
+        VBoxContainer form = Column();
+        form.AddChild(title);
+        form.AddChild(auth);
+        form.AddChild(preview);
+        form.AddChild(gender);
+        form.AddChild(path);
+        form.AddChild(hair);
+        form.AddChild(color);
+        form.AddChild(_status);
+        form.AddChild(buttons);
+        return form;
+    }
+
+    /// <summary>
+    /// 짧은 가로 화면은 세로 여백 대신 폭을 쓴다. 입력·미리보기·꾸미기를 서로 다른 열에 놓아 모든
+    /// 조작이 360px 높이 안에 남고, HAIR/COLOR는 기존의 스크롤 격자와 선택 동작을 그대로 쓴다.
+    /// </summary>
+    private Control BuildLandscapeForm(
+        Control title, Control auth, Control preview, Control gender, Control path, Control hair, Control color, Control buttons)
+    {
+        HBoxContainer columns = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+        columns.AddThemeConstantOverride("separation", Main.Gutter);
+
+        VBoxContainer input = Column();
+        input.CustomMinimumSize = new Vector2(200, 0);
+        input.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        input.AddChild(title);
+        input.AddChild(auth);
+        input.AddChild(gender);
+        input.AddChild(path);
+        input.AddChild(_status);
+        input.AddChild(buttons);
+
+        preview.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+
+        VBoxContainer appearance = Column();
+        appearance.CustomMinimumSize = new Vector2(ColorGridColumns * Main.TouchMinimum + (ColorGridColumns - 1) * Main.Gutter, 0);
+        appearance.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        appearance.AddChild(hair);
+        appearance.AddChild(color);
+
+        columns.AddChild(input);
+        columns.AddChild(preview);
+        columns.AddChild(appearance);
+        return columns;
+    }
+
+    /// <summary>화면의 같은 세로 묶음이 쓰는 간격 — 기존 세로 폼의 값과 같다.</summary>
+    private static VBoxContainer Column()
+    {
+        VBoxContainer column = new();
+        column.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        return column;
     }
 
     private Control BuildGenderRow()
@@ -304,12 +390,79 @@ public sealed partial class CreateScreen : Control
     }
 
     /// <summary>
-    /// 가운데 미리보기 자리. 맨몸에 고른 머리·색만 얹는다 — 옷·모자·신발은 없다(사용자, 2026-09-19).
-    /// 실제 그림은 <see cref="RefreshPreview"/> 가 채운다.
+    /// The primary class is selected at creation, not deferred to the NPC-only legacy chooser. The row is
+    /// horizontally scrollable on a short landscape phone so every 48px touch target remains reachable.
+    /// </summary>
+    private Control BuildPathRow()
+    {
+        HBoxContainer choices = new();
+        choices.AddThemeConstantOverride("separation", Main.Gutter / 2);
+
+        foreach ((byte path, string label) in new[]
+        {
+            ((byte)1, "전사"), ((byte)2, "도적"), ((byte)3, "법사"), ((byte)4, "사제"), ((byte)5, "무도")
+        })
+        {
+            Button tile = new()
+            {
+                Text = label,
+                ToggleMode = true,
+                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+            };
+            Greybox.Tab(tile);
+            tile.Pressed += () => SelectPath(path);
+            _pathTiles[path] = tile;
+            choices.AddChild(tile);
+        }
+
+        ScrollContainer scroll = new()
+        {
+            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+            VerticalScrollMode = ScrollContainer.ScrollMode.Disabled,
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Auto
+        };
+        scroll.AddChild(choices);
+        _pathRow = scroll;
+        return scroll;
+    }
+
+    private void ApplyPickedPath()
+    {
+        if (Main.PickedPath is byte path && path is >= 1 and <= 5)
+        {
+            _path = path;
+        }
+    }
+
+    private void SelectPath(byte path)
+    {
+        _path = path;
+        RefreshPathSelection();
+        RefreshPreview();
+        RefreshCreateState();
+    }
+
+    private void RefreshPathSelection()
+    {
+        foreach ((byte path, Button tile) in _pathTiles)
+        {
+            tile.ButtonPressed = _path == path;
+        }
+    }
+
+    /// <summary>
+    /// 가운데 미리보기 자리. 고른 직업이 있으면 실제 5.99 레벨 1 직업 갑옷을 입히고, 아직 안 골랐을
+    /// 때만 맨몸이다. 실제 그림은 <see cref="RefreshPreview"/> 가 채운다.
     /// </summary>
     private Control BuildPreview()
     {
-        PanelContainer box = new() { CustomMinimumSize = new Vector2(PreviewWidth, PreviewHeight) };
+        // On the compact 360x640 portrait drawable the decorative preview yields height, never input
+        // fields or the two final actions.
+        // The five job choices add one 48px thumb row.  At 360x640 reserve that room from the
+        // decorative preview, rather than letting the first fields and the final actions fall offscreen.
+        int height = Main.Portrait && GetViewportRect().Size.Y <= 680 ? 110 : PreviewHeight;
+        _previewHeight = height;
+        PanelContainer box = new() { CustomMinimumSize = new Vector2(PreviewWidth, height) };
         box.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
         _stage = new Control { ClipContents = true };
@@ -338,7 +491,7 @@ public sealed partial class CreateScreen : Control
         {
             Position = new Vector2(
                 PreviewWidth / 2f + BodyCentreOffsetX * PreviewScale,
-                PreviewHeight / 2f + BodyCentreOffsetY * PreviewScale),
+                _previewHeight / 2f + BodyCentreOffsetY * PreviewScale),
             Scale = new Vector2(PreviewScale, PreviewScale)
         };
 
@@ -351,7 +504,7 @@ public sealed partial class CreateScreen : Control
     }
 
     /// <summary>
-    /// 맨몸 + 고른 머리만 그리는 겹 목록. 실제 게임이 쓰는 <see cref="Wardrobe.Pieces"/> 를 그대로 쓴다 —
+    /// 고른 머리와 실제 레벨 1 직업 갑옷을 그리는 겹 목록. 실제 게임이 쓰는 <see cref="Wardrobe.Pieces"/> 를 그대로 쓴다 —
     /// 갑옷·무기·신발·방패를 전부 0으로 주면 그 부위들은 스스로 빠진다(<c>Wardrobe.cs</c>). 다만 바지
     /// (part 'n')는 여기서 따로 뺀다: 몸 그림(mb001.png) 을 실제로 뽑아 보니 이미 흰/회색 팬티 차림의
     /// 맨몸이었다 — 바지는 그 위에 게임 화면(WorldView)이 항상 덧입히는 것이라 미리보기에서는 필요
@@ -362,7 +515,7 @@ public sealed partial class CreateScreen : Control
     private Actor.Sheet BareBodySheet()
     {
         Appearance appearance = new(
-            Head: _hairStyle, Body: _gender * 16, Armor: 0, Boots: 0, Shield: 0, Weapon: 0,
+            Head: _hairStyle, Body: _gender * 16, Armor: StarterArmor(), Boots: 0, Shield: 0, Weapon: 0,
             HairColor: _hairColor, BootColor: 0, HeadAccessory1: 0, Lantern: 0, HeadAccessory2: 0,
             Resting: 0, OverCoat: 0);
 
@@ -391,6 +544,17 @@ public sealed partial class CreateScreen : Control
 
         return paths.Count > 0 ? Actor.Sheet.Walk(paths, colours, [], parts) : Actor.Sheet.Walk(HeroSheet);
     }
+
+    /// <summary>5.99 level-one class armour image: warrior 2, rogue 4, wizard 6, priest 5, monk 3.</summary>
+    private int StarterArmor() => _path switch
+    {
+        1 => 2,
+        2 => 4,
+        3 => 6,
+        4 => 5,
+        5 => 3,
+        _ => 0
+    };
 
     /// <summary>HAIR 격자의 틀 — 자리는 <see cref="PopulateHairGrid"/> 가 채운다(성별이 바뀔 때 다시).</summary>
     private Control BuildHairGrid()
@@ -621,6 +785,7 @@ public sealed partial class CreateScreen : Control
             (byte)_hairStyle,
             _gender,
             (byte)_hairColor,
+            _path!.Value,
             new Progress<string>(_reported.Enqueue),
             _closing.Token);
     }
@@ -637,12 +802,18 @@ public sealed partial class CreateScreen : Control
             return;
         }
 
-        Task finished = _attempt;
+        Task<WorldSession> finished = _attempt;
         _attempt = null;
 
         if (finished.IsCompletedSuccessfully)
         {
-            _status.Text = "계정과 캐릭터를 만들었습니다. 취소를 누르면 로그인 화면으로 갑니다.";
+            // The submitted secret lives only in the current attempt/field. The screen is removed as the
+            // live world takes ownership of its session, so it is not retained for a later login.
+            _password.Text = string.Empty;
+            _confirm.Text = string.Empty;
+            _status.Text = "노비스마을에 들어왔습니다.";
+            WorldSession session = finished.Result;
+            Entered?.Invoke(session);
             return;
         }
 
@@ -684,10 +855,12 @@ public sealed partial class CreateScreen : Control
             return;
         }
 
-        bool ready = _username.Text.Length > 0 && _password.Text.Length > 0 && _password.Text == _confirm.Text;
+        bool ready = _username.Text.Length > 0 && _password.Text.Length > 0 && _password.Text == _confirm.Text && _path is not null;
 
         _create.Disabled = !ready;
-        _status.Text = ready ? "만들 준비가 됐습니다." : "이름과 비밀번호(확인 포함)를 입력하세요.";
+        _status.Text = ready
+            ? "직업과 꾸밈을 확인한 뒤 만들 수 있습니다."
+            : _path is null ? "직업을 하나 고르세요." : "이름과 비밀번호(확인 포함)를 입력하세요.";
     }
 
     /// <summary>한 바퀴 도는 차례 — 북·동·남·서(시계 방향). 두 벌만 있는 그림을 돌아가며 거울에 비추므로
@@ -727,6 +900,7 @@ public sealed partial class CreateScreen : Control
 
     public override void _ExitTree()
     {
+        Main.LayoutChanged -= RebuildForOrientation;
         _closing.Cancel();
         _closing.Dispose();
     }
