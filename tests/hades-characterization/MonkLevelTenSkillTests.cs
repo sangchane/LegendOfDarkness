@@ -243,6 +243,95 @@ public sealed class MonkLevelTenSkillTests : IDisposable
         }
     }
 
+    /// <summary>
+    /// 11개 5.99 무도가 기술 템플릿은 아직 `Type`이 없어 enum 기본값인 Assail(0)로 실린다
+    /// (`SkillTemplate.cs:30`, `Aisling.GetAssails` — `Types/Aisling.cs:537-540`). 그 결과 두 가지가
+    /// 생긴다 — 평타를 칠 때마다 진짜 평타(양의신권/Assail)와 함께 같이 나가고, 기술 단추로 쓰면
+    /// `GameServerHandlers.Format3EHandler`(`GameServerHandlers.cs:1787-1838`)가 나머지 Assail
+    /// 종류(진짜 평타 포함)를 `GlobalBaseSkillDelay`(500ms)만큼 실행 없이 잠가, 바로 뒤의 평타가
+    /// 헛손이 된다. `database/server/templates/skills/*.json`에 `"Type": 1`을 넣으면 둘 다 없어진다.
+    /// </summary>
+    [Fact]
+    public async Task The_599_monk_skills_missing_Type_no_longer_ride_or_stall_the_plain_attack()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        MakeGameMaster(server);
+        PutStationaryTargetAhead(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        MakeLevelTenMonk(server);
+        SetHealthAndMana(server, 2000); // 무영신공 하나가 마나 320을 쓴다.
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback,
+            server.LoginPort,
+            Name,
+            LoginFlow.SyntheticSecret,
+            progress: null,
+            _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.State is { Map.Id: WoodlandOneOne, Where: var where } && where == Start,
+            "우드랜드1-1 입구에 서지 못했습니다.");
+        await FindTarget(world);
+
+        int bungakSlot = await Learn(world, "붕각");
+
+        // 붕각을 기술 단추로 쓰고 곧바로(틈 없이) 평타를 친다 — 몸동작이 둘이어야 한다: 붕각 자신 하나,
+        // 그 뒤 평타(양의신권/Assail) 하나. 버그가 있으면 평타 쪽이 잠겨 하나만 온다.
+        while (world.TakeMotion(out _))
+        {
+        }
+
+        await world.UseSkillAsync(bungakSlot, _deadline.Token);
+        await world.AttackAsync(_deadline.Token);
+        await Task.Delay(500, _deadline.Token);
+
+        Assert.Equal(2, CountSelfSwings(world));
+
+        // 나머지 열 개도 배운다. 평타 한 번은 몸동작 하나여야 한다 — Type 없는 것이 하나라도 남으면
+        // 그 기술도 평타에 같이 나가 몸동작이 그만큼 늘어난다.
+        foreach (string skill in new[]
+                 {
+                     "늑대의위상", "마구때리기", "무영신공", "발경", "백보신권",
+                     "붕신선각", "소수신공", "연천단각", "파천각", "허공답보",
+                 })
+        {
+            await Learn(world, skill);
+        }
+
+        while (world.TakeMotion(out _))
+        {
+        }
+
+        await world.AttackAsync(_deadline.Token);
+        await Task.Delay(500, _deadline.Token);
+
+        Assert.Equal(1, CountSelfSwings(world));
+
+        // 허공답보(MonkStrike.Step)는 몸동작 없이 칸만 옮긴다 — 평타에 같이 나가면 표적을 넘어 2칸
+        // 튀어 오르는 것으로 드러난다. 몸동작 셈이 못 보는 것을 자리로 잡아낸다.
+        Assert.Equal(Start, world.State?.Where);
+    }
+
+    private static int CountSelfSwings(WorldClient world)
+    {
+        int count = 0;
+        while (world.TakeMotion(out Motion? motion))
+        {
+            if (motion.Serial == world.Serial)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     private async Task<int> Learn(WorldClient world, string skill)
     {
         await world.SayAsync($"/skill \"{skill}\" 1", _deadline.Token);
