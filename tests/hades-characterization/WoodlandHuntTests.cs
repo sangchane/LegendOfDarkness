@@ -97,9 +97,14 @@ public sealed class WoodlandHuntTests : IDisposable
 
     /// <summary>
     /// Enough swings to finish the largest of the five definitions several times over — a fresh character's
-    /// Assail takes off something like twenty a blow — while still giving up inside a minute if none land.
+    /// Assail takes off something like twenty a blow — while still giving up inside a few minutes if none
+    /// land.
     /// </summary>
-    private const int MostSwings = 120;
+    /// <remarks>
+    /// 120 이었다. 금화가 셋에 하나꼴로만 떨어지게 된 뒤로(5.99 `골드 50 30`) 한 마리로는 모자라
+    /// 올렸다 — 스무 마리쯤 잡으면 빈손으로 끝날 확률이 천에 하나 아래로 내려간다.
+    /// </remarks>
+    private const int MostSwings = 240;
 
     /// <summary>
     /// Steps spent looking for something to fight. At roughly a step every 150ms this is about a minute of
@@ -163,6 +168,11 @@ public sealed class WoodlandHuntTests : IDisposable
     /// </summary>
     private long _promised;
 
+    /// <summary>
+    /// 이 존의 정의가 적어 둔 금화 가운데 가장 큰 것. 어느 놈이 죽었는지 고를 수 없으므로 위쪽만 조인다.
+    /// </summary>
+    private long _mostGold;
+
     /// <summary>How many of the zone's definitions were given something to drop.</summary>
     private int _patched;
 
@@ -196,7 +206,9 @@ public sealed class WoodlandHuntTests : IDisposable
 
         Vitals before = Mine(world);
 
-        await SwingUntil(world, enough: () => Mine(world).Experience > before.Experience);
+        // 금화까지 기다린다. 정의가 적은 확률이 30% 라(5.99 `골드 50 30`) 한 마리로는 열에 일곱이
+        // 빈손이다 — 경험치에서 멈추면 시험이 동전 던지기가 된다.
+        await SwingUntil(world, enough: () => Mine(world).Gold > before.Gold);
 
         Vitals after = Mine(world);
         long paid = after.Experience - before.Experience;
@@ -213,11 +225,20 @@ public sealed class WoodlandHuntTests : IDisposable
             paid >= _promised,
             $"이 존에서 가장 싼 정의가 경험치 {_promised} 를 약속하는데 {paid} 만 들어왔습니다.");
 
+        long coins = after.Gold - before.Gold;
+
         Assert.True(
-            after.Gold > before.Gold,
+            coins > 0,
             $"괴물을 잡아 경험치 {paid} 를 받았는데 골드가 {before.Gold} 그대로입니다 — " +
             $"LootType 32 는 Gold 한 가지이므로 이 존이 내놓는 것은 골드뿐입니다. " +
             $"서버가 마지막으로 한 말: \"{world.Said}\" ({world.SaidCount}번).");
+
+        // 한 무더기가 들어오는 순간 멈추므로 들어온 것은 정의가 적은 한 마리 몫이다. 이 존이 적는 것은
+        // 20전과 50전 — 레벨 식(Level × 500~1000)으로 되돌아가면 500 이상이 들어와 여기서 걸린다.
+        Assert.True(
+            coins <= _mostGold,
+            $"이 존이 적어 둔 가장 큰 금화가 {_mostGold} 전인데 한 마리에 {coins} 전이 들어왔습니다 — " +
+            $"정의를 안 읽고 레벨로 만든 값입니다.");
     }
 
     /// <summary>
@@ -419,7 +440,7 @@ public sealed class WoodlandHuntTests : IDisposable
     /// The least any of the zone's five definitions pays. Which of them walks into us is the spawner's
     /// business, so the claim has to hold for whichever it was.
     /// </summary>
-    private static long CheapestKillInTheZone(IsolatedHadesServer server)
+    private (long Cheapest, long MostGold) CheapestKillInTheZone(IsolatedHadesServer server)
     {
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
         JsonDocumentOptions lenient = new()
@@ -429,6 +450,7 @@ public sealed class WoodlandHuntTests : IDisposable
         };
 
         long cheapest = long.MaxValue;
+        long mostGold = 0;
 
         foreach (string path in Directory.EnumerateFiles(folder, "*.json", SearchOption.AllDirectories))
         {
@@ -445,10 +467,18 @@ public sealed class WoodlandHuntTests : IDisposable
             {
                 cheapest = exp;
             }
+
+            if ((long?)node["Gold"] is { } gold && gold > mostGold)
+            {
+                mostGold = gold;
+            }
         }
 
         Assert.NotEqual(long.MaxValue, cheapest);
-        return cheapest;
+        Assert.True(mostGold > 0,
+            "이 존의 정의에 Gold 가 없습니다 — 그러면 서버는 레벨로 금화를 만듭니다(Level × 500~1000).");
+
+        return (cheapest, mostGold);
     }
 
     /// <summary>
@@ -544,7 +574,7 @@ public sealed class WoodlandHuntTests : IDisposable
         if (carrying is null)
         {
             // 표적을 심지 않는다. 우드랜드1-1 이 스스로 채워지는지가 이 시험이 볼 것의 하나다.
-            _promised = CheapestKillInTheZone(server);
+            (_promised, _mostGold) = CheapestKillInTheZone(server);
         }
         else
         {
