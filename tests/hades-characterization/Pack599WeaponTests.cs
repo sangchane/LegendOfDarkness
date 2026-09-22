@@ -75,9 +75,11 @@ public sealed class Pack599WeaponTests : IDisposable
 
         await Until(() => world.Self is { Wearing: not null }, "처음 겉모습이 오지 않았습니다.");
 
-        // 맨손: 기본 동작 1, 속도 20.
+        // 무기 없이: 이제 새 캐릭터는 레더튜닉을 입고 시작한다(LoginServer.EquipStarterOutfit). 그 갑옷은
+        // AttackMotion·AttackSpeed 를 안 적어 둘 다 0 이라 BlowMotion 의 갑옷 가지(무기 없을 때 갑옷의 것)가
+        // 동작 1, 속도 22 를 낸다 — 정말로 아무것도 안 걸쳤을 때의 (1, 20) 이 아니다.
         Motion bare = await Blow(world);
-        Assert.Equal((1, 20), (bare.Number, bare.Speed));
+        Assert.Equal((1, 22), (bare.Number, bare.Speed));
 
         await world.SayAsync("/give \"설단검\" 1", _deadline.Token);
         InventoryItem? dagger = null;
