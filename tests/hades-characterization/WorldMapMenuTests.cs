@@ -7,8 +7,8 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 월드맵을 숨은 칸이 아니라 **말 한 마디로** 연다. 마을에서만 열리고(사냥터에서 열면 싸우다 갇힌다),
-/// 열었다가 그냥 닫을 수도 있다(사용자 결정, 2026-09-19).
+/// 월드맵을 숨은 칸이 아니라 **말 한 마디로** 연다. 사냥터(괴물이 있는 맵)에서도 열리고(사용자 결정,
+/// 2026-09-23 — 예전엔 거절했다), 열었다가 그냥 닫을 수도 있다(사용자 결정, 2026-09-19).
 /// </summary>
 [Collection(TimedCollection.Name)]
 public sealed class WorldMapMenuTests : IDisposable
@@ -25,7 +25,7 @@ public sealed class WorldMapMenuTests : IDisposable
     public void Dispose() => _deadline.Dispose();
 
     [Fact]
-    public async Task Asking_for_it_where_monsters_are_is_refused()
+    public async Task Asking_for_it_where_monsters_are_is_allowed()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NovicePlain, 25, 25));
         server.Start(TimeSpan.FromMinutes(2));
@@ -39,15 +39,16 @@ public sealed class WorldMapMenuTests : IDisposable
 
         await Waiting.Until(() => world.State is { } state && state.Map.Id == NovicePlain, "노비스평원A 에 들어가지 못했습니다.", _deadline.Token);
 
-        // 괴물이 젠될 때까지 기다린다 — 젠 관리자가 세우기 전에 물으면 마을처럼 보인다.
+        // 괴물이 젠될 때까지 기다린다 — 괴물이 실제로 서 있는 상태에서 열리는지 재는 시험이다.
         await Waiting.Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile), "노비스평원A 에 괴물이 나오지 않았습니다.", _deadline.Token);
 
         await world.OpenFieldAsync(_deadline.Token);
-        await Task.Delay(1500, _deadline.Token);
+        await Waiting.Until(() => world.Field is not null, "사냥터에서 지도 단추를 눌렀는데 월드맵이 오지 않았습니다.", _deadline.Token);
 
-        Assert.Null(world.Field);
+        await world.CloseFieldAsync(_deadline.Token);
+        await Waiting.Until(() => world.Field is null, "닫았는데 월드맵이 그대로입니다.", _deadline.Token);
 
-        // 거절당했어도 갇히면 안 된다 — 걸음이 그대로 닿는다.
+        // 닫힌 뒤 갇히면 안 된다 — 걸음이 그대로 닿는다.
         // 원작 걸음은 성공해도 자기에게는 아무 말도 오지 않는다(ServerFormat0C 는
         // Scope.NearbyAislingsExludingSelf) — 그래서 걷고 나서 RefreshAsync 로 서버에게
         // 있는 자리를 다시 물어야 world.State.Where 가 실제로 바뀐 값을 받는다.
