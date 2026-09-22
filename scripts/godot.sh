@@ -16,6 +16,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GODOT="$ROOT/.tools/godot-4.6-mono/Godot_mono.app/Contents/MacOS/Godot"
 DOTNET="$ROOT/.tools/dotnet-9.0.317"
+GODOT_DOTNET_SHIM="$ROOT/scripts/godot-dotnet"
 
 if [ ! -x "$GODOT" ]; then
     echo "모노 판 고도가 없습니다: $GODOT" >&2
@@ -28,7 +29,26 @@ if [ ! -x "$DOTNET/dotnet" ]; then
     exit 1
 fi
 
+if [ ! -x "$GODOT_DOTNET_SHIM/dotnet" ] || [ ! -x "$ROOT/mobile/client/dotnet" ]; then
+    echo "Godot용 저장소 .NET 탐색기가 빠졌습니다. 저장소의 scripts/godot-dotnet/ 와 mobile/client/dotnet 을 복원하세요." >&2
+    exit 1
+fi
+
+# Godot 4.6's editor tools themselves target net8.0 even though this project
+# targets net9.0.  Keep the host deterministic: Finder and a bare shell do not
+# inherit the repository SDK path, and then Godot displays its misleading SDK
+# installation prompt.  The checked-in SDK deliberately includes this runtime.
+if ! "$DOTNET/dotnet" --list-runtimes | grep -q '^Microsoft.NETCore.App 8\.'; then
+    echo "Godot 4.6 needs the bundled .NET 8 runtime, but it is missing from: $DOTNET" >&2
+    echo "Restore the repository .tools/dotnet-9.0.317 tool bundle; do not install a system SDK." >&2
+    exit 1
+fi
+
 export DOTNET_ROOT="$DOTNET"
-export PATH="$DOTNET:$PATH"
+# Godot 4.6's plugin falls back to its current working directory while finding
+# dotnet, where mobile/client/dotnet is the repository-local shim. The shim
+# leaves its SDK-list probe alive after output so the editor receives it.
+export PATH="$GODOT_DOTNET_SHIM:$DOTNET:$PATH"
+export DOTNET_MULTILEVEL_LOOKUP=0
 
 exec "$GODOT" --path "$ROOT/mobile/client" "$@"

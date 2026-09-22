@@ -1,0 +1,25 @@
+#!/bin/bash
+# Godot 4.6 calls BeginOutputReadLine(), then only one WaitForExit(). Its
+# `--list-sdks` handler can therefore be lost when the repository-local host
+# writes and exits immediately. Keep this one probe alive briefly *after* its
+# output is written. Every other command is delegated to the unmodified host.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+REAL_DOTNET="$ROOT/.tools/dotnet-9.0.317/dotnet"
+
+if [ ! -x "$REAL_DOTNET" ]; then
+    echo "Repository .NET host is missing: $REAL_DOTNET" >&2
+    exit 1
+fi
+
+if [ "$#" -eq 1 ] && [ "$1" = "--list-sdks" ]; then
+    "$REAL_DOTNET" --list-sdks
+    status=$?
+    # The delay must follow the output, not precede process launch: Godot's
+    # output callback otherwise still races the wrapper process exit.
+    /bin/sleep 0.2
+    exit "$status"
+fi
+
+exec "$REAL_DOTNET" "$@"

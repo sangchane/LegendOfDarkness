@@ -84,12 +84,17 @@ $dotnet = "$env:DOTNET_ROOT\dotnet.exe"
 버전을 작업공간 안에 둔다(`.tools/`, 커밋되지 않는다).
 
 ```bash
-export DOTNET_ROOT="$PWD/.tools/dotnet-9.0.317"     # 윈도우와 같은 SDK 버전
-export PATH="$DOTNET_ROOT:$PATH"
-GODOT="$PWD/.tools/godot-4.6-mono/Godot_mono.app/Contents/MacOS/Godot"   # 4.6-stable mono, 윈도우와 같음
+./scripts/godot.sh                       # 편집기
+./scripts/godot.sh --headless --import   # 처음 한 번, 그림 들여오기
+./scripts/godot.sh -- --login monk:1234  # 게임 실행
 ```
 
-처음 한 번은 그림을 들여와야 한다 — `"$GODOT" --headless --path mobile/client --import`.
+Finder에서 열 때도 `scripts/open-lod-client.command`를 더블클릭한다. `project.godot`를 시스템 Godot으로
+열면 그 앱은 작업공간의 SDK 경로를 받지 못한다. Godot 4.6의 **편집기 도구는 net8.0**, 클라이언트는
+**net9.0**이므로 이때 나오는 “.NET 8 SDK를 설치” 안내는 프로젝트의 대상 프레임워크 오류가 아니라
+실행 환경 오류다. 래퍼는 저장소의 .NET 9 SDK(포함된 .NET 8 런타임)를 명시해 둘 다 해결한다.
+
+도구 묶음이 온전한지 확인: `./scripts/check-godot-dotnet.sh`.
 
 | | 결과 |
 |---|---|
