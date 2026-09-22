@@ -193,11 +193,12 @@ public sealed class MonkLevelTenSkillTests : IDisposable
                 "구양신공 뒤 체력이 최대의 2% 로 맞춰지지 않았습니다.");
         }
 
-        // 이형환위 — 앞의 표적을 넘어 두 칸 앞에 서서 돌아선다.
+        // 이형환위 — 앞의 표적을 넘어 두 칸 앞에 서고, 그 표적을 다시 바라본다.
         await world.UseSkillAsync(await Learn(world, "이형환위"), _deadline.Token);
         await Until(
-            () => world.State?.Where == Start with { Y = Start.Y - 2 },
-            $"이형환위 뒤 {Start.X},{Start.Y - 2} 에 서지 않았습니다: {world.State?.Where}");
+            () => world.State?.Where == Start with { Y = Start.Y - 2 }
+                  && world.Self?.Facing == Direction.South,
+            $"이형환위 뒤 {Start.X},{Start.Y - 2} 에서 표적 쪽(남쪽)을 보지 않았습니다: {world.State?.Where}, {world.Self?.Facing}");
 
         // 허공답보 — 같은 건너뛰기에 한 방이 붙는다. 돌아서 있으니 표적을 다시 넘어 출발 칸으로 온다.
         {
@@ -332,6 +333,45 @@ public sealed class MonkLevelTenSkillTests : IDisposable
         return count;
     }
 
+    [Fact]
+    public async Task Yi_hyung_hwan_wi_keeps_position_and_facing_when_the_landing_tile_is_occupied()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        MakeGameMaster(server);
+        PutStationaryTargetAhead(server);
+        PutStationaryLandingBlocker(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        MakeLevelTenMonk(server);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback,
+            server.LoginPort,
+            Name,
+            LoginFlow.SyntheticSecret,
+            progress: null,
+            _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(
+            () => world.State?.Where == Start
+                  && world.Creatures.Any(creature => creature.Where == Ahead)
+                  && world.Creatures.Any(creature => creature.Where == Ahead with { Y = Ahead.Y - 1 }),
+            "이형환위의 앞 표적 또는 착지 칸 막이가 나타나지 않았습니다.");
+
+        await world.UseSkillAsync(await Learn(world, "이형환위"), _deadline.Token);
+        await Task.Delay(500, _deadline.Token);
+        await world.RefreshAsync(_deadline.Token);
+
+        await Until(
+            () => world.State?.Where == Start && world.Self?.Facing == Direction.North,
+            $"막힌 착지 칸에서 이형환위가 움직이거나 돌았습니다: {world.State?.Where}, {world.Self?.Facing}");
+    }
+
     private async Task<int> Learn(WorldClient world, string skill)
     {
         await world.SayAsync($"/skill \"{skill}\" 1", _deadline.Token);
@@ -388,6 +428,16 @@ public sealed class MonkLevelTenSkillTests : IDisposable
 
     private static void PutStationaryTargetAhead(IsolatedHadesServer server)
     {
+        PutStationaryMonster(server, "무도가기술시험표적", Ahead);
+    }
+
+    private static void PutStationaryLandingBlocker(IsolatedHadesServer server)
+    {
+        PutStationaryMonster(server, "무도가기술착지막이", Ahead with { Y = Ahead.Y - 1 });
+    }
+
+    private static void PutStationaryMonster(IsolatedHadesServer server, string name, Tile at)
+    {
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
         Regex woodland = new($"\"AreaID\"\\s*:\\s*{WoodlandOneOne}\\b");
         JsonDocumentOptions options = new()
@@ -399,14 +449,14 @@ public sealed class MonkLevelTenSkillTests : IDisposable
             .First(path => woodland.IsMatch(File.ReadAllText(path)));
         JsonNode target = JsonNode.Parse(File.ReadAllText(source), documentOptions: options)!;
 
-        target["Name"] = "무도가기술시험표적";
-        target["BaseName"] = "무도가기술시험표적";
+        target["Name"] = name;
+        target["BaseName"] = name;
         target["AreaID"] = WoodlandOneOne;
         target["SpawnMax"] = 1;
         target["SpawnType"] = 4;
         target["SpawnRate"] = 1;
-        target["DefinedX"] = Ahead.X;
-        target["DefinedY"] = Ahead.Y;
+        target["DefinedX"] = at.X;
+        target["DefinedY"] = at.Y;
         target["MaximumHP"] = 1_000_000;
         target["Ac"] = 0;
         target["MoodType"] = 1;
@@ -416,7 +466,7 @@ public sealed class MonkLevelTenSkillTests : IDisposable
         string testFolder = Path.Combine(folder, "characterization");
         Directory.CreateDirectory(testFolder);
         File.WriteAllText(
-            Path.Combine(testFolder, "monk-level-ten-target.json"),
+            Path.Combine(testFolder, $"monk-level-ten-{name}.json"),
             target.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
     }
 

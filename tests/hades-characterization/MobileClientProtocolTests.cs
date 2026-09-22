@@ -1,5 +1,7 @@
 ﻿using System.Net;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Darkages.Network;
 using Darkages.Security;
 using Lod.Mobile.Core.Net;
@@ -18,6 +20,10 @@ public sealed class MobileClientProtocolTests
 {
     private const string MobileName = "lodmobile";
     private const string OtherName = "lodfriend";
+    private const int WoodlandOneOne = 20015;
+    private static readonly Tile MonkStart = new(2, 35);
+    private static readonly Tile MonkTarget = new(2, 34);
+    private static readonly Tile MonkLanding = new(2, 33);
 
     /// <summary>
     /// A stalled exchange should fail the test rather than hold the run. One per test, not one for the
@@ -78,8 +84,14 @@ public sealed class MobileClientProtocolTests
         LoginFlow.WaitForLog(server, LoginFlow.WelcomeMessage(MobileName), TimeSpan.FromSeconds(30));
     }
 
-    [Fact]
-    public async Task Mobile_client_creates_an_account_and_character_with_the_chosen_appearance()
+    [Theory]
+    [InlineData(1, "튜닉", 2)]
+    [InlineData(2, "꼬뜨", 4)]
+    [InlineData(3, "매직스커트", 6)]
+    [InlineData(4, "로브", 5)]
+    [InlineData(5, "연무복", 3)]
+    public async Task Mobile_client_creates_the_selected_class_at_novice_town_in_its_level_one_outfit(
+        byte selectedPath, string outfit, int armour)
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
         server.Start(TimeSpan.FromMinutes(2));
@@ -90,7 +102,7 @@ public sealed class MobileClientProtocolTests
         const byte gender = 0x02;
         const byte hairColor = 0x47;
 
-        await HadesLoginClient.CreateCharacterAsync(
+        using WorldSession session = await HadesLoginClient.CreateCharacterAsync(
             IPAddress.Loopback,
             server.LoginPort,
             MobileName,
@@ -98,10 +110,9 @@ public sealed class MobileClientProtocolTests
             hairStyle,
             gender,
             hairColor,
+            selectedPath,
             progress: null,
             _deadline.Token);
-
-        using WorldSession session = await LoginAsync(server);
 
         Assert.Equal(MobileName, session.Character.CharacterName);
 
@@ -115,6 +126,104 @@ public sealed class MobileClientProtocolTests
         Assert.Equal(hairStyle, (byte)saved["HairStyle"]!.GetValue<int>());
         Assert.Equal(((Darkages.Types.Gender)gender).ToString(), saved["Gender"]!.GetValue<string>());
         Assert.Equal(hairColor, (byte)saved["HairColor"]!.GetValue<int>());
+        Assert.Equal(((Darkages.Types.Class)selectedPath).ToString(), saved["Path"]!.GetValue<string>());
+        Assert.Equal(outfit, saved["EquipmentManager"]!["Equipment"]!["2"]!["Item"]!["Template"]!["Name"]!.GetValue<string>());
+        Assert.Equal(20373, saved["CurrentMapId"]!.GetValue<int>());
+        Assert.Equal(37, saved["X"]!.GetValue<int>());
+        Assert.Equal(29, saved["Y"]!.GetValue<int>());
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+        Character appeared = await Dressed(world, wearing => wearing.Armor == armour);
+        Assert.Equal(armour, appeared.Wearing!.Armor);
+    }
+
+    [Fact]
+    public async Task A_new_monk_keeps_exactly_the_two_requested_starters_across_relogin_and_can_use_them()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, MonkStart.X, MonkStart.Y));
+        PutMonkStarterTargetAhead(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        const byte monk = 5;
+        int leapSlot, kickSlot;
+
+        using (WorldSession session = await HadesLoginClient.CreateCharacterAsync(
+                   IPAddress.Loopback, server.LoginPort, MobileName, LoginFlow.SyntheticSecret,
+                   hairStyle: 12, gender: 1, hairColor: 40, path: monk, progress: null, _deadline.Token))
+        {
+            WorldClient world = new(session);
+            _ = world.PumpAsync(_deadline.Token);
+
+            await Settled(world, seen => seen is { Map.Id: WoodlandOneOne, Where: var where } && where == MonkStart);
+            await StarterSkillsArrive(world);
+            await Until(() => world.Creatures.Any(creature => creature.Where == MonkTarget),
+                "새 무도가 앞에 기술 시험 표적이 나타나지 않았습니다.");
+
+            LearnedSkill kick = world.Skills.Single(skill => skill.Name.StartsWith("단각 (", StringComparison.Ordinal));
+            LearnedSkill leap = world.Skills.Single(skill => skill.Name.StartsWith("이형환위 (", StringComparison.Ordinal));
+            Assert.All(new[] { kick, leap }, skill => Assert.Equal(1, ParseSkillLevel(skill.Name)));
+
+            // Skill.GiveTo picks the pane slots; which numbers it picks is the server's business, but the two
+            // must land in different slots and the same ones must come back after a relogin (checked below).
+            (leapSlot, kickSlot) = (leap.Slot, kick.Slot);
+            Assert.NotEqual(leapSlot, kickSlot);
+            Assert.All(new[] { leapSlot, kickSlot }, slot => Assert.True(slot > 0, $"기술이 칸을 받지 못했습니다: {slot}"));
+
+            // 단각 is the project's one implementation of the Kick animation; a separate English Kick must
+            // not be added beside it.  Its real Monk script returns motion 131, not the generic Assail motion.
+            Assert.DoesNotContain(world.Skills, skill => skill.Name.StartsWith("Kick (", StringComparison.Ordinal));
+            await world.UseSkillAsync(kick.Slot, _deadline.Token);
+            await MovedBody(world, 131);
+
+            // 이형환위's script requires a target, then steps over it and turns toward it.
+            await world.UseSkillAsync(leap.Slot, _deadline.Token);
+            await Until(() => world.State?.Where == MonkLanding && world.Self?.Facing == Direction.South,
+                "이형환위가 표적을 넘어가 표적 방향을 보지 않았습니다.");
+        }
+
+        // Re-enter instead of just reading the freshly written JSON: LoadSkillBook must restore both scripts
+        // into the skill pane for a later login too.
+        using WorldSession relogged = await LoginAsync(server);
+        WorldClient afterRelogin = new(relogged);
+        _ = afterRelogin.PumpAsync(_deadline.Token);
+        await Settled(afterRelogin, seen => seen is not null);
+        await StarterSkillsArrive(afterRelogin);
+
+        Assert.Equal(leapSlot, afterRelogin.Skills
+            .Single(skill => skill.Name.StartsWith("이형환위 (", StringComparison.Ordinal)).Slot);
+        Assert.Equal(kickSlot, afterRelogin.Skills
+            .Single(skill => skill.Name.StartsWith("단각 (", StringComparison.Ordinal)).Slot);
+
+        string savedPath = Path.Combine(server.ContentLocation, "aislings", $"{MobileName}.json");
+        JsonNode saved = JsonNode.Parse(File.ReadAllText(savedPath))!;
+        List<JsonNode> skills = saved["SkillBook"]!["Skills"]!.AsObject()
+            .Select(pair => pair.Value)
+            .Where(skill => skill is not null)
+            .Select(skill => skill!)
+            .ToList();
+        Assert.Equal(1, skills.Count(skill => (string?)skill!["Template"]?["Name"] == "이형환위"));
+        Assert.Equal(1, skills.Count(skill => (string?)skill!["Template"]?["Name"] == "단각"));
+        Assert.All(skills.Where(skill => (string?)skill!["Template"]?["Name"] is "이형환위" or "단각"),
+            skill => Assert.Equal(1, (int?)skill!["Level"]));
+
+        // The exact script keys are the authoritative backing for the pane entries, not a display-name alias.
+        Assert.Equal("이형환위", ReadSkillTemplate(server, "이형환위")["ScriptName"]!.GetValue<string>());
+        Assert.Equal("단각", ReadSkillTemplate(server, "단각")["ScriptName"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task Mobile_client_rejects_an_invalid_creation_class_without_saving_a_character()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        await Assert.ThrowsAsync<ProtocolException>(() => HadesLoginClient.CreateCharacterAsync(
+            IPAddress.Loopback, server.LoginPort, MobileName, LoginFlow.SyntheticSecret,
+            hairStyle: 12, gender: 2, hairColor: 40, path: 0, progress: null, _deadline.Token));
+
+        Assert.False(File.Exists(Path.Combine(server.ContentLocation, "aislings", $"{MobileName}.json")));
     }
 
     [Fact]
@@ -132,10 +241,8 @@ public sealed class MobileClientProtocolTests
 
         WorldEntry entry = await Settled(world, seen => seen is not null);
 
-        // lod1.map, the same 30x31 floor tools/dat-extract draws for the mockups, and where
-        // LoruleConfig.json drops a new character.
-        Assert.Equal(new MapInfo(1, 30, 31, "Safe House"), entry.Map);
-        Assert.Equal(new Tile(4, 4), entry.Where);
+        Assert.Equal(new MapInfo(20373, 70, 70, "노비스마을"), entry.Map);
+        Assert.Equal(new Tile(37, 29), entry.Where);
     }
 
     [Fact]
@@ -397,8 +504,9 @@ public sealed class MobileClientProtocolTests
 
         WorldEntry after = await Settled(world, _ => world.PositionReports > told, TimeSpan.FromSeconds(15));
 
-        Assert.InRange(after.Where.X, 0, 29);
-        Assert.InRange(after.Where.Y, 0, 30);
+        // Wherever the server puts it back, it is a tile of the map the character is standing on.
+        Assert.InRange(after.Where.X, 0, after.Map.Columns - 1);
+        Assert.InRange(after.Where.Y, 0, after.Map.Rows - 1);
     }
 
     [Fact]
@@ -541,13 +649,15 @@ public sealed class MobileClientProtocolTests
         throw new TimeoutException($"마법 창에 {name} 이 오지 않았습니다.");
     }
 
-    private async Task MovedBody(WorldClient world)
+    private async Task MovedBody(WorldClient world, int? expectedMotion = null)
     {
         DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(20);
 
         while (DateTime.UtcNow < giveUp)
         {
-            if (world.TakeMotion(out Motion? motion) && motion.Serial == world.Serial)
+            if (world.TakeMotion(out Motion? motion)
+                && motion.Serial == world.Serial
+                && (expectedMotion is null || motion.Number == expectedMotion))
             {
                 return;
             }
@@ -555,7 +665,77 @@ public sealed class MobileClientProtocolTests
             await Task.Delay(50, _deadline.Token);
         }
 
-        throw new TimeoutException("Assail 뒤 서버가 몸동작을 돌려주지 않았습니다.");
+        throw new TimeoutException($"기술 뒤 서버가 기대한 몸동작({expectedMotion?.ToString() ?? "임의"})을 돌려주지 않았습니다.");
+    }
+
+    private async Task StarterSkillsArrive(WorldClient world)
+    {
+        await Learned(world, "이형환위");
+        await Learned(world, "단각");
+
+        Assert.Single(world.Skills, skill => skill.Name.StartsWith("이형환위 (", StringComparison.Ordinal));
+        Assert.Single(world.Skills, skill => skill.Name.StartsWith("단각 (", StringComparison.Ordinal));
+    }
+
+    private static int ParseSkillLevel(string name)
+    {
+        Match match = Regex.Match(name, @"\(Lev:(\d+)/");
+        Assert.True(match.Success, $"기술 이름에 레벨이 없습니다: {name}");
+        return int.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private static JsonNode ReadSkillTemplate(IsolatedHadesServer server, string name) =>
+        JsonNode.Parse(File.ReadAllText(Path.Combine(server.ContentLocation, "templates", "skills", $"{name}.json")))!;
+
+    private static void PutMonkStarterTargetAhead(IsolatedHadesServer server)
+    {
+        string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
+        Regex woodland = new($"\\\"AreaID\\\"\\s*:\\s*{WoodlandOneOne}\\b");
+        JsonDocumentOptions options = new()
+        {
+            AllowTrailingCommas = true,
+            CommentHandling = JsonCommentHandling.Skip,
+        };
+        string source = Directory.EnumerateFiles(folder, "*.json", SearchOption.AllDirectories)
+            .First(path => woodland.IsMatch(File.ReadAllText(path)));
+        JsonNode target = JsonNode.Parse(File.ReadAllText(source), documentOptions: options)!;
+
+        target["Name"] = "무도가시작기술표적";
+        target["BaseName"] = "무도가시작기술표적";
+        target["AreaID"] = WoodlandOneOne;
+        target["SpawnMax"] = 1;
+        target["SpawnType"] = 4;
+        target["SpawnRate"] = 1;
+        target["DefinedX"] = MonkTarget.X;
+        target["DefinedY"] = MonkTarget.Y;
+        target["MaximumHP"] = 1_000_000;
+        target["Ac"] = 0;
+        target["MoodType"] = 1;
+        target["PathQualifer"] = 2;
+        target["Grow"] = false;
+
+        string testFolder = Path.Combine(folder, "characterization");
+        Directory.CreateDirectory(testFolder);
+        File.WriteAllText(
+            Path.Combine(testFolder, "monk-starter-target.json"),
+            target.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    private async Task Until(Func<bool> condition, string failure)
+    {
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+
+        while (DateTime.UtcNow < giveUp)
+        {
+            if (condition())
+            {
+                return;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        throw new TimeoutException(failure);
     }
 
     private async Task ServerSaid(WorldClient world, string words)

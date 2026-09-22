@@ -172,9 +172,9 @@ public sealed class WorldMapMenuTests : IDisposable
         const byte gender = 2;
         const byte hairColor = 40;
 
-        await HadesLoginClient.CreateCharacterAsync(
+        using WorldSession created = await HadesLoginClient.CreateCharacterAsync(
             IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret,
-            hairStyle, gender, hairColor, progress: null, deadline.Token);
+            hairStyle, gender, hairColor, path: 5, progress: null, deadline.Token);
 
         string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
         System.Text.Json.Nodes.JsonNode character = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(saved))!;
@@ -184,6 +184,10 @@ public sealed class WorldMapMenuTests : IDisposable
         Assert.Equal(hairStyle, (byte)character["HairStyle"]!.GetValue<int>());
         Assert.Equal(((Darkages.Types.Gender)gender).ToString(), character["Gender"]!.GetValue<string>());
         Assert.Equal(hairColor, (byte)character["HairColor"]!.GetValue<int>());
+
+        // Creation already authenticated and entered the world. Dispose that one before changing the saved
+        // test level, then take a fresh session so this test's historical setup remains deterministic.
+        created.Dispose();
 
         // 수오미마을 → 포테의숲1존은 레벨 21~51 이다. 실제로 싸워서 올리는 것이 아니라 WorldMapTests 와
         // 같은 방식으로 저장 파일의 레벨 값만 고친다.

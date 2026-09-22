@@ -109,7 +109,9 @@ internal static class LoginFlow
             session.Client.SendSecured(CreateAccountCommand, ordinal: 0, Credentials(name, secret));
             session.Client.Receive();
 
-            session.Client.SendSecured(CreateCharacterCommand, ordinal: 0, 0x01, 0x01, 0x01);
+            // Format04's fourth byte is the mobile creation class contract. Harness helpers create a
+            // disposable warrior; production UI must require an explicit choice.
+            session.Client.SendSecured(CreateCharacterCommand, ordinal: 0, 0x01, 0x01, 0x01, 0x01);
 
             // Reading the reply also waits for the save to finish before the connection closes.
             session.Client.Receive();
@@ -134,7 +136,7 @@ internal static class LoginFlow
         observed.Add(Describe("C2S", CreateAccountCommand));
         observed.Add(Describe("S2C", login.Receive().Command));
 
-        login.SendSecured(CreateCharacterCommand, ordinal: 0, 0x01, 0x01, 0x01);
+        login.SendSecured(CreateCharacterCommand, ordinal: 0, 0x01, 0x01, 0x01, 0x01);
         observed.Add(Describe("C2S", CreateCharacterCommand));
         observed.Add(Describe("S2C", login.Receive().Command));
 

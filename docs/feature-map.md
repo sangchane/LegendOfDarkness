@@ -33,7 +33,7 @@
 |---|---|---|---|---|---|
 | **접속** |||||
 | 1 | 로그인·계정 만들기 | 돌아감 `LS:108-131` · 해시 PBKDF2 `HB/Security/Passwords.cs:20` | 일부 — 로그인만 `mobile/src/Lod.Mobile.Core/Net/HadesLoginClient.cs:42-103` | `H/src/Hades.Client/ClientFormats/CreateAccount.cs` | 계정 만들기 화면 없음 |
-| 2 | 캐릭터 만들기·직업 고르기 | 돌아감 — 성별·머리 `LS:166-184`, 직업은 NPC `S/Mundanes/ClassChooser.cs:71-77` | 없음 | `H/database/server/areas/전직선택의장.json` | 직업 선택이 대화창에 달려 있다 |
+| 2 | 캐릭터 만들기·직업 고르기 | 돌아감 — 생성 `LS:166-184`가 `0x04`의 Path(1~5)를 검증해 실제 1레벨 직업 갑옷을 장비하고 노비스마을 20373 (37,29)에 저장한다 | 됨 — 생성 화면에서 전사·도적·법사·사제·무도가를 고르고 성공 뒤 곧바로 월드에 들어간다 | `database/server/templates/items/{도복,연무복}.json` · 원작 `skill.tbl` ST | `0x04`는 HairStyle·Gender·HairColor·Path 네 바이트인 모바일/서버 동시 배포 계약; 기존 NPC 전직 선택은 남아 있다 |
 | 3 | 끊긴 뒤 다시 붙기 | 부분 — 끊기면 저장 후 제거 `HB/Network/Game/GameServer.cs:30-51` | 없음 | 확인 못 함 | 재로그인만 된다. 이어받기 없음 |
 | 4 | 저장 | 돌아감 — 캐릭터당 JSON `HB/Storage/AislingStorage.cs:13-21`, 주기 저장 `GSH:234` | — | — | DB 가 아니라 파일 |
 | **월드** |||||
@@ -90,7 +90,7 @@
 | 0x00 | 버전 확인 | `LS:65` | 돌아감 | 보냄 |
 | 0x02 | 계정 만들기 1 | `LS:91` | 돌아감 | — |
 | 0x03 | 로그인 | `LS:108` | 돌아감 | 보냄 |
-| 0x04 | 계정 만들기 2(성별·머리) | `LS:166` | 돌아감 | — |
+| 0x04 | 계정 만들기 2(성별·머리·직업) | `LS:166` | 보냄 — 본문 `HairStyle, Gender, HairColor, Path(1..5)` | 모바일/서버 동시 배포 계약 |
 | 0x05 | 지도 요청 | `GSH:266` | 돌아감 | — |
 | 0x06 | 걷기 | `GSH:278` | 돌아감 | 보냄 |
 | 0x07 | 줍기 | `GSH:362` | 돌아감 | 보냄 |
