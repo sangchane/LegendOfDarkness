@@ -8,12 +8,35 @@ namespace Lod.Mobile.Core.Net;
 /// What a completed login leaves in your hands: the game-server connection, the character that was admitted,
 /// and the cipher parameters every secured packet from here on needs.
 /// </summary>
-public sealed record WorldSession(
-    HadesConnection Connection,
-    RedirectTarget Character,
-    EncryptionParameters Parameters) : IDisposable
+public sealed class WorldSession(
+    HadesConnection connection,
+    RedirectTarget character,
+    EncryptionParameters parameters) : IDisposable
 {
-    public void Dispose() => Connection.Dispose();
+    private int _disposed;
+    private int _disposeAttempts;
+
+    public HadesConnection Connection { get; } = connection;
+
+    public RedirectTarget Character { get; } = character;
+
+    public EncryptionParameters Parameters { get; } = parameters;
+
+    public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
+
+    internal int DisposeAttempts => Volatile.Read(ref _disposeAttempts);
+
+    public void Dispose()
+    {
+        Interlocked.Increment(ref _disposeAttempts);
+
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        Connection.Dispose();
+    }
 }
 
 /// <summary>

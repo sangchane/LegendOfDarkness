@@ -19,7 +19,7 @@ namespace Lod.Mobile.Core.World;
 /// <see cref="PumpAsync" /> keeps <see cref="State" /> up to date and passes over everything it does not
 /// yet understand.
 /// </remarks>
-public sealed class WorldClient(WorldSession session)
+public sealed class WorldClient(WorldSession session) : IDisposable
 {
     private const byte WalkCommand = 0x06;
     private const byte TurnCommand = 0x11;
@@ -115,6 +115,8 @@ public sealed class WorldClient(WorldSession session)
 
     private byte _ordinal;
     private byte _step;
+    private int _disposed;
+    private int _disposeAttempts;
 
     // Written by the pump, read by whoever is drawing. A whole state at once, so a reader never sees a map
     // from one moment and a tile from another.
@@ -336,6 +338,11 @@ public sealed class WorldClient(WorldSession session)
     /// </summary>
     public string? Broke => _broke;
 
+    /// <summary>Whether this world's session has already been released.</summary>
+    public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
+
+    internal int DisposeAttempts => Volatile.Read(ref _disposeAttempts);
+
     /// <summary>How many packets were too short to read. A rise means the server and this client disagree.</summary>
     public int Ignored => _ignored;
 
@@ -348,6 +355,11 @@ public sealed class WorldClient(WorldSession session)
         catch (OperationCanceledException)
         {
             // 나가는 길이다 — 알릴 것이 없다.
+        }
+        catch (Exception) when (IsDisposed)
+        {
+            // 로그아웃은 먼저 소켓을 닫고 다음 프레임에 화면을 거둔다. 닫힌 소켓에서 깨어난
+            // 받기 루프는 고장이 아니라 그 정상 종료 경로다.
         }
         catch (Exception stopped)
         {
@@ -906,6 +918,19 @@ public sealed class WorldClient(WorldSession session)
         session.Connection.SendAsync(
             HadesCipher.EncodeSecured(command, _ordinal++, body, session.Parameters),
             cancellationToken);
+
+    /// <summary>Releases the owned world session. Safe when both logout and tree teardown arrive.</summary>
+    public void Dispose()
+    {
+        Interlocked.Increment(ref _disposeAttempts);
+
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        session.Dispose();
+    }
 
     /// <summary>Keeps a packet that was passed over where <see cref="Unread" /> can show it, rather than losing it without a trace.</summary>
     private void NoteUnread(string why)

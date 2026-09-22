@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Sockets;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.Protocol;
+using Lod.Mobile.Core.Protocol.Login;
+using Lod.Mobile.Core.World;
 
 namespace Lod.Mobile.Core.Tests.Net;
 
@@ -72,6 +74,39 @@ public sealed class HadesConnectionTests
             async () => await connection.ReceiveAsync(Deadline.Token));
     }
 
+    [Fact]
+    public async Task World_client_dispose_closes_every_owner_once_and_stops_the_pump()
+    {
+        using CancellationTokenSource deadline = new(TimeSpan.FromSeconds(10));
+        using Peer peer = Peer.Listen();
+        HadesConnection connection = await peer.AcceptedClient();
+        EncryptionParameters cipher = new(HadesCipher.SupportedSeed, "NexonInc."u8.ToArray(), 0);
+        WorldSession session = new(
+            connection,
+            new RedirectTarget(IPAddress.Loopback, 0, cipher.Seed, cipher.Salt, "퇴장시험", 1),
+            cipher);
+        WorldClient world = new(session);
+
+        Task pump = world.PumpAsync(deadline.Token);
+
+        world.Dispose();
+
+        // GameScreen explicitly closes on logout and _ExitTree closes defensively. Direct owners may also
+        // be used by engine-free clients, so the top owner must tolerate that same second close without
+        // repeating the calls down the ownership chain.
+        world.Dispose();
+
+        await pump;
+
+        Assert.True(world.IsDisposed);
+        Assert.True(session.IsDisposed);
+        Assert.True(connection.IsDisposed);
+        Assert.Equal(2, world.DisposeAttempts);
+        Assert.Equal(1, session.DisposeAttempts);
+        Assert.Equal(1, connection.DisposeAttempts);
+        Assert.Equal(0, await peer.ReadAsync(deadline.Token));
+    }
+
     /// <summary>A listener on loopback that plays the far side of one connection.</summary>
     private sealed class Peer : IDisposable
     {
@@ -102,6 +137,9 @@ public sealed class HadesConnectionTests
 
         public Task SendAsync(byte[] bytes) =>
             _accepted!.GetStream().WriteAsync(bytes, CancellationToken.None).AsTask();
+
+        public Task<int> ReadAsync(CancellationToken cancellationToken) =>
+            _accepted!.GetStream().ReadAsync(new byte[1], cancellationToken).AsTask();
 
         public void HangUp() => _accepted!.Close();
 

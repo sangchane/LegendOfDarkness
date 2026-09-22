@@ -16,6 +16,8 @@ public sealed class HadesConnection : IDisposable
     private readonly NetworkStream _stream;
 
     private byte[] _pending = [];
+    private int _disposed;
+    private int _disposeAttempts;
 
     private HadesConnection(TcpClient client)
     {
@@ -45,6 +47,11 @@ public sealed class HadesConnection : IDisposable
 
     public async Task SendAsync(ReadOnlyMemory<byte> frame, CancellationToken cancellationToken) =>
         await _stream.WriteAsync(frame, cancellationToken);
+
+    /// <summary>Whether this socket has already crossed its one-way ownership boundary.</summary>
+    public bool IsDisposed => Volatile.Read(ref _disposed) != 0;
+
+    internal int DisposeAttempts => Volatile.Read(ref _disposeAttempts);
 
     /// <summary>Returns the next complete frame, reading from the socket until one is there.</summary>
     public async Task<PacketFrame> ReceiveAsync(CancellationToken cancellationToken)
@@ -82,6 +89,13 @@ public sealed class HadesConnection : IDisposable
 
     public void Dispose()
     {
+        Interlocked.Increment(ref _disposeAttempts);
+
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
         _stream.Dispose();
         _client.Dispose();
     }
