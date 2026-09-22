@@ -15,6 +15,7 @@
 | `StatsPerLevel` | `2` |
 | `MinimumHp` | `250` |
 | `MaxHP` | `999999` |
+| `RegenRate` | `21000` |
 | `GlobalBaseSkillDelay` | `500.0` |
 | `AssailsCancelSpells` | `true` |
 | `DeathHPPenalty` | `50` |

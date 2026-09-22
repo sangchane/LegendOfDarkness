@@ -35,7 +35,7 @@ HUNTS = [
 ]
 
 # 식이 읽는 설정값. 값이 바뀌면 세계가 바뀐다.
-KNOBS = ["HpGainFactor", "MpGainFactor", "StatsPerLevel", "MinimumHp", "MaxHP",
+KNOBS = ["HpGainFactor", "MpGainFactor", "StatsPerLevel", "MinimumHp", "MaxHP", "RegenRate",
          "GlobalBaseSkillDelay", "AssailsCancelSpells", "DeathHPPenalty",
          "PlayerLevelCap", "GiveAssailOnCreate", "StarterSpellOnCreate"]
 
@@ -165,12 +165,42 @@ FINDINGS = [
      "tests/hades-characterization/CombatSmokeTests.cs (NothingWasHit)"),
 
     ("속성이 없는 쪽끼리는 절반",
-     "때리는 쪽도 맞는 쪽도 속성이 None 이면 피해가 **0.50** 배다. 새 캐릭터와 이식한 괴물이 바로 그 짝이다.",
+     "**전에 그랬다 — 고쳤다(2026-09-22).** 때리는 쪽도 맞는 쪽도 속성이 None 이면 피해가 0.50 배였다. "
+     "새 캐릭터와 이식한 괴물이 바로 그 짝이라 사람과 괴물 사이의 거의 모든 한 방이 반이 됐다. 이제 **1.00** 배다.",
      [(SCRIPTS / "Formulas/elements.cs", r"None && element == ElementManager\.Element\.None|return 0\.50|return 1\.00")],
-     ["맞는 쪽만 None 이고 때리는 쪽에 속성이 있으면 1.00 배다 — 속성을 붙이는 것이 두 배로 때리는 "
-      "일이 된다. 이식한 괴물 565개는 `ElementType` 이 없어 전부 None 이다.",
-      "`Element.Random` 은 읽을 때마다 다시 굴린다. 그런 놈이 섞이면 같은 한 방이 두 번 다르다."],
+     ["5.99 서버(Novaonline.exe)의 피해 함수에는 상대 속성을 보는 표도, 반으로 깎는 단계도 없다 — 괴물이 "
+      "맞을 때 `0x424215`, 사람이 맞을 때 `0x415341`. 반이던 때 괴물 평타는 5.99 의 약 40% 였다"
+      "(독거미 16~18 · 5.99 41~44, 포테의숲 팜팻 77~85 · 5.99 198~217).",
+      "양쪽이 같이 바뀌었다 — 사람이 괴물을 치는 것도 두 배가 됐다.",
+      "공격력 1 이 0점이 되던 것도 함께 풀렸다. 최소 1 보정(`CompleteDamageApplication` 첫 줄)이 ×0.5 보다 "
+      "앞에 있어서 1 × 0.5 가 버림에 0 이 됐었다.",
+      "맞는 쪽만 None 이고 때리는 쪽에 속성이 있으면 여전히 1.00 배다. 이식한 괴물은 `ElementType` 이 "
+      "없어 전부 None 이다. `Element.Random` 은 읽을 때마다 다시 굴린다."],
      "tests/hades-characterization/CombatSmokeTests.cs (NoElementEither)"),
+
+    ("괴물 평타는 방어를 거친 뒤 ×1.3 이다",
+     "5.99 는 굴린 공격력을 사람 방어로 먼저 거르고(`0x425d6e` → `0x415173`) 그 뒤 괴물의 공격속성으로 "
+     "×13/10 한다(`0x425dc3` → `0x415cff`).",
+     [(SCRIPTS / "Skills/Assail.cs", r"MonsterBlowElement|ApplyDamageAfterArmour"),
+      (SRC / "Hades.Server.Base/Types/Sprite.cs", r"_afterArmour")],
+     ["속성이 안 적힌 괴물에게도 5.99 는 생길 때 1~4 를 붙인다(`0x422bc5`). 그래서 괴물 평타는 **늘** ×1.3 이다.",
+      "방어 **뒤에** 곱한다. 앞에서 곱하면 작은 한 방이 버림에 깎인다 — 니에(공격 3)가 5.99 는 6, "
+      "앞에서 곱하면 5 다.",
+      "괴물 마법(`char_damaged2` — 마레노·플라모)은 이 단계를 거치지 않는다. 5.99 에서 `0x415cff` 를 "
+      "부르는 곳은 괴물 평타(`0x425dc3`)와 괴물이 맞을 때(`0x4243d8`) 둘뿐이다."],
+     "tests/hades-characterization/Pack599MonsterBlowTests.cs"),
+
+    ("체력·마력은 21초마다 능력치로 찬다",
+     "5.99 식이다(`0x46d1a5`, 타이머 `0x4766aa` 의 21000ms). 한 번에 최대 ÷ 100 × 지구력(마력은 지혜) ÷ 4.3 "
+     "을 채우고, 최대의 15% 아래면 15%, 25% 위거나 능력치 108 이상이면 25%.",
+     [(SRC / "Hades.Server.Base/Network/Game/GameClient.cs", r"NaturalRecovery|hundredth|attribute >= 108")],
+     ["**전에는 5초마다 최대의 10~20%** 를 채웠다(분당 120~240%). 25레벨·지구력 65·체력 3083 이면 "
+      "5초에 622 — 괴물 하나가 치는 것보다 빨리 차서 죽지 않았다. 5.99 는 21초에 466 이다.",
+      "능력치는 장비를 뺀 것(캐릭터 칸 +163 지구력 · +162 지혜)이고, 장비의 회복 칸 합(+152)을 그대로 "
+      "더한다 — 하데스에서 그 자리는 `Regen` 이다(지금 그 칸을 가진 아이템은 없다).",
+      "5.99 가 더 보는 것 셋은 옮기지 않았다: 배고픔 0 이면 안 참(하데스에 배고픔이 없다), 혼수 모습이면 "
+      "안 참, 캐릭터 칸 +98 이 켜져 있으면 1.5배(무엇인지 모른다)."],
+     "tests/hades-characterization/Pack599RecoveryTests.cs"),
 ]
 
 
