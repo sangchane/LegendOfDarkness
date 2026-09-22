@@ -34,6 +34,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - **원작 기술·마법·퀘스트·아이템(선행 관계 그래프): `docs/game-data.md`** (`data/game-data/*.json`, Obsidian 노트 2,969장 — 맵·워프·NPC까지)
 - **Hades 에 뭐가 이미 있나(만들 것 vs 채울 것): `docs/what-hades-already-has.md`** — 콘텐츠를 이식하기 전에 **여기부터**. 그래프·볼트에 묻는 법도 여기 있다
 - **원작 기술·마법 613개(선행 관계 포함): `python3 scripts/build-ability-vault.py` → `data/game-data/vault-abilities/`** (Obsidian). 팩의 153개와 다른 계보
+- **2023 기술·마법표(일반·어빌리티 539행): `docs/skill-spell-2023.md`** — 사용자 제공 워크북의 별도 계보; Hades 613개 표와 섞지 않는다
 - **세계가 굴러가는 식(피해·방어·성장): `python3 scripts/build-formula-vault.py` → `data/formula-vault/`** (Obsidian). **수치는 표에 없고 식이 코드에 박혀 있다** — 근거 줄과 **돌려 보고 재 본 값**까지 함께(방어가 피해를 늘린다·기술이 휘두를 때마다 오른다·괴물 템플릿의 체력이 버려진다 …)
 - **원작 아카이브에 뭐가 들었나: `python3 scripts/build-archive-vault.py` → `data/archives-vault/`** (Obsidian). `.dat` 11개 안의 읽을 수 있는 표 503개. **팩을 뒤지기 전에 여기부터**
 - **5.99 서버·클라이언트 실행 파일 역어셈블(식·평타 동작·장착 규칙·그리는 순서, 주소 근거): `docs/disassembly.md`** (`data/disassembly/findings.json` → 그래프)
