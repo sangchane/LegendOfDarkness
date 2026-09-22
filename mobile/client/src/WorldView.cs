@@ -1454,10 +1454,25 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         // Put back: a step it would not allow, or one it never saw.
+        Tile walkedTo = _tile;
         _tile = state.Where;
         _walked = -1;
         _player.Position = Ground(_tile);
         _player.Rest();
+        StandAsPut(walkedTo);
+    }
+
+    /// <summary>
+    /// Turns us the way the server stood us when it put us on a tile we did not walk to — 이형환위 lands past the
+    /// target and faces back at it (MonkStrike.Step). Only then: at any other time what the server last said about
+    /// our facing is a step behind our walking (<see cref="OwnFacing" />), and following it draws a walk west as north.
+    /// </summary>
+    private void StandAsPut(Tile walkedTo)
+    {
+        if (OwnFacing.PutBy(server?.Self, _tile, walkedTo) is { } facing && facing != _player.Looking)
+        {
+            _player.Face(facing);
+        }
     }
 
     public override void _Process(double delta)
