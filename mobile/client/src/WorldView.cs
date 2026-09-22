@@ -84,6 +84,10 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // And what is lying on it. Marked rather than drawn: nothing has been cut out of the icon archive yet.
     private readonly Dictionary<uint, GroundMark> _dropped = [];
 
+    // A floor item stays in the server snapshot until its pickup answer arrives.  Keep that wait out of
+    // the frame loop, or a full bag would send dozens of identical requests per second.
+    private readonly AutoLootGate _autoLoot = new();
+
     // 그림이 없는 NPC(팩의 스크립트 NPC)가 선 자리의 표식. 번호로 골라 말을 건다.
     private readonly Dictionary<uint, NpcMark> _signs = [];
     private readonly List<AudioStreamPlayer> _voices = [];
@@ -1163,32 +1167,19 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </remarks>
     private void Gather()
     {
-        if (server is null || Frozen || !Main.AutoLoot || _lifted > 0)
+        if (server is null || Frozen)
         {
-            _lifted = Math.Max(0, _lifted - 1);
             return;
         }
 
-        Tile standing = server.State?.Where ?? _tile;
-
-        foreach (GroundMark mark in _dropped.Values)
+        // Allowed walks are silent on this protocol.  State.Where is therefore often the tile where we
+        // logged in, while _tile is the prediction we just told the server to make.  Pickup must name the
+        // latter or the server quite correctly finds no item at the old coordinate.
+        if (_autoLoot.Next(Main.AutoLoot, _tile, server.Creatures) is { } where)
         {
-            if (mark.Where != standing)
-            {
-                continue;
-            }
-
-            _ = server.PickUpAsync(standing, _leaving.Token);
-            _lifted = LiftFrames;
-
-            return;
+            _ = server.PickUpAsync(where, _leaving.Token);
         }
     }
-
-    /// <summary>주운 뒤 다음으로 손을 뻗기까지 기다리는 프레임. 60프레임이 1초다.</summary>
-    private const int LiftFrames = 24;
-
-    private int _lifted;
 
     /// <summary>
     /// Puts a bar over the head of whoever was just struck. The server tells us about every blow (0x13) with
