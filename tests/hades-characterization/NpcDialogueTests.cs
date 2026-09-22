@@ -104,7 +104,8 @@ public sealed class NpcDialogueTests : IDisposable
         Dialogue menu = await Window(world, 0, talk => talk.Options.Count > 0);
 
         Assert.Equal((Diner, DialogueKind.Options), (menu.Who, menu.Kind));
-        DialogueOption buy = Assert.Single(menu.Options, option => option.Text == "Buy");
+        // 상점 말이 한국어로 바뀌었다(shop1.cs, 커밋 f3f5727ab) — "Buy" 가 아니라 "삽니다".
+        DialogueOption buy = Assert.Single(menu.Options, option => option.Text == "삽니다");
 
         int opened = world.TalkCount;
         await world.AnswerAsync(keeper.Serial, buy.Step, _deadline.Token);
