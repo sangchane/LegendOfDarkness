@@ -44,6 +44,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
   - 팩별 내용: `docs/server-packs/5.99-server.md` · `docs/server-packs/honden-community.md` · `docs/server-packs/novaonline.md`
   - **팩 3개와 Hades 를 나란히 놓고 본 것: `docs/pack-comparison.md`** — 무엇을 팩에서 가져오고 무엇을 가져오면 안 되는가 (`python3 scripts/compare-packs.py`)
 - 화면 배치(세로·가로): `docs/mobile-test-v1-wireframes.md` · 눌러볼 화면: `docs/index.html` (그림은 `docs/ui/assets/`)
+- **`docs/index.html` = 「지금 무엇이 되나」** — 기능 39개 구현/미구현 · 괴물 스펙·드랍·경험치 · 기술 연출 · 워프 연결 · **원작과 달라진 것**. 숫자는 생성기가 뽑고, 낡으면 화면이 스스로 말한다 (`python3 scripts/build-data-freshness.py`)
 - **UI 테마 — 원작 4.51(5.01 이전) 을 쓴다: `docs/original-ui-451.md`** (원작 UI 92장 `docs/ui/original-451/` · 눌러볼 시안 `docs/ui/mockups-451/index.html`). **화면을 만들거나 고치면 여기 규칙표부터** — 돌 두 가지·글자 색·치수가 거기 있다
   - 볼트로 묻기: `data/ui-vault/`(Obsidian) · 그래프 `python scripts/build-ui-graph.py` → `graphify query "..." --graph data/original-ui/graph/graph.json`. 단일 출처는 `data/original-ui/451.json`
 - 서버 안정화 계획과 결과: `docs/hades-p0-stabilization-plan.md`

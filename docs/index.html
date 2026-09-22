@@ -14,191 +14,101 @@
   <aside class="sidebar" id="sidebar">
     <div class="brand"><span class="brand-mark" aria-hidden="true">L</span><div><strong>LOD 대시보드</strong><small>Mobile restoration</small></div></div>
     <nav class="primary-nav" aria-label="주 메뉴">
-      <button type="button" class="nav-item is-active" data-view-target="overview" aria-current="page"><span aria-hidden="true">◈</span>대시보드</button>
-      <button type="button" class="nav-item" data-view-target="system"><span aria-hidden="true">⌘</span>시스템 지도</button>
-      <button type="button" class="nav-item" data-view-target="flows"><span aria-hidden="true">⇢</span>기능 흐름</button>
-      <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>개발·지식 그래프</button>
-      <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">✦</span>월드 지도</button>
+      <button type="button" class="nav-item is-active" data-view-target="overview" aria-current="page"><span aria-hidden="true">◈</span>지금 되는 것</button>
+      <button type="button" class="nav-item" data-view-target="monsters"><span aria-hidden="true">✦</span>괴물 도감</button>
       <button type="button" class="nav-item" data-view-target="abilities"><span aria-hidden="true">✧</span>기술·마법</button>
       <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템 도감</button>
+      <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도·워프</button>
+      <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
       <button type="button" class="nav-item" data-view-target="knowledge"><span aria-hidden="true">▤</span>게임 데이터</button>
-      <button type="button" class="nav-item" data-view-target="operations"><span aria-hidden="true">◎</span>운영·유지보수</button>
-      <button type="button" class="nav-item" data-view-target="prototypes"><span aria-hidden="true">▣</span>화면 실험실</button>
+      <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>지식 그래프</button>
     </nav>
-    <div class="sidebar-status"><span class="status-dot is-live" aria-hidden="true"></span><div><strong>현재 기준</strong><span>2026-09-10 · 로컬 스냅샷</span></div></div>
+    <div class="sidebar-status"><span class="status-dot is-live" aria-hidden="true"></span><div><strong>근거 기준일</strong><span id="snapshot-generated-date">—</span></div></div>
   </aside>
 
   <div class="app-column">
     <header class="topbar">
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="sidebar">☰</button>
-      <div class="crumb"><span>어둠의 전설 모바일 복원</span><strong id="view-label">대시보드</strong></div>
-      <div class="topbar-state"><span class="status-dot is-warning" aria-hidden="true"></span><span>현재 브랜치</span><code id="snapshot-branch">test/hades-characterization</code></div>
+      <div class="crumb"><span>어둠의 전설 모바일 복원</span><strong id="view-label">지금 되는 것</strong></div>
+      <div class="topbar-state"><span class="status-dot is-warning" aria-hidden="true"></span><span>현재 브랜치</span><code id="snapshot-branch">—</code></div>
     </header>
 
     <main id="workspace" tabindex="-1">
+
+
       <section class="view is-active" data-view="overview" aria-labelledby="overview-title">
-        <div class="page-heading"><div><p class="eyebrow">Command overview</p><h1 id="overview-title">개발 전체가 한눈에 보여요</h1><p>서버 안정화부터 모바일 화면, 게임 데이터, 운영 준비까지 한곳에서 이어서 볼 수 있어요.</p></div><a class="quiet-link" href="../NEXT.md">NEXT.md 원문 →</a></div>
-        <div class="signal-grid" aria-label="핵심 현황">
-          <article class="signal signal-primary"><span>현재 작업 · NEXT.md</span><strong id="snapshot-current-title">월드 동기화 검증</strong><p id="snapshot-current-detail">맵·사람·이동 패킷을 Godot 실제 좌표에 연결</p></article>
-          <article class="signal"><span>최근 검증</span><strong id="snapshot-verification-title">검증 기록 없음</strong><p id="snapshot-verification-detail">스냅샷 생성 시 테스트 결과를 연결</p></article>
-          <article class="signal"><span>가장 큰 위험</span><strong>인증·저장</strong><p>평문 비밀번호와 파일 저장은 운영 전 교체 필요</p></article>
-          <article class="signal"><span>근거 기준일</span><strong id="snapshot-generated-date">2026-09-10</strong><p>생성된 스냅샷 · 원문 링크로 재검증</p></article>
-        </div>
-        <div class="dashboard-grid">
-          <article class="panel focus-panel">
-            <div class="panel-heading"><div><p class="eyebrow">Now</p><h2>지금 해야 할 일</h2></div><span class="badge badge-now">진행 중</span></div>
-            <div class="focus-row"><span class="step-number">01</span><div><strong>서버 좌표를 Godot 월드에 연결</strong><p><code>WorldSession</code>을 통해 맵·사람·이동 값을 화면에 반영합니다.</p></div></div>
-            <div class="focus-row"><span class="step-number">02</span><div><strong>P0-14~17 안정화 마무리</strong><p>완전 전송, 원자 저장, 기본 전투, 하드코딩 설정화를 검증합니다.</p></div></div>
-            <div class="focus-row"><span class="step-number">03</span><div><strong>Mac/iPhone 실기기 gate</strong><p>macOS 실행, Xcode export, arm64 설치를 확인합니다.</p></div></div>
-          </article>
-          <article class="panel health-panel">
-            <div class="panel-heading"><div><p class="eyebrow">Decision radar</p><h2>판단이 필요한 경계</h2></div><button type="button" class="text-button" data-view-jump="flows">흐름 보기 →</button></div>
-            <div class="health-row"><span>모바일 통신</span><strong>직접 TCP 또는 TLS 게이트웨이</strong><span class="badge badge-partial">미결정</span></div>
-            <div class="health-row"><span>콘텐츠 운영</span><strong>변경 검증·버전·롤백 기준 있음</strong><span class="badge badge-risk">자동화 없음</span></div>
-            <div class="health-row"><span>관측성</span><strong>로그·지표·추적·SLO</strong><span class="badge">미계측</span></div>
-            <div class="health-row"><span>배포 근거</span><strong>소스→빌드→아티팩트 연결</strong><span class="badge badge-partial">부분</span></div>
-          </article>
-          <article class="panel art-panel">
-            <div class="panel-heading"><div><p class="eyebrow">Original assets</p><h2>원작 자산 파이프라인</h2></div><button type="button" class="text-button" data-view-jump="knowledge">데이터 보드 →</button></div>
-            <img src="ui/assets/mob-gallery.png" alt="원작 데이터에서 추출한 괴물 스프라이트 모음" width="1488" height="486"><p>캐릭터·괴물은 읽힘. 벽 타일, 아이템 아이콘, 대화·효과·음악은 다음 변환 대상입니다.</p>
-          </article>
-          <article class="panel art-panel equip-panel">
-            <div class="panel-heading"><div><p class="eyebrow">Original UI</p><h2>원작 장비창 — 구형과 신형</h2></div><a class="quiet-link" href="original-equipment-window.md">좌표 표 →</a></div>
-            <div class="equip-pair">
-              <figure>
-                <img src="ui/assets/equip-window-old.png" alt="setoa.dat 에서 복원한 원작 구형 장비창" width="270" height="302">
-                <figcaption><b>구형</b> · <code>lequip.txt</code> + <code>equip01.epf</code> · <b>266×298</b> · 칸 <b>14</b>개, 각 <b>33×33</b>. 장비만 있는 거의 정사각 창이라 세로 폰에 그대로 들어갑니다. 장신구·겉투구 자리는 없습니다.</figcaption>
-              </figure>
-              <figure>
-                <img src="ui/assets/equip-window.png" alt="setoa.dat 에서 복원한 원작 신형 장비창" width="603" height="310">
-                <figcaption><b>신형</b> · <code>_nui_eq.txt</code> + <code>_nui_eq.spf</code> · <b>599×306</b> · 칸 <b>18</b>개, 각 <b>32×32</b>. 책 두 쪽이라 왼쪽이 장비, 오른쪽이 이름·직업·무리·칭호·초상·능력치입니다. 18칸이 서버의 자리 번호와 그대로 맞습니다.</figcaption>
-              </figure>
-            </div>
-            <div class="equip-pair">
-              <figure>
-                <img src="ui/assets/equip-slots-old.png" alt="구형 장비창의 빈 칸 그림 14종" width="252" height="72">
-                <figcaption><b>구형</b> 빈 칸 그림 · <code>equip07.epf</code> <b>14</b>종</figcaption>
-              </figure>
-              <figure>
-                <img src="ui/assets/equip-slots.png" alt="신형 장비창의 빈 칸 그림 14종" width="252" height="72">
-                <figcaption><b>신형</b> 빈 칸 그림 · <code>_nui_eqi.spf</code> <b>14</b>종 — 같은 부위, 같은 차례</figcaption>
-              </figure>
-            </div>
-            <p>종이인형은 두 세대 모두 <b>110×84</b> 로 같습니다. 신형은 <code>.spf</code> 라 색표를 파일 안에 들고 있고, 구형은 <code>.epf</code> + <code>gui00.pal</code> 입니다 — <code>setoa.dat</code> 의 색표 18개 중 맞는 것은 그 하나뿐입니다.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="view" data-view="system" aria-labelledby="system-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Software catalog</p><h1 id="system-title">무엇이 어디에 있는가</h1><p>코드를 직접 읽지 않아도 각 구성요소의 책임·위치·의존 관계·생명주기를 찾을 수 있습니다.</p></div><a class="quiet-link" href="current-system-analysis/02-system-architecture.md">아키텍처 원문 →</a></div>
-        <div class="system-chain" aria-label="LOD 시스템의 주요 데이터 흐름">
-          <span>레거시 자료</span><i aria-hidden="true">→</i><span>자산 변환</span><i aria-hidden="true">→</i><span>Godot 모바일</span><i aria-hidden="true">⇄</i><span>프로토콜</span><i aria-hidden="true">⇄</i><span>Hades 서버</span><i aria-hidden="true">⇄</i><span>콘텐츠 저장소</span>
-        </div>
-        <aside class="catalog-note"><strong>지도 원칙</strong><p>모든 파일을 나열하지 않고 사람이 시스템을 이해하는 데 필요한 책임 경계만 표시합니다. 동적 상태는 이후 관측 도구에 연결합니다.</p></aside>
-        <div class="component-catalog" id="component-catalog"></div>
-      </section>
-
-      <section class="view" data-view="flows" aria-labelledby="flows-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Feature trace</p><h1 id="flows-title">기능은 어디를 지나가는가</h1><p>사용자 행동에서 서버 판정과 데이터, 테스트, 운영 신호까지 한 줄로 추적합니다.</p></div><a class="quiet-link" href="current-system-analysis/04-login-to-game-flow.md">로그인 흐름 원문 →</a></div>
-        <div class="flow-tabs" role="tablist" aria-label="기능 흐름 선택" id="flow-tabs"></div>
-        <div id="flow-panel" role="tabpanel" tabindex="0" aria-live="polite"><article class="flow-summary"><div><p class="eyebrow">End-to-end path</p><h2 id="flow-label"></h2><p id="flow-summary"></p></div><span class="badge" id="flow-status"></span></article>
-        <ol class="flow-steps" id="flow-steps"></ol></div>
-        <aside class="notice"><strong>AI 작업의 검토 단위</strong><p>코드 줄 수가 아니라 이 흐름의 어느 단계가 바뀌었고 어떤 근거와 운영 신호가 함께 갱신됐는지 확인합니다.</p></aside>
-      </section>
-
-      <section class="view" data-view="delivery" aria-labelledby="delivery-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Delivery map</p><h1 id="delivery-title">개발 흐름과 지식 그래프</h1><p>로드맵과 검증 근거, 코드·문서의 연결을 한 화면에서 함께 봅니다.</p></div><a class="quiet-link" href="hades-p0-stabilization-plan.md">계획 원문 →</a></div>
-        <div class="phase-track" aria-label="개발 단계">
-          <article class="phase is-done"><span>S0</span><h2>현행 고정</h2><p>로그인→월드 입장과 초기 상태 기록</p><strong>통과</strong></article>
-          <article class="phase is-current"><span>S1</span><h2>연동 안전선</h2><p>네트워크·저장·전투 안정화</p><strong>4 / 8</strong></article>
-          <article class="phase"><span>M1</span><h2>월드 플레이</h2><p>맵, 캐릭터, 이동, NPC 대화</p><strong>진입 중</strong></article>
-          <article class="phase"><span>M2</span><h2>게임 루프</h2><p>전투, 스킬, 아이템, 퀘스트</p><strong>대기</strong></article>
-          <article class="phase"><span>OPS</span><h2>서비스 운영</h2><p>보안, 백업, 관측, 배포</p><strong>기준 정리</strong></article>
-        </div>
-        <div class="board-columns">
-          <article class="board-column"><header><h2>완료</h2><span>7</span></header><div class="task-card"><small>P0-10</small><strong>패킷 검증·예외 격리</strong><span class="badge badge-done">검증됨</span></div><div class="task-card"><small>P0-11</small><strong>이름·저장 경로 검증</strong><span class="badge badge-done">검증됨</span></div><div class="task-card"><small>M0</small><strong>Godot 로그인·원작 그래픽</strong><span class="badge badge-done">완료</span></div></article>
-          <article class="board-column is-current"><header><h2>진행 중</h2><span>2</span></header><div class="task-card"><small id="snapshot-current-area">M1-01</small><strong id="snapshot-board-title">월드 패킷과 화면 좌표 연결</strong><p id="snapshot-board-detail">현재 NEXT-ACTION</p><span class="badge badge-now">작업 중</span></div><div class="task-card"><small>ASSET</small><strong>아이템·벽 자산 해석</strong><p>원본 자료만 사용</p><span class="badge badge-now">분석 중</span></div></article>
-          <article class="board-column"><header><h2>다음</h2><span>4</span></header><div class="task-card"><small>P0-14</small><strong>송신 큐·완전 전송</strong><span class="badge">대기</span></div><div class="task-card"><small>P0-15</small><strong>원자 저장·복구</strong><span class="badge">대기</span></div><div class="task-card"><small>P0-16</small><strong>기본 전투 정확성</strong><span class="badge">대기</span></div><div class="task-card"><small>P0-17</small><strong>주소·포트 설정화</strong><span class="badge">대기</span></div></article>
-        </div>
-        <div class="section-heading"><div><p class="eyebrow">Connected knowledge</p><h2>Graphify 지식 그래프</h2></div><div class="section-actions"><a class="quiet-link" href="../graphify-out/GRAPH_REPORT.md">분석 보고서 →</a><a class="quiet-link" href="../graphify-out/graph.html">전체 화면 →</a></div></div>
-        <div class="graphify-summary" aria-label="Graphify 생성 현황"><article><span>노드</span><strong id="snapshot-graphify-nodes">미확인</strong></article><article><span>관계</span><strong id="snapshot-graphify-links">미확인</strong></article><article><span>커뮤니티</span><strong id="snapshot-graphify-communities">미확인</strong></article><article><span>Obsidian 노트</span><strong id="snapshot-obsidian-notes">미확인</strong></article></div>
-        <div class="graphify-layout">
-          <article class="panel graph-panel"><div class="panel-heading"><div><p class="eyebrow">Interactive map</p><h2>프로젝트 연결망을 여기서 탐색</h2><p class="snapshot" id="snapshot-graphify-mode">표시 방식 확인 중</p></div><span class="badge badge-partial" id="snapshot-graphify-state" role="status">생성 결과 확인 중</span></div><p class="graph-intro" id="graphify-description">확대·이동·노드 선택으로 구현 위치와 문서 근거를 탐색합니다. 현재 작업 검색에서 월드, 대상 선택, 전투, 인벤토리 구현 단위가 함께 발견됐습니다. 작은 화면에서는 그래프 안을 가로로 움직여 전체 작업면을 볼 수 있습니다. 생성 시각화는 마우스 중심이므로 키보드 사용자는 위 분석 보고서와 오른쪽 구현 위치 목록을 이용해 주세요.</p><div class="graph-frame-scroll" id="graphify-frame-shell"><iframe id="graphify-frame" title="LOD Graphify 지식 그래프" src="../graphify-out/graph.html" sandbox="allow-scripts" loading="lazy" tabindex="-1" aria-describedby="graphify-description"></iframe></div><p class="graph-unavailable" id="graphify-unavailable" role="status" hidden>이 환경에는 생성된 그래프 파일이 없습니다. 프로젝트에서 Graphify를 갱신한 뒤 스냅샷을 다시 생성해 주세요.</p></article>
-          <aside class="panel obsidian-panel"><p class="eyebrow">Linked notes</p><h2>Obsidian vault</h2><p>Graphify의 노드와 커뮤니티를 노트와 Canvas로 내보냈습니다. 처음에는 <code>graphify-out/obsidian</code> 폴더를 이름이 <code>obsidian</code>인 vault로 등록하면 양방향 링크로 탐색할 수 있습니다.</p><div class="obsidian-links"><a class="primary-button" href="obsidian://open?vault=obsidian&amp;file=graph.canvas">Obsidian에서 열기</a><a class="quiet-link" href="../graphify-out/obsidian/graph.canvas">Canvas 원본 →</a><a class="quiet-link" href="../graphify-out/obsidian/">vault 폴더 →</a></div><dl class="graph-sources" aria-label="현재 작업과 함께 발견된 구현 위치"><dt>월드 세션</dt><dd><code>mobile/src/Lod.Mobile.Core/World/WorldClient.cs:22</code></dd><dt>화면·대상</dt><dd><code>mobile/client/src/WorldView.cs:14, 522</code></dd><dt>전투 표현</dt><dd><code>mobile/client/src/Actor.cs:11, 134</code></dd><dt>인벤토리</dt><dd><code>mobile/client/src/PackPanel.cs:15</code></dd></dl><p class="snapshot" id="snapshot-graphify-date">생성 시각 미확인</p></aside>
-        </div>
-        <article class="command-box"><div><p class="eyebrow">Snapshot</p><h2>대시보드 상태 갱신</h2></div><code>node scripts/generate-dashboard-snapshot.js --verify</code><button type="button" data-copy-command="node scripts/generate-dashboard-snapshot.js --verify">복사</button></article>
-      </section>
-
-      <section class="view" data-view="world" aria-labelledby="world-title" hidden>
         <div class="page-heading">
           <div>
-            <p class="eyebrow">World connectivity</p>
-            <h1 id="world-title">Hades 지역 실제 맵·워프</h1>
-            <p>노비스 마을·포테의 숲·우드랜드를 전환해 Hades 실제 맵, 이미지 위 워프 좌표와 다음 목적지를 함께 확인합니다. 없는 연결은 추측하지 않습니다.</p>
+            <p class="eyebrow">What actually runs</p>
+            <h1 id="overview-title">지금 무엇이 되나</h1>
+            <p>기능 39개를 <b>서버에서 도는가</b> · <b>모바일에서 만져지는가</b> 두 칸으로 갈랐습니다. 숫자는 전부 저장소에서 다시 셌고, 근거 없는 진척률은 적지 않습니다.</p>
           </div>
-          <a class="quiet-link" href="../plans/server-pack-content-port.md">이식 계획 →</a>
+          <a class="quiet-link" href="feature-map.md">기능 표 원문 →</a>
         </div>
-        <div class="map-focus-tabs" role="tablist" aria-label="검토할 지역">
-          <button id="map-focus-tab-novice" type="button" role="tab" data-map-focus-target="novice" aria-controls="novice-village-focus" aria-selected="true">노비스 마을</button>
-          <button id="map-focus-tab-porte" type="button" role="tab" data-map-focus-target="porte" aria-controls="porte-forest-focus" aria-selected="false" tabindex="-1">포테의 숲</button>
-          <button id="map-focus-tab-woodland" type="button" role="tab" data-map-focus-target="woodland" aria-controls="woodland-focus" aria-selected="false" tabindex="-1">우드랜드</button>
+
+        <div class="tally-strip" id="impl-tally" aria-label="구현 현황 셈"></div>
+
+        <div class="filterbar item-filterbar">
+          <label class="visually-hidden" for="feature-search">기능 검색</label>
+          <input id="feature-search" type="search" placeholder="기능 이름·근거 경로로 찾기" autocomplete="off">
+          <div class="item-filter-row" role="group" aria-label="구현 상태"><span>상태</span><div class="item-chips" id="feature-states"></div></div>
+          <div class="item-filter-row" role="group" aria-label="묶음"><span>묶음</span><div class="item-chips" id="feature-groups-filter"></div></div>
         </div>
-        <div id="novice-village-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-novice" aria-live="polite"></div>
-        <div id="porte-forest-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-porte" aria-live="polite" hidden></div>
-        <div id="woodland-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-woodland" aria-live="polite" hidden></div>
-        <details class="world-draft">
-          <summary>전체 월드 탐색기 초안 보기</summary>
-          <div class="world-draft-body">
-        <ol class="world-reading" aria-label="지도 읽는 순서">
-          <li><span>1</span><div><strong>연결 구역</strong><small>서로 오갈 수 있는 맵 묶음</small></div></li>
-          <li><span>2</span><div><strong>현재 맵</strong><small>가운데에서 출발점을 확인</small></div></li>
-          <li><span>3</span><div><strong>워프 방향</strong><small>들어오는 길과 나가는 길을 구분</small></div></li>
-        </ol>
-        <div id="world-summary" class="world-summary"></div>
-        <section class="world-regions-panel" aria-labelledby="world-regions-title">
-          <div class="world-section-heading">
-            <div><p class="eyebrow">Connected regions</p><h2 id="world-regions-title">연결 구역 구조도</h2></div>
-            <p>각 구역은 다른 구역과 끊겨 있습니다. 구역을 누르면 대표 맵부터 살펴봅니다.</p>
-          </div>
-          <div id="world-regions" class="world-regions" role="group" aria-label="연결 구역 선택"></div>
-        </section>
-        <div class="world-controls">
-          <div class="world-search-field">
-            <label class="world-search-label" for="world-search">맵 이름 또는 번호로 찾기</label>
-            <input id="world-search" type="search" placeholder="예: 밀레스마을, 20287" autocomplete="off">
-          </div>
-          <div id="world-filters" class="world-filters" aria-label="맵 표시 범위">
-            <button type="button" data-world-filter="connected" aria-pressed="true">연결된 맵</button>
-            <button type="button" data-world-filter="image" aria-pressed="false">지형 그림 있음</button>
-            <button type="button" data-world-filter="isolated" aria-pressed="false">미연결 맵</button>
-            <button type="button" data-world-filter="all" aria-pressed="false">전체</button>
-          </div>
-        </div>
-        <div class="world-body">
-          <article class="panel world-panel">
-            <div id="world-detail" class="world-detail" aria-live="polite"></div>
-          </article>
-          <aside class="world-side" aria-labelledby="world-results-title">
-            <div class="world-results-heading"><h2 id="world-results-title">맵 목록</h2><span id="world-result-count"></span></div>
-            <div id="world-list" class="world-list" role="group" aria-label="검색된 맵 선택"></div>
-          </aside>
-        </div>
-          </div>
-        </details>
+
+        <div class="feature-board" id="feature-board"></div>
+        <p class="empty-state" id="feature-empty" hidden>조건에 맞는 기능이 없어요. 필터를 지워 보세요.</p>
+
+        <aside class="notice" id="overview-now"><strong>지금 할 일</strong><p id="snapshot-current-title">스냅샷을 읽는 중입니다.</p><p class="snapshot" id="snapshot-verification-title">검증 기록 없음</p><a class="quiet-link" href="../NEXT.md">NEXT.md 원문 →</a></aside>
       </section>
+
+      <section class="view" data-view="monsters" aria-labelledby="monsters-title" hidden>
+        <div class="item-topbar">
+          <h1 id="monsters-title">괴물 도감</h1>
+          <dl class="item-tally">
+            <dt>종류</dt><dd id="monster-kinds">—</dd>
+            <dt>자리</dt><dd id="monster-slots">—</dd>
+            <dt>그림 있음</dt><dd id="monster-sprites">—</dd>
+            <dt>지금</dt><dd id="monster-shown">—</dd>
+          </dl>
+          <p>지금 걸어 다닐 수 있는 지역에 실제로 서 있는 괴물만 있습니다</p>
+          <a class="quiet-link" href="monster-behaviour.md">움직임·선공 근거 →</a>
+        </div>
+
+        <div class="filterbar item-filterbar">
+          <label class="visually-hidden" for="monster-search">괴물 검색</label>
+          <input id="monster-search" type="search" placeholder="이름·맵 이름으로 찾기" autocomplete="off">
+          <div class="item-filter-row" role="group" aria-label="지역"><span>지역</span><div class="item-chips" id="monster-regions"></div></div>
+          <div class="item-filter-row" role="group" aria-label="맵"><span>맵</span><div class="item-chips" id="monster-maps"></div></div>
+          <div class="item-filter-row" role="group" aria-label="정렬"><span>정렬</span><div class="item-chips" id="monster-sorts"></div></div>
+          <div class="item-filter-row monster-level-row">
+            <label for="monster-level">내 레벨</label>
+            <input id="monster-level" type="range" min="1" max="40" value="1" aria-describedby="monster-level-note">
+            <output id="monster-level-out" for="monster-level">1</output>
+            <small id="monster-level-note">레벨이 높으면 경험치가 깎입니다 — 그 규칙은 <b>우리가 정한 값</b>입니다</small>
+          </div>
+        </div>
+
+        <div class="monster-grid" id="monster-grid"></div>
+        <p class="empty-state" id="monster-empty" hidden>조건에 맞는 괴물이 없어요. 필터를 지워 보세요.</p>
+
+        <aside class="notice" id="monster-rules"></aside>
+      </section>
+
       <section class="view" data-view="abilities" aria-labelledby="abilities-title" hidden>
         <div class="item-topbar">
           <h1 id="abilities-title">기술·마법 도감</h1>
           <dl class="item-tally">
             <dt>전체</dt><dd id="ability-total">—</dd>
             <dt>한글</dt><dd id="ability-named">—</dd>
-            <dt>연출 있음</dt><dd id="ability-playable">—</dd>
-            <dt>구현</dt><dd id="ability-built-count">—</dd>
+            <dt>다 나감</dt><dd id="ability-playable">—</dd>
+            <dt>스크립트</dt><dd id="ability-built-count">—</dd>
             <dt>지금</dt><dd id="ability-shown">—</dd>
           </dl>
-          <p>카드를 가리키면 샌드백에 그 기술의 연출이 재생됩니다</p>
-          <a class="quiet-link" href="../data/기술마법-한글이름.tsv">이름표 →</a>
+          <p>기본은 <b>몸동작·이펙트·소리가 다 나가는 것</b>만 봅니다. 번호는 팩 표가 아니라 <b>서버가 실제로 보내는 것</b>입니다</p>
+          <a class="quiet-link" href="martial-artist-skill-presentation.md">연출 근거 →</a>
         </div>
+
+        <div class="tally-strip" id="ability-presentation" aria-label="연출 세 채널 채움"></div>
 
         <div class="filterbar item-filterbar">
           <label class="visually-hidden" for="ability-search">기술·마법 검색</label>
@@ -215,6 +125,12 @@
           </div></div>
         </div>
 
+        <details class="ability-original" id="ability-original-monk">
+          <summary>원작 엑셀 — 도가 일반 기술표 (검토용)</summary>
+          <p class="notice">모션·이펙트·소리는 엑셀 열이 아니라 기존 Hades 템플릿·스크립트와 이름을 맞춘 결과입니다. 매칭되지 않은 행은 값을 추측하지 않습니다.</p>
+          <div class="ability-original-table" id="ability-original-monk-table"></div>
+        </details>
+
         <div id="ability-export-box" hidden></div>
 
         <div class="item-grid ability-grid" id="ability-grid"></div>
@@ -228,6 +144,7 @@
 
         <div class="ability-stage" id="ability-stage" hidden aria-hidden="true"></div>
       </section>
+
       <section class="view" data-view="items" aria-labelledby="items-title" hidden>
         <div class="item-topbar">
           <h1 id="items-title">아이템 도감</h1>
@@ -266,60 +183,129 @@
         <div class="item-hover" id="item-hover" hidden aria-hidden="true"></div>
       </section>
 
+      <section class="view" data-view="world" aria-labelledby="world-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Where you can walk</p>
+            <h1 id="world-title">지도 — 지금 걸어 다닐 수 있는 곳</h1>
+            <p>마을에서 몇 번 워프해야 닿는지로 줄을 세웠습니다. <b>마을에서 못 닿는 맵</b>과 <b>들어가면 못 나오는 길</b>을 따로 표시합니다. 없는 연결은 추측하지 않습니다.</p>
+          </div>
+          <a class="quiet-link" href="pote-forest.md">포테의숲 계획 →</a>
+        </div>
+
+        <section class="route" aria-labelledby="route-title">
+          <div class="world-section-heading">
+            <div><p class="eyebrow">How you actually get there</p><h2 id="route-title">가는 길 — 노비스마을에서 포테의숲까지</h2></div>
+            <p>칸마다 그 맵의 실제 그림이고, <b>밝게 찍힌 칸</b>이 다음 맵으로 넘어가는 자리입니다. 좌표는 서버 워프 정의 그대로입니다.</p>
+          </div>
+          <ol class="route-legs" id="route-legs"></ol>
+        </section>
+
+        <div class="map-focus-tabs" role="tablist" aria-label="지역 고르기" id="warp-region-tabs"></div>
+        <div class="tally-strip" id="warp-tally" aria-label="연결 셈"></div>
+        <div class="warp-chart" id="warp-chart"></div>
+        <p class="empty-state" id="warp-empty" hidden>이 지역의 연결 자료가 없습니다.</p>
+
+        <details class="world-draft">
+          <summary>맵 그림 위에서 워프 자리 보기 — 노비스 · 포테의 숲 · 우드랜드</summary>
+          <div class="world-draft-body">
+            <div class="map-focus-tabs" role="tablist" aria-label="검토할 지역">
+              <button id="map-focus-tab-novice" type="button" role="tab" data-map-focus-target="novice" aria-controls="novice-village-focus" aria-selected="true">노비스 마을</button>
+              <button id="map-focus-tab-porte" type="button" role="tab" data-map-focus-target="porte" aria-controls="porte-forest-focus" aria-selected="false" tabindex="-1">포테의 숲</button>
+              <button id="map-focus-tab-woodland" type="button" role="tab" data-map-focus-target="woodland" aria-controls="woodland-focus" aria-selected="false" tabindex="-1">우드랜드</button>
+            </div>
+            <div id="novice-village-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-novice" aria-live="polite"></div>
+            <div id="porte-forest-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-porte" aria-live="polite" hidden></div>
+            <div id="woodland-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-woodland" aria-live="polite" hidden></div>
+          </div>
+        </details>
+
+        <details class="world-draft">
+          <summary>전체 월드 탐색기 초안 보기 — 맵 전체, 다른 세션이 만드는 중</summary>
+          <div class="world-draft-body">
+            <ol class="world-reading" aria-label="지도 읽는 순서">
+              <li><span>1</span><div><strong>연결 구역</strong><small>서로 오갈 수 있는 맵 묶음</small></div></li>
+              <li><span>2</span><div><strong>현재 맵</strong><small>가운데에서 출발점을 확인</small></div></li>
+              <li><span>3</span><div><strong>워프 방향</strong><small>들어오는 길과 나가는 길을 구분</small></div></li>
+            </ol>
+            <div id="world-summary" class="world-summary"></div>
+            <section class="world-regions-panel" aria-labelledby="world-regions-title">
+              <div class="world-section-heading">
+                <div><p class="eyebrow">Connected regions</p><h2 id="world-regions-title">연결 구역 구조도</h2></div>
+                <p>각 구역은 다른 구역과 끊겨 있습니다. 구역을 누르면 대표 맵부터 살펴봅니다.</p>
+              </div>
+              <div id="world-regions" class="world-regions" role="group" aria-label="연결 구역 선택"></div>
+            </section>
+            <div class="world-controls">
+              <div class="world-search-field">
+                <label class="world-search-label" for="world-search">맵 이름 또는 번호로 찾기</label>
+                <input id="world-search" type="search" placeholder="예: 밀레스마을, 20287" autocomplete="off">
+              </div>
+              <div id="world-filters" class="world-filters" aria-label="맵 표시 범위">
+                <button type="button" data-world-filter="connected" aria-pressed="true">연결된 맵</button>
+                <button type="button" data-world-filter="image" aria-pressed="false">지형 그림 있음</button>
+                <button type="button" data-world-filter="isolated" aria-pressed="false">미연결 맵</button>
+                <button type="button" data-world-filter="all" aria-pressed="false">전체</button>
+              </div>
+            </div>
+            <div class="world-body">
+              <article class="panel world-panel">
+                <div id="world-detail" class="world-detail" aria-live="polite"></div>
+              </article>
+              <aside class="world-side" aria-labelledby="world-results-title">
+                <div class="world-results-heading"><h2 id="world-results-title">맵 목록</h2><span id="world-result-count"></span></div>
+                <div id="world-list" class="world-list" role="group" aria-label="검색된 맵 선택"></div>
+              </aside>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="view" data-view="changes" aria-labelledby="changes-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Diff from the original</p>
+            <h1 id="changes-title">원작과 달라진 것</h1>
+            <p>되돌린 것·팩에서 가져온 것·<b>근거 없이 우리가 정한 것</b>을 갈라 놓았습니다. 우리가 정한 값에는 「무엇이 나오면 버릴 수 있나」가 함께 적혀 있습니다.</p>
+          </div>
+          <a class="quiet-link" href="monster-experience-rescale.md">경험치 조사 원문 →</a>
+        </div>
+
+        <div class="tally-strip" id="change-tally" aria-label="달라진 것 셈"></div>
+
+        <div class="filterbar item-filterbar">
+          <div class="item-filter-row" role="group" aria-label="갈래"><span>갈래</span><div class="item-chips" id="change-kinds"></div></div>
+          <div class="item-filter-row" role="group" aria-label="영역"><span>영역</span><div class="item-chips" id="change-areas"></div></div>
+        </div>
+
+        <div class="change-list" id="change-list"></div>
+        <p class="empty-state" id="change-empty" hidden>조건에 맞는 항목이 없어요.</p>
+      </section>
+
       <section class="view" data-view="knowledge" aria-labelledby="knowledge-title" hidden>
         <div class="page-heading"><div><p class="eyebrow">Game knowledge</p><h1 id="knowledge-title">게임 데이터 게시판</h1><p>스킬·마법·캐릭터·퀘스트와 월드 데이터를 출처·확인 수준과 함께 관리합니다.</p></div><a class="quiet-link" href="current-system-analysis/05-game-data-locations.md">분석 원문 →</a></div>
         <div class="filterbar" role="search"><label for="knowledge-search">게시판 검색</label><input id="knowledge-search" type="search" placeholder="이름, 설명, 소스 경로 검색" autocomplete="off"><div class="filter-chips" aria-label="분류 필터"><button type="button" class="chip is-active" data-category="all" aria-pressed="true">전체</button><button type="button" class="chip" data-category="characters" aria-pressed="false">캐릭터</button><button type="button" class="chip" data-category="skills" aria-pressed="false">스킬</button><button type="button" class="chip" data-category="spells" aria-pressed="false">마법</button><button type="button" class="chip" data-category="quests" aria-pressed="false">퀘스트</button><button type="button" class="chip" data-category="world" aria-pressed="false">월드</button><button type="button" class="chip" data-category="operations" aria-pressed="false">운영</button></div></div>
         <p class="result-count" id="knowledge-count" aria-live="polite"></p><div class="knowledge-list" id="knowledge-list"></div><div class="empty-state" id="knowledge-empty" hidden><strong>일치하는 항목이 없습니다.</strong><p>검색어를 줄이거나 다른 분류를 선택해 보세요.</p></div>
       </section>
 
-      <section class="view" data-view="operations" aria-labelledby="operations-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Live operations</p><h1 id="operations-title">게임을 계속 운영하려면</h1><p>서비스에 필요한 보안·저장·관측·배포 업무를 놓치지 않게 정리합니다.</p></div><a class="quiet-link" href="operations/README.md">운영 기준 전체 보기 →</a></div>
-        <aside class="notice"><strong>기준 문서화 ≠ 기능 구현</strong><p>레거시 인증은 존재하지만 비밀번호 해시·TLS·세션 보호·RBAC 등 공개 운영 통제 미구현 상태입니다. 백업·관측·배포 자동화도 구현 전입니다.</p></aside>
-        <div class="ops-grid">
-          <article class="ops-card"><header><span>01</span><h2>계정·보안</h2><span class="badge badge-risk">통제 미구현</span></header><ul><li>평문 비밀번호 제거와 안전한 해시</li><li>TLS·토큰 세션·계정 복구</li><li>로그인 남용 방지와 권한 분리</li></ul><a class="quiet-link" href="operations/security-maintenance.md">보안 유지보수 기준 →</a></article>
-          <article class="ops-card"><header><span>02</span><h2>저장·백업</h2><span class="badge badge-now">기준 문서화</span></header><ul><li>JSON 원자 저장과 실패 복구</li><li>불변 백업·복원 리허설</li><li>사용자 증가 시 DB 이전 기준</li></ul><a class="quiet-link" href="operations/backup-restore.md">백업·복구 기준 →</a></article>
-          <article class="ops-card"><header><span>03</span><h2>관측·장애 대응</h2><span class="badge badge-partial">기준 문서화</span></header><ul><li>서버 로그·지표·알림</li><li>변조 방지 감사 기록</li><li>SEV 분류·역할·보안 사고 분기</li></ul><a class="quiet-link" href="operations/incident-response.md">장애 대응 기준 →</a></article>
-          <article class="ops-card"><header><span>04</span><h2>배포·업데이트</h2><span class="badge badge-partial">기준 문서화</span></header><ul><li>.NET 지원 버전 이전</li><li>빌드 출처·SBOM·서명 검증</li><li>앱·서버·데이터 호환과 롤백</li></ul><a class="quiet-link" href="operations/release-rollback.md">릴리스·롤백 기준 →</a></article>
-          <article class="ops-card"><header><span>05</span><h2>게임 운영 도구</h2><span class="badge">대기</span></header><ul><li>캐릭터·아이템 조회와 제재</li><li>공지·이벤트·퀘스트 배포</li><li>월드 상태와 경제 모니터링</li></ul></article>
-          <article class="ops-card"><header><span>06</span><h2>권리·정책</h2><span class="badge badge-risk">결정 필요</span></header><ul><li>원작 리소스 사용 범위</li><li>개인 실험과 공개 배포 구분</li><li>개인정보·로그 보존 정책</li></ul></article>
+      <section class="view" data-view="delivery" aria-labelledby="delivery-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">Connected knowledge</p><h1 id="delivery-title">Graphify 지식 그래프</h1><p>코드와 문서의 연결을 한 화면에서 봅니다. 구현 위치를 찾을 때 씁니다.</p></div><div class="section-actions"><a class="quiet-link" href="../graphify-out/GRAPH_REPORT.md">분석 보고서 →</a><a class="quiet-link" href="../graphify-out/graph.html">전체 화면 →</a></div></div>
+        <div class="graphify-summary" aria-label="Graphify 생성 현황"><article><span>노드</span><strong id="snapshot-graphify-nodes">미확인</strong></article><article><span>관계</span><strong id="snapshot-graphify-links">미확인</strong></article><article><span>커뮤니티</span><strong id="snapshot-graphify-communities">미확인</strong></article><article><span>Obsidian 노트</span><strong id="snapshot-obsidian-notes">미확인</strong></article></div>
+        <div class="graphify-layout">
+          <article class="panel graph-panel"><div class="panel-heading"><div><p class="eyebrow">Interactive map</p><h2>프로젝트 연결망을 여기서 탐색</h2><p class="snapshot" id="snapshot-graphify-mode">표시 방식 확인 중</p></div><span class="badge badge-partial" id="snapshot-graphify-state" role="status">생성 결과 확인 중</span></div><p class="graph-intro" id="graphify-description">확대·이동·노드 선택으로 구현 위치와 문서 근거를 탐색합니다. 작은 화면에서는 그래프 안을 가로로 움직여 전체 작업면을 볼 수 있습니다. 생성 시각화는 마우스 중심이므로 키보드 사용자는 위 분석 보고서와 오른쪽 구현 위치 목록을 이용해 주세요.</p><div class="graph-frame-scroll" id="graphify-frame-shell"><iframe id="graphify-frame" title="LOD Graphify 지식 그래프" src="../graphify-out/graph.html" sandbox="allow-scripts" loading="lazy" tabindex="-1" aria-describedby="graphify-description"></iframe></div><p class="graph-unavailable" id="graphify-unavailable" role="status" hidden>이 환경에는 생성된 그래프 파일이 없습니다. 프로젝트에서 Graphify를 갱신한 뒤 스냅샷을 다시 생성해 주세요.</p></article>
+          <aside class="panel obsidian-panel"><p class="eyebrow">Linked notes</p><h2>Obsidian vault</h2><p>Graphify의 노드와 커뮤니티를 노트와 Canvas로 내보냈습니다. 처음에는 <code>graphify-out/obsidian</code> 폴더를 이름이 <code>obsidian</code>인 vault로 등록하면 양방향 링크로 탐색할 수 있습니다.</p><div class="obsidian-links"><a class="primary-button" href="obsidian://open?vault=obsidian&amp;file=graph.canvas">Obsidian에서 열기</a><a class="quiet-link" href="../graphify-out/obsidian/graph.canvas">Canvas 원본 →</a><a class="quiet-link" href="../graphify-out/obsidian/">vault 폴더 →</a></div><dl class="graph-sources" aria-label="현재 작업과 함께 발견된 구현 위치"><dt>월드 세션</dt><dd><code>mobile/src/Lod.Mobile.Core/World/WorldClient.cs</code></dd><dt>화면·대상</dt><dd><code>mobile/client/src/WorldView.cs</code></dd><dt>전투 표현</dt><dd><code>mobile/client/src/Actor.cs</code></dd><dt>인벤토리</dt><dd><code>mobile/client/src/PackPanel.cs</code></dd></dl><p class="snapshot" id="snapshot-graphify-date">생성 시각 미확인</p></aside>
         </div>
-        <div class="section-heading"><div><p class="eyebrow">Operational truth</p><h2>운영 가능성 체크</h2></div><span class="snapshot">근거 기준일 2026-09-10</span></div>
-        <div class="readiness-table" role="table" aria-label="운영과 유지보수 준비 상태">
-          <div class="readiness-row readiness-head" role="row"><span role="columnheader">영역</span><span role="columnheader">현재 근거</span><span role="columnheader">운영 기준</span><span role="columnheader">상태</span></div>
-          <div class="readiness-row" role="row"><strong role="cell">신뢰성</strong><span role="cell">로컬 특성화 테스트</span><span role="cell">사용자 관점 SLI/SLO·오류 예산</span><span role="cell" class="badge">미계측</span></div>
-          <div class="readiness-row" role="row"><strong role="cell">장애 대응</strong><span role="cell"><a href="operations/incident-response.md">SEV·역할·대응 기준</a></span><span role="cell">호출 체계·훈련·사후 검토 근거</span><span role="cell" class="badge badge-partial">실행 미검증</span></div>
-          <div class="readiness-row" role="row"><strong role="cell">복구</strong><span role="cell"><a href="operations/backup-restore.md">RPO/RTO·불변 백업 기준</a></span><span role="cell">자동 백업·복원 리허설·삭제 내성</span><span role="cell" class="badge badge-risk">통제 미구현</span></div>
-          <div class="readiness-row" role="row"><strong role="cell">유지보수</strong><span role="cell"><a href="operations/security-maintenance.md">보안·의존성 기준</a></span><span role="cell">지원 버전·SBOM·취약점·감사 로그</span><span role="cell" class="badge badge-risk">전환 필요</span></div>
-          <div class="readiness-row" role="row"><strong role="cell">릴리스</strong><span role="cell"><a href="operations/release-rollback.md">릴리스·롤백 기준</a></span><span role="cell">CI·신뢰된 빌드·서명·롤백 실행</span><span role="cell" class="badge badge-risk">자동화 미구현</span></div>
-        </div>
-        <div class="maintenance-grid"><article class="panel"><p class="eyebrow">Maintenance queue</p><h2>기술 부채를 기능처럼 관리</h2><ul><li>.NET 5 지원 종료와 이전 목표 버전</li><li>직접·전이 의존성, 라이선스, 알려진 취약점</li><li>원작 자산의 출처·권리·변환 재현성</li><li>삭제·마이그레이션·호환 중단 결정 기록</li></ul></article><article class="panel"><p class="eyebrow">Activation gate</p><h2>언제 실시간 화면을 붙일까</h2><p>공개 테스트 서버가 생기면 로그인·월드 입장·이동·전투에 trace를 연결하고, 사용자 관점 SLI와 알림을 이 화면에 붙입니다. 지금은 허위 숫자 대신 <strong>미계측</strong>으로 둡니다.</p></article></div>
-        <aside class="notice"><strong>운영 준비도는 아직 낮습니다.</strong><p>현재는 실행·연동 검증 단계입니다. <a href="operations/service-readiness.md">서비스 준비도 게이트</a>에서 공개 테스트 금지 조건과 단계별 판정 근거를 확인할 수 있습니다.</p></aside>
+        <article class="command-box"><div><p class="eyebrow">Snapshot</p><h2>대시보드 상태 갱신</h2></div><code>node scripts/generate-dashboard-snapshot.js --verify</code><button type="button" data-copy-command="node scripts/generate-dashboard-snapshot.js --verify">복사</button></article>
       </section>
 
-      <section class="view" data-view="prototypes" aria-labelledby="prototypes-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Prototype lab</p><h1 id="prototypes-title">화면 실험실</h1><p>로그인부터 전투 HUD까지 모두 이 대시보드 안에서 바로 확인합니다.</p></div><a class="quiet-link" href="mobile-test-v1-wireframes.md">와이어프레임 명세 →</a></div>
-        <article class="inline-lab">
-          <div class="lab-heading"><div><p class="eyebrow">Mobile flow</p><h2>모바일 화면 6장</h2></div><div class="screen-tabs" role="tablist" aria-label="미리 볼 게임 화면"><button id="screen-tab-login" type="button" role="tab" aria-selected="true" aria-controls="screen-layer-login" data-demo-screen="login">로그인</button><button id="screen-tab-character" type="button" role="tab" aria-selected="false" aria-controls="screen-layer-character" data-demo-screen="character">캐릭터</button><button id="screen-tab-world" type="button" role="tab" aria-selected="false" aria-controls="screen-layer-world" data-demo-screen="world">게임</button><button id="screen-tab-npc" type="button" role="tab" aria-selected="false" aria-controls="screen-layer-npc" data-demo-screen="npc">NPC</button><button id="screen-tab-combat" type="button" role="tab" aria-selected="false" aria-controls="screen-layer-combat" data-demo-screen="combat">전투</button><button id="screen-tab-inventory" type="button" role="tab" aria-selected="false" aria-controls="screen-layer-inventory" data-demo-screen="inventory">인벤토리</button></div></div>
-          <div class="game-preview" id="inline-game-preview" data-screen="login">
-            <img class="world-art" src="ui/assets/world-safehouse.png" alt="원작 자산으로 구성한 게임 월드 배경">
-            <div class="world-hud" aria-hidden="true"><span>HP 100</span><span>MP 80</span><i></i><b>공격</b></div>
-            <div id="screen-layer-login" class="screen-layer login-layer" role="tabpanel" aria-labelledby="screen-tab-login" data-screen-layer="login"><div class="demo-window"><small>DARK AGES</small><strong>어둠의 전설</strong><label for="demo-login-id">아이디</label><input id="demo-login-id" type="text" value="test" readonly><button type="button">로그인</button></div></div>
-            <div id="screen-layer-character" class="screen-layer" role="tabpanel" aria-labelledby="screen-tab-character" data-screen-layer="character" hidden><div class="demo-window"><small>CHARACTER</small><strong>테스트 캐릭터</strong><p>레벨 1 · 밀레스 여관</p><button type="button">게임 입장</button></div></div>
-            <div id="screen-layer-world" class="screen-layer screen-caption" role="tabpanel" aria-labelledby="screen-tab-world" data-screen-layer="world" hidden><strong>기본 게임</strong><span>맵·캐릭터·이동 패킷 연동 화면</span></div>
-            <div id="screen-layer-npc" class="screen-layer" role="tabpanel" aria-labelledby="screen-tab-npc" data-screen-layer="npc" hidden><div class="dialogue-box"><strong>여관 주인</strong><p>어서 오세요. 무엇을 도와드릴까요?</p><button type="button">대화 계속</button></div></div>
-            <div id="screen-layer-combat" class="screen-layer" role="tabpanel" aria-labelledby="screen-tab-combat" data-screen-layer="combat" hidden><div class="target-ring" aria-hidden="true"></div><div class="combat-log"><strong>벌</strong><span>HP 24 / 30</span><p>기본 공격 대상을 선택했습니다.</p></div></div>
-            <div id="screen-layer-inventory" class="screen-layer" role="tabpanel" aria-labelledby="screen-tab-inventory" data-screen-layer="inventory" hidden><div class="inventory-window"><strong>인벤토리</strong><div aria-label="아이템 슬롯"><span>검</span><span>옷</span><span>물약</span><span></span><span></span><span></span></div></div></div>
-          </div>
-        </article>
-        <article class="inline-lab hud-lab">
-          <div class="lab-heading"><div><p class="eyebrow">Interactive HUD</p><h2>HUD 조작 시안</h2></div><div class="hud-tools"><button type="button" aria-pressed="false" data-hud-toggle="touch">터치 영역</button><button type="button" aria-pressed="false" data-hud-toggle="offline">연결 끊김</button></div></div>
-          <div class="hud-preview" id="inline-hud-preview"><img src="ui/assets/world-safehouse-2.png" alt="원작 자산으로 구성한 HUD 테스트 월드"><div class="offline-banner" role="status">서버 연결이 끊겼습니다 · 재연결 중</div><div class="touch-zone move-zone" aria-hidden="true">이동</div><div class="touch-zone action-zone" aria-hidden="true">행동</div><div class="hud-status"><span>테스트</span><b>HP 100</b><b>MP 80</b><em id="hud-feedback" role="status" aria-live="polite">대기</em></div><span class="hud-avatar" aria-hidden="true"></span><button type="button" class="hud-target" data-hud-target aria-pressed="false"><strong>벌</strong><span>HP <b id="hud-target-hp">30</b> / 30</span></button><div class="hud-pad" aria-label="이동 조작"><button type="button" aria-label="위로 이동" data-hud-move="up">↑</button><button type="button" aria-label="왼쪽으로 이동" data-hud-move="left">←</button><button type="button" aria-label="제자리" data-hud-move="center">●</button><button type="button" aria-label="오른쪽으로 이동" data-hud-move="right">→</button><button type="button" aria-label="아래로 이동" data-hud-move="down">↓</button></div><div class="hud-actions" aria-label="전투 단축키"><button type="button" data-hud-action="attack">공격</button><button type="button" data-hud-action="skill">스킬</button><button type="button" data-hud-action="potion">물약</button></div></div>
-        </article>
-      </section>
     </main>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-effects-data.js"></script><script src="body-motions-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script><script src="dashboard-model.js"></script><script src="world-map-model.js"></script><script src="dashboard.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="items-data.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<!-- 자료가 먼저, 그다음 모델, 마지막이 화면. overview.js 가 다른 화면의 셈까지 한 줄로 보여 주므로
+     자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-effects-data.js"></script><script src="body-motions-data.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
+<script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
+<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>
