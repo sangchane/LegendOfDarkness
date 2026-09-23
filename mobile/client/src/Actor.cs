@@ -172,11 +172,14 @@ public sealed partial class Actor : Node2D
         // 사람 기준 120x96 에 발이 83 이라, 칸 꼭대기에 붙이면 머리 위로 서른 칸쯤 떠 버린다.
         float head = -_sheet.FeetY + HeadTop(_standing[0], _sheet);
 
-        _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, head - 7) };
+        // 걸린 것들은 막대 바로 아래, 머리 바로 위에 줄로 선다 — 눈이 이미 가 있는 자리라 따로 찾지 않아도 된다.
+        // 배지(10)가 머리카락을 덮지 않게 머리 꼭대기에서 2 띄우고, 막대는 그 배지 위로 올린다(사용자, 2026-09-23).
+        float badges = head - 2 - StatusRow.Height;
+
+        _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, badges - 2 - HealthBar.Thickness) };
         AddChild(_hurt);
 
-        // 걸린 것들은 그 막대 바로 아래에 줄로 선다 — 눈이 이미 가 있는 자리라 따로 찾지 않아도 된다.
-        _ailing = new StatusRow { Name = "Status", Visible = false, Position = new Vector2(0, head - 5) };
+        _ailing = new StatusRow { Name = "Status", Visible = false, Position = new Vector2(0, badges) };
         AddChild(_ailing);
 
         Face(_direction);

@@ -18,6 +18,9 @@ public sealed partial class HealthBar : Node2D
 
     private const int Height = 3;
 
+    /// <summary>How tall the bar is with its edge, so the badges under it can be placed clear of it.</summary>
+    public const int Thickness = Height + 1;
+
     /// <summary>How long it stays at full strength, and how long it takes to fade after that.</summary>
     private const double StaySeconds = 3.0;
 

@@ -28,6 +28,9 @@ public sealed partial class StatusRow : Node2D
     /// <summary>How big one picture is, the time bar beside it, and how far apart they sit.</summary>
     private const int Side = 10;
 
+    /// <summary>How tall the row is, so whoever places it can keep it off the head.</summary>
+    public const int Height = Side;
+
     private const int Bar = 2;
 
     private const int Gap = 2;
