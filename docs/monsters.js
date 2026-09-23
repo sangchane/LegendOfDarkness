@@ -46,15 +46,18 @@
   function sprite(monster) {
     var art = monster.스프라이트;
     if (!art) { return text("div", "monster-art is-missing", "그림 없음"); }
-    // 한 칸만 보인다. 판을 칸 수만큼 넓게 깔고 왼쪽 끝으로 잘라 낸다.
-    var frame = Math.round(art.너비 / art.칸);
+    var frameWidth = Math.round(art.너비 / art.칸);
     var box = text("div", "monster-art is-animated");
-    box.style.setProperty("--w", frame + "px");
+    box.style.setProperty("--w", frameWidth + "px");
     box.style.setProperty("--h", art.높이 + "px");
     box.style.setProperty("--sheet", "url(" + SPRITE_DIR + art.이름 + ".png)");
-    box.style.setProperty("--sheet-w", art.너비 + "px");
-    box.style.setProperty("--frames", art.칸);
     box.title = art.이름 + " · " + art.칸 + "칸";
+
+    // 동작 구간: walk 가 없으면 기본 0, 1
+    var walk = art.동작 && art.동작.walk ? art.동작.walk : [0, 1];
+    box.dataset.walkOffset = walk[0];
+    box.dataset.walkCount = walk[1];
+    box.dataset.frameWidth = frameWidth;
     return box;
   }
 
@@ -240,6 +243,35 @@
     render();
   });
 
+  // 몬스터 상하좌우 모션 애니메이터
+  var tick = 0;
+  function animateMonsters() {
+    tick += 1;
+    // 6틱(약 100ms * 6 = 0.6초)마다 프레임 변경, 24틱마다 방향 전환
+    var dir = Math.floor(tick / 24) % 4; 
+    // 0=North(등), 1=East(앞), 2=South(앞,반전), 3=West(등,반전)
+    var usesBack = (dir === 0 || dir === 3);
+    var usesFlip = (dir === 2 || dir === 3);
+
+    var arts = document.querySelectorAll(".monster-art.is-animated");
+    for (var i = 0; i < arts.length; i++) {
+      var box = arts[i];
+      var offset = Number(box.dataset.walkOffset) || 0;
+      var count = Number(box.dataset.walkCount) || 1;
+      var w = Number(box.dataset.frameWidth) || 0;
+
+      // 앞/등 구간 결정: 앞(Front) 구간은 등(Back) 구간 뒤에 바로 이어진다.
+      var baseFrame = usesBack ? offset : offset + count;
+      var frameIdx = baseFrame + (Math.floor(tick / 6) % count);
+
+      box.style.backgroundPosition = (-frameIdx * w) + "px 0";
+      box.style.transform = usesFlip ? "scaleX(-1)" : "scaleX(1)";
+    }
+    
+    setTimeout(animateMonsters, 100);
+  }
+
   rules();
   render();
+  animateMonsters();
 })();

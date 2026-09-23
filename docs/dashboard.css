@@ -225,8 +225,6 @@ button.tally:hover{background:var(--raised)}
 .monster-where{display:block;margin-top:2px;color:var(--muted);font:10px var(--mono)}
 .monster-marks{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .monster-art{flex:0 0 auto;width:var(--w);height:var(--h);background-image:var(--sheet);background-size:var(--sheet-w) auto;background-position:0 0;background-repeat:no-repeat;image-rendering:pixelated;transform:scale(1.4);transform-origin:top left;margin-right:calc(var(--w) * .4)}
-.monster-art.is-animated{animation:monster-walk calc(var(--frames) * 0.15s) steps(var(--frames)) infinite}
-@keyframes monster-walk{to{background-position:calc(var(--sheet-w) * -1) 0}}
 .monster-art.is-missing{width:44px;height:44px;display:grid;place-items:center;border:1px dashed var(--edge);color:var(--muted);font-size:9px;transform:none;margin:0}
 .monster-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--edge);border:1px solid var(--edge)}
 .monster-stat{background:var(--raised);padding:8px 9px;min-width:0}

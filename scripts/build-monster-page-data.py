@@ -98,13 +98,18 @@ def sprite_for(image):
     height = int.from_bytes(head[20:24], "big")
 
     frames = 1
+    actions = {}
     meta = SPRITES / f"{name}.txt"
     if meta.exists():
         for line in meta.read_text(encoding="utf-8").splitlines():
-            if line.startswith("frames "):
-                frames = max(1, int(line.split()[1]))
-                break
-    return {"이름": name, "칸": frames, "너비": width, "높이": height}
+            parts = line.split()
+            if not parts: continue
+            if parts[0] == "frames":
+                frames = max(1, int(parts[1]))
+            elif len(parts) >= 3:
+                actions[parts[0]] = [int(parts[1]), int(parts[2])]
+
+    return {"이름": name, "칸": frames, "너비": width, "높이": height, "동작": actions}
 
 
 def kind_of(item):
