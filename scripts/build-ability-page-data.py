@@ -78,7 +78,13 @@ def scripted():
 
 # 서버가 클라이언트에 연출을 보내는 길. 이펙트는 0x29, 소리는 0x13/0x19, 몸동작은 0x1A 다
 # (docs/martial-artist-skill-presentation.md 1절). 5.99 팩 스크립트는 `Pack599.Call` 을 거친다.
-PACK_CALL = re.compile(r'Call\("(effect|game_sound|motion)"\s*,(.*?)\);', re.S)
+PACK_CALL = re.compile(r'Call\("(effect|game_sound|motion|group_hill|god_bless|group_mobsor_end|group_mobnar_end'
+                       r'|hprecovery)"\s*,(.*?)\);', re.S)
+#: 파티에 그림을 거는 명령은 그림 번호가 다른 자리에 있다 — `group_hill 회복량, 그림` · `god_bless 그림, 초` ·
+#: `group_mob*_end 그림`(Pack599.cs 가 0x29 로 보낸다).
+PARTY_PICTURE = {"group_hill": 1, "god_bless": 0, "group_mobsor_end": 0, "group_mobnar_end": 0}
+#: `hprecovery` 는 스크립트에 그림이 없다 — 5.99 서버가 1초마다 그림 22 를 보낸다(Novaonline.exe 0x46e120).
+REGEN_PICTURE = 22
 #: 16진수로 적힌 것도 있다(beag ioc fein 의 `SendAnimation(0x04, …)`).
 SEND_ANIMATION = re.compile(r'SendAnimation\((0x[0-9A-Fa-f]+|\d+)')
 FORMAT_19 = re.compile(r'ServerFormat19\s*\{\s*Number\s*=\s*\(?[a-z]*\)?\s*(\d+)')
@@ -140,6 +146,12 @@ def sent_by(bodies, template):
                 for at in (1, 2):
                     if at < len(args):
                         add("이펙트", literal(args[at]))
+            elif command in PARTY_PICTURE:
+                at = PARTY_PICTURE[command]
+                if at < len(args):
+                    add("이펙트", literal(args[at]))
+            elif command == "hprecovery":
+                add("이펙트", REGEN_PICTURE)
             elif command == "game_sound" and args:
                 add("소리", literal(args[0]))
             elif command == "motion" and args:
@@ -157,6 +169,9 @@ def sent_by(bodies, template):
                     add("몸동작", literal(arg))
 
     add("이펙트", template.get("TargetAnimation") or 0)
+    # 하데스 옛 마법 스크립트는 `Spell.Template.Animation` 을 대상에게 쏜다(ao cradh · armachd · deo saighead …).
+    if template.get("갈래") == "spells":
+        add("이펙트", template.get("Animation") or 0)
     add("소리", template.get("Sound") or 0)
     return out
 
@@ -174,7 +189,7 @@ def template_scripts():
             except ValueError:
                 continue
             if t.get("Name"):
-                out[t["Name"]] = dict(t, 스크립트=t.get(field) or "")
+                out[t["Name"]] = dict(t, 스크립트=t.get(field) or "", 갈래=folder)
     return out
 
 
