@@ -243,13 +243,13 @@
     render();
   });
 
-  // 몬스터 상하좌우 모션 애니메이터
-  var tick = 0;
-  function animateMonsters() {
-    tick += 1;
-    // 6틱(약 100ms * 6 = 0.6초)마다 프레임 변경, 24틱마다 방향 전환
-    var dir = Math.floor(tick / 24) % 4; 
+  // 몬스터 상하좌우 방향 전환 타이머 (CSS 애니메이션 변수 제어)
+  var dirTick = 0;
+  function updateMonsterDirections() {
     // 0=North(등), 1=East(앞), 2=South(앞,반전), 3=West(등,반전)
+    var dir = dirTick % 4;
+    dirTick += 1;
+    
     var usesBack = (dir === 0 || dir === 3);
     var usesFlip = (dir === 2 || dir === 3);
 
@@ -262,16 +262,17 @@
 
       // 앞/등 구간 결정: 앞(Front) 구간은 등(Back) 구간 뒤에 바로 이어진다.
       var baseFrame = usesBack ? offset : offset + count;
-      var frameIdx = baseFrame + (Math.floor(tick / 6) % count);
 
-      box.style.backgroundPosition = (-frameIdx * w) + "px 0";
-      box.style.transform = usesFlip ? "scaleX(-1)" : "scaleX(1)";
+      box.style.setProperty("--frames", count);
+      box.style.setProperty("--from", (-baseFrame * w) + "px");
+      box.style.setProperty("--to", (-(baseFrame + count) * w) + "px");
+      box.style.setProperty("--flip", usesFlip ? "scaleX(-1)" : "scaleX(1)");
     }
     
-    setTimeout(animateMonsters, 100);
+    setTimeout(updateMonsterDirections, 1500); // 1.5초마다 방향 전환
   }
 
   rules();
   render();
-  animateMonsters();
+  updateMonsterDirections();
 })();
