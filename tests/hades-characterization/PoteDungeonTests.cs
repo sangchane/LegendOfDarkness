@@ -225,7 +225,10 @@ public sealed class PoteDungeonTests : IDisposable
             $"뮤레칸이 살려 수오미마을 39,19 로 보내지 않았습니다. 마지막: {world.State} · 창: {world.Talking?.What} · 서버가 한 말: {world.Said}");
 
         // 살아났다 — 유령이면 하데스가 걷기 말고는 막는다. 저장 파일의 Flags 가 0(보통)이 되고 소지품은 그대로다.
-        await Waiting.Until(() => Flags(server, "potecoma") == 0, "살아났는데 저장된 캐릭터가 아직 유령입니다.", _deadline.Token);
+        // 되살림은 곧바로 저장하지 않는다 — 이 시험 손님은 0x45·0x75 를 보내지 않아 SaveRate 저장이 안 돌고, SaveComponent 가
+        // 45초마다 한 번 저장할 뿐이다. 위의 24초 지켜보기로 되살림이 그 저장 바로 뒤에 걸리면 기본 30초로는 다음 저장을 못 본다.
+        await Waiting.Until(() => Flags(server, "potecoma") == 0, "살아났는데 저장된 캐릭터가 아직 유령입니다.", _deadline.Token,
+            TimeSpan.FromSeconds(60));
         Assert.Equal(before, Belongings(world));
         Assert.Equal(1000, world.Vitals?.Gold);
     }
