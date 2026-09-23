@@ -63,8 +63,8 @@ LOOT_TABLE = 4
 # 한 번에 표에서 뽑는 횟수의 상한 (`Lorule.Config/LoruleConfig.json` 의 LootTableStackSize).
 LOOT_STACK = 3
 
-# 옷 한 벌 값. 5.99 팩의 레더튜닉이다 — 몇 마리를 잡아야 하는지 세는 잣대로만 쓴다.
-TUNIC = 300
+# 첫 옷 — 몇 마리를 잡아야 하는지 세는 잣대. 값은 박지 않고 템플릿에서 읽는다(원작 도감 950전).
+TUNIC = "레더튜닉"
 
 # 셈을 보여 줄 사냥터.
 GROUNDS = {
@@ -196,17 +196,22 @@ def price_junk(writing, said):
 
 
 def earnings(said):
-    """한 마리에 얼마를 벌고, 옷 한 벌에 몇 마리인가.
+    """**100마리를 잡으면 얼마를 벌고, 첫 옷까지 몇 마리인가.**
 
     정의에 적힌 것을 읽는다 — 그래서 `--쓰기` 전에는 고치기 전 값이, 뒤에는 고친 값이 나온다.
+
+    **시약도 벌이에 센다.** 마시는 물건이지만 상점이 사 주고(`Value / 1.6`), 실제로 초반 벌이는 시약이
+    끌고 간다 — 세지 않으면 「첫 옷까지 몇 마리」가 서너 배로 부풀어 거짓말이 된다. 장비는 입는 물건이라
+    따로 세고 합에 넣지 않는다.
     """
     found = items()
+    tunic = (found[TUNIC][1].get("Value") or 0) if TUNIC in found else 0
 
     said.append("")
-    said.append(f"한 마리에 얼마인가 (레더튜닉 {TUNIC} 전 기준)")
+    said.append(f"100마리에 얼마인가 · 첫 옷({TUNIC} {tunic} 전)까지 몇 마리인가")
     said.append(
-        f"{'사냥터':<16}{'괴물':<12}{'금화':>10}{'잡템':>8}{'장비':>8}{'시약':>8}{'합':>8}"
-        f"{'옷 한 벌':>10}"
+        f"{'사냥터':<16}{'괴물':<12}{'금화':>10}{'잡템':>8}{'장비':>8}{'시약':>8}{'합':>9}"
+        f"{'첫 옷까지':>11}"
     )
 
     for ground, area in GROUNDS.items():
@@ -248,17 +253,19 @@ def earnings(said):
                 else:
                     junk += worth
 
-            total = coins + junk
-            many = TUNIC / total if total > 0 else 0
+            # 표는 100마리 값이다 — 한 마리 값은 잔돈이라 읽히지 않는다.
+            coins, junk, gear, potion = (100 * value for value in (coins, junk, gear, potion))
+            total = coins + junk + potion
+            many = 100 * tunic / total if total > 0 else 0
             kills = "못 산다" if total <= 0 else f"{many:.1f}마리" if many < 10 else f"{many:.0f}마리"
 
             said.append(
-                f"{ground:<16}{monster.get('Name'):<12}{coins:>10.1f}{junk:>8.1f}"
-                f"{gear:>8.1f}{potion:>8.1f}{total:>8.1f}{kills:>10}"
+                f"{ground:<16}{monster.get('Name'):<12}{coins:>10.0f}{junk:>8.0f}"
+                f"{gear:>8.0f}{potion:>8.0f}{total:>9.0f}{kills:>11}"
             )
 
     said.append(
-        "  「합」은 금화 + 잡템 판 값이다. 시약은 쓰는 물건이고 장비는 입는 물건이라 따로 세고 합에 넣지 않았다."
+        "  「합」은 금화 + 잡템 + 시약을 판 값이다(100마리 기준). 장비는 입는 물건이라 따로 세고 합에 넣지 않았다."
     )
 
 
