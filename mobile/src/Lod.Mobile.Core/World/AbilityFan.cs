@@ -24,8 +24,8 @@ public static class AbilityFan
     /// <summary>Switches between skills and spells — beside the attack button, on its row.</summary>
     public static (int X, int Y) Switch { get; } = (24, 216);
 
-    /// <summary>The next page — at the far end of the fan, because it is pressed least.</summary>
-    public static (int X, int Y) Next { get; } = (160, 40);
+    /// <summary>The next page — at the top of the fan, because it is pressed least. The right edge is the potions'.</summary>
+    public static (int X, int Y) Next { get; } = (104, 40);
 
     /// <summary>Where the six buttons of a page go, nearest the attack button first.</summary>
     public static IReadOnlyList<(int X, int Y)> Slots { get; } =
@@ -39,16 +39,16 @@ public static class AbilityFan
     ];
 
     /// <summary>
-    /// The two automatic-potion switches (health, mana) — a little smaller than a skill button, as asked (사용자,
-    /// 2026-09-23), but not below the 44 the theme sets as the least a thumb can press (docs/original-ui-451.md 치수).
+    /// The two automatic-potion switches (health, mana). They need not be as big as a skill (사용자, 2026-09-23: "스킬창
+    /// 만큼 클 필요 없으니까") — 32, below the theme's 44 on purpose; they are touched rarely and never in a hurry.
     /// </summary>
-    public const int PotionSide = 44;
+    public const int PotionSide = 32;
 
-    /// <summary>Where the two potion switches go: above the highest skills, left of the next-page button.</summary>
+    /// <summary>Where the two potion switches go: one above the other against the right edge, clear of the skills.</summary>
     public static IReadOnlyList<(int X, int Y)> Potions { get; } =
     [
-        (48, 36),
-        (104, 36)
+        (168, 32),
+        (168, 80)
     ];
 
     public static int Pages(int learned) => Paging.Pages(learned, PerPage);

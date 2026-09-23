@@ -26,15 +26,14 @@ public sealed class AbilityFanTests
         yield return ("마력 포션", AbilityFan.Potions[1], AbilityFan.PotionSide);
     }
 
-    /// <summary>The potion switches sit above every skill, smaller than one, and still big enough to press.</summary>
+    /// <summary>The potion switches stand one above the other against the right edge, smaller than a skill.</summary>
     [Fact]
-    public void The_potions_sit_on_top_a_little_smaller_than_a_skill()
+    public void The_potions_stand_small_against_the_right_edge()
     {
-        int highestSkill = AbilityFan.Slots.Min(slot => slot.Y);
-
-        Assert.All(AbilityFan.Potions, potion => Assert.True(potion.Y < highestSkill));
+        Assert.All(AbilityFan.Potions, potion => Assert.Equal(AbilityFan.Width, potion.X + AbilityFan.PotionSide / 2));
+        Assert.Equal(AbilityFan.Potions[0].X, AbilityFan.Potions[1].X);
+        Assert.True(AbilityFan.Potions[0].Y < AbilityFan.Potions[1].Y);
         Assert.True(AbilityFan.PotionSide < AbilityFan.ButtonSide);
-        Assert.True(AbilityFan.PotionSide >= 44);
     }
 
     [Fact]
