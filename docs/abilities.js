@@ -257,6 +257,14 @@
     // 시전자는 원점, 샌드백은 보는 쪽으로 한 칸. 이 둘의 간격이 곧 게임에서 붙어 선 간격이다.
     var caster = { x: 0, y: 0 };
     var target = { x: STEP.x, y: STEP.y };
+    var isJumpOver = false;
+
+    // 이형환위(Ambush)는 상대를 뛰어넘는다
+    var name = nameOf(row) || row["이름"];
+    if (name === "이형환위" || row["영문"] === "Ambush") {
+      isJumpOver = true;
+      caster = { x: STEP.x * 2, y: STEP.y * 2 };
+    }
 
     // 몸동작 그림이 있는 직업(지금은 무도가)은 그 칸으로, 없으면 서 있는 칸으로 선다. 칸 크기가
     // 달라 무대 너비도 달라지므로 먼저 정한다.
@@ -298,6 +306,10 @@
     // 안 보인다. 그림이 있는 직업(지금은 무도가)만 실제 동작이 나가고, 나머지는 기본 공격 자세다.
     var hero = el("i", "hero stage-piece");
     place(hero, caster.x - cell.wide / 2, caster.y - cell.floor);
+    if (isJumpOver) {
+      // 뛰어넘은 직후 상대를 돌아본다
+      hero.style.transform = "scaleX(-1)";
+    }
     hero.style.width = cell.wide + "px";
     hero.style.height = cell.tall + "px";
 
