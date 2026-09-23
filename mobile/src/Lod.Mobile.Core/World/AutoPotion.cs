@@ -1,11 +1,15 @@
 namespace Lod.Mobile.Core.World;
 
-/// <summary>Whether one kind of automatic drinking is on, and at what share of the bar it fires.</summary>
+/// <summary>Whether one kind of automatic drinking is on, at what share of the bar it fires, and with what.</summary>
 /// <param name="Percent">Drinks when the bar is at or below this share of its maximum.</param>
-public sealed record PotionRule(bool Enabled, int Percent);
+/// <param name="Potion">The item name to drink — the player picks it; nothing else of the kind is used.</param>
+public sealed record PotionRule(bool Enabled, int Percent, string Potion);
+
+/// <summary>A potion the player can pick, and the picture the server uses for it (the template's DisplayImage).</summary>
+public sealed record Potion(string Name, int Icon);
 
 /// <summary>
-/// Decides which carried potion to drink when health or mana falls to the chosen line.
+/// Decides when to drink the chosen potion as health or mana falls to the chosen line.
 /// </summary>
 /// <remarks>
 /// The server has no cooldown on 0x1C, so asking every frame would empty the stack in a second. A
@@ -15,11 +19,20 @@ public sealed record PotionRule(bool Enabled, int Percent);
 /// </remarks>
 public sealed class AutoPotion
 {
-    /// <summary>Healing potions, smallest first (쿠룸 250 · 엑스쿠라눔 10000). 쿠라눔 has no template yet.</summary>
-    public static readonly string[] Healing = ["쿠룸", "쿠라눔", "엑스쿠라눔"];
+    /// <summary>
+    /// Healing potions, smallest first (250 · 10000). 쿠라눔 is left out: the server has no such item yet.
+    /// </summary>
+    public static readonly Potion[] Healing = [new("쿠룸", 32813), new("엑스쿠라눔", 34941)];
 
     /// <summary>Mana potions, smallest first (100 · 500 · 1000 · 1500 · 2000). Food is left to the player.</summary>
-    public static readonly string[] Restoring = ["마라디움", "최하급마력포션", "하급마력포션", "중급마력포션", "상급마력포션"];
+    public static readonly Potion[] Restoring =
+    [
+        new("마라디움", 32815),
+        new("최하급마력포션", 32822),
+        new("하급마력포션", 32827),
+        new("중급마력포션", 32829),
+        new("상급마력포션", 32830),
+    ];
 
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(2);
 
@@ -49,8 +62,8 @@ public sealed class AutoPotion
         }
 
         InventoryItem? drink =
-            (Low(vitals.Health, vitals.MaximumHealth, health) ? Smallest(pack, Healing) : null)
-            ?? (Low(vitals.Mana, vitals.MaximumMana, mana) ? Smallest(pack, Restoring) : null);
+            (Low(vitals.Health, vitals.MaximumHealth, health) ? Carried(pack, health.Potion) : null)
+            ?? (Low(vitals.Mana, vitals.MaximumMana, mana) ? Carried(pack, mana.Potion) : null);
 
         if (drink is null)
         {
@@ -62,12 +75,13 @@ public sealed class AutoPotion
         return drink.Slot;
     }
 
+    /// <summary>How many of one potion the pack holds, over every slot it is split across.</summary>
+    public static int Count(IReadOnlyList<InventoryItem> pack, string name) =>
+        pack.Where(one => one.Name == name).Sum(one => Math.Max(1, one.Stacks));
+
     private static bool Low(int value, int maximum, PotionRule rule) =>
         rule.Enabled && maximum > 0 && value * 100L <= (long)maximum * rule.Percent;
 
-    private static InventoryItem? Smallest(IReadOnlyList<InventoryItem> pack, string[] order) =>
-        pack.Where(one => Array.IndexOf(order, one.Name) >= 0)
-            .OrderBy(one => Array.IndexOf(order, one.Name))
-            .ThenBy(one => one.Slot)
-            .FirstOrDefault();
+    private static InventoryItem? Carried(IReadOnlyList<InventoryItem> pack, string name) =>
+        pack.Where(one => one.Name == name).OrderBy(one => one.Slot).FirstOrDefault();
 }

@@ -24,6 +24,7 @@ public partial class GameScreen : Control
     private PackPanel _pack = null!;
     private TalkPanel _talk = null!;
     private FieldPanel _field = null!;
+    private SettingsPanel _settings = null!;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
     // 그대로 남아 있어(WorldClient.cs:363), 창을 도로 띄워 두 번 고르게 하면 안 된다.
@@ -161,6 +162,10 @@ public partial class GameScreen : Control
             _ = _server?.CloseFieldAsync(System.Threading.CancellationToken.None);
         };
 
+        _settings = new SettingsPanel();
+        _settings.Close.Pressed += () => _settings.Visible = false;
+        _settings.Visible = Main.OpeningSettings;
+
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
         _talk.Answered += (speaker, step, words) => _ = words is null
@@ -219,7 +224,7 @@ public partial class GameScreen : Control
 
         List<VBoxContainer> holders = [];
 
-        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field })
+        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field, _settings })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -410,19 +415,29 @@ public partial class GameScreen : Control
         _logout.Pressed += LogOut;
 
         // 자동 포션은 창 안에 숨기지 않는다 — 싸우는 중에 한 번에 닿아야 한다(사용자, 2026-09-23).
-        // 누르면 켜고 끄기, 길게 누른 채 위아래로 밀면 줄을 옮긴다.
-        PotionChip health = new("체력", Greybox.Health,
-            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion));
-        PotionChip mana = new("마력", Greybox.Mana,
-            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule));
+        // 마실 포션의 그림에 줄을 작게 적는다. 누르면 켜고 끄기, 길게 누르면 다른 포션을 고른다. 줄은 설정 창에서.
+        PotionChip health = new(Lod.Mobile.Core.World.AutoPotion.Healing,
+            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? []);
+        PotionChip mana = new(Lod.Mobile.Core.World.AutoPotion.Restoring,
+            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? []);
+
+        Button settings = new()
+        {
+            Text = "설정",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        Greybox.Plain(settings);
+        settings.Pressed += () => _settings.Visible = !_settings.Visible;
 
         actions.AddChild(health);
         actions.AddChild(mana);
+        actions.AddChild(settings);
         actions.AddChild(_logout);
 
         if (Main.Portrait)
         {
-            foreach (Button action in new Button[] { pack, _map, health, mana, _logout })
+            foreach (Button action in new Button[] { pack, _map, settings, _logout })
             {
                 action.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             }

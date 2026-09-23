@@ -4,8 +4,9 @@ namespace Lod.Mobile.Core.Tests.World;
 
 public sealed class AutoPotionTests
 {
-    private static readonly PotionRule Off = new(false, 50);
-    private static readonly PotionRule Half = new(true, 50);
+    private static readonly PotionRule Off = new(false, 50, "쿠룸");
+    private static readonly PotionRule Half = new(true, 50, "쿠룸");
+    private static readonly PotionRule HalfMana = new(true, 50, "마라디움");
 
     private static Vitals Life(int health, int mana, int maximum = 1000) => Vitals.Unknown with
     {
@@ -19,12 +20,26 @@ public sealed class AutoPotionTests
         new(slot, 0, 0, name, stacks, 0, 0);
 
     [Fact]
-    public void Low_health_drinks_the_smallest_healing_potion_first()
+    public void Low_health_drinks_the_chosen_potion()
     {
-        AutoPotion potion = new();
         InventoryItem[] pack = [Carried(1, "엑스쿠라눔"), Carried(2, "쿠룸"), Carried(3, "마라디움")];
 
-        Assert.Equal(2, potion.Next(Life(400, 1000), pack, Half, Off, TimeSpan.Zero));
+        Assert.Equal(2, new AutoPotion().Next(Life(400, 1000), pack, Half, Off, TimeSpan.Zero));
+        Assert.Equal(1, new AutoPotion().Next(Life(400, 1000), pack, Half with { Potion = "엑스쿠라눔" }, Off, TimeSpan.Zero));
+    }
+
+    [Fact]
+    public void Another_potion_is_not_used_when_the_chosen_one_has_run_out()
+    {
+        AutoPotion potion = new();
+
+        Assert.Null(potion.Next(Life(100, 1000), [Carried(1, "엑스쿠라눔")], Half, Off, TimeSpan.Zero));
+    }
+
+    [Fact]
+    public void Count_adds_up_every_slot_of_one_potion()
+    {
+        Assert.Equal(8, AutoPotion.Count([Carried(1, "쿠룸", 5), Carried(4, "쿠룸", 3), Carried(2, "마라디움", 9)], "쿠룸"));
     }
 
     [Fact]
@@ -42,7 +57,7 @@ public sealed class AutoPotionTests
         AutoPotion potion = new();
         InventoryItem[] pack = [Carried(1, "쿠룸"), Carried(2, "하급마력포션"), Carried(3, "마라디움")];
 
-        Assert.Equal(3, potion.Next(Life(1000, 100), pack, Half, Half, TimeSpan.Zero));
+        Assert.Equal(3, potion.Next(Life(1000, 100), pack, Half, HalfMana, TimeSpan.Zero));
     }
 
     [Fact]

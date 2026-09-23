@@ -74,14 +74,14 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// 체력·마력이 몇 % 이하일 때 포션을 저절로 마시나. 줍기처럼 기기에 남는다(한 줄에 하나, "on 50").
-    /// 처음에는 꺼져 있다 — 사람이 켜기 전에는 가방의 물건을 쓰지 않는다.
+    /// 체력·마력이 몇 % 이하일 때 어느 포션을 저절로 마시나. 줍기처럼 기기에 남는다(한 줄에 하나, "on 70 쿠룸").
+    /// 처음에는 꺼져 있다 — 사람이 켜기 전에는 가방의 물건을 쓰지 않는다. 줄은 70%(사용자, 2026-09-23).
     /// </summary>
     private const string PotionFile = "user://potion.cfg";
 
-    public static Lod.Mobile.Core.World.PotionRule HealthPotion { get; private set; } = new(false, 50);
+    public static Lod.Mobile.Core.World.PotionRule HealthPotion { get; private set; } = new(false, 70, "쿠룸");
 
-    public static Lod.Mobile.Core.World.PotionRule ManaPotion { get; private set; } = new(false, 30);
+    public static Lod.Mobile.Core.World.PotionRule ManaPotion { get; private set; } = new(false, 70, "마라디움");
 
     public static void SetPotions(Lod.Mobile.Core.World.PotionRule health, Lod.Mobile.Core.World.PotionRule mana)
     {
@@ -94,7 +94,7 @@ public partial class Main : Control
         {
             foreach (Lod.Mobile.Core.World.PotionRule rule in new[] { health, mana })
             {
-                writing.StoreLine($"{(rule.Enabled ? "on" : "off")} {rule.Percent}");
+                writing.StoreLine($"{(rule.Enabled ? "on" : "off")} {rule.Percent} {rule.Potion}");
             }
 
             writing.Close();
@@ -118,8 +118,8 @@ public partial class Main : Control
         {
             string[] parts = line.Trim().Split(' ');
 
-            return parts.Length == 2 && int.TryParse(parts[1], out int percent) && percent is > 0 and < 100
-                ? new(parts[0] == "on", percent)
+            return parts.Length == 3 && int.TryParse(parts[1], out int percent) && percent is > 0 and < 100
+                ? new(parts[0] == "on", percent, parts[2])
                 : fallback;
         }
     }
@@ -200,6 +200,12 @@ public partial class Main : Control
     /// <summary>Whether to open the pack on its own, as <c>--pack</c>. For checking it without a thumb.</summary>
     public static bool OpeningPack { get; private set; }
 
+    /// <summary>Whether to open the settings window on its own, as <c>--settings</c>. Same purpose as --pack.</summary>
+    public static bool OpeningSettings { get; private set; }
+
+    /// <summary>Whether to hold the health-potion button on its own, as <c>--pick-potion</c>, to see the row it opens.</summary>
+    public static bool PickingPotion { get; private set; }
+
     /// <summary>Whether to press the "지도" button on its own, as <c>--map</c>. For checking it without a thumb.</summary>
     public static bool OpeningMap { get; private set; }
 
@@ -275,6 +281,8 @@ public partial class Main : Control
         CreateNow = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--create-now") >= 0;
         Saying = Flag("--say");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
+        OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
+        PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0;
         OnGear = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;

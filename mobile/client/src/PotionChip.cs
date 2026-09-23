@@ -1,91 +1,182 @@
+using System.Collections.Generic;
 using Godot;
 using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
 /// <summary>
-/// One automatic-potion switch on the game screen, so it is never more than one touch away.
-/// Tap turns it on or off; press and hold, then slide up or down, moves the line in steps of five.
+/// One automatic-potion switch on the game screen: the chosen potion's picture with the line written small on it.
+/// Tap turns it on or off; press and hold opens a row of the potions of its kind to pick another. The line itself
+/// is moved in the settings window (<see cref="SettingsPanel"/>) — 사용자, 2026-09-23.
 /// </summary>
-/// <remarks>
-/// The rule is read and written through Main, which keeps the one copy that is remembered on the device.
-/// </remarks>
 public partial class PotionChip : Button
 {
     private const ulong HoldMilliseconds = 400;
-    private const float PixelsPerStep = 12;
-    private const int Step = 5;
 
-    private readonly string _name;
-    private readonly Color _paint;
+    private readonly Potion[] _choices;
     private readonly System.Func<PotionRule> _read;
     private readonly System.Action<PotionRule> _write;
+    private readonly System.Func<IReadOnlyList<InventoryItem>> _pack;
+    private readonly Label _line = new();
+    private readonly PopupPanel _picker = new();
 
     private ulong _downAt;
-    private float _downY;
     private bool _down;
-    private bool _adjusting;
-    private int _percent;
+    private bool _held;
+    private (PotionRule Rule, int Count)? _shown;
 
-    public PotionChip(string name, Color paint, System.Func<PotionRule> read, System.Action<PotionRule> write)
+    public PotionChip(
+        Potion[] choices,
+        System.Func<PotionRule> read,
+        System.Action<PotionRule> write,
+        System.Func<IReadOnlyList<InventoryItem>> pack)
     {
-        _name = name;
-        _paint = paint;
+        _choices = choices;
         _read = read;
         _write = write;
+        _pack = pack;
         CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum);
+        ExpandIcon = true;
+        IconAlignment = HorizontalAlignment.Center;
         Greybox.Plain(this);
-        Show(_read());
+
+        // 줄은 작게, 그림 아래 구석에 — 그림이 무엇을 마시는지 말하고 숫자는 거든다.
+        _line.AddThemeFontSizeOverride("font_size", 11);
+        _line.AddThemeColorOverride("font_outline_color", Colors.Black);
+        _line.AddThemeConstantOverride("outline_size", 4);
+        _line.HorizontalAlignment = HorizontalAlignment.Right;
+        _line.VerticalAlignment = VerticalAlignment.Bottom;
+        _line.MouseFilter = MouseFilterEnum.Ignore;
+        _line.SetAnchorsPreset(LayoutPreset.FullRect);
+        _line.OffsetRight = -3;
+        _line.OffsetBottom = -1;
+        AddChild(_line);
+        AddChild(_picker);
     }
 
     public override void _GuiInput(InputEvent @event)
     {
-        switch (@event)
+        if (@event is not InputEventMouseButton { ButtonIndex: MouseButton.Left } button)
         {
-            case InputEventMouseButton { ButtonIndex: MouseButton.Left } button when button.Pressed:
-                _down = true;
-                _adjusting = false;
-                _downAt = Time.GetTicksMsec();
-                _downY = button.Position.Y;
-                _percent = _read().Percent;
-                AcceptEvent();
-                break;
-
-            case InputEventMouseButton { ButtonIndex: MouseButton.Left } when _down:
-                _down = false;
-                PotionRule now = _read();
-                // 길게 눌러 옮긴 줄은 켜진 채로 남는다 — 줄을 옮긴 것은 쓰겠다는 뜻이다.
-                _write(_adjusting ? new PotionRule(true, _percent) : now with { Enabled = !now.Enabled });
-                _adjusting = false;
-                Show(_read());
-                AcceptEvent();
-                break;
-
-            case InputEventMouseMotion motion when _adjusting:
-                int steps = Mathf.RoundToInt((_downY - motion.Position.Y) / PixelsPerStep);
-                _percent = Mathf.Clamp(_read().Percent + steps * Step, Step, 100 - Step);
-                Text = $"▲{_percent}%▼";
-                AcceptEvent();
-                break;
+            return;
         }
+
+        if (button.Pressed)
+        {
+            _down = true;
+            _held = false;
+            _downAt = Time.GetTicksMsec();
+        }
+        else if (_down)
+        {
+            _down = false;
+
+            if (!_held)
+            {
+                PotionRule now = _read();
+                _write(now with { Enabled = !now.Enabled });
+            }
+        }
+
+        AcceptEvent();
     }
+
+    private int _rehearsed;
 
     public override void _Process(double delta)
     {
-        if (_down && !_adjusting && Time.GetTicksMsec() - _downAt >= HoldMilliseconds)
+        // --pick-potion: 월드가 자리를 잡은 뒤 한 번 길게 누른 셈 친다(체력 단추만).
+        if (Main.PickingPotion && _choices == AutoPotion.Healing && ++_rehearsed == 240)
         {
-            _adjusting = true;
-            Text = $"▲{_percent}%▼";
+            Pick();
+        }
+
+        if (_down && !_held && Time.GetTicksMsec() - _downAt >= HoldMilliseconds)
+        {
+            _held = true;
+            Pick();
+        }
+
+        PotionRule rule = _read();
+        int count = AutoPotion.Count(_pack(), rule.Potion);
+
+        if (_shown != (rule, count))
+        {
+            _shown = (rule, count);
+            Show(rule, count);
         }
     }
 
-    /// <summary>On: the line in the bar's colour. Off: greyed, and the word says so — colour is not the only sign.</summary>
-    private void Show(PotionRule rule)
+    /// <summary>Off, or none left: the picture greys. The word or the number says which — colour is not the only sign.</summary>
+    private void Show(PotionRule rule, int count)
     {
-        Text = rule.Enabled ? $"{_name} {rule.Percent}%" : $"{_name} 끔";
-        Color ink = rule.Enabled ? _paint.Lightened(0.25f) : Greybox.Muted;
-        AddThemeColorOverride("font_color", ink);
-        AddThemeColorOverride("font_hover_color", ink);
-        AddThemeColorOverride("font_pressed_color", ink);
+        Icon = ItemIcons.For(IconOf(rule.Potion));
+        Modulate = rule.Enabled && count > 0 ? Colors.White : new Color(1, 1, 1, 0.45f);
+        _line.Text = rule.Enabled ? $"{rule.Percent}%" : "끔";
+        TooltipText = $"{rule.Potion} {count}개";
+    }
+
+    /// <summary>A row of every potion of this kind, each with how many are carried. Picking one closes it.</summary>
+    private void Pick()
+    {
+        foreach (Node old in _picker.GetChildren())
+        {
+            _picker.RemoveChild(old);
+            old.QueueFree();
+        }
+
+        HBoxContainer row = new();
+        row.AddThemeConstantOverride("separation", Main.Gutter / 2);
+
+        foreach (Potion potion in _choices)
+        {
+            int count = AutoPotion.Count(_pack(), potion.Name);
+
+            Button choice = new()
+            {
+                Icon = ItemIcons.For(potion.Icon),
+                ExpandIcon = true,
+                IconAlignment = HorizontalAlignment.Center,
+                VerticalIconAlignment = VerticalAlignment.Top,
+                Text = count.ToString(),
+                TooltipText = potion.Name,
+                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum + 16),
+                Modulate = count > 0 ? Colors.White : new Color(1, 1, 1, 0.45f),
+            };
+
+            Greybox.Plain(choice);
+            choice.AddThemeFontSizeOverride("font_size", 11);
+
+            if (potion.Name == _read().Potion)
+            {
+                choice.AddThemeStyleboxOverride("normal", Greybox.Lit());
+            }
+
+            string name = potion.Name;
+            choice.Pressed += () =>
+            {
+                _write(_read() with { Potion = name });
+                _picker.Hide();
+            };
+
+            row.AddChild(choice);
+        }
+
+        _picker.AddChild(row);
+        Rect2 at = GetGlobalRect();
+        _picker.Popup(new Rect2I((int)at.Position.X, (int)at.End.Y + Main.Gutter / 2, 0, 0));
+    }
+
+    private int IconOf(string name)
+    {
+        foreach (Potion potion in _choices)
+        {
+            if (potion.Name == name)
+            {
+                return potion.Icon;
+            }
+        }
+
+        return _choices[0].Icon;
     }
 }
