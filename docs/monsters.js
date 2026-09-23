@@ -131,9 +131,18 @@
     hover.hidden = false;
     hover.setAttribute("aria-hidden", "false");
     var own = hover.getBoundingClientRect();
-    var left = Math.min(box.right + 12, window.innerWidth - own.width - 12);
+    // 오른쪽에 공간이 있으면 오른쪽, 없으면 왼쪽에 둔다.
+    var left = box.right + 12;
+    if (left + own.width + 12 > window.innerWidth) {
+      left = box.left - own.width - 12;
+    }
+    // 그래도 화면 밖이면 화면 경계에 맞춘다 (모바일 등 좁은 화면).
+    left = Math.max(12, Math.min(left, window.innerWidth - own.width - 12));
+
     var topPos = Math.min(box.top, window.innerHeight - own.height - 12);
-    hover.style.transform = "translate(" + Math.max(12, left) + "px," + Math.max(12, topPos) + "px)";
+    topPos = Math.max(12, topPos);
+    
+    hover.style.transform = "translate(" + left + "px," + topPos + "px)";
   }
 
   function closeHover() {

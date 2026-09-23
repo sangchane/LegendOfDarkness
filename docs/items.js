@@ -96,9 +96,16 @@
     hover.hidden = false;
     hover.setAttribute("aria-hidden", "false");
     var own = hover.getBoundingClientRect();
-    var left = Math.min(box.right + 12, window.innerWidth - own.width - 12);
-    var top = Math.min(box.top, window.innerHeight - own.height - 12);
-    hover.style.transform = "translate(" + Math.max(12, left) + "px," + Math.max(12, top) + "px)";
+    var left = box.right + 12;
+    if (left + own.width + 12 > window.innerWidth) {
+      left = box.left - own.width - 12;
+    }
+    left = Math.max(12, Math.min(left, window.innerWidth - own.width - 12));
+    
+    var topPos = Math.min(box.top, window.innerHeight - own.height - 12);
+    topPos = Math.max(12, topPos);
+    
+    hover.style.transform = "translate(" + left + "px," + topPos + "px)";
   }
 
   /* ── 카드 ──────────────────────────────────────────────────────────── */
