@@ -1029,6 +1029,10 @@ SHOP_SCRIPT = "shop1"           # scripts/Mundanes/shop1.cs
 # 상점 NPC 13명 중 npc/Npc.txt 에 정의(그림 번호)가 있는 것은 셋뿐이다(베이가 35 · 시장마스터 31 · 카르마 31).
 # 나머지는 팩에도 그림이 없어, 보이고 눌리도록 팩의 상인 모습 31 을 쓴다. (예전 값 1 은 말벌 그림이었다.)
 SHOP_IMAGE = 31
+# 5.99 목록에 없는 물건을 이 자리에서 더 판다 — (NPC, 맵, x, y) → [물건]. 템플릿이 있을 때만 넣는다(끊긴 참조 0).
+#   리콜(아무 마을로 가는 귀환) — 5.99 에 그 아이템이 없다. 혼든 npc/마이소시아/노비스마을_shop.txt 의 노베스
+#   (노비스 잡화상)가 마을 리콜들과 함께 판다. 하데스의 노비스 잡화상은 베이가다. 템플릿: scripts/build-recall.py
+MORE_STOCK = {("베이가", "노비스잡화상점", 3, 14): ["리콜"]}
 
 
 def shop_rows(ids):
@@ -1069,7 +1073,7 @@ def write_shops(_keep):
     n = 0
     for key, (npc, mp, x, y) in sorted(spots.items()):
         seen, keep = set(), []
-        for g in goods.get(key, []):
+        for g in goods.get(key, []) + [g for g in MORE_STOCK.get(key, []) if (SERVER / "templates" / "items" / f"{g}.json").exists()]:
             if g not in seen:
                 seen.add(g); keep.append(g)
         j = {
