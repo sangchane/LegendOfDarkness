@@ -3,41 +3,45 @@ using Godot;
 namespace LodClient;
 
 /// <summary>
-/// The last few things said — by the server, or by this screen when it refuses something. Each line stays a moment, then
-/// fades out the way the movement pad does, and the plate behind them fades with the last line, so the floor comes back
-/// once nothing new has been said.
+/// The ticker: the last two things worth seeing, as outlined words straight on the floor — no box. Each line stays a
+/// moment and then fades, so once nothing new has been said the floor is all there is (사용자, 2026-09-23: 검은 기록판이
+/// 화면을 가려 몰입이 깨진다). Tapping it opens the full log; everything the ticker leaves out is there.
 /// </summary>
 /// <remarks>
-/// The box keeps its size while empty. In portrait the character is stood in the middle of the part above it, and a
-/// box that came and went would move the character each time.
+/// Only what <see cref="Lod.Mobile.Core.World.MessageSort" /> sends to the ticker lands here — what was gained goes to the
+/// toasts, a level or a death to the banner, speech over the speaker's head, and the noise to the log alone.
 /// </remarks>
-public sealed partial class MessageLog : PanelContainer
+public sealed partial class MessageLog : VBoxContainer
 {
     private const int FontSize = 14;
 
     /// <summary>How long a line stays fully readable, and how long it then takes to fade.</summary>
     private const double StaysFor = 4;
-    private const double FadesFor = 1.5;
+    private const double FadesFor = 1;
 
     private readonly int _most;
-    private readonly VBoxContainer _lines = new() { Alignment = BoxContainer.AlignmentMode.End };
+    private readonly bool _wraps;
     private readonly List<(Label Line, double Age)> _shown = [];
 
-    public MessageLog(int most)
+    /// <param name="most">How many lines at once.</param>
+    /// <param name="wraps">
+    /// Whether a long line may take a second row. Portrait keeps one row each: the ticker's height decides where the
+    /// character stands (GameScreen.FocusY), and a ticker that grew would move the character with every line.
+    /// </param>
+    public MessageLog(int most, bool wraps)
     {
         _most = most;
+        _wraps = wraps;
+        Alignment = AlignmentMode.End;
         MouseFilter = MouseFilterEnum.Ignore;
-        SelfModulate = Colors.Transparent;
-
-        AddThemeStyleboxOverride("panel", Greybox.Plate());
-        _lines.AddThemeConstantOverride("separation", 2);
-        AddChild(_lines);
+        AddThemeConstantOverride("separation", 0);
     }
+
+    /// <summary>Somebody tapped the lines — the screen opens the full log.</summary>
+    public event Action? Tapped;
 
     public void Add(string text)
     {
-        text = Clean(text);
-
         if (text.Length == 0)
         {
             return;
@@ -46,13 +50,16 @@ public sealed partial class MessageLog : PanelContainer
         Label line = new()
         {
             Text = text,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            MouseFilter = MouseFilterEnum.Ignore,
+            AutowrapMode = _wraps ? TextServer.AutowrapMode.WordSmart : TextServer.AutowrapMode.Off,
+            TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
+            ClipText = !_wraps,
+            MaxLinesVisible = _wraps ? 2 : 1
         };
-        line.AddThemeFontSizeOverride("font_size", FontSize);
-        line.AddThemeColorOverride("font_color", Greybox.Muted);
+        Outlined(line, FontSize, Greybox.Text);
 
-        _lines.AddChild(line);
+        AddChild(line);
         _shown.Add((line, 0));
 
         while (_shown.Count > _most)
@@ -63,15 +70,31 @@ public sealed partial class MessageLog : PanelContainer
     }
 
     /// <summary>
-    /// Throws away what cannot be read. The server sends lines that are a single zero byte, or a bare newline (실제
-    /// 서버에서 봤다) — as a line each of those is an empty plate lying over the map.
+    /// Words that stay readable over any floor without a plate behind them: a dark outline and a soft shadow, the way
+    /// mobile games write over the world.
     /// </summary>
-    public static string Clean(string text) => new string([.. text.Where(letter => !char.IsControl(letter))]).Trim();
+    public static void Outlined(Label label, int size, Color colour)
+    {
+        label.AddThemeFontSizeOverride("font_size", size);
+        label.AddThemeColorOverride("font_color", colour);
+        label.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
+        label.AddThemeConstantOverride("outline_size", 4);
+        label.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.5f));
+        label.AddThemeConstantOverride("shadow_offset_x", 1);
+        label.AddThemeConstantOverride("shadow_offset_y", 1);
+    }
+
+    public override void _GuiInput(InputEvent @event)
+    {
+        if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } or InputEventScreenTouch { Pressed: true })
+        {
+            Tapped?.Invoke();
+            AcceptEvent();
+        }
+    }
 
     public override void _Process(double delta)
     {
-        float brightest = 0;
-
         for (int index = _shown.Count - 1; index >= 0; index--)
         {
             (Label line, double age) = _shown[index];
@@ -84,12 +107,11 @@ public sealed partial class MessageLog : PanelContainer
                 continue;
             }
 
-            float alpha = 1f - (float)Math.Clamp((age - StaysFor) / FadesFor, 0, 1);
-            line.Modulate = new Color(1, 1, 1, alpha);
-            brightest = Math.Max(brightest, alpha);
+            line.Modulate = new Color(1, 1, 1, 1f - (float)Math.Clamp((age - StaysFor) / FadesFor, 0, 1));
             _shown[index] = (line, age);
         }
 
-        SelfModulate = new Color(1, 1, 1, brightest);
+        // 보이는 줄이 있을 때만 탭을 받는다 — 빈 자리가 바닥을 누르는 손가락을 가로채면 안 된다.
+        MouseFilter = _shown.Count > 0 ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
     }
 }

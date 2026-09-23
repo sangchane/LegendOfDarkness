@@ -26,7 +26,8 @@ public sealed partial class SettingsPanel : PanelContainer
         head.AddChild(Close);
 
         HBoxContainer wheels = new() { Alignment = BoxContainer.AlignmentMode.Center };
-        wheels.AddThemeConstantOverride("separation", Main.Gutter * 3);
+        // 가로는 방향판과 부채꼴 사이 가운데에 서므로(GameScreen.Cover) 좁게 — 640 폭에서도 부채꼴에 닿지 않는다.
+        wheels.AddThemeConstantOverride("separation", Main.Portrait ? Main.Gutter * 3 : Main.Gutter);
 
         PercentWheel health = new(Main.HealthPotion.Percent);
         health.Changed += percent => Main.SetPotions(Main.HealthPotion with { Percent = percent }, Main.ManaPotion);

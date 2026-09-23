@@ -197,6 +197,18 @@ public partial class Main : Control
     /// </summary>
     public static string Saying { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Which tab of the full log to open on its own once the world has settled, as <c>--chat 시스템</c>
+    /// (전체 · 일반 · 파티 · 시스템). Empty leaves it shut. For checking it without a thumb.
+    /// </summary>
+    public static string ChatTab { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Whether to put a handful of real server lines through the sorting on their own, as <c>--notices</c>, with no
+    /// server — so the ticker, the toasts and the banner can be photographed in both orientations.
+    /// </summary>
+    public static bool Noticing { get; private set; }
+
     /// <summary>Whether to open the pack on its own, as <c>--pack</c>. For checking it without a thumb.</summary>
     public static bool OpeningPack { get; private set; }
 
@@ -280,6 +292,8 @@ public partial class Main : Control
         PickedPath = ReadPickedPath(Flag("--pick-job"));
         CreateNow = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--create-now") >= 0;
         Saying = Flag("--say");
+        ChatTab = Flag("--chat");
+        Noticing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--notices") >= 0;
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;

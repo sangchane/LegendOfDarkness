@@ -68,6 +68,10 @@ public static class Screenshot
             await host.ToSignal(host.GetTree().CreateTimer(seconds), SceneTreeTimer.SignalName.Timeout);
         }
 
+        // 창이 가려지면(화면 밖으로 내보낸 창, 다른 앱이 전체 화면일 때) macOS 의 Godot 는 그리기를 멈춘다 — 접속처럼
+        // 오래 기다린 사진이 로그인 화면으로 남았다(2026-09-23). 찍기 직전에 한 번 그리게 한다.
+        RenderingServer.ForceDraw(swapBuffers: false);
+
         Image image = host.GetViewport().GetTexture().GetImage();
         Error saved = image.SavePng(path);
 

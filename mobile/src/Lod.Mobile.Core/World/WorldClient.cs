@@ -173,6 +173,10 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private volatile string _said = string.Empty;
     private volatile int _saidCount;
 
+    // 0x0A 를 타입 바이트와 함께 줄줄이 담는다. _said 는 마지막 한 줄뿐이라, 한 프레임에 둘이 오면(주운 것 + 경험치)
+    // 하나를 잃었다.
+    private readonly ConcurrentQueue<(byte Type, string Text)> _told = new();
+
     /// <summary>How many lines of what people said are kept for looking back at.</summary>
     private const int HeardKept = 60;
 
@@ -284,6 +288,22 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
+
+    /// <summary>
+    /// Takes the next line the server said (0x0A) with its type byte (Hades <c>ServerFormat0A.MsgType</c>), oldest
+    /// first, so a screen can sort it (<see cref="MessageSort.FromServer" />) without missing any.
+    /// </summary>
+    public bool TakeTold(out byte type, out string text)
+    {
+        if (_told.TryDequeue(out (byte Type, string Text) told))
+        {
+            (type, text) = told;
+            return true;
+        }
+
+        (type, text) = (0, string.Empty);
+        return false;
+    }
 
     /// <summary>The last lines anybody near us said, oldest first.</summary>
     public IReadOnlyList<Spoken> Heard => _heard;
@@ -500,13 +520,17 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
                 case SpokenCommand:
                 {
-                    ReadOnlySpan<byte> spoken = HadesCipher.DecodeSecured(frame, session.Parameters);
-
                     // A sound with no words is still this packet; there is simply nothing to show.
-                    if (spoken.Length > 3)
+                    if (ReadTold(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } told)
                     {
-                        _said = LegacyKoreanEncoding.DecodeStringB(spoken[1..], out _);
+                        _said = told.Text;
                         _saidCount++;
+
+                        // 읽는 쪽이 없으면 끝없이 쌓이지 않게 넉넉히 자른다.
+                        if (_told.Count < HeardKept)
+                        {
+                            _told.Enqueue(told);
+                        }
                     }
                 }
 
@@ -1508,6 +1532,14 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
         return new Cooldown(body[0] == 1, body[1], (int)BinaryPrimitives.ReadUInt32BigEndian(body[2..]));
     }
+
+    /// <summary>
+    /// Reads one line the server says (0x0A): the type byte, then the words as a two-byte-length string
+    /// (Hades <c>ServerFormat0A.Serialize</c>). A packet with no words — Hades leaves the string out when it is empty —
+    /// is nothing to show.
+    /// </summary>
+    public static (byte Type, string Text)? ReadTold(ReadOnlySpan<byte> body) =>
+        body.Length > 3 ? (body[0], LegacyKoreanEncoding.DecodeStringB(body[1..], out _)) : null;
 
     /// <summary>Reads one line of speech (0x0D): how it was said, whose it is, and the words.</summary>
     public static Spoken ReadSpoken(ReadOnlySpan<byte> body)

@@ -165,6 +165,20 @@ public partial class PotionChip : Button
         _picker.AddChild(row);
         Rect2 at = GetGlobalRect();
         _picker.Popup(new Rect2I((int)at.Position.X, (int)at.End.Y + Main.Gutter / 2, 0, 0));
+
+        // 단추가 오른쪽 아래 부채꼴 맨 위로 옮겨 가(GameScreen) 단추 왼쪽 끝에서 펴면 줄이 화면 오른쪽 밖으로 나갔다 —
+        // 화면 안으로 당긴다. 아래로 넘치면 단추 위로 편다.
+        Vector2 screen = GetViewportRect().Size;
+        Vector2I size = _picker.Size;
+        int x = Mathf.Clamp((int)at.Position.X, Main.Gutter, Mathf.Max(Main.Gutter, (int)screen.X - size.X - Main.Gutter));
+        int y = (int)at.End.Y + Main.Gutter / 2;
+
+        if (y + size.Y > screen.Y - Main.Gutter)
+        {
+            y = (int)at.Position.Y - size.Y - Main.Gutter / 2;
+        }
+
+        _picker.Position = new Vector2I(x, y);
     }
 
     private int IconOf(string name)

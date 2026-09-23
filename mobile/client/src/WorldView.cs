@@ -1204,6 +1204,36 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     }
 
     /// <summary>
+    /// Puts what somebody said over their head (0x0D) — a person, a monster, or a merchant's sign. Somebody the screen
+    /// is not drawing has nowhere to put it; the log still has it.
+    /// </summary>
+    public void Speak(uint serial, string words)
+    {
+        if (server is { } world && serial == world.Serial)
+        {
+            _player.Say(words);
+        }
+        else if (_crowd.TryGetValue(serial, out Actor? person))
+        {
+            person.Say(words);
+        }
+        else if (_herd.TryGetValue(serial, out Actor? beast))
+        {
+            beast.Say(words);
+        }
+        else if (_signs.TryGetValue(serial, out NpcMark? sign))
+        {
+            if (sign.GetNodeOrNull<SpeechBubble>("Speech") is not { } bubble)
+            {
+                bubble = new SpeechBubble { Name = "Speech", Position = new Vector2(0, -NpcMark.Waist * 2 - 4) };
+                sign.AddChild(bubble);
+            }
+
+            bubble.Say(words);
+        }
+    }
+
+    /// <summary>
     /// Puts a bar over the head of whoever was just struck. The server tells us about every blow (0x13) with
     /// what is left as a percentage, and until now the screen only listened for the sound in it — so a fight
     /// showed no sign of how it was going, on a monster or on a person.

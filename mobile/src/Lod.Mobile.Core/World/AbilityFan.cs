@@ -38,6 +38,19 @@ public static class AbilityFan
         (120, 96)
     ];
 
+    /// <summary>
+    /// The two automatic-potion switches (health, mana) — a little smaller than a skill button, as asked (사용자,
+    /// 2026-09-23), but not below the 44 the theme sets as the least a thumb can press (docs/original-ui-451.md 치수).
+    /// </summary>
+    public const int PotionSide = 44;
+
+    /// <summary>Where the two potion switches go: above the highest skills, left of the next-page button.</summary>
+    public static IReadOnlyList<(int X, int Y)> Potions { get; } =
+    [
+        (48, 36),
+        (104, 36)
+    ];
+
     public static int Pages(int learned) => Paging.Pages(learned, PerPage);
 
     /// <summary>The page after this one, back to the first after the last.</summary>

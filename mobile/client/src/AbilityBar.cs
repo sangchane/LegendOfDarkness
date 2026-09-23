@@ -196,6 +196,15 @@ public sealed partial class AbilityBar : Control
         }
     }
 
+    /// <summary>
+    /// Puts one automatic-potion switch at the top of the fan, above the highest skills (<see cref="AbilityFan.Potions" />).
+    /// </summary>
+    public void Hold(PotionChip chip, int index)
+    {
+        chip.CustomMinimumSize = new Vector2(AbilityFan.PotionSide, AbilityFan.PotionSide);
+        Place(chip, AbilityFan.Potions[index], AbilityFan.PotionSide);
+    }
+
     private void Place(Button button, (int X, int Y) centre, int side)
     {
         button.Position = new Vector2(centre.X - (side / 2), centre.Y - (side / 2));

@@ -14,8 +14,11 @@ public partial class GameScreen : Control
     /// <summary>체력·마력 구슬의 지름. 원작 구슬(86x85)을 이만큼으로 줄여 그림 없이 그린다.</summary>
     private const int Pip = 18;
 
-    /// <summary>Rows the chat and combat log keeps in portrait. Landscape has no room for it at all.</summary>
-    private const int LogHeight = 76;
+    /// <summary>
+    /// How tall the ticker's row is in portrait: two one-row lines, and the 대화 button beside them. It does not grow —
+    /// the character stands in the middle of what is left above it (FocusY).
+    /// </summary>
+    private const int LogHeight = Main.TouchMinimum;
 
     private WorldView _world = null!;
     private Label _who = null!;
@@ -41,9 +44,23 @@ public partial class GameScreen : Control
     private MessageLog _messages = null!;
     private ChatPanel _chat = null!;
     private Control _chatHolder = null!;
+    private Control? _settingsHolder;
+    private Control _over = null!;
+    private const int ToastWidth = 150;
 
-    /// <summary>What has been said, kept for reading back through — the same lines the log shows as they fade.</summary>
-    private readonly List<(bool Speech, string Text)> _history = [];
+    /// <summary>What has been said, kept for reading back through — every line, wherever else it was shown.</summary>
+    private readonly List<(MessageChannel Channel, string Text)> _history = [];
+
+    // 얻은 것은 옆에 쌓이고, 큰일은 가운데 한 줄로 뜬다(MessageSort).
+    private readonly ToastFeed _toasts = new();
+    private readonly Banner _banner = new();
+
+    // 마지막으로 가운데 띄운 곳 이름. 바뀔 때만 다시 띄운다.
+    private string _bannered = string.Empty;
+
+    // --chat: 월드가 자리를 잡은 뒤 기록 창을 그 탭으로 연다.
+    private int _chatSettling;
+    private const ulong ChatAfterMilliseconds = 12000;
     private const int HistoryKept = 60;
 
     // 서버가 들려준 말이 몇 줄째인가. 새로 온 것만 적는다.
@@ -69,8 +86,6 @@ public partial class GameScreen : Control
     private Label _experience = null!;
     private Vitals? _shownVitals;
 
-    // 서버가 말한 횟수. 같은 말을 다시 하는 것과 새로 하는 것을 가르려고 센다.
-    private int _heard = -1;
     private Control _packRow = null!;
     private Control? _log;
 
@@ -188,7 +203,7 @@ public partial class GameScreen : Control
         // 세로는 기록 줄이 조작 바로 위에 있다. 가로는 그 자리가 없어 방향판 위에 얹는다(BuildControlRow).
         if (Main.Portrait)
         {
-            _messages = new MessageLog(3) { CustomMinimumSize = new Vector2(0, LogHeight) };
+            _messages = new MessageLog(2, wraps: false) { CustomMinimumSize = new Vector2(0, LogHeight) };
             rows.AddChild(_log = BuildMessageRow());
         }
 
@@ -211,6 +226,31 @@ public partial class GameScreen : Control
         Control over = new() { MouseFilter = MouseFilterEnum.Ignore };
 
         hud.AddChild(over);
+
+        // 얻은 것은 오른쪽 위 줄 바로 아래에 쌓인다 — 방향판에서 멀고, 가운데 캐릭터 옆을 비켜 간다. 가로는 부채꼴(공격)이
+        // 위 줄 바로 밑까지 올라오므로 부채꼴 왼쪽 끝에 맞춘다(PlaceToasts). 창들보다 먼저 넣어 창이 열리면 그 아래로 간다.
+        over.AddChild(_toasts);
+        _over = over;
+        _toasts.AnchorLeft = 1;
+        _toasts.AnchorRight = 1;
+        _toasts.OffsetLeft = -ToastWidth;
+        _toasts.OffsetRight = 0;
+        _toasts.GrowHorizontal = GrowDirection.Begin;
+        _topRow.Resized += () =>
+        {
+            // 가로는 가운데 한 줄(배너)과 높이가 겹쳐 레벨이 오를 때 글자가 포개졌다 — 그 아래에서 시작한다.
+            _toasts.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter + (Main.Portrait ? 0 : 40);
+            _toasts.OffsetBottom = _toasts.OffsetTop + 120;
+        };
+
+        // 큰일은 가운데, 캐릭터 머리보다 위에 — 위 줄과 캐릭터 사이.
+        over.AddChild(_banner);
+        _banner.AnchorLeft = 0;
+        _banner.AnchorRight = 1;
+        _banner.AnchorTop = Main.Portrait ? 0.27f : 0.24f;
+        _banner.AnchorBottom = _banner.AnchorTop;
+        _banner.OffsetTop = -20;
+        _banner.OffsetBottom = 20;
 
         // 창은 아래에 붙는다. 대화 창과 장비 고리는 남는 높이를 다 쓰고, 소지품 한 장은 제 높이만큼만 올라와
         // 위쪽 맵을 남긴다(PackPanel.ShowTab 이 정한다).
@@ -236,6 +276,11 @@ public partial class GameScreen : Control
                 _chatHolder = holder;
             }
 
+            if (panel == _settings)
+            {
+                _settingsHolder = holder;
+            }
+
             holder.SetAnchorsPreset(LayoutPreset.FullRect);
             holder.OffsetLeft = 0;
             holder.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
@@ -248,6 +293,14 @@ public partial class GameScreen : Control
             {
                 holder.OffsetTop = 0;
                 continue;
+            }
+
+            // 가로 설정 창은 오른쪽 기둥에 서면 공격 단추와 기술 부채꼴을 덮었다(사용자, 2026-09-23). 설정은 월드를 멈추지
+            // 않으므로 조작이 살아 있어야 한다 — 위 줄 바로 아래, 방향판과 부채꼴 사이 가운데에 제 크기만큼만 선다.
+            if (panel == _settings && !Main.Portrait)
+            {
+                holder.Alignment = BoxContainer.AlignmentMode.Begin;
+                _settings.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
             }
 
             // 창은 위 줄이 실제로 끝나는 곳 아래에서 시작한다. 세로 위 줄은 단추 줄이 붙어 두 줄(120)이라, 가로 위 줄
@@ -276,7 +329,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder ? 0 : column;
         }
     }
 
@@ -414,12 +467,6 @@ public partial class GameScreen : Control
         Greybox.Plain(_logout);
         _logout.Pressed += LogOut;
 
-        // 자동 포션은 창 안에 숨기지 않는다 — 싸우는 중에 한 번에 닿아야 한다(사용자, 2026-09-23).
-        // 마실 포션의 그림에 줄을 작게 적는다. 누르면 켜고 끄기, 길게 누르면 다른 포션을 고른다. 줄은 설정 창에서.
-        PotionChip health = new(Lod.Mobile.Core.World.AutoPotion.Healing,
-            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? []);
-        PotionChip mana = new(Lod.Mobile.Core.World.AutoPotion.Restoring,
-            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? []);
 
         Button settings = new()
         {
@@ -430,8 +477,6 @@ public partial class GameScreen : Control
         Greybox.Plain(settings);
         settings.Pressed += () => _settings.Visible = !_settings.Visible;
 
-        actions.AddChild(health);
-        actions.AddChild(mana);
         actions.AddChild(settings);
         actions.AddChild(_logout);
 
@@ -530,13 +575,19 @@ public partial class GameScreen : Control
             Talk(talking.Talking);
         }
 
-        if (_server is { } server && server.SaidCount != _heard)
+        while (_server is { } server && server.TakeTold(out byte type, out string told))
         {
-            _heard = server.SaidCount;
-            Notify(server.Said);
+            if (MessageSort.FromServer(type, told) is { } notice)
+            {
+                Route(notice);
+            }
         }
 
         Listen();
+        PlaceToasts();
+        Entered();
+        OpenChatOnItsOwn();
+        RehearseNotices();
         Dropped();
         KeepWalking(delta);
         RehearseAHold(delta);
@@ -764,23 +815,134 @@ public partial class GameScreen : Control
     private static void Press(Button key, bool down) => Input.ParseInputEvent(
         new InputEventScreenTouch { Index = 0, Pressed = down, Position = key.GetGlobalRect().GetCenter() });
 
-    /// <summary>Adds a line to the messages, which fade on their own once read, and keeps it for reading back through.</summary>
-    private void Notify(string line, bool speech = false)
-    {
-        line = MessageLog.Clean(line);
-        _messages.Add(line);
+    /// <summary>Says something this screen itself has to say — a refusal, a lost connection. It goes on the ticker.</summary>
+    private void Notify(string line) => Route(MessageSort.Own(line));
 
-        if (line.Length == 0)
+    /// <summary>
+    /// Puts one sorted line where it belongs (<see cref="MessageSort" />) and keeps it for reading back through. Every
+    /// line goes to the log; only some of them go anywhere over the world.
+    /// </summary>
+    private void Route(Notice notice, uint speaker = 0)
+    {
+        if (notice.Text.Length == 0)
         {
             return;
         }
 
-        _history.Add((speech, line));
+        _history.Add((notice.Channel, notice.Text));
 
         if (_history.Count > HistoryKept)
         {
             _history.RemoveRange(0, _history.Count - HistoryKept);
         }
+
+        switch (notice.Place)
+        {
+            case MessagePlace.Ticker:
+                _messages.Add(notice.Text);
+                break;
+
+            case MessagePlace.Toast:
+                _toasts.Add(notice.Short);
+                break;
+
+            case MessagePlace.Banner:
+                _banner.Show(notice.Short, bright: notice.Short == "레벨이 올랐습니다");
+                break;
+
+            case MessagePlace.Bubble:
+                _world.Speak(speaker, notice.Short);
+                break;
+        }
+
+        GD.Print($"GREYBOX_MESSAGE {Time.GetTicksMsec() / 1000.0:0.0}s {notice.Place} {notice.Channel} {notice.Text}");
+    }
+
+    /// <summary>
+    /// Keeps the toasts clear of the attack fan in landscape. The fan sits where the width cap puts it, not against the
+    /// screen edge, so its left end is read rather than assumed.
+    /// </summary>
+    private void PlaceToasts()
+    {
+        if (Main.Portrait)
+        {
+            return;
+        }
+
+        float fanLeft = _abilities.GetGlobalRect().Position.X - _over.GetGlobalRect().Position.X;
+        _toasts.AnchorLeft = 0;
+        _toasts.AnchorRight = 0;
+        _toasts.OffsetRight = fanLeft - Main.Gutter;
+        _toasts.OffsetLeft = _toasts.OffsetRight - ToastWidth;
+    }
+
+    /// <summary>Names the place in the middle of the screen when the character comes into it.</summary>
+    private void Entered()
+    {
+        string place = _world.PlaceName;
+
+        if (place.Length == 0 || place == _bannered)
+        {
+            return;
+        }
+
+        _bannered = place;
+        _banner.Show(place);
+    }
+
+    // --notices 를 한 번만 흘린다.
+    private int _noticeWait;
+
+    /// <summary>
+    /// Only when checking without a server (<c>--notices</c>): puts lines Hades really sends through the same sorting
+    /// the live screen uses, so each place they land can be seen at once.
+    /// </summary>
+    private void RehearseNotices()
+    {
+        if (!Main.Noticing || _server is not null || _noticeWait < 0 || _noticeWait++ < 30)
+        {
+            return;
+        }
+
+        _noticeWait = -1;
+
+        foreach ((byte type, string line) in new (byte, string)[]
+        {
+            (2, "you cast dion."),
+            (2, "Your skin is already like stone."),
+            (2, "You can't attack that."),
+            (2, "길이 막혀 가까운 곳으로 옮겼습니다."),
+            (2, "쿠룸 Received."),
+            (3, "You've Received 120 coins."),
+            (2, "You received 1164 Experience!."),
+            (2, "Your insight has increased!")
+        })
+        {
+            if (MessageSort.FromServer(type, line) is { } notice)
+            {
+                Route(notice);
+            }
+        }
+    }
+
+    /// <summary>Only when checking without a hand (<c>--chat 시스템</c>): opens the full log on that tab.</summary>
+    private void OpenChatOnItsOwn()
+    {
+        // 사냥이 몇 줄을 쌓을 틈을 준다 — 창이 열리면 월드가 멈춘다.
+        if (Main.ChatTab.Length == 0 || _chat.Visible || _chatSettling < 0 || Time.GetTicksMsec() < ChatAfterMilliseconds)
+        {
+            return;
+        }
+
+        _chatSettling = -1;
+        Chatting(true);
+        _chat.Choose(Main.ChatTab switch
+        {
+            "일반" or "general" => MessageChannel.General,
+            "파티" or "party" => MessageChannel.Party,
+            "시스템" or "system" => MessageChannel.System,
+            _ => null
+        });
     }
 
     // 듣기가 멈춘 것을 한 번만 알린다.
@@ -817,13 +979,11 @@ public partial class GameScreen : Control
 
         foreach (Spoken spoken in server.Heard.TakeLast(missed))
         {
-            if (spoken.Kind == SpeechKind.Chant)
+            // 서버가 이미 "이름: 말" 로 보낸다(Hades ServerFormat0D) — 기록에는 그대로, 머리 위에는 이름을 뗀 말만.
+            if (MessageSort.FromSpeech(spoken.Kind, spoken.Text) is { } notice)
             {
-                continue;
+                Route(notice, spoken.Serial);
             }
-
-            // 서버가 이미 "이름: 말" 로 보낸다(Hades ServerFormat0D) — 이름을 한 번 더 붙이면 두 번 나온다.
-            Notify(spoken.Text, speech: true);
         }
     }
 
@@ -1049,7 +1209,7 @@ public partial class GameScreen : Control
             // 기록판이 아니라 잠깐 뜨는 토스트다. 중앙의 캐릭터를 가리지 않도록, 세 칸 방향판 너비를
             // 넘지 않는다. 긴 말은 그 안에서 줄바꿈하고 [대화]가 지난 말을 모두 다시 보여 준다.
             int toastWidth = MessageToastLayout.DirectionPadWidth(Main.TouchMinimum, Main.Gutter / 2);
-            _messages = new MessageLog(2) { CustomMinimumSize = new Vector2(toastWidth, 0) };
+            _messages = new MessageLog(2, wraps: true) { CustomMinimumSize = new Vector2(toastWidth, 0) };
 
             VBoxContainer left = new()
             {
@@ -1087,6 +1247,16 @@ public partial class GameScreen : Control
         // One tap is one blow. It does not chase and it does not repeat — the server decides whether it
         // landed, and says so in words we show below rather than guessing at damage here.
         _abilities.Attack.Pressed += () => _world.Strike();
+
+        // 자동 포션은 창 안에 숨기지 않는다 — 싸우는 중에 한 번에 닿아야 한다(사용자, 2026-09-23). 위 줄에 있던 것을
+        // 기술 부채꼴 맨 위, 가장 높은 기술 칸 위로 옮겼다 — 기술 칸(48)보다 조금 작게(사용자, 2026-09-23 "기술창 제일
+        // 상단쪽에 … 기술창 보다 조금 작게"). 마실 포션의 그림에 줄을 작게 적는다. 누르면 켜고 끄기, 길게 누르면 다른
+        // 포션을 고른다. 줄은 설정 창에서.
+        _abilities.Hold(new PotionChip(AutoPotion.Healing,
+            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? []), 0);
+        _abilities.Hold(new PotionChip(AutoPotion.Restoring,
+            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? []), 1);
+
         row.AddChild(_abilities);
 
         MarginContainer capped = Main.Capped(row, Main.ThumbSpanMaximum);
@@ -1186,6 +1356,7 @@ public partial class GameScreen : Control
         // 커스텀 최소 높이를 주므로(단추의 48보다 커) 줄지 않는다 — 그대로다.
         _messages.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _messages.SizeFlagsVertical = SizeFlags.ShrinkEnd;
+        _messages.Tapped += () => Chatting(true);
         row.AddChild(_messages);
 
         Button said = new()

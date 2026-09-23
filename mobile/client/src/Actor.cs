@@ -115,6 +115,24 @@ public sealed partial class Actor : Node2D
     /// <summary>Says this one was struck and this much of them is left, as a percentage the server sends (0x13).</summary>
     public void Struck(int left) => _hurt?.Struck(left);
 
+    /// <summary>What this one said last, over the bar. Made the first time they speak.</summary>
+    private SpeechBubble? _speech;
+
+    /// <summary>Where over the head the words sit — just above the bar.</summary>
+    private float _speechAt = -64;
+
+    /// <summary>Shows words over the head for a few seconds (0x0D).</summary>
+    public void Say(string words)
+    {
+        if (_speech is null)
+        {
+            _speech = new SpeechBubble { Name = "Speech", Position = new Vector2(0, _speechAt) };
+            AddChild(_speech);
+        }
+
+        _speech.Say(words);
+    }
+
     /// <summary>The badges under the bar — what is on this one now.</summary>
     private StatusRow? _ailing;
 
@@ -178,6 +196,9 @@ public sealed partial class Actor : Node2D
 
         _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, badges - 2 - HealthBar.Thickness) };
         AddChild(_hurt);
+
+        // 말은 막대 위에 — 막대·배지가 떠 있어도 겹치지 않는다.
+        _speechAt = badges - 2 - HealthBar.Thickness - 3;
 
         _ailing = new StatusRow { Name = "Status", Visible = false, Position = new Vector2(0, badges) };
         AddChild(_ailing);

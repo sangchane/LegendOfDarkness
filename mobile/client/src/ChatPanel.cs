@@ -1,4 +1,5 @@
 using Godot;
+using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
@@ -37,13 +38,18 @@ public sealed partial class ChatPanel : PanelContainer
         CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
     };
 
-    private readonly Button _all = Tab("전체");
-    private readonly Button _speech = Tab("대화");
-    private readonly Button _system = Tab("시스템");
+    // 전체 · 일반(사람의 말 — 근처 말·외침·귓속말·길드) · 파티 · 시스템. 귓속말은 따로 두지 않는다: 서버가 귓속말을
+    // 보내는 곳이 두 군데뿐이고(GameServerHandlers.cs:865-866) 줄 앞에 이름이 붙어 섞여도 구별된다.
+    private readonly (Button Tab, MessageChannel? Channel)[] _tabs =
+    [
+        (Tab("전체"), null),
+        (Tab("일반"), MessageChannel.General),
+        (Tab("파티"), MessageChannel.Party),
+        (Tab("시스템"), MessageChannel.System)
+    ];
 
-    // 어느 탭이 눌렸나, 그리고 그 탭으로 몇 줄을 적어 두었나. 늘어난 만큼만 덧붙인다.
-    private bool _onlySpeech;
-    private bool _onlySystem;
+    // 어느 탭이 눌렸나(null 은 전체), 그리고 그 탭으로 몇 줄을 적어 두었나. 늘어난 만큼만 덧붙인다.
+    private MessageChannel? _only;
     private int _written;
     private int _read;
 
@@ -59,13 +65,12 @@ public sealed partial class ChatPanel : PanelContainer
 
         HBoxContainer head = new();
         head.AddThemeConstantOverride("separation", Main.Gutter);
-        _all.Pressed += () => Choose(speech: false, system: false);
-        _speech.Pressed += () => Choose(speech: true, system: false);
-        _system.Pressed += () => Choose(speech: false, system: true);
+        foreach ((Button tab, MessageChannel? channel) in _tabs)
+        {
+            tab.Pressed += () => Choose(channel);
+            head.AddChild(tab);
+        }
 
-        head.AddChild(_all);
-        head.AddChild(_speech);
-        head.AddChild(_system);
         head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
 
         Close = new Button { Text = "닫기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
@@ -95,7 +100,7 @@ public sealed partial class ChatPanel : PanelContainer
 
         AddChild(inside);
 
-        Choose(speech: false, system: false);
+        Choose(null);
     }
 
     /// <summary>The button that shuts the panel, so whoever opened it decides what that means.</summary>
@@ -137,14 +142,16 @@ public sealed partial class ChatPanel : PanelContainer
         return tab;
     }
 
-    /// <summary>Shows one kind of line, or all of them. The list is written again, because a different lot belongs in it.</summary>
-    private void Choose(bool speech, bool system)
+    /// <summary>Shows one kind of line, or all of them (null). The list is written again, because a different lot belongs in it.</summary>
+    public void Choose(MessageChannel? channel)
     {
-        _onlySpeech = speech;
-        _onlySystem = system;
-        _all.ButtonPressed = !speech && !system;
-        _speech.ButtonPressed = speech;
-        _system.ButtonPressed = system;
+        _only = channel;
+
+        foreach ((Button tab, MessageChannel? mine) in _tabs)
+        {
+            tab.ButtonPressed = mine == channel;
+        }
+
         _written = -1;
     }
 
@@ -152,7 +159,7 @@ public sealed partial class ChatPanel : PanelContainer
     /// Shows every line said so far, oldest at the top. Only the new ones are added — rebuilding the lot every frame
     /// would throw away where the reader had scrolled to.
     /// </summary>
-    public void Show(IReadOnlyList<(bool Speech, string Text)> said)
+    public void Show(IReadOnlyList<(MessageChannel Channel, string Text)> said)
     {
         if (said.Count == _read && _written >= 0)
         {
@@ -172,7 +179,7 @@ public sealed partial class ChatPanel : PanelContainer
 
         for (int index = _written; index < said.Count; index++)
         {
-            if ((_onlySpeech && !said[index].Speech) || (_onlySystem && said[index].Speech))
+            if (_only is { } only && said[index].Channel != only)
             {
                 continue;
             }
