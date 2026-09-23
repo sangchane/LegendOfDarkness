@@ -73,6 +73,57 @@ public partial class Main : Control
         }
     }
 
+    /// <summary>
+    /// 체력·마력이 몇 % 이하일 때 포션을 저절로 마시나. 줍기처럼 기기에 남는다(한 줄에 하나, "on 50").
+    /// 처음에는 꺼져 있다 — 사람이 켜기 전에는 가방의 물건을 쓰지 않는다.
+    /// </summary>
+    private const string PotionFile = "user://potion.cfg";
+
+    public static Lod.Mobile.Core.World.PotionRule HealthPotion { get; private set; } = new(false, 50);
+
+    public static Lod.Mobile.Core.World.PotionRule ManaPotion { get; private set; } = new(false, 30);
+
+    public static void SetPotions(Lod.Mobile.Core.World.PotionRule health, Lod.Mobile.Core.World.PotionRule mana)
+    {
+        HealthPotion = health;
+        ManaPotion = mana;
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(PotionFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            foreach (Lod.Mobile.Core.World.PotionRule rule in new[] { health, mana })
+            {
+                writing.StoreLine($"{(rule.Enabled ? "on" : "off")} {rule.Percent}");
+            }
+
+            writing.Close();
+        }
+    }
+
+    private static void ReadPotions()
+    {
+        Godot.FileAccess? reading = Godot.FileAccess.Open(PotionFile, Godot.FileAccess.ModeFlags.Read);
+
+        if (reading is null)
+        {
+            return;
+        }
+
+        HealthPotion = Rule(reading.GetLine(), HealthPotion);
+        ManaPotion = Rule(reading.GetLine(), ManaPotion);
+        reading.Close();
+
+        static Lod.Mobile.Core.World.PotionRule Rule(string line, Lod.Mobile.Core.World.PotionRule fallback)
+        {
+            string[] parts = line.Trim().Split(' ');
+
+            return parts.Length == 2 && int.TryParse(parts[1], out int percent) && percent is > 0 and < 100
+                ? new(parts[0] == "on", percent)
+                : fallback;
+        }
+    }
+
     /// <summary>환경변수로도 준다. 데스크톱에서 인자 없이 다른 서버를 가리킬 때 쓴다.</summary>
     private const string ServerVariable = "LOD_SERVER";
 
@@ -240,6 +291,7 @@ public partial class Main : Control
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
         GearAfter = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear-after") >= 0;
         ReadAutoLoot();
+        ReadPotions();
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 
         // 입거나 버려 보려면 소지품이 열려 있어야 한다 — 따로 적게 하지 않는다.

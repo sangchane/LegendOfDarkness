@@ -408,11 +408,21 @@ public partial class GameScreen : Control
 
         Greybox.Plain(_logout);
         _logout.Pressed += LogOut;
+
+        // 자동 포션은 창 안에 숨기지 않는다 — 싸우는 중에 한 번에 닿아야 한다(사용자, 2026-09-23).
+        // 누르면 켜고 끄기, 길게 누른 채 위아래로 밀면 줄을 옮긴다.
+        PotionChip health = new("체력", Greybox.Health,
+            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion));
+        PotionChip mana = new("마력", Greybox.Mana,
+            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule));
+
+        actions.AddChild(health);
+        actions.AddChild(mana);
         actions.AddChild(_logout);
 
         if (Main.Portrait)
         {
-            foreach (Button action in new[] { pack, _map, _logout })
+            foreach (Button action in new Button[] { pack, _map, health, mana, _logout })
             {
                 action.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             }

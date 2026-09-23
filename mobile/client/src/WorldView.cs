@@ -88,6 +88,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // the frame loop, or a full bag would send dozens of identical requests per second.
     private readonly AutoLootGate _autoLoot = new();
 
+    // The server has no cooldown on using an item either; this waits for each drink to be answered.
+    private readonly AutoPotion _potion = new();
+
     // 그림이 없는 NPC(팩의 스크립트 NPC)가 선 자리의 표식. 번호로 골라 말을 건다.
     private readonly Dictionary<uint, NpcMark> _signs = [];
     private readonly List<AudioStreamPlayer> _voices = [];
@@ -106,11 +109,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     /// <summary>
     /// 내 평타를 어떤 몸 동작으로 그리나. 서버가 한 번 말해 주면 그 뒤로는 기다리지 않고 이것으로 그린다.
-    /// 아직 못 들었으면 일반 휘두르기다.
+    /// 아직 못 들었으면 일반 휘두르기다. 공격 단추에 대한 대답만 듣는다 — 주문 자세를 평타로 배우지 않게.
     /// </summary>
-    private BodyMotion? _ownBlow;
-
-    private int _ownBlowSpeed = 20;
+    private readonly OwnBlow _ownBlow = new();
 
     /// <summary>Frames since the hunt started. Everything it does is paced off this rather than a timer.</summary>
     private int _hunted;
@@ -1012,7 +1013,15 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         // 무엇을 그릴지는 **서버가 지난번에 말해 준 것**을 쓴다. 평타 동작은 입은 것이 정하는데(무기의
         // 공격모션, 없으면 갑옷의 것 — 도복은 주먹 132) 클라이언트는 그 칸을 모른다. 그래서 늘 일반
         // 휘두르기만 그렸고, 무도가가 주먹을 안 쥐었다(사용자, 2026-09-18).
-        _player.Play(_ownBlow ?? BodyMotion.Blow, BodyMotion.Blow.SecondsPerFrame(_ownBlowSpeed));
+        // 직업 동작은 그 동작을 받는 옷(skill.tbl ST)을 입었을 때만 — 아니면 원작처럼 일반 휘두르기다.
+        BodyMotion blow = _ownBlow.Number is { } number
+            && BodyMotion.Of(number) is { } known
+            && server is { } world
+            && BodyMotion.Fits(number, ArmourOf(world, world.Serial))
+            ? known
+            : BodyMotion.Blow;
+        _player.Play(blow, blow.SecondsPerFrame(_ownBlow.Speed));
+        _ownBlow.Swung(System.TimeSpan.FromMilliseconds(Time.GetTicksMsec()));
 
         _ = server?.AttackAsync(_leaving.Token);
     }
@@ -1181,6 +1190,22 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
     }
 
+    /// <summary>Drinks a carried potion when health or mana has fallen to the line chosen on the game screen.</summary>
+    private void Drink()
+    {
+        if (server is null || Frozen || server.Vitals is not { } vitals)
+        {
+            return;
+        }
+
+        System.TimeSpan now = System.TimeSpan.FromMilliseconds(Time.GetTicksMsec());
+
+        if (_potion.Next(vitals, server.Pack, Main.HealthPotion, Main.ManaPotion, now) is { } slot)
+        {
+            _ = server.UseAsync(slot, _leaving.Token);
+        }
+    }
+
     /// <summary>
     /// Puts a bar over the head of whoever was just struck. The server tells us about every blow (0x13) with
     /// what is left as a percentage, and until now the screen only listened for the sound in it — so a fight
@@ -1252,6 +1277,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     {
         while (server is { } world && world.TakeMotion(out Motion? motion))
         {
+            if (motion.Serial == world.Serial)
+            {
+                _ownBlow.Heard(motion.Number, motion.Speed, System.TimeSpan.FromMilliseconds(Time.GetTicksMsec()));
+            }
+
             if ((motion.Serial == world.Serial && motion.Number == 1) || Someone(world, motion.Serial) is not { } actor)
             {
                 continue;
@@ -1261,13 +1291,6 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 && (_herd.ContainsKey(motion.Serial) || BodyMotion.Fits(motion.Number, ArmourOf(world, motion.Serial))))
             {
                 actor.Play(body, body.SecondsPerFrame(motion.Speed));
-
-                // 내 평타가 무엇으로 그려지는지 기억해 둔다 — 다음 휘두름부터는 기다리지 않고 이것으로 그린다.
-                if (motion.Serial == world.Serial && motion.Number >= BodyMotion.FirstSkill)
-                {
-                    _ownBlow = body;
-                    _ownBlowSpeed = motion.Speed;
-                }
             }
             else if (_herd.ContainsKey(motion.Serial))
             {
@@ -1476,6 +1499,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Swings();
         Wounds();
         Gather();
+        Drink();
         Flashes();
         Sounds();
         Band();
