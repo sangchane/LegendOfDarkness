@@ -60,3 +60,6 @@ data/original-ui/graph/
 
 # 2023 workbook JSON에서 언제든 다시 만드는 Graphify 산출물
 data/skill-spell-2023/graph/
+
+# 다른 도구(Antigravity)의 스킬·평가 산출물 — 저장소에 싣지 않는다(2026-09-23)
+.agents/
