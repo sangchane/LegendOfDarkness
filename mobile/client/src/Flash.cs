@@ -20,11 +20,22 @@ public sealed partial class Flash : Sprite2D
     private readonly double _perFrame;
     private double _age;
 
-    private Flash(Texture2D picture, EffectSheet sheet, int speed)
+    /// <summary>
+    /// Whether this is a head effect (<see cref="Overhead.IsHeadClass" />) — Miss, 일음지, the coma — which plays in
+    /// the slot just over the head rather than where the sheet's anchor would put it.
+    /// </summary>
+    public bool OnHead { get; }
+
+    /// <summary>The lowest drawn row of the sheet, in cell pixels, for <see cref="Overhead.Shift" />.</summary>
+    private readonly int _drawnBottom;
+
+    private Flash(Texture2D picture, EffectSheet sheet, int speed, int drawnBottom)
     {
         Texture = picture;
         Hframes = Math.Max(1, sheet.Frames);
         _sheet = sheet;
+        _drawnBottom = drawnBottom;
+        OnHead = Overhead.IsHeadClass(sheet, drawnBottom);
 
         // 바탕의 기준점이 맞는 쪽의 발밑(칸)에 온다 — 원작이 그렇게 놓고, 머리 위 반짝임(efct042)이나
         // 머리 위 「Miss」(efct033·115)가 제 높이에 서는 것도 이 때문이다. 가운데를 맞추면 그림마다 어긋났다.
@@ -51,7 +62,59 @@ public sealed partial class Flash : Sprite2D
             return null;
         }
 
-        return new Flash(GD.Load<Texture2D>(path), sheet, speed);
+        Texture2D picture = GD.Load<Texture2D>(path);
+
+        return new Flash(picture, sheet, speed, DrawnBottom(number, picture));
+    }
+
+    /// <summary>
+    /// Puts the effect on somebody whose feet are at <paramref name="feet" />. A head effect sits just over that
+    /// one's drawn head (<paramref name="headTop" />, from the feet); anything else stays where its anchor puts it.
+    /// </summary>
+    public void Land(Vector2 feet, float? headTop) =>
+        Position = OnHead && headTop is { } head
+            ? feet + new Vector2(0, Mathf.Round(Overhead.Shift(_sheet, _drawnBottom, head)))
+            : feet;
+
+    private static readonly Dictionary<int, int> Bottoms = [];
+
+    /// <summary>The lowest row anything is drawn on in any frame — measured once per effect, as reading back is slow.</summary>
+    private static int DrawnBottom(int number, Texture2D picture)
+    {
+        if (Bottoms.TryGetValue(number, out int known))
+        {
+            return known;
+        }
+
+        int bottom = picture.GetHeight() - 1;
+
+        if (picture.GetImage() is { } image)
+        {
+            if (image.IsCompressed())
+            {
+                image.Decompress();
+            }
+
+            bottom = -1;
+
+            for (int y = image.GetHeight() - 1; y >= 0 && bottom < 0; y--)
+            {
+                for (int x = 0; x < image.GetWidth(); x++)
+                {
+                    if (image.GetPixel(x, y).A > 0.1f)
+                    {
+                        bottom = y;
+                        break;
+                    }
+                }
+            }
+
+            // 빈 그림은 머리 이펙트로 치지 않는다.
+            bottom = bottom < 0 ? image.GetHeight() - 1 : bottom;
+        }
+
+        Bottoms[number] = bottom;
+        return bottom;
     }
 
     private static readonly Dictionary<int, Color> Tints = [];

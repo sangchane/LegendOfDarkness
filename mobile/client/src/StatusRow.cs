@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
 /// <summary>
-/// The little badges under somebody's health bar saying what is on them — a curse, poison, sleep. The original
+/// The little badges over somebody's health bar saying what is on them — a curse, poison, sleep. The original
 /// sends a picture number and a grade for how much time is left (<c>0x3A</c>), and draws each as it does here: the
 /// picture, and beside it a thin bar as tall as the time left, in that grade's colour.
 /// </summary>
@@ -28,8 +29,8 @@ public sealed partial class StatusRow : Node2D
     /// <summary>How big one picture is, the time bar beside it, and how far apart they sit.</summary>
     private const int Side = 10;
 
-    /// <summary>How tall the row is, so whoever places it can keep it off the head.</summary>
-    public const int Height = Side;
+    /// <summary>How tall the row is with the badges' edges, so whoever places it can keep it clear of the bar.</summary>
+    public const int Height = Side + 2;
 
     private const int Bar = 2;
 
@@ -61,32 +62,36 @@ public sealed partial class StatusRow : Node2D
         Color.Color8(27, 127, 127)
     ];
 
-    /// <summary>How many fit before the rest are summed up. Five is as many as a tile's width allows.</summary>
-    private const int Most = 5;
-
     private static readonly Color Edge = new(0f, 0f, 0f, 0.85f);
     private static readonly Color Fading = new(0.95f, 0.85f, 0.35f);
 
-    /// <summary>What is on us now, the ones running out soonest first.</summary>
+    /// <summary>The size of the "+N" figures — as tall as a badge.</summary>
+    private const int RestSize = 10;
+
+    /// <summary>What is drawn now, the ones running out soonest first, and how many more there are ("+N").</summary>
     private readonly List<Ailment> _showing = [];
+
+    private int _more;
 
     private double _blink;
 
     /// <summary>
     /// Says what is on somebody now. The ones running out soonest come first, so the badge a player must act on
     /// is never the one pushed off the end — which is the complaint every game with a capped status row collects.
+    /// In a coma none are drawn: the coma owns the head (<see cref="Overhead.Badges" />).
     /// </summary>
     public void Show(IEnumerable<Ailment> ailments)
     {
-        List<Ailment> sorted = [.. ailments.OrderBy(one => one.Left).ThenBy(one => one.Icon)];
+        (IReadOnlyList<Ailment> shown, int more) = Overhead.Badges(ailments);
 
-        if (sorted.Count == _showing.Count && !sorted.Where((one, at) => one != _showing[at]).Any())
+        if (more == _more && shown.Count == _showing.Count && !shown.Where((one, at) => one != _showing[at]).Any())
         {
             return;
         }
 
         _showing.Clear();
-        _showing.AddRange(sorted);
+        _showing.AddRange(shown);
+        _more = more;
         Visible = _showing.Count > 0;
         QueueRedraw();
     }
@@ -116,14 +121,17 @@ public sealed partial class StatusRow : Node2D
 
     public override void _Draw()
     {
-        int shown = Mathf.Min(_showing.Count, Most);
-        int badges = _showing.Count > Most ? shown + 1 : shown;
-        float left = -(badges * (Slot + Gap) - Gap) / 2f;
+        int shown = _showing.Count;
+        string rest = $"+{_more}";
+        Font font = ThemeDB.FallbackFont;
+        float restWide = _more > 0 ? font.GetStringSize(rest, HorizontalAlignment.Left, -1, RestSize).X + 2 : 0;
+        float wide = shown * (Slot + Gap) - Gap + (_more > 0 ? Gap + restWide : 0);
+        float left = Mathf.Round(-wide / 2f);
 
         for (int at = 0; at < shown; at++)
         {
             Ailment one = _showing[at];
-            Rect2 box = new(left + at * (Slot + Gap), 0, Side, Side);
+            Rect2 box = new(left + at * (Slot + Gap), 1, Side, Side);
 
             // 1등급(10초 미만)은 깜빡인다.
             if (one.Left == 1 && Time.GetTicksMsec() / 300 % 2 == 1)
@@ -142,20 +150,21 @@ public sealed partial class StatusRow : Node2D
             if (one.Left is >= 1 and <= 6)
             {
                 float tall = Side * (one.Left * 2 + 2) / 14f;
-                Rect2 bar = new(box.End.X + 1, 0, Bar, tall);
+                Rect2 bar = new(box.End.X + 1, box.Position.Y, Bar, tall);
 
                 DrawRect(bar.Grow(0.5f), Edge);
                 DrawRect(bar, Grades[one.Left - 1]);
             }
         }
 
-        if (_showing.Count > Most)
+        // 다섯을 넘으면 나머지는 「+N」 한 칸으로 — 가장 늦게 풀리는 것들이다.
+        if (_more > 0)
         {
-            Rect2 rest = new(left + shown * (Slot + Gap), 0, Side, Side);
+            Rect2 box = new(left + shown * (Slot + Gap), 1, restWide, Side);
 
-            DrawRect(rest.Grow(1), Edge);
-            DrawRect(rest, Fading);
-            DrawRect(new Rect2(rest.Position + new Vector2(2, 4), new Vector2(Side - 4, 1)), Edge);
+            DrawRect(box.Grow(1), Edge);
+            DrawRect(box, Fading);
+            DrawString(font, new Vector2(box.Position.X + 1, box.End.Y - 1), rest, HorizontalAlignment.Left, -1, RestSize, Edge);
         }
     }
 

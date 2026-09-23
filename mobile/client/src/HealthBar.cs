@@ -18,8 +18,8 @@ public sealed partial class HealthBar : Node2D
 
     private const int Height = 3;
 
-    /// <summary>How tall the bar is with its edge, so the badges under it can be placed clear of it.</summary>
-    public const int Thickness = Height + 1;
+    /// <summary>How tall the bar is with its edge above and below, so what stands around it can be placed clear of it.</summary>
+    public const int Thickness = Height + 2;
 
     /// <summary>How long it stays at full strength, and how long it takes to fade after that.</summary>
     private const double StaySeconds = 3.0;
@@ -74,8 +74,9 @@ public sealed partial class HealthBar : Node2D
 
     public override void _Draw()
     {
-        DrawRect(new Rect2(-Width / 2f - 1, -1, Width + 2, Height + 2), Edge);
-        DrawRect(new Rect2(-Width / 2f, 0, Width, Height), Backing);
+        // 테두리까지 원점 아래에 그린다 — 자리를 잡는 쪽(Overhead.Place)이 테두리째 띄운다.
+        DrawRect(new Rect2(-Width / 2f - 1, 0, Width + 2, Thickness), Edge);
+        DrawRect(new Rect2(-Width / 2f, 1, Width, Height), Backing);
 
         if (_left <= 0)
         {
@@ -84,6 +85,6 @@ public sealed partial class HealthBar : Node2D
 
         Color paint = _left > 60 ? Hale : _left > 25 ? Worn : Dying;
 
-        DrawRect(new Rect2(-Width / 2f, 0, Width * (_left / 100f), Height), paint);
+        DrawRect(new Rect2(-Width / 2f, 1, Width * (_left / 100f), Height), paint);
     }
 }

@@ -430,13 +430,19 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     public float? FocusY { get; set; }
 
+    /// <summary>
+    /// Whether we are in a coma (badge 89 on us, 0x3A). The server refuses every step and blow then
+    /// (<c>CanMoveDuringReap</c> false), so taking one here would only walk us off and snap us back.
+    /// </summary>
+    private bool Comatose => _player.Comatose;
+
     /// <summary>Whether a step is under way — the movement pad fades while it is.</summary>
     public bool Walking => _walked >= 0;
 
     /// <summary>Starts a step. Ignored while one is still running, so a tile is never half walked.</summary>
     public void Walk(Direction direction)
     {
-        if (Frozen || _walked >= 0)
+        if (Frozen || _walked >= 0 || Comatose)
         {
             return;
         }
@@ -1022,7 +1028,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     public void Strike()
     {
-        if (Frozen)
+        if (Frozen || Comatose)
         {
             return;
         }
@@ -1087,12 +1093,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
             if (effect.TargetAnimation > 0 && Someone(world, effect.Target) is { } target)
             {
-                Show(effect.TargetAnimation, target.Position, effect.Speed);
+                Show(effect.TargetAnimation, target.Position, effect.Speed, target);
             }
 
             if (effect.SourceAnimation > 0 && Someone(world, effect.Source) is { } source)
             {
-                Show(effect.SourceAnimation, source.Position, effect.Speed);
+                Show(effect.SourceAnimation, source.Position, effect.Speed, source);
             }
         }
     }
@@ -1118,7 +1124,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
     }
 
-    private void Show(int number, Vector2 feet, int speed)
+    private void Show(int number, Vector2 feet, int speed, Actor? on = null)
     {
         if (number <= 0)
         {
@@ -1131,9 +1137,22 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
-        // 그림이 제 기준점을 지니므로 발밑(칸)에 놓는다 — 몸 가운데·머리 위는 그림이 정한다.
-        flash.Position = feet;
+        // 혼수인 동안은 혼수가 머리 칸을 차지한다 — 다른 머리 이펙트(Miss·일음지 …)는 그리지 않는다.
+        if (flash.OnHead && on is { Comatose: true } && number != Overhead.ComaEffect)
+        {
+            flash.Free();
+            return;
+        }
+
+        // 그림이 제 기준점을 지니므로 발밑(칸)에 놓는다 — 몸 가운데는 그림이 정한다. 머리 이펙트만은 맞은
+        // 이의 그려진 머리 바로 위 칸으로 옮긴다(Overhead.Shift) — 원작 칸 그대로면 키 큰 사람의 얼굴을 덮었다.
+        flash.Land(feet, on?.HeadTop);
         _camera.AddChild(flash);
+
+        if (flash.OnHead)
+        {
+            GD.Print($"GREYBOX_HEAD_FLASH {number} frame {Engine.GetProcessFrames()} on {on?.DisplayName}");
+        }
     }
 
     // 배경음악은 효과음과 따로 한 대에서 돈다 — 맵을 옮기면 갈아 끼우고, 같은 곡이면 이어서 튼다.
@@ -1571,6 +1590,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Sounds();
         Band();
         RehearseAPick();
+        RehearseOverhead(delta);
         HuntOnItsOwn();
 
         if (_walked < 0 && _rehearsal.Count > 0)
@@ -1601,6 +1621,57 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         Look();
+    }
+
+    private double _overheadAt = -1;
+
+    /// <summary>
+    /// With no server, stands what <c>--overhead</c> asks for over the heads, so the stack can be photographed: badges
+    /// on everyone (seven on 주모 with the bar up, six on us with it down), 일음지 42 and Miss 33/115 over 주모 and the
+    /// wasp every second — or, for <c>coma</c>, us in a coma with its effect 24 and a Miss that must not show.
+    /// </summary>
+    private void RehearseOverhead(double delta)
+    {
+        if (server is not null || Main.Overhead.Length == 0)
+        {
+            return;
+        }
+
+        int was = (int)_overheadAt;
+        _overheadAt += delta;
+
+        if ((int)_overheadAt == was && _overheadAt > 0)
+        {
+            return;
+        }
+
+        Ailment[] many = [new(3, 6), new(12, 1), new(27, 4), new(40, 2), new(55, 5), new(82, 3), new(101, 6)];
+        List<Actor> others = [.. _camera.GetChildren().OfType<Actor>().Where(actor => actor != _player)];
+        Actor? person = others.Find(actor => actor.DisplayName == "주모");
+        Actor? beast = others.Find(actor => actor.DisplayName == "말벌");
+        bool coma = Main.Overhead == "coma";
+        int beat = (int)_overheadAt;
+
+        _player.Ailing(coma ? [new(Lod.Mobile.Core.Art.Overhead.ComaIcon, 2), .. many[..3]] : many[..6]);
+        person?.Ailing(many);
+        person?.Struck(55);
+        beast?.Struck(30);
+
+        if (coma)
+        {
+            Show(Lod.Mobile.Core.Art.Overhead.ComaEffect, _player.Position, 100, _player);
+            Show(33, _player.Position, 100, _player);
+            GD.Print($"GREYBOX_OVERHEAD coma tile {_tile} at {_player.Position} comatose {Comatose}");
+            return;
+        }
+
+        foreach (Actor? one in new[] { person, beast })
+        {
+            if (one is not null)
+            {
+                Show(beat % 2 == 0 ? 42 : one == person ? 33 : 115, one.Position, 100, one);
+            }
+        }
     }
 
     /// <summary>

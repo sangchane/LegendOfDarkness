@@ -221,6 +221,12 @@ public partial class Main : Control
     /// </summary>
     public static bool Noticing { get; private set; }
 
+    /// <summary>
+    /// With no server (<c>--screen game</c>), what to stand over the heads to photograph the overhead stack, as
+    /// <c>--overhead badges</c> (many badges, bar up and down, 일음지 and Miss) or <c>--overhead coma</c> (us in a coma).
+    /// </summary>
+    public static string Overhead { get; private set; } = string.Empty;
+
     /// <summary>Whether to open the pack on its own, as <c>--pack</c>. For checking it without a thumb.</summary>
     public static bool OpeningPack { get; private set; }
 
@@ -310,6 +316,7 @@ public partial class Main : Control
         PartySaying = Flag("--party-say");
         LeavingAfter = double.TryParse(Flag("--leave-after"), out double leaveAfter) ? leaveAfter : -1;
         Noticing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--notices") >= 0;
+        Overhead = Flag("--overhead");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;

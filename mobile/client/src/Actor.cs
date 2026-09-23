@@ -136,9 +136,39 @@ public sealed partial class Actor : Node2D
     /// <summary>The badges under the bar — what is on this one now.</summary>
     private StatusRow? _ailing;
 
-    /// <summary>Says what is on this one now (0x3A). An empty list clears the badges.</summary>
-    public void Ailing(System.Collections.Generic.IEnumerable<Lod.Mobile.Core.World.Ailment> ailments) =>
-        _ailing?.Show(ailments);
+    /// <summary>
+    /// Says what is on this one now (0x3A for us, 0x5C for others). An empty list clears the badges; a coma hides
+    /// them and keeps the head slot for the coma (<see cref="Overhead" />).
+    /// </summary>
+    public void Ailing(IEnumerable<Ailment> ailments)
+    {
+        List<Ailment> on = [.. ailments];
+
+        Comatose = Overhead.InComa(on);
+        _ailing?.Show(on);
+    }
+
+    /// <summary>Whether this one is in a coma now — the coma effect then owns the head slot.</summary>
+    public bool Comatose { get; private set; }
+
+    /// <summary>The top of the drawn head, from the feet (negative) — where the head slot starts.</summary>
+    public float HeadTop { get; private set; } = -60;
+
+    /// <summary>Puts the badge row over the bar while it shows, and in its place when it does not.</summary>
+    private void Stack()
+    {
+        if (_ailing is null || _hurt is null)
+        {
+            return;
+        }
+
+        float badges = Overhead.Place(HeadTop, _hurt.Visible, HealthBar.Thickness, StatusRow.Height).Badges;
+
+        if (_ailing.Position.Y != badges)
+        {
+            _ailing.Position = new Vector2(0, badges);
+        }
+    }
 
     /// <summary>The colour a monster's body is tinted with while a spell is on it; white is none.</summary>
     private Color _tint = Colors.White;
@@ -186,22 +216,22 @@ public sealed partial class Actor : Node2D
             AddChild(piece);
         }
 
-        // 머리 위 체력바. 그림 칸이 아니라 **그려진 머리** 위에 둔다 — 칸은 옆으로 뻗은 무기까지 담느라
-        // 사람 기준 120x96 에 발이 83 이라, 칸 꼭대기에 붙이면 머리 위로 서른 칸쯤 떠 버린다.
-        float head = -_sheet.FeetY + HeadTop(_standing[0], _sheet);
+        // 머리 위는 아래에서부터 머리 이펙트 칸 · 체력바 · 배지 한 줄이다(Overhead). 그림 칸이 아니라 **그려진 머리**
+        // 위에 둔다 — 칸은 옆으로 뻗은 무기까지 담느라 사람 기준 120x96 에 발이 83 이라, 칸 꼭대기에 붙이면
+        // 머리 위로 서른 칸쯤 떠 버린다.
+        HeadTop = -_sheet.FeetY + DrawnTop(_standing[0], _sheet);
 
-        // 걸린 것들은 막대 바로 아래, 머리 바로 위에 줄로 선다 — 눈이 이미 가 있는 자리라 따로 찾지 않아도 된다.
-        // 배지(10)가 머리카락을 덮지 않게 머리 꼭대기에서 2 띄우고, 막대는 그 배지 위로 올린다(사용자, 2026-09-23).
-        float badges = head - 2 - StatusRow.Height;
+        (float bar, float badges) = Overhead.Place(HeadTop, true, HealthBar.Thickness, StatusRow.Height);
 
-        _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, badges - 2 - HealthBar.Thickness) };
+        _hurt = new HealthBar { Name = "Health", Visible = false, Position = new Vector2(0, bar) };
         AddChild(_hurt);
 
-        // 말은 막대 위에 — 막대·배지가 떠 있어도 겹치지 않는다.
-        _speechAt = badges - 2 - HealthBar.Thickness - 3;
+        // 말은 가장 높이 선 배지 줄 위에 — 막대·배지가 떠 있어도 겹치지 않는다.
+        _speechAt = badges - 3;
 
-        _ailing = new StatusRow { Name = "Status", Visible = false, Position = new Vector2(0, badges) };
+        _ailing = new StatusRow { Name = "Status", Visible = false };
         AddChild(_ailing);
+        Stack();
 
         Face(_direction);
     }
@@ -371,6 +401,8 @@ public sealed partial class Actor : Node2D
 
     public override void _Process(double delta)
     {
+        Stack();
+
         if (_stepped >= 0)
         {
             _stepped += delta;
@@ -503,7 +535,7 @@ public sealed partial class Actor : Node2D
     /// head; hanging a bar off the cell leaves it floating in the air.
     /// </summary>
     /// <remarks>Measured once per sheet, because reading a picture back is slow and thirty monsters share a few.</remarks>
-    private static float HeadTop(Texture2D sheet, Sheet cut)
+    private static float DrawnTop(Texture2D sheet, Sheet cut)
     {
         string key = $"{sheet.ResourcePath}|{cut.CellWidth}x{cut.CellHeight}";
 
