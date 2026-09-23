@@ -116,6 +116,21 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private const byte UseSkillCommand = 0x3E;
     private const byte UseSpellCommand = 0x0F;
 
+    /// <summary>그룹 청하기·받아들이기(나가는 쪽). 오는 <see cref="WorldMapCommand" /> 와 번호가 같다.</summary>
+    private const byte GroupCommand = 0x2E;
+
+    /// <summary>누가 그룹을 청한다(오는 쪽, <see cref="Party.ReadAsk" />).</summary>
+    private const byte GroupAskCommand = 0x63;
+
+    /// <summary>내 프로필을 달라는 말. 오는 <see cref="RemoveSkillCommand" /> 와 번호가 같다.</summary>
+    private const byte ProfileRequestCommand = 0x2D;
+
+    /// <summary>내 프로필 — 그 안에 그룹 목록이 있다(<see cref="Party.ReadRoster" />).</summary>
+    private const byte ProfileCommand = 0x39;
+
+    /// <summary>귓속말. 받는 이 이름이 "!" 이면 그룹말이다.</summary>
+    private const byte WhisperCommand = 0x19;
+
     private byte _ordinal;
     private byte _step;
     private int _disposed;
@@ -186,6 +201,11 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     private volatile IReadOnlyList<Spoken> _heard = [];
     private volatile int _heardTotal;
+
+    // 그룹을 청한 사람들, 온 차례대로. 그리는 쪽이 하나씩 꺼내 묻는다.
+    private readonly ConcurrentQueue<string> _asks = new();
+    private volatile PartyRoster _roster = PartyRoster.Alone;
+    private volatile int _rosterCount;
 
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
     public WorldEntry? State => _state;
@@ -338,6 +358,15 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     private volatile string _unread = string.Empty;
     private volatile int _unreadCount;
+
+    /// <summary>Who is in our group, as the profile last said. Alone until asked for (<see cref="AskProfileAsync" />).</summary>
+    public PartyRoster Roster => _roster;
+
+    /// <summary>How many times the group list has come — to tell a fresh one from the same one.</summary>
+    public int RosterCount => _rosterCount;
+
+    /// <summary>Takes the next person asking us to join their group (0x63), oldest first.</summary>
+    public bool TakeAsk([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? name) => _asks.TryDequeue(out name);
 
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
@@ -547,6 +576,27 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                         _heardTotal++;
                     }
                 }
+
+                    continue;
+
+                case GroupAskCommand:
+                    if (Party.ReadAsk(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } asker && _asks.Count < 8)
+                    {
+                        _asks.Enqueue(asker);
+                    }
+
+                    continue;
+
+                case ProfileCommand:
+                    try
+                    {
+                        _roster = Party.ReadRoster(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _rosterCount++;
+                    }
+                    catch (ProtocolException cut)
+                    {
+                        NoteUnread($"0x39: {cut.Message}");
+                    }
 
                     continue;
 
@@ -807,6 +857,28 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// </summary>
     public Task SayAsync(string text, CancellationToken cancellationToken) =>
         Send(TalkCommand, [0, .. LegacyKoreanEncoding.EncodeStringA(text)], cancellationToken);
+
+    /// <summary>Asks somebody standing near us to join our group. They are asked, not added (<see cref="Party" />).</summary>
+    public Task AskToGroupAsync(string name, CancellationToken cancellationToken) =>
+        Send(GroupCommand, Party.Ask(name), cancellationToken);
+
+    /// <summary>Takes the ask of the person who asked us. There is no "no" on the wire — not answering is the no.</summary>
+    public Task AcceptGroupAsync(string name, CancellationToken cancellationToken) =>
+        Send(GroupCommand, Party.Accept(name), cancellationToken);
+
+    /// <summary>Leaves the group the original way: by asking ourselves. Nothing is sent before the server has named us.</summary>
+    public Task LeaveGroupAsync(CancellationToken cancellationToken) =>
+        _self?.Name is { Length: > 0 } mine
+            ? Send(GroupCommand, Party.Ask(mine), cancellationToken)
+            : Task.CompletedTask;
+
+    /// <summary>Says something to everyone in our group (a whisper to "!").</summary>
+    public Task SayToGroupAsync(string text, CancellationToken cancellationToken) =>
+        Send(WhisperCommand, Party.Chat(text), cancellationToken);
+
+    /// <summary>Asks for our own profile, which is where the server lists the group.</summary>
+    public Task AskProfileAsync(CancellationToken cancellationToken) =>
+        Send(ProfileRequestCommand, [], cancellationToken);
 
     /// <summary>
     /// Strikes whatever is in front of us. The server decides whether that hits anything — it knows where

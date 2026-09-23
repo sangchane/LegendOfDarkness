@@ -96,6 +96,14 @@ public sealed class MessageSortTests
     {
         Assert.Equal(MessageChannel.Party, Sorted(2, "wren has left the party.").Channel);
         Assert.Equal(MessageChannel.Party, Sorted(2, "wren is now the party leader.").Channel);
+
+        // 청하고 받는 길에 새로 적은 말(GameServerHandlers AskToGroup·AcceptGroup·그룹말) — "이미" 로 시작해도 기록에만
+        // 묻히지 않고 파티 탭과 기록 줄에 뜬다.
+        Assert.Equal(MessageChannel.Party, Sorted(2, "이미 그룹 중 입니다.").Channel);
+        Assert.Equal(MessagePlace.Ticker, Sorted(2, "이미 그룹 중 입니다.").Place);
+        Assert.Equal(MessageChannel.Party, Sorted(2, "그룹장만 할 수 있습니다.").Channel);
+        Assert.Equal(MessageChannel.Party, Sorted(2, "그룹이 없습니다.").Channel);
+        Assert.Equal(MessageChannel.Party, Sorted(11, "[그룹말]wren: 이쪽으로").Channel);
     }
 
     [Fact]

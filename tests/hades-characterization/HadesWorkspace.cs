@@ -18,11 +18,23 @@ public static class HadesWorkspace
     public static string HadesRoot { get; } =
         Path.Combine(RepositoryRoot, "sources", "wren11", "Dark-Ages-Private-Server");
 
-    /// <summary>Build output of <c>dotnet build src/Hades.sln -c Debug</c>.</summary>
-    public static string StagingDirectory { get; } = Path.Combine(HadesRoot, "Staging", "net9.0");
+    /// <summary>
+    /// Build output of <c>dotnet build src/Hades.sln -c Debug</c>. <c>LOD_HADES_STAGING</c> points it at another copy —
+    /// the live server runs from the default folder, so a changed server is built and tried somewhere else first.
+    /// </summary>
+    public static string StagingDirectory { get; } =
+        Environment.GetEnvironmentVariable("LOD_HADES_STAGING") is { Length: > 0 } elsewhere
+            ? elsewhere
+            : Path.Combine(HadesRoot, "Staging", "net9.0");
 
-    /// <summary>Server content the running server rewrites in place, so tests only ever use a copy.</summary>
-    public static string ServerDataDirectory { get; } = Path.Combine(HadesRoot, "database", "server");
+    /// <summary>
+    /// Server content the running server rewrites in place, so tests only ever use a copy. <c>LOD_HADES_DATA</c> points
+    /// it at another copy — scripts being edited half-way stop the whole script set from compiling.
+    /// </summary>
+    public static string ServerDataDirectory { get; } =
+        Environment.GetEnvironmentVariable("LOD_HADES_DATA") is { Length: > 0 } elsewhere
+            ? elsewhere
+            : Path.Combine(HadesRoot, "database", "server");
 
     private static string FindRepositoryRoot()
     {

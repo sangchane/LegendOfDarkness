@@ -57,6 +57,21 @@ public static class Screenshot
         return 0;
     }
 
+    private static double? QuitAfterFromCommandLine()
+    {
+        string[] args = OS.GetCmdlineUserArgs();
+
+        for (int index = 0; index < args.Length - 1; index++)
+        {
+            if (args[index] == "--quit-after" && double.TryParse(args[index + 1], out double seconds))
+            {
+                return seconds;
+            }
+        }
+
+        return null;
+    }
+
     private static async System.Threading.Tasks.Task SaveAfterFirstFrames(Node host, string path, double seconds)
     {
         // Two frames: the first builds the tree, the second has it drawn.
@@ -76,6 +91,13 @@ public static class Screenshot
         Error saved = image.SavePng(path);
 
         GD.Print(saved == Error.Ok ? $"GREYBOX_SHOT_OK {path}" : $"GREYBOX_SHOT_FAILED {saved}");
+
+        // 두 클라이언트를 함께 찍을 때 — 먼저 찍은 쪽이 바로 나가면 상대 화면에서 그 사람이 사라진다(파티가 흩어진다).
+        // --quit-after 초만큼(시작부터 센다) 더 머문다.
+        if (QuitAfterFromCommandLine() is { } stay && stay > seconds)
+        {
+            await host.ToSignal(host.GetTree().CreateTimer(stay - seconds), SceneTreeTimer.SignalName.Timeout);
+        }
 
         host.GetTree().Quit(saved == Error.Ok ? 0 : 1);
     }

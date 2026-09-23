@@ -203,6 +203,18 @@ public partial class Main : Control
     /// </summary>
     public static string ChatTab { get; private set; } = string.Empty;
 
+    /// <summary>손 없이 확인할 때 — 이 이름의 사람을 실제로 탭하고 [파티 초대]를 누른다(<c>--invite 이름</c>).</summary>
+    public static string Inviting { get; private set; } = string.Empty;
+
+    /// <summary>손 없이 확인할 때 — 파티 초대가 오면 [수락]을 누른다(<c>--accept</c>).</summary>
+    public static bool Accepting { get; private set; }
+
+    /// <summary>손 없이 확인할 때 — 파티가 되면 대화 창 파티 탭에서 이 말을 보낸다(<c>--party-say 말</c>).</summary>
+    public static string PartySaying { get; private set; } = string.Empty;
+
+    /// <summary>손 없이 확인할 때 — 파티가 되고 이만큼(초) 뒤 [나가기]를 누른다(<c>--leave-after 초</c>).</summary>
+    public static double LeavingAfter { get; private set; } = -1;
+
     /// <summary>
     /// Whether to put a handful of real server lines through the sorting on their own, as <c>--notices</c>, with no
     /// server — so the ticker, the toasts and the banner can be photographed in both orientations.
@@ -293,6 +305,10 @@ public partial class Main : Control
         CreateNow = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--create-now") >= 0;
         Saying = Flag("--say");
         ChatTab = Flag("--chat");
+        Inviting = Flag("--invite");
+        Accepting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--accept") >= 0;
+        PartySaying = Flag("--party-say");
+        LeavingAfter = double.TryParse(Flag("--leave-after"), out double leaveAfter) ? leaveAfter : -1;
         Noticing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--notices") >= 0;
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;

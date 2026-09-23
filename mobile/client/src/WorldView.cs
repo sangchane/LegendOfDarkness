@@ -808,6 +808,29 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     public uint Target => _target;
 
     /// <summary>
+    /// Only when checking without a hand (<c>--invite</c>): taps the person of that name where a thumb would — the
+    /// middle of the figure — so the picking itself is what gets checked. False while they are not on screen.
+    /// </summary>
+    public bool TapPerson(string name)
+    {
+        uint serial = server?.Others.FirstOrDefault(other => other.Name == name)?.Serial ?? 0;
+
+        if (serial == 0 || !_crowd.TryGetValue(serial, out Actor? actor))
+        {
+            return false;
+        }
+
+        GetViewport().PushInput(new InputEventMouseButton
+        {
+            ButtonIndex = MouseButton.Left,
+            Pressed = true,
+            Position = actor.Position + _camera.Position - new Vector2(0, 32)
+        }, true);
+
+        return true;
+    }
+
+    /// <summary>
     /// Plays the character by itself: walks to the nearest monster, swings at it, and spends the points a
     /// level hands out. Only runs when the build was told to (<c>--hunt</c>, or a shipped `hunt.cfg`).
     /// </summary>

@@ -43,6 +43,14 @@ public partial class GameScreen : Control
     private int _talked;
     private MessageLog _messages = null!;
     private ChatPanel _chat = null!;
+
+    // 파티(원작의 그룹) — 초대 단추·묻기·목록이 위 줄 아래 한 기둥에 선다(PartyColumn).
+    private readonly PartyColumn _party = new();
+    private bool _rosterAsked;
+    private double _groupedFor = -1;
+    private bool _partyRehearsed;
+    private bool _partySaid;
+    private bool _partyLeft;
     private Control _chatHolder = null!;
     private Control? _settingsHolder;
     private Control _over = null!;
@@ -161,7 +169,24 @@ public partial class GameScreen : Control
 
         _chat = new ChatPanel();
         _chat.Close.Pressed += () => Chatting(false);
-        _chat.Sent += line => _ = _server?.SayAsync(line, System.Threading.CancellationToken.None);
+        _chat.Sent += line => _ = _chat.ToParty
+            ? _server?.SayToGroupAsync(line, System.Threading.CancellationToken.None)
+            : _server?.SayAsync(line, System.Threading.CancellationToken.None);
+
+        _party.Invited += Invite;
+        _party.Answered += (name, yes) =>
+        {
+            if (yes)
+            {
+                _ = _server?.AcceptGroupAsync(name, System.Threading.CancellationToken.None);
+            }
+            else
+            {
+                // 원작에는 "싫다"는 말이 없다 — 답하지 않는 것이 거절이다. 청한 쪽에는 아무것도 가지 않는다.
+                Route(new Notice(MessageChannel.Party, MessagePlace.LogOnly, $"{name}님의 파티 초대를 거절했습니다.", string.Empty));
+            }
+        };
+        _party.Left += () => _ = _server?.LeaveGroupAsync(System.Threading.CancellationToken.None);
 
         _field = new FieldPanel();
         _field.Chosen += area =>
@@ -231,6 +256,15 @@ public partial class GameScreen : Control
         // 위 줄 바로 밑까지 올라오므로 부채꼴 왼쪽 끝에 맞춘다(PlaceToasts). 창들보다 먼저 넣어 창이 열리면 그 아래로 간다.
         over.AddChild(_toasts);
         _over = over;
+
+        // 파티는 위 줄 바로 아래 왼쪽에 — 세로는 방향판·부채꼴·기록 줄이 모두 아래에 있어 비어 있는 자리다. 가로는 왼쪽 아래
+        // 방향판과 그 위 기록 줄이 위 줄 가까이까지 올라오므로 방향판 오른쪽 옆으로 비킨다(PlaceParty). 창들보다 먼저
+        // 넣어 창이 열리면 그 아래로 간다.
+        over.AddChild(_party);
+        _party.AnchorLeft = 0;
+        _party.AnchorRight = 0;
+        _party.CustomMinimumSize = new Vector2(PartyColumn.Wide, 0);
+        _topRow.Resized += () => _party.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter;
         _toasts.AnchorLeft = 1;
         _toasts.AnchorRight = 1;
         _toasts.OffsetLeft = -ToastWidth;
@@ -580,10 +614,17 @@ public partial class GameScreen : Control
             if (MessageSort.FromServer(type, told) is { } notice)
             {
                 Route(notice);
+
+                // 누가 들어오고 나갔다는 말이 오면 목록을 다시 받는다 — 서버는 목록을 스스로 보내지 않는다(Party).
+                if (notice.Channel == MessageChannel.Party && type != GroupChat)
+                {
+                    _ = _server?.AskProfileAsync(System.Threading.CancellationToken.None);
+                }
             }
         }
 
         Listen();
+        KeepParty(delta);
         PlaceToasts();
         Entered();
         OpenChatOnItsOwn();
@@ -675,6 +716,133 @@ public partial class GameScreen : Control
             {
                 _gearShown = true;
                 ShowGearTab(true);
+            }
+        }
+    }
+
+    /// <summary>0x0A kind 11 — somebody talking to the group, not the server saying the group changed.</summary>
+    private const byte GroupChat = 11;
+
+    /// <summary>
+    /// Keeps the party column in step: asks for the list once on entering, puts up whoever is asking us, shows the list
+    /// with each member's health, and offers 파티 초대 only for a person who could join.
+    /// </summary>
+    private void KeepParty(double delta)
+    {
+        PlaceParty();
+
+        if (_server is not { } server)
+        {
+            return;
+        }
+
+        if (!_rosterAsked && server.State is not null && server.Self is not null)
+        {
+            _rosterAsked = true;
+            _ = server.AskProfileAsync(System.Threading.CancellationToken.None);
+        }
+
+        while (server.TakeAsk(out string? asker))
+        {
+            _party.Ask(asker);
+            Route(new Notice(MessageChannel.Party, MessagePlace.LogOnly, $"{asker}님이 파티에 초대합니다.", string.Empty));
+        }
+
+        string self = server.Self?.Name ?? string.Empty;
+        PartyRoster roster = server.Roster;
+
+        _party.Show(roster, self, name =>
+            server.Others.FirstOrDefault(other => other.Name == name) is { } seen ? server.Health(seen.Serial) : null);
+
+        Character? picked = server.Others.FirstOrDefault(other => other.Serial == _world.Target);
+        bool leading = !roster.Grouped || roster.Members.Any(member => member.Leader && member.Name == self);
+
+        _party.CanInvite(picked is { Name.Length: > 0 } && leading &&
+                         !roster.Members.Any(member => member.Name == picked.Name));
+
+        RehearseParty(delta);
+    }
+
+    /// <summary>Asks whoever is picked out to join. The server says nothing back to the asker, so this screen says it.</summary>
+    private void Invite()
+    {
+        if (_server?.Others.FirstOrDefault(other => other.Serial == _world.Target) is not { Name.Length: > 0 } person)
+        {
+            return;
+        }
+
+        _ = _server.AskToGroupAsync(person.Name, System.Threading.CancellationToken.None);
+        Route(new Notice(MessageChannel.Party, MessagePlace.Ticker, $"{person.Name}님을 파티에 초대했습니다.", string.Empty));
+    }
+
+    /// <summary>
+    /// Stands the party column under the top row: at the left edge in portrait, beside the movement pad in landscape —
+    /// there the pad and the lines over it reach up close to the top row. Read from where the pad really is, because
+    /// the control row is capped and centred on a wide screen.
+    /// </summary>
+    private void PlaceParty()
+    {
+        _party.OffsetLeft = Main.Portrait
+            ? 0
+            : _pad.GetGlobalRect().End.X - _over.GetGlobalRect().Position.X + Main.Gutter;
+        _party.OffsetRight = _party.OffsetLeft + PartyColumn.Wide;
+    }
+
+    /// <summary>
+    /// Only when checking without a hand: taps the person named by <c>--invite</c> and presses 파티 초대, presses 수락 for
+    /// <c>--accept</c>, sends <c>--party-say</c> from the 파티 tab once grouped, and presses 나가기 <c>--leave-after</c>
+    /// seconds after that. Each press is the button's own signal, so the wiring is what gets checked.
+    /// </summary>
+    private void RehearseParty(double delta)
+    {
+        if (Main.Inviting.Length > 0 && !_partyRehearsed && Time.GetTicksMsec() > 6000)
+        {
+            if (_world.TargetName == Main.Inviting && _party.Invite.Visible)
+            {
+                _partyRehearsed = true;
+                _party.Invite.EmitSignal(BaseButton.SignalName.Pressed);
+                GD.Print($"GREYBOX_PARTY 초대 {Main.Inviting}");
+            }
+            else if (_world.TargetName != Main.Inviting)
+            {
+                _world.TapPerson(Main.Inviting);
+            }
+        }
+
+        if (Main.Accepting && _party.Asking)
+        {
+            _party.AcceptButton.EmitSignal(BaseButton.SignalName.Pressed);
+            GD.Print("GREYBOX_PARTY 수락");
+        }
+
+        _groupedFor = _party.Grouped ? Math.Max(_groupedFor, 0) + delta : -1;
+
+        if (Main.PartySaying.Length > 0 && !_partySaid && _groupedFor > 2)
+        {
+            _partySaid = true;
+            Chatting(true);
+            _chat.Rehearse(Main.PartySaying);
+            GD.Print($"GREYBOX_PARTY 말 {Main.PartySaying}");
+        }
+
+        if (Main.LeavingAfter >= 0 && !_partyLeft && _groupedFor > Main.LeavingAfter)
+        {
+            _partyLeft = true;
+            _party.Leave.EmitSignal(BaseButton.SignalName.Pressed);
+            GD.Print("GREYBOX_PARTY 나가기");
+        }
+
+        if (_party.Grouped || _party.Asking || _party.Invite.Visible)
+        {
+            Rect2 column = _party.GetGlobalRect();
+
+            foreach ((string name, Control part) in new (string, Control)[]
+                     { ("방향판", _pad), ("부채꼴", _abilities), ("기록 줄", _messages), ("위 줄", _topRow) })
+            {
+                if (part.IsVisibleInTree() && column.Intersects(part.GetGlobalRect()))
+                {
+                    GD.Print($"GREYBOX_PARTY_OVERLAP {name}");
+                }
             }
         }
     }

@@ -110,6 +110,20 @@ public sealed partial class ChatPanel : PanelContainer
     public event Action<string>? Sent;
 
     /// <summary>
+    /// Whether what is typed goes to the group rather than out loud: it does while the 파티 tab is open, the way mobile
+    /// games send to the channel being read.
+    /// </summary>
+    public bool ToParty => _only == MessageChannel.Party;
+
+    /// <summary>Only when checking without a hand (<c>--party-say</c>): opens the 파티 tab and sends a line from the box.</summary>
+    public void Rehearse(string line)
+    {
+        Choose(MessageChannel.Party);
+        _typed.Text = line;
+        Say();
+    }
+
+    /// <summary>
     /// Says what was written and empties the box, leaving the keyboard up so another line can follow. What was said comes
     /// back from the server like anybody else's words — nothing is written here as if it had been.
     /// </summary>
@@ -146,6 +160,7 @@ public sealed partial class ChatPanel : PanelContainer
     public void Choose(MessageChannel? channel)
     {
         _only = channel;
+        _typed.PlaceholderText = channel == MessageChannel.Party ? "파티에게 할 말" : "할 말";
 
         foreach ((Button tab, MessageChannel? mine) in _tabs)
         {

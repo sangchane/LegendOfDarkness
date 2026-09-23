@@ -71,7 +71,7 @@
 | 38 | 금화 | 돌아감 — 버리기 `GSH:1009-1040`, 교환 `GSH:2272-2299` | 됨 — 버리기 `WC:534-542`, 소지품 창에 금화 | `TS:24` | |
 | **함께 하기** |||||
 | 32 | 채팅(말·외침·귓속말) | 돌아감 `GSH:609-684,827-864` | 일부 — 말하기만(종류 0 고정) `WC:480-481` | `TS:19` Whisper | |
-| 33 | 그룹·파티 | 돌아감 `GSH:1082-1149` · `HB/Types/Party.cs` | 없음 | `TS` GroupRequest 46 | |
+| 33 | 그룹·파티 | 돌아감 — 청하기 → 묻기(0x63) → 받아들이기(0x2E 3), 제 이름을 청하면 나감, 그룹말(0x19 `!` → 0x0A 11) `GSH` `AskToGroup`·`AcceptGroup`·`Format19Handler` (2026-09-24, **라이브 서버는 다시 빌드해야 반영**) · `HB/Types/Party.cs` · 경험치는 곁의 그룹원이 같은 몫 + 인원×5% (`monsterexp.cs` `GenerateExperience`) | 됨 — 사람을 누르면 [파티 초대], 묻는 창 [거절]/[수락], 위 줄 아래 파티 목록(이름·체력·[나가기]), 대화 창 파티 탭에서 보내면 그룹말 (`World/Party.cs`, `client/src/PartyColumn.cs`) | Arbiter `ClientGroupInviteMessage`·`ServerGroupMessage` · 5.99 `Legend.exe` `GroupAskList`·`GroupAlertPane` · 5.99 서버 문구 `[그룹말]%s` | 그룹원 체력은 서버가 따로 보내지 않는다 — 보일 때 맞은 체력바(0x13)만. 모집 게시판(0x2E 4~7)은 없음 |
 | 34 | 길드 | 틀만 — `Clan` 문자열뿐 `HB/Types/Aisling.cs:74-76`, 만들기·가입·계급 없음 | 없음 | `sources/FallenDev/dark-ages-ts/packages/network/src/packets/server/self-profile-packet.ts:8-16` guildName | **서버부터 만들 것** |
 | 35 | 레전드 마크·프로필 | 돌아감 `GSH:1060-1080,2434-2438` | 없음 — 0x34 안 읽음 | `HB/Network/ServerFormats/ServerFormat34.cs:24-27` LegendMarks | |
 | 37 | GM 명령 | 돌아감 `HB/Systems/Commander.cs:14-70` | 없음 | — | 채팅 `/` 로 쓴다 |
@@ -111,8 +111,8 @@
 | 0x29 | 교환창에 올리기 | `GSH:1042` | 돌아감 | — |
 | 0x2A | (모름) | `GSH:1056` | 틀만 | — |
 | 0x2D | 내 프로필 열기 | `GSH:1060` | 돌아감 | — |
-| 0x2E | 파티 초대 | `GSH:1082` | 돌아감 | — |
-| 0x2F | 파티 수락·탈퇴 | `GSH:1124` | 돌아감 | — |
+| 0x2E | 파티 청하기(2)·받아들이기(3) | `GSH` `Format2EHandler` | 돌아감 | 보냄 |
+| 0x2F | 그룹 받기 켜고 끄기(끄면 나감) | `GSH:1124` | 돌아감 | — |
 | 0x30 | 칸 바꾸기 | `GSH:1151` | 돌아감 | 보냄 |
 | 0x32 | (모름) | `GSH:1322` | 틀만 | — |
 | 0x38 | 새로고침 | `GSH:1327` | 돌아감 | 보냄 |
