@@ -14,6 +14,7 @@
 
   var grid = document.querySelector("#monster-grid");
   var empty = document.querySelector("#monster-empty");
+  var hover = document.querySelector("#monster-hover");
   var state = { query: "", region: "", map: "", sort: "exp", level: 1 };
 
   function text(tag, className, value) {
@@ -47,11 +48,12 @@
     if (!art) { return text("div", "monster-art is-missing", "그림 없음"); }
     // 한 칸만 보인다. 판을 칸 수만큼 넓게 깔고 왼쪽 끝으로 잘라 낸다.
     var frame = Math.round(art.너비 / art.칸);
-    var box = text("div", "monster-art");
+    var box = text("div", "monster-art is-animated");
     box.style.setProperty("--w", frame + "px");
     box.style.setProperty("--h", art.높이 + "px");
     box.style.setProperty("--sheet", "url(" + SPRITE_DIR + art.이름 + ".png)");
     box.style.setProperty("--sheet-w", art.너비 + "px");
+    box.style.setProperty("--frames", art.칸);
     box.title = art.이름 + " · " + art.칸 + "칸";
     return box;
   }
@@ -87,6 +89,57 @@
     return row;
   }
 
+  function openHover(monster, anchor) {
+    if (!hover) { return; }
+    hover.replaceChildren();
+
+    var top = text("div", "item-hover-top");
+    top.appendChild(sprite(monster));
+    var title = text("div", "");
+    title.append(text("b", "", monster.이름), text("em", "", monster.맵 + " · " + monster.맵번호));
+    top.appendChild(title);
+    hover.appendChild(top);
+
+    var stats = text("div", "monster-stats");
+    var kills = killsToLevel(monster, state.level);
+    var gain = earned(monster, state.level);
+    stats.append(
+      stat("체력", number(monster.체력)),
+      stat("때리는 힘", monster.피해[0] + "~" + monster.피해[1], "방어 " + monster.방어),
+      stat("경험치", number(gain), gain === monster.경험치 ? "표값 그대로" : "표값 " + number(monster.경험치) + " 에서 깎임"),
+      stat("다음 레벨까지", kills === null ? "—" : number(kills) + "마리", "내 레벨 " + state.level),
+      stat("한 맵 최대", monster.젠최대 + "마리", monster.젠주기 ? monster.젠주기 + "초마다" : ""),
+      stat("금화", monster.금화[1] ? number(monster.금화[0]) + "~" + number(monster.금화[1]) : "없음"));
+    hover.appendChild(stats);
+
+    var drops = text("div", "monster-drops");
+    if (monster.드랍.length) {
+      drops.appendChild(text("h4", "", "떨구는 것 " + monster.드랍.length + "가지 — 하나를 골라 한 번 굴린다"));
+      monster.드랍.forEach(function (drop) { drops.appendChild(dropRow(drop)); });
+    } else {
+      drops.appendChild(text("p", "monster-nodrop", "떨구는 것이 없습니다"));
+    }
+    hover.appendChild(drops);
+
+    var source = text("code", "monster-source", monster.근거);
+    hover.appendChild(source);
+
+    var box = anchor.getBoundingClientRect();
+    hover.hidden = false;
+    hover.setAttribute("aria-hidden", "false");
+    var own = hover.getBoundingClientRect();
+    var left = Math.min(box.right + 12, window.innerWidth - own.width - 12);
+    var topPos = Math.min(box.top, window.innerHeight - own.height - 12);
+    hover.style.transform = "translate(" + Math.max(12, left) + "px," + Math.max(12, topPos) + "px)";
+  }
+
+  function closeHover() {
+    if (hover) {
+      hover.hidden = true;
+      hover.setAttribute("aria-hidden", "true");
+    }
+  }
+
   function card(monster) {
     var article = text("article", "monster-card");
 
@@ -102,30 +155,13 @@
     head.appendChild(title);
     article.appendChild(head);
 
-    var stats = text("div", "monster-stats");
-    var kills = killsToLevel(monster, state.level);
-    var gain = earned(monster, state.level);
-    stats.append(
-      stat("체력", number(monster.체력)),
-      stat("때리는 힘", monster.피해[0] + "~" + monster.피해[1], "방어 " + monster.방어),
-      stat("경험치", number(gain), gain === monster.경험치 ? "표값 그대로" : "표값 " + number(monster.경험치) + " 에서 깎임"),
-      stat("다음 레벨까지", kills === null ? "—" : number(kills) + "마리", "내 레벨 " + state.level),
-      stat("한 맵 최대", monster.젠최대 + "마리", monster.젠주기 ? monster.젠주기 + "초마다" : ""),
-      stat("금화", monster.금화[1] ? number(monster.금화[0]) + "~" + number(monster.금화[1]) : "없음"));
-    article.appendChild(stats);
+    article.addEventListener("mouseenter", function () { openHover(monster, article); });
+    article.addEventListener("mouseleave", closeHover);
+    article.addEventListener("click", function () { openHover(monster, article); });
 
-    var drops = text("div", "monster-drops");
-    if (monster.드랍.length) {
-      drops.appendChild(text("h4", "", "떨구는 것 " + monster.드랍.length + "가지 — 하나를 골라 한 번 굴린다"));
-      monster.드랍.forEach(function (drop) { drops.appendChild(dropRow(drop)); });
-    } else {
-      drops.appendChild(text("p", "monster-nodrop", "떨구는 것이 없습니다"));
-    }
-    article.appendChild(drops);
-
-    article.appendChild(text("code", "monster-source", monster.근거));
     return article;
   }
+
 
   function chips(host, values, current, onPick) {
     host.replaceChildren();

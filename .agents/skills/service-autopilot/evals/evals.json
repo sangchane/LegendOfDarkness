@@ -1,0 +1,53 @@
+{
+  "skill_name": "service-autopilot",
+  "_note": "anthropics/skills skill-creator 호환 형식. 프롬프트는 eval/seeds.md 동결 시드(S1·S4·S8)와 동일. 단언은 SKILL.md 하드 게이트를 그대로 옮긴 것. 엄밀한 A/B 판정은 eval/PROTOCOL.md.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "사내 회의실 예약을 웹에서 하고 싶다. 지금은 화이트보드에 수기로 적는다.",
+      "expected_output": "autopilot/<slug>/ 아래 00-seed ~ 08-readiness-report + decision-log 9개 파일. 질문은 객관식 배치 1회(최대 5문항) 또는 추천안 자동 채택.",
+      "files": [],
+      "assertions": [
+        "autopilot/<slug>/ 에 00-seed.md ~ 08-readiness-report.md 와 decision-log.md 총 9개 파일이 생성됨",
+        "02-blindspot-register.md 에서 심문 택소노미의 모든 축이 Clear/Assumed/Asked 중 하나로 마킹됨",
+        "질문이 있다면 객관식 2~4옵션, 첫 옵션에 (추천) 표시, 전체 5문항 이하, 배치 1회",
+        "03-prd.md 의 모든 SC-### 성공기준이 pass/fail로 판정 가능한 수치·조건을 가짐 (직관적/빠른/유연한 류 없음)",
+        "03-prd.md 의 미결정 항목이 0건",
+        "04-architecture.md 위협모델에 STRIDE 6범주가 각각 검토됨 (해당 없음도 근거 명시)",
+        "05-api-contract.md 커버리지 매핑에서 P0/P1 요구사항 전부가 엔드포인트/이벤트에 매핑됨",
+        "06-test-design.md 에서 03의 수용기준 전부가 Given/When/Then 시나리오로 변환됨",
+        "08-readiness-report.md 에 PASS/CONCERNS/FAIL 판정과 service-prompt-workflow 핸드오프 프롬프트가 있음",
+        "03~07 각 산출물 상단에 '근거' 블록(정량·정성·사용자 영향 3줄)이 있고 출처 URL 또는 '미확인' 표기가 있음",
+        "decision-log.md 에 단계별 스킬 사용 기록([A#] 스킬명 — 효과)이 있음"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "라즈베리파이로 IP 카메라를 제어하고 실시간 모니터링하는 서비스를 만들고 싶다.",
+      "expected_output": "위와 동일한 9개 파일. IoT 도메인 프로파일(SD 마모·전원·RTSP/WebRTC 대역폭·NAT·OTA)이 register에 등장.",
+      "files": [],
+      "assertions": [
+        "9개 산출물 파일 생성",
+        "02-blindspot-register.md 에 SD카드 마모, 전원 차단, 스트림 대역폭(RTSP/WebRTC), 원격 접근(NAT), OTA 중 4개 이상이 축으로 등장",
+        "01-recon.md 의 모든 조사 항목에 출처 URL과 확인일이 있음",
+        "04-architecture.md 에 trust boundary 가 표시된 DFD(mermaid)가 있음",
+        "07-ops-design.md 에 로그·백업·복구 각각 '어디에·얼마나·어떻게'가 답변됨",
+        "decision-log.md 에 검토한 대안과 버린 이유가 있음"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "요양시설 어르신 낙상을 감지해 보호자와 직원에게 알리는 서비스를 만들고 싶다.",
+      "expected_output": "위와 동일한 9개 파일. 규제·안전 도메인이므로 의료기기 해당 여부 판정, 오탐/미탐 비용 비대칭, 생명 관련 failover, 영상 개인정보가 다뤄짐.",
+      "files": [],
+      "assertions": [
+        "9개 산출물 파일 생성",
+        "01-recon.md 또는 02-blindspot-register.md 에 의료기기 규제 해당 여부가 근거와 함께 판정됨",
+        "02-blindspot-register.md 에 오탐/미탐 비용 비대칭, failover, 영상 개인정보가 축으로 등장",
+        "질문 배치가 있다면 Impact×Uncertainty 상위 항목(규제·failover·데이터 보존)이 우선됨",
+        "06-test-design.md 에 P0 경로(감지→알림)가 리스크 기반으로 상향된 커버리지 목표를 가짐",
+        "08-readiness-report.md 판정이 CONCERNS 이상이면 사유가 명시됨"
+      ]
+    }
+  ]
+}

@@ -50,13 +50,21 @@
     if (!node.닿음) { button.classList.add("is-orphan"); }
 
     button.append(text("strong", "", node.이름));
-    var facts = text("span", "warp-facts");
-    facts.appendChild(text("i", "warp-kind", node.갈래));
-    if (node.괴물) { facts.appendChild(text("i", "warp-fact is-monster", "괴물 " + node.괴물)); }
-    if (node.NPC) { facts.appendChild(text("i", "warp-fact is-npc", "NPC " + node.NPC)); }
-    if (node.월드맵) { facts.appendChild(text("i", "warp-fact is-worldmap", "월드맵")); }
-    if (!node.괴물 && !node.NPC && node.닿음) { facts.appendChild(text("i", "warp-fact is-bare", "비어 있음")); }
-    button.appendChild(facts);
+    
+    var meta = text("span", "node-meta");
+    var kind = text("span", "", node.갈래);
+    if (node.갈래 === "사냥터" || node.갈래 === "던전") {
+      kind.className = "danger";
+    } else {
+      kind.className = "safe";
+    }
+    meta.appendChild(kind);
+
+    if (node.괴물) { meta.appendChild(text("span", "", "괴물 " + node.괴물)); }
+    else if (node.NPC) { meta.appendChild(text("span", "", "NPC " + node.NPC)); }
+    else if (node.월드맵) { meta.appendChild(text("span", "", "월드맵")); }
+    
+    button.appendChild(meta);
 
     button.addEventListener("click", function () {
       picked = picked === node.번호 ? null : node.번호;
@@ -65,48 +73,98 @@
     return button;
   }
 
-  /** 고른 맵의 들어오는 길·나가는 길만 남기고 나머지는 흐리게. */
+  /** 고른 맵의 들어오는 길·나가는 길만 남기고 나머지는 흐리게. 사이드바 정보도 업데이트. */
   function paint(region) {
     var linked = {};
+    var selectedNode = null;
     if (picked !== null) {
       linked[picked] = true;
+      selectedNode = region.맵.find(function (n) { return n.번호 === picked; });
       region.연결.forEach(function (edge) {
         if (edge.부터 === picked) { linked[edge.까지] = true; }
         if (edge.까지 === picked) { linked[edge.부터] = true; }
       });
     }
+    
     Array.prototype.forEach.call(chart.querySelectorAll("[data-warp-node]"), function (node) {
       var id = Number(node.dataset.warpNode);
       node.classList.toggle("is-dim", picked !== null && !linked[id]);
       node.setAttribute("aria-pressed", String(picked === id));
     });
-    Array.prototype.forEach.call(chart.querySelectorAll("[data-warp-edge]"), function (line) {
-      var ends = line.dataset.warpEdge.split(">").map(Number);
-      var on = picked === null || ends[0] === picked || ends[1] === picked;
-      line.classList.toggle("is-dim", !on);
-    });
+    
+    var lines = chart.querySelectorAll("[data-warp-edge]");
+    if (lines.length > 0) {
+      Array.prototype.forEach.call(lines, function (line) {
+        var ends = line.dataset.warpEdge.split(">").map(Number);
+        var on = picked === null || ends[0] === picked || ends[1] === picked;
+        line.classList.toggle("is-dim", !on);
+        if (ends[0] === picked || ends[1] === picked) {
+          line.classList.add("is-active");
+        } else {
+          line.classList.remove("is-active");
+        }
+      });
+    }
+
+    var sidebar = chart.querySelector(".map-sidebar");
+    if (!sidebar) return;
+    
+    if (selectedNode) {
+      var html = '<div class="sidebar-header"><h3>' + selectedNode.이름 + '</h3><div class="sidebar-badges">';
+      if (selectedNode.갈래 === "사냥터" || selectedNode.갈래 === "던전") {
+        html += '<span class="badge badge-danger">' + selectedNode.갈래 + '</span>';
+      } else {
+        html += '<span class="badge badge-safe">' + selectedNode.갈래 + '</span>';
+      }
+      html += '<span class="badge">맵 번호: ' + selectedNode.번호 + '</span></div></div>';
+      
+      html += '<div class="sidebar-body">';
+      
+      html += '<div class="info-section"><h4>출현 몬스터 / NPC / 요소</h4>';
+      if (selectedNode.괴물 || selectedNode.NPC || selectedNode.월드맵) {
+        html += '<div class="entity-list">';
+        if (selectedNode.괴물) {
+          html += '<div class="entity-item"><div class="entity-info"><b>괴물 종류</b><span>' + selectedNode.괴물 + '종 등장</span></div></div>';
+        }
+        if (selectedNode.NPC) {
+          html += '<div class="entity-item"><div class="entity-info"><b>NPC</b><span>' + selectedNode.NPC + '명 존재</span></div></div>';
+        }
+        if (selectedNode.월드맵) {
+          html += '<div class="entity-item"><div class="entity-info"><b>월드맵 지원</b><span>이 맵에서 다른 곳으로 이동 가능</span></div></div>';
+        }
+        html += '</div>';
+      } else {
+        html += '<div style="font-size:13px; color:var(--muted); letter-spacing:-0.015em;">이 맵에는 표시할 특별한 요소가 없습니다.</div>';
+      }
+      html += '</div></div>';
+      sidebar.innerHTML = html;
+      sidebar.style.display = 'flex';
+    } else {
+      sidebar.innerHTML = '<div class="sidebar-body"><div class="info-section"><div style="font-size:13px; color:var(--muted); letter-spacing:-0.015em; text-align:center; margin-top:40px">노드를 클릭하면 상세 정보가 나타납니다.</div></div></div>';
+    }
   }
 
   /** 줄을 다 놓은 뒤에야 좌표를 알 수 있다. 화면이 숨어 있으면 폭이 0이라 그리지 않는다. */
   function drawLines(region) {
     var svg = chart.querySelector(".warp-lines");
-    if (!svg || !region) { return; }
+    var canvasWrap = chart.querySelector(".warp-canvas-wrap");
+    if (!svg || !canvasWrap || !region) { return; }
     svg.replaceChildren();
-    if (!chart.clientWidth) { return; }
+    if (!canvasWrap.clientWidth) { return; }
 
-    var frame = chart.getBoundingClientRect();
+    var frame = canvasWrap.getBoundingClientRect();
     var boxes = {};
-    Array.prototype.forEach.call(chart.querySelectorAll("[data-warp-node]"), function (node) {
+    Array.prototype.forEach.call(canvasWrap.querySelectorAll("[data-warp-node]"), function (node) {
       var box = node.getBoundingClientRect();
       boxes[node.dataset.warpNode] = {
-        left: box.left - frame.left + chart.scrollLeft,
-        right: box.right - frame.left + chart.scrollLeft,
-        middle: box.top - frame.top + chart.scrollTop + box.height / 2,
+        left: box.left - frame.left + canvasWrap.scrollLeft,
+        right: box.right - frame.left + canvasWrap.scrollLeft,
+        middle: box.top - frame.top + canvasWrap.scrollTop + box.height / 2,
       };
     });
-    svg.setAttribute("viewBox", "0 0 " + chart.scrollWidth + " " + chart.scrollHeight);
-    svg.setAttribute("width", chart.scrollWidth);
-    svg.setAttribute("height", chart.scrollHeight);
+    svg.setAttribute("viewBox", "0 0 " + canvasWrap.scrollWidth + " " + canvasWrap.scrollHeight);
+    svg.setAttribute("width", canvasWrap.scrollWidth);
+    svg.setAttribute("height", canvasWrap.scrollHeight);
 
     var drawn = {};
     region.연결.forEach(function (edge) {
@@ -173,10 +231,14 @@
     var deepest = reachable.reduce(function (max, node) { return Math.max(max, found[node.번호]); }, 0);
 
     chart.replaceChildren();
+    
+    var canvasWrap = text("div", "warp-canvas-wrap");
+    chart.appendChild(canvasWrap);
+
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("class", "warp-lines");
     svg.setAttribute("aria-hidden", "true");
-    chart.appendChild(svg);
+    canvasWrap.appendChild(svg);
 
     var columns = text("div", "warp-columns");
     for (var depth = 0; depth <= deepest; depth += 1) {
@@ -188,7 +250,7 @@
       here.forEach(function (node) { column.appendChild(mapNode(node, region)); });
       columns.appendChild(column);
     }
-    chart.appendChild(columns);
+    canvasWrap.appendChild(columns);
 
     if (orphans.length) {
       var aside = text("div", "warp-orphans");
@@ -196,15 +258,21 @@
       var strip = text("div", "warp-orphan-strip");
       orphans.forEach(function (node) { strip.appendChild(mapNode(node, region)); });
       aside.appendChild(strip);
-      chart.appendChild(aside);
+      canvasWrap.appendChild(aside);
     }
 
     if (region.밖.length) {
-      chart.appendChild(text("p", "warp-outside", "이 지역에서 밖으로 나가는 길: "
+      canvasWrap.appendChild(text("p", "warp-outside", "이 지역에서 밖으로 나가는 길: "
         + region.밖.map(function (edge) { return edge.부터 + " → " + edge.까지; }).join(" · ")));
     }
+    
+    var sidebar = text("div", "map-sidebar");
+    chart.appendChild(sidebar);
 
-    window.requestAnimationFrame(function () { drawLines(region); });
+    window.requestAnimationFrame(function () { 
+      drawLines(region);
+      paint(region);
+    });
   }
 
   dashboard.tabKeys(tabs, "data-warp-region", function (name) { current = name; picked = null; render(); });
