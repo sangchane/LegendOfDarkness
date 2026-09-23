@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
-"""노비스 지역 괴물이 시약과 저레벨 직업 장비를 떨구게 한다.
+"""노비스 지역 괴물이 시약을 떨구게 한다.
 
   python3 scripts/build-novice-drops.py            # 무엇이 바뀌는지만 본다
   python3 scripts/build-novice-drops.py --쓰기      # 서버 정의에 적는다
 
-**쿠룸과 마라디움은 원작 시약이고 5.99 팩에는 없다.** 값은 혼든 팩의 정의를 그대로 쓴다
-(`data/server-packs/honden-community/db/item/아이템/포션.txt` — 쿠룸 체력 +250·300전, 마라디움 마력 +100·1000전).
-그림 번호는 원작 번호 + 32768 이다(코마디움 46 → 32814 로 확인).
+**쿠룸과 마라디움은 원작 시약이다.** 회복량과 그림 번호는 혼든 팩의 정의를 그대로 쓴다
+(`data/server-packs/honden-community/db/item/아이템/포션.txt` — 쿠룸 체력 +250, 마라디움 마력 +100).
+그림 번호는 원작 번호 + 32768 이다(원작 도감 설명표의 쿠룸 45 → 32813 · 마라디움 47 → 32815).
+
+**값은 우리가 정했다 — 근거가 없어서다**(2026-09-23). 자료 출처를 위에서부터 훑었다:
+  1. 원작 도감(`data/game-data/items-original-sheets.json`) — **수치표에 없다.** 수치표 5,722줄은 장비만
+     담는다(사과·뱀고기·포션도 한 줄이 없다). 쿠룸·마라디움은 **설명표**에만 있고 거기에는 값 칸이 없다.
+  2. 원작 아카이브 `ItemInfo0~11` — 영문 이름표라 이 둘이 없다.
+  3. 서버팩 셋 — **혼든만** 적었다(쿠룸 300 · 마라디움 1,000). 5.99 와 Novaonline 은 이 시약을 아예
+     안 싣는다. **셋이 일치하지 않으니 팩 값을 쓰지 않는다**(`AGENTS.md` 자료 출처 우선순위 4).
+그래서 **혼든의 비(쿠룸 : 마라디움 = 3 : 10)는 그대로 두고 값만 절반으로 내렸다** — 쿠룸 150 · 마라디움 500.
+잣대는 사용자가 준 「**첫 옷까지 열 마리 안팎**」이다. 혼든 값 그대로면 노비스 한 마리 벌이가 170전이라
+레더튜닉(950전)까지 **5.6마리**였고, 마라디움 한 가지가 벌이의 61% 를 냈다. 절반으로 내리면 **10.2마리**다
+(표는 `python3 scripts/build-pack-gold.py`).
 
 **떨어질 확률은 두 값의 곱이다.** 하데스는 괴물의 `Drops` 에서 **하나를 고르고**(같은 확률) 그 물건의
 `DropRate` 를 굴린다(`database/server/scripts/Formulas/monsterexp.cs` DetermineRandomDrop). 그래서 목록이
@@ -26,27 +37,17 @@ MONSTERS = SERVER / "templates/monsters/5.99"
 # 노비스 지역 맵. 마을(20373)에는 주민만 있어 빼고, 사냥하는 곳만 넣는다.
 NOVICE_MAPS = {20393: "평원A", 20394: "평원B"} | {20380 + n: f"지하던전{'ABC'[n // 3]}{n % 3 + 1}" for n in range(9)}
 
-# 시약. 값은 혼든 팩(원작 이름을 쓴 유일한 팩)에서 왔다.
+# 시약. 회복량·그림은 혼든 팩(원작 이름을 쓴 유일한 팩)에서 왔고, **값은 혼든의 절반**이다 — 위 머리글 참고.
 POTIONS = {
-    "쿠룸": {"DisplayImage": 32813, "HealthRestore": 250, "Value": 300, "DropRate": 0.80},
-    "마라디움": {"DisplayImage": 32815, "ManaRestore": 100, "Value": 1000, "DropRate": 0.50},
+    "쿠룸": {"DisplayImage": 32813, "HealthRestore": 250, "Value": 150, "DropRate": 0.80},
+    "마라디움": {"DisplayImage": 32815, "ManaRestore": 100, "Value": 500, "DropRate": 0.50},
 }
 
 # 한 칸에 쌓을 수 있는 양. 요즘 게임처럼 넉넉히 든다(사용자, 2026-09-18).
 BUNDLE = 1000
 
-# 저레벨 직업 장비. 직업마다 무기 하나와 옷 하나 — 괴물마다 돌려 가며 붙인다.
-# (직업 번호는 서버의 ClassType: 1 전사 · 2 도적 · 3 마법사 · 4 성직자 · 5 무도가)
-CLASS_GEAR = {
-    1: ["커틀라스", "레더튜닉"],
-    2: ["설단검", "스카웃튜닉"],
-    3: ["매직마르시아", "매직스커트"],
-    4: ["홀리마르시아", "로브"],
-    5: ["용의발톱", "도복"],
-}
-
-# 장비가 나올 확률(목록에서 뽑힐 확률과 곱해진다).
-GEAR_RATE = 0.10
+# **장비는 여기서 붙이지 않는다.** 저레벨 괴물은 잡템만 떨구고, 장비는 그 위 사냥터에서 낮은 확률로
+# 나온다(사용자, 2026-09-23). 어느 사냥터에 어느 장비가 걸리는지는 `scripts/build-gear-drops.py` 가 정한다.
 
 DROPS_TYPE = "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
 
@@ -109,20 +110,6 @@ def bundle_potions(writing, said):
     said.append(f"시약·물약 {changed} 가지를 한 칸에 {BUNDLE} 개까지 쌓게 했다")
 
 
-def rate_gear(writing, said):
-    for pieces in CLASS_GEAR.values():
-        for piece in pieces:
-            path = ITEMS / f"{piece}.json"
-
-            if not path.exists():
-                said.append(f"  없는 장비: {piece}")
-                continue
-
-            item = read(path)
-            item["DropRate"] = GEAR_RATE
-            write(path, item, writing)
-
-
 def spread_drops(writing, said):
     monsters = []
 
@@ -131,17 +118,11 @@ def spread_drops(writing, said):
         if monster.get("AreaID") in NOVICE_MAPS:
             monsters.append((path, monster))
 
-    gear = [piece for pieces in CLASS_GEAR.values() for piece in pieces]
     lines = []
 
-    for index, (path, monster) in enumerate(monsters):
+    for path, monster in monsters:
         drops = list((monster.get("Drops") or {}).get("$values") or [])
-        piece = gear[index % len(gear)]
-
         drops += [name for name in POTIONS if name not in drops]
-
-        if piece not in drops:
-            drops.append(piece)
 
         monster["Drops"] = {"$type": DROPS_TYPE, "$values": drops}
 
@@ -152,11 +133,10 @@ def spread_drops(writing, said):
         lines.append(
             f"  {monster['Name']}@{NOVICE_MAPS[monster['AreaID']]}: {' · '.join(drops)}"
             f"  (쿠룸 {100 * POTIONS['쿠룸']['DropRate'] / len(drops):.0f}%"
-            f" · 마라디움 {100 * POTIONS['마라디움']['DropRate'] / len(drops):.0f}%"
-            f" · {piece} {100 * GEAR_RATE / len(drops):.0f}%)"
+            f" · 마라디움 {100 * POTIONS['마라디움']['DropRate'] / len(drops):.0f}%)"
         )
 
-    said.append(f"노비스 괴물 {len(monsters)} 마리에 시약과 직업 장비를 붙였다")
+    said.append(f"노비스 괴물 {len(monsters)} 마리에 시약을 붙였다")
     said.extend(lines)
 
 
@@ -168,7 +148,6 @@ def main():
     said = []
     make_potions(writing, said)
     bundle_potions(writing, said)
-    rate_gear(writing, said)
     spread_drops(writing, said)
 
     print("\n".join(said))
