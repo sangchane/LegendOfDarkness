@@ -120,6 +120,9 @@ SHOPS = [
         # 안 묶인 7개 + 장갑사기(시장은행에만 있다).
         "목록": ["장갑사기", "각반사기", "신발사기", "벨트사기", "귀걸이사기", "방패사기", "반지사기", "전사투구사기"],
         "너클": [],
+        # 1~10레벨이 낄 수 있는 것은 원작에도 원소 목걸이·벨트 넷씩뿐이다(사용자, 2026-09-23). 5.99 목록엔 없다.
+        "원작장신구": ["바다의목걸이", "바람의목걸이", "화염의목걸이", "대지의목걸이",
+                   "바다의벨트", "바람의벨트", "화염의벨트", "대지의벨트"],
         "문": (10, 23),  # warp 우드랜드입구 to world map — 세계지도에서 내려서는 칸
     },
 ]
@@ -404,6 +407,12 @@ def main():
                 if name not in seen:
                     seen.add(name)
                     names.append(name)
+        for name in shop.get("원작장신구", []):
+            if name not in items:
+                trouble.append(f"{who}: 원작 장신구 {name} 이 아이템 템플릿에 없다")
+            elif name not in seen:
+                seen.add(name)
+                names.append(name)
         for name in shop["너클"]:
             if name not in items:
                 trouble.append(f"{who}: 너클 {name} 이 아이템 템플릿에 없다 — python3 scripts/build-nova-knuckles.py --쓰기")
