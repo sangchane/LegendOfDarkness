@@ -54,6 +54,72 @@ public sealed partial class Flash : Sprite2D
         return new Flash(GD.Load<Texture2D>(path), sheet, speed);
     }
 
+    private static readonly Dictionary<int, Color> Tints = [];
+
+    /// <summary>
+    /// What a monster under a spell is tinted with: the colour of the picture that spell drew on it, half-way from
+    /// white so the monster is still itself — 프라보's 257 is red, so a cursed monster turns reddish. White when the
+    /// picture was never cut.
+    /// </summary>
+    /// <remarks>
+    /// No original evidence for the tint itself: the 5.99 client can recolour a monster only through the four
+    /// palette bytes of its 0x07 record (<c>0x63f4bb</c> → <c>0x59d770</c> → drawn by <c>0x495100</c> when the
+    /// monster's own table allows it), and the 5.99 server always writes those four as zero. The colour is the
+    /// picture's own: every drawn pixel weighted by how vivid it is, so the dark edges and grey smoke do not wash it
+    /// out.
+    /// </remarks>
+    public static Color Tint(int number)
+    {
+        if (Tints.TryGetValue(number, out Color known))
+        {
+            return known;
+        }
+
+        string path = $"{Folder}efct{number:000}.png";
+        Color tint = Colors.White;
+
+        if (number > 0 && ResourceLoader.Exists(path) && GD.Load<Texture2D>(path).GetImage() is { } image)
+        {
+            if (image.IsCompressed())
+            {
+                image.Decompress();
+            }
+
+            float red = 0, green = 0, blue = 0, weight = 0;
+
+            // 큰 그림도 있다(257 은 4800x180) — 둘째 칸마다 본다. 색을 고르는 데는 충분하다.
+            for (int y = 0; y < image.GetHeight(); y += 2)
+            {
+                for (int x = 0; x < image.GetWidth(); x += 2)
+                {
+                    Color pixel = image.GetPixel(x, y);
+
+                    if (pixel.A <= 0)
+                    {
+                        continue;
+                    }
+
+                    float vivid = pixel.S * pixel.V;
+                    red += pixel.R * vivid;
+                    green += pixel.G * vivid;
+                    blue += pixel.B * vivid;
+                    weight += vivid;
+                }
+            }
+
+            if (weight > 0)
+            {
+                Color mean = new(red / weight, green / weight, blue / weight);
+                float top = Mathf.Max(mean.R, Mathf.Max(mean.G, mean.B));
+                tint = Colors.White.Lerp(top > 0 ? mean / top : Colors.White, 0.5f);
+                tint.A = 1;
+            }
+        }
+
+        Tints[number] = tint;
+        return tint;
+    }
+
     public override void _Process(double delta)
     {
         _age += delta;

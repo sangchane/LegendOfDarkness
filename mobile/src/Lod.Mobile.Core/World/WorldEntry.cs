@@ -165,6 +165,23 @@ public sealed record Ailment(int Icon, int Left)
     };
 }
 
+/// <summary>
+/// Something on somebody else — another player or a monster — as our own 0x5C tells it to everyone who can see
+/// them. The original has no such packet: it only ever tells the afflicted one (0x3A). See
+/// <c>ServerFormat5C</c> in the server fork.
+/// </summary>
+/// <param name="Left">The same time grade as <see cref="Ailment.Left" />; 0 means it is over.</param>
+/// <param name="Harmful">A debuff rather than a buff. Only these tint a monster.</param>
+/// <param name="Effect">
+/// The picture the spell drew on them (<c>efct###</c>), whose colour a monster is tinted in; 0 when the server
+/// does not know it.
+/// </param>
+public sealed record SeenAilment(uint Serial, int Icon, int Left, bool Harmful, int Effect)
+{
+    /// <summary>The badge this makes under a person's health bar.</summary>
+    public Ailment Badge => new(Icon, Left);
+}
+
 public enum CreatureKind
 {
     /// <summary>A monster. It fights.</summary>

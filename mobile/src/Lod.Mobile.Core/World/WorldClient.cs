@@ -44,6 +44,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// 상태 이상 아이콘. 나가는 0x3A(대화 답장)와 번호가 같지만 오는 것은 이쪽이다 — 걸린 본인에게만 온다.
     /// </summary>
     private const byte StatusCommand = 0x3A;
+
+    // 우리 확장 — 남에게 걸린 것(0x5C). 원작은 당사자에게만 0x3A 로 알린다.
+    private const byte SeenStatusCommand = 0x5C;
     private const byte AttackCommand = 0x13;
     private const byte HealthCommand = 0x13;
     private const byte SpokenCommand = 0x0A;
@@ -146,6 +149,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private readonly ConcurrentDictionary<uint, int> _health = new();
     private readonly ConcurrentDictionary<int, Ailment> _ailing = new();
 
+    // What is on everybody else we can see, by who and which picture (0x5C).
+    private readonly ConcurrentDictionary<(uint Serial, int Icon), SeenAilment> _seenAiling = new();
+
     // Every report in the order it came, because the latest one is not enough to check a blow against a
     // formula: two blows landing between two reads would leave only the second one's figure behind.
     private readonly ConcurrentQueue<(uint Serial, int Left)> _hurts = new();
@@ -209,6 +215,13 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// roughly how long is left; it only ever tells the one afflicted, so this is our own list and nobody else's.
     /// </summary>
     public IReadOnlyCollection<Ailment> Ailments => (IReadOnlyCollection<Ailment>)_ailing.Values;
+
+    /// <summary>
+    /// What is on somebody else we can see — another player or a monster — as our server tells bystanders (0x5C).
+    /// Empty for anybody it has said nothing about.
+    /// </summary>
+    public IReadOnlyList<SeenAilment> AilmentsOf(uint serial) =>
+        [.. _seenAiling.Values.Where(one => one.Serial == serial)];
 
     /// <summary>
     /// Every health report the server has sent, oldest first. One report is one blow landing, so this is
@@ -382,6 +395,7 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                 case MapChangedCommand:
                     map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
                     _field = null;
+                    _seenAiling.Clear();
                     break;
 
                 case WorldMapCommand:
@@ -538,6 +552,22 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
                     continue;
 
+                case SeenStatusCommand:
+                {
+                    SeenAilment seen = ReadSeenAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                    if (seen.Left == 0)
+                    {
+                        _seenAiling.TryRemove((seen.Serial, seen.Icon), out _);
+                    }
+                    else
+                    {
+                        _seenAiling[(seen.Serial, seen.Icon)] = seen;
+                    }
+                }
+
+                    continue;
+
                 case ShowCreaturesCommand:
                     foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
                     {
@@ -625,6 +655,11 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
                     _others.TryRemove(gone, out _);
                     _creatures.TryRemove(gone, out _);
+
+                    foreach ((uint Serial, int Icon) key in _seenAiling.Keys.Where(key => key.Serial == gone))
+                    {
+                        _seenAiling.TryRemove(key, out _);
+                    }
                 }
 
                     continue;
@@ -1325,6 +1360,25 @@ public sealed class WorldClient(WorldSession session) : IDisposable
         }
 
         return new Ailment(BinaryPrimitives.ReadUInt16BigEndian(body), body[2]);
+    }
+
+    /// <summary>
+    /// Something on somebody else (0x5C, our server's own packet): serial(4) · picture(2) · grade(1) · harmful(1) ·
+    /// effect(2), all big-endian like the rest.
+    /// </summary>
+    public static SeenAilment ReadSeenAilment(ReadOnlySpan<byte> body)
+    {
+        if (body.Length < 10)
+        {
+            throw new ProtocolException($"남의 상태 안내가 10바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        return new SeenAilment(
+            BinaryPrimitives.ReadUInt32BigEndian(body),
+            BinaryPrimitives.ReadUInt16BigEndian(body[4..]),
+            body[6],
+            body[7] != 0,
+            BinaryPrimitives.ReadUInt16BigEndian(body[8..]));
     }
 
     public static IReadOnlyList<Creature> ReadCreatures(ReadOnlySpan<byte> body)

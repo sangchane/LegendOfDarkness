@@ -122,6 +122,28 @@ public sealed partial class Actor : Node2D
     public void Ailing(System.Collections.Generic.IEnumerable<Lod.Mobile.Core.World.Ailment> ailments) =>
         _ailing?.Show(ailments);
 
+    /// <summary>The colour a monster's body is tinted with while a spell is on it; white is none.</summary>
+    private Color _tint = Colors.White;
+
+    /// <summary>
+    /// Tints the body — only the drawn figure, not the bar or badges over it — in a spell's colour for as long as
+    /// it lasts (0x5C, <see cref="Flash.Tint" />). White takes it off.
+    /// </summary>
+    public void Tint(Color colour)
+    {
+        if (colour == _tint)
+        {
+            return;
+        }
+
+        _tint = colour;
+
+        foreach (Sprite2D piece in _sprites)
+        {
+            piece.SelfModulate = colour;
+        }
+    }
+
     public override void _Ready()
     {
         for (int layer = 0; layer < _sheet.Paths.Count; layer++)
@@ -141,6 +163,7 @@ public sealed partial class Actor : Node2D
                 Offset = new Vector2(-_sheet.FeetX, -_sheet.FeetY)
             };
 
+            piece.SelfModulate = _tint;
             _sprites.Add(piece);
             AddChild(piece);
         }

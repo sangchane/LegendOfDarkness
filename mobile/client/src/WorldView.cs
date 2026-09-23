@@ -1232,10 +1232,27 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             }
         }
 
-        // 걸린 것들은 나에게만 온다 — 서버가 당사자에게만 보낸다(Debuff.Display).
+        // 내 것은 0x3A 로(원작 그대로), 남의 것은 우리 서버가 둘레에 알리는 0x5C 로 온다.
         if (server is { } mine)
         {
             _player.Ailing(mine.Ailments);
+
+            // 사람은 체력바 아래 배지, 괴물은 배지 없이 몸을 그 마법 그림의 색으로 물들인다 — 해로운 것 중
+            // 가장 오래 남는 것의 색으로(사용자 결정 2026-09-18).
+            foreach ((uint serial, Actor person) in _crowd)
+            {
+                person.Ailing(mine.AilmentsOf(serial).Select(one => one.Badge));
+            }
+
+            foreach ((uint serial, Actor beast) in _herd)
+            {
+                SeenAilment? worst = mine.AilmentsOf(serial)
+                    .Where(one => one.Harmful && one.Effect > 0)
+                    .OrderByDescending(one => one.Left)
+                    .FirstOrDefault();
+
+                beast.Tint(worst is null ? Colors.White : Flash.Tint(worst.Effect));
+            }
         }
     }
 

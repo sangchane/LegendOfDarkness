@@ -7,20 +7,56 @@ namespace LodClient;
 
 /// <summary>
 /// The little badges under somebody's health bar saying what is on them — a curse, poison, sleep. The original
-/// sends a picture number and a grade for how much time is left (<c>0x3A</c>), and until those pictures are cut
-/// out of the archive each one is drawn as a shape of its own.
+/// sends a picture number and a grade for how much time is left (<c>0x3A</c>), and draws each as it does here: the
+/// picture, and beside it a thin bar as tall as the time left, in that grade's colour.
 /// </summary>
 /// <remarks>
-/// Shapes, not only colours. Somebody who cannot tell red from green still reads a triangle from a circle, and
-/// that is what the accessibility guidance every console maker publishes asks for. Badges are drawn rather than
+/// <para>
+/// Evidence, 5.99/2005 Legend.exe: <c>SSpelled</c> (0x3A) fills the own status bar <c>SpelledViewPane</c>, whose
+/// draw at <c>0x605ab0</c> loads each picture as kind 2 (<c>0x4e9980</c> → <c>spell%03d.epf</c>, frame = number %
+/// 266) — the same sheet the spell pane uses, so <c>assets/ability/spell.png</c> is reused — and fills a 2-pixel bar
+/// right of it from y 4 to <c>grade × 2 + 6</c>, coloured by palette entry 88 · 137 · 69 · 151 · 40 · 255 for
+/// grades 1…6 (<c>legend.pal</c>: light blue · green · yellow · orange · red · entry 255).
+/// </para>
+/// <para>
+/// A number outside the sheet keeps a shape of its own, so it is still told apart. Badges are drawn rather than
 /// built out of nodes, for the same reason the bar above them is.
+/// </para>
 /// </remarks>
 public sealed partial class StatusRow : Node2D
 {
-    /// <summary>How big one badge is, and how far apart they sit.</summary>
-    private const int Side = 9;
+    /// <summary>How big one picture is, the time bar beside it, and how far apart they sit.</summary>
+    private const int Side = 10;
+
+    private const int Bar = 2;
 
     private const int Gap = 2;
+
+    /// <summary>One badge's width: the picture, a pixel, the bar.</summary>
+    private const int Slot = Side + 1 + Bar;
+
+    /// <summary>The spell sheet: 266 pictures, sixteen to a row of 35-pixel cells (<c>AbilityBar</c>).</summary>
+    private const int Pictures = 266;
+
+    private const int Cell = 35;
+
+    private const int Columns = 16;
+
+    private static Texture2D? _sheet;
+
+    /// <summary>
+    /// The time bar's colour for grades 1…6 — <c>legend.pal</c> entries 88 · 137 · 69 · 151 · 40 · 255, which
+    /// <c>SpelledViewPane</c> (<c>0x605b8e</c>) picks by grade.
+    /// </summary>
+    private static readonly Color[] Grades =
+    [
+        Color.Color8(127, 167, 243),
+        Color.Color8(0, 99, 0),
+        Color.Color8(255, 231, 59),
+        Color.Color8(243, 143, 27),
+        Color.Color8(203, 0, 23),
+        Color.Color8(27, 127, 127)
+    ];
 
     /// <summary>How many fit before the rest are summed up. Five is as many as a tile's width allows.</summary>
     private const int Most = 5;
@@ -59,6 +95,12 @@ public sealed partial class StatusRow : Node2D
             return;
         }
 
+        // 몸이 좌우로 뒤집혀도(Actor.Face) 그림과 막대는 뒤집히지 않는다 — 부모의 뒤집기를 되돌린다.
+        if (GetParent() is Node2D body)
+        {
+            Scale = new Vector2(body.Scale.X < 0 ? -1 : 1, 1);
+        }
+
         // 곧 풀리는 것은 깜빡인다 — 남은 시간을 색으로만 말하지 않기 위한 두 번째 신호다.
         _blink += delta;
 
@@ -73,12 +115,12 @@ public sealed partial class StatusRow : Node2D
     {
         int shown = Mathf.Min(_showing.Count, Most);
         int badges = _showing.Count > Most ? shown + 1 : shown;
-        float left = -(badges * (Side + Gap) - Gap) / 2f;
+        float left = -(badges * (Slot + Gap) - Gap) / 2f;
 
         for (int at = 0; at < shown; at++)
         {
             Ailment one = _showing[at];
-            Rect2 box = new(left + at * (Side + Gap), 0, Side, Side);
+            Rect2 box = new(left + at * (Slot + Gap), 0, Side, Side);
 
             // 1등급(10초 미만)은 깜빡인다.
             if (one.Left == 1 && Time.GetTicksMsec() / 300 % 2 == 1)
@@ -87,12 +129,26 @@ public sealed partial class StatusRow : Node2D
             }
 
             DrawRect(box.Grow(1), Edge);
-            Badge(box, one.Icon);
+
+            if (!Picture(box, one.Icon))
+            {
+                Badge(box, one.Icon);
+            }
+
+            // 원작처럼 그림 오른쪽에 남은 시간만큼 선 막대 — 등급 × 2 + 2 칸(6등급이면 그림 높이).
+            if (one.Left is >= 1 and <= 6)
+            {
+                float tall = Side * (one.Left * 2 + 2) / 14f;
+                Rect2 bar = new(box.End.X + 1, 0, Bar, tall);
+
+                DrawRect(bar.Grow(0.5f), Edge);
+                DrawRect(bar, Grades[one.Left - 1]);
+            }
         }
 
         if (_showing.Count > Most)
         {
-            Rect2 rest = new(left + shown * (Side + Gap), 0, Side, Side);
+            Rect2 rest = new(left + shown * (Slot + Gap), 0, Side, Side);
 
             DrawRect(rest.Grow(1), Edge);
             DrawRect(rest, Fading);
@@ -100,8 +156,27 @@ public sealed partial class StatusRow : Node2D
         }
     }
 
+    /// <summary>The original picture for this number, or false when the sheet has none.</summary>
+    private bool Picture(Rect2 box, int icon)
+    {
+        if (icon is < 0 or >= Pictures)
+        {
+            return false;
+        }
+
+        _sheet ??= ResourceLoader.Exists(AbilityBar.SpellSheet) ? GD.Load<Texture2D>(AbilityBar.SpellSheet) : null;
+
+        if (_sheet is null)
+        {
+            return false;
+        }
+
+        DrawTextureRectRegion(_sheet, box, new Rect2(icon % Columns * Cell, icon / Columns * Cell, Cell, Cell));
+        return true;
+    }
+
     /// <summary>
-    /// One badge. Its shape comes from the picture number, so two different things never look the same even when
+    /// A badge for a number the sheet does not have. Its shape comes from the picture number, so two different things never look the same even when
     /// their colours are close — the original numbers its statuses and that numbering is kept.
     /// </summary>
     private void Badge(Rect2 box, int icon)

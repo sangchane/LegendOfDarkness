@@ -52,4 +52,38 @@ public sealed class AilmentTests
     {
         Assert.Throws<ProtocolException>(() => WorldClient.ReadAilment([0x00, 0x52]));
     }
+
+    /// <summary>
+    /// Somebody else's status (0x5C, our own packet): who, the same picture and grade as 0x3A, whether it harms,
+    /// and the effect picture a monster is tinted after — 프라보 on a monster is curse picture 82 and effect 257.
+    /// </summary>
+    [Fact]
+    public void Somebody_elses_status_names_who_and_the_effect_it_came_with()
+    {
+        SeenAilment seen = WorldClient.ReadSeenAilment([0x00, 0x01, 0x02, 0x03, 0x00, 0x52, 0x06, 0x01, 0x01, 0x01]);
+
+        Assert.Equal(0x00010203u, seen.Serial);
+        Assert.Equal(82, seen.Icon);
+        Assert.Equal(6, seen.Left);
+        Assert.True(seen.Harmful);
+        Assert.Equal(257, seen.Effect);
+        Assert.Equal(new Ailment(82, 6), seen.Badge);
+    }
+
+    /// <summary>A buff says so with a zero, and an unknown effect is zero too.</summary>
+    [Fact]
+    public void A_buff_on_somebody_else_is_not_harmful()
+    {
+        SeenAilment seen = WorldClient.ReadSeenAilment([0x00, 0x00, 0x00, 0x09, 0x00, 0x35, 0x00, 0x00, 0x00, 0x00]);
+
+        Assert.False(seen.Harmful);
+        Assert.Equal(0, seen.Left);
+        Assert.Equal(0, seen.Effect);
+    }
+
+    [Fact]
+    public void A_short_status_of_somebody_else_is_refused()
+    {
+        Assert.Throws<ProtocolException>(() => WorldClient.ReadSeenAilment([0x00, 0x00, 0x00, 0x09, 0x00, 0x35, 0x06, 0x01, 0x01]));
+    }
 }
