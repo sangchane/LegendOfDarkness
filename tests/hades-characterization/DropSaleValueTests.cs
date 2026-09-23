@@ -44,7 +44,8 @@ public sealed class DropSaleValueTests
     /// 셋이 일치하지 않으므로 팩 값을 쓰지 않고, 혼든의 비(3 : 10)만 남긴 채 절반으로 내려
     /// 「첫 옷까지 열 마리 안팎」에 맞춘 값이다.
     /// </summary>
-    private static readonly (string Name, int Value)[] Potions = [("쿠룸", 150), ("마라디움", 500)];
+    // 2026-09-24 사용자: 마라디움이 초반 벌이의 절반을 넘어 더 낮춘다 — 250.
+    private static readonly (string Name, int Value)[] Potions = [("쿠룸", 150), ("마라디움", 250)];
 
     /// <summary>「열 마리 안팎」의 폭. 목록 칸수가 둘인 괴물(브라운맨티스·지네)은 시약이 나올 확률이
     /// 그만큼 높아 아래쪽에, 잡템까지 셋인 괴물은 위쪽에 선다.</summary>

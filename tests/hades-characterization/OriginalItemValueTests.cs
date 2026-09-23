@@ -107,7 +107,8 @@ public sealed class OriginalItemValueTests
 
         int[] ladder = Staves.Select(name => Whole(items[name], "LevelRequired")).Distinct().Order().ToArray();
 
-        Assert.Equal([1, 21, 51, 81, 99], ladder);
+        // 매직파나·홀리파나는 원작대로 11레벨(사용자, 2026-09-24) — 사다리에 11 이 한 칸 낀다.
+        Assert.Equal([1, 11, 21, 51, 81, 99], ladder);
     }
 
     /// <summary>
