@@ -47,7 +47,6 @@
 		"BaseDamageMod": 60,
 		"AiteDamageReductionMod": 3,
 		"SleepProcsDoubleDmg": true,
-		"BehindDamageMod": 0.45,
 
 		// Defense
 		"BaseStatAttribute": 5,
