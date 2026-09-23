@@ -306,24 +306,26 @@
     // 안 보인다. 그림이 있는 직업(지금은 무도가)만 실제 동작이 나가고, 나머지는 기본 공격 자세다.
     var hero = el("i", "hero stage-piece");
     place(hero, caster.x - cell.wide / 2, caster.y - cell.floor);
-    if (isJumpOver) {
-      // 뛰어넘은 직후 상대를 돌아본다
-      hero.style.transform = "scaleX(-1)";
-    }
+    // 뛰어넘은 직후 상대를 돌아본다 — 서버는 방향을 +2, 곧 **180°** 돌린다(MonkStrike.cs:193).
+    // 반대쪽을 보려면 앞/등 그림을 바꾸고 좌우도 뒤집는다. 뒤집기만 하면 90° 돈 것으로 읽힌다
+    // (docs/original-sprite-animation.md §2).
+    var turned = isJumpOver;
+    if (turned) { hero.style.transform = "scaleX(-1)"; }
     hero.style.width = cell.wide + "px";
     hero.style.height = cell.tall + "px";
 
     if (body) {
       var step = BODY["동작"][body];
       hero.classList.add("acting");
-      hero.style.backgroundImage = "url(ui/assets/motion/" + step["파일"] + ")";
+      hero.style.backgroundImage = "url(ui/assets/motion/" + (turned && step["등파일"] ? step["등파일"] : step["파일"]) + ")";
       hero.style.backgroundSize = (BODY["칸"] * step["칸수"]) + "px " + BODY["높이"] + "px";
       hero.style.setProperty("--frames", step["칸수"]);
       hero.style.setProperty("--from", "0px");
       hero.style.setProperty("--to", (-step["칸수"] * BODY["칸"]) + "px");
     } else {
       hero.style.backgroundImage = "url(" + IDLE.file + ")";
-      hero.style.backgroundPositionX = (-IDLE.frame * IDLE.wide) + "px";
+      // 걷기 시트는 등 0~4 · 앞 5~9 다 — 돌아서면 같은 자리의 등 칸을 쓴다.
+      hero.style.backgroundPositionX = (-(turned ? IDLE.frame - 5 : IDLE.frame) * IDLE.wide) + "px";
     }
     floor.appendChild(hero);
 

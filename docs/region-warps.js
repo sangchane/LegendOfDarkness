@@ -61,8 +61,8 @@
     meta.appendChild(kind);
 
     if (node.괴물) { meta.appendChild(text("span", "", "괴물 " + node.괴물)); }
-    else if (node.NPC) { meta.appendChild(text("span", "", "NPC " + node.NPC)); }
-    else if (node.월드맵) { meta.appendChild(text("span", "", "월드맵")); }
+    if (node.NPC) { meta.appendChild(text("span", "", "NPC " + node.NPC)); }
+    if (node.월드맵) { meta.appendChild(text("span", "", "월드맵")); }
     
     button.appendChild(meta);
 
@@ -109,39 +109,44 @@
     var sidebar = chart.querySelector(".map-sidebar");
     if (!sidebar) return;
     
-    if (selectedNode) {
-      var html = '<div class="sidebar-header"><h3>' + selectedNode.이름 + '</h3><div class="sidebar-badges">';
-      if (selectedNode.갈래 === "사냥터" || selectedNode.갈래 === "던전") {
-        html += '<span class="badge badge-danger">' + selectedNode.갈래 + '</span>';
-      } else {
-        html += '<span class="badge badge-safe">' + selectedNode.갈래 + '</span>';
-      }
-      html += '<span class="badge">맵 번호: ' + selectedNode.번호 + '</span></div></div>';
-      
-      html += '<div class="sidebar-body">';
-      
-      html += '<div class="info-section"><h4>출현 몬스터 / NPC / 요소</h4>';
-      if (selectedNode.괴물 || selectedNode.NPC || selectedNode.월드맵) {
-        html += '<div class="entity-list">';
-        if (selectedNode.괴물) {
-          html += '<div class="entity-item"><div class="entity-info"><b>괴물 종류</b><span>' + selectedNode.괴물 + '종 등장</span></div></div>';
-        }
-        if (selectedNode.NPC) {
-          html += '<div class="entity-item"><div class="entity-info"><b>NPC</b><span>' + selectedNode.NPC + '명 존재</span></div></div>';
-        }
-        if (selectedNode.월드맵) {
-          html += '<div class="entity-item"><div class="entity-info"><b>월드맵 지원</b><span>이 맵에서 다른 곳으로 이동 가능</span></div></div>';
-        }
-        html += '</div>';
-      } else {
-        html += '<div style="font-size:13px; color:var(--muted); letter-spacing:-0.015em;">이 맵에는 표시할 특별한 요소가 없습니다.</div>';
-      }
-      html += '</div></div>';
-      sidebar.innerHTML = html;
-      sidebar.style.display = 'flex';
-    } else {
-      sidebar.innerHTML = '<div class="sidebar-body"><div class="info-section"><div style="font-size:13px; color:var(--muted); letter-spacing:-0.015em; text-align:center; margin-top:40px">노드를 클릭하면 상세 정보가 나타납니다.</div></div></div>';
+    sidebar.replaceChildren();
+    if (!selectedNode) {
+      var hint = text("div", "sidebar-body");
+      hint.appendChild(text("p", "sidebar-empty is-hint", "노드를 클릭하면 상세 정보가 나타납니다."));
+      sidebar.appendChild(hint);
+      return;
     }
+
+    var header = text("div", "sidebar-header");
+    header.appendChild(text("h3", "", selectedNode.이름));
+    var badges = text("div", "sidebar-badges");
+    var risky = selectedNode.갈래 === "사냥터" || selectedNode.갈래 === "던전";
+    badges.append(text("span", "badge " + (risky ? "badge-risk" : "badge-done"), selectedNode.갈래),
+      text("span", "badge", "맵 번호: " + selectedNode.번호));
+    header.appendChild(badges);
+
+    var body = text("div", "sidebar-body");
+    var section = text("div", "info-section");
+    section.appendChild(text("h4", "", "출현 몬스터 / NPC / 요소"));
+    var entities = [];
+    if (selectedNode.괴물) { entities.push(["괴물 종류", selectedNode.괴물 + "종 등장"]); }
+    if (selectedNode.NPC) { entities.push(["NPC", selectedNode.NPC + "명 존재"]); }
+    if (selectedNode.월드맵) { entities.push(["월드맵 지원", "이 맵에서 다른 곳으로 이동 가능"]); }
+    if (entities.length) {
+      var list = text("div", "entity-list");
+      entities.forEach(function (entry) {
+        var item = text("div", "entity-item");
+        var info = text("div", "entity-info");
+        info.append(text("b", "", entry[0]), text("span", "", entry[1]));
+        item.appendChild(info);
+        list.appendChild(item);
+      });
+      section.appendChild(list);
+    } else {
+      section.appendChild(text("p", "sidebar-empty", "이 맵에는 표시할 특별한 요소가 없습니다."));
+    }
+    body.appendChild(section);
+    sidebar.append(header, body);
   }
 
   /** 줄을 다 놓은 뒤에야 좌표를 알 수 있다. 화면이 숨어 있으면 폭이 0이라 그리지 않는다. */

@@ -15,7 +15,10 @@
   var grid = document.querySelector("#monster-grid");
   var empty = document.querySelector("#monster-empty");
   var hover = document.querySelector("#monster-hover");
+  var section = grid.closest(".view");
   var state = { query: "", region: "", map: "", sort: "exp", level: 1 };
+  // 눌러서(탭해서) 고정한 괴물. 고정되면 마우스가 떠나거나 초점이 빠져도 풍선이 남는다.
+  var pinned = null, shownFor = null;
 
   function text(tag, className, value) {
     var element = document.createElement(tag);
@@ -51,13 +54,18 @@
     box.style.setProperty("--w", frameWidth + "px");
     box.style.setProperty("--h", art.높이 + "px");
     box.style.setProperty("--sheet", "url(" + SPRITE_DIR + art.이름 + ".png)");
+    box.style.setProperty("--sheet-w", art.너비 + "px");
     box.title = art.이름 + " · " + art.칸 + "칸";
 
-    // 동작 구간: walk 가 없으면 기본 0, 1
+    // 걷기 구간: 등 구간 [시작, 칸수] 다음에 앞 구간이 바로 이어진다. 없으면 0 에서 한 칸.
+    // 어느 쪽을 볼지는 CSS 가 화면의 data-monster-dir 로 고른다 — 만들자마자 움직인다.
     var walk = art.동작 && art.동작.walk ? art.동작.walk : [0, 1];
-    box.dataset.walkOffset = walk[0];
-    box.dataset.walkCount = walk[1];
-    box.dataset.frameWidth = frameWidth;
+    var back = walk[0], count = walk[1] || 1, front = back + count;
+    box.style.setProperty("--frames", count);
+    box.style.setProperty("--back-from", (-back * frameWidth) + "px");
+    box.style.setProperty("--back-to", (-(back + count) * frameWidth) + "px");
+    box.style.setProperty("--front-from", (-front * frameWidth) + "px");
+    box.style.setProperty("--front-to", (-(front + count) * frameWidth) + "px");
     return box;
   }
 
@@ -94,6 +102,7 @@
 
   function openHover(monster, anchor) {
     if (!hover) { return; }
+    shownFor = monster;
     hover.replaceChildren();
 
     var top = text("div", "item-hover-top");
@@ -146,10 +155,20 @@
   }
 
   function closeHover() {
+    shownFor = null;
     if (hover) {
       hover.hidden = true;
       hover.setAttribute("aria-hidden", "true");
     }
+  }
+
+  /** 카드 위에 늘 보이는 한 줄 — 풍선을 열지 않아도 셈의 핵심은 읽힌다. */
+  function keyLine(monster) {
+    var kills = killsToLevel(monster, state.level);
+    return "체력 " + number(monster.체력)
+      + " · 피해 " + monster.피해[0] + "~" + monster.피해[1]
+      + " · 경험치 " + number(earned(monster, state.level))
+      + " · 다음 레벨 " + (kills === null ? "—" : number(kills) + "마리");
   }
 
   function card(monster) {
@@ -166,10 +185,26 @@
     title.appendChild(marks);
     head.appendChild(title);
     article.appendChild(head);
+    article.appendChild(text("p", "monster-keyline", keyLine(monster)));
 
+    // 풍선은 마우스·초점·탭 모두로 연다. 탭(누름)은 고정 — 다시 누르거나 바깥을 누르거나 Esc 로 닫는다.
+    article.tabIndex = 0;
+    article.setAttribute("aria-describedby", "monster-hover");
     article.addEventListener("mouseenter", function () { openHover(monster, article); });
-    article.addEventListener("mouseleave", closeHover);
-    article.addEventListener("click", function () { openHover(monster, article); });
+    article.addEventListener("mouseleave", function () { if (pinned !== monster) { closeHover(); } });
+    article.addEventListener("focus", function () { openHover(monster, article); });
+    article.addEventListener("blur", function () { if (pinned !== monster) { closeHover(); } });
+    article.addEventListener("click", function () {
+      if (pinned === monster) { pinned = null; closeHover(); return; }
+      pinned = monster;
+      openHover(monster, article);
+    });
+    article.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") { return; }
+      event.preventDefault();
+      article.click();
+    });
+    cards.set(monster, article);
 
     return article;
   }
@@ -195,6 +230,8 @@
     return (monster.이름 + " " + monster.맵).toLocaleLowerCase("ko").indexOf(state.query) >= 0;
   }
 
+  var cards = new Map();
+
   function render() {
     chips(document.querySelector("#monster-regions"),
       data.지역.map(function (name) { return { id: name, 이름: name }; }), state.region,
@@ -216,8 +253,13 @@
     var shown = data.괴물.filter(matches).slice().sort(function (a, b) { return order.재다(a) - order.재다(b); });
 
     grid.replaceChildren();
+    cards = new Map();
     shown.forEach(function (monster) { grid.appendChild(card(monster)); });
     empty.hidden = shown.length !== 0;
+
+    // 열려 있던 풍선은 새 카드에 다시 붙여 새 레벨의 값으로 그린다. 걸러져 사라졌으면 닫는다.
+    var still = shownFor && cards.get(shownFor);
+    if (still) { openHover(shownFor, still); } else { pinned = null; closeHover(); }
 
     document.querySelector("#monster-kinds").textContent = data.셈.이름;
     document.querySelector("#monster-slots").textContent = data.셈.괴물자리;
@@ -252,36 +294,35 @@
     render();
   });
 
-  // 몬스터 상하좌우 방향 전환 타이머 (CSS 애니메이션 변수 제어)
-  var dirTick = 0;
-  function updateMonsterDirections() {
-    // 0=North(등), 1=East(앞), 2=South(앞,반전), 3=West(등,반전)
-    var dir = dirTick % 4;
-    dirTick += 1;
-    
-    var usesBack = (dir === 0 || dir === 3);
-    var usesFlip = (dir === 2 || dir === 3);
+  document.addEventListener("click", function (event) {
+    if (!pinned || grid.contains(event.target) || event.target.closest(".monster-level-row")) { return; }
+    pinned = null;
+    closeHover();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape" || !shownFor) { return; }
+    pinned = null;
+    closeHover();
+  });
 
-    var arts = document.querySelectorAll(".monster-art.is-animated");
-    for (var i = 0; i < arts.length; i++) {
-      var box = arts[i];
-      var offset = Number(box.dataset.walkOffset) || 0;
-      var count = Number(box.dataset.walkCount) || 1;
-      var w = Number(box.dataset.frameWidth) || 0;
-
-      // 앞/등 구간 결정: 앞(Front) 구간은 등(Back) 구간 뒤에 바로 이어진다.
-      var baseFrame = usesBack ? offset : offset + count;
-
-      box.style.setProperty("--frames", count);
-      box.style.setProperty("--from", (-baseFrame * w) + "px");
-      box.style.setProperty("--to", (-(baseFrame + count) * w) + "px");
-      box.style.setProperty("--flip", usesFlip ? "scaleX(-1)" : "scaleX(1)");
-    }
-    
-    setTimeout(updateMonsterDirections, 1500); // 1.5초마다 방향 전환
+  // 네 방향을 1.5초마다 돈다: 0=북(등) 1=동(앞) 2=남(앞·뒤집기) 3=서(등·뒤집기).
+  // 카드마다가 아니라 화면에 방향 하나만 적고, 어느 그림을 쓸지는 CSS 가 고른다.
+  // 괴물 화면이 숨어 있거나 창이 가려지면 멈춘다.
+  var direction = 1, turner = null;
+  function turn() {
+    if (section.hidden || document.hidden) { window.clearInterval(turner); turner = null; return; }
+    direction = (direction + 1) % 4;
+    section.dataset.monsterDir = String(direction);
   }
+  function startTurning() {
+    if (turner || section.hidden || document.hidden) { return; }
+    turner = window.setInterval(turn, 1500);
+  }
+  section.dataset.monsterDir = String(direction);
+  window.LodDashboard.onViewShown(startTurning);
+  document.addEventListener("visibilitychange", startTurning);
 
   rules();
   render();
-  updateMonsterDirections();
+  startTurning();
 })();

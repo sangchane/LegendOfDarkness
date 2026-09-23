@@ -24,7 +24,7 @@ ST 목록은 직업 다섯을 돌아가며 채운다 — 2 전사 · 3 무도가
 다르다(성직자 NO 0 은 5, NO 9 는 266) — 그래서 **파일 한 장이 아니라 동작마다 한 장**을 뽑는다.
 
   쓰는 법: python3 scripts/build-body-motions.py
-  산출물:  docs/ui/assets/motion/motion-<번호>.png · motions.json
+  산출물:  docs/ui/assets/motion/motion-<번호>.png(앞) · motion-<번호>-back.png(등) · motions.json
 """
 import json
 import subprocess
@@ -184,6 +184,14 @@ def main():
         ground = max(ground, bottom)
         drawn[str(motion)] = {"파일": out.name, "칸수": count, "직업": letter,
                               "옷": clothes[0] if clothes else 0, "발밑": bottom}
+
+        # 등 구간도 한 장 더 뽑는다 — 반대쪽(서)을 보려면 **등 그림을 좌우로 뒤집어야** 한다.
+        # 앞 그림만 뒤집으면 남쪽, 곧 90° 돈 것으로 읽힌다 (docs/original-sprite-animation.md §2).
+        back = DEST / f"motion-{motion}-back.png"
+        run(["pose", str(KHAN), f"mb001{letter},mn001{letter}{outfit},MH285{letter.upper()}",
+             str(back), ",".join(str(n) for n in range(start, start + count)), "1", CELL])
+        if back.exists():
+            drawn[str(motion)]["등파일"] = back.name
 
     # **안 쓰는 그림이라도 지우지 않는다.** 이 폴더에는 문서가 쓰는 도판(`body-*.png`·`four-directions.png`)도
     # 함께 있고, 한 번 통째로 지워 `docs/original-sprite-animation.md` 의 그림이 다 날아갔다. 지우는 것은
