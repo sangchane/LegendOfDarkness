@@ -51,7 +51,8 @@ public sealed class DropSaleValueTests
     /// 그만큼 높아 아래쪽에, 잡템까지 셋인 괴물은 위쪽에 선다.</summary>
     private const double Fewest = 7;
 
-    private const double Most = 14;
+    // 마라디움을 250 으로 내린 뒤 14~16 마리가 됐고 사용자가 그대로 두기로 했다(2026-09-24).
+    private const double Most = 16;
 
     /// <summary>
     /// 시약 값은 우리가 정한 값이어야 한다 — 근거가 없어 우리가 정한 자리라, 아무도 안 보면 말없이
