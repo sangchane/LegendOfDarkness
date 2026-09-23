@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -112,8 +113,12 @@ public sealed class IsolatedHadesServerTests
     public void Running_the_server_leaves_the_read_only_sources_untouched()
     {
         // Compared before and after rather than against a clean tree: from S1 on, the fork legitimately
-        // carries work in progress. What must never change is that a run adds nothing of its own.
+        // carries work in progress. What must never change is that a run adds nothing of its own. The same
+        // goes for aislings: it is gitignored, so `git status` never sees it, and the manually run, supervised
+        // server keeps its own real characters there — the directory is never empty. A snapshot before and
+        // after is the only comparison that does not assume the running server's state.
         string before = GitStatus(HadesWorkspace.HadesRoot);
+        string[] aislingsBefore = ListAislings();
 
         using (IsolatedHadesServer server = IsolatedHadesServer.Prepare())
         {
@@ -121,9 +126,13 @@ public sealed class IsolatedHadesServerTests
         }
 
         Assert.Equal(before, GitStatus(HadesWorkspace.HadesRoot));
-        Assert.Empty(Directory.EnumerateFileSystemEntries(
-            Path.Combine(HadesWorkspace.ServerDataDirectory, "aislings")));
+        Assert.Equal(aislingsBefore, ListAislings());
     }
+
+    private static string[] ListAislings() =>
+        [.. Directory.EnumerateFileSystemEntries(Path.Combine(HadesWorkspace.ServerDataDirectory, "aislings"))
+            .Select(path => Path.GetFileName(path)!)
+            .OrderBy(name => name, StringComparer.Ordinal)];
 
     private static string GitStatus(string workingDirectory)
     {

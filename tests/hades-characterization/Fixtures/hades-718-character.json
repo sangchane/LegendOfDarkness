@@ -2,9 +2,9 @@
   "description": "Stable fields of a freshly created 7.18 character right after its first world entry. Only fields that must not drift are listed; serials, timestamps and session state are deliberately absent.",
   "stableFields": {
     "Username": "lodharness",
-    "CurrentMapId": 1,
-    "X": 4,
-    "Y": 4,
+    "CurrentMapId": 20373,
+    "X": 37,
+    "Y": 29,
     "GameMaster": false
   },
   "volatileFields": {
@@ -12,6 +12,7 @@
     "LastLogged": "login timestamp",
     "SkillBook": "the skill granted by GiveAssailOnCreate carries a randomly generated ID; every other field of the book is identical between runs",
     "SpellBook": "the spell granted by StarterSpellOnCreate carries a randomly generated ID, exactly as the skill does; every other field of the book is identical between runs",
-    "Password": "stored as PBKDF2 over a random salt, so the same password hashes to a different string every time; that difference is the point — two accounts sharing a password must not look alike in the files"
+    "Password": "stored as PBKDF2 over a random salt, so the same password hashes to a different string every time; that difference is the point — two accounts sharing a password must not look alike in the files",
+    "EquipmentManager": "the starter outfit EquipStarterOutfit puts on is made by Item.Create, which gives it a random Serial (Item.cs:245); every other field of the worn item is identical between runs"
   }
 }

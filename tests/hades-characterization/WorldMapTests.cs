@@ -16,6 +16,7 @@ public sealed class WorldMapTests : IDisposable
 {
     private const int WoodlandGate = 20028;
     private const int SuomiTown = 20355;
+    private const int NoviceVillage = 20373;
 
     private const string Name = "mapwalker";
 
@@ -52,7 +53,7 @@ public sealed class WorldMapTests : IDisposable
         WorldMapInfo field = world.Field!;
 
         Assert.Equal("field001", field.Field);
-        Assert.Equal(2, field.Nodes.Count);
+        Assert.Equal(3, field.Nodes.Count);
 
         // 들어가면 못 나오는 곳은 목록에 두지 않는다 — 드라큐라의성(20399)·크리스마스마을(20711) 에는
         // 밟을 수 있는 워프가 하나도 없어 걸어 나갈 수도 월드맵을 다시 열 수도 없다.
@@ -63,6 +64,14 @@ public sealed class WorldMapTests : IDisposable
         Assert.Equal(SuomiTown, suomi.AreaId);
         Assert.Equal(40, suomi.X);
         Assert.Equal(11, suomi.Y);
+
+        // 새 캐릭터가 시작하는 곳이 지도에 없었다(하데스 1241e297c, NEXT.md: "새 캐릭터 시작 = 노비스마을
+        // 37,29") — 노비스마을 노드를 더했다.
+        WorldMapNode novice = Assert.Single(field.Nodes, node => node.Name == "노비스마을");
+
+        Assert.Equal(NoviceVillage, novice.AreaId);
+        Assert.Equal(34, novice.X);
+        Assert.Equal(34, novice.Y);
 
         await world.ChooseFieldAsync(SuomiTown, _deadline.Token);
 
