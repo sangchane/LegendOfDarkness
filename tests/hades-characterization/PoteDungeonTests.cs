@@ -184,6 +184,24 @@ public sealed class PoteDungeonTests : IDisposable
         Assert.Equal(before, Belongings(world));
         Assert.Equal(1000, world.Vitals?.Gold);
 
+        // 회귀 시험 — debuff_reeping.OnEnded 가 CastDeath() 보다 먼저 유령 깃발을 세우면, CastDeath() 가
+        // 「아직 유령이 아닐 때」만 부르는 AislingToGhostForm()(체력 자연회복 타이머를 끄는 곳)이 불리지
+        // 않아 유령인 채로 체력이 계속 찬다. 뮤레칸이 살리기 전까지(기본 RegenRate 21초를 한 번은 넘겨서)
+        // 체력이 죽었을 때 값에서 오르지 않는지 본다.
+        int deadHealth = world.Vitals?.Health ?? 0;
+        int worstGhostHealth = deadHealth;
+        DateTime regenWatch = DateTime.UtcNow + TimeSpan.FromSeconds(24);
+        while (DateTime.UtcNow < regenWatch)
+        {
+            if (world.Vitals is { } vitals)
+                worstGhostHealth = Math.Max(worstGhostHealth, vitals.Health);
+            await Task.Delay(500, _deadline.Token);
+        }
+
+        Assert.True(worstGhostHealth <= deadHealth,
+            $"유령인 동안 체력이 죽었을 때 값({deadHealth})을 넘어 {worstGhostHealth} 로 올랐습니다 — " +
+            $"CastDeath() 가 AislingToGhostForm() 을 부르지 못해 자연회복 타이머가 안 꺼진 것입니다.");
+
         Creature murekan = null!;
         await Waiting.Until(() => (murekan = world.Creatures.FirstOrDefault(c => c.Where == new Tile(12, 5))!) is not null,
             "뮤레칸의방 12,5 에 뮤레칸이 없습니다.", _deadline.Token);
