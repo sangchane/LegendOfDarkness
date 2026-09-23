@@ -6,8 +6,8 @@
 뽑으므로, 여기서는 **서버가 실제로 보낼 수 있는 번호를 다 모은다**:
 
 - 5.99 스크립트(기술·마법·괴물 마법)의 `effect @대상, 쓴쪽그림, 대상그림` · 파티 그림(`group_hill` 등)
-- 하데스 기술·마법 템플릿의 `TargetAnimation`·`Animation`
-- 하데스 코드에 박힌 `SendAnimation(번호, …)` (디버프가 거는 그림 등)
+- 하데스 기술·마법 템플릿의 `TargetAnimation`·`Animation`·`MissAnimation`
+- 하데스 코드에 박힌 `SendAnimation(번호, …)` (디버프가 거는 그림 등) · 헛친 기술의 `SkillMiss` 상수
 
 소리는 165개 다 해도 2MB 남짓이라 전부 넣는다.
 
@@ -72,11 +72,15 @@ def effect_numbers():
             template = json.loads(path.read_text(encoding="utf-8-sig"))
         except ValueError:
             continue
-        for key in ("TargetAnimation", "Animation"):
+        for key in ("TargetAnimation", "Animation", "MissAnimation"):
             if isinstance(template.get(key), int):
                 found.add(template[key])
     for path in list((HADES / "database" / "server" / "scripts").rglob("*.cs")) + list((HADES / "src").rglob("*.cs")):
-        found.update(int(n) for n in re.findall(r"SendAnimation\((\d+)", path.read_text(encoding="utf-8", errors="replace")))
+        text = path.read_text(encoding="utf-8", errors="replace")
+        # 16진수로 적힌 것도 있다(beag ioc fein 의 `SendAnimation(0x04, …)`).
+        found.update(int(n, 0) for n in re.findall(r"SendAnimation\((0x[0-9A-Fa-f]+|\d+)", text))
+        # 헛친 기술의 「Miss」 그림은 코드의 상수다(`MonkStrike.SkillMiss`).
+        found.update(int(n) for n in re.findall(r"const ushort \w*Miss\w* = (\d+)", text))
     return sorted(n for n in found if 0 < n < 1000)
 
 

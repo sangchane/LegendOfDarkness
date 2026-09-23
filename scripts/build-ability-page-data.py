@@ -79,7 +79,8 @@ def scripted():
 # 서버가 클라이언트에 연출을 보내는 길. 이펙트는 0x29, 소리는 0x13/0x19, 몸동작은 0x1A 다
 # (docs/martial-artist-skill-presentation.md 1절). 5.99 팩 스크립트는 `Pack599.Call` 을 거친다.
 PACK_CALL = re.compile(r'Call\("(effect|game_sound|motion)"\s*,(.*?)\);', re.S)
-SEND_ANIMATION = re.compile(r'SendAnimation\((\d+)')
+#: 16진수로 적힌 것도 있다(beag ioc fein 의 `SendAnimation(0x04, …)`).
+SEND_ANIMATION = re.compile(r'SendAnimation\((0x[0-9A-Fa-f]+|\d+)')
 FORMAT_19 = re.compile(r'ServerFormat19\s*\{\s*Number\s*=\s*\(?[a-z]*\)?\s*(\d+)')
 FORMAT_1A = re.compile(r'ServerFormat1A\s*\{[^}]*?Number\s*=\s*(?:\(byte\)\s*)?(0x[0-9A-Fa-f]+|\d+)', re.S)
 #: 무도가 기술은 도우미를 거쳐 나간다 — 16진수로 적힌 인자가 몸동작 번호다(`MonkStrike.Afflict(…, 0x84)`).
@@ -144,7 +145,7 @@ def sent_by(bodies, template):
             elif command == "motion" and args:
                 add("몸동작", literal(args[0]))
         for number in SEND_ANIMATION.findall(body):
-            add("이펙트", int(number))
+            add("이펙트", int(number, 0))
         for number in FORMAT_19.findall(body):
             add("소리", int(number))
         for number in FORMAT_1A.findall(body):

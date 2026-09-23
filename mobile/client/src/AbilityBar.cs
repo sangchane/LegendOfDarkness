@@ -167,9 +167,16 @@ public sealed partial class AbilityBar : Control
         }
     }
 
-    /// <summary>Presses one slot from outside — for a run with nobody watching (<c>--skill</c>).</summary>
-    public void Press(int index)
+    /// <summary>Presses one slot from outside — for a run with nobody watching (<c>--skill 1</c>, <c>--skill m1</c> for a spell).</summary>
+    public void Press(int index, bool spell = false)
     {
+        if (_spells != spell)
+        {
+            _spells = spell;
+            _page = 0;
+            Redraw();
+        }
+
         if (index >= 0 && index < _slots.Length && !_slots[index].Disabled)
         {
             Use(index);

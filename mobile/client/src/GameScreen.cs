@@ -692,7 +692,10 @@ public partial class GameScreen : Control
     /// <summary>Presses one fan slot every so often, so a run with nobody watching shows what a technique draws.</summary>
     private void RehearseASkill(double delta)
     {
-        if (Main.Ability.Length == 0 || !int.TryParse(Main.Ability, out int slot))
+        // "m3" 은 마법 쪽 세 번째 칸이다.
+        bool spell = Main.Ability.StartsWith('m');
+
+        if (Main.Ability.Length == 0 || !int.TryParse(spell ? Main.Ability[1..] : Main.Ability, out int slot))
         {
             return;
         }
@@ -705,7 +708,7 @@ public partial class GameScreen : Control
         }
 
         _skillWait = 0;
-        _abilities.Press(slot - 1);
+        _abilities.Press(slot - 1, spell);
     }
 
     // --hold 로 누르고 있는 시간. 음수면 아직 안 눌렀다.

@@ -95,9 +95,6 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private readonly Dictionary<uint, NpcMark> _signs = [];
     private readonly List<AudioStreamPlayer> _voices = [];
 
-    /// <summary>How high above the feet a flash on somebody bursts.</summary>
-    private const float BodyMiddle = 36;
-
     // Whoever is picked out, and the mark that says so. Zero is nobody.
     private readonly TargetMark _mark = new() { Name = "Target", Visible = false };
     private uint _target;
@@ -1111,8 +1108,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
-        // 발밑이 아니라 몸 한가운데쯤에 터진다.
-        flash.Position = feet + new Vector2(0, -BodyMiddle);
+        // 그림이 제 기준점을 지니므로 발밑(칸)에 놓는다 — 몸 가운데·머리 위는 그림이 정한다.
+        flash.Position = feet;
         _camera.AddChild(flash);
     }
 
