@@ -59,10 +59,10 @@ public sealed class NoviceHuntingGroundTests : IDisposable
 
     /// <summary>
     /// 5.99 `Novice_Warp.txt` 의 레벨 범위. 평원 → 지하던전은 5~22 라 레벨 1 은 못 내려가고, 마을 → 평원은 1~22 라 23 은 못 나간다.
-    /// 문구는 5.99 서버(Novaonline.exe) 그대로다.
+    /// 문구는 5.99 서버(Novaonline.exe) 그대로이고, 낮을 때는 입장 레벨을 뒤에 붙인다.
     /// </summary>
     [Theory]
-    [InlineData(20393, 34, 9, 1, "아직 들어가기엔 레벨이 낮습니다.", "노비스평원A → 지하던전A1 (5~22)")]
+    [InlineData(20393, 34, 9, 1, "아직 들어가기엔 레벨이 낮습니다. (입장 레벨 5)", "노비스평원A → 지하던전A1 (5~22)")]
     [InlineData(20373, 67, 28, 23, "이곳에 들어가기엔 늙었습니다.", "노비스마을 → 평원A (1~22)")]
     public async Task A_warp_outside_its_level_range_keeps_you_where_you_are(int map, int x, int y, int level, string refusal, string what)
     {

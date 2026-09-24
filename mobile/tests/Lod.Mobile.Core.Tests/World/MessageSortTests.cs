@@ -71,6 +71,8 @@ public sealed class MessageSortTests
     [InlineData("공격할 수 없습니다.")] // CantAttack
     [InlineData("죽음의 그림자가 드리웁니다.")] // ReapMessageDuringAction — 혼수 중에 무엇을 하려 할 때마다; 배너가 아니다
     [InlineData("길이 막혀 가까운 곳으로 옮겼습니다.")] // GameClient.cs:686
+    [InlineData("아직 들어가기엔 레벨이 낮습니다. (입장 레벨 5)")] // GameClient.WarpTo — 거절과 입장 레벨은 보여야 한다
+    [InlineData("이곳에 들어가기엔 늙었습니다.")] // GameClient.WarpTo
     [InlineData("nov님이 wren님에게 죽었습니다.")] // GameClient.cs:1160
     [InlineData("wren님이 beag srad(으)로 공격합니다.")] // scripts "Attacks you with"
     public void Anything_else_is_the_ticker(string text)
