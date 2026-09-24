@@ -152,18 +152,34 @@ public sealed class BodyMotionTests
 
     /// <summary>
     /// The server's speed for a blow is 30 (Hades Assail), which we already drew at about 0.14 seconds a
-    /// drawing. Read as the whole motion in hundredths of a second, split over its drawings, it lands there.
+    /// drawing. Read as the whole motion in hundredths of a second, split over its drawings, it lands there —
+    /// then <see cref="BodyMotion" />'s 30% slowdown holds it 1/0.7 longer still (2026-09-24, 사용자: 기술이
+    /// 너무 빨라 안 보인다).
     /// </summary>
     [Fact]
     public void Speed_is_the_whole_motion_in_hundredths_split_over_its_drawings()
     {
-        Assert.Equal(0.15, BodyMotion.Of(1)!.SecondsPerFrame(30), 3);
-        Assert.Equal(0.125, BodyMotion.Of(133)!.SecondsPerFrame(50), 3);
+        Assert.Equal(0.15 / 0.7, BodyMotion.Of(1)!.SecondsPerFrame(30), 3);
+        Assert.Equal(0.125 / 0.7, BodyMotion.Of(133)!.SecondsPerFrame(50), 3);
     }
 
     [Fact]
     public void No_speed_still_plays_at_the_pace_of_a_blow()
     {
-        Assert.Equal(0.14, BodyMotion.Of(131)!.SecondsPerFrame(0), 3);
+        Assert.Equal(0.14 / 0.7, BodyMotion.Of(131)!.SecondsPerFrame(0), 3);
+    }
+
+    /// <summary>
+    /// The 30% slowdown is one multiplier applied to every motion alike, so a kick stays exactly as much
+    /// slower than a blow as it always was — only how long each drawing is held changes, not the shape of
+    /// the motion (2026-09-24).
+    /// </summary>
+    [Fact]
+    public void The_slowdown_keeps_every_motion_s_speed_relative_to_the_others()
+    {
+        double blow = BodyMotion.Of(1)!.SecondsPerFrame(30);
+        double kick = BodyMotion.Of(133)!.SecondsPerFrame(50);
+
+        Assert.Equal(0.15 / 0.125, blow / kick, 5);
     }
 }

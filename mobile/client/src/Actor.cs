@@ -70,11 +70,8 @@ public sealed partial class Actor : Node2D
 
     // The motion under way, how long each drawing is held, and which pieces have no drawing for it.
     private BodyMotion _playing = BodyMotion.Blow;
-    private double _perFrame = SecondsPerStrikeFrame;
+    private double _perFrame = BodyMotion.Blow.SecondsPerFrame(0);
     private readonly List<bool> _still = [];
-
-    /// <summary>How long one drawing of a swing is held. Two of them make a blow.</summary>
-    private const double SecondsPerStrikeFrame = 0.14;
 
     // The emote over the head, how long it has been up (below zero when none) and the sprite it is drawn on.
     private const string EmoteSheet = "res://assets/actor/emote.png";
@@ -311,7 +308,7 @@ public sealed partial class Actor : Node2D
     /// Swings once. Nothing follows from it here — whether it hit is the server's to say — and a swing
     /// already under way is left to finish rather than restarted.
     /// </summary>
-    public void Strike() => Play(BodyMotion.Blow, SecondsPerStrikeFrame);
+    public void Strike() => Play(BodyMotion.Blow, BodyMotion.Blow.SecondsPerFrame(0));
 
     /// <summary>
     /// Plays a body motion the server named, towards the way the figure already faces — a spell does not turn

@@ -30,8 +30,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private const string CreatureFolder = "res://assets/actor/creature/";
     private const int CreatureNumbering = 0x4000;
 
-    /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in.</summary>
-    private const double StepSeconds = 0.28;
+    /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in — 30% slower than the
+    /// original 0.28 so the walk can actually be seen on a phone (사용자, 2026-09-24).</summary>
+    private const double StepSeconds = 0.4;
 
     // Y sorting is what makes someone standing in front actually draw in front, which an isometric floor
     // needs: screen height is depth here.
@@ -714,7 +715,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     {
         // Not the moment somebody appears: the view is still sliding to where the server put us, and a tap
         // aimed before it settles lands on empty floor.
-        // 리허설은 1초에 한 번씩 휘두른다. 한 번만 휘두르면 0.28초짜리 동작을 사진으로 잡기가 어렵다.
+        // 리허설은 1초에 한 번씩 휘두른다. 한 번만 휘두르면 0.4초짜리 동작을 사진으로 잡기가 어렵다.
         // 화면의 버튼은 여전히 한 번 누르면 한 번이다(시안 AC-009).
         if (_rehearsedStrike >= 0 && _rehearsedStrike++ % 60 == 30)
         {

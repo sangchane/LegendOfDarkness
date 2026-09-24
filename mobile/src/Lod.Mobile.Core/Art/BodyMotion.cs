@@ -15,8 +15,16 @@ namespace Lod.Mobile.Core.Art;
 /// <param name="Faster">How many times shorter each drawing is held than the speed says — the wave is 3.</param>
 public sealed record BodyMotion(string File, int Start, int Count, int Faster = 1)
 {
-    /// <summary>How long one drawing is held when the server gives no speed — the pace a blow was always drawn at.</summary>
+    /// <summary>How long one drawing is held when the server gives no speed — the pace a blow was always drawn at,
+    /// before <see cref="Slowdown" /> is applied.</summary>
     public const double DefaultSecondsPerFrame = 0.14;
+
+    /// <summary>
+    /// How much longer every drawing of a skill, spell, plain blow or class motion is now held — 30% slower,
+    /// each drawing held 1/0.7 ≈ 1.43× longer, so the motion can actually be seen on a phone (사용자, 2026-09-24).
+    /// Applied once, here, so every motion keeps its speed relative to the others.
+    /// </summary>
+    private const double Slowdown = 0.7;
 
     public static readonly BodyMotion Blow = new("02", 0, 2);
 
@@ -111,8 +119,9 @@ public sealed record BodyMotion(string File, int Start, int Count, int Faster = 
     /// <summary>
     /// How long each drawing is held. The speed is read as the whole motion in hundredths of a second — no file
     /// says so, but it puts Hades' blow (30) at the pace it was already drawn at, and a longer skill at a
-    /// slower one. No speed at all falls back to that pace.
+    /// slower one. No speed at all falls back to that pace. <see cref="Slowdown" /> then holds every drawing
+    /// 30% longer, whatever the speed.
     /// </summary>
     public double SecondsPerFrame(int speed) =>
-        (speed > 0 ? speed / 100.0 / Count : DefaultSecondsPerFrame) / Faster;
+        (speed > 0 ? speed / 100.0 / Count : DefaultSecondsPerFrame) / Faster / Slowdown;
 }
