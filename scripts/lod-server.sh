@@ -53,7 +53,14 @@ verify_config() {
 }
 
 pid() {
-    pgrep -f 'Lorule.GameServer.dll' || true
+    # 시험이 띄우는 격리 서버(임시 폴더에서 도는 같은 이름의 프로세스)는 세지 않는다 — Staging 에서 도는 것만.
+    # 그것까지 세면 실제 서버가 꺼져 있어도 "이미 켜져 있습니다" 라고 하고 켜지 않았다(2026-09-24).
+    local p
+    for p in $(pgrep -f 'Lorule.GameServer.dll' || true); do
+        if lsof -p "$p" 2>/dev/null | awk '$4=="cwd"{print $NF}' | grep -qF "$STAGING"; then
+            echo "$p"
+        fi
+    done
 }
 
 # 자동 실행을 등록해 두었으면 맥이 서버를 직접 돌본다(꺼지면 바로 다시 켠다). 그때는 그쪽에 맡긴다 —
