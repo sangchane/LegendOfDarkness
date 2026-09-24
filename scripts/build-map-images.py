@@ -102,26 +102,27 @@ def render_map_without_dotnet(archive, map_path, columns, rows, output):
     tiles = [tile_data[i:i + 1512] for i in range(0, len(tile_data), 1512)]
     palette_names = sorted(name for name in entries if name.lower().startswith("mpt") and name.lower().endswith(".pal"))
     palettes = [entries[name] for name in palette_names]
-    tables = []
-    for name, data in entries.items():
-        stem = Path(name).stem
-        if not (name.lower().startswith("mpt") and name.lower().endswith(".tbl")):
+    # mptpal.tbl 만 본다 — tools/dat-extract/MapObjects.cs PaletteChoice 와 같은 자료(단일 표),
+    # mpt0000.tbl 같은 애니메이션 표는 바닥 팔레트를 고르는 표가 아니다.
+    table_name = next((name for name in entries if name.lower() == "mptpal.tbl"), None)
+    if table_name is None:
+        raise RuntimeError("mptpal.tbl 을 찾지 못했습니다.")
+    singles, ranges = {}, {}
+    for line in entries[table_name].decode("ascii").splitlines():
+        parts = line.split()
+        try:
+            numbers = [int(part) for part in parts]
+        except ValueError:
             continue
-        if stem[3:].isdigit() or "ani" in stem.lower():
-            continue
-        for line in data.decode("ascii").splitlines():
-            parts = line.split()
-            if len(parts) == 3:
-                tables.append(tuple(map(int, parts)))
-            elif len(parts) == 2:
-                minimum, palette = map(int, parts)
-                tables.append((minimum - 1, minimum, palette))
+        if len(numbers) == 2:
+            singles[numbers[0]] = numbers[1]
+        elif len(numbers) == 3:
+            minimum, maximum, palette = numbers
+            for tile_id in range(minimum, maximum + 1):
+                ranges[tile_id] = palette
 
-    def palette_for(index):
-        chosen = 0
-        for minimum, maximum, palette in tables:
-            if minimum <= index <= maximum:
-                chosen = palette
+    def palette_for(tile_id):
+        chosen = singles.get(tile_id, ranges.get(tile_id, 0))
         return palettes[max(0, min(chosen, len(palettes) - 1))]
 
     width = (columns + rows) * HALF_W
@@ -139,7 +140,8 @@ def render_map_without_dotnet(archive, map_path, columns, rows, output):
                 continue
             index = floor - 1
             if index not in tile_cache:
-                palette = palette_for(index)
+                # da-lib Graphics.RenderMap 의 GetPaletteForId(index + 2) 와 같다 — 표의 첫 구간이 2 에서 시작한다.
+                palette = palette_for(index + 2)
                 rgba = bytearray()
                 for code in tiles[index]:
                     if code == 0:
