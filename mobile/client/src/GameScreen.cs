@@ -129,6 +129,12 @@ public partial class GameScreen : Control
     private Control _topRow = null!;
     private Control _controlRow = null!;
     private Button _logout = null!;
+
+    // [종료] 가 여는 작은 판 — 로그아웃 · 게임 종료 · 취소.
+    private readonly ExitChoice _exit = new();
+
+    // --exit-menu 로 [종료] 를 누르기까지 센 프레임.
+    private int _exitSettling;
     private bool _leaving;
 
     private readonly WorldClient? _server;
@@ -247,6 +253,19 @@ public partial class GameScreen : Control
         rows.AddChild(_controlRow);
 
         Cover(hud);
+
+        // 맨 위에 둔다 — 판 밖 어디를 눌러도 닫히도록 화면 전체를 받는다.
+        _exit.LogOut.Pressed += () =>
+        {
+            _exit.Shut();
+            LogOut();
+        };
+        _exit.Quit.Pressed += () =>
+        {
+            _exit.Shut();
+            QuitGame();
+        };
+        AddChild(_exit);
     }
 
     /// <summary>
@@ -534,12 +553,22 @@ public partial class GameScreen : Control
 
         _logout = new Button
         {
-            Text = "로그아웃",
+            Text = "종료",
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
         };
 
         Greybox.Plain(_logout);
-        _logout.Pressed += LogOut;
+        _logout.Pressed += () =>
+        {
+            if (_exit.Visible)
+            {
+                _exit.Shut();
+            }
+            else
+            {
+                _exit.Open(_logout.GetGlobalRect(), centred: !Main.Portrait);
+            }
+        };
 
 
         Button settings = new()
@@ -676,6 +705,23 @@ public partial class GameScreen : Control
         LoggedOut?.Invoke();
     }
 
+    /// <summary>
+    /// Closes the network and then the app. iOS does not let an app close itself (<see cref="ExitChoice" />), so
+    /// there it logs out instead.
+    /// </summary>
+    private void QuitGame()
+    {
+        if (!ExitChoice.CanQuit)
+        {
+            LogOut();
+            return;
+        }
+
+        _world.Frozen = true;
+        _server?.Dispose();
+        GetTree().Quit();
+    }
+
     public override void _ExitTree() => _server?.Dispose();
 
     /// <summary>
@@ -780,6 +826,12 @@ public partial class GameScreen : Control
         KeepGuiding(delta);
         RehearseAHold(delta);
         RehearseASkill(delta);
+
+        // 손 없이 확인할 때만 — [종료] 를 실제로 눌러(EmitSignal) 고르는 판을 띄운다.
+        if (Main.OpeningExit && _exitSettling++ == 90)
+        {
+            _logout.EmitSignal(BaseButton.SignalName.Pressed);
+        }
 
         // 레이아웃 검사는 세 프레임 만에 재고 끝난다. 90 프레임을 기다리면 닫힌 화면을 재게 되고,
         // 실제로 그래서 장비 칸이 넘쳤는데도 0 오류였다 — 검사 중에는 바로 연다.

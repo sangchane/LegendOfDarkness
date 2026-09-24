@@ -233,6 +233,9 @@ public partial class Main : Control
     /// <summary>Whether to open the settings window on its own, as <c>--settings</c>. Same purpose as --pack.</summary>
     public static bool OpeningSettings { get; private set; }
 
+    /// <summary><c>--exit-menu</c>: presses the top row's [종료] once the screen settles, to photograph the choice.</summary>
+    public static bool OpeningExit { get; private set; }
+
     /// <summary>Whether to hold the health-potion button on its own, as <c>--pick-potion</c>, to see the row it opens.</summary>
     public static bool PickingPotion { get; private set; }
 
@@ -336,6 +339,7 @@ public partial class Main : Control
         Overhead = Flag("--overhead");
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
+        OpeningExit = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--exit-menu") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         MapGo = Flag("--map-go");
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0 || MapGo.Length > 0;
