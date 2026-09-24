@@ -1,0 +1,279 @@
+# lod20308 — tools/dat-extract layout 이 만든다. 손으로 고치지 말 것.
+size 15 15
+blocked
+###############
+##.###.######..
+##.............
+##.######.###..
+#..######.####.
+##.######.#####
+#..............
+#..............
+###############
+#..............
+#..............
+#..............
+#..............
+#..............
+#..............
+floor
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478 1478
+1478 1478 1478 1478 1478 1478 3076 3076 3076 1478 1478 1478 1478 1478 1478
+tile 1478 0 0
+tile 3076 56 0
+picture 99 140 222 54 0
+picture 100 140 276 54 0
+picture 101 140 330 54 0
+picture 102 140 384 54 0
+picture 103 140 438 54 0
+picture 104 140 492 54 0
+picture 265 140 546 53 0
+picture 266 140 756 51 0
+picture 313 84 650 77 0
+picture 314 84 803 75 0
+picture 315 84 194 92 0
+picture 316 84 286 92 0
+picture 319 28 111 97 0
+picture 320 28 208 97 0
+picture 323 112 421 66 0
+picture 324 112 619 65 0
+picture 716 112 933 56 0
+picture 717 140 0 56 0
+picture 727 168 703 41 0
+picture 728 140 56 56 0
+picture 731 168 744 40 0
+picture 732 112 749 62 0
+picture 741 28 305 97 0
+picture 742 28 402 97 0
+picture 934 28 499 97 0
+picture 935 0 0 111 0
+picture 936 28 596 97 0
+picture 937 28 693 97 0
+picture 938 0 111 111 0
+picture 939 28 790 97 0
+picture 946 28 887 97 0
+picture 947 0 222 111 0
+picture 948 56 0 97 0
+picture 949 56 97 97 0
+picture 950 0 333 111 0
+picture 952 56 194 97 0
+picture 953 0 444 111 0
+picture 954 56 291 97 0
+picture 955 56 388 97 0
+picture 956 0 555 111 0
+picture 957 56 485 97 0
+picture 958 56 582 97 0
+picture 959 0 666 111 0
+picture 960 56 679 97 0
+picture 967 56 776 97 0
+picture 968 0 777 111 0
+picture 969 56 873 97 0
+picture 1156 168 98 47 0
+picture 1157 112 811 61 0
+picture 1158 168 427 46 0
+picture 1159 168 145 47 0
+picture 1160 112 73 70 0
+picture 1161 168 192 47 0
+picture 1162 168 0 49 0
+picture 1163 112 684 65 0
+picture 1164 168 239 47 0
+picture 1168 168 286 47 0
+picture 1169 112 143 70 0
+picture 1170 168 333 47 0
+picture 1171 168 473 46 0
+picture 1172 112 872 61 0
+picture 1173 168 380 47 0
+picture 1174 140 807 51 0
+picture 1175 112 487 66 0
+picture 1176 140 652 52 0
+picture 1177 140 599 53 0
+picture 1178 112 353 68 0
+picture 1179 168 49 49 0
+picture 1180 140 112 55 0
+picture 1181 112 213 70 0
+picture 1182 140 909 50 0
+picture 1183 140 959 50 0
+picture 1184 112 283 70 0
+picture 1185 140 167 55 0
+picture 1189 140 704 52 0
+picture 1190 112 553 66 0
+picture 1191 140 858 51 0
+picture 1273 168 784 37 0
+picture 1274 84 878 75 0
+picture 1275 84 727 76 0
+picture 2379 84 0 97 0
+picture 2380 0 888 111 0
+picture 2381 28 0 111 0
+picture 2382 84 97 97 0
+picture 3260 84 378 92 0
+picture 3974 84 470 90 0
+picture 3979 84 560 90 0
+picture 3980 112 0 73 0
+picture 4043 168 893 32 0
+picture 4044 168 519 46 0
+picture 4045 168 821 36 0
+picture 4046 168 565 46 0
+picture 4047 168 857 36 0
+picture 4048 168 611 46 0
+picture 4049 168 925 32 0
+picture 4050 168 657 46 0
+object 0 0 left 741
+object 0 0 right 742
+object 1 0 left 934
+object 2 0 left 935
+object 2 0 right 936
+object 3 0 left 937
+object 3 0 right 936
+object 4 0 left 938
+object 4 0 right 939
+object 5 0 left 935
+object 5 0 right 936
+object 6 0 left 935
+object 6 0 right 936
+object 7 0 left 934
+object 8 0 left 935
+object 8 0 right 936
+object 9 0 left 937
+object 10 0 left 938
+object 10 0 right 939
+object 11 0 left 934
+object 12 0 left 935
+object 12 0 right 936
+object 13 0 left 946
+object 14 0 left 947
+object 14 0 right 948
+object 0 1 right 954
+object 1 1 left 319
+object 1 1 right 320
+object 3 1 left 323
+object 3 1 right 324
+object 4 1 left 731
+object 4 1 right 732
+object 5 1 left 731
+object 5 1 right 732
+object 6 1 left 3974
+object 7 1 left 1273
+object 8 1 left 1274
+object 8 1 right 1275
+object 9 1 left 265
+object 9 1 right 266
+object 10 1 left 2379
+object 11 1 left 2380
+object 12 1 left 2381
+object 12 1 right 2382
+object 13 1 right 3260
+object 0 2 left 952
+object 0 2 right 953
+object 1 2 left 315
+object 1 2 right 316
+object 0 3 left 952
+object 0 3 right 957
+object 1 3 left 313
+object 1 3 right 314
+object 3 3 left 1159
+object 4 3 left 1160
+object 4 3 right 1161
+object 5 3 right 4045
+object 6 3 left 1177
+object 7 3 left 1178
+object 7 3 right 1179
+object 8 3 right 4045
+object 10 3 left 4047
+object 11 3 left 4050
+object 12 3 left 4048
+object 12 3 right 4049
+object 0 4 left 955
+object 0 4 right 960
+object 1 4 left 3979
+object 1 4 right 3980
+object 3 4 left 1156
+object 4 4 left 1157
+object 4 4 right 1158
+object 5 4 right 4046
+object 6 4 left 1174
+object 7 4 left 1175
+object 7 4 right 1176
+object 8 4 right 4046
+object 10 4 right 1170
+object 11 4 right 1191
+object 12 4 right 1173
+object 13 4 right 1185
+object 0 5 left 958
+object 0 5 right 959
+object 1 5 left 716
+object 1 5 right 717
+object 3 5 left 1162
+object 4 5 left 1163
+object 4 5 right 1164
+object 5 5 left 4043
+object 5 5 right 4044
+object 6 5 left 1180
+object 7 5 left 1181
+object 7 5 right 1182
+object 8 5 left 4043
+object 8 5 right 4044
+object 10 5 left 1168
+object 10 5 right 1169
+object 11 5 left 1189
+object 11 5 right 1190
+object 12 5 left 1171
+object 12 5 right 1172
+object 13 5 left 1183
+object 13 5 right 1184
+object 14 5 left 727
+object 14 5 right 728
+object 0 6 right 954
+object 0 7 left 952
+object 0 7 right 953
+object 0 8 right 957
+object 1 8 left 99
+object 1 8 right 100
+object 2 8 left 101
+object 2 8 right 102
+object 3 8 left 101
+object 3 8 right 102
+object 4 8 left 101
+object 4 8 right 102
+object 5 8 left 101
+object 5 8 right 102
+object 6 8 left 101
+object 6 8 right 102
+object 7 8 left 101
+object 7 8 right 102
+object 8 8 left 101
+object 8 8 right 102
+object 9 8 left 101
+object 9 8 right 102
+object 10 8 left 101
+object 10 8 right 102
+object 11 8 left 101
+object 11 8 right 102
+object 12 8 left 101
+object 12 8 right 102
+object 13 8 left 101
+object 13 8 right 102
+object 14 8 left 103
+object 14 8 right 104
+object 0 9 left 955
+object 0 9 right 956
+object 0 10 left 949
+object 0 10 right 950
+object 0 11 right 960
+object 0 12 left 958
+object 0 12 right 959
+object 0 13 right 969
+object 0 14 left 967
+object 0 14 right 968

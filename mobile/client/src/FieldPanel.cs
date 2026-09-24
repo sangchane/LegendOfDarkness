@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using Lod.Mobile.Core.World;
 
@@ -83,4 +84,7 @@ public sealed partial class FieldPanel : PanelContainer
 
         Visible = true;
     }
+
+    /// <summary>그 이름의 줄 — 손 없이 확인할 때(<c>--map-go</c>) 누른다.</summary>
+    public Button? RowNamed(string name) => _places.GetChildren().OfType<Button>().FirstOrDefault(row => row.Text == name);
 }

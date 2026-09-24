@@ -239,6 +239,9 @@ public partial class Main : Control
     /// <summary>Whether to press the "지도" button on its own, as <c>--map</c>. For checking it without a thumb.</summary>
     public static bool OpeningMap { get; private set; }
 
+    /// <summary><c>--map-go 이름</c> — <c>--map</c> 으로 연 월드맵에서 그 이름의 줄을 눌러 그리로 간다(닫기는 누르지 않는다).</summary>
+    public static string MapGo { get; private set; } = string.Empty;
+
     /// <summary>
     /// Whether to press the 「길」 button on its own, as <c>--tabmap</c>; with <c>--tabmap-go 이름</c> it then taps the exit or
     /// NPC of that name on the map, and with <c>--tabmap-close 초</c> it presses 닫기 that long after opening. For checking the
@@ -334,7 +337,8 @@ public partial class Main : Control
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
-        OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0;
+        MapGo = Flag("--map-go");
+        OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0 || MapGo.Length > 0;
         TabMapGo = Flag("--tabmap-go");
         TabMapCloseAfter = double.TryParse(Flag("--tabmap-close"), out double tabMapClose) ? tabMapClose : -1;
         TabMapZoom = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--tabmap-zoom") >= 0;

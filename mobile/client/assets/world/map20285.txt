@@ -1,0 +1,298 @@
+# lod20285 — tools/dat-extract layout 이 만든다. 손으로 고치지 말 것.
+size 18 25
+blocked
+##################
+###..............#
+##...............#
+#......#####......
+#.................
+#.................
+#.................
+#...##.#..###.##..
+##................
+##..##.....##.##..
+##................
+##..##.#..###.##..
+##................
+##..##.....##.##..
+##................
+##..##.#..###.##..
+##................
+#...##.....##.##..
+#.................
+#...##.#..###.##..
+#.................
+#...##.....##.##..
+#.................
+#.................
+#.....##.##.......
+floor
+258 259 258 259 258 259 258 259 258 259 258 259 258 259 258 259 258 259
+260 261 260 261 260 261 260 261 260 261 260 261 260 261 260 261 260 261
+262 263 262 263 262 263 262 263 262 263 262 263 262 263 262 263 262 263
+264 265 264 265 264 265 264 265 264 265 264 265 264 265 264 265 264 265
+266 267 266 267 266 267 266 267 1062 1063 266 267 266 267 266 267 266 267
+268 269 268 269 268 269 268 269 1060 1061 268 269 268 269 268 269 268 269
+258 259 258 259 258 259 258 259 1062 1063 258 259 258 259 258 259 258 259
+260 261 260 261 260 261 260 261 1060 1061 260 261 260 261 260 261 260 261
+262 263 262 263 262 263 262 263 1060 1061 262 263 262 263 262 263 262 263
+264 265 264 265 264 265 264 265 1062 1063 264 265 264 265 264 265 264 265
+266 267 266 267 266 267 266 267 1060 1061 266 267 266 267 266 267 266 267
+268 269 268 269 268 269 268 269 1062 1063 268 269 268 269 268 269 268 269
+258 259 258 259 258 259 258 259 1060 1061 258 259 258 259 258 259 258 259
+260 261 260 261 260 261 260 261 1062 1063 260 261 260 261 260 261 260 261
+262 263 262 263 262 263 262 263 1060 1061 262 263 262 263 262 263 262 263
+264 265 264 265 264 265 264 265 1062 1063 264 265 264 265 264 265 264 265
+266 267 266 267 266 267 266 267 1060 1061 266 267 266 267 266 267 266 267
+268 269 268 269 268 269 268 269 1062 1063 268 269 268 269 268 269 268 269
+258 259 258 259 258 259 258 259 1060 1061 258 259 258 259 258 259 258 259
+260 261 260 261 260 261 260 261 1062 1063 260 261 260 261 260 261 260 261
+262 263 262 263 262 263 262 263 1065 1066 262 263 262 263 262 263 262 263
+264 265 264 265 264 265 264 265 1067 1068 264 265 264 265 264 265 264 265
+266 267 266 267 266 267 266 267 266 267 266 267 266 267 266 267 266 267
+268 269 268 269 268 269 268 269 268 269 268 269 268 269 268 269 268 269
+258 259 258 259 258 259 258 259 258 259 258 259 258 259 258 259 258 259
+tile 258 0 0
+tile 259 56 0
+tile 260 112 0
+tile 261 168 0
+tile 262 224 0
+tile 263 0 27
+tile 264 56 27
+tile 265 112 27
+tile 266 168 27
+tile 267 224 27
+tile 268 0 54
+tile 269 56 54
+tile 1060 112 54
+tile 1061 168 54
+tile 1062 224 54
+tile 1063 0 81
+tile 1065 56 81
+tile 1066 112 81
+tile 1067 168 81
+tile 1068 224 81
+picture 3989 0 799 97 0
+picture 3990 28 679 96 0
+picture 3993 56 127 62 0
+picture 3994 56 64 63 0
+picture 4368 0 537 151 0
+picture 4369 0 189 175 0
+picture 4370 0 0 189 0
+picture 4371 0 364 173 0
+picture 4709 0 896 97 0
+picture 4710 28 0 97 0
+picture 4711 28 97 97 0
+picture 4712 28 194 97 0
+picture 4713 28 291 97 0
+picture 4714 28 388 97 0
+picture 4715 28 485 97 0
+picture 4716 0 688 111 0
+picture 4717 28 582 97 0
+picture 4721 28 852 76 0
+picture 4722 28 928 72 0
+picture 4723 28 775 77 0
+picture 4724 56 0 64 0
+picture 6443 56 305 56 0
+picture 6444 56 189 58 0
+picture 6445 56 247 58 0
+object 0 0 left 4713
+object 0 0 right 4714
+object 1 0 left 4709
+object 1 0 right 4710
+object 2 0 left 4709
+object 2 0 right 4710
+object 3 0 left 4709
+object 3 0 right 4710
+object 4 0 left 4709
+object 4 0 right 4710
+object 5 0 left 4709
+object 5 0 right 4710
+object 6 0 left 4709
+object 6 0 right 4710
+object 7 0 left 4709
+object 7 0 right 4710
+object 8 0 left 4709
+object 8 0 right 4710
+object 9 0 left 4709
+object 9 0 right 4710
+object 10 0 left 4709
+object 10 0 right 4710
+object 11 0 left 4709
+object 11 0 right 4710
+object 12 0 left 4709
+object 12 0 right 4710
+object 13 0 left 4709
+object 13 0 right 4710
+object 14 0 left 4709
+object 14 0 right 4710
+object 15 0 left 4709
+object 15 0 right 4710
+object 16 0 left 4709
+object 16 0 right 4710
+object 17 0 left 4709
+object 17 0 right 4710
+object 0 1 right 4717
+object 1 1 left 3989
+object 1 1 right 3990
+object 2 1 left 3989
+object 2 1 right 3990
+object 17 1 left 3989
+object 17 1 right 3990
+object 0 2 left 4715
+object 0 2 right 4716
+object 1 2 left 3989
+object 1 2 right 3990
+object 17 2 left 3989
+object 17 2 right 3990
+object 0 3 right 4717
+object 7 3 left 3993
+object 7 3 right 3994
+object 8 3 left 4721
+object 9 3 left 4722
+object 10 3 left 4723
+object 10 3 right 4724
+object 11 3 left 3993
+object 11 3 right 3994
+object 0 4 left 4715
+object 0 4 right 4716
+object 0 5 right 4717
+object 0 6 left 4715
+object 0 6 right 4716
+object 0 7 right 4717
+object 4 7 left 6443
+object 5 7 left 6444
+object 6 7 left 6445
+object 7 7 left 3993
+object 7 7 right 3994
+object 10 7 left 3993
+object 10 7 right 3994
+object 11 7 left 6443
+object 12 7 left 6444
+object 13 7 left 6445
+object 14 7 left 6443
+object 15 7 left 6444
+object 16 7 left 6445
+object 0 8 left 4715
+object 0 8 right 4716
+object 1 8 right 4717
+object 0 9 right 4717
+object 1 9 left 4715
+object 1 9 right 4716
+object 4 9 left 6443
+object 5 9 left 6444
+object 6 9 left 6445
+object 11 9 left 6443
+object 12 9 left 6444
+object 13 9 left 6445
+object 14 9 left 6443
+object 15 9 left 6444
+object 16 9 left 6445
+object 0 10 left 4715
+object 0 10 right 4716
+object 1 10 right 4717
+object 0 11 right 4717
+object 1 11 left 4715
+object 1 11 right 4716
+object 4 11 left 6443
+object 5 11 left 6444
+object 6 11 left 6445
+object 7 11 left 3993
+object 7 11 right 3994
+object 10 11 left 3993
+object 10 11 right 3994
+object 11 11 left 6443
+object 12 11 left 6444
+object 13 11 left 6445
+object 14 11 left 6443
+object 15 11 left 6444
+object 16 11 left 6445
+object 0 12 left 4715
+object 0 12 right 4716
+object 1 12 right 4717
+object 0 13 right 4717
+object 1 13 left 4715
+object 1 13 right 4716
+object 4 13 left 6443
+object 5 13 left 6444
+object 6 13 left 6445
+object 11 13 left 6443
+object 12 13 left 6444
+object 13 13 left 6445
+object 14 13 left 6443
+object 15 13 left 6444
+object 16 13 left 6445
+object 0 14 left 4715
+object 0 14 right 4716
+object 1 14 right 4717
+object 0 15 right 4717
+object 1 15 left 4715
+object 1 15 right 4716
+object 4 15 left 6443
+object 5 15 left 6444
+object 6 15 left 6445
+object 7 15 left 3993
+object 7 15 right 3994
+object 10 15 left 3993
+object 10 15 right 3994
+object 11 15 left 6443
+object 12 15 left 6444
+object 13 15 left 6445
+object 14 15 left 6443
+object 15 15 left 6444
+object 16 15 left 6445
+object 0 16 left 4715
+object 0 16 right 4716
+object 1 16 left 4711
+object 1 16 right 4712
+object 0 17 right 4717
+object 4 17 left 6443
+object 5 17 left 6444
+object 6 17 left 6445
+object 11 17 left 6443
+object 12 17 left 6444
+object 13 17 left 6445
+object 14 17 left 6443
+object 15 17 left 6444
+object 16 17 left 6445
+object 0 18 left 4715
+object 0 18 right 4716
+object 0 19 right 4717
+object 4 19 left 6443
+object 5 19 left 6444
+object 6 19 left 6445
+object 7 19 left 3993
+object 7 19 right 3994
+object 10 19 left 3993
+object 10 19 right 3994
+object 11 19 left 6443
+object 12 19 left 6444
+object 13 19 left 6445
+object 14 19 left 6443
+object 15 19 left 6444
+object 16 19 left 6445
+object 0 20 left 4715
+object 0 20 right 4716
+object 0 21 right 4717
+object 4 21 left 6443
+object 5 21 left 6444
+object 6 21 left 6445
+object 11 21 left 6443
+object 12 21 left 6444
+object 13 21 left 6445
+object 14 21 left 6443
+object 15 21 left 6444
+object 16 21 left 6445
+object 0 22 left 4715
+object 0 22 right 4716
+object 0 23 right 4717
+object 0 24 left 4715
+object 0 24 right 4716
+object 6 24 left 3993
+object 6 24 right 3994
+object 7 24 left 4368
+object 8 24 left 4369
+object 9 24 left 4370
+object 9 24 right 4371
+object 10 24 left 3993
+object 10 24 right 3994

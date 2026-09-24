@@ -802,7 +802,15 @@ public partial class GameScreen : Control
 
             if (_field.Visible && (_mapOpenSeconds += delta) >= MapCloseAfterSeconds)
             {
-                _field.Close.EmitSignal(BaseButton.SignalName.Pressed);
+                // --map-go 는 닫지 않고 그 줄을 눌러 그리로 간다.
+                if (Main.MapGo.Length > 0)
+                {
+                    _field.RowNamed(Main.MapGo)?.EmitSignal(BaseButton.SignalName.Pressed);
+                }
+                else
+                {
+                    _field.Close.EmitSignal(BaseButton.SignalName.Pressed);
+                }
             }
         }
 

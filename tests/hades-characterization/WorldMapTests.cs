@@ -20,6 +20,18 @@ public sealed class WorldMapTests : IDisposable
 
     private const string Name = "mapwalker";
 
+    /// <summary>
+    /// 2026-09-24 다시 연 마을 — 2026-09-19 에 뺀 줄(하데스 dfe5acfe2)을 그대로 되돌렸다. 노드 자리는 원작
+    /// Legend.dat field001.txt(아벨 324,269 · 밀레스 389,190 · 마인 137,113), 내려놓는 칸은 5.99 팩.
+    /// 뤼케시온·로톤은 아직 안 연다 — 건물·상점이 없다(NEXT.md).
+    /// </summary>
+    internal static readonly (string Name, int AreaId, Tile Arrival)[] Reopened =
+    {
+        ("아벨", 20030, new Tile(58, 22)),
+        ("밀레스", 20287, new Tile(50, 50)),
+        ("마인", 20304, new Tile(89, 32)),
+    };
+
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(5));
 
     public void Dispose() => _deadline.Dispose();
@@ -53,7 +65,7 @@ public sealed class WorldMapTests : IDisposable
         WorldMapInfo field = world.Field!;
 
         Assert.Equal("field001", field.Field);
-        Assert.Equal(3, field.Nodes.Count);
+        Assert.Equal(3 + Reopened.Length, field.Nodes.Count);
 
         // 들어가면 못 나오는 곳은 목록에 두지 않는다 — 드라큐라의성(20399)·크리스마스마을(20711) 에는
         // 밟을 수 있는 워프가 하나도 없어 걸어 나갈 수도 월드맵을 다시 열 수도 없다.
@@ -73,6 +85,14 @@ public sealed class WorldMapTests : IDisposable
         Assert.Equal(34, novice.X);
         Assert.Equal(34, novice.Y);
 
+        foreach ((string name, int areaId, Tile arrival) in Reopened)
+        {
+            WorldMapNode town = Assert.Single(field.Nodes, node => node.Name == name);
+
+            Assert.Equal(areaId, town.AreaId);
+            Assert.Equal(arrival, new Tile(town.X, town.Y));
+        }
+
         await world.ChooseFieldAsync(SuomiTown, _deadline.Token);
 
         await Waiting.Until(() => world.State is { } state && state.Map.Id == SuomiTown,
@@ -80,6 +100,51 @@ public sealed class WorldMapTests : IDisposable
 
         // 창은 맵이 바뀌면 닫힌다 — 안 닫히면 그 뒤로 걸음이 서버에 닿지 않는다.
         Assert.Null(world.Field);
+    }
+
+    /// <summary>
+    /// 다시 연 마을 셋을 [지도] 단추로 차례로 간다 — 고른 칸에 서고, 그 칸이 벽이 아니며, 그 마을에서
+    /// 걸어서 월드맵으로 나가는 칸(WarpType World)이 있어야 한다(없으면 들어가서 월드맵을 다시 못 연다).
+    /// </summary>
+    [Fact]
+    public async Task The_reopened_towns_are_on_the_map_and_choosing_one_puts_you_on_a_walkable_tile_there()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceVillage, 37, 29));
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, "towntrip");
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, "towntrip", LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Waiting.Until(() => world.State is { } state && state.Map.Id == NoviceVillage,
+            "노비스마을에 들어가지 못했습니다.", _deadline.Token);
+
+        foreach ((string name, int areaId, Tile arrival) in Reopened)
+        {
+            await world.OpenFieldAsync(_deadline.Token);
+            await Waiting.Until(() => world.Field is not null, $"{name}로 가려고 지도를 달라고 했는데 오지 않았습니다.", _deadline.Token);
+
+            Assert.Contains(world.Field!.Nodes, node => node.AreaId == areaId);
+
+            await world.ChooseFieldAsync(areaId, _deadline.Token);
+            await Waiting.Until(() => world.State is { } state && state.Map.Id == areaId && state.Where == arrival,
+                $"{name}를 골랐는데 {areaId} {arrival} 에 서지 않았습니다. 마지막: {world.State}", _deadline.Token);
+
+            Assert.Null(world.Field);
+
+            MapInfo map = world.State!.Map;
+            Assert.False(Walled(server, areaId, map.Columns, map.Rows)(arrival), $"{name} 도착 칸 {arrival} 이 벽입니다.");
+
+            string warps = Path.Combine(server.ContentLocation, "templates", "warps");
+            Assert.Contains(Directory.EnumerateFiles(warps, "*.json"), path =>
+            {
+                System.Text.Json.Nodes.JsonNode warp = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path))!;
+                return warp["WarpType"]?.ToString() == "World" && warp["ActivationMapId"]?.GetValue<int>() == areaId;
+            });
+        }
     }
 
     /// <summary>

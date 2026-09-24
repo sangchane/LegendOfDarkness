@@ -16,10 +16,14 @@ public sealed class RecallTests : IDisposable
     private const string Name = "recaller";
 
     // Recall.cs 의 Villages 와 같은 마을들 — 그 마을 리콜 템플릿의 자리다(수오미 20355 · 노비스 20373, plans/5.99-맵번호표.tsv).
+    // 밀레스·아벨·마인은 2026-09-24 월드맵에 다시 열며 더했다(WorldMapTests.Reopened).
     private static readonly (string Recall, int Map, Tile Where)[] Villages =
     {
         ("노비스마을리콜", 20373, new Tile(40, 33)),
         ("수오미마을리콜", 20355, new Tile(33, 22)),
+        ("밀레스마을리콜", 20287, new Tile(50, 52)),
+        ("아벨마을리콜", 20030, new Tile(61, 24)),
+        ("마인마을리콜", 20304, new Tile(47, 59)),
     };
 
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(3));
@@ -52,13 +56,50 @@ public sealed class RecallTests : IDisposable
             $"리콜을 썼는데 마을 자리({string.Join(" · ", Villages.Select(v => $"{v.Map} {v.Where}"))}) 어디에도 있지 않습니다. "
             + $"마지막: {world.State} · 서버가 한 말: {world.Said}");
 
-        // 이름 리콜은 리콜이 내려 준 곳이 아닌 다른 마을 것을 쓴다 — 같은 자리면 움직였는지 알 수 없다.
-        (string recall, int map, Tile spot) = Villages.First(v => v.Map != world.State!.Map.Id || v.Where != world.State.Where);
-        InventoryItem named = await Given(world, recall);
-        await world.UseAsync(named.Slot, _deadline.Token);
-        await Until(() => world.State is { } state && state.Map.Id == map && state.Where == spot,
-            $"{recall}을 썼는데 {map} {spot} 으로 가지 않았습니다. 마지막: {world.State} · 서버가 한 말: {world.Said}");
-        await Until(() => world.Pack.All(item => item.Name != recall), $"{recall}이 줄지 않았습니다.");
+        // 이름 리콜은 마을마다 한 번씩 쓴다. 리콜이 내려 준 곳과 같은 자리의 것은 건너뛴다 — 같은 자리면
+        // 움직였는지 알 수 없다(그 마을은 그다음 마을에서 돌아오며 확인되지 않지만, 한 곳뿐이다).
+        foreach ((string recall, int map, Tile spot) in Villages)
+        {
+            if (world.State!.Map.Id == map && world.State.Where == spot)
+                continue;
+
+            InventoryItem named = await Given(world, recall);
+            await world.UseAsync(named.Slot, _deadline.Token);
+            await Until(() => world.State is { } state && state.Map.Id == map && state.Where == spot,
+                $"{recall}을 썼는데 {map} {spot} 으로 가지 않았습니다. 마지막: {world.State} · 서버가 한 말: {world.Said}");
+            await Until(() => world.Pack.All(item => item.Name != recall), $"{recall}이 줄지 않았습니다.");
+        }
+    }
+
+    /// <summary>
+    /// 그냥 리콜이 고르는 목록(서버 <c>Recall.Villages</c>)이 이 시험의 마을들과 같고, 마을마다 리콜 자리가 벽이 아니다 —
+    /// 그냥 리콜은 무작위라 한 번 써서는 새 마을에 내리는지 못 본다. 목록과 자리를 직접 본다.
+    /// </summary>
+    [Fact]
+    public void The_plain_recall_picks_from_exactly_these_villages_and_each_spot_is_walkable()
+    {
+        string script = File.ReadAllText(Path.Combine(HadesWorkspace.ServerDataDirectory, "scripts", "Items", "Recall.cs"));
+        string list = script[script.IndexOf("Villages =", StringComparison.Ordinal)..];
+        list = list[..list.IndexOf("};", StringComparison.Ordinal)];
+        string[] named = System.Text.RegularExpressions.Regex.Matches(list, "\"([^\"]+)\"").Select(m => m.Groups[1].Value).ToArray();
+
+        Assert.Equal(Villages.Select(v => v.Recall).OrderBy(n => n), named.OrderBy(n => n));
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+
+        foreach ((string recall, int map, Tile spot) in Villages)
+        {
+            string itemPath = Path.Combine(HadesWorkspace.ServerDataDirectory, "templates", "items", $"{recall}.json");
+            JsonNode item = JsonNode.Parse(File.ReadAllText(itemPath))!;
+            Assert.Equal(map, item["RecallArea"]!.GetValue<int>());
+            Assert.Equal(spot, new Tile(item["RecallX"]!.GetValue<int>(), item["RecallY"]!.GetValue<int>()));
+
+            string areaPath = Directory.EnumerateFiles(Path.Combine(HadesWorkspace.ServerDataDirectory, "areas"), "*.json")
+                .Single(path => JsonNode.Parse(File.ReadAllText(path))!["ID"]!.GetValue<int>() == map);
+            JsonNode area = JsonNode.Parse(File.ReadAllText(areaPath))!;
+            Assert.False(WorldMapTests.Walled(server, map, area["Cols"]!.GetValue<int>(), area["Rows"]!.GetValue<int>())(spot),
+                $"{recall} 자리 {map} {spot} 이 벽입니다.");
+        }
     }
 
     /// <summary>그냥 리콜은 노비스마을 잡화상(베이가)이 마을 리콜들과 함께 판다 — 혼든 노비스마을_shop.txt 의 노베스 목록.</summary>
