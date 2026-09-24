@@ -257,6 +257,20 @@ button.tally:hover{background:var(--raised)}
 .monster-level-row output{min-width:2.5ch;font:600 14px var(--mono);font-variant-numeric:tabular-nums}
 .monster-level-row small{flex:1 1 100%;color:var(--muted);font-size:10px}
 
+.npc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.npc-card{border:1px solid var(--edge);border-radius:14px;background:var(--panel);padding:13px;display:grid;gap:6px;align-content:start}
+.npc-card.is-unreached{opacity:.55}
+.npc-card>header{display:flex;justify-content:space-between;gap:8px;align-items:start}
+.npc-card h3{margin:0;font-size:14px}
+.npc-where{display:block;margin-top:2px;color:var(--muted);font:10px var(--mono)}
+.npc-line{margin:0;color:var(--muted);font:500 11px var(--mono);overflow-wrap:anywhere}
+.npc-card details{font-size:11px;color:var(--muted)}
+.npc-card summary{cursor:pointer;color:var(--text);font-size:11px}
+.npc-stock{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.npc-stock span{border:1px solid var(--edge-soft);border-radius:8px;padding:1px 6px;font:10px var(--mono)}
+.npc-stock span.is-missing{opacity:.5;border-style:dashed}
+.npc-source{display:block;color:var(--muted);font-size:10px;overflow-wrap:anywhere;margin-top:2px}
+
 .warp-chart{display:flex;height:640px;overflow:hidden;border:1px solid var(--edge);border-radius:16px;background:var(--panel);box-shadow:0 4px 24px rgba(25,31,40,.04);padding:0}
 .warp-canvas-wrap{flex:1;position:relative;overflow:auto;background-image:radial-gradient(var(--edge) 1px,transparent 0);background-size:24px 24px;padding:40px}
 .warp-lines{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:0}

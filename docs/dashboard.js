@@ -4,7 +4,7 @@
   var model = window.LodDashboardModel;
   var snapshot = model.isValidDashboardSnapshot(window.LOD_DASHBOARD_SNAPSHOT) ? window.LOD_DASHBOARD_SNAPSHOT : null;
   var labels = {
-    overview: "지금 되는 것", monsters: "괴물 도감", abilities: "기술·마법", items: "아이템 도감",
+    overview: "지금 되는 것", monsters: "괴물 도감", npcs: "NPC 도감", abilities: "기술·마법", items: "아이템 도감",
     world: "지도·워프", changes: "원작과 달라진 것", knowledge: "게임 데이터", delivery: "지식 그래프",
   };
   var category = "all";

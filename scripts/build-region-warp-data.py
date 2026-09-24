@@ -23,6 +23,13 @@ OUT = ROOT / "docs" / "region-warps-data.js"
 # 지역과 그 지역의 출발점. 걸어서 닿는지는 여기서부터 잰다.
 REGIONS = {"노비스": "노비스마을", "수오미": "수오미마을"}
 
+# 원작 팩의 몬스터 젠 표. 던전인데 괴물이 하나도 없으면 원작도 그런지 여기서 확인한다
+# (형제 방은 있는데 이 방만 없으면 "원작도 빈 방", 팩 자체에 이 던전이 없으면 증거 없음).
+PACK_SPAWNS = {
+    "5.99": ROOT / "data/server-packs/5.99-server/db/mob/Novice/Novice_Spawn.txt",
+    "novaonline": ROOT / "data/server-packs/novaonline/db/mob/노비스/spawn.txt",
+}
+
 # 맵 이름으로 갈래를 가른다. 위에서부터 먼저 맞는 것을 쓴다.
 KINDS = [
     ("마을", ("마을",)),
@@ -44,6 +51,44 @@ def kind_of(name):
     return "그밖"
 
 
+def pack_spawn_maps(path):
+    """그 팩 젠 표에 몬스터가 한 마리라도 적힌 맵 이름 집합. 팩이 없으면 빈 집합(증거 없음과 같다)."""
+    if not path.exists():
+        return set()
+    names = set()
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        line = line.strip()
+        if not line or line.startswith("//"):
+            continue
+        field = line.split(",")[0].strip()
+        if field:
+            names.add(field)
+    return names
+
+
+def dungeon_zone(name):
+    """맵 이름 끝의 'C1'·'A3' 같은 영문 한 글자 + 숫자를 떼어 그 던전 묶음 이름을 얻는다."""
+    return re.sub(r"[A-Za-z]\d+$", "", name)
+
+
+def empty_room_evidence(name, spawn_sets):
+    """이 던전 방이 원작 팩에도 비어 있는지. 팩이 같은 던전의 형제 방은 담고 있는데 이 방만
+    없으면 원작도 빈 방이라는 뜻 — 팩이 이 던전 자체를 안 실었으면(형제 방도 없으면) 증거가 아니다."""
+    zone = dungeon_zone(name)
+    corroborating = []
+    for pack, spawn_map in spawn_sets.items():
+        zones = {dungeon_zone(n) for n in spawn_map}
+        if zone in zones and name not in spawn_map:
+            corroborating.append(pack)
+    if not corroborating:
+        return None
+    return {
+        "원작도빈방": True,
+        "팩": corroborating,
+        "근거": [f"{pack}: {PACK_SPAWNS[pack].relative_to(ROOT)}" for pack in corroborating],
+    }
+
+
 def region_of(name):
     for region in REGIONS:
         if name.startswith(region):
@@ -61,6 +106,7 @@ def main():
         names[data["Id"]] = data["Name"]
 
     wanted = {i: n for i, n in names.items() if region_of(n)}
+    spawn_sets = {pack: pack_spawn_maps(path) for pack, path in PACK_SPAWNS.items()}
 
     # 그 맵에 무엇이 서 있나. 괴물은 템플릿의 AreaID, NPC 는 파일 이름의 "@맵이름" 이 근거다.
     monsters = defaultdict(int)
@@ -127,17 +173,21 @@ def main():
         nodes = []
         for area in sorted(ids):
             name = wanted[area]
-            nodes.append({
+            monster_count = monsters.get(area, 0)
+            node = {
                 "번호": area,
                 "이름": name,
                 "갈래": kind_of(name),
                 "출발점": name == start,
                 "닿음": area in reached,
-                "괴물": monsters.get(area, 0),
+                "괴물": monster_count,
                 "NPC": npcs.get(area, 0),
                 "월드맵": worldmap.get(area, 0),
                 "나가는곳": len(nexts.get(area, ())),
-            })
+            }
+            if monster_count == 0 and node["갈래"] == "던전":
+                node["빈방"] = empty_room_evidence(name, spawn_sets)
+            nodes.append(node)
 
         # 지역 밖으로 이어지는 곳 — 다음에 무엇을 채워야 하는지가 여기 보인다.
         outside = sorted({(e["부터"], e["까지"]) for e in edges if e["밖으로"]})

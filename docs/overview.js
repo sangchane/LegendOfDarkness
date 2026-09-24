@@ -48,6 +48,7 @@
     var host = document.querySelector("#impl-tally");
     var abilities = window.ABILITY_DATA;
     var monsters = window.LOD_MONSTERS;
+    var npcs = window.LOD_NPCS;
     var warps = window.LOD_REGION_WARPS;
     var items = window.LOD_ITEMS;
 
@@ -71,6 +72,10 @@
     if (monsters) {
       cells.push({ 이름: "괴물", 값: monsters.셈.이름 + "종",
         메모: monsters.셈.괴물자리 + "자리 · 그림 " + monsters.셈.그림있음, 화면: "monsters" });
+    }
+    if (npcs) {
+      cells.push({ 이름: "NPC", 값: npcs.셈.지금서있다 + " / " + npcs.셈.전체,
+        메모: "나머지는 아직 안 이어진 마을에 정의만 있다", 화면: "npcs" });
     }
     if (warps) {
       var 맵 = 0, 닿음 = 0;

@@ -61,6 +61,7 @@
     meta.appendChild(kind);
 
     if (node.괴물) { meta.appendChild(text("span", "", "괴물 " + node.괴물)); }
+    else if (node.빈방 && node.빈방.원작도빈방) { meta.appendChild(text("span", "safe", "원작도 빈 방")); }
     if (node.NPC) { meta.appendChild(text("span", "", "NPC " + node.NPC)); }
     if (node.월드맵) { meta.appendChild(text("span", "", "월드맵")); }
     
@@ -142,6 +143,9 @@
         list.appendChild(item);
       });
       section.appendChild(list);
+    } else if (selectedNode.빈방 && selectedNode.빈방.원작도빈방) {
+      section.appendChild(text("p", "sidebar-empty", "원작도 빈 방 — 형제 방은 있는데 이 방만 없습니다. "
+        + "근거: " + selectedNode.빈방.근거.join(" · ")));
     } else {
       section.appendChild(text("p", "sidebar-empty", "이 맵에는 표시할 특별한 요소가 없습니다."));
     }

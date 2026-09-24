@@ -16,6 +16,7 @@
     <nav class="primary-nav" aria-label="주 메뉴">
       <button type="button" class="nav-item is-active" data-view-target="overview" aria-current="page"><span aria-hidden="true">◈</span>지금 되는 것</button>
       <button type="button" class="nav-item" data-view-target="monsters"><span aria-hidden="true">✦</span>괴물 도감</button>
+      <button type="button" class="nav-item" data-view-target="npcs"><span aria-hidden="true">⌂</span>NPC 도감</button>
       <button type="button" class="nav-item" data-view-target="abilities"><span aria-hidden="true">✧</span>기술·마법</button>
       <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템 도감</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도·워프</button>
@@ -93,6 +94,34 @@
         <div class="item-hover" id="monster-hover" hidden aria-hidden="true"></div>
 
         <aside class="notice" id="monster-rules"></aside>
+      </section>
+
+      <section class="view" data-view="npcs" aria-labelledby="npcs-title" hidden>
+        <div class="item-topbar">
+          <h1 id="npcs-title">NPC 도감</h1>
+          <dl class="item-tally">
+            <dt>전체</dt><dd id="npc-total">—</dd>
+            <dt>지금 서 있다</dt><dd id="npc-now">—</dd>
+            <dt>아직 못 감</dt><dd id="npc-later">—</dd>
+            <dt>보임</dt><dd id="npc-shown">—</dd>
+          </dl>
+          <p>누가 어디 서서 무엇을 하는지 — 역할은 실제 대화 스크립트가 부르는 명령으로 가릅니다(짐작 없음)</p>
+        </div>
+
+        <div class="filterbar item-filterbar">
+          <label class="visually-hidden" for="npc-search">NPC 검색</label>
+          <input id="npc-search" type="search" placeholder="이름·맵·마을로 찾기" autocomplete="off">
+          <div class="item-filter-row" role="group" aria-label="마을"><span>마을</span><div class="item-chips" id="npc-towns"></div></div>
+          <div class="item-filter-row" role="group" aria-label="역할"><span>역할</span><div class="item-chips" id="npc-roles"></div></div>
+          <div class="item-filter-row"><span>보기</span><div class="item-chips">
+            <button type="button" class="chip is-active" id="npc-only-now" aria-pressed="true">지금 서 있다만</button>
+          </div></div>
+        </div>
+
+        <div class="npc-grid" id="npc-grid"></div>
+        <p class="empty-state" id="npc-empty" hidden>조건에 맞는 NPC 가 없어요. 필터를 지워 보세요.</p>
+
+        <aside class="notice" id="npc-rules"></aside>
       </section>
 
       <section class="view" data-view="abilities" aria-labelledby="abilities-title" hidden>
@@ -305,8 +334,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!-- 자료가 먼저, 그다음 모델, 마지막이 화면. overview.js 가 다른 화면의 셈까지 한 줄로 보여 주므로
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-effects-data.js"></script><script src="body-motions-data.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-effects-data.js"></script><script src="body-motions-data.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
-<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>

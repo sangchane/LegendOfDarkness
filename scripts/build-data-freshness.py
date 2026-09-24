@@ -39,7 +39,12 @@ SHEETS = [
         f"{HADES}/areas", f"{HADES}/templates/monsters", f"{HADES}/templates/items"]),
     ("region-warps-data.js", "scripts/build-region-warp-data.py", [
         f"{HADES}/areas", f"{HADES}/templates/warps",
-        f"{HADES}/templates/monsters", f"{HADES}/templates/mundanes"]),
+        f"{HADES}/templates/monsters", f"{HADES}/templates/mundanes",
+        "data/server-packs/5.99-server/db/mob/Novice/Novice_Spawn.txt",
+        "data/server-packs/novaonline/db/mob/노비스/spawn.txt"]),
+    ("npcs-data.js", "scripts/build-npc-page-data.py", [
+        f"{HADES}/areas", f"{HADES}/templates/warps", f"{HADES}/templates/mundanes",
+        f"{HADES}/templates/items", f"{HADES}/scripts/Pack599/Npcs"]),
     ("feature-map-data.js", "scripts/build-feature-map-data.py", ["docs/feature-map.md"]),
     ("world-map-data.js", "scripts/build-world-map-data.py", [
         f"{HADES}/areas", f"{HADES}/templates/warps"]),
