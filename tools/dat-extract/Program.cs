@@ -390,6 +390,22 @@ internal static class Program
 
             Directory.CreateDirectory(Path.GetDirectoryName(output)!);
             await floorSheet.SaveAsPngAsync($"{output}-floor.png");
+
+            PaletteCycles cycles = PaletteCycles.FromArchive(seo.Select(entry => (entry.Name, entry.Data)));
+            (Image<Rgba32> marks, Image<Rgba32> colours, int turning)? cycling =
+                MarkFloorCycles(floorSheet.Width, floorSheet.Height, floors, tileAt, tiles, cycles);
+
+            if (cycling is { } found)
+            {
+                using (found.marks)
+                using (found.colours)
+                {
+                    await found.marks.SaveAsPngAsync($"{output}-floor-cycle.png");
+                    await found.colours.SaveAsPngAsync($"{output}-floor-cycle-colours.png");
+                }
+
+                Console.WriteLine($"  물결(색 돌림) 점 {found.turning}개 → -floor-cycle.png · -floor-cycle-colours.png");
+            }
         }
 
         (Image<Rgba32> sheet, Dictionary<int, MapObjects.Placed> where) = MapObjects.Pack([.. pictures.Values], 1024);
@@ -1469,9 +1485,12 @@ internal static class Program
             };
         }
 
+        /// <summary>The palette number a floor tile (0-based) is coloured with.</summary>
+        public int PaletteOf(int index) => Math.Clamp(FloorPalette(Choice, index + PaletteOffset), 0, Palettes.Count - 1);
+
         public void Draw(Image<Rgba32> canvas, int index, int originX, int originY)
         {
-            Palette palette = Palettes[Math.Clamp(FloorPalette(Choice, index + PaletteOffset), 0, Palettes.Count - 1)];
+            Palette palette = Palettes[PaletteOf(index)];
             byte[] data = Tiles[index].Data;
 
             for (int y = 0; y < TileHeight; y++)
@@ -1501,6 +1520,74 @@ internal static class Program
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Finds the floor pixels whose colour turns over (<see cref="PaletteCycles" />) so the client can turn them too,
+    /// and returns nothing when the map has none. Two pictures come back. The marks are laid out like the floor sheet:
+    /// a turning pixel holds its palette entry in red and its palette's row in green; every other pixel is clear. The
+    /// colours hold two rows per palette that turns — the palette's 256 colours, then under each turning entry its run
+    /// (red 처음, green 길이, blue 빠르기 in ticks). The floor sheet itself stays as it was, the colours at turn 0.
+    /// </summary>
+    private static (Image<Rgba32> Marks, Image<Rgba32> Colours, int Turning)? MarkFloorCycles(
+        int width, int height, int[] floors, Dictionary<int, (int X, int Y)> tileAt, TileSource tiles, PaletteCycles cycles)
+    {
+        Image<Rgba32> marks = new(width, height);
+        List<int> rows = [];
+        int turning = 0;
+
+        foreach (int floor in floors)
+        {
+            int palette = tiles.PaletteOf(floor - 1);
+            byte[] data = tiles.Tiles[floor - 1].Data;
+            (int originX, int originY) = tileAt[floor];
+
+            for (int at = 0; at < TileWidth * TileHeight; at++)
+            {
+                byte code = data[at];
+
+                if (code == 0 || cycles.RunOf(palette, code) is null)
+                {
+                    continue;
+                }
+
+                int row = rows.IndexOf(palette);
+                if (row < 0)
+                {
+                    row = rows.Count;
+                    rows.Add(palette);
+                }
+
+                marks[originX + (at % TileWidth), originY + (at / TileWidth)] = new Rgba32(code, (byte)row, 0, 255);
+                turning++;
+            }
+        }
+
+        if (turning == 0)
+        {
+            marks.Dispose();
+            return null;
+        }
+
+        Image<Rgba32> colours = new(256, rows.Count * 2);
+
+        for (int row = 0; row < rows.Count; row++)
+        {
+            Palette palette = tiles.Palettes[rows[row]];
+
+            for (int index = 0; index < 256; index++)
+            {
+                System.Drawing.Color colour = palette[index];
+                colours[index, row * 2] = new Rgba32(colour.R, colour.G, colour.B, 255);
+
+                if (cycles.RunOf(rows[row], index) is { } run)
+                {
+                    colours[index, (row * 2) + 1] = new Rgba32((byte)run.First, (byte)run.Length, (byte)run.Ticks, 255);
+                }
+            }
+        }
+
+        return (marks, colours, turning);
     }
 
     /// <summary>

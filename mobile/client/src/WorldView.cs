@@ -65,6 +65,31 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // sotp.dat 에 투명 표시가 붙은 그림(샘물 반짝임 …)은 가리지 않고 빛을 더한다 — 맵 편집기가 그렇게 그린다.
     private readonly CanvasItemMaterial _glow = new() { BlendMode = CanvasItemMaterial.BlendModeEnum.Add };
 
+    // 바닥 색 돌림(물결). 원작 Legend.exe 는 100ms 마다 mpt%04d.tbl 의 색 구간(처음 끝 빠르기)을 한 칸씩 돌린다 —
+    // 끝 칸 색이 처음으로, 나머지는 한 칸 위로. 빠르기는 몇 번 만에 한 번 돌리나(0x5df450). 돌 점은 -floor-cycle.png 가
+    // (빨강 = 팔레트 칸, 초록 = 줄) 짚고, -floor-cycle-colours.png 가 줄마다 원래 256색과 그 아래 구간(처음·길이·빠르기)을 든다.
+    // 돌 점이 없는 맵에는 이 재료를 붙이지 않는다. 알맹이 없는 계산이라 시험은 tools/tests 의 PaletteCyclesTests 가 한다.
+    private static readonly Shader FloorCycle = new()
+    {
+        Code = """
+            shader_type canvas_item;
+            uniform sampler2D marks : filter_nearest;
+            uniform sampler2D colours : filter_nearest;
+
+            void fragment() {
+                vec4 mark = texture(marks, UV);
+                if (mark.a > 0.5) {
+                    int index = int(round(mark.r * 255.0));
+                    int row = int(round(mark.g * 255.0)) * 2;
+                    ivec3 run = ivec3(round(texelFetch(colours, ivec2(index, row + 1), 0).rgb * 255.0));
+                    int turns = (int(floor(TIME * 10.0)) / max(run.z, 1)) % run.y;
+                    int shown = run.x + (index - run.x - turns + run.y) % run.y;
+                    COLOR.rgb = texelFetch(colours, ivec2(shown, row), 0).rgb;
+                }
+            }
+            """
+    };
+
     // The tile we believe we are on. A walk moves it straight away, because the server answers an allowed
     // step with silence; when it does speak, it wins.
     private Tile _tile;
@@ -1540,6 +1565,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         string floorPath = $"{FloorFolder}map{map.Id}-floor.png";
         _floorSheet = _layout.Tiles.Count > 0 && ResourceLoader.Exists(floorPath) ? GD.Load<Texture2D>(floorPath) : null;
+        _tiledFloor.Material = _floorSheet is not null ? CyclingFloor(map.Id) : null;
 
         if (!ResourceLoader.Exists(sheetPath))
         {
@@ -1575,6 +1601,23 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             _camera.AddChild(sprite);
             _objects.Add(sprite);
         }
+    }
+
+    /// <summary>The floor's colour-turning material, or nothing when no pixel of this map's floor turns (<see cref="FloorCycle" />).</summary>
+    private static ShaderMaterial? CyclingFloor(int mapId)
+    {
+        string marks = $"{FloorFolder}map{mapId}-floor-cycle.png";
+        string colours = $"{FloorFolder}map{mapId}-floor-cycle-colours.png";
+
+        if (!ResourceLoader.Exists(marks) || !ResourceLoader.Exists(colours))
+        {
+            return null;
+        }
+
+        ShaderMaterial material = new() { Shader = FloorCycle };
+        material.SetShaderParameter("marks", GD.Load<Texture2D>(marks));
+        material.SetShaderParameter("colours", GD.Load<Texture2D>(colours));
+        return material;
     }
 
     /// <summary>
