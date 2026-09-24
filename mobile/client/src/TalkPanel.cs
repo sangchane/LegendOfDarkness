@@ -22,6 +22,22 @@ public sealed partial class TalkPanel : PanelContainer
     private readonly Label _words = new() { AutowrapMode = TextServer.AutowrapMode.WordSmart };
     private readonly VBoxContainer _offers = new();
 
+    // 물건이 많은 상점은 화면을 넘는다 — 이 안에서 굴린다. 글을 칠 때는 입력 줄이 늘 보이게 따라간다.
+    private readonly ScrollContainer _scroll = new()
+    {
+        SizeFlagsVertical = SizeFlags.ExpandFill,
+        HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+        FollowFocus = true
+    };
+
+    // 글 입력 창일 때의 입력 줄(칸 + 확인), 그리고 키보드 때문에 창을 들어 올린 만큼.
+    private Control? _typingRow;
+    private readonly HBoxContainer _head = new();
+    private float _lift;
+
+    // --talk-input: 손 없이 확인할 때 가짜 "글 입력" 창을 스스로 띄운다(서버의 NPC 없이 키보드 자리를 찍으려고).
+    private double _rehearseAfter = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--talk-input") >= 0 ? 1.0 : -1;
+
     public TalkPanel()
     {
         Name = "Talk";
@@ -29,7 +45,7 @@ public sealed partial class TalkPanel : PanelContainer
         // 틀은 원작 돌, 속은 평평한 어둠 — 무늬 위에 작은 글자를 얹으면 먼저 무너진다(data/ui-vault).
         AddThemeStyleboxOverride("panel", Greybox.Stone());
 
-        HBoxContainer head = new();
+        HBoxContainer head = _head;
         head.AddThemeConstantOverride("separation", Main.Gutter);
         head.AddChild(_who);
 
@@ -43,11 +59,7 @@ public sealed partial class TalkPanel : PanelContainer
         inside.AddChild(_offers);
 
         // 물건이 많은 상점은 화면을 넘는다. 넘치는 것은 스크롤로 두고 이름과 닫기는 늘 남긴다.
-        ScrollContainer scroll = new()
-        {
-            SizeFlagsVertical = SizeFlags.ExpandFill,
-            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
-        };
+        ScrollContainer scroll = _scroll;
         scroll.AddChild(inside);
 
         VBoxContainer body = new();
@@ -79,6 +91,8 @@ public sealed partial class TalkPanel : PanelContainer
         {
             old.QueueFree();
         }
+
+        _typingRow = null;
 
         switch (talk.Kind)
         {
@@ -122,12 +136,81 @@ public sealed partial class TalkPanel : PanelContainer
                 break;
 
             case DialogueKind.TextInput:
-                LineEdit typed = new() { CustomMinimumSize = Row };
-                _offers.AddChild(typed);
-                Offer("확인", null, () => Answered?.Invoke(talk.Serial, talk.Step, typed.Text));
+                // 칸과 [확인]을 한 줄에 — 키보드가 올라와도 둘이 함께 키보드 바로 위에 선다. 엔터도 [확인]이다.
+                LineEdit typed = new() { CustomMinimumSize = Row, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+                typed.TextSubmitted += words => Answered?.Invoke(talk.Serial, talk.Step, words);
+
+                Button confirm = new() { Text = "확인", CustomMinimumSize = new Vector2(Main.TouchMinimum * 2, Main.TouchMinimum) };
+                confirm.Pressed += () => Answered?.Invoke(talk.Serial, talk.Step, typed.Text);
+
+                HBoxContainer row = new();
+                row.AddThemeConstantOverride("separation", Main.Gutter);
+                row.AddChild(typed);
+                row.AddChild(confirm);
+                _offers.AddChild(row);
+
+                TouchInput.Zone(typed, row);
+                _typingRow = row;
 
                 break;
         }
+    }
+
+    /// <summary>
+    /// While a line is being typed, the window's bottom rides just above the keyboard and its list scrolls so the input
+    /// row stays in sight; the world behind is not moved. Before, the window kept its full height and the input row
+    /// sat under the keyboard.
+    /// </summary>
+    /// <remarks>The holder belongs to GameScreen and nothing else lifts it; putting it back when the keyboard goes is ours.</remarks>
+    public override void _Process(double delta)
+    {
+        RehearseTextInput(delta);
+
+        if (!Visible || GetParent() is not Control holder)
+        {
+            return;
+        }
+
+        float bottom = holder.GetGlobalRect().End.Y - holder.OffsetBottom;
+        float keyboardTop = GetViewportRect().Size.Y - TouchInput.Covered;
+        float lift = Mathf.Max(0, bottom - keyboardTop);
+
+        if (!Mathf.IsEqualApprox(lift, _lift))
+        {
+            _lift = lift;
+            holder.OffsetBottom = -lift;
+        }
+
+        bool typing = lift > 0 && _typingRow is { } row && IsInstanceValid(row)
+                      && TouchInput.Editing(GetViewport()) is { } field && row.IsAncestorOf(field);
+
+        // 가로 폰은 키보드 위에 100 쯤 남는다 — 이름·닫기 줄까지 두면 입력 줄이 반쯤 잘린다. 그때만 그 줄을 접는다.
+        // 지금 접혀 있는지와 상관없이 "탭 줄을 둔다면 굴림 칸에 얼마가 남나"로 정해야 켜졌다 꺼졌다 하지 않는다.
+        float heads = _head.GetCombinedMinimumSize().Y + Main.Gutter;
+        float chrome = GetCombinedMinimumSize().Y + (_head.Visible ? 0 : heads);
+        float left = bottom - lift - holder.GetGlobalRect().Position.Y - chrome;
+        _head.Visible = !typing || left >= Row.Y + Main.Gutter;
+
+        if (typing)
+        {
+            _scroll.EnsureControlVisible(_typingRow!);
+        }
+    }
+
+    /// <summary>Only when checking without a hand (<c>--talk-input</c>): shows a made-up window that asks for a line.</summary>
+    private void RehearseTextInput(double delta)
+    {
+        if (_rehearseAfter < 0 || (_rehearseAfter -= delta) > 0)
+        {
+            return;
+        }
+
+        _rehearseAfter = -1;
+        Show(new Dialogue(0, "카르마@노비스마을식당#3,10", "무엇을 찾으시오? 이름을 적어 주시오.\n\n(글 입력 창을 손 없이 확인하는 가짜 창)")
+        {
+            Kind = DialogueKind.TextInput
+        }, []);
+        Visible = true;
     }
 
     private void Offer(string text, Texture2D? icon, System.Action pressed)

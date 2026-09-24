@@ -261,10 +261,16 @@ public sealed partial class CreateScreen : Control
         };
         title.AddThemeFontSizeOverride("font_size", TitleFontSize);
         title.AddThemeColorOverride("font_color", Greybox.Title);
+        _title = title;
 
         _username = Field(secret: false, placeholder: "이름");
         _password = Field(secret: true, placeholder: "비밀번호");
         _confirm = Field(secret: true, placeholder: "확인");
+
+        // 엔터(키보드의 완료)는 이름 → 비밀번호 → 확인 → 만들기(아직 못 만들면 키보드만 내린다).
+        _username.TextSubmitted += _ => _password.Edit();
+        _password.TextSubmitted += _ => _confirm.Edit();
+        _confirm.TextSubmitted += _ => SubmitFromKeyboard();
 
         HBoxContainer authRow = new();
         authRow.AddThemeConstantOverride("separation", Main.Gutter);
@@ -834,6 +840,7 @@ public sealed partial class CreateScreen : Control
     {
         Secret = secret,
         PlaceholderText = placeholder,
+        VirtualKeyboardType = secret ? LineEdit.VirtualKeyboardTypeEnum.Password : LineEdit.VirtualKeyboardTypeEnum.Default,
         CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
         SizeFlagsHorizontal = SizeFlags.ExpandFill
     };
@@ -873,18 +880,52 @@ public sealed partial class CreateScreen : Control
         _ => Direction.North
     };
 
-    /// <summary>로그인 화면과 같은 이유로 같은 방식으로 키보드를 피한다. 미리보기가 스스로 도는 것도
-    /// 여기서 잰다 — Actor 를 다시 짓지 않고 <see cref="Actor.Face"/> 만 불러 가볍다.</summary>
+    /// <summary>키보드의 엔터를 마지막 칸에서 누르면 — 만들 수 있으면 만들고, 아니면 키보드만 내려 직업·꾸밈을 보인다.</summary>
+    private void SubmitFromKeyboard()
+    {
+        if (!_create.Disabled)
+        {
+            BeginCreate();
+        }
+    }
+
+    // 키보드 때문에 화면을 올린 만큼, 그리고 그동안 접어 두는 제목(칸이 맨 위로 올라가면 반쯤 잘려 보였다).
+    private float _slide;
+    private Control _title = null!;
+
+    /// <summary>
+    /// 로그인 화면과 같은 방식으로 키보드를 피한다 — 화면 전체를 줄이지 않고, 치고 있는 칸(자리가 되면 [만들기]까지)이
+    /// 키보드 위에 오도록 그만큼만 올린다(<see cref="KeyboardFit.Slide"/>). 예전에는 화면을 키보드만큼 줄여 격자·미리보기가
+    /// 찌그러졌다. 미리보기가 스스로 도는 것도 여기서 잰다 — Actor 를 다시 짓지 않고 <see cref="Actor.Face"/> 만 불러 가볍다.
+    /// </summary>
     public override void _Process(double delta)
     {
-        int keyboard = DisplayServer.VirtualKeyboardGetHeight();
-        Vector2I screen = DisplayServer.ScreenGetSize();
+        float covered = TouchInput.Covered;
+        float slide = 0;
 
-        int lift = keyboard > 0 && screen.Y > 0
-            ? Mathf.RoundToInt(keyboard / (float)screen.Y * GetViewportRect().Size.Y)
-            : 0;
+        // 세로 한 열은 칸이 이미 맨 위 가까이에 있어 제목을 접어도 얻는 것이 없다 — 가로만 접는다.
+        _title.Visible = covered <= 0 || Main.Portrait;
 
-        _safeArea.AddThemeConstantOverride("margin_bottom", Main.SafeInsets.Bottom + lift);
+        if (covered > 0 && TouchInput.Editing(GetViewport()) is { } field && IsAncestorOf(field))
+        {
+            Rect2 typed = field.GetGlobalRect();
+            Rect2 finish = _buttonsRow.GetGlobalRect();
+
+            slide = KeyboardFit.Slide(
+                typed.Position.Y + _slide,
+                typed.End.Y + _slide,
+                finish.End.Y + _slide,
+                GetViewportRect().Size.Y - covered,
+                Main.SafeInsets.Top,
+                Main.Gutter);
+        }
+
+        if (!Mathf.IsEqualApprox(slide, _slide))
+        {
+            _slide = slide;
+            OffsetTop = -slide;
+            OffsetBottom = -slide;
+        }
 
         _facingElapsed += delta;
 

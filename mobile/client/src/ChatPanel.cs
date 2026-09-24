@@ -1,4 +1,5 @@
 using Godot;
+using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.World;
 
 namespace LodClient;
@@ -35,8 +36,14 @@ public sealed partial class ChatPanel : PanelContainer
         PlaceholderText = "할 말",
         MaxLength = Longest,
         SizeFlagsHorizontal = SizeFlags.ExpandFill,
-        CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+        CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+        // 엔터로 보낸 뒤에도 키보드를 내리지 않는다 — 다음 줄을 바로 친다. 기본값은 보낼 때마다 키보드를 내렸다.
+        KeepEditingOnTextSubmit = true
     };
+
+    // 키보드가 올라와 자리가 모자라면 접는 탭 줄, 그리고 창을 들어 올린 만큼.
+    private readonly HBoxContainer _head = new();
+    private float _lift;
 
     // 전체 · 일반(사람의 말 — 근처 말·외침·귓속말·길드) · 파티 · 시스템. 귓속말은 따로 두지 않는다: 서버가 귓속말을
     // 보내는 곳이 두 군데뿐이고(GameServerHandlers.cs:865-866) 줄 앞에 이름이 붙어 섞여도 구별된다.
@@ -63,7 +70,7 @@ public sealed partial class ChatPanel : PanelContainer
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter);
 
-        HBoxContainer head = new();
+        HBoxContainer head = _head;
         head.AddThemeConstantOverride("separation", Main.Gutter);
         foreach ((Button tab, MessageChannel? channel) in _tabs)
         {
@@ -80,7 +87,8 @@ public sealed partial class ChatPanel : PanelContainer
         _scroll.CustomMinimumSize = new Vector2(0, Tall);
         _scroll.AddChild(_lines);
 
-        Button send = new() { Text = "보내기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
+        // 초점을 받지 않는 단추 — 누를 때 글자 칸이 초점을 잃지 않아 키보드가 내려갔다 다시 오르지 않는다.
+        Button send = new() { Text = "보내기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
 
         Greybox.Commit(send);
         send.Pressed += Say;
@@ -90,6 +98,9 @@ public sealed partial class ChatPanel : PanelContainer
         typing.AddThemeConstantOverride("separation", Main.Gutter);
         typing.AddChild(_typed);
         typing.AddChild(send);
+
+        // 입력 줄 안(보내기 포함)을 누르면 키보드를 그대로 둔다. 밖을 누르면 내린다(TouchInput).
+        TouchInput.Zone(_typed, typing);
 
         body.AddChild(head);
         body.AddChild(_scroll);
@@ -219,4 +230,67 @@ public sealed partial class ChatPanel : PanelContainer
     }
 
     private void ScrollToEnd() => _scroll.ScrollVertical = (int)_scroll.GetVScrollBar().MaxValue;
+
+    /// <summary>
+    /// While words are being typed, the input bar rides just above the keyboard and the world stays as it is: the window
+    /// is lifted by what the keyboard covers below it, and the lines give up height so the whole window fits between the
+    /// top row and the keyboard. When even two lines would not fit (a landscape phone leaves about 110), the tabs fold
+    /// away too, leaving the last lines and the bar. Closing the keyboard puts everything back.
+    /// </summary>
+    /// <remarks>
+    /// The holder this window stands in belongs to GameScreen, which lifts it by the whole keyboard height each frame
+    /// before this runs; this overrides that with the lift that leaves no gap (the keyboard also covers the home-bar
+    /// margin) and with the pretend keyboard of <c>--keyboard</c>. Without the list giving way, the window was taller
+    /// than the room left and its holder grew downwards, putting the input under the keyboard.
+    /// </remarks>
+    public override void _Process(double delta)
+    {
+        if (!Visible || GetParent() is not Control holder)
+        {
+            return;
+        }
+
+        float covered = TouchInput.Covered;
+        bool typing = covered > 0 && TouchInput.Editing(GetViewport()) == _typed;
+
+        // 들어 올리기 전의 창 바닥. 위에서 누가 들어 올렸든 OffsetBottom 만큼 되돌려 잰다.
+        Rect2 held = holder.GetGlobalRect();
+        float bottom = held.End.Y - holder.OffsetBottom;
+        float keyboardTop = GetViewportRect().Size.Y - covered;
+        float lift = Mathf.Max(0, bottom - keyboardTop);
+
+        holder.OffsetBottom = -lift;
+
+        float list = Tall;
+        bool head = true;
+
+        if (typing)
+        {
+            // 창에서 목록을 뺀 높이(탭 줄은 있는 것으로). 줄 사이 간격(Gutter)도 보이는 것만 센다.
+            float room = bottom - lift - held.Position.Y;
+            float heads = _head.GetCombinedMinimumSize().Y + Main.Gutter;
+            float chrome = GetCombinedMinimumSize().Y
+                           - (_scroll.Visible ? _scroll.CustomMinimumSize.Y + Main.Gutter : 0)
+                           + (_head.Visible ? 0 : heads);
+
+            list = KeyboardFit.ListRoom(Tall, 0, room, chrome + Main.Gutter);
+
+            // 두 줄도 안 들어가면 탭 줄을 접는다.
+            if (list < FontSize * 3)
+            {
+                head = false;
+                list = KeyboardFit.ListRoom(Tall, 0, room, chrome + Main.Gutter - heads);
+            }
+        }
+
+        _head.Visible = head;
+        _scroll.Visible = list > 0;
+
+        if (!Mathf.IsEqualApprox(list, _scroll.CustomMinimumSize.Y) || !Mathf.IsEqualApprox(lift, _lift))
+        {
+            _scroll.CustomMinimumSize = new Vector2(0, list);
+            _lift = lift;
+            CallDeferred(MethodName.ScrollToEnd);
+        }
+    }
 }

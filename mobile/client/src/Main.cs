@@ -391,6 +391,9 @@ public partial class Main : Control
         }
 
         Theme = BuildTheme();
+
+        // 화면 키보드·키보드 치우기·목록 끌기 — 화면마다 따로 하지 않고 여기 한 곳에서(TouchInput).
+        AddChild(new TouchInput());
         GetWindow().SizeChanged += RefreshDrawableLayout;
         RefreshDrawableLayout();
 

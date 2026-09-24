@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using Godot;
+using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
 
@@ -44,7 +45,11 @@ public partial class LoginScreen : Control
     private LineEdit _password = null!;
     private Button _submit = null!;
     private Button _create = null!;
-    private ScrollContainer? _formScroll;
+
+    // 키보드가 올라와 있는 동안 접어 두는 줄(위 환경 줄·아래 판 번호·안내 한 줄), 그리고 화면을 올린 만큼.
+    private Control _statusRow = null!;
+    private Control _versionLine = null!;
+    private float _slide;
 
     /// <summary>Launch-time rehearsal may submit once; a screen reached by explicit logout only fills the fields.</summary>
     public bool AutomaticLogin { get; init; } = true;
@@ -69,9 +74,9 @@ public partial class LoginScreen : Control
         rows.AddThemeConstantOverride("separation", Main.Gutter);
         _safeArea.AddChild(rows);
 
-        rows.AddChild(BuildStatusRow());
+        rows.AddChild(_statusRow = BuildStatusRow());
         rows.AddChild(BuildForm());
-        rows.AddChild(BuildVersionLine());
+        rows.AddChild(_versionLine = BuildVersionLine());
 
         RefreshSubmitState();
 
@@ -164,6 +169,8 @@ public partial class LoginScreen : Control
         CenterContainer center = new()
         {
             Name = "FormCenter",
+            // 가로에서는 굴림 칸 안에 들어가, 폭을 다 쓰라고 하지 않으면 제 최소 폭으로 왼쪽에 붙었다.
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ExpandFill
         };
 
@@ -199,6 +206,10 @@ public partial class LoginScreen : Control
 
         _username = Field(secret: false);
         _password = Field(secret: true);
+
+        // 엔터(키보드의 완료)는 다음 칸으로, 마지막 칸에서는 로그인으로 — 손가락이 키보드를 떠나지 않아도 된다.
+        _username.TextSubmitted += _ => _password.Edit();
+        _password.TextSubmitted += _ => SubmitFromKeyboard();
 
         _status = new Label
         {
@@ -238,18 +249,19 @@ public partial class LoginScreen : Control
             return center;
         }
 
-        // A landscape keyboard can leave less height than four 48px controls need. Keep the controls at
-        // their accessible size and scroll the focused field into view instead of shrinking or clipping them.
-        _formScroll = new ScrollContainer
+        // A short landscape screen (360) can have less height than the form. Keep the controls at their accessible
+        // size and let the form scroll rather than shrinking or clipping them. The keyboard no longer shrinks this
+        // area — the screen slides instead (_Process) — so the scroll is only for short screens.
+        ScrollContainer formScroll = new()
         {
             Name = "FormScroll",
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ExpandFill,
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
-        _formScroll.AddChild(center);
+        formScroll.AddChild(center);
 
-        return _formScroll;
+        return formScroll;
     }
 
     /// <summary>The established phone flow stays one vertical column.</summary>
@@ -328,8 +340,23 @@ public partial class LoginScreen : Control
     private static LineEdit Field(bool secret) => new()
     {
         Secret = secret,
+        // 비밀번호 칸은 iOS 에 비밀번호라고 알린다(자동 완성 줄의 열쇠). 사용자명은 보통 자판.
+        VirtualKeyboardType = secret ? LineEdit.VirtualKeyboardTypeEnum.Password : LineEdit.VirtualKeyboardTypeEnum.Default,
         CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
     };
+
+    /// <summary>The keyboard's Return on the last field: log in when both fields are filled, else go back to the empty one.</summary>
+    private void SubmitFromKeyboard()
+    {
+        if (!_submit.Disabled)
+        {
+            BeginLogin();
+        }
+        else if (_username.Text.Length == 0)
+        {
+            _username.Edit();
+        }
+    }
 
     /// <summary>Client version and the font actually in use, which is what tells us Korean will render.</summary>
     private Control BuildVersionLine()
@@ -347,24 +374,42 @@ public partial class LoginScreen : Control
     }
 
     /// <summary>
-    /// Keeps the field being typed into and the login button above the on-screen keyboard, which the
-    /// wireframes require. Shrinking the area the form centres in lifts it by exactly what the keyboard takes.
+    /// Keeps the field being typed into and the login button above the on-screen keyboard, which the wireframes
+    /// require. The screen slides up by only as much as that takes (<see cref="KeyboardFit.Slide"/>) and the rows that
+    /// only inform fold away meanwhile. It used to shrink the area the form centres in by the whole keyboard: on a
+    /// landscape iPhone that left about 100 of 393 for a 320-tall form, which then scrolled one field at a time.
     /// </summary>
     public override void _Process(double delta)
     {
-        int keyboard = DisplayServer.VirtualKeyboardGetHeight();
-        Vector2I screen = DisplayServer.ScreenGetSize();
+        float covered = TouchInput.Covered;
+        bool typing = covered > 0;
 
-        int lift = keyboard > 0 && screen.Y > 0
-            ? Mathf.RoundToInt(keyboard / (float)screen.Y * GetViewportRect().Size.Y)
-            : 0;
+        _statusRow.Visible = !typing;
+        _versionLine.Visible = !typing;
+        _status.Visible = !typing;
 
-        _safeArea.AddThemeConstantOverride("margin_bottom", Main.SafeInsets.Bottom + lift);
+        float slide = 0;
 
-        if (_formScroll is not null && GetViewport().GuiGetFocusOwner() is Control focused
-            && _formScroll.IsAncestorOf(focused))
+        if (typing && TouchInput.Editing(GetViewport()) is { } field && IsAncestorOf(field))
         {
-            _formScroll.EnsureControlVisible(focused);
+            // 지금 자리는 이미 올린 만큼 올라가 있다 — 올리기 전 자리로 되돌려 잰다.
+            Rect2 typed = field.GetGlobalRect();
+            Rect2 finish = _submit.GetGlobalRect();
+
+            slide = KeyboardFit.Slide(
+                typed.Position.Y + _slide,
+                typed.End.Y + _slide,
+                finish.End.Y + _slide,
+                GetViewportRect().Size.Y - covered,
+                Main.SafeInsets.Top,
+                Main.Gutter);
+        }
+
+        if (!Mathf.IsEqualApprox(slide, _slide))
+        {
+            _slide = slide;
+            OffsetTop = -slide;
+            OffsetBottom = -slide;
         }
 
         DrainLogin();

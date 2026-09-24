@@ -30,6 +30,10 @@ window/handheld/orientation=4
 
 project/assembly_name="LodClient"
 
+[gui]
+
+common/default_scroll_deadzone=10
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
