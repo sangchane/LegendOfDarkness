@@ -158,6 +158,22 @@ renew() {
         return 1
     fi
 
+    # 서명 파일은 하드웨어 UDID 로 기기를 적는다. devicectl 의 번호(연결용)를 받았으면 UDID 로 바꾼다 —
+    # 그대로 비교하면 늘 "프로필에 없다" 가 된다(2026-09-24).
+    local udid
+    udid="$(xcrun devicectl device info details --device "$device" 2>/dev/null | awk -F': ' '/• udid:/ {print $2; exit}')"
+    [ -n "$udid" ] && device="$udid"
+
+    # 아직 살아 있는 서명이 있으면 Xcode 가 그것을 다시 써서 날수가 늘지 않는다. 옆으로 치워 두고 새로 받는다
+    # (지우지 않는다 — ~/LOD-backups/profiles-<날짜>).
+    local old
+    old="$(profile)"
+    if [ -n "$old" ]; then
+        local keep="$HOME/LOD-backups/profiles-$(date +%Y%m%d)"
+        mkdir -p "$keep"
+        mv "$old" "$keep/"
+    fi
+
     echo "기기 $device 로 서명을 받습니다..."
     # **-scheme 이어야 한다.** -target 으로 부르면 xcodebuild 가 -destination 을 통째로 무시하고
     # ("Ignoring provided run destination because no scheme was passed") 기기를 등록하지 않는다.
