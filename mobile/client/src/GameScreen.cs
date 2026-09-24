@@ -27,6 +27,14 @@ public partial class GameScreen : Control
     private PackPanel _pack = null!;
     private TalkPanel _talk = null!;
     private FieldPanel _field = null!;
+
+    // 길 찾기 — 원작의 Tab 지도. 위 줄 [길] 로 연다. 길을 걷는 동안은 위 줄 아래 가운데에 간 곳과 [멈춤]이 뜬다.
+    private TabMapPanel _tabMap = null!;
+    private Control _guideChip = null!;
+    private Label _guideText = null!;
+    private int _tabMapSettling;
+    private double _tabMapOpenFor = -1;
+    private bool _tabMapWent;
     private SettingsPanel _settings = null!;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
@@ -109,6 +117,7 @@ public partial class GameScreen : Control
     private double _mapOpenSeconds;
     private const double MapCloseAfterSeconds = 5;
     private Button _map = null!;
+    private Button _way = null!;
 
     // 리허설로 한 번만 입어 본다.
     private bool _worn;
@@ -219,6 +228,9 @@ public partial class GameScreen : Control
         BuildWorld();
         _controlRow = BuildControlRow();
 
+        _tabMap = new TabMapPanel(_world, _server, LoadGuide());
+        _tabMap.Close.Pressed += () => _tabMap.Visible = false;
+
         AddChild(_world);
         AddChild(hud);
         hud.AddChild(rows);
@@ -296,9 +308,15 @@ public partial class GameScreen : Control
         // 대화 창은 제 높이만큼만 아래에 붙는다 — 소지품 한 장과 같다. 긴 이야기는 창 안에서 굴린다.
         _chat.SizeFlagsVertical = SizeFlags.ShrinkEnd;
 
+        // 길 찾기 창도 제 높이만큼만 — 세로는 그 위로 걸어가는 캐릭터가 보이고, 가로는 오른쪽 기둥 전체를 쓴다.
+        _tabMap.SizeFlagsVertical = Main.Portrait ? SizeFlags.ShrinkEnd : SizeFlags.ExpandFill;
+
+        // 길을 걷는 동안의 표시 — 창을 닫아도 어디로 가는지와 멈추는 단추가 남는다. 창들보다 먼저 넣어 창 아래로 간다.
+        over.AddChild(_guideChip = BuildGuideChip());
+
         List<VBoxContainer> holders = [];
 
-        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field, _settings })
+        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field, _settings, _tabMap })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -323,7 +341,7 @@ public partial class GameScreen : Control
 
             // 가로 소지품·장비 창은 화면 높이를 거의 다 쓴다 — 위 줄 아래에서 시작하면 장비 고리 여섯 줄이 한 화면에 안
             // 들어 굴려야 했고, 사용자가 그건 못 쓴다고 했다(2026-09-23). 열려 있는 동안 오른쪽 위 줄을 덮고, 닫기는 창 안에 있다.
-            if (panel == _pack && !Main.Portrait)
+            if ((panel == _pack || panel == _tabMap) && !Main.Portrait)
             {
                 holder.OffsetTop = 0;
                 continue;
@@ -492,6 +510,28 @@ public partial class GameScreen : Control
         _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
         actions.AddChild(_map);
 
+        // [지도]는 월드맵(다른 곳으로), [길]은 원작 Tab 지도(이 맵 안의 길). 한 번 더 누르면 닫힌다.
+        Button way = new()
+        {
+            Text = "길",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        Greybox.Plain(way);
+        way.Pressed += () =>
+        {
+            if (_tabMap.Visible)
+            {
+                _tabMap.Visible = false;
+            }
+            else
+            {
+                _tabMap.Open();
+            }
+        };
+        actions.AddChild(way);
+        _way = way;
+
         _logout = new Button
         {
             Text = "로그아웃",
@@ -516,7 +556,7 @@ public partial class GameScreen : Control
 
         if (Main.Portrait)
         {
-            foreach (Button action in new Button[] { pack, _map, settings, _logout })
+            foreach (Button action in new Button[] { pack, _map, way, settings, _logout })
             {
                 action.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             }
@@ -530,6 +570,92 @@ public partial class GameScreen : Control
         }
 
         return row;
+    }
+
+    /// <summary>Exits and standing NPCs for every drawn map (<c>scripts/build-client-guide.py</c>). Empty when not shipped.</summary>
+    private static MapGuide LoadGuide()
+    {
+        const string path = "res://assets/world/guide.txt";
+
+        return Godot.FileAccess.FileExists(path) ? MapGuide.Read(Godot.FileAccess.GetFileAsString(path)) : MapGuide.Empty;
+    }
+
+    /// <summary>
+    /// The small plate that says where we are being walked to, with a 멈춤 on it — under the top row, in the middle,
+    /// where nothing else sits. Only while guiding and the map is closed; the map window says the same itself.
+    /// </summary>
+    private Control BuildGuideChip()
+    {
+        HBoxContainer inside = new();
+        inside.AddThemeConstantOverride("separation", Main.Gutter);
+        _guideText = new Label { VerticalAlignment = VerticalAlignment.Center };
+        _guideText.AddThemeColorOverride("font_color", Greybox.Text);
+
+        Button stop = new() { Text = "멈춤", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
+        Greybox.Plain(stop);
+        stop.Pressed += () => _world.StopGuiding();
+
+        inside.AddChild(_guideText);
+        inside.AddChild(stop);
+
+        CenterContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Visible = false };
+        holder.AnchorLeft = 0;
+        holder.AnchorRight = 1;
+        holder.AddChild(Plated(inside));
+        _topRow.Resized += () =>
+        {
+            holder.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter;
+            holder.OffsetBottom = holder.OffsetTop + Main.TouchMinimum + 12;
+        };
+
+        return holder;
+    }
+
+    /// <summary>Keeps the guide plate in step, and — hands-free only — opens the map, taps a place on it, and closes it.</summary>
+    private void KeepGuiding(double delta)
+    {
+        string? going = _world.Guiding;
+        _guideChip.Visible = going is not null && !_tabMap.Visible && _world.Route.Count > 0;
+
+        if (_guideChip.Visible)
+        {
+            _guideText.Text = $"→ {(going!.Length > 0 ? going : "고른 자리")} · {_world.Route.Count}걸음";
+        }
+
+        if (!Main.OpeningTabMap)
+        {
+            return;
+        }
+
+        // 옆 단추와 같은 규칙 — 단추 자신의 눌림으로 연다. 월드가 자리를 잡고 이 맵의 벽을 읽은 뒤에.
+        if (_tabMapOpenFor < 0 && _world.MapId > 0 && _tabMapSettling++ == 90)
+        {
+            _way.EmitSignal(BaseButton.SignalName.Pressed);
+            _tabMapOpenFor = 0;
+        }
+
+        if (_tabMapOpenFor < 0)
+        {
+            return;
+        }
+
+        _tabMapOpenFor += delta;
+
+        if (Main.TabMapGo.Length > 0 && !_tabMapWent && _tabMapOpenFor >= 2 && _tabMap.PointOf(Main.TabMapGo) is { } spot)
+        {
+            _tabMapWent = true;
+            _tabMap.TapAt(spot);
+        }
+
+        if (Main.TabMapZoom && _tabMapOpenFor >= 1 && _tabMap.Zoom.Text == "확대")
+        {
+            _tabMap.Zoom.EmitSignal(BaseButton.SignalName.Pressed);
+        }
+
+        if (Main.TabMapCloseAfter >= 0 && _tabMap.Visible && _tabMapOpenFor >= Main.TabMapCloseAfter)
+        {
+            _tabMap.Close.EmitSignal(BaseButton.SignalName.Pressed);
+        }
     }
 
     /// <summary>
@@ -584,6 +710,26 @@ public partial class GameScreen : Control
             _world.FocusY = middle - _world.GetGlobalRect().Position.Y;
         }
 
+        // 길 찾기 창이 열려 있으면 캐릭터를 창이 안 덮은 쪽 한가운데에 세운다 — 걸어가는 모습이 보이게.
+        // 세로는 위 줄과 창 사이, 가로는 창 왼쪽.
+        if (_tabMap.Visible && _tabMap.Size.Y > 0)
+        {
+            Rect2 covered = _tabMap.GetGlobalRect();
+
+            if (Main.Portrait)
+            {
+                _world.FocusY = ((_topRow.GetGlobalRect().End.Y + covered.Position.Y) / 2) - _world.GetGlobalRect().Position.Y;
+            }
+            else
+            {
+                _world.FocusX = (covered.Position.X / 2) - _world.GetGlobalRect().Position.X;
+            }
+        }
+        else
+        {
+            _world.FocusX = null;
+        }
+
         // 서버가 어디라고 말하기 전에는 빈 판이 오른쪽 위에 남는다.
         if (_placePlate is not null)
         {
@@ -631,6 +777,7 @@ public partial class GameScreen : Control
         RehearseNotices();
         Dropped();
         KeepWalking(delta);
+        KeepGuiding(delta);
         RehearseAHold(delta);
         RehearseASkill(delta);
 
@@ -1193,6 +1340,7 @@ public partial class GameScreen : Control
             if (key.Held)
             {
                 held = true;
+                _world.StopGuiding();
                 _world.Walk(where);
             }
         }
@@ -1504,7 +1652,12 @@ public partial class GameScreen : Control
             };
 
             Greybox.Disc(button);
-            button.ButtonDown += () => _world.Walk(where);
+            button.ButtonDown += () =>
+            {
+                // 방향판을 누르면 길 안내는 멈춘다 — 손이 이긴다.
+                _world.StopGuiding();
+                _world.Walk(where);
+            };
             _keys.Add((button, where));
 
             pad.AddChild(button);

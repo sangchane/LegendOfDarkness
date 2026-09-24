@@ -239,6 +239,20 @@ public partial class Main : Control
     /// <summary>Whether to press the "지도" button on its own, as <c>--map</c>. For checking it without a thumb.</summary>
     public static bool OpeningMap { get; private set; }
 
+    /// <summary>
+    /// Whether to press the 「길」 button on its own, as <c>--tabmap</c>; with <c>--tabmap-go 이름</c> it then taps the exit or
+    /// NPC of that name on the map, and with <c>--tabmap-close 초</c> it presses 닫기 that long after opening. For checking the
+    /// 길 찾기 map without a thumb.
+    /// </summary>
+    public static bool OpeningTabMap { get; private set; }
+
+    public static string TabMapGo { get; private set; } = string.Empty;
+
+    public static double TabMapCloseAfter { get; private set; } = -1;
+
+    /// <summary>With <c>--tabmap-zoom</c>, presses 확대 once the map is open.</summary>
+    public static bool TabMapZoom { get; private set; }
+
     /// <summary>Whether to swing once after picking somebody, as <c>--strike</c>.</summary>
     public static bool Striking { get; private set; }
 
@@ -321,6 +335,10 @@ public partial class Main : Control
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0;
+        TabMapGo = Flag("--tabmap-go");
+        TabMapCloseAfter = double.TryParse(Flag("--tabmap-close"), out double tabMapClose) ? tabMapClose : -1;
+        TabMapZoom = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--tabmap-zoom") >= 0;
+        OpeningTabMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--tabmap") >= 0 || TabMapGo.Length > 0 || TabMapZoom;
         OnGear = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
         Hunting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--hunt") >= 0
