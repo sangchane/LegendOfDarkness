@@ -196,7 +196,7 @@ internal static class Program
         }
 
         Console.WriteLine(
-            $"타일 {source.Tiles.Count}개 · 팔레트 {source.Palettes.Count}개 · 표 {source.Tables.Count}개");
+            $"타일 {source.Tiles.Count}개 · 팔레트 {source.Palettes.Count}개");
 
         string output = Path.GetFullPath(args[2]);
         int start = int.Parse(args[3]);
@@ -1406,7 +1406,7 @@ internal static class Program
     {
         public required List<Tile> Tiles { get; init; }
         public required List<Palette> Palettes { get; init; }
-        public required List<PaletteTable> Tables { get; init; }
+        public required MapObjects.PaletteChoice Choice { get; init; }
 
         /// <summary>How far into the palette table this set's own tile 0 sits.</summary>
         public required int PaletteOffset { get; init; }
@@ -1448,41 +1448,30 @@ internal static class Program
                 offset = plain.Data.Length / (TileWidth * TileHeight);
             }
 
-            string prefix = TilePalettePrefix(entries);
+            ArchivedItem? table = entries.FirstOrDefault(entry =>
+                entry.Name.Equals($"{FloorPaletteFamily}pal.tbl", StringComparison.OrdinalIgnoreCase));
+
+            if (table is null)
+            {
+                Console.Error.WriteLine($"{FloorPaletteFamily}pal.tbl 을 찾지 못했습니다.");
+                return null;
+            }
 
             return new TileSource
             {
                 Tiles = new TileCollection(tileSet).Load(),
-                Palettes = Palette.FromArchive(Matching(entries, ".pal", prefix)),
-                Tables = PaletteTable.FromArchive(Matching(entries, ".tbl", prefix), prefix, _ => { }).Result,
+                Palettes = Palette.FromArchive(
+                    entries.Where(e => e.Name.StartsWith(FloorPaletteFamily, StringComparison.OrdinalIgnoreCase)
+                                       && e.Name.EndsWith(".pal", StringComparison.OrdinalIgnoreCase))
+                           .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase)),
+                Choice = MapObjects.PaletteChoice.Read(System.Text.Encoding.ASCII.GetString(table.Data)),
                 PaletteOffset = offset
             };
         }
 
-        /// <summary>
-        /// Which family of tile palettes this archive keeps. 7.18 names them mpt0000.pal with mpt0018.tbl
-        /// beside them; 5.99 names them mps0000.pal with mpspal.tbl — and ships a handful of mpt palettes
-        /// too, so picking the wrong family is not an error, it is a picture in the wrong colours. The
-        /// table is what decides: it is the file that says which palette each tile takes, so the palettes
-        /// it means are the ones named like it.
-        /// </summary>
-        internal static string TilePalettePrefix(List<ArchivedItem> entries)
-        {
-            bool Has(string name) =>
-                entries.Any(e => e.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-            return Has("mpspal.tbl") ? "mps" : "mpt";
-        }
-
-        private static IEnumerable<ArchivedItem> Matching(
-            List<ArchivedItem> entries, string extension, string prefix) =>
-            entries.Where(e => e.Name.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
-                            && e.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                   .OrderBy(e => e.Name, StringComparer.OrdinalIgnoreCase);
-
         public void Draw(Image<Rgba32> canvas, int index, int originX, int originY)
         {
-            Palette palette = PaletteFor(index + PaletteOffset, Tables, Palettes);
+            Palette palette = Palettes[Math.Clamp(FloorPalette(Choice, index + PaletteOffset), 0, Palettes.Count - 1)];
             byte[] data = Tiles[index].Data;
 
             for (int y = 0; y < TileHeight; y++)
@@ -1514,18 +1503,20 @@ internal static class Program
         }
     }
 
-    private static Palette PaletteFor(int index, List<PaletteTable> tables, List<Palette> palettes)
-    {
-        int chosen = 0;
+    /// <summary>
+    /// Which family of floor palettes the client reads. 5.99 seo.dat carries two — mpt0000~0079.pal with
+    /// mptpal.tbl, and mps0000~0022.pal with mpspal.tbl — but Legend.exe names only the first (its strings
+    /// "mpt%04d.pal" · "mpt%04d.tbl" · "mptpal.tbl" at file 0x313180~0x313306; "mps" appears nowhere). Taking
+    /// the mps pair painted grass as orange speckle, a stream as white snow and flower beds as red and blue dots.
+    /// </summary>
+    internal const string FloorPaletteFamily = "mpt";
 
-        foreach (PaletteTable table in tables
-            .Where(table => index >= table.PaletteRange.Item1 && index <= table.PaletteRange.Item2))
-        {
-            chosen = table.Palette;
-        }
-
-        return palettes[Math.Clamp(chosen, 0, palettes.Count - 1)];
-    }
+    /// <summary>
+    /// The palette of the floor tile at a 0-based index (map floor number - 1). The table is asked with the
+    /// index plus two, as da-lib's Graphics.RenderMap does — the tables' first range starts at 2 for that reason.
+    /// A two-number line names one tile and beats any range (<see cref="MapObjects.PaletteChoice" />).
+    /// </summary>
+    internal static int FloorPalette(MapObjects.PaletteChoice choice, int tileIndex) => choice.For(tileIndex + 2);
 
     /// <summary>
     /// Says which cells of a map block. Walls are not pictures of their own — the map's two wall numbers
