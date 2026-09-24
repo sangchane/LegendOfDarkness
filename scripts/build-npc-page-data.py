@@ -52,9 +52,11 @@ def areas():
 
 
 def reachable_set(names):
-    """노비스·수오미 마을에서 워프로 걸어서 닿는 맵 번호 집합. region-warp 과 같은 BFS."""
-    wanted = {i: n for i, n in names.items() if any(n.startswith(r) for r in REGIONS)}
-    by_name = {n: i for i, n in wanted.items()}
+    """노비스·수오미 마을과 월드맵(`worldmaps/*.json`)이 내려놓는 맵에서 워프로 걸어서 닿는 맵 번호 집합.
+
+    월드맵으로 여는 마을(아벨·밀레스·마인 …)도 갈 수 있는 곳이다(2026-09-24).
+    """
+    by_name = {n: i for i, n in names.items()}
     nexts = defaultdict(set)
     for path in (SERVER / "templates/warps").glob("*.json"):
         try:
@@ -65,20 +67,24 @@ def reachable_set(names):
         if not target:
             continue
         for activation in data.get("Activations") or []:
-            source = activation.get("AreaID")
-            if source not in wanted and target not in wanted:
-                continue
-            nexts[source].add(target)
+            nexts[activation.get("AreaID")].add(target)
+
+    starts = [by_name.get(start) for start in REGIONS.values()]
+    for path in (SERVER / "templates/worldmaps").glob("*.json"):
+        try:
+            data = read(path)
+        except Exception:
+            continue
+        starts += [(p.get("Destination") or {}).get("AreaID") for p in data.get("Portals") or []]
 
     reached = set()
-    for start in REGIONS.values():
-        queue = deque([by_name.get(start)])
-        while queue:
-            here = queue.popleft()
-            if here is None or here in reached:
-                continue
-            reached.add(here)
-            queue.extend(nexts.get(here, ()))
+    queue = deque(starts)
+    while queue:
+        here = queue.popleft()
+        if here is None or here in reached:
+            continue
+        reached.add(here)
+        queue.extend(nexts.get(here, ()))
     return reached
 
 
@@ -231,7 +237,7 @@ def main():
         "마을": towns,
         "맵": maps,
         "규칙": {
-            "닿음": "노비스·수오미 마을에서 워프로 걸어서 닿는 맵의 NPC만 '지금 서 있다' — build-region-warp-data.py 와 같은 셈",
+            "닿음": "노비스·수오미 마을과 월드맵이 내려놓는 맵에서 워프로 걸어서 닿는 맵의 NPC만 '지금 서 있다'",
             "역할": "5.99 대화 스크립트가 실제로 부르는 명령으로 가른다(skill_add/spell_add → 사범, set_hair 류 → 꾸밈, "
                     "set_class_sub → 승급/전직, legend_add → 퀘스트, warp 류 → 이동). 상점은 ScriptKey 가 shop1/shop2 이고 "
                     "실제 재고가 있을 때만.",
