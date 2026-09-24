@@ -149,7 +149,7 @@ public sealed class Pack599ArmorTests : IDisposable
 
         await world.UseAsync(uniform.Slot, _deadline.Token);
 
-        await Until(() => world.SaidCount > said && world.Said.Contains("Broken"),
+        await Until(() => world.SaidCount > said && world.Said.Contains("부서져서"),
             $"부서진 도복을 막는 말이 오지 않았습니다. 서버가 한 말: {world.Said}");
 
         await Task.Delay(500, _deadline.Token);

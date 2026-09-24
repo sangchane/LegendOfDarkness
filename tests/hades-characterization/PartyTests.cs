@@ -89,15 +89,16 @@ public sealed class PartyTests : IDisposable
 
         // 그룹장이 잡은 괴물의 경험치가 곁의 그룹원에게도 간다 (monsterexp.cs GenerateExperience).
         long mateBefore = mate.Vitals?.Experience ?? 0;
-        await Hunt(lead, () => mateHeard.Any(line => line.Text.Contains("Experience", StringComparison.Ordinal)));
+        await Hunt(lead, () => mateHeard.Any(line => line.Text.StartsWith("경험치가 ", StringComparison.Ordinal)));
 
-        Assert.True(leadHeard.Any(line => line.Text.Contains("Experience", StringComparison.Ordinal)), leadHeard.All());
+        Assert.True(leadHeard.Any(line => line.Text.StartsWith("경험치가 ", StringComparison.Ordinal)), leadHeard.All());
         await Waiting.Until(() => (mate.Vitals?.Experience ?? 0) > mateBefore,
             "그룹원의 경험치 숫자가 오르지 않았습니다.", _deadline.Token);
 
         // 제 이름을 청하면 나간다. 둘뿐이었으니 그룹이 흩어진다.
         await mate.LeaveGroupAsync(_deadline.Token);
-        await Waiting.Until(() => leadHeard.Any(line => line.Text.Contains("disbanded", StringComparison.Ordinal)),
+        // 5.99 서버의 말: 나간 이는 "…님 그룹 해체", 흩어진 그룹은 "그룹 해체".
+        await Waiting.Until(() => leadHeard.Any(line => line.Text == "그룹 해체"),
             "그룹이 흩어졌다는 말을 듣지 못했습니다.", _deadline.Token);
 
         await Roster(lead);

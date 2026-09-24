@@ -25,7 +25,7 @@ internal static class LoginFlow
     public const string SyntheticSecret = "not-a-real-secret";
 
     // ServerConfig.ServerWelcomeMessage in LoruleConfig.json.
-    private const string ServerWelcome = "Welcome to Lorule";
+    private const string ServerWelcome = "어둠의 전설에 오신 것을 환영합니다!";
     private const byte ClientVersionCommand = 0x00;
     private const byte EncryptionReceivedCommand = 0x57;
     private const byte RedirectRequestCommand = 0x10;

@@ -271,7 +271,7 @@ public sealed class PoteDungeonTests : IDisposable
 
     /// <summary>하데스 빈사 문구(LoruleConfig ReapMessage) — 이 가운데 하나가 뜨면 혼수다.</summary>
     private static readonly string[] Dying =
-        ["You are dying.", "You cannot move nor raise your arms.", "Barron is going to take your soul.", "All things eventually come to an end."];
+        ["죽어 가고 있습니다.", "움직일 수도, 팔을 들 수도 없습니다.", "바론이 당신의 영혼을 거두러 옵니다.", "모든 것에는 끝이 있는 법입니다."];
 
     /// <summary>오르내리며 자리를 바꿔야 함정이 돈다. 혼수 문구가 처음 뜬 때를 돌려준다.</summary>
     private async Task<DateTime> WalkUntilComa(WorldClient world, IsolatedHadesServer server)

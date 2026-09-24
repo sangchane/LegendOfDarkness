@@ -272,7 +272,7 @@ public sealed class MobileClientProtocolTests
 
         // The healing spell executes its real script and confirms the cast in a server message.
         await world.UseSpellAsync(spell.Slot, 0, _deadline.Token);
-        await ServerSaid(world, "you cast beag ioc fein");
+        await ServerSaid(world, "beag ioc fein을(를) 외웠습니다");
     }
 
     [Fact]
@@ -977,7 +977,7 @@ public sealed class MobileClientProtocolTests
                 _deadline.Token));
 
         // The server's own words, decrypted — not a timeout of our own making, and never the secret we sent.
-        Assert.Contains("Password", refused.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("비밀번호", refused.Message, StringComparison.Ordinal);
         Assert.DoesNotContain("definitely-the-wrong-secret", refused.Message, StringComparison.Ordinal);
     }
 
