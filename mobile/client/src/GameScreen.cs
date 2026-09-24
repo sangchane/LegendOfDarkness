@@ -1228,8 +1228,8 @@ public partial class GameScreen : Control
             (2, "You can't attack that."),
             (2, "길이 막혀 가까운 곳으로 옮겼습니다."),
             (2, "쿠룸 Received."),
-            (3, "You've Received 120 coins."),
-            (2, "You received 1164 Experience!."),
+            (3, "금전 120전을 주웠습니다."),
+            (2, "경험치가 1164 올랐습니다"),
             (2, "Your insight has increased!")
         })
         {
