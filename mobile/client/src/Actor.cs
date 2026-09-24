@@ -154,6 +154,10 @@ public sealed partial class Actor : Node2D
     /// <summary>The top of the drawn head, from the feet (negative) — where the head slot starts.</summary>
     public float HeadTop { get; private set; } = -60;
 
+    /// <summary>Where a floating number starts now, from the feet: just above the bar and badges that are up.</summary>
+    public float FigureStart => FloatingFigure.Start(
+        HeadTop, _hurt?.Visible ?? false, _ailing?.Visible ?? false, HealthBar.Thickness, StatusRow.Height);
+
     /// <summary>Puts the badge row over the bar while it shows, and in its place when it does not.</summary>
     private void Stack()
     {

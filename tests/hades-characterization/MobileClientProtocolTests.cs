@@ -139,7 +139,7 @@ public sealed class MobileClientProtocolTests
     }
 
     [Fact]
-    public async Task A_new_monk_keeps_exactly_the_two_requested_starters_across_relogin_and_can_use_them()
+    public async Task A_new_monk_keeps_exactly_the_requested_starters_across_relogin_and_can_use_them()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
             startTogether: (WoodlandOneOne, MonkStart.X, MonkStart.Y));
@@ -203,10 +203,18 @@ public sealed class MobileClientProtocolTests
             .Where(skill => skill is not null)
             .Select(skill => skill!)
             .ToList();
-        Assert.Equal(1, skills.Count(skill => (string?)skill!["Template"]?["Name"] == "이형환위"));
-        Assert.Equal(1, skills.Count(skill => (string?)skill!["Template"]?["Name"] == "단각"));
-        Assert.All(skills.Where(skill => (string?)skill!["Template"]?["Name"] is "이형환위" or "단각"),
+        // Exactly these and nothing else (user, 2026-09-24): the three Monk techniques beside the base attack the
+        // attack button swings (0x13 runs only Assail-type skills), and 쿠로토 instead of beag ioc fein.
+        Assert.Equal(new[] { "Assail", "단각", "붕각", "이형환위" },
+            skills.Select(skill => (string)skill["Template"]!["Name"]!).Order(StringComparer.Ordinal));
+        Assert.All(skills.Where(skill => (string?)skill!["Template"]?["Name"] is "이형환위" or "붕각" or "단각"),
             skill => Assert.Equal(1, (int?)skill!["Level"]));
+        List<string> spells = saved["SpellBook"]!["Spells"]!.AsObject()
+            .Select(pair => pair.Value)
+            .Where(spell => spell is not null)
+            .Select(spell => (string)spell!["Template"]!["Name"]!)
+            .ToList();
+        Assert.Equal(new[] { "쿠로토" }, spells);
 
         // The exact script keys are the authoritative backing for the pane entries, not a display-name alias.
         Assert.Equal("이형환위", ReadSkillTemplate(server, "이형환위")["ScriptName"]!.GetValue<string>());
@@ -671,9 +679,11 @@ public sealed class MobileClientProtocolTests
     private async Task StarterSkillsArrive(WorldClient world)
     {
         await Learned(world, "이형환위");
+        await Learned(world, "붕각");
         await Learned(world, "단각");
 
         Assert.Single(world.Skills, skill => skill.Name.StartsWith("이형환위 (", StringComparison.Ordinal));
+        Assert.Single(world.Skills, skill => skill.Name.StartsWith("붕각 (", StringComparison.Ordinal));
         Assert.Single(world.Skills, skill => skill.Name.StartsWith("단각 (", StringComparison.Ordinal));
     }
 

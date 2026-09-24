@@ -38,6 +38,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private readonly Node2D _camera = new() { Name = "Camera", YSortEnabled = true };
     private readonly Sprite2D _floor = new() { Name = "Floor", Centered = false };
 
+    // 맞은 만큼·채운 만큼 떠오르는 숫자(0x5D) — 한 노드가 전부 그린다.
+    private readonly FigureLayer _figures = new();
+
     // 맵을 타일로 맞춰 까는 바닥(map<번호>.txt 가 있을 때). 한 번 그려 두면 Godot 가 명령을 들고 있다가 다시 쓴다.
     private readonly Node2D _tiledFloor = new() { Name = "TiledFloor" };
     private Texture2D? _floorSheet;
@@ -293,6 +296,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         _camera.AddChild(_trail);
         _trail.Draw += DrawTrail;
         _camera.AddChild(_mark);
+        _camera.AddChild(_figures);
 
         _tile = new Tile(4, 4);
         _player = Add(
@@ -1370,6 +1374,27 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     }
 
     /// <summary>
+    /// Floats how much a blow took or a heal gave over whoever it was (0x5D). Read after <see cref="Wounds" /> so a
+    /// blow's bar is already up and the number starts above it.
+    /// </summary>
+    private void Figures()
+    {
+        while (server is { } world && world.TakeFigure(out Figure? figure))
+        {
+            Actor? on = figure.Target == world.Serial ? _player
+                : _herd.TryGetValue(figure.Target, out Actor? beast) ? beast
+                : _crowd.TryGetValue(figure.Target, out Actor? person) ? person
+                : null;
+
+            if (on is not null && figure.Amount > 0)
+            {
+                _figures.Add(on, on.FigureStart, figure, world.Serial);
+                GD.Print($"GREYBOX_FIGURE {FloatingFigure.Tone(figure, world.Serial)} {FloatingFigure.Text(figure)} on {on.DisplayName}");
+            }
+        }
+    }
+
+    /// <summary>
     /// Puts a bar over the head of whoever was just struck. The server tells us about every blow (0x13) with
     /// what is left as a percentage, and until now the screen only listened for the sound in it — so a fight
     /// showed no sign of how it was going, on a monster or on a person.
@@ -1696,6 +1721,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Herd();
         Swings();
         Wounds();
+        Figures();
         Gather();
         Drink();
         Flashes();
@@ -1838,6 +1864,22 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 Show(beat % 2 == 0 ? 42 : one == person ? 33 : 115, one.Position, 100, one);
             }
         }
+
+        // 떠오르는 숫자 넷 — 내가 준 것(말벌) · 남의 싸움(주모) · 내가 받은 것 · 회복, 나를 1번으로 친다.
+        const uint self = 1;
+
+        if (beast is not null)
+        {
+            _figures.Add(beast, beast.FigureStart, new Figure(2, self, 37 + beat, FigureKind.Damage), self);
+        }
+
+        if (person is not null)
+        {
+            _figures.Add(person, person.FigureStart, new Figure(3, 9, 12, FigureKind.Damage), self);
+        }
+
+        _figures.Add(_player, _player.FigureStart,
+            beat % 2 == 0 ? new Figure(self, 2, 8, FigureKind.Damage) : new Figure(self, self, 120, FigureKind.Heal), self);
     }
 
     /// <summary>

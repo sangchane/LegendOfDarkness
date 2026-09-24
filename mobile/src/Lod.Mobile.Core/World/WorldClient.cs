@@ -47,6 +47,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     // 우리 확장 — 남에게 걸린 것(0x5C). 원작은 당사자에게만 0x3A 로 알린다.
     private const byte SeenStatusCommand = 0x5C;
+
+    // 우리 확장 — 한 방이 뺀 만큼·회복이 채운 만큼(0x5D). 원작은 0x13 백분율뿐이다.
+    private const byte FigureCommand = 0x5D;
     private const byte AttackCommand = 0x13;
     private const byte HealthCommand = 0x13;
     private const byte SpokenCommand = 0x0A;
@@ -177,6 +180,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private readonly ConcurrentQueue<Motion> _motions = new();
     private readonly ConcurrentQueue<Effect> _effects = new();
     private readonly ConcurrentQueue<int> _sounds = new();
+
+    // Every figure in the order it came (0x5D), for the floating numbers.
+    private readonly ConcurrentQueue<Figure> _figures = new();
     private readonly ConcurrentQueue<int> _songs = new();
 
     private volatile WorldMapInfo? _field;
@@ -305,6 +311,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
         (serial, left) = (0, 0);
         return false;
     }
+
+    /// <summary>Takes the next amount a blow took or a heal gave (0x5D), oldest first.</summary>
+    public bool TakeFigure([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Figure? figure) => _figures.TryDequeue(out figure);
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
@@ -640,6 +649,10 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                     }
                 }
 
+                    continue;
+
+                case FigureCommand:
+                    _figures.Enqueue(ReadFigure(HadesCipher.DecodeSecured(frame, session.Parameters)));
                     continue;
 
                 case ShowCreaturesCommand:
@@ -1475,6 +1488,24 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             body[6],
             body[7] != 0,
             BinaryPrimitives.ReadUInt16BigEndian(body[8..]));
+    }
+
+    /// <summary>
+    /// How much a blow took or a heal gave (0x5D, our server's own packet): target(4) · source(4) · amount(4) ·
+    /// kind(1, 0 damage · 1 heal), all big-endian like the rest. An unknown kind is read as damage.
+    /// </summary>
+    public static Figure ReadFigure(ReadOnlySpan<byte> body)
+    {
+        if (body.Length < 13)
+        {
+            throw new ProtocolException($"피해·회복 안내가 13바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+
+        return new Figure(
+            BinaryPrimitives.ReadUInt32BigEndian(body),
+            BinaryPrimitives.ReadUInt32BigEndian(body[4..]),
+            (int)Math.Min(int.MaxValue, BinaryPrimitives.ReadUInt32BigEndian(body[8..])),
+            body[12] == 1 ? FigureKind.Heal : FigureKind.Damage);
     }
 
     public static IReadOnlyList<Creature> ReadCreatures(ReadOnlySpan<byte> body)

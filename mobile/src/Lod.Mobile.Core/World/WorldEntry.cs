@@ -182,6 +182,21 @@ public sealed record SeenAilment(uint Serial, int Icon, int Left, bool Harmful, 
     public Ailment Badge => new(Icon, Left);
 }
 
+/// <summary>
+/// How much one blow took or one heal gave (0x5D, our server's own packet — the original only sends a percentage,
+/// 0x13). See <c>ServerFormat5D</c> in the server fork.
+/// </summary>
+/// <param name="Target">Whose health changed.</param>
+/// <param name="Source">Who did it; 0 when the server does not say.</param>
+/// <param name="Amount">What really changed, after armour and the cap.</param>
+public sealed record Figure(uint Target, uint Source, int Amount, FigureKind Kind);
+
+public enum FigureKind
+{
+    Damage = 0,
+    Heal = 1,
+}
+
 public enum CreatureKind
 {
     /// <summary>A monster. It fights.</summary>
