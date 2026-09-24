@@ -26,6 +26,18 @@ public sealed class WardrobeTests
         Assert.Equal(["mb001"], Names(Wearing()));
     }
 
+    /// <summary>
+    /// 유령(몸 종류 3·4 — ServerFormat33 이 죽은 사람에게 0x30·0x40 을 보낸다)은 5.99 아카이브의 몸 002, 고리와 날개를 단
+    /// 유령 한 장이다. 벗은 몸(001)을 그리면 옷이 벗겨진 것처럼 보였다(사용자, 2026-09-24).
+    /// </summary>
+    [Theory]
+    [InlineData(0x30, "mb002")]
+    [InlineData(0x40, "wb002")]
+    public void A_ghost_is_the_ghost_drawing_and_nothing_else(int body, string drawing)
+    {
+        Assert.Equal([drawing], Names(Wearing(body: body, hairColour: 5)));
+    }
+
     [Fact]
     public void Every_piece_the_server_names_is_asked_for()
     {
@@ -87,8 +99,8 @@ public sealed class WardrobeTests
     [Theory]
     [InlineData(16, "mb001")]
     [InlineData(32, "wb001")]
-    [InlineData(48, "mb001")]
-    [InlineData(64, "wb001")]
+    [InlineData(48, "mb002")] // 유령 — A_ghost_is_the_ghost_drawing_and_nothing_else
+    [InlineData(64, "wb002")]
     [InlineData(144, "wb001")]
     [InlineData(176, "wb001")]
     public void The_body_says_which_archive_the_drawings_come_from(int body, string expected)

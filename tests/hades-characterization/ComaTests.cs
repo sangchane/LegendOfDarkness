@@ -209,7 +209,7 @@ public sealed class ComaTests : IDisposable
     /// <paramref name="nibblerBeside" /> 는 옆칸(3,35)에 한 대 1 짜리 선공 괴물을 하나 더 세운다. 혼수인 사람 곁에 붙어 서서 계속 노리는 괴물이라,
     /// 혼수 동안 피해가 들어가지 않는지(무적)와 괴물이 혼수인 사람을 목표에서 빼는지(표적)를 함께 본다 — 쓰러뜨린 괴물은 죽인 뒤 떠나 버린다.
     /// </remarks>
-    private static void StandOneKillerAhead(IsolatedHadesServer server, bool nibblerBeside = false)
+    internal static void StandOneKillerAhead(IsolatedHadesServer server, bool nibblerBeside = false)
     {
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
         Regex woodland = new($"\"AreaID\"\\s*:\\s*{WoodlandOneOne}\\b");

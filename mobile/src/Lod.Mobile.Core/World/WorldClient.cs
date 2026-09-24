@@ -67,6 +67,20 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>월드맵을 열어 달라는 말. 원작 클라이언트는 0x80 넘는 명령을 보내지 않으므로 이 번호는 우리 것이다.</summary>
     private const byte OpenFieldCommand = 0xF0;
+
+    /// <summary>
+    /// 서버의 심장박동(ServerFormat3B, <c>PingComponent</c> 가 PingInterval 마다). 원작 클라이언트는 0x45 로 답한다 —
+    /// 답이 끊긴 접속은 서버가 세계에서 뺀다(GameServer.UpdateClients). 소켓을 쥔 채 멈춘 앱(iOS 뒤로 감)도 이것으로 빠진다.
+    /// </summary>
+    private const byte HeartbeatCommand = 0x3B;
+    private const byte HeartbeatReplyCommand = 0x45;
+
+    /// <summary>나가겠다는 말(ClientFormat0B). 종류 1 이면 서버가 캐릭터를 곧장 세계에서 빼고 0x4C 로 답한다(LeaveGame).</summary>
+    private const byte ExitCommand = 0x0B;
+    private const byte ExitedCommand = 0x4C;
+
+    /// <summary>로그아웃이 서버의 0x4C 를 기다리는 가장 긴 시간. 오지 않아도 소켓을 닫으면 서버는 곧 뺀다.</summary>
+    public static readonly TimeSpan LogOutWait = TimeSpan.FromSeconds(1);
     private const byte BodyMotionCommand = 0x1A;
     private const byte AnimationCommand = 0x29;
     private const byte SoundCommand = 0x19;
@@ -135,6 +149,10 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private const byte WhisperCommand = 0x19;
 
     private byte _ordinal;
+
+    // 심장박동 답은 받는 실에서, 나머지는 화면 실에서 보낸다. 번호 매기기와 쓰기를 한 줄로 세워 프레임이 섞이지 않게 한다.
+    private readonly SemaphoreSlim _sending = new(1, 1);
+    private readonly TaskCompletionSource _exited = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private byte _step;
     private int _disposed;
     private int _disposeAttempts;
@@ -454,7 +472,20 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                     map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
                     _field = null;
                     _seenAiling.Clear();
+
+                    // 원작처럼 맵이 바뀌면(같은 맵 새로고침도) 보던 것을 모두 버린다 — 서버는 0x15 뒤에 시야를 비우고
+                    // 곁의 것을 다시 보낸다(GameClient.RefreshMap). 남겨 두면 지난 맵 괴물이 새 맵 위에 선다.
+                    _creatures.Clear();
+                    _others.Clear();
                     break;
+
+                case HeartbeatCommand:
+                    await Send(HeartbeatReplyCommand, HadesCipher.DecodeSecured(frame, session.Parameters).ToArray(), cancellationToken);
+                    continue;
+
+                case ExitedCommand:
+                    _exited.TrySetResult();
+                    continue;
 
                 case WorldMapCommand:
                     try
@@ -1054,14 +1085,52 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// a second layer of enciphering — which <see cref="HadesCipher.EncodeDialogSecured" /> explains.
     /// </summary>
     private Task SendDialog(byte command, byte[] fields, CancellationToken cancellationToken) =>
-        session.Connection.SendAsync(
-            HadesCipher.EncodeDialogSecured(command, _ordinal++, fields, session.Parameters),
-            cancellationToken);
+        SendInTurn(() => HadesCipher.EncodeDialogSecured(command, _ordinal++, fields, session.Parameters), cancellationToken);
 
     private Task Send(byte command, byte[] body, CancellationToken cancellationToken) =>
-        session.Connection.SendAsync(
-            HadesCipher.EncodeSecured(command, _ordinal++, body, session.Parameters),
-            cancellationToken);
+        SendInTurn(() => HadesCipher.EncodeSecured(command, _ordinal++, body, session.Parameters), cancellationToken);
+
+    private async Task SendInTurn(Func<byte[]> frame, CancellationToken cancellationToken)
+    {
+        await _sending.WaitAsync(cancellationToken);
+
+        try
+        {
+            await session.Connection.SendAsync(frame(), cancellationToken);
+        }
+        finally
+        {
+            _sending.Release();
+        }
+    }
+
+    /// <summary>
+    /// 원작 클라이언트처럼 나간다고 먼저 말하고(0x0B, 종류 1) 서버가 캐릭터를 뺐다는 답(0x4C)을 잠깐 기다린 뒤 소켓을 닫는다.
+    /// 말이 닿지 않아도(끊긴 망) 닫는 것은 반드시 한다 — 서버는 닫힌 소켓으로도 곧 뺀다.
+    /// </summary>
+    public async Task LogOutAsync(CancellationToken cancellationToken)
+    {
+        if (IsDisposed)
+        {
+            return;
+        }
+
+        try
+        {
+            using CancellationTokenSource wait = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            wait.CancelAfter(LogOutWait);
+            await Send(ExitCommand, [1], wait.Token);
+            await _exited.Task.WaitAsync(wait.Token);
+        }
+        catch (Exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            // 답이 늦거나 망이 끊겼다 — 닫는 것으로 충분하다.
+        }
+        finally
+        {
+            Dispose();
+        }
+    }
 
     /// <summary>Releases the owned world session. Safe when both logout and tree teardown arrive.</summary>
     public void Dispose()

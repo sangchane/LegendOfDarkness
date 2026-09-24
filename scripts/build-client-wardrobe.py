@@ -53,6 +53,9 @@ CELL = "120x96"
 #: 직업 의상 — skill.tbl ST 에 전사 동작은 옷 2, 도적 동작은 옷 4 가 있다.
 CLASS_CLOTHES = ["mu002", "mu004", "wu002", "wu004"]
 
+#: 유령의 몸 — 5.99 아카이브의 몸 002(머리 위 고리·날개, 남녀 같은 그림). 서버가 몸 종류 3·4(0x30·0x40)를 보낼 때 그린다(`Wardrobe`).
+GHOSTS = ["mb002", "wb002"]
+
 ITEMS = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "templates" / "items"
 #: 아이템 스크립트 → 입은 그림의 부위 글자(docs/original-sprite-animation.md 7절).
 SLOTS = {"Armor": "u", "Weapon": "w", "Helmet": "h", "Shield": "s", "Boot": "l"}
@@ -125,7 +128,7 @@ def main():
         return 1
 
     pieces = sorted({p.stem for p in PARTS.glob("*.png") if re.fullmatch(r"[mw][a-z]\d{3}", p.stem)}
-                    | set(CLASS_CLOTHES) | worn_by_items())
+                    | set(CLASS_CLOTHES) | set(GHOSTS) | worn_by_items())
     # 새것만: 서기 그림이 아직 없는 부위만(옷장을 이미 최신 도구로 뽑아 둔 뒤 아이템이 늘었을 때).
     if "--새것만" in sys.argv:
         pieces = [piece for piece in pieces if not (PARTS / f"{piece}.png").exists()]

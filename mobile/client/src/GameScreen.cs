@@ -691,7 +691,11 @@ public partial class GameScreen : Control
     /// Closes the network before asking Main for a deferred tree change. The exit callback below is a
     /// second safety net, so WorldClient and every owner beneath it make Dispose idempotent.
     /// </summary>
-    private void LogOut()
+    /// <remarks>
+    /// 원작처럼 먼저 나간다고 말하고(0x0B) 서버가 캐릭터를 뺐다는 답을 잠깐(1초까지) 기다린 뒤 닫는다 — 소켓만 끊고 떠나면
+    /// 캐릭터가 사냥터에 남아 보였다(사용자, 2026-09-24).
+    /// </remarks>
+    private async void LogOut()
     {
         if (_leaving)
         {
@@ -701,7 +705,12 @@ public partial class GameScreen : Control
         _leaving = true;
         _logout.Disabled = true;
         _world.Frozen = true;
-        _server?.Dispose();
+
+        if (_server is { } server)
+        {
+            await server.LogOutAsync(System.Threading.CancellationToken.None);
+        }
+
         LoggedOut?.Invoke();
     }
 
@@ -709,7 +718,7 @@ public partial class GameScreen : Control
     /// Closes the network and then the app. iOS does not let an app close itself (<see cref="ExitChoice" />), so
     /// there it logs out instead.
     /// </summary>
-    private void QuitGame()
+    private async void QuitGame()
     {
         if (!ExitChoice.CanQuit)
         {
@@ -718,7 +727,12 @@ public partial class GameScreen : Control
         }
 
         _world.Frozen = true;
-        _server?.Dispose();
+
+        if (_server is { } server)
+        {
+            await server.LogOutAsync(System.Threading.CancellationToken.None);
+        }
+
         GetTree().Quit();
     }
 

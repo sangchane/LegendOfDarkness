@@ -19,6 +19,9 @@ public static class Wardrobe
     // BodySprite on the server: 2 woman, 4 her ghost, 6 her unseen, 9 her head alone, 11 her blank.
     private static readonly int[] Women = [2, 4, 6, 9, 11];
 
+    // BodySprite 3 남자 유령(0x30) · 4 여자 유령(0x40).
+    private const int Ghost = 3;
+
     /// <summary>
     /// The pieces to draw, furthest back first. Anything the server left at zero is not worn and so is not
     /// in the list; a caller with no picture for a piece should skip that piece rather than the person.
@@ -32,6 +35,13 @@ public static class Wardrobe
     {
         char gender = Women.Contains((worn.Body & Kind) >> 4) ? 'w' : 'm';
         List<Piece> pieces = [];
+
+        // 유령(3 남 · 4 여) — 5.99 아카이브의 몸 002 가 머리 위 고리와 날개를 단 유령이다(khan.dat mb00201 · khan2.dat
+        // wb00201, 두 파일이 같다). 서버는 유령에게 옷을 보내지 않고(ServerFormat33) 원작도 유령 한 장만 그린다.
+        if ((worn.Body & Kind) >> 4 is Ghost or Ghost + 1)
+        {
+            return [new Piece($"{gender}b002", 0)];
+        }
 
         Add('s', worn.Shield);
 
