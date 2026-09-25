@@ -5,15 +5,16 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 장비를 얻는 길은 둘이고 그 둘은 레벨로 갈린다 — <b>저레벨은 사서 입고, 그 위는 가끔 주워 입는다.</b>
-/// 사용자가 정한 것이다(2026-09-23): "괴물이 잡템만 남기는건 저레벨때나 그렇고 장비같은건 낮은 확률로
-/// 드랍되긴해".
+/// 장비를 얻는 길은 둘이고 그 둘은 레벨로 갈린다 — <b>기본템은 상점에서만 사고, 사냥터는 레벨이 맞는
+/// 접미사·속성 장비만 가끔 준다.</b> 사용자가 정한 것이다(2026-09-23 "낮은 확률로 드랍되긴해" →
+/// 2026-09-25 "기본템을 빼고 그 자리에 접미사·속성 장비를 넣어라, 사냥터마다 레벨이 맞게").
 /// </summary>
 /// <remarks>
 /// <para>
-/// 여기서 지키는 것은 세 가지다. 노비스 동선 괴물의 드롭 목록에 장비 이름이 <b>하나도 없다</b>,
-/// 우드랜드·포테의숲 괴물에는 <b>있고</b> 실제로 떨어질 확률이 <b>1~5%</b> 안이다, 그리고 떨구라고 적힌
-/// 이름이 <b>전부 실제 아이템</b>이다.
+/// 여기서 지키는 것은 넷이다. 노비스 동선 괴물의 드롭 목록에 장비 이름이 <b>하나도 없다</b>,
+/// 우드랜드·포테의숲 괴물의 드롭 목록에 <b>기본템(달마티카·단도복 같은 접미사 없는 것)이 하나도 없다</b>,
+/// 대신 <b>그 사냥터 레벨에 맞는 접미사·속성 장비</b>가 옛 기본템 자리와 같은 확률로 있다, 그리고 떨구라고
+/// 적힌 이름이 <b>전부 실제 아이템</b>이다.
 /// </para>
 /// <para>
 /// <b>왜 목록을 보고 확률을 안 보나.</b> 떨어질 확률은 괴물이 아니라 아이템 템플릿의 <c>DropRate</c> 에
@@ -27,6 +28,13 @@ namespace Lod.Hades.Characterization.Tests;
 /// 6% 짜리 장비가 두 칸짜리 목록에 있으면 3%, 세 칸이면 2% 다.
 /// </para>
 /// <para>
+/// <b>왜 사냥터마다 다른 장비인가.</b> 접미사(사람이름) 반지·목걸이는 11~12레벨 한 층뿐이다(하데스표
+/// 496종을 다 훑어도 이 계열은 5~16레벨 보석 등급이 전부다, <c>data/pack-compare/한글이름-검토.tsv</c>,
+/// <c>scripts/build-suffix-gear-ko.py</c>). 그래서 우드랜드3-4(11레벨 대)만 접미사 반지를 쓰고, 그 위
+/// 세 사냥터는 이미 층이 있는 4원소 공격 속성 장비를 그 사냥터 레벨에 맞춰 쓴다(자세한 근거는
+/// <c>scripts/build-gear-drops.py</c> <c>TIERS</c> 주석).
+/// </para>
+/// <para>
 /// <b>용의발톱은 아무 데도 없어야 한다.</b> <c>LevelRequired 1</c> 에 피해 180~200, 값 0 이다 — 같은
 /// 아이템이 Novaonline 팩에서는 레벨제한 99 다. 1레벨이 주우면 초반이 통째로 무너진다.
 /// </para>
@@ -36,11 +44,6 @@ public sealed class GearDropTests
 {
     /// <summary>하데스가 목록에서 하나를 골라 굴리는 갈래. <c>LootQualifer.Random</c>.</summary>
     private const int LootRandom = 1 << 1;
-
-    /// <summary>5.99 팩이 장비를 떨구는 괴물에 쓰는 폭. 우리가 넣는 것도 이 안에 있어야 한다.</summary>
-    private const double Least = 0.01;
-
-    private const double Most = 0.05;
 
     /// <summary>잡템만 나오는 곳 — 노비스 동선과 우드랜드 첫 구역들(워프 레벨문이 1~22 이거나 없다).</summary>
     private static readonly int[] Early =
@@ -80,54 +83,106 @@ public sealed class GearDropTests
             "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
     }
 
+    /// <summary>우드랜드3-4(11~12레벨) — 로오·칸은 5.99 팩 것, 나머지 다섯은 되살린 것.</summary>
+    private static readonly string[] DefenseSuffixGear =
+    [
+        "로오의반지", "이아의호안석반지", "메투스의호안석반지",
+        "세토아의호안석반지", "세오의호안석반지", "셔스의호안석반지", "칸의목걸이",
+    ];
+
+    /// <summary>포테의숲(21레벨 대) — 접미사 반지에 21레벨 층이 없어 4원소 11레벨 층으로 채운다.</summary>
+    private static readonly string[] ElementAt11 =
+        ["화염의룬스톤목걸이", "바다의룬스톤목걸이", "바람의룬스톤목걸이", "대지의룬스톤목걸이"];
+
+    /// <summary>우드랜드5-6(41레벨 대) — 41레벨 층이 없어 4원소 51레벨 층으로 채운다.</summary>
+    private static readonly string[] ElementAt51 =
+        ["화염의크리스탈목걸이", "바다의크리스탈목걸이", "바람의크리스탈목걸이", "대지의크리스탈목걸이"];
+
+    /// <summary>우드랜드14(71레벨 대) — 4원소 71레벨 층, 그대로 맞는다.</summary>
+    private static readonly string[] ElementAt71 =
+        ["화염의홀디트링", "바다의홀디트링", "바람의홀디트링", "대지의홀디트링"];
+
+    /// <summary>
+    /// 사냥터별로 레벨이 맞는 접미사·속성 장비 한 벌 — <c>scripts/build-gear-drops.py</c> <c>TIERS</c> 와
+    /// 같은 목록이다. 기본템은 여기 없으니 이 목록 밖의 장비가 보이면 아직 기본템이 남은 것이다.
+    /// </summary>
+    private static readonly Dictionary<int, string[]> GroundGear = new()
+    {
+        [20023] = DefenseSuffixGear,
+        [20024] = DefenseSuffixGear,
+        [20263] = ElementAt11,
+        [20264] = ElementAt11,
+        [20265] = ElementAt11,
+        [20266] = ElementAt11,
+        [20267] = ElementAt11,
+        [20268] = ElementAt11,
+        [20025] = ElementAt51,
+        [20026] = ElementAt51,
+        [20020] = ElementAt71,
+    };
+
+    /// <summary>실제 확률이 이 안이어야 한다 — 옛 기본템 자리(잡템 3 + 장비 1~2칸)와 같은 폭이다.</summary>
+    private const double GroundRateLeast = 0.01;
+
+    private const double GroundRateMost = 0.03;
+
     [Fact]
-    public void Woodland_and_pote_monsters_leave_gear_between_one_and_five_percent()
+    public void Later_grounds_carry_no_base_gear_only_level_matched_suffix_or_element_gear()
     {
         IReadOnlyDictionary<string, JsonNode> items = Items();
-        List<string> bare = [];
+        List<string> stillBase = [];
+        List<string> missing = [];
         List<string> outside = [];
 
         foreach ((int map, string ground) in Later)
         {
             JsonNode[] here = [.. Monsters().Where(m => (int?)m["AreaID"] == map)];
             Assert.True(here.Length > 0, $"{ground}({map}) 에 괴물 정의가 없습니다.");
-
-            string[] gear = [.. here.SelectMany(m => Dropped(m).Where(name => IsNormalGear(items, name)))];
-
-            if (gear.Length == 0)
-            {
-                bare.Add($"{ground}({map})");
-                continue;
-            }
+            string[] allowed = GroundGear[map];
 
             foreach (JsonNode monster in here)
             {
                 string[] listed = [.. Dropped(monster)];
+                string[] baseGear = [.. listed.Where(name => IsGear(items, name) && !allowed.Contains(name))];
 
-                foreach (string name in listed.Where(name => IsNormalGear(items, name)))
+                if (baseGear.Length > 0)
                 {
-                    // 목록에서 하나를 고르는 갈래여야 확률을 셀 수 있다.
-                    Assert.True(((int?)monster["LootType"] & LootRandom) == LootRandom,
-                        $"{ground} {monster["Name"]} 의 LootType 이 {monster["LootType"]} 입니다 — " +
-                        $"장비를 실으려면 목록에서 하나를 고르는 갈래(Random {LootRandom})여야 합니다.");
+                    stillBase.Add($"{ground} {monster["Name"]} → {string.Join('·', baseGear)}");
+                    continue;
+                }
 
-                    double rate = (double?)items[name]["DropRate"] ?? 0;
-                    double real = rate / listed.Length;
+                string? picked = listed.FirstOrDefault(name => allowed.Contains(name));
 
-                    if (real < Least || real > Most)
-                    {
-                        outside.Add(
-                            $"{ground} {monster["Name"]} → {name} {real:P1}" +
-                            $"(DropRate {rate} ÷ {listed.Length}칸)");
-                    }
+                if (picked is null)
+                {
+                    missing.Add($"{ground} {monster["Name"]}");
+                    continue;
+                }
+
+                // 목록에서 하나를 고르는 갈래여야 확률을 셀 수 있다.
+                Assert.True(((int?)monster["LootType"] & LootRandom) == LootRandom,
+                    $"{ground} {monster["Name"]} 의 LootType 이 {monster["LootType"]} 입니다 — " +
+                    $"장비를 실으려면 목록에서 하나를 고르는 갈래(Random {LootRandom})여야 합니다.");
+
+                double rate = (double?)items[picked]["DropRate"] ?? 0;
+                double real = rate / listed.Length;
+
+                if (real < GroundRateLeast || real > GroundRateMost)
+                {
+                    outside.Add(
+                        $"{ground} {monster["Name"]} → {picked} {real:P1}" +
+                        $"(DropRate {rate} ÷ {listed.Length}칸)");
                 }
             }
         }
 
-        Assert.True(bare.Count == 0,
-            $"장비가 하나도 안 떨어지는 사냥터가 {bare.Count} 곳입니다: {string.Join(", ", bare)}.");
+        Assert.True(stillBase.Count == 0,
+            $"기본템이 아직 남은 사냥터 드롭 줄이 {stillBase.Count}개입니다: {string.Join(", ", stillBase.Order())}. " +
+            "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
+        Assert.True(missing.Count == 0,
+            $"레벨이 맞는 접미사·속성 장비가 없는 사냥터 괴물이 {missing.Count}마리입니다: {string.Join(", ", missing.Order())}.");
         Assert.True(outside.Count == 0,
-            $"실제 확률이 {Least:P0}~{Most:P0} 밖인 장비 드롭이 {outside.Count} 줄입니다: " +
+            $"실제 확률이 {GroundRateLeast:P0}~{GroundRateMost:P0} 밖인 드롭이 {outside.Count} 줄입니다: " +
             $"{string.Join(", ", outside.Order())}.");
     }
 
@@ -267,73 +322,6 @@ public sealed class GearDropTests
             "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
     }
 
-    /// <summary>방어 접미사 — 사냥터 드랍 전용(사용자 결정 2026-09-24). 상점 쪽은 <c>TownGearShopTests</c>.</summary>
-    private static readonly string[] DefenseSuffixGear = ["로오의반지", "칸의목걸이"];
-
-    /// <summary>공격 속성 — 상점과 사냥터 둘 다(같은 결정).</summary>
-    private static readonly string[] AttackElementGear =
-    [
-        "대지의목걸이", "대지의벨트", "바다의목걸이", "바다의벨트",
-        "바람의목걸이", "바람의벨트", "화염의목걸이", "화염의벨트",
-    ];
-
-    /// <summary>일반 장비(1~5%)보다 드물게 — 한 마리당 0.5~1%.</summary>
-    private const double RareLeast = 0.005;
-
-    private const double RareMost = 0.01;
-
-    [Fact]
-    public void Later_grounds_drop_defense_suffix_and_attack_element_gear_more_rarely_than_normal_gear()
-    {
-        IReadOnlyDictionary<string, JsonNode> items = Items();
-        List<string> missingSuffix = [];
-        List<string> missingElement = [];
-        List<string> outside = [];
-
-        foreach ((int map, string ground) in Later)
-        {
-            JsonNode[] here = [.. Monsters().Where(m => (int?)m["AreaID"] == map)];
-
-            foreach (JsonNode monster in here)
-            {
-                string[] listed = [.. Dropped(monster)];
-                string? suffix = listed.FirstOrDefault(n => DefenseSuffixGear.Contains(n));
-                string? element = listed.FirstOrDefault(n => AttackElementGear.Contains(n));
-
-                if (suffix is null)
-                {
-                    missingSuffix.Add($"{ground} {monster["Name"]}");
-                    continue;
-                }
-
-                if (element is null)
-                {
-                    missingElement.Add($"{ground} {monster["Name"]}");
-                    continue;
-                }
-
-                foreach (string name in new[] { suffix, element })
-                {
-                    double rate = (double?)items[name]["DropRate"] ?? 0;
-                    double real = rate / listed.Length;
-
-                    if (real < RareLeast || real > RareMost)
-                    {
-                        outside.Add($"{ground} {monster["Name"]} → {name} {real:P2}(DropRate {rate} ÷ {listed.Length}칸)");
-                    }
-                }
-            }
-        }
-
-        Assert.True(missingSuffix.Count == 0,
-            $"방어 접미사 장비가 없는 장비 사냥터 괴물이 {missingSuffix.Count}마리입니다: {string.Join(", ", missingSuffix.Order())}.");
-        Assert.True(missingElement.Count == 0,
-            $"공격 속성 장비가 없는 장비 사냥터 괴물이 {missingElement.Count}마리입니다: {string.Join(", ", missingElement.Order())}.");
-        Assert.True(outside.Count == 0,
-            $"접미사·속성 장비의 실제 확률이 {RareLeast:P1}~{RareMost:P1} 밖인 줄이 {outside.Count}개입니다: "
-            + $"{string.Join(", ", outside.Order())}.");
-    }
-
     [Fact]
     public void Nothing_drops_the_dragon_claw()
     {
@@ -430,13 +418,6 @@ public sealed class GearDropTests
 
     private static bool IsGear(IReadOnlyDictionary<string, JsonNode> items, string name) =>
         items.TryGetValue(name, out JsonNode? item) && (int?)item["EquipmentSlot"] is > 0;
-
-    /// <summary>
-    /// 일반 장비만 — 방어 접미사·공격 속성은 <see cref="DefenseSuffixGear"/>·<see cref="AttackElementGear"/>
-    /// 가 따로 보는 더 드문 확률(0.5~1%)이라 여기서는 뺀다.
-    /// </summary>
-    private static bool IsNormalGear(IReadOnlyDictionary<string, JsonNode> items, string name) =>
-        IsGear(items, name) && !DefenseSuffixGear.Contains(name) && !AttackElementGear.Contains(name);
 
     private static JsonNode[] Monsters() => _monsters ??=
         [.. Definitions(Path.Combine(HadesWorkspace.ServerDataDirectory, "templates", "monsters"))];
