@@ -96,6 +96,8 @@ public sealed class FloatingFigureTests : IDisposable
         }, $"쿠로토가 채운 만큼을 보내지 않았습니다: {string.Join(", ", figures)} · 서버: {world.Said}");
 
         Assert.True(heal!.Amount > 0);
+        // 쿠로토는 100 을 채운다(사용자 2026-09-25: "체력 100 정도 회복") — 상한에 걸리면 모자란 만큼만.
+        Assert.Equal(Math.Min(100, world.Vitals!.MaximumHealth - health), heal.Amount);
         await Until(() => world.Vitals!.Health == health + heal.Amount,
             $"쿠로토 숫자 {heal.Amount} 가 실제로 오른 체력({health} → {world.Vitals!.Health})과 다릅니다.");
     }
