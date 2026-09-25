@@ -12,7 +12,10 @@
 
 무도가 기술은 `build-monk-skills.py` 가 따로 만든 것(`Skills/Monk/`)을 그대로 둔다.
 
-  쓰는 법: python3 scripts/build-pack-abilities.py [--쓰기]
+  쓰는 법: python3 scripts/build-pack-abilities.py [--쓰기] [--만 이름 …]
+
+`--만` 을 붙이면 그 이름의 블록만 쓴다. 손본 스크립트(쿠로토·다라밀공의 무도가 몸동작 …)를 되돌리지 않고
+한두 개만 새로 옮길 때 쓴다.
 """
 import json
 import re
@@ -32,7 +35,8 @@ RUNTIME = OUT / "Pack599.cs"
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
 MARK = "5.99표"
-EXCLUDED = {"정권"}  # 사용자 지시(2026-09-16)
+#: 사용자가 2026-09-16 에 뺐던 정권은 2026-09-25 에 다시 넣으라 했다("5.99 기준으로 완성") — 비어 있다.
+EXCLUDED = set()
 
 #: 옮기지 않고 하데스 스크립트를 그대로 붙이는 것. 기본공격은 하데스 `Assail` 이 바로 그것이다(사용자 확인).
 ALIASES = {"기본공격": "Assail"}
@@ -565,7 +569,10 @@ def implemented():
 
 def main():
     writing = "--쓰기" in sys.argv or "--write" in sys.argv
+    only = set(sys.argv[sys.argv.index("--만") + 1:]) if "--만" in sys.argv else None
     found = blocks()
+    if only is not None:
+        found = {key: value for key, value in found.items() if key[1] in only}
     skills, spells = definitions(PACK / "skill" / "Skill.txt"), definitions(PACK / "spell" / "spell.txt")
     taught = teachers()
     known = implemented()
