@@ -6,11 +6,11 @@
   아이폰 앱이 맥 서버에 **닿지 않았다.** 무료로 쓸 수 있는 클라우드(예: Oracle Cloud Always Free Arm VM 등 — 후보를 비교해
   고른다)에 Hades 서버(.NET 9, `Staging/net9.0` · 포트 2610 로그인 · 2615 게임 · `LoruleConfig`·`MServerTable` 주소를 공인 IP 로)를
   올리고, 캐릭터 저장(`database/server/aislings`)·백업을 옮기고, 앱의 `mobile/client/server.cfg` 를 공인 주소로 바꿔 설치한다.
-  **지금 상태(2026-09-24 밤)**: 테더링이 안 된 까닭은 SKT 테더링이 **IPv6 전용**이라서였다(맥의 192.0.0.x 는 가짜 IPv4).
-  서버가 IPv6 로도 듣고, 앱은 로그인한 주소로 로비·게임을 따라가게 고쳤다(시험 ::1 통과 · 맥 IPv6 로 2610 열림 · 폰 확인 전). 네트워크가 바뀌면
-  `scripts/lod-server.sh config` 한 번(테더링이면 맥 IPv6, 와이파이면 IPv4 를 서버 설정·`server.cfg` 에 넣는다) →
-  `scripts/ios-build.sh install`. 클라우드: Oracle 오사카 가입 끝, ARM 자리가 없어("Out of capacity") 서버는 아직 —
-  만들면 `LOD_CLOUD_IP=<공인 IP> scripts/cloud-server.sh setup`(열쇠 `~/.ssh/lod_oracle`).
+  **지금 상태(2026-09-25)**: **서버는 Oracle 클라우드(오사카, 161.33.43.117 · Ubuntu 24.04 x86 · 12GB)에서 돈다** — 앱 주소도
+  `161.33.43.117:2610`. 올리기 `LOD_CLOUD_IP=161.33.43.117 scripts/cloud-server.sh deploy`(캐릭터는 클라우드 것이 진짜, 덮지 않는다) ·
+  기록 `… logs` · 캐릭터 받기 `… backup` · 앱을 클라우드로 `… app`. 게임 폴더는 대소문자를 안 가리는 ext4(casefold) 위
+  (`~/lod` → `~/lod-ci/lod`) — 코드·자료가 맥에서 자라 이름 대소문자가 섞여 있다. 맥 서버는 그대로 떠 있지만 캐릭터가 따로 논다.
+  테더링(SKT)은 IPv6 전용이라 맥 서버로 붙으려면 `scripts/lod-server.sh config`(맥 IPv6 를 앱에) → 설치, 주소가 재연결마다 바뀐다.
 - **[끝남/2026-09-24 밤 — 폰 확인 전]** 우드랜드 나머지 13맵(입구·1-2·1-3·2-1~6-1·14-1·10-1·11-1·(진) 둘) 그림을 앱에 넣었다
   (입구가 "깨져" 보인 까닭 — 그림이 1-1 뿐이었다). 로그아웃한 자리가 사라지던 것: 서버가 마지막 저장 2초 안이면 나갈 때 저장을
   건너뛰었다 → 늘 저장(`LogoutTests.The_next_character_does_not_take_the_place_the_last_one_logged_out_at`). 서버 반영·앱 설치 끝.
