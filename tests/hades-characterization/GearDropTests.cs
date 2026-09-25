@@ -349,6 +349,70 @@ public sealed class GearDropTests
             $"{string.Join(", ", carrying.Order())}.");
     }
 
+    /// <summary>
+    /// 죽어 있던 팩 드롭 3종 — 5.99 팩이 떨구라고 적어 두었지만 아이템에 <c>DropRate</c> 가 없어 영영
+    /// 안 나왔다. 아벨해안이 열려(2026-09-25) 이제 손이 닿으므로 살린다.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>근거</b> — 5.99 팩 <c>db/mob/Abel/Abel_Monster.txt</c>: 크라켄1 <c>드롭아이템 3 실버아쿠아링</c>
+    /// (49줄) · 크라켄2 <c>드롭아이템 5 실버아쿠아링</c>(97줄) · 킹아크퍼스2 <c>드롭아이템 40 골드아쿠아링</c>
+    /// (259줄). Novaonline <c>db/mob/아벨해안/아벨해안.txt</c> 도 크라켄(1) 3% · 킹아크퍼스2 40% 로 같다 —
+    /// 크라켄2 의 5% 만 5.99 에만 있다. 아이템의 <c>DropRate</c> 는 하나뿐이라 크라켄1·2 를 가르지 못해 두
+    /// 팩이 겹치는 3% 를 쓴다. <c>db/mob/Casmanum/Casmanum_Monster.txt</c> 그림록퀸 → 그림록퀸홀은
+    /// <c>드롭아이템 1</c>(1%) — Novaonline <c>mine.txt</c> 는 15%, 혼든은 그림록퀸1-3 5% · 그림록퀸2-3 3%
+    /// 로 셋이 갈려, 이 서버의 괴물 정의가 온 5.99 값을 쓴다(카스마늄 갱도는 아직 손대지 않은 지역이라
+    /// 다른 근거가 없다).
+    /// </para>
+    /// <para>
+    /// <b>왜 안 떨어졌나</b> — 넷 다 <c>LootType</c> 이 <c>Table</c>(4) 이었다. Table 갈래는 <c>DropRate</c>
+    /// 를 가중치로 써서 목록에서 하나를 고르는데(<c>LootDropper.Drop</c>), 목록이 한 칸뿐이고
+    /// <c>DropRate</c> 가 0 이면 굴러가는 확률이 사실상 0 이다. 목록에서 하나를 고른 뒤 그 값을 확률로
+    /// 굴리는 <c>Random</c>(2) 으로 바꿔야 <c>DropRate</c> 가 실제 확률이 된다(우드랜드·포테 장비와 같은
+    /// 갈래, <c>DetermineRandomDrop</c>).
+    /// </para>
+    /// <para>
+    /// 이 넷은 <see cref="Later" /> 목록 밖(아벨해안·카스마늄)이라 걸어 다니는 사냥터의 1~5% 잣대를 걸지
+    /// 않는다 — 팩이 적은 값을 그대로 믿는다. 정의를 만드는 것은 <c>scripts/build-gear-drops.py</c> 의
+    /// <c>FIELD_BOSSES</c> 다.
+    /// </para>
+    /// </remarks>
+    private static readonly (string Beast, string Prize, double Rate)[] FieldBosses =
+    [
+        ("크라켄1", "실버아쿠아링", 0.03),
+        ("크라켄2", "실버아쿠아링", 0.03),
+        ("킹아크퍼스2", "골드아쿠아링", 0.40),
+        ("그림록퀸", "그림록퀸홀", 0.01),
+    ];
+
+    [Fact]
+    public void Field_bosses_actually_roll_their_pack_listed_drop()
+    {
+        IReadOnlyDictionary<string, JsonNode> items = Items();
+
+        foreach ((string beast, string prize, double rate) in FieldBosses)
+        {
+            JsonNode[] carrying =
+            [
+                .. Monsters().Where(m => m["Name"]?.GetValue<string>() == beast && Dropped(m).Contains(prize)),
+            ];
+
+            Assert.True(carrying.Length > 0, $"{beast} 가 {prize} 를 떨구는 정의를 못 찾았습니다.");
+
+            foreach (JsonNode monster in carrying)
+            {
+                // Table 갈래는 DropRate 를 가중치로 써서 목록이 한 칸이면 사실상 안 뽑힌다 — 확률을
+                // 실제로 굴리려면 Random 이어야 한다.
+                Assert.True(((int?)monster["LootType"] & LootRandom) == LootRandom,
+                    $"{beast}@{monster["AreaID"]} 의 LootType 이 {monster["LootType"]} 입니다 — " +
+                    $"목록이 한 칸이면 Random({LootRandom})이어야 DropRate 가 실제로 굴러갑니다.");
+            }
+
+            Assert.True(items.ContainsKey(prize), $"«{prize}» 의 아이템 정의가 없습니다.");
+            Assert.Equal(rate, (double?)items[prize]["DropRate"] ?? 0);
+        }
+    }
+
     /// <summary>한 괴물 정의가 떨구겠다고 적어 둔 이름. <c>random</c> 은 이름이 아니라 낱말이다.</summary>
     private static IEnumerable<string> Dropped(JsonNode monster)
     {

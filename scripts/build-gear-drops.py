@@ -113,6 +113,28 @@ BOSSES = [
     ("자이언트맨티스", "세줄금반지", 0.80, 11, "포테의숲오솔길보스존(개인 던전 · 입장 52레벨 미만)"),
 ]
 
+# 맵에 그냥 서 있는 이름 있는 몬스터(개인 던전 보스가 아니다). 칸: (괴물, 떨구는 것, 확률, 어디인가).
+#
+# **크라켄1·2 → 실버아쿠아링, 킹아크퍼스2 → 골드아쿠아링** — 5.99 팩 `db/mob/Abel/Abel_Monster.txt`:
+# 크라켄1 `드롭아이템 3 실버아쿠아링`(49줄) · 크라켄2 `드롭아이템 5 실버아쿠아링`(97줄) · 킹아크퍼스2
+# `드롭아이템 40 골드아쿠아링`(259줄). Novaonline `db/mob/아벨해안/아벨해안.txt` 도 크라켄(1) 3% ·
+# 킹아크퍼스2 40% 로 같다 — 크라켄2 의 5% 만 5.99 에만 있다. 아이템의 `DropRate` 는 하나뿐이라 크라켄
+# 1·2 를 가르지 못해 두 팩이 겹치는 3% 를 쓴다.
+#
+# **그림록퀸 → 그림록퀸홀** — 5.99 `db/mob/Casmanum/Casmanum_Monster.txt` `드롭아이템 1 그림록퀸홀`
+# (1%). Novaonline `mine.txt` 는 15%, 혼든은 그림록퀸1-3 5% · 그림록퀸2-3 3% 로 셋이 갈린다 — 이 서버의
+# 괴물 정의가 온 5.99 값을 쓴다(카스마늄 갱도는 아직 손대지 않은 지역이라 다른 근거가 없다).
+#
+# 왜 죽어 있었나: 넷 다 `LootType` 이 Table(4) 이었다. Table 은 `DropRate` 를 가중치로 써서 고르는데
+# 목록이 한 칸뿐이고 `DropRate` 가 0(기본값)이면 사실상 절대 안 뽑힌다. `BOSSES` 와 같은 자리(Random)로
+# 옮기면 `DropRate` 가 그대로 실제 확률이 된다.
+FIELD_BOSSES = [
+    ("크라켄1", "실버아쿠아링", 0.03, "아벨해안1(51레벨)"),
+    ("크라켄2", "실버아쿠아링", 0.03, "아벨해안2(51레벨)"),
+    ("킹아크퍼스2", "골드아쿠아링", 0.40, "아벨해안4(81레벨)"),
+    ("그림록퀸", "그림록퀸홀", 0.01, "카스마늄제1-3갱도(99레벨)"),
+]
+
 # Random 쪽으로 옮기면 잡템도 제 확률이 있어야 한다. 5.99 팩 `드롭아이템` 의 확률 그대로다.
 JUNK_RATE = {"엘란디스": 0.40, "이슬": 0.40, "아칸더스": 0.40}
 
@@ -322,6 +344,35 @@ def lay_boss(monsters, items, writing, said):
         said.append(f"{beast} — {where}: {prize} {100 * rate:.0f}% (레벨제한 {level})")
 
 
+def lay_field_boss(monsters, items, writing, said):
+    """맵에 서 있는 이름 있는 몬스터에 팩이 적은 드롭을 건다. 목록이 한 칸이라 확률이 그대로 나온다.
+
+    `lay_boss` 와 같은 모양이지만 레벨제한은 건드리지 않는다 — 넷 다 이미 원작 도감과 같다
+    (실버아쿠아링 51 · 골드아쿠아링 81 · 그림록퀸홀 99, `FIELD_BOSSES` 주석 참고).
+    """
+    for beast, prize, rate, where in FIELD_BOSSES:
+        here = [(path, monster) for path, monster in monsters if monster.get("Name") == beast]
+
+        if not here:
+            said.append(f"{beast}: 괴물 정의를 못 찾았다")
+            continue
+
+        if not rate_item(prize, rate, items, writing, said):
+            continue
+
+        for path, monster in here:
+            loot = monster.get("LootType") or 0
+            # 목록에서 하나를 고르는 갈래여야 `DropRate` 가 그대로 확률이 된다(Table 은 가중치로 쓴다).
+            loot = (loot & LOOT_GOLD) | LOOT_RANDOM
+
+            if drops_of(monster) != [prize] or monster.get("LootType") != loot:
+                set_drops(monster, [prize])
+                monster["LootType"] = loot
+                write(path, monster, writing, "")
+
+        said.append(f"{beast} — {where}: {prize} {100 * rate:.0f}%")
+
+
 def cut_stale_rates(monsters, items, writing, said):
     """아무도 안 떨구는데 `DropRate` 가 남은 **우리 장비**에서 그 칸을 뺀다.
 
@@ -365,6 +416,7 @@ def main():
     strip_early(monsters, items, writing, said)
     lay_gear(monsters, items, writing, said)
     lay_boss(monsters, items, writing, said)
+    lay_field_boss(monsters, items, writing, said)
     cut_stale_rates(monsters, items, writing, said)
 
     print("\n".join(said))
