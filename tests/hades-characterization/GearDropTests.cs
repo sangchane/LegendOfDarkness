@@ -45,23 +45,35 @@ public sealed class GearDropTests
     /// <summary>하데스가 목록에서 하나를 골라 굴리는 갈래. <c>LootQualifer.Random</c>.</summary>
     private const int LootRandom = 1 << 1;
 
-    /// <summary>잡템만 나오는 곳 — 노비스 동선과 우드랜드 첫 구역들(워프 레벨문이 1~22 이거나 없다).</summary>
+    /// <summary>잡템만 나오는 곳 — 노비스 동선과 우드랜드 첫 구역들(워프 레벨문이 1~10 이거나 없다).</summary>
     private static readonly int[] Early =
     [
         20373, 20393, 20394,
         20380, 20381, 20382, 20383, 20384, 20385, 20386, 20387, 20388,
-        20015, 20016, 20017, 20022,
+        20015, 20016, 20017,
     ];
 
-    /// <summary>장비가 나오는 곳. 맵과 그 사냥터 이름.</summary>
+    /// <summary>
+    /// 장비가 나오는 곳. 맵과 그 사냥터 이름. 우드랜드2-1 은 2026-09-25 에 더했다 — 워프 레벨문이
+    /// 11(`warps.json` 우드랜드입구→우드랜드2-1)이라 우드3-4 와 같은 대접이다. 아벨해안 일반 몹(그래브·
+    /// 문어·바크·슬러그·애스코모이드·일·터틀·퐁퐁이)도 같은 날 더했다 — 크라켄·킹아크퍼스는 같은 맵에
+    /// 서 있어도 <c>FIELD_BOSSES</c> 가 따로 관리하므로 <see cref="ReservedNames"/> 로 뺀다.
+    /// </summary>
     private static readonly (int Map, string Name)[] Later =
     [
-        (20023, "우드랜드3-1"), (20024, "우드랜드4-1"),
+        (20022, "우드랜드2-1"), (20023, "우드랜드3-1"), (20024, "우드랜드4-1"),
         (20025, "우드랜드5-1"), (20026, "우드랜드6-1"),
         (20020, "우드랜드14-1"),
         (20263, "포테의숲1존"), (20264, "포테의숲2존"), (20265, "포테의숲3존"),
         (20266, "포테의숲4존"), (20267, "포테의숲5존"), (20268, "포테의숲6존"),
+        (20584, "아벨해안1-a"), (20585, "아벨해안1-b"),
+        (20586, "아벨해안2-a"), (20587, "아벨해안2-b"), (20588, "아벨해안2-c"),
+        (20589, "아벨해안3-a"), (20590, "아벨해안3-b"), (20591, "아벨해안3-c"),
+        (20592, "아벨해안4-a"), (20593, "아벨해안4-b"), (20594, "아벨해안4-c"),
     ];
+
+    /// <summary><c>FIELD_BOSSES</c> 가 관리하는 이름 — 아벨해안 일반 몹 잣대에서 뺀다.</summary>
+    private static readonly string[] ReservedNames = ["크라켄1", "크라켄2", "킹아크퍼스1", "킹아크퍼스2"];
 
     [Fact]
     public void Early_monsters_leave_junk_and_never_gear()
@@ -83,8 +95,11 @@ public sealed class GearDropTests
             "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
     }
 
-    /// <summary>우드랜드3-4(11~12레벨) — 로오·칸은 5.99 팩 것, 나머지 다섯은 되살린 것.</summary>
-    private static readonly string[] DefenseSuffixGear =
+    /// <summary>
+    /// 우드2-4(11레벨 대) — 로오·칸은 5.99 팩 것(표 값으로 맞춰 1레벨), 나머지 다섯은
+    /// <c>data/game-data/items-original-sheets.json</c> 원작 표로 되살린 것(11레벨).
+    /// </summary>
+    private static readonly string[] DefenseSuffixRing11 =
     [
         "로오의반지", "이아의호안석반지", "메투스의호안석반지",
         "세토아의호안석반지", "세오의호안석반지", "셔스의호안석반지", "칸의목걸이",
@@ -94,13 +109,26 @@ public sealed class GearDropTests
     private static readonly string[] ElementAt11 =
         ["화염의룬스톤목걸이", "바다의룬스톤목걸이", "바람의룬스톤목걸이", "대지의룬스톤목걸이"];
 
-    /// <summary>우드랜드5-6(41레벨 대) — 41레벨 층이 없어 4원소 51레벨 층으로 채운다.</summary>
-    private static readonly string[] ElementAt51 =
-        ["화염의크리스탈목걸이", "바다의크리스탈목걸이", "바람의크리스탈목걸이", "대지의크리스탈목걸이"];
+    /// <summary>우드랜드5-6(41레벨 대) — 원작 표로 되살린 방어 접미사 동각반, 41레벨 그대로 맞는다.</summary>
+    private static readonly string[] DefenseSuffixAt41 =
+    [
+        "로오의동각반", "이아의동각반", "메투스의동각반",
+        "세토아의동각반", "세오의동각반", "셔스의동각반", "칸의동각반",
+    ];
 
-    /// <summary>우드랜드14(71레벨 대) — 4원소 71레벨 층, 그대로 맞는다.</summary>
-    private static readonly string[] ElementAt71 =
-        ["화염의홀디트링", "바다의홀디트링", "바람의홀디트링", "대지의홀디트링"];
+    /// <summary>우드랜드14(71레벨 대) — 원작 표로 되살린 방어 접미사 은각반, 그대로 들어맞는다.</summary>
+    private static readonly string[] DefenseSuffixAt71 =
+    [
+        "로오의은각반", "이아의은각반", "메투스의은각반",
+        "세토아의은각반", "세오의은각반", "셔스의은각반", "칸의은각반",
+    ];
+
+    /// <summary>아벨해안 일반 몹(51~80레벨) — 51레벨에 맞는 층이 없어 원작 표의 56레벨 은제방패를 쓴다.</summary>
+    private static readonly string[] DefenseSuffixAt56 =
+    [
+        "로오의은제방패", "이아의은제방패", "메투스의은제방패",
+        "세토아의은제방패", "세오의은제방패", "셔스의은제방패", "칸의은제방패",
+    ];
 
     /// <summary>
     /// 사냥터별로 레벨이 맞는 접미사·속성 장비 한 벌 — <c>scripts/build-gear-drops.py</c> <c>TIERS</c> 와
@@ -108,23 +136,40 @@ public sealed class GearDropTests
     /// </summary>
     private static readonly Dictionary<int, string[]> GroundGear = new()
     {
-        [20023] = DefenseSuffixGear,
-        [20024] = DefenseSuffixGear,
+        [20022] = DefenseSuffixRing11,
+        [20023] = DefenseSuffixRing11,
+        [20024] = DefenseSuffixRing11,
         [20263] = ElementAt11,
         [20264] = ElementAt11,
         [20265] = ElementAt11,
         [20266] = ElementAt11,
         [20267] = ElementAt11,
         [20268] = ElementAt11,
-        [20025] = ElementAt51,
-        [20026] = ElementAt51,
-        [20020] = ElementAt71,
+        [20025] = DefenseSuffixAt41,
+        [20026] = DefenseSuffixAt41,
+        [20020] = DefenseSuffixAt71,
+        [20584] = DefenseSuffixAt56,
+        [20585] = DefenseSuffixAt56,
+        [20586] = DefenseSuffixAt56,
+        [20587] = DefenseSuffixAt56,
+        [20588] = DefenseSuffixAt56,
+        [20589] = DefenseSuffixAt56,
+        [20590] = DefenseSuffixAt56,
+        [20591] = DefenseSuffixAt56,
+        [20592] = DefenseSuffixAt56,
+        [20593] = DefenseSuffixAt56,
+        [20594] = DefenseSuffixAt56,
     };
 
-    /// <summary>실제 확률이 이 안이어야 한다 — 옛 기본템 자리(잡템 3 + 장비 1~2칸)와 같은 폭이다.</summary>
+    /// <summary>
+    /// 실제 확률이 이 안이어야 한다 — 옛 기본템 자리(잡템 2~3 + 장비 1~2칸)와 같은 폭이다. 아벨해안
+    /// 일반 몹 중 원래 잡템이 없던 여섯(문어·슬러그1·슬러그2·애스코모이드·일1·일2)은 목록이 장비
+    /// 한 칸뿐이라 같은 계산식(<c>GEAR_RATE</c> ÷ 목록칸수)이 그대로 6% 를 낸다 — 잡템을 지어내 채우지
+    /// 않았으니 위 칸까지 넓힌다("확률 계산은 지금 방식 그대로" — 사용자 지시).
+    /// </summary>
     private const double GroundRateLeast = 0.01;
 
-    private const double GroundRateMost = 0.03;
+    private const double GroundRateMost = 0.06;
 
     [Fact]
     public void Later_grounds_carry_no_base_gear_only_level_matched_suffix_or_element_gear()
@@ -136,7 +181,11 @@ public sealed class GearDropTests
 
         foreach ((int map, string ground) in Later)
         {
-            JsonNode[] here = [.. Monsters().Where(m => (int?)m["AreaID"] == map)];
+            JsonNode[] here =
+            [
+                .. Monsters().Where(m => (int?)m["AreaID"] == map
+                    && !ReservedNames.Contains(m["Name"]?.GetValue<string>())),
+            ];
             Assert.True(here.Length > 0, $"{ground}({map}) 에 괴물 정의가 없습니다.");
             string[] allowed = GroundGear[map];
 
@@ -338,6 +387,39 @@ public sealed class GearDropTests
     }
 
     /// <summary>
+    /// 되살린 접미사 장비 넷을 원작 표 값과 맞대본다 — 표는
+    /// <c>data/game-data/items-original-sheets.json</c>(생성기 <c>scripts/build-suffix-gear-from-sheet.py</c>).
+    /// 새로 살린 것(이아의호안석반지·로오의동각반·로오의은제방패)과 이미 있던 것을 고쳐 맞춘 것
+    /// (칸의목걸이, 원래 체력·마력 +200 이었으나 표에는 없어 뺐다)을 하나씩 본다.
+    /// </summary>
+    [Fact]
+    public void Restored_suffix_gear_matches_the_original_sheet()
+    {
+        IReadOnlyDictionary<string, JsonNode> items = Items();
+        IReadOnlyDictionary<string, JsonNode> sheet = OriginalSheet();
+
+        string[] sample = ["이아의호안석반지", "로오의동각반", "로오의은제방패", "칸의목걸이"];
+
+        foreach (string name in sample)
+        {
+            Assert.True(sheet.ContainsKey(name), $"원작 표에 «{name}» 줄이 없습니다.");
+            Assert.True(items.ContainsKey(name), $"«{name}» 의 아이템 정의가 없습니다.");
+
+            JsonNode row = sheet[name];
+            JsonNode item = items[name];
+
+            Assert.True(int.Parse(row["레벨제한"]!.GetValue<string>()) == (int?)item["LevelRequired"],
+                $"«{name}» 레벨제한 — 표 {row["레벨제한"]} vs 템플릿 {item["LevelRequired"]}.");
+            Assert.True(int.Parse(row["판매가격"]!.GetValue<string>()) == (int?)item["Value"],
+                $"«{name}» 판매가격 — 표 {row["판매가격"]} vs 템플릿 {item["Value"]}.");
+            Assert.True(int.Parse(row["내구력"]!.GetValue<string>()) == (int?)item["MaxDurability"],
+                $"«{name}» 내구력 — 표 {row["내구력"]} vs 템플릿 {item["MaxDurability"]}.");
+            Assert.True(int.Parse(row["무게"]!.GetValue<string>()) == (int?)item["CarryWeight"],
+                $"«{name}» 무게 — 표 {row["무게"]} vs 템플릿 {item["CarryWeight"]}.");
+        }
+    }
+
+    /// <summary>
     /// 죽어 있던 팩 드롭 3종 — 5.99 팩이 떨구라고 적어 두었지만 아이템에 <c>DropRate</c> 가 없어 영영
     /// 안 나왔다. 아벨해안이 열려(2026-09-25) 이제 손이 닿으므로 살린다.
     /// </summary>
@@ -418,6 +500,24 @@ public sealed class GearDropTests
 
     private static bool IsGear(IReadOnlyDictionary<string, JsonNode> items, string name) =>
         items.TryGetValue(name, out JsonNode? item) && (int?)item["EquipmentSlot"] is > 0;
+
+    /// <summary>사용자가 원작에서 모은 표. 이름 → 그 줄(<c>수치표</c>).</summary>
+    private static IReadOnlyDictionary<string, JsonNode> OriginalSheet()
+    {
+        string path = Path.Combine(HadesWorkspace.RepositoryRoot, "data", "game-data", "items-original-sheets.json");
+        JsonNode root = JsonNode.Parse(File.ReadAllText(path))!;
+        Dictionary<string, JsonNode> byName = [];
+
+        foreach (JsonNode? row in root["수치표"]!.AsArray())
+        {
+            if (row?["이름"]?.GetValue<string>() is { Length: > 0 } name)
+            {
+                byName[name] = row;
+            }
+        }
+
+        return byName;
+    }
 
     private static JsonNode[] Monsters() => _monsters ??=
         [.. Definitions(Path.Combine(HadesWorkspace.ServerDataDirectory, "templates", "monsters"))];
