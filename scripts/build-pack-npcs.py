@@ -48,6 +48,22 @@ ITEM_FILES = ["E.T.C.txt", "Quest.txt", "Potion.txt", "Blessing.txt", "CashI.txt
 #: 플레이어를 기다리는 명령 — 아이템 스크립트에서는 아직 띄울 창이 없다.
 WAITS = {"mes", "menu", "input"}
 
+#: 대사 속에 남은 영어 낱말을 옮기기 전에 고친다. 팩 파일은 그대로 두고(참고 자료), 옮길 때만 바꾼다.
+#: 여섯 다 같은 팩 안에서 같은 낱말의 한국어 표기가 이미 쓰인다 — `Npc_Warp.txt` 137줄 "3천골드",
+#: `미용사.cs`·`유령하녀.cs` 의 "다음을 누르시면"(2026-09-25, docs/server-messages-ko.md).
+TEXT_PATCH = {
+    "1500Gold입니다": "1500골드입니다",  # Npc_Warp.txt 273줄, 개인던전입장도우미
+    "(5000Gold)": "(5000골드)",  # Npc_Warp.txt 295줄, 애교
+    "1만Gold라네": "1만골드라네",  # Npc_Warp.txt 314줄, 워프할아버지
+    "30만Gold라네": "30만골드라네",  # Npc_Warp.txt 584줄, 타바리마을이동
+    "5000GOLD": "5000골드",  # Npc_Script.txt 157줄, 미용사
+    "?Next를 누르면": "? 다음을 누르면",  # Npc_Script.txt 408줄, 선진
+    "Next를 누르시면": "다음을 누르시면",  # Npc_Script.txt 416줄, 선진
+    "NEXT를 누르시면": "다음을 누르시면",  # Npc_Script.txt 232줄, 리프트도우미
+    "ex)모든 몬스터 처치": "예)모든 몬스터 처치",  # Npc_Script.txt 73줄, 멜로린
+    "생셋 or 암셋": "생셋 또는 암셋",  # Npc_Making.txt 92줄, 신의대장장이1
+}
+
 #: 블록 머리 — 줄 맨 앞의 `0,0,0,0,0,0,0` 다음 탭, 이름, `{`. 안쪽의 `if(…){` 줄은 탭으로 시작해 걸리지 않는다.
 HEADER = re.compile(r"^\d[\d,]*\t([^\t{]+?)\s*\{", re.M)
 #: 2026-09-17 에 센 블록 수. HEADER 는 줄 모양(숫자열 + 탭)에 기대므로 팩 파일 모양이 바뀌면 블록이 말없이 빠진다 — 적게 잡히면 알린다.
@@ -112,6 +128,8 @@ class NpcTranslator(abilities.Translator):
 def blocks(path):
     """이름 → 본문. 괄호 짝으로 자른다(글자 안의 괄호는 세지 않는다)."""
     text = abilities.read(path)
+    for old, new in TEXT_PATCH.items():
+        text = text.replace(old, new)
     heads = list(HEADER.finditer(text))
     out = {}
     for n, head in enumerate(heads):

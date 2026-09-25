@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
 using Xunit;
@@ -161,6 +162,42 @@ public sealed class NpcDialogueTests : IDisposable
         await world.AnswerAsync(ferryman.Serial, next.Step, _deadline.Token);
         await Until(() => world.State is { } state && state.Map.Id == Noem && state.Where == new Tile(35, 27),
             $"노엠마을 35,27 로 가지 않았습니다. 마지막: {world.State}");
+    }
+
+    /// <summary>
+    /// 대사 속 영어 낱말 — 5.99 팩 원문은 "1500Gold입니다"·"(요금5000GOLD)" 처럼 한국어 문장 안에 영어
+    /// 낱말을 그대로 남겼다(<c>Npc_Warp.txt</c> 273줄 · <c>Npc_Script.txt</c> 157줄). 2026-09-25 에
+    /// <c>scripts/build-pack-npcs.py</c> 의 <c>TEXT_PATCH</c> 로 고쳤다(개인던전입장도우미·미용사·애교·
+    /// 워프할아버지·타바리마을이동·선진·리프트도우미·멜로린·신의대장장이1, <c>docs/server-messages-ko.md</c>).
+    /// 대표로 둘을 격리 서버에서 열어 실제 창에도 라틴 글자가 없는지 본다.
+    /// </summary>
+    [Theory]
+    [InlineData(20338, 29, 10, 29, 9, "npceng1", "개인던전입장도우미@뤼케시온마을#29,9", "1500골드입니다")]
+    [InlineData(20321, 3, 4, 3, 3, "npceng2", "미용사@로톤미용실#3,3", "5000골드")]
+    public async Task Ported_npc_dialogue_has_no_leftover_english_word(
+        int map, int startX, int startY, int npcX, int npcY, string account, string who, string mustContain)
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (map, startX, startY));
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, account);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, account, LoginFlow.SyntheticSecret,
+            progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        Creature keeper = await Standing(world, new Tile(npcX, npcY));
+
+        await world.ClickAsync(keeper.Serial, _deadline.Token);
+        Dialogue talk = await Answered(world);
+
+        Assert.Equal(who, talk.Who);
+        Assert.Contains(mustContain, talk.What);
+        Assert.False(Regex.IsMatch(talk.What, "[A-Za-z]"),
+            $"{who} 의 대사에 라틴 글자가 남아 있습니다: {talk.What}");
     }
 
     /// <summary>Waits for a window opened after the <paramref name="seen" />-th one that is the one wanted.</summary>
