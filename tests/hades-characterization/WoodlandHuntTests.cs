@@ -234,12 +234,13 @@ public sealed class WoodlandHuntTests : IDisposable
             $"LootType 32 는 Gold 한 가지이므로 이 존이 내놓는 것은 골드뿐입니다. " +
             $"서버가 마지막으로 한 말: \"{world.Said}\" ({world.SaidCount}번).");
 
-        // 한 무더기가 들어오는 순간 멈추므로 들어온 것은 정의가 적은 한 마리 몫이다. 이 존이 적는 것은
-        // 20전과 50전 — 레벨 식(Level × 500~1000)으로 되돌아가면 500 이상이 들어와 여기서 걸린다.
+        // 금화는 정의의 Gold 칸이 아니라 경험치에서 나온다(2026-09-24) — 우드랜드는 노비스 밖이라 경험치×0.1
+        // ±20% (2026-09-25, Formulas/monsterexp.cs GoldPerExp). 받은 경험치는 천 단위로 올려 준 값이라 정의보다
+        // 크거나 같으므로 위쪽 한도로 쓰고, 아래쪽은 이 존에서 가장 싼 정의로 잡는다.
+        long least = (long)Math.Floor(_promised * 0.1 * 0.8), most = (long)Math.Ceiling(paid * 0.1 * 1.2);
         Assert.True(
-            coins <= _mostGold,
-            $"이 존이 적어 둔 가장 큰 금화가 {_mostGold} 전인데 한 마리에 {coins} 전이 들어왔습니다 — " +
-            $"정의를 안 읽고 레벨로 만든 값입니다.");
+            coins >= least && coins <= most,
+            $"경험치 {paid} 에 금화 {coins} 전 — {least}~{most} 안이어야 합니다(경험치×0.1 ±20%).");
     }
 
     /// <summary>

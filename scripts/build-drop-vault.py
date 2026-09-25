@@ -32,8 +32,18 @@ FORMULA = SERVER / "scripts/Formulas/monsterexp.cs"
 VAULT = ROOT / "data" / "drop-vault"
 
 # `Formulas/monsterexp.cs` 의 값을 그대로 되풀이한다 — 바뀌면 여기도 다시 만든다.
-GOLD_PER_EXP = 0.02
+GOLD_PER_EXP = 0.1          # 노비스 밖 (2026-09-25, 0.02 의 다섯 배)
+NOVICE_GOLD_PER_EXP = 0.02  # 노비스 맵은 그대로
 GOLD_VARIANCE = 0.2
+
+
+def is_novice(area_id):
+    """monsterexp.cs IsNovice 와 같은 맵 번호 — areas/ 에서 이름이 "노비스"로 시작하는 맵."""
+    return 20083 <= area_id <= 20086 or 20373 <= area_id <= 20394
+
+
+def gold_rate(area_id):
+    return NOVICE_GOLD_PER_EXP if is_novice(area_id) else GOLD_PER_EXP
 LOOT_RANDOM, LOOT_TABLE, LOOT_GOLD = 2, 4, 32
 
 BANNED = re.compile(r'[\\/:*?"<>|#\[\]^]')
@@ -66,9 +76,10 @@ def monster_exp(m):
     return int(level * (level * 0.1 + 1.5) * 300)
 
 
-def gold_range(exp):
-    lo = int(exp * GOLD_PER_EXP * (1 - GOLD_VARIANCE))
-    hi = int(exp * GOLD_PER_EXP * (1 + GOLD_VARIANCE)) + 1
+def gold_range(exp, area_id):
+    rate = gold_rate(area_id)
+    lo = int(exp * rate * (1 - GOLD_VARIANCE))
+    hi = int(exp * rate * (1 + GOLD_VARIANCE)) + 1
     return lo, hi
 
 
@@ -149,7 +160,7 @@ def build_notes(monsters, items, mundanes):
             note = f"{m['Name']}@{zname}"
             monster_notes[(m["Name"], area)] = note
             exp = monster_exp(m)
-            lo, hi = gold_range(exp)
+            lo, hi = gold_range(exp, area)
             loot_type = m.get("LootType") or 0
             names = dropped(m)
 
@@ -176,7 +187,7 @@ def build_notes(monsters, items, mundanes):
                 "---\n\n"
                 f"# {m['Name']} @ {zname}\n\n"
                 f"사냥터: [[사냥터/{slug(f'{area}-{zname}')}|{zname}]]\n\n"
-                f"경험치 {exp} · 골드 {lo}~{hi}전(경험치×{GOLD_PER_EXP}, ±{int(GOLD_VARIANCE*100)}%, "
+                f"경험치 {exp} · 골드 {lo}~{hi}전(경험치×{gold_rate(area)}, ±{int(GOLD_VARIANCE*100)}%, "
                 f"항상 지급 — [[식/골드-경험치식]]) · LootType {loot_type}\n\n"
                 "## 드랍 목록 (실제 확률 = DropRate ÷ 목록 칸수)\n\n"
                 "| 아이템 | 실제 확률 | 갈래 |\n|---|---|---|\n" + drop_table + "\n",
@@ -266,8 +277,11 @@ def write_formula_note():
         "# 골드는 경험치에 비례한다\n\n"
         "**2026-09-24 사용자 결정.** 원작에도 하데스에도 \"몬스터 레벨\" 이라는 값이 없어(서버팩 3개·"
         "원작 아카이브·참고저장소 16개를 다 뒤져 확인) 레벨 대신 경험치를 쓴다.\n\n"
-        f"금화 = 경험치 × {GOLD_PER_EXP} × (0.8~1.2 무작위), 항상 지급. 비율 {GOLD_PER_EXP} 는 노비스 "
-        "괴물 11마리의 경험치(1,068~1,849)와 지금 금화(20~30)에서 역산한 값이다.\n\n"
+        f"금화 = 경험치 × {GOLD_PER_EXP} × (0.8~1.2 무작위), 항상 지급 — **노비스 맵은 × {NOVICE_GOLD_PER_EXP}**. "
+        f"{NOVICE_GOLD_PER_EXP} 는 노비스 괴물 11마리의 경험치(1,068~1,849)와 그때 금화(20~30)에서 역산한 값이고, "
+        "**2026-09-25 사용자 결정**(\"포테 3존인데 47원씩 — 금전이 너무 적다\")으로 노비스 밖은 그 다섯 배로 올렸다. "
+        "노비스 맵 번호: 20083~20086 · 20373~20394 (areas/ 에서 이름이 \"노비스\"로 시작하는 맵).\n\n"
+        "금화는 쓰러진 자리 바닥에 놓이고, 주워야 들어온다(2026-09-25 — 서버가 대신 줍던 AUTO LOOT GOLD 를 껐다).\n\n"
         f"## 근거 — `monsterexp.cs:{gold_line}`\n\n```csharp\n{gold_src}\n```\n\n"
         f"## 경험치를 읽는 곳(같은 값을 되풀이) — `monsterexp.cs:{exp_line}`\n\n```csharp\n{exp_src}\n```\n\n"
         "시험: [[../README|드랍 볼트]] 의 괴물 노트마다 있는 골드범위 칸이 이 식의 결과다. "
@@ -309,7 +323,7 @@ def build_graph(zones, monsters, items_count):
         edges.append({"source": a, "target": b, "relation": relation,
                       "confidence": "EXTRACTED", "source_file": "data/drop-vault"})
 
-    formula = node("식", "골드-경험치식", "골드=경험치×0.02×0.8~1.2")
+    formula = node("식", "골드-경험치식", f"골드=경험치×{GOLD_PER_EXP}(노비스 ×{NOVICE_GOLD_PER_EXP})×0.8~1.2")
 
     all_mons, all_items, all_mund = load_all()
     by_area = {}

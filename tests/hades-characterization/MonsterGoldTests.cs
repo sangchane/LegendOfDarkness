@@ -32,11 +32,11 @@ public sealed class MonsterGoldTests : IDisposable
     /// 우드랜드1-1 — 1수준이 살아남는 유일한 존이고, 다섯 정의가 <c>LootType 32</c>(<c>Gold</c> 하나뿐)라
     /// 금화 말고는 아무것도 떨어지지 않는다. <see cref="CombatSmokeTests" /> 와 같은 방·같은 문 앞칸이다.
     /// </summary>
-    private const int MonsterRoom = 20015;
+    private int MonsterRoom = 20015;
 
-    private static readonly Tile Start = new(2, 35);
+    private Tile Start = new(2, 35);
 
-    private static readonly Tile TargetTile = new(2, 34);
+    private Tile TargetTile = new(2, 34);
 
     /// <summary><c>SpawnQualifer.Defined</c> — 정의가 적은 자리에 선다.</summary>
     private const int SpawnDefined = 4;
@@ -78,15 +78,18 @@ public sealed class MonsterGoldTests : IDisposable
         }
     }
 
-    /// <summary><c>Formulas/monsterexp.cs</c> 의 <c>GoldPerExp</c> 을 그대로 되풀이한다.</summary>
-    private const double GoldPerExp = 0.02;
+    /// <summary><c>Formulas/monsterexp.cs</c> 의 <c>GoldPerExp</c> 을 그대로 되풀이한다 — 노비스 밖(2026-09-25 부터 0.02 의 다섯 배).</summary>
+    private const double GoldPerExp = 0.1;
+
+    /// <summary><c>Formulas/monsterexp.cs</c> 의 <c>NoviceGoldPerExp</c> — 노비스 맵은 그대로 0.02.</summary>
+    private const double NoviceGoldPerExp = 0.02;
 
     /// <summary><c>Formulas/monsterexp.cs</c> 의 <c>GoldVariance</c> 을 그대로 되풀이한다(±20%).</summary>
     private const double GoldVariance = 0.2;
 
-    private static (long Low, long High) GoldRangeFor(int exp) =>
-        ((long)Math.Floor(exp * GoldPerExp * (1 - GoldVariance)),
-         (long)Math.Ceiling(exp * GoldPerExp * (1 + GoldVariance)));
+    private static (long Low, long High) GoldRangeFor(int exp, double perExp = GoldPerExp) =>
+        ((long)Math.Floor(exp * perExp * (1 - GoldVariance)),
+         (long)Math.Ceiling(exp * perExp * (1 + GoldVariance)));
 
     [Fact]
     public async Task A_kill_pays_gold_proportional_to_its_experience()
@@ -110,6 +113,35 @@ public sealed class MonsterGoldTests : IDisposable
 
         Assert.True(paid >= low && paid <= high,
             $"경험치 {exp}짜리가 금화 {paid}를 냈습니다 — {low}~{high} 안이어야 합니다. {Said(world)}");
+    }
+
+    /// <summary>
+    /// 사용자 결정(2026-09-25) — 노비스 밖은 경험치×0.1 로 올렸지만 **노비스는 그대로 ×0.02**. 노비스평원A(20393)의
+    /// 제 정의 하나를 세워, 같은 경험치라도 노비스에서는 다섯 배가 아닌 지금 금액이 나오는지 본다.
+    /// </summary>
+    [Fact]
+    public async Task A_novice_kill_still_pays_the_old_gold()
+    {
+        const int exp = 2000;
+
+        MonsterRoom = 20393;
+        Start = new Tile(25, 25);
+        TargetTile = new Tile(25, 24);
+
+        (WorldClient world, _) = await Enter(target => target["Exp"] = exp);
+
+        await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "노비스평원A 에 괴물이 서지 않았습니다.");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+
+        long before = Mine(world).Gold;
+        await KillAndPickUp(world, before);
+
+        long paid = Mine(world).Gold - before;
+        (long low, long high) = GoldRangeFor(exp, NoviceGoldPerExp);
+
+        Assert.True(paid >= low && paid <= high,
+            $"노비스평원A 에서 경험치 {exp}짜리가 금화 {paid}를 냈습니다 — 노비스는 {low}~{high} 안이어야 합니다. {Said(world)}");
     }
 
     /// <summary>
@@ -232,6 +264,53 @@ public sealed class MonsterGoldTests : IDisposable
     }
 
     /// <summary>
+    /// 사용자(2026-09-25, 아이폰) — "돈 위에 올라가도 이미지가 사라지지 않는 경우가 발생". 괴물은 물건과 금화를
+    /// **같은 칸**(쓰러진 자리)에 떨군다. 줍기 한 번은 칸을 가리키는데, 서버(<c>Format07Handler</c>)는 그 칸의
+    /// 것을 물건 먼저 돌며 물건 하나를 주우면 — 또는 못 들 만큼 무겁거나 남의 몫이면 — 거기서 멈춰 금화는 남았다
+    /// (여기 신발이 그렇다: 1레벨이 못 든다). 앱의 밟으면 줍기(<c>AutoLootGate</c>)는 한
+    /// 번 물은 것을 다시 묻지 않으므로, 금화를 물은 차례에 물건이 대신 주워지면 금화는 영영 바닥에 남는다.
+    /// 그래서 한 칸에 물건과 금화가 함께 있어도 **줍기 한 번에 금화는 들어와야** 한다.
+    /// </summary>
+    [Fact]
+    public async Task One_pickup_on_a_tile_holding_an_item_and_gold_takes_the_gold()
+    {
+        // 소지품 첫 칸에 신발 한 켤레 — MobileClientProtocolTests.PutBootsInThePack 과 같은 모양.
+        (WorldClient world, _) = await Enter(target => target["Exp"] = 2000, character: saved =>
+            saved["Inventory"]!["Items"]!["1"] = new JsonObject
+            {
+                ["Template"] = new JsonObject { ["Name"] = "Shagreen Boots" },
+                ["Slot"] = 1,
+                ["Image"] = 1,
+                ["DisplayImage"] = 32882,
+                ["Color"] = 1,
+                ["Stacks"] = 1,
+                ["Durability"] = 100,
+            });
+
+        await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "문 앞에 괴물이 서지 않았습니다.");
+        await Until(() => world.Pack.Count > 0, "소지품이 비어 있어 바닥에 놓을 물건이 없습니다.");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+
+        Vitals before = Mine(world);
+        await SwingUntil(world, enough: () => Mine(world).Experience > before.Experience);
+        await Until(() => CoinsAt(world, TargetTile) is not null, $"쓰러진 자리에 금화가 없습니다. {Said(world)}");
+
+        // 금화 칸에 물건을 하나 놓는다 — 괴물이 물건과 금화를 함께 떨군 칸과 같은 모양이다.
+        InventoryItem thing = world.Pack.OrderBy(item => item.Slot).First();
+        await world.DropAsync(thing.Slot, 1, TargetTile, _deadline.Token);
+        await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Passable && c.Where == TargetTile && CoinsAt(world, TargetTile) != c),
+            $"금화 칸에 {thing.Name} 을(를) 놓지 못했습니다. {Said(world)}");
+
+        await world.PickUpAsync(TargetTile, _deadline.Token);
+
+        await Until(() => Mine(world).Gold > before.Gold,
+            $"물건과 금화가 함께 있는 칸을 한 번 주웠는데 금화가 그대로입니다 — 지갑 {Mine(world).Gold}, " +
+            $"바닥 [{string.Join(", ", world.Creatures.Where(c => c.Kind == CreatureKind.Passable).Select(c => $"{c.Sprite}@{c.Where}"))}]. {Said(world)}");
+        await Until(() => CoinsAt(world, TargetTile) is null, "금화가 지갑에 들어왔는데 바닥 그림이 남아 있습니다.");
+    }
+
+    /// <summary>
     /// <c>MoneySprites</c>(0x89~0x8E) 에 <c>Money.Create</c> 가 0x8000 을 더한 그림 번호 — 앱은 이 번호로
     /// <c>assets/item/32905~32910.png</c> 를 그린다.
     /// </summary>
@@ -263,7 +342,7 @@ public sealed class MonsterGoldTests : IDisposable
     /// <c>Gold</c> 는 정의가 적은 그대로 두고 <c>GoldChance</c> 만 100 으로 올린다. 30% 를 기다리면 몇
     /// 마리를 잡아야 하는가가 운에 달려 시험이 흔들린다. <see cref="CombatSmokeTests" /> 와 같은 모양이다.
     /// </summary>
-    private static void StandOneAtTheDoor(IsolatedHadesServer server, Action<JsonNode>? customize = null)
+    private void StandOneAtTheDoor(IsolatedHadesServer server, Action<JsonNode>? customize = null)
     {
         JsonSerializerOptions indented = new() { WriteIndented = true };
         (string Path, JsonNode Template)[] room = [.. DefinitionsInTheRoom(server)];
@@ -299,7 +378,7 @@ public sealed class MonsterGoldTests : IDisposable
         File.WriteAllText(Path.Combine(testFolder, "monster-gold-target.json"), target.ToJsonString(indented));
     }
 
-    private static IEnumerable<(string Path, JsonNode Template)> DefinitionsInTheRoom(IsolatedHadesServer server)
+    private IEnumerable<(string Path, JsonNode Template)> DefinitionsInTheRoom(IsolatedHadesServer server)
     {
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
 
@@ -318,13 +397,22 @@ public sealed class MonsterGoldTests : IDisposable
         }
     }
 
-    private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter(Action<JsonNode>? customize = null)
+    private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter(Action<JsonNode>? customize = null,
+        Action<JsonNode>? character = null)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MonsterRoom, Start.X, Start.Y));
         _servers.Add(server);
         StandOneAtTheDoor(server, customize);
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, Name);
+
+        if (character is not null)
+        {
+            string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
+            JsonNode node = JsonNode.Parse(File.ReadAllText(saved))!;
+            character(node);
+            File.WriteAllText(saved, node.ToJsonString());
+        }
 
         WorldSession session = await HadesLoginClient.LoginAsync(
             IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret,
