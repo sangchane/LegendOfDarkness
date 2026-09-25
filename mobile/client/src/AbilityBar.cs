@@ -41,6 +41,10 @@ public sealed partial class AbilityBar : Control
     private readonly bool[] _longHeld = new bool[AbilityFan.PerPage];
     private int _rehearsedHold; // --slot-hold: 손 없이 확인할 때 프레임을 센다.
 
+    // 공격 단추도 같은 0.5초 규칙으로 길게 누르면 자동 사냥을 켜고 끈다(사용자 요청, 2026-09-26) — 판단은
+    // 알맹이 LongPress(시험 LongPressTests)로 뺐다. 짧게 누르면(길게 눌리지 않았으면) 지금처럼 곧장 평타.
+    private readonly LongPress _attackHold = new(TimeSpan.FromMilliseconds(HoldMilliseconds));
+
     // 슬롯 배치(사용자 요청) — 캐릭터 이름별로 기기 안에 저장한다(Main.LoadAbilitySlots/SaveAbilitySlots).
     private AbilityArrangement _skillArrangement = new();
     private AbilityArrangement _spellArrangement = new();
@@ -61,11 +65,28 @@ public sealed partial class AbilityBar : Control
     /// </summary>
     public Button Attack { get; } = Struck("공격", AbilityFan.AttackSide);
 
+    // 자동 사냥이 켜지면 공격 단추에 테두리와 이 작은 글자로 보인다(위 줄의 [자동] 단추는 없앴다 — 사용자
+    // 요청, 2026-09-26).
+    private readonly Label _autoHuntTag = new()
+    {
+        Text = "자동",
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center,
+        MouseFilter = MouseFilterEnum.Ignore,
+        Visible = false
+    };
+
     /// <summary>How many seconds one slot still has to wait, asked of the server every frame.</summary>
     public Func<bool, int, int>? Cooling { get; set; }
 
     public event Action<int>? SkillUsed;
     public event Action<int>? SpellUsed;
+
+    /// <summary>The attack button was let go as an ordinary short press — swing once (<see cref="WorldView.Strike" />).</summary>
+    public event Action? AttackReleased;
+
+    /// <summary>The attack button was held 0.5초 — turn auto-hunt on or off.</summary>
+    public event Action? AutoHuntToggleRequested;
 
     public override void _Ready()
     {
@@ -73,6 +94,24 @@ public sealed partial class AbilityBar : Control
         MouseFilter = MouseFilterEnum.Ignore;
 
         Place(Attack, AbilityFan.Attack, AbilityFan.AttackSide);
+
+        // 0.5초 길게 누르면 자동 사냥을 켜고 끈다 — 뗄 때(짧게 눌렀을 때)만 평타가 나간다. 길게 눌러 이미
+        // 자동 사냥을 건드렸으면 뗄 때의 눌림은 버린다(기술 슬롯의 길게 누르기와 같은 결).
+        Attack.ButtonDown += () => _attackHold.Down(TimeSpan.FromMilliseconds(Time.GetTicksMsec()));
+        Attack.ButtonUp += () => _attackHold.Up();
+        Attack.Pressed += () =>
+        {
+            if (_attackHold.ShortPress)
+            {
+                AttackReleased?.Invoke();
+            }
+        };
+
+        _autoHuntTag.SetAnchorsPreset(LayoutPreset.BottomWide);
+        _autoHuntTag.OffsetTop = -18;
+        _autoHuntTag.AddThemeFontSizeOverride("font_size", 9);
+        _autoHuntTag.AddThemeColorOverride("font_color", Greybox.OnAccent);
+        Attack.AddChild(_autoHuntTag);
 
         // 누른 그 자리에서 다시 그린다 — 다음 프레임까지 기다리면 그사이 누른 칸이 앞 장의 것을 쓴다.
         _switch.Pressed += () =>
@@ -166,6 +205,21 @@ public sealed partial class AbilityBar : Control
             _longHeld[Main.SlotHold - 1] = true;
             OpenPicker(Main.SlotHold - 1);
         }
+
+        if (_attackHold.CrossedThreshold(TimeSpan.FromMilliseconds(Time.GetTicksMsec())))
+        {
+            AutoHuntToggleRequested?.Invoke();
+        }
+    }
+
+    /// <summary>Shows or hides the attack button's auto-hunt "켜짐" mark — a ring plus the small "자동" tag,
+    /// dimmed while a person's own hand has it paused. <see cref="GameScreen"/> calls this instead of drawing
+    /// a separate [자동] button (없앴다, 사용자 요청 2026-09-26).</summary>
+    public void ShowAutoHunt(bool on, bool paused = false)
+    {
+        PaintAttack(Attack, AbilityFan.AttackSide, on, paused);
+        _autoHuntTag.Visible = on;
+        _autoHuntTag.Modulate = paused ? new Color(1, 1, 1, 0.55f) : Colors.White;
     }
 
     /// <summary>
@@ -444,19 +498,7 @@ public sealed partial class AbilityBar : Control
     private static Button Struck(string text, int side)
     {
         Button button = Disc(text, side);
-
-        foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
-        {
-            // 화면에서 유일하게 색을 입은 조작이다 — 손가락이 먼저 가는 곳이라 눈도 먼저 가야 한다.
-            StyleBoxFlat filled = new()
-            {
-                BgColor = state == "pressed" ? Greybox.Accent.Darkened(0.18f) : Greybox.Accent
-            };
-
-            filled.SetCornerRadiusAll(side / 2 - 1);
-            filled.SetContentMarginAll(7);
-            button.AddThemeStyleboxOverride(state, filled);
-        }
+        PaintAttack(button, side, on: false);
 
         foreach (string colour in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
         {
@@ -464,6 +506,30 @@ public sealed partial class AbilityBar : Control
         }
 
         return button;
+    }
+
+    /// <summary>
+    /// Fills the attack button — plain, or with a border ring when auto-hunt is on (원작 4.51 규칙표의 밝은 돌
+    /// 틀 색 <see cref="Greybox.Muted"/>), dimmed while a person's own hand has it paused.
+    /// </summary>
+    private static void PaintAttack(Button button, int side, bool on, bool paused = false)
+    {
+        Color ring = paused ? Greybox.Muted with { A = 0.5f } : Greybox.Muted;
+
+        foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
+        {
+            // 화면에서 유일하게 색을 입은 조작이다 — 손가락이 먼저 가는 곳이라 눈도 먼저 가야 한다.
+            StyleBoxFlat filled = new()
+            {
+                BgColor = state == "pressed" ? Greybox.Accent.Darkened(0.18f) : Greybox.Accent,
+                BorderColor = ring
+            };
+
+            filled.SetCornerRadiusAll(side / 2 - 1);
+            filled.SetContentMarginAll(7);
+            filled.SetBorderWidthAll(on ? 3 : 0);
+            button.AddThemeStyleboxOverride(state, filled);
+        }
     }
 
     private static Button Disc(string text, int side)

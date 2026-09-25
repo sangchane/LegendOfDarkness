@@ -136,8 +136,8 @@ public partial class GameScreen : Control
     private Control _controlRow = null!;
     private Button _logout = null!;
 
-    // [자동] — 자동 사냥 켜고 끄기. 켜져 있으면 강조색으로 채운다(Greybox.Commit), 꺼져 있으면 보통 단추.
-    private Button _autoHunt = null!;
+    // 자동 사냥 켜고 끄기 — 공격 단추를 0.5초 길게 눌러서 한다(위 줄의 [자동] 단추는 없앴다, 사용자 요청
+    // 2026-09-26). 켜져 있으면 공격 단추 자체가 표시한다(AbilityBar.ShowAutoHunt).
     private bool _autoHuntDrawn;
     private bool _autoHuntPausedDrawn;
     private int _autoHuntSettling;
@@ -595,28 +595,12 @@ public partial class GameScreen : Control
         Greybox.Plain(settings);
         settings.Pressed += () => _settings.Visible = !_settings.Visible;
 
-        _autoHunt = new Button
-        {
-            Text = "자동",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(_autoHunt);
-        _autoHunt.Pressed += () =>
-        {
-            _world.SetAutoHunt(!_world.AutoHunting);
-            Notify(_world.AutoHunting
-                ? $"자동 사냥을 켰습니다 — 이 자리에서 {Main.AutoHuntSettings.Radius}칸 안."
-                : "자동 사냥을 껐습니다.");
-        };
-
-        actions.AddChild(_autoHunt);
         actions.AddChild(settings);
         actions.AddChild(_logout);
 
         if (Main.Portrait)
         {
-            foreach (Button action in new Button[] { pack, _map, way, _autoHunt, settings, _logout })
+            foreach (Button action in new Button[] { pack, _map, way, settings, _logout })
             {
                 action.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             }
@@ -671,9 +655,19 @@ public partial class GameScreen : Control
         return holder;
     }
 
+    /// <summary>자동 사냥을 켜고 끄고, 켰다·껐다 한 줄로 알린다 — 공격 단추를 0.5초 길게 눌러도(<see cref="AbilityBar.AutoHuntToggleRequested" />)
+    /// <c>--auto-hunt</c> 로 스스로 눌러도 같은 문을 지난다.</summary>
+    private void ToggleAutoHunt()
+    {
+        _world.SetAutoHunt(!_world.AutoHunting);
+        Notify(_world.AutoHunting
+            ? $"자동 사냥을 켰습니다 — 이 자리에서 {Main.AutoHuntSettings.Radius}칸 안."
+            : "자동 사냥을 껐습니다.");
+    }
+
     /// <summary>
-    /// [자동] 단추의 모양을 자동 사냥과 맞춘다 — 켜짐은 강조색, 손이 잠시 조작 중이면 흐리게. <c>--auto-hunt</c> 면 자리를
-    /// 잡은 뒤 한 번 스스로 누른다.
+    /// 공격 단추의 모양을 자동 사냥과 맞춘다 — 켜짐은 테두리 + "자동" 글자, 손이 잠시 조작 중이면 흐리게
+    /// (<see cref="AbilityBar.ShowAutoHunt" />). <c>--auto-hunt</c> 면 자리를 잡은 뒤 한 번 스스로 켠다.
     /// </summary>
     private void KeepAutoHuntButton()
     {
@@ -681,36 +675,18 @@ public partial class GameScreen : Control
             && ++_autoHuntSettling == 120)
         {
             _autoHuntSettling = -1;
-            _autoHunt.EmitSignal(BaseButton.SignalName.Pressed);
+            ToggleAutoHunt();
             GD.Print("GREYBOX_AUTOHUNT 켬");
         }
 
         bool on = _world.AutoHunting;
         bool paused = _world.AutoHuntPaused;
 
-        if (on != _autoHuntDrawn)
+        if (on != _autoHuntDrawn || paused != _autoHuntPausedDrawn)
         {
             _autoHuntDrawn = on;
-
-            if (on)
-            {
-                Greybox.Commit(_autoHunt);
-            }
-            else
-            {
-                foreach (string colour in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
-                {
-                    _autoHunt.RemoveThemeColorOverride(colour);
-                }
-
-                Greybox.Plain(_autoHunt);
-            }
-        }
-
-        if (paused != _autoHuntPausedDrawn)
-        {
             _autoHuntPausedDrawn = paused;
-            _autoHunt.Modulate = paused ? new Color(1, 1, 1, 0.6f) : Colors.White;
+            _abilities.ShowAutoHunt(on, paused);
         }
     }
 
@@ -1725,12 +1701,15 @@ public partial class GameScreen : Control
 
         // One tap is one blow. It does not chase and it does not repeat — the server decides whether it
         // landed, and says so in words we show below rather than guessing at damage here.
-        _abilities.Attack.Pressed += () =>
+        _abilities.AttackReleased += () =>
         {
             // 사람이 직접 치면 자동 사냥은 3초 쉰다 — 끄지 않는다. 손을 떼면 다시 돈다.
             _world.FoughtByHand();
             _world.Strike();
         };
+
+        // 0.5초 길게 누르면 자동 사냥을 켜고 끈다(위 줄의 [자동] 단추는 없앴다 — 사용자 요청, 2026-09-26).
+        _abilities.AutoHuntToggleRequested += ToggleAutoHunt;
 
         // 자동 포션은 창 안에 숨기지 않는다 — 싸우는 중에 한 번에 닿아야 한다(사용자, 2026-09-23). 위 줄에 있던 것을
         // 기술 부채꼴 맨 위, 가장 높은 기술 칸 위로 옮겼다 — 기술 칸(48)보다 조금 작게(사용자, 2026-09-23 "기술창 제일

@@ -166,7 +166,7 @@ public sealed class AutoHuntTests(ITestOutputHelper output) : IDisposable
 
         foreach (string argument in new[]
                  {
-                     "--audio-driver", "Dummy", "--",
+                     "--position", "-3000,-3000", "--audio-driver", "Dummy", "--",
                      "--server", $"127.0.0.1:{server.LoginPort}", "--login", $"{name}:{LoginFlow.SyntheticSecret}",
                      "--orient", "portrait", "--size", "360x780",
                      "--auto-hunt", "--shot", shot, "--shot-after", after

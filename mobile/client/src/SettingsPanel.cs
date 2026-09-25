@@ -4,10 +4,10 @@ using Godot;
 namespace LodClient;
 
 /// <summary>
-/// 설정 창. 자동 포션 줄 둘 — 체력·마력이 몇 % 이하일 때 마시나를 셀렉트 박스(<see cref="PercentSelect"/>, 1~99)로
-/// 고른다 — 자동 사냥의 반경 슬라이더 하나·회복 기술 셀렉트 박스 하나, 그리고 자동 로그인 끄기 단추 하나. 무엇을
-/// 마실지와 켜고 끄기는 게임 화면의 포션 단추에서 한다(<see cref="PotionChip"/>).
-/// 자동 로그인을 다시 켜는 것은 로그인 화면에서만 한다(계정·비밀번호가 그 화면에만 있다).
+/// 설정 창. 자동 포션 줄 둘 — 체력·마력이 몇 % 이하일 때 마시나를 게이지 바(<see cref="PotionGauge"/>, 10~90%
+/// 10단위, 2026-09-26)로 고른다 — 자동 사냥의 반경 슬라이더 하나·회복 기술 셀렉트 박스(<see cref="PercentSelect"/>,
+/// 1~99) 하나, 그리고 자동 로그인 끄기 단추 하나. 무엇을 마실지와 켜고 끄기는 게임 화면의 포션 단추에서 한다
+/// (<see cref="PotionChip"/>). 자동 로그인을 다시 켜는 것은 로그인 화면에서만 한다(계정·비밀번호가 그 화면에만 있다).
 /// </summary>
 public sealed partial class SettingsPanel : PanelContainer
 {
@@ -32,19 +32,17 @@ public sealed partial class SettingsPanel : PanelContainer
         Greybox.Plain(Close);
         head.AddChild(Close);
 
-        HBoxContainer wheels = new() { Alignment = BoxContainer.AlignmentMode.Center };
-        // 가로는 방향판과 부채꼴 사이 가운데에 서므로(GameScreen.Cover) 좁게 — 640 폭에서도 부채꼴에 닿지 않는다.
-        wheels.AddThemeConstantOverride("separation", Main.Portrait ? Main.Gutter * 3 : Main.Gutter);
-
-        PercentSelect health = new(Main.HealthPotion.Percent);
+        PotionGauge health = new(Main.HealthPotion.Percent, Greybox.Health);
         health.Changed += percent => Main.SetPotions(Main.HealthPotion with { Percent = percent }, Main.ManaPotion);
-        wheels.AddChild(Titled("체력 포션", health));
-        _percentSelects["health"] = health;
+        inside.AddChild(head);
+        inside.AddChild(new Label { Text = "이하가 되면 저절로 마신다", HorizontalAlignment = HorizontalAlignment.Center });
+        inside.AddChild(Row("체력 포션", health));
 
-        PercentSelect mana = new(Main.ManaPotion.Percent);
+        PotionGauge mana = new(Main.ManaPotion.Percent, Greybox.Mana);
         mana.Changed += percent => Main.SetPotions(Main.HealthPotion, Main.ManaPotion with { Percent = percent });
-        wheels.AddChild(Titled("마력 포션", mana));
-        _percentSelects["mana"] = mana;
+        inside.AddChild(Row("마력 포션", mana));
+
+        inside.AddChild(BuildAutoHunt());
 
         _autoLoginOff = new Button
         {
@@ -59,20 +57,6 @@ public sealed partial class SettingsPanel : PanelContainer
             _autoLoginOff.Disabled = true;
         };
 
-        inside.AddChild(head);
-        inside.AddChild(new Label { Text = "이하가 되면 저절로 마신다", HorizontalAlignment = HorizontalAlignment.Center });
-        inside.AddChild(wheels);
-
-        // 가로는 높이가 모자라 자동 사냥 두 줄을 돌림판 옆에 세운다. 세로는 아래에.
-        if (Main.Portrait)
-        {
-            inside.AddChild(BuildAutoHunt());
-        }
-        else
-        {
-            wheels.AddChild(BuildAutoHunt());
-        }
-
         inside.AddChild(_autoLoginOff);
 
         MarginContainer margin = new();
@@ -82,7 +66,21 @@ public sealed partial class SettingsPanel : PanelContainer
             margin.AddThemeConstantOverride(side, Main.Gutter);
         }
 
-        margin.AddChild(inside);
+        // 가로는 화면이 낮아(360짜리) 포션 게이지 두 줄이 늘어난 뒤로는 자동 사냥·자동 로그인 끄기까지 다 안
+        // 들어간다 — 굴리게 한다(사용자 요청, 2026-09-26). 세로는 700 안팎이라 그대로 다 보인다.
+        if (Main.Portrait)
+        {
+            margin.AddChild(inside);
+        }
+        else
+        {
+            // ScrollContainer 는 속의 너비를 제 최소 크기로 올려 보내지 않는다 — 안 주면 가로 폭이 0 이 돼
+            // 창이 통째로 사라진다(실측, 2026-09-26). 세로와 같은 내용 너비(344)를 그대로 준다.
+            ScrollContainer scroll = new() { CustomMinimumSize = new Vector2(340, 260) };
+            scroll.AddChild(inside);
+            margin.AddChild(scroll);
+        }
+
         AddChild(margin);
     }
 
@@ -90,7 +88,7 @@ public sealed partial class SettingsPanel : PanelContainer
 
     /// <summary>
     /// 자동 사냥 두 줄 — 켠 자리에서 몇 칸까지 쫓나(4~20, 기본 12), 체력 몇 % 이하에서 회복 기술을 쓰나(1~99, 기본 50).
-    /// 켜고 끄기는 게임 화면의 [자동] 단추에서 한다.
+    /// 켜고 끄기는 공격 단추를 0.5초 길게 눌러서 한다(<see cref="AbilityBar"/>).
     /// </summary>
     private Control BuildAutoHunt()
     {
@@ -100,9 +98,9 @@ public sealed partial class SettingsPanel : PanelContainer
         rows.AddChild(SliderRow("사냥 반경", 4, 20, 1, Main.AutoHuntSettings.Radius, value => $"{value}칸",
             value => Main.SetAutoHuntSettings(Main.AutoHuntSettings with { Radius = value })));
 
-        PercentSelect heal = new(Main.AutoHuntSettings.HealPercent);
+        PercentSelect heal = new(Main.AutoHuntSettings.HealPercent, this);
         heal.Changed += value => Main.SetAutoHuntSettings(Main.AutoHuntSettings with { HealPercent = value });
-        rows.AddChild(SelectRow("회복 기술", heal));
+        rows.AddChild(Row("회복 기술", heal));
         _percentSelects["heal"] = heal;
 
         VBoxContainer block = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
@@ -163,7 +161,9 @@ public sealed partial class SettingsPanel : PanelContainer
         return row;
     }
 
-    private static Control SelectRow(string title, PercentSelect select)
+    /// <summary>A label on the left, some control on the right — the heal-skill select and, since it already
+    /// fills the row itself (<see cref="PotionGauge"/>), the two potion gauges too.</summary>
+    private static Control Row(string title, Control control)
     {
         HBoxContainer row = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         row.AddThemeConstantOverride("separation", Main.Gutter);
@@ -172,19 +172,20 @@ public sealed partial class SettingsPanel : PanelContainer
         {
             Text = title,
             VerticalAlignment = VerticalAlignment.Center,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
+            SizeFlagsHorizontal = control is PotionGauge ? SizeFlags.ShrinkBegin : SizeFlags.ExpandFill
         };
         name.AddThemeColorOverride("font_color", Greybox.Muted);
 
         row.AddChild(name);
-        row.AddChild(select);
+        row.AddChild(control);
 
         return row;
     }
 
     /// <summary>
-    /// --percent-open health|mana|heal: 손 없이 확인할 때, 창이 자리를 잡으면 그 셀렉트 박스를 스스로 눌러
-    /// 목록을 열어 본다(<see cref="AbilityBar"/>의 --slot-hold 와 같은 결).
+    /// --percent-open heal: 손 없이 확인할 때, 창이 자리를 잡으면 그 셀렉트 박스를 스스로 눌러 목록을 열어 본다
+    /// (<see cref="AbilityBar"/>의 --slot-hold 와 같은 결). 체력·마력은 이제 게이지 바라(<see cref="PotionGauge"/>,
+    /// 2026-09-26) 열 목록이 없다 — 이 값은 받아도 조용히 아무 일 하지 않는다.
     /// </summary>
     public override void _Process(double delta)
     {
@@ -198,14 +199,5 @@ public sealed partial class SettingsPanel : PanelContainer
             select.Open();
             _rehearsedOpen = -1;
         }
-    }
-
-    private static Control Titled(string title, Control below)
-    {
-        VBoxContainer column = new();
-        column.AddChild(new Label { Text = title, HorizontalAlignment = HorizontalAlignment.Center });
-        column.AddChild(below);
-
-        return column;
     }
 }

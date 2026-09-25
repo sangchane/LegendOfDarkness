@@ -16,16 +16,24 @@ public sealed partial class PercentSelect : Button
 {
     private const int Minimum = 1;
     private const int Maximum = 99;
+    private const int MinVisibleRows = 3;
     private const int MaxVisibleRows = 6;
 
     private readonly PopupPanel _picker = new();
     private readonly ScrollContainer _scroll = new();
     private readonly Button[] _rows = new Button[Maximum - Minimum + 1];
+    private readonly Control _bounds;
 
     private int _value;
 
-    public PercentSelect(int value)
+    /// <summary>
+    /// <paramref name="bounds"/> is the window this select box lives in (the settings panel) — the dropped-down
+    /// list is kept inside its edges rather than the whole screen's (사용자 신고, 2026-09-26: 목록이 설정 창 밖까지
+    /// 덮었다).
+    /// </summary>
+    public PercentSelect(int value, Control bounds)
     {
+        _bounds = bounds;
         _value = Mathf.Clamp(value, Minimum, Maximum);
         Text = $"{_value}%";
         CustomMinimumSize = new Vector2(96, Main.TouchMinimum);
@@ -50,7 +58,7 @@ public sealed partial class PercentSelect : Button
             list.AddChild(row);
         }
 
-        _scroll.CustomMinimumSize = new Vector2(96, MaxVisibleRows * (Main.TouchMinimum + Main.Gutter / 2));
+        // 실제 높이는 열 때마다(Open) 창 안 남은 자리를 보고 정한다.
         _scroll.AddChild(list);
         _picker.AddChild(_scroll);
         AddChild(_picker);
@@ -61,18 +69,36 @@ public sealed partial class PercentSelect : Button
     /// <summary>A new value was picked from the list.</summary>
     public event System.Action<int>? Changed;
 
-    /// <summary>Opens the list — also called by <c>--percent-open</c> to check it without a hand.</summary>
+    /// <summary>
+    /// Opens the list — also called by <c>--percent-open</c> to check it without a hand. Kept inside
+    /// <see cref="_bounds"/> (the settings window), not the screen: opens upward when there is not enough room
+    /// below, and its height fits whatever room is left in that direction (at least <see cref="MinVisibleRows"/>
+    /// rows).
+    /// </summary>
     public async void Open()
     {
+        Rect2 at = GetGlobalRect();
+        Rect2 bounds = _bounds.GetGlobalRect();
+
+        int rowStride = Main.TouchMinimum + Main.Gutter / 2;
+        int spaceBelow = (int)(bounds.End.Y - at.End.Y) - Main.Gutter;
+        int spaceAbove = (int)(at.Position.Y - bounds.Position.Y) - Main.Gutter;
+
+        bool below = spaceBelow >= rowStride * MinVisibleRows || spaceBelow >= spaceAbove;
+        int rows = Mathf.Clamp((below ? spaceBelow : spaceAbove) / rowStride, MinVisibleRows, MaxVisibleRows);
+        _scroll.CustomMinimumSize = new Vector2(96, rows * rowStride);
+
         _picker.Popup(new Rect2I(0, 0, 0, 0));
 
-        // 화면 밖으로 넘치지 않게, 단추 바로 아래에.
-        Rect2 at = GetGlobalRect();
-        Vector2 screen = GetViewportRect().Size;
         Vector2I size = _picker.Size;
 
-        int x = Mathf.Clamp((int)at.Position.X, Main.Gutter, Mathf.Max(Main.Gutter, (int)screen.X - size.X - Main.Gutter));
-        int y = Mathf.Clamp((int)at.End.Y + Main.Gutter / 2, Main.Gutter, Mathf.Max(Main.Gutter, (int)screen.Y - size.Y - Main.Gutter));
+        int x = Mathf.Clamp((int)at.Position.X,
+            (int)bounds.Position.X + Main.Gutter,
+            Mathf.Max((int)bounds.Position.X + Main.Gutter, (int)bounds.End.X - size.X - Main.Gutter));
+
+        int y = below
+            ? Mathf.Min((int)at.End.Y + Main.Gutter / 2, (int)bounds.End.Y - size.Y - Main.Gutter)
+            : Mathf.Max((int)bounds.Position.Y + Main.Gutter, (int)at.Position.Y - Main.Gutter / 2 - size.Y);
 
         _picker.Position = new Vector2I(x, y);
 
