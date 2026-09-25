@@ -130,6 +130,52 @@ def blocks(folder):
     return found
 
 
+def pack_wiring():
+    """노바 팩이 우드랜드를 **실제로 얼마나 이어 두었나**.
+
+    맵 파일이 원작이라는 것과, 그 맵들이 서버에서 이어져 있다는 것은 다른 이야기다. 팩은 맵 정의를
+    `db/maps/woodland/{east,west,north}.txt` 셋으로 나눠 두었고 — 이 파일 이름이 곧 동의·서의·북의다 —
+    연결은 `db/warp/woodland.txt` 에 있다. 정의된 맵 중 워프가 닿는 것이 몇 개인지 센다.
+    """
+    folder = NOVA_PACK / "db" / "maps" / "woodland"
+    warp = NOVA_PACK / "db" / "warp" / "woodland.txt"
+    if not folder.is_dir() or not warp.is_file():
+        return None
+
+    def read(path):
+        return path.read_bytes().decode("cp949", "replace")
+
+    lines = [l.split(",") for l in read(warp).splitlines() if l.count(",") >= 6]
+    wired = {row[1].strip() for row in lines} | {row[4].strip() for row in lines}
+
+    out = []
+    for tag, side in (("east", "동의"), ("west", "서의"), ("north", "북의")):
+        path = folder / f"{tag}.txt"
+        if not path.is_file():
+            continue
+        text = read(path)
+        names = [n.strip() for n in re.findall(r"이름\t(.+)", text)]
+        files = sorted({int(n) for n in re.findall(r"lod(\d+)\.map", text)})
+        out.append({
+            "쪽": side,
+            "정의파일": f"db/maps/woodland/{tag}.txt",
+            "맵파일": f"lod{files[0]}~lod{files[-1]}" if files else "확인 못 함",
+            "맵수": len(names),
+            "워프가닿는맵": sorted(n for n in names if n in wired),
+        })
+
+    # 남의우드랜드가 팩 어디에라도 있나.
+    south = []
+    for path in (NOVA_PACK / "db").rglob("*.txt"):
+        try:
+            if "남의" in path.read_bytes().decode("cp949", "replace"):
+                south.append(str(path.relative_to(NOVA_PACK)))
+        except OSError:
+            continue
+
+    return {"구간": out, "남의가나오는파일": south}
+
+
 def document(facts):
     """표 한 장과 결론을 `docs/woodland-origin.md` 로 적는다."""
     rows = facts["맵"]
@@ -160,10 +206,20 @@ def document(facts):
         f"2. **원작에는 우드랜드 구간이 넷 있다** — "
         + " · ".join(f"`lod{b['시작']}`" for b in shapes)
         + ". 원작 월드맵(`field001.txt`)이 이름 붙인 동의·서의·남의·북의 넷과 수가 맞는다.",
-        "   Novaonline 이 쓰는 것은 셋(`441` 이름 없음 · `600` 동의 · `700` 북의)이고, **`542` 는 어느 팩도 안 쓴다**.",
+        "   **노바 팩이 그 셋에 이름을 붙여 두었다** — 맵 정의를 `db/maps/woodland/` 아래 `east`·`west`·`north`",
+        "   셋으로 나눴고, `db/warp/worldmap.txt` 에 `동의·서의·북의우드랜드입구` 가 있다. 그래서:",
         "",
-        "**맵 파일에는 이름이 없다** — 이름은 서버가 붙인다. 그래서 `441` 과 `542` 중 어느 쪽이 서의이고",
-        "어느 쪽이 남의인지는 **확인 못 했다**. 참고로 원작 월드맵에서 **남의우드랜드만 `EX`(들어가는 자리)가 없다**:",
+        "   | 원작 구간 | 어느 쪽 | 근거 |",
+        "   |---|---|---|",
+        "   | `lod600~623` | **동의** | 노바 `east.txt` · 맵 이름이 `동의우드랜드…` |",
+        "   | `lod441~464` | **서의** | 노바 `west.txt` (맵 이름에는 방향이 빠져 그냥 `우드랜드…` 지만 월드맵에는 `서의우드랜드입구` 가 있다) |",
+        "   | `lod700~723` | **북의** | 노바 `north.txt` · 맵 이름이 `북의우드랜드…` |",
+        "   | `lod542~565` | **남의로 본다** | 남은 하나다. 노바 어디에도 `남의` 가 없고, 원작 월드맵에서 **남의우드랜드만 `EX`(들어가는 자리)가 없다** |",
+        "",
+        "   넷째만은 **소거법이다** — 맵 파일에는 이름이 없고(이름은 서버가 붙인다) `542` 를 쓰는 팩이 없어",
+        "   직접 근거가 없다. 앞의 셋은 팩이 이름을 붙여 둔 것이라 확실하다.",
+        "",
+        "원작 월드맵(`field001.txt`):",
         "",
         "```",
         "동의우드랜드  f003  516 176  EX 443 140 22",
@@ -171,6 +227,24 @@ def document(facts):
         "남의우드랜드  f005  398 365            ← EX 없음",
         "북의우드랜드  f006  255  96  EX 203  86 23",
         "```",
+        "",
+        "## 노바 팩이 실제로 이어 둔 것 (맵 파일과는 다른 이야기)",
+        "",
+        "맵 파일이 원작이라는 것과, 그 맵들이 서버에서 **이어져 있다**는 것은 다르다.",
+        "노바의 연결은 `db/warp/woodland.txt` 에 있고, 구간마다 정의된 24~25맵 중 워프가 닿는 것은 열 몇 개뿐이다.",
+        "",
+        "| 쪽 | 맵 정의 | 맵 파일 | 정의된 맵 | 워프가 닿는 맵 |",
+        "|---|---|---|---|---|",
+        *[f"| {b['쪽']} | `{b['정의파일']}` | `{b['맵파일']}` | {b['맵수']} | "
+          f"{len(b['워프가닿는맵'])} — {', '.join(b['워프가닿는맵'][:4])}{' …' if len(b['워프가닿는맵']) > 4 else ''} |"
+          for b in (facts.get("노바배선") or {}).get("구간", [])],
+        "",
+        "**10-1 부터 20-1 까지는 워프가 없다.** 맵 파일은 원작 것이 다 있는데 연결이 안 되어 있다 —",
+        "노바도 위쪽 절반은 안 쓴 것이다. 연결은 아래층(`대기실`)을 중심으로 갈라지는 모양이고,",
+        "이것은 팩이 정한 것이지 원작 구조가 아니다.",
+        "",
+        "`남의` 는 노바 `db/` 어디에도 " + ("나오지 않는다." if not (facts.get("노바배선") or {}).get("남의가나오는파일")
+                                       else "다음 파일에 나온다: " + ", ".join((facts["노바배선"]["남의가나오는파일"])[:5])),
         "",
         "## 덤으로 알게 된 것",
         "",
@@ -206,9 +280,14 @@ def document(facts):
         "",
         "## 그래서 무엇을 기준으로 옮기나",
         "",
-        "**Novaonline 이다.** 맵 파일이 원작과 같으니 그 팩의 우드랜드가 원작 구조다.",
-        "다만 **맵 사이 연결(워프)은 서버 자료라 클라이언트에 없다** — 이 확인이 가려 준 것은 *맵 파일*까지이고,",
-        "연결이 원작과 같은지는 여기서 답하지 못한다.",
+        "**맵과 이름은 Novaonline 이다** — 맵 파일이 원작과 바이트까지 같고, 동의·서의·북의 세 쪽의 이름도 거기서 나온다.",
+        "",
+        "**연결은 아니다.** 노바의 워프는 각 구간 24맵 중 열 몇 개(1-1~9-2)까지만 닿고 10-1 위로는 비어 있다.",
+        "게다가 아래층을 `대기실` 하나로 모으는 모양은 팩이 정한 것이다 — 원작 연결은 **클라이언트에 없어**",
+        "(맵 사이 연결은 서버 자료다) 어느 팩에서도 원작이라고 말할 수 없다.",
+        "",
+        "그래서 옮길 때는 **맵 파일·맵 이름·크기는 Novaonline 을 그대로**, **연결은 새로 정해야 한다**.",
+        "남의우드랜드(`lod542~565`)는 맵만 있고 쓰는 팩이 없다 — 원작에서도 월드맵에 들어가는 자리가 없었다.",
         "",
     ]
     OUT_DOC.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -231,6 +310,7 @@ def main():
         print(f"{name}: {folder if folder else '확인 못 함 (폴더를 안 줬거나 맵이 없다)'}")
     print(f"7.41: {SEVEN41 if SEVEN41.is_dir() else '확인 못 함'}")
 
+    wiring = pack_wiring()
     shapes = blocks(folders["원작4.51"] or folders["원작2005"])
     print("원작 우드랜드 모양 구간: " + (", ".join(f"lod{b['시작']}" for b in shapes) or "확인 못 함"))
 
@@ -287,6 +367,7 @@ def main():
             "혼든": "data/map-origins/woodland-candidates.json (맥이 뽑음)",
             "5.99": "data/map-origins/woodland-candidates.json (맥이 뽑음)",
         },
+        "노바배선": wiring,
         "원작우드랜드구간": {
             "설명": ("맵 파일에는 이름이 없다. 입구(25x25=3750) 뒤에 100x100 이 둘 이어지는 차례를 "
                      "열쇠로 삼아 원작 맵에서 우드랜드 모양 구간을 센 것. 원작 월드맵(field001.txt)이 "
