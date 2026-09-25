@@ -40,6 +40,7 @@ public sealed partial class AbilityBar : Control
     private readonly bool[] _down = new bool[AbilityFan.PerPage];
     private readonly bool[] _longHeld = new bool[AbilityFan.PerPage];
     private int _rehearsedHold; // --slot-hold: 손 없이 확인할 때 프레임을 센다.
+    private int _rehearsedAutoHunt; // --auto-hunt-preview: 서버 없이 켜짐 표시만 그려 볼 때 프레임을 센다.
 
     // 공격 단추도 같은 0.5초 규칙으로 길게 누르면 자동 사냥을 켜고 끈다(사용자 요청, 2026-09-26) — 판단은
     // 알맹이 LongPress(시험 LongPressTests)로 뺐다. 짧게 누르면(길게 눌리지 않았으면) 지금처럼 곧장 평타.
@@ -50,8 +51,14 @@ public sealed partial class AbilityBar : Control
     private AbilityArrangement _spellArrangement = new();
     private string _loadedFor = string.Empty;
     private readonly PopupPanel _picker = new();
+    private readonly VBoxContainer _pickerRoot = new();
     private readonly VBoxContainer _pickerList = new();
     private readonly ScrollContainer _pickerScroll = new();
+
+    // "비우기" 줄 — 굴림 밖에 고정해 늘 맨 위에 보인다(사용자 확인 요청, 2026-09-26 — 전에는 목록 첫 줄이라
+    // 함께 굴러가 화면 밖으로 밀렸다). 한 번만 만들고 열 때마다 눌림 줄만 바꿔 단다.
+    private readonly Button _clearRow = Row("비우기", null);
+    private Action? _clearHandler;
 
     /// <summary>Given a character's name, the saved lines for their slots (empty if none yet).</summary>
     public Func<string, IEnumerable<string>>? LoadSlots { get; set; }
@@ -75,6 +82,10 @@ public sealed partial class AbilityBar : Control
         MouseFilter = MouseFilterEnum.Ignore,
         Visible = false
     };
+
+    // 켜져 있는 동안 공격 단추 둘레를 도는 빛 — 테두리가 멈춰 있어 "자동 사냥이 도는지" 한눈에 안 읽히던 것을
+    // 고친다(사용자 요청, 2026-09-26). AutoHuntRing.cs.
+    private readonly AutoHuntRing _autoHuntRing = new();
 
     /// <summary>How many seconds one slot still has to wait, asked of the server every frame.</summary>
     public Func<bool, int, int>? Cooling { get; set; }
@@ -106,6 +117,10 @@ public sealed partial class AbilityBar : Control
                 AttackReleased?.Invoke();
             }
         };
+
+        // 링을 글자보다 먼저 붙여, 도는 빛이 "자동" 글자 뒤로 지나가 글자는 늘 그대로 읽힌다.
+        _autoHuntRing.SetAnchorsPreset(LayoutPreset.FullRect);
+        Attack.AddChild(_autoHuntRing);
 
         _autoHuntTag.SetAnchorsPreset(LayoutPreset.BottomWide);
         _autoHuntTag.OffsetTop = -18;
@@ -162,11 +177,16 @@ public sealed partial class AbilityBar : Control
         }
 
         // 길게 누르면 뜨는 배치 목록 — 목록 밖을 누르면 닫힌다(PopupPanel 기본 동작). 돌을 쓰지 않는 목록이다
-        // (docs/original-ui-451.md: "돌을 안 쓰는 곳 — 목록").
+        // (docs/original-ui-451.md: "돌을 안 쓰는 곳 — 목록"). "비우기"는 _pickerRoot 에 고정으로 붙고,
+        // 배운 기술·마법만 그 아래 _pickerScroll 안에서 굴러간다.
         _pickerList.AddThemeConstantOverride("separation", Main.Gutter / 2);
         _pickerScroll.CustomMinimumSize = new Vector2(PickerWidth, 0);
         _pickerScroll.AddChild(_pickerList);
-        _picker.AddChild(_pickerScroll);
+
+        _pickerRoot.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        _pickerRoot.AddChild(_clearRow);
+        _pickerRoot.AddChild(_pickerScroll);
+        _picker.AddChild(_pickerRoot);
         AddChild(_picker);
     }
 
@@ -210,6 +230,12 @@ public sealed partial class AbilityBar : Control
         {
             AutoHuntToggleRequested?.Invoke();
         }
+
+        // --auto-hunt-preview: 서버가 없어 GameScreen 이 실제로 켤 수 없으니, 여기서 스스로 켜짐 표시만 그려 본다.
+        if (Main.AutoHuntPreview && ++_rehearsedAutoHunt == 90)
+        {
+            ShowAutoHunt(true);
+        }
     }
 
     /// <summary>Shows or hides the attack button's auto-hunt "켜짐" mark — a ring plus the small "자동" tag,
@@ -220,6 +246,7 @@ public sealed partial class AbilityBar : Control
         PaintAttack(Attack, AbilityFan.AttackSide, on, paused);
         _autoHuntTag.Visible = on;
         _autoHuntTag.Modulate = paused ? new Color(1, 1, 1, 0.55f) : Colors.White;
+        _autoHuntRing.Show(on, paused);
     }
 
     /// <summary>
@@ -381,8 +408,9 @@ public sealed partial class AbilityBar : Control
     }
 
     /// <summary>
-    /// Opens the picker above the slot just held — a combined roster of every learned skill and spell, "비우기"
-    /// first. Picking one puts it there (swapping with wherever it already sat), even across the 기술/마법 switch.
+    /// Opens the picker above the slot just held — "비우기" pinned above a combined, scrolling roster of every
+    /// learned skill and spell. Picking one puts it there (swapping with wherever it already sat), even across
+    /// the 기술/마법 switch.
     /// </summary>
     private void OpenPicker(int index)
     {
@@ -394,16 +422,31 @@ public sealed partial class AbilityBar : Control
             old.QueueFree();
         }
 
-        Button empty = Row("비우기", null);
+        if (_clearHandler is { } previous)
+        {
+            _clearRow.Pressed -= previous;
+        }
+
         bool heldSpells = _spells;
-        empty.Pressed += () =>
+        int currentSlot = _drawn[index] switch
+        {
+            LearnedSkill skill => skill.Slot,
+            LearnedSpell spell => spell.Slot,
+            _ => 0
+        };
+
+        _clearHandler = () =>
         {
             (heldSpells ? _spellArrangement : _skillArrangement).Clear(position);
             Persist();
             _picker.Hide();
             Redraw();
         };
-        _pickerList.AddChild(empty);
+        _clearRow.Pressed += _clearHandler;
+
+        // 이미 빈 칸이면 지울 것이 없다 — 흐리게 하고 눌러도 아무 일이 안 일어난다(사용자 확인 요청, 2026-09-26).
+        _clearRow.Disabled = currentSlot == 0;
+        _clearRow.Modulate = currentSlot == 0 ? new Color(1, 1, 1, 0.4f) : Colors.White;
 
         foreach (LearnedSkill skill in _learnedSkills)
         {
@@ -421,21 +464,28 @@ public sealed partial class AbilityBar : Control
             _pickerList.AddChild(row);
         }
 
-        // 다섯 줄까지는 그대로 보이고, 더 있으면 굴린다(docs/mobile-client.md 의 스크롤 규칙 — TouchInput 이
-        // 목록 안 단추의 누름을 목록에도 넘긴다).
+        // 다섯 줄까지는 그대로 보이고, 더 있으면 굴린다 — 화면이 낮으면(가로 아이폰 등) 그보다 더 줄여, "비우기"
+        // + 목록을 합친 판이 화면 높이를 넘지 않게 한다(사용자 확인 요청, 2026-09-26). docs/mobile-client.md 의
+        // 스크롤 규칙 — TouchInput 이 목록 안 단추의 누름을 목록에도 넘긴다.
         const int MaxVisibleRows = 5;
-        int visible = Math.Min(_pickerList.GetChildCount(), MaxVisibleRows);
-        _pickerScroll.CustomMinimumSize = new Vector2(PickerWidth, visible * (Main.TouchMinimum + Main.Gutter / 2));
+        int rowHeight = Main.TouchMinimum + Main.Gutter / 2;
+        int reserved = Main.TouchMinimum + Main.Gutter * 3; // 비우기 줄 + 틈 + 판 테두리 어림
+        int screenLimited = Math.Max(1, (int)((GetViewportRect().Size.Y - reserved) / rowHeight));
+        int visible = Math.Min(Math.Min(_pickerList.GetChildCount(), MaxVisibleRows), screenLimited);
+        _pickerScroll.CustomMinimumSize = new Vector2(PickerWidth, visible * rowHeight);
 
         _picker.Popup(new Rect2I(0, 0, 0, 0));
 
-        // 그 슬롯 위에, 화면 밖으로 넘치지 않게.
+        // 그 슬롯 위에, 화면·가장자리를 넘지 않게(위아래 모두 자른다 — 전에는 위로 넘치는 것만 막았다).
         Rect2 at = _slots[index].GetGlobalRect();
         Vector2 screen = GetViewportRect().Size;
         Vector2I size = _picker.Size;
 
         int x = Mathf.Clamp((int)at.Position.X, Main.Gutter, Mathf.Max(Main.Gutter, (int)screen.X - size.X - Main.Gutter));
-        int y = Mathf.Max(Main.Gutter, (int)at.Position.Y - size.Y - Main.Gutter / 2);
+        int y = Mathf.Clamp(
+            (int)at.Position.Y - size.Y - Main.Gutter / 2,
+            Main.Gutter,
+            Mathf.Max(Main.Gutter, (int)screen.Y - size.Y - Main.Gutter));
 
         _picker.Position = new Vector2I(x, y);
     }

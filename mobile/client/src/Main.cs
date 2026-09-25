@@ -187,6 +187,13 @@ public partial class Main : Control
     /// <summary><c>--auto-hunt</c> — 게임 화면이 뜨고 자리를 잡으면 [자동] 단추를 스스로 누른다. 손 없이 확인하는 용.</summary>
     public static bool AutoHuntOnStart { get; private set; }
 
+    /// <summary>
+    /// <c>--auto-hunt-preview</c> — 서버 없이(<c>--screen game</c>) 공격 단추의 켜짐 표시(테두리·도는 빛·"자동" 글자,
+    /// <see cref="AbilityBar.ShowAutoHunt" />)만 그려 본다. <c>--auto-hunt</c> 는 실제 서버 접속이 있어야 켜져 이
+    /// 화면에서는 켜지지 않는다.
+    /// </summary>
+    public static bool AutoHuntPreview { get; private set; }
+
     public static void SetAutoHuntSettings(Lod.Mobile.Core.World.AutoHuntSettings settings)
     {
         AutoHuntSettings = settings;
@@ -507,6 +514,7 @@ public partial class Main : Control
         ReadPotions();
         ReadAutoHuntSettings();
         AutoHuntOnStart = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auto-hunt") >= 0;
+        AutoHuntPreview = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auto-hunt-preview") >= 0;
         ReadSavedLogin();
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 
