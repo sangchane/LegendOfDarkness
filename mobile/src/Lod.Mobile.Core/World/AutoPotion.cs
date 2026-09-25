@@ -20,18 +20,36 @@ public sealed record Potion(string Name, int Icon);
 public sealed class AutoPotion
 {
     /// <summary>
-    /// Healing potions, smallest first (250 · 10000). 쿠라눔 is left out: the server has no such item yet.
+    /// Every item that restores health, smallest first (250 · 500 · 1000 · 2000 · 3000 · 10000) — every
+    /// server template (templates/items) with a <c>ScriptName: Consumable</c> and a <c>HealthRestore</c>
+    /// whose <c>Group</c> reads 물약/시약 (a potion or reagent). Food that also heals (닭고기·바베큐·사과·
+    /// 마이소시아정식…, Group 음식) is left to the player, as mana food already was.
     /// </summary>
-    public static readonly Potion[] Healing = [new("쿠룸", 32813), new("엑스쿠라눔", 34941)];
+    public static readonly Potion[] Healing =
+    [
+        new("쿠룸", 32813),
+        new("최하급체력포션", 32823),
+        new("하급체력포션", 32828),
+        new("중급체력포션", 32831),
+        new("상급체력포션", 32832),
+        new("엑스쿠라눔", 34941),
+    ];
 
-    /// <summary>Mana potions, smallest first (100 · 500 · 1000 · 1500 · 2000). Food is left to the player.</summary>
+    /// <summary>
+    /// Every item that restores mana, smallest first (100 · 500 · 1000 · 1000 · 1500 · 2000 · 2500) — the
+    /// same 물약/시약 rule as <see cref="Healing"/>. 파프리카·블루피치 read as food by name but are grouped
+    /// as potions in the server's own templates, so they are included; other mana food (치즈·와인 …) is left
+    /// to the player.
+    /// </summary>
     public static readonly Potion[] Restoring =
     [
         new("마라디움", 32815),
         new("최하급마력포션", 32822),
         new("하급마력포션", 32827),
+        new("파프리카", 34265),
         new("중급마력포션", 32829),
         new("상급마력포션", 32830),
+        new("블루피치", 34270),
     ];
 
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(2);

@@ -109,4 +109,44 @@ public sealed class AutoPotionTests
         Assert.Null(potion.Next(Life(100, 1000), pack, Half, Off, TimeSpan.FromSeconds(1.9)));
         Assert.Equal(1, potion.Next(Life(100, 1000), pack, Half, Off, TimeSpan.FromSeconds(2)));
     }
+
+    [Fact]
+    public void Every_hunting_ground_health_potion_can_be_chosen()
+    {
+        string[] names = [.. AutoPotion.Healing.Select(p => p.Name)];
+
+        Assert.Contains("최하급체력포션", names);
+        Assert.Contains("하급체력포션", names);
+        Assert.Contains("중급체력포션", names);
+        Assert.Contains("상급체력포션", names);
+    }
+
+    [Fact]
+    public void Every_hunting_ground_mana_potion_can_be_chosen()
+    {
+        string[] names = [.. AutoPotion.Restoring.Select(p => p.Name)];
+
+        Assert.Contains("최하급마력포션", names);
+        Assert.Contains("하급마력포션", names);
+        Assert.Contains("중급마력포션", names);
+        Assert.Contains("상급마력포션", names);
+        Assert.Contains("파프리카", names);
+        Assert.Contains("블루피치", names);
+    }
+
+    [Fact]
+    public void Low_health_drinks_a_hunting_ground_tier_when_chosen()
+    {
+        InventoryItem[] pack = [Carried(1, "하급체력포션")];
+
+        Assert.Equal(1, new AutoPotion().Next(Life(400, 1000), pack, Half with { Potion = "하급체력포션" }, Off, TimeSpan.Zero));
+    }
+
+    [Fact]
+    public void Low_mana_drinks_a_hunting_ground_tier_when_chosen()
+    {
+        InventoryItem[] pack = [Carried(1, "파프리카")];
+
+        Assert.Equal(1, new AutoPotion().Next(Life(1000, 400), pack, Off, HalfMana with { Potion = "파프리카" }, TimeSpan.Zero));
+    }
 }
