@@ -1,15 +1,19 @@
+using System.Collections.Generic;
 using Godot;
 
 namespace LodClient;
 
 /// <summary>
-/// 설정 창. 자동 포션 줄 둘 — 체력·마력이 몇 % 이하일 때 마시나를 돌림판으로 고른다 — 자동 사냥의 반경·회복 줄
-/// 슬라이더 둘, 그리고 자동 로그인 끄기 단추 하나. 무엇을 마실지와 켜고 끄기는 게임 화면의 포션 단추에서 한다(<see cref="PotionChip"/>).
+/// 설정 창. 자동 포션 줄 둘 — 체력·마력이 몇 % 이하일 때 마시나를 셀렉트 박스(<see cref="PercentSelect"/>, 1~99)로
+/// 고른다 — 자동 사냥의 반경 슬라이더 하나·회복 기술 셀렉트 박스 하나, 그리고 자동 로그인 끄기 단추 하나. 무엇을
+/// 마실지와 켜고 끄기는 게임 화면의 포션 단추에서 한다(<see cref="PotionChip"/>).
 /// 자동 로그인을 다시 켜는 것은 로그인 화면에서만 한다(계정·비밀번호가 그 화면에만 있다).
 /// </summary>
 public sealed partial class SettingsPanel : PanelContainer
 {
     private Button _autoLoginOff = null!;
+    private readonly Dictionary<string, PercentSelect> _percentSelects = new();
+    private int _rehearsedOpen; // --percent-open: 손 없이 확인할 때 몇 프레임 기다렸다 목록을 연다.
 
     public SettingsPanel()
     {
@@ -32,13 +36,15 @@ public sealed partial class SettingsPanel : PanelContainer
         // 가로는 방향판과 부채꼴 사이 가운데에 서므로(GameScreen.Cover) 좁게 — 640 폭에서도 부채꼴에 닿지 않는다.
         wheels.AddThemeConstantOverride("separation", Main.Portrait ? Main.Gutter * 3 : Main.Gutter);
 
-        PercentWheel health = new(Main.HealthPotion.Percent);
+        PercentSelect health = new(Main.HealthPotion.Percent);
         health.Changed += percent => Main.SetPotions(Main.HealthPotion with { Percent = percent }, Main.ManaPotion);
         wheels.AddChild(Titled("체력 포션", health));
+        _percentSelects["health"] = health;
 
-        PercentWheel mana = new(Main.ManaPotion.Percent);
+        PercentSelect mana = new(Main.ManaPotion.Percent);
         mana.Changed += percent => Main.SetPotions(Main.HealthPotion, Main.ManaPotion with { Percent = percent });
         wheels.AddChild(Titled("마력 포션", mana));
+        _percentSelects["mana"] = mana;
 
         _autoLoginOff = new Button
         {
@@ -83,18 +89,21 @@ public sealed partial class SettingsPanel : PanelContainer
     public Button Close { get; }
 
     /// <summary>
-    /// 자동 사냥 두 줄 — 켠 자리에서 몇 칸까지 쫓나(4~20, 기본 12), 체력 몇 % 이하에서 회복 기술을 쓰나(10~90, 기본 50).
+    /// 자동 사냥 두 줄 — 켠 자리에서 몇 칸까지 쫓나(4~20, 기본 12), 체력 몇 % 이하에서 회복 기술을 쓰나(1~99, 기본 50).
     /// 켜고 끄기는 게임 화면의 [자동] 단추에서 한다.
     /// </summary>
-    private static Control BuildAutoHunt()
+    private Control BuildAutoHunt()
     {
         VBoxContainer rows = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         rows.AddThemeConstantOverride("separation", Main.Gutter);
 
         rows.AddChild(SliderRow("사냥 반경", 4, 20, 1, Main.AutoHuntSettings.Radius, value => $"{value}칸",
             value => Main.SetAutoHuntSettings(Main.AutoHuntSettings with { Radius = value })));
-        rows.AddChild(SliderRow("회복 기술", 10, 90, 5, Main.AutoHuntSettings.HealPercent, value => $"{value}%",
-            value => Main.SetAutoHuntSettings(Main.AutoHuntSettings with { HealPercent = value })));
+
+        PercentSelect heal = new(Main.AutoHuntSettings.HealPercent);
+        heal.Changed += value => Main.SetAutoHuntSettings(Main.AutoHuntSettings with { HealPercent = value });
+        rows.AddChild(SelectRow("회복 기술", heal));
+        _percentSelects["heal"] = heal;
 
         VBoxContainer block = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         block.AddThemeConstantOverride("separation", Main.Gutter / 2);
@@ -152,6 +161,43 @@ public sealed partial class SettingsPanel : PanelContainer
         row.AddChild(figure);
 
         return row;
+    }
+
+    private static Control SelectRow(string title, PercentSelect select)
+    {
+        HBoxContainer row = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        row.AddThemeConstantOverride("separation", Main.Gutter);
+
+        Label name = new()
+        {
+            Text = title,
+            VerticalAlignment = VerticalAlignment.Center,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        name.AddThemeColorOverride("font_color", Greybox.Muted);
+
+        row.AddChild(name);
+        row.AddChild(select);
+
+        return row;
+    }
+
+    /// <summary>
+    /// --percent-open health|mana|heal: 손 없이 확인할 때, 창이 자리를 잡으면 그 셀렉트 박스를 스스로 눌러
+    /// 목록을 열어 본다(<see cref="AbilityBar"/>의 --slot-hold 와 같은 결).
+    /// </summary>
+    public override void _Process(double delta)
+    {
+        if (Main.PercentOpen.Length == 0 || _rehearsedOpen < 0)
+        {
+            return;
+        }
+
+        if (Visible && ++_rehearsedOpen >= 30 && _percentSelects.TryGetValue(Main.PercentOpen, out PercentSelect? select))
+        {
+            select.Open();
+            _rehearsedOpen = -1;
+        }
     }
 
     private static Control Titled(string title, Control below)

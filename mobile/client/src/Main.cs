@@ -373,6 +373,12 @@ public partial class Main : Control
     /// </summary>
     public static int SlotHold { get; private set; }
 
+    /// <summary>
+    /// Which settings select box (<c>health</c>·<c>mana</c>·<c>heal</c>) to open on its own, as
+    /// <c>--percent-open health</c>, to see the list it drops down without a thumb.
+    /// </summary>
+    public static string PercentOpen { get; private set; } = string.Empty;
+
     /// <summary>Whether to press the "지도" button on its own, as <c>--map</c>. For checking it without a thumb.</summary>
     public static bool OpeningMap { get; private set; }
 
@@ -476,6 +482,7 @@ public partial class Main : Control
         OpeningExit = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--exit-menu") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
+        PercentOpen = Flag("--percent-open");
         MapGo = Flag("--map-go");
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0 || MapGo.Length > 0;
         TabMapGo = Flag("--tabmap-go");

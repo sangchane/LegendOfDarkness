@@ -326,4 +326,14 @@ public sealed class AutoHuntTests
         Assert.Equal(12, new AutoHuntSettings().Radius);
         Assert.Equal(50, new AutoHuntSettings().HealPercent);
     }
+
+    /// <summary>설정 창 셀렉트 박스가 1~99 전부를 받는다 — 경계값 1·99 는 그대로, 0·100 은 거절해 기본값으로.</summary>
+    [Fact]
+    public void HealPercent_accepts_the_full_1_to_99_range()
+    {
+        Assert.Equal(new AutoHuntSettings(12, 1), AutoHuntSettings.Parse(new AutoHuntSettings(12, 1).ToLine()));
+        Assert.Equal(new AutoHuntSettings(12, 99), AutoHuntSettings.Parse(new AutoHuntSettings(12, 99).ToLine()));
+        Assert.Equal(new AutoHuntSettings(), AutoHuntSettings.Parse("12 0"));
+        Assert.Equal(new AutoHuntSettings(), AutoHuntSettings.Parse("12 100"));
+    }
 }
