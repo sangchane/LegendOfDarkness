@@ -372,6 +372,73 @@ public sealed class MonkLevelTenSkillTests : IDisposable
             $"막힌 착지 칸에서 이형환위가 움직이거나 돌았습니다: {world.State?.Where}, {world.Self?.Facing}");
     }
 
+    /// <summary>
+    /// 마력이 모자라 붕각이 나가지 않았으면 기다림(6초)도 걸리지 않는다. 5.99 `SKILL_붕각` 은 마력을 보고
+    /// `end` 한 뒤에야 `skill_delay 6` 을 부른다(`db/script/Skill/무도가(비전직).txt` 211·216줄). 하데스는 스크립트가
+    /// 무엇을 했든 뒤에서 템플릿 쿨다운을 걸어, 앱은 남은 초를 모른 채(0x3F 가 안 온다) 단추를 눌러도 6초 동안
+    /// 아무 일도 없었다 — 「붕각이 가끔 안 나간다」(사용자, 2026-09-25).
+    /// </summary>
+    [Fact]
+    public async Task Bungak_refused_for_mana_does_not_start_its_six_second_wait()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        MakeGameMaster(server);
+        PutStationaryTargetAhead(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        MakeLevelTenMonk(server);
+        SetHealthAndMana(server, 1000);
+        SetMana(server, 50); // 붕각은 70 을 쓴다.
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback,
+            server.LoginPort,
+            Name,
+            LoginFlow.SyntheticSecret,
+            progress: null,
+            _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.State is { Map.Id: WoodlandOneOne, Where: var where } && where == Start,
+            "우드랜드1-1 입구에 서지 못했습니다.");
+        await FindTarget(world);
+        int slot = await Learn(world, "붕각");
+        await Until(() => world.Vitals?.Mana == 50, $"마력 50 으로 들어오지 않았습니다: {world.Vitals}");
+
+        DateTime refused = DateTime.UtcNow;
+        await world.UseSkillAsync(slot, _deadline.Token);
+        await Until(() => world.Said.Contains("마력량", StringComparison.Ordinal),
+            $"마력이 모자란데 붕각이 거절하지 않았습니다. 서버: {world.Said}");
+        Assert.Equal(0, world.CoolingFor(true, slot));
+
+        await world.SayAsync("/give \"하급마력포션\" 1", _deadline.Token);
+        InventoryItem? potion = null;
+        await Until(() => (potion = world.Pack.FirstOrDefault(item => item.Name == "하급마력포션")) is not null,
+            $"마력포션이 오지 않았습니다. 서버: {world.Said}");
+        await world.UseAsync(potion!.Slot, _deadline.Token);
+        await Until(() => world.Vitals?.Mana >= 70, $"마력포션을 먹었는데 마력이 70 이 되지 않았습니다: {world.Vitals}");
+
+        while (world.TakeMotion(out _))
+        {
+        }
+
+        await world.UseSkillAsync(slot, _deadline.Token);
+        await Until(() => Swung(world), $"마력을 채운 뒤 누른 붕각이 나가지 않았습니다(거절된 한 번이 6초 기다림을 걸었다). 마력 {world.Vitals?.Mana} · 서버: {world.Said}");
+        Assert.True(DateTime.UtcNow - refused < TimeSpan.FromSeconds(6), "시험이 6초 안에 끝나야 기다림을 가를 수 있습니다.");
+    }
+
+    private static void SetMana(IsolatedHadesServer server, int mana)
+    {
+        string path = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
+        JsonNode saved = JsonNode.Parse(File.ReadAllText(path))!;
+        saved["CurrentMp"] = mana;
+        File.WriteAllText(path, saved.ToJsonString());
+    }
+
     private async Task<int> Learn(WorldClient world, string skill)
     {
         await world.SayAsync($"/skill \"{skill}\" 1", _deadline.Token);
