@@ -14,15 +14,15 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 /// <remarks>
 /// <para>
-/// 하데스가 싣고 있던 식은 <c>Random(Level * 500, Level * 1000)</c> 였고(<c>Formulas/monsterexp.cs</c>),
-/// 하데스의 괴물 정의 568개는 **하나도 빠짐없이 <c>Level 1</c>** 이라 세상의 모든 괴물이 한 마리에
-/// 500~999 전을 냈다. 레더튜닉이 300전이다. 5.99 팩은 같은 노비스 괴물에게 `골드 20 30` — 스무 전을
-/// 셋에 하나꼴로 — 을 적어 두었다.
+/// <b>2026-09-24, 두 번째 결정 — 골드는 경험치에 비례한다.</b> 원작에도 하데스에도 "몬스터 레벨"이라는
+/// 값이 없어(서버팩 3개·원작 아카이브·참고저장소 16개를 다 뒤져 확인) 레벨 대신 경험치를 쓴다 —
+/// <c>Formulas/monsterexp.cs</c> 의 <c>GoldPerExp</c>(0.02) · <c>GoldVariance</c>(±20%). 노비스
+/// 괴물 11마리의 경험치(1,068~1,849)와 지금 금화(20~30)에서 역산한 값이다.
 /// </para>
 /// <para>
-/// 그래서 정의에 적힌 값을 서버가 그대로 내는지를 본다. 확률은 이 시험이 100 으로 고정한다(아래
-/// <see cref="StandOneAtTheDoor" />): 셋에 하나를 기다리면 몇 마리를 잡아야 하는지가 운에 달리고, 여기서
-/// 보려는 것은 확률이 아니라 액수다.
+/// 그래서 여기서는 (1) 금화가 경험치×0.02 의 ±20% 안에 드는지, (2) 확률·골드플래그가 없어도 항상
+/// 나오는지, (3) 경험치가 큰 괴물이 더 많이 주는지, (4) **경험치 지급 자체는 이 작업으로 안 바뀌었는지**
+/// (서버가 보내는 "경험치가 N 올랐습니다" 메시지의 N이 정의값과 정확히 같은지)를 본다.
 /// </para>
 /// </remarks>
 [Collection(TimedCollection.Name)]
@@ -58,6 +58,13 @@ public sealed class MonsterGoldTests : IDisposable
 
     private const string Name = "goldkill";
 
+    /// <summary>
+    /// <c>LootQualifer.None</c>(256) — Random·Table·Gold 어느 플래그도 없는 값. 사슴 등은 실제로는
+    /// Random(2)만 켜져 있었지만, 여기서는 빈 <c>Drops</c> 목록에서 <c>DetermineRandomDrop</c> 이
+    /// 인덱스 예외를 던지지 않도록 아무 갈래도 없는 값으로 "골드 플래그 없음"만 따로 본다.
+    /// </summary>
+    private const int LootTypeWithoutGoldFlag = 256;
+
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(9));
     private readonly List<IsolatedHadesServer> _servers = [];
 
@@ -71,12 +78,22 @@ public sealed class MonsterGoldTests : IDisposable
         }
     }
 
-    [Fact]
-    public async Task A_kill_pays_the_gold_its_definition_states()
-    {
-        (WorldClient world, IsolatedHadesServer server) = await Enter();
+    /// <summary><c>Formulas/monsterexp.cs</c> 의 <c>GoldPerExp</c> 을 그대로 되풀이한다.</summary>
+    private const double GoldPerExp = 0.02;
 
-        int stated = StatedGold(server);
+    /// <summary><c>Formulas/monsterexp.cs</c> 의 <c>GoldVariance</c> 을 그대로 되풀이한다(±20%).</summary>
+    private const double GoldVariance = 0.2;
+
+    private static (long Low, long High) GoldRangeFor(int exp) =>
+        ((long)Math.Floor(exp * GoldPerExp * (1 - GoldVariance)),
+         (long)Math.Ceiling(exp * GoldPerExp * (1 + GoldVariance)));
+
+    [Fact]
+    public async Task A_kill_pays_gold_proportional_to_its_experience()
+    {
+        const int exp = 2000;
+
+        (WorldClient world, IsolatedHadesServer server) = await Enter(target => target["Exp"] = exp);
 
         await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
             "문 앞에 괴물이 서지 않았습니다.");
@@ -89,41 +106,118 @@ public sealed class MonsterGoldTests : IDisposable
         await SwingUntil(world, enough: () => Mine(world).Gold > before);
 
         long paid = Mine(world).Gold - before;
+        (long low, long high) = GoldRangeFor(exp);
 
-        Assert.True(paid > 0,
-            $"{MostSwings}번 휘둘렀는데 금화가 {before} 그대로입니다. {Said(world)}");
-
-        // 금화는 부탁하지 않아도 들어온다(AUTO LOOT GOLD) — 그래서 지갑을 본다.
-        Assert.Equal(stated, paid);
+        Assert.True(paid >= low && paid <= high,
+            $"경험치 {exp}짜리가 금화 {paid}를 냈습니다 — {low}~{high} 안이어야 합니다. {Said(world)}");
     }
 
     /// <summary>
-    /// 정의가 적어 둔 액수. 여기 적지 않고 정의에서 읽는다 — 둘이 어긋날 수 없게.
+    /// 사용자 결정(2026-09-24) — 금화는 무조건 떨어진다. <c>GoldChance</c> 를 1(1%)로 낮춰도,
+    /// <c>LootType</c> 에서 Gold 플래그(32)를 빼도(사슴 등이 그랬다) 여전히 준다.
     /// </summary>
-    private static int StatedGold(IsolatedHadesServer server)
+    [Fact]
+    public async Task A_kill_always_pays_gold_no_matter_the_chance_or_the_loot_flag()
     {
-        JsonNode only = TheOnlyDefinitionInTheRoom(server);
+        const int exp = 5000;
 
-        int? gold = (int?)only["Gold"];
+        (WorldClient world, IsolatedHadesServer server) = await Enter(target =>
+        {
+            target["Exp"] = exp;
+            target["GoldChance"] = 1;
+            target["LootType"] = LootTypeWithoutGoldFlag; // 사슴 등이 실제로 쓰던 값 — Gold(32) 플래그가 없다.
+        });
 
-        Assert.True(gold is not null,
-            "정의에 Gold 가 없습니다 — 그러면 서버는 레벨로 금화를 만듭니다(Level × 500~1000). " +
-            "정의 568개가 모두 Level 1 이라 그 길은 어느 괴물이든 500~999 전입니다.");
+        await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "문 앞에 괴물이 서지 않았습니다.");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
 
-        return gold.Value;
+        long before = Mine(world).Gold;
+        await SwingUntil(world, enough: () => Mine(world).Gold > before);
+
+        long paid = Mine(world).Gold - before;
+        (long low, long high) = GoldRangeFor(exp);
+
+        Assert.True(paid >= low && paid <= high,
+            $"확률 1%·골드플래그 없음인데 금화 {paid}를 냈습니다 — {low}~{high} 안이어야 합니다. {Said(world)}");
     }
 
-    private static JsonNode TheOnlyDefinitionInTheRoom(IsolatedHadesServer server) =>
-        Assert.Single(
-            DefinitionsInTheRoom(server).Select(definition => definition.Template),
-            template => ((int?)template["SpawnMax"] ?? 0) > 0);
+    /// <summary>사용자 결정(2026-09-24) — 경험치가 큰 괴물이 금화도 더 많이 준다(레벨 최저금액 분기의 대체).</summary>
+    [Fact]
+    public async Task A_bigger_experience_kill_pays_more_gold()
+    {
+        (WorldClient smallWorld, _) = await Enter(target => target["Exp"] = 1000);
+        await Until(() => smallWorld.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "문 앞에 괴물이 서지 않았습니다(작은 쪽).");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+
+        long beforeSmall = Mine(smallWorld).Gold;
+        await SwingUntil(smallWorld, enough: () => Mine(smallWorld).Gold > beforeSmall);
+        long paidSmall = Mine(smallWorld).Gold - beforeSmall;
+
+        (WorldClient bigWorld, _) = await Enter(target => target["Exp"] = 40000);
+        await Until(() => bigWorld.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "문 앞에 괴물이 서지 않았습니다(큰 쪽).");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+
+        long beforeBig = Mine(bigWorld).Gold;
+        await SwingUntil(bigWorld, enough: () => Mine(bigWorld).Gold > beforeBig);
+        long paidBig = Mine(bigWorld).Gold - beforeBig;
+
+        Assert.True(paidBig > paidSmall,
+            $"경험치 40,000짜리({paidBig}전)가 경험치 1,000짜리({paidSmall}전)보다 적게 냈습니다.");
+    }
+
+    /// <summary>
+    /// 사용자 결정(2026-09-24) — 골드 식을 바꿔도 **경험치 지급 자체는 그대로**여야 한다. 서버가 보내는
+    /// "경험치가 N 올랐습니다"(<c>GenerateExperience</c>, <c>Formulas/monsterexp.cs</c>)의 N이 정의에
+    /// 적은 값과 정확히 같은지 본다 — 다르면 <c>GenerateGold</c> 를 고치다 <c>GenerateExperience</c> 를
+    /// 건드린 것이다.
+    /// </summary>
+    [Fact]
+    public async Task A_kill_still_grants_exactly_the_experience_its_definition_states()
+    {
+        const int exp = 3333;
+
+        (WorldClient world, IsolatedHadesServer server) = await Enter(target => target["Exp"] = exp);
+
+        await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "문 앞에 괴물이 서지 않았습니다.");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+
+        long before = Mine(world).Gold;
+        await SwingUntil(world, enough: () => Mine(world).Gold > before);
+
+        Assert.True(TryReadExperienceGain(world, out int gained),
+            $"\"경험치가 N 올랐습니다\" 알림을 못 받았습니다. {Said(world)}");
+        Assert.Equal(exp, gained);
+    }
+
+    /// <summary>서버가 보낸 0x0A 줄 중 "경험치가 N 올랐습니다" 를 찾아 N을 읽는다. 없으면 false.</summary>
+    private static bool TryReadExperienceGain(WorldClient world, out int amount)
+    {
+        while (world.TakeTold(out _, out string text))
+        {
+            System.Text.RegularExpressions.Match match =
+                System.Text.RegularExpressions.Regex.Match(text, @"경험치가 (\d+) 올랐습니다");
+
+            if (match.Success)
+            {
+                amount = int.Parse(match.Groups[1].Value);
+                return true;
+            }
+        }
+
+        amount = 0;
+        return false;
+    }
 
     /// <summary>
     /// 존의 제 정의 하나를 문 앞칸에 세우고, 나머지는 세우지 않는다. 액수 말고는 아무것도 바꾸지 않는다 —
     /// <c>Gold</c> 는 정의가 적은 그대로 두고 <c>GoldChance</c> 만 100 으로 올린다. 30% 를 기다리면 몇
     /// 마리를 잡아야 하는가가 운에 달려 시험이 흔들린다. <see cref="CombatSmokeTests" /> 와 같은 모양이다.
     /// </summary>
-    private static void StandOneAtTheDoor(IsolatedHadesServer server)
+    private static void StandOneAtTheDoor(IsolatedHadesServer server, Action<JsonNode>? customize = null)
     {
         JsonSerializerOptions indented = new() { WriteIndented = true };
         (string Path, JsonNode Template)[] room = [.. DefinitionsInTheRoom(server)];
@@ -152,6 +246,7 @@ public sealed class MonsterGoldTests : IDisposable
         target["MoodType"] = MoodIdle;
         target["Grow"] = false;
         target["GoldChance"] = 100;
+        customize?.Invoke(target);
 
         string testFolder = Path.Combine(server.ContentLocation, "templates", "monsters", "characterization");
         Directory.CreateDirectory(testFolder);
@@ -177,11 +272,11 @@ public sealed class MonsterGoldTests : IDisposable
         }
     }
 
-    private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter()
+    private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter(Action<JsonNode>? customize = null)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MonsterRoom, Start.X, Start.Y));
         _servers.Add(server);
-        StandOneAtTheDoor(server);
+        StandOneAtTheDoor(server, customize);
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, Name);
 

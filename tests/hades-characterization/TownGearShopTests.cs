@@ -42,8 +42,12 @@ public sealed class TownGearShopTests : IDisposable
     /// <summary>5.99 `전사갑옷사기` 목록의 전사 갑옷.</summary>
     private const string Mail = "레더메일";
 
-    /// <summary>5.99 `반지사기` 목록의 첫 줄 — 안 묶여 있어 어디서도 못 사던 장신구다.</summary>
-    private const string Ring = "로오의반지";
+    /// <summary>
+    /// 5.99 `반지사기` 목록의 첫 줄이던 「로오의반지」는 방어 접미사 장비라 상점에서 뺐다
+    /// (사용자 결정 2026-09-24 — <see cref="The_shops_sell_no_defense_suffix_gear"/>). 대신 접미사
+    /// 없는 기본 반지 「홍옥반지」를 채웠다.
+    /// </summary>
+    private const string Ring = "홍옥반지";
 
     /// <summary>1~25레벨 다섯 직업이 초반 동선에서 살 것이 있어야 한다.</summary>
     private const int EarlyLevel = 25;
@@ -265,6 +269,38 @@ public sealed class TownGearShopTests : IDisposable
         // 값이 0 이면 shop1 이 공짜로 내준다(`shop1.cs:149` `GoldPoints >= Value`).
         string[] free = stock.Where(one => items[one]["Value"]?.GetValue<int>() <= 0).ToArray();
         Assert.True(free.Length == 0, $"{Jeweller} 가 값 0 인 것을 팝니다(공짜로 나갑니다): {string.Join(", ", free)}");
+    }
+
+    /// <summary>
+    /// 방어 접미사(세오·이아·로오·메투스·세토아·셔스·칸·마력·체력·풍요·축복)는 사냥터 드랍 전용이다 —
+    /// 상점은 접미사 없는 기본템만 판다(사용자 결정 2026-09-24). 공격 속성(화염·바다·바람·대지)은
+    /// 예외로 상점 판매를 유지한다.
+    /// </summary>
+    private static readonly string[] DefenseSuffixes =
+    {
+        "세오의", "이아의", "로오의", "메투스의", "세토아의", "셔스의", "칸의",
+        "마력의", "체력의", "풍요의", "축복의",
+    };
+
+    [Fact]
+    public void The_shops_sell_no_defense_suffix_gear()
+    {
+        List<string> broken = [];
+
+        foreach (string shop in new[] { WeaponSmith, Armourer, Jeweller })
+        {
+            foreach (string good in Stock(shop))
+            {
+                if (DefenseSuffixes.Any(good.StartsWith))
+                {
+                    broken.Add($"{shop} → {good}");
+                }
+            }
+        }
+
+        Assert.True(broken.Count == 0,
+            $"방어 접미사 장비를 파는 상점 줄이 {broken.Count}개입니다(사냥터 드랍 전용이어야 합니다): "
+            + $"{string.Join(", ", broken.Order())}.");
     }
 
     private static readonly int[] AccessorySlots = { 3, 4, 5, 6, 7, 9, 11, 12, 13 };

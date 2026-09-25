@@ -47,6 +47,21 @@ public sealed class DropSaleValueTests
     // 2026-09-24 사용자: 마라디움이 초반 벌이의 절반을 넘어 더 낮춘다 — 250.
     private static readonly (string Name, int Value)[] Potions = [("쿠룸", 150), ("마라디움", 250)];
 
+    /// <summary><c>Formulas/monsterexp.cs</c> 의 <c>GoldPerExp</c> 을 그대로 되풀이한다.</summary>
+    private const double GoldPerExp = 0.02;
+
+    /// <summary>정의가 경험치를 적어 두면 그것, 안 적어 두면 <c>GenerateExperience</c> 의 레벨식.</summary>
+    private static double MonsterExp(JsonNode monster)
+    {
+        if ((int?)monster["Exp"] is { } stated)
+        {
+            return stated;
+        }
+
+        double level = (int?)monster["Level"] ?? 1;
+        return level * (level * 0.1 + 1.5) * 300;
+    }
+
     /// <summary>「열 마리 안팎」의 폭. 목록 칸수가 둘인 괴물(브라운맨티스·지네)은 시약이 나올 확률이
     /// 그만큼 높아 아래쪽에, 잡템까지 셋인 괴물은 위쪽에 선다.</summary>
     private const double Fewest = 7;
@@ -91,7 +106,12 @@ public sealed class DropSaleValueTests
     /// <para>
     /// 셈은 <c>Formulas/monsterexp.cs</c> 그대로다 — <c>LootQualifer.Random</c> 은 <c>Drops</c> 에서
     /// 하나를 같은 확률로 고른 뒤 그 물건의 <c>DropRate</c> 를 한 번 굴리므로 한 마리가 어떤 물건을
-    /// 내놓을 확률은 <c>DropRate ÷ 목록 칸수</c> 다. 금화는 따로 <c>Gold × GoldChance</c> 로 온다.
+    /// 내놓을 확률은 <c>DropRate ÷ 목록 칸수</c> 다.
+    /// </para>
+    /// <para>
+    /// <b>2026-09-24, 두 번째 결정.</b> 금화는 더는 <c>Gold × GoldChance</c> 가 아니라
+    /// <c>경험치 × GoldPerExp</c>(항상 지급) 다 — <see cref="MonsterGoldTests"/> 참고. 여기서는
+    /// 무작위 폭(±20%) 없이 가운데 값으로 잡는다 — 벌이를 "가늠"하는 자리라 운까지 셀 필요는 없다.
     /// </para>
     /// </remarks>
     [Fact]
@@ -109,7 +129,7 @@ public sealed class DropSaleValueTests
                      .Where(m => NoviceGround.Contains((int?)m["AreaID"] ?? 0)))
         {
             counted++;
-            double earned = ((int?)monster["Gold"] ?? 0) * (((int?)monster["GoldChance"] ?? 100) / 100.0);
+            double earned = MonsterExp(monster) * GoldPerExp;
             string[] drops = [.. Dropped(monster)];
 
             foreach (string name in drops.Where(items.ContainsKey))

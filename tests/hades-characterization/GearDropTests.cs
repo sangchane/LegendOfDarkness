@@ -92,7 +92,7 @@ public sealed class GearDropTests
             JsonNode[] here = [.. Monsters().Where(m => (int?)m["AreaID"] == map)];
             Assert.True(here.Length > 0, $"{ground}({map}) 에 괴물 정의가 없습니다.");
 
-            string[] gear = [.. here.SelectMany(m => Dropped(m).Where(name => IsGear(items, name)))];
+            string[] gear = [.. here.SelectMany(m => Dropped(m).Where(name => IsNormalGear(items, name)))];
 
             if (gear.Length == 0)
             {
@@ -104,7 +104,7 @@ public sealed class GearDropTests
             {
                 string[] listed = [.. Dropped(monster)];
 
-                foreach (string name in listed.Where(name => IsGear(items, name)))
+                foreach (string name in listed.Where(name => IsNormalGear(items, name)))
                 {
                     // 목록에서 하나를 고르는 갈래여야 확률을 셀 수 있다.
                     Assert.True(((int?)monster["LootType"] & LootRandom) == LootRandom,
@@ -267,6 +267,73 @@ public sealed class GearDropTests
             "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
     }
 
+    /// <summary>방어 접미사 — 사냥터 드랍 전용(사용자 결정 2026-09-24). 상점 쪽은 <c>TownGearShopTests</c>.</summary>
+    private static readonly string[] DefenseSuffixGear = ["로오의반지", "칸의목걸이"];
+
+    /// <summary>공격 속성 — 상점과 사냥터 둘 다(같은 결정).</summary>
+    private static readonly string[] AttackElementGear =
+    [
+        "대지의목걸이", "대지의벨트", "바다의목걸이", "바다의벨트",
+        "바람의목걸이", "바람의벨트", "화염의목걸이", "화염의벨트",
+    ];
+
+    /// <summary>일반 장비(1~5%)보다 드물게 — 한 마리당 0.5~1%.</summary>
+    private const double RareLeast = 0.005;
+
+    private const double RareMost = 0.01;
+
+    [Fact]
+    public void Later_grounds_drop_defense_suffix_and_attack_element_gear_more_rarely_than_normal_gear()
+    {
+        IReadOnlyDictionary<string, JsonNode> items = Items();
+        List<string> missingSuffix = [];
+        List<string> missingElement = [];
+        List<string> outside = [];
+
+        foreach ((int map, string ground) in Later)
+        {
+            JsonNode[] here = [.. Monsters().Where(m => (int?)m["AreaID"] == map)];
+
+            foreach (JsonNode monster in here)
+            {
+                string[] listed = [.. Dropped(monster)];
+                string? suffix = listed.FirstOrDefault(n => DefenseSuffixGear.Contains(n));
+                string? element = listed.FirstOrDefault(n => AttackElementGear.Contains(n));
+
+                if (suffix is null)
+                {
+                    missingSuffix.Add($"{ground} {monster["Name"]}");
+                    continue;
+                }
+
+                if (element is null)
+                {
+                    missingElement.Add($"{ground} {monster["Name"]}");
+                    continue;
+                }
+
+                foreach (string name in new[] { suffix, element })
+                {
+                    double rate = (double?)items[name]["DropRate"] ?? 0;
+                    double real = rate / listed.Length;
+
+                    if (real < RareLeast || real > RareMost)
+                    {
+                        outside.Add($"{ground} {monster["Name"]} → {name} {real:P2}(DropRate {rate} ÷ {listed.Length}칸)");
+                    }
+                }
+            }
+        }
+
+        Assert.True(missingSuffix.Count == 0,
+            $"방어 접미사 장비가 없는 장비 사냥터 괴물이 {missingSuffix.Count}마리입니다: {string.Join(", ", missingSuffix.Order())}.");
+        Assert.True(missingElement.Count == 0,
+            $"공격 속성 장비가 없는 장비 사냥터 괴물이 {missingElement.Count}마리입니다: {string.Join(", ", missingElement.Order())}.");
+        Assert.True(outside.Count == 0,
+            $"접미사·속성 장비의 실제 확률이 {RareLeast:P1}~{RareMost:P1} 밖인 줄이 {outside.Count}개입니다: "
+            + $"{string.Join(", ", outside.Order())}.");
+    }
+
     [Fact]
     public void Nothing_drops_the_dragon_claw()
     {
@@ -299,6 +366,13 @@ public sealed class GearDropTests
 
     private static bool IsGear(IReadOnlyDictionary<string, JsonNode> items, string name) =>
         items.TryGetValue(name, out JsonNode? item) && (int?)item["EquipmentSlot"] is > 0;
+
+    /// <summary>
+    /// 일반 장비만 — 방어 접미사·공격 속성은 <see cref="DefenseSuffixGear"/>·<see cref="AttackElementGear"/>
+    /// 가 따로 보는 더 드문 확률(0.5~1%)이라 여기서는 뺀다.
+    /// </summary>
+    private static bool IsNormalGear(IReadOnlyDictionary<string, JsonNode> items, string name) =>
+        IsGear(items, name) && !DefenseSuffixGear.Contains(name) && !AttackElementGear.Contains(name);
 
     private static JsonNode[] Monsters() => _monsters ??=
         [.. Definitions(Path.Combine(HadesWorkspace.ServerDataDirectory, "templates", "monsters"))];
