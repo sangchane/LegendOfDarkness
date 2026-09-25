@@ -12,7 +12,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// <summary>
 /// 5.99 무도가 기술 정권과 무도가 마법 넷(주먹단련 · 장풍 · 금강불괴 · 다라밀공). `scripts/build-pack-abilities.py` 가
 /// 5.99 `무도가(비전직).txt` 를 문장 그대로 옮긴 것(`scripts/Pack599/Skills/정권.cs` · `Spells/*.cs`)이 도복 입은
-/// 무도가에게서 5.99 에 적힌 몸동작·이펙트·소리·마력을 보내는지, 그리고 밀레스마을 리신 사범에게 배워지는지 본다.
+/// 무도가에게서 5.99 에 적힌 몸동작·이펙트·소리·마력을 보내는지, 그리고 밀레스마을 리신 사범에게 배워지는지 본다(리신2 는 5.99 원본이 망가져 메뉴대로 채웠다).
 /// </summary>
 public sealed class MonkPackAbilityTests : IDisposable
 {
@@ -128,41 +128,73 @@ public sealed class MonkPackAbilityTests : IDisposable
     }
 
     /// <summary>
-    /// 밀레스마을 리신(`Npc_Skill.txt` 리신 · 리신4)이 주먹단련[11] · 다라밀공[99] 을 가르친다. 리신2 는 5.99 원본이 망가져
-    /// 있다 — 메뉴는 "양의신권 · 단각 · 장풍 · 금강불괴 · 구양신공" 인데 2~6번 갈래가 도적 사범 것을 베낀 채라(블로우 ·
-    /// 습격진 · 백스텝 · 파이어트랩 …) 장풍을 고르면 「순수가 아닌자는 배울수없습니다.」 로 돌아간다. 문장 그대로 옮겨 하데스도 같다.
+    /// 밀레스마을 리신 넷이 무도가 기술·마법을 가르친다 — 리신 주먹단련[11], 리신4 다라밀공[99], 리신2 단각[31] · 장풍[31] ·
+    /// 금강불괴[41] · 구양신공[50]. 리신2 는 5.99 원본의 2~5번 갈래가 도적 사범 것을 베낀 채라 아무것도 못 가르쳤다 —
+    /// 메뉴에 적힌 기술·레벨대로 채웠다(`build-pack-npcs.py` BLOCK_PATCH, 사용자 결정 2026-09-25).
     /// </summary>
     [Fact]
-    public async Task The_mileth_lee_sins_teach_the_monk_spells_as_the_599_pack_wrote_them()
+    public async Task The_mileth_lee_sins_teach_the_monk_skills_and_spells_on_their_menus()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MilethId, 49, 45));
         server.Start(TimeSpan.FromMinutes(2));
+        WorldClient world = await EnterMonk(server, Name, level: 99);
 
-        LoginFlow.TryCreateAccount(server, Name);
-        Save(server, saved =>
+        foreach ((Tile teacher, string what, bool spell) in new[]
+                 {
+                     (new Tile(48, 46), "주먹단련", true), (new Tile(48, 43), "다라밀공", true),
+                     (new Tile(48, 45), "단각", false), (new Tile(48, 45), "장풍", true),
+                     (new Tile(48, 45), "금강불괴", true), (new Tile(48, 45), "구양신공", false),
+                 })
         {
-            saved["Path"] = "Monk";
-            saved["ExpLevel"] = 99;
-        });
-
-        using WorldSession session = await HadesLoginClient.LoginAsync(
-            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
-        WorldClient world = new(session);
-        _ = world.PumpAsync(_deadline.Token);
-
-        foreach ((Tile teacher, string spell) in new[] { (new Tile(48, 46), "주먹단련"), (new Tile(48, 43), "다라밀공") })
-        {
-            await Converse(world, await Standing(world, teacher), spell,
-                words => words.StartsWith(spell + "을 익히셧습니다") || words.StartsWith(spell + "를 익히셧습니다"));
-            await Until(() => world.Spells.Any(s => s.Name.StartsWith(spell, StringComparison.Ordinal)),
-                $"리신이 익혔다고 했는데 {spell}이 마법창에 없습니다.");
+            await Converse(world, await Standing(world, teacher), what, Learned(what));
+            await Until(() => spell
+                    ? world.Spells.Any(s => s.Name.StartsWith(what, StringComparison.Ordinal))
+                    : world.Skills.Any(s => s.Name.StartsWith(what + " (", StringComparison.Ordinal)),
+                $"리신이 익혔다고 했는데 {what}이 창에 없습니다.");
             await world.ShutDialogueAsync(_deadline.Token);
             await Task.Delay(300, _deadline.Token);
         }
+    }
 
-        await Converse(world, await Standing(world, new Tile(48, 45)), "장풍", words => words == "순수가 아닌자는 배울수없습니다.");
+    /// <summary>리신2 의 장풍[31] — 31레벨 무도가는 배우고, 30레벨은 「아직 어립니다」로 메뉴에 돌아간다.</summary>
+    [Fact]
+    public async Task Lee_sin_two_teaches_jangpung_at_thirty_one_but_not_at_thirty()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MilethId, 49, 45));
+        server.Start(TimeSpan.FromMinutes(2));
+        Tile leeSinTwo = new(48, 45);
+
+        WorldClient young = await EnterMonk(server, "monkyoung", level: 30);
+        await Converse(young, await Standing(young, leeSinTwo), "장풍",
+            words => words == "이스킬을 습득하시기엔 아직 어립니다. 심안의 힘으로!");
+        await young.ShutDialogueAsync(_deadline.Token);
         await Task.Delay(500, _deadline.Token);
-        Assert.DoesNotContain(world.Spells, s => s.Name.StartsWith("장풍", StringComparison.Ordinal));
+        Assert.DoesNotContain(young.Spells, s => s.Name.StartsWith("장풍", StringComparison.Ordinal));
+        await young.LogOutAsync(_deadline.Token);
+
+        WorldClient grown = await EnterMonk(server, "monkgrown", level: 31);
+        await Converse(grown, await Standing(grown, leeSinTwo), "장풍", Learned("장풍"));
+        await Until(() => grown.Spells.Any(s => s.Name.StartsWith("장풍", StringComparison.Ordinal)),
+            "31레벨이 장풍을 익혔다는데 마법창에 없습니다.");
+    }
+
+    private static Func<string, bool> Learned(string what) =>
+        words => words.StartsWith(what + "을 익히셧습니다") || words.StartsWith(what + "를 익히셧습니다");
+
+    private async Task<WorldClient> EnterMonk(IsolatedHadesServer server, string name, int level)
+    {
+        LoginFlow.TryCreateAccount(server, name);
+        string path = Path.Combine(server.ContentLocation, "aislings", $"{name}.json");
+        JsonNode saved = JsonNode.Parse(File.ReadAllText(path))!;
+        saved["Path"] = "Monk";
+        saved["ExpLevel"] = level;
+        File.WriteAllText(path, saved.ToJsonString());
+
+        WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+        return world;
     }
 
     private async Task Converse(WorldClient world, Creature npc, string choice, Func<string, bool> done)

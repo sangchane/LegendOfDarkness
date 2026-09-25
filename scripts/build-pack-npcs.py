@@ -64,6 +64,34 @@ TEXT_PATCH = {
     "생셋 or 암셋": "생셋 또는 암셋",  # Npc_Making.txt 92줄, 신의대장장이1
 }
 
+#: 블록째 고치는 곳(TEXT_PATCH 는 낱말만 바꾼다). 이름 → 원본 본문을 받아 고친 본문을 돌려주는 함수.
+#: 리신2(`Npc_Skill.txt` 495줄): 메뉴는 "양의신권[21] · 단각[31] · 장풍[31] · 금강불괴[41] · 구양신공[50]" 인데 2~6번 갈래가
+#: 도적 사범 것을 베낀 채다(블로우 · 습격진 · 백스텝 · 파이어트랩 · 암살격진, 순수 검사 뒤 좀비의살 …). 그래서 장풍을
+#: 고르면 "순수가 아닌자는 배울수없습니다." 로 돌아가 무도가가 넷을 영영 못 배웠다. 사용자 결정(2026-09-25): 메뉴에 적힌
+#: 기술·레벨대로 배우게 채운다. 갈래 모양은 같은 파일 리신(주먹단련 · 이형환위)·리신4(다라밀공) 그대로 — 레벨 검사 →
+#: 이미 배웠나 → skill_add/spell_add → 익혔다는 말. 5.99 에 이 넷의 설명 글이 없어(`Skill.txt`·`spell.txt` 에 설명 칸 없음)
+#: 설명 줄은 넣지 않고 레벨 줄만 둔다. 첫 갈래(양의신권)는 원본 그대로다.
+def _lee_sin_two(body):
+    """리신2 의 2번 갈래부터 끝까지를 메뉴대로 다시 쓴다."""
+    cut = body.index("\tif(@select == 2){")
+    branches = [("단각", 31, "skill", "을"), ("장풍", 31, "spell", "을"),
+                ("금강불괴", 41, "spell", "를"), ("구양신공", 50, "skill", "을")]
+    out = []
+    for n, (name, level, kind, particle) in enumerate(branches, start=2):
+        out.append(
+            f"\tif(@select == {n}){{\n"
+            f"\t\tmes 1, \"배우실려면 레벨이 {level}이상이셔야 합니다.\";\n"
+            f"\t\tif(get_level(@myid) < {level}){{mes 1, \"이스킬을 습득하시기엔 아직 어립니다. 심안의 힘으로!\";goto re;}}\n"
+            f"\t\tif({kind}_exist(\"{name}\")){{mes 1, \"이미 이 스킬을 습득 하셧습니다.\"; goto re;}}\n"
+            f"\t\t{kind}_add \"{name}\";\n"
+            f"\t\tmes 1, \"{name}{particle} 익히셧습니다. 앞으로 무도가로서 사명감을 가져주시길 바랍니다.\";\n"
+            f"\t\tgoto re;\n"
+            f"\t}}\n")
+    return body[:cut] + "".join(out)
+
+
+BLOCK_PATCH = {"리신2": _lee_sin_two}
+
 #: 블록 머리 — 줄 맨 앞의 `0,0,0,0,0,0,0` 다음 탭, 이름, `{`. 안쪽의 `if(…){` 줄은 탭으로 시작해 걸리지 않는다.
 HEADER = re.compile(r"^\d[\d,]*\t([^\t{]+?)\s*\{", re.M)
 #: 2026-09-17 에 센 블록 수. HEADER 는 줄 모양(숫자열 + 탭)에 기대므로 팩 파일 모양이 바뀌면 블록이 말없이 빠진다 — 적게 잡히면 알린다.
@@ -143,7 +171,9 @@ def blocks(path):
                 depth += c == "{"
                 depth -= c == "}"
             at += 1
-        out[head.group(1).strip()] = text[head.end():at - 1 if not depth else at]
+        name = head.group(1).strip()
+        body = text[head.end():at - 1 if not depth else at]
+        out[name] = BLOCK_PATCH[name](body) if name in BLOCK_PATCH else body
     return out
 
 
@@ -316,9 +346,13 @@ def items(write):
 
 def main():
     write = "--쓰기" in sys.argv or "--write" in sys.argv
+    # `--만 이름 …` — 그 NPC 만 다시 쓴다(아이템·반복 스크립트는 건드리지 않는다).
+    only = set(sys.argv[sys.argv.index("--만") + 1:]) if "--만" in sys.argv else None
     made, failed, calls = [], [], {}
     for file in FILES:
         for name, body in blocks(NPC_SCRIPTS / file).items():
+            if only is not None and name not in only:
+                continue
             translator = NpcTranslator(body)
             try:
                 code = translator.program()
@@ -341,6 +375,9 @@ def main():
     if failed:
         print(f"  못 옮긴 것 {len(failed)}: {', '.join(failed)}")
     print("  부르는 명령: " + ", ".join(f"{k}×{v}" for k, v in sorted(calls.items(), key=lambda kv: -kv[1])))
+
+    if only is not None:
+        return 0
 
     done, waiting = items(write)
     print(f"아이템 스크립트 {len(done)}개 {'씀' if write else '(세어만 봄)'} → {ITEM_OUT.relative_to(ROOT)}: {', '.join(done)}")
