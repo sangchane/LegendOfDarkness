@@ -690,6 +690,7 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                     foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
                     {
                         _creatures[creature.Serial] = creature;
+                        _others.TryRemove(creature.Serial, out _);
                     }
 
                     continue;
@@ -1197,9 +1198,13 @@ public sealed class WorldClient(WorldSession session) : IDisposable
         }
 
         // A step says nothing about clothes, so keep the ones we were shown rather than undressing them.
-        Show(Known(serial) is { } known
-            ? known with { Where = now, Facing = facing }
-            : new Character(serial, now, facing));
+        // 모르는 serial 의 걸음은 버린다. 서버는 걸음(0x0C)을 걸음 뒤 자리로, 보여 주기(0x07·0x33)는 걸음 전 자리로
+        // 곁의 사람을 골라(Sprite.Walk) 시야로 걸어 들어오는 괴물의 걸음이 먼저 온다 — 사람으로 받으면 npc-walk.png 를
+        // 입은 이름 없는 사람이 괴물 자리에 선다(2026-09-24 사용자 보고). 곧 올 0x07·0x33 이 제자리에 세운다.
+        if (Known(serial) is { } known)
+        {
+            Show(known with { Where = now, Facing = facing });
+        }
     }
 
     /// <summary>
