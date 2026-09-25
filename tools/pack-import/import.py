@@ -36,6 +36,9 @@ IDTABLE = ROOT / "plans" / "5.99-맵번호표.tsv"
 SUOMI_WARPS = ROOT / "data" / "server-packs" / PACK / "db" / "warp" / "Suomi_Warp.txt"
 # 워프 줄의 레벨 범위를 옮기는 파일(warp_json).
 LEVEL_RANGE_SOURCES = {"warp/Novice_Warp.txt", "warp/Suomi_Warp.txt"}
+# 다른 파일에서도 레벨 범위를 옮기는 곳 — (파일, 맵 이름 머리). 한쪽 끝이 이 맵이면 옮긴다. 아벨해안은 51~80
+# (대기실 → 아벨마을만 51~99)이다(2026-09-25 사용자: 입장 레벨은 원작대로, tests AbelCoastTests).
+LEVEL_RANGE_MAPS = {("warp/Abel_Warp.txt", "아벨해안")}
 
 BYTES_PER_TILE = 6          # 바닥 + 왼벽 + 오른벽, 각 ushort
 FIRST_MAP_ID = 20_000        # 1~65535 만 쓸 수 있다 — 맵 번호는 전선에서 16비트다(0x15).
@@ -1200,7 +1203,9 @@ def warp_json(x, ids):
     # 줄 끝 두 칸이 들어갈 수 있는 레벨 범위다(노비스 사냥터 1~22 · 지하던전 5~22 · 포테의숲 21~51). 99 는 제한 없음.
     # 노비스·수오미(포테의숲) 파일에만 적용한다 — 다른 파일까지 쓰면 아벨 130장이 51~80, 밀레스·VOD·광산 등 137장이 99레벨
     # 전용이 된다(2026-09-17 사용자가 정한 범위 밖, docs/pote-forest.md).
-    ranged = x["출처"] in LEVEL_RANGE_SOURCES and len(x["raw"]) >= 9
+    ranged = (x["출처"] in LEVEL_RANGE_SOURCES
+              or any(x["출처"] == f and (x["출발맵"].startswith(m) or x["도착맵"].startswith(m))
+                     for f, m in LEVEL_RANGE_MAPS)) and len(x["raw"]) >= 9
     low, high = (int(x["raw"][7]), int(x["raw"][8])) if ranged else (1, 99)
     return {
         "ActivationMapId": src,
