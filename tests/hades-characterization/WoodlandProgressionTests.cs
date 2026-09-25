@@ -22,7 +22,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// Growth has three separate parts and this proves each one rather than assuming it: a level arrives, it
 /// hands out <c>StatsPerLevel</c> points, and spending a point raises the attribute it names. What makes
 /// it worth anything is that two of those attributes feed the next level — maximum health grows by
-/// <c>HpGainFactor × Con × 0.65</c> and maximum mana by <c>MpGainFactor × Wis × 0.45</c>, both read at the
+/// <c>Con + 30</c> and maximum mana by <c>Wis + 25</c> (the original's, <c>Monster.Levelup</c>), both read at the
 /// moment the level lands — so points spent early are worth more than the same points spent late, and a
 /// character that banks them grows slower than one that spends them.
 /// </para>
@@ -255,13 +255,10 @@ public sealed class WoodlandProgressionTests : IDisposable
     }
 
     /// <summary>
-    /// <c>Formulas/monsterexp.cs Levelup</c> — what one level adds to maximum health, read from the
-    /// constitution standing at the moment it lands.
+    /// <c>Monster.Levelup</c> — what one level adds to maximum health, read from the constitution standing
+    /// at the moment it lands: the original's Con + 30 (<see cref="LevelUpVitalsTests" />).
     /// </summary>
-    private static int Health(int con) => (int)(HpGainFactor * con * 0.65);
-
-    /// <summary><c>LoruleConfig.json</c>.</summary>
-    private const int HpGainFactor = 5;
+    private static int Health(int con) => con + 30;
 
     /// <summary>
     /// Fights until the level goes up, without spending anything on the way.

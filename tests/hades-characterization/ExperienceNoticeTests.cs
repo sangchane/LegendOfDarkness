@@ -21,16 +21,13 @@ namespace Lod.Hades.Characterization.Tests;
 [Collection(TimedCollection.Name)]
 public sealed class ExperienceNoticeTests : IDisposable
 {
-    /// <summary>우드랜드1-1 — <see cref="LevelUpVitalsTests" /> 와 같은 방·같은 문 앞칸.</summary>
-    private const int MonsterRoom = 20015;
-
-    private static readonly Tile Start = new(2, 35);
-    private static readonly Tile TargetTile = new(2, 34);
-
     private const int SpawnDefined = 4;
     private const int PathFixed = 2;
     private const int MoodIdle = 1;
     private const int MostSwings = 120;
+
+    /// <summary>표적 괴물의 경험치 — 1,000 이 넘어야 예전의 1,000 단위 올림도 드러난다.</summary>
+    private const int TargetExp = 2000;
 
     /// <summary>한 마리로는 절대 닿지 않는 다음 레벨까지.</summary>
     private const long FarAway = 1_000_000;
@@ -43,14 +40,24 @@ public sealed class ExperienceNoticeTests : IDisposable
 
     public void Dispose() => _deadline.Dispose();
 
-    /// <summary>1레벨은 깎이지 않고(1,000 단위 올림만 본다), 20레벨은 레벨 차이로 깎인다.</summary>
+    /// <summary>
+    /// 깎기에 쓰는 괴물 레벨은 그 사냥터 입장 레벨의 위쪽 끝이다(monsterexp.cs <c>HuntingGroundLevel</c>).
+    /// 포테의숲 21~51 → 51 · 노비스 1~22 → 22 · 우드랜드1-1 은 레벨문이 없어 정의의 레벨(1) 그대로.
+    /// </summary>
     [Theory]
-    [InlineData(1)]
-    [InlineData(20)]
-    public async Task The_notice_is_what_the_bar_actually_moves(int level)
+    [InlineData(20015, 2, 35, 1, 1)]    // 우드랜드1-1 · 1레벨 — 안 깎인다
+    [InlineData(20015, 2, 35, 20, 1)]   // 우드랜드1-1 · 20레벨 — 레벨문이 없어 정의의 레벨 1 로 깎인다
+    [InlineData(20263, 33, 47, 30, 51)] // 포테의숲1존 · 30레벨 — 51 보다 낮아 안 깎인다
+    [InlineData(20263, 33, 47, 90, 51)] // 포테의숲1존 · 90레벨 — 깎인다
+    [InlineData(20393, 25, 25, 30, 22)] // 노비스평원A · 30레벨 — 깎인다
+    public async Task The_notice_is_what_the_bar_actually_moves(int room, int x, int y, int level, int monsterLevel)
     {
-        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MonsterRoom, Start.X, Start.Y));
-        StandOneAtTheDoor(server);
+        Tile start = new(x, y);
+        Tile target = new(x, y - 1);
+        long expected = Expected(level, monsterLevel);
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (room, start.X, start.Y));
+        StandOneAtTheDoor(server, room, target);
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, Name);
 
@@ -80,6 +87,8 @@ public sealed class ExperienceNoticeTests : IDisposable
             await SwingUntil(world, enough: () => Collect(world, notices) > 0);
             Assert.True(notices.Count == 1, $"알림이 {notices.Count}번 왔습니다. 서버가 한 말: {world.Said}");
             notice = notices[0];
+            Assert.True(notice == expected,
+                $"{level}레벨이 괴물 레벨 {monsterLevel} 자리({room})에서 경험치 {TargetExp} 짜리를 잡았는데 {notice:N0} 받았습니다 — {expected:N0} 이어야 합니다.");
 
             // 서버는 0x08 을 알림보다 먼저 보낸다. 늦게 오는 몫이 있는지 조금 더 기다려 본다.
             await Task.Delay(TimeSpan.FromSeconds(2), _deadline.Token);
@@ -104,6 +113,13 @@ public sealed class ExperienceNoticeTests : IDisposable
             $"저장된 ExpNext 가 앱이 본 {toGo:N0} 과 다릅니다: {JsonNode.Parse(File.ReadAllText(saved))?["ExpNext"]}");
     }
 
+    /// <summary>monsterexp.cs <c>ForLevel</c> 과 같은 식 — 다섯 레벨까지 그대로, 그 뒤 다섯 레벨마다 반, 2% 에서 멈춘다.</summary>
+    private static long Expected(int level, int monsterLevel)
+    {
+        int gap = level - monsterLevel;
+        return gap <= 5 ? TargetExp : (uint)(TargetExp * Math.Max(0.02, Math.Pow(0.5, (gap - 5) / 5.0)));
+    }
+
     private static int Collect(WorldClient world, List<long> notices)
     {
         while (world.TakeTold(out _, out string text))
@@ -118,25 +134,25 @@ public sealed class ExperienceNoticeTests : IDisposable
     }
 
     /// <summary>방의 정의 하나만 문 앞칸에 가만히 세운다 — <see cref="LevelUpVitalsTests" /> 와 같은 모양.</summary>
-    private static void StandOneAtTheDoor(IsolatedHadesServer server)
+    private static void StandOneAtTheDoor(IsolatedHadesServer server, int room, Tile targetTile)
     {
         JsonSerializerOptions indented = new() { WriteIndented = true };
         JsonDocumentOptions lenient = new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip };
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
 
-        (string Path, JsonNode Template)[] room =
+        (string Path, JsonNode Template)[] definitions =
         [
             .. Directory.EnumerateFiles(folder, "*.json", SearchOption.AllDirectories)
                 .Select(path => (path, text: File.ReadAllText(path)))
-                .Where(file => file.text.Contains($"\"AreaID\": {MonsterRoom}", StringComparison.Ordinal))
+                .Where(file => file.text.Contains($"\"AreaID\": {room}", StringComparison.Ordinal))
                 .Select(file => (file.path, JsonNode.Parse(file.text, documentOptions: lenient)!))
         ];
 
-        Assert.NotEmpty(room);
+        Assert.NotEmpty(definitions);
 
-        JsonNode target = room.MinBy(definition => (int?)definition.Template["MaximumHP"] ?? 0).Template.DeepClone();
+        JsonNode target = definitions.MinBy(definition => (int?)definition.Template["MaximumHP"] ?? 0).Template.DeepClone();
 
-        foreach ((string path, JsonNode template) in room)
+        foreach ((string path, JsonNode template) in definitions)
         {
             template["SpawnMax"] = 0;
             File.WriteAllText(path, template.ToJsonString(indented));
@@ -146,8 +162,9 @@ public sealed class ExperienceNoticeTests : IDisposable
         target["SpawnType"] = SpawnDefined;
         target["SpawnRate"] = 60;
         target["SpawnMax"] = 1;
-        target["DefinedX"] = TargetTile.X;
-        target["DefinedY"] = TargetTile.Y;
+        target["DefinedX"] = targetTile.X;
+        target["DefinedY"] = targetTile.Y;
+        target["Exp"] = TargetExp;
         target["PathQualifer"] = PathFixed;
         target["MoodType"] = MoodIdle;
         target["Grow"] = false;
