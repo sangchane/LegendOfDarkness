@@ -1013,6 +1013,118 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         Walk(step);
     }
 
+    // 자동 사냥 — 판단은 알맹이(AutoHunt), 여기는 그 결정을 걸음·평타·기술로 옮기기만 한다.
+    private readonly AutoHunt _autoHunt = new();
+
+    /// <summary>다른 사람이 이만큼 안에 친 괴물은 "남이 치는 것"으로 본다.</summary>
+    private static readonly System.TimeSpan ContestedFor = System.TimeSpan.FromSeconds(5);
+
+    /// <summary>자동 사냥이 켜져 있나.</summary>
+    public bool AutoHunting => _autoHunt.On;
+
+    /// <summary>손이 잠시 조작 중이라 자동 사냥이 쉬고 있나.</summary>
+    public bool AutoHuntPaused => _autoHunt.On && _autoHunt.Paused(Now);
+
+    /// <summary>기술 부채꼴에 놓인 기술 — GameScreen 이 AbilityBar 에서 이어 준다.</summary>
+    public System.Func<IReadOnlyList<LearnedSkill>>? BarSkills { get; set; }
+
+    /// <summary>자동 사냥이 스스로 멈췄다 — 한 줄 알림.</summary>
+    public event System.Action<string>? AutoHuntStopped;
+
+    private static System.TimeSpan Now => System.TimeSpan.FromMilliseconds(Time.GetTicksMsec());
+
+    /// <summary>켜고 끈다. 켠 자리가 사냥 반경의 중심이다.</summary>
+    public void SetAutoHunt(bool on)
+    {
+        if (on && !_autoHunt.On)
+        {
+            _autoHunt.Start(_tile, MapId);
+        }
+        else if (!on && _autoHunt.On)
+        {
+            _autoHunt.Stop();
+        }
+    }
+
+    /// <summary>사람이 방향판을 눌렀다 — 잠시 손에 맡기고, 선 자리를 새 중심으로.</summary>
+    public void SteeredByHand()
+    {
+        if (_autoHunt.On)
+        {
+            _autoHunt.Steered(_tile, Now);
+        }
+    }
+
+    /// <summary>사람이 공격·기술 단추를 눌렀다 — 잠시 손에 맡긴다.</summary>
+    public void FoughtByHand()
+    {
+        if (_autoHunt.On)
+        {
+            _autoHunt.Pause(Now);
+        }
+    }
+
+    private void AutoHuntTick()
+    {
+        if (!_autoHunt.On || server is not { } world || Frozen || _walked >= 0 || _guide is not null)
+        {
+            return;
+        }
+
+        uint me = world.Serial;
+        HuntSight sight = new()
+        {
+            Standing = _tile,
+            Facing = _player.Looking,
+            MapId = MapId,
+            Vitals = world.Vitals,
+            Comatose = Comatose,
+            Creatures = world.Creatures,
+            HealthOf = world.Health,
+            FoughtByOthers = serial => world.StruckByOthers(serial, ContestedFor),
+            Skills = BarSkills?.Invoke() ?? [],
+            Spells = world.Spells,
+            Cooling = world.CoolingFor,
+            PotionReady = Main.HealthPotion.Enabled && AutoPotion.Count(world.Pack, Main.HealthPotion.Potion) > 0,
+            AutoLoot = Main.AutoLoot,
+            Blocked = Walled,
+            People = [.. world.Others.Where(one => one.Serial != me).Select(one => one.Where)],
+            Now = Now,
+        };
+
+        HuntStep step = _autoHunt.Next(sight, Main.AutoHuntSettings);
+
+        if (step.Target != 0 && step.Target != _target)
+        {
+            _target = step.Target;
+            Mark();
+        }
+
+        switch (step.Act)
+        {
+            case HuntAct.Stop:
+                GD.Print($"GREYBOX_AUTOHUNT 멈춤 {step.Why}");
+                AutoHuntStopped?.Invoke(step.Why);
+                break;
+            case HuntAct.Heal:
+                UseSpell(step.Slot, 0);
+                break;
+            case HuntAct.Walk:
+                Walk(step.Toward);
+                break;
+            case HuntAct.Face:
+                _player.Face(step.Toward);
+                _ = world.TurnAsync(step.Toward, _leaving.Token);
+                break;
+            case HuntAct.Strike:
+                Strike();
+                break;
+            case HuntAct.Skill:
+                UseSkill(step.Slot);
+                break;
+        }
+    }
+
     /// <summary>Faces the neighbouring tile without stepping onto it, so a swing lands the right way.</summary>
     private void Face(int dx, int dy)
     {
@@ -1745,6 +1857,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         RehearseAPick();
         RehearseOverhead(delta);
         HuntOnItsOwn();
+        AutoHuntTick();
         FollowGuide();
 
         if (_walked < 0 && _rehearsal.Count > 0)

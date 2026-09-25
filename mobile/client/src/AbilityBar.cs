@@ -191,6 +191,13 @@ public sealed partial class AbilityBar : Control
         Redraw();
     }
 
+    /// <summary>기술 부채꼴에 놓인 기술, 놓인 차례대로 — 비운 칸의 것은 빠진다. 자동 사냥이 이것만 쓴다.</summary>
+    public IReadOnlyList<LearnedSkill> PlacedSkills()
+    {
+        int capacity = AbilityFan.Pages(_learnedSkills.Count) * AbilityFan.PerPage;
+        return [.. _skillArrangement.Fill(_learnedSkills, skill => skill.Slot, capacity).OfType<LearnedSkill>()];
+    }
+
     private void Redraw()
     {
         int learned = _spells ? _learnedSpells.Count : _learnedSkills.Count;

@@ -201,6 +201,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     // Every figure in the order it came (0x5D), for the floating numbers.
     private readonly ConcurrentQueue<Figure> _figures = new();
+
+    // 누가 마지막으로 누구를 쳤나(0x5D 의 Source) — 자동 사냥이 남이 치는 괴물을 피하려고 본다.
+    private readonly ConcurrentDictionary<uint, (uint Source, DateTime At)> _struck = new();
     private readonly ConcurrentQueue<int> _songs = new();
 
     private volatile WorldMapInfo? _field;
@@ -331,6 +334,16 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     }
 
     /// <summary>Takes the next amount a blow took or a heal gave (0x5D), oldest first.</summary>
+    /// <summary>
+    /// 다른 사람(우리 말고 보이는 플레이어)이 <paramref name="within"/> 안에 이 괴물을 쳤나. 원작에는 없는 0x5D 의
+    /// Source 로 안다 — 서버는 가까운 사람 모두에게 보낸다(<c>ServerFormat5D</c>, Scope.VeryNearbyAislings).
+    /// </summary>
+    public bool StruckByOthers(uint target, TimeSpan within) =>
+        _struck.TryGetValue(target, out (uint Source, DateTime At) hit)
+        && hit.Source != _serial
+        && _others.ContainsKey(hit.Source)
+        && DateTime.UtcNow - hit.At <= within;
+
     public bool TakeFigure([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Figure? figure) => _figures.TryDequeue(out figure);
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
@@ -692,7 +705,14 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                     continue;
 
                 case FigureCommand:
-                    _figures.Enqueue(ReadFigure(HadesCipher.DecodeSecured(frame, session.Parameters)));
+                    Figure figure = ReadFigure(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    _figures.Enqueue(figure);
+
+                    if (figure.Kind == FigureKind.Damage && figure.Source != 0)
+                    {
+                        _struck[figure.Target] = (figure.Source, DateTime.UtcNow);
+                    }
+
                     continue;
 
                 case ShowCreaturesCommand:

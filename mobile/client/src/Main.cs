@@ -178,6 +178,40 @@ public partial class Main : Control
     }
 
     /// <summary>
+    /// 자동 사냥의 반경(칸)과 회복 기술 줄(%). potion.cfg 처럼 기기에 한 줄("12 50")로 남는다.
+    /// </summary>
+    private const string AutoHuntFile = "user://autohunt.cfg";
+
+    public static Lod.Mobile.Core.World.AutoHuntSettings AutoHuntSettings { get; private set; } = new();
+
+    /// <summary><c>--auto-hunt</c> — 게임 화면이 뜨고 자리를 잡으면 [자동] 단추를 스스로 누른다. 손 없이 확인하는 용.</summary>
+    public static bool AutoHuntOnStart { get; private set; }
+
+    public static void SetAutoHuntSettings(Lod.Mobile.Core.World.AutoHuntSettings settings)
+    {
+        AutoHuntSettings = settings;
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(AutoHuntFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            writing.StoreLine(settings.ToLine());
+            writing.Close();
+        }
+    }
+
+    private static void ReadAutoHuntSettings()
+    {
+        Godot.FileAccess? reading = Godot.FileAccess.Open(AutoHuntFile, Godot.FileAccess.ModeFlags.Read);
+
+        if (reading is not null)
+        {
+            AutoHuntSettings = Lod.Mobile.Core.World.AutoHuntSettings.Parse(reading.GetLine());
+            reading.Close();
+        }
+    }
+
+    /// <summary>
     /// 기술 슬롯을 길게 눌러 정한 배치 — 캐릭터 이름마다 따로 남는다(사용자 요청, 2026-09-25). 규칙(무엇을
     /// 어디에 두나)은 알맹이 <see cref="Lod.Mobile.Core.World.AbilityArrangement"/> 가 갖고, 여기는 potion.cfg 처럼
     /// 한 줄에 하나씩 기기(user://)에 적고 읽기만 한다.
@@ -464,6 +498,8 @@ public partial class Main : Control
         GearAfter = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear-after") >= 0;
         ReadAutoLoot();
         ReadPotions();
+        ReadAutoHuntSettings();
+        AutoHuntOnStart = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auto-hunt") >= 0;
         ReadSavedLogin();
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 

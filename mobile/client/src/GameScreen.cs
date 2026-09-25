@@ -136,6 +136,12 @@ public partial class GameScreen : Control
     private Control _controlRow = null!;
     private Button _logout = null!;
 
+    // [자동] — 자동 사냥 켜고 끄기. 켜져 있으면 강조색으로 채운다(Greybox.Commit), 꺼져 있으면 보통 단추.
+    private Button _autoHunt = null!;
+    private bool _autoHuntDrawn;
+    private bool _autoHuntPausedDrawn;
+    private int _autoHuntSettling;
+
     // [종료] 가 여는 작은 판 — 로그아웃 · 게임 종료 · 취소.
     private readonly ExitChoice _exit = new();
 
@@ -450,6 +456,9 @@ public partial class GameScreen : Control
             GrowHorizontal = GrowDirection.Both,
             GrowVertical = GrowDirection.Both
         };
+
+        // 자동 사냥이 스스로 멈추면(맵 이동·쓰러짐·회복 수단 없음) 한 줄로 알린다.
+        _world.AutoHuntStopped += Notify;
     }
 
     /// <summary>
@@ -586,12 +595,28 @@ public partial class GameScreen : Control
         Greybox.Plain(settings);
         settings.Pressed += () => _settings.Visible = !_settings.Visible;
 
+        _autoHunt = new Button
+        {
+            Text = "자동",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        Greybox.Plain(_autoHunt);
+        _autoHunt.Pressed += () =>
+        {
+            _world.SetAutoHunt(!_world.AutoHunting);
+            Notify(_world.AutoHunting
+                ? $"자동 사냥을 켰습니다 — 이 자리에서 {Main.AutoHuntSettings.Radius}칸 안."
+                : "자동 사냥을 껐습니다.");
+        };
+
+        actions.AddChild(_autoHunt);
         actions.AddChild(settings);
         actions.AddChild(_logout);
 
         if (Main.Portrait)
         {
-            foreach (Button action in new Button[] { pack, _map, way, settings, _logout })
+            foreach (Button action in new Button[] { pack, _map, way, _autoHunt, settings, _logout })
             {
                 action.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             }
@@ -644,6 +669,49 @@ public partial class GameScreen : Control
         };
 
         return holder;
+    }
+
+    /// <summary>
+    /// [자동] 단추의 모양을 자동 사냥과 맞춘다 — 켜짐은 강조색, 손이 잠시 조작 중이면 흐리게. <c>--auto-hunt</c> 면 자리를
+    /// 잡은 뒤 한 번 스스로 누른다.
+    /// </summary>
+    private void KeepAutoHuntButton()
+    {
+        if (Main.AutoHuntOnStart && _autoHuntSettling >= 0 && _world.MapId > 0 && _server?.Vitals is not null
+            && ++_autoHuntSettling == 120)
+        {
+            _autoHuntSettling = -1;
+            _autoHunt.EmitSignal(BaseButton.SignalName.Pressed);
+            GD.Print("GREYBOX_AUTOHUNT 켬");
+        }
+
+        bool on = _world.AutoHunting;
+        bool paused = _world.AutoHuntPaused;
+
+        if (on != _autoHuntDrawn)
+        {
+            _autoHuntDrawn = on;
+
+            if (on)
+            {
+                Greybox.Commit(_autoHunt);
+            }
+            else
+            {
+                foreach (string colour in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
+                {
+                    _autoHunt.RemoveThemeColorOverride(colour);
+                }
+
+                Greybox.Plain(_autoHunt);
+            }
+        }
+
+        if (paused != _autoHuntPausedDrawn)
+        {
+            _autoHuntPausedDrawn = paused;
+            _autoHunt.Modulate = paused ? new Color(1, 1, 1, 0.6f) : Colors.White;
+        }
     }
 
     /// <summary>Keeps the guide plate in step, and — hands-free only — opens the map, taps a place on it, and closes it.</summary>
@@ -845,6 +913,7 @@ public partial class GameScreen : Control
         Dropped();
         KeepWalking(delta);
         KeepGuiding(delta);
+        KeepAutoHuntButton();
         RehearseAHold(delta);
         RehearseASkill(delta);
 
@@ -1422,6 +1491,7 @@ public partial class GameScreen : Control
             {
                 held = true;
                 _world.StopGuiding();
+                _world.SteeredByHand();
                 _world.Walk(where);
             }
         }
@@ -1643,14 +1713,24 @@ public partial class GameScreen : Control
 
         _abilities = new AbilityBar { SizeFlagsVertical = SizeFlags.ShrinkEnd };
         _abilities.Cooling = (skill, slot) => _server?.CoolingFor(skill, slot) ?? 0;
-        _abilities.SkillUsed += slot => _world.UseSkill(slot);
+        _abilities.SkillUsed += slot =>
+        {
+            _world.FoughtByHand();
+            _world.UseSkill(slot);
+        };
+        _world.BarSkills = _abilities.PlacedSkills;
         _abilities.SpellUsed += slot => UseSpell(slot);
         _abilities.LoadSlots = Main.LoadAbilitySlots;
         _abilities.SaveSlots = Main.SaveAbilitySlots;
 
         // One tap is one blow. It does not chase and it does not repeat — the server decides whether it
         // landed, and says so in words we show below rather than guessing at damage here.
-        _abilities.Attack.Pressed += () => _world.Strike();
+        _abilities.Attack.Pressed += () =>
+        {
+            // 사람이 직접 치면 자동 사냥은 3초 쉰다 — 끄지 않는다. 손을 떼면 다시 돈다.
+            _world.FoughtByHand();
+            _world.Strike();
+        };
 
         // 자동 포션은 창 안에 숨기지 않는다 — 싸우는 중에 한 번에 닿아야 한다(사용자, 2026-09-23). 위 줄에 있던 것을
         // 기술 부채꼴 맨 위, 가장 높은 기술 칸 위로 옮겼다 — 기술 칸(48)보다 조금 작게(사용자, 2026-09-23 "기술창 제일
@@ -1742,8 +1822,9 @@ public partial class GameScreen : Control
             Greybox.Disc(button);
             button.ButtonDown += () =>
             {
-                // 방향판을 누르면 길 안내는 멈춘다 — 손이 이긴다.
+                // 방향판을 누르면 길 안내는 멈춘다 — 손이 이긴다. 자동 사냥은 잠시 쉬고, 선 자리가 새 중심이 된다.
                 _world.StopGuiding();
+                _world.SteeredByHand();
                 _world.Walk(where);
             };
             _keys.Add((button, where));
