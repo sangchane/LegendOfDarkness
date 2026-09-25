@@ -3,6 +3,7 @@
 #
 #   scripts/lod-server.sh config          설정 두 개를 틀에서 다시 만든다(빌드하면 덮어써진다)
 #   scripts/lod-server.sh check-config    두 리다이렉트 주소가 같은지 검사한다
+#   scripts/lod-server.sh app             앱 주소(server.cfg)를 이 맥으로(평소엔 클라우드 — cloud-server.sh app)
 #   scripts/lod-server.sh start|stop|restart|status
 #   scripts/lod-server.sh logs [줄수]     기록 끝을 본다
 #   scripts/lod-server.sh backup          캐릭터를 압축해 두고 오래된 것은 지운다
@@ -49,7 +50,10 @@ config() {
 
     "$ROOT/scripts/check-server-config.sh" "$STAGING"
     echo "설정을 다시 깔았습니다 — 주소 $ip"
+}
 
+# 앱이 이 맥 서버로 붙게 한다. 평소 앱은 클라우드를 본다(cloud-server.sh app) — 맥 서버로 시험할 때만 쓴다.
+app() {
     echo "$(phone_address):2610" > "$ROOT/mobile/client/server.cfg"
     echo "앱 주소(server.cfg) — $(cat "$ROOT/mobile/client/server.cfg") · 앱을 다시 설치해야 반영됩니다"
 }
@@ -265,6 +269,7 @@ remove_agents() {
 
 case "${1:-status}" in
     config) config ;;
+    app) app ;;
     start) start ;;
     stop) stop ;;
     restart) stop; start ;;
@@ -274,5 +279,5 @@ case "${1:-status}" in
     backup) backup ;;
     install-agents) install_agents ;;
     remove-agents) remove_agents ;;
-    *) echo "쓸 수 있는 것: config check-config start stop restart status logs backup install-agents remove-agents"; exit 2 ;;
+    *) echo "쓸 수 있는 것: config app check-config start stop restart status logs backup install-agents remove-agents"; exit 2 ;;
 esac

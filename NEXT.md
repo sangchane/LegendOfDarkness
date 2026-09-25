@@ -10,7 +10,7 @@
   `161.33.43.117:2610`. 올리기 `LOD_CLOUD_IP=161.33.43.117 scripts/cloud-server.sh deploy`(캐릭터는 클라우드 것이 진짜, 덮지 않는다) ·
   기록 `… logs` · 캐릭터 받기 `… backup` · 앱을 클라우드로 `… app`. 게임 폴더는 대소문자를 안 가리는 ext4(casefold) 위
   (`~/lod` → `~/lod-ci/lod`) — 코드·자료가 맥에서 자라 이름 대소문자가 섞여 있다. 맥 서버는 그대로 떠 있지만 캐릭터가 따로 논다.
-  테더링(SKT)은 IPv6 전용이라 맥 서버로 붙으려면 `scripts/lod-server.sh config`(맥 IPv6 를 앱에) → 설치, 주소가 재연결마다 바뀐다.
+  테더링(SKT)은 IPv6 전용이라 맥 서버로 붙으려면 `scripts/lod-server.sh app`(맥 IPv6 를 앱에) → 설치, 주소가 재연결마다 바뀐다.
 - **[끝남/2026-09-24 밤 — 폰 확인 전]** 우드랜드 나머지 13맵(입구·1-2·1-3·2-1~6-1·14-1·10-1·11-1·(진) 둘) 그림을 앱에 넣었다
   (입구가 "깨져" 보인 까닭 — 그림이 1-1 뿐이었다). 로그아웃한 자리가 사라지던 것: 서버가 마지막 저장 2초 안이면 나갈 때 저장을
   건너뛰었다 → 늘 저장(`LogoutTests.The_next_character_does_not_take_the_place_the_last_one_logged_out_at`). 서버 반영·앱 설치 끝.

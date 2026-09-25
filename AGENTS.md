@@ -54,6 +54,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - Git/Graphite 작업 규칙: `WORKFLOW.md` · 처음 받기: `README.md`
 
 ## 규약
+- **운영(2026-09-25): 개발은 맥(격리 서버 시험), 플레이는 클라우드.** 고치기·시험·커밋은 맥에서 → `LOD_CLOUD_IP=161.33.43.117 scripts/cloud-server.sh deploy` 로 올린다(올리면 접속 중인 사람이 끊긴다 — 직전에 알린다) → 앱이 바뀌었으면 `scripts/ios-build.sh install`. **캐릭터의 기준은 클라우드**(`… backup` 으로 받아 로컬에서 재현). 아이폰 앱 주소는 늘 클라우드 — 맥 서버(`com.lod.gameserver`)는 꺼 두고 필요할 때만 켠다
 - 구현·검증·리뷰·커밋 요청에는 `$service-prompt-workflow`가 자동 적용된다. 사용자 요청·`NEXT.md` 현재 블록·관련 변경 파일·실패 이력을 기준으로 내장 모델 라우팅을 적용하며, 같은 파일을 고치는 작업은 동시에 분산하지 않는다.
 - **볼트는 저장소에 들어 있다 — 생성기를 돌리지 않고 그냥 Obsidian 으로 연다.** `data/truth-vault/`(자료 출처) · `data/formula-vault/`(식) · `data/archives-vault/`(아카이브 503표) · `data/game-data/vault-abilities/`(원작 기술·마법 613) · `data/ui-vault/`(원작 4.51 UI 와 테마 규칙) · `data/drop-vault/`(사냥터·괴물·아이템·골드식 — `graphify query "..." --graph data/drop-vault/graph/graph.json`). 낡았으면 해당 생성기로 다시 만든다. 팩 볼트(`data/server-packs/vault/`, 43MB)만 무시 목록에 있다
 - **자료가 어디서 오나 (갈래별 셈): `python3 scripts/build-truth-vault.py` → `data/truth-vault/`** (Obsidian). **`database/assets/MetaFiles/` 를 먼저 본다** — 아이템 2,110·기술마법 613·퀘스트 38 이 거기서 나온다. 손으로 적은 표는 틀렸었다
