@@ -68,6 +68,65 @@ public sealed class MonsterShapeTests
         Assert.DoesNotContain(world.Others, one => one.Serial == Beast);
     }
 
+    /// <summary>
+    /// 같은 맵에서 다시 그리기(0x15 — 벽·괴물에 막힌 걸음, 속도 초과가 부르는 <c>client.Refresh</c>)는 괴물을 지우지 않는다.
+    /// 서버는 곧 곁의 것을 0x07 로 다시 보낼 뿐이고, 그 사이 화면에서 괴물이 모두 사라졌다가 1초쯤 뒤에 돌아왔다
+    /// ("몬스터가 보였다가 사라진다", 사용자 2026-09-25). 맵이 바뀔 때만 지난 맵 것을 버린다.
+    /// </summary>
+    [Fact]
+    public async Task A_redraw_of_the_same_map_keeps_the_monsters_and_a_new_map_drops_them()
+    {
+        using CancellationTokenSource deadline = new(TimeSpan.FromSeconds(10));
+        using TcpListener listener = new(IPAddress.Loopback, 0);
+        listener.Start();
+        IPEndPoint endpoint = (IPEndPoint)listener.LocalEndpoint;
+        Task<TcpClient> accepting = listener.AcceptTcpClientAsync(deadline.Token).AsTask();
+        HadesConnection connection = await HadesConnection.ConnectAsync(endpoint.Address, endpoint.Port, deadline.Token);
+        using TcpClient server = await accepting;
+        EncryptionParameters cipher = new(HadesCipher.SupportedSeed, "NexonInc."u8.ToArray(), 0);
+        using WorldSession session = new(
+            connection, new RedirectTarget(IPAddress.Loopback, 0, cipher.Seed, cipher.Salt, "monk", 1), cipher);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(deadline.Token);
+
+        byte ordinal = 0;
+        async Task Say(byte command, byte[] body) =>
+            await server.GetStream().WriteAsync(HadesCipher.EncodeSecured(command, ordinal++, body, cipher), deadline.Token);
+        int reports = 0;
+        async Task Settle()
+        {
+            await Say(0x04, [0, 5, 0, 5]);
+            reports++;
+            await Until(() => world.PositionReports == reports, deadline.Token);
+        }
+
+        byte[] shown = new byte[2 + 17];
+        shown[1] = 1;
+        shown[3] = 11;
+        shown[5] = 10;
+        shown[7] = 0x01;
+        shown[8] = 0x23;
+        shown[9] = 0x45;
+        shown[10] = 0x41;
+        shown[11] = 0x0F;
+
+        await Say(0x05, [0, 0, 0, (byte)Me]);
+        await Say(0x15, [0x4E, 0x2F, 60, 60, 0, 0, 0, 0, 0, 0]);
+        await Say(0x07, shown);
+        await Settle();
+        Assert.Contains(world.Creatures, one => one.Serial == Beast);
+
+        // 같은 맵(20015)을 다시 그린다.
+        await Say(0x15, [0x4E, 0x2F, 60, 60, 0, 0, 0, 0, 0, 0]);
+        await Settle();
+        Assert.Contains(world.Creatures, one => one.Serial == Beast);
+
+        // 다른 맵(20016)으로 옮긴다.
+        await Say(0x15, [0x4E, 0x30, 60, 60, 0, 0, 0, 0, 0, 0]);
+        await Settle();
+        Assert.DoesNotContain(world.Creatures, one => one.Serial == Beast);
+    }
+
     private static async Task Until(Func<bool> done, CancellationToken cancellationToken)
     {
         while (!done())

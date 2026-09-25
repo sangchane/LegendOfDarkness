@@ -469,15 +469,24 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             switch (frame.Command)
             {
                 case MapChangedCommand:
+                {
+                    int before = map?.Id ?? -1;
                     map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
                     _field = null;
                     _seenAiling.Clear();
 
-                    // 원작처럼 맵이 바뀌면(같은 맵 새로고침도) 보던 것을 모두 버린다 — 서버는 0x15 뒤에 시야를 비우고
-                    // 곁의 것을 다시 보낸다(GameClient.RefreshMap). 남겨 두면 지난 맵 괴물이 새 맵 위에 선다.
-                    _creatures.Clear();
-                    _others.Clear();
+                    // 맵이 바뀌면 보던 것을 모두 버린다 — 남겨 두면 지난 맵 괴물이 새 맵 위에 선다. 같은 맵 새로고침
+                    // (막힌 걸음·속도 초과가 부르는 GameClient.Refresh)에는 버리지 않는다: 서버는 곁의 것을 곧 0x07 로 다시
+                    // 보낼 뿐이고, 버리면 그때까지 괴물이 모두 사라졌다가 돌아온다(사용자 2026-09-25 "보였다가 사라진다").
+                    // 시야 밖이 된 것은 서버가 0x0E 로 거둔다.
+                    if (map.Id != before)
+                    {
+                        _creatures.Clear();
+                        _others.Clear();
+                    }
+
                     break;
+                }
 
                 case HeartbeatCommand:
                     await Send(HeartbeatReplyCommand, HadesCipher.DecodeSecured(frame, session.Parameters).ToArray(), cancellationToken);

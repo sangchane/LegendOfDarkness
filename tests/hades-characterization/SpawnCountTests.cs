@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
 using Xunit;
@@ -117,6 +118,52 @@ public sealed class SpawnCountTests : IDisposable
 
         Assert.True(left.Length == 0,
             $"노비스평원A 에서 보던 괴물 {left.Length}마리가 노비스마을 화면에 남았습니다(평원에서 {plain.Count}마리를 봤다).");
+    }
+
+    /// <summary>
+    /// 같은 맵 안에서 다시 그리면(막힌 걸음·속도 초과가 부르는 Refresh — 느린 망에서는 걸음이 몰려 와 자주 걸린다) 곁의 괴물은 화면에서 한순간도 빠지지
+    /// 않는다. 맵을 옮길 때 거두는 것(위 시험)을 모든 새로고침에 했더니 괴물이 모두 사라졌다가 1초쯤 뒤 돌아왔다
+    /// (2026-09-25 사용자 "몬스터가 보였다가 사라진다").
+    /// </summary>
+    [Fact]
+    public async Task Redrawing_the_same_map_keeps_the_monsters_nearby_on_the_screen()
+    {
+        const string name = "redrawmob";
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NovicePlainA, 25, 25));
+        Waiting.MakeGameMaster(server, name);
+        (WorldSession session, WorldClient world) = await Enter(server, name);
+        using WorldSession _ = session;
+
+        await Waiting.Until(() => world.State?.Map.Id == NovicePlainA, "노비스평원A 에 들어가지 못했습니다.", _deadline.Token);
+
+        HashSet<uint> near = [];
+        int hops = 0;
+
+        for (int round = 0; round < 6; round++)
+        {
+            await Waiting.Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile && Near(c.Where)),
+                "노비스평원A 에서 곁의 괴물이 보이지 않았습니다.", _deadline.Token, TimeSpan.FromSeconds(90));
+
+            near = [.. world.Creatures.Where(c => c.Kind == CreatureKind.Hostile && Near(c.Where)).Select(c => c.Serial)];
+            // 걸음을 서버가 허락하는 것(275ms)보다 빨리 두 번 — 둘째 걸음이 Refresh(true)를 부른다(Format06Handler).
+            await world.WalkAsync(round % 2 == 0 ? Direction.East : Direction.West, _deadline.Token);
+            await world.WalkAsync(round % 2 == 0 ? Direction.West : Direction.East, _deadline.Token);
+            hops++;
+
+            for (int look = 0; look < 75; look++)
+            {
+                uint[] gone = [.. near.Where(serial => world.Creatures.All(c => c.Serial != serial))];
+
+                // 죽은 것은 없다(아무도 치지 않는다). 곁에서 걷던 것이 한 번에 시야 밖(12)으로 나갈 수는 없다.
+                Assert.True(gone.Length == 0,
+                    $"같은 맵 새로고침 {hops}번째에 곁의 괴물 {gone.Length}마리가 화면에서 빠졌습니다(곁에 {near.Count}마리).");
+
+                await Task.Delay(20, _deadline.Token);
+            }
+        }
+
+        static bool Near(Tile where) => Math.Abs(where.X - 25) + Math.Abs(where.Y - 25) <= 5;
     }
 
     /// <summary>
