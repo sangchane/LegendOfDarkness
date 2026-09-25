@@ -11,8 +11,12 @@ namespace LodClient;
 public partial class GameScreen : Control
 {
     private const int AuxFontSize = 14;
-    /// <summary>체력·마력 구슬의 지름. 원작 구슬(86x85)을 이만큼으로 줄여 그림 없이 그린다.</summary>
-    private const int Pip = 18;
+
+    /// <summary>체력·마력 막대의 높이 — 고른 대상의 막대(_targetHealth)와 같은 높이라 HUD가 한 체계로 읽힌다.</summary>
+    private const int GaugeHeight = 10;
+
+    /// <summary>막대 옆 숫자의 글자 크기. 작게 두어(사용자 지시) 막대를 더한 만큼 판이 넓어지지 않게 한다.</summary>
+    private const int GaugeFontSize = 11;
 
     /// <summary>
     /// How tall the ticker's row is in portrait: two one-row lines, and the 대화 button beside them. It does not grow —
@@ -97,6 +101,8 @@ public partial class GameScreen : Control
     private const double FadeSeconds = 0.12;
 
     // 내 체력·마력. 서버가 준 값이 바뀔 때만 다시 쓴다.
+    private ProgressBar _healthBar = null!;
+    private ProgressBar _manaBar = null!;
     private Label _healthText = null!;
     private Label _manaText = null!;
     private Label _experience = null!;
@@ -1485,8 +1491,9 @@ public partial class GameScreen : Control
     private Vitals Mine => _server is null ? LayoutCheck.PretendVitals : _server.Vitals ?? Vitals.Unknown;
 
     /// <summary>
-    /// Health over mana, each a bar with its numbers beside it: health must never be readable by colour alone, and
-    /// the two bars share a colour, so the words say which is which.
+    /// Health over mana, each a filling gauge with its exact numbers beside it — the wireframes always asked for
+    /// both together (docs/mobile-test-v1-wireframes.md: "HP는 막대와 숫자를 함께 표시"), and each keeps its own
+    /// theme colour (health's orange, mana's blue — data/ui-vault/색) so the two are told apart without reading.
     /// </summary>
     private Control BuildVitals()
     {
@@ -1497,47 +1504,48 @@ public partial class GameScreen : Control
         // 말하지 않는다. 막대를 그리려면 길이를 지어내야 한다.
         _experience = Aux(string.Empty);
 
-        vitals.AddChild(Gauge("체력", Greybox.Health, out _healthText));
-        vitals.AddChild(Gauge("마력", Greybox.Mana, out _manaText));
+        vitals.AddChild(Gauge("체력", Greybox.Health, out _healthBar, out _healthText));
+        vitals.AddChild(Gauge("마력", Greybox.Mana, out _manaBar, out _manaText));
         vitals.AddChild(_experience);
 
         return vitals;
     }
 
     /// <summary>
-    /// One vital: the original's bead, shrunk to a flat disc, and the exact numbers beside it. No long bar —
-    /// how a fight is going is read over the head now (HealthBar), and the same thing is not drawn twice.
+    /// One vital: a name, a bar that fills in its theme colour, and the exact numbers beside it, small. The
+    /// over-the-head bar (HealthBar) still carries how a fight is going; this one is the place the numbers are
+    /// always exact, so the bar and the numbers are read together rather than the same thing drawn twice.
     /// </summary>
-    private static Control Gauge(string name, Color paint, out Label text)
+    private static Control Gauge(string name, Color paint, out ProgressBar bar, out Label text)
     {
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter / 2);
-
-        StyleBoxFlat bead = new() { BgColor = paint, BorderColor = new Color(0, 0, 0, 0.55f) };
-        bead.SetCornerRadiusAll(Pip / 2);
-        bead.SetBorderWidthAll(2);
-
-        Panel pip = new()
-        {
-            CustomMinimumSize = new Vector2(Pip, Pip),
-            SizeFlagsVertical = SizeFlags.ShrinkCenter
-        };
-
-        pip.AddThemeStyleboxOverride("panel", bead);
 
         // 구슬만 두었더니 무엇을 뜻하는지 알 수 없다는 말을 들었다(사용자, 2026-09-18). 이름을 되살린다 —
         // 색은 거드는 것이지 뜻을 나르는 것이 아니다.
         Label named = Aux(name);
 
+        bar = new ProgressBar
+        {
+            CustomMinimumSize = new Vector2(Main.Portrait ? 48 : 72, GaugeHeight),
+            MaxValue = 1,
+            ShowPercentage = false,
+            SizeFlagsVertical = SizeFlags.ShrinkCenter
+        };
+        bar.AddThemeStyleboxOverride("background", Greybox.Surface());
+        bar.AddThemeStyleboxOverride("fill", Greybox.Fill(paint));
+
         text = Aux(string.Empty);
-        row.AddChild(pip);
+        text.AddThemeFontSizeOverride("font_size", GaugeFontSize);
+
         row.AddChild(named);
+        row.AddChild(bar);
         row.AddChild(text);
 
         return row;
     }
 
-    /// <summary>Puts the newest health and mana on the bars, only when they have changed.</summary>
+    /// <summary>Puts the newest health and mana on the gauges, only when they have changed.</summary>
     private void ShowVitals()
     {
         Vitals mine = Mine;
@@ -1548,8 +1556,8 @@ public partial class GameScreen : Control
         }
 
         _shownVitals = mine;
-        Fill(_healthText, mine.Health, mine.MaximumHealth);
-        Fill(_manaText, mine.Mana, mine.MaximumMana);
+        Fill(_healthBar, _healthText, mine.Health, mine.MaximumHealth);
+        Fill(_manaBar, _manaText, mine.Mana, mine.MaximumMana);
 
         string points = mine.Unspent > 0 ? $" · 점수 {mine.Unspent}" : string.Empty;
 
@@ -1559,11 +1567,14 @@ public partial class GameScreen : Control
     }
 
     /// <summary>
-    /// Writes one vital. It turns colour as it falls — but the numbers themselves are the reading, so somebody
-    /// who cannot tell the colours apart loses nothing.
+    /// Fills one vital's bar and writes its number. The number turns colour as it falls — but the numbers
+    /// themselves are the reading, so somebody who cannot tell the colours apart loses nothing.
     /// </summary>
-    private static void Fill(Label text, int left, int most)
+    private static void Fill(ProgressBar bar, Label text, int left, int most)
     {
+        bar.MaxValue = most > 0 ? most : 1;
+        bar.Value = most > 0 ? Mathf.Clamp(left, 0, most) : 0;
+
         text.Text = $"{left} / {most}";
 
         text.AddThemeColorOverride("font_color", most <= 0 || left > most * 0.5

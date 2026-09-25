@@ -259,8 +259,11 @@ public static class Greybox
     /// <summary>The play area behind the HUD.</summary>
     public static StyleBoxFlat World() => new() { BgColor = Inner };
 
-    /// <summary>Filled portion of a bar. Always paired with numbers, never read by shade alone.</summary>
-    public static StyleBoxFlat Fill() => new() { BgColor = Health };
+    /// <summary>Filled portion of a bar, in the health colour. Always paired with numbers, never read by shade alone.</summary>
+    public static StyleBoxFlat Fill() => Fill(Health);
+
+    /// <summary>Filled portion of a bar in a given colour — health's orange, mana's blue, still paired with numbers.</summary>
+    public static StyleBoxFlat Fill(Color paint) => new() { BgColor = paint };
 
     /// <summary>
     /// Marks a zone the layout has to respect. A guide, not part of the game: it goes away once the rule it
