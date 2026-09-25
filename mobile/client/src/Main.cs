@@ -30,8 +30,18 @@ public partial class Main : Control
     // 고쳐야 한다. 그래서 빌드에 함께 실리는 이 파일에서 읽는다 — 커밋되지 않는다(.gitignore).
     private const string ServerFile = "res://server.cfg";
 
-    /// <summary>계정이 적혀 있으면 화면을 거치지 않고 바로 들어간다. `server.cfg` 와 같은 자리에 둔다.</summary>
+    /// <summary>
+    /// 계정이 적혀 있으면 화면을 거치지 않고 바로 들어간다. `server.cfg` 와 같은 자리에 둔다. **실기기에서는
+    /// 읽지 않는다**(<see cref="LoginFromFile"/>) — 데스크톱에서 로컬 서버를 손 없이 확인하는 지름길이지,
+    /// 기기에서 앱을 켠 사람을 그 계정으로 곧장 들여보내려는 것이 아니다.
+    /// </summary>
     private const string LoginFile = "res://login.cfg";
+
+    /// <summary>
+    /// 로그인 화면의 "자동 로그인"을 켜고 로그인에 성공하면 그 계정이 여기 남는다(기기 안 user:// —
+    /// 저장소가 아니라 이 기기에만). 로그인 화면에서 끄면 지운다. 처음에는 없다(꺼져 있다).
+    /// </summary>
+    private const string AutoLoginFile = "user://autologin.cfg";
 
     /// <summary>이 파일이 실려 있으면 캐릭터가 스스로 사냥한다. 실기기가 인자를 못 받아 파일로 켠다.</summary>
     private const string HuntFile = "res://hunt.cfg";
@@ -44,9 +54,52 @@ public partial class Main : Control
 
     public static bool AutoLoot { get; private set; } = true;
 
-    // Launch-time credentials may submit once. An explicit logout turns that convenience off for every
-    // login screen reached afterward, including a round trip through account creation.
-    private bool _automaticLogin = true;
+    /// <summary>The account the login screen's own "자동 로그인" toggle has saved, or none.</summary>
+    public static Lod.Mobile.Core.World.AutoLoginAccount? SavedLogin { get; private set; }
+
+    // Launch-time credentials (--login / login.cfg) and a saved account may each submit once. An explicit
+    // logout turns that convenience off for every login screen reached afterward, including a round trip
+    // through account creation, until the app is launched again.
+    private readonly Lod.Mobile.Core.World.AutoLoginGate _autoLoginGate = new();
+
+    /// <summary>Saves, or (given <c>null</c>) forgets, the account to sign in with automatically next launch.</summary>
+    public static void SetSavedLogin(Lod.Mobile.Core.World.AutoLoginAccount? account)
+    {
+        SavedLogin = account;
+
+        if (account is null)
+        {
+            if (Godot.FileAccess.FileExists(AutoLoginFile))
+            {
+                Godot.DirAccess.RemoveAbsolute(AutoLoginFile);
+            }
+
+            return;
+        }
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(AutoLoginFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            foreach (string line in account.ToLines())
+            {
+                writing.StoreLine(line);
+            }
+
+            writing.Close();
+        }
+    }
+
+    private static void ReadSavedLogin()
+    {
+        if (!Godot.FileAccess.FileExists(AutoLoginFile))
+        {
+            return;
+        }
+
+        using Godot.FileAccess reading = Godot.FileAccess.Open(AutoLoginFile, Godot.FileAccess.ModeFlags.Read);
+        SavedLogin = Lod.Mobile.Core.World.AutoLoginAccount.Parse(reading.GetLine().Trim(), reading.GetLine().Trim());
+    }
 
     /// <summary>Turns picking-up-as-you-walk on or off, and remembers which.</summary>
     public static void SetAutoLoot(bool on)
@@ -363,6 +416,7 @@ public partial class Main : Control
         GearAfter = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear-after") >= 0;
         ReadAutoLoot();
         ReadPotions();
+        ReadSavedLogin();
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 
         // 입거나 버려 보려면 소지품이 열려 있어야 한다 — 따로 적게 하지 않는다.
@@ -474,7 +528,7 @@ public partial class Main : Control
 
     private LoginScreen BuildLoginScreen()
     {
-        LoginScreen login = new() { AutomaticLogin = _automaticLogin };
+        LoginScreen login = new() { AutomaticLogin = _autoLoginGate.MaySubmit };
 
         // Deferred, because this runs from the login screen's own frame and the tree may not be changed
         // in the middle of one.
@@ -540,9 +594,9 @@ public partial class Main : Control
         RemoveChild(game);
         game.QueueFree();
 
-        // login.cfg and --login are launch conveniences. An explicit logout must not consume them again
-        // and immediately put the same account back in the world.
-        _automaticLogin = false;
+        // login.cfg, --login and a saved account are all launch conveniences. An explicit logout must not
+        // consume them again and immediately put the same account back in the world.
+        _autoLoginGate.NoteLogout();
         AddChild(BuildLoginScreen());
     }
 
@@ -679,6 +733,14 @@ public partial class Main : Control
     /// </summary>
     private static string? LoginFromFile()
     {
+        // A real device only ever has its icon tapped — whoever does that would be signed straight into
+        // this account. login.cfg is a desktop rehearsal convenience for a local server with no one at the
+        // keyboard, so a handheld must never read it, regardless of what an export filter lets through.
+        if (OS.GetName() is "iOS" or "Android")
+        {
+            return null;
+        }
+
         if (!Godot.FileAccess.FileExists(LoginFile))
         {
             return null;

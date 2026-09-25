@@ -45,6 +45,10 @@ public partial class LoginScreen : Control
     private LineEdit _password = null!;
     private Button _submit = null!;
     private Button _create = null!;
+    private Button _autoLogin = null!;
+
+    /// <summary>기본은 꺼짐 — 이미 저장된 계정이 있을 때만 켜져서 보인다.</summary>
+    private bool _autoLoginWanted;
 
     // 키보드가 올라와 있는 동안 접어 두는 줄(위 환경 줄·아래 판 번호·안내 한 줄), 그리고 화면을 올린 만큼.
     private Control _statusRow = null!;
@@ -80,10 +84,15 @@ public partial class LoginScreen : Control
 
         RefreshSubmitState();
 
-        if (Main.Rehearsal.Username.Length > 0)
+        // --login / login.cfg (desktop rehearsal) wins over a saved account when both are somehow present.
+        (string Username, string Password) fill = Main.Rehearsal.Username.Length > 0
+            ? Main.Rehearsal
+            : Main.SavedLogin is { } saved ? (saved.Username, saved.Password) : (string.Empty, string.Empty);
+
+        if (fill.Username.Length > 0)
         {
-            _username.Text = Main.Rehearsal.Username;
-            _password.Text = Main.Rehearsal.Password;
+            _username.Text = fill.Username;
+            _password.Text = fill.Password;
 
             if (AutomaticLogin)
             {
@@ -148,6 +157,11 @@ public partial class LoginScreen : Control
             _session = finished.Result;
             _status.Text = $"{_session.Character.CharacterName} 님, 월드에 들어왔습니다.";
             _submit.Text = "접속됨";
+
+            if (_autoLoginWanted)
+            {
+                Main.SetSavedLogin(new AutoLoginAccount(_username.Text, _password.Text));
+            }
 
             // The world takes the connection from here, so this screen must not close it.
             WorldSession handed = _session;
@@ -230,6 +244,29 @@ public partial class LoginScreen : Control
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
         Greybox.Plain(_create);
+
+        // 기본은 꺼짐(사용자) — 이미 저장된 계정이 있을 때만 켜진 채로 보인다.
+        _autoLoginWanted = Main.SavedLogin is not null;
+        _autoLogin = new Button
+        {
+            ToggleMode = true,
+            ButtonPressed = _autoLoginWanted,
+            CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+        };
+        Greybox.Tab(_autoLogin);
+        ShowAutoLogin();
+
+        _autoLogin.Pressed += () =>
+        {
+            _autoLoginWanted = _autoLogin.ButtonPressed;
+            ShowAutoLogin();
+
+            // 꺼면 그 자리에서 지운다 — 켜는 것은 이 계정으로 실제 로그인에 성공했을 때뿐이다.
+            if (!_autoLoginWanted)
+            {
+                Main.SetSavedLogin(null);
+            }
+        };
 
         Control form = Main.Portrait
             ? PortraitForm(crest, title)
@@ -315,10 +352,14 @@ public partial class LoginScreen : Control
         // into two rows. Both orientations use this same compact field treatment.
         form.AddChild(FieldRow("사용자명", _username));
         form.AddChild(FieldRow("비밀번호", _password));
+        form.AddChild(_autoLogin);
         form.AddChild(_status);
         form.AddChild(_submit);
         form.AddChild(_create);
     }
+
+    private void ShowAutoLogin() =>
+        _autoLogin.Text = _autoLoginWanted ? "자동 로그인 켬" : "자동 로그인 꺼짐";
 
     private static Control FieldRow(string caption, LineEdit field)
     {
