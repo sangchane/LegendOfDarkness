@@ -1139,16 +1139,25 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         // 공격모션, 없으면 갑옷의 것 — 도복은 주먹 132) 클라이언트는 그 칸을 모른다. 그래서 늘 일반
         // 휘두르기만 그렸고, 무도가가 주먹을 안 쥐었다(사용자, 2026-09-18).
         // 직업 동작은 그 동작을 받는 옷(skill.tbl ST)을 입었을 때만 — 아니면 원작처럼 일반 휘두르기다.
-        BodyMotion blow = _ownBlow.Number is { } number
-            && BodyMotion.Of(number) is { } known
+        // 서버가 아직 한 번도 답하지 않았으면 미리 그리지 않는다 — 공통 휘두르기를 짐작해 그리면 무도가가 로그인 뒤
+        // 첫 평타를 휘둘렀다(2026-09-25). 그 한 번은 답이 오면 Swings 가 그린다.
+        if (_ownBlow.Swung(System.TimeSpan.FromMilliseconds(Time.GetTicksMsec())))
+        {
+            DrawOwnBlow(_ownBlow.Number ?? 1, _ownBlow.Speed);
+        }
+
+        _ = server?.AttackAsync(_leaving.Token);
+    }
+
+    /// <summary>Our own blow in the motion given — a class motion only in clothes skill.tbl lists for it, else the plain swing.</summary>
+    private void DrawOwnBlow(int number, int speed)
+    {
+        BodyMotion blow = BodyMotion.Of(number) is { } known
             && server is { } world
             && BodyMotion.Fits(number, ArmourOf(world, world.Serial))
             ? known
             : BodyMotion.Blow;
-        _player.Play(blow, blow.SecondsPerFrame(_ownBlow.Speed));
-        _ownBlow.Swung(System.TimeSpan.FromMilliseconds(Time.GetTicksMsec()));
-
-        _ = server?.AttackAsync(_leaving.Token);
+        _player.Play(blow, blow.SecondsPerFrame(speed));
     }
 
     /// <summary>
@@ -1162,6 +1171,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
+        _ownBlow.Other();
         _ = server?.UseSkillAsync(slot, _leaving.Token);
     }
 
@@ -1173,6 +1183,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
+        _ownBlow.Other();
         _ = server?.UseSpellAsync(slot, target, _leaving.Token);
     }
 
@@ -1483,9 +1494,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     {
         while (server is { } world && world.TakeMotion(out Motion? motion))
         {
-            if (motion.Serial == world.Serial)
+            // 미리 그리지 않은 평타(로그인 뒤 첫 번)는 답이 왔을 때 그린다.
+            if (motion.Serial == world.Serial
+                && _ownBlow.Heard(motion.Number, motion.Speed, System.TimeSpan.FromMilliseconds(Time.GetTicksMsec())))
             {
-                _ownBlow.Heard(motion.Number, motion.Speed, System.TimeSpan.FromMilliseconds(Time.GetTicksMsec()));
+                DrawOwnBlow(motion.Number, motion.Speed);
+                continue;
             }
 
             if ((motion.Serial == world.Serial && motion.Number == 1) || Someone(world, motion.Serial) is not { } actor)
