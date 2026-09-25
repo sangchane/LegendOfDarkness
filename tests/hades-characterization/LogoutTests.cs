@@ -1,4 +1,5 @@
 using System.Net;
+using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.World;
 using Xunit;
@@ -64,6 +65,38 @@ public sealed class LogoutTests : IDisposable
         await watcher.RefreshAsync(_deadline.Token);
         await Waiting.Until(() => watcher.State is not null, "가만히 선 사람이 세계에서 떨어졌습니다.", _deadline.Token);
         Assert.True(took >= TimeSpan.FromSeconds(10), $"조용해진 지 {took.TotalSeconds:0.0}초 만에 뺐습니다 — 한 번 늦은 심장박동으로 빼면 안 됩니다.");
+    }
+
+    /// <summary>
+    /// 사용자(2026-09-24): "케릭터들 종료하고 다른 케릭터 들어가면 같은 위치인거 같던데". 나간 캐릭터의 자리는 그 캐릭터의
+    /// 것이다 — 다음에 들어온 다른 캐릭터는 제 자리에 서고, 나갔던 캐릭터는 다시 들어오면 걸어간 자리에 선다.
+    /// </summary>
+    [Fact]
+    public async Task The_next_character_does_not_take_the_place_the_last_one_logged_out_at()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        (WorldClient first, WorldSession firstSession) = await Enter(server, "placefirst");
+        Tile start = first.State!.Where;
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+        await first.WalkAsync(Direction.East, _deadline.Token);
+        await Task.Delay(TimeSpan.FromMilliseconds(600), _deadline.Token);
+        await first.WalkAsync(Direction.East, _deadline.Token);
+        await first.RefreshAsync(_deadline.Token);
+        Tile walked = new(start.X + 2, start.Y);
+        await Waiting.Until(() => first.State?.Where == walked, "첫 캐릭터가 두 칸 걷지 못했습니다.", _deadline.Token);
+        await first.LogOutAsync(_deadline.Token);
+        Assert.True(firstSession.IsDisposed);
+
+        (WorldClient second, WorldSession secondSession) = await Enter(server, "placesecond");
+        Assert.Equal(start, second.State!.Where);
+        await second.LogOutAsync(_deadline.Token);
+        Assert.True(secondSession.IsDisposed);
+
+        (WorldClient again, WorldSession againSession) = await Enter(server, "placefirst");
+        using WorldSession _ = againSession;
+        Assert.Equal(walked, again.State!.Where);
     }
 
     /// <summary>서버가 심장박동에 답이 없는 접속을 빼는 한도(GameClient.IdleLimit).</summary>
