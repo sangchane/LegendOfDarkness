@@ -107,12 +107,15 @@ public partial class PotionChip : Button
         }
     }
 
-    /// <summary>Off, or none left: the picture greys. The word or the number says which — colour is not the only sign.</summary>
+    /// <summary>
+    /// Off: the picture greys. On stays bright even with none left (사용자 2026-09-25: "활성화 상태면 흐리지 않게") —
+    /// then the word says so instead.
+    /// </summary>
     private void Show(PotionRule rule, int count)
     {
         Icon = ItemIcons.For(IconOf(rule.Potion));
-        Modulate = rule.Enabled && count > 0 ? Colors.White : new Color(1, 1, 1, 0.45f);
-        _line.Text = rule.Enabled ? $"{rule.Percent}%" : "끔";
+        Modulate = rule.Enabled ? Colors.White : new Color(1, 1, 1, 0.45f);
+        _line.Text = !rule.Enabled ? "끔" : count > 0 ? $"{rule.Percent}%" : "없음";
         TooltipText = $"{rule.Potion} {count}개";
     }
 
