@@ -6,8 +6,14 @@
   아이폰 앱이 맥 서버에 **닿지 않았다.** 무료로 쓸 수 있는 클라우드(예: Oracle Cloud Always Free Arm VM 등 — 후보를 비교해
   고른다)에 Hades 서버(.NET 9, `Staging/net9.0` · 포트 2610 로그인 · 2615 게임 · `LoruleConfig`·`MServerTable` 주소를 공인 IP 로)를
   올리고, 캐릭터 저장(`database/server/aislings`)·백업을 옮기고, 앱의 `mobile/client/server.cfg` 를 공인 주소로 바꿔 설치한다.
-  **지금 상태**: 서버 설정과 아이폰 앱이 192.0.0.2 로 되어 있다(예전 값 192.168.0.8 — 집 Wi-Fi 로 돌아가면
-  `LOD_SERVER_IP=<맥 주소> scripts/lod-server.sh config` + `server.cfg` 바꿔 다시 설치).
+  **지금 상태(2026-09-24 밤)**: 테더링이 안 된 까닭은 SKT 테더링이 **IPv6 전용**이라서였다(맥의 192.0.0.x 는 가짜 IPv4).
+  서버가 IPv6 로도 듣고, 앱은 로그인한 주소로 로비·게임을 따라가게 고쳤다(시험 ::1 통과 · 맥 IPv6 로 2610 열림 · 폰 확인 전). 네트워크가 바뀌면
+  `scripts/lod-server.sh config` 한 번(테더링이면 맥 IPv6, 와이파이면 IPv4 를 서버 설정·`server.cfg` 에 넣는다) →
+  `scripts/ios-build.sh install`. 클라우드: Oracle 오사카 가입 끝, ARM 자리가 없어("Out of capacity") 서버는 아직 —
+  만들면 `LOD_CLOUD_IP=<공인 IP> scripts/cloud-server.sh setup`(열쇠 `~/.ssh/lod_oracle`).
+- **[끝남/2026-09-24 밤 — 폰 확인 전]** 우드랜드 나머지 13맵(입구·1-2·1-3·2-1~6-1·14-1·10-1·11-1·(진) 둘) 그림을 앱에 넣었다
+  (입구가 "깨져" 보인 까닭 — 그림이 1-1 뿐이었다). 로그아웃한 자리가 사라지던 것: 서버가 마지막 저장 2초 안이면 나갈 때 저장을
+  건너뛰었다 → 늘 저장(`LogoutTests.The_next_character_does_not_take_the_place_the_last_one_logged_out_at`). 서버 반영·앱 설치 끝.
 - **[끝남/2026-09-24 오후]** 로그아웃 0x0B · 심장박동 30초로 끊긴 캐릭터 빼기 · 유령 그림(원작 몸 002) · 되살면 장비 다시 그림 ·
   맵 옮기면 지난 괴물 지움(마을 좀비·맵 밖 괴물의 원인) · 괴물 수 ×0.7 · 모션·걷기 30% 느리게 · 입장 레벨 표시 · 피해·회복 숫자(0x5D) ·
   [종료] 선택 · 새 무도가(이형환위·붕각·단각·쿠로토) · 혼수 규칙(무리 없으면 바로 뮤레칸, 혼수 중 무적) · 글자 입력·스크롤 ·
