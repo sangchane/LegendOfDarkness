@@ -15,6 +15,22 @@ namespace Lod.Mobile.Core.Art;
 /// </remarks>
 public sealed record EffectSheet(int Frames, int Wide, int Tall, int AnchorX, int AnchorY, IReadOnlyList<int> Order)
 {
+    /// <summary>
+    /// Where the anchor goes, from the feet of the figure it lands on. Not on the feet: the original lays an effect
+    /// canvas on the figure the way it lays a weapon's 111x85 canvas on the 57x85 wardrobe canvas — centred, same
+    /// top — and every EPF effect keeps its anchor at the canvas middle, 15 above the bottom (effects.txt: 55,70 on
+    /// 111x85, 28,70 on 57x85, 55,97 on 111x112). So the anchor is wardrobe point (28,70), which the wardrobe cell
+    /// puts at (30,72) (dat-extract pose draws the canvas 2,2 in) against feet at (31.5,83) (Actor.Sheet.Walk).
+    /// On the feet it was 11 too low: 쿠로토's ring turned round the knees, not the body (사용자, 2026-09-24).
+    /// </summary>
+    public static readonly (float X, float Y) AnchorFromFeet = (30 - 31.5f, 72 - 83f);
+
+    /// <summary>
+    /// How long each step is held. The server's speed is that interval in milliseconds (the original re-arms its timer
+    /// per frame, 4.51 0x483870), kept to 30~300. 쿠로토's slower ring is the server's to say (Pack599 쿠로토, 117).
+    /// </summary>
+    public static double SecondsPerStep(int speed) => Math.Clamp(speed, 30, 300) / 1000.0;
+
     /// <summary>How many steps the effect lasts.</summary>
     public int Steps => Order.Count > 0 ? Order.Count : Frames;
 

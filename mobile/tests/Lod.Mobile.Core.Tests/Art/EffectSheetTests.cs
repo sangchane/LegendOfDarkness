@@ -60,4 +60,28 @@ public sealed class EffectSheetTests
     {
         Assert.Equal([203, 102, 7], EffectSheet.Read(Written).Keys);
     }
+
+    [Fact]
+    public void The_anchor_lands_on_the_wardrobe_canvas_not_on_the_feet()
+    {
+        // 쿠로토의 링(efct004, 111x85, 기준 55,70) — 그려진 링의 가운데는 기준점에서 (-1.5, -22).
+        // 사람 그림(hero-walk 0칸, 120x96 칸, 발 31.5,83)의 그려진 몸은 x 20~39 · y 24~77, 가운데는 발에서 (-2, -32.5).
+        // 기준점을 발에 두면 링이 무릎께(-22)에 돈다 — "핀트가 안 맞는다"(사용자, 2026-09-24).
+        (float x, float y) = EffectSheet.AnchorFromFeet;
+        (float ringX, float ringY) = (x - 1.5f, y - 22f);
+
+        Assert.InRange(ringX, -2f - 1.5f, -2f + 1.5f);
+        Assert.InRange(ringY, -32.5f - 1.5f, -32.5f + 1.5f);
+
+        // 일음지(efct042)의 반짝임은 기준점에서 48 위가 가장 아래 줄 — 머리 꼭대기(발에서 -59) 께에 선다.
+        Assert.InRange(y - 48f, -59f - 1f, -59f + 1f);
+    }
+
+    [Fact]
+    public void A_step_is_held_as_long_as_the_server_says_within_bounds()
+    {
+        Assert.Equal(0.117, EffectSheet.SecondsPerStep(117), 6);
+        Assert.Equal(0.03, EffectSheet.SecondsPerStep(1), 6);
+        Assert.Equal(0.3, EffectSheet.SecondsPerStep(1000), 6);
+    }
 }

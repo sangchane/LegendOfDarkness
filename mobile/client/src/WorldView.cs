@@ -1838,6 +1838,13 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
+        // 쿠로토 — 서버가 보내는 그대로(쓴 쪽 그림 4, 속도 117)를 매초 내게 그린다. 링이 몸에 겹치는지 찍어 본다.
+        if (Main.Overhead == "kuroto")
+        {
+            Show(4, _player.Position, 117, _player);
+            return;
+        }
+
         Ailment[] many = [new(3, 6), new(12, 1), new(27, 4), new(40, 2), new(55, 5), new(82, 3), new(101, 6)];
         List<Actor> others = [.. _camera.GetChildren().OfType<Actor>().Where(actor => actor != _player)];
         Actor? person = others.Find(actor => actor.DisplayName == "주모");
