@@ -135,6 +135,12 @@ public partial class PotionChip : Button
         {
             int count = AutoPotion.Count(_pack(), potion.Name);
 
+            // 가방에 있는 것만 고르게 한다(사용자 2026-09-25: "갖고 있는 것만 … 너무 많이 나올 필요 없다").
+            if (count == 0)
+            {
+                continue;
+            }
+
             Button choice = new()
             {
                 Icon = ItemIcons.For(potion.Icon),
@@ -144,7 +150,6 @@ public partial class PotionChip : Button
                 Text = count.ToString(),
                 TooltipText = potion.Name,
                 CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum + 16),
-                Modulate = count > 0 ? Colors.White : new Color(1, 1, 1, 0.45f),
             };
 
             Greybox.Plain(choice);
@@ -163,6 +168,11 @@ public partial class PotionChip : Button
             };
 
             row.AddChild(choice);
+        }
+
+        if (row.GetChildCount() == 0)
+        {
+            row.AddChild(new Label { Text = "가진 포션이 없습니다" });
         }
 
         _picker.AddChild(row);
