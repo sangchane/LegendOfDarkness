@@ -15,8 +15,8 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 /// <remarks>
 /// 워프 자체는 첫 워프 이식(하데스 04f49d3e2) 때 들어왔지만 레벨 칸을 버렸다 — 5.99 줄 끝 두 칸이 들어오는 레벨
-/// 범위다. 아벨해안은 **51~80**(해안 안쪽 128줄과 아벨마을에서 들어가는 2줄), 대기실에서 아벨마을로 나가는 2줄은
-/// 51~99 다(99 는 제한 없음). 다른 아벨 줄은 모두 0~99 라 그대로다.
+/// 범위다. 5.99 는 아벨해안 130여 줄 모두에 51~80 을 걸었지만, **입구(아벨마을 → 대기실) 2줄에만** 건다 —
+/// 사용자 2026-09-25 "입구에만 걸어 두면 돼"(안쪽에서 81 이 되어도 해안 안을 다닐 수 있다). 나머지는 제한이 없다.
 /// </remarks>
 [Collection(TimedCollection.Name)]
 public sealed class AbelCoastTests : IDisposable
@@ -31,9 +31,9 @@ public sealed class AbelCoastTests : IDisposable
 
     public void Dispose() => _deadline.Dispose();
 
-    /// <summary>아벨해안에 닿는 5.99 줄마다 같은 칸·같은 목적지의 워프가 있고, 레벨 범위가 5.99 그대로다.</summary>
+    /// <summary>아벨해안에 닿는 5.99 줄마다 같은 칸·같은 목적지의 워프가 있고, 입구 두 줄만 5.99 의 레벨 범위를 갖는다.</summary>
     [Fact]
-    public void Every_abel_coast_warp_carries_the_599_level_range()
+    public void Every_abel_coast_warp_exists_and_only_the_entrance_carries_the_599_level_range()
     {
         string server = HadesWorkspace.ServerDataDirectory;
         Dictionary<string, int> ids = AreaIds(server);
@@ -70,9 +70,12 @@ public sealed class AbelCoastTests : IDisposable
             int required = warp["LevelRequired"]?.GetValue<int>() ?? 0;
             int maximum = warp["LevelMaximum"]?.GetValue<int>() ?? 0;
 
-            if (required != Math.Max(1, low) || maximum != (high < 99 ? high : 0))
+            bool entrance = from.StartsWith("아벨마을", StringComparison.Ordinal) && to.StartsWith("아벨해안대기실", StringComparison.Ordinal);
+            (int wantLow, int wantHigh) = entrance ? (Math.Max(1, low), high < 99 ? high : 0) : (1, 0);
+
+            if (required != wantLow || maximum != wantHigh)
             {
-                wrong.Add($"{from}({key.Item2},{key.Item3}) → {to}: {required}~{maximum} (5.99 는 {low}~{high})");
+                wrong.Add($"{from}({key.Item2},{key.Item3}) → {to}: {required}~{maximum} (바랐던 것 {wantLow}~{wantHigh}, 5.99 는 {low}~{high})");
             }
         }
 
