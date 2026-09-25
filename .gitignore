@@ -52,11 +52,14 @@ data/server-packs/vault/
 #   data/archives-vault/            아카이브 503표      (scripts/build-archive-vault.py)
 #   data/game-data/vault-abilities/ 원작 기술·마법 613   (scripts/build-ability-vault.py)
 #   data/ui-vault/                  원작 4.51 UI 와 테마 규칙 (scripts/build-ui-vault.py)
+#   data/drop-vault/                사냥터·괴물·아이템 드랍표 (scripts/build-drop-vault.py)
 data/server-packs/graph/
 # 역어셈블 그래프 — data/disassembly/findings.json 에서 언제든 다시 만든다 (scripts/build-disassembly-graph.py)
 data/disassembly/graph/
 # UI 테마 그래프 — data/original-ui/451.json 에서 언제든 다시 만든다 (scripts/build-ui-graph.py)
 data/original-ui/graph/
+# 드랍 그래프 — 괴물·아이템 템플릿에서 언제든 다시 만든다 (scripts/build-drop-vault.py --그래프)
+data/drop-vault/graph/
 
 # 2023 workbook JSON에서 언제든 다시 만드는 Graphify 산출물
 data/skill-spell-2023/graph/
