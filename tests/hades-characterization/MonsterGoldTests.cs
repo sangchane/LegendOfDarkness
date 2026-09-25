@@ -103,7 +103,7 @@ public sealed class MonsterGoldTests : IDisposable
 
         long before = Mine(world).Gold;
 
-        await SwingUntil(world, enough: () => Mine(world).Gold > before);
+        await KillAndPickUp(world, before);
 
         long paid = Mine(world).Gold - before;
         (long low, long high) = GoldRangeFor(exp);
@@ -133,7 +133,7 @@ public sealed class MonsterGoldTests : IDisposable
         await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
 
         long before = Mine(world).Gold;
-        await SwingUntil(world, enough: () => Mine(world).Gold > before);
+        await KillAndPickUp(world, before);
 
         long paid = Mine(world).Gold - before;
         (long low, long high) = GoldRangeFor(exp);
@@ -152,7 +152,7 @@ public sealed class MonsterGoldTests : IDisposable
         await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
 
         long beforeSmall = Mine(smallWorld).Gold;
-        await SwingUntil(smallWorld, enough: () => Mine(smallWorld).Gold > beforeSmall);
+        await KillAndPickUp(smallWorld, beforeSmall);
         long paidSmall = Mine(smallWorld).Gold - beforeSmall;
 
         (WorldClient bigWorld, _) = await Enter(target => target["Exp"] = 40000);
@@ -161,7 +161,7 @@ public sealed class MonsterGoldTests : IDisposable
         await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
 
         long beforeBig = Mine(bigWorld).Gold;
-        await SwingUntil(bigWorld, enough: () => Mine(bigWorld).Gold > beforeBig);
+        await KillAndPickUp(bigWorld, beforeBig);
         long paidBig = Mine(bigWorld).Gold - beforeBig;
 
         Assert.True(paidBig > paidSmall,
@@ -186,12 +186,58 @@ public sealed class MonsterGoldTests : IDisposable
         await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
 
         long before = Mine(world).Gold;
-        await SwingUntil(world, enough: () => Mine(world).Gold > before);
+        await KillAndPickUp(world, before);
 
         Assert.True(TryReadExperienceGain(world, out int gained),
             $"\"경험치가 N 올랐습니다\" 알림을 못 받았습니다. {Said(world)}");
         Assert.Equal(exp, gained);
     }
+
+    /// <summary>
+    /// 사용자(2026-09-25, 아이폰) — "금전은 왜 드랍 안 돼". 잡으면 금화는 **쓰러진 자리 바닥에 보여야** 한다.
+    /// 서버가 들고 있던 <c>AUTO LOOT GOLD</c>(모든 캐릭터가 켠 채로 시작)가 바닥 금화를 보여 주기도 전에
+    /// 지갑에 넣어 버려(<c>ObjectComponent</c>) 앱에는 금화가 한 번도 떨어지지 않았다. 앱에는 제 줍기
+    /// (밟으면 줍는 <c>Main.AutoLoot</c>)가 따로 있다 — 서버가 대신 줍지 않는다.
+    /// </summary>
+    [Fact]
+    public async Task A_kill_leaves_its_gold_lying_where_the_monster_fell_until_picked_up()
+    {
+        const int exp = 2000;
+
+        (WorldClient world, _) = await Enter(target => target["Exp"] = exp);
+
+        await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "문 앞에 괴물이 서지 않았습니다.");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+
+        Vitals before = Mine(world);
+        await SwingUntil(world, enough: () => Mine(world).Experience > before.Experience);
+
+        Assert.True(Mine(world).Experience > before.Experience, $"괴물을 끝내지 못했습니다. {Said(world)}");
+
+        await Until(() => CoinsAt(world, TargetTile) is not null,
+            $"괴물이 쓰러진 {TargetTile} 에 금화가 보이지 않습니다 — 금전 {Mine(world).Gold - before.Gold}전이 " +
+            $"이미 지갑에 들어와 있습니다. 보이는 것 [{string.Join(", ", world.Creatures.Select(c => $"{c.Kind}:{c.Sprite}@{c.Where}"))}]. " +
+            $"{Said(world)}");
+
+        Assert.Equal(before.Gold, Mine(world).Gold);
+
+        await world.PickUpAsync(TargetTile, _deadline.Token);
+        await Until(() => Mine(world).Gold > before.Gold, "바닥 금화를 주웠는데 지갑이 그대로입니다.");
+
+        long paid = Mine(world).Gold - before.Gold;
+        (long low, long high) = GoldRangeFor(exp);
+        Assert.True(paid >= low && paid <= high, $"주운 금화 {paid}전 — {low}~{high} 안이어야 합니다.");
+        Assert.Null(CoinsAt(world, TargetTile));
+    }
+
+    /// <summary>
+    /// <c>MoneySprites</c>(0x89~0x8E) 에 <c>Money.Create</c> 가 0x8000 을 더한 그림 번호 — 앱은 이 번호로
+    /// <c>assets/item/32905~32910.png</c> 를 그린다.
+    /// </summary>
+    private static Creature? CoinsAt(WorldClient world, Tile tile) =>
+        world.Creatures.FirstOrDefault(c =>
+            c.Kind == CreatureKind.Passable && c.Where == tile && c.Sprite is >= 0x8089 and <= 0x808E);
 
     /// <summary>서버가 보낸 0x0A 줄 중 "경험치가 N 올랐습니다" 를 찾아 N을 읽는다. 없으면 false.</summary>
     private static bool TryReadExperienceGain(WorldClient world, out int amount)
@@ -288,6 +334,19 @@ public sealed class MonsterGoldTests : IDisposable
         _ = world.PumpAsync(_deadline.Token);
         await Until(() => world.State is not null && world.Vitals is not null, "세계에 들어가지 못했습니다.");
         return (world, server);
+    }
+
+    /// <summary>
+    /// 한 마리를 끝내고, 쓰러진 자리에 놓인 금화를 줍는다. 금화는 저절로 지갑에 들어오지 않는다 —
+    /// 바닥에 보이고, 주워야 들어온다(<see cref="A_kill_leaves_its_gold_lying_where_the_monster_fell_until_picked_up" />).
+    /// </summary>
+    private async Task KillAndPickUp(WorldClient world, long goldBefore)
+    {
+        long experienceBefore = Mine(world).Experience;
+        await SwingUntil(world, enough: () => Mine(world).Experience > experienceBefore);
+        await Until(() => CoinsAt(world, TargetTile) is not null, $"쓰러진 자리에 금화가 없습니다. {Said(world)}");
+        await world.PickUpAsync(TargetTile, _deadline.Token);
+        await Until(() => Mine(world).Gold > goldBefore, $"금화를 주웠는데 지갑이 그대로입니다. {Said(world)}");
     }
 
     private async Task SwingUntil(WorldClient world, Func<bool> enough)

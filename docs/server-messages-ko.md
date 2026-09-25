@@ -12,7 +12,7 @@
 
 | 무엇 | 어디 | 까닭 |
 |---|---|---|
-| 사용자 설정 글자 `AUTO LOOT GOLD: Toggle` · `Loot Mode` · `PVP` | `LoruleConfig` `Settings` | 글자가 곧 열쇠다 — `ObjectComponent.cs:83` 이 `"AUTO LOOT GOLD"` 를 찾아 금전 자동 줍기를 켠다. 캐릭터 저장에도 그 글자로 남는다 |
+| 사용자 설정 글자 `AUTO LOOT GOLD: Toggle` · `Loot Mode` · `PVP` | `LoruleConfig` `Settings` | 캐릭터 설정 창에 뜨는 글자일 뿐, 2026-09-25 부터 금전 자동 줍기는 하지 않는다(`ObjectComponent.cs` — 금화는 바닥에 보여 주고 앱이 줍는다). 캐릭터 저장에도 그 글자로 남는다 |
 | `HandShakeMessage` `CAN WE ALL GET ALONG` | `LoruleConfig` | 접속 규약의 일부 |
 | 운영자 명령 결과 (`Port: Success.` · `spawnMonster` · `OnLearnSpell: True` …) · `[System]:` 방송 | `GameClientAPI.cs` · `Commander.cs` · `PingComponent.cs` | 운영자·개발용 |
 | 배우기 조건 문구 (`LearningPredicate.cs`) | `Types/LearningPredicate.cs` | 하데스 스승 스크립트(`LearnSkills` · `GrandMaster01`)만 쓰는데, 세상에 선 NPC 는 모두 팩 스크립트라 닿지 않는다 |

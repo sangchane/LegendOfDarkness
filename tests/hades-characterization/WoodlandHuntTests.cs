@@ -29,10 +29,10 @@ namespace Lod.Hades.Characterization.Tests;
 /// <para>
 /// Gold is a separate claim because it travels a different road, and not the road the code first suggests.
 /// <c>GenerateGold</c> does lay it on the floor where the body stood, and picking a thing up is otherwise
-/// something a player has to ask for by naming the exact tile. But gold never waits to be asked: every
-/// player carries an <c>AUTO LOOT GOLD</c> game setting, it is on from the start, and
-/// <c>ObjectComponent</c> hands the pile over the moment it comes into view. So a kill pays gold straight
-/// into the purse, and this watches the purse rather than the floor.
+/// something a player has to ask for by naming the exact tile. Gold used to skip that: an
+/// <c>AUTO LOOT GOLD</c> setting, on for everyone, had <c>ObjectComponent</c> hand the pile over before it was
+/// ever shown, so gold never appeared on the floor (user, 2026-09-25). Now it lies there like anything else and
+/// this picks it up around the body before reading the purse.
 /// </para>
 /// </remarks>
 [Collection(TimedCollection.Name)]
@@ -206,9 +206,10 @@ public sealed class WoodlandHuntTests : IDisposable
 
         Vitals before = Mine(world);
 
-        // 금화까지 기다린다. 정의가 적은 확률이 30% 라(5.99 `골드 50 30`) 한 마리로는 열에 일곱이
-        // 빈손이다 — 경험치에서 멈추면 시험이 동전 던지기가 된다.
-        await SwingUntil(world, enough: () => Mine(world).Gold > before.Gold);
+        // 금화는 쓰러진 자리 바닥에 놓인다 — 서버가 대신 줍지 않는다(2026-09-25). 한 마리를 끝내고 줍는다.
+        await SwingUntil(world, enough: () => Mine(world).Experience > before.Experience);
+        await PickUpAroundTheBody(world);
+        await Until(() => Mine(world).Gold > before.Gold, "쓰러진 자리의 금화를 줍지 못했습니다.", seconds: 10);
 
         Vitals after = Mine(world);
         long paid = after.Experience - before.Experience;
