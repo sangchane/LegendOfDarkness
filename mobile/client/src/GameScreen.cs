@@ -813,7 +813,8 @@ public partial class GameScreen : Control
         ShowTarget();
         _abilities.Show(
             _server?.Skills ?? LayoutCheck.PretendSkills,
-            _server?.Spells ?? LayoutCheck.PretendSpells);
+            _server?.Spells ?? LayoutCheck.PretendSpells,
+            _server?.Self?.Name ?? string.Empty);
 
         if (_server is { } talking && talking.TalkCount != _talked)
         {
@@ -1644,6 +1645,8 @@ public partial class GameScreen : Control
         _abilities.Cooling = (skill, slot) => _server?.CoolingFor(skill, slot) ?? 0;
         _abilities.SkillUsed += slot => _world.UseSkill(slot);
         _abilities.SpellUsed += slot => UseSpell(slot);
+        _abilities.LoadSlots = Main.LoadAbilitySlots;
+        _abilities.SaveSlots = Main.SaveAbilitySlots;
 
         // One tap is one blow. It does not chase and it does not repeat — the server decides whether it
         // landed, and says so in words we show below rather than guessing at damage here.

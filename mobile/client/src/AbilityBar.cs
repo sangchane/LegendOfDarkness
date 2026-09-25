@@ -33,6 +33,28 @@ public sealed partial class AbilityBar : Control
     private IReadOnlyList<LearnedSkill> _learnedSkills = [];
     private IReadOnlyList<LearnedSpell> _learnedSpells = [];
 
+    // 0.5초 길게 누르면 배치 목록을 연다(사용자 요청, 2026-09-25) — 뗄 때 쓰는 지금 방식(action_mode 기본값)이라
+    // 길게 눌림이 잡히면 Use()에서 취소한다. 짧게 누르면 그대로 뗄 때 바로 쓰여 늦어지지 않는다.
+    private const ulong HoldMilliseconds = 500;
+    private readonly ulong[] _downAt = new ulong[AbilityFan.PerPage];
+    private readonly bool[] _down = new bool[AbilityFan.PerPage];
+    private readonly bool[] _longHeld = new bool[AbilityFan.PerPage];
+    private int _rehearsedHold; // --slot-hold: 손 없이 확인할 때 프레임을 센다.
+
+    // 슬롯 배치(사용자 요청) — 캐릭터 이름별로 기기 안에 저장한다(Main.LoadAbilitySlots/SaveAbilitySlots).
+    private AbilityArrangement _skillArrangement = new();
+    private AbilityArrangement _spellArrangement = new();
+    private string _loadedFor = string.Empty;
+    private readonly PopupPanel _picker = new();
+    private readonly VBoxContainer _pickerList = new();
+    private readonly ScrollContainer _pickerScroll = new();
+
+    /// <summary>Given a character's name, the saved lines for their slots (empty if none yet).</summary>
+    public Func<string, IEnumerable<string>>? LoadSlots { get; set; }
+
+    /// <summary>Given a character's name and the lines to keep, saves the slot arrangement.</summary>
+    public Action<string, IReadOnlyList<string>>? SaveSlots { get; set; }
+
     /// <summary>One tap is one blow — see <see cref="WorldView.Strike" />.</summary>
     /// <summary>
     /// 공격 단추. 시안에서 유일하게 돌로 남긴 조작이다 — 창의 확정 단추와 같은 자리다(data/ui-vault 안C).
@@ -74,7 +96,11 @@ public sealed partial class AbilityBar : Control
             Button slot = Disc(string.Empty, AbilityFan.ButtonSide);
             slot.ExpandIcon = true;
             slot.IconAlignment = HorizontalAlignment.Center;
-            slot.Disabled = true;
+
+            // 칸을 계속 눌러 둘 수 있어야 길게 눌러 배치를 바꿀 수 있다 — 빈 칸·식는 중에도 배치는 바꿀 수 있어야
+            // 하므로, "쓸 수 있나"는 더는 Disabled 가 아니라 Use() 안에서 가린다(아래).
+            slot.ButtonDown += () => OnSlotDown(which);
+            slot.ButtonUp += () => OnSlotUp(which);
             slot.Pressed += () => Use(which);
 
             _slots[index] = slot;
@@ -95,6 +121,14 @@ public sealed partial class AbilityBar : Control
             _waits[index] = waiting;
             slot.AddChild(waiting);
         }
+
+        // 길게 누르면 뜨는 배치 목록 — 목록 밖을 누르면 닫힌다(PopupPanel 기본 동작). 돌을 쓰지 않는 목록이다
+        // (docs/original-ui-451.md: "돌을 안 쓰는 곳 — 목록").
+        _pickerList.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        _pickerScroll.CustomMinimumSize = new Vector2(PickerWidth, 0);
+        _pickerScroll.AddChild(_pickerList);
+        _picker.AddChild(_pickerScroll);
+        AddChild(_picker);
     }
 
     /// <summary>
@@ -116,13 +150,42 @@ public sealed partial class AbilityBar : Control
 
             _waits[index].Visible = left > 0;
             _waits[index].Text = left > 0 ? left.ToString() : string.Empty;
-            _slots[index].Disabled = slot == 0 || left > 0;
+
+            // 0.5초를 채우면 길게 누른 것으로 치고 배치 목록을 연다. 빈 칸·식는 중에도 열려야 하므로 여기서는
+            // Disabled 를 보지 않는다(짧게 눌렀을 때 쓰는지는 Use() 가 가린다).
+            if (_down[index] && !_longHeld[index] && Time.GetTicksMsec() - _downAt[index] >= HoldMilliseconds)
+            {
+                _longHeld[index] = true;
+                OpenPicker(index);
+            }
+        }
+
+        // --slot-hold N: 서버 없이 확인할 때, 자리를 잡고 잠시 뒤 N번째 칸을 길게 누른 셈 친다.
+        if (Main.SlotHold > 0 && Main.SlotHold <= _slots.Length && !_longHeld[Main.SlotHold - 1] && ++_rehearsedHold == 90)
+        {
+            _longHeld[Main.SlotHold - 1] = true;
+            OpenPicker(Main.SlotHold - 1);
         }
     }
 
-    /// <summary>Redraws the page only when what is on it has changed, so loading textures is not a per-frame job.</summary>
-    public void Show(IReadOnlyList<LearnedSkill> skills, IReadOnlyList<LearnedSpell> spells)
+    /// <summary>
+    /// Redraws the page only when what is on it has changed, so loading textures is not a per-frame job. The
+    /// character's name (once known) picks which saved slot arrangement to read, one time.
+    /// </summary>
+    public void Show(IReadOnlyList<LearnedSkill> skills, IReadOnlyList<LearnedSpell> spells, string character = "")
     {
+        if (character.Length > 0 && character != _loadedFor)
+        {
+            _loadedFor = character;
+            _skillArrangement = new AbilityArrangement();
+            _spellArrangement = new AbilityArrangement();
+
+            if (LoadSlots?.Invoke(character) is { } lines)
+            {
+                AbilitySlotSave.Parse(lines, _skillArrangement, _spellArrangement);
+            }
+        }
+
         _learnedSkills = skills;
         _learnedSpells = spells;
         Redraw();
@@ -133,7 +196,12 @@ public sealed partial class AbilityBar : Control
         int learned = _spells ? _learnedSpells.Count : _learnedSkills.Count;
         _page = AbilityFan.Kept(_page, learned);
 
-        object?[] page = _spells ? [.. AbilityFan.Page(_learnedSpells, _page)] : [.. AbilityFan.Page(_learnedSkills, _page)];
+        int capacity = AbilityFan.Pages(learned) * AbilityFan.PerPage;
+
+        object?[] page = _spells
+            ? [.. Slice(_spellArrangement.Fill(_learnedSpells, spell => spell.Slot, capacity), _page)]
+            : [.. Slice(_skillArrangement.Fill(_learnedSkills, skill => skill.Slot, capacity), _page)];
+
         string pages = $"{_page + 1}/{AbilityFan.Pages(learned)}";
 
         if (_drawnSpells == _spells && _drawnPage == pages && page.SequenceEqual(_drawn))
@@ -159,13 +227,16 @@ public sealed partial class AbilityBar : Control
             };
 
             _slots[index].TooltipText = name;
-            _slots[index].Disabled = icon is null;
 
-            // 빈 칸은 자리만 알린다. 배운 것이 적으면 짙은 원 다섯이 바닥을 가렸다.
+            // 빈 칸은 자리만 알린다. 배운 것이 적으면 짙은 원 다섯이 바닥을 가렸다. 더는 Disabled 로 가리지
+            // 않는다 — 빈 칸도 길게 누르면 배치를 받아야 한다(위 _Process, Use() 참고).
             _slots[index].Modulate = icon is null ? new Color(1, 1, 1, 0.4f) : Colors.White;
             _slots[index].Icon = icon is { } frame ? Frame(_spells ? SpellSheet : SkillSheet, frame) : null;
         }
     }
+
+    private static IEnumerable<T?> Slice<T>(IReadOnlyList<T?> all, int page) =>
+        all.Skip(page * AbilityFan.PerPage).Take(AbilityFan.PerPage);
 
     /// <summary>Presses one slot from outside — for a run with nobody watching (<c>--skill 1</c>, <c>--skill m1</c> for a spell).</summary>
     public void Press(int index, bool spell = false)
@@ -177,14 +248,43 @@ public sealed partial class AbilityBar : Control
             Redraw();
         }
 
-        if (index >= 0 && index < _slots.Length && !_slots[index].Disabled)
+        if (index >= 0 && index < _slots.Length)
         {
             Use(index);
         }
     }
 
+    private void OnSlotDown(int index)
+    {
+        _down[index] = true;
+        _longHeld[index] = false;
+        _downAt[index] = Time.GetTicksMsec();
+    }
+
+    private void OnSlotUp(int index) => _down[index] = false;
+
     private void Use(int index)
     {
+        // 길게 눌러 배치 목록이 이미 열렸으면, 손을 뗄 때 오는 이 누름은 취소한다 — 길게 누른 것은 쓰지 않는다.
+        if (_longHeld[index])
+        {
+            _longHeld[index] = false;
+            return;
+        }
+
+        int slot = _drawn[index] switch
+        {
+            LearnedSkill skill => skill.Slot,
+            LearnedSpell spell => spell.Slot,
+            _ => 0
+        };
+
+        // 빈 칸, 또는 식는 중 — 예전에는 Disabled 가 막았지만 이제 그 칸도 길게 누를 수 있어야 해서 여기서 가린다.
+        if (slot == 0 || (Cooling is { } ask && ask(!_drawnSpells, slot) > 0))
+        {
+            return;
+        }
+
         switch (_drawn[index])
         {
             case LearnedSkill skill:
@@ -194,6 +294,127 @@ public sealed partial class AbilityBar : Control
                 SpellUsed?.Invoke(spell.Slot);
                 break;
         }
+    }
+
+    /// <summary>What the bar is showing at a given (page, index) position of one kind, regardless of which tab is open now.</summary>
+    private int? DisplayedSlotAt(bool spells, int position)
+    {
+        int learned = spells ? _learnedSpells.Count : _learnedSkills.Count;
+        int capacity = AbilityFan.Pages(learned) * AbilityFan.PerPage;
+
+        if (position < 0 || position >= capacity)
+        {
+            return null;
+        }
+
+        object? shown = spells
+            ? _spellArrangement.Fill(_learnedSpells, spell => spell.Slot, capacity)[position]
+            : _skillArrangement.Fill(_learnedSkills, skill => skill.Slot, capacity)[position];
+
+        return shown switch
+        {
+            LearnedSkill skill => skill.Slot,
+            LearnedSpell spell => spell.Slot,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Opens the picker above the slot just held — a combined roster of every learned skill and spell, "비우기"
+    /// first. Picking one puts it there (swapping with wherever it already sat), even across the 기술/마법 switch.
+    /// </summary>
+    private void OpenPicker(int index)
+    {
+        int position = _page * AbilityFan.PerPage + index;
+
+        foreach (Node old in _pickerList.GetChildren())
+        {
+            _pickerList.RemoveChild(old);
+            old.QueueFree();
+        }
+
+        Button empty = Row("비우기", null);
+        bool heldSpells = _spells;
+        empty.Pressed += () =>
+        {
+            (heldSpells ? _spellArrangement : _skillArrangement).Clear(position);
+            Persist();
+            _picker.Hide();
+            Redraw();
+        };
+        _pickerList.AddChild(empty);
+
+        foreach (LearnedSkill skill in _learnedSkills)
+        {
+            Button row = Row(skill.Name, Frame(SkillSheet, skill.Icon));
+            int pickedSlot = skill.Slot;
+            row.Pressed += () => Pick(position, spell: false, pickedSlot);
+            _pickerList.AddChild(row);
+        }
+
+        foreach (LearnedSpell spell in _learnedSpells)
+        {
+            Button row = Row(spell.Name, Frame(SpellSheet, spell.Icon));
+            int pickedSlot = spell.Slot;
+            row.Pressed += () => Pick(position, spell: true, pickedSlot);
+            _pickerList.AddChild(row);
+        }
+
+        // 다섯 줄까지는 그대로 보이고, 더 있으면 굴린다(docs/mobile-client.md 의 스크롤 규칙 — TouchInput 이
+        // 목록 안 단추의 누름을 목록에도 넘긴다).
+        const int MaxVisibleRows = 5;
+        int visible = Math.Min(_pickerList.GetChildCount(), MaxVisibleRows);
+        _pickerScroll.CustomMinimumSize = new Vector2(PickerWidth, visible * (Main.TouchMinimum + Main.Gutter / 2));
+
+        _picker.Popup(new Rect2I(0, 0, 0, 0));
+
+        // 그 슬롯 위에, 화면 밖으로 넘치지 않게.
+        Rect2 at = _slots[index].GetGlobalRect();
+        Vector2 screen = GetViewportRect().Size;
+        Vector2I size = _picker.Size;
+
+        int x = Mathf.Clamp((int)at.Position.X, Main.Gutter, Mathf.Max(Main.Gutter, (int)screen.X - size.X - Main.Gutter));
+        int y = Mathf.Max(Main.Gutter, (int)at.Position.Y - size.Y - Main.Gutter / 2);
+
+        _picker.Position = new Vector2I(x, y);
+    }
+
+    private void Pick(int position, bool spell, int slotNumber)
+    {
+        int? displaced = DisplayedSlotAt(spell, position);
+        (spell ? _spellArrangement : _skillArrangement).Place(position, slotNumber, displaced);
+        _spells = spell;
+        Persist();
+        _picker.Hide();
+        Redraw();
+    }
+
+    private void Persist()
+    {
+        if (_loadedFor.Length > 0)
+        {
+            SaveSlots?.Invoke(_loadedFor, [.. AbilitySlotSave.ToLines(_skillArrangement, _spellArrangement)]);
+        }
+    }
+
+    private const int PickerWidth = 220;
+
+    private static Button Row(string name, Texture2D? icon)
+    {
+        Button row = new()
+        {
+            Text = name,
+            Icon = icon,
+            Alignment = HorizontalAlignment.Left,
+            IconAlignment = HorizontalAlignment.Left,
+            // 너비를 칸 자신이 갖는다 — 담는 쪽(ScrollContainer)의 CustomMinimumSize 는 다음 프레임에야
+            // 자리를 잡아, 첫 장은 그림 너비로 오그라들었다.
+            CustomMinimumSize = new Vector2(PickerWidth, Main.TouchMinimum),
+            ClipText = true
+        };
+
+        Greybox.Plain(row);
+        return row;
     }
 
     /// <summary>

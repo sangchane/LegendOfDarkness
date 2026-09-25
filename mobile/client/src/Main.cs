@@ -177,6 +177,47 @@ public partial class Main : Control
         }
     }
 
+    /// <summary>
+    /// 기술 슬롯을 길게 눌러 정한 배치 — 캐릭터 이름마다 따로 남는다(사용자 요청, 2026-09-25). 규칙(무엇을
+    /// 어디에 두나)은 알맹이 <see cref="Lod.Mobile.Core.World.AbilityArrangement"/> 가 갖고, 여기는 potion.cfg 처럼
+    /// 한 줄에 하나씩 기기(user://)에 적고 읽기만 한다.
+    /// </summary>
+    private static string AbilitySlotsFile(string character)
+    {
+        string safe = new([.. character.Where(char.IsLetterOrDigit)]);
+        return $"user://ability_slots_{(safe.Length > 0 ? safe : "player")}.cfg";
+    }
+
+    public static void SaveAbilitySlots(string character, IReadOnlyList<string> lines)
+    {
+        Godot.FileAccess? writing = Godot.FileAccess.Open(AbilitySlotsFile(character), Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is null)
+        {
+            return;
+        }
+
+        foreach (string line in lines)
+        {
+            writing.StoreLine(line);
+        }
+
+        writing.Close();
+    }
+
+    public static string[] LoadAbilitySlots(string character)
+    {
+        string path = AbilitySlotsFile(character);
+
+        if (!Godot.FileAccess.FileExists(path))
+        {
+            return [];
+        }
+
+        using Godot.FileAccess reading = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
+        return reading.GetAsText().Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
     /// <summary>환경변수로도 준다. 데스크톱에서 인자 없이 다른 서버를 가리킬 때 쓴다.</summary>
     private const string ServerVariable = "LOD_SERVER";
 
@@ -292,6 +333,12 @@ public partial class Main : Control
     /// <summary>Whether to hold the health-potion button on its own, as <c>--pick-potion</c>, to see the row it opens.</summary>
     public static bool PickingPotion { get; private set; }
 
+    /// <summary>
+    /// Which ability-bar slot (1-based, 0 = none) to hold on its own, as <c>--slot-hold 2</c>, to see the
+    /// picker it opens without a thumb.
+    /// </summary>
+    public static int SlotHold { get; private set; }
+
     /// <summary>Whether to press the "지도" button on its own, as <c>--map</c>. For checking it without a thumb.</summary>
     public static bool OpeningMap { get; private set; }
 
@@ -394,6 +441,7 @@ public partial class Main : Control
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
         OpeningExit = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--exit-menu") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
+        SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
         MapGo = Flag("--map-go");
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0 || MapGo.Length > 0;
         TabMapGo = Flag("--tabmap-go");
