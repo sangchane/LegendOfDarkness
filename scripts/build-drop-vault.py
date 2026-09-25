@@ -46,6 +46,77 @@ def gold_rate(area_id):
     return NOVICE_GOLD_PER_EXP if is_novice(area_id) else GOLD_PER_EXP
 LOOT_RANDOM, LOOT_TABLE, LOOT_GOLD = 2, 4, 32
 
+
+def _cut_module():
+    """깎기용 괴물 레벨 — `scripts/build-monster-cut-level.py` 와 같은 기준점·식을 쓴다(같은 코드를 불러온다)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("cut_level", Path(__file__).resolve().parent / "build-monster-cut-level.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+CUT = _cut_module()
+CUT_ROWS = list(CUT.monsters())
+CUT_POINTS = CUT.fit(CUT_ROWS)
+CUT_WOODS = CUT.woodland(CUT_ROWS)
+FORGIVEN, HALVING, LEAST = 5, 5, 0.02  # monsterexp.cs ForLevel 의 상수 — 바뀌면 여기도 고친다
+
+
+def cut_level(exp, area=None):
+    return CUT.level_for(CUT_POINTS, CUT_WOODS, area, exp)
+
+
+def cut_basis(exp, area=None):
+    """어느 기준점 사이에서 보간했나 — 사람이 읽는 한 줄."""
+    import math
+    for ids, maps, e0, e1, low, high, why in CUT_WOODS:
+        if area in ids or area in maps:
+            return (f"우드랜드 구간 {low}~{high}({' · '.join(maps)}) 안 — 구간의 가장 낮은 경험치 {e0:,}→{low}, "
+                    f"가장 높은 {e1:,}→{high} 사이 보간. 근거: {why}")
+    x = math.log(max(exp, 1))
+    logs = [math.log(e) for e, _, _ in CUT_POINTS]
+    if x <= logs[0] or x >= logs[-1]:
+        (e0, l0, a0), (e1, l1, a1) = CUT_POINTS[0], CUT_POINTS[-1]
+        side = "아래" if x <= logs[0] else "위"
+        return f"기준점 {side} 끝 밖 — 첫 점 {a0}({e0:,}→{l0})과 끝 점 {a1}({e1:,}→{l1})을 잇는 기울기로 뻗음"
+    i = next(i for i in range(1, len(CUT_POINTS)) if x <= logs[i])
+    (e0, l0, a0), (e1, l1, a1) = CUT_POINTS[i - 1], CUT_POINTS[i]
+    return f"{a0}({e0:,}→{l0}) 와 {a1}({e1:,}→{l1}) 사이 보간"
+
+
+def cut_share(gap):
+    """monsterexp.cs ForLevel — 레벨 차이 gap 에서 실제로 받는 몫."""
+    if gap <= FORGIVEN:
+        return 1.0
+    return max(LEAST, 0.5 ** ((gap - FORGIVEN) / HALVING))
+
+
+def entry_levels():
+    """맵 이름 → 그 맵으로 들어오는 워프의 레벨문 [(최소, 최대, 출처)] — 5.99 warps.json 줄 끝 두 칸 + 하데스 워프 템플릿."""
+    gates = {}
+    warps = ROOT / "data/server-packs/extracted/5.99-server/warps.json"
+    if warps.exists():
+        for w in json.loads(warps.read_text(encoding="utf-8")):
+            lo, hi = int(w["raw"][-2]), int(w["raw"][-1])
+            if (lo, hi) != (0, 99):
+                gates.setdefault(w["도착맵"], set()).add((lo, hi, f"5.99 {w['출처']}"))
+    names = {}
+    for path in (SERVER / "areas").glob("*.json"):
+        d = lenient(path)
+        if d and "ID" in d:
+            names[d["ID"]] = d.get("Name")
+    for path in (SERVER / "templates/warps").glob("*.json"):
+        d = lenient(path)
+        if not d:
+            continue
+        lo, hi = d.get("LevelRequired") or 0, d.get("LevelMaximum") or 99
+        if lo > 1 or hi < 99:
+            name = names.get((d.get("To") or {}).get("AreaID"))
+            if name:
+                gates.setdefault(name, set()).add((lo, hi, "하데스 워프 템플릿"))
+    return gates
+
 BANNED = re.compile(r'[\\/:*?"<>|#\[\]^]')
 
 
@@ -161,6 +232,7 @@ def build_notes(monsters, items, mundanes):
             monster_notes[(m["Name"], area)] = note
             exp = monster_exp(m)
             lo, hi = gold_range(exp, area)
+            lvl = cut_level(exp, area)
             loot_type = m.get("LootType") or 0
             names = dropped(m)
 
@@ -184,29 +256,42 @@ def build_notes(monsters, items, mundanes):
                 f'이름: "{m["Name"]}"\nAreaID: {area}\n사냥터: "{zname}"\n'
                 f'경험치: {exp}\n골드범위: "{lo}~{hi}"\nLootType: {loot_type}\n'
                 f'체력: {m.get("MaximumHP", 0)}\n'
+                f"추정레벨: {lvl}\n깎이기시작: {lvl + FORGIVEN + 1}\n"
                 "---\n\n"
                 f"# {m['Name']} @ {zname}\n\n"
                 f"사냥터: [[사냥터/{slug(f'{area}-{zname}')}|{zname}]]\n\n"
                 f"경험치 {exp} · 골드 {lo}~{hi}전(경험치×{gold_rate(area)}, ±{int(GOLD_VARIANCE*100)}%, "
                 f"항상 지급 — [[식/골드-경험치식]]) · LootType {loot_type}\n\n"
+                "## 경험치 깎기\n\n"
+                f"추정 레벨 **{lvl}** (깎기에만 쓴다 — [[식/경험치-레벨-대응]]): {cut_basis(exp, area)}.\n\n"
+                f"**{lvl + FORGIVEN + 1}레벨부터** 경험치가 깎인다([[식/경험치-깎기]]) — "
+                + " · ".join(f"{lvl + g}레벨 {round(exp * cut_share(g)):,}" for g in (6, 10, 15, 20, 30)) + "\n\n"
                 "## 드랍 목록 (실제 확률 = DropRate ÷ 목록 칸수)\n\n"
                 "| 아이템 | 실제 확률 | 갈래 |\n|---|---|---|\n" + drop_table + "\n",
                 encoding="utf-8")
-            zone_rows[area][1].append((m["Name"], note, exp, lo, hi))
+            zone_rows[area][1].append((m["Name"], note, exp, lo, hi, lvl))
 
     # 2) 사냥터 노트
+    gates = entry_levels()
     for area, (zname, rows) in sorted(zone_rows.items()):
         table = "\n".join(
-            f"| [[괴물/{slug(note)}\\|{name}]] | {exp} | {lo}~{hi} |"
-            for name, note, exp, lo, hi in rows
-        ) or "| (없음) | | |"
+            f"| [[괴물/{slug(note)}\\|{name}]] | {exp} | {lvl} | {lo}~{hi} |"
+            for name, note, exp, lo, hi, lvl in rows
+        ) or "| (없음) | | | |"
+        exps = [r[2] for r in rows] or [0]
+        lvls = [r[5] for r in rows] or [0]
+        entry = "\n".join(f"- {a}~{b} ({src})" for a, b, src in sorted(gates.get(zname, []))) \
+            or "- 워프 레벨문 없음"
         (VAULT / "사냥터" / f"{slug(f'{area}-{zname}')}.md").write_text(
             "---\n"
             f'AreaID: {area}\n사냥터: "{zname}"\n괴물수: {len(rows)}\n'
+            f'경험치범위: "{min(exps)}~{max(exps)}"\n추정레벨범위: "{min(lvls)}~{max(lvls)}"\n'
             "---\n\n"
             f"# {zname} (AreaID {area})\n\n"
+            f"경험치 {min(exps):,}~{max(exps):,} → 추정 레벨 {min(lvls)}~{max(lvls)} ([[식/경험치-레벨-대응]])\n\n"
+            "## 입장 레벨 (이 맵으로 들어오는 워프의 레벨문)\n\n" + entry + "\n\n"
             "## 스폰\n\n"
-            "| 괴물 | 경험치 | 골드범위 |\n|---|---|---|\n" + table + "\n",
+            "| 괴물 | 경험치 | 추정레벨 | 골드범위 |\n|---|---|---|---|\n" + table + "\n",
             encoding="utf-8")
 
     # 3) 아이템 노트 — 몬스터가 떨구거나 상점이 파는 것만
@@ -237,6 +322,7 @@ def build_notes(monsters, items, mundanes):
 
     # 4) 식 노트 — monsterexp.cs 근거 줄을 그대로 인용한다(다시 만들 때마다 최신 줄로 갱신됨)
     write_formula_note()
+    write_cut_notes()
 
     # README
     zone_index = "\n".join(
@@ -251,7 +337,7 @@ def build_notes(monsters, items, mundanes):
         f"사냥터 {len(zone_rows)}개 · 괴물 {len(monster_notes)}종 · "
         f"아이템 {len(relevant)}종(몬스터가 떨구거나 상점이 파는 것만 — 아무도 안 쓰는 "
         "\"하데스표\" 변형 900여 종은 뺐다).\n\n"
-        "식: [[식/골드-경험치식]]\n\n"
+        "식: [[식/골드-경험치식]] · [[식/경험치-깎기]] · [[식/경험치-레벨-대응]]\n\n"
         "## 사냥터\n\n| 사냥터 | AreaID | 괴물수 |\n|---|---|---|\n" + zone_index + "\n",
         encoding="utf-8")
 
@@ -284,8 +370,67 @@ def write_formula_note():
         "금화는 쓰러진 자리 바닥에 놓이고, 주워야 들어온다(2026-09-25 — 서버가 대신 줍던 AUTO LOOT GOLD 를 껐다).\n\n"
         f"## 근거 — `monsterexp.cs:{gold_line}`\n\n```csharp\n{gold_src}\n```\n\n"
         f"## 경험치를 읽는 곳(같은 값을 되풀이) — `monsterexp.cs:{exp_line}`\n\n```csharp\n{exp_src}\n```\n\n"
+        "같이 볼 식: [[경험치-깎기]] · [[경험치-레벨-대응]]\n\n"
         "시험: [[../README|드랍 볼트]] 의 괴물 노트마다 있는 골드범위 칸이 이 식의 결과다. "
         "`tests/hades-characterization/MonsterGoldTests.cs` 가 실제 서버로 확인한다.\n",
+        encoding="utf-8")
+
+
+def write_cut_notes():
+    lines = FORMULA.read_text(encoding="utf-8-sig").splitlines()
+
+    def excerpt(pattern, after):
+        for i, line in enumerate(lines):
+            if re.search(pattern, line):
+                return i + 1, "\n".join(lines[i:i + after])
+        return None, ""
+
+    cut_line, cut_src = excerpt(r"private double ForLevel", 11)
+    use_line, use_src = excerpt(r"public uint DistributeExperience", 1)
+    ratio = "\n".join(f"| {g} | {cut_share(g):.1%} |" for g in (0, 5, 6, 8, 10, 15, 20, 25, 30, 40, 50, 60))
+    (VAULT / "식" / "경험치-깎기.md").write_text(
+        "---\n제목: 경험치-깎기\n파일: \"database/server/scripts/Formulas/monsterexp.cs\"\n---\n\n"
+        "# 저보다 한참 낮은 괴물은 경험치를 덜 준다\n\n"
+        f"레벨 차이(내 레벨 − 괴물 추정 레벨)가 {FORGIVEN} 까지는 그대로, 그 뒤로 {HALVING} 레벨마다 반, "
+        f"{LEAST:.0%} 에서 멈춘다. 괴물 레벨은 정의의 `Level`(모두 1) 이 아니라 경험치에서 추정한 값 — "
+        "[[경험치-레벨-대응]]. 알림 \"경험치가 N 올랐습니다\" 의 N 은 깎인 뒤의 값이다(2026-09-25).\n\n"
+        "| 레벨 차이 | 받는 몫 |\n|---|---|\n" + ratio + "\n\n"
+        f"## 근거 — `monsterexp.cs:{cut_line}`\n\n```csharp\n{cut_src}\n```\n\n"
+        f"## 쓰는 곳 — `monsterexp.cs:{use_line}`\n\n```csharp\n{use_src}\n```\n\n"
+        "같이 볼 식: [[골드-경험치식]] · [[경험치-레벨-대응]]\n\n"
+        "시험: `tests/hades-characterization/ExperienceNoticeTests.cs` — 알림 = '다음까지' 줄어든 양 = 저장값, "
+        "깎이는지·안 깎이는지.\n",
+        encoding="utf-8")
+
+    points = "\n".join(f"| {a} | {e:,} | {l} |" for e, l, a in CUT_POINTS)
+    grounds = {}
+    for area, name, exp, _ in CUT_ROWS:
+        key = area if area.startswith("우드랜드") else re.sub(r"[\d\-A-Za-z]+$", "", area.replace("존", ""))
+        grounds.setdefault(key, set()).add(exp)
+    summary = "\n".join(
+        f"| {g} | {min(v):,}~{max(v):,} | {cut_level(min(v), g)}~{cut_level(max(v), g)} |"
+        for g, v in sorted(grounds.items(), key=lambda kv: sorted(kv[1])[len(kv[1]) // 2]))
+    (VAULT / "식" / "경험치-레벨-대응.md").write_text(
+        "---\n제목: 경험치-레벨-대응\n생성기: \"scripts/build-monster-cut-level.py\"\n---\n\n"
+        "# 괴물의 경험치로 레벨을 추정한다 (깎기에만)\n\n"
+        "괴물 정의가 모두 `Level` 1 이라, 입장 레벨이 워프로 알려진 사냥터의 경험치를 기준으로 레벨을 매긴다"
+        "(사용자 2026-09-25: \"입장 레벨 생각해서 경험치량으로 비교해 봐\" · \"존마다 몬스터 레벨 차이가 좀 날 거야\"). "
+        "체력·능력치(`Template.Level`)·경험치·금화 식은 그대로다.\n\n"
+        "## 방법\n\n"
+        "1. 기준 사냥터: 노비스 1~22 (5.99 `Novice_Warp`) · 포테의숲 21~51 (하데스 워프 템플릿) · 아벨해안 51~80 (5.99 `Abel_Warp`).\n"
+        "2. 존(맵)마다 대표 경험치 = 괴물 경험치의 기하평균(SpawnMax 무게).\n"
+        "3. 사냥터 안에서 존들을 ln(경험치) 순으로 범위에 펼친다 — 가장 낮은 존 = 아래 끝, 가장 높은 존 = 위 끝.\n"
+        "4. 레벨이 줄지 않게 앞 값보다 작으면 앞 값으로 올린다. 사이는 ln(경험치) 위 꺾은선, 양 끝 밖은 첫 점·끝 점을 "
+        "잇는 기울기로 뻗고 1~99 로 자른다.\n\n"
+        "## 우드랜드는 구간마다 따로\n\n"
+        "5.99 팩이 새로 만든 판이라 같은 입장 레벨에서 경험치가 3~4배 적어 위 대응에 못 넣는다(사용자 2026-09-26: "
+        "\"우드랜드도 존별로 차이가 많이 나\"). 구간 안에서 가장 낮은 경험치 괴물 = 아래 끝, 가장 높은 = 위 끝, 사이는 "
+        "ln 경험치에 비례.\n\n| 구간 | 레벨 | 경험치 | 근거 |\n|---|---|---|---|\n"
+        + "\n".join(f"| {' · '.join(maps)} | {lo}~{hi} | {e0:,}~{e1:,} | {why} |" for _, maps, e0, e1, lo, hi, why in CUT_WOODS)
+        + "\n\n"
+        "## 기준점\n\n| 존 | 대표 경험치 | 레벨 |\n|---|---|---|\n" + points + "\n\n"
+        "## 사냥터별 추정 레벨\n\n| 사냥터 | 경험치 | 추정 레벨 |\n|---|---|---|\n" + summary + "\n\n"
+        "같이 볼 식: [[경험치-깎기]] · [[골드-경험치식]]\n",
         encoding="utf-8")
 
 
@@ -324,6 +469,9 @@ def build_graph(zones, monsters, items_count):
                       "confidence": "EXTRACTED", "source_file": "data/drop-vault"})
 
     formula = node("식", "골드-경험치식", f"골드=경험치×{GOLD_PER_EXP}(노비스 ×{NOVICE_GOLD_PER_EXP})×0.8~1.2")
+    cutting = node("식", "경험치-깎기", f"경험치 깎기 — 레벨 차이 {FORGIVEN} 넘으면 {HALVING}레벨마다 반, {LEAST:.0%}까지")
+    mapping = node("식", "경험치-레벨-대응", "괴물 경험치 → 추정 레벨(노비스·포테의숲·아벨해안 존별 기준점 · 우드랜드 구간별)")
+    edge(mapping, cutting, "정한다")
 
     all_mons, all_items, all_mund = load_all()
     by_area = {}
@@ -339,11 +487,14 @@ def build_graph(zones, monsters, items_count):
     item_nodes = {}
     for area, here in by_area.items():
         zname = zone_name(area, [m["_file"] for m in here])
-        zone_id = node("사냥터", f"{area}-{zname}", zname)
+        lvls = [cut_level(monster_exp(m), area) for m in here]
+        zone_id = node("사냥터", f"{area}-{zname}", f"{zname} 괴물 레벨 {min(lvls)}~{max(lvls)}")
         for m in here:
-            mon_id = node("괴물", f"{m['Name']}@{area}", m["Name"])
+            exp = monster_exp(m)
+            mon_id = node("괴물", f"{m['Name']}@{area}", f"{m['Name']} 경험치 {exp} 레벨 {cut_level(exp, area)}")
             edge(zone_id, mon_id, "스폰")
             edge(formula, mon_id, "정한다")
+            edge(mapping, mon_id, f"추정레벨 {cut_level(exp, area)}")
             for name in dropped(m):
                 item = all_items.get(name)
                 if item is None:
