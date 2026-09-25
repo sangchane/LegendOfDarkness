@@ -103,7 +103,7 @@ public static class HadesLoginClient
 
         progress?.Report("계정을 만드는 중…");
 
-        using HadesConnection login = await HadesConnection.ConnectAsync(lobby.Address, lobby.Port, cancellationToken);
+        using HadesConnection login = await HadesConnection.ConnectAsync(address, lobby.Port, cancellationToken);
 
         await login.ReceiveAsync(cancellationToken);
 
@@ -160,7 +160,7 @@ public static class HadesLoginClient
 
         RedirectTarget game;
 
-        using (HadesConnection login = await HadesConnection.ConnectAsync(lobby.Address, lobby.Port, cancellationToken))
+        using (HadesConnection login = await HadesConnection.ConnectAsync(address, lobby.Port, cancellationToken))
         {
             await login.ReceiveAsync(cancellationToken);
 
@@ -176,7 +176,9 @@ public static class HadesLoginClient
 
         progress?.Report("월드에 들어가는 중…");
 
-        HadesConnection world = await HadesConnection.ConnectAsync(game.Address, game.Port, cancellationToken);
+        // 넘겨받는 주소는 IPv4 4바이트뿐이라 IPv6 로 붙은 폰은 따라갈 수 없다. 로비·게임은 로그인과 같은 기계에
+        // 있으므로 처음 붙은 주소에 포트만 바꿔 따라간다(아이폰 테더링, 2026-09-24).
+        HadesConnection world = await HadesConnection.ConnectAsync(address, game.Port, cancellationToken);
 
         try
         {

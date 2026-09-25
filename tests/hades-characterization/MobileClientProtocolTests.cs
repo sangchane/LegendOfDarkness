@@ -84,6 +84,25 @@ public sealed class MobileClientProtocolTests
         LoginFlow.WaitForLog(server, LoginFlow.WelcomeMessage(MobileName), TimeSpan.FromSeconds(30));
     }
 
+    /// <summary>
+    /// 아이폰 테더링(SKT)은 IPv6 뿐이라 폰이 맥에 IPv6 로만 닿는다(2026-09-24). 서버는 IPv6 로도 듣고, 앱은
+    /// 넘겨받는 주소(IPv4 4바이트뿐)가 아니라 처음 붙은 주소로 로비·게임에 따라간다.
+    /// </summary>
+    [Fact]
+    public async Task Mobile_client_logs_in_over_ipv6()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, MobileName);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.IPv6Loopback, server.LoginPort, MobileName, LoginFlow.SyntheticSecret, null, _deadline.Token);
+
+        Assert.Equal(server.GamePort, session.Character.Port);
+        LoginFlow.WaitForLog(server, LoginFlow.WelcomeMessage(MobileName), TimeSpan.FromSeconds(30));
+    }
+
     [Theory]
     [InlineData(1, "튜닉", 2)]
     [InlineData(2, "꼬뜨", 4)]

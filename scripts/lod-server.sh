@@ -32,7 +32,10 @@ server_ip() {
     fi
 
     # 이 맥의 집 안 주소. 무선이 먼저, 없으면 유선.
-    ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo 127.0.0.1
+    # 아이폰 테더링의 가짜 IPv4(192.0.0.x)는 ipconfig 가 답하지 않아 ifconfig 로 읽는다.
+    ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null \
+        || ifconfig en0 2>/dev/null | awk '$1=="inet" {print $2; found=1; exit} END {if (!found) exit 1}' \
+        || echo 127.0.0.1
 }
 
 config() {
@@ -46,6 +49,23 @@ config() {
 
     "$ROOT/scripts/check-server-config.sh" "$STAGING"
     echo "설정을 다시 깔았습니다 — 주소 $ip"
+
+    echo "$(phone_address):2610" > "$ROOT/mobile/client/server.cfg"
+    echo "앱 주소(server.cfg) — $(cat "$ROOT/mobile/client/server.cfg") · 앱을 다시 설치해야 반영됩니다"
+}
+
+# 폰이 맥을 찾아올 주소. 아이폰 테더링(SKT)은 IPv6 뿐이라 맥의 IPv4 가 가짜(192.0.0.x, 맥이 나가려고 만든
+# 것)다 — 그때는 맥의 고정 IPv6 를 준다(2026-09-24). 집 와이파이면 그냥 IPv4.
+phone_address() {
+    local ip
+    ip="$(server_ip)"
+
+    case "$ip" in
+        192.0.0.*)
+            ifconfig en0 | awk '$1=="inet6" && $2 !~ /^fe80/ && /autoconf secured/ && !/temporary|clat46/ {print "[" $2 "]"; exit}'
+            ;;
+        *) echo "$ip" ;;
+    esac
 }
 
 verify_config() {

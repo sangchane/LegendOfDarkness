@@ -635,20 +635,16 @@ public partial class Main : Control
     private static void ReadServer(string value)
     {
         string fallback = ServerFromEnvironment() ?? ServerFromFile() ?? DefaultServer;
-        string[] parts = (value.Length > 0 ? value : fallback).Split(':');
-
-        if (parts.Length != 2
-            || !System.Net.IPAddress.TryParse(parts[0], out System.Net.IPAddress? address)
-            || !int.TryParse(parts[1], out int port))
+        // IPv6 는 `[주소]:포트` 로 적는다 — 아이폰 테더링은 IPv6 뿐이다.
+        if (!System.Net.IPEndPoint.TryParse(value.Length > 0 ? value : fallback, out System.Net.IPEndPoint? server)
+            || server.Port == 0)
         {
             GD.PushWarning($"--server 를 읽을 수 없어 {fallback} 을 씁니다: {value}");
-            parts = fallback.Split(':');
-            address = System.Net.IPAddress.Parse(parts[0]);
-            port = int.Parse(parts[1]);
+            server = System.Net.IPEndPoint.Parse(fallback);
         }
 
-        ServerAddress = address;
-        ServerPort = port;
+        ServerAddress = server.Address;
+        ServerPort = server.Port;
     }
 
     /// <summary>`LOD_SERVER=host:port`. 없으면 null.</summary>
