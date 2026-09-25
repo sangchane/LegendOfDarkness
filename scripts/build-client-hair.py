@@ -11,7 +11,12 @@
 프레임 10개를 한 장에 담고, 정면 서기는 그중 5번 칸이다(`Lod.Mobile.Core.Art.WalkMotion.Stand(Side.Front) == 5`).
 1칸만 뽑으면 그 자리를 읽으려 할 때 칸 밖을 읽어 미리보기가 비어 보인다 — 그래서 10칸을 그대로 두고
 클라이언트가 5번 칸만 보여주게 한다(정지 미리보기라 나머지 칸은 그려지지 않는다). "미리보기에 한 프레임이면
-된다"는 것은 02(평타)·03(손짓)·b~f(직업 동작) 같은 다른 파일들을 뽑지 않는다는 뜻이다 — 그건 안 뽑는다.
+된다"는 것은 02(평타)·03(손짓)·b~f(직업 동작) 같은 다른 파일들을 뽑지 않는다는 뜻이었다.
+
+**동작 파일(02·03·b~f)도 뽑는다(2026-09-25).** 게임에서는 이 머리가 평타·손 들기·직업 동작을 한다. 원작 아카이브에는
+머리 모양마다 그 파일이 다 있고(`khan.dat` mh01202·mh01203·mh012b~f), 원작 클라이언트는 동작마다 그 파일에서 머리를
+그린다. 우리는 01 만 뽑아 두어, 동작 파일이 없는 조각은 동작 동안 빼는 앱 규칙(Actor)에 걸려 무도가가 쿠로토 손을 들
+때 머리카락이 사라졌다(사용자, 2026-09-25). 칸 수는 `build-client-wardrobe.py` 의 표와 같다.
 
 **이미 있는 것은 다시 뽑지 않는다** — `mh001~008`·`wh001~008` 은 그대로 둔다.
 
@@ -39,10 +44,14 @@ ZOOM = "1"
 ARCHIVES = {"m": HADES / "khan" / "khan.dat", "w": HADES / "khan2" / "khan2.dat"}
 
 
-def cut(archive, entry, out):
+#: 동작 파일마다 칸 수 — build-client-wardrobe.py 의 STANDING·MOTIONS 와 같다.
+MOVES = {"02": 4, "03": 10, "b": 14, "c": 30, "d": 18, "e": 36, "f": 12}
+
+
+def cut(archive, entry, out, frames=FRAMES):
     """실패하면 마지막 줄(이유)을 돌려주고, 성공하면 None."""
     proc = subprocess.run(
-        [str(DOTNET), str(TOOL), "pose", str(archive), entry, str(out), FRAMES, ZOOM, CELL, "marker"],
+        [str(DOTNET), str(TOOL), "pose", str(archive), entry, str(out), frames, ZOOM, CELL, "marker"],
         capture_output=True, text=True, encoding="utf-8", errors="replace")
     if proc.returncode == 0:
         return None
@@ -71,14 +80,21 @@ def main():
 
             if out.exists():
                 already += 1
-                continue
-
-            if (why := cut(archive, f"{name}01", out)) is not None:
+            elif (why := cut(archive, f"{name}01", out)) is not None:
                 skipped.append(f"{name}({why})")
                 continue
+            else:
+                made += 1
+                print(f"  {name}")
 
-            made += 1
-            print(f"  {name}")
+            for suffix, count in MOVES.items():
+                moving = PARTS / f"{name}{suffix}.png"
+                if moving.exists():
+                    continue
+                if (why := cut(archive, f"{name}{suffix}", moving, ",".join(map(str, range(count))))) is not None:
+                    skipped.append(f"{name}{suffix}({why})")
+                    continue
+                made += 1
 
     print(f"새로 뽑은 그림 {made}장 (이미 있던 것 {already}장) → {PARTS.relative_to(ROOT)}")
     if skipped:
