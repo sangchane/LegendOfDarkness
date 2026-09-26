@@ -113,7 +113,49 @@ public sealed class CompanionSleepTests : IDisposable
         Assert.Contains(did, line => line.StartsWith("해제 디나르콜리", StringComparison.Ordinal));
     }
 
-    private IsolatedHadesServer Ready(bool blows)
+    /// <summary>봇이 21레벨 아래(주인 3레벨 → 봇 1레벨)라 디나르콜리가 없으면, 주인이 잠들 때 서버가 한 줄 알린다 — 한 번 잠드는 동안 한 번.</summary>
+    [Fact]
+    public async Task An_owner_asleep_hears_once_that_a_young_bot_cannot_wake_them()
+    {
+        using IsolatedHadesServer server = Ready(blows: false, ownerLevel: 3);
+        WorldClient owner = await Enter(server, OwnerName);
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName);
+
+        for (int tries = 0; tries < 10 && bot.Master is null; tries++)
+        {
+            await owner.CallCompanionAsync(_deadline.Token);
+            await Task.Delay(1000, _deadline.Token);
+        }
+
+        const string Notice = "봇이 아직 수면을 풀지 못합니다 (21레벨부터)";
+        List<string> heard = [];
+        bool slept = false;
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(40);
+
+        // 첫 수면이 저절로 끝날 때까지(8초) 듣는다.
+        while (DateTime.UtcNow < giveUp)
+        {
+            while (owner.TakeTold(out _, out string text))
+            {
+                heard.Add(text);
+            }
+
+            bool asleep = owner.Ailments.Any(a => a.Icon == SleepIcon);
+            slept |= asleep;
+
+            if (slept && !asleep)
+            {
+                break;
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        Assert.True(slept, "주인이 잠들지 않았습니다.");
+        Assert.Equal(1, heard.Count(line => line == Notice));
+    }
+
+    private IsolatedHadesServer Ready(bool blows, int ownerLevel = 30)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (ForestOne, 33, 47));
         CompanionCallTests.Configure(server);
@@ -130,7 +172,7 @@ public sealed class CompanionSleepTests : IDisposable
         LoginFlow.TryCreateAccount(server, CompanionCallTests.BotName);
         CompanionCallTests.Edit(server, OwnerName, saved =>
         {
-            saved["ExpLevel"] = 30;
+            saved["ExpLevel"] = ownerLevel;
             saved["_MaximumHp"] = 20000;
             saved["CurrentHp"] = 20000;
         });
