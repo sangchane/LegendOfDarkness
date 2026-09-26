@@ -125,9 +125,10 @@ public sealed class OriginalItemValueTests
         Assert.Equal(18, Whole(items["설단검"], "AttackSpeed"));
         Assert.Equal(6, Whole(items["설단검"], "Image"));
 
-        // 커틀라스 — 우드랜드3-1·4-1 이 떨군다. 떨굴 확률은 도감에 없는 칸이라 되돌리기가 지우면 안 된다.
+        // 커틀라스 — 그림은 팩 것이다. 사냥터 드랍에서는 2026-09-25 에 빠졌다(기본템은 상점에서만 —
+        // 우드랜드3-1·4-1 은 이제 접미사 반지를 떨군다, GearDropTests). 떨굴 확률이 없는 것이 맞다.
         Assert.Equal(3, Whole(items["커틀라스"], "Image"));
-        Assert.Equal(0.06, items["커틀라스"]["DropRate"]!.GetValue<double>(), 3);
+        Assert.Null(items["커틀라스"]["DropRate"]);
 
         // 레더튜닉 — 그림은 팩 것이다. 떨굴 확률이 없는 것이 맞다(아무도 안 떨구고 상점에서 산다 —
         // GearDropTests.No_gear_we_brought_in_keeps_a_drop_rate_nobody_rolls 가 그 쪽을 본다).

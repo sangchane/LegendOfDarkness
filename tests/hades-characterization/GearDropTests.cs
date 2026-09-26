@@ -389,8 +389,8 @@ public sealed class GearDropTests
     /// <summary>
     /// 되살린 접미사 장비 넷을 원작 표 값과 맞대본다 — 표는
     /// <c>data/game-data/items-original-sheets.json</c>(생성기 <c>scripts/build-suffix-gear-from-sheet.py</c>).
-    /// 새로 살린 것(이아의호안석반지·로오의동각반·로오의은제방패)과 이미 있던 것을 고쳐 맞춘 것
-    /// (칸의목걸이, 원래 체력·마력 +200 이었으나 표에는 없어 뺐다)을 하나씩 본다.
+    /// 넷 다 <c>Group</c> 이 <c>하데스표/...</c> 인 것만 골랐다 — 5.99 팩 자기 물건(<c>5.99표/...</c>)은
+    /// 아래 <see cref="Sheet_never_touches_589_packs_own_gear"/> 가 따로 본다.
     /// </summary>
     [Fact]
     public void Restored_suffix_gear_matches_the_original_sheet()
@@ -398,7 +398,7 @@ public sealed class GearDropTests
         IReadOnlyDictionary<string, JsonNode> items = Items();
         IReadOnlyDictionary<string, JsonNode> sheet = OriginalSheet();
 
-        string[] sample = ["이아의호안석반지", "로오의동각반", "로오의은제방패", "칸의목걸이"];
+        string[] sample = ["이아의호안석반지", "로오의동각반", "로오의은제방패", "칸의호안석반지"];
 
         foreach (string name in sample)
         {
@@ -417,6 +417,28 @@ public sealed class GearDropTests
             Assert.True(int.Parse(row["무게"]!.GetValue<string>()) == (int?)item["CarryWeight"],
                 $"«{name}» 무게 — 표 {row["무게"]} vs 템플릿 {item["CarryWeight"]}.");
         }
+    }
+
+    /// <summary>
+    /// 표로 되살리다가 한 번 밟은 덫 — 로오의반지·칸의목걸이는 이름이 접미사 모양이지만 5.99 팩 자기
+    /// 물건이다(<c>db/item/Armor/공통반지.txt</c>·<c>공통목걸이.txt</c>, <c>Group: "5.99표/..."</c>).
+    /// 2026-09-25 <c>build-suffix-gear-from-sheet.py</c> 가 이 둘까지 표 값(레벨1·능력치 없음)으로 덮어
+    /// <c>OriginalItemValueTests.The_gold_ring_the_mantis_drops_is_worth_what_the_sheet_says</c> 를
+    /// 깼다 — 값이 500(팩)에서 200(표)으로 바뀌었었다. 이제 생성기가 <c>Group</c> 이 <c>5.99표/</c> 로
+    /// 시작하면 건드리지 않으니, 원래 값(레벨11·체력·마력 있음)이 그대로인지 여기서 지킨다.
+    /// </summary>
+    [Fact]
+    public void Sheet_never_touches_589_packs_own_gear()
+    {
+        IReadOnlyDictionary<string, JsonNode> items = Items();
+
+        Assert.Equal(11, (int?)items["로오의반지"]["LevelRequired"]);
+        Assert.Equal(500, (int?)items["로오의반지"]["Value"]);
+        Assert.Equal("5.99표/반지/공통반지", items["로오의반지"]["Group"]?.GetValue<string>());
+
+        Assert.Equal(11, (int?)items["칸의목걸이"]["LevelRequired"]);
+        Assert.Equal(1000, (int?)items["칸의목걸이"]["Value"]);
+        Assert.Equal("5.99표/목걸이/공통목걸이", items["칸의목걸이"]["Group"]?.GetValue<string>());
     }
 
     /// <summary>

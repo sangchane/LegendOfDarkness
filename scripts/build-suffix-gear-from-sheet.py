@@ -158,7 +158,7 @@ def main():
     korean_to_english = load_korean_to_english()
     rows = json.loads(SHEET.read_text(encoding="utf-8"))["수치표"]
 
-    merged, created, skipped = [], [], []
+    merged, created, skipped, protected = [], [], [], []
     seen = set()
 
     for row in rows:
@@ -174,6 +174,14 @@ def main():
 
         if name in by_name:
             path, item = by_name[name]
+
+            # 5.99 팩 자기 물건은 이름이 접두사 모양이어도 건드리지 않는다 — 로오의반지·칸의목걸이
+            # (`db/item/Armor/공통반지.txt`·`공통목걸이.txt`)처럼 팩이 손수 값을 매긴 것이다. 표는
+            # 접미사로 우리가 되살린 하데스표(`Group: "하데스표/..."`)만 고친다.
+            if str(item.get("Group", "")).startswith("5.99표/"):
+                protected.append(name)
+                continue
+
             apply_stats(item, row)
             if writing:
                 path.write_text(json.dumps(item, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -215,6 +223,7 @@ def main():
 
     print(f"고침 {len(merged)}개 {'씀' if writing else '(미리 봄)'}")
     print(f"새로 살림 {len(created)}개 {'씀' if writing else '(미리 봄)'}")
+    print(f"5.99 팩 자기 물건이라 안 건드림 {len(protected)}개: {', '.join(sorted(protected))}")
     print(f"그림 정본을 못 찾아 건너뜀 {len(skipped)}개: {', '.join(sorted(skipped))}")
     if not writing:
         print("\n미리 본 것입니다 — 적으려면 --쓰기")
