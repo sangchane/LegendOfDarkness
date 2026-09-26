@@ -15,7 +15,7 @@ public sealed class AbilityFanTests
     {
         yield return ("공격", AbilityFan.Attack, AbilityFan.AttackSide);
         yield return ("전환", AbilityFan.Switch, AbilityFan.ButtonSide);
-        yield return ("다음", AbilityFan.Next, AbilityFan.ButtonSide);
+        yield return ("다음", AbilityFan.Next, AbilityFan.NextSide);
 
         for (int index = 0; index < AbilityFan.Slots.Count; index++)
         {
@@ -35,6 +35,17 @@ public sealed class AbilityFanTests
         Assert.Equal(AbilityFan.Potions[0].X, AbilityFan.Potions[1].X);
         Assert.True(AbilityFan.Potions[0].Y < AbilityFan.Potions[1].Y);
         Assert.True(AbilityFan.PotionSide < AbilityFan.ButtonSide);
+    }
+
+    /// <summary>
+    /// The page chip ("1/3") is as small as a potion switch and sits in the fan's top-left corner (사용자, 2026-09-26: 포션 창
+    /// 사이즈만큼 줄여서 구석에) — clear of the potions on the right and the 코마디움 beside it.
+    /// </summary>
+    [Fact]
+    public void The_page_chip_is_potion_sized_in_the_top_left_corner()
+    {
+        Assert.Equal(AbilityFan.PotionSide, AbilityFan.NextSide);
+        Assert.Equal((AbilityFan.NextSide / 2, AbilityFan.NextSide / 2), AbilityFan.Next);
     }
 
     [Fact]

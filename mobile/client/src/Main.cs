@@ -115,6 +115,39 @@ public partial class Main : Control
         }
     }
 
+    /// <summary>미니맵이 보이는 반경(칸) — [+]·[−] 로 바꾸고 기기에 남는다(<c>user://minimap.cfg</c> 한 줄, 2026-09-26).</summary>
+    private const string MinimapFile = "user://minimap.cfg";
+
+    public static int MinimapRadius { get; private set; } = Lod.Mobile.Core.Art.Minimap.Radius;
+
+    public static void SetMinimapRadius(int radius)
+    {
+        MinimapRadius = Lod.Mobile.Core.Art.Minimap.NearestStep(radius);
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(MinimapFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            writing.StoreLine(MinimapRadius.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writing.Close();
+        }
+    }
+
+    private static void ReadMinimapRadius()
+    {
+        Godot.FileAccess? reading = Godot.FileAccess.Open(MinimapFile, Godot.FileAccess.ModeFlags.Read);
+
+        if (reading is not null)
+        {
+            if (int.TryParse(reading.GetLine().Trim(), out int radius))
+            {
+                MinimapRadius = Lod.Mobile.Core.Art.Minimap.NearestStep(radius);
+            }
+
+            reading.Close();
+        }
+    }
+
     private static void ReadAutoLoot()
     {
         Godot.FileAccess? reading = Godot.FileAccess.Open(LootFile, Godot.FileAccess.ModeFlags.Read);
@@ -380,6 +413,9 @@ public partial class Main : Control
     /// <summary><c>--settings-tab 자동|봇|계정</c>: which tab the settings window opens on. For photographs.</summary>
     public static string SettingsTab { get; private set; } = string.Empty;
 
+    /// <summary><c>--minimap-zoom N</c>: 자리를 잡은 뒤 미니맵의 [+](N>0) 또는 [−](N<0) 를 |N| 번 실제로 누른다 — 사진·배선 확인용(기기에 남는다).</summary>
+    public static int MinimapZoom { get; private set; }
+
     /// <summary><c>--party-preview</c>: 서버 없이 파티원 다섯을 지어 파티원 칸을 그린다(사진·배치 검사용).</summary>
     public static bool PartyPreview { get; private set; }
 
@@ -515,6 +551,7 @@ public partial class Main : Control
         OpeningSettings = OpeningSettings || SettingsTab.Length > 0;
         CheckingMinimap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--minimap") >= 0;
         PartyPreview = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--party-preview") >= 0;
+        MinimapZoom = int.TryParse(Flag("--minimap-zoom"), out int minimapZoom) ? minimapZoom : 0;
         PackPick = int.TryParse(Flag("--pack-pick"), out int packPick) ? packPick : 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
@@ -541,6 +578,7 @@ public partial class Main : Control
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
         GearAfter = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear-after") >= 0;
         ReadAutoLoot();
+        ReadMinimapRadius();
         ReadPotions();
         ReadAutoHuntSettings();
         AutoHuntOnStart = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auto-hunt") >= 0;

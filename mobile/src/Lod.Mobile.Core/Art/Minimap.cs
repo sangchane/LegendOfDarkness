@@ -13,8 +13,45 @@ namespace Lod.Mobile.Core.Art;
 /// </remarks>
 public static class Minimap
 {
-    /// <summary>How many steps each way the minimap shows.</summary>
+    /// <summary>How many steps each way the minimap shows at first.</summary>
     public const int Radius = 12;
+
+    /// <summary>The radii [+]·[−] step through (2026-09-26) — [+] is fewer tiles, larger.</summary>
+    public static IReadOnlyList<int> Steps { get; } = [6, 9, 12, 16, 20, 24];
+
+    /// <summary>One step in (fewer tiles); the smallest stays.</summary>
+    public static int ZoomIn(int radius)
+    {
+        int at = IndexOf(radius);
+
+        return Steps[Math.Max(0, at - 1)];
+    }
+
+    /// <summary>One step out (more tiles); the largest stays.</summary>
+    public static int ZoomOut(int radius)
+    {
+        int at = IndexOf(radius);
+
+        return Steps[Math.Min(Steps.Count - 1, at + 1)];
+    }
+
+    /// <summary>The step nearest a radius — for one read back from the device.</summary>
+    public static int NearestStep(int radius) => Steps.MinBy(step => Math.Abs(step - radius));
+
+    private static int IndexOf(int radius)
+    {
+        int nearest = NearestStep(radius);
+
+        for (int at = 0; at < Steps.Count; at++)
+        {
+            if (Steps[at] == nearest)
+            {
+                return at;
+            }
+        }
+
+        return 0;
+    }
 
     /// <summary>
     /// The drawing round <paramref name="me" />: as large as lets <paramref name="radius" /> steps in each of the four

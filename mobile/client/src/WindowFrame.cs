@@ -21,7 +21,9 @@ public enum GlyphKind
     Zoom,
     Stop,
     Town,
-    Field
+    Field,
+    Plus,
+    Minus
 }
 
 /// <summary>
@@ -148,6 +150,15 @@ public sealed partial class Glyph : Control
                 DrawPolyline([P(0.12f, 0.48f), P(0.5f, 0.15f), P(0.88f, 0.48f)], c, w, true);
                 DrawPolyline([P(0.22f, 0.42f), P(0.22f, 0.86f), P(0.78f, 0.86f), P(0.78f, 0.42f)], c, w, true);
                 DrawRect(new Rect2(P(0.42f, 0.6f), new Vector2(0.16f * s, 0.26f * s)), c);
+                break;
+
+            case GlyphKind.Plus:
+                DrawLine(P(0.2f, 0.5f), P(0.8f, 0.5f), c, w + 0.5f, true);
+                DrawLine(P(0.5f, 0.2f), P(0.5f, 0.8f), c, w + 0.5f, true);
+                break;
+
+            case GlyphKind.Minus:
+                DrawLine(P(0.2f, 0.5f), P(0.8f, 0.5f), c, w + 0.5f, true);
                 break;
 
             case GlyphKind.Field:

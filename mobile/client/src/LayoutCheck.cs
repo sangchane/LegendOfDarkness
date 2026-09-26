@@ -63,7 +63,10 @@ public static class LayoutCheck
     /// survive the worst of it. The numbers are the item pictures that have actually been cut.
     /// </remarks>
     public static IReadOnlyList<InventoryItem> PretendPack { get; } = Stuffed()
-        ? [.. Enumerable(1, 60, slot => new InventoryItem(
+        ? [.. Enumerable(1, 60, slot => slot == 60
+            // 마지막 칸은 쿠룸 열둘 — 게임 화면 포션 칸의 개수(오른쪽 아래)가 사진에 보이게. 마라디움은 없다(0 이 흐리게).
+            ? new InventoryItem(slot, 32813, 0, "쿠룸", 12, 0, 0)
+            : new InventoryItem(
             slot,
             Icons[slot % Icons.Length],
             0,

@@ -18,6 +18,9 @@ public partial class PotionChip : Button
     private readonly System.Action<PotionRule> _write;
     private readonly System.Func<IReadOnlyList<InventoryItem>> _pack;
     private readonly Label _line = new();
+
+    // 가방에 있는 개수 — 칸 오른쪽 아래 구석, 코마디움 칸(ComaButton)의 개수와 같은 모양(사용자, 2026-09-26).
+    private readonly Label _count = new();
     private readonly PopupPanel _picker = new();
 
     private ulong _downAt;
@@ -40,17 +43,28 @@ public partial class PotionChip : Button
         IconAlignment = HorizontalAlignment.Center;
         Greybox.Plain(this);
 
-        // 줄은 작게, 그림 아래 구석에 — 그림이 무엇을 마시는지 말하고 숫자는 거든다.
-        _line.AddThemeFontSizeOverride("font_size", 11);
+        // 줄(70% · 끔 · 없음)은 왼쪽 위 구석에 작게 — 오른쪽 아래는 개수 자리다. 그림이 무엇을 마시는지 말하고 글자는 거든다.
+        _line.AddThemeFontSizeOverride("font_size", 10);
         _line.AddThemeColorOverride("font_outline_color", Colors.Black);
         _line.AddThemeConstantOverride("outline_size", 4);
-        _line.HorizontalAlignment = HorizontalAlignment.Right;
-        _line.VerticalAlignment = VerticalAlignment.Bottom;
+        _line.HorizontalAlignment = HorizontalAlignment.Left;
+        _line.VerticalAlignment = VerticalAlignment.Top;
         _line.MouseFilter = MouseFilterEnum.Ignore;
         _line.SetAnchorsPreset(LayoutPreset.FullRect);
-        _line.OffsetRight = -3;
-        _line.OffsetBottom = -1;
+        _line.OffsetLeft = 2;
+        _line.OffsetTop = -2;
         AddChild(_line);
+
+        _count.AddThemeFontSizeOverride("font_size", 11);
+        _count.AddThemeColorOverride("font_outline_color", Colors.Black);
+        _count.AddThemeConstantOverride("outline_size", 4);
+        _count.HorizontalAlignment = HorizontalAlignment.Right;
+        _count.VerticalAlignment = VerticalAlignment.Bottom;
+        _count.MouseFilter = MouseFilterEnum.Ignore;
+        _count.SetAnchorsPreset(LayoutPreset.FullRect);
+        _count.OffsetRight = -3;
+        _count.OffsetBottom = -1;
+        AddChild(_count);
         AddChild(_picker);
     }
 
@@ -116,6 +130,10 @@ public partial class PotionChip : Button
         Icon = ItemIcons.For(IconOf(rule.Potion));
         Modulate = rule.Enabled ? Colors.White : new Color(1, 1, 1, 0.45f);
         _line.Text = !rule.Enabled ? "끔" : count > 0 ? $"{rule.Percent}%" : "없음";
+
+        // 0 이면 0 을 흐리게 — 떨어진 것도 한눈에.
+        _count.Text = count.ToString();
+        _count.AddThemeColorOverride("font_color", count > 0 ? Greybox.Text : Greybox.Muted with { A = 0.7f });
         TooltipText = $"{rule.Potion} {count}개";
     }
 

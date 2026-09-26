@@ -21,7 +21,7 @@ public sealed partial class AbilityBar : Control
     private readonly Button[] _slots = new Button[AbilityFan.PerPage];
     private readonly Label[] _waits = new Label[AbilityFan.PerPage];
     private readonly Button _switch = Disc("기술", AbilityFan.ButtonSide);
-    private readonly Button _next = Disc("1/1", AbilityFan.ButtonSide);
+    private readonly Button _next = Disc("1/1", AbilityFan.NextSide);
 
     // 지금 칸에 그려 둔 것. 서버 목록은 프레임마다 새로 만들어지므로, 내용이 같으면 다시 그리지 않는다.
     private object?[] _drawn = new object?[AbilityFan.PerPage];
@@ -142,7 +142,18 @@ public sealed partial class AbilityBar : Control
             _page = AbilityFan.After(_page, _spells ? _learnedSpells.Count : _learnedSkills.Count);
             Redraw();
         };
-        Place(_next, AbilityFan.Next, AbilityFan.ButtonSide);
+        // 쪽 표시는 포션 칸만 한 작은 칸으로 부채꼴 왼쪽 위 구석에(2026-09-26). 글자도 작게.
+        _next.AddThemeFontSizeOverride("font_size", 11);
+
+        // 둥근 판의 안 여백(7)은 기술 그림용이다 — 32 칸에 "1/3" 이 잘리지 않게 줄인다.
+        foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
+        {
+            if (_next.GetThemeStylebox(state) is StyleBoxFlat box)
+            {
+                box.SetContentMarginAll(1);
+            }
+        }
+        Place(_next, AbilityFan.Next, AbilityFan.NextSide);
 
         for (int index = 0; index < _slots.Length; index++)
         {

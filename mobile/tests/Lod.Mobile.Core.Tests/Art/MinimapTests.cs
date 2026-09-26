@@ -146,4 +146,35 @@ public sealed class MinimapTests
 
         Assert.Equal([near], Minimap.InRound(frame, side, [corner, near]));
     }
+
+    /// <summary>
+    /// [+]·[−] (2026-09-26): a few steps between 6 and 24 tiles. [+] shows fewer tiles larger, [−] more tiles smaller, and
+    /// the ends stay put. A radius read back from the device that is not a step goes to the nearest one.
+    /// </summary>
+    [Fact]
+    public void Zoom_steps_between_six_and_twenty_four()
+    {
+        Assert.Equal(6, Minimap.Steps[0]);
+        Assert.Equal(24, Minimap.Steps[^1]);
+        Assert.Contains(Minimap.Radius, Minimap.Steps);
+
+        Assert.Equal(9, Minimap.ZoomIn(12));
+        Assert.Equal(16, Minimap.ZoomOut(12));
+        Assert.Equal(6, Minimap.ZoomIn(6));
+        Assert.Equal(24, Minimap.ZoomOut(24));
+
+        Assert.Equal(12, Minimap.NearestStep(13));
+        Assert.Equal(24, Minimap.NearestStep(99));
+        Assert.Equal(6, Minimap.NearestStep(0));
+    }
+
+    /// <summary>Zooming in makes each tile larger in the same box.</summary>
+    [Fact]
+    public void Fewer_tiles_are_drawn_larger()
+    {
+        TabMapProjection near = Minimap.Frame(new Tile(30, 30), 70, 70, 160, 80, radius: 6);
+        TabMapProjection far = Minimap.Frame(new Tile(30, 30), 70, 70, 160, 80, radius: 24);
+
+        Assert.True(near.HalfWidth > far.HalfWidth * 3.9f);
+    }
 }

@@ -1486,11 +1486,20 @@ public partial class GameScreen : Control
     /// half, lets go, and says where the character stands and how see-through the pad is every quarter second.
     /// </summary>
     private int _minimapTold;
+    private int _minimapZoomWait;
+    private int _minimapPressed;
     private int _packPickWait;
 
     /// <summary><c>--minimap</c>: every two seconds, where the minimap stands and what it shows — no thumb needed.</summary>
     private void RehearseMinimap()
     {
+        // --minimap-zoom: 60 프레임 뒤부터 10 프레임마다 [+]/[−] 를 한 번씩.
+        if (Main.MinimapZoom != 0 && _minimapPressed < Math.Abs(Main.MinimapZoom) && ++_minimapZoomWait >= 60 && _minimapZoomWait % 10 == 0)
+        {
+            _minimapPressed++;
+            (Main.MinimapZoom > 0 ? _minimap.ZoomIn : _minimap.ZoomOut).EmitSignal(BaseButton.SignalName.Pressed);
+        }
+
         if (Main.CheckingMinimap && (_world.MapId > 0 || _server is null) && ++_minimapTold % 120 == 30)
         {
             GD.Print($"GREYBOX_MINIMAP {_minimap.GetGlobalRect()} {_minimap.Describe()}");
@@ -1988,9 +1997,9 @@ public partial class GameScreen : Control
         // 상단쪽에 … 기술창 보다 조금 작게"). 마실 포션의 그림에 줄을 작게 적는다. 누르면 켜고 끄기, 길게 누르면 다른
         // 포션을 고른다. 줄은 설정 창에서.
         _abilities.Hold(new PotionChip(AutoPotion.Healing,
-            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? []), 0);
+            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? LayoutCheck.PretendPack), 0);
         _abilities.Hold(new PotionChip(AutoPotion.Restoring,
-            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? []), 1);
+            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? LayoutCheck.PretendPack), 1);
         _abilities.HoldComa(new ComaButton(() => _server, Notify));
 
         row.AddChild(_abilities);

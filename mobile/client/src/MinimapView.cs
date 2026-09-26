@@ -8,18 +8,18 @@ using Lod.Mobile.Core.World;
 namespace LodClient;
 
 /// <summary>
-/// The minimap that always stays up at the left end of the top row — round (사용자, 2026-09-26: 동그란 테두리로, 안에는
-/// 길 창을 열었을 때 보이는 지도). Inside is the 길 찾기 map's own drawing, small and centred on us: the floor's flat
-/// diamond, walls in its light stone and floor in its dark (<see cref="TabMapPanel.WallPaint" />), <see cref="Minimap.Radius" />
-/// tiles round us. Everyone is one dot of a pixel or two in the 길 찾기 map's colours — monsters red, NPCs pale, party
-/// blue, the bot green, others grey — exits small diamonds, and we are a white dot a little larger with a thin black
-/// rim so we are found at a glance. Pressing it opens the full 길 찾기 map.
+/// The minimap at the left end of the top row — a rectangle again, as large as the row lets it be (사용자, 2026-09-26: 둥근
+/// 것은 너무 작아서 안 보인다 — 사각형으로, 크게, [+]·[−] 로 확대·축소). Inside is the 길 찾기 map's own drawing, centred on
+/// us: the floor's flat diamond, walls in its light stone and floor in its dark (<see cref="TabMapPanel.WallPaint" />).
+/// Everyone is one dot of two pixels in the 길 찾기 map's colours — monsters red, NPCs pale, party blue, the bot green,
+/// others grey — exits small diamonds, and we are a white dot a little larger with a thin black rim. [+]·[−] in the right
+/// corners step how many tiles show (<see cref="Minimap.Steps" />, 6~24, kept on the device); pressing the rest of it
+/// opens the full 길 찾기 map.
 /// </summary>
 /// <remarks>
-/// Round by masking: the button itself draws a disc and clips its children to it (<see cref="CanvasItem.ClipChildren" />);
-/// the map is one child, the rim another. Light to draw: the floor is baked once per map into a picture of one pixel per
-/// tile, and each redraw lays that picture down through the diamond transform (<see cref="Minimap.FromGrid" />) and the
-/// few dots over it — when we step and four times a second for the others.
+/// Light to draw: the floor is baked once per map into a picture of one pixel per tile, and each redraw lays that
+/// picture down through the diamond transform (<see cref="Minimap.FromGrid" />) and the few dots over it — when we step and
+/// four times a second for the others. (The round look's <see cref="Minimap.SeesRound" /> stays in the core, unused.)
 /// </remarks>
 public sealed partial class MinimapView : Button
 {
@@ -74,20 +74,89 @@ public sealed partial class MinimapView : Button
         FocusMode = FocusModeEnum.None;
         TooltipText = "길 찾기";
 
-        // 동그라미 — 지름은 내 판(네 줄) 높이쯤. 제 사각형을 벗어나 늘어나지 않는다.
-        float side = Main.Portrait ? 80 : 72;
-        CustomMinimumSize = new Vector2(side, side);
-        SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
+        // 사각형 — 세로는 첫 줄의 남는 폭을 다 쓰고(최소 120) 높이 96, 가로는 176×76(가로 360 에서 위 줄이 80 을 넘으면 조작 줄을
+        // 밀어낸다 — 그 안의 가장 큰 높이).
+        CustomMinimumSize = Main.Portrait ? new Vector2(120, 96) : new Vector2(176, 76);
+        SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ExpandFill : SizeFlags.ShrinkBegin;
         SizeFlagsVertical = SizeFlags.ShrinkCenter;
-
-        // 제가 그리는 원판이 아이들을 자르는 틀이 된다 — 지도와 테두리는 원 안에만 보인다.
-        ClipChildren = ClipChildrenMode.Only;
+        ClipContents = true;
         _face = new Face(this) { MouseFilter = MouseFilterEnum.Ignore, TextureFilter = TextureFilterEnum.Nearest };
         _face.SetAnchorsPreset(LayoutPreset.FullRect);
         _rim.MouseFilter = MouseFilterEnum.Ignore;
         _rim.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(_face);
         AddChild(_rim);
+
+        // [+]·[−] — 오른쪽 위·아래 구석. 누르는 곳은 44 폭(높이는 판의 반까지), 그림은 작게. 이것을 누르면 길 창은 열리지 않는다
+        // (아이 단추가 먼저 받는다).
+        ZoomIn = Corner(GlyphKind.Plus, top: true);
+        ZoomOut = Corner(GlyphKind.Minus, top: false);
+        ZoomIn.Pressed += () => Zoom(Minimap.ZoomIn(Main.MinimapRadius));
+        ZoomOut.Pressed += () => Zoom(Minimap.ZoomOut(Main.MinimapRadius));
+    }
+
+    /// <summary>[+] — 칸을 줄여 크게.</summary>
+    public Button ZoomIn { get; }
+
+    /// <summary>[−] — 칸을 늘려 작게.</summary>
+    public Button ZoomOut { get; }
+
+    private void Zoom(int radius)
+    {
+        Main.SetMinimapRadius(radius);
+        GD.Print($"GREYBOX_MINIMAP_ZOOM {Main.MinimapRadius}칸");
+        _face.QueueRedraw();
+    }
+
+    private Button Corner(GlyphKind kind, bool top)
+    {
+        float tall = Mathf.Min(Main.TouchMinimum, CustomMinimumSize.Y / 2);
+        Button button = new() { Flat = true, FocusMode = FocusModeEnum.None, TooltipText = kind == GlyphKind.Plus ? "확대" : "축소" };
+        StyleBoxEmpty none = new();
+
+        foreach (string state in new[] { "normal", "hover", "focus", "pressed" })
+        {
+            button.AddThemeStyleboxOverride(state, none);
+        }
+
+        button.AnchorLeft = button.AnchorRight = 1;
+        button.AnchorTop = button.AnchorBottom = top ? 0 : 1;
+        button.OffsetLeft = -Main.TouchMinimum;
+        button.OffsetRight = 0;
+        button.OffsetTop = top ? 0 : -tall;
+        button.OffsetBottom = top ? tall : 0;
+
+        // 작은 둥근 판 위에 + / − — 지도 위에서도 보이게 어두운 판.
+        Control chip = new ZoomChip(kind) { MouseFilter = MouseFilterEnum.Ignore };
+        chip.AnchorLeft = chip.AnchorRight = 1;
+        chip.AnchorTop = chip.AnchorBottom = top ? 0 : 1;
+        chip.OffsetLeft = -20;
+        chip.OffsetRight = -2;
+        chip.OffsetTop = top ? 2 : -20;
+        chip.OffsetBottom = top ? 20 : -2;
+        button.AddChild(chip);
+        AddChild(button);
+
+        return button;
+    }
+
+    /// <summary>The little dark disc with + or − on it.</summary>
+    private sealed partial class ZoomChip(GlyphKind kind) : Control
+    {
+        public override void _Draw()
+        {
+            Vector2 c = Size / 2;
+            DrawCircle(c, (Size.X / 2) + 0.5f, new Color("#636357"));
+            DrawCircle(c, (Size.X / 2) - 0.5f, new Color("#0f0f0f") with { A = 0.9f });
+            Color paint = Greybox.Title;
+            float r = Size.X * 0.28f;
+            DrawLine(c - new Vector2(r, 0), c + new Vector2(r, 0), paint, 2, true);
+
+            if (kind == GlyphKind.Plus)
+            {
+                DrawLine(c - new Vector2(0, r), c + new Vector2(0, r), paint, 2, true);
+            }
+        }
     }
 
     public override void _Process(double delta)
@@ -112,11 +181,11 @@ public sealed partial class MinimapView : Button
     public string Describe()
     {
         (int columns, int rows) = Layout is { } layout ? (layout.Columns, layout.Rows) : _world.MapSize;
-        TabMapProjection frame = Minimap.Frame(Standing, columns, rows, Size.X, Size.X);
-        IReadOnlyList<TabMarker> seen = Minimap.InRound(frame, Size.X, _markers);
+        TabMapProjection frame = Minimap.Frame(Standing, columns, rows, Size.X, Size.Y, Main.MinimapRadius);
+        IReadOnlyList<TabMarker> seen = Minimap.InSight(frame, Size.X, Size.Y, _markers);
         string kinds = string.Join(" ", seen.GroupBy(one => one.Kind).Select(group => $"{group.Key}={group.Count()}"));
 
-        return $"맵 {MapId} 나 {Standing.X},{Standing.Y} 칸 {frame.HalfWidth * 2:0.0}px 바닥 {(_grid is null ? "없음" : "있음")} 점 [{kinds}]";
+        return $"맵 {MapId} 나 {Standing.X},{Standing.Y} 반경 {Main.MinimapRadius} 칸 {frame.HalfWidth * 2:0.0}px 바닥 {(_grid is null ? "없음" : "있음")} 점 [{kinds}]";
     }
 
     private void Refresh()
@@ -182,31 +251,24 @@ public sealed partial class MinimapView : Button
         return ImageTexture.CreateFromImage(grid);
     }
 
-    /// <summary>The disc that masks the children — only its shape counts (<see cref="CanvasItem.ClipChildren" />).</summary>
-    public override void _Draw()
-    {
-        float side = Mathf.Min(Size.X, Size.Y);
-        DrawCircle(new Vector2(side / 2, side / 2), side / 2, Colors.White);
-    }
-
-    /// <summary>The map itself, inside the disc.</summary>
+    /// <summary>The map itself.</summary>
     private sealed partial class Face(MinimapView owner) : Control
     {
         public override void _Draw()
         {
-            float side = Mathf.Min(Size.X, Size.Y);
-            DrawRect(new Rect2(Vector2.Zero, new Vector2(side, side)), TabMapPanel.Backdrop with { A = 0.9f });
+            float wide = Size.X, high = Size.Y;
+            DrawRect(new Rect2(Vector2.Zero, Size), TabMapPanel.Backdrop with { A = 0.9f });
 
             (int columns, int rows) = owner.Layout is { } layout ? (layout.Columns, layout.Rows) : owner._world.MapSize;
 
             if (columns == 0)
             {
                 Font font = GetThemeDefaultFont();
-                DrawString(font, new Vector2(0, (side / 2) + 4), "지도 없음", HorizontalAlignment.Center, side, 11, Greybox.Muted);
+                DrawString(font, new Vector2(0, (high / 2) + 4), "지도 없음", HorizontalAlignment.Center, wide, 11, Greybox.Muted);
                 return;
             }
 
-            TabMapProjection frame = Minimap.Frame(owner.Standing, columns, rows, side, side);
+            TabMapProjection frame = Minimap.Frame(owner.Standing, columns, rows, wide, high, Main.MinimapRadius);
 
             if (owner._grid is not null)
             {
@@ -222,20 +284,20 @@ public sealed partial class MinimapView : Button
             // 걸어갈 길 — 한 픽셀 점.
             foreach (Tile step in owner._world.Route)
             {
-                if (Minimap.SeesRound(frame, side, step))
+                if (Minimap.Sees(frame, wide, high, step))
                 {
                     DrawRect(new Rect2(At(frame, step) - new Vector2(0.5f, 0.5f), Vector2.One), Greybox.Accent);
                 }
             }
 
-            foreach (TabMarker marker in Minimap.InRound(frame, side, owner._markers))
+            foreach (TabMarker marker in Minimap.InSight(frame, wide, high, owner._markers))
             {
                 Color paint = TabMapPanel.Paint(marker.Kind);
 
                 if (marker.Kind == TabMarkerKind.Exit)
                 {
                     // 출구는 작은 마름모(반 칸) — 문이 어디인지는 보여야 한다.
-                    foreach (Tile tile in marker.Goals.Where(tile => Minimap.SeesRound(frame, side, tile)))
+                    foreach (Tile tile in marker.Goals.Where(tile => Minimap.Sees(frame, wide, high, tile)))
                     {
                         Vector2 at = At(frame, tile);
                         float w = frame.HalfWidth * 0.6f, h = frame.HalfHeight * 0.6f;
@@ -248,7 +310,7 @@ public sealed partial class MinimapView : Button
                 Dot(At(frame, marker.Where), paint);
             }
 
-            if (owner._botAt is { } bot && Minimap.SeesRound(frame, side, bot))
+            if (owner._botAt is { } bot && Minimap.Sees(frame, wide, high, bot))
             {
                 Dot(At(frame, bot), BotPaint);
             }
@@ -258,13 +320,13 @@ public sealed partial class MinimapView : Button
             DrawRect(new Rect2(me - new Vector2(2.5f, 2.5f), new Vector2(5, 5)), Colors.Black);
             DrawRect(new Rect2(me - new Vector2(1.5f, 1.5f), new Vector2(3, 3)), Colors.White);
 
-            // 지금 곳 — 원 아래쪽 가운데에 아주 작게(위 줄의 곳 이름 판을 대신한다).
+            // 지금 곳 — 아래 왼쪽에 작게(위 줄의 곳 이름 판을 대신한다). 오른쪽 구석은 [+]·[−] 자리.
             if (owner.PlaceName.Length > 0)
             {
                 Font font = GetThemeDefaultFont();
-                Vector2 where = new(side * 0.15f, side - 9);
-                DrawStringOutline(font, where, owner.PlaceName, HorizontalAlignment.Center, side * 0.7f, 9, 3, Colors.Black);
-                DrawString(font, where, owner.PlaceName, HorizontalAlignment.Center, side * 0.7f, 9, Greybox.Title);
+                Vector2 where = new(4, high - 4);
+                DrawStringOutline(font, where, owner.PlaceName, HorizontalAlignment.Left, wide - 28, 10, 3, Colors.Black);
+                DrawString(font, where, owner.PlaceName, HorizontalAlignment.Left, wide - 28, 10, Greybox.Title);
             }
         }
 
@@ -279,14 +341,13 @@ public sealed partial class MinimapView : Button
         }
     }
 
-    /// <summary>The round edge, drawn over the map inside the disc; brighter while pressed.</summary>
+    /// <summary>The edge, drawn over the map; brighter while pressed.</summary>
     private sealed partial class Rim : Control
     {
         public override void _Draw()
         {
-            float side = Mathf.Min(Size.X, Size.Y);
             bool down = GetParent() is MinimapView view && view.IsPressed();
-            DrawArc(new Vector2(side / 2, side / 2), (side / 2) - 1.5f, 0, Mathf.Tau, 64, down ? Greybox.Title : Edge, 3, true);
+            DrawRect(new Rect2(new Vector2(0.5f, 0.5f), Size - Vector2.One), down ? Greybox.Title : Edge, false, 1);
         }
 
         public override void _Process(double delta)

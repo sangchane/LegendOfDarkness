@@ -24,8 +24,14 @@ public static class AbilityFan
     /// <summary>Switches between skills and spells — beside the attack button, on its row.</summary>
     public static (int X, int Y) Switch { get; } = (24, 216);
 
-    /// <summary>The next page — at the top of the fan, because it is pressed least. The right edge is the potions'.</summary>
-    public static (int X, int Y) Next { get; } = (104, 40);
+    /// <summary>
+    /// The next page ("1/3") — a small chip in the fan's top-left corner, as big as a potion switch (사용자, 2026-09-26: 포션 창
+    /// 사이즈만큼 줄여서 구석에). It is pressed least; the right edge is the potions', the 코마디움 stands beside it.
+    /// </summary>
+    public static (int X, int Y) Next { get; } = (16, 16);
+
+    /// <summary>The page chip's side — a potion switch's.</summary>
+    public const int NextSide = PotionSide;
 
     /// <summary>Where the six buttons of a page go, nearest the attack button first.</summary>
     public static IReadOnlyList<(int X, int Y)> Slots { get; } =
