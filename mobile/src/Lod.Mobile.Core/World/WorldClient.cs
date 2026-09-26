@@ -241,6 +241,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private CompanionTie? _companion;
     private readonly ConcurrentDictionary<uint, IReadOnlyList<CompanionStatus>> _statuses = new();
     private CompanionLife? _companionLife;
+
+    // 그룹원마다 마지막으로 온 체력·마력 %·상태 그림(0x5E 종류 6).
+    private readonly ConcurrentDictionary<uint, PartyMemberStatus> _members = new();
     private CompanionKit? _companionKit;
     private int _companionKitCount;
     private volatile PartyRoster _roster = PartyRoster.Alone;
@@ -431,6 +434,13 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>사람일 때 — 봇의 체력·마력 %(0x5E 종류 4).</summary>
     public CompanionLife? CompanionLife => _companionLife;
+
+    /// <summary>그룹원의 체력·마력 %·상태 그림(0x5E 종류 6, 서버가 1초마다). 아직 없거나 그룹이 끝났으면 null.</summary>
+    public PartyMemberStatus? MemberStatus(uint serial) => _members.TryGetValue(serial, out PartyMemberStatus? member) ? member : null;
+
+    /// <summary>그룹원 이름으로 — 멀리 있어 보이지 않는 그룹원도 목록(0x39)의 이름과 짝짓는다.</summary>
+    public PartyMemberStatus? MemberStatus(string name) =>
+        _members.Values.FirstOrDefault(member => string.Equals(member.Name, name, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>사람일 때 — 봇이 입은 것과 봇 가방의 포션(0x5E 종류 5).</summary>
     public CompanionKit? CompanionKit => _companionKit;
@@ -707,6 +717,20 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                                 break;
                             case World.Companion.VitalsKind:
                                 _companionLife = World.Companion.ReadLife(tieBody);
+                                break;
+                            case World.Companion.MemberKind:
+                                PartyMemberStatus member = World.Companion.ReadMember(tieBody);
+
+                                // serial 0 — 그룹이 끝났다(나갔거나 흩어졌다). 모두 지운다.
+                                if (member.Serial == 0)
+                                {
+                                    _members.Clear();
+                                }
+                                else
+                                {
+                                    _members[member.Serial] = member;
+                                }
+
                                 break;
                             case World.Companion.KitKind:
                                 _companionKit = World.Companion.ReadKit(tieBody);
@@ -1033,6 +1057,10 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// <summary>봇의 장비 한 자리를 내 가방으로(0xF1 3).</summary>
     public Task TakeOffCompanionAsync(int place, CancellationToken cancellationToken) =>
         Send(CompanionCommand, World.Companion.TakeOff(place), cancellationToken);
+
+    /// <summary>내 코마디움으로 혼수인 봇을 깨운다(0xF1 4).</summary>
+    public Task WakeCompanionAsync(CancellationToken cancellationToken) =>
+        Send(CompanionCommand, World.Companion.Wake(), cancellationToken);
 
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>

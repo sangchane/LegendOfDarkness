@@ -131,9 +131,24 @@ public static class LayoutCheck
             1,
             new Tile(0, 0),
             Direction.South,
-            new Appearance(1, 1, 0, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0),
+            PretendLook() ?? new Appearance(1, 1, 0, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0),
             "시험용 수련생")
         : null;
+
+    /// <summary>
+    /// <c>--pretend-look 몸,갑옷</c> — 서버 없이 옷차림을 넣어 그려 본다(예: <c>17,8</c> 은 바지 색 1 의 남자가 천지도복).
+    /// 몸은 서버가 보내는 바이트 그대로다(위 반쪽 몸 종류 · 아래 반쪽 바지 색).
+    /// </summary>
+    private static Appearance? PretendLook()
+    {
+        string[] args = OS.GetCmdlineUserArgs();
+        int at = System.Array.IndexOf(args, "--pretend-look");
+        string[] numbers = at >= 0 && at + 1 < args.Length ? args[at + 1].Split(',') : [];
+
+        return numbers.Length == 2 && int.TryParse(numbers[0], out int body) && int.TryParse(numbers[1], out int armor)
+            ? new Appearance(1, body, armor, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            : null;
+    }
 
     /// <summary>
     /// The world map as the server sends it (templates/worldmaps/temuair.json — six places), for <c>--map</c> with no
@@ -383,6 +398,11 @@ public static class LayoutCheck
 
         // 미니맵은 위 줄 안에 선다(2026-09-26) — 위 줄과 겹치는 것이 제자리다. 화면 밖으로 나가는지는 따로 잰다.
         || (one, other) is ("미니맵", "위 줄") or ("위 줄", "미니맵")
+
+        // 방향판은 조작 줄 안에 있다. 파티원 칸은 조작 줄의 빈 왼쪽 위를 지나갈 수 있다 — 겹치면 안 되는 것은 방향판이다.
+        // 인벤토리 창은 둘 다 덮는다(열려 있는 동안 조작이 죽는다).
+        || (one, other) is ("방향판", "조작 줄") or ("조작 줄", "방향판") or ("파티원", "조작 줄") or ("조작 줄", "파티원")
+        || (one, other) is ("방향판", "인벤토리") or ("인벤토리", "방향판") or ("파티원", "인벤토리") or ("인벤토리", "파티원")
         || (!Main.Portrait && (one, other) is ("인벤토리", "위 줄") or ("위 줄", "인벤토리") or ("인벤토리", "미니맵") or ("미니맵", "인벤토리"));
 
     private static IEnumerable<string> Overlaps(IReadOnlyList<(string Name, Control Part)> parts)

@@ -16,6 +16,9 @@ public sealed record CompanionStatus(string Name, int Seconds, bool Harmful, int
 /// <summary>봇의 체력·마력 %(0x5E 종류 4) — 봇 칸의 막대.</summary>
 public sealed record CompanionLife(uint Serial, int HealthPercent, int ManaPercent);
 
+/// <summary>그룹원 한 사람(0x5E 종류 6) — 파티원 칸의 막대와 상태 그림. 원작은 그룹원 체력을 보내지 않는다.</summary>
+public sealed record PartyMemberStatus(uint Serial, int HealthPercent, int ManaPercent, IReadOnlyList<int> Icons, string Name = "");
+
 /// <summary>봇 가방의 겹치는 물건 하나 — 이름 · 그림 · 개수.</summary>
 public sealed record CarriedItem(string Name, int Icon, int Stacks);
 
@@ -38,6 +41,7 @@ public static class Companion
     public const byte StatusesKind = 3;
     public const byte VitalsKind = 4;
     public const byte KitKind = 5;
+    public const byte MemberKind = 6;
 
     public static byte[] Call() => [1];
 
@@ -48,6 +52,9 @@ public static class Companion
 
     /// <summary>봇의 장비 한 자리를 내 가방으로(0xF1 3).</summary>
     public static byte[] TakeOff(int place) => [3, (byte)place];
+
+    /// <summary>내 코마디움으로 혼수인 봇을 깨운다(0xF1 4) — 봇 바로 옆에서.</summary>
+    public static byte[] Wake() => [4];
 
     /// <summary>0x5E 종류 3 — 한 사람(주인 또는 봇 자신)에게 걸린 것: 이름 · 남은 초 · 해로움.</summary>
     public static (uint Serial, IReadOnlyList<CompanionStatus> Statuses) ReadStatuses(ReadOnlySpan<byte> body)
@@ -77,6 +84,25 @@ public static class Companion
         }
 
         return (serial, listed);
+    }
+
+    /// <summary>0x5E 종류 6 — 그룹원 한 사람: serial(4) · 체력 %(1) · 마력 %(1) · 개수(1) · 그림(2)×개수 · 이름(StringA). serial 0 은 "그룹 끝".</summary>
+    public static PartyMemberStatus ReadMember(ReadOnlySpan<byte> body)
+    {
+        Require(body, 8);
+        int count = body[7];
+        Require(body, 8 + (count * 2));
+        List<int> icons = [];
+
+        for (int i = 0; i < count; i++)
+        {
+            icons.Add(BinaryPrimitives.ReadUInt16BigEndian(body[(8 + (i * 2))..]));
+        }
+
+        int at = 8 + (count * 2);
+        string name = body.Length > at ? LegacyKoreanEncoding.DecodeStringA(body[at..], out _) : string.Empty;
+
+        return new PartyMemberStatus(BinaryPrimitives.ReadUInt32BigEndian(body[1..]), body[5], body[6], icons, name);
     }
 
     /// <summary>0x5E 종류 4 — 봇의 체력·마력 %.</summary>
@@ -292,7 +318,7 @@ public static class CompanionSpells
 
 /// <summary>
 /// 동료 봇의 판단 — 엔진 없이. <see cref="AutoHunt" /> 처럼 우선순위 순으로 훑어 할 수 있는 첫 일 하나를 돌려준다:
-/// 멈춤(혼수·죽음) &gt; 주인 회복 &gt; 봇 체력 포션 &gt; 자기 회복 마법 &gt; 봇 마력 포션 &gt; 해제 &gt; 버프 유지 &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
+/// 멈춤(혼수·죽음·유령) &gt; 해제(수면·빙결) &gt; 주인 회복 &gt; 봇 체력 포션 &gt; 자기 회복 마법 &gt; 봇 마력 포션 &gt; 버프 유지 &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
 /// SleepHunter4 의 파티원 회복(<c>PlayerMacroState</c> 의 FlowerQueue — 체력이 기준 아래인 이를 먼저)과 버프 유지(지속 시간이
 /// 끝나면 다시)를 본떴다.
 /// </summary>
@@ -300,6 +326,9 @@ public sealed class CompanionBrain
 {
     /// <summary>마법 하나를 쓰고 다음 무엇이든 하기까지. 서버는 걷는 중의 주문을 끊는다(CancelCastingWhenWalking).</summary>
     public static readonly TimeSpan CastGap = TimeSpan.FromSeconds(1);
+
+    /// <summary>해제는 앞 주문 뒤 이만큼만 기다린다 — 서버는 다른 마법이면 곧 받는다.</summary>
+    public static readonly TimeSpan CureGap = TimeSpan.FromMilliseconds(300);
 
     /// <summary>회복 사이 — 한 번 걸고 체력바(0x13)가 오르는 것을 본 뒤에.</summary>
     public static readonly TimeSpan HealGap = TimeSpan.FromMilliseconds(1500);
@@ -351,7 +380,8 @@ public sealed class CompanionBrain
             return new(CompanionAct.Wait, Why: "주인 없음");
         }
 
-        if (sight.Comatose || sight.Vitals is { MaximumHealth: > 0, Health: <= 0 })
+        if (sight.Comatose || sight.Vitals is { MaximumHealth: > 0, Health: <= 0 }
+            || sight.StatusesOf(sight.Me)?.Contains("ghost") == true)
         {
             return new(CompanionAct.Stop, Why: "쓰러짐");
         }
@@ -373,6 +403,13 @@ public sealed class CompanionBrain
             .Select(entry => entry!.Mana)
             .DefaultIfEmpty(0)
             .Min();
+
+        // 해제가 가장 먼저 — 수면(나르콜리)·빙결이면 주인은 아무것도 못 한다(사용자, 2026-09-26). 주문 사이(1초)를 다 기다리지
+        // 않는다(CureGap) — 막 버프를 걸었어도 곧 푼다.
+        if (now - _lastCast >= CureGap && Cure(sight, empowered, mana, ownerNear) is { } cure)
+        {
+            return Cast(cure, now, heal: false);
+        }
 
         // 주인 회복(둘 다 아프면 파티 회복).
         if (canHeal && ownerHurt)
@@ -405,11 +442,6 @@ public sealed class CompanionBrain
         {
             _lastDrink = now;
             return new(CompanionAct.Drink, restoring.Slot, Why: $"마력 포션 {restoring.Name}");
-        }
-
-        if (canCast && Cure(sight, empowered, mana, ownerNear) is { } cure)
-        {
-            return Cast(cure, now, heal: false);
         }
 
         if (canCast && Buff(sight, empowered, mana, ownerNear) is { } buff)

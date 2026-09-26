@@ -370,6 +370,19 @@ public sealed class CompanionTests
         Assert.Equal([new CompanionStatus("horrama", 120, false, 11), new CompanionStatus("sleep", 9, true, 0)], listed);
     }
 
+    /// <summary>0x5E 종류 6 — 그룹원 한 사람: serial · 체력 % · 마력 % · 상태 그림 개수와 그림들. serial 0 은 "그룹 끝".</summary>
+    [Fact]
+    public void A_member_is_health_mana_and_status_pictures()
+    {
+        PartyMemberStatus member = Companion.ReadMember([6, 0, 0, 0, 9, 55, 80, 2, 0, 11, 0, 82, .. LegacyKoreanEncoding.EncodeStringA("동료")]);
+
+        Assert.Equal(9u, member.Serial);
+        Assert.Equal(55, member.HealthPercent);
+        Assert.Equal(80, member.ManaPercent);
+        Assert.Equal([11, 82], member.Icons);
+        Assert.Equal("동료", member.Name);
+    }
+
     [Fact]
     public void Life_is_two_percentages()
     {
@@ -400,5 +413,23 @@ public sealed class CompanionTests
 
         Assert.Equal(CompanionAct.Walk, again.Act);
         Assert.NotEqual(Direction.East, again.Toward);
+    }
+
+    /// <summary>수면이면 주인은 아무것도 못 한다 — 체력이 낮아도 해제가 먼저.</summary>
+    [Fact]
+    public void An_asleep_owner_is_woken_even_before_being_healed()
+    {
+        IReadOnlyList<LearnedSpell> spells = [.. Level21, Spell(7, "디나르콜리")];
+        CompanionSight sight = Sight(ownerHealth: 30, spells: spells) with { StatusesOf = On(["sleep"]) };
+
+        Assert.Equal(7, new CompanionBrain().Next(sight, Defaults).Slot);
+    }
+
+    [Fact]
+    public void A_ghost_bot_stands_still_until_brought_back()
+    {
+        CompanionSight sight = Sight(ownerHealth: 30) with { StatusesOf = On([], ["ghost"]) };
+
+        Assert.Equal(CompanionAct.Stop, new CompanionBrain().Next(sight, Defaults).Act);
     }
 }

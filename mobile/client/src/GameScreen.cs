@@ -177,7 +177,7 @@ public partial class GameScreen : Control
     /// way. Named in Korean because the names are printed for a person to read.
     /// </summary>
     public IReadOnlyList<(string Name, Control Part)> Parts =>
-        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("인벤토리", _pack), ("월드", _world)];
+        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("방향판", _pad), ("파티원", _party.Members), ("인벤토리", _pack), ("월드", _world)];
 
     /// <summary>Which tab the pack shows. Only a layout check asks — a thumb presses the tab itself.</summary>
     public void ShowGearTab(bool gear) => _pack.ShowTab(gear);
@@ -420,6 +420,9 @@ public partial class GameScreen : Control
         _party.CustomMinimumSize = new Vector2(PartyColumn.Wide, 0);
         // 봇 칸은 파티 기둥 밖, 화면 왼쪽 가장자리에 딱 붙는다(사용자, 2026-09-26) — 위 줄 바로 아래(PlaceParty).
         over.AddChild(_party.BotSlot);
+
+        // 파티원 칸들 — 봇 칸 아래(세로) · 봇 칸 옆(가로), 왼쪽 가장자리부터(사용자, 2026-09-26: 그룹원 체력 정보 창).
+        over.AddChild(_party.Members);
         _toasts.AnchorLeft = 1;
         _toasts.AnchorRight = 1;
         _toasts.OffsetLeft = -ToastWidth;
@@ -695,8 +698,7 @@ public partial class GameScreen : Control
 
         if (Main.Portrait)
         {
-            // 세로: 첫 줄 = 미니맵(맨 왼쪽, 남는 폭을 다 쓴다 — 이름이 길면 줄어든다) · 내 판, 둘째 줄 = 고른 이 · 월드맵 · 인벤토리 · 설정.
-            _minimap.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            // 세로: 첫 줄 = 둥근 미니맵(맨 왼쪽) · 내 판, 둘째 줄 = 고른 이 · 월드맵 · 인벤토리 · 설정.
             row.AddChild(_minimap);
             row.MoveChild(_minimap, 0);
 
@@ -1161,6 +1163,15 @@ public partial class GameScreen : Control
 
         if (_server is not { } server)
         {
+            // --party-preview: 서버 없이 파티원 다섯(+ 나)을 지어 파티원 칸을 그려 본다 — 사진·배치 검사용.
+            if (Main.PartyPreview)
+            {
+                string[] names = ["나", "가나다라마바", "검객", "궁수아이디", "도사", "치유사"];
+                _party.Show(new PartyRoster([.. names.Select((name, at) => new PartyMember(name, at == 1))]), "나", name =>
+                    new MemberLook(90 - (name.Length * 9), 70 - (name.Length * 7),
+                        StatusBadges.OfIcons(name.Length % 2 == 0 ? [11, 52] : [82])));
+            }
+
             return;
         }
 
@@ -1179,8 +1190,11 @@ public partial class GameScreen : Control
         string self = server.Self?.Name ?? string.Empty;
         PartyRoster roster = server.Roster;
 
-        _party.Show(roster, self, name =>
-            server.Others.FirstOrDefault(other => other.Name == name) is { } seen ? server.Health(seen.Serial) : null);
+        // 서버가 1초마다 보내는 그룹원 체력·마력 %·상태(0x5E 종류 6, 이름으로 짝짓는다 — 멀리 있어도). 아직 없으면 보이는 이의
+        // 체력바 %(0x13)만.
+        _party.Show(roster, self, name => server.MemberStatus(name) is { } told
+            ? new MemberLook(told.HealthPercent, told.ManaPercent, StatusBadges.OfIcons(told.Icons))
+            : new MemberLook(server.Others.FirstOrDefault(other => other.Name == name) is { } seen ? server.Health(seen.Serial) : null, null, []));
 
         Character? picked = server.Others.FirstOrDefault(other => other.Serial == _world.Target);
         bool leading = !roster.Grouped || roster.Members.Any(member => member.Leader && member.Name == self);
@@ -1278,12 +1292,46 @@ public partial class GameScreen : Control
         bot.OffsetTop = top;
         bot.OffsetBottom = top + bot.GetCombinedMinimumSize().Y;
 
-        // 파티 기둥: 세로는 봇 칸 아래, 가로는 방향판 오른쪽 옆(봇 칸과 안 겹친다).
+        // 파티원 칸들: 세로는 봇 칸 아래로 쌓고, 가로는 봇 칸 오른쪽으로 늘어놓는다(왼쪽 아래는 방향판) — 화면 폭의 반까지만.
+        Control members = _party.Members;
+        float edge = bot.OffsetLeft;
+
+        if (Main.Portrait)
+        {
+            members.OffsetLeft = edge;
+            members.OffsetTop = bot.Visible ? bot.OffsetBottom + 4 : top;
+
+            // 한 줄로 쌓아 방향판에 닿으면 두 줄로 — 낮은 세로 화면(360x640)에 다섯이면 그렇다.
+            float room = _pad.GetGlobalRect().Position.Y - _over.GetGlobalRect().Position.Y - members.OffsetTop - Main.Gutter;
+            float[] tall = [.. members.GetChildren().OfType<Control>().Select(child => child.GetCombinedMinimumSize().Y)];
+            float stacked = tall.Sum(one => one + 4);
+            int columns = stacked > room ? 2 : 1;
+            members.OffsetRight = edge + (columns * PartyColumn.MemberWide) + ((columns - 1) * 4);
+
+            // 높이는 직접 센다 — 흐르는 칸은 폭이 바뀐 다음 프레임에야 제 높이를 다시 재서, 그 한 프레임 동안 한 줄 높이로 남았다.
+            members.OffsetBottom = members.OffsetTop + (columns == 1
+                ? stacked
+                : tall.Chunk(2).Sum(pair => pair.Max() + 4));
+        }
+        else
+        {
+            members.OffsetLeft = bot.Visible ? bot.OffsetRight + 4 : edge;
+            members.OffsetTop = top;
+            members.OffsetRight = edge + (GetViewportRect().Size.X * 0.72f);
+        }
+
+        if (!Main.Portrait)
+        {
+            members.OffsetBottom = members.OffsetTop + members.GetCombinedMinimumSize().Y;
+        }
+        float below = members.Visible ? members.OffsetBottom : bot.Visible ? bot.OffsetBottom : top - Main.Gutter;
+
+        // 파티 기둥(초대 단추·묻기): 세로는 그 아래, 가로는 방향판 오른쪽 옆 — 파티원 칸 줄 아래.
         _party.OffsetLeft = Main.Portrait
             ? 0
             : _pad.GetGlobalRect().End.X - _over.GetGlobalRect().Position.X + Main.Gutter;
         _party.OffsetRight = _party.OffsetLeft + PartyColumn.Wide;
-        _party.OffsetTop = Main.Portrait && bot.Visible ? bot.OffsetBottom + Main.Gutter : top;
+        _party.OffsetTop = Main.Portrait ? below + Main.Gutter : Mathf.Max(top, members.Visible ? members.OffsetBottom + Main.Gutter : top);
     }
 
     /// <summary>
@@ -1943,6 +1991,7 @@ public partial class GameScreen : Control
             () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? []), 0);
         _abilities.Hold(new PotionChip(AutoPotion.Restoring,
             () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? []), 1);
+        _abilities.HoldComa(new ComaButton(() => _server, Notify));
 
         row.AddChild(_abilities);
 

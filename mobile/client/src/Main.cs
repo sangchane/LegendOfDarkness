@@ -380,6 +380,9 @@ public partial class Main : Control
     /// <summary><c>--settings-tab 자동|봇|계정</c>: which tab the settings window opens on. For photographs.</summary>
     public static string SettingsTab { get; private set; } = string.Empty;
 
+    /// <summary><c>--party-preview</c>: 서버 없이 파티원 다섯을 지어 파티원 칸을 그린다(사진·배치 검사용).</summary>
+    public static bool PartyPreview { get; private set; }
+
     /// <summary><c>--minimap</c>: prints where the minimap stands and what it shows (<c>GREYBOX_MINIMAP</c>), to check it without a thumb.</summary>
     public static bool CheckingMinimap { get; private set; }
 
@@ -511,6 +514,7 @@ public partial class Main : Control
         SettingsTab = Flag("--settings-tab");
         OpeningSettings = OpeningSettings || SettingsTab.Length > 0;
         CheckingMinimap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--minimap") >= 0;
+        PartyPreview = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--party-preview") >= 0;
         PackPick = int.TryParse(Flag("--pack-pick"), out int packPick) ? packPick : 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
