@@ -86,6 +86,23 @@ public sealed class CreatureTests
         Assert.Equal(new Tile(7, 8), shown[1].Where);
     }
 
+    /// <summary>
+    /// 바닥 물건 칸의 비어 있던 4바이트에 서버가 묶음 개수(<c>Item.Stacks</c>)를 적는다 — 포션 1~3개 묶음을
+    /// 앱이 "x3" 으로 보이려고(2026-09-26). 괴물·금화에는 0 이 온다.
+    /// </summary>
+    [Fact]
+    public void A_bundle_on_the_floor_says_how_many_it_holds()
+    {
+        byte[] bundle = Record(5, 6, 700, 32827, 0, 1);
+        bundle[13] = 3;
+
+        IReadOnlyList<Creature> shown = WorldClient.ReadCreatures(
+            [0x00, 0x02, .. bundle, .. Record(7, 8, 701, 16385, 2, 0)]);
+
+        Assert.Equal(3, shown[0].Count);
+        Assert.Equal(0, shown[1].Count);
+    }
+
     [Fact]
     public void A_packet_that_stops_short_is_refused()
     {

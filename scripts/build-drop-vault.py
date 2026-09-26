@@ -193,8 +193,16 @@ def slot_kind(item):
     return "잡템"
 
 
+def bundle_text(item):
+    """겹쳐지는 소모품(Consumable 256 | Stackable 128)은 1~3개 묶음으로 떨어진다(`monsterexp.cs` BundleSize,
+    2026-09-26). 나머지는 하나."""
+    both = 256 | 128
+    return "1~3개 묶음" if ((item.get("Flags") or 0) & both) == both else "1개"
+
+
 def real_rate(item, listed_len, loot_type):
-    """`DetermineRandomDrop` 그대로 — 목록에서 하나를 고른 뒤 그 아이템의 DropRate 를 굴린다.
+    """`DetermineRandomDrop` 그대로 — 목록의 DropRate 를 이어 붙인 줄(길이 = 칸수)에서 한 점을 뽑는다.
+    그래서 한 물건의 확률은 DropRate ÷ 칸수 이고, DropRate 가 1 을 넘어도 그대로다(2026-09-26 부터).
     Table 갈래는 가중치 추첨이라 이 나눗셈이 안 맞으므로 `None`."""
     if loot_type & LOOT_TABLE:
         return None
@@ -240,16 +248,16 @@ def build_notes(monsters, items, mundanes):
             for name in names:
                 item = items.get(name)
                 if item is None:
-                    rows.append((name, "**정의 없음 — 영영 안 나옴**", "?"))
+                    rows.append((name, "**정의 없음 — 영영 안 나옴**", "?", "?"))
                     continue
                 rate = real_rate(item[1], len(names), loot_type)
                 pct = "표(가중치) 추첨" if rate is None else f"{rate:.2%}"
-                rows.append((name, pct, slot_kind(item[1])))
+                rows.append((name, pct, slot_kind(item[1]), bundle_text(item[1])))
                 dropped_by.setdefault(name, []).append((note, f"{area}-{zname}", rate))
 
             drop_table = "\n".join(
-                f"| [[아이템/{slug(n)}\\|{n}]] | {p} | {k} |" for n, p, k in rows
-            ) or "| (없음) | | |"
+                f"| [[아이템/{slug(n)}\\|{n}]] | {p} | {c} | {k} |" for n, p, k, c in rows
+            ) or "| (없음) | | | |"
 
             (VAULT / "괴물" / f"{slug(note)}.md").write_text(
                 "---\n"
@@ -267,7 +275,7 @@ def build_notes(monsters, items, mundanes):
                 f"**{lvl + FORGIVEN + 1}레벨부터** 경험치가 깎인다([[식/경험치-깎기]]) — "
                 + " · ".join(f"{lvl + g}레벨 {round(exp * cut_share(g)):,}" for g in (6, 10, 15, 20, 30)) + "\n\n"
                 "## 드랍 목록 (실제 확률 = DropRate ÷ 목록 칸수)\n\n"
-                "| 아이템 | 실제 확률 | 갈래 |\n|---|---|---|\n" + drop_table + "\n",
+                "| 아이템 | 실제 확률 | 한 번에 | 갈래 |\n|---|---|---|---|\n" + drop_table + "\n",
                 encoding="utf-8")
             zone_rows[area][1].append((m["Name"], note, exp, lo, hi, lvl))
 

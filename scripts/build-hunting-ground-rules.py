@@ -71,6 +71,9 @@ ATTACK_ELEMENT_ITEMS = [
 GEAR_DROP_RATE = 0.18  # 기존 0.06 의 3배 — 목록 2칸→6칸이라도 실제 3%를 지킨다.
 SUFFIX_ELEMENT_DROP_RATE = 0.045  # 6칸 목록에서 0.75% (0.5~1% 안)
 POTION_DROP_RATE = 0.6
+# 2026-09-26 사용자 "맵 전체에 마력 포션 드랍률 좀 높이고" — 마력포션만 두 배(0.6 → 1.2). 1 을 넘어도
+# 서버 셈(DetermineRandomDrop)이 DropRate ÷ 칸수 를 그대로 지킨다.
+MANA_POTION_DROP_RATE = 1.2
 
 
 def read(path):
@@ -160,7 +163,7 @@ def retune_item_drop_rates(writing, said):
 
     for name in ["하급체력포션", "하급마력포션", "중급체력포션", "중급마력포션"]:
         path, item = found[name]
-        item["DropRate"] = POTION_DROP_RATE
+        item["DropRate"] = MANA_POTION_DROP_RATE if "마력" in name else POTION_DROP_RATE
         write(path, item, writing)
 
     said.append(

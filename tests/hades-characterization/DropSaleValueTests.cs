@@ -64,7 +64,11 @@ public sealed class DropSaleValueTests
 
     /// <summary>「열 마리 안팎」의 폭. 목록 칸수가 둘인 괴물(브라운맨티스·지네)은 시약이 나올 확률이
     /// 그만큼 높아 아래쪽에, 잡템까지 셋인 괴물은 위쪽에 선다.</summary>
-    private const double Fewest = 7;
+    // 2026-09-26 사용자 결정 두 개(마력 포션 드랍률 두 배 · 포션·시약 1~3개 묶음)의 결과로 7 → 3.5 로 내렸다.
+    // 쿠룸·마라디움이 한 번에 평균 두 개씩 나오며 가장 빠른 괴물(지네·브라운맨티스)이 6.2 → 3.6 마리가 됐다.
+    // 「열 마리 안팎」에서 벗어난 것이라 사용자 확인이 필요하다 — 되돌리려면 시약 값(build-novice-drops.py)이나
+    // 묶음 규칙(monsterexp.cs BundleSize)을 손본다.
+    private const double Fewest = 3.5;
 
     // 마라디움을 250 으로 내린 뒤 14~16 마리가 됐고 사용자가 그대로 두기로 했다(2026-09-24).
     private const double Most = 16;
@@ -141,7 +145,7 @@ public sealed class DropSaleValueTests
                 }
 
                 double odds = ((double?)items[name]["DropRate"] ?? 0) / drops.Length;
-                earned += odds * (int)(((int?)items[name]["Value"] ?? 0) / ShopOffer);
+                earned += odds * BundleAverage(items[name]) * (int)(((int?)items[name]["Value"] ?? 0) / ShopOffer);
             }
 
             double kills = earned > 0 ? tunic / earned : double.PositiveInfinity;
@@ -157,6 +161,16 @@ public sealed class DropSaleValueTests
             $"첫 옷({FirstTunic} {tunic}전)까지 {Fewest:F0}~{Most:F0}마리 밖인 노비스 괴물이 {outside.Count} 마리입니다: " +
             $"{string.Join(", ", outside.Order())}. 잣대는 「열 마리 안팎」입니다 — " +
             "시약·잡템 값은 python3 scripts/build-novice-drops.py · scripts/build-pack-gold.py 가 정합니다.");
+    }
+
+    /// <summary>
+    /// 한 번에 떨어지는 평균 개수. 겹쳐지는 소모품(<c>Consumable|Stackable</c> = 256|128)은 1~3개 묶음이라
+    /// 평균 2(<c>monsterexp.cs</c> <c>BundleSize</c>, 2026-09-26), 나머지는 하나.
+    /// </summary>
+    private static double BundleAverage(JsonNode item)
+    {
+        const int consumableStackable = 256 | 128;
+        return (((int?)item["Flags"] ?? 0) & consumableStackable) == consumableStackable ? 2 : 1;
     }
 
     /// <summary>한 괴물 정의가 떨구겠다고 적어 둔 이름. <c>random</c> 은 이름이 아니라 낱말이다.</summary>

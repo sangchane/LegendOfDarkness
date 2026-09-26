@@ -38,6 +38,22 @@ public sealed partial class GroundMark : Node2D
 
     private static float Half(Texture2D? picture) => picture?.GetSize().Y ?? 2 * Standing;
 
+    private int _count;
+
+    /// <summary>How many the bundle holds (0x07). Two or more is written beside the picture as "x3".</summary>
+    public int Count
+    {
+        get => _count;
+        set
+        {
+            if (_count != value)
+            {
+                _count = value;
+                QueueRedraw();
+            }
+        }
+    }
+
     public override void _Draw()
     {
         if (Picture is { } picture)
@@ -47,6 +63,7 @@ public sealed partial class GroundMark : Node2D
             Vector2 size = picture.GetSize();
 
             DrawTexture(picture, new Vector2(-size.X / 2, -Standing - (size.Y / 2)));
+            DrawCount(new Vector2((size.X / 2) - 4, -Standing + (size.Y / 2)));
 
             return;
         }
@@ -65,5 +82,20 @@ public sealed partial class GroundMark : Node2D
         // 바닥 무늬가 금빛이라 어두운 표식은 묻힌다: 밝게 채우고 어두운 테두리로 띄운다.
         DrawPolyline([.. diamond, diamond[0]], new Color(0, 0, 0, 0.8f), 4);
         DrawColoredPolygon(diamond, new Color(1, 0.87f, 0.45f));
+        DrawCount(new Vector2(across - 4, -Standing + down));
+    }
+
+    /// <summary>A bundle's count at the picture's lower right, the way the pack writes a stack's.</summary>
+    private void DrawCount(Vector2 at)
+    {
+        if (_count < 2)
+        {
+            return;
+        }
+
+        const int size = 10;
+        string text = $"x{_count}";
+        DrawStringOutline(ThemeDB.FallbackFont, at, text, HorizontalAlignment.Left, -1, size, 3, Colors.Black);
+        DrawString(ThemeDB.FallbackFont, at, text, HorizontalAlignment.Left, -1, size, Colors.White);
     }
 }

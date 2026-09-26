@@ -215,13 +215,18 @@ public enum CreatureKind
 /// <param name="Sprite">
 /// Which drawing, in the monster archive's own numbering — not the wardrobe numbering that dresses people.
 /// </param>
+/// <param name="Count">
+/// How many a thing on the floor holds (a bundle of potions), from the four bytes the server used to leave
+/// empty. Zero for monsters, merchants and gold.
+/// </param>
 public sealed record Creature(
     uint Serial,
     Tile Where,
     Art.Direction Facing,
     int Sprite,
     CreatureKind Kind,
-    string Name);
+    string Name,
+    int Count = 0);
 
 /// <summary>
 /// A skill's flash, as the server sends it (0x29). On somebody the first animation plays over
