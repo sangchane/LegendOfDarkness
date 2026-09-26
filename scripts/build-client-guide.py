@@ -10,6 +10,8 @@
 줄 모양(알맹이 `MapGuide.Read` 가 읽는다):
   exit <맵> <x> <y> <간 곳 이름>      — 워프 칸 하나. 이어 붙은 칸은 알맹이가 한 출구로 묶는다
   npc  <맵> <x> <y> <이름>            — mundanes 템플릿의 NPC 자리
+  area <맵> <입장 레벨> <town|field> <이름> — 월드맵이 내려 주는 맵(카드에 적는다). 레벨은 그 맵으로 드는 워프의
+                                        LevelRequired 중 가장 작은 것, 마을은 이름에 "마을"이 든 곳
 """
 import json
 from pathlib import Path
@@ -45,6 +47,30 @@ def main() -> None:
 
     lines += [f"exit {a} {x} {y} {w}" for a, x, y, w in sorted(exits)]
 
+    # 월드맵 카드 — 월드맵이 내려 주는 맵마다 이름·마을인지·입장 레벨.
+    levels = {}
+
+    for path in sorted((SERVER / "templates" / "warps").glob("*.json")):
+        warp = json.loads(path.read_text(encoding="utf-8-sig"))
+        to = int((warp.get("To") or {}).get("AreaID") or 0)
+
+        if to:
+            levels[to] = min(levels.get(to, 999), int(warp.get("LevelRequired") or 1))
+
+    places = set()
+
+    for path in sorted((SERVER / "templates" / "worldmaps").glob("*.json")):
+        field = json.loads(path.read_text(encoding="utf-8-sig"))
+
+        for portal in field.get("Portals") or []:
+            area = int(((portal.get("Destination") or {}).get("AreaID")) or 0)
+
+            if area in names:
+                name = names[area]
+                places.add((area, max(1, levels.get(area, 1)), "town" if "마을" in name else "field", name))
+
+    lines += [f"area {a} {lv} {kind} {n}" for a, lv, kind, n in sorted(places)]
+
     npcs = set()
 
     for path in sorted((SERVER / "templates" / "mundanes").glob("*.json")):
@@ -57,7 +83,7 @@ def main() -> None:
     lines += [f"npc {a} {x} {y} {n}" for a, x, y, n in sorted(npcs)]
 
     (OUT / "guide.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"guide.txt: 맵 {len(drawn)} · 출구 칸 {len(exits)} · NPC {len(npcs)}")
+    print(f"guide.txt: 맵 {len(drawn)} · 출구 칸 {len(exits)} · NPC {len(npcs)} · 월드맵 맵 {len(places)}")
 
 
 if __name__ == "__main__":

@@ -18,6 +18,9 @@ public sealed record MapExit(string To, IReadOnlyList<Tile> Tiles)
     }
 }
 
+/// <summary>A map the world map lands on: its name, whether it is a town, and the level its warps ask (<c>area</c> lines).</summary>
+public sealed record MapPlace(int Area, string Name, bool Town, int Level);
+
 /// <summary>Somebody who always stands in the same place — a shopkeeper, a trainer.</summary>
 public sealed record MapSign(Tile Where, string Name);
 
@@ -33,6 +36,7 @@ public sealed class MapGuide
 {
     private readonly Dictionary<int, List<(Tile Where, string To)>> _exits = [];
     private readonly Dictionary<int, List<MapSign>> _signs = [];
+    private readonly Dictionary<int, MapPlace> _places = [];
 
     public static MapGuide Empty { get; } = new();
 
@@ -43,6 +47,13 @@ public sealed class MapGuide
         foreach (string line in text.Split('\n', StringSplitOptions.TrimEntries))
         {
             string[] words = line.Split(' ', 5, StringSplitOptions.RemoveEmptyEntries);
+
+            // area <맵> <입장 레벨> <town|field> <이름> — 월드맵 카드가 쓴다.
+            if (words.Length == 5 && words[0] == "area" && int.TryParse(words[1], out int area) && int.TryParse(words[2], out int level))
+            {
+                guide._places[area] = new MapPlace(area, words[4], words[3] == "town", level);
+                continue;
+            }
 
             if (words.Length < 5 || !int.TryParse(words[1], out int map)
                 || !int.TryParse(words[2], out int x) || !int.TryParse(words[3], out int y))
@@ -107,6 +118,9 @@ public sealed class MapGuide
 
         return exits;
     }
+
+    /// <summary>What the guide knows about a map the world map lands on, or nothing.</summary>
+    public MapPlace? Place(int map) => _places.TryGetValue(map, out MapPlace? place) ? place : null;
 
     public IReadOnlyList<MapSign> SignsOn(int map) => _signs.TryGetValue(map, out List<MapSign>? signs) ? signs : [];
 

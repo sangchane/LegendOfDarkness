@@ -9,7 +9,7 @@ namespace LodClient;
 
 /// <summary>
 /// 길 찾기 창 — 원작에서 Tab 을 누르면 뜨던 지형 지도(<c>Legend.exe</c> <c>MapViewPane</c>, 2005 판 <c>setoa.dat</c> 의
-/// <c>TabMap</c> 단추)를 엄지로 쓰게 다시 만든 것. 위 줄 [지도](월드맵 — 다른 곳으로 가기)와 다르다: 이것은 지금 선 맵 안의 길이다.
+/// <c>TabMap</c> 단추)를 엄지로 쓰게 다시 만든 것. 위 줄 [월드맵](다른 곳으로 가기)과 다르다: 이것은 지금 선 맵 안의 길이다 — 위 줄의 미니맵(<see cref="MinimapView" />)을 누르면 열린다.
 /// </summary>
 /// <remarks>
 /// 벽 · 걸을 수 있는 곳 · 출구(간 곳 이름) · NPC(이름) · 괴물 · 파티 · 다른 사람 · 나(보는 쪽)를 그린다. 출구나 NPC 를 누르면
@@ -49,10 +49,6 @@ public sealed partial class TabMapPanel : PanelContainer
         VBoxContainer inside = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         inside.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        HBoxContainer head = new();
-        head.AddThemeConstantOverride("separation", Main.Gutter);
-        _title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-
         // 긴 제목(곳 이름 + 안내)이 창을 밀어 세로 화면에서 닫기가 화면 밖으로 나갔다 — 두 줄까지 접고, 넘치면 줄임표로 자른다.
         _title.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         _title.MaxLinesVisible = 2;
@@ -61,31 +57,26 @@ public sealed partial class TabMapPanel : PanelContainer
         _title.AddThemeFontSizeOverride("font_size", 14);
         _title.VerticalAlignment = VerticalAlignment.Center;
         _title.AddThemeColorOverride("font_color", Greybox.Title);
-        head.AddChild(_title);
 
-        Zoom = new Button { Text = "확대", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
-        Greybox.Plain(Zoom);
+        // 공통 창 틀 — 도구는 작은 아이콘, 닫기는 오른쪽 위 X(WindowFrame).
+        Zoom = WindowFrame.IconButton(GlyphKind.Zoom, "확대");
         Zoom.Pressed += () =>
         {
             _canvas.Zoom = _canvas.Zoom > 1 ? 1 : Near;
-            Zoom.Text = _canvas.Zoom > 1 ? "전체" : "확대";
+            WindowFrame.Relabel(Zoom, Zoomed ? "전체" : "확대");
             _canvas.Refresh();
         };
-        head.AddChild(Zoom);
 
-        Stop = new Button { Text = "멈춤", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum), Visible = false };
-        Greybox.Plain(Stop);
+        Stop = WindowFrame.IconButton(GlyphKind.Stop, "멈춤");
+        Stop.Visible = false;
         Stop.Pressed += () => _world.StopGuiding();
-        head.AddChild(Stop);
 
-        Close = new Button { Text = "닫기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
-        Greybox.Plain(Close);
-        head.AddChild(Close);
+        Close = WindowFrame.CloseButton();
 
         _canvas.SizeFlagsVertical = SizeFlags.ExpandFill;
         _canvas.CustomMinimumSize = new Vector2(0, Main.Portrait ? 320 : 160);
 
-        inside.AddChild(Greybox.Header(head));
+        inside.AddChild(WindowFrame.Head(_title, Close, Zoom, Stop));
         inside.AddChild(_canvas);
         inside.AddChild(Legend());
 
@@ -105,8 +96,11 @@ public sealed partial class TabMapPanel : PanelContainer
 
     public Button Zoom { get; }
 
+    /// <summary>Whether the map is drawn larger round us (확대) rather than whole.</summary>
+    public bool Zoomed => _canvas.Zoom > 1;
+
     /// <summary>What each kind of dot looks like. The only strong colours are the original's two beads and the red of "gone".</summary>
-    private static Color Paint(TabMarkerKind kind) => kind switch
+    public static Color Paint(TabMarkerKind kind) => kind switch
     {
         TabMarkerKind.Monster => Greybox.Gone,
         TabMarkerKind.Person => Greybox.Muted,
@@ -335,7 +329,7 @@ public sealed partial class TabMapPanel : PanelContainer
 
             if (Markers.Count == 0)
             {
-                DrawString(ThemeDB.FallbackFont, new Vector2(12, 24), "이 맵은 아직 지도가 없습니다.", HorizontalAlignment.Left, -1, 14, Greybox.Muted);
+                DrawString(GetThemeDefaultFont(), new Vector2(12, 24), "이 맵은 아직 지도가 없습니다.", HorizontalAlignment.Left, -1, 14, Greybox.Muted);
                 return;
             }
 
@@ -357,7 +351,7 @@ public sealed partial class TabMapPanel : PanelContainer
                 DrawArc(line[^1], dot + 5, 0, Mathf.Tau, 24, Greybox.Accent, 2, true);
             }
 
-            Font font = ThemeDB.FallbackFont;
+            Font font = GetThemeDefaultFont();
 
             foreach (TabMarker marker in Markers)
             {
