@@ -51,6 +51,9 @@ public static class AbilityFan
         (168, 80)
     ];
 
+    /// <summary>코마디움 칸 — 포션 칸과 같은 크기, 부채꼴 왼쪽 위(다음 쪽 단추 왼쪽). 혼수를 풀 때만 누른다.</summary>
+    public static (int X, int Y) Coma { get; } = (56, 40);
+
     public static int Pages(int learned) => Paging.Pages(learned, PerPage);
 
     /// <summary>The page after this one, back to the first after the last.</summary>

@@ -24,6 +24,7 @@ public sealed class AbilityFanTests
 
         yield return ("체력 포션", AbilityFan.Potions[0], AbilityFan.PotionSide);
         yield return ("마력 포션", AbilityFan.Potions[1], AbilityFan.PotionSide);
+        yield return ("코마디움", AbilityFan.Coma, AbilityFan.PotionSide);
     }
 
     /// <summary>The potion switches stand one above the other against the right edge, smaller than a skill.</summary>

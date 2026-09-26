@@ -539,6 +539,13 @@ public sealed partial class AbilityBar : Control
         Place(chip, AbilityFan.Potions[index], AbilityFan.PotionSide);
     }
 
+    /// <summary>코마디움 칸을 부채꼴 왼쪽 위에(<see cref="AbilityFan.Coma" />), 포션 칸과 같은 크기로.</summary>
+    public void HoldComa(Button chip)
+    {
+        chip.CustomMinimumSize = new Vector2(AbilityFan.PotionSide, AbilityFan.PotionSide);
+        Place(chip, AbilityFan.Coma, AbilityFan.PotionSide);
+    }
+
     private void Place(Button button, (int X, int Y) centre, int side)
     {
         button.Position = new Vector2(centre.X - (side / 2), centre.Y - (side / 2));
