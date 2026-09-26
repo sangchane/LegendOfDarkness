@@ -107,6 +107,13 @@ public sealed class CompanionKitTests : IDisposable
         await Until(() => bot.StatusesOf(owner.Serial)?.Any(s => s.Name == "horrama") == true,
             () => $"주인에게 호르라마가 걸리지 않았습니다: {Joined(did)}");
 
+        // 주인도 제 상태를 받는다(내 판의 상태 아이콘 줄, 2026-09-26) — 이름과 그림 번호(호르라마 템플릿 Icon 11).
+        await Until(() => owner.StatusesOf(owner.Serial)?.Any(s => s.Name == "horrama" && s.Icon == 11) == true,
+            () => $"주인이 제 호르라마를 받지 못했습니다: {string.Join(",", owner.StatusesOf(owner.Serial)?.Select(s => $"{s.Name}/{s.Icon}") ?? [])}");
+
+        // 봇의 상태도 주인에게 온다(봇 칸의 상태 아이콘 줄).
+        await Until(() => owner.StatusesOf(bot.Serial) is not null, () => "봇의 상태가 주인에게 오지 않았습니다.");
+
         // 주인이 리베라토로 제 버프를 지운다 — 봇은 지속 시간(120초)을 기다리지 않고 곧 다시 건다.
         await owner.SayAsync("/spell \"리베라토\" 1", _deadline.Token);
         LearnedSpell? liberato = null;

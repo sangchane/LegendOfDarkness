@@ -357,6 +357,19 @@ public sealed class CompanionTests
         Assert.Equal([new CompanionStatus("enare", 150, false), new CompanionStatus("sleep", 9, true)], listed);
     }
 
+    /// <summary>
+    /// 새 서버는 목록 뒤에 그림 번호(2바이트)를 하나씩 덧붙인다 — 상태 아이콘 줄이 쓴다. 옛 봇은 뒤를 안 읽어 그대로 돈다.
+    /// </summary>
+    [Fact]
+    public void Statuses_read_the_picture_numbers_appended_after_the_list()
+    {
+        byte[] body = [3, 0, 0, 0, 42, 2, .. LegacyKoreanEncoding.EncodeStringA("horrama"), 0, 120, 0, .. LegacyKoreanEncoding.EncodeStringA("sleep"), 0, 9, 1, 0, 11, 0, 0];
+
+        (_, IReadOnlyList<CompanionStatus> listed) = Companion.ReadStatuses(body);
+
+        Assert.Equal([new CompanionStatus("horrama", 120, false, 11), new CompanionStatus("sleep", 9, true, 0)], listed);
+    }
+
     [Fact]
     public void Life_is_two_percentages()
     {

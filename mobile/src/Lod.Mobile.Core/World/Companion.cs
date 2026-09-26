@@ -7,8 +7,11 @@ namespace Lod.Mobile.Core.World;
 /// <summary>동료 사이의 한쪽 — 봇에게는 주인, 사람에게는 동료 봇.</summary>
 public sealed record CompanionTie(uint Serial, string Name);
 
-/// <summary>걸린 것 하나(0x5E 종류 3): 서버 이름(sleep·frozen·horrama·enare …) · 남은 초 · 해로움.</summary>
-public sealed record CompanionStatus(string Name, int Seconds, bool Harmful);
+/// <summary>
+/// 걸린 것 하나(0x5E 종류 3): 서버 이름(sleep·frozen·horrama·enare …) · 남은 초 · 해로움 · 그림 번호(스펠 시트, 모르면 0 —
+/// 목록 뒤에 덧붙어 온다, 2026-09-26).
+/// </summary>
+public sealed record CompanionStatus(string Name, int Seconds, bool Harmful, int Icon = 0);
 
 /// <summary>봇의 체력·마력 %(0x5E 종류 4) — 봇 칸의 막대.</summary>
 public sealed record CompanionLife(uint Serial, int HealthPercent, int ManaPercent);
@@ -62,6 +65,15 @@ public static class Companion
             Require(body, at + 3);
             listed.Add(new CompanionStatus(name, BinaryPrimitives.ReadUInt16BigEndian(body[at..]), body[at + 2] != 0));
             at += 3;
+        }
+
+        // 새 서버는 목록 뒤에 그림 번호(2)를 차례로 덧붙인다. 옛 서버에는 없다 — 그때는 0 그대로.
+        if (body.Length >= at + (count * 2))
+        {
+            for (int i = 0; i < count; i++)
+            {
+                listed[i] = listed[i] with { Icon = BinaryPrimitives.ReadUInt16BigEndian(body[(at + (i * 2))..]) };
+            }
         }
 
         return (serial, listed);
