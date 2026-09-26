@@ -97,6 +97,12 @@ public static class LayoutCheck
         Level = 99, Health = 99999, MaximumHealth = 99999, Mana = 99999, MaximumMana = 99999, Gold = 999_999_999
     };
 
+    /// <summary>
+    /// The name a layout check writes in the top row — six Korean letters, a long name, so the minimap beside it is
+    /// measured narrow. The check used to measure a nameless plate and the minimap overflowed on a real server.
+    /// </summary>
+    public const string PretendName = "가나다라마바";
+
     /// <summary>Representative pane entries so layout and screenshots exercise the restored icon sheets.</summary>
     /// <remarks>Filled past one page when stuffed, so the fan round the attack button is seen with a page to turn.</remarks>
     public static IReadOnlyList<LearnedSkill> PretendSkills { get; } = Stuffed()
@@ -120,6 +126,20 @@ public static class LayoutCheck
             new Appearance(1, 1, 0, 1, 6, 0, 0, 0, 0, 0, 0, 0, 0),
             "시험용 수련생")
         : null;
+
+    /// <summary>
+    /// The world map as the server sends it (templates/worldmaps/temuair.json — six places), for <c>--map</c> with no
+    /// server, so the cards can be photographed and measured.
+    /// </summary>
+    public static WorldMapInfo PretendField { get; } = new("field001", 1,
+    [
+        new WorldMapNode("수오미", 20355, 40, 11, 345, 112),
+        new WorldMapNode("우드랜드", 20028, 10, 21, 516, 176),
+        new WorldMapNode("노비스마을", 20373, 34, 34, 200, 200),
+        new WorldMapNode("아벨", 20030, 58, 22, 324, 269),
+        new WorldMapNode("밀레스", 20287, 50, 50, 389, 190),
+        new WorldMapNode("마인", 20304, 89, 32, 137, 113),
+    ]);
 
     private static IEnumerable<T> Enumerable<T>(int from, int count, System.Func<int, T> make)
     {
@@ -352,7 +372,10 @@ public static class LayoutCheck
 
     private static bool MeantToLieOver(string one, string other) =>
         (one, other) is ("인벤토리", "조작 줄") or ("조작 줄", "인벤토리")
-        || (!Main.Portrait && (one, other) is ("인벤토리", "위 줄") or ("위 줄", "인벤토리"));
+
+        // 미니맵은 위 줄 안에 선다(2026-09-26) — 위 줄과 겹치는 것이 제자리다. 화면 밖으로 나가는지는 따로 잰다.
+        || (one, other) is ("미니맵", "위 줄") or ("위 줄", "미니맵")
+        || (!Main.Portrait && (one, other) is ("인벤토리", "위 줄") or ("위 줄", "인벤토리") or ("인벤토리", "미니맵") or ("미니맵", "인벤토리"));
 
     private static IEnumerable<string> Overlaps(IReadOnlyList<(string Name, Control Part)> parts)
     {

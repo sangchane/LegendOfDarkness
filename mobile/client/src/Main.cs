@@ -377,7 +377,16 @@ public partial class Main : Control
     /// <summary>Whether to open the settings window on its own, as <c>--settings</c>. Same purpose as --pack.</summary>
     public static bool OpeningSettings { get; private set; }
 
-    /// <summary><c>--exit-menu</c>: presses the top row's [종료] once the screen settles, to photograph the choice.</summary>
+    /// <summary><c>--settings-tab 자동|봇|계정</c>: which tab the settings window opens on. For photographs.</summary>
+    public static string SettingsTab { get; private set; } = string.Empty;
+
+    /// <summary><c>--minimap</c>: prints where the minimap stands and what it shows (<c>GREYBOX_MINIMAP</c>), to check it without a thumb.</summary>
+    public static bool CheckingMinimap { get; private set; }
+
+    /// <summary><c>--pack-pick N</c>: once the pack is open, taps its N-th picture (1-based) so the action row beside it can be photographed.</summary>
+    public static int PackPick { get; private set; }
+
+    /// <summary><c>--exit-menu</c>: opens settings on its 계정 tab and presses [종료] once the screen settles, to photograph the choice.</summary>
     public static bool OpeningExit { get; private set; }
 
     /// <summary>Whether to hold the health-potion button on its own, as <c>--pick-potion</c>, to see the row it opens.</summary>
@@ -496,6 +505,10 @@ public partial class Main : Control
         OpeningPack = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack") >= 0;
         OpeningSettings = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--settings") >= 0;
         OpeningExit = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--exit-menu") >= 0;
+        SettingsTab = Flag("--settings-tab");
+        OpeningSettings = OpeningSettings || SettingsTab.Length > 0;
+        CheckingMinimap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--minimap") >= 0;
+        PackPick = int.TryParse(Flag("--pack-pick"), out int packPick) ? packPick : 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
         PercentOpen = Flag("--percent-open");

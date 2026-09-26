@@ -32,8 +32,13 @@ public partial class GameScreen : Control
     private TalkPanel _talk = null!;
     private FieldPanel _field = null!;
 
-    // 길 찾기 — 원작의 Tab 지도. 위 줄 [길] 로 연다. 길을 걷는 동안은 위 줄 아래 가운데에 간 곳과 [멈춤]이 뜬다.
+    // 길 찾기 — 원작의 Tab 지도. 위 줄의 미니맵을 누르면 연다. 길을 걷는 동안은 위 줄 아래 가운데에 간 곳과 [멈춤]이 뜬다.
     private TabMapPanel _tabMap = null!;
+    private MinimapView _minimap = null!;
+    private MapGuide _guide = MapGuide.Empty;
+
+    // 큰 창은 한 번에 하나만(사용자, 2026-09-26). 여는 것은 모두 SetWindow 를 지난다.
+    private readonly OneWindow _windows = new();
     private Control _guideChip = null!;
     private Label _guideText = null!;
     private int _tabMapSettling;
@@ -125,7 +130,6 @@ public partial class GameScreen : Control
     private double _mapOpenSeconds;
     private const double MapCloseAfterSeconds = 5;
     private Button _map = null!;
-    private Button _way = null!;
 
     // 리허설로 한 번만 입어 본다.
     private bool _worn;
@@ -136,7 +140,6 @@ public partial class GameScreen : Control
     private bool _gearShown;
     private Control _topRow = null!;
     private Control _controlRow = null!;
-    private Button _logout = null!;
 
     // 자동 사냥 켜고 끄기 — 공격 단추를 0.5초 길게 눌러서 한다(위 줄의 [자동] 단추는 없앴다, 사용자 요청
     // 2026-09-26). 켜져 있으면 공격 단추 자체가 표시한다(AbilityBar.ShowAutoHunt).
@@ -145,10 +148,10 @@ public partial class GameScreen : Control
     private int _autoHuntSettling;
     private int _companionSettling; // --companion: 자리를 잡은 뒤 [동료 부르기] 를 한 번 누르기까지 센 프레임.
 
-    // [종료] 가 여는 작은 판 — 로그아웃 · 게임 종료 · 취소.
+    // 설정 → 계정 탭의 [종료] 가 여는 작은 판 — 로그아웃 · 게임 종료 · 취소.
     private readonly ExitChoice _exit = new();
 
-    // --exit-menu 로 [종료] 를 누르기까지 센 프레임.
+    // --exit-menu 로 설정 → 계정 → [종료] 를 누르기까지 센 프레임.
     private int _exitSettling;
     private bool _leaving;
 
@@ -172,7 +175,7 @@ public partial class GameScreen : Control
     /// way. Named in Korean because the names are printed for a person to read.
     /// </summary>
     public IReadOnlyList<(string Name, Control Part)> Parts =>
-        [("위 줄", _topRow), ("조작 줄", _controlRow), ("인벤토리", _pack), ("월드", _world)];
+        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("인벤토리", _pack), ("월드", _world)];
 
     /// <summary>Which tab the pack shows. Only a layout check asks — a thumb presses the tab itself.</summary>
     public void ShowGearTab(bool gear) => _pack.ShowTab(gear);
@@ -188,6 +191,13 @@ public partial class GameScreen : Control
         // ever touching a figure. The plates and buttons inside it still take their own.
         hud.MouseFilter = MouseFilterEnum.Ignore;
         rows.MouseFilter = MouseFilterEnum.Ignore;
+
+        _guide = LoadGuide();
+
+        // 미니맵은 위 줄 안에 선다 — 월드를 먼저 지어야 한다(무엇을 그릴지 월드에게 묻는다).
+        BuildWorld();
+        _minimap = new MinimapView(_world, _server, _guide);
+        _minimap.Pressed += () => SetWindow(GameWindow.TabMap, !_tabMap.Visible);
 
         _topRow = BuildTopRow();
         _pack = new PackPanel();
@@ -218,30 +228,42 @@ public partial class GameScreen : Control
         };
         _party.Left += () => _ = _server?.LeaveGroupAsync(System.Threading.CancellationToken.None);
 
-        _field = new FieldPanel();
+        _field = new FieldPanel(_guide);
         _field.Chosen += area =>
         {
-            _field.Visible = false;
             _chosenField = area;
+            SetWindow(GameWindow.WorldMap, false);
             _ = _server?.ChooseFieldAsync(area, System.Threading.CancellationToken.None);
         };
         _field.Close.Pressed += () =>
         {
-            _field.Visible = false;
-            _closedAtFieldShown = _server?.FieldShown;
-            _ = _server?.CloseFieldAsync(System.Threading.CancellationToken.None);
+            CancelField();
+            _windows.Shut(GameWindow.WorldMap);
+            _world.Frozen = _windows.Freezing;
         };
 
         _settings = new SettingsPanel();
-        _settings.Close.Pressed += () => _settings.Visible = false;
+        _settings.Close.Pressed += () => SetWindow(GameWindow.Settings, false);
+
+        // [종료] 는 위 줄에서 설정 → 계정 탭으로 옮겼다(2026-09-26). 판은 그대로 — 로그아웃 · 게임 종료 · 취소.
+        _settings.Exit.Pressed += () =>
+        {
+            if (_exit.Visible)
+            {
+                _exit.Shut();
+            }
+            else
+            {
+                _exit.Open(_settings.Exit.GetGlobalRect(), centred: true);
+            }
+        };
         _settings.Companion.Pressed += () => _ = _server?.Companion is null
             ? _server?.CallCompanionAsync(System.Threading.CancellationToken.None)
             : _server.DismissCompanionAsync(System.Threading.CancellationToken.None);
-        _settings.Visible = Main.OpeningSettings;
 
         // 봇 칸을 누르면 봇 장비창. 주기·벗기기는 우리 확장 0xF1 2·3, 결과는 서버 알림과 봇 장비 안내(0x5E 종류 5).
-        _party.BotOpened += () => _botGear.Visible = !_botGear.Visible;
-        _botGear.Close.Pressed += () => _botGear.Visible = false;
+        _party.BotOpened += () => SetWindow(GameWindow.BotGear, !_botGear.Visible);
+        _botGear.Close.Pressed += () => SetWindow(GameWindow.BotGear, false);
         _botGear.Given += (slot, count) => _ = _server?.GiveToCompanionAsync(slot, count, System.Threading.CancellationToken.None);
         _botGear.TakenOff += place => _ = _server?.TakeOffCompanionAsync(place, System.Threading.CancellationToken.None);
 
@@ -255,11 +277,10 @@ public partial class GameScreen : Control
         // row of its own above the controls, which left a third of the screen black behind the buttons (사용자,
         // 2026-09-18). Nothing the player aims at goes under a thumb all the same: the character stands in the middle of
         // the part the controls leave uncovered (WorldView.FocusY).
-        BuildWorld();
         _controlRow = BuildControlRow();
 
-        _tabMap = new TabMapPanel(_world, _server, LoadGuide());
-        _tabMap.Close.Pressed += () => _tabMap.Visible = false;
+        _tabMap = new TabMapPanel(_world, _server, _guide);
+        _tabMap.Close.Pressed += () => SetWindow(GameWindow.TabMap, false);
 
         AddChild(_world);
         AddChild(hud);
@@ -290,6 +311,82 @@ public partial class GameScreen : Control
             QuitGame();
         };
         AddChild(_exit);
+
+        if (Main.OpeningSettings)
+        {
+            SetWindow(GameWindow.Settings, true);
+        }
+    }
+
+    /// <summary>
+    /// Shows or hides one big window. Opening one first puts away whichever was open (<see cref="OneWindow" />), and the
+    /// world stops taking taps and steps only while a window that lies over it is up.
+    /// </summary>
+    private void SetWindow(GameWindow window, bool open)
+    {
+        if (open)
+        {
+            if (_windows.Open(window) is { } before)
+            {
+                PutAway(before);
+            }
+
+            WindowOf(window).Visible = true;
+
+            if (window == GameWindow.TabMap)
+            {
+                _tabMap.Open();
+            }
+        }
+        else
+        {
+            _windows.Shut(window);
+            WindowOf(window).Visible = false;
+        }
+
+        _world.Frozen = _windows.Freezing;
+    }
+
+    private Control WindowOf(GameWindow window) => window switch
+    {
+        GameWindow.Pack => _pack,
+        GameWindow.Talk => _talk,
+        GameWindow.Chat => _chat,
+        GameWindow.WorldMap => _field,
+        GameWindow.Settings => _settings,
+        GameWindow.TabMap => _tabMap,
+        _ => _botGear
+    };
+
+    /// <summary>
+    /// Puts a window away because another is taking its place. An NPC's talk and the world map have to tell the server
+    /// — it keeps walking us through a menu, or holds every other packet, until it hears they were shut.
+    /// </summary>
+    private void PutAway(GameWindow window)
+    {
+        switch (window)
+        {
+            case GameWindow.Talk:
+                _talk.Visible = false;
+                _ = _server?.ShutDialogueAsync(System.Threading.CancellationToken.None);
+                break;
+
+            case GameWindow.WorldMap:
+                CancelField();
+                break;
+
+            default:
+                WindowOf(window).Visible = false;
+                break;
+        }
+    }
+
+    /// <summary>Takes the world map down and tells the server "none" (map 0), which is what gives the hands back.</summary>
+    private void CancelField()
+    {
+        _field.Visible = false;
+        _closedAtFieldShown = _server?.FieldShown;
+        _ = _server?.CloseFieldAsync(System.Threading.CancellationToken.None);
     }
 
     /// <summary>
@@ -345,8 +442,8 @@ public partial class GameScreen : Control
         // 위쪽 맵을 남긴다(PackPanel.ShowTab 이 정한다).
         _talk.SizeFlagsVertical = SizeFlags.ExpandFill;
 
-        // 곳이 스물넷이라 남는 높이를 다 쓴다 — 대화 창과 같다.
-        _field.SizeFlagsVertical = SizeFlags.ExpandFill;
+        // 월드맵 카드 — 세로는 제 높이만큼만 아래에 붙어 위쪽 맵을 남기고(카드가 많으면 창 안에서 굴린다), 가로는 오른쪽 기둥을 다 쓴다.
+        _field.SizeFlagsVertical = Main.Portrait ? SizeFlags.ShrinkEnd : SizeFlags.ExpandFill;
 
         // 대화 창은 제 높이만큼만 아래에 붙는다 — 소지품 한 장과 같다. 긴 이야기는 창 안에서 굴린다.
         _chat.SizeFlagsVertical = SizeFlags.ShrinkEnd;
@@ -500,10 +597,14 @@ public partial class GameScreen : Control
         // HUD is worse than none, because there is no way to tell it from a real one.
         _who = Aux(string.Empty);
 
-        HBoxContainer mine = new();
-        mine.AddThemeConstantOverride("separation", Main.Gutter);
+        // 세로는 이름을 막대 위 한 줄로 — 옆에 두면 이름이 긴 만큼 판이 넓어져 같은 줄의 미니맵이 화면 밖으로 밀렸다(2026-09-26).
+        BoxContainer mine = Main.Portrait ? new VBoxContainer() : new HBoxContainer();
+        mine.AddThemeConstantOverride("separation", Main.Portrait ? 0 : Main.Gutter);
         mine.AddChild(_who);
         mine.AddChild(BuildVitals());
+
+        // 세로 이름 줄은 이름이 오기 전에는 접는다 — 빈 줄이 판 위에 남는다.
+        _who.Visible = !Main.Portrait;
         row.AddChild(Plated(mine));
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
@@ -525,29 +626,18 @@ public partial class GameScreen : Control
         picked.AddChild(_target);
         picked.AddChild(_targetHealth);
 
-        // 고른 이가 없으면 판째로 숨긴다 — 빈 판이 바닥 한가운데를 가린다.
+        // 고른 이가 없으면 판째로 숨긴다 — 빈 판이 바닥 한가운데를 가린다. 가로는 위 줄 가운데, 세로는 둘째 줄 왼쪽(첫 줄
+        // 오른쪽은 미니맵 자리다).
         CenterContainer middle = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
         _targetPlate = Plated(picked);
         _targetPlate.Visible = false;
         middle.AddChild(_targetPlate);
-        row.AddChild(middle);
 
-        // Where the server says we are. Offline it stays empty rather than claiming something untrue.
+        // 곳 이름은 미니맵 아래 구석에 적는다(MinimapView) — 가로 위 줄에 따로 두던 판은 뺐다(2026-09-26).
         _place = Aux(string.Empty);
 
-        // 360 across cannot hold this as well, so in portrait the log carries it instead.
-        if (!Main.Portrait)
-        {
-            row.AddChild(_placePlate = Plated(_place));
-            _placePlate.Visible = false;
-        }
-
-        // A real portrait status plate can already use half the safe width once name, HP, MP and EXP arrive.
-        // Keep all three 48px actions in a second line of the same top status area instead of squeezing the
-        // last one beyond the right safe edge. Landscape has the width and keeps the established single row.
-        HBoxContainer actions = Main.Portrait
-            ? new HBoxContainer { MouseFilter = MouseFilterEnum.Ignore }
-            : row;
+        // 위 줄 단추는 셋만(2026-09-26): [인벤토리] · [월드맵] · [설정]. [종료]는 설정 → 계정 탭으로, [길]은 미니맵이 되었다.
+        HBoxContainer actions = new() { MouseFilter = MouseFilterEnum.Ignore };
         actions.AddThemeConstantOverride("separation", Main.Gutter);
 
         Button pack = new()
@@ -557,60 +647,18 @@ public partial class GameScreen : Control
         };
 
         Greybox.Plain(pack);
-        pack.Pressed += () => Carrying(true);
+        pack.Pressed += () => Carrying(!_pack.Visible);
         actions.AddChild(pack);
 
         _map = new Button
         {
-            Text = "지도",
+            Text = "월드맵",
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
         };
 
         Greybox.Plain(_map);
         _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
         actions.AddChild(_map);
-
-        // [지도]는 월드맵(다른 곳으로), [길]은 원작 Tab 지도(이 맵 안의 길). 한 번 더 누르면 닫힌다.
-        Button way = new()
-        {
-            Text = "길",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(way);
-        way.Pressed += () =>
-        {
-            if (_tabMap.Visible)
-            {
-                _tabMap.Visible = false;
-            }
-            else
-            {
-                _tabMap.Open();
-            }
-        };
-        actions.AddChild(way);
-        _way = way;
-
-        _logout = new Button
-        {
-            Text = "종료",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(_logout);
-        _logout.Pressed += () =>
-        {
-            if (_exit.Visible)
-            {
-                _exit.Shut();
-            }
-            else
-            {
-                _exit.Open(_logout.GetGlobalRect(), centred: !Main.Portrait);
-            }
-        };
-
 
         Button settings = new()
         {
@@ -619,25 +667,38 @@ public partial class GameScreen : Control
         };
 
         Greybox.Plain(settings);
-        settings.Pressed += () => _settings.Visible = !_settings.Visible;
-
+        settings.Pressed += () => SetWindow(GameWindow.Settings, !_settings.Visible);
         actions.AddChild(settings);
-        actions.AddChild(_logout);
 
         if (Main.Portrait)
         {
-            foreach (Button action in new Button[] { pack, _map, way, settings, _logout })
+            // 세로: 첫 줄 = 내 판 · 미니맵(남는 폭을 다 쓴다 — 이름이 길면 줄어든다), 둘째 줄 = 고른 이 · 단추 셋.
+            _minimap.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            row.AddChild(_minimap);
+
+            HBoxContainer second = new() { MouseFilter = MouseFilterEnum.Ignore };
+            second.AddThemeConstantOverride("separation", Main.Gutter);
+            middle.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            second.AddChild(middle);
+            second.AddChild(actions);
+
+            foreach (Button action in new Button[] { pack, _map, settings })
             {
-                action.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+                action.CustomMinimumSize = new Vector2(64, Main.TouchMinimum);
             }
 
             VBoxContainer top = new() { MouseFilter = MouseFilterEnum.Ignore };
             top.AddThemeConstantOverride("separation", Main.Gutter);
             top.AddChild(row);
-            top.AddChild(actions);
+            top.AddChild(second);
 
             return top;
         }
+
+        // 가로: 내 판 · 고른 이(가운데) · 미니맵 · 단추 셋, 한 줄.
+        row.AddChild(middle);
+        row.AddChild(_minimap);
+        row.AddChild(actions);
 
         return row;
     }
@@ -732,10 +793,10 @@ public partial class GameScreen : Control
             return;
         }
 
-        // 옆 단추와 같은 규칙 — 단추 자신의 눌림으로 연다. 월드가 자리를 잡고 이 맵의 벽을 읽은 뒤에.
-        if (_tabMapOpenFor < 0 && _world.MapId > 0 && _tabMapSettling++ == 90)
+        // 옆 단추와 같은 규칙 — 미니맵 자신의 눌림으로 연다. 월드가 자리를 잡고 이 맵의 벽을 읽은 뒤에.
+        if (_tabMapOpenFor < 0 && (_world.MapId > 0 || _server is null) && _tabMapSettling++ == 90)
         {
-            _way.EmitSignal(BaseButton.SignalName.Pressed);
+            _minimap.EmitSignal(BaseButton.SignalName.Pressed);
             _tabMapOpenFor = 0;
         }
 
@@ -752,7 +813,7 @@ public partial class GameScreen : Control
             _tabMap.TapAt(spot);
         }
 
-        if (Main.TabMapZoom && _tabMapOpenFor >= 1 && _tabMap.Zoom.Text == "확대")
+        if (Main.TabMapZoom && _tabMapOpenFor >= 1 && !_tabMap.Zoomed)
         {
             _tabMap.Zoom.EmitSignal(BaseButton.SignalName.Pressed);
         }
@@ -779,7 +840,7 @@ public partial class GameScreen : Control
         }
 
         _leaving = true;
-        _logout.Disabled = true;
+        _settings.Exit.Disabled = true;
         _world.Frozen = true;
 
         if (_server is { } server)
@@ -873,9 +934,12 @@ public partial class GameScreen : Control
         }
 
         // The server names us in 0x33; nothing else on this screen knows who we are.
-        if (_server?.Self?.Name is { Length: > 0 } called)
+        // 배치 검사는 이름이 붙은 판을 잰다 — 이름 없는 판으로 재면 미니맵 자리가 넉넉해 보였다(실제 서버에서 넘쳤다, 2026-09-26).
+        // 평소 서버 없는 화면에는 지어낸 이름을 적지 않는다(아래 설명 그대로).
+        if ((_server?.Self?.Name ?? (LayoutCheck.Requested() ? LayoutCheck.PretendName : null)) is { Length: > 0 } called)
         {
             _who.Text = Mine.Level > 0 ? $"{called} Lv{Mine.Level}" : called;
+            _who.Visible = true;
         }
 
         ShowVitals();
@@ -928,11 +992,24 @@ public partial class GameScreen : Control
         RehearseAHold(delta);
         RehearseASkill(delta);
 
-        // 손 없이 확인할 때만 — [종료] 를 실제로 눌러(EmitSignal) 고르는 판을 띄운다.
-        if (Main.OpeningExit && _exitSettling++ == 90)
+        // 손 없이 확인할 때만 — 설정을 계정 탭으로 열고, 몇 프레임 뒤(자리를 잡은 뒤) [종료] 를 실제로 눌러(EmitSignal) 고르는 판을 띄운다.
+        if (Main.OpeningExit)
         {
-            _logout.EmitSignal(BaseButton.SignalName.Pressed);
+            if (_exitSettling == 90)
+            {
+                SetWindow(GameWindow.Settings, true);
+                _settings.ShowTab("계정");
+            }
+            else if (_exitSettling == 96)
+            {
+                _settings.Exit.EmitSignal(BaseButton.SignalName.Pressed);
+            }
+
+            _exitSettling++;
         }
+
+        RehearseMinimap();
+        RehearsePackPick();
 
         // 레이아웃 검사는 세 프레임 만에 재고 끝난다. 90 프레임을 기다리면 닫힌 화면을 재게 되고,
         // 실제로 그래서 장비 칸이 넘쳤는데도 0 오류였다 — 검사 중에는 바로 연다.
@@ -951,6 +1028,13 @@ public partial class GameScreen : Control
             if (_server?.Field is null && _closedAtFieldShown is null && _mapSettling++ == settle)
             {
                 _map.EmitSignal(BaseButton.SignalName.Pressed);
+
+                // 서버 없이는 아무도 창을 보내 주지 않는다 — 사진·배치 검사용으로 서버가 보낼 여섯 곳을 그대로 띄운다.
+                if (_server is null)
+                {
+                    _field.Show(LayoutCheck.PretendField);
+                    SetWindow(GameWindow.WorldMap, true);
+                }
             }
 
             if (_field.Visible && (_mapOpenSeconds += delta) >= MapCloseAfterSeconds)
@@ -980,14 +1064,20 @@ public partial class GameScreen : Control
         if (_server?.Field is { } field && !_field.Visible && _chosenField is null &&
             (_closedAtFieldShown is null || _server?.FieldShown != _closedAtFieldShown))
         {
+            // 서버가 띄운 창도 창 하나 규칙을 지난다 — 열려 있던 창은 닫힌다.
             _field.Show(field);
+            SetWindow(GameWindow.WorldMap, true);
             _closedAtFieldShown = null;
         }
-        else if (_server?.Field is null)
+        else if (_server is not null && _server.Field is null)
         {
             // 보내기가 실패해 서버가 영영 맵을 안 바꾸면(고르기도, 닫기도) 창이 다시 안 뜬다 — 두 번
             // 이동하거나 닫았는데 도로 열리는 것보다 안 뜨는 편이 낫다고 보고, 그때는 사람이 다시 접속한다.
-            _field.Visible = false;
+            if (_field.Visible)
+            {
+                SetWindow(GameWindow.WorldMap, false);
+            }
+
             _chosenField = null;
             _closedAtFieldShown = null;
         }
@@ -1101,7 +1191,7 @@ public partial class GameScreen : Control
             if (Main.BotGearOpen && !_botGearRehearsed)
             {
                 _botGearRehearsed = true;
-                _botGear.Visible = true;
+                SetWindow(GameWindow.BotGear, true);
                 _botGear.Choose(1);
             }
         }
@@ -1110,7 +1200,11 @@ public partial class GameScreen : Control
 
         if (bot is null)
         {
-            _botGear.Visible = false;
+            if (_botGear.Visible)
+            {
+                SetWindow(GameWindow.BotGear, false);
+            }
+
             return;
         }
 
@@ -1299,6 +1393,28 @@ public partial class GameScreen : Control
     /// Only when checking without a hand (<c>--hold E</c>): presses the key in the middle with a finger for a second and a
     /// half, lets go, and says where the character stands and how see-through the pad is every quarter second.
     /// </summary>
+    private int _minimapTold;
+    private int _packPickWait;
+
+    /// <summary><c>--minimap</c>: every two seconds, where the minimap stands and what it shows — no thumb needed.</summary>
+    private void RehearseMinimap()
+    {
+        if (Main.CheckingMinimap && (_world.MapId > 0 || _server is null) && ++_minimapTold % 120 == 30)
+        {
+            GD.Print($"GREYBOX_MINIMAP {_minimap.GetGlobalRect()} {_minimap.Describe()}");
+        }
+    }
+
+    /// <summary><c>--pack-pick N</c>: once the pack is open and filled, taps its N-th picture so the action row shows.</summary>
+    private void RehearsePackPick()
+    {
+        if (Main.PackPick > 0 && _pack.Visible && _packPickWait >= 0 && ++_packPickWait == 45)
+        {
+            _packPickWait = -1;
+            GD.Print(_pack.PickNth(Main.PackPick) ? $"GREYBOX_PACK_PICK {Main.PackPick}" : "GREYBOX_PACK_PICK 없음");
+        }
+    }
+
     private void RehearseAHold(double delta)
     {
         // 접속 직후 서버가 화면을 새로 보내는 동안은 걸음을 버린다(CancelWalkingIfRefreshing) — 서버가 있으면 4초 남짓 기다린다.
@@ -1523,21 +1639,10 @@ public partial class GameScreen : Control
     {
         if (open)
         {
-            if (_pack.Visible)
-            {
-                Carrying(false);
-            }
-
-            if (_talk.Visible)
-            {
-                ShutTalk();
-            }
-
             _chat.Show(_history);
         }
 
-        _chat.Visible = open;
-        _world.Frozen = open;
+        SetWindow(GameWindow.Chat, open);
     }
 
     /// <summary>
@@ -1569,18 +1674,12 @@ public partial class GameScreen : Control
 
     /// <summary>
     /// Opens or shuts the pack. While it is open the world takes no taps and no steps — the panel lies over
-    /// it, and a thumb aimed at the list must not walk the character. An NPC's window lies in the same place, so
-    /// opening the pack shuts it the way its own close button does.
+    /// it, and a thumb aimed at the list must not walk the character. Whatever window was open is put away first
+    /// (<see cref="SetWindow" />) — an NPC's window the way its own close button does.
     /// </summary>
     private void Carrying(bool open)
     {
-        if (open && _talk.Visible)
-        {
-            ShutTalk();
-        }
-
-        _pack.Visible = open;
-        _world.Frozen = open;
+        SetWindow(GameWindow.Pack, open);
 
         if (open)
         {
@@ -1590,7 +1689,7 @@ public partial class GameScreen : Control
 
     /// <summary>
     /// Opens the window an NPC sent, or shuts it when the server did. While it is open the world takes no taps or steps,
-    /// as with the pack, and the pack is put away so the two never lie on top of each other.
+    /// as with the pack, and whatever window was open is put away (<see cref="SetWindow" />) so two never lie on top of each other.
     /// </summary>
     private void Talk(Dialogue? talk)
     {
@@ -1600,13 +1699,7 @@ public partial class GameScreen : Control
             return;
         }
 
-        if (talk is not null && _pack.Visible)
-        {
-            Carrying(false);
-        }
-
-        _talk.Visible = talk is not null;
-        _world.Frozen = talk is not null;
+        SetWindow(GameWindow.Talk, talk is not null);
 
         if (talk is not null)
         {

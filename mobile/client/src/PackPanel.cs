@@ -6,28 +6,29 @@ using Lod.Mobile.Core.World;
 namespace LodClient;
 
 /// <summary>
-/// What the character has on and what they are carrying, as the original showed it: pictures with no names
-/// in them. One thing is picked out at a time, and its name and what can be done with it are written
-/// underneath — a line of text per item eats a phone screen, and names here run past thirty letters.
+/// What the character has on and what they are carrying, as the original showed it: pictures with no names in them.
+/// Laid out the way phone RPGs lay an inventory out (사용자, 2026-09-26): small icon tabs at the top — 소지품 · 장비 — and
+/// an X in the top-right corner (<see cref="WindowFrame" />), the grid across the whole width, a count in a cell's corner,
+/// and gold with how full the pack is on one line at the bottom beside the 줍기 and 정렬 icons. There are no long buttons
+/// standing under the grid any more: tapping a thing opens a small action row beside it — its name, one line (how many,
+/// how worn) and icon buttons (사용/입기 · 버리기, or 벗기 for something worn). Tapping the same thing twice quickly does
+/// the main one at once (<see cref="DoubleTap" />).
 /// </summary>
 /// <remarks>
-/// The two are separate tabs, not one list above another, because the original kept them in separate
-/// windows and stacking them pushed the pack off the screen as the worn places filled up. The gear tab is
-/// the original's own ring of places (<see cref="GearGrid" />); the pack tab is a plain grid of pictures.
-/// Both are rebuilt only when what they would show changes, because they are asked every frame and a panel
-/// that throws its children away sixty times a second cannot be pressed.
+/// The two are separate tabs, not one list above another, because the original kept them in separate windows. The gear
+/// tab is the original's own ring of places (<see cref="GearGrid" />); the pack tab is a plain grid of pictures. Both are
+/// rebuilt only when what they would show changes, because they are asked every frame and a panel that throws its
+/// children away sixty times a second cannot be pressed.
 ///
 /// The pack shows one page at a time and turns left and right — by a swipe across the pictures or by the arrows, since
-/// no action may need a swipe alone (wireframes 2.2). Sixty pictures in a scrolling list covered nearly the whole
-/// portrait screen (사용자, 2026-09-18); a page sits at the bottom and leaves the map above it.
+/// no action may need a swipe alone (wireframes 2.2).
 /// </remarks>
 public sealed partial class PackPanel : PanelContainer
 {
-    // 원작은 33x36 칸이었다. 손가락은 그보다 커서 시안의 최소 터치 크기를 쓴다.
+    // 원작은 33x36 칸이었다. 손가락은 그보다 커서 시안의 최소 터치 크기를 쓴다. 칸은 창 폭을 다 쓰도록 옆으로 늘어난다.
     private static readonly Vector2 Cell = new(Main.TouchMinimum, Main.TouchMinimum);
 
-    // 한 장에 6열, 네 줄까지. 창이 받은 높이에 들어가는 만큼만 둔다(FitRows) — 돌 제목줄이 붙은 뒤로 가로 360 에서
-    // 두 줄이면 입기 줄이 화면 밑으로 빠졌다. 가로 창이 화면 높이를 다 쓰게 된 뒤로는 가로에도 네 줄이 든다.
+    // 한 장에 6열, 네 줄까지. 창이 받은 높이에 들어가는 만큼만 둔다(FitRows).
     private const int Columns = 6;
     private const int MostRows = 4;
     private int _perPage = Columns * MostRows;
@@ -40,23 +41,30 @@ public sealed partial class PackPanel : PanelContainer
 
     private readonly GearGrid _gear = new();
     private readonly GridContainer _rows = new() { Name = "Items" };
-    private readonly Button _gearTab = new() { Text = "장비", ToggleMode = true };
-    private readonly Button _packTab = new() { Text = "소지품", ToggleMode = true };
-    private readonly Label _chosenName = new();
+    private readonly Button _packTab = WindowFrame.IconButton(GlyphKind.Bag, "소지품", tab: true, width: 56);
+    private readonly Button _gearTab = WindowFrame.IconButton(GlyphKind.Armor, "장비", tab: true, width: 56);
 
-    /// <summary>The name on the stone strip — which of the two tabs is open.</summary>
-    private Label _title = null!;
+    /// <summary>밟은 것을 알아서 줍는지 켜고 끄는 아이콘.</summary>
+    private readonly Button _loot = WindowFrame.IconButton(GlyphKind.Loot, "줍기", tab: true);
 
-    /// <summary>밟은 것을 알아서 줍는지 켜고 끄는 단추.</summary>
-    private Button _loot = null!;
+    private void ShowLoot() => WindowFrame.Relabel(_loot, Main.AutoLoot ? "줍기 켬" : "줍기 끔");
 
-    private void ShowLoot() =>
-        _loot.Text = Main.AutoLoot ? "줍기 켬" : "줍기 끔";
-    private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right };
-    private readonly Button _use = new() { Text = "입기" };
-    private readonly Button _drop = new() { Text = "버리기" };
+    // 아래 한 줄 — 금화와 몇 칸 찼나.
+    private readonly Label _gold = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, VerticalAlignment = VerticalAlignment.Center };
 
-    // 탭의 내용(장비 고리 또는 소지품 한 장과 장 넘김), 그리고 그것이 선 줄. 가로에서는 그 줄에 탭·입기 기둥이 옆에 선다.
+    // 칸을 누르면 그 옆에 뜨는 작은 동작 줄 — 이름 · 한 줄 설명 · 아이콘 단추.
+    private readonly PanelContainer _action = new() { Name = "ItemAction", TopLevel = true, Visible = false, ZIndex = 5 };
+    private readonly Label _actionName = new();
+    private readonly Label _actionLine = new();
+    private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
+    private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", width: 56);
+    private readonly Button _off = WindowFrame.IconButton(GlyphKind.TakeOff, "벗기", width: 56);
+    private readonly DoubleTap _taps = new();
+
+    // 지금 그려진 소지품 칸 — 동작 줄을 그 칸 옆에 세우려고 칸 번호로 찾는다.
+    private readonly Dictionary<int, Button> _cellsBySlot = [];
+
+    // 탭의 내용(장비 고리 또는 소지품 한 장과 장 넘김).
     private readonly VBoxContainer _content = new()
     {
         SizeFlagsHorizontal = SizeFlags.ExpandFill,
@@ -64,8 +72,9 @@ public sealed partial class PackPanel : PanelContainer
     };
 
     private readonly HBoxContainer _main = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
-    private readonly HBoxContainer _pager = new();
+    private readonly HBoxContainer _pager = new() { Alignment = BoxContainer.AlignmentMode.Center, SizeFlagsHorizontal = SizeFlags.ExpandFill };
     private readonly Label _pageNumber = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+    private HBoxContainer _foot = null!;
 
     // 보이는 장, 그리고 손가락이 누른 자리. 밀어 넘긴 손은 그림을 고르지 않는다.
     private int _page;
@@ -90,59 +99,38 @@ public sealed partial class PackPanel : PanelContainer
         AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         VBoxContainer body = new();
-        body.AddThemeConstantOverride("separation", Main.Gutter);
+        body.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        // 세로는 탭·줍기·정렬·닫기가 한 줄로 창 위에, 가로는 두 칸씩 고리 옆 기둥에 선다.
-        Container head = Main.Portrait ? new HBoxContainer() : new GridContainer { Columns = 2 };
-        head.AddThemeConstantOverride("separation", Main.Gutter);
-        head.AddThemeConstantOverride("h_separation", Main.Gutter);
-        head.AddThemeConstantOverride("v_separation", Main.Gutter / 2);
-
-        _gearTab.CustomMinimumSize = Cell;
-        _packTab.CustomMinimumSize = Cell;
-        Greybox.Tab(_gearTab);
-        Greybox.Tab(_packTab);
-
-        // 창마다 확정 단추는 하나뿐이다 — 전부 돌로 하면 아무것도 돋보이지 않는다.
-        Greybox.Commit(_use);
-        Greybox.Plain(_drop);
         _gearTab.Pressed += () => ShowTab(gear: true);
         _packTab.Pressed += () => ShowTab(gear: false);
 
-        head.AddChild(_gearTab);
-        head.AddChild(_packTab);
-
-        if (Main.Portrait)
-        {
-            head.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        }
-
         // 밟은 것을 알아서 주울지. 원작에는 없던 것이라 끌 수 있어야 한다(사용자, 2026-09-19).
-        _loot = new Button { CustomMinimumSize = Cell, ToggleMode = true, ButtonPressed = Main.AutoLoot };
-        Greybox.Tab(_loot);
+        _loot.ButtonPressed = Main.AutoLoot;
         ShowLoot();
-
         _loot.Pressed += () =>
         {
             Main.SetAutoLoot(_loot.ButtonPressed);
             ShowLoot();
         };
 
-        head.AddChild(_loot);
-
-        Tidy = new Button { Text = "정렬", CustomMinimumSize = Cell };
-        Greybox.Plain(Tidy);
-        head.AddChild(Tidy);
-
-        Close = new Button { Text = "닫기", CustomMinimumSize = Cell };
-        Greybox.Plain(Close);
-        head.AddChild(Close);
+        Tidy = WindowFrame.IconButton(GlyphKind.Sort, "정렬");
+        Close = WindowFrame.CloseButton();
 
         _rows.Columns = Columns;
+        _rows.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _rows.AddThemeConstantOverride("h_separation", 4);
+        _rows.AddThemeConstantOverride("v_separation", 4);
 
-        // 걸친 것을 고르는 것은 소지품과 같은 한 자리를 쓴다. 음수로 두어 칸 번호와 구별한다.
+        // 걸친 것을 고르는 것은 소지품과 같은 한 자리를 쓴다. 음수로 두어 칸 번호와 구별한다. 빠르게 두 번 누르면 벗는다.
         _gear.Chosen += slot =>
         {
+            if (_taps.Tap(-slot, Now()))
+            {
+                _action.Visible = false;
+                TakenOff?.Invoke(slot);
+                return;
+            }
+
             _chosen = -slot;
             _showing = null;
         };
@@ -150,128 +138,147 @@ public sealed partial class PackPanel : PanelContainer
         // 장비 고리는 장으로 나눌 수도, 굴릴 수도 없다 — 가로에서 굴려 내리게 했더니 불편해서 못 쓴다고 했다(사용자,
         // 2026-09-23). 가로는 칸을 줄여(FitRing) 여섯 줄을 한 화면에 세운다.
         _gear.SizeFlagsVertical = SizeFlags.ExpandFill;
+        _gear.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
 
-        Button back = new() { Text = "◀", CustomMinimumSize = Cell };
-        Button forward = new() { Text = "▶", CustomMinimumSize = Cell };
+        Button back = new() { Text = "◀", CustomMinimumSize = Cell, FocusMode = FocusModeEnum.None };
+        Button forward = new() { Text = "▶", CustomMinimumSize = Cell, FocusMode = FocusModeEnum.None };
+        Greybox.Plain(back);
+        Greybox.Plain(forward);
         back.Pressed += () => Turn(-1);
         forward.Pressed += () => Turn(1);
         _pageNumber.CustomMinimumSize = Cell;
+        _pageNumber.AddThemeColorOverride("font_color", Greybox.Muted);
         _pager.AddThemeConstantOverride("separation", Main.Gutter / 2);
         _pager.AddChild(back);
         _pager.AddChild(_pageNumber);
         _pager.AddChild(forward);
 
-        _chosenName.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        _chosenName.MaxLinesVisible = 2;
-        _chosenName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        BuildAction();
 
-        _use.CustomMinimumSize = Cell;
-        _use.Visible = false;
+        _content.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        _content.AddChild(_gear);
+        _content.AddChild(_rows);
 
-        // 한 버튼이 둘을 한다. 고른 것이 소지품이면 입고, 걸친 것이면 벗는다 — 둘이 동시에 골라지는
-        // 일이 없으므로 버튼을 둘 둘 이유가 없다. 걸친 것은 음수로 두어 어느 쪽인지 가린다.
+        // 세로는 장 넘김이 칸 아래에, 가로는 낮아서 아래 한 줄(금화 옆)에 — 그만큼 칸이 한 줄 더 든다.
+        if (Main.Portrait)
+        {
+            _content.AddChild(_pager);
+        }
+
+        _main.AddThemeConstantOverride("separation", Main.Gutter);
+        _main.AddChild(_content);
+
+        // 아래 한 줄: 금화 · 몇 칸 — 그리고 줍기 · 정렬 아이콘.
+        _gold.AddThemeColorOverride("font_color", Greybox.Title);
+        _gold.AddThemeFontSizeOverride("font_size", 13);
+        _foot = new HBoxContainer();
+        _foot.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        _foot.AddChild(_gold);
+
+        if (!Main.Portrait)
+        {
+            _pager.SizeFlagsHorizontal = SizeFlags.ShrinkEnd;
+            _pageNumber.CustomMinimumSize = new Vector2(36, Cell.Y);
+            _gold.AddThemeFontSizeOverride("font_size", 11);
+            _foot.AddChild(_pager);
+        }
+
+        _foot.AddChild(_loot);
+        _foot.AddChild(Tidy);
+
+        body.AddChild(WindowFrame.Head(WindowFrame.Tabs(_packTab, _gearTab), Close));
+        body.AddChild(_main);
+        body.AddChild(_foot);
+
+        if (!Main.Portrait)
+        {
+            // 두 탭이 같은 폭을 쓰게 — 소지품 한 장과 줄인 고리가 다르면 탭을 바꿀 때마다 창이 옆으로 움직인다.
+            _content.CustomMinimumSize = new Vector2(_gear.CustomMinimumSize.X, 0);
+        }
+
+        // 속 여백은 좌우 4 — 세로 장비 고리(328)가 360 화면의 안전 폭(344) 안에 들어야 한다.
+        StyleBoxFlat sheet = Greybox.Sheet();
+        sheet.ContentMarginLeft = Main.Gutter / 2;
+        sheet.ContentMarginRight = Main.Gutter / 2;
+
+        PanelContainer inside = new();
+        inside.AddThemeStyleboxOverride("panel", sheet);
+        inside.AddChild(body);
+
+        AddChild(inside);
+        AddChild(_action);
+
+        ShowTab(Main.OnGear);
+    }
+
+    /// <summary>
+    /// The row beside a picked thing: its name, a line under it, and the icon buttons that apply. One button does both
+    /// carried things — the server's use (0x1C) puts gear on and drinks a potion — so only its word changes.
+    /// </summary>
+    private void BuildAction()
+    {
+        StyleBoxFlat plate = Greybox.Plate();
+        plate.BgColor = new Color("#0f0f0f");
+        plate.BorderColor = Greybox.Muted;
+        plate.SetCornerRadiusAll(10);
+        plate.SetContentMarginAll(6);
+        _action.AddThemeStyleboxOverride("panel", plate);
+
+        _actionName.AddThemeColorOverride("font_color", Greybox.Text);
+        _actionName.AddThemeFontSizeOverride("font_size", 13);
+        _actionName.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
+        _actionName.ClipText = true;
+        _actionName.CustomMinimumSize = new Vector2(120, 0);
+        _actionLine.AddThemeColorOverride("font_color", Greybox.Muted);
+        _actionLine.AddThemeFontSizeOverride("font_size", 11);
+
+        // 주 동작은 강조색 아이콘 — 창마다 확정은 하나(Greybox.Commit 과 같은 뜻).
+        if (_use.GetMeta("glyph").As<Glyph>() is { } lit)
+        {
+            lit.Paint = Greybox.Accent;
+        }
+
         _use.Pressed += () =>
         {
             if (_chosen > 0)
             {
                 Used?.Invoke(_chosen);
             }
-            else if (_chosen < 0)
-            {
-                TakenOff?.Invoke(-_chosen);
-            }
         };
-
-        _drop.CustomMinimumSize = Cell;
-        _drop.Visible = false;
 
         _drop.Pressed += () =>
         {
             if (_chosen > 0)
             {
                 Dropped?.Invoke(_chosen);
+                _action.Visible = false;
             }
         };
 
-        // 입기 단추가 뜨기 전에도 그 높이를 잡아 둔다. 안 그러면 고르는 순간 창이 28 자라 화면 밑으로 빠진다.
-        // 세로는 이름 옆에 단추, 가로는 좁은 기둥이라 이름 아래에 단추.
-        HBoxContainer buttons = new() { CustomMinimumSize = new Vector2(0, Cell.Y) };
-        buttons.AddThemeConstantOverride("separation", Main.Gutter);
-        BoxContainer foot = Main.Portrait ? buttons : new VBoxContainer();
-        foot.AddThemeConstantOverride("separation", Main.Gutter);
-        foot.AddChild(_chosenName);
-
-        if (!Main.Portrait)
+        _off.Pressed += () =>
         {
-            foot.AddChild(buttons);
-        }
+            if (_chosen < 0)
+            {
+                TakenOff?.Invoke(-_chosen);
+                _action.Visible = false;
+            }
+        };
 
+        HBoxContainer buttons = new();
+        buttons.AddThemeConstantOverride("separation", 4);
         buttons.AddChild(_use);
         buttons.AddChild(_drop);
+        buttons.AddChild(_off);
 
-        // 돌 제목줄 — 어느 창인지와 지금 가진 금화를 늘 같은 자리에서 본다. 어두운 돌 위라 글자는 밝은 쪽이다.
-        HBoxContainer naming = new();
-        naming.AddThemeConstantOverride("separation", Main.Gutter);
-
-        _title = new Label { Text = "소지품" };
-        _title.AddThemeColorOverride("font_color", Greybox.Title);
-        naming.AddChild(_title);
-        naming.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-
-        _gold.AddThemeColorOverride("font_color", Greybox.Title);
-        naming.AddChild(_gold);
-
-        // 원작도 금화를 소지품 창에 적었다. 상점에서 사기 전에 볼 곳이 여기다. 머리 줄에 두면 세로 360 에서
-        // 탭·정렬·닫기와 함께 넘친다(한 번 그렇게 됐다) — 장 넘김과 한 줄.
-        HBoxContainer turning = new();
-        turning.AddChild(_pager);
-
-        _content.AddThemeConstantOverride("separation", Main.Gutter);
-        _content.AddChild(_gear);
-        _content.AddChild(_rows);
-        _content.AddChild(turning);
-
-        _main.AddThemeConstantOverride("separation", Main.Gutter);
-        _main.AddChild(_content);
-
-        body.AddChild(Greybox.Header(naming));
-
-        if (Main.Portrait)
-        {
-            body.AddChild(head);
-            body.AddChild(_main);
-            body.AddChild(foot);
-        }
-        else
-        {
-            // 가로 기둥: 위에 탭, 아래에 고른 것과 입기 — 고리가 창 높이를 다 쓰도록 머리 줄과 꼬리 줄을 옆으로 뺐다.
-            VBoxContainer side = new();
-            side.AddThemeConstantOverride("separation", Main.Gutter);
-            side.AddChild(head);
-            side.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill });
-            side.AddChild(foot);
-
-            foreach (Control button in new Control[] { _gearTab, _packTab, _loot, Tidy, Close, _use, _drop })
-            {
-                button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            }
-
-            _main.AddChild(side);
-            body.AddChild(_main);
-
-            // 두 탭이 같은 폭을 쓰게 — 소지품 한 장(308)과 줄인 고리가 다르면 탭을 바꿀 때마다 창이 옆으로 움직인다.
-            // 온 크기 고리(312)를 잡아 두면 둘 다 들어간다.
-            _content.CustomMinimumSize = new Vector2(_gear.CustomMinimumSize.X, 0);
-        }
-
-        PanelContainer inside = new();
-        inside.AddThemeStyleboxOverride("panel", Greybox.Sheet());
-        inside.AddChild(body);
-
-        AddChild(inside);
-
-        ShowTab(Main.OnGear);
+        VBoxContainer column = new();
+        column.AddThemeConstantOverride("separation", 2);
+        column.AddChild(_actionName);
+        column.AddChild(_actionLine);
+        column.AddChild(buttons);
+        _action.AddChild(column);
     }
+
+    private static double Now() => Time.GetTicksMsec() / 1000.0;
 
     /// <summary>
     /// Shows one tab and hides the other. Nothing is asked of the server — both were already sent, so this
@@ -287,14 +294,16 @@ public sealed partial class PackPanel : PanelContainer
 
         // 소지품 한 장은 제 높이만큼만 아래에 붙고, 장비 고리는 남는 높이를 다 쓴다(GameScreen.Cover).
         SizeFlagsVertical = gear ? SizeFlags.ExpandFill : SizeFlags.ShrinkEnd;
-        _gearTab.ButtonPressed = gear;
-        _packTab.ButtonPressed = !gear;
+        _gearTab.SetPressedNoSignal(gear);
+        _packTab.SetPressedNoSignal(!gear);
+        _gearTab.EmitSignal(BaseButton.SignalName.Toggled, gear);
+        _packTab.EmitSignal(BaseButton.SignalName.Toggled, !gear);
         Tidy.Visible = !gear;
-        _title.Text = gear ? "장비" : "소지품";
 
         // 탭을 옮기면 고른 것이 다른 탭에 있을 수 있다. 놓고 다시 고르게 한다.
         _chosen = 0;
         _showing = null;
+        _action.Visible = false;
     }
 
     /// <summary>The button that shuts the panel, so whoever opened it can decide what that means.</summary>
@@ -315,7 +324,7 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>Shows what is worn and what is carried, and says plainly when there is nothing.</summary>
     public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn, Character? self = null, long gold = 0)
     {
-        _gold.Text = $"금화 {gold:N0}";
+        _gold.Text = Main.Portrait ? $"금화 {gold:N0} · {carried.Count}/60칸" : $"금화 {gold:N0}\n{carried.Count}/60칸";
 
         // 종이인형은 목록과 따로 갱신한다 — 차림이 바뀌는 것과 소지품이 바뀌는 것은 같은 일이 아니다.
         _gear.ShowDoll(self);
@@ -352,7 +361,7 @@ public sealed partial class PackPanel : PanelContainer
             if (cell is Button button)
             {
                 button.EmitSignal(BaseButton.SignalName.Pressed);
-                (throwing ? _drop : _use).EmitSignal(BaseButton.SignalName.Pressed);
+                (_onGear ? _off : throwing ? _drop : _use).EmitSignal(BaseButton.SignalName.Pressed);
 
                 return true;
             }
@@ -372,6 +381,8 @@ public sealed partial class PackPanel : PanelContainer
             cell.QueueFree();
         }
 
+        _cellsBySlot.Clear();
+
         foreach (InventoryItem? item in page)
         {
             if (item is null)
@@ -387,13 +398,59 @@ public sealed partial class PackPanel : PanelContainer
                 CustomMinimumSize = Cell,
                 Icon = ItemIcons.For(item.Icon),
                 ExpandIcon = true,
-                Flat = key != _chosen
+                IconAlignment = HorizontalAlignment.Center,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                FocusMode = FocusModeEnum.None
             };
+
+            // 칸은 평평한 어둠, 고른 칸은 밝은 테두리 — 돌은 칸에 쓰지 않는다(규칙표).
+            StyleBoxFlat box = Greybox.Surface();
+            box.SetCornerRadiusAll(6);
+
+            if (key == _chosen)
+            {
+                box.BorderColor = Greybox.Title;
+                box.SetBorderWidthAll(2);
+            }
+
+            foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
+            {
+                cell.AddThemeStyleboxOverride(state, box);
+            }
+
+            // 개수는 칸 오른쪽 아래 구석에 작게.
+            if (item.Stacks > 1)
+            {
+                Label count = new() { Text = item.Stacks.ToString(), MouseFilter = MouseFilterEnum.Ignore, HorizontalAlignment = HorizontalAlignment.Right };
+                count.AddThemeFontSizeOverride("font_size", 10);
+                count.AddThemeColorOverride("font_color", Greybox.Text);
+                count.AddThemeColorOverride("font_outline_color", Colors.Black);
+                count.AddThemeConstantOverride("outline_size", 3);
+                count.AnchorLeft = 0;
+                count.AnchorRight = 1;
+                count.AnchorTop = 1;
+                count.AnchorBottom = 1;
+                count.OffsetTop = -14;
+                count.OffsetRight = -3;
+                count.OffsetBottom = -1;
+                cell.AddChild(count);
+            }
+
+            _cellsBySlot[key] = cell;
 
             cell.Pressed += () =>
             {
                 if (_swiped)
                 {
+                    return;
+                }
+
+                // 빠르게 두 번 = 사용/입기.
+                if (_taps.Tap(key, Now()))
+                {
+                    _chosen = key;
+                    _action.Visible = false;
+                    Used?.Invoke(key);
                     return;
                 }
 
@@ -487,17 +544,25 @@ public sealed partial class PackPanel : PanelContainer
         _swipeFrom = null;
     }
 
-    /// <summary>Writes out whatever is picked, and offers to put it on when it is not on already.</summary>
+    /// <summary>
+    /// Fills the action row for whatever is picked — name, one line, and the buttons that apply — or hides it when
+    /// nothing is. Where it stands is worked out every frame (<see cref="PlaceAction" />), once the grid has settled.
+    /// </summary>
     private void ShowChosen(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn)
     {
         InventoryItem? held = carried.FirstOrDefault(item => item.Slot == _chosen);
 
         if (held is not null)
         {
-            _chosenName.Text = held.Stacks > 1 ? $"{held.Name} ×{held.Stacks}" : held.Name;
-            _use.Text = "입기";
+            _actionName.Text = held.Name;
+            _actionLine.Text = ItemActions.Line(held);
+            _actionLine.Visible = _actionLine.Text.Length > 0;
+            WindowFrame.Relabel(_use, ItemActions.Primary(held));
             _use.Visible = true;
             _drop.Visible = true;
+            _off.Visible = false;
+            _action.Visible = true;
+            _action.ResetSize();
 
             return;
         }
@@ -506,23 +571,75 @@ public sealed partial class PackPanel : PanelContainer
 
         if (gear is not null)
         {
-            _chosenName.Text = $"{WornPlace.Of(gear.Slot)} · {gear.Called}";
-            _use.Text = "벗기";
-            _use.Visible = true;
-
             // 걸친 것은 바로 버릴 수 없다. 벗어서 소지품에 든 다음에야 버릴 것이 생긴다.
+            _actionName.Text = gear.Called;
+            _actionLine.Text = ItemActions.Line(gear);
+            _actionLine.Visible = true;
+            _use.Visible = false;
             _drop.Visible = false;
+            _off.Visible = true;
+            _action.Visible = true;
+            _action.ResetSize();
 
             return;
         }
 
-        _chosenName.Text = _onGear
-            ? worn.Count == 0 ? "걸친 것이 없습니다." : $"걸친 것 {worn.Count}가지"
-            : carried.Count == 0 ? "가진 것이 없습니다." : $"{carried.Count}가지";
+        _action.Visible = false;
+    }
 
-        _chosenName.AddThemeColorOverride("font_color", Greybox.Muted);
-        _use.Visible = false;
-        _drop.Visible = false;
+    /// <summary>
+    /// Stands the action row just above the picked cell — below it when there is no room above inside the window — and
+    /// keeps it inside the window left and right.
+    /// </summary>
+    private void PlaceAction()
+    {
+        if (!_action.Visible)
+        {
+            return;
+        }
+
+        Control? cell = _chosen > 0
+            ? _cellsBySlot.GetValueOrDefault(_chosen)
+            : _gear.FindChild($"Slot{-_chosen}", true, false) as Control;
+
+        if (cell is null || !cell.IsVisibleInTree())
+        {
+            _action.Visible = false;
+            return;
+        }
+
+        Rect2 window = GetGlobalRect();
+        Rect2 at = cell.GetGlobalRect();
+        Vector2 size = _action.GetCombinedMinimumSize();
+        float x = Mathf.Clamp(at.GetCenter().X - (size.X / 2), window.Position.X + 4, Mathf.Max(window.Position.X + 4, window.End.X - size.X - 4));
+        float above = at.Position.Y - size.Y - 4;
+        float y = above >= window.Position.Y + 4 ? above : at.End.Y + 4;
+
+        _action.Size = size;
+        _action.GlobalPosition = new Vector2(x, Mathf.Min(y, window.End.Y - size.Y - 4));
+    }
+
+    public override void _Process(double delta)
+    {
+        PlaceAction();
+    }
+
+    /// <summary>
+    /// Taps the <paramref name="nth" /> picture on the pack page (1-based) the way a finger does — only for a run with no
+    /// hand on it (<c>--pack-pick</c>), to photograph the action row it opens.
+    /// </summary>
+    public bool PickNth(int nth)
+    {
+        Button? cell = _rows.GetChildren().OfType<Button>().Skip(nth - 1).FirstOrDefault();
+
+        if (_onGear || cell is null)
+        {
+            return false;
+        }
+
+        cell.EmitSignal(BaseButton.SignalName.Pressed);
+
+        return true;
     }
 
     private string Describe(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn) =>
