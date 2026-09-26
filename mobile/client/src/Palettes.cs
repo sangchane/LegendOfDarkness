@@ -61,12 +61,9 @@ public static class Palettes
         {
             for (int x = 0; x < image.GetWidth(); x++)
             {
+                // 투명한 화소도 본다 — 들여오기의 fix_alpha_border 가 가장자리 투명 화소에 옆 화소 색(표시색)을 채워 두어,
+                // 그대로 두면 줄여 그릴 때 섞여 테두리가 분홍으로 번졌다(바지 mn001 은 윤곽선 없이 표시색뿐이다).
                 Color pixel = image.GetPixel(x, y);
-
-                if (pixel.A8 == 0)
-                {
-                    continue;
-                }
 
                 for (int slot = 0; slot < markers.Count && slot < wanted.Count; slot++)
                 {
@@ -75,8 +72,8 @@ public static class Palettes
                         continue;
                     }
 
-                    image.SetPixel(x, y, Color.Color8(wanted[slot].R, wanted[slot].G, wanted[slot].B));
-                    painted = true;
+                    image.SetPixel(x, y, Color.Color8(wanted[slot].R, wanted[slot].G, wanted[slot].B, (byte)pixel.A8));
+                    painted |= pixel.A8 != 0;
                     break;
                 }
             }

@@ -84,6 +84,9 @@ MODIFIERS = {
 }
 
 
+# 원작처럼 바지까지 그려지는 옷. 혼든 팩이 더 많은 옷을 입히지만 팩 셋이 일치하지 않아 사용자가 기억한 것만.
+WITH_PANTS = {"천지도복"}
+
 def text(fields, key, default=""):
     """칸 값. 같은 칸이 두 번 적힌 줄은 목록으로 뽑혀 있어 첫 값을 쓴다."""
     value = fields.get(key, default)
@@ -166,6 +169,10 @@ def template(item):
         made["AttackMotion"] = min(255, number(f, "공격모션"))
     if number(f, "공격속도"):
         made["AttackSpeed"] = min(255, number(f, "공격속도"))
+    # 바지를 입히는 옷(서버가 몸 번호 아래 반쪽에 바지 색을 실어 보낸다 — Armor.cs · 원작 Legend.exe 0x54ffaa).
+    # 5.99 팩에는 이 칸이 없다. 사용자(2026-09-26): "천지도복 입으면 원래 하의까지 표시됐다".
+    if made["Name"] in WITH_PANTS:
+        made["HasPants"] = True
     for key, field in MODIFIERS.items():
         value = number(f, key)
         if value:

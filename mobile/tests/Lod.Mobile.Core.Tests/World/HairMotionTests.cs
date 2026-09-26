@@ -30,7 +30,7 @@ public sealed class HairMotionTests
         Assert.True(missing.Count == 0, $"동작 그림이 없는 머리 {missing.Count}개: {string.Join(" ", missing.Take(20))}");
     }
 
-    private static string Parts()
+    internal static string Parts()
     {
         for (DirectoryInfo? at = new(AppContext.BaseDirectory); at is not null; at = at.Parent)
         {

@@ -42,7 +42,7 @@ public sealed class WardrobeTests
     public void Every_piece_the_server_names_is_asked_for()
     {
         Assert.Equal(
-            ["ms006", "mb001", "ml001", "mu061", "ma061", "mi007", "mw020", "mp020", "mh003", "me003", "mf003", "mc009"],
+            ["ms006", "mb001", "mn001", "ml001", "mu061", "ma061", "mi007", "mw020", "mp020", "mh003", "me003", "mf003", "mc009"],
             Names(Wearing(
                 head: 3, body: 16 + 2, armor: 61, boots: 1, shield: 6, overCoat: 7, weapon: 20,
                 accessory: 9)));
@@ -58,7 +58,7 @@ public sealed class WardrobeTests
     public void Facing_us_the_weapon_is_drawn_first_and_the_body_covers_the_hand()
     {
         Assert.Equal(
-            ["mw020", "mf003", "mb001", "ml001", "mh003", "mu061", "ma061", "me003", "mp020", "ms006", "mc009"],
+            ["mw020", "mf003", "mb001", "mn001", "ml001", "mh003", "mu061", "ma061", "me003", "mp020", "ms006", "mc009"],
             Stacked(Side.Front));
     }
 
@@ -66,7 +66,7 @@ public sealed class WardrobeTests
     public void From_behind_the_shield_is_first_and_the_weapon_goes_under_the_arms_and_head()
     {
         Assert.Equal(
-            ["ms006", "mb001", "ml001", "mu061", "mf003", "mw020", "ma061", "mh003", "me003", "mp020", "mc009"],
+            ["ms006", "mb001", "mn001", "ml001", "mu061", "mf003", "mw020", "ma061", "mh003", "me003", "mp020", "mc009"],
             Stacked(Side.Back));
     }
 
@@ -109,17 +109,43 @@ public sealed class WardrobeTests
     }
 
     /// <summary>
-    /// Nobody is drawn with trousers. The reference client gives men mn001 dyed by the bottom half of the
-    /// body byte, but that hides the body's own underwear, so we leave the piece out for both genders.
+    /// 바지는 몸 바이트 아래 반쪽이 0 이 아닐 때만 입는다 — 5.99 Legend.exe 0x54ffaa..0x55006b 가 그 반쪽을 떼어
+    /// 0 이 아니면 바지 번호 1, 0 이면 0 으로 적고(0x55005d · 0x550069) 그리는 함수는 번호 0 인 부위를 건너뛴다
+    /// (0x4e85d1). 색은 그 반쪽 그대로다(0x54ffb4). 천지도복(갑옷 8)을 입은 무도가가 속옷 차림으로 보였다(사용자,
+    /// 2026-09-26) — 도복은 윗도리만 그리고 하의는 이 바지(mn001)가 그린다. 여자 아카이브에는 바지 그림이 없다.
     /// </summary>
     [Fact]
-    public void Nobody_is_drawn_with_trousers()
+    public void A_man_whose_body_byte_carries_a_colour_wears_trousers_dyed_with_it()
     {
-        Assert.Equal(["mb001"], Names(Wearing(body: 16 + 5)));
+        IReadOnlyList<Piece> pieces = Wardrobe.Pieces(Wearing(body: 16 + 1, armor: 8));
+
+        Assert.Equal(["mb001", "mn001", "mu008", "ma008"], pieces.Select(piece => piece.Name));
+        Assert.Equal(1, pieces.Single(piece => piece.Name == "mn001").Colour);
+    }
+
+    [Fact]
+    public void With_no_colour_in_the_body_byte_there_are_no_trousers()
+    {
+        Assert.Equal(["mb001", "mu008", "ma008"], Names(Wearing(body: 16, armor: 8)));
         Assert.Equal(["wb001"], Names(Wearing(body: 32 + 5)));
     }
 
-    /// <summary>Now that the trousers are gone, only the head and the boots are dyed.</summary>
+    /// <summary>천지도복 차림을 무도가 동작까지 그릴 그림이 다 있다 — 바지·도복·팔의 서기·평타·도가 기술(d).</summary>
+    [Fact]
+    public void The_earth_garb_and_its_trousers_are_cut_for_the_monk()
+    {
+        string parts = HairMotionTests.Parts();
+        string[] missing =
+        [
+            .. new[] { "mn001", "mu008", "ma008" }
+                .SelectMany(piece => new[] { "", "02", "d" }.Select(move => $"{piece}{move}.png"))
+                .Where(name => !File.Exists(Path.Combine(parts, name)))
+        ];
+
+        Assert.Empty(missing);
+    }
+
+    /// <summary>The head, the boots and the trousers are dyed; the shield is not.</summary>
     [Fact]
     public void The_head_and_the_boots_carry_a_colour()
     {
@@ -128,6 +154,7 @@ public sealed class WardrobeTests
 
         Assert.Equal(11, pieces.Single(piece => piece.Name == "mh003").Colour);
         Assert.Equal(4, pieces.Single(piece => piece.Name == "ml001").Colour);
+        Assert.Equal(5, pieces.Single(piece => piece.Name == "mn001").Colour);
         Assert.Equal(0, pieces.Single(piece => piece.Name == "ms006").Colour);
     }
 }

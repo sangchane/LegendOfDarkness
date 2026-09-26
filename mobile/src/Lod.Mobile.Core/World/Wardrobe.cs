@@ -15,6 +15,7 @@ public static class Wardrobe
 {
     // The body byte holds the kind of body in its top half and the trousers' colour in its bottom half.
     private const int Kind = 0xF0;
+    private const int Trousers = 0x0F;
 
     // BodySprite on the server: 2 woman, 4 her ghost, 6 her unseen, 9 her head alone, 11 her blank.
     private static readonly int[] Women = [2, 4, 6, 9, 11];
@@ -48,9 +49,13 @@ public static class Wardrobe
         // The body is always the same drawing; which archive it comes out of is what the gender decides.
         pieces.Add(new Piece($"{gender}b001", 0));
 
-        // No trousers piece. The reference client gives men drawing mn001 dyed by the bottom half of the
-        // body byte (map-scene.ts: setItemId(1) then setDye(79 + (bodyShape & 0x0f))), but that draws the
-        // purple tights over the body's own white underwear, so we leave it out and show the body as is.
+        // 바지(mn001)는 몸 바이트 아래 반쪽이 0 이 아닐 때만, 그 반쪽 색으로 입는다 — 5.99 Legend.exe 0x54ffaa..0x55006b
+        // (0 이면 바지 번호 0 → 그리지 않음, 0x4e85d1). 참고 클라이언트는 늘 입혀 0 일 때 보라 쫄바지가 됐다. 도복처럼
+        // 윗도리만 있는 옷의 하의가 이 바지다. 여자 아카이브에는 바지 그림이 없다.
+        if (gender == 'm' && (worn.Body & Trousers) != 0)
+        {
+            pieces.Add(new Piece("mn001", worn.Body & Trousers));
+        }
 
         Add('l', worn.Boots, worn.BootColor);
         Add('u', worn.Armor);
