@@ -32,6 +32,17 @@
       "role": "원작 한국 클라이언트 2001-12-07 빌드 — 사람 그림 12부위·동작 고르기·Skill.tbl·이펙트·괴물 그림",
       "sections": ".text 0x40c000 · .rdata 0x4c6000 · .data 0x4c7000(파일 0xc7000) · .data1 0x4fd000(파일 0xe0000)",
       "installer": "lodr4.51.exe 59,050,364 바이트 — InstallShield 6(data1.hdr·data1.cab·data2.cab). unshield x data1.cab 로 푼다"
+    },
+    {
+      "id": "nova-server",
+      "name": "Legend.exe (novaonline)",
+      "path": "sources/novaonline/Legend.exe",
+      "size": 544768,
+      "md5": "b909a155253918fde0ce7cd5e28bbb3a",
+      "sha256": "be1f768676c258d668ac8bae640da87fcf45bbfb7a14c2e0b34315d76aeb39d8",
+      "format": "PE32 i386",
+      "role": "노바온라인 서버 — 스크립트 명령. 5.99 Novaonline.exe 와는 다른 파일이다",
+      "sections": ".text 0x401000 · .rdata 0x472000 · .data 0x474000(파일 0x74000)"
     }
   ],
   "functions": [
@@ -250,6 +261,20 @@
       "name": "혼수 1초 처리",
       "role": "접속자마다 +0xF1(남은 초)을 1 줄이며 그림 24·아이콘 89 를 보내고, 0 이 되면 메시지 3 과 스크립트 __COMA_END__(죽음·뮤레칸의방)를 부른다. 하데스 빈사 디버프(debuff_reeping — 아이콘 89 · 그림 24)와 같다",
       "excerpt": "data/disassembly/excerpts/nova-coma-46f5d3.asm"
+    },
+    {
+      "binary": "nova-server",
+      "address": "0x442430",
+      "name": "effect 명령",
+      "role": "스크립트 `effect @대상, 번호, 0, 속도` 를 받는다. 인자 넷을 0x4390c4(인자 읽기)로 꺼내 **하나도 손대지 않고** 0x45cd18 로 넘긴다 — 더하기도 표 거치기도 없다",
+      "excerpt": "data/disassembly/excerpts/nova-effect-442430.asm"
+    },
+    {
+      "binary": "nova-server",
+      "address": "0x45cd18",
+      "name": "0x29 이펙트 패킷 만들기",
+      "role": "0x48c3e0 부터 패킷을 채우고 0x416ba7 로 보낸다. **이펙트 번호는 0x48c3ed 에 1바이트로 그대로 들어간다**(0x45cdc2). 그래서 노바 엔진은 256 이상 번호를 못 보낸다",
+      "excerpt": "data/disassembly/excerpts/nova-effect-442430.asm"
     }
   ],
   "offsets": [
@@ -816,6 +841,15 @@
       "name": "감정표현 표",
       "shape": "한 줄 64바이트: +0 단축키 · +4 클라이언트 번호 0~35 · +8 동작 번호(-1 이면 앞 줄+1) · +12 첫 칸(-1 이면 이어서) · +16 칸 수(그림+1) · +20 칸마다 ms · +24 채팅 글 주소. +0 이 음수면 끝",
       "content": "32줄 — 9~17 · (18·19 그림 없음) · 23~44"
+    },
+    {
+      "binary": "nova-server",
+      "address": "0x47c73c",
+      "file_offset": "0x7c73c",
+      "name": "스크립트 명령표",
+      "shape": "한 칸 12바이트 {핸들러 주소, 이름 주소, 인자 서명 주소}",
+      "note": "effect 칸은 {0x442430, 0x47d8fc \"effect\", 0x47d904 \"iiii\"} 이고 그 다음이 {0x44453f, 0x47d90c \"effect2\", \"iiiii\"} 다. 이름·서명 문자열은 0x47d8xx 대에 4바이트 맞춤으로 줄지어 있다. 노바 명령에 기계어 근거가 붙은 것은 이것이 처음이다",
+      "excerpt": "data/disassembly/excerpts/nova-effect-442430.asm"
     }
   ],
   "packets": [
@@ -841,6 +875,17 @@
       "builder": "0x45d363",
       "layout": "AA 00 06 19 00 <sound> C8 2A 3D",
       "note": "평타는 sound 1 고정(0x41688d · 0x416b06)"
+    },
+    {
+      "binary": "nova-server",
+      "opcode": "0x29",
+      "name": "이펙트",
+      "builder": "0x45cd18",
+      "layout": "AA 00 0E 29 00 00 00 | idHi idLo | 대상 4바이트(빅엔디언) | 번호(1바이트) | 인자3(1바이트) | 속도 2바이트",
+      "note": "번호가 1바이트다 — 노바 스크립트가 쓰는 값도 0~195 뿐이라 서로 맞는다",
+      "senders": [
+        "effect 명령 0x442430"
+      ]
     }
   ],
   "rules": [
@@ -1259,6 +1304,18 @@
         "0x449b8d"
       ],
       "implemented": "Actor.Face (Scale.X)"
+    },
+    {
+      "id": "nova-effect-passthrough",
+      "binary": "nova-server",
+      "statement": "노바 서버는 스크립트의 이펙트 번호를 그대로 0x29 에 싣는다 — 바꾸지 않는다",
+      "evidence": [
+        "0x442430",
+        "0x45cd18",
+        "0x45cdc2"
+      ],
+      "note": "노바 스크립트의 옛 번호(≤195)와 5.99 의 새 번호(232 이상)가 다른 것은 서버가 번호를 바꿔서가 아니다. 노바가 실제로 쓰는 값은 0~195 뿐이고 256 이상은 하나도 없다 — 1바이트 칸과 맞는다. 5.99 가 쓰는 299 같은 값은 1바이트에 안 들어가므로 5.99 엔진의 칸 너비는 따로 봐야 한다",
+      "implemented": "안 옮김 — scripts/build-nova-effects.py 가 번호만 바꿔 두었다"
     }
   ],
   "comparisons": [
