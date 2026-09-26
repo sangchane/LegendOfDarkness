@@ -46,15 +46,24 @@ TEMPLATES = SERVER / "database" / "server" / "templates"
 OUT = SERVER / "src" / "Hades.Server.Base" / "Types" / "AutoLearnTable.cs"
 APP_OUT = ROOT / "mobile" / "client" / "assets" / "world" / "auto-learn.txt"
 NOVA = ROOT / "data" / "server-packs" / "novaonline" / "db" / "script"
+ORIGINAL_2023 = ROOT / "data" / "skill-spell-2023" / "skills.json"
 
 #: 밀레스마을 직업 사범 — 이름 뒤 숫자 없는 것과 2·3·4.
 TEACHERS = [f"{name}{n}" for name in ("가렌", "이블린", "럭스", "소라카", "리신") for n in ("", "2", "3", "4")]
 #: 사용자 결정으로 빼는 것.
-EXCLUDED = {"정권": "운영자 명령으로만 (사용자)"}
+EXCLUDED = {
+    "정권": "운영자 명령으로만 (사용자)",
+}
+BLOCKED_AUTO = {"투핸드어택": "기술이 아니라 전사 두손 무기 동작 (사용자)"}
+FORCED_WITHDRAWN = {(1, "skill", "투핸드어택")}
+#: 사용자가 2026-09-27 원작 기술이라고 직접 확인한 이름. 2023 원작 표의 일반 기술·마법 행으로
+#: 직업과 레벨을 확인하며, 빠지면 생성기를 실패시켜 조용히 다시 치워지지 않게 한다.
+MANDATORY_ORIGINAL = {"양의신권", "백보신권", "소수신공", "일루메나", "피닉스모드", "콘푸지오", "딜루메니"}
 #: 팩 직업 번호 = 하데스 `Class` 값(1 전사 · 2 도적 · 3 마법사 · 4 성직자 · 5 무도가).
 CLASS_NAMES = {1: "Warrior", 2: "Rogue", 3: "Wizard", 4: "Priest", 5: "Monk"}
 CLASS_KO = {1: "전사", 2: "도적", 3: "마법사", 4: "성직자", 5: "무도가"}
 CLASS_BY_KO = {v: k for k, v in CLASS_KO.items()}
+WORKBOOK_CLASS = {"전사": 1, "도적": 2, "법사": 3, "직자": 4, "도가": 5}
 
 NOVA_MERCHANT = re.compile(r"^0,0,0,0,0,0,0\t([23]?)(전사|도적|마법사|성직자|무도가)스킬상인\t\{", re.M)
 NOVA_HEAD = re.compile(r"^0,0,0,0,0,0,0\t", re.M)
@@ -179,16 +188,55 @@ def pack599(known):
     return rows, skipped, instead, replaces
 
 
+def original_restored(old, nova_rows):
+    """2023 원작 표의 같은 직업·같은 이름인 일반 기술·마법을 되살린다.
+
+    이 워크북은 Hades 영문 SClass와 신원 키가 없는 별도 계보다. 그래서 번역이나 아이콘으로 짝짓지 않고,
+    현재 5.99 사범 표에 있던 한글 이름과 `ordinary` 행의 한글 이름이 정확히 같을 때만 근거로 쓴다.
+    승급 조건처럼 캐릭터 레벨이 아닌 행은 현재 자동 습득기가 표현할 수 없어 5.99 사범 레벨을 유지한다.
+    """
+    records = json.loads(ORIGINAL_2023.read_text(encoding="utf-8-sig"))["records"]
+    ordinary = {
+        (WORKBOOK_CLASS[row["class"]], row["name"]): row
+        for row in records
+        if row["section"] == "ordinary" and row["class"] in WORKBOOK_CLASS
+    }
+    restored = {}
+    taught = {(path, name) for path, _, name in nova_rows}
+    for key, (pack_level, _) in old.items():
+        path, _, name = key
+        if (path, name) in taught:
+            continue
+        row = ordinary.get((path, name))
+        if row is None:
+            continue
+        requirement = row["requirement"]
+        if requirement["type"] == "level":
+            level = int(requirement["value"])
+            source = f"원작 2023 {row['class']} {row['source']['row']}행"
+        else:
+            level = pack_level
+            source = f"원작 2023 {row['class']} {row['source']['row']}행({requirement['value']}) · 5.99 레벨"
+        restored[key] = (level, source)
+
+    found_names = {name for (_, _, name) in restored}
+    missing = sorted(MANDATORY_ORIGINAL - found_names)
+    if missing:
+        sys.exit(f"사용자가 확인한 원작 기술이 2023 일반 표에서 사라졌다: {', '.join(missing)}")
+    return restored
+
+
 def main():
     write = "--쓰기" in sys.argv
     known = {"skill": templates("skill"), "spell": templates("spell")}
     old, _, _, _ = pack599(known)
     found, instead, promoted = nova()
+    restored = original_restored(old, found)
 
     rows, skipped, icons = {}, [], {}
     for (path, kind, name), (level, source) in found.items():
-        if name in EXCLUDED:
-            skipped.append((source, name, EXCLUDED[name]))
+        if name in EXCLUDED or name in BLOCKED_AUTO:
+            skipped.append((source, name, (EXCLUDED | BLOCKED_AUTO)[name]))
             continue
         template = known[kind].get(name)
         if template is None:
@@ -196,11 +244,18 @@ def main():
             continue
         rows[(path, kind, name)] = (level, source)
         icons[(path, kind, name)] = int(template.get("Icon") or 0)
+    for key, value in restored.items():
+        rows[key] = value
+        icons[key] = int(known[key[1]][key[2]].get("Icon") or 0)
     replaces = {}
 
     # 5.99 에만 있던 것 — 같은 직업의 노바 1차 목록(템플릿이 없어 못 넣은 것·정권까지)에 이름이 없는 것.
     taught = {(path, name) for (path, _, name) in found}
-    withdrawn = sorted({(path, kind, name) for (path, kind, name) in old if (path, name) not in taught})
+    withdrawn = sorted({
+        (path, kind, name)
+        for (path, kind, name) in old
+        if (path, name) not in taught and (path, kind, name) not in restored
+    } | FORCED_WITHDRAWN)
 
     ordered = sorted(rows.items(), key=lambda r: (r[0][0], r[1][0], r[0][1], r[0][2]))
     def listed(names):
@@ -216,7 +271,9 @@ def main():
     for teacher, name, why in skipped:
         print(f"못 넣음\t{teacher}\t{name}\t{why}")
     for path, kind, name in withdrawn:
-        print(f"치움(5.99 전용)\t{CLASS_KO[path]}\t{'기술' if kind == 'skill' else '마법'}\t{name}\t5.99 {old[(path, kind, name)][0]}레벨")
+        source = (f"5.99 {old[(path, kind, name)][0]}레벨" if (path, kind, name) in old
+                  else BLOCKED_AUTO[name])
+        print(f"치움(5.99 전용)\t{CLASS_KO[path]}\t{'기술' if kind == 'skill' else '마법'}\t{name}\t{source}")
     for path, tier, kind, name in promoted:
         print(f"안 넣음({tier})\t{CLASS_KO[path]}\t{'기술' if kind == 'skill' else '마법'}\t{name}")
     print(f"모두 {len(ordered)}개 (못 넣은 것 {len(skipped)} · 치울 5.99 전용 {len(withdrawn)} · 승급 {len(promoted)})")
@@ -250,8 +307,9 @@ def main():
         "        {",
     ]
     for path, kind, name in withdrawn:
-        lines.append(f'            (Class.{CLASS_NAMES[path]}, {"true" if kind == "skill" else "false"}, "{name}"), '
-                     f'// 5.99 {old[(path, kind, name)][1]} {old[(path, kind, name)][0]}레벨')
+        source = (f"5.99 {old[(path, kind, name)][1]} {old[(path, kind, name)][0]}레벨"
+                  if (path, kind, name) in old else BLOCKED_AUTO[name])
+        lines.append(f'            (Class.{CLASS_NAMES[path]}, {"true" if kind == "skill" else "false"}, "{name}"), // {source}')
     lines += ["        };", "    }", "}", ""]
 
     # 앱: 직업 번호(서버 `Class`, 프로필 0x39 의 직업 바이트와 같다) · 레벨 · skill/spell · 이름 · 그림 번호(템플릿 `Icon`,

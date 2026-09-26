@@ -20,8 +20,8 @@
 **노바에서 옮기는 것**(`FROM_NOVA`): 사용자 결정(2026-09-27) 「기술·마법 목록과 배우는 레벨을 노바처럼」으로 노바 1차
 스킬상인이 가르치는데 5.99 팩에 블록이 없는 것. 노바 팩(`data/server-packs/novaonline/db`)의 같은 이름 블록을 같은 길로
 옮긴다 — 두 팩은 같은 엔진의 같은 말이다. 템플릿 묶음은 `노바표/…`, 아이콘·설명·마법 대상은 노바 `skill/default.txt`·
-`spell/spell.txt` 에서 읽는다. 노바에도 블록이 없는 것(통배권 — 정의는 `SKILL_통배권` 을 부르는데 스크립트엔 `통배권1` 뿐)은
-옮기지 못한다.
+`spell/spell.txt` 에서 읽는다. 통배권은 노바 정의가 `SKILL_통배권`을 부르지만 실제 블록 이름이 `SKILL_통배권1`인
+오타라서 그 블록을 통배권으로 옮긴다. 혼든의 같은 이름 정의도 아이콘 4로 일치한다.
 """
 import json
 import re
@@ -44,7 +44,7 @@ configure_utf8_stdio(sys.stdout, sys.stderr)
 MARK = "5.99표"
 NOVA_MARK = "노바표"
 #: 노바 1차 스킬상인이 가르치는데 5.99 에 블록이 없는 것 — 노바 블록을 옮긴다(위 설명).
-FROM_NOVA = {"두번찌르기", "마레네라", "엑스마레나", "디베노모", "벨라르모", "수페라벨라르모"}
+FROM_NOVA = {"두번찌르기", "마레네라", "엑스마레나", "디베노모", "벨라르모", "수페라벨라르모", "통배권"}
 #: 사용자가 2026-09-16 에 뺐던 정권은 2026-09-25 에 다시 넣으라 했다("5.99 기준으로 완성") — 비어 있다.
 EXCLUDED = set()
 
@@ -89,6 +89,8 @@ def nova_blocks():
     paths = [NOVA.parent / rel for rel in re.findall(r"^script:(\S.*?)\s*$", listing, re.M)]
     out = {}
     for key, (source, body) in _cut([p for p in paths if p.exists()], first=True).items():
+        if key == ("SKILL", "통배권1"):
+            key = ("SKILL", "통배권")
         if key[0] in ("SKILL", "SPELL") and key[1] in FROM_NOVA:
             out[key] = (f"노바/{source}", body)
     return out

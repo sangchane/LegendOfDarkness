@@ -81,6 +81,12 @@ public sealed class MonkPackAbilityTests : IDisposable
         int robe = world.Self!.Wearing!.Armor;
         Assert.True(BodyMotion.Fits(132, robe), $"도복({robe})이 132 를 못 그립니다.");
 
+        // 통배권 — 노바 정의가 SKILL_통배권을 부르지만 실제 블록 이름은 통배권1이다. 혼든도 아이콘 4로 일치한다.
+        int tongbaegwon = await LearnSkill(world, "통배권");
+        Assert.Equal(4, world.Skills.First(skill => skill.Name.StartsWith("통배권", StringComparison.Ordinal)).Icon);
+        await Blow(world, () => world.UseSkillAsync(tongbaegwon, _deadline.Token), 0,
+            motion: (134, 20), effect: (69, 0, 50), sound: 16, "통배권");
+
         // 장풍 — 마력 150 · 맞는 쪽 158 · 소리 15 · 몸 132(속도 50) · 「장풍 외웠습니다.」
         int jangpung = await LearnSpell(world, "장풍");
         await Blow(world, () => world.UseSpellAsync(jangpung, plain.Target, _deadline.Token), 150,

@@ -86,6 +86,48 @@ public sealed class Pack599TeacherTests : IDisposable
         Assert.DoesNotContain(heard, words => words.StartsWith("윈드블레이드를 익히셧습니다"));
     }
 
+    [Fact]
+    public async Task Garen_three_does_not_offer_two_handed_attack()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MilethId, 53, 44));
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, Name);
+
+        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
+        JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
+        character["Path"] = "Warrior";
+        character["ExpLevel"] = 99;
+        File.WriteAllText(saved, character.ToJsonString());
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+        Creature garen = await Standing(world, new Tile(52, 44));
+        await world.ClickAsync(garen.Serial, _deadline.Token);
+
+        int answered = 0;
+        Dialogue? menu = null;
+        while (menu is null)
+        {
+            await Waiting.Until(() => world.TalkCount > answered && world.Talking is not null,
+                "가렌3 대화가 오지 않았습니다.", _deadline.Token);
+            answered = world.TalkCount;
+            Dialogue talk = world.Talking!;
+            if (talk.Options.Any(option => option.Text != "다음"))
+            {
+                menu = talk;
+                break;
+            }
+            DialogueOption next = talk.Options.First(option => option.Text == "다음");
+            await world.AnswerAsync(garen.Serial, next.Step, _deadline.Token);
+        }
+
+        Assert.DoesNotContain(menu.Options, option => option.Text.StartsWith("투핸드어택", StringComparison.Ordinal));
+        Assert.Contains(menu.Options, option => option.Text.StartsWith("피닉스모드", StringComparison.Ordinal));
+        Assert.Contains(menu.Options, option => option.Text.StartsWith("휘두르기", StringComparison.Ordinal));
+    }
+
     private async Task<Creature> Standing(WorldClient world, Tile where)
     {
         DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(30);

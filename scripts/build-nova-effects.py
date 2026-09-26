@@ -19,8 +19,7 @@
 - `templates/skills/<이름>.json` 의 `TargetAnimation` — `Skills/Monk/<이름>.cs`(`build-monk-skills.py`)는
   이펙트를 템플릿에서 읽는다. 노바 첫 `effect` 의 대상그림을 넣고, **노바에 이펙트가 없으면 5.99 번호를 둔다**
   (0 으로 지우지 않는다 — 사용자 2026-09-27: 허공답보는 5.99 의 68 이 원작).
-  템플릿에는 속도 칸이 없다 — `MonkStrike` 가 속도를 100 으로 박아 보낸다(`ServerFormat29(..., 100)`). 노바 속도는
-  `--쓰기` 없이 돌리면 「무도가 속도」 줄로 보여 준다.
+  템플릿의 `TargetAnimationSpeed` 에 노바 속도를 적고 `MonkStrike` 가 0x29 에 그 값을 보낸다.
 
 다시 돌려도 같다: 바꾼 줄 끝에 `// 노바 이펙트(5.99: 쓴쪽, 대상, 속도 N)` 로 원래 값을 남겨 두고 그것에서 다시
 계산하며(속도가 없는 옛 꼬리표는 줄의 속도가 곧 5.99 값이다),
@@ -51,9 +50,6 @@ configure_utf8_stdio(sys.stdout, sys.stderr)
 EFFECT = re.compile(r"(?<![\w/])effect\s+([^;\n]+);")
 LINE = re.compile(r'^(?P<pad>\s*)p\.Call\("effect", (?P<who>[^,]+), \(V\)(?P<a>\d+)L, \(V\)(?P<b>\d+)L, '
                   r'\(V\)(?P<s>\d+)L\);(?P<tail>.*)$')
-#: 속도를 노바로 바꾸지 않는 것 — 사람이 정한 값이다. 쿠로토 117: 5.99·노바는 75 인데 무도가 손 들기에 맞춰
-#: 「20%씩 두 번 느리게」 한 것(`KurotoTests`, 몸 동작 90 = 117 / 1.3 과 짝).
-KEEP_SPEED = {"쿠로토"}
 KEPT = re.compile(r"\s*// 노바 이펙트\(5\.99: (\d+), (\d+)(?:, 속도 (\d+))?\)$")
 
 
@@ -114,7 +110,7 @@ def plan(old, new):
     return out
 
 
-def rewrite(path, old, new, keep_speed=False):
+def rewrite(path, old, new):
     """`.cs` 를 새 글로. 바뀐 게 없거나 못 맞추면 `(None, 까닭)`."""
     text = path.read_text(encoding="utf-8-sig")
     lines = text.split("\n")
@@ -127,7 +123,7 @@ def rewrite(path, old, new, keep_speed=False):
         kept = KEPT.search(m["tail"])
         a0, b0 = (int(kept[1]), int(kept[2])) if kept else (int(m["a"]), int(m["b"]))
         s0 = int(kept[3]) if kept and kept[3] else int(m["s"])  # 옛 꼬리표엔 속도가 없다 — 그땐 줄의 속도가 5.99 값
-        s = s0 if s is None or keep_speed else s
+        s = s0 if s is None else s
         tail = KEPT.sub("", m["tail"])
         mark = f"  // 노바 이펙트(5.99: {a0}, {b0}, 속도 {s0})" if (a, b, s) != (a0, b0, s0) else ""
         lines[i] = f'{m["pad"]}p.Call("effect", {m["who"]}, (V){a}L, (V){b}L, (V){s}L);{tail}{mark}'
@@ -154,21 +150,27 @@ def main():
             # 노바 스크립트에 이펙트가 없으면 5.99 번호를 둔다 — 0 으로 지우지 않는다(사용자 2026-09-27: 허공답보 68 이 원작).
             want = next((c[2] for c in new if c[2]), None) or next((c[2] for c in old if c[2]), 0)
             speed = next((c[3] for c in new if c[2]), None)
-            if speed is not None and speed != 100:  # 템플릿에 속도 칸이 없다 — MonkStrike 가 100 을 보낸다
+            if speed is not None:
                 monk_speed.append((name, speed))
-            if template.get("TargetAnimation") != want:
-                changed.append((name, f"TargetAnimation {template.get('TargetAnimation')} → {want}", path))
-                if writing:  # 그 칸만 바꾼다 — 머리표(BOM)·줄바꿈·다른 칸은 그대로 둔다
+            old_speed = int(template.get("TargetAnimationSpeed") or 100)
+            if template.get("TargetAnimation") != want or speed is not None and old_speed != speed:
+                changed.append((name, f"TargetAnimation {template.get('TargetAnimation')} → {want}, 속도 {old_speed} → {speed or old_speed}", path))
+                if writing:  # 이 두 칸만 바꾼다 — 머리표(BOM)·줄바꿈·다른 칸은 그대로 둔다
                     raw = path.read_bytes().decode("utf-8")
                     raw, n = re.subn(r'("TargetAnimation":\s*)-?\d+', lambda m: f"{m[1]}{want}", raw, count=1)
                     if not n:
                         raw = re.sub(r'(\n\s*"ScriptName":[^\n]*,)', lambda m: f'{m[1]}\n  "TargetAnimation": {want},', raw, count=1)
+                    if speed is not None:
+                        raw, n = re.subn(r'("TargetAnimationSpeed":\s*)-?\d+', lambda m: f"{m[1]}{speed}", raw, count=1)
+                        if not n:
+                            raw = re.sub(r'(\n\s*"TargetAnimation":\s*-?\d+,)',
+                                         lambda m: f'{m[1]}\n  "TargetAnimationSpeed": {speed},', raw, count=1)
                     path.write_bytes(raw.encode("utf-8"))
             continue
         path = PACK599 / ("Skills" if kind == "SKILL" else "Spells") / f"{name}.cs"
         if not path.exists() or not old:
             continue
-        text, why = rewrite(path, old, new, keep_speed=name in KEEP_SPEED)
+        text, why = rewrite(path, old, new)
         if why:
             skipped.append((name, why))
         elif text is not None:
@@ -184,7 +186,7 @@ def main():
     for name, why in skipped:
         print(f"  건너뜀 {name}: {why}")
     for name, speed in monk_speed:
-        print(f"  무도가 속도 {name}: 노바 {speed} · 우리 100(MonkStrike 고정, 템플릿에 칸 없음)")
+        print(f"  무도가 속도 {name}: 노바 {speed}")
     return 0
 
 

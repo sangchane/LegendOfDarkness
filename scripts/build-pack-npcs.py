@@ -90,7 +90,13 @@ def _lee_sin_two(body):
     return body[:cut] + "".join(out)
 
 
-BLOCK_PATCH = {"리신2": _lee_sin_two}
+def _garen_three(body):
+    """투핸드어택은 기술이 아니라 두손 무기 동작이므로 메뉴와 가르치는 갈래를 함께 막는다."""
+    body = body.replace(', "투핸드어택[71]"', '')
+    return body[:body.index("\tif(@select == 3){")]
+
+
+BLOCK_PATCH = {"리신2": _lee_sin_two, "가렌3": _garen_three}
 
 #: 블록 머리 — 줄 맨 앞의 `0,0,0,0,0,0,0` 다음 탭, 이름, `{`. 안쪽의 `if(…){` 줄은 탭으로 시작해 걸리지 않는다.
 HEADER = re.compile(r"^\d[\d,]*\t([^\t{]+?)\s*\{", re.M)

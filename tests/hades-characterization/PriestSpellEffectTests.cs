@@ -103,6 +103,59 @@ public sealed class PriestSpellEffectTests : IDisposable
         }
     }
 
+    [Theory]
+    [InlineData("벨라르모", 7, 50)]
+    [InlineData("수페라벨라르모", 14, 120)]
+    public async Task Nova_belra_spells_lower_armour_and_send_their_effect_and_sound(
+        string spell, int amount, int mana)
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        Waiting.MakeGameMaster(server, Name);
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, Name);
+        Save(server, saved =>
+        {
+            saved["Path"] = "Priest";
+            saved["ExpLevel"] = 99;
+            saved["_MaximumMp"] = 1000;
+            saved["CurrentMp"] = 1000;
+        });
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+        await Until(() => world.State is { Map.Id: WoodlandOneOne } && world.Vitals is not null,
+            "벨라르모 시험 캐릭터가 들어오지 못했습니다.");
+
+        int slot = await LearnSpell(world, spell);
+        while (world.TakeEffect(out _) || world.TakeSound(out _))
+        {
+        }
+        int armour = world.Vitals!.Armor;
+        int manaBefore = world.Vitals.Mana;
+        await world.UseSpellAsync(slot, world.Serial, _deadline.Token);
+
+        await Until(() => world.Vitals!.Armor == armour - amount,
+            $"{spell} 뒤 방어가 {armour}에서 {amount}만큼 낮아지지 않았습니다: {world.Vitals!.Armor}");
+        await Until(() => world.Vitals!.Mana == manaBefore - mana,
+            $"{spell}이 마력 {mana}를 쓰지 않았습니다.");
+
+        List<Effect> effects = [];
+        List<int> sounds = [];
+        await Until(() =>
+        {
+            while (world.TakeEffect(out Effect? effect)) effects.Add(effect);
+            while (world.TakeSound(out int sound)) sounds.Add(sound);
+            return effects.Any(effect => effect.Target == world.Serial
+                                         && effect.SourceAnimation == 93
+                                         && effect.TargetAnimation == 93
+                                         && effect.Speed == 100)
+                   && sounds.Contains(8);
+        }, $"{spell}의 그림 93/속도 100 또는 소리 8이 오지 않았습니다.");
+    }
+
     /// <summary>
     /// 한 번 외워 그림을 기다린다. 하데스 옛 마법은 주사위(레벨 100 이면 99%)나 표적의 마법 방어로 빗나갈 수 있어 몇 번 다시 외운다.
     /// </summary>

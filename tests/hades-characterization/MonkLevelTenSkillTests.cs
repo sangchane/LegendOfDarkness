@@ -135,11 +135,28 @@ public sealed class MonkLevelTenSkillTests : IDisposable
 
         foreach (string skill in new[] { "늑대의위상", "마구때리기" })
         {
+            while (world.TakeEffect(out _))
+            {
+            }
             int before = world.Hurts.Count;
             await world.UseSkillAsync(await Learn(world, skill), _deadline.Token);
             await Until(
                 () => world.Hurts.Skip(before).Any(hurt => hurt.Serial == target.Serial),
                 $"{skill}이 앞칸 표적에 체력 보고를 만들지 않았습니다.");
+            if (skill == "마구때리기")
+            {
+                Effect? flash = null;
+                await Until(() =>
+                {
+                    while (world.TakeEffect(out Effect? seen))
+                    {
+                        if (seen.Target == target.Serial && seen.TargetAnimation == 69)
+                            flash = seen;
+                    }
+                    return flash is not null;
+                }, "마구때리기의 0x29 이펙트 69가 오지 않았습니다.");
+                Assert.Equal(75, flash!.Speed);
+            }
         }
 
         // 마력은 5.99 의 `manal_del` 그대로: 일음지 80 · 발경 0 · 소수신공 120.

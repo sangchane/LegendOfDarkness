@@ -222,11 +222,11 @@ public sealed class MobileClientProtocolTests
             .Where(skill => skill is not null)
             .Select(skill => skill!)
             .ToList();
-        // Exactly these and nothing else (user, 2026-09-24): the three Monk techniques beside the base attack the
+        // Exactly these and nothing else (user, 2026-09-27): the two Monk techniques beside the base attack the
         // attack button swings (0x13 runs only Assail-type skills), and 쿠로토 instead of beag ioc fein.
-        Assert.Equal(new[] { "Assail", "단각", "붕각", "이형환위" },
+        Assert.Equal(new[] { "Assail", "단각", "이형환위" },
             skills.Select(skill => (string)skill["Template"]!["Name"]!).Order(StringComparer.Ordinal));
-        Assert.All(skills.Where(skill => (string?)skill!["Template"]?["Name"] is "이형환위" or "붕각" or "단각"),
+        Assert.All(skills.Where(skill => (string?)skill!["Template"]?["Name"] is "이형환위" or "단각"),
             skill => Assert.Equal(1, (int?)skill!["Level"]));
         List<string> spells = saved["SpellBook"]!["Spells"]!.AsObject()
             .Select(pair => pair.Value)
@@ -698,12 +698,11 @@ public sealed class MobileClientProtocolTests
     private async Task StarterSkillsArrive(WorldClient world)
     {
         await Learned(world, "이형환위");
-        await Learned(world, "붕각");
         await Learned(world, "단각");
 
         Assert.Single(world.Skills, skill => skill.Name.StartsWith("이형환위 (", StringComparison.Ordinal));
-        Assert.Single(world.Skills, skill => skill.Name.StartsWith("붕각 (", StringComparison.Ordinal));
         Assert.Single(world.Skills, skill => skill.Name.StartsWith("단각 (", StringComparison.Ordinal));
+        Assert.DoesNotContain(world.Skills, skill => skill.Name.StartsWith("붕각 (", StringComparison.Ordinal));
     }
 
     private static int ParseSkillLevel(string name)
