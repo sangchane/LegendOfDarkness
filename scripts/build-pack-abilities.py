@@ -16,6 +16,12 @@
 
 `--만` 을 붙이면 그 이름의 블록만 쓴다. 손본 스크립트(쿠로토·다라밀공의 무도가 몸동작 …)를 되돌리지 않고
 한두 개만 새로 옮길 때 쓴다.
+
+**노바에서 옮기는 것**(`FROM_NOVA`): 사용자 결정(2026-09-27) 「기술·마법 목록과 배우는 레벨을 노바처럼」으로 노바 1차
+스킬상인이 가르치는데 5.99 팩에 블록이 없는 것. 노바 팩(`data/server-packs/novaonline/db`)의 같은 이름 블록을 같은 길로
+옮긴다 — 두 팩은 같은 엔진의 같은 말이다. 템플릿 묶음은 `노바표/…`, 아이콘·설명·마법 대상은 노바 `skill/default.txt`·
+`spell/spell.txt` 에서 읽는다. 노바에도 블록이 없는 것(통배권 — 정의는 `SKILL_통배권` 을 부르는데 스크립트엔 `통배권1` 뿐)은
+옮기지 못한다.
 """
 import json
 import re
@@ -27,6 +33,7 @@ from graphify_runtime import configure_utf8_stdio
 
 ROOT = Path(__file__).resolve().parent.parent
 PACK = ROOT / "data" / "server-packs" / "5.99-server" / "db"
+NOVA = ROOT / "data" / "server-packs" / "novaonline" / "db"
 HADES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
 OUT = HADES / "scripts" / "Pack599"
 MONK = HADES / "scripts" / "Skills" / "Monk"
@@ -35,6 +42,9 @@ RUNTIME = OUT / "Pack599.cs"
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
 MARK = "5.99표"
+NOVA_MARK = "노바표"
+#: 노바 1차 스킬상인이 가르치는데 5.99 에 블록이 없는 것 — 노바 블록을 옮긴다(위 설명).
+FROM_NOVA = {"두번찌르기", "마레네라", "엑스마레나", "디베노모", "벨라르모", "수페라벨라르모"}
 #: 사용자가 2026-09-16 에 뺐던 정권은 2026-09-25 에 다시 넣으라 했다("5.99 기준으로 완성") — 비어 있다.
 EXCLUDED = set()
 
@@ -70,8 +80,23 @@ def read(path):
 def blocks():
     """블록은 괄호 짝으로 자른다. 5.99 원본은 줄 맨 앞에 `}` 를 두기도 하고(퓨리소월루) 닫는 괄호가
     하나 더 있기도 해서(전체크래셔) 줄 모양으로는 못 자른다. 짝이 안 맞으면 다음 블록 머리에서 멈춘다."""
+    return _cut(sorted((PACK / "script" / "Skill").glob("*.txt")) + [PACK / "script" / "Mob_Spell.txt"])
+
+
+def nova_blocks():
+    """`FROM_NOVA` 의 노바 블록. 노바가 읽는 순서(`script/script_db.txt`)대로 보고 같은 이름은 먼저 것. 출처는 `노바/파일`."""
+    listing = read(NOVA / "script" / "script_db.txt")
+    paths = [NOVA.parent / rel for rel in re.findall(r"^script:(\S.*?)\s*$", listing, re.M)]
     out = {}
-    for path in sorted((PACK / "script" / "Skill").glob("*.txt")) + [PACK / "script" / "Mob_Spell.txt"]:
+    for key, (source, body) in _cut([p for p in paths if p.exists()], first=True).items():
+        if key[0] in ("SKILL", "SPELL") and key[1] in FROM_NOVA:
+            out[key] = (f"노바/{source}", body)
+    return out
+
+
+def _cut(paths, first=False):
+    out = {}
+    for path in paths:
         text = read(path)
         heads = list(HEADER.finditer(text))
         for n, head in enumerate(heads):
@@ -89,6 +114,8 @@ def blocks():
                     depth += c == "{"
                     depth -= c == "}"
                 at += 1
+            if first and (head.group(1), head.group(2)) in out:
+                continue
             out[(head.group(1), head.group(2))] = (path.name, text[head.end():at - 1 if not depth else at])
     return out
 
@@ -472,7 +499,7 @@ using Darkages.Types;
 namespace Darkages.Storage.locales.Scripts.Pack599
 {{
     /// <summary>
-    /// {name} — 5.99 `{source}` 의 {kind}_{name} 을 그대로 옮긴 것.
+    /// {name} — {"노바 `" + source[3:] if source.startswith("노바/") else "5.99 `" + source}` 의 {kind}_{name} 을 그대로 옮긴 것.
     /// </summary>
     /// <remarks>
     /// 손으로 고치지 말 것. `scripts/build-pack-abilities.py` 가 다시 만든다.
@@ -570,10 +597,11 @@ def implemented():
 def main():
     writing = "--쓰기" in sys.argv or "--write" in sys.argv
     only = set(sys.argv[sys.argv.index("--만") + 1:]) if "--만" in sys.argv else None
-    found = blocks()
+    found = {**blocks(), **nova_blocks()}
     if only is not None:
         found = {key: value for key, value in found.items() if key[1] in only}
     skills, spells = definitions(PACK / "skill" / "Skill.txt"), definitions(PACK / "spell" / "spell.txt")
+    nova_skills, nova_spells = definitions(NOVA / "skill" / "default.txt"), definitions(NOVA / "spell" / "spell.txt")
     taught = teachers()
     known = implemented()
 
@@ -619,14 +647,17 @@ def main():
                                         "Group": f"{MARK}/괴물마법"}, ensure_ascii=False, indent=2), encoding="utf-8-sig")
             continue
 
-        define = (skills if kind == "SKILL" else spells).get(name, {})
-        level = taught.get(name, (None, None))[1]
+        nova = source.startswith("노바/")
+        define = ((nova_skills if kind == "SKILL" else nova_spells) if nova
+                  else (skills if kind == "SKILL" else spells)).get(name, {})
+        level = None if nova else taught.get(name, (None, None))[1]
         path = HADES / "templates" / ("skills" if kind == "SKILL" else "spells") / f"{name}.json"
         if path.exists():
             template = json.loads(path.read_text(encoding="utf-8-sig"))
         else:
             template = {"Name": name, "Prerequisites": {}, "MaxLevel": 100, "ID": 0,
-                        "Description": define.get("설명"), "Group": f"{MARK}/{source[:-4]}"}
+                        "Description": define.get("설명"),
+                        "Group": f"{NOVA_MARK if nova else MARK}/{Path(source).stem}"}
             if cls:
                 template["Prerequisites"]["Class_Required"] = cls
             if level:
@@ -636,7 +667,7 @@ def main():
             if kind == "SPELL" and define.get("타입", "").isdigit():
                 template["TargetType"] = int(define["타입"])
         # 이 생성기가 만든 템플릿은 직업을 다시 정한다(원작 템플릿은 건드리지 않는다).
-        if str(template.get("Group", "")).startswith(MARK):
+        if str(template.get("Group", "")).startswith((MARK, NOVA_MARK)):
             template.setdefault("Prerequisites", {}).pop("Class_Required", None)
             if cls:
                 template["Prerequisites"]["Class_Required"] = cls

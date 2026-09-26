@@ -12,14 +12,14 @@ public sealed class LearnLadderTests
     private const string Table = """
         # tools: scripts/build-auto-learn.py
         # 직업	레벨	skill|spell	이름	그림
-        5	11	spell	주먹단련	7
-        5	11	spell	쿠로토	0
-        5	15	skill	이형환위	42
-        5	31	skill	단각	2
-        5	31	spell	장풍	0
-        5	41	spell	금강불괴	0
-        5	50	skill	구양신공	9
-        1	5	skill	숏블레이드	1
+        5	11	skill	단각	2
+        5	11	skill	이형환위	42
+        5	11	spell	쿠로토	21
+        5	41	skill	붕각	3
+        5	71	spell	금강불괴	53
+        5	71	spell	장풍	27
+        5	99	skill	구양신공	37
+        1	1	skill	숏블레이드	1
         """;
 
     private static readonly LearnLadder Ladder = LearnLadder.Read(Table);
@@ -28,8 +28,8 @@ public sealed class LearnLadderTests
     public void The_table_is_read_without_its_comments()
     {
         Assert.Equal(8, Ladder.Steps.Count);
-        Assert.Equal(new LadderStep(5, 15, false, "이형환위", 42), Ladder.Steps[2]);
-        Assert.Equal(new LadderStep(5, 11, true, "주먹단련", 7), Ladder.Steps[0]);
+        Assert.Equal(new LadderStep(5, 11, false, "이형환위", 42), Ladder.Steps[1]);
+        Assert.Equal(new LadderStep(5, 11, true, "쿠로토", 21), Ladder.Steps[2]);
     }
 
     [Fact]
@@ -37,24 +37,23 @@ public sealed class LearnLadderTests
     {
         IReadOnlyList<RosterRow> rows = Ladder.Roster(
             path: 5,
-            level: 31,
-            skills: [new LearnedSkill(1, 1, "Assail (Lev:1/100)"), new LearnedSkill(2, 2, "단각 (Lev:1/100)"), new LearnedSkill(3, 42, "이형환위 (Lev:1/100)")],
-            spells: [new LearnedSpell(1, 0, SpellTargetType.NoTarget, "장풍 (Lev:1/100)", string.Empty, 1),
-                new LearnedSpell(2, 7, SpellTargetType.NoTarget, "주먹단련 (Lev:1/100)", string.Empty, 1),
-                new LearnedSpell(3, 0, SpellTargetType.NoTarget, "쿠로토 (Lev:1/100)", string.Empty, 1)]);
+            level: 41,
+            skills: [new LearnedSkill(1, 1, "Assail (Lev:1/100)"), new LearnedSkill(2, 2, "단각 (Lev:1/100)"),
+                new LearnedSkill(3, 42, "이형환위 (Lev:1/100)"), new LearnedSkill(4, 3, "붕각 (Lev:1/100)")],
+            spells: [new LearnedSpell(1, 21, SpellTargetType.NoTarget, "쿠로토 (Lev:1/100)", string.Empty, 1)]);
 
         // 표에 없는 배운 것(Assail)이 먼저, 그 뒤 레벨 순 — 같은 레벨은 기술 먼저. 못 배운 것은 끝에 레벨과 함께.
         Assert.Equal(
-            ["Assail", "주먹단련", "쿠로토", "이형환위", "단각", "장풍", "금강불괴", "구양신공"],
+            ["Assail", "단각", "이형환위", "쿠로토", "붕각", "금강불괴", "장풍", "구양신공"],
             rows.Select(row => LearnLadderTests.Bare(row.Name)));
-        Assert.All(rows.Take(6), row => Assert.True(row.Learned));
+        Assert.All(rows.Take(5), row => Assert.True(row.Learned));
 
-        RosterRow later = rows[6];
+        RosterRow later = rows[5];
         Assert.False(later.Learned);
-        Assert.Equal(("금강불괴", true, 0, 41), (later.Name, later.Spell, later.Icon, later.Level));
+        Assert.Equal(("금강불괴", true, 53, 71), (later.Name, later.Spell, later.Icon, later.Level));
         Assert.Null(later.Slot);
 
-        Assert.Equal((false, 50, 9), (rows[7].Spell, rows[7].Level, rows[7].Icon));
+        Assert.Equal((false, 99, 37), (rows[7].Spell, rows[7].Level, rows[7].Icon));
         Assert.Equal((2, false), (rows.Single(row => row.Name.StartsWith("단각")).Slot, rows.Single(row => row.Name.StartsWith("단각")).Spell));
     }
 

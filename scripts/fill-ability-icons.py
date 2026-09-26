@@ -12,6 +12,9 @@
 **예외 — 노바 팩의 `이미지` 가 먼저다**(사용자 2026-09-26: "아이콘은 노바가 맞다"). 노바 `skill/default.txt`·`spell/spell.txt`
 에 같은 이름이 있으면 그 번호를 쓰고, 이미 적힌 값이 다르면 고친다(금강불괴 53 · 바투 38 · 찔러휘비기 6 · 슬레쉬 64 …).
 
+**같은 그림 규칙**(`SAME_ICON`) — 어느 자료에도 번호가 없어 사람이 정한 것. 쿠라노토는 쿠로토와 같은 번호
+(사용자 2026-09-27: "쿠로토랑 같았던 것 같다/비슷하게 생겼거나"). 이 규칙이 노바·SClass·5.99 보다 먼저다.
+
 채운 뒤 `python3 scripts/build-auto-learn.py --쓰기` 로 앱의 자동 습득 표를 다시 만든다.
 
     python3 scripts/fill-ability-icons.py          # 무엇을 채울지 세기만
@@ -29,6 +32,16 @@ TEMPLATES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database
 ABILITIES = ROOT / "data" / "game-data" / "abilities.json"
 PACK = ROOT / "data" / "server-packs" / "5.99-server" / "db"
 NOVA = ROOT / "data" / "server-packs" / "novaonline" / "db"
+#: (종류, 이름) → 같은 그림을 쓰는 (종류, 이름). 위 설명.
+SAME_ICON = {("spell", "쿠라노토"): ("spell", "쿠로토")}
+
+
+def template_icon(kind, name):
+    for path in (TEMPLATES / f"{kind}s").rglob("*.json"):
+        template = json.loads(path.read_bytes().decode("utf-8-sig"))
+        if isinstance(template, dict) and template.get("Name") == name:
+            return template.get("Icon")
+    return None
 
 
 def original():
@@ -74,13 +87,16 @@ def main():
                 counts["괴물"] += 1
                 continue
 
-            if (kind, name) in nova:
-                icon, source = nova[(kind, name)], "노바"
+            same = SAME_ICON.get((kind, name))
+            if same or (kind, name) in nova:
+                icon, source = (template_icon(*same), "같은 그림 규칙") if same else (nova[(kind, name)], "노바")
+                if icon is None:
+                    sys.exit(f"{same} 템플릿의 Icon 이 없습니다")
                 if template.get("Icon") == icon:
-                    counts["노바와 같음"] += 1
+                    counts[f"{source}{'와' if source == '노바' else '과'} 같음"] += 1
                     continue
                 if "Icon" in template:
-                    counts["노바로 고침"] += 1
+                    counts[f"{source}로 고침"] += 1
                     if write:
                         fixed, n = re.subn(r'^(\s*"Icon":\s*)-?\d+', lambda m: f"{m.group(1)}{icon}", text, count=1, flags=re.M)
                         if n != 1:

@@ -106,7 +106,7 @@ public sealed class MonkPackAbilityTests : IDisposable
             await Sound(world, 8, "금강불괴");
         }
 
-        // 다라밀공 — 마력 1300 이상에서, 맞는 쪽 47(노바 번호 — 5.99 는 288 · 속도 130 은 5.99 그대로) · 소리 98 · 체력 1 · 마력 0. 몸은 5.99 의 136(마법사 옷만) 대신
+        // 다라밀공 — 마력 1300 이상에서, 맞는 쪽 47 · 속도 75(노바 값 — 5.99 는 288 · 130, 속도도 노바로 사용자 2026-09-27) · 소리 98 · 체력 1 · 마력 0. 몸은 5.99 의 136(마법사 옷만) 대신
         // 도복이 그리는 손 들기 6(혼든 팩 다라밀공과 같다 — 쿠로토와 같은 까닭).
         {
             int slot = await LearnSpell(world, "다라밀공");
@@ -116,7 +116,7 @@ public sealed class MonkPackAbilityTests : IDisposable
             await Until(() => world.Hurts.Skip(before).Any(h => OnAhead(world, h.Serial)), "다라밀공이 표적을 치지 않았습니다.");
             Effect flash = await NextEffect(world, "다라밀공");
             Assert.True(OnAhead(world, flash.Target), $"다라밀공 그림이 표적 위가 아닙니다: {flash}");
-            Assert.Equal((47, 130), (flash.TargetAnimation, flash.Speed));
+            Assert.Equal((47, 75), (flash.TargetAnimation, flash.Speed));
             Motion cast = await NextMotion(world, "다라밀공");
             Assert.Equal((world.Serial, 6, 75), (cast.Serial, cast.Number, cast.Speed));
             Assert.True(BodyMotion.Fits(6, robe));
@@ -131,8 +131,9 @@ public sealed class MonkPackAbilityTests : IDisposable
     /// 밀레스마을 리신 넷이 무도가 기술·마법을 가르친다 — 리신 주먹단련[11], 리신4 다라밀공[99], 리신2 단각[31] · 장풍[31] ·
     /// 금강불괴[41] · 구양신공[50]. 리신2 는 5.99 원본의 2~5번 갈래가 도적 사범 것을 베낀 채라 아무것도 못 가르쳤다 —
     /// 메뉴에 적힌 기술·레벨대로 채웠다(`build-pack-npcs.py` BLOCK_PATCH, 사용자 결정 2026-09-25).
-    /// 2026-09-26 부터 레벨이 되면 저절로 익히므로(<see cref="AutoLearnTests" />) 99레벨 무도가는 들어오며 이미 다 가졌고,
-    /// 리신들은 메뉴의 갈래마다 "이미 이 스킬을 습득 하셧습니다." 로 돌아간다.
+    /// 2026-09-26 부터 레벨이 되면 저절로 익히므로(<see cref="AutoLearnTests" />) 99레벨 무도가는 들어오며 이미 가졌고,
+    /// 리신들은 메뉴의 갈래마다 "이미 이 스킬을 습득 하셧습니다." 로 돌아간다. 주먹단련은 2026-09-27 부터 저절로 익히는 표(노바)에
+    /// 없는 5.99 전용이라 여기서 빠진다 — 리신은 여전히 가르친다(사범 메뉴는 5.99 그대로).
     /// </summary>
     [Fact]
     public async Task The_mileth_lee_sins_tell_a_monk_who_already_learned_by_level_that_he_has_them()
@@ -143,7 +144,7 @@ public sealed class MonkPackAbilityTests : IDisposable
 
         foreach ((Tile teacher, string what, bool spell) in new[]
                  {
-                     (new Tile(48, 46), "주먹단련", true), (new Tile(48, 43), "다라밀공", true),
+                     (new Tile(48, 43), "다라밀공", true),
                      (new Tile(48, 45), "단각", false), (new Tile(48, 45), "장풍", true),
                      (new Tile(48, 45), "금강불괴", true), (new Tile(48, 45), "구양신공", false),
                  })
@@ -159,11 +160,11 @@ public sealed class MonkPackAbilityTests : IDisposable
     }
 
     /// <summary>
-    /// 리신2 의 장풍[31] — 30레벨은 「아직 어립니다」로 메뉴에 돌아간다. 31레벨은 레벨이 되어 이미 익혔으므로(2026-09-26 저절로
-    /// 익히기) 「이미 이 스킬을 습득 하셧습니다.」.
+    /// 리신2 의 장풍[31] — 30레벨은 「아직 어립니다」로 메뉴에 돌아간다. 저절로 익히는 레벨은 노바의 71 이라(2026-09-27)
+    /// 71레벨은 이미 익혔으므로 「이미 이 스킬을 습득 하셧습니다.」.
     /// </summary>
     [Fact]
-    public async Task Lee_sin_two_says_too_young_at_thirty_and_already_learned_at_thirty_one()
+    public async Task Lee_sin_two_says_too_young_at_thirty_and_already_learned_at_seventy_one()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MilethId, 49, 45));
         server.Start(TimeSpan.FromMinutes(2));
@@ -177,9 +178,9 @@ public sealed class MonkPackAbilityTests : IDisposable
         Assert.DoesNotContain(young.Spells, s => s.Name.StartsWith("장풍", StringComparison.Ordinal));
         await young.LogOutAsync(_deadline.Token);
 
-        WorldClient grown = await EnterMonk(server, "monkgrown", level: 31);
+        WorldClient grown = await EnterMonk(server, "monkgrown", level: 71);
         await Until(() => grown.Spells.Any(s => s.Name.StartsWith("장풍", StringComparison.Ordinal)),
-            "31레벨 무도가인데 장풍이 마법창에 없습니다.");
+            "71레벨 무도가인데 장풍이 마법창에 없습니다.");
         await Converse(grown, await Standing(grown, leeSinTwo), "장풍", words => words == AlreadyLearned);
     }
 
