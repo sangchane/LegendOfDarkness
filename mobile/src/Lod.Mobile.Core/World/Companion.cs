@@ -315,6 +315,13 @@ public sealed class CompanionBrain
     private TimeSpan _lastWalk = Never;
     private TimeSpan _lastDrink = Never;
     private uint _master;
+
+    // 서버가 되돌린 걸음 — 벽 파일이 없는 맵의 벽이나 선 괴물. 막힌 칸으로 잠시 기억해 돌아간다.
+    private readonly Dictionary<Tile, TimeSpan> _refused = [];
+    private (Tile From, Tile To)? _stepped;
+
+    /// <summary>되돌려진 칸을 막힌 칸으로 기억하는 시간 — 괴물은 비키므로 영영은 아니다.</summary>
+    public static readonly TimeSpan RefusedFor = TimeSpan.FromSeconds(10);
     private bool _following;
 
     public CompanionStep Next(CompanionSight sight, CompanionSettings settings)
@@ -539,12 +546,27 @@ public sealed class CompanionBrain
             return new(CompanionAct.Wait, Why: "걸음 사이");
         }
 
+        // 지난 걸음을 서버가 되돌렸으면(제자리) 그 칸을 막힌 칸으로 적는다.
+        if (_stepped is { } last && sight.Standing == last.From)
+        {
+            _refused[last.To] = now;
+        }
+
+        _stepped = null;
+
+        foreach (Tile old in _refused.Where(pair => now - pair.Value > RefusedFor).Select(pair => pair.Key).ToList())
+        {
+            _refused.Remove(old);
+        }
+
         HashSet<Tile> occupied = [.. sight.Occupied];
         occupied.Remove(owner);
-        bool Blocked(Tile tile) => tile != owner && (sight.Blocked(tile) || occupied.Contains(tile));
+        bool Blocked(Tile tile) => tile != owner && (sight.Blocked(tile) || occupied.Contains(tile) || _refused.ContainsKey(tile));
 
         Direction toward = Pathing.StepTowards(sight.Standing, owner, Blocked) ?? Straight(sight.Standing, owner);
+        (int dx, int dy) = Facing.TileStep(toward);
 
+        _stepped = (sight.Standing, new Tile(sight.Standing.X + dx, sight.Standing.Y + dy));
         _lastWalk = now;
         return new(CompanionAct.Walk, Toward: toward, Why: "따라가기");
     }

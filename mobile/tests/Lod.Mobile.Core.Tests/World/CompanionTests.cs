@@ -374,4 +374,18 @@ public sealed class CompanionTests
         Assert.Equal(new WornItem(1, 0x8226, "홀리파나", "홀리파나", 1000, 1000), Assert.Single(kit.Worn));
         Assert.Equal(new CarriedItem("쿠룸", 0x802D, 5), Assert.Single(kit.Carried));
     }
+
+    /// <summary>벽 파일이 없는 맵 — 동쪽이 막힌 줄 모르고 걸었는데 서버가 되돌렸다(제자리). 다음엔 돌아간다.</summary>
+    [Fact]
+    public void A_step_the_server_refused_is_remembered_as_a_wall()
+    {
+        CompanionBrain brain = Buffed();
+
+        Assert.Equal(Direction.East, brain.Next(Sight(owner: new Tile(15, 10), seconds: 100), Defaults).Toward);
+
+        CompanionStep again = brain.Next(Sight(owner: new Tile(15, 10), seconds: 101), Defaults);
+
+        Assert.Equal(CompanionAct.Walk, again.Act);
+        Assert.NotEqual(Direction.East, again.Toward);
+    }
 }
