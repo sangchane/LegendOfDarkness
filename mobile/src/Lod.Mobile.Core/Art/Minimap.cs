@@ -67,4 +67,30 @@ public static class Minimap
                                        ? marker.Goals.Any(tile => Sees(frame, width, height, tile))
                                        : Sees(frame, width, height, marker.Where)))
     ];
+
+    /// <summary>
+    /// Whether a tile's middle falls inside the round minimap — a circle of diameter <paramref name="side" /> filling a
+    /// square box (사용자, 2026-09-26: 동그란 테두리) — and the tile is on the map.
+    /// </summary>
+    public static bool SeesRound(TabMapProjection frame, float side, Tile tile)
+    {
+        if (tile.X < 0 || tile.Y < 0 || tile.X >= frame.Columns || tile.Y >= frame.Rows)
+        {
+            return false;
+        }
+
+        (float x, float y) = frame.Centre(tile.X, tile.Y);
+        float dx = x - (side / 2), dy = y - (side / 2);
+
+        return (dx * dx) + (dy * dy) <= (side / 2) * (side / 2);
+    }
+
+    /// <summary>The dots inside the circle (an exit when any of its tiles is), ourselves left to the caller.</summary>
+    public static IReadOnlyList<TabMarker> InRound(TabMapProjection frame, float side, IEnumerable<TabMarker> markers) =>
+    [
+        .. markers.Where(marker => marker.Kind != TabMarkerKind.Me
+                                   && (marker.Kind == TabMarkerKind.Exit
+                                       ? marker.Goals.Any(tile => SeesRound(frame, side, tile))
+                                       : SeesRound(frame, side, marker.Where)))
+    ];
 }

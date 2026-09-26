@@ -34,8 +34,10 @@ public sealed partial class PartyColumn : VBoxContainer
     private readonly Button _invite = new() { Text = "파티 초대", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Label _question = new() { AutowrapMode = TextServer.AutowrapMode.WordSmart };
     private readonly Control _ask;
-    private readonly Control _frame;
-    private readonly VBoxContainer _rows = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+    // 파티원 칸들 — 봇 칸과 같은 틀의 작은 칸을 사람마다 하나, 끝에 [나가기]. 이 기둥 밖(화면 왼쪽 가장자리, 봇 칸 아래)에
+    // 게임 화면이 세운다(Members). 흐르는 칸 — 게임 화면이 폭을 정해 세로는 한 줄(모자라면 두 줄)로 쌓고, 가로는 방향판이 왼쪽
+    // 아래를 차지해 옆으로 늘어놓는다.
+    private readonly Container _frame = new HFlowContainer();
 
     private string? _asker;
     private double _askedFor;
@@ -82,21 +84,20 @@ public sealed partial class PartyColumn : VBoxContainer
         Greybox.Plain(Leave);
         Leave.Pressed += () => Left?.Invoke();
 
-        _rows.AddThemeConstantOverride("separation", 2);
-
-        HBoxContainer list = new();
-        list.AddThemeConstantOverride("separation", Main.Gutter);
-        list.AddChild(_rows);
-        list.AddChild(Leave);
-        _frame = Plated(list);
+        _frame.AddThemeConstantOverride("separation", 4);
+        _frame.AddThemeConstantOverride("h_separation", 4);
+        _frame.AddThemeConstantOverride("v_separation", 4);
+        _frame.MouseFilter = MouseFilterEnum.Ignore;
         _frame.Visible = false;
+
+        // 파티원 칸들 끝의 [나가기] — 세로는 칸 폭 그대로, 가로는 작게(한 줄에 더 들게).
+        Leave.CustomMinimumSize = new Vector2(Main.Portrait ? MemberWide : 64, Main.TouchMinimum);
 
         _botFrame = BuildBotFrame();
         _botFrame.Visible = false;
 
         AddChild(_invite);
         AddChild(_ask);
-        AddChild(_frame);
     }
 
     // ── 봇 칸 ─────────────────────────────────────────────────────────────
@@ -110,7 +111,7 @@ public sealed partial class PartyColumn : VBoxContainer
     private readonly Control _botFrame;
     private readonly ProgressBar _botHealth = Bar(Greybox.Health, 8);
     private readonly ProgressBar _botMana = Bar(Greybox.Mana, 4);
-    private readonly StatusStrip _botStatus = new(side: 10, most: 4);
+    private readonly StatusStrip _botStatus = new(side: 10, most: 4, timed: false);
 
     /// <summary>봇 칸을 눌렀다 — 봇 장비창을 연다.</summary>
     public event Action? BotOpened;
@@ -224,6 +225,12 @@ public sealed partial class PartyColumn : VBoxContainer
     /// <summary>Whether the group list is showing.</summary>
     public bool Grouped => _frame.Visible;
 
+    /// <summary>파티원 칸들과 [나가기] — 게임 화면이 봇 칸 아래(왼쪽 가장자리)에 세운다.</summary>
+    public Control Members => _frame;
+
+    /// <summary>파티원 칸 하나의 폭 — 이름(아이디) 한 줄이 들 만큼, 봇 칸보다 조금 넓게.</summary>
+    public const int MemberWide = 88;
+
     /// <summary>The 파티 초대 button, for whoever is picked out — only a person, and only one who could join.</summary>
     public void CanInvite(bool can) => _invite.Visible = can && !_ask.Visible;
 
@@ -252,17 +259,19 @@ public sealed partial class PartyColumn : VBoxContainer
     /// Everyone in the group but ourselves, each with the health the server last showed us, or a dash when it has not.
     /// Rebuilt only when what it would show changes.
     /// </summary>
-    public void Show(PartyRoster roster, string self, Func<string, int?> health)
+    public void Show(PartyRoster roster, string self, Func<string, MemberLook> look)
     {
-        List<(string Name, bool Leader, int? Health)> others = roster.Grouped
+        List<(string Name, bool Leader, MemberLook Look)> others = roster.Grouped
             ? [.. roster.Members
                 .Where(member => !string.Equals(member.Name, self, StringComparison.OrdinalIgnoreCase)
                                  && !string.Equals(member.Name, _botShown, StringComparison.OrdinalIgnoreCase))
-                .Select(member => (member.Name, member.Leader, health(member.Name)))]
+                .Select(member => (member.Name, member.Leader, look(member.Name)))]
             : [];
 
-        string shown = string.Join("|", others.Select(one => $"{one.Name}{one.Leader}{one.Health}"));
+        string shown = string.Join("|", others.Select(one =>
+            $"{one.Name}{one.Leader}{one.Look.Health}/{one.Look.Mana}/{string.Join(",", one.Look.Statuses.Select(b => b.Icon))}"));
 
+        // 봇만 있는 그룹(나와 봇 둘)도 [나가기] 는 봇 장비창·설정에 있다 — 사람 파티원이 있을 때만 선다.
         _frame.Visible = others.Count > 0;
 
         if (shown == _shown)
@@ -272,15 +281,26 @@ public sealed partial class PartyColumn : VBoxContainer
 
         _shown = shown;
 
-        foreach (Node row in _rows.GetChildren())
+        foreach (Node row in _frame.GetChildren())
         {
-            row.QueueFree();
+            if (row != Leave)
+            {
+                _frame.RemoveChild(row);
+                row.QueueFree();
+            }
         }
 
-        foreach ((string name, bool leader, int? left) in others)
+        foreach ((string name, bool leader, MemberLook memberLook) in others)
         {
-            _rows.AddChild(Row(name, leader, left));
+            _frame.AddChild(MemberFrame(name, leader, memberLook));
         }
+
+        if (Leave.GetParent() != _frame)
+        {
+            _frame.AddChild(Leave);
+        }
+
+        _frame.MoveChild(Leave, -1);
     }
 
     public override void _Process(double delta)
@@ -291,53 +311,53 @@ public sealed partial class PartyColumn : VBoxContainer
         }
     }
 
-    /// <summary>One member: the name (the leader marked 장), a short bar and the number beside it.</summary>
-    private static Control Row(string name, bool leader, int? left)
+    /// <summary>
+    /// One member's frame, in the bot slot's look: the name (아이디 — the leader's lighter, with "·장") on one line, a bold
+    /// health bar and a thin mana bar under it, and what is on them as icons without time (<see cref="StatusStrip" />).
+    /// A bar the server has not told about is kept in place but not drawn — an empty bar reads as "down".
+    /// </summary>
+    private static Control MemberFrame(string name, bool leader, MemberLook look)
     {
-        HBoxContainer row = new();
-        row.AddThemeConstantOverride("separation", Main.Gutter / 2);
-
         Label named = new()
         {
-            Text = leader ? $"{name} ·장" : name,
-            CustomMinimumSize = new Vector2(72, 0),
+            Text = leader ? $"{name}·장" : name,
             ClipText = true,
             TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
-            VerticalAlignment = VerticalAlignment.Center
+            MouseFilter = MouseFilterEnum.Ignore
         };
-        named.AddThemeFontSizeOverride("font_size", FontSize);
-        named.AddThemeColorOverride("font_color", leader ? Greybox.Title : Greybox.Muted);
+        named.AddThemeFontSizeOverride("font_size", 11);
+        named.AddThemeColorOverride("font_color", leader ? Greybox.Title : Greybox.Text);
 
-        ProgressBar bar = new()
-        {
-            CustomMinimumSize = new Vector2(40, 8),
-            MaxValue = 100,
-            Value = left ?? 0,
-            ShowPercentage = false,
-            SizeFlagsVertical = SizeFlags.ShrinkCenter
-        };
-        bar.AddThemeStyleboxOverride("background", Greybox.Surface());
-        bar.AddThemeStyleboxOverride("fill", Greybox.Fill());
+        ProgressBar health = Bar(Greybox.Health, 6);
+        health.Value = look.Health ?? 0;
+        health.Modulate = look.Health is null ? Colors.Transparent : Colors.White;
+        ProgressBar mana = Bar(Greybox.Mana, 3);
+        mana.Value = look.Mana ?? 0;
+        mana.Modulate = look.Mana is null ? Colors.Transparent : Colors.White;
 
-        // 모르는 체력을 빈 막대로 그리면 "쓰러졌다" 로 읽힌다 — 자리만 지키고 안 보인다.
-        bar.Modulate = left is null ? Colors.Transparent : Colors.White;
+        StatusStrip status = new(side: 10, most: 5, timed: false);
+        status.Show(look.Statuses);
 
-        // 숫자가 읽기다 — 막대는 거든다. 모르면 지어내지 않고 줄표.
-        Label number = new()
-        {
-            Text = left is { } percent ? $"{percent,3}%" : "  —",
-            CustomMinimumSize = new Vector2(34, 0),
-            HorizontalAlignment = HorizontalAlignment.Right,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        number.AddThemeFontSizeOverride("font_size", FontSize);
-        number.AddThemeColorOverride("font_color", left is null ? Greybox.Muted : Greybox.Text);
+        VBoxContainer inside = new() { MouseFilter = MouseFilterEnum.Ignore };
+        inside.AddThemeConstantOverride("separation", 2);
+        inside.AddChild(named);
+        inside.AddChild(health);
+        inside.AddChild(mana);
+        inside.AddChild(status);
 
-        row.AddChild(named);
-        row.AddChild(bar);
-        row.AddChild(number);
+        PanelContainer frame = new() { CustomMinimumSize = new Vector2(MemberWide, 0), MouseFilter = MouseFilterEnum.Ignore, TooltipText = name };
+        StyleBoxFlat plate = Greybox.Plate();
+        plate.BorderWidthLeft = Main.Portrait ? 0 : 1;
+        plate.CornerRadiusTopRight = 8;
+        plate.CornerRadiusBottomRight = 8;
+        plate.ContentMarginLeft = 6;
+        plate.ContentMarginRight = 6;
+        plate.ContentMarginTop = 3;
+        plate.ContentMarginBottom = 4;
+        frame.AddThemeStyleboxOverride("panel", plate);
+        frame.AddChild(inside);
 
-        return row;
+        return frame;
     }
 
     /// <summary>The stone frame round a flat, nearly opaque inside — the same plate as the top row's.</summary>
@@ -354,3 +374,6 @@ public sealed partial class PartyColumn : VBoxContainer
         return plate;
     }
 }
+
+/// <summary>What a party member's frame shows — health and mana %, when known, and what is on them (icons only).</summary>
+public sealed record MemberLook(int? Health, int? Mana, IReadOnlyList<StatusBadge> Statuses);

@@ -51,4 +51,14 @@ public sealed class StatusBadgesTests
         Assert.Equal([11, 52], StatusBadges.Of([], told).Select(one => one.Icon));
         Assert.Empty(StatusBadges.Of([], null));
     }
+
+    /// <summary>A party member's pictures (0x5E kind 6) come without time or harm — icons only, the blank ones left out.</summary>
+    [Fact]
+    public void Pictures_alone_become_badges_without_time()
+    {
+        IReadOnlyList<StatusBadge> shown = StatusBadges.OfIcons([11, 0, 82]);
+
+        Assert.Equal([11, 82], shown.Select(one => one.Icon));
+        Assert.All(shown, one => Assert.False(one.Harmful));
+    }
 }

@@ -51,4 +51,11 @@ public static class StatusBadges
 
         return [.. badges.OrderBy(one => one.Seconds)];
     }
+
+    /// <summary>
+    /// A party member's pictures (0x5E kind 6) — the server sends no time or harm for them, and the frame shows icons
+    /// alone anyway; a blank picture is left out.
+    /// </summary>
+    public static IReadOnlyList<StatusBadge> OfIcons(IEnumerable<int> icons) =>
+        [.. icons.Where(icon => icon > 0).Select(icon => new StatusBadge(icon, 90, 6, false))];
 }

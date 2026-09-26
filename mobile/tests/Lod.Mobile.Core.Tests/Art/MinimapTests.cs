@@ -112,4 +112,38 @@ public sealed class MinimapTests
         Assert.DoesNotContain(far, shown);
         Assert.DoesNotContain(self, shown);
     }
+
+    /// <summary>
+    /// The round minimap (2026-09-26): only what falls inside the circle counts — a tile in the box's corner is cut off,
+    /// the middle and a few steps each way are in.
+    /// </summary>
+    [Fact]
+    public void The_round_view_keeps_only_the_circle()
+    {
+        const float side = 80;
+        Tile me = new(35, 35);
+        TabMapProjection frame = Minimap.Frame(me, 70, 70, side, side);
+
+        Assert.True(Minimap.SeesRound(frame, side, me));
+        Assert.True(Minimap.SeesRound(frame, side, new Tile(me.X + 5, me.Y)));
+
+        // 상자 오른쪽 위 구석 근처 — 상자 안이지만 원 밖.
+        (int column, int row) = frame.TileAt(side - 4, 4)!.Value;
+        Assert.True(Minimap.Sees(frame, side, side, new Tile(column, row)));
+        Assert.False(Minimap.SeesRound(frame, side, new Tile(column, row)));
+    }
+
+    [Fact]
+    public void Round_sight_drops_dots_outside_the_circle()
+    {
+        const float side = 80;
+        Tile me = new(35, 35);
+        TabMapProjection frame = Minimap.Frame(me, 70, 70, side, side);
+        (int column, int row) = frame.TileAt(side - 4, 4)!.Value;
+
+        TabMarker corner = new(new Tile(column, row), TabMarkerKind.Monster, string.Empty, []);
+        TabMarker near = new(new Tile(36, 35), TabMarkerKind.Monster, string.Empty, []);
+
+        Assert.Equal([near], Minimap.InRound(frame, side, [corner, near]));
+    }
 }

@@ -32,15 +32,22 @@ public sealed partial class StatusStrip : Control
 
     private readonly int _side;
     private readonly int _most;
+    private readonly bool _timed;
     private IReadOnlyList<StatusBadge> _shown = [];
     private double _blink;
 
     /// <param name="side">One picture's size.</param>
     /// <param name="most">How many fit; the rest are counted as "+N".</param>
-    public StatusStrip(int side = 12, int most = 6)
+    /// <param name="timed">
+    /// Whether to show how long is left — the grade bar and the last-ten-seconds blink. Mine only; the bot's and a party
+    /// member's show icons alone (사용자, 2026-09-26: 봇이나 그룹원 버프는 남은 시간 표시 안 해도 된다). The red edge of a
+    /// harmful one stays either way — that is what one acts on.
+    /// </param>
+    public StatusStrip(int side = 12, int most = 6, bool timed = true)
     {
         _side = side;
         _most = most;
+        _timed = timed;
         MouseFilter = MouseFilterEnum.Ignore;
         CustomMinimumSize = new Vector2(0, side + 2);
         Visible = false;
@@ -64,7 +71,7 @@ public sealed partial class StatusStrip : Control
 
     public override void _Process(double delta)
     {
-        if (Visible && _shown.Any(one => one.Grade == 1) && (_blink += delta) > 0.3)
+        if (_timed && Visible && _shown.Any(one => one.Grade == 1) && (_blink += delta) > 0.3)
         {
             _blink = 0;
             QueueRedraw();
@@ -73,7 +80,7 @@ public sealed partial class StatusStrip : Control
 
     public override void _Draw()
     {
-        int step = _side + 1 + Bar + Gap;
+        int step = Step;
         int shown = System.Math.Min(_shown.Count, _most);
 
         for (int at = 0; at < shown; at++)
@@ -82,7 +89,7 @@ public sealed partial class StatusStrip : Control
             Rect2 box = new(1 + (at * step), 1, _side, _side);
 
             // 10초 미만은 깜빡인다 — 곧 풀린다.
-            if (one.Grade == 1 && Time.GetTicksMsec() / 300 % 2 == 1)
+            if (_timed && one.Grade == 1 && Time.GetTicksMsec() / 300 % 2 == 1)
             {
                 continue;
             }
@@ -92,6 +99,11 @@ public sealed partial class StatusStrip : Control
             if (!Picture(box, one.Icon))
             {
                 DrawRect(box, Color.FromHsv(one.Icon % 12 / 12f, 0.55f, 0.95f));
+            }
+
+            if (!_timed)
+            {
+                continue;
             }
 
             float tall = _side * ((one.Grade * 2) + 2) / 14f;
@@ -108,7 +120,10 @@ public sealed partial class StatusStrip : Control
     }
 
     /// <summary>The width the strip wants for this many badges — a plate may size itself by it.</summary>
-    public float WidthFor(int count) => (System.Math.Min(count, _most) * (_side + 1 + Bar + Gap)) + 2;
+    public float WidthFor(int count) => (System.Math.Min(count, _most) * Step) + 2;
+
+    /// <summary>One badge and the gap after it — the time bar only takes room when time is shown.</summary>
+    private int Step => _side + Gap + (_timed ? 1 + Bar : 0);
 
     private bool Picture(Rect2 box, int icon)
     {

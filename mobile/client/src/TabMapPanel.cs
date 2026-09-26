@@ -99,6 +99,17 @@ public sealed partial class TabMapPanel : PanelContainer
     /// <summary>Whether the map is drawn larger round us (확대) rather than whole.</summary>
     public bool Zoomed => _canvas.Zoom > 1;
 
+    /// <summary>
+    /// The map's own colours — walls in the original's light stone, floor a shade above the window, the window itself.
+    /// The round minimap in the top row draws in the same (<see cref="MinimapView" />); <c>Canvas.Bake</c> writes the same
+    /// values as bytes.
+    /// </summary>
+    public static readonly Color WallPaint = new("#8a8a7e");
+
+    public static readonly Color FloorPaint = new("#2a2a30");
+
+    public static readonly Color Backdrop = new("#0f0f0f");
+
     /// <summary>What each kind of dot looks like. The only strong colours are the original's two beads and the red of "gone".</summary>
     public static Color Paint(TabMarkerKind kind) => kind switch
     {

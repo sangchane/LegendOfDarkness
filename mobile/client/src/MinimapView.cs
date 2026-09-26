@@ -8,22 +8,26 @@ using Lod.Mobile.Core.World;
 namespace LodClient;
 
 /// <summary>
-/// The minimap that always stays up in the top row (사용자, 2026-09-26: 길은 모바일 게임 지도처럼 화면에 미니맵으로):
-/// <see cref="Minimap.Radius" /> tiles round us in the floor's own diamond, walls in the original's light stone and each
-/// floor tile in its own colour shrunk to a pixel, and on it the exits, NPCs, monsters, party and bot and others as dots,
-/// with us as one tile's diamond and a tick the way we face. Pressing it opens the full 길 찾기 map.
+/// The minimap that always stays up at the left end of the top row — round (사용자, 2026-09-26: 동그란 테두리로, 안에는
+/// 길 창을 열었을 때 보이는 지도). Inside is the 길 찾기 map's own drawing, small and centred on us: the floor's flat
+/// diamond, walls in its light stone and floor in its dark (<see cref="TabMapPanel.WallPaint" />), <see cref="Minimap.Radius" />
+/// tiles round us. Everyone is one dot of a pixel or two in the 길 찾기 map's colours — monsters red, NPCs pale, party
+/// blue, the bot green, others grey — exits small diamonds, and we are a white dot a little larger with a thin black
+/// rim so we are found at a glance. Pressing it opens the full 길 찾기 map.
 /// </summary>
 /// <remarks>
-/// Light to draw: the floor is baked once per map into a picture of one pixel per tile, and each redraw only lays that
-/// picture down through the diamond transform (<see cref="Minimap.FromGrid" />) and the few dots over it. It redraws when
-/// we step and a few times a second for the others, never the whole grid again. A map with no floor picture shows the
-/// walls only; a map with no layout at all says so.
+/// Round by masking: the button itself draws a disc and clips its children to it (<see cref="CanvasItem.ClipChildren" />);
+/// the map is one child, the rim another. Light to draw: the floor is baked once per map into a picture of one pixel per
+/// tile, and each redraw lays that picture down through the diamond transform (<see cref="Minimap.FromGrid" />) and the
+/// few dots over it — when we step and four times a second for the others.
 /// </remarks>
 public sealed partial class MinimapView : Button
 {
     private readonly WorldView _world;
     private readonly WorldClient? _server;
     private readonly MapGuide _guide;
+    private readonly Face _face;
+    private readonly Rim _rim = new();
 
     private ImageTexture? _grid;
     private (int Map, bool Laid) _baked = (-2, false);
@@ -35,9 +39,6 @@ public sealed partial class MinimapView : Button
     public static readonly Color BotPaint = new("#72e07e");
     private double _since;
 
-    private static readonly Color Wall = new("#8a8a7e");
-    private static readonly Color Bare = new("#2a2a30");
-    private static readonly Color Ground = new(0, 0, 0, 0.55f);
     private static readonly Color Edge = new("#636357");
 
     // --minimap 을 서버 없이(--screen game) 주면 노비스마을 (37,29)(새 캐릭터가 서는 곳)에 선 셈 치고 그린다 — 사진·배치 검사용.
@@ -71,12 +72,22 @@ public sealed partial class MinimapView : Button
         Name = "Minimap";
         Flat = true;
         FocusMode = FocusModeEnum.None;
-        ClipContents = true;
-        TextureFilter = TextureFilterEnum.Nearest;
         TooltipText = "길 찾기";
-        // 세로는 위 줄 첫 줄의 남는 폭을 다 쓴다(GameScreen) — 최소 폭만 정한다. 높이는 내 판(세 줄)과 비슷하게.
-        CustomMinimumSize = Main.Portrait ? new Vector2(96, 76) : new Vector2(128, 64);
+
+        // 동그라미 — 지름은 내 판(네 줄) 높이쯤. 제 사각형을 벗어나 늘어나지 않는다.
+        float side = Main.Portrait ? 80 : 72;
+        CustomMinimumSize = new Vector2(side, side);
+        SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
         SizeFlagsVertical = SizeFlags.ShrinkCenter;
+
+        // 제가 그리는 원판이 아이들을 자르는 틀이 된다 — 지도와 테두리는 원 안에만 보인다.
+        ClipChildren = ClipChildrenMode.Only;
+        _face = new Face(this) { MouseFilter = MouseFilterEnum.Ignore, TextureFilter = TextureFilterEnum.Nearest };
+        _face.SetAnchorsPreset(LayoutPreset.FullRect);
+        _rim.MouseFilter = MouseFilterEnum.Ignore;
+        _rim.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddChild(_face);
+        AddChild(_rim);
     }
 
     public override void _Process(double delta)
@@ -101,8 +112,8 @@ public sealed partial class MinimapView : Button
     public string Describe()
     {
         (int columns, int rows) = Layout is { } layout ? (layout.Columns, layout.Rows) : _world.MapSize;
-        TabMapProjection frame = Minimap.Frame(Standing, columns, rows, Size.X, Size.Y);
-        IReadOnlyList<TabMarker> seen = Minimap.InSight(frame, Size.X, Size.Y, _markers);
+        TabMapProjection frame = Minimap.Frame(Standing, columns, rows, Size.X, Size.X);
+        IReadOnlyList<TabMarker> seen = Minimap.InRound(frame, Size.X, _markers);
         string kinds = string.Join(" ", seen.GroupBy(one => one.Kind).Select(group => $"{group.Key}={group.Count()}"));
 
         return $"맵 {MapId} 나 {Standing.X},{Standing.Y} 칸 {frame.HalfWidth * 2:0.0}px 바닥 {(_grid is null ? "없음" : "있음")} 점 [{kinds}]";
@@ -113,7 +124,7 @@ public sealed partial class MinimapView : Button
         if (_baked != (MapId, Layout is not null))
         {
             _baked = (MapId, Layout is not null);
-            _grid = Bake(Layout, MapId);
+            _grid = Bake(Layout);
         }
 
         _markers = TabMap.Markers(
@@ -136,7 +147,7 @@ public sealed partial class MinimapView : Button
                 new TabMarker(new Tile(42, 27), TabMarkerKind.Person, string.Empty, []),
             ];
             _botAt = new Tile(38, 30);
-            QueueRedraw();
+            _face.QueueRedraw();
             return;
         }
 
@@ -144,187 +155,149 @@ public sealed partial class MinimapView : Button
             ? seen.Where
             : null;
 
-        QueueRedraw();
+        _face.QueueRedraw();
     }
 
     /// <summary>
-    /// One pixel per tile: a wall is light stone, a floor tile is that tile's own colour (the middle of its picture on
-    /// the floor sheet) darkened so the dots stand out, a cell with nothing laid is left clear. Once per map.
+    /// One pixel per tile in the 길 찾기 map's colours: a wall its light stone, a floor its dark, off the laid floor clear.
+    /// Once per map.
     /// </summary>
-    private static ImageTexture? Bake(MapLayout? layout, int mapId)
+    private static ImageTexture? Bake(MapLayout? layout)
     {
         if (layout is null || layout.Columns == 0)
         {
             return null;
         }
 
-        Image? sheet = null;
-        string floorPath = $"res://assets/world/map{mapId}-floor.png";
-
-        if (ResourceLoader.Exists(floorPath) && GD.Load<Texture2D>(floorPath)?.GetImage() is { } image)
-        {
-            if (image.IsCompressed())
-            {
-                image.Decompress();
-            }
-
-            sheet = image;
-        }
-
-        Dictionary<int, Color> colours = [];
         Image grid = Image.CreateEmpty(layout.Columns, layout.Rows, false, Image.Format.Rgba8);
 
         for (int row = 0; row < layout.Rows; row++)
         {
             for (int column = 0; column < layout.Columns; column++)
             {
-                Color paint;
-
-                if (layout.Blocks(new Tile(column, row)))
-                {
-                    paint = Wall;
-                }
-                else if (sheet is null)
-                {
-                    paint = Bare;
-                }
-                else
-                {
-                    int tile = layout.Floor(column, row);
-
-                    if (!colours.TryGetValue(tile, out paint))
-                    {
-                        paint = layout.Tiles.TryGetValue(tile, out (int X, int Y) at)
-                            ? Sample(sheet, at.X + (IsometricFloor.TileWidth / 2), at.Y + (IsometricFloor.TileHeight / 2))
-                            : new Color(0, 0, 0, 0);
-                        colours[tile] = paint;
-                    }
-                }
-
-                grid.SetPixel(column, row, paint);
+                grid.SetPixel(column, row, layout.Blocks(new Tile(column, row)) ? TabMapPanel.WallPaint : TabMapPanel.FloorPaint);
             }
         }
 
         return ImageTexture.CreateFromImage(grid);
     }
 
-    /// <summary>A few pixels round a tile's middle, averaged and darkened — one colour for the whole tile.</summary>
-    private static Color Sample(Image sheet, int x, int y)
-    {
-        Color sum = new(0, 0, 0, 0);
-        int count = 0;
-
-        foreach ((int dx, int dy) in new[] { (0, 0), (-8, 0), (8, 0), (0, -4), (0, 4) })
-        {
-            int px = Math.Clamp(x + dx, 0, sheet.GetWidth() - 1);
-            int py = Math.Clamp(y + dy, 0, sheet.GetHeight() - 1);
-            Color one = sheet.GetPixel(px, py);
-            sum = new Color(sum.R + one.R, sum.G + one.G, sum.B + one.B, sum.A + one.A);
-            count++;
-        }
-
-        Color mean = new(sum.R / count, sum.G / count, sum.B / count, 1);
-
-        return mean.Darkened(0.35f);
-    }
-
+    /// <summary>The disc that masks the children — only its shape counts (<see cref="CanvasItem.ClipChildren" />).</summary>
     public override void _Draw()
     {
-        Vector2 box = Size;
-        DrawRect(new Rect2(Vector2.Zero, box), Ground);
+        float side = Mathf.Min(Size.X, Size.Y);
+        DrawCircle(new Vector2(side / 2, side / 2), side / 2, Colors.White);
+    }
 
-        (int columns, int rows) = Layout is { } layout ? (layout.Columns, layout.Rows) : _world.MapSize;
-
-        if (columns == 0)
+    /// <summary>The map itself, inside the disc.</summary>
+    private sealed partial class Face(MinimapView owner) : Control
+    {
+        public override void _Draw()
         {
-            DrawString(GetThemeDefaultFont(), new Vector2(6, (box.Y / 2) + 4), "지도 없음", HorizontalAlignment.Left, -1, 11, Greybox.Muted);
-            DrawBorder(box);
-            return;
-        }
+            float side = Mathf.Min(Size.X, Size.Y);
+            DrawRect(new Rect2(Vector2.Zero, new Vector2(side, side)), TabMapPanel.Backdrop with { A = 0.9f });
 
-        TabMapProjection frame = Minimap.Frame(Standing, columns, rows, box.X, box.Y);
+            (int columns, int rows) = owner.Layout is { } layout ? (layout.Columns, layout.Rows) : owner._world.MapSize;
 
-        if (_grid is not null)
-        {
-            // 한 칸 = 한 픽셀인 그림을 마름모로 눕혀 깐다(Minimap.FromGrid 와 같은 식).
-            DrawSetTransformMatrix(new Transform2D(
-                new Vector2(frame.HalfWidth, frame.HalfHeight),
-                new Vector2(-frame.HalfWidth, frame.HalfHeight),
-                new Vector2(frame.OriginX, frame.OriginY)));
-            DrawTexture(_grid, Vector2.Zero);
-            DrawSetTransformMatrix(Transform2D.Identity);
-        }
-
-        // 걸어갈 길 — 점으로.
-        foreach (Tile step in _world.Route)
-        {
-            if (Minimap.Sees(frame, box.X, box.Y, step))
+            if (columns == 0)
             {
-                DrawCircle(At(frame, step), 1.5f, Greybox.Accent);
+                Font font = GetThemeDefaultFont();
+                DrawString(font, new Vector2(0, (side / 2) + 4), "지도 없음", HorizontalAlignment.Center, side, 11, Greybox.Muted);
+                return;
             }
-        }
 
-        float dot = Math.Clamp(frame.HalfHeight * 0.8f, 2f, 3.5f);
+            TabMapProjection frame = Minimap.Frame(owner.Standing, columns, rows, side, side);
 
-        foreach (TabMarker marker in Minimap.InSight(frame, box.X, box.Y, _markers))
-        {
-            Color paint = TabMapPanel.Paint(marker.Kind);
-
-            if (marker.Kind == TabMarkerKind.Exit)
+            if (owner._grid is not null)
             {
-                foreach (Tile tile in marker.Goals.Where(tile => Minimap.Sees(frame, box.X, box.Y, tile)))
+                // 한 칸 = 한 픽셀인 그림을 마름모로 눕혀 깐다(Minimap.FromGrid 와 같은 식).
+                DrawSetTransformMatrix(new Transform2D(
+                    new Vector2(frame.HalfWidth, frame.HalfHeight),
+                    new Vector2(-frame.HalfWidth, frame.HalfHeight),
+                    new Vector2(frame.OriginX, frame.OriginY)));
+                DrawTexture(owner._grid, Vector2.Zero);
+                DrawSetTransformMatrix(Transform2D.Identity);
+            }
+
+            // 걸어갈 길 — 한 픽셀 점.
+            foreach (Tile step in owner._world.Route)
+            {
+                if (Minimap.SeesRound(frame, side, step))
                 {
-                    Diamond(frame, tile, paint, 1f);
+                    DrawRect(new Rect2(At(frame, step) - new Vector2(0.5f, 0.5f), Vector2.One), Greybox.Accent);
+                }
+            }
+
+            foreach (TabMarker marker in Minimap.InRound(frame, side, owner._markers))
+            {
+                Color paint = TabMapPanel.Paint(marker.Kind);
+
+                if (marker.Kind == TabMarkerKind.Exit)
+                {
+                    // 출구는 작은 마름모(반 칸) — 문이 어디인지는 보여야 한다.
+                    foreach (Tile tile in marker.Goals.Where(tile => Minimap.SeesRound(frame, side, tile)))
+                    {
+                        Vector2 at = At(frame, tile);
+                        float w = frame.HalfWidth * 0.6f, h = frame.HalfHeight * 0.6f;
+                        DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
+                    }
+
+                    continue;
                 }
 
-                continue;
+                Dot(At(frame, marker.Where), paint);
             }
 
-            Vector2 at = At(frame, marker.Where);
-            DrawCircle(at, dot + 1, Colors.Black);
-            DrawCircle(at, dot, paint);
+            if (owner._botAt is { } bot && Minimap.SeesRound(frame, side, bot))
+            {
+                Dot(At(frame, bot), BotPaint);
+            }
+
+            // 나 — 흰 점, 조금 크게(3픽셀) + 검은 테 1픽셀. 다른 점과 한눈에 갈린다.
+            Vector2 me = At(frame, owner.Standing);
+            DrawRect(new Rect2(me - new Vector2(2.5f, 2.5f), new Vector2(5, 5)), Colors.Black);
+            DrawRect(new Rect2(me - new Vector2(1.5f, 1.5f), new Vector2(3, 3)), Colors.White);
+
+            // 지금 곳 — 원 아래쪽 가운데에 아주 작게(위 줄의 곳 이름 판을 대신한다).
+            if (owner.PlaceName.Length > 0)
+            {
+                Font font = GetThemeDefaultFont();
+                Vector2 where = new(side * 0.15f, side - 9);
+                DrawStringOutline(font, where, owner.PlaceName, HorizontalAlignment.Center, side * 0.7f, 9, 3, Colors.Black);
+                DrawString(font, where, owner.PlaceName, HorizontalAlignment.Center, side * 0.7f, 9, Greybox.Title);
+            }
         }
 
-        if (_botAt is { } botAt && Minimap.Sees(frame, box.X, box.Y, botAt))
+        /// <summary>Everyone else: a two-pixel dot.</summary>
+        private void Dot(Vector2 at, Color paint) => DrawRect(new Rect2(at - Vector2.One, new Vector2(2, 2)), paint);
+
+        private static Vector2 At(TabMapProjection frame, Tile tile)
         {
-            Vector2 at = At(frame, botAt);
-            DrawCircle(at, dot + 1, Colors.Black);
-            DrawCircle(at, dot, BotPaint);
+            (float x, float y) = frame.Centre(tile.X, tile.Y);
+
+            return new Vector2(Mathf.Round(x), Mathf.Round(y));
         }
-
-        // 나 — 한 칸 크기의 마름모, 검은 테두리, 보는 쪽으로 짧은 줄.
-        Diamond(frame, Standing, Colors.Black, 1.35f);
-        Diamond(frame, Standing, Colors.White, 1f);
-        (float fx, float fy) = frame.Toward(Looking);
-        Vector2 me = At(frame, Standing);
-        DrawLine(me, me + (new Vector2(fx, fy) * frame.HalfWidth * 1.8f), Colors.White, 2, true);
-
-        // 지금 곳 — 아래 왼쪽에 작게.
-        if (PlaceName.Length > 0)
-        {
-            Font font = GetThemeDefaultFont();
-            Vector2 where = new(4, box.Y - 4);
-            DrawStringOutline(font, where, PlaceName, HorizontalAlignment.Left, box.X - 8, 10, 3, Colors.Black);
-            DrawString(font, where, PlaceName, HorizontalAlignment.Left, box.X - 8, 10, Greybox.Title);
-        }
-
-        DrawBorder(box);
     }
 
-    private void DrawBorder(Vector2 box) =>
-        DrawRect(new Rect2(new Vector2(0.5f, 0.5f), box - Vector2.One), ButtonPressed || IsPressed() ? Greybox.Title : Edge, false, 1);
-
-    private void Diamond(TabMapProjection frame, Tile tile, Color paint, float grow)
+    /// <summary>The round edge, drawn over the map inside the disc; brighter while pressed.</summary>
+    private sealed partial class Rim : Control
     {
-        Vector2 at = At(frame, tile);
-        float w = frame.HalfWidth * grow, h = frame.HalfHeight * grow;
-        DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
-    }
+        public override void _Draw()
+        {
+            float side = Mathf.Min(Size.X, Size.Y);
+            bool down = GetParent() is MinimapView view && view.IsPressed();
+            DrawArc(new Vector2(side / 2, side / 2), (side / 2) - 1.5f, 0, Mathf.Tau, 64, down ? Greybox.Title : Edge, 3, true);
+        }
 
-    private static Vector2 At(TabMapProjection frame, Tile tile)
-    {
-        (float x, float y) = frame.Centre(tile.X, tile.Y);
+        public override void _Process(double delta)
+        {
+            if (GetParent() is MinimapView view && view.IsPressed() != _down)
+            {
+                _down = view.IsPressed();
+                QueueRedraw();
+            }
+        }
 
-        return new Vector2(x, y);
+        private bool _down;
     }
 }
