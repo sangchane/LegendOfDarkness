@@ -20,7 +20,11 @@ namespace Lod.Hades.Characterization.Tests;
 /// </remarks>
 public sealed class ManaPotionDropTests
 {
-    /// <summary>2026-09-26 전의 DropRate. 두 배가 지금 값이어야 한다.</summary>
+    /// <summary>
+    /// 2026-09-26 전의 DropRate. 지금 값은 그 <b>두 배 이상</b>이어야 한다 — 같은 날 드랍 종류를 늘리며
+    /// (<c>scripts/build-drop-variety.py</c>) 목록 칸이 늘어난 만큼 <c>DropRate</c> 를 더 올려 실제 확률을
+    /// 지켰으므로(하급마력 1.2 → 1.6 · 중급마력 1.2 → 1.5) 딱 두 배가 아니다.
+    /// </summary>
     private static readonly (string Name, double Before)[] ManaPotions =
     [
         ("마라디움", 0.5),
@@ -38,17 +42,20 @@ public sealed class ManaPotionDropTests
         {
             double now = (double?)items[name]["DropRate"] ?? 0;
 
-            if (Math.Abs(now - (2 * before)) > 1e-9)
+            if (now < (2 * before) - 1e-9)
             {
-                wrong.Add($"{name} {now} (그 전 {before} → {2 * before} 이어야)");
+                wrong.Add($"{name} {now} (그 전 {before} → {2 * before} 이상이어야)");
             }
         }
 
-        Assert.True(wrong.Count == 0, $"마력 포션 DropRate 가 두 배가 아닙니다: {string.Join(", ", wrong)}");
+        Assert.True(wrong.Count == 0, $"마력 포션 DropRate 가 두 배보다 낮습니다: {string.Join(", ", wrong)}");
 
         int carrying = Monsters().Count(m => Dropped(m).Any(n => ManaPotions.Any(p => p.Name == n)));
         Assert.True(carrying > 0, "마력 포션을 떨구는 괴물이 하나도 없습니다.");
     }
+
+    /// <summary><c>Formulas/monsterexp.cs</c> <c>DropBoost</c> — 사용자 2026-09-26 "전체 확률 올려", 1.5배.</summary>
+    private const double DropBoost = 1.5;
 
     [Fact]
     public void No_monster_list_adds_up_to_more_than_its_slots()
@@ -65,11 +72,12 @@ public sealed class ManaPotionDropTests
                 continue;
             }
 
-            double sum = listed.Sum(n => items.TryGetValue(n, out JsonNode? item) ? (double?)item["DropRate"] ?? 0 : 0);
+            // 서버가 굴릴 때 모든 DropRate 에 DropBoost(1.5)를 곱하므로(`monsterexp.cs`, 2026-09-26) 곱한 합으로 잰다.
+            double sum = DropBoost * listed.Sum(n => items.TryGetValue(n, out JsonNode? item) ? (double?)item["DropRate"] ?? 0 : 0);
 
             if (sum > listed.Length + 1e-9)
             {
-                over.Add($"{monster["Name"]}@{monster["AreaID"]} 합 {sum:F2} > {listed.Length}칸");
+                over.Add($"{monster["Name"]}@{monster["AreaID"]} 합×1.5 {sum:F2} > {listed.Length}칸");
             }
         }
 

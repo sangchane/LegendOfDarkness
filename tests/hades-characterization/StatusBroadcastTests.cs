@@ -13,7 +13,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 /// <remarks>
 /// 둘이 같은 칸에서 시작한다. 첫째가 dion(버프, 아이콘 53)을 걸면 둘째가 첫째 번호로 받고, 괴물에게 프라보를
-/// 걸면 둘 다 그 괴물 번호로 저주(아이콘 82) · 해로움 · 프라보가 그 괴물에 그린 그림 257 을 받는다 —
+/// 걸면 둘 다 그 괴물 번호로 저주(아이콘 82) · 해로움 · 프라보가 그 괴물에 그린 그림 43(노바 번호 — 5.99 는 257, 2026-09-26) 을 받는다 —
 /// 괴물을 물들일 색이 그 그림에서 온다.
 /// </remarks>
 public sealed class StatusBroadcastTests : IDisposable
@@ -23,7 +23,7 @@ public sealed class StatusBroadcastTests : IDisposable
     private const int WoodlandOneOne = 20015;
     private const int Dion = 53;
     private const int Curse = 82;
-    private const int PraboOnTarget = 257;
+    private const int PraboOnTarget = 43;
     private static readonly Tile Start = new(2, 35);
 
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(5));
@@ -70,7 +70,7 @@ public sealed class StatusBroadcastTests : IDisposable
         foreach (WorldClient looking in new[] { first, second })
         {
             await Until(() => looking.AilmentsOf(mob.Serial).Any(one => one.Icon == Curse && one.Effect == PraboOnTarget),
-                $"괴물 {mob.Serial} 에 걸린 저주(82 · 그림 257)가 오지 않았습니다: " +
+                $"괴물 {mob.Serial} 에 걸린 저주(82 · 그림 43)가 오지 않았습니다: " +
                 string.Join(", ", looking.AilmentsOf(mob.Serial)));
             Assert.True(looking.AilmentsOf(mob.Serial).Single(one => one.Icon == Curse).Harmful);
         }

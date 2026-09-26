@@ -23,6 +23,9 @@ OUT = ROOT / "docs" / "monsters-data.js"
 # 지금 모바일로 실제 돌아다닐 수 있는 지역. 이름 앞머리로 가른다.
 REGIONS = ["노비스", "수오미"]
 
+# 목록 드랍 전체에 곱하는 배율 — `Formulas/monsterexp.cs` DropBoost 와 같아야 한다(사용자 2026-09-26, 1.5배).
+DROP_BOOST = 1.5
+
 # 괴물 그림 번호 → 원작 스프라이트 번호. 16437(거미) → MNS053 으로 확인(docs/monster-behaviour.md).
 SPRITE_BASE = 16384
 
@@ -147,7 +150,7 @@ def main():
                     "이름": name,
                     "갈래": kind_of(item),
                     "표확률": rate,
-                    "실제확률": round(share * rate, 4),
+                    "실제확률": round(min(1.0, share * rate * DROP_BOOST), 4),
                     "값": item.get("Value") or 0,
                     "체력회복": item.get("HealthRestore") or 0,
                     "마력회복": item.get("ManaRestore") or 0,
@@ -204,7 +207,7 @@ def main():
         "서버포인터": pointer,
         "지역": REGIONS,
         "규칙": {
-            "드랍": "목록에서 하나를 고르고(같은 확률) 그 물건의 DropRate 를 굴린다 — monsterexp.cs DetermineRandomDrop",
+            "드랍": "목록에서 하나를 고르고(같은 확률) 그 물건의 DropRate×1.5 를 굴린다 — monsterexp.cs DetermineRandomDrop·DropBoost",
             "금화": "레벨 × 500 ~ 레벨 × 1000",
             "감산": PENALTY,
             "감산근거": "레벨 차이로 경험치를 깎는 값은 우리가 정한 것이다 — 원작에도 5.99 팩에도 그 규칙이 없다",

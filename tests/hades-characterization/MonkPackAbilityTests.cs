@@ -65,15 +65,15 @@ public sealed class MonkPackAbilityTests : IDisposable
         await world.UseAsync(robeItem!.Slot, _deadline.Token);
         await Until(() => world.Self?.Wearing?.Armor == 3, $"도복을 입지 못했습니다: {world.Said}");
 
-        // 정권 — 주먹단련이 없으면 마력 15 · 공격력 ×2.0, 있으면 마력 25 · ×2.5. 몸 132(도복 d 시트 6~9) · 맞는 쪽 27 · 소리 18.
+        // 정권 — 주먹단련이 없으면 마력 15 · 공격력 ×2.0, 있으면 마력 25 · ×2.5. 몸 132(도복 d 시트 6~9) · 맞는 쪽 166(노바 번호 — 5.99 는 27, 사용자 결정 2026-09-26 「노바 것이 원작 이펙트다」) · 소리 18.
         int jeonggwon = await LearnSkill(world, "정권");
         Figure plain = await Blow(world, () => world.UseSkillAsync(jeonggwon, _deadline.Token), 15,
-            motion: (132, 20), effect: (27, 0, 75), sound: 18, "정권");
+            motion: (132, 20), effect: (166, 0, 75), sound: 18, "정권");
 
         await LearnSpell(world, "주먹단련");
         await Task.Delay(TimeSpan.FromSeconds(2.5), _deadline.Token); // 정권 딜레이 2초
         await Blow(world, () => world.UseSkillAsync(jeonggwon, _deadline.Token), 25,
-            motion: (132, 20), effect: (27, 0, 75), sound: 18, "주먹단련 뒤 정권");
+            motion: (132, 20), effect: (166, 0, 75), sound: 18, "주먹단련 뒤 정권");
         // 피해 크기는 대 보지 않는다 — 하데스가 맞은 쪽이 어디를 보고 있었나(등 ×2 …)를 곱해 한 방마다 달라진다.
         // 두 갈래는 마력(15 · 25)으로 가린다.
 
@@ -106,7 +106,7 @@ public sealed class MonkPackAbilityTests : IDisposable
             await Sound(world, 8, "금강불괴");
         }
 
-        // 다라밀공 — 마력 1300 이상에서, 맞는 쪽 288(속도 130) · 소리 98 · 체력 1 · 마력 0. 몸은 5.99 의 136(마법사 옷만) 대신
+        // 다라밀공 — 마력 1300 이상에서, 맞는 쪽 47(노바 번호 — 5.99 는 288 · 속도 130 은 5.99 그대로) · 소리 98 · 체력 1 · 마력 0. 몸은 5.99 의 136(마법사 옷만) 대신
         // 도복이 그리는 손 들기 6(혼든 팩 다라밀공과 같다 — 쿠로토와 같은 까닭).
         {
             int slot = await LearnSpell(world, "다라밀공");
@@ -116,7 +116,7 @@ public sealed class MonkPackAbilityTests : IDisposable
             await Until(() => world.Hurts.Skip(before).Any(h => OnAhead(world, h.Serial)), "다라밀공이 표적을 치지 않았습니다.");
             Effect flash = await NextEffect(world, "다라밀공");
             Assert.True(OnAhead(world, flash.Target), $"다라밀공 그림이 표적 위가 아닙니다: {flash}");
-            Assert.Equal((288, 130), (flash.TargetAnimation, flash.Speed));
+            Assert.Equal((47, 130), (flash.TargetAnimation, flash.Speed));
             Motion cast = await NextMotion(world, "다라밀공");
             Assert.Equal((world.Serial, 6, 75), (cast.Serial, cast.Number, cast.Speed));
             Assert.True(BodyMotion.Fits(6, robe));

@@ -669,7 +669,17 @@ def main():
     print(f"괴물 템플릿 {attached}장에 괴물 마법을 붙였습니다.")
     if undefined:
         print("5.99 에 정의가 없는 괴물 마법(템플릿 수): " + ", ".join(f"{k}({v})" for k, v in undefined.most_common()))
+    run_nova_effects()
     return 0
+
+
+def run_nova_effects():
+    """이펙트 번호는 노바 것이 원작이다(사용자 결정 2026-09-26) — 옮긴 뒤 `build-nova-effects.py` 로 바꾼다."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("build_nova_effects", Path(__file__).with_name("build-nova-effects.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.apply()
 
 
 if __name__ == "__main__":

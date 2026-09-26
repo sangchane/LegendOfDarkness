@@ -200,6 +200,10 @@ def bundle_text(item):
     return "1~3개 묶음" if ((item.get("Flags") or 0) & both) == both else "1개"
 
 
+# 목록 드랍 전체에 곱하는 배율 — `Formulas/monsterexp.cs` DropBoost 와 같아야 한다(사용자 2026-09-26, 1.5배).
+DROP_BOOST = 1.5
+
+
 def real_rate(item, listed_len, loot_type):
     """`DetermineRandomDrop` 그대로 — 목록의 DropRate 를 이어 붙인 줄(길이 = 칸수)에서 한 점을 뽑는다.
     그래서 한 물건의 확률은 DropRate ÷ 칸수 이고, DropRate 가 1 을 넘어도 그대로다(2026-09-26 부터).
@@ -208,7 +212,7 @@ def real_rate(item, listed_len, loot_type):
         return None
     if not listed_len:
         return 0.0
-    return (item.get("DropRate") or 0) / listed_len
+    return min(1.0, (item.get("DropRate") or 0) * DROP_BOOST / listed_len)
 
 
 def build_notes(monsters, items, mundanes):
@@ -274,7 +278,7 @@ def build_notes(monsters, items, mundanes):
                 f"추정 레벨 **{lvl}** (깎기에만 쓴다 — [[식/경험치-레벨-대응]]): {cut_basis(exp, area)}.\n\n"
                 f"**{lvl + FORGIVEN + 1}레벨부터** 경험치가 깎인다([[식/경험치-깎기]]) — "
                 + " · ".join(f"{lvl + g}레벨 {round(exp * cut_share(g)):,}" for g in (6, 10, 15, 20, 30)) + "\n\n"
-                "## 드랍 목록 (실제 확률 = DropRate ÷ 목록 칸수)\n\n"
+                "## 드랍 목록 (실제 확률 = DropRate × 1.5 ÷ 목록 칸수)\n\n"
                 "| 아이템 | 실제 확률 | 한 번에 | 갈래 |\n|---|---|---|---|\n" + drop_table + "\n",
                 encoding="utf-8")
             zone_rows[area][1].append((m["Name"], note, exp, lo, hi, lvl))

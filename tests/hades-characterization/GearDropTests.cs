@@ -132,33 +132,35 @@ public sealed class GearDropTests
 
     /// <summary>
     /// 사냥터별로 레벨이 맞는 접미사·속성 장비 한 벌 — <c>scripts/build-gear-drops.py</c> <c>TIERS</c> 와
-    /// 같은 목록이다. 기본템은 여기 없으니 이 목록 밖의 장비가 보이면 아직 기본템이 남은 것이다.
+    /// 같은 목록에, 2026-09-26 드랍 종류를 늘리며 더한 한 벌(<see cref="DropVarietyTests"/>,
+    /// <c>scripts/build-drop-variety.py</c>)을 붙였다. 기본템은 여기 없으니 이 목록 밖의 장비가 보이면
+    /// 아직 기본템이 남은 것이다.
     /// </summary>
     private static readonly Dictionary<int, string[]> GroundGear = new()
     {
-        [20022] = DefenseSuffixRing11,
-        [20023] = DefenseSuffixRing11,
-        [20024] = DefenseSuffixRing11,
-        [20263] = ElementAt11,
-        [20264] = ElementAt11,
-        [20265] = ElementAt11,
-        [20266] = ElementAt11,
-        [20267] = ElementAt11,
-        [20268] = ElementAt11,
-        [20025] = DefenseSuffixAt41,
-        [20026] = DefenseSuffixAt41,
-        [20020] = DefenseSuffixAt71,
-        [20584] = DefenseSuffixAt56,
-        [20585] = DefenseSuffixAt56,
-        [20586] = DefenseSuffixAt56,
-        [20587] = DefenseSuffixAt56,
-        [20588] = DefenseSuffixAt56,
-        [20589] = DefenseSuffixAt56,
-        [20590] = DefenseSuffixAt56,
-        [20591] = DefenseSuffixAt56,
-        [20592] = DefenseSuffixAt56,
-        [20593] = DefenseSuffixAt56,
-        [20594] = DefenseSuffixAt56,
+        [20022] = [.. DefenseSuffixRing11, .. DropVarietyTests.LeatherGloves11],
+        [20023] = [.. DefenseSuffixRing11, .. DropVarietyTests.LeatherGloves11],
+        [20024] = [.. DefenseSuffixRing11, .. DropVarietyTests.LeatherGloves11],
+        [20263] = [.. ElementAt11, .. DropVarietyTests.LeatherBelts11],
+        [20264] = [.. ElementAt11, .. DropVarietyTests.LeatherBelts11],
+        [20265] = [.. ElementAt11, .. DropVarietyTests.LeatherBelts11],
+        [20266] = [.. ElementAt11, .. DropVarietyTests.LeatherBelts11],
+        [20267] = [.. ElementAt11, .. DropVarietyTests.LeatherBelts11],
+        [20268] = [.. ElementAt11, .. DropVarietyTests.LeatherBelts11],
+        [20025] = [.. DefenseSuffixAt41, .. DropVarietyTests.Crystal51],
+        [20026] = [.. DefenseSuffixAt41, .. DropVarietyTests.Crystal51],
+        [20020] = [.. DefenseSuffixAt71, .. DropVarietyTests.Obsidian81],
+        [20584] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20585] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20586] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20587] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20588] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20589] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20590] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20591] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20592] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20593] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
+        [20594] = [.. DefenseSuffixAt56, .. DropVarietyTests.BronzeGloves41],
     };
 
     /// <summary>

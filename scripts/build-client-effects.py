@@ -6,6 +6,7 @@
 뽑으므로, 여기서는 **서버가 실제로 보낼 수 있는 번호를 다 모은다**:
 
 - 5.99 스크립트(기술·마법·괴물 마법)의 `effect @대상, 쓴쪽그림, 대상그림` · 파티 그림(`group_hill` 등)
+- 하데스로 옮긴 스크립트(`scripts/Pack599`)의 `p.Call("effect", …)` — 노바 번호로 바꾼 것(`build-nova-effects.py`)
 - 하데스 기술·마법 템플릿의 `TargetAnimation`·`Animation`·`MissAnimation`
 - 하데스 코드에 박힌 `SendAnimation(번호, …)` (디버프가 거는 그림 등) · 헛친 기술의 `SkillMiss` 상수
 
@@ -81,6 +82,9 @@ def effect_numbers():
         found.update(int(n, 0) for n in re.findall(r"SendAnimation\((0x[0-9A-Fa-f]+|\d+)", text))
         # 헛친 기술의 「Miss」 그림은 코드의 상수다(`MonkStrike.SkillMiss`).
         found.update(int(n) for n in re.findall(r"const ushort \w*Miss\w* = (\d+)", text))
+        # 옮긴 5.99 스크립트의 `effect` — 노바 번호로 바뀐 것이 여기 있다(`build-nova-effects.py`, 2026-09-26).
+        for a, b in re.findall(r'p\.Call\("effect", [^,]+, \(V\)(\d+)L, \(V\)(\d+)L', text):
+            found.update((int(a), int(b)))
     return sorted(n for n in found if 0 < n < 1000)
 
 
