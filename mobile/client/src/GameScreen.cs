@@ -12,11 +12,17 @@ public partial class GameScreen : Control
 {
     private const int AuxFontSize = 14;
 
-    /// <summary>체력·마력 막대의 높이 — 고른 대상의 막대(_targetHealth)와 같은 높이라 HUD가 한 체계로 읽힌다.</summary>
-    private const int GaugeHeight = 10;
+    /// <summary>체력·마력 막대의 높이 — 숫자를 막대 안에 얹으므로(2026-09-27) 글자 한 줄이 들 만큼.</summary>
+    private const int GaugeHeight = 14;
 
-    /// <summary>막대 옆 숫자의 글자 크기. 작게 두어(사용자 지시) 막대를 더한 만큼 판이 넓어지지 않게 한다.</summary>
+    /// <summary>막대 안 숫자의 글자 크기. 작게 두어(사용자 지시) 막대를 더한 만큼 판이 넓어지지 않게 한다.</summary>
     private const int GaugeFontSize = 11;
+
+    /// <summary>
+    /// 막대 폭 — 전의 막대(세로 48 · 가로 72)와 옆 숫자("99999 / 99999" 약 75)를 합친 것보다 좁게, "99999/99999" 가 안에 들게
+    /// (사용자, 2026-09-27: "숫자를 게이지 위에 겹쳐 공간을 더 활용").
+    /// </summary>
+    private static int GaugeWidth => Main.Portrait ? 96 : 116;
 
     /// <summary>
     /// How tall the ticker's row is in portrait: two one-row lines, and the 대화 button beside them. It does not grow —
@@ -179,7 +185,7 @@ public partial class GameScreen : Control
     /// way. Named in Korean because the names are printed for a person to read.
     /// </summary>
     public IReadOnlyList<(string Name, Control Part)> Parts =>
-        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("방향판", _pad), ("파티원", _party.Members), ("인벤토리", _pack), ("월드", _world)];
+        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("방향판", _pad), ("파티원", _party.Members), ("나가기", _party.Leave), ("인벤토리", _pack), ("월드", _world)];
 
     /// <summary>Which tab the pack shows. Only a layout check asks — a thumb presses the tab itself.</summary>
     public void ShowGearTab(bool gear) => _pack.ShowTab(gear);
@@ -420,11 +426,10 @@ public partial class GameScreen : Control
         _party.AnchorLeft = 0;
         _party.AnchorRight = 0;
         _party.CustomMinimumSize = new Vector2(PartyColumn.Wide, 0);
-        // 봇 칸은 파티 기둥 밖, 화면 왼쪽 가장자리에 딱 붙는다(사용자, 2026-09-26) — 위 줄 바로 아래(PlaceParty).
-        over.AddChild(_party.BotSlot);
-
-        // 파티원 칸들 — 봇 칸 아래(세로) · 봇 칸 옆(가로), 왼쪽 가장자리부터(사용자, 2026-09-26: 그룹원 체력 정보 창).
+        // 봇·파티원 타일 격자 — 파티 기둥 밖, 화면 왼쪽 가장자리에 딱 붙는다(사용자, 2026-09-26 · 2026-09-27 "그리드" 식),
+        // 그 아래(자리가 없으면 옆)에 [나가기](PlaceParty).
         over.AddChild(_party.Members);
+        over.AddChild(_party.Leave);
         _toasts.AnchorLeft = 1;
         _toasts.AnchorRight = 1;
         _toasts.OffsetLeft = -ToastWidth;
@@ -1169,9 +1174,18 @@ public partial class GameScreen : Control
             if (Main.PartyPreview)
             {
                 string[] names = ["나", "가나다라마바", "검객", "궁수아이디", "도사", "치유사"];
+                // 숫자(종류 6 꼬리)가 있는 칸과, 옛 서버처럼 %만 있는 칸(치유사)을 함께 그려 본다.
                 _party.Show(new PartyRoster([.. names.Select((name, at) => new PartyMember(name, at == 1))]), "나", name =>
-                    new MemberLook(90 - (name.Length * 9), 70 - (name.Length * 7),
-                        StatusBadges.OfIcons(name.Length % 2 == 0 ? [11, 52] : [82])));
+                {
+                    // 도사는 체력 낮음(빨강), 궁수아이디는 쓰러짐(회색)으로 — 타일 색 규칙을 한눈에.
+                    int health = name switch { "도사" => 10, "궁수아이디" => 0, _ => 90 - (name.Length * 9) };
+                    int mana = 70 - (name.Length * 7), most = 400 + (name.Length * 150);
+                    VitalNumbers? numbers = name == "치유사" ? null
+                        : name == "가나다라마바" ? new VitalNumbers(12345, 23456, 4321, 9876)
+                        : new VitalNumbers(most * health / 100, most, most * mana / 200, most / 2);
+
+                    return new MemberLook(health, mana, StatusBadges.OfIcons(name.Length % 2 == 0 ? [11, 52] : [82]), numbers);
+                });
             }
 
             return;
@@ -1195,7 +1209,7 @@ public partial class GameScreen : Control
         // 서버가 1초마다 보내는 그룹원 체력·마력 %·상태(0x5E 종류 6, 이름으로 짝짓는다 — 멀리 있어도). 아직 없으면 보이는 이의
         // 체력바 %(0x13)만.
         _party.Show(roster, self, name => server.MemberStatus(name) is { } told
-            ? new MemberLook(told.HealthPercent, told.ManaPercent, StatusBadges.OfIcons(told.Icons))
+            ? new MemberLook(told.HealthPercent, told.ManaPercent, StatusBadges.OfIcons(told.Icons), server.MemberNumbers(told.Serial))
             : new MemberLook(server.Others.FirstOrDefault(other => other.Name == name) is { } seen ? server.Health(seen.Serial) : null, null, []));
 
         Character? picked = server.Others.FirstOrDefault(other => other.Serial == _world.Target);
@@ -1216,12 +1230,14 @@ public partial class GameScreen : Control
         CompanionTie? bot = _server?.Companion;
         CompanionKit? kit = _server?.CompanionKit;
         (int? health, int? mana) = BotKit.Bars(_server?.CompanionLife);
+        VitalNumbers? numbers = _server?.CompanionNumbers;
         IReadOnlyList<InventoryItem> pack = _server?.Pack ?? [];
 
         if (bot is null && Main.BotPreview)
         {
             bot = new CompanionTie(1, "동료사제");
             (health, mana) = (72, 45);
+            numbers = new VitalNumbers(655, 910, 322, 715);
             kit = new CompanionKit(
                 [new WornItem(1, 33318, "홀리파나", "홀리파나", 3000, 3000), new WornItem(2, 32873, "레더로브", "레더로브", 2000, 2000)],
                 [new CarriedItem("쿠룸", 32813, 4), new CarriedItem("마라디움", 32815, 2)]);
@@ -1244,7 +1260,7 @@ public partial class GameScreen : Control
         IReadOnlyList<StatusBadge> botStatus = bot is null ? []
             : Main.BotPreview && _server is null ? [new StatusBadge(11, 100, 6, false), new StatusBadge(52, 40, 4, false), new StatusBadge(82, 8, 1, true)]
             : StatusBadges.Of([], _server?.StatusesOf(bot.Serial));
-        _party.ShowBot(bot?.Name, health, mana, botStatus);
+        _party.ShowBot(bot?.Name, health, mana, botStatus, numbers);
 
         if (bot is null)
         {
@@ -1285,48 +1301,33 @@ public partial class GameScreen : Control
     private void PlaceParty()
     {
         float top = _topRow.GetGlobalRect().End.Y - _over.GetGlobalRect().Position.Y + Main.Gutter;
-        Control bot = _party.BotSlot;
-
-        // 봇 칸: 화면 왼쪽 끝에 붙인다 — HUD 여백(틈 8)만큼 왼쪽으로 뺀다. 가로 아이폰은 노치 쪽 안전선까지만(SafeInsets 에는
-        // 틈 8 이 들어 있어 뺀다).
-        bot.OffsetLeft = Main.SafeInsets.Left - Main.Gutter - _over.GetGlobalRect().Position.X;
-        bot.OffsetRight = bot.OffsetLeft + PartyColumn.BotWide;
-        bot.OffsetTop = top;
-        bot.OffsetBottom = top + bot.GetCombinedMinimumSize().Y;
-
-        // 파티원 칸들: 세로는 봇 칸 아래로 쌓고, 가로는 봇 칸 오른쪽으로 늘어놓는다(왼쪽 아래는 방향판) — 화면 폭의 반까지만.
         Control members = _party.Members;
-        float edge = bot.OffsetLeft;
+        Control leave = _party.Leave;
+        const int gap = PartyColumn.TileGap;
 
-        if (Main.Portrait)
-        {
-            members.OffsetLeft = edge;
-            members.OffsetTop = bot.Visible ? bot.OffsetBottom + 4 : top;
+        // 타일 격자: 화면 왼쪽 끝에 붙인다 — HUD 여백(틈 8)만큼 왼쪽으로 뺀다. 가로 아이폰은 노치 쪽 안전선까지만(SafeInsets 에는
+        // 틈 8 이 들어 있어 뺀다). 세로로 쌓다가 방향판에 닿으면 2열(더 많으면 3열) 격자(사용자, 2026-09-27: 그리드 식).
+        float edge = Main.SafeInsets.Left - Main.Gutter - _over.GetGlobalRect().Position.X;
+        float floor = _pad.GetGlobalRect().Position.Y - _over.GetGlobalRect().Position.Y - Main.Gutter;
+        int count = Math.Max(1, _party.TileCount);
+        int rowsFit = Math.Max(1, (int)((floor - top + gap) / (PartyColumn.TileRow + gap)));
+        int columns = (count + rowsFit - 1) / rowsFit;
+        int rows = (count + columns - 1) / columns;
 
-            // 한 줄로 쌓아 방향판에 닿으면 두 줄로 — 낮은 세로 화면(360x640)에 다섯이면 그렇다.
-            float room = _pad.GetGlobalRect().Position.Y - _over.GetGlobalRect().Position.Y - members.OffsetTop - Main.Gutter;
-            float[] tall = [.. members.GetChildren().OfType<Control>().Select(child => child.GetCombinedMinimumSize().Y)];
-            float stacked = tall.Sum(one => one + 4);
-            int columns = stacked > room ? 2 : 1;
-            members.OffsetRight = edge + (columns * PartyColumn.MemberWide) + ((columns - 1) * 4);
+        members.OffsetLeft = edge;
+        members.OffsetTop = top;
+        members.OffsetRight = edge + (columns * PartyColumn.TileWide) + ((columns - 1) * gap);
+        // 높이는 직접 센다 — 흐르는 칸은 폭이 바뀐 다음 프레임에야 제 높이를 다시 잰다.
+        members.OffsetBottom = top + (rows * PartyColumn.TileRow) + ((rows - 1) * gap);
 
-            // 높이는 직접 센다 — 흐르는 칸은 폭이 바뀐 다음 프레임에야 제 높이를 다시 재서, 그 한 프레임 동안 한 줄 높이로 남았다.
-            members.OffsetBottom = members.OffsetTop + (columns == 1
-                ? stacked
-                : tall.Chunk(2).Sum(pair => pair.Max() + 4));
-        }
-        else
-        {
-            members.OffsetLeft = bot.Visible ? bot.OffsetRight + 4 : edge;
-            members.OffsetTop = top;
-            members.OffsetRight = edge + (GetViewportRect().Size.X * 0.72f);
-        }
+        // [나가기]: 격자 아래, 방향판에 닿으면 격자 오른쪽 옆 위.
+        bool under = members.OffsetBottom + gap + Main.TouchMinimum <= floor;
+        leave.OffsetLeft = under ? edge : members.OffsetRight + gap;
+        leave.OffsetTop = under ? members.OffsetBottom + gap : top;
+        leave.OffsetRight = leave.OffsetLeft + PartyColumn.LeaveWide;
+        leave.OffsetBottom = leave.OffsetTop + Main.TouchMinimum;
 
-        if (!Main.Portrait)
-        {
-            members.OffsetBottom = members.OffsetTop + members.GetCombinedMinimumSize().Y;
-        }
-        float below = members.Visible ? members.OffsetBottom : bot.Visible ? bot.OffsetBottom : top - Main.Gutter;
+        float below = !members.Visible ? top - Main.Gutter : leave.Visible ? Mathf.Max(members.OffsetBottom, leave.OffsetBottom) : members.OffsetBottom;
 
         // 파티 기둥(초대 단추·묻기): 세로는 그 아래, 가로는 방향판 오른쪽 옆 — 파티원 칸 줄 아래.
         _party.OffsetLeft = Main.Portrait
@@ -1840,7 +1841,8 @@ public partial class GameScreen : Control
     }
 
     /// <summary>
-    /// One vital: a name, a bar that fills in its theme colour, and the exact numbers beside it, small. The
+    /// One vital: a name, a bar that fills in its theme colour, and the exact numbers on it, small (2026-09-27 — they used to
+    /// stand beside it; on the bar the panel is narrower and the bar longer). The
     /// over-the-head bar (HealthBar) still carries how a fight is going; this one is the place the numbers are
     /// always exact, so the bar and the numbers are read together rather than the same thing drawn twice.
     /// </summary>
@@ -1855,7 +1857,7 @@ public partial class GameScreen : Control
 
         bar = new ProgressBar
         {
-            CustomMinimumSize = new Vector2(Main.Portrait ? 48 : 72, GaugeHeight),
+            CustomMinimumSize = new Vector2(GaugeWidth, GaugeHeight),
             MaxValue = 1,
             ShowPercentage = false,
             SizeFlagsVertical = SizeFlags.ShrinkCenter
@@ -1863,12 +1865,10 @@ public partial class GameScreen : Control
         bar.AddThemeStyleboxOverride("background", Greybox.Surface());
         bar.AddThemeStyleboxOverride("fill", Greybox.Fill(paint));
 
-        text = Aux(string.Empty);
-        text.AddThemeFontSizeOverride("font_size", GaugeFontSize);
+        text = Greybox.OnBar(bar, GaugeFontSize);
 
         row.AddChild(named);
         row.AddChild(bar);
-        row.AddChild(text);
 
         return row;
     }
@@ -1884,14 +1884,14 @@ public partial class GameScreen : Control
         }
 
         _shownVitals = mine;
-        Fill(_healthBar, _healthText, mine.Health, mine.MaximumHealth);
-        Fill(_manaBar, _manaText, mine.Mana, mine.MaximumMana);
+        Fill(_healthBar, _healthText, mine.Health, mine.MaximumHealth, Greybox.Health);
+        Fill(_manaBar, _manaText, mine.Mana, mine.MaximumMana, Greybox.Mana);
 
         if (ExperienceGauge.Of(mine.Level, mine.ExperienceToGo) is { } exp)
         {
             _experienceBar.MaxValue = exp.Need;
             _experienceBar.Value = exp.Earned;
-            _experienceText.Text = $"{ExperienceGauge.Short(exp.Earned)} / {ExperienceGauge.Short(exp.Need)}";
+            _experienceText.Text = $"{ExperienceGauge.Short(exp.Earned)}/{ExperienceGauge.Short(exp.Need)}";
         }
         else
         {
@@ -1903,19 +1903,19 @@ public partial class GameScreen : Control
     }
 
     /// <summary>
-    /// Fills one vital's bar and writes its number. The number turns colour as it falls — but the numbers
-    /// themselves are the reading, so somebody who cannot tell the colours apart loses nothing.
+    /// Fills one vital's bar and writes its number on it. The number used to turn colour as it fell; written on the bar it
+    /// now stays light (a coloured number over its own colour would vanish), and the bar's fill turns 위험(Gone) red at 15% or
+    /// below instead — the length already tells "half gone". The numbers themselves are still the reading, so somebody who
+    /// cannot tell the colours apart loses nothing.
     /// </summary>
-    private static void Fill(ProgressBar bar, Label text, int left, int most)
+    private static void Fill(ProgressBar bar, Label text, int left, int most, Color paint)
     {
         bar.MaxValue = most > 0 ? most : 1;
         bar.Value = most > 0 ? Mathf.Clamp(left, 0, most) : 0;
 
-        text.Text = $"{left} / {most}";
+        text.Text = $"{left}/{most}";
 
-        text.AddThemeColorOverride("font_color", most <= 0 || left > most * 0.5
-            ? Greybox.Text
-            : left > most * 0.15 ? Greybox.Health : Greybox.Gone);
+        bar.AddThemeStyleboxOverride("fill", Greybox.Fill(most > 0 && left <= most * 0.15 ? Greybox.Gone : paint));
     }
 
     /// <summary>

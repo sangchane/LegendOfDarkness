@@ -408,6 +408,8 @@ public static class LayoutCheck
         // 인벤토리 창은 둘 다 덮는다(열려 있는 동안 조작이 죽는다).
         || (one, other) is ("방향판", "조작 줄") or ("조작 줄", "방향판") or ("파티원", "조작 줄") or ("조작 줄", "파티원")
         || (one, other) is ("방향판", "인벤토리") or ("인벤토리", "방향판") or ("파티원", "인벤토리") or ("인벤토리", "파티원")
+        // [나가기] 는 파티원 격자 옆·아래에 따로 선다(2026-09-27) — 파티원 칸과 같은 규칙.
+        || (one, other) is ("나가기", "조작 줄") or ("조작 줄", "나가기") or ("나가기", "인벤토리") or ("인벤토리", "나가기")
         || (!Main.Portrait && (one, other) is ("인벤토리", "위 줄") or ("위 줄", "인벤토리") or ("인벤토리", "미니맵") or ("미니맵", "인벤토리"));
 
     private static IEnumerable<string> Overlaps(IReadOnlyList<(string Name, Control Part)> parts)

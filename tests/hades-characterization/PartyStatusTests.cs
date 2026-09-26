@@ -76,6 +76,9 @@ public sealed class PartyStatusTests : IDisposable
         // 서로의 %가 온다 — 그룹원은 반(50).
         await Waiting.Until(() => lead.MemberStatus(mate.Serial) is { HealthPercent: 50, ManaPercent: 100 },
             $"그룹장이 그룹원의 체력 %를 받지 못했습니다: {lead.MemberStatus(mate.Serial)}", _deadline.Token);
+        // 숫자도 함께 온다(종류 6 꼬리, 2026-09-27) — 앱이 게이지 안에 "500/1000" 으로 적는다.
+        Assert.Equal(new VitalNumbers(500, 1000, 1000, 1000), lead.MemberNumbers(mate.Serial));
+
         // 그룹장은 새로 만든 캐릭터라 제 체력이 가득이 아닐 수 있다 — 제가 아는 제 체력과 같은 %면 된다.
         await Waiting.Until(() => lead.Vitals is { MaximumHealth: > 0 } own
                                   && mate.MemberStatus(lead.Serial)?.HealthPercent == (int)(100L * own.Health / own.MaximumHealth),
@@ -93,6 +96,8 @@ public sealed class PartyStatusTests : IDisposable
 
         await Waiting.Until(() => lead.MemberStatus(mate.Serial) is { HealthPercent: 60 },
             $"그룹원의 체력이 바뀐 것이 그룹장에게 오지 않았습니다: {lead.MemberStatus(mate.Serial)}", _deadline.Token);
+        await Waiting.Until(() => lead.MemberNumbers(mate.Serial) is { Health: 600, MaximumHealth: 1000 },
+            $"그룹원의 체력 숫자가 따라 오지 않았습니다: {lead.MemberNumbers(mate.Serial)}", _deadline.Token);
 
         // 나가면 끝(serial 은 남아도 더는 새로 오지 않는다) — 그룹을 떠난 뒤에는 목록이 비워진다.
         await mate.LeaveGroupAsync(_deadline.Token);

@@ -93,6 +93,81 @@ public sealed class CompanionNewOwnerTests : IDisposable
             _deadline.Token, TimeSpan.FromSeconds(10));
     }
 
+    /// <summary>
+    /// 클라우드 2026-09-27 03:47~04:18(무도가 Monk5, 우드랜드입구): 월드맵으로 옮겨 다닌 주인이 로그아웃 없이 끊겼다 다시 들어오자 서버가
+    /// 그 주인을 **1초에 150번** 저장했고(<c>Aisling Monk5 data has been saved.</c>), 봇은 따라오지 않았으며 앱의 봇 칸은 빈 검은 네모였다.
+    /// 월드맵으로 옮기면 전 맵 목록에서 빠지지 않은 채 새 맵에도 들어간다 — 끊긴 뒤 전 맵에 남은 옛 캐릭터가 "같은 이름의 다른 접속"으로
+    /// 남아, 새 접속이 한 걸음마다 그것을 치우며 저장하고(<c>GameClient.ObjectCheckPoint</c>), 봇 짝(<c>Companions.FindOnline</c>)은 그 옛
+    /// 캐릭터를 주인으로 집어 봇을 그 곁으로 옮기고 체력을 그 끊긴 접속에 보냈다. 다시 들어온 주인에게 봇이 새 serial 로 돌아와야 한다.
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task A_returning_owner_who_travelled_by_world_map_gets_the_bot_back_and_is_not_saved_over_and_over(bool socketClosed)
+    {
+        const int Miles = 20287;
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceVillage, 26, 21));
+        CompanionCallTests.Configure(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, OwnerName);
+        LoginFlow.TryCreateAccount(server, CompanionCallTests.BotName);
+
+        WorldClient first = await Enter(server, OwnerName);
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName);
+        _ = new CompanionRunner(bot, new MapWalls(HadesWorkspace.MapLayoutFolder), new CompanionSettings()).RunAsync(_deadline.Token);
+
+        for (int tries = 0; tries < 10 && bot.Master is null; tries++)
+        {
+            await first.CallCompanionAsync(_deadline.Token);
+            await Task.Delay(1000, _deadline.Token);
+        }
+
+        Assert.NotNull(bot.Master);
+
+        await first.OpenFieldAsync(_deadline.Token);
+        await Waiting.Until(() => first.Field is not null, "월드맵이 오지 않았습니다.", _deadline.Token);
+        await first.ChooseFieldAsync(Miles, _deadline.Token);
+        await Waiting.Until(() => first.State?.Map.Id == Miles, "밀레스로 가지 않았습니다.", _deadline.Token);
+        await Task.Delay(2000, _deadline.Token);
+
+        if (socketClosed)
+        {
+            first.Dispose();
+            await Task.Delay(3000, _deadline.Token);
+        }
+
+        WorldClient owner = await Enter(server, OwnerName, Miles);
+        await Waiting.Until(() => first.IsDisposed || first.Broke is not null, "남은 전 접속이 빠지지 않았습니다.", _deadline.Token);
+
+        int before = Saves(server);
+        await Task.Delay(3000, _deadline.Token);
+        int during = Saves(server) - before;
+
+        Assert.True(during <= 3, $"다시 들어온 주인을 3초에 {during}번 저장했습니다.");
+
+        // 주인이 없던 틈에 서버가 짝을 풀었으면(문서의 "나가면 돌아감") 봇은 마을로 가 있다 — 그때는 [봇 부르기] 를 다시 누른다.
+        // 짝이 남아 있었으면 서버가 새 serial 을 스스로 다시 알린다(Companions.Tick).
+        await Task.Delay(1500, _deadline.Token);
+
+        for (int tries = 0; tries < 10 && bot.Master?.Serial != owner.Serial; tries++)
+        {
+            await owner.CallCompanionAsync(_deadline.Token);
+            await Task.Delay(1000, _deadline.Token);
+        }
+
+        await Waiting.Until(() => bot.Master?.Serial == owner.Serial,
+            $"봇이 다시 들어온 주인을 모릅니다: 봇의 주인 {bot.Master?.Serial} · 새 주인 {owner.Serial}", _deadline.Token, TimeSpan.FromSeconds(5));
+        await Waiting.Until(() => owner.Companion?.Serial == bot.Serial && owner.CompanionLife?.Serial == bot.Serial,
+            $"앱의 봇 칸이 비어 있습니다: 짝 {owner.Companion} · 체력 {owner.CompanionLife}", _deadline.Token, TimeSpan.FromSeconds(5));
+        await Waiting.Until(() => bot.State?.Map.Id == Miles && Where(owner, bot.Serial) is not null,
+            $"봇이 주인 곁에 오지 않았습니다: 봇 맵 {bot.State?.Map.Id} · 주인이 보는 봇 {Where(owner, bot.Serial)}", _deadline.Token, TimeSpan.FromSeconds(10));
+    }
+
+    private static int Saves(IsolatedHadesServer server) =>
+        server.ConsoleOutput.Split('\n').Count(line => line.Contains($"Aisling {OwnerName} data has been saved", StringComparison.Ordinal));
+
     private static Tile? Where(WorldClient viewer, uint serial) =>
         viewer.Others.FirstOrDefault(one => one.Serial == serial)?.Where;
 
@@ -104,13 +179,13 @@ public sealed class CompanionNewOwnerTests : IDisposable
         }
     }
 
-    private async Task<WorldClient> Enter(IsolatedHadesServer server, string who)
+    private async Task<WorldClient> Enter(IsolatedHadesServer server, string who, int map = NoviceVillage)
     {
         WorldSession session = await HadesLoginClient.LoginAsync(
             IPAddress.Loopback, server.LoginPort, who, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
         WorldClient world = new(session);
         _ = world.PumpAsync(_deadline.Token);
-        await Waiting.Until(() => world.State?.Map.Id == NoviceVillage && world.Serial != 0, $"{who} 가 서지 못했습니다.", _deadline.Token);
+        await Waiting.Until(() => world.State?.Map.Id == map && world.Serial != 0, $"{who} 가 서지 못했습니다.", _deadline.Token);
         return world;
     }
 }

@@ -17,6 +17,12 @@ public sealed record BotConfig
     /// <summary>맵 벽 파일(<c>map번호.txt</c>, 앱의 <c>mobile/client/assets/world</c>) 폴더. 설정 파일 자리에서 센다. 없으면 벽을 모른 채 걷는다.</summary>
     public string MapFolder { get; init; } = string.Empty;
 
+    /// <summary>
+    /// 기록 파일(설정 파일 자리에서 센다). 적지 않으면 <c>logs/설정파일이름.log</c> — 봇마다 설정 파일이 따로라 기록도 따로다.
+    /// 1MB 마다 <c>.1</c>~<c>.4</c> 로 밀려 5개까지 남는다(<see cref="BotLog" />). 빈 글이면 파일에 안 적는다.
+    /// </summary>
+    public string? LogFile { get; init; }
+
     public int HealOwnerPercent { get; init; } = 70;
     public int HealSelfPercent { get; init; } = 50;
     public int PotionHealthPercent { get; init; } = 40;
@@ -39,6 +45,11 @@ public sealed record BotConfig
             ? string.Empty
             : Path.GetFullPath(config.MapFolder, Path.GetDirectoryName(Path.GetFullPath(path))!);
 
-        return config with { MapFolder = folder };
+        string wanted = config.LogFile ?? Path.Combine("logs", $"{Path.GetFileNameWithoutExtension(path)}.log");
+        string log = wanted.Length == 0
+            ? string.Empty
+            : Path.GetFullPath(wanted, Path.GetDirectoryName(Path.GetFullPath(path))!);
+
+        return config with { MapFolder = folder, LogFile = log };
     }
 }

@@ -14,14 +14,13 @@ namespace LodClient;
 /// 수락 or 거절 right where the question shows; leaving is one button beside the list. Nothing here opens a window.
 /// </para>
 /// <para>
-/// <b>Health.</b> The server never sends a group member's numbers — only the same out-of-a-hundred health bar it sends
-/// to anyone who can see them being hurt (0x13). So a member standing near shows that, and one who is not in sight shows
-/// a dash rather than a number made up here.
+/// <b>Who is in the group</b> is a grid of small tiles at the left edge (2026-09-27, 사용자: WoW 애드온 "그리드" 처럼) —
+/// the bot's first, then each member's. A tile is its health: the fill is the tile's ground, the name (아이디, the bot's
+/// "봇") sits on it, mana is one thin line under it. Numbers are not written (the tooltip has them).
 /// </para>
 /// <para>
 /// Theme (docs/original-ui-451.md): the stone frame and a flat dark inside, light letters on dark, the one committing
-/// button (수락) lit, every button 48 tall. The percentage sits right-aligned in a box of its own width so it does not
-/// jitter as it changes.
+/// button (수락) lit, every button 48 tall.
 /// </para>
 /// </remarks>
 public sealed partial class PartyColumn : VBoxContainer
@@ -31,17 +30,26 @@ public sealed partial class PartyColumn : VBoxContainer
     /// <summary>How long a question waits for an answer. Not answering is the original's "no" — there is no packet for it.</summary>
     private const double AskWaits = 30;
 
+    /// <summary>타일 하나 — 폭, 체력 칸 높이, 그 아래 마력 줄 높이, 타일 사이 틈.</summary>
+    public const int TileWide = 68;
+    public const int TileTall = 24;
+    public const int ManaTall = 3;
+    public const int TileGap = 3;
+
+    /// <summary>타일 한 줄의 높이(체력 칸 + 마력 줄).</summary>
+    public const int TileRow = TileTall + ManaTall;
+
     private readonly Button _invite = new() { Text = "파티 초대", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Label _question = new() { AutowrapMode = TextServer.AutowrapMode.WordSmart };
     private readonly Control _ask;
-    // 파티원 칸들 — 봇 칸과 같은 틀의 작은 칸을 사람마다 하나, 끝에 [나가기]. 이 기둥 밖(화면 왼쪽 가장자리, 봇 칸 아래)에
-    // 게임 화면이 세운다(Members). 흐르는 칸 — 게임 화면이 폭을 정해 세로는 한 줄(모자라면 두 줄)로 쌓고, 가로는 방향판이 왼쪽
-    // 아래를 차지해 옆으로 늘어놓는다.
+
+    // 타일 격자 — 봇 타일이 맨 앞, 그다음 파티원. 이 기둥 밖(화면 왼쪽 가장자리)에 게임 화면이 세우고 폭(열 수)을 정한다(Members).
     private readonly Container _frame = new HFlowContainer();
 
     private string? _asker;
     private double _askedFor;
     private string _shown = string.Empty;
+    private int _memberCount;
 
     public PartyColumn()
     {
@@ -80,38 +88,31 @@ public sealed partial class PartyColumn : VBoxContainer
         _ask = Plated(asking);
         _ask.Visible = false;
 
-        Leave = new Button { Text = "나가기", CustomMinimumSize = new Vector2(64, Main.TouchMinimum) };
+        // [나가기] — 격자 밖, 게임 화면이 격자 아래(자리가 없으면 옆)에 세운다. 작게, 그래도 손가락 높이(48)는 지킨다.
+        Leave = new Button { Text = "나가기", CustomMinimumSize = new Vector2(LeaveWide, Main.TouchMinimum), Visible = false };
         Greybox.Plain(Leave);
+        Leave.AddThemeFontSizeOverride("font_size", FontSize);
         Leave.Pressed += () => Left?.Invoke();
 
-        _frame.AddThemeConstantOverride("separation", 4);
-        _frame.AddThemeConstantOverride("h_separation", 4);
-        _frame.AddThemeConstantOverride("v_separation", 4);
+        _frame.AddThemeConstantOverride("h_separation", TileGap);
+        _frame.AddThemeConstantOverride("v_separation", TileGap);
         _frame.MouseFilter = MouseFilterEnum.Ignore;
         _frame.Visible = false;
 
-        // 파티원 칸들 끝의 [나가기] — 세로는 칸 폭 그대로, 가로는 작게(한 줄에 더 들게).
-        Leave.CustomMinimumSize = new Vector2(Main.Portrait ? MemberWide : 64, Main.TouchMinimum);
-
         _botFrame = BuildBotFrame();
         _botFrame.Visible = false;
+        _frame.AddChild(_botFrame);
 
         AddChild(_invite);
         AddChild(_ask);
     }
 
-    // ── 봇 칸 ─────────────────────────────────────────────────────────────
-    // 체력 막대(굵게)와 마력 막대(얇게), 그 아래 봇에게 걸린 것(상태 아이콘 줄) — 이름은 뺐다(사용자, 2026-09-26: 이름까지
-    // 띄울 필요 없고 자리를 너무 차지한다). 이 기둥이 아니라 화면 왼쪽 가장자리에 붙는다(GameScreen 이 <see cref="BotSlot" /> 을
-    // 따로 세운다). 누르면 봇 장비창(BotGearPanel). 체력·마력 %는 서버가 1초마다 보낸다(0x5E 종류 4), 상태는 종류 3.
-
-    /// <summary>봇 칸의 폭 — 전의 3분의 1 남짓. 상태 아이콘 넷이 든다.</summary>
-    public const int BotWide = 72;
+    // ── 봇 타일 ───────────────────────────────────────────────────────────
+    // 파티원과 같은 타일, 이름 자리에 "봇"(봇 이름은 뺀다 — 2026-09-26 "이름까지 띄울 필요 없다"). 격자 맨 앞. 누르면 봇
+    // 장비창(BotGearPanel). 체력·마력 %는 서버가 1초마다 보낸다(0x5E 종류 4), 상태는 종류 3.
 
     private readonly Control _botFrame;
-    private readonly ProgressBar _botHealth = Bar(Greybox.Health, 8);
-    private readonly ProgressBar _botMana = Bar(Greybox.Mana, 4);
-    private readonly StatusStrip _botStatus = new(side: 10, most: 4, timed: false);
+    private readonly GridTile _botTile = new();
 
     /// <summary>봇 칸을 눌렀다 — 봇 장비창을 연다.</summary>
     public event Action? BotOpened;
@@ -119,89 +120,61 @@ public sealed partial class PartyColumn : VBoxContainer
     /// <summary>봇 칸 자체(손 없이 확인할 때 누르려고).</summary>
     public Button BotButton { get; private set; } = null!;
 
-    /// <summary>봇 칸 — 게임 화면이 왼쪽 가장자리에 세운다. 봇이 있을 때만 보인다.</summary>
+    /// <summary>봇 타일 — 격자 맨 앞에 선다. 봇이 있을 때만 보인다.</summary>
     public Control BotSlot => _botFrame;
 
     /// <summary>봇 이름을 — 봇 칸이 따로 있으니 파티 목록에서는 뺀다.</summary>
     private string? _botShown;
 
-    /// <summary>봇 칸을 그린다. 이름이 없으면 숨긴다. 막대 값을 모르면 막대를 숨긴다(빈 막대는 "쓰러졌다" 로 읽힌다).</summary>
-    public void ShowBot(string? name, int? health, int? mana, IReadOnlyList<StatusBadge>? statuses = null)
+    /// <summary>격자에 선 타일 수(봇 포함) — 게임 화면이 열 수를 정하려고.</summary>
+    public int TileCount => (_botShown is null ? 0 : 1) + _memberCount;
+
+    /// <summary>[나가기] 의 폭.</summary>
+    public const int LeaveWide = 60;
+
+    /// <summary>
+    /// 봇 타일을 그린다. 이름이 없으면 숨긴다. 숫자(<paramref name="numbers" />, 0x5E 종류 4 꼬리)는 타일에 적지 않고 누르기 전
+    /// 안내(툴팁)에만 둔다.
+    /// </summary>
+    public void ShowBot(string? name, int? health, int? mana, IReadOnlyList<StatusBadge>? statuses = null, VitalNumbers? numbers = null)
     {
         _botShown = name;
         _botFrame.Visible = name is not null;
+        Refresh();
 
         if (name is null)
         {
             return;
         }
 
-        BotButton.TooltipText = $"봇 · {name} — 누르면 봇 장비";
-        _botHealth.Value = health ?? 0;
-        _botMana.Value = mana ?? 0;
-        _botHealth.Modulate = health is null ? Colors.Transparent : Colors.White;
-        _botMana.Modulate = mana is null ? Colors.Transparent : Colors.White;
-        _botStatus.Show(statuses ?? []);
+        BotButton.TooltipText = $"봇 · {name} {PartyNumbers.Text(numbers?.Health, numbers?.MaximumHealth, health)} — 누르면 봇 장비";
+        _botTile.Show("봇", false, health, mana, statuses ?? []);
     }
 
     private Control BuildBotFrame()
     {
-        VBoxContainer inside = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = AlignmentMode.Center };
-        inside.AddThemeConstantOverride("separation", 3);
-        inside.AddChild(_botHealth);
-        inside.AddChild(_botMana);
-        inside.AddChild(_botStatus);
+        _botTile.SetAnchorsPreset(LayoutPreset.FullRect);
 
-        foreach (Control part in new Control[] { _botHealth, _botMana })
-        {
-            part.MouseFilter = MouseFilterEnum.Ignore;
-        }
-
-        MarginContainer pad = new() { MouseFilter = MouseFilterEnum.Ignore };
-        pad.AddThemeConstantOverride("margin_left", 6);
-        pad.AddThemeConstantOverride("margin_right", 6);
-        pad.AddThemeConstantOverride("margin_top", 5);
-        pad.AddThemeConstantOverride("margin_bottom", 5);
-        pad.SetAnchorsPreset(LayoutPreset.FullRect);
-        pad.AddChild(inside);
-
-        // 칸 전체가 단추다 — 손가락 최소 높이(44), 평평한 어둠(원작 4.51: 돌은 틀에만). 왼쪽 가장자리에 붙으니 오른쪽만 둥글게.
-        BotButton = new Button { CustomMinimumSize = new Vector2(BotWide, Main.TouchMinimum), ClipContents = true, FocusMode = FocusModeEnum.None };
+        // 타일 전체가 단추다 — 평평한 틀 없이 타일이 곧 모양(누를 때만 테두리 빛).
+        BotButton = new Button { CustomMinimumSize = new Vector2(TileWide, TileRow), FocusMode = FocusModeEnum.None };
 
         foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
         {
-            StyleBoxFlat plate = Greybox.Plate();
-            plate.BorderWidthLeft = 0;
-            plate.CornerRadiusTopRight = 8;
-            plate.CornerRadiusBottomRight = 8;
+            StyleBoxFlat plate = new() { BgColor = Colors.Transparent };
 
             if (state == "pressed")
             {
                 plate.BorderColor = Greybox.Title;
+                plate.SetBorderWidthAll(1);
             }
 
             BotButton.AddThemeStyleboxOverride(state, plate);
         }
 
-        BotButton.AddChild(pad);
+        BotButton.AddChild(_botTile);
         BotButton.Pressed += () => BotOpened?.Invoke();
 
         return BotButton;
-    }
-
-    private static ProgressBar Bar(Color paint, int height)
-    {
-        ProgressBar bar = new()
-        {
-            CustomMinimumSize = new Vector2(0, height),
-            MaxValue = 100,
-            ShowPercentage = false,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill
-        };
-        bar.AddThemeStyleboxOverride("background", Greybox.Surface());
-        bar.AddThemeStyleboxOverride("fill", Greybox.Fill(paint));
-
-        return bar;
     }
 
     /// <summary>How wide the column may get — a name, a short bar and a percentage, and the button beside them.</summary>
@@ -223,13 +196,10 @@ public sealed partial class PartyColumn : VBoxContainer
     public bool Asking => _ask.Visible;
 
     /// <summary>Whether the group list is showing.</summary>
-    public bool Grouped => _frame.Visible;
+    public bool Grouped => _memberCount > 0;
 
-    /// <summary>파티원 칸들과 [나가기] — 게임 화면이 봇 칸 아래(왼쪽 가장자리)에 세운다.</summary>
+    /// <summary>타일 격자(봇 + 파티원) — 게임 화면이 왼쪽 가장자리에 세운다.</summary>
     public Control Members => _frame;
-
-    /// <summary>파티원 칸 하나의 폭 — 이름(아이디) 한 줄이 들 만큼, 봇 칸보다 조금 넓게.</summary>
-    public const int MemberWide = 88;
 
     /// <summary>The 파티 초대 button, for whoever is picked out — only a person, and only one who could join.</summary>
     public void CanInvite(bool can) => _invite.Visible = can && !_ask.Visible;
@@ -256,8 +226,8 @@ public sealed partial class PartyColumn : VBoxContainer
     }
 
     /// <summary>
-    /// Everyone in the group but ourselves, each with the health the server last showed us, or a dash when it has not.
-    /// Rebuilt only when what it would show changes.
+    /// Everyone in the group but ourselves (and the bot, which has its own tile), each as a tile. Rebuilt only when what
+    /// it would show changes.
     /// </summary>
     public void Show(PartyRoster roster, string self, Func<string, MemberLook> look)
     {
@@ -268,11 +238,11 @@ public sealed partial class PartyColumn : VBoxContainer
                 .Select(member => (member.Name, member.Leader, look(member.Name)))]
             : [];
 
-        string shown = string.Join("|", others.Select(one =>
-            $"{one.Name}{one.Leader}{one.Look.Health}/{one.Look.Mana}/{string.Join(",", one.Look.Statuses.Select(b => b.Icon))}"));
+        _memberCount = others.Count;
+        Refresh();
 
-        // 봇만 있는 그룹(나와 봇 둘)도 [나가기] 는 봇 장비창·설정에 있다 — 사람 파티원이 있을 때만 선다.
-        _frame.Visible = others.Count > 0;
+        string shown = string.Join("|", others.Select(one =>
+            $"{one.Name}{one.Leader}{one.Look.Health}/{one.Look.Mana}/{one.Look.Numbers}/{string.Join(",", one.Look.Statuses.Select(b => b.Icon))}"));
 
         if (shown == _shown)
         {
@@ -281,26 +251,32 @@ public sealed partial class PartyColumn : VBoxContainer
 
         _shown = shown;
 
-        foreach (Node row in _frame.GetChildren())
+        foreach (Node tile in _frame.GetChildren())
         {
-            if (row != Leave)
+            if (tile != _botFrame)
             {
-                _frame.RemoveChild(row);
-                row.QueueFree();
+                _frame.RemoveChild(tile);
+                tile.QueueFree();
             }
         }
 
         foreach ((string name, bool leader, MemberLook memberLook) in others)
         {
-            _frame.AddChild(MemberFrame(name, leader, memberLook));
+            GridTile tile = new()
+            {
+                CustomMinimumSize = new Vector2(TileWide, TileRow),
+                TooltipText = $"{name} {PartyNumbers.Text(memberLook.Numbers?.Health, memberLook.Numbers?.MaximumHealth, memberLook.Health)}"
+            };
+            tile.Show(name, leader, memberLook.Health, memberLook.Mana, memberLook.Statuses);
+            _frame.AddChild(tile);
         }
+    }
 
-        if (Leave.GetParent() != _frame)
-        {
-            _frame.AddChild(Leave);
-        }
-
-        _frame.MoveChild(Leave, -1);
+    /// <summary>격자는 봇이나 파티원이 있으면, [나가기] 는 사람 파티원이 있을 때만(봇만 있는 그룹은 봇 장비창·설정에서 나간다).</summary>
+    private void Refresh()
+    {
+        _frame.Visible = TileCount > 0;
+        Leave.Visible = _memberCount > 0;
     }
 
     public override void _Process(double delta)
@@ -309,55 +285,6 @@ public sealed partial class PartyColumn : VBoxContainer
         {
             Answer(false);
         }
-    }
-
-    /// <summary>
-    /// One member's frame, in the bot slot's look: the name (아이디 — the leader's lighter, with "·장") on one line, a bold
-    /// health bar and a thin mana bar under it, and what is on them as icons without time (<see cref="StatusStrip" />).
-    /// A bar the server has not told about is kept in place but not drawn — an empty bar reads as "down".
-    /// </summary>
-    private static Control MemberFrame(string name, bool leader, MemberLook look)
-    {
-        Label named = new()
-        {
-            Text = leader ? $"{name}·장" : name,
-            ClipText = true,
-            TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        named.AddThemeFontSizeOverride("font_size", 11);
-        named.AddThemeColorOverride("font_color", leader ? Greybox.Title : Greybox.Text);
-
-        ProgressBar health = Bar(Greybox.Health, 6);
-        health.Value = look.Health ?? 0;
-        health.Modulate = look.Health is null ? Colors.Transparent : Colors.White;
-        ProgressBar mana = Bar(Greybox.Mana, 3);
-        mana.Value = look.Mana ?? 0;
-        mana.Modulate = look.Mana is null ? Colors.Transparent : Colors.White;
-
-        StatusStrip status = new(side: 10, most: 5, timed: false);
-        status.Show(look.Statuses);
-
-        VBoxContainer inside = new() { MouseFilter = MouseFilterEnum.Ignore };
-        inside.AddThemeConstantOverride("separation", 2);
-        inside.AddChild(named);
-        inside.AddChild(health);
-        inside.AddChild(mana);
-        inside.AddChild(status);
-
-        PanelContainer frame = new() { CustomMinimumSize = new Vector2(MemberWide, 0), MouseFilter = MouseFilterEnum.Ignore, TooltipText = name };
-        StyleBoxFlat plate = Greybox.Plate();
-        plate.BorderWidthLeft = Main.Portrait ? 0 : 1;
-        plate.CornerRadiusTopRight = 8;
-        plate.CornerRadiusBottomRight = 8;
-        plate.ContentMarginLeft = 6;
-        plate.ContentMarginRight = 6;
-        plate.ContentMarginTop = 3;
-        plate.ContentMarginBottom = 4;
-        frame.AddThemeStyleboxOverride("panel", plate);
-        frame.AddChild(inside);
-
-        return frame;
     }
 
     /// <summary>The stone frame round a flat, nearly opaque inside — the same plate as the top row's.</summary>
@@ -375,5 +302,86 @@ public sealed partial class PartyColumn : VBoxContainer
     }
 }
 
-/// <summary>What a party member's frame shows — health and mana %, when known, and what is on them (icons only).</summary>
-public sealed record MemberLook(int? Health, int? Mana, IReadOnlyList<StatusBadge> Statuses);
+/// <summary>
+/// 파티원·봇 타일 하나(WoW "그리드" 식, 2026-09-27): 체력이 곧 타일 바탕(채워진 만큼 체력 색, 15% 이하 빨강, 쓰러지면 회색),
+/// 그 위 가운데 이름, 그룹장이면 왼쪽 위에 작은 별, 오른쪽 위 구석에 상태 아이콘 셋까지(아주 작게, 해로운 것은 빨간 테두리), 타일 아래 마력 한 줄.
+/// 체력을 모르면(아직 알림 전) 바탕은 비고 이름만 — 쓰러진 것(회색으로 가득)과 구별된다.
+/// </summary>
+public sealed partial class GridTile : VBoxContainer
+{
+    private static readonly Color Dead = new("#5c5c58");
+
+    private readonly ProgressBar _health = new() { MaxValue = 100, ShowPercentage = false, MouseFilter = MouseFilterEnum.Ignore };
+    private readonly ProgressBar _mana = new() { MaxValue = 100, ShowPercentage = false, MouseFilter = MouseFilterEnum.Ignore };
+    private readonly Label _name = new()
+    {
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center,
+        ClipText = true,
+        TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
+        MouseFilter = MouseFilterEnum.Ignore
+    };
+    private readonly Label _star = new() { Text = "★", MouseFilter = MouseFilterEnum.Ignore, Visible = false };
+    private readonly StatusStrip _status = new(side: 6, most: 3, timed: false);
+
+    public GridTile()
+    {
+        MouseFilter = MouseFilterEnum.Ignore;
+        AddThemeConstantOverride("separation", 0);
+
+        _health.CustomMinimumSize = new Vector2(PartyColumn.TileWide, PartyColumn.TileTall);
+        StyleBoxFlat ground = Greybox.Plate();
+        ground.SetContentMarginAll(0);
+        _health.AddThemeStyleboxOverride("background", ground);
+
+        _mana.CustomMinimumSize = new Vector2(PartyColumn.TileWide, PartyColumn.ManaTall);
+        _mana.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = new Color("#0f0f0f") });
+        _mana.AddThemeStyleboxOverride("fill", Greybox.Fill(Greybox.Mana));
+
+        _name.AddThemeFontSizeOverride("font_size", 10);
+        _name.AddThemeColorOverride("font_outline_color", new Color("#030303"));
+        _name.AddThemeConstantOverride("outline_size", 2);
+        _name.SetAnchorsPreset(LayoutPreset.FullRect);
+        _name.OffsetLeft = 3;
+        _name.OffsetRight = -3;
+        // 위 구석(별·상태 아이콘)을 비켜 조금 아래로.
+        _name.OffsetTop = 5;
+        _health.AddChild(_name);
+
+        _star.AddThemeFontSizeOverride("font_size", 8);
+        _star.AddThemeColorOverride("font_color", Greybox.Title);
+        _star.AddThemeColorOverride("font_outline_color", new Color("#030303"));
+        _star.AddThemeConstantOverride("outline_size", 2);
+        _star.Position = new Vector2(2, -2);
+        _health.AddChild(_star);
+
+        _status.MouseFilter = MouseFilterEnum.Ignore;
+        _status.SetAnchorsPreset(LayoutPreset.TopRight);
+        _status.GrowHorizontal = GrowDirection.Begin;
+        _health.AddChild(_status);
+
+        AddChild(_health);
+        AddChild(_mana);
+    }
+
+    public void Show(string name, bool leader, int? health, int? mana, IReadOnlyList<StatusBadge> statuses)
+    {
+        _name.Text = name;
+        _star.Visible = leader;
+
+        bool dead = health is 0;
+        _health.Value = dead ? 100 : health ?? 0;
+        _health.AddThemeStyleboxOverride("fill", Greybox.Fill(dead ? Dead : health <= 15 ? Greybox.Gone : Greybox.Health));
+        _name.AddThemeColorOverride("font_color", leader ? Greybox.Title : Greybox.Text);
+
+        _mana.Value = mana ?? 0;
+        _mana.Modulate = mana is null ? Colors.Transparent : Colors.White;
+        _status.Show(statuses);
+    }
+}
+
+/// <summary>
+/// What a party member's frame shows — health and mana %, when known, what is on them (icons only), and the exact numbers
+/// when the server sends them (0x5E 종류 6 꼬리, 2026-09-27 — 타일에는 적지 않고 안내에만).
+/// </summary>
+public sealed record MemberLook(int? Health, int? Mana, IReadOnlyList<StatusBadge> Statuses, VitalNumbers? Numbers = null);

@@ -245,6 +245,10 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     // 그룹원마다 마지막으로 온 체력·마력 %·상태 그림(0x5E 종류 6).
     private readonly ConcurrentDictionary<uint, PartyMemberStatus> _members = new();
+
+    // 그룹원·봇의 체력·마력 숫자(종류 6·4 끝의 꼬리, 2026-09-27). 옛 서버면 비어 있다.
+    private readonly ConcurrentDictionary<uint, VitalNumbers> _memberNumbers = new();
+    private VitalNumbers? _companionNumbers;
     private CompanionKit? _companionKit;
     private int _companionKitCount;
     private volatile PartyRoster _roster = PartyRoster.Alone;
@@ -418,6 +422,14 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private volatile string _unread = string.Empty;
     private volatile int _unreadCount;
 
+    /// <summary>
+    /// 서버에서 마지막으로 무엇이든 받은 때(UTC). 서버는 10초마다 심장박동(0x3B)을 보내므로, 이것이 오래되면 접속이 죽은 것이다 —
+    /// 소켓이 닫히지 않은 채 조용해진 접속은 받기 루프가 끝나지 않아 달리 알 길이 없다(동료 봇 기록, 2026-09-27).
+    /// </summary>
+    public DateTime LastHeard => new(Interlocked.Read(ref _lastHeardTicks), DateTimeKind.Utc);
+
+    private long _lastHeardTicks = DateTime.UtcNow.Ticks;
+
     /// <summary>Who is in our group, as the profile last said. Alone until asked for (<see cref="AskProfileAsync" />).</summary>
     public PartyRoster Roster => _roster;
 
@@ -441,6 +453,12 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>그룹원의 체력·마력 %·상태 그림(0x5E 종류 6, 서버가 1초마다). 아직 없거나 그룹이 끝났으면 null.</summary>
     public PartyMemberStatus? MemberStatus(uint serial) => _members.TryGetValue(serial, out PartyMemberStatus? member) ? member : null;
+
+    /// <summary>봇의 체력·마력 숫자(0x5E 종류 4 꼬리). 옛 서버면 null — 그때는 %만.</summary>
+    public VitalNumbers? CompanionNumbers => _companionNumbers;
+
+    /// <summary>그룹원의 체력·마력 숫자(0x5E 종류 6 꼬리). 옛 서버거나 아직 없으면 null — 그때는 %만.</summary>
+    public VitalNumbers? MemberNumbers(uint serial) => _memberNumbers.TryGetValue(serial, out VitalNumbers? numbers) ? numbers : null;
 
     /// <summary>그룹원 이름으로 — 멀리 있어 보이지 않는 그룹원도 목록(0x39)의 이름과 짝짓는다.</summary>
     public PartyMemberStatus? MemberStatus(string name) =>
@@ -522,6 +540,7 @@ public sealed class WorldClient(WorldSession session) : IDisposable
         while (!cancellationToken.IsCancellationRequested)
         {
             PacketFrame frame = await session.Connection.ReceiveAsync(cancellationToken);
+            Interlocked.Exchange(ref _lastHeardTicks, DateTime.UtcNow.Ticks);
 
             switch (frame.Command)
             {
@@ -710,6 +729,7 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                                 if (_companion is null)
                                 {
                                     _companionLife = null;
+                                    _companionNumbers = null;
                                     _companionKit = null;
                                     _companionKitCount++;
                                 }
@@ -721,6 +741,7 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                                 break;
                             case World.Companion.VitalsKind:
                                 _companionLife = World.Companion.ReadLife(tieBody);
+                                _companionNumbers = PartyNumbers.ReadLife(tieBody);
                                 break;
                             case World.Companion.MemberKind:
                                 PartyMemberStatus member = World.Companion.ReadMember(tieBody);
@@ -729,10 +750,20 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                                 if (member.Serial == 0)
                                 {
                                     _members.Clear();
+                                    _memberNumbers.Clear();
                                 }
                                 else
                                 {
                                     _members[member.Serial] = member;
+
+                                    if (PartyNumbers.ReadMember(tieBody) is { } numbers)
+                                    {
+                                        _memberNumbers[member.Serial] = numbers;
+                                    }
+                                    else
+                                    {
+                                        _memberNumbers.TryRemove(member.Serial, out _);
+                                    }
                                 }
 
                                 break;

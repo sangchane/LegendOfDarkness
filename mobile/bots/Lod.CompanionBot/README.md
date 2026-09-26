@@ -22,7 +22,16 @@ DOTNET_ROOT=../../../.tools/dotnet-9.0.317 ../../../.tools/dotnet-9.0.317/dotnet
 포션 기준은 설정 `PotionHealthPercent`·`PotionManaPercent` 로 바꾼다. 포션·장비는 주인이 앱의 봇 장비창에서 넘겨 준다.
 레벨·마법·체력은 서버가 부를 때마다 맞춘다(부른 사람 레벨 −2). 자세한 것은 `docs/mobile-client.md` 「동료 봇」.
 
+## 기록(2026-09-27)
+
+화면(systemd journal)과 파일에 함께 적는다. 파일은 설정 파일 옆 `logs/설정파일이름.log`(설정 `LogFile` 로 바꿈, 빈 글이면 끔),
+1MB 마다 `.1`~`.4` 로 밀려 다섯 개까지. 상태가 바뀔 때만 적고 5분마다 한 줄 요약:
+접속·재접속(몇 번째 시도·걸린 시간·끊긴 까닭·마지막 패킷이 몇 초 전) · 주인 serial 이 바뀜 · 자리 잡음·맵 이동 ·
+주인이 15초 넘게 안 보이거나 12칸 넘게 떨어짐(그리고 돌아옴) · 서버 소식이 30초 없음(90초면 끊고 다시 접속) ·
+판단 중 예외(루프는 계속 돈다, 같은 예외는 1분에 한 번) · 못 읽은 패킷 · 기다리지 않은 일의 예외.
+
 ## 클라우드
 
-`scripts/cloud-server.sh deploy` 가 이 프로그램과 벽 파일을 올리고 `lod-bot` 서비스를 깐다.
-처음 한 번 `scripts/cloud-server.sh bot-config` — 비밀번호를 묻고 클라우드의 `~/lod-bot/companion-bot.json` 에만 적는다.
+봇마다 `lod-bot@N`(N = 서버 설정 `CompanionBots` 의 N 번째 이름, 다섯까지). `scripts/cloud-server.sh deploy` 가 이 프로그램과 벽 파일을
+올리고 서비스를 깐다. `scripts/cloud-server.sh bot-config` — 없는 봇의 설정(`~/lod-bot/companion-bot-N.json`, 비밀번호는 클라우드에만)을
+만든다. 비밀번호는 맥 `~/LOD-backups/companion-bot-password.txt` 에서 읽고 없으면 묻는다. 기록 `bot-logs [줄수] [봇번호]`, 파일은 `~/lod-bot/logs/`.

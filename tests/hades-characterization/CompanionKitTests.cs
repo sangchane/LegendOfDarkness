@@ -72,6 +72,45 @@ public sealed class CompanionKitTests : IDisposable
         await Until(() => owner.CompanionKit?.Carried.Any(c => c.Name == "쿠룸" && c.Stacks == 4) == true, () => "봇 가방 포션이 사람에게 오지 않았습니다.");
     }
 
+    /// <summary>
+    /// 반지·장갑처럼 두 짝을 끼는 것은 한쪽이 차 있으면 다른 쪽에 낀다 — 템플릿은 한쪽(홍옥반지 7 왼손, 가죽장갑 9 왼팔)만 적어 두어 봇에게
+    /// 한 짝만 입혀졌다(사용자, 2026-09-27). 그리고 준 장비·포션은 봇이 끊겼다 다시 들어와 다시 불려도(<c>Prepare</c>·기본 장비) 남는다.
+    /// </summary>
+    [Fact]
+    public async Task The_bot_wears_a_pair_of_rings_and_gloves_and_keeps_what_it_was_given_across_a_reconnect()
+    {
+        using IsolatedHadesServer server = Ready(ownerLevel: 40);
+        WorldClient owner = await Enter(server, OwnerName);
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName);
+        await Call(owner, bot);
+
+        foreach (string name in new[] { "홍옥반지", "홍옥반지", "가죽장갑", "가죽장갑" })
+        {
+            int slot = await Give(owner, name);
+            await owner.GiveToCompanionAsync(slot, 0, _deadline.Token);
+            await Until(() => !owner.Pack.Any(one => one.Slot == slot && one.Name == name), () => $"{name} 이 주인 가방에 남았습니다(먼저 준 한 짝이 돌아왔나): 봇 {Worn(bot)} · {owner.Said}");
+        }
+
+        await Until(() => Wears(bot, 7, "홍옥반지") && Wears(bot, 8, "홍옥반지") && Wears(bot, 9, "가죽장갑") && Wears(bot, 10, "가죽장갑"),
+            () => $"두 짝을 다 끼지 않았습니다: {Worn(bot)} · 주인 가방 {string.Join(",", owner.Pack.Select(p => p.Name))}");
+        await Until(() => owner.CompanionKit?.Worn.Count(w => w.Slot is 7 or 8 or 9 or 10) == 4, () => "봇 장비창에 네 자리가 다 오지 않았습니다.");
+
+        int kurum = await Give(owner, "쿠룸", 10);
+        await owner.GiveToCompanionAsync(kurum, 0, _deadline.Token);
+        await Until(() => AutoPotion.Count(bot.Pack, "쿠룸") == 10, () => $"쿠룸: 봇 {AutoPotion.Count(bot.Pack, "쿠룸")}");
+
+        // 봇 프로그램이 끊겼다 다시 들어온다(봇 서버 재시작과 같은 길 — 나갈 때 저장하고 들어올 때 읽는다). 주인이 다시 부른다.
+        bot.Dispose();
+        await Until(() => owner.Said.Contains("떠났습니다", StringComparison.Ordinal), () => $"봇이 떠나지 않았습니다: {owner.Said}");
+        WorldClient again = await Enter(server, CompanionCallTests.BotName);
+        await Call(owner, again);
+
+        await Until(() => Wears(again, 7, "홍옥반지") && Wears(again, 8, "홍옥반지") && Wears(again, 9, "가죽장갑") && Wears(again, 10, "가죽장갑"),
+            () => $"다시 들어온 봇이 준 장비를 잃었습니다: {Worn(again)}");
+        await Until(() => AutoPotion.Count(again.Pack, "쿠룸") == 10, () => $"다시 들어온 봇의 쿠룸: {AutoPotion.Count(again.Pack, "쿠룸")}");
+        await Until(() => owner.CompanionKit?.Carried.Any(c => c.Name == "쿠룸" && c.Stacks == 10) == true, () => "봇 장비창에 쿠룸이 오지 않았습니다.");
+    }
+
     [Fact]
     public async Task The_bot_recasts_a_buff_the_owner_lost_and_drinks_its_potions()
     {

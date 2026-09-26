@@ -266,6 +266,32 @@ public static class Greybox
     public static StyleBoxFlat Fill(Color paint) => new() { BgColor = paint };
 
     /// <summary>
+    /// The numbers written on a bar (2026-09-27 — 막대 옆 따로 적던 숫자를 막대 안에 얹어 판을 좁힌다). Light letters with a dark
+    /// outline, so they read the same over the filled colour and over the dark empty part. Centred across the whole bar.
+    /// </summary>
+    public static Label OnBar(ProgressBar bar, int fontSize)
+    {
+        Label text = new()
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        text.AddThemeFontSizeOverride("font_size", fontSize);
+        text.AddThemeColorOverride("font_color", Text);
+        text.AddThemeColorOverride("font_outline_color", new Color("#030303"));
+        // 작은 글자는 외곽선이 두꺼우면 획이 뭉개진다.
+        text.AddThemeConstantOverride("outline_size", fontSize <= 9 ? 2 : 3);
+        text.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        // 막대보다 글자가 조금 높다 — 위아래로 넘쳐도 가운데에 선다.
+        text.OffsetTop = -4;
+        text.OffsetBottom = 4;
+        bar.AddChild(text);
+
+        return text;
+    }
+
+    /// <summary>
     /// Marks a zone the layout has to respect. A guide, not part of the game: it goes away once the rule it
     /// shows has been checked on a device.
     /// </summary>

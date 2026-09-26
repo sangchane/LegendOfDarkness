@@ -86,7 +86,8 @@
 		"DeathDropsItems": false,
 		// 동료 봇(성직자) 계정 이름 — 봇 프로그램(mobile/bots/Lod.CompanionBot)이 이 이름으로 접속한다. 비밀번호는 봇 쪽 설정 파일에만.
 		// 보낸 동료는 CompanionHomeMap(0 이면 StartingMap)의 CompanionHomePosition(없으면 StartingPosition)에서 기다린다.
-		"CompanionBots": [ "동료사제" ],
+		// 다섯까지(사용자 결정 2026-09-27) — 클라우드는 lod-bot@1~5 가 이 차례대로 하나씩 접속한다(scripts/cloud-server.sh bot-config).
+		"CompanionBots": [ "동료사제", "동료사제2", "동료사제3", "동료사제4", "동료사제5" ],
 		"CompanionHomeMap": 0,
 
 		// Monsters | NPCs

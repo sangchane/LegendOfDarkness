@@ -7,11 +7,11 @@
 #   scripts/cloud-server.sh backup    클라우드의 캐릭터를 맥(~/LOD-backups/cloud)으로 받아 온다
 #   scripts/cloud-server.sh app       앱 주소(server.cfg)를 클라우드로 — 맥 서버로 돌아가려면 lod-server.sh config
 #   scripts/cloud-server.sh bot-config  동료 봇 설정 파일을 클라우드에 만든다(비밀번호를 여기서 묻고 클라우드에만 적는다)
-#   scripts/cloud-server.sh bot-logs [줄수]   동료 봇 기록
+#   scripts/cloud-server.sh bot-logs [줄수] [봇번호]   동료 봇 기록(줄마다 [봇 이름]) — 파일 기록은 클라우드 ~/lod-bot/logs/
 #
-# 동료 봇(성직자, mobile/bots/Lod.CompanionBot)은 서버와 같은 기계에서 lod-bot 으로 돈다. deploy 가 봇 프로그램과 맵 벽
-# 파일(앱의 map*.txt)도 올린다. 봇 계정 이름은 서버 설정 CompanionBots 와 같아야 하고, 비밀번호는 클라우드의
-# ~/lod-bot/companion-bot.json 에만 있다 — 그 파일이 없으면 lod-bot 은 뜨지 않는다.
+# 동료 봇(성직자, mobile/bots/Lod.CompanionBot)은 서버와 같은 기계에서 봇마다 lod-bot@1~5 로 돈다(2026-09-27 — 다섯까지).
+# N 번째 봇 = 서버 설정 CompanionBots 의 N 번째 이름, 설정은 클라우드의 ~/lod-bot/companion-bot-N.json(비밀번호, 여기에만) —
+# 그 파일이 없으면 lod-bot@N 은 뜨지 않는다. deploy 가 봇 프로그램과 맵 벽 파일(앱의 map*.txt)도 올린다.
 #
 # 주소는 LOD_CLOUD_IP(공인 IP) 하나. 열쇠는 ~/.ssh/lod_oracle. 올린 뒤로는 **클라우드의 캐릭터가 진짜**다 —
 # deploy 는 캐릭터(database/server/aislings)를 덮지 않는다.
@@ -23,7 +23,7 @@ IP="${LOD_CLOUD_IP:?LOD_CLOUD_IP=<공인 IP> 를 붙여 주세요}"
 KEY="$HOME/.ssh/lod_oracle"
 HOST="ubuntu@$IP"
 REMOTE=/home/ubuntu/lod          # 클라우드 쪽 FORK
-BOT_REMOTE=/home/ubuntu/lod-bot  # 동료 봇: app/(프로그램) · world/(맵 벽) · companion-bot.json(비밀번호, 여기에만)
+BOT_REMOTE=/home/ubuntu/lod-bot  # 동료 봇: app/(프로그램) · world/(맵 벽) · companion-bot-N.json(비밀번호, 여기에만) · logs/
 BOT_PROJECT="$ROOT/mobile/bots/Lod.CompanionBot"
 SSH=(ssh -i "$KEY" -o StrictHostKeyChecking=accept-new "$HOST")
 
@@ -50,7 +50,20 @@ upload() {
     remote "find $REMOTE -name '.*.??????' -type f -delete"
 }
 
-# 동료 봇 — 프로그램(.NET, 서버와 같은 런타임)과 맵 벽 파일을 올리고 lod-bot 서비스를 깐다. 여러 번 해도 같다.
+# 봇 이름 — 서버 설정 CompanionBots 차례대로. lod-bot@N 은 N 번째 이름으로 접속한다.
+bot_names() {
+    python3 - "$ROOT/scripts/server-config/LoruleConfig.template.json" <<'PY'
+import re, sys
+text = open(sys.argv[1], encoding="utf-8").read()
+listed = re.search(r'"CompanionBots"\s*:\s*\[([^\]]*)\]', text).group(1)
+print("\n".join(re.findall(r'"([^"]+)"', listed)))
+PY
+}
+
+# 설정 파일이 있는 봇마다(lod-bot@N) 무엇을 한다 — 없으면 예전 하나짜리 lod-bot.
+BOT_EACH='shopt -s nullglob; bots=(); for f in /home/ubuntu/lod-bot/companion-bot-*.json; do n=${f##*-}; bots+=("lod-bot@${n%.json}"); done; [ ${#bots[@]} -gt 0 ] || bots=(lod-bot)'
+
+# 동료 봇 — 프로그램(.NET, 서버와 같은 런타임)과 맵 벽 파일을 올리고 lod-bot@ 서비스를 깐다. 여러 번 해도 같다.
 bot_upload() {
     local out
     out="$(mktemp -d)"
@@ -58,25 +71,25 @@ bot_upload() {
         -c Release -o "$out" -p:UseAppHost=false --nologo -v quiet >/dev/null
 
     remote "mkdir -p $BOT_REMOTE/app $BOT_REMOTE/world"
-    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'companion-bot.json' "$out/" "$HOST:$BOT_REMOTE/app/"
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'companion-bot*.json' "$out/" "$HOST:$BOT_REMOTE/app/"
     rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --include 'map*.txt' --exclude '*' \
         "$ROOT/mobile/client/assets/world/" "$HOST:$BOT_REMOTE/world/"
     rm -rf "$out"
 
     remote 'bash -s' <<'SH'
 set -euo pipefail
-sudo tee /etc/systemd/system/lod-bot.service >/dev/null <<UNIT
+sudo tee /etc/systemd/system/lod-bot@.service >/dev/null <<UNIT
 [Unit]
-Description=LOD companion bot (priest)
+Description=LOD companion bot %i (priest)
 After=lod.service
 # 비밀번호가 든 설정 파일이 있어야 뜬다 — scripts/cloud-server.sh bot-config
-ConditionPathExists=/home/ubuntu/lod-bot/companion-bot.json
+ConditionPathExists=/home/ubuntu/lod-bot/companion-bot-%i.json
 
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/lod-bot
 Environment=DOTNET_ROOT=/opt/dotnet
-ExecStart=/opt/dotnet/dotnet /home/ubuntu/lod-bot/app/Lod.CompanionBot.dll /home/ubuntu/lod-bot/companion-bot.json
+ExecStart=/opt/dotnet/dotnet /home/ubuntu/lod-bot/app/Lod.CompanionBot.dll /home/ubuntu/lod-bot/companion-bot-%i.json
 Restart=always
 RestartSec=10
 
@@ -84,23 +97,49 @@ RestartSec=10
 WantedBy=multi-user.target
 UNIT
 sudo systemctl daemon-reload
-sudo systemctl enable lod-bot >/dev/null
+
+shopt -s nullglob
+numbered=(/home/ubuntu/lod-bot/companion-bot-*.json)
+for f in "${numbered[@]}"; do
+    n=${f##*-}
+    sudo systemctl enable "lod-bot@${n%.json}" >/dev/null 2>&1
+done
+
+# 예전 하나짜리(lod-bot · companion-bot.json)는 번호 붙은 설정이 생기면 끈다 — 같은 계정이 둘 접속하지 않게.
+if [ ${#numbered[@]} -gt 0 ] && systemctl list-unit-files lod-bot.service >/dev/null 2>&1; then
+    sudo systemctl disable --now lod-bot >/dev/null 2>&1 || true
+fi
 SH
 }
 
-# 봇 설정 파일을 클라우드에 만든다. 비밀번호는 여기서 한 번 묻고 클라우드 파일에만 적는다(맵에도 저장소에도 남기지 않는다).
-# 계정 이름은 서버 설정 CompanionBots 의 첫 이름(scripts/server-config/LoruleConfig.template.json)과 같게.
+# 봇 설정 파일(companion-bot-N.json)을 클라우드에 만든다 — 이미 있는 것은 그대로 둔다. 비밀번호는 맥의
+# ~/LOD-backups/companion-bot-password.txt(LOD_BOT_PASSWORD_FILE 로 바꿈)에서 읽고, 없으면 여기서 한 번 묻는다 —
+# 저장소에는 남기지 않는다. 예전 하나짜리 companion-bot.json 은 1번(companion-bot-1.json)으로 이름만 바꾼다.
+# 계정이 없으면 봇이 처음 접속할 때 성직자로 만든다(BotLogin).
 bot_config() {
-    local name password
-    name="$(sed -n 's/.*"CompanionBots": \[ *"\([^"]*\)".*/\1/p' "$ROOT/scripts/server-config/LoruleConfig.template.json")"
-    read -r -s -p "봇 계정($name) 비밀번호: " password
-    echo
+    local file="${LOD_BOT_PASSWORD_FILE:-$HOME/LOD-backups/companion-bot-password.txt}" password n=0 name
+    if [ -f "$file" ]; then
+        password="$(head -n 1 "$file")"
+    else
+        read -r -s -p "새 봇 계정 비밀번호(모든 봇 같게): " password
+        echo
+    fi
     [ -n "$password" ] || { echo "비밀번호가 비었습니다." >&2; return 1; }
 
-    printf '{\n  "Host": "127.0.0.1",\n  "LoginPort": 2610,\n  "Name": "%s",\n  "Password": "%s",\n  "MapFolder": "world",\n  "HealOwnerPercent": 70,\n  "HealSelfPercent": 50\n}\n' \
-        "$name" "$password" | remote "mkdir -p $BOT_REMOTE && umask 077 && cat > $BOT_REMOTE/companion-bot.json"
-    remote 'sudo systemctl restart lod-bot'
-    echo "봇 설정을 적고 lod-bot 을 켰습니다 — 계정이 없으면 봇이 처음 접속할 때 성직자로 만듭니다."
+    remote "mkdir -p $BOT_REMOTE && cd $BOT_REMOTE && if [ -f companion-bot.json ] && [ ! -f companion-bot-1.json ]; then mv companion-bot.json companion-bot-1.json; fi"
+
+    while IFS= read -r name; do
+        n=$((n + 1))
+        printf '{\n  "Host": "127.0.0.1",\n  "LoginPort": 2610,\n  "Name": "%s",\n  "Password": "%s",\n  "MapFolder": "world",\n  "HealOwnerPercent": 70,\n  "HealSelfPercent": 50\n}\n' \
+            "$name" "$password" | remote "cd $BOT_REMOTE && umask 077 && if [ -f companion-bot-$n.json ]; then cat >/dev/null; echo '$n 번 봇 설정은 이미 있습니다 — 그대로 둡니다.'; else cat > companion-bot-$n.json; echo '$n 번 봇($name) 설정을 적었습니다.'; fi"
+    done < <(bot_names)
+
+    bot_upload
+    bot_restart
+}
+
+bot_restart() {
+    remote "$BOT_EACH; sudo systemctl restart \"\${bots[@]}\""
 }
 
 setup() {
@@ -177,7 +216,7 @@ restart() {
         if remote 'ss -ltn | grep -q ":2610 " && ss -ltn | grep -q ":2615 "'; then
             echo "켰습니다 — $IP · 로그인 2610 · 게임 2615"
             # 서버가 새로 뜨면 봇도 다시 붙게 한다(설정 파일이 없으면 systemd 가 조건으로 건너뛴다).
-            remote 'sudo systemctl restart lod-bot' || true
+            bot_restart || true
             return
         fi
         sleep 1
@@ -189,7 +228,14 @@ restart() {
 
 logs() { remote "journalctl -u lod -n ${1:-40} --no-pager"; }
 
-bot_logs() { remote "journalctl -u lod-bot -n ${1:-40} --no-pager"; }
+# 봇 기록 — 줄마다 [봇 이름]. 봇 번호를 주면 그 봇만.
+bot_logs() {
+    if [ -n "${2:-}" ]; then
+        remote "journalctl -u lod-bot@$2 -n ${1:-40} --no-pager"
+    else
+        remote "journalctl -u 'lod-bot*' -n ${1:-40} --no-pager"
+    fi
+}
 
 backup() {
     local dir="$HOME/LOD-backups/cloud" name="aislings-$(date +%Y%m%d-%H%M).tar.gz"
@@ -202,11 +248,11 @@ case "${1:-status}" in
     setup) setup ;;
     deploy) upload; bot_upload; restart ;;
     restart) restart ;;
-    status) remote 'systemctl is-active lod; echo "봇: $(systemctl is-active lod-bot)"; ss -ltn | grep -E ":(2610|2615) "' ;;
+    status) remote "systemctl is-active lod; $BOT_EACH; for b in \"\${bots[@]}\"; do echo \"\$b: \$(systemctl is-active \$b)\"; done; ss -ltn | grep -E ':(2610|2615) '" ;;
     logs) logs "${2:-40}" ;;
     backup) backup ;;
     app) app ;;
     bot-config) bot_config ;;
-    bot-logs) bot_logs "${2:-40}" ;;
+    bot-logs) bot_logs "${2:-40}" "${3:-}" ;;
     *) echo "쓸 수 있는 것: setup deploy restart status logs backup app bot-config bot-logs"; exit 2 ;;
 esac
