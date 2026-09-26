@@ -90,6 +90,12 @@ public sealed partial class AbilityBar : Control
     /// <summary>How many seconds one slot still has to wait, asked of the server every frame.</summary>
     public Func<bool, int, int>? Cooling { get; set; }
 
+    /// <summary>
+    /// 내 직업(Hades <c>Class</c> 번호, 모르면 null)과 레벨 — 목록이 아직 못 배운 내 직업 기술을 "N레벨에 배움" 으로 적는다
+    /// (<see cref="LearnLadder" />, 사용자 요청 2026-09-26).
+    /// </summary>
+    public Func<(int? Path, int Level)>? Standing { get; set; }
+
     public event Action<int>? SkillUsed;
     public event Action<int>? SpellUsed;
 
@@ -278,6 +284,14 @@ public sealed partial class AbilityBar : Control
             }
         }
 
+        // --learn-preview 직업:레벨 — 서버 없이, 표에서 그 레벨까지를 배운 셈 친다.
+        if (character.Length == 0 && Main.LearnPreview is { } preview)
+        {
+            List<LadderStep> had = [.. Main.Ladder.Steps.Where(step => step.Path == preview.Path && step.Level <= preview.Level)];
+            skills = [new LearnedSkill(1, 1, "Assail (Lev:1/100)"), .. had.Where(step => !step.Spell).Select((step, at) => new LearnedSkill(73 + at, step.Icon, $"{step.Name} (Lev:1/100)"))];
+            spells = [.. had.Where(step => step.Spell).Select((step, at) => new LearnedSpell(1 + at, step.Icon, SpellTargetType.NoTarget, $"{step.Name} (Lev:1/100)", string.Empty, 1))];
+        }
+
         _learnedSkills = skills;
         _learnedSpells = spells;
         Redraw();
@@ -420,8 +434,9 @@ public sealed partial class AbilityBar : Control
 
     /// <summary>
     /// Opens the picker above the slot just held — "비우기" pinned above a combined, scrolling roster of every
-    /// learned skill and spell. Picking one puts it there (swapping with wherever it already sat), even across
-    /// the 기술/마법 switch.
+    /// learned skill and spell and, dimmed with "N레벨에 배움", my class's ones still to come, all in level order
+    /// (<see cref="LearnLadder.Roster" />). Picking a learned one puts it there (swapping with wherever it already sat),
+    /// even across the 기술/마법 switch; a dimmed one does nothing.
     /// </summary>
     private void OpenPicker(int index)
     {
@@ -461,19 +476,27 @@ public sealed partial class AbilityBar : Control
         _clearRow.Disabled = currentSlot == 0;
         _clearRow.Modulate = currentSlot == 0 ? new Color(1, 1, 1, 0.4f) : Colors.White;
 
-        foreach (LearnedSkill skill in _learnedSkills)
+        (int? path, int level) = Standing?.Invoke() ?? (null, 0);
+
+        if (path is null && Main.LearnPreview is { } preview)
         {
-            Button row = Row(skill.Name, Frame(SkillSheet, skill.Icon));
-            int pickedSlot = skill.Slot;
-            row.Pressed += () => Pick(position, spell: false, pickedSlot);
-            _pickerList.AddChild(row);
+            (path, level) = (preview.Path, preview.Level);
         }
 
-        foreach (LearnedSpell spell in _learnedSpells)
+        foreach (RosterRow entry in Main.Ladder.Roster(path, level, _learnedSkills, _learnedSpells))
         {
-            Button row = Row(spell.Name, Frame(SpellSheet, spell.Icon));
-            int pickedSlot = spell.Slot;
-            row.Pressed += () => Pick(position, spell: true, pickedSlot);
+            Button row = Row(entry.Name, Frame(entry.Spell ? SpellSheet : SkillSheet, entry.Icon));
+
+            if (entry.Slot is { } pickedSlot)
+            {
+                bool pickedSpell = entry.Spell;
+                row.Pressed += () => Pick(position, pickedSpell, pickedSlot);
+            }
+            else
+            {
+                Lock(row, entry.Level ?? 0);
+            }
+
             _pickerList.AddChild(row);
         }
 
@@ -522,6 +545,35 @@ public sealed partial class AbilityBar : Control
     }
 
     private const int PickerWidth = 220;
+
+    /// <summary>아직 못 배운 줄 — 그림은 회색, 이름은 흐리게, 오른쪽에 작은 "N레벨에 배움". 눌러도 아무 일이 없다.</summary>
+    private static void Lock(Button row, int level)
+    {
+        Color grey = new(0.45f, 0.45f, 0.45f);
+
+        foreach (string state in new[] { "icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color" })
+        {
+            row.AddThemeColorOverride(state, grey);
+        }
+
+        foreach (string state in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color" })
+        {
+            row.AddThemeColorOverride(state, Greybox.Muted);
+        }
+
+        Label when = new()
+        {
+            Text = $"{level}레벨에 배움",
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Center,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        when.SetAnchorsPreset(LayoutPreset.FullRect);
+        when.OffsetRight = -Main.Gutter;
+        when.AddThemeFontSizeOverride("font_size", 10);
+        when.AddThemeColorOverride("font_color", Greybox.Muted);
+        row.AddChild(when);
+    }
 
     private static Button Row(string name, Texture2D? icon)
     {

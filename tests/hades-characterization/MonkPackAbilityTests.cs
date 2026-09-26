@@ -131,9 +131,11 @@ public sealed class MonkPackAbilityTests : IDisposable
     /// 밀레스마을 리신 넷이 무도가 기술·마법을 가르친다 — 리신 주먹단련[11], 리신4 다라밀공[99], 리신2 단각[31] · 장풍[31] ·
     /// 금강불괴[41] · 구양신공[50]. 리신2 는 5.99 원본의 2~5번 갈래가 도적 사범 것을 베낀 채라 아무것도 못 가르쳤다 —
     /// 메뉴에 적힌 기술·레벨대로 채웠다(`build-pack-npcs.py` BLOCK_PATCH, 사용자 결정 2026-09-25).
+    /// 2026-09-26 부터 레벨이 되면 저절로 익히므로(<see cref="AutoLearnTests" />) 99레벨 무도가는 들어오며 이미 다 가졌고,
+    /// 리신들은 메뉴의 갈래마다 "이미 이 스킬을 습득 하셧습니다." 로 돌아간다.
     /// </summary>
     [Fact]
-    public async Task The_mileth_lee_sins_teach_the_monk_skills_and_spells_on_their_menus()
+    public async Task The_mileth_lee_sins_tell_a_monk_who_already_learned_by_level_that_he_has_them()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MilethId, 49, 45));
         server.Start(TimeSpan.FromMinutes(2));
@@ -146,19 +148,22 @@ public sealed class MonkPackAbilityTests : IDisposable
                      (new Tile(48, 45), "금강불괴", true), (new Tile(48, 45), "구양신공", false),
                  })
         {
-            await Converse(world, await Standing(world, teacher), what, Learned(what));
             await Until(() => spell
                     ? world.Spells.Any(s => s.Name.StartsWith(what, StringComparison.Ordinal))
                     : world.Skills.Any(s => s.Name.StartsWith(what + " (", StringComparison.Ordinal)),
-                $"리신이 익혔다고 했는데 {what}이 창에 없습니다.");
+                $"99레벨 무도가인데 {what}이 창에 없습니다.");
+            await Converse(world, await Standing(world, teacher), what, words => words == AlreadyLearned);
             await world.ShutDialogueAsync(_deadline.Token);
             await Task.Delay(300, _deadline.Token);
         }
     }
 
-    /// <summary>리신2 의 장풍[31] — 31레벨 무도가는 배우고, 30레벨은 「아직 어립니다」로 메뉴에 돌아간다.</summary>
+    /// <summary>
+    /// 리신2 의 장풍[31] — 30레벨은 「아직 어립니다」로 메뉴에 돌아간다. 31레벨은 레벨이 되어 이미 익혔으므로(2026-09-26 저절로
+    /// 익히기) 「이미 이 스킬을 습득 하셧습니다.」.
+    /// </summary>
     [Fact]
-    public async Task Lee_sin_two_teaches_jangpung_at_thirty_one_but_not_at_thirty()
+    public async Task Lee_sin_two_says_too_young_at_thirty_and_already_learned_at_thirty_one()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MilethId, 49, 45));
         server.Start(TimeSpan.FromMinutes(2));
@@ -173,13 +178,12 @@ public sealed class MonkPackAbilityTests : IDisposable
         await young.LogOutAsync(_deadline.Token);
 
         WorldClient grown = await EnterMonk(server, "monkgrown", level: 31);
-        await Converse(grown, await Standing(grown, leeSinTwo), "장풍", Learned("장풍"));
         await Until(() => grown.Spells.Any(s => s.Name.StartsWith("장풍", StringComparison.Ordinal)),
-            "31레벨이 장풍을 익혔다는데 마법창에 없습니다.");
+            "31레벨 무도가인데 장풍이 마법창에 없습니다.");
+        await Converse(grown, await Standing(grown, leeSinTwo), "장풍", words => words == AlreadyLearned);
     }
 
-    private static Func<string, bool> Learned(string what) =>
-        words => words.StartsWith(what + "을 익히셧습니다") || words.StartsWith(what + "를 익히셧습니다");
+    private const string AlreadyLearned = "이미 이 스킬을 습득 하셧습니다.";
 
     private async Task<WorldClient> EnterMonk(IsolatedHadesServer server, string name, int level)
     {
