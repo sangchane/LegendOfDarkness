@@ -1,0 +1,1927 @@
+{
+ "아카이브": "setoa.dat",
+ "크기": 19157630,
+ "md5": "33ab203ffa4a7de675bc9ec307fe0aff",
+ "항목": {
+  "ac.epf": {
+   "크기": 47980,
+   "md5": "ef64c511c5fed12869fa3a55b84354c2"
+  },
+  "addimg.spf": {
+   "크기": 1605,
+   "md5": "256cc51d2f25b9cfcb403162679108ab"
+  },
+  "album.epf": {
+   "크기": 6398,
+   "md5": "ddeae6f699c88f333ca908e0a4c6620d"
+  },
+  "album_b.epf": {
+   "크기": 2716,
+   "md5": "4e969acdae379f225c20122f6512a9a8"
+  },
+  "albumd.epf": {
+   "크기": 460,
+   "md5": "74d58537a2c00fa7bb5c7a0a84b45ec2"
+  },
+  "albums.epf": {
+   "크기": 460,
+   "md5": "3eb802c9b28d5c6f4e1a3ef06ae3f3f8"
+  },
+  "backgrnd.spf": {
+   "크기": 308276,
+   "md5": "0b2f4902cd0604534a05f595a20bcc67"
+  },
+  "bsvrbot.epf": {
+   "크기": 4318,
+   "md5": "471a5f8b1590a60b981a12511c6db1da"
+  },
+  "bsvrmid.epf": {
+   "크기": 3928,
+   "md5": "08032d85db6f537eca40d485b89ec0b8"
+  },
+  "bsvrtop.epf": {
+   "크기": 26158,
+   "md5": "ebaeb36f4f681f5a6053b3210fbdb70e"
+  },
+  "btn220.epf": {
+   "크기": 7964,
+   "md5": "22ae77bad6b97e3c7efbf7f942385234"
+  },
+  "butt001.epf": {
+   "크기": 107448,
+   "md5": "3745302c287cd819811f39347d8dc18e"
+  },
+  "buttonex.epf": {
+   "크기": 13328,
+   "md5": "8a36e334baffae23bf18538bd75123ea"
+  },
+  "bw_back.epf": {
+   "크기": 307228,
+   "md5": "b19165ff233b19d80cfa3ba410f0570d"
+  },
+  "bw_check.epf": {
+   "크기": 168,
+   "md5": "e9dcb97e48f71b4c94c9c13fb39d7a37"
+  },
+  "bw_data.dat": {
+   "크기": 4948,
+   "md5": "769971876bd4895601067405f309a7c6"
+  },
+  "bw_flag.epf": {
+   "크기": 12108,
+   "md5": "b746ba78c6128979d1f4812f4588d52e"
+  },
+  "bw_num.epf": {
+   "크기": 238060,
+   "md5": "fe47f938a1b1adc486a28a8a6e1ba924"
+  },
+  "dlgback.epf": {
+   "크기": 4124,
+   "md5": "a041ccb6a21839c6b3e49018e29dfe5e"
+  },
+  "dlgbbs01.epf": {
+   "크기": 184248,
+   "md5": "146a5567610d72ae7e62d906a4538e46"
+  },
+  "dlgbbs02.epf": {
+   "크기": 184248,
+   "md5": "bd5c212817fcbd974bb3187a7eb3a0fe"
+  },
+  "dlgbbs03.epf": {
+   "크기": 184248,
+   "md5": "42fd5346e9122b542e17b0be27f9d4c5"
+  },
+  "dlgbg001.epf": {
+   "크기": 163996,
+   "md5": "914336700896246c1873f580b0b3693e"
+  },
+  "dlgcre00.epf": {
+   "크기": 307228,
+   "md5": "bc83c5ddb9dc175de4c2c70f11346f24"
+  },
+  "dlgcre01.epf": {
+   "크기": 11202,
+   "md5": "f67f6c2ed8a0249e275fc2b6cd6d0804"
+  },
+  "dlgcre02.epf": {
+   "크기": 2606,
+   "md5": "3704a255e82cce515c8a6fde52ca2bb7"
+  },
+  "dlgcre03.epf": {
+   "크기": 2860,
+   "md5": "5677a4492770e338c910f21ac55173d2"
+  },
+  "dlgcre04.epf": {
+   "크기": 17500,
+   "md5": "58485577ad43d38a9e03c180b6505016"
+  },
+  "dlgcre05.epf": {
+   "크기": 3320,
+   "md5": "862d62ec17f657e4a46fbddde9150417"
+  },
+  "dlgframe.epf": {
+   "크기": 2188,
+   "md5": "1b4405f2eef7666980673ef908015ee5"
+  },
+  "dlglogin.epf": {
+   "크기": 30828,
+   "md5": "016c000b3e731470949d0b6115e77cf8"
+  },
+  "dlgpass.epf": {
+   "크기": 30828,
+   "md5": "b4bdb11951c1ebe7706269e8606d89dd"
+  },
+  "dlgpass1.epf": {
+   "크기": 30828,
+   "md5": "b7edbcb63664215e4fcb4f3c6b8026d1"
+  },
+  "emot000.epf": {
+   "크기": 8172,
+   "md5": "b19981913e0c7e7305941dcb0a699671"
+  },
+  "emot001.epf": {
+   "크기": 1108,
+   "md5": "e92e84334c6d6375b07e48c2945dcd45"
+  },
+  "emot05.epf": {
+   "크기": 85854,
+   "md5": "7e25c84b15d0b1452c624093382e2304"
+  },
+  "emot06.epf": {
+   "크기": 84710,
+   "md5": "4599bfd11bd56d1e37203f378784e7c3"
+  },
+  "emot07.epf": {
+   "크기": 85618,
+   "md5": "b2b421110ecbfb3d8062704b523dd6d6"
+  },
+  "emot08.epf": {
+   "크기": 78976,
+   "md5": "9ca53b0db3c69a1da6978dd9a17b0ff8"
+  },
+  "emot09.epf": {
+   "크기": 77176,
+   "md5": "71e3d70de739904fbade886a5d3daf06"
+  },
+  "emot10.epf": {
+   "크기": 75894,
+   "md5": "b69c2fcf192cc95357228c33e81223a5"
+  },
+  "emotdlg.epf": {
+   "크기": 8428,
+   "md5": "b8f7840be88b4147fdc96809dd48d53f"
+  },
+  "equip01.epf": {
+   "크기": 79296,
+   "md5": "2a3d99bb3feed0708ce761a2fb97664b"
+  },
+  "equip02.epf": {
+   "크기": 31876,
+   "md5": "a70351499daf443bd37dafc16c44c3ce"
+  },
+  "equip03.epf": {
+   "크기": 88540,
+   "md5": "4e7bee160299a816b055befad7689d6e"
+  },
+  "equip03b.epf": {
+   "크기": 1029,
+   "md5": "b003996787a4254472d8a674a18753a4"
+  },
+  "equip04.epf": {
+   "크기": 3584,
+   "md5": "51cff1fc5842182b7f1bbd01a06737dd"
+  },
+  "equip05.epf": {
+   "크기": 4276,
+   "md5": "d1f1f3f7d950f96bad429a5593a6c4c6"
+  },
+  "equip06.epf": {
+   "크기": 2144,
+   "md5": "4267ea0738b6e67bc489d340d6881a2f"
+  },
+  "equip07.epf": {
+   "크기": 14572,
+   "md5": "9d8418161acde1a17bb421a6e8aff33c"
+  },
+  "exchange.epf": {
+   "크기": 121734,
+   "md5": "90babdb06cb6bfc721c0657f2100dd68"
+  },
+  "exchange.spf": {
+   "크기": 122782,
+   "md5": "4f6c0aff3caad3ffbcbd69007b8468b8"
+  },
+  "f001.spf": {
+   "크기": 1580,
+   "md5": "6ebc968191a6c487bb4494d04822521b"
+  },
+  "f002.spf": {
+   "크기": 1832,
+   "md5": "ed34409e5ef747cfb149f26a10f39e9d"
+  },
+  "f003.spf": {
+   "크기": 2462,
+   "md5": "01539fa8f37d584afc09f655498bca4a"
+  },
+  "f004.spf": {
+   "크기": 2462,
+   "md5": "320d999bc999e210b72c05e4e0b7fc0a"
+  },
+  "f005.spf": {
+   "크기": 2462,
+   "md5": "6e2e33f786208874c7892eaf5da81383"
+  },
+  "f006.spf": {
+   "크기": 2462,
+   "md5": "77b8dcf148ec870b7a93b2aa3aaf5096"
+  },
+  "f007.spf": {
+   "크기": 1796,
+   "md5": "8abc6f26c442fb27a6adec20d9ed1535"
+  },
+  "f008.spf": {
+   "크기": 1778,
+   "md5": "42859983f73bef0ef07c944644271712"
+  },
+  "f009.spf": {
+   "크기": 1796,
+   "md5": "36b8d73d15dfdbba97fb4e73f18398f4"
+  },
+  "f00bm.spf": {
+   "크기": 12900,
+   "md5": "ac04b4e7f85354dda7c43b6480dfcd27"
+  },
+  "f00bw.spf": {
+   "크기": 12900,
+   "md5": "77ed02bc916b9131c739150f5a09aea2"
+  },
+  "f010.spf": {
+   "크기": 1814,
+   "md5": "60de4bc1d23667cf763bbf9cd9f8d28d"
+  },
+  "f011.spf": {
+   "크기": 2030,
+   "md5": "4ac0e87d83b3a6f6d1fbb50de4873763"
+  },
+  "f012.spf": {
+   "크기": 2660,
+   "md5": "dc977d2a34f4f1361809dff1a9c6c04d"
+  },
+  "f013.spf": {
+   "크기": 2822,
+   "md5": "203cc3d87fa85721adff2f92bdbf3be7"
+  },
+  "f014.spf": {
+   "크기": 2390,
+   "md5": "f7055ca8efb38080728031634914b472"
+  },
+  "f015.spf": {
+   "크기": 2426,
+   "md5": "bd5395d91bc7dfc518752532791f6032"
+  },
+  "f016.spf": {
+   "크기": 1580,
+   "md5": "be6bc4df006e033ce08487e221749b79"
+  },
+  "f017.spf": {
+   "크기": 2264,
+   "md5": "dd4e26d431d8b310d7773ed0837282d7"
+  },
+  "f018.spf": {
+   "크기": 1796,
+   "md5": "dd03e3ac463b5db591e07f12e41bcb72"
+  },
+  "f019.spf": {
+   "크기": 1580,
+   "md5": "6158dfa80b7121e2da115233012604dd"
+  },
+  "f020.spf": {
+   "크기": 1598,
+   "md5": "6e9f7bce6f25aa307f34b10c12a10023"
+  },
+  "f021.spf": {
+   "크기": 2264,
+   "md5": "6b5321629c932f81259e6fdc3aa80e9f"
+  },
+  "f022.spf": {
+   "크기": 2624,
+   "md5": "acdd07cfa5cd2e254b27fc25d36a2fb8"
+  },
+  "f022a.spf": {
+   "크기": 2980,
+   "md5": "4f0e4905ce199d76d652e72e7f04031a"
+  },
+  "f023.spf": {
+   "크기": 1580,
+   "md5": "1b68cf84c5c79c48c52a4615d2a3e7c0"
+  },
+  "f024.spf": {
+   "크기": 1994,
+   "md5": "97730c06ac1bd7eced996bde6e5ce069"
+  },
+  "f024a.spf": {
+   "크기": 12772,
+   "md5": "d619954f9efb2dab946198d3bf864675"
+  },
+  "f025.spf": {
+   "크기": 2364,
+   "md5": "e15aac6f38f6bc1eaf50f70a48e92aa0"
+  },
+  "f026.spf": {
+   "크기": 1628,
+   "md5": "f64834cfa04d7a0501b5aacd37cb56bf"
+  },
+  "family.epf": {
+   "크기": 109297,
+   "md5": "b50edc31f4e11658f4d387e02ee43c4a"
+  },
+  "field001.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field001.txt": {
+   "크기": 915,
+   "md5": "b35db9797c7ffb9b5b75111a1ac3ced4"
+  },
+  "field002.spf": {
+   "크기": 308276,
+   "md5": "7befbf7fb296b656dc924b77893d4c32"
+  },
+  "field002.txt": {
+   "크기": 911,
+   "md5": "82542982c12c9876e5617a885400d256"
+  },
+  "field003.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field003.txt": {
+   "크기": 886,
+   "md5": "5954ccf32ed3ed6894dafe422645538c"
+  },
+  "field004.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field004.txt": {
+   "크기": 740,
+   "md5": "d9b1bffcb2c6f7ef0d0456b0d49eebf2"
+  },
+  "field005.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field005.txt": {
+   "크기": 740,
+   "md5": "d9b1bffcb2c6f7ef0d0456b0d49eebf2"
+  },
+  "field006.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field006.txt": {
+   "크기": 740,
+   "md5": "d9b1bffcb2c6f7ef0d0456b0d49eebf2"
+  },
+  "field007.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field007.txt": {
+   "크기": 740,
+   "md5": "d9b1bffcb2c6f7ef0d0456b0d49eebf2"
+  },
+  "field008.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field008.txt": {
+   "크기": 740,
+   "md5": "d9b1bffcb2c6f7ef0d0456b0d49eebf2"
+  },
+  "field009.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field009.txt": {
+   "크기": 740,
+   "md5": "d9b1bffcb2c6f7ef0d0456b0d49eebf2"
+  },
+  "field010.spf": {
+   "크기": 308276,
+   "md5": "6eef7d88cdfa2f5cb9558b983f2f29de"
+  },
+  "field010.txt": {
+   "크기": 740,
+   "md5": "d9b1bffcb2c6f7ef0d0456b0d49eebf2"
+  },
+  "friend.epf": {
+   "크기": 135928,
+   "md5": "45b36af6c2f40acf09513ab1ac319984"
+  },
+  "fw01.spf": {
+   "크기": 2501,
+   "md5": "324285fc6888b6a42df4addc4e1734c5"
+  },
+  "fw02.spf": {
+   "크기": 2862,
+   "md5": "2dbd7e4295698dca1ff4d52b9b9db272"
+  },
+  "fw03.spf": {
+   "크기": 3077,
+   "md5": "2287e463a67cd2ac76425e36d4fd66d4"
+  },
+  "fw04.spf": {
+   "크기": 2026,
+   "md5": "66ec834114b1dffda28691408131d5da"
+  },
+  "fw05.spf": {
+   "크기": 2596,
+   "md5": "8a3386799cd13a9b8dacf50fbcbdb5c5"
+  },
+  "fw06.spf": {
+   "크기": 2197,
+   "md5": "4dfd261c5bfa660c69f8a37f0cef7f69"
+  },
+  "gbicon01.epf": {
+   "크기": 10650,
+   "md5": "e0f2209897a16618d384fd0d46ee827a"
+  },
+  "gbicon02.epf": {
+   "크기": 2052,
+   "md5": "261226cf9a15b668f89d1bcc6bb4e2ee"
+  },
+  "gbicon03.epf": {
+   "크기": 464,
+   "md5": "c3aa07989134d5beb4c5824666e836c4"
+  },
+  "gbicon12.epf": {
+   "크기": 692,
+   "md5": "eea7234a75f032b0273be4395cf8c8b0"
+  },
+  "gc_btnu.spf": {
+   "크기": 2940,
+   "md5": "8763732ff1084242f1554c0d49041578"
+  },
+  "gc_dlg0.spf": {
+   "크기": 69326,
+   "md5": "88c23a2c7affc45b851459614e9c1ad1"
+  },
+  "gc_dlg1.spf": {
+   "크기": 69326,
+   "md5": "9d6c19d0138af92f915239bf375f3c3e"
+  },
+  "gc_gbtn0.spf": {
+   "크기": 5196,
+   "md5": "b6573870ce7d92567cbdc42508c1269c"
+  },
+  "gc_gbtn1.spf": {
+   "크기": 5196,
+   "md5": "5995c6c88f494fdb178b449632384741"
+  },
+  "gc_gbtn2.spf": {
+   "크기": 5196,
+   "md5": "ce9d6cf7bed06eb42fa2bf7b99259b04"
+  },
+  "gc_gbtn3.spf": {
+   "크기": 5196,
+   "md5": "08cd1199787994bacca80666c41ae966"
+  },
+  "gc_gbtn4.spf": {
+   "크기": 3652,
+   "md5": "45d9b0d12e65e0ed49626f8cfbf6ff3d"
+  },
+  "gc_gbtn5.spf": {
+   "크기": 3652,
+   "md5": "8ff7c83ee2b76c6ace6de24ead9121ae"
+  },
+  "gc_gbtn6.spf": {
+   "크기": 3652,
+   "md5": "3584086d98cb1583a9df12e73fa8c3ed"
+  },
+  "gc_gbtn7.spf": {
+   "크기": 3652,
+   "md5": "010d84078ed848df566f2076c3de9964"
+  },
+  "gc_gbtn8.spf": {
+   "크기": 3652,
+   "md5": "f8f81cd28bd353220e504b7692079fa6"
+  },
+  "gc_pane.spf": {
+   "크기": 3960,
+   "md5": "8f8d9da6726ad77b498c0ad831ee6afb"
+  },
+  "gc_pane2.spf": {
+   "크기": 3033,
+   "md5": "5ff3e097c8cfeaeca586abf467036222"
+  },
+  "gc_tab00.spf": {
+   "크기": 2526,
+   "md5": "0dea23cb98683a182b66f3df446f144d"
+  },
+  "gc_tab01.spf": {
+   "크기": 1743,
+   "md5": "0cee659af2a2bc2a7dc977e4240e7907"
+  },
+  "gc_tab10.spf": {
+   "크기": 2526,
+   "md5": "ba25cae74e5c0f69646a0bfe56780a45"
+  },
+  "gc_tab11.spf": {
+   "크기": 1743,
+   "md5": "c1936a443cb74f17db6f5385ed068e9d"
+  },
+  "groupbtn.epf": {
+   "크기": 692,
+   "md5": "70599bdc5306399444ff7019d89858d5"
+  },
+  "gset01.epf": {
+   "크기": 135928,
+   "md5": "19299abc04593e6514f767680a7beb16"
+  },
+  "gui00.pal": {
+   "크기": 768,
+   "md5": "e465b256bf986caf6c821985d28b268f"
+  },
+  "gui01.pal": {
+   "크기": 768,
+   "md5": "bee19334bdcad34c2112eca75cb05925"
+  },
+  "gui02.pal": {
+   "크기": 768,
+   "md5": "60321b3dcbe98cf0befa0e3bef3fc647"
+  },
+  "gui03.pal": {
+   "크기": 768,
+   "md5": "51697d1e1abfafa8330c42df8737fae8"
+  },
+  "gui04.pal": {
+   "크기": 768,
+   "md5": "b9c74a2771da4839c76ad201c9b98353"
+  },
+  "gui05.pal": {
+   "크기": 768,
+   "md5": "5bc7bfc9a246dcd55c0b8d933c3679c9"
+  },
+  "gui06.pal": {
+   "크기": 768,
+   "md5": "47b3a103e1e09e2d50a019076d2fd33e"
+  },
+  "gui07.pal": {
+   "크기": 768,
+   "md5": "4dc223bec6c9727a375b5d79a23b08e0"
+  },
+  "gui08.pal": {
+   "크기": 768,
+   "md5": "447ee6f21706c2776837dc5aae8fe5c2"
+  },
+  "gui09.pal": {
+   "크기": 768,
+   "md5": "8305b8e8437e2b67a35e6d4ef7649140"
+  },
+  "gui10.pal": {
+   "크기": 768,
+   "md5": "706842f3ac7d022aea91d41916a5503d"
+  },
+  "gui11.pal": {
+   "크기": 768,
+   "md5": "05fe707c567127dc3776ba3de447ed4a"
+  },
+  "gui12.pal": {
+   "크기": 768,
+   "md5": "31f73363e39797a8d1c9b93f7c34151d"
+  },
+  "gui13.pal": {
+   "크기": 768,
+   "md5": "4fa3d59ee72ce38118300654762e77b0"
+  },
+  "gui14.pal": {
+   "크기": 768,
+   "md5": "6d3887b73dce6c2d2b133ed520e2dc08"
+  },
+  "gui15.pal": {
+   "크기": 768,
+   "md5": "1a24ea4b0a9d5ed3164d09fb09e38763"
+  },
+  "gui16.pal": {
+   "크기": 768,
+   "md5": "32bac0e1d9b7053ccde08e8f675af784"
+  },
+  "gui17.pal": {
+   "크기": 768,
+   "md5": "43903fea7d0e69ed5752193d14402fdd"
+  },
+  "helpbtn.epf": {
+   "크기": 692,
+   "md5": "ab8e7268d3ff146f9a84f48ed1e0b494"
+  },
+  "ic_grou0.epf": {
+   "크기": 674,
+   "md5": "8c70be9873880cc6d7841dadef3389e2"
+  },
+  "ic_group.epf": {
+   "크기": 674,
+   "md5": "944d68961fb3d5daf0bc290c9debf27f"
+  },
+  "ic_mail.epf": {
+   "크기": 674,
+   "md5": "7ba1462658eded377c7a4d770b2b8494"
+  },
+  "ic_shot.epf": {
+   "크기": 674,
+   "md5": "f480291ecc9c6236350e39a09d797288"
+  },
+  "invback.epf": {
+   "크기": 47980,
+   "md5": "d53a2b1bf92274c7ef0cfb841a1c97f0"
+  },
+  "item001.epf": {
+   "크기": 47980,
+   "md5": "62de49ffadc36ce7807ba9f95bec4a57"
+  },
+  "item002.epf": {
+   "크기": 77284,
+   "md5": "5f1889f6731b48b2b2c4fcf081f1ceb1"
+  },
+  "item003.epf": {
+   "크기": 47980,
+   "md5": "5b2f48d1b62ffc051b3bcd31a68241bd"
+  },
+  "itemex.epf": {
+   "크기": 26470,
+   "md5": "11582dc6949883109df0b8505fc1705a"
+  },
+  "kdesc00.epf": {
+   "크기": 109544,
+   "md5": "65ff19fdb26e466b9e7a35a893a7c235"
+  },
+  "kdesc01.epf": {
+   "크기": 91772,
+   "md5": "296757d4eb4cfa5db65f4e7a83f3d505"
+  },
+  "kdesc02.epf": {
+   "크기": 73174,
+   "md5": "6a279d03e19a3f1cb87fed7f870baafa"
+  },
+  "kdesc03.epf": {
+   "크기": 80108,
+   "md5": "ab5d5081087ade8a2faa232e8ffd3366"
+  },
+  "kdesc04.epf": {
+   "크기": 72128,
+   "md5": "9a8a77b3ec332f7332d91a0c81116c95"
+  },
+  "kdesc05.epf": {
+   "크기": 51602,
+   "md5": "79ab9fa556731b09672a405fab5813f9"
+  },
+  "kdesc06.epf": {
+   "크기": 60226,
+   "md5": "9b5c4ebc0e4ad4747a69a1bb76cf04e2"
+  },
+  "kdesc07.epf": {
+   "크기": 58816,
+   "md5": "79b47627d1eac037c5f480a030d9c081"
+  },
+  "kdesc08.epf": {
+   "크기": 55508,
+   "md5": "038130de1ae0b8910f2b39b8f8a8214e"
+  },
+  "kdesc09.epf": {
+   "크기": 81248,
+   "md5": "18ee897f317269f1cb3784c816db9f6a"
+  },
+  "kdesc10.epf": {
+   "크기": 15354,
+   "md5": "ead5cd66739ffc6a17b4f586feda56f7"
+  },
+  "kdesc11.epf": {
+   "크기": 25054,
+   "md5": "ca3f4de2e6c724844120155051e4852a"
+  },
+  "key00.epf": {
+   "크기": 4537,
+   "md5": "a1394e19b201cbdce2fbda4c8b2614ec"
+  },
+  "key01.epf": {
+   "크기": 4537,
+   "md5": "9bf57a6488cc4c4fdf7ecf4805ad6c39"
+  },
+  "key02.epf": {
+   "크기": 24888,
+   "md5": "f130111827565708670c5e09a20547d0"
+  },
+  "key03.epf": {
+   "크기": 4868,
+   "md5": "c1596bc6ea51a167ed0efd2de27cd503"
+  },
+  "key04.epf": {
+   "크기": 3053,
+   "md5": "a13c7e03a73340383944d7f1d0f0ab06"
+  },
+  "key05.epf": {
+   "크기": 3025,
+   "md5": "bcc058755183320ea8030df912e040fc"
+  },
+  "key06.epf": {
+   "크기": 3025,
+   "md5": "487c374f768bd723e81cbbe0b015f587"
+  },
+  "key07.epf": {
+   "크기": 3025,
+   "md5": "ba893d1d28d41bb3bcaa49f1578aa340"
+  },
+  "key08.epf": {
+   "크기": 1513,
+   "md5": "8f9ffa097474f6a55346d0a334227bcb"
+  },
+  "key09.epf": {
+   "크기": 8317,
+   "md5": "777e73a8c00791d84c8e3d68bf78e782"
+  },
+  "key10.epf": {
+   "크기": 3673,
+   "md5": "2fb247d3f8b9522534f7514cae4e927b"
+  },
+  "key11.epf": {
+   "크기": 757,
+   "md5": "fa1669d1f5f77b3a2d4ab97602c4e872"
+  },
+  "khotkey.epf": {
+   "크기": 89124,
+   "md5": "3a91c0fefdc0ae0b80035b4b63a1ffe0"
+  },
+  "la_adv.PCX": {
+   "크기": 4190,
+   "md5": "aaa7f7b9bc8f8a502d0d895005b3a8f6"
+  },
+  "la_advc.PCX": {
+   "크기": 4305,
+   "md5": "27c9993915d5300184ce8476385c4b77"
+  },
+  "la_exit.PCX": {
+   "크기": 3100,
+   "md5": "6f7df64874915108755e32aebe2d96f4"
+  },
+  "la_exitc.PCX": {
+   "크기": 3136,
+   "md5": "e17a0b80769e5d8bc2bfa965a3466a90"
+  },
+  "la_main.PCX": {
+   "크기": 319595,
+   "md5": "b19bfebe4f95c0fc54c147225dfe8926"
+  },
+  "la_setuc.PCX": {
+   "크기": 3088,
+   "md5": "28d1ed6690b2b865235b7bb15492828b"
+  },
+  "la_setup.PCX": {
+   "크기": 3129,
+   "md5": "caea5bfd8354c3bdc5b319eebd6b23af"
+  },
+  "la_starc.pcx": {
+   "크기": 4330,
+   "md5": "5b5c381c4eccbbaf28bb91cd95300668"
+  },
+  "la_start.PCX": {
+   "크기": 4200,
+   "md5": "40d2a5a4f73c6a639d911029c7ec5ac7"
+  },
+  "lagre.txt": {
+   "크기": 448,
+   "md5": "e6092a400e587a1c413384bb4e09a567"
+  },
+  "larlist.txt": {
+   "크기": 833,
+   "md5": "444730be2381e7162bba711cabbf5000"
+  },
+  "larre.txt": {
+   "크기": 440,
+   "md5": "345843870e11403ff3e26a937c5744a2"
+  },
+  "larti.txt": {
+   "크기": 1094,
+   "md5": "de7e59574b76295d1076af2545a46b53"
+  },
+  "lback.epf": {
+   "크기": 307228,
+   "md5": "ac931b5bfcffab9d551101421d090284"
+  },
+  "lback.txt": {
+   "크기": 4526,
+   "md5": "d6118b0be1a1c287ed14cc9981215f07"
+  },
+  "lbang.txt": {
+   "크기": 405,
+   "md5": "a50ce906bf0aba9e5425a21275b993d6"
+  },
+  "lbdlist.txt": {
+   "크기": 382,
+   "md5": "05718509ca7291038df291ae4ecb7da0"
+  },
+  "lbgrp.txt": {
+   "크기": 713,
+   "md5": "480404175531720bba741d761902e353"
+  },
+  "lbtn00.epf": {
+   "크기": 2563,
+   "md5": "64c89f4a6170e0ffd1af0c42c4f74460"
+  },
+  "lbtn01.epf": {
+   "크기": 980,
+   "md5": "e3a130cdcd91c110115aa789b400a07e"
+  },
+  "lbtn10.epf": {
+   "크기": 2563,
+   "md5": "d299752a1c3d74693b6024ac1137181c"
+  },
+  "lbtn11.epf": {
+   "크기": 980,
+   "md5": "3b29ce22160392f64f28feb557b964df"
+  },
+  "lbtn20.epf": {
+   "크기": 2563,
+   "md5": "543219daff0f7e087727171b04ec0bc1"
+  },
+  "lbtn21.epf": {
+   "크기": 980,
+   "md5": "c4b66dd335a19a319735e33e51b0597a"
+  },
+  "lbtn30.epf": {
+   "크기": 2563,
+   "md5": "f580252e492a66462e8deb2150eeb650"
+  },
+  "lbtn31.epf": {
+   "크기": 980,
+   "md5": "5ab0f6d4e3579ae20a22d485d50b7b33"
+  },
+  "lbtn40.epf": {
+   "크기": 2563,
+   "md5": "39b22b442c1417a2e7aad62bdadb2824"
+  },
+  "lbtn41.epf": {
+   "크기": 980,
+   "md5": "16bba748480b3bbbe21917bed64336f1"
+  },
+  "lbtn50.epf": {
+   "크기": 2563,
+   "md5": "d848dedd842c998953787a84da0bbcb3"
+  },
+  "lbtn51.epf": {
+   "크기": 1043,
+   "md5": "8d452d335511173c6af7bf6d79d2a2eb"
+  },
+  "lbtn60.epf": {
+   "크기": 2563,
+   "md5": "f099ba957b38b49196f4bb4701f2dff7"
+  },
+  "lbtn61.epf": {
+   "크기": 1043,
+   "md5": "fe12a0dfbc6578694cf335e92b49b9f4"
+  },
+  "lbtnh0.epf": {
+   "크기": 1043,
+   "md5": "0b3b9509e343620f06ac8bac84d82075"
+  },
+  "lbtnh1.epf": {
+   "크기": 2563,
+   "md5": "774780968a7e645296480c74a27cec3b"
+  },
+  "lbtnm0.epf": {
+   "크기": 2563,
+   "md5": "74f96db89f9aa82219a51ec19c0b1fbf"
+  },
+  "lbtnm1.epf": {
+   "크기": 1043,
+   "md5": "29f44153429ae6c04bd2e8dc827604e0"
+  },
+  "lbworld.txt": {
+   "크기": 1353,
+   "md5": "a707710afb2bbbef505dc836833371cb"
+  },
+  "lconf.epf": {
+   "크기": 1700,
+   "md5": "314505d510f26353cfbd462cbffe50fe"
+  },
+  "lcreate.txt": {
+   "크기": 2243,
+   "md5": "3eb9a67b964732716c2da5295a9c7ba1"
+  },
+  "ldi001.epf": {
+   "크기": 2832,
+   "md5": "a39cde53db3c2de7d8781687af77ea64"
+  },
+  "ldi002.epf": {
+   "크기": 2832,
+   "md5": "91456bdd614a6d05a83f6bded0c4d331"
+  },
+  "ldi003.epf": {
+   "크기": 2832,
+   "md5": "8efce917d0b4203d87c31521920da8aa"
+  },
+  "ldi004.epf": {
+   "크기": 2832,
+   "md5": "f07607e7210a18f69e8a6e915836b7ac"
+  },
+  "ldi005.epf": {
+   "크기": 2832,
+   "md5": "5865c9a24a3315b1e1bbdc8e15261d40"
+  },
+  "ldi006.epf": {
+   "크기": 2832,
+   "md5": "d79da050a9ddc7588519e9bad1d9e682"
+  },
+  "ldi007.epf": {
+   "크기": 2832,
+   "md5": "cff60cc8ad5a8abac95ef6a4ef29b6fe"
+  },
+  "ldi008.epf": {
+   "크기": 2832,
+   "md5": "3419cbe2677a559bf97c7b3443e16f7d"
+  },
+  "ldi009.epf": {
+   "크기": 2832,
+   "md5": "adf651d95069d993b7eef4ed7e98e101"
+  },
+  "ldi010.epf": {
+   "크기": 2832,
+   "md5": "68801ba18b8a46650a3866b117d732e1"
+  },
+  "ldi011.epf": {
+   "크기": 2832,
+   "md5": "c1cda6d9dc7642a31e978239ccebbe59"
+  },
+  "ldi012.epf": {
+   "크기": 2832,
+   "md5": "946ce093c63e643454e54b5b2c5ed8c8"
+  },
+  "ldi013.epf": {
+   "크기": 2832,
+   "md5": "07eb1dfc9221246e5a962eae67afe7b8"
+  },
+  "ldiline.epf": {
+   "크기": 1058,
+   "md5": "6fc0c89cace376bb862b9a54e7ead530"
+  },
+  "ldimback.epf": {
+   "크기": 246804,
+   "md5": "fef8d6cf04ecd795119354ff0233967e"
+  },
+  "ldinext.epf": {
+   "크기": 3426,
+   "md5": "9715e37d4ff680b14c1917976e0db896"
+  },
+  "ldiprev.epf": {
+   "크기": 3426,
+   "md5": "ac648bfc5ce775b790246ea72ac9bdc7"
+  },
+  "le100.epf": {
+   "크기": 2844,
+   "md5": "51eded399df8a4b75731d34091b9a679"
+  },
+  "le101.epf": {
+   "크기": 974,
+   "md5": "a7842537c512d30cecc61da9e4313b2a"
+  },
+  "le200.epf": {
+   "크기": 2844,
+   "md5": "fb09b22628985fd6e4a3110601469892"
+  },
+  "le201.epf": {
+   "크기": 974,
+   "md5": "201d8d316daca720e588c686b2b6912e"
+  },
+  "le300.epf": {
+   "크기": 2844,
+   "md5": "116b203213a954c0db0c8819b8329150"
+  },
+  "le301.epf": {
+   "크기": 974,
+   "md5": "7add8332627f0fbdc4947087e3fb9b68"
+  },
+  "le400.epf": {
+   "크기": 2844,
+   "md5": "cbfd926e6c67746235648765df87f2b6"
+  },
+  "le401.epf": {
+   "크기": 974,
+   "md5": "37e8efdae56fdcd413098e0aa4b29213"
+  },
+  "le500.epf": {
+   "크기": 2844,
+   "md5": "85b2c079239ea4b40c65bb4161fe8b19"
+  },
+  "le501.epf": {
+   "크기": 974,
+   "md5": "3166aea02e8735fefe13f29d39d6f2fd"
+  },
+  "le600.epf": {
+   "크기": 2844,
+   "md5": "83b0d20a4bf7fa497c7e956077379c4b"
+  },
+  "le601.epf": {
+   "크기": 974,
+   "md5": "03cfa922f29c8490ba4b88e9a1c533f5"
+  },
+  "leback.epf": {
+   "크기": 246804,
+   "md5": "10be1904ea91a405ba54c1ba17bcd973"
+  },
+  "leback1.epf": {
+   "크기": 39244,
+   "md5": "74399ced07a67ec4be465b5e6a0ca8ab"
+  },
+  "legend.epf": {
+   "크기": 182956,
+   "md5": "10215e2aaa2b3780427d181c0b2daf87"
+  },
+  "legendi.epf": {
+   "크기": 2144,
+   "md5": "220304b482cec95493b93f3eb2e78a12"
+  },
+  "legends.epf": {
+   "크기": 3500,
+   "md5": "e8996cc9107354458a1c168afee14698"
+  },
+  "leicon.epf": {
+   "크기": 3132,
+   "md5": "0f5a2016f47456a04fcfc1203cf12763"
+  },
+  "lemap.spf": {
+   "크기": 219228,
+   "md5": "c495f797aa0ce2b317861d31f4a1dfb9"
+  },
+  "lemot.txt": {
+   "크기": 462,
+   "md5": "f71711f9e705100b8a7e3f6ab6df3173"
+  },
+  "lequip.txt": {
+   "크기": 3146,
+   "md5": "db34d63abb3d2ac95a391747d5b928fa"
+  },
+  "levelup.epf": {
+   "크기": 924,
+   "md5": "bfa8788a8fea68ec6a84e5fe44c24b61"
+  },
+  "lexch.txt": {
+   "크기": 953,
+   "md5": "b303549772bb0b46191829e16a1f3bd9"
+  },
+  "lexchai.txt": {
+   "크기": 532,
+   "md5": "63654df46dcc577312b5bf4589ccb31a"
+  },
+  "lfamily.txt": {
+   "크기": 887,
+   "md5": "516707ada22e41e1e8d2551b21b0bc05"
+  },
+  "lfriend.txt": {
+   "크기": 555,
+   "md5": "5d434c454e227532a7238db82d1db10c"
+  },
+  "lg_chat.epf": {
+   "크기": 33418,
+   "md5": "30727d514d1341a610948cd33eb7496c"
+  },
+  "lg_emot.epf": {
+   "크기": 8428,
+   "md5": "a75b847fbf5206faa8e370c2c8360064"
+  },
+  "lg_item.epf": {
+   "크기": 33418,
+   "md5": "dc14796ea5683828994903267a68bd88"
+  },
+  "lg_main.epf": {
+   "크기": 215500,
+   "md5": "c01aab708121bab7634fe1efa724b367"
+  },
+  "lg_skill.epf": {
+   "크기": 33418,
+   "md5": "a75276a64f8cdcefcf87d85ed1c622b4"
+  },
+  "lg_spell.epf": {
+   "크기": 33418,
+   "md5": "fc2cf91253ab648310c4afaddf4bde8e"
+  },
+  "lg_stat.epf": {
+   "크기": 33418,
+   "md5": "b87affba7eb1812550e9e4de6dc53015"
+  },
+  "lg_stat2.epf": {
+   "크기": 33418,
+   "md5": "62833201390458668ab79c4596aa3fcd"
+  },
+  "lgcdlg0.txt": {
+   "크기": 544,
+   "md5": "74ef8e3002b8bc64f2e57b01cb939a51"
+  },
+  "lgcdlg1.txt": {
+   "크기": 1514,
+   "md5": "88914f347dfdfccbc141a079fd9dcebb"
+  },
+  "lgcmain.txt": {
+   "크기": 605,
+   "md5": "2c6e5c7bea15bde19daab7628f714156"
+  },
+  "lgcpane.txt": {
+   "크기": 177,
+   "md5": "c006d98b6e518e9c6d5921b93b86656b"
+  },
+  "lhinfo00.epf": {
+   "크기": 2844,
+   "md5": "e8119e73684d53ce7ceca56de4a11dc5"
+  },
+  "lhinfo01.epf": {
+   "크기": 974,
+   "md5": "1479e6e40047247e0a8bbcb572dbc482"
+  },
+  "lhkey00.epf": {
+   "크기": 2844,
+   "md5": "dcb8832c42864caae73a47b8184619fb"
+  },
+  "lhkey01.epf": {
+   "크기": 974,
+   "md5": "d769e3d9af4c9e8a7b85f36b15ea2887"
+  },
+  "litemex.txt": {
+   "크기": 433,
+   "md5": "c5dd1be3cc5447393a1f5bf76b437bd7"
+  },
+  "lkey.txt": {
+   "크기": 1853,
+   "md5": "6af0d676eb4707b4a20412ee21e5c843"
+  },
+  "llalbum.txt": {
+   "크기": 783,
+   "md5": "37d0afa8f1e37dddbab8a4c331937c07"
+  },
+  "llback.epf": {
+   "크기": 246804,
+   "md5": "98b1ef51a29305e6345ddba18a0c8538"
+  },
+  "llchange.epf": {
+   "크기": 2544,
+   "md5": "b04890afd71547090eef58c7dd2925dc"
+  },
+  "lldi.txt": {
+   "크기": 1107,
+   "md5": "c3961bd3005f77910125f91fe65ae782"
+  },
+  "llegend2.txt": {
+   "크기": 732,
+   "md5": "18066caa303761096bc9be24978dc2c2"
+  },
+  "llegends.txt": {
+   "크기": 488,
+   "md5": "921433417fdaf06f7177aa5e46b6a187"
+  },
+  "llevent.txt": {
+   "크기": 589,
+   "md5": "e1e8f1a0c3bebd66c8958513f9400a27"
+  },
+  "llgui.txt": {
+   "크기": 650,
+   "md5": "01c6c4872a0143dd1b60daa6ad76b5c5"
+  },
+  "llinfo.txt": {
+   "크기": 4436,
+   "md5": "4fe44bbf308a434e4c98f31a976e2f97"
+  },
+  "llmap.txt": {
+   "크기": 222,
+   "md5": "91bab40dd5a84e3b8376690276f83ab7"
+  },
+  "llmi.txt": {
+   "크기": 497,
+   "md5": "d65bca3ffb56f05ed04f3eda30315621"
+  },
+  "llodmap.txt": {
+   "크기": 414,
+   "md5": "00b3faa3ab5985f840d9c6b98e695dcb"
+  },
+  "llodusr.txt": {
+   "크기": 414,
+   "md5": "075dd40b0f3daa051c3f65a49bed5390"
+  },
+  "llogin.txt": {
+   "크기": 506,
+   "md5": "b8137ec3bc920eb4fc50532033694a6d"
+  },
+  "llspell.txt": {
+   "크기": 687,
+   "md5": "ea38aa8018ef9c0b2b9c4b22178931d2"
+  },
+  "llsprop.txt": {
+   "크기": 496,
+   "md5": "82715183dff64561153bd2b80ec4e7c7"
+  },
+  "lmacro.txt": {
+   "크기": 466,
+   "md5": "1dd2657ef2203ecdf99595320765e94a"
+  },
+  "lmail.txt": {
+   "크기": 1141,
+   "md5": "31e4696eb0098bb41e0769b145d06599"
+  },
+  "lmain.txt": {
+   "크기": 1134,
+   "md5": "4c5735e0446a81c140ca647c05855b38"
+  },
+  "lmanu.txt": {
+   "크기": 1077,
+   "md5": "ef6164b0c947a9ee0f1d94450274a64b"
+  },
+  "lmanu2.txt": {
+   "크기": 1077,
+   "md5": "ef6164b0c947a9ee0f1d94450274a64b"
+  },
+  "lmerc.txt": {
+   "크기": 1157,
+   "md5": "c2a144e5d44c8c22b2cfc19442376238"
+  },
+  "lmerc2.txt": {
+   "크기": 2259,
+   "md5": "fe2e24f00b8878559fd9c53808386e40"
+  },
+  "lmerd.txt": {
+   "크기": 947,
+   "md5": "47ab360d106fe6dfeba10405bc1203ab"
+  },
+  "lmi00.epf": {
+   "크기": 3284,
+   "md5": "2a6ec33715bf4994952a6b7554b094ff"
+  },
+  "lmi01.epf": {
+   "크기": 1304,
+   "md5": "aa681c671b12458b41e01df7a87bed78"
+  },
+  "lmi10.epf": {
+   "크기": 3284,
+   "md5": "4544fd739b3d0ddba6b4b2298d937ddf"
+  },
+  "lmi11.epf": {
+   "크기": 1304,
+   "md5": "d735fd2209dcfa3209d629c2cb70dd61"
+  },
+  "lmiback.epf": {
+   "크기": 261628,
+   "md5": "83723ed82ee33400b0c49daee6b71d0c"
+  },
+  "lmllist.txt": {
+   "크기": 733,
+   "md5": "2e7cb0d1a25eae0ddd8d6ba0a02a3cd2"
+  },
+  "lmoney.txt": {
+   "크기": 432,
+   "md5": "c524e2a65d3b52d9ce0dc090250bd97d"
+  },
+  "lmsg.txt": {
+   "크기": 1224,
+   "md5": "d45307dd79c9251e44b129b5962f76c7"
+  },
+  "lnewa.txt": {
+   "크기": 602,
+   "md5": "e12bba7ea45b37ee2c44a787f812fc8f"
+  },
+  "lnewm.txt": {
+   "크기": 725,
+   "md5": "4dec113d8c348b9a72b7784e15622ccf"
+  },
+  "loading0.epf": {
+   "크기": 73,
+   "md5": "15cb4585f16258d276a3d223425c5e3b"
+  },
+  "loading1.epf": {
+   "크기": 2323,
+   "md5": "b32e635bc38a89d5e8084c5ee1b5aaaa"
+  },
+  "loading2.epf": {
+   "크기": 73,
+   "md5": "a15ef0627d3575911d2d15f2bb03a40d"
+  },
+  "lod00.epf": {
+   "크기": 307228,
+   "md5": "dc84164c18bd2ca7082d993044cdc6de"
+  },
+  "lod01.epf": {
+   "크기": 56652,
+   "md5": "9709075f70a999e4ca4cc7c0e85f9b46"
+  },
+  "lodbk00.epf": {
+   "크기": 112899,
+   "md5": "112354cf86a39035cbbfa3e1e3bbb72c"
+  },
+  "lodbk01.epf": {
+   "크기": 112899,
+   "md5": "09ca15d13ab029116e054c9da0e44a0a"
+  },
+  "lodbk02.epf": {
+   "크기": 112899,
+   "md5": "70e33d25d31d45e119a7a6be53ea8e28"
+  },
+  "lodbk03.epf": {
+   "크기": 112899,
+   "md5": "9078e47f9fd1ddffbfc81a1cada0f4a8"
+  },
+  "lodbk04.epf": {
+   "크기": 112899,
+   "md5": "ec8b47864e0c8ece72cc221a991c1f36"
+  },
+  "lodbk05.epf": {
+   "크기": 112899,
+   "md5": "76b58c90ea7efdb1284fea1e9372dc25"
+  },
+  "lodbk06.epf": {
+   "크기": 112899,
+   "md5": "c2e06f5a15b818fb154d307ace5d5b71"
+  },
+  "lodbk07.epf": {
+   "크기": 112899,
+   "md5": "0d5721e2a83a9214fe84c313db4364f0"
+  },
+  "lodbk08.epf": {
+   "크기": 112899,
+   "md5": "abe2a70ed44e0f140b8d1d8f0942051b"
+  },
+  "lodclk.epf": {
+   "크기": 13724,
+   "md5": "292e50cc2f726bfc89802b4b0c6d1d4f"
+  },
+  "lodmap.epf": {
+   "크기": 21186,
+   "md5": "2bb3e4739287a22fd4cdc77811f1178a"
+  },
+  "lodusr.epf": {
+   "크기": 21186,
+   "md5": "978991ab60f0f08b2554b0e16fb8e70a"
+  },
+  "lopt.txt": {
+   "크기": 971,
+   "md5": "a9c4682f67e2ca7fd292bdb2ef2e804e"
+  },
+  "lpasswd.txt": {
+   "크기": 664,
+   "md5": "1840bd09efcdf55f26b6cc9e8dddded7"
+  },
+  "lpasswd1.txt": {
+   "크기": 427,
+   "md5": "18b32bab56ce7dcc0d4ad1192fc50ecb"
+  },
+  "lpopup.txt": {
+   "크기": 390,
+   "md5": "4f7550c330e616a1953c94e9a21154d1"
+  },
+  "ls100.epf": {
+   "크기": 2844,
+   "md5": "3ccbbecd3929fcf518a9558068022c14"
+  },
+  "ls101.epf": {
+   "크기": 974,
+   "md5": "88685c83b917823b116a3d66c1c102ed"
+  },
+  "ls200.epf": {
+   "크기": 2844,
+   "md5": "83b0d20a4bf7fa497c7e956077379c4b"
+  },
+  "ls201.epf": {
+   "크기": 974,
+   "md5": "03cfa922f29c8490ba4b88e9a1c533f5"
+  },
+  "ls300.epf": {
+   "크기": 2844,
+   "md5": "cb24e8f086ab351c0f586dbfeb4a1466"
+  },
+  "ls301.epf": {
+   "크기": 974,
+   "md5": "ca0a701198d309e9173df6ac1202a309"
+  },
+  "ls_blan.pcx": {
+   "크기": 4510,
+   "md5": "8eab5d613a841600e1b8b27c9728b685"
+  },
+  "ls_bmod.pcx": {
+   "크기": 4733,
+   "md5": "d1f97e7a95d8e7e7fdc70498248ee441"
+  },
+  "ls_cok.pcx": {
+   "크기": 8869,
+   "md5": "2537c0f8c96724e1a39252e3f1f6db57"
+  },
+  "ls_cport.pcx": {
+   "크기": 2826,
+   "md5": "7a540329465d03228ac56af9e30c7bc3"
+  },
+  "ls_cspd.pcx": {
+   "크기": 2833,
+   "md5": "4312559b58f6a68166bf22c06709d127"
+  },
+  "ls_ctel1.pcx": {
+   "크기": 2804,
+   "md5": "f6d4226c3d91b4351d96b48eeaa4bfe9"
+  },
+  "ls_ctel2.pcx": {
+   "크기": 2804,
+   "md5": "ba798d219d024f02d36aa7430869d969"
+  },
+  "ls_ctel3.pcx": {
+   "크기": 2828,
+   "md5": "b8e6392788ba2e1f7da14299bfe3afb9"
+  },
+  "ls_ctel4.pcx": {
+   "크기": 2798,
+   "md5": "d03340686958f4d209f528ddd88327dd"
+  },
+  "ls_main.pcx": {
+   "크기": 64433,
+   "md5": "51df8a2ca6da9645a68ea7242c7899bc"
+  },
+  "lsback.epf": {
+   "크기": 217238,
+   "md5": "59ef887d90be9cb4c5d5cbc1e04caf2d"
+  },
+  "lsback2.epf": {
+   "크기": 218180,
+   "md5": "3d6c81fab147a9595d0e7fbfc11fc56a"
+  },
+  "lsbackm.epf": {
+   "크기": 246804,
+   "md5": "52df998cd1e666012a34cc3558a4f729"
+  },
+  "lscroll.txt": {
+   "크기": 101,
+   "md5": "27b454508ad3f5838ae784de387a190d"
+  },
+  "lset.txt": {
+   "크기": 530,
+   "md5": "16e9d77565b37835a92cd3968cbbb930"
+  },
+  "lshop0.txt": {
+   "크기": 1108,
+   "md5": "4726aebcf87225c4d72603bb791f3033"
+  },
+  "lshop1.txt": {
+   "크기": 462,
+   "md5": "7fccad0e9c17e23967ec6cb04f555e3f"
+  },
+  "lshop2.txt": {
+   "크기": 855,
+   "md5": "1fc1cdd6cba82224f4f9ab1caff7b886"
+  },
+  "lshopbag.txt": {
+   "크기": 1184,
+   "md5": "b4a86cbd7ed776dda9533ef9665b7d5f"
+  },
+  "lsprop.epf": {
+   "크기": 88916,
+   "md5": "b3d23d04536bedc70dfaeeb446b1aaa8"
+  },
+  "lssback.txt": {
+   "크기": 280,
+   "md5": "ed0c3040321852220c7b82dd170fe022"
+  },
+  "lssbook.txt": {
+   "크기": 873,
+   "md5": "dfd98dec76133bed0bb23fafec17d05d"
+  },
+  "lsshelp.epf": {
+   "크기": 1456,
+   "md5": "0a1e544d9bfb11ec6886896bf25f8d4e"
+  },
+  "lsshelpe.epf": {
+   "크기": 1456,
+   "md5": "49e71ee3522b692dfb7b29e0c5d0e76d"
+  },
+  "lsskm.epf": {
+   "크기": 152361,
+   "md5": "4a2555e230167615b145f2f527bd474e"
+  },
+  "lsskmm.epf": {
+   "크기": 14029,
+   "md5": "d9ba761e23c8a555eff470ef4cb95188"
+  },
+  "lsskp.epf": {
+   "크기": 30849,
+   "md5": "cb875e945df85cc5dbc9fc5c0be1b67e"
+  },
+  "lsskr.epf": {
+   "크기": 146462,
+   "md5": "4118b138b38c83e8209a830b721de5a2"
+  },
+  "lsskrm.epf": {
+   "크기": 17149,
+   "md5": "8c3ab222127b53e9c9d301c1cdb336e7"
+  },
+  "lsskw.epf": {
+   "크기": 171677,
+   "md5": "2dc1c812b8c99c01320028161b467c0c"
+  },
+  "lsskwm.epf": {
+   "크기": 17149,
+   "md5": "8c3ab222127b53e9c9d301c1cdb336e7"
+  },
+  "lsskz.epf": {
+   "크기": 30849,
+   "md5": "4b59b664c27b86c254b362f39a9df09d"
+  },
+  "lsspm.epf": {
+   "크기": 124757,
+   "md5": "ae15d44b835cf09e2d20e21a70d05d11"
+  },
+  "lsspmm.epf": {
+   "크기": 4669,
+   "md5": "c5e96fa50f141a4347c5625229541b0e"
+  },
+  "lsspp.epf": {
+   "크기": 171677,
+   "md5": "1fd639fba17db0db6b1e39f0dc74e954"
+  },
+  "lssppm.epf": {
+   "크기": 36465,
+   "md5": "4a2a0ac5667e894d2f13aee8770294be"
+  },
+  "lsspr.epf": {
+   "크기": 20489,
+   "md5": "2dea4bdd6bbc67ccc467930a914a7167"
+  },
+  "lssprm.epf": {
+   "크기": 1549,
+   "md5": "457320bdd8b4225a391e51c9dd03b07f"
+  },
+  "lsspsk2.epf": {
+   "크기": 156037,
+   "md5": "e94317db419d222fd32b9cb6fb8acdc6"
+  },
+  "lsspw.epf": {
+   "크기": 4669,
+   "md5": "e6ff8c9aba0e59bac2b7762ca815b040"
+  },
+  "lsspwm.epf": {
+   "크기": 1549,
+   "md5": "457320bdd8b4225a391e51c9dd03b07f"
+  },
+  "lsspz.epf": {
+   "크기": 171677,
+   "md5": "77c978d3ce6eb51af4b3098a9a5c664d"
+  },
+  "lsspzm.epf": {
+   "크기": 36465,
+   "md5": "b07ea9e28463919a0fb0604a4378f09b"
+  },
+  "lstat.txt": {
+   "크기": 2281,
+   "md5": "1fe571095a61f9f26dafcb74ece6675d"
+  },
+  "lsu.epf": {
+   "크기": 9708,
+   "md5": "fa62a65fd0ab0bb66b95189def3adedb"
+  },
+  "lsvr.txt": {
+   "크기": 733,
+   "md5": "20e4af36b5ba67fd07fa814e997b26b7"
+  },
+  "lsvrb.txt": {
+   "크기": 735,
+   "md5": "066da4ebc4186e29b274d26e162c5072"
+  },
+  "lterm.txt": {
+   "크기": 1021,
+   "md5": "5ab05561093b969a2c5c6b84a1c104dd"
+  },
+  "ltermset.txt": {
+   "크기": 2134,
+   "md5": "354ce0ec897414bf6d058ed9bf66f789"
+  },
+  "luser.txt": {
+   "크기": 823,
+   "md5": "7d7ba06a3fe077a4297f5f95f0028184"
+  },
+  "lwmap.epf": {
+   "크기": 218180,
+   "md5": "7a084da3b8ce89a0e8f44bc29d411693"
+  },
+  "macro01.epf": {
+   "크기": 135928,
+   "md5": "c2ed40340b09f5f702907bf82c900e00"
+  },
+  "mail.epf": {
+   "크기": 314,
+   "md5": "1723059ae255b4a14b1caafddf9f1875"
+  },
+  "manufac.spf": {
+   "크기": 75668,
+   "md5": "9f04c7d55464e4bb23ab8eac30222102"
+  },
+  "manunext.spf": {
+   "크기": 1360,
+   "md5": "72300c4b68e1e154e76619b53b3e133d"
+  },
+  "manuprev.spf": {
+   "크기": 1360,
+   "md5": "f7a85ae96eec98db6a2369c1b16819e5"
+  },
+  "merbot.epf": {
+   "크기": 26460,
+   "md5": "eb750561ec129f2f34d28563642dbb5d"
+  },
+  "mercback.spf": {
+   "크기": 146342,
+   "md5": "06ab6349cb77640ab728c0682490298f"
+  },
+  "merccn.spf": {
+   "크기": 2148,
+   "md5": "98ea1e9ff4b2584ef061f185a9a32220"
+  },
+  "merccp.spf": {
+   "크기": 2148,
+   "md5": "24a23061c30f36ba1cf487cea3c3cbc6"
+  },
+  "mercnext.spf": {
+   "크기": 4425,
+   "md5": "d287549cf66a9487aed3198449514de3"
+  },
+  "mercprev.spf": {
+   "크기": 4425,
+   "md5": "67063838d44f5c788a3c623c79e30275"
+  },
+  "merctab.spf": {
+   "크기": 3028,
+   "md5": "e8f36bc28b468c4e838608ebe696033a"
+  },
+  "mermid.epf": {
+   "크기": 13468,
+   "md5": "87c80ee444d7e0643704973a7f63964a"
+  },
+  "mernum.epf": {
+   "크기": 22362,
+   "md5": "d902b1feee40349da8684ff67ebdbeab"
+  },
+  "mertop.epf": {
+   "크기": 53788,
+   "md5": "93b885fbdbaa5f9066cc913e1790d11b"
+  },
+  "money.epf": {
+   "크기": 26470,
+   "md5": "722614da560a81045bb04bf3ab6d004f"
+  },
+  "money.spf": {
+   "크기": 27518,
+   "md5": "f30023b074299af6781ec84e1f22413d"
+  },
+  "mouse.epf": {
+   "크기": 3228,
+   "md5": "19bbb5fe776fc4c29e1d783aabba421a"
+  },
+  "msgbot.epf": {
+   "크기": 30940,
+   "md5": "1891fec1b6d8f1e0341d652eb062313d"
+  },
+  "msgmid.epf": {
+   "크기": 13468,
+   "md5": "f71ef091a7f20989695caa13182929b4"
+  },
+  "msgsm.epf": {
+   "크기": 9568,
+   "md5": "766b4035c9b29eb941980bd5cc45c287"
+  },
+  "msgtop.epf": {
+   "크기": 40348,
+   "md5": "879a917dad3224e4d9d41417f2a26143"
+  },
+  "nation.epf": {
+   "크기": 23035,
+   "md5": "a64d3c7b3d91ef4e338a1fa02c234282"
+  },
+  "newidbtn.epf": {
+   "크기": 7686,
+   "md5": "09f90b26ba9344db800a7f852f74717b"
+  },
+  "Nsetup05.epf": {
+   "크기": 51972,
+   "md5": "a697efcb2ad753ee03572283aa951dfc"
+  },
+  "option02.epf": {
+   "크기": 15292,
+   "md5": "1ce11e238b6e6fe2437381bf17e9953b"
+  },
+  "option03.epf": {
+   "크기": 4202,
+   "md5": "f0d65d2a852053667db6293140461429"
+  },
+  "option04.epf": {
+   "크기": 172,
+   "md5": "e1a3f91940f13a5a321abff362ca54e3"
+  },
+  "orb001.epf": {
+   "크기": 54840,
+   "md5": "21583bed79b7572272586c08c3bc700e"
+  },
+  "orb002.epf": {
+   "크기": 54840,
+   "md5": "0b2445df623f85fbd757c1269b8de0fa"
+  },
+  "popupbox.epf": {
+   "크기": 5604,
+   "md5": "a89244c249a48f1dcbc4e0c53c91ad1b"
+  },
+  "portrait.epf": {
+   "크기": 4764,
+   "md5": "21f68eac23017a9721b7197495f8777a"
+  },
+  "sb_back.spf": {
+   "크기": 96136,
+   "md5": "7d3463e49c11cc19e2f541f19987aca8"
+  },
+  "sb_close.spf": {
+   "크기": 3652,
+   "md5": "8e1ebce23a213cd73f47765cf16cd455"
+  },
+  "sb_get.spf": {
+   "크기": 3940,
+   "md5": "86544f78fc32ccce77c0c144252119c9"
+  },
+  "sb_gift.spf": {
+   "크기": 2100,
+   "md5": "c1dea9cc36a18492f4b7612faefefabc"
+  },
+  "sb_next.spf": {
+   "크기": 4425,
+   "md5": "81d53061b0c6cdfc3ebc3888b5462a2f"
+  },
+  "sb_prev.spf": {
+   "크기": 4425,
+   "md5": "f157cc20b5a089ce7db2a4457bc19426"
+  },
+  "sbbtn.spf": {
+   "크기": 1350,
+   "md5": "9e10116769094589c1a744051d1b9544"
+  },
+  "scroll.epf": {
+   "크기": 2732,
+   "md5": "e36c2bbb7fa9872b19a8d0077c741b78"
+  },
+  "setup01.epf": {
+   "크기": 307228,
+   "md5": "26b22eece8e1d9e36a9513c34f8efc5f"
+  },
+  "setup05.epf": {
+   "크기": 25948,
+   "md5": "e361976708f56c96ad0dfdd697e17e3a"
+  },
+  "setup06.epf": {
+   "크기": 2712,
+   "md5": "275a8d246e8636ec52b0a2c293a8320e"
+  },
+  "setup12.epf": {
+   "크기": 66592,
+   "md5": "5e29fc1b10f4fc1dd1c3d0471a6151b5"
+  },
+  "setup13.epf": {
+   "크기": 8236,
+   "md5": "330539f95335f46be326762344f5bd77"
+  },
+  "setup14.epf": {
+   "크기": 11244,
+   "md5": "8cfdfc7766b7007772ccb45b41369b9c"
+  },
+  "shop00.epf": {
+   "크기": 42828,
+   "md5": "be342da9ab416a3b83080e76bae6ad6e"
+  },
+  "shop01.epf": {
+   "크기": 24424,
+   "md5": "52465330d6b94ffe332127010e709e68"
+  },
+  "shop02.epf": {
+   "크기": 27228,
+   "md5": "70cef61cebc3dfeb928df32a15ecbbb1"
+  },
+  "shopbtn.epf": {
+   "크기": 4062,
+   "md5": "9866642b74fdbd4e2c9921b1e73df368"
+  },
+  "shopbtn0.epf": {
+   "크기": 356,
+   "md5": "c0153afd219cc6d1ddd7facb4a71ea81"
+  },
+  "shopbtn1.epf": {
+   "크기": 7686,
+   "md5": "6177795e970b4554cd31dbb58a4c0b37"
+  },
+  "skill001.epf": {
+   "크기": 110151,
+   "md5": "6e1c49fd05e69e57b80c46426e7fffa6"
+  },
+  "skill002.epf": {
+   "크기": 136435,
+   "md5": "45a641f07cbdcec9b29c9477f82e0f82"
+  },
+  "skill003.epf": {
+   "크기": 113475,
+   "md5": "f973709151913869ab95ed7bc76116a5"
+  },
+  "spell001.epf": {
+   "크기": 201210,
+   "md5": "6d99e08dc749d732a71e9b80088142b1"
+  },
+  "spell002.epf": {
+   "크기": 247735,
+   "md5": "ebd86693f1ceaef3fe5fc316bb5f980b"
+  },
+  "spell003.epf": {
+   "크기": 206852,
+   "md5": "f1d1924e0e815412069b910df3711726"
+  },
+  "spelled.epf": {
+   "크기": 4692,
+   "md5": "d377d55710736ee8629e833486b92b50"
+  },
+  "ssbottom.epf": {
+   "크기": 11098,
+   "md5": "aa3c6e406ca2f6b54edfd99c82fbd93f"
+  },
+  "sstext.epf": {
+   "크기": 6178,
+   "md5": "a693183e582d6f6814cc02ec6d6b347c"
+  },
+  "sstop.epf": {
+   "크기": 21922,
+   "md5": "b43185cca8a0ca8cb10259843a81d349"
+  },
+  "staff.epf": {
+   "크기": 307228,
+   "md5": "ede39c6006304c18fefbbc50b0f87ec8"
+  },
+  "stat001.epf": {
+   "크기": 47980,
+   "md5": "55bc64456ccc8252020166ff91207e09"
+  },
+  "stat002.epf": {
+   "크기": 47980,
+   "md5": "ef64c511c5fed12869fa3a55b84354c2"
+  },
+  "statcon.epf": {
+   "크기": 556,
+   "md5": "b2a05030cbbd5376ec773e72fe254093"
+  },
+  "svrbot.epf": {
+   "크기": 7049,
+   "md5": "fdcf38770926a8000da1876275dc5f32"
+  },
+  "svrmid.epf": {
+   "크기": 8288,
+   "md5": "726b88ca5e64a46d858caa7c1f5d03bd"
+  },
+  "svrtop.epf": {
+   "크기": 60326,
+   "md5": "1be53f949c93da947d3dae2b54fbbea9"
+  },
+  "sysmsg.epf": {
+   "크기": 54517,
+   "md5": "b81aa21c061a5c2715debe88a6a009cf"
+  },
+  "tmapv01.epf": {
+   "크기": 153928,
+   "md5": "26ebfdb771e7dc062b9db25170776169"
+  },
+  "tmapv02.epf": {
+   "크기": 153928,
+   "md5": "bc5f5cbf2674c28ca8a808acac0dee7e"
+  },
+  "tmapv03.epf": {
+   "크기": 153928,
+   "md5": "9c6036ab7d2f93308bf653026af24762"
+  },
+  "tmapv04.epf": {
+   "크기": 153928,
+   "md5": "400a2d090f942db382da158c193706ab"
+  },
+  "tmapv05.epf": {
+   "크기": 153928,
+   "md5": "7cbc891c540d67f5e82dd80229b1c7af"
+  },
+  "tmapv06.epf": {
+   "크기": 153928,
+   "md5": "7cbc891c540d67f5e82dd80229b1c7af"
+  },
+  "tmapv07.epf": {
+   "크기": 153928,
+   "md5": "3e1e196ad0d7987fd105ab99b00ddda1"
+  },
+  "townbtn.epf": {
+   "크기": 692,
+   "md5": "016db63ea9ba2a2bacab4b10ebec5d0a"
+  },
+  "users01.epf": {
+   "크기": 139408,
+   "md5": "65cbb6ba3604c3564e0bdb3da9b770b0"
+  },
+  "users04.epf": {
+   "크기": 23628,
+   "md5": "15bfad4928560e0bbfe7bb7e4971b2ee"
+  },
+  "wsbtn.spf": {
+   "크기": 2054,
+   "md5": "c49d7ffa6dad4966efb07c0e25645232"
+  }
+ }
+}
