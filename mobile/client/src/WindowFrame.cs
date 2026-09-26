@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 
 namespace LodClient;
@@ -307,5 +308,46 @@ public static class WindowFrame
         button.AddThemeStyleboxOverride("hover", none);
         button.AddThemeStyleboxOverride("focus", none);
         button.AddThemeStyleboxOverride("pressed", down);
+    }
+}
+
+/// <summary>
+/// The 월드맵 button, shaped like the map it opens (사용자, 2026-09-26: 마름모 모양 테두리로, 맨 왼쪽에) — a diamond edge in the
+/// 4.51 palette round its word, the same diamond the minimap and the 길 찾기 map draw the floor in. The pressable square
+/// stays the full rectangle, so a thumb need not hit the diamond.
+/// </summary>
+public sealed partial class DiamondButton : Button
+{
+    private readonly string _word;
+
+    public DiamondButton(string word)
+    {
+        _word = word;
+        Flat = true;
+        FocusMode = FocusModeEnum.None;
+        TooltipText = word;
+        CustomMinimumSize = new Vector2(72, Main.TouchMinimum + 4);
+        SizeFlagsVertical = SizeFlags.ShrinkCenter;
+    }
+
+    public override void _Draw()
+    {
+        Vector2 c = Size / 2;
+        float w = (Size.X / 2) - 1, h = (Size.Y / 2) - 1;
+        Vector2[] edge = [c + new Vector2(0, -h), c + new Vector2(w, 0), c + new Vector2(0, h), c + new Vector2(-w, 0)];
+        bool down = IsPressed() || Disabled;
+
+        DrawColoredPolygon(edge, new Color("#0f0f0f") with { A = 0.92f });
+        DrawPolyline([.. edge, edge[0]], down ? Greybox.Title : new Color("#636357"), 1.5f, true);
+
+        // 안쪽 한 겹 더 — 원작 틀의 두 겹 돌처럼.
+        Vector2[] inner = [.. edge.Select(point => c + ((point - c) * 0.82f))];
+        DrawPolyline([.. inner, inner[0]], new Color("#303036"), 1f, true);
+
+        Font font = GetThemeDefaultFont();
+        const int size = 13;
+        Vector2 text = font.GetStringSize(_word, HorizontalAlignment.Left, -1, size);
+        DrawString(font, new Vector2(c.X - (text.X / 2), c.Y + (size / 2f) - 2), _word, HorizontalAlignment.Left, -1, size,
+            Disabled ? Greybox.Muted : Greybox.Title);
     }
 }

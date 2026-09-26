@@ -10,7 +10,8 @@ namespace LodClient;
 /// 반경 슬라이더·회복 기술 셀렉트 박스(<see cref="PercentSelect"/>, 1~99). 무엇을 마실지와 켜고 끄기는 게임 화면의 포션 단추에서
 /// 한다(<see cref="PotionChip"/>).</item>
 /// <item><b>봇</b> — [봇 부르기]/[봇 보내기].</item>
-/// <item><b>계정</b> — 자동 로그인 끄기, [종료](위 줄에 있던 것 — 누르면 [로그아웃]·[게임 종료]·[취소] 판, <see cref="ExitChoice"/>).
+/// <item><b>계정</b> — 자동 로그인 끄기. [로그아웃] 은 어느 탭에서나 보이는 제목 줄에 있다(누르면 [로그아웃]·[게임 종료]·[취소] 판,
+/// <see cref="ExitChoice"/>).
 /// 자동 로그인을 다시 켜는 것은 로그인 화면에서만 한다(계정·비밀번호가 그 화면에만 있다).</item>
 /// </list>
 /// </summary>
@@ -67,9 +68,10 @@ public sealed partial class SettingsPanel : PanelContainer
         account.AddChild(Caption(Main.SavedLogin is null ? "자동 로그인이 꺼져 있습니다." : "이 기기에 계정이 저장되어 있습니다."));
         account.AddChild(_autoLoginOff);
 
-        Exit = new Button { Text = "종료", CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
+        // 계정 탭의 [종료] 는 같은 일을 두 곳에 두지 않으려고 뺐다.
+        Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(76, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
         Greybox.Plain(Exit);
-        account.AddChild(Exit);
 
         Button autoTab = WindowFrame.IconButton(GlyphKind.Auto, "자동", tab: true, width: 52);
         Button botTab = WindowFrame.IconButton(GlyphKind.Bot, "봇", tab: true, width: 52);
@@ -90,7 +92,7 @@ public sealed partial class SettingsPanel : PanelContainer
 
         VBoxContainer inside = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         inside.AddThemeConstantOverride("separation", Main.Gutter);
-        inside.AddChild(WindowFrame.Head(WindowFrame.Tabs(autoTab, botTab, accountTab), Close));
+        inside.AddChild(WindowFrame.Head(WindowFrame.Tabs(autoTab, botTab, accountTab), Close, Exit));
 
         MarginContainer margin = new();
 
@@ -133,7 +135,7 @@ public sealed partial class SettingsPanel : PanelContainer
         }
     }
 
-    /// <summary>계정 탭의 [종료] — 누르면 게임 화면이 [로그아웃]·[게임 종료]·[취소] 판(<see cref="ExitChoice"/>)을 연다.</summary>
+    /// <summary>제목 줄의 [로그아웃] — 누르면 게임 화면이 [로그아웃]·[게임 종료]·[취소] 판(<see cref="ExitChoice"/>)을 연다.</summary>
     public Button Exit { get; }
 
     private static VBoxContainer Page()

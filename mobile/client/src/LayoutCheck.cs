@@ -103,6 +103,14 @@ public static class LayoutCheck
     /// </summary>
     public const string PretendName = "가나다라마바";
 
+    /// <summary>
+    /// Status icons for my plate while nothing is connected: the plate's fullest (eight, with a "+N") when stuffed, so the
+    /// top row is measured at its tallest and widest; none otherwise.
+    /// </summary>
+    public static IReadOnlyList<StatusBadge> PretendStatuses { get; } = Stuffed()
+        ? [.. Enumerable(0, 9, at => new StatusBadge(new[] { 11, 52, 82, 3, 24, 40, 7, 19, 30 }[at], 5 + (at * 20), StatusBadges.Grade(5 + (at * 20)), at == 2))]
+        : [];
+
     /// <summary>Representative pane entries so layout and screenshots exercise the restored icon sheets.</summary>
     /// <remarks>Filled past one page when stuffed, so the fan round the attack button is seen with a page to turn.</remarks>
     public static IReadOnlyList<LearnedSkill> PretendSkills { get; } = Stuffed()

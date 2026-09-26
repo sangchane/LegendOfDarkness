@@ -113,6 +113,8 @@ public partial class GameScreen : Control
     private Label _healthText = null!;
     private Label _manaText = null!;
     private Label _experience = null!;
+    // 버프·디버프 아이콘 — 체력·마력 판의 첫 줄, 이름 옆(사용자, 2026-09-26). 다섯까지, 나머지는 "+N".
+    private readonly StatusStrip _myStatus = new(side: 12, most: 5);
     private Vitals? _shownVitals;
 
     private Control _packRow = null!;
@@ -129,7 +131,7 @@ public partial class GameScreen : Control
     // 가늠이 안 된다 — 흐른 시간(초)으로 센다.
     private double _mapOpenSeconds;
     private const double MapCloseAfterSeconds = 5;
-    private Button _map = null!;
+    private DiamondButton _map = null!;
 
     // 리허설로 한 번만 입어 본다.
     private bool _worn;
@@ -245,7 +247,7 @@ public partial class GameScreen : Control
         _settings = new SettingsPanel();
         _settings.Close.Pressed += () => SetWindow(GameWindow.Settings, false);
 
-        // [종료] 는 위 줄에서 설정 → 계정 탭으로 옮겼다(2026-09-26). 판은 그대로 — 로그아웃 · 게임 종료 · 취소.
+        // [종료] 는 위 줄에서 설정 창 제목 줄의 [로그아웃] 으로 옮겼다(2026-09-26). 판은 그대로 — 로그아웃 · 게임 종료 · 취소.
         _settings.Exit.Pressed += () =>
         {
             if (_exit.Visible)
@@ -416,7 +418,8 @@ public partial class GameScreen : Control
         _party.AnchorLeft = 0;
         _party.AnchorRight = 0;
         _party.CustomMinimumSize = new Vector2(PartyColumn.Wide, 0);
-        _topRow.Resized += () => _party.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter;
+        // 봇 칸은 파티 기둥 밖, 화면 왼쪽 가장자리에 딱 붙는다(사용자, 2026-09-26) — 위 줄 바로 아래(PlaceParty).
+        over.AddChild(_party.BotSlot);
         _toasts.AnchorLeft = 1;
         _toasts.AnchorRight = 1;
         _toasts.OffsetLeft = -ToastWidth;
@@ -501,6 +504,13 @@ public partial class GameScreen : Control
                 continue;
             }
 
+            // 대화(기록) 창은 화면 가운데 아래에(사용자, 2026-09-26) — 가로는 오른쪽 기둥 대신 가운데에 제 폭만큼. 세로는 원래 폭 전체.
+            if (panel == _chat && !Main.Portrait)
+            {
+                _chat.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+                _chat.CustomMinimumSize = new Vector2(Mathf.Min(460, GetViewportRect().Size.X - (Main.Gutter * 4)), 0);
+            }
+
             // 가로 설정 창은 오른쪽 기둥에 서면 공격 단추와 기술 부채꼴을 덮었다(사용자, 2026-09-23). 설정은 월드를 멈추지
             // 않으므로 조작이 살아 있어야 한다 — 위 줄 바로 아래, 방향판과 부채꼴 사이 가운데에 제 크기만큼만 선다.
             if (panel == _settings && !Main.Portrait)
@@ -535,7 +545,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _chatHolder ? 0 : column;
         }
     }
 
@@ -598,13 +608,23 @@ public partial class GameScreen : Control
         _who = Aux(string.Empty);
 
         // 세로는 이름을 막대 위 한 줄로 — 옆에 두면 이름이 긴 만큼 판이 넓어져 같은 줄의 미니맵이 화면 밖으로 밀렸다(2026-09-26).
-        BoxContainer mine = Main.Portrait ? new VBoxContainer() : new HBoxContainer();
-        mine.AddThemeConstantOverride("separation", Main.Portrait ? 0 : Main.Gutter);
-        mine.AddChild(_who);
+        // 가로도 같게(2026-09-26) — 월드맵 마름모가 맨 왼쪽에 서면서 640 가로에서 이름 옆에 막대를 두면 위 줄이 넘쳤다.
+        VBoxContainer mine = new();
+        mine.AddThemeConstantOverride("separation", 0);
+        // 첫 줄: 이름과 그 옆 상태 아이콘 줄(버프·디버프) — 둘 다 없으면 줄째 접힌다.
+        HBoxContainer headline = new() { MouseFilter = MouseFilterEnum.Ignore };
+        headline.AddThemeConstantOverride("separation", Main.Gutter);
+        _myStatus.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _myStatus.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        headline.AddChild(_who);
+        headline.AddChild(_myStatus);
+        mine.AddChild(headline);
         mine.AddChild(BuildVitals());
 
-        // 세로 이름 줄은 이름이 오기 전에는 접는다 — 빈 줄이 판 위에 남는다.
-        _who.Visible = !Main.Portrait;
+        // 이름 줄은 이름이 오기 전에는 접는다 — 빈 줄이 판 위에 남는다. 글자는 조금 작게 — 가로 360 에서 위 줄이 한 줄 늘어난
+        // 만큼 조작 줄을 밀어내지 않게(판 네 줄이 80 안에 들어야 한다).
+        _who.Visible = false;
+        _who.AddThemeFontSizeOverride("font_size", 12);
         row.AddChild(Plated(mine));
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
@@ -650,15 +670,9 @@ public partial class GameScreen : Control
         pack.Pressed += () => Carrying(!_pack.Visible);
         actions.AddChild(pack);
 
-        _map = new Button
-        {
-            Text = "월드맵",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(_map);
+        // 월드맵은 마름모 테두리 단추로, 윗줄 맨 왼쪽에(사용자, 2026-09-26).
+        _map = new DiamondButton("월드맵");
         _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
-        actions.AddChild(_map);
 
         Button settings = new()
         {
@@ -672,7 +686,7 @@ public partial class GameScreen : Control
 
         if (Main.Portrait)
         {
-            // 세로: 첫 줄 = 내 판 · 미니맵(남는 폭을 다 쓴다 — 이름이 길면 줄어든다), 둘째 줄 = 고른 이 · 단추 셋.
+            // 세로: 첫 줄 = 내 판 · 미니맵(남는 폭을 다 쓴다 — 이름이 길면 줄어든다), 둘째 줄 = 월드맵(마름모) · 고른 이 · 인벤토리 · 설정.
             _minimap.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             row.AddChild(_minimap);
 
@@ -682,7 +696,10 @@ public partial class GameScreen : Control
             second.AddChild(middle);
             second.AddChild(actions);
 
-            foreach (Button action in new Button[] { pack, _map, settings })
+            second.AddChild(_map);
+            second.MoveChild(_map, 0);
+
+            foreach (Button action in new Button[] { pack, settings })
             {
                 action.CustomMinimumSize = new Vector2(64, Main.TouchMinimum);
             }
@@ -695,7 +712,9 @@ public partial class GameScreen : Control
             return top;
         }
 
-        // 가로: 내 판 · 고른 이(가운데) · 미니맵 · 단추 셋, 한 줄.
+        // 가로: 월드맵(마름모) · 내 판 · 고른 이(가운데) · 미니맵 · 인벤토리 · 설정, 한 줄.
+        row.AddChild(_map);
+        row.MoveChild(_map, 0);
         row.AddChild(middle);
         row.AddChild(_minimap);
         row.AddChild(actions);
@@ -944,6 +963,11 @@ public partial class GameScreen : Control
 
         ShowVitals();
 
+        // 내 상태 아이콘 줄 — 원작 상태 아이콘(0x3A)과 서버가 알리는 상태(0x5E 종류 3, 5.99 호르라마·에나르마 포함).
+        _myStatus.Show(_server is { } me
+            ? StatusBadges.Of(me.Ailments, me.StatusesOf(me.Serial))
+            : LayoutCheck.PretendStatuses);
+
         ShowTarget();
         _abilities.Show(
             _server?.Skills ?? LayoutCheck.PretendSkills,
@@ -992,13 +1016,12 @@ public partial class GameScreen : Control
         RehearseAHold(delta);
         RehearseASkill(delta);
 
-        // 손 없이 확인할 때만 — 설정을 계정 탭으로 열고, 몇 프레임 뒤(자리를 잡은 뒤) [종료] 를 실제로 눌러(EmitSignal) 고르는 판을 띄운다.
+        // 손 없이 확인할 때만 — 설정을 열고, 몇 프레임 뒤(자리를 잡은 뒤) 제목 줄의 [로그아웃] 을 실제로 눌러(EmitSignal) 고르는 판을 띄운다.
         if (Main.OpeningExit)
         {
             if (_exitSettling == 90)
             {
                 SetWindow(GameWindow.Settings, true);
-                _settings.ShowTab("계정");
             }
             else if (_exitSettling == 96)
             {
@@ -1196,7 +1219,10 @@ public partial class GameScreen : Control
             }
         }
 
-        _party.ShowBot(bot?.Name, health, mana);
+        IReadOnlyList<StatusBadge> botStatus = bot is null ? []
+            : Main.BotPreview && _server is null ? [new StatusBadge(11, 100, 6, false), new StatusBadge(52, 40, 4, false), new StatusBadge(82, 8, 1, true)]
+            : StatusBadges.Of([], _server?.StatusesOf(bot.Serial));
+        _party.ShowBot(bot?.Name, health, mana, botStatus);
 
         if (bot is null)
         {
@@ -1236,10 +1262,22 @@ public partial class GameScreen : Control
     /// </summary>
     private void PlaceParty()
     {
+        float top = _topRow.GetGlobalRect().End.Y - _over.GetGlobalRect().Position.Y + Main.Gutter;
+        Control bot = _party.BotSlot;
+
+        // 봇 칸: 화면 왼쪽 끝에 붙인다 — HUD 여백(틈 8)만큼 왼쪽으로 뺀다. 가로 아이폰은 노치 쪽 안전선까지만(SafeInsets 에는
+        // 틈 8 이 들어 있어 뺀다).
+        bot.OffsetLeft = Main.SafeInsets.Left - Main.Gutter - _over.GetGlobalRect().Position.X;
+        bot.OffsetRight = bot.OffsetLeft + PartyColumn.BotWide;
+        bot.OffsetTop = top;
+        bot.OffsetBottom = top + bot.GetCombinedMinimumSize().Y;
+
+        // 파티 기둥: 세로는 봇 칸 아래, 가로는 방향판 오른쪽 옆(봇 칸과 안 겹친다).
         _party.OffsetLeft = Main.Portrait
             ? 0
             : _pad.GetGlobalRect().End.X - _over.GetGlobalRect().Position.X + Main.Gutter;
         _party.OffsetRight = _party.OffsetLeft + PartyColumn.Wide;
+        _party.OffsetTop = Main.Portrait && bot.Visible ? bot.OffsetBottom + Main.Gutter : top;
     }
 
     /// <summary>
@@ -1921,12 +1959,6 @@ public partial class GameScreen : Control
             return;
         }
 
-        if (spell.TargetType == SpellTargetType.ChooseTarget && _world.Target == 0)
-        {
-            Notify("마법 대상을 먼저 누르세요.");
-            return;
-        }
-
         if (spell.TargetType is SpellTargetType.Prompt or SpellTargetType.FourDigit
             or SpellTargetType.ThreeDigit or SpellTargetType.TwoDigit or SpellTargetType.OneDigit)
         {
@@ -1934,7 +1966,8 @@ public partial class GameScreen : Control
             return;
         }
 
-        _world.UseSpell(spell.Slot, spell.TargetType == SpellTargetType.ChooseTarget ? _world.Target : 0);
+        // 대상 마법인데 고른 이가 없으면 나에게(SpellAim) — 전에는 "마법 대상을 먼저 누르세요" 로 거절해 호르라마·쿠로를 제게 못 걸었다.
+        _world.UseSpell(spell.Slot, SpellAim.Target(spell.TargetType, _world.Target, _server?.Serial ?? 0));
     }
 
     /// <summary>
