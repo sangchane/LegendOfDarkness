@@ -9,6 +9,9 @@
   2. 5.99 서버팩 — `db/skill/Skill.txt`·`db/spell/spell.txt` 의 `이미지`(한글 이름, 한 이름에 번호가 하나일 때만)
 둘이 같은 이름을 함께 가진 경우는 없다. 근거가 없는 템플릿(5.99 스크립트에만 있는 금강불괴·주먹단련 등)은 그대로 둔다.
 
+**예외 — 노바 팩의 `이미지` 가 먼저다**(사용자 2026-09-26: "아이콘은 노바가 맞다"). 노바 `skill/default.txt`·`spell/spell.txt`
+에 같은 이름이 있으면 그 번호를 쓰고, 이미 적힌 값이 다르면 고친다(금강불괴 53 · 바투 38 · 찔러휘비기 6 · 슬레쉬 64 …).
+
 채운 뒤 `python3 scripts/build-auto-learn.py --쓰기` 로 앱의 자동 습득 표를 다시 만든다.
 
     python3 scripts/fill-ability-icons.py          # 무엇을 채울지 세기만
@@ -25,6 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "templates"
 ABILITIES = ROOT / "data" / "game-data" / "abilities.json"
 PACK = ROOT / "data" / "server-packs" / "5.99-server" / "db"
+NOVA = ROOT / "data" / "server-packs" / "novaonline" / "db"
 
 
 def original():
@@ -55,6 +59,7 @@ def main():
     write = "--쓰기" in sys.argv
     sclass = original()
     five = {**pack(PACK / "skill" / "Skill.txt", "skill"), **pack(PACK / "spell" / "spell.txt", "spell")}
+    nova = {**pack(NOVA / "skill" / "default.txt", "skill"), **pack(NOVA / "spell" / "spell.txt", "spell")}
     counts = collections.Counter()
 
     for kind in ("skill", "spell"):
@@ -65,12 +70,29 @@ def main():
             template = json.loads(text)
             name = template.get("Name", "")
 
-            if name.startswith("Monster_") or "Icon" in template:
-                counts["있음·괴물"] += 1
+            if name.startswith("Monster_"):
+                counts["괴물"] += 1
                 continue
 
-            icon = sclass.get((kind, name.lower()))
-            source = "SClass"
+            if (kind, name) in nova:
+                icon, source = nova[(kind, name)], "노바"
+                if template.get("Icon") == icon:
+                    counts["노바와 같음"] += 1
+                    continue
+                if "Icon" in template:
+                    counts["노바로 고침"] += 1
+                    if write:
+                        fixed, n = re.subn(r'^(\s*"Icon":\s*)-?\d+', lambda m: f"{m.group(1)}{icon}", text, count=1, flags=re.M)
+                        if n != 1:
+                            sys.exit(f"Icon 줄을 못 찾았습니다: {path}")
+                        json.loads(fixed)
+                        path.write_bytes((b"\xef\xbb\xbf" if bom else b"") + fixed.encode("utf-8"))
+                    continue
+            elif "Icon" in template:
+                counts["있음"] += 1
+                continue
+            else:
+                icon, source = sclass.get((kind, name.lower())), "SClass"
             if icon is None:
                 icon, source = five.get((kind, name)), "5.99"
             if icon is None:
