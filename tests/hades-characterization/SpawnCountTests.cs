@@ -11,8 +11,8 @@ namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
 /// 젠 마릿수와 선 자리, 그리고 맵을 옮길 때 지난 맵의 괴물이 남지 않는지.
-/// 마릿수는 <c>MonolithComponent</c> 한 곳이 정한다 — <c>SpawnMax × √(칸수/400) × 0.7</c>(0.7 은 2026-09-24 사용자 결정,
-/// "30% 줄여 달라").
+/// 마릿수는 <c>MonolithComponent</c> 한 곳이 정한다 — <c>SpawnMax × √(칸수/400) × 0.7 × 2/3</c>(0.7 은 2026-09-24 사용자 결정,
+/// "30% 줄여 달라" · 2/3 은 2026-09-26 "젠 되는 숫자는 좀 줄이고" — 간격은 그 대신 1/3, <see cref="RespawnTests" />).
 /// </summary>
 [Collection(TimedCollection.Name)]
 public sealed class SpawnCountTests : IDisposable
@@ -31,9 +31,9 @@ public sealed class SpawnCountTests : IDisposable
     private const int Written = 4;
 
     /// <summary>
-    /// 이 맵에 서야 할 마릿수 — 4 × √6 × 0.7 = 6.86 → 7. 줄이기 전(× 1)에는 10 이었다.
+    /// 이 맵에 서야 할 마릿수 — 4 × √6 × 0.7 × 2/3 = 4.57 → 5. × 0.7 만 있을 때 7, 줄이기 전(× 1)에는 10 이었다.
     /// </summary>
-    private static readonly int Expected = (int)Math.Round(Written * Math.Sqrt(PlainSide * PlainSide / 400) * 0.7);
+    private static readonly int Expected = (int)Math.Round(Written * Math.Sqrt(PlainSide * PlainSide / 400) * 0.7 * 2 / 3);
 
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(5));
 
@@ -84,7 +84,7 @@ public sealed class SpawnCountTests : IDisposable
         });
 
         Assert.True(seen.Count == Expected,
-            $"노비스평원A 에 선 시험 괴물이 {seen.Count}마리입니다({Expected}마리를 기대 — {Written} × √6 × 0.7). " +
+            $"노비스평원A 에 선 시험 괴물이 {seen.Count}마리입니다({Expected}마리를 기대 — {Written} × √6 × 0.7 × 2/3). " +
             $"자리: {string.Join(" ", seen.Values.Select(t => $"({t.X},{t.Y})"))}");
     }
 

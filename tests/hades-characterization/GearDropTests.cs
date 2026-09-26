@@ -314,7 +314,9 @@ public sealed class GearDropTests
             Assert.True(((int?)boss["LootType"] & LootRandom) == LootRandom,
                 $"{beast} 의 LootType 이 {boss["LootType"]} 입니다 — 확률을 세려면 Random({LootRandom}) 이어야 합니다.");
 
-            Assert.Equal(rate, (double?)items[prize]["DropRate"] ?? 0);
+            // 실제 확률 = DropRate × 1.5(`monsterexp.cs` DropBoost, 2026-09-26). 1.5배 뒤 120% 라 한 괴물 합 80% 상한
+            // (`scripts/build-drop-cap.py`)이 DropRate 를 0.5333 으로 내렸고, 그 실제 확률이 팩이 적은 80% 그대로다.
+            Assert.Equal(rate, Math.Round(1.5 * ((double?)items[prize]["DropRate"] ?? 0), 3));
 
             // 도감 값. 떨어져도 못 끼면 떨어지지 않은 것과 같다.
             Assert.True((int?)items[prize]["LevelRequired"] == level,

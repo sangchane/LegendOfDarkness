@@ -21,7 +21,9 @@ namespace Lod.Hades.Characterization.Tests;
 public sealed class ManaPotionDropTests
 {
     /// <summary>
-    /// 2026-09-26 전의 DropRate. 지금 값은 그 <b>두 배 이상</b>이어야 한다 — 같은 날 드랍 종류를 늘리며
+    /// 2026-09-26 전의 DropRate. 지금 값에 <see cref="DropBoost" />(1.5)를 곱한 것 — 실제 확률 — 이 그 <b>두 배 이상</b>이어야
+    /// 한다(같은 날 1.5배가 들어와, 한 괴물 합 80% 상한(<c>scripts/build-drop-cap.py</c>)을 지키려 마라디움 DropRate 를
+    /// 1.0 → 0.6667 로 내려도 실제 확률은 여전히 두 배다). 그 전 설명: — 같은 날 드랍 종류를 늘리며
     /// (<c>scripts/build-drop-variety.py</c>) 목록 칸이 늘어난 만큼 <c>DropRate</c> 를 더 올려 실제 확률을
     /// 지켰으므로(하급마력 1.2 → 1.6 · 중급마력 1.2 → 1.5) 딱 두 배가 아니다.
     /// </summary>
@@ -40,11 +42,11 @@ public sealed class ManaPotionDropTests
 
         foreach ((string name, double before) in ManaPotions)
         {
-            double now = (double?)items[name]["DropRate"] ?? 0;
+            double now = DropBoost * ((double?)items[name]["DropRate"] ?? 0);
 
-            if (now < (2 * before) - 1e-9)
+            if (now < (2 * before) - 1e-6)
             {
-                wrong.Add($"{name} {now} (그 전 {before} → {2 * before} 이상이어야)");
+                wrong.Add($"{name} {now}(×1.5) (그 전 {before} → {2 * before} 이상이어야)");
             }
         }
 
@@ -57,6 +59,15 @@ public sealed class ManaPotionDropTests
     /// <summary><c>Formulas/monsterexp.cs</c> <c>DropBoost</c> — 사용자 2026-09-26 "전체 확률 올려", 1.5배.</summary>
     private const double DropBoost = 1.5;
 
+    /// <summary>
+    /// 한 괴물이 뭐라도 떨굴 확률의 윗선 — 사용자 2026-09-26 "100% 나오는 건 좀 그렇다, 적당히 낮춰".
+    /// <c>scripts/build-drop-cap.py</c> 가 이 선 아래로 DropRate 를 누른다.
+    /// </summary>
+    private const double DropCap = 0.80;
+
+    /// <summary>
+    /// 합이 칸수를 넘으면 뒤쪽 물건이 확률을 잃는다(100%). 그보다 낮게, 합이 <see cref="DropCap" />(80%)를 넘지 않아야 한다.
+    /// </summary>
     [Fact]
     public void No_monster_list_adds_up_to_more_than_its_slots()
     {
@@ -75,14 +86,14 @@ public sealed class ManaPotionDropTests
             // 서버가 굴릴 때 모든 DropRate 에 DropBoost(1.5)를 곱하므로(`monsterexp.cs`, 2026-09-26) 곱한 합으로 잰다.
             double sum = DropBoost * listed.Sum(n => items.TryGetValue(n, out JsonNode? item) ? (double?)item["DropRate"] ?? 0 : 0);
 
-            if (sum > listed.Length + 1e-9)
+            if (sum > (DropCap * listed.Length) + 1e-6)
             {
-                over.Add($"{monster["Name"]}@{monster["AreaID"]} 합×1.5 {sum:F2} > {listed.Length}칸");
+                over.Add($"{monster["Name"]}@{monster["AreaID"]} 합×1.5 {sum / listed.Length:P1} > {DropCap:P0} ({listed.Length}칸)");
             }
         }
 
         Assert.True(over.Count == 0,
-            $"DropRate 합이 목록 칸수를 넘는 괴물 — 뒤쪽 물건이 확률을 잃습니다: {string.Join(", ", over)}");
+            $"뭐라도 떨굴 확률이 {DropCap:P0} 를 넘는 괴물(scripts/build-drop-cap.py 를 돌려라): {string.Join(", ", over)}");
     }
 
     private static IEnumerable<string> Dropped(JsonNode monster)

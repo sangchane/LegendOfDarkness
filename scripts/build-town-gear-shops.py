@@ -98,6 +98,11 @@ SHOPS = [
         # 노바 팩에서 들여온 무도가 너클 사다리의 아래 두 칸(`scripts/build-nova-knuckles.py`).
         # 5.99 상점 47개에 무도가 무기 목록이 없어 노비스 델란도 같은 두 칸으로 메운다.
         "너클": ["글러브1", "견습자의글러브"],
+        # 41레벨 전사 무기 — 5.99 전사무기 목록(에페~투핸드엑시큐터)에 없어 어디서도 못 샀다(사용자 2026-09-26
+        # "액스를 상점에"). 원작 표(`data/game-data/items-original-sheets.json` 판매가격 6100 = 템플릿 Value)가 있고
+        # 5.99·노바 팩 둘 다 같은 이름·레벨 41 로 적었다(값은 둘 다 100000 — 원작 표가 먼저다). 수오미가 21~50 레벨
+        # 마을이라(뮤레칸) 노비스 델란이 아니라 여기서 판다.
+        "원작무기": ["액스"],
         "문": (6, 13),   # warp 수오미마을(11,55) to 수오미무기점(6,13)
     },
     {
@@ -123,6 +128,9 @@ SHOPS = [
         # 1~10레벨이 낄 수 있는 것은 원작에도 원소 목걸이·벨트 넷씩뿐이다(사용자, 2026-09-23). 5.99 목록엔 없다.
         "원작장신구": ["바다의목걸이", "바람의목걸이", "화염의목걸이", "대지의목걸이",
                    "바다의벨트", "바람의벨트", "화염의벨트", "대지의벨트"],
+        # 로오의반지는 사냥터 드랍(방어 접미사)이 되어 상점에서는 홍옥반지로 바꿔 판다 — 서버 커밋 e1a4bc4e3 이
+        # 파일에 손으로 적은 것을 여기 옮겨 둔다(다시 돌려도 되돌아가지 않게).
+        "바꿈": {"로오의반지": "홍옥반지"},
         "문": (10, 23),  # warp 우드랜드입구 to world map — 세계지도에서 내려서는 칸
     },
 ]
@@ -407,9 +415,9 @@ def main():
                 if name not in seen:
                     seen.add(name)
                     names.append(name)
-        for name in shop.get("원작장신구", []):
+        for name in shop.get("원작장신구", []) + shop.get("원작무기", []):
             if name not in items:
-                trouble.append(f"{who}: 원작 장신구 {name} 이 아이템 템플릿에 없다")
+                trouble.append(f"{who}: 원작 물건 {name} 이 아이템 템플릿에 없다")
             elif name not in seen:
                 seen.add(name)
                 names.append(name)
@@ -420,6 +428,7 @@ def main():
                 seen.add(name)
                 names.append(name)
 
+        names = [shop.get("바꿈", {}).get(n, n) for n in names]
         missing = [n for n in names if n not in items]
         if missing:
             trouble.append(f"{who}: 아이템 템플릿에 없는 물건 {missing}")

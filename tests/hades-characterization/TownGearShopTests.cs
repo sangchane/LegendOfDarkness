@@ -244,6 +244,21 @@ public sealed class TownGearShopTests : IDisposable
     }
 
     /// <summary>
+    /// 41레벨 전사 무기 「액스」는 5.99 전사무기 목록에 없어 어디서도 못 샀다(사용자 2026-09-26 "액스를 상점에").
+    /// 수오미 가이가 원작 표 값(판매가격 6100)으로 판다 — `scripts/build-town-gear-shops.py` 원작무기.
+    /// </summary>
+    [Fact]
+    public void The_suomi_weapon_smith_sells_the_level_41_axe_at_the_original_price()
+    {
+        Dictionary<string, JsonNode> items = Items();
+
+        Assert.Contains("액스", Stock(WeaponSmith));
+        Assert.Equal(41, items["액스"]["LevelRequired"]!.GetValue<int>());
+        Assert.Equal(1, items["액스"]["Class"]!.GetValue<int>());
+        Assert.Equal(6100, items["액스"]["Value"]!.GetValue<int>());
+    }
+
+    /// <summary>
     /// 5.99 팩이 NPC 에 묶지 않고 남긴 장신구 목록 — 각반·신발·벨트·귀걸이·방패·반지(+전사투구)。
     /// 장신구 칸은 방패 3 · 투구 4 · 귀걸이 5 · 목걸이 6 · 반지 7 · 장갑 9 · 벨트 11 · 각반 12 · 신발 13 이다.
     /// 그중 **1~25레벨에 낄 수 있는 칸**이 실제로 팔리는지 본다.
