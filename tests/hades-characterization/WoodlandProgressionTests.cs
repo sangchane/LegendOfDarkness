@@ -201,18 +201,19 @@ public sealed class WoodlandProgressionTests : IDisposable
     /// What is checked is a ceiling, not an equality, because what the server reports is what is
     /// <em>left</em>: a kill worth more than the level needed carries its remainder straight into the next
     /// one, so the figure is the requirement minus whatever came over. The ceiling is still enough to
-    /// catch the old curve, which asked 12,000 at level three where the original asks 3,000.
+    /// catch Hades's own curve, which asked 12,000 at level three where the original asks 2,400.
     /// </para>
     /// <para>
-    /// Three per cent of slack on the ceiling because the server works the number out from a formula
-    /// fitted to that table rather than reading the table. Fifty of the ninety-seven levels come out
-    /// exactly; the worst is level 56 at 2.94 %.
+    /// Each value in the table is what that one level costs, not a running total: 5.99's
+    /// <c>Novaonline.exe</c> compares the experience held against table[level+1] and puts it back to
+    /// zero on a level (0x4699cb · 0x469b15, 2026-09-26). This test used to read it as a running total
+    /// and take differences, which let a curve about a twenty-fifth of the original's through at level 50.
     /// </para>
     /// </remarks>
     private static void AssertNextMatchesTheOriginal(Vitals me)
     {
         long asked = OriginalRequirement(me.Level + 1);
-        long ceiling = asked + asked * 3 / 100;
+        long ceiling = asked;
 
         Assert.True(
             me.ExperienceToGo > 0 && me.ExperienceToGo <= ceiling,
@@ -222,8 +223,8 @@ public sealed class WoodlandProgressionTests : IDisposable
     }
 
     /// <summary>
-    /// What the original asked to go from <paramref name="level" /> minus one up to it, read from the
-    /// pack's own table rather than written down here.
+    /// What the original asked to go from <paramref name="level" /> minus one up to it — the table's
+    /// value for that level as it stands, read from the pack's own table rather than written down here.
     /// </summary>
     private static long OriginalRequirement(int level)
     {
@@ -231,7 +232,7 @@ public sealed class WoodlandProgressionTests : IDisposable
             HadesWorkspace.RepositoryRoot,
             "data", "server-packs", "5.99-server", "db", "server", "experience.txt");
 
-        Dictionary<int, long> total = [];
+        Dictionary<int, long> cost = [];
 
         foreach (string line in File.ReadAllLines(path, System.Text.Encoding.GetEncoding(949)))
         {
@@ -240,18 +241,17 @@ public sealed class WoodlandProgressionTests : IDisposable
             if (parts.Length < 4
                 || !int.TryParse(parts[0], out int kind) || kind != 0
                 || !int.TryParse(parts[1], out int at)
-                || !long.TryParse(parts[3], out long cumulative))
+                || !long.TryParse(parts[3], out long value))
             {
                 continue;
             }
 
-            total.TryAdd(at, cumulative);
+            cost.TryAdd(at, value);
         }
 
-        Assert.True(total.ContainsKey(level) && total.ContainsKey(level - 1),
-            $"원작 표에 {level} 레벨이 없습니다.");
+        Assert.True(cost.ContainsKey(level), $"원작 표에 {level} 레벨이 없습니다.");
 
-        return total[level] - total[level - 1];
+        return cost[level];
     }
 
     /// <summary>

@@ -34,18 +34,18 @@ def read(path):
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
+EXPERIENCE = ROOT / "data" / "server-packs" / "5.99-server" / "db" / "server" / "experience.txt"
+
+
 def to_reach(level):
-    """ExperienceCurve.ToReach 와 같은 식. 누적이 아니라 그 한 레벨의 값이다."""
-    early = [0, 0, 600, 1800, 3000, 4200, 5850, 6798]
+    """ExperienceCurve.ToReach 와 같은 값 — 5.99 experience.txt 직업 1 줄의 넷째 칸 그대로. 누적이 아니라 그 한 레벨의 값이다."""
     if level <= 1:
         return 0
-    if level < len(early):
-        return early[level]
-    if level <= 49:
-        return int(1236 * level - 1854)
-    if level <= 68:
-        return int(61000 * 1.02747 ** (level - 50))
-    return int(130872 * 1.02482 ** (level - 69))
+    for line in EXPERIENCE.read_text(encoding="cp949").splitlines():
+        parts = line.split()
+        if len(parts) >= 4 and parts[0] == "1" and parts[1] == str(level):
+            return int(parts[3])
+    raise KeyError(level)
 
 
 def areas():

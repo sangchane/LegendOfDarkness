@@ -112,7 +112,9 @@ public partial class GameScreen : Control
     private ProgressBar _manaBar = null!;
     private Label _healthText = null!;
     private Label _manaText = null!;
-    private Label _experience = null!;
+    private ProgressBar _experienceBar = null!;
+
+    private Label _experienceText = null!;
     // 버프·디버프 아이콘 — 체력·마력 판의 첫 줄, 이름 옆(사용자, 2026-09-26). 다섯까지, 나머지는 "+N".
     private readonly StatusStrip _myStatus = new(side: 12, most: 5);
     private Vitals? _shownVitals;
@@ -1828,13 +1830,11 @@ public partial class GameScreen : Control
         VBoxContainer vitals = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
         vitals.AddThemeConstantOverride("separation", 0);
 
-        // 경험치는 막대 없이 숫자만 둔다 — 서버는 다음 레벨까지 얼마 남았는지만 말하고 그 레벨에 얼마가 드는지는
-        // 말하지 않는다. 막대를 그리려면 길이를 지어내야 한다.
-        _experience = Aux(string.Empty);
-
+        // 경험치도 게이지로 — 이번 레벨에 모은 양 / 드는 양(사용자 요청 2026-09-26: "문구는 필요 없으니 게이지로 하고 필요한
+        // 경험치 표기"). 서버는 남은 양만 보내므로 드는 양은 원작 표(ExperienceGauge)에서 읽는다.
         vitals.AddChild(Gauge("체력", Greybox.Health, out _healthBar, out _healthText));
         vitals.AddChild(Gauge("마력", Greybox.Mana, out _manaBar, out _manaText));
-        vitals.AddChild(_experience);
+        vitals.AddChild(Gauge("EXP", Greybox.Title, out _experienceBar, out _experienceText));
 
         return vitals;
     }
@@ -1887,11 +1887,19 @@ public partial class GameScreen : Control
         Fill(_healthBar, _healthText, mine.Health, mine.MaximumHealth);
         Fill(_manaBar, _manaText, mine.Mana, mine.MaximumMana);
 
-        string points = mine.Unspent > 0 ? $" · 점수 {mine.Unspent}" : string.Empty;
-
-        _experience.Text = mine.Level <= 0
-            ? string.Empty
-            : (mine.ExperienceToGo <= 0 ? "EXP 다 올랐습니다" : $"EXP 다음까지 {mine.ExperienceToGo:N0}") + points;
+        if (ExperienceGauge.Of(mine.Level, mine.ExperienceToGo) is { } exp)
+        {
+            _experienceBar.MaxValue = exp.Need;
+            _experienceBar.Value = exp.Earned;
+            _experienceText.Text = $"{ExperienceGauge.Short(exp.Earned)} / {ExperienceGauge.Short(exp.Need)}";
+        }
+        else
+        {
+            // 99 레벨(다음이 없다)이거나 아직 레벨을 모른다.
+            _experienceBar.MaxValue = 1;
+            _experienceBar.Value = mine.Level > 0 ? 1 : 0;
+            _experienceText.Text = string.Empty;
+        }
     }
 
     /// <summary>

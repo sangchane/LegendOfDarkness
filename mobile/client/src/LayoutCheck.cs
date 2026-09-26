@@ -92,12 +92,14 @@ public static class LayoutCheck
         : [];
 
     /// <summary>
-    /// Our own numbers while nothing is connected. The widest the top row will ever have to hold — a level-99 character
-    /// with five-digit health and mana — so a check measures the row at its fullest, and a plain run still shows bars.
+    /// Our own numbers while nothing is connected. The widest the top row will ever have to hold — a level-98 character
+    /// (the last with a next level, so the experience gauge carries its longest numbers, 7 digits over 7) with five-digit
+    /// health and mana — so a check measures the row at its fullest, and a plain run still shows bars.
     /// </summary>
     public static Vitals PretendVitals { get; } = Vitals.Unknown with
     {
-        Level = 99, Health = 99999, MaximumHealth = 99999, Mana = 99999, MaximumMana = 99999, Gold = 999_999_999
+        Level = 98, Health = 99999, MaximumHealth = 99999, Mana = 99999, MaximumMana = 99999, Gold = 999_999_999,
+        ExperienceToGo = 3_000_000
     };
 
     /// <summary>
