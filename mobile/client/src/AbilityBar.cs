@@ -609,6 +609,13 @@ public sealed partial class AbilityBar : Control
         Place(chip, AbilityFan.Coma, AbilityFan.PotionSide);
     }
 
+    /// <summary>[대화] 단추를 전환(기술) 단추 왼쪽, 부채꼴 밖에(<see cref="AbilityFan.Chat" />, 2026-09-27).</summary>
+    public void HoldChat(Button chat)
+    {
+        chat.CustomMinimumSize = new Vector2(AbilityFan.ChatSide, AbilityFan.ChatSide);
+        Place(chat, AbilityFan.Chat, AbilityFan.ChatSide);
+    }
+
     private void Place(Button button, (int X, int Y) centre, int side)
     {
         button.Position = new Vector2(centre.X - (side / 2), centre.Y - (side / 2));

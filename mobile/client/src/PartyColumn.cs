@@ -88,10 +88,13 @@ public sealed partial class PartyColumn : VBoxContainer
         _ask = Plated(asking);
         _ask.Visible = false;
 
-        // [나가기] — 격자 밖, 게임 화면이 격자 아래(자리가 없으면 옆)에 세운다. 작게, 그래도 손가락 높이(48)는 지킨다.
-        Leave = new Button { Text = "나가기", CustomMinimumSize = new Vector2(LeaveWide, Main.TouchMinimum), Visible = false };
+        // [나가기] — 격자 오른쪽 위 모서리에 붙는 작은 그림 단추(문 밖으로 나가는 화살표, 2026-09-27). 누르는 곳은 32 — 포션 칸과
+        // 같은 크기, 급하게 누를 일이 없다. 누르면 전처럼 곧바로 나간다(묻지 않는다).
+        Leave = new Button { TooltipText = "파티 나가기", CustomMinimumSize = new Vector2(LeaveSide, LeaveSide), Visible = false, FocusMode = FocusModeEnum.None };
         Greybox.Plain(Leave);
-        Leave.AddThemeFontSizeOverride("font_size", FontSize);
+        Glyph door = new(GlyphKind.Leave, 16) { Paint = Greybox.Text };
+        Leave.AddChild(door);
+        WindowFrame.Centre(door, 16);
         Leave.Pressed += () => Left?.Invoke();
 
         _frame.AddThemeConstantOverride("h_separation", TileGap);
@@ -129,8 +132,8 @@ public sealed partial class PartyColumn : VBoxContainer
     /// <summary>격자에 선 타일 수(봇 포함) — 게임 화면이 열 수를 정하려고.</summary>
     public int TileCount => (_botShown is null ? 0 : 1) + _memberCount;
 
-    /// <summary>[나가기] 의 폭.</summary>
-    public const int LeaveWide = 60;
+    /// <summary>[나가기] 그림 단추의 한 변.</summary>
+    public const int LeaveSide = 32;
 
     /// <summary>
     /// 봇 타일을 그린다. 이름이 없으면 숨긴다. 숫자(<paramref name="numbers" />, 0x5E 종류 4 꼬리)는 타일에 적지 않고 누르기 전

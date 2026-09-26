@@ -23,7 +23,13 @@ public enum GlyphKind
     Town,
     Field,
     Plus,
-    Minus
+    Minus,
+
+    /// <summary>엔터 키(↵) — [대화] 단추(2026-09-27).</summary>
+    Enter,
+
+    /// <summary>문틀 밖으로 나가는 화살표 — 파티 [나가기](2026-09-27).</summary>
+    Leave
 }
 
 /// <summary>
@@ -159,6 +165,19 @@ public sealed partial class Glyph : Control
 
             case GlyphKind.Minus:
                 DrawLine(P(0.2f, 0.5f), P(0.8f, 0.5f), c, w + 0.5f, true);
+                break;
+
+            case GlyphKind.Enter:
+                // 위에서 내려와 왼쪽으로 꺾이고, 끝에 왼쪽을 가리키는 촉 — 키보드의 엔터.
+                DrawPolyline([P(0.78f, 0.15f), P(0.78f, 0.62f), P(0.2f, 0.62f)], c, w, true);
+                DrawPolyline([P(0.4f, 0.42f), P(0.19f, 0.62f), P(0.4f, 0.82f)], c, w, true);
+                break;
+
+            case GlyphKind.Leave:
+                // 왼쪽이 막힌 문틀과 그 밖으로 나가는 오른쪽 화살표.
+                DrawPolyline([P(0.5f, 0.15f), P(0.15f, 0.15f), P(0.15f, 0.85f), P(0.5f, 0.85f)], c, w, true);
+                DrawLine(P(0.36f, 0.5f), P(0.88f, 0.5f), c, w, true);
+                DrawPolyline([P(0.68f, 0.3f), P(0.89f, 0.5f), P(0.68f, 0.7f)], c, w, true);
                 break;
 
             case GlyphKind.Field:

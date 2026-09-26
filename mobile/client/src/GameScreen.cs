@@ -1320,12 +1320,11 @@ public partial class GameScreen : Control
         // 높이는 직접 센다 — 흐르는 칸은 폭이 바뀐 다음 프레임에야 제 높이를 다시 잰다.
         members.OffsetBottom = top + (rows * PartyColumn.TileRow) + ((rows - 1) * gap);
 
-        // [나가기]: 격자 아래, 방향판에 닿으면 격자 오른쪽 옆 위.
-        bool under = members.OffsetBottom + gap + Main.TouchMinimum <= floor;
-        leave.OffsetLeft = under ? edge : members.OffsetRight + gap;
-        leave.OffsetTop = under ? members.OffsetBottom + gap : top;
-        leave.OffsetRight = leave.OffsetLeft + PartyColumn.LeaveWide;
-        leave.OffsetBottom = leave.OffsetTop + Main.TouchMinimum;
+        // [나가기]: 격자 오른쪽 위 모서리에 붙는 작은 그림 단추(사용자, 2026-09-27: 크고 자리가 뜬금없다).
+        leave.OffsetLeft = members.OffsetRight + gap;
+        leave.OffsetTop = top;
+        leave.OffsetRight = leave.OffsetLeft + PartyColumn.LeaveSide;
+        leave.OffsetBottom = leave.OffsetTop + PartyColumn.LeaveSide;
 
         float below = !members.Visible ? top - Main.Gutter : leave.Visible ? Mathf.Max(members.OffsetBottom, leave.OffsetBottom) : members.OffsetBottom;
 
@@ -1977,6 +1976,15 @@ public partial class GameScreen : Control
         }
 
         _abilities = new AbilityBar { SizeFlagsVertical = SizeFlags.ShrinkEnd };
+
+        // [대화] — 기술 단추 왼쪽의 둥근 단추, 엔터 키(↵) 그림(사용자, 2026-09-27). 전에는 기록 줄 끝의 "대화" 글자 단추였다.
+        Button said = new() { TooltipText = "대화", CustomMinimumSize = new Vector2(AbilityFan.ChatSide, AbilityFan.ChatSide), FocusMode = FocusModeEnum.None };
+        Greybox.Disc(said);
+        Glyph enter = new(GlyphKind.Enter, 20) { Paint = Greybox.Text };
+        said.AddChild(enter);
+        WindowFrame.Centre(enter, 20);
+        said.Pressed += () => Chatting(true);
+        _abilities.HoldChat(said);
         _abilities.Cooling = (skill, slot) => _server?.CoolingFor(skill, slot) ?? 0;
         _abilities.Standing = () => (_server?.Path, _server?.Vitals?.Level ?? 0);
         _abilities.SkillUsed += slot =>
@@ -2114,16 +2122,7 @@ public partial class GameScreen : Control
         _messages.Tapped += () => Chatting(true);
         row.AddChild(_messages);
 
-        Button said = new()
-        {
-            Text = "대화",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
-            SizeFlagsVertical = SizeFlags.ShrinkEnd
-        };
-        Greybox.Plain(said);
-        said.Pressed += () => Chatting(true);
-        row.AddChild(said);
-
+        // [대화] 는 이 줄이 아니라 기술 단추 왼쪽에 선다 — 글자 대신 엔터 키 그림(사용자, 2026-09-27, AbilityBar.HoldChat).
         return row;
     }
 

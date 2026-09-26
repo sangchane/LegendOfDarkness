@@ -48,6 +48,23 @@ public sealed class AbilityFanTests
         Assert.Equal((AbilityFan.NextSide / 2, AbilityFan.NextSide / 2), AbilityFan.Next);
     }
 
+    /// <summary>
+    /// [대화] 는 전환 단추 왼쪽, 부채꼴 밖에 같은 줄로 선다 — 전환과 틈 하나 이상 떨어지고, 세로 화면의 방향판 → · ↓ 키(부채꼴 좌표,
+    /// <see cref="AbilityFan.Chat" /> 설명)와도 틈 하나 이상.
+    /// </summary>
+    [Fact]
+    public void Chat_stands_left_of_the_switch_clear_of_it_and_of_the_pad_keys()
+    {
+        int half = AbilityFan.ChatSide / 2;
+        (int x, int y) = AbilityFan.Chat;
+
+        Assert.True(x + half <= 0, "대화 단추가 부채꼴 안으로 들어왔다");
+        Assert.True(AbilityFan.Switch.X - (AbilityFan.ButtonSide / 2) - (x + half) >= Gutter, "대화와 전환이 너무 붙었다");
+        Assert.True(y + half <= AbilityFan.Height && Math.Abs(y - AbilityFan.Switch.Y) <= half, "대화가 전환과 같은 줄이 아니다");
+        Assert.True(y - half - 196 >= Gutter, "대화가 방향판 → 키에 붙었다");
+        Assert.True(x - half - (-66) >= Gutter, "대화가 방향판 ↓ 키에 붙었다");
+    }
+
     [Fact]
     public void There_is_a_place_for_every_button_on_a_page()
     {

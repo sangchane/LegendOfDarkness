@@ -60,6 +60,16 @@ public static class AbilityFan
     /// <summary>코마디움 칸 — 포션 칸과 같은 크기, 부채꼴 왼쪽 위(다음 쪽 단추 왼쪽). 혼수를 풀 때만 누른다.</summary>
     public static (int X, int Y) Coma { get; } = (56, 40);
 
+    /// <summary>
+    /// [대화](엔터 키 그림) — 전환(기술) 단추 왼쪽, 부채꼴 **밖**(사용자, 2026-09-27: 대화 단추를 기술 단추 왼쪽으로). 세로 화면에서는
+    /// 방향판 오른쪽 아래 빈 구석(→ 아래, ↓ 오른쪽)에 든다: 부채꼴과 방향판은 아래가 맞춰져 있고 틈이 14 라, 방향판의 → 는 부채꼴
+    /// 좌표로 x −62..−14 · y 148..196, ↓ 는 x −114..−66 · y 200..248 이다.
+    /// </summary>
+    public static (int X, int Y) Chat { get; } = (-32, 224);
+
+    /// <summary>[대화] 단추의 한 변 — 기술 단추(48)보다 작게.</summary>
+    public const int ChatSide = 40;
+
     public static int Pages(int learned) => Paging.Pages(learned, PerPage);
 
     /// <summary>The page after this one, back to the first after the last.</summary>
