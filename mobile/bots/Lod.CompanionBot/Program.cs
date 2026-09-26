@@ -32,11 +32,7 @@ while (!stop.IsCancellationRequested)
 {
     try
     {
-        IPAddress address = IPAddress.TryParse(config.Host, out IPAddress? parsed)
-            ? parsed
-            : (await Dns.GetHostAddressesAsync(config.Host, stop.Token))[0];
-
-        using WorldSession session = await Enter(address);
+        using WorldSession session = await BotLogin.EnterAsync(config, Log, stop.Token);
         using WorldClient world = new(session);
         Task pump = world.PumpAsync(stop.Token);
         Log("접속했습니다 — 주인을 기다립니다.");
@@ -50,9 +46,9 @@ while (!stop.IsCancellationRequested)
     {
         break;
     }
-    catch (Exception failed) when (failed is SocketException or IOException or ProtocolException or TimeoutException)
+    catch (Exception failed) when (!stop.IsCancellationRequested)
     {
-        Log($"접속하지 못했습니다: {failed.Message}");
+        Log($"접속하지 못했습니다: {BotLogin.Describe(failed)}");
     }
 
     // 다시 접속 — 5초에서 시작해 1분까지 늘린다.
@@ -69,20 +65,3 @@ while (!stop.IsCancellationRequested)
 }
 
 Log("멈췄습니다.");
-
-// 로그인. 계정이 없으면(처음 한 번) 성직자로 만든다 — 옷은 서버가 성직자 기본 옷을 입힌다(LoginServer.EquipStarterOutfit).
-async Task<WorldSession> Enter(IPAddress address)
-{
-    try
-    {
-        return await HadesLoginClient.LoginAsync(address, config.LoginPort, config.Name, config.Password, null, stop.Token);
-    }
-    catch (ProtocolException refused) when (refused.Message.Contains("계정", StringComparison.Ordinal))
-    {
-        Log("계정이 없어 성직자로 만듭니다.");
-        const byte priest = 4;
-        return await HadesLoginClient.CreateCharacterAsync(
-            address, config.LoginPort, config.Name, config.Password, hairStyle: 1, gender: 1, hairColor: 1, path: priest,
-            cancellationToken: stop.Token);
-    }
-}
