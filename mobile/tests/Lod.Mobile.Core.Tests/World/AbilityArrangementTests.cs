@@ -94,6 +94,59 @@ public sealed class AbilityArrangementTests
     }
 
     [Fact]
+    public void Clearing_a_never_touched_slot_does_not_shift_the_others_or_bring_the_cleared_skill_back()
+    {
+        AbilityArrangement arrangement = new();
+        IReadOnlyList<Item> learned = Learned(1, 2, 3);
+
+        // 배치 — 아직 아무도 손대지 않아 서버 순서 그대로: 0번 기술1 · 1번 기술2 · 2번 기술3.
+        IReadOnlyList<Item?> before = arrangement.Fill(learned, item => item.Slot, 6);
+        string?[] beforeExpected = ["기술 1", "기술 2", "기술 3", null, null, null];
+        Assert.Equal(beforeExpected, Names(before));
+
+        // 0번 자리(기술 1)를 길게 눌러 "비우기" — 화면은 지금 그 자리에 있던 슬롯 번호(1)를 함께 넘긴다.
+        arrangement.Clear(0, slot: 1);
+
+        // 서버가 기술 목록을 다시 보낸다 — 같은 목록.
+        IReadOnlyList<Item?> after = arrangement.Fill(learned, item => item.Slot, 6);
+
+        // 버그: 예전에는 기술 1이 1번 자리로 다시 들어오고 기술 2·3이 한 칸씩 밀렸다. 고친 뒤에는 0번만
+        // 비고 1·2번은 그대로다 — 기술 1은 어디에도 다시 나타나지 않는다.
+        string?[] afterExpected = [null, "기술 2", "기술 3", null, null, null];
+        Assert.Equal(afterExpected, Names(after));
+
+        // 저장하고 다시 읽어도 같다.
+        AbilityArrangement spells = new();
+        string[] lines = [.. AbilitySlotSave.ToLines(arrangement, spells)];
+
+        AbilityArrangement reread = new();
+        AbilityArrangement rereadSpells = new();
+        AbilitySlotSave.Parse(lines, reread, rereadSpells);
+
+        IReadOnlyList<Item?> reloaded = reread.Fill(learned, item => item.Slot, 6);
+        Assert.Equal(Names(after), Names(reloaded));
+    }
+
+    [Fact]
+    public void Picking_a_removed_skill_again_from_the_list_brings_it_back()
+    {
+        AbilityArrangement arrangement = new();
+        IReadOnlyList<Item> learned = Learned(1, 2, 3);
+
+        arrangement.Fill(learned, item => item.Slot, 6);
+        arrangement.Clear(0, slot: 1); // 기술 1을 뺐다.
+
+        // 목록에서 기술 1을 다시 골라 3번 자리에 놓는다 — 3번 자리는 비어 있었다(displaced: null).
+        arrangement.Place(3, slot: 1, displaced: null);
+
+        IReadOnlyList<Item?> filled = arrangement.Fill(learned, item => item.Slot, 6);
+
+        // 기술 1이 3번 자리로 돌아왔고, 0·1·2번(기술 2·기술 3)은 그대로다.
+        string?[] expected = [null, "기술 2", "기술 3", "기술 1", null, null];
+        Assert.Equal(expected, Names(filled));
+    }
+
+    [Fact]
     public void Save_lines_round_trip_through_parse()
     {
         AbilityArrangement skills = new();
@@ -111,6 +164,29 @@ public sealed class AbilityArrangementTests
 
         Assert.Equal(skills.Positions, readSkills.Positions);
         Assert.Equal(spells.Positions, readSpells.Positions);
+    }
+
+    [Fact]
+    public void Removed_slots_round_trip_through_save_lines_too()
+    {
+        AbilityArrangement skills = new();
+        skills.Clear(0, slot: 1); // 비운 기술 1 — 다시 채워지면 안 된다.
+
+        AbilityArrangement spells = new();
+
+        string[] lines = [.. AbilitySlotSave.ToLines(skills, spells)];
+
+        AbilityArrangement readSkills = new();
+        AbilityArrangement readSpells = new();
+        AbilitySlotSave.Parse(lines, readSkills, readSpells);
+
+        Assert.Equal(skills.Positions, readSkills.Positions);
+        Assert.Equal(skills.RemovedSlots, readSkills.RemovedSlots);
+
+        // 다시 읽은 뒤 Fill 을 돌려도 기술 1은 여전히 나타나지 않는다.
+        IReadOnlyList<Item?> filled = readSkills.Fill(Learned(1, 2, 3), item => item.Slot, 6);
+        string?[] expected = [null, "기술 2", "기술 3", null, null, null];
+        Assert.Equal(expected, Names(filled));
     }
 
     [Fact]

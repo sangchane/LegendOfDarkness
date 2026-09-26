@@ -437,7 +437,9 @@ public sealed partial class AbilityBar : Control
 
         _clearHandler = () =>
         {
-            (heldSpells ? _spellArrangement : _skillArrangement).Clear(position);
+            // 지금 그 자리에 있던 슬롯 번호(currentSlot)도 함께 넘긴다 — 그래야 그 기술이 다른 빈 칸으로
+            // 도로 들어가지 않는다(AbilityArrangement.Clear 참고, 사용자 버그 리포트 2026-09-26).
+            (heldSpells ? _spellArrangement : _skillArrangement).Clear(position, currentSlot);
             Persist();
             _picker.Hide();
             Redraw();

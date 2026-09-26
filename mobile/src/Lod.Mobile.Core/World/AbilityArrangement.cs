@@ -10,19 +10,48 @@ namespace Lod.Mobile.Core.World;
 /// skill has always landed in an empty slot. A touched position either names the learned item's own
 /// <see cref="LearnedSkill.Slot" />/<see cref="LearnedSpell.Slot" /> to show, or <see cref="Cleared" /> for a
 /// slot a person emptied on purpose, which must stay empty rather than being refilled from the pool.
+///
+/// Clearing a slot that was only ever showing something by the pool's own default (never explicitly placed)
+/// used to let that very skill re-enter the pool and pop back into the next open position, shoving everything
+/// after it over by one (사용자 버그 리포트, 2026-09-26). <see cref="Clear" /> now also remembers the slot that
+/// was cleared in <see cref="RemovedSlots" />, so the pool never offers it again — only picking it from the
+/// list (<see cref="Place" />) brings it back.
 /// </remarks>
 public sealed class AbilityArrangement
 {
     public const int Cleared = -1;
 
     private readonly Dictionary<int, int> _positions = [];
+    private readonly HashSet<int> _removedSlots = [];
 
     /// <summary>Every touched position, for saving — position, then what is there (a Slot number, or <see cref="Cleared"/>).</summary>
     public IReadOnlyDictionary<int, int> Positions => _positions;
 
-    public void Assign(int position, int slot) => _positions[position] = slot;
+    /// <summary>Slots a person cleared on purpose — kept out of the pool everywhere, not just at the position they were cleared from, until picked again.</summary>
+    public IReadOnlySet<int> RemovedSlots => _removedSlots;
 
-    public void Clear(int position) => _positions[position] = Cleared;
+    public void Assign(int position, int slot)
+    {
+        _removedSlots.Remove(slot);
+        _positions[position] = slot;
+    }
+
+    /// <summary>
+    /// Empties <paramref name="position"/>. When <paramref name="slot"/> (what was showing there — 0 if
+    /// nothing, or unknown, such as an old save line) is given, that skill is barred from the pool everywhere
+    /// until someone picks it again, so it cannot pop back into a different empty slot.
+    /// </summary>
+    public void Clear(int position, int slot = 0)
+    {
+        _positions[position] = Cleared;
+
+        if (slot > 0)
+        {
+            _removedSlots.Add(slot);
+        }
+    }
+
+    public void MarkRemoved(int slot) => _removedSlots.Add(slot);
 
     /// <summary>Where a learned item sits, if a person has ever put it somewhere in particular.</summary>
     public int? PositionOf(int slot)
@@ -46,6 +75,8 @@ public sealed class AbilityArrangement
     /// </summary>
     public void Place(int position, int slot, int? displaced)
     {
+        _removedSlots.Remove(slot); // 목록에서 다시 골랐다 — 더는 "뺀 기술"이 아니다.
+
         if (PositionOf(slot) is { } oldPosition && oldPosition != position)
         {
             if (displaced is { } other)
@@ -75,7 +106,7 @@ public sealed class AbilityArrangement
             bySlot[slotOf(item)] = item;
         }
 
-        HashSet<int> placed = [];
+        HashSet<int> placed = [.. _removedSlots];
 
         foreach (int there in _positions.Values)
         {
@@ -132,7 +163,7 @@ public static class AbilitySlotSave
         {
             string[] parts = line.Trim().Split(' ');
 
-            if (parts.Length != 3 || !int.TryParse(parts[1], out int position))
+            if (parts.Length != 3)
             {
                 continue;
             }
@@ -145,6 +176,18 @@ public static class AbilitySlotSave
             };
 
             if (target is null)
+            {
+                continue;
+            }
+
+            // "skill removed 3" — 뺀 기술 하나. 자리(position)가 아니라 슬롯 번호를 적는 줄이라 먼저 본다.
+            if (parts[1] == "removed" && int.TryParse(parts[2], out int removedSlot))
+            {
+                target.MarkRemoved(removedSlot);
+                continue;
+            }
+
+            if (!int.TryParse(parts[1], out int position))
             {
                 continue;
             }
@@ -163,5 +206,6 @@ public static class AbilitySlotSave
     private static IEnumerable<string> Lines(string kind, AbilityArrangement arrangement) =>
         arrangement.Positions
             .OrderBy(pair => pair.Key)
-            .Select(pair => $"{kind} {pair.Key} {(pair.Value == AbilityArrangement.Cleared ? "empty" : pair.Value.ToString())}");
+            .Select(pair => $"{kind} {pair.Key} {(pair.Value == AbilityArrangement.Cleared ? "empty" : pair.Value.ToString())}")
+            .Concat(arrangement.RemovedSlots.OrderBy(slot => slot).Select(slot => $"{kind} removed {slot}"));
 }
