@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Lod.Mobile.Core.World;
@@ -6,51 +7,62 @@ using Lod.Mobile.Core.World;
 namespace LodClient;
 
 /// <summary>
-/// 월드맵 창: 갈 수 있는 곳의 이름을 줄로 세운다. 그림 위에 점을 찍는 원작 모습은 아직이고,
-/// 지금은 고를 수만 있으면 된다.
+/// 월드맵 창: 갈 수 있는 곳마다 카드 한 장 — 곳 이름을 크게, 그 아래 마을/사냥터 · 도착하는 맵 · 입장 레벨(1보다 클 때만).
+/// 서버는 이름과 맵 번호만 주고, 나머지는 <c>guide.txt</c> 의 <c>area</c> 줄에서 온다(<see cref="WorldMapCards" />). 모르는 곳은
+/// 이름만 적는다 — 지어내지 않는다.
 /// </summary>
 /// <remarks>
-/// 닫을 수 있다(<see cref="Close"/>). 이 창이 열려 있는 동안 서버는 고르기 말고 이 접속의 패킷을 모두
-/// 버리므로(`NetworkServer.cs:141`), 화면만 숨기면 손이 묶인 채다 — 닫을 때 서버에 취소(0x3F, 맵 번호 0)를
-/// 보내야 조작이 돌아온다.
+/// 닫을 수 있다(<see cref="Close"/>, 오른쪽 위 X). 이 창이 열려 있는 동안 서버는 고르기 말고 이 접속의 패킷을 모두
+/// 버리므로(`NetworkServer.cs:141`), 화면만 숨기면 손이 묶인 채다 — 닫을 때 서버에 취소(맵 번호 0)를 보내야 조작이
+/// 돌아온다. 주고받는 것(0xF0 · FieldChoice)은 줄 목록이던 때와 같다.
 /// </remarks>
 public sealed partial class FieldPanel : PanelContainer
 {
-    private readonly Label _title = new() { Text = "어디로 갈까" };
-    private readonly VBoxContainer _places = new();
+    private readonly MapGuide _guide;
+    private readonly GridContainer _places = new();
+    private readonly Dictionary<Button, string> _names = [];
 
-    public FieldPanel()
+    public FieldPanel(MapGuide guide)
     {
+        _guide = guide;
         Name = "Field";
         Visible = false;
         AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         VBoxContainer inside = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         inside.AddThemeConstantOverride("separation", Main.Gutter);
-        _places.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        HBoxContainer head = new();
-        head.AddThemeConstantOverride("separation", Main.Gutter);
-        _title.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        head.AddChild(_title);
+        // 세로는 두 장씩, 가로는 세 장씩 — 가로 화면은 낮고 넓다.
+        _places.Columns = Main.Portrait ? 2 : 3;
+        _places.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _places.AddThemeConstantOverride("h_separation", Main.Gutter);
+        _places.AddThemeConstantOverride("v_separation", Main.Gutter);
 
-        Close = new Button { Text = "닫기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
-        head.AddChild(Close);
+        Close = WindowFrame.CloseButton();
 
-        ScrollContainer scroll = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+        // 세로 창은 제 높이만큼만 선다 — 굴림 칸은 속을 제 크기로 올려 보내지 않으니 세 줄(여섯 곳)이 드는 높이를 준다.
+        ScrollContainer scroll = new()
+        {
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+            CustomMinimumSize = new Vector2(0, Main.Portrait ? (72 * 3) + (Main.Gutter * 2) : 0)
+        };
         scroll.AddChild(_places);
 
-        inside.AddChild(head);
+        inside.AddChild(WindowFrame.Head(WindowFrame.Title("월드맵 — 어디로 갈까"), Close));
         inside.AddChild(scroll);
 
         MarginContainer margin = new();
         margin.AddThemeConstantOverride("margin_left", Main.Gutter);
         margin.AddThemeConstantOverride("margin_right", Main.Gutter);
-        margin.AddThemeConstantOverride("margin_top", Main.Gutter);
+        margin.AddThemeConstantOverride("margin_top", Main.Gutter / 2);
         margin.AddThemeConstantOverride("margin_bottom", Main.Gutter);
         margin.AddChild(inside);
 
-        AddChild(margin);
+        PanelContainer sheet = new();
+        sheet.AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        sheet.AddChild(margin);
+        AddChild(sheet);
     }
 
     /// <summary>창을 그냥 닫는다. 서버에 "취소"를 보내야 조작이 돌아온다 — 화면만 숨기면 손이 묶인 채다.</summary>
@@ -68,23 +80,97 @@ public sealed partial class FieldPanel : PanelContainer
             old.QueueFree();
         }
 
-        foreach (WorldMapNode place in field.Nodes)
+        _names.Clear();
+
+        foreach (WorldMapCard card in WorldMapCards.From(field, _guide))
         {
-            Button row = new()
-            {
-                Text = place.Name,
-                CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
-            };
-
-            int area = place.AreaId;
-            row.Pressed += () => Chosen?.Invoke(area);
-
-            _places.AddChild(row);
+            Button face = Card(card);
+            int area = card.AreaId;
+            face.Pressed += () => Chosen?.Invoke(area);
+            _names[face] = card.Name;
+            _places.AddChild(face);
         }
 
         Visible = true;
     }
 
-    /// <summary>그 이름의 줄 — 손 없이 확인할 때(<c>--map-go</c>) 누른다.</summary>
-    public Button? RowNamed(string name) => _places.GetChildren().OfType<Button>().FirstOrDefault(row => row.Text == name);
+    /// <summary>그 이름의 카드 — 손 없이 확인할 때(<c>--map-go</c>) 누른다.</summary>
+    public Button? RowNamed(string name) => _names.FirstOrDefault(pair => pair.Value == name).Key;
+
+    /// <summary>
+    /// 한 장: 어두운 칸(돌 아님 — 목록은 돌을 쓰지 않는다) 위에 이름, 그 아래 작은 글씨로 종류 · 도착 · 레벨. 마을은
+    /// 강조색 띠, 사냥터는 빨강 띠 — 고르기 전에 한눈에 갈린다.
+    /// </summary>
+    private static Button Card(WorldMapCard card)
+    {
+        Button face = new()
+        {
+            CustomMinimumSize = new Vector2(0, 72),
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            FocusMode = FocusModeEnum.None,
+            ClipContents = true
+        };
+
+        Color stripe = card.Kind switch { "마을" => Greybox.Accent, "사냥터" => Greybox.Gone, _ => Greybox.Muted };
+
+        foreach ((string state, Color back) in new[] { ("normal", new Color("#1f1f24")), ("hover", new Color("#1f1f24")), ("focus", new Color("#1f1f24")), ("pressed", new Color("#2a2a30")) })
+        {
+            StyleBoxFlat box = new() { BgColor = back, BorderColor = new Color("#303036") };
+            box.SetBorderWidthAll(1);
+            box.BorderWidthLeft = 4;
+            box.BorderColor = new Color("#303036");
+            box.SetCornerRadiusAll(8);
+            face.AddThemeStyleboxOverride(state, box);
+        }
+
+        ColorRect band = new() { Color = stripe, MouseFilter = MouseFilterEnum.Ignore };
+        band.AnchorTop = 0;
+        band.AnchorBottom = 1;
+        band.OffsetLeft = 0;
+        band.OffsetRight = 4;
+        face.AddChild(band);
+
+        VBoxContainer words = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.Center };
+        words.SetAnchorsPreset(LayoutPreset.FullRect);
+        words.OffsetLeft = 14;
+        words.OffsetRight = -8;
+        words.AddThemeConstantOverride("separation", 2);
+
+        Label name = new() { Text = card.Name, MouseFilter = MouseFilterEnum.Ignore, ClipText = true };
+        name.AddThemeFontSizeOverride("font_size", 16);
+        name.AddThemeColorOverride("font_color", Greybox.Text);
+        words.AddChild(name);
+
+        List<string> about = [];
+
+        if (card.Kind.Length > 0)
+        {
+            about.Add(card.Kind);
+        }
+
+        if (card.Level > 0)
+        {
+            about.Add($"Lv {card.Level}+");
+        }
+
+        if (about.Count > 0)
+        {
+            Label kind = new() { Text = string.Join(" · ", about), MouseFilter = MouseFilterEnum.Ignore };
+            kind.AddThemeFontSizeOverride("font_size", 12);
+            kind.AddThemeColorOverride("font_color", stripe);
+            words.AddChild(kind);
+        }
+
+        if (card.Arrival.Length > 0 && card.Arrival != card.Name)
+        {
+            Label arrival = new() { Text = $"도착 {card.Arrival}", MouseFilter = MouseFilterEnum.Ignore, ClipText = true };
+            arrival.AddThemeFontSizeOverride("font_size", 11);
+            arrival.AddThemeColorOverride("font_color", Greybox.Muted);
+            words.AddChild(arrival);
+        }
+
+        face.AddChild(words);
+
+        return face;
+    }
 }

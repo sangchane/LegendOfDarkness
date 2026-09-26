@@ -17,7 +17,7 @@ namespace LodClient;
 public sealed partial class BotGearPanel : PanelContainer
 {
     private readonly GearGrid _gear = new();
-    private readonly Label _title = new() { Text = "봇 장비", SizeFlagsHorizontal = SizeFlags.ExpandFill };
+    private readonly Label _title = WindowFrame.Title("봇 장비");
     private readonly Label _potions = new() { AutowrapMode = TextServer.AutowrapMode.WordSmart };
     private readonly Label _hint = new() { AutowrapMode = TextServer.AutowrapMode.WordSmart };
     private readonly VBoxContainer _choices = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
@@ -31,13 +31,9 @@ public sealed partial class BotGearPanel : PanelContainer
         Visible = false;
         AddThemeStyleboxOverride("panel", Greybox.Stone());
 
-        Close = new Button { Text = "닫기", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
-        Greybox.Plain(Close);
-
-        HBoxContainer head = new();
-        head.AddThemeConstantOverride("separation", Main.Gutter);
-        head.AddChild(_title);
-        head.AddChild(Close);
+        // 공통 창 틀 — 오른쪽 위 X(WindowFrame).
+        Close = WindowFrame.CloseButton();
+        Control head = WindowFrame.Head(_title, Close);
 
         _potions.AddThemeColorOverride("font_color", Greybox.Text);
         _potions.AddThemeFontSizeOverride("font_size", 13);
