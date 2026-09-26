@@ -140,6 +140,20 @@
 
         <div class="tally-strip" id="ability-presentation" aria-label="연출 세 채널 채움"></div>
 
+        <section class="aip" id="ability-icon-picker" aria-labelledby="aip-title">
+          <h2 id="aip-title">무도가 아이콘 고르기</h2>
+          <p class="aip-help">기술·마법을 누르고 아래 그림에서 맞는 것을 고르세요. 다 고르면 <b>[글 복사]</b> 해서 채팅에 붙여 넣으면 그대로 바꿉니다. 고른 것은 이 브라우저에 기억됩니다.</p>
+          <div class="aip-rows"></div>
+          <p class="aip-sheet-title"></p>
+          <div class="aip-sheet"></div>
+          <div class="aip-send">
+            <label class="visually-hidden" for="aip-output">바꿀 것</label>
+            <textarea id="aip-output" class="aip-output" rows="4" readonly></textarea>
+            <div class="aip-actions"><button type="button" class="chip aip-copy">글 복사</button><button type="button" class="chip aip-reset">처음대로</button><span class="aip-copied" hidden>복사했습니다</span></div>
+          </div>
+        </section>
+
+
         <div class="filterbar item-filterbar">
           <label class="visually-hidden" for="ability-search">기술·마법 검색</label>
           <input id="ability-search" type="search" placeholder="이름으로 찾기 — 한글·영문 모두" autocomplete="off">
@@ -334,8 +348,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!-- 자료가 먼저, 그다음 모델, 마지막이 화면. overview.js 가 다른 화면의 셈까지 한 줄로 보여 주므로
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-effects-data.js"></script><script src="body-motions-data.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-icon-picker-data.js"></script><script src="ability-effects-data.js"></script><script src="body-motions-data.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
-<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="ability-icon-picker.js"></script><script src="items.js"></script>
 </body>
 </html>
