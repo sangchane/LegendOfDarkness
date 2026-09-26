@@ -29,6 +29,8 @@
   <ItemGroup>
     <!-- The mobile client's own protocol code, checked here against a running server. -->
     <ProjectReference Include="../../mobile/src/Lod.Mobile.Core/Lod.Mobile.Core.csproj" />
+    <!-- 동료 봇 프로그램의 판단 루프(CompanionRunner)를 격리 서버에 대고 그대로 돌린다. -->
+    <ProjectReference Include="../../mobile/bots/Lod.CompanionBot/Lod.CompanionBot.csproj" />
   </ItemGroup>
 
   <ItemGroup>

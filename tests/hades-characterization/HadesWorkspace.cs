@@ -36,6 +36,10 @@ public static class HadesWorkspace
             ? elsewhere
             : Path.Combine(HadesRoot, "database", "server");
 
+    /// <summary>앱이 그리는 맵 벽 파일(map번호.txt) 폴더 — 동료 봇도 이것으로 길을 찾는다.</summary>
+    public static string MapLayoutFolder { get; } =
+        Path.Combine(RepositoryRoot, "mobile", "client", "assets", "world");
+
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);

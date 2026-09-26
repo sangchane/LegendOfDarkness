@@ -84,6 +84,10 @@
 		"DeathMapY": 9,
 		// 죽으면 뮤레칸의방(20138) 10,9 — 5.99·Novaonline __SCRIPT_DEAD__. 소지품을 떨어뜨리는 벌칙은 끈다.
 		"DeathDropsItems": false,
+		// 동료 봇(성직자) 계정 이름 — 봇 프로그램(mobile/bots/Lod.CompanionBot)이 이 이름으로 접속한다. 비밀번호는 봇 쪽 설정 파일에만.
+		// 보낸 동료는 CompanionHomeMap(0 이면 StartingMap)의 CompanionHomePosition(없으면 StartingPosition)에서 기다린다.
+		"CompanionBots": [ "동료사제" ],
+		"CompanionHomeMap": 0,
 
 		// Monsters | NPCs
 		"MundaneRespawnInterval": 10.0,

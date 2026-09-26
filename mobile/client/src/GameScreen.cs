@@ -141,6 +141,7 @@ public partial class GameScreen : Control
     private bool _autoHuntDrawn;
     private bool _autoHuntPausedDrawn;
     private int _autoHuntSettling;
+    private int _companionSettling; // --companion: 자리를 잡은 뒤 [동료 부르기] 를 한 번 누르기까지 센 프레임.
 
     // [종료] 가 여는 작은 판 — 로그아웃 · 게임 종료 · 취소.
     private readonly ExitChoice _exit = new();
@@ -231,6 +232,9 @@ public partial class GameScreen : Control
 
         _settings = new SettingsPanel();
         _settings.Close.Pressed += () => _settings.Visible = false;
+        _settings.Companion.Pressed += () => _ = _server?.Companion is null
+            ? _server?.CallCompanionAsync(System.Threading.CancellationToken.None)
+            : _server.DismissCompanionAsync(System.Threading.CancellationToken.None);
         _settings.Visible = Main.OpeningSettings;
 
         _talk = new TalkPanel();
@@ -890,6 +894,15 @@ public partial class GameScreen : Control
         KeepWalking(delta);
         KeepGuiding(delta);
         KeepAutoHuntButton();
+        _settings.ShowCompanion(_server?.Companion is not null);
+
+        if (Main.CompanionOnStart && _companionSettling >= 0 && _world.MapId > 0 && _server?.Vitals is not null
+            && ++_companionSettling == 120)
+        {
+            _companionSettling = -1;
+            _settings.Companion.EmitSignal(BaseButton.SignalName.Pressed);
+            GD.Print("GREYBOX_COMPANION 부름");
+        }
         RehearseAHold(delta);
         RehearseASkill(delta);
 

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Lod.CompanionBot</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Lod.Mobile.Core/Lod.Mobile.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="companion-bot.example.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

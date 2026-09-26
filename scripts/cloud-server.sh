@@ -6,6 +6,12 @@
 #   scripts/cloud-server.sh status|logs [줄수]|restart
 #   scripts/cloud-server.sh backup    클라우드의 캐릭터를 맥(~/LOD-backups/cloud)으로 받아 온다
 #   scripts/cloud-server.sh app       앱 주소(server.cfg)를 클라우드로 — 맥 서버로 돌아가려면 lod-server.sh config
+#   scripts/cloud-server.sh bot-config  동료 봇 설정 파일을 클라우드에 만든다(비밀번호를 여기서 묻고 클라우드에만 적는다)
+#   scripts/cloud-server.sh bot-logs [줄수]   동료 봇 기록
+#
+# 동료 봇(성직자, mobile/bots/Lod.CompanionBot)은 서버와 같은 기계에서 lod-bot 으로 돈다. deploy 가 봇 프로그램과 맵 벽
+# 파일(앱의 map*.txt)도 올린다. 봇 계정 이름은 서버 설정 CompanionBots 와 같아야 하고, 비밀번호는 클라우드의
+# ~/lod-bot/companion-bot.json 에만 있다 — 그 파일이 없으면 lod-bot 은 뜨지 않는다.
 #
 # 주소는 LOD_CLOUD_IP(공인 IP) 하나. 열쇠는 ~/.ssh/lod_oracle. 올린 뒤로는 **클라우드의 캐릭터가 진짜**다 —
 # deploy 는 캐릭터(database/server/aislings)를 덮지 않는다.
@@ -17,6 +23,8 @@ IP="${LOD_CLOUD_IP:?LOD_CLOUD_IP=<공인 IP> 를 붙여 주세요}"
 KEY="$HOME/.ssh/lod_oracle"
 HOST="ubuntu@$IP"
 REMOTE=/home/ubuntu/lod          # 클라우드 쪽 FORK
+BOT_REMOTE=/home/ubuntu/lod-bot  # 동료 봇: app/(프로그램) · world/(맵 벽) · companion-bot.json(비밀번호, 여기에만)
+BOT_PROJECT="$ROOT/mobile/bots/Lod.CompanionBot"
 SSH=(ssh -i "$KEY" -o StrictHostKeyChecking=accept-new "$HOST")
 
 remote() { "${SSH[@]}" "$@"; }
@@ -40,6 +48,59 @@ upload() {
 
     # 끊겼다 이어 올릴 때 rsync 가 남긴 조각(.이름.XXXXXX)을 치운다 — 빈 조각 하나가 메타파일 읽기를 깨뜨렸다.
     remote "find $REMOTE -name '.*.??????' -type f -delete"
+}
+
+# 동료 봇 — 프로그램(.NET, 서버와 같은 런타임)과 맵 벽 파일을 올리고 lod-bot 서비스를 깐다. 여러 번 해도 같다.
+bot_upload() {
+    local out
+    out="$(mktemp -d)"
+    DOTNET_ROOT="$ROOT/.tools/dotnet-9.0.317" "$ROOT/.tools/dotnet-9.0.317/dotnet" publish "$BOT_PROJECT" \
+        -c Release -o "$out" -p:UseAppHost=false --nologo -v quiet >/dev/null
+
+    remote "mkdir -p $BOT_REMOTE/app $BOT_REMOTE/world"
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'companion-bot.json' "$out/" "$HOST:$BOT_REMOTE/app/"
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --include 'map*.txt' --exclude '*' \
+        "$ROOT/mobile/client/assets/world/" "$HOST:$BOT_REMOTE/world/"
+    rm -rf "$out"
+
+    remote 'bash -s' <<'SH'
+set -euo pipefail
+sudo tee /etc/systemd/system/lod-bot.service >/dev/null <<UNIT
+[Unit]
+Description=LOD companion bot (priest)
+After=lod.service
+# 비밀번호가 든 설정 파일이 있어야 뜬다 — scripts/cloud-server.sh bot-config
+ConditionPathExists=/home/ubuntu/lod-bot/companion-bot.json
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/lod-bot
+Environment=DOTNET_ROOT=/opt/dotnet
+ExecStart=/opt/dotnet/dotnet /home/ubuntu/lod-bot/app/Lod.CompanionBot.dll /home/ubuntu/lod-bot/companion-bot.json
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+sudo systemctl daemon-reload
+sudo systemctl enable lod-bot >/dev/null
+SH
+}
+
+# 봇 설정 파일을 클라우드에 만든다. 비밀번호는 여기서 한 번 묻고 클라우드 파일에만 적는다(맵에도 저장소에도 남기지 않는다).
+# 계정 이름은 서버 설정 CompanionBots 의 첫 이름(scripts/server-config/LoruleConfig.template.json)과 같게.
+bot_config() {
+    local name password
+    name="$(sed -n 's/.*"CompanionBots": \[ *"\([^"]*\)".*/\1/p' "$ROOT/scripts/server-config/LoruleConfig.template.json")"
+    read -r -s -p "봇 계정($name) 비밀번호: " password
+    echo
+    [ -n "$password" ] || { echo "비밀번호가 비었습니다." >&2; return 1; }
+
+    printf '{\n  "Host": "127.0.0.1",\n  "LoginPort": 2610,\n  "Name": "%s",\n  "Password": "%s",\n  "MapFolder": "world",\n  "HealOwnerPercent": 70,\n  "HealSelfPercent": 50\n}\n' \
+        "$name" "$password" | remote "mkdir -p $BOT_REMOTE && umask 077 && cat > $BOT_REMOTE/companion-bot.json"
+    remote 'sudo systemctl restart lod-bot'
+    echo "봇 설정을 적고 lod-bot 을 켰습니다 — 계정이 없으면 봇이 처음 접속할 때 성직자로 만듭니다."
 }
 
 setup() {
@@ -97,6 +158,7 @@ sudo systemctl enable lod >/dev/null
 SH
 
     upload
+    bot_upload
     # 처음 한 번만 맥의 캐릭터를 올린다.
     rsync -az --partial --timeout=60 -e "ssh -i $KEY" "$FORK/database/server/aislings" "$HOST:$REMOTE/database/server/"
     restart
@@ -114,6 +176,8 @@ restart() {
     for _ in $(seq 1 60); do
         if remote 'ss -ltn | grep -q ":2610 " && ss -ltn | grep -q ":2615 "'; then
             echo "켰습니다 — $IP · 로그인 2610 · 게임 2615"
+            # 서버가 새로 뜨면 봇도 다시 붙게 한다(설정 파일이 없으면 systemd 가 조건으로 건너뛴다).
+            remote 'sudo systemctl restart lod-bot' || true
             return
         fi
         sleep 1
@@ -125,6 +189,8 @@ restart() {
 
 logs() { remote "journalctl -u lod -n ${1:-40} --no-pager"; }
 
+bot_logs() { remote "journalctl -u lod-bot -n ${1:-40} --no-pager"; }
+
 backup() {
     local dir="$HOME/LOD-backups/cloud" name="aislings-$(date +%Y%m%d-%H%M).tar.gz"
     mkdir -p "$dir"
@@ -134,11 +200,13 @@ backup() {
 
 case "${1:-status}" in
     setup) setup ;;
-    deploy) upload; restart ;;
+    deploy) upload; bot_upload; restart ;;
     restart) restart ;;
-    status) remote 'systemctl is-active lod; ss -ltn | grep -E ":(2610|2615) "' ;;
+    status) remote 'systemctl is-active lod; echo "봇: $(systemctl is-active lod-bot)"; ss -ltn | grep -E ":(2610|2615) "' ;;
     logs) logs "${2:-40}" ;;
     backup) backup ;;
     app) app ;;
-    *) echo "쓸 수 있는 것: setup deploy restart status logs backup app"; exit 2 ;;
+    bot-config) bot_config ;;
+    bot-logs) bot_logs "${2:-40}" ;;
+    *) echo "쓸 수 있는 것: setup deploy restart status logs backup app bot-config bot-logs"; exit 2 ;;
 esac
