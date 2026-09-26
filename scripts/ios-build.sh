@@ -237,12 +237,43 @@ install_to() {
         device="$(device_id)"
     fi
 
+    # 집 Wi-Fi 에서는 기기를 로컬 네트워크 알림(Bonjour)으로 찾는데, 화면이 꺼진 아이폰은 잠시 뒤 알림을 멈춰 "unavailable" 이
+    # 된다 — 빌드(수 분) 사이에 잠기면 설치 때 안 보였다. 핫스팟에서는 아이폰이 공유기라 늘 보인다(사용자 2026-09-26).
+    # 짝지은 아이폰이 있으면 2분까지 다시 보이기를 기다린다.
     if [ -z "$device" ]; then
-        echo "기기가 보이지 않습니다 — 케이블로 한 번 짝짓고, Xcode 의 기기 창에서 '네트워크로 연결'을 켜십시오." >&2
+        local paired
+        paired="$(xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /paired|unavailable/ && $5 ~ /iPhone/ {print $3; exit}')"
+        if [ -n "$paired" ]; then
+            echo "아이폰이 잠들어 안 보입니다 — 화면을 켜고 잠금을 풀어 두십시오(2분 기다립니다)." >&2
+            for _ in $(seq 1 24); do
+                xcrun devicectl device info details --device "$paired" >/dev/null 2>&1 || true
+                device="$(device_id)"
+                [ -n "$device" ] && break
+                sleep 5
+            done
+        fi
+    fi
+
+    if [ -z "$device" ]; then
+        echo "기기가 보이지 않습니다 — 아이폰 화면을 켠 채 맥과 같은 Wi-Fi 에 두십시오. 처음이면 케이블로 한 번 짝짓고, Xcode 의 기기 창에서 '네트워크로 연결'을 켜십시오." >&2
         exit 1
     fi
 
-    xcrun devicectl device install app --device "$device" "$IPA"
+    # 와이파이에서 연결이 한 번 끊기면("Connection interrupted") 맥의 CoreDevice 서비스가 그 연결을 붙잡고
+    # "Failed to allocate RSD device" 만 되풀이했다 — 용량 탓이 아니다(2026-09-26). 서비스를 내리면 스스로 다시 뜬다.
+    for attempt in 1 2 3; do
+        if xcrun devicectl device install app --device "$device" "$IPA"; then
+            return
+        fi
+        [ "$attempt" = 3 ] && break
+        echo "설치가 끊겼습니다 — 맥의 기기 연결 서비스를 다시 켜고 한 번 더 합니다($attempt/2)." >&2
+        killall CoreDeviceService remotepairingd 2>/dev/null || true
+        for _ in $(seq 1 12); do
+            xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /^(available|connected)/' | grep -q . && break
+            sleep 5
+        done
+    done
+    exit 1
 }
 
 watch_sign() {
