@@ -5,5 +5,7 @@
   "Password": "여기에-봇-비밀번호",
   "MapFolder": "../../client/assets/world",
   "HealOwnerPercent": 70,
-  "HealSelfPercent": 50
+  "HealSelfPercent": 50,
+  "PotionHealthPercent": 40,
+  "PotionManaPercent": 30
 }

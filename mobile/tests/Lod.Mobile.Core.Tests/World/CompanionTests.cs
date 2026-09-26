@@ -234,4 +234,144 @@ public sealed class CompanionTests
         Assert.Equal(Companion.MasterKind, kind);
         Assert.Null(tie);
     }
+
+    // ── 2단계: 서버가 알리는 상태 · 해제 · 포션 · 봇 장비 선 ──────────────────
+
+    private static InventoryItem Item(int slot, string name, int stacks = 5) => new(slot, 0, 0, name, stacks, 0, 0);
+
+    private static Func<uint, IReadOnlyCollection<string>?> On(IReadOnlyCollection<string> owner, IReadOnlyCollection<string>? self = null) =>
+        serial => serial == Owner ? owner : serial == Me ? self ?? [] : null;
+
+    [Fact]
+    public void With_statuses_known_a_buff_the_owner_still_has_is_not_cast_again()
+    {
+        CompanionSight sight = Sight() with { StatusesOf = On(["horrama", "enare"], ["horrama", "enare"]) };
+
+        Assert.NotEqual(CompanionAct.Cast, new CompanionBrain().Next(sight, Defaults).Act);
+    }
+
+    /// <summary>시계가 아직 남았어도 서버가 "없다" 고 하면 다시 건다(리베라토로 지워졌거나 죽었다 살아난 경우).</summary>
+    [Fact]
+    public void A_buff_gone_from_the_owner_is_cast_again_at_once()
+    {
+        CompanionBrain brain = Buffed(at: 100);
+
+        CompanionStep step = brain.Next(Sight(seconds: 110) with { StatusesOf = On(["enare"], ["horrama", "enare"]) }, Defaults);
+
+        Assert.Equal(CompanionAct.Cast, step.Act);
+        Assert.Equal(4, step.Slot); // 호르라마
+        Assert.Equal(Owner, step.Target);
+    }
+
+    [Fact]
+    public void Just_cast_it_waits_for_the_status_report_before_casting_again()
+    {
+        CompanionBrain brain = new();
+        CompanionSight bare = Sight(seconds: 100) with { StatusesOf = On([], ["horrama", "enare"]) };
+
+        Assert.Equal(4, brain.Next(bare, Defaults).Slot);
+        CompanionStep next = brain.Next(bare with { Now = TimeSpan.FromSeconds(101.5) }, Defaults);
+        Assert.False(next.Act == CompanionAct.Cast && next.Slot == 4 && next.Target == Owner);
+    }
+
+    [Fact]
+    public void An_asleep_owner_is_woken_with_dinarcoli()
+    {
+        IReadOnlyList<LearnedSpell> spells = [.. Level21, Spell(7, "디나르콜리"), Spell(8, "디소루마")];
+        CompanionSight sight = Sight(spells: spells) with { StatusesOf = On(["sleep", "horrama", "enare"], ["horrama", "enare"]) };
+
+        CompanionStep step = new CompanionBrain().Next(sight, Defaults);
+
+        Assert.Equal(CompanionAct.Cast, step.Act);
+        Assert.Equal(7, step.Slot);
+        Assert.Equal(Owner, step.Target);
+    }
+
+    [Fact]
+    public void Low_on_health_it_drinks_before_spending_mana_on_itself()
+    {
+        CompanionSight sight = Sight(health: 150) with { Pack = [Item(3, "쿠룸"), Item(4, "마라디움")] };
+
+        CompanionStep step = new CompanionBrain().Next(sight, Defaults);
+
+        Assert.Equal(CompanionAct.Drink, step.Act);
+        Assert.Equal(3, step.Slot);
+    }
+
+    [Fact]
+    public void The_owner_is_healed_before_it_drinks()
+    {
+        CompanionSight sight = Sight(ownerHealth: 40, health: 150) with { Pack = [Item(3, "쿠룸")] };
+
+        Assert.Equal(CompanionAct.Cast, new CompanionBrain().Next(sight, Defaults).Act);
+    }
+
+    /// <summary>모자란 350 — 쿠룸(250)으론 모자라고 최하급(500)이 맞다. 상급(3000)은 아낀다.</summary>
+    [Fact]
+    public void It_picks_the_smallest_potion_that_covers_what_is_missing()
+    {
+        CompanionSight sight = Sight(health: 150) with
+        {
+            Pack = [Item(1, "상급체력포션"), Item(2, "쿠룸"), Item(3, "최하급체력포션")],
+        };
+
+        Assert.Equal(3, new CompanionBrain().Next(sight, Defaults).Slot);
+    }
+
+    [Fact]
+    public void Out_of_mana_it_drinks_instead_of_resting()
+    {
+        CompanionSight sight = Sight(mana: 5) with { Pack = [Item(4, "마라디움")] };
+
+        CompanionStep step = new CompanionBrain().Next(sight, Defaults);
+
+        Assert.Equal(CompanionAct.Drink, step.Act);
+        Assert.Equal(4, step.Slot);
+    }
+
+    [Fact]
+    public void Drinks_are_paced()
+    {
+        CompanionBrain brain = new();
+        CompanionSight sight = Sight(mana: 5, seconds: 100) with { Pack = [Item(4, "마라디움")] };
+
+        Assert.Equal(CompanionAct.Drink, brain.Next(sight, Defaults).Act);
+        Assert.NotEqual(CompanionAct.Drink, brain.Next(sight with { Now = TimeSpan.FromSeconds(100.5) }, Defaults).Act);
+    }
+
+    [Fact]
+    public void Giving_and_taking_off_go_out_as_kinds_two_and_three()
+    {
+        Assert.Equal(new byte[] { 2, 7, 0, 5 }, Companion.Give(7, 5));
+        Assert.Equal(new byte[] { 3, 1 }, Companion.TakeOff(1));
+    }
+
+    [Fact]
+    public void Statuses_read_name_seconds_and_harm()
+    {
+        byte[] body = [3, 0, 0, 0, 42, 2, .. LegacyKoreanEncoding.EncodeStringA("enare"), 0, 150, 0, .. LegacyKoreanEncoding.EncodeStringA("sleep"), 0, 9, 1];
+
+        (uint serial, IReadOnlyList<CompanionStatus> listed) = Companion.ReadStatuses(body);
+
+        Assert.Equal(42u, serial);
+        Assert.Equal([new CompanionStatus("enare", 150, false), new CompanionStatus("sleep", 9, true)], listed);
+    }
+
+    [Fact]
+    public void Life_is_two_percentages()
+    {
+        Assert.Equal(new CompanionLife(9, 80, 35), Companion.ReadLife([4, 0, 0, 0, 9, 80, 35]));
+    }
+
+    [Fact]
+    public void The_kit_lists_what_the_bot_wears_and_the_potions_it_carries()
+    {
+        byte[] worn = [1, 0x82, 0x26, 3, .. LegacyKoreanEncoding.EncodeStringA("홀리파나"), .. LegacyKoreanEncoding.EncodeStringA("홀리파나"), 0, 0, 3, 232, 0, 0, 3, 232];
+        byte[] body = [5, 0, 0, 0, 9, 1, .. worn, 1, .. LegacyKoreanEncoding.EncodeStringA("쿠룸"), 0x80, 0x2D, 0, 5];
+
+        CompanionKit kit = Companion.ReadKit(body);
+
+        Assert.Equal(new WornItem(1, 0x8226, "홀리파나", "홀리파나", 1000, 1000), Assert.Single(kit.Worn));
+        Assert.Equal(new CarriedItem("쿠룸", 0x802D, 5), Assert.Single(kit.Carried));
+    }
 }

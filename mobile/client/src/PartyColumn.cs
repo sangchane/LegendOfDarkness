@@ -90,9 +90,115 @@ public sealed partial class PartyColumn : VBoxContainer
         _frame = Plated(list);
         _frame.Visible = false;
 
+        _botFrame = BuildBotFrame();
+        _botFrame.Visible = false;
+
+        AddChild(_botFrame);
         AddChild(_invite);
         AddChild(_ask);
         AddChild(_frame);
+    }
+
+    // ── 봇 칸 ─────────────────────────────────────────────────────────────
+    // 디아블로의 동료 칸처럼 이름 한 줄, 그 아래 와우 파티원 칸처럼 체력 막대(굵게)와 마력 막대(얇게). 봇이 있을 때만 선다.
+    // 누르면 봇 장비창(BotGearPanel). 체력·마력 %는 서버가 1초마다 보낸다(0x5E 종류 4).
+
+    private readonly Control _botFrame;
+    private readonly Label _botName = new() { ClipText = true, TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis };
+    private readonly Label _botNumber = new() { HorizontalAlignment = HorizontalAlignment.Right, CustomMinimumSize = new Vector2(38, 0) };
+    private readonly ProgressBar _botHealth = Bar(Greybox.Health, 10);
+    private readonly ProgressBar _botMana = Bar(Greybox.Mana, 4);
+
+    /// <summary>봇 칸을 눌렀다 — 봇 장비창을 연다.</summary>
+    public event Action? BotOpened;
+
+    /// <summary>봇 칸 자체(손 없이 확인할 때 누르려고).</summary>
+    public Button BotButton { get; private set; } = null!;
+
+    /// <summary>봇 이름을 — 봇 칸이 따로 있으니 파티 목록에서는 뺀다.</summary>
+    private string? _botShown;
+
+    /// <summary>봇 칸을 그린다. 이름이 없으면 숨긴다. 막대 값을 모르면 막대를 숨긴다(빈 막대는 "쓰러졌다" 로 읽힌다).</summary>
+    public void ShowBot(string? name, int? health, int? mana)
+    {
+        _botShown = name;
+        _botFrame.Visible = name is not null;
+
+        if (name is null)
+        {
+            return;
+        }
+
+        _botName.Text = $"봇 · {name}";
+        _botHealth.Value = health ?? 0;
+        _botMana.Value = mana ?? 0;
+        _botHealth.Modulate = health is null ? Colors.Transparent : Colors.White;
+        _botMana.Modulate = mana is null ? Colors.Transparent : Colors.White;
+        _botNumber.Text = health is { } percent ? $"{percent,3}%" : "  —";
+    }
+
+    private Control BuildBotFrame()
+    {
+        _botName.AddThemeFontSizeOverride("font_size", FontSize);
+        _botName.AddThemeColorOverride("font_color", Greybox.Title);
+        _botName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _botNumber.AddThemeFontSizeOverride("font_size", FontSize);
+        _botNumber.AddThemeColorOverride("font_color", Greybox.Text);
+
+        HBoxContainer top = new() { MouseFilter = MouseFilterEnum.Ignore };
+        top.AddChild(_botName);
+        top.AddChild(_botNumber);
+
+        VBoxContainer inside = new() { MouseFilter = MouseFilterEnum.Ignore };
+        inside.AddThemeConstantOverride("separation", 3);
+        inside.AddChild(top);
+        inside.AddChild(_botHealth);
+        inside.AddChild(_botMana);
+
+        foreach (Control part in new Control[] { _botName, _botNumber, _botHealth, _botMana })
+        {
+            part.MouseFilter = MouseFilterEnum.Ignore;
+        }
+
+        MarginContainer pad = new() { MouseFilter = MouseFilterEnum.Ignore };
+        pad.AddThemeConstantOverride("margin_left", Main.Gutter);
+        pad.AddThemeConstantOverride("margin_right", Main.Gutter);
+        pad.AddThemeConstantOverride("margin_top", 6);
+        pad.AddThemeConstantOverride("margin_bottom", 6);
+        pad.SetAnchorsPreset(LayoutPreset.FullRect);
+        pad.AddChild(inside);
+
+        // 칸 전체가 단추다 — 손가락 최소치(48) 높이, 평평한 어둠(원작 4.51: 돌은 틀에만).
+        BotButton = new Button { CustomMinimumSize = new Vector2(Wide - 20, Main.TouchMinimum), ClipContents = true };
+
+        foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
+        {
+            BotButton.AddThemeStyleboxOverride(state, Greybox.Plate());
+        }
+
+        BotButton.AddChild(pad);
+        BotButton.Pressed += () => BotOpened?.Invoke();
+
+        PanelContainer plate = new() { SizeFlagsHorizontal = SizeFlags.ShrinkBegin };
+        plate.AddThemeStyleboxOverride("panel", Greybox.Stone());
+        plate.AddChild(BotButton);
+
+        return plate;
+    }
+
+    private static ProgressBar Bar(Color paint, int height)
+    {
+        ProgressBar bar = new()
+        {
+            CustomMinimumSize = new Vector2(0, height),
+            MaxValue = 100,
+            ShowPercentage = false,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        bar.AddThemeStyleboxOverride("background", Greybox.Surface());
+        bar.AddThemeStyleboxOverride("fill", Greybox.Fill(paint));
+
+        return bar;
     }
 
     /// <summary>How wide the column may get — a name, a short bar and a percentage, and the button beside them.</summary>
@@ -148,7 +254,8 @@ public sealed partial class PartyColumn : VBoxContainer
     {
         List<(string Name, bool Leader, int? Health)> others = roster.Grouped
             ? [.. roster.Members
-                .Where(member => !string.Equals(member.Name, self, StringComparison.OrdinalIgnoreCase))
+                .Where(member => !string.Equals(member.Name, self, StringComparison.OrdinalIgnoreCase)
+                                 && !string.Equals(member.Name, _botShown, StringComparison.OrdinalIgnoreCase))
                 .Select(member => (member.Name, member.Leader, health(member.Name)))]
             : [];
 

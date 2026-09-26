@@ -19,8 +19,11 @@ public sealed record BotConfig
 
     public int HealOwnerPercent { get; init; } = 70;
     public int HealSelfPercent { get; init; } = 50;
+    public int PotionHealthPercent { get; init; } = 40;
+    public int PotionManaPercent { get; init; } = 30;
 
-    public CompanionSettings Settings => new(HealOwnerPercent, HealSelfPercent);
+    public CompanionSettings Settings => new(HealOwnerPercent, HealSelfPercent,
+        PotionHealthPercent: PotionHealthPercent, PotionManaPercent: PotionManaPercent);
 
     public static BotConfig Load(string path)
     {

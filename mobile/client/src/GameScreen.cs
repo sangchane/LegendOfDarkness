@@ -40,6 +40,8 @@ public partial class GameScreen : Control
     private double _tabMapOpenFor = -1;
     private bool _tabMapWent;
     private SettingsPanel _settings = null!;
+    private readonly BotGearPanel _botGear = new();
+    private Control? _botGearHolder;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
     // 그대로 남아 있어(WorldClient.cs:363), 창을 도로 띄워 두 번 고르게 하면 안 된다.
@@ -237,6 +239,12 @@ public partial class GameScreen : Control
             : _server.DismissCompanionAsync(System.Threading.CancellationToken.None);
         _settings.Visible = Main.OpeningSettings;
 
+        // 봇 칸을 누르면 봇 장비창. 주기·벗기기는 우리 확장 0xF1 2·3, 결과는 서버 알림과 봇 장비 안내(0x5E 종류 5).
+        _party.BotOpened += () => _botGear.Visible = !_botGear.Visible;
+        _botGear.Close.Pressed += () => _botGear.Visible = false;
+        _botGear.Given += (slot, count) => _ = _server?.GiveToCompanionAsync(slot, count, System.Threading.CancellationToken.None);
+        _botGear.TakenOff += place => _ = _server?.TakeOffCompanionAsync(place, System.Threading.CancellationToken.None);
+
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
         _talk.Answered += (speaker, step, words) => _ = words is null
@@ -351,7 +359,7 @@ public partial class GameScreen : Control
 
         List<VBoxContainer> holders = [];
 
-        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field, _settings, _tabMap })
+        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field, _settings, _tabMap, _botGear })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -368,6 +376,11 @@ public partial class GameScreen : Control
                 _settingsHolder = holder;
             }
 
+            if (panel == _botGear)
+            {
+                _botGearHolder = holder;
+            }
+
             holder.SetAnchorsPreset(LayoutPreset.FullRect);
             holder.OffsetLeft = 0;
             holder.OffsetTop = Main.TouchMinimum + (Main.Gutter * 3);
@@ -376,6 +389,15 @@ public partial class GameScreen : Control
 
             // 가로 소지품·장비 창은 화면 높이를 거의 다 쓴다 — 위 줄 아래에서 시작하면 장비 고리 여섯 줄이 한 화면에 안
             // 들어 굴려야 했고, 사용자가 그건 못 쓴다고 했다(2026-09-23). 열려 있는 동안 오른쪽 위 줄을 덮고, 닫기는 창 안에 있다.
+            // 가로 봇 장비창은 고리 옆에 목록을 두어 넓다 — 오른쪽 기둥에 안 들어가 가운데에, 화면 높이를 다 쓴다.
+            if (panel == _botGear && !Main.Portrait)
+            {
+                holder.OffsetTop = 0;
+                holder.Alignment = BoxContainer.AlignmentMode.Center;
+                _botGear.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+                continue;
+            }
+
             if ((panel == _pack || panel == _tabMap) && !Main.Portrait)
             {
                 holder.OffsetTop = 0;
@@ -416,7 +438,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder ? 0 : column;
         }
     }
 
@@ -1016,6 +1038,7 @@ public partial class GameScreen : Control
     private void KeepParty(double delta)
     {
         PlaceParty();
+        KeepBot();
 
         if (_server is not { } server)
         {
@@ -1048,6 +1071,57 @@ public partial class GameScreen : Control
 
         RehearseParty(delta);
     }
+
+    /// <summary>
+    /// 봇 칸과 봇 장비창을 서버 소식(0x5E)에 맞춘다. 봇이 없으면 둘 다 숨긴다. <c>--bot-preview</c> 는 서버 없이 지어낸 봇으로
+    /// 그려 본다(사진·배치 검사용), <c>--bot-gear</c> 는 창까지 연다.
+    /// </summary>
+    private void KeepBot()
+    {
+        CompanionTie? bot = _server?.Companion;
+        CompanionKit? kit = _server?.CompanionKit;
+        (int? health, int? mana) = BotKit.Bars(_server?.CompanionLife);
+        IReadOnlyList<InventoryItem> pack = _server?.Pack ?? [];
+
+        if (bot is null && Main.BotPreview)
+        {
+            bot = new CompanionTie(1, "동료사제");
+            (health, mana) = (72, 45);
+            kit = new CompanionKit(
+                [new WornItem(1, 33318, "홀리파나", "홀리파나", 3000, 3000), new WornItem(2, 32873, "레더로브", "레더로브", 2000, 2000)],
+                [new CarriedItem("쿠룸", 32813, 4), new CarriedItem("마라디움", 32815, 2)]);
+            pack =
+            [
+                new InventoryItem(1, 32900, 0, "홀리머큐리아", 0, 3000, 3000),
+                new InventoryItem(2, 32878, 0, "맨틀", 0, 2500, 2500),
+                new InventoryItem(3, 32813, 0, "쿠룸", 10, 0, 0),
+                new InventoryItem(4, 32815, 0, "마라디움", 6, 0, 0),
+            ];
+
+            if (Main.BotGearOpen && !_botGearRehearsed)
+            {
+                _botGearRehearsed = true;
+                _botGear.Visible = true;
+                _botGear.Choose(1);
+            }
+        }
+
+        _party.ShowBot(bot?.Name, health, mana);
+
+        if (bot is null)
+        {
+            _botGear.Visible = false;
+            return;
+        }
+
+        if (_botGear.Visible)
+        {
+            Character? doll = _server?.Others.FirstOrDefault(other => other.Serial == bot.Serial);
+            _botGear.Show(bot.Name, kit, pack, doll);
+        }
+    }
+
+    private bool _botGearRehearsed;
 
     /// <summary>Asks whoever is picked out to join. The server says nothing back to the asker, so this screen says it.</summary>
     private void Invite()

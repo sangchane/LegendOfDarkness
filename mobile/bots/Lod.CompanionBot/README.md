@@ -18,7 +18,8 @@ DOTNET_ROOT=../../../.tools/dotnet-9.0.317 ../../../.tools/dotnet-9.0.317/dotnet
 ## 판단
 
 알맹이 `Lod.Mobile.Core/World/Companion.cs` 의 `CompanionBrain`(시험 `mobile/tests/.../CompanionTests.cs`):
-멈춤(혼수·죽음) > 주인 회복 > 자기 회복 > 버프 유지(호르라마 120초 · 에나르마 150초) > 따라가기(3칸 넘으면 걷고 2칸 안이면 선다) > 쉬기 > 대기.
+멈춤(혼수·죽음) > 주인 회복 > 봇 체력 포션(40%) > 자기 회복 마법 > 봇 마력 포션(30%) > 해제(디나르콜리·디소루마) > 버프 유지(서버가 알린 상태에 없을 때만) > 따라가기(3칸 넘으면 걷고 2칸 안이면 선다) > 쉬기 > 대기.
+포션 기준은 설정 `PotionHealthPercent`·`PotionManaPercent` 로 바꾼다. 포션·장비는 주인이 앱의 봇 장비창에서 넘겨 준다.
 레벨·마법·체력은 서버가 부를 때마다 맞춘다(부른 사람 레벨 −2). 자세한 것은 `docs/mobile-client.md` 「동료 봇」.
 
 ## 클라우드

@@ -239,6 +239,10 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private readonly ConcurrentQueue<string> _asks = new();
     private CompanionTie? _master;
     private CompanionTie? _companion;
+    private readonly ConcurrentDictionary<uint, IReadOnlyList<CompanionStatus>> _statuses = new();
+    private CompanionLife? _companionLife;
+    private CompanionKit? _companionKit;
+    private int _companionKitCount;
     private volatile PartyRoster _roster = PartyRoster.Alone;
     private volatile int _rosterCount;
 
@@ -421,6 +425,18 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>사람일 때 — 지금 함께 있는 동료 봇(0x5E 종류 2). 없으면 null.</summary>
     public CompanionTie? Companion => _companion;
+
+    /// <summary>봇일 때 — 서버가 1초마다 알리는, 주인·자기에게 걸린 것(0x5E 종류 3). 알림이 아직 없으면 null.</summary>
+    public IReadOnlyList<CompanionStatus>? StatusesOf(uint serial) => _statuses.TryGetValue(serial, out var listed) ? listed : null;
+
+    /// <summary>사람일 때 — 봇의 체력·마력 %(0x5E 종류 4).</summary>
+    public CompanionLife? CompanionLife => _companionLife;
+
+    /// <summary>사람일 때 — 봇이 입은 것과 봇 가방의 포션(0x5E 종류 5).</summary>
+    public CompanionKit? CompanionKit => _companionKit;
+
+    /// <summary>봇 장비 안내를 받은 횟수 — 바뀌었는지 보려고.</summary>
+    public int CompanionKitCount => _companionKitCount;
 
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
@@ -666,15 +682,36 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                 case CompanionTieCommand:
                     try
                     {
-                        (byte kind, CompanionTie? tie) = World.Companion.ReadTie(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        ReadOnlySpan<byte> tieBody = HadesCipher.DecodeSecured(frame, session.Parameters);
 
-                        if (kind == World.Companion.MasterKind)
+                        switch (tieBody.Length > 0 ? tieBody[0] : 0)
                         {
-                            _master = tie;
-                        }
-                        else if (kind == World.Companion.CompanionKind)
-                        {
-                            _companion = tie;
+                            case World.Companion.MasterKind:
+                                _master = World.Companion.ReadTie(tieBody).Tie;
+                                _statuses.Clear();
+                                break;
+                            case World.Companion.CompanionKind:
+                                _companion = World.Companion.ReadTie(tieBody).Tie;
+
+                                if (_companion is null)
+                                {
+                                    _companionLife = null;
+                                    _companionKit = null;
+                                    _companionKitCount++;
+                                }
+
+                                break;
+                            case World.Companion.StatusesKind:
+                                (uint on, IReadOnlyList<CompanionStatus> listed) = World.Companion.ReadStatuses(tieBody);
+                                _statuses[on] = listed;
+                                break;
+                            case World.Companion.VitalsKind:
+                                _companionLife = World.Companion.ReadLife(tieBody);
+                                break;
+                            case World.Companion.KitKind:
+                                _companionKit = World.Companion.ReadKit(tieBody);
+                                _companionKitCount++;
+                                break;
                         }
                     }
                     catch (ProtocolException cut)
@@ -988,6 +1025,14 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// <summary>동료 봇을 부른다(0xF1 1). 결과는 서버 알림(0x0A)과 0x5E 로 온다.</summary>
     public Task CallCompanionAsync(CancellationToken cancellationToken) =>
         Send(CompanionCommand, World.Companion.Call(), cancellationToken);
+
+    /// <summary>내 가방 한 칸을 봇에게(0xF1 2) — 장비면 입히고 포션이면 개수만큼(0 은 다).</summary>
+    public Task GiveToCompanionAsync(int slot, int count, CancellationToken cancellationToken) =>
+        Send(CompanionCommand, World.Companion.Give(slot, count), cancellationToken);
+
+    /// <summary>봇의 장비 한 자리를 내 가방으로(0xF1 3).</summary>
+    public Task TakeOffCompanionAsync(int place, CancellationToken cancellationToken) =>
+        Send(CompanionCommand, World.Companion.TakeOff(place), cancellationToken);
 
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>

@@ -68,6 +68,8 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             OwnerAt = owner?.Where,
             HealthOf = world.Health,
             Spells = world.Spells,
+            Pack = world.Pack,
+            StatusesOf = serial => world.StatusesOf(serial)?.Select(one => one.Name).ToHashSet(),
             Blocked = walls.For(state.Map.Id),
             Occupied =
             [
@@ -83,6 +85,11 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
         {
             case CompanionAct.Cast:
                 await world.UseSpellAsync(step.Slot, step.Target, token);
+                Say(step.Why);
+                break;
+
+            case CompanionAct.Drink:
+                await world.UseAsync(step.Slot, token);
                 Say(step.Why);
                 break;
 

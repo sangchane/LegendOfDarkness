@@ -6,7 +6,7 @@ namespace LodClient;
 /// <summary>
 /// 설정 창. 자동 포션 줄 둘 — 체력·마력이 몇 % 이하일 때 마시나를 게이지 바(<see cref="PotionGauge"/>, 10~90%
 /// 10단위, 2026-09-26)로 고른다 — 자동 사냥의 반경 슬라이더 하나·회복 기술 셀렉트 박스(<see cref="PercentSelect"/>,
-/// 1~99) 하나, [동료 부르기]/[동료 보내기] 단추 하나, 그리고 자동 로그인 끄기 단추 하나. 무엇을 마실지와 켜고 끄기는 게임 화면의 포션 단추에서 한다
+/// 1~99) 하나, [봇 부르기]/[봇 보내기] 단추 하나, 그리고 자동 로그인 끄기 단추 하나. 무엇을 마실지와 켜고 끄기는 게임 화면의 포션 단추에서 한다
 /// (<see cref="PotionChip"/>). 자동 로그인을 다시 켜는 것은 로그인 화면에서만 한다(계정·비밀번호가 그 화면에만 있다).
 /// </summary>
 public sealed partial class SettingsPanel : PanelContainer
@@ -44,7 +44,7 @@ public sealed partial class SettingsPanel : PanelContainer
 
         inside.AddChild(BuildAutoHunt());
 
-        // 동료 봇(성직자) — 부르면 서버가 봇을 내 곁으로 데려와 파티에 넣는다. 결과는 서버 알림으로 온다(우리 확장 0xF1·0x5E).
+        // 봇(성직자 동료) — 부르면 서버가 봇을 내 곁으로 데려와 파티에 넣는다. 결과는 서버 알림으로 온다(우리 확장 0xF1·0x5E).
         Companion = new Button { Text = CallText, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
         Greybox.Plain(Companion);
         inside.AddChild(Companion);
@@ -91,10 +91,10 @@ public sealed partial class SettingsPanel : PanelContainer
 
     public Button Close { get; }
 
-    private const string CallText = "동료 부르기";
-    private const string DismissText = "동료 보내기";
+    private const string CallText = "봇 부르기";
+    private const string DismissText = "봇 보내기";
 
-    /// <summary>[동료 부르기] — 동료가 있으면 [동료 보내기]. 누르면 무엇을 할지는 게임 화면이 정한다.</summary>
+    /// <summary>[봇 부르기] — 봇이 있으면 [봇 보내기]. 누르면 무엇을 할지는 게임 화면이 정한다.</summary>
     public Button Companion { get; }
 
     /// <summary>동료가 있나(0x5E)에 따라 단추 글자를 바꾼다.</summary>

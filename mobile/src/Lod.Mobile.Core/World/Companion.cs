@@ -7,6 +7,18 @@ namespace Lod.Mobile.Core.World;
 /// <summary>동료 사이의 한쪽 — 봇에게는 주인, 사람에게는 동료 봇.</summary>
 public sealed record CompanionTie(uint Serial, string Name);
 
+/// <summary>걸린 것 하나(0x5E 종류 3): 서버 이름(sleep·frozen·horrama·enare …) · 남은 초 · 해로움.</summary>
+public sealed record CompanionStatus(string Name, int Seconds, bool Harmful);
+
+/// <summary>봇의 체력·마력 %(0x5E 종류 4) — 봇 칸의 막대.</summary>
+public sealed record CompanionLife(uint Serial, int HealthPercent, int ManaPercent);
+
+/// <summary>봇 가방의 겹치는 물건 하나 — 이름 · 그림 · 개수.</summary>
+public sealed record CarriedItem(string Name, int Icon, int Stacks);
+
+/// <summary>봇이 입은 것과 봇 가방의 포션(0x5E 종류 5) — 봇 장비창.</summary>
+public sealed record CompanionKit(IReadOnlyList<WornItem> Worn, IReadOnlyList<CarriedItem> Carried);
+
 /// <summary>
 /// 동료 봇(성직자)을 부르고 보내는 선. <b>우리 확장이다.</b>
 /// </summary>
@@ -20,10 +32,90 @@ public static class Companion
 {
     public const byte MasterKind = 1;
     public const byte CompanionKind = 2;
+    public const byte StatusesKind = 3;
+    public const byte VitalsKind = 4;
+    public const byte KitKind = 5;
 
     public static byte[] Call() => [1];
 
     public static byte[] Dismiss() => [0];
+
+    /// <summary>내 가방 한 칸을 봇에게(0xF1 2): 장비면 입히고, 겹치는 물건이면 <paramref name="count" /> 개(0 은 다).</summary>
+    public static byte[] Give(int slot, int count) => [2, (byte)slot, (byte)(count >> 8), (byte)count];
+
+    /// <summary>봇의 장비 한 자리를 내 가방으로(0xF1 3).</summary>
+    public static byte[] TakeOff(int place) => [3, (byte)place];
+
+    /// <summary>0x5E 종류 3 — 한 사람(주인 또는 봇 자신)에게 걸린 것: 이름 · 남은 초 · 해로움.</summary>
+    public static (uint Serial, IReadOnlyList<CompanionStatus> Statuses) ReadStatuses(ReadOnlySpan<byte> body)
+    {
+        Require(body, 6);
+        uint serial = BinaryPrimitives.ReadUInt32BigEndian(body[1..]);
+        int count = body[5];
+        int at = 6;
+        List<CompanionStatus> listed = [];
+
+        for (int i = 0; i < count; i++)
+        {
+            string name = LegacyKoreanEncoding.DecodeStringA(body[at..], out int used);
+            at += used;
+            Require(body, at + 3);
+            listed.Add(new CompanionStatus(name, BinaryPrimitives.ReadUInt16BigEndian(body[at..]), body[at + 2] != 0));
+            at += 3;
+        }
+
+        return (serial, listed);
+    }
+
+    /// <summary>0x5E 종류 4 — 봇의 체력·마력 %.</summary>
+    public static CompanionLife ReadLife(ReadOnlySpan<byte> body)
+    {
+        Require(body, 7);
+        return new CompanionLife(BinaryPrimitives.ReadUInt32BigEndian(body[1..]), body[5], body[6]);
+    }
+
+    /// <summary>0x5E 종류 5 — 봇이 입은 것(0x37 몸 그대로)과 봇 가방의 겹치는 물건(포션).</summary>
+    public static CompanionKit ReadKit(ReadOnlySpan<byte> body)
+    {
+        Require(body, 6);
+        int at = 6;
+        List<WornItem> worn = [];
+
+        for (int i = 0; i < body[5]; i++)
+        {
+            int start = at;
+            at += 4;
+            LegacyKoreanEncoding.DecodeStringA(body[at..], out int name);
+            at += name;
+            LegacyKoreanEncoding.DecodeStringA(body[at..], out int called);
+            at += called + 8;
+            Require(body, at);
+            worn.Add(WorldClient.ReadWorn(body[start..at]));
+        }
+
+        Require(body, at + 1);
+        int carriedCount = body[at++];
+        List<CarriedItem> carried = [];
+
+        for (int i = 0; i < carriedCount; i++)
+        {
+            string name = LegacyKoreanEncoding.DecodeStringA(body[at..], out int used);
+            at += used;
+            Require(body, at + 4);
+            carried.Add(new CarriedItem(name, BinaryPrimitives.ReadUInt16BigEndian(body[at..]), BinaryPrimitives.ReadUInt16BigEndian(body[(at + 2)..])));
+            at += 4;
+        }
+
+        return new CompanionKit(worn, carried);
+    }
+
+    private static void Require(ReadOnlySpan<byte> body, int length)
+    {
+        if (body.Length < length)
+        {
+            throw new ProtocolException($"봇 안내(0x5E 종류 {(body.Length > 0 ? body[0] : 0)})가 {length}바이트보다 짧습니다 ({body.Length}바이트).");
+        }
+    }
 
     /// <summary>0x5E 를 읽는다. serial 0 이면 사이가 끝났다는 뜻이라 null.</summary>
     public static (byte Kind, CompanionTie? Tie) ReadTie(ReadOnlySpan<byte> body)
@@ -45,11 +137,15 @@ public static class Companion
 /// <param name="HealSelfPercent">자기 체력이 이 % 아래면 회복.</param>
 /// <param name="FollowFrom">주인과 이만큼 넘게 떨어지면 따라 걷기 시작한다.</param>
 /// <param name="FollowTo">따라 걷다가 이만큼 가까워지면 선다.</param>
+/// <param name="PotionHealthPercent">자기 체력이 이 % 아래면 체력 포션.</param>
+/// <param name="PotionManaPercent">자기 마력이 이 % 아래면 마력 포션(가장 싼 회복도 못 걸 마력이면 그 전에라도).</param>
 public sealed record CompanionSettings(
     int HealOwnerPercent = 70,
     int HealSelfPercent = 50,
     int FollowFrom = 3,
-    int FollowTo = 2);
+    int FollowTo = 2,
+    int PotionHealthPercent = 40,
+    int PotionManaPercent = 30);
 
 public enum CompanionAct
 {
@@ -67,6 +163,9 @@ public enum CompanionAct
 
     /// <summary>마력이 모자라 쉰다 — 저절로 차기를 기다린다.</summary>
     Rest,
+
+    /// <summary>가방의 포션 하나(<see cref="CompanionStep.Slot" /> 은 가방 칸).</summary>
+    Drink,
 }
 
 public sealed record CompanionStep(CompanionAct Act, int Slot = 0, uint Target = 0, Direction Toward = Direction.South, string Why = "");
@@ -94,6 +193,14 @@ public sealed record CompanionSight
 
     public IReadOnlyList<LearnedSpell> Spells { get; init; } = [];
 
+    /// <summary>봇 가방 — 포션을 여기서 찾는다.</summary>
+    public IReadOnlyList<InventoryItem> Pack { get; init; } = [];
+
+    /// <summary>
+    /// 주인·봇에게 지금 걸린 것의 서버 이름(0x5E 종류 3). 서버가 아직 알리지 않았으면 null — 그때는 버프를 제 시계로 다시 건다.
+    /// </summary>
+    public Func<uint, IReadOnlyCollection<string>?> StatusesOf { get; init; } = _ => null;
+
     /// <summary>벽·맵 밖.</summary>
     public Func<Tile, bool> Blocked { get; init; } = _ => false;
 
@@ -104,8 +211,9 @@ public sealed record CompanionSight
 }
 
 /// <summary>
-/// 5.99 성직자 회복·버프 마법의 값 — <c>성직자(비전직).txt</c> 의 SPELL_ 블록에서: 회복량은 위즈의 몇 배, 마력, 버프는
-/// 몇 초. 쿠로는 신성력강화가 있으면 ×15·22마력, 없으면 ×8·15마력.
+/// 5.99 성직자 회복·버프·해제 마법의 값 — <c>성직자(비전직).txt</c> 의 SPELL_ 블록에서: 회복량은 위즈의 몇 배, 마력, 버프는
+/// 몇 초. 쿠로는 신성력강화가 있으면 ×15·22마력, 없으면 ×8·15마력. 포션이 채우는 양은 서버 템플릿(templates/items)의
+/// HealthRestore·ManaRestore.
 /// </summary>
 public static class CompanionSpells
 {
@@ -114,9 +222,11 @@ public static class CompanionSpells
         Heal,
         GroupHeal,
         Buff,
+        Cure,
     }
 
-    public sealed record Entry(Kind Kind, int Power, int Mana, int Seconds = 0);
+    /// <param name="State">버프는 서버가 알리는 상태 이름(5.99 스크립트의 horrama·enare), 해제는 푸는 디버프 이름.</param>
+    public sealed record Entry(Kind Kind, int Power, int Mana, int Seconds = 0, string State = "");
 
     private static readonly Dictionary<string, Entry> Known = new(StringComparer.Ordinal)
     {
@@ -129,8 +239,23 @@ public static class CompanionSpells
         ["쿠라누스"] = new(Kind.GroupHeal, 30, 95),
         ["쿠라네라"] = new(Kind.GroupHeal, 40, 250),
         ["엑스쿠라네라"] = new(Kind.GroupHeal, 70, 430),
-        ["호르라마"] = new(Kind.Buff, 0, 55, 120),
-        ["에나르마"] = new(Kind.Buff, 0, 40, 150),
+        ["호르라마"] = new(Kind.Buff, 0, 55, 120, "horrama"),
+        ["에나르마"] = new(Kind.Buff, 0, 40, 150, "enare"),
+        // 5.99 SPELL_디나르콜리 mobnar_end → 하데스 수면(sleep), SPELL_디소루마 mobsor_end → 빙결(frozen). 30마력.
+        ["디나르콜리"] = new(Kind.Cure, 0, 30, 0, "sleep"),
+        ["디소루마"] = new(Kind.Cure, 0, 30, 0, "frozen"),
+    };
+
+    /// <summary>포션 하나가 채우는 양 — AutoPotion 의 두 목록과 같은 이름들.</summary>
+    public static readonly IReadOnlyDictionary<string, int> HealthRestore = new Dictionary<string, int>
+    {
+        ["쿠룸"] = 250, ["최하급체력포션"] = 500, ["하급체력포션"] = 1000, ["중급체력포션"] = 2000, ["상급체력포션"] = 3000, ["엑스쿠라눔"] = 10000,
+    };
+
+    public static readonly IReadOnlyDictionary<string, int> ManaRestore = new Dictionary<string, int>
+    {
+        ["마라디움"] = 100, ["최하급마력포션"] = 500, ["하급마력포션"] = 1000, ["파프리카"] = 1000, ["중급마력포션"] = 1500,
+        ["상급마력포션"] = 2000, ["블루피치"] = 2500,
     };
 
     /// <summary>배운 마법 중 이 이름의 값. 신성력강화가 쿠로를 바꾼다.</summary>
@@ -155,7 +280,7 @@ public static class CompanionSpells
 
 /// <summary>
 /// 동료 봇의 판단 — 엔진 없이. <see cref="AutoHunt" /> 처럼 우선순위 순으로 훑어 할 수 있는 첫 일 하나를 돌려준다:
-/// 멈춤(혼수·죽음) &gt; 주인 회복 &gt; 자기 회복 &gt; 버프 유지 &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
+/// 멈춤(혼수·죽음) &gt; 주인 회복 &gt; 봇 체력 포션 &gt; 자기 회복 마법 &gt; 봇 마력 포션 &gt; 해제 &gt; 버프 유지 &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
 /// SleepHunter4 의 파티원 회복(<c>PlayerMacroState</c> 의 FlowerQueue — 체력이 기준 아래인 이를 먼저)과 버프 유지(지속 시간이
 /// 끝나면 다시)를 본떴다.
 /// </summary>
@@ -173,6 +298,12 @@ public sealed class CompanionBrain
     /// <summary>버프는 지속 시간이 다 지나고 이만큼 뒤에 다시 — 일찍 걸면 걸린 사람에게 "이미 걸려있습니다." 가 간다.</summary>
     public static readonly TimeSpan BuffSlack = TimeSpan.FromSeconds(1);
 
+    /// <summary>버프를 건 뒤 서버의 상태 알림(1초마다)에 나타나기를 기다리는 시간 — 그 안에 또 걸지 않는다.</summary>
+    public static readonly TimeSpan BuffConfirm = TimeSpan.FromSeconds(3);
+
+    /// <summary>포션 사이 — 한 병 마시고 가방·체력이 바뀌는 것을 본 뒤에.</summary>
+    public static readonly TimeSpan DrinkGap = TimeSpan.FromMilliseconds(1500);
+
     /// <summary>이만큼보다 멀면 주인을 회복하지 않는다(화면 밖).</summary>
     public const int CastReach = 10;
 
@@ -182,6 +313,7 @@ public sealed class CompanionBrain
     private TimeSpan _lastCast = Never;
     private TimeSpan _lastHeal = Never;
     private TimeSpan _lastWalk = Never;
+    private TimeSpan _lastDrink = Never;
     private uint _master;
     private bool _following;
 
@@ -214,19 +346,51 @@ public sealed class CompanionBrain
         bool empowered = sight.Spells.Any(one => CompanionSpells.Bare(one.Name) == "신성력강화");
         int mana = sight.Vitals?.Mana ?? 0;
 
-        if (canCast && now - _lastHeal >= HealGap && (ownerHurt || selfHurt))
+        bool canHeal = canCast && now - _lastHeal >= HealGap;
+        bool canDrink = now - _lastDrink >= DrinkGap;
+        int cheapest = sight.Spells
+            .Select(one => CompanionSpells.Of(one.Name, empowered))
+            .Where(entry => entry is { Kind: CompanionSpells.Kind.Heal })
+            .Select(entry => entry!.Mana)
+            .DefaultIfEmpty(0)
+            .Min();
+
+        // 주인 회복(둘 다 아프면 파티 회복).
+        if (canHeal && ownerHurt)
         {
-            CompanionStep? heal = ownerHurt && selfHurt ? Best(sight, CompanionSpells.Kind.GroupHeal, sight.Master, empowered, mana, "파티 회복") : null;
-            heal ??= ownerHurt
-                ? Best(sight, CompanionSpells.Kind.Heal, sight.Master, empowered, mana, "주인 회복")
-                : Best(sight, CompanionSpells.Kind.Heal, sight.Me, empowered, mana, "자기 회복");
+            CompanionStep? heal = (selfHurt ? Best(sight, CompanionSpells.Kind.GroupHeal, sight.Master, empowered, mana, "파티 회복") : null)
+                                  ?? Best(sight, CompanionSpells.Kind.Heal, sight.Master, empowered, mana, "주인 회복");
 
             if (heal is not null)
             {
-                _lastCast = now;
-                _lastHeal = now;
-                return heal;
+                return Cast(heal, now, heal: true);
             }
+        }
+
+        // 봇 체력 포션 — 회복 마법보다 먼저(마력을 아낀다).
+        if (canDrink && Percent(sight.Vitals) < settings.PotionHealthPercent
+            && Potion(sight.Pack, CompanionSpells.HealthRestore, Missing(sight.Vitals?.MaximumHealth, sight.Vitals?.Health)) is { } health)
+        {
+            _lastDrink = now;
+            return new(CompanionAct.Drink, health.Slot, Why: $"체력 포션 {health.Name}");
+        }
+
+        if (canHeal && selfHurt && Best(sight, CompanionSpells.Kind.Heal, sight.Me, empowered, mana, "자기 회복") is { } self)
+        {
+            return Cast(self, now, heal: true);
+        }
+
+        // 봇 마력 포션 — 마력이 낮거나, 가장 싼 회복도 못 걸어 쉬어야 할 때.
+        if (canDrink && (ManaPercent(sight.Vitals) < settings.PotionManaPercent || mana < cheapest)
+            && Potion(sight.Pack, CompanionSpells.ManaRestore, Missing(sight.Vitals?.MaximumMana, sight.Vitals?.Mana)) is { } restoring)
+        {
+            _lastDrink = now;
+            return new(CompanionAct.Drink, restoring.Slot, Why: $"마력 포션 {restoring.Name}");
+        }
+
+        if (canCast && Cure(sight, empowered, mana, ownerNear) is { } cure)
+        {
+            return Cast(cure, now, heal: false);
         }
 
         if (canCast && Buff(sight, empowered, mana, ownerNear) is { } buff)
@@ -240,16 +404,62 @@ public sealed class CompanionBrain
             return step;
         }
 
-        int cheapest = sight.Spells
-            .Select(one => CompanionSpells.Of(one.Name, empowered))
-            .Where(entry => entry is { Kind: CompanionSpells.Kind.Heal })
-            .Select(entry => entry!.Mana)
-            .DefaultIfEmpty(0)
-            .Min();
-
         return mana < cheapest
             ? new(CompanionAct.Rest, Why: "마력 부족")
             : new(CompanionAct.Wait, Why: "기다림");
+    }
+
+    private CompanionStep Cast(CompanionStep step, TimeSpan now, bool heal)
+    {
+        _lastCast = now;
+
+        if (heal)
+        {
+            _lastHeal = now;
+        }
+
+        return step;
+    }
+
+    private static int Missing(int? maximum, int? value) => Math.Max(0, (maximum ?? 0) - (value ?? 0));
+
+    /// <summary>가방에 든 것 중 모자란 만큼을 채우는 가장 작은 등급 — 그런 것이 없으면 가진 것 중 가장 큰 것.</summary>
+    private static InventoryItem? Potion(IReadOnlyList<InventoryItem> pack, IReadOnlyDictionary<string, int> restore, int missing)
+    {
+        var carried = pack
+            .Where(one => restore.ContainsKey(one.Name))
+            .OrderBy(one => restore[one.Name])
+            .ThenBy(one => one.Slot)
+            .ToList();
+
+        return carried.FirstOrDefault(one => restore[one.Name] >= missing) ?? carried.LastOrDefault();
+    }
+
+    /// <summary>해제 — 주인 먼저 그다음 자기. 서버가 알린 디버프 중 배운 해제 마법이 푸는 것이 있으면.</summary>
+    private CompanionStep? Cure(CompanionSight sight, bool empowered, int mana, bool ownerNear)
+    {
+        foreach (uint target in ownerNear ? new[] { sight.Master, sight.Me } : new[] { sight.Me })
+        {
+            if (sight.StatusesOf(target) is not { Count: > 0 } on)
+            {
+                continue;
+            }
+
+            foreach (LearnedSpell spell in sight.Spells)
+            {
+                string name = CompanionSpells.Bare(spell.Name);
+
+                if (CompanionSpells.Of(name, empowered) is { Kind: CompanionSpells.Kind.Cure } entry && entry.Mana <= mana
+                    && on.Contains(entry.State)
+                    && !(_buffed.TryGetValue((name, target), out TimeSpan at) && sight.Now - at < BuffConfirm))
+                {
+                    _buffed[(name, target)] = sight.Now;
+                    return new(CompanionAct.Cast, spell.Slot, target, Why: $"해제 {name}");
+                }
+            }
+        }
+
+        return null;
     }
 
     /// <summary>이 종류에서 마력이 닿는 가장 센 것.</summary>
@@ -261,7 +471,7 @@ public sealed class CompanionBrain
             .Select(pair => new CompanionStep(CompanionAct.Cast, pair.Spell.Slot, target, Why: $"{why} {pair.Spell.Name}"))
             .FirstOrDefault();
 
-    /// <summary>버프 — 마법 차례대로, 주인 먼저 그다음 자기. 지속 시간이 다 지난 것만.</summary>
+    /// <summary>버프 — 마법 차례대로, 주인 먼저 그다음 자기. 서버가 알린 상태에 없을 때만(알림이 없으면 지속 시간이 다 지난 뒤).</summary>
     private CompanionStep? Buff(CompanionSight sight, bool empowered, int mana, bool ownerNear)
     {
         foreach (LearnedSpell spell in sight.Spells)
@@ -275,9 +485,19 @@ public sealed class CompanionBrain
             {
                 string name = CompanionSpells.Bare(spell.Name);
 
-                if (_buffed.TryGetValue((name, target), out TimeSpan at)
-                    && sight.Now - at < TimeSpan.FromSeconds(entry.Seconds) + BuffSlack)
+                bool castLately = _buffed.TryGetValue((name, target), out TimeSpan at);
+
+                if (sight.StatusesOf(target) is { } on)
                 {
+                    // 서버가 알린 상태로 — 걸려 있거나, 막 걸어 알림을 기다리는 중이면 건너뛴다.
+                    if (on.Contains(entry.State) || (castLately && sight.Now - at < BuffConfirm))
+                    {
+                        continue;
+                    }
+                }
+                else if (castLately && sight.Now - at < TimeSpan.FromSeconds(entry.Seconds) + BuffSlack)
+                {
+                    // 알림이 없으면 제 시계로(지속 시간이 다 지난 뒤).
                     continue;
                 }
 
@@ -340,6 +560,9 @@ public sealed class CompanionBrain
     }
 
     private static int Distance(Tile a, Tile b) => Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
+
+    private static int ManaPercent(Vitals? vitals) =>
+        vitals is { MaximumMana: > 0 } known ? (int)(known.Mana * 100L / known.MaximumMana) : 100;
 
     private static int Percent(Vitals? vitals) =>
         vitals is { MaximumHealth: > 0 } known ? (int)(known.Health * 100L / known.MaximumHealth) : 100;

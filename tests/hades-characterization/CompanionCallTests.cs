@@ -49,7 +49,7 @@ public sealed class CompanionCallTests : IDisposable
         await Waiting.Until(() => owner.State?.Map.Id == NovicePlain && owner.Serial != 0, "사람이 노비스평원A 에 서지 못했습니다.", _deadline.Token);
 
         // 봇이 아직 없다 — 한국어로 알린다.
-        await CallUntilHeard(owner, ownerHeard, "지금 부를 수 있는 동료가 없습니다.");
+        await CallUntilHeard(owner, ownerHeard, "지금 부를 수 있는 봇이 없습니다.");
 
         (WorldSession botSession, WorldClient bot, List<string> botHeard) = await Enter(server, BotName);
         using WorldSession botHold = botSession;
@@ -69,9 +69,15 @@ public sealed class CompanionCallTests : IDisposable
         Assert.Equal(bot.Vitals!.MaximumHealth, bot.Vitals.Health);
         Assert.Equal(bot.Vitals.MaximumMana, bot.Vitals.Mana);
 
-        string[] priest21 = ["쿠로", "신성력강화", "쿠러스", "호르라마", "에나르마", "쿠라노"];
+        string[] priest21 = ["쿠로", "신성력강화", "쿠러스", "호르라마", "에나르마", "쿠라노", "디나르콜리", "디소루마"];
         await Waiting.Until(() => bot.Spells.Select(s => CompanionSpells.Bare(s.Name)).Order().SequenceEqual(priest21.Order()),
             $"봇 마법이 5.99 사범 21레벨까지가 아닙니다: {string.Join(",", bot.Spells.Select(s => s.Name))}", _deadline.Token);
+
+        // 기본 장비 — 홀리파나(11레벨 성직자 무기) + 21레벨 남자 성직자 의상 레더로브(11). 사람에게도 봇 장비가 간다(0x5E 종류 5).
+        await Waiting.Until(() => bot.Worn.Any(w => w.Slot == 1 && w.Name == "홀리파나") && bot.Worn.Any(w => w.Slot == 2 && w.Name == "레더로브"),
+            $"봇이 기본 장비를 입지 않았습니다: {string.Join(",", bot.Worn.Select(w => $"{w.Slot}:{w.Name}"))}", _deadline.Token);
+        await Waiting.Until(() => owner.CompanionKit is { } kit && kit.Worn.Any(w => w.Name == "홀리파나"),
+            "사람에게 봇 장비가 오지 않았습니다.", _deadline.Token);
 
         // 사람 옆 칸.
         await Waiting.Until(() => bot.State is { Map.Id: NovicePlain } && owner.State is { } o &&
