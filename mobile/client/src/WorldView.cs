@@ -846,7 +846,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
                 mark.Where = one.Where;
                 mark.Sprite = one.Sprite;
-                mark.Position = Ground(one.Where);
+                mark.Count = one.Count;
+                // 같은 칸이면 금화를 먼저(아래에) 그린다 — 사용자 2026-09-26 "돈은 항상 아이템 밑에".
+                mark.Position = Ground(one.Where) + new Vector2(0, GroundPile.SortNudge(one.Sprite));
 
                 continue;
             }

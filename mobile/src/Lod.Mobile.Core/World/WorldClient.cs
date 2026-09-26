@@ -68,6 +68,12 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// <summary>월드맵을 열어 달라는 말. 원작 클라이언트는 0x80 넘는 명령을 보내지 않으므로 이 번호는 우리 것이다.</summary>
     private const byte OpenFieldCommand = 0xF0;
 
+    /// <summary>동료 봇을 불러 달라·보내 달라(우리 확장 0xF1 — <see cref="Companion" />).</summary>
+    private const byte CompanionCommand = 0xF1;
+
+    /// <summary>동료 사이(우리 확장 0x5E) — 봇에게는 주인, 사람에게는 동료.</summary>
+    private const byte CompanionTieCommand = 0x5E;
+
     /// <summary>
     /// 서버의 심장박동(ServerFormat3B, <c>PingComponent</c> 가 PingInterval 마다). 원작 클라이언트는 0x45 로 답한다 —
     /// 답이 끊긴 접속은 서버가 세계에서 뺀다(GameServer.UpdateClients). 소켓을 쥔 채 멈춘 앱(iOS 뒤로 감)도 이것으로 빠진다.
@@ -231,6 +237,8 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     // 그룹을 청한 사람들, 온 차례대로. 그리는 쪽이 하나씩 꺼내 묻는다.
     private readonly ConcurrentQueue<string> _asks = new();
+    private CompanionTie? _master;
+    private CompanionTie? _companion;
     private volatile PartyRoster _roster = PartyRoster.Alone;
     private volatile int _rosterCount;
 
@@ -407,6 +415,12 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>Takes the next person asking us to join their group (0x63), oldest first.</summary>
     public bool TakeAsk([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? name) => _asks.TryDequeue(out name);
+
+    /// <summary>봇일 때 — 서버가 정해 준 주인(0x5E 종류 1). 없으면 null.</summary>
+    public CompanionTie? Master => _master;
+
+    /// <summary>사람일 때 — 지금 함께 있는 동료 봇(0x5E 종류 2). 없으면 null.</summary>
+    public CompanionTie? Companion => _companion;
 
     /// <summary>What we are carrying, as the server has told us, in slot order.</summary>
     public IReadOnlyList<InventoryItem> Pack => [.. _pack.Values.OrderBy(item => item.Slot)];
@@ -645,6 +659,27 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                     if (Party.ReadAsk(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } asker && _asks.Count < 8)
                     {
                         _asks.Enqueue(asker);
+                    }
+
+                    continue;
+
+                case CompanionTieCommand:
+                    try
+                    {
+                        (byte kind, CompanionTie? tie) = World.Companion.ReadTie(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                        if (kind == World.Companion.MasterKind)
+                        {
+                            _master = tie;
+                        }
+                        else if (kind == World.Companion.CompanionKind)
+                        {
+                            _companion = tie;
+                        }
+                    }
+                    catch (ProtocolException cut)
+                    {
+                        NoteUnread($"0x5E: {cut.Message}");
                     }
 
                     continue;
@@ -949,6 +984,14 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// <summary>Says something to everyone in our group (a whisper to "!").</summary>
     public Task SayToGroupAsync(string text, CancellationToken cancellationToken) =>
         Send(WhisperCommand, Party.Chat(text), cancellationToken);
+
+    /// <summary>동료 봇을 부른다(0xF1 1). 결과는 서버 알림(0x0A)과 0x5E 로 온다.</summary>
+    public Task CallCompanionAsync(CancellationToken cancellationToken) =>
+        Send(CompanionCommand, World.Companion.Call(), cancellationToken);
+
+    /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
+    public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
+        Send(CompanionCommand, World.Companion.Dismiss(), cancellationToken);
 
     /// <summary>Asks for our own profile, which is where the server lists the group.</summary>
     public Task AskProfileAsync(CancellationToken cancellationToken) =>
@@ -1648,7 +1691,8 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                 FromServer(rest[14]),
                 BinaryPrimitives.ReadUInt16BigEndian(rest[8..]),
                 kind,
-                name));
+                name,
+                (int)Math.Min(ushort.MaxValue, BinaryPrimitives.ReadUInt32BigEndian(rest[10..]))));
 
             rest = rest[read..];
         }
