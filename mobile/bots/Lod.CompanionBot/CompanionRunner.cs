@@ -88,6 +88,11 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
                 Say(step.Why);
                 break;
 
+            case CompanionAct.WakeOwner:
+                await world.WakeMasterAsync(token);
+                Say(step.Why);
+                break;
+
             case CompanionAct.Drink:
                 await world.UseAsync(step.Slot, token);
                 Say(step.Why);

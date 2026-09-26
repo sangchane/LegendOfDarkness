@@ -288,6 +288,23 @@ public partial class Main : Control
         writing.Close();
     }
 
+    private static Lod.Mobile.Core.World.LearnLadder? _ladder;
+
+    /// <summary>
+    /// 레벨이 되면 저절로 배우는 표 — 서버와 같은 것(<c>scripts/build-auto-learn.py</c> → <c>assets/world/auto-learn.txt</c>).
+    /// 기술 목록이 아직 못 배운 것에 "N레벨에 배움" 을 적는다(<see cref="AbilityBar" />). 없으면 빈 표.
+    /// </summary>
+    public static Lod.Mobile.Core.World.LearnLadder Ladder => _ladder ??= LoadLadder();
+
+    private static Lod.Mobile.Core.World.LearnLadder LoadLadder()
+    {
+        const string path = "res://assets/world/auto-learn.txt";
+
+        return Godot.FileAccess.FileExists(path)
+            ? Lod.Mobile.Core.World.LearnLadder.Read(Godot.FileAccess.GetFileAsString(path))
+            : Lod.Mobile.Core.World.LearnLadder.Empty;
+    }
+
     public static string[] LoadAbilitySlots(string character)
     {
         string path = AbilitySlotsFile(character);
@@ -438,6 +455,12 @@ public partial class Main : Control
     public static int SlotHold { get; private set; }
 
     /// <summary>
+    /// <c>--learn-preview 5:31</c>: 서버 없이(<c>--screen game</c>) 기술 목록을 그 직업·레벨로 본다 — 표에서 그 레벨까지를
+    /// 배운 셈 치고, 그 위는 흐리게 "N레벨에 배움". <c>--slot-hold</c> 와 함께 찍는다.
+    /// </summary>
+    public static (int Path, int Level)? LearnPreview { get; private set; }
+
+    /// <summary>
     /// Which settings select box (<c>health</c>·<c>mana</c>·<c>heal</c>) to open on its own, as
     /// <c>--percent-open health</c>, to see the list it drops down without a thumb.
     /// </summary>
@@ -555,6 +578,10 @@ public partial class Main : Control
         PackPick = int.TryParse(Flag("--pack-pick"), out int packPick) ? packPick : 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
+        LearnPreview = Flag("--learn-preview").Split(':') is [var previewPath, var previewLevel]
+                       && int.TryParse(previewPath, out int learnPath) && int.TryParse(previewLevel, out int learnLevel)
+            ? (learnPath, learnLevel)
+            : null;
         PercentOpen = Flag("--percent-open");
         MapGo = Flag("--map-go");
         MapTab = Flag("--map-tab");

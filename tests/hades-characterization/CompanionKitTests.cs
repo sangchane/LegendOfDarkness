@@ -118,8 +118,20 @@ public sealed class CompanionKitTests : IDisposable
         await owner.SayAsync("/spell \"리베라토\" 1", _deadline.Token);
         LearnedSpell? liberato = null;
         await Until(() => (liberato = owner.Spells.FirstOrDefault(s => CompanionSpells.Bare(s.Name) == "리베라토")) is not null, () => "리베라토를 받지 못했습니다.");
-        await owner.UseSpellAsync(liberato!.Slot, owner.Serial, _deadline.Token);
-        await Until(() => bot.StatusesOf(owner.Serial)?.Any(s => s.Name == "horrama") == false, () => "리베라토가 호르라마를 지우지 않았습니다.");
+        // 외우기가 한 번에 안 먹을 때가 있다(앞 주문이 도는 중 등) — 지워질 때까지 2초마다 다시 외운다.
+        bool gone = false;
+        for (int tries = 0; tries < 10 && !gone; tries++)
+        {
+            await owner.UseSpellAsync(liberato!.Slot, owner.Serial, _deadline.Token);
+
+            for (int wait = 0; wait < 40 && !gone; wait++)
+            {
+                gone = bot.StatusesOf(owner.Serial)?.Any(s => s.Name == "horrama") == false;
+                await Task.Delay(50, _deadline.Token);
+            }
+        }
+
+        Assert.True(gone, $"리베라토가 호르라마를 지우지 않았습니다: {owner.Said}");
         await Until(() => bot.StatusesOf(owner.Serial)?.Any(s => s.Name == "horrama") == true,
             () => $"빠진 호르라마를 다시 걸지 않았습니다: {Joined(did)}", TimeSpan.FromSeconds(15));
     }

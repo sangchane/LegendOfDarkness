@@ -432,4 +432,35 @@ public sealed class CompanionTests
 
         Assert.Equal(CompanionAct.Stop, new CompanionBrain().Next(sight, Defaults).Act);
     }
+
+    [Fact]
+    public void A_comatose_owner_close_by_is_woken_before_anything_else()
+    {
+        IReadOnlyList<LearnedSpell> spells = [.. Level21, Spell(7, "디나르콜리")];
+        CompanionSight sight = Sight(ownerHealth: 1, spells: spells) with { StatusesOf = On(["skulled", "sleep"]) };
+
+        CompanionStep step = new CompanionBrain().Next(sight, Defaults);
+
+        Assert.Equal(CompanionAct.WakeOwner, step.Act);
+        Assert.Equal(Owner, step.Target);
+    }
+
+    [Fact]
+    public void A_comatose_owner_further_off_is_walked_to_first()
+    {
+        CompanionSight sight = Sight(owner: new Tile(12, 10)) with { StatusesOf = On(["skulled"]) };
+
+        CompanionStep step = new CompanionBrain().Next(sight, Defaults);
+
+        Assert.Equal(CompanionAct.Walk, step.Act);
+        Assert.Equal(Direction.East, step.Toward);
+    }
+
+    [Fact]
+    public void A_comatose_bot_cannot_wake_its_owner()
+    {
+        CompanionSight sight = Sight(comatose: true) with { StatusesOf = On(["skulled"]) };
+
+        Assert.Equal(CompanionAct.Stop, new CompanionBrain().Next(sight, Defaults).Act);
+    }
 }

@@ -7,8 +7,8 @@ namespace LodClient;
 
 /// <summary>
 /// 코마디움 칸 — 자동 포션 두 칸과 같은 크기로 기술 부채꼴 왼쪽 위(<see cref="AbilityFan.Coma" />). 코마디움 그림에 가방의
-/// 코마디움·엑스코마디움 수를 작게 적고, 없으면 흐리게. 누르면 내가 혼수면 엑스코마디움을 쓰고, 아니고 봇이 혼수면 내 코마디움으로
-/// 봇을 깨운다(원작 5.99 규칙 — <see cref="ComaChip" />). 둘 다 아니면 "혼수 상태가 아닙니다".
+/// 코마디움·엑스코마디움 수를 작게 적고, 없으면 흐리게(봇이 혼수면 흐리지 않는다). 누르면 내가 혼수면 엑스코마디움을 쓰고, 아니고
+/// 봇이 혼수면 봇을 깨운다 — 코마디움 없이(<see cref="ComaChip" />). 둘 다 아니면 "혼수 상태가 아닙니다".
 /// </summary>
 public sealed partial class ComaButton : Button
 {
@@ -44,16 +44,20 @@ public sealed partial class ComaButton : Button
 
     public override void _Process(double delta)
     {
-        int count = _server() is { } world ? ComaChip.Count(world.Pack) : 0;
+        // 봇이 혼수면 코마디움이 없어도 눌린다(봇은 아무것도 쓰지 않고 깨운다) — 그때는 흐리지 않는다.
+        WorldClient? world = _server();
+        int count = world is null ? 0 : ComaChip.Count(world.Pack);
+        bool botDown = world?.Companion is { } tie && world.AilmentsOf(tie.Serial).Any(one => one.Icon == Overhead.ComaIcon);
+        int shown = botDown ? count + 100_000 : count;
 
-        if (count == _shown)
+        if (shown == _shown)
         {
             return;
         }
 
-        _shown = count;
+        _shown = shown;
         _count.Text = count > 0 ? count.ToString() : string.Empty;
-        Modulate = count > 0 ? Colors.White : new Color(1, 1, 1, 0.4f);
+        Modulate = count > 0 || botDown ? Colors.White : new Color(1, 1, 1, 0.4f);
     }
 
     private void Use()

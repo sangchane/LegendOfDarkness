@@ -56,6 +56,9 @@ public static class Companion
     /// <summary>내 코마디움으로 혼수인 봇을 깨운다(0xF1 4) — 봇 바로 옆에서.</summary>
     public static byte[] Wake() => [4];
 
+    /// <summary>봇이 혼수인 주인을 깨운다(0xF1 5) — 봇 계정만, 주인 바로 옆에서. 서버가 가려 듣는다.</summary>
+    public static byte[] WakeMaster() => [5];
+
     /// <summary>0x5E 종류 3 — 한 사람(주인 또는 봇 자신)에게 걸린 것: 이름 · 남은 초 · 해로움.</summary>
     public static (uint Serial, IReadOnlyList<CompanionStatus> Statuses) ReadStatuses(ReadOnlySpan<byte> body)
     {
@@ -204,6 +207,9 @@ public enum CompanionAct
 
     /// <summary>가방의 포션 하나(<see cref="CompanionStep.Slot" /> 은 가방 칸).</summary>
     Drink,
+
+    /// <summary>혼수인 주인을 깨운다(바로 옆 칸에서, 서버 0xF1 5).</summary>
+    WakeOwner,
 }
 
 public sealed record CompanionStep(CompanionAct Act, int Slot = 0, uint Target = 0, Direction Toward = Direction.South, string Why = "");
@@ -318,7 +324,7 @@ public static class CompanionSpells
 
 /// <summary>
 /// 동료 봇의 판단 — 엔진 없이. <see cref="AutoHunt" /> 처럼 우선순위 순으로 훑어 할 수 있는 첫 일 하나를 돌려준다:
-/// 멈춤(혼수·죽음·유령) &gt; 해제(수면·빙결) &gt; 주인 회복 &gt; 봇 체력 포션 &gt; 자기 회복 마법 &gt; 봇 마력 포션 &gt; 버프 유지 &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
+/// 멈춤(혼수·죽음·유령) &gt; 주인 혼수 깨우기 &gt; 해제(수면·빙결) &gt; 주인 회복 &gt; 봇 체력 포션 &gt; 자기 회복 마법 &gt; 봇 마력 포션 &gt; 버프 유지 &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
 /// SleepHunter4 의 파티원 회복(<c>PlayerMacroState</c> 의 FlowerQueue — 체력이 기준 아래인 이를 먼저)과 버프 유지(지속 시간이
 /// 끝나면 다시)를 본떴다.
 /// </summary>
@@ -403,6 +409,23 @@ public sealed class CompanionBrain
             .Select(entry => entry!.Mana)
             .DefaultIfEmpty(0)
             .Min();
+
+        // 주인이 혼수면 가장 먼저 — 옆 칸으로 가서 깨운다(사용자 결정 2026-09-26, 서버 0xF1 5 — 코마디움과 같은 효과, 아무것도 안 쓴다).
+        if (sight.OwnerAt is { } fallen && sight.StatusesOf(sight.Master)?.Contains("skulled") == true)
+        {
+            if (Distance(fallen, sight.Standing) > 1)
+            {
+                return StepTo(sight, fallen, now, "주인 깨우러 가기");
+            }
+
+            if (now - _lastCast >= CastGap)
+            {
+                _lastCast = now;
+                return new(CompanionAct.WakeOwner, Target: sight.Master, Why: "주인 깨우기");
+            }
+
+            return new(CompanionAct.Wait, Why: "주인 깨우기 사이");
+        }
 
         // 해제가 가장 먼저 — 수면(나르콜리)·빙결이면 주인은 아무것도 못 한다(사용자, 2026-09-26). 주문 사이(1초)를 다 기다리지
         // 않는다(CureGap) — 막 버프를 걸었어도 곧 푼다.
@@ -585,6 +608,12 @@ public sealed class CompanionBrain
             return null;
         }
 
+        return StepTo(sight, owner, now, "따라가기");
+    }
+
+    /// <summary>주인 쪽으로 한 칸 — 벽과 선 것, 서버가 되돌린 칸을 돌아간다. 걸음 사이·주문 뒤에는 기다린다.</summary>
+    private CompanionStep StepTo(CompanionSight sight, Tile owner, TimeSpan now, string why)
+    {
         if (now - _lastWalk < WalkGap || now - _lastCast < CastGap)
         {
             return new(CompanionAct.Wait, Why: "걸음 사이");
@@ -612,7 +641,7 @@ public sealed class CompanionBrain
 
         _stepped = (sight.Standing, new Tile(sight.Standing.X + dx, sight.Standing.Y + dy));
         _lastWalk = now;
-        return new(CompanionAct.Walk, Toward: toward, Why: "따라가기");
+        return new(CompanionAct.Walk, Toward: toward, Why: why);
     }
 
     private static Direction Straight(Tile from, Tile to)

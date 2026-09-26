@@ -22,10 +22,10 @@ public sealed class ComaChipTests
     }
 
     [Fact]
-    public void A_comatose_bot_is_woken_with_my_comadium()
+    public void A_comatose_bot_is_woken_even_without_comadium()
     {
         Assert.Equal(ComaUse.WakeBot, ComaChip.Choose(false, true, Both).Use);
-        Assert.Equal(ComaUse.Missing, ComaChip.Choose(false, true, [Item(6, "엑스코마디움")]).Use);
+        Assert.Equal(ComaUse.WakeBot, ComaChip.Choose(false, true, []).Use);
     }
 
     [Fact]

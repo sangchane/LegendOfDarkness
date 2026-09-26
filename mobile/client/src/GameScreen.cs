@@ -1970,6 +1970,7 @@ public partial class GameScreen : Control
 
         _abilities = new AbilityBar { SizeFlagsVertical = SizeFlags.ShrinkEnd };
         _abilities.Cooling = (skill, slot) => _server?.CoolingFor(skill, slot) ?? 0;
+        _abilities.Standing = () => (_server?.Path, _server?.Vitals?.Level ?? 0);
         _abilities.SkillUsed += slot =>
         {
             _world.FoughtByHand();

@@ -60,14 +60,13 @@ public sealed class CompanionComaTests : IDisposable
     }
 
     [Fact]
-    public async Task My_comadium_wakes_the_bot_and_a_dead_bot_comes_back_when_called()
+    public async Task The_bot_is_woken_without_comadium_and_a_dead_bot_comes_back_when_called()
     {
         // 주인은 사슴과 대각선(맞지 않는다), 불린 봇은 주인 남쪽 — 사슴 바로 옆이라 맞는다. 봇은 1레벨(체력 150)이라 한 대에 혼수.
         using IsolatedHadesServer server = Ready(ownerLevel: 3, ownerHealth: 5000, (32, 45));
         WorldClient owner = await Enter(server, OwnerName, ForestOne);
         WorldClient bot = await Enter(server, CompanionCallTests.BotName, 20373);
-        await Give(owner, "코마디움", 3);
-
+        // 코마디움은 들고 있지 않다 — 봇은 없이도 깨운다(사용자, 2026-09-26).
         for (int tries = 0; tries < 10 && bot.Master is null; tries++)
         {
             await owner.CallCompanionAsync(_deadline.Token);
@@ -79,8 +78,9 @@ public sealed class CompanionComaTests : IDisposable
         Assert.Equal(ComaUse.WakeBot, ComaChip.Choose(false, true, owner.Pack).Use);
 
         await owner.WakeCompanionAsync(_deadline.Token);
-        await Until(() => !Overhead.InComa(bot.Ailments) && AutoPotion.Count(owner.Pack, "코마디움") == 2,
-            () => $"내 코마디움으로 봇이 깨어나지 않았습니다: 혼수 {Overhead.InComa(bot.Ailments)} · 남은 {AutoPotion.Count(owner.Pack, "코마디움")} · {owner.Said}");
+        await Until(() => !Overhead.InComa(bot.Ailments),
+            () => $"코마디움 없이 봇이 깨어나지 않았습니다: 혼수 {Overhead.InComa(bot.Ailments)} · {owner.Said}");
+        Assert.Equal(0, AutoPotion.Count(owner.Pack, "코마디움"));
 
         // 또 맞아 혼수 → 3초 뒤 죽어 뮤레칸의방(유령). 서버는 유령을 데려오지 않는다.
         await Until(() => bot.State?.Map.Id == MurekansRoom, () => $"봇이 죽어 뮤레칸에 가지 않았습니다: {bot.State?.Map.Id}", TimeSpan.FromSeconds(60));
@@ -94,7 +94,119 @@ public sealed class CompanionComaTests : IDisposable
             () => $"유령 봇이 되살아 오지 않았습니다: {bot.State?.Map.Id} · {owner.Said}");
     }
 
-    private IsolatedHadesServer Ready(int ownerLevel, int ownerHealth, (int X, int Y) at, bool gameMaster = true)
+    /// <summary>
+    /// 봇이 죽어(유령) 뮤레칸에 가 있어도 [봇 보내기] 는 듣는다 — 파티에서 빠지고, 알림이 오고, 앱의 봇 상태(0x5E 종류 2)가 비어
+    /// 단추가 [봇 부르기] 로 돌아간다(사용자 2026-09-26 "봇이 죽고서 봇 보내기 누르니까 반응이 없다").
+    /// </summary>
+    [Fact]
+    public async Task A_dead_bot_can_still_be_sent_away()
+    {
+        using IsolatedHadesServer server = Ready(ownerLevel: 3, ownerHealth: 5000, (32, 45));
+        WorldClient owner = await Enter(server, OwnerName, ForestOne);
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName, 20373);
+        List<string> heard = [];
+
+        for (int tries = 0; tries < 10 && bot.Master is null; tries++)
+        {
+            await owner.CallCompanionAsync(_deadline.Token);
+            await Task.Delay(1000, _deadline.Token);
+        }
+
+        await Until(() => bot.State?.Map.Id == MurekansRoom, () => $"봇이 죽어 뮤레칸에 가지 않았습니다: {bot.State?.Map.Id}", TimeSpan.FromSeconds(60));
+        while (owner.TakeTold(out _, out _))
+        {
+        }
+
+        await owner.DismissCompanionAsync(_deadline.Token);
+
+        await Until(() =>
+        {
+            while (owner.TakeTold(out _, out string text))
+            {
+                heard.Add(text);
+            }
+
+            return owner.Companion is null && bot.Master is null && heard.Any(line => line.Contains("보냈습니다", StringComparison.Ordinal));
+        }, () => $"죽은 봇을 보내지 못했습니다: 봇 상태 {owner.Companion} · 주인 {bot.Master} · 들은 말 {string.Join(" | ", heard)}");
+
+        int before = owner.RosterCount;
+        await owner.AskProfileAsync(_deadline.Token);
+        await Until(() => owner.RosterCount > before, () => "프로필이 오지 않았습니다.");
+        Assert.False(owner.Roster.Grouped);
+    }
+
+    /// <summary>
+    /// 주인도 죽어(유령) 있을 때 — 서버는 죽은 사람의 0xF1 을 모두 버려 [봇 보내기] 가 아무 반응이 없었다(클라우드 기록: 봇이 쓰러진 뒤
+    /// 보내기가 서버에 닿은 흔적이 없다). 보내기는 죽어서도 듣는다.
+    /// </summary>
+    [Fact]
+    public async Task A_dead_owner_can_still_send_the_bot_away()
+    {
+        using IsolatedHadesServer server = Ready(ownerLevel: 1, ownerHealth: 150, (33, 47), gameMaster: false);
+        WorldClient owner = await Enter(server, OwnerName, ForestOne);
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName, 20373);
+
+        for (int tries = 0; tries < 10 && bot.Master is null; tries++)
+        {
+            await owner.CallCompanionAsync(_deadline.Token);
+            await Task.Delay(1000, _deadline.Token);
+        }
+
+        await Until(() => owner.State?.Map.Id == MurekansRoom, () => $"주인이 죽어 뮤레칸에 가지 않았습니다: {owner.State?.Map.Id}", TimeSpan.FromSeconds(60));
+        List<string> heard = [];
+        await owner.DismissCompanionAsync(_deadline.Token);
+
+        await Until(() =>
+        {
+            while (owner.TakeTold(out _, out string text))
+            {
+                heard.Add(text);
+            }
+
+            return owner.Companion is null && bot.Master is null && heard.Any(line => line.Contains("보냈습니다", StringComparison.Ordinal));
+        }, () => $"죽은 주인이 봇을 보내지 못했습니다: 봇 상태 {owner.Companion} · 주인 {bot.Master} · 들은 말 {string.Join(" | ", heard)}");
+    }
+
+    /// <summary>주인이 사슴에게 맞아 혼수가 되면, 봇(프로그램과 같은 판단)이 옆 칸에서 깨운다 — 코마디움 없이(0xF1 5).</summary>
+    [Fact]
+    public async Task The_bot_wakes_its_comatose_owner()
+    {
+        using IsolatedHadesServer server = Ready(ownerLevel: 1, ownerHealth: 150, (33, 47), gameMaster: false, coma: 20);
+        WorldClient owner = await Enter(server, OwnerName, ForestOne);
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName, 20373);
+        List<string> did = [];
+        _ = new Lod.CompanionBot.CompanionRunner(bot, new Lod.CompanionBot.MapWalls(HadesWorkspace.MapLayoutFolder), new CompanionSettings(),
+            line =>
+            {
+                lock (did)
+                {
+                    did.Add(line);
+                }
+            }).RunAsync(_deadline.Token);
+
+        for (int tries = 0; tries < 10 && bot.Master is null; tries++)
+        {
+            await owner.CallCompanionAsync(_deadline.Token);
+            await Task.Delay(1000, _deadline.Token);
+        }
+
+        await Until(() => Overhead.InComa(owner.Ailments), () => "주인이 혼수가 되지 않았습니다.", TimeSpan.FromSeconds(40));
+        List<string> heard = [];
+
+        await Until(() =>
+        {
+            while (owner.TakeTold(out _, out string text))
+            {
+                heard.Add(text);
+            }
+
+            return heard.Contains("봇이 당신을 깨웠습니다.");
+        }, () => $"봇이 깨우지 않았습니다: 혼수 {Overhead.InComa(owner.Ailments)} · 봇이 한 일 {string.Join(" | ", did)}", TimeSpan.FromSeconds(10));
+
+        Assert.Equal(ForestOne, owner.State?.Map.Id);
+    }
+
+    private IsolatedHadesServer Ready(int ownerLevel, int ownerHealth, (int X, int Y) at, bool gameMaster = true, int coma = 3)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (ForestOne, at.X, at.Y));
         CompanionCallTests.Configure(server);
@@ -106,7 +218,7 @@ public sealed class CompanionComaTests : IDisposable
 
         string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
         JsonNode config = JsonNode.Parse(File.ReadAllText(path))!;
-        config["ServerConfig"]!["SkullLength"] = 3;
+        config["ServerConfig"]!["SkullLength"] = coma;
         File.WriteAllText(path, config.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
 
         OneDeer(server);

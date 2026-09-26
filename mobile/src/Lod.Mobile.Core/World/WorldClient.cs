@@ -219,6 +219,7 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     private volatile int _ignored;
 
     private volatile string _said = string.Empty;
+    private int? _path;
     private volatile int _saidCount;
 
     // 0x0A 를 타입 바이트와 함께 줄줄이 담는다. _said 는 마지막 한 줄뿐이라, 한 프레임에 둘이 오면(주운 것 + 경험치)
@@ -363,6 +364,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
     public string Said => _said;
+
+    /// <summary>My class as the profile (0x39) last said — Hades <c>Class</c> number (5 무도가 …); null until asked for.</summary>
+    public int? Path => _path;
 
     /// <summary>
     /// Takes the next line the server said (0x0A) with its type byte (Hades <c>ServerFormat0A.MsgType</c>), oldest
@@ -748,7 +752,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                 case ProfileCommand:
                     try
                     {
-                        _roster = Party.ReadRoster(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        byte[] profile = HadesCipher.DecodeSecured(frame, session.Parameters).ToArray();
+                        _path = LearnLadder.PathFromProfile(profile) ?? _path;
+                        _roster = Party.ReadRoster(profile);
                         _rosterCount++;
                     }
                     catch (ProtocolException cut)
@@ -1061,6 +1067,10 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// <summary>내 코마디움으로 혼수인 봇을 깨운다(0xF1 4).</summary>
     public Task WakeCompanionAsync(CancellationToken cancellationToken) =>
         Send(CompanionCommand, World.Companion.Wake(), cancellationToken);
+
+    /// <summary>봇일 때 — 혼수인 주인을 깨운다(0xF1 5, 바로 옆에서).</summary>
+    public Task WakeMasterAsync(CancellationToken cancellationToken) =>
+        Send(CompanionCommand, World.Companion.WakeMaster(), cancellationToken);
 
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>

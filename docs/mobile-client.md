@@ -326,6 +326,7 @@ $godot --path mobile/client -- --screen game --size 360x780 --orient portrait `
 | `--overhead` | `badges` · `coma` · `kuroto` | 서버 없이(`--screen game`) 머리 위 쌓기를 찍는다(`kuroto` 는 매초 내게 쿠로토 링 4·속도 117) — `badges` 는 배지 6·7개(막대 있음·없음)와 매초 일음지 42·Miss 33/115, `coma` 는 내가 혼수(배지 89 · 그림 24, Miss 는 안 보여야 한다). `GREYBOX_OVERHEAD` 에 칸을 찍는다 |
 | `--notices` | (값 없음) | 서버 없이(`--screen game`) Hades 가 실제로 보내는 줄 여덟을 분류기(`MessageSort`)에 흘려 기록 줄·옆 알림·가운데 한 줄 자리를 찍어 본다 |
 | `--slot-hold` | N | 서버 없이(`--screen game`) 자리를 잡고 잠시 뒤 N번째(1부터) 기술 슬롯을 길게 누른 셈 쳐서, 그 위에 뜨는 배치 목록(배운 기술·마법 + "비우기")을 찍어 본다 |
+| `--learn-preview` | 직업:레벨 (`5:15`) | 서버 없이 기술 목록을 그 직업·레벨로 — 자동 습득 표(`assets/world/auto-learn.txt`, `scripts/build-auto-learn.py`)에서 그 레벨까지를 배운 셈 치고, 그 위 내 직업 것은 흐리게 "N레벨에 배움"(알맹이 `LearnLadder`, 시험 `LearnLadderTests`). 실제 서버에서는 직업을 프로필(0x39) 끝 바이트로 안다(`WorldClient.Path`). `--slot-hold 1` 과 함께 찍는다 |
 | `--percent-open` | `heal` | `--settings` 와 같이 주면, 설정 창이 뜨고 잠시 뒤 그 셀렉트 박스를 스스로 눌러 1~99 목록을 열어 본다. 체력·마력 포션은 게이지 바라(2026-09-26) 열 목록이 없다 |
 | `--lift` | (값 없음) | 바닥에 놓인 것 중 가장 가까운 것을 **그림 한가운데를 실제로 탭해서** 주워 본다. 보낼 때만 `GREYBOX_LIFTED` 가 찍힌다 |
 | `--throw` | (값 없음) | 소지품 첫 칸을 버린다. `--lift` 와 같이 주면 버린 뒤 소지품을 닫고 그것을 다시 줍는다 |
