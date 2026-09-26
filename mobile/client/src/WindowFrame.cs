@@ -19,7 +19,9 @@ public enum GlyphKind
     Bot,
     Account,
     Zoom,
-    Stop
+    Stop,
+    Town,
+    Field
 }
 
 /// <summary>
@@ -139,6 +141,21 @@ public sealed partial class Glyph : Control
 
             case GlyphKind.Stop:
                 DrawRect(new Rect2(P(0.25f, 0.25f), new Vector2(0.5f * s, 0.5f * s)), c);
+                break;
+
+            case GlyphKind.Town:
+                // 지붕 있는 집.
+                DrawPolyline([P(0.12f, 0.48f), P(0.5f, 0.15f), P(0.88f, 0.48f)], c, w, true);
+                DrawPolyline([P(0.22f, 0.42f), P(0.22f, 0.86f), P(0.78f, 0.86f), P(0.78f, 0.42f)], c, w, true);
+                DrawRect(new Rect2(P(0.42f, 0.6f), new Vector2(0.16f * s, 0.26f * s)), c);
+                break;
+
+            case GlyphKind.Field:
+                // 엇갈린 두 칼 — 싸우는 곳.
+                DrawLine(P(0.18f, 0.18f), P(0.78f, 0.78f), c, w, true);
+                DrawLine(P(0.82f, 0.18f), P(0.22f, 0.78f), c, w, true);
+                DrawLine(P(0.62f, 0.86f), P(0.86f, 0.62f), c, w, true);
+                DrawLine(P(0.14f, 0.62f), P(0.38f, 0.86f), c, w, true);
                 break;
         }
     }

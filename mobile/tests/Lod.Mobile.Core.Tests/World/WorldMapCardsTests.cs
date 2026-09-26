@@ -64,3 +64,58 @@ public sealed class WorldMapCardsTests
         Assert.Null(guide.Place(20374));
     }
 }
+
+/// <summary>The world map's two tabs — 마을 · 사냥터 — and which one opens first.</summary>
+public sealed class WorldMapTabsTests
+{
+    private const string Guide = """
+        area 20373 1 town 노비스마을
+        area 20028 11 field 우드랜드입구
+        area 20030 1 town 아벨마을
+        area 20050 5 field 포테의숲입구
+        """;
+
+    private static readonly WorldMapInfo Field = new("field001", 1,
+    [
+        new WorldMapNode("우드랜드", 20028, 10, 21, 516, 176),
+        new WorldMapNode("노비스마을", 20373, 34, 34, 200, 200),
+        new WorldMapNode("포테의숲", 20050, 1, 1, 10, 10),
+        new WorldMapNode("아벨", 20030, 58, 22, 324, 269),
+        new WorldMapNode("어딘가마을", 99998, 1, 1, 10, 10),
+        new WorldMapNode("어딘가", 99999, 1, 1, 10, 10),
+    ]);
+
+    /// <summary>
+    /// Towns and hunting grounds apart. A place the guide does not know goes by its own name ("마을" in it is a town).
+    /// Towns keep the server's order; hunting grounds go lowest level first, ties in the server's order.
+    /// </summary>
+    [Fact]
+    public void Towns_and_hunting_grounds_are_apart_and_ordered()
+    {
+        IReadOnlyList<WorldMapCard> cards = WorldMapCards.From(Field, MapGuide.Read(Guide));
+
+        Assert.Equal(["노비스마을", "아벨", "어딘가마을"], WorldMapCards.Towns(cards).Select(card => card.Name));
+        Assert.Equal(["어딘가", "포테의숲", "우드랜드"], WorldMapCards.Fields(cards).Select(card => card.Name));
+    }
+
+    /// <summary>The tab that opens first is the kind of place we stand in; when that tab would be empty, the other.</summary>
+    [Theory]
+    [InlineData("노비스마을", true)]
+    [InlineData("우드랜드1-1", false)]
+    [InlineData("", true)]
+    public void The_first_tab_is_where_we_stand(string place, bool towns)
+    {
+        IReadOnlyList<WorldMapCard> cards = WorldMapCards.From(Field, MapGuide.Read(Guide));
+
+        Assert.Equal(towns, WorldMapCards.OpensOnTowns(place, cards));
+    }
+
+    [Fact]
+    public void An_empty_tab_is_not_opened_first()
+    {
+        WorldMapInfo onlyFields = new("field001", 1, [new WorldMapNode("우드랜드", 20028, 10, 21, 516, 176)]);
+        IReadOnlyList<WorldMapCard> cards = WorldMapCards.From(onlyFields, MapGuide.Read(Guide));
+
+        Assert.False(WorldMapCards.OpensOnTowns("노비스마을", cards));
+    }
+}

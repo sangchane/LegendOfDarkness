@@ -407,6 +407,9 @@ public partial class Main : Control
     /// <summary>Whether to press the "지도" button on its own, as <c>--map</c>. For checking it without a thumb.</summary>
     public static bool OpeningMap { get; private set; }
 
+    /// <summary><c>--map-tab 마을|사냥터</c> — 서버 없이 <c>--map</c> 으로 띄운 카드 창을 그 탭으로 연다(선 곳을 그 종류로 친다). 사진용.</summary>
+    public static string MapTab { get; private set; } = string.Empty;
+
     /// <summary><c>--map-go 이름</c> — <c>--map</c> 으로 연 월드맵에서 그 이름의 줄을 눌러 그리로 간다(닫기는 누르지 않는다).</summary>
     public static string MapGo { get; private set; } = string.Empty;
 
@@ -513,6 +516,7 @@ public partial class Main : Control
         SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
         PercentOpen = Flag("--percent-open");
         MapGo = Flag("--map-go");
+        MapTab = Flag("--map-tab");
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0 || MapGo.Length > 0;
         TabMapGo = Flag("--tabmap-go");
         TabMapCloseAfter = double.TryParse(Flag("--tabmap-close"), out double tabMapClose) ? tabMapClose : -1;

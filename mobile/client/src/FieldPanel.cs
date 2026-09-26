@@ -20,6 +20,9 @@ public sealed partial class FieldPanel : PanelContainer
 {
     private readonly MapGuide _guide;
     private readonly GridContainer _places = new();
+    private readonly GridContainer _fields = new();
+    private readonly Button _townTab = WindowFrame.IconButton(GlyphKind.Town, "마을", tab: true, width: 56);
+    private readonly Button _fieldTab = WindowFrame.IconButton(GlyphKind.Field, "사냥터", tab: true, width: 56);
     private readonly Dictionary<Button, string> _names = [];
 
     public FieldPanel(MapGuide guide)
@@ -38,6 +41,14 @@ public sealed partial class FieldPanel : PanelContainer
         _places.AddThemeConstantOverride("h_separation", Main.Gutter);
         _places.AddThemeConstantOverride("v_separation", Main.Gutter);
 
+        // 사냥터 탭의 카드 칸 — 마을 칸과 같은 모양(2026-09-26: 사냥터랑 마을 구분 탭).
+        _fields.Columns = _places.Columns;
+        _fields.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _fields.AddThemeConstantOverride("h_separation", Main.Gutter);
+        _fields.AddThemeConstantOverride("v_separation", Main.Gutter);
+        _townTab.Pressed += () => ShowTab(towns: true);
+        _fieldTab.Pressed += () => ShowTab(towns: false);
+
         Close = WindowFrame.CloseButton();
 
         // 세로 창은 제 높이만큼만 선다 — 굴림 칸은 속을 제 크기로 올려 보내지 않으니 세 줄(여섯 곳)이 드는 높이를 준다.
@@ -47,9 +58,19 @@ public sealed partial class FieldPanel : PanelContainer
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
             CustomMinimumSize = new Vector2(0, Main.Portrait ? (72 * 3) + (Main.Gutter * 2) : 0)
         };
-        scroll.AddChild(_places);
+        VBoxContainer both = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        both.AddChild(_places);
+        both.AddChild(_fields);
+        scroll.AddChild(both);
 
-        inside.AddChild(WindowFrame.Head(WindowFrame.Title("월드맵 — 어디로 갈까"), Close));
+        // 제목 자리에 두 탭 — [마을] · [사냥터](공통 창 틀의 아이콘 탭). 제목 글자는 탭 옆에 작게.
+        HBoxContainer left = new();
+        left.AddThemeConstantOverride("separation", Main.Gutter);
+        left.AddChild(WindowFrame.Tabs(_townTab, _fieldTab));
+        Label title = WindowFrame.Title("월드맵");
+        title.AddThemeColorOverride("font_color", Greybox.Muted);
+        left.AddChild(title);
+        inside.AddChild(WindowFrame.Head(left, Close));
         inside.AddChild(scroll);
 
         MarginContainer margin = new();
@@ -72,26 +93,49 @@ public sealed partial class FieldPanel : PanelContainer
     public event Action<int>? Chosen;
 
     /// <summary>창을 채우고 보인다. 창은 늘 통째로 다시 짓는다 — 월드맵은 한 번에 하나뿐이다.</summary>
-    public void Show(WorldMapInfo field)
+    /// <remarks>
+    /// 카드를 [마을] · [사냥터] 두 칸에 나눠 담는다(<see cref="WorldMapCards.Towns" /> · <see cref="WorldMapCards.Fields" />). 처음 보이는
+    /// 탭은 지금 선 곳의 종류다 — 마을에 서 있으면 [마을], 사냥터면 [사냥터](그 탭이 비었으면 다른 쪽).
+    /// </remarks>
+    public void Show(WorldMapInfo field, string standingIn = "")
     {
-        foreach (Node old in _places.GetChildren())
+        foreach (GridContainer grid in new[] { _places, _fields })
         {
-            _places.RemoveChild(old);
-            old.QueueFree();
+            foreach (Node old in grid.GetChildren())
+            {
+                grid.RemoveChild(old);
+                old.QueueFree();
+            }
         }
 
         _names.Clear();
+        IReadOnlyList<WorldMapCard> cards = WorldMapCards.From(field, _guide);
 
-        foreach (WorldMapCard card in WorldMapCards.From(field, _guide))
+        foreach ((GridContainer grid, IReadOnlyList<WorldMapCard> list) in new[] { (_places, WorldMapCards.Towns(cards)), (_fields, WorldMapCards.Fields(cards)) })
         {
-            Button face = Card(card);
-            int area = card.AreaId;
-            face.Pressed += () => Chosen?.Invoke(area);
-            _names[face] = card.Name;
-            _places.AddChild(face);
+            foreach (WorldMapCard card in list)
+            {
+                Button face = Card(card);
+                int area = card.AreaId;
+                face.Pressed += () => Chosen?.Invoke(area);
+                _names[face] = card.Name;
+                grid.AddChild(face);
+            }
         }
 
+        ShowTab(WorldMapCards.OpensOnTowns(standingIn, cards));
         Visible = true;
+    }
+
+    /// <summary>한 탭만 보인다 — 마을이면 true.</summary>
+    public void ShowTab(bool towns)
+    {
+        _places.Visible = towns;
+        _fields.Visible = !towns;
+        _townTab.SetPressedNoSignal(towns);
+        _fieldTab.SetPressedNoSignal(!towns);
+        _townTab.EmitSignal(BaseButton.SignalName.Toggled, towns);
+        _fieldTab.EmitSignal(BaseButton.SignalName.Toggled, !towns);
     }
 
     /// <summary>그 이름의 카드 — 손 없이 확인할 때(<c>--map-go</c>) 누른다.</summary>

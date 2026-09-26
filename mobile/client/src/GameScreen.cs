@@ -131,7 +131,7 @@ public partial class GameScreen : Control
     // 가늠이 안 된다 — 흐른 시간(초)으로 센다.
     private double _mapOpenSeconds;
     private const double MapCloseAfterSeconds = 5;
-    private DiamondButton _map = null!;
+    private Button _map = null!;
 
     // 리허설로 한 번만 입어 본다.
     private bool _worn;
@@ -670,9 +670,18 @@ public partial class GameScreen : Control
         pack.Pressed += () => Carrying(!_pack.Visible);
         actions.AddChild(pack);
 
-        // 월드맵은 마름모 테두리 단추로, 윗줄 맨 왼쪽에(사용자, 2026-09-26).
-        _map = new DiamondButton("월드맵");
+        // 월드맵은 인벤토리·설정과 같은 보통 단추(2026-09-26 3차 — 2차의 마름모 단추는 요청을 잘못 읽은 것이었다. 맨 왼쪽으로
+        // 가는 것은 미니맵이다). 누르면 카드형 월드맵.
+        _map = new Button
+        {
+            Text = "월드맵",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        Greybox.Plain(_map);
         _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
+        actions.AddChild(_map);
+        actions.MoveChild(_map, 0);
 
         Button settings = new()
         {
@@ -686,9 +695,10 @@ public partial class GameScreen : Control
 
         if (Main.Portrait)
         {
-            // 세로: 첫 줄 = 내 판 · 미니맵(남는 폭을 다 쓴다 — 이름이 길면 줄어든다), 둘째 줄 = 월드맵(마름모) · 고른 이 · 인벤토리 · 설정.
+            // 세로: 첫 줄 = 미니맵(맨 왼쪽, 남는 폭을 다 쓴다 — 이름이 길면 줄어든다) · 내 판, 둘째 줄 = 고른 이 · 월드맵 · 인벤토리 · 설정.
             _minimap.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             row.AddChild(_minimap);
+            row.MoveChild(_minimap, 0);
 
             HBoxContainer second = new() { MouseFilter = MouseFilterEnum.Ignore };
             second.AddThemeConstantOverride("separation", Main.Gutter);
@@ -696,10 +706,7 @@ public partial class GameScreen : Control
             second.AddChild(middle);
             second.AddChild(actions);
 
-            second.AddChild(_map);
-            second.MoveChild(_map, 0);
-
-            foreach (Button action in new Button[] { pack, settings })
+            foreach (Button action in new Button[] { _map, pack, settings })
             {
                 action.CustomMinimumSize = new Vector2(64, Main.TouchMinimum);
             }
@@ -712,11 +719,10 @@ public partial class GameScreen : Control
             return top;
         }
 
-        // 가로: 월드맵(마름모) · 내 판 · 고른 이(가운데) · 미니맵 · 인벤토리 · 설정, 한 줄.
-        row.AddChild(_map);
-        row.MoveChild(_map, 0);
-        row.AddChild(middle);
+        // 가로: 미니맵(맨 왼쪽) · 내 판 · 고른 이(가운데) · 월드맵 · 인벤토리 · 설정, 한 줄.
         row.AddChild(_minimap);
+        row.MoveChild(_minimap, 0);
+        row.AddChild(middle);
         row.AddChild(actions);
 
         return row;
@@ -1055,7 +1061,7 @@ public partial class GameScreen : Control
                 // 서버 없이는 아무도 창을 보내 주지 않는다 — 사진·배치 검사용으로 서버가 보낼 여섯 곳을 그대로 띄운다.
                 if (_server is null)
                 {
-                    _field.Show(LayoutCheck.PretendField);
+                    _field.Show(LayoutCheck.PretendField, Main.MapTab == "사냥터" ? "우드랜드1-1" : "노비스마을");
                     SetWindow(GameWindow.WorldMap, true);
                 }
             }
@@ -1088,7 +1094,7 @@ public partial class GameScreen : Control
             (_closedAtFieldShown is null || _server?.FieldShown != _closedAtFieldShown))
         {
             // 서버가 띄운 창도 창 하나 규칙을 지난다 — 열려 있던 창은 닫힌다.
-            _field.Show(field);
+            _field.Show(field, _world.PlaceName);
             SetWindow(GameWindow.WorldMap, true);
             _closedAtFieldShown = null;
         }
