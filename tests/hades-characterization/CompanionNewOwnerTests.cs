@@ -165,6 +165,29 @@ public sealed class CompanionNewOwnerTests : IDisposable
             $"봇이 주인 곁에 오지 않았습니다: 봇 맵 {bot.State?.Map.Id} · 주인이 보는 봇 {Where(owner, bot.Serial)}", _deadline.Token, TimeSpan.FromSeconds(10));
     }
 
+    /// <summary>
+    /// "봇 소환했다가 앱 종료하고 다시 접속해도 봇이 마지막 자리에 좀비처럼 있다"(사용자, 2026-09-27 클라우드 05:23). 짝은 서버 기억에만
+    /// 있어, 짝을 맺은 채 서버가 다시 뜨면 짝은 사라지고 봇은 저장된 마지막 자리(주인 곁, 우드랜드입구)로 들어와 주인 없이 서 있었다.
+    /// 짝이 없는 봇은 대기 장소로 돌아가야 한다.
+    /// </summary>
+    [Fact]
+    public async Task A_bot_without_an_owner_goes_home_instead_of_standing_where_it_was_saved()
+    {
+        const int Mileth = 20287;
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceVillage, 26, 21));
+        CompanionCallTests.Configure(server);
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, CompanionCallTests.BotName);
+
+        // 서버가 다시 뜬 뒤처럼 — 봇이 대기 장소가 아닌 곳(주인 곁이던 곳)에 저장된 채 들어온다. 짝을 맺는 사람은 없다.
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName);
+
+        await Waiting.Until(() => bot.State?.Map.Id == Mileth,
+            $"주인 없는 봇이 제자리에 남았습니다: 맵 {bot.State?.Map.Id} {bot.State?.Where}", _deadline.Token, TimeSpan.FromSeconds(30));
+        Assert.Null(bot.Master);
+    }
+
     private static int Saves(IsolatedHadesServer server) =>
         server.ConsoleOutput.Split('\n').Count(line => line.Contains($"Aisling {OwnerName} data has been saved", StringComparison.Ordinal));
 
