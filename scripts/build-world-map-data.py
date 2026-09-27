@@ -12,6 +12,8 @@
 import json, glob, collections
 from pathlib import Path
 
+from script_warps import script_warp_destination
+
 ROOT = Path(__file__).resolve().parent.parent
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 OUT = ROOT / "docs" / "world-map-data.js"
@@ -32,6 +34,10 @@ def main():
     for f in glob.glob(str(SERVER / "templates" / "warps" / "*.json")):
         w = json.loads(Path(f).read_text(encoding="utf-8-sig"))
         a, b = w["ActivationMapId"], w["To"]["AreaID"]
+        # 밟으면 스크립트가 도는 워프는 To 가 제자리다 — 스크립트가 사본을 짓는 원래 맵으로 잇는다.
+        scripted = script_warp_destination(SERVER, w)
+        if scripted:
+            b = scripted[0]
         if a in areas and b in areas:
             edges[(a, b)] += 1
         else:

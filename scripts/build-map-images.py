@@ -20,6 +20,8 @@
 import json, subprocess, sys, collections, shutil, struct
 from pathlib import Path
 
+from script_warps import script_warp_destination
+
 ROOT = Path(__file__).resolve().parent.parent
 SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
 SEO = SERVER.parent / "archives" / "seo" / "seo.dat"
@@ -44,6 +46,8 @@ DEFAULT_NAMES = [
     "포테의숲보스존",
     "우드랜드입구", "우드랜드1-1", "우드랜드1-2", "우드랜드1-3", "우드랜드2-1",
     "우드랜드3-1", "우드랜드4-1", "우드랜드5-1", "우드랜드6-1", "우드랜드14-1",
+    # 월드맵이 내려 주는 마을(자료에는 있었는데 목록에 없어 인자 없이 돌리면 사라졌다).
+    "아벨마을", "밀레스마을", "마인마을",
 ]
 
 
@@ -201,6 +205,10 @@ def main(names):
                 continue
             destination_id = w["To"]["AreaID"]
             destination = "월드맵" if destination_id == 0 else names_by_id.get(destination_id, "맵 #" + str(destination_id))
+            # 밟으면 스크립트가 도는 워프는 To 가 제자리다 — 스크립트가 보내는 곳(개인 던전)을 적는다.
+            scripted = script_warp_destination(SERVER, w)
+            if scripted:
+                destination = scripted[1]
             for activation in w.get("Activations", []):
                 if activation.get("AreaID") != area["Id"]:
                     continue

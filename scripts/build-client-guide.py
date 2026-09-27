@@ -16,6 +16,8 @@
 import json
 from pathlib import Path
 
+from script_warps import script_warp_destination
+
 ROOT = Path(__file__).resolve().parent.parent
 SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
 OUT = ROOT / "mobile" / "client" / "assets" / "world"
@@ -37,6 +39,10 @@ def main() -> None:
         to = warp.get("To") or {}
         world = warp.get("WarpType") == "World" or not to.get("AreaID")
         where = "월드맵" if world else names.get(int(to["AreaID"]), str(to["AreaID"]))
+        # 밟으면 스크립트가 도는 워프는 To 가 제자리다 — 스크립트가 보내는 곳(개인 던전)을 적는다.
+        scripted = script_warp_destination(SERVER, warp)
+        if scripted:
+            where = scripted[1]
 
         for step in warp.get("Activations") or []:
             spot = step.get("Location") or {}

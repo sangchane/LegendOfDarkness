@@ -64,6 +64,11 @@ public sealed class PoteDungeonTests : IDisposable
             $"늑대를 다 잡았는데 보스방으로 가지 않았습니다. 서버 기록: {PackLog(server)} · 마지막: {world.State} · 서버가 한 말: {world.Said} · 보이는 것: {string.Join(", ", world.Creatures.Select(c => $"{c.Kind}:{c.Name}#{c.Sprite}@{c.Where}"))}", _deadline.Token);
 
         long before = world.Vitals?.Experience ?? 0;
+        // 서버가 한 말은 60줄까지만 쌓인다 — 보스방 앞의 것은 비워 두고 보스방에서 온 것만 본다.
+        while (world.TakeTold(out _, out _))
+        {
+        }
+
         await KillEverything(world, BossRoom);
 
         await Waiting.Until(() => world.State is { } state && state.Map.Id == FifthZone && state.Where == new Tile(16, 16),
@@ -71,6 +76,16 @@ public sealed class PoteDungeonTests : IDisposable
             _deadline.Token, TimeSpan.FromSeconds(40));
         await Waiting.Until(() => (world.Vitals?.Experience ?? 0) - before >= 200000,
             $"클리어 경험치 20만이 들어오지 않았습니다: {before} → {world.Vitals?.Experience}", _deadline.Token, TimeSpan.FromSeconds(5));
+
+        // 자이언트맨티스를 잡으면 세계수의나뭇가지 1개와 안내 — 5.99 `__MOB_KILL__`(script.txt).
+        Assert.Contains(world.Pack, item => item.Name.StartsWith("세계수의나뭇가지"));
+        List<string> told = [];
+        while (world.TakeTold(out _, out string line))
+        {
+            told.Add(line);
+        }
+
+        Assert.Single(told, line => line.Contains("자이언트맨티스에게서 세계수의나뭇가지를 획득 하셧습니다."));
     }
 
     /// <summary>5존 26,1 에서 들어가 오솔길 사본 9,39 에 선다. 5존 사냥터 괴물은 치운다(나르콜리에 잠들면 대화 대답이 무시된다).</summary>
