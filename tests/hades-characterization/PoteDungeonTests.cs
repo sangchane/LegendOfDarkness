@@ -86,6 +86,16 @@ public sealed class PoteDungeonTests : IDisposable
         }
 
         Assert.Single(told, line => line.Contains("자이언트맨티스에게서 세계수의나뭇가지를 획득 하셧습니다."));
+
+        // 원작처럼 자동 줍기가 없어, 마지막 괴물이 떨군 반지·금화는 5초 카운트다운 뒤 사본과 함께 사라졌다(2026-09-27 사용자 신고).
+        // 사본에서 나가는 마지막 사람이 바닥에 남은 것을 가방에 챙긴다(Systems/Instances.HandOver). 테스트는 아무것도 줍지 않는다.
+        Assert.Contains(world.Pack, item => item.Name.StartsWith("세줄금반지"));
+        Assert.Contains(told, line => line.StartsWith("금전 ") && line.Contains("주웠습니다"));
+
+        // 5.99 대본은 줄바꿈을 `\n` 두 글자로 적는다 — 대화창처럼 message 도 줄바꿈으로 바꿔 보낸다.
+        string cleared = Assert.Single(told, line => line.Contains("던전클리어"));
+        Assert.DoesNotContain("\\n", cleared);
+        Assert.Contains("던전클리어\n\n던전이름 : 포테의숲오솔길", cleared);
     }
 
     /// <summary>5존 26,1 에서 들어가 오솔길 사본 9,39 에 선다. 5존 사냥터 괴물은 치운다(나르콜리에 잠들면 대화 대답이 무시된다).</summary>
@@ -108,6 +118,10 @@ public sealed class PoteDungeonTests : IDisposable
         // 던전 괴물 체력만 1 로 — 마릿수(대기실 늑대 6 · 보스방 늑대 8 · 자이언트맨티스 1)와 흐름은 그대로 두고 잡는 시간만 줄인다.
         string entry = Path.Combine(server.ContentLocation, "scripts", "Pack599", "Npcs", "포테의숲오솔길입장.cs");
         File.WriteAllText(entry, File.ReadAllText(entry).Replace("(V)4500L", "(V)1L").Replace("(V)15000L", "(V)1L"));
+
+        // 자이언트맨티스의 세줄금반지(실제 80%)가 꼭 떨어지게 — 줍지 않고 나가도 가방에 오는지 본다.
+        string ring = Path.Combine(server.ContentLocation, "templates", "items", "세줄금반지.json");
+        File.WriteAllText(ring, File.ReadAllText(ring).Replace("\"DropRate\": 0.5333", "\"DropRate\": 10.0"));
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, who);
 

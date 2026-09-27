@@ -148,10 +148,13 @@ public static class MessageSort
 
     /// <summary>
     /// Throws away what cannot be read: control characters (the server sends lines that are a single zero byte, or a bare
-    /// newline — 실제 서버에서 봤다) and colour codes.
+    /// newline — 실제 서버에서 봤다) and colour codes. A line the server broke into lines keeps its breaks, without the
+    /// empty ones — 5.99 대본의 던전클리어 안내(message 8)는 줄마다 한 가지를 적는다.
     /// </summary>
     public static string Clean(string text) =>
-        Colour.Replace(new string([.. text.Where(letter => !char.IsControl(letter))]), string.Empty).Trim();
+        string.Join('\n', text.Split('\n')
+            .Select(part => Colour.Replace(new string([.. part.Where(letter => !char.IsControl(letter))]), string.Empty).Trim())
+            .Where(part => part.Length > 0));
 
     /// <summary>Sorts one line the server said (0x0A) by its type byte, then — where the type is the bar — by its words.</summary>
     /// <returns>Null when there is nothing to show — an empty line, or the "clear the bar" type 1 with no words.</returns>

@@ -143,6 +143,14 @@ public sealed class MessageSortTests
         Assert.Equal("안내 : 이동할수 없습니다. [남아있는 몬스터수 : 3]", notice.Text);
     }
 
+    [Fact]
+    public void A_line_the_script_broke_into_lines_keeps_its_breaks() // 5.99 Dungeon__Script 던전클리어 (message 8)
+    {
+        Notice notice = Sorted(8, "{=u\n던전클리어\n\n던전이름 : 포테의숲오솔길\n\n클리어타임(초) : 202\n\n잡은 몬스터수 : 9\n\n클리어경험치 : 200000");
+
+        Assert.Equal("던전클리어\n던전이름 : 포테의숲오솔길\n클리어타임(초) : 202\n잡은 몬스터수 : 9\n클리어경험치 : 200000", notice.Text);
+    }
+
     [Theory]
     [InlineData(1, "\0")] // MessageComponent.cs:27 — clears the bar
     [InlineData(2, "\n")]
