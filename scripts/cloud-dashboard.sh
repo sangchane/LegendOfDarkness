@@ -2,13 +2,14 @@
 # 기술·마법 운영 대시보드를 클라우드에 올린다. 게임 서버는 재시작하지 않는다.
 #
 #   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh setup
-#   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh deploy|status|logs|credentials
+#   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh deploy|status|logs|credentials|cert
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 IP="${LOD_CLOUD_IP:?LOD_CLOUD_IP=<공인 IP> 를 붙여 주세요}"
 KEY="$HOME/.ssh/lod_oracle"
 HOST="ubuntu@$IP"
+DOMAIN="${LOD_OPS_DOMAIN:-lodgame.duckdns.org}"  # 무료 인증서 주소(DuckDNS, 사용자 2026-09-27)
 REMOTE=/home/ubuntu/lod-ops
 BACKUP_DIR="$HOME/LOD-backups/cloud"
 LOCAL_CREDENTIAL="$BACKUP_DIR/ability-ops-credentials.txt"
@@ -131,7 +132,31 @@ SH
 deploy() {
     upload
     remote "sudo systemctl restart lod-ability-ops && sudo systemctl reload nginx"
-    echo "대시보드 갱신 완료 — https://$IP/?view=abilities"
+    echo "대시보드 갱신 완료 — https://$DOMAIN/?view=abilities"
+}
+
+# 무료 정식 인증서(Let's Encrypt) — 사용자 2026-09-27: 주소 lodgame.duckdns.org(DuckDNS, IP 161.33.43.117 고정).
+# 80 번은 닫혀 있어 443 하나로 받는 TLS-ALPN 방식(acme.sh --alpn)을 쓴다 — 받는 몇 초만 nginx 를 멈춘다(게임 서버는 그대로).
+# nginx 가 읽는 자리(/etc/ssl/…/lod-ops.*)에 그대로 깔아 setup 의 자체 서명과 설정을 바꾸지 않는다. 갱신은 acme.sh 의 root cron 이 한다.
+cert() {
+    remote "LOD_OPS_DOMAIN='$DOMAIN' bash -s" <<'SH'
+set -euo pipefail
+: "${LOD_OPS_DOMAIN:?}"
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq socat >/dev/null
+if ! sudo test -x /root/.acme.sh/acme.sh; then
+    curl -fsSL https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh | sudo sh -s -- --install-online >/dev/null
+fi
+ACME="sudo /root/.acme.sh/acme.sh"
+$ACME --set-default-ca --server letsencrypt >/dev/null
+# 이미 받은 인증서가 유효하면 acme.sh 가 2 를 돌려준다 — 실패가 아니다.
+$ACME --issue --alpn -d "$LOD_OPS_DOMAIN" \
+    --pre-hook "systemctl stop nginx" --post-hook "systemctl start nginx" || [ $? -eq 2 ]
+$ACME --install-cert -d "$LOD_OPS_DOMAIN" \
+    --key-file /etc/ssl/private/lod-ops.key --fullchain-file /etc/ssl/certs/lod-ops.crt \
+    --reloadcmd "systemctl reload nginx" >/dev/null
+sudo openssl x509 -in /etc/ssl/certs/lod-ops.crt -noout -subject -issuer -enddate
+SH
+    echo "인증서 — https://$DOMAIN/?view=abilities"
 }
 
 save_credentials() {
@@ -148,5 +173,6 @@ case "${1:-status}" in
     status) remote "systemctl is-active lod-ability-ops nginx; ss -ltn | grep -E ':(443|8787) '" ;;
     logs) remote "journalctl -u lod-ability-ops -n ${2:-50} --no-pager" ;;
     credentials) save_credentials ;;
-    *) echo "쓸 수 있는 것: setup deploy status logs credentials"; exit 2 ;;
+    cert) cert ;;
+    *) echo "쓸 수 있는 것: setup deploy status logs credentials cert"; exit 2 ;;
 esac
