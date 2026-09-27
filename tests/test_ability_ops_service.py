@@ -52,6 +52,12 @@ class AbilityOpsStoreTests(unittest.TestCase):
         self.store.update("spell:쿠로토", {"effect": 4, "speed": 75, "sound": 8}, 0)
         saved = self.store.update("spell:쿠로토", {"effect": None, "speed": None, "sound": None}, 1)
         self.assertNotIn("spell:쿠로토", saved["abilities"])
+        self.assertNotIn("spell:쿠로토", saved["changedAt"])
+
+    def test_each_saved_entry_remembers_when_it_changed(self):
+        saved = self.store.update("skill:단각", {"effect": 42}, 0)
+        self.assertIn("skill:단각", saved["changedAt"])
+        self.assertEqual(self.store.read()["changedAt"], saved["changedAt"])
 
 
 class AbilityOpsSecurityTests(unittest.TestCase):

@@ -21,6 +21,8 @@ OUT_JSON = ROOT / "data/game-data/ability-operations.json"
 OUT_JS = ROOT / "docs/ability-operations-data.js"
 MEDIA_JS = ROOT / "docs/ability-media-catalog.js"
 AUTO = ROOT / "mobile/client/assets/world/auto-learn.txt"
+NOVA = ROOT / "data/game-data/ability-effects.json"
+NOVA_TAIL = re.compile(r",\s*(\d+)\s*,\s*\d+\s*$")
 
 CLASS = {0: "공통", 1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "무도가", 6: "평민"}
 PACK_EFFECT = re.compile(
@@ -44,6 +46,25 @@ def auto_levels():
             continue
         path, level, kind, name, _ = line.split("\t")
         out[(int(path), kind, name)] = int(level)
+    return out
+
+
+def nova_table():
+    """노바온라인 팩 표(한글 이름)의 첫 레벨 대상 그림·소리. 원작 비교용 참고값일 뿐 기본값이 아니다."""
+    if not NOVA.exists():
+        return {}
+    out = {}
+    for name, entry in json.loads(NOVA.read_text(encoding="utf-8"))["밑말"].items():
+        level = (entry.get("레벨") or [{}])[0]
+        effect = None
+        for directive in level.get("이펙트") or []:
+            found = NOVA_TAIL.search(directive)
+            if found:
+                effect = int(found.group(1))
+                break
+        sound = (level.get("사운드") or [None])[0]
+        if effect or sound is not None:
+            out[name] = {"effect": effect, "sound": sound}
     return out
 
 
@@ -72,6 +93,7 @@ def build_abilities():
     source = ability_builder()
     scripts = source.scripted()
     levels = auto_levels()
+    nova = nova_table()
     rows = []
     for folder, kind, label, script_field in (
         ("skills", "skill", "기술", "ScriptName"),
@@ -90,6 +112,12 @@ def build_abilities():
             level = levels.get((class_number, kind, name))
             if level is None:
                 level = int((template.get("Prerequisites") or {}).get("ExpLevel_Required") or 0)
+            default = {
+                "effect": sent["이펙트"][0] if sent["이펙트"] else None,
+                "speed": speed_of(bodies, template),
+                "sound": sent["소리"][0] if sent["소리"] else None,
+            }
+            reference = nova.get(name)
             rows.append({
                 "운영키": f"{kind}:{name}",
                 "갈래": label,
@@ -100,11 +128,11 @@ def build_abilities():
                 "그룹": template.get("Group") or "",
                 "구현": bool(script and bodies),
                 "게임": sent,
-                "기본": {
-                    "effect": sent["이펙트"][0] if sent["이펙트"] else None,
-                    "speed": speed_of(bodies, template),
-                    "sound": sent["소리"][0] if sent["소리"] else None,
-                },
+                "기본": default,
+                "노바": reference,
+                "노바와다름": bool(reference) and any(
+                    reference[field] is not None and reference[field] != default[field]
+                    for field in ("effect", "sound")),
                 "반영가능": {
                     "effect": bool(sent["이펙트"]),
                     "speed": bool(sent["이펙트"]),
@@ -122,6 +150,7 @@ def build_abilities():
             "마법": sum(row["갈래"] == "마법" for row in rows),
             "이펙트수정": sum(row["반영가능"]["effect"] for row in rows),
             "사운드수정": sum(row["반영가능"]["sound"] for row in rows),
+            "노바와다름": sum(row["노바와다름"] for row in rows),
         },
     }
 

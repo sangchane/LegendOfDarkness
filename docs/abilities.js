@@ -10,10 +10,12 @@
 
   var rows = source["목록"] || [];
   var effects = media["이펙트"] || [];
-  var sounds = media["사운드"] || [];
+  var sounds = media["소리"] || media["사운드"] || [];
   var byKey = {};
   var effectByNumber = {};
   var overrides = {};
+  var changedAt = {};
+  var view = "전체";
   var revision = 0;
   var apiReady = false;
   var kind = "기술";
@@ -62,12 +64,24 @@
   }
 
   function filtered() {
-    return rows.filter(function (row) {
+    var list = rows.filter(function (row) {
       if (row["갈래"] !== kind) { return false; }
+      if (view === "노바와다름" && !row["노바와다름"]) { return false; }
+      if (view === "운영수정" && !changed(row)) { return false; }
       if (job !== "전체" && row["직업"] !== job) { return false; }
       if (!query) { return true; }
       return (row["이름"] + " " + row["그룹"] + " " + row["직업"]).toLowerCase().indexOf(query) >= 0;
     });
+    if (view === "운영수정") {
+      list.sort(function (a, b) { return String(changedAt[b["운영키"]] || "").localeCompare(String(changedAt[a["운영키"]] || "")); });
+    }
+    return list;
+  }
+  function when(key) {
+    var at = changedAt[key];
+    if (!at) { return ""; }
+    var date = new Date(at);
+    return isNaN(date) ? "" : (date.getMonth() + 1) + "/" + date.getDate() + " " + String(date.getHours()).padStart(2, "0") + ":" + String(date.getMinutes()).padStart(2, "0");
   }
 
   function renderJobs() {
@@ -92,7 +106,8 @@
     var copy = node("span", "ability-ops-copy");
     var title = node("span", "ability-ops-title");
     title.appendChild(node("strong", "", row["이름"]));
-    if (changed(row)) { title.appendChild(node("em", "", "운영 수정")); }
+    if (changed(row)) { title.appendChild(node("em", "", "운영 수정" + (when(row["운영키"]) ? " · " + when(row["운영키"]) : ""))); }
+    if (row["노바와다름"]) { title.appendChild(node("em", "is-nova", "노바 표와 다름")); }
     copy.appendChild(title);
     copy.appendChild(node("small", "", row["직업"] + " · Lv " + row["레벨"] + (row["그룹"] ? " · " + row["그룹"] : "")));
 
@@ -100,6 +115,9 @@
     values.appendChild(node("span", "", "이펙트 " + label(effective(row, "effect"))));
     values.appendChild(node("span", "", "속도 " + label(effective(row, "speed"))));
     values.appendChild(node("span", "", "소리 " + label(effective(row, "sound"))));
+    if (row["노바와다름"]) {
+      values.appendChild(node("span", "is-nova", "노바 " + label(row["노바"].effect) + "·" + label(row["노바"].sound)));
+    }
     copy.appendChild(values);
     button.appendChild(copy);
     button.appendChild(node("span", "ability-ops-chevron", "›"));
@@ -118,6 +136,9 @@
     $("ability-shown").textContent = list.length;
     $("ability-empty").hidden = list.length > 0;
     $("ability-override-count").textContent = "운영 수정 " + Object.keys(overrides).length + "개";
+    $("ability-changed-count").textContent = rows.filter(function (row) { return row["갈래"] === kind && changed(row); }).length;
+    $("ability-nova-count").textContent = rows.filter(function (row) { return row["갈래"] === kind && row["노바와다름"]; }).length;
+    $("ability-empty").textContent = view === "운영수정" ? "아직 바꾼 " + kind + "이 없어요." : view === "노바와다름" ? "노바 표와 다른 " + kind + "이 없어요." : "조건에 맞는 " + kind + "이 없어요. 필터를 지워 보세요.";
 
     var pager = $("ability-pager");
     pager.hidden = pages <= 1;
@@ -163,11 +184,11 @@
     if (type === "effect") {
       var thumb = node("i", "ability-effect-thumb");
       var width = item["바탕"][0], height = item["바탕"][1];
-      var scale = Math.min(1, 48 / Math.max(width, height));
-      thumb.style.width = width + "px";
-      thumb.style.height = height + "px";
+      var scale = Math.min(1.5, 44 / Math.max(width, height));
+      thumb.style.width = Math.round(width * scale) + "px";
+      thumb.style.height = Math.round(height * scale) + "px";
       thumb.style.backgroundImage = "url(ui/assets/ability-effects/" + item["파일"] + ")";
-      thumb.style.transform = "scale(" + scale + ")";
+      thumb.style.backgroundSize = Math.round(width * item["프레임"] * scale) + "px " + Math.round(height * scale) + "px";
       button.appendChild(thumb);
     } else {
       button.appendChild(node("span", "ability-sound-mark", "▶"));
@@ -203,6 +224,33 @@
     });
   }
 
+  function renderCompare(row) {
+    var host = $("ability-compare");
+    host.replaceChildren();
+    var nova = row["노바"];
+    var table = node("div", "ability-compare-grid");
+    ["", "서버 기본", "노바 표", "지금 운영"].forEach(function (text) { table.appendChild(node("b", "", text)); });
+    [["effect", "이펙트"], ["speed", "속도"], ["sound", "소리"]].forEach(function (pair) {
+      var field = pair[0];
+      var novaValue = nova && field !== "speed" ? nova[field] : null;
+      table.appendChild(node("span", "", pair[1]));
+      table.appendChild(node("span", "", label(row["기본"][field])));
+      table.appendChild(node("span", novaValue !== null && novaValue !== undefined && novaValue !== row["기본"][field] ? "is-nova" : "", field === "speed" ? "—" : label(novaValue)));
+      table.appendChild(node("span", overrides[row["운영키"]] && field in overrides[row["운영키"]] ? "is-changed" : "", label(effective(row, field))));
+    });
+    host.appendChild(table);
+    if (nova) {
+      var use = node("button", "ability-use-nova", "노바 표 값 넣기");
+      use.type = "button";
+      use.addEventListener("click", function () {
+        if (nova.effect && row["반영가능"].effect) { draft.effect = nova.effect; $("ability-effect-number").value = nova.effect; previewEffect(nova.effect); }
+        if (nova.sound !== null && nova.sound !== undefined && row["반영가능"].sound) { draft.sound = nova.sound; $("ability-sound-number").value = nova.sound; }
+        syncEditor(); toast("노바 표 값을 넣었습니다. [운영에 반영]을 눌러야 저장됩니다.");
+      });
+      host.appendChild(use);
+    }
+  }
+
   function setControl(field, enabled) {
     var ids = field === "effect" ? ["ability-effect-number"] : field === "sound" ? ["ability-sound-number", "ability-sound-preview"] : ["ability-speed"];
     ids.forEach(function (id) { $(id).disabled = !enabled; });
@@ -225,8 +273,11 @@
     setControl("speed", row["반영가능"].speed);
     setControl("sound", row["반영가능"].sound);
     $("ability-apply").disabled = !apiReady;
+    $("ability-reset").disabled = !apiReady || !changed(row);
+    renderCompare(row);
     renderMedia(); syncEditor(); previewEffect(draft.effect);
     $("ability-editor").hidden = false;
+    document.querySelector(".ability-editor-scroll").scrollTop = 0;
     $("ability-editor-scrim").hidden = false;
     document.body.classList.add("ability-editor-open");
     $("ability-editor-close").focus();
@@ -261,6 +312,7 @@
     }).then(function (result) {
       if (result.status === 409) {
         overrides = result.body.current.abilities || {};
+        changedAt = result.body.current.changedAt || {};
         revision = result.body.current.revision || 0;
         state("저장 충돌 · 다시 확인", "is-warning");
         toast("다른 기기에서 먼저 바꿨습니다. 최신값을 불러왔어요.");
@@ -269,6 +321,7 @@
       }
       if (!result.ok) { throw new Error(result.body.error || "저장하지 못했습니다."); }
       overrides = result.body.abilities || {};
+      changedAt = result.body.changedAt || {};
       revision = result.body.revision || 0;
       state("운영에 반영됨", "is-live");
       render(); closeEditor(); toast(reset ? "서버 기본값으로 되돌렸습니다." : "운영값을 바로 반영했습니다.");
@@ -285,6 +338,7 @@
       return response.json();
     }).then(function (data) {
       overrides = data.abilities || {};
+      changedAt = data.changedAt || {};
       revision = data.revision || 0;
       apiReady = true;
       state("운영 연결됨", "is-live");
@@ -304,6 +358,16 @@
     kind = button.dataset.abilityKind; page = 0;
     $("ability-kind-tabs").querySelectorAll("button").forEach(function (tab) {
       tab.setAttribute("aria-selected", String(tab === button));
+    });
+    render();
+  });
+  $("ability-views").addEventListener("click", function (event) {
+    var button = event.target.closest("[data-ability-view]");
+    if (!button) { return; }
+    view = button.dataset.abilityView; page = 0;
+    $("ability-views").querySelectorAll("button").forEach(function (chip) {
+      chip.classList.toggle("is-active", chip === button);
+      chip.setAttribute("aria-pressed", String(chip === button));
     });
     render();
   });

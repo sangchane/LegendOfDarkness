@@ -36,7 +36,7 @@ class OverrideStore:
 
     def read(self):
         if not self.path.exists():
-            return {"version": 1, "revision": 0, "updatedAt": None, "abilities": {}}
+            return {"version": 1, "revision": 0, "updatedAt": None, "abilities": {}, "changedAt": {}}
         try:
             data = json.loads(self.path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
@@ -48,6 +48,8 @@ class OverrideStore:
             "revision": int(data.get("revision") or 0),
             "updatedAt": data.get("updatedAt"),
             "abilities": data["abilities"],
+            # 항목별 마지막 저장 시각(화면의 「최근 바꾼 것」). 게임 서버는 abilities 만 읽는다.
+            "changedAt": data["changedAt"] if isinstance(data.get("changedAt"), dict) else {},
         }
 
     def update(self, key, patch, revision):
@@ -78,12 +80,15 @@ class OverrideStore:
                     entry.pop(field, None)
                 else:
                     entry[field] = value
+            now = datetime.now(timezone.utc).isoformat()
             if entry:
                 data["abilities"][key] = entry
+                data["changedAt"][key] = now
             else:
                 data["abilities"].pop(key, None)
+                data["changedAt"].pop(key, None)
             data["revision"] += 1
-            data["updatedAt"] = datetime.now(timezone.utc).isoformat()
+            data["updatedAt"] = now
             self._write(data)
             return data
 
