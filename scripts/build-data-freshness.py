@@ -32,6 +32,9 @@ SLACK = 5
 SHEETS = [
     ("abilities-data.js", "scripts/build-ability-page-data.py", [
         "data/game-data/abilities.json", "data/기술마법-한글이름.tsv", f"{HADES}/scripts"]),
+    ("ability-operations-data.js", "scripts/build-ability-operations-data.py", [
+        f"{HADES}/templates/skills", f"{HADES}/templates/spells",
+        "data/game-data/ability-presentation.json"]),
     ("items-data.js", "scripts/build-item-page-data.py", [
         "data/game-data/items-hades.json", "data/pack-compare/item-korean-names.json",
         "docs/ui/assets/item-icons.json"]),

@@ -125,59 +125,23 @@
       </section>
 
       <section class="view" data-view="abilities" aria-labelledby="abilities-title" hidden>
-        <div class="item-topbar">
-          <h1 id="abilities-title">기술·마법 도감</h1>
-          <dl class="item-tally">
-            <dt>전체</dt><dd id="ability-total">—</dd>
-            <dt>한글</dt><dd id="ability-named">—</dd>
-            <dt>다 나감</dt><dd id="ability-playable">—</dd>
-            <dt>스크립트</dt><dd id="ability-built-count">—</dd>
-            <dt>지금</dt><dd id="ability-shown">—</dd>
-          </dl>
-          <p>기본은 <b>몸동작·이펙트·소리가 다 나가는 것</b>만 봅니다. 번호는 팩 표가 아니라 <b>서버가 실제로 보내는 것</b>입니다</p>
-          <a class="quiet-link" href="martial-artist-skill-presentation.md">연출 근거 →</a>
+        <div class="ability-ops-head">
+          <div><p class="eyebrow">Live presentation</p><h1 id="abilities-title">기술·마법 연출 운영</h1><p>현재 서버 템플릿을 보고, 원작과 다른 이펙트·속도·사운드를 바로 고칩니다.</p></div>
+          <span class="ability-api-state is-loading" id="ability-api-state" role="status">운영 서버 확인 중</span>
         </div>
 
-        <div class="tally-strip" id="ability-presentation" aria-label="연출 세 채널 채움"></div>
-
-        <section class="aip" id="ability-icon-picker" aria-labelledby="aip-title">
-          <h2 id="aip-title">무도가 아이콘 고르기</h2>
-          <p class="aip-help">기술·마법을 누르고 아래 그림에서 맞는 것을 고르세요. 다 고르면 <b>[글 복사]</b> 해서 채팅에 붙여 넣으면 그대로 바꿉니다. 고른 것은 이 브라우저에 기억됩니다.</p>
-          <div class="aip-rows"></div>
-          <p class="aip-sheet-title"></p>
-          <div class="aip-sheet"></div>
-          <div class="aip-send">
-            <label class="visually-hidden" for="aip-output">바꿀 것</label>
-            <textarea id="aip-output" class="aip-output" rows="4" readonly></textarea>
-            <div class="aip-actions"><button type="button" class="chip aip-copy">글 복사</button><button type="button" class="chip aip-reset">처음대로</button><span class="aip-copied" hidden>복사했습니다</span></div>
-          </div>
-        </section>
-
-
-        <div class="filterbar item-filterbar">
-          <label class="visually-hidden" for="ability-search">기술·마법 검색</label>
-          <input id="ability-search" type="search" placeholder="이름으로 찾기 — 한글·영문 모두" autocomplete="off">
-          <div class="item-filter-row" role="group" aria-label="직업"><span>직업</span><div class="item-chips" id="ability-classes"></div></div>
-          <div class="item-filter-row" role="group" aria-label="갈래"><span>갈래</span><div class="item-chips" id="ability-kinds"></div></div>
-          <div class="item-filter-row" role="group" aria-label="차수"><span>차수</span><div class="item-chips" id="ability-stages"></div></div>
-          <div class="item-filter-row" role="group" aria-label="구현"><span>구현</span><div class="item-chips" id="ability-built"></div></div>
-          <div class="item-filter-row"><span>보기</span><div class="item-chips">
-            <button type="button" class="chip" id="ability-fold" aria-pressed="true">레벨 변형 묶기</button>
-            <button type="button" class="chip" id="ability-only-playable" aria-pressed="false">연출 있는 것만</button>
-            <button type="button" class="chip" id="ability-only-unnamed" aria-pressed="false">한글 없는 것만</button>
-            <button type="button" class="chip" id="ability-export">표로 내보내기</button>
-          </div></div>
+        <div class="ability-kind-tabs" id="ability-kind-tabs" role="tablist" aria-label="기술 또는 마법">
+          <button type="button" role="tab" data-ability-kind="기술" aria-selected="true">기술 <b id="ability-skill-count">—</b></button>
+          <button type="button" role="tab" data-ability-kind="마법" aria-selected="false">마법 <b id="ability-spell-count">—</b></button>
         </div>
 
-        <details class="ability-original" id="ability-original-monk">
-          <summary>원작 엑셀 — 도가 일반 기술표 (검토용)</summary>
-          <p class="notice">모션·이펙트·소리는 엑셀 열이 아니라 기존 Hades 템플릿·스크립트와 이름을 맞춘 결과입니다. 매칭되지 않은 행은 값을 추측하지 않습니다.</p>
-          <div class="ability-original-table" id="ability-original-monk-table"></div>
-        </details>
+        <div class="ability-ops-tools">
+          <label class="ability-search" for="ability-search"><span>이름 검색</span><input id="ability-search" type="search" placeholder="단각, 쿠로토…" autocomplete="off"></label>
+          <div class="ability-class-filter" id="ability-classes" role="group" aria-label="직업"></div>
+        </div>
 
-        <div id="ability-export-box" hidden></div>
-
-        <div class="item-grid ability-grid" id="ability-grid"></div>
+        <div class="ability-ops-summary"><strong id="ability-shown">—</strong><span>개 표시</span><span id="ability-override-count">운영 수정 0개</span></div>
+        <div class="ability-ops-list" id="ability-grid"></div>
         <p class="empty-state" id="ability-empty" hidden>조건에 맞는 기술이 없어요. 필터를 지워 보세요.</p>
 
         <nav class="item-pager" id="ability-pager" aria-label="쪽 이동" hidden>
@@ -186,7 +150,20 @@
           <button type="button" class="chip" data-ability-page="1">다음 →</button>
         </nav>
 
-        <div class="ability-stage" id="ability-stage" hidden aria-hidden="true"></div>
+        <div class="ability-editor-scrim" id="ability-editor-scrim" hidden></div>
+        <aside class="ability-editor" id="ability-editor" aria-labelledby="ability-editor-title" hidden>
+          <header><div><span id="ability-editor-kind">기술</span><h2 id="ability-editor-title">—</h2><p id="ability-editor-meta">—</p></div><button type="button" id="ability-editor-close" aria-label="편집 닫기">×</button></header>
+          <div class="ability-editor-scroll">
+            <section class="ability-live-preview" aria-label="고른 연출 미리보기"><div id="ability-effect-preview"></div><button type="button" id="ability-sound-preview">▶ 고른 소리 듣기</button></section>
+
+            <section class="ability-control"><div class="ability-control-head"><div><h3>이펙트</h3><p>그림을 누르면 바로 미리 봅니다.</p></div><output id="ability-effect-output">기본값</output></div><label class="ability-number"><span>번호</span><input id="ability-effect-number" type="number" min="1" max="999" inputmode="numeric"></label><div class="ability-media-grid effect-grid" id="ability-effect-list"></div></section>
+
+            <section class="ability-control"><div class="ability-control-head"><div><h3>속도</h3><p>작을수록 빠르게 재생됩니다.</p></div><output id="ability-speed-output">100</output></div><input id="ability-speed" type="range" min="1" max="255" value="100"></section>
+
+            <section class="ability-control"><div class="ability-control-head"><div><h3>사운드</h3><p>번호를 누르면 바로 재생합니다.</p></div><output id="ability-sound-output">기본값</output></div><label class="ability-number"><span>번호</span><input id="ability-sound-number" type="number" min="0" max="255" inputmode="numeric"></label><div class="ability-media-grid sound-grid" id="ability-sound-list"></div></section>
+          </div>
+          <footer><button type="button" class="ability-reset" id="ability-reset">서버 기본값</button><button type="button" class="ability-apply" id="ability-apply">운영에 반영</button></footer>
+        </aside>
       </section>
 
       <section class="view" data-view="items" aria-labelledby="items-title" hidden>
@@ -348,8 +325,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!-- 자료가 먼저, 그다음 모델, 마지막이 화면. overview.js 가 다른 화면의 셈까지 한 줄로 보여 주므로
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-icon-picker-data.js"></script><script src="ability-effects-data.js"></script><script src="body-motions-data.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
-<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="ability-icon-picker.js"></script><script src="items.js"></script>
+<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>
