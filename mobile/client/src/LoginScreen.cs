@@ -45,7 +45,7 @@ public partial class LoginScreen : Control
     private LineEdit _password = null!;
     private Button _submit = null!;
     private Button _create = null!;
-    private Button _autoLogin = null!;
+    private CheckBox _autoLogin = null!;
 
     /// <summary>기본은 꺼짐 — 이미 저장된 계정이 있을 때만 켜져서 보인다.</summary>
     private bool _autoLoginWanted;
@@ -82,8 +82,6 @@ public partial class LoginScreen : Control
         rows.AddChild(BuildForm());
         rows.AddChild(_versionLine = BuildVersionLine());
 
-        RefreshSubmitState();
-
         // --login / login.cfg (desktop rehearsal) wins over a saved account when both are somehow present.
         (string Username, string Password) fill = Main.Rehearsal.Username.Length > 0
             ? Main.Rehearsal
@@ -99,6 +97,8 @@ public partial class LoginScreen : Control
                 BeginLogin();
             }
         }
+
+        RefreshSubmitState();
     }
 
     /// <summary>Environment on the left, which server we will talk to on the right.</summary>
@@ -247,19 +247,16 @@ public partial class LoginScreen : Control
 
         // 기본은 꺼짐(사용자) — 이미 저장된 계정이 있을 때만 켜진 채로 보인다.
         _autoLoginWanted = Main.SavedLogin is not null;
-        _autoLogin = new Button
+        _autoLogin = new CheckBox
         {
-            ToggleMode = true,
+            Text = "자동 로그인",
             ButtonPressed = _autoLoginWanted,
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
-        Greybox.Tab(_autoLogin);
-        ShowAutoLogin();
 
         _autoLogin.Pressed += () =>
         {
             _autoLoginWanted = _autoLogin.ButtonPressed;
-            ShowAutoLogin();
 
             // 꺼면 그 자리에서 지운다 — 켜는 것은 이 계정으로 실제 로그인에 성공했을 때뿐이다.
             if (!_autoLoginWanted)
@@ -358,8 +355,7 @@ public partial class LoginScreen : Control
         form.AddChild(_create);
     }
 
-    private void ShowAutoLogin() =>
-        _autoLogin.Text = _autoLoginWanted ? "자동 로그인 켬" : "자동 로그인 꺼짐";
+
 
     private static Control FieldRow(string caption, LineEdit field)
     {
