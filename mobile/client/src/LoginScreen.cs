@@ -190,7 +190,7 @@ public partial class LoginScreen : Control
 
         PanelContainer panel = new()
         {
-            CustomMinimumSize = new Vector2(Main.Portrait ? FormWidth : LandscapeFormWidth, 0)
+            CustomMinimumSize = new Vector2(FormWidth, 0)
         };
         panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
@@ -253,6 +253,7 @@ public partial class LoginScreen : Control
             ButtonPressed = _autoLoginWanted,
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
+        _autoLogin.AddThemeConstantOverride("h_separation", Main.Gutter);
 
         _autoLogin.Pressed += () =>
         {
@@ -265,9 +266,7 @@ public partial class LoginScreen : Control
             }
         };
 
-        Control form = Main.Portrait
-            ? PortraitForm(crest, title)
-            : LandscapeForm(crest, title);
+        Control form = PortraitForm(crest, title);
 
         padding.AddChild(form);
         panel.AddChild(padding);
@@ -309,31 +308,7 @@ public partial class LoginScreen : Control
         return form;
     }
 
-    /// <summary>
-    /// A short, two-column version of the same form for landscape: identity on the left and the actual
-    /// task on the right. It removes two tall rows without shrinking fields or touch targets.
-    /// </summary>
-    private Control LandscapeForm(TextureRect crest, Label title)
-    {
-        HBoxContainer form = new();
-        form.AddThemeConstantOverride("separation", Main.Gutter * 2);
 
-        VBoxContainer identity = FormColumn();
-        identity.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        identity.SizeFlagsStretchRatio = 2;
-        identity.AddChild(crest);
-        identity.AddChild(title);
-
-        VBoxContainer credentials = FormColumn();
-        credentials.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        credentials.SizeFlagsStretchRatio = 3;
-        AddCredentials(credentials);
-
-        form.AddChild(identity);
-        form.AddChild(credentials);
-
-        return form;
-    }
 
     private static VBoxContainer FormColumn()
     {

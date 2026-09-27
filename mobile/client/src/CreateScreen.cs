@@ -340,12 +340,15 @@ public sealed partial class CreateScreen : Control
     private Control BuildLandscapeForm(
         Control title, Control auth, Control preview, Control gender, Control path, Control hair, Control color, Control buttons)
     {
-        HBoxContainer columns = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
-        columns.AddThemeConstantOverride("separation", Main.Gutter);
+        HBoxContainer columns = new() 
+        { 
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            Alignment = BoxContainer.AlignmentMode.Center
+        };
+        columns.AddThemeConstantOverride("separation", Main.Gutter * 3);
 
         VBoxContainer input = Column();
-        input.CustomMinimumSize = new Vector2(200, 0);
-        input.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        input.CustomMinimumSize = new Vector2(FormWidth, 0);
         input.AddChild(title);
         input.AddChild(auth);
         input.AddChild(gender);
@@ -354,10 +357,10 @@ public sealed partial class CreateScreen : Control
         input.AddChild(buttons);
 
         preview.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        preview.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
 
         VBoxContainer appearance = Column();
         appearance.CustomMinimumSize = new Vector2(ColorGridColumns * Main.TouchMinimum + (ColorGridColumns - 1) * Main.Gutter, 0);
-        appearance.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         appearance.AddChild(hair);
         appearance.AddChild(color);
 
