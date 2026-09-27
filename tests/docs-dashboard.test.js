@@ -154,62 +154,31 @@ test('overview sorts features into what can and cannot be touched today', () => 
   assert.ok(data['셈']['양쪽됨'] < data['셈']['전체'], '전부 된다고 나오면 표를 안 읽은 것이다');
 });
 
-test('ability workspace counts the three presentation channels separately', () => {
+test('ability workspace operates the current Hades skill and spell catalog directly', () => {
   const html = read('docs/index.html');
   const script = read('docs/abilities.js');
   const css = read('docs/dashboard.css');
-  const data = readBrowserGlobal('docs/abilities-data.js', 'ABILITY_DATA');
+  const data = readBrowserGlobal('docs/ability-operations-data.js', 'LOD_ABILITY_OPERATIONS');
 
   assert.match(html, /id="ability-grid"/);
-  assert.match(html, /id="ability-stage"/);                 // 샌드백 무대
-  assert.match(html, /id="ability-presentation"/);          // 연출 채움 한 줄
-  assert.match(css, /\.ability-card\s*\{[^}]*grid-template-columns/s);
-  assert.match(css, /\.playing\{[^}]*steps\(var\(--frames\)\)/s);
-  assert.match(script, /ability-icons\//);                  // 아이콘 시트를 계속 쓴다
-  assert.match(script, /LOD_ABILITY_EFFECTS/);              // 연출 색인을 읽는다
-  assert.match(script, /presentationStrip/);
+  assert.match(html, /id="ability-kind-tabs"/);
+  assert.match(html, /id="ability-editor"/);
+  assert.match(html, /id="ability-effect-list"/);
+  assert.match(html, /id="ability-sound-list"/);
+  assert.match(css, /\.ability-editor\{[^}]*100dvh/s);
+  assert.match(script, /LOD_ABILITY_OPERATIONS/);
+  assert.match(script, /LOD_ABILITY_MEDIA/);
+  assert.match(script, /\/api\/ability-overrides/);
 
-  assert.equal(data['요약']['전체'], 613);
-  const abilities = data['묶음'].flatMap((group) => group['목록']);
-  assert.equal(abilities.length, data['요약']['전체']);
-
-  // 기본 화면은 몸동작·이펙트·소리가 다 나가는 것으로 연다 (사용자, 2026-09-19).
-  assert.match(script, /built = "다 나감"/);
-  // 여러 직업에 겹치는 기술은 직업을 안 고른 동안 대표 하나만 보인다.
-  assert.match(script, /cls === "all" && row\["대표"\] === false/);
-
-  // **「스크립트 있음」은 「눌러서 보인다」가 아니다.** 연출은 한글 이름으로만 찾으므로 이름이
-  // 없으면 찾아보지도 못한다 — 빈 칸을 원작의 사실처럼 적으면 화면이 거짓말을 한다.
-  const rep = abilities.filter((ability) => ability['대표']);
-  assert.equal(rep.length, data['요약']['서로다름']);
-  assert.ok(rep.length < abilities.length, '직업에 겹치는 기술이 하나도 없다면 셈이 틀렸다');
-  assert.equal(abilities.filter((a) => a['구현']).length, data['요약']['구현']);
-
-  // 대표 자리는 네 갈래로 빠짐없이 갈린다: 셋 다 · 일부 · 이름 없음 · 표에 없음.
-  assert.equal(
-    data['요약']['연출셋다'] + data['요약']['연출일부']
-      + data['요약']['이름없어못찾음'] + data['요약']['표에없음'],
-    data['요약']['서로다름']);
-  assert.ok(data['요약']['연출셋다'] > 0, '연출 셋이 다 찬 기술이 하나도 없다');
-  assert.ok(data['요약']['이름없어못찾음'] > 0, '한글 이름이 613개 다 정해졌을 리 없다');
-
-  for (const ability of rep) {
-    const has = ability['모션'].length || ability['이펙트'].length || ability['소리'].length;
-    if (has) { assert.equal(ability['연출막힘'], ''); continue; }
-    // 연출이 비었으면 반드시 왜 비었는지가 적혀 있어야 한다.
-    assert.equal(ability['연출막힘'], ability['한글'] ? '표에없음' : '한글이름없음', ability['이름']);
-  }
-  assert.doesNotMatch(script, /구현됐지만 아무것도 안 보인다/);
-
-  // 선행 기술이 목록에서 뒤에 오면 사슬을 거꾸로 읽게 된다.
-  for (const group of data['묶음']) {
-    const position = new Map(group['목록'].map((ability, index) => [ability['이름'], index]));
-    for (const ability of group['목록']) {
-      if (position.has(ability['선행'])) {
-        assert.ok(position.get(ability['선행']) < position.get(ability['이름']),
-          `${group['직업']} ${group['갈래']}: ${ability['선행']} must precede ${ability['이름']}`);
-      }
-    }
+  assert.equal(data['목록'].length, data['셈']['전체']);
+  assert.ok(data['셈']['기술'] > 0);
+  assert.ok(data['셈']['마법'] > 0);
+  assert.equal(new Set(data['목록'].map((row) => row['운영키'])).size, data['목록'].length);
+  for (const ability of data['목록']) {
+    assert.ok(['기술', '마법'].includes(ability['갈래']));
+    assert.ok(ability['게임']);
+    assert.ok(ability['기본']);
+    assert.ok(ability['반영가능']);
   }
 });
 
@@ -440,44 +409,15 @@ test('the route shows which tile on each map leads to the next one', () => {
   assert.match(script, /doorsTo/);
 });
 
-test('the sandbag stage stands both at one tile apart and leaves effects their own size', () => {
-  const script = read('docs/abilities.js');
-  const shots = readBrowserGlobal('docs/ability-effects-data.js', 'LOD_ABILITY_EFFECTS');
-
-  // 원작 자 그대로다. 그림은 1배로 자르고 화면에서만 확대한다 — 자를 키우면 좌표가 거짓말을 한다.
-  assert.equal(shots['배율'], 1);
-
-  // 연출마다 제 바탕과 기준점이 있다. 그것이 없으면 화면은 어디에 얼마만 하게 그릴지 알 수 없어
-  // 조각을 몸통 크기로 늘리게 된다 — 일음지의 작은 반짝임이 샌드백 전체를 덮던 까닭이다.
-  for (const [number, shot] of Object.entries(shots['연출'])) {
-    assert.ok(Array.isArray(shot['바탕']) && shot['바탕'].length === 2, `${number} 에 바탕이 없다`);
-    assert.ok(Array.isArray(shot['기준']) && shot['기준'].length === 2, `${number} 에 기준점이 없다`);
-    assert.ok(shot['기준'][1] > 0 && shot['기준'][1] <= shot['바탕'][1], `${number} 기준점이 바탕 밖이다`);
+test('the operations effect catalog preserves original frame geometry', () => {
+  const media = readBrowserGlobal('docs/ability-media-catalog.js', 'LOD_ABILITY_MEDIA');
+  assert.ok(media['이펙트'].length > 0);
+  for (const shot of media['이펙트']) {
+    assert.ok(Array.isArray(shot['바탕']) && shot['바탕'].length === 2, `${shot['번호']} 에 바탕이 없다`);
+    assert.ok(Array.isArray(shot['기준']) && shot['기준'].length === 2, `${shot['번호']} 에 기준점이 없다`);
+    assert.ok(shot['프레임'] > 0, `${shot['번호']} 에 프레임이 없다`);
+    assert.equal(fs.existsSync(path.join(root, 'docs/ui/assets/ability-effects', shot['파일'])), true);
   }
-
-  // 일음지가 게임에서 쓰는 번호는 276 이다(팩 표의 42 가 아니다). 160x120 바탕에 기준점 71,95 —
-  // 그 값이 바뀌면 자리가 틀어진다. 값만 견준다: vm 으로 읽은 배열은 다른 realm 것이라
-  // deepEqual 이 통째로 다르다고 한다.
-  assert.equal(shots['연출']['276']['바탕'].join(), '160,120');
-  assert.equal(shots['연출']['276']['기준'].join(), '71,95');
-
-  // 그림은 게임이 쏘는 번호에서만 나온다 — 팩 표의 번호로 뽑으면 화면과 게임이 다른 그림을 본다.
-  const used = JSON.parse(read('data/game-data/ability-presentation.json'))['채널']['이펙트'];
-  for (const number of Object.keys(shots['연출'])) {
-    assert.ok(used.includes(Number(number)), `${number} 은 게임이 안 쏘는데 그림만 있다`);
-  }
-
-  // 크기를 화면이 정하지 않는다. 예전에는 96px 높이로 늘렸다.
-  assert.doesNotMatch(script, /SHOT_HEIGHT/);
-  // 무대는 원래 크기 그대로, 카드마다 같다 — 카드마다 맞춰 키우면 가리킬 때마다 창이 커졌다 작아졌다 하고,
-  // 제일 큰 연출에 맞추면 창이 두 배가 된다. 둘 다 사용자가 물렸다(2026-09-19).
-  assert.match(script, /var FLOOR = \{ wide: 228, tall: 150/);
-  assert.doesNotMatch(script, /scale\(" \+ ZOOM/);
-  assert.match(script, /STEP = \{ x: 28, y: 13 \}/);       // 한 칸 = 화면으로 (28,13)
-  assert.match(script, /shotBox/);                          // 자리는 기준점에서 나온다
-
-  // 샌드백은 원작 괴물 그림이다 — 팩의 연습장이 세우는 「샌드백1」의 그림 번호 154.
-  assert.equal(fs.existsSync(path.join(root, 'docs/ui/assets/stage/sandbag.png')), true);
 });
 
 test('every sound and picture the stage can ask for is on disk', () => {
@@ -533,39 +473,14 @@ test('a skill motion is drawn wearing the outfit its own class can do it in', ()
   assert.equal(new Set(worn).size, worn.length, '두 직업이 같은 옷을 입고 있다');
 });
 
-test('an ability with a script but nothing to show says so', () => {
+test('an ability can only edit packet channels it actually sends', () => {
   const script = read('docs/abilities.js');
-  const data = readBrowserGlobal('docs/abilities-data.js', 'ABILITY_DATA');
-  const rep = data['묶음'].flatMap((g) => g['목록']).filter((a) => a['대표']);
-
-  // 「스크립트 있음」은 「눌러서 뭔가 나온다」가 아니다. 화면이 세던 연출은 노바온라인 팩의 표를
-  // 한글 이름으로 찾은 것이고, 게임이 보내는 것은 우리 템플릿·스크립트가 정한다 — 둘은 다르다.
-  // 발경은 TargetAnimation 이 0 이라 이펙트가 아예 안 나간다(사용자, 2026-09-19).
-  // 채널마다 **번호 목록**이다. 참/거짓만으로는 무엇이 나가는지 알 수 없고, 그림·소리를 자르는
-  // 생성기도 그 번호를 보고 자른다.
-  for (const ability of rep) {
-    assert.ok(ability['게임'], `${ability['이름']} 에 게임이 보내는 것이 안 적혀 있다`);
-    for (const channel of ['이펙트', '소리', '몸동작']) {
-      assert.ok(Array.isArray(ability['게임'][channel]), `${ability['이름']} ${channel}`);
-    }
-  }
-
-  // 프라보는 팩 표가 43·33 인데 서버는 257 을 쏜다. 팩 표를 믿으면 화면이 딴 그림을 보여 준다.
-  const prabo = rep.find((a) => a['이름'] === 'ard cradh');
-  assert.ok(prabo && prabo['게임']['이펙트'].includes(257), '프라보는 257 을 쏜다');
-
-  const silent = rep.filter((a) => a['구현']
-    && !a['게임']['이펙트'].length && !a['게임']['소리'].length && !a['게임']['몸동작'].length);
-  assert.equal(silent.length, data['요약']['게임연출없음']);
-  assert.ok(silent.length > 0, '스크립트만 있고 아무것도 안 나가는 것이 하나도 없을 리 없다');
-
-  const whole = rep.filter((a) => a['구현'] && a['게임']['이펙트'].length
-    && a['게임']['소리'].length && a['게임']['몸동작'].length);
-  assert.equal(whole.length, data['요약']['게임연출셋다']);
-  assert.ok(whole.length > 0, '다 나가는 것이 하나도 없다면 기본 화면이 빈다');
-
-  assert.match(script, /ability-silent/);                   // 카드에 그렇게 적는다
-  assert.match(script, /게임연출없음/);                        // 한 줄 셈에도 올린다
+  const data = readBrowserGlobal('docs/ability-operations-data.js', 'LOD_ABILITY_OPERATIONS');
+  const locked = data['목록'].filter((ability) => !ability['반영가능'].effect || !ability['반영가능'].sound);
+  assert.ok(locked.length > 0, '수정할 패킷 채널이 없는 항목도 있어야 한다');
+  assert.match(script, /setControl\("effect", row\["반영가능"\]\.effect\)/);
+  assert.match(script, /setControl\("sound", row\["반영가능"\]\.sound\)/);
+  assert.match(script, /if \(selected\["반영가능"\]\[field\]\)/);
 });
 
 test('how stale the data is stays a build-time record, not screen furniture', () => {
