@@ -31,8 +31,8 @@ public sealed partial class CreateScreen : Control
     // 것은 사람이 가로보다 세로로 긴 그림이기 때문이다. 이름·비밀번호·확인 세 칸을 한 줄로 모으고
     // (아래 AuthRow) 옆 캡션을 힌트 글자로 바꿔 세로 96px 을 돌려받아, 그 값으로 배율을 3배까지
     // 올렸다(예전엔 격자 둘 자리가 안 나 2배에 머물렀다).
-    private const int PreviewWidth = 168;
-    private const int PreviewHeight = 228;
+    private const int PreviewWidth = 140;
+    private const int PreviewHeight = 160;
 
     // 정수 배율로 키운다 — 3배씩이면 원작 그림 한 칸(1px)이 화면에서도 칼같이 3px 로 남는다(흐려지지
     // 않음). 고도 프로젝트 설정(project.godot: default_texture_filter=0=Nearest)이 이미 전역으로
@@ -249,10 +249,10 @@ public sealed partial class CreateScreen : Control
         panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
         MarginContainer padding = new();
-        padding.AddThemeConstantOverride("margin_left", Main.Gutter * 2);
-        padding.AddThemeConstantOverride("margin_top", Main.Gutter * 2);
-        padding.AddThemeConstantOverride("margin_right", Main.Gutter * 2);
-        padding.AddThemeConstantOverride("margin_bottom", Main.Gutter * 2);
+        padding.AddThemeConstantOverride("margin_left", Main.Gutter);
+        padding.AddThemeConstantOverride("margin_top", Main.Gutter);
+        padding.AddThemeConstantOverride("margin_right", Main.Gutter);
+        padding.AddThemeConstantOverride("margin_bottom", Main.Gutter);
 
         Label title = new()
         {
@@ -413,7 +413,8 @@ public sealed partial class CreateScreen : Control
             {
                 Text = label,
                 ToggleMode = true,
-                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+                CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
             Greybox.Tab(tile);
             tile.Pressed += () => SelectPath(path);
@@ -421,15 +422,8 @@ public sealed partial class CreateScreen : Control
             choices.AddChild(tile);
         }
 
-        ScrollContainer scroll = new()
-        {
-            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
-            VerticalScrollMode = ScrollContainer.ScrollMode.Disabled,
-            HorizontalScrollMode = ScrollContainer.ScrollMode.Auto
-        };
-        scroll.AddChild(choices);
-        _pathRow = scroll;
-        return scroll;
+        _pathRow = choices;
+        return choices;
     }
 
     private void ApplyPickedPath()
@@ -565,7 +559,7 @@ public sealed partial class CreateScreen : Control
     /// <summary>HAIR 격자의 틀 — 자리는 <see cref="PopulateHairGrid"/> 가 채운다(성별이 바뀔 때 다시).</summary>
     private Control BuildHairGrid()
     {
-        VBoxContainer section = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+        VBoxContainer section = new();
         section.AddThemeConstantOverride("separation", Main.Gutter / 2);
         section.AddChild(Aux("HAIR"));
 
@@ -573,12 +567,10 @@ public sealed partial class CreateScreen : Control
         _hairGrid.AddThemeConstantOverride("h_separation", Main.Gutter);
         _hairGrid.AddThemeConstantOverride("v_separation", Main.Gutter);
 
-        // 최소 두 줄은 보이게 한다(사용자, 2026-09-19) — 한 줄만 보이면 옆에 뭐가 더 있는지 스크롤바
-        // 손잡이로만 짐작해야 해서 고르기 나쁘다. (임시: 한 줄로 자리를 먼저 잡는다 — 다음 편집에서
-        // 실제 예산을 재고 두 줄 높이로 올린다.)
+        // 최소 두 줄은 보이게 한다 — 한 줄만 보이면 옆에 뭐가 더 있는지 스크롤바
+        // 손잡이로만 짐작해야 해서 고르기 나쁘다.
         ScrollContainer scroll = new()
         {
-            SizeFlagsVertical = SizeFlags.ExpandFill,
             CustomMinimumSize = new Vector2(0, HairTileSize.Y * 2 + Main.Gutter),
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
@@ -655,7 +647,7 @@ public sealed partial class CreateScreen : Control
     /// <summary>COLOR 격자 — 72가지 색 조각. 한 번만 짓는다(성별과 무관).</summary>
     private Control BuildColorGrid()
     {
-        VBoxContainer section = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+        VBoxContainer section = new();
         section.AddThemeConstantOverride("separation", Main.Gutter / 2);
         section.AddChild(Aux("COLOR"));
 
@@ -691,8 +683,7 @@ public sealed partial class CreateScreen : Control
 
         ScrollContainer scroll = new()
         {
-            SizeFlagsVertical = SizeFlags.ExpandFill,
-            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+            CustomMinimumSize = new Vector2(0, Main.TouchMinimum * 2 + Main.Gutter),
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
         scroll.AddChild(grid);
