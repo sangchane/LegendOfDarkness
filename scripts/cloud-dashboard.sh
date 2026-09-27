@@ -110,6 +110,12 @@ server {
         proxy_set_header X-Forwarded-Proto https;
     }
 
+    # 주소만 쳐도 기술·마법 화면으로(사용자 2026-09-27 "?view=abilities 붙여야 해?").
+    location = / {
+        if ($arg_view = "") { return 302 /?view=abilities; }
+        try_files /index.html =404;
+    }
+
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -132,7 +138,7 @@ SH
 deploy() {
     upload
     remote "sudo systemctl restart lod-ability-ops && sudo systemctl reload nginx"
-    echo "대시보드 갱신 완료 — https://$DOMAIN/?view=abilities"
+    echo "대시보드 갱신 완료 — https://$DOMAIN"
 }
 
 # 무료 정식 인증서(Let's Encrypt) — 사용자 2026-09-27: 주소 lodgame.duckdns.org(DuckDNS, IP 161.33.43.117 고정).
@@ -159,6 +165,21 @@ SH
     echo "인증서 — https://$DOMAIN/?view=abilities"
 }
 
+# 비밀번호 바꾸기 — 운영 API(credential)와 nginx(htpasswd)를 함께. 사용자 2026-09-27 "비밀번호가 너무 길다".
+#   LOD_CLOUD_IP=… scripts/cloud-dashboard.sh password [새비밀번호]   (없으면 소문자·숫자 10자로 만든다)
+set_password() {
+    local new="${1:-$(LC_ALL=C tr -dc 'a-z2-9' </dev/urandom | head -c 10)}"
+    remote "LOD_OPS_PASSWORD='$new' bash -s" <<'SH'
+set -euo pipefail
+REMOTE=/home/ubuntu/lod-ops
+umask 077
+printf 'lod-admin:%s\n' "$LOD_OPS_PASSWORD" > "$REMOTE/data/credential"
+sudo htpasswd -b /etc/nginx/lod-ops.htpasswd lod-admin "$LOD_OPS_PASSWORD" >/dev/null 2>&1
+sudo systemctl restart lod-ability-ops
+SH
+    save_credentials
+}
+
 save_credentials() {
     mkdir -p "$BACKUP_DIR"
     umask 077
@@ -174,5 +195,6 @@ case "${1:-status}" in
     logs) remote "journalctl -u lod-ability-ops -n ${2:-50} --no-pager" ;;
     credentials) save_credentials ;;
     cert) cert ;;
-    *) echo "쓸 수 있는 것: setup deploy status logs credentials cert"; exit 2 ;;
+    password) set_password "${2:-}" ;;
+    *) echo "쓸 수 있는 것: setup deploy status logs credentials cert password"; exit 2 ;;
 esac
