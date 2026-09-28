@@ -1,0 +1,1998 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "id": "Category:Dialogs",
+      "label": "\ub2e4\uc774\uc5bc\ub85c\uadf8",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "\u1103\u1161\u110b\u1175\u110b\u1165\u11af\u1105\u1169\u1100\u1173",
+      "source_file": "MervTools/Settings",
+      "type": "Category"
+    },
+    {
+      "id": "Dialog:1005",
+      "label": "[1005] Maze",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1005] maze",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1019",
+      "label": "[1019] Giant Pearl",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1019] giant pearl",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:108",
+      "label": "[108] Harvest Conix",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[108] harvest conix",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1132",
+      "label": "[1132] Talisman",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1132] talisman",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1133",
+      "label": "[1133] Broken Talisman",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1133] broken talisman",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1154",
+      "label": "[1154] Dragon Scale Sword",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1154] dragon scale sword",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1157",
+      "label": "[1157] Giant Ant",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1157] giant ant",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1158",
+      "label": "[1158] Fruits",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1158] fruits",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1159",
+      "label": "[1159] Red Mantis",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1159] red mantis",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1160",
+      "label": "[1160] Mantis Stuff",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1160] mantis stuff",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1166",
+      "label": "[1166] Creants",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1166] creants",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1167",
+      "label": "[1167] I have the head",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1167] i have the head",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1168",
+      "label": "[1168] I have the claw",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1168] i have the claw",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1194",
+      "label": "[1194] Goblin Disguise",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1194] goblin disguise",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1300",
+      "label": "[1300] Express Ship",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1300] express ship",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1302",
+      "label": "[1302] Caravan to Noam",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1302] caravan to noam",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1303",
+      "label": "[1303] Caravan to Asilon or Hwarone",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1303] caravan to asilon or hwarone",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1304",
+      "label": "[1304] Carpet Merchant",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1304] carpet merchant",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1350",
+      "label": "[1350] Enter Training Dojo",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1350] enter training dojo",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:147",
+      "label": "[147] Path Reception",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[147] path reception",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1490",
+      "label": "[1490] Crystal Table",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1490] crystal table",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1504",
+      "label": "[1504] Manor Key",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1504] manor key",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1560",
+      "label": "[1560] Item Shop Trade-In",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1560] item shop trade-in",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:160",
+      "label": "[160] Warrior",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[160] warrior",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:161",
+      "label": "[161] Rogue",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[161] rogue",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:162",
+      "label": "[162] Wizard",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[162] wizard",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:163",
+      "label": "[163] Priest",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[163] priest",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:164",
+      "label": "[164] Monk",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[164] monk",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1650",
+      "label": "[1650] Swimming",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1650] swimming",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:1687",
+      "label": "[1687] Item Removal",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[1687] item removal",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:174",
+      "label": "[174] Wake Up",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[174] wake up",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:18",
+      "label": "[18] Tutorial Exit",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[18] tutorial exit",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:185",
+      "label": "[185] Riona's Greeting",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[185] riona's greeting",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:204",
+      "label": "[204] Loures Soldiers",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[204] loures soldiers",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:230",
+      "label": "[230] Buy Fior",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[230] buy fior",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:231",
+      "label": "[231] Buy Gem",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[231] buy gem",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:2437",
+      "label": "[2437] Hostile Clothing",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[2437] hostile clothing",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:2454",
+      "label": "[2454] Jovino",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[2454] jovino",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:294",
+      "label": "[294] Ancusa",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[294] ancusa",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:295",
+      "label": "[295] Betony",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[295] betony",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:296",
+      "label": "[296] Fifleaf",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[296] fifleaf",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:297",
+      "label": "[297] Hemloch",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[297] hemloch",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:298",
+      "label": "[298] Hydele",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[298] hydele",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:299",
+      "label": "[299] Personaca",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[299] personaca",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:300",
+      "label": "[300] Nadurra Srad",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[300] nadurra srad",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:302",
+      "label": "[302] Nadurra Athar",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[302] nadurra athar",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:304",
+      "label": "[304] Nadurra Creag",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[304] nadurra creag",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:306",
+      "label": "[306] Nadurra Sal",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[306] nadurra sal",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:311",
+      "label": "[311] Labor",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[311] labor",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:312",
+      "label": "[312] Mentor",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[312] mentor",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:315",
+      "label": "[315] Wizardry Research",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[315] wizardry research",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:316",
+      "label": "[316] Gem Polishing",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[316] gem polishing",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:317",
+      "label": "[317] Sword Smith",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[317] sword smith",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:319",
+      "label": "[319] Male Tailoring",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[319] male tailoring",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:320",
+      "label": "[320] Female Tailoring",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[320] female tailoring",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:381",
+      "label": "[381] Higgle",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[381] higgle",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:542",
+      "label": "[542] Deoch Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[542] deoch prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:543",
+      "label": "[543] Glioca Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[543] glioca prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:544",
+      "label": "[544] Cail Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[544] cail prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:545",
+      "label": "[545] Luathas Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[545] luathas prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:546",
+      "label": "[546] Gramail Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[546] gramail prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:547",
+      "label": "[547] Fiosachd Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[547] fiosachd prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:548",
+      "label": "[548] Ceannlaidir Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[548] ceannlaidir prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:549",
+      "label": "[549] Sgrios Prayer",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[549] sgrios prayer",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:616",
+      "label": "[616] From The Heart",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[616] from the heart",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:617",
+      "label": "[617] Cycle of Becoming",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[617] cycle of becoming",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:618",
+      "label": "[618] Dancing Faerie",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[618] dancing faerie",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:619",
+      "label": "[619] Enter Dark Chamber",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[619] enter dark chamber",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:620",
+      "label": "[620] Enter Heart of Stone",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[620] enter heart of stone",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:626",
+      "label": "[626] Deoch Toiseach",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[626] deoch toiseach",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:627",
+      "label": "[627] Gramail Toiseach",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[627] gramail toiseach",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:669",
+      "label": "[669] Master Stats",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[669] master stats",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:70",
+      "label": "[70] Mother's Love",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[70] mother's love",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:703",
+      "label": "[703] Tagor Welcome",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[703] tagor welcome",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:78",
+      "label": "[78] The Letter",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[78] the letter",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:79",
+      "label": "[79] The Letter (Riona)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[79] the letter (riona)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:80",
+      "label": "[80] The Letter (Marlon)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[80] the letter (marlon)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:81",
+      "label": "[81] The Letter (Baltasar)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[81] the letter (baltasar)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:82",
+      "label": "[82] The Letter (Library)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[82] the letter (library)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:83",
+      "label": "[83] The Letter (Aoife)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[83] the letter (aoife)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:84",
+      "label": "[84] The Letter (Frida)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[84] the letter (frida)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:85",
+      "label": "[85] The Letter (Duana)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[85] the letter (duana)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:856",
+      "label": "[856] Arena Exit",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[856] arena exit",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:86",
+      "label": "[86] The Letter (Lowell)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[86] the letter (lowell)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:87",
+      "label": "[87] The Letter (Thibault)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[87] the letter (thibault)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:88",
+      "label": "[88] The Letter (Courtney)",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[88] the letter (courtney)",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Dialog:922",
+      "label": "[922] Leave Battle Ring",
+      "community": 0,
+      "community_name": "\ub2e4\uc774\uc5bc\ub85c\uadf8 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "[922] leave battle ring",
+      "source_file": "MervTools/Settings",
+      "type": "Dialog"
+    },
+    {
+      "id": "Category:AlarmMaps",
+      "label": "\uacbd\ubcf4\ub9f5",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "\u1100\u1167\u11bc\u1107\u1169\u1106\u1162\u11b8",
+      "source_file": "MervTools/Settings",
+      "type": "Category"
+    },
+    {
+      "id": "Map:andor",
+      "label": "andor",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "andor",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:chadul",
+      "label": "chadul",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "chadul",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:chaos",
+      "label": "chaos",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "chaos",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:crystal cave",
+      "label": "crystal cave",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "crystal cave",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:cthonic remains",
+      "label": "cthonic remains",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "cthonic remains",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:cursed home",
+      "label": "cursed home",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "cursed home",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:hostile ground",
+      "label": "hostile ground",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "hostile ground",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:lost ruins",
+      "label": "lost ruins",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "lost ruins",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:mount giragan",
+      "label": "mount giragan",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "mount giragan",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:noam plains",
+      "label": "noam plains",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "noam plains",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:oren ruins",
+      "label": "oren ruins",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "oren ruins",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:shinewood forest",
+      "label": "shinewood forest",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "shinewood forest",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:tavaly",
+      "label": "tavaly",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "tavaly",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:veltain mine",
+      "label": "veltain mine",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "veltain mine",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Map:water dungeon",
+      "label": "water dungeon",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "water dungeon",
+      "source_file": "MervTools/Settings",
+      "type": "Map"
+    },
+    {
+      "id": "Tool:MervTools",
+      "label": "MervTools",
+      "community": 1,
+      "community_name": "\uacbd\ubcf4\ub9f5 \uad70\uc9d1",
+      "confidence": "EXTRACTED",
+      "file_type": "concept",
+      "norm_label": "mervtools",
+      "source_file": "MervTools/Settings",
+      "type": "Tool"
+    }
+  ],
+  "links": [
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:andor",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:chadul",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:chaos",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:crystal cave",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:cthonic remains",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:cursed home",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:hostile ground",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:lost ruins",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:mount giragan",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:noam plains",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:oren ruins",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:shinewood forest",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:tavaly",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:veltain mine",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:AlarmMaps",
+      "target": "Map:water dungeon",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1005",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1019",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:108",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1132",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1133",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1154",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1157",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1158",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1159",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1160",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1166",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1167",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1168",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1194",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1300",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1302",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1303",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1304",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1350",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:147",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1490",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1504",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1560",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:160",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:161",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:162",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:163",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:164",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1650",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:1687",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:174",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:18",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:185",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:204",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:230",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:231",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:2437",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:2454",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:294",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:295",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:296",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:297",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:298",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:299",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:300",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:302",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:304",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:306",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:311",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:312",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:315",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:316",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:317",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:319",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:320",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:381",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:542",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:543",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:544",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:545",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:546",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:547",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:548",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:549",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:616",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:617",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:618",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:619",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:620",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:626",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:627",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:669",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:70",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:703",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:78",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:79",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:80",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:81",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:82",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:83",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:84",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:85",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:856",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:86",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:87",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:88",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Category:Dialogs",
+      "target": "Dialog:922",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Tool:MervTools",
+      "target": "Category:AlarmMaps",
+      "relation": "has_category",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    },
+    {
+      "source": "Tool:MervTools",
+      "target": "Category:Dialogs",
+      "relation": "has_category",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "MervTools/Settings"
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "8763b364ed3b634d7b484262445fb3c0540e07c5"
+}
