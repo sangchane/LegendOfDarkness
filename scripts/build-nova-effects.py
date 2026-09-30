@@ -56,7 +56,11 @@ LINE = re.compile(r'^(?P<pad>\s*)p\.Call\("effect", (?P<who>[^,]+), \(V\)(?P<a>\
 #  나르콜리: 33 은 「Miss」 글자 그림이다 — 28 이 「z z」 잠.  콘푸지오: 118 은 보라 소용돌이(바투) — 208 이 머리 위 별.
 #  수페라에나르마·에나르마: 167 구버전이 맞다(사용자 2026-09-30 "에나르마도 167번이 구버전이 맞아").
 #  에나르마는 노바가 두 칸 다 195(옛 목록 「카운터」)라 5.99 꼴(쓴쪽 칸 하나)로 통째로 둔다.
-OLD_LIST_FIX = {"나르콜리": {33: 28}, "콘푸지오": {118: 208}, "수페라에나르마": {271: 167}, "에나르마": (167, 0)}
+#  나머지는 목록대로(사용자 2026-09-30: 노바로 바꾼 뒤 이펙트가 달라져 이 목록으로 되돌리기로) — 찌르기 119 · 숏블레이드 26 ·
+#  마구때리기 188 · 무영신공 110(무도가 템플릿 TargetAnimation) · 딜루메니 42 · 연막(괴물) 57.
+OLD_LIST_FIX = {"나르콜리": {33: 28}, "콘푸지오": {118: 208}, "수페라에나르마": {271: 167}, "에나르마": (167, 0),
+                "찌르기": {26: 119}, "숏블레이드": {166: 26}, "마구때리기": {69: 188}, "무영신공": {273: 110},
+                "딜루메니": {276: 42}, "연막": {276: 57}}
 
 
 def fixed(name, number):
@@ -167,7 +171,7 @@ def main():
                 continue
             template = json.loads(path.read_text(encoding="utf-8-sig"))
             # 노바 스크립트에 이펙트가 없으면 5.99 번호를 둔다 — 0 으로 지우지 않는다(사용자 2026-09-27: 허공답보 68 이 원작).
-            want = next((c[2] for c in new if c[2]), None) or next((c[2] for c in old if c[2]), 0)
+            want = fixed(name, next((c[2] for c in new if c[2]), None) or next((c[2] for c in old if c[2]), 0))
             speed = next((c[3] for c in new if c[2]), None)
             if speed is not None:
                 monk_speed.append((name, speed))
@@ -218,6 +222,19 @@ def main():
                 changed.append((name, f"옛 이펙트 목록 {swap}", path))
                 if writing:
                     path.write_text(out, encoding="utf-8-sig")
+
+    # 무도가 템플릿(TargetAnimation)에도 — 노바 짝이 없어 위에서 안 거친 것(무영신공).
+    for name in OLD_LIST_FIX:
+        path = TEMPLATES / f"{name}.json"
+        if not path.exists() or path in done or any(p == path for _, _, p in changed):
+            continue
+        raw = path.read_bytes().decode("utf-8")
+        m = re.search(r'"TargetAnimation":\s*(\d+)', raw)
+        if m and fixed(name, int(m[1])) != int(m[1]):
+            want = fixed(name, int(m[1]))
+            changed.append((name, f"TargetAnimation {m[1]} → {want} (옛 이펙트 목록)", path))
+            if writing:
+                path.write_bytes(raw.replace(m[0], f'"TargetAnimation": {want}', 1).encode("utf-8"))
 
     print(f"노바 이펙트로 바꿀 것 {len(changed)}개" + ("" if writing else " (--쓰기 를 붙이면 씁니다)"))
     for name, what, path in changed:

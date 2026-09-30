@@ -150,11 +150,11 @@ public sealed class MonkLevelTenSkillTests : IDisposable
                 {
                     while (world.TakeEffect(out Effect? seen))
                     {
-                        if (seen.Target == target.Serial && seen.TargetAnimation == 69)
+                        if (seen.Target == target.Serial && seen.TargetAnimation == 188)
                             flash = seen;
                     }
                     return flash is not null;
-                }, "마구때리기의 0x29 이펙트 69가 오지 않았습니다.");
+                }, "마구때리기의 0x29 이펙트 188(옛 이펙트 목록)이 오지 않았습니다.");
                 Assert.Equal(75, flash!.Speed);
             }
         }
