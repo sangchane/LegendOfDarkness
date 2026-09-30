@@ -10,7 +10,7 @@ namespace LodClient;
 /// </summary>
 /// <remarks>
 /// <c>build-client-assets.ps1</c> cuts one file per number the server's item templates use. A number with
-/// no file is not an error: it means that item has not been cut yet, and the caller draws its placeholder.
+/// no file receives the shared grey tile so every screen shows the same placeholder.
 /// </remarks>
 public static class ItemIcons
 {
@@ -18,7 +18,20 @@ public static class ItemIcons
 
     private static readonly Dictionary<int, Texture2D?> Known = [];
 
-    /// <summary>The picture for one item number, or null when none has been cut.</summary>
+    private static Texture2D? _missing;
+    private static Texture2D Missing
+    {
+        get
+        {
+            if (_missing is not null) return _missing;
+            Image tile = Image.CreateEmpty(24, 24, false, Image.Format.Rgba8);
+            tile.Fill(Greybox.Muted with { A = 0.5f });
+            _missing = ImageTexture.CreateFromImage(tile);
+            return _missing;
+        }
+    }
+
+    /// <summary>The picture for an item number, or a grey tile when none has been cut.</summary>
     public static Texture2D? For(int number)
     {
         if (Known.TryGetValue(number, out Texture2D? found))
@@ -27,7 +40,7 @@ public static class ItemIcons
         }
 
         string path = $"{Folder}{number}.png";
-        found = ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : null;
+        found = ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : Missing;
         Known[number] = found;
 
         return found;

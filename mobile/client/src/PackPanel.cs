@@ -60,6 +60,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", width: 56);
     private readonly Button _off = WindowFrame.IconButton(GlyphKind.TakeOff, "벗기", width: 56);
     private readonly DoubleTap _taps = new();
+    private readonly SpinBox _dropCount = new() { MinValue = 1, MaxValue = 1, Step = 1, Value = 1, CustomMinimumSize = new Vector2(80, Main.TouchMinimum) };
 
     // 지금 그려진 소지품 칸 — 동작 줄을 그 칸 옆에 세우려고 칸 번호로 찾는다.
     private readonly Dictionary<int, Button> _cellsBySlot = [];
@@ -206,7 +207,9 @@ public sealed partial class PackPanel : PanelContainer
         inside.AddChild(body);
 
         AddChild(inside);
-        AddChild(_action);
+        Control actionLayer = new() { MouseFilter = MouseFilterEnum.Ignore };
+        AddChild(actionLayer);
+        actionLayer.AddChild(_action);
 
         ShowTab(Main.OnGear);
     }
@@ -223,6 +226,8 @@ public sealed partial class PackPanel : PanelContainer
         plate.SetCornerRadiusAll(10);
         plate.SetContentMarginAll(6);
         _action.AddThemeStyleboxOverride("panel", plate);
+
+        _dropCount.GetLineEdit().VirtualKeyboardType = LineEdit.VirtualKeyboardTypeEnum.Number;
 
         _actionName.AddThemeColorOverride("font_color", Greybox.Text);
         _actionName.AddThemeFontSizeOverride("font_size", 13);
@@ -250,7 +255,7 @@ public sealed partial class PackPanel : PanelContainer
         {
             if (_chosen > 0)
             {
-                Dropped?.Invoke(_chosen);
+                Dropped?.Invoke(_chosen, (int)_dropCount.Value);
                 _action.Visible = false;
             }
         };
@@ -274,6 +279,12 @@ public sealed partial class PackPanel : PanelContainer
         column.AddThemeConstantOverride("separation", 2);
         column.AddChild(_actionName);
         column.AddChild(_actionLine);
+        HBoxContainer quantity = new();
+        quantity.AddThemeConstantOverride("separation", Main.Gutter);
+        quantity.AddChild(new Label { Text = "버릴 수량", SizeFlagsVertical = SizeFlags.ShrinkCenter });
+        quantity.AddChild(_dropCount);
+        column.AddChild(quantity);
+        _dropCount.SetMeta("row", quantity);
         column.AddChild(buttons);
         _action.AddChild(column);
     }
@@ -313,7 +324,7 @@ public sealed partial class PackPanel : PanelContainer
     public event System.Action<int>? Used;
 
     /// <summary>Somebody asked to throw a carried thing away. The server decides whether it may be.</summary>
-    public event System.Action<int>? Dropped;
+    public event System.Action<int, int>? Dropped;
 
     /// <summary>Somebody asked to take off what is in one worn place. The number is the server's own.</summary>
     public event System.Action<int>? TakenOff;
@@ -560,6 +571,9 @@ public sealed partial class PackPanel : PanelContainer
             WindowFrame.Relabel(_use, ItemActions.Primary(held));
             _use.Visible = true;
             _drop.Visible = true;
+            _dropCount.MaxValue = System.Math.Max(1, held.Stacks);
+            _dropCount.Value = 1;
+            _dropCount.GetMeta("row").As<Control>().Visible = true;
             _off.Visible = false;
             _action.Visible = true;
             _action.ResetSize();
@@ -577,6 +591,7 @@ public sealed partial class PackPanel : PanelContainer
             _actionLine.Visible = true;
             _use.Visible = false;
             _drop.Visible = false;
+            _dropCount.GetMeta("row").As<Control>().Visible = false;
             _off.Visible = true;
             _action.Visible = true;
             _action.ResetSize();
@@ -616,7 +631,8 @@ public sealed partial class PackPanel : PanelContainer
         float y = above >= window.Position.Y + 4 ? above : at.End.Y + 4;
 
         _action.Size = size;
-        _action.GlobalPosition = new Vector2(x, Mathf.Min(y, window.End.Y - size.Y - 4));
+        float bottom = Mathf.Min(window.End.Y, GetViewportRect().Size.Y - TouchInput.Covered);
+        _action.GlobalPosition = new Vector2(x, Mathf.Clamp(y, window.Position.Y + 4, Mathf.Max(window.Position.Y + 4, bottom - size.Y - 4)));
     }
 
     public override void _Process(double delta)

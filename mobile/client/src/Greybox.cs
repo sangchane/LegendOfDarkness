@@ -7,12 +7,9 @@ namespace LodClient;
 /// it now carries the original 4.51 theme, worked out and written down in <c>data/ui-vault/</c>.
 /// </summary>
 /// <remarks>
-/// The rule is 안A — <b>borrow the colours, not the stone</b>. Everything is flat, generously spaced and
-/// rounded; the original's palette is what carries the feel. 안C was built first, with the original stone
-/// under the frames and buttons, and put on a device: the texture reads as clutter at phone size, so the
-/// plainer one won (사용자, 2026-09-18).
-///
-/// Nothing here moves anything. Only the material changes, so the screens that call this were not touched.
+/// Original 4.51 stone on frames, title strips and primary actions; flat, dark interiors for small text.
+/// The extracted tiles repeat at their native size, so a phone never stretches a desktop dialog into a skin.
+/// Material changes stay here; touch targets, safe areas and responsive layouts stay with the screens.
 /// </remarks>
 public static class Greybox
 {
@@ -52,8 +49,8 @@ public static class Greybox
     /// <summary>Letters on the accent. Dark, because dark on that orange is what stays readable.</summary>
     public static readonly Color OnAccent = new("#1a1208");
 
-    /// <summary>A window's own frame — one shade above its inside.</summary>
-    private static readonly Color Frame_ = new("#17171b");
+    private static readonly Texture2D DarkStone = GD.Load<Texture2D>("res://assets/ui/stone-dark.png");
+    private static readonly Texture2D LightStone = GD.Load<Texture2D>("res://assets/ui/stone.png");
 
     // ── 치수. data/ui-vault/치수/치수.md ─────────────────────────────────────
 
@@ -68,6 +65,50 @@ public static class Greybox
     /// <summary>Rounding. Only on the inside — a stone frame has to stay square to read as the original's.</summary>
     public const int Round = 12;
 
+
+    /// <summary>Login backdrop, shared with its panel and input surfaces.</summary>
+    public static ColorRect EntryBackground()
+    {
+        ColorRect background = new() { Color = Inner, MouseFilter = Control.MouseFilterEnum.Ignore };
+        background.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+        return background;
+    }
+
+    /// <summary>Game title cutout with real alpha, contained at any screen ratio.</summary>
+    public static TextureRect EntryTitle(Vector2 minimum) => new()
+    {
+        Texture = new AtlasTexture
+        {
+            Atlas = GD.Load<Texture2D>("res://assets/ui/title-cutout.png"),
+            Region = new Rect2(130, 61, 1451, 828)
+        },
+        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+        TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
+        CustomMinimumSize = minimum,
+        MouseFilter = Control.MouseFilterEnum.Ignore
+    };
+
+    public static Texture2D CheckIcon(bool selected)
+    {
+        Image image = Image.CreateEmpty(18, 18, false, Image.Format.Rgba8);
+        image.Fill(Colors.Transparent);
+        for (int x = 1; x < 17; x++)
+        {
+            image.SetPixel(x, 1, Muted);
+            image.SetPixel(x, 16, Muted);
+            image.SetPixel(1, x, Muted);
+            image.SetPixel(16, x, Muted);
+        }
+        if (selected)
+            for (int x = 4; x < 14; x++)
+            {
+                int y = x < 7 ? x + 4 : 18 - x;
+                image.SetPixel(x, y, Accent);
+                image.SetPixel(x, y + 1, Accent);
+            }
+        return ImageTexture.CreateFromImage(image);
+    }
 
     /// <summary>
     /// A cell in a grid, a row in a list, an input box. Flat and dark — the vault forbids stone here, because a
@@ -114,37 +155,45 @@ public static class Greybox
         return sheet;
     }
 
-    /// <summary>
-    /// A window's frame. Flat and dark, a shade above what is inside it, so the window reads as one thing
-    /// without a pattern doing the work.
-    /// </summary>
-    public static StyleBoxFlat Stone()
+    /// <summary>A narrow original stone rim. Preserve container geometry while drawing a visible edge.</summary>
+    public static StyleBoxTexture Stone()
     {
-        StyleBoxFlat frame = new() { BgColor = Frame_, BorderColor = CellEdge };
-        frame.SetBorderWidthAll(1);
-        frame.SetCornerRadiusAll(Round + 4);
-        frame.SetContentMarginAll(1);
-
+        StyleBoxTexture frame = Tile(LightStone, 1);
+        frame.DrawCenter = false;
+        frame.SetTextureMarginAll(4);
+        frame.SetExpandMarginAll(2);
         return frame;
     }
 
-    /// <summary>The colour that means "this is the one" — the button that commits, the tab that is open.</summary>
-    public static StyleBoxFlat Lit()
+    public static StyleBoxTexture TitleStrip()
     {
-        StyleBoxFlat filled = new() { BgColor = Accent };
-        filled.SetCornerRadiusAll(Round);
+        StyleBoxTexture strip = Tile(DarkStone, 0);
+        strip.ModulateColor = new Color(0.7f, 0.7f, 0.7f);
+        return strip;
+    }
 
-        return filled;
+    /// <summary>Original bright stone for an action or the selected tab.</summary>
+    public static StyleBoxTexture Lit() => Tile(LightStone, 2);
+
+    private static StyleBoxTexture Tile(Texture2D texture, int padding)
+    {
+        StyleBoxTexture tile = new()
+        {
+            Texture = texture,
+            AxisStretchHorizontal = StyleBoxTexture.AxisStretchMode.Tile,
+            AxisStretchVertical = StyleBoxTexture.AxisStretchMode.Tile
+        };
+        tile.SetContentMarginAll(padding);
+        return tile;
     }
 
     /// <summary>
-    /// The one button that commits — 입기, 삽니다, 보내기. Filled in the accent with dark letters on it, which
-    /// is the plainest way to say which button finishes the job. Only one per window.
+    /// The button that commits — 입기, 삽니다, 보내기. Bright stone with engraved letters; one per window.
     /// </summary>
     public static void Commit(Button button)
     {
-        StyleBoxFlat pressed = Lit();
-        pressed.BgColor = Accent.Darkened(0.18f);
+        StyleBoxTexture pressed = Lit();
+        pressed.ModulateColor = Colors.White.Darkened(0.18f);
 
         button.AddThemeStyleboxOverride("normal", Lit());
         button.AddThemeStyleboxOverride("hover", Lit());
@@ -157,7 +206,7 @@ public static class Greybox
 
         foreach (string colour in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
         {
-            button.AddThemeColorOverride(colour, OnAccent);
+            button.AddThemeColorOverride(colour, Engrave);
         }
 
         button.AddThemeColorOverride("font_disabled_color", Muted);
@@ -172,34 +221,27 @@ public static class Greybox
         StyleBoxFlat quiet = new() { BgColor = new Color(0, 0, 0, 0) };
         quiet.SetCornerRadiusAll(Round);
 
-        StyleBoxFlat chosen = new() { BgColor = Cell };
-        chosen.SetCornerRadiusAll(Round);
-        chosen.BorderColor = Accent;
-        chosen.SetBorderWidthAll(0);
-        chosen.BorderWidthBottom = 2;
+        StyleBoxTexture chosen = Lit();
 
         button.AddThemeStyleboxOverride("normal", quiet);
         button.AddThemeStyleboxOverride("hover", quiet);
         button.AddThemeStyleboxOverride("focus", quiet);
         button.AddThemeStyleboxOverride("pressed", chosen);
+        button.AddThemeStyleboxOverride("hover_pressed", chosen);
+        button.AddThemeColorOverride("font_hover_pressed_color", Engrave);
         button.AddThemeColorOverride("font_color", Muted);
         button.AddThemeColorOverride("font_hover_color", Text);
-        button.AddThemeColorOverride("font_pressed_color", Text);
+        button.AddThemeColorOverride("font_pressed_color", Engrave);
         button.AddThemeColorOverride("font_focus_color", Muted);
     }
 
     /// <summary>
-    /// The strip a window's title sits on. No band of its own — a line under it is enough, which is what keeps
-    /// the window feeling light.
+    /// Dark stone behind a window title; light letters remain readable at phone size.
     /// </summary>
     public static Control Header(Control inside)
     {
-        StyleBoxFlat strip = new() { BgColor = new Color(0, 0, 0, 0), BorderColor = CellEdge };
-        strip.BorderWidthBottom = 1;
-        strip.ContentMarginLeft = Pad / 2;
-        strip.ContentMarginRight = Pad / 2;
-        strip.ContentMarginTop = Pad / 2;
-        strip.ContentMarginBottom = Pad / 2;
+        StyleBoxTexture strip = TitleStrip();
+        strip.SetContentMarginAll(Pad / 2);
 
         PanelContainer head = new();
         head.AddThemeStyleboxOverride("panel", strip);

@@ -18,10 +18,7 @@ public partial class LoginScreen : Control
 {
     private const int TitleFontSize = 22;
 
-    /// <summary>원작 문장. 그림 한 장이면 충분하다.</summary>
-    private const string Crest = "res://assets/ui/crest.png";
-
-    private const int CrestHeight = 68;
+    private static int LogoHeight => Main.Portrait ? 112 : 88;
     private const int AuxFontSize = 14;
     private const int FormWidth = 300;
     private const int LandscapeFormWidth = 560;
@@ -45,7 +42,7 @@ public partial class LoginScreen : Control
     private LineEdit _password = null!;
     private Button _submit = null!;
     private Button _create = null!;
-    private Button _autoLogin = null!;
+    private CheckBox _autoLogin = null!;
 
     /// <summary>기본은 꺼짐 — 이미 저장된 계정이 있을 때만 켜져서 보인다.</summary>
     private bool _autoLoginWanted;
@@ -69,6 +66,7 @@ public partial class LoginScreen : Control
 
     public override void _Ready()
     {
+        AddChild(Greybox.EntryBackground());
         _safeArea = Main.SafeAreaContainer();
         AddChild(_safeArea);
 
@@ -99,6 +97,31 @@ public partial class LoginScreen : Control
         }
 
         RefreshSubmitState();
+        Main.LayoutChanged += RebuildForOrientation;
+    }
+
+    private void RebuildForOrientation()
+    {
+        string username = _username.Text, password = _password.Text, status = _status.Text;
+        bool automatic = _autoLoginWanted;
+        foreach (Node child in _safeArea.GetChildren())
+        {
+            _safeArea.RemoveChild(child);
+            child.QueueFree();
+        }
+        VBoxContainer rows = new();
+        rows.AddThemeConstantOverride("separation", Main.Gutter);
+        _safeArea.AddChild(rows);
+        rows.AddChild(_statusRow = BuildStatusRow());
+        rows.AddChild(BuildForm());
+        rows.AddChild(_versionLine = BuildVersionLine());
+        _username.Text = username;
+        _password.Text = password;
+        _autoLoginWanted = automatic;
+        _autoLogin.SetPressedNoSignal(automatic);
+        RefreshSubmitState();
+        _status.Text = status;
+        _submit.Disabled = _attempt is not null || username.Length == 0 || password.Length == 0;
     }
 
     /// <summary>Environment on the left, which server we will talk to on the right.</summary>
@@ -192,7 +215,7 @@ public partial class LoginScreen : Control
         {
             CustomMinimumSize = new Vector2(Main.Portrait ? FormWidth : LandscapeFormWidth, 0)
         };
-        panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
+        panel.AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         MarginContainer padding = new();
         padding.AddThemeConstantOverride("margin_left", Main.Gutter * 2);
@@ -200,15 +223,7 @@ public partial class LoginScreen : Control
         padding.AddThemeConstantOverride("margin_right", Main.Gutter * 2);
         padding.AddThemeConstantOverride("margin_bottom", Main.Gutter * 2);
 
-        // 로고 하나와 이름뿐이다 — 돌 무늬는 쓰지 않는다(사용자, 2026-09-18). 처음 보는 화면이라
-        // 무엇을 하는 곳인지만 분명하면 된다.
-        TextureRect crest = new()
-        {
-            Texture = GD.Load<Texture2D>(Crest),
-            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-            TextureFilter = TextureFilterEnum.Nearest,
-            CustomMinimumSize = new Vector2(0, CrestHeight)
-        };
+        TextureRect crest = Greybox.EntryTitle(new Vector2(0, LogoHeight));
 
         Label title = new()
         {
@@ -218,8 +233,19 @@ public partial class LoginScreen : Control
         title.AddThemeFontSizeOverride("font_size", TitleFontSize);
         title.AddThemeColorOverride("font_color", Greybox.Title);
 
+
         _username = Field(secret: false);
         _password = Field(secret: true);
+        foreach (LineEdit field in new[] { _username, _password })
+            foreach (string state in new[] { "normal", "focus", "read_only" })
+            {
+                StyleBoxFlat inputBackground = Greybox.Sheet();
+                inputBackground.SetContentMarginAll(4);
+                inputBackground.SetCornerRadiusAll(8);
+                if (state == "focus") inputBackground.BorderColor = Greybox.Muted;
+                field.AddThemeStyleboxOverride(state, inputBackground);
+            }
+
 
         // 엔터(키보드의 완료)는 다음 칸으로, 마지막 칸에서는 로그인으로 — 손가락이 키보드를 떠나지 않아도 된다.
         _username.TextSubmitted += _ => _password.Edit();
@@ -238,6 +264,12 @@ public partial class LoginScreen : Control
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
 
+        Greybox.Commit(_submit);
+        StyleBoxFlat disabled = Greybox.Sheet();
+        disabled.SetCornerRadiusAll(Greybox.Round);
+        disabled.SetContentMarginAll(0);
+        _submit.AddThemeStyleboxOverride("disabled", disabled);
+
         _create = new Button
         {
             Text = "계정 만들기",
@@ -247,19 +279,17 @@ public partial class LoginScreen : Control
 
         // 기본은 꺼짐(사용자) — 이미 저장된 계정이 있을 때만 켜진 채로 보인다.
         _autoLoginWanted = Main.SavedLogin is not null;
-        _autoLogin = new Button
+        _autoLogin = new CheckBox
         {
             ToggleMode = true,
             ButtonPressed = _autoLoginWanted,
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
-        Greybox.Tab(_autoLogin);
-        ShowAutoLogin();
+        _autoLogin.Text = "자동 로그인";
 
         _autoLogin.Pressed += () =>
         {
             _autoLoginWanted = _autoLogin.ButtonPressed;
-            ShowAutoLogin();
 
             // 꺼면 그 자리에서 지운다 — 켜는 것은 이 계정으로 실제 로그인에 성공했을 때뿐이다.
             if (!_autoLoginWanted)
@@ -273,7 +303,12 @@ public partial class LoginScreen : Control
             : LandscapeForm(crest, title);
 
         padding.AddChild(form);
-        panel.AddChild(padding);
+        PanelContainer interior = new();
+        StyleBoxFlat surface = Greybox.Sheet();
+        surface.SetContentMarginAll(0);
+        interior.AddThemeStyleboxOverride("panel", surface);
+        interior.AddChild(padding);
+        panel.AddChild(interior);
         center.AddChild(panel);
 
         _username.TextChanged += _ => RefreshSubmitState();
@@ -357,9 +392,6 @@ public partial class LoginScreen : Control
         form.AddChild(_submit);
         form.AddChild(_create);
     }
-
-    private void ShowAutoLogin() =>
-        _autoLogin.Text = _autoLoginWanted ? "자동 로그인 켬" : "자동 로그인 꺼짐";
 
     private static Control FieldRow(string caption, LineEdit field)
     {
@@ -458,6 +490,7 @@ public partial class LoginScreen : Control
 
     public override void _ExitTree()
     {
+        Main.LayoutChanged -= RebuildForOrientation;
         _closing.Cancel();
         _session?.Dispose();
         _closing.Dispose();

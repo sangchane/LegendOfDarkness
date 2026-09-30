@@ -1028,6 +1028,17 @@ public partial class Main : Control
         theme.SetStylebox("pressed", "Button", Greybox.Surface());
         theme.SetStylebox("focus", "Button", Greybox.Plate());
         theme.SetStylebox("disabled", "Button", Greybox.Surface());
+        // Opaque fields keep the stone title/frame out of small input text, including SpinBox editors.
+        foreach (string state in new[] { "normal", "focus", "read_only" })
+        {
+            StyleBoxFlat field = Greybox.Surface();
+            field.SetCornerRadiusAll(8);
+            field.SetContentMarginAll(4);
+            if (state == "focus") field.BorderColor = Greybox.Muted;
+            theme.SetStylebox(state, "LineEdit", field);
+        }
+        theme.SetIcon("checked", "CheckBox", Greybox.CheckIcon(true));
+        theme.SetIcon("unchecked", "CheckBox", Greybox.CheckIcon(false));
 
         return theme;
     }
@@ -1036,6 +1047,14 @@ public partial class Main : Control
     {
         Vector2I screen = DisplayServer.ScreenGetSize();
         Rect2I safe = DisplayServer.GetDisplaySafeArea();
+        if (Engine.Singleton.HasMeta("safe_area_preview"))
+        {
+            Godot.Collections.Dictionary preview = Engine.Singleton.GetMeta("safe_area_preview").AsGodotDictionary();
+            Vector2 device = preview["screen"].AsVector2();
+            screen = new Vector2I((int)device.X, (int)device.Y);
+            int top = (int)preview["top"].AsDouble(), bottom = (int)preview["bottom"].AsDouble();
+            safe = new Rect2I(0, top, screen.X, screen.Y - top - bottom);
+        }
 
         if (screen.X <= 0 || screen.Y <= 0 || safe.Size.X <= 0 || safe.Size.Y <= 0)
         {

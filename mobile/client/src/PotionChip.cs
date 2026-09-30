@@ -176,6 +176,7 @@ public partial class PotionChip : Button
             if (potion.Name == _read().Potion)
             {
                 choice.AddThemeStyleboxOverride("normal", Greybox.Lit());
+                choice.AddThemeColorOverride("font_color", Greybox.Engrave);
             }
 
             string name = potion.Name;

@@ -353,48 +353,26 @@ public sealed partial class TabMapPanel : PanelContainer
             float dot = Math.Clamp(map.HalfWidth * 0.9f, 2.5f, 5f);
             WorldView world = owner._world;
 
-            // 걸어갈 길 — 선과 끝 고리.
-            if (world.Route.Count > 0)
-            {
-                List<Vector2> line = [At(map, world.Standing)];
-                line.AddRange(world.Route.Select(tile => At(map, tile)));
-                DrawPolyline([.. line], Greybox.Accent, 3, true);
-                DrawArc(line[^1], dot + 5, 0, Mathf.Tau, 24, Greybox.Accent, 2, true);
-            }
+            foreach (Tile step in world.Route) Diamond(map, step, Greybox.Accent);
 
             Font font = GetThemeDefaultFont();
 
             foreach (TabMarker marker in Markers)
             {
-                Vector2 at = At(map, marker.Where);
                 Color paint = Paint(marker.Kind);
 
-                switch (marker.Kind)
+                if (marker.Kind == TabMarkerKind.Exit)
                 {
-                    case TabMarkerKind.Exit:
-                        foreach (Tile tile in marker.Goals)
-                        {
-                            Diamond(map, tile, paint);
-                        }
-
-                        break;
-
-                    case TabMarkerKind.Me:
-                        // 나는 이름들 위에 맨 나중에 그린다 — 출구 이름이 화살표를 덮었다.
-                        break;
-
-                    case TabMarkerKind.Npc:
-                        DrawCircle(at, dot + 1, Colors.Black);
-                        DrawCircle(at, dot, paint);
-                        DrawArc(at, dot + 3, 0, Mathf.Tau, 16, paint, 1, true);
-                        break;
-
-                    default:
-                        DrawCircle(at, dot * 0.8f + 1, Colors.Black);
-                        DrawCircle(at, dot * 0.8f, paint);
-                        break;
+                    foreach (Tile tile in marker.Goals) Diamond(map, tile, paint);
+                }
+                else if (marker.Kind != TabMarkerKind.Me)
+                {
+                    Diamond(map, marker.Where, paint);
                 }
             }
+
+            if (owner._server?.Companion is { } bot && owner._server.Others.FirstOrDefault(one => one.Serial == bot.Serial) is { } seen)
+                Diamond(map, seen.Where, MinimapView.BotPaint);
 
             // 이름은 점을 다 그린 뒤 — 점이 글자를 가리지 않게. 출구가 먼저 자리를 잡고, 겹치는 이름은 건너뛴다(점은 남는다).
             List<Rect2> taken = [];
@@ -419,21 +397,13 @@ public sealed partial class TabMapPanel : PanelContainer
                 DrawString(font, where, marker.Label, HorizontalAlignment.Left, -1, fontSize, Paint(marker.Kind));
             }
 
-            // 나 — 보는 쪽을 가리키는 화살표. 검은 테두리 안에 흰 속.
-            Vector2 me = At(map, world.Standing);
-            (float fx, float fy) = map.Toward(world.Looking);
-            Vector2 ahead = new(fx, fy);
-            Vector2 side = new(-fy, fx);
-            float reach = dot + 5;
-            Vector2[] arrow = [me + (ahead * reach * 1.4f), me - (ahead * reach * 0.7f) + (side * reach * 0.8f), me - (ahead * reach * 0.7f) - (side * reach * 0.8f)];
-            DrawColoredPolygon(arrow, Colors.Black);
-            DrawColoredPolygon([.. arrow.Select(point => me + ((point - me) * 0.7f))], Paint(TabMarkerKind.Me));
+            Diamond(map, world.Standing, Paint(TabMarkerKind.Me));
         }
 
         private void Diamond(TabMapProjection map, Tile tile, Color paint)
         {
             Vector2 at = At(map, tile);
-            float w = Math.Max(map.HalfWidth, 3), h = Math.Max(map.HalfHeight, 3);
+            float w = map.HalfWidth, h = map.HalfHeight;
             DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
         }
 

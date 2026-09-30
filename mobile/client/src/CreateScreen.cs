@@ -18,8 +18,7 @@ namespace LodClient;
 /// 원작의 E-MAIL 칸과 PHRASE MACRO 표는 뺐다 — 서버 프로토콜(<see cref="Hades718LoginProtocol"/> 의
 /// <c>CreateAccountRequest</c>)이 이름·비밀번호만 받는다. 원작은 HAIR·COLOR 를 ◀ ▶ 로 숫자를 하나씩
 /// 넘기게 했지만, 숫자만 보고는 무슨 모양·무슨 색인지 알 수 없다(사용자, 2026-09-19) — 그래서 여기서는
-/// 격자를 깔아 눈으로 보고 누르게 바꿨다. 화살표는 없앴다: 격자 하나로 고르고 확인까지 되므로 화살표가
-/// 하는 일이 남지 않고, 좁은 화면에서 화살표 두 줄(96px)을 없애야 격자가 앉을 자리가 난다.
+/// 격자를 깔아 눈으로 보고 누르게 바꿨다. 머리·색은 격자로 고르고, 미리보기 양옆 화살표는 몸의 방향만 바꾼다.
 /// </remarks>
 public sealed partial class CreateScreen : Control
 {
@@ -31,14 +30,14 @@ public sealed partial class CreateScreen : Control
     // 것은 사람이 가로보다 세로로 긴 그림이기 때문이다. 이름·비밀번호·확인 세 칸을 한 줄로 모으고
     // (아래 AuthRow) 옆 캡션을 힌트 글자로 바꿔 세로 96px 을 돌려받아, 그 값으로 배율을 3배까지
     // 올렸다(예전엔 격자 둘 자리가 안 나 2배에 머물렀다).
-    private const int PreviewWidth = 168;
-    private const int PreviewHeight = 228;
+    private static int PreviewWidth => Main.Portrait ? 168 : 144;
+    private const int PreviewHeight = 168;
 
     // 정수 배율로 키운다 — 3배씩이면 원작 그림 한 칸(1px)이 화면에서도 칼같이 3px 로 남는다(흐려지지
     // 않음). 고도 프로젝트 설정(project.godot: default_texture_filter=0=Nearest)이 이미 전역으로
     // 이렇게 그리고 있어 Actor.cs·WorldView.cs 를 보니 텍스처마다 따로 필터를 거는 코드가 없었다 — 여기도
     // 새로 걸지 않고 그 설정에 얹힌다.
-    private const int PreviewScale = 3;
+    private int PreviewScale => Main.Portrait && _previewHeight < 160 ? 2 : 3;
 
     // 원작 그림칸(120x96)의 발 기준점(FeetX=31.5, FeetY=83, Actor.cs)은 실제 그려진 그림의 한가운데가
     // 아니다 — 옆으로는 무기를 휘두를 자리를, 위로는 머리 위 여백을 남겨 두기 때문이다. 몸(mb001·wb001)과
@@ -47,10 +46,7 @@ public sealed partial class CreateScreen : Control
     // 한가운데 오게 한다. 뒷모습·앞모습이 이 차이가 서로 거의 같아(값이 다르지 않음) 방향이 바뀌어도
     // 이 보정은 그대로 쓴다 — 그래서 돌아도 들썩이지 않는다.
     private const float BodyCentreOffsetX = 2.25f;
-    private const float BodyCentreOffsetY = 42f;
-
-    /// <summary>사람이 한 바퀴 도는 데 걸리는, 한 방향을 보여 주는 시간.</summary>
-    private const float FacingSeconds = 1.2f;
+    private const float BodyCentreOffsetY = 36f;
 
     /// <summary>맨몸·머리 그림이 하나도 없을 때만 쓰는 마지막 대안(있을 리 없음).</summary>
     private const string HeroSheet = "res://assets/actor/hero-walk.png";
@@ -65,26 +61,17 @@ public sealed partial class CreateScreen : Control
     // COLOR 조각 하나 — 원작 소지품 칸(PackPanel.cs)과 같은 최소 터치 크기를 그대로 쓴다. 새 치수를
     // 만들지 않는다. 색은 판판한 사각형이라 이 크기로도 잘 보인다.
     private static readonly Vector2 ColorTileSize = new(Main.TouchMinimum, Main.TouchMinimum);
-    private const int ColorGridColumns = 4;
+    private static int ColorGridColumns => Main.Portrait ? 4 : 3;
 
-    // HAIR 조각은 44x56 으로는 부족했다 — 찍어 보니 작은 보라색 얼룩일 뿐 모양이 안 보였다(원인:
-    // 자른 그림(36x60)이 44x56 에 맞추려 오히려 0.93배로 더 줄어들었다 — 칸의 가로세로 비가 자른
-    // 그림과 달라, 짧은 쪽(세로)이 기준이 돼 버렸다). 자른 그림과 같은 비(34:58)로 54x92 를 줘
-    // 약 1.59배로 키운다(몸 미리보기를 키우고 두 줄을 다 보이게 하는 것과 세로를 나눠 가지느라
-    // 63x108·1.86배보다는 한 단 낮췄다 — 찍어서 제목이 안 잘리는 걸 확인하며 정함). 한 줄에 4개
-    // 대신 3개만 두는 것도 여기서 나온 자리다(칸이 커진 만큼).
-    private static readonly Vector2 HairTileSize = new(54, 92);
-    private const int HairGridColumns = 3;
+    // 터치 높이는 유지하면서 머리·색 목록의 여백을 줄인다. 세로 네 열, 짧은 가로는 세 열.
+    private static readonly Vector2 HairTileSize = new(48, 72);
+    private static int HairGridColumns => Main.Portrait ? 4 : 3;
 
     private const int ColorCount = 72;
 
-    // 머리 그림칸(120x96) 안에서 머리·얼굴이 있는 자리만 잘라 쓴다 — 전신을 다 보여 주면 칸 안에서
-    // 아주 작아져 모양을 알아볼 수 없다. 남 59·여 56 가지 전부(앞모습, 프레임 5)를 하나하나 실측하니
-    // (스크립트로 낱개 테두리를 다 짐) 대부분(특히 남자)은 x 18~41·y 18~42 안에 들지만, 여자 긴 머리
-    // 여럿(wh025·wh031·wh036 …)은 y 60 까지 내려온다 — 거기서 잘리면 그 머리가 "긴 머리"인 것 자체를
-    // 못 알아본다. 그래서 세로는 줄이지 않고 x 14~48(34폭)·y 0~58(58높이)을 쓴다.
+    // 머리 그림칸에서 위 빈 12px만 덜어낸다. 여자 긴 머리의 아래쪽(y60)은 남긴다.
     private static readonly Rect2 HairThumbRegion =
-        new(WalkMotion.Stand(Lod.Mobile.Core.Art.Side.Front) * CellWidth + 14, 0, 34, 58);
+        new(WalkMotion.Stand(Lod.Mobile.Core.Art.Side.Front) * CellWidth + 14, 12, 34, 48);
 
     private readonly ConcurrentQueue<string> _reported = new();
     private readonly CancellationTokenSource _closing = new();
@@ -130,14 +117,13 @@ public sealed partial class CreateScreen : Control
     // 1=전사 · 2=도적 · 3=마법사 · 4=성직자 · 5=무도가. A new character must deliberately pick one;
     // Peasant (0) is never silently persisted by this screen.
     private byte? _path;
+    private int _appearanceTab;
 
     /// <summary>Called on the main thread when creation has already completed the normal login into the world.</summary>
     public Action<WorldSession>? Entered { get; set; }
 
-    // 미리보기가 스스로 도는 방향과, 지금 방향을 얼마나 오래 보여 줬나. 머리·색·성별을 바꿔도 이 둘은
-    // 그대로 둔다 — 돌던 것이 끊기지 않게(사용자, 2026-09-19).
+    // 화살표로 고른 방향은 머리·색·성별 변경과 화면 회전 뒤에도 유지한다.
     private Direction _facing = Direction.South;
-    private double _facingElapsed;
 
     public CreateScreen()
     {
@@ -158,6 +144,7 @@ public sealed partial class CreateScreen : Control
 
     public override void _Ready()
     {
+        AddChild(Greybox.EntryBackground());
         _safeArea = Main.SafeAreaContainer();
         AddChild(_safeArea);
 
@@ -246,7 +233,7 @@ public sealed partial class CreateScreen : Control
             SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ShrinkCenter : SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ExpandFill
         };
-        panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
+        panel.AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         MarginContainer padding = new();
         padding.AddThemeConstantOverride("margin_left", Main.Gutter * 2);
@@ -257,11 +244,30 @@ public sealed partial class CreateScreen : Control
         Label title = new()
         {
             Text = "캐릭터 만들기",
-            HorizontalAlignment = HorizontalAlignment.Center
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            ClipText = true
         };
         title.AddThemeFontSizeOverride("font_size", TitleFontSize);
         title.AddThemeColorOverride("font_color", Greybox.Title);
-        _title = title;
+        HBoxContainer heading = new();
+        heading.AddThemeConstantOverride("separation", Main.Gutter);
+        heading.AddChild(new TextureRect
+        {
+            Texture = new AtlasTexture
+            {
+                Atlas = GD.Load<Texture2D>("res://assets/ui/create-wizard-cutout.png"),
+                Region = new Rect2(190, 45, 925, 1095)
+            },
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            TextureFilter = TextureFilterEnum.Nearest,
+            CustomMinimumSize = new Vector2(64, Main.Portrait ? 64 : 48),
+            MouseFilter = MouseFilterEnum.Ignore
+        });
+        heading.AddChild(title);
+        _title = heading;
 
         _username = Field(secret: false, placeholder: "이름");
         _password = Field(secret: true, placeholder: "비밀번호");
@@ -272,21 +278,33 @@ public sealed partial class CreateScreen : Control
         _password.TextSubmitted += _ => _confirm.Edit();
         _confirm.TextSubmitted += _ => SubmitFromKeyboard();
 
-        HBoxContainer authRow = new();
+        BoxContainer authRow = Main.Portrait ? new HBoxContainer() : new VBoxContainer();
         authRow.AddThemeConstantOverride("separation", Main.Gutter);
-        authRow.AddChild(_username);
-        authRow.AddChild(_password);
-        authRow.AddChild(_confirm);
+        if (!Main.Portrait)
+            foreach (LineEdit field in new[] { _username, _password, _confirm }) field.PlaceholderText = string.Empty;
+        authRow.AddChild(Main.Portrait ? _username : LabelledField("이름", _username));
+        authRow.AddChild(Main.Portrait ? _password : LabelledField("비밀번호", _password));
+        authRow.AddChild(Main.Portrait ? _confirm : LabelledField("확인", _confirm));
 
         _status = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
         _status.AddThemeFontSizeOverride("font_size", AuxFontSize);
         _status.AddThemeColorOverride("font_color", Greybox.Muted);
 
         _create = new Button { Text = "만들기", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        Greybox.Commit(_create);
+        StyleButton(_create);
+        foreach (string state in new[] { "normal", "hover", "focus", "pressed" })
+        {
+            StyleBoxFlat primary = Greybox.Sheet();
+            primary.BgColor = state == "pressed" ? Greybox.Muted : Greybox.Title;
+            primary.SetCornerRadiusAll(8);
+            primary.SetContentMarginAll(4);
+            _create.AddThemeStyleboxOverride(state, primary);
+        }
+        foreach (string state in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
+            _create.AddThemeColorOverride(state, Greybox.Engrave);
 
         _back = new Button { Text = "취소", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        Greybox.Plain(_back);
+        StyleButton(_back);
 
         HBoxContainer buttons = new();
         buttons.AddThemeConstantOverride("separation", Main.Gutter);
@@ -301,11 +319,16 @@ public sealed partial class CreateScreen : Control
         Control color = BuildColorGrid();
 
         Control form = Main.Portrait
-            ? BuildPortraitForm(title, authRow, preview, gender, path, hair, color, buttons)
-            : BuildLandscapeForm(title, authRow, preview, gender, path, hair, color, buttons);
+            ? BuildPortraitForm(heading, authRow, preview, gender, path, hair, color, buttons)
+            : BuildLandscapeForm(heading, authRow, preview, gender, path, hair, color, buttons);
 
         padding.AddChild(form);
-        panel.AddChild(padding);
+        PanelContainer interior = new();
+        StyleBoxFlat surface = Greybox.Sheet();
+        surface.SetContentMarginAll(0);
+        interior.AddThemeStyleboxOverride("panel", surface);
+        interior.AddChild(padding);
+        panel.AddChild(interior);
 
         _username.TextChanged += _ => RefreshCreateState();
         _password.TextChanged += _ => RefreshCreateState();
@@ -333,38 +356,103 @@ public sealed partial class CreateScreen : Control
         return form;
     }
 
-    /// <summary>
-    /// 짧은 가로 화면은 세로 여백 대신 폭을 쓴다. 입력·미리보기·꾸미기를 서로 다른 열에 놓아 모든
-    /// 조작이 360px 높이 안에 남고, HAIR/COLOR는 기존의 스크롤 격자와 선택 동작을 그대로 쓴다.
-    /// </summary>
+    /// <summary>원작의 세로 입력 칸, 모바일의 큰 인물·아래 성별·오른쪽 아래 완료 구조.</summary>
     private Control BuildLandscapeForm(
         Control title, Control auth, Control preview, Control gender, Control path, Control hair, Control color, Control buttons)
     {
-        HBoxContainer columns = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
-        columns.AddThemeConstantOverride("separation", Main.Gutter);
+        VBoxContainer form = Column();
+        form.AddChild(title);
 
-        VBoxContainer input = Column();
-        input.CustomMinimumSize = new Vector2(200, 0);
-        input.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        input.AddChild(title);
-        input.AddChild(auth);
-        input.AddChild(gender);
-        input.AddChild(path);
-        input.AddChild(_status);
-        input.AddChild(buttons);
+        HBoxContainer content = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+        content.AddThemeConstantOverride("separation", Main.Gutter * 2);
+        auth.CustomMinimumSize = new Vector2(208, 0);
+        auth.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        auth.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        content.AddChild(auth);
 
-        preview.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        VBoxContainer character = Column();
+        character.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        character.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        character.AddChild(preview);
+        character.AddChild(gender);
+        content.AddChild(character);
 
         VBoxContainer appearance = Column();
-        appearance.CustomMinimumSize = new Vector2(ColorGridColumns * Main.TouchMinimum + (ColorGridColumns - 1) * Main.Gutter, 0);
+        appearance.CustomMinimumSize = new Vector2(160, 0);
         appearance.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        appearance.AddChild(hair);
-        appearance.AddChild(color);
+        HBoxContainer tabs = new();
+        tabs.AddThemeConstantOverride("separation", 0);
+        Control[] sections = [path, hair, color];
+        List<Button> selectors = [];
+        foreach ((int index, string label) in new[] { (0, "직업"), (1, "머리"), (2, "색") })
+        {
+            Button tab = new()
+            {
+                Name = $"AppearanceTab{index}", Text = label, ToggleMode = true,
+                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            StyleButton(tab);
+            foreach (string state in new[] { "normal", "hover", "focus", "pressed", "hover_pressed" })
+            {
+                bool selected = state is "pressed" or "hover_pressed";
+                StyleBoxFlat underline = Greybox.Sheet();
+                underline.SetBorderWidthAll(0);
+                underline.BorderWidthBottom = selected ? 3 : 1;
+                if (selected) underline.BorderColor = Greybox.Title;
+                underline.SetContentMarginAll(4);
+                tab.AddThemeStyleboxOverride(state, underline);
+            }
+            tab.AddThemeColorOverride("font_color", Greybox.Muted);
+            tab.AddThemeColorOverride("font_pressed_color", Greybox.Text);
+            tab.Pressed += () =>
+            {
+                _appearanceTab = index;
+                for (int i = 0; i < sections.Length; i++)
+                {
+                    sections[i].Visible = i == index;
+                    selectors[i].ButtonPressed = i == index;
+                }
+            };
+            selectors.Add(tab);
+            tabs.AddChild(tab);
+        }
+        appearance.AddChild(tabs);
+        for (int i = 0; i < sections.Length; i++)
+        {
+            sections[i].Visible = i == _appearanceTab;
+            selectors[i].ButtonPressed = i == _appearanceTab;
+            appearance.AddChild(sections[i]);
+        }
+        content.AddChild(appearance);
+        form.AddChild(content);
 
-        columns.AddChild(input);
-        columns.AddChild(preview);
-        columns.AddChild(appearance);
-        return columns;
+        // 하단 위치는 입력·꾸밈 탭과 무관하게 고정한다.
+        _back.CustomMinimumSize = new Vector2(88, Main.TouchMinimum);
+        _back.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
+        _create.CustomMinimumSize = new Vector2(144, Main.TouchMinimum);
+        _create.SizeFlagsHorizontal = SizeFlags.ShrinkEnd;
+        _status.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _status.CustomMinimumSize = new Vector2(0, Main.TouchMinimum);
+        _status.VerticalAlignment = VerticalAlignment.Center;
+        _status.MaxLinesVisible = 2;
+        _status.ClipText = true;
+        buttons.AddChild(_status);
+        buttons.MoveChild(_status, 1);
+        form.AddChild(buttons);
+        return form;
+    }
+
+    private static Control LabelledField(string label, LineEdit field)
+    {
+        HBoxContainer row = new();
+        row.AddThemeConstantOverride("separation", Main.Gutter);
+        Label caption = Aux(label);
+        caption.CustomMinimumSize = new Vector2(64, 0);
+        caption.VerticalAlignment = VerticalAlignment.Center;
+        row.AddChild(caption);
+        row.AddChild(field);
+        return row;
     }
 
     /// <summary>화면의 같은 세로 묶음이 쓰는 간격 — 기존 세로 폼의 값과 같다.</summary>
@@ -382,8 +470,8 @@ public sealed partial class CreateScreen : Control
 
         _male = new Button { Text = "남", ToggleMode = true, CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _female = new Button { Text = "여", ToggleMode = true, CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        Greybox.Tab(_male);
-        Greybox.Tab(_female);
+        StyleButton(_male);
+        StyleButton(_female);
 
         _male.Pressed += () => SelectGender(1);
         _female.Pressed += () => SelectGender(2);
@@ -396,13 +484,13 @@ public sealed partial class CreateScreen : Control
     }
 
     /// <summary>
-    /// The primary class is selected at creation, not deferred to the NPC-only legacy chooser. The row is
-    /// horizontally scrollable on a short landscape phone so every 48px touch target remains reachable.
+    /// All five classes remain visible: one row upright, two rows on a short landscape phone.
     /// </summary>
     private Control BuildPathRow()
     {
-        HBoxContainer choices = new();
-        choices.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        GridContainer choices = new() { Columns = Main.Portrait ? 5 : 3, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        choices.AddThemeConstantOverride("h_separation", Main.Gutter);
+        choices.AddThemeConstantOverride("v_separation", Main.Gutter);
 
         foreach ((byte path, string label) in new[]
         {
@@ -413,23 +501,17 @@ public sealed partial class CreateScreen : Control
             {
                 Text = label,
                 ToggleMode = true,
-                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
-            Greybox.Tab(tile);
+            StyleButton(tile);
             tile.Pressed += () => SelectPath(path);
             _pathTiles[path] = tile;
             choices.AddChild(tile);
         }
 
-        ScrollContainer scroll = new()
-        {
-            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
-            VerticalScrollMode = ScrollContainer.ScrollMode.Disabled,
-            HorizontalScrollMode = ScrollContainer.ScrollMode.Auto
-        };
-        scroll.AddChild(choices);
-        _pathRow = scroll;
-        return scroll;
+        _pathRow = choices;
+        return choices;
     }
 
     private void ApplyPickedPath()
@@ -466,20 +548,72 @@ public sealed partial class CreateScreen : Control
         // fields or the two final actions.
         // The five job choices add one 48px thumb row.  At 360x640 reserve that room from the
         // decorative preview, rather than letting the first fields and the final actions fall offscreen.
-        int height = Main.Portrait && GetViewportRect().Size.Y <= 680 ? 110 : PreviewHeight;
+        float available = GetViewportRect().Size.Y - Main.SafeInsets.Top - Main.SafeInsets.Bottom;
+        int height = Main.Portrait ? (int)Mathf.Clamp(available - 628, 112, PreviewHeight) : 144;
         _previewHeight = height;
         PanelContainer box = new() { CustomMinimumSize = new Vector2(PreviewWidth, height) };
-        box.AddThemeStyleboxOverride("panel", Greybox.Surface());
+        StyleBoxFlat background = Greybox.Sheet();
+        background.SetBorderWidthAll(0);
+        box.AddThemeStyleboxOverride("panel", background);
 
         _stage = new Control { ClipContents = true };
+        TextureRect circle = new()
+        {
+            Texture = new AtlasTexture
+            {
+                Atlas = GD.Load<Texture2D>("res://assets/ui/create-circle-cutout.png"),
+                Region = new Rect2(171, 152, 952, 947)
+            },
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            TextureFilter = TextureFilterEnum.Nearest,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        circle.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        box.AddChild(circle);
 
+
+        _stage.Resized += RefreshPreview;
         box.AddChild(_stage);
+        Control turns = new() { MouseFilter = MouseFilterEnum.Ignore, ZIndex = 10 };
+        foreach (bool right in new[] { false, true })
+        {
+            Button arrow = new()
+            {
+                Name = right ? "TurnRight" : "TurnLeft",
+                Text = right ? "›" : "‹",
+                TooltipText = right ? "오른쪽으로 회전" : "왼쪽으로 회전",
+                CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum),
+                AnchorLeft = right ? 1 : 0,
+                AnchorRight = right ? 1 : 0,
+                AnchorTop = 0.5f,
+                AnchorBottom = 0.5f,
+                OffsetLeft = right ? -Main.TouchMinimum : 0,
+                OffsetRight = right ? 0 : Main.TouchMinimum,
+                OffsetTop = -Main.TouchMinimum / 2f,
+                OffsetBottom = Main.TouchMinimum / 2f
+            };
+            arrow.AddThemeFontSizeOverride("font_size", 32);
+            arrow.AddThemeColorOverride("font_outline_color", Colors.Black);
+            arrow.AddThemeConstantOverride("outline_size", 4);
+            StyleButton(arrow);
+            foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus" })
+                arrow.AddThemeStyleboxOverride(state, new StyleBoxEmpty());
+            arrow.Pressed += () =>
+            {
+                _facing = NextFacing(_facing);
+                if (!right) _facing = NextFacing(NextFacing(_facing));
+                _previewActor?.Face(_facing);
+            };
+            turns.AddChild(arrow);
+        }
+        box.AddChild(turns);
         _preview = box;
         return box;
     }
 
     /// <summary>
-    /// 미리보기를 지금 고른 성별·머리·색으로, 지금 돌고 있는 방향으로 다시 그린다. 머리나 색을 넘길
+    /// 미리보기를 지금 고른 성별·머리·색으로, 화살표로 고른 방향으로 다시 그린다. 머리나 색을 넘길
     /// 때마다 다시 불린다 — 팔레트 교체(<see cref="Palettes"/>)는 (그림, 색) 별로 캐시돼 있어 이미
     /// 그려 본 조합은 다시 읽지 않는다.
     /// </summary>
@@ -496,7 +630,7 @@ public sealed partial class CreateScreen : Control
         Node2D wrapper = new()
         {
             Position = new Vector2(
-                PreviewWidth / 2f + BodyCentreOffsetX * PreviewScale,
+                _stage.Size.X / 2f + BodyCentreOffsetX * PreviewScale,
                 _previewHeight / 2f + BodyCentreOffsetY * PreviewScale),
             Scale = new Vector2(PreviewScale, PreviewScale)
         };
@@ -567,19 +701,17 @@ public sealed partial class CreateScreen : Control
     {
         VBoxContainer section = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
         section.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        section.AddChild(Aux("HAIR"));
+        if (Main.Portrait) section.AddChild(Aux("HAIR"));
 
         _hairGrid = new GridContainer { Columns = HairGridColumns };
         _hairGrid.AddThemeConstantOverride("h_separation", Main.Gutter);
         _hairGrid.AddThemeConstantOverride("v_separation", Main.Gutter);
 
-        // 최소 두 줄은 보이게 한다(사용자, 2026-09-19) — 한 줄만 보이면 옆에 뭐가 더 있는지 스크롤바
-        // 손잡이로만 짐작해야 해서 고르기 나쁘다. (임시: 한 줄로 자리를 먼저 잡는다 — 다음 편집에서
-        // 실제 예산을 재고 두 줄 높이로 올린다.)
+        // 짧은 화면은 한 줄의 터치 크기를 보장하고, 남는 높이를 머리·색 목록에 나눠 준다.
         ScrollContainer scroll = new()
         {
             SizeFlagsVertical = SizeFlags.ExpandFill,
-            CustomMinimumSize = new Vector2(0, HairTileSize.Y * 2 + Main.Gutter),
+            CustomMinimumSize = new Vector2(0, HairTileSize.Y),
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
         scroll.AddChild(_hairGrid);
@@ -609,6 +741,7 @@ public sealed partial class CreateScreen : Control
             Button tile = new()
             {
                 CustomMinimumSize = HairTileSize,
+                TextureFilter = TextureFilterEnum.Nearest,
                 Icon = HairIcon(number),
                 ExpandIcon = true,
                 Flat = number != _hairStyle
@@ -636,7 +769,13 @@ public sealed partial class CreateScreen : Control
         }
 
         Texture2D dyed = Palettes.Load(path, _hairColor);
-        return new AtlasTexture { Atlas = dyed, Region = HairThumbRegion };
+        // Crop only transparent thumb padding: the actual hairstyle gets the whole existing touch tile.
+        Rect2I frame = new((int)HairThumbRegion.Position.X, (int)HairThumbRegion.Position.Y,
+            (int)HairThumbRegion.Size.X, (int)HairThumbRegion.Size.Y);
+        Rect2I ink = dyed.GetImage().GetRegion(frame).GetUsedRect();
+        Rect2 region = ink.Size == Vector2I.Zero ? HairThumbRegion
+            : new Rect2(frame.Position + ink.Position, ink.Size).Grow(2).Intersection(HairThumbRegion);
+        return new AtlasTexture { Atlas = dyed, Region = region };
     }
 
     /// <summary>
@@ -657,7 +796,7 @@ public sealed partial class CreateScreen : Control
     {
         VBoxContainer section = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
         section.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        section.AddChild(Aux("COLOR"));
+        if (Main.Portrait) section.AddChild(Aux("COLOR"));
 
         GridContainer grid = new() { Columns = ColorGridColumns };
         grid.AddThemeConstantOverride("h_separation", Main.Gutter);
@@ -836,14 +975,42 @@ public sealed partial class CreateScreen : Control
     /// 너무 좁아져 뺐다. 높이는 그대로 <see cref="Main.TouchMinimum"/> — 터치 최소보다 낮추지
     /// 않는다.
     /// </summary>
-    private static LineEdit Field(bool secret, string placeholder) => new()
+    private static LineEdit Field(bool secret, string placeholder)
     {
-        Secret = secret,
-        PlaceholderText = placeholder,
-        VirtualKeyboardType = secret ? LineEdit.VirtualKeyboardTypeEnum.Password : LineEdit.VirtualKeyboardTypeEnum.Default,
-        CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
-        SizeFlagsHorizontal = SizeFlags.ExpandFill
-    };
+        LineEdit field = new()
+        {
+            Secret = secret,
+            PlaceholderText = placeholder,
+            VirtualKeyboardType = secret ? LineEdit.VirtualKeyboardTypeEnum.Password : LineEdit.VirtualKeyboardTypeEnum.Default,
+            CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
+            SizeFlagsHorizontal = SizeFlags.ExpandFill
+        };
+        foreach (string state in new[] { "normal", "focus", "read_only" })
+        {
+            StyleBoxFlat background = Greybox.Sheet();
+            background.SetContentMarginAll(4);
+            background.SetCornerRadiusAll(8);
+            if (state == "focus") background.BorderColor = Greybox.Muted;
+            field.AddThemeStyleboxOverride(state, background);
+        }
+        return field;
+    }
+
+    // 로그인과 같은 단색 바탕. 선택은 돌 타일 대신 테두리와 글자 밝기로 표시한다.
+    private static void StyleButton(Button button)
+    {
+        Greybox.Plain(button);
+        foreach (string state in new[] { "normal", "hover", "focus", "pressed", "hover_pressed", "disabled" })
+        {
+            StyleBoxFlat background = Greybox.Sheet();
+            background.SetContentMarginAll(4);
+            background.SetCornerRadiusAll(8);
+            if (state is "pressed" or "hover_pressed" or "focus") background.BorderColor = Greybox.Muted;
+            button.AddThemeStyleboxOverride(state, background);
+        }
+        button.AddThemeColorOverride("font_disabled_color", Greybox.Muted);
+        button.AddThemeColorOverride("font_hover_pressed_color", Greybox.Text);
+    }
 
     private static Label Aux(string text)
     {
@@ -896,7 +1063,7 @@ public sealed partial class CreateScreen : Control
     /// <summary>
     /// 로그인 화면과 같은 방식으로 키보드를 피한다 — 화면 전체를 줄이지 않고, 치고 있는 칸(자리가 되면 [만들기]까지)이
     /// 키보드 위에 오도록 그만큼만 올린다(<see cref="KeyboardFit.Slide"/>). 예전에는 화면을 키보드만큼 줄여 격자·미리보기가
-    /// 찌그러졌다. 미리보기가 스스로 도는 것도 여기서 잰다 — Actor 를 다시 짓지 않고 <see cref="Actor.Face"/> 만 불러 가볍다.
+    /// 찌그러졌다.
     /// </summary>
     public override void _Process(double delta)
     {
@@ -925,15 +1092,6 @@ public sealed partial class CreateScreen : Control
             _slide = slide;
             OffsetTop = -slide;
             OffsetBottom = -slide;
-        }
-
-        _facingElapsed += delta;
-
-        if (_facingElapsed >= FacingSeconds)
-        {
-            _facingElapsed -= FacingSeconds;
-            _facing = NextFacing(_facing);
-            _previewActor?.Face(_facing);
         }
 
         DrainCreate();

@@ -11,6 +11,8 @@ namespace LodClient;
 public partial class GameScreen : Control
 {
     private const int AuxFontSize = 14;
+    private Label _wealth = null!;
+    private bool _shopPreviewed;
 
     /// <summary>체력·마력 막대의 높이 — 숫자를 막대 안에 얹으므로(2026-09-27) 글자 한 줄이 들 만큼.</summary>
     private const int GaugeHeight = 14;
@@ -53,6 +55,7 @@ public partial class GameScreen : Control
     private SettingsPanel _settings = null!;
     private readonly BotGearPanel _botGear = new();
     private Control? _botGearHolder;
+    private Control? _talkHolder;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
     // 그대로 남아 있어(WorldClient.cs:363), 창을 도로 띄워 두 번 고르게 하면 안 된다.
@@ -214,7 +217,7 @@ public partial class GameScreen : Control
         _pack.Close.Pressed += () => Carrying(false);
         _pack.Used += slot => _ = _server?.UseAsync(slot, System.Threading.CancellationToken.None);
         _pack.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
-        _pack.Dropped += slot => _ = Throw(slot);
+        _pack.Dropped += (slot, count) => _ = Throw(slot, count);
         _pack.Tidy.Pressed += () => _ = Straighten();
 
         _chat = new ChatPanel();
@@ -279,6 +282,8 @@ public partial class GameScreen : Control
 
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
+        _talk.Traded += (merchant, selling, lines) => _ = Trade(merchant, selling, lines);
+        _talk.MenuRequested += merchant => _ = _server?.ShopMenuAsync(merchant, System.Threading.CancellationToken.None);
         _talk.Answered += (speaker, step, words) => _ = words is null
             ? _server?.AnswerAsync(speaker, step, System.Threading.CancellationToken.None)
             : _server?.AnswerAsync(speaker, step, words, System.Threading.CancellationToken.None);
@@ -476,6 +481,18 @@ public partial class GameScreen : Control
             holder.AddChild(panel);
             holders.Add(holder);
 
+            if (panel == _talk)
+            {
+                _talkHolder = holder;
+                if (!Main.Portrait)
+                {
+                    holder.OffsetTop = 0;
+                    holder.Alignment = BoxContainer.AlignmentMode.Center;
+                    _talk.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+                    _talk.CustomMinimumSize = new Vector2(Mathf.Min(640, GetViewportRect().Size.X - Main.SafeInsets.Left - Main.SafeInsets.Right), 0);
+                }
+            }
+
             if (panel == _chat)
             {
                 _chatHolder = holder;
@@ -508,7 +525,7 @@ public partial class GameScreen : Control
                 continue;
             }
 
-            if ((panel == _pack || panel == _tabMap) && !Main.Portrait)
+            if ((panel == _pack || panel == _tabMap || panel == _talk) && !Main.Portrait)
             {
                 holder.OffsetTop = 0;
                 continue;
@@ -555,7 +572,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _chatHolder ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _chatHolder || holder == _talkHolder ? 0 : column;
         }
     }
 
@@ -616,6 +633,10 @@ public partial class GameScreen : Control
         // Empty until the server names us, in step with the place name below: a made-up name on the
         // HUD is worse than none, because there is no way to tell it from a real one.
         _who = Aux(string.Empty);
+        _who.ClipText = true;
+        _who.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
+        _who.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _who.CustomMinimumSize = new Vector2(48, 0);
 
         // 세로는 이름을 막대 위 한 줄로 — 옆에 두면 이름이 긴 만큼 판이 넓어져 같은 줄의 미니맵이 화면 밖으로 밀렸다(2026-09-26).
         // 가로도 같게(2026-09-26) — 월드맵 마름모가 맨 왼쪽에 서면서 640 가로에서 이름 옆에 막대를 두면 위 줄이 넘쳤다.
@@ -627,15 +648,18 @@ public partial class GameScreen : Control
         _myStatus.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _myStatus.SizeFlagsVertical = SizeFlags.ShrinkCenter;
         headline.AddChild(_who);
-        headline.AddChild(_myStatus);
+        _wealth = Aux(string.Empty);
+        _wealth.AddThemeFontSizeOverride("font_size", 11);
+        headline.AddChild(_wealth);
         mine.AddChild(headline);
         mine.AddChild(BuildVitals());
+        mine.AddChild(_myStatus);
 
         // 이름 줄은 이름이 오기 전에는 접는다 — 빈 줄이 판 위에 남는다. 글자는 조금 작게 — 가로 360 에서 위 줄이 한 줄 늘어난
         // 만큼 조작 줄을 밀어내지 않게(판 네 줄이 80 안에 들어야 한다).
         _who.Visible = false;
         _who.AddThemeFontSizeOverride("font_size", 12);
-        row.AddChild(Plated(mine));
+        row.AddChild(Plated(mine, compact: !Main.Portrait));
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
         _target = Aux(string.Empty);
@@ -913,10 +937,12 @@ public partial class GameScreen : Control
     /// A panel over the world: an original stone frame with a dark, nearly opaque inside. The frame is what
     /// carries the theme; the inside is flat, because a pattern under small text is the first thing to fail.
     /// </summary>
-    private static Control Plated(Control inside)
+    private static Control Plated(Control inside, bool compact = false)
     {
         PanelContainer inner = new();
-        inner.AddThemeStyleboxOverride("panel", Greybox.Plate());
+        StyleBoxFlat surface = Greybox.Plate();
+        if (compact) surface.ContentMarginTop = surface.ContentMarginBottom = 1;
+        inner.AddThemeStyleboxOverride("panel", surface);
         inner.AddChild(inside);
 
         PanelContainer plate = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
@@ -970,10 +996,29 @@ public partial class GameScreen : Control
         // The server names us in 0x33; nothing else on this screen knows who we are.
         // 배치 검사는 이름이 붙은 판을 잰다 — 이름 없는 판으로 재면 미니맵 자리가 넉넉해 보였다(실제 서버에서 넘쳤다, 2026-09-26).
         // 평소 서버 없는 화면에는 지어낸 이름을 적지 않는다(아래 설명 그대로).
-        if ((_server?.Self?.Name ?? (LayoutCheck.Requested() ? LayoutCheck.PretendName : null)) is { Length: > 0 } called)
+        if ((_server?.Self?.Name ?? (LayoutCheck.PretendSelf is not null ? LayoutCheck.PretendName : null)) is { Length: > 0 } called)
         {
-            _who.Text = Mine.Level > 0 ? $"{called} Lv{Mine.Level}" : called;
+            _who.Text = called;
+            _who.TooltipText = called;
+            _wealth.Text = $"Lv{Mine.Level} · {GoldText(Mine.Gold)}";
             _who.Visible = true;
+        }
+
+        if (!_shopPreviewed && _server is null && System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--shop-preview") >= 0)
+        {
+            _shopPreviewed = true;
+            bool selling = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--shop-sell") >= 0;
+            Dialogue preview = new(1, "델란", "필요한 수량을 고른 뒤 아래에서 거래를 마치세요.")
+            {
+                Kind = selling ? DialogueKind.PackSlots : DialogueKind.Goods,
+                Step = selling ? (ushort)0x0500 : (ushort)4,
+                Slots = [1, 2, 3],
+                Goods = [new(32813, 0, 150, "쿠룸"), new(32882, 0, 950, "레더튜닉", "Warrior", 1, 1),
+                    new(999999, 0, 1200, "그림 없는 도복", "Monk", 2, 1), new(32813, 0, 500, "마라디움")]
+            };
+            SetWindow(GameWindow.Talk, true);
+            _talk.Show(preview, [new(1, 32813, 0, "쿠룸", 12, 0, 0), new(2, 32882, 0, "레더튜닉", 1, 30, 100)], Mine.Gold);
+            if (System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--shop-check") >= 0) _talk.CheckShop();
         }
 
         ShowVitals();
@@ -1396,14 +1441,14 @@ public partial class GameScreen : Control
     }
 
     /// <summary>Throws one slot on the floor, at our own feet — the only tile we can be sure of.</summary>
-    private async Task Throw(int slot)
+    private async Task Throw(int slot, int count)
     {
         if (_server is not { State: { } standing } server)
         {
             return;
         }
 
-        await server.DropAsync(slot, 1, standing.Where, System.Threading.CancellationToken.None);
+        await server.DropAsync(slot, count, standing.Where, System.Threading.CancellationToken.None);
     }
 
     /// <summary>
@@ -1806,18 +1851,36 @@ public partial class GameScreen : Control
 
         if (talk is not null)
         {
-            _talk.Show(talk, _server?.Pack ?? []);
+            _talk.Show(talk, _server?.Pack ?? [], Mine.Gold);
         }
     }
 
-    /// <summary>Shuts an NPC's window from our side and tells the server, so it stops walking us through a menu.</summary>
+    /// <summary>Sends the selected order and lets the next server dialog confirm the result.</summary>
+    private async Task Trade(uint merchant, bool selling, System.Collections.Generic.IReadOnlyList<(string Name, int Slot, int Quantity)> lines)
+    {
+        if (_server is null) return;
+        try
+        {
+            await _server.BulkTradeAsync(merchant, selling, lines, System.Threading.CancellationToken.None);
+        }
+        catch (Exception failure)
+        {
+            _talk.TradeFailed($"거래를 보내지 못했습니다: {failure.Message}");
+        }
+    }
+
+    /// <summary>Shuts an NPC window and tells the server.</summary>
     private void ShutTalk()
     {
         Talk(null);
         _ = _server?.ShutDialogueAsync(System.Threading.CancellationToken.None);
     }
 
-    /// <summary>Our own numbers as the server last gave them; made-up ones while nothing is connected.</summary>
+    /// <summary>Shortens gold without rounding up to money the character does not have.</summary>
+    private static string GoldText(long gold) => gold >= 100_000_000 ? $"{Math.Floor(gold / 10_000_000d) / 10:0.#}억"
+        : gold >= 10_000 ? $"{Math.Floor(gold / 1_000d) / 10:0.#}만" : $"{gold:N0}";
+
+    /// <summary>Our latest numbers, or rehearsal numbers offline.</summary>
     private Vitals Mine => _server is null ? LayoutCheck.PretendVitals : _server.Vitals ?? Vitals.Unknown;
 
     /// <summary>
@@ -1853,6 +1916,7 @@ public partial class GameScreen : Control
         // 구슬만 두었더니 무엇을 뜻하는지 알 수 없다는 말을 들었다(사용자, 2026-09-18). 이름을 되살린다 —
         // 색은 거드는 것이지 뜻을 나르는 것이 아니다.
         Label named = Aux(name);
+        if (!Main.Portrait) named.AddThemeFontSizeOverride("font_size", GaugeFontSize);
 
         bar = new ProgressBar
         {

@@ -286,7 +286,7 @@ public sealed partial class MinimapView : Button
             {
                 if (Minimap.Sees(frame, wide, high, step))
                 {
-                    DrawRect(new Rect2(At(frame, step) - new Vector2(0.5f, 0.5f), Vector2.One), Greybox.Accent);
+                    Diamond(frame, step, Greybox.Accent);
                 }
             }
 
@@ -299,26 +299,21 @@ public sealed partial class MinimapView : Button
                     // 출구는 작은 마름모(반 칸) — 문이 어디인지는 보여야 한다.
                     foreach (Tile tile in marker.Goals.Where(tile => Minimap.Sees(frame, wide, high, tile)))
                     {
-                        Vector2 at = At(frame, tile);
-                        float w = frame.HalfWidth * 0.6f, h = frame.HalfHeight * 0.6f;
-                        DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
+                        Diamond(frame, tile, paint);
                     }
 
                     continue;
                 }
 
-                Dot(At(frame, marker.Where), paint);
+                Diamond(frame, marker.Where, paint);
             }
 
             if (owner._botAt is { } bot && Minimap.Sees(frame, wide, high, bot))
             {
-                Dot(At(frame, bot), BotPaint);
+                Diamond(frame, bot, BotPaint);
             }
 
-            // 나 — 흰 점, 조금 크게(3픽셀) + 검은 테 1픽셀. 다른 점과 한눈에 갈린다.
-            Vector2 me = At(frame, owner.Standing);
-            DrawRect(new Rect2(me - new Vector2(2.5f, 2.5f), new Vector2(5, 5)), Colors.Black);
-            DrawRect(new Rect2(me - new Vector2(1.5f, 1.5f), new Vector2(3, 3)), Colors.White);
+            Diamond(frame, owner.Standing, Colors.White);
 
             // 지금 곳 — 아래 왼쪽에 작게(위 줄의 곳 이름 판을 대신한다). 오른쪽 구석은 [+]·[−] 자리.
             if (owner.PlaceName.Length > 0)
@@ -330,8 +325,13 @@ public sealed partial class MinimapView : Button
             }
         }
 
-        /// <summary>Everyone else: a two-pixel dot.</summary>
-        private void Dot(Vector2 at, Color paint) => DrawRect(new Rect2(at - Vector2.One, new Vector2(2, 2)), paint);
+        /// <summary>Every marker occupies exactly one grid tile.</summary>
+        private void Diamond(TabMapProjection frame, Tile tile, Color paint)
+        {
+            Vector2 at = At(frame, tile);
+            float w = frame.HalfWidth, h = frame.HalfHeight;
+            DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
+        }
 
         private static Vector2 At(TabMapProjection frame, Tile tile)
         {

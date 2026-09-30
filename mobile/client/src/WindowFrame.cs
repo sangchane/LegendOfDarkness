@@ -265,7 +265,7 @@ public static class WindowFrame
 
         void Tint(bool lit)
         {
-            Color paint = !tab || lit ? Greybox.Text : Greybox.Muted;
+            Color paint = tab && lit ? Greybox.Engrave : !tab ? Greybox.Text : Greybox.Muted;
             glyph.Paint = paint;
             word.AddThemeColorOverride("font_color", paint);
         }
