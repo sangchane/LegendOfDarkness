@@ -45,7 +45,7 @@ public partial class LoginScreen : Control
     private LineEdit _password = null!;
     private Button _submit = null!;
     private Button _create = null!;
-    private CheckBox _autoLogin = null!;
+    private Button _autoLogin = null!;
 
     /// <summary>기본은 꺼짐 — 이미 저장된 계정이 있을 때만 켜져서 보인다.</summary>
     private bool _autoLoginWanted;
@@ -190,7 +190,7 @@ public partial class LoginScreen : Control
 
         PanelContainer panel = new()
         {
-            CustomMinimumSize = new Vector2(FormWidth, 0)
+            CustomMinimumSize = new Vector2(Main.Portrait ? FormWidth : LandscapeFormWidth, 0)
         };
         panel.AddThemeStyleboxOverride("panel", Greybox.Surface());
 
@@ -247,17 +247,19 @@ public partial class LoginScreen : Control
 
         // 기본은 꺼짐(사용자) — 이미 저장된 계정이 있을 때만 켜진 채로 보인다.
         _autoLoginWanted = Main.SavedLogin is not null;
-        _autoLogin = new CheckBox
+        _autoLogin = new Button
         {
-            Text = "자동 로그인",
+            ToggleMode = true,
             ButtonPressed = _autoLoginWanted,
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
         };
-        _autoLogin.AddThemeConstantOverride("h_separation", Main.Gutter);
+        Greybox.Tab(_autoLogin);
+        ShowAutoLogin();
 
         _autoLogin.Pressed += () =>
         {
             _autoLoginWanted = _autoLogin.ButtonPressed;
+            ShowAutoLogin();
 
             // 꺼면 그 자리에서 지운다 — 켜는 것은 이 계정으로 실제 로그인에 성공했을 때뿐이다.
             if (!_autoLoginWanted)
@@ -266,7 +268,9 @@ public partial class LoginScreen : Control
             }
         };
 
-        Control form = PortraitForm(crest, title);
+        Control form = Main.Portrait
+            ? PortraitForm(crest, title)
+            : LandscapeForm(crest, title);
 
         padding.AddChild(form);
         panel.AddChild(padding);
@@ -308,7 +312,31 @@ public partial class LoginScreen : Control
         return form;
     }
 
+    /// <summary>
+    /// A short, two-column version of the same form for landscape: identity on the left and the actual
+    /// task on the right. It removes two tall rows without shrinking fields or touch targets.
+    /// </summary>
+    private Control LandscapeForm(TextureRect crest, Label title)
+    {
+        HBoxContainer form = new();
+        form.AddThemeConstantOverride("separation", Main.Gutter * 2);
 
+        VBoxContainer identity = FormColumn();
+        identity.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        identity.SizeFlagsStretchRatio = 2;
+        identity.AddChild(crest);
+        identity.AddChild(title);
+
+        VBoxContainer credentials = FormColumn();
+        credentials.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        credentials.SizeFlagsStretchRatio = 3;
+        AddCredentials(credentials);
+
+        form.AddChild(identity);
+        form.AddChild(credentials);
+
+        return form;
+    }
 
     private static VBoxContainer FormColumn()
     {
@@ -330,7 +358,8 @@ public partial class LoginScreen : Control
         form.AddChild(_create);
     }
 
-
+    private void ShowAutoLogin() =>
+        _autoLogin.Text = _autoLoginWanted ? "자동 로그인 켬" : "자동 로그인 꺼짐";
 
     private static Control FieldRow(string caption, LineEdit field)
     {

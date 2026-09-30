@@ -20,8 +20,6 @@ public enum GlyphKind
     Account,
     Zoom,
     Stop,
-    Back,
-    Gold,
     Town,
     Field,
     Plus,
@@ -151,17 +149,6 @@ public sealed partial class Glyph : Control
 
             case GlyphKind.Stop:
                 DrawRect(new Rect2(P(0.25f, 0.25f), new Vector2(0.5f * s, 0.5f * s)), c);
-                break;
-
-            case GlyphKind.Back:
-                DrawLine(P(0.82f, 0.5f), P(0.2f, 0.5f), c, w, true);
-                DrawPolyline([P(0.42f, 0.22f), P(0.18f, 0.5f), P(0.42f, 0.78f)], c, w, true);
-                break;
-
-            case GlyphKind.Gold:
-                DrawCircle(P(0.5f, 0.5f), 0.34f * s, c, false, w, true);
-                DrawCircle(P(0.5f, 0.5f), 0.15f * s, c, false, w * 0.75f, true);
-                DrawLine(P(0.5f, 0.27f), P(0.5f, 0.73f), c, w * 0.7f, true);
                 break;
 
             case GlyphKind.Town:
