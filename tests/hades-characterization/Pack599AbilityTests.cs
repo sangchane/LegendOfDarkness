@@ -101,8 +101,9 @@ public sealed class Pack599AbilityTests : IDisposable
                     sounds.Add(sound);
                 }
 
-                return sounds.Contains(75);
-            }, $"플레어 소리(75)가 오지 않았습니다: {string.Join(", ", sounds)}");
+                // 노바 47 이 지금 값, 5.99 75 는 되돌렸을 때(build-nova-effects.py 의 SOUND_FROM, 사용자 2026-09-30).
+                return sounds.Contains(47) || sounds.Contains(75);
+            }, $"플레어 소리(노바 47 · 5.99 75)가 오지 않았습니다: {string.Join(", ", sounds)}");
         }
 
         // 메테오 — 내 둘레 ±7 칸을 `for` 두 겹으로 돌며 치고, 마력을 비운다.

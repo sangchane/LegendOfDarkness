@@ -63,6 +63,45 @@ OLD_LIST_FIX = {"나르콜리": {33: 28}, "콘푸지오": {118: 208}, "수페라
                 "딜루메니": {276: 42}, "연막": {276: 57}}
 
 
+# 5.99 대본에 이펙트 줄이 아예 없는데 옛 목록에 그림이 있는 것 — 그 줄 뒤에 한 줄 더한다(이미 있으면 그대로).
+# 리젠: 옛 목록 187 노란 반짝이(사용자 2026-09-30 "리젠 아까 구버전 맞는거 같던데").
+OLD_LIST_ADD = {"리젠(Lev1)": ('p.Call("hprecovery"', "v_target", 187, 100)}
+
+
+# 소리(`game_sound`)도 노바로 — 사용자 2026-09-30 「노바로 바꿔봐 내가 플레이해보고 다시 돌릴 수 있게」.
+# **되돌리기: 아래를 "5.99" 로 바꾸고 `python3 scripts/build-nova-effects.py --쓰기`.** 대본 줄에는
+# `// 노바 소리(5.99: N)` 꼬리표로 원래 번호를 남기고, 무도가 템플릿 `Sound` 는 5.99 블록에서 다시 계산한다.
+# 짝짓기: 5.99·노바 블록에 나오는 소리 번호를 나온 차례(겹친 것 빼고)로 i 번째끼리. 노바에 소리가 없으면 그대로,
+# 노바에만 있는 갈래(데빌크래셔의 둘레 치기 18)는 더하지 않는다.
+SOUND_FROM = "노바"
+SOUND = re.compile(r'^(?P<head>\s*p\.Call\("game_sound", \(V\))(?P<n>\d+)(?P<rest>L, .*?;)(?P<tail>\s*// 노바 소리\(5\.99: (?P<was>\d+)\))?\s*$')
+SOUND_IN_PACK = re.compile(r"\b(?:game_sound|sound)\s+(\d+)")
+
+
+def sound_map(old_body, new_body):
+    old = list(dict.fromkeys(int(n) for n in SOUND_IN_PACK.findall(old_body)))
+    new = list(dict.fromkeys(int(n) for n in SOUND_IN_PACK.findall(new_body)))
+    if not new:
+        return {}
+    return {was: new[min(i, len(new) - 1)] for i, was in enumerate(old)}
+
+
+def resound(path, swap):
+    """대본의 game_sound 줄을 SOUND_FROM 쪽 번호로. 바뀐 글이나 None."""
+    text = path.read_text(encoding="utf-8-sig")
+    lines = text.split("\n")
+    for i, ln in enumerate(lines):
+        m = SOUND.match(ln)
+        if not m:
+            continue
+        was = int(m["was"] or m["n"])
+        want = swap.get(was, was) if SOUND_FROM == "노바" else was
+        tail = f"  // 노바 소리(5.99: {was})" if want != was else ""
+        lines[i] = f'{m["head"]}{want}{m["rest"]}{tail}'
+    out = "\n".join(lines)
+    return out if out != text else None
+
+
 def fixed(name, number):
     swap = OLD_LIST_FIX.get(name, {})
     return swap.get(number, number) if isinstance(swap, dict) else number
@@ -203,6 +242,34 @@ def main():
             if writing:
                 path.write_text(text, encoding="utf-8-sig")
 
+    # 소리 — 노바 짝이 있는 기술·마법만.
+    sounds = []
+    for (kind, name), body in sorted(old_blocks.items()):
+        if kind not in ("SKILL", "SPELL") or (kind, name) not in new_blocks:
+            continue
+        swap = sound_map(body, new_blocks[(kind, name)])
+        template = TEMPLATES / f"{name}.json"
+        if kind == "SKILL" and (MONK / f"{name}.cs").exists() and template.exists():
+            first = next(iter(swap), None)
+            if first is None:
+                continue
+            want = swap[first] if SOUND_FROM == "노바" else first
+            raw = template.read_bytes().decode("utf-8")
+            m = re.search(r'"Sound":\s*(\d+)', raw)
+            if m and int(m[1]) != want:
+                sounds.append((name, f"Sound {m[1]} → {want}", template))
+                if writing:
+                    template.write_bytes(raw.replace(m[0], f'"Sound": {want}', 1).encode("utf-8"))
+            continue
+        path = PACK599 / ("Skills" if kind == "SKILL" else "Spells") / f"{name}.cs"
+        if path.exists():
+            text = resound(path, swap)
+            if text is not None:
+                sounds.append((name, f"소리 → {SOUND_FROM}", path))
+                if writing:
+                    path.write_text(text, encoding="utf-8-sig")
+    changed += sounds
+
     # 노바 짝이 없는 스크립트(괴물 마법·노바에 없는 마법)에도 옛 목록 바로잡기를 건다.
     done = {path for _, _, path in changed}
     for name, swap in OLD_LIST_FIX.items():
@@ -222,6 +289,21 @@ def main():
                 changed.append((name, f"옛 이펙트 목록 {swap}", path))
                 if writing:
                     path.write_text(out, encoding="utf-8-sig")
+
+    for name, (after, who, number, speed) in OLD_LIST_ADD.items():
+        for path in sorted(PACK599.glob(f"*/{name}.cs")):
+            text = path.read_text(encoding="utf-8-sig")
+            if any(LINE.match(ln) for ln in text.split("\n")):
+                continue
+            lines = text.split("\n")
+            at = next((i for i, ln in enumerate(lines) if after in ln), None)
+            if at is None:
+                continue
+            pad = lines[at][:len(lines[at]) - len(lines[at].lstrip())]
+            lines.insert(at + 1, f'{pad}p.Call("effect", {who}, (V)0L, (V){number}L, (V){speed}L);  // 옛 이펙트 목록(5.99 에 없던 줄)')
+            changed.append((name, f"이펙트 줄 더함 {number}", path))
+            if writing:
+                path.write_text("\n".join(lines), encoding="utf-8-sig")
 
     # 무도가 템플릿(TargetAnimation)에도 — 노바 짝이 없어 위에서 안 거친 것(무영신공).
     for name in OLD_LIST_FIX:
