@@ -1,15 +1,14 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git status --ignore-submodules=all:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(dotnet test mobile/tests/Lod.Mobile.Core.Tests/Lod.Mobile.Core.Tests.csproj:*)",
+      "Bash(dotnet test tests/hades-characterization/Hades.Characterization.Tests.csproj:*)"
+    ]
+  },
   "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python \"$CLAUDE_PROJECT_DIR/tools/hooks/print_next_action.py\""
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
