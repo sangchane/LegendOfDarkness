@@ -213,6 +213,8 @@ build() {
 
     sed -i '' "s|^application/app_store_team_id=.*|application/app_store_team_id=\"$id\"|" "$PRESETS"
     mkdir -p "$CLIENT/build/ios"
+    # 새 그림(생성기가 막 뽑은 efct###.png 등)을 먼저 들인다 — .import 없이 내보내면 앱에서 빠진다(2026-09-30).
+    "$GODOT" --headless --path "$CLIENT" --import >/dev/null 2>&1 || true
     "$GODOT" --headless --path "$CLIENT" --export-debug "iOS" "$IPA"
 
     # EXPORT SUCCEEDED 를 믿지 않는다 — C# 이 빠진 채로도 성공으로 끝난다(docs/mobile-client.md).
