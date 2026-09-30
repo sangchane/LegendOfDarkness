@@ -1,0 +1,87 @@
+# 인게임 UI 다시 만들기 — 작업지침 (2026-09-30)
+
+등급 M · 스킬 `ui`(+ Godot 화면 촬영) · ponytail. 새 세션은 이 문서와 `NEXT.md` 블록부터 읽는다.
+
+## 사용자 의도 (원문 요지)
+- 오전에 로그인·캐릭터 생성 두 화면은 **규칙을 세워** 다시 만들었다. **인게임 창은 의도한 방식이 아니다.**
+- 방식: **원작 UI 의 느낌은 살리되**, 로고·인물 같은 **정체성 그림은 필요한 것만 누끼**를 따서 쓰고,
+  **배치·조작은 다른 모바일 게임을 레퍼런스**로 삼는다.
+- **원작 타일(돌 무늬)을 그대로 입힌 버튼은 가독성이 떨어져 지양**한다 — **로그인 버튼의 돌 타일도 마음에 안 든다**(2026-09-30).
+- 순서: ① 오늘 만든 두 화면의 방식을 분석해 규칙으로 → ② **데이터(원작 에셋·치수·색·창 목록)부터 정리** →
+  ③ 현재 에셋을 최대한 오리지널 느낌이 나게 고쳐 인게임 창에 적용.
+
+## 1. 오늘 두 화면에서 뽑은 규칙 (로그인 `LoginScreen.cs` · 생성 `CreateScreen.cs`)
+근거: `plans/mobile-ui-rebuild.md`(오늘 작업 기록), `mobile/client/assets/ui/README.md`.
+
+| # | 규칙 | 두 화면에서 한 것 |
+|---|---|---|
+| R1 | **정체성 그림만 원작에서, 누끼로** | 타이틀(`title-cutout.png`) · 생성 마법사(`create-wizard-cutout.png`) · 원형 문양(`create-circle-cutout.png`) — 실제 알파 PNG, 원본은 `docs/ui/original-451/` 에 둔다 |
+| R2 | **글자·입력·선택은 단색 바탕 + 글자 + 선택 테두리/밑줄** | 생성창의 제목 돌 띠·성별/직업 선택 타일을 없앰. 탭은 밑줄, 선택은 테두리 |
+| R3 | **돌 무늬는 외곽 테두리 정도만** | 로그인·생성은 바깥 돌 테두리만 남기고 안쪽은 단색. 무늬 위에 글자를 얹지 않는다 |
+| R4 | **확정 버튼 = 단색 채움(활성) / 어두운 바탕(비활성)** | 생성 [만들기]. **로그인 버튼은 아직 돌 타일(`Greybox.Commit`) — 고칠 대상** |
+| R5 | **배치는 모바일 게임 관례** | 가로: 입력 세로 3줄·캐릭터 아래 성별·오른쪽 외형 탭·**확정 오른쪽 아래, 취소 왼쪽 아래**. 참고: 검은사막 모바일·라그나로크 오리진(외부 아트는 복사하지 않는다) |
+| R6 | **터치 48dp · 본문 16 · 간격 8**, 논리 좌표 1dp | 모든 탭·버튼 48 이상 |
+| R7 | **자동 연출보다 손 조작** | 미리보기 자동 회전을 없애고 좌우 48dp 화살표 |
+| R8 | **회전·키보드에도 상태 보존** | 입력·선택·방향 유지, 첫/끝 입력칸 키보드 자리 확인 |
+| R9 | **원작 그림은 늘리지 않는다** | AtlasTexture 로 투명 여백·희미한 외곽을 잘라 선명하게, 프레임 확장으로 최소 크기 보존 |
+
+기존 규칙 중 그대로 가는 것(`docs/original-ui-451.md`): 색조 회색–흙빛 한 갈래 · 체력·마력 강조색은 구슬에서 ·
+숫자는 고정폭 · 속/칸/테두리 어두운 단색 · 목록·격자·입력칸엔 돌 금지.
+**바뀌는 것:** 원작 규칙표의 「밝은 돌 → 확정 단추·공격 버튼·고른 탭」은 **폐기**한다(R2·R4). 돌은 테두리(R3)에만.
+
+## 2. 지금 인게임에서 규칙과 어긋나는 곳 (2026-09-30 코드 기준)
+- **돌 타일 확정 버튼 `Greybox.Commit`**: `LoginScreen` · `TalkPanel`(상점 확정) · `ChatPanel` · `BotGearPanel` · `PartyColumn` · `ExitChoice`
+- **돌 타일 탭 `Greybox.Tab`**: `WindowFrame`(모든 창의 탭) · `ChatPanel`
+- **둥근 돌 단추 `Greybox.Disc`**: `AbilityBar` · `GameScreen`(공격·기술 부채꼴)
+- 창 틀 `WindowFrame` 의 제목 띠·테두리가 돌 — 테두리만 남길지 창마다 판단(R3)
+- 창 목록(`GameWindow`): 가방 `PackPanel` · 대화/상점 `TalkPanel` · 월드맵 `FieldPanel` · 탭 지도 `TabMapPanel` ·
+  설정 `SettingsPanel` · 봇 장비 `BotGearPanel` · 채팅 `ChatPanel` · 그 밖에 위 판(`GameScreen` 상태줄·`StatusRow`) ·
+  파티 `PartyColumn` · 기술 `AbilityBar` · 물약 `PotionChip` · 종료 `ExitChoice` · 혼수 `ComaButton`
+- 모든 버튼 스타일은 `mobile/client/src/Greybox.cs` 한 곳에서 나온다 → **거기부터 고치면 창 전체가 따라온다.**
+
+## 3. 데이터부터 정리 (다음 세션 첫 단계)
+산출물: **`data/original-ui/451.json` 에 `인게임` 절을 더하고** `python3 scripts/build-ui-vault.py` 로 볼트(`data/ui-vault/`)를 다시 만든다.
+새 파일을 따로 만들지 않는다 — 단일 출처가 거기다.
+
+창마다 한 줄씩(아래는 출발점 — 칸은 **그림을 실제로 열어 보고** 채운다):
+
+| 창(코드) | 원작 4.51 그림(`docs/ui/original-451/`) | 누끼 후보(정체성) | 단색으로 갈 것 | 모바일 레퍼런스 |
+|---|---|---|---|---|
+| 위 판·체력/마력 | `stat001` · `statcon` · `orb001/002` · `portrait` | 구슬(색·광택만) · 초상 틀? | 막대·숫자 | (조사) |
+| 가방 `PackPanel` | `Item001` · `item002~007` | 없음(아이템 그림은 이미 원작) | 칸·수량 | (조사) |
+| 장비 `GearGrid`/`BotGear` | `equip01~06` · 시안 `slot0~13` | 빈 자리 실루엣 14개 · 인형(`doll`) | 칸 | |
+| 기술·마법 `AbilityBar` | `skill001` · `spell001` · `spelled` | 없음(아이콘은 원작) | 둥근 돌 → 단색 원 | |
+| 대화·상점 `TalkPanel` | `msgtop/mid/bot` · `mertop/mid/bot` | 상인 초상? | 목록·수량·확정 | |
+| 채팅 `ChatPanel`/기록 | `sysmsg` · `msgsm` | 없음 | 전부 | |
+| 월드맵 `FieldPanel` | `lodmap` · 시안 `world.png` | 지도 바탕 | 카드 | |
+| 설정 `SettingsPanel` | `option01~04` · `setup01~06` | 없음 | 전부 | |
+| 파티 `PartyColumn` | `users01~04` · `tmuser` | 문장(`nation`)? | 줄 | |
+| 종료 `ExitChoice` | `menuok` · `menucncl` | 없음 | 버튼 | |
+| 연출 | `levelup` · `legend*` · `clock01` | 레벨업 글자 등 | — | |
+
+한눈에: `docs/ui/assets/original-451-contact-sheet.png`. 누끼 후보는 「없으면 그 창이 원작처럼 안 보이는 그림」만.
+버튼·틀·타일 조각은 후보가 아니다(지양). 모바일 레퍼런스는 창마다 1~2개, 링크와 무엇을 따라 할지 한 줄. 외부 아트는 복사하지 않는다.
+
+같이 정리할 것:
+- **현재 화면 기준 사진**: 창마다 세로 360×780·가로 852×393 한 장씩 → `shots/ingame-before/`(무시 목록).
+  찍는 법은 `plans/mobile-ui-rebuild.md` 「재현」의 `scripts/godot.sh -- --screen game …` 과 `--shop-preview` 류 옵션.
+- **색·치수 토큰**: `Greybox.cs` 의 현재 값 ↔ 원작 규칙표 값 대조(바꿀 것만).
+
+## 4. 고치는 순서 (데이터 정리 뒤)
+1. **`Greybox` 버튼 계열**: `Commit` → 단색 채움/비활성 어두운 바탕(생성 [만들기]와 같게) · `Tab` → 밑줄 · `Disc` → 단색 원.
+   **로그인 버튼이 여기서 같이 바뀐다** — 로그인 화면의 나머지(확정 상태)는 건드리지 않는다.
+2. `WindowFrame`: 제목 띠 돌 제거 여부를 한 창에서 먼저 보여 주고 사용자 확인 → 전 창.
+3. 창별로 누끼 에셋 적용(데이터 표의 후보만) → 배치를 모바일 관례로(R5).
+4. 한 단계 끝날 때마다 **결과 화면 한 장**으로 보고(설명 대신 스크린샷).
+
+## 5. 검증 (단계마다)
+- `.tools/dotnet-9.0.317/dotnet build mobile/client/LodClient.csproj --no-restore` 경고·오류 0
+- 모바일 알맹이 시험 `dotnet test mobile/tests/Lod.Mobile.Core.Tests`
+- 7개 크기 배치 검사(`--resize-sequence --layout`, `GREYBOX_LAYOUT_OK`) · 폰 2종·태블릿·가로 사진
+- 상점은 `--shop-preview --shop-check`(구매·판매 컨트롤 체크)
+- 기기 설치는 `scripts/ios-build.sh install` — 새 그림은 빌드가 먼저 들인다(2026-09-30 고침)
+
+## 하지 않는 것
+- 서버·프로토콜 변경 · 창 **기능** 변경(상점 수량·필터 등 오늘 만든 동작은 그대로)
+- 원작 그림을 늘려 배경으로 깔기 · 돌 무늬 위 글자 · 외부 게임 아트 복사
+- 보이는 브라우저·창 띄우기(헤드리스·파일로만) · 번호로 보고하기(이름·생김새·그림으로)
