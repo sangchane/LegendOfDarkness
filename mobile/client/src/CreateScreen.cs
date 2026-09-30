@@ -291,17 +291,7 @@ public sealed partial class CreateScreen : Control
         _status.AddThemeColorOverride("font_color", Greybox.Muted);
 
         _create = new Button { Text = "만들기", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        StyleButton(_create);
-        foreach (string state in new[] { "normal", "hover", "focus", "pressed" })
-        {
-            StyleBoxFlat primary = Greybox.Sheet();
-            primary.BgColor = state == "pressed" ? Greybox.Muted : Greybox.Title;
-            primary.SetCornerRadiusAll(8);
-            primary.SetContentMarginAll(4);
-            _create.AddThemeStyleboxOverride(state, primary);
-        }
-        foreach (string state in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color" })
-            _create.AddThemeColorOverride(state, Greybox.Engrave);
+        Greybox.Commit(_create);
 
         _back = new Button { Text = "취소", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
         StyleButton(_back);

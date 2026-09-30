@@ -1,12 +1,12 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-09-30] 인게임 UI 다시 만들기 — 등급 M · ui + ponytail · 단계: 버튼 계열 끝 → 제목 띠 시안.**
+- **[현재/2026-09-30] 인게임 UI 다시 만들기 — 등급 M · ui + ponytail · 단계: 버튼 계열 고침(회색 금지) · 화면 사진 확인 남음.**
   사용자 결정: 장비창·체력마력 구슬·로딩창은 원작 그림 통째로 비율 지켜 줄여 쓴다. 장비창 자르기는 쇠고리·위 이름 줄만(확정, 안 `shots/ingame-before/equip-crop-proposal.png`). Next Lev·사람 단추(그룹 받기, 서버 0x2F — 모바일 미전송)는 남김. 책 단추 기능 보류 → backlog.
   작업지침 `docs/mobile-ingame-ui-work-order.md`(규칙 R1~R9). 창 자료 `data/original-ui/451.json` 「인게임」 → `data/ui-vault/인게임/`.
-  한 것: 바꾸기 전 화면 11장 `shots/ingame-before/01~11` · `Greybox.Commit` 단색 채움(로그인·상점·보내기·수락·벗기기·게임 종료) · `Greybox.Tab` 밑줄(모든 창 탭·기록 탭), 탭은 이미 48 — 화면 `shots/ingame-after/`.
-  **다음**: ③ 제목 띠(`Greybox.Header`·`TitleStrip` 돌)를 창 하나에 단색+용문양으로 시안 → 사용자 확인 → 창별 적용 ④ 장비창 원작 그림 자르기 적용.
-  Godot 는 `scripts/godot.sh --audio-driver Dummy -- …` 로 소리 없이 켠다(사용자). 로그인 화면 사진은 `--server 127.0.0.1:1`(자동 로그인 막기).
+  한 것: 바꾸기 전 화면 11장 `shots/ingame-before/01~11` · **사용자: 회색 단추 금지, 로그인·생성창 방식(어두운 판+밝은 글자, 탭은 판 유지+밑줄), 원작 에셋은 누끼나 통째 축소로만** → `Greybox.Commit`·`Tab`·생성 [만들기] 그렇게 · 설정·봇 장비 창 속 불투명 · 설정 계정 탭 뺌. 헤드리스 `--layout` 통과, **창 띄운 사진은 아직**(사용자가 딴 일 중 — Godot 창이 앞으로 튀어나와 방해).
+  **다음**: ⓪ 사용자에게 알리고 사진 몰아 찍기(설정·가방·상점·게임 종료·로그인·생성) → 확인 ③ 제목 띠(`Greybox.Header`·`TitleStrip` 돌)를 창 하나에 단색+용문양으로 시안 → 사용자 확인 → 창별 적용 ④ 장비창 원작 그림 자르기 적용.
+  Godot 는 `scripts/godot.sh --audio-driver Dummy -- …` 로 소리 없이 켜고, 검사는 `--headless`(창이 앞으로 나와 사용자 화면을 뺏는다). 로그인 화면 사진은 `--server 127.0.0.1:1`(자동 로그인 막기).
 
 - **[끝/2026-09-30] 이펙트 번호 옛 목록으로 바로잡기 — 등급 M · 적용 끝(로컬 커밋, 클라우드 게임 서버·앱 미반영).**
   까닭: 9/26 노바 이펙트 일괄 교체 뒤 이펙트가 달라짐(사용자). 목록 `data/이펙트번호-옛목록.tsv` · 비교 그림 `shots/effects/old-list-compare.png`.

@@ -427,7 +427,7 @@ public partial class Main : Control
     /// <summary>Whether to open the settings window on its own, as <c>--settings</c>. Same purpose as --pack.</summary>
     public static bool OpeningSettings { get; private set; }
 
-    /// <summary><c>--settings-tab 자동|봇|계정</c>: which tab the settings window opens on. For photographs.</summary>
+    /// <summary><c>--settings-tab 자동|봇</c>: which tab the settings window opens on. For photographs.</summary>
     public static string SettingsTab { get; private set; } = string.Empty;
 
     /// <summary><c>--minimap-zoom N</c>: 자리를 잡은 뒤 미니맵의 [+](N>0) 또는 [−](N<0) 를 |N| 번 실제로 누른다 — 사진·배선 확인용(기기에 남는다).</summary>
@@ -442,7 +442,7 @@ public partial class Main : Control
     /// <summary><c>--pack-pick N</c>: once the pack is open, taps its N-th picture (1-based) so the action row beside it can be photographed.</summary>
     public static int PackPick { get; private set; }
 
-    /// <summary><c>--exit-menu</c>: opens settings on its 계정 tab and presses [종료] once the screen settles, to photograph the choice.</summary>
+    /// <summary><c>--exit-menu</c>: opens settings and presses [로그아웃] on its title row once the screen settles, to photograph the choice.</summary>
     public static bool OpeningExit { get; private set; }
 
     /// <summary>Whether to hold the health-potion button on its own, as <c>--pick-potion</c>, to see the row it opens.</summary>

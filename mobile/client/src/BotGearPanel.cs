@@ -85,7 +85,12 @@ public sealed partial class BotGearPanel : PanelContainer
         }
 
         margin.AddChild(inside);
-        AddChild(margin);
+
+        // 돌 테두리(Stone)는 속을 안 그린다 — 지도 위에서 글자가 비쳐 안 읽혔다(사용자, 2026-09-30). 상점·기록 창처럼 불투명 판을 한 겹.
+        PanelContainer within = new();
+        within.AddThemeStyleboxOverride("panel", Greybox.Sheet());
+        within.AddChild(margin);
+        AddChild(within);
     }
 
     public Button Close { get; }

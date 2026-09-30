@@ -17,7 +17,6 @@ public enum GlyphKind
     TakeOff,
     Auto,
     Bot,
-    Account,
     Zoom,
     Stop,
     Town,
@@ -135,11 +134,6 @@ public sealed partial class Glyph : Control
             case GlyphKind.Bot:
                 DrawRect(new Rect2(P(0.42f, 0.14f), new Vector2(0.16f * s, 0.72f * s)), c);
                 DrawRect(new Rect2(P(0.2f, 0.34f), new Vector2(0.6f * s, 0.16f * s)), c);
-                break;
-
-            case GlyphKind.Account:
-                DrawArc(P(0.5f, 0.33f), 0.16f * s, 0, Mathf.Tau, 16, c, w, true);
-                DrawArc(P(0.5f, 0.95f), 0.33f * s, Mathf.Pi * 1.08f, Mathf.Pi * 1.92f, 16, c, w, true);
                 break;
 
             case GlyphKind.Zoom:
@@ -265,7 +259,7 @@ public static class WindowFrame
 
         void Tint(bool lit)
         {
-            Color paint = tab && lit ? Greybox.Title : !tab ? Greybox.Text : Greybox.Muted;
+            Color paint = tab && lit ? Greybox.Text : !tab ? Greybox.Text : Greybox.Muted;
             glyph.Paint = paint;
             word.AddThemeColorOverride("font_color", paint);
         }

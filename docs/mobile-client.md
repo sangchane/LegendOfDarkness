@@ -320,7 +320,7 @@ $godot --path mobile/client -- --screen game --size 360x780 --orient portrait `
 | `--tabmap` | (값 없음) | 월드가 자리를 잡으면 위 줄의 **미니맵**을 실제로 눌러(`EmitSignal`) 길 찾기 창을 연다 |
 | `--minimap` | (값 없음) | 2초마다 미니맵 자리와 보이는 점(종류별 수)을 `GREYBOX_MINIMAP` 에 찍는다. 서버 없이 주면 노비스마을 (37,29) 에 선 셈 치고 괴물·파티·봇 점을 지어 그린다(사진용) |
 | `--settings` | (값 없음) | 설정 창을 연 채로 시작한다 |
-| `--settings-tab` | `자동`·`봇`·`계정` | 설정 창을 그 탭으로 연다(`--settings` 를 따로 안 줘도 연다) |
+| `--settings-tab` | `자동`·`봇` | 설정 창을 그 탭으로 연다(`--settings` 를 따로 안 줘도 연다) |
 | `--pack-pick` | N | 소지품이 열리고 잠시 뒤 N번째(1부터) 칸을 실제로 눌러 그 옆 동작 줄을 띄운다(`GREYBOX_PACK_PICK`) |
 | `--tabmap-go` | 이름 | 창을 열고 2초 뒤 그 이름(출구 간 곳·NPC)이 붙은 점을 창의 탭 경로 그대로 눌러 걷게 한다. `GREYBOX_TABMAP_GO` 가 찍힌다 |
 | `--tabmap-zoom` | (값 없음) | 창을 열고 1초 뒤 [확대] 를 누른다 |

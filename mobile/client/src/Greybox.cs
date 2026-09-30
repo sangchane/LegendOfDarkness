@@ -188,51 +188,52 @@ public static class Greybox
     }
 
     /// <summary>
-    /// The button that commits — 입기, 삽니다, 보내기. One flat fill with dark letters, one per window — the same
-    /// as 생성 [만들기]. Stone under letters is what the vault now forbids (work order R2·R4).
+    /// The button that commits — 입기, 삽니다, 보내기. Same as every button on the login and create screens: opaque
+    /// dark plate, light letters, a thin edge — one per window, told apart by its brighter edge. No grey fill: dark
+    /// letters on grey read poorly, and stone under letters clashes (사용자, 2026-09-30).
     /// </summary>
     public static void Commit(Button button)
     {
-        foreach (string state in new[] { "normal", "hover", "focus", "pressed", "hover_pressed" })
+        foreach (string state in new[] { "normal", "hover", "focus", "pressed", "hover_pressed", "disabled" })
         {
-            StyleBoxFlat fill = new() { BgColor = state is "pressed" or "hover_pressed" ? Muted : Title };
-            fill.SetCornerRadiusAll(Round);
-            fill.SetContentMarginAll(4);
-            button.AddThemeStyleboxOverride(state, fill);
+            StyleBoxFlat plate = Sheet();
+            plate.SetCornerRadiusAll(Round);
+            plate.SetContentMarginAll(4);
+            if (state is not ("pressed" or "hover_pressed" or "disabled")) plate.BorderColor = Title;
+            if (state is "pressed" or "hover_pressed") plate.BgColor = Cell;
+            button.AddThemeStyleboxOverride(state, plate);
         }
-
-        StyleBoxFlat off = Surface();
-        off.SetCornerRadiusAll(Round);
-        button.AddThemeStyleboxOverride("disabled", off);
 
         foreach (string colour in new[] { "font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color" })
         {
-            button.AddThemeColorOverride(colour, Engrave);
+            button.AddThemeColorOverride(colour, Text);
         }
 
         button.AddThemeColorOverride("font_disabled_color", Muted);
     }
 
     /// <summary>
-    /// A tab. The open one gets a bright underline and bright letters; the others are bare and muted. No fill,
-    /// so a row of tabs never reads as a row of buttons (work order R2).
+    /// A tab, as on the create screen: every tab keeps the dark plate; the open one gets a thick bright underline
+    /// and bright letters, the others a thin rule and muted letters.
     /// </summary>
     public static void Tab(Button button)
     {
-        StyleBoxFlat quiet = new() { BgColor = new Color(0, 0, 0, 0) };
+        foreach (string state in new[] { "normal", "hover", "focus", "pressed", "hover_pressed" })
+        {
+            bool chosen = state is "pressed" or "hover_pressed";
+            StyleBoxFlat plate = Sheet();
+            plate.SetBorderWidthAll(0);
+            plate.BorderWidthBottom = chosen ? 3 : 1;
+            if (chosen) plate.BorderColor = Title;
+            plate.SetContentMarginAll(4);
+            button.AddThemeStyleboxOverride(state, plate);
+        }
 
-        StyleBoxFlat chosen = new() { BgColor = new Color(0, 0, 0, 0), BorderColor = Title, BorderWidthBottom = 2 };
-
-        button.AddThemeStyleboxOverride("normal", quiet);
-        button.AddThemeStyleboxOverride("hover", quiet);
-        button.AddThemeStyleboxOverride("focus", quiet);
-        button.AddThemeStyleboxOverride("pressed", chosen);
-        button.AddThemeStyleboxOverride("hover_pressed", chosen);
-        button.AddThemeColorOverride("font_hover_pressed_color", Title);
         button.AddThemeColorOverride("font_color", Muted);
-        button.AddThemeColorOverride("font_hover_color", Text);
-        button.AddThemeColorOverride("font_pressed_color", Title);
+        button.AddThemeColorOverride("font_hover_color", Muted);
         button.AddThemeColorOverride("font_focus_color", Muted);
+        button.AddThemeColorOverride("font_pressed_color", Text);
+        button.AddThemeColorOverride("font_hover_pressed_color", Text);
     }
 
     /// <summary>
