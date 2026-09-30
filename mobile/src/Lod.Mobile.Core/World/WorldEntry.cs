@@ -408,6 +408,6 @@ public enum DialogueKind : byte
 public sealed record DialogueOption(string Text, ushort Step);
 
 /// <summary>One thing on offer. <paramref name="Price" /> is gold in a shop and how many there are in a bank.</summary>
-public sealed record DialogueGoods(int Icon, int Colour, uint Price, string Name);
+public sealed record DialogueGoods(int Icon, int Colour, uint Price, string Name, string Class = "", byte Gender = 255, byte Circle = 0);
 
 public sealed record DialogueAbility(int Icon, string Name);

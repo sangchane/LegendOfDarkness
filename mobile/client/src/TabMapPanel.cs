@@ -366,7 +366,6 @@ public sealed partial class TabMapPanel : PanelContainer
 
             foreach (TabMarker marker in Markers)
             {
-                Vector2 at = At(map, marker.Where);
                 Color paint = Paint(marker.Kind);
 
                 switch (marker.Kind)
@@ -383,15 +382,9 @@ public sealed partial class TabMapPanel : PanelContainer
                         // 나는 이름들 위에 맨 나중에 그린다 — 출구 이름이 화살표를 덮었다.
                         break;
 
-                    case TabMarkerKind.Npc:
-                        DrawCircle(at, dot + 1, Colors.Black);
-                        DrawCircle(at, dot, paint);
-                        DrawArc(at, dot + 3, 0, Mathf.Tau, 16, paint, 1, true);
-                        break;
-
                     default:
-                        DrawCircle(at, dot * 0.8f + 1, Colors.Black);
-                        DrawCircle(at, dot * 0.8f, paint);
+                        // Every marked coordinate gets the same one-tile diamond; kind is shown by colour alone.
+                        Diamond(map, marker.Where, paint);
                         break;
                 }
             }
@@ -405,7 +398,7 @@ public sealed partial class TabMapPanel : PanelContainer
                 int fontSize = marker.Kind == TabMarkerKind.Exit ? 13 : 12;
                 Vector2 size = font.GetStringSize(marker.Label, HorizontalAlignment.Left, -1, fontSize);
                 float x = Math.Clamp(at.X - (size.X / 2), 2, Math.Max(2, Size.X - size.X - 2));
-                float y = Math.Clamp(at.Y - dot - 5, size.Y, Size.Y - 2);
+                float y = Math.Clamp(at.Y - map.HalfHeight - 5, size.Y, Size.Y - 2);
                 Vector2 where = new(x, y);
                 Rect2 box = new(new Vector2(x - 2, y - size.Y + 2), size + new Vector2(4, 0));
 
@@ -433,7 +426,7 @@ public sealed partial class TabMapPanel : PanelContainer
         private void Diamond(TabMapProjection map, Tile tile, Color paint)
         {
             Vector2 at = At(map, tile);
-            float w = Math.Max(map.HalfWidth, 3), h = Math.Max(map.HalfHeight, 3);
+            float w = map.HalfWidth, h = map.HalfHeight;
             DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
         }
 

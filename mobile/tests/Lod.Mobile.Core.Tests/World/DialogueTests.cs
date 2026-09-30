@@ -54,12 +54,12 @@ public sealed class DialogueTests
         [
             0x00, 0x04,             // 답할 번호
             0x00, 0x02,             // 두 가지
-            0x80, 0x57, 0x00, 0x00, 0x00, 0x05, 0xDC, .. StringA("에페"), .. StringA("Warrior"),
-            0x80, 0x01, 0x03, 0x00, 0x01, 0x86, 0xA0, .. StringA("도복"), .. StringA("Monk")
+            0x80, 0x57, 0x00, 0x00, 0x00, 0x05, 0xDC, .. StringA("에페"), .. StringA("Warrior"), 0x01, 0x00,
+            0x80, 0x01, 0x03, 0x00, 0x01, 0x86, 0xA0, .. StringA("도복"), .. StringA("Monk"), 0x02, 0x01
         ]));
 
         Assert.Equal((DialogueKind.Goods, (ushort)4), (talk.Kind, talk.Step));
-        Assert.Equal([new DialogueGoods(0x8057, 0, 1500, "에페"), new DialogueGoods(0x8001, 3, 100000, "도복")], talk.Goods);
+        Assert.Equal([new DialogueGoods(0x8057, 0, 1500, "에페", "Warrior", 1, 0), new DialogueGoods(0x8001, 3, 100000, "도복", "Monk", 2, 1)], talk.Goods);
     }
 
     /// <summary>

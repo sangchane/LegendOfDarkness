@@ -70,6 +70,8 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>동료 봇을 불러 달라·보내 달라(우리 확장 0xF1 — <see cref="Companion" />).</summary>
     private const byte CompanionCommand = 0xF1;
+    /// <summary>상점 일괄 거래(우리 확장 0xF2).</summary>
+    private const byte BulkTradeCommand = 0xF2;
 
     /// <summary>동료 사이(우리 확장 0x5E) — 봇에게는 주인, 사람에게는 동료.</summary>
     private const byte CompanionTieCommand = 0x5E;
@@ -1107,6 +1109,56 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
         Send(CompanionCommand, World.Companion.Dismiss(), cancellationToken);
 
+    /// <summary>상점에서 여러 품목을 한 번에 사고 판다.</summary>
+    public Task BulkTradeAsync(uint merchant, bool selling, IReadOnlyList<(string Name, int Slot, int Quantity)> lines, CancellationToken cancellationToken)
+    {
+        return Send(BulkTradeCommand, EncodeBulkTrade(selling, merchant, lines), cancellationToken);
+    }
+
+    private static byte[] EncodeBulkTrade(bool selling, uint merchant, IReadOnlyList<(string Name, int Slot, int Quantity)> lines)
+    {
+        IReadOnlyList<(string Name, int Slot, int Quantity)> selected = lines.Take(128).ToArray();
+        List<byte> body = EncodeTradeHeader(selling, merchant, selected.Count);
+        foreach (var line in selected)
+        {
+            body.AddRange(EncodeTradeLine(selling, line));
+        }
+
+        return body.ToArray();
+    }
+
+    private static List<byte> EncodeTradeHeader(bool selling, uint merchant, int count) =>
+        [selling ? (byte)2 : (byte)1,
+         (byte)(merchant >> 24), (byte)(merchant >> 16), (byte)(merchant >> 8), (byte)merchant,
+         (byte)(count >> 8), (byte)count];
+
+    private static IEnumerable<byte> EncodeTradeLine(bool selling, (string Name, int Slot, int Quantity) line)
+    {
+        if (!selling)
+        {
+            foreach (byte part in LegacyKoreanEncoding.EncodeStringA(line.Name))
+            {
+                yield return part;
+            }
+        }
+        else
+        {
+            yield return (byte)line.Slot;
+        }
+
+        yield return (byte)(line.Quantity >> 8);
+        yield return (byte)line.Quantity;
+    }
+
+    /// <summary>상점 구매/판매 첫 메뉴로 돌아간다(0xF2 kind 3).</summary>
+    public Task ShopMenuAsync(uint merchant, CancellationToken cancellationToken)
+    {
+        byte[] body = [3,
+            (byte)(merchant >> 24), (byte)(merchant >> 16), (byte)(merchant >> 8), (byte)merchant,
+            0, 0];
+        return Send(BulkTradeCommand, body, cancellationToken);
+    }
+
     /// <summary>Asks for our own profile, which is where the server lists the group.</summary>
     public Task AskProfileAsync(CancellationToken cancellationToken) =>
         Send(ProfileRequestCommand, [], cancellationToken);
@@ -2055,10 +2107,12 @@ public sealed class WorldClient(WorldSession session) : IDisposable
                         Icon: Word(data, ref at),
                         Colour: Byte(data, ref at),
                         Price: Long(data, ref at),
-                        Name: Words(data, ref at)));
+                        Name: Words(data, ref at),
+                        Class: Words(data, ref at),
+                        Gender: at < data.Length ? Byte(data, ref at) : (byte)255,
+                        Circle: at < data.Length ? Byte(data, ref at) : (byte)0));
 
-                    // 직업 이름 — 원작 창은 쓰지 않는다.
-                    Words(data, ref at);
+                    // 상점 패킷의 직업 문자열은 이제 모바일 필터에 사용한다.
                 }
 
                 return talk with { Step = step, Goods = goods };
