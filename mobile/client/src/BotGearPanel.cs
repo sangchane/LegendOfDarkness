@@ -12,7 +12,7 @@ namespace LodClient;
 /// </summary>
 /// <remarks>
 /// 봇이 입을 수 있는지(레벨·직업·성별)는 서버만 안다 — 여기선 내구가 있는 것을 다 보이고, 안 맞으면 서버 알림으로 까닭을 듣는다
-/// (<see cref="BotKit" />). 원작 4.51 규칙(docs/original-ui-451.md): 돌 틀·평평한 어두운 속, 확정 단추 하나만 밝은 돌.
+/// (<see cref="BotKit" />). 원작 4.51 규칙(docs/original-ui-451.md): 돌 틀·평평한 어두운 속, 확정 단추 하나만 단색 채움(Greybox.Commit).
 /// </remarks>
 public sealed partial class BotGearPanel : PanelContainer
 {

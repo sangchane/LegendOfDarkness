@@ -220,7 +220,7 @@ public static class WindowFrame
     }
 
     /// <summary>
-    /// A small icon button with its word under it. A tab when <paramref name="tab" /> (the open one is filled and lit);
+    /// A small icon button with its word under it. A tab when <paramref name="tab" /> (the open one is underlined and lit);
     /// otherwise an action with a thin edge, so it still reads as a button over the dark inside.
     /// </summary>
     public static Button IconButton(GlyphKind kind, string label, bool tab = false, int width = 0)
@@ -265,7 +265,7 @@ public static class WindowFrame
 
         void Tint(bool lit)
         {
-            Color paint = tab && lit ? Greybox.Engrave : !tab ? Greybox.Text : Greybox.Muted;
+            Color paint = tab && lit ? Greybox.Title : !tab ? Greybox.Text : Greybox.Muted;
             glyph.Paint = paint;
             word.AddThemeColorOverride("font_color", paint);
         }

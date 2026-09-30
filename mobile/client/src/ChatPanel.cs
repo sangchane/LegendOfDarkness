@@ -161,7 +161,7 @@ public sealed partial class ChatPanel : PanelContainer
             CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
         };
 
-        // 고른 탭만 밝은 돌에 음각 — 글자를 읽지 않고도 어느 쪽이 열려 있는지 보인다.
+        // 고른 탭만 밝은 밑줄과 밝은 글자 — 글자를 읽지 않고도 어느 쪽이 열려 있는지 보인다.
         Greybox.Tab(tab);
 
         return tab;
