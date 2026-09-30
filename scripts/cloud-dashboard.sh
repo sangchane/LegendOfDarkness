@@ -2,7 +2,7 @@
 # 기술·마법 운영 대시보드를 클라우드에 올린다. 게임 서버는 재시작하지 않는다.
 #
 #   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh setup
-#   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh deploy|status|logs|credentials|cert
+#   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -86,6 +86,23 @@ sudo tee /etc/systemd/system/lod.service.d/ability-operations.conf >/dev/null <<
 Environment=LOD_ABILITY_OVERRIDES=$REMOTE/data/ability-presentation-overrides.json
 UNIT
 
+
+sudo iptables -C INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || sudo iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT
+sudo netfilter-persistent save >/dev/null
+sudo systemctl daemon-reload
+sudo systemctl enable --now lod-ability-ops nginx >/dev/null
+sudo systemctl restart nginx
+SH
+    nginx_site
+    save_credentials
+    echo "대시보드 준비 완료 — https://$IP/?view=abilities"
+}
+
+# nginx 는 HTTPS 만 맡고 모든 요청을 운영 서비스로 넘긴다. 로그인은 서비스가 페이지 안에서 받는다(쿠키) —
+# 브라우저 Basic 팝업을 쓰지 않는다(사용자 2026-09-30). setup·deploy 둘 다 부른다.
+nginx_site() {
+    remote "bash -s" <<'SH'
+set -euo pipefail
 sudo tee /etc/nginx/sites-available/lod-ops >/dev/null <<'NGINX'
 server {
     listen 443 ssl;
@@ -95,48 +112,43 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy no-referrer always;
+    client_max_body_size 300k;
 
-    auth_basic "LOD operations";
-    auth_basic_user_file /etc/nginx/lod-ops.htpasswd;
-
-    root /home/ubuntu/lod-ops/www;
-    index index.html;
-
-    location /api/ {
-        proxy_pass http://127.0.0.1:8787;
-        proxy_http_version 1.1;
-        proxy_set_header Authorization $http_authorization;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto https;
-    }
+    proxy_http_version 1.1;
+    proxy_set_header Authorization $http_authorization;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Proto https;
 
     # 주소만 쳐도 기술·마법 화면으로(사용자 2026-09-27 "?view=abilities 붙여야 해?").
     location = / {
         if ($arg_view = "") { return 302 /?view=abilities; }
-        try_files /index.html =404;
+        proxy_pass http://127.0.0.1:8787;
     }
 
     location / {
-        try_files $uri $uri/ /index.html;
+        proxy_pass http://127.0.0.1:8787;
     }
 }
 NGINX
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo ln -sfn /etc/nginx/sites-available/lod-ops /etc/nginx/sites-enabled/lod-ops
-sudo nginx -t
-
-sudo iptables -C INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || sudo iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT
-sudo netfilter-persistent save >/dev/null
-sudo systemctl daemon-reload
-sudo systemctl enable --now lod-ability-ops nginx >/dev/null
-sudo systemctl restart nginx
+sudo nginx -t 2>&1 | tail -1
 SH
-    save_credentials
-    echo "대시보드 준비 완료 — https://$IP/?view=abilities"
+}
+
+# 페이지에서 바꾼 값(연출·아이템 이름·바꾼 기록 changes.jsonl)을 맥으로 받는다. 비밀번호 파일은 빼고.
+backup() {
+    local out="$BACKUP_DIR/ops-data-$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$out"
+    rsync -az --timeout=60 --exclude credential -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
+    echo "관리 페이지 값 백업 — $out"
+    ls -la "$out"
 }
 
 deploy() {
     upload
+    nginx_site
     remote "sudo systemctl restart lod-ability-ops && sudo systemctl reload nginx"
     echo "대시보드 갱신 완료 — https://$DOMAIN"
 }
@@ -191,10 +203,11 @@ save_credentials() {
 case "${1:-status}" in
     setup) setup ;;
     deploy) deploy ;;
+    backup) backup ;;
     status) remote "systemctl is-active lod-ability-ops nginx; ss -ltn | grep -E ':(443|8787) '" ;;
     logs) remote "journalctl -u lod-ability-ops -n ${2:-50} --no-pager" ;;
     credentials) save_credentials ;;
     cert) cert ;;
     password) set_password "${2:-}" ;;
-    *) echo "쓸 수 있는 것: setup deploy status logs credentials cert password"; exit 2 ;;
+    *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password"; exit 2 ;;
 esac

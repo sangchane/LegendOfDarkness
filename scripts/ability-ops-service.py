@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """인증된 기술·마법 연출 운영 API와 로컬 미리보기 정적 서버.
 
-클라우드에서는 nginx가 HTTPS·Basic 인증·정적 파일을 맡고 이 프로세스의 `/api`만
-127.0.0.1로 프록시한다. 프로세스도 같은 인증을 다시 확인한다.
+클라우드에서는 nginx가 HTTPS만 맡고 모든 요청을 127.0.0.1의 이 프로세스로 넘긴다.
+로그인은 여기서 본다 — 페이지 안 로그인 화면 → 서명 쿠키(브라우저 Basic 팝업 없음, 사용자 2026-09-30).
+스크립트용 Basic 헤더도 받는다. 페이지에서 바꾼 값은 모두 data 폴더에 두고 changes.jsonl 에 쌓는다.
+명세: plans/ops-login-and-backup.md
 """
 import argparse
 import base64
@@ -13,6 +15,7 @@ import mimetypes
 import os
 import tempfile
 import threading
+import time
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -27,11 +30,69 @@ class RevisionConflict(RuntimeError):
     pass
 
 
+def atomic_write(path: Path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handle, temporary = tempfile.mkstemp(prefix="." + path.stem + "-", dir=path.parent)
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8") as stream:
+            json.dump(data, stream, ensure_ascii=False, indent=2)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def log_change(log: Path, kind, key, value):
+    """바꾼 값을 한 줄씩 쌓는다 — 백업·되돌리기용. 지우지 않는다."""
+    line = json.dumps({"at": datetime.now(timezone.utc).isoformat(), "kind": kind, "key": key,
+                       "value": value}, ensure_ascii=False)
+    with open(log, "a", encoding="utf-8") as stream:
+        stream.write(line + "\n")
+
+
+class StateStore:
+    """페이지에서 바꾸는 나머지 값(지금은 아이템 한글 이름). 이름 하나 = 파일 하나. 새 값이 생기면 NAMES 에 더한다."""
+    NAMES = {"item-names"}
+    LIMIT = 256 * 1024
+
+    def __init__(self, folder: Path, log: Path):
+        self.folder = folder
+        self.log = log
+        self.lock = threading.Lock()
+
+    def read(self, name):
+        if name not in self.NAMES:
+            raise InvalidRequest("없는 저장 이름입니다.")
+        path = self.folder / f"{name}.json"
+        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+    def write(self, name, value):
+        if name not in self.NAMES:
+            raise InvalidRequest("없는 저장 이름입니다.")
+        if not isinstance(value, dict) or any(
+                not isinstance(k, str) or isinstance(v, bool) or not isinstance(v, (str, int))
+                for k, v in value.items()):
+            raise InvalidRequest("값은 {글자: 글자|정수} 꼴이어야 합니다.")
+        with self.lock:
+            before = self.read(name)
+            atomic_write(self.folder / f"{name}.json", value)
+            # 기록에는 바뀐 칸만(지운 칸은 null) — 통째로 적으면 입력할 때마다 커진다.
+            changed = {k: value.get(k) for k in set(before) | set(value) if before.get(k) != value.get(k)}
+            if changed:
+                log_change(self.log, "state", name, changed)
+        return value
+
+
 class OverrideStore:
-    def __init__(self, catalog: Path, overrides: Path):
+    def __init__(self, catalog: Path, overrides: Path, log: Path = None):
         source = json.loads(catalog.read_text(encoding="utf-8"))
         self.allowed = {row["운영키"] for row in source["목록"]}
         self.path = overrides
+        self.log = log
         self.lock = threading.Lock()
 
     def read(self):
@@ -90,22 +151,12 @@ class OverrideStore:
             data["revision"] += 1
             data["updatedAt"] = now
             self._write(data)
+            if self.log:
+                log_change(self.log, "ability", key, entry)
             return data
 
     def _write(self, data):
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        handle, temporary = tempfile.mkstemp(prefix=".ability-overrides-", dir=self.path.parent)
-        try:
-            with os.fdopen(handle, "w", encoding="utf-8") as stream:
-                json.dump(data, stream, ensure_ascii=False, indent=2)
-                stream.write("\n")
-                stream.flush()
-                os.fsync(stream.fileno())
-            os.chmod(temporary, 0o600)
-            os.replace(temporary, self.path)
-        finally:
-            if os.path.exists(temporary):
-                os.unlink(temporary)
+        atomic_write(self.path, data)
 
 
 def authorized(header, expected):
@@ -120,6 +171,58 @@ def authorized(header, expected):
         hashlib.sha256(expected.encode()).digest())
 
 
+SESSION_COOKIE = "lod_ops"
+REMEMBER_SECONDS = 30 * 24 * 3600
+SESSION_SECONDS = 12 * 3600
+# 로그인 없이 받는 파일. 나머지 페이지 요청에는 login.html 을 준다.
+PUBLIC_FILES = {"/login.html", "/login.js", "/favicon.svg"}
+
+
+def session_key(credential):
+    return hashlib.sha256(b"lod-ops-session\0" + credential.encode()).digest()
+
+
+def make_session(credential, lifetime, now=None):
+    expiry = str(int((now or time.time()) + lifetime))
+    return expiry + "." + hmac.new(session_key(credential), expiry.encode(), hashlib.sha256).hexdigest()
+
+
+def valid_session(token, credential, now=None):
+    expiry, _, signature = (token or "").partition(".")
+    if not (expiry.isascii() and expiry.isdigit() and len(expiry) < 12) or int(expiry) < (now or time.time()):
+        return False
+    wanted = hmac.new(session_key(credential), expiry.encode(), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(signature, wanted)
+
+
+def cookie_value(header, name):
+    for part in (header or "").split(";"):
+        key, _, value = part.strip().partition("=")
+        if key == name:
+            return value
+    return None
+
+
+class LoginThrottle:
+    """같은 곳에서 10분에 5번 넘게 틀리면 10분 쉰다."""
+    WINDOW, TRIES = 600, 5
+
+    def __init__(self):
+        self.failures = {}
+        self.lock = threading.Lock()
+
+    def blocked(self, who, now=None):
+        now = now or time.time()
+        with self.lock:
+            recent = [t for t in self.failures.get(who, []) if now - t < self.WINDOW]
+            self.failures[who] = recent
+            return len(recent) >= self.TRIES
+
+    def failed(self, who, now=None):
+        with self.lock:
+            self.failures.setdefault(who, []).append(now or time.time())
+
+
 def safe_static_path(root: Path, request_path: str):
     decoded = unquote(urlsplit(request_path).path)
     relative = decoded.lstrip("/") or "index.html"
@@ -132,15 +235,29 @@ def safe_static_path(root: Path, request_path: str):
     return candidate if candidate.is_file() else None
 
 
-def handler_for(root, store, credential):
+def handler_for(root, store, credential, states=None, throttle=None):
+    throttle = throttle or LoginThrottle()
+
     class Handler(BaseHTTPRequestHandler):
         server_version = "LODAbilityOps/1"
 
         def do_GET(self):
-            if not self._authenticate():
-                return
             path = urlsplit(self.path).path
-            if path == "/api/health":
+            if path in PUBLIC_FILES:
+                self._static()
+                return
+            if not self._signed_in():
+                if path.startswith("/api/"):
+                    self._json(401, {"error": "로그인이 필요합니다."})
+                else:
+                    self._login_page()
+                return
+            if path.startswith("/api/state/") and states:
+                try:
+                    self._json(200, states.read(unquote(path[len("/api/state/"):])))
+                except InvalidRequest as error:
+                    self._json(404, {"error": str(error)})
+            elif path == "/api/health":
                 self._json(200, {"ok": True})
             elif path == "/api/ability-overrides":
                 try:
@@ -150,19 +267,55 @@ def handler_for(root, store, credential):
             else:
                 self._static()
 
+        def do_POST(self):
+            path = urlsplit(self.path).path
+            if path == "/api/logout":
+                self._json(200, {"ok": True}, cookie=f"{SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict")
+                return
+            if path != "/api/login":
+                self._json(404, {"error": "없는 API입니다."})
+                return
+            who = self._client()
+            if throttle.blocked(who):
+                self._json(429, {"error": "너무 여러 번 틀렸습니다. 10분 뒤에 다시 해 주세요."})
+                return
+            try:
+                body = self._body(1024)
+            except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+                self._json(400, {"error": str(error)})
+                return
+            user = credential.split(":", 1)[0]
+            supplied = f"{user}:{body.get('password') or ''}"
+            if not hmac.compare_digest(hashlib.sha256(supplied.encode()).digest(),
+                                       hashlib.sha256(credential.encode()).digest()):
+                throttle.failed(who)
+                self._json(401, {"error": "비밀번호가 맞지 않습니다."})
+                return
+            remember = body.get("remember") is True
+            token = make_session(credential, REMEMBER_SECONDS if remember else SESSION_SECONDS)
+            cookie = f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; Secure; SameSite=Strict"
+            if remember:
+                cookie += f"; Max-Age={REMEMBER_SECONDS}"
+            self._json(200, {"ok": True}, cookie=cookie)
+
         def do_PUT(self):
-            if not self._authenticate():
+            if not self._signed_in():
+                self._json(401, {"error": "로그인이 필요합니다."})
                 return
             prefix = "/api/ability-overrides/"
             path = urlsplit(self.path).path
+            if path.startswith("/api/state/") and states:
+                try:
+                    body = self._body(StateStore.LIMIT)
+                    self._json(200, states.write(unquote(path[len("/api/state/"):]), body.get("value")))
+                except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+                    self._json(400, {"error": str(error)})
+                return
             if not path.startswith(prefix):
                 self._json(404, {"error": "없는 API입니다."})
                 return
             try:
-                length = int(self.headers.get("Content-Length", "0"))
-                if length <= 0 or length > 4096:
-                    raise InvalidRequest("요청 크기가 올바르지 않습니다.")
-                body = json.loads(self.rfile.read(length).decode("utf-8"))
+                body = self._body(4096)
                 saved = store.update(unquote(path[len(prefix):]), body.get("values"), body.get("revision"))
                 self._json(200, saved)
             except RevisionConflict as error:
@@ -170,14 +323,49 @@ def handler_for(root, store, credential):
             except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
                 self._json(400, {"error": str(error)})
 
-        def _authenticate(self):
-            if authorized(self.headers.get("Authorization"), credential):
+        def _signed_in(self):
+            # 쿠키(페이지) 또는 Basic 헤더(스크립트). 401 에 WWW-Authenticate 를 붙이지 않는다 — 붙이면 팝업이 뜬다.
+            if valid_session(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), credential):
                 return True
-            self.send_response(401)
-            self.send_header("WWW-Authenticate", 'Basic realm="LOD operations", charset="UTF-8"')
-            self.send_header("Content-Length", "0")
-            self.end_headers()
+            header = self.headers.get("Authorization")
+            if not header:
+                return False
+            # Basic 으로 비밀번호를 맞춰 보는 것도 로그인과 같은 횟수 제한을 받는다.
+            who = self._client()
+            if throttle.blocked(who):
+                return False
+            if authorized(header, credential):
+                return True
+            throttle.failed(who)
             return False
+
+        def _client(self):
+            # nginx 뒤에서는 모든 요청이 127.0.0.1 에서 온다 — 그때만 nginx 가 적은 X-Real-IP 를 믿는다.
+            peer = self.client_address[0]
+            return (self.headers.get("X-Real-IP") or peer) if peer == "127.0.0.1" else peer
+
+        def _body(self, limit):
+            # JSON 만 받는다 — 다른 사이트의 폼 제출(단순 요청)로는 쓸 수 없게.
+            if not (self.headers.get("Content-Type") or "").startswith("application/json"):
+                raise InvalidRequest("JSON 으로 보내야 합니다.")
+            length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > limit:
+                raise InvalidRequest("요청 크기가 올바르지 않습니다.")
+            body = json.loads(self.rfile.read(length).decode("utf-8"))
+            if not isinstance(body, dict):
+                raise InvalidRequest("요청 꼴이 잘못됐습니다.")
+            return body
+
+        def _login_page(self):
+            path = safe_static_path(root, "/login.html")
+            payload = path.read_bytes() if path else "로그인 화면이 없습니다.".encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(payload)))
+            self.send_header("Cache-Control", "no-store")
+            self._security_headers()
+            self.end_headers()
+            self.wfile.write(payload)
 
         def _static(self):
             path = safe_static_path(root, self.path)
@@ -194,9 +382,11 @@ def handler_for(root, store, credential):
             self.end_headers()
             self.wfile.write(payload)
 
-        def _json(self, status, value):
+        def _json(self, status, value, cookie=None):
             payload = json.dumps(value, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
+            if cookie:
+                self.send_header("Set-Cookie", cookie)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(payload)))
             self.send_header("Cache-Control", "no-store")
@@ -230,7 +420,10 @@ def main():
     credential = args.password_file.read_text(encoding="utf-8").strip()
     if ":" not in credential:
         raise SystemExit("password file must contain user:password")
-    server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, OverrideStore(args.catalog, args.overrides), credential))
+    data = args.overrides.parent
+    log = data / "changes.jsonl"
+    stores = (OverrideStore(args.catalog, args.overrides, log), StateStore(data / "state", log))
+    server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1]))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

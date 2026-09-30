@@ -4,7 +4,7 @@
  * (한글·영문·슬롯/레벨/대표수치). 나머지는 카드에 올리면 읽을 게 너무 많아져서,
  * 가리켰을 때만 옆에 띄운다 — 손가락에는 hover 가 없으므로 탭도 같은 자리를 연다.
  *
- * 한글 이름을 고치면 이 브라우저에 남고, [표로 내보내기] 로 받아
+ * 한글 이름을 고치면 이 브라우저와 관리 페이지 서버(`/api/state/item-names`)에 남고, [표로 내보내기] 로 받아
  * `data/아이템-한글이름.tsv` 에 붙여 넣는다. 기술·마법(abilities.js)과 같은 흐름이다.
  */
 (function () {
@@ -37,6 +37,36 @@
   function remember(en, value) {
     if (value) { typed[en] = value; } else { delete typed[en]; }
     try { localStorage.setItem(STORE, JSON.stringify(typed)); } catch (e) { /* 사생활 모드 */ }
+    push();
+  }
+
+  // 관리 페이지(클라우드)에서는 서버에도 둔다 — 기기를 바꿔도 남고 서버가 바뀐 기록을 쌓는다(백업).
+  // 파일로 열었을 때(file://)는 서버가 없으니 이 브라우저에만 남는다.
+  var SERVER = "/api/state/item-names";
+  var serverReady = false;
+  var pushTimer = null;
+  function push() {
+    if (!serverReady) { return; }
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () {
+      fetch(SERVER, { method: "PUT", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ value: typed }) }).catch(function () { /* 다음 입력 때 다시 */ });
+    }, 600);
+  }
+  if (location.protocol !== "file:") {
+    fetch(SERVER, { cache: "no-store" }).then(function (response) {
+      if (!response.ok) { throw new Error("no server"); }
+      return response.json();
+    }).then(function (saved) {
+      // 서버 값이 기준이다(다른 기기에서 지운 이름이 되살아나지 않게). 서버가 아직 비어 있을 때만
+      // 이 브라우저에 모아 둔 것을 처음 한 번 올린다.
+      var first = !Object.keys(saved).length && Object.keys(typed).length;
+      if (!first) { typed = saved; }
+      try { localStorage.setItem(STORE, JSON.stringify(typed)); } catch (e) { /* 사생활 모드 */ }
+      serverReady = true;
+      if (first) { push(); }
+      if ($("item-grid")) { render(); }
+    }).catch(function () { /* 서버 없음 — 브라우저에만 */ });
   }
 
   function matches(row) {

@@ -310,6 +310,7 @@
     }).then(function (response) {
       return response.json().then(function (body) { return { status: response.status, ok: response.ok, body: body }; });
     }).then(function (result) {
+      if (result.status === 401) { window.location.reload(); return; }  // 로그인이 풀렸다 — 로그인 화면으로
       if (result.status === 409) {
         overrides = result.body.current.abilities || {};
         changedAt = result.body.current.changedAt || {};
