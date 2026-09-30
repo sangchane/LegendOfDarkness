@@ -150,7 +150,7 @@ public sealed class RespawnTests : IDisposable
 
     /// <summary>
     /// 잡은 자리가 몇 초 안에 다시 차나 — 노비스평원A 의 제 정의 하나(SpawnRate 30 그대로)를 코앞 한 칸에 세우고(정의 자리 ·
-    /// 제자리 · 비선공 · 체력 1) 여섯 번 잡는다. 다시 서는 간격은 SpawnRate ÷ 넓이 배수(6) ÷ 3 = 1.7초에 순회 1초라
+    /// 제자리 · 비선공 · 체력 1) 여섯 번 잡는다. 다시 서는 간격은 SpawnRate ÷ 넓이 배수(6) ÷ 6 = 0.8초에 순회 1초라
     /// {Refill}초 안이어야 한다. 3 으로 나누기 전(5초 + 1초)에는 여섯 번 중 한 번은 거의 늘 넘었다.
     /// </summary>
     [Fact]
@@ -202,8 +202,8 @@ public sealed class RespawnTests : IDisposable
             $"잡은 자리가 {waits.Max():F1}초 만에야 다시 찼습니다({Refill.TotalSeconds}초 안이어야). 모두: {string.Join(", ", waits.Select(w => $"{w:F1}"))}");
     }
 
-    /// <summary>한 마리가 다시 서기까지 기다려 줄 시간 — 간격 1.7초 + 순회 1초 + 화면에 알리는 틈.</summary>
-    private static readonly TimeSpan Refill = TimeSpan.FromSeconds(4);
+    /// <summary>한 마리가 다시 서기까지 기다려 줄 시간 — 간격 0.8초 + 순회 1초 + 화면에 알리는 틈.</summary>
+    private static readonly TimeSpan Refill = TimeSpan.FromSeconds(3);
 
     /// <summary>
     /// 노비스평원A 정의를 모두 재우고(SpawnMax 0) 첫 정의 하나를 <paramref name="spot" /> 에 묶어 세운다. SpawnRate 는 정의 값

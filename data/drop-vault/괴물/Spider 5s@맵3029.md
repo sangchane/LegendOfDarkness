@@ -26,4 +26,4 @@ LootType: 2
 
 | 아이템 | 실제 확률 | 한 번에 | 갈래 |
 |---|---|---|---|
-| [[아이템/Spider's Eye\|Spider's Eye]] | 100.00% | 1개 | 잡템 |
+| [[아이템/Spider's Eye\|Spider's Eye]] | 79.99% | 1개 | 잡템 |
