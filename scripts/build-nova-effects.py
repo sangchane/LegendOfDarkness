@@ -74,6 +74,9 @@ OLD_LIST_ADD = {"리젠(Lev1)": ('p.Call("hprecovery"', "v_target", 187, 100)}
 # 짝짓기: 5.99·노바 블록에 나오는 소리 번호를 나온 차례(겹친 것 빼고)로 i 번째끼리. 노바에 소리가 없으면 그대로,
 # 노바에만 있는 갈래(데빌크래셔의 둘레 치기 18)는 더하지 않는다.
 SOUND_FROM = "노바"
+# 무도가 템플릿 소리를 다른 기술과 같게 — 백보신권은 노바에 없어 단각 소리로(사용자 2026-09-30 "단각이랑 같은 사운드로").
+# SOUND_FROM 과 상관없이 늘 건다.
+SOUND_SAME_AS = {"백보신권": "단각"}
 SOUND = re.compile(r'^(?P<head>\s*p\.Call\("game_sound", \(V\))(?P<n>\d+)(?P<rest>L, .*?;)(?P<tail>\s*// 노바 소리\(5\.99: (?P<was>\d+)\))?\s*$')
 SOUND_IN_PACK = re.compile(r"\b(?:game_sound|sound)\s+(\d+)")
 
@@ -268,6 +271,17 @@ def main():
                 sounds.append((name, f"소리 → {SOUND_FROM}", path))
                 if writing:
                     path.write_text(text, encoding="utf-8-sig")
+    for name, like in SOUND_SAME_AS.items():
+        path, source = TEMPLATES / f"{name}.json", TEMPLATES / f"{like}.json"
+        if not (path.exists() and source.exists()):
+            continue
+        want = re.search(r'"Sound":\s*(\d+)', source.read_text(encoding="utf-8-sig"))
+        raw = path.read_bytes().decode("utf-8")
+        m = re.search(r'"Sound":\s*(\d+)', raw)
+        if want and m and m[1] != want[1]:
+            sounds.append((name, f"Sound {m[1]} → {want[1]} ({like}와 같게)", path))
+            if writing:
+                path.write_bytes(raw.replace(m[0], f'"Sound": {want[1]}', 1).encode("utf-8"))
     changed += sounds
 
     # 노바 짝이 없는 스크립트(괴물 마법·노바에 없는 마법)에도 옛 목록 바로잡기를 건다.
