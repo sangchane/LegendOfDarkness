@@ -21,10 +21,12 @@ from pathlib import Path
 from graphify_runtime import configure_utf8_stdio
 
 ROOT = Path(__file__).resolve().parent.parent
-HADES = ROOT / "data" / "game-data" / "items-hades.json"
+TEMPLATES = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
 ARCHIVE = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives" / "legend" / "Legend.dat"
 PNG = ROOT / "docs" / "ui" / "assets" / "item-icons.png"
 INDEX = ROOT / "docs" / "ui" / "assets" / "item-icons.json"
+# 원작 아카이브에 없는 번호(5.99 가 새로 그린 것)만 여기서 채운다. 원작 그림은 덮지 않는다.
+LATER = Path.home() / "Downloads" / "5.99 클라이언트" / "Legend.dat"
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
@@ -34,29 +36,55 @@ def png_size(path):
     return struct.unpack(">II", head[16:24])
 
 
+def draw(archive, numbers, out):
+    """`dat-extract icon` 으로 한 줄 띠를 그리고, 그려진 번호를 그려진 차례대로 돌려준다."""
+    proc = subprocess.run(
+        ["dotnet", "run", "--project", str(ROOT / "tools" / "dat-extract"), "-c", "Release", "--",
+         "icon", str(archive), ",".join(str(n) for n in numbers), str(out), "1"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
+    if proc.returncode != 0:
+        print(proc.stderr[-800:])
+        return None
+    # 그려진 것만, 그려진 차례대로. 못 찾은 번호는 건너뛰므로 넣은 차례와 다르다.
+    # 아카이브에 파일 이름이 `item006.epf` 와 `Item006.epf` 로 섞여 있다. 대소문자를 가리면
+    # 다섯 줄을 놓쳐 칸 너비 계산이 어긋난다 (띠는 350칸인데 345로 나눈다).
+    return [int(m) for m in re.findall(r"^\s*(\d+) -> item\d+\.epf", proc.stdout, re.M | re.I)]
+
+
 def main():
     if not ARCHIVE.exists():
         print(f"원작 아카이브가 없습니다: {ARCHIVE.relative_to(ROOT)}")
         print("포크 submodule 을 받아야 합니다 — 아이콘 없이도 도감은 뜹니다.")
         return 1
 
-    items = json.loads(HADES.read_text(encoding="utf-8-sig"))
+    # 서버가 지금 읽는 템플릿(items 맨 위) — 도감 카드와 같은 원본.
+    items = [json.loads(p.read_text(encoding="utf-8-sig")) for p in TEMPLATES.glob("*.json")]
     wanted = sorted({it["DisplayImage"] for it in items if it.get("DisplayImage")})
 
     PNG.parent.mkdir(parents=True, exist_ok=True)
-    proc = subprocess.run(
-        ["dotnet", "run", "--project", str(ROOT / "tools" / "dat-extract"), "-c", "Release", "--",
-         "icon", str(ARCHIVE), ",".join(str(n) for n in wanted), str(PNG), "1"],
-        capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
-    if proc.returncode != 0:
-        print(proc.stderr[-800:])
-        return proc.returncode
-
-    # 그려진 것만, 그려진 차례대로. 못 찾은 번호는 건너뛰므로 넣은 차례와 다르다.
-    # 아카이브에 파일 이름이 `item006.epf` 와 `Item006.epf` 로 섞여 있다. 대소문자를 가리면
-    # 다섯 줄을 놓쳐 칸 너비 계산이 어긋난다 (띠는 350칸인데 345로 나눈다).
-    drawn = [int(m) for m in re.findall(r"^\s*(\d+) -> item\d+\.epf", proc.stdout, re.M | re.I)]
+    drawn = draw(ARCHIVE, wanted, PNG)
+    if drawn is None:
+        return 1
     missing = sorted(set(wanted) - set(drawn))
+
+    if missing and LATER.exists():
+        extra_png = PNG.with_name("item-icons-599.png")
+        extra = draw(LATER, missing, extra_png)
+        if extra:
+            from PIL import Image
+            base, more = Image.open(PNG), Image.open(extra_png)
+            # 두 아카이브의 칸 너비가 다르다(37·36). 원작 칸 너비에 한 칸씩 맞춰 붙인다.
+            cell, more_cell = base.width // len(drawn), more.width // len(extra)
+            strip = Image.new("RGBA", (base.width + cell * len(extra), max(base.height, more.height)))
+            strip.paste(base, (0, 0))
+            for i in range(len(extra)):
+                one = more.crop((i * more_cell, 0, (i + 1) * more_cell, more.height))
+                strip.paste(one, (base.width + i * cell, 0))
+            strip.save(PNG)
+            print(f"  5.99 클라이언트에서 채운 번호 {len(extra)}개")
+            drawn += extra
+            missing = sorted(set(wanted) - set(drawn))
+        extra_png.unlink(missing_ok=True)
 
     width, height = png_size(PNG)
     if width % len(drawn):

@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """아이템을 화면에서 볼 수 있게 한 덩어리로 뽑는다 — 슬롯별, 직업별.
 
-978장을 표로 보면 무엇이 어느 자리에 쓰이는지가 안 보인다. 슬롯과 직업으로 나누고
-대표 수치 하나만 앞에 내면 보인다. 베이스는 하데스(영문)이고, 한글 이름은
-`compare-packs.py` 가 정한 것을 얹는다. `data/아이템-한글이름.tsv` 의 사람이 고친 값은
-거기서 이미 최우선으로 반영돼 들어온다 (등급 `HUMAN`).
+표로 보면 무엇이 어느 자리에 쓰이는지가 안 보인다. 슬롯과 직업으로 나누고
+대표 수치 하나만 앞에 내면 보인다. 베이스는 **서버가 지금 읽는 템플릿**(`templates/items` 맨 위)이다
+— 2026-09-30 하데스 영문판을 걷어낸 뒤로 한글(5.99 → 원작 도감) 표다.
 
-카페에만 있는 371장(`items-cafe-missing.json`)은 **싣지 않는다.** 게임에 없는 것이라
-섞으면 도감을 보고 만든 판단이 틀린다.
+카드의 「이름 근거」 칸은 원작 도감(`docs/items/어둠템#1~5.xlsx` → `items-original-sheets.json`)과
+견준 결과다: 도감대로 / 도감과 N칸 다름 / 도감에 없음. 칸 대응은 `build-gear-from-original.py` 의
+`wanted`·`differs` 를 그대로 쓴다 — 두 곳이 따로 놀지 않게.
 
   쓰는 법: python3 scripts/build-item-page-data.py   → docs/items-data.js
 """
+import importlib.util
 import json
 import sys
 from collections import Counter
@@ -19,8 +20,8 @@ from pathlib import Path
 from graphify_runtime import configure_utf8_stdio
 
 ROOT = Path(__file__).resolve().parent.parent
-HADES = ROOT / "data" / "game-data" / "items-hades.json"
-KOREAN = ROOT / "data" / "pack-compare" / "item-korean-names.json"
+TEMPLATES = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
+SHEET = ROOT / "data" / "game-data" / "items-original-sheets.json"
 ICONS = ROOT / "docs" / "ui" / "assets" / "item-icons.json"
 OUT = ROOT / "docs" / "items-data.js"
 
@@ -72,13 +73,31 @@ def headline(item):
     return ""
 
 
+def load_original():
+    spec = importlib.util.spec_from_file_location(
+        "gear_from_original", Path(__file__).with_name("build-gear-from-original.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def sheet_verdict(item, rows, original):
+    """원작 도감과 견준 한 줄. 같은 이름 줄이 없으면 「도감에 없음」."""
+    row = rows.get(item["Name"])
+    if row is None:
+        return "도감에 없음"
+    off = sum(1 for field, value in original.wanted(row).items()
+              if original.differs(item, field, value))
+    return "도감대로" if off == 0 else f"도감과 {off}칸 다름"
+
+
 def main():
-    items = json.loads(HADES.read_text(encoding="utf-8-sig"))
-    korean = {}
-    if KOREAN.exists():
-        for row in json.loads(KOREAN.read_text(encoding="utf-8")):
-            if row.get("한글이름"):
-                korean[row["영문"]] = (row["한글이름"], row.get("등급") or "")
+    # 서버는 items 맨 위만 읽는다(templates-retired 는 치운 것).
+    items = [json.loads(p.read_text(encoding="utf-8-sig")) for p in sorted(TEMPLATES.glob("*.json"))]
+    original = load_original()
+    rows_by_name = {}
+    for row in json.loads(SHEET.read_text(encoding="utf-8"))["수치표"]:
+        rows_by_name.setdefault(str(row.get("이름") or "").strip(), row)
 
     icons = json.loads(ICONS.read_text(encoding="utf-8")) if ICONS.exists() else {"자리": {}}
     where = icons.get("자리", {})
@@ -88,7 +107,8 @@ def main():
         name = it.get("Name")
         if not name:
             continue
-        ko, source = korean.get(name, ("", ""))
+        ko = "" if name.isascii() else name
+        source = sheet_verdict(it, rows_by_name, original)
         stats = [[label, stat_value(it[key])] for key, label in STATS
                  if it.get(key) and stat_value(it[key])]
         rows.append({

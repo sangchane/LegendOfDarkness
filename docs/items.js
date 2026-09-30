@@ -72,7 +72,7 @@
     top.appendChild(big);
     var title = el("div", "");
     title.appendChild(el("b", "", nameOf(row) || row.en));
-    if (nameOf(row)) { title.appendChild(el("em", "", row.en)); }
+    if (nameOf(row) && nameOf(row) !== row.en) { title.appendChild(el("em", "", row.en)); }
     top.appendChild(title);
     hover.appendChild(top);
 
@@ -89,7 +89,7 @@
     add("내구도", row.dur ? row.dur.toLocaleString("ko-KR") : "");
     add("그림", row.img || "");
     row.stats.forEach(function (pair) { add(pair[0], pair[1]); });
-    add("이름 근거", row.src || (nameOf(row) ? "직접 입력" : "아직 없음"));
+    add("원작 도감", row.src || (nameOf(row) ? "직접 입력" : "아직 없음"));
     hover.appendChild(facts);
 
     var box = anchor.getBoundingClientRect();
@@ -124,7 +124,7 @@
 
     var head = el("div", "item-card-head");
     head.appendChild(el("b", "", nameOf(row) || row.en));
-    if (nameOf(row)) { head.appendChild(el("em", "", row.en)); }
+    if (nameOf(row) && nameOf(row) !== row.en) { head.appendChild(el("em", "", row.en)); }
     article.appendChild(head);
 
     var meta = el("div", "item-card-meta");
@@ -132,6 +132,7 @@
     meta.appendChild(el("span", "item-lv", row.lv ? "Lv" + row.lv : "Lv—"));
     if (row.head) { meta.appendChild(el("span", "item-head", row.head)); }
     if (row.cls !== "공용") { meta.appendChild(el("span", "item-cls", row.cls)); }
+    if (row.src) { meta.appendChild(el("span", "item-cls", row.src)); }
     article.appendChild(meta);
 
     var input = el("input", "item-name");

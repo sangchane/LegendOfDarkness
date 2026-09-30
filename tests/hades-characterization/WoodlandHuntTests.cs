@@ -127,30 +127,18 @@ public sealed class WoodlandHuntTests : IDisposable
     private const int GlanceTicks = 40;
 
     /// <summary>
-    /// 1서클 물건. 하데스가 싣는 영문 표의 목걸이 넷이다.
+    /// 1서클 물건. 한글 표(5.99 → 원작 도감)의 원소 목걸이 넷이다.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// 처음에는 같은 물건의 한글 쪽(<c>대지/바다/바람/화염의목걸이</c>, <c>Group: 팩드롭</c>, 그림번호가
-    /// 197·199·198 로 같다)을 실었는데 <b>여섯 마리를 잡아도 하나도 떨어지지 않았다.</b> 자리 문제가
-    /// 아니었다 — 표적을 제자리에 못 박고 죽은 칸과 그 둘레를 집어도 마찬가지였고, 이름만 영문으로
-    /// 바꾸자 같은 자리에서 곧바로 들어왔다.
-    /// </para>
-    /// <para>
-    /// 두 정의가 다른 곳: 한글 쪽은 <c>DropRate</c> 가 없고(0 이 된다) <c>Flags</c> 가 65
-    /// (<c>Equipable|Repairable</c>) 뿐이며 <c>DisplayImage</c> 가 0 이다. 영문 쪽은 <c>DropRate 0.5</c> ·
-    /// <c>Flags 5241</c>(여기에 <c>Dropable</c>·<c>Sellable</c>·<c>Bankable</c>·<c>Upgradeable</c> 이 있다) ·
-    /// <c>DisplayImage 32965</c> 다. 어느 칸이 막는지는 아직 못 짚었다 — 사람이 물건을 버릴 때 보는
-    /// <c>Dropable</c> 검사(<c>GameServerHandlers</c>)는 괴물이 떨어뜨리는 길과 상관이 없다.
-    /// </para>
-    /// <para>
-    /// <b>드롭 기능이 고장난 것은 아니다.</b> 팩드롭 쪽은 한글 이름을 붙이는 작업이 아직 진행 중이라
-    /// 정의가 덜 채워진 상태였다(2026-09-15 확인). 여기서 영문을 쓰는 것은 그 편이 맞기 때문이기도
-    /// 하다 — 아이템은 하데스 표를 기준으로 가기로 되어 있다.
+    /// 전에는 하데스 영문 표의 <c>Earth/Sea/Wind/Fire Necklace</c> 를 실었다. 한글 쪽은 <c>DropRate</c> 가
+    /// 없어(0 이 된다) 여섯 마리를 잡아도 하나도 떨어지지 않았기 때문이다. 2026-09-30 영문 표를 걷어내면서
+    /// 한글 쪽으로 돌아왔고, 이 시험이 보려는 것은 떨어진 물건이 소지품까지 오는가이므로 시험 복사본에서만
+    /// <c>DropRate</c> 를 영문 쪽과 같은 0.5 로 채운다(<see cref="GiveTheZoneSomethingToDrop"/>).
     /// </para>
     /// </remarks>
     private static readonly string[] FirstCircleDrops =
-        ["Earth Necklace", "Sea Necklace", "Wind Necklace", "Fire Necklace"];
+        ["대지의목걸이", "바다의목걸이", "바람의목걸이", "화염의목걸이"];
 
     /// <summary>
     /// How many bodies before giving up. One kill is not enough to conclude anything: the table is asked
@@ -522,6 +510,19 @@ public sealed class WoodlandHuntTests : IDisposable
                 ["$values"] = new JsonArray([.. carrying.Select(name => JsonValue.Create(name))]),
             };
             return node;
+        }
+
+        // 한글 목걸이는 DropRate 가 비어 있다(0). 시험 복사본에서만 영문 표가 쓰던 0.5 로 채운다.
+        foreach (string path in Directory.EnumerateFiles(
+                     Path.Combine(server.ContentLocation, "templates", "items"), "*.json"))
+        {
+            JsonNode item = JsonNode.Parse(File.ReadAllText(path), documentOptions: lenient)!;
+
+            if (carrying.Contains((string?)item["Name"]))
+            {
+                item["DropRate"] = 0.5;
+                File.WriteAllText(path, item.ToJsonString(indented));
+            }
         }
 
         JsonNode? entrance = null;

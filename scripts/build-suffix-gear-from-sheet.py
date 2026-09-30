@@ -44,6 +44,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ITEMS = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
+RETIRED = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates-retired/items-hades-en"
 TSV = ROOT / "data/pack-compare/한글이름-검토.tsv"
 SHEET = ROOT / "data/game-data/items-original-sheets.json"
 
@@ -83,7 +84,8 @@ def read(path):
 
 def load_items():
     by_name, by_lower = {}, {}
-    for path in ITEMS.rglob("*.json"):
+    # 2026-09-30 영문판은 서버가 안 읽는 곳으로 치웠다 — 그림 원본(갈래 2)으로는 여전히 읽는다.
+    for path in [*ITEMS.rglob("*.json"), *RETIRED.glob("*.json")]:
         try:
             item = read(path)
         except json.JSONDecodeError:

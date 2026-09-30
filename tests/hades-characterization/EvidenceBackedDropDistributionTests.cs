@@ -12,7 +12,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 public sealed class EvidenceBackedDropDistributionTests
 {
-    private const int ItemTemplateCount = 2296;
+    private const int ItemTemplateCount = 1364;
     private const int ReferencedItemTypeCount = 103;
     private const int DropRelationCount = 655;
     private const int LootRandom = 2;
