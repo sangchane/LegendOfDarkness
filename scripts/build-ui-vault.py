@@ -227,6 +227,30 @@ def targets(facts):
     return len(facts["구현대상"])
 
 
+def ingame(facts):
+    """인게임 창마다 원작 그림·누끼 후보·단색·레퍼런스 한 장씩, 그리고 토큰 대조 한 장."""
+    game = facts["인게임"]
+    marks = {m["id"]: m for m in game["공통정체성"]}
+    for w in game["창"]:
+        pics = ", ".join(link("화면", p) for p in w["원작그림"]) or "없음"
+        cut = [f"- **{c}** — {marks[c]['생김새']} · 쓸 곳: {marks[c]['쓸곳']}" if c in marks else f"- {c}"
+               for c in w["누끼후보"]]
+        body = (
+            front(창=w["창"], 코드=", ".join(w["코드"]))
+            + f"# {w['창']}\n\n- 코드: {', '.join(f'`{c}`' for c in w['코드'])}\n- 원작 그림: {pics}\n\n"
+            + f"## 원작은 어떻게 생겼나\n\n{w['원작모습']}\n\n"
+            + (f"## 원작 그림 통째로\n\n{w['통째로']}\n\n" if w.get("통째로") else "")
+            + "## 누끼 후보\n\n" + ("\n".join(cut) or "없음") + "\n\n"
+            + "## 단색으로 갈 것\n\n" + ("\n".join(f"- {s}" for s in w["단색"]) or "없음") + "\n\n"
+            + f"## 돌\n\n{w['돌']}\n\n## 모바일 레퍼런스\n\n{w['모바일레퍼런스']}\n"
+        )
+        write("인게임", w["창"], body)
+    rows = "\n".join(f"| {t['이름']} | {t['지금']} | {t['바꿀것']} | {t['규칙']} |" for t in game["토큰대조"])
+    write("인게임", "토큰대조", front(무엇="Greybox 값 ↔ 규칙")
+          + f"# 토큰 대조\n\n> {game['통째로']}\n\n| 이름 | 지금 | 바꿀 것 | 규칙 |\n|---|---|---|---|\n" + rows + "\n")
+    return len(game["창"])
+
+
 def readme(facts, counts):
     adopted = next(d for d in facts["시안"] if d["채택"])
     version = next(v for v in facts["판"] if v.get("채택"))
@@ -244,6 +268,8 @@ def readme(facts, counts):
         "## 색\n\n| 이름 | 값 | 무엇 |\n|---|---|---|\n" + colour_rows + "\n\n"
         f"치수: {link('치수', '치수')}\n\n"
         "## 손댈 코드\n\n| 파일 | 무엇 | 상태 |\n|---|---|---|\n" + target_rows + "\n\n"
+        "## 인게임 창\n\n" + " · ".join(link("인게임", w["창"]) for w in facts["인게임"]["창"])
+        + f" · {link('인게임', '토큰대조')}\n\n"
         "## 원작 자료\n\n"
         f"- 화면 **{counts['화면']}장** (`docs/ui/original-451/`) — 쓰임까지 확인된 것 {counts['확인']}장, "
         f"나머지는 모양만 봤다\n"
@@ -264,7 +290,7 @@ def main():
 
     if VAULT.exists():
         shutil.rmtree(VAULT)                 # 이름이 바뀌면 옛 노트가 남는다
-    for folder in ("판", "아카이브", "화면", "재질", "색", "치수", "규칙", "시안", "화면시안", "구현대상"):
+    for folder in ("판", "아카이브", "화면", "재질", "색", "치수", "규칙", "시안", "화면시안", "구현대상", "인게임"):
         (VAULT / folder).mkdir(parents=True)
 
     counts = {}
@@ -277,11 +303,12 @@ def main():
     counts["규칙"] = rules(facts)
     counts["시안"], counts["화면시안"] = drafts(facts)
     counts["구현대상"] = targets(facts)
+    counts["인게임"] = ingame(facts)
     readme(facts, counts)
 
     notes = sum(1 for _ in VAULT.rglob("*.md"))
     print("UI 테마 볼트")
-    for key in ("판", "아카이브", "화면", "재질", "색", "규칙", "시안", "화면시안", "구현대상"):
+    for key in ("판", "아카이브", "화면", "재질", "색", "규칙", "시안", "화면시안", "구현대상", "인게임"):
         print(f"  {key:8} {counts[key]}")
     print(f"\n노트 {notes}장 -> {VAULT.relative_to(ROOT)}/  (Obsidian 으로 연다)")
 
