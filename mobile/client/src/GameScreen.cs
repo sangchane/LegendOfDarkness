@@ -1,7 +1,6 @@
 using Godot;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.World;
-using System.Globalization;
 
 namespace LodClient;
 
@@ -33,14 +32,10 @@ public partial class GameScreen : Control
 
     private WorldView _world = null!;
     private Label _who = null!;
-    private Label _levelText = null!;
-    private Control _goldIndicator = null!;
-    private Label _goldText = null!;
     private Label _place = null!;
     private Label _target = null!;
     private PackPanel _pack = null!;
     private TalkPanel _talk = null!;
-    private VBoxContainer _talkHolder = null!;
     private FieldPanel _field = null!;
 
     // 길 찾기 — 원작의 Tab 지도. 위 줄의 미니맵을 누르면 연다. 길을 걷는 동안은 위 줄 아래 가운데에 간 곳과 [멈춤]이 뜬다.
@@ -219,7 +214,7 @@ public partial class GameScreen : Control
         _pack.Close.Pressed += () => Carrying(false);
         _pack.Used += slot => _ = _server?.UseAsync(slot, System.Threading.CancellationToken.None);
         _pack.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
-        _pack.Dropped += (slot, amount) => _ = Throw(slot, amount);
+        _pack.Dropped += slot => _ = Throw(slot);
         _pack.Tidy.Pressed += () => _ = Straighten();
 
         _chat = new ChatPanel();
@@ -284,10 +279,6 @@ public partial class GameScreen : Control
 
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
-        _talk.BulkTradeRequested += (merchant, selling, lines) =>
-            _ = _server?.BulkTradeAsync(merchant, selling, lines, System.Threading.CancellationToken.None);
-        _talk.ShopBackRequested += merchant =>
-            _ = _server?.ShopMenuAsync(merchant, System.Threading.CancellationToken.None);
         _talk.Answered += (speaker, step, words) => _ = words is null
             ? _server?.AnswerAsync(speaker, step, System.Threading.CancellationToken.None)
             : _server?.AnswerAsync(speaker, step, words, System.Threading.CancellationToken.None);
@@ -490,11 +481,6 @@ public partial class GameScreen : Control
                 _chatHolder = holder;
             }
 
-            if (panel == _talk)
-            {
-                _talkHolder = holder;
-            }
-
             if (panel == _settings)
             {
                 _settingsHolder = holder;
@@ -535,14 +521,6 @@ public partial class GameScreen : Control
                 _chat.CustomMinimumSize = new Vector2(Mathf.Min(460, GetViewportRect().Size.X - (Main.Gutter * 4)), 0);
             }
 
-            // 상점은 상품명과 수량 조작을 한 줄에 담아야 한다. 가로에서는 오른쪽 좁은 기둥 대신 가운데에 넓게 둔다.
-            if (panel == _talk && !Main.Portrait)
-            {
-                holder.Alignment = BoxContainer.AlignmentMode.Center;
-                _talk.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-                _talk.CustomMinimumSize = new Vector2(Mathf.Min(620, GetViewportRect().Size.X - (Main.Gutter * 4)), 0);
-            }
-
             // 가로 설정 창은 오른쪽 기둥에 서면 공격 단추와 기술 부채꼴을 덮었다(사용자, 2026-09-23). 설정은 월드를 멈추지
             // 않으므로 조작이 살아 있어야 한다 — 위 줄 바로 아래, 방향판과 부채꼴 사이 가운데에 제 크기만큼만 선다.
             if (panel == _settings && !Main.Portrait)
@@ -577,7 +555,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _chatHolder || holder == _talkHolder ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _chatHolder ? 0 : column;
         }
     }
 
@@ -646,27 +624,9 @@ public partial class GameScreen : Control
         // 첫 줄: 이름과 그 옆 상태 아이콘 줄(버프·디버프) — 둘 다 없으면 줄째 접힌다.
         HBoxContainer headline = new() { MouseFilter = MouseFilterEnum.Ignore };
         headline.AddThemeConstantOverride("separation", Main.Gutter);
-        _who.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
-        _who.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
-        _who.ClipText = true;
-
-        HBoxContainer gold = new() { MouseFilter = MouseFilterEnum.Ignore, Visible = false };
-        gold.AddThemeConstantOverride("separation", Main.Gutter / 3);
-        _levelText = Aux(string.Empty);
-        _levelText.AddThemeFontSizeOverride("font_size", 12);
-        _levelText.AddThemeColorOverride("font_color", Greybox.Title);
-        gold.AddChild(_levelText);
-        gold.AddChild(new Glyph(GlyphKind.Gold, 16) { Paint = Greybox.Accent });
-        _goldText = Aux("0");
-        _goldText.AddThemeFontSizeOverride("font_size", 12);
-        _goldText.AddThemeColorOverride("font_color", Greybox.Title);
-        gold.AddChild(_goldText);
-        _goldIndicator = gold;
-
         _myStatus.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _myStatus.SizeFlagsVertical = SizeFlags.ShrinkCenter;
         headline.AddChild(_who);
-        headline.AddChild(gold);
         headline.AddChild(_myStatus);
         mine.AddChild(headline);
         mine.AddChild(BuildVitals());
@@ -1010,12 +970,10 @@ public partial class GameScreen : Control
         // The server names us in 0x33; nothing else on this screen knows who we are.
         // 배치 검사는 이름이 붙은 판을 잰다 — 이름 없는 판으로 재면 미니맵 자리가 넉넉해 보였다(실제 서버에서 넘쳤다, 2026-09-26).
         // 평소 서버 없는 화면에는 지어낸 이름을 적지 않는다(아래 설명 그대로).
-        string called = _server?.Self?.Name ?? (LayoutCheck.Requested() ? LayoutCheck.PretendName : string.Empty);
-        if (called.Length > 0 || Mine.Level > 0)
+        if ((_server?.Self?.Name ?? (LayoutCheck.Requested() ? LayoutCheck.PretendName : null)) is { Length: > 0 } called)
         {
-            _who.Text = called;
+            _who.Text = Mine.Level > 0 ? $"{called} Lv{Mine.Level}" : called;
             _who.Visible = true;
-            _goldIndicator.Visible = true;
         }
 
         ShowVitals();
@@ -1438,14 +1396,14 @@ public partial class GameScreen : Control
     }
 
     /// <summary>Throws one slot on the floor, at our own feet — the only tile we can be sure of.</summary>
-    private async Task Throw(int slot, int amount = 1)
+    private async Task Throw(int slot)
     {
         if (_server is not { State: { } standing } server)
         {
             return;
         }
 
-        await server.DropAsync(slot, amount, standing.Where, System.Threading.CancellationToken.None);
+        await server.DropAsync(slot, 1, standing.Where, System.Threading.CancellationToken.None);
     }
 
     /// <summary>
@@ -1925,9 +1883,6 @@ public partial class GameScreen : Control
         }
 
         _shownVitals = mine;
-        _levelText.Text = mine.Level > 0 ? $"Lv{mine.Level}" : string.Empty;
-        _levelText.Visible = mine.Level > 0;
-        _goldText.Text = FormatGold(mine.Gold);
         Fill(_healthBar, _healthText, mine.Health, mine.MaximumHealth, Greybox.Health);
         Fill(_manaBar, _manaText, mine.Mana, mine.MaximumMana, Greybox.Mana);
 
@@ -1944,25 +1899,6 @@ public partial class GameScreen : Control
             _experienceBar.Value = mine.Level > 0 ? 1 : 0;
             _experienceText.Text = string.Empty;
         }
-    }
-
-    private static string FormatGold(long gold)
-    {
-        if (gold < 1_000)
-        {
-            return gold.ToString("N0", CultureInfo.InvariantCulture);
-        }
-
-        (long unit, string suffix) = gold switch
-        {
-            >= 100_000_000 => (100_000_000, "억"),
-            >= 10_000_000 => (10_000_000, "천만"),
-            >= 1_000_000 => (1_000_000, "백만"),
-            >= 10_000 => (10_000, "만"),
-            _ => (1_000, "천")
-        };
-
-        return $"{(gold / (double)unit).ToString("0.#", CultureInfo.InvariantCulture)}{suffix}";
     }
 
     /// <summary>

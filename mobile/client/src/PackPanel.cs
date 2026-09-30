@@ -58,9 +58,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Label _actionLine = new();
     private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
     private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", width: 56);
-    private readonly Button _dropAll = WindowFrame.IconButton(GlyphKind.Drop, "전부 버리기", width: 56);
     private readonly Button _off = WindowFrame.IconButton(GlyphKind.TakeOff, "벗기", width: 56);
-    private readonly Button _dismiss = WindowFrame.CloseButton();
     private readonly DoubleTap _taps = new();
 
     // 지금 그려진 소지품 칸 — 동작 줄을 그 칸 옆에 세우려고 칸 번호로 찾는다.
@@ -213,19 +211,6 @@ public sealed partial class PackPanel : PanelContainer
         ShowTab(Main.OnGear);
     }
 
-    public override void _Ready()
-    {
-        // The floating action plate must not be a child of the sized panel. A visible plate otherwise
-        // changes the panel's minimum height, which is the source of the inventory jump.
-        if (_action.GetParent() is Node panel && panel.GetParent() is Node host)
-        {
-            panel.RemoveChild(_action);
-            host.AddChild(_action);
-            _action.TopLevel = true;
-            _action.ZIndex = 100;
-        }
-    }
-
     /// <summary>
     /// The row beside a picked thing: its name, a line under it, and the icon buttons that apply. One button does both
     /// carried things — the server's use (0x1C) puts gear on and drinks a potion — so only its word changes.
@@ -265,17 +250,8 @@ public sealed partial class PackPanel : PanelContainer
         {
             if (_chosen > 0)
             {
-                Dropped?.Invoke(_chosen, 1);
-                DismissAction();
-            }
-        };
-
-        _dropAll.Pressed += () =>
-        {
-            if (_chosen > 0 && CurrentItem()?.Stacks > 1 is true)
-            {
-                Dropped?.Invoke(_chosen, CurrentItem()!.Stacks);
-                DismissAction();
+                Dropped?.Invoke(_chosen);
+                _action.Visible = false;
             }
         };
 
@@ -284,17 +260,14 @@ public sealed partial class PackPanel : PanelContainer
             if (_chosen < 0)
             {
                 TakenOff?.Invoke(-_chosen);
-                DismissAction();
+                _action.Visible = false;
             }
         };
-
-        _dismiss.Pressed += DismissAction;
 
         HBoxContainer buttons = new();
         buttons.AddThemeConstantOverride("separation", 4);
         buttons.AddChild(_use);
         buttons.AddChild(_drop);
-        buttons.AddChild(_dropAll);
         buttons.AddChild(_off);
 
         VBoxContainer column = new();
@@ -303,12 +276,6 @@ public sealed partial class PackPanel : PanelContainer
         column.AddChild(_actionLine);
         column.AddChild(buttons);
         _action.AddChild(column);
-
-        // 선택 정보는 창 위에 뜨는 보조 UI다. 패널의 최소 크기에 참여하면 표시/숨김마다
-        // 인벤토리 높이가 재계산되어 순간적으로 늘었다 줄어든다. 닫기 단추는 같은 줄에 둔다.
-        column.AddChild(_dismiss);
-        _action.MouseFilter = Control.MouseFilterEnum.Stop;
-        _action.ClipContents = false;
     }
 
     private static double Now() => Time.GetTicksMsec() / 1000.0;
@@ -346,7 +313,7 @@ public sealed partial class PackPanel : PanelContainer
     public event System.Action<int>? Used;
 
     /// <summary>Somebody asked to throw a carried thing away. The server decides whether it may be.</summary>
-    public event System.Action<int, int>? Dropped;
+    public event System.Action<int>? Dropped;
 
     /// <summary>Somebody asked to take off what is in one worn place. The number is the server's own.</summary>
     public event System.Action<int>? TakenOff;
@@ -357,7 +324,6 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>Shows what is worn and what is carried, and says plainly when there is nothing.</summary>
     public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn, Character? self = null, long gold = 0)
     {
-        _lastCarried = carried;
         _gold.Text = Main.Portrait ? $"금화 {gold:N0} · {carried.Count}/60칸" : $"금화 {gold:N0}\n{carried.Count}/60칸";
 
         // 종이인형은 목록과 따로 갱신한다 — 차림이 바뀌는 것과 소지품이 바뀌는 것은 같은 일이 아니다.
@@ -410,119 +376,92 @@ public sealed partial class PackPanel : PanelContainer
     /// </summary>
     private void Fill(GridContainer grid, IReadOnlyList<InventoryItem?> page)
     {
-        ClearGrid(grid);
-        foreach (InventoryItem? item in page)
-        {
-            AddPageCell(grid, item);
-        }
-    }
-
-    private void ClearGrid(GridContainer grid)
-    {
         foreach (Node cell in grid.GetChildren())
         {
             cell.QueueFree();
         }
 
         _cellsBySlot.Clear();
-    }
 
-    private void AddPageCell(GridContainer grid, InventoryItem? item)
-    {
-        if (item is null)
+        foreach (InventoryItem? item in page)
         {
-            grid.AddChild(new Control { CustomMinimumSize = Cell, MouseFilter = MouseFilterEnum.Ignore });
-            return;
+            if (item is null)
+            {
+                grid.AddChild(new Control { CustomMinimumSize = Cell, MouseFilter = MouseFilterEnum.Ignore });
+                continue;
+            }
+
+            int key = item.Slot;
+
+            Button cell = new()
+            {
+                CustomMinimumSize = Cell,
+                Icon = ItemIcons.For(item.Icon),
+                ExpandIcon = true,
+                IconAlignment = HorizontalAlignment.Center,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                FocusMode = FocusModeEnum.None
+            };
+
+            // 칸은 평평한 어둠, 고른 칸은 밝은 테두리 — 돌은 칸에 쓰지 않는다(규칙표).
+            StyleBoxFlat box = Greybox.Surface();
+            box.SetCornerRadiusAll(6);
+
+            if (key == _chosen)
+            {
+                box.BorderColor = Greybox.Title;
+                box.SetBorderWidthAll(2);
+            }
+
+            foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
+            {
+                cell.AddThemeStyleboxOverride(state, box);
+            }
+
+            // 개수는 칸 오른쪽 아래 구석에 작게.
+            if (item.Stacks > 1)
+            {
+                Label count = new() { Text = item.Stacks.ToString(), MouseFilter = MouseFilterEnum.Ignore, HorizontalAlignment = HorizontalAlignment.Right };
+                count.AddThemeFontSizeOverride("font_size", 10);
+                count.AddThemeColorOverride("font_color", Greybox.Text);
+                count.AddThemeColorOverride("font_outline_color", Colors.Black);
+                count.AddThemeConstantOverride("outline_size", 3);
+                count.AnchorLeft = 0;
+                count.AnchorRight = 1;
+                count.AnchorTop = 1;
+                count.AnchorBottom = 1;
+                count.OffsetTop = -14;
+                count.OffsetRight = -3;
+                count.OffsetBottom = -1;
+                cell.AddChild(count);
+            }
+
+            _cellsBySlot[key] = cell;
+
+            cell.Pressed += () =>
+            {
+                if (_swiped)
+                {
+                    return;
+                }
+
+                // 빠르게 두 번 = 사용/입기.
+                if (_taps.Tap(key, Now()))
+                {
+                    _chosen = key;
+                    _action.Visible = false;
+                    Used?.Invoke(key);
+                    return;
+                }
+
+                _chosen = key;
+
+                // 테두리를 옮기려면 다시 그려야 한다. 다음 프레임의 Show 가 하도록 표시만 지운다.
+                _showing = null;
+            };
+
+            grid.AddChild(cell);
         }
-
-        Button cell = CreateItemCell(item);
-        AddStackCount(cell, item);
-        WireItemCell(cell, item.Slot);
-        _cellsBySlot[item.Slot] = cell;
-        grid.AddChild(cell);
-    }
-
-    private Button CreateItemCell(InventoryItem item)
-    {
-        Button cell = new()
-        {
-            CustomMinimumSize = Cell,
-            Icon = ItemIcons.For(item.Icon),
-            ExpandIcon = true,
-            IconAlignment = HorizontalAlignment.Center,
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            FocusMode = FocusModeEnum.None
-        };
-        ApplyCellStyle(cell, item.Slot == _chosen);
-        return cell;
-    }
-
-    private static void ApplyCellStyle(Button cell, bool selected)
-    {
-        StyleBoxFlat box = Greybox.Surface();
-        box.SetCornerRadiusAll(6);
-        if (selected)
-        {
-            box.BorderColor = Greybox.Title;
-            box.SetBorderWidthAll(2);
-        }
-
-        foreach (string state in new[] { "normal", "hover", "pressed", "focus" })
-        {
-            cell.AddThemeStyleboxOverride(state, box);
-        }
-    }
-
-    private static void AddStackCount(Button cell, InventoryItem item)
-    {
-        if (item.Stacks <= 1)
-        {
-            return;
-        }
-
-        Label count = new()
-        {
-            Text = $"×{item.Stacks}",
-            MouseFilter = MouseFilterEnum.Ignore,
-            HorizontalAlignment = HorizontalAlignment.Right
-        };
-        count.AddThemeFontSizeOverride("font_size", 10);
-        count.AddThemeColorOverride("font_color", Greybox.Text);
-        count.AddThemeColorOverride("font_outline_color", Colors.Black);
-        count.AddThemeConstantOverride("outline_size", 3);
-        count.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.BottomRight, Control.LayoutPresetMode.Minsize, 4);
-        cell.AddChild(count);
-    }
-
-    private void WireItemCell(Button cell, int key)
-    {
-        cell.Pressed += () => SelectItem(key);
-    }
-
-    private void SelectItem(int key)
-    {
-        if (_swiped)
-        {
-            return;
-        }
-
-        if (_taps.Tap(key, Now()))
-        {
-            _chosen = key;
-            _action.Visible = false;
-            Used?.Invoke(key);
-            return;
-        }
-
-        bool wasChosen = _chosen == key && _action.Visible;
-        _chosen = key;
-        if (wasChosen)
-        {
-            DismissAction();
-            return;
-        }
-
-        _showing = null;
     }
 
     private void Turn(int step)
@@ -621,7 +560,6 @@ public sealed partial class PackPanel : PanelContainer
             WindowFrame.Relabel(_use, ItemActions.Primary(held));
             _use.Visible = true;
             _drop.Visible = true;
-            _dropAll.Visible = held.Stacks > 1;
             _off.Visible = false;
             _action.Visible = true;
             _action.ResetSize();
@@ -639,7 +577,6 @@ public sealed partial class PackPanel : PanelContainer
             _actionLine.Visible = true;
             _use.Visible = false;
             _drop.Visible = false;
-            _dropAll.Visible = false;
             _off.Visible = true;
             _action.Visible = true;
             _action.ResetSize();
@@ -648,17 +585,6 @@ public sealed partial class PackPanel : PanelContainer
         }
 
         _action.Visible = false;
-    }
-
-    private InventoryItem? CurrentItem() => _lastCarried.FirstOrDefault(item => item.Slot == _chosen);
-
-    private IReadOnlyList<InventoryItem> _lastCarried = [];
-
-    private void DismissAction()
-    {
-        _chosen = 0;
-        _action.Visible = false;
-        _showing = null;
     }
 
     /// <summary>

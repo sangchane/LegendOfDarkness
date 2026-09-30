@@ -281,12 +281,12 @@ public sealed partial class MinimapView : Button
                 DrawSetTransformMatrix(Transform2D.Identity);
             }
 
-            // 길과 존재 표식은 각 좌표의 한 칸을 그대로 덮는다 — 확대해도 크기와 마름모 모양을 함께 키운다.
+            // 걸어갈 길 — 한 픽셀 점.
             foreach (Tile step in owner._world.Route)
             {
                 if (Minimap.Sees(frame, wide, high, step))
                 {
-                    TileMark(frame, step, Greybox.Accent);
+                    DrawRect(new Rect2(At(frame, step) - new Vector2(0.5f, 0.5f), Vector2.One), Greybox.Accent);
                 }
             }
 
@@ -296,24 +296,29 @@ public sealed partial class MinimapView : Button
 
                 if (marker.Kind == TabMarkerKind.Exit)
                 {
-                    // 출구도 같은 한 칸 마름모 — 종류는 색으로만 구분한다.
+                    // 출구는 작은 마름모(반 칸) — 문이 어디인지는 보여야 한다.
                     foreach (Tile tile in marker.Goals.Where(tile => Minimap.Sees(frame, wide, high, tile)))
                     {
-                        TileMark(frame, tile, paint);
+                        Vector2 at = At(frame, tile);
+                        float w = frame.HalfWidth * 0.6f, h = frame.HalfHeight * 0.6f;
+                        DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
                     }
 
                     continue;
                 }
 
-                TileMark(frame, marker.Where, paint);
+                Dot(At(frame, marker.Where), paint);
             }
 
             if (owner._botAt is { } bot && Minimap.Sees(frame, wide, high, bot))
             {
-                TileMark(frame, bot, BotPaint);
+                Dot(At(frame, bot), BotPaint);
             }
 
-            TileMark(frame, owner.Standing, Colors.White);
+            // 나 — 흰 점, 조금 크게(3픽셀) + 검은 테 1픽셀. 다른 점과 한눈에 갈린다.
+            Vector2 me = At(frame, owner.Standing);
+            DrawRect(new Rect2(me - new Vector2(2.5f, 2.5f), new Vector2(5, 5)), Colors.Black);
+            DrawRect(new Rect2(me - new Vector2(1.5f, 1.5f), new Vector2(3, 3)), Colors.White);
 
             // 지금 곳 — 아래 왼쪽에 작게(위 줄의 곳 이름 판을 대신한다). 오른쪽 구석은 [+]·[−] 자리.
             if (owner.PlaceName.Length > 0)
@@ -325,13 +330,8 @@ public sealed partial class MinimapView : Button
             }
         }
 
-        /// <summary>One projected map tile, so terrain, route, units, and objects share the same marker size and shape.</summary>
-        private void TileMark(TabMapProjection frame, Tile tile, Color paint)
-        {
-            Vector2 at = At(frame, tile);
-            float w = frame.HalfWidth, h = frame.HalfHeight;
-            DrawColoredPolygon([at + new Vector2(0, -h), at + new Vector2(w, 0), at + new Vector2(0, h), at + new Vector2(-w, 0)], paint);
-        }
+        /// <summary>Everyone else: a two-pixel dot.</summary>
+        private void Dot(Vector2 at, Color paint) => DrawRect(new Rect2(at - Vector2.One, new Vector2(2, 2)), paint);
 
         private static Vector2 At(TabMapProjection frame, Tile tile)
         {
