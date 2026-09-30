@@ -19,6 +19,11 @@
   이펙트 속도(노바 값으로?) · 기술 목록·배우는 레벨을 노바로 바꿀지(직업별 비교 그림 scratchpad nova-icons) · 아이콘 없는 주먹단련·쿠라노토(대시보드 고르기).
   드랍 생성기 순서: build-gear-drops → build-drop-variety → **build-drop-cap**(마지막). 노바 클라이언트 조사 `docs/nova-client-work-order.md`(결과 절).
 
+- **[이어서/2026-09-30] 원작 아이템 — 드랍 적용 끝, 클라우드 반영·한글화 남음 — 등급 M.** 근거 기반 드랍(죽은 드랍 14종 5.99 확률로 복구 · 단일 Table 139 → Random)과
+  리스폰 1/6 을 evidence-drops 작업 폴더에서 옮겨 커밋(`090750b0`, 서버 `b3276d411`·`a19f7a38a`). 드랍 시험 25/25.
+  **다음**: ① 클라우드 deploy(사용자 확인 뒤) ② 영문 이름 아이템 941/2,296 한글화 — 원작 `ItemInfo` 와 그림 번호로 잇는 방법(`docs/pack-comparison.md` 「아이템 한글화」).
+  명세 `docs/evidence-backed-item-drops-spec.md`.
+
 대기·미결(보류·정할 것·남음) 목록: `plans/backlog.md` · 지난 일: `WORKLOG.md`
 <!-- NEXT-ACTION:END -->
 
