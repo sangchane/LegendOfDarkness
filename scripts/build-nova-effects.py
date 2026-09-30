@@ -50,6 +50,25 @@ configure_utf8_stdio(sys.stdout, sys.stderr)
 EFFECT = re.compile(r"(?<![\w/])effect\s+([^;\n]+);")
 LINE = re.compile(r'^(?P<pad>\s*)p\.Call\("effect", (?P<who>[^,]+), \(V\)(?P<a>\d+)L, \(V\)(?P<b>\d+)L, '
                   r'\(V\)(?P<s>\d+)L\);(?P<tail>.*)$')
+# 노바·5.99 번호가 원작 그림과 어긋나는 것 — 사용자가 준 옛 이펙트 번호 목록(`data/이펙트번호-옛목록.tsv`,
+# 2026-09-30)과 아카이브 그림으로 확인한 것만. {이름: {지금 번호: 바른 번호}} 또는 {이름: (쓴쪽, 대상)} 통째로.
+# 노바 값을 계산한 뒤에 덮는다.
+#  나르콜리: 33 은 「Miss」 글자 그림이다 — 28 이 「z z」 잠.  콘푸지오: 118 은 보라 소용돌이(바투) — 208 이 머리 위 별.
+#  수페라에나르마·에나르마: 167 구버전이 맞다(사용자 2026-09-30 "에나르마도 167번이 구버전이 맞아").
+#  에나르마는 노바가 두 칸 다 195(옛 목록 「카운터」)라 5.99 꼴(쓴쪽 칸 하나)로 통째로 둔다.
+OLD_LIST_FIX = {"나르콜리": {33: 28}, "콘푸지오": {118: 208}, "수페라에나르마": {271: 167}, "에나르마": (167, 0)}
+
+
+def fixed(name, number):
+    swap = OLD_LIST_FIX.get(name, {})
+    return swap.get(number, number) if isinstance(swap, dict) else number
+
+
+def fixed_pair(name, a, b):
+    swap = OLD_LIST_FIX.get(name)
+    return swap if isinstance(swap, tuple) else (fixed(name, a), fixed(name, b))
+
+
 KEPT = re.compile(r"\s*// 노바 이펙트\(5\.99: (\d+), (\d+)(?:, 속도 (\d+))?\)$")
 
 
@@ -117,7 +136,7 @@ def rewrite(path, old, new):
     at = [i for i, ln in enumerate(lines) if LINE.match(ln)]
     if len(at) != len(old):
         return None, f"effect 줄 {len(at)}개 · 5.99 {len(old)}개 — 맞추지 못함"
-    target = plan(old, new)
+    target = [(*fixed_pair(path.stem, a, b), s) for a, b, s in plan(old, new)]
     for n, (i, (a, b, s)) in enumerate(zip(at, target)):
         m = LINE.match(lines[i])
         kept = KEPT.search(m["tail"])
@@ -179,6 +198,26 @@ def main():
             changed.append((name, f"{sorted(set(before))} → {sorted(set(after))}", path))
             if writing:
                 path.write_text(text, encoding="utf-8-sig")
+
+    # 노바 짝이 없는 스크립트(괴물 마법·노바에 없는 마법)에도 옛 목록 바로잡기를 건다.
+    done = {path for _, _, path in changed}
+    for name, swap in OLD_LIST_FIX.items():
+        for path in sorted(PACK599.glob(f"*/{name}.cs")):
+            if path in done:
+                continue
+            text = path.read_text(encoding="utf-8-sig")
+            lines = text.split("\n")
+            for i, ln in enumerate(lines):
+                m = LINE.match(ln)
+                a, b = fixed_pair(name, int(m["a"]), int(m["b"])) if m else (0, 0)
+                if m and (a, b) != (int(m["a"]), int(m["b"])):
+                    lines[i] = (f'{m["pad"]}p.Call("effect", {m["who"]}, (V){a}L, (V){b}L, (V){m["s"]}L);{m["tail"]}'
+                                f'  // 옛 이펙트 목록({m["a"]}, {m["b"]} → {a}, {b})')
+            out = "\n".join(lines)
+            if out != text:
+                changed.append((name, f"옛 이펙트 목록 {swap}", path))
+                if writing:
+                    path.write_text(out, encoding="utf-8-sig")
 
     print(f"노바 이펙트로 바꿀 것 {len(changed)}개" + ("" if writing else " (--쓰기 를 붙이면 씁니다)"))
     for name, what, path in changed:
