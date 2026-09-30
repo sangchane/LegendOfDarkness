@@ -94,7 +94,8 @@ public sealed partial class TalkPanel : PanelContainer
 
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter);
-        body.AddChild(Greybox.Header(head));
+        // 용문양은 뺀다 — 거르개 셋·상인 이름만으로 세로 360 이 꽉 차, 넣으면 [닫기] 가 화면 밖으로 밀렸다(2026-09-30).
+        body.AddChild(Greybox.Header(head, emblem: false));
         _filters.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
         _filters.AddThemeConstantOverride("separation", Main.Gutter / 2);
         body.AddChild(scroll);

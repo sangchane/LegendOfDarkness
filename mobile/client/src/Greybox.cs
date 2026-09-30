@@ -49,7 +49,6 @@ public static class Greybox
     /// <summary>Letters on the accent. Dark, because dark on that orange is what stays readable.</summary>
     public static readonly Color OnAccent = new("#1a1208");
 
-    private static readonly Texture2D DarkStone = GD.Load<Texture2D>("res://assets/ui/stone-dark.png");
     private static readonly Texture2D LightStone = GD.Load<Texture2D>("res://assets/ui/stone.png");
 
     // ── 치수. data/ui-vault/치수/치수.md ─────────────────────────────────────
@@ -165,13 +164,6 @@ public static class Greybox
         return frame;
     }
 
-    public static StyleBoxTexture TitleStrip()
-    {
-        StyleBoxTexture strip = Tile(DarkStone, 0);
-        strip.ModulateColor = new Color(0.7f, 0.7f, 0.7f);
-        return strip;
-    }
-
     /// <summary>Original bright stone for an action or the selected tab.</summary>
     public static StyleBoxTexture Lit() => Tile(LightStone, 2);
 
@@ -237,16 +229,35 @@ public static class Greybox
     }
 
     /// <summary>
-    /// Dark stone behind a window title; light letters remain readable at phone size.
+    /// A window's title row: a flat dark plate (no stone under letters, work order 0절) with the original dragon
+    /// emblem on its left — the one mark that keeps every window reading as Dark Ages once the stone strip is gone.
+    /// The emblem is the option01 dragon cut out (`assets/ui/dragon-cutout.png`), shown at half size, never enlarged (R9).
+    /// A head already full to the edge (the shop's three filters and the NPC's name) passes <paramref name="emblem" /> false.
     /// </summary>
-    public static Control Header(Control inside)
+    public static Control Header(Control inside, bool emblem = true)
     {
-        StyleBoxTexture strip = TitleStrip();
+        StyleBoxFlat strip = new() { BgColor = Cell, BorderColor = CellEdge, BorderWidthBottom = 1 };
         strip.SetContentMarginAll(Pad / 2);
+
+        TextureRect dragon = new()
+        {
+            Texture = GD.Load<Texture2D>("res://assets/ui/dragon-cutout.png"),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            CustomMinimumSize = new Vector2(27, 24),
+            SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+
+        HBoxContainer row = new();
+        row.AddThemeConstantOverride("separation", Pad / 2);
+        if (emblem) row.AddChild(dragon);
+        inside.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        row.AddChild(inside);
 
         PanelContainer head = new();
         head.AddThemeStyleboxOverride("panel", strip);
-        head.AddChild(inside);
+        head.AddChild(row);
 
         return head;
     }
