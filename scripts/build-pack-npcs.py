@@ -24,14 +24,11 @@ NPC·아이템 스크립트의 `#이름`·`$이름` 은 캐릭터에 남는다(�
   쓰는 법: python3 scripts/build-pack-npcs.py [--쓰기]
   산출물:  sources/wren11/Dark-Ages-Private-Server/database/server/scripts/Pack599/Npcs/<스크립트 이름>.cs
 """
-import importlib.util
 import re
 import sys
 
 from lib._paths import ROOT
-_spec = importlib.util.spec_from_file_location("abilities", ROOT / "scripts" / "build-pack-abilities.py")
-abilities = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(abilities)
+from lib import _pack_abilities as abilities
 
 NPC_SCRIPTS = abilities.PACK / "script" / "Npc"
 OUT = abilities.OUT / "Npcs"

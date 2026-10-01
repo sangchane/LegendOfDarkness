@@ -4,13 +4,12 @@
 원작 613개 계보가 아니라 서버가 지금 읽는 templates/skills·spells 전체가 운영 대상이다.
 브라우저는 이 자료와 `/api/ability-overrides`를 합쳐 현재 운영값을 보여 준다.
 """
-import importlib.util
 import json
 import re
 import shutil
-from pathlib import Path
 
 from lib._paths import ROOT
+from lib._ability_page import scripted, sent_by
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 TEMPLATES = SERVER / "database/server/templates"
 CLIENT_EFFECTS = ROOT / "mobile/client/assets/effect"
@@ -27,14 +26,6 @@ NOVA_TAIL = re.compile(r",\s*(\d+)\s*,\s*\d+\s*$")
 CLASS = {0: "공통", 1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "무도가", 6: "평민"}
 PACK_EFFECT = re.compile(
     r'p\.Call\("effect",\s*[^,]+,\s*\(V\)(\d+)L,\s*\(V\)(\d+)L,\s*\(V\)(\d+)L\)')
-
-
-def ability_builder():
-    path = Path(__file__).with_name("build-ability-page-data.py")
-    spec = importlib.util.spec_from_file_location("build_ability_page_data", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 def auto_levels():
@@ -90,8 +81,7 @@ def speed_of(bodies, template):
 
 
 def build_abilities():
-    source = ability_builder()
-    scripts = source.scripted()
+    scripts = scripted()
     levels = auto_levels()
     nova = nova_table()
     rows = []
@@ -107,7 +97,7 @@ def build_abilities():
             script = template.get(script_field) or ""
             bodies = scripts.get(script, [])
             shaped = dict(template, 갈래=folder)
-            sent = source.sent_by(bodies, shaped) if bodies else {"이펙트": [], "소리": [], "몸동작": []}
+            sent = sent_by(bodies, shaped) if bodies else {"이펙트": [], "소리": [], "몸동작": []}
             class_number = class_of(template)
             level = levels.get((class_number, kind, name))
             if level is None:

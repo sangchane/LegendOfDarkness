@@ -23,7 +23,6 @@
 import json
 import re
 import sys
-from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
@@ -357,11 +356,8 @@ def main():
         path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
     print(f"\n스크립트·템플릿 {len(made)}쌍을 만들었습니다.")
     # 이펙트 번호는 노바 것이 원작이다(사용자 결정 2026-09-26) — 템플릿의 `TargetAnimation` 을 노바 값으로.
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("build_nova_effects", Path(__file__).with_name("build-nova-effects.py"))
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    module.apply()
+    from lib._nova_effects import apply
+    apply()
     return 0
 
 

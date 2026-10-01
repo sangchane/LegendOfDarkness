@@ -20,9 +20,9 @@ import json
 import re
 import shutil
 import sys
-from pathlib import Path
 
 from lib._paths import ROOT
+from lib import _cut_level as CUT  # 깎기용 괴물 레벨 — build-monster-cut-level.py 와 같은 기준점·식
 FORK = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 SERVER = FORK / "database/server"
 MONSTERS = SERVER / "templates/monsters"
@@ -47,16 +47,6 @@ def gold_rate(area_id):
 LOOT_RANDOM, LOOT_TABLE, LOOT_GOLD = 2, 4, 32
 
 
-def _cut_module():
-    """깎기용 괴물 레벨 — `scripts/build-monster-cut-level.py` 와 같은 기준점·식을 쓴다(같은 코드를 불러온다)."""
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("cut_level", Path(__file__).resolve().parent / "build-monster-cut-level.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-CUT = _cut_module()
 CUT_ROWS = list(CUT.monsters())
 CUT_POINTS = CUT.fit(CUT_ROWS)
 CUT_WOODS = CUT.woodland(CUT_ROWS)

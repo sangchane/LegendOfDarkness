@@ -22,18 +22,17 @@
     11레벨 무기는 커틀라스 1500 과 중단검 4000 둘뿐이라 낮은 쪽). **이 두 숫자만 우리가 고른 것이다.**
 
 **칸을 잇는 법은 `scripts/build-pack-equipment.py` 그대로다** — 같은 규칙을 두 번 적으면 어긋나므로
-그 생성기의 `template()` 을 그대로 불러 쓰고, `Group` 과 `Value` 만 여기서 덮는다.
+그 생성기와 같이 쓰는 `lib/_pack_equipment.py` 의 `template()` 을 그대로 불러 쓰고, `Group` 과 `Value` 만 여기서 덮는다.
 
 **덮어쓰지 않는다.** 같은 이름의 템플릿이 이미 있고 그것이 이 생성기가 쓴 것이 아니면 멈춘다.
 """
 
 import argparse
-import importlib.util
 import json
 import sys
 
 from lib._paths import ROOT
-sys.path.insert(0, str(ROOT / "scripts"))
+from lib import _pack_equipment as equipment
 
 PACK = ROOT / "data/server-packs/extracted/novaonline/items.json"
 OUT = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
@@ -45,15 +44,6 @@ GROUP = "노바표/무기/LCT"
 
 #: 들일 것과 그 값. 값만 5.99 표에서 왔다(위 docstring).
 WANTED = {"글러브1": 500, "견습자의글러브": 1500}
-
-
-def pack_equipment():
-    """`build-pack-equipment.py` 를 모듈로 읽는다 — 파일 이름에 점·빼기가 있어 그냥은 import 가 안 된다."""
-    path = ROOT / "scripts" / "build-pack-equipment.py"
-    spec = importlib.util.spec_from_file_location("build_pack_equipment", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 def named(path, name):
@@ -68,7 +58,6 @@ def main():
     parser.add_argument("--쓰기", action="store_true", dest="writing")
     args = parser.parse_args()
 
-    equipment = pack_equipment()
     items = json.loads(PACK.read_text(encoding="utf-8"))
 
     trouble = []

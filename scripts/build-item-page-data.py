@@ -6,20 +6,19 @@
 — 2026-09-30 하데스 영문판을 걷어낸 뒤로 한글(5.99 → 원작 도감) 표다.
 
 카드의 「이름 근거」 칸은 원작 도감(`docs/items/어둠템#1~5.xlsx` → `items-original-sheets.json`)과
-견준 결과다: 도감대로 / 도감과 N칸 다름 / 도감에 없음. 칸 대응은 `build-gear-from-original.py` 의
+견준 결과다: 도감대로 / 도감과 N칸 다름 / 도감에 없음. 칸 대응은 `lib/_gear_original.py`(build-gear-from-original.py 도 쓴다)의
 `wanted`·`differs` 를 그대로 쓴다 — 두 곳이 따로 놀지 않게.
 
   쓰는 법: python3 scripts/build-item-page-data.py   → docs/items-data.js
 """
-import importlib.util
 import json
 import sys
 from collections import Counter
-from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
 from lib._paths import ROOT
+from lib import _gear_original
 TEMPLATES = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
 SHEET = ROOT / "data" / "game-data" / "items-original-sheets.json"
 ICONS = ROOT / "docs" / "ui" / "assets" / "item-icons.json"
@@ -73,14 +72,6 @@ def headline(item):
     return ""
 
 
-def load_original():
-    spec = importlib.util.spec_from_file_location(
-        "gear_from_original", Path(__file__).with_name("build-gear-from-original.py"))
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def sheet_verdict(item, rows, original):
     """원작 도감과 견준 한 줄. 같은 이름 줄이 없으면 「도감에 없음」."""
     row = rows.get(item["Name"])
@@ -94,7 +85,7 @@ def sheet_verdict(item, rows, original):
 def main():
     # 서버는 items 맨 위만 읽는다(templates-retired 는 치운 것).
     items = [json.loads(p.read_text(encoding="utf-8-sig")) for p in sorted(TEMPLATES.glob("*.json"))]
-    original = load_original()
+    original = _gear_original
     rows_by_name = {}
     for row in json.loads(SHEET.read_text(encoding="utf-8"))["수치표"]:
         rows_by_name.setdefault(str(row.get("이름") or "").strip(), row)
