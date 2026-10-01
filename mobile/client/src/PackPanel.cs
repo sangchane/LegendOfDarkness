@@ -36,11 +36,6 @@ public sealed partial class PackPanel : PanelContainer
 
     private readonly GridContainer _rows = new() { Name = "Items" };
 
-    /// <summary>밟은 것을 알아서 줍는지 켜고 끄는 아이콘.</summary>
-    private readonly Button _loot = WindowFrame.IconButton(GlyphKind.Loot, "줍기", tab: true);
-
-    private void ShowLoot() => WindowFrame.Relabel(_loot, Main.AutoLoot ? "줍기 켬" : "줍기 끔");
-
     // 아래 한 줄 — 원작처럼 왼쪽에 몇 칸 찼나, 오른쪽 끝에 금화(사용자 2026-10-01).
     private readonly Label _count = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, VerticalAlignment = VerticalAlignment.Center };
     private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
@@ -79,6 +74,9 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Label _pageNumber = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
     private HBoxContainer _foot = null!;
     private Control _head = null!;
+    private bool _under;
+    private Node _tidyHome = null!;
+    private int _tidyAt;
 
     // 보이는 장, 그리고 손가락이 누른 자리. 밀어 넘긴 손은 그림을 고르지 않는다.
     private int _page;
@@ -101,15 +99,6 @@ public sealed partial class PackPanel : PanelContainer
 
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter / 2);
-
-        // 밟은 것을 알아서 주울지. 원작에는 없던 것이라 끌 수 있어야 한다(사용자, 2026-09-19).
-        _loot.ButtonPressed = Main.AutoLoot;
-        ShowLoot();
-        _loot.Pressed += () =>
-        {
-            Main.SetAutoLoot(_loot.ButtonPressed);
-            ShowLoot();
-        };
 
         Tidy = WindowFrame.IconButton(GlyphKind.Sort, "정렬");
         Close = WindowFrame.CloseButton();
@@ -169,8 +158,6 @@ public sealed partial class PackPanel : PanelContainer
             _foot.AddChild(_pager);
         }
 
-        _foot.AddChild(_loot);
-        _foot.AddChild(Tidy);
         _foot.AddChild(_gold);
 
         ButtonGroup kinds = new();
@@ -190,7 +177,10 @@ public sealed partial class PackPanel : PanelContainer
 
         _kinds[0].ButtonPressed = true;
 
-        body.AddChild(_head = WindowFrame.Head(WindowFrame.Title("소지품"), Close, _kinds));
+        // 정렬은 위 줄 탭 옆에(사용자 2026-10-01). 자동 줍기는 설정 창으로 옮겼다 — 모바일 게임들도 인벤토리에 두지 않는다.
+        body.AddChild(_head = WindowFrame.Head(WindowFrame.Title("소지품"), Close, [.. _kinds, Tidy]));
+        _tidyHome = Tidy.GetParent();
+        _tidyAt = Tidy.GetIndex();
         body.AddChild(_main);
         body.AddChild(_foot);
 
@@ -293,9 +283,29 @@ public sealed partial class PackPanel : PanelContainer
     /// </summary>
     public void UnderGear(bool under)
     {
+        if (under == _under)
+        {
+            return;
+        }
+
+        _under = under;
         _head.Visible = !under;
 
-        if (!Main.Portrait || (_pager.GetParent() == _foot) == under)
+        // 위 줄이 숨으면 정렬은 아래 줄 금화 앞으로.
+        Tidy.GetParent().RemoveChild(Tidy);
+
+        if (under)
+        {
+            _foot.AddChild(Tidy);
+            _foot.MoveChild(Tidy, _foot.GetChildCount() - 2);
+        }
+        else
+        {
+            _tidyHome.AddChild(Tidy);
+            _tidyHome.MoveChild(Tidy, _tidyAt);
+        }
+
+        if (!Main.Portrait)
         {
             return;
         }
@@ -306,7 +316,7 @@ public sealed partial class PackPanel : PanelContainer
         _gold.AddThemeFontSizeOverride("font_size", under ? 11 : 13);
         _count.AddThemeFontSizeOverride("font_size", under ? 11 : 13);
 
-        // 금화·칸 수·줍기·정렬과 한 줄에 들도록 화살표를 조금 좁힌다(높이는 그대로).
+        // 금화·칸 수·정렬과 한 줄에 들도록 화살표를 조금 좁힌다(높이는 그대로).
         foreach (Node arrow in _pager.GetChildren())
         {
             if (arrow is Button button)

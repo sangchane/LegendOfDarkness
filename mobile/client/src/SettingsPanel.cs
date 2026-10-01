@@ -40,6 +40,16 @@ public sealed partial class SettingsPanel : PanelContainer
         auto.AddChild(Row("마력 포션", mana));
         auto.AddChild(BuildAutoHunt());
 
+        // 밟은 것을 알아서 주울지 — 원작에 없던 것이라 끌 수 있어야 한다(2026-09-19). 소지품 창에서 옮겨 왔다(사용자 2026-10-01).
+        CheckButton loot = new() { ButtonPressed = Main.AutoLoot, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        loot.Toggled += Main.SetAutoLoot;
+        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus" })
+        {
+            loot.AddThemeStyleboxOverride(state, new StyleBoxEmpty());
+        }
+
+        auto.AddChild(Row("아이템 자동 줍기", loot));
+
         // ── 봇 ───────────────────────────────────────────────
         // 봇(성직자 동료) — 부르면 서버가 봇을 내 곁으로 데려와 파티에 넣는다. 결과는 서버 알림으로 온다(우리 확장 0xF1·0x5E).
         VBoxContainer bot = Page();
