@@ -558,462 +558,471 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             PacketFrame frame = await session.Connection.ReceiveAsync(cancellationToken);
             Interlocked.Exchange(ref _lastHeardTicks, DateTime.UtcNow.Ticks);
 
-            switch (frame.Command)
+            try
             {
-                case MapChangedCommand:
+                switch (frame.Command)
                 {
-                    int before = map?.Id ?? -1;
-                    map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    _field = null;
-                    _seenAiling.Clear();
-
-                    // 맵이 바뀌면 보던 것을 모두 버린다 — 남겨 두면 지난 맵 괴물이 새 맵 위에 선다. 같은 맵 새로고침
-                    // (막힌 걸음·속도 초과가 부르는 GameClient.Refresh)에는 버리지 않는다: 서버는 곁의 것을 곧 0x07 로 다시
-                    // 보낼 뿐이고, 버리면 그때까지 괴물이 모두 사라졌다가 돌아온다(사용자 2026-09-25 "보였다가 사라진다").
-                    // 시야 밖이 된 것은 서버가 0x0E 로 거둔다.
-                    if (map.Id != before)
+                    case MapChangedCommand:
                     {
-                        _creatures.Clear();
-                        _others.Clear();
-                    }
+                        int before = map?.Id ?? -1;
+                        map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _field = null;
+                        _seenAiling.Clear();
 
-                    break;
-                }
-
-                case HeartbeatCommand:
-                    await Send(HeartbeatReplyCommand, HadesCipher.DecodeSecured(frame, session.Parameters).ToArray(), cancellationToken);
-                    continue;
-
-                case ExitedCommand:
-                    _exited.TrySetResult();
-                    continue;
-
-                case WorldMapCommand:
-                    try
-                    {
-                        _field = ReadWorldMap(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _fieldShown++;
-                    }
-                    catch (ProtocolException cut)
-                    {
-                        NoteUnread($"월드맵 안내를 읽다가 끊겼습니다: {cut.Message}");
-                    }
-
-                    continue;
-
-                case LocationCommand:
-                    where = ReadLocation(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    _reports++;
-                    break;
-
-                case OwnSerialCommand:
-                    _serial = BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                    // It may arrive after we have already been shown ourselves, in which case we are
-                    // standing in the crowd under our own name until now.
-                    if (_others.TryRemove(_serial, out Character? mistaken))
-                    {
-                        _self = mistaken;
-                    }
-
-                    continue;
-
-                case DisplayCharacterCommand:
-                    Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
-                    continue;
-
-                case BodyMotionCommand:
-                {
-                    ReadOnlySpan<byte> motion = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                    if (motion.Length >= 4)
-                    {
-                        _motions.Enqueue(ReadMotion(motion));
-                    }
-                    else
-                    {
-                        _ignored++;
-                    }
-                }
-
-                    continue;
-
-                case AnimationCommand:
-                {
-                    ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                    if (body.Length >= 12)
-                    {
-                        _effects.Enqueue(ReadEffect(body));
-                    }
-                    else
-                    {
-                        _ignored++;
-                    }
-                }
-
-                    continue;
-
-                case SoundCommand:
-                {
-                    ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                    if (body.Length >= 3)
-                    {
-                        // 같은 패킷이 효과음과 배경음악을 함께 나른다 — 번호가 가른다(Music).
-                        int number = ReadSound(body);
-
-                        if (Music.Song(number) is { } song)
+                        // 맵이 바뀌면 보던 것을 모두 버린다 — 남겨 두면 지난 맵 괴물이 새 맵 위에 선다. 같은 맵 새로고침
+                        // (막힌 걸음·속도 초과가 부르는 GameClient.Refresh)에는 버리지 않는다: 서버는 곁의 것을 곧 0x07 로 다시
+                        // 보낼 뿐이고, 버리면 그때까지 괴물이 모두 사라졌다가 돌아온다(사용자 2026-09-25 "보였다가 사라진다").
+                        // 시야 밖이 된 것은 서버가 0x0E 로 거둔다.
+                        if (map.Id != before)
                         {
-                            _songs.Enqueue(song);
+                            _creatures.Clear();
+                            _others.Clear();
+                        }
+
+                        break;
+                    }
+
+                    case HeartbeatCommand:
+                        await Send(HeartbeatReplyCommand, HadesCipher.DecodeSecured(frame, session.Parameters).ToArray(), cancellationToken);
+                        continue;
+
+                    case ExitedCommand:
+                        _exited.TrySetResult();
+                        continue;
+
+                    case WorldMapCommand:
+                        try
+                        {
+                            _field = ReadWorldMap(HadesCipher.DecodeSecured(frame, session.Parameters));
+                            _fieldShown++;
+                        }
+                        catch (ProtocolException cut)
+                        {
+                            NoteUnread($"월드맵 안내를 읽다가 끊겼습니다: {cut.Message}");
+                        }
+
+                        continue;
+
+                    case LocationCommand:
+                        where = ReadLocation(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _reports++;
+                        break;
+
+                    case OwnSerialCommand:
+                        _serial = BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                        // It may arrive after we have already been shown ourselves, in which case we are
+                        // standing in the crowd under our own name until now.
+                        if (_others.TryRemove(_serial, out Character? mistaken))
+                        {
+                            _self = mistaken;
+                        }
+
+                        continue;
+
+                    case DisplayCharacterCommand:
+                        Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
+                        continue;
+
+                    case BodyMotionCommand:
+                    {
+                        ReadOnlySpan<byte> motion = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                        if (motion.Length >= 4)
+                        {
+                            _motions.Enqueue(ReadMotion(motion));
                         }
                         else
                         {
-                            _sounds.Enqueue(number);
+                            _ignored++;
                         }
                     }
-                    else
+
+                        continue;
+
+                    case AnimationCommand:
                     {
-                        _ignored++;
-                    }
-                }
+                        ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
 
-                    continue;
-
-                case HealthCommand:
-                    ReadHealth(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    continue;
-
-                case VitalsCommand:
-                    _vitals = ReadVitals(HadesCipher.DecodeSecured(frame, session.Parameters), _vitals);
-                    continue;
-
-                case SpokenCommand:
-                {
-                    // A sound with no words is still this packet; there is simply nothing to show.
-                    if (ReadTold(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } told)
-                    {
-                        _said = told.Text;
-                        _saidCount++;
-
-                        // 읽는 쪽이 없으면 끝없이 쌓이지 않게 넉넉히 자른다.
-                        if (_told.Count < HeardKept)
+                        if (body.Length >= 12)
                         {
-                            _told.Enqueue(told);
+                            _effects.Enqueue(ReadEffect(body));
+                        }
+                        else
+                        {
+                            _ignored++;
                         }
                     }
-                }
 
-                    continue;
+                        continue;
 
-                case SpeechCommand:
-                {
-                    Spoken spoken = ReadSpoken(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                    // 지난 말은 다시 볼 수 있어야 하지만 접속해 있는 내내 쌓아 둘 것은 아니다.
-                    if (spoken.Text.Length > 0)
+                    case SoundCommand:
                     {
-                        _heard = [.. _heard.TakeLast(HeardKept - 1), spoken];
-                        _heardTotal++;
-                    }
-                }
+                        ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
 
-                    continue;
-
-                case GroupAskCommand:
-                    if (Party.ReadAsk(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } asker && _asks.Count < 8)
-                    {
-                        _asks.Enqueue(asker);
-                    }
-
-                    continue;
-
-                case CompanionTieCommand:
-                    try
-                    {
-                        ReadOnlySpan<byte> tieBody = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                        switch (tieBody.Length > 0 ? tieBody[0] : 0)
+                        if (body.Length >= 3)
                         {
-                            case World.Companion.MasterKind:
-                                _master = World.Companion.ReadTie(tieBody).Tie;
-                                _statuses.Clear();
-                                break;
-                            case World.Companion.CompanionKind:
-                                _companion = World.Companion.ReadTie(tieBody).Tie;
+                            // 같은 패킷이 효과음과 배경음악을 함께 나른다 — 번호가 가른다(Music).
+                            int number = ReadSound(body);
 
-                                if (_companion is null)
-                                {
-                                    _companionLife = null;
-                                    _companionNumbers = null;
-                                    _companionKit = null;
-                                    _companionKitCount++;
-                                }
+                            if (Music.Song(number) is { } song)
+                            {
+                                _songs.Enqueue(song);
+                            }
+                            else
+                            {
+                                _sounds.Enqueue(number);
+                            }
+                        }
+                        else
+                        {
+                            _ignored++;
+                        }
+                    }
 
-                                break;
-                            case World.Companion.StatusesKind:
-                                (uint on, IReadOnlyList<CompanionStatus> listed) = World.Companion.ReadStatuses(tieBody);
-                                _statuses[on] = listed;
-                                break;
-                            case World.Companion.VitalsKind:
-                                _companionLife = World.Companion.ReadLife(tieBody);
-                                _companionNumbers = PartyNumbers.ReadLife(tieBody);
-                                break;
-                            case World.Companion.MemberKind:
-                                PartyMemberStatus member = World.Companion.ReadMember(tieBody);
+                        continue;
 
-                                // serial 0 — 그룹이 끝났다(나갔거나 흩어졌다). 모두 지운다.
-                                if (member.Serial == 0)
-                                {
-                                    _members.Clear();
-                                    _memberNumbers.Clear();
-                                }
-                                else
-                                {
-                                    _members[member.Serial] = member;
+                    case HealthCommand:
+                        ReadHealth(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        continue;
 
-                                    if (PartyNumbers.ReadMember(tieBody) is { } numbers)
+                    case VitalsCommand:
+                        _vitals = ReadVitals(HadesCipher.DecodeSecured(frame, session.Parameters), _vitals);
+                        continue;
+
+                    case SpokenCommand:
+                    {
+                        // A sound with no words is still this packet; there is simply nothing to show.
+                        if (ReadTold(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } told)
+                        {
+                            _said = told.Text;
+                            _saidCount++;
+
+                            // 읽는 쪽이 없으면 끝없이 쌓이지 않게 넉넉히 자른다.
+                            if (_told.Count < HeardKept)
+                            {
+                                _told.Enqueue(told);
+                            }
+                        }
+                    }
+
+                        continue;
+
+                    case SpeechCommand:
+                    {
+                        Spoken spoken = ReadSpoken(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                        // 지난 말은 다시 볼 수 있어야 하지만 접속해 있는 내내 쌓아 둘 것은 아니다.
+                        if (spoken.Text.Length > 0)
+                        {
+                            _heard = [.. _heard.TakeLast(HeardKept - 1), spoken];
+                            _heardTotal++;
+                        }
+                    }
+
+                        continue;
+
+                    case GroupAskCommand:
+                        if (Party.ReadAsk(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } asker && _asks.Count < 8)
+                        {
+                            _asks.Enqueue(asker);
+                        }
+
+                        continue;
+
+                    case CompanionTieCommand:
+                        try
+                        {
+                            ReadOnlySpan<byte> tieBody = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                            switch (tieBody.Length > 0 ? tieBody[0] : 0)
+                            {
+                                case World.Companion.MasterKind:
+                                    _master = World.Companion.ReadTie(tieBody).Tie;
+                                    _statuses.Clear();
+                                    break;
+                                case World.Companion.CompanionKind:
+                                    _companion = World.Companion.ReadTie(tieBody).Tie;
+
+                                    if (_companion is null)
                                     {
-                                        _memberNumbers[member.Serial] = numbers;
+                                        _companionLife = null;
+                                        _companionNumbers = null;
+                                        _companionKit = null;
+                                        _companionKitCount++;
+                                    }
+
+                                    break;
+                                case World.Companion.StatusesKind:
+                                    (uint on, IReadOnlyList<CompanionStatus> listed) = World.Companion.ReadStatuses(tieBody);
+                                    _statuses[on] = listed;
+                                    break;
+                                case World.Companion.VitalsKind:
+                                    _companionLife = World.Companion.ReadLife(tieBody);
+                                    _companionNumbers = PartyNumbers.ReadLife(tieBody);
+                                    break;
+                                case World.Companion.MemberKind:
+                                    PartyMemberStatus member = World.Companion.ReadMember(tieBody);
+
+                                    // serial 0 — 그룹이 끝났다(나갔거나 흩어졌다). 모두 지운다.
+                                    if (member.Serial == 0)
+                                    {
+                                        _members.Clear();
+                                        _memberNumbers.Clear();
                                     }
                                     else
                                     {
-                                        _memberNumbers.TryRemove(member.Serial, out _);
-                                    }
-                                }
+                                        _members[member.Serial] = member;
 
-                                break;
-                            case World.Companion.KitKind:
-                                _companionKit = World.Companion.ReadKit(tieBody);
-                                _companionKitCount++;
-                                break;
+                                        if (PartyNumbers.ReadMember(tieBody) is { } numbers)
+                                        {
+                                            _memberNumbers[member.Serial] = numbers;
+                                        }
+                                        else
+                                        {
+                                            _memberNumbers.TryRemove(member.Serial, out _);
+                                        }
+                                    }
+
+                                    break;
+                                case World.Companion.KitKind:
+                                    _companionKit = World.Companion.ReadKit(tieBody);
+                                    _companionKitCount++;
+                                    break;
+                            }
+                        }
+                        catch (ProtocolException cut)
+                        {
+                            NoteUnread($"0x5E: {cut.Message}");
+                        }
+
+                        continue;
+
+                    case OtherProfileCommand:
+                        try
+                        {
+                            _seen = OtherProfile.Read(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        }
+                        catch (ProtocolException cut)
+                        {
+                            NoteUnread($"0x34: {cut.Message}");
+                        }
+
+                        continue;
+
+                    case ProfileCommand:
+                        try
+                        {
+                            byte[] profile = HadesCipher.DecodeSecured(frame, session.Parameters).ToArray();
+                            _path = LearnLadder.PathFromProfile(profile) ?? _path;
+                            _groupOpen = LearnLadder.GroupOpenFromProfile(profile) ?? _groupOpen;
+                            _roster = Party.ReadRoster(profile);
+                            _rosterCount++;
+                        }
+                        catch (ProtocolException cut)
+                        {
+                            NoteUnread($"0x39: {cut.Message}");
+                        }
+
+                        continue;
+
+                    case CooldownCommand:
+                    {
+                        Cooldown cooling = ReadCooldown(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                        _cooling[(cooling.Skill, cooling.Slot)] = DateTime.UtcNow.AddSeconds(cooling.Seconds);
+                    }
+
+                        continue;
+
+                    case StatusCommand:
+                    {
+                        Ailment told = ReadAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                        // 등급 0 은 풀렸다는 뜻이다(Debuff.OnEnded 가 0 을 보낸다).
+                        if (told.Left == 0)
+                        {
+                            _ailing.TryRemove(told.Icon, out _);
+                        }
+                        else
+                        {
+                            _ailing[told.Icon] = told;
                         }
                     }
-                    catch (ProtocolException cut)
+
+                        continue;
+
+                    case SeenStatusCommand:
                     {
-                        NoteUnread($"0x5E: {cut.Message}");
+                        SeenAilment seen = ReadSeenAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                        if (seen.Left == 0)
+                        {
+                            _seenAiling.TryRemove((seen.Serial, seen.Icon), out _);
+                        }
+                        else
+                        {
+                            _seenAiling[(seen.Serial, seen.Icon)] = seen;
+                        }
                     }
 
-                    continue;
+                        continue;
 
-                case OtherProfileCommand:
-                    try
+                    case FigureCommand:
+                        Figure figure = ReadFigure(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _figures.Enqueue(figure);
+
+                        if (figure.Kind == FigureKind.Damage && figure.Source != 0)
+                        {
+                            _struck[figure.Target] = (figure.Source, DateTime.UtcNow);
+                        }
+
+                        continue;
+
+                    case ShowCreaturesCommand:
+                        foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
+                        {
+                            _creatures[creature.Serial] = creature;
+                            _others.TryRemove(creature.Serial, out _);
+                        }
+
+                        continue;
+
+                    case TakeFromPackCommand:
                     {
-                        _seen = OtherProfile.Read(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    }
-                    catch (ProtocolException cut)
-                    {
-                        NoteUnread($"0x34: {cut.Message}");
-                    }
+                        ReadOnlySpan<byte> gone = HadesCipher.DecodeSecured(frame, session.Parameters);
 
-                    continue;
-
-                case ProfileCommand:
-                    try
-                    {
-                        byte[] profile = HadesCipher.DecodeSecured(frame, session.Parameters).ToArray();
-                        _path = LearnLadder.PathFromProfile(profile) ?? _path;
-                        _groupOpen = LearnLadder.GroupOpenFromProfile(profile) ?? _groupOpen;
-                        _roster = Party.ReadRoster(profile);
-                        _rosterCount++;
-                    }
-                    catch (ProtocolException cut)
-                    {
-                        NoteUnread($"0x39: {cut.Message}");
-                    }
-
-                    continue;
-
-                case CooldownCommand:
-                {
-                    Cooldown cooling = ReadCooldown(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                    _cooling[(cooling.Skill, cooling.Slot)] = DateTime.UtcNow.AddSeconds(cooling.Seconds);
-                }
-
-                    continue;
-
-                case StatusCommand:
-                {
-                    Ailment told = ReadAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                    // 등급 0 은 풀렸다는 뜻이다(Debuff.OnEnded 가 0 을 보낸다).
-                    if (told.Left == 0)
-                    {
-                        _ailing.TryRemove(told.Icon, out _);
-                    }
-                    else
-                    {
-                        _ailing[told.Icon] = told;
-                    }
-                }
-
-                    continue;
-
-                case SeenStatusCommand:
-                {
-                    SeenAilment seen = ReadSeenAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                    if (seen.Left == 0)
-                    {
-                        _seenAiling.TryRemove((seen.Serial, seen.Icon), out _);
-                    }
-                    else
-                    {
-                        _seenAiling[(seen.Serial, seen.Icon)] = seen;
-                    }
-                }
-
-                    continue;
-
-                case FigureCommand:
-                    Figure figure = ReadFigure(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    _figures.Enqueue(figure);
-
-                    if (figure.Kind == FigureKind.Damage && figure.Source != 0)
-                    {
-                        _struck[figure.Target] = (figure.Source, DateTime.UtcNow);
+                        if (gone.Length >= 1)
+                        {
+                            _pack.TryRemove(gone[0], out _);
+                        }
                     }
 
-                    continue;
+                        continue;
 
-                case ShowCreaturesCommand:
-                    foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
+                    case WornCommand:
                     {
-                        _creatures[creature.Serial] = creature;
-                        _others.TryRemove(creature.Serial, out _);
+                        WornItem gear = ReadWorn(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _worn[gear.Slot] = gear;
                     }
 
-                    continue;
+                        continue;
 
-                case TakeFromPackCommand:
-                {
-                    ReadOnlySpan<byte> gone = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                    if (gone.Length >= 1)
+                    case TookOffCommand:
                     {
-                        _pack.TryRemove(gone[0], out _);
-                    }
-                }
+                        ReadOnlySpan<byte> bare = HadesCipher.DecodeSecured(frame, session.Parameters);
 
-                    continue;
-
-                case WornCommand:
-                {
-                    WornItem gear = ReadWorn(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    _worn[gear.Slot] = gear;
-                }
-
-                    continue;
-
-                case TookOffCommand:
-                {
-                    ReadOnlySpan<byte> bare = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                    if (bare.Length >= 1)
-                    {
-                        _worn.TryRemove(bare[0], out _);
-                    }
-                }
-
-                    continue;
-
-                case AddSkillCommand:
-                {
-                    LearnedSkill skill = ReadSkill(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    _skills[skill.Slot] = skill;
-                }
-
-                    continue;
-
-                case AddSpellCommand:
-                {
-                    LearnedSpell spell = ReadSpell(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    _spells[spell.Slot] = spell;
-                }
-
-                    continue;
-
-                case RemoveSkillCommand:
-                    _skills.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
-                    continue;
-
-                case RemoveSpellCommand:
-                    _spells.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
-                    continue;
-
-                case AddToPackCommand:
-                    {
-                        InventoryItem carried = ReadPackItem(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _pack[carried.Slot] = carried;
+                        if (bare.Length >= 1)
+                        {
+                            _worn.TryRemove(bare[0], out _);
+                        }
                     }
 
-                    continue;
+                        continue;
 
-                case CreatureWalkedCommand:
-                    Moved(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    continue;
-
-                case TurnedCommand:
-                    Turned(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    continue;
-
-                case RemoveCommand:
-                {
-                    uint gone = BinaryPrimitives.ReadUInt32BigEndian(
-                        HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                    _others.TryRemove(gone, out _);
-                    _creatures.TryRemove(gone, out _);
-
-                    foreach ((uint Serial, int Icon) key in _seenAiling.Keys.Where(key => key.Serial == gone))
+                    case AddSkillCommand:
                     {
-                        _seenAiling.TryRemove(key, out _);
+                        LearnedSkill skill = ReadSkill(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _skills[skill.Slot] = skill;
                     }
-                }
 
-                    continue;
+                        continue;
 
-                case DialogueCommand:
-                {
-                    Dialogue talk = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
-                    Talking = talk;
-                    _talkCount++;
-
-                    if (talk.Unread is { } cut)
+                    case AddSpellCommand:
                     {
-                        NoteUnread($"0x2F: {cut}");
+                        LearnedSpell spell = ReadSpell(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        _spells[spell.Slot] = spell;
                     }
-                }
 
-                    continue;
+                        continue;
 
-                case SequenceCommand:
-                {
-                    byte[] sequence = HadesCipher.DecodeSecured(frame, session.Parameters);
+                    case RemoveSkillCommand:
+                        _skills.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
+                        continue;
 
-                    if (ShutsDialogue(sequence))
+                    case RemoveSpellCommand:
+                        _spells.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
+                        continue;
+
+                    case AddToPackCommand:
+                        {
+                            InventoryItem carried = ReadPackItem(HadesCipher.DecodeSecured(frame, session.Parameters));
+                            _pack[carried.Slot] = carried;
+                        }
+
+                        continue;
+
+                    case CreatureWalkedCommand:
+                        Moved(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        continue;
+
+                    case TurnedCommand:
+                        Turned(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        continue;
+
+                    case RemoveCommand:
                     {
-                        Talking = null;
+                        uint gone = BinaryPrimitives.ReadUInt32BigEndian(
+                            HadesCipher.DecodeSecured(frame, session.Parameters));
+
+                        _others.TryRemove(gone, out _);
+                        _creatures.TryRemove(gone, out _);
+
+                        foreach ((uint Serial, int Icon) key in _seenAiling.Keys.Where(key => key.Serial == gone))
+                        {
+                            _seenAiling.TryRemove(key, out _);
+                        }
+                    }
+
+                        continue;
+
+                    case DialogueCommand:
+                    {
+                        Dialogue talk = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
+                        Talking = talk;
                         _talkCount++;
+
+                        if (talk.Unread is { } cut)
+                        {
+                            NoteUnread($"0x2F: {cut}");
+                        }
                     }
-                    else
+
+                        continue;
+
+                    case SequenceCommand:
                     {
-                        // 반응기 창(ReactorSequence·ReactorInputSequence)도 0x30 으로 온다. 아직 그리지 않지만 말없이 버리지는 않는다.
-                        string kind = sequence.Length > 0 ? $"0x{sequence[0]:X2}" : "없음";
-                        NoteUnread($"0x30: 닫기가 아닌 창 순서입니다 (첫 바이트 {kind}).");
+                        byte[] sequence = HadesCipher.DecodeSecured(frame, session.Parameters);
+
+                        if (ShutsDialogue(sequence))
+                        {
+                            Talking = null;
+                            _talkCount++;
+                        }
+                        else
+                        {
+                            // 반응기 창(ReactorSequence·ReactorInputSequence)도 0x30 으로 온다. 아직 그리지 않지만 말없이 버리지는 않는다.
+                            string kind = sequence.Length > 0 ? $"0x{sequence[0]:X2}" : "없음";
+                            NoteUnread($"0x30: 닫기가 아닌 창 순서입니다 (첫 바이트 {kind}).");
+                        }
                     }
+
+                        continue;
+
+                    default:
+                        continue;
                 }
 
-                    continue;
-
-                default:
-                    continue;
+                if (map is not null && where is not null)
+                {
+                    _state = new WorldEntry(map, where.Value);
+                }
             }
-
-            if (map is not null && where is not null)
+            catch (Exception unreadable) when (unreadable is ProtocolException or ArgumentException or IndexOutOfRangeException)
             {
-                _state = new WorldEntry(map, where.Value);
+                // 갈래마다 따로 잡지 않은 패킷도 여기서 막는다 — 하나가 어긋났다고 받기 루프(접속)가 죽지 않게.
+                NoteUnread($"0x{frame.Command:X2}: {unreadable.Message}");
+                _ignored++;
             }
         }
     }
@@ -1926,7 +1935,8 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             // Byte 4 says whether it stacks, which the count already tells us.
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest[9..]),
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest[5..]),
-            ReadItemStats(rest[17..]));
+            // 13~16바이트로 끝나면 수치가 없는 것이다 — 자르다 넘치지 않게.
+            ReadItemStats(rest[Math.Min(17, rest.Length)..]));
     }
 
     /// <summary>

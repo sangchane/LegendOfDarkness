@@ -324,7 +324,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
         else
         {
-            _ = server.PumpAsync(_leaving.Token);
+            Main.Fire(server.PumpAsync(_leaving.Token));
         }
 
         _rehearsal = new Queue<Direction>(Main.Rehearse
@@ -420,7 +420,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         if (who != 0 && server is { } world)
         {
-            _ = world.ClickAsync(who, System.Threading.CancellationToken.None);
+            Main.Fire(world.ClickAsync(who, System.Threading.CancellationToken.None));
         }
     }
 
@@ -468,7 +468,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             && (world.Creatures.FirstOrDefault(one => one.Serial == _target) is { Kind: CreatureKind.Merchant }
                 || (_target != 0 && _target == before && _crowd.ContainsKey(_target))))
         {
-            _ = world.ClickAsync(_target, System.Threading.CancellationToken.None);
+            Main.Fire(world.ClickAsync(_target, System.Threading.CancellationToken.None));
         }
     }
 
@@ -533,7 +533,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return false;
         }
 
-        _ = server.PickUpAsync(asked.Where, _leaving.Token);
+        Main.Fire(server.PickUpAsync(asked.Where, _leaving.Token));
 
         // 실제로 보낼 때만 말한다. 리허설 쪽에서 말하면 화면이 얼어 탭이 무시돼도 찍혀서,
         // 되는 줄 알고 한참 헤맸다(2026-09-11).
@@ -599,7 +599,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         _player.Face(direction);
-        _ = server?.TurnAsync(direction, _leaving.Token);
+        Main.Fire(server?.TurnAsync(direction, _leaving.Token));
         return true;
     }
 
@@ -623,14 +623,14 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             if (turned)
             {
-                _ = server?.TurnAsync(direction, _leaving.Token);
+                Main.Fire(server?.TurnAsync(direction, _leaving.Token));
             }
 
             return;
         }
 
         // Telling the server is enough — it only answers when it disagrees.
-        _ = server?.WalkAsync(direction, _leaving.Token);
+        Main.Fire(server?.WalkAsync(direction, _leaving.Token));
 
         _tile = next;
         _from = _player.Position;
@@ -818,7 +818,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         if (Main.Saying.Length > 0)
         {
-            _ = server?.SayAsync(Main.Saying, _leaving.Token);
+            Main.Fire(server?.SayAsync(Main.Saying, _leaving.Token));
         }
 
         if (Main.Lifting)
@@ -1181,7 +1181,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 break;
             case HuntAct.Face:
                 _player.Face(step.Toward);
-                _ = world.TurnAsync(step.Toward, _leaving.Token);
+                Main.Fire(world.TurnAsync(step.Toward, _leaving.Token));
                 break;
             case HuntAct.Strike:
                 Strike();
@@ -1196,7 +1196,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private void Face(int dx, int dy)
     {
         _player.Face(Toward(dx, dy));
-        _ = server?.TurnAsync(Toward(dx, dy), _leaving.Token);
+        Main.Fire(server?.TurnAsync(Toward(dx, dy), _leaving.Token));
     }
 
     private static Direction Toward(int dx, int dy) =>
@@ -1270,33 +1270,15 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     }
 
     /// <summary>
-    /// Puts one unspent point on whichever attribute is furthest from the Monk build. One point at a time,
-    /// because the server takes one per packet.
+    /// 레벨업 점수 한 점을 직업 계획(알맹이 <see cref="StatPlan"/>)대로 찍는다. 계획이 없는 직업은 그대로 둔다.
     /// </summary>
     private void SpendAPoint()
     {
         // 레벨업이 준 점수를 스스로 찍는다. 예전에는 자동 사냥 중에만 돌아, 사람이 놀면 점수가 쌓이기만 했다
         // (2026-09-18 조사). 서버는 한 번에 한 점씩 받으므로 프레임마다 한 점.
-        if (server?.Vitals is not { Unspent: > 0 } mine)
+        if (server?.Vitals is { } mine && StatPlan.Next(server.Path, mine) is { } which)
         {
-            return;
-        }
-
-        (Stat Which, int Want, int Have)[] build =
-        [
-            (Stat.Con, 65, mine.Con), (Stat.Str, 77, mine.Str),
-            (Stat.Int, 43, mine.Int), (Stat.Wis, 36, mine.Wis)
-        ];
-
-        Stat? next = build
-            .Where(want => want.Want > want.Have)
-            .OrderByDescending(want => want.Want - want.Have)
-            .Select(want => (Stat?)want.Which)
-            .FirstOrDefault();
-
-        if (next is { } which)
-        {
-            _ = server.RaiseAsync(which, _leaving.Token);
+            Main.Fire(server.RaiseAsync(which, _leaving.Token));
         }
     }
 
@@ -1325,7 +1307,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             DrawOwnBlow(_ownBlow.Number ?? 1, _ownBlow.Speed);
         }
 
-        _ = server?.AttackAsync(_leaving.Token);
+        Main.Fire(server?.AttackAsync(_leaving.Token));
     }
 
     /// <summary>Our own blow in the motion given — a class motion only in clothes skill.tbl lists for it, else the plain swing.</summary>
@@ -1351,7 +1333,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         _ownBlow.Other();
-        _ = server?.UseSkillAsync(slot, _leaving.Token);
+        Main.Fire(server?.UseSkillAsync(slot, _leaving.Token));
     }
 
     /// <summary>Casts a learned spell at a chosen serial, or at self when target is zero.</summary>
@@ -1363,7 +1345,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
 
         _ownBlow.Other();
-        _ = server?.UseSpellAsync(slot, target, _leaving.Token);
+        Main.Fire(server?.UseSpellAsync(slot, target, _leaving.Token));
     }
 
     /// <summary>
@@ -1517,7 +1499,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         // latter or the server quite correctly finds no item at the old coordinate.
         if (_autoLoot.Next(Main.AutoLoot, _tile, server.Creatures) is { } where)
         {
-            _ = server.PickUpAsync(where, _leaving.Token);
+            Main.Fire(server.PickUpAsync(where, _leaving.Token));
         }
     }
 
@@ -1533,7 +1515,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         if (_potion.Next(vitals, server.Pack, Main.HealthPotion, Main.ManaPotion, now) is { } slot)
         {
-            _ = server.UseAsync(slot, _leaving.Token);
+            Main.Fire(server.UseAsync(slot, _leaving.Token));
         }
     }
 

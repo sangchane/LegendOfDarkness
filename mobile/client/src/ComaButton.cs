@@ -75,10 +75,10 @@ public sealed partial class ComaButton : Button
         switch (choice.Use)
         {
             case ComaUse.UseOnSelf:
-                _ = world.UseAsync(choice.Slot, System.Threading.CancellationToken.None);
+                Main.Fire(world.UseAsync(choice.Slot, System.Threading.CancellationToken.None));
                 break;
             case ComaUse.WakeBot:
-                _ = world.WakeCompanionAsync(System.Threading.CancellationToken.None);
+                Main.Fire(world.WakeCompanionAsync(System.Threading.CancellationToken.None));
                 break;
             default:
                 _notify(choice.Why);

@@ -246,15 +246,15 @@ public partial class GameScreen : Control
         _topRow = BuildTopRow();
         _pack = new PackPanel();
         _pack.Close.Pressed += () => Carrying(false);
-        _pack.Used += slot => _ = _server?.UseAsync(slot, System.Threading.CancellationToken.None);
+        _pack.Used += slot => Main.Fire(_server?.UseAsync(slot, System.Threading.CancellationToken.None));
         _pack.Dropped += (slot, count) => _ = Throw(slot, count);
         _pack.Tidy.Pressed += () => _ = Straighten();
 
         _gearPanel = new GearPanel();
-        _gearPanel.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
+        _gearPanel.TakenOff += place => Main.Fire(_server?.TakeOffAsync(place, System.Threading.CancellationToken.None));
         _gearPanel.Close.Pressed += () => Dressing(false);
         _gearPanel.GroupToggled += () => _ = ToggleGroup();
-        _gearPanel.GroupAsked += name => _ = _server?.AskToGroupAsync(name, System.Threading.CancellationToken.None);
+        _gearPanel.GroupAsked += name => Main.Fire(_server?.AskToGroupAsync(name, System.Threading.CancellationToken.None));
 
         _chat = new ChatPanel();
         _chat.Close.Pressed += () => Chatting(false);
@@ -267,7 +267,7 @@ public partial class GameScreen : Control
         {
             if (yes)
             {
-                _ = _server?.AcceptGroupAsync(name, System.Threading.CancellationToken.None);
+                Main.Fire(_server?.AcceptGroupAsync(name, System.Threading.CancellationToken.None));
             }
             else
             {
@@ -275,14 +275,14 @@ public partial class GameScreen : Control
                 Route(new Notice(MessageChannel.Party, MessagePlace.LogOnly, $"{name}님의 파티 초대를 거절했습니다.", string.Empty));
             }
         };
-        _party.Left += () => _ = _server?.LeaveGroupAsync(System.Threading.CancellationToken.None);
+        _party.Left += () => Main.Fire(_server?.LeaveGroupAsync(System.Threading.CancellationToken.None));
 
         _field = new FieldPanel(_guide);
         _field.Chosen += area =>
         {
             _chosenField = area;
             SetWindow(GameWindow.WorldMap, false);
-            _ = _server?.ChooseFieldAsync(area, System.Threading.CancellationToken.None);
+            Main.Fire(_server?.ChooseFieldAsync(area, System.Threading.CancellationToken.None));
         };
         _field.Close.Pressed += () =>
         {
@@ -313,13 +313,13 @@ public partial class GameScreen : Control
         // 봇 칸을 누르면 봇 장비창. 주기·벗기기는 우리 확장 0xF1 2·3, 결과는 서버 알림과 봇 장비 안내(0x5E 종류 5).
         _party.BotOpened += () => SetWindow(GameWindow.BotGear, !_botGear.Visible);
         _botGear.Close.Pressed += () => SetWindow(GameWindow.BotGear, false);
-        _botGear.Given += (slot, count) => _ = _server?.GiveToCompanionAsync(slot, count, System.Threading.CancellationToken.None);
-        _botGear.TakenOff += place => _ = _server?.TakeOffCompanionAsync(place, System.Threading.CancellationToken.None);
+        _botGear.Given += (slot, count) => Main.Fire(_server?.GiveToCompanionAsync(slot, count, System.Threading.CancellationToken.None));
+        _botGear.TakenOff += place => Main.Fire(_server?.TakeOffCompanionAsync(place, System.Threading.CancellationToken.None));
 
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
         _talk.Traded += (merchant, selling, lines) => _ = Trade(merchant, selling, lines);
-        _talk.MenuRequested += merchant => _ = _server?.ShopMenuAsync(merchant, System.Threading.CancellationToken.None);
+        _talk.MenuRequested += merchant => Main.Fire(_server?.ShopMenuAsync(merchant, System.Threading.CancellationToken.None));
         _talk.Answered += (speaker, step, words) => _ = words is null
             ? _server?.AnswerAsync(speaker, step, System.Threading.CancellationToken.None)
             : _server?.AnswerAsync(speaker, step, words, System.Threading.CancellationToken.None);
@@ -424,7 +424,7 @@ public partial class GameScreen : Control
         {
             case GameWindow.Talk:
                 _talk.Visible = false;
-                _ = _server?.ShutDialogueAsync(System.Threading.CancellationToken.None);
+                Main.Fire(_server?.ShutDialogueAsync(System.Threading.CancellationToken.None));
                 break;
 
             case GameWindow.WorldMap:
@@ -447,7 +447,7 @@ public partial class GameScreen : Control
     {
         _field.Visible = false;
         _closedAtFieldShown = _server?.FieldShown;
-        _ = _server?.CloseFieldAsync(System.Threading.CancellationToken.None);
+        Main.Fire(_server?.CloseFieldAsync(System.Threading.CancellationToken.None));
     }
 
     /// <summary>
@@ -790,7 +790,7 @@ public partial class GameScreen : Control
         // 월드맵은 인벤토리·설정과 같은 보통 단추(2026-09-26 3차 — 2차의 마름모 단추는 요청을 잘못 읽은 것이었다. 맨 왼쪽으로
         // 가는 것은 미니맵이다). 누르면 카드형 월드맵.
         _map = MenuButton("월드맵", "res://assets/ui/menu-map.png");
-        _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
+        _map.Pressed += () => Main.Fire(_server?.OpenFieldAsync(System.Threading.CancellationToken.None));
         actions.AddChild(_map);
         actions.MoveChild(_map, 0);
 
@@ -1236,7 +1236,7 @@ public partial class GameScreen : Control
                 // 누가 들어오고 나갔다는 말이 오면 목록을 다시 받는다 — 서버는 목록을 스스로 보내지 않는다(Party).
                 if (notice.Channel == MessageChannel.Party && type != GroupChat)
                 {
-                    _ = _server?.AskProfileAsync(System.Threading.CancellationToken.None);
+                    Main.Fire(_server?.AskProfileAsync(System.Threading.CancellationToken.None));
                 }
             }
         }
@@ -1459,7 +1459,7 @@ public partial class GameScreen : Control
         if (!_rosterAsked && server.State is not null && server.Self is not null)
         {
             _rosterAsked = true;
-            _ = server.AskProfileAsync(System.Threading.CancellationToken.None);
+            Main.Fire(server.AskProfileAsync(System.Threading.CancellationToken.None));
         }
 
         while (server.TakeAsk(out string? asker))
@@ -1553,7 +1553,7 @@ public partial class GameScreen : Control
             return;
         }
 
-        _ = _server.AskToGroupAsync(person.Name, System.Threading.CancellationToken.None);
+        Main.Fire(_server.AskToGroupAsync(person.Name, System.Threading.CancellationToken.None));
         Route(new Notice(MessageChannel.Party, MessagePlace.Ticker, $"{person.Name}님을 파티에 초대했습니다.", string.Empty));
     }
 
@@ -2115,7 +2115,7 @@ public partial class GameScreen : Control
         _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, Mine.Gold);
 
         // 직업·그룹 받기는 프로필(0x39)에서 온다 — 열 때마다 새로 묻는다.
-        _ = _server?.AskProfileAsync(System.Threading.CancellationToken.None);
+        Main.Fire(_server?.AskProfileAsync(System.Threading.CancellationToken.None));
     }
 
     /// <summary>
@@ -2214,7 +2214,7 @@ public partial class GameScreen : Control
     private void ShutTalk()
     {
         Talk(null);
-        _ = _server?.ShutDialogueAsync(System.Threading.CancellationToken.None);
+        Main.Fire(_server?.ShutDialogueAsync(System.Threading.CancellationToken.None));
     }
 
     /// <summary>Shortens gold without rounding up to money the character does not have.</summary>

@@ -8,6 +8,17 @@ namespace LodClient;
 /// </summary>
 public partial class Main : Control
 {
+    /// <summary>
+    /// 결과를 기다리지 않는 서버 요청을 보낸다. 실패하면 말없이 사라지지 않게 오류 기록을 남긴다
+    /// (취소 — 화면을 떠나는 길 — 는 기록하지 않는다).
+    /// </summary>
+    public static void Fire(System.Threading.Tasks.Task? request)
+    {
+        request?.ContinueWith(
+            failed => GD.PushError($"서버 요청 실패: {failed.Exception?.GetBaseException().Message}"),
+            System.Threading.Tasks.TaskContinuationOptions.OnlyOnFaulted);
+    }
+
     /// <summary>Smallest touch target, in logical units. One unit is one dp at this project's base size.</summary>
     public const int TouchMinimum = 48;
 
@@ -97,7 +108,14 @@ public partial class Main : Control
             return;
         }
 
-        using Godot.FileAccess reading = Godot.FileAccess.Open(AutoLoginFile, Godot.FileAccess.ModeFlags.Read);
+        // 열기가 실패하면(권한·손상) 저장된 계정이 없는 것으로 친다 — 시작하자마자 죽지 않게.
+        using Godot.FileAccess? reading = Godot.FileAccess.Open(AutoLoginFile, Godot.FileAccess.ModeFlags.Read);
+
+        if (reading is null)
+        {
+            return;
+        }
+
         SavedLogin = Lod.Mobile.Core.World.AutoLoginAccount.Parse(reading.GetLine().Trim(), reading.GetLine().Trim());
     }
 
@@ -314,8 +332,8 @@ public partial class Main : Control
             return [];
         }
 
-        using Godot.FileAccess reading = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
-        return reading.GetAsText().Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        using Godot.FileAccess? reading = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
+        return reading is null ? [] : reading.GetAsText().Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
     /// <summary>환경변수로도 준다. 데스크톱에서 인자 없이 다른 서버를 가리킬 때 쓴다.</summary>
@@ -921,7 +939,7 @@ public partial class Main : Control
             return null;
         }
 
-        using Godot.FileAccess file = Godot.FileAccess.Open(ServerFile, Godot.FileAccess.ModeFlags.Read);
+        using Godot.FileAccess? file = Godot.FileAccess.Open(ServerFile, Godot.FileAccess.ModeFlags.Read);
         string line = file?.GetLine().Trim() ?? string.Empty;
 
         return line.Length > 0 && !line.StartsWith('#') ? line : null;
@@ -947,7 +965,7 @@ public partial class Main : Control
             return null;
         }
 
-        using Godot.FileAccess file = Godot.FileAccess.Open(LoginFile, Godot.FileAccess.ModeFlags.Read);
+        using Godot.FileAccess? file = Godot.FileAccess.Open(LoginFile, Godot.FileAccess.ModeFlags.Read);
         string line = file?.GetLine().Trim() ?? string.Empty;
 
         return line.Length > 0 && !line.StartsWith('#') ? line : null;
