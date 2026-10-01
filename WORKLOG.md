@@ -1110,3 +1110,4 @@ ui의 Godot 지침과 ponytail 적용. 기존 Greybox 팔레트·원작 아트�
 - 서버 커밋 7: `CompanionPairing`·`CompanionKit`·`CompanionStatus`·`CompanionState`, `HandleBuy`·`HandleSell`·`ShopPricing.Offer`, `ClientFormatF2.cs`, `Infrastructure/AbilityPresentationOverrides`(경고 로그, 서버 밖에서는 조용히), `MonkStrike` 이름 붙은 상수. 레벨업 점수 중복 요청은 서버가 막음 — 다만 원본부터의 구멍 둘(backlog).
 - 생성기 커밋 5: `scripts/lib/`(`_paths` `_io` `_dotnet` `_git` `_graphify` `_drops` …), 100줄 넘는 함수 17개 나눔, 운영 스크립트 8개 `scripts/ops/`(launchd `com.lod.backup`·`com.lod.iossign` 도 새 경로). 출력 전후 바이트 동일 101회.
 - 시험: 알맹이 669 · 서버 278(사냥 시간 시험 2개는 단독 통과) · 사진 `out/tidy-compare.png`(서버 없는 화면, 배치 같음).
+- 이펙트 첫 사용 끊김: `build-client-effects.py` 가 `effects-look.txt`(바닥줄·물들일 색)를 미리 쓰고 `Flash` 는 읽기만(알맹이 `EffectLook`, 시험 1). 생성기가 서버가 안 쓰게 된 208 줄을 지우던 것도 남기게. 08:40 클라우드 반영, 폰 설치는 사용자 외출로 대기.
