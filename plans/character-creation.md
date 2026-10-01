@@ -30,7 +30,7 @@
 | 지금 모바일에 있는 머리 그림 | `mobile/client/assets/actor/` | **285번 하나뿐**(`hero-walk.png`·`hero-attack.png` 에 구워져 있다) |
 | 알맹이가 아는 것 | `mobile/src/Lod.Mobile.Core/Net/HadesLoginClient.cs` | **로그인만.** 계정 만들기·캐릭터 만들기를 보내는 길이 없다 |
 | 시험이 지금 하는 것 | `tests/hades-characterization/LoginFlow.cs:103-121` | `CreateAccountCommand` 로 계정, `CreateCharacterCommand` 에 **`0x01,0x01,0x01` 을 박아** 캐릭터 |
-| 새 캐릭터 시작 자리 | `scripts/server-config/LoruleConfig.template.json:27-31` | 노비스마을(20373) (37,29) |
+| 새 캐릭터 시작 자리 | `scripts/ops/server-config/LoruleConfig.template.json:27-31` | 노비스마을(20373) (37,29) |
 
 **믿지 말 것**: `sources/FallenDev/dark-ages-ts` 의 만들기 화면은 머리 17가지·색 14가지로 박아 놨고 **둘 다 틀렸다**.
 패킷도 4바이트(`skinColour` 가 더 있다)로 **차례가 다르다**. 참고만 하고 값을 베끼지 마라(`AGENTS.md` 출처 우선순위: 아카이브 2순위 > 참고 저장소 3순위).

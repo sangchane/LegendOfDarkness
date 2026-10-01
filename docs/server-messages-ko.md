@@ -5,7 +5,7 @@
 없으면 게임 말투(합쇼체, 원작의 「~습니다」)에 맞춰 새로 적었다(「새로」). 이름·숫자는 그대로 끼워 넣고, 받침을 알 수 없는 조사는 `을(를)`·`이(가)` 로 적는다(`EquipmentManager.cs` 의 기존 꼴).
 
 - 코드 속 말 **116가지 · 245곳** (5.99 47 · 팩 6 · 새로 63) — `src/Hades.Server.Base`, `database/server/scripts`(Spells·Skills·Items·Formulas·Mundanes/ClassChooser)
-- 설정 말 **42칸** (5.99 22 · 새로 9 · 틀에 이미 한국어였던 상인 말 11) — `src/Lorule.Config/LoruleConfig.json` 과 `scripts/server-config/LoruleConfig.template.json` 에 똑같이
+- 설정 말 **42칸** (5.99 22 · 새로 9 · 틀에 이미 한국어였던 상인 말 11) — `src/Lorule.Config/LoruleConfig.json` 과 `scripts/ops/server-config/LoruleConfig.template.json` 에 똑같이
 - 모바일이 말을 가르는 규칙: `mobile/src/Lod.Mobile.Core/World/MessageSort.cs` (영어 꼴도 같은 규칙 안에 남겨 두었다 — 옛 빌드 서버용)
 
 ## 영어로 남긴 것과 까닭

@@ -34,7 +34,7 @@ def main() -> int:
             {
                 "systemMessage": (
                     f"Hades 서버가 아직 떠 있습니다 (포트 {', '.join(busy)}). "
-                    "`./scripts/stop-hades.ps1` 로 내리지 않으면 다음 세션의 격리 시험이 막힙니다."
+                    "`./scripts/ops/stop-hades.ps1` 로 내리지 않으면 다음 세션의 격리 시험이 막힙니다."
                 )
             },
             sys.stdout,

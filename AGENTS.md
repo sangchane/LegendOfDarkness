@@ -32,7 +32,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - 현행 분석서 `docs/current-system-analysis/README.md` · 서버 실행 `docs/run-procedure.md` · Git 규칙 `WORKFLOW.md` · 처음 받기 `README.md`
 
 ## 규약
-- **운영(2026-09-25): 개발은 맥(격리 서버 시험), 플레이는 클라우드.** 고치기·시험·커밋은 맥에서 → `LOD_CLOUD_IP=161.33.43.117 scripts/cloud-server.sh deploy` 로 올린다(올리면 접속 중인 사람이 끊긴다 — 직전에 알린다) → 앱이 바뀌었으면 `scripts/ios-build.sh install`. **캐릭터의 기준은 클라우드**(`… backup` 으로 받아 로컬에서 재현). 아이폰 앱 주소는 늘 클라우드 — 맥 서버(`com.lod.gameserver`)는 꺼 두고 필요할 때만 켠다
+- **운영(2026-09-25): 개발은 맥(격리 서버 시험), 플레이는 클라우드.** 고치기·시험·커밋은 맥에서 → `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh deploy` 로 올린다(올리면 접속 중인 사람이 끊긴다 — 직전에 알린다) → 앱이 바뀌었으면 `scripts/ops/ios-build.sh install`. **캐릭터의 기준은 클라우드**(`… backup` 으로 받아 로컬에서 재현). 아이폰 앱 주소는 늘 클라우드 — 맥 서버(`com.lod.gameserver`)는 꺼 두고 필요할 때만 켠다
 - 구현·검증·리뷰·커밋 절차는 아래 dev 작업 규칙(등급별 단계)을 따른다. 같은 파일을 고치는 작업은 동시에 여러 에이전트에 나누지 않는다.
 - **자료 출처 우선순위**: Hades 자기 자료 → 원작 아카이브 → 참고 저장소 16개 → 서버팩(3개 모두 일치할 때만). 위쪽을 팩으로 덮지 않는다. 예외: 기술·마법 이펙트 번호·속도는 노바. 자세한 것 `data/CLAUDE.md`.
 - `sources/` 아래는 외부 원본 submodule. 직접 push 금지. 수정이 필요하면 fork 뒤 submodule 포인터만 갱신한다 (`WORKFLOW.md`).

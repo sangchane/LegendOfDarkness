@@ -3,7 +3,7 @@
 - 작성: 2026-09-27 (맥 세션, Claude Code)
 - 받는 쪽: **안티그래비티(Antigravity) 세션** — 맥이든 윈도우든 이 저장소를 받은 곳. `AGENTS.md` 를 먼저 읽는다.
 - 브랜치: `feature/nova-abilities-2` (지금 `test/hades-characterization` 에서 딴다). 끝나면 **푸시만** 한다.
-- **하지 않는 것**: 클라우드 올리기(`scripts/cloud-server.sh deploy`)·앱 설치(`scripts/ios-build.sh install`) — 맥 세션이 받아서 한다.
+- **하지 않는 것**: 클라우드 올리기(`scripts/ops/cloud-server.sh deploy`)·앱 설치(`scripts/ops/ios-build.sh install`) — 맥 세션이 받아서 한다.
   `sources/` 아래 원본 submodule 은 직접 push 하지 않는다. 단 서버 포크 `sources/wren11/Dark-Ages-Private-Server`(origin = `sangchane/Dark-Ages-Private-Server`)는
   우리 포크라 커밋·푸시하고 상위 저장소에 포인터를 올린다(`WORKFLOW.md`).
 

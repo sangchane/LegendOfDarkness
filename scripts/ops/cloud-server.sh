@@ -1,13 +1,13 @@
 #!/bin/bash
 # 클라우드(Oracle Cloud 무료 ARM · Ubuntu) 에서 도는 서버를 맥에서 다룬다.
 #
-#   scripts/cloud-server.sh setup     처음 한 번: .NET 9 · 방화벽 · 자동 실행 · 날마다 백업, 그리고 캐릭터까지 올린다
-#   scripts/cloud-server.sh deploy    서버 실행 파일과 자료만 다시 올리고 서버를 새로 띄운다(캐릭터는 클라우드 것을 둔다)
-#   scripts/cloud-server.sh status|logs [줄수]|restart
-#   scripts/cloud-server.sh backup    클라우드의 캐릭터를 맥(~/LOD-backups/cloud)으로 받아 온다
-#   scripts/cloud-server.sh app       앱 주소(server.cfg)를 클라우드로 — 맥 서버로 돌아가려면 lod-server.sh config
-#   scripts/cloud-server.sh bot-config  동료 봇 설정 파일을 클라우드에 만든다(비밀번호를 여기서 묻고 클라우드에만 적는다)
-#   scripts/cloud-server.sh bot-logs [줄수] [봇번호]   동료 봇 기록(줄마다 [봇 이름]) — 파일 기록은 클라우드 ~/lod-bot/logs/
+#   scripts/ops/cloud-server.sh setup     처음 한 번: .NET 9 · 방화벽 · 자동 실행 · 날마다 백업, 그리고 캐릭터까지 올린다
+#   scripts/ops/cloud-server.sh deploy    서버 실행 파일과 자료만 다시 올리고 서버를 새로 띄운다(캐릭터는 클라우드 것을 둔다)
+#   scripts/ops/cloud-server.sh status|logs [줄수]|restart
+#   scripts/ops/cloud-server.sh backup    클라우드의 캐릭터를 맥(~/LOD-backups/cloud)으로 받아 온다
+#   scripts/ops/cloud-server.sh app       앱 주소(server.cfg)를 클라우드로 — 맥 서버로 돌아가려면 lod-server.sh config
+#   scripts/ops/cloud-server.sh bot-config  동료 봇 설정 파일을 클라우드에 만든다(비밀번호를 여기서 묻고 클라우드에만 적는다)
+#   scripts/ops/cloud-server.sh bot-logs [줄수] [봇번호]   동료 봇 기록(줄마다 [봇 이름]) — 파일 기록은 클라우드 ~/lod-bot/logs/
 #
 # 동료 봇(성직자, mobile/bots/Lod.CompanionBot)은 서버와 같은 기계에서 봇마다 lod-bot@1~5 로 돈다(2026-09-27 — 다섯까지).
 # N 번째 봇 = 서버 설정 CompanionBots 의 N 번째 이름, 설정은 클라우드의 ~/lod-bot/companion-bot-N.json(비밀번호, 여기에만) —
@@ -17,7 +17,7 @@
 # deploy 는 캐릭터(database/server/aislings)를 덮지 않는다.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FORK="$ROOT/sources/wren11/Dark-Ages-Private-Server"
 IP="${LOD_CLOUD_IP:?LOD_CLOUD_IP=<공인 IP> 를 붙여 주세요}"
 KEY="$HOME/.ssh/lod_oracle"
@@ -34,9 +34,9 @@ upload() {
     local conf
     conf="$(mktemp -d)"
     for pair in "LoruleConfig.template.json:LoruleConfig.json" "MServerTable.template.xml:MServerTable.xml"; do
-        sed -e "s|{{FORK}}|$REMOTE|g" -e "s|{{SERVER_IP}}|$IP|g" "$ROOT/scripts/server-config/${pair%%:*}" > "$conf/${pair##*:}"
+        sed -e "s|{{FORK}}|$REMOTE|g" -e "s|{{SERVER_IP}}|$IP|g" "$ROOT/scripts/ops/server-config/${pair%%:*}" > "$conf/${pair##*:}"
     done
-    "$ROOT/scripts/check-server-config.sh" "$conf"
+    "$ROOT/scripts/ops/check-server-config.sh" "$conf"
 
     remote "mkdir -p $REMOTE/Staging/net9.0 $REMOTE/database"
     # 기록 파일(Hades_*.txt)은 맥 것이라 올리지 않는다. archives(414MB)는 서버가 읽지 않는다.
@@ -52,7 +52,7 @@ upload() {
 
 # 봇 이름 — 서버 설정 CompanionBots 차례대로. lod-bot@N 은 N 번째 이름으로 접속한다.
 bot_names() {
-    python3 - "$ROOT/scripts/server-config/LoruleConfig.template.json" <<'PY'
+    python3 - "$ROOT/scripts/ops/server-config/LoruleConfig.template.json" <<'PY'
 import re, sys
 text = open(sys.argv[1], encoding="utf-8").read()
 listed = re.search(r'"CompanionBots"\s*:\s*\[([^\]]*)\]', text).group(1)
@@ -82,7 +82,7 @@ sudo tee /etc/systemd/system/lod-bot@.service >/dev/null <<UNIT
 [Unit]
 Description=LOD companion bot %i (priest)
 After=lod.service
-# 비밀번호가 든 설정 파일이 있어야 뜬다 — scripts/cloud-server.sh bot-config
+# 비밀번호가 든 설정 파일이 있어야 뜬다 — scripts/ops/cloud-server.sh bot-config
 ConditionPathExists=/home/ubuntu/lod-bot/companion-bot-%i.json
 
 [Service]
@@ -204,10 +204,10 @@ SH
     app
 }
 
-# 앱이 클라우드로 붙게 한다(맥 서버로 돌아가려면 scripts/lod-server.sh config). 앱을 다시 설치해야 반영된다.
+# 앱이 클라우드로 붙게 한다(맥 서버로 돌아가려면 scripts/ops/lod-server.sh config). 앱을 다시 설치해야 반영된다.
 app() {
     echo "$IP:2610" > "$ROOT/mobile/client/server.cfg"
-    echo "앱 주소(server.cfg) — $IP:2610 · scripts/ios-build.sh install 로 다시 설치"
+    echo "앱 주소(server.cfg) — $IP:2610 · scripts/ops/ios-build.sh install 로 다시 설치"
 }
 
 restart() {

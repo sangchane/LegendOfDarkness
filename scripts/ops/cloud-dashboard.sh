@@ -1,11 +1,11 @@
 #!/bin/bash
 # 기술·마법 운영 대시보드를 클라우드에 올린다. 게임 서버는 재시작하지 않는다.
 #
-#   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh setup
-#   LOD_CLOUD_IP=... scripts/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
+#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh setup
+#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 IP="${LOD_CLOUD_IP:?LOD_CLOUD_IP=<공인 IP> 를 붙여 주세요}"
 KEY="$HOME/.ssh/lod_oracle"
 HOST="ubuntu@$IP"
@@ -22,7 +22,7 @@ upload() {
     rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" \
         "$ROOT/docs/" "$HOST:$REMOTE/www/"
     rsync -az --partial --timeout=60 -e "ssh -i $KEY" \
-        "$ROOT/scripts/ability-ops-service.py" "$ROOT/data/game-data/ability-operations.json" \
+        "$ROOT/scripts/ops/ability-ops-service.py" "$ROOT/data/game-data/ability-operations.json" \
         "$HOST:$REMOTE/app/"
 }
 
@@ -178,7 +178,7 @@ SH
 }
 
 # 비밀번호 바꾸기 — 운영 API(credential)와 nginx(htpasswd)를 함께. 사용자 2026-09-27 "비밀번호가 너무 길다".
-#   LOD_CLOUD_IP=… scripts/cloud-dashboard.sh password [새비밀번호]   (없으면 소문자·숫자 10자로 만든다)
+#   LOD_CLOUD_IP=… scripts/ops/cloud-dashboard.sh password [새비밀번호]   (없으면 소문자·숫자 10자로 만든다)
 set_password() {
     local new="${1:-$(LC_ALL=C tr -dc 'a-z2-9' </dev/urandom | head -c 10)}"
     remote "LOD_OPS_PASSWORD='$new' bash -s" <<'SH'

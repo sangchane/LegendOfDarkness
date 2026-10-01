@@ -770,7 +770,7 @@ git commit -m "feat(mobile): 월드맵에서 갈 곳을 고르는 창"
 - [ ] **Step 1: 서버를 띄운다**
 
 ```bash
-./scripts/lod-server.sh
+./scripts/ops/lod-server.sh
 ```
 기대: 2610·2615 가 열렸다는 줄. 안 열리면 기록을 보고 멈춘다(`NEXT.md` 함정).
 
@@ -789,7 +789,7 @@ d["ExpLevel"] = max(d.get("ExpLevel", 1), 21)
 saved.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
 print("watch 를 우드랜드입구 10,22 에 세웠다")
 PY
-./scripts/lod-server.sh
+./scripts/ops/lod-server.sh
 ```
 
 - [ ] **Step 3: 월드맵이 뜬 화면을 찍는다**

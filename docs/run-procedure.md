@@ -26,24 +26,24 @@
 
 ---
 
-## 0.4 서비스로 돌리기 — `scripts/lod-server.sh` (2026-09-18 확인)
+## 0.4 서비스로 돌리기 — `scripts/ops/lod-server.sh` (2026-09-18 확인)
 
 아래 0.5·0.6 절을 손으로 하지 않아도 되게 한 곳에 모았다. **날마다 백업하고, 꺼지면 스스로 다시 켜진다.**
 
 ```bash
-./scripts/lod-server.sh status          # 켜졌나 · 주소 · 기록 · 마지막 백업
-./scripts/lod-server.sh start|stop|restart
-./scripts/lod-server.sh logs 60         # 기록 끝 60줄
-./scripts/lod-server.sh config          # 빌드가 덮어쓴 설정 둘을 다시 깐다
-./scripts/lod-server.sh check-config    # 로비·게임 리다이렉트 주소가 같은지 검사
-./scripts/lod-server.sh backup          # 캐릭터 압축 + 기록 정리(자동으로도 돈다)
-./scripts/lod-server.sh install-agents  # 맥에 등록: 꺼지면 다시 켜기 + 새벽 4시 백업
-./scripts/lod-server.sh remove-agents   # 그 등록을 지운다
+./scripts/ops/lod-server.sh status          # 켜졌나 · 주소 · 기록 · 마지막 백업
+./scripts/ops/lod-server.sh start|stop|restart
+./scripts/ops/lod-server.sh logs 60         # 기록 끝 60줄
+./scripts/ops/lod-server.sh config          # 빌드가 덮어쓴 설정 둘을 다시 깐다
+./scripts/ops/lod-server.sh check-config    # 로비·게임 리다이렉트 주소가 같은지 검사
+./scripts/ops/lod-server.sh backup          # 캐릭터 압축 + 기록 정리(자동으로도 돈다)
+./scripts/ops/lod-server.sh install-agents  # 맥에 등록: 꺼지면 다시 켜기 + 새벽 4시 백업
+./scripts/ops/lod-server.sh remove-agents   # 그 등록을 지운다
 ```
 
 | 무엇 | 어디 |
 |---|---|
-| 설정 틀(저장소가 진실) | `scripts/server-config/LoruleConfig.template.json` · `MServerTable.template.xml` — 경로 `{{FORK}}`, 주소 `{{SERVER_IP}}` |
+| 설정 틀(저장소가 진실) | `scripts/ops/server-config/LoruleConfig.template.json` · `MServerTable.template.xml` — 경로 `{{FORK}}`, 주소 `{{SERVER_IP}}` |
 | 접속 주소 | `LOD_SERVER_IP` 하나. 없으면 이 맥의 집 안 주소(`ipconfig getifaddr en0`). **두 파일에 같이 채운다**(0.6절) |
 | 기록 | `~/Library/Logs/LOD/server.log` (20MB 넘으면 날짜를 붙여 넘기고, 14일 지난 것은 지운다) |
 | 캐릭터 백업 | `~/LOD-backups/aislings-<날짜>-<시각>.tar.gz`, 30벌까지 |
@@ -132,7 +132,7 @@ Lorule.GameServer (Program.Main)
 
 **포트 3개를 쓴다. 그리고 반드시 종료해야 한다(확인됨).** 2610(로그인)·2615(게임) 외에 게임 서버가 시작하면서 `http://localhost:2620/`을 **하드코딩**으로 연다(`Network/Game/GameServer.cs`의 `Start` → `Network/WS/ObjectServer.cs`). 설정 키가 없어 옮길 수 없으므로 이 PC에서 Hades는 **한 번에 한 대만** 뜬다. 남아 있는 서버가 2620을 쥐고 있으면 새로 띄운 서버는 `HttpListener` 예외를 `StartServers`의 `catch (SocketException)`이 못 잡아 **로그인 서버 없이 프로세스만 살아 있는** 상태가 된다(2026-09-09 재현).
 
-- 서버를 띄우기 전과 세션을 끝낼 때 `powershell -File scripts\stop-hades.ps1`을 실행한다. 남은 프로세스를 종료하고 세 포트가 비었는지 확인해 준다.
+- 서버를 띄우기 전과 세션을 끝낼 때 `powershell -File scripts\ops\stop-hades.ps1`을 실행한다. 남은 프로세스를 종료하고 세 포트가 비었는지 확인해 준다.
 - 격리 harness(`tests/hades-characterization/`)는 2620을 사전 검사해서, 다른 Hades가 떠 있으면 기다리지 않고 즉시 실패한다.
 
 ### B. Medenia
@@ -359,7 +359,7 @@ Copy-Item apps\client\.env.example apps\client\.env    # 3절대로 VITE_ASSET_P
    - 관리자 권한을 쓰려면 이름을 `GameMasters` 목록의 값(`wren`)으로 만든다. 생성된 json에 `GameMaster: true`가 찍히면 성공
 8. [x] 메인 메뉴 Continue로 로그인 — 확인: 서버 로그 `<이름> : Welcome to Lorule`, 게임 포트 2615 연결이 ESTABLISHED, 클라이언트에 시작 맵 표시(설정값대로 zone `Safe House`, 좌표 4,4)
 9. [x] 결과를 `WORKLOG.md`에 기록. `tmp\hades-run`은 `.gitignore` 대상이라 커밋되지 않음
-10. [ ] **서버를 끈다.** `powershell -File scripts\stop-hades.ps1` — 안 끄면 2610·2615·2620이 잡힌 채 남아 다음 세션의 실행과 harness를 전부 막는다(2026-09-09에 실제로 발생)
+10. [ ] **서버를 끈다.** `powershell -File scripts\ops\stop-hades.ps1` — 안 끄면 2610·2615·2620이 잡힌 채 남아 다음 세션의 실행과 harness를 전부 막는다(2026-09-09에 실제로 발생)
 
 ### 완료 판정
 - B: 체크리스트 8·9 통과 → "브라우저 클라이언트 로그인→맵 입장 검증 완료"

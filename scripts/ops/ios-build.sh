@@ -1,15 +1,15 @@
 #!/bin/bash
 # 아이폰·아이패드에 넣을 .ipa 를 만들고, 같은 Wi-Fi 로 짝지은 기기에 무선으로 넣는다(무료 애플 계정).
 #
-#   scripts/ios-build.sh build            .ipa 를 만든다
-#   scripts/ios-build.sh install          만들고 기기에 넣는다(기기 이름·번호는 --device 로)
-#   scripts/ios-build.sh devices          지금 보이는 기기를 이름·번호로 보여 준다(아이패드·아이폰 따로)
-#   scripts/ios-build.sh logs [기기]      앱 기록(user://logs/godot.log)을 맥 out/ios-logs/ 로 가져온다 — 폰에서 난 문제를 볼 때
-#   scripts/ios-build.sh renew            서명을 새로 받는다(LOD_DEVICE_ID 로 기기를 고른다 — 그 기기가
+#   scripts/ops/ios-build.sh build            .ipa 를 만든다
+#   scripts/ops/ios-build.sh install          만들고 기기에 넣는다(기기 이름·번호는 --device 로)
+#   scripts/ops/ios-build.sh devices          지금 보이는 기기를 이름·번호로 보여 준다(아이패드·아이폰 따로)
+#   scripts/ops/ios-build.sh logs [기기]      앱 기록(user://logs/godot.log)을 맥 out/ios-logs/ 로 가져온다 — 폰에서 난 문제를 볼 때
+#   scripts/ops/ios-build.sh renew            서명을 새로 받는다(LOD_DEVICE_ID 로 기기를 고른다 — 그 기기가
 #                                         프로필에 실제로 들어갔는지까지 확인한다)
-#   scripts/ios-build.sh check            며칠 남았나 — 이틀 이하면 스스로 갱신한다
-#   scripts/ios-build.sh watch-sign       날마다 check 를 돌게 맥에 등록한다
-#   scripts/ios-build.sh unwatch-sign     그 등록을 지운다
+#   scripts/ops/ios-build.sh check            며칠 남았나 — 이틀 이하면 스스로 갱신한다
+#   scripts/ops/ios-build.sh watch-sign       날마다 check 를 돌게 맥에 등록한다
+#   scripts/ops/ios-build.sh unwatch-sign     그 등록을 지운다
 #
 # **무료 계정은 서명이 7일이면 끝난다.** 명령줄로 새로 받을 수 있다 — 2026-09-18 확인: 보관본을 다시
 # 내보내는 것(`-exportArchive -allowProvisioningUpdates`)으로는 안 되고("No profiles ... were found"),
@@ -24,7 +24,7 @@ if [ -z "${DEVELOPER_DIR:-}" ] && [ -d /Applications/Xcode.app/Contents/Develope
     export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 fi
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CLIENT="$ROOT/mobile/client"
 PRESETS="$CLIENT/export_presets.cfg"
 IPA="$CLIENT/build/ios/LodClient.ipa"
@@ -289,7 +289,7 @@ watch_sign() {
 <dict>
     <key>Label</key><string>com.lod.iossign</string>
     <key>ProgramArguments</key>
-    <array><string>/bin/bash</string><string>$ROOT/scripts/ios-build.sh</string><string>check</string></array>
+    <array><string>/bin/bash</string><string>$ROOT/scripts/ops/ios-build.sh</string><string>check</string></array>
     <key>WorkingDirectory</key><string>$ROOT</string>
     <key>StandardOutPath</key><string>$LOGS/com.lod.iossign.log</string>
     <key>StandardErrorPath</key><string>$LOGS/com.lod.iossign.log</string>

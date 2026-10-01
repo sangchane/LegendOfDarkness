@@ -25,8 +25,8 @@
 
 | 무엇 | 어디 | 값 |
 |---|---|---|
-| 새 캐릭터 시작 자리 | `scripts/server-config/LoruleConfig.template.json:27-31` | **이미 노비스마을(20373) (37,29)** 다. 게시판알리미(34,29)에서 3칸. **고칠 것 없다** |
-| 서버가 실제로 읽는 설정 | `sources/wren11/…/Staging/net9.0/LoruleConfig.json` | 위 틀에서 만들어진다(`scripts/lod-server.sh config`). submodule 안의 `src/Lorule.Config/LoruleConfig.json`(StartingMap 1)은 **덮어써지는 원본**이라 고쳐도 소용없다 |
+| 새 캐릭터 시작 자리 | `scripts/ops/server-config/LoruleConfig.template.json:27-31` | **이미 노비스마을(20373) (37,29)** 다. 게시판알리미(34,29)에서 3칸. **고칠 것 없다** |
+| 서버가 실제로 읽는 설정 | `sources/wren11/…/Staging/net9.0/LoruleConfig.json` | 위 틀에서 만들어진다(`scripts/ops/lod-server.sh config`). submodule 안의 `src/Lorule.Config/LoruleConfig.json`(StartingMap 1)은 **덮어써지는 원본**이라 고쳐도 소용없다 |
 | 노비스마을에서 걸어 닿는 곳 | 워프 자료 | 18곳. **노비스평원A(20393)·B(20394) 포함** — 레벨을 올릴 수 있다. 우드랜드·수오미·포테의숲에는 **못 걸어간다** |
 | 노비스마을의 월드맵 칸 | `templates/warps/` | **(63,49) 한 칸뿐.** 시작 자리에서 멀고, 있는 줄 모르면 못 찾는다 — 이 계획이 푸는 문제다 |
 | 월드맵 목록 | `templates/worldmaps/temuair.json` | 지금 **2곳**(수오미 20355 (40,11) · 우드랜드입구 20028 (10,18)). 앞 작업에서 줄였다 |
@@ -489,7 +489,7 @@ dotnet test tests/hades-characterization --filter "WorldMapMenuTests|WorldMapTes
 
 - [ ] **Step 3: 화면 두 장**
 
-서버를 켜고(`scripts/lod-server.sh restart`) 새 계정으로 붙어,
+서버를 켜고(`scripts/ops/lod-server.sh restart`) 새 계정으로 붙어,
 ① 노비스마을에서 "지도" 단추를 누른 화면 ② 닫기를 눌러 조작이 돌아온 화면을 찍는다.
 `./scripts/godot.sh -- --login <이름>:1234 --shot <파일> --shot-after 12`
 (**`scripts/godot.sh` 에는 `--path` 를 주지 않는다** — 래퍼가 이미 넣는다, `docs/mobile-client.md` 함정 절.)

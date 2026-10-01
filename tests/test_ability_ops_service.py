@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SPEC = importlib.util.spec_from_file_location(
-    "ability_ops_service", ROOT / "scripts" / "ability-ops-service.py")
+    "ability_ops_service", ROOT / "scripts" / "ops" / "ability-ops-service.py")
 SERVICE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SERVICE)
 

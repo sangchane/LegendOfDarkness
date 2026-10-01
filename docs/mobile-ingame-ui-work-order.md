@@ -98,7 +98,7 @@
 - 모바일 알맹이 시험 `dotnet test mobile/tests/Lod.Mobile.Core.Tests`
 - 7개 크기 배치 검사(`--resize-sequence --layout`, `GREYBOX_LAYOUT_OK`) · 폰 2종·태블릿·가로 사진
 - 상점은 `--shop-preview --shop-check`(구매·판매 컨트롤 체크)
-- 기기 설치는 `scripts/ios-build.sh install` — 새 그림은 빌드가 먼저 들인다(2026-09-30 고침)
+- 기기 설치는 `scripts/ops/ios-build.sh install` — 새 그림은 빌드가 먼저 들인다(2026-09-30 고침)
 
 ## 하지 않는 것
 - 서버·프로토콜 변경 · 창 **기능** 변경(상점 수량·필터 등 오늘 만든 동작은 그대로)

@@ -1,20 +1,20 @@
 #!/bin/bash
 # 서버를 켜고 끄고 살피는 한 곳. 설정을 다시 깔고, 캐릭터를 백업하고, 기록을 정리한다.
 #
-#   scripts/lod-server.sh config          설정 두 개를 틀에서 다시 만든다(빌드하면 덮어써진다)
-#   scripts/lod-server.sh check-config    두 리다이렉트 주소가 같은지 검사한다
-#   scripts/lod-server.sh app             앱 주소(server.cfg)를 이 맥으로(평소엔 클라우드 — cloud-server.sh app)
-#   scripts/lod-server.sh start|stop|restart|status
-#   scripts/lod-server.sh logs [줄수]     기록 끝을 본다
-#   scripts/lod-server.sh backup          캐릭터를 압축해 두고 오래된 것은 지운다
-#   scripts/lod-server.sh install-agents  꺼지면 다시 켜기 · 날마다 백업을 맥에 등록한다
-#   scripts/lod-server.sh remove-agents   그 등록을 지운다
+#   scripts/ops/lod-server.sh config          설정 두 개를 틀에서 다시 만든다(빌드하면 덮어써진다)
+#   scripts/ops/lod-server.sh check-config    두 리다이렉트 주소가 같은지 검사한다
+#   scripts/ops/lod-server.sh app             앱 주소(server.cfg)를 이 맥으로(평소엔 클라우드 — cloud-server.sh app)
+#   scripts/ops/lod-server.sh start|stop|restart|status
+#   scripts/ops/lod-server.sh logs [줄수]     기록 끝을 본다
+#   scripts/ops/lod-server.sh backup          캐릭터를 압축해 두고 오래된 것은 지운다
+#   scripts/ops/lod-server.sh install-agents  꺼지면 다시 켜기 · 날마다 백업을 맥에 등록한다
+#   scripts/ops/lod-server.sh remove-agents   그 등록을 지운다
 #
 # 접속 주소는 LOD_SERVER_IP 하나로 정한다(없으면 이 맥의 집 안 주소). 로그인 절차가 주소를 두 번
 # 알려 주므로(MServerTable.xml → LoruleConfig.json) 둘 다 이 값으로 채운다 — docs/run-procedure.md.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FORK="$ROOT/sources/wren11/Dark-Ages-Private-Server"
 STAGING="$FORK/Staging/net9.0"
 DOTNET="$ROOT/.tools/dotnet-9.0.317"
@@ -45,10 +45,10 @@ config() {
 
     for pair in "LoruleConfig.template.json:LoruleConfig.json" "MServerTable.template.xml:MServerTable.xml"; do
         local from="${pair%%:*}" to="${pair##*:}"
-        sed -e "s|{{FORK}}|$FORK|g" -e "s|{{SERVER_IP}}|$ip|g" "$ROOT/scripts/server-config/$from" > "$STAGING/$to"
+        sed -e "s|{{FORK}}|$FORK|g" -e "s|{{SERVER_IP}}|$ip|g" "$ROOT/scripts/ops/server-config/$from" > "$STAGING/$to"
     done
 
-    "$ROOT/scripts/check-server-config.sh" "$STAGING"
+    "$ROOT/scripts/ops/check-server-config.sh" "$STAGING"
     echo "설정을 다시 깔았습니다 — 주소 $ip"
 }
 
@@ -73,7 +73,7 @@ phone_address() {
 }
 
 verify_config() {
-    "$ROOT/scripts/check-server-config.sh" "$STAGING"
+    "$ROOT/scripts/ops/check-server-config.sh" "$STAGING"
 }
 
 pid() {
@@ -213,7 +213,7 @@ agent() {
 <dict>
     <key>Label</key><string>$name</string>
     <key>ProgramArguments</key>
-    <array><string>/bin/bash</string><string>$ROOT/scripts/lod-server.sh</string><string>$what</string></array>
+    <array><string>/bin/bash</string><string>$ROOT/scripts/ops/lod-server.sh</string><string>$what</string></array>
     <key>WorkingDirectory</key><string>$ROOT</string>
     <key>StandardOutPath</key><string>$LOGS/$name.log</string>
     <key>StandardErrorPath</key><string>$LOGS/$name.log</string>

@@ -25,7 +25,7 @@
 
 ## 10번 시각 점검 결과 (2026-09-27, 로컬 헤드리스)
 
-로컬 운영 API(`scripts/ability-ops-service.py --root docs --catalog data/game-data/ability-operations.json
+로컬 운영 API(`scripts/ops/ability-ops-service.py --root docs --catalog data/game-data/ability-operations.json
 --overrides <임시파일> --password-file <user:pass 임시파일> --port 8799`)에 헤드리스 크롬으로 390×844·1440×900 을 찍었다.
 목록 → 항목 → 편집판 → 적용 → 되돌리기까지 PUT 200 왕복, 가로 넘침 0, 44px 미만 조작부 0.
 
@@ -49,9 +49,9 @@
 **저장 왕복 시험은 로컬에서 끝냈다. 클라우드에서는 읽기만 확인한다** — 클라우드의 override 파일은 실제 운영값이다.
 
 11. 대시보드 올리기와 확인
-   1. `LOD_CLOUD_IP=161.33.43.117 scripts/cloud-dashboard.sh deploy` — docs/ 와 운영 API(`changedAt` 포함)를 올리고
+   1. `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-dashboard.sh deploy` — docs/ 와 운영 API(`changedAt` 포함)를 올리고
       API 만 재시작한다. 게임 서버는 재시작하지 않는다(접속자 안 끊김).
-   2. `LOD_CLOUD_IP=161.33.43.117 scripts/cloud-dashboard.sh status` → `active active`, 443·8787 LISTEN.
+   2. `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-dashboard.sh status` → `active active`, 443·8787 LISTEN.
    3. `C=$(cat ~/LOD-backups/cloud/ability-ops-credentials.txt)`
       - `curl -sk -o /dev/null -w '%{http_code}' https://161.33.43.117/` → 401 (인증 없이는 막힘)
       - `curl -sk -u "$C" https://161.33.43.117/api/health` → `{"ok": true}`

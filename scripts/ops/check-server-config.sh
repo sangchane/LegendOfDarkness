@@ -3,7 +3,7 @@
 # Usage: check-server-config.sh [Staging/net9.0]
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 STAGING="${1:-$ROOT/sources/wren11/Dark-Ages-Private-Server/Staging/net9.0}"
 
 python3 - "$STAGING" <<'PY'

@@ -198,13 +198,13 @@ lsof -nP -iTCP:2610 -iTCP:2615 | grep <기기 IP>   # 어디까지 닿았나
 grep "Welcome to Lorule" <서버 로그>              # 월드에 들어왔나
 ```
 
-### iPad·iPhone 에 클라이언트 올리기 — `scripts/ios-build.sh` (2026-09-18)
+### iPad·iPhone 에 클라이언트 올리기 — `scripts/ops/ios-build.sh` (2026-09-18)
 
 ```bash
-./scripts/ios-build.sh build          # .ipa 를 만든다(팀 번호를 서명에서 읽어 넣었다가 다시 비운다)
-./scripts/ios-build.sh install [기기]  # 만들고 무선으로 넣는다
-./scripts/ios-build.sh check          # 서명이 며칠 남았나 · 이틀 이하면 알림
-./scripts/ios-build.sh watch-sign     # 날마다 오전 10시에 그 알림을 띄우게 등록
+./scripts/ops/ios-build.sh build          # .ipa 를 만든다(팀 번호를 서명에서 읽어 넣었다가 다시 비운다)
+./scripts/ops/ios-build.sh install [기기]  # 만들고 무선으로 넣는다
+./scripts/ops/ios-build.sh check          # 서명이 며칠 남았나 · 이틀 이하면 알림
+./scripts/ops/ios-build.sh watch-sign     # 날마다 오전 10시에 그 알림을 띄우게 등록
 ```
 
 **무료 애플 계정은 서명이 7일이면 끝난다. 그 갱신을 명령줄로 할 수 있다**(2026-09-18 확인) — 무엇으로 하느냐가
@@ -431,7 +431,7 @@ LOD_AUTOHUNT_SHOT=/tmp/autohunt.png LOD_AUTOHUNT_SHOT_AFTER=11 \
 - **시험**: 알맹이 `CompanionTests` 19개 · 격리 서버 `CompanionCallTests`(부르기 → 21레벨·체력850·마력1180·위즈45·마법 여섯·옆 칸·파티 / 보내기 → 밀레스마을 / 나가면 돌아감) ·
   `CompanionBotTests`(사슴에게 맞아 70% 아래 → 봇이 쿠라노로 회복, 사람이 서쪽 6칸 → 봇이 걸어서 3칸 안). 사진:
   `LOD_COMPANION_SHOT=/tmp/companion.png dotnet test tests/hades-characterization --filter "FullyQualifiedName~Photograph_the_bot_healing"`.
-- **클라우드**: `scripts/cloud-server.sh deploy` 가 봇 프로그램·맵 벽 파일도 올리고 `lod-bot` 서비스를 깐다. 처음 한 번 `scripts/cloud-server.sh bot-config`
+- **클라우드**: `scripts/ops/cloud-server.sh deploy` 가 봇 프로그램·맵 벽 파일도 올리고 `lod-bot` 서비스를 깐다. 처음 한 번 `scripts/ops/cloud-server.sh bot-config`
   (비밀번호를 묻고 클라우드 `~/lod-bot/companion-bot.json` 에만 적는다). 기록 `… bot-logs`.
 - **2단계(2026-09-26) — 이름 [봇 부르기]/[봇 보내기], 알림도 "봇 …"**
   - **상태 알림**: 서버가 1초마다 봇에게 주인·봇 자신에게 걸린 것을 보낸다(0x5E 종류 3: serial(4) · 개수(1) · [이름 · 남은 초(2) · 해로움(1)]).
@@ -622,7 +622,7 @@ LOD_AUTOHUNT_SHOT=/tmp/autohunt.png LOD_AUTOHUNT_SHOT_AFTER=11 \
 격리 시험은 자기 서버를 띄우지만, 화면을 눈으로 볼 때는 `tmp/hades-run`의 서버를 쓴다.
 
 ```powershell
-./scripts/stop-hades.ps1                        # 먼저 항상 이것
+./scripts/ops/stop-hades.ps1                        # 먼저 항상 이것
 Start-Process -FilePath 'D:\_personal\LOD\tmp\hades-run\Lorule.GameServer.exe' `
   -WorkingDirectory 'D:\_personal\LOD\tmp\hades-run' `
   -RedirectStandardOutput 'D:\_personal\LOD\tmp\hades-run\out.log' `
@@ -630,7 +630,7 @@ Start-Process -FilePath 'D:\_personal\LOD\tmp\hades-run\Lorule.GameServer.exe' `
 ```
 
 로그에 `pet (Usage: pet)` 이 나오면 다 뜬 것이다(그게 마지막 줄이다). 끝나면 **반드시**
-`./scripts/stop-hades.ps1`.
+`./scripts/ops/stop-hades.ps1`.
 
 **바닥에 쌓인 물건은 서버를 다시 띄우면 사라진다** — 원작이 그렇고 Hades 도 그렇다. 저장되는 것이
 아니라 서버 메모리에만 있다. 사람이 접속을 끊었다 들어오는 것은 상관없다.
@@ -691,7 +691,7 @@ insight_1/safehouse_wasp.json` — 저장소의 `sources/` 에는 없다. `AreaI
   멈추면 `index.lock` 때문에 git 전체가 마비된다. `git status --porcelain --ignore-submodules=all`.
 - **`git add <폴더>` 로 디렉터리째 담지 않는다.** 이 저장소는 에이전트가 나눠 쓸 수 있고, 실제로 다른
   에이전트가 만든 `tests/docs-dashboard.test.js` 가 이쪽 커밋에 섞여 들어간 적이 있다. 경로를 명시한다.
-- **서버를 띄웠으면 `scripts/stop-hades.ps1`.** 남은 프로세스가 다음 세션의 포트를 막는다.
+- **서버를 띄웠으면 `scripts/ops/stop-hades.ps1`.** 남은 프로세스가 다음 세션의 포트를 막는다.
 - **격리 시험은 `Staging/net5.0` 을 실행한다.** 서버를 고치고 빌드하지 않으면 **옛 서버를 시험하고 통과한다.**
 - **PowerShell → 네이티브 실행 파일에 한글 인자를 넘기면 깨진다.** `dat-extract`의 `투명` 인자가 그래서
   안 먹었고 말벌 시트에 배경이 칠해져 나왔다. ASCII 이름(`transparent`)도 받게 해 뒀다.

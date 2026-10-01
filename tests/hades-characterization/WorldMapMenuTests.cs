@@ -135,7 +135,7 @@ public sealed class WorldMapMenuTests : IDisposable
     /// 새 캐릭터가 노비스마을 (37,29) 에서 시작해 → "지도" 단추(<see cref="WorldClient.OpenFieldAsync"/>) →
     /// 수오미 고르기 → 수오미마을 가로지르기(길찾기) → 포테의숲1존 (33,47) → 괴물 둘. Task 1~3 이 실제로
     /// 이어지는지 한 줄로 확인한다. 시작 자리는 이미 노비스마을이다
-    /// (scripts/server-config/LoruleConfig.template.json:27-31) — startTogether 는 다른 시험과 꼴을 맞추려는
+    /// (scripts/ops/server-config/LoruleConfig.template.json:27-31) — startTogether 는 다른 시험과 꼴을 맞추려는
     /// 것뿐이다. 수오미 가로지르기는 <see cref="WorldMapTests" /> 의 벽 읽기·길찾기를 그대로 쓴다(복사하지
     /// 않음): <see cref="WorldMapTests.Walled" />·<see cref="WorldMapTests.WalkTheWay" />.
     /// </summary>
