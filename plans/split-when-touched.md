@@ -29,7 +29,6 @@
 |---|---|---|
 | `WorldView.cs` `HuntOnItsOwn` vs `AutoHuntTick` | **사냥 판단이 두 벌** — 옛 `--hunt` 봇은 화면에서 직접, 새 것은 알맹이 `AutoHunt` | 옛 봇을 `AutoHunt` 로 합치거나 지운다(지울 때는 사용자에게 먼저) |
 | `CreateScreen.cs` (1096줄) | 세로·가로 폼이 거의 같은 조립을 반복 | `LookPicker`(머리·색 격자) · `CharacterPreview`. `StarterArmor` 표는 알맹이 자료로 |
-| `Main.cs` (1074줄) | 실행 인자 45개·`user://*.cfg` 읽기쓰기 6벌·글꼴·화면 전환 | `LaunchFlags`(+`Has("--x")`) · `DeviceSettings`(공용 `ReadLines`/`WriteLines`) · `ScreenRouter` |
 | `PackPanel.cs` `BuildAction`(135줄)·`Fill`(96줄) | 동작 줄+버릴 수량, 칸 만들기 | `PackActionRow` · `Cell(item)` |
 | `AbilityBar.cs` | `_drawn[i] switch { LearnedSkill => Slot … }` 네 번 반복, 시험 코드 섞임 | `SlotOf(object?)` 하나 · 시험은 `GameRehearsal` |
 | 게임 규칙이 화면에 있는 곳 | 월드맵 다시 띄우기(`GameScreen` 76-82·1324-1353) · 0.2초 돌기/걷기 · 만·억 표기 `GoldText` | 알맹이(`WorldMapGate` · `GoldFormat`)로 옮겨 시험 가능하게 |
