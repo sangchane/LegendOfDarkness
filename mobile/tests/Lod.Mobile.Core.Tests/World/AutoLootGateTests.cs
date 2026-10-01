@@ -49,4 +49,18 @@ public sealed class AutoLootGateTests
 
         Assert.Null(gate.Next(true, Standing, [Ground(41, new Tile(13, 9))]));
     }
+
+    [Fact]
+    public void What_we_threw_at_our_feet_is_not_picked_back_up()
+    {
+        AutoLootGate gate = new();
+        Tile next = new(13, 9);
+
+        gate.Threw(Standing);
+        Assert.Null(gate.Next(true, Standing, [])); // the drop is on its way
+        Assert.Null(gate.Next(true, Standing, [Ground(41)]));
+        Assert.Null(gate.Next(true, next, [Ground(41)]));
+        Assert.Null(gate.Next(true, Standing, [Ground(41)])); // walking back over it
+        Assert.Equal(next, gate.Next(true, next, [Ground(41), Ground(42, next)]));
+    }
 }

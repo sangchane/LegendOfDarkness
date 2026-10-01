@@ -31,6 +31,7 @@ public sealed partial class GearPanel : PanelContainer
         StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
     };
     private readonly Button _off = WindowFrame.IconButton(GlyphKind.TakeOff, "장착 해제", width: 56);
+    private readonly Button _shut = WindowFrame.CloseButton();
     private readonly DoubleTap _taps = new();
 
     // 고른 자리(서버 번호), 없으면 0. 무엇을 그렸는지 — 같으면 다시 그리지 않는다.
@@ -58,8 +59,16 @@ public sealed partial class GearPanel : PanelContainer
                 return;
             }
 
-            _chosen = slot;
+            // 보고 있는 칸을 다시 누르면 정보 상자를 내린다(사용자 2026-10-02).
+            _chosen = slot == _chosen && _action.Visible ? 0 : slot;
             _showing = null;
+        };
+
+        _shut.Pressed += () =>
+        {
+            _chosen = 0;
+            _showing = null;
+            _action.Visible = false;
         };
 
         _gear.GroupPressed += () =>
@@ -105,6 +114,7 @@ public sealed partial class GearPanel : PanelContainer
         top.AddChild(_actionIcon);
         top.AddChild(words);
         top.AddChild(_off);
+        top.AddChild(_shut);
 
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);

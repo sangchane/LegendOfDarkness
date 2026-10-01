@@ -13,6 +13,15 @@ public sealed class AutoLootGate
 {
     private readonly HashSet<uint> _requested = [];
 
+    // The tile we just threw something on. What lands there while we still stand on it is ours, thrown away.
+    private Tile? _thrown;
+
+    /// <summary>
+    /// We threw something at our feet. It is not to be picked straight back up — not now, nor on walking back over it
+    /// while it stays in sight; tapping it still picks it up.
+    /// </summary>
+    public void Threw(Tile where) => _thrown = where;
+
     /// <summary>
     /// Returns one object standing under the player that has not already been requested, or no request.
     /// Call this once per frame with the server's current floor-object snapshot.
@@ -21,6 +30,18 @@ public sealed class AutoLootGate
     {
         Creature[] floor = creatures.Where(one => one.Kind == CreatureKind.Passable).ToArray();
         _requested.IntersectWith(floor.Select(one => one.Serial));
+
+        if (_thrown is { } thrown)
+        {
+            if (thrown == standing)
+            {
+                _requested.UnionWith(floor.Where(one => one.Where == thrown).Select(one => one.Serial));
+            }
+            else
+            {
+                _thrown = null;
+            }
+        }
 
         if (!enabled)
         {

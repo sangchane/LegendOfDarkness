@@ -1662,6 +1662,7 @@ public partial class GameScreen : Control
             return;
         }
 
+        _world.Threw(standing.Where);
         await server.DropAsync(slot, count, standing.Where, System.Threading.CancellationToken.None);
     }
 
