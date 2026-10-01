@@ -10,9 +10,24 @@ namespace Lod.Mobile.Core.World;
 /// <summary>월드 연결 — 서버로 보내는 요청(걷기·말하기·아이템·기술·거래·나가기).</summary>
 public sealed partial class WorldClient
 {
+    /// <summary>로그아웃이 서버의 0x4C 를 기다리는 가장 긴 시간. 오지 않아도 소켓을 닫으면 서버는 곧 뺀다.</summary>
+    public static readonly TimeSpan LogOutWait = TimeSpan.FromSeconds(1);
+
+    private const byte ClickBySerial = 0x01;
+
+    /// <summary>
+    /// Which pack slot to put a picked-up thing in. The server finds a free one itself
+    /// (<c>Format07Handler</c> hands the item to <c>GiveTo</c>, which does not read this), so nothing is
+    /// gained by choosing — and choosing wrongly would be a way to lose things.
+    /// </summary>
+    private const byte AnyPackSlot = 0;
+
+    /// <summary>소지품 칸을 가리키는 번호. 주문·기술 칸도 같은 명령을 쓴다.</summary>
+    private const byte InventoryPane = 0x00;
+
     /// <summary>Says we are taking one step. The count rises so the server can see how fast we claim to move.</summary>
     public Task WalkAsync(Direction direction, CancellationToken cancellationToken) =>
-        Send(WalkCommand, [ToServer(direction), _step++], cancellationToken);
+        Send(ClientOpcode.Walk, [ToServer(direction), _step++], cancellationToken);
 
     /// <summary>
     /// Turns on the spot, without claiming a step.
@@ -24,7 +39,7 @@ public sealed partial class WorldClient
     /// the packet the original client sends for that, so facing costs nothing.
     /// </remarks>
     public Task TurnAsync(Direction direction, CancellationToken cancellationToken) =>
-        Send(TurnCommand, [ToServer(direction)], cancellationToken);
+        Send(ClientOpcode.Turn, [ToServer(direction)], cancellationToken);
 
     /// <summary>
     /// Picks one of the choices an NPC is offering. <paramref name="choice" /> is the number the server put
@@ -61,7 +76,7 @@ public sealed partial class WorldClient
 
     private Task Answer(uint speaker, ushort script, ushort choice, byte[] tail, CancellationToken cancellationToken) =>
         SendDialog(
-            AnswerCommand,
+            ClientOpcode.Answer,
             [
                 MundaneSpeaker,
                 (byte)(speaker >> 24), (byte)(speaker >> 16), (byte)(speaker >> 8), (byte)speaker,
@@ -84,33 +99,33 @@ public sealed partial class WorldClient
     /// speaker is allowed to give one, which is how a test gets an item into an empty pack.
     /// </summary>
     public Task SayAsync(string text, CancellationToken cancellationToken) =>
-        Send(TalkCommand, [0, .. LegacyKoreanEncoding.EncodeStringA(text)], cancellationToken);
+        Send(ClientOpcode.Talk, [0, .. LegacyKoreanEncoding.EncodeStringA(text)], cancellationToken);
 
     /// <summary>Asks somebody standing near us to join our group. They are asked, not added (<see cref="Party" />).</summary>
     public Task AskToGroupAsync(string name, CancellationToken cancellationToken) =>
-        Send(GroupCommand, Party.Ask(name), cancellationToken);
+        Send(ClientOpcode.Group, Party.Ask(name), cancellationToken);
 
     /// <summary>Takes the ask of the person who asked us. There is no "no" on the wire — not answering is the no.</summary>
     public Task AcceptGroupAsync(string name, CancellationToken cancellationToken) =>
-        Send(GroupCommand, Party.Accept(name), cancellationToken);
+        Send(ClientOpcode.Group, Party.Accept(name), cancellationToken);
 
     /// <summary>Leaves the group the original way: by asking ourselves. Nothing is sent before the server has named us.</summary>
     /// <summary>Turns taking group requests on or off. The server says nothing back — ask the profile again to see it.</summary>
-    public Task ToggleGroupAsync(CancellationToken cancellationToken) => Send(GroupToggleCommand, [], cancellationToken);
+    public Task ToggleGroupAsync(CancellationToken cancellationToken) => Send(ClientOpcode.GroupToggle, [], cancellationToken);
 
     public Task LeaveGroupAsync(CancellationToken cancellationToken) =>
         _self?.Name is { Length: > 0 } mine
-            ? Send(GroupCommand, Party.Ask(mine), cancellationToken)
+            ? Send(ClientOpcode.Group, Party.Ask(mine), cancellationToken)
             : Task.CompletedTask;
 
     /// <summary>Says something to everyone in our group (a whisper to "!").</summary>
     public Task SayToGroupAsync(string text, CancellationToken cancellationToken) =>
-        Send(WhisperCommand, Party.Chat(text), cancellationToken);
+        Send(ClientOpcode.Whisper, Party.Chat(text), cancellationToken);
 
     /// <summary>상점에서 여러 품목을 한 번에 사고 판다.</summary>
     public Task BulkTradeAsync(uint merchant, bool selling, IReadOnlyList<(string Name, int Slot, int Quantity)> lines, CancellationToken cancellationToken)
     {
-        return Send(BulkTradeCommand, EncodeBulkTrade(selling, merchant, lines), cancellationToken);
+        return Send(ClientOpcode.BulkTrade, EncodeBulkTrade(selling, merchant, lines), cancellationToken);
     }
 
     private static byte[] EncodeBulkTrade(bool selling, uint merchant, IReadOnlyList<(string Name, int Slot, int Quantity)> lines)
@@ -154,12 +169,12 @@ public sealed partial class WorldClient
         byte[] body = [3,
             (byte)(merchant >> 24), (byte)(merchant >> 16), (byte)(merchant >> 8), (byte)merchant,
             0, 0];
-        return Send(BulkTradeCommand, body, cancellationToken);
+        return Send(ClientOpcode.BulkTrade, body, cancellationToken);
     }
 
     /// <summary>Asks for our own profile, which is where the server lists the group.</summary>
     public Task AskProfileAsync(CancellationToken cancellationToken) =>
-        Send(ProfileRequestCommand, [], cancellationToken);
+        Send(ClientOpcode.ProfileRequest, [], cancellationToken);
 
     /// <summary>
     /// Strikes whatever is in front of us. The server decides whether that hits anything — it knows where
@@ -167,11 +182,11 @@ public sealed partial class WorldClient
     /// One tap is one blow: it does not chase and does not repeat.
     /// </summary>
     public Task AttackAsync(CancellationToken cancellationToken) =>
-        Send(AttackCommand, [], cancellationToken);
+        Send(ClientOpcode.Attack, [], cancellationToken);
 
     /// <summary>Activates one learned technique by its server-owned pane slot.</summary>
     public Task UseSkillAsync(int slot, CancellationToken cancellationToken) =>
-        Send(UseSkillCommand, [(byte)slot], cancellationToken);
+        Send(ClientOpcode.UseSkill, [(byte)slot], cancellationToken);
 
     /// <summary>
     /// Casts one learned spell. Hades reads the four bytes following the slot as the target serial; zero
@@ -180,7 +195,7 @@ public sealed partial class WorldClient
     /// </summary>
     public Task UseSpellAsync(int slot, uint target, CancellationToken cancellationToken) =>
         Send(
-            UseSpellCommand,
+            ClientOpcode.UseSpell,
             [(byte)slot, (byte)(target >> 24), (byte)(target >> 16), (byte)(target >> 8), (byte)target, 0],
             cancellationToken);
 
@@ -190,7 +205,7 @@ public sealed partial class WorldClient
     /// of clothing by describing us again, which is how the figure comes to be redrawn.
     /// </summary>
     public Task UseAsync(int slot, CancellationToken cancellationToken) =>
-        Send(UseCommand, [(byte)slot], cancellationToken);
+        Send(ClientOpcode.Use, [(byte)slot], cancellationToken);
 
     /// <summary>
     /// Throws one pack slot on the floor. The server decides whether it may be thrown at all — some things
@@ -198,7 +213,7 @@ public sealed partial class WorldClient
     /// </summary>
     public Task DropAsync(int slot, int amount, Tile where, CancellationToken cancellationToken) =>
         Send(
-            DropCommand,
+            ClientOpcode.Drop,
             [
                 (byte)slot,
                 (byte)(where.X >> 8), (byte)where.X,
@@ -214,7 +229,7 @@ public sealed partial class WorldClient
     /// </summary>
     public Task DropGoldAsync(int amount, Tile where, CancellationToken cancellationToken) =>
         Send(
-            DropGoldCommand,
+            ClientOpcode.DropGold,
             [
                 (byte)(amount >> 24), (byte)(amount >> 16), (byte)(amount >> 8), (byte)amount,
                 (byte)(where.X >> 8), (byte)where.X,
@@ -228,7 +243,7 @@ public sealed partial class WorldClient
     /// here has to say where. The server answers by describing us again, which redraws the figure.
     /// </summary>
     public Task TakeOffAsync(int place, CancellationToken cancellationToken) =>
-        Send(TakeOffCommand, [(byte)place], cancellationToken);
+        Send(ClientOpcode.TakeOff, [(byte)place], cancellationToken);
 
     /// <summary>
     /// Taps someone. This is how a conversation starts: the server finds whatever carries that serial and
@@ -238,7 +253,7 @@ public sealed partial class WorldClient
     /// </summary>
     public Task ClickAsync(uint serial, CancellationToken cancellationToken) =>
         Send(
-            ClickCommand,
+            ClientOpcode.Click,
             [
                 ClickBySerial,
                 (byte)(serial >> 24), (byte)(serial >> 16), (byte)(serial >> 8), (byte)serial
@@ -253,7 +268,7 @@ public sealed partial class WorldClient
     /// </summary>
     public Task PickUpAsync(Tile where, CancellationToken cancellationToken) =>
         Send(
-            PickUpCommand,
+            ClientOpcode.PickUp,
             [
                 AnyPackSlot,
                 (byte)(where.X >> 8), (byte)where.X,
@@ -266,7 +281,7 @@ public sealed partial class WorldClient
     /// whatever order there is, the player made it.
     /// </summary>
     public Task MoveAsync(int from, int to, CancellationToken cancellationToken) =>
-        Send(MoveCommand, [InventoryPane, (byte)from, (byte)to], cancellationToken);
+        Send(ClientOpcode.Move, [InventoryPane, (byte)from, (byte)to], cancellationToken);
 
     /// <summary>
     /// Spends one of the points a level handed out, on one attribute.
@@ -277,11 +292,11 @@ public sealed partial class WorldClient
     /// spend with the whole of our numbers, which is how the new maximum health arrives.
     /// </remarks>
     public Task RaiseAsync(Stat which, CancellationToken cancellationToken) =>
-        Send(RaiseCommand, [(byte)which], cancellationToken);
+        Send(ClientOpcode.Raise, [(byte)which], cancellationToken);
 
     /// <summary>Asks the server to say where we are again, which it answers with the map and the tile.</summary>
     public Task RefreshAsync(CancellationToken cancellationToken) =>
-        Send(RefreshCommand, [], cancellationToken);
+        Send(ClientOpcode.Refresh, [], cancellationToken);
 
     /// <summary>
     /// 월드맵에서 고른 곳의 맵 번호. 서버는 이 번호로 자기 목록에서 곳을 찾는다
@@ -302,20 +317,20 @@ public sealed partial class WorldClient
     /// 보내면 조작이 돌아온다.
     /// </summary>
     public Task ChooseFieldAsync(int areaId, CancellationToken cancellationToken) =>
-        Send(ChooseFieldCommand, FieldChoice(areaId), cancellationToken);
+        Send(ClientOpcode.ChooseField, FieldChoice(areaId), cancellationToken);
 
     /// <summary>
     /// 월드맵을 열어 달라고 서버에 말한다. 원작에는 없는 말이다 — 원작은 바닥의 숨은 칸을 밟아야 열렸다.
     /// 마을이 아니면 서버가 거절하고 말 한 줄만 돌려준다(싸우는 중에 열면 손이 묶이기 때문이다).
     /// </summary>
     public Task OpenFieldAsync(CancellationToken cancellationToken) =>
-        Send(OpenFieldCommand, [], cancellationToken);
+        Send(ClientOpcode.OpenField, [], cancellationToken);
 
     /// <summary>
     /// 월드맵을 그냥 닫는다. 갈 맵 번호 0 이 취소라고 서버와 약속했다 — 0 은 어느 맵의 번호도 아니다.
     /// </summary>
     public Task CloseFieldAsync(CancellationToken cancellationToken) =>
-        Send(ChooseFieldCommand, FieldChoice(0), cancellationToken);
+        Send(ClientOpcode.ChooseField, FieldChoice(0), cancellationToken);
 
     /// <summary>
     /// Sends one of the two answers an NPC takes. They go in a different envelope — six bytes of header and
@@ -356,7 +371,7 @@ public sealed partial class WorldClient
         {
             using CancellationTokenSource wait = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             wait.CancelAfter(LogOutWait);
-            await Send(ExitCommand, [1], wait.Token);
+            await Send(ClientOpcode.Exit, [1], wait.Token);
             await _exited.Task.WaitAsync(wait.Token);
         }
         catch (Exception) when (!cancellationToken.IsCancellationRequested)

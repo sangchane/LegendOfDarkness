@@ -330,7 +330,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
             {
                 switch (frame.Command)
                 {
-                    case MapChangedCommand:
+                    case ServerOpcode.MapChanged:
                     {
                         int before = map?.Id ?? -1;
                         map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
@@ -350,15 +350,15 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
                         break;
                     }
 
-                    case HeartbeatCommand:
-                        await Send(HeartbeatReplyCommand, HadesCipher.DecodeSecured(frame, session.Parameters).ToArray(), cancellationToken);
+                    case ServerOpcode.Heartbeat:
+                        await Send(ClientOpcode.HeartbeatReply, HadesCipher.DecodeSecured(frame, session.Parameters).ToArray(), cancellationToken);
                         continue;
 
-                    case ExitedCommand:
+                    case ServerOpcode.Exited:
                         _exited.TrySetResult();
                         continue;
 
-                    case WorldMapCommand:
+                    case ServerOpcode.WorldMap:
                         try
                         {
                             _field = ReadWorldMap(HadesCipher.DecodeSecured(frame, session.Parameters));
@@ -371,12 +371,12 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case LocationCommand:
+                    case ServerOpcode.Location:
                         where = ReadLocation(HadesCipher.DecodeSecured(frame, session.Parameters));
                         _reports++;
                         break;
 
-                    case OwnSerialCommand:
+                    case ServerOpcode.OwnSerial:
                         _serial = BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters));
 
                         // It may arrive after we have already been shown ourselves, in which case we are
@@ -388,11 +388,11 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case DisplayCharacterCommand:
+                    case ServerOpcode.DisplayCharacter:
                         Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
                         continue;
 
-                    case BodyMotionCommand:
+                    case ServerOpcode.BodyMotion:
                     {
                         ReadOnlySpan<byte> motion = HadesCipher.DecodeSecured(frame, session.Parameters);
 
@@ -408,7 +408,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case AnimationCommand:
+                    case ServerOpcode.Animation:
                     {
                         ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
 
@@ -424,7 +424,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case SoundCommand:
+                    case ServerOpcode.Sound:
                     {
                         ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
 
@@ -450,15 +450,15 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case HealthCommand:
+                    case ServerOpcode.Health:
                         ReadHealth(HadesCipher.DecodeSecured(frame, session.Parameters));
                         continue;
 
-                    case VitalsCommand:
+                    case ServerOpcode.Vitals:
                         _vitals = ReadVitals(HadesCipher.DecodeSecured(frame, session.Parameters), _vitals);
                         continue;
 
-                    case SpokenCommand:
+                    case ServerOpcode.Spoken:
                     {
                         // A sound with no words is still this packet; there is simply nothing to show.
                         if (ReadTold(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } told)
@@ -476,7 +476,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case SpeechCommand:
+                    case ServerOpcode.Speech:
                     {
                         Spoken spoken = ReadSpoken(HadesCipher.DecodeSecured(frame, session.Parameters));
 
@@ -490,7 +490,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case GroupAskCommand:
+                    case ServerOpcode.GroupAsk:
                         if (Party.ReadAsk(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } asker && _asks.Count < 8)
                         {
                             _asks.Enqueue(asker);
@@ -498,7 +498,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case CompanionTieCommand:
+                    case ServerOpcode.CompanionTie:
                         try
                         {
                             ReadOnlySpan<byte> tieBody = HadesCipher.DecodeSecured(frame, session.Parameters);
@@ -566,7 +566,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case OtherProfileCommand:
+                    case ServerOpcode.OtherProfile:
                         try
                         {
                             _seen = OtherProfile.Read(HadesCipher.DecodeSecured(frame, session.Parameters));
@@ -578,7 +578,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case ProfileCommand:
+                    case ServerOpcode.Profile:
                         try
                         {
                             byte[] profile = HadesCipher.DecodeSecured(frame, session.Parameters).ToArray();
@@ -594,7 +594,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case CooldownCommand:
+                    case ServerOpcode.Cooldown:
                     {
                         Cooldown cooling = ReadCooldown(HadesCipher.DecodeSecured(frame, session.Parameters));
 
@@ -603,7 +603,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case StatusCommand:
+                    case ServerOpcode.Status:
                     {
                         Ailment told = ReadAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
 
@@ -620,7 +620,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case SeenStatusCommand:
+                    case ServerOpcode.SeenStatus:
                     {
                         SeenAilment seen = ReadSeenAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
 
@@ -636,7 +636,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case FigureCommand:
+                    case ServerOpcode.Figure:
                         Figure figure = ReadFigure(HadesCipher.DecodeSecured(frame, session.Parameters));
                         _figures.Enqueue(figure);
 
@@ -647,7 +647,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case ShowCreaturesCommand:
+                    case ServerOpcode.ShowCreatures:
                         foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
                         {
                             _creatures[creature.Serial] = creature;
@@ -656,7 +656,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case TakeFromPackCommand:
+                    case ServerOpcode.TakeFromPack:
                     {
                         ReadOnlySpan<byte> gone = HadesCipher.DecodeSecured(frame, session.Parameters);
 
@@ -668,7 +668,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case WornCommand:
+                    case ServerOpcode.Worn:
                     {
                         WornItem gear = ReadWorn(HadesCipher.DecodeSecured(frame, session.Parameters));
                         _worn[gear.Slot] = gear;
@@ -676,7 +676,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case TookOffCommand:
+                    case ServerOpcode.TookOff:
                     {
                         ReadOnlySpan<byte> bare = HadesCipher.DecodeSecured(frame, session.Parameters);
 
@@ -688,7 +688,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case AddSkillCommand:
+                    case ServerOpcode.AddSkill:
                     {
                         LearnedSkill skill = ReadSkill(HadesCipher.DecodeSecured(frame, session.Parameters));
                         _skills[skill.Slot] = skill;
@@ -696,7 +696,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case AddSpellCommand:
+                    case ServerOpcode.AddSpell:
                     {
                         LearnedSpell spell = ReadSpell(HadesCipher.DecodeSecured(frame, session.Parameters));
                         _spells[spell.Slot] = spell;
@@ -704,15 +704,15 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case RemoveSkillCommand:
+                    case ServerOpcode.RemoveSkill:
                         _skills.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
                         continue;
 
-                    case RemoveSpellCommand:
+                    case ServerOpcode.RemoveSpell:
                         _spells.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
                         continue;
 
-                    case AddToPackCommand:
+                    case ServerOpcode.AddToPack:
                         {
                             InventoryItem carried = ReadPackItem(HadesCipher.DecodeSecured(frame, session.Parameters));
                             _pack[carried.Slot] = carried;
@@ -720,15 +720,15 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case CreatureWalkedCommand:
+                    case ServerOpcode.CreatureWalked:
                         Moved(HadesCipher.DecodeSecured(frame, session.Parameters));
                         continue;
 
-                    case TurnedCommand:
+                    case ServerOpcode.Turned:
                         Turned(HadesCipher.DecodeSecured(frame, session.Parameters));
                         continue;
 
-                    case RemoveCommand:
+                    case ServerOpcode.Remove:
                     {
                         uint gone = BinaryPrimitives.ReadUInt32BigEndian(
                             HadesCipher.DecodeSecured(frame, session.Parameters));
@@ -744,7 +744,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case DialogueCommand:
+                    case ServerOpcode.Dialogue:
                     {
                         Dialogue talk = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
                         Talking = talk;
@@ -758,7 +758,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
                         continue;
 
-                    case SequenceCommand:
+                    case ServerOpcode.Sequence:
                     {
                         byte[] sequence = HadesCipher.DecodeSecured(frame, session.Parameters);
 

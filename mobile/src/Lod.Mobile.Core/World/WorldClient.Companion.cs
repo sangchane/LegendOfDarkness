@@ -52,25 +52,25 @@ public sealed partial class WorldClient
 
     /// <summary>동료 봇을 부른다(0xF1 1). 결과는 서버 알림(0x0A)과 0x5E 로 온다.</summary>
     public Task CallCompanionAsync(CancellationToken cancellationToken) =>
-        Send(CompanionCommand, World.Companion.Call(), cancellationToken);
+        Send(ClientOpcode.Companion, World.Companion.Call(), cancellationToken);
 
     /// <summary>내 가방 한 칸을 봇에게(0xF1 2) — 장비면 입히고 포션이면 개수만큼(0 은 다).</summary>
     public Task GiveToCompanionAsync(int slot, int count, CancellationToken cancellationToken) =>
-        Send(CompanionCommand, World.Companion.Give(slot, count), cancellationToken);
+        Send(ClientOpcode.Companion, World.Companion.Give(slot, count), cancellationToken);
 
     /// <summary>봇의 장비 한 자리를 내 가방으로(0xF1 3).</summary>
     public Task TakeOffCompanionAsync(int place, CancellationToken cancellationToken) =>
-        Send(CompanionCommand, World.Companion.TakeOff(place), cancellationToken);
+        Send(ClientOpcode.Companion, World.Companion.TakeOff(place), cancellationToken);
 
     /// <summary>내 코마디움으로 혼수인 봇을 깨운다(0xF1 4).</summary>
     public Task WakeCompanionAsync(CancellationToken cancellationToken) =>
-        Send(CompanionCommand, World.Companion.Wake(), cancellationToken);
+        Send(ClientOpcode.Companion, World.Companion.Wake(), cancellationToken);
 
     /// <summary>봇일 때 — 혼수인 주인을 깨운다(0xF1 5, 바로 옆에서).</summary>
     public Task WakeMasterAsync(CancellationToken cancellationToken) =>
-        Send(CompanionCommand, World.Companion.WakeMaster(), cancellationToken);
+        Send(ClientOpcode.Companion, World.Companion.WakeMaster(), cancellationToken);
 
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
-        Send(CompanionCommand, World.Companion.Dismiss(), cancellationToken);
+        Send(ClientOpcode.Companion, World.Companion.Dismiss(), cancellationToken);
 }
