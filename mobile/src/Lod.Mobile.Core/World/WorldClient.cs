@@ -1,4 +1,3 @@
-﻿using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Net;
@@ -30,16 +29,9 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     private int _disposed;
     private int _disposeAttempts;
 
-    // Written by the pump, read by whoever is drawing. A whole state at once, so a reader never sees a map
-    // from one moment and a tile from another.
-    private volatile WorldEntry? _state;
-    private volatile int _reports;
-    private volatile uint _serial;
-
-    // Keyed by serial, which is the only name the server gives them at first.
-    private readonly ConcurrentDictionary<uint, Character> _others = new();
-
-    private volatile Character? _self;
+    // 지금 보이는 세계(맵·자리·나·남·괴물)와 들은 말. 받는 실이 쓰고 그리는 실이 읽는다.
+    private readonly WorldState _world = new();
+    private readonly ChatLog _chat = new();
 
     // Keyed by the slot the server puts each thing in, which is how it refers to them afterwards.
     private readonly ConcurrentDictionary<int, InventoryItem> _pack = new();
@@ -51,15 +43,9 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     private readonly ConcurrentDictionary<int, LearnedSkill> _skills = new();
     private readonly ConcurrentDictionary<int, LearnedSpell> _spells = new();
 
-    // Everything on the floor that is not a player, by the same serial the server removes them by.
-    private readonly ConcurrentDictionary<uint, Creature> _creatures = new();
-
     // How hurt each of them is, out of a hundred. The server never says more than that about somebody else.
     private readonly ConcurrentDictionary<uint, int> _health = new();
     private readonly ConcurrentDictionary<int, Ailment> _ailing = new();
-
-    // What is on everybody else we can see, by who and which picture (0x5C).
-    private readonly ConcurrentDictionary<(uint Serial, int Icon), SeenAilment> _seenAiling = new();
 
     // Every report in the order it came, because the latest one is not enough to check a blow against a
     // formula: two blows landing between two reads would leave only the second one's figure behind.
@@ -85,25 +71,12 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     private volatile string? _broke;
     private volatile int _ignored;
 
-    private volatile string _said = string.Empty;
     private int? _path;
     private bool? _groupOpen;
     private OtherProfile? _seen;
-    private volatile int _saidCount;
 
-    // 0x0A 를 타입 바이트와 함께 줄줄이 담는다. _said 는 마지막 한 줄뿐이라, 한 프레임에 둘이 오면(주운 것 + 경험치)
-    // 하나를 잃었다.
-    private readonly ConcurrentQueue<(byte Type, string Text)> _told = new();
-
-    /// <summary>How many lines of what people said are kept for looking back at.</summary>
-    private const int HeardKept = 60;
-
-    // 받는 쪽은 다른 실이다. 목록을 고치는 대신 새 목록으로 바꿔 끼워, 읽는 쪽이 훑는 도중에 바뀌지 않게 한다.
     // 언제 다시 쓸 수 있나. 받는 쪽과 그리는 쪽이 다른 실이라 한꺼번에 읽고 쓰는 사전을 쓴다.
     private readonly ConcurrentDictionary<(bool Skill, int Slot), DateTime> _cooling = new();
-
-    private volatile IReadOnlyList<Spoken> _heard = [];
-    private volatile int _heardTotal;
 
     // 그룹을 청한 사람들, 온 차례대로. 그리는 쪽이 하나씩 꺼내 묻는다.
     private readonly ConcurrentQueue<string> _asks = new();
@@ -124,25 +97,25 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     private volatile int _rosterCount;
 
     /// <summary>Where the server last said we are, or null until it has said so.</summary>
-    public WorldEntry? State => _state;
+    public WorldEntry? State => _world.Entry;
 
     /// <summary>
     /// How many times the server has stated our position. It does that on entry, on a refresh, and when it
     /// refuses a step — so a rise the client did not ask for means a walk was turned down.
     /// </summary>
-    public int PositionReports => _reports;
+    public int PositionReports => _world.Reports;
 
     /// <summary>
     /// The serial the server uses for our own character in the world. It is not the number the login
     /// server handed over — that one only opened the door.
     /// </summary>
-    public uint Serial => _serial;
+    public uint Serial => _world.Serial;
 
     /// <summary>
     /// Our own character as the server describes it — what we are wearing and what it calls us. The server
     /// shows us to ourselves like anybody else, so this is the same packet everyone else arrives in.
     /// </summary>
-    public Character? Self => _self;
+    public Character? Self => _world.Self;
 
     /// <summary>
     /// How much of somebody's health is left, out of a hundred, or nothing if the server has not said. It
@@ -161,7 +134,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     /// Empty for anybody it has said nothing about.
     /// </summary>
     public IReadOnlyList<SeenAilment> AilmentsOf(uint serial) =>
-        [.. _seenAiling.Values.Where(one => one.Serial == serial)];
+        [.. _world.SeenAiling.Values.Where(one => one.Serial == serial)];
 
     /// <summary>
     /// Every health report the server has sent, oldest first. One report is one blow landing, so this is
@@ -185,7 +158,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     public int FieldShown => _fieldShown;
 
     /// <summary>The last thing the server said in words — a refused blow, a greeting, a warning.</summary>
-    public string Said => _said;
+    public string Said => _chat.Said;
 
     /// <summary>My class as the profile (0x39) last said — Hades <c>Class</c> number (5 무도가 …); null until asked for.</summary>
     public int? Path => _path;
@@ -200,29 +173,19 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     /// Takes the next line the server said (0x0A) with its type byte (Hades <c>ServerFormat0A.MsgType</c>), oldest
     /// first, so a screen can sort it (<see cref="MessageSort.FromServer" />) without missing any.
     /// </summary>
-    public bool TakeTold(out byte type, out string text)
-    {
-        if (_told.TryDequeue(out (byte Type, string Text) told))
-        {
-            (type, text) = told;
-            return true;
-        }
-
-        (type, text) = (0, string.Empty);
-        return false;
-    }
+    public bool TakeTold(out byte type, out string text) => _chat.TakeTold(out type, out text);
 
     /// <summary>The last lines anybody near us said, oldest first.</summary>
-    public IReadOnlyList<Spoken> Heard => _heard;
+    public IReadOnlyList<Spoken> Heard => _chat.Heard;
 
     /// <summary>How many lines have been heard in all, so a screen can tell a new one from the same one again.</summary>
-    public int HeardCount => _heardTotal;
+    public int HeardCount => _chat.HeardCount;
 
     /// <summary>How many times it has spoken, so a reader can tell a repeat from a new line.</summary>
-    public int SaidCount => _saidCount;
+    public int SaidCount => _chat.SaidCount;
 
     /// <summary>Monsters and merchants the server has shown us, by serial.</summary>
-    public IReadOnlyCollection<Creature> Creatures => (IReadOnlyCollection<Creature>)_creatures.Values;
+    public IReadOnlyCollection<Creature> Creatures => (IReadOnlyCollection<Creature>)_world.Creatures.Values;
 
     /// <summary>The window the last tapped NPC opened, or null if none has. (Not <c>Said</c> — that is
     /// chat overheard in the map; this is a conversation we started by tapping.)</summary>
@@ -267,7 +230,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     public IReadOnlyList<LearnedSpell> Spells => [.. _spells.Values.OrderBy(spell => spell.Slot)];
 
     /// <summary>Everyone else the server has shown us, by serial. Our own character is not in here.</summary>
-    public IReadOnlyCollection<Character> Others => (IReadOnlyCollection<Character>)_others.Values;
+    public IReadOnlyCollection<Character> Others => (IReadOnlyCollection<Character>)_world.Others.Values;
 
     /// <summary>The direction bytes the server walks by: 0 north, 1 east, 2 south, 3 west.</summary>
     public static byte ToServer(Direction direction) => direction switch
@@ -316,11 +279,11 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
         }
     }
 
+    /// <summary>
+    /// 받기 루프. 아는 번호면 몸을 한 번 해독해 갈래(<see cref="HandlerFor" />)에 넘기고, 모르는 번호는 해독하지 않고 넘긴다.
+    /// </summary>
     private async Task Listen(CancellationToken cancellationToken)
     {
-        MapInfo? map = null;
-        Tile? where = null;
-
         while (!cancellationToken.IsCancellationRequested)
         {
             PacketFrame frame = await session.Connection.ReceiveAsync(cancellationToken);
@@ -330,460 +293,18 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
             {
                 switch (frame.Command)
                 {
-                    case ServerOpcode.MapChanged:
-                    {
-                        int before = map?.Id ?? -1;
-                        map = ReadMap(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _field = null;
-                        _seenAiling.Clear();
-
-                        // 맵이 바뀌면 보던 것을 모두 버린다 — 남겨 두면 지난 맵 괴물이 새 맵 위에 선다. 같은 맵 새로고침
-                        // (막힌 걸음·속도 초과가 부르는 GameClient.Refresh)에는 버리지 않는다: 서버는 곁의 것을 곧 0x07 로 다시
-                        // 보낼 뿐이고, 버리면 그때까지 괴물이 모두 사라졌다가 돌아온다(사용자 2026-09-25 "보였다가 사라진다").
-                        // 시야 밖이 된 것은 서버가 0x0E 로 거둔다.
-                        if (map.Id != before)
-                        {
-                            _creatures.Clear();
-                            _others.Clear();
-                        }
-
-                        break;
-                    }
-
-                    case ServerOpcode.Heartbeat:
-                        await Send(ClientOpcode.HeartbeatReply, HadesCipher.DecodeSecured(frame, session.Parameters).ToArray(), cancellationToken);
-                        continue;
-
                     case ServerOpcode.Exited:
                         _exited.TrySetResult();
                         continue;
 
-                    case ServerOpcode.WorldMap:
-                        try
-                        {
-                            _field = ReadWorldMap(HadesCipher.DecodeSecured(frame, session.Parameters));
-                            _fieldShown++;
-                        }
-                        catch (ProtocolException cut)
-                        {
-                            NoteUnread($"월드맵 안내를 읽다가 끊겼습니다: {cut.Message}");
-                        }
-
-                        continue;
-
-                    case ServerOpcode.Location:
-                        where = ReadLocation(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _reports++;
-                        break;
-
-                    case ServerOpcode.OwnSerial:
-                        _serial = BinaryPrimitives.ReadUInt32BigEndian(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                        // It may arrive after we have already been shown ourselves, in which case we are
-                        // standing in the crowd under our own name until now.
-                        if (_others.TryRemove(_serial, out Character? mistaken))
-                        {
-                            _self = mistaken;
-                        }
-
-                        continue;
-
-                    case ServerOpcode.DisplayCharacter:
-                        Show(ReadCharacter(HadesCipher.DecodeSecured(frame, session.Parameters)));
-                        continue;
-
-                    case ServerOpcode.BodyMotion:
-                    {
-                        ReadOnlySpan<byte> motion = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                        if (motion.Length >= 4)
-                        {
-                            _motions.Enqueue(ReadMotion(motion));
-                        }
-                        else
-                        {
-                            _ignored++;
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Animation:
-                    {
-                        ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                        if (body.Length >= 12)
-                        {
-                            _effects.Enqueue(ReadEffect(body));
-                        }
-                        else
-                        {
-                            _ignored++;
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Sound:
-                    {
-                        ReadOnlySpan<byte> body = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                        if (body.Length >= 3)
-                        {
-                            // 같은 패킷이 효과음과 배경음악을 함께 나른다 — 번호가 가른다(Music).
-                            int number = ReadSound(body);
-
-                            if (Music.Song(number) is { } song)
-                            {
-                                _songs.Enqueue(song);
-                            }
-                            else
-                            {
-                                _sounds.Enqueue(number);
-                            }
-                        }
-                        else
-                        {
-                            _ignored++;
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Health:
-                        ReadHealth(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        continue;
-
-                    case ServerOpcode.Vitals:
-                        _vitals = ReadVitals(HadesCipher.DecodeSecured(frame, session.Parameters), _vitals);
-                        continue;
-
-                    case ServerOpcode.Spoken:
-                    {
-                        // A sound with no words is still this packet; there is simply nothing to show.
-                        if (ReadTold(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } told)
-                        {
-                            _said = told.Text;
-                            _saidCount++;
-
-                            // 읽는 쪽이 없으면 끝없이 쌓이지 않게 넉넉히 자른다.
-                            if (_told.Count < HeardKept)
-                            {
-                                _told.Enqueue(told);
-                            }
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Speech:
-                    {
-                        Spoken spoken = ReadSpoken(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                        // 지난 말은 다시 볼 수 있어야 하지만 접속해 있는 내내 쌓아 둘 것은 아니다.
-                        if (spoken.Text.Length > 0)
-                        {
-                            _heard = [.. _heard.TakeLast(HeardKept - 1), spoken];
-                            _heardTotal++;
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.GroupAsk:
-                        if (Party.ReadAsk(HadesCipher.DecodeSecured(frame, session.Parameters)) is { } asker && _asks.Count < 8)
-                        {
-                            _asks.Enqueue(asker);
-                        }
-
-                        continue;
-
-                    case ServerOpcode.CompanionTie:
-                        try
-                        {
-                            ReadOnlySpan<byte> tieBody = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                            switch (tieBody.Length > 0 ? tieBody[0] : 0)
-                            {
-                                case World.Companion.MasterKind:
-                                    _master = World.Companion.ReadTie(tieBody).Tie;
-                                    _statuses.Clear();
-                                    break;
-                                case World.Companion.CompanionKind:
-                                    _companion = World.Companion.ReadTie(tieBody).Tie;
-
-                                    if (_companion is null)
-                                    {
-                                        _companionLife = null;
-                                        _companionNumbers = null;
-                                        _companionKit = null;
-                                        _companionKitCount++;
-                                    }
-
-                                    break;
-                                case World.Companion.StatusesKind:
-                                    (uint on, IReadOnlyList<CompanionStatus> listed) = World.Companion.ReadStatuses(tieBody);
-                                    _statuses[on] = listed;
-                                    break;
-                                case World.Companion.VitalsKind:
-                                    _companionLife = World.Companion.ReadLife(tieBody);
-                                    _companionNumbers = PartyNumbers.ReadLife(tieBody);
-                                    break;
-                                case World.Companion.MemberKind:
-                                    PartyMemberStatus member = World.Companion.ReadMember(tieBody);
-
-                                    // serial 0 — 그룹이 끝났다(나갔거나 흩어졌다). 모두 지운다.
-                                    if (member.Serial == 0)
-                                    {
-                                        _members.Clear();
-                                        _memberNumbers.Clear();
-                                    }
-                                    else
-                                    {
-                                        _members[member.Serial] = member;
-
-                                        if (PartyNumbers.ReadMember(tieBody) is { } numbers)
-                                        {
-                                            _memberNumbers[member.Serial] = numbers;
-                                        }
-                                        else
-                                        {
-                                            _memberNumbers.TryRemove(member.Serial, out _);
-                                        }
-                                    }
-
-                                    break;
-                                case World.Companion.KitKind:
-                                    _companionKit = World.Companion.ReadKit(tieBody);
-                                    _companionKitCount++;
-                                    break;
-                            }
-                        }
-                        catch (ProtocolException cut)
-                        {
-                            NoteUnread($"0x5E: {cut.Message}");
-                        }
-
-                        continue;
-
-                    case ServerOpcode.OtherProfile:
-                        try
-                        {
-                            _seen = OtherProfile.Read(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        }
-                        catch (ProtocolException cut)
-                        {
-                            NoteUnread($"0x34: {cut.Message}");
-                        }
-
-                        continue;
-
-                    case ServerOpcode.Profile:
-                        try
-                        {
-                            byte[] profile = HadesCipher.DecodeSecured(frame, session.Parameters).ToArray();
-                            _path = LearnLadder.PathFromProfile(profile) ?? _path;
-                            _groupOpen = LearnLadder.GroupOpenFromProfile(profile) ?? _groupOpen;
-                            _roster = Party.ReadRoster(profile);
-                            _rosterCount++;
-                        }
-                        catch (ProtocolException cut)
-                        {
-                            NoteUnread($"0x39: {cut.Message}");
-                        }
-
-                        continue;
-
-                    case ServerOpcode.Cooldown:
-                    {
-                        Cooldown cooling = ReadCooldown(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                        _cooling[(cooling.Skill, cooling.Slot)] = DateTime.UtcNow.AddSeconds(cooling.Seconds);
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Status:
-                    {
-                        Ailment told = ReadAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                        // 등급 0 은 풀렸다는 뜻이다(Debuff.OnEnded 가 0 을 보낸다).
-                        if (told.Left == 0)
-                        {
-                            _ailing.TryRemove(told.Icon, out _);
-                        }
-                        else
-                        {
-                            _ailing[told.Icon] = told;
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.SeenStatus:
-                    {
-                        SeenAilment seen = ReadSeenAilment(HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                        if (seen.Left == 0)
-                        {
-                            _seenAiling.TryRemove((seen.Serial, seen.Icon), out _);
-                        }
-                        else
-                        {
-                            _seenAiling[(seen.Serial, seen.Icon)] = seen;
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Figure:
-                        Figure figure = ReadFigure(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _figures.Enqueue(figure);
-
-                        if (figure.Kind == FigureKind.Damage && figure.Source != 0)
-                        {
-                            _struck[figure.Target] = (figure.Source, DateTime.UtcNow);
-                        }
-
-                        continue;
-
-                    case ServerOpcode.ShowCreatures:
-                        foreach (Creature creature in ReadCreatures(HadesCipher.DecodeSecured(frame, session.Parameters)))
-                        {
-                            _creatures[creature.Serial] = creature;
-                            _others.TryRemove(creature.Serial, out _);
-                        }
-
-                        continue;
-
-                    case ServerOpcode.TakeFromPack:
-                    {
-                        ReadOnlySpan<byte> gone = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                        if (gone.Length >= 1)
-                        {
-                            _pack.TryRemove(gone[0], out _);
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Worn:
-                    {
-                        WornItem gear = ReadWorn(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _worn[gear.Slot] = gear;
-                    }
-
-                        continue;
-
-                    case ServerOpcode.TookOff:
-                    {
-                        ReadOnlySpan<byte> bare = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                        if (bare.Length >= 1)
-                        {
-                            _worn.TryRemove(bare[0], out _);
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.AddSkill:
-                    {
-                        LearnedSkill skill = ReadSkill(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _skills[skill.Slot] = skill;
-                    }
-
-                        continue;
-
-                    case ServerOpcode.AddSpell:
-                    {
-                        LearnedSpell spell = ReadSpell(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        _spells[spell.Slot] = spell;
-                    }
-
-                        continue;
-
-                    case ServerOpcode.RemoveSkill:
-                        _skills.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
-                        continue;
-
-                    case ServerOpcode.RemoveSpell:
-                        _spells.TryRemove(ReadAbilitySlot(HadesCipher.DecodeSecured(frame, session.Parameters)), out _);
-                        continue;
-
-                    case ServerOpcode.AddToPack:
-                        {
-                            InventoryItem carried = ReadPackItem(HadesCipher.DecodeSecured(frame, session.Parameters));
-                            _pack[carried.Slot] = carried;
-                        }
-
-                        continue;
-
-                    case ServerOpcode.CreatureWalked:
-                        Moved(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        continue;
-
-                    case ServerOpcode.Turned:
-                        Turned(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        continue;
-
-                    case ServerOpcode.Remove:
-                    {
-                        uint gone = BinaryPrimitives.ReadUInt32BigEndian(
-                            HadesCipher.DecodeSecured(frame, session.Parameters));
-
-                        _others.TryRemove(gone, out _);
-                        _creatures.TryRemove(gone, out _);
-
-                        foreach ((uint Serial, int Icon) key in _seenAiling.Keys.Where(key => key.Serial == gone))
-                        {
-                            _seenAiling.TryRemove(key, out _);
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Dialogue:
-                    {
-                        Dialogue talk = ReadDialogue(HadesCipher.DecodeSecured(frame, session.Parameters));
-                        Talking = talk;
-                        _talkCount++;
-
-                        if (talk.Unread is { } cut)
-                        {
-                            NoteUnread($"0x2F: {cut}");
-                        }
-                    }
-
-                        continue;
-
-                    case ServerOpcode.Sequence:
-                    {
-                        byte[] sequence = HadesCipher.DecodeSecured(frame, session.Parameters);
-
-                        if (ShutsDialogue(sequence))
-                        {
-                            Talking = null;
-                            _talkCount++;
-                        }
-                        else
-                        {
-                            // 반응기 창(ReactorSequence·ReactorInputSequence)도 0x30 으로 온다. 아직 그리지 않지만 말없이 버리지는 않는다.
-                            string kind = sequence.Length > 0 ? $"0x{sequence[0]:X2}" : "없음";
-                            NoteUnread($"0x30: 닫기가 아닌 창 순서입니다 (첫 바이트 {kind}).");
-                        }
-                    }
-
-                        continue;
-
-                    default:
+                    case ServerOpcode.Heartbeat:
+                        await Send(ClientOpcode.HeartbeatReply, HadesCipher.DecodeSecured(frame, session.Parameters), cancellationToken);
                         continue;
                 }
 
-                if (map is not null && where is not null)
+                if (HandlerFor(frame.Command) is { } handle)
                 {
-                    _state = new WorldEntry(map, where.Value);
+                    handle(HadesCipher.DecodeSecured(frame, session.Parameters));
                 }
             }
             catch (Exception unreadable) when (unreadable is ProtocolException or ArgumentException or IndexOutOfRangeException)
@@ -815,120 +336,8 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
         _unreadCount++;
     }
 
-    /// <summary>Remembers somebody. The server shows us our own character too, and that one is kept apart.</summary>
-    private void Show(Character character)
-    {
-        if (character.Serial == _serial)
-        {
-            _self = character;
-            return;
-        }
-
-        _others[character.Serial] = character;
-    }
-
-    /// <summary>Whoever we already know by that serial, so a packet without clothes does not undress them.</summary>
-    private Character? Known(uint serial) =>
-        serial == _serial ? _self : _others.GetValueOrDefault(serial);
-
-    /// <summary>
-    /// A step somebody took. The tile in the packet is where they were, not where they are now, so the
-    /// direction has to be applied to it.
-    /// </summary>
-    private void Moved(ReadOnlySpan<byte> body)
-    {
-        if (body.Length < 9)
-        {
-            throw new ProtocolException($"걸음 안내가 9바이트보다 짧습니다 ({body.Length}바이트).");
-        }
-
-        uint serial = BinaryPrimitives.ReadUInt32BigEndian(body);
-        int fromX = BinaryPrimitives.ReadUInt16BigEndian(body[4..]);
-        int fromY = BinaryPrimitives.ReadUInt16BigEndian(body[6..]);
-        Direction facing = FromServer(body[8]);
-
-        (int column, int row) = Facing.TileStep(facing);
-        Tile now = new(fromX + column, fromY + row);
-
-        // Monsters walk too, and the server uses this same packet for them. Take somebody we already know
-        // to be a monster as a monster — otherwise it joins the crowd as a nameless person and stands there
-        // wearing borrowed clothes on the tile its own picture is drawn on.
-        if (_creatures.TryGetValue(serial, out Creature? beast))
-        {
-            _creatures[serial] = beast with { Where = now, Facing = facing };
-            return;
-        }
-
-        // A step says nothing about clothes, so keep the ones we were shown rather than undressing them.
-        // 모르는 serial 의 걸음은 버린다. 서버는 걸음(0x0C)을 걸음 뒤 자리로, 보여 주기(0x07·0x33)는 걸음 전 자리로
-        // 곁의 사람을 골라(Sprite.Walk) 시야로 걸어 들어오는 괴물의 걸음이 먼저 온다 — 사람으로 받으면 npc-walk.png 를
-        // 입은 이름 없는 사람이 괴물 자리에 선다(2026-09-24 사용자 보고). 곧 올 0x07·0x33 이 제자리에 세운다.
-        if (Known(serial) is { } known)
-        {
-            Show(known with { Where = now, Facing = facing });
-        }
-    }
-
-    /// <summary>
-    /// Somebody turning where they stand. A monster does it right before it swings, so its blow is drawn
-    /// towards whoever it hits rather than wherever it last walked.
-    /// </summary>
-    private void Turned(ReadOnlySpan<byte> body)
-    {
-        if (body.Length < 5)
-        {
-            return;
-        }
-
-        (uint serial, Direction facing) = ReadTurn(body);
-
-        if (_creatures.TryGetValue(serial, out Creature? beast))
-        {
-            _creatures[serial] = beast with { Facing = facing };
-            return;
-        }
-
-        if (Known(serial) is { } known)
-        {
-            Show(known with { Facing = facing });
-        }
-    }
-
-    /// <summary>
-    /// How hurt somebody is: whose, how much of their health is left out of a hundred, and a sound to play.
-    /// A full bar is written as 255 rather than 100 — that is the server saying there is nothing to show,
-    /// which is also how it answers a blow that could not land.
-    /// </summary>
-    private void ReadHealth(ReadOnlySpan<byte> body)
-    {
-        const int fixedLength = 7;
-
-        if (body.Length < fixedLength)
-        {
-            throw new ProtocolException($"체력 안내가 {fixedLength}바이트보다 짧습니다 ({body.Length}바이트).");
-        }
-
-        if (ReadHealthSound(body) is int sound)
-        {
-            _sounds.Enqueue(sound);
-        }
-
-        int left = BinaryPrimitives.ReadUInt16BigEndian(body[4..]);
-
-        if (left > 100)
-        {
-            return;
-        }
-
-        uint serial = BinaryPrimitives.ReadUInt32BigEndian(body);
-
-        _health[serial] = left;
-        _hurts.Enqueue((serial, left));
-    }
-
     /// <summary>A skill pane row: slot, icon, then its display name as a short string.</summary>
     /// <summary>Seconds left before one slot may be used again, or none when it is ready.</summary>
     public int CoolingFor(bool skill, int slot) =>
         _cooling.TryGetValue((skill, slot), out DateTime ready) ? Cooldown.Left(ready, DateTime.UtcNow) : 0;
-
 }

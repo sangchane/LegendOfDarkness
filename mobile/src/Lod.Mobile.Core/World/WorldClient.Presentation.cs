@@ -55,8 +55,8 @@ public sealed partial class WorldClient
     /// </summary>
     public bool StruckByOthers(uint target, TimeSpan within) =>
         _struck.TryGetValue(target, out (uint Source, DateTime At) hit)
-        && hit.Source != _serial
-        && _others.ContainsKey(hit.Source)
+        && hit.Source != _world.Serial
+        && _world.Others.ContainsKey(hit.Source)
         && DateTime.UtcNow - hit.At <= within;
 
     public bool TakeFigure([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Figure? figure) => _figures.TryDequeue(out figure);

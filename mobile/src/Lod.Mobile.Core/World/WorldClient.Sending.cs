@@ -114,7 +114,7 @@ public sealed partial class WorldClient
     public Task ToggleGroupAsync(CancellationToken cancellationToken) => Send(ClientOpcode.GroupToggle, [], cancellationToken);
 
     public Task LeaveGroupAsync(CancellationToken cancellationToken) =>
-        _self?.Name is { Length: > 0 } mine
+        _world.Self?.Name is { Length: > 0 } mine
             ? Send(ClientOpcode.Group, Party.Ask(mine), cancellationToken)
             : Task.CompletedTask;
 
