@@ -36,14 +36,13 @@
 import json
 import re
 import shutil
-import subprocess
 import tempfile
 import sys
 from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 EFFECTS = ROOT / "data" / "game-data" / "ability-effects.json"
 USED = ROOT / "data" / "game-data" / "ability-presentation.json"
 #: 5.99 한국 클라이언트. 저장소 밖에 있다 — 없으면 232 번 이상(EFA)은 건너뛴다.
@@ -56,13 +55,8 @@ DEST = ROOT / "docs" / "ui" / "assets" / "ability-effects"
 INDEX = DEST / "index.json"
 PAGE = ROOT / "docs" / "ability-effects-data.js"
 # `build-client-effects.py` 와 같은 자리를 쓴다 — 시스템 PATH 에 dotnet 이 없는 맥에서도 돌게.
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._dotnet import DOTNET, TOOL, run_tool as run
 
-
-def run(*args):
-    return subprocess.run([str(DOTNET), str(TOOL), *map(str, args)],
-                          capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
 

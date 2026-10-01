@@ -17,13 +17,12 @@
 """
 import json
 import sys
-from pathlib import Path
 
 import openpyxl
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SHEETS = ROOT / "docs" / "items"
 OUT = ROOT / "data" / "game-data" / "items-original-sheets.json"
 

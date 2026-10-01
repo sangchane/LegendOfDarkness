@@ -38,10 +38,9 @@ import argparse
 import collections
 import json
 import math
-import pathlib
 import re
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 SCRIPT = SERVER / "scripts/Formulas/monsterexp.cs"
 

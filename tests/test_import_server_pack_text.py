@@ -1,5 +1,6 @@
 import hashlib
 import importlib.util
+import sys
 import json
 import tempfile
 import unittest
@@ -8,6 +9,7 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))      # lib/ 이 거기 있다
 SCRIPT = ROOT / "scripts" / "import-server-pack-text.py"
 SPEC = importlib.util.spec_from_file_location("import_server_pack_text", SCRIPT)
 importer = importlib.util.module_from_spec(SPEC)

@@ -12,11 +12,10 @@
 """
 import json, re, sys
 from collections import defaultdict
-from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 EXTRACTED = ROOT / "data" / "server-packs" / "extracted"
 HADES_ITEMS = ROOT / "data" / "game-data" / "items-hades.json"
 OUT = ROOT / "data" / "pack-compare"

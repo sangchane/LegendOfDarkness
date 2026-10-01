@@ -15,11 +15,11 @@
 import json
 import sys
 import re
-import subprocess
 from collections import defaultdict, deque
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._git import git_pointer
+from lib._io import read_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 PACK599 = SERVER / "scripts/Pack599/Npcs"
 OUT = ROOT / "docs" / "npcs-data.js"
@@ -35,10 +35,6 @@ ROLE_CALLS = [
     ("퀘스트", {"legend_add"}),
     ("이동", {"warp", "warp_create", "group_warp"}),
 ]
-
-
-def read(path):
-    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def areas():
@@ -228,13 +224,7 @@ def main():
     towns = sorted({r["마을"] for r in rows})
     maps = sorted({r["맵"] for r in rows})
 
-    try:
-        pointer = subprocess.run(
-            ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
-            capture_output=True, text=True, check=True).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as e:
-        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
-        pointer = "unknown"
+    pointer = git_pointer(SERVER.parents[1])
 
     now_count = sum(1 for r in rows if r["닿음"])
     payload = {

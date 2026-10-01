@@ -9,11 +9,10 @@
 """
 import json, re
 from collections import defaultdict
-from pathlib import Path
 
 from ability_name_consensus import load_consensus
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SRC = ROOT / "data" / "game-data" / "abilities.json"
 NAMES = ROOT / "data" / "기술마법-한글이름.tsv"
 SCRIPTS = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/scripts"

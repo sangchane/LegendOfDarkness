@@ -27,10 +27,10 @@
 
 import argparse
 import json
-import pathlib
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
 MONSTERS = SERVER / "templates/monsters/5.99"
@@ -51,10 +51,6 @@ BUNDLE = 1000
 # 나온다(사용자, 2026-09-23). 어느 사냥터에 어느 장비가 걸리는지는 `scripts/build-gear-drops.py` 가 정한다.
 
 DROPS_TYPE = "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
-
-
-def read(path):
-    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def write(path, data, writing):

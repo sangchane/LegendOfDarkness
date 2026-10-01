@@ -37,9 +37,8 @@
 import json
 import re
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server"
 NPCS = SERVER / "database" / "server" / "scripts" / "Pack599" / "Npcs"
 TEMPLATES = SERVER / "database" / "server" / "templates"

@@ -19,12 +19,11 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
 CLIENT = Path.home() / "Downloads" / "5.99 클라이언트"
 OUT = ROOT / "mobile" / "client" / "assets" / "world"
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._dotnet import DOTNET, TOOL
 
 # 1단계(2026-09-17 사용자: 시작 맵을 노비스마을처럼 제대로 · 노비스 사냥터): 노비스마을 · 건물 안 여섯 · 평원 둘 · 지하던전 아홉 · 우드랜드1-1.
 MAPS = [

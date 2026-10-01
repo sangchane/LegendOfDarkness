@@ -20,7 +20,7 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 HADES = ROOT / "data" / "game-data" / "abilities.json"
 WORKBOOK = ROOT / "data" / "skill-spell-2023" / "skills.json"
 TEMPLATES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "templates"

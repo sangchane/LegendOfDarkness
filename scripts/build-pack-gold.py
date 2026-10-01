@@ -41,10 +41,10 @@ Novaonline 은 몇 가지만 적어 두었다. 원작 도감(어둠템#1~5)과 �
 import argparse
 import collections
 import json
-import pathlib
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
 MONSTERS = SERVER / "templates/monsters"
@@ -74,10 +74,6 @@ GROUNDS = {
     "우드랜드1-1": 20015,
     "포테의숲1존": 20263,
 }
-
-
-def read(path):
-    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def write(path, data, writing):

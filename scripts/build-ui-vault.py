@@ -18,7 +18,7 @@ import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 FACTS = ROOT / "data" / "original-ui" / "451.json"
 VAULT = ROOT / "data" / "ui-vault"
 MOCKUPS = "docs/ui/mockups-451/index.html"

@@ -15,11 +15,10 @@
 """
 
 import argparse
-import pathlib
 import subprocess
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 FROM = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/assets/MusicFiles"
 TO = ROOT / "mobile/client/assets/music"
 

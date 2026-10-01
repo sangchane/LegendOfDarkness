@@ -3,30 +3,16 @@
 import json
 import sys
 from collections import defaultdict
-from pathlib import Path
 
-from graphify_runtime import configure_utf8_stdio, execute_graphify_script, find_graphify_python
-
-ROOT = Path(__file__).resolve().parent.parent
+from graphify_runtime import configure_utf8_stdio
+from lib._paths import ROOT
+from lib._graphify import ensure_graphify_python
 FACTS = ROOT / "data" / "skill-spell-2023" / "skills.json"
 OUT = ROOT / "data" / "skill-spell-2023" / "graph"
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
 
-def ensure_graphify_python():
-    try:
-        import graphify  # noqa: F401
-        return
-    except ImportError:
-        pass
-    try:
-        python = find_graphify_python()
-    except RuntimeError as exc:
-        sys.exit(str(exc))
-    raise SystemExit(execute_graphify_script(python, Path(__file__).resolve(), sys.argv[1:]))
-
-
-ensure_graphify_python()
+ensure_graphify_python(__file__)
 from graphify.analyze import god_nodes, surprising_connections, suggest_questions  # noqa: E402
 from graphify.build import build_from_json  # noqa: E402
 from graphify.cluster import cluster, score_all  # noqa: E402

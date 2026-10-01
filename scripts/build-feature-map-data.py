@@ -9,9 +9,8 @@
 """
 import json
 import re
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SRC = ROOT / "docs" / "feature-map.md"
 OUT = ROOT / "docs" / "feature-map-data.js"
 

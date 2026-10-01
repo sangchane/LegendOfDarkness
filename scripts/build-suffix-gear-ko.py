@@ -28,11 +28,10 @@ Fiosachd=셔스 · Gramail=칸. **Sgrios 는 대응이 불확실해 쓰지 않�
 
 import argparse
 import json
-import pathlib
-import re
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_lenient_json as read
 ITEMS = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
 TSV = ROOT / "data/pack-compare/한글이름-검토.tsv"
 
@@ -48,13 +47,6 @@ PREFIXES = {
 }
 
 SKIP_GRADES = {"CONFLICT", "NAME_CLASH"}
-
-LENIENT = re.compile(r",(\s*[\]}])")
-
-
-def read(path):
-    return json.loads(LENIENT.sub(r"\1", path.read_text(encoding="utf-8-sig")))
-
 
 def load_items():
     """영문 이름(소문자) → 경로. 파일 이름 표기가 들쭉날쭉해 Name 칸으로 찾는다."""

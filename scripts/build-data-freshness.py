@@ -15,12 +15,10 @@
   쓰는 법: python3 scripts/build-data-freshness.py   → docs/data-freshness.js
 """
 import json
-import sys
-import subprocess
 from datetime import datetime, timezone
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._git import git_pointer
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 OUT = ROOT / "docs" / "data-freshness.js"
 HADES = "sources/wren11/Dark-Ages-Private-Server/database/server"
@@ -108,13 +106,7 @@ def main():
             "낡음": bool(made and newest and newest > made + SLACK),
         })
 
-    try:
-        pointer = subprocess.run(
-            ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
-            capture_output=True, text=True, check=True).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as e:
-        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
-        pointer = "unknown"
+    pointer = git_pointer(SERVER.parents[1])
 
     payload = {
         "생성": "scripts/build-data-freshness.py",

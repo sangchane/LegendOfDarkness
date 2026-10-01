@@ -14,6 +14,8 @@ import tempfile
 from collections import Counter, namedtuple
 from pathlib import Path
 
+from lib._paths import ROOT
+
 
 PACK_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 ImportResult = namedtuple("ImportResult", "copied encodings written target")
@@ -180,7 +182,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = ROOT
     try:
         result = import_pack(args.source, args.pack_id, repo_root, write=args.write)
     except (FileNotFoundError, OSError, UnicodeError, ValueError) as error:

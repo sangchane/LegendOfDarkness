@@ -24,9 +24,9 @@
 """
 import json, re, sys
 from collections import defaultdict
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_text as read
 PACKS_DIR = ROOT / "data" / "server-packs"
 OUT_DIR = PACKS_DIR / "extracted"
 
@@ -67,10 +67,6 @@ def _is_int(x):
         return True
     except ValueError:
         return False
-
-
-def read(p):
-    return p.read_text(encoding="utf-8", errors="replace")
 
 
 def scripts_in(path):

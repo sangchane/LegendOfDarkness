@@ -22,7 +22,7 @@ from pathlib import Path
 import pefile
 from capstone import Cs, CS_ARCH_X86, CS_MODE_32, CS_OP_IMM, CS_OP_MEM
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 OUT = ROOT / "data" / "server-packs" / "extracted"
 
 IDENT = re.compile(rb'^[a-z_][a-z0-9_]{1,30}$')

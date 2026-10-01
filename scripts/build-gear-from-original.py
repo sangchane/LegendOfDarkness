@@ -48,11 +48,10 @@
 import argparse
 import json
 import sys
-from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SHEET = ROOT / "data" / "game-data" / "items-original-sheets.json"
 ITEMS = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "templates" / "items"
 

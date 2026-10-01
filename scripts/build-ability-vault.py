@@ -13,9 +13,8 @@
 """
 import json, re, shutil
 from collections import Counter, defaultdict
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SRC = ROOT / "data" / "game-data" / "abilities.json"
 VAULT = ROOT / "data" / "game-data" / "vault-abilities"
 

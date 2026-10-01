@@ -20,13 +20,12 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database"
 TEMPLATES = SERVER / "server" / "templates"
 ARCHIVES = [SERVER / "archives" / "hades" / "hades.dat", Path.home() / "Downloads" / "5.99 클라이언트" / "hades.dat"]
 OUT = ROOT / "mobile" / "client" / "assets" / "actor" / "creature"
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._dotnet import DOTNET, TOOL
 # 0x4000 은 서버 템플릿을 쓰는 쪽(import.py)이 정한다 — 두 곳에 따로 적으면 한쪽만 바뀐다.
 _spec = importlib.util.spec_from_file_location("pack_import", ROOT / "tools" / "pack-import" / "import.py")
 _pack_import = importlib.util.module_from_spec(_spec)

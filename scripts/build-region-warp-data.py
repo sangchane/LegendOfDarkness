@@ -13,11 +13,11 @@
 import json
 import sys
 import re
-import subprocess
 from collections import defaultdict, deque
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._git import git_pointer
+from lib._io import read_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 OUT = ROOT / "docs" / "region-warps-data.js"
 
@@ -39,10 +39,6 @@ KINDS = [
     ("가게", ("상점", "무기점", "방어구점", "주점", "여관", "음식점", "식당", "잡화")),
     ("집", ("민가", "의집", "대련장")),
 ]
-
-
-def read(path):
-    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def kind_of(name):
@@ -207,13 +203,7 @@ def main():
             },
         }
 
-    try:
-        pointer = subprocess.run(
-            ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
-            capture_output=True, text=True, check=True).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as e:
-        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
-        pointer = "unknown"
+    pointer = git_pointer(SERVER.parents[1])
 
     payload = {
         "생성": "scripts/build-region-warp-data.py",

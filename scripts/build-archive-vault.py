@@ -17,7 +17,7 @@
 import json, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 ARCHIVES = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/archives"
 VAULT = ROOT / "data" / "archives-vault"
 TOOL = ROOT / "tools" / "dat-extract"

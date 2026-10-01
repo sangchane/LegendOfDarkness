@@ -6,11 +6,10 @@ Hades의 갈래·아이콘별 영문 이름이 하나이고, 5.99·혼든·Novao
 채우며 사용자가 고친 기존 값은 절대 덮지 않는다.
 """
 import sys
-from pathlib import Path
 
 from ability_name_consensus import LABELS, load_consensus
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 TABLE = ROOT / "data/기술마법-한글이름.tsv"
 OUT = ROOT / "plans/서버팩-기술마법-합의.tsv"
 

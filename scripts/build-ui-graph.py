@@ -16,35 +16,17 @@ import json
 import sys
 from pathlib import Path
 
-from graphify_runtime import (
-    configure_utf8_stdio,
-    execute_graphify_script,
-    find_graphify_python,
-)
+from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._graphify import ensure_graphify_python
 FACTS = ROOT / "data" / "original-ui" / "451.json"
 OUT = ROOT / "data" / "original-ui" / "graph"
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
 
-def ensure_graphify_python():
-    """graphify 는 uv tool 로 따로 깔려 있다. 그쪽 파이썬으로 옮겨 탄다."""
-    try:
-        import graphify  # noqa: F401
-        return
-    except ImportError:
-        pass
-    try:
-        py = find_graphify_python()
-    except RuntimeError as exc:
-        sys.exit(str(exc))
-    status = execute_graphify_script(py, Path(__file__).resolve(), sys.argv[1:])
-    raise SystemExit(status)
-
-
-ensure_graphify_python()
+ensure_graphify_python(__file__)
 
 from graphify.build import build_from_json                    # noqa: E402
 from graphify.cluster import cluster, score_all               # noqa: E402

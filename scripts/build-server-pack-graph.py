@@ -10,37 +10,18 @@ graphify 는 .txt 를 산문으로 보고 LLM 으로 뜻을 뽑는다. 그런데
   (graphify 가 깔린 파이썬으로 자동으로 다시 실행한다)
 """
 import json, sys
-from pathlib import Path
 
-from graphify_runtime import (
-    configure_utf8_stdio,
-    execute_graphify_script,
-    find_graphify_python,
-)
+from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._graphify import ensure_graphify_python
 EXTRACTED = ROOT / "data" / "server-packs" / "extracted"
 GRAPH_ROOT = ROOT / "data" / "server-packs" / "graph"
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
 
-def ensure_graphify_python():
-    """graphify 는 uv tool 로 따로 깔려 있다. 그쪽 파이썬으로 옮겨 탄다."""
-    try:
-        import graphify  # noqa: F401
-        return
-    except ImportError:
-        pass
-    try:
-        py = find_graphify_python()
-    except RuntimeError as exc:
-        sys.exit(str(exc))
-    status = execute_graphify_script(py, Path(__file__).resolve(), sys.argv[1:])
-    raise SystemExit(status)
-
-
-ensure_graphify_python()
+ensure_graphify_python(__file__)
 
 from graphify.build import build_from_json                    # noqa: E402
 from graphify.cluster import cluster, score_all               # noqa: E402

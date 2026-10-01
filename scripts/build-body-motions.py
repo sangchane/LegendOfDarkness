@@ -27,7 +27,6 @@ ST 목록은 직업 다섯을 돌아가며 채운다 — 2 전사 · 3 무도가
   산출물:  docs/ui/assets/motion/motion-<번호>.png(앞) · motion-<번호>-back.png(등) · motions.json
 """
 import json
-import subprocess
 import sys
 import tempfile
 import zlib
@@ -35,7 +34,7 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 EFFECTS = ROOT / "data" / "game-data" / "ability-effects.json"
 KHAN = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives" / "khan" / "khan.dat"
 LEGEND = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives" / "legend" / "Legend.dat"
@@ -45,8 +44,7 @@ PAGE = ROOT / "docs" / "body-motions-data.js"
 #: 게임이 실제로 시키는 몸동작 번호. `build-ability-page-data.py` 가 적어 둔다.
 USED = ROOT / "data" / "game-data" / "ability-presentation.json"
 # 시스템 PATH 에 dotnet 이 없는 맥에서도 돌게 — 다른 생성기와 같은 자리를 쓴다.
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._dotnet import DOTNET, TOOL, run_tool
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
@@ -59,11 +57,6 @@ FIRST = 128
 #: 한 칸의 크기. `build-client-assets.ps1` 이 걷기·평타를 뽑을 때 쓰는 것과 같다.
 CELL = "80x88"
 CELL_WIDE, CELL_TALL = 80, 88
-
-
-def run(args):
-    return subprocess.run([str(DOTNET), str(TOOL), *args],
-                          capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
 
 
 def foot_line(png):
@@ -109,7 +102,7 @@ def foot_line(png):
 
 def skill_table(scratch):
     """`NO → (파일글자, 시작칸, 칸수, 옷번호들)`. 주석(`;`)과 머리말은 건너뛴다."""
-    run(["dump", str(LEGEND), scratch, "skill.tbl"])
+    run_tool("dump", str(LEGEND), scratch, "skill.tbl")
     found = next(Path(scratch).rglob("skill.tbl"), None)
     if found is None:
         return {}
@@ -173,8 +166,8 @@ def main():
         # 이 동작을 할 수 있는 첫째 옷. 없으면 맨몸이고, 원작에서도 그러면 깨져 보인다.
         outfit = f",mu{clothes[0]:03d}{letter}" if clothes else ""
         out = DEST / f"motion-{motion}.png"
-        proc = run(["pose", str(KHAN), f"mb001{letter},mn001{letter}{outfit},MH285{letter.upper()}",
-                    str(out), ",".join(str(n) for n in frames), "1", CELL])
+        proc = run_tool("pose", str(KHAN), f"mb001{letter},mn001{letter}{outfit},MH285{letter.upper()}",
+                        str(out), ",".join(str(n) for n in frames), "1", CELL)
         if not out.exists():
             print(f"  {motion} 을 그리지 못했습니다: {(proc.stderr or proc.stdout).strip()[:120]}")
             missing.append(motion)
@@ -188,8 +181,8 @@ def main():
         # 등 구간도 한 장 더 뽑는다 — 반대쪽(서)을 보려면 **등 그림을 좌우로 뒤집어야** 한다.
         # 앞 그림만 뒤집으면 남쪽, 곧 90° 돈 것으로 읽힌다 (docs/original-sprite-animation.md §2).
         back = DEST / f"motion-{motion}-back.png"
-        run(["pose", str(KHAN), f"mb001{letter},mn001{letter}{outfit},MH285{letter.upper()}",
-             str(back), ",".join(str(n) for n in range(start, start + count)), "1", CELL])
+        run_tool("pose", str(KHAN), f"mb001{letter},mn001{letter}{outfit},MH285{letter.upper()}",
+                 str(back), ",".join(str(n) for n in range(start, start + count)), "1", CELL)
         if back.exists():
             drawn[str(motion)]["등파일"] = back.name
 

@@ -19,7 +19,7 @@
 import collections, glob, io, json, os, re, struct, sys, zlib
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 FORK = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 # `ItemInfo` 가 있는 모든 곳. 버리지 않고 출처를 적는다.
 FOLDERS = [FORK / "database/assets/MetaFiles",

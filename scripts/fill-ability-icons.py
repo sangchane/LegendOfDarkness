@@ -25,9 +25,8 @@ import collections
 import json
 import re
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 TEMPLATES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "templates"
 ABILITIES = ROOT / "data" / "game-data" / "abilities.json"
 PACK = ROOT / "data" / "server-packs" / "5.99-server" / "db"

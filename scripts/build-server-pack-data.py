@@ -22,11 +22,11 @@
   쓰는 법: python3 scripts/build-server-pack-data.py
 """
 import json, re, sys
-from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_text as read
 PACKS_DIR = ROOT / "data" / "server-packs"
 OUT_DIR = PACKS_DIR / "extracted"
 
@@ -39,10 +39,6 @@ BLOCK_KINDS = {"item", "mob", "npc", "spell", "skill", "maps", "door", "worldmap
 BUCKET = {"item": "items", "mob": "mobs", "npc": "npcs", "spell": "spells",
           "skill": "skills", "maps": "maps", "worldmap": "worldmaps",
           "door": "doors"}
-
-
-def read(p):
-    return p.read_text(encoding="utf-8", errors="replace")
 
 
 def content_lines(text):

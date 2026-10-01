@@ -13,11 +13,10 @@
 
 import json
 import shutil
-from pathlib import Path
 
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 LADDER = ROOT / "mobile" / "client" / "assets" / "world" / "auto-learn.txt"
 SHEETS = ROOT / "mobile" / "client" / "assets" / "ability"
 OUT_SHEETS = ROOT / "docs" / "ui" / "assets" / "ability-icons"

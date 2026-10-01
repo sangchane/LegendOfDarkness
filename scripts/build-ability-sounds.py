@@ -19,7 +19,7 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 EFFECTS = ROOT / "data" / "game-data" / "ability-effects.json"
 ARCHIVE = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives" / "legend" / "Legend.dat"
 DEST = ROOT / "docs" / "ui" / "assets" / "ability-sounds"

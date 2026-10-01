@@ -16,14 +16,12 @@ ServerFormat33.cs:64,70 · docs/original-sprite-animation.md). 머리색은 khan
 import json
 import re
 import shutil
-import subprocess
 import sys
 from datetime import date
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._paths import ROOT
+from lib._dotnet import DOTNET, TOOL, run_tool
 HADES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives"
 #: 5.99 한국 클라이언트. 저장소 밖에 있다 — 없으면 하데스 것만 쓴다(build-client-wardrobe.py 와 같은 자리).
 KOREAN = Path.home() / "Downloads" / "5.99 클라이언트"
@@ -35,8 +33,7 @@ HEAD_MAX = 100  # 100 이하가 머리, 초과는 투구.
 
 
 def run(*args):
-    proc = subprocess.run([str(DOTNET), str(TOOL), *args], capture_output=True, text=True,
-                          encoding="utf-8", errors="replace", cwd=ROOT)
+    proc = run_tool(*args)
     if proc.returncode != 0:
         print(proc.stderr, file=sys.stderr)
         raise SystemExit(proc.returncode)

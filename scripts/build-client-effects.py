@@ -31,14 +31,13 @@
 import json
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 HADES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server"
 PACK = ROOT / "data" / "server-packs" / "5.99-server" / "db" / "script"
 ROH = HADES / "database" / "archives" / "roh" / "roh.dat"
@@ -47,18 +46,12 @@ KOREAN_ROH = Path.home() / "Downloads" / "5.99 클라이언트" / "roh.dat"
 LEGEND = HADES / "database" / "archives" / "legend" / "Legend.dat"
 EFFECTS = ROOT / "mobile" / "client" / "assets" / "effect"
 SOUNDS = ROOT / "mobile" / "client" / "assets" / "sound"
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._dotnet import DOTNET, TOOL, run_tool as run
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
 #: `efct`·`efa` 가 적어 주는 줄: 프레임 수 · 바탕 크기 · 기준점.
 CUT = re.compile(r"프레임 (\d+)개 · 바탕 (\d+)x(\d+) · 기준 (-?\d+),(-?\d+)")
-
-
-def run(*args):
-    return subprocess.run([str(DOTNET), str(TOOL), *map(str, args)], capture_output=True, text=True,
-                          encoding="utf-8", errors="replace", cwd=ROOT)
 
 
 def effect_numbers():

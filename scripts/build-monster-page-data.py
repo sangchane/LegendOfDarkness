@@ -10,10 +10,10 @@
 """
 import json
 import sys
-import subprocess
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._git import git_pointer
+from lib._io import read_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 AREAS = SERVER / "areas"
 MONSTERS = SERVER / "templates/monsters"
@@ -32,10 +32,6 @@ SPRITE_BASE = 16384
 
 # 레벨 차이로 경험치를 깎는 규칙. monsterexp.cs 의 Forgiven·Halving·Least 와 같아야 한다.
 PENALTY = {"용서": 5, "반감": 5, "최소": 0.02}
-
-
-def read(path):
-    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 EXPERIENCE = ROOT / "data" / "server-packs" / "5.99-server" / "db" / "server" / "experience.txt"
@@ -198,13 +194,7 @@ def main():
     empty = [{"맵번호": i, "맵": n, "지역": region_of(n)}
              for i, n in sorted(wanted.items()) if i not in filled]
 
-    try:
-        pointer = subprocess.run(
-            ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
-            capture_output=True, text=True, check=True).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as e:
-        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
-        pointer = "unknown"
+    pointer = git_pointer(SERVER.parents[1])
 
     payload = {
         "생성": "scripts/build-monster-page-data.py",

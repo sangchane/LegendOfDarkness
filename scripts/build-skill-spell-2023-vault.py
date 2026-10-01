@@ -4,9 +4,8 @@ import json
 import re
 import shutil
 from collections import defaultdict
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 FACTS = ROOT / "data" / "skill-spell-2023" / "skills.json"
 VAULT = ROOT / "data" / "skill-spell-2023-vault"
 BANNED = re.compile(r'[\\/:*?"<>|#\[\]^]')

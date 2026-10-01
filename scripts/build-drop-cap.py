@@ -28,12 +28,12 @@
 import argparse
 import json
 import math
-import pathlib
 import re
 import sys
 from collections import defaultdict
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_lenient_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
 MONSTERS = SERVER / "templates/monsters"
@@ -45,12 +45,7 @@ CAP = 0.80
 MANA_BEFORE = {"마라디움": 0.5, "하급마력포션": 0.6, "중급마력포션": 0.6}
 FLOOR = {name: 2 * before / DROP_BOOST for name, before in MANA_BEFORE.items()}
 
-LENIENT = re.compile(r",(\s*[\]}])")
 RATE = re.compile(r'("DropRate"\s*:\s*)(-?[0-9.eE+-]+)')
-
-
-def read(path):
-    return json.loads(LENIENT.sub(r"\1", path.read_text(encoding="utf-8-sig")))
 
 
 def drops_of(monster):

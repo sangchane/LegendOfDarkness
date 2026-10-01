@@ -15,9 +15,8 @@
 """
 import json
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SOURCE = ROOT / "data" / "legend-tables" / "color0.tbl"
 OUT = ROOT / "data" / "character-creation" / "hair-colours.json"
 

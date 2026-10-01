@@ -20,7 +20,7 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 TEMPLATES = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
 ARCHIVE = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives" / "legend" / "Legend.dat"
 PNG = ROOT / "docs" / "ui" / "assets" / "item-icons.png"

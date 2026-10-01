@@ -38,11 +38,10 @@
 
 import argparse
 import json
-import pathlib
-import re
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_lenient_json as read
 ITEMS = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/items"
 RETIRED = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates-retired/items-hades-en"
 TSV = ROOT / "data/pack-compare/한글이름-검토.tsv"
@@ -74,13 +73,6 @@ STAT_FIELDS = [
     ("명중수정", "HitModifer", 0, 1), ("공격수정", "DmgModifer", 0, 1),
     ("방어력", "AcModifer", 1, -1),
 ]
-
-LENIENT = re.compile(r",(\s*[\]}])")
-
-
-def read(path):
-    return json.loads(LENIENT.sub(r"\1", path.read_text(encoding="utf-8-sig")))
-
 
 def load_items():
     by_name, by_lower = {}, {}

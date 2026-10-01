@@ -17,9 +17,8 @@
   쓰는 법: python3 scripts/write-hades-items.py [--write] [--korean]
 """
 import json, sys, glob, re
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 FORK = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 KOREAN = ROOT / "data/pack-compare/item-korean-names.json"
 OUT = FORK / "database/server/templates/items"

@@ -32,13 +32,12 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 PARTS = ROOT / "mobile" / "client" / "assets" / "actor" / "parts"
 HADES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives"
 #: 5.99 한국 클라이언트. 저장소 밖에 있다 — 없으면 하데스 것만 쓴다.
 KOREAN = Path.home() / "Downloads" / "5.99 클라이언트"
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._dotnet import DOTNET, TOOL
 
 #: 파일마다 skill.tbl 이 빈틈없이 채우는 칸 수(3.2절). 01 서기·걷기 · 02 평타 · 03 손 들기·키스·손 흔들기는 3.3절.
 MOTIONS = {"b": 14, "c": 30, "d": 18, "e": 36, "f": 12}

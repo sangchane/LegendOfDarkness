@@ -21,9 +21,8 @@
 """
 import json
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 ITEMS = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server" / "templates" / "items"
 LOOK_LIKE = ITEMS / "노비스마을리콜.json"
 OUT = ITEMS / "리콜.json"

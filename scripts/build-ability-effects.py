@@ -23,11 +23,11 @@ import json
 import re
 import sys
 from collections import defaultdict
-from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_text as read
 PACK = ROOT / "data" / "server-packs" / "novaonline" / "db"
 OUT = ROOT / "data" / "game-data" / "ability-effects.json"
 
@@ -95,15 +95,6 @@ def script_media(text, wanted):
         if pair not in motions:
             motions.append(pair)
     return {"사운드": sounds, "이펙트": effects, "모션": motions}
-
-
-def read(path, *encodings):
-    for encoding in encodings:
-        try:
-            return path.read_text(encoding=encoding)
-        except (UnicodeDecodeError, LookupError):
-            continue
-    return path.read_text(encoding="utf-8", errors="replace")
 
 
 def main():

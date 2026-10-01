@@ -31,7 +31,8 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_source as read
 PACK = ROOT / "data" / "server-packs" / "5.99-server" / "db"
 NOVA = ROOT / "data" / "server-packs" / "novaonline" / "db"
 HADES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
@@ -64,15 +65,6 @@ MOTION_CLASS = {0: 4, 9: 4, 10: 4, 1: 1, 2: 1, 11: 1, 12: 1, 13: 1, 3: 5, 4: 5, 
                 6: 2, 7: 2, 14: 2, 15: 2, 16: 2, 8: 3, 17: 3}
 
 HEADER = re.compile(r"^[\d,]*\s*(SKILL|SPELL|Monster)_([^\s{]+)\s*\{", re.M)
-
-
-def read(path):
-    for encoding in ("utf-8", "cp949"):
-        try:
-            return path.read_text(encoding=encoding)
-        except (UnicodeDecodeError, ValueError):
-            continue
-    return ""
 
 
 # ── 읽기 ─────────────────────────────────────────────────────────────────────

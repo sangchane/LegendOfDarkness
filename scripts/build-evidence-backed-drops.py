@@ -21,12 +21,11 @@ import argparse
 import json
 import sys
 import math
-import re
 from collections import defaultdict
-from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_lenient_json
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
 MONSTERS = SERVER / "templates/monsters"
@@ -46,14 +45,6 @@ SUPPORTED = frozenset({
     "바크의척추뼈", "엑스쿠라눔", "좀비의막대기", "좀비의살", "좀비지팡이",
     "크리스마스얼음", "킹아크퍼스의팬던트", "퐁퐁이의점액질",
 })
-
-TRAILING_COMMA = re.compile(r",\s*([}\]])")
-
-
-def read(path):
-    text = path.read_text(encoding="utf-8-sig", errors="ignore")
-    return json.loads(TRAILING_COMMA.sub(r"\1", text))
-
 
 def write(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -95,7 +86,7 @@ def load_templates():
     bad = False
     for path in sorted(ITEMS.rglob("*.json")):
         try:
-            item = read(path)
+            item = read_lenient_json(path, errors="ignore")
         except json.JSONDecodeError:
             print(f"깨진 JSON 건너뜀: {path}", file=sys.stderr)
             bad = True
@@ -108,7 +99,7 @@ def load_templates():
     monsters = []
     for path in sorted(MONSTERS.rglob("*.json")):
         try:
-            monster = read(path)
+            monster = read_lenient_json(path, errors="ignore")
         except json.JSONDecodeError:
             continue
         listed = drops_of(monster) if isinstance(monster, dict) else []

@@ -27,7 +27,8 @@ from pathlib import Path
 
 from graphify_runtime import configure_utf8_stdio
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_source as read
 PACK = ROOT / "data" / "server-packs" / "5.99-server" / "db" / "script"
 HADES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
 SCRIPTS = HADES / "scripts" / "Skills" / "Monk"
@@ -82,15 +83,6 @@ def learn_levels():
             out.setdefault(found.group(1), int(levels[-1]))
     return out
 SPELLS = HADES / "templates" / "spells"
-
-
-def read(path):
-    for encoding in ("utf-8", "cp949"):
-        try:
-            return path.read_text(encoding=encoding)
-        except (UnicodeDecodeError, ValueError):
-            continue
-    return ""
 
 
 def blocks():

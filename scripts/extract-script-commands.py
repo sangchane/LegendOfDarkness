@@ -23,7 +23,7 @@ sources/ 의 저장소 16개에는 없다(그쪽은 Dark Ages 계열로 혈통�
 import hashlib, json, re, struct, sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 OUT_DIR = ROOT / "data" / "server-packs" / "extracted"
 
 IDENT = re.compile(rb'^[a-z_][a-z0-9_]{1,30}$')

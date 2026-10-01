@@ -12,9 +12,8 @@ Hades 쪽도 그 아이콘에 영문 이름이 하나뿐이어야 한다(직업�
 """
 import json
 from collections import defaultdict
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 HADES = ROOT / "data/game-data/abilities.json"
 PACKS = {
     "5.99-server": ROOT / "data/server-packs/extracted/5.99-server",

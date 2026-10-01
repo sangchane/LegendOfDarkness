@@ -19,7 +19,7 @@
 import json, shutil, collections, sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 FORK = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 META = FORK / "database/assets/MetaFiles"
 TPL = FORK / "database/server/templates"

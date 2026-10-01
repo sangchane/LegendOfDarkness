@@ -19,9 +19,8 @@
 """
 import json, re, shutil
 from collections import defaultdict
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 EXTRACTED = ROOT / "data" / "server-packs" / "extracted"
 VAULT_ROOT = ROOT / "data" / "server-packs" / "vault"
 

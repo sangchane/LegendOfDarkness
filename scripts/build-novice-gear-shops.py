@@ -35,11 +35,10 @@
 
 import argparse
 import json
-import pathlib
 import re
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 AREAS = SERVER / "areas"
 ITEMS = SERVER / "templates/items"

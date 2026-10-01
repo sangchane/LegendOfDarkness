@@ -27,9 +27,8 @@ NPC·아이템 스크립트의 `#이름`·`$이름` 은 캐릭터에 남는다(�
 import importlib.util
 import re
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 _spec = importlib.util.spec_from_file_location("abilities", ROOT / "scripts" / "build-pack-abilities.py")
 abilities = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(abilities)

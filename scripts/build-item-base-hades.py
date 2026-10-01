@@ -52,7 +52,7 @@ def loads_loose(text):
         out.append(ch)
     return json.loads("".join(out))
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 OUT = ROOT / "data/game-data/items-hades.json"
 
 KEEP = ("Name", "Image", "DisplayImage", "EquipmentSlot", "Class", "Gender",

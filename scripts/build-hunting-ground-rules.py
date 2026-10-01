@@ -33,9 +33,9 @@
 import argparse
 import json
 import sys
-import pathlib
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
 MONSTERS = SERVER / "templates/monsters"
@@ -75,10 +75,6 @@ POTION_DROP_RATE = 0.6
 # 2026-09-26 사용자 "맵 전체에 마력 포션 드랍률 좀 높이고" — 마력포션만 두 배(0.6 → 1.2). 1 을 넘어도
 # 서버 셈(DetermineRandomDrop)이 DropRate ÷ 칸수 를 그대로 지킨다.
 MANA_POTION_DROP_RATE = 1.2
-
-
-def read(path):
-    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def write(path, data, writing):

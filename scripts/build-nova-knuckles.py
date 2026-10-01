@@ -30,10 +30,9 @@
 import argparse
 import importlib.util
 import json
-import pathlib
 import sys
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 sys.path.insert(0, str(ROOT / "scripts"))
 
 PACK = ROOT / "data/server-packs/extracted/novaonline/items.json"

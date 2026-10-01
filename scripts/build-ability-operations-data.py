@@ -10,7 +10,7 @@ import re
 import shutil
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 TEMPLATES = SERVER / "database/server/templates"
 CLIENT_EFFECTS = ROOT / "mobile/client/assets/effect"

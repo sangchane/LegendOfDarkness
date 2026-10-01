@@ -32,7 +32,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 CANDIDATES = ROOT / "data" / "map-origins" / "woodland-candidates.json"
 NOVA_MAPS = ROOT / "data" / "server-packs" / "extracted" / "novaonline" / "maps.json"
 NOVA_PACK = ROOT / "sources" / "novaonline"

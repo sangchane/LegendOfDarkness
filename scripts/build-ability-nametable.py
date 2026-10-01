@@ -14,9 +14,8 @@
 """
 import json
 from collections import defaultdict
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SRC = ROOT / "data" / "game-data" / "abilities.json"
 OUT = ROOT / "data" / "기술마법-한글이름.tsv"
 

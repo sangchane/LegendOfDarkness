@@ -46,12 +46,11 @@
 
 import argparse
 import json
-import pathlib
-import re
 import sys
 from collections import defaultdict
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
+from lib._io import read_lenient_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
 MONSTERS = SERVER / "templates/monsters"
@@ -107,13 +106,6 @@ BASE_RATE = {
 }
 
 DROPS_TYPE = "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
-
-LENIENT = re.compile(r",(\s*[\]}])")
-
-
-def read(path):
-    return json.loads(LENIENT.sub(r"\1", path.read_text(encoding="utf-8-sig")))
-
 
 def write(path, data, writing, newline):
     if writing:

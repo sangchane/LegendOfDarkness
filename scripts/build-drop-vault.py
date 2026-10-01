@@ -22,7 +22,7 @@ import shutil
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 FORK = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 SERVER = FORK / "database/server"
 MONSTERS = SERVER / "templates/monsters"
@@ -447,18 +447,11 @@ def write_cut_notes():
 
 
 def build_graph(zones, monsters, items_count):
-    from graphify_runtime import configure_utf8_stdio, execute_graphify_script, find_graphify_python
+    from graphify_runtime import configure_utf8_stdio
+    from lib._graphify import ensure_graphify_python
 
     configure_utf8_stdio(sys.stdout, sys.stderr)
-
-    try:
-        import graphify  # noqa: F401
-    except ImportError:
-        try:
-            py = find_graphify_python()
-        except RuntimeError as exc:
-            sys.exit(str(exc))
-        raise SystemExit(execute_graphify_script(py, Path(__file__).resolve(), sys.argv[1:]))
+    ensure_graphify_python(__file__)
 
     from graphify.build import build_from_json
     from graphify.cluster import cluster, score_all

@@ -16,10 +16,9 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import Counter
-from pathlib import Path
 from zipfile import ZipFile
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SOURCE = next((ROOT / "docs" / "skill_spell").glob("*.xlsx"))
 OUT = ROOT / "data" / "skill-spell-2023" / "skills.json"
 NS = {"x": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",

@@ -16,11 +16,10 @@
                                         레벨은 구역과 카드 중 큰 것 — 서버가 구역에도 입구(카드)의 제한을 건다
 """
 import json
-from pathlib import Path
 
 from script_warps import script_warp_destination
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
 OUT = ROOT / "mobile" / "client" / "assets" / "world"
 

@@ -26,14 +26,12 @@
 import json
 import subprocess
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from lib._paths import ROOT
 PARTS = ROOT / "mobile" / "client" / "assets" / "actor" / "parts"
 HADES = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "archives"
 HAIRSTYLES = ROOT / "data" / "character-creation" / "hairstyles.json"
-DOTNET = ROOT / ".tools" / "dotnet-9.0.317" / "dotnet"
-TOOL = ROOT / "tools" / "dat-extract" / "bin" / "Release" / "net8.0" / "dat-extract.dll"
+from lib._dotnet import DOTNET, TOOL
 
 #: 몸·바지와 같은 칸 — build-client-assets.ps1 의 $cell, build-client-wardrobe.py 의 CELL.
 CELL = "120x96"
