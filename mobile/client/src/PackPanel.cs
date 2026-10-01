@@ -41,8 +41,19 @@ public sealed partial class PackPanel : PanelContainer
 
     private void ShowLoot() => WindowFrame.Relabel(_loot, Main.AutoLoot ? "줍기 켬" : "줍기 끔");
 
-    // 아래 한 줄 — 금화와 몇 칸 찼나.
-    private readonly Label _gold = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, VerticalAlignment = VerticalAlignment.Center };
+    // 아래 한 줄 — 원작처럼 왼쪽에 몇 칸 찼나, 오른쪽 끝에 금화(사용자 2026-10-01).
+    private readonly Label _count = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, VerticalAlignment = VerticalAlignment.Center };
+    private readonly Label _gold = new() { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
+
+    // 종류 탭 — 서버는 무엇인지 말해 주지 않아 닳는 것을 장비로 친다(ItemActions.IsGear). null 이면 전체.
+    private bool? _gearOnly;
+    private readonly Button[] _kinds = [KindTab("전체"), KindTab("장비"), KindTab("기타")];
+    private readonly TextureRect _actionIcon = new()
+    {
+        CustomMinimumSize = new Vector2(40, 40),
+        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
+    };
 
     // 칸을 누르면 그 옆에 뜨는 작은 동작 줄 — 이름 · 한 줄 설명 · 아이콘 단추.
     private readonly PanelContainer _action = new() { Name = "ItemAction", TopLevel = true, Visible = false, ZIndex = 5 };
@@ -143,22 +154,43 @@ public sealed partial class PackPanel : PanelContainer
         // 아래 한 줄: 금화 · 몇 칸 — 그리고 줍기 · 정렬 아이콘.
         _gold.AddThemeColorOverride("font_color", Greybox.Title);
         _gold.AddThemeFontSizeOverride("font_size", 13);
+        _count.AddThemeColorOverride("font_color", Greybox.Muted);
+        _count.AddThemeFontSizeOverride("font_size", 13);
         _foot = new HBoxContainer();
         _foot.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        _foot.AddChild(_gold);
+        _foot.AddChild(_count);
 
         if (!Main.Portrait)
         {
             _pager.SizeFlagsHorizontal = SizeFlags.ShrinkEnd;
             _pageNumber.CustomMinimumSize = new Vector2(36, Cell.Y);
             _gold.AddThemeFontSizeOverride("font_size", 11);
+            _count.AddThemeFontSizeOverride("font_size", 11);
             _foot.AddChild(_pager);
         }
 
         _foot.AddChild(_loot);
         _foot.AddChild(Tidy);
+        _foot.AddChild(_gold);
 
-        body.AddChild(_head = WindowFrame.Head(WindowFrame.Title("소지품"), Close));
+        ButtonGroup kinds = new();
+        bool?[] shows = [null, true, false];
+
+        for (int i = 0; i < _kinds.Length; i++)
+        {
+            bool? only = shows[i];
+            _kinds[i].ButtonGroup = kinds;
+            _kinds[i].Pressed += () =>
+            {
+                _gearOnly = only;
+                _page = 0;
+                _showing = null;
+            };
+        }
+
+        _kinds[0].ButtonPressed = true;
+
+        body.AddChild(_head = WindowFrame.Head(WindowFrame.Title("소지품"), Close, _kinds));
         body.AddChild(_main);
         body.AddChild(_foot);
 
@@ -195,13 +227,13 @@ public sealed partial class PackPanel : PanelContainer
 
         _dropCount.GetLineEdit().VirtualKeyboardType = LineEdit.VirtualKeyboardTypeEnum.Number;
 
-        _actionName.AddThemeColorOverride("font_color", Greybox.Text);
-        _actionName.AddThemeFontSizeOverride("font_size", 13);
+        _actionName.AddThemeColorOverride("font_color", Greybox.Title);
+        _actionName.AddThemeFontSizeOverride("font_size", 15);
         _actionName.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
         _actionName.ClipText = true;
         _actionName.CustomMinimumSize = new Vector2(120, 0);
         _actionLine.AddThemeColorOverride("font_color", Greybox.Muted);
-        _actionLine.AddThemeFontSizeOverride("font_size", 11);
+        _actionLine.AddThemeFontSizeOverride("font_size", 12);
 
         // 주 동작은 강조색 아이콘 — 창마다 확정은 하나(Greybox.Commit 과 같은 뜻).
         if (_use.GetMeta("glyph").As<Glyph>() is { } lit)
@@ -233,8 +265,15 @@ public sealed partial class PackPanel : PanelContainer
 
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);
-        column.AddChild(_actionName);
-        column.AddChild(_actionLine);
+        // 누르면 뜨는 정보 상자 — 그림을 크게, 이름 아래에 내구·개수(사용자 2026-10-01, 다른 게임의 말풍선처럼).
+        VBoxContainer words = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+        words.AddChild(_actionName);
+        words.AddChild(_actionLine);
+        HBoxContainer top = new();
+        top.AddThemeConstantOverride("separation", Main.Gutter);
+        top.AddChild(_actionIcon);
+        top.AddChild(words);
+        column.AddChild(top);
         HBoxContainer quantity = new();
         quantity.AddThemeConstantOverride("separation", Main.Gutter);
         quantity.AddChild(new Label { Text = "버릴 수량", SizeFlagsVertical = SizeFlags.ShrinkCenter });
@@ -250,7 +289,7 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>
     /// Upright under our gear window the pack gets only what the picture leaves, and its title strip and page turner ate
     /// all but one row (사용자 2026-10-01). There the gear window's Close shuts both, so the strip goes, and the turner joins
-    /// the gold line as it does on its side, the gold going to two small lines to make room.
+    /// the gold line as it does on its side, with smaller letters and the gold shortened to make room.
     /// </summary>
     public void UnderGear(bool under)
     {
@@ -265,6 +304,16 @@ public sealed partial class PackPanel : PanelContainer
         _pager.SizeFlagsHorizontal = under ? SizeFlags.ShrinkEnd : SizeFlags.ExpandFill;
         _pageNumber.CustomMinimumSize = new Vector2(under ? 36 : Cell.X, Cell.Y);
         _gold.AddThemeFontSizeOverride("font_size", under ? 11 : 13);
+        _count.AddThemeFontSizeOverride("font_size", under ? 11 : 13);
+
+        // 금화·칸 수·줍기·정렬과 한 줄에 들도록 화살표를 조금 좁힌다(높이는 그대로).
+        foreach (Node arrow in _pager.GetChildren())
+        {
+            if (arrow is Button button)
+            {
+                button.CustomMinimumSize = new Vector2(under ? 40 : Cell.X, Cell.Y);
+            }
+        }
 
         if (under)
         {
@@ -275,6 +324,24 @@ public sealed partial class PackPanel : PanelContainer
         {
             _content.AddChild(_pager);
         }
+    }
+
+    private static Button KindTab(string name)
+    {
+        Button tab = new() { Text = name, ToggleMode = true, FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(40, Main.TouchMinimum) };
+        Greybox.Tab(tab);
+
+        return tab;
+    }
+
+    /// <summary>One place in the pack: a faintly sunken square on the floor, so empty places read as room left.</summary>
+    private static StyleBoxFlat Place()
+    {
+        StyleBoxFlat place = new() { BgColor = new Color(0, 0, 0, 0.3f), BorderColor = new Color(1, 1, 1, 0.07f) };
+        place.SetBorderWidthAll(1);
+        place.SetCornerRadiusAll(3);
+
+        return place;
     }
 
     private const string FloorArt = "res://assets/ui/pack-floor.png";
@@ -313,11 +380,15 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>Shows what is carried, and says plainly when there is nothing.</summary>
     public void Show(IReadOnlyList<InventoryItem> carried, long gold = 0)
     {
-        _gold.Text = _pager.GetParent() != _foot ? $"금화 {gold:N0} · {carried.Count}/60칸" : $"금화 {gold:N0}\n{carried.Count}/60칸";
+        bool roomy = _pager.GetParent() != _foot;
+        _count.Text = $"{carried.Count}/60칸";
+        _gold.Text = roomy ? $"금화 {gold:N0}" : $"금화 {GameScreen.GoldText(gold)}";
+        IReadOnlyList<InventoryItem> all = carried;
+        carried = _gearOnly is { } gearOnly ? [.. carried.Where(item => ItemActions.IsGear(item) == gearOnly)] : carried;
 
         FitRows();
 
-        string wanted = Describe(carried);
+        string wanted = $"{_gearOnly}|{Describe(carried)}";
 
         if (wanted == _showing)
         {
@@ -331,7 +402,7 @@ public sealed partial class PackPanel : PanelContainer
         _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, _perPage)}";
         Fill(_rows, Paging.Page(carried, _page, _perPage));
 
-        ShowChosen(carried);
+        ShowChosen(all);
     }
 
     /// <summary>
@@ -371,7 +442,9 @@ public sealed partial class PackPanel : PanelContainer
         {
             if (item is null)
             {
-                grid.AddChild(new Control { CustomMinimumSize = Cell, MouseFilter = MouseFilterEnum.Ignore });
+                Panel place = new() { CustomMinimumSize = Cell, SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
+                place.AddThemeStyleboxOverride("panel", Place());
+                grid.AddChild(place);
                 continue;
             }
 
@@ -387,9 +460,8 @@ public sealed partial class PackPanel : PanelContainer
                 FocusMode = FocusModeEnum.None
             };
 
-            // 칸은 바닥 그대로(상자 없음), 고른 칸만 밝은 테두리.
-            StyleBoxFlat box = new() { DrawCenter = false };
-            box.SetCornerRadiusAll(6);
+            // 칸은 바닥 위 희미한 자리(사용자 2026-10-01: 바닥 + 칸 자리), 고른 칸만 밝은 테두리.
+            StyleBoxFlat box = Place();
 
             if (key == _chosen)
             {
@@ -519,6 +591,7 @@ public sealed partial class PackPanel : PanelContainer
         if (held is not null)
         {
             _actionName.Text = held.Name;
+            _actionIcon.Texture = ItemIcons.For(held.Icon);
             _actionLine.Text = ItemActions.Line(held);
             _actionLine.Visible = _actionLine.Text.Length > 0;
             WindowFrame.Relabel(_use, ItemActions.Primary(held));

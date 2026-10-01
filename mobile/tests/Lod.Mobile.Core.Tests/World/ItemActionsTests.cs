@@ -17,6 +17,8 @@ public sealed class ItemActionsTests
 
         Assert.Equal("입기", ItemActions.Primary(sword));
         Assert.Equal("사용", ItemActions.Primary(potion));
+        Assert.True(ItemActions.IsGear(sword));
+        Assert.False(ItemActions.IsGear(potion));
     }
 
     [Fact]

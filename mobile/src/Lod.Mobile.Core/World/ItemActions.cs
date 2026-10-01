@@ -7,7 +7,10 @@ namespace Lod.Mobile.Core.World;
 public static class ItemActions
 {
     /// <summary>The main thing to do with something carried — the server's 0x1C does both; only the word differs.</summary>
-    public static string Primary(InventoryItem item) => item.MaxDurability > 0 ? "입기" : "사용";
+    public static string Primary(InventoryItem item) => IsGear(item) ? "입기" : "사용";
+
+    /// <summary>Gear is what wears out — the 장비 tab of the pack, and the 입기 word.</summary>
+    public static bool IsGear(InventoryItem item) => item.MaxDurability > 0;
 
     public static string Line(InventoryItem item) =>
         item.MaxDurability > 0 ? $"내구 {item.Durability}/{item.MaxDurability}"
