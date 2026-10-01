@@ -43,6 +43,7 @@ import re
 import sys
 
 from lib._paths import ROOT
+from lib._drops import drops_of
 from lib._io import read_lenient_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
@@ -177,15 +178,10 @@ LOOT_RANDOM, LOOT_TABLE, LOOT_GOLD = 1 << 1, 1 << 2, 1 << 5
 
 DROPS_TYPE = "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
 
+
 def write(path, data, writing, newline):
     if writing:
         path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + newline, encoding="utf-8")
-
-
-def drops_of(monster):
-    listed = monster.get("Drops")
-    values = listed.get("$values") if isinstance(listed, dict) else listed
-    return [name for name in (values or []) if isinstance(name, str)]
 
 
 def set_drops(monster, names):

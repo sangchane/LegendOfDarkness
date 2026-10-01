@@ -25,6 +25,7 @@ from collections import defaultdict
 
 
 from lib._paths import ROOT
+from lib._drops import drops_of
 from lib._io import read_lenient_json
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
@@ -46,14 +47,9 @@ SUPPORTED = frozenset({
     "크리스마스얼음", "킹아크퍼스의팬던트", "퐁퐁이의점액질",
 })
 
+
 def write(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-
-def drops_of(monster):
-    drops = monster.get("Drops")
-    values = drops.get("$values") if isinstance(drops, dict) else drops
-    return [name for name in (values or []) if isinstance(name, str) and name and name != "random"]
 
 
 def evidence_pairs(value):
@@ -102,7 +98,7 @@ def load_templates():
             monster = read_lenient_json(path, errors="ignore")
         except json.JSONDecodeError:
             continue
-        listed = drops_of(monster) if isinstance(monster, dict) else []
+        listed = drops_of(monster, items_only=True) if isinstance(monster, dict) else []
         if listed:
             monsters.append((path, monster, listed))
     return items, monsters

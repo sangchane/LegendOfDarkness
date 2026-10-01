@@ -48,6 +48,7 @@ PREFIXES = {
 
 SKIP_GRADES = {"CONFLICT", "NAME_CLASH"}
 
+
 def load_items():
     """영문 이름(소문자) → 경로. 파일 이름 표기가 들쭉날쭉해 Name 칸으로 찾는다."""
     by_name = {}

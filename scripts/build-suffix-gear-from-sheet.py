@@ -74,6 +74,7 @@ STAT_FIELDS = [
     ("방어력", "AcModifer", 1, -1),
 ]
 
+
 def load_items():
     by_name, by_lower = {}, {}
     # 2026-09-30 영문판은 서버가 안 읽는 곳으로 치웠다 — 그림 원본(갈래 2)으로는 여전히 읽는다.

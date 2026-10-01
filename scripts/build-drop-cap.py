@@ -33,6 +33,7 @@ import sys
 from collections import defaultdict
 
 from lib._paths import ROOT
+from lib._drops import drops_of
 from lib._io import read_lenient_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
@@ -46,12 +47,6 @@ MANA_BEFORE = {"마라디움": 0.5, "하급마력포션": 0.6, "중급마력포�
 FLOOR = {name: 2 * before / DROP_BOOST for name, before in MANA_BEFORE.items()}
 
 RATE = re.compile(r'("DropRate"\s*:\s*)(-?[0-9.eE+-]+)')
-
-
-def drops_of(monster):
-    listed = monster.get("Drops")
-    values = listed.get("$values") if isinstance(listed, dict) else listed
-    return [n for n in (values or []) if isinstance(n, str) and n and n != "random"]
 
 
 def load():
@@ -74,7 +69,7 @@ def load():
             m = read(path)
         except json.JSONDecodeError:
             continue
-        listed = drops_of(m)
+        listed = drops_of(m, items_only=True)
         if listed:
             monsters.append((m, listed))
     return items, monsters
