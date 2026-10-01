@@ -332,7 +332,7 @@ public static class WornPlace
         [1] = "무기", [2] = "갑옷", [3] = "방패", [4] = "투구", [5] = "귀고리",
         [6] = "목걸이", [7] = "왼손", [8] = "오른손", [9] = "왼팔", [10] = "오른팔",
         [11] = "허리", [12] = "다리", [13] = "신발", [14] = "장신구", [15] = "겉옷",
-        [16] = "겉투구", [17] = "장신구2",
+        [16] = "겉투구", [17] = "장신구2", [18] = "장신구3",
     };
 
     /// <summary>The name of one place, or the number itself when the server uses one we do not know.</summary>

@@ -8,7 +8,7 @@ namespace Lod.Mobile.Core.World;
 /// </summary>
 /// <remarks>
 /// The picture has thirteen squares; the server names eighteen places. The five it has no square for — the
-/// cloak, the overhelm and the three trinkets came after 4.51 — stand in a row of plain cells under it.
+/// cloak, the overhelm and the three trinkets came after 4.51 — stand in a row of named plain cells above it.
 /// Which square is which comes from their shape and the older window's layout (docs/original-equipment-window.md
 /// 2절): the three big ones across the chest are weapon, armour and shield, the one at the waist is the belt.
 /// The empty-slot drawing in each square is what says so on screen.
@@ -52,7 +52,7 @@ public static class GearLayout
         [18] = 4,  // 장신구3 — 겉옷 그림을 같이 쓴다
     };
 
-    /// <summary>The places the picture has no square for, left to right in the row under it.</summary>
+    /// <summary>The places the picture has no square for, left to right in the row above it.</summary>
     public static IReadOnlyList<int> Spare { get; } = [16, 15, 14, 17, 18];
 
     /// <summary>The picture's number box for armour; the fighting figures run down beside the chest.</summary>
@@ -73,7 +73,7 @@ public static class GearLayout
     /// <summary>Every place, so a panel can build its cells without knowing the numbers itself.</summary>
     public static IEnumerable<int> Slots => EmptyDrawing.Keys;
 
-    /// <summary>The dark square a place fills in the picture, or nothing for a place in the row under it.</summary>
+    /// <summary>The dark square a place fills in the picture, or nothing for a place in the row above it.</summary>
     public static (int X, int Y, int Width, int Height)? Square(int slot) =>
         Painted.TryGetValue(slot, out var square) ? square : null;
 

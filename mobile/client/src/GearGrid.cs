@@ -8,7 +8,7 @@ namespace LodClient;
 /// What the character has on, on the original's own equipment picture: <c>equip01.epf</c> cut to its paper doll and
 /// the squares round it, shown whole at its own size or a whole multiple of it, with what is worn laid into the
 /// picture's squares and the fighting figures into its number boxes. Which square is which is <see cref="GearLayout" />'s
-/// to say. The five places the picture has no square for stand in a row of plain cells under it.
+/// to say. The five places the picture has no square for stand in a row of named plain cells above it.
 /// </summary>
 /// <remarks>
 /// The picture is never stretched to fit (data/original-ui/451.json 「통째로」) — on a phone its squares are about twenty
@@ -18,11 +18,11 @@ public sealed partial class GearGrid : VBoxContainer
 {
     private const string PicturePath = "res://assets/ui/equip-panel.png";
 
-    // 그림 아래 빈 칸 줄과 그림 사이.
+    // 그림 위 칸 줄과 그림 사이.
     private const int Gap = Main.Gutter / 2;
 
     /// <summary>
-    /// A cell in the row under the picture. Five of them and the window's X have to stand within the picture's width, so
+    /// A cell in the row above the picture. Five of them and the window's X have to stand within the picture's width, so
     /// they are a little under a finger — the smallest the gear cells have ever been pressed at (2026-09-23).
     /// </summary>
     public const int SpareSide = 40;
@@ -58,7 +58,7 @@ public sealed partial class GearGrid : VBoxContainer
         MouseFilter = MouseFilterEnum.Stop;
         AddThemeConstantOverride("separation", Gap);
 
-        // 그림은 제 크기(정수배)만, 아래 줄은 그 밑 가운데에 — 크기는 컨테이너가 잰다. 화면에 붙기 전에 손으로 재면
+        // 그림은 제 크기(정수배)만, 위 줄은 그 위 가운데에 — 크기는 컨테이너가 잰다. 화면에 붙기 전에 손으로 재면
         // 단추의 테마 여백이 빠져 줄이 그림보다 넓게 삐져나갔다(2026-10-01).
         _picture.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
         _spare.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
@@ -85,17 +85,28 @@ public sealed partial class GearGrid : VBoxContainer
 
         _spare.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
+        // 그림에 칸이 없는 다섯 자리는 그림 위 한 줄에, 칸마다 이름을 달아(사용자 2026-10-01: 아래 줄은 뭔지 모르겠다).
         foreach (int slot in GearLayout.Spare)
         {
-            _spare.AddChild(MakeCell(slot, painted: false));
+            VBoxContainer named = new();
+            named.AddThemeConstantOverride("separation", 0);
+            named.AddChild(MakeCell(slot, painted: false));
+
+            Label name = new() { Text = WornPlace.Of(slot), HorizontalAlignment = HorizontalAlignment.Center };
+            name.AddThemeFontSizeOverride("font_size", 9);
+            name.AddThemeColorOverride("font_color", Greybox.Muted);
+            named.AddChild(name);
+
+            _spare.AddChild(named);
         }
 
         AddChild(_spare);
+        MoveChild(_spare, 0);
 
         Lay(1);
     }
 
-    /// <summary>Stands <paramref name="tail" /> at the end of the row under the picture — the gear window's X.</summary>
+    /// <summary>Stands <paramref name="tail" /> at the end of the row above the picture — the gear window's X.</summary>
     public void Append(Control tail)
     {
         _spare.AddChild(tail);
@@ -285,7 +296,7 @@ public sealed partial class GearGrid : VBoxContainer
             CustomMinimumSize = painted ? Vector2.Zero : new Vector2(SpareSide, SpareSide)
         };
 
-        // 그림 속 칸은 원작 그림의 어두운 칸이 바탕이다. 아래 줄은 평평한 어둠(data/ui-vault 안C).
+        // 그림 속 칸은 원작 그림의 어두운 칸이 바탕이다. 위 줄은 평평한 어둠(data/ui-vault 안C).
         foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
         {
             StyleBoxFlat box = painted ? Outline() : Greybox.Surface();

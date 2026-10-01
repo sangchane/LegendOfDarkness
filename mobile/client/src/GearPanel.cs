@@ -7,7 +7,7 @@ namespace LodClient;
 
 /// <summary>
 /// 장비창 — 위 메뉴 [장비] 로 연다(사용자, 2026-10-01: 소지품 창의 탭으로는 세로가 모자라 따로 뺐다). 창은 원작 장비 그림
-/// 그 자체이고 틀·제목 줄·여백이 없다(<see cref="GearGrid" />). 그림 아래 한 줄에 그림에 칸이 없는 다섯 자리와 닫기 X.
+/// 그 자체이고 틀·제목 줄·여백이 없다(<see cref="GearGrid" />). 그림 위 한 줄에 그림에 칸이 없는 다섯 자리(이름 달린)와 닫기 X.
 /// </summary>
 /// <remarks>
 /// 칸을 누르면 그 위에 이름·한 줄·[벗기]가 뜨고, 빠르게 두 번 누르면 바로 벗는다 — 소지품 창의 동작 줄과 같은 규칙.
@@ -31,10 +31,10 @@ public sealed partial class GearPanel : PanelContainer
         Name = "GearWindow";
         Visible = false;
 
-        // 그림 밖은 아래 한 줄뿐 — 그 뒤만 불투명 어둠으로 채우고 여백은 두지 않는다.
+        // 그림 밖은 위 한 줄뿐 — 그 뒤만 불투명 어둠으로 채우고 여백은 두지 않는다.
         StyleBoxFlat sheet = Greybox.Sheet();
         sheet.SetContentMarginAll(0);
-        sheet.ContentMarginBottom = Main.Gutter / 2;
+        sheet.ContentMarginTop = Main.Gutter / 2;
         sheet.SetBorderWidthAll(0);
         AddThemeStyleboxOverride("panel", sheet);
 
@@ -89,7 +89,7 @@ public sealed partial class GearPanel : PanelContainer
         actionLayer.AddChild(_action);
     }
 
-    /// <summary>The X under the picture, so whoever opened the window can decide what shutting it means.</summary>
+    /// <summary>The X above the picture, so whoever opened the window can decide what shutting it means.</summary>
     public Button Close { get; }
 
     /// <summary>Somebody asked to take off what is in one worn place. The number is the server's own.</summary>

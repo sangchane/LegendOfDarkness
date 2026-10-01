@@ -27,10 +27,10 @@ public sealed class GearLayoutTests
 
     /// <summary>
     /// The picture has thirteen squares and the server eighteen places, so every place is either on the picture or in
-    /// the row under it — never both, never neither.
+    /// the row above it — never both, never neither.
     /// </summary>
     [Fact]
-    public void Every_place_is_on_the_picture_or_in_the_row_under_it()
+    public void Every_place_is_on_the_picture_or_in_the_row_above_it()
     {
         for (int slot = 1; slot <= 18; slot++)
         {
