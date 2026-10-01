@@ -369,56 +369,64 @@ public sealed class AutoHunt
 
         _targetWhere = prey.Where;
 
-        if (Distance(prey.Where, sight.Standing) == 1)
+        return Distance(prey.Where, sight.Standing) == 1
+            ? Strike(sight, prey)
+            : Approach(sight, prey);
+    }
+
+    /// <summary>바로 옆의 괴물 — 돌아서고, 쓸 수 있는 싸움 기술이 있으면 그것, 없으면 평타.</summary>
+    private HuntStep Strike(HuntSight sight, Creature prey)
+    {
+        _stuck = 0;
+        Direction toward = TabMap.StepOf(sight.Standing, prey.Where);
+
+        if (sight.Facing != toward)
         {
-            _stuck = 0;
-            Direction toward = TabMap.StepOf(sight.Standing, prey.Where);
+            return new(HuntAct.Face, toward, Target: prey.Serial, Why: "돌아서기");
+        }
 
-            if (sight.Facing != toward)
-            {
-                return new(HuntAct.Face, toward, Target: prey.Serial, Why: "돌아서기");
-            }
-
-            if (sight.Now - _lastAct < ActGap)
-            {
-                return new(HuntAct.Wait, Target: prey.Serial, Why: "다음 공격 기다림");
-            }
-
-            foreach ((int slot, (TimeSpan at, bool cooled)) in _skillUsed.ToArray())
-            {
-                if (!cooled && sight.Cooling(true, slot) > 0)
-                {
-                    _skillUsed[slot] = (at, true);
-                }
-            }
-
-            LearnedSkill? skill = sight.Skills.FirstOrDefault(one =>
-                IsForFighting(one.Name)
-                && sight.Cooling(true, one.Slot) == 0
-                && (!_skillUsed.TryGetValue(one.Slot, out (TimeSpan At, bool Cooled) used)
-                    || used.Cooled
-                    || sight.Now - used.At >= SkillRetry));
-
-            if (skill is not null)
-            {
-                _skillUsed[skill.Slot] = (sight.Now, false);
-                _lastAct = sight.Now;
-                _struckTarget = true;
-                return new(HuntAct.Skill, Slot: skill.Slot, Target: prey.Serial, Why: skill.Name);
-            }
-
-            if (sight.Now - _lastStrike >= StrikeGap)
-            {
-                _lastStrike = sight.Now;
-                _lastAct = sight.Now;
-                _struckTarget = true;
-                return new(HuntAct.Strike, Target: prey.Serial, Why: "평타");
-            }
-
+        if (sight.Now - _lastAct < ActGap)
+        {
             return new(HuntAct.Wait, Target: prey.Serial, Why: "다음 공격 기다림");
         }
 
-        // 다가가기 — 괴물 옆의 빈 칸 중 가장 가까운 곳으로. 벽은 돌아가고, 길이 없거나 막혀 제자리면 다른 대상.
+        foreach ((int slot, (TimeSpan at, bool cooled)) in _skillUsed.ToArray())
+        {
+            if (!cooled && sight.Cooling(true, slot) > 0)
+            {
+                _skillUsed[slot] = (at, true);
+            }
+        }
+
+        LearnedSkill? skill = sight.Skills.FirstOrDefault(one =>
+            IsForFighting(one.Name)
+            && sight.Cooling(true, one.Slot) == 0
+            && (!_skillUsed.TryGetValue(one.Slot, out (TimeSpan At, bool Cooled) used)
+                || used.Cooled
+                || sight.Now - used.At >= SkillRetry));
+
+        if (skill is not null)
+        {
+            _skillUsed[skill.Slot] = (sight.Now, false);
+            _lastAct = sight.Now;
+            _struckTarget = true;
+            return new(HuntAct.Skill, Slot: skill.Slot, Target: prey.Serial, Why: skill.Name);
+        }
+
+        if (sight.Now - _lastStrike >= StrikeGap)
+        {
+            _lastStrike = sight.Now;
+            _lastAct = sight.Now;
+            _struckTarget = true;
+            return new(HuntAct.Strike, Target: prey.Serial, Why: "평타");
+        }
+
+        return new(HuntAct.Wait, Target: prey.Serial, Why: "다음 공격 기다림");
+    }
+
+    /// <summary>다가가기 — 괴물 옆의 빈 칸 중 가장 가까운 곳으로. 벽은 돌아가고, 길이 없거나 막혀 제자리면 다른 대상.</summary>
+    private HuntStep Approach(HuntSight sight, Creature prey)
+    {
         _stuck = _walkedFrom == sight.Standing ? _stuck + 1 : 0;
 
         if (_stuck >= StuckSteps)
