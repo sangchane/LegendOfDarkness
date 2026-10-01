@@ -150,7 +150,7 @@ public sealed class CompanionNewOwnerTests : IDisposable
         Assert.True(during <= 3, $"다시 들어온 주인을 3초에 {during}번 저장했습니다.");
 
         // 주인이 없던 틈에 서버가 짝을 풀었으면(문서의 "나가면 돌아감") 봇은 마을로 가 있다 — 그때는 [봇 부르기] 를 다시 누른다.
-        // 짝이 남아 있었으면 서버가 새 serial 을 스스로 다시 알린다(Companions.Tick).
+        // 짝이 남아 있었으면 서버가 새 serial 을 스스로 다시 알린다(CompanionPairing.Tick).
         await Task.Delay(1500, _deadline.Token);
 
         for (int tries = 0; tries < 10 && bot.Master?.Serial != owner.Serial; tries++)

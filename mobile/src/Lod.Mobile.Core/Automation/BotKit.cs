@@ -4,7 +4,7 @@ using Lod.Mobile.Core.Protocol.World;
 namespace Lod.Mobile.Core.Automation;
 
 /// <summary>
-/// 봇 장비창의 규칙 — 엔진 없이. 봇이 입을 수 있는지(레벨·직업·성별)는 서버만 안다(<c>Companions.CannotWear</c>), 그래서 여기서는
+/// 봇 장비창의 규칙 — 엔진 없이. 봇이 입을 수 있는지(레벨·직업·성별)는 서버만 안다(<c>CompanionKit.CannotWear</c>), 그래서 여기서는
 /// 내 가방에서 **장비로 보이는 것**(내구가 있는 것)과 **포션**만 가려 보이고, 거절은 서버 알림으로 듣는다.
 /// </summary>
 public static class BotKit
