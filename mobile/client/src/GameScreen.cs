@@ -125,6 +125,12 @@ public partial class GameScreen : Control
     private readonly List<(ThumbButton Key, Direction Where)> _keys = [];
     private double _stillFor = SettleSeconds;
 
+    // 방향키: 보고 있지 않은 쪽을 누르면 먼저 돌기만 하고, 이만큼 더 누르고 있어야 걷는다(원작처럼, 사용자 2026-10-02).
+    private const double TurnHoldSeconds = 0.2;
+    private Direction? _holding;
+    private double _holdFor;
+    private bool _turnedFirst;
+
     /// <summary>How see-through the pad gets while walking, how long it waits after the last step, how fast it fades.</summary>
     private const float WalkingAlpha = 0.35f;
     private const double SettleSeconds = 0.25;
@@ -2024,8 +2030,35 @@ public partial class GameScreen : Control
                 held = true;
                 _world.StopGuiding();
                 _world.SteeredByHand();
-                _world.Walk(where);
+
+                if (_holding != where)
+                {
+                    _turnedFirst = _world.Looking != where;
+
+                    // 걸음 중이면 그 걸음이 끝난 뒤에 돈다 — 짧게 누른 것이 씹히지 않게.
+                    if (!_world.Turn(where))
+                    {
+                        continue;
+                    }
+
+                    _holding = where;
+                    _holdFor = 0;
+                }
+                else
+                {
+                    _holdFor += delta;
+                }
+
+                if (!_turnedFirst || _holdFor >= TurnHoldSeconds)
+                {
+                    _world.Walk(where);
+                }
             }
+        }
+
+        if (!held)
+        {
+            _holding = null;
         }
 
         _stillFor = held || _world.Walking ? 0 : _stillFor + delta;

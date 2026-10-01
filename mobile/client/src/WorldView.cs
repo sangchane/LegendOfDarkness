@@ -31,8 +31,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     private const int CreatureNumbering = 0x4000;
 
     /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in — 30% slower than the
-    /// original 0.28 so the walk can actually be seen on a phone (사용자, 2026-09-24).</summary>
-    private const double StepSeconds = 0.4;
+    /// original 0.28 so the walk can actually be seen on a phone (사용자, 2026-09-24), then 10% slower again (사용자, 2026-10-02).</summary>
+    private const double StepSeconds = 0.44;
 
     // Y sorting is what makes someone standing in front actually draw in front, which an isometric floor
     // needs: screen height is depth here.
@@ -583,6 +583,25 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     /// <summary>Whether a step is under way — the movement pad fades while it is.</summary>
     public bool Walking => _walked >= 0;
+
+    /// <summary>돌아서기만 한다 — 방향키를 짧게 누르면(원작처럼) 칸을 옮기지 않고 그쪽을 본다(사용자 2026-10-02).</summary>
+    /// <returns>돌았거나 이미 그쪽을 보면 true, 걸음 중이라 아직 못 돌았으면 false.</returns>
+    public bool Turn(Direction direction)
+    {
+        if (_player.Looking == direction)
+        {
+            return true;
+        }
+
+        if (Frozen || _walked >= 0 || Comatose)
+        {
+            return false;
+        }
+
+        _player.Face(direction);
+        _ = server?.TurnAsync(direction, _leaving.Token);
+        return true;
+    }
 
     /// <summary>Starts a step. Ignored while one is still running, so a tile is never half walked.</summary>
     public void Walk(Direction direction)

@@ -308,6 +308,9 @@ public sealed partial class Actor : Node2D
     /// Swings once. Nothing follows from it here — whether it hit is the server's to say — and a swing
     /// already under way is left to finish rather than restarted.
     /// </summary>
+    private const double SameBurstSeconds = 0.15;
+    private const double MotionSlowdown = 1.1;
+
     public void Strike() => Play(BodyMotion.Blow, BodyMotion.Blow.SecondsPerFrame(0));
 
     /// <summary>
@@ -317,8 +320,9 @@ public sealed partial class Actor : Node2D
     /// the motion.
     /// </summary>
     /// <remarks>
-    /// A motion that arrives while another is under way is ignored, as the original client does (Legend.exe 2005
-    /// 0x4e1130: a busy figure keeps what it is doing). Hades sends several at once when one press sets off more than
+    /// A motion that arrives while another is under way was ignored, as the original client does (Legend.exe 2005
+    /// 0x4e1130: a busy figure keeps what it is doing); now only within <see cref="SameBurstSeconds" /> or for the same
+    /// motion — a different skill used later cuts in (사용자 2026-10-02). Hades sends several at once when one press sets off more than
     /// one thing — every learned skill of the blow kind runs with the plain blow (1, then 131, then 133) — so only
     /// the first of those is seen, the same as it would be in the original.
     /// <para>
@@ -329,10 +333,20 @@ public sealed partial class Actor : Node2D
     /// </remarks>
     public void Play(BodyMotion motion, double secondsPerFrame)
     {
-        if (_struck >= 0 || _emoted >= 0)
+        // 한 번 누름에 서버가 한꺼번에 보내는 것(0.15초 안)과 같은 동작의 되풀이는 지금 것을 마저 한다. 그 뒤에 온 다른
+        // 동작은 지금 것을 끊고 그린다 — 붕각 도중 쿠로토가 안 보였다(사용자 2026-10-02).
+        if (_emoted >= 0 || (_struck >= 0 && (_struck < SameBurstSeconds || motion.Equals(_playing))))
         {
             return;
         }
+
+        if (_struck >= 0)
+        {
+            Wear(_standing);
+        }
+
+        // 모든 동작을 10% 느리게(사용자 2026-10-02).
+        secondsPerFrame *= MotionSlowdown;
 
         if (_sheet.Motion is null)
         {
