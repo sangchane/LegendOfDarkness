@@ -139,7 +139,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>
     /// Every health report the server has sent, oldest first. One report is one blow landing, so this is
-    /// the record a test needs when the question is how much a single blow took off.
+    /// the record a test needs when the question is how much a single blow took off. Kept up to <see cref="QueueKept" />.
     /// </summary>
     public IReadOnlyList<(uint Serial, int Left)> Hurts => [.. _hurts];
 

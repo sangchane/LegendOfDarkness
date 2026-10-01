@@ -9,6 +9,20 @@ namespace Lod.Mobile.Core.Protocol.World;
 public sealed partial class WorldClient
 {
     /// <summary>
+    /// 화면이 꺼내 가는 큐의 상한. 봇은 꺼내지 않으므로 상한이 없으면 접속해 있는 내내 쌓인다 — 넘으면 새 것을 버린다
+    /// (<see cref="ChatLog" /> 의 0x0A 줄과 같은 방식). 화면은 매 프레임 꺼내므로 닿지 않는다.
+    /// </summary>
+    internal const int QueueKept = 1024;
+
+    private static void Keep<T>(System.Collections.Concurrent.ConcurrentQueue<T> queue, T item)
+    {
+        if (queue.Count < QueueKept)
+        {
+            queue.Enqueue(item);
+        }
+    }
+
+    /// <summary>
     /// 받은 번호를 맡는 갈래. 모르는 번호는 null — 해독하지 않고 넘긴다.
     /// 심장박동·나가기 답은 <see cref="Listen" /> 이 따로 맡는다(보내기를 기다리거나 몸이 없다).
     /// </summary>
@@ -55,7 +69,14 @@ public sealed partial class WorldClient
     {
         MapInfo map = ReadMap(body);
         _field = null;
-        _world.EnterMap(map);
+
+        // 맵이 바뀌면 지난 맵의 체력 막대·누가 쳤나도 버린다 — 남겨 두면 다시 쓰이는 serial 이 묵은 값을 물려받고,
+        // 오래 도는 봇에서는 끝없이 쌓인다. 같은 맵 새로고침은 그대로 둔다(괴물과 같은 규칙).
+        if (_world.EnterMap(map))
+        {
+            _health.Clear();
+            _struck.Clear();
+        }
     }
 
     private void OnWorldMap(byte[] body)
@@ -81,7 +102,7 @@ public sealed partial class WorldClient
     {
         if (body.Length >= 4)
         {
-            _motions.Enqueue(ReadMotion(body));
+            Keep(_motions, ReadMotion(body));
         }
         else
         {
@@ -93,7 +114,7 @@ public sealed partial class WorldClient
     {
         if (body.Length >= 12)
         {
-            _effects.Enqueue(ReadEffect(body));
+            Keep(_effects, ReadEffect(body));
         }
         else
         {
@@ -114,11 +135,11 @@ public sealed partial class WorldClient
 
         if (Music.Song(number) is { } song)
         {
-            _songs.Enqueue(song);
+            Keep(_songs, song);
         }
         else
         {
-            _sounds.Enqueue(number);
+            Keep(_sounds, number);
         }
     }
 
@@ -138,7 +159,7 @@ public sealed partial class WorldClient
 
         if (ReadHealthSound(body) is int sound)
         {
-            _sounds.Enqueue(sound);
+            Keep(_sounds, sound);
         }
 
         int left = BinaryPrimitives.ReadUInt16BigEndian(body.AsSpan(4));
@@ -151,7 +172,7 @@ public sealed partial class WorldClient
         uint serial = BinaryPrimitives.ReadUInt32BigEndian(body);
 
         _health[serial] = left;
-        _hurts.Enqueue((serial, left));
+        Keep(_hurts, (serial, left));
     }
 
     private void OnVitals(byte[] body) => _vitals = ReadVitals(body, _vitals);
@@ -311,7 +332,7 @@ public sealed partial class WorldClient
     private void OnFigure(byte[] body)
     {
         Figure figure = ReadFigure(body);
-        _figures.Enqueue(figure);
+        Keep(_figures, figure);
 
         if (figure.Kind == FigureKind.Damage && figure.Source != 0)
         {
