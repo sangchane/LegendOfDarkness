@@ -32,6 +32,6 @@ DOTNET_ROOT=../../../.tools/dotnet-9.0.317 ../../../.tools/dotnet-9.0.317/dotnet
 
 ## 클라우드
 
-봇마다 `lod-bot@N`(N = 서버 설정 `CompanionBots` 의 N 번째 이름, 다섯까지). `scripts/cloud-server.sh deploy` 가 이 프로그램과 벽 파일을
-올리고 서비스를 깐다. `scripts/cloud-server.sh bot-config` — 없는 봇의 설정(`~/lod-bot/companion-bot-N.json`, 비밀번호는 클라우드에만)을
+봇마다 `lod-bot@N`(N = 서버 설정 `CompanionBots` 의 N 번째 이름, 다섯까지). `scripts/ops/cloud-server.sh deploy` 가 이 프로그램과 벽 파일을
+올리고 서비스를 깐다. `scripts/ops/cloud-server.sh bot-config` — 없는 봇의 설정(`~/lod-bot/companion-bot-N.json`, 비밀번호는 클라우드에만)을
 만든다. 비밀번호는 맥 `~/LOD-backups/companion-bot-password.txt` 에서 읽고 없으면 묻는다. 기록 `bot-logs [줄수] [봇번호]`, 파일은 `~/lod-bot/logs/`.
