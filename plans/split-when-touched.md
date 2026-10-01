@@ -27,7 +27,6 @@
 
 | 파일 | 지금 | 나누는 경계 |
 |---|---|---|
-| `WorldView.cs` (2143줄) | 바닥·캐릭터·이펙트·사냥 판단이 섞임, 셰이더 155줄이 문자열 | `FloorLayer`(셰이더는 `.gdshader` 로) · `ActorRoster` · `EffectPlayer` · `HuntDriver` |
 | `WorldView.cs` `HuntOnItsOwn` vs `AutoHuntTick` | **사냥 판단이 두 벌** — 옛 `--hunt` 봇은 화면에서 직접, 새 것은 알맹이 `AutoHunt` | 옛 봇을 `AutoHunt` 로 합치거나 지운다(지울 때는 사용자에게 먼저) |
 | `CreateScreen.cs` (1096줄) | 세로·가로 폼이 거의 같은 조립을 반복 | `LookPicker`(머리·색 격자) · `CharacterPreview`. `StarterArmor` 표는 알맹이 자료로 |
 | `Main.cs` (1074줄) | 실행 인자 45개·`user://*.cfg` 읽기쓰기 6벌·글꼴·화면 전환 | `LaunchFlags`(+`Has("--x")`) · `DeviceSettings`(공용 `ReadLines`/`WriteLines`) · `ScreenRouter` |
