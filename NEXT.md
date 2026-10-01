@@ -1,6 +1,10 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[현재/2026-10-02] 위 판(체력창)·위 메뉴 다시 만들기 — 등급 M · ui · 단계: 레퍼런스 끝, 사용자 선택 대기.**
+  롤 스타일 판(금테·각진 모서리·눈금 막대) + 그림 메뉴(그림 아래 글자, 뒤 비침). 레퍼런스·색·후보 `docs/hud-renewal-references.md`,
+  시안 `shots/hud-ref/concept.png`. **다음**: 사용자가 고른 것(체력 색·지도 그림·장비 그림)으로 `GameScreen` 위 판·단추 구현 → 세로·가로 `--layout` → 사진.
+
 - **[현재/2026-10-01] 인게임 UI 다시 만들기 — 등급 M · ui + ponytail · 단계: 장비창 통째로 적용(로컬 커밋) · 제목 줄·장비창 사용자 확인 대기.**
   사용자 결정: 장비창·체력마력 구슬·로딩창은 원작 그림 통째로 비율 지켜 줄여 쓴다. 장비창 자르기는 쇠고리·위 이름 줄만(확정, 안 `shots/ingame-before/equip-crop-proposal.png`). Next Lev·사람 단추(그룹 받기, 서버 0x2F — 모바일 미전송)는 남김. 책 단추 기능 보류 → backlog.
   작업지침 `docs/mobile-ingame-ui-work-order.md`(규칙 R1~R9). 창 자료 `data/original-ui/451.json` 「인게임」 → `data/ui-vault/인게임/`.
