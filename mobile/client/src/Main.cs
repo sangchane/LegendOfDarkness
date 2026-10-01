@@ -512,8 +512,8 @@ public partial class Main : Control
     public static bool Wearing { get; private set; }
 
     /// <summary>
-    /// Whether to turn to the gear tab a little after the pack opens — after <c>--wear</c> has pressed 입기, when given —
-    /// as <c>--gear-after</c>, so one run shows the pack tab and then the gear tab, or the thing leaving the pack and then
+    /// Whether to open the gear window a little after the pack opens — after <c>--wear</c> has pressed 입기, when given —
+    /// as <c>--gear-after</c>, so one run shows the pack and then the gear window, or the thing leaving the pack and then
     /// sitting in its worn place.
     /// </summary>
     public static bool GearAfter { get; private set; }
@@ -525,8 +525,8 @@ public partial class Main : Control
     public static bool Throwing { get; private set; }
 
     /// <summary>
-    /// Whether the pack opens on the gear tab rather than the pack tab, as <c>--gear</c>. Without it there
-    /// is no way to photograph the gear tab with no hand on the screen.
+    /// Whether <c>--pack</c> opens the gear window rather than the pack, as <c>--gear</c>. Without it there
+    /// is no way to photograph the gear window with no hand on the screen.
     /// </summary>
     public static bool OnGear { get; private set; }
 

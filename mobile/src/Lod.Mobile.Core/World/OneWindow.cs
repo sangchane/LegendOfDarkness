@@ -4,6 +4,7 @@ namespace Lod.Mobile.Core.World;
 public enum GameWindow
 {
     Pack,
+    Gear,
     Talk,
     Chat,
     WorldMap,
@@ -45,9 +46,9 @@ public sealed class OneWindow
     public bool IsOpen(GameWindow window) => Current == window;
 
     /// <summary>
-    /// The pack, an NPC's talk and the log lie over the world and a thumb aimed at them must not walk the character.
+    /// The pack, the gear window, an NPC's talk and the log lie over the world and a thumb aimed at them must not walk the character.
     /// The others leave the pad alive: settings and the bot's gear sit aside, the 길 찾기 map walks us while open, and
     /// the world map is held by the server anyway.
     /// </summary>
-    public static bool Freezes(GameWindow window) => window is GameWindow.Pack or GameWindow.Talk or GameWindow.Chat;
+    public static bool Freezes(GameWindow window) => window is GameWindow.Pack or GameWindow.Gear or GameWindow.Talk or GameWindow.Chat;
 }

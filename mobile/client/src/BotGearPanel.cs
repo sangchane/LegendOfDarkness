@@ -67,11 +67,6 @@ public sealed partial class BotGearPanel : PanelContainer
         body.AddChild(_gear);
         body.AddChild(side);
 
-        if (!Main.Portrait)
-        {
-            _gear.Lay(40);
-        }
-
         VBoxContainer inside = new();
         inside.AddThemeConstantOverride("separation", Main.Gutter);
         inside.AddChild(head);
@@ -111,10 +106,9 @@ public sealed partial class BotGearPanel : PanelContainer
     /// <summary>
     /// 봇이 입은 것·봇 가방 포션·내 가방으로 창을 다시 그린다. 같은 것이면 목록은 그대로 둔다(누르는 중인 단추를 지우지 않게).
     /// </summary>
-    public void Show(string name, CompanionKit? kit, IReadOnlyList<InventoryItem> pack, Character? doll)
+    public void Show(string name, CompanionKit? kit, IReadOnlyList<InventoryItem> pack)
     {
         _title.Text = $"봇 장비 · {name}";
-        _gear.ShowDoll(doll);
         _gear.Show(kit?.Worn ?? [], -_chosen);
         _potions.Text = $"봇 가방: {BotKit.Summary(kit)}";
 

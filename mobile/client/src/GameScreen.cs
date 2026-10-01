@@ -37,6 +37,7 @@ public partial class GameScreen : Control
     private Label _place = null!;
     private Label _target = null!;
     private PackPanel _pack = null!;
+    private GearPanel _gearPanel = null!;
     private TalkPanel _talk = null!;
     private FieldPanel _field = null!;
 
@@ -55,6 +56,7 @@ public partial class GameScreen : Control
     private SettingsPanel _settings = null!;
     private readonly BotGearPanel _botGear = new();
     private Control? _botGearHolder;
+    private Control? _gearHolder;
     private Control? _talkHolder;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
@@ -188,10 +190,20 @@ public partial class GameScreen : Control
     /// way. Named in Korean because the names are printed for a person to read.
     /// </summary>
     public IReadOnlyList<(string Name, Control Part)> Parts =>
-        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("방향판", _pad), ("파티원", _party.Members), ("나가기", _party.Leave), ("인벤토리", _pack), ("월드", _world)];
+        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("방향판", _pad), ("파티원", _party.Members), ("나가기", _party.Leave), ("인벤토리", _pack), ("장비", _gearPanel), ("월드", _world)];
 
-    /// <summary>Which tab the pack shows. Only a layout check asks — a thumb presses the tab itself.</summary>
-    public void ShowGearTab(bool gear) => _pack.ShowTab(gear);
+    /// <summary>Opens the gear window, or the pack. Only a layout check asks — a thumb presses the top row's buttons.</summary>
+    public void ShowGear(bool gear)
+    {
+        if (gear)
+        {
+            Dressing(true);
+        }
+        else
+        {
+            Carrying(true);
+        }
+    }
 
     public override void _Ready()
     {
@@ -216,9 +228,12 @@ public partial class GameScreen : Control
         _pack = new PackPanel();
         _pack.Close.Pressed += () => Carrying(false);
         _pack.Used += slot => _ = _server?.UseAsync(slot, System.Threading.CancellationToken.None);
-        _pack.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
         _pack.Dropped += (slot, count) => _ = Throw(slot, count);
         _pack.Tidy.Pressed += () => _ = Straighten();
+
+        _gearPanel = new GearPanel();
+        _gearPanel.Close.Pressed += () => Dressing(false);
+        _gearPanel.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
 
         _chat = new ChatPanel();
         _chat.Close.Pressed += () => Chatting(false);
@@ -365,6 +380,7 @@ public partial class GameScreen : Control
     private Control WindowOf(GameWindow window) => window switch
     {
         GameWindow.Pack => _pack,
+        GameWindow.Gear => _gearPanel,
         GameWindow.Talk => _talk,
         GameWindow.Chat => _chat,
         GameWindow.WorldMap => _field,
@@ -474,7 +490,7 @@ public partial class GameScreen : Control
 
         List<VBoxContainer> holders = [];
 
-        foreach (Control panel in new Control[] { _pack, _talk, _chat, _field, _settings, _tabMap, _botGear })
+        foreach (Control panel in new Control[] { _pack, _gearPanel, _talk, _chat, _field, _settings, _tabMap, _botGear })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -506,6 +522,14 @@ public partial class GameScreen : Control
             if (panel == _botGear)
             {
                 _botGearHolder = holder;
+            }
+
+            // 장비창은 그림 한 장이라 제 크기만큼만 — 위 줄 바로 아래, 세로는 가운데 · 가로는 오른쪽 끝(사용자 2026-10-01).
+            if (panel == _gearPanel)
+            {
+                _gearHolder = holder;
+                holder.Alignment = BoxContainer.AlignmentMode.Begin;
+                _gearPanel.SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ShrinkCenter : SizeFlags.ShrinkEnd;
             }
 
             holder.SetAnchorsPreset(LayoutPreset.FullRect);
@@ -572,7 +596,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _chatHolder || holder == _talkHolder ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _gearHolder || holder == _chatHolder || holder == _talkHolder ? 0 : column;
         }
     }
 
@@ -690,7 +714,7 @@ public partial class GameScreen : Control
         // 곳 이름은 미니맵 아래 구석에 적는다(MinimapView) — 가로 위 줄에 따로 두던 판은 뺐다(2026-09-26).
         _place = Aux(string.Empty);
 
-        // 위 줄 단추는 셋만(2026-09-26): [인벤토리] · [월드맵] · [설정]. [종료]는 설정 → 계정 탭으로, [길]은 미니맵이 되었다.
+        // 위 줄 단추(2026-09-26, 장비 2026-10-01): [월드맵] · [인벤토리] · [장비] · [설정]. [종료]는 설정 → 계정 탭으로, [길]은 미니맵이 되었다.
         HBoxContainer actions = new() { MouseFilter = MouseFilterEnum.Ignore };
         actions.AddThemeConstantOverride("separation", Main.Gutter);
 
@@ -703,6 +727,17 @@ public partial class GameScreen : Control
         Greybox.Plain(pack);
         pack.Pressed += () => Carrying(!_pack.Visible);
         actions.AddChild(pack);
+
+        // 장비는 소지품 탭에서 빼서 따로 연다(사용자, 2026-10-01).
+        Button gear = new()
+        {
+            Text = "장비",
+            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
+        };
+
+        Greybox.Plain(gear);
+        gear.Pressed += () => Dressing(!_gearPanel.Visible);
+        actions.AddChild(gear);
 
         // 월드맵은 인벤토리·설정과 같은 보통 단추(2026-09-26 3차 — 2차의 마름모 단추는 요청을 잘못 읽은 것이었다. 맨 왼쪽으로
         // 가는 것은 미니맵이다). 누르면 카드형 월드맵.
@@ -739,7 +774,7 @@ public partial class GameScreen : Control
             second.AddChild(middle);
             second.AddChild(actions);
 
-            foreach (Button action in new Button[] { _map, pack, settings })
+            foreach (Button action in new Button[] { _map, pack, gear, settings })
             {
                 action.CustomMinimumSize = new Vector2(64, Main.TouchMinimum);
             }
@@ -1098,9 +1133,9 @@ public partial class GameScreen : Control
         // 실제로 그래서 장비 칸이 넘쳤는데도 0 오류였다 — 검사 중에는 바로 연다.
         int settle = LayoutCheck.Requested() || LayoutCheck.PretendPack.Count > 0 ? 0 : 90;
 
-        if (Main.OpeningPack && !_pack.Visible && _settling++ == settle)
+        if (Main.OpeningPack && !_pack.Visible && !_gearPanel.Visible && _settling++ == settle)
         {
-            Carrying(true);
+            ShowGear(Main.OnGear);
         }
 
         // 손 없이 확인할 때만. 같은 규칙 — 옆 단추(인벤토리)가 쓰는 것을 그대로 쓴다: 눌러 보는 것은
@@ -1173,9 +1208,18 @@ public partial class GameScreen : Control
             _chatHolder.OffsetBottom = -Lifted();
         }
 
+        if (_gearPanel.Visible && _gearHolder is not null)
+        {
+            Vector2 screen = GetViewportRect().Size;
+            _gearPanel.Show(
+                _server?.Worn ?? LayoutCheck.PretendWorn,
+                Mine,
+                new Vector2(screen.X - (Main.Gutter * 2), screen.Y - _gearHolder.OffsetTop - Main.Gutter));
+        }
+
         if (_pack.Visible)
         {
-            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf, Mine.Gold);
+            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, Mine.Gold);
 
             // 손 없이 확인할 때만. 목록이 채워진 다음 프레임에 첫 줄을 한 번 누른다.
             if ((Main.Wearing || Main.Throwing) && !_worn && _pack.PressFirst(Main.Throwing))
@@ -1196,7 +1240,7 @@ public partial class GameScreen : Control
             if (Main.GearAfter && (_worn || !Main.Wearing) && !_gearShown && (_wornFor += delta) >= GearAfterSeconds)
             {
                 _gearShown = true;
-                ShowGearTab(true);
+                ShowGear(true);
             }
         }
     }
@@ -1319,8 +1363,7 @@ public partial class GameScreen : Control
 
         if (_botGear.Visible)
         {
-            Character? doll = _server?.Others.FirstOrDefault(other => other.Serial == bot.Serial);
-            _botGear.Show(bot.Name, kit, pack, doll);
+            _botGear.Show(bot.Name, kit, pack);
         }
     }
 
@@ -1831,8 +1874,14 @@ public partial class GameScreen : Control
 
         if (open)
         {
-            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, _server?.Worn ?? LayoutCheck.PretendWorn, _server?.Self ?? LayoutCheck.PretendSelf, Mine.Gold);
+            _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, Mine.Gold);
         }
+    }
+
+    /// <summary>Opens or shuts the gear window — like the pack, it lies over the world and puts away whatever was open.</summary>
+    private void Dressing(bool open)
+    {
+        SetWindow(GameWindow.Gear, open);
     }
 
     /// <summary>

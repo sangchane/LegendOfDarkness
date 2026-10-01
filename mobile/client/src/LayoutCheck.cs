@@ -295,7 +295,7 @@ public static class LayoutCheck
         GameScreen screen,
         bool gear)
     {
-        screen.ShowGearTab(gear);
+        screen.ShowGear(gear);
 
         // Containers settle over a couple of frames; asking before that reads sizes nobody will ever see.
         await host.ToSignal(host.GetTree(), SceneTree.SignalName.ProcessFrame);
@@ -343,14 +343,14 @@ public static class LayoutCheck
     }
 
     /// <summary>
-    /// Every worn place has to be in full sight on the gear tab at once — inside the window, on the screen, and not cut
+    /// Every worn place has to be in full sight in the gear window at once — inside the window, on the screen, and not cut
     /// by anything that clips it. A ring that has to be scrolled to find the armour is one nobody uses (사용자, 2026-09-23:
     /// 가로에서 장비창을 스크롤로 내리게 하는건 불편해서 못 쓴다).
     /// </summary>
     private static IEnumerable<string> GearCellsCut(Control screen, Vector2 screenSize)
     {
         // 창이 닫혀 있으면 볼 것이 없다.
-        if (screen.FindChild("Ring", true, false) is not Control { } ring || !ring.IsVisibleInTree())
+        if (screen.FindChild("GearWindow", true, false) is not GearPanel { } window || !window.IsVisibleInTree())
         {
             yield break;
         }
@@ -358,7 +358,7 @@ public static class LayoutCheck
         Rect2 whole = new(Vector2.Zero, screenSize);
         int cut = 0;
 
-        foreach (Node node in ring.GetChildren())
+        foreach (Node node in window.FindChildren("Slot*", "Button", true, false))
         {
             if (node is not Button cell)
             {
@@ -370,7 +370,7 @@ public static class LayoutCheck
 
             for (Node? up = cell.GetParent(); seen && up is not null && up != screen; up = up.GetParent())
             {
-                if (up is Control { ClipContents: true } or PackPanel)
+                if (up is Control { ClipContents: true } or GearPanel)
                 {
                     seen = ((Control)up).GetGlobalRect().Encloses(where);
                 }
@@ -398,7 +398,13 @@ public static class LayoutCheck
     /// </remarks>
     private static readonly string[] MeantToCover = ["월드"];
 
+    // 장비창은 소지품 창과 같은 모달이다(열려 있는 동안 조작이 죽는다, OneWindow.Freezes) — 아래 조작 줄을 덮어도 된다.
+    // 위 줄은 덮지 않는다: 장비창은 늘 위 줄 아래에서 시작한다.
     private static bool MeantToLieOver(string one, string other) =>
+        MeantToLieOverAsPack(one == "장비" ? "인벤토리" : one, other == "장비" ? "인벤토리" : other)
+        && (one, other) is not (("장비", "위 줄") or ("위 줄", "장비") or ("장비", "미니맵") or ("미니맵", "장비"));
+
+    private static bool MeantToLieOverAsPack(string one, string other) =>
         (one, other) is ("인벤토리", "조작 줄") or ("조작 줄", "인벤토리")
 
         // 미니맵은 위 줄 안에 선다(2026-09-26) — 위 줄과 겹치는 것이 제자리다. 화면 밖으로 나가는지는 따로 잰다.

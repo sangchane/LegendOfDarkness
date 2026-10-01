@@ -57,6 +57,7 @@ public sealed class OneWindowTests
     /// </summary>
     [Theory]
     [InlineData(GameWindow.Pack, true)]
+    [InlineData(GameWindow.Gear, true)]
     [InlineData(GameWindow.Talk, true)]
     [InlineData(GameWindow.Chat, true)]
     [InlineData(GameWindow.Settings, false)]

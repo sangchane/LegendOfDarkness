@@ -6,19 +6,17 @@ using Lod.Mobile.Core.World;
 namespace LodClient;
 
 /// <summary>
-/// What the character has on and what they are carrying, as the original showed it: pictures with no names in them.
-/// Laid out the way phone RPGs lay an inventory out (사용자, 2026-09-26): small icon tabs at the top — 소지품 · 장비 — and
-/// an X in the top-right corner (<see cref="WindowFrame" />), the grid across the whole width, a count in a cell's corner,
-/// and gold with how full the pack is on one line at the bottom beside the 줍기 and 정렬 icons. There are no long buttons
-/// standing under the grid any more: tapping a thing opens a small action row beside it — its name, one line (how many,
-/// how worn) and icon buttons (사용/입기 · 버리기, or 벗기 for something worn). Tapping the same thing twice quickly does
-/// the main one at once (<see cref="DoubleTap" />).
+/// What the character is carrying, as the original showed it: pictures with no names in them. Laid out the way phone
+/// RPGs lay an inventory out (사용자, 2026-09-26): a title and an X in the top-right corner (<see cref="WindowFrame" />),
+/// the grid across the whole width, a count in a cell's corner, and gold with how full the pack is on one line at the
+/// bottom beside the 줍기 and 정렬 icons. Tapping a thing opens a small action row beside it — its name, one line (how
+/// many, how worn) and icon buttons (사용/입기 · 버리기). Tapping the same thing twice quickly does the main one at once
+/// (<see cref="DoubleTap" />).
 /// </summary>
 /// <remarks>
-/// The two are separate tabs, not one list above another, because the original kept them in separate windows. The gear
-/// tab is the original's own ring of places (<see cref="GearGrid" />); the pack tab is a plain grid of pictures. Both are
-/// rebuilt only when what they would show changes, because they are asked every frame and a panel that throws its
-/// children away sixty times a second cannot be pressed.
+/// What is worn is its own window now (<see cref="GearPanel" />, 사용자 2026-10-01) — the original kept the two apart too,
+/// and the gear picture did not fit under this window's head. The grid is rebuilt only when what it would show changes,
+/// because it is asked every frame and a panel that throws its children away sixty times a second cannot be pressed.
 ///
 /// The pack shows one page at a time and turns left and right — by a swipe across the pictures or by the arrows, since
 /// no action may need a swipe alone (wireframes 2.2).
@@ -33,16 +31,10 @@ public sealed partial class PackPanel : PanelContainer
     private const int MostRows = 4;
     private int _perPage = Columns * MostRows;
 
-    // 가로 장비 고리의 칸. 44 를 먼저 노리고, 안 되면 40, 36 까지 — 그 아래는 손가락이 못 누른다(사용자·조정자, 2026-09-23).
-    private static readonly int[] PressableCells = [44, 40, 36];
-
     /// <summary>How far a finger has to travel across the pictures before it counts as turning the page.</summary>
     private const float SwipeDistance = Main.TouchMinimum;
 
-    private readonly GearGrid _gear = new();
     private readonly GridContainer _rows = new() { Name = "Items" };
-    private readonly Button _packTab = WindowFrame.IconButton(GlyphKind.Bag, "소지품", tab: true, width: 56);
-    private readonly Button _gearTab = WindowFrame.IconButton(GlyphKind.Armor, "장비", tab: true, width: 56);
 
     /// <summary>밟은 것을 알아서 줍는지 켜고 끄는 아이콘.</summary>
     private readonly Button _loot = WindowFrame.IconButton(GlyphKind.Loot, "줍기", tab: true);
@@ -58,14 +50,13 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Label _actionLine = new();
     private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
     private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", width: 56);
-    private readonly Button _off = WindowFrame.IconButton(GlyphKind.TakeOff, "벗기", width: 56);
     private readonly DoubleTap _taps = new();
     private readonly SpinBox _dropCount = new() { MinValue = 1, MaxValue = 1, Step = 1, Value = 1, CustomMinimumSize = new Vector2(80, Main.TouchMinimum) };
 
     // 지금 그려진 소지품 칸 — 동작 줄을 그 칸 옆에 세우려고 칸 번호로 찾는다.
     private readonly Dictionary<int, Button> _cellsBySlot = [];
 
-    // 탭의 내용(장비 고리 또는 소지품 한 장과 장 넘김).
+    // 소지품 한 장과 장 넘김.
     private readonly VBoxContainer _content = new()
     {
         SizeFlagsHorizontal = SizeFlags.ExpandFill,
@@ -83,13 +74,10 @@ public sealed partial class PackPanel : PanelContainer
     private bool _swiped;
     private int _carriedCount;
 
-    // 어느 탭이 보이나. 장비면 true.
-    private bool _onGear;
-
     // 무엇을 고쳐 그렸는지. 고른 것이 바뀌어도 테두리가 옮겨 가야 하므로 함께 센다.
     private string? _showing;
 
-    // 고른 것: 소지품이면 칸 번호, 걸친 것이면 자리 번호에 음수를 붙여 구별한다.
+    // 고른 소지품 칸 번호, 없으면 0.
     private int _chosen;
 
     public PackPanel()
@@ -101,9 +89,6 @@ public sealed partial class PackPanel : PanelContainer
 
         VBoxContainer body = new();
         body.AddThemeConstantOverride("separation", Main.Gutter / 2);
-
-        _gearTab.Pressed += () => ShowTab(gear: true);
-        _packTab.Pressed += () => ShowTab(gear: false);
 
         // 밟은 것을 알아서 주울지. 원작에는 없던 것이라 끌 수 있어야 한다(사용자, 2026-09-19).
         _loot.ButtonPressed = Main.AutoLoot;
@@ -122,25 +107,6 @@ public sealed partial class PackPanel : PanelContainer
         _rows.AddThemeConstantOverride("h_separation", 4);
         _rows.AddThemeConstantOverride("v_separation", 4);
 
-        // 걸친 것을 고르는 것은 소지품과 같은 한 자리를 쓴다. 음수로 두어 칸 번호와 구별한다. 빠르게 두 번 누르면 벗는다.
-        _gear.Chosen += slot =>
-        {
-            if (_taps.Tap(-slot, Now()))
-            {
-                _action.Visible = false;
-                TakenOff?.Invoke(slot);
-                return;
-            }
-
-            _chosen = -slot;
-            _showing = null;
-        };
-
-        // 장비 고리는 장으로 나눌 수도, 굴릴 수도 없다 — 가로에서 굴려 내리게 했더니 불편해서 못 쓴다고 했다(사용자,
-        // 2026-09-23). 가로는 칸을 줄여(FitRing) 여섯 줄을 한 화면에 세운다.
-        _gear.SizeFlagsVertical = SizeFlags.ExpandFill;
-        _gear.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-
         Button back = new() { Text = "◀", CustomMinimumSize = Cell, FocusMode = FocusModeEnum.None };
         Button forward = new() { Text = "▶", CustomMinimumSize = Cell, FocusMode = FocusModeEnum.None };
         Greybox.Plain(back);
@@ -157,7 +123,6 @@ public sealed partial class PackPanel : PanelContainer
         BuildAction();
 
         _content.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        _content.AddChild(_gear);
         _content.AddChild(_rows);
 
         // 세로는 장 넘김이 칸 아래에, 가로는 낮아서 아래 한 줄(금화 옆)에 — 그만큼 칸이 한 줄 더 든다.
@@ -187,17 +152,11 @@ public sealed partial class PackPanel : PanelContainer
         _foot.AddChild(_loot);
         _foot.AddChild(Tidy);
 
-        body.AddChild(WindowFrame.Head(WindowFrame.Tabs(_packTab, _gearTab), Close));
+        body.AddChild(WindowFrame.Head(WindowFrame.Title("소지품"), Close));
         body.AddChild(_main);
         body.AddChild(_foot);
 
-        if (!Main.Portrait)
-        {
-            // 두 탭이 같은 폭을 쓰게 — 소지품 한 장과 줄인 고리가 다르면 탭을 바꿀 때마다 창이 옆으로 움직인다.
-            _content.CustomMinimumSize = new Vector2(_gear.CustomMinimumSize.X, 0);
-        }
-
-        // 속 여백은 좌우 4 — 세로 장비 고리(328)가 360 화면의 안전 폭(344) 안에 들어야 한다.
+        // 속 여백은 좌우 4.
         StyleBoxFlat sheet = Greybox.Sheet();
         sheet.ContentMarginLeft = Main.Gutter / 2;
         sheet.ContentMarginRight = Main.Gutter / 2;
@@ -211,7 +170,8 @@ public sealed partial class PackPanel : PanelContainer
         AddChild(actionLayer);
         actionLayer.AddChild(_action);
 
-        ShowTab(Main.OnGear);
+        // 소지품 한 장은 제 높이만큼만 아래에 붙는다(GameScreen.Cover).
+        SizeFlagsVertical = SizeFlags.ShrinkEnd;
     }
 
     /// <summary>
@@ -260,20 +220,10 @@ public sealed partial class PackPanel : PanelContainer
             }
         };
 
-        _off.Pressed += () =>
-        {
-            if (_chosen < 0)
-            {
-                TakenOff?.Invoke(-_chosen);
-                _action.Visible = false;
-            }
-        };
-
         HBoxContainer buttons = new();
         buttons.AddThemeConstantOverride("separation", 4);
         buttons.AddChild(_use);
         buttons.AddChild(_drop);
-        buttons.AddChild(_off);
 
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);
@@ -291,32 +241,6 @@ public sealed partial class PackPanel : PanelContainer
 
     private static double Now() => Time.GetTicksMsec() / 1000.0;
 
-    /// <summary>
-    /// Shows one tab and hides the other. Nothing is asked of the server — both were already sent, so this
-    /// is only which of them is on screen. Tidying is a pack thing, so its button goes with the pack.
-    /// </summary>
-    internal void ShowTab(bool gear)
-    {
-        _onGear = gear;
-
-        _gear.Visible = gear;
-        _rows.Visible = !gear;
-        _pager.Visible = !gear;
-
-        // 소지품 한 장은 제 높이만큼만 아래에 붙고, 장비 고리는 남는 높이를 다 쓴다(GameScreen.Cover).
-        SizeFlagsVertical = gear ? SizeFlags.ExpandFill : SizeFlags.ShrinkEnd;
-        _gearTab.SetPressedNoSignal(gear);
-        _packTab.SetPressedNoSignal(!gear);
-        _gearTab.EmitSignal(BaseButton.SignalName.Toggled, gear);
-        _packTab.EmitSignal(BaseButton.SignalName.Toggled, !gear);
-        Tidy.Visible = !gear;
-
-        // 탭을 옮기면 고른 것이 다른 탭에 있을 수 있다. 놓고 다시 고르게 한다.
-        _chosen = 0;
-        _showing = null;
-        _action.Visible = false;
-    }
-
     /// <summary>The button that shuts the panel, so whoever opened it can decide what that means.</summary>
     public Button Close { get; }
 
@@ -326,23 +250,17 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>Somebody asked to throw a carried thing away. The server decides whether it may be.</summary>
     public event System.Action<int, int>? Dropped;
 
-    /// <summary>Somebody asked to take off what is in one worn place. The number is the server's own.</summary>
-    public event System.Action<int>? TakenOff;
-
     /// <summary>The button that pulls everything to the front of the pack.</summary>
     public Button Tidy { get; }
 
-    /// <summary>Shows what is worn and what is carried, and says plainly when there is nothing.</summary>
-    public void Show(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn, Character? self = null, long gold = 0)
+    /// <summary>Shows what is carried, and says plainly when there is nothing.</summary>
+    public void Show(IReadOnlyList<InventoryItem> carried, long gold = 0)
     {
         _gold.Text = Main.Portrait ? $"금화 {gold:N0} · {carried.Count}/60칸" : $"금화 {gold:N0}\n{carried.Count}/60칸";
 
-        // 종이인형은 목록과 따로 갱신한다 — 차림이 바뀌는 것과 소지품이 바뀌는 것은 같은 일이 아니다.
-        _gear.ShowDoll(self);
         FitRows();
-        FitRing();
 
-        string wanted = Describe(carried, worn);
+        string wanted = Describe(carried);
 
         if (wanted == _showing)
         {
@@ -351,28 +269,26 @@ public sealed partial class PackPanel : PanelContainer
 
         _showing = wanted;
 
-        _gear.Show(worn, _chosen);
         _carriedCount = carried.Count;
         _page = Paging.Kept(_page, carried.Count, _perPage);
         _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, _perPage)}";
         Fill(_rows, Paging.Page(carried, _page, _perPage));
 
-        ShowChosen(carried, worn);
+        ShowChosen(carried);
     }
 
     /// <summary>
-    /// Picks the first thing on whichever tab is showing and presses the button beside it — put it on from
-    /// the pack, take it off from the gear ring. Only for a run with no hand on it: it goes through the
-    /// same events the buttons raise, so the wiring is checked, not bypassed.
+    /// Picks the first thing in the pack and presses the button beside it — put it on, or throw it down. Only for a run
+    /// with no hand on it: it goes through the same events the buttons raise, so the wiring is checked, not bypassed.
     /// </summary>
     public bool PressFirst(bool throwing = false)
     {
-        foreach (Node cell in (_onGear ? _gear.Cells : _rows.GetChildren()))
+        foreach (Node cell in _rows.GetChildren())
         {
             if (cell is Button button)
             {
                 button.EmitSignal(BaseButton.SignalName.Pressed);
-                (_onGear ? _off : throwing ? _drop : _use).EmitSignal(BaseButton.SignalName.Pressed);
+                (throwing ? _drop : _use).EmitSignal(BaseButton.SignalName.Pressed);
 
                 return true;
             }
@@ -484,15 +400,10 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>
     /// Counts again how many rows a page can hold in the room the panel is given. What is outside the row the page
     /// stands in (the title strip, and upright the tab row and the 입기 row) and what stands under the page in it (the
-    /// page turner) are measured apart from the rows, so the count does not feed back on itself. Only the pack tab has rows.
+    /// page turner) are measured apart from the rows, so the count does not feed back on itself.
     /// </summary>
     private void FitRows()
     {
-        if (_onGear)
-        {
-            return;
-        }
-
         float outside = GetCombinedMinimumSize().Y - _main.GetCombinedMinimumSize().Y;
         float under = _content.GetCombinedMinimumSize().Y - _rows.GetCombinedMinimumSize().Y;
         int rows = Paging.RowsThatFit(Room() - outside, under, Cell.Y, _rows.GetThemeConstant("v_separation"), MostRows);
@@ -502,21 +413,6 @@ public sealed partial class PackPanel : PanelContainer
             _perPage = Columns * rows;
             _showing = null;
         }
-    }
-
-    /// <summary>
-    /// On its side, sizes the ring's cells so all six rows stand in the window at once (GearLayout.CellThatFits). Upright
-    /// the ring keeps its full-size cells — it fits there already.
-    /// </summary>
-    private void FitRing()
-    {
-        if (Main.Portrait)
-        {
-            return;
-        }
-
-        float outside = GetCombinedMinimumSize().Y - _main.GetCombinedMinimumSize().Y;
-        _gear.Lay(GearLayout.CellThatFits(Room(), outside, GearGrid.Gap, PressableCells));
     }
 
     /// <summary>
@@ -534,7 +430,7 @@ public sealed partial class PackPanel : PanelContainer
     /// </summary>
     public override void _Input(InputEvent @event)
     {
-        if (!IsVisibleInTree() || _onGear || @event is not InputEventMouseButton { ButtonIndex: MouseButton.Left } press)
+        if (!IsVisibleInTree() || @event is not InputEventMouseButton { ButtonIndex: MouseButton.Left } press)
         {
             return;
         }
@@ -559,7 +455,7 @@ public sealed partial class PackPanel : PanelContainer
     /// Fills the action row for whatever is picked — name, one line, and the buttons that apply — or hides it when
     /// nothing is. Where it stands is worked out every frame (<see cref="PlaceAction" />), once the grid has settled.
     /// </summary>
-    private void ShowChosen(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn)
+    private void ShowChosen(IReadOnlyList<InventoryItem> carried)
     {
         InventoryItem? held = carried.FirstOrDefault(item => item.Slot == _chosen);
 
@@ -574,25 +470,6 @@ public sealed partial class PackPanel : PanelContainer
             _dropCount.MaxValue = System.Math.Max(1, held.Stacks);
             _dropCount.Value = 1;
             _dropCount.GetMeta("row").As<Control>().Visible = true;
-            _off.Visible = false;
-            _action.Visible = true;
-            _action.ResetSize();
-
-            return;
-        }
-
-        WornItem? gear = worn.FirstOrDefault(one => -one.Slot == _chosen);
-
-        if (gear is not null)
-        {
-            // 걸친 것은 바로 버릴 수 없다. 벗어서 소지품에 든 다음에야 버릴 것이 생긴다.
-            _actionName.Text = gear.Called;
-            _actionLine.Text = ItemActions.Line(gear);
-            _actionLine.Visible = true;
-            _use.Visible = false;
-            _drop.Visible = false;
-            _dropCount.GetMeta("row").As<Control>().Visible = false;
-            _off.Visible = true;
             _action.Visible = true;
             _action.ResetSize();
 
@@ -613,9 +490,7 @@ public sealed partial class PackPanel : PanelContainer
             return;
         }
 
-        Control? cell = _chosen > 0
-            ? _cellsBySlot.GetValueOrDefault(_chosen)
-            : _gear.FindChild($"Slot{-_chosen}", true, false) as Control;
+        Control? cell = _cellsBySlot.GetValueOrDefault(_chosen);
 
         if (cell is null || !cell.IsVisibleInTree())
         {
@@ -648,7 +523,7 @@ public sealed partial class PackPanel : PanelContainer
     {
         Button? cell = _rows.GetChildren().OfType<Button>().Skip(nth - 1).FirstOrDefault();
 
-        if (_onGear || cell is null)
+        if (cell is null)
         {
             return false;
         }
@@ -658,9 +533,6 @@ public sealed partial class PackPanel : PanelContainer
         return true;
     }
 
-    private string Describe(IReadOnlyList<InventoryItem> carried, IReadOnlyList<WornItem> worn) =>
-        $"{_chosen}|{_page}|"
-        + string.Join(";", carried.Select(item => $"{item.Slot}:{item.Icon}:{item.Stacks}"))
-        + "|"
-        + string.Join(";", worn.Select(gear => $"{gear.Slot}:{gear.Icon}"));
+    private string Describe(IReadOnlyList<InventoryItem> carried) =>
+        $"{_chosen}|{_page}|" + string.Join(";", carried.Select(item => $"{item.Slot}:{item.Icon}:{item.Stacks}"));
 }
