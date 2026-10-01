@@ -57,7 +57,7 @@ public partial class GameScreen : Control
     private readonly BotGearPanel _botGear = new();
     private Control? _botGearHolder;
     private Control? _gearHolder;
-    private Control? _packHolder;
+    private VBoxContainer? _packHolder;
     private Control? _talkHolder;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
@@ -378,6 +378,9 @@ public partial class GameScreen : Control
         }
 
         _world.Frozen = _windows.Freezing;
+
+        // 장비창이 열려 있어도 사람은 눌린다 — 누르면 그 사람 장비창이 내 것 대신 뜬다(사용자 2026-10-01).
+        _world.PeopleOnly = _windows.IsOpen(GameWindow.Gear);
     }
 
     private Control WindowOf(GameWindow window) => window switch
@@ -537,13 +540,13 @@ public partial class GameScreen : Control
                 _packHolder = holder;
             }
 
-            // 장비창은 그림 한 장이라 제 크기만큼만 — 세로는 위 줄 바로 아래 가운데(소지품은 그 아래), 가로는 왼쪽(소지품은
-            // 오른쪽 기둥) — 내 장비창은 소지품과 같이 열어 입고 벗는다(사용자 2026-10-01).
+            // 장비창은 그림 한 장이라 제 크기만큼만 — 세로는 위 줄 바로 아래 가운데(소지품은 그 바로 아래), 가로는 소지품 기둥
+            // 바로 왼쪽(혼자면 오른쪽 끝) — 내 장비창은 소지품과 같이 열어 입고 벗는다(사용자 2026-10-01).
             if (panel == _gearPanel)
             {
                 _gearHolder = holder;
                 holder.Alignment = BoxContainer.AlignmentMode.Begin;
-                _gearPanel.SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ShrinkCenter : SizeFlags.ShrinkBegin;
+                _gearPanel.SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ShrinkCenter : SizeFlags.ShrinkEnd;
             }
 
             holder.SetAnchorsPreset(LayoutPreset.FullRect);
@@ -569,7 +572,7 @@ public partial class GameScreen : Control
                 continue;
             }
 
-            // 가로 장비창은 그림 키(302)가 위 줄 아래에 안 든다 — 맨 위부터 왼쪽에. 닫기는 그림 속 Close.
+            // 가로 장비창은 그림 키(302)가 위 줄 아래에 안 든다 — 맨 위부터. 닫기는 그림 속 Close.
             if (panel == _gearPanel && !Main.Portrait)
             {
                 holder.OffsetTop = 0;
@@ -1246,12 +1249,18 @@ public partial class GameScreen : Control
                 GearRoom());
         }
 
-        // 세로에서 내 장비창과 소지품을 같이 열면 소지품은 장비 그림 아래에서 시작한다.
+        // 내 장비창과 소지품을 같이 열면 둘을 붙인다(사용자 2026-10-01: 거리가 멀다). 세로는 소지품이 장비 그림 바로 아래에서
+        // 시작하고, 가로는 장비 그림이 소지품 기둥 바로 왼쪽에 선다.
+        bool together = _gearPanel.Visible && _pack.Visible;
+
         if (Main.Portrait && _packHolder is not null && _gearHolder is not null)
         {
-            _packHolder.OffsetTop = _gearPanel.Visible && _pack.Visible
-                ? _gearHolder.OffsetTop + _gearPanel.Size.Y + Main.Gutter
-                : _gearHolder.OffsetTop;
+            _packHolder.OffsetTop = together ? _gearHolder.OffsetTop + _gearPanel.Size.Y + Main.Gutter : _gearHolder.OffsetTop;
+            _packHolder.Alignment = together ? BoxContainer.AlignmentMode.Begin : BoxContainer.AlignmentMode.End;
+        }
+        else if (!Main.Portrait && _gearHolder is not null)
+        {
+            _gearHolder.OffsetRight = together ? _pack.GlobalPosition.X - GetViewportRect().Size.X - Main.Gutter : 0;
         }
 
         if (_pack.Visible)

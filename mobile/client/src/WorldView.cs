@@ -172,6 +172,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     public bool Frozen { get; set; }
 
+    /// <summary>
+    /// While frozen, whether a tap may still press on a person — the gear window is open, and pressing somebody shows
+    /// theirs in its place at once (사용자 2026-10-01). Nothing else on the floor answers.
+    /// </summary>
+    public bool PeopleOnly { get; set; }
+
     /// <summary>The tile the player is on, as this client believes it — which is what a player wants shown.</summary>
     public Tile Standing => _tile;
 
@@ -353,7 +359,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// </summary>
     public override void _GuiInput(InputEvent @event)
     {
-        if (Frozen)
+        if (Frozen && !PeopleOnly)
         {
             return;
         }
@@ -374,9 +380,42 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
                 return;
         }
 
-        // Already in this view's own coordinates; the camera says how far the world has been slid under it.
-        Choose(at - _camera.Position);
         AcceptEvent();
+
+        // Already in this view's own coordinates; the camera says how far the world has been slid under it.
+        if (Frozen)
+        {
+            PressPerson(at - _camera.Position);
+            return;
+        }
+
+        Choose(at - _camera.Position);
+    }
+
+    private const float Reach = 34;
+    private const float FigureWaist = 32;
+
+    /// <summary>Asks the server for the window of whichever person stands nearest the tap (0x43 → 0x34), if one is near enough.</summary>
+    private void PressPerson(Vector2 where)
+    {
+        float nearest = Reach * Reach;
+        uint who = 0;
+
+        foreach ((uint serial, Actor person) in _crowd)
+        {
+            float distance = (person.Position - new Vector2(0, FigureWaist)).DistanceSquaredTo(where);
+
+            if (distance < nearest)
+            {
+                nearest = distance;
+                who = serial;
+            }
+        }
+
+        if (who != 0 && server is { } world)
+        {
+            _ = world.ClickAsync(who, System.Threading.CancellationToken.None);
+        }
     }
 
     /// <summary>
@@ -394,17 +433,14 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return;
         }
 
-        const float reach = 34;
-        const float figureWaist = 32;
-
-        float nearest = reach * reach;
+        float nearest = Reach * Reach;
 
         uint before = _target;
         _target = 0;
 
         // 사람·괴물은 허리를, 표식은 떠 있는 높이(NpcMark.Waist)를 겨눈다.
         IEnumerable<(uint Serial, Vector2 Aim)> standing = _crowd.Concat(_herd)
-            .Select(one => (one.Key, one.Value.Position - new Vector2(0, figureWaist)))
+            .Select(one => (one.Key, one.Value.Position - new Vector2(0, FigureWaist)))
             .Concat(_signs.Select(sign => (sign.Key, sign.Value.Position - new Vector2(0, NpcMark.Waist))));
 
         foreach ((uint serial, Vector2 aim) in standing)

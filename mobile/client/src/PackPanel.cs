@@ -123,7 +123,12 @@ public sealed partial class PackPanel : PanelContainer
         BuildAction();
 
         _content.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        _content.AddChild(_rows);
+        // 칸 뒤 바닥은 원작 아이템 인벤토리 판(panel02)의 어두운 바닥 무늬 — 늘리지 않고 되풀이해 깐다. 칸 상자는 없고 아이템이
+        // 바닥에 바로 놓인다(사용자 2026-10-01: 원작 장비창 아래 인벤토리를 모바일에 맞게).
+        PanelContainer floor = new() { Name = "Floor" };
+        floor.AddThemeStyleboxOverride("panel", Floor());
+        floor.AddChild(_rows);
+        _content.AddChild(floor);
 
         // 세로는 장 넘김이 칸 아래에, 가로는 낮아서 아래 한 줄(금화 옆)에 — 그만큼 칸이 한 줄 더 든다.
         if (Main.Portrait)
@@ -241,6 +246,27 @@ public sealed partial class PackPanel : PanelContainer
 
     private static double Now() => Time.GetTicksMsec() / 1000.0;
 
+    private const string FloorArt = "res://assets/ui/pack-floor.png";
+
+    /// <summary>The pack's floor: <c>panel02</c>'s dark recessed stone, tiled at its own size; plain dark when the picture is missing.</summary>
+    private static StyleBox Floor()
+    {
+        if (!ResourceLoader.Exists(FloorArt))
+        {
+            return Greybox.Surface();
+        }
+
+        StyleBoxTexture floor = new()
+        {
+            Texture = GD.Load<Texture2D>(FloorArt),
+            AxisStretchHorizontal = StyleBoxTexture.AxisStretchMode.Tile,
+            AxisStretchVertical = StyleBoxTexture.AxisStretchMode.Tile
+        };
+        floor.SetContentMarginAll(4);
+
+        return floor;
+    }
+
     /// <summary>The button that shuts the panel, so whoever opened it can decide what that means.</summary>
     public Button Close { get; }
 
@@ -330,8 +356,8 @@ public sealed partial class PackPanel : PanelContainer
                 FocusMode = FocusModeEnum.None
             };
 
-            // 칸은 평평한 어둠, 고른 칸은 밝은 테두리 — 돌은 칸에 쓰지 않는다(규칙표).
-            StyleBoxFlat box = Greybox.Surface();
+            // 칸은 바닥 그대로(상자 없음), 고른 칸만 밝은 테두리.
+            StyleBoxFlat box = new() { DrawCenter = false };
             box.SetCornerRadiusAll(6);
 
             if (key == _chosen)
