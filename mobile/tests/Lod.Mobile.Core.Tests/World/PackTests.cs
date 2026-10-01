@@ -47,6 +47,31 @@ public sealed class PackTests
         Assert.Equal(42, carried.Durability);
     }
 
+    /// <summary>Our server adds the item's numbers after the original's end (우리 확장); the original's end alone has none.</summary>
+    [Fact]
+    public void Our_servers_numbers_after_the_end_are_read_and_said()
+    {
+        byte[] numbers =
+        [
+            0x01,                                       // 표식
+            0xFF, 0xFB, 0x00, 0x02, 0x00, 0x00,         // 방어 -5 · 명중 +2 · 타격 0
+            0x00, 0x03, 0x00, 0x00, 0x00, 0x00,         // 힘 +3 · 지능 · 지혜
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x0A,         // 체력 · 민첩 · 마법 방어 +10
+            0x00, 0x00, 0x01, 0xF4, 0x00, 0x00, 0x00, 0x00, // HP +500 · MP
+            0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x28, // 공격력 20~40
+            41, 5, 0, 3, 1, 0,                          // 레벨 41 · 무도가 · 단계 · 무게 3 · 불 · 없음
+            0x00, 0x00, 0x03, 0xE8                      // 값 1000
+        ];
+
+        InventoryItem carried = WorldClient.ReadPackItem([.. Carrying("Boots"), .. numbers]);
+
+        Assert.Equal(42, carried.Durability);
+        Assert.Equal(
+            ["공격력 20~40", "방어 -5", "명중 +2", "힘 +3", "마법 방어 +10", "HP +500", "공격 속성 불", "요구 레벨 41 · 무도가", "무게 3"],
+            ItemActions.Stats(carried));
+        Assert.Empty(ItemActions.Stats(WorldClient.ReadPackItem(Carrying("Boots"))));
+    }
+
     [Fact]
     public void A_packet_that_stops_short_is_refused()
     {

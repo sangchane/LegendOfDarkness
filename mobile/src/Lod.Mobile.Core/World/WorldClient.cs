@@ -1925,8 +1925,37 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest),
             // Byte 4 says whether it stacks, which the count already tells us.
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest[9..]),
-            (int)BinaryPrimitives.ReadUInt32BigEndian(rest[5..]));
+            (int)BinaryPrimitives.ReadUInt32BigEndian(rest[5..]),
+            ReadItemStats(rest[13..]));
     }
+
+    /// <summary>
+    /// Our server's addition after the original's last four bytes: a 1, then the item's numbers (ServerFormat0F). An
+    /// original server ends there, so there is nothing to show.
+    /// </summary>
+    private static ItemStats? ReadItemStats(ReadOnlySpan<byte> tail)
+    {
+        const int size = 4 + 1 + (9 * 2) + (4 * 4) + 6 + 4;
+
+        if (tail.Length < size || tail[4] != 1)
+        {
+            return null;
+        }
+
+        ReadOnlySpan<byte> s = tail[5..];
+        ReadOnlySpan<byte> wide = s[18..];
+        ReadOnlySpan<byte> small = wide[16..];
+
+        return new ItemStats(
+            Short(s, 0), Short(s, 1), Short(s, 2), Short(s, 3), Short(s, 4), Short(s, 5), Short(s, 6), Short(s, 7), Short(s, 8),
+            Int(wide, 0), Int(wide, 1), Int(wide, 2), Int(wide, 3),
+            small[0], small[1], small[2], small[3], small[4], small[5],
+            BinaryPrimitives.ReadUInt32BigEndian(small[6..]));
+    }
+
+    private static int Short(ReadOnlySpan<byte> from, int nth) => BinaryPrimitives.ReadInt16BigEndian(from[(nth * 2)..]);
+
+    private static int Int(ReadOnlySpan<byte> from, int nth) => BinaryPrimitives.ReadInt32BigEndian(from[(nth * 4)..]);
 
     /// <summary>
     /// One piece of gear the character is wearing. The place it sits comes first, then the picture, then a

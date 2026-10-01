@@ -276,7 +276,18 @@ public sealed record InventoryItem(
     string Name,
     int Stacks,
     int Durability,
-    int MaxDurability);
+    int MaxDurability,
+    ItemStats? Stats = null);
+
+/// <summary>
+/// What a carried thing does, as our server adds after the original 0x0F (우리 확장, 2026-10-01). Bonuses are signed —
+/// armour class goes down when it gets better, as in the original. <see cref="Class" /> is 0 for anyone; the elements
+/// are the server's numbers (1 불 · 2 물 · 3 바람 · 4 땅 · 5 빛 · 6 어둠).
+/// </summary>
+public sealed record ItemStats(
+    int Ac, int Hit, int Dmg, int Str, int Int, int Wis, int Con, int Dex, int Mr,
+    int Hp, int Mp, int DmgMin, int DmgMax,
+    int Level, int Class, int Stage, int Weight, int Offense, int Defense, long Value);
 
 /// <summary>One learned technique in the character's skill pane.</summary>
 /// <param name="Slot">The server-owned pane slot used again when the skill is activated.</param>

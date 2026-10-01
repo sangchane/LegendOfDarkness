@@ -54,6 +54,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly PanelContainer _action = new() { Name = "ItemAction", TopLevel = true, Visible = false, ZIndex = 5 };
     private readonly Label _actionName = new();
     private readonly Label _actionLine = new();
+    private readonly Label _actionStats = new();
     private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
     private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", width: 56);
     private readonly DoubleTap _taps = new();
@@ -224,6 +225,9 @@ public sealed partial class PackPanel : PanelContainer
         _actionName.CustomMinimumSize = new Vector2(120, 0);
         _actionLine.AddThemeColorOverride("font_color", Greybox.Muted);
         _actionLine.AddThemeFontSizeOverride("font_size", 12);
+        _actionStats.AddThemeColorOverride("font_color", Greybox.Text);
+        _actionStats.AddThemeFontSizeOverride("font_size", 12);
+
 
         // 주 동작은 강조색 아이콘 — 창마다 확정은 하나(Greybox.Commit 과 같은 뜻).
         if (_use.GetMeta("glyph").As<Glyph>() is { } lit)
@@ -264,6 +268,8 @@ public sealed partial class PackPanel : PanelContainer
         top.AddChild(_actionIcon);
         top.AddChild(words);
         column.AddChild(top);
+        // 서버가 보낸 수치 — 공격력·방어·능력치·요구 레벨·직업·무게(우리 확장 0x0F 꼬리).
+        column.AddChild(_actionStats);
         HBoxContainer quantity = new();
         quantity.AddThemeConstantOverride("separation", Main.Gutter);
         quantity.AddChild(new Label { Text = "버릴 수량", SizeFlagsVertical = SizeFlags.ShrinkCenter });
@@ -334,6 +340,35 @@ public sealed partial class PackPanel : PanelContainer
         {
             _content.AddChild(_pager);
         }
+    }
+
+    /// <summary>
+    /// The numbers several to a line, broken only between two of them — the engine's own wrapping breaks Korean between
+    /// any two letters ("요구 레 / 벨 41").
+    /// </summary>
+    private string Packed(IReadOnlyList<string> numbers)
+    {
+        const float wide = 220;
+        const string gap = "   ";
+        Font font = _actionStats.GetThemeFont("font");
+        int size = _actionStats.GetThemeFontSize("font_size");
+        List<string> lines = [];
+
+        foreach (string number in numbers)
+        {
+            string joined = lines.Count > 0 ? lines[^1] + gap + number : number;
+
+            if (lines.Count > 0 && font.GetStringSize(joined, fontSize: size).X <= wide)
+            {
+                lines[^1] = joined;
+            }
+            else
+            {
+                lines.Add(number);
+            }
+        }
+
+        return string.Join("\n", lines);
     }
 
     private static Button KindTab(string name)
@@ -604,6 +639,8 @@ public sealed partial class PackPanel : PanelContainer
             _actionIcon.Texture = ItemIcons.For(held.Icon);
             _actionLine.Text = ItemActions.Line(held);
             _actionLine.Visible = _actionLine.Text.Length > 0;
+            _actionStats.Text = Packed(ItemActions.Stats(held));
+            _actionStats.Visible = _actionStats.Text.Length > 0;
             WindowFrame.Relabel(_use, ItemActions.Primary(held));
             _use.Visible = true;
             _drop.Visible = true;
