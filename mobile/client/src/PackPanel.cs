@@ -67,6 +67,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly HBoxContainer _pager = new() { Alignment = BoxContainer.AlignmentMode.Center, SizeFlagsHorizontal = SizeFlags.ExpandFill };
     private readonly Label _pageNumber = new() { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
     private HBoxContainer _foot = null!;
+    private Control _head = null!;
 
     // 보이는 장, 그리고 손가락이 누른 자리. 밀어 넘긴 손은 그림을 고르지 않는다.
     private int _page;
@@ -157,7 +158,7 @@ public sealed partial class PackPanel : PanelContainer
         _foot.AddChild(_loot);
         _foot.AddChild(Tidy);
 
-        body.AddChild(WindowFrame.Head(WindowFrame.Title("소지품"), Close));
+        body.AddChild(_head = WindowFrame.Head(WindowFrame.Title("소지품"), Close));
         body.AddChild(_main);
         body.AddChild(_foot);
 
@@ -246,6 +247,36 @@ public sealed partial class PackPanel : PanelContainer
 
     private static double Now() => Time.GetTicksMsec() / 1000.0;
 
+    /// <summary>
+    /// Upright under our gear window the pack gets only what the picture leaves, and its title strip and page turner ate
+    /// all but one row (사용자 2026-10-01). There the gear window's Close shuts both, so the strip goes, and the turner joins
+    /// the gold line as it does on its side, the gold going to two small lines to make room.
+    /// </summary>
+    public void UnderGear(bool under)
+    {
+        _head.Visible = !under;
+
+        if (!Main.Portrait || (_pager.GetParent() == _foot) == under)
+        {
+            return;
+        }
+
+        _pager.GetParent().RemoveChild(_pager);
+        _pager.SizeFlagsHorizontal = under ? SizeFlags.ShrinkEnd : SizeFlags.ExpandFill;
+        _pageNumber.CustomMinimumSize = new Vector2(under ? 36 : Cell.X, Cell.Y);
+        _gold.AddThemeFontSizeOverride("font_size", under ? 11 : 13);
+
+        if (under)
+        {
+            _foot.AddChild(_pager);
+            _foot.MoveChild(_pager, 1);
+        }
+        else
+        {
+            _content.AddChild(_pager);
+        }
+    }
+
     private const string FloorArt = "res://assets/ui/pack-floor.png";
 
     /// <summary>The pack's floor: <c>panel02</c>'s dark recessed stone, tiled at its own size; plain dark when the picture is missing.</summary>
@@ -282,7 +313,7 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>Shows what is carried, and says plainly when there is nothing.</summary>
     public void Show(IReadOnlyList<InventoryItem> carried, long gold = 0)
     {
-        _gold.Text = Main.Portrait ? $"금화 {gold:N0} · {carried.Count}/60칸" : $"금화 {gold:N0}\n{carried.Count}/60칸";
+        _gold.Text = _pager.GetParent() != _foot ? $"금화 {gold:N0} · {carried.Count}/60칸" : $"금화 {gold:N0}\n{carried.Count}/60칸";
 
         FitRows();
 

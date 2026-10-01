@@ -1252,6 +1252,7 @@ public partial class GameScreen : Control
         // 내 장비창과 소지품을 같이 열면 둘을 붙인다(사용자 2026-10-01: 거리가 멀다). 세로는 소지품이 장비 그림 바로 아래에서
         // 시작하고, 가로는 장비 그림이 소지품 기둥 바로 왼쪽에 선다.
         bool together = _gearPanel.Visible && _pack.Visible;
+        _pack.UnderGear(together);
 
         if (Main.Portrait && _packHolder is not null && _gearHolder is not null)
         {
