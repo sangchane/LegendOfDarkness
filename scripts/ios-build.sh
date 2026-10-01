@@ -194,9 +194,9 @@ renew() {
     echo "서명을 새로 받았습니다 — $(days_left)일 남았습니다."
 }
 
-# 맥 알림은 띄우지 않는다(사용자 2026-10-02) — 글로만 남긴다.
 say() {
     echo "$1"
+    osascript -e "display notification \"$1\" with title \"어둠의 전설 — 아이폰 서명\"" 2>/dev/null || true
 }
 
 restore() {
