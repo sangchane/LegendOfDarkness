@@ -153,23 +153,61 @@ public sealed class CompanionBrain
             return new(CompanionAct.Stop, Why: "쓰러짐");
         }
 
+        Reading reading = Read(sight, settings);
+
+        return Emergency(sight, reading)
+               ?? Recover(sight, settings, reading)
+               ?? Maintain(sight, reading)
+               ?? Follow(sight, settings, reading.Now)
+               ?? (reading.Mana < reading.Cheapest
+                   ? new(CompanionAct.Rest, Why: "마력 부족")
+                   : new(CompanionAct.Wait, Why: "기다림"));
+    }
+
+    /// <summary>한 틱의 판단에 두루 쓰는 값 — 주문 사이가 됐나, 주인이 가까운가·다쳤나, 마력, 가장 싼 회복.</summary>
+    private readonly record struct Reading(
+        TimeSpan Now,
+        bool CanCast,
+        bool CanHeal,
+        bool CanDrink,
+        bool OwnerNear,
+        bool OwnerHurt,
+        bool SelfHurt,
+        bool Empowered,
+        int Mana,
+        int Cheapest);
+
+    private Reading Read(CompanionSight sight, CompanionSettings settings)
+    {
         TimeSpan now = sight.Now;
         bool canCast = now - _lastCast >= CastGap;
         bool ownerNear = sight.OwnerAt is { } at && Distance(at, sight.Standing) <= CastReach;
         int ownerHealth = ownerNear ? sight.HealthOf(sight.Master) ?? 100 : 100;
-        bool ownerHurt = ownerNear && ownerHealth > 0 && ownerHealth < settings.HealOwnerPercent;
-        bool selfHurt = Percent(sight.Vitals) < settings.HealSelfPercent;
         bool empowered = sight.Spells.Any(one => CompanionSpells.Bare(one.Name) == "신성력강화");
-        int mana = sight.Vitals?.Mana ?? 0;
-
-        bool canHeal = canCast && now - _lastHeal >= HealGap;
-        bool canDrink = now - _lastDrink >= DrinkGap;
         int cheapest = sight.Spells
             .Select(one => CompanionSpells.Of(one.Name, empowered))
             .Where(entry => entry is { Kind: CompanionSpells.Kind.Heal })
             .Select(entry => entry!.Mana)
             .DefaultIfEmpty(0)
             .Min();
+
+        return new Reading(
+            now,
+            canCast,
+            CanHeal: canCast && now - _lastHeal >= HealGap,
+            CanDrink: now - _lastDrink >= DrinkGap,
+            ownerNear,
+            OwnerHurt: ownerNear && ownerHealth > 0 && ownerHealth < settings.HealOwnerPercent,
+            SelfHurt: Percent(sight.Vitals) < settings.HealSelfPercent,
+            empowered,
+            Mana: sight.Vitals?.Mana ?? 0,
+            cheapest);
+    }
+
+    /// <summary>급한 일 — 혼수인 주인 깨우기, 그다음 해제(수면·빙결).</summary>
+    private CompanionStep? Emergency(CompanionSight sight, Reading reading)
+    {
+        TimeSpan now = reading.Now;
 
         // 주인이 혼수면 가장 먼저 — 옆 칸으로 가서 깨운다(사용자 결정 2026-09-26, 서버 0xF1 5 — 코마디움과 같은 효과, 아무것도 안 쓴다).
         if (sight.OwnerAt is { } fallen && sight.StatusesOf(sight.Master)?.Contains("skulled") == true)
@@ -190,16 +228,24 @@ public sealed class CompanionBrain
 
         // 해제가 가장 먼저 — 수면(나르콜리)·빙결이면 주인은 아무것도 못 한다(사용자, 2026-09-26). 주문 사이(1초)를 다 기다리지
         // 않는다(CureGap) — 막 버프를 걸었어도 곧 푼다.
-        if (now - _lastCast >= CureGap && Cure(sight, empowered, mana, ownerNear) is { } cure)
+        if (now - _lastCast >= CureGap && Cure(sight, reading.Empowered, reading.Mana, reading.OwnerNear) is { } cure)
         {
             return Cast(cure, now, heal: false);
         }
 
+        return null;
+    }
+
+    /// <summary>채우기 — 주인 회복, 봇 체력 포션, 자기 회복 마법, 봇 마력 포션 차례.</summary>
+    private CompanionStep? Recover(CompanionSight sight, CompanionSettings settings, Reading reading)
+    {
+        TimeSpan now = reading.Now;
+
         // 주인 회복(둘 다 아프면 파티 회복).
-        if (canHeal && ownerHurt)
+        if (reading.CanHeal && reading.OwnerHurt)
         {
-            CompanionStep? heal = (selfHurt ? Best(sight, CompanionSpells.Kind.GroupHeal, sight.Master, empowered, mana, "파티 회복") : null)
-                                  ?? Best(sight, CompanionSpells.Kind.Heal, sight.Master, empowered, mana, "주인 회복");
+            CompanionStep? heal = (reading.SelfHurt ? Best(sight, CompanionSpells.Kind.GroupHeal, sight.Master, reading.Empowered, reading.Mana, "파티 회복") : null)
+                                  ?? Best(sight, CompanionSpells.Kind.Heal, sight.Master, reading.Empowered, reading.Mana, "주인 회복");
 
             if (heal is not null)
             {
@@ -208,40 +254,39 @@ public sealed class CompanionBrain
         }
 
         // 봇 체력 포션 — 회복 마법보다 먼저(마력을 아낀다).
-        if (canDrink && Percent(sight.Vitals) < settings.PotionHealthPercent
+        if (reading.CanDrink && Percent(sight.Vitals) < settings.PotionHealthPercent
             && Potion(sight.Pack, CompanionSpells.HealthRestore, Missing(sight.Vitals?.MaximumHealth, sight.Vitals?.Health)) is { } health)
         {
             _lastDrink = now;
             return new(CompanionAct.Drink, health.Slot, Why: $"체력 포션 {health.Name}");
         }
 
-        if (canHeal && selfHurt && Best(sight, CompanionSpells.Kind.Heal, sight.Me, empowered, mana, "자기 회복") is { } self)
+        if (reading.CanHeal && reading.SelfHurt && Best(sight, CompanionSpells.Kind.Heal, sight.Me, reading.Empowered, reading.Mana, "자기 회복") is { } self)
         {
             return Cast(self, now, heal: true);
         }
 
         // 봇 마력 포션 — 마력이 낮거나, 가장 싼 회복도 못 걸어 쉬어야 할 때.
-        if (canDrink && (ManaPercent(sight.Vitals) < settings.PotionManaPercent || mana < cheapest)
+        if (reading.CanDrink && (ManaPercent(sight.Vitals) < settings.PotionManaPercent || reading.Mana < reading.Cheapest)
             && Potion(sight.Pack, CompanionSpells.ManaRestore, Missing(sight.Vitals?.MaximumMana, sight.Vitals?.Mana)) is { } restoring)
         {
             _lastDrink = now;
             return new(CompanionAct.Drink, restoring.Slot, Why: $"마력 포션 {restoring.Name}");
         }
 
-        if (canCast && Buff(sight, empowered, mana, ownerNear) is { } buff)
+        return null;
+    }
+
+    /// <summary>유지 — 버프가 풀렸으면 다시 건다.</summary>
+    private CompanionStep? Maintain(CompanionSight sight, Reading reading)
+    {
+        if (reading.CanCast && Buff(sight, reading.Empowered, reading.Mana, reading.OwnerNear) is { } buff)
         {
-            _lastCast = now;
+            _lastCast = reading.Now;
             return buff;
         }
 
-        if (Follow(sight, settings, now) is { } step)
-        {
-            return step;
-        }
-
-        return mana < cheapest
-            ? new(CompanionAct.Rest, Why: "마력 부족")
-            : new(CompanionAct.Wait, Why: "기다림");
+        return null;
     }
 
     private CompanionStep Cast(CompanionStep step, TimeSpan now, bool heal)
