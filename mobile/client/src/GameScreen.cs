@@ -1477,6 +1477,8 @@ public partial class GameScreen : Control
     /// </summary>
     private void RehearseParty(double delta)
     {
+        RehearseLook(delta);
+
         if (Main.Inviting.Length > 0 && !_partyRehearsed && Time.GetTicksMsec() > 6000)
         {
             if (_world.TargetName == Main.Inviting && _party.Invite.Visible)
@@ -1970,6 +1972,38 @@ public partial class GameScreen : Control
         return Main.Portrait
             ? new Vector2(screen.X - (Main.Gutter * 2), (screen.Y - top) / 2)
             : new Vector2(screen.X / 2, screen.Y - top);
+    }
+
+    // --look: 다음 탭까지 남은 초, 끝났나.
+    private double _lookIn;
+    private bool _looked;
+
+    /// <summary>
+    /// 손 없이 확인할 때만(<c>--look 이름</c>): 내 장비창을 열고, 그 위에서 그 사람을 실제 터치로 1초마다 눌러 그 사람 장비창으로
+    /// 바뀌면 멈춘다 — 장비창이 열린 채 사람 누르기(WorldView.PeopleOnly)까지 같은 길로 확인된다.
+    /// </summary>
+    private void RehearseLook(double delta)
+    {
+        if (Main.Looking.Length == 0 || _looked || Time.GetTicksMsec() < 6000 || (_lookIn -= delta) > 0)
+        {
+            return;
+        }
+
+        _lookIn = 1;
+
+        if (!_gearPanel.Visible)
+        {
+            Dressing(true);
+        }
+        else if (!_gearPanel.ShowingOther)
+        {
+            _world.TapPerson(Main.Looking);
+        }
+        else
+        {
+            _looked = true;
+            GD.Print($"GREYBOX_LOOK {Main.Looking} 소지품 {(_pack.Visible ? "열림" : "닫힘")}");
+        }
     }
 
     /// <summary>Turns taking group requests on or off, then asks the profile again so the person button shows it.</summary>

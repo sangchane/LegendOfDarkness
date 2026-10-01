@@ -400,6 +400,9 @@ public partial class Main : Control
     /// <summary>손 없이 확인할 때 — 이 이름의 사람을 실제로 탭하고 [파티 초대]를 누른다(<c>--invite 이름</c>).</summary>
     public static string Inviting { get; private set; } = string.Empty;
 
+    /// <summary>손 없이 확인할 때 — 내 장비창을 연 채 이 이름의 사람을 실제로 탭해 그 사람 장비창을 받는다(<c>--look 이름</c>).</summary>
+    public static string Looking { get; private set; } = string.Empty;
+
     /// <summary>손 없이 확인할 때 — 파티 초대가 오면 [수락]을 누른다(<c>--accept</c>).</summary>
     public static bool Accepting { get; private set; }
 
@@ -562,6 +565,7 @@ public partial class Main : Control
         Saying = Flag("--say");
         ChatTab = Flag("--chat");
         Inviting = Flag("--invite");
+        Looking = Flag("--look");
         Accepting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--accept") >= 0;
         PartySaying = Flag("--party-say");
         LeavingAfter = double.TryParse(Flag("--leave-after"), out double leaveAfter) ? leaveAfter : -1;
