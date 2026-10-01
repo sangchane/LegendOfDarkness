@@ -124,9 +124,6 @@ public partial class GameScreen : Control
     private Control _pad = null!;
     private readonly List<(ThumbButton Key, Direction Where)> _keys = [];
     private double _stillFor = SettleSeconds;
-
-    // 방향키: 보고 있지 않은 쪽을 누르면 먼저 돌기만 하고, 이만큼 더 누르고 있어야 걷는다(원작처럼, 사용자 2026-10-02).
-    private const double TurnHoldSeconds = 0.2;
     private Direction? _holding;
     private double _holdFor;
     private bool _turnedFirst;

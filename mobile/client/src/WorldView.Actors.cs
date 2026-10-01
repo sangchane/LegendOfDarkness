@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Godot;
+using Lod.Mobile.Core;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.World;
 
@@ -265,7 +266,7 @@ public sealed partial class WorldView
                 _worn[one.Serial] = one.Wearing;
             }
 
-            actor.GoTo(Ground(one.Where), TileStep, StepSeconds);
+            actor.GoTo(Ground(one.Where), TileStep, Tuning.StepSeconds);
 
             // 매 프레임 돌려세우면 서 있는 그림으로 되돌아가 걷는 동작이 지워진다. 바뀔 때만.
             if (actor.Looking != one.Facing)
@@ -428,7 +429,7 @@ public sealed partial class WorldView
                 _herd[one.Serial] = actor;
             }
 
-            actor.GoTo(Ground(one.Where), TileStep, StepSeconds);
+            actor.GoTo(Ground(one.Where), TileStep, Tuning.StepSeconds);
 
             // 매 프레임 돌려세우면 서 있는 그림으로 되돌아가 걷는 동작이 지워진다. 바뀔 때만.
             if (actor.Looking != one.Facing)

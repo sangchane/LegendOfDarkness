@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Godot;
+using Lod.Mobile.Core;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.World;
 
@@ -29,10 +30,6 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // Monsters, named by the number the server calls them. It counts from 0x4000; the archive counts from 1.
     private const string CreatureFolder = "res://assets/actor/creature/";
     private const int CreatureNumbering = 0x4000;
-
-    /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in — 30% slower than the
-    /// original 0.28 so the walk can actually be seen on a phone (사용자, 2026-09-24), then 10% slower again (사용자, 2026-10-02).</summary>
-    private const double StepSeconds = 0.44;
 
     // Y sorting is what makes someone standing in front actually draw in front, which an isometric floor
     // needs: screen height is depth here.
@@ -453,7 +450,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         {
             _walked += delta;
 
-            double progress = Mathf.Min(1.0, _walked / StepSeconds);
+            double progress = Mathf.Min(1.0, _walked / Tuning.StepSeconds);
             _player.Position = _from.Lerp(_to, (float)progress);
 
             int frame = (int)(progress * WalkMotion.WalkFrames);

@@ -1,4 +1,5 @@
 using Godot;
+using Lod.Mobile.Core;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.World;
 
@@ -41,7 +42,7 @@ public partial class GameScreen : Control
                     _holdFor += delta;
                 }
 
-                if (!_turnedFirst || _holdFor >= TurnHoldSeconds)
+                if (!_turnedFirst || _holdFor >= Tuning.TurnHoldSeconds)
                 {
                     _world.Walk(where);
                 }

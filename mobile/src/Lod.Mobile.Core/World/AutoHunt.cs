@@ -100,7 +100,7 @@ public sealed record HuntSight
 /// </summary>
 /// <remarks>
 /// 걷는 빠르기는 여기서 재지 않는다 — 앱이 한 걸음이 끝난 뒤에만 <see cref="Next"/> 를 부르고, 그 한 걸음의 길이
-/// (<c>WorldView.StepSeconds</c>)가 서버 걷기 제한을 이미 지킨다. 평타·기술 간격은 여기서 잰다.
+/// (<see cref="Tuning.StepSeconds"/>)가 서버 걷기 제한을 이미 지킨다. 평타·기술 간격은 여기서 잰다.
 /// </remarks>
 public sealed class AutoHunt
 {

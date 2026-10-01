@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Lod.Mobile.Core;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.World;
 
@@ -304,8 +305,6 @@ public sealed partial class Actor : Node2D
         ShowFrame(_sheet.Motion?.Stand(Facing.Of(_direction).Side) ?? WalkMotion.Stand(Facing.Of(_direction).Side));
     }
 
-    private const double MotionSlowdown = 1.1;
-
     /// <summary>
     /// Swings once. Nothing follows from it here — whether it hit is the server's to say — and a swing
     /// already under way is left to finish rather than restarted.
@@ -338,7 +337,7 @@ public sealed partial class Actor : Node2D
         }
 
         // 모든 동작을 10% 느리게(사용자 2026-10-02).
-        secondsPerFrame *= MotionSlowdown;
+        secondsPerFrame *= Tuning.MotionSlowdown;
 
         if (_sheet.Motion is null)
         {
