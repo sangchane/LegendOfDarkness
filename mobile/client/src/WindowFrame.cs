@@ -282,13 +282,44 @@ public static class WindowFrame
     }
 
     /// <summary>A window title on the dark frame: light letters, a little larger than the body.</summary>
+    /// <summary>
+    /// The numbers several to a line, broken only between two of them — the engine's own wrapping breaks Korean between
+    /// any two letters ("요구 레 / 벨 41").
+    /// </summary>
+    public static string Packed(Label label, IReadOnlyList<string> numbers)
+    {
+        const float wide = 220;
+        const string gap = "   ";
+        Font font = label.GetThemeFont("font");
+        int size = label.GetThemeFontSize("font_size");
+        List<string> lines = [];
+
+        foreach (string number in numbers)
+        {
+            string joined = lines.Count > 0 ? lines[^1] + gap + number : number;
+
+            if (lines.Count > 0 && font.GetStringSize(joined, fontSize: size).X <= wide)
+            {
+                lines[^1] = joined;
+            }
+            else
+            {
+                lines.Add(number);
+            }
+        }
+
+        return string.Join("\n", lines);
+    }
+
     public static Label Title(string text)
     {
         Label title = new() { Text = text, VerticalAlignment = VerticalAlignment.Center, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         title.AddThemeColorOverride("font_color", Greybox.Title);
         title.AddThemeFontSizeOverride("font_size", 15);
         title.ClipText = true;
-        title.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
+
+        // 잘리면 글자를 지우고 왼쪽 용 문양만 남긴다(사용자 2026-10-01: 잘리면 아이콘으로만) — 「소지…」처럼 반만 보이지 않게.
+        title.Resized += () => title.Text = title.GetThemeFont("font").GetStringSize(text, fontSize: 15).X <= title.Size.X ? text : string.Empty;
 
         return title;
     }

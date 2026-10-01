@@ -342,35 +342,6 @@ public sealed partial class PackPanel : PanelContainer
         }
     }
 
-    /// <summary>
-    /// The numbers several to a line, broken only between two of them — the engine's own wrapping breaks Korean between
-    /// any two letters ("요구 레 / 벨 41").
-    /// </summary>
-    private string Packed(IReadOnlyList<string> numbers)
-    {
-        const float wide = 220;
-        const string gap = "   ";
-        Font font = _actionStats.GetThemeFont("font");
-        int size = _actionStats.GetThemeFontSize("font_size");
-        List<string> lines = [];
-
-        foreach (string number in numbers)
-        {
-            string joined = lines.Count > 0 ? lines[^1] + gap + number : number;
-
-            if (lines.Count > 0 && font.GetStringSize(joined, fontSize: size).X <= wide)
-            {
-                lines[^1] = joined;
-            }
-            else
-            {
-                lines.Add(number);
-            }
-        }
-
-        return string.Join("\n", lines);
-    }
-
     private static Button KindTab(string name)
     {
         Button tab = new() { Text = name, ToggleMode = true, FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(40, Main.TouchMinimum) };
@@ -418,6 +389,9 @@ public sealed partial class PackPanel : PanelContainer
 
     /// <summary>Somebody asked to throw a carried thing away. The server decides whether it may be.</summary>
     public event System.Action<int, int>? Dropped;
+
+    /// <summary>What is worn now — the info box weighs a carried thing against what is on in its place.</summary>
+    public IReadOnlyList<WornItem> Worn { get; set; } = [];
 
     /// <summary>The button that pulls everything to the front of the pack.</summary>
     public Button Tidy { get; }
@@ -639,9 +613,17 @@ public sealed partial class PackPanel : PanelContainer
             _actionIcon.Texture = ItemIcons.For(held.Icon);
             _actionLine.Text = ItemActions.Line(held);
             _actionLine.Visible = _actionLine.Text.Length > 0;
-            _actionStats.Text = Packed(ItemActions.Stats(held));
+            WornItem? instead = ItemActions.WornInstead(held, Worn);
+            _actionStats.Text = WindowFrame.Packed(_actionStats, ItemActions.Stats(held, instead?.Stats));
+
+            // 같은 자리에 걸친 것이 있으면 그것과 견준다(▲ 나음 · ▼ 못함).
+            if (instead is not null)
+            {
+                _actionLine.Text = _actionLine.Text.Length > 0 ? $"{_actionLine.Text} · {instead.Called} 착용 중" : $"{instead.Called} 착용 중";
+                _actionLine.Visible = true;
+            }
             _actionStats.Visible = _actionStats.Text.Length > 0;
-            WindowFrame.Relabel(_use, ItemActions.Primary(held));
+            WindowFrame.Relabel(_use, ItemActions.Primary(held, Worn));
             _use.Visible = true;
             _drop.Visible = true;
             _dropCount.MaxValue = System.Math.Max(1, held.Stacks);

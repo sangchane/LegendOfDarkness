@@ -6,8 +6,6 @@ namespace Lod.Mobile.Core.World;
 /// </summary>
 public static class ItemActions
 {
-    /// <summary>The main thing to do with something carried — the server's 0x1C does both; only the word differs.</summary>
-    public static string Primary(InventoryItem item) => IsGear(item) ? "입기" : "사용";
 
     /// <summary>Gear is what wears out — the 장비 tab of the pack, and the 입기 word.</summary>
     public static bool IsGear(InventoryItem item) => item.MaxDurability > 0;
@@ -18,28 +16,34 @@ public static class ItemActions
         : string.Empty;
 
     /// <summary>
-    /// The numbers under the name in the info box, one line each, only those that say something — what the other games'
-    /// item bubble shows (사용자 2026-10-01). Empty when the server sent none.
+    /// The numbers under the name in the info box, only those that say something — what other games' item bubble shows
+    /// (사용자 2026-10-01). Given what is <paramref name="worn" /> in the same place, each number also says how much better
+    /// (▲) or worse (▼) it is than that, and a number only the worn thing has shows as 0 ▼. Armour class is better lower.
+    /// Empty when the server sent none.
     /// </summary>
-    public static IReadOnlyList<string> Stats(InventoryItem item)
+    public static IReadOnlyList<string> Stats(ItemStats? s, ItemStats? worn = null)
     {
-        if (item.Stats is not { } s)
+        if (s is null)
         {
             return [];
         }
 
         List<string> lines = [];
 
-        if (s.DmgMax > 0) lines.Add($"공격력 {s.DmgMin}~{s.DmgMax}");
-        if (s.Ac != 0) lines.Add($"방어 {s.Ac:+0;-0}");
+        if (s.DmgMax > 0 || worn?.DmgMax > 0) lines.Add($"공격력 {s.DmgMin}~{s.DmgMax}{Change(s.DmgMax, worn?.DmgMax, false)}");
 
-        foreach ((string name, int value) in new[]
+        foreach ((string name, int value, int? before, bool lowerIsBetter) in new[]
                  {
-                     ("명중", s.Hit), ("타격", s.Dmg), ("힘", s.Str), ("지능", s.Int), ("지혜", s.Wis), ("체력", s.Con),
-                     ("민첩", s.Dex), ("마법 방어", s.Mr), ("HP", s.Hp), ("MP", s.Mp)
+                     ("방어", s.Ac, worn?.Ac, true), ("명중", s.Hit, worn?.Hit, false), ("타격", s.Dmg, worn?.Dmg, false),
+                     ("힘", s.Str, worn?.Str, false), ("지능", s.Int, worn?.Int, false), ("지혜", s.Wis, worn?.Wis, false),
+                     ("체력", s.Con, worn?.Con, false), ("민첩", s.Dex, worn?.Dex, false), ("마법 방어", s.Mr, worn?.Mr, false),
+                     ("HP", s.Hp, worn?.Hp, false), ("MP", s.Mp, worn?.Mp, false)
                  })
         {
-            if (value != 0) lines.Add($"{name} {value:+0;-0}");
+            if (value != 0 || before is not (null or 0))
+            {
+                lines.Add($"{name} {value:+0;-0;0}{Change(value, before, lowerIsBetter)}");
+            }
         }
 
         if (Element(s.Offense) is { Length: > 0 } offense) lines.Add($"공격 속성 {offense}");
@@ -54,6 +58,42 @@ public static class ItemActions
 
         return lines;
     }
+
+    public static IReadOnlyList<string> Stats(InventoryItem item, ItemStats? worn = null) => Stats(item.Stats, worn);
+
+    private static string Change(int now, int? before, bool lowerIsBetter)
+    {
+        if (before is not { } was || was == now)
+        {
+            return string.Empty;
+        }
+
+        bool better = lowerIsBetter ? now < was : now > was;
+
+        return $" {(better ? "▲" : "▼")}{Math.Abs(now - was)}";
+    }
+
+    /// <summary>
+    /// What is worn where a carried thing would go, so the info box can set them side by side — null when that place
+    /// is empty (a ring or a gauntlet has two places; it counts as empty while either is). Null too for what is not
+    /// gear or when the server sent no place.
+    /// </summary>
+    public static WornItem? WornInstead(InventoryItem item, IReadOnlyList<WornItem> worn)
+    {
+        if (item.Stats is not { Place: > 0 } s)
+        {
+            return null;
+        }
+
+        int[] places = s.Place switch { 7 or 8 => [7, 8], 9 or 10 => [9, 10], _ => [s.Place] };
+        WornItem?[] there = [.. places.Select(place => worn.FirstOrDefault(on => on.Slot == place))];
+
+        return there.Any(on => on is null) ? null : there.FirstOrDefault(on => on!.Slot == s.Place) ?? there[0];
+    }
+
+    /// <summary>The main button for a carried thing — the server's 0x1C does all three; only the word differs: 교체 when it takes a worn thing's place, 장착 into an empty one, 사용 otherwise.</summary>
+    public static string Primary(InventoryItem item, IReadOnlyList<WornItem> worn) =>
+        !IsGear(item) ? "사용" : WornInstead(item, worn) is not null ? "교체" : "장착";
 
     private static readonly string[] Paths = ["평민", "전사", "도적", "마법사", "성직자", "무도가"];
 

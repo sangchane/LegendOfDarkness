@@ -280,14 +280,15 @@ public sealed record InventoryItem(
     ItemStats? Stats = null);
 
 /// <summary>
-/// What a carried thing does, as our server adds after the original 0x0F (우리 확장, 2026-10-01). Bonuses are signed —
+/// What a carried or worn thing does, as our server adds after the original 0x0F and 0x37 (우리 확장, 2026-10-01). Bonuses are signed —
 /// armour class goes down when it gets better, as in the original. <see cref="Class" /> is 0 for anyone; the elements
-/// are the server's numbers (1 불 · 2 물 · 3 바람 · 4 땅 · 5 빛 · 6 어둠).
+/// are the server's numbers (1 불 · 2 물 · 3 바람 · 4 땅 · 5 빛 · 6 어둠). <see cref="Place" /> is the worn place it goes
+/// to, as 0x37 numbers it (0 for none).
 /// </summary>
 public sealed record ItemStats(
     int Ac, int Hit, int Dmg, int Str, int Int, int Wis, int Con, int Dex, int Mr,
     int Hp, int Mp, int DmgMin, int DmgMax,
-    int Level, int Class, int Stage, int Weight, int Offense, int Defense, long Value);
+    int Level, int Class, int Stage, int Weight, int Offense, int Defense, long Value, int Place);
 
 /// <summary>One learned technique in the character's skill pane.</summary>
 /// <param name="Slot">The server-owned pane slot used again when the skill is activated.</param>
@@ -330,7 +331,8 @@ public sealed record WornItem(
     string Name,
     string Called,
     long Durability,
-    long MaxDurability);
+    long MaxDurability,
+    ItemStats? Stats = null);
 
 /// <summary>
 /// The names of the places gear is worn, so a screen can say "신발" rather than "13". Straight from the

@@ -1926,23 +1926,23 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             // Byte 4 says whether it stacks, which the count already tells us.
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest[9..]),
             (int)BinaryPrimitives.ReadUInt32BigEndian(rest[5..]),
-            ReadItemStats(rest[13..]));
+            ReadItemStats(rest[17..]));
     }
 
     /// <summary>
-    /// Our server's addition after the original's last four bytes: a 1, then the item's numbers (ServerFormat0F). An
-    /// original server ends there, so there is nothing to show.
+    /// Our server's addition after the original's end of 0x0F and 0x37: a 1, then the item's numbers
+    /// (ServerFormat0F.WriteNumbers). An original server ends there, so there is nothing to show.
     /// </summary>
     private static ItemStats? ReadItemStats(ReadOnlySpan<byte> tail)
     {
-        const int size = 4 + 1 + (9 * 2) + (4 * 4) + 6 + 4;
+        const int size = 1 + (9 * 2) + (4 * 4) + 6 + 4 + 1;
 
-        if (tail.Length < size || tail[4] != 1)
+        if (tail.Length < size || tail[0] != 1)
         {
             return null;
         }
 
-        ReadOnlySpan<byte> s = tail[5..];
+        ReadOnlySpan<byte> s = tail[1..];
         ReadOnlySpan<byte> wide = s[18..];
         ReadOnlySpan<byte> small = wide[16..];
 
@@ -1950,7 +1950,8 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             Short(s, 0), Short(s, 1), Short(s, 2), Short(s, 3), Short(s, 4), Short(s, 5), Short(s, 6), Short(s, 7), Short(s, 8),
             Int(wide, 0), Int(wide, 1), Int(wide, 2), Int(wide, 3),
             small[0], small[1], small[2], small[3], small[4], small[5],
-            BinaryPrimitives.ReadUInt32BigEndian(small[6..]));
+            BinaryPrimitives.ReadUInt32BigEndian(small[6..]),
+            small[10]);
     }
 
     private static int Short(ReadOnlySpan<byte> from, int nth) => BinaryPrimitives.ReadInt16BigEndian(from[(nth * 2)..]);
@@ -1987,7 +1988,8 @@ public sealed class WorldClient(WorldSession session) : IDisposable
             name,
             called,
             BinaryPrimitives.ReadUInt32BigEndian(wear),
-            BinaryPrimitives.ReadUInt32BigEndian(wear[4..]));
+            BinaryPrimitives.ReadUInt32BigEndian(wear[4..]),
+            ReadItemStats(wear[8..]));
     }
 
     /// <summary>A skill pane row: slot, icon, then its display name as a short string.</summary>

@@ -9,7 +9,7 @@ namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
 /// 우리 확장 — 소지품 0x0F 끝에 아이템 수치를 덧붙인다(ServerFormat0F, 2026-10-01). 도복 템플릿(방어 10 빼기 · 레벨 1 · 무도가 ·
-/// 무게 4)이 앱의 정보 상자 줄까지 그대로 오는지 본다.
+/// 무게 4)이 앱의 정보 상자 줄까지 그대로 오는지, 입으면 장비(0x37)에도 오는지 본다.
 /// </summary>
 public sealed class ItemNumbersTests : IDisposable
 {
@@ -29,6 +29,10 @@ public sealed class ItemNumbersTests : IDisposable
         server.Start(TimeSpan.FromMinutes(2));
 
         LoginFlow.TryCreateAccount(server, Name);
+        string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
+        JsonNode aisling = JsonNode.Parse(File.ReadAllText(saved))!;
+        aisling["Path"] = 5; // 도복은 무도가 옷
+        File.WriteAllText(saved, aisling.ToJsonString());
         using WorldSession session = await HadesLoginClient.LoginAsync(
             IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
         WorldClient world = new(session);
@@ -43,6 +47,15 @@ public sealed class ItemNumbersTests : IDisposable
 
         Assert.NotNull(robe!.Stats);
         Assert.Equal(["방어 -10", "요구 레벨 1 · 무도가", "무게 4"], ItemActions.Stats(robe));
+        Assert.Equal(2, robe.Stats!.Place); // 갑옷 자리
+        // 새 캐릭터는 처음부터 옷을 입고 있다 — 그러면 갑옷 자리를 바꾸는 것이다.
+        Assert.Equal(world.Worn.Any(on => on.Slot == 2) ? "교체" : "장착", ItemActions.Primary(robe, world.Worn));
+
+        // 입으면 장비창(0x37)에도 같은 수치가 온다.
+        await world.UseAsync(robe.Slot, _deadline.Token);
+        WornItem? worn = null;
+        await Until(() => (worn = world.Worn.FirstOrDefault(on => on.Slot == 2 && on.Name == "도복")) is not null, $"도복을 입지 못했습니다: {world.Said}");
+        Assert.Equal(["방어 -10", "요구 레벨 1 · 무도가", "무게 4"], ItemActions.Stats(worn!.Stats));
     }
 
     private async Task Until(Func<bool> condition, string failure)

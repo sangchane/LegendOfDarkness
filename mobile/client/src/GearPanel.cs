@@ -22,7 +22,14 @@ public sealed partial class GearPanel : PanelContainer
     private readonly PanelContainer _action = new() { Name = "GearAction", TopLevel = true, Visible = false, ZIndex = 5 };
     private readonly Label _actionName = new();
     private readonly Label _actionLine = new();
-    private readonly Button _off = WindowFrame.IconButton(GlyphKind.TakeOff, "벗기", width: 56);
+    private readonly Label _actionStats = new();
+    private readonly TextureRect _actionIcon = new()
+    {
+        CustomMinimumSize = new Vector2(40, 40),
+        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
+    };
+    private readonly Button _off = WindowFrame.IconButton(GlyphKind.TakeOff, "장착 해제", width: 56);
     private readonly DoubleTap _taps = new();
 
     // 고른 자리(서버 번호), 없으면 0. 무엇을 그렸는지 — 같으면 다시 그리지 않는다.
@@ -81,16 +88,27 @@ public sealed partial class GearPanel : PanelContainer
         plate.SetCornerRadiusAll(10);
         plate.SetContentMarginAll(6);
         _action.AddThemeStyleboxOverride("panel", plate);
-        _actionName.AddThemeColorOverride("font_color", Greybox.Text);
-        _actionName.AddThemeFontSizeOverride("font_size", 13);
+        _actionName.AddThemeColorOverride("font_color", Greybox.Title);
+        _actionName.AddThemeFontSizeOverride("font_size", 15);
         _actionLine.AddThemeColorOverride("font_color", Greybox.Muted);
-        _actionLine.AddThemeFontSizeOverride("font_size", 11);
+        _actionLine.AddThemeFontSizeOverride("font_size", 12);
+        _actionStats.AddThemeColorOverride("font_color", Greybox.Text);
+        _actionStats.AddThemeFontSizeOverride("font_size", 12);
+
+        // 소지품 정보 상자와 같은 모양 — 그림 · 이름 · 내구, 그 아래 수치. [장착 해제]는 오른쪽 위(사용자 2026-10-01).
+        VBoxContainer words = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        words.AddChild(_actionName);
+        words.AddChild(_actionLine);
+        HBoxContainer top = new();
+        top.AddThemeConstantOverride("separation", Main.Gutter);
+        top.AddChild(_actionIcon);
+        top.AddChild(words);
+        top.AddChild(_off);
 
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);
-        column.AddChild(_actionName);
-        column.AddChild(_actionLine);
-        column.AddChild(_off);
+        column.AddChild(top);
+        column.AddChild(_actionStats);
         _action.AddChild(column);
 
         AddChild(_gear);
@@ -177,8 +195,11 @@ public sealed partial class GearPanel : PanelContainer
         {
             // 걸친 것은 바로 버릴 수 없다 — 벗어서 소지품에 든 다음에야. 남의 것은 부위 이름만 온다.
             _actionName.Text = picked.Called;
+            _actionIcon.Texture = ItemIcons.For(picked.Icon);
             _actionLine.Text = _other is null ? ItemActions.Line(picked) : string.Empty;
             _actionLine.Visible = _other is null;
+            _actionStats.Text = WindowFrame.Packed(_actionStats, ItemActions.Stats(picked.Stats));
+            _actionStats.Visible = _actionStats.Text.Length > 0;
             _off.Visible = _other is null;
             _action.ResetSize();
         }

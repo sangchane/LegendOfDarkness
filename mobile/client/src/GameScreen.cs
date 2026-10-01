@@ -1266,6 +1266,7 @@ public partial class GameScreen : Control
 
         if (_pack.Visible)
         {
+            _pack.Worn = _server?.Worn ?? LayoutCheck.PretendWorn;
             _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, Mine.Gold);
 
             // 손 없이 확인할 때만. 목록이 채워진 다음 프레임에 첫 줄을 한 번 누른다.

@@ -60,12 +60,14 @@ public sealed class PackTests
             0x00, 0x00, 0x01, 0xF4, 0x00, 0x00, 0x00, 0x00, // HP +500 · MP
             0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x28, // 공격력 20~40
             41, 5, 0, 3, 1, 0,                          // 레벨 41 · 무도가 · 단계 · 무게 3 · 불 · 없음
-            0x00, 0x00, 0x03, 0xE8                      // 값 1000
+            0x00, 0x00, 0x03, 0xE8,                     // 값 1000
+            13                                          // 신발 자리
         ];
 
         InventoryItem carried = WorldClient.ReadPackItem([.. Carrying("Boots"), .. numbers]);
 
         Assert.Equal(42, carried.Durability);
+        Assert.Equal(13, carried.Stats!.Place);
         Assert.Equal(
             ["공격력 20~40", "방어 -5", "명중 +2", "힘 +3", "마법 방어 +10", "HP +500", "공격 속성 불", "요구 레벨 41 · 무도가", "무게 3"],
             ItemActions.Stats(carried));
