@@ -12,6 +12,17 @@ public partial class GameScreen : Control
 {
     private const int AuxFontSize = 14;
     private Label _wealth = null!;
+    private Label _level = null!;
+
+    // 위 판·위 메뉴 — 롤(LoL) 클라이언트 색(사용자 2026-10-02, docs/hud-renewal-references.md).
+    private static readonly Color LolBack = new(0.004f, 0.039f, 0.075f, 0.88f); // #010A13
+    private static readonly Color LolGold = new("#C8AA6E");
+    private static readonly Color LolGoldDark = new("#785A28");
+    private static readonly Color LolCoin = new("#C89B3C");
+    private static readonly Color LolText = new("#F0E6D2");
+    private static readonly Color LolMuted = new("#A09B8C");
+    private static readonly Color HudHealth = new("#D6463C");
+    private static readonly Color HudMana = new("#2C7BD6");
     private bool _shopPreviewed;
 
     /// <summary>체력·마력 막대의 높이 — 숫자를 막대 안에 얹으므로(2026-09-27) 글자 한 줄이 들 만큼.</summary>
@@ -695,9 +706,25 @@ public partial class GameScreen : Control
         headline.AddThemeConstantOverride("separation", Main.Gutter);
         _myStatus.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _myStatus.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+        // 첫 줄: 레벨 배지(금테 동그라미) · 금색 이름 · 금화.
+        _level = new Label { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        _level.AddThemeFontSizeOverride("font_size", 10);
+        _level.AddThemeColorOverride("font_color", LolText);
+        PanelContainer badge = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter, CustomMinimumSize = new Vector2(22, 18) };
+        StyleBoxFlat round = new() { BgColor = new Color("#0A1428"), BorderColor = LolCoin };
+        round.SetBorderWidthAll(1);
+        round.SetCornerRadiusAll(9);
+        round.SetContentMarginAll(1);
+        badge.AddThemeStyleboxOverride("panel", round);
+        badge.AddChild(_level);
+        badge.Visible = false;
+        _who.VisibilityChanged += () => badge.Visible = _who.Visible;
+        headline.AddChild(badge);
         headline.AddChild(_who);
+        _who.AddThemeColorOverride("font_color", LolGold);
         _wealth = Aux(string.Empty);
         _wealth.AddThemeFontSizeOverride("font_size", 11);
+        _wealth.AddThemeColorOverride("font_color", LolCoin);
         headline.AddChild(_wealth);
         mine.AddChild(headline);
         mine.AddChild(BuildVitals());
@@ -707,7 +734,7 @@ public partial class GameScreen : Control
         // 만큼 조작 줄을 밀어내지 않게(판 네 줄이 80 안에 들어야 한다).
         _who.Visible = false;
         _who.AddThemeFontSizeOverride("font_size", 12);
-        row.AddChild(Plated(mine, compact: !Main.Portrait));
+        row.AddChild(LolPlated(mine, compact: !Main.Portrait));
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
         _target = Aux(string.Empty);
@@ -742,47 +769,24 @@ public partial class GameScreen : Control
         HBoxContainer actions = new() { MouseFilter = MouseFilterEnum.Ignore };
         actions.AddThemeConstantOverride("separation", Main.Gutter);
 
-        Button pack = new()
-        {
-            Text = "인벤토리",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(pack);
+        // 위 메뉴는 그림 + 아래 글자, 반투명 원에 금테만 — 뒤가 비친다(사용자 2026-10-02).
+        Button pack = MenuButton("인벤토리", "res://assets/item/40999.png", pixel: true);
         pack.Pressed += () => Carrying(!_pack.Visible);
         actions.AddChild(pack);
 
         // 장비는 소지품 탭에서 빼서 따로 연다(사용자, 2026-10-01).
-        Button gear = new()
-        {
-            Text = "장비",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(gear);
+        Button gear = MenuButton("장비", "res://assets/item/32786.png", pixel: true);
         gear.Pressed += () => Dressing(!_gearPanel.Visible);
         actions.AddChild(gear);
 
         // 월드맵은 인벤토리·설정과 같은 보통 단추(2026-09-26 3차 — 2차의 마름모 단추는 요청을 잘못 읽은 것이었다. 맨 왼쪽으로
         // 가는 것은 미니맵이다). 누르면 카드형 월드맵.
-        _map = new Button
-        {
-            Text = "월드맵",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(_map);
+        _map = MenuButton("월드맵", "res://assets/ui/menu-map.png");
         _map.Pressed += () => _ = _server?.OpenFieldAsync(System.Threading.CancellationToken.None);
         actions.AddChild(_map);
         actions.MoveChild(_map, 0);
 
-        Button settings = new()
-        {
-            Text = "설정",
-            CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum)
-        };
-
-        Greybox.Plain(settings);
+        Button settings = MenuButton("설정", "res://assets/ui/menu-settings.png");
         settings.Pressed += () => SetWindow(GameWindow.Settings, !_settings.Visible);
         actions.AddChild(settings);
 
@@ -797,11 +801,6 @@ public partial class GameScreen : Control
             middle.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             second.AddChild(middle);
             second.AddChild(actions);
-
-            foreach (Button action in new Button[] { _map, pack, gear, settings })
-            {
-                action.CustomMinimumSize = new Vector2(64, Main.TouchMinimum);
-            }
 
             VBoxContainer top = new() { MouseFilter = MouseFilterEnum.Ignore };
             top.AddThemeConstantOverride("separation", Main.Gutter);
@@ -996,6 +995,95 @@ public partial class GameScreen : Control
     /// A panel over the world: an original stone frame with a dark, nearly opaque inside. The frame is what
     /// carries the theme; the inside is flat, because a pattern under small text is the first thing to fail.
     /// </summary>
+    /// <summary>
+    /// The top-right plate in the LoL client's dress: near-opaque blue-black, corners cut at 45° (not rounded), a dark gold
+    /// rim with a thin bright gold line inside it (사용자 2026-10-02: 테두리가 촌스럽다 → 롤 같게).
+    /// </summary>
+    private static Control LolPlated(Control inside, bool compact)
+    {
+        StyleBoxFlat outer = new() { BgColor = LolBack, BorderColor = LolGoldDark, CornerDetail = 1 };
+        outer.SetBorderWidthAll(2);
+        outer.SetCornerRadiusAll(7);
+        outer.SetContentMarginAll(1);
+
+        StyleBoxFlat line = new() { DrawCenter = false, BorderColor = LolGold, CornerDetail = 1 };
+        line.SetBorderWidthAll(1);
+        line.SetCornerRadiusAll(6);
+        line.SetContentMarginAll(5);
+        // 가로는 판이 미니맵 높이(76) 안에 들어야 해 위아래 여백을 뺀다.
+        if (compact)
+        {
+            outer.SetContentMarginAll(0);
+            line.ContentMarginTop = line.ContentMarginBottom = 0;
+        }
+
+        PanelContainer inner = new();
+        inner.AddThemeStyleboxOverride("panel", line);
+        inner.AddChild(inside);
+
+        PanelContainer plate = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+        plate.AddThemeStyleboxOverride("panel", outer);
+        plate.AddChild(inner);
+
+        return plate;
+    }
+
+    /// <summary>
+    /// A top-menu button: a picture in a see-through dark ring with a thin dark-gold rim, its name small underneath — no
+    /// plate, so the world shows through. Original item pictures (<paramref name="pixel" />) are drawn at their own size,
+    /// never enlarged; the drawn ones are shrunk to fit.
+    /// </summary>
+    private static Button MenuButton(string name, string art, bool pixel = false)
+    {
+        Button button = new() { CustomMinimumSize = new Vector2(56, 52), FocusMode = FocusModeEnum.None, TooltipText = name };
+
+        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus", "disabled" })
+        {
+            button.AddThemeStyleboxOverride(state, new StyleBoxEmpty());
+        }
+
+        StyleBoxFlat ring = new() { BgColor = new Color(0, 0, 0, 0.35f), BorderColor = LolGoldDark };
+        ring.SetBorderWidthAll(1);
+        ring.SetCornerRadiusAll(18);
+        PanelContainer circle = new()
+        {
+            CustomMinimumSize = new Vector2(36, 36),
+            SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        circle.AddThemeStyleboxOverride("panel", ring);
+
+        TextureRect picture = new()
+        {
+            Texture = ResourceLoader.Exists(art) ? GD.Load<Texture2D>(art) : null,
+            CustomMinimumSize = new Vector2(28, 28),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = pixel ? TextureRect.StretchModeEnum.KeepCentered : TextureRect.StretchModeEnum.KeepAspectCentered,
+            TextureFilter = pixel ? TextureFilterEnum.Nearest : TextureFilterEnum.Linear,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        circle.AddChild(picture);
+
+        Label word = new() { Text = name, HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = MouseFilterEnum.Ignore };
+        word.AddThemeFontSizeOverride("font_size", 11);
+        word.AddThemeColorOverride("font_color", LolText);
+        word.AddThemeColorOverride("font_outline_color", Colors.Black);
+        word.AddThemeConstantOverride("outline_size", 3);
+
+        VBoxContainer stack = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.Center };
+        stack.AddThemeConstantOverride("separation", 0);
+        stack.SetAnchorsPreset(LayoutPreset.FullRect);
+        stack.AddChild(circle);
+        stack.AddChild(word);
+        button.AddChild(stack);
+
+        // 누르는 동안 테두리가 밝은 금으로.
+        button.ButtonDown += () => ring.BorderColor = LolGold;
+        button.ButtonUp += () => ring.BorderColor = LolGoldDark;
+
+        return button;
+    }
+
     private static Control Plated(Control inside, bool compact = false)
     {
         PanelContainer inner = new();
@@ -1059,7 +1147,8 @@ public partial class GameScreen : Control
         {
             _who.Text = called;
             _who.TooltipText = called;
-            _wealth.Text = $"Lv{Mine.Level} · {GoldText(Mine.Gold)}";
+            _wealth.Text = GoldText(Mine.Gold);
+            _level.Text = $"{Mine.Level}";
             _who.Visible = true;
         }
 
@@ -2080,9 +2169,9 @@ public partial class GameScreen : Control
 
         // 경험치도 게이지로 — 이번 레벨에 모은 양 / 드는 양(사용자 요청 2026-09-26: "문구는 필요 없으니 게이지로 하고 필요한
         // 경험치 표기"). 서버는 남은 양만 보내므로 드는 양은 원작 표(ExperienceGauge)에서 읽는다.
-        vitals.AddChild(Gauge("체력", Greybox.Health, out _healthBar, out _healthText));
-        vitals.AddChild(Gauge("마력", Greybox.Mana, out _manaBar, out _manaText));
-        vitals.AddChild(Gauge("EXP", Greybox.Title, out _experienceBar, out _experienceText));
+        vitals.AddChild(Gauge("체력", HudHealth, out _healthBar, out _healthText, ticks: true));
+        vitals.AddChild(Gauge("마력", HudMana, out _manaBar, out _manaText, ticks: true));
+        vitals.AddChild(Gauge("EXP", LolCoin, out _experienceBar, out _experienceText));
 
         return vitals;
     }
@@ -2093,7 +2182,7 @@ public partial class GameScreen : Control
     /// over-the-head bar (HealthBar) still carries how a fight is going; this one is the place the numbers are
     /// always exact, so the bar and the numbers are read together rather than the same thing drawn twice.
     /// </summary>
-    private static Control Gauge(string name, Color paint, out ProgressBar bar, out Label text)
+    private static Control Gauge(string name, Color paint, out ProgressBar bar, out Label text, bool ticks = false)
     {
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter / 2);
@@ -2101,6 +2190,7 @@ public partial class GameScreen : Control
         // 구슬만 두었더니 무엇을 뜻하는지 알 수 없다는 말을 들었다(사용자, 2026-09-18). 이름을 되살린다 —
         // 색은 거드는 것이지 뜻을 나르는 것이 아니다.
         Label named = Aux(name);
+        named.AddThemeColorOverride("font_color", LolMuted);
         if (!Main.Portrait) named.AddThemeFontSizeOverride("font_size", GaugeFontSize);
 
         bar = new ProgressBar
@@ -2110,8 +2200,31 @@ public partial class GameScreen : Control
             ShowPercentage = false,
             SizeFlagsVertical = SizeFlags.ShrinkCenter
         };
-        bar.AddThemeStyleboxOverride("background", Greybox.Surface());
-        bar.AddThemeStyleboxOverride("fill", Greybox.Fill(paint));
+        // 롤 막대: 어두운 홈 + 얇은 회색 선, 채움은 위가 밝은 그라데이션, 체력·마력은 그 위에 얇은 눈금과 광택 한 줄.
+        StyleBoxFlat trough = new() { BgColor = new Color("#050D18"), BorderColor = new Color("#3B3B3B") };
+        trough.SetBorderWidthAll(1);
+        bar.AddThemeStyleboxOverride("background", trough);
+        bar.AddThemeStyleboxOverride("fill", LolFill(paint));
+
+        if (ticks)
+        {
+            ProgressBar measured = bar;
+            Control marks = new() { MouseFilter = MouseFilterEnum.Ignore };
+            marks.SetAnchorsPreset(LayoutPreset.FullRect);
+            marks.Draw += () =>
+            {
+                float filled = (float)(measured.Value / measured.MaxValue) * marks.Size.X;
+                marks.DrawLine(new Vector2(1, 1.5f), new Vector2(Mathf.Max(1, filled - 1), 1.5f), new Color(1, 1, 1, 0.3f));
+
+                for (float x = 12; x < filled - 1; x += 12)
+                {
+                    marks.DrawLine(new Vector2(x, 2), new Vector2(x, marks.Size.Y - 2), new Color(0, 0, 0, 0.45f));
+                }
+            };
+            bar.ValueChanged += _ => marks.QueueRedraw();
+            bar.Resized += marks.QueueRedraw;
+            bar.AddChild(marks);
+        }
 
         text = Greybox.OnBar(bar, GaugeFontSize);
 
@@ -2132,8 +2245,8 @@ public partial class GameScreen : Control
         }
 
         _shownVitals = mine;
-        Fill(_healthBar, _healthText, mine.Health, mine.MaximumHealth, Greybox.Health);
-        Fill(_manaBar, _manaText, mine.Mana, mine.MaximumMana, Greybox.Mana);
+        Fill(_healthBar, _healthText, mine.Health, mine.MaximumHealth, HudHealth);
+        Fill(_manaBar, _manaText, mine.Mana, mine.MaximumMana, HudMana);
 
         if (ExperienceGauge.Of(mine.Level, mine.ExperienceToGo) is { } exp)
         {
@@ -2163,7 +2276,18 @@ public partial class GameScreen : Control
 
         text.Text = $"{left}/{most}";
 
-        bar.AddThemeStyleboxOverride("fill", Greybox.Fill(most > 0 && left <= most * 0.15 ? Greybox.Gone : paint));
+        bar.AddThemeStyleboxOverride("fill", LolFill(most > 0 && left <= most * 0.15 ? Greybox.Gone : paint));
+    }
+
+    /// <summary>A bar's fill brighter at the top and darker at the bottom, as the LoL bars are.</summary>
+    private static StyleBoxTexture LolFill(Color paint)
+    {
+        Gradient shade = new() { Colors = [paint.Lightened(0.15f), paint.Darkened(0.4f)], Offsets = [0, 1] };
+
+        return new StyleBoxTexture
+        {
+            Texture = new GradientTexture2D { Gradient = shade, FillFrom = new Vector2(0, 0), FillTo = new Vector2(0, 1), Width = 4, Height = 16 }
+        };
     }
 
     /// <summary>
