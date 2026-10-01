@@ -63,7 +63,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Button _askDrop = new() { Text = "버리기", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Button _askCancel = new() { Text = "취소", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
-    private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기");
+    private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", tab: true);
     private readonly DoubleTap _taps = new();
     private readonly SpinBox _dropCount = new() { MinValue = 1, MaxValue = 1, Step = 1, Value = 1, CustomMinimumSize = new Vector2(80, Main.TouchMinimum) };
 
@@ -254,26 +254,21 @@ public sealed partial class PackPanel : PanelContainer
             }
         };
 
-        // 버리기는 위 줄에(사용자 2026-10-01) — 고른 것을 버린다. 묶음이면 몇 개인지 묻고(기본 전부), 하나면 바로.
-        _drop.Pressed += () =>
+        // 버리기는 위 줄에 켜고 끄는 단추(사용자 2026-10-01) — 켜 둔 동안 누르는 것마다 버린다. 창을 닫으면 꺼진다.
+        _drop.Toggled += on =>
         {
-            if (_held is not { } held)
-            {
-                return;
-            }
-
-            if (held.Stacks <= 1)
-            {
-                Dropped?.Invoke(held.Slot, 1);
-                _action.Visible = false;
-                return;
-            }
-
-            _askName.Text = $"{held.Name} — 몇 개 버릴까요?";
-            _dropCount.MaxValue = held.Stacks;
-            _dropCount.Value = held.Stacks;
+            _dropping = on;
+            _chosen = 0;
+            _showing = null;
             _action.Visible = false;
-            _ask.Visible = true;
+            _ask.Visible = false;
+        };
+        VisibilityChanged += () =>
+        {
+            if (!Visible)
+            {
+                _drop.ButtonPressed = false;
+            }
         };
 
         _askDrop.Pressed += () =>
@@ -493,10 +488,18 @@ public sealed partial class PackPanel : PanelContainer
         {
             if (cell is Button button)
             {
-                button.EmitSignal(BaseButton.SignalName.Pressed);
-                // 누른 칸이 그려지려면 Show 가 한 번 돌아야 한다 — 손 없는 확인만 그 자리에서 고른 것을 채운다.
-                ShowChosen(_lastCarried);
-                (throwing ? _drop : _use).EmitSignal(BaseButton.SignalName.Pressed);
+                // 버리기는 켜 두고 누른다. 입기는 누른 칸이 그려지려면 Show 가 한 번 돌아야 해 그 자리에서 고른 것을 채운다.
+                if (throwing)
+                {
+                    _drop.ButtonPressed = true;
+                    button.EmitSignal(BaseButton.SignalName.Pressed);
+                }
+                else
+                {
+                    button.EmitSignal(BaseButton.SignalName.Pressed);
+                    ShowChosen(_lastCarried);
+                    _use.EmitSignal(BaseButton.SignalName.Pressed);
+                }
 
                 if (_ask.Visible)
                 {
@@ -583,6 +586,12 @@ public sealed partial class PackPanel : PanelContainer
             {
                 if (_swiped)
                 {
+                    return;
+                }
+
+                if (_dropping)
+                {
+                    Throw(item);
                     return;
                 }
 
@@ -691,7 +700,6 @@ public sealed partial class PackPanel : PanelContainer
             WindowFrame.Relabel(_use, ItemActions.Primary(held, Worn));
             _use.Visible = true;
             _held = held;
-            _drop.Disabled = false;
             _action.Visible = !_ask.Visible;
             _action.ResetSize();
 
@@ -699,10 +707,32 @@ public sealed partial class PackPanel : PanelContainer
         }
 
         _action.Visible = false;
-        _held = null;
-        _drop.Disabled = true;
-        _ask.Visible = false;
+
+        if (!_dropping)
+        {
+            _held = null;
+            _ask.Visible = false;
+        }
     }
+
+    /// <summary>Throws away what was pressed while 버리기 is on: one at once, a bundle after asking how many (all, to begin with).</summary>
+    private void Throw(InventoryItem item)
+    {
+        _held = item;
+
+        if (item.Stacks <= 1)
+        {
+            Dropped?.Invoke(item.Slot, 1);
+            return;
+        }
+
+        _askName.Text = $"{item.Name} — 몇 개 버릴까요?";
+        _dropCount.MaxValue = item.Stacks;
+        _dropCount.Value = item.Stacks;
+        _ask.Visible = true;
+    }
+
+    private bool _dropping;
 
     // 지금 고른 것 — 위 줄 [버리기]가 버린다.
     private InventoryItem? _held;
