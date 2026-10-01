@@ -36,3 +36,4 @@ AtlasTexture 영역은 희미한 외곽 픽셀과 투명 여백을 제외해 모
   오른쪽 위 「The Basic Continent MYTHOSIA」 깃발 띠까지 대륙째 96 폭으로 줄였다(2026-10-02, 사용자: 월드맵에서 마이소시아만 축소 · 깃발 남긴 쪽).
 - `menu-settings.png`: 위 메뉴 [설정] 금색 톱니(`#C8AA6E`) — 원작에 맞는 그림이 없어 그렸다. [장비]·[인벤토리]는 원작 아이템 그림
   `assets/item/32786.png`(골든플레이트투구)·`40999.png`(가죽가방)을 그대로 쓴다.
+- `lodmap.png`·`lodusr.png`: 원작 451 로딩 띠(`docs/ui/original-451/`) 통째로 — 맵 바뀔 때 「Loading Map」, 접속하는 동안 「Loading ...」(`LoadingBand.cs`).

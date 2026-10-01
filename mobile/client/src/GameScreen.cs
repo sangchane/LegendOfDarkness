@@ -342,6 +342,7 @@ public partial class GameScreen : Control
         rows.AddChild(_controlRow);
 
         Cover(hud);
+        AddChild(_loadingMap);
 
         // 맨 위에 둔다 — 판 밖 어디를 눌러도 닫히도록 화면 전체를 받는다.
         _exit.LogOut.Pressed += () =>
@@ -995,6 +996,34 @@ public partial class GameScreen : Control
     /// A panel over the world: an original stone frame with a dark, nearly opaque inside. The frame is what
     /// carries the theme; the inside is flat, because a pattern under small text is the first thing to fail.
     /// </summary>
+    // 맵이 바뀔 때 원작 「Loading Map」 띠(LoadingBand) — 맵 그림은 앱 안에 있어 금방이므로, 홈이 다 차는 0.5초만 보인다.
+    private readonly LoadingBand _loadingMap = new(map: true);
+    private int _loadedMap = -1;
+    private double _mapLoading = -1;
+
+    private void ShowMapLoading(double delta)
+    {
+        if (_world.MapId != _loadedMap)
+        {
+            _loadedMap = _world.MapId;
+            _mapLoading = _loadedMap > 0 ? 0 : -1;
+        }
+
+        if (_mapLoading < 0)
+        {
+            return;
+        }
+
+        _mapLoading += delta;
+        _loadingMap.Show((float)(_mapLoading / 0.5));
+
+        if (_mapLoading >= 0.6)
+        {
+            _loadingMap.Visible = false;
+            _mapLoading = -1;
+        }
+    }
+
     /// <summary>
     /// The top-right plate in the LoL client's dress: near-opaque blue-black, corners cut at 45° (not rounded), a dark gold
     /// rim with a thin bright gold line inside it (사용자 2026-10-02: 테두리가 촌스럽다 → 롤 같게).
@@ -1103,6 +1132,8 @@ public partial class GameScreen : Control
     /// <summary>Keeps the place name and whoever is picked out in step with the world below.</summary>
     public override void _Process(double delta)
     {
+        ShowMapLoading(delta);
+
         if (_world.PlaceName.Length > 0)
         {
             _place.Text = $"{_world.PlaceName} · {_world.Standing.X},{_world.Standing.Y}";

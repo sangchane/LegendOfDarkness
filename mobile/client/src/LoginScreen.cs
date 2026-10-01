@@ -69,6 +69,7 @@ public partial class LoginScreen : Control
         AddChild(Greybox.EntryBackground());
         _safeArea = Main.SafeAreaContainer();
         AddChild(_safeArea);
+        AddChild(_loading);
 
         // One child per container: a MarginContainer gives every child its whole rect, so three siblings
         // would sit on top of one another instead of at the top, middle and bottom.
@@ -149,6 +150,7 @@ public partial class LoginScreen : Control
 
         _submit.Disabled = true;
         _status.Text = "접속하는 중…";
+        _loginStarted = Time.GetTicksMsec();
 
         _attempt = HadesLoginClient.LoginAsync(
             Main.ServerAddress,
@@ -160,6 +162,9 @@ public partial class LoginScreen : Control
     }
 
     /// <summary>Reports what the login is doing, and what became of it.</summary>
+    private readonly LoadingBand _loading = new(map: false);
+    private ulong _loginStarted;
+
     private void DrainLogin()
     {
         while (_reported.TryDequeue(out string? line))
@@ -167,11 +172,18 @@ public partial class LoginScreen : Control
             _status.Text = line;
         }
 
+        // 접속하는 동안 원작 「Loading ...」 띠 — 홈은 3초에 걸쳐 90%까지 차고, 끝나면 사라진다.
+        if (_attempt is not null && !_attempt.IsCompleted)
+        {
+            _loading.Show(Mathf.Min(0.9f, (Time.GetTicksMsec() - _loginStarted) / 3000f));
+        }
+
         if (_attempt is null || !_attempt.IsCompleted)
         {
             return;
         }
 
+        _loading.Visible = false;
         Task<WorldSession> finished = _attempt;
         _attempt = null;
 
