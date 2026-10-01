@@ -27,7 +27,6 @@
 
 | 파일 | 지금 | 나누는 경계 |
 |---|---|---|
-| `GameScreen.cs` (2578줄) | `_Process` 283줄에 위 판·월드맵 판단·시험 코드·가방 배치. 필드 110개 | `HudTopBar`(위 판) · `ControlCluster`(아래 조작) · `WindowHost`(`SetWindow` `Cover` 164줄) · `PartyHud` · `NoticeRouter`(`Route` `Listen`) · `GameRehearsal`(`Rehearse*`·`GREYBOX_` 출력·`LayoutCheck.Pretend*`) |
 | `WorldView.cs` (2143줄) | 바닥·캐릭터·이펙트·사냥 판단이 섞임, 셰이더 155줄이 문자열 | `FloorLayer`(셰이더는 `.gdshader` 로) · `ActorRoster` · `EffectPlayer` · `HuntDriver` |
 | `WorldView.cs` `HuntOnItsOwn` vs `AutoHuntTick` | **사냥 판단이 두 벌** — 옛 `--hunt` 봇은 화면에서 직접, 새 것은 알맹이 `AutoHunt` | 옛 봇을 `AutoHunt` 로 합치거나 지운다(지울 때는 사용자에게 먼저) |
 | `CreateScreen.cs` (1096줄) | 세로·가로 폼이 거의 같은 조립을 반복 | `LookPicker`(머리·색 격자) · `CharacterPreview`. `StarterArmor` 표는 알맹이 자료로 |
@@ -67,7 +66,7 @@
 | 폴더 | 103개 평평 | `lib/` `ops/` 부터(가리키는 곳 166개라 `gen/<도메인>/` 은 나중) |
 
 ## 작은 것(고치는 김에)
-- 엉뚱한 멤버에 붙은 설명: `WorldClient.cs` 366·514·1105·1788-1805·1995·2098 근처, `WorldEntry.cs:112`, `Wardrobe.cs:8`, `GameScreen.cs:1002`, `WorldView.cs:700`, 서버 `Companions.cs:340`(+"1초마다"→0.5초).
+- 엉뚱한 멤버에 붙은 설명: `WorldClient.cs` 366·514·1105·1788-1805·1995·2098 근처, `WorldEntry.cs:112`, `Wardrobe.cs:8`, `WorldView.cs:700`, 서버 `Companions.cs:340`(+"1초마다"→0.5초).
 - 낡은 주석: `GameScreen.cs:184,187,776`([종료] 위치) · `Main.cs:472,482`(「길」 단추) · `WorldView.cs:10-12`(그림 출처) · `WorldClient.cs:1796-1800`(바닥 물건 13바이트).
 - 봇에서 끝없이 쌓이는 큐: `WorldClient` 의 `_hurts` `_motions` `_effects` `_sounds` `_figures` `_songs` 는 봇이 꺼내지 않는다 — `_told` 처럼 상한. 맵이 바뀔 때 `_health` `_struck` 도 비운다.
 - 레벨업 점수: 서버 갱신이 오기 전 같은 점수에 요청이 여러 번 갈 수 있다(서버가 남은 점수로 막는지 확인).
