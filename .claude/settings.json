@@ -6,16 +6,6 @@
       "Bash(git log:*)",
       "Bash(dotnet test mobile/tests/Lod.Mobile.Core.Tests/Lod.Mobile.Core.Tests.csproj:*)",
       "Bash(dotnet test tests/hades-characterization/Hades.Characterization.Tests.csproj:*)"
-    ],
-    "deny": [
-      "Read(./mobile/client/build/**)",
-      "Read(./mobile/client/.godot/**)",
-      "Read(./experiments/*/build/**)",
-      "Read(./experiments/*/.godot/**)",
-      "Read(./.tools/**)",
-      "Read(./**/node_modules/**)",
-      "Read(./**/bin/**)",
-      "Read(./**/obj/**)"
     ]
   },
   "hooks": {
