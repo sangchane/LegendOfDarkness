@@ -32,6 +32,11 @@
   되돌려 두었다. 아이패드 빌드를 다시 구우려면 `HQC44HA87V` 를 넣고, **끝나면 다시 비운다**.
   `mobile/client/{server,login,hunt}.cfg` 는 커밋되지 않는다(`.gitignore`).
 
+## 기록(로그) — 문제를 볼 때 여기부터
+- **폰 앱**: `scripts/ios-build.sh logs` → `out/ios-logs/<시각>/` (앱의 `user://logs/godot.log`, 실행마다 하나). 받기 멈춤(`받기 멈춤:`)·읽지 못한 패킷(`읽지 못한 패킷 N번째:`)·실패한 서버 요청(`서버 요청 실패:`)이 남는다. 맥에서 띄운 것은 `~/Library/Application Support/Godot/app_userdata/LOD Client Greybox/logs/`.
+- **서버**: `LOD_CLOUD_IP=161.33.43.117 scripts/cloud-server.sh logs 200`. 오류만은 클라우드 `~/lod/Staging/net9.0/Hades_Exceptions.txt` — 오류 종류·스택, 패킷에서 났으면 다음 줄 `↳ 패킷 0x.. · 이름 · 맵 (x,y)`. 봇 저장 줄은 Debug 라 안 남는다.
+- **봇**: `scripts/cloud-server.sh bot-logs 100 [번호]` — 5분마다 요약(주인·맵·체력·마지막 패킷·예외 수).
+
 ## 검증
 - `dotnet test mobile/tests/Lod.Mobile.Core.Tests/Lod.Mobile.Core.Tests.csproj` (알맹이, 몇 초)
 - 서버와 붙는 시험: `dotnet test tests/hades-characterization/Hades.Characterization.Tests.csproj`

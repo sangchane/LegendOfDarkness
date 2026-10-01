@@ -4,6 +4,7 @@
 #   scripts/ios-build.sh build            .ipa 를 만든다
 #   scripts/ios-build.sh install          만들고 기기에 넣는다(기기 이름·번호는 --device 로)
 #   scripts/ios-build.sh devices          지금 보이는 기기를 이름·번호로 보여 준다(아이패드·아이폰 따로)
+#   scripts/ios-build.sh logs [기기]      앱 기록(user://logs/godot.log)을 맥 out/ios-logs/ 로 가져온다 — 폰에서 난 문제를 볼 때
 #   scripts/ios-build.sh renew            서명을 새로 받는다(LOD_DEVICE_ID 로 기기를 고른다 — 그 기기가
 #                                         프로필에 실제로 들어갔는지까지 확인한다)
 #   scripts/ios-build.sh check            며칠 남았나 — 이틀 이하면 스스로 갱신한다
@@ -311,13 +312,33 @@ unwatch_sign() {
 
 mkdir -p "$LOGS"
 
+# 앱 기록을 가져온다. 앱은 user://logs/ 에 실행마다 godot.log 를 남기고(project.godot 의 file_logging, 지난 것은
+# 날짜 붙은 이름으로 몇 개 보관), iOS 의 user:// 는 앱 칸의 Documents 다.
+pull_logs() {
+    local device="${1:-}"
+    [ -n "$device" ] || device="$(device_id)"
+    if [ -z "$device" ]; then
+        echo "기기가 보이지 않습니다 — 아이폰 화면을 켠 채 맥과 같은 Wi-Fi 에 두십시오." >&2
+        exit 1
+    fi
+
+    local bundle out
+    bundle="$(grep '^application/bundle_identifier=' "$PRESETS" | cut -d'"' -f2)"
+    out="$ROOT/out/ios-logs/$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$out"
+    xcrun devicectl device copy from --device "$device" --domain-type appDataContainer \
+        --domain-identifier "$bundle" --source Documents/logs --destination "$out"
+    echo "$out"
+}
+
 case "${1:-check}" in
     build) build ;;
     install) build; install_to "${2:-}" ;;
     renew) renew ;;
     devices) devices ;;
+    logs) pull_logs "${2:-}" ;;
     check) check ;;
     watch-sign) watch_sign ;;
     unwatch-sign) unwatch_sign ;;
-    *) echo "쓸 수 있는 것: build install [기기] devices renew check watch-sign unwatch-sign"; exit 2 ;;
+    *) echo "쓸 수 있는 것: build install [기기] devices logs [기기] renew check watch-sign unwatch-sign"; exit 2 ;;
 esac

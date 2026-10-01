@@ -1248,6 +1248,7 @@ public partial class GameScreen : Control
         OpenChatOnItsOwn();
         RehearseNotices();
         Dropped();
+        LogUnread();
         KeepWalking(delta);
         KeepGuiding(delta);
         KeepAutoHuntButton();
@@ -1975,6 +1976,25 @@ public partial class GameScreen : Control
 
         _toldBroken = true;
         Notify($"연결이 끊겼습니다 — {why}");
+        GD.PushError($"받기 멈춤: {why}");
+    }
+
+    // 기록에 남긴 마지막 "읽지 못한 패킷" 수.
+    private int _unreadLogged;
+
+    /// <summary>
+    /// 알맹이가 읽지 못하고 버린 패킷을 기록(godot.log)에 남긴다. 화면에는 안 보이고, 서버와 클라이언트가 어긋난
+    /// 곳을 나중에 찾는 단서다(2026-10-02 — 전에는 세기만 하고 아무 데도 적지 않았다).
+    /// </summary>
+    private void LogUnread()
+    {
+        if (_server is not { } server || server.UnreadCount == _unreadLogged)
+        {
+            return;
+        }
+
+        _unreadLogged = server.UnreadCount;
+        GD.PushWarning($"읽지 못한 패킷 {_unreadLogged}번째: {server.Unread}");
     }
 
     /// <summary>
