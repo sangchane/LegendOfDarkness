@@ -304,16 +304,12 @@ public sealed partial class Actor : Node2D
         ShowFrame(_sheet.Motion?.Stand(Facing.Of(_direction).Side) ?? WalkMotion.Stand(Facing.Of(_direction).Side));
     }
 
+    private const double MotionSlowdown = 1.1;
+
     /// <summary>
     /// Swings once. Nothing follows from it here — whether it hit is the server's to say — and a swing
     /// already under way is left to finish rather than restarted.
     /// </summary>
-    private const double SameBurstSeconds = 0.15;
-
-    // 지금 동작이 끝나면 그릴 것 — 동작 중에 쓴 다른 기술.
-    private (BodyMotion Motion, double SecondsPerFrame)? _next;
-    private const double MotionSlowdown = 1.1;
-
     public void Strike() => Play(BodyMotion.Blow, BodyMotion.Blow.SecondsPerFrame(0));
 
     /// <summary>
@@ -323,9 +319,8 @@ public sealed partial class Actor : Node2D
     /// the motion.
     /// </summary>
     /// <remarks>
-    /// A motion that arrives while another is under way was ignored, as the original client does (Legend.exe 2005
-    /// 0x4e1130: a busy figure keeps what it is doing); now only within <see cref="SameBurstSeconds" /> or a blow during a
-    /// blow — any other motion used later waits and plays when this one ends (사용자 2026-10-02). Hades sends several at once when one press sets off more than
+    /// A motion that arrives while another is under way is ignored, as the original client does (Legend.exe 2005
+    /// 0x4e1130: a busy figure keeps what it is doing). Hades sends several at once when one press sets off more than
     /// one thing — every learned skill of the blow kind runs with the plain blow (1, then 131, then 133) — so only
     /// the first of those is seen, the same as it would be in the original.
     /// <para>
@@ -336,17 +331,9 @@ public sealed partial class Actor : Node2D
     /// </remarks>
     public void Play(BodyMotion motion, double secondsPerFrame)
     {
-        // 어느 동작이든(사용자 2026-10-02: 붕각·쿠로토만이 아니라 개념이다) 동작 중에 온 동작은 지금 것을 끝까지 한 다음에
-        // 그린다 — 하나만 기다리고, 더 오면 마지막 것. 버리는 것은 둘뿐: 한 번 누름에 서버가 한꺼번에 보내는 것(0.15초 안)과
-        // 평타 도중의 평타(누르고 있으면 계속 오는 것이라 밀려 쌓이면 손과 어긋난다).
-        if (_emoted >= 0 || (_struck >= 0 && (_struck < SameBurstSeconds || (motion.Equals(BodyMotion.Blow) && _playing.Equals(BodyMotion.Blow)))))
+        // 동작 중에 쓴 기술·마법은 모션 없이 작동한다(원작, 사용자 2026-10-02 확인) — 그 동작은 버린다.
+        if (_struck >= 0 || _emoted >= 0)
         {
-            return;
-        }
-
-        if (_struck >= 0)
-        {
-            _next = (motion, secondsPerFrame);
             return;
         }
 
@@ -476,12 +463,6 @@ public sealed partial class Actor : Node2D
             _struck = -1;
             Wear(_standing);
             Rest();
-
-            if (_next is { } next)
-            {
-                _next = null;
-                Play(next.Motion, next.SecondsPerFrame);
-            }
 
             return;
         }
