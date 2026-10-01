@@ -18,6 +18,7 @@ public sealed class WorldMapTests : IDisposable
     private const int SuomiTown = 20355;
     private const int NoviceVillage = 20373;
     private const int PoteForest = 20263;
+    private const int AbelCoast = 20595;
 
     private const string Name = "mapwalker";
 
@@ -66,9 +67,10 @@ public sealed class WorldMapTests : IDisposable
         WorldMapInfo field = world.Field!;
 
         Assert.Equal("field001", field.Field);
-        // 수오미·우드랜드·노비스마을 + 다시 연 마을 + 포테의숲(사냥터 카드, 2026-10-02).
-        Assert.Equal(4 + Reopened.Length, field.Nodes.Count);
+        // 수오미·우드랜드·노비스마을 + 다시 연 마을 + 포테의숲·아벨해안(사냥터 카드, 2026-10-02).
+        Assert.Equal(5 + Reopened.Length, field.Nodes.Count);
         Assert.Equal(PoteForest, Assert.Single(field.Nodes, node => node.Name == "포테의숲").AreaId);
+        Assert.Equal(AbelCoast, Assert.Single(field.Nodes, node => node.Name == "아벨해안").AreaId);
 
         // 들어가면 못 나오는 곳은 목록에 두지 않는다 — 드라큐라의성(20399)·크리스마스마을(20711) 에는
         // 밟을 수 있는 워프가 하나도 없어 걸어 나갈 수도 월드맵을 다시 열 수도 없다.
@@ -152,7 +154,8 @@ public sealed class WorldMapTests : IDisposable
 
     /// <summary>
     /// 사냥터 아래 구역(월드맵 자료 <c>Portals[].Zones</c>)으로 바로 간다(사용자 2026-10-02). 1레벨은 우드랜드 구역마다 그
-    /// 도착 칸에 서고, 포테의숲 구역은 걸어 들어갈 때처럼 레벨(21) 때문에 막혀 제자리에 남고 손이 풀린다. 모든 도착 칸은 벽이 아니다.
+    /// 도착 칸에 서고, 포테의숲(21~)·아벨해안(입구 51~) 구역은 걸어 들어갈 때처럼 레벨 때문에 막혀 제자리에 남고 손이 풀린다 —
+    /// 해안 구역끼리의 워프는 레벨 1 이라, 입구 제한까지 봐야 막힌다. 모든 도착 칸은 벽이 아니다.
     /// </summary>
     [Fact]
     public async Task Choosing_a_zone_under_a_hunting_ground_lands_in_that_zone_unless_the_level_bars_it()
@@ -182,6 +185,9 @@ public sealed class WorldMapTests : IDisposable
 
         Assert.Contains(zones, zone => zone.Field == WoodlandGate);
         Assert.Contains(zones, zone => zone.Field == PoteForest);
+        Assert.Contains(zones, zone => zone.Field == AbelCoast);
+        HashSet<int> barred = [PoteForest, AbelCoast];
+        HashSet<int> tried = [];
 
         foreach ((int field, int area, Tile arrival) in zones)
         {
@@ -190,7 +196,8 @@ public sealed class WorldMapTests : IDisposable
                 .First(one => one["ID"]!.GetValue<int>() == area);
             Assert.False(Walled(server, area, map["Cols"]!.GetValue<int>(), map["Rows"]!.GetValue<int>())(arrival), $"{area} 도착 칸 {arrival} 이 벽입니다.");
 
-            if (field == PoteForest && area != PoteForest)
+            // 막히는 사냥터는 구역 하나씩만 가 본다.
+            if (barred.Contains(field) && !tried.Add(field))
             {
                 continue;
             }
@@ -200,7 +207,7 @@ public sealed class WorldMapTests : IDisposable
             await Waiting.Until(() => world.Field is not null, $"{area}로 가려고 지도를 달라고 했는데 오지 않았습니다.", _deadline.Token);
             await world.ChooseFieldAsync(area, _deadline.Token);
 
-            if (field == PoteForest)
+            if (barred.Contains(field))
             {
                 // 1레벨은 못 든다 — 제자리에서 손이 풀려야 한다(지도가 닫히고 다시 걸을 수 있다).
                 await Waiting.Until(() => world.Field is null, $"{area} 를 막은 뒤 지도가 닫히지 않았습니다.", _deadline.Token);

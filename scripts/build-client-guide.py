@@ -11,8 +11,9 @@
   exit <맵> <x> <y> <간 곳 이름>      — 워프 칸 하나. 이어 붙은 칸은 알맹이가 한 출구로 묶는다
   npc  <맵> <x> <y> <이름>            — mundanes 템플릿의 NPC 자리
   area <맵> <입장 레벨> <town|field> <이름> — 월드맵이 내려 주는 맵(카드에 적는다). 레벨은 그 맵으로 드는 워프의
-                                        LevelRequired 중 가장 작은 것, 마을은 이름에 "마을"이 든 곳
-  zone <카드 맵> <구역 맵> <입장 레벨> <이름> — 사냥터 카드 아래 구역(월드맵 Portals[].Zones). 고르면 바로 그 구역으로 간다
+                                        LevelRequired 중 가장 큰 것(서버도 가장 엄한 것을 쓴다), 마을은 이름에 "마을"이 든 곳
+  zone <카드 맵> <구역 맵> <입장 레벨> <이름> — 사냥터 카드 아래 구역(월드맵 Portals[].Zones). 고르면 바로 그 구역으로 간다.
+                                        레벨은 구역과 카드 중 큰 것 — 서버가 구역에도 입구(카드)의 제한을 건다
 """
 import json
 from pathlib import Path
@@ -62,7 +63,7 @@ def main() -> None:
         to = int((warp.get("To") or {}).get("AreaID") or 0)
 
         if to:
-            levels[to] = min(levels.get(to, 999), int(warp.get("LevelRequired") or 1))
+            levels[to] = max(levels.get(to, 1), int(warp.get("LevelRequired") or 1))
 
     places = set()
     zones = []
@@ -82,7 +83,7 @@ def main() -> None:
                 inner = int(zone.get("AreaID") or 0)
 
                 if inner in names:
-                    zones.append((area, inner, max(1, levels.get(inner, 1)), names[inner]))
+                    zones.append((area, inner, max(levels.get(inner, 1), levels.get(area, 1)), names[inner]))
 
     lines += [f"area {a} {lv} {kind} {n}" for a, lv, kind, n in sorted(places)]
     lines += [f"zone {a} {z} {lv} {n}" for a, z, lv, n in zones]
