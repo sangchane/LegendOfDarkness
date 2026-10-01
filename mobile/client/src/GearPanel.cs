@@ -7,7 +7,8 @@ namespace LodClient;
 
 /// <summary>
 /// 장비창 — 위 메뉴 [장비] 로 연다(사용자, 2026-10-01: 소지품 창의 탭으로는 세로가 모자라 따로 뺐다). 창은 원작 장비 그림
-/// 그 자체이고 틀·제목 줄·여백이 없다(<see cref="GearGrid" />). 그림 위 한 줄에 그림에 칸이 없는 다섯 자리(이름 달린)와 닫기 X.
+/// 그 자체이고 틀·제목 줄·여백이 없다(<see cref="GearGrid" />). 닫기는 위 메뉴 [장비]를 다시 누른다. 그림에 칸이 없는 다섯
+/// 자리(겉투구·겉옷·장신구1~3)는 아직 안 보인다 — 따로 추가한다(사용자 2026-10-01).
 /// </summary>
 /// <remarks>
 /// 칸을 누르면 그 위에 이름·한 줄·[벗기]가 뜨고, 빠르게 두 번 누르면 바로 벗는다 — 소지품 창의 동작 줄과 같은 규칙.
@@ -31,16 +32,8 @@ public sealed partial class GearPanel : PanelContainer
         Name = "GearWindow";
         Visible = false;
 
-        // 그림 밖은 위 한 줄뿐 — 그 뒤만 불투명 어둠으로 채우고 여백은 두지 않는다.
-        StyleBoxFlat sheet = Greybox.Sheet();
-        sheet.SetContentMarginAll(0);
-        sheet.ContentMarginTop = Main.Gutter / 2;
-        sheet.SetBorderWidthAll(0);
-        AddThemeStyleboxOverride("panel", sheet);
-
-        Close = WindowFrame.CloseButton();
-        Close.CustomMinimumSize = new Vector2(GearGrid.SpareSide, GearGrid.SpareSide);
-        _gear.Append(Close);
+        // 창은 그림뿐 — 바탕 판도 여백도 없다. 그림 왼쪽 위 귀퉁이는 투명하다.
+        AddThemeStyleboxOverride("panel", new StyleBoxEmpty());
         _gear.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
 
         _gear.Chosen += slot =>
@@ -88,9 +81,6 @@ public sealed partial class GearPanel : PanelContainer
         AddChild(actionLayer);
         actionLayer.AddChild(_action);
     }
-
-    /// <summary>The X above the picture, so whoever opened the window can decide what shutting it means.</summary>
-    public Button Close { get; }
 
     /// <summary>Somebody asked to take off what is in one worn place. The number is the server's own.</summary>
     public event System.Action<int>? TakenOff;

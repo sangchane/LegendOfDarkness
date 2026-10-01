@@ -399,10 +399,10 @@ public static class LayoutCheck
     private static readonly string[] MeantToCover = ["월드"];
 
     // 장비창은 소지품 창과 같은 모달이다(열려 있는 동안 조작이 죽는다, OneWindow.Freezes) — 아래 조작 줄을 덮어도 된다.
-    // 위 줄은 덮지 않는다: 장비창은 늘 위 줄 아래에서 시작한다.
+    // 세로는 위 줄을 덮지 않는다(위 줄 아래에서 시작한다). 가로는 맨 위부터 메뉴 단추 왼쪽에 서므로 내 판·미니맵을 덮을 수 있다.
     private static bool MeantToLieOver(string one, string other) =>
         MeantToLieOverAsPack(one == "장비" ? "인벤토리" : one, other == "장비" ? "인벤토리" : other)
-        && (one, other) is not (("장비", "위 줄") or ("위 줄", "장비") or ("장비", "미니맵") or ("미니맵", "장비"));
+        && (!Main.Portrait || (one, other) is not (("장비", "위 줄") or ("위 줄", "장비") or ("장비", "미니맵") or ("미니맵", "장비")));
 
     private static bool MeantToLieOverAsPack(string one, string other) =>
         (one, other) is ("인벤토리", "조작 줄") or ("조작 줄", "인벤토리")

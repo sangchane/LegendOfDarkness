@@ -8,7 +8,7 @@ namespace LodClient;
 /// What the character has on, on the original's own equipment picture: <c>equip01.epf</c> cut to its paper doll and
 /// the squares round it, shown whole at its own size or a whole multiple of it, with what is worn laid into the
 /// picture's squares and the fighting figures into its number boxes. Which square is which is <see cref="GearLayout" />'s
-/// to say. The five places the picture has no square for stand in a row of named plain cells above it.
+/// to say. The five places the picture has no square for are not shown yet (사용자 2026-10-01: 따로 추가한다).
 /// </summary>
 /// <remarks>
 /// The picture is never stretched to fit (data/original-ui/451.json 「통째로」) — on a phone its squares are about twenty
@@ -17,15 +17,6 @@ namespace LodClient;
 public sealed partial class GearGrid : VBoxContainer
 {
     private const string PicturePath = "res://assets/ui/equip-panel.png";
-
-    // 그림 위 칸 줄과 그림 사이.
-    private const int Gap = Main.Gutter / 2;
-
-    /// <summary>
-    /// A cell in the row above the picture. Five of them and the window's X have to stand within the picture's width, so
-    /// they are a little under a finger — the smallest the gear cells have ever been pressed at (2026-09-23).
-    /// </summary>
-    public const int SpareSide = 40;
 
     // 손가락이 칸 밖에 떨어져도 이만큼 안이면 가장 가까운 칸으로 친다.
     private const int Reach = 14;
@@ -38,8 +29,6 @@ public sealed partial class GearGrid : VBoxContainer
         TextureFilter = TextureFilterEnum.Nearest,
         MouseFilter = MouseFilterEnum.Ignore
     };
-
-    private readonly HBoxContainer _spare = new() { Name = "Spare" };
 
     private readonly Dictionary<int, Button> _cells = [];
 
@@ -56,12 +45,9 @@ public sealed partial class GearGrid : VBoxContainer
         Name = "Gear";
         SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
         MouseFilter = MouseFilterEnum.Stop;
-        AddThemeConstantOverride("separation", Gap);
 
-        // 그림은 제 크기(정수배)만, 위 줄은 그 위 가운데에 — 크기는 컨테이너가 잰다. 화면에 붙기 전에 손으로 재면
-        // 단추의 테마 여백이 빠져 줄이 그림보다 넓게 삐져나갔다(2026-10-01).
+        // 그림은 제 크기(정수배)만 — 크기는 컨테이너가 잰다.
         _picture.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-        _spare.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
 
         if (ResourceLoader.Exists(PicturePath))
         {
@@ -74,7 +60,7 @@ public sealed partial class GearGrid : VBoxContainer
         {
             if (GearLayout.Square(slot) is not null)
             {
-                _picture.AddChild(MakeCell(slot, painted: true));
+                _picture.AddChild(MakeCell(slot));
             }
         }
 
@@ -83,33 +69,9 @@ public sealed partial class GearGrid : VBoxContainer
             _picture.AddChild(figure);
         }
 
-        _spare.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        // 그림에 칸이 없는 다섯 자리는 그림 위 한 줄에, 칸마다 이름을 달아(사용자 2026-10-01: 아래 줄은 뭔지 모르겠다).
-        foreach (int slot in GearLayout.Spare)
-        {
-            VBoxContainer named = new();
-            named.AddThemeConstantOverride("separation", 0);
-            named.AddChild(MakeCell(slot, painted: false));
-
-            Label name = new() { Text = WornPlace.Of(slot), HorizontalAlignment = HorizontalAlignment.Center };
-            name.AddThemeFontSizeOverride("font_size", 9);
-            name.AddThemeColorOverride("font_color", Greybox.Muted);
-            named.AddChild(name);
-
-            _spare.AddChild(named);
-        }
-
-        AddChild(_spare);
-        MoveChild(_spare, 0);
 
         Lay(1);
-    }
-
-    /// <summary>Stands <paramref name="tail" /> at the end of the row above the picture — the gear window's X.</summary>
-    public void Append(Control tail)
-    {
-        _spare.AddChild(tail);
     }
 
     /// <summary>
@@ -152,9 +114,8 @@ public sealed partial class GearGrid : VBoxContainer
     /// <summary>The largest whole multiple of the picture that fits the room, and never less than its own size.</summary>
     public int ScaleThatFits(Vector2 room)
     {
-        Vector2 spare = _spare.GetCombinedMinimumSize();
         int across = (int)(room.X / GearLayout.PictureWidth);
-        int down = (int)((room.Y - Gap - spare.Y) / GearLayout.PictureHeight);
+        int down = (int)(room.Y / GearLayout.PictureHeight);
 
         return Mathf.Max(1, Mathf.Min(across, down));
     }
@@ -174,7 +135,7 @@ public sealed partial class GearGrid : VBoxContainer
         _nextLevel.Text = mine is null ? string.Empty : ExperienceGauge.Short(mine.ExperienceToGo);
     }
 
-    /// <summary>Puts what is worn into the squares, and the part's own drawing into every place left empty.</summary>
+    /// <summary>Puts what is worn into the squares. An empty square, or one whose picture has not been cut, stays the picture's own dark square.</summary>
     public void Show(IReadOnlyList<WornItem> worn, int chosen)
     {
         Dictionary<int, WornItem> onNow = [];
@@ -187,25 +148,17 @@ public sealed partial class GearGrid : VBoxContainer
         foreach ((int slot, Button cell) in _cells)
         {
             bool filled = onNow.TryGetValue(slot, out WornItem? gear);
-            bool painted = GearLayout.Square(slot) is not null;
 
-            cell.Icon = filled ? ItemIcons.For(gear!.Icon) ?? Empty(slot) : Empty(slot);
+            // 칸 바탕은 늘 원작 그림의 어두운 칸 — 빈 자리 그림·회색 타일을 얹으면 칸마다 색이 달라진다(사용자 2026-10-01).
+            cell.Icon = filled ? ItemIcons.Found(gear!.Icon) : null;
 
-            // 걸친 것은 또렷하게, 빈 자리는 흐리게 — 원작 빈자리 그림을 그대로 쓰되 눈에 덜 걸리게 한다.
-            cell.Modulate = filled ? Colors.White : new Color(1, 1, 1, 0.35f);
-
-            // 고른 칸은 테두리가 밝고 굵다. 그림 속 칸은 제 테두리가 있어 고른 것만 긋는다.
-            StyleBoxFlat edge = painted ? Outline() : Greybox.Surface();
-            edge.SetCornerRadiusAll(painted ? 0 : 8);
+            // 고른 칸만 밝고 굵은 테두리. 그림 속 칸은 제 테두리가 있다.
+            StyleBoxFlat edge = Outline();
 
             if (slot == -chosen)
             {
                 edge.BorderColor = Greybox.Title;
                 edge.SetBorderWidthAll(2);
-            }
-            else if (filled && !painted)
-            {
-                edge.BorderColor = Greybox.Muted;
             }
 
             cell.AddThemeStyleboxOverride("normal", edge);
@@ -213,7 +166,7 @@ public sealed partial class GearGrid : VBoxContainer
         }
     }
 
-    /// <summary>The places, the picture's squares first. Only a run with no hand on it asks.</summary>
+    /// <summary>The places on the picture. Only a run with no hand on it asks.</summary>
     public IEnumerable<Node> Cells => _cells.Values;
 
     /// <summary>
@@ -254,9 +207,6 @@ public sealed partial class GearGrid : VBoxContainer
         }
     }
 
-    /// <summary>The drawing the original shows while a place is empty.</summary>
-    private static Texture2D? Empty(int slot) => GearSlotArt.For(GearLayout.Drawing(slot));
-
     private void Place(Control control, (int X, int Y, int Width, int Height) box)
     {
         control.Position = new Vector2(box.X, box.Y) * _scale;
@@ -282,7 +232,7 @@ public sealed partial class GearGrid : VBoxContainer
         return figure;
     }
 
-    private Button MakeCell(int slot, bool painted)
+    private Button MakeCell(int slot)
     {
         Button cell = new()
         {
@@ -291,17 +241,15 @@ public sealed partial class GearGrid : VBoxContainer
             IconAlignment = HorizontalAlignment.Center,
             FocusMode = FocusModeEnum.None,
 
-            // 그림 속 칸은 누르는 곳이 칸보다 넓다 — 손가락은 GearGrid 가 받아 가장 가까운 칸에 준다(_GuiInput).
-            MouseFilter = painted ? MouseFilterEnum.Ignore : MouseFilterEnum.Stop,
-            CustomMinimumSize = painted ? Vector2.Zero : new Vector2(SpareSide, SpareSide)
+            // 누르는 곳이 칸보다 넓다 — 손가락은 GearGrid 가 받아 가장 가까운 칸에 준다(_GuiInput).
+            MouseFilter = MouseFilterEnum.Ignore
         };
 
-        // 그림 속 칸은 원작 그림의 어두운 칸이 바탕이다. 위 줄은 평평한 어둠(data/ui-vault 안C).
+        // 칸 바탕은 원작 그림의 어두운 칸이다.
         foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
         {
-            StyleBoxFlat box = painted ? Outline() : Greybox.Surface();
-            box.SetCornerRadiusAll(painted ? 0 : 8);
-            box.SetContentMarginAll(painted ? 1 : 4);
+            StyleBoxFlat box = Outline();
+            box.SetContentMarginAll(1);
             cell.AddThemeStyleboxOverride(state, box);
         }
 
@@ -309,42 +257,5 @@ public sealed partial class GearGrid : VBoxContainer
         _cells[slot] = cell;
 
         return cell;
-    }
-}
-
-/// <summary>
-/// The fourteen drawings the original puts in an empty place, cut from <c>_nui_eqi.spf</c> into one strip
-/// of 32-wide cells by <c>build-client-assets.ps1</c>. Eighteen places share them: the overhelm borrows
-/// the helmet's and the three trinkets borrow armour and cloak, which is what the original does too.
-/// </summary>
-internal static class GearSlotArt
-{
-    private const string Path = "res://assets/ui/gear-slots.png";
-
-    private const int Side = 32;
-
-    private static readonly Dictionary<int, Texture2D?> Cut = [];
-
-    public static Texture2D? For(int drawing)
-    {
-        if (Cut.TryGetValue(drawing, out Texture2D? found))
-        {
-            return found;
-        }
-
-        found = null;
-
-        if (ResourceLoader.Exists(Path))
-        {
-            found = new AtlasTexture
-            {
-                Atlas = GD.Load<Texture2D>(Path),
-                Region = new Rect2(drawing * Side, 0, Side, Side)
-            };
-        }
-
-        Cut[drawing] = found;
-
-        return found;
     }
 }

@@ -57,6 +57,9 @@ public partial class GameScreen : Control
     private readonly BotGearPanel _botGear = new();
     private Control? _botGearHolder;
     private Control? _gearHolder;
+
+    // 위 줄 오른쪽 단추 묶음 — 가로 장비창이 그 왼쪽에 선다.
+    private Control _menu = null!;
     private Control? _talkHolder;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
@@ -232,7 +235,6 @@ public partial class GameScreen : Control
         _pack.Tidy.Pressed += () => _ = Straighten();
 
         _gearPanel = new GearPanel();
-        _gearPanel.Close.Pressed += () => Dressing(false);
         _gearPanel.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
 
         _chat = new ChatPanel();
@@ -555,6 +557,14 @@ public partial class GameScreen : Control
                 continue;
             }
 
+            // 가로 장비창은 그림 키(302)가 위 줄 아래에 안 든다 — 맨 위부터, 위 메뉴 단추 바로 왼쪽에 선다(그래야 [장비]로 닫는다).
+            // 오른쪽 끝은 그릴 때마다 단추 묶음 자리에 맞춘다(_Process).
+            if (panel == _gearPanel && !Main.Portrait)
+            {
+                holder.OffsetTop = 0;
+                continue;
+            }
+
             // 대화(기록) 창은 화면 가운데 아래에(사용자, 2026-09-26) — 가로는 오른쪽 기둥 대신 가운데에 제 폭만큼. 세로는 원래 폭 전체.
             if (panel == _chat && !Main.Portrait)
             {
@@ -716,6 +726,7 @@ public partial class GameScreen : Control
 
         // 위 줄 단추(2026-09-26, 장비 2026-10-01): [월드맵] · [인벤토리] · [장비] · [설정]. [종료]는 설정 → 계정 탭으로, [길]은 미니맵이 되었다.
         HBoxContainer actions = new() { MouseFilter = MouseFilterEnum.Ignore };
+        _menu = actions;
         actions.AddThemeConstantOverride("separation", Main.Gutter);
 
         Button pack = new()
@@ -1211,6 +1222,12 @@ public partial class GameScreen : Control
         if (_gearPanel.Visible && _gearHolder is not null)
         {
             Vector2 screen = GetViewportRect().Size;
+
+            if (!Main.Portrait)
+            {
+                _gearHolder.OffsetRight = _menu.GlobalPosition.X - screen.X - Main.Gutter;
+            }
+
             _gearPanel.Show(
                 _server?.Worn ?? LayoutCheck.PretendWorn,
                 Mine,

@@ -31,6 +31,9 @@ public static class ItemIcons
         }
     }
 
+    /// <summary>The picture for an item number, or nothing when none has been cut — where a grey tile would stand out.</summary>
+    public static Texture2D? Found(int number) => ResourceLoader.Exists($"{Folder}{number}.png") ? For(number) : null;
+
     /// <summary>The picture for an item number, or a grey tile when none has been cut.</summary>
     public static Texture2D? For(int number)
     {
