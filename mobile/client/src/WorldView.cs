@@ -399,6 +399,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         float nearest = reach * reach;
 
+        uint before = _target;
         _target = 0;
 
         // 사람·괴물은 허리를, 표식은 떠 있는 높이(NpcMark.Waist)를 겨눈다.
@@ -419,8 +420,11 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         Mark();
 
-        // 서버가 창을 보내 오면 화면이 연다(GameScreen). 여기서는 누른 것만 알린다.
-        if (server is { } world && world.Creatures.FirstOrDefault(one => one.Serial == _target) is { Kind: CreatureKind.Merchant })
+        // 서버가 창을 보내 오면 화면이 연다(GameScreen). 여기서는 누른 것만 알린다. 사람은 이미 고른 이를 한 번 더 누를 때만 —
+        // 한 번 누르는 것은 겨누기다. 그러면 서버가 그 사람 장비창(0x34)을 보낸다(사용자 2026-10-01: 장비창에서 그룹 신청).
+        if (server is { } world
+            && (world.Creatures.FirstOrDefault(one => one.Serial == _target) is { Kind: CreatureKind.Merchant }
+                || (_target != 0 && _target == before && _crowd.ContainsKey(_target))))
         {
             _ = world.ClickAsync(_target, System.Threading.CancellationToken.None);
         }

@@ -67,6 +67,18 @@ public static class GearLayout
     /// <summary>The picture's box under 「Next Lev」 — what is left to earn before the next level.</summary>
     public static readonly (int X, int Y, int Width, int Height) NextLevel = (21, 240, 64, 13);
 
+    /// <summary>The picture's box at the top left — the class.</summary>
+    public static readonly (int X, int Y, int Width, int Height) Class = (24, 18, 56, 17);
+
+    /// <summary>The picture's framed bar at the top — the name. The two lines under it (guild, guild title) come later.</summary>
+    public static readonly (int X, int Y, int Width, int Height) Name = (120, 19, 116, 15);
+
+    /// <summary>The person button at the bottom right — group requests on or off (<c>equip05</c> draws its two states).</summary>
+    public static readonly (int X, int Y, int Width, int Height) Group = (204, 227, 36, 30);
+
+    /// <summary>Where the original Close button (<c>butt001</c>) sits — the bare stone under the person button.</summary>
+    public static readonly (int X, int Y, int Width, int Height) Close = (183, 268, 68, 20);
+
     /// <summary>Whether this is a place the panel knows how to show.</summary>
     public static bool Has(int slot) => EmptyDrawing.ContainsKey(slot);
 

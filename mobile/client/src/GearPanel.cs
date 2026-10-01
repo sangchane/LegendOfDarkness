@@ -7,11 +7,13 @@ namespace LodClient;
 
 /// <summary>
 /// 장비창 — 위 메뉴 [장비] 로 연다(사용자, 2026-10-01: 소지품 창의 탭으로는 세로가 모자라 따로 뺐다). 창은 원작 장비 그림
-/// 그 자체이고 틀·제목 줄·여백이 없다(<see cref="GearGrid" />). 닫기는 위 메뉴 [장비]를 다시 누른다. 그림에 칸이 없는 다섯
-/// 자리(겉투구·겉옷·장신구1~3)는 아직 안 보인다 — 따로 추가한다(사용자 2026-10-01).
+/// 그 자체이고 틀·제목 줄·여백이 없다(<see cref="GearGrid" />). 닫기는 그림 속 원작 Close 단추나 [장비]를 다시 누른다. 그림에
+/// 칸이 없는 다섯 자리(겉투구·겉옷·장신구1~3)는 아직 안 보인다 — 따로 추가한다(사용자 2026-10-01).
 /// </summary>
 /// <remarks>
-/// 칸을 누르면 그 위에 이름·한 줄·[벗기]가 뜨고, 빠르게 두 번 누르면 바로 벗는다 — 소지품 창의 동작 줄과 같은 규칙.
+/// 두 가지로 쓴다(사용자 2026-10-01). 내 것: 옆에 소지품 창이 같이 열려 입고 벗는다 — 칸을 누르면 그 위에 이름·한 줄·[벗기],
+/// 빠르게 두 번 누르면 바로 벗는다. 사람 단추는 그룹 신청 받기 켜고 끄기. 남의 것(<see cref="ShowOther" />): 사람을 눌러 서버가
+/// 보낸 장비를 보이고, 사람 단추는 그 사람에게 그룹 신청.
 /// </remarks>
 public sealed partial class GearPanel : PanelContainer
 {
@@ -27,6 +29,9 @@ public sealed partial class GearPanel : PanelContainer
     private int _chosen;
     private string? _showing;
 
+    // 남의 장비창이면 그 사람. 없으면 내 것.
+    private OtherProfile? _other;
+
     public GearPanel()
     {
         Name = "GearWindow";
@@ -38,7 +43,7 @@ public sealed partial class GearPanel : PanelContainer
 
         _gear.Chosen += slot =>
         {
-            if (_taps.Tap(slot, Time.GetTicksMsec() / 1000.0))
+            if (_other is null && _taps.Tap(slot, Time.GetTicksMsec() / 1000.0))
             {
                 _action.Visible = false;
                 TakenOff?.Invoke(slot);
@@ -47,6 +52,18 @@ public sealed partial class GearPanel : PanelContainer
 
             _chosen = slot;
             _showing = null;
+        };
+
+        _gear.GroupPressed += () =>
+        {
+            if (_other is null)
+            {
+                GroupToggled?.Invoke();
+            }
+            else
+            {
+                GroupAsked?.Invoke(_other.Name);
+            }
         };
 
         _off.Pressed += () =>
@@ -85,10 +102,62 @@ public sealed partial class GearPanel : PanelContainer
     /// <summary>Somebody asked to take off what is in one worn place. The number is the server's own.</summary>
     public event System.Action<int>? TakenOff;
 
-    /// <summary>Shows what is worn and our fighting figures; the squares are redrawn only when what is worn or picked changes.</summary>
-    public void Show(IReadOnlyList<WornItem> worn, Vitals? mine, Vector2 room)
+    /// <summary>Our person button: take group requests, or stop taking them.</summary>
+    public event System.Action? GroupToggled;
+
+    /// <summary>Somebody else's person button: ask them to group. The name is theirs.</summary>
+    public event System.Action<string>? GroupAsked;
+
+    /// <summary>The original Close button in the picture.</summary>
+    public BaseButton Close => _gear.Close;
+
+    /// <summary>Whether this is somebody else's window rather than ours.</summary>
+    public bool ShowingOther => _other is not null;
+
+    /// <summary>
+    /// Shows our own gear, class and name, fighting figures and whether we take group requests; the squares are redrawn
+    /// only when what is worn or picked changes.
+    /// </summary>
+    public void Show(IReadOnlyList<WornItem> worn, Vitals? mine, int? path, string name, bool groupOpen, Vector2 room)
     {
+        if (_other is not null)
+        {
+            _other = null;
+            _chosen = 0;
+            _showing = null;
+        }
+
         _gear.ShowFigures(mine);
+        _gear.ShowWho(ClassName(path), name);
+        _gear.ShowGroup(groupOpen);
+        Fill(worn, room);
+    }
+
+    /// <summary>Shows somebody else's gear as the server sent it (0x34). Their fighting figures are not sent, so the boxes stay empty.</summary>
+    public void ShowOther(OtherProfile who, Vector2 room)
+    {
+        _other = who;
+        _chosen = 0;
+        _showing = null;
+        _gear.ShowFigures(null);
+        _gear.ShowWho(ClassName(who.Path), who.Name);
+        _gear.ShowGroup(who.GroupOpen);
+        Fill(who.Worn, room);
+    }
+
+    /// <summary>Hades <c>Class</c> as a number (0x39) or a name (0x34), in the words the game uses.</summary>
+    private static string ClassName(int? path) => path switch
+    {
+        0 => "평민", 1 => "전사", 2 => "도적", 3 => "마법사", 4 => "성직자", 5 => "무도가", _ => string.Empty
+    };
+
+    private static string ClassName(string path) => path switch
+    {
+        "Peasant" => "평민", "Warrior" => "전사", "Rogue" => "도적", "Wizard" => "마법사", "Priest" => "성직자", "Monk" => "무도가", _ => path
+    };
+
+    private void Fill(IReadOnlyList<WornItem> worn, Vector2 room)
+    {
         _gear.Lay(_gear.ScaleThatFits(room));
 
         string wanted = $"{_chosen}|" + string.Join(";", worn.Select(gear => $"{gear.Slot}:{gear.Icon}"));
@@ -106,9 +175,11 @@ public sealed partial class GearPanel : PanelContainer
 
         if (picked is not null)
         {
-            // 걸친 것은 바로 버릴 수 없다 — 벗어서 소지품에 든 다음에야.
+            // 걸친 것은 바로 버릴 수 없다 — 벗어서 소지품에 든 다음에야. 남의 것은 부위 이름만 온다.
             _actionName.Text = picked.Called;
-            _actionLine.Text = ItemActions.Line(picked);
+            _actionLine.Text = _other is null ? ItemActions.Line(picked) : string.Empty;
+            _actionLine.Visible = _other is null;
+            _off.Visible = _other is null;
             _action.ResetSize();
         }
     }

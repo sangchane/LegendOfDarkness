@@ -153,6 +153,12 @@ public sealed class WorldClient(WorldSession session) : IDisposable
     /// <summary>내 프로필 — 그 안에 그룹 목록이 있다(<see cref="Party.ReadRoster" />).</summary>
     private const byte ProfileCommand = 0x39;
 
+    /// <summary>남의 장비창 — 사람을 누르면(0x43) 서버가 보낸다(Hades <c>ServerFormat34</c>).</summary>
+    private const byte OtherProfileCommand = 0x34;
+
+    /// <summary>그룹 받기 켜고 끄기. 몸 없이 번호만 — 서버가 지금 상태를 뒤집는다(Hades <c>Format2FHandler</c>).</summary>
+    private const byte GroupToggleCommand = 0x2F;
+
     /// <summary>귓속말. 받는 이 이름이 "!" 이면 그룹말이다.</summary>
     private const byte WhisperCommand = 0x19;
 
@@ -222,6 +228,8 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     private volatile string _said = string.Empty;
     private int? _path;
+    private bool? _groupOpen;
+    private OtherProfile? _seen;
     private volatile int _saidCount;
 
     // 0x0A 를 타입 바이트와 함께 줄줄이 담는다. _said 는 마지막 한 줄뿐이라, 한 프레임에 둘이 오면(주운 것 + 경험치)
@@ -373,6 +381,12 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
     /// <summary>My class as the profile (0x39) last said — Hades <c>Class</c> number (5 무도가 …); null until asked for.</summary>
     public int? Path => _path;
+
+    /// <summary>Whether we take group requests, as the profile (0x39) last said; null until asked for.</summary>
+    public bool? GroupOpen => _groupOpen;
+
+    /// <summary>Takes the equipment window the server last sent for somebody we pressed on (0x34), once.</summary>
+    public OtherProfile? TakeSeen() => Interlocked.Exchange(ref _seen, null);
 
     /// <summary>
     /// Takes the next line the server said (0x0A) with its type byte (Hades <c>ServerFormat0A.MsgType</c>), oldest
@@ -782,11 +796,24 @@ public sealed class WorldClient(WorldSession session) : IDisposable
 
                     continue;
 
+                case OtherProfileCommand:
+                    try
+                    {
+                        _seen = OtherProfile.Read(HadesCipher.DecodeSecured(frame, session.Parameters));
+                    }
+                    catch (ProtocolException cut)
+                    {
+                        NoteUnread($"0x34: {cut.Message}");
+                    }
+
+                    continue;
+
                 case ProfileCommand:
                     try
                     {
                         byte[] profile = HadesCipher.DecodeSecured(frame, session.Parameters).ToArray();
                         _path = LearnLadder.PathFromProfile(profile) ?? _path;
+                        _groupOpen = LearnLadder.GroupOpenFromProfile(profile) ?? _groupOpen;
                         _roster = Party.ReadRoster(profile);
                         _rosterCount++;
                     }
@@ -1076,6 +1103,9 @@ public sealed class WorldClient(WorldSession session) : IDisposable
         Send(GroupCommand, Party.Accept(name), cancellationToken);
 
     /// <summary>Leaves the group the original way: by asking ourselves. Nothing is sent before the server has named us.</summary>
+    /// <summary>Turns taking group requests on or off. The server says nothing back — ask the profile again to see it.</summary>
+    public Task ToggleGroupAsync(CancellationToken cancellationToken) => Send(GroupToggleCommand, [], cancellationToken);
+
     public Task LeaveGroupAsync(CancellationToken cancellationToken) =>
         _self?.Name is { Length: > 0 } mine
             ? Send(GroupCommand, Party.Ask(mine), cancellationToken)

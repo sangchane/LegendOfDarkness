@@ -41,6 +41,9 @@ public sealed partial class BotGearPanel : PanelContainer
         _hint.AddThemeFontSizeOverride("font_size", 13);
         _choices.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
+        // 봇 창은 제 틀의 X 로 닫는다 — 그림 속 Close 는 내 장비창 것이다.
+        _gear.Close.Visible = false;
+
         _gear.Chosen += slot =>
         {
             _chosen = slot;

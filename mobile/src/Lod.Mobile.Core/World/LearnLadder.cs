@@ -84,7 +84,15 @@ public sealed class LearnLadder
     /// The class byte of a profile (0x39) — Hades <c>ServerFormat39</c> writes, after the group text, the group status,
     /// a zero and then <c>Aisling.Path</c>. Null when the profile is cut short.
     /// </summary>
-    public static int? PathFromProfile(ReadOnlySpan<byte> body)
+    public static int? PathFromProfile(ReadOnlySpan<byte> body) => AfterGroup(body, 2);
+
+    /// <summary>
+    /// Whether a profile (0x39) says we take group requests — the byte right after the group text (Hades
+    /// <c>Aisling.PartyStatus</c>, 1 = <c>AcceptingRequests</c>). Null when the profile is cut short.
+    /// </summary>
+    public static bool? GroupOpenFromProfile(ReadOnlySpan<byte> body) => AfterGroup(body, 0) is { } status ? status == 1 : null;
+
+    private static int? AfterGroup(ReadOnlySpan<byte> body, int skip)
     {
         const int fixedAfterClan = 8;
 
@@ -104,7 +112,7 @@ public sealed class LearnLadder
             }
 
             LegacyKoreanEncoding.DecodeStringA(body[at..], out int group);
-            int path = at + group + 2;
+            int path = at + group + skip;
 
             return path < body.Length ? body[path] : null;
         }

@@ -17,6 +17,9 @@ namespace LodClient;
 public sealed partial class GearGrid : VBoxContainer
 {
     private const string PicturePath = "res://assets/ui/equip-panel.png";
+    private const string CloseArt = "res://assets/ui/close.png";
+    private const string ClosePressedArt = "res://assets/ui/close-pressed.png";
+    private const string GroupArt = "res://assets/ui/equip-group.png";
 
     // 손가락이 칸 밖에 떨어져도 이만큼 안이면 가장 가까운 칸으로 친다.
     private const int Reach = 14;
@@ -36,6 +39,18 @@ public sealed partial class GearGrid : VBoxContainer
     private readonly Label _damage = Figure("Damage");
     private readonly Label _hit = Figure("Hit");
     private readonly Label _nextLevel = Figure("NextLevel");
+    private readonly Label _class = Figure("Class");
+    private readonly Label _name = Figure("Name");
+
+    // 사람 단추 위에 얹는 원작 그림(equip05) — 사람 하나 = 그룹 신청 안 받음, 둘 = 받음.
+    private readonly TextureRect _group = new()
+    {
+        Name = "Group",
+        StretchMode = TextureRect.StretchModeEnum.Scale,
+        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+        TextureFilter = TextureFilterEnum.Nearest,
+        MouseFilter = MouseFilterEnum.Ignore
+    };
 
     // 그림을 몇 배로 보이나 — 늘리지 않으므로 1 이상의 정수다.
     private int _scale;
@@ -64,10 +79,31 @@ public sealed partial class GearGrid : VBoxContainer
             }
         }
 
-        foreach (Label figure in new[] { _armor, _damage, _hit, _nextLevel })
+        foreach (Label figure in Figures)
         {
             _picture.AddChild(figure);
         }
+
+        _picture.AddChild(_group);
+        ShowGroup(false);
+
+        // 원작 Close 단추(butt001) — 누른 모양까지 원작 그림.
+        Close = new TextureButton
+        {
+            Name = "Close",
+            IgnoreTextureSize = true,
+            StretchMode = TextureButton.StretchModeEnum.Scale,
+            TextureFilter = TextureFilterEnum.Nearest,
+            TooltipText = "닫기"
+        };
+
+        if (ResourceLoader.Exists(CloseArt))
+        {
+            Close.TextureNormal = GD.Load<Texture2D>(CloseArt);
+            Close.TexturePressed = GD.Load<Texture2D>(ClosePressedArt);
+        }
+
+        _picture.AddChild(Close);
 
 
 
@@ -100,15 +136,17 @@ public sealed partial class GearGrid : VBoxContainer
             }
         }
 
-        Place(_armor, GearLayout.Armor);
-        Place(_damage, GearLayout.Damage);
-        Place(_hit, GearLayout.Hit);
-        Place(_nextLevel, GearLayout.NextLevel);
-
-        foreach (Label figure in new[] { _armor, _damage, _hit, _nextLevel })
+        foreach (Label figure in Figures)
         {
             figure.AddThemeFontSizeOverride("font_size", 10 * scale);
         }
+
+        Place(Close, GearLayout.Close);
+
+        // 그룹 그림(34x27)은 단추(36x30) 가운데에.
+        _group.Position = new Vector2(GearLayout.Group.X + 1, GearLayout.Group.Y + 2) * scale;
+        _group.Size = new Vector2(34, 27) * scale;
+        Centre();
     }
 
     /// <summary>The largest whole multiple of the picture that fits the room, and never less than its own size.</summary>
@@ -133,6 +171,59 @@ public sealed partial class GearGrid : VBoxContainer
         _damage.Text = mine is null ? string.Empty : $"{mine.Damage}";
         _hit.Text = mine is null ? string.Empty : $"{mine.Hit}";
         _nextLevel.Text = mine is null ? string.Empty : ExperienceGauge.Short(mine.ExperienceToGo);
+        Centre();
+    }
+
+    /// <summary>Writes the class and the name into the picture's top boxes.</summary>
+    public void ShowWho(string called, string name)
+    {
+        _class.Text = called;
+        _name.Text = name;
+        Centre();
+    }
+
+    /// <summary>Draws the person button as the original does: one figure while requests are refused, two while taken.</summary>
+    public void ShowGroup(bool open)
+    {
+        if (!ResourceLoader.Exists(GroupArt))
+        {
+            return;
+        }
+
+        _group.Texture = new AtlasTexture
+        {
+            Atlas = GD.Load<Texture2D>(GroupArt),
+            Region = new Rect2(open ? 76 : 0, 0, 34, 27)
+        };
+    }
+
+    /// <summary>The original Close button under the person button.</summary>
+    public TextureButton Close { get; }
+
+    /// <summary>Somebody pressed the person button.</summary>
+    public event System.Action? GroupPressed;
+
+    private Label[] Figures => [_armor, _damage, _hit, _nextLevel, _class, _name];
+
+    /// <summary>
+    /// Stands every line of text in the middle of its box. A label is never shorter than its font, which is taller than
+    /// the picture's boxes — laid from the box's top it sank to the bottom right (사용자 2026-10-01). So each is laid at
+    /// its own size around the box's centre instead.
+    /// </summary>
+    private void Centre()
+    {
+        foreach ((Label figure, (int X, int Y, int Width, int Height) box) in new[]
+        {
+            (_armor, GearLayout.Armor), (_damage, GearLayout.Damage), (_hit, GearLayout.Hit),
+            (_nextLevel, GearLayout.NextLevel), (_class, GearLayout.Class), (_name, GearLayout.Name)
+        })
+        {
+            Vector2 size = figure.GetCombinedMinimumSize();
+            Vector2 middle = new Vector2(box.X + (box.Width / 2f), box.Y + (box.Height / 2f)) * _scale;
+
+            figure.Size = size;
+            figure.Position = (middle - (size / 2)).Floor();
+        }
     }
 
     /// <summary>Puts what is worn into the squares. An empty square, or one whose picture has not been cut, stays the picture's own dark square.</summary>
@@ -180,6 +271,16 @@ public sealed partial class GearGrid : VBoxContainer
             return;
         }
 
+        (int X, int Y, int Width, int Height) person = GearLayout.Group;
+
+        if (new Rect2(_picture.Position + (new Vector2(person.X, person.Y) * _scale), new Vector2(person.Width, person.Height) * _scale)
+            .HasPoint(release.Position))
+        {
+            AcceptEvent();
+            GroupPressed?.Invoke();
+            return;
+        }
+
         int nearest = 0;
         float best = Reach * _scale;
 
@@ -220,9 +321,8 @@ public sealed partial class GearGrid : VBoxContainer
         Label figure = new()
         {
             Name = name,
-            HorizontalAlignment = HorizontalAlignment.Right,
+            HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            ClipText = true,
             MouseFilter = MouseFilterEnum.Ignore
         };
 

@@ -92,5 +92,23 @@ public sealed class LearnLadderTests
         Assert.Null(LearnLadder.PathFromProfile([0x01, 0x00]));
     }
 
+    /// <summary>그룹 받기는 그룹 글 바로 뒤 바이트다 — 1 이면 받는다(Hades <c>GroupStatus.AcceptingRequests</c>).</summary>
+    [Fact]
+    public void The_profile_says_whether_i_take_group_requests()
+    {
+        byte[] Profile(byte status) =>
+        [
+            0x01,
+            .. LegacyKoreanEncoding.EncodeStringA("어둠"),
+            0x07, 0, 0, 0, 0, 0, 0, 1,
+            .. LegacyKoreanEncoding.EncodeStringA("Adventuring Alone"),
+            status, 0x00, 0x05, 0x01
+        ];
+
+        Assert.True(LearnLadder.GroupOpenFromProfile(Profile(1)));
+        Assert.False(LearnLadder.GroupOpenFromProfile(Profile(0)));
+        Assert.Null(LearnLadder.GroupOpenFromProfile([0x01, 0x00]));
+    }
+
     private static string Bare(string name) => CompanionSpells.Bare(name);
 }

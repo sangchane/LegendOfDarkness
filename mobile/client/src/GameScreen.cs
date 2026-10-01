@@ -57,9 +57,7 @@ public partial class GameScreen : Control
     private readonly BotGearPanel _botGear = new();
     private Control? _botGearHolder;
     private Control? _gearHolder;
-
-    // 위 줄 오른쪽 단추 묶음 — 가로 장비창이 그 왼쪽에 선다.
-    private Control _menu = null!;
+    private Control? _packHolder;
     private Control? _talkHolder;
 
     // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
@@ -236,6 +234,9 @@ public partial class GameScreen : Control
 
         _gearPanel = new GearPanel();
         _gearPanel.TakenOff += place => _ = _server?.TakeOffAsync(place, System.Threading.CancellationToken.None);
+        _gearPanel.Close.Pressed += () => Dressing(false);
+        _gearPanel.GroupToggled += () => _ = ToggleGroup();
+        _gearPanel.GroupAsked += name => _ = _server?.AskToGroupAsync(name, System.Threading.CancellationToken.None);
 
         _chat = new ChatPanel();
         _chat.Close.Pressed += () => Chatting(false);
@@ -408,6 +409,11 @@ public partial class GameScreen : Control
                 CancelField();
                 break;
 
+            case GameWindow.Gear:
+                _gearPanel.Visible = false;
+                _pack.Visible = false;
+                break;
+
             default:
                 WindowOf(window).Visible = false;
                 break;
@@ -526,12 +532,18 @@ public partial class GameScreen : Control
                 _botGearHolder = holder;
             }
 
-            // 장비창은 그림 한 장이라 제 크기만큼만 — 위 줄 바로 아래, 세로는 가운데 · 가로는 오른쪽 끝(사용자 2026-10-01).
+            if (panel == _pack)
+            {
+                _packHolder = holder;
+            }
+
+            // 장비창은 그림 한 장이라 제 크기만큼만 — 세로는 위 줄 바로 아래 가운데(소지품은 그 아래), 가로는 왼쪽(소지품은
+            // 오른쪽 기둥) — 내 장비창은 소지품과 같이 열어 입고 벗는다(사용자 2026-10-01).
             if (panel == _gearPanel)
             {
                 _gearHolder = holder;
                 holder.Alignment = BoxContainer.AlignmentMode.Begin;
-                _gearPanel.SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ShrinkCenter : SizeFlags.ShrinkEnd;
+                _gearPanel.SizeFlagsHorizontal = Main.Portrait ? SizeFlags.ShrinkCenter : SizeFlags.ShrinkBegin;
             }
 
             holder.SetAnchorsPreset(LayoutPreset.FullRect);
@@ -557,8 +569,7 @@ public partial class GameScreen : Control
                 continue;
             }
 
-            // 가로 장비창은 그림 키(302)가 위 줄 아래에 안 든다 — 맨 위부터, 위 메뉴 단추 바로 왼쪽에 선다(그래야 [장비]로 닫는다).
-            // 오른쪽 끝은 그릴 때마다 단추 묶음 자리에 맞춘다(_Process).
+            // 가로 장비창은 그림 키(302)가 위 줄 아래에 안 든다 — 맨 위부터 왼쪽에. 닫기는 그림 속 Close.
             if (panel == _gearPanel && !Main.Portrait)
             {
                 holder.OffsetTop = 0;
@@ -726,7 +737,6 @@ public partial class GameScreen : Control
 
         // 위 줄 단추(2026-09-26, 장비 2026-10-01): [월드맵] · [인벤토리] · [장비] · [설정]. [종료]는 설정 → 계정 탭으로, [길]은 미니맵이 되었다.
         HBoxContainer actions = new() { MouseFilter = MouseFilterEnum.Ignore };
-        _menu = actions;
         actions.AddThemeConstantOverride("separation", Main.Gutter);
 
         Button pack = new()
@@ -1219,19 +1229,29 @@ public partial class GameScreen : Control
             _chatHolder.OffsetBottom = -Lifted();
         }
 
-        if (_gearPanel.Visible && _gearHolder is not null)
+        // 사람을 눌러 서버가 그 사람 장비창(0x34)을 보내 왔다.
+        if (_server?.TakeSeen() is { } seen)
         {
-            Vector2 screen = GetViewportRect().Size;
+            Dressing(true, seen);
+        }
 
-            if (!Main.Portrait)
-            {
-                _gearHolder.OffsetRight = _menu.GlobalPosition.X - screen.X - Main.Gutter;
-            }
-
+        if (_gearPanel.Visible && !_gearPanel.ShowingOther)
+        {
             _gearPanel.Show(
                 _server?.Worn ?? LayoutCheck.PretendWorn,
                 Mine,
-                new Vector2(screen.X - (Main.Gutter * 2), screen.Y - _gearHolder.OffsetTop - Main.Gutter));
+                _server is null ? 5 : _server.Path,
+                _server?.Self?.Name ?? (LayoutCheck.PretendSelf is not null ? LayoutCheck.PretendName : string.Empty),
+                _server?.GroupOpen ?? false,
+                GearRoom());
+        }
+
+        // 세로에서 내 장비창과 소지품을 같이 열면 소지품은 장비 그림 아래에서 시작한다.
+        if (Main.Portrait && _packHolder is not null && _gearHolder is not null)
+        {
+            _packHolder.OffsetTop = _gearPanel.Visible && _pack.Visible
+                ? _gearHolder.OffsetTop + _gearPanel.Size.Y + Main.Gutter
+                : _gearHolder.OffsetTop;
         }
 
         if (_pack.Visible)
@@ -1887,6 +1907,13 @@ public partial class GameScreen : Control
     /// </summary>
     private void Carrying(bool open)
     {
+        // 내 장비창과 같이 열린 소지품을 닫으면 둘 다 닫는다.
+        if (!open && _windows.IsOpen(GameWindow.Gear))
+        {
+            Dressing(false);
+            return;
+        }
+
         SetWindow(GameWindow.Pack, open);
 
         if (open)
@@ -1895,10 +1922,57 @@ public partial class GameScreen : Control
         }
     }
 
-    /// <summary>Opens or shuts the gear window — like the pack, it lies over the world and puts away whatever was open.</summary>
-    private void Dressing(bool open)
+    /// <summary>
+    /// Opens or shuts the gear window — like the pack, it lies over the world and puts away whatever was open. Ours opens
+    /// with the pack beside it, so things can be put on and taken off (사용자 2026-10-01); somebody else's
+    /// (<paramref name="other" />) opens alone.
+    /// </summary>
+    private void Dressing(bool open, OtherProfile? other = null)
     {
         SetWindow(GameWindow.Gear, open);
+        _pack.Visible = open && other is null;
+
+        if (!open)
+        {
+            return;
+        }
+
+        if (other is not null)
+        {
+            _gearPanel.ShowOther(other, GearRoom());
+            return;
+        }
+
+        _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, Mine.Gold);
+
+        // 직업·그룹 받기는 프로필(0x39)에서 온다 — 열 때마다 새로 묻는다.
+        _ = _server?.AskProfileAsync(System.Threading.CancellationToken.None);
+    }
+
+    /// <summary>
+    /// The room the gear picture may grow into (whole multiples only): upright, half the height under the top row when the
+    /// pack stands under it; on its side, the left part of the screen beside the pack's column.
+    /// </summary>
+    private Vector2 GearRoom()
+    {
+        Vector2 screen = GetViewportRect().Size;
+        float top = _gearHolder?.OffsetTop ?? 0;
+
+        return Main.Portrait
+            ? new Vector2(screen.X - (Main.Gutter * 2), (screen.Y - top) / 2)
+            : new Vector2(screen.X / 2, screen.Y - top);
+    }
+
+    /// <summary>Turns taking group requests on or off, then asks the profile again so the person button shows it.</summary>
+    private async System.Threading.Tasks.Task ToggleGroup()
+    {
+        if (_server is null)
+        {
+            return;
+        }
+
+        await _server.ToggleGroupAsync(System.Threading.CancellationToken.None);
+        await _server.AskProfileAsync(System.Threading.CancellationToken.None);
     }
 
     /// <summary>
