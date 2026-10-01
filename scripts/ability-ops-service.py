@@ -235,177 +235,179 @@ def safe_static_path(root: Path, request_path: str):
     return candidate if candidate.is_file() else None
 
 
-def handler_for(root, store, credential, states=None, throttle=None):
-    throttle = throttle or LoginThrottle()
+class OpsHandler(BaseHTTPRequestHandler):
+    """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
+    root = store = credential = states = throttle = None
+    server_version = "LODAbilityOps/1"
 
-    class Handler(BaseHTTPRequestHandler):
-        server_version = "LODAbilityOps/1"
-
-        def do_GET(self):
-            path = urlsplit(self.path).path
-            if path in PUBLIC_FILES:
-                self._static()
-                return
-            if not self._signed_in():
-                if path.startswith("/api/"):
-                    self._json(401, {"error": "로그인이 필요합니다."})
-                else:
-                    self._login_page()
-                return
-            if path.startswith("/api/state/") and states:
-                try:
-                    self._json(200, states.read(unquote(path[len("/api/state/"):])))
-                except InvalidRequest as error:
-                    self._json(404, {"error": str(error)})
-            elif path == "/api/health":
-                self._json(200, {"ok": True})
-            elif path == "/api/ability-overrides":
-                try:
-                    self._json(200, store.read())
-                except InvalidRequest as error:
-                    self._json(500, {"error": str(error)})
-            else:
-                self._static()
-
-        def do_POST(self):
-            path = urlsplit(self.path).path
-            if path == "/api/logout":
-                self._json(200, {"ok": True}, cookie=f"{SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict")
-                return
-            if path != "/api/login":
-                self._json(404, {"error": "없는 API입니다."})
-                return
-            who = self._client()
-            if throttle.blocked(who):
-                self._json(429, {"error": "너무 여러 번 틀렸습니다. 10분 뒤에 다시 해 주세요."})
-                return
-            try:
-                body = self._body(1024)
-            except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
-                self._json(400, {"error": str(error)})
-                return
-            user = credential.split(":", 1)[0]
-            supplied = f"{user}:{body.get('password') or ''}"
-            if not hmac.compare_digest(hashlib.sha256(supplied.encode()).digest(),
-                                       hashlib.sha256(credential.encode()).digest()):
-                throttle.failed(who)
-                self._json(401, {"error": "비밀번호가 맞지 않습니다."})
-                return
-            remember = body.get("remember") is True
-            token = make_session(credential, REMEMBER_SECONDS if remember else SESSION_SECONDS)
-            cookie = f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; Secure; SameSite=Strict"
-            if remember:
-                cookie += f"; Max-Age={REMEMBER_SECONDS}"
-            self._json(200, {"ok": True}, cookie=cookie)
-
-        def do_PUT(self):
-            if not self._signed_in():
+    def do_GET(self):
+        path = urlsplit(self.path).path
+        if path in PUBLIC_FILES:
+            self._static()
+            return
+        if not self._signed_in():
+            if path.startswith("/api/"):
                 self._json(401, {"error": "로그인이 필요합니다."})
-                return
-            prefix = "/api/ability-overrides/"
-            path = urlsplit(self.path).path
-            if path.startswith("/api/state/") and states:
-                try:
-                    body = self._body(StateStore.LIMIT)
-                    self._json(200, states.write(unquote(path[len("/api/state/"):]), body.get("value")))
-                except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
-                    self._json(400, {"error": str(error)})
-                return
-            if not path.startswith(prefix):
-                self._json(404, {"error": "없는 API입니다."})
-                return
+            else:
+                self._login_page()
+            return
+        if path.startswith("/api/state/") and self.states:
             try:
-                body = self._body(4096)
-                saved = store.update(unquote(path[len(prefix):]), body.get("values"), body.get("revision"))
-                self._json(200, saved)
-            except RevisionConflict as error:
-                self._json(409, {"error": str(error), "current": store.read()})
+                self._json(200, self.states.read(unquote(path[len("/api/state/"):])))
+            except InvalidRequest as error:
+                self._json(404, {"error": str(error)})
+        elif path == "/api/health":
+            self._json(200, {"ok": True})
+        elif path == "/api/ability-overrides":
+            try:
+                self._json(200, self.store.read())
+            except InvalidRequest as error:
+                self._json(500, {"error": str(error)})
+        else:
+            self._static()
+
+    def do_POST(self):
+        path = urlsplit(self.path).path
+        if path == "/api/logout":
+            self._json(200, {"ok": True}, cookie=f"{SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict")
+            return
+        if path != "/api/login":
+            self._json(404, {"error": "없는 API입니다."})
+            return
+        who = self._client()
+        if self.throttle.blocked(who):
+            self._json(429, {"error": "너무 여러 번 틀렸습니다. 10분 뒤에 다시 해 주세요."})
+            return
+        try:
+            body = self._body(1024)
+        except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            self._json(400, {"error": str(error)})
+            return
+        user = self.credential.split(":", 1)[0]
+        supplied = f"{user}:{body.get('password') or ''}"
+        if not hmac.compare_digest(hashlib.sha256(supplied.encode()).digest(),
+                                   hashlib.sha256(self.credential.encode()).digest()):
+            self.throttle.failed(who)
+            self._json(401, {"error": "비밀번호가 맞지 않습니다."})
+            return
+        remember = body.get("remember") is True
+        token = make_session(self.credential, REMEMBER_SECONDS if remember else SESSION_SECONDS)
+        cookie = f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; Secure; SameSite=Strict"
+        if remember:
+            cookie += f"; Max-Age={REMEMBER_SECONDS}"
+        self._json(200, {"ok": True}, cookie=cookie)
+
+    def do_PUT(self):
+        if not self._signed_in():
+            self._json(401, {"error": "로그인이 필요합니다."})
+            return
+        prefix = "/api/ability-overrides/"
+        path = urlsplit(self.path).path
+        if path.startswith("/api/state/") and self.states:
+            try:
+                body = self._body(StateStore.LIMIT)
+                self._json(200, self.states.write(unquote(path[len("/api/state/"):]), body.get("value")))
             except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
                 self._json(400, {"error": str(error)})
+            return
+        if not path.startswith(prefix):
+            self._json(404, {"error": "없는 API입니다."})
+            return
+        try:
+            body = self._body(4096)
+            saved = self.store.update(unquote(path[len(prefix):]), body.get("values"), body.get("revision"))
+            self._json(200, saved)
+        except RevisionConflict as error:
+            self._json(409, {"error": str(error), "current": self.store.read()})
+        except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            self._json(400, {"error": str(error)})
 
-        def _signed_in(self):
-            # 쿠키(페이지) 또는 Basic 헤더(스크립트). 401 에 WWW-Authenticate 를 붙이지 않는다 — 붙이면 팝업이 뜬다.
-            if valid_session(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), credential):
-                return True
-            header = self.headers.get("Authorization")
-            if not header:
-                return False
-            # Basic 으로 비밀번호를 맞춰 보는 것도 로그인과 같은 횟수 제한을 받는다.
-            who = self._client()
-            if throttle.blocked(who):
-                return False
-            if authorized(header, credential):
-                return True
-            throttle.failed(who)
+    def _signed_in(self):
+        # 쿠키(페이지) 또는 Basic 헤더(스크립트). 401 에 WWW-Authenticate 를 붙이지 않는다 — 붙이면 팝업이 뜬다.
+        if valid_session(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.credential):
+            return True
+        header = self.headers.get("Authorization")
+        if not header:
             return False
+        # Basic 으로 비밀번호를 맞춰 보는 것도 로그인과 같은 횟수 제한을 받는다.
+        who = self._client()
+        if self.throttle.blocked(who):
+            return False
+        if authorized(header, self.credential):
+            return True
+        self.throttle.failed(who)
+        return False
 
-        def _client(self):
-            # nginx 뒤에서는 모든 요청이 127.0.0.1 에서 온다 — 그때만 nginx 가 적은 X-Real-IP 를 믿는다.
-            peer = self.client_address[0]
-            return (self.headers.get("X-Real-IP") or peer) if peer == "127.0.0.1" else peer
+    def _client(self):
+        # nginx 뒤에서는 모든 요청이 127.0.0.1 에서 온다 — 그때만 nginx 가 적은 X-Real-IP 를 믿는다.
+        peer = self.client_address[0]
+        return (self.headers.get("X-Real-IP") or peer) if peer == "127.0.0.1" else peer
 
-        def _body(self, limit):
-            # JSON 만 받는다 — 다른 사이트의 폼 제출(단순 요청)로는 쓸 수 없게.
-            if not (self.headers.get("Content-Type") or "").startswith("application/json"):
-                raise InvalidRequest("JSON 으로 보내야 합니다.")
-            length = int(self.headers.get("Content-Length", "0"))
-            if length <= 0 or length > limit:
-                raise InvalidRequest("요청 크기가 올바르지 않습니다.")
-            body = json.loads(self.rfile.read(length).decode("utf-8"))
-            if not isinstance(body, dict):
-                raise InvalidRequest("요청 꼴이 잘못됐습니다.")
-            return body
+    def _body(self, limit):
+        # JSON 만 받는다 — 다른 사이트의 폼 제출(단순 요청)로는 쓸 수 없게.
+        if not (self.headers.get("Content-Type") or "").startswith("application/json"):
+            raise InvalidRequest("JSON 으로 보내야 합니다.")
+        length = int(self.headers.get("Content-Length", "0"))
+        if length <= 0 or length > limit:
+            raise InvalidRequest("요청 크기가 올바르지 않습니다.")
+        body = json.loads(self.rfile.read(length).decode("utf-8"))
+        if not isinstance(body, dict):
+            raise InvalidRequest("요청 꼴이 잘못됐습니다.")
+        return body
 
-        def _login_page(self):
-            path = safe_static_path(root, "/login.html")
-            payload = path.read_bytes() if path else "로그인 화면이 없습니다.".encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(payload)))
-            self.send_header("Cache-Control", "no-store")
-            self._security_headers()
-            self.end_headers()
-            self.wfile.write(payload)
+    def _login_page(self):
+        path = safe_static_path(self.root, "/login.html")
+        payload = path.read_bytes() if path else "로그인 화면이 없습니다.".encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(payload)))
+        self.send_header("Cache-Control", "no-store")
+        self._security_headers()
+        self.end_headers()
+        self.wfile.write(payload)
 
-        def _static(self):
-            path = safe_static_path(root, self.path)
-            if path is None:
-                self._json(404, {"error": "파일이 없습니다."})
-                return
-            payload = path.read_bytes()
-            content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
-            self.send_response(200)
-            self.send_header("Content-Type", content_type)
-            self.send_header("Content-Length", str(len(payload)))
-            self.send_header("Cache-Control", "no-cache" if path.suffix in {".html", ".js"} else "public, max-age=86400")
-            self._security_headers()
-            self.end_headers()
-            self.wfile.write(payload)
+    def _static(self):
+        path = safe_static_path(self.root, self.path)
+        if path is None:
+            self._json(404, {"error": "파일이 없습니다."})
+            return
+        payload = path.read_bytes()
+        content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(payload)))
+        self.send_header("Cache-Control", "no-cache" if path.suffix in {".html", ".js"} else "public, max-age=86400")
+        self._security_headers()
+        self.end_headers()
+        self.wfile.write(payload)
 
-        def _json(self, status, value, cookie=None):
-            payload = json.dumps(value, ensure_ascii=False).encode("utf-8")
-            self.send_response(status)
-            if cookie:
-                self.send_header("Set-Cookie", cookie)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(payload)))
-            self.send_header("Cache-Control", "no-store")
-            self._security_headers()
-            self.end_headers()
-            self.wfile.write(payload)
+    def _json(self, status, value, cookie=None):
+        payload = json.dumps(value, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        if cookie:
+            self.send_header("Set-Cookie", cookie)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(payload)))
+        self.send_header("Cache-Control", "no-store")
+        self._security_headers()
+        self.end_headers()
+        self.wfile.write(payload)
 
-        def _security_headers(self):
-            self.send_header("X-Content-Type-Options", "nosniff")
-            self.send_header("X-Frame-Options", "DENY")
-            self.send_header("Referrer-Policy", "no-referrer")
-            self.send_header("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; "
-                             "media-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; "
-                             "connect-src 'self'; frame-src 'self'")
+    def _security_headers(self):
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; "
+                         "media-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; "
+                         "connect-src 'self'; frame-src 'self'")
 
-        def log_message(self, pattern, *args):
-            print(f"{self.address_string()} {pattern % args}")
+    def log_message(self, pattern, *args):
+        print(f"{self.address_string()} {pattern % args}")
 
-    return Handler
+
+def handler_for(root, store, credential, states=None, throttle=None):
+    return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
+                                           "states": states, "throttle": throttle or LoginThrottle()})
 
 
 def main():

@@ -161,12 +161,8 @@ def rewrite(path, old, new):
     return (out if out != text else None), None
 
 
-def main():
-    writing = "--쓰기" in sys.argv or "--write" in sys.argv
-    bpa = _pack_abilities
-    old_blocks = {k: body for k, (_, body) in bpa.blocks().items()}
-    new_blocks = nova_blocks(bpa)
-
+def swap_effects(old_blocks, new_blocks, writing):
+    """이펙트 번호·속도를 노바 것으로 — 무도가는 템플릿, 나머지는 Pack599 스크립트 줄."""
     changed, skipped, monk_speed = [], [], []
     for (kind, name), body in sorted(old_blocks.items()):
         if kind not in ("SKILL", "SPELL") or (kind, name) not in new_blocks:
@@ -209,7 +205,11 @@ def main():
             changed.append((name, f"{sorted(set(before))} → {sorted(set(after))}", path))
             if writing:
                 path.write_text(text, encoding="utf-8-sig")
+    return changed, skipped, monk_speed
 
+
+def swap_sounds(old_blocks, new_blocks, writing, changed):
+    """소리 — 노바 짝이 있는 기술·마법만."""
     # 소리 — 노바 짝이 있는 기술·마법만.
     sounds = []
     for (kind, name), body in sorted(old_blocks.items()):
@@ -248,7 +248,11 @@ def main():
             if writing:
                 path.write_bytes(raw.replace(m[0], f'"Sound": {want[1]}', 1).encode("utf-8"))
     changed += sounds
+    return changed
 
+
+def apply_old_list(changed, writing):
+    """옛 이펙트 번호 목록으로 덮는다(노바 값을 계산한 뒤)."""
     # 노바 짝이 없는 스크립트(괴물 마법·노바에 없는 마법)에도 옛 목록 바로잡기를 건다.
     done = {path for _, _, path in changed}
     for name, swap in OLD_LIST_FIX.items():
@@ -297,6 +301,9 @@ def main():
             if writing:
                 path.write_bytes(raw.replace(m[0], f'"TargetAnimation": {want}', 1).encode("utf-8"))
 
+
+def report(changed, writing, skipped, monk_speed):
+    """바꿀 것·건너뛴 것·무도가 속도를 알린다."""
     print(f"노바 이펙트로 바꿀 것 {len(changed)}개" + ("" if writing else " (--쓰기 를 붙이면 씁니다)"))
     for name, what, path in changed:
         print(f"  {name:12} {what}")
@@ -304,6 +311,21 @@ def main():
         print(f"  건너뜀 {name}: {why}")
     for name, speed in monk_speed:
         print(f"  무도가 속도 {name}: 노바 {speed}")
+
+
+def main():
+    writing = "--쓰기" in sys.argv or "--write" in sys.argv
+    bpa = _pack_abilities
+    old_blocks = {k: body for k, (_, body) in bpa.blocks().items()}
+    new_blocks = nova_blocks(bpa)
+
+    changed, skipped, monk_speed = swap_effects(old_blocks, new_blocks, writing)
+
+    changed = swap_sounds(old_blocks, new_blocks, writing, changed)
+
+    apply_old_list(changed, writing)
+
+    report(changed, writing, skipped, monk_speed)
     return 0
 
 

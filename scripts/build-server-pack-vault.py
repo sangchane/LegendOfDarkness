@@ -19,6 +19,7 @@
 """
 import json, re, shutil
 from collections import defaultdict
+from types import SimpleNamespace
 
 from lib._paths import ROOT
 EXTRACTED = ROOT / "data" / "server-packs" / "extracted"
@@ -106,31 +107,8 @@ def merge_command_records(command_table, evidence):
     ]
 
 
-def build(pack):
-    out = VAULT_ROOT / pack
-    # 자기 출력만 먼저 비운다. macOS 는 파일이름의 대소문자를 보존만 하고 구분하지 않아서,
-    # 지난 빌드가 만든 `프리프리lev99.md` 위에 `프리프리Lev99.md` 를 쓰면 같은 파일에 쓰이고
-    # 이름은 옛 대소문자가 남는다. 그러면 링크가 가리키는 이름과 실제 파일이름이 어긋난다.
-    if out.exists():
-        assert out.parent == VAULT_ROOT, out      # vault/<팩> 밖은 건드리지 않는다
-        shutil.rmtree(out)
-    data = {key: load(pack, key) for _, key in CATS}
-    # 명령은 실행파일에서 나온 둘을 합친 것이다: 표(이름·인자서명)와 기계어 증거.
-    cmd_tbl = load(pack, "script-commands")
-    ev = load(pack, "script-command-evidence")
-    data["commands"] = merge_command_records(cmd_tbl, ev)
-    for key, nk in NAME_KEY.items():
-        for e in data.get(key, []):
-            e["이름"] = e[nk]
-            e.setdefault("출처", [])
-            if isinstance(e["출처"], list):
-                e["출처전체"] = e["출처"]
-                e["출처"] = e["출처"][0] if e["출처"] else "(없음)"
-    warps = load(pack, "warps")
-    mob_spawns = load(pack, "mob_spawns")
-    npc_spawns = load(pack, "npc_spawns")
-    traps = load(pack, "traps")
-
+def link(warps, mob_spawns, npc_spawns, data, traps):
+    """간선 모으기 — 무엇이 무엇을 부르는지, 정의 없이 불린 이름, 거꾸로 가는 길, 노트 이름."""
     # ── 간선 모으기 ──
     out_warp, in_warp = defaultdict(set), defaultdict(set)
     for w in warps:
@@ -212,163 +190,171 @@ def build(pack):
             back["명령"][c].add(("스크립트", x))
     known = {cat: defined[cat] | referred[cat] for cat, _ in CATS}
     slugs = {cat: resolve_slugs(known[cat]) for cat, _ in CATS}
+    return SimpleNamespace(
+        out_warp=out_warp, in_warp=in_warp, map_mobs=map_mobs, mob_maps=mob_maps, map_npcs=map_npcs,
+        npc_maps=npc_maps, item_shops=item_shops, map_traps=map_traps, npc_quests=npc_quests,
+        item_quests=item_quests, script_cmds=script_cmds, cmd_scripts=cmd_scripts,
+        event_items=event_items, defined=defined, referred=referred, back=back, slugs=slugs)
 
-    def maybe(cat, name):
-        if name not in slugs[cat]:
-            return f"`{name}`"
-        return f"[[{cat}/{slugs[cat][name]}|{name}]]"
 
-    written = 0
-    for cat, key in CATS:
-        merged = defaultdict(list)
-        for e in data[key]:
-            merged[e["이름"]].append(e)
-        for n in referred[cat] - defined[cat]:
-            merged.setdefault(n, [])          # 불렸지만 정의가 없는 것
-        (out / cat).mkdir(parents=True, exist_ok=True)
-        for name, entries in merged.items():
-            body = [f"---",
-                    f"이름: {yaml_str(name)}",
-                    f"갈래: {cat}",
-                    f"팩: {pack}",
-                    f"출처: [{', '.join(yaml_str(e['출처']) for e in entries)}]"]
-            if len(entries) > 1:
-                body.append(f"정의수: {len(entries)}")
-            if not entries:
-                body.append("정의없음: true")
-            body += ["---", "", f"# {name}", ""]
-            if not entries:
-                whence = sorted(back[cat].get(name, ()))
-                body += ["> 이 이름은 자료 안에서 불리는데 **정의가 없다**. 팩에 빠진 것인지",
-                         "> 오타인지는 확인되지 않았다.", ""]
-                if whence:
-                    body += [f"## 불린 곳 ({len(whence)})",
-                             ", ".join(maybe(c, n) for c, n in whence), ""]
+def command_section(entries, links, name, body, maybe):
+    """명령 노트의 본문 — 인자서명·기계어 증거·쓰는 스크립트."""
+    c = entries[0] if entries else None
+    if c:
+        e = c.get("증거") or {}
+        head = [f"- 인자서명 `{c['인자서명']}`"
+                + (f" (인자 {c['인자수']}개)" if c.get("인자수") is not None else "")]
+        if e.get("함수주소"):
+            head.append(f"- 함수 `{e['함수주소']}` · 명령어 {e.get('명령어수', '?')}개")
+        body += head + [""]
+        if e.get("참조문자열"):
+            body += ["## 참조하는 문자열", ""] + \
+                    [f"> {t}" for t in e["참조문자열"][:8]] + [""]
+        for label, key in (("이 명령만 쓰는 자리", "고유쓰기"),
+                           ("이 명령만 읽는 자리", "고유읽기")):
+            if e.get(key):
+                body += [f"## {label}", ", ".join(f"`{o}`" for o in e[key][:10]), ""]
+        if e.get("가르는helper"):
+            body += ["## 갈래를 가르는 helper",
+                     ", ".join(f"`{h}`" for h in e["가르는helper"][:10]), ""]
+    if links.cmd_scripts.get(name):
+        ss = sorted(links.cmd_scripts[name])
+        body += [f"## 이 명령을 쓰는 스크립트 ({len(ss)})",
+                 ", ".join(maybe("스크립트", x) for x in ss[:60])
+                 + (f" … 외 {len(ss)-60}" if len(ss) > 60 else ""), ""]
+    elif c:
+        body += ["> 엔진에는 있지만 이 팩의 스크립트는 쓰지 않는다.", ""]
+    return body
 
-            if cat == "맵":
-                for label, names, target in (("나가는 문", out_warp.get(name, ()), "맵"),
-                                             ("들어오는 문", in_warp.get(name, ()), "맵"),
-                                             ("사는 괴물", map_mobs.get(name, ()), "괴물"),
-                                             ("선 NPC", map_npcs.get(name, ()), "NPC"),
-                                             ("함정", map_traps.get(name, ()), "스크립트")):
-                    if names:
-                        body += [f"## {label} ({len(names)})",
-                                 ", ".join(maybe(target, n) for n in sorted(names)), ""]
-            elif cat == "괴물" and mob_maps.get(name):
-                body += [f"## 나오는 맵 ({len(mob_maps[name])})",
-                         ", ".join(maybe("맵", m) for m in sorted(mob_maps[name])), ""]
-            elif cat == "NPC":
-                for label, names, tgt in (("서 있는 맵", npc_maps.get(name, ()), "맵"),
-                                          ("주는 퀘스트", npc_quests.get(name, ()), "퀘스트")):
-                    if names:
-                        body += [f"## {label} ({len(names)})",
-                                 ", ".join(maybe(tgt, n) for n in sorted(names)), ""]
-            elif cat == "아이템":
-                for label, names, tgt in (("파는 곳", item_shops.get(name, ()), "상점"),
-                                          ("걸린 퀘스트", item_quests.get(name, ()), "퀘스트"),
-                                          ("이벤트", event_items.get(name, ()), "이벤트")):
-                    if names:
-                        body += [f"## {label} ({len(names)})",
-                                 ", ".join(maybe(tgt, n) for n in sorted(names)), ""]
-            elif cat == "퀘스트":
-                q = entries[0] if entries else None
-                if q:
-                    if q["NPC"]:
-                        body += [f"## 주는 사람 ({len(q['NPC'])})",
-                                 ", ".join(maybe("NPC", n) for n in q["NPC"]), ""]
-                    if q["전이"]:
-                        body += [f"## 단계 ({len(q['단계'])})", "",
-                                 "```", "  ".join(f"{a}→{b}" for a, b in q["전이"]), "```", ""]
-                    for label, key in (("가져오라는 것", "요구아이템"),
-                                       ("거두어 가는 것", "회수아이템"),
-                                       ("주는 것", "보상아이템")):
-                        if q[key]:
-                            body += [f"## {label} ({len(q[key])})",
-                                     ", ".join(f"{maybe('아이템', it)} ×{c}" for it, c in q[key]), ""]
-                    extra = []
-                    if q["보상경험치"]:
-                        extra.append("경험치 " + ", ".join(q["보상경험치"]))
-                    if q["보상돈"]:
-                        extra.append("돈 " + ", ".join(q["보상돈"]))
-                    if q["조건"]:
-                        extra.append("조건 " + " · ".join(f"{k} {' '.join(v)}"
-                                                          for k, v in q["조건"].items()))
-                    if q["워프"]:
-                        extra.append("보내는 곳 " + ", ".join(maybe("맵", m) for m in q["워프"]))
-                    if extra:
-                        body += ["## 그밖에", ""] + [f"- {x}" for x in extra] + [""]
-                    if q["대사"]:
-                        body += ["## 대사 (앞부분)", ""] + [f"> {d}" for d in q["대사"][:6]] + [""]
-                    if q["정수아닌값"]:
-                        body += ["## 정수가 아닌 값", "",
-                                 "단계로 읽을 수 없는 값이 들어간다. 뜻은 확인되지 않았다.", "",
-                                 ", ".join(f"`{x}`" for x in q["정수아닌값"][:10]), ""]
-                    body += [f"출처: " + ", ".join(f"`db/{x}`" for x in
-                                                  (q.get("출처전체") or [q["출처"]])), ""]
-            elif cat == "명령":
-                c = entries[0] if entries else None
-                if c:
-                    e = c.get("증거") or {}
-                    head = [f"- 인자서명 `{c['인자서명']}`"
-                            + (f" (인자 {c['인자수']}개)" if c.get("인자수") is not None else "")]
-                    if e.get("함수주소"):
-                        head.append(f"- 함수 `{e['함수주소']}` · 명령어 {e.get('명령어수', '?')}개")
-                    body += head + [""]
-                    if e.get("참조문자열"):
-                        body += ["## 참조하는 문자열", ""] + \
-                                [f"> {t}" for t in e["참조문자열"][:8]] + [""]
-                    for label, key in (("이 명령만 쓰는 자리", "고유쓰기"),
-                                       ("이 명령만 읽는 자리", "고유읽기")):
-                        if e.get(key):
-                            body += [f"## {label}", ", ".join(f"`{o}`" for o in e[key][:10]), ""]
-                    if e.get("가르는helper"):
-                        body += ["## 갈래를 가르는 helper",
-                                 ", ".join(f"`{h}`" for h in e["가르는helper"][:10]), ""]
-                if cmd_scripts.get(name):
-                    ss = sorted(cmd_scripts[name])
-                    body += [f"## 이 명령을 쓰는 스크립트 ({len(ss)})",
-                             ", ".join(maybe("스크립트", x) for x in ss[:60])
-                             + (f" … 외 {len(ss)-60}" if len(ss) > 60 else ""), ""]
-                elif c:
-                    body += ["> 엔진에는 있지만 이 팩의 스크립트는 쓰지 않는다.", ""]
-            elif cat == "이벤트":
-                ev = entries[0] if entries else None
-                if ev and ev["아이템"]:
-                    body += [f"## 아이템 ({len(ev['아이템'])})",
-                             ", ".join(maybe("아이템", i) for i in ev["아이템"]), ""]
-            elif cat == "상점":
-                goods = sorted({g for e in entries for g in e["아이템"]})
-                if goods:
-                    body += [f"## 파는 물건 ({len(goods)})",
-                             ", ".join(maybe("아이템", g) for g in goods), ""]
-            elif cat == "스크립트":
-                for e in entries:
-                    for target, names in e["부름"].items():
-                        if names:
-                            body += [f"## 부르는 {target} ({len(names)})",
-                                     ", ".join(maybe(target, n) for n in names), ""]
-                    if script_cmds.get(name):
-                        cs = sorted(script_cmds[name])
-                        body += [f"## 쓰는 엔진 명령 ({len(cs)})",
-                                 ", ".join(maybe("명령", c) for c in cs), ""]
-                    if e.get("머리말"):
-                        body += [f"머리말: `{e['머리말']}`", ""]
-                    body += [f"줄수: {e['줄수']}", ""]
 
-            for e in entries:
-                if "fields" in e and cat not in ("퀘스트", "이벤트", "명령"):
-                    t = field_table(e["fields"])
-                    if t:
-                        if len(entries) > 1:
-                            body.append(f"### `{e['출처']}`")
-                        body += [t, ""]
-            if entries and cat not in ("퀘스트", "이벤트", "명령"):
-                body += ["", f"원본: `db/{entries[0]['출처']}`"]
-            (out / cat / f"{slugs[cat][name]}.md").write_text("\n".join(body), encoding="utf-8")
-            written += 1
+def quest_section(entries, body, maybe):
+    """퀘스트 노트의 본문 — 주는 사람·단계·아이템·보상·대사."""
+    q = entries[0] if entries else None
+    if q:
+        if q["NPC"]:
+            body += [f"## 주는 사람 ({len(q['NPC'])})",
+                     ", ".join(maybe("NPC", n) for n in q["NPC"]), ""]
+        if q["전이"]:
+            body += [f"## 단계 ({len(q['단계'])})", "",
+                     "```", "  ".join(f"{a}→{b}" for a, b in q["전이"]), "```", ""]
+        for label, key in (("가져오라는 것", "요구아이템"),
+                           ("거두어 가는 것", "회수아이템"),
+                           ("주는 것", "보상아이템")):
+            if q[key]:
+                body += [f"## {label} ({len(q[key])})",
+                         ", ".join(f"{maybe('아이템', it)} ×{c}" for it, c in q[key]), ""]
+        extra = []
+        if q["보상경험치"]:
+            extra.append("경험치 " + ", ".join(q["보상경험치"]))
+        if q["보상돈"]:
+            extra.append("돈 " + ", ".join(q["보상돈"]))
+        if q["조건"]:
+            extra.append("조건 " + " · ".join(f"{k} {' '.join(v)}"
+                                              for k, v in q["조건"].items()))
+        if q["워프"]:
+            extra.append("보내는 곳 " + ", ".join(maybe("맵", m) for m in q["워프"]))
+        if extra:
+            body += ["## 그밖에", ""] + [f"- {x}" for x in extra] + [""]
+        if q["대사"]:
+            body += ["## 대사 (앞부분)", ""] + [f"> {d}" for d in q["대사"][:6]] + [""]
+        if q["정수아닌값"]:
+            body += ["## 정수가 아닌 값", "",
+                     "단계로 읽을 수 없는 값이 들어간다. 뜻은 확인되지 않았다.", "",
+                     ", ".join(f"`{x}`" for x in q["정수아닌값"][:10]), ""]
+        body += [f"출처: " + ", ".join(f"`db/{x}`" for x in
+                                      (q.get("출처전체") or [q["출처"]])), ""]
+    return body
 
-    counts = {cat: len(defined[cat]) for cat, _ in CATS}
-    stubs = {cat: len(referred[cat] - defined[cat]) for cat, _ in CATS}
+
+def note_body(name, cat, pack, entries, links, maybe):
+    """노트 한 장의 줄들 — 머리말, 정의 없음 표시, 갈래마다 이어진 것, 원본 칸."""
+    body = [f"---",
+            f"이름: {yaml_str(name)}",
+            f"갈래: {cat}",
+            f"팩: {pack}",
+            f"출처: [{', '.join(yaml_str(e['출처']) for e in entries)}]"]
+    if len(entries) > 1:
+        body.append(f"정의수: {len(entries)}")
+    if not entries:
+        body.append("정의없음: true")
+    body += ["---", "", f"# {name}", ""]
+    if not entries:
+        whence = sorted(links.back[cat].get(name, ()))
+        body += ["> 이 이름은 자료 안에서 불리는데 **정의가 없다**. 팩에 빠진 것인지",
+                 "> 오타인지는 확인되지 않았다.", ""]
+        if whence:
+            body += [f"## 불린 곳 ({len(whence)})",
+                     ", ".join(maybe(c, n) for c, n in whence), ""]
+
+    if cat == "맵":
+        for label, names, target in (("나가는 문", links.out_warp.get(name, ()), "맵"),
+                                     ("들어오는 문", links.in_warp.get(name, ()), "맵"),
+                                     ("사는 괴물", links.map_mobs.get(name, ()), "괴물"),
+                                     ("선 NPC", links.map_npcs.get(name, ()), "NPC"),
+                                     ("함정", links.map_traps.get(name, ()), "스크립트")):
+            if names:
+                body += [f"## {label} ({len(names)})",
+                         ", ".join(maybe(target, n) for n in sorted(names)), ""]
+    elif cat == "괴물" and links.mob_maps.get(name):
+        body += [f"## 나오는 맵 ({len(links.mob_maps[name])})",
+                 ", ".join(maybe("맵", m) for m in sorted(links.mob_maps[name])), ""]
+    elif cat == "NPC":
+        for label, names, tgt in (("서 있는 맵", links.npc_maps.get(name, ()), "맵"),
+                                  ("주는 퀘스트", links.npc_quests.get(name, ()), "퀘스트")):
+            if names:
+                body += [f"## {label} ({len(names)})",
+                         ", ".join(maybe(tgt, n) for n in sorted(names)), ""]
+    elif cat == "아이템":
+        for label, names, tgt in (("파는 곳", links.item_shops.get(name, ()), "상점"),
+                                  ("걸린 퀘스트", links.item_quests.get(name, ()), "퀘스트"),
+                                  ("이벤트", links.event_items.get(name, ()), "이벤트")):
+            if names:
+                body += [f"## {label} ({len(names)})",
+                         ", ".join(maybe(tgt, n) for n in sorted(names)), ""]
+    elif cat == "퀘스트":
+        body = quest_section(entries, body, maybe)
+    elif cat == "명령":
+        body = command_section(entries, links, name, body, maybe)
+    elif cat == "이벤트":
+        ev = entries[0] if entries else None
+        if ev and ev["아이템"]:
+            body += [f"## 아이템 ({len(ev['아이템'])})",
+                     ", ".join(maybe("아이템", i) for i in ev["아이템"]), ""]
+    elif cat == "상점":
+        goods = sorted({g for e in entries for g in e["아이템"]})
+        if goods:
+            body += [f"## 파는 물건 ({len(goods)})",
+                     ", ".join(maybe("아이템", g) for g in goods), ""]
+    elif cat == "스크립트":
+        for e in entries:
+            for target, names in e["부름"].items():
+                if names:
+                    body += [f"## 부르는 {target} ({len(names)})",
+                             ", ".join(maybe(target, n) for n in names), ""]
+            if links.script_cmds.get(name):
+                cs = sorted(links.script_cmds[name])
+                body += [f"## 쓰는 엔진 명령 ({len(cs)})",
+                         ", ".join(maybe("명령", c) for c in cs), ""]
+            if e.get("머리말"):
+                body += [f"머리말: `{e['머리말']}`", ""]
+            body += [f"줄수: {e['줄수']}", ""]
+
+    for e in entries:
+        if "fields" in e and cat not in ("퀘스트", "이벤트", "명령"):
+            t = field_table(e["fields"])
+            if t:
+                if len(entries) > 1:
+                    body.append(f"### `{e['출처']}`")
+                body += [t, ""]
+    if entries and cat not in ("퀘스트", "이벤트", "명령"):
+        body += ["", f"원본: `db/{entries[0]['출처']}`"]
+    return body
+
+
+def write_readme(pack, warps, mob_spawns, links, npc_spawns, data, traps, out):
+    """팩 README — 갈래별 수, 정의 없이 불린 수, 이어진 것."""
+    counts = {cat: len(links.defined[cat]) for cat, _ in CATS}
+    stubs = {cat: len(links.referred[cat] - links.defined[cat]) for cat, _ in CATS}
     readme = [f"# {pack} — 서버팩 자료", "",
               f"`data/server-packs/{pack}/db/` 를 읽어 만든 것. 고쳐도 다음 빌드에 지워진다 —",
               "고칠 곳은 원본 db 다. 만드는 법: `python3 scripts/build-server-pack-vault.py`", "",
@@ -377,18 +363,79 @@ def build(pack):
     readme += [f"| {c} | {n} | {stubs[c] or ''} |" for c, n in counts.items()]
     readme += ["", "## 이어진 것", "",
                f"- 워프 {len(warps)}개 — 맵과 맵을 잇는다",
-               f"- 괴물 젠 {len(mob_spawns)}개 — 맵 {len(map_mobs)}곳에 괴물 {len(mob_maps)}종",
-               f"- NPC 배치 {len(npc_spawns)}개 — 맵 {len(map_npcs)}곳에 NPC {len(npc_maps)}명",
-               f"- 상점 {len(data['shops'])}곳이 아이템 {len(item_shops)}종을 판다",
+               f"- 괴물 젠 {len(mob_spawns)}개 — 맵 {len(links.map_mobs)}곳에 괴물 {len(links.mob_maps)}종",
+               f"- NPC 배치 {len(npc_spawns)}개 — 맵 {len(links.map_npcs)}곳에 NPC {len(links.npc_maps)}명",
+               f"- 상점 {len(data['shops'])}곳이 아이템 {len(links.item_shops)}종을 판다",
                f"- 함정 {len(traps)}개",
-               f"- 퀘스트 {len(data['quests'])}종 — NPC {len(npc_quests)}명이 주고 아이템 {len(item_quests)}종이 걸린다",
-               f"- 이벤트 {len(data['events'])}묶음 — 아이템 {len(event_items)}종",
-               f"- 엔진 명령 {len(data['commands'])}개 — 스크립트 {len(script_cmds)}개가 그중 {len(cmd_scripts)}개를 쓴다", "",
+               f"- 퀘스트 {len(data['quests'])}종 — NPC {len(links.npc_quests)}명이 주고 아이템 {len(links.item_quests)}종이 걸린다",
+               f"- 이벤트 {len(data['events'])}묶음 — 아이템 {len(links.event_items)}종",
+               f"- 엔진 명령 {len(data['commands'])}개 — 스크립트 {len(links.script_cmds)}개가 그중 {len(links.cmd_scripts)}개를 쓴다", "",
                "## 믿을 수 있는 만큼만", "",
                "칸 이름은 원본 db 에 적힌 그대로다. 뜻을 짐작해 붙인 이름은 없다.",
                "링크는 워프·젠·상점·스크립트 호출에서 그대로 나온 것이고, 이름이 자료에 없으면",
                "링크 대신 `글자` 로 남겼다 — 그게 오타인지 빠진 자료인지는 확인되지 않았다."]
     (out / "README.md").write_text("\n".join(readme), encoding="utf-8")
+    return counts
+
+
+def write_notes(data, links, out, pack, maybe):
+    """갈래마다 노트를 쓴다. 쓴 장수를 돌려준다."""
+    written = 0
+    for cat, key in CATS:
+        merged = defaultdict(list)
+        for e in data[key]:
+            merged[e["이름"]].append(e)
+        for n in links.referred[cat] - links.defined[cat]:
+            merged.setdefault(n, [])          # 불렸지만 정의가 없는 것
+        (out / cat).mkdir(parents=True, exist_ok=True)
+        for name, entries in merged.items():
+            body = note_body(name, cat, pack, entries, links, maybe)
+            (out / cat / f"{links.slugs[cat][name]}.md").write_text("\n".join(body), encoding="utf-8")
+            written += 1
+    return written
+
+
+def read_pack(pack):
+    """팩 자료를 읽는다 — 갈래별 표, 명령(표+기계어 증거), 워프·스폰·함정."""
+    data = {key: load(pack, key) for _, key in CATS}
+    # 명령은 실행파일에서 나온 둘을 합친 것이다: 표(이름·인자서명)와 기계어 증거.
+    cmd_tbl = load(pack, "script-commands")
+    ev = load(pack, "script-command-evidence")
+    data["commands"] = merge_command_records(cmd_tbl, ev)
+    for key, nk in NAME_KEY.items():
+        for e in data.get(key, []):
+            e["이름"] = e[nk]
+            e.setdefault("출처", [])
+            if isinstance(e["출처"], list):
+                e["출처전체"] = e["출처"]
+                e["출처"] = e["출처"][0] if e["출처"] else "(없음)"
+    warps = load(pack, "warps")
+    mob_spawns = load(pack, "mob_spawns")
+    npc_spawns = load(pack, "npc_spawns")
+    traps = load(pack, "traps")
+    return data, warps, mob_spawns, npc_spawns, traps
+
+
+def build(pack):
+    out = VAULT_ROOT / pack
+    # 자기 출력만 먼저 비운다. macOS 는 파일이름의 대소문자를 보존만 하고 구분하지 않아서,
+    # 지난 빌드가 만든 `프리프리lev99.md` 위에 `프리프리Lev99.md` 를 쓰면 같은 파일에 쓰이고
+    # 이름은 옛 대소문자가 남는다. 그러면 링크가 가리키는 이름과 실제 파일이름이 어긋난다.
+    if out.exists():
+        assert out.parent == VAULT_ROOT, out      # vault/<팩> 밖은 건드리지 않는다
+        shutil.rmtree(out)
+    data, warps, mob_spawns, npc_spawns, traps = read_pack(pack)
+
+    links = link(warps, mob_spawns, npc_spawns, data, traps)
+
+    def maybe(cat, name):
+        if name not in links.slugs[cat]:
+            return f"`{name}`"
+        return f"[[{cat}/{links.slugs[cat][name]}|{name}]]"
+
+    written = write_notes(data, links, out, pack, maybe)
+
+    counts = write_readme(pack, warps, mob_spawns, links, npc_spawns, data, traps, out)
     return written, counts
 
 

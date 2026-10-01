@@ -98,12 +98,81 @@ def load_effects():
     return json.loads(EFFECTS.read_text(encoding="utf-8"))["밑말"]
 
 
-def main():
-    rows = json.loads(SRC.read_text(encoding="utf-8-sig"))
-    manual, has, script_of = manual_names(), scripted(), template_scripts()
-    consensus, _ = load_consensus()
-    effects = load_effects()
+def add_row(here, name, consensus, manual, effects, script_of, has, listed, depth):
+    """기술·마법 한 줄 — 한글 이름과 그 출처, 연출(모션·이펙트·소리), 차수, 구현 여부."""
+    r = here[name]
+    # raw[1] 의 첫 값. Assail 이 1 이고 Hades 의 assail.json 도 Icon 1 이라 아이콘인가 했지만
+    # Assault 도 1 이다 — **아이콘 번호가 아니다.** 뜻을 모르므로 원문 그대로만 보여 준다.
+    icon = 0
+    try:
+        icon = int(r["raw"][1].split("/")[0])
+    except (IndexError, ValueError):
+        pass
+    automatic = consensus.get(name, {}).get("korean", "")
+    corrected = manual.get(name, "")
+    if corrected and corrected != automatic:
+        korean, source = corrected, "사용자 수정"
+    elif automatic:
+        korean, source = automatic, "서버팩 3개 일치"
+    elif corrected:
+        korean, source = corrected, "사용자 수정"
+    else:
+        korean, source = "", "미확정"
+    media = effects.get(korean) if korean else None
+    # 모션과 이펙트를 갈라 둔다. 둘은 같은 번호 공간을 쓰지만 **얹히는 데가 다르다** —
+    # 모션은 시전자가 하는 것이고 이펙트는 맞는 쪽에 걸리는 것이다. 한 목록으로 합쳐
+    # 두었더니 화면이 어느 것을 캐릭터에 두고 어느 것을 샌드백에 둘지 알 수가 없어
+    # 둘 다 샌드백 위에 겹쳐 터졌다.
+    motions, shots, sounds = [], [], []
+    if media:
+        for level in media["레벨"]:
+            for directive in level["이펙트"]:
+                found = EFFECT_TAIL.search(directive)
+                if found and int(found.group(1)) not in shots:
+                    shots.append(int(found.group(1)))
+            for pair in level["모션"]:
+                if pair[0] not in motions:
+                    motions.append(pair[0])
+            for number in level["사운드"]:
+                if number not in sounds:
+                    sounds.append(number)
+    # `raw[0]` 은 `요구레벨/2차여부/요구어빌리티레벨` 이다. 613개가 1차 257 · 2차 356 으로
+    # 갈린다 — 한 화면에 다 놓으면 무엇이 무엇인지 안 보여서 갈래를 하나 더 둔다.
+    stage, ability = 1, 0
+    first = (r.get("raw") or [""])[0].split("/")
+    if len(first) >= 3:
+        stage = 2 if first[1] != "0" else 1
+        ability = int(first[2]) if first[2].isdigit() else 0
 
+    # 구현 = 게임이 쓰는 템플릿이 가리키는 스크립트가 실제로 있다. 영문 이름에 스크립트가
+    # 있어도 템플릿이 다른 것을 가리키면(달마신공 → `달마신공`) 그쪽을 본다.
+    #
+    # **이것은 「눌러서 뭔가 나온다」가 아니다.** 연출(모션·이펙트·소리)은 위에서 보듯
+    # **한글 이름으로만** 찾는다. 그래서 연출이 비었다는 말은 원작에 연출이 없다는 뜻이
+    # 아니라 **우리가 못 이었다**는 뜻이다 — 원작 기술에 연출 없는 것은 없다(사용자,
+    # 2026-09-19). 왜 못 이었는지를 함께 적지 않으면 화면이 거짓말을 한다.
+    template = script_of.get(name) or script_of.get(korean) or {}
+    script = template.get("스크립트") or ""
+    sends = sent_by(has.get(script, []), template) if script in has else {
+        "이펙트": [], "소리": [], "몸동작": []}
+    if motions or shots or sounds:
+        blocked = ""
+    elif not korean:
+        blocked = "한글이름없음"
+    else:
+        blocked = "표에없음"
+    listed.append({"구현": script in has, "연출막힘": blocked, "게임": sends,
+                   "모션": motions, "이펙트": shots, "소리": sounds,
+                   "차수": stage, "어빌리티": ability,
+                   "이름": name, "한글": korean, "한글자동": automatic,
+                   "한글수정": corrected if corrected != automatic else "",
+                   "이름출처": source, "선행": r.get("requires") or "",
+                   "레벨": r.get("atLevel") or 0, "깊이": depth, "아이콘": icon,
+                   "스크립트": name in has, "요구": r.get("statCosts") or []})
+
+
+def group_rows(rows, consensus, effects, has, manual, script_of):
+    """직업·갈래(기술/마법)마다 선행 나무 순서로 늘어놓는다."""
     unlocks = defaultdict(list)
     for r in rows:
         if r.get("requires"):
@@ -121,75 +190,7 @@ def main():
                 if name in seen or name not in here:
                     return
                 seen.add(name)
-                r = here[name]
-                # raw[1] 의 첫 값. Assail 이 1 이고 Hades 의 assail.json 도 Icon 1 이라 아이콘인가 했지만
-                # Assault 도 1 이다 — **아이콘 번호가 아니다.** 뜻을 모르므로 원문 그대로만 보여 준다.
-                icon = 0
-                try:
-                    icon = int(r["raw"][1].split("/")[0])
-                except (IndexError, ValueError):
-                    pass
-                automatic = consensus.get(name, {}).get("korean", "")
-                corrected = manual.get(name, "")
-                if corrected and corrected != automatic:
-                    korean, source = corrected, "사용자 수정"
-                elif automatic:
-                    korean, source = automatic, "서버팩 3개 일치"
-                elif corrected:
-                    korean, source = corrected, "사용자 수정"
-                else:
-                    korean, source = "", "미확정"
-                media = effects.get(korean) if korean else None
-                # 모션과 이펙트를 갈라 둔다. 둘은 같은 번호 공간을 쓰지만 **얹히는 데가 다르다** —
-                # 모션은 시전자가 하는 것이고 이펙트는 맞는 쪽에 걸리는 것이다. 한 목록으로 합쳐
-                # 두었더니 화면이 어느 것을 캐릭터에 두고 어느 것을 샌드백에 둘지 알 수가 없어
-                # 둘 다 샌드백 위에 겹쳐 터졌다.
-                motions, shots, sounds = [], [], []
-                if media:
-                    for level in media["레벨"]:
-                        for directive in level["이펙트"]:
-                            found = EFFECT_TAIL.search(directive)
-                            if found and int(found.group(1)) not in shots:
-                                shots.append(int(found.group(1)))
-                        for pair in level["모션"]:
-                            if pair[0] not in motions:
-                                motions.append(pair[0])
-                        for number in level["사운드"]:
-                            if number not in sounds:
-                                sounds.append(number)
-                # `raw[0]` 은 `요구레벨/2차여부/요구어빌리티레벨` 이다. 613개가 1차 257 · 2차 356 으로
-                # 갈린다 — 한 화면에 다 놓으면 무엇이 무엇인지 안 보여서 갈래를 하나 더 둔다.
-                stage, ability = 1, 0
-                first = (r.get("raw") or [""])[0].split("/")
-                if len(first) >= 3:
-                    stage = 2 if first[1] != "0" else 1
-                    ability = int(first[2]) if first[2].isdigit() else 0
-
-                # 구현 = 게임이 쓰는 템플릿이 가리키는 스크립트가 실제로 있다. 영문 이름에 스크립트가
-                # 있어도 템플릿이 다른 것을 가리키면(달마신공 → `달마신공`) 그쪽을 본다.
-                #
-                # **이것은 「눌러서 뭔가 나온다」가 아니다.** 연출(모션·이펙트·소리)은 위에서 보듯
-                # **한글 이름으로만** 찾는다. 그래서 연출이 비었다는 말은 원작에 연출이 없다는 뜻이
-                # 아니라 **우리가 못 이었다**는 뜻이다 — 원작 기술에 연출 없는 것은 없다(사용자,
-                # 2026-09-19). 왜 못 이었는지를 함께 적지 않으면 화면이 거짓말을 한다.
-                template = script_of.get(name) or script_of.get(korean) or {}
-                script = template.get("스크립트") or ""
-                sends = sent_by(has.get(script, []), template) if script in has else {
-                    "이펙트": [], "소리": [], "몸동작": []}
-                if motions or shots or sounds:
-                    blocked = ""
-                elif not korean:
-                    blocked = "한글이름없음"
-                else:
-                    blocked = "표에없음"
-                listed.append({"구현": script in has, "연출막힘": blocked, "게임": sends,
-                               "모션": motions, "이펙트": shots, "소리": sounds,
-                               "차수": stage, "어빌리티": ability,
-                               "이름": name, "한글": korean, "한글자동": automatic,
-                               "한글수정": corrected if corrected != automatic else "",
-                               "이름출처": source, "선행": r.get("requires") or "",
-                               "레벨": r.get("atLevel") or 0, "깊이": depth, "아이콘": icon,
-                               "스크립트": name in has, "요구": r.get("statCosts") or []})
+                add_row(here, name, consensus, manual, effects, script_of, has, listed, depth)
                 for nxt in sorted(unlocks.get(name, [])):
                     walk(nxt, depth + 1)
 
@@ -200,7 +201,11 @@ def main():
                 walk(name, 0)
 
             groups.append({"직업": CLASS.get(cls, str(cls)), "갈래": label, "목록": listed})
+    return groups
 
+
+def cross_check(groups, script_of, has):
+    """같은 기술이 여러 직업에 걸린 곳, 수도사 표와 원작 표를 견준다."""
     # 같은 기술이 여러 직업에 걸려 있다 — `Assail`(평타)은 다섯 직업 전부에 나온다. 직업별로
     # 늘어놓으면 613 칸이지만 서로 다른 것은 587 개뿐이라, 같은 카드를 다섯 번 보게 된다
     # (사용자, 2026-09-19). 줄은 그대로 두고 **어느 직업들이 쓰는지**와 **어느 자리가 대표인지**만
@@ -239,7 +244,11 @@ def main():
                     "이펙트": [], "소리": [], "몸동작": []},
                 "구현": script in has,
             })
+    return original_rows
 
+
+def page_data(consensus, manual, rows, groups, original_rows, has):
+    """화면이 읽을 한 덩어리 — 요약 수와 직업·갈래별 목록."""
     automatic_names = set(consensus)
     corrected_names = {name for name, value in manual.items()
                        if value and value != consensus.get(name, {}).get("korean", "")}
@@ -281,6 +290,11 @@ def main():
                 "주의": "엑셀에는 모션·이펙트·소리 열이 없어, 매칭된 게임 값은 Hades 템플릿·스크립트에서 온다.",
                 "목록": original_rows,
             }}
+    return data
+
+
+def write_page(data, groups):
+    """abilities-data.js 와 게임이 쓰는 번호표를 쓴다."""
     OUT.write_text("window.ABILITY_DATA = " + json.dumps(data, ensure_ascii=False) + ";\n", encoding="utf-8")
     s = data["요약"]
     print(f"기술 {s['기술']} · 마법 {s['마법']} · 세 팩 합의 {s['자동확정']} · "
@@ -296,6 +310,20 @@ def main():
     print(f"게임이 쓰는 번호 → {USED.relative_to(ROOT)} "
           f"(이펙트 {len(used['채널']['이펙트'])} · 소리 {len(used['채널']['소리'])} · 몸동작 {len(used['채널']['몸동작'])})")
     print(f"→ {OUT.relative_to(ROOT)}  ({OUT.stat().st_size//1024} KB)")
+
+
+def main():
+    rows = json.loads(SRC.read_text(encoding="utf-8-sig"))
+    manual, has, script_of = manual_names(), scripted(), template_scripts()
+    consensus, _ = load_consensus()
+    effects = load_effects()
+
+    groups = group_rows(rows, consensus, effects, has, manual, script_of)
+
+    original_rows = cross_check(groups, script_of, has)
+
+    data = page_data(consensus, manual, rows, groups, original_rows, has)
+    write_page(data, groups)
 
 
 if __name__ == "__main__":

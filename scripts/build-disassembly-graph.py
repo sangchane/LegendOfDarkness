@@ -37,22 +37,44 @@ ADDRESS = re.compile(r"0x[0-9a-fA-F]{5,}")
 NOT_PORTED = ("옮기지 않음", "해당 없음", "아직")
 
 
-def extraction(facts):
-    nodes, edges, seen = [], [], set()
-    src = str(FINDINGS.relative_to(ROOT))
+def rule_facts(facts, node, edge, binaries, address, known):
+    """규칙·비교·스크립트 명령 증거를 잇는다."""
+    def implemented(from_id, text):
+        if not text or text.startswith(NOT_PORTED):
+            return
+        for part in text.split("·"):
+            symbol = re.split(r"[ (]", part.strip(), maxsplit=1)[0].strip()
+            if symbol:
+                edge(from_id, node("구현", symbol), "옮겼다")
 
-    def node(kind, key, label=None):
-        nid = f"{kind}:{key}"
-        if nid not in seen:
-            seen.add(nid)
-            nodes.append({"id": nid, "label": label or key, "type": kind,
-                          "source_file": src, "confidence": "EXTRACTED"})
-        return nid
+    for r in facts["rules"]:
+        nid = node("규칙", r["id"], r["statement"].split("—")[0].split(".")[0][:40])
+        edge(binaries[r["binary"]], nid, "들어있다")
+        for evidence in r["evidence"]:
+            for a in address(r["binary"], evidence):
+                edge(nid, a, "근거")
+        implemented(nid, r.get("implemented", ""))
 
-    def edge(a, b, relation):
-        edges.append({"source": a, "target": b, "relation": relation,
-                      "confidence": "EXTRACTED", "source_file": src})
+    for c in facts["comparisons"]:
+        implemented(node("비교", c["id"], c["statement"][:40]), c.get("implemented", ""))
 
+    for cmd in facts["script_command_evidence"]["examples"]:
+        nid = node("명령", cmd["name"])
+        edge(nid, known.get(cmd["address"].lower()) or node("주소", f"server:{cmd['address']}", cmd["address"]), "들어있다")
+        for key, relation in (("reads", "읽는다"), ("writes", "쓴다")):
+            if key in cmd:
+                for o in facts["offsets"]:
+                    if o["binary"] == "server" and o["struct"] == "character" and o["offset"].lower() == cmd[key].lower():
+                        edge(nid, node("칸", f"server:character+{o['offset']}"), relation)
+        if "calls" in cmd:
+            for a in address("server", cmd["calls"]):
+                edge(nid, a, "부른다")
+        if "sends" in cmd:
+            edge(nid, node("패킷", cmd["sends"]), "보낸다")
+
+
+def code_facts(facts, node, edge):
+    """실행파일·함수·표·오프셋·패킷 노드."""
     binaries = {b["id"]: node("실행파일", b["name"]) for b in facts["binaries"]}
     known = {}  # 주소(소문자) → 노드
 
@@ -98,39 +120,28 @@ def extraction(facts):
         for sender in p.get("senders", []):
             for a in address(p["binary"], sender):
                 edge(a, nid, "보낸다")
+    return binaries, known, address
 
-    def implemented(from_id, text):
-        if not text or text.startswith(NOT_PORTED):
-            return
-        for part in text.split("·"):
-            symbol = re.split(r"[ (]", part.strip(), maxsplit=1)[0].strip()
-            if symbol:
-                edge(from_id, node("구현", symbol), "옮겼다")
 
-    for r in facts["rules"]:
-        nid = node("규칙", r["id"], r["statement"].split("—")[0].split(".")[0][:40])
-        edge(binaries[r["binary"]], nid, "들어있다")
-        for evidence in r["evidence"]:
-            for a in address(r["binary"], evidence):
-                edge(nid, a, "근거")
-        implemented(nid, r.get("implemented", ""))
+def extraction(facts):
+    nodes, edges, seen = [], [], set()
+    src = str(FINDINGS.relative_to(ROOT))
 
-    for c in facts["comparisons"]:
-        implemented(node("비교", c["id"], c["statement"][:40]), c.get("implemented", ""))
+    def node(kind, key, label=None):
+        nid = f"{kind}:{key}"
+        if nid not in seen:
+            seen.add(nid)
+            nodes.append({"id": nid, "label": label or key, "type": kind,
+                          "source_file": src, "confidence": "EXTRACTED"})
+        return nid
 
-    for cmd in facts["script_command_evidence"]["examples"]:
-        nid = node("명령", cmd["name"])
-        edge(nid, known.get(cmd["address"].lower()) or node("주소", f"server:{cmd['address']}", cmd["address"]), "들어있다")
-        for key, relation in (("reads", "읽는다"), ("writes", "쓴다")):
-            if key in cmd:
-                for o in facts["offsets"]:
-                    if o["binary"] == "server" and o["struct"] == "character" and o["offset"].lower() == cmd[key].lower():
-                        edge(nid, node("칸", f"server:character+{o['offset']}"), relation)
-        if "calls" in cmd:
-            for a in address("server", cmd["calls"]):
-                edge(nid, a, "부른다")
-        if "sends" in cmd:
-            edge(nid, node("패킷", cmd["sends"]), "보낸다")
+    def edge(a, b, relation):
+        edges.append({"source": a, "target": b, "relation": relation,
+                      "confidence": "EXTRACTED", "source_file": src})
+
+    binaries, known, address = code_facts(facts, node, edge)
+
+    rule_facts(facts, node, edge, binaries, address, known)
 
     uniq, keep = set(), []
     for e in edges:

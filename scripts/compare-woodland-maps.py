@@ -176,22 +176,8 @@ def pack_wiring():
     return {"구간": out, "남의가나오는파일": south}
 
 
-def document(facts):
-    """표 한 장과 결론을 `docs/woodland-origin.md` 로 적는다."""
-    rows = facts["맵"]
-    shapes = facts["원작우드랜드구간"]["구간"]
-
-    def named(source):
-        names = source.get("이름")
-        if not names:
-            return "—"
-        return " · ".join(names) if isinstance(names, list) else names
-
-    same = sum(1 for r in rows if r["판정"]["노바온라인"] == "원작과 같음")
-    nova_total = sum(1 for r in rows if "md5" in r["출처"]["노바온라인"])
-    honden_diff = sum(1 for r in rows if r["판정"]["혼든"] == "다름")
-    five_diff = sum(1 for r in rows if r["판정"]["5.99"] == "다름")
-
+def doc_head(same, nova_total, honden_diff, five_diff, facts, shapes):
+    """문서 머리 — 결론, 어떻게 쟀나, 원작 구간."""
     lines = [
         "# 원작 우드랜드 — 어느 팩의 맵이 원작 파일인가",
         "",
@@ -266,6 +252,11 @@ def document(facts):
         "| 파일 | 원작 | 7.41 | Novaonline | 혼든 | 5.99 | 판정(노바/혼든/5.99) |",
         "|---|---|---|---|---|---|---|",
     ]
+    return lines
+
+
+def doc_rows(rows, lines, named):
+    """맵마다 한 줄과 문서 끝."""
     for r in rows:
         orig = r["출처"]["원작4.51"].get("바이트") or r["출처"]["원작2005"].get("바이트")
         short = {"원작과 같음": "같음", "다름": "다름", "없음": "—"}
@@ -290,6 +281,27 @@ def document(facts):
         "남의우드랜드(`lod542~565`)는 맵만 있고 쓰는 팩이 없다 — 원작에서도 월드맵에 들어가는 자리가 없었다.",
         "",
     ]
+    return lines
+
+
+def document(facts):
+    """표 한 장과 결론을 `docs/woodland-origin.md` 로 적는다."""
+    rows = facts["맵"]
+    shapes = facts["원작우드랜드구간"]["구간"]
+
+    def named(source):
+        names = source.get("이름")
+        if not names:
+            return "—"
+        return " · ".join(names) if isinstance(names, list) else names
+
+    same = sum(1 for r in rows if r["판정"]["노바온라인"] == "원작과 같음")
+    nova_total = sum(1 for r in rows if "md5" in r["출처"]["노바온라인"])
+    honden_diff = sum(1 for r in rows if r["판정"]["혼든"] == "다름")
+    five_diff = sum(1 for r in rows if r["판정"]["5.99"] == "다름")
+
+    lines = doc_head(same, nova_total, honden_diff, five_diff, facts, shapes)
+    lines = doc_rows(rows, lines, named)
     OUT_DOC.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"-> {OUT_DOC.relative_to(ROOT)}")
 

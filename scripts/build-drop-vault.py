@@ -205,24 +205,8 @@ def real_rate(item, listed_len, loot_type):
     return min(1.0, (item.get("DropRate") or 0) * DROP_BOOST / listed_len)
 
 
-def build_notes(monsters, items, mundanes):
-    if VAULT.exists():
-        shutil.rmtree(VAULT)
-    for sub in ("사냥터", "괴물", "아이템", "식"):
-        (VAULT / sub).mkdir(parents=True)
-
-    by_area = {}
-    for m in monsters:
-        by_area.setdefault(m["AreaID"], []).append(m)
-
-    stocked_by = {}  # 아이템 이름 -> [상점 이름]
-    for shop in mundanes:
-        for name in shop["DefaultMerchantStock"]:
-            stocked_by.setdefault(name, []).append(shop["Name"])
-
-    dropped_by = {}  # 아이템 이름 -> [(괴물note, 사냥터note, 실제확률 or None)]
-    monster_notes = {}  # (이름, area) -> note 이름
-
+def write_monster_notes(by_area, monster_notes, items, dropped_by):
+    """사냥터마다 괴물 노트를 쓰고, 드랍을 아이템 쪽에서 볼 수 있게 모은다."""
     # 1) 괴물 노트 + 사냥터별 목록
     zone_rows = {}
     for area, here in sorted(by_area.items()):
@@ -272,7 +256,11 @@ def build_notes(monsters, items, mundanes):
                 "| 아이템 | 실제 확률 | 한 번에 | 갈래 |\n|---|---|---|---|\n" + drop_table + "\n",
                 encoding="utf-8")
             zone_rows[area][1].append((m["Name"], note, exp, lo, hi, lvl))
+    return zone_rows
 
+
+def write_zone_notes(zone_rows):
+    """사냥터 노트 — 입장 레벨과 괴물 표."""
     # 2) 사냥터 노트
     gates = entry_levels()
     for area, (zname, rows) in sorted(zone_rows.items()):
@@ -296,6 +284,9 @@ def build_notes(monsters, items, mundanes):
             "| 괴물 | 경험치 | 추정레벨 | 골드범위 |\n|---|---|---|---|\n" + table + "\n",
             encoding="utf-8")
 
+
+def write_item_notes(dropped_by, stocked_by, items):
+    """아이템 노트 — 떨어뜨리는 괴물과 파는 상점."""
     # 3) 아이템 노트 — 몬스터가 떨구거나 상점이 파는 것만
     relevant = sorted(set(dropped_by) | set(stocked_by))
     for name in relevant:
@@ -321,11 +312,11 @@ def build_notes(monsters, items, mundanes):
             "| 괴물 | 사냥터 | 실제 확률 |\n|---|---|---|\n" + drops_rows + "\n\n"
             "## 어느 상점이 파나\n\n" + shops_rows + "\n",
             encoding="utf-8")
+    return relevant
 
-    # 4) 식 노트 — monsterexp.cs 근거 줄을 그대로 인용한다(다시 만들 때마다 최신 줄로 갱신됨)
-    write_formula_note()
-    write_cut_notes()
 
+def write_readme(zone_rows, monster_notes, relevant):
+    """볼트 README."""
     # README
     zone_index = "\n".join(
         f"| [[사냥터/{slug(f'{a}-{z}')}\\|{z}]] | {a} | {len(rows)} |"
@@ -342,6 +333,37 @@ def build_notes(monsters, items, mundanes):
         "식: [[식/골드-경험치식]] · [[식/경험치-깎기]] · [[식/경험치-레벨-대응]]\n\n"
         "## 사냥터\n\n| 사냥터 | AreaID | 괴물수 |\n|---|---|---|\n" + zone_index + "\n",
         encoding="utf-8")
+
+
+def build_notes(monsters, items, mundanes):
+    if VAULT.exists():
+        shutil.rmtree(VAULT)
+    for sub in ("사냥터", "괴물", "아이템", "식"):
+        (VAULT / sub).mkdir(parents=True)
+
+    by_area = {}
+    for m in monsters:
+        by_area.setdefault(m["AreaID"], []).append(m)
+
+    stocked_by = {}  # 아이템 이름 -> [상점 이름]
+    for shop in mundanes:
+        for name in shop["DefaultMerchantStock"]:
+            stocked_by.setdefault(name, []).append(shop["Name"])
+
+    dropped_by = {}  # 아이템 이름 -> [(괴물note, 사냥터note, 실제확률 or None)]
+    monster_notes = {}  # (이름, area) -> note 이름
+
+    zone_rows = write_monster_notes(by_area, monster_notes, items, dropped_by)
+
+    write_zone_notes(zone_rows)
+
+    relevant = write_item_notes(dropped_by, stocked_by, items)
+
+    # 4) 식 노트 — monsterexp.cs 근거 줄을 그대로 인용한다(다시 만들 때마다 최신 줄로 갱신됨)
+    write_formula_note()
+    write_cut_notes()
+
+    write_readme(zone_rows, monster_notes, relevant)
 
     return len(zone_rows), len(monster_notes), len(relevant)
 
@@ -436,19 +458,8 @@ def write_cut_notes():
         encoding="utf-8")
 
 
-def build_graph(zones, monsters, items_count):
-    from graphify_runtime import configure_utf8_stdio
-    from lib._graphify import ensure_graphify_python
-
-    configure_utf8_stdio(sys.stdout, sys.stderr)
-    ensure_graphify_python(__file__)
-
-    from graphify.build import build_from_json
-    from graphify.cluster import cluster, score_all
-    from graphify.analyze import god_nodes, surprising_connections, suggest_questions
-    from graphify.export import to_json, to_html
-    from graphify.report import generate
-
+def graph_facts():
+    """그래프 노드·간선 — 식, 사냥터, 괴물, 아이템, 상점."""
     nodes, edges, seen = [], [], set()
 
     def node(kind, key, label=None):
@@ -503,6 +514,23 @@ def build_graph(zones, monsters, items_count):
             item_nodes[name] = node("아이템", name)
         for shop_id in shops:
             edge(shop_id, item_nodes[name], "판다")
+    return nodes, edges
+
+
+def build_graph(zones, monsters, items_count):
+    from graphify_runtime import configure_utf8_stdio
+    from lib._graphify import ensure_graphify_python
+
+    configure_utf8_stdio(sys.stdout, sys.stderr)
+    ensure_graphify_python(__file__)
+
+    from graphify.build import build_from_json
+    from graphify.cluster import cluster, score_all
+    from graphify.analyze import god_nodes, surprising_connections, suggest_questions
+    from graphify.export import to_json, to_html
+    from graphify.report import generate
+
+    nodes, edges = graph_facts()
 
     data = {"nodes": nodes, "edges": edges}
     out = VAULT / "graph"

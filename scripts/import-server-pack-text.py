@@ -66,34 +66,8 @@ def clear_target_db(target_db: Path, pack_root: Path) -> None:
             target_db.unlink()
 
 
-def import_pack(
-    source: Path | str,
-    pack_id: str,
-    repo_root: Path | str,
-    *,
-    write: bool = False,
-) -> ImportResult:
-    if not PACK_ID_PATTERN.fullmatch(pack_id):
-        raise ValueError("pack id must be a lowercase slug containing only a-z, 0-9, and single hyphens")
-
-    source = Path(source).resolve()
-    repo_root = Path(repo_root).resolve()
-    source_db = source / "db"
-    if not source_db.is_dir():
-        raise FileNotFoundError(f"source db directory does not exist: {source_db}")
-
-    output_root = (repo_root / "data" / "server-packs").resolve(strict=False)
-    pack_root = (output_root / pack_id).resolve(strict=False)
-    if pack_root.parent != output_root:
-        raise ValueError(f"output escaped data/server-packs: {pack_root}")
-
-    source_files = sorted(
-        (path for path in source_db.rglob("*") if path.is_file() and path.suffix.casefold() == ".txt"),
-        key=lambda path: path.relative_to(source_db).as_posix(),
-    )
-    if not source_files:
-        raise ValueError(f"source db contains no .txt files: {source_db}")
-
+def decode_sources(source_db, source_files):
+    """원본 .txt 를 읽는다 — UTF-8(BOM) 이 아니면 CP949."""
     resolved_source_db = source_db.resolve()
     decoded: list[tuple[Path, str]] = []
     encodings: Counter[str] = Counter()
@@ -105,7 +79,11 @@ def import_pack(
         text, encoding = decode_text(source_file.read_bytes(), source_file)
         decoded.append((source_file.relative_to(source_db), text))
         encodings[encoding] += 1
+    return decoded, encodings
 
+
+def pack_metadata(source, repo_root, encodings, decoded):
+    """스냅숏 머리표 — 원본 위치, 파일 수, 인코딩, 실행 파일."""
     executables = sorted(
         (path for path in source.iterdir() if path.is_file() and path.suffix.casefold() == ".exe"),
         key=lambda path: path.name.casefold(),
@@ -129,7 +107,11 @@ def import_pack(
         "copied_text_files": len(decoded),
         "top_level_exe": executable_metadata,
     }
+    return metadata
 
+
+def write_snapshot(write, pack_root, decoded, metadata):
+    """임시 폴더에 다 쓴 뒤 한 번에 바꿔 넣는다."""
     if write:
         pack_root.mkdir(parents=True, exist_ok=True)
         target_db = pack_root / "db"
@@ -168,6 +150,41 @@ def import_pack(
                 if had_previous_db and previous_db.exists():
                     os.replace(previous_db, target_db)
                 raise
+
+
+def import_pack(
+    source: Path | str,
+    pack_id: str,
+    repo_root: Path | str,
+    *,
+    write: bool = False,
+) -> ImportResult:
+    if not PACK_ID_PATTERN.fullmatch(pack_id):
+        raise ValueError("pack id must be a lowercase slug containing only a-z, 0-9, and single hyphens")
+
+    source = Path(source).resolve()
+    repo_root = Path(repo_root).resolve()
+    source_db = source / "db"
+    if not source_db.is_dir():
+        raise FileNotFoundError(f"source db directory does not exist: {source_db}")
+
+    output_root = (repo_root / "data" / "server-packs").resolve(strict=False)
+    pack_root = (output_root / pack_id).resolve(strict=False)
+    if pack_root.parent != output_root:
+        raise ValueError(f"output escaped data/server-packs: {pack_root}")
+
+    source_files = sorted(
+        (path for path in source_db.rglob("*") if path.is_file() and path.suffix.casefold() == ".txt"),
+        key=lambda path: path.relative_to(source_db).as_posix(),
+    )
+    if not source_files:
+        raise ValueError(f"source db contains no .txt files: {source_db}")
+
+    decoded, encodings = decode_sources(source_db, source_files)
+
+    metadata = pack_metadata(source, repo_root, encodings, decoded)
+
+    write_snapshot(write, pack_root, decoded, metadata)
 
     return ImportResult(len(decoded), dict(encodings), write, pack_root)
 

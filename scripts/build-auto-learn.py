@@ -225,13 +225,8 @@ def original_restored(old, nova_rows):
     return restored
 
 
-def main():
-    write = "--쓰기" in sys.argv
-    known = {"skill": templates("skill"), "spell": templates("spell")}
-    old, _, _, _ = pack599(known)
-    found, instead, promoted = nova()
-    restored = original_restored(old, found)
-
+def table_rows(found, known, restored, old):
+    """줄 것과 못 넣은 것, 5.99 에만 있어 치울 것."""
     rows, skipped, icons = {}, [], {}
     for (path, kind, name), (level, source) in found.items():
         if name in EXCLUDED or name in BLOCKED_AUTO:
@@ -255,11 +250,11 @@ def main():
         for (path, kind, name) in old
         if (path, name) not in taught and (path, kind, name) not in restored
     } | FORCED_WITHDRAWN)
+    return rows, skipped, icons, replaces, withdrawn
 
-    ordered = sorted(rows.items(), key=lambda r: (r[0][0], r[1][0], r[0][1], r[0][2]))
-    def listed(names):
-        return "new string[] { " + ", ".join(f'"{n}"' for n in sorted(names)) + " }" if names else "System.Array.Empty<string>()"
 
+def report(ordered, instead, replaces, skipped, withdrawn, old, promoted):
+    """표를 사람이 읽게 찍는다."""
     for (path, kind, name), (level, source) in ordered:
         extra = ""
         if instead.get(name):
@@ -276,6 +271,12 @@ def main():
     for path, tier, kind, name in promoted:
         print(f"안 넣음({tier})\t{CLASS_KO[path]}\t{'기술' if kind == 'skill' else '마법'}\t{name}")
     print(f"모두 {len(ordered)}개 (못 넣은 것 {len(skipped)} · 치울 5.99 전용 {len(withdrawn)} · 승급 {len(promoted)})")
+
+
+def csharp_table(ordered, instead, replaces, withdrawn, old):
+    """서버 C# 표(AutoLearn.Table·Withdrawn)."""
+    def listed(names):
+        return "new string[] { " + ", ".join(f'"{n}"' for n in sorted(names)) + " }" if names else "System.Array.Empty<string>()"
 
     lines = [
         "// 손으로 고치지 말 것. `python3 scripts/build-auto-learn.py --쓰기` 가 다시 만든다.",
@@ -310,7 +311,11 @@ def main():
                   if (path, kind, name) in old else BLOCKED_AUTO[name])
         lines.append(f'            (Class.{CLASS_NAMES[path]}, {"true" if kind == "skill" else "false"}, "{name}"), // {source}')
     lines += ["        };", "    }", "}", ""]
+    return lines
 
+
+def app_table(ordered, icons):
+    """앱이 읽는 표 — 직업·레벨·갈래·이름·그림."""
     # 앱: 직업 번호(서버 `Class`, 프로필 0x39 의 직업 바이트와 같다) · 레벨 · skill/spell · 이름 · 그림 번호(템플릿 `Icon`,
     # 서버가 0x2C/0x17 로 보내는 것과 같은 값 — 없으면 0).
     app = [
@@ -319,6 +324,23 @@ def main():
     ]
     for (path, kind, name), (level, source) in ordered:
         app.append(f"{path}\t{level}\t{kind}\t{name}\t{icons[(path, kind, name)]}")
+    return app
+
+
+def main():
+    write = "--쓰기" in sys.argv
+    known = {"skill": templates("skill"), "spell": templates("spell")}
+    old, _, _, _ = pack599(known)
+    found, instead, promoted = nova()
+    restored = original_restored(old, found)
+
+    rows, skipped, icons, replaces, withdrawn = table_rows(found, known, restored, old)
+
+    ordered = sorted(rows.items(), key=lambda r: (r[0][0], r[1][0], r[0][1], r[0][2]))
+    report(ordered, instead, replaces, skipped, withdrawn, old, promoted)
+    lines = csharp_table(ordered, instead, replaces, withdrawn, old)
+
+    app = app_table(ordered, icons)
 
     if write:
         OUT.write_text("\n".join(lines), encoding="utf-8")

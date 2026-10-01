@@ -215,14 +215,8 @@ def hits(where, pattern):
     return found
 
 
-def main():
-    if VAULT.exists():
-        shutil.rmtree(VAULT)
-    (VAULT / "식").mkdir(parents=True)
-    (VAULT / "설정").mkdir(parents=True)
-
-    (VAULT / "확인").mkdir(parents=True)
-
+def write_formula_notes():
+    """식마다 노트 한 장 — 근거 파일에서 그 줄을 찾아 붙인다."""
     index = []
     for title, where, pattern in HUNTS:
         found = hits(where, pattern)
@@ -243,7 +237,11 @@ def main():
         body += ["## 읽는 설정", "", "이 식이 쓰는 값은 [[설정/LoruleConfig|LoruleConfig]] 에 있다.", ""]
         (VAULT / "식" / f"{BANNED.sub('_', title)}.md").write_text("\n".join(body), encoding="utf-8")
         index.append((title, len(found)))
+    return index
 
+
+def ability_reality_note():
+    """「기술·마법이 실제로 도는가」 — 스크립트와 템플릿을 잇고 원작 목록과 견준 노트."""
     # ── 기술·마법이 실제로 도는가 ────────────────────────────────────────
     # **하데스 먼저, 원작 다음, 팩은 안 본다.** 이 함수는 팩 자료를 읽지 않는다 — 규칙을 글로만
     # 적어 두면 다음 사람이 또 팩부터 뒤진다.
@@ -314,6 +312,9 @@ def main():
         "`tests/hades-characterization/MonkLevelTenSkillTests.cs`\n",
         encoding="utf-8")
 
+
+def write_findings():
+    """확인한 주장마다 노트 — 근거 줄이 아직 그대로인지 본다."""
     checked = []
     for title, claim, evidence, notes, pinned in FINDINGS:
         rows = [(w, p, hits(w, p)) for w, p in evidence]
@@ -341,7 +342,11 @@ def main():
                  "\"체력이 좀 깎였다\" 로는 한 대에 1% 가 깎이든 90% 가 깎이든 똑같이 통과한다.", ""]
         (VAULT / "확인" / f"{BANNED.sub('_', title)}.md").write_text("\n".join(body), encoding="utf-8")
         checked.append((title, total))
+    return checked
 
+
+def write_config_note():
+    """서버 설정에서 식에 닿는 손잡이들."""
     raw = CONFIG.read_text(encoding="utf-8-sig")
     rows = []
     for k in KNOBS:
@@ -355,6 +360,9 @@ def main():
         "| 값 | 지금 |\n|---|---|\n" + "\n".join(f"| `{k}` | `{v}` |" for k, v in rows) + "\n",
         encoding="utf-8")
 
+
+def write_readme(checked, index):
+    """볼트 README."""
     (VAULT / "README.md").write_text(
         "# 세계가 굴러가는 식\n\n"
         "**수치는 표에 없다. 식이 코드에 박혀 있다.**\n"
@@ -374,6 +382,25 @@ def main():
           "[[설정/LoruleConfig|식이 읽는 설정값]]\n\n"
           "`python3 scripts/build-formula-vault.py` 로 다시 만든다.\n",
         encoding="utf-8")
+
+
+def main():
+    if VAULT.exists():
+        shutil.rmtree(VAULT)
+    (VAULT / "식").mkdir(parents=True)
+    (VAULT / "설정").mkdir(parents=True)
+
+    (VAULT / "확인").mkdir(parents=True)
+
+    index = write_formula_notes()
+
+    ability_reality_note()
+
+    checked = write_findings()
+
+    write_config_note()
+
+    write_readme(checked, index)
     for t, n in index:
         print(f"  {t:24} 근거 {n}줄")
     print()

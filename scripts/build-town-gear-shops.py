@@ -360,6 +360,71 @@ def coverage(items, stock, slots, level):
     return out
 
 
+def stock(shop, lists, trouble, items, who, honden):
+    """물목 — 5.99 목록을 잇고, 원작 장신구·무기와 너클, 칸에 맞는 혼든 물목을 더해 레벨순으로."""
+    # 물목 — 5.99 목록을 차례대로 잇고 겹치는 것은 한 번만 둔다.
+    names, seen = [], set()
+    for key in shop["목록"]:
+        if key not in lists:
+            trouble.append(f"5.99 팩에 {key} 목록이 없다")
+            continue
+        for name in lists[key]:
+            if name not in seen:
+                seen.add(name)
+                names.append(name)
+    for name in shop.get("원작장신구", []) + shop.get("원작무기", []):
+        if name not in items:
+            trouble.append(f"{who}: 원작 물건 {name} 이 아이템 템플릿에 없다")
+        elif name not in seen:
+            seen.add(name)
+            names.append(name)
+    for name in shop["너클"]:
+        if name not in items:
+            trouble.append(f"{who}: 너클 {name} 이 아이템 템플릿에 없다 — python3 scripts/build-nova-knuckles.py --쓰기")
+        elif name not in seen:
+            seen.add(name)
+            names.append(name)
+
+    names = [shop.get("바꿈", {}).get(n, n) for n in names]
+    missing = [n for n in names if n not in items]
+    if missing:
+        trouble.append(f"{who}: 아이템 템플릿에 없는 물건 {missing}")
+    names = [n for n in names if n in items]
+
+    # 혼든 물목은 **서버에 있고 이 상점 칸에 맞는 것만** 더한다.
+    from_honden = []
+    for giver in ("가이", "아돌"):
+        for name in honden.get(giver, []):
+            it = items.get(name)
+            if it and it.get("EquipmentSlot") in shop["칸"] and name not in seen:
+                seen.add(name)
+                names.append(name)
+                from_honden.append(name)
+
+    # 낮은 레벨이 먼저 보이게 놓는다 — 긴 목록에서 1레벨짜리를 끝까지 넘겨 찾지 않도록.
+    names.sort(key=lambda n: (items[n].get("LevelRequired") or 1, items[n].get("Value") or 0, n))
+    return names, from_honden
+
+
+def report_shop(full, image, shop, names, source, counter, far, speech, before, args, from_honden, items, trouble, who):
+    """상점 하나를 알린다 — 자리 근거, 계산대, 물목, 직업마다 초반 레벨에 살 것."""
+    print(f"\n■ {full}  그림 {SPRITE_BASE + image}(혼든 이미지 {image}) · {shop['갈래']} {len(names)}종")
+    print(f"   자리 근거: {source}")
+    print(f"   계산대: 문 {shop['문']} 에서 걸어 닿는 가장 가까운 칸 {counter} — {far}칸")
+    print(f"   인사말 {len(speech)}줄 · 스크립트 {SHOP_SCRIPT} · {'고침' if before else '새로 씀'}"
+          f"{'' if args.writing else ' (아직 안 씀 — --쓰기)'}")
+    print(f"   물목: {', '.join(names)}")
+    if from_honden:
+        print(f"   혼든에서 더한 것 {len(from_honden)}종: {', '.join(from_honden)}")
+
+    for cls, got in coverage(items, names, shop["칸"], EARLY_LEVEL).items():
+        mark = "○" if got else "✗"
+        print(f"   {mark} {CLASS_NAME[cls]} 1~{EARLY_LEVEL}레벨: "
+              + (", ".join(f"{n}(Lv{items[n]['LevelRequired']}·{items[n]['Value']}골드)" for n in got) or "없다"))
+        if not got:
+            trouble.append(f"{who}: {CLASS_NAME[cls]} 가 1~{EARLY_LEVEL}레벨에 살 {shop['갈래']}가 없다")
+
+
 def main():
     parser = argparse.ArgumentParser(description="수오미·우드랜드에 장비 상점을 세운다")
     parser.add_argument("--쓰기", action="store_true", dest="writing")
@@ -404,47 +469,7 @@ def main():
             x, y, direction = pspawns[key]
             source = f"5.99 {key[0]},{x},{y},{direction},{key[1]}"
 
-        # 물목 — 5.99 목록을 차례대로 잇고 겹치는 것은 한 번만 둔다.
-        names, seen = [], set()
-        for key in shop["목록"]:
-            if key not in lists:
-                trouble.append(f"5.99 팩에 {key} 목록이 없다")
-                continue
-            for name in lists[key]:
-                if name not in seen:
-                    seen.add(name)
-                    names.append(name)
-        for name in shop.get("원작장신구", []) + shop.get("원작무기", []):
-            if name not in items:
-                trouble.append(f"{who}: 원작 물건 {name} 이 아이템 템플릿에 없다")
-            elif name not in seen:
-                seen.add(name)
-                names.append(name)
-        for name in shop["너클"]:
-            if name not in items:
-                trouble.append(f"{who}: 너클 {name} 이 아이템 템플릿에 없다 — python3 scripts/build-nova-knuckles.py --쓰기")
-            elif name not in seen:
-                seen.add(name)
-                names.append(name)
-
-        names = [shop.get("바꿈", {}).get(n, n) for n in names]
-        missing = [n for n in names if n not in items]
-        if missing:
-            trouble.append(f"{who}: 아이템 템플릿에 없는 물건 {missing}")
-        names = [n for n in names if n in items]
-
-        # 혼든 물목은 **서버에 있고 이 상점 칸에 맞는 것만** 더한다.
-        from_honden = []
-        for giver in ("가이", "아돌"):
-            for name in honden.get(giver, []):
-                it = items.get(name)
-                if it and it.get("EquipmentSlot") in shop["칸"] and name not in seen:
-                    seen.add(name)
-                    names.append(name)
-                    from_honden.append(name)
-
-        # 낮은 레벨이 먼저 보이게 놓는다 — 긴 목록에서 1레벨짜리를 끝까지 넘겨 찾지 않도록.
-        names.sort(key=lambda n: (items[n].get("LevelRequired") or 1, items[n].get("Value") or 0, n))
+        names, from_honden = stock(shop, lists, trouble, items, who, honden)
 
         full = f"{who}@{area_name}#{x},{y}"
 
@@ -462,21 +487,7 @@ def main():
         if args.writing:
             out.write_text(json.dumps(body, ensure_ascii=False, indent=2), encoding="utf-8")
 
-        print(f"\n■ {full}  그림 {SPRITE_BASE + image}(혼든 이미지 {image}) · {shop['갈래']} {len(names)}종")
-        print(f"   자리 근거: {source}")
-        print(f"   계산대: 문 {shop['문']} 에서 걸어 닿는 가장 가까운 칸 {counter} — {far}칸")
-        print(f"   인사말 {len(speech)}줄 · 스크립트 {SHOP_SCRIPT} · {'고침' if before else '새로 씀'}"
-              f"{'' if args.writing else ' (아직 안 씀 — --쓰기)'}")
-        print(f"   물목: {', '.join(names)}")
-        if from_honden:
-            print(f"   혼든에서 더한 것 {len(from_honden)}종: {', '.join(from_honden)}")
-
-        for cls, got in coverage(items, names, shop["칸"], EARLY_LEVEL).items():
-            mark = "○" if got else "✗"
-            print(f"   {mark} {CLASS_NAME[cls]} 1~{EARLY_LEVEL}레벨: "
-                  + (", ".join(f"{n}(Lv{items[n]['LevelRequired']}·{items[n]['Value']}골드)" for n in got) or "없다"))
-            if not got:
-                trouble.append(f"{who}: {CLASS_NAME[cls]} 가 1~{EARLY_LEVEL}레벨에 살 {shop['갈래']}가 없다")
+        report_shop(full, image, shop, names, source, counter, far, speech, before, args, from_honden, items, trouble, who)
 
     if trouble:
         print("\n막는 것:")

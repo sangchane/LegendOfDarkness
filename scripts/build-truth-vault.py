@@ -107,14 +107,8 @@ def note(title, hades, original, now, packs, verdict, howto):
     return title, verdict
 
 
-def main():
-    if VAULT.exists():
-        shutil.rmtree(VAULT)
-    (VAULT / "갈래").mkdir(parents=True)
-
-    metafiles = sorted(f.name for f in META.glob("*") if f.is_file()) if META.exists() else []
-    index = []
-
+def item_note(index):
+    """아이템 갈래 — 하데스·원작·지금·팩을 견준 노트."""
     # ── 아이템 ─────────────────────────────────────────────────────────
     # 하데스가 싣는 영문 아이템 템플릿. `origin/Zolian` 브랜치에 있고 **이미지 번호를 갖는다** —
     # 클라이언트가 받는 `ItemInfo` 에는 이미지가 없다(서버가 보내는 값이라 들어갈 이유가 없다).
@@ -156,11 +150,9 @@ def main():
           if from_pack > from_orig else "규칙대로다."),
         ["`docs/game-data.md` · `data/archives-vault/` · `tools/dat-extract`"]))
 
-    # ── 괴물 ───────────────────────────────────────────────────────────
-    now_mobs = templates("monsters")
-    ours = {n for n, g in now_mobs.items() if n not in ("bees", "spider", "minion")}
-    mp = pack("mobs")
-    mag = agreement(mp, ["체력", "최소공격력", "최대공격력", "방어력", "경험치", "이미지"])
+
+def hunting_grounds(mp):
+    """사냥터별로 팩 둘이 일치하는 괴물 수치가 있는지."""
     # 사냥터별로 팩 2개가 일치하는 수치가 있는지. "그럼 우드랜드·포테의숲 것으로 하자" 는
     # 물음에 매번 다시 세지 않도록 여기서 답을 만든다.
     hunt = []
@@ -194,7 +186,11 @@ def main():
         real_here = sorted(k for k in kinds if _base(k) in {_base(n) for n in ps[1]})
         hunt.append(f"**{keyword}** — 괴물 {len(kinds)}종 · **뿌리가 둘 다에 있는 것(실재) "
                     f"{len(real_here)}종**: {', '.join(real_here) or '없다'}")
+    return hunt
 
+
+def pack_verdicts(mp):
+    """팩이 어긋날 때 사람이 준 판정 줄."""
     # 사람이 준 판정. 팩이 어긋날 때 이것이 정한다 — 적어 두지 않으면 또 묻게 된다.
     ps2 = list(mp.values())
     verdict_lines = []
@@ -233,6 +229,19 @@ def main():
             "- 방어력·공격력은 유저가 알 수 없는 값이라 사람이 판정할 수 없다. 그림 번호는 겹치는 것에서 "
             "대부분 일치하므로 **신원은 믿을 수 있고 수치만 못 믿는다**",
         ]
+    return verdict_lines
+
+
+def monster_note(index):
+    """괴물 갈래 노트."""
+    # ── 괴물 ───────────────────────────────────────────────────────────
+    now_mobs = templates("monsters")
+    ours = {n for n, g in now_mobs.items() if n not in ("bees", "spider", "minion")}
+    mp = pack("mobs")
+    mag = agreement(mp, ["체력", "최소공격력", "최대공격력", "방어력", "경험치", "이미지"])
+    hunt = hunting_grounds(mp)
+
+    verdict_lines = pack_verdicts(mp)
 
     index.append(note(
         "괴물",
@@ -258,6 +267,9 @@ def main():
          if mag else "팩 자료를 못 읽었다."),
         ["`data/formula-vault/` — 식이 레벨에서 무엇을 만드는지"]))
 
+
+def ability_note(index):
+    """기술·마법 갈래 노트."""
     # ── 기술·마법 ──────────────────────────────────────────────────────
     ab = rows(ORIG / "abilities.json")
     sk, sp = templates("skills"), templates("spells")
@@ -284,6 +296,9 @@ def main():
         "규칙대로다. 구조는 하데스 스크립트 66개 + 원작 `SClass` 613개이고, 팩 2개 합의는 한글 표시만 보조한다.",
         ["`data/formula-vault/구현/기술·마법이 실제로 도는가` — 몇 개가 실제로 도는지"]))
 
+
+def quest_note(index):
+    """퀘스트·NPC 초상 갈래 노트."""
     # ── 퀘스트 · NPC 초상 ──────────────────────────────────────────────
     q = rows(ORIG / "quests.json")
     por = rows(ORIG / "npc-portraits.json")
@@ -297,6 +312,9 @@ def main():
         "규칙대로다 — 퀘스트와 초상은 하데스 메타파일에서 나왔다.",
         []))
 
+
+def write_metafile_note(metafiles):
+    """하데스 메타파일 목록 노트."""
     # ── 메타파일 목록 ──────────────────────────────────────────────────
     (VAULT / "갈래" / "하데스 메타파일.md").write_text(
         "---\n이름: \"하데스 메타파일\"\n갈래: 자료출처\n---\n\n"
@@ -320,6 +338,9 @@ def main():
         + "\n\n꺼내는 도구: `tools/dat-extract` · `scripts/build-game-data.ps1`\n",
         encoding="utf-8")
 
+
+def write_readme(index):
+    """볼트 README — 갈래마다 한 줄 판정."""
     (VAULT / "README.md").write_text(
         "# 자료가 어디서 오는가\n\n"
         "**판단 절차**\n\n"
@@ -333,6 +354,27 @@ def main():
         + "\n\n[[갈래/하데스 메타파일|하데스 메타파일 — 여기부터 본다]]\n\n"
           "`python3 scripts/build-truth-vault.py` 로 다시 만든다.\n",
         encoding="utf-8")
+
+
+def main():
+    if VAULT.exists():
+        shutil.rmtree(VAULT)
+    (VAULT / "갈래").mkdir(parents=True)
+
+    metafiles = sorted(f.name for f in META.glob("*") if f.is_file()) if META.exists() else []
+    index = []
+
+    item_note(index)
+
+    monster_note(index)
+
+    ability_note(index)
+
+    quest_note(index)
+
+    write_metafile_note(metafiles)
+
+    write_readme(index)
 
     for t, v in index:
         print(f"  {t:14} {v.splitlines()[0][:80]}")

@@ -123,11 +123,8 @@ def kind_of(item):
     return "재료"
 
 
-def main():
-    names = areas()
-    facts = item_facts()
-    wanted = {i: n for i, n in names.items() if region_of(n)}
-
+def monster_rows(wanted, facts):
+    """괴물 자리마다 한 줄 — 맵, 수치, 금화, 드랍, 그림."""
     rows = []
     for folder in sorted(p for p in MONSTERS.iterdir() if p.is_dir()):
         for path in sorted(folder.glob("*.json")):
@@ -188,7 +185,11 @@ def main():
             })
 
     rows.sort(key=lambda r: (r["지역"], r["맵번호"], r["경험치"]))
+    return rows
 
+
+def write_page(rows, wanted):
+    """monsters-data.js 를 쓰고 수를 알린다."""
     # 사람이 갈 수 있는 맵인데 괴물이 하나도 없는 곳 — 마을이라 없는 것일 수도, 안 채운 것일 수도.
     filled = {r["맵번호"] for r in rows}
     empty = [{"맵번호": i, "맵": n, "지역": region_of(n)}
@@ -223,6 +224,16 @@ def main():
         encoding="utf-8")
     print(f"괴물 자리 {len(rows)} · 이름 {payload['셈']['이름']} · 그림 {payload['셈']['그림있음']} · 빈 맵 {len(empty)}")
     print(f"→ {OUT.relative_to(ROOT)}  ({OUT.stat().st_size // 1024} KB)")
+
+
+def main():
+    names = areas()
+    facts = item_facts()
+    wanted = {i: n for i, n in names.items() if region_of(n)}
+
+    rows = monster_rows(wanted, facts)
+
+    write_page(rows, wanted)
 
 
 if __name__ == "__main__":

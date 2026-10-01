@@ -248,17 +248,8 @@ def implemented():
     return set(re.findall(r'case "([^"]+)":', read(RUNTIME)))
 
 
-def main():
-    writing = "--쓰기" in sys.argv or "--write" in sys.argv
-    only = set(sys.argv[sys.argv.index("--만") + 1:]) if "--만" in sys.argv else None
-    found = {**blocks(), **nova_blocks()}
-    if only is not None:
-        found = {key: value for key, value in found.items() if key[1] in only}
-    skills, spells = definitions(PACK / "skill" / "Skill.txt"), definitions(PACK / "spell" / "spell.txt")
-    nova_skills, nova_spells = definitions(NOVA / "skill" / "default.txt"), definitions(NOVA / "spell" / "spell.txt")
-    taught = teachers()
-    known = implemented()
-
+def translate_all(found, known, taught):
+    """블록마다 C# 으로 옮긴다 — 옮긴 것, 못 옮긴 것, 아직 없는 명령, 하데스 스크립트를 붙일 것."""
     made, failed, missing, aliased = [], [], Counter(), []
     for (kind, name), (source, body) in sorted(found.items()):
         if name in EXCLUDED or (kind == "SKILL" and (MONK / f"{name}.cs").exists()):
@@ -277,17 +268,11 @@ def main():
         delay = re.search(r"\bskill_delay\s+(\d+)", body)
         made.append((kind, name, source, code, variables, flags, lacking, int(delay.group(1)) if delay else 0,
                      class_of(name, source, body, taught)))
+    return made, failed, missing, aliased
 
-    whole = [m for m in made if not m[6]]
-    print(f"5.99 블록 {len(found)} · 옮김 {len(made)} (명령이 다 있는 것 {len(whole)}) · 못 옮김 {len(failed)}")
-    for kind, name, error in failed:
-        print(f"  못 옮김 {kind} {name}: {error}")
-    print("아직 없는 명령(쓰는 블록 수): " + ", ".join(f"{k}({v})" for k, v in missing.most_common()))
 
-    if not writing:
-        print("\n--쓰기 를 붙이면 실제로 만듭니다.")
-        return 0
-
+def write_made(made, nova_skills, nova_spells, skills, spells, taught):
+    """옮긴 스크립트와 그 템플릿을 쓴다."""
     for kind, name, source, code, variables, flags, lacking, delay, cls in made:
         folder = OUT / {"SKILL": "Skills", "SPELL": "Spells", "Monster": "Monsters"}[kind]
         folder.mkdir(parents=True, exist_ok=True)
@@ -328,6 +313,10 @@ def main():
         template["ScriptName" if kind == "SKILL" else "ScriptKey"] = name
         template["Cooldown"] = delay
         path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
+
+
+def write_aliased(aliased):
+    """하데스 스크립트를 붙이는 것 — 템플릿이 그 스크립트를 가리키게."""
     for kind, name in aliased:
         folder = "skills" if kind == "SKILL" else "spells"
         (OUT / folder.capitalize() / f"{name}.cs").unlink(missing_ok=True)
@@ -335,6 +324,10 @@ def main():
         template = json.loads(path.read_text(encoding="utf-8-sig"))
         template["ScriptName" if kind == "SKILL" else "ScriptKey"] = ALIASES[name]
         path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
+
+
+def attach_monster_spells(made):
+    """괴물 마법을 괴물 템플릿에 붙인다."""
     # 괴물 마법을 괴물 템플릿에 붙인다. 하데스 `CommonMonster` 가 `SpellScripts` 의 것을 표적에게 쓴다.
     defined = {name for kind, name, *_ in made if kind == "Monster"}
     wanted = monster_spells()
@@ -350,6 +343,35 @@ def main():
         template["SpellScripts"] = [spell]
         path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
         attached += 1
+    return attached, undefined
+
+
+def main():
+    writing = "--쓰기" in sys.argv or "--write" in sys.argv
+    only = set(sys.argv[sys.argv.index("--만") + 1:]) if "--만" in sys.argv else None
+    found = {**blocks(), **nova_blocks()}
+    if only is not None:
+        found = {key: value for key, value in found.items() if key[1] in only}
+    skills, spells = definitions(PACK / "skill" / "Skill.txt"), definitions(PACK / "spell" / "spell.txt")
+    nova_skills, nova_spells = definitions(NOVA / "skill" / "default.txt"), definitions(NOVA / "spell" / "spell.txt")
+    taught = teachers()
+    known = implemented()
+
+    made, failed, missing, aliased = translate_all(found, known, taught)
+
+    whole = [m for m in made if not m[6]]
+    print(f"5.99 블록 {len(found)} · 옮김 {len(made)} (명령이 다 있는 것 {len(whole)}) · 못 옮김 {len(failed)}")
+    for kind, name, error in failed:
+        print(f"  못 옮김 {kind} {name}: {error}")
+    print("아직 없는 명령(쓰는 블록 수): " + ", ".join(f"{k}({v})" for k, v in missing.most_common()))
+
+    if not writing:
+        print("\n--쓰기 를 붙이면 실제로 만듭니다.")
+        return 0
+
+    write_made(made, nova_skills, nova_spells, skills, spells, taught)
+    write_aliased(aliased)
+    attached, undefined = attach_monster_spells(made)
     print(f"\n스크립트·템플릿 {len(made)}쌍을 만들었습니다. 하데스 스크립트를 붙인 것 {len(aliased)}개.")
     print(f"괴물 템플릿 {attached}장에 괴물 마법을 붙였습니다.")
     if undefined:

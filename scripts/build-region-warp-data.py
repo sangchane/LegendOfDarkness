@@ -14,6 +14,7 @@ import json
 import sys
 import re
 from collections import defaultdict, deque
+from types import SimpleNamespace
 
 from lib._paths import ROOT
 from lib._git import git_pointer
@@ -93,7 +94,8 @@ def region_of(name):
     return None
 
 
-def main():
+def read_world():
+    """서버 자료를 읽는다 — 맵 이름, 팩 스폰, 괴물·NPC 수, 워프(타일·월드맵)."""
     names = {}
     for path in (SERVER / "areas").glob("*.json"):
         try:
@@ -145,12 +147,18 @@ def main():
                     worldmap[source] += 1
                 continue
             tiles[(source, target)] += 1
+    return SimpleNamespace(
+        names=names, wanted=wanted, spawn_sets=spawn_sets, monsters=monsters, by_name=by_name, npcs=npcs,
+        tiles=tiles, worldmap=worldmap)
 
+
+def regions(world):
+    """지역마다 시작 맵에서 워프로 닿는 맵을 따라가 노드·간선을 만든다."""
     result = {}
     for region, start in REGIONS.items():
-        ids = {i for i, n in wanted.items() if region_of(n) == region}
+        ids = {i for i, n in world.wanted.items() if region_of(n) == region}
         edges = [{"부터": s, "까지": t, "칸": c, "밖으로": t not in ids}
-                 for (s, t), c in tiles.items() if s in ids or t in ids]
+                 for (s, t), c in world.tiles.items() if s in ids or t in ids]
 
         # 왕복인지 한 방향인지. 되돌아오는 칸이 없으면 들어가면 못 나온다.
         pairs = {(e["부터"], e["까지"]) for e in edges}
@@ -161,7 +169,7 @@ def main():
         nexts = defaultdict(set)
         for edge in edges:
             nexts[edge["부터"]].add(edge["까지"])
-        reached, queue = set(), deque([by_name.get(start)])
+        reached, queue = set(), deque([world.by_name.get(start)])
         while queue:
             here = queue.popleft()
             if here is None or here in reached:
@@ -171,8 +179,8 @@ def main():
 
         nodes = []
         for area in sorted(ids):
-            name = wanted[area]
-            monster_count = monsters.get(area, 0)
+            name = world.wanted[area]
+            monster_count = world.monsters.get(area, 0)
             node = {
                 "번호": area,
                 "이름": name,
@@ -180,21 +188,21 @@ def main():
                 "출발점": name == start,
                 "닿음": area in reached,
                 "괴물": monster_count,
-                "NPC": npcs.get(area, 0),
-                "월드맵": worldmap.get(area, 0),
+                "NPC": world.npcs.get(area, 0),
+                "월드맵": world.worldmap.get(area, 0),
                 "나가는곳": len(nexts.get(area, ())),
             }
             if monster_count == 0 and node["갈래"] == "던전":
-                node["빈방"] = empty_room_evidence(name, spawn_sets)
+                node["빈방"] = empty_room_evidence(name, world.spawn_sets)
             nodes.append(node)
 
         # 지역 밖으로 이어지는 곳 — 다음에 무엇을 채워야 하는지가 여기 보인다.
         outside = sorted({(e["부터"], e["까지"]) for e in edges if e["밖으로"]})
         result[region] = {
-            "출발점": by_name.get(start),
+            "출발점": world.by_name.get(start),
             "맵": nodes,
             "연결": edges,
-            "밖": [{"부터": names.get(s, s), "까지": names.get(t, t)} for s, t in outside],
+            "밖": [{"부터": world.names.get(s, s), "까지": world.names.get(t, t)} for s, t in outside],
             "셈": {
                 "맵": len(nodes),
                 "닿음": sum(1 for n in nodes if n["닿음"]),
@@ -202,13 +210,17 @@ def main():
                 "한방향": sum(1 for e in edges if not e["왕복"]),
             },
         }
+    return result
 
+
+def write_page(result, world):
+    """regions-data.js 를 쓰고 지역별 수를 알린다."""
     pointer = git_pointer(SERVER.parents[1])
 
     payload = {
         "생성": "scripts/build-region-warp-data.py",
         "서버포인터": pointer,
-        "이름": {str(i): n for i, n in names.items()},
+        "이름": {str(i): n for i, n in world.names.items()},
         "지역": result,
     }
     OUT.write_text(
@@ -219,6 +231,14 @@ def main():
         c = data["셈"]
         print(f"{region}: 맵 {c['맵']} · 닿음 {c['닿음']} · 고아 {c['고아']} · 한방향 {c['한방향']}")
     print(f"→ {OUT.relative_to(ROOT)}  ({OUT.stat().st_size // 1024} KB)")
+
+
+def main():
+    world = read_world()
+
+    result = regions(world)
+
+    write_page(result, world)
 
 
 if __name__ == "__main__":

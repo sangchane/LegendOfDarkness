@@ -157,13 +157,8 @@ def role_of(mundane, scripts):
     return "안내", None
 
 
-def main():
-    names = areas()
-    reached = reachable_set(names)
-    anchors = town_anchors(names)
-    facts = item_facts()
-    scripts = pack599_scripts()
-
+def npc_rows(names, scripts, reached, anchors, facts):
+    """NPC 마다 한 줄 — 마을·맵·역할, 지금 닿는지, 무엇을 파는지."""
     rows = []
     role_tally_all = defaultdict(int)
     role_tally_now = defaultdict(int)
@@ -220,7 +215,11 @@ def main():
             role_tally_now[role] += 1
 
     rows.sort(key=lambda r: (not r["닿음"], r["마을"], r["맵"], r["이름"]))
+    return rows, role_tally_all, role_tally_now
 
+
+def write_page(rows, role_tally_all, role_tally_now):
+    """npcs-data.js 를 쓰고 수를 알린다."""
     towns = sorted({r["마을"] for r in rows})
     maps = sorted({r["맵"] for r in rows})
 
@@ -258,6 +257,18 @@ def main():
     print(f"NPC {len(rows)} · 지금 서 있다 {now_count} · 아직 못 감 {len(rows) - now_count}")
     print("역할별(지금):", dict(role_tally_now))
     print(f"→ {OUT.relative_to(ROOT)}  ({OUT.stat().st_size // 1024} KB)")
+
+
+def main():
+    names = areas()
+    reached = reachable_set(names)
+    anchors = town_anchors(names)
+    facts = item_facts()
+    scripts = pack599_scripts()
+
+    rows, role_tally_all, role_tally_now = npc_rows(names, scripts, reached, anchors, facts)
+
+    write_page(rows, role_tally_all, role_tally_now)
 
 
 if __name__ == "__main__":
