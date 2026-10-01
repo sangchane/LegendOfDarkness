@@ -171,10 +171,10 @@ public partial class GameScreen : Control
     private int _autoHuntSettling;
     private int _companionSettling; // --companion: 자리를 잡은 뒤 [동료 부르기] 를 한 번 누르기까지 센 프레임.
 
-    // 설정 → 계정 탭의 [종료] 가 여는 작은 판 — 로그아웃 · 게임 종료 · 취소.
+    // 설정 창 제목 줄의 [로그아웃] 이 여는 작은 판 — 로그아웃 · 게임 종료 · 취소.
     private readonly ExitChoice _exit = new();
 
-    // --exit-menu 로 설정 → 계정 → [종료] 를 누르기까지 센 프레임.
+    // --exit-menu 로 설정 창을 열고 제목 줄의 [로그아웃] 을 누르기까지 센 프레임.
     private int _exitSettling;
     private bool _leaving;
 

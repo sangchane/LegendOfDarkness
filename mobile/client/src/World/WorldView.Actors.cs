@@ -287,12 +287,10 @@ public sealed partial class WorldView
     }
 
     /// <summary>
-    /// The pieces somebody is drawn from. A piece we have no picture for is left out rather than left
-    /// blank — the wardrobe in this repository only holds what the world can currently hand out.
-    /// </summary>
-    /// <summary>
     /// The sheets one person is drawn from. The equipment panel draws the same figure in its middle, so
-    /// this is shared rather than written twice — one wardrobe, one set of rules about layer order.
+    /// this is shared rather than written twice — one wardrobe, one set of rules about layer order. A piece we
+    /// have no picture for is left out rather than left blank — the wardrobe in this repository only holds what
+    /// the world can currently hand out.
     /// </summary>
     internal static Actor.Sheet Dress(Character one)
     {

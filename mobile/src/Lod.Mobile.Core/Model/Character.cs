@@ -24,6 +24,7 @@ public sealed record Appearance(
     int Resting,
     int OverCoat);
 
+/// <summary>What kind of thing the server is showing, which decides how the rest of it is read.</summary>
 public enum CreatureKind
 {
     /// <summary>A monster. It fights.</summary>
@@ -55,15 +56,15 @@ public sealed record Creature(
     string Name,
     int Count = 0);
 
+/// <summary>A body motion (0x1A): whose, which motion (see <c>Art.BodyMotion</c>) and how fast.</summary>
+public sealed record Motion(uint Serial, int Number, int Speed);
+
 /// <summary>
 /// A skill's flash, as the server sends it (0x29). On somebody the first animation plays over
 /// <paramref name="Target" /> and the second over <paramref name="Source" />; on the ground both serials are zero
 /// and <paramref name="At" /> says where.
 /// </summary>
 /// <param name="Speed">How long each frame stays, in milliseconds as the original counts them.</param>
-/// <summary>A body motion (0x1A): whose, which motion (see <c>Art.BodyMotion</c>) and how fast.</summary>
-public sealed record Motion(uint Serial, int Number, int Speed);
-
 public sealed record Effect(uint Target, uint Source, int TargetAnimation, int SourceAnimation, int Speed, Tile? At);
 
 /// <summary>

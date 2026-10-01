@@ -265,20 +265,6 @@ public sealed partial class WorldClient
     }
 
     /// <summary>
-    /// Everything the server is showing at once: how many, then that many records.
-    /// </summary>
-    /// <remarks>
-    /// Each record is the same seventeen bytes — place, serial, drawing, four bytes the server leaves
-    /// empty, a direction, one more empty, and what kind of thing it is. A merchant is named after that
-    /// and nothing else is.
-    ///
-    /// Things lying on the floor are written shorter than this by our server (thirteen bytes, with no
-    /// direction and no kind), and there is nothing in the record to tell them apart from the start of a
-    /// monster — so a floor with something dropped on it would be read wrongly from that point. The
-    /// original format has no such gap; ours does. Nothing can be dropped here yet, and this is where to
-    /// come back when it can be.
-    /// </remarks>
-    /// <summary>
     /// One status icon (0x3A): which picture, and a grade saying how much longer it lasts. The server works the
     /// grade out in <c>Debuff.Display</c> — 6 is over ninety seconds, 1 is under ten, and 0 means it is over.
     /// </summary>
@@ -329,6 +315,15 @@ public sealed partial class WorldClient
             body[12] == 1 ? FigureKind.Heal : FigureKind.Damage);
     }
 
+    /// <summary>
+    /// Everything the server is showing at once: how many, then that many records.
+    /// </summary>
+    /// <remarks>
+    /// Each record is the same seventeen bytes — place, serial, drawing, four bytes for how many a thing on the floor
+    /// holds (<see cref="Creature.Count" />, empty for the rest), a direction, one more empty, and what kind of thing it
+    /// is. A merchant is named after that and nothing else is. Things lying on the floor come in the same seventeen
+    /// bytes, as <see cref="CreatureKind.Passable" />.
+    /// </remarks>
     public static IReadOnlyList<Creature> ReadCreatures(ReadOnlySpan<byte> body)
     {
         const int recordLength = 17;
@@ -509,6 +504,7 @@ public sealed partial class WorldClient
             LegacyKoreanEncoding.DecodeStringA(body[beforeText..], out _));
     }
 
+    /// <summary>A skill pane row: slot, icon, then its display name as a short string.</summary>
     public static LearnedSkill ReadSkill(ReadOnlySpan<byte> body)
     {
         const int beforeName = 3;
@@ -570,7 +566,6 @@ public sealed partial class WorldClient
         return body[0];
     }
 
-    /// <summary>The name, if the server got as far as writing one.</summary>
     /// <summary>
     /// What an NPC answered when tapped. The head is fixed — a kind byte, the NPC's serial and picture,
     /// and five bytes the original client reads and ignores — and then two strings: who is speaking and
@@ -712,6 +707,7 @@ public sealed partial class WorldClient
         return words;
     }
 
+    /// <summary>The name, if the server got as far as writing one.</summary>
     private static string ReadName(ReadOnlySpan<byte> body, int at) =>
         body.Length > at ? LegacyKoreanEncoding.DecodeStringA(body[at..], out _) : string.Empty;
 

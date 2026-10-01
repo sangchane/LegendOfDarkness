@@ -360,7 +360,6 @@ public sealed partial class WorldView
     /// <summary>We threw something at our feet; walk-over loot leaves it lying (<see cref="AutoLootGate.Threw" />).</summary>
     public void Threw(Tile where) => _autoLoot.Threw(where);
 
-    /// <summary>Plays the sounds the server asked for (0x19). The number is the file's name.</summary>
     /// <summary>
     /// Picks up whatever we are standing on. The only way to lift something was to tap it, and on a floor with
     /// thirty monsters on it nobody finds a 20-pixel bundle to tap — a character fought all night and came home

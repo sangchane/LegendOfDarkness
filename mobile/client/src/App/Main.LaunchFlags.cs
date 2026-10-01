@@ -135,7 +135,7 @@ public partial class Main : Control
     public static string MapGo { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Whether to press the 「길」 button on its own, as <c>--tabmap</c>; with <c>--tabmap-go 이름</c> it then taps the exit or
+    /// Whether to press the minimap (it opens the 길 찾기 map — the old 「길」 button became the minimap) on its own, as <c>--tabmap</c>; with <c>--tabmap-go 이름</c> it then taps the exit or
     /// NPC of that name on the map, and with <c>--tabmap-close 초</c> it presses 닫기 that long after opening. For checking the
     /// 길 찾기 map without a thumb.
     /// </summary>

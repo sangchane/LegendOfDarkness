@@ -65,9 +65,9 @@ public sealed partial class AbilityBar : Control
     /// <summary>Given a character's name and the lines to keep, saves the slot arrangement.</summary>
     public Action<string, IReadOnlyList<string>>? SaveSlots { get; set; }
 
-    /// <summary>One tap is one blow — see <see cref="WorldView.Strike" />.</summary>
     /// <summary>
-    /// 공격 단추. 시안에서 유일하게 돌로 남긴 조작이다 — 창의 확정 단추와 같은 자리다(data/ui-vault 안C).
+    /// 공격 단추 — 한 번 누르면 한 대(<see cref="WorldView.Strike" />). 시안에서 유일하게 돌로 남긴 조작이다 — 창의 확정
+    /// 단추와 같은 자리다(data/ui-vault 안C).
     /// </summary>
     public Button Attack { get; } = Struck("공격", AbilityFan.AttackSide);
 

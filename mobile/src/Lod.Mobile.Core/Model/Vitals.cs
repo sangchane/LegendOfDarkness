@@ -71,7 +71,6 @@ public sealed record Vitals(
         Element.None, Element.None, 0, 0, 0, 0, false);
 }
 
-/// <summary>What kind of thing the server is showing, which decides how the rest of it is read.</summary>
 /// <summary>
 /// One of the five attributes, numbered the way the raise-a-stat packet numbers them.
 /// </summary>

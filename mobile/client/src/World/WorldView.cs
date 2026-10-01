@@ -13,7 +13,8 @@ namespace LodClient;
 
 /// <summary>
 /// The floor and everyone standing on it, seen through a window that follows the player. Every picture here
-/// was drawn out of this repository's own archives by scripts/build-client-assets.ps1.
+/// was drawn out of this repository's own archives by the scripts/build-client-* extractors (build-client-assets.ps1,
+/// and build-client-maps·creatures·wardrobe·effects·hair·emotes.py for what each names).
 /// </summary>
 public sealed partial class WorldView(WorldClient? server = null) : Control
 {

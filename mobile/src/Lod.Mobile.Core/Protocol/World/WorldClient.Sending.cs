@@ -110,10 +110,10 @@ public sealed partial class WorldClient
     public Task AcceptGroupAsync(string name, CancellationToken cancellationToken) =>
         Send(ClientOpcode.Group, Party.Accept(name), cancellationToken);
 
-    /// <summary>Leaves the group the original way: by asking ourselves. Nothing is sent before the server has named us.</summary>
     /// <summary>Turns taking group requests on or off. The server says nothing back — ask the profile again to see it.</summary>
     public Task ToggleGroupAsync(CancellationToken cancellationToken) => Send(ClientOpcode.GroupToggle, [], cancellationToken);
 
+    /// <summary>Leaves the group the original way: by asking ourselves. Nothing is sent before the server has named us.</summary>
     public Task LeaveGroupAsync(CancellationToken cancellationToken) =>
         _world.Self?.Name is { Length: > 0 } mine
             ? Send(ClientOpcode.Group, Party.Ask(mine), cancellationToken)

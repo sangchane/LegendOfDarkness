@@ -1,16 +1,16 @@
 namespace Lod.Mobile.Core.Model;
 
 /// <summary>
-/// Which drawings make up a person. The server sends numbers, not file names; the name is the gender
-/// letter, the part letter, and the number padded to three digits — docs/original-sprite-animation.md
-/// section 7 has the letters and where each one was confirmed.
-/// </summary>
-/// <summary>
 /// One drawing and the colour to dye it. Only the head, the boots and the trousers are dyed — the
 /// server sends a colour for those and for nothing else, and the reference client dyes the same three.
 /// </summary>
 public sealed record Piece(string Name, int Colour);
 
+/// <summary>
+/// Which drawings make up a person. The server sends numbers, not file names; the name is the gender
+/// letter, the part letter, and the number padded to three digits — docs/original-sprite-animation.md
+/// section 7 has the letters and where each one was confirmed.
+/// </summary>
 public static class Wardrobe
 {
     // The body byte holds the kind of body in its top half and the trousers' colour in its bottom half.

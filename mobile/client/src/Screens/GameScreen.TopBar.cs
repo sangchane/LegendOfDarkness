@@ -93,7 +93,7 @@ public partial class GameScreen : Control
         // 곳 이름은 미니맵 아래 구석에 적는다(MinimapView) — 가로 위 줄에 따로 두던 판은 뺐다(2026-09-26).
         _place = Aux(string.Empty);
 
-        // 위 줄 단추(2026-09-26, 장비 2026-10-01): [월드맵] · [인벤토리] · [장비] · [설정]. [종료]는 설정 → 계정 탭으로, [길]은 미니맵이 되었다.
+        // 위 줄 단추(2026-09-26, 장비 2026-10-01): [월드맵] · [인벤토리] · [장비] · [설정]. [종료]는 설정 창 제목 줄의 [로그아웃]으로, [길]은 미니맵이 되었다.
         HBoxContainer actions = new() { MouseFilter = MouseFilterEnum.Ignore };
         actions.AddThemeConstantOverride("separation", Main.Gutter);
 

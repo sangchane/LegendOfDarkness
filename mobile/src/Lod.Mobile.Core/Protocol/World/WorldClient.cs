@@ -243,7 +243,6 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
         _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "알 수 없는 방향입니다.")
     };
 
-    /// <summary>Reads until the connection ends or the caller stops asking.</summary>
     /// <summary>
     /// Why the listening stopped, or nothing while it is still going. A screen shows this — a listener that dies
     /// silently leaves the character frozen with everything else looking fine (2026-09-18 조사).
@@ -258,6 +257,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
     /// <summary>How many packets were too short to read. A rise means the server and this client disagree.</summary>
     public int Ignored => _ignored;
 
+    /// <summary>Reads until the connection ends or the caller stops asking.</summary>
     public async Task PumpAsync(CancellationToken cancellationToken)
     {
         try
@@ -337,7 +337,6 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
         _unreadCount++;
     }
 
-    /// <summary>A skill pane row: slot, icon, then its display name as a short string.</summary>
     /// <summary>Seconds left before one slot may be used again, or none when it is ready.</summary>
     public int CoolingFor(bool skill, int slot) =>
         _cooling.TryGetValue((skill, slot), out DateTime ready) ? Cooldown.Left(ready, DateTime.UtcNow) : 0;

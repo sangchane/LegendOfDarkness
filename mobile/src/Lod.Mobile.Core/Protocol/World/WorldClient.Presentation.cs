@@ -49,7 +49,6 @@ public sealed partial class WorldClient
         return false;
     }
 
-    /// <summary>Takes the next amount a blow took or a heal gave (0x5D), oldest first.</summary>
     /// <summary>
     /// 다른 사람(우리 말고 보이는 플레이어)이 <paramref name="within"/> 안에 이 괴물을 쳤나. 원작에는 없는 0x5D 의
     /// Source 로 안다 — 서버는 가까운 사람 모두에게 보낸다(<c>ServerFormat5D</c>, Scope.VeryNearbyAislings).
@@ -60,5 +59,6 @@ public sealed partial class WorldClient
         && _world.Others.ContainsKey(hit.Source)
         && DateTime.UtcNow - hit.At <= within;
 
+    /// <summary>Takes the next amount a blow took or a heal gave (0x5D), oldest first.</summary>
     public bool TakeFigure([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Figure? figure) => _figures.TryDequeue(out figure);
 }

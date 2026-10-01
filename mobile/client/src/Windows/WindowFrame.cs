@@ -101,11 +101,6 @@ public static class WindowFrame
         button.TooltipText = label;
     }
 
-    /// <summary>A window title on the dark frame: light letters, a little larger than the body.</summary>
-    /// <summary>
-    /// The numbers several to a line, broken only between two of them — the engine's own wrapping breaks Korean between
-    /// any two letters ("요구 레 / 벨 41").
-    /// </summary>
     // ▲ 나음 · ▼ 못함 색.
     private static readonly Color Better = new("#7fd17f");
     private static readonly Color Worse = new("#e07070");
@@ -153,6 +148,10 @@ public static class WindowFrame
         return label;
     }
 
+    /// <summary>
+    /// The numbers several to a line, broken only between two of them — the engine's own wrapping breaks Korean between
+    /// any two letters ("요구 레 / 벨 41").
+    /// </summary>
     public static string Packed(Label label, IReadOnlyList<string> numbers)
     {
         const float wide = 220;
@@ -178,6 +177,7 @@ public static class WindowFrame
         return string.Join("\n", lines);
     }
 
+    /// <summary>A window title on the dark frame: light letters, a little larger than the body.</summary>
     public static Label Title(string text)
     {
         Label title = new() { Text = text, VerticalAlignment = VerticalAlignment.Center, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };

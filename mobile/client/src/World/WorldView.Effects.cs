@@ -232,6 +232,7 @@ public sealed partial class WorldView
         }
     }
 
+    /// <summary>Plays the sounds the server asked for (0x19). The number is the file's name.</summary>
     private void Sounds()
     {
         while (server is { } world && world.TakeSound(out int number))
