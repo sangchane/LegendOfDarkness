@@ -85,7 +85,7 @@ public partial class GameScreen : Control
     private void CancelField()
     {
         _field.Visible = false;
-        _closedAtFieldShown = _server?.FieldShown;
+        _mapGate.Closed(_server?.FieldShown);
         Main.Fire(_server?.CloseFieldAsync(System.Threading.CancellationToken.None));
     }
 

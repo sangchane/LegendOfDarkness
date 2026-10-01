@@ -3,7 +3,6 @@ using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Automation;
 using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Ui;
-using Lod.Mobile.Core;
 
 namespace LodClient;
 
@@ -26,9 +25,9 @@ public partial class GameScreen : Control
                 _world.StopGuiding();
                 _world.SteeredByHand();
 
-                if (_holding != where)
+                if (_hold.IsNew(where))
                 {
-                    _turnedFirst = _world.Looking != where;
+                    _hold.Pressing(looking: _world.Looking == where);
 
                     // 걸음 중이면 그 걸음이 끝난 뒤에 돈다 — 짧게 누른 것이 씹히지 않게.
                     if (!_world.Turn(where))
@@ -36,15 +35,14 @@ public partial class GameScreen : Control
                         continue;
                     }
 
-                    _holding = where;
-                    _holdFor = 0;
+                    _hold.Began(where);
                 }
                 else
                 {
-                    _holdFor += delta;
+                    _hold.Held(delta);
                 }
 
-                if (!_turnedFirst || _holdFor >= Tuning.TurnHoldSeconds)
+                if (_hold.MayWalk)
                 {
                     _world.Walk(where);
                 }
@@ -53,7 +51,7 @@ public partial class GameScreen : Control
 
         if (!held)
         {
-            _holding = null;
+            _hold.Released();
         }
 
         _stillFor = held || _world.Walking ? 0 : _stillFor + delta;

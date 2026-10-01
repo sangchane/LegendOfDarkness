@@ -407,10 +407,6 @@ public partial class GameScreen : Control
         return plate;
     }
 
-    /// <summary>Shortens gold without rounding up to money the character does not have.</summary>
-    internal static string GoldText(long gold) => gold >= 100_000_000 ? $"{Math.Floor(gold / 10_000_000d) / 10:0.#}억"
-        : gold >= 10_000 ? $"{Math.Floor(gold / 1_000d) / 10:0.#}만" : $"{gold:N0}";
-
     /// <summary>Our latest numbers, or rehearsal numbers offline.</summary>
     private Vitals Mine => _server is null ? LayoutCheck.PretendVitals : _server.Vitals ?? Vitals.Unknown;
 

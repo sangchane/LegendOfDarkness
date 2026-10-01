@@ -483,7 +483,7 @@ public sealed partial class PackPanel : PanelContainer
     {
         bool roomy = _pager.GetParent() != _foot;
         _count.Text = $"{carried.Count}/60칸";
-        _gold.Text = roomy ? $"금화 {gold:N0}" : $"금화 {GameScreen.GoldText(gold)}";
+        _gold.Text = roomy ? $"금화 {gold:N0}" : $"금화 {GoldFormat.Short(gold)}";
         IReadOnlyList<InventoryItem> all = carried;
         carried = _gearOnly is { } gearOnly ? [.. carried.Where(item => ItemActions.IsGear(item) == gearOnly)] : carried;
 

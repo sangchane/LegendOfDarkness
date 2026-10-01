@@ -73,15 +73,8 @@ public partial class GameScreen : Control
     private VBoxContainer? _packHolder;
     private Control? _talkHolder;
 
-    // 고른 곳의 맵 번호. 0x15(맵 바뀜)가 올 때까지 담아 둔다 — 그 전에는 알맹이의 _server.Field 가
-    // 그대로 남아 있어(WorldClient.cs:363), 창을 도로 띄워 두 번 고르게 하면 안 된다.
-    private int? _chosenField;
-
-    // 닫기를 보냈을 때 알맹이의 FieldShown(WorldClient.cs 0x2E 셈)을 담아 둔다. 서버가 창을 거두면
-    // (0x15 → Field null) 또는 새 창을 보내면(FieldShown 이 오르면) 풀린다 — 둘 다 서버가 보낸
-    // 신호라 시간에 기대지 않는다. 취소가 영영 유실돼 서버가 창을 안 거두면 "지도" 단추가 계속
-    // 막힌다 — 닫았는데 도로 열리는 것보다 낫고, 그때는 사람이 다시 접속한다(사용자 결정).
-    private int? _closedAtFieldShown;
+    // 월드맵 창을 언제 다시 띄우나(고른 뒤·닫은 뒤) — 규칙은 알맹이에.
+    private readonly WorldMapGate _mapGate = new();
 
     // 창이 몇 번 열리고 닫혔나. 같은 말의 창이 다시 온 것과 아무 일 없는 것을 가르려고 센다.
     private int _talked;
@@ -126,9 +119,7 @@ public partial class GameScreen : Control
     private Control _pad = null!;
     private readonly List<(ThumbButton Key, Direction Where)> _keys = [];
     private double _stillFor = SettleSeconds;
-    private Direction? _holding;
-    private double _holdFor;
-    private bool _turnedFirst;
+    private readonly DirectionHold _hold = new();
 
     /// <summary>How see-through the pad gets while walking, how long it waits after the last step, how fast it fades.</summary>
     private const float WalkingAlpha = 0.35f;
@@ -279,7 +270,7 @@ public partial class GameScreen : Control
         _field = new FieldPanel(_guide);
         _field.Chosen += area =>
         {
-            _chosenField = area;
+            _mapGate.Chose(area);
             SetWindow(GameWindow.WorldMap, false);
             Main.Fire(_server?.ChooseFieldAsync(area, System.Threading.CancellationToken.None));
         };
@@ -485,7 +476,7 @@ public partial class GameScreen : Control
         {
             _who.Text = called;
             _who.TooltipText = called;
-            _wealth.Text = GoldText(Mine.Gold);
+            _wealth.Text = GoldFormat.Short(Mine.Gold);
             _level.Text = $"{Mine.Level}";
             _who.Visible = true;
         }
@@ -595,7 +586,7 @@ public partial class GameScreen : Control
         // 닫기까지 눌러, 열린 화면과 닫아 조작이 돌아온 화면을 --shot-after 만 달리해 --map 하나로 잡는다.
         if (Main.OpeningMap)
         {
-            if (_server?.Field is null && _closedAtFieldShown is null && _mapSettling++ == settle)
+            if (_server?.Field is null && !_mapGate.Closing && _mapSettling++ == settle)
             {
                 _map.EmitSignal(BaseButton.SignalName.Pressed);
 
@@ -623,33 +614,24 @@ public partial class GameScreen : Control
 
         // 닫는 동안(또는 창이 떠 있는 동안) "지도"를 다시 누르면 그 0xF0 이 닫기의 0x15 와 한 프레임에
         // 겹쳐 위 표시가 영영 굳을 수 있었다 — 막아서 그 경주 자체를 없앤다.
-        _map.Disabled = _closedAtFieldShown is not null || _field.Visible;
+        _map.Disabled = _mapGate.Closing || _field.Visible;
 
-        // 월드맵은 서버가 띄우는 것이지 사람이 여는 것이 아니다. 온 것을 그대로 보여 준다.
-        // 한 곳을 고른 뒤(_chosenField)에는 0x15(맵 바뀜)로 알맹이가 비울 때까지 다시 띄우지 않는다 —
-        // 서버가 맵을 새로 보내기까지 두 번의 0.5초를 거치는 동안(GameServerHandlers.cs:1885-1890)
-        // _server.Field 가 그대로 남아 있어, 그새 창을 도로 띄우면 두 번 고를 수 있었다. 닫기를
-        // 보낸 뒤에는(_closedAtFieldShown) FieldShown 이 그때와 달라졌을 때만 — 즉 서버가 새 창을
-        // 보냈을 때만 — 다시 띄운다.
-        if (_server?.Field is { } field && !_field.Visible && _chosenField is null &&
-            (_closedAtFieldShown is null || _server?.FieldShown != _closedAtFieldShown))
+        // 월드맵은 서버가 띄우는 것이지 사람이 여는 것이 아니다. 온 것을 그대로 보여 준다(언제 다시 띄우나는 WorldMapGate).
+        if (_server?.Field is { } field && _mapGate.ShouldShow(_server.FieldShown, _field.Visible))
         {
             // 서버가 띄운 창도 창 하나 규칙을 지난다 — 열려 있던 창은 닫힌다.
             _field.Show(field, _world.PlaceName);
             SetWindow(GameWindow.WorldMap, true);
-            _closedAtFieldShown = null;
+            _mapGate.Shown();
         }
         else if (_server is not null && _server.Field is null)
         {
-            // 보내기가 실패해 서버가 영영 맵을 안 바꾸면(고르기도, 닫기도) 창이 다시 안 뜬다 — 두 번
-            // 이동하거나 닫았는데 도로 열리는 것보다 안 뜨는 편이 낫다고 보고, 그때는 사람이 다시 접속한다.
             if (_field.Visible)
             {
                 SetWindow(GameWindow.WorldMap, false);
             }
 
-            _chosenField = null;
-            _closedAtFieldShown = null;
+            _mapGate.Withdrawn();
         }
 
         // 창이 열려 있는 동안은 새 줄과 탭을 따라가고, 글자를 치는 동안 화면 키보드에 가리지 않게 창을 들어 올린다
