@@ -70,7 +70,7 @@ public sealed class PackTests
         Assert.Equal(13, carried.Stats!.Place);
         Assert.Equal(
             ["공격력 20~40", "방어 -5", "명중 +2", "힘 +3", "마법 방어 +10", "HP +500", "공격 속성 불", "요구 레벨 41 · 무도가", "무게 3"],
-            ItemActions.Stats(carried));
+            ItemActions.Stats(carried).Select(line => line.Text));
         Assert.Empty(ItemActions.Stats(WorldClient.ReadPackItem(Carrying("Boots"))));
     }
 

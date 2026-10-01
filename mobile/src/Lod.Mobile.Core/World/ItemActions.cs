@@ -21,16 +21,16 @@ public static class ItemActions
     /// (▲) or worse (▼) it is than that, and a number only the worn thing has shows as 0 ▼. Armour class is better lower.
     /// Empty when the server sent none.
     /// </summary>
-    public static IReadOnlyList<string> Stats(ItemStats? s, ItemStats? worn = null)
+    public static IReadOnlyList<StatLine> Stats(ItemStats? s, ItemStats? worn = null)
     {
         if (s is null)
         {
             return [];
         }
 
-        List<string> lines = [];
+        List<StatLine> lines = [];
 
-        if (s.DmgMax > 0 || worn?.DmgMax > 0) lines.Add($"공격력 {s.DmgMin}~{s.DmgMax}{Change(s.DmgMax, worn?.DmgMax, false)}");
+        if (s.DmgMax > 0 || worn?.DmgMax > 0) lines.Add(new("공격력", $"{s.DmgMin}~{s.DmgMax}", Change(s.DmgMax, worn?.DmgMax, false)));
 
         foreach ((string name, int value, int? before, bool lowerIsBetter) in new[]
                  {
@@ -42,36 +42,28 @@ public static class ItemActions
         {
             if (value != 0 || before is not (null or 0))
             {
-                lines.Add($"{name} {value:+0;-0;0}{Change(value, before, lowerIsBetter)}");
+                lines.Add(new(name, $"{value:+0;-0;0}", Change(value, before, lowerIsBetter)));
             }
         }
 
-        if (Element(s.Offense) is { Length: > 0 } offense) lines.Add($"공격 속성 {offense}");
-        if (Element(s.Defense) is { Length: > 0 } defense) lines.Add($"방어 속성 {defense}");
+        if (Element(s.Offense) is { Length: > 0 } offense) lines.Add(new("공격 속성", offense, 0, Numeric: false));
+        if (Element(s.Defense) is { Length: > 0 } defense) lines.Add(new("방어 속성", defense, 0, Numeric: false));
 
         List<string> needs = [];
         if (s.Level > 0) needs.Add($"레벨 {s.Level}");
         if (s.Class is >= 1 and <= 5) needs.Add(Paths[s.Class]);
-        if (needs.Count > 0) lines.Add($"요구 {string.Join(" · ", needs)}");
+        if (needs.Count > 0) lines.Add(new("요구", string.Join(" · ", needs), 0, Numeric: false));
 
-        if (s.Weight > 0) lines.Add($"무게 {s.Weight}");
+        if (s.Weight > 0) lines.Add(new("무게", $"{s.Weight}", 0, Numeric: false));
 
         return lines;
     }
 
-    public static IReadOnlyList<string> Stats(InventoryItem item, ItemStats? worn = null) => Stats(item.Stats, worn);
+    public static IReadOnlyList<StatLine> Stats(InventoryItem item, ItemStats? worn = null) => Stats(item.Stats, worn);
 
-    private static string Change(int now, int? before, bool lowerIsBetter)
-    {
-        if (before is not { } was || was == now)
-        {
-            return string.Empty;
-        }
-
-        bool better = lowerIsBetter ? now < was : now > was;
-
-        return $" {(better ? "▲" : "▼")}{Math.Abs(now - was)}";
-    }
+    /// <summary>How much better (above 0) or worse (below 0) than what was worn, 0 when the same or nothing to weigh.</summary>
+    private static int Change(int now, int? before, bool lowerIsBetter) =>
+        before is not { } was ? 0 : lowerIsBetter ? was - now : now - was;
 
     /// <summary>
     /// What is worn where a carried thing would go, so the info box can set them side by side — null when that place
@@ -128,4 +120,15 @@ public sealed class DoubleTap
 
         return false;
     }
+}
+
+/// <summary>
+/// One number in the item info box: what it is, its value, and against what is worn how much better (above 0) or
+/// worse (below 0). <see cref="Numeric" /> numbers stand in the aligned table; the rest (elements, needs, weight) go
+/// under it as one line.
+/// </summary>
+public sealed record StatLine(string Name, string Value, int Change, bool Numeric = true)
+{
+    /// <summary>The way it reads on one line — ▲ better, ▼ worse.</summary>
+    public string Text => Change == 0 ? $"{Name} {Value}" : $"{Name} {Value} {(Change > 0 ? "▲" : "▼")}{Math.Abs(Change)}";
 }

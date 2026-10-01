@@ -55,8 +55,15 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Label _actionName = new();
     private readonly Label _actionLine = new();
     private readonly Label _actionStats = new();
+    private readonly GridContainer _actionTable = new();
+
+    // 묶음을 버릴 때만 뜨는 개수 묻기 — 기본은 전부(사용자 2026-10-01).
+    private readonly PanelContainer _ask = new() { Name = "DropCount", Visible = false };
+    private readonly Label _askName = new();
+    private readonly Button _askDrop = new() { Text = "버리기", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
+    private readonly Button _askCancel = new() { Text = "취소", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
-    private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", width: 56);
+    private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기");
     private readonly DoubleTap _taps = new();
     private readonly SpinBox _dropCount = new() { MinValue = 1, MaxValue = 1, Step = 1, Value = 1, CustomMinimumSize = new Vector2(80, Main.TouchMinimum) };
 
@@ -179,7 +186,7 @@ public sealed partial class PackPanel : PanelContainer
         _kinds[0].ButtonPressed = true;
 
         // 정렬은 위 줄 탭 옆에(사용자 2026-10-01). 자동 줍기는 설정 창으로 옮겼다 — 모바일 게임들도 인벤토리에 두지 않는다.
-        body.AddChild(_head = WindowFrame.Head(WindowFrame.Title("소지품"), Close, [.. _kinds, Tidy]));
+        body.AddChild(_head = WindowFrame.Head(WindowFrame.Title("소지품"), Close, [.. _kinds, Tidy, _drop]));
         _tidyHome = Tidy.GetParent();
         _tidyAt = Tidy.GetIndex();
         body.AddChild(_main);
@@ -198,6 +205,10 @@ public sealed partial class PackPanel : PanelContainer
         Control actionLayer = new() { MouseFilter = MouseFilterEnum.Ignore };
         AddChild(actionLayer);
         actionLayer.AddChild(_action);
+        actionLayer.AddChild(_ask);
+        _ask.SetAnchorsAndOffsetsPreset(LayoutPreset.Center, LayoutPresetMode.Minsize);
+        _ask.GrowHorizontal = GrowDirection.Both;
+        _ask.GrowVertical = GrowDirection.Both;
 
         // 소지품 한 장은 제 높이만큼만 아래에 붙는다(GameScreen.Cover).
         SizeFlagsVertical = SizeFlags.ShrinkEnd;
@@ -243,19 +254,63 @@ public sealed partial class PackPanel : PanelContainer
             }
         };
 
+        // 버리기는 위 줄에(사용자 2026-10-01) — 고른 것을 버린다. 묶음이면 몇 개인지 묻고(기본 전부), 하나면 바로.
         _drop.Pressed += () =>
         {
-            if (_chosen > 0)
+            if (_held is not { } held)
             {
-                Dropped?.Invoke(_chosen, (int)_dropCount.Value);
-                _action.Visible = false;
+                return;
             }
+
+            if (held.Stacks <= 1)
+            {
+                Dropped?.Invoke(held.Slot, 1);
+                _action.Visible = false;
+                return;
+            }
+
+            _askName.Text = $"{held.Name} — 몇 개 버릴까요?";
+            _dropCount.MaxValue = held.Stacks;
+            _dropCount.Value = held.Stacks;
+            _action.Visible = false;
+            _ask.Visible = true;
         };
+
+        _askDrop.Pressed += () =>
+        {
+            if (_held is { } held)
+            {
+                Dropped?.Invoke(held.Slot, (int)_dropCount.Value);
+            }
+
+            _ask.Visible = false;
+        };
+        _askCancel.Pressed += () => _ask.Visible = false;
+        Greybox.Commit(_askDrop);
+        Greybox.Plain(_askCancel);
+
+        StyleBoxFlat askPlate = Greybox.Plate();
+        askPlate.BgColor = new Color("#0f0f0f");
+        askPlate.BorderColor = Greybox.Muted;
+        askPlate.SetCornerRadiusAll(10);
+        askPlate.SetContentMarginAll(Main.Gutter);
+        _ask.AddThemeStyleboxOverride("panel", askPlate);
+        _askName.AddThemeColorOverride("font_color", Greybox.Title);
+        VBoxContainer asking = new();
+        asking.AddThemeConstantOverride("separation", Main.Gutter);
+        asking.AddChild(_askName);
+        _dropCount.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        asking.AddChild(_dropCount);
+        HBoxContainer answers = new() { Alignment = BoxContainer.AlignmentMode.Center };
+        answers.AddThemeConstantOverride("separation", Main.Gutter);
+        answers.AddChild(_askDrop);
+        answers.AddChild(_askCancel);
+        asking.AddChild(answers);
+        _ask.AddChild(asking);
 
         HBoxContainer buttons = new();
         buttons.AddThemeConstantOverride("separation", 4);
         buttons.AddChild(_use);
-        buttons.AddChild(_drop);
 
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);
@@ -269,13 +324,8 @@ public sealed partial class PackPanel : PanelContainer
         top.AddChild(words);
         column.AddChild(top);
         // 서버가 보낸 수치 — 공격력·방어·능력치·요구 레벨·직업·무게(우리 확장 0x0F 꼬리).
+        column.AddChild(_actionTable);
         column.AddChild(_actionStats);
-        HBoxContainer quantity = new();
-        quantity.AddThemeConstantOverride("separation", Main.Gutter);
-        quantity.AddChild(new Label { Text = "버릴 수량", SizeFlagsVertical = SizeFlags.ShrinkCenter });
-        quantity.AddChild(_dropCount);
-        column.AddChild(quantity);
-        _dropCount.SetMeta("row", quantity);
         column.AddChild(buttons);
         _action.AddChild(column);
     }
@@ -297,18 +347,24 @@ public sealed partial class PackPanel : PanelContainer
         _under = under;
         _head.Visible = !under;
 
-        // 위 줄이 숨으면 정렬은 아래 줄 금화 앞으로.
-        Tidy.GetParent().RemoveChild(Tidy);
-
-        if (under)
+        // 위 줄이 숨으면 정렬·버리기는 아래 줄 금화 앞으로.
+        foreach (Button tool in new[] { Tidy, _drop })
         {
-            _foot.AddChild(Tidy);
-            _foot.MoveChild(Tidy, _foot.GetChildCount() - 2);
+            tool.GetParent().RemoveChild(tool);
+
+            if (under)
+            {
+                _foot.AddChild(tool);
+                _foot.MoveChild(tool, _foot.GetChildCount() - 2);
+            }
         }
-        else
+
+        if (!under)
         {
             _tidyHome.AddChild(Tidy);
             _tidyHome.MoveChild(Tidy, _tidyAt);
+            _tidyHome.AddChild(_drop);
+            _tidyHome.MoveChild(_drop, _tidyAt + 1);
         }
 
         if (!Main.Portrait)
@@ -421,6 +477,7 @@ public sealed partial class PackPanel : PanelContainer
         _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, _perPage)}";
         Fill(_rows, Paging.Page(carried, _page, _perPage));
 
+        _lastCarried = all;
         ShowChosen(all);
     }
 
@@ -435,7 +492,14 @@ public sealed partial class PackPanel : PanelContainer
             if (cell is Button button)
             {
                 button.EmitSignal(BaseButton.SignalName.Pressed);
+                // 누른 칸이 그려지려면 Show 가 한 번 돌아야 한다 — 손 없는 확인만 그 자리에서 고른 것을 채운다.
+                ShowChosen(_lastCarried);
                 (throwing ? _drop : _use).EmitSignal(BaseButton.SignalName.Pressed);
+
+                if (_ask.Visible)
+                {
+                    _askDrop.EmitSignal(BaseButton.SignalName.Pressed);
+                }
 
                 return true;
             }
@@ -614,7 +678,7 @@ public sealed partial class PackPanel : PanelContainer
             _actionLine.Text = ItemActions.Line(held);
             _actionLine.Visible = _actionLine.Text.Length > 0;
             WornItem? instead = ItemActions.WornInstead(held, Worn);
-            _actionStats.Text = WindowFrame.Packed(_actionStats, ItemActions.Stats(held, instead?.Stats));
+            WindowFrame.ShowStats(_actionTable, _actionStats, ItemActions.Stats(held, instead?.Stats));
 
             // 같은 자리에 걸친 것이 있으면 그것과 견준다(▲ 나음 · ▼ 못함).
             if (instead is not null)
@@ -622,21 +686,25 @@ public sealed partial class PackPanel : PanelContainer
                 _actionLine.Text = _actionLine.Text.Length > 0 ? $"{_actionLine.Text} · {instead.Called} 착용 중" : $"{instead.Called} 착용 중";
                 _actionLine.Visible = true;
             }
-            _actionStats.Visible = _actionStats.Text.Length > 0;
             WindowFrame.Relabel(_use, ItemActions.Primary(held, Worn));
             _use.Visible = true;
-            _drop.Visible = true;
-            _dropCount.MaxValue = System.Math.Max(1, held.Stacks);
-            _dropCount.Value = 1;
-            _dropCount.GetMeta("row").As<Control>().Visible = true;
-            _action.Visible = true;
+            _held = held;
+            _drop.Disabled = false;
+            _action.Visible = !_ask.Visible;
             _action.ResetSize();
 
             return;
         }
 
         _action.Visible = false;
+        _held = null;
+        _drop.Disabled = true;
+        _ask.Visible = false;
     }
+
+    // 지금 고른 것 — 위 줄 [버리기]가 버린다.
+    private InventoryItem? _held;
+    private IReadOnlyList<InventoryItem> _lastCarried = [];
 
     /// <summary>
     /// Stands the action row just above the picked cell — below it when there is no room above inside the window — and

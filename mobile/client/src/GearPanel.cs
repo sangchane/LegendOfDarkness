@@ -23,6 +23,7 @@ public sealed partial class GearPanel : PanelContainer
     private readonly Label _actionName = new();
     private readonly Label _actionLine = new();
     private readonly Label _actionStats = new();
+    private readonly GridContainer _actionTable = new();
     private readonly TextureRect _actionIcon = new()
     {
         CustomMinimumSize = new Vector2(40, 40),
@@ -108,6 +109,7 @@ public sealed partial class GearPanel : PanelContainer
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);
         column.AddChild(top);
+        column.AddChild(_actionTable);
         column.AddChild(_actionStats);
         _action.AddChild(column);
 
@@ -198,8 +200,7 @@ public sealed partial class GearPanel : PanelContainer
             _actionIcon.Texture = ItemIcons.For(picked.Icon);
             _actionLine.Text = _other is null ? ItemActions.Line(picked) : string.Empty;
             _actionLine.Visible = _other is null;
-            _actionStats.Text = WindowFrame.Packed(_actionStats, ItemActions.Stats(picked.Stats));
-            _actionStats.Visible = _actionStats.Text.Length > 0;
+            WindowFrame.ShowStats(_actionTable, _actionStats, ItemActions.Stats(picked.Stats));
             _off.Visible = _other is null;
             _action.ResetSize();
         }

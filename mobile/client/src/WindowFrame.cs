@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Godot;
+using Lod.Mobile.Core.World;
 
 namespace LodClient;
 
@@ -286,6 +287,53 @@ public static class WindowFrame
     /// The numbers several to a line, broken only between two of them — the engine's own wrapping breaks Korean between
     /// any two letters ("요구 레 / 벨 41").
     /// </summary>
+    // ▲ 나음 · ▼ 못함 색.
+    private static readonly Color Better = new("#7fd17f");
+    private static readonly Color Worse = new("#e07070");
+
+    /// <summary>
+    /// The info box's numbers (소지품 · 장비창): two to a row in columns — name, value, how it compares — so they line up
+    /// (사용자 2026-10-01), and the rest (elements, needs, weight) under them in <paramref name="notes" />.
+    /// </summary>
+    public static void ShowStats(GridContainer table, Label notes, IReadOnlyList<StatLine> lines)
+    {
+        foreach (Node old in table.GetChildren())
+        {
+            table.RemoveChild(old);
+            old.QueueFree();
+        }
+
+        table.Columns = 6;
+        table.AddThemeConstantOverride("h_separation", 6);
+        table.AddThemeConstantOverride("v_separation", 0);
+
+        foreach (StatLine line in lines.Where(line => line.Numeric))
+        {
+            table.AddChild(Small(line.Name, Greybox.Muted));
+            Label value = Small(line.Value, Greybox.Text);
+            value.HorizontalAlignment = HorizontalAlignment.Right;
+            value.CustomMinimumSize = new Vector2(44, 0);
+            table.AddChild(value);
+            Label change = Small(line.Change == 0 ? string.Empty : $"{(line.Change > 0 ? "▲" : "▼")}{System.Math.Abs(line.Change)}",
+                line.Change > 0 ? Better : Worse);
+            change.CustomMinimumSize = new Vector2(34, 0);
+            table.AddChild(change);
+        }
+
+        table.Visible = table.GetChildCount() > 0;
+        notes.Text = Packed(notes, [.. lines.Where(line => !line.Numeric).Select(line => line.Text)]);
+        notes.Visible = notes.Text.Length > 0;
+    }
+
+    private static Label Small(string text, Color colour)
+    {
+        Label label = new() { Text = text };
+        label.AddThemeFontSizeOverride("font_size", 12);
+        label.AddThemeColorOverride("font_color", colour);
+
+        return label;
+    }
+
     public static string Packed(Label label, IReadOnlyList<string> numbers)
     {
         const float wide = 220;

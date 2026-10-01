@@ -54,8 +54,8 @@ public sealed class ItemActionsTests
     [Fact]
     public void Gear_is_weighed_against_what_is_worn_in_its_place()
     {
-        Assert.Equal(["방어 -10 ▲4", "힘 0 ▼2"], ItemActions.Stats(Numbers(ac: -10), Numbers(ac: -6, str: 2)));
-        Assert.Equal(["방어 -10"], ItemActions.Stats(Numbers(ac: -10)));
+        Assert.Equal(["방어 -10 ▲4", "힘 0 ▼2"], ItemActions.Stats(Numbers(ac: -10), Numbers(ac: -6, str: 2)).Select(line => line.Text));
+        Assert.Equal(["방어 -10"], ItemActions.Stats(Numbers(ac: -10)).Select(line => line.Text));
     }
 
     /// <summary>교체 when something is on in that place, 장착 when it is empty — a ring has two places and fills an empty one.</summary>
