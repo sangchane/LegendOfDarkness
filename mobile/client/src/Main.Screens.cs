@@ -11,7 +11,7 @@ public partial class Main : Control
         RemoveChild(login);
         login.QueueFree();
 
-        GameScreen game = new(new Lod.Mobile.Core.World.WorldClient(session));
+        GameScreen game = new(new Lod.Mobile.Core.Protocol.World.WorldClient(session));
 
         game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
         AddChild(game);
@@ -51,7 +51,7 @@ public partial class Main : Control
         RemoveChild(create);
         create.QueueFree();
 
-        GameScreen game = new(new Lod.Mobile.Core.World.WorldClient(session));
+        GameScreen game = new(new Lod.Mobile.Core.Protocol.World.WorldClient(session));
         game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
         AddChild(game);
     }

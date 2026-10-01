@@ -1,4 +1,5 @@
 using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.Ui;
 
 namespace Lod.Mobile.Core.Tests.Art;
 

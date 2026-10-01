@@ -1,9 +1,9 @@
 using System.Net;
 using System.Text.Json.Nodes;
 using Lod.Mobile.Core.Net;
-using Lod.Mobile.Core.Protocol;
 using Lod.Mobile.Core.Protocol.Login;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Protocol.World;
+using Lod.Mobile.Core.Protocol;
 using Xunit;
 
 namespace Lod.Hades.Characterization.Tests;

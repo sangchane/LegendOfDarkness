@@ -8,7 +8,7 @@ namespace LodClient;
 /// 화면을 가려 몰입이 깨진다). Tapping it opens the full log; everything the ticker leaves out is there.
 /// </summary>
 /// <remarks>
-/// Only what <see cref="Lod.Mobile.Core.World.MessageSort" /> sends to the ticker lands here — what was gained goes to the
+/// Only what <see cref="Lod.Mobile.Core.Ui.MessageSort" /> sends to the ticker lands here — what was gained goes to the
 /// toasts, a level or a death to the banner, speech over the speaker's head, and the noise to the log alone.
 /// </remarks>
 public sealed partial class MessageLog : VBoxContainer

@@ -4,8 +4,11 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Lod.CompanionBot;
+using Lod.Mobile.Core.Automation;
+using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Net;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Protocol.World;
+using Lod.Mobile.Core.Ui;
 using Xunit;
 
 namespace Lod.Hades.Characterization.Tests;

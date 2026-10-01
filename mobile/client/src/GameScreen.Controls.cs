@@ -1,7 +1,9 @@
 using Godot;
-using Lod.Mobile.Core;
 using Lod.Mobile.Core.Art;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Automation;
+using Lod.Mobile.Core.Model;
+using Lod.Mobile.Core.Ui;
+using Lod.Mobile.Core;
 
 namespace LodClient;
 

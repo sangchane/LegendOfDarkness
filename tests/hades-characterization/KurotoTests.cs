@@ -1,7 +1,8 @@
 using System.Net;
 using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Net;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Protocol.World;
 using Xunit;
 using Xunit.Abstractions;
 

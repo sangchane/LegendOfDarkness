@@ -1,4 +1,6 @@
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Automation;
+using Lod.Mobile.Core.Model;
+using Lod.Mobile.Core.Protocol.World;
 
 namespace Lod.Mobile.Core.Tests.World;
 

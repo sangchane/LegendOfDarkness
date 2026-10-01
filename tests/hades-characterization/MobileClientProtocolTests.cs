@@ -4,11 +4,12 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Darkages.Network;
 using Darkages.Security;
-using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.Art;
-using Lod.Mobile.Core.World;
-using Lod.Mobile.Core.Protocol;
+using Lod.Mobile.Core.Model;
+using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.Protocol.Login;
+using Lod.Mobile.Core.Protocol.World;
+using Lod.Mobile.Core.Protocol;
 using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 

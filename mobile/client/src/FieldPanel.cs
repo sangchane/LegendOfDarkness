@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Model;
+using Lod.Mobile.Core.Ui;
 
 namespace LodClient;
 

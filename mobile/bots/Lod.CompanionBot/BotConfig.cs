@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Automation;
 
 namespace Lod.CompanionBot;
 

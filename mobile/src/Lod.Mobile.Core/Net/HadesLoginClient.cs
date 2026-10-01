@@ -1,6 +1,7 @@
 using System.Net;
-using Lod.Mobile.Core.Protocol;
+using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Protocol.Login;
+using Lod.Mobile.Core.Protocol;
 
 namespace Lod.Mobile.Core.Net;
 

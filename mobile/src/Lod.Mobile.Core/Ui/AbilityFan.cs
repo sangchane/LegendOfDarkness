@@ -1,0 +1,84 @@
+namespace Lod.Mobile.Core.Ui;
+
+/// <summary>
+/// The skill and spell buttons fanned round the attack button in the bottom-right corner — one page of six at a time,
+/// a switch between skills and spells, and a button for the next page. Centres are in a box whose bottom-right corner
+/// is the attack button's.
+/// </summary>
+/// <remarks>
+/// The box is as wide as a 360-wide portrait screen leaves beside the movement pad (360 − 8 − 8 − 152 − 8 = 184), so
+/// the one shape serves both orientations. A button is pressed by its square, so the rows step up and inward like a
+/// staircase rather than lying on a true circle: on a circle the squares of neighbours overlap. The nearest three sit
+/// against the attack button, where the thumb already is.
+/// </remarks>
+public static class AbilityFan
+{
+    public const int Width = 184;
+    public const int Height = 248;
+    public const int AttackSide = 64;
+    public const int ButtonSide = 48;
+    public const int PerPage = 6;
+
+    public static (int X, int Y) Attack { get; } = (152, 216);
+
+    /// <summary>Switches between skills and spells — beside the attack button, on its row.</summary>
+    public static (int X, int Y) Switch { get; } = (24, 216);
+
+    /// <summary>
+    /// The next page ("1/3") — a small chip in the fan's top-left corner, as big as a potion switch (사용자, 2026-09-26: 포션 창
+    /// 사이즈만큼 줄여서 구석에). It is pressed least; the right edge is the potions', the 코마디움 stands beside it.
+    /// </summary>
+    public static (int X, int Y) Next { get; } = (16, 16);
+
+    /// <summary>The page chip's side — a potion switch's.</summary>
+    public const int NextSide = PotionSide;
+
+    /// <summary>Where the six buttons of a page go, nearest the attack button first.</summary>
+    public static IReadOnlyList<(int X, int Y)> Slots { get; } =
+    [
+        (80, 216),
+        (104, 152),
+        (160, 152),
+        (40, 152),
+        (64, 96),
+        (120, 96)
+    ];
+
+    /// <summary>
+    /// The two automatic-potion switches (health, mana). They need not be as big as a skill (사용자, 2026-09-23: "스킬창
+    /// 만큼 클 필요 없으니까") — 32, below the theme's 44 on purpose; they are touched rarely and never in a hurry.
+    /// </summary>
+    public const int PotionSide = 32;
+
+    /// <summary>Where the two potion switches go: one above the other against the right edge, clear of the skills.</summary>
+    public static IReadOnlyList<(int X, int Y)> Potions { get; } =
+    [
+        (168, 32),
+        (168, 80)
+    ];
+
+    /// <summary>코마디움 칸 — 포션 칸과 같은 크기, 부채꼴 왼쪽 위(다음 쪽 단추 왼쪽). 혼수를 풀 때만 누른다.</summary>
+    public static (int X, int Y) Coma { get; } = (56, 40);
+
+    /// <summary>
+    /// [대화](엔터 키 그림) — 전환(기술) 단추 왼쪽, 부채꼴 **밖**(사용자, 2026-09-27: 대화 단추를 기술 단추 왼쪽으로). 세로 화면에서는
+    /// 방향판 오른쪽 아래 빈 구석(→ 아래, ↓ 오른쪽)에 든다: 부채꼴과 방향판은 아래가 맞춰져 있고 틈이 14 라, 방향판의 → 는 부채꼴
+    /// 좌표로 x −62..−14 · y 148..196, ↓ 는 x −114..−66 · y 200..248 이다.
+    /// </summary>
+    public static (int X, int Y) Chat { get; } = (-32, 224);
+
+    /// <summary>[대화] 단추의 한 변 — 기술 단추(48)보다 작게.</summary>
+    public const int ChatSide = 40;
+
+    public static int Pages(int learned) => Paging.Pages(learned, PerPage);
+
+    /// <summary>The page after this one, back to the first after the last.</summary>
+    public static int After(int page, int learned) => Paging.After(page, learned, PerPage);
+
+    /// <summary>The page still to show once some have gone — the last one left.</summary>
+    public static int Kept(int page, int learned) => Paging.Kept(page, learned, PerPage);
+
+    /// <summary>The six on a page, in the server's order, with nothing where the learned ones run out.</summary>
+    public static IReadOnlyList<T?> Page<T>(IReadOnlyList<T> learned, int page) where T : class =>
+        Paging.Page(learned, page, PerPage);
+}

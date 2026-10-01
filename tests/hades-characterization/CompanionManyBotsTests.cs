@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Lod.Mobile.Core.Net;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Protocol.World;
 using Xunit;
 
 namespace Lod.Hades.Characterization.Tests;

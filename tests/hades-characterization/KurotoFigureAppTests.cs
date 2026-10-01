@@ -48,7 +48,7 @@ public sealed class KurotoFigureAppTests(ITestOutputHelper output) : IDisposable
 
             if (learn.Length > 0)
             {
-                Lod.Mobile.Core.World.WorldClient world = new(created);
+                Lod.Mobile.Core.Protocol.World.WorldClient world = new(created);
                 _ = world.PumpAsync(_deadline.Token);
                 await Task.Delay(1500, _deadline.Token);
                 await world.SayAsync($"/spell \"{learn}\" 1", _deadline.Token);

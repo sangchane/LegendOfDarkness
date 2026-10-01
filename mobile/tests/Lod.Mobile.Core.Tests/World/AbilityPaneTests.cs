@@ -1,5 +1,6 @@
+using Lod.Mobile.Core.Model;
+using Lod.Mobile.Core.Protocol.World;
 using Lod.Mobile.Core.Protocol;
-using Lod.Mobile.Core.World;
 
 namespace Lod.Mobile.Core.Tests.World;
 

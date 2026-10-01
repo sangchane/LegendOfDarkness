@@ -1,8 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
+using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.Protocol.Login;
-using Lod.Mobile.Core.World;
+using Lod.Mobile.Core.Protocol.World;
 
 namespace Lod.Mobile.Core.Tests.World;
 

@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Sockets;
 using Lod.CompanionBot;
 using Lod.Mobile.Core.Net;
+using Lod.Mobile.Core.Protocol.World;
 using Lod.Mobile.Core.Protocol;
-using Lod.Mobile.Core.World;
 
 // 동료 봇(성직자) — 설정 파일의 계정으로 서버에 접속해 기다리다가, 서버가 주인을 정해 주면(0x5E) 따라다니며 회복·버프를 건다.
 // 쓰는 법: Lod.CompanionBot [설정 파일]   (없으면 LOD_BOT_CONFIG, 그것도 없으면 실행 파일 옆 companion-bot.json)

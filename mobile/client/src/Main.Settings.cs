@@ -1,4 +1,5 @@
 using Godot;
+using Lod.Mobile.Core.Automation;
 
 namespace LodClient;
 
@@ -38,15 +39,15 @@ public partial class Main : Control
     public static bool AutoLoot { get; private set; } = true;
 
     /// <summary>The account the login screen's own "자동 로그인" toggle has saved, or none.</summary>
-    public static Lod.Mobile.Core.World.AutoLoginAccount? SavedLogin { get; private set; }
+    public static Lod.Mobile.Core.Automation.AutoLoginAccount? SavedLogin { get; private set; }
 
     // Launch-time credentials (--login / login.cfg) and a saved account may each submit once. An explicit
     // logout turns that convenience off for every login screen reached afterward, including a round trip
     // through account creation, until the app is launched again.
-    private readonly Lod.Mobile.Core.World.AutoLoginGate _autoLoginGate = new();
+    private readonly Lod.Mobile.Core.Automation.AutoLoginGate _autoLoginGate = new();
 
     /// <summary>Saves, or (given <c>null</c>) forgets, the account to sign in with automatically next launch.</summary>
-    public static void SetSavedLogin(Lod.Mobile.Core.World.AutoLoginAccount? account)
+    public static void SetSavedLogin(Lod.Mobile.Core.Automation.AutoLoginAccount? account)
     {
         SavedLogin = account;
 
@@ -88,7 +89,7 @@ public partial class Main : Control
             return;
         }
 
-        SavedLogin = Lod.Mobile.Core.World.AutoLoginAccount.Parse(reading.GetLine().Trim(), reading.GetLine().Trim());
+        SavedLogin = Lod.Mobile.Core.Automation.AutoLoginAccount.Parse(reading.GetLine().Trim(), reading.GetLine().Trim());
     }
 
     /// <summary>Turns picking-up-as-you-walk on or off, and remembers which.</summary>
@@ -155,11 +156,11 @@ public partial class Main : Control
     /// </summary>
     private const string PotionFile = "user://potion.cfg";
 
-    public static Lod.Mobile.Core.World.PotionRule HealthPotion { get; private set; } = new(false, 70, "쿠룸");
+    public static Lod.Mobile.Core.Automation.PotionRule HealthPotion { get; private set; } = new(false, 70, "쿠룸");
 
-    public static Lod.Mobile.Core.World.PotionRule ManaPotion { get; private set; } = new(false, 70, "마라디움");
+    public static Lod.Mobile.Core.Automation.PotionRule ManaPotion { get; private set; } = new(false, 70, "마라디움");
 
-    public static void SetPotions(Lod.Mobile.Core.World.PotionRule health, Lod.Mobile.Core.World.PotionRule mana)
+    public static void SetPotions(Lod.Mobile.Core.Automation.PotionRule health, Lod.Mobile.Core.Automation.PotionRule mana)
     {
         HealthPotion = health;
         ManaPotion = mana;
@@ -168,7 +169,7 @@ public partial class Main : Control
 
         if (writing is not null)
         {
-            foreach (Lod.Mobile.Core.World.PotionRule rule in new[] { health, mana })
+            foreach (Lod.Mobile.Core.Automation.PotionRule rule in new[] { health, mana })
             {
                 writing.StoreLine($"{(rule.Enabled ? "on" : "off")} {rule.Percent} {rule.Potion}");
             }
@@ -190,7 +191,7 @@ public partial class Main : Control
         ManaPotion = Rule(reading.GetLine(), ManaPotion);
         reading.Close();
 
-        static Lod.Mobile.Core.World.PotionRule Rule(string line, Lod.Mobile.Core.World.PotionRule fallback)
+        static Lod.Mobile.Core.Automation.PotionRule Rule(string line, Lod.Mobile.Core.Automation.PotionRule fallback)
         {
             string[] parts = line.Trim().Split(' ');
 
@@ -205,7 +206,7 @@ public partial class Main : Control
     /// </summary>
     private const string AutoHuntFile = "user://autohunt.cfg";
 
-    public static Lod.Mobile.Core.World.AutoHuntSettings AutoHuntSettings { get; private set; } = new();
+    public static Lod.Mobile.Core.Automation.AutoHuntSettings AutoHuntSettings { get; private set; } = new();
 
     /// <summary><c>--auto-hunt</c> — 게임 화면이 뜨고 자리를 잡으면 [자동] 단추를 스스로 누른다. 손 없이 확인하는 용.</summary>
     public static bool AutoHuntOnStart { get; private set; }
@@ -226,7 +227,7 @@ public partial class Main : Control
     /// </summary>
     public static bool AutoHuntPreview { get; private set; }
 
-    public static void SetAutoHuntSettings(Lod.Mobile.Core.World.AutoHuntSettings settings)
+    public static void SetAutoHuntSettings(Lod.Mobile.Core.Automation.AutoHuntSettings settings)
     {
         AutoHuntSettings = settings;
 
@@ -245,14 +246,14 @@ public partial class Main : Control
 
         if (reading is not null)
         {
-            AutoHuntSettings = Lod.Mobile.Core.World.AutoHuntSettings.Parse(reading.GetLine());
+            AutoHuntSettings = Lod.Mobile.Core.Automation.AutoHuntSettings.Parse(reading.GetLine());
             reading.Close();
         }
     }
 
     /// <summary>
     /// 기술 슬롯을 길게 눌러 정한 배치 — 캐릭터 이름마다 따로 남는다(사용자 요청, 2026-09-25). 규칙(무엇을
-    /// 어디에 두나)은 알맹이 <see cref="Lod.Mobile.Core.World.AbilityArrangement"/> 가 갖고, 여기는 potion.cfg 처럼
+    /// 어디에 두나)은 알맹이 <see cref="Lod.Mobile.Core.Ui.AbilityArrangement"/> 가 갖고, 여기는 potion.cfg 처럼
     /// 한 줄에 하나씩 기기(user://)에 적고 읽기만 한다.
     /// </summary>
     private static string AbilitySlotsFile(string character)
@@ -278,21 +279,21 @@ public partial class Main : Control
         writing.Close();
     }
 
-    private static Lod.Mobile.Core.World.LearnLadder? _ladder;
+    private static Lod.Mobile.Core.Model.LearnLadder? _ladder;
 
     /// <summary>
     /// 레벨이 되면 저절로 배우는 표 — 서버와 같은 것(<c>scripts/build-auto-learn.py</c> → <c>assets/world/auto-learn.txt</c>).
     /// 기술 목록이 아직 못 배운 것에 "N레벨에 배움" 을 적는다(<see cref="AbilityBar" />). 없으면 빈 표.
     /// </summary>
-    public static Lod.Mobile.Core.World.LearnLadder Ladder => _ladder ??= LoadLadder();
+    public static Lod.Mobile.Core.Model.LearnLadder Ladder => _ladder ??= LoadLadder();
 
-    private static Lod.Mobile.Core.World.LearnLadder LoadLadder()
+    private static Lod.Mobile.Core.Model.LearnLadder LoadLadder()
     {
         const string path = "res://assets/world/auto-learn.txt";
 
         return Godot.FileAccess.FileExists(path)
-            ? Lod.Mobile.Core.World.LearnLadder.Read(Godot.FileAccess.GetFileAsString(path))
-            : Lod.Mobile.Core.World.LearnLadder.Empty;
+            ? Lod.Mobile.Core.Model.LearnLadder.Read(Godot.FileAccess.GetFileAsString(path))
+            : Lod.Mobile.Core.Model.LearnLadder.Empty;
     }
 
     public static string[] LoadAbilitySlots(string character)
