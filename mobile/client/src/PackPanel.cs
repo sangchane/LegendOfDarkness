@@ -296,10 +296,14 @@ public sealed partial class PackPanel : PanelContainer
         askPlate.SetContentMarginAll(Main.Gutter);
         _ask.AddThemeStyleboxOverride("panel", askPlate);
         _askName.AddThemeColorOverride("font_color", Greybox.Title);
+        _askName.HorizontalAlignment = HorizontalAlignment.Center;
         VBoxContainer asking = new();
         asking.AddThemeConstantOverride("separation", Main.Gutter);
         asking.AddChild(_askName);
-        _dropCount.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        // 숫자 칸은 작게 가운데, 숫자도 가운데.
+        _dropCount.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+        _dropCount.CustomMinimumSize = new Vector2(120, 40);
+        _dropCount.Alignment = HorizontalAlignment.Center;
         asking.AddChild(_dropCount);
         HBoxContainer answers = new() { Alignment = BoxContainer.AlignmentMode.Center };
         answers.AddThemeConstantOverride("separation", Main.Gutter);
@@ -308,25 +312,23 @@ public sealed partial class PackPanel : PanelContainer
         asking.AddChild(answers);
         _ask.AddChild(asking);
 
-        HBoxContainer buttons = new();
-        buttons.AddThemeConstantOverride("separation", 4);
-        buttons.AddChild(_use);
 
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);
         // 누르면 뜨는 정보 상자 — 그림을 크게, 이름 아래에 내구·개수(사용자 2026-10-01, 다른 게임의 말풍선처럼).
-        VBoxContainer words = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
+        VBoxContainer words = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter, SizeFlagsHorizontal = SizeFlags.ExpandFill };
         words.AddChild(_actionName);
         words.AddChild(_actionLine);
         HBoxContainer top = new();
         top.AddThemeConstantOverride("separation", Main.Gutter);
         top.AddChild(_actionIcon);
         top.AddChild(words);
+        // 교체·장착·사용은 오른쪽 위(장비창의 [장착 해제]와 같은 자리) — 아래 단추 줄 몫의 빈 곳이 없어진다(사용자 2026-10-01).
+        top.AddChild(_use);
         column.AddChild(top);
         // 서버가 보낸 수치 — 공격력·방어·능력치·요구 레벨·직업·무게(우리 확장 0x0F 꼬리).
         column.AddChild(_actionTable);
         column.AddChild(_actionStats);
-        column.AddChild(buttons);
         _action.AddChild(column);
     }
 
