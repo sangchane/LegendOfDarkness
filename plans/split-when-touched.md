@@ -14,7 +14,7 @@
 
 | 파일 | 지금 | 나누는 경계 |
 |---|---|---|
-| `World/WorldClient.cs` (2280줄) | 신호 번호 표·상태 40여 개·받기 루프(`Listen` 470줄)·보내기·해석 함수(약 770줄)를 한 클래스가 다 한다 | `WorldPackets`(정적 `Read*` 전부) · `WorldState`(보이는 것·내 것) · `CompanionState`(`_master`~`_companionKitCount`) · `ChatLog`(`_said` `_told` `_heard`) · `PresentationQueues`(동작·이펙트·소리·음악·숫자 큐) · `WorldClient`(받기·갈래·보내기만). `Listen` 의 갈래는 `OnXxx(body)` 메서드로, 해독은 switch 앞에서 한 번 |
+| `World/WorldClient.cs` (934줄 — 2026-10-02 partial 로 신호표·보내기·패킷 읽기·큐·동료를 뗐다) | 받기 루프 `Listen` 470줄과 상태 필드가 남음 | `Listen` 의 갈래는 `OnXxx(body)` 메서드로, 해독은 switch 앞에서 한 번. 상태는 `WorldState`·`ChatLog` 로 |
 | 같은 파일 24-163줄 | 같은 번호가 방향만 달리 이름 여러 개(0x11 Turn/Turned …) | `ClientOpcode` · `ServerOpcode` 두 정적 클래스 |
 | `World/Companion.cs` (664줄) | 패킷 해석·기록 타입·주문표·판단이 한 파일 | 패킷은 Protocol 쪽, `CompanionSpells`·`CompanionBrain` 각자 파일. `Next`(112줄)는 `AutoHunt.Next` 처럼 `Emergency() ?? Recover() ?? Maintain() ?? Follow()` |
 | `World/AutoHunt.cs` `Fight`(100줄) | 대상 바꾸기·공격·다가가기 | `Strike(prey)` · `Approach(prey)` |
