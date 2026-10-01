@@ -40,8 +40,6 @@ public sealed partial class AbilityBar : Control
     private readonly ulong[] _downAt = new ulong[AbilityFan.PerPage];
     private readonly bool[] _down = new bool[AbilityFan.PerPage];
     private readonly bool[] _longHeld = new bool[AbilityFan.PerPage];
-    private int _rehearsedHold; // --slot-hold: 손 없이 확인할 때 프레임을 센다.
-    private int _rehearsedAutoHunt; // --auto-hunt-preview: 서버 없이 켜짐 표시만 그려 볼 때 프레임을 센다.
 
     // 공격 단추도 같은 0.5초 규칙으로 길게 누르면 자동 사냥을 켜고 끈다(사용자 요청, 2026-09-26) — 판단은
     // 알맹이 LongPress(시험 LongPressTests)로 뺐다. 짧게 누르면(길게 눌리지 않았으면) 지금처럼 곧장 평타.
@@ -216,12 +214,7 @@ public sealed partial class AbilityBar : Control
     {
         for (int index = 0; index < _slots.Length; index++)
         {
-            int slot = _drawn[index] switch
-            {
-                LearnedSkill skill => skill.Slot,
-                LearnedSpell spell => spell.Slot,
-                _ => 0
-            };
+            int slot = SlotOf(_drawn[index]);
 
             int left = slot > 0 && Cooling is { } ask ? ask(!_drawnSpells, slot) : 0;
 
@@ -237,23 +230,14 @@ public sealed partial class AbilityBar : Control
             }
         }
 
-        // --slot-hold N: 서버 없이 확인할 때, 자리를 잡고 잠시 뒤 N번째 칸을 길게 누른 셈 친다.
-        if (Main.SlotHold > 0 && Main.SlotHold <= _slots.Length && !_longHeld[Main.SlotHold - 1] && ++_rehearsedHold == 90)
-        {
-            _longHeld[Main.SlotHold - 1] = true;
-            OpenPicker(Main.SlotHold - 1);
-        }
+        RehearseSlotHold();
 
         if (_attackHold.CrossedThreshold(TimeSpan.FromMilliseconds(Time.GetTicksMsec())))
         {
             AutoHuntToggleRequested?.Invoke();
         }
 
-        // --auto-hunt-preview: 서버가 없어 GameScreen 이 실제로 켤 수 없으니, 여기서 스스로 켜짐 표시만 그려 본다.
-        if (Main.AutoHuntPreview && ++_rehearsedAutoHunt == 90)
-        {
-            ShowAutoHunt(true);
-        }
+        RehearseAutoHunt();
     }
 
     /// <summary>Shows or hides the attack button's auto-hunt "켜짐" mark — a ring plus the small "자동" tag,
@@ -285,12 +269,9 @@ public sealed partial class AbilityBar : Control
             }
         }
 
-        // --learn-preview 직업:레벨 — 서버 없이, 표에서 그 레벨까지를 배운 셈 친다.
-        if (character.Length == 0 && Main.LearnPreview is { } preview)
+        if (character.Length == 0)
         {
-            List<LadderStep> had = [.. Main.Ladder.Steps.Where(step => step.Path == preview.Path && step.Level <= preview.Level)];
-            skills = [new LearnedSkill(1, 1, "Assail (Lev:1/100)"), .. had.Where(step => !step.Spell).Select((step, at) => new LearnedSkill(73 + at, step.Icon, $"{step.Name} (Lev:1/100)"))];
-            spells = [.. had.Where(step => step.Spell).Select((step, at) => new LearnedSpell(1 + at, step.Icon, SpellTargetType.NoTarget, $"{step.Name} (Lev:1/100)", string.Empty, 1))];
+            (skills, spells) = RehearsedLearning(skills, spells);
         }
 
         _learnedSkills = skills;
@@ -352,22 +333,6 @@ public sealed partial class AbilityBar : Control
     private static IEnumerable<T?> Slice<T>(IReadOnlyList<T?> all, int page) =>
         all.Skip(page * AbilityFan.PerPage).Take(AbilityFan.PerPage);
 
-    /// <summary>Presses one slot from outside — for a run with nobody watching (<c>--skill 1</c>, <c>--skill m1</c> for a spell).</summary>
-    public void Press(int index, bool spell = false)
-    {
-        if (_spells != spell)
-        {
-            _spells = spell;
-            _page = 0;
-            Redraw();
-        }
-
-        if (index >= 0 && index < _slots.Length)
-        {
-            Use(index);
-        }
-    }
-
     private void OnSlotDown(int index)
     {
         _down[index] = true;
@@ -386,12 +351,7 @@ public sealed partial class AbilityBar : Control
             return;
         }
 
-        int slot = _drawn[index] switch
-        {
-            LearnedSkill skill => skill.Slot,
-            LearnedSpell spell => spell.Slot,
-            _ => 0
-        };
+        int slot = SlotOf(_drawn[index]);
 
         // 빈 칸, 또는 식는 중 — 예전에는 Disabled 가 막았지만 이제 그 칸도 길게 누를 수 있어야 해서 여기서 가린다.
         if (slot == 0 || (Cooling is { } ask && ask(!_drawnSpells, slot) > 0))
@@ -425,13 +385,16 @@ public sealed partial class AbilityBar : Control
             ? _spellArrangement.Fill(_learnedSpells, spell => spell.Slot, capacity)[position]
             : _skillArrangement.Fill(_learnedSkills, skill => skill.Slot, capacity)[position];
 
-        return shown switch
-        {
-            LearnedSkill skill => skill.Slot,
-            LearnedSpell spell => spell.Slot,
-            _ => null
-        };
+        return shown is LearnedSkill or LearnedSpell ? SlotOf(shown) : null;
     }
+
+    /// <summary>칸에 놓인 것의 서버 칸 번호 — 기술이든 마법이든. 빈 칸은 0.</summary>
+    private static int SlotOf(object? shown) => shown switch
+    {
+        LearnedSkill skill => skill.Slot,
+        LearnedSpell spell => spell.Slot,
+        _ => 0
+    };
 
     /// <summary>
     /// Opens the picker above the slot just held — "비우기" pinned above a combined, scrolling roster of every
@@ -455,12 +418,7 @@ public sealed partial class AbilityBar : Control
         }
 
         bool heldSpells = _spells;
-        int currentSlot = _drawn[index] switch
-        {
-            LearnedSkill skill => skill.Slot,
-            LearnedSpell spell => spell.Slot,
-            _ => 0
-        };
+        int currentSlot = SlotOf(_drawn[index]);
 
         _clearHandler = () =>
         {
@@ -477,12 +435,7 @@ public sealed partial class AbilityBar : Control
         _clearRow.Disabled = currentSlot == 0;
         _clearRow.Modulate = currentSlot == 0 ? new Color(1, 1, 1, 0.4f) : Colors.White;
 
-        (int? path, int level) = Standing?.Invoke() ?? (null, 0);
-
-        if (path is null && Main.LearnPreview is { } preview)
-        {
-            (path, level) = (preview.Path, preview.Level);
-        }
+        (int? path, int level) = RehearsedStanding(Standing?.Invoke() ?? (null, 0));
 
         foreach (RosterRow entry in Main.Ladder.Roster(path, level, _learnedSkills, _learnedSpells))
         {
