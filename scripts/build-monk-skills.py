@@ -62,6 +62,9 @@ NPC = PACK / "Npc" / "Npc_Skill.txt"
 #: 원작 템플릿이 따로 있는 같은 기술. 원작의 배우는 레벨이 있으니 팩 값으로 덮지 않는다.
 ORIGINAL_TWIN = {"단각": "Kick", "붕각": "Martial Awareness"}
 
+#: 팩·노바 값 대신 지금 템플릿 값을 지키는 칸(사용자 결정 2026-10-02). 팩은 이형환위 쿨다운 7 · 일음지 이펙트 276.
+KEEP = {"이형환위": {"Cooldown": 0.25}, "일음지": {"TargetAnimation": 42}}
+
 
 def learn_levels():
     """`기술 → 레벨`. NPC 가 `skill_add "기술"` 하기 전에 `get_level(@myid) < N` 으로 막는 값.
@@ -353,6 +356,7 @@ def main():
         if "MonkStrike.Use(" in shape(skill)[1]:
             attack, endurance = stat_percents(skill)
             template.update({"AttackPercent": attack, "EndurancePercent": endurance})
+        template.update(KEEP.get(skill["이름"], {}))
         if skill["이름"] in PACK_ONLY:
             template["Group"] = f"{MARK}/원작없음"
         level = levels.get(skill["이름"])
