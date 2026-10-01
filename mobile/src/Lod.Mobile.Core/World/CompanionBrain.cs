@@ -115,13 +115,11 @@ public sealed class CompanionBrain
     /// <summary>이만큼보다 멀면 주인을 회복하지 않는다(화면 밖).</summary>
     public const int CastReach = 10;
 
-    private static readonly TimeSpan Never = TimeSpan.FromDays(-365);
-
     private readonly Dictionary<(string Spell, uint Target), TimeSpan> _buffed = [];
-    private TimeSpan _lastCast = Never;
-    private TimeSpan _lastHeal = Never;
-    private TimeSpan _lastWalk = Never;
-    private TimeSpan _lastDrink = Never;
+    private TimeSpan _lastCast = Reckon.Never;
+    private TimeSpan _lastHeal = Reckon.Never;
+    private TimeSpan _lastWalk = Reckon.Never;
+    private TimeSpan _lastDrink = Reckon.Never;
     private uint _master;
 
     // 서버가 되돌린 걸음 — 벽 파일이 없는 맵의 벽이나 선 괴물. 막힌 칸으로 잠시 기억해 돌아간다.
@@ -181,7 +179,7 @@ public sealed class CompanionBrain
     {
         TimeSpan now = sight.Now;
         bool canCast = now - _lastCast >= CastGap;
-        bool ownerNear = sight.OwnerAt is { } at && Distance(at, sight.Standing) <= CastReach;
+        bool ownerNear = sight.OwnerAt is { } at && Reckon.Steps(at, sight.Standing) <= CastReach;
         int ownerHealth = ownerNear ? sight.HealthOf(sight.Master) ?? 100 : 100;
         bool empowered = sight.Spells.Any(one => CompanionSpells.Bare(one.Name) == "신성력강화");
         int cheapest = sight.Spells
@@ -198,7 +196,7 @@ public sealed class CompanionBrain
             CanDrink: now - _lastDrink >= DrinkGap,
             ownerNear,
             OwnerHurt: ownerNear && ownerHealth > 0 && ownerHealth < settings.HealOwnerPercent,
-            SelfHurt: Percent(sight.Vitals) < settings.HealSelfPercent,
+            SelfHurt: Reckon.HealthPercent(sight.Vitals) < settings.HealSelfPercent,
             empowered,
             Mana: sight.Vitals?.Mana ?? 0,
             cheapest);
@@ -212,7 +210,7 @@ public sealed class CompanionBrain
         // 주인이 혼수면 가장 먼저 — 옆 칸으로 가서 깨운다(사용자 결정 2026-09-26, 서버 0xF1 5 — 코마디움과 같은 효과, 아무것도 안 쓴다).
         if (sight.OwnerAt is { } fallen && sight.StatusesOf(sight.Master)?.Contains("skulled") == true)
         {
-            if (Distance(fallen, sight.Standing) > 1)
+            if (Reckon.Steps(fallen, sight.Standing) > 1)
             {
                 return StepTo(sight, fallen, now, "주인 깨우러 가기");
             }
@@ -254,7 +252,7 @@ public sealed class CompanionBrain
         }
 
         // 봇 체력 포션 — 회복 마법보다 먼저(마력을 아낀다).
-        if (reading.CanDrink && Percent(sight.Vitals) < settings.PotionHealthPercent
+        if (reading.CanDrink && Reckon.HealthPercent(sight.Vitals) < settings.PotionHealthPercent
             && Potion(sight.Pack, CompanionSpells.HealthRestore, Missing(sight.Vitals?.MaximumHealth, sight.Vitals?.Health)) is { } health)
         {
             _lastDrink = now;
@@ -267,7 +265,7 @@ public sealed class CompanionBrain
         }
 
         // 봇 마력 포션 — 마력이 낮거나, 가장 싼 회복도 못 걸어 쉬어야 할 때.
-        if (reading.CanDrink && (ManaPercent(sight.Vitals) < settings.PotionManaPercent || reading.Mana < reading.Cheapest)
+        if (reading.CanDrink && (Reckon.ManaPercent(sight.Vitals) < settings.PotionManaPercent || reading.Mana < reading.Cheapest)
             && Potion(sight.Pack, CompanionSpells.ManaRestore, Missing(sight.Vitals?.MaximumMana, sight.Vitals?.Mana)) is { } restoring)
         {
             _lastDrink = now;
@@ -398,7 +396,7 @@ public sealed class CompanionBrain
             return null;
         }
 
-        int distance = Distance(owner, sight.Standing);
+        int distance = Reckon.Steps(owner, sight.Standing);
 
         if (distance > settings.FollowFrom)
         {
@@ -459,12 +457,4 @@ public sealed class CompanionBrain
             ? dx > 0 ? Direction.East : Direction.West
             : dy > 0 ? Direction.South : Direction.North;
     }
-
-    private static int Distance(Tile a, Tile b) => Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
-
-    private static int ManaPercent(Vitals? vitals) =>
-        vitals is { MaximumMana: > 0 } known ? (int)(known.Mana * 100L / known.MaximumMana) : 100;
-
-    private static int Percent(Vitals? vitals) =>
-        vitals is { MaximumHealth: > 0 } known ? (int)(known.Health * 100L / known.MaximumHealth) : 100;
 }

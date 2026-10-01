@@ -133,9 +133,6 @@ public sealed class AutoHunt
 
     private const int Reach = 30;
 
-    // TimeSpan.MinValue 에서 빼면 넘친다 — "한 번도 안 했다"는 충분히 먼 옛날로.
-    private static readonly TimeSpan Never = TimeSpan.FromDays(-365);
-
     private readonly Dictionary<uint, TimeSpan> _shunned = [];
     private readonly Dictionary<int, (TimeSpan At, bool Cooled)> _skillUsed = [];
     private readonly List<(Tile Where, TimeSpan At)> _drops = [];
@@ -144,10 +141,10 @@ public sealed class AutoHunt
     private uint _target;
     private Tile _targetWhere;
     private bool _struckTarget;
-    private TimeSpan _lastStrike = Never;
-    private TimeSpan _lastAct = Never;
-    private TimeSpan _lastHeal = Never;
-    private TimeSpan _pausedUntil = Never;
+    private TimeSpan _lastStrike = Reckon.Never;
+    private TimeSpan _lastAct = Reckon.Never;
+    private TimeSpan _lastHeal = Reckon.Never;
+    private TimeSpan _pausedUntil = Reckon.Never;
     private Tile? _walkedFrom;
     private int _stuck;
 
@@ -169,7 +166,7 @@ public sealed class AutoHunt
         _shunned.Clear();
         _stuck = 0;
         _walkedFrom = null;
-        _pausedUntil = Never;
+        _pausedUntil = Reckon.Never;
     }
 
     public void Stop()
@@ -257,7 +254,7 @@ public sealed class AutoHunt
             return "쓰러져 자동 사냥을 멈췄습니다.";
         }
 
-        if (Percent(sight.Vitals) < AutoHuntSettings.DangerPercent
+        if (Reckon.HealthPercent(sight.Vitals) < AutoHuntSettings.DangerPercent
             && !sight.PotionReady
             && !sight.Spells.Any(spell => IsHealing(spell.Name)))
         {
@@ -266,9 +263,6 @@ public sealed class AutoHunt
 
         return null;
     }
-
-    private static int Percent(Vitals? vitals) =>
-        vitals is { MaximumHealth: > 0 } known ? (int)(known.Health * 100L / known.MaximumHealth) : 100;
 
     /// <summary>노리던 괴물이 사라졌으면 그 자리를 떨어진 칸으로 적어 둔다.</summary>
     private void Remember(HuntSight sight)
@@ -300,7 +294,7 @@ public sealed class AutoHunt
 
     private HuntStep? Heal(HuntSight sight, AutoHuntSettings settings)
     {
-        if (Percent(sight.Vitals) > settings.HealPercent
+        if (Reckon.HealthPercent(sight.Vitals) > settings.HealPercent
             || sight.Now - _lastHeal < HealGap
             || sight.Now - _lastAct < ActGap)
         {
@@ -332,12 +326,12 @@ public sealed class AutoHunt
         _drops.RemoveAll(drop =>
             sight.Now - drop.At > DropForget
             || drop.Where == sight.Standing
-            || Distance(drop.Where, Home) > settings.Radius
+            || Reckon.Steps(drop.Where, Home) > settings.Radius
             || (sight.Now - drop.At > DropGrace && !lying.Contains(drop.Where)));
 
         Func<Tile, bool> blocked = Blocking(sight);
 
-        foreach ((Tile where, _) in _drops.Where(drop => lying.Contains(drop.Where)).OrderBy(drop => Distance(drop.Where, sight.Standing)).ToArray())
+        foreach ((Tile where, _) in _drops.Where(drop => lying.Contains(drop.Where)).OrderBy(drop => Reckon.Steps(drop.Where, sight.Standing)).ToArray())
         {
             if (Pathing.Way(sight.Standing, where, blocked, Reach) is { Count: > 0 } way)
             {
@@ -369,7 +363,7 @@ public sealed class AutoHunt
 
         _targetWhere = prey.Where;
 
-        return Distance(prey.Where, sight.Standing) == 1
+        return Reckon.Steps(prey.Where, sight.Standing) == 1
             ? Strike(sight, prey)
             : Approach(sight, prey);
     }
@@ -476,7 +470,7 @@ public sealed class AutoHunt
     {
         Creature[] inRange = sight.Creatures
             .Where(one => one.Kind == CreatureKind.Hostile
-                          && Distance(one.Where, Home) <= settings.Radius
+                          && Reckon.Steps(one.Where, Home) <= settings.Radius
                           && !_shunned.ContainsKey(one.Serial))
             .ToArray();
 
@@ -489,7 +483,7 @@ public sealed class AutoHunt
         }
 
         return pool
-            .OrderBy(one => Distance(one.Where, sight.Standing))
+            .OrderBy(one => Reckon.Steps(one.Where, sight.Standing))
             .ThenBy(one => sight.HealthOf(one.Serial) ?? 100)
             .ThenBy(one => one.Serial)
             .FirstOrDefault();
@@ -497,7 +491,7 @@ public sealed class AutoHunt
 
     private HuntStep? GoHome(HuntSight sight)
     {
-        if (Distance(sight.Standing, Home) <= 1)
+        if (Reckon.Steps(sight.Standing, Home) <= 1)
         {
             return null;
         }
@@ -517,8 +511,6 @@ public sealed class AutoHunt
         taken.UnionWith(sight.People);
         return tile => sight.Blocked(tile) || taken.Contains(tile);
     }
-
-    private static int Distance(Tile one, Tile other) => Math.Abs(one.X - other.X) + Math.Abs(one.Y - other.Y);
 
     private static IEnumerable<Tile> Around(Tile tile)
     {

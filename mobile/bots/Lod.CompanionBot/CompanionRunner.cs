@@ -131,7 +131,7 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
 
         CompanionTie? master = world.Master;
         Character? owner = master is null ? null : world.Others.FirstOrDefault(one => one.Serial == master.Serial);
-        int? distance = owner is null ? null : Math.Abs(owner.Where.X - _tile.X) + Math.Abs(owner.Where.Y - _tile.Y);
+        int? distance = owner is null ? null : Reckon.Steps(owner.Where, _tile);
         bool away = master is not null && (owner is null || distance > 12);
 
         if (away)
