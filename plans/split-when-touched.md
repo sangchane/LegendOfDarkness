@@ -10,32 +10,14 @@
 - Godot 스크립트를 옮기면 `.tscn` 의 `res://src/…` 경로와 `.cs.uid` 파일도 같이 옮긴다.
 - 주석은 새로 쓰거나 고치는 것부터 한국어로. 변경 이력은 주석 말고 커밋·WORKLOG 에.
 
-## 알맹이 `mobile/src/Lod.Mobile.Core`
-
-| 파일 | 지금 | 나누는 경계 |
-|---|---|---|
-| `World/WorldClient.cs` (934줄 — 2026-10-02 partial 로 신호표·보내기·패킷 읽기·큐·동료를 뗐다) | 받기 루프 `Listen` 470줄과 상태 필드가 남음 | `Listen` 의 갈래는 `OnXxx(body)` 메서드로, 해독은 switch 앞에서 한 번. 상태는 `WorldState`·`ChatLog` 로 |
-| 같은 파일 24-163줄 | 같은 번호가 방향만 달리 이름 여러 개(0x11 Turn/Turned …) | `ClientOpcode` · `ServerOpcode` 두 정적 클래스 |
-| `World/Companion.cs` (664줄) | 패킷 해석·기록 타입·주문표·판단이 한 파일 | 패킷은 Protocol 쪽, `CompanionSpells`·`CompanionBrain` 각자 파일. `Next`(112줄)는 `AutoHunt.Next` 처럼 `Emergency() ?? Recover() ?? Maintain() ?? Follow()` |
-| `World/AutoHunt.cs` `Fight`(100줄) | 대상 바꾸기·공격·다가가기 | `Strike(prey)` · `Approach(prey)` |
-| 거리·체력%·`Never` | `AutoHunt`·`Companion`·`CompanionRunner` 세 곳에 따로 | 한 곳에 |
-| `World/WorldEntry.cs` (426줄) | 기록 타입 30여 개 | 맵·캐릭터·수치·아이템·기술·대화 단위 파일 |
-| `World/` 폴더 (40개) | 해석·화면 규칙·자동화·저장이 섞임 | `Protocol/World/` · `Ui/`(`LongPress` `Paging` `AbilityFan` `GearLayout` `OneWindow` …) · `Automation/`(`AutoHunt` `AutoPotion` `AutoLootGate` `CompanionBrain` `BotKit` `StatPlan`) · `Model/`. 네임스페이스가 바뀌니 Godot `using` 과 한 번에 |
-| `Art/KeyboardFit.cs` `MessageToastLayout.cs` `SideColumn.cs` | 그림이 아니라 배치 규칙 | `Ui/` |
-
 ## 화면 `mobile/client/src`
 
 | 파일 | 지금 | 나누는 경계 |
 |---|---|---|
-| `WorldView.cs` `HuntOnItsOwn` vs `AutoHuntTick` | **사냥 판단이 두 벌** — 옛 `--hunt` 봇은 화면에서 직접, 새 것은 알맹이 `AutoHunt` | 옛 봇을 `AutoHunt` 로 합치거나 지운다(지울 때는 사용자에게 먼저) |
-| `CreateScreen.cs` (1096줄) | 세로·가로 폼이 거의 같은 조립을 반복 | `LookPicker`(머리·색 격자) · `CharacterPreview`. `StarterArmor` 표는 알맹이 자료로 |
-| `PackPanel.cs` `BuildAction`(135줄)·`Fill`(96줄) | 동작 줄+버릴 수량, 칸 만들기 | `PackActionRow` · `Cell(item)` |
-| `AbilityBar.cs` | `_drawn[i] switch { LearnedSkill => Slot … }` 네 번 반복, 시험 코드 섞임 | `SlotOf(object?)` 하나 · 시험은 `GameRehearsal` |
-| 게임 규칙이 화면에 있는 곳 | 월드맵 다시 띄우기(`GameScreen` 76-82·1324-1353) · 0.2초 돌기/걷기 · 만·억 표기 `GoldText` | 알맹이(`WorldMapGate` · `GoldFormat`)로 옮겨 시험 가능하게 |
 | `Flash.cs` | 이펙트 첫 사용 때 메인 스레드에서 `GetPixel` 전체 훑기(끊김) | 바닥 줄·색을 생성기가 `effects.txt` 에 미리 |
-| `src/` 평평한 48개 | 화면·위젯·시험 도구가 섞임 | `App/` `Screens/` `World/` `Hud/` `Windows/` `Widgets/` `Diagnostics/`(`LayoutCheck` `Screenshot` `GameRehearsal`) |
-| `WindowFrame.cs` · `PartyColumn.cs` | 파일 하나에 타입 여럿 | `Glyph.cs` · `GridTile.cs` |
-| 쓰이지 않음 | `PercentWheel.cs` 전체 · `WindowFrame.cs` `DiamondButton` | 지울지 사용자에게 |
+
+결정(2026-10-02): 옛 `--hunt` 봇(`WorldView.Hunt.cs` 의 `HuntOnItsOwn`)은 합치지도 지우지도 않고 그대로 둔다.
+`Flash.cs` 는 생성기(`scripts/`)가 바닥 줄·색을 미리 적어야 해서 남겼다.
 
 ## 서버 포크 `sources/wren11/Dark-Ages-Private-Server` (우리 코드만)
 
@@ -52,7 +34,6 @@
 |---|---|---|
 | 서버 기술 스크립트 `database/server/scripts/Skills/Monk/*.cs` | 2026-10-02: 한 방(`MonkStrike.Use`, 14개)의 배율은 템플릿 `AttackPercent`·`EndurancePercent` 로 옮겼다(시험 `MonkStrikeNumbersTests`). 남은 것: `Step`(허공답보)·`UseCross`·`UseVitality`·`UseWolf`·`UseStrengthAndEndurance`·`Afflict`·`Empower` 의 수치와 마나(`Spend`) | 필요할 때 같은 방식으로 템플릿 필드를 더한다 |
 | `MonkStrike.cs:72` 등 | `damage / 4 * 3` 같은 이름 없는 식 | 이름 붙은 상수로(무엇을 줄이는지 주석) |
-| 알맹이 `StatPlan` · 걷기 0.44초 · 돌기 0.2초 등 | 클라이언트 상수 | 지금은 상수로 두되 한 파일(`Tuning`)에 모은다 |
 
 ## 생성기 `scripts/`
 
@@ -64,7 +45,5 @@
 | 폴더 | 103개 평평 | `lib/` `ops/` 부터(가리키는 곳 166개라 `gen/<도메인>/` 은 나중) |
 
 ## 작은 것(고치는 김에)
-- 엉뚱한 멤버에 붙은 설명: `WorldClient.cs` 366·514·1105·1788-1805·1995·2098 근처, `WorldEntry.cs:112`, `Wardrobe.cs:8`, `WorldView.cs:700`, 서버 `Companions.cs:340`(+"1초마다"→0.5초).
-- 낡은 주석: `GameScreen.cs:184,187,776`([종료] 위치) · `Main.cs:472,482`(「길」 단추) · `WorldView.cs:10-12`(그림 출처) · `WorldClient.cs:1796-1800`(바닥 물건 13바이트).
-- 봇에서 끝없이 쌓이는 큐: `WorldClient` 의 `_hurts` `_motions` `_effects` `_sounds` `_figures` `_songs` 는 봇이 꺼내지 않는다 — `_told` 처럼 상한. 맵이 바뀔 때 `_health` `_struck` 도 비운다.
+- 엉뚱한 멤버에 붙은 설명: 서버 `Companions.cs:340`(+"1초마다"→0.5초).
 - 레벨업 점수: 서버 갱신이 오기 전 같은 점수에 요청이 여러 번 갈 수 있다(서버가 남은 점수로 막는지 확인).

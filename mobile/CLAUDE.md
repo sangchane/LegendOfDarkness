@@ -12,6 +12,7 @@
 ## 핵심 관례
 - **큰 파일을 고칠 땐 먼저 `plans/split-when-touched.md`** — 그 파일을 어떻게 나눌지 적어 둔 지도. 고치는 작업 앞에 해당 줄 하나만 나눈다(나누기 커밋 따로).
 - **모바일 클라이언트 — 빌드·실행·인자·함정: `docs/mobile-client.md`** (클라이언트를 만지면 여기부터)
+- 폴더(2026-10-02): 알맹이 `Protocol/World`(해석·`WorldClient`) · `Model`(기록 타입) · `Ui`(화면 규칙) · `Automation`(자동 사냥·봇) · `Art`, 손맛 수치는 `Tuning.cs`. 화면 `client/src` 는 `App` `Screens` `World` `Hud` `Windows` `Widgets` `Diagnostics`(손 없이 확인하는 `*.Rehearsal.cs`·`LayoutCheck`). Godot 스크립트를 옮기면 `.cs.uid` 도 함께, `Main.tscn` 경로도.
 - 원작 스프라이트 방향·프레임 구간: `docs/original-sprite-animation.md`
 - 무도가 1~10 기술 모션·이펙트·사운드 근거와 구현 계약: `docs/martial-artist-skill-presentation.md`
 - 화면 배치(세로·가로): `docs/mobile-test-v1-wireframes.md` · 눌러볼 화면: `docs/index.html` (그림은 `docs/ui/assets/`)
