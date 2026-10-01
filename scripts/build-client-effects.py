@@ -26,7 +26,11 @@
 `dat-extract` 가 빈 칸을 자리표시로 남긴 뒤에 뽑아야 순서가 맞는다.
 
   쓰는 법: python3 scripts/build-client-effects.py
-  산출물:  mobile/client/assets/effect/efct###.png · effects.txt · mobile/client/assets/sound/N.mp3
+  산출물:  mobile/client/assets/effect/efct###.png · effects.txt · effects-look.txt · mobile/client/assets/sound/N.mp3
+
+`effects-look.txt`(`번호 바닥줄 빨강 초록 파랑`)는 화면이 이펙트를 처음 쓸 때 그림을 픽셀마다 훑던 것을 미리 해 둔
+것이다(폰에서 끊겼다). 바닥줄은 어느 칸이든 그려진 가장 아래 줄(머리 이펙트 판단), 색은 그 마법에 걸린 괴물을 물들일 색
+— 화면 `Flash.Tint` 이 하던 셈 그대로(선명한 픽셀일수록 무겁게 평균, 가장 밝은 성분을 1로, 흰색과 반반).
 """
 import json
 import re
@@ -121,6 +125,34 @@ def effect_orders(scratch):
     return {}
 
 
+def look(png):
+    """그림 하나의 바닥줄과 물들일 색(0~255) — 예전 화면 `Flash.DrawnBottom`·`Flash.Tint` 과 같은 셈."""
+    from PIL import Image
+    image = Image.open(png).convert("RGBA")
+    wide, tall = image.size
+    pixels = image.load()
+    # 알파 0.1 넘게 그려진 가장 아래 줄. 빈 그림은 맨 아래로(머리 이펙트로 치지 않는다).
+    bottom = next((y for y in range(tall - 1, -1, -1) if any(pixels[x, y][3] > 25.5 for x in range(wide))), tall - 1)
+    red = green = blue = weight = 0.0
+    # 큰 그림도 있다(257 은 4800x180) — 둘째 칸마다 본다.
+    for y in range(0, tall, 2):
+        for x in range(0, wide, 2):
+            r, g, b, a = pixels[x, y]
+            if a == 0:
+                continue
+            top = max(r, g, b)
+            vivid = (top - min(r, g, b)) / 255 if top else 0.0  # 채도 x 명도 = (최대-최소)/최대 x 최대
+            red += r / 255 * vivid
+            green += g / 255 * vivid
+            blue += b / 255 * vivid
+            weight += vivid
+    if weight <= 0:
+        return bottom, (255, 255, 255)
+    mean = (red / weight, green / weight, blue / weight)
+    top = max(mean)
+    return bottom, tuple(round((1 + (c / top if top else 1)) / 2 * 255) for c in mean)
+
+
 def main():
     if not TOOL.exists():
         print(f"도구가 없습니다. 먼저: {DOTNET} build tools/dat-extract/DatExtract.csproj -c Release")
@@ -149,12 +181,25 @@ def main():
                 continue
             drawn.append((number, *(int(g) for g in cut.groups())))
 
-    (EFFECTS / "effects.txt").write_text(
+    # EFA 는 자기 칸 수·간격을 파일에 갖고, effect.tbl 의 그 번호 줄은 "0" 한 칸뿐이다 — 순서를 적지 않고 차례로 튼다.
+    rows = {n: f"{n} {f} {w} {h} {x} {y} {'' if n in efa else ' '.join(map(str, orders.get(n, [])))}".rstrip()
+            for n, f, w, h, x, y in drawn}
+    # 서버가 더는 안 쓰는 번호(예 208)도 지우지 않는다 — 그림이 남아 있으면 줄도 남긴다.
+    sheet = EFFECTS / "effects.txt"
+    if sheet.exists():
+        for line in sheet.read_text(encoding="utf-8").splitlines():
+            head = line.split(" ", 1)[0]
+            if head.isdigit() and int(head) not in rows and (EFFECTS / f"efct{int(head):03d}.png").exists():
+                rows[int(head)] = line
+    sheet.write_text(
         "# 번호 칸수 바탕가로 바탕세로 기준x 기준y 순서 — scripts/build-client-effects.py (순서는 effect.tbl)\n"
-        # EFA 는 자기 칸 수·간격을 파일에 갖고, effect.tbl 의 그 번호 줄은 "0" 한 칸뿐이다 — 순서를 적지 않고 차례로 튼다.
-        + "".join(
-            f"{n} {f} {w} {h} {x} {y} {'' if n in efa else ' '.join(map(str, orders.get(n, [])))}".rstrip() + "\n"
-            for n, f, w, h, x, y in drawn),
+        + "".join(rows[n] + "\n" for n in sorted(rows)),
+        encoding="utf-8")
+    (EFFECTS / "effects-look.txt").write_text(
+        "# 번호 바닥줄 빨강 초록 파랑 — scripts/build-client-effects.py (화면이 처음 쓸 때 훑던 것을 미리)\n"
+        + "".join(f"{n} {bottom} {r} {g} {b}\n"
+                  for n in sorted(rows)
+                  for bottom, (r, g, b) in [look(EFFECTS / f"efct{n:03d}.png")]),
         encoding="utf-8")
     print(f"이펙트 {len(drawn)}개 → {EFFECTS.relative_to(ROOT)}")
     if missing:

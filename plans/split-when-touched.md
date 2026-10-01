@@ -12,9 +12,7 @@
 
 ## 화면 `mobile/client/src`
 
-| 파일 | 지금 | 나누는 경계 |
-|---|---|---|
-| `Flash.cs` | 이펙트 첫 사용 때 메인 스레드에서 `GetPixel` 전체 훑기(끊김) | 바닥 줄·색을 생성기가 `effects.txt` 에 미리 |
+2026-10-02 표의 줄을 모두 끝냈다.
 
 결정(2026-10-02): 옛 `--hunt` 봇(`WorldView.Hunt.cs` 의 `HuntOnItsOwn`)은 합치지도 지우지도 않고 그대로 둔다.
 `Flash.cs` 는 생성기(`scripts/`)가 바닥 줄·색을 미리 적어야 해서 남겼다.

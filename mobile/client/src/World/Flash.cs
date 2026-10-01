@@ -76,48 +76,13 @@ public sealed partial class Flash : Sprite2D
             ? feet + new Vector2(0, Mathf.Round(Overhead.Shift(_sheet, _drawnBottom, head)))
             : feet + new Vector2(EffectSheet.AnchorFromFeet.X, EffectSheet.AnchorFromFeet.Y);
 
-    private static readonly Dictionary<int, int> Bottoms = [];
+    private static IReadOnlyDictionary<int, EffectLook>? _looks;
 
-    /// <summary>The lowest row anything is drawn on in any frame — measured once per effect, as reading back is slow.</summary>
-    private static int DrawnBottom(int number, Texture2D picture)
-    {
-        if (Bottoms.TryGetValue(number, out int known))
-        {
-            return known;
-        }
-
-        int bottom = picture.GetHeight() - 1;
-
-        if (picture.GetImage() is { } image)
-        {
-            if (image.IsCompressed())
-            {
-                image.Decompress();
-            }
-
-            bottom = -1;
-
-            for (int y = image.GetHeight() - 1; y >= 0 && bottom < 0; y--)
-            {
-                for (int x = 0; x < image.GetWidth(); x++)
-                {
-                    if (image.GetPixel(x, y).A > 0.1f)
-                    {
-                        bottom = y;
-                        break;
-                    }
-                }
-            }
-
-            // 빈 그림은 머리 이펙트로 치지 않는다.
-            bottom = bottom < 0 ? image.GetHeight() - 1 : bottom;
-        }
-
-        Bottoms[number] = bottom;
-        return bottom;
-    }
-
-    private static readonly Dictionary<int, Color> Tints = [];
+    /// <summary>
+    /// 어느 칸이든 그려진 가장 아래 줄 — 생성기가 미리 잰 것(<c>effects-look.txt</c>). 없으면 맨 아래(머리 이펙트로 치지 않는다).
+    /// </summary>
+    private static int DrawnBottom(int number, Texture2D picture) =>
+        Look(number)?.Bottom ?? picture.GetHeight() - 1;
 
     /// <summary>
     /// What a monster under a spell is tinted with: the colour of the picture that spell drew on it, half-way from
@@ -128,59 +93,22 @@ public sealed partial class Flash : Sprite2D
     /// No original evidence for the tint itself: the 5.99 client can recolour a monster only through the four
     /// palette bytes of its 0x07 record (<c>0x63f4bb</c> → <c>0x59d770</c> → drawn by <c>0x495100</c> when the
     /// monster's own table allows it), and the 5.99 server always writes those four as zero. The colour is the
-    /// picture's own: every drawn pixel weighted by how vivid it is, so the dark edges and grey smoke do not wash it
-    /// out.
+    /// picture's own, worked out by scripts/build-client-effects.py (every drawn pixel weighted by how vivid it is).
     /// </remarks>
-    public static Color Tint(int number)
+    public static Color Tint(int number) =>
+        number > 0 && Look(number) is { } look ? Color.Color8(look.Red, look.Green, look.Blue) : Colors.White;
+
+    private static EffectLook? Look(int number)
     {
-        if (Tints.TryGetValue(number, out Color known))
+        if (_looks is null)
         {
-            return known;
+            string path = $"{Folder}effects-look.txt";
+            _looks = Godot.FileAccess.FileExists(path)
+                ? EffectLook.Read(Godot.FileAccess.GetFileAsString(path))
+                : new Dictionary<int, EffectLook>();
         }
 
-        string path = $"{Folder}efct{number:000}.png";
-        Color tint = Colors.White;
-
-        if (number > 0 && ResourceLoader.Exists(path) && GD.Load<Texture2D>(path).GetImage() is { } image)
-        {
-            if (image.IsCompressed())
-            {
-                image.Decompress();
-            }
-
-            float red = 0, green = 0, blue = 0, weight = 0;
-
-            // 큰 그림도 있다(257 은 4800x180) — 둘째 칸마다 본다. 색을 고르는 데는 충분하다.
-            for (int y = 0; y < image.GetHeight(); y += 2)
-            {
-                for (int x = 0; x < image.GetWidth(); x += 2)
-                {
-                    Color pixel = image.GetPixel(x, y);
-
-                    if (pixel.A <= 0)
-                    {
-                        continue;
-                    }
-
-                    float vivid = pixel.S * pixel.V;
-                    red += pixel.R * vivid;
-                    green += pixel.G * vivid;
-                    blue += pixel.B * vivid;
-                    weight += vivid;
-                }
-            }
-
-            if (weight > 0)
-            {
-                Color mean = new(red / weight, green / weight, blue / weight);
-                float top = Mathf.Max(mean.R, Mathf.Max(mean.G, mean.B));
-                tint = Colors.White.Lerp(top > 0 ? mean / top : Colors.White, 0.5f);
-                tint.A = 1;
-            }
-        }
-
-        Tints[number] = tint;
-        return tint;
+        return _looks.TryGetValue(number, out EffectLook? look) ? look : null;
     }
 
     public override void _Process(double delta)
