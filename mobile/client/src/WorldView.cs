@@ -66,6 +66,12 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // 건물·나무 하나하나. 맵이 바뀌면 통째로 치운다.
     private readonly List<Sprite2D> _objects = [];
 
+    // 워프 칸 위 이름표 — 어디로 가는 출구인지(사용자 2026-10-02). 맵이 바뀌면 다시 세운다.
+    private readonly List<Control> _exitTags = [];
+
+    /// <summary>출구 이름을 아는 길잡이(<c>guide.txt</c>). 길 찾기 창·미니맵과 같은 것.</summary>
+    public MapGuide Exits { get; set; } = MapGuide.Empty;
+
     // sotp.dat 에 투명 표시가 붙은 그림(샘물 반짝임 …)은 가리지 않고 빛을 더한다 — 맵 편집기가 그렇게 그린다.
     private readonly CanvasItemMaterial _glow = new() { BlendMode = CanvasItemMaterial.BlendModeEnum.Add };
 
@@ -1711,6 +1717,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         _floored = map.Id;
         StandObjects(map);
+        TagExits(map);
 
         if (_floorSheet is not null)
         {
@@ -1729,6 +1736,42 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
         _floor.Texture = GD.Load<Texture2D>(path);
         _floorSize = _floor.Texture.GetSize();
+    }
+
+    /// <summary>
+    /// 출구마다 가운데 칸 위에 「→ 간 곳」 이름표 하나. 붙은 칸들이 한 출구로 묶여 있어(<see cref="MapGuide.ExitsOn" />) 이름표가
+    /// 칸마다 겹치지 않는다. 사람·물건보다 위에 그려 가려지지 않게 한다.
+    /// </summary>
+    private void TagExits(MapInfo map)
+    {
+        foreach (Control old in _exitTags)
+        {
+            old.QueueFree();
+        }
+
+        _exitTags.Clear();
+
+        foreach (MapExit exit in Exits.ExitsOn(map.Id))
+        {
+            (int x, int y) = IsometricFloor.Stand(exit.Middle.X, exit.Middle.Y, map.Rows);
+            PanelContainer tag = new() { Name = $"Exit{exit.Middle.X}_{exit.Middle.Y}", MouseFilter = MouseFilterEnum.Ignore, ZIndex = 50 };
+            StyleBoxFlat plate = new() { BgColor = new Color(0, 0, 0, 0.65f), BorderColor = new Color(1, 0.87f, 0.45f, 0.8f) };
+            plate.SetBorderWidthAll(1);
+            plate.SetCornerRadiusAll(4);
+            plate.ContentMarginLeft = plate.ContentMarginRight = 5;
+            plate.ContentMarginTop = plate.ContentMarginBottom = 1;
+            tag.AddThemeStyleboxOverride("panel", plate);
+
+            Label words = new() { Text = $"→ {exit.To}", MouseFilter = MouseFilterEnum.Ignore };
+            words.AddThemeFontSizeOverride("font_size", 11);
+            words.AddThemeColorOverride("font_color", new Color(1, 0.87f, 0.45f));
+            tag.AddChild(words);
+
+            _camera.AddChild(tag);
+            Vector2 size = tag.GetCombinedMinimumSize();
+            tag.Position = new Vector2(x - (size.X / 2), y - size.Y - 6);
+            _exitTags.Add(tag);
+        }
     }
 
     /// <summary>

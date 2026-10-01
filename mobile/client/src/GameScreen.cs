@@ -233,6 +233,7 @@ public partial class GameScreen : Control
 
         // 미니맵은 위 줄 안에 선다 — 월드를 먼저 지어야 한다(무엇을 그릴지 월드에게 묻는다).
         BuildWorld();
+        _world.Exits = _guide;
         _minimap = new MinimapView(_world, _server, _guide);
         _minimap.Pressed += () => SetWindow(GameWindow.TabMap, !_tabMap.Visible);
 
