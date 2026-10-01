@@ -1,6 +1,9 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[현재/2026-10-02] 큰 파일 나누기 — 등급 M · 단계: 시작 전.** 사용자 결정: 미루지 말고 지금. 지도 `plans/split-when-touched.md` 순서대로 `GameScreen` → `WorldClient` → `WorldView` → `Main` → 기술 수치(위력·고정 피해)를 템플릿 JSON 으로. 파일 하나 = 커밋 하나, 동작 그대로 — 알맹이 시험·서버 시험·로그인 화면 사진 한 장으로 확인. 브랜치 `fix/code-review-findings` 이어서(또는 새 `refactor/…`).
+  덤: 폰에서 앱을 한 번 켠 뒤 `scripts/ios-build.sh logs` 가 기록을 가져오는지 확인(설치 직후엔 폴더가 아직 없었다).
+
 - **[현재/2026-10-02] 코드 리뷰 뒤 버그 다섯 — 등급 M · 단계: 고침·시험 끝, 배포 전(브랜치 `fix/code-review-findings`, 서버도 같은 이름).** 받기 루프 한 겹 오류 잡기 · 레벨업 점수 직업 계획(알맹이 `StatPlan`, 무도가만 — 다른 직업은 만들 때 표에 더함) · 서버 요청 실패 기록(`Main.Fire`) · 봇에게 포션 주기 실패 시 사라지던 것(서버) · 생성기 조용한 실패. 시험: 알맹이 655 · 서버 봇 장비 3 통과.
   로그도 고침: 서버 오류에 종류·스택·누가·어디서, 봇 저장 잡음 제거, 폰 앱 기록 파일+`ios-build.sh logs`(앱 설치 뒤 처음 시험).
   **다음**: ① 서버 `cloud-server.sh deploy` + `scripts/ios-build.sh install`(사용자 알림 뒤) → 설치 뒤 `ios-build.sh logs` 로 가져와지는지 확인 ② 구조 정리는 `plans/split-when-touched.md` 를 그 파일 고칠 때 한 줄씩.

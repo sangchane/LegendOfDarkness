@@ -1,8 +1,8 @@
 # 고칠 때 나누기 — 큰 파일·섞인 폴더 정리 지도
 
 2026-10-02 코드 리뷰(함수 하나에 기능 하나 · 폴더 구조 · 예외 처리 · 주석)에서 나온 것 가운데 **기능은 그대로이고 구조만 바꾸는 일**을 모았다.
-한 번에 하지 않는다. **그 파일을 고칠 일이 생기면, 그 작업 앞에 해당 줄 하나만** 한다(나누기 커밋을 먼저, 기능 커밋은 따로).
-나눈 뒤에는 이 표에서 그 줄을 지운다.
+~~고칠 때 하나씩~~ → **사용자 결정(2026-10-02): 지금 한다.** 큰 파일은 최근 14일 중 8~10일을 고치는 파일이라 미룰 이유가 없다.
+순서: `GameScreen` → `WorldClient` → `WorldView` → `Main` → 기술 수치 빼기 → 나머지. 파일 하나 = 커밋 하나(동작 그대로). 나눈 뒤 이 표에서 그 줄을 지운다.
 
 ## 규칙
 - 나누기 커밋은 동작을 바꾸지 않는다 — 시험이 그대로 통과해야 한다(`dotnet test mobile/tests/...`, 서버는 `tests/hades-characterization`).
@@ -48,6 +48,14 @@
 | `GameServerHandlers.cs` `FormatF2Handler`(100줄) | 검증·사기·팔기·메뉴 | `HandleBuy` · `HandleSell`. `Value / 1.6` 6곳 → `ShopPricing.Offer(item)` |
 | `Network/ClientFormats/Undefined.cs:766-805` | 쓰는 패킷 `ClientFormatF2` 가 빈 껍데기 파일에 | `ClientFormatF2.cs` 로(`BulkTradeLine` 같이) |
 | `Types/AbilityPresentationOverrides.cs` | 설정 로더가 `Types/` 에. 깨지면 로그 없이 기본값 | `Infrastructure/` 로, catch 에 경고 한 줄 |
+
+## 밸런스 수치 — 코드에 박힌 숫자
+
+| 어디 | 지금 | 방향 |
+|---|---|---|
+| 서버 기술 스크립트 `database/server/scripts/Skills/Monk/*.cs` (26개, 기술마다 파일 하나) | 위력·고정 피해가 호출 인자로 박혀 있다 — `MonkStrike.Use(sprite, Skill, 350, 5900, 0x85)`. 쿨다운·소리·이펙트는 이미 템플릿 JSON(`templates/skills/*.json`) | 위력·고정 피해를 기술 템플릿 JSON 필드로 옮기고 스크립트는 읽기만. 그러면 한 표(운영 대시보드)에서 조절 |
+| `MonkStrike.cs:72` 등 | `damage / 4 * 3` 같은 이름 없는 식 | 이름 붙은 상수로(무엇을 줄이는지 주석) |
+| 알맹이 `StatPlan` · 걷기 0.44초 · 돌기 0.2초 등 | 클라이언트 상수 | 지금은 상수로 두되 한 파일(`Tuning`)에 모은다 |
 
 ## 생성기 `scripts/`
 
