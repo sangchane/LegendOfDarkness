@@ -1104,3 +1104,9 @@ ui의 Godot 지침과 ponytail 적용. 기존 Greybox 팔레트·원작 아트�
 - 2026-09-08 — 실행 절차·체크리스트 초안 `docs/run-procedure.md` 작성, catch-up 구조 세팅
 - 2026-09-08 — 현행 프로젝트 분석서 `docs/current-system-analysis/` 01~09 작성, Graphite 작업 규칙 추가 (dfe0ff2, c74b2db)
 - 2026-09-19 — 모바일 해상도('돋보기 현상') 수정 시도 및 후속 작업 인계. `project.godot`의 `viewport_width/height`를 800x360에서 480x216으로 축소해 UI와 캐릭터 크기를 1.6배 확대(Zoom-in)하도록 수정. 캐시 문제로 iOS 빌드에 반영되지 않는 현상이 확인되어 `.godot` 캐시 삭제 후 재빌드. 가로 모드(Landscape)일 때 `Main.cs`가 `ContentScaleSize`를 기본값(800x360)으로 돌려놓을 가능성을 차단하기 위해 `Main.cs`에서 가로 모드 `ContentScaleSize = (480, 216)`을 강제하도록 패치 후 iOS `.ipa` 설치 완료.
+
+## 2026-10-02 코드 정리 끝(알맹이·화면 폴더 · 서버 나누기 · 생성기 lib/ops)
+- 모바일 커밋 20: 신호표 `ClientOpcode`/`ServerOpcode`, `WorldClient` 받기 루프 `OnXxx` + `WorldState`·`ChatLog`, `Companion` → `CompanionSpells`·`CompanionBrain`, `AutoHunt` `Strike`·`Approach`, `Reckon`, `WorldEntry` 나눔, `Tuning`, 폴더 재배치, `PercentWheel`·`DiamondButton` 삭제(사용자), `WorldMapGate`·`GoldFormat`·`DirectionHold`·`StarterArmor` 알맹이로, 봇 큐 상한 1024·맵 전환 때 `_health`·`_struck` 비움. 빈 몸 패킷 0x2E·0x34·0x39·0x5E 는 이제 `Ignored` 에 셈. 옛 `--hunt` 봇 그대로(사용자).
+- 서버 커밋 7: `CompanionPairing`·`CompanionKit`·`CompanionStatus`·`CompanionState`, `HandleBuy`·`HandleSell`·`ShopPricing.Offer`, `ClientFormatF2.cs`, `Infrastructure/AbilityPresentationOverrides`(경고 로그, 서버 밖에서는 조용히), `MonkStrike` 이름 붙은 상수. 레벨업 점수 중복 요청은 서버가 막음 — 다만 원본부터의 구멍 둘(backlog).
+- 생성기 커밋 5: `scripts/lib/`(`_paths` `_io` `_dotnet` `_git` `_graphify` `_drops` …), 100줄 넘는 함수 17개 나눔, 운영 스크립트 8개 `scripts/ops/`(launchd `com.lod.backup`·`com.lod.iossign` 도 새 경로). 출력 전후 바이트 동일 101회.
+- 시험: 알맹이 669 · 서버 278(사냥 시간 시험 2개는 단독 통과) · 사진 `out/tidy-compare.png`(서버 없는 화면, 배치 같음).
