@@ -247,7 +247,7 @@ def shape(skill):
         elif skill["앞칸수"] > 1:
             where, extra = f"앞 {skill['앞칸수']}칸에 ", f", reach: {skill['앞칸수']}"
         return (where + f"공격력 ×{attack / 100:g}" + (f" + 지구력 ×{endurance / 100:g}" if endurance else ""),
-                f"MonkStrike.Use(sprite, Skill, {attack}, {endurance}, {motion}{extra});", "")
+                f"MonkStrike.Use(sprite, Skill, {motion}{extra});", "")
     return None
 
 
@@ -349,6 +349,10 @@ def main():
             "TargetAnimation": skill["이펙트"] or 0,
             "Cooldown": skill["딜레이"] or 0,
         })
+        # 위력은 템플릿에 둔다 — 스크립트는 읽기만 해서, 수치를 한 표에서 조절할 수 있게.
+        if "MonkStrike.Use(" in shape(skill)[1]:
+            attack, endurance = stat_percents(skill)
+            template.update({"AttackPercent": attack, "EndurancePercent": endurance})
         if skill["이름"] in PACK_ONLY:
             template["Group"] = f"{MARK}/원작없음"
         level = levels.get(skill["이름"])

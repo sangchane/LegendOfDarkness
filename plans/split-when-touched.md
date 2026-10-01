@@ -50,7 +50,7 @@
 
 | 어디 | 지금 | 방향 |
 |---|---|---|
-| 서버 기술 스크립트 `database/server/scripts/Skills/Monk/*.cs` (26개, 기술마다 파일 하나) | 위력·고정 피해가 호출 인자로 박혀 있다 — `MonkStrike.Use(sprite, Skill, 350, 5900, 0x85)`. 쿨다운·소리·이펙트는 이미 템플릿 JSON(`templates/skills/*.json`) | 위력·고정 피해를 기술 템플릿 JSON 필드로 옮기고 스크립트는 읽기만. 그러면 한 표(운영 대시보드)에서 조절 |
+| 서버 기술 스크립트 `database/server/scripts/Skills/Monk/*.cs` | 2026-10-02: 한 방(`MonkStrike.Use`, 14개)의 배율은 템플릿 `AttackPercent`·`EndurancePercent` 로 옮겼다(시험 `MonkStrikeNumbersTests`). 남은 것: `Step`(허공답보)·`UseCross`·`UseVitality`·`UseWolf`·`UseStrengthAndEndurance`·`Afflict`·`Empower` 의 수치와 마나(`Spend`) | 필요할 때 같은 방식으로 템플릿 필드를 더한다 |
 | `MonkStrike.cs:72` 등 | `damage / 4 * 3` 같은 이름 없는 식 | 이름 붙은 상수로(무엇을 줄이는지 주석) |
 | 알맹이 `StatPlan` · 걷기 0.44초 · 돌기 0.2초 등 | 클라이언트 상수 | 지금은 상수로 두되 한 파일(`Tuning`)에 모은다 |
 
