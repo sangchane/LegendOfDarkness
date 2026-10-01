@@ -16,6 +16,13 @@ public static class WorldMapCards
             : new WorldMapCard(node.Name, node.AreaId, string.Empty, string.Empty, 0))
     ];
 
+    /// <summary>
+    /// The zones under one hunting ground — a card each. Choosing one sends its own map number and the server lands us
+    /// straight in it (the zone list is on the server's world map too, so it only lets these through).
+    /// </summary>
+    public static IReadOnlyList<WorldMapCard> Zones(WorldMapCard card, MapGuide guide) =>
+        [.. guide.ZonesUnder(card.AreaId).Select(zone => new WorldMapCard(zone.Name, zone.Area, "사냥터", string.Empty, zone.Level > 1 ? zone.Level : 0))];
+
     /// <summary>Whether a card is a town — the guide says so, or, for a place it does not know, "마을" is in its name.</summary>
     public static bool IsTown(WorldMapCard card) => card.Kind.Length > 0 ? card.Kind == "마을" : card.Name.Contains("마을", StringComparison.Ordinal);
 

@@ -63,6 +63,7 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Button _askDrop = new() { Text = "버리기", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Button _askCancel = new() { Text = "취소", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
+    private readonly Button _shut = WindowFrame.CloseButton();
     private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", tab: true);
     private readonly DoubleTap _taps = new();
     private readonly SpinBox _dropCount = new() { MinValue = 1, MaxValue = 1, Step = 1, Value = 1, CustomMinimumSize = new Vector2(80, Main.TouchMinimum) };
@@ -246,6 +247,14 @@ public sealed partial class PackPanel : PanelContainer
             lit.Paint = Greybox.Accent;
         }
 
+        // 정보 상자 오른쪽 위 X — 장비창과 같다(사용자 2026-10-02).
+        _shut.Pressed += () =>
+        {
+            _chosen = 0;
+            _showing = null;
+            _action.Visible = false;
+        };
+
         _use.Pressed += () =>
         {
             if (_chosen > 0)
@@ -338,6 +347,7 @@ public sealed partial class PackPanel : PanelContainer
         top.AddChild(words);
         // 교체·장착·사용은 오른쪽 위(장비창의 [장착 해제]와 같은 자리) — 아래 단추 줄 몫의 빈 곳이 없어진다(사용자 2026-10-01).
         top.AddChild(_use);
+        top.AddChild(_shut);
         column.AddChild(top);
         // 서버가 보낸 수치 — 공격력·방어·능력치·요구 레벨·직업·무게(우리 확장 0x0F 꼬리).
         column.AddChild(_actionTable);

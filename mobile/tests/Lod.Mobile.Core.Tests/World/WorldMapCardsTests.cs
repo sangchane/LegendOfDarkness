@@ -12,6 +12,8 @@ public sealed class WorldMapCardsTests
         area 20373 1 town 노비스마을
         area 20028 11 field 우드랜드입구
         exit 20373 69 26 노비스평원A
+        zone 20028 20015 1 우드랜드1-1
+        zone 20028 20020 21 우드랜드14-1
         """;
 
     private static readonly WorldMapInfo Field = new("field001", 1,
@@ -62,6 +64,20 @@ public sealed class WorldMapCardsTests
 
         Assert.Single(guide.ExitsOn(20373));
         Assert.Null(guide.Place(20374));
+    }
+
+    [Fact]
+    public void A_hunting_ground_lists_its_zones_in_order_each_with_its_own_map()
+    {
+        MapGuide guide = MapGuide.Read(Guide);
+        IReadOnlyList<WorldMapCard> cards = WorldMapCards.From(Field, guide);
+
+        IReadOnlyList<WorldMapCard> zones = WorldMapCards.Zones(cards[1], guide);
+
+        Assert.Equal(["우드랜드1-1", "우드랜드14-1"], zones.Select(zone => zone.Name));
+        Assert.Equal([20015, 20020], zones.Select(zone => zone.AreaId));
+        Assert.Equal([0, 21], zones.Select(zone => zone.Level));
+        Assert.Empty(WorldMapCards.Zones(cards[0], guide));
     }
 }
 

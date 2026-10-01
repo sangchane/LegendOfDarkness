@@ -37,6 +37,7 @@ public sealed class MapGuide
     private readonly Dictionary<int, List<(Tile Where, string To)>> _exits = [];
     private readonly Dictionary<int, List<MapSign>> _signs = [];
     private readonly Dictionary<int, MapPlace> _places = [];
+    private readonly Dictionary<int, List<MapPlace>> _zones = [];
 
     public static MapGuide Empty { get; } = new();
 
@@ -52,6 +53,14 @@ public sealed class MapGuide
             if (words.Length == 5 && words[0] == "area" && int.TryParse(words[1], out int area) && int.TryParse(words[2], out int level))
             {
                 guide._places[area] = new MapPlace(area, words[4], words[3] == "town", level);
+                continue;
+            }
+
+            // zone <카드 맵> <구역 맵> <입장 레벨> <이름> — 사냥터 카드 아래 구역.
+            if (words.Length == 5 && words[0] == "zone" && int.TryParse(words[1], out int under)
+                && int.TryParse(words[2], out int zone) && int.TryParse(words[3], out int entry))
+            {
+                Add(guide._zones, under, new MapPlace(zone, words[4], false, entry));
                 continue;
             }
 
@@ -121,6 +130,9 @@ public sealed class MapGuide
 
     /// <summary>What the guide knows about a map the world map lands on, or nothing.</summary>
     public MapPlace? Place(int map) => _places.TryGetValue(map, out MapPlace? place) ? place : null;
+
+    /// <summary>The zones under a hunting ground's card, in the order the server's world map lists them.</summary>
+    public IReadOnlyList<MapPlace> ZonesUnder(int map) => _zones.TryGetValue(map, out List<MapPlace>? zones) ? zones : [];
 
     public IReadOnlyList<MapSign> SignsOn(int map) => _signs.TryGetValue(map, out List<MapSign>? signs) ? signs : [];
 

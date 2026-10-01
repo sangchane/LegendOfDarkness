@@ -12,6 +12,7 @@
   npc  <맵> <x> <y> <이름>            — mundanes 템플릿의 NPC 자리
   area <맵> <입장 레벨> <town|field> <이름> — 월드맵이 내려 주는 맵(카드에 적는다). 레벨은 그 맵으로 드는 워프의
                                         LevelRequired 중 가장 작은 것, 마을은 이름에 "마을"이 든 곳
+  zone <카드 맵> <구역 맵> <입장 레벨> <이름> — 사냥터 카드 아래 구역(월드맵 Portals[].Zones). 고르면 바로 그 구역으로 간다
 """
 import json
 from pathlib import Path
@@ -64,6 +65,7 @@ def main() -> None:
             levels[to] = min(levels.get(to, 999), int(warp.get("LevelRequired") or 1))
 
     places = set()
+    zones = []
 
     for path in sorted((SERVER / "templates" / "worldmaps").glob("*.json")):
         field = json.loads(path.read_text(encoding="utf-8-sig"))
@@ -75,7 +77,15 @@ def main() -> None:
                 name = names[area]
                 places.add((area, max(1, levels.get(area, 1)), "town" if "마을" in name else "field", name))
 
+            # 구역은 자료에 적힌 차례 그대로.
+            for zone in portal.get("Zones") or []:
+                inner = int(zone.get("AreaID") or 0)
+
+                if inner in names:
+                    zones.append((area, inner, max(1, levels.get(inner, 1)), names[inner]))
+
     lines += [f"area {a} {lv} {kind} {n}" for a, lv, kind, n in sorted(places)]
+    lines += [f"zone {a} {z} {lv} {n}" for a, z, lv, n in zones]
 
     npcs = set()
 
@@ -89,7 +99,7 @@ def main() -> None:
     lines += [f"npc {a} {x} {y} {n}" for a, x, y, n in sorted(npcs)]
 
     (OUT / "guide.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"guide.txt: 맵 {len(drawn)} · 출구 칸 {len(exits)} · NPC {len(npcs)} · 월드맵 맵 {len(places)}")
+    print(f"guide.txt: 맵 {len(drawn)} · 출구 칸 {len(exits)} · NPC {len(npcs)} · 월드맵 맵 {len(places)} · 구역 {len(zones)}")
 
 
 if __name__ == "__main__":

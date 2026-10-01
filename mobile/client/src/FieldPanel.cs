@@ -21,6 +21,9 @@ public sealed partial class FieldPanel : PanelContainer
     private readonly MapGuide _guide;
     private readonly GridContainer _places = new();
     private readonly GridContainer _fields = new();
+    private readonly GridContainer _zones = new();
+    private readonly VBoxContainer _zoneBox = new() { Visible = false };
+    private readonly Label _zoneTitle = new();
     private readonly Button _townTab = WindowFrame.IconButton(GlyphKind.Town, "마을", tab: true, width: 56);
     private readonly Button _fieldTab = WindowFrame.IconButton(GlyphKind.Field, "사냥터", tab: true, width: 56);
     private readonly Dictionary<Button, string> _names = [];
@@ -46,6 +49,23 @@ public sealed partial class FieldPanel : PanelContainer
         _fields.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _fields.AddThemeConstantOverride("h_separation", Main.Gutter);
         _fields.AddThemeConstantOverride("v_separation", Main.Gutter);
+        // 사냥터 카드를 누르면 그 아래 구역 — 같은 모양 카드, 위에 [‹ 사냥터] 와 사냥터 이름(사용자 2026-10-02).
+        _zones.Columns = _places.Columns;
+        _zones.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _zones.AddThemeConstantOverride("h_separation", Main.Gutter);
+        _zones.AddThemeConstantOverride("v_separation", Main.Gutter);
+        Button back = new() { Text = "‹ 사냥터", FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        Greybox.Plain(back);
+        back.Pressed += () => ShowTab(towns: false);
+        _zoneTitle.AddThemeColorOverride("font_color", Greybox.Text);
+        _zoneTitle.AddThemeFontSizeOverride("font_size", 16);
+        HBoxContainer zoneHead = new();
+        zoneHead.AddThemeConstantOverride("separation", Main.Gutter);
+        zoneHead.AddChild(back);
+        zoneHead.AddChild(_zoneTitle);
+        _zoneBox.AddThemeConstantOverride("separation", Main.Gutter);
+        _zoneBox.AddChild(zoneHead);
+        _zoneBox.AddChild(_zones);
         _townTab.Pressed += () => ShowTab(towns: true);
         _fieldTab.Pressed += () => ShowTab(towns: false);
 
@@ -61,6 +81,7 @@ public sealed partial class FieldPanel : PanelContainer
         VBoxContainer both = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         both.AddChild(_places);
         both.AddChild(_fields);
+        both.AddChild(_zoneBox);
         scroll.AddChild(both);
 
         // 제목 자리에 두 탭 — [마을] · [사냥터](공통 창 틀의 아이콘 탭). 제목 글자는 탭 옆에 작게.
@@ -117,7 +138,18 @@ public sealed partial class FieldPanel : PanelContainer
             {
                 Button face = Card(card);
                 int area = card.AreaId;
-                face.Pressed += () => Chosen?.Invoke(area);
+                IReadOnlyList<WorldMapCard> zones = WorldMapCards.Zones(card, _guide);
+                face.Pressed += () =>
+                {
+                    if (zones.Count > 0)
+                    {
+                        ShowZones(card.Name, zones);
+                    }
+                    else
+                    {
+                        Chosen?.Invoke(area);
+                    }
+                };
                 _names[face] = card.Name;
                 grid.AddChild(face);
             }
@@ -127,11 +159,36 @@ public sealed partial class FieldPanel : PanelContainer
         Visible = true;
     }
 
+    /// <summary>한 사냥터 아래 구역 카드들. 고르면 그 구역 맵 번호를 보내고, 서버가 바로 그 구역으로 보낸다.</summary>
+    private void ShowZones(string field, IReadOnlyList<WorldMapCard> zones)
+    {
+        foreach (Node old in _zones.GetChildren())
+        {
+            _names.Remove((Button)old);
+            _zones.RemoveChild(old);
+            old.QueueFree();
+        }
+
+        foreach (WorldMapCard zone in zones)
+        {
+            Button face = Card(zone);
+            int area = zone.AreaId;
+            face.Pressed += () => Chosen?.Invoke(area);
+            _names[face] = zone.Name;
+            _zones.AddChild(face);
+        }
+
+        _zoneTitle.Text = field;
+        _fields.Visible = false;
+        _zoneBox.Visible = true;
+    }
+
     /// <summary>한 탭만 보인다 — 마을이면 true.</summary>
     public void ShowTab(bool towns)
     {
         _places.Visible = towns;
         _fields.Visible = !towns;
+        _zoneBox.Visible = false;
         _townTab.SetPressedNoSignal(towns);
         _fieldTab.SetPressedNoSignal(!towns);
         _townTab.EmitSignal(BaseButton.SignalName.Toggled, towns);
