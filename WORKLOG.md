@@ -10,6 +10,13 @@
 
 ## History (append; 최신이 위)
 
+### 2026-10-02 — 큰 파일 나누기(지도 순서 다섯)
+
+- partial 로 나눔, 동작 그대로: GameScreen(2598→746 + 창·위 판·조작·파티·알림·시험) · WorldClient(2290→934 + 신호표·보내기·패킷 읽기·큐·동료) · WorldView(2125→493 + 사람·사냥·이펙트·바닥·길 안내·시험) · Main(1092→311 + 설정·실행 인자·화면 전환·글꼴). 옮긴 줄은 원본과 정렬 비교로 같음을 확인.
+- 무도가 한 방 14개의 배율을 기술 템플릿으로(서버 `SkillTemplate.AttackPercent`·`EndurancePercent`). 로그인 때 템플릿을 전역 표로 바꿔 끼우므로 캐릭터 파일의 옛 사본은 상관없다.
+- 시험 도구는 서버 dll 을 다시 빌드하지 않는다 — 서버 `src/` 를 고치면 `dotnet build src/Lorule.GameServer/Lorule.GameServer.csproj -c Debug` 먼저(안 하면 스크립트 컴파일 실패로 시험 수십 개가 6초 만에 넘어진다). 전체 서버 시험은 30분 넘게 걸려 골라 돌렸다.
+- 어제 시험이 남긴 격리 서버 하나가 하루째 CPU 를 쓰고 있어 껐다.
+
 ### 2026-10-02 — 코드 리뷰(함수 하나에 기능 하나·폴더·예외·주석)와 버그 다섯
 
 - 리뷰: 예외·주석은 대체로 좋고, 약한 곳은 거대 파일(GameScreen 2578·WorldClient 2280·WorldView 2143)과 평평한 폴더. 구조 정리는 한 번에 하지 않고 `plans/split-when-touched.md` 로.
