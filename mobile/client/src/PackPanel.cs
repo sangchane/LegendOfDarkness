@@ -255,8 +255,26 @@ public sealed partial class PackPanel : PanelContainer
         };
 
         // 버리기는 위 줄에 켜고 끄는 단추(사용자 2026-10-01) — 켜 둔 동안 누르는 것마다 버린다. 창을 닫으면 꺼진다.
+        // 켜진 버리기는 빨갛게 — 판·테두리·아이콘·글자까지, 글자도 「버리는 중」(사용자 2026-10-01: 잘못 버리지 않게).
+        Color danger = new("#e05a5a");
+        StyleBoxFlat armed = Greybox.Sheet();
+        armed.BgColor = new Color("#3a1414");
+        armed.BorderColor = danger;
+        armed.SetBorderWidthAll(2);
+        armed.SetCornerRadiusAll(8);
+        armed.SetContentMarginAll(4);
+        _drop.AddThemeStyleboxOverride("pressed", armed);
+        _drop.AddThemeStyleboxOverride("hover_pressed", armed);
         _drop.Toggled += on =>
         {
+            WindowFrame.Relabel(_drop, on ? "버리는 중" : "버리기");
+
+            if (on)
+            {
+                _drop.GetMeta("glyph").As<Glyph>().Paint = danger;
+                _drop.GetMeta("word").As<Label>().AddThemeColorOverride("font_color", danger);
+            }
+
             _dropping = on;
             _chosen = 0;
             _showing = null;
