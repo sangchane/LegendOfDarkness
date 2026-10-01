@@ -1030,12 +1030,12 @@ public partial class GameScreen : Control
 
     /// <summary>
     /// A top-menu button: a picture in a see-through dark ring with a thin dark-gold rim, its name small underneath — no
-    /// plate, so the world shows through. Original item pictures (<paramref name="pixel" />) are drawn at their own size,
-    /// never enlarged; the drawn ones are shrunk to fit.
+    /// plate, so the world shows through. Original item pictures (<paramref name="pixel" />) are enlarged to fill the ring
+    /// with the nearest pixel; the drawn ones are shrunk to fit.
     /// </summary>
     private static Button MenuButton(string name, string art, bool pixel = false)
     {
-        Button button = new() { CustomMinimumSize = new Vector2(56, 52), FocusMode = FocusModeEnum.None, TooltipText = name };
+        Button button = new() { CustomMinimumSize = new Vector2(56, 56), FocusMode = FocusModeEnum.None, TooltipText = name };
 
         foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus", "disabled" })
         {
@@ -1044,10 +1044,10 @@ public partial class GameScreen : Control
 
         StyleBoxFlat ring = new() { BgColor = new Color(0, 0, 0, 0.35f), BorderColor = LolGoldDark };
         ring.SetBorderWidthAll(1);
-        ring.SetCornerRadiusAll(18);
+        ring.SetCornerRadiusAll(20);
         PanelContainer circle = new()
         {
-            CustomMinimumSize = new Vector2(36, 36),
+            CustomMinimumSize = new Vector2(40, 40),
             SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
             MouseFilter = MouseFilterEnum.Ignore
         };
@@ -1056,9 +1056,10 @@ public partial class GameScreen : Control
         TextureRect picture = new()
         {
             Texture = ResourceLoader.Exists(art) ? GD.Load<Texture2D>(art) : null,
-            CustomMinimumSize = new Vector2(28, 28),
+            // 원작 아이템 그림(25px 안팎)은 원 안을 채우도록 키운다(사용자 2026-10-02) — 화소가 뭉개지지 않게 가장 가까운 화소로.
+            CustomMinimumSize = new Vector2(pixel ? 36 : 30, pixel ? 36 : 30),
             ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-            StretchMode = pixel ? TextureRect.StretchModeEnum.KeepCentered : TextureRect.StretchModeEnum.KeepAspectCentered,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
             TextureFilter = pixel ? TextureFilterEnum.Nearest : TextureFilterEnum.Linear,
             MouseFilter = MouseFilterEnum.Ignore
         };
@@ -2252,7 +2253,8 @@ public partial class GameScreen : Control
         {
             _experienceBar.MaxValue = exp.Need;
             _experienceBar.Value = exp.Earned;
-            _experienceText.Text = $"{ExperienceGauge.Short(exp.Earned)}/{ExperienceGauge.Short(exp.Need)}";
+            // 절대 수치보다 몇 %인지(사용자 2026-10-02).
+            _experienceText.Text = $"{Math.Floor(exp.Earned * 1000.0 / exp.Need) / 10:0.0}%";
         }
         else
         {
