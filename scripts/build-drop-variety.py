@@ -128,24 +128,34 @@ def drops_of(monster):
 
 def load_items():
     items = {}
+    bad = False
     for path in ITEMS.rglob("*.json"):
         try:
             item = read(path)
         except json.JSONDecodeError:
+            print(f"깨진 JSON 건너뜀: {path}", file=sys.stderr)
+            bad = True
             continue
         if item.get("Name"):
             items[item["Name"]] = (path, item)
+    if bad:
+        sys.exit(1)
     return items
 
 
 def load_area_names():
     names = {}
+    bad = False
     for path in (SERVER / "areas").glob("*.json"):
         try:
             area = read(path)
         except json.JSONDecodeError:
+            print(f"깨진 JSON 건너뜀: {path}", file=sys.stderr)
+            bad = True
             continue
         names[area.get("ID") or area.get("Id")] = area.get("Name")
+    if bad:
+        sys.exit(1)
     return names
 
 

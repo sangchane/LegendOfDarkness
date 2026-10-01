@@ -19,6 +19,7 @@
 
 import argparse
 import json
+import sys
 import math
 import re
 from collections import defaultdict
@@ -91,13 +92,18 @@ def pack_evidence():
 
 def load_templates():
     items = {}
+    bad = False
     for path in sorted(ITEMS.rglob("*.json")):
         try:
             item = read(path)
         except json.JSONDecodeError:
+            print(f"깨진 JSON 건너뜀: {path}", file=sys.stderr)
+            bad = True
             continue
         if isinstance(item, dict) and item.get("Name"):
             items[item["Name"]] = (path, item)
+    if bad:
+        sys.exit(1)
 
     monsters = []
     for path in sorted(MONSTERS.rglob("*.json")):

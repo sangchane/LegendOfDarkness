@@ -9,6 +9,7 @@
   쓰는 법: python3 scripts/build-monster-page-data.py   → docs/monsters-data.js
 """
 import json
+import sys
 import subprocess
 from pathlib import Path
 
@@ -56,7 +57,8 @@ def areas():
     for path in AREAS.glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         out[data["Id"]] = data["Name"]
     return out
@@ -74,7 +76,8 @@ def item_facts():
     for path in ITEMS.glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         out[data.get("Name")] = data
     return out
@@ -199,8 +202,9 @@ def main():
         pointer = subprocess.run(
             ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
             capture_output=True, text=True, check=True).stdout.strip()
-    except Exception:
-        pointer = ""
+    except (OSError, subprocess.CalledProcessError) as e:
+        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
+        pointer = "unknown"
 
     payload = {
         "생성": "scripts/build-monster-page-data.py",

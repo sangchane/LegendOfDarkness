@@ -37,6 +37,9 @@ HEAD_MAX = 100  # 100 이하가 머리, 초과는 투구.
 def run(*args):
     proc = subprocess.run([str(DOTNET), str(TOOL), *args], capture_output=True, text=True,
                           encoding="utf-8", errors="replace", cwd=ROOT)
+    if proc.returncode != 0:
+        print(proc.stderr, file=sys.stderr)
+        raise SystemExit(proc.returncode)
     return proc.stdout
 
 

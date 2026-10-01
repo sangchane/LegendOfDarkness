@@ -96,13 +96,18 @@ def monsters():
 
 def items():
     found = {}
+    bad = False
     for path in sorted(ITEMS.rglob("*.json")):
         try:
             item = read(path)
         except json.JSONDecodeError:
+            print(f"깨진 JSON 건너뜀: {path}", file=sys.stderr)
+            bad = True
             continue
         name = item.get("Name") or path.stem
         found[name] = (path, item)
+    if bad:
+        sys.exit(1)
     return found
 
 

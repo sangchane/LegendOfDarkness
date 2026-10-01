@@ -202,15 +202,21 @@ def set_drops(monster, names):
 
 def load_items():
     items = {}
+    bad = False
 
     for path in ITEMS.rglob("*.json"):
         try:
             item = read(path)
         except json.JSONDecodeError:
+            print(f"깨진 JSON 건너뜀: {path}", file=sys.stderr)
+            bad = True
             continue
 
         if item.get("Name"):
             items[item["Name"]] = path
+
+    if bad:
+        sys.exit(1)
 
     return items
 

@@ -13,6 +13,7 @@
   쓰는 법: python3 scripts/build-npc-page-data.py   → docs/npcs-data.js
 """
 import json
+import sys
 import re
 import subprocess
 from collections import defaultdict, deque
@@ -45,7 +46,8 @@ def areas():
     for path in (SERVER / "areas").glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         out[data["Id"]] = data["Name"]
     return out
@@ -61,7 +63,8 @@ def reachable_set(names):
     for path in (SERVER / "templates/warps").glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         target = (data.get("To") or {}).get("AreaID")
         if not target:
@@ -73,7 +76,8 @@ def reachable_set(names):
     for path in (SERVER / "templates/worldmaps").glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         starts += [(p.get("Destination") or {}).get("AreaID") for p in data.get("Portals") or []]
 
@@ -114,7 +118,8 @@ def item_facts():
     for path in (SERVER / "templates/items").glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         out[data.get("Name")] = data
     return out
@@ -170,7 +175,8 @@ def main():
     for path in sorted((SERVER / "templates/mundanes").glob("*.json")):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
 
         area_id = data.get("AreaID")
@@ -226,8 +232,9 @@ def main():
         pointer = subprocess.run(
             ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
             capture_output=True, text=True, check=True).stdout.strip()
-    except Exception:
-        pointer = ""
+    except (OSError, subprocess.CalledProcessError) as e:
+        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
+        pointer = "unknown"
 
     now_count = sum(1 for r in rows if r["닿음"])
     payload = {

@@ -16,7 +16,7 @@
 
   쓰는 법: python3 scripts/build-truth-vault.py   → data/truth-vault/
 """
-import json, shutil, collections
+import json, shutil, collections, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -31,7 +31,8 @@ VAULT = ROOT / "data" / "truth-vault"
 def rows(path):
     try:
         return json.loads(Path(path).read_text(encoding="utf-8-sig"))
-    except Exception:
+    except (OSError, ValueError) as e:
+        print(f"건너뜀(읽기 실패): {path}: {e}", file=sys.stderr)
         return []
 
 
@@ -45,7 +46,9 @@ def templates(kind):
     for f in sorted((TPL / kind).rglob("*.json")):
         try:
             d = json.loads(f.read_text(encoding="utf-8-sig"))
-        except Exception:
+        except (OSError, ValueError):
+            if f.name != "minion.json":  # 몬스터 폴더의 minion.json 은 원래 JSON 이 아니다
+                print(f"건너뜀(읽기 실패): {f}", file=sys.stderr)
             continue
         out[d.get("Name") or f.stem] = str(d.get("Group") or "")
     return out
@@ -166,8 +169,8 @@ def main():
         try:
             d = json.loads(f.read_text(encoding="utf-8-sig"))
             area_of[d["Id"]] = d["Name"]
-        except Exception:
-            pass
+        except (OSError, ValueError, KeyError):
+            print(f"건너뜀(읽기 실패): {f}", file=sys.stderr)
     for keyword in ("우드랜드", "포테의숲", "노비스"):
         kinds = set()
         for f in sorted((TPL / "monsters").rglob("*.json")):

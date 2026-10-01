@@ -15,6 +15,7 @@
   쓰는 법: python3 scripts/build-data-freshness.py   → docs/data-freshness.js
 """
 import json
+import sys
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -111,8 +112,9 @@ def main():
         pointer = subprocess.run(
             ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
             capture_output=True, text=True, check=True).stdout.strip()
-    except Exception:
-        pointer = ""
+    except (OSError, subprocess.CalledProcessError) as e:
+        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
+        pointer = "unknown"
 
     payload = {
         "생성": "scripts/build-data-freshness.py",

@@ -11,6 +11,7 @@
   쓰는 법: python3 scripts/build-region-warp-data.py   → docs/region-warps-data.js
 """
 import json
+import sys
 import re
 import subprocess
 from collections import defaultdict, deque
@@ -101,7 +102,8 @@ def main():
     for path in (SERVER / "areas").glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         names[data["Id"]] = data["Name"]
 
@@ -134,7 +136,8 @@ def main():
     for path in (SERVER / "templates/warps").glob("*.json"):
         try:
             data = read(path)
-        except Exception:
+        except (OSError, ValueError):
+            print(f"건너뜀(읽기 실패): {path}", file=sys.stderr)
             continue
         target = (data.get("To") or {}).get("AreaID")
         for activation in data.get("Activations") or []:
@@ -208,8 +211,9 @@ def main():
         pointer = subprocess.run(
             ["git", "-C", str(SERVER.parents[1]), "rev-parse", "--short", "HEAD"],
             capture_output=True, text=True, check=True).stdout.strip()
-    except Exception:
-        pointer = ""
+    except (OSError, subprocess.CalledProcessError) as e:
+        print(f"git 포인터 못 구함: {e}", file=sys.stderr)
+        pointer = "unknown"
 
     payload = {
         "생성": "scripts/build-region-warp-data.py",

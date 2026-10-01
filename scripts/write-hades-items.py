@@ -36,7 +36,8 @@ def existing():
         text = re.sub(r",(\s*[}\]])", r"\1", f.read_text(encoding="utf-8-sig"))
         try:
             d = json.loads(text)
-        except Exception:
+        except ValueError:
+            print(f"건너뜀(읽기 실패): {f}", file=sys.stderr)
             continue
         out[d.get("Name") or f.stem] = (f, str(d.get("Group") or ""))
     return out
