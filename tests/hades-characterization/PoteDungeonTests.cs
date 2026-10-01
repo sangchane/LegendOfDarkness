@@ -117,7 +117,7 @@ public sealed class PoteDungeonTests : IDisposable
 
         // 던전 괴물 체력만 1 로 — 마릿수(대기실 늑대 6 · 보스방 늑대 8 · 자이언트맨티스 1)와 흐름은 그대로 두고 잡는 시간만 줄인다.
         string entry = Path.Combine(server.ContentLocation, "scripts", "Pack599", "Npcs", "포테의숲오솔길입장.cs");
-        File.WriteAllText(entry, File.ReadAllText(entry).Replace("(V)4500L", "(V)1L").Replace("(V)15000L", "(V)1L"));
+        File.WriteAllText(entry, File.ReadAllText(entry).Replace("(V)5850L", "(V)1L").Replace("(V)19500L", "(V)1L"));
 
         // 자이언트맨티스의 세줄금반지(실제 80%)가 꼭 떨어지게 — 줍지 않고 나가도 가방에 오는지 본다.
         string ring = Path.Combine(server.ContentLocation, "templates", "items", "세줄금반지.json");
