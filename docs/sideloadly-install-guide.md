@@ -13,7 +13,11 @@
 2. 페이지의 앱 파일은 **`scripts/ops/ios-build.sh install` 이 내 폰에 넣는 데 성공하면 저절로 최신판으로 바뀐다.**
    폰 없이 올리려면 `scripts/ops/ios-build.sh build && scripts/ops/ios-build.sh release`.
    페이지 글·그림을 고쳤으면 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-dashboard.sh deploy`(게임 서버는 안 끊긴다).
-3. 가능하면 **처음 한 번은 전화를 하면서** 같이 한다(10~20분).
+3. **윈도우 PC판**도 같은 페이지 「윈도우 PC」 탭(주소 끝 `#pc`)에 있다 — 압축만 풀고 실행, 서명·7일 제한 없음.
+   만들고 올리기: `scripts/ops/windows-build.sh release`(맥에서 그대로 만든다).
+4. 가능하면 **처음 한 번은 전화를 하면서** 같이 한다(10~20분).
+
+⚠️ `mobile/client/login.cfg`(맥 시험용 자동 로그인)는 내보내기에서 뺀다(`export_presets.cfg` exclude_filter). 두 빌드 스크립트가 실렸는지 한 번 더 보고 멈춘다.
 
 알아 둘 것
 - 무료 애플 계정으로 넣은 앱은 **7일 뒤 열리지 않는다**. 그때 같은 방법으로 다시 넣으면 된다(캐릭터는 서버에 있어 그대로다).

@@ -230,6 +230,12 @@ build() {
         exit 1
     fi
 
+    # 맥 시험용 자동 로그인(login.cfg)은 내보내기 설정이 뺀다. 공개 내려받기에 계정이 실린 적이 있어(2026-10-02) 한 번 더 본다.
+    if [ -f "$CLIENT/login.cfg" ] && unzip -p "$IPA" 'Payload/LodClient.app/LodClient.pck' | strings | grep -qxF "$(head -1 "$CLIENT/login.cfg")"; then
+        echo "시험 계정(login.cfg)이 실렸습니다 — export_presets.cfg 의 exclude_filter 를 보십시오." >&2
+        exit 1
+    fi
+
     echo "만들었습니다 — $IPA ($(du -h "$IPA" | cut -f1))"
 }
 
@@ -336,9 +342,9 @@ case "${1:-check}" in
     build) build ;;
     # 내 폰에 들어간 판을 내려받기 페이지에도 올린다 — 멀리 있는 사람도 늘 같은 최신판을 받는다(사용자 2026-10-02).
     install) build; install_to "${2:-}"
-        LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ||
+        LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ios ||
             echo "내려받기 페이지에 올리지 못했습니다 — 나중에 scripts/ops/cloud-dashboard.sh release" >&2 ;;
-    release) LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ;;
+    release) LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ios ;;
     renew) renew ;;
     devices) devices ;;
     logs) pull_logs "${2:-}" ;;

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>어둠의 전설 모바일 — 내려받기</title>
-<meta name="description" content="어둠의 전설 모바일 아이폰 앱 내려받기와 설치 방법">
+<meta name="description" content="어둠의 전설 모바일 — 아이폰·윈도우 PC 내려받기와 설치 방법">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -125,6 +125,30 @@ h2{font:800 30px/1.3 "Nanum Myeongjo",serif;color:var(--gold2);margin:0 0 14px}
 .choice strong{display:block;font-size:34px}
 .arrow{align-self:center;color:var(--gold);font-size:22px}
 
+/* 탭 */
+.tabs{display:inline-flex;padding:5px;gap:4px;border-radius:14px;background:var(--plate);border:1px solid var(--line);margin:0 0 22px}
+.tabs button{all:unset;cursor:pointer;padding:10px 22px;border-radius:10px;font-weight:700;font-size:16px;color:var(--dim);display:flex;align-items:center;gap:8px}
+.tabs button[aria-selected=true]{background:linear-gradient(180deg,#3a2c1b,#261c11);color:var(--gold2);box-shadow:0 0 0 1px var(--gold) inset}
+.tabs.small{margin:0 auto 34px;display:flex;width:max-content}
+body[data-tab=ios] .pc-only, body[data-tab=pc] .ios-only{display:none!important}
+.monitor{justify-self:center;width:min(460px,92vw)}
+.monitor .screen{border:10px solid #000;border-radius:12px;box-shadow:0 0 0 2px #2c241b,0 30px 80px rgba(0,0,0,.7);overflow:hidden}
+.monitor .stand{width:90px;height:34px;margin:0 auto;background:linear-gradient(#1a1714,#0d0b09)}
+.monitor .base{width:180px;height:8px;margin:0 auto;border-radius:4px;background:#1a1714}
+
+/* 그림: 윈도우 */
+.explorer{width:100%;max-width:420px;border-radius:8px;overflow:hidden;background:#fff;color:#222;font:13px/1.4 "Segoe UI","Noto Sans KR",sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.explorer .tb{background:#eef2f7;padding:8px 12px;font-size:12px;color:#444;border-bottom:1px solid #dde3ea}
+.explorer .item{display:flex;align-items:center;gap:10px;padding:9px 14px;position:relative}
+.explorer .item small{margin-left:auto;color:#888}
+.menu{position:absolute;left:150px;top:30px;width:200px;background:#f9f9f9;border:1px solid #ccc;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.3);padding:4px 0;z-index:1}
+.menu div{padding:7px 14px}
+.smart{width:100%;max-width:420px;background:#1b62b3;color:#fff;font:13px/1.5 "Segoe UI","Noto Sans KR",sans-serif;padding:20px 22px;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.smart h4{font-size:20px;font-weight:400;margin:0 0 10px}
+.smart u{display:inline-block;margin:6px 0 10px;position:relative}
+.smart .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.smart .row span{padding:6px 18px;border:2px solid #fff;position:relative}
+
 /* 막힐 때 */
 .faq{padding:56px 0 72px;background:var(--bg2);border-top:1px solid var(--line)}
 table{width:100%;border-collapse:collapse;font-size:15px}
@@ -147,7 +171,7 @@ footer{padding:28px 0;color:#6d6252;font-size:13px;text-align:center}
 }
 </style>
 </head>
-<body>
+<body data-tab="ios">
 
 <header class="top"><div class="wrap">
   <img src="logo.png" alt="어둠의 전설">
@@ -158,16 +182,31 @@ footer{padding:28px 0;color:#6d6252;font-size:13px;text-align:center}
   <div>
     <img class="logo" src="logo.png" alt="Legend of Darkness">
     <h1>어둠의 전설, 이제 내 손 안에서</h1>
-    <p class="lead">그 시절 그 마을, 그 사냥터. 아이폰으로 다시 만나는 어둠의 전설 모바일.</p>
-    <a class="cta" href="LodClient.ipa" download>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>
-      <span>아이폰용 내려받기<small>컴퓨터에서 받아 주세요</small></span>
-    </a>
-    <div class="meta" id="meta">최신판 · <b>확인 중…</b></div>
-    <div class="mobile-only" id="onphone">📱 지금 휴대폰으로 보고 계십니다. 이 파일은 <b>컴퓨터(윈도우·맥)</b>에서 받아야 설치할 수 있습니다. 컴퓨터로 이 주소를 열어 주세요.</div>
-    <div class="notice">앱스토어에 없는 앱이라 <b>처음 한 번은 컴퓨터와 케이블로</b> 설치합니다. 15분이면 됩니다 — 아래 <a href="#guide">설치 방법</a>을 그림대로 따라 하세요.</div>
+    <p class="lead">그 시절 그 마을, 그 사냥터. 아이폰과 PC로 다시 만나는 어둠의 전설 모바일.</p>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-to="ios">📱 아이폰</button>
+      <button role="tab" data-to="pc">🖥️ 윈도우 PC</button>
+    </div>
+    <div class="ios-only">
+      <a class="cta" href="LodClient.ipa" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>
+        <span>아이폰용 내려받기<small>컴퓨터에서 받아 주세요</small></span>
+      </a>
+      <div class="meta" data-file="LodClient.ipa">최신판 · <b>확인 중…</b></div>
+      <div class="mobile-only" id="onphone">📱 지금 휴대폰으로 보고 계십니다. 이 파일은 <b>컴퓨터(윈도우·맥)</b>에서 받아야 설치할 수 있습니다. 컴퓨터로 이 주소를 열어 주세요.</div>
+      <div class="notice">앱스토어에 없는 앱이라 <b>처음 한 번은 컴퓨터와 케이블로</b> 설치합니다. 15분이면 됩니다 — 아래 <a href="#guide">설치 방법</a>을 그림대로 따라 하세요.</div>
+    </div>
+    <div class="pc-only">
+      <a class="cta" href="LodClient-windows.zip" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>
+        <span>윈도우 PC판 내려받기<small>윈도우 10·11 (64비트)</small></span>
+      </a>
+      <div class="meta" data-file="LodClient-windows.zip">최신판 · <b>확인 중…</b></div>
+      <div class="notice">설치 없이 <b>압축만 풀고 바로 실행</b>합니다. 5분이면 됩니다 — 아래 <a href="#guide">설치 방법</a>을 보세요.</div>
+    </div>
   </div>
-  <div class="shot"><img src="play-portrait.png" alt="게임 화면 — 세로"></div>
+  <div class="shot ios-only"><img src="play-portrait.png" alt="게임 화면 — 세로"></div>
+  <div class="monitor pc-only"><div class="screen"><img src="play-landscape.png" alt="게임 화면 — PC"></div><div class="stand"></div><div class="base"></div></div>
 </div></section>
 
 <section class="intro" id="intro"><div class="wrap">
@@ -187,6 +226,12 @@ footer{padding:28px 0;color:#6d6252;font-size:13px;text-align:center}
     <h2>설치 방법</h2>
     <p>그림 속 <b style="color:#ff6b5f">빨간 표시</b>가 누를 곳입니다. 이해를 돕는 그림이라 실제 화면과 조금 다를 수 있습니다.</p>
   </div>
+  <div class="tabs small" role="tablist">
+    <button role="tab" data-to="ios">📱 아이폰</button>
+    <button role="tab" data-to="pc">🖥️ 윈도우 PC</button>
+  </div>
+
+  <div class="ios-only">
 
   <div class="ready">
     <div><span>💻</span>컴퓨터<br><small>윈도우 또는 맥</small></div>
@@ -390,11 +435,118 @@ footer{padding:28px 0;color:#6d6252;font-size:13px;text-align:center}
     </div>
     <div class="pic"><div class="shot" style="width:220px"><img src="play-portrait.png" alt="게임 화면"></div></div>
   </div>
+  </div>
+
+  <div class="pc-only">
+  <div class="ready" style="grid-template-columns:repeat(2,1fr)">
+    <div><span>🖥️</span>윈도우 10 또는 11<br><small>64비트</small></div>
+    <div><span>🌐</span>인터넷</div>
+  </div>
+
+  <div class="step">
+    <div>
+      <div class="no">1</div>
+      <h3>게임 파일 받기 <span class="when">새 버전 나올 때마다</span></h3>
+      <ol>
+        <li>맨 위 <b>「윈도우 PC판 내려받기」</b> 단추를 누릅니다.</li>
+        <li><b>LodClient-windows.zip</b> 이 「다운로드」 폴더에 받아집니다.</li>
+      </ol>
+      <a class="btn" href="LodClient-windows.zip" download>⬇ 지금 받기</a>
+    </div>
+    <div class="pic">
+      <div class="choice"><div class="yes"><strong>🗜️</strong>LodClient-windows.zip<br><small style="color:var(--dim)">「다운로드」 폴더</small></div></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div>
+      <div class="no">2</div>
+      <h3>압축 풀기 <span class="when">받을 때마다</span></h3>
+      <ol>
+        <li>받은 <b>LodClient-windows.zip</b> 위에서 <b>마우스 오른쪽 단추</b>를 누릅니다.</li>
+        <li><b>「모두 압축 풀기」</b> → 뜬 창에서 <b>「압축 풀기」</b>.</li>
+        <li><b>LegendOfDarkness</b> 폴더가 열립니다.</li>
+      </ol>
+      <div class="warn">⚠️ 압축을 풀지 않고 zip 안에서 바로 실행하면 게임이 뜨지 않습니다.</div>
+    </div>
+    <div class="pic">
+      <div class="explorer" style="position:relative;min-height:190px">
+        <div class="tb">📁 다운로드</div>
+        <div class="item hl">🗜️ LodClient-windows.zip<small>160MB</small></div>
+        <div class="menu">
+          <div>열기</div>
+          <div class="hl tap" style="font-weight:600">모두 압축 풀기…</div>
+          <div>복사</div>
+          <div>삭제</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div>
+      <div class="no">3</div>
+      <h3>게임 실행 <span class="when">할 때마다</span></h3>
+      <ol>
+        <li><b>LegendOfDarkness</b> 폴더 안의 <b>LodClient</b>(LodClient.exe)를 <b>두 번 누릅니다</b>.</li>
+        <li>옆의 <b>data_…</b> 폴더는 지우거나 옮기지 마세요 — 게임이 그 안의 것을 씁니다.</li>
+      </ol>
+      <p style="color:var(--dim);font-size:14px">💡 바탕화면에서 바로 열려면: LodClient 위에서 오른쪽 단추 → 「더 많은 옵션 표시」 → 「보내기」 → 「바탕 화면에 바로 가기 만들기」.</p>
+    </div>
+    <div class="pic">
+      <div class="explorer">
+        <div class="tb">📁 LegendOfDarkness</div>
+        <div class="item">📁 data_LodClient_windows_x86_64<small>건드리지 않기</small></div>
+        <div class="item hl tap" style="font-weight:600">🎮 LodClient<small>응용 프로그램</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div>
+      <div class="no">4</div>
+      <h3>「PC 보호」 창 넘기기 <span class="when">처음 한 번만</span></h3>
+      <ol>
+        <li>파란 창 <b>「Windows의 PC 보호」</b>가 뜨면 글자 <b>「추가 정보」</b>를 누릅니다.</li>
+        <li>아래에 생긴 <b>「실행」</b> 단추를 누릅니다.</li>
+      </ol>
+      <p style="color:var(--dim);font-size:14px">작은 팀이 만든 게임이라 윈도우가 아직 모르는 프로그램이어서 뜨는 창입니다. 바이러스 백신이 막으면 「허용」을 눌러 주세요.</p>
+    </div>
+    <div class="pic">
+      <div class="smart">
+        <h4>Windows의 PC 보호</h4>
+        Microsoft Defender SmartScreen에서 인식할 수 없는 앱의 시작을 차단했습니다.<br>
+        <u class="hl" style="padding:0 4px">추가 정보<span class="mark" style="left:auto;right:-16px">1</span></u>
+        <div class="row"><span class="hl">실행<span class="mark" style="left:auto;right:-14px">2</span></span><span>실행 안 함</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div>
+      <div class="no">✓</div>
+      <h3>게임 시작!</h3>
+      <ol>
+        <li>「계정 만들기」로 캐릭터를 만들고 들어갑니다. 아이폰과 <b>같은 계정·같은 캐릭터</b>입니다.</li>
+        <li>창 모서리를 끌어 크기를 바꿀 수 있습니다.</li>
+      </ol>
+      <div class="notice" style="margin-top:14px">🔄 새 버전이 나오면 <b>1번부터</b> 다시 받아 풀고, 예전 폴더는 지워도 됩니다. 캐릭터는 서버에 있어 그대로입니다.</div>
+    </div>
+    <div class="pic"><img src="play-landscape.png" alt="게임 화면 — PC" style="border-radius:10px"></div>
+  </div>
+  </div>
 </div></section>
 
 <section class="faq" id="faq"><div class="wrap">
   <h2>막힐 때</h2>
-  <table>
+  <table class="pc-only">
+    <tr><th>두 번 눌러도 아무 일이 없어요</th><td>압축을 풀었는지 보세요(2번). zip 안에서 바로 열면 안 됩니다.</td></tr>
+    <tr><th>「.NET」「data_…」 관련 오류가 나와요</th><td>LodClient 와 data_… 폴더가 <b>같은 폴더에 나란히</b> 있어야 합니다. 다시 받아 압축을 풀어 주세요.</td></tr>
+    <tr><th>바이러스 백신이 지워 버렸어요</th><td>백신의 「검역소」에서 복원·허용한 뒤 다시 실행합니다.</td></tr>
+    <tr><th>「실행」 단추가 안 보여요</th><td>파란 창의 「추가 정보」를 먼저 눌러야 나타납니다(4번).</td></tr>
+    <tr><th>접속이 안 돼요</th><td>인터넷이 되는지 보고, 회사·학교 컴퓨터라면 집 컴퓨터로 해 보세요.</td></tr>
+  </table>
+  <table class="ios-only">
     <tr><th>Sideloadly 맨 위에 아이폰이 안 보여요</th><td>케이블을 다른 구멍에 꽂기 · 아이폰 잠금 풀기 · 3번 「신뢰」 다시 · 아이튠즈가 스토어판이면 지우고 1번부터</td></tr>
     <tr><th>「iTunes」「iCloud」가 없다는 말이 나와요</th><td>1번을 다시(스토어판이 아닌 것으로). iCloud 를 요구하면 sideloadly.io 첫 화면에 있는 iCloud 링크로 깝니다.</td></tr>
     <tr><th>비밀번호가 틀렸다고 해요</th><td>애플 계정 홈페이지(account.apple.com)에서 로그인이 되는지 먼저 확인하세요.</td></tr>
@@ -403,17 +555,29 @@ footer{padding:28px 0;color:#6d6252;font-size:13px;text-align:center}
     <tr><th>앱을 누르면 바로 꺼져요 / 안 열려요</th><td>7일이 지났을 수 있습니다 → 0번과 4번을 다시.</td></tr>
     <tr><th>애플 계정을 넣기가 걱정돼요</th><td>이 일에만 쓸 새 애플 계정을 하나 만들어 써도 됩니다.</td></tr>
   </table>
-  <p class="help">그래도 안 되면 <b>Sideloadly 창 아래쪽 글자를 사진으로 찍어</b> 알려 주신 분께 보내 주세요.</p>
+  <p class="help ios-only">그래도 안 되면 <b>Sideloadly 창 아래쪽 글자를 사진으로 찍어</b> 알려 주신 분께 보내 주세요.</p>
+  <p class="help pc-only">그래도 안 되면 <b>뜬 오류 창을 사진으로 찍어</b> 알려 주신 분께 보내 주세요.</p>
 </div></section>
 
 <footer>어둠의 전설 모바일 · 팬이 만든 비공개 시험판</footer>
 
 <script>
+// 탭: 주소 끝 #pc · #ios 로 고른다. 없으면 윈도우에서 연 사람은 PC, 나머지는 아이폰.
+function show(tab) {
+  document.body.dataset.tab = tab;
+  document.querySelectorAll('[data-to]').forEach(b => b.setAttribute('aria-selected', b.dataset.to === tab));
+}
+document.querySelectorAll('[data-to]').forEach(b => b.addEventListener('click', () => {
+  show(b.dataset.to);
+  history.replaceState(null, '', '#' + b.dataset.to);
+}));
+show(location.hash === '#pc' ? 'pc' : location.hash === '#ios' ? 'ios' : /Windows/i.test(navigator.userAgent) ? 'pc' : 'ios');
+if (/iPhone|iPad|Android/i.test(navigator.userAgent)) document.getElementById('onphone').style.display = 'block';
+
 // 최신 파일의 날짜·크기를 서버에서 바로 읽는다 — 새 파일을 올리면 이 줄도 저절로 바뀐다.
-(async () => {
-  const meta = document.getElementById('meta');
+document.querySelectorAll('[data-file]').forEach(async meta => {
   try {
-    const r = await fetch('LodClient.ipa', { method: 'HEAD', cache: 'no-store' });
+    const r = await fetch(meta.dataset.file, { method: 'HEAD', cache: 'no-store' });
     if (!r.ok) throw 0;
     const when = new Date(r.headers.get('Last-Modified'));
     const mb = Math.round(Number(r.headers.get('Content-Length')) / 1048576);
@@ -422,8 +586,7 @@ footer{padding:28px 0;color:#6d6252;font-size:13px;text-align:center}
   } catch {
     meta.innerHTML = '최신판 · <b>지금은 파일을 준비 중입니다</b>';
   }
-  if (/iPhone|iPad|Android/i.test(navigator.userAgent)) document.getElementById('onphone').style.display = 'block';
-})();
+});
 </script>
 </body>
 </html>

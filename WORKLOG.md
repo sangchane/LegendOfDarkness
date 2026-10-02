@@ -10,6 +10,11 @@
 
 ## History (append; 최신이 위)
 
+### 2026-10-02 — 내려받기 페이지 윈도우 PC판 탭 · 공개 앱에 시험 계정이 실렸던 것
+
+- 고도 내보내기에 Windows 설정 추가, `scripts/ops/windows-build.sh release` 로 만들어 `/download/LodClient-windows.zip` 에 올림(161MB, 윈도우 실기 실행은 못 봄). 페이지에 「아이폰 | 윈도우 PC」 탭(`#pc`), PC 설치 그림 4단계.
+- **`*.cfg` 를 통째 싣던 탓에 공개 .ipa 안에 `login.cfg`(monk 계정)가 들어 있었다**(iOS 앱은 안 읽지만 풀면 보인다). exclude_filter 로 빼고, 두 빌드 스크립트가 실렸으면 멈추게 함. 공개 .ipa 는 아직 옛것 — Xcode 가 애플 계정에서 로그아웃돼(10:00 서명 갱신 실패, 서명 파일 폴더 비었음) 다시 못 만든다. 로그인 → `LOD_DEVICE_ID=<아이폰|아이패드> scripts/ops/ios-build.sh renew` → `build` → `release`.
+
 ### 2026-10-02 — 레벨업 점수 구멍 둘 · 멀리 있는 사람용 내려받기 페이지
 
 - 서버 `Format47Handler`: 점수 1에 능력치 하나만, 여러 칸·상한 능력치는 거절하고 점수 그대로(`StatRaiseTests`). 클라우드에는 아직 안 올림.

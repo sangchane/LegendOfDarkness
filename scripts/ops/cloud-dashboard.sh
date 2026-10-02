@@ -3,7 +3,7 @@
 #
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh setup
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
-#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh release   맥의 최신 .ipa 를 내려받기 페이지(/download/)에 올린다
+#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh release [ios|windows]   맥의 최신 앱 파일을 내려받기 페이지(/download/)에 올린다
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -132,12 +132,12 @@ server {
     }
 
     # 멀리 있는 사람이 앱을 받는 페이지 — 로그인 없이 nginx 가 바로 준다(사용자 2026-10-02).
-    # 페이지는 docs/download/(www 로 올라감), 앱 파일은 release 가 올린 lod-ops/release/LodClient.ipa.
+    # 페이지는 docs/download/(www 로 올라감), 앱 파일(아이폰 .ipa·윈도우 .zip)은 release 가 올린 lod-ops/release/.
     location = /download { return 301 /download/; }
-    location = /download/LodClient.ipa {
-        alias /home/ubuntu/lod-ops/release/LodClient.ipa;
+    location ~ ^/download/(LodClient\.ipa|LodClient-windows\.zip)$ {
+        alias /home/ubuntu/lod-ops/release/$1;
         default_type application/octet-stream;
-        add_header Content-Disposition 'attachment; filename="LodClient.ipa"' always;
+        add_header Content-Disposition 'attachment; filename="$1"' always;
         add_header Cache-Control no-cache always;
         add_header X-Content-Type-Options nosniff always;
     }
@@ -170,15 +170,22 @@ deploy() {
     echo "대시보드 갱신 완료 — https://$DOMAIN"
 }
 
-# 내려받기 페이지(/download/)의 앱 파일을 맥의 최신 .ipa 로 바꾼다. 다 올린 뒤 이름을 바꿔, 받는 중인 사람에게
-# 반쪽 파일이 가지 않는다. ios-build.sh install 이 설치에 성공하면 부른다.
+# 내려받기 페이지(/download/)의 앱 파일을 맥의 최신판으로 바꾼다 — release [ios|windows]. 다 올린 뒤 이름을 바꿔,
+# 받는 중인 사람에게 반쪽 파일이 가지 않는다. ios-build.sh install(성공 뒤)·windows-build.sh release 가 부른다.
 release() {
-    local ipa="$ROOT/mobile/client/build/ios/LodClient.ipa"
-    [ -s "$ipa" ] || { echo "앱 파일이 없습니다 — 먼저 scripts/ops/ios-build.sh build" >&2; exit 1; }
+    local file
+    case "${1:-ios}" in
+        ios) file="$ROOT/mobile/client/build/ios/LodClient.ipa" ;;
+        windows) file="$ROOT/mobile/client/build/windows/LodClient-windows.zip" ;;
+        *) echo "release ios|windows" >&2; exit 2 ;;
+    esac
+    [ -s "$file" ] || { echo "앱 파일이 없습니다 — $file" >&2; exit 1; }
+    local name
+    name="$(basename "$file")"
     remote "mkdir -p $REMOTE/release && chmod 755 $REMOTE/release"
-    rsync -az --timeout=120 -e "ssh -i $KEY" "$ipa" "$HOST:$REMOTE/release/LodClient.ipa.uploading"
-    remote "chmod 644 $REMOTE/release/LodClient.ipa.uploading && mv -f $REMOTE/release/LodClient.ipa.uploading $REMOTE/release/LodClient.ipa"
-    echo "내려받기 페이지 갱신 — https://$DOMAIN/download/ ($(du -h "$ipa" | cut -f1))"
+    rsync -az --timeout=120 -e "ssh -i $KEY" "$file" "$HOST:$REMOTE/release/$name.uploading"
+    remote "chmod 644 $REMOTE/release/$name.uploading && mv -f $REMOTE/release/$name.uploading $REMOTE/release/$name"
+    echo "내려받기 페이지 갱신 — https://$DOMAIN/download/ ($name $(du -h "$file" | cut -f1))"
 }
 
 # 무료 정식 인증서(Let's Encrypt) — 사용자 2026-09-27: 주소 lodgame.duckdns.org(DuckDNS, IP 161.33.43.117 고정).
@@ -237,6 +244,6 @@ case "${1:-status}" in
     credentials) save_credentials ;;
     cert) cert ;;
     password) set_password "${2:-}" ;;
-    release) release ;;
+    release) release "${2:-ios}" ;;
     *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password release"; exit 2 ;;
 esac
