@@ -82,6 +82,11 @@ def kind_of(fields):
     return classify(fields)[0]
 
 
+#: 원작 그림이 없는 착용 번호를 빌려 입힌다 — 글러브1 의 79 는 5.99·하데스 아카이브 모두 mw079 가 없어(무기 그림 001~151 중
+#: 79 만 빔) 맨손으로 보였다. 견습자의글러브(86) 그림을 쓴다(사용자 2026-10-03).
+WORN_IMAGE = {"글러브1": 86}
+
+
 def template(item):
     f = item["fields"]
     kind = kind_of(f)
@@ -97,7 +102,7 @@ def template(item):
     made = {
         "$type": "Darkages.Types.ItemTemplate, Darkages.Server",
         "Name": text(f, "이름"),
-        "Image": number(f, "착용이미지"),
+        "Image": WORN_IMAGE.get(text(f, "이름"), number(f, "착용이미지")),
         "DisplayImage": 0x8000 + number(f, "이미지"),
         "EquipmentSlot": spec["equipment"],
         "Class": number(f, "직업제한"),
