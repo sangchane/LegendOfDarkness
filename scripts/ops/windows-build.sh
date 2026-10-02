@@ -29,7 +29,7 @@ build() {
 
     # 맥 시험용 자동 로그인(login.cfg)이 실리면 받는 사람 모두 그 계정으로 들어간다(윈도우판은 그 파일을 읽는다).
     # 내보내기 설정(exclude_filter)이 빼지만, 올리기 전에 한 번 더 본다.
-    if [ -f "$CLIENT/login.cfg" ] && strings "$OUT/LodClient.exe" | grep -qxF "$(head -1 "$CLIENT/login.cfg")"; then
+    if [ -f "$CLIENT/login.cfg" ] && strings "$OUT/LodClient.exe" | grep -axF "$(head -1 "$CLIENT/login.cfg")" >/dev/null; then
         echo "시험 계정(login.cfg)이 실렸습니다 — export_presets.cfg 의 exclude_filter 를 보십시오." >&2
         exit 1
     fi
