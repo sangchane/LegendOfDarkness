@@ -351,9 +351,11 @@ pull_logs() {
 case "${1:-check}" in
     build) build ;;
     # 내 폰에 들어간 판을 내려받기 페이지에도 올린다 — 멀리 있는 사람도 늘 같은 최신판을 받는다(사용자 2026-10-02).
-    install) build; install_to "${2:-}"
+    # 올리기가 먼저다 — 폰이 안 보이면 install_to 가 스크립트를 끝내서, 뒤에 두면 올리지 못했다(2026-10-02).
+    install) build
         LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ios ||
-            echo "내려받기 페이지에 올리지 못했습니다 — 나중에 scripts/ops/cloud-dashboard.sh release" >&2 ;;
+            echo "내려받기 페이지에 올리지 못했습니다 — 나중에 scripts/ops/cloud-dashboard.sh release" >&2
+        install_to "${2:-}" ;;
     release) LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ios ;;
     renew) renew ;;
     devices) devices ;;

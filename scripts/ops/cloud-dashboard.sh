@@ -192,6 +192,9 @@ release() {
     remote "mkdir -p $REMOTE/release && chmod 755 $REMOTE/release"
     rsync -az --timeout=120 -e "ssh -i $KEY" "$file" "$HOST:$REMOTE/release/$name.uploading"
     remote "chmod 644 $REMOTE/release/$name.uploading && mv -f $REMOTE/release/$name.uploading $REMOTE/release/$name"
+    # 페이지(docs/download/)도 늘 같이 올린다 — 앱만 바뀌고 안내가 옛것으로 남지 않게(사용자 2026-10-02).
+    remote "mkdir -p $REMOTE/www/download"
+    rsync -az --timeout=60 -e "ssh -i $KEY" "$ROOT/docs/download/" "$HOST:$REMOTE/www/download/"
     echo "내려받기 페이지 갱신 — https://$DOMAIN/download/ ($name $(du -h "$file" | cut -f1))"
 }
 
