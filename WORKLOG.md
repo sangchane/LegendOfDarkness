@@ -10,6 +10,12 @@
 
 ## History (append; 최신이 위)
 
+### 2026-10-02 오후 — 대시보드 공개·계정 관리·휴대폰 메뉴 · 내려받기 페이지 정리
+
+- 대시보드 보기 공개(`/api/session`), 고치기(PUT)만 로그인 · 계정 관리 `POST /api/password`(지금 비밀번호 확인, 바꾸면 다른 기기 로그인 풀림) · 「앱 내려받기」 탭, 등록 기기 무선 설치(`docs/download/manifest.plist`, 로그인한 사람만 보임).
+- CSS 를 하루 보관하게 보내 폰 새로고침에도 옛 모양이던 것 — `.css` 도 no-cache + `dashboard.css?v=`. 휴대폰은 위쪽 가로 메뉴, 계정·로그아웃 아이콘.
+- 내려받기 페이지를 대시보드와 같은 디자인으로 다시(큰 로고·게임 화면 뺌), 아이폰 7단계에 Sideloadly 자동 갱신.
+
 ### 2026-10-02 — 내려받기 페이지 윈도우 PC판 탭 · 공개 앱에 시험 계정이 실렸던 것
 
 - 고도 내보내기에 Windows 설정 추가, `scripts/ops/windows-build.sh release` 로 만들어 `/download/LodClient-windows.zip` 에 올림(161MB, 윈도우 실기 실행은 못 봄). 페이지에 「아이폰 | 윈도우 PC」 탭(`#pc`), PC 설치 그림 4단계.

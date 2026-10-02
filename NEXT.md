@@ -1,9 +1,10 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-10-02] 코드 정리 끝 — 등급 M · 단계: 클라우드 반영 끝, 폰 설치 대기(브랜치 `fix/code-review-findings`, 서버도 같은 이름).** 알맹이 폴더 `Protocol/World`·`Ui`·`Automation`·`Model`, 화면 `src/` 를 `App/Screens/World/Hud/Windows/Widgets/Diagnostics` 로 · `WorldClient` 받기 루프 갈래·`Companion`·`WorldEntry` 나눔 · `Tuning.cs` · `PercentWheel`·`DiamondButton` 지움(사용자) · 옛 `--hunt` 봇 그대로(사용자) · 봇 큐 상한(버그) · 서버 `Companions` 셋으로·상점 `ShopPricing` · 생성기 `scripts/lib/`·`scripts/ops/`(운영 스크립트 경로가 **`scripts/ops/cloud-server.sh`·`scripts/ops/ios-build.sh`** 로 바뀜). 시험: 알맹이 669 · 서버 278(시간 걸린 사냥 2개는 따로 돌려 통과) · 생성기 출력 전후 동일.
-  2026-10-02 08:40 클라우드 반영(서버·봇 다섯 정상). 이펙트 첫 사용 끊김도 고침(생성기가 `effects-look.txt` 를 미리).
-  **다음**: ① 사용자가 맥 곁에 오면 `scripts/ops/ios-build.sh install`(폰 앱만 남음 — 정리·이펙트 끊김) ② ~~레벨업 점수 구멍 둘~~ 고침(2026-10-02, `StatRaiseTests`) ③ 남은 정리 몇 줄 `plans/split-when-touched.md`
+- **[현재/2026-10-02 오후] 앱 배포 — 등급 M · 단계: 배포 끝(사용자 "이 정도로"), 확인 남음. 브랜치 `fix/code-review-findings`.**
+  공개 내려받기 https://lodgame.duckdns.org/download/ (아이폰 Sideloadly 7단계·자동 갱신 / 윈도우 PC 탭, `docs/download/`) · 올리기 `scripts/ops/ios-build.sh release`·`scripts/ops/windows-build.sh release` (`install` 은 스스로 올림) · 대시보드는 보기 공개·고치기만 로그인, 계정 관리(비밀번호 바꾸기), 휴대폰은 위쪽 가로 메뉴, 「앱 내려받기」 탭 · 서명 자동 갱신은 기기 없이도 받고 실패하면 옛 서명을 되돌림(10월 9일까지) · 공개 빌드에서 `login.cfg`(시험 계정) 뺌. 지침 `docs/sideloadly-install-guide.md`.
+  **다음**: ① **레벨업 점수 구멍 수정(`StatRaiseTests`)이 클라우드에 아직 안 올라감** — `dotnet build …/Lorule.GameServer.csproj` → `cloud-server.sh deploy`(접속자 끊김, 직전에 알림) ② 내 아이폰 설치: 대시보드 「앱 내려받기」 → 「내 아이폰에 설치」(무료 계정에서 링크 설치가 되는지 미확인) 또는 맥 곁에서 `ios-build.sh install` ③ 윈도우판은 실기에서 아직 안 돌려 봄 — 친구가 처음 띄울 때 확인 ④ 안드로이드판 만들지(SDK·자바 설치부터, 사용자 결정 대기) ⑤ 남은 정리 `plans/split-when-touched.md`
+  알아 둘 것: `docs/` 전체가 로그인 없이 보인다(숨길 문서 있으면 정할 것) · 대시보드 시험 1개 실패는 원래 있던 괴물 도감 자료(노비스풀뱀·뱀고기 드랍) · 서명 갱신 뒤 공개 .ipa 를 저절로 다시 만들지는 않음(작업 중 코드가 나갈 수 있어 일부러 안 함).
 
 - **[현재/2026-10-02 밤] 손맛 고치기 — 등급 M · 단계: 설치 끝, 사용자 폰 확인 대기.** 워프 칸 위 「→ 간 곳」 이름표(`WorldView.TagExits`) · 봇이 잠든 채 제 잠 풀기(서버 마법 예외에 디나르콜리·디소루마, 봇만 잠드는 시험은 못 짬 — 폰 확인) · 오솔길 보스방 체력 5.99 몹 정의로(맨티스 19500·늑대 5850, 경험치 그대로 — 사용자) · 방향키 짧게 = 돌기만(0.2초) · 모션·걷기 10% 느리게(걷기 0.44초) · 동작 중 쓴 기술·마법은 모션 없이(원작 그대로) · 월드맵 사냥터 아래 구역 바로 가기(우드랜드·포테의숲·아벨해안, 워프 레벨 제한 — 가장 엄한 것 + 카드 입구) · 정보 상자 X·다시 누르면 닫힘 · 버린 것 안 줍기. 모두 클라우드·iOS 반영.
   **남음**: ① 세로에서 장비창 아래 소지품이 한 줄뿐 ② 남의 장비창 화면 사진(사용자는 못 함 — 사용자 화면이 빌 때 내가 `LOD_GEAR_SHOT=… dotnet test --filter Photograph_somebody_elses_gear`) ③ 몬스터가 빠르게 느껴지면 서버 이동 간격을 원작과 대조(정할 것).
