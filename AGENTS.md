@@ -68,5 +68,5 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 ## 모델·effort·위임
 - 모델과 reasoning effort는 사용자가 `/model`로 고른다. 나는 바꾸지 못한다. 모델 기본 effort로 시작하고, L 작업만 한 단계 올리는 게 맞다. L 작업을 기본보다 낮게 하고 있을 때만 `/model`로 올리라고 한 줄로 권한다.
 - 스킬은 `$ui`, `$setup`으로 부르거나 요청에 맞으면 스스로 쓴다.
-- `build`·`design`은 이 도구에 스킬로 없다. 그 등급의 괄호 안 단계를 직접 수행하고, design은 요구사항·아키텍처·API·테스트 설계를 문서로 먼저 쓰는 단계로 한다. 스킬 본문의 `dev:X`는 스킬 `X`다. 본문이 없는 다른 이름(`superpowers:*`, `ponytail:*`, `ecc:*`, `reviewer`·`deep`·`quick` 에이전트)을 가리키면, 그 이름이 뜻하는 단계를 직접 수행한다. 리뷰는 구현을 마친 뒤 diff만 다시 읽는 별도 단계로 한다.
+- `build`·`design`은 설치된 `dev:build`·`dev:design` 스킬로 수행한다(Codex 호출: `$dev:build`, `$dev:design`). 스킬 본문의 `dev:X`·`superpowers:X`·`ecc:X`는 설치된 같은 이름의 스킬을 읽는다. 설치되지 않은 환경에서는 그 등급의 괄호 안 단계를 직접 수행한다. 본문이 없는 다른 이름(`superpowers:*`, `ponytail:*`, `ecc:*`, `reviewer`·`deep`·`quick` 에이전트)을 가리키면, 그 이름이 뜻하는 단계를 직접 수행한다. 리뷰는 구현을 마친 뒤 diff만 다시 읽는 별도 단계로 한다.
 <!-- dev:end -->

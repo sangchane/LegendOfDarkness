@@ -1,0 +1,18 @@
+{
+  "description": "Claude 프로젝트 훅의 Codex 호환 설정. 기존 원본 스크립트를 사용한다.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/tools/hooks/guard_shell.py\"",
+            "timeout": 5,
+            "statusMessage": "프로젝트 Git 명령 확인"
+          }
+        ]
+      }
+    ]
+  }
+}
