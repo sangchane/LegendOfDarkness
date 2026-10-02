@@ -17,7 +17,12 @@
       29층으로 갈수록 5.99 카스마늄 갱도(나중에 나온 더 깊은 광산, 체력 45만 · 공격 5,200~ · 방어 -70)에 다가간다:
       체력 ×1→×3, 최소 공격 2,409→5,200, 방어 → -70. 경험치는 카스마늄의 경험치/체력(1,309,240/450,000)에
       하데스 나눗수 7.3(tools/pack-import EXPERIENCE_DIVISOR). 드라코는 노바 값(2,375만)이 튀어서 혼든 비율(그림록가 아니라 헬 바로 아래 — 헬 × 혼든 드라코/헬 비율).
-      금화 500(카스마늄) · 드랍 없음(혼든·노바 모두 근거가 엇갈려 아직).
+      금화는 한 마리에 최소 10,000전(사용자) — 템플릿 `GoldMinimum`, 그 위로는 경험치 비례식(Formulas/monsterexp.cs).
+      드랍은 노바 방식(사용자): 그림록퀸 → 그림록퀸홀, 헬 직업 → 그 직업 헬옷(노바 `mine.txt` 헬불씨프1·2 처럼 갈래마다
+      한 벌씩이던 것을 한 괴물 목록으로 모았다). 확률은 노바(15%)가 아니라 **0.5% 아래**(사용자 — 원작 헬옷은 0.5% 도 안 된다).
+      하데스는 목록에서 하나를 고르고 그 아이템의 DropRate × 1.5 를 굴리므로 DropRate 0.003 — 한 마리에 0.45%,
+      목록이 넷이면 한 벌에 0.11%. 다른 곳의 그림록퀸도 같은 그림록퀸홀(전에는 0.01)을 쓰므로 함께 0.45% 가 된다.
+      일반 괴물(노바는 3백만·5백만골드 주머니)은 금화만. 드라코(노바는 캐시템 드라코의발톱)는 아직 없음.
 
   쓰는 법: python3 scripts/gen/world/build-old-mine.py            # 무엇이 바뀌는지만
            python3 scripts/gen/world/build-old-mine.py --쓰기     # 서버 자료에 쓴다
@@ -58,8 +63,18 @@ LAST_FLOOR = 29
 DMG_MIN = (2409, 5200)        # 1층(노바) → 29층(카스마늄)
 AC_DEEP = -70
 EXP_PER_HP = 1309240 / 450000 / 7.3
-GOLD = 500
-LOOT_GOLD = 1 << 5            # tools/pack-import LOOT_GOLD
+GOLD_MINIMUM = 10000
+LOOT_RANDOM, LOOT_NONE = 1 << 1, 256        # Random 이어야 DropRate 가 굴러간다(GearDropTests). 금화는 깃발과 상관없이 늘 준다
+ITEMS = SERVER / "templates" / "items"
+DROP_RATE = 0.003             # × DropBoost 1.5 = 0.45% — 헬옷은 0.5% 도 안 된다(사용자 2026-10-02)
+DROPS = {
+    "그림록퀸": ["그림록퀸홀"],
+    "헬몽크": ["헬몽크아머"],
+    "헬불씨프": ["헬씨프아머", "헬씨프투구"],
+    "헬블루나이트": ["헬나이트아머", "헬나이트투구"],
+    "헬소서러": ["헬소서러로브", "헬소서러후드", "헬소서리스로브", "매직베일"],
+    "헬소서리스": ["헬클레릭로브", "헬클레릭후드", "홀리베일", "헬프리스트로브"],
+}
 
 
 def text(path):
@@ -123,9 +138,10 @@ def monster(kind, count, map_name, area):
         "MaximumHP": hp, "MaximumMP": 0, "Exp": round(hp * EXP_PER_HP),
         "DmgMin": round(DMG_MIN[0] + (DMG_MIN[1] - DMG_MIN[0]) * step), "DmgMax": dmg_max, "Ac": ac,
         "Level": 1, "MovementSpeed": 1500, "EngagedWalkingSpeed": 1500, "AttackSpeed": 1000, "CastSpeed": 8000,
-        "MoodType": 4, "PathQualifer": 1, "LootType": LOOT_GOLD, "Drops": {"$values": []},
+        "MoodType": 4, "PathQualifer": 1,
+        "LootType": LOOT_RANDOM if kind in DROPS else LOOT_NONE, "Drops": {"$values": DROPS.get(kind, [])},
         "ScriptName": "Common Monster", "UpdateMapWide": True, "UpdateRate": 1000.0,
-        "Grow": False, "IgnoreCollision": False, "Gold": GOLD, "GoldChance": 100,
+        "Grow": False, "IgnoreCollision": False, "GoldMinimum": GOLD_MINIMUM,
     }
 
 
@@ -185,6 +201,18 @@ def main():
         for m in spawns:
             map_name = next(our_name(n) for n, i in ids.items() if i == m["AreaID"])
             (MONSTERS / f"{m['Name']}@{map_name}.json").write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    changed_items = []
+    for item in sorted({i for names in DROPS.values() for i in names}):
+        path = ITEMS / f"{item}.json"
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+        if data.get("DropRate") != DROP_RATE:
+            changed_items.append(f"{item} {data.get('DropRate')}→{DROP_RATE}")
+            if write:
+                data["DropRate"] = DROP_RATE
+                path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    if changed_items:
+        print("  아이템 확률: " + " · ".join(changed_items))
 
     for kind, before, after, number in plan:
         print(f"  {kind:4} {number}  {before} → {after}")

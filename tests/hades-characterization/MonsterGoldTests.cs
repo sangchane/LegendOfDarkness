@@ -201,6 +201,26 @@ public sealed class MonsterGoldTests : IDisposable
             $"경험치 40,000짜리({paidBig}전)가 경험치 1,000짜리({paidSmall}전)보다 적게 냈습니다.");
     }
 
+    /// <summary>사용자(2026-10-02) — 구광산은 한 마리에 최소 10,000전. <c>GoldMinimum</c> 이 경험치 비례식보다 크면 그 값을 준다.</summary>
+    [Fact]
+    public async Task A_gold_minimum_lifts_a_small_kill_to_the_floor()
+    {
+        (WorldClient world, _) = await Enter(target =>
+        {
+            target["Exp"] = 1000;               // 식대로면 80~120전
+            target["GoldMinimum"] = 10000;
+        });
+        await Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "문 앞에 괴물이 서지 않았습니다.");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+
+        long before = Mine(world).Gold;
+        await KillAndPickUp(world, before);
+        long paid = Mine(world).Gold - before;
+
+        Assert.True(paid >= 10000, $"최소 10,000전이어야 하는데 {paid}전을 냈습니다.");
+    }
+
     /// <summary>
     /// 사용자 결정(2026-09-24) — 골드 식을 바꿔도 **경험치 지급 자체는 그대로**여야 한다. 서버가 보내는
     /// "경험치가 N 올랐습니다"(<c>GenerateExperience</c>, <c>Formulas/monsterexp.cs</c>)의 N이 정의에
