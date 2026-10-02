@@ -3,6 +3,7 @@
 #
 #   scripts/ops/ios-build.sh build            .ipa 를 만든다
 #   scripts/ops/ios-build.sh install          만들고 기기에 넣는다(기기 이름·번호는 --device 로)
+#   scripts/ops/ios-build.sh release          만든 .ipa 를 클라우드 내려받기 페이지(/download/)에 올린다(install 은 스스로 한다)
 #   scripts/ops/ios-build.sh devices          지금 보이는 기기를 이름·번호로 보여 준다(아이패드·아이폰 따로)
 #   scripts/ops/ios-build.sh logs [기기]      앱 기록(user://logs/godot.log)을 맥 out/ios-logs/ 로 가져온다 — 폰에서 난 문제를 볼 때
 #   scripts/ops/ios-build.sh renew            서명을 새로 받는다(LOD_DEVICE_ID 로 기기를 고른다 — 그 기기가
@@ -333,12 +334,16 @@ pull_logs() {
 
 case "${1:-check}" in
     build) build ;;
-    install) build; install_to "${2:-}" ;;
+    # 내 폰에 들어간 판을 내려받기 페이지에도 올린다 — 멀리 있는 사람도 늘 같은 최신판을 받는다(사용자 2026-10-02).
+    install) build; install_to "${2:-}"
+        LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ||
+            echo "내려받기 페이지에 올리지 못했습니다 — 나중에 scripts/ops/cloud-dashboard.sh release" >&2 ;;
+    release) LOD_CLOUD_IP="${LOD_CLOUD_IP:-161.33.43.117}" "$ROOT/scripts/ops/cloud-dashboard.sh" release ;;
     renew) renew ;;
     devices) devices ;;
     logs) pull_logs "${2:-}" ;;
     check) check ;;
     watch-sign) watch_sign ;;
     unwatch-sign) unwatch_sign ;;
-    *) echo "쓸 수 있는 것: build install [기기] devices logs [기기] renew check watch-sign unwatch-sign"; exit 2 ;;
+    *) echo "쓸 수 있는 것: build install [기기] release devices logs [기기] renew check watch-sign unwatch-sign"; exit 2 ;;
 esac

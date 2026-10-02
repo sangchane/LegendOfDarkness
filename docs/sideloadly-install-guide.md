@@ -8,11 +8,12 @@
 
 ## 1부 — 보내는 사람(우리)이 할 일
 
-1. 맥에서 앱 파일을 만든다: `scripts/ops/ios-build.sh build`
-   → `mobile/client/build/ios/LodClient.ipa`(약 130MB). 서버 주소는 클라우드라 그대로 쓰면 된다.
-2. 파일을 보낸다. 카카오톡 PC판 파일 보내기(300MB까지)나 구글 드라이브 링크면 된다.
-3. 아래 2부를 함께 보낸다. 가능하면 **처음 한 번은 전화를 하면서** 같이 한다(10~20분).
-4. 앱을 고쳐 다시 보낼 때도 같은 파일 이름으로 보내면 된다. 받는 사람은 2부의 ④~⑥만 다시 하면 된다.
+1. **받는 사람에게는 주소 하나만 보낸다: https://lodgame.duckdns.org/download/** — 내려받기 단추와 그림이 들어간
+   설치 방법(아래 2부와 같은 내용)이 한 페이지에 있다. 로그인 없이 열린다. 페이지 원본 `docs/download/index.html`.
+2. 페이지의 앱 파일은 **`scripts/ops/ios-build.sh install` 이 내 폰에 넣는 데 성공하면 저절로 최신판으로 바뀐다.**
+   폰 없이 올리려면 `scripts/ops/ios-build.sh build && scripts/ops/ios-build.sh release`.
+   페이지 글·그림을 고쳤으면 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-dashboard.sh deploy`(게임 서버는 안 끊긴다).
+3. 가능하면 **처음 한 번은 전화를 하면서** 같이 한다(10~20분).
 
 알아 둘 것
 - 무료 애플 계정으로 넣은 앱은 **7일 뒤 열리지 않는다**. 그때 같은 방법으로 다시 넣으면 된다(캐릭터는 서버에 있어 그대로다).

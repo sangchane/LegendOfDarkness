@@ -10,6 +10,11 @@
 
 ## History (append; 최신이 위)
 
+### 2026-10-02 — 레벨업 점수 구멍 둘 · 멀리 있는 사람용 내려받기 페이지
+
+- 서버 `Format47Handler`: 점수 1에 능력치 하나만, 여러 칸·상한 능력치는 거절하고 점수 그대로(`StatRaiseTests`). 클라우드에는 아직 안 올림.
+- 공개 내려받기 페이지 https://lodgame.duckdns.org/download/ (`docs/download/`, nginx 가 로그인 없이 직접) — 큰 단추·최신 날짜·크기(파일 머리에서 읽음)·그림 들어간 Sideloadly 설치 7단계·막힐 때. 앱 파일은 `lod-ops/release/` 에, `ios-build.sh install` 성공 뒤 저절로·`ios-build.sh release` 로 손수. 설치 그림은 실제 화면이 아닌 그린 것(실기 확인 전). 화면 `shots/download-page.png`.
+
 ### 2026-10-02 — 큰 파일 나누기(지도 순서 다섯)
 
 - partial 로 나눔, 동작 그대로: GameScreen(2598→746 + 창·위 판·조작·파티·알림·시험) · WorldClient(2290→934 + 신호표·보내기·패킷 읽기·큐·동료) · WorldView(2125→493 + 사람·사냥·이펙트·바닥·길 안내·시험) · Main(1092→311 + 설정·실행 인자·화면 전환·글꼴). 옮긴 줄은 원본과 정렬 비교로 같음을 확인.
