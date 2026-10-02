@@ -30,6 +30,10 @@ PACK_EFFECT = re.compile(
     r'p\.Call\("effect",\s*[^,]+,\s*\(V\)(\d+)L,\s*\(V\)(\d+)L,\s*\(V\)(\d+)L\)')
 
 
+#: 새 캐릭터가 처음 받는 기본공격(LoruleConfig `GiveAssailOnCreate`). 시작 마법 beag ioc fein 은 스킬창에서 뺀다(사용자 2026-10-03).
+STARTERS = {("skill", "Assail")}
+
+
 def auto_levels():
     out = {}
     if not AUTO.exists():
@@ -85,6 +89,8 @@ def speed_of(bodies, template):
 def build_abilities():
     scripts = scripted()
     levels = auto_levels()
+    # 구현 = 게임 스킬창에 보이는 것 — 레벨이 되면 배우는 표 + 모두가 처음 받는 것(사용자 2026-10-03).
+    in_game = {(kind, name) for _, kind, name in levels} | STARTERS
     nova = nova_table()
     rows = []
     for folder, kind, label, script_field in (
@@ -118,7 +124,7 @@ def build_abilities():
                 "레벨": level,
                 "아이콘": int(template.get("Icon") or 0),
                 "그룹": template.get("Group") or "",
-                "구현": bool(script and bodies),
+                "구현": (kind, name) in in_game,
                 "게임": sent,
                 "기본": default,
                 "노바": reference,

@@ -146,7 +146,8 @@
           <label class="ability-search" for="ability-search"><span>이름 검색</span><input id="ability-search" type="search" placeholder="단각, 쿠로토…" autocomplete="off"></label>
           <div class="ability-class-filter" id="ability-classes" role="group" aria-label="직업"></div>
           <div class="ability-class-filter" id="ability-views" role="group" aria-label="보기">
-            <button type="button" class="chip is-active" data-ability-view="전체" aria-pressed="true">연출 모두</button>
+            <button type="button" class="chip is-active" data-ability-view="구현" aria-pressed="true">구현 <b id="ability-done-count">—</b></button>
+            <button type="button" class="chip" data-ability-view="미구현" aria-pressed="false">미구현 <b id="ability-todo-count">—</b></button>
             <button type="button" class="chip" data-ability-view="노바와다름" aria-pressed="false">노바 표와 다름 <b id="ability-nova-count">—</b></button>
             <button type="button" class="chip" data-ability-view="운영수정" aria-pressed="false">최근 바꾼 것 <b id="ability-changed-count">0</b></button>
           </div>

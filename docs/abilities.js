@@ -16,7 +16,8 @@
   var effectByNumber = {};
   var overrides = {};
   var changedAt = {};
-  var view = "전체";
+  // 구현 = 게임 스킬창에 보이는 것(레벨 표 + 기본공격, 사용자 2026-10-03). 나머지는 「미구현」 칩에서 본다.
+  var view = "구현";
   var revision = 0;
   var apiReady = false;
   var kind = "기술";
@@ -67,6 +68,8 @@
   function filtered() {
     var list = rows.filter(function (row) {
       if (row["갈래"] !== kind) { return false; }
+      if (view === "구현" && !row.구현) { return false; }
+      if (view === "미구현" && row.구현) { return false; }
       if (view === "노바와다름" && !row["노바와다름"]) { return false; }
       if (view === "운영수정" && !changed(row)) { return false; }
       if (job !== "전체" && row["직업"] !== job) { return false; }
@@ -106,7 +109,7 @@
 
     var copy = node("span", "ability-ops-copy");
     var title = node("span", "ability-ops-title");
-    title.appendChild(node("strong", "", row["이름"]));
+    title.appendChild(node("strong", "", row["이름"] === "Assail" ? "기본공격" : row["이름"]));
     if (changed(row)) { title.appendChild(node("em", "", "운영 수정" + (when(row["운영키"]) ? " · " + when(row["운영키"]) : ""))); }
     if (row["노바와다름"]) { title.appendChild(node("em", "is-nova", "노바 표와 다름")); }
     copy.appendChild(title);
@@ -138,6 +141,8 @@
     $("ability-empty").hidden = list.length > 0;
     $("ability-override-count").textContent = "운영 수정 " + Object.keys(overrides).length + "개";
     $("ability-changed-count").textContent = rows.filter(function (row) { return row["갈래"] === kind && changed(row); }).length;
+    $("ability-done-count").textContent = rows.filter(function (row) { return row["갈래"] === kind && row.구현; }).length;
+    $("ability-todo-count").textContent = rows.filter(function (row) { return row["갈래"] === kind && !row.구현; }).length;
     $("ability-nova-count").textContent = rows.filter(function (row) { return row["갈래"] === kind && row["노바와다름"]; }).length;
     $("ability-empty").textContent = view === "운영수정" ? "아직 바꾼 " + kind + "이 없어요." : view === "노바와다름" ? "노바 표와 다른 " + kind + "이 없어요." : "조건에 맞는 " + kind + "이 없어요. 필터를 지워 보세요.";
 
