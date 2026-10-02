@@ -195,44 +195,51 @@ DEBUFFS = "using Darkages.Storage.locales.debuffs;\n"
 
 
 def shape(skill):
-    """`(설명, MonkStrike 부르는 줄, 더 쓸 using)` — 옮길 모양이 없으면 None."""
+    """`(설명, MonkStrike 부르는 줄, 더 쓸 using, 템플릿에 쓸 수치)` — 옮길 모양이 없으면 None.
+
+    수치는 템플릿에 둔다 — 스크립트는 읽기만 해서, 수치를 한 표에서 조절할 수 있게.
+    """
     motion = f"0x{skill['모션'] or 0x84:02X}"
     if skill["체력배수"] is not None and skill["남길체력분율"] is not None:
         return (f"현재 체력 ×{skill['체력배수']} 로 사방 네 칸, 내 체력은 최대의 {skill['남길체력분율']}% 로",
-                f"MonkStrike.UseCross(sprite, Skill, {skill['체력배수']}, {skill['남길체력분율']}, {motion});", "")
+                f"MonkStrike.UseCross(sprite, Skill, {motion});", "",
+                {"HealthMultiplier": skill["체력배수"], "MaximumHealthPercent": skill["남길체력분율"]})
     if skill["체력분율"] is not None:
         return (f"현재 체력의 {skill['체력분율']}%, 내 체력도 그 값으로",
-                f"MonkStrike.UseVitality(sprite, Skill, {skill['체력분율']}, {motion});", "")
+                f"MonkStrike.UseVitality(sprite, Skill, {motion});", "", {"CurrentHealthPercent": skill["체력분율"]})
     if len(skill["최대체력배수"]) == 2:
         low, high = skill["최대체력배수"]
         return (f"(최대 체력 + 1) × {low} 또는 × {high} 반반",
-                f"MonkStrike.UseWolf(sprite, Skill, {low}, {high}, {motion});", "")
+                f"MonkStrike.UseWolf(sprite, Skill, {motion});", "",
+                {"HealthMultiplier": int(low), "HighHealthMultiplier": int(high)})
     if skill["힘지구력"]:
         strength, endurance, multiplier = skill["힘지구력"].groups()
         return (f"((힘 + {strength}) + (지구력 + {endurance})) × {multiplier}",
-                f"MonkStrike.UseStrengthAndEndurance(sprite, Skill, {strength}, {endurance}, {multiplier}, {motion});",
-                "")
+                f"MonkStrike.UseStrengthAndEndurance(sprite, Skill, {motion});", "",
+                {"StrengthBonus": int(strength), "EnduranceBonus": int(endurance), "StatMultiplier": int(multiplier)})
     players = "true" if skill["사람도"] else "false"
     if skill["실명초"] is not None:
         return (f"앞의 적을 {skill['실명초']}초 실명",
-                f"MonkStrike.Afflict(sprite, Skill, new debuff_blind(), {skill['실명초']}, {players}, {motion});",
-                DEBUFFS)
+                f"MonkStrike.Afflict(sprite, Skill, new debuff_blind(), {players}, {motion});",
+                DEBUFFS, {"Seconds": skill["실명초"]})
     if skill["빙결초"] is not None:
         return (f"앞의 적을 {skill['빙결초']}초 빙결",
-                f"MonkStrike.Afflict(sprite, Skill, new debuff_frozen(), {skill['빙결초']}, {players}, {motion});",
-                DEBUFFS)
+                f"MonkStrike.Afflict(sprite, Skill, new debuff_frozen(), {players}, {motion});",
+                DEBUFFS, {"Seconds": skill["빙결초"]})
     if skill["강화초"] is not None:
         return (f"{skill['강화초']}초 동안 공격력 +40%",
-                f"MonkStrike.Empower(sprite, Skill, {skill['강화초']}, {motion}, \"{skill['외움말']}\");", "")
+                f"MonkStrike.Empower(sprite, Skill, {motion}, \"{skill['외움말']}\");", "", {"Seconds": skill["강화초"]})
     if skill["건너뛸칸"] is not None and skill["공격력배수"] is not None:
         attack, endurance = stat_percents(skill)
         health = 100 if skill["최대체력더함"] else 0
         return (f"앞의 적을 넘어 {skill['건너뛸칸']}칸 건너뛰고 돌아서서 공격력 ×{attack / 100:g}"
                 + (" + 최대 체력" if health else "") + f" + 지구력 ×{endurance / 100:g}",
-                f"MonkStrike.Step(sprite, Skill, {skill['건너뛸칸']}, {attack}, {endurance}, {health});", "")
+                "MonkStrike.Step(sprite, Skill);", "",
+                {"Distance": skill["건너뛸칸"], "AttackPercent": attack, "EndurancePercent": endurance,
+                 "MaximumHealthPercent": health})
     if skill["건너뛸칸"] is not None:
         return (f"앞의 적을 넘어 {skill['건너뛸칸']}칸 건너뛰고 돌아선다",
-                f"MonkStrike.Step(sprite, Skill, {skill['건너뛸칸']});", "")
+                "MonkStrike.Step(sprite, Skill);", "", {"Distance": skill["건너뛸칸"]})
     if skill["공격력배수"] is not None:
         attack, endurance = stat_percents(skill)
         where, extra = "", ""
@@ -241,17 +248,18 @@ def shape(skill):
         elif skill["앞칸수"] > 1:
             where, extra = f"앞 {skill['앞칸수']}칸에 ", f", reach: {skill['앞칸수']}"
         return (where + f"공격력 ×{attack / 100:g}" + (f" + 지구력 ×{endurance / 100:g}" if endurance else ""),
-                f"MonkStrike.Use(sprite, Skill, {motion}{extra});", "")
+                f"MonkStrike.Use(sprite, Skill, {motion}{extra});", "",
+                {"AttackPercent": attack, "EndurancePercent": endurance})
     return None
 
 
 def csharp(skill):
     """하데스 스크립트 한 장. 이름은 팩의 한글 그대로 쓴다 — 영문 짝이 아직 없다."""
     name = skill["이름"]
-    note, call, using = shape(skill)
+    note, call, using, _ = shape(skill)
     if skill["마나"]:
         note += f" · 마나 {skill['마나']}"
-        call = (f"if (!MonkStrike.Spend(sprite, Skill, {skill['마나']}))\n"
+        call = ("if (!MonkStrike.Spend(sprite, Skill))\n"
                 f"                return;\n\n            {call}")
     if name in PACK_ONLY:
         note += " · 원작에 없는 팩 전용 기술"
@@ -343,10 +351,9 @@ def main():
             "TargetAnimation": skill["이펙트"] or 0,
             "Cooldown": skill["딜레이"] or 0,
         })
-        # 위력은 템플릿에 둔다 — 스크립트는 읽기만 해서, 수치를 한 표에서 조절할 수 있게.
-        if "MonkStrike.Use(" in shape(skill)[1]:
-            attack, endurance = stat_percents(skill)
-            template.update({"AttackPercent": attack, "EndurancePercent": endurance})
+        template.update(shape(skill)[3])
+        if skill["마나"]:
+            template["ManaCost"] = skill["마나"]
         template.update(KEEP.get(skill["이름"], {}))
         if skill["이름"] in PACK_ONLY:
             template["Group"] = f"{MARK}/원작없음"

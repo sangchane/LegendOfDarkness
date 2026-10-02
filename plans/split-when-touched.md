@@ -19,9 +19,7 @@
 
 ## 밸런스 수치 — 코드에 박힌 숫자
 
-| 어디 | 지금 | 방향 |
-|---|---|---|
-| 서버 기술 스크립트 `database/server/scripts/Skills/Monk/*.cs` | 한 방(`MonkStrike.Use`, 14개)의 배율은 템플릿 `AttackPercent`·`EndurancePercent`. 남은 것: `Step`(허공답보)·`UseCross`·`UseVitality`·`UseWolf`·`UseStrengthAndEndurance`·`Afflict`·`Empower` 의 수치와 마나(`Spend`) | 필요할 때 같은 방식으로 템플릿 필드를 더한다 |
+2026-10-02 끝 — 무도가 기술 수치(마나·초·칸·체력 배율 등)는 모두 템플릿에 있다. `scripts/build-monk-skills.py` 가 쓰고 `MonkStrike` 는 읽기만 한다.
 
 ## 생성기 `scripts/`
 

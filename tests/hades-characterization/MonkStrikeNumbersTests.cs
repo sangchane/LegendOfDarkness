@@ -37,4 +37,30 @@ public sealed class MonkStrikeNumbersTests
 
         Assert.Equal(14, strikes.Count);
     }
+
+    [Fact]
+    public void Every_monk_skill_that_spends_mana_has_its_cost_in_the_template()
+    {
+        string scripts = Path.Combine(HadesWorkspace.ServerDataDirectory, "scripts", "Skills", "Monk");
+        Dictionary<string, JsonNode> templates = Directory
+            .GetFiles(Path.Combine(HadesWorkspace.ServerDataDirectory, "templates", "skills"), "*.json")
+            .Select(path => JsonNode.Parse(File.ReadAllText(path))!)
+            .Where(template => template["ScriptName"] is not null)
+            .GroupBy(template => (string)template["ScriptName"]!)
+            .ToDictionary(group => group.Key, group => group.First());
+
+        int spenders = 0;
+        foreach (string path in Directory.GetFiles(scripts, "*.cs"))
+        {
+            string code = File.ReadAllText(path);
+            if (!code.Contains("MonkStrike.Spend(", StringComparison.Ordinal))
+                continue;
+
+            string name = Regex.Match(code, "\\[Script\\(\"([^\"]+)\"").Groups[1].Value;
+            spenders++;
+            Assert.True((int?)templates[name]["ManaCost"] > 0, $"{name}: 템플릿에 ManaCost 가 없다 — 마력 없이 쓰인다");
+        }
+
+        Assert.Equal(10, spenders);
+    }
 }
