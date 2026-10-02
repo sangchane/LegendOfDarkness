@@ -174,8 +174,6 @@ def authorized(header, expected):
 SESSION_COOKIE = "lod_ops"
 REMEMBER_SECONDS = 30 * 24 * 3600
 SESSION_SECONDS = 12 * 3600
-# 로그인 없이 받는 파일. 나머지 페이지 요청에는 login.html 을 준다.
-PUBLIC_FILES = {"/login.html", "/login.js", "/favicon.svg"}
 
 
 def session_key(credential):
@@ -241,17 +239,11 @@ class OpsHandler(BaseHTTPRequestHandler):
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
+        # 보기는 누구나, 고치기(PUT)만 로그인한 사람 — 사용자 2026-10-02. 페이지는 /api/session 으로 편집 단추를 켠다.
         path = urlsplit(self.path).path
-        if path in PUBLIC_FILES:
-            self._static()
-            return
-        if not self._signed_in():
-            if path.startswith("/api/"):
-                self._json(401, {"error": "로그인이 필요합니다."})
-            else:
-                self._login_page()
-            return
-        if path.startswith("/api/state/") and self.states:
+        if path == "/api/session":
+            self._json(200, {"signedIn": self._signed_in()})
+        elif path.startswith("/api/state/") and self.states:
             try:
                 self._json(200, self.states.read(unquote(path[len("/api/state/"):])))
             except InvalidRequest as error:
@@ -354,17 +346,6 @@ class OpsHandler(BaseHTTPRequestHandler):
         if not isinstance(body, dict):
             raise InvalidRequest("요청 꼴이 잘못됐습니다.")
         return body
-
-    def _login_page(self):
-        path = safe_static_path(self.root, "/login.html")
-        payload = path.read_bytes() if path else "로그인 화면이 없습니다.".encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(payload)))
-        self.send_header("Cache-Control", "no-store")
-        self._security_headers()
-        self.end_headers()
-        self.wfile.write(payload)
 
     def _static(self):
         path = safe_static_path(self.root, self.path)

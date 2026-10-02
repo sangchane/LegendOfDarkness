@@ -169,6 +169,7 @@
     input.type = "text";
     input.value = typed[row.en] || row.ko || "";
     input.placeholder = "한글 이름";
+    input.readOnly = window.LOD_SIGNED_IN === false;  // 보기는 누구나, 고치기는 로그인한 사람(session.js)
     input.setAttribute("aria-label", row.en + " 한글 이름");
     input.addEventListener("change", function () {
       remember(row.en, input.value.trim());
@@ -283,4 +284,6 @@
   } else {
     boot();
   }
+  // 로그인 여부가 늦게 오면 이름 칸의 잠금을 다시 맞춘다.
+  document.addEventListener("lod-session", function () { if ($("item-grid")) { render(); } });
 })();

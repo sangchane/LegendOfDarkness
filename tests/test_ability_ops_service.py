@@ -124,13 +124,18 @@ class LoginAndStateTests(unittest.TestCase):
         self.assertEqual(status, 200)
         return headers["Set-Cookie"]
 
-    def test_signed_out_page_shows_login_screen_without_browser_popup(self):
-        status, headers, body = self.request("GET", "/index.html")
-        self.assertEqual((status, body), (200, "LOGIN"))
-        self.assertIsNone(headers.get("WWW-Authenticate"))
-        status, headers, _ = self.request("GET", "/api/ability-overrides")
+    def test_anyone_can_look_but_only_a_signed_in_person_can_change(self):
+        status, _, body = self.request("GET", "/index.html")
+        self.assertEqual((status, body), (200, "DASHBOARD"))
+        status, _, body = self.request("GET", "/api/session")
+        self.assertEqual(json.loads(body), {"signedIn": False})
+        status, _, _ = self.request("GET", "/api/ability-overrides")
+        self.assertEqual(status, 200)
+        status, headers, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}})
         self.assertEqual(status, 401)
         self.assertIsNone(headers.get("WWW-Authenticate"))
+        status, _, body = self.request("GET", "/api/session", cookie=self.login().split(";")[0])
+        self.assertEqual(json.loads(body), {"signedIn": True})
 
     def test_login_sets_a_cookie_that_opens_the_dashboard(self):
         cookie = self.login(remember=True)
@@ -161,7 +166,8 @@ class LoginAndStateTests(unittest.TestCase):
         wrong = "Basic " + base64.b64encode(b"lod-admin:nope").decode()
         right = "Basic " + base64.b64encode(self.CREDENTIAL.encode()).decode()
         def health(header):
-            req = urllib.request.Request(self.base + "/api/health", headers={"Authorization": header})
+            req = urllib.request.Request(self.base + "/api/state/item-names", method="PUT", data=b'{"value": {}}',
+                                         headers={"Authorization": header, "Content-Type": "application/json"})
             try:
                 with urllib.request.urlopen(req) as response:
                     return response.status

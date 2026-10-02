@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- 등록된 기기(우리 서명에 든 아이폰·아이패드)가 사파리에서 바로 설치하는 안내서. 대시보드 「앱 내려받기」의 링크가 읽는다. -->
+<plist version="1.0">
+<dict>
+  <key>items</key>
+  <array>
+    <dict>
+      <key>assets</key>
+      <array>
+        <dict>
+          <key>kind</key><string>software-package</string>
+          <key>url</key><string>https://lodgame.duckdns.org/download/LodClient.ipa</string>
+        </dict>
+      </array>
+      <key>metadata</key>
+      <dict>
+        <key>bundle-identifier</key><string>com.fallendev.lod.client</string>
+        <key>bundle-version</key><string>0.1.0</string>
+        <key>kind</key><string>software</string>
+        <key>title</key><string>어둠의 전설</string>
+      </dict>
+    </dict>
+  </array>
+</dict>
+</plist>

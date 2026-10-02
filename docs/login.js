@@ -16,7 +16,9 @@
     }).then(function (response) {
       return response.json().then(function (body) {
         if (!response.ok) { throw new Error(body.error || "들어가지 못했습니다."); }
-        window.location.reload();
+        // 공개 화면의 「로그인」 단추로 왔으면 원래 화면으로 돌려보낸다(같은 사이트 경로만).
+        var next = new URLSearchParams(window.location.search).get("next") || "/";
+        window.location.href = next.charAt(0) === "/" && next.charAt(1) !== "/" ? next : "/";
       });
     }).catch(function (e) {
       error.textContent = e.message;

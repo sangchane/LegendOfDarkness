@@ -141,6 +141,13 @@ server {
         add_header Cache-Control no-cache always;
         add_header X-Content-Type-Options nosniff always;
     }
+    # 등록된 기기가 사파리에서 바로 설치하는 안내서 — 아이폰은 xml 로 받아야 읽는다.
+    location = /download/manifest.plist {
+        alias /home/ubuntu/lod-ops/www/download/manifest.plist;
+        types { }
+        default_type application/xml;
+        add_header Cache-Control no-cache always;
+    }
     location /download/ {
         alias /home/ubuntu/lod-ops/www/download/;
         add_header Cache-Control no-cache always;

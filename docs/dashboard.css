@@ -401,3 +401,8 @@ button.tally:hover{background:var(--raised)}
 .aip-output { width: 100%; box-sizing: border-box; font-family: var(--mono); font-size: .85rem; background: var(--raised); color: var(--text); border: 1px solid var(--edge); border-radius: 8px; padding: 8px; }
 .aip-actions { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .aip-copied { color: var(--muted); font-size: .85rem; }
+/* 보기 전용·로그인 단추(session.js) · 앱 내려받기 화면(download.js) — 2026-10-02 */
+.session-box{display:flex;align-items:center;gap:8px;margin-left:12px}.session-button{min-height:36px;padding:0 14px;border:0;border-radius:10px;background:var(--brand);color:var(--panel);font-weight:700;cursor:pointer}.session-button[hidden],.session-box .badge[hidden]{display:none}
+.download-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.download-grid .panel p{color:var(--muted);margin:6px 0 12px}.download-link{display:inline-block;padding:12px 18px;text-decoration:none}.download-link[hidden]{display:none}.download-url{display:block;margin-top:10px;font-size:12px;color:var(--muted);word-break:break-all}.download-meta{font-size:13px}.download-note{font-size:12px}
+.is-read-only .item-name[readonly]{background:transparent;cursor:default}
+@media(max-width:780px){.session-box .badge{display:none}}

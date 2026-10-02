@@ -23,6 +23,7 @@
       <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
       <button type="button" class="nav-item" data-view-target="knowledge"><span aria-hidden="true">▤</span>게임 데이터</button>
       <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>지식 그래프</button>
+      <button type="button" class="nav-item" data-view-target="download"><span aria-hidden="true">⤓</span>앱 내려받기</button>
     </nav>
     <div class="sidebar-status"><span class="status-dot is-live" aria-hidden="true"></span><div><strong>근거 기준일</strong><span id="snapshot-generated-date">—</span></div></div>
   </aside>
@@ -32,6 +33,7 @@
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="sidebar">☰</button>
       <div class="crumb"><span>어둠의 전설 모바일 복원</span><strong id="view-label">지금 되는 것</strong></div>
       <div class="topbar-state"><span class="status-dot is-warning" aria-hidden="true"></span><span>현재 브랜치</span><code id="snapshot-branch">—</code></div>
+      <div class="session-box"><span class="badge" id="session-badge">보기 전용</span><button type="button" class="session-button" id="session-button">로그인</button></div>
     </header>
 
     <main id="workspace" tabindex="-1">
@@ -315,6 +317,15 @@
         <p class="result-count" id="knowledge-count" aria-live="polite"></p><div class="knowledge-list" id="knowledge-list"></div><div class="empty-state" id="knowledge-empty" hidden><strong>일치하는 항목이 없습니다.</strong><p>검색어를 줄이거나 다른 분류를 선택해 보세요.</p></div>
       </section>
 
+      <section class="view" data-view="download" aria-labelledby="download-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">Download</p><h1 id="download-title">앱 내려받기</h1><p>받는 사람에게는 공개 페이지 주소를 보내면 됩니다. 아이폰은 그 사람의 컴퓨터에서 Sideloadly 로, PC 는 압축만 풀고 실행합니다.</p></div></div>
+        <div class="download-grid">
+          <article class="panel"><h2>📱 아이폰</h2><p>그림이 들어간 설치 방법과 최신 파일.</p><p class="download-meta" data-file="/download/LodClient.ipa">확인 중…</p><a class="primary-button download-link" href="/download/#ios" target="_blank" rel="noopener">공개 페이지 열기</a><code class="download-url">https://lodgame.duckdns.org/download/#ios</code></article>
+          <article class="panel"><h2>🖥️ 윈도우 PC</h2><p>압축을 풀고 LodClient 를 실행합니다.</p><p class="download-meta" data-file="/download/LodClient-windows.zip">확인 중…</p><a class="primary-button download-link" href="/download/#pc" target="_blank" rel="noopener">공개 페이지 열기</a><code class="download-url">https://lodgame.duckdns.org/download/#pc</code></article>
+          <article class="panel download-own"><h2>⚡ 내 기기에 바로 설치</h2><p>우리 서명에 등록된 아이폰·아이패드만 됩니다. <b>그 기기의 사파리</b>로 이 화면을 열고 누르세요 — 같은 Wi‑Fi·케이블이 없어도 됩니다.</p><a class="primary-button download-link" id="download-ota" href="itms-services://?action=download-manifest&amp;url=https://lodgame.duckdns.org/download/manifest.plist">내 아이폰에 설치</a><p class="download-note" id="download-ota-note">로그인해야 보입니다.</p></article>
+        </div>
+      </section>
+
       <section class="view" data-view="delivery" aria-labelledby="delivery-title" hidden>
         <div class="page-heading"><div><p class="eyebrow">Connected knowledge</p><h1 id="delivery-title">Graphify 지식 그래프</h1><p>코드와 문서의 연결을 한 화면에서 봅니다. 구현 위치를 찾을 때 씁니다.</p></div><div class="section-actions"><a class="quiet-link" href="../graphify-out/GRAPH_REPORT.md">분석 보고서 →</a><a class="quiet-link" href="../graphify-out/graph.html">전체 화면 →</a></div></div>
         <div class="graphify-summary" aria-label="Graphify 생성 현황"><article><span>노드</span><strong id="snapshot-graphify-nodes">미확인</strong></article><article><span>관계</span><strong id="snapshot-graphify-links">미확인</strong></article><article><span>커뮤니티</span><strong id="snapshot-graphify-communities">미확인</strong></article><article><span>Obsidian 노트</span><strong id="snapshot-obsidian-notes">미확인</strong></article></div>
@@ -333,6 +344,6 @@
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
 <script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
-<script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>

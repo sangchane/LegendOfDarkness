@@ -272,8 +272,10 @@
     setControl("effect", row["반영가능"].effect);
     setControl("speed", row["반영가능"].speed);
     setControl("sound", row["반영가능"].sound);
-    $("ability-apply").disabled = !apiReady;
-    $("ability-reset").disabled = !apiReady || !changed(row);
+    // 보기는 누구나 — 반영 단추는 로그인한 사람에게만 열린다(session.js).
+    $("ability-apply").disabled = !apiReady || !window.LOD_SIGNED_IN;
+    $("ability-reset").disabled = !apiReady || !window.LOD_SIGNED_IN || !changed(row);
+    $("ability-apply").title = window.LOD_SIGNED_IN ? "" : "로그인해야 고칠 수 있습니다";
     renderCompare(row);
     renderMedia(); syncEditor(); previewEffect(draft.effect);
     $("ability-editor").hidden = false;
@@ -310,7 +312,7 @@
     }).then(function (response) {
       return response.json().then(function (body) { return { status: response.status, ok: response.ok, body: body }; });
     }).then(function (result) {
-      if (result.status === 401) { window.location.reload(); return; }  // 로그인이 풀렸다 — 로그인 화면으로
+      if (result.status === 401) { state("로그인 필요", "is-warning"); toast("로그인해야 고칠 수 있습니다. 오른쪽 위 「로그인」."); return; }
       if (result.status === 409) {
         overrides = result.body.current.abilities || {};
         changedAt = result.body.current.changedAt || {};
