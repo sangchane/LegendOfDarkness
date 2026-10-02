@@ -15,6 +15,8 @@
     var link = document.getElementById("download-ota");
     var note = document.getElementById("download-ota-note");
     if (!link) { return; }
+    // 우리 서명에 등록된 기기 전용이라 친구들이 보면 헷갈린다 — 카드째 로그인한 사람에게만(사용자 2026-10-02).
+    link.closest(".download-own").hidden = !signedIn;
     link.hidden = !signedIn;
     note.textContent = signedIn
       ? "설치 확인 창에서 「설치」 → 홈 화면에서 아이콘이 채워질 때까지 기다립니다(1~3분)."

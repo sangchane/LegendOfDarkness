@@ -27,6 +27,8 @@
       var active = button.getAttribute("data-view-target") === normalized;
       button.classList.toggle("is-active", active);
       if (active) { button.setAttribute("aria-current", "page"); } else { button.removeAttribute("aria-current"); }
+      // 휴대폰의 가로 메뉴에서 고른 칸이 화면 밖이면 보이게 민다.
+      if (active && button.scrollIntoView) { button.scrollIntoView({ block: "nearest", inline: "nearest" }); }
     });
     select("#view-label").textContent = labels[normalized];
     document.title = labels[normalized] + " · LOD 개발 대시보드";
