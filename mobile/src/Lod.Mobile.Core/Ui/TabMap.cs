@@ -28,7 +28,7 @@ public sealed record MapSign(Tile Where, string Name);
 
 /// <summary>
 /// What the 길 찾기 map knows about a map beyond its walls: the exits and the standing NPCs, read from
-/// <c>assets/world/guide.txt</c> (<c>scripts/build-client-guide.py</c>, out of the server's warp and NPC templates).
+/// <c>assets/world/guide.txt</c> (<c>scripts/gen/client/build-client-guide.py</c>, out of the server's warp and NPC templates).
 /// </summary>
 /// <remarks>
 /// The original client never knew where the exits were — it saw a door drawn on the floor and the server moved

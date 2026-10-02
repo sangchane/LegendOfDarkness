@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 SPEC = importlib.util.spec_from_file_location(
-    "compare_packs", ROOT / "scripts" / "compare-packs.py"
+    "compare_packs", ROOT / "scripts" / "gen" / "pack" / "compare-packs.py"
 )
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)

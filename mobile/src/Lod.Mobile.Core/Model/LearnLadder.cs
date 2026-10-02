@@ -15,7 +15,7 @@ public sealed record RosterRow(string Name, bool Spell, int Icon, int? Slot, int
 }
 
 /// <summary>
-/// 레벨이 되면 저절로 배우는 표(서버 <c>AutoLearnTable.cs</c> 와 같은 것, <c>scripts/build-auto-learn.py</c> →
+/// 레벨이 되면 저절로 배우는 표(서버 <c>AutoLearnTable.cs</c> 와 같은 것, <c>scripts/gen/ability/build-auto-learn.py</c> →
 /// <c>assets/world/auto-learn.txt</c>)로 기술 목록을 짠다 — 배운 것 + 아직 못 배운 내 직업 것을 레벨 순으로
 /// (사용자 요청 2026-09-26: "아직 레벨이 낮아서 활성화 안 된 것까지 몇 레벨에 배울 수 있는지").
 /// </summary>

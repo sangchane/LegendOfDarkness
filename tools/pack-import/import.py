@@ -420,7 +420,7 @@ def flatten_drop(v):
 def write_items(keep):
     """**아이템의 베이스는 하데스 것이다.** 여기서는 괴물이 떨구는 잡템만 채운다.
 
-    `origin/Zolian` 브랜치가 아이템 템플릿 978장을 갖춰 싣고(`scripts/write-hades-items.py`),
+    `origin/Zolian` 브랜치가 아이템 템플릿 978장을 갖춰 싣고(`scripts/gen/items/write-hades-items.py`),
     규칙 1번대로 하데스에 있으면 하데스 것을 쓴다. 전에 팩 989개를 통째로 넣었다가 뺐다.
 
     그런데 괴물 드롭이 부르는 40종(`뱀고기`·`벌꿀`·`독거미알` …)은 **하데스에도 원작에도 없다** —
@@ -701,7 +701,7 @@ def write_monsters(keep):
 # 캐시가 `Name` 열쇠라(GlobalMundaneTemplateCache) 31종을 그대로 쓰면 179배치가
 # 31개로 뭉갠다. 배치마다 이름을 새로 짓는다 — 화면에 뜨는 이름이 아니라 열쇠다.
 NPC_SCRIPT = "pack_speaker"          # scripts/Mundanes/PackSpeaker.cs
-# 팩 npc/Spawn.txt 의 여섯째 칸이 그 자리 NPC 의 스크립트 이름이다(가렌@밀레스마을#52,45 → 가렌2). scripts/build-pack-npcs.py 가
+# 팩 npc/Spawn.txt 의 여섯째 칸이 그 자리 NPC 의 스크립트 이름이다(가렌@밀레스마을#52,45 → 가렌2). scripts/gen/world/build-pack-npcs.py 가
 # 옮겨 둔 스크립트가 있으면 그것을(`NPC_이름`), 없으면 대사만 보여 주는 pack_speaker 를 붙인다.
 NPC_SCRIPTS = SERVER / "scripts" / "Pack599" / "Npcs"
 
@@ -1024,7 +1024,7 @@ def write_quests(_keep):
 # ── 상점 ────────────────────────────────────────────────────────────────
 # 상점은 만드는 게 아니다. shop1.cs 가 사기·팔기·수리를 다 하고 DefaultMerchantStock 만
 # 읽는다. 문제는 **어느 NPC 가 어느 목록을 여느냐** 였고, 그건 팩 스크립트의 shop 호출에
-# 있었다(scripts/build-shop-binding.py 가 표로 뽑아 둔다).
+# 있었다(scripts/gen/items/build-shop-binding.py 가 표로 뽑아 둔다).
 #
 # 이 NPC 들은 팩 npc/Npc.txt 에 정의가 없다 — 스크립트가 만드는 NPC 라 8단계에서 놓지
 # 못한 95건 쪽이다. 상점을 여는 13명은 여기서 놓는다.
@@ -1035,7 +1035,7 @@ SHOP_SCRIPT = "shop1"           # scripts/Mundanes/shop1.cs
 SHOP_IMAGE = 31
 # 5.99 목록에 없는 물건을 이 자리에서 더 판다 — (NPC, 맵, x, y) → [물건]. 템플릿이 있을 때만 넣는다(끊긴 참조 0).
 #   리콜(아무 마을로 가는 귀환) — 5.99 에 그 아이템이 없다. 혼든 npc/마이소시아/노비스마을_shop.txt 의 노베스
-#   (노비스 잡화상)가 마을 리콜들과 함께 판다. 하데스의 노비스 잡화상은 베이가다. 템플릿: scripts/build-recall.py
+#   (노비스 잡화상)가 마을 리콜들과 함께 판다. 하데스의 노비스 잡화상은 베이가다. 템플릿: scripts/gen/world/build-recall.py
 MORE_STOCK = {("베이가", "노비스잡화상점", 3, 14): ["리콜"]}
 
 
@@ -1056,7 +1056,7 @@ def shop_rows(ids):
 
 def write_shops(_keep):
     if not SHOPBIND.exists():
-        raise SystemExit("상점 결합표가 없다 — python3 scripts/build-shop-binding.py 를 먼저 돌려라")
+        raise SystemExit("상점 결합표가 없다 — python3 scripts/gen/items/build-shop-binding.py 를 먼저 돌려라")
     ids = name_to_id()
     npcs = {n["이름"]: n for n in load("npcs")}
     stock = {s["이름"]: s["아이템"] for s in load("shops")}
@@ -1110,7 +1110,7 @@ WORLD_FIELD_NUMBER = 1               # Hades 의 Temuair. fieldmaps/field001.png
 def original_nodes():
     """볼트 노트에 옮겨 둔 field001.txt 를 읽는다. `이름 그림키 x y [EX …]`."""
     if not ORIGINAL_FIELD.exists():
-        raise SystemExit("원작 월드맵 노트가 없다 — python3 scripts/build-archive-vault.py 를 먼저 돌려라")
+        raise SystemExit("원작 월드맵 노트가 없다 — python3 scripts/gen/vault/build-archive-vault.py 를 먼저 돌려라")
     body = ORIGINAL_FIELD.read_text(encoding="utf-8").split("```")[1]
     out = []
     for line in body.splitlines()[2:]:

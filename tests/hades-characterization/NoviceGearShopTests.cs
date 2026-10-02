@@ -14,7 +14,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// 돌았지만 파는 것이 포션·음식·귀환서뿐이라, 1~25레벨이 장비를 얻을 길이 없었다.
 ///
 /// 노비스마을 옆 무기방어구상점(20375)에 둘을 세운다 — `델란`(무기)·`드보이`(갑옷).
-/// 물목은 5.99 팩의 목록, 자리·이름·그림·인사말은 혼든 팩이다(`scripts/build-novice-gear-shops.py`).
+/// 물목은 5.99 팩의 목록, 자리·이름·그림·인사말은 혼든 팩이다(`scripts/gen/items/build-novice-gear-shops.py`).
 /// 되돌리면(템플릿 두 장을 지우면) 아래 셋이 모두 실패한다.
 /// </summary>
 public sealed class NoviceGearShopTests : IDisposable
@@ -30,7 +30,7 @@ public sealed class NoviceGearShopTests : IDisposable
 
     /// <summary>
     /// 1레벨 도적 무기. 5.99 `도적무기` 목록의 첫 줄이고 값은 아이템 템플릿의 `Value` 다.
-    /// 2026-09-23 에 500 에서 원작 도감 값 1,000 으로 되돌렸다(`scripts/build-gear-from-original.py`).
+    /// 2026-09-23 에 500 에서 원작 도감 값 1,000 으로 되돌렸다(`scripts/gen/items/build-gear-from-original.py`).
     /// </summary>
     private const string Dagger = "설단검";
     private const uint DaggerPrice = 1000;
@@ -41,12 +41,12 @@ public sealed class NoviceGearShopTests : IDisposable
 
     /// <summary>
     /// 1레벨 전사 갑옷. 혼든 드보이 목록에서 왔다 — 5.99 갑옷은 전부 21레벨부터라 1~20레벨이 입을 것이 없었다.
-    /// 2026-09-23 에 300 에서 원작 도감 값 950 으로 되돌렸다(`scripts/build-gear-from-original.py`).
+    /// 2026-09-23 에 300 에서 원작 도감 값 950 으로 되돌렸다(`scripts/gen/items/build-gear-from-original.py`).
     /// </summary>
     private const string Tunic = "레더튜닉";
     private const uint TunicPrice = 950;
 
-    /// <summary>1레벨 무도가 너클. 노바 팩에서 들여왔다(`scripts/build-nova-knuckles.py`).</summary>
+    /// <summary>1레벨 무도가 너클. 노바 팩에서 들여왔다(`scripts/gen/ability/build-nova-knuckles.py`).</summary>
     private const string Knuckle = "글러브1";
     private const uint KnucklePrice = 500;
 

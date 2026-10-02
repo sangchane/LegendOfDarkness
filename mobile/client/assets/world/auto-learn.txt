@@ -1,4 +1,4 @@
-# tools: scripts/build-auto-learn.py 가 서버와 같은 표로 만든다. 손으로 고치지 말 것.
+# tools: scripts/gen/ability/build-auto-learn.py 가 서버와 같은 표로 만든다. 손으로 고치지 말 것.
 # 직업(1 전사 · 2 도적 · 3 마법사 · 4 성직자 · 5 무도가)	레벨	skill|spell	이름	그림
 1	1	skill	숏블레이드	1
 1	11	skill	윈드블레이드	15

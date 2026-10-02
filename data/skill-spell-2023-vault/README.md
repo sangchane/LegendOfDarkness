@@ -19,7 +19,7 @@
 ## 다시 만들기
 
 ```bash
-python3 scripts/build-skill-spell-2023.py
-python3 scripts/build-skill-spell-2023-vault.py
-python3 scripts/build-skill-spell-2023-graph.py
+python3 scripts/gen/ability/build-skill-spell-2023.py
+python3 scripts/gen/ability/build-skill-spell-2023-vault.py
+python3 scripts/gen/ability/build-skill-spell-2023-graph.py
 ```

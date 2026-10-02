@@ -284,4 +284,4 @@ player.ExpNext = (uint) (player.ExpLevel * seed * 5000);
 | 지금 서버에 실린 괴물 | `sources/wren11/.../database/server/templates/monsters/**/*.json` |
 | 하데스 경험치·레벨업 | `database/server/scripts/Formulas/monsterexp.cs` |
 | 성장 설정 | `Staging/net9.0/LoruleConfig.json` (`HpGainFactor 5` · `MpGainFactor 5` · `StatsPerLevel 2`) |
-| 팩 비교 방법 | `docs/pack-comparison.md` · `scripts/compare-packs.py` |
+| 팩 비교 방법 | `docs/pack-comparison.md` · `scripts/gen/pack/compare-packs.py` |

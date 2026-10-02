@@ -282,7 +282,7 @@ public partial class Main : Control
     private static Lod.Mobile.Core.Model.LearnLadder? _ladder;
 
     /// <summary>
-    /// 레벨이 되면 저절로 배우는 표 — 서버와 같은 것(<c>scripts/build-auto-learn.py</c> → <c>assets/world/auto-learn.txt</c>).
+    /// 레벨이 되면 저절로 배우는 표 — 서버와 같은 것(<c>scripts/gen/ability/build-auto-learn.py</c> → <c>assets/world/auto-learn.txt</c>).
     /// 기술 목록이 아직 못 배운 것에 "N레벨에 배움" 을 적는다(<see cref="AbilityBar" />). 없으면 빈 표.
     /// </summary>
     public static Lod.Mobile.Core.Model.LearnLadder Ladder => _ladder ??= LoadLadder();

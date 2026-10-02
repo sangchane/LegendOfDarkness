@@ -24,15 +24,15 @@
    `sources/novaonline/` 은 서버 팩이다. 찾은 폴더 경로와 실행 파일 이름·크기·md5 를 적는다. **없으면 "노바 클라이언트 없음"** 이라고 적고 4번으로.
 2. **목록 만들기** — 저장소 루트에서(파이썬 3, 표준 라이브러리만):
    ```
-   python scripts/dat-manifest.py "<노바클라이언트>\roh.dat"   --out data/client-manifests/nova-roh.json
-   python scripts/dat-manifest.py "<노바클라이언트>\setoa.dat" --out data/client-manifests/nova-setoa.json
-   python scripts/dat-manifest.py "<노바클라이언트>\legend.dat" --out data/client-manifests/nova-legend.json
-   python scripts/dat-manifest.py --compare data/client-manifests/5.99-roh.json data/client-manifests/nova-roh.json
+   python scripts/gen/pack/dat-manifest.py "<노바클라이언트>\roh.dat"   --out data/client-manifests/nova-roh.json
+   python scripts/gen/pack/dat-manifest.py "<노바클라이언트>\setoa.dat" --out data/client-manifests/nova-setoa.json
+   python scripts/gen/pack/dat-manifest.py "<노바클라이언트>\legend.dat" --out data/client-manifests/nova-legend.json
+   python scripts/gen/pack/dat-manifest.py --compare data/client-manifests/5.99-roh.json data/client-manifests/nova-roh.json
    ```
    맥의 5.99 클라이언트 목록(`data/client-manifests/5.99-*.json`)은 이미 들어 있다. 비교 결과(같음·다름·한쪽에만)를 아래 5번에 붙인다.
 3. **다른 것만 꺼내기** — 비교에서 `efct*`·`effect*.tbl`·`effpal.tbl`·`eff*.pal` 중 **다름 또는 노바에만** 인 것이 있으면:
    ```
-   python scripts/dat-manifest.py "<노바클라이언트>\roh.dat" --extract "efct*" "effect*.tbl" "effpal.tbl" "eff*.pal" --to data/nova-client/roh
+   python scripts/gen/pack/dat-manifest.py "<노바클라이언트>\roh.dat" --extract "efct*" "effect*.tbl" "effpal.tbl" "eff*.pal" --to data/nova-client/roh
    ```
    (roh.dat 통째는 35MB 라 올리지 않는다. 이펙트 쪽 파일만 — 모두 합쳐도 수십 MB 아래.)
    아이콘 시트(`setoa.dat` 의 `skill001.epf`·`spell001.epf`·`gui06.pal`)가 다르면 그것도 `data/nova-client/setoa/` 로 꺼낸다.
@@ -51,9 +51,9 @@
 
 ## 4. 맥이 받은 뒤 할 일 (참고)
 
-- 다른 그림이 없으면: 번호는 같은 그림이므로 **이펙트는 5.99 번호로 되돌린다**(`scripts/build-nova-effects.py` 가 바꾼 줄 끝의
+- 다른 그림이 없으면: 번호는 같은 그림이므로 **이펙트는 5.99 번호로 되돌린다**(`scripts/gen/ability/build-nova-effects.py` 가 바꾼 줄 끝의
   `// 노바 이펙트(5.99: …)` 에 원래 번호가 있다). 아이콘은 노바 번호 그대로(사용자 2026-09-26 "아이콘은 노바가 맞다").
-- 다른 그림이 있으면: 앱 이펙트 그림을 노바 클라이언트 것으로 뽑고(`scripts/build-client-effects.py` 입력) 번호는 노바 것을 둔다.
+- 다른 그림이 있으면: 앱 이펙트 그림을 노바 클라이언트 것으로 뽑고(`scripts/gen/client/build-client-effects.py` 입력) 번호는 노바 것을 둔다.
 
 ---
 

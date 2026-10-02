@@ -1,4 +1,4 @@
-# tools: scripts/build-client-guide.py 가 서버 워프·NPC 템플릿에서 만든다. 손으로 고치지 말 것.
+# tools: scripts/gen/client/build-client-guide.py 가 서버 워프·NPC 템플릿에서 만든다. 손으로 고치지 말 것.
 exit 20015 0 34 우드랜드입구
 exit 20015 0 35 우드랜드입구
 exit 20015 0 36 우드랜드입구

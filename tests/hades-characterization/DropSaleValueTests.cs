@@ -39,7 +39,7 @@ public sealed class DropSaleValueTests
     private const string FirstTunic = "레더튜닉";
 
     /// <summary>
-    /// 우리가 정한 시약 값. 근거는 <c>scripts/build-novice-drops.py</c> 머리글에 있다 — 도감 수치표에도
+    /// 우리가 정한 시약 값. 근거는 <c>scripts/gen/items/build-novice-drops.py</c> 머리글에 있다 — 도감 수치표에도
     /// 원작 아카이브에도 이 둘은 없고, 서버팩 셋 중 <b>혼든만</b> 값을 적었다(쿠룸 300 · 마라디움 1,000).
     /// 셋이 일치하지 않으므로 팩 값을 쓰지 않고, 혼든의 비(3 : 10)만 남긴 채 절반으로 내려
     /// 「첫 옷까지 열 마리 안팎」에 맞춘 값이다.
@@ -95,7 +95,7 @@ public sealed class DropSaleValueTests
 
         Assert.True(wrong.Count == 0,
             $"시약 값이 정한 값과 다릅니다: {string.Join(", ", wrong)}. " +
-            "python3 scripts/build-novice-drops.py --쓰기 로 다시 만드세요.");
+            "python3 scripts/gen/items/build-novice-drops.py --쓰기 로 다시 만드세요.");
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public sealed class DropSaleValueTests
         Assert.True(outside.Count == 0,
             $"첫 옷({FirstTunic} {tunic}전)까지 {Fewest:F0}~{Most:F0}마리 밖인 노비스 괴물이 {outside.Count} 마리입니다: " +
             $"{string.Join(", ", outside.Order())}. 잣대는 「열 마리 안팎」입니다 — " +
-            "시약·잡템 값은 python3 scripts/build-novice-drops.py · scripts/build-pack-gold.py 가 정합니다.");
+            "시약·잡템 값은 python3 scripts/gen/items/build-novice-drops.py · scripts/gen/items/build-pack-gold.py 가 정합니다.");
     }
 
     /// <summary>

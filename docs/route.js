@@ -4,7 +4,7 @@
  * **그 맵의 어디로 걸어가야 하는가** 다(사용자, 2026-09-19). 그래서 길을 한 줄로 세우고, 칸마다
  * 그 맵의 실제 그림을 워프 자리 둘레만 잘라 보여 준다.
  *
- * 칸 좌표·그림은 `map-images-data.js`(= `scripts/build-map-images.py`, Hades `templates/warps` 기준)
+ * 칸 좌표·그림은 `map-images-data.js`(= `scripts/gen/world/build-map-images.py`, Hades `templates/warps` 기준)
  * 에서 그대로 온다 — 여기서 지어내는 자리는 없다. 자료에 없는 칸(월드맵 창처럼 지도가 아닌 것)은
  * 그림 없이 무엇을 하는지만 적는다.
  */

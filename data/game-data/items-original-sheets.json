@@ -1,5 +1,5 @@
 {
- "생성": "scripts/build-original-item-sheets.py",
+ "생성": "scripts/gen/items/build-original-item-sheets.py",
  "출처": "docs/items/*.xlsx — 사람이 원작에서 모아 둔 표",
  "칸이름_근거": "서버팩 셋과 겹치는 3,026개를 맞대어 0 이 아닌 값의 일치율로 정했다 · 판매가격(열4)은 혼든 77%, 공격력(열25)·마법공격력(열26)은 노바 72%·70% 로 가렸다(팩마다 따로 셈)",
  "칸": [

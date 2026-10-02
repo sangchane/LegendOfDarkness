@@ -7,7 +7,7 @@ namespace LodClient;
 
 /// <summary>
 /// One skill flash, played once and gone. The picture is a single row of frames cut from the original archive
-/// (<c>scripts/build-client-effects.py</c>); how many frames it has, and the order the original plays them in
+/// (<c>scripts/gen/client/build-client-effects.py</c>); how many frames it has, and the order the original plays them in
 /// (effect.tbl — 203 is "0 1 1"), are written beside it in <c>effects.txt</c>.
 /// </summary>
 public sealed partial class Flash : Sprite2D
@@ -93,7 +93,7 @@ public sealed partial class Flash : Sprite2D
     /// No original evidence for the tint itself: the 5.99 client can recolour a monster only through the four
     /// palette bytes of its 0x07 record (<c>0x63f4bb</c> → <c>0x59d770</c> → drawn by <c>0x495100</c> when the
     /// monster's own table allows it), and the 5.99 server always writes those four as zero. The colour is the
-    /// picture's own, worked out by scripts/build-client-effects.py (every drawn pixel weighted by how vivid it is).
+    /// picture's own, worked out by scripts/gen/client/build-client-effects.py (every drawn pixel weighted by how vivid it is).
     /// </remarks>
     public static Color Tint(int number) =>
         number > 0 && Look(number) is { } look ? Color.Color8(look.Red, look.Green, look.Blue) : Colors.White;

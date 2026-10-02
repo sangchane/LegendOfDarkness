@@ -147,7 +147,7 @@ public partial class GameScreen : Control
         return row;
     }
 
-    /// <summary>Exits and standing NPCs for every drawn map (<c>scripts/build-client-guide.py</c>). Empty when not shipped.</summary>
+    /// <summary>Exits and standing NPCs for every drawn map (<c>scripts/gen/client/build-client-guide.py</c>). Empty when not shipped.</summary>
     private static MapGuide LoadGuide()
     {
         const string path = "res://assets/world/guide.txt";

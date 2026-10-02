@@ -1,5 +1,5 @@
 {
-  "설명": "원작 4.51(5.01 이전) 클라이언트의 화면 자료와, 그것으로 정한 모바일 UI 테마 규칙. 판 번호 근거는 Legend.dat 안 version.nfo. 그래프: python scripts/build-ui-graph.py · 볼트: python scripts/build-ui-vault.py",
+  "설명": "원작 4.51(5.01 이전) 클라이언트의 화면 자료와, 그것으로 정한 모바일 UI 테마 규칙. 판 번호 근거는 Legend.dat 안 version.nfo. 그래프: python scripts/gen/vault/build-ui-graph.py · 볼트: python scripts/gen/vault/build-ui-vault.py",
   "갱신": "2026-09-25",
   "판": [
     {

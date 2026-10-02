@@ -18,8 +18,8 @@ def load(name, file):
     return module
 
 
-ABILITIES = load("build_pack_abilities", "build-pack-abilities.py")
-NPCS = load("build_pack_npcs", "build-pack-npcs.py")
+ABILITIES = load("build_pack_abilities", "gen/ability/build-pack-abilities.py")
+NPCS = load("build_pack_npcs", "gen/world/build-pack-npcs.py")
 
 
 def compact(code):

@@ -9,7 +9,7 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))      # graphify_runtime 이 거기 있다
-SPEC = importlib.util.spec_from_file_location("build_pack_equipment", ROOT / "scripts" / "build-pack-equipment.py")
+SPEC = importlib.util.spec_from_file_location("build_pack_equipment", ROOT / "scripts" / "gen" / "items" / "build-pack-equipment.py")
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 

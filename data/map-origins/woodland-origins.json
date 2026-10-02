@@ -1,5 +1,5 @@
 {
-  "설명": "우드랜드 맵 파일이 어느 판에서 왔는지 여섯 갈래의 md5 를 맞대어 본 것. 설치본·맵 파일은 커밋하지 않는다 — 경로만 적는다. 만드는 법: python scripts/compare-woodland-maps.py",
+  "설명": "우드랜드 맵 파일이 어느 판에서 왔는지 여섯 갈래의 md5 를 맞대어 본 것. 설치본·맵 파일은 커밋하지 않는다 — 경로만 적는다. 만드는 법: python scripts/gen/world/compare-woodland-maps.py",
   "갱신": "2026-09-25",
   "출처경로": {
     "원작4.51": "sources/lodr4.51.exe 를 풀어서 나온 maps/ (저장소 밖)",

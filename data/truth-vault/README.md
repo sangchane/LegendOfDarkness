@@ -18,4 +18,4 @@
 
 [[갈래/하데스 메타파일|하데스 메타파일 — 여기부터 본다]]
 
-`python3 scripts/build-truth-vault.py` 로 다시 만든다.
+`python3 scripts/gen/vault/build-truth-vault.py` 로 다시 만든다.

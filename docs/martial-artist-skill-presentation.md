@@ -170,7 +170,7 @@ Sound 1이고 다섯 무도가 템플릿은 모두 0이다. 서버팩의 `game_s
 > 5.99 값을 남긴다. 무도가 템플릿은 `TargetAnimationSpeed`를 가지며 `MonkStrike`가 그 값을 0x29에 보낸다
 > (구양신공·달마신공·마구때리기·붕신선각·연천단각·파천각 75, 단각·붕각·선풍각 69).
 > 쿠로토 이펙트도 예외 없이 노바 75이며, 도복에서 보이는 손 들기 몸 동작은 기존 속도 90을 유지한다.
-> 생성기 `scripts/build-nova-effects.py` 가 5.99 를 옮긴 스크립트(`scripts/Pack599`)와 무도가 템플릿의
+> 생성기 `scripts/gen/ability/build-nova-effects.py` 가 5.99 를 옮긴 스크립트(`scripts/Pack599`)와 무도가 템플릿의
 > `TargetAnimation` 을 바꾼다(`build-pack-abilities.py`·`build-monk-skills.py` 가 끝에 부른다). 노바에만 있는
 > 갈래(40% 빗나감의 33 · 데빌크래셔 둘레 131)는 동작이라 옮기지 않았다.
 

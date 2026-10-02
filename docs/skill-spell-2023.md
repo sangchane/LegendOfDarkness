@@ -7,11 +7,11 @@
 계보별 정본·실행 자료·매칭 금지 규칙은 [기술·마법 자료 표준](skill-spell-standard.md)에 있다. 관리 페이지의 무도가 표도 이 JSON을 읽으며, XLSX를 별도로 해석하지 않는다.
 
 ```bash
-python3 scripts/build-skill-spell-2023.py
-python3 scripts/build-skill-spell-2023-vault.py
-python3 scripts/build-skill-spell-2023-graph.py
-python3 scripts/build-ability-page-data.py
-python3 scripts/build-ability-standard.py --check
+python3 scripts/gen/ability/build-skill-spell-2023.py
+python3 scripts/gen/ability/build-skill-spell-2023-vault.py
+python3 scripts/gen/ability/build-skill-spell-2023-graph.py
+python3 scripts/gen/ability/build-ability-page-data.py
+python3 scripts/gen/ability/build-ability-standard.py --check
 ```
 
 볼트는 `data/skill-spell-2023-vault/`이다. 그래프 산출물은 재생성물 `data/skill-spell-2023/graph/`이며 다음처럼 묻는다.

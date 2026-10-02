@@ -43,4 +43,4 @@
 
 [[설정/LoruleConfig|식이 읽는 설정값]]
 
-`python3 scripts/build-formula-vault.py` 로 다시 만든다.
+`python3 scripts/gen/vault/build-formula-vault.py` 로 다시 만든다.

@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))      # graphify_runtime 이 거기 있다
 
 SPEC = importlib.util.spec_from_file_location(
-    "build_ability_effects", ROOT / "scripts" / "build-ability-effects.py")
+    "build_ability_effects", ROOT / "scripts" / "gen" / "ability" / "build-ability-effects.py")
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 

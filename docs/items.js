@@ -242,7 +242,7 @@
       box.appendChild(el("p", "notice", "이 브라우저에서 고친 이름이 아직 없어요. 카드의 칸에 적어 보세요."));
     } else {
       box.appendChild(el("p", "", "아래를 복사해 data/아이템-한글이름.tsv 에 붙여 넣으세요 ("
-        + (lines.length - 1) + "줄). 반영: python3 scripts/compare-packs.py && python3 scripts/build-item-page-data.py"));
+        + (lines.length - 1) + "줄). 반영: python3 scripts/gen/pack/compare-packs.py && python3 scripts/gen/items/build-item-page-data.py"));
       box.appendChild(el("pre", "item-export", lines.join("\n")));
     }
     box.hidden = false;

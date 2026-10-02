@@ -168,7 +168,7 @@ public sealed class NpcDialogueTests : IDisposable
     /// <summary>
     /// 대사 속 영어 낱말 — 5.99 팩 원문은 "1500Gold입니다"·"(요금5000GOLD)" 처럼 한국어 문장 안에 영어
     /// 낱말을 그대로 남겼다(<c>Npc_Warp.txt</c> 273줄 · <c>Npc_Script.txt</c> 157줄). 2026-09-25 에
-    /// <c>scripts/build-pack-npcs.py</c> 의 <c>TEXT_PATCH</c> 로 고쳤다(개인던전입장도우미·미용사·애교·
+    /// <c>scripts/gen/world/build-pack-npcs.py</c> 의 <c>TEXT_PATCH</c> 로 고쳤다(개인던전입장도우미·미용사·애교·
     /// 워프할아버지·타바리마을이동·선진·리프트도우미·멜로린·신의대장장이1, <c>docs/server-messages-ko.md</c>).
     /// 대표로 둘을 격리 서버에서 열어 실제 창에도 라틴 글자가 없는지 본다.
     /// </summary>

@@ -11,7 +11,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 5.99 무도가 기술 정권과 무도가 마법 넷(주먹단련 · 장풍 · 금강불괴 · 다라밀공). `scripts/build-pack-abilities.py` 가
+/// 5.99 무도가 기술 정권과 무도가 마법 넷(주먹단련 · 장풍 · 금강불괴 · 다라밀공). `scripts/gen/ability/build-pack-abilities.py` 가
 /// 5.99 `무도가(비전직).txt` 를 문장 그대로 옮긴 것(`scripts/Pack599/Skills/정권.cs` · `Spells/*.cs`)이 도복 입은
 /// 무도가에게서 5.99 에 적힌 몸동작·이펙트·소리·마력을 보내는지, 그리고 밀레스마을 리신 사범에게 배워지는지 본다(리신2 는 5.99 원본이 망가져 메뉴대로 채웠다).
 /// </summary>

@@ -41,7 +41,7 @@ public sealed class ExperienceNoticeTests : IDisposable
 
     /// <summary>
     /// 깎기에 쓰는 괴물 레벨은 괴물의 경험치에서 추정한다(monsterexp.cs <c>CutLevel</c>, 생성기
-    /// <c>scripts/build-monster-cut-level.py</c>). 표적은 그 방에서 체력이 가장 낮은 제 정의 — 경험치도 제 값 그대로다.
+    /// <c>scripts/gen/world/build-monster-cut-level.py</c>). 표적은 그 방에서 체력이 가장 낮은 제 정의 — 경험치도 제 값 그대로다.
     /// 표적의 추정 레벨: 우드랜드1-1 니에1(466) 1(우드랜드1 구간 1~10 의 맨 아래) · 우드랜드3-1 녹색말벌3(2,534) 26 ·
     /// 포테의숲1존 그린팜팻(7,671) 22 · 노비스평원A 노비스풀뱀(1,068) 1.
     /// 다섯 레벨 차이까지는 깎지 않는다.

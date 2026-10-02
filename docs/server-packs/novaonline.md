@@ -93,4 +93,4 @@ Hades 원본에 괴물이 3개뿐이라는 말은 맞다. 현재 작업본의 56
 
 사용자 결정: **「노바 것이 원작 이펙트다」.** 5.99 와 노바에 같은 이름으로 있는 기술·마법은 `effect` 의 그림 번호를
 노바 값으로 쓴다(동작·소리·확률·범위는 5.99 그대로). 노바가 읽는 파일은 `db/script/script_db.txt` 순서(`skill/*.txt`).
-`python3 scripts/build-nova-effects.py --쓰기` — 근거·목록은 `docs/martial-artist-skill-presentation.md` 6장.
+`python3 scripts/gen/ability/build-nova-effects.py --쓰기` — 근거·목록은 `docs/martial-artist-skill-presentation.md` 6장.

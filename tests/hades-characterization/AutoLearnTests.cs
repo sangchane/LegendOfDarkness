@@ -13,7 +13,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// 레벨이 되면 기술·마법을 저절로 익힌다 — 사범에게 가지 않아도(사용자 결정 2026-09-26).
 /// </summary>
 /// <remarks>
-/// 표는 노바 팩 1차 스킬상인이 가르치는 레벨과 전직 첫 기술이다(사용자 결정 2026-09-27, <c>scripts/build-auto-learn.py</c> →
+/// 표는 노바 팩 1차 스킬상인이 가르치는 레벨과 전직 첫 기술이다(사용자 결정 2026-09-27, <c>scripts/gen/ability/build-auto-learn.py</c> →
 /// 서버 <c>AutoLearnTable.cs</c>). 기준은 레벨·직업만. 레벨업 때 그 레벨의 것을, 로그인 때 이미 넘은 레벨의 빠진 것을 한꺼번에 준다.
 /// 5.99 사범만 가르치던 것(<c>AutoLearn.Withdrawn</c> — 주먹단련 …)은 로그인 때 그 직업 창에서 치운다.
 /// 2023 원작 표에서 같은 직업·같은 이름의 일반 기술·마법으로 확인된 것은 되살린다.

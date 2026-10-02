@@ -91,7 +91,7 @@ TDD: 바이트 시험 먼저(`0x01,0x02,0x47` 같은 값을 주면 그 차례로
 
 ### Task C: 머리 그림과 색
 
-**Files:** Create/Modify `scripts/build-client-hair.py` · `mobile/client/src/Palettes.cs` · 미리보기 부분
+**Files:** Create/Modify `scripts/gen/client/build-client-hair.py` · `mobile/client/src/Palettes.cs` · 미리보기 부분
 
 - **미리보기는 맨몸이다 (사용자, 2026-09-19)**: 옷·모자·신발을 **하나도 안 입은** 몸에 고른 머리만 얹는다.
   모자를 쓰고 있으면 머리가 가려져 고를 수가 없다. 지금 자리에 있는 `hero-walk.png` 는 머리 285번에 옷까지
@@ -118,6 +118,6 @@ TDD: 바이트 시험 먼저(`0x01,0x02,0x47` 같은 값을 주면 그 차례로
 - **명세 덮기**: 성별(A·B) · 머리 모양(A·B·C) · 머리색(A·B·C) · 실제로 만들어져 들어가는가(A·D).
 - **자리표시자**: 없음. 값은 전부 위 "사실" 절에 있다.
 - **남는 위험**:
-  - 머리 그림을 뽑는 도구가 100 이하 번호를 어떻게 다루는지 Task C 에서 확인해야 한다(`scripts/build-client-wardrobe.py` 가 본보기).
+  - 머리 그림을 뽑는 도구가 100 이하 번호를 어떻게 다루는지 Task C 에서 확인해야 한다(`scripts/gen/client/build-client-wardrobe.py` 가 본보기).
   - 미리보기 색을 런타임에 갈아 끼우는 것이 고도에서 얼마나 비싼지 모른다 — 72칸을 한꺼번에 그리지 말고 **고른 하나만** 그린다.
   - 여자 전용/남자 전용 번호(18·32·33) 때문에 성별을 바꾸면 고른 머리 번호가 없을 수 있다 — 그때 어떻게 할지 Task B 에서 정한다(가장 가까운 번호로 내리기 등).

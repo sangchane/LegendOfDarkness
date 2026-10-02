@@ -20,16 +20,16 @@
 - 멀리 있는 사람 아이폰에 앱 넣기: 공개 내려받기 페이지 `docs/download/`(https://lodgame.duckdns.org/download/) · 지침 `docs/sideloadly-install-guide.md`
 - **인게임 UI 다시 만들기(작업지침): `docs/mobile-ingame-ui-work-order.md`** — 로그인·생성 규칙 R1~R9, 돌 타일 버튼 지양
 - **기술·마법·이펙트·사운드 노바 정리 2차(안티그래비티 작업지시서): `docs/abilities-nova-work-order.md`** — 사용자 결정 D1~D9
-- 노바 클라이언트 이펙트 그림 가져오기(윈도우 세션 작업지시서): `docs/nova-client-work-order.md` · `.dat` 목록·비교 `scripts/dat-manifest.py`
+- 노바 클라이언트 이펙트 그림 가져오기(윈도우 세션 작업지시서): `docs/nova-client-work-order.md` · `.dat` 목록·비교 `scripts/gen/pack/dat-manifest.py`
 - 원작 우드랜드 확인(윈도우 세션 작업지시서): `docs/woodland-origin-work-order.md` — 지금 서버의 우드랜드는 5.99 팩이 새로 만든 판
 - 포테의숲(1~6존 · 보스존 개인 던전 · 수오미 건물 문 — 5.99 map_create 사본은 서버 `Systems/Instances`): `docs/pote-forest.md`
 - **서버팩 자료 — 방법·공통 규칙: `docs/server-pack-data.md`** (원작 자료와 별개)
   - 팩별 내용: `docs/server-packs/5.99-server.md` · `docs/server-packs/honden-community.md` · `docs/server-packs/novaonline.md`
-  - **팩 3개와 Hades 를 나란히 놓고 본 것: `docs/pack-comparison.md`** — 무엇을 팩에서 가져오고 무엇을 가져오면 안 되는가 (`python3 scripts/compare-packs.py`)
-- **`docs/index.html` = 「지금 무엇이 되나」** — 기능 39개 구현/미구현 · 괴물 스펙·드랍·경험치 · 기술 연출 · 워프 연결 · **원작과 달라진 것**. 숫자는 생성기가 뽑고, 낡으면 화면이 스스로 말한다 (`python3 scripts/build-data-freshness.py`)
+  - **팩 3개와 Hades 를 나란히 놓고 본 것: `docs/pack-comparison.md`** — 무엇을 팩에서 가져오고 무엇을 가져오면 안 되는가 (`python3 scripts/gen/pack/compare-packs.py`)
+- **`docs/index.html` = 「지금 무엇이 되나」** — 기능 39개 구현/미구현 · 괴물 스펙·드랍·경험치 · 기술 연출 · 워프 연결 · **원작과 달라진 것**. 숫자는 생성기가 뽑고, 낡으면 화면이 스스로 말한다 (`python3 scripts/gen/vault/build-data-freshness.py`)
 - **UI 테마 — 원작 4.51(5.01 이전) 을 쓴다: `docs/original-ui-451.md`** (원작 UI 92장 `docs/ui/original-451/` · 눌러볼 시안 `docs/ui/mockups-451/index.html`). **화면을 만들거나 고치면 여기 규칙표부터** — 돌 두 가지·글자 색·치수가 거기 있다
 - 서버 안정화 계획과 결과: `docs/hades-p0-stabilization-plan.md`
 - 화면에 「왜 낡았나」 같은 잡일은 넣지 않는다 — 생성기 출력으로.
 
 ## 검증
-- 현황판을 바꿨으면 `python3 scripts/build-data-freshness.py` 뒤 헤드리스로 `docs/index.html` 을 한 장 찍어 본다(보이는 브라우저 금지).
+- 현황판을 바꿨으면 `python3 scripts/gen/vault/build-data-freshness.py` 뒤 헤드리스로 `docs/index.html` 을 한 장 찍어 본다(보이는 브라우저 금지).

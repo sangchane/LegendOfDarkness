@@ -31,7 +31,7 @@
 
 - **[정할 것/마라디움이 초반 벌이의 절반을 넘는다]** 값을 절반으로 내린 뒤에도 노비스 한 마리 벌이의
   **55~65%**(팜팻 기준 56%)가 마라디움 하나다 — 금화 600, 잡템 363~1,033 인데 마라디움만 5,208 이다
-  (100마리 기준, `python3 scripts/build-pack-gold.py`). 첫 옷까지 10마리는 맞췄지만 **벌이가 시약
+  (100마리 기준, `python3 scripts/gen/items/build-pack-gold.py`). 첫 옷까지 10마리는 맞췄지만 **벌이가 시약
   하나에 얹혀 있다.** 금화나 잡템 쪽을 올려 기대는 데를 나누는 것이 맞는지 정해야 한다.
 
 - **[정할 것/매직파나·홀리파나가 1레벨에 180~200 피해]** 같은 1레벨 에페가 15~20 이다. 수오미 가이가
@@ -45,7 +45,7 @@
 - **[정할 것/코스튬·장신구는 도감 되돌림에서 뺐다]** 되돌린 것은 5.99 **무기·갑옷** 묶음뿐이다
   (+ 세줄금반지 값 하나). 장식 132장과 반지·귀걸이·목걸이·장갑·각반·허리띠·신발·방패·투구는 팩 값
   그대로다 — 묶음째 되돌리면 219장이 한꺼번에 움직이고 방금 문을 연 보석상 물목 21개가 전부 흔들린다.
-  필요해지면 `scripts/build-gear-from-original.py` 의 `VALUE_ONLY` 에 이름을 하나씩 적는다.
+  필요해지면 `scripts/gen/items/build-gear-from-original.py` 의 `VALUE_ONLY` 에 이름을 하나씩 적는다.
 
 - **[남음/사제 마법 19개가 이펙트를 아예 안 쏜다]** `ao cradh`·`ao beag cradh`·`ao mor cradh`·`ao ard cradh`·
   `ao puinsein`·`armachd`·`deo saighead`·`디나르콜룸`·`디소루미아`·`리젠(Lev1)`·`신성력강화`·`신의축복`·
@@ -72,7 +72,7 @@
   노바 실측(1→2 에 1.5 마리)에 맞춘 값이라 초반이 빠른 것이 의도다.
 
 - **[지금/5.99 전 직업 기술·마법]** 5.99 스크립트를 **문장 그대로 C# 으로 옮긴다**(사용자 지시: 5.99 기준으로 완성).
-  변환기 `python3 scripts/build-pack-abilities.py [--쓰기]` → `scripts/Pack599/{Skills,Spells}/<이름>.cs`.
+  변환기 `python3 scripts/gen/ability/build-pack-abilities.py [--쓰기]` → `scripts/Pack599/{Skills,Spells}/<이름>.cs`.
   명령의 뜻은 통역 한 곳 `scripts/Pack599/Pack599.cs` — 없는 명령은 서버를 멈추지 않고 로그만 남긴다.
   **157블록 중 136개를 옮기고 기본공격은 하데스 Assail 을 붙였다 — 131개는 명령이 다 있다**(무도가 기술 18개는 `build-monk-skills.py` 그대로, 정권 제외).
   시험 `Pack599AbilityTests`: 전사 내려치기 · 도적 찌르기 · 성직자 쿠라노(회복) · 법사 플레어 · 메테오(±7칸) 통과.
@@ -87,9 +87,9 @@
   마레노3(51) · 플라모3·4(각 32) · 나르콜리2·소루마2(각 22) · 마레노4(16) · 마레노2(8) · 아듀로·아듀로2 · 플라모2.
   **모바일 화면**: 사람·괴물이 칸 사이를 걷고, 기술 이펙트(0x29)·소리(0x19 와 체력바 0x13 끝 바이트)가
   나온다(2026-09-17, 녹화 프레임으로 확인 — `docs/mobile-client.md`). 기술·마법 **몸 동작**도 서버 번호대로 그린다
-  (`BodyMotion`, 부위별 b~f 시트 — `scripts/build-client-wardrobe.py`). **직업 동작은 직업 의상에서만 온전하다**(사용자) —
+  (`BodyMotion`, 부위별 b~f 시트 — `scripts/gen/client/build-client-wardrobe.py`). **직업 동작은 직업 의상에서만 온전하다**(사용자) —
   녹화해 보일 때는 직업 의상(`skill.tbl` ST)을 입힌다. 옷장(갑옷·무기·투구·방패·신발)은 서버 아이템 전부를 뽑았다
-  (`scripts/build-client-wardrobe.py`, 칸 120x96). 5.99 무기 111종이 서버 템플릿으로 들어왔다(`build-pack-equipment.py`).
+  (`scripts/gen/client/build-client-wardrobe.py`, 칸 120x96). 5.99 무기 111종이 서버 템플릿으로 들어왔다(`build-pack-equipment.py`).
   겹치는 순서는 5.99 `Legend.exe` 표 그대로(`Wardrobe.Rank`). **평타 동작은 5.99 서버처럼 무기 → 갑옷의 `공격모션` 으로 고른다**
   (`ItemTemplate.AttackMotion`·`Assail.BlowMotion`). 5.99 갑옷 225종도 들어와 도복 주먹·신발 금지가 된다
   (`build-pack-equipment.py`), 옷장 그림·아이콘까지. **상점·드롭은 2026-09-23 에 붙었다**(`build-town-gear-shops.py`·`build-gear-drops.py`).
@@ -105,7 +105,7 @@
   서버 프로그램은 저장소 밖 `~/Downloads/5.99 서버팩/Novaonline.exe` — `objdump -d --x86-asm-syntax=intel` 로 읽는다.
 
 - **[다음/무도가 기술 — 남은 틈]** 5.99 팩의 무도가 기술 19개 중 **정권을 뺀 18개**가 들어갔다(WORKLOG 2026-09-16).
-  생성기 `python3 scripts/build-monk-skills.py [--쓰기]` · 시험 `MonkLevelTenSkillTests`.
+  생성기 `python3 scripts/gen/ability/build-monk-skills.py [--쓰기]` · 시험 `MonkLevelTenSkillTests`.
   팩에 있는데 아직 안 옮긴 것:
 
   | 빠진 것 | 팩에서 |
@@ -169,7 +169,7 @@
   단추가 어디서나 열려 빠져나올 수 있다. ③ 아벨 바닥 일부(꽃밭)가 빨강·파랑 점으로 나온다 — 팔레트가
   도는 타일로 보인다, 그리기 쪽 일.
 
-- **[끝남·1단계/맵 세우기]** 노비스마을 · 건물 안 6 · 평원 A·B · 우드랜드1-1 은 바닥·건물·나무·벽을 클라이언트가 맞춰 그리고 벽으로는 내딛지 않는다(`scripts/build-client-maps.py`, WORKLOG 2026-09-17). **나머지 맵은 재료가 없어 바닥이 비어 나온다** — 2단계: 맵 번호를 넣어 더 뽑거나, 타일·그림 판을 맵끼리 나눠 써서 801맵 전부. 움직이는 그림(`stcani.tbl` 물·횃불)은 첫 장만. 새 캐릭터 시작 = 노비스마을 37,29(라이브 설정, 서버 재시작 필요).
+- **[끝남·1단계/맵 세우기]** 노비스마을 · 건물 안 6 · 평원 A·B · 우드랜드1-1 은 바닥·건물·나무·벽을 클라이언트가 맞춰 그리고 벽으로는 내딛지 않는다(`scripts/gen/client/build-client-maps.py`, WORKLOG 2026-09-17). **나머지 맵은 재료가 없어 바닥이 비어 나온다** — 2단계: 맵 번호를 넣어 더 뽑거나, 타일·그림 판을 맵끼리 나눠 써서 801맵 전부. 움직이는 그림(`stcani.tbl` 물·횃불)은 첫 장만. 새 캐릭터 시작 = 노비스마을 37,29(라이브 설정, 서버 재시작 필요).
 
   `SuomiTownTests` · `PoteDungeonTests`. 오솔길 함정은 5.99 역어셈블로 **혼수**(하데스 빈사)로 옮겼다. **남은 것**: 다른 지역 워프 레벨 범위(아벨 51~80 · 밀레스·VOD·광산 99 전용 — **시험을 끝낸 뒤 구현**, 사용자 2026-09-18) ·
   다른 5.99 개인 던전(튜토리얼·호러캐슬·엘리멘탈 — 같은 명령으로 돈다, 시험 안 함) — `docs/pote-forest.md`.

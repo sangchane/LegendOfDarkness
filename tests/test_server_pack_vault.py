@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))      # lib/ 이 거기 있다
 SPEC = importlib.util.spec_from_file_location(
-    "build_server_pack_vault", ROOT / "scripts" / "build-server-pack-vault.py"
+    "build_server_pack_vault", ROOT / "scripts" / "gen" / "pack" / "build-server-pack-vault.py"
 )
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)

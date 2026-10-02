@@ -56,7 +56,7 @@
   "5.99 와 같음/다름" 을 적는다.
 - `data/disassembly/excerpts/original-*.asm` — 근거 발췌(각 몇 KB).
 - `docs/disassembly.md` — "원작 클라이언트" 절을 더한다. 표 한 장: 항목 · 5.99 주소 · 원작 주소 · 같음/다름 · 메모.
-- 그래프를 다시 만든다: `scripts/build-disassembly-graph.py` 를 **graphify 가 깔린 파이썬으로** 돌린다(명령은 `docs/disassembly.md` 의 그래프 절). 그래프 산출물(`data/disassembly/graph/`)은 커밋하지 않는다.
+- 그래프를 다시 만든다: `scripts/gen/pack/build-disassembly-graph.py` 를 **graphify 가 깔린 파이썬으로** 돌린다(명령은 `docs/disassembly.md` 의 그래프 절). 그래프 산출물(`data/disassembly/graph/`)은 커밋하지 않는다.
 - `WORKLOG.md` 맨 위 History 에 한 줄 요약.
 
 ## 5. 지킬 것

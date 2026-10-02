@@ -6,7 +6,7 @@ namespace Lod.Mobile.Core.Art;
 /// </summary>
 public sealed record EffectLook(int Bottom, byte Red, byte Green, byte Blue)
 {
-    /// <summary>scripts/build-client-effects.py 가 쓰는 <c>effects-look.txt</c>: "번호 바닥줄 빨강 초록 파랑", '#' 줄은 설명.</summary>
+    /// <summary>scripts/gen/client/build-client-effects.py 가 쓰는 <c>effects-look.txt</c>: "번호 바닥줄 빨강 초록 파랑", '#' 줄은 설명.</summary>
     public static IReadOnlyDictionary<int, EffectLook> Read(string text)
     {
         Dictionary<int, EffectLook> looks = [];

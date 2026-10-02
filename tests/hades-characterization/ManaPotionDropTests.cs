@@ -22,9 +22,9 @@ public sealed class ManaPotionDropTests
 {
     /// <summary>
     /// 2026-09-26 전의 DropRate. 지금 값에 <see cref="DropBoost" />(1.5)를 곱한 것 — 실제 확률 — 이 그 <b>두 배 이상</b>이어야
-    /// 한다(같은 날 1.5배가 들어와, 한 괴물 합 80% 상한(<c>scripts/build-drop-cap.py</c>)을 지키려 마라디움 DropRate 를
+    /// 한다(같은 날 1.5배가 들어와, 한 괴물 합 80% 상한(<c>scripts/gen/items/build-drop-cap.py</c>)을 지키려 마라디움 DropRate 를
     /// 1.0 → 0.6667 로 내려도 실제 확률은 여전히 두 배다). 그 전 설명: — 같은 날 드랍 종류를 늘리며
-    /// (<c>scripts/build-drop-variety.py</c>) 목록 칸이 늘어난 만큼 <c>DropRate</c> 를 더 올려 실제 확률을
+    /// (<c>scripts/gen/items/build-drop-variety.py</c>) 목록 칸이 늘어난 만큼 <c>DropRate</c> 를 더 올려 실제 확률을
     /// 지켰으므로(하급마력 1.2 → 1.6 · 중급마력 1.2 → 1.5) 딱 두 배가 아니다.
     /// </summary>
     private static readonly (string Name, double Before)[] ManaPotions =
@@ -61,7 +61,7 @@ public sealed class ManaPotionDropTests
 
     /// <summary>
     /// 한 괴물이 뭐라도 떨굴 확률의 윗선 — 사용자 2026-09-26 "100% 나오는 건 좀 그렇다, 적당히 낮춰".
-    /// <c>scripts/build-drop-cap.py</c> 가 이 선 아래로 DropRate 를 누른다.
+    /// <c>scripts/gen/items/build-drop-cap.py</c> 가 이 선 아래로 DropRate 를 누른다.
     /// </summary>
     private const double DropCap = 0.80;
 
@@ -93,7 +93,7 @@ public sealed class ManaPotionDropTests
         }
 
         Assert.True(over.Count == 0,
-            $"뭐라도 떨굴 확률이 {DropCap:P0} 를 넘는 괴물(scripts/build-drop-cap.py 를 돌려라): {string.Join(", ", over)}");
+            $"뭐라도 떨굴 확률이 {DropCap:P0} 를 넘는 괴물(scripts/gen/items/build-drop-cap.py 를 돌려라): {string.Join(", ", over)}");
     }
 
     private static IEnumerable<string> Dropped(JsonNode monster)

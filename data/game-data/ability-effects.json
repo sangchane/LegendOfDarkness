@@ -1,5 +1,5 @@
 {
- "생성": "scripts/build-ability-effects.py",
+ "생성": "scripts/gen/ability/build-ability-effects.py",
  "출처": "data/server-packs/novaonline/db (기술 DB + 스크립트 본문)",
  "밑말": {
   "검투술": {

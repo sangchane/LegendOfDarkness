@@ -224,7 +224,7 @@ b는 0–13(14칸), c는 0–29(30칸), d는 0–17(18칸), e는 0–35(36칸), 
 - **자리:** 원작은 가로 x+55−28, 세로 y+10 에 칸의 left·top 을 더한다. 우리 옷장 칸(120x96)으로 옮기면 (+2, +2) 다 —
   표정 머리의 윤곽이 남녀 몸 앞모습의 머리와 한 점도 어긋나지 않는다.
 - `emot02`~`04` 는 같은 그림에 얼굴 장식(빨간 안경·파란 안경·물안경)을 그린 것이다. 얼굴 장식 C 번호가 32·31·30 이면 쓴다.
-- 구현: `Lod.Mobile.Core.Art.Emote` · `Actor.Show` · 그림 `python3 scripts/build-client-emotes.py`.
+- 구현: `Lod.Mobile.Core.Art.Emote` · `Actor.Show` · 그림 `python3 scripts/gen/client/build-client-emotes.py`.
 
 ---
 

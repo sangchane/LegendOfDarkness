@@ -1,4 +1,4 @@
-# 번호 바닥줄 빨강 초록 파랑 — scripts/build-client-effects.py (화면이 처음 쓸 때 훑던 것을 미리)
+# 번호 바닥줄 빨강 초록 파랑 — scripts/gen/client/build-client-effects.py (화면이 처음 쓸 때 훑던 것을 미리)
 1 68 255 255 255
 4 80 212 231 255
 5 74 255 208 150

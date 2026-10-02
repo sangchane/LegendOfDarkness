@@ -19,4 +19,4 @@ Hades 의 `database/server/metafile/SClass1~5` 가 원본이고, 팩(5.99)의 15
 
 아이콘 번호는 여기 없다. `data/archives-vault` 의 `Legend — skill.tbl` 을 본다.
 
-`python3 scripts/build-ability-vault.py` 로 다시 만든다.
+`python3 scripts/gen/ability/build-ability-vault.py` 로 다시 만든다.

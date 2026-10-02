@@ -6,12 +6,12 @@ namespace Lod.Hades.Characterization.Tests;
 /// <summary>
 /// 5.99 팩에서 들여온 무기·갑옷의 값은 **원작 도감이 정본이다**(사용자 결정, 2026-09-23). 팩은 같은 이름의
 /// 물건에 값을 다시 매긴 갈래다 — 갑옷 값을 계단으로 뭉갰고(전부 300 / 3,000 / 7,000 …), 방어를 깎았고,
-/// 레벨 칸을 한 칸씩 올렸다(도감 1·11·41·71·99 → 팩 1·21·51·81·99). `scripts/build-gear-from-original.py`
+/// 레벨 칸을 한 칸씩 올렸다(도감 1·11·41·71·99 → 팩 1·21·51·81·99). `scripts/gen/items/build-gear-from-original.py`
 /// 가 도감에 값이 적힌 칸만 되돌린다. 이 시험이 그 되돌림을 지킨다.
 /// </summary>
 /// <remarks>
 /// 도감은 <c>data/game-data/items-original-sheets.json</c> 의 <c>수치표</c> 5,722행이다
-/// (<c>docs/items/어둠템#1.xlsx</c> → <c>scripts/build-original-item-sheets.py</c>). 칸 이름은 짐작이 아니라
+/// (<c>docs/items/어둠템#1.xlsx</c> → <c>scripts/gen/items/build-original-item-sheets.py</c>). 칸 이름은 짐작이 아니라
 /// 서버팩과 맞대어 정한 것이고, 판매가격(열4)·공격력(열25)은 2026-09-23 에 혼든 77%·노바 72% 로 가렸다.
 /// </remarks>
 public sealed class OriginalItemValueTests
@@ -82,7 +82,7 @@ public sealed class OriginalItemValueTests
 
         Assert.True(checked_ > 150, $"도감에 이름이 있는 팩 무기·갑옷이 {checked_}장뿐입니다 — 159장이어야 합니다.");
         Assert.True(wrong.Count == 0,
-            $"도감과 어긋난 칸 {wrong.Count}개 (python3 scripts/build-gear-from-original.py --쓰기):\n  "
+            $"도감과 어긋난 칸 {wrong.Count}개 (python3 scripts/gen/items/build-gear-from-original.py --쓰기):\n  "
             + string.Join("\n  ", wrong.Take(40)));
     }
 
@@ -113,7 +113,7 @@ public sealed class OriginalItemValueTests
 
     /// <summary>
     /// 되돌리기가 **도감에 없는 칸**을 건드리면 안 된다. 평타 몸 동작·속도·그림은 팩 값이 유일한 근거이고,
-    /// <c>DropRate</c> 는 <c>scripts/build-gear-drops.py</c> 가 얹은 것이라 장비 생성기가 덮으면 사라진다.
+    /// <c>DropRate</c> 는 <c>scripts/gen/items/build-gear-drops.py</c> 가 얹은 것이라 장비 생성기가 덮으면 사라진다.
     /// </summary>
     [Fact]
     public void Reverting_left_the_columns_the_sheet_has_no_word_on_alone()
@@ -178,7 +178,7 @@ public sealed class OriginalItemValueTests
     /// 연 우드랜드 보석상(<c>보석상여주인@우드랜드입구#10,15</c>) 물목 22개 중 도감에 이름이 있는 21개가
     /// <b>하나도 빠짐없이</b> 거기 들어 있다 —
     /// 로오의반지 500→200 · 가죽방패 3,000→750 처럼 상점 값이 통째로 흔들린다. 그래서
-    /// <c>scripts/build-gear-from-original.py</c> 의 <c>VALUE_ONLY</c> 에 <b>이름을 적은 것만</b> 따라간다.
+    /// <c>scripts/gen/items/build-gear-from-original.py</c> 의 <c>VALUE_ONLY</c> 에 <b>이름을 적은 것만</b> 따라간다.
     /// </remarks>
     [Fact]
     public void The_gold_ring_the_mantis_drops_is_worth_what_the_sheet_says()
@@ -273,7 +273,7 @@ public sealed class OriginalItemValueTests
     {
         string path = Path.Combine(HadesWorkspace.RepositoryRoot, "data", "game-data", "items-original-sheets.json");
 
-        Assert.True(File.Exists(path), $"원작 도감이 없습니다: {path} (python3 scripts/build-original-item-sheets.py)");
+        Assert.True(File.Exists(path), $"원작 도감이 없습니다: {path} (python3 scripts/gen/items/build-original-item-sheets.py)");
 
         JsonNode sheet = JsonNode.Parse(File.ReadAllText(path))!;
         Dictionary<string, JsonNode> rows = new(StringComparer.Ordinal);

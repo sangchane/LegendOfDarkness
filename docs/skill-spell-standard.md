@@ -16,12 +16,12 @@
 ## 생성·검증
 
 ```bash
-python3 scripts/build-skill-spell-2023.py
-python3 scripts/build-skill-spell-2023-vault.py
-python3 scripts/build-skill-spell-2023-graph.py
-python3 scripts/build-ability-page-data.py
-python3 scripts/build-ability-standard.py
-python3 scripts/build-ability-standard.py --check
+python3 scripts/gen/ability/build-skill-spell-2023.py
+python3 scripts/gen/ability/build-skill-spell-2023-vault.py
+python3 scripts/gen/ability/build-skill-spell-2023-graph.py
+python3 scripts/gen/ability/build-ability-page-data.py
+python3 scripts/gen/ability/build-ability-standard.py
+python3 scripts/gen/ability/build-ability-standard.py --check
 ```
 
 2023 워크북의 볼트는 `data/skill-spell-2023-vault/`, Hades 613개 볼트는 `data/game-data/vault-abilities/`, 워크북 그래프는 `data/skill-spell-2023/graph/`에 각각 남는다. 관리 페이지의 무도가 표도 더 이상 XLSX를 직접 읽지 않고 `skills.json`의 `도가/ordinary` 행을 읽는다.

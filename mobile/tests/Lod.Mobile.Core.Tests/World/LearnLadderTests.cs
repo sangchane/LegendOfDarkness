@@ -11,7 +11,7 @@ namespace Lod.Mobile.Core.Tests.World;
 public sealed class LearnLadderTests
 {
     private const string Table = """
-        # tools: scripts/build-auto-learn.py
+        # tools: scripts/gen/ability/build-auto-learn.py
         # 직업	레벨	skill|spell	이름	그림
         5	11	skill	단각	2
         5	11	skill	이형환위	42

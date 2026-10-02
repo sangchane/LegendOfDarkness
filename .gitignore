@@ -41,25 +41,25 @@ graphify-out/
 data/game-data/vault/
 
 # 서버팩 자료 노트 — data/server-packs/extracted/*.json 에서 언제든 다시 만든다
-# (scripts/build-server-pack-vault.py)
+# (scripts/gen/pack/build-server-pack-vault.py)
 data/server-packs/vault/
 # ↑ 이것만 무시한다. 43MB · 파일 11,015개로 커서 저장소에 올리지 않는다.
 #
 # **나머지 볼트는 올린다.** 생성물이지만 볼트는 **읽으려고 만든 것**이고, 다른 기기에서
 # 다시 만들려면 포크 submodule·dotnet·PowerShell 이 필요하다 — 그걸 안 하려고 만든 것이
 # 볼트다. 합쳐 4.5MB · 파일 1,131개다:
-#   data/truth-vault/               자료가 어디서 오는가 (scripts/build-truth-vault.py)
-#   data/formula-vault/             세계가 굴러가는 식   (scripts/build-formula-vault.py)
-#   data/archives-vault/            아카이브 503표      (scripts/build-archive-vault.py)
-#   data/game-data/vault-abilities/ 원작 기술·마법 613   (scripts/build-ability-vault.py)
-#   data/ui-vault/                  원작 4.51 UI 와 테마 규칙 (scripts/build-ui-vault.py)
-#   data/drop-vault/                사냥터·괴물·아이템 드랍표 (scripts/build-drop-vault.py)
+#   data/truth-vault/               자료가 어디서 오는가 (scripts/gen/vault/build-truth-vault.py)
+#   data/formula-vault/             세계가 굴러가는 식   (scripts/gen/vault/build-formula-vault.py)
+#   data/archives-vault/            아카이브 503표      (scripts/gen/vault/build-archive-vault.py)
+#   data/game-data/vault-abilities/ 원작 기술·마법 613   (scripts/gen/ability/build-ability-vault.py)
+#   data/ui-vault/                  원작 4.51 UI 와 테마 규칙 (scripts/gen/vault/build-ui-vault.py)
+#   data/drop-vault/                사냥터·괴물·아이템 드랍표 (scripts/gen/items/build-drop-vault.py)
 data/server-packs/graph/
-# 역어셈블 그래프 — data/disassembly/findings.json 에서 언제든 다시 만든다 (scripts/build-disassembly-graph.py)
+# 역어셈블 그래프 — data/disassembly/findings.json 에서 언제든 다시 만든다 (scripts/gen/pack/build-disassembly-graph.py)
 data/disassembly/graph/
-# UI 테마 그래프 — data/original-ui/451.json 에서 언제든 다시 만든다 (scripts/build-ui-graph.py)
+# UI 테마 그래프 — data/original-ui/451.json 에서 언제든 다시 만든다 (scripts/gen/vault/build-ui-graph.py)
 data/original-ui/graph/
-# 드랍 그래프 — 괴물·아이템 템플릿에서 언제든 다시 만든다 (scripts/build-drop-vault.py --그래프)
+# 드랍 그래프 — 괴물·아이템 템플릿에서 언제든 다시 만든다 (scripts/gen/items/build-drop-vault.py --그래프)
 data/drop-vault/graph/
 
 # 2023 workbook JSON에서 언제든 다시 만드는 Graphify 산출물

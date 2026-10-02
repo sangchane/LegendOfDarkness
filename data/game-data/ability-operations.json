@@ -1,5 +1,5 @@
 {
-  "생성": "scripts/build-ability-operations-data.py",
+  "생성": "scripts/gen/ability/build-ability-operations-data.py",
   "설명": "현재 Hades templates 전체. 운영 override는 이펙트·속도·사운드만 바꾼다.",
   "목록": [
     {

@@ -1,7 +1,7 @@
 # 원작 우드랜드 — 어느 팩의 맵이 원작 파일인가
 
 - 기준일: 2026-09-25 (윈도우 세션, `docs/woodland-origin-work-order.md` 의 결과)
-- 만드는 법: `python scripts/compare-woodland-maps.py --원작4.51 <폴더> --원작2005 <폴더>`
+- 만드는 법: `python scripts/gen/world/compare-woodland-maps.py --원작4.51 <폴더> --원작2005 <폴더>`
 - 단일 출처: `data/map-origins/woodland-origins.json`
 
 ## 결론

@@ -162,7 +162,7 @@
 `templates/<갈래>/<이름>.json` 한 모양이다.
 
 ### 할 일
-`tools/pack-import/` 를 만든다 (Python, `scripts/build-server-pack-data.py` 와 같은 결).
+`tools/pack-import/` 를 만든다 (Python, `scripts/gen/pack/build-server-pack-data.py` 와 같은 결).
 
 - 입력: `extracted/<팩>/<갈래>.json` + 3단계 번호 표 · 출력: fork 의 `templates/` (맵은 `areas/`)
 - **갈래마다 다른 것은 칸 대응표 하나뿐.** 읽기·검사·쓰기·보고는 공용.

@@ -1,5 +1,5 @@
 {
- "생성": "scripts/build-ability-sprites.py",
+ "생성": "scripts/gen/ability/build-ability-sprites.py",
  "출처": "roh.dat — efct###.epf + eff###.pal (색표는 effpal.tbl, 기준점은 efct###.tbl)",
  "배율": 1,
  "연출": {

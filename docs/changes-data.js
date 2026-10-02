@@ -49,7 +49,7 @@ window.LOD_CHANGES = {
       전: "노비스 지역 괴물의 드랍 목록이 비어 있었다",
       후: "쿠룸(체력 +250·300전) · 마라디움(마력 +100·1000전)",
       왜: "둘 다 원작 시약인데 5.99 팩에 없다. 원작 이름을 쓴 유일한 팩인 혼든의 값을 그대로 썼다",
-      근거: ["scripts/build-novice-drops.py"],
+      근거: ["scripts/gen/items/build-novice-drops.py"],
     },
     {
       제목: "시약이 한 칸에 1000개 쌓인다",
@@ -59,7 +59,7 @@ window.LOD_CHANGES = {
       후: "MaxStack 1000",
       왜: "요즘 게임처럼 넉넉히 들게 한다(사용자, 2026-09-18)",
       풀림: "원작 한도를 되살리기로 하면 BUNDLE 한 줄이다",
-      근거: ["scripts/build-novice-drops.py:36"],
+      근거: ["scripts/gen/items/build-novice-drops.py:36"],
     },
     {
       제목: "노비스 괴물이 저레벨 직업 장비를 떨군다",
@@ -69,7 +69,7 @@ window.LOD_CHANGES = {
       후: "직업마다 무기 하나·옷 하나를 괴물마다 돌려 가며. 목록에서 뽑힐 확률 × 0.10",
       왜: "1레벨이 맨손으로 시작해 아무것도 못 바꾼다",
       풀림: "원작 노비스 드랍표가 나오면 통째로 갈아 끼운다",
-      근거: ["scripts/build-novice-drops.py — CLASS_GEAR·GEAR_RATE"],
+      근거: ["scripts/gen/items/build-novice-drops.py — CLASS_GEAR·GEAR_RATE"],
     },
     {
       제목: "노비스 괴물 마릿수 15",

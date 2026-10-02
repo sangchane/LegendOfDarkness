@@ -65,5 +65,5 @@
 ---
 
 단일 출처는 `data/original-ui/451.json` 이다. 이 볼트는 그것을 옮겨 적은 것이므로,
-새로 알게 된 것은 **JSON 에 적고** `python scripts/build-ui-vault.py` 로 다시 만든다.
-그래프는 `python scripts/build-ui-graph.py`.
+새로 알게 된 것은 **JSON 에 적고** `python scripts/gen/vault/build-ui-vault.py` 로 다시 만든다.
+그래프는 `python scripts/gen/vault/build-ui-graph.py`.

@@ -4,5 +4,5 @@
 # 거기 적으면 지워진다. 남기려면 이 파일에 적는다.
 #
 # 채우는 자리: 대시보드 → 아이템 도감 탭. 고친 뒤 [표로 내보내기] 로 받아 여기 붙여 넣는다.
-# 반영: python3 scripts/compare-packs.py && python3 scripts/build-item-page-data.py
+# 반영: python3 scripts/gen/pack/compare-packs.py && python3 scripts/gen/items/build-item-page-data.py
 영문	한글

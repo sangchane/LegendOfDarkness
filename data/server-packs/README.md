@@ -14,8 +14,8 @@
 `db/` 아래 `.txt`만 UTF-8로 변환한다. 기본 실행은 검사만 하는 dry-run이고, 실제 갱신에는 `--write`가 필요하다.
 
 ```powershell
-python scripts/import-server-pack-text.py sources/novaonline novaonline
-python scripts/import-server-pack-text.py sources/novaonline novaonline --write
+python scripts/gen/pack/import-server-pack-text.py sources/novaonline novaonline
+python scripts/gen/pack/import-server-pack-text.py sources/novaonline novaonline --write
 ```
 
 쓰기 전 모든 텍스트를 UTF-8-sig 디코더(일반 UTF-8과 BOM 포함 UTF-8), CP949 순서로 엄격하게 검사한다. 쓰기 시 `data/server-packs/novaonline/db/`만 비운 뒤 다시 만들며,

@@ -1,5 +1,5 @@
 {
-  "설명": "5.99 서버팩·5.99 한국 클라이언트·원작 4.51(2001) 클라이언트 실행 파일을 역어셈블해서 확인한 사실. 규칙마다 근거 주소가 있다. 그래프: python3 scripts/build-disassembly-graph.py",
+  "설명": "5.99 서버팩·5.99 한국 클라이언트·원작 4.51(2001) 클라이언트 실행 파일을 역어셈블해서 확인한 사실. 규칙마다 근거 주소가 있다. 그래프: python3 scripts/gen/pack/build-disassembly-graph.py",
   "갱신": "2026-09-18",
   "binaries": [
     {
@@ -1315,7 +1315,7 @@
         "0x45cdc2"
       ],
       "note": "노바 스크립트의 옛 번호(≤195)와 5.99 의 새 번호(232 이상)가 다른 것은 서버가 번호를 바꿔서가 아니다. 노바가 실제로 쓰는 값은 0~195 뿐이고 256 이상은 하나도 없다 — 1바이트 칸과 맞는다. 5.99 가 쓰는 299 같은 값은 1바이트에 안 들어가므로 5.99 엔진의 칸 너비는 따로 봐야 한다",
-      "implemented": "안 옮김 — scripts/build-nova-effects.py 가 번호만 바꿔 두었다"
+      "implemented": "안 옮김 — scripts/gen/ability/build-nova-effects.py 가 번호만 바꿔 두었다"
     }
   ],
   "comparisons": [

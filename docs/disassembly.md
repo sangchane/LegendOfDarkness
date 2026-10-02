@@ -27,7 +27,7 @@ objdump -d --x86-asm-syntax=intel Novaonline.exe > nova.asm     # 맥 기본 obj
 - **문자열 주소**(`push 4754284`)는 PE 섹션 표로 파일 위치를 구해 **CP949** 로 읽는다.
   Legend.exe: `.text 0x427000` · `.rdata 0x680000` · `.data 0x686000(파일 0x286000)` · `.data1 0x846000(파일 0x2c4000)`.
 - **칸 뜻은 읽는 쪽과 쓰는 쪽을 맞춰 푼다.** 스크립트 명령 401개가 읽고 쓰는 칸은
-  `data/server-packs/extracted/5.99-server/script-command-evidence.json`(`scripts/disasm-script-commands.py`)에 있다 —
+  `data/server-packs/extracted/5.99-server/script-command-evidence.json`(`scripts/gen/pack/disasm-script-commands.py`)에 있다 —
   `sosusin` 이 `+0x7C` 를 쓰고 능력치 재계산이 그 칸으로 공격력을 +40% 한다, 식으로 이어진다.
 - 서버 아이템 칸과 캐릭터 칸은 같은 오프셋이 다른 뜻이다(`item+0x1B` 공격모션 ≠ 캐릭터 `+0x1B`). 구조체를 헷갈리지 않는다.
 
@@ -136,13 +136,13 @@ objdump -d --x86-asm-syntax=intel Novaonline.exe > nova.asm     # 맥 기본 obj
 ## 그래프 다시 만들기
 
 ```bash
-~/.local/share/uv/tools/graphifyy/bin/python scripts/build-disassembly-graph.py
+~/.local/share/uv/tools/graphifyy/bin/python scripts/gen/pack/build-disassembly-graph.py
 ```
 
 노드(실행파일·함수·칸·표·패킷·규칙·비교·구현·명령·발췌)와 간선(들어있다·근거·읽는다·쓴다·만든다·보낸다·부른다·옮겼다)은
 `findings.json` 이 그대로 정한다 — LLM 으로 뽑지 않는다. 결과: `data/disassembly/graph/graph.html` · `GRAPH_REPORT.md`.
 
-윈도우에서는 `python scripts/build-disassembly-graph.py` 로 바로 된다(graphify 파이썬을 스스로 찾는다).
+윈도우에서는 `python scripts/gen/pack/build-disassembly-graph.py` 로 바로 된다(graphify 파이썬을 스스로 찾는다).
 
 **그래프에 묻기** — 기본 그래프는 저장소 전체 코드라 `--graph` 로 이 그래프를 가리킨다:
 

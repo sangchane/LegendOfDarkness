@@ -1,6 +1,6 @@
 # 드랍 볼트 — 무엇이 어디서 얼마나 떨어지나
 
-드랍 표는 따로 없다. 괴물 정의의 `Drops`·`LootType` 과 `Formulas/monsterexp.cs` 식이 합쳐진 것이 드랍 표다 — 이 볼트는 그것을 한 번 계산해 둔 것이다. 낡으면 `python3 scripts/build-drop-vault.py` 로 다시 만든다.
+드랍 표는 따로 없다. 괴물 정의의 `Drops`·`LootType` 과 `Formulas/monsterexp.cs` 식이 합쳐진 것이 드랍 표다 — 이 볼트는 그것을 한 번 계산해 둔 것이다. 낡으면 `python3 scripts/gen/items/build-drop-vault.py` 로 다시 만든다.
 
 사냥터 117개 · 괴물 569종 · 아이템 368종(몬스터가 떨구거나 상점이 파는 것만 — 아무도 안 쓰는 "하데스표" 변형 900여 종은 뺐다).
 

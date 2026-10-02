@@ -8,7 +8,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 5.99 기술 사범(`Npc_Skill.txt`)을 적힌 그대로 돌린 것(`scripts/build-pack-npcs.py` · `scripts/Pack599/PackNpc.cs`).
+/// 5.99 기술 사범(`Npc_Skill.txt`)을 적힌 그대로 돌린 것(`scripts/gen/world/build-pack-npcs.py` · `scripts/Pack599/PackNpc.cs`).
 /// 밀레스마을 가렌(`가렌@밀레스마을#52,46`, 스크립트 `가렌`)은 인사 두 마디 → 전사가 아니면 거절 → 메뉴
 /// "숏블레이드[5] …" → 설명 두 마디 → 레벨 확인 → `skill_add "숏블레이드"`. 플레이어가 "다음"을 누르고 메뉴를 골라야
 /// 이어지므로, 대화가 멈췄다 이어 가는지까지 본다.

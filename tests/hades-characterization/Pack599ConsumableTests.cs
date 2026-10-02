@@ -9,7 +9,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 5.99 서버팩의 소모품(물약·음식·귀환 주문서)을 하데스 아이템 템플릿으로 옮긴 것(`scripts/build-pack-consumables.py`).
+/// 5.99 서버팩의 소모품(물약·음식·귀환 주문서)을 하데스 아이템 템플릿으로 옮긴 것(`scripts/gen/items/build-pack-consumables.py`).
 /// 5.99 는 스크립트가 아니라 칸으로 움직인다 — `체력변화 +1000` 은 쓰면 체력이 그만큼 돌아오고, `이동맵 노비스마을`·
 /// `이동좌표 40,33` 은 쓰면 그리로 옮겨진다. 하데스는 스크립트 없는 아이템을 "쓸 수 없다"고만 해서 상점에서 사도 쓸모가 없었다.
 /// </summary>
@@ -60,7 +60,7 @@ public sealed class Pack599ConsumableTests : IDisposable
 
     /// <summary>
     /// 염색약은 칸이 아니라 아이템 사용 스크립트다(`script/Item/E.T.C.txt`: `set_haircolor 16; item_del "분홍색염색약", 1;`).
-    /// `scripts/build-pack-npcs.py` 가 기다리지 않는 블록을 `ITEM_이름` 아이템 스크립트로 옮기고, 템플릿이 사용펄숫으로 그것을 부른다.
+    /// `scripts/gen/world/build-pack-npcs.py` 가 기다리지 않는 블록을 `ITEM_이름` 아이템 스크립트로 옮기고, 템플릿이 사용펄숫으로 그것을 부른다.
     /// </summary>
     [Fact]
     public async Task A_hair_dye_colours_the_hair_and_takes_itself_away()

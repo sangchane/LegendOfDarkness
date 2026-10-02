@@ -99,7 +99,7 @@ public sealed partial class WorldView
     /// Stands up the map's buildings, trees and lamps, each picture on its own so a figure behind one is drawn under
     /// it and a figure in front over it — the camera sorts everything by height. Also takes the map's walls, so a
     /// step into one is not taken, and its floor tiles (<see cref="LayTiles" />). All of it comes from
-    /// <c>map&lt;번호&gt;.txt</c>, <c>-floor.png</c> and <c>-objects.png</c>, which <c>scripts/build-client-maps.py</c>
+    /// <c>map&lt;번호&gt;.txt</c>, <c>-floor.png</c> and <c>-objects.png</c>, which <c>scripts/gen/client/build-client-maps.py</c>
     /// draws out of the same .map file and sotp.dat the server reads.
     /// </summary>
     private void StandObjects(MapInfo map)

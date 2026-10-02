@@ -30,15 +30,15 @@ namespace Lod.Hades.Characterization.Tests;
 /// <para>
 /// <b>왜 사냥터마다 다른 장비인가.</b> 접미사(사람이름) 반지·목걸이는 11~12레벨 한 층뿐이다(하데스표
 /// 496종을 다 훑어도 이 계열은 5~16레벨 보석 등급이 전부다, <c>data/pack-compare/한글이름-검토.tsv</c>,
-/// <c>scripts/build-suffix-gear-ko.py</c>). 그래서 우드랜드3-4(11레벨 대)만 접미사 반지를 쓰고, 그 위
+/// <c>scripts/gen/items/build-suffix-gear-ko.py</c>). 그래서 우드랜드3-4(11레벨 대)만 접미사 반지를 쓰고, 그 위
 /// 세 사냥터는 이미 층이 있는 4원소 공격 속성 장비를 그 사냥터 레벨에 맞춰 쓴다(자세한 근거는
-/// <c>scripts/build-gear-drops.py</c> <c>TIERS</c> 주석).
+/// <c>scripts/gen/items/build-gear-drops.py</c> <c>TIERS</c> 주석).
 /// </para>
 /// <para>
 /// <b>용의발톱은 아무 데도 없어야 한다.</b> <c>LevelRequired 1</c> 에 피해 180~200, 값 0 이다 — 같은
 /// 아이템이 Novaonline 팩에서는 레벨제한 99 다. 1레벨이 주우면 초반이 통째로 무너진다.
 /// </para>
-/// <para>정의를 만드는 것은 <c>scripts/build-gear-drops.py</c> 다.</para>
+/// <para>정의를 만드는 것은 <c>scripts/gen/items/build-gear-drops.py</c> 다.</para>
 /// </remarks>
 public sealed class GearDropTests
 {
@@ -92,7 +92,7 @@ public sealed class GearDropTests
         Assert.True(wearing.Count == 0,
             $"초반 사냥터 괴물이 장비를 떨굽니다 ({wearing.Count} 줄): {string.Join(", ", wearing.Order())}. " +
             "저레벨은 잡템을 팔아 상점에서 사 입는 것이 원작 얼개입니다 — " +
-            "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
+            "python3 scripts/gen/items/build-gear-drops.py --쓰기 로 다시 만드세요.");
     }
 
     /// <summary>
@@ -131,9 +131,9 @@ public sealed class GearDropTests
     ];
 
     /// <summary>
-    /// 사냥터별로 레벨이 맞는 접미사·속성 장비 한 벌 — <c>scripts/build-gear-drops.py</c> <c>TIERS</c> 와
+    /// 사냥터별로 레벨이 맞는 접미사·속성 장비 한 벌 — <c>scripts/gen/items/build-gear-drops.py</c> <c>TIERS</c> 와
     /// 같은 목록에, 2026-09-26 드랍 종류를 늘리며 더한 한 벌(<see cref="DropVarietyTests"/>,
-    /// <c>scripts/build-drop-variety.py</c>)을 붙였다. 기본템은 여기 없으니 이 목록 밖의 장비가 보이면
+    /// <c>scripts/gen/items/build-drop-variety.py</c>)을 붙였다. 기본템은 여기 없으니 이 목록 밖의 장비가 보이면
     /// 아직 기본템이 남은 것이다.
     /// </summary>
     private static readonly Dictionary<int, string[]> GroundGear = new()
@@ -229,7 +229,7 @@ public sealed class GearDropTests
 
         Assert.True(stillBase.Count == 0,
             $"기본템이 아직 남은 사냥터 드롭 줄이 {stillBase.Count}개입니다: {string.Join(", ", stillBase.Order())}. " +
-            "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
+            "python3 scripts/gen/items/build-gear-drops.py --쓰기 로 다시 만드세요.");
         Assert.True(missing.Count == 0,
             $"레벨이 맞는 접미사·속성 장비가 없는 사냥터 괴물이 {missing.Count}마리입니다: {string.Join(", ", missing.Order())}.");
         Assert.True(outside.Count == 0,
@@ -315,7 +315,7 @@ public sealed class GearDropTests
                 $"{beast} 의 LootType 이 {boss["LootType"]} 입니다 — 확률을 세려면 Random({LootRandom}) 이어야 합니다.");
 
             // 실제 확률 = DropRate × 1.5(`monsterexp.cs` DropBoost, 2026-09-26). 1.5배 뒤 120% 라 한 괴물 합 80% 상한
-            // (`scripts/build-drop-cap.py`)이 DropRate 를 0.5333 으로 내렸고, 그 실제 확률이 팩이 적은 80% 그대로다.
+            // (`scripts/gen/items/build-drop-cap.py`)이 DropRate 를 0.5333 으로 내렸고, 그 실제 확률이 팩이 적은 80% 그대로다.
             Assert.Equal(rate, Math.Round(1.5 * ((double?)items[prize]["DropRate"] ?? 0), 3));
 
             // 도감 값. 떨어져도 못 끼면 떨어지지 않은 것과 같다.
@@ -372,7 +372,7 @@ public sealed class GearDropTests
         Assert.True(leftover.Count == 0,
             $"아무도 안 떨구는데 DropRate 가 남은 5.99 장비가 {leftover.Count} 종입니다: " +
             $"{string.Join(", ", leftover.Order())}. " +
-            "python3 scripts/build-gear-drops.py --쓰기 로 다시 만드세요.");
+            "python3 scripts/gen/items/build-gear-drops.py --쓰기 로 다시 만드세요.");
     }
 
     [Fact]
@@ -392,7 +392,7 @@ public sealed class GearDropTests
 
     /// <summary>
     /// 되살린 접미사 장비 넷을 원작 표 값과 맞대본다 — 표는
-    /// <c>data/game-data/items-original-sheets.json</c>(생성기 <c>scripts/build-suffix-gear-from-sheet.py</c>).
+    /// <c>data/game-data/items-original-sheets.json</c>(생성기 <c>scripts/gen/items/build-suffix-gear-from-sheet.py</c>).
     /// 넷 다 <c>Group</c> 이 <c>하데스표/...</c> 인 것만 골랐다 — 5.99 팩 자기 물건(<c>5.99표/...</c>)은
     /// 아래 <see cref="Sheet_never_touches_589_packs_own_gear"/> 가 따로 본다.
     /// </summary>
@@ -469,7 +469,7 @@ public sealed class GearDropTests
     /// </para>
     /// <para>
     /// 이 넷은 <see cref="Later" /> 목록 밖(아벨해안·카스마늄)이라 걸어 다니는 사냥터의 1~5% 잣대를 걸지
-    /// 않는다 — 팩이 적은 값을 그대로 믿는다. 정의를 만드는 것은 <c>scripts/build-gear-drops.py</c> 의
+    /// 않는다 — 팩이 적은 값을 그대로 믿는다. 정의를 만드는 것은 <c>scripts/gen/items/build-gear-drops.py</c> 의
     /// <c>FIELD_BOSSES</c> 다.
     /// </para>
     /// </remarks>

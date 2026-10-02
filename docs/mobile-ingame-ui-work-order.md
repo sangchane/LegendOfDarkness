@@ -59,7 +59,7 @@
 - 모든 버튼 스타일은 `mobile/client/src/Greybox.cs` 한 곳에서 나온다 → **거기부터 고치면 창 전체가 따라온다.**
 
 ## 3. 데이터부터 정리 (다음 세션 첫 단계)
-산출물: **`data/original-ui/451.json` 에 `인게임` 절을 더하고** `python3 scripts/build-ui-vault.py` 로 볼트(`data/ui-vault/`)를 다시 만든다.
+산출물: **`data/original-ui/451.json` 에 `인게임` 절을 더하고** `python3 scripts/gen/vault/build-ui-vault.py` 로 볼트(`data/ui-vault/`)를 다시 만든다.
 새 파일을 따로 만들지 않는다 — 단일 출처가 거기다.
 
 창마다 한 줄씩(아래는 출발점 — 칸은 **그림을 실제로 열어 보고** 채운다):

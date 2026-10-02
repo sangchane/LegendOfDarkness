@@ -13,13 +13,13 @@
 ## 만드는 순서
 
 ```
-python3 scripts/build-server-pack-data.py                        # db/ → JSON
-python3 scripts/build-server-pack-quests.py                      # 스크립트 → 퀘스트·이벤트
-python3 scripts/extract-script-commands.py <서버.exe> <팩>        # 실행파일 → 명령표
-python3 scripts/classify-script-names.py                         # 부르는 이름 갈래짓기
-.venv/bin/python scripts/disasm-script-commands.py <서버.exe> <팩>  # 기계어 → 증거
-python3 scripts/build-server-pack-vault.py                       # → Obsidian (팩마다 따로)
-python3 scripts/build-server-pack-graph.py                       # → 지식 그래프 (Windows도 자동 탐지)
+python3 scripts/gen/pack/build-server-pack-data.py                        # db/ → JSON
+python3 scripts/gen/pack/build-server-pack-quests.py                      # 스크립트 → 퀘스트·이벤트
+python3 scripts/gen/pack/extract-script-commands.py <서버.exe> <팩>        # 실행파일 → 명령표
+python3 scripts/gen/pack/classify-script-names.py                         # 부르는 이름 갈래짓기
+.venv/bin/python scripts/gen/pack/disasm-script-commands.py <서버.exe> <팩>  # 기계어 → 증거
+python3 scripts/gen/pack/build-server-pack-vault.py                       # → Obsidian (팩마다 따로)
+python3 scripts/gen/pack/build-server-pack-graph.py                       # → 지식 그래프 (Windows도 자동 탐지)
 ```
 
 마지막 증거 단계만 `capstone`·`pefile` 이 필요하다 (시스템 파이썬 금지, PEP 668):

@@ -9,10 +9,10 @@
 
 ## 0. 지금까지 된 것 (2026-09-26~27, 이미 클라우드 반영)
 
-- 기술·마법 **아이콘** = 노바 팩 `이미지` 번호 우선(`scripts/fill-ability-icons.py`).
+- 기술·마법 **아이콘** = 노바 팩 `이미지` 번호 우선(`scripts/gen/ability/fill-ability-icons.py`).
 - **이펙트 번호** = 노바 번호(원작 = 200 이하 옛 그림 — `docs/nova-client-work-order.md` 결과 절). 노바에 이펙트가 없으면 5.99 번호를 둔다(허공답보 68).
-  생성기 `scripts/build-nova-effects.py` — 바꾼 줄 끝에 `// 노바 이펙트(5.99: …)` 로 원래 값.
-- **자동 습득 표** = 노바 `db/script/스킬배우기.txt` 1차 스킬상인 + 전직 첫 기술(`scripts/build-auto-learn.py` →
+  생성기 `scripts/gen/ability/build-nova-effects.py` — 바꾼 줄 끝에 `// 노바 이펙트(5.99: …)` 로 원래 값.
+- **자동 습득 표** = 노바 `db/script/스킬배우기.txt` 1차 스킬상인 + 전직 첫 기술(`scripts/gen/ability/build-auto-learn.py` →
   서버 `src/Hades.Server.Base/Types/AutoLearnTable.cs` · 앱 `mobile/client/assets/world/auto-learn.txt`).
   노바 목록에 없는 5.99 기술 31개는 `AutoLearnTable.Withdrawn` 으로 로그인·레벨업 때 **치운다**(`AutoLearn.cs`).
 - 노바 기술 6개를 새로 옮김(`build-pack-abilities.py` 의 `FROM_NOVA`): 두번찌르기·마레네라·엑스마레나·디베노모·벨라르모·수페라벨라르모.
@@ -45,7 +45,7 @@
 - 검증: `AutoLearnTests` 에 "되살린 것은 치우지 않고 레벨이 되면 채운다" 시험을 더해 통과.
 
 ### T2. 이펙트 속도 전부 노바 (D2)
-- `scripts/build-nova-effects.py` 의 `KEEP_SPEED = {"쿠로토"}` 를 없애 쿠로토 속도를 노바 75 로(몸동작 90 과의 짝은 `docs/martial-artist-skill-presentation.md` 에 남긴다).
+- `scripts/gen/ability/build-nova-effects.py` 의 `KEEP_SPEED = {"쿠로토"}` 를 없애 쿠로토 속도를 노바 75 로(몸동작 90 과의 짝은 `docs/martial-artist-skill-presentation.md` 에 남긴다).
 - 무도가 템플릿 기술은 속도 칸이 없고 `database/server/scripts/Skills/…` 의 `MonkStrike`(Clobber.cs·beagsuainia.cs 근처)가 **100 을 박아** 보낸다.
   템플릿에 속도 칸(예: `TargetAnimationSpeed`)을 더하고 `MonkStrike` 가 그것을 읽게 한 뒤, 생성기가 노바 값을 적게 한다:
   구양신공·달마신공·마구때리기·붕신선각·연천단각·파천각 75 · 단각·붕각·선풍각 69 (`build-nova-effects.py` 가 보기로만 보여 주는 목록).
@@ -82,12 +82,12 @@
 ## 4. 공통 규칙
 
 - 자료는 **생성기로** 바꾼다(`--쓰기` 없으면 보기만). 생성기는 **더하고 고치기만** — 요청 없는 삭제 금지, `git stash`·`git checkout` 으로 되돌리기 금지.
-  `scripts/build-monk-skills.py` 는 다시 돌리면 손본 템플릿 값(단각 Cooldown 4 · 이형환위 7 · 일음지 TargetAnimation)을 되돌린다 — 돌리지 말거나 그 규칙을 먼저 생성기에 옮긴다.
+  `scripts/gen/ability/build-monk-skills.py` 는 다시 돌리면 손본 템플릿 값(단각 Cooldown 4 · 이형환위 7 · 일음지 TargetAnimation)을 되돌린다 — 돌리지 말거나 그 규칙을 먼저 생성기에 옮긴다.
 - 서버 C# 을 고치면 시험 전에 빌드: `dotnet build sources/wren11/Dark-Ages-Private-Server/src/Lorule.GameServer/Lorule.GameServer.csproj -c Debug`
   (격리 서버 시험은 그 `Staging/net9.0` 을 쓴다. `src/Hades.sln` 은 맥에서 윈도우 도구 때문에 실패).
 - 시험: `dotnet test tests/hades-characterization --filter "FullyQualifiedName~AutoLearn|FullyQualifiedName~Pack599|FullyQualifiedName~Monk|FullyQualifiedName~Kuroto|FullyQualifiedName~Login"`,
   앱 알맹이 `dotnet test mobile/tests/Lod.Mobile.Core.Tests`. 끝에 서버 시험 전체 한 번(≈40분).
-- 앱 자료가 바뀌면(`auto-learn.txt`, 아이콘) `python3 scripts/build-ability-icon-picker.py` 도 다시.
+- 앱 자료가 바뀌면(`auto-learn.txt`, 아이콘) `python3 scripts/gen/ability/build-ability-icon-picker.py` 도 다시.
 - 이 저장소에서 그냥 `git status` 는 submodule 을 훑다 멈춘다 — `git status --ignore-submodules=all` 또는 `git -C sources/<소유자>/<저장소> status`.
 - 보고·커밋 메시지는 한국어. 커밋은 Conventional Commits.
 

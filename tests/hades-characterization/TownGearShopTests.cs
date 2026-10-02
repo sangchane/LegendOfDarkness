@@ -16,7 +16,7 @@ namespace Lod.Hades.Characterization.Tests;
 ///
 /// 셋을 세운다 — `가이@수오미무기점#7,7`(무기) · `아돌@수오미방어구점#4,5`(갑옷) ·
 /// `보석상여주인@우드랜드입구#10,15`(장신구). 물목은 5.99 팩, 이름·그림·인사말은 혼든 팩,
-/// 자리는 혼든(수오미)과 5.99(우드랜드)의 spawn 줄이다 — `scripts/build-town-gear-shops.py`.
+/// 자리는 혼든(수오미)과 5.99(우드랜드)의 spawn 줄이다 — `scripts/gen/items/build-town-gear-shops.py`.
 /// 되돌리면(템플릿 세 장을 지우면) 아래 넷이 모두 실패한다.
 ///
 /// **값은 아이템 템플릿에서 읽는다.** 가격·레벨은 다른 작업이 원작 도감으로 되돌리는 중이라
@@ -247,7 +247,7 @@ public sealed class TownGearShopTests : IDisposable
 
     /// <summary>
     /// 41레벨 전사 무기 「액스」는 5.99 전사무기 목록에 없어 어디서도 못 샀다(사용자 2026-09-26 "액스를 상점에").
-    /// 수오미 가이가 원작 표 값(판매가격 6100)으로 판다 — `scripts/build-town-gear-shops.py` 원작무기.
+    /// 수오미 가이가 원작 표 값(판매가격 6100)으로 판다 — `scripts/gen/items/build-town-gear-shops.py` 원작무기.
     /// </summary>
     [Fact]
     public void The_suomi_weapon_smith_sells_the_level_41_axe_at_the_original_price()

@@ -9,8 +9,8 @@ namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
 /// 귀환(리콜). 원작: 마을 이름이 붙은 리콜은 그 마을의 정해진 자리로, 그냥 `리콜` 은 정해지지 않은 마을의 정해진 자리로 간다.
-/// 마을 이름 리콜은 `scripts/build-pack-consumables.py`(5.99 Recoll.txt → RecallArea·RecallX·RecallY, `Consumable`),
-/// 그냥 리콜은 `scripts/build-recall.py` 템플릿 + 서버 스크립트 `scripts/Items/Recall.cs` 의 `Villages` 가 움직인다.
+/// 마을 이름 리콜은 `scripts/gen/items/build-pack-consumables.py`(5.99 Recoll.txt → RecallArea·RecallX·RecallY, `Consumable`),
+/// 그냥 리콜은 `scripts/gen/world/build-recall.py` 템플릿 + 서버 스크립트 `scripts/Items/Recall.cs` 의 `Villages` 가 움직인다.
 /// </summary>
 public sealed class RecallTests : IDisposable
 {

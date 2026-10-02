@@ -51,7 +51,7 @@
 | `cious.dat` `lpz_dlg.txt` `lpz_lev1/2.txt` | 아직 안 봄 |
 | `seo2.dat` | **5.99 계보 타일 아카이브** (`mpspal.tbl`). 저장소에 이미 있다 |
 
-**목록을 통째로 만들어 두었다**: `python3 scripts/build-archive-vault.py` → `data/archives-vault/`
+**목록을 통째로 만들어 두었다**: `python3 scripts/gen/vault/build-archive-vault.py` → `data/archives-vault/`
 (Obsidian 으로 연다. `.dat` 11개 · 읽을 수 있는 표 **503개** · 내용과 꺼내는 법까지 노트마다 적혀 있다.)
 
 한 개만 볼 때: `dotnet run --project tools/dat-extract -c Release -- list <아카이브.dat>`
@@ -77,7 +77,7 @@
 그것을 근거로 팩을 베이스로 삼았는데, Hades 의 `database/assets/MetaFiles/ItemInfo0~3` 에
 **2,110개**가 있었다. 손으로 적은 표는 낡는다.
 
-셈은 `python3 scripts/build-truth-vault.py` → `data/truth-vault/` 가 **매번 다시 한다.**
+셈은 `python3 scripts/gen/vault/build-truth-vault.py` → `data/truth-vault/` 가 **매번 다시 한다.**
 갈래마다 "Hades 에 있나 / 원작에서 뽑아 둔 것 / 지금 실린 것 / 팩 일치 / 판정" 이 계산된다.
 
 **`MetaFiles/` 를 먼저 본다.** 원본 클라이언트가 읽는 데이터가 거기 있다:
@@ -134,7 +134,7 @@ JSON 한 장을 넣으면 붙는다 — 그게 NPC 대화를 여는 가장 짧�
 ## 기술·마법 — 실린 것과 도는 것은 다르다
 
 **개수는 맞는데 눌러도 아무 일이 없는 것이 대부분이다.** 셈은
-`python3 scripts/build-formula-vault.py` → `data/formula-vault/구현/` 이 매번 다시 한다.
+`python3 scripts/gen/vault/build-formula-vault.py` → `data/formula-vault/구현/` 이 매번 다시 한다.
 
 | | 실린 것 | 스크립트 붙음 | 빈 껍데기 |
 |---|---|---|---|
@@ -255,7 +255,7 @@ Map Templates Loaded: 3
 
 ## 수치는 표에 없다 — 돌려 보고 재 본 것
 
-`python3 scripts/build-formula-vault.py` → `data/formula-vault/` (Obsidian). 근거 줄과 재 본 값,
+`python3 scripts/gen/vault/build-formula-vault.py` → `data/formula-vault/` (Obsidian). 근거 줄과 재 본 값,
 그리고 그걸 지키는 시험이 노트마다 적혀 있다. **괴물 공격력 표를 찾지 마라 — 없다.**
 
 | 알아낸 것 | 그래서 |

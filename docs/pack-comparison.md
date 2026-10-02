@@ -1,6 +1,6 @@
 # 서버팩 3개와 Hades 를 나란히 놓고 본 것
 
-> 셈한 날 2026-09-14 · `python3 scripts/compare-packs.py` 가 매번 다시 센다.
+> 셈한 날 2026-09-14 · `python3 scripts/gen/pack/compare-packs.py` 가 매번 다시 센다.
 > 산출물: `data/pack-compare/summary.json` · `data/pack-compare/item-korean-names.json`
 > 손으로 적은 표는 이 저장소에서 여러 번 틀렸다. **여기 숫자는 전부 그 스크립트가 낸 것이다.**
 
@@ -169,7 +169,7 @@ Hades 아이템 978장을 그렇게 이어 등급을 매긴 결과:
 ## 다시 세는 법
 
 ```bash
-python3 scripts/compare-packs.py     # → data/pack-compare/
+python3 scripts/gen/pack/compare-packs.py     # → data/pack-compare/
 ```
 
 팩 수는 고정돼 있지 않다. `data/server-packs/extracted/` 에 팩을 더 넣으면 그대로 같이 센다.

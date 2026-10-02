@@ -7,7 +7,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// <summary>
 /// 사용자(2026-09-26) — 99레벨 이전 사냥터의 드랍 <b>종류</b>를 늘린다. 재료(잡템·괴물 부산물)는 늘리지 않고,
 /// 속성·접미사 장비와 포션만 더한다. 새 칸 때문에 기존 물건의 실제 확률이 떨어지지 않게 하고, 새 장비 한
-/// 종은 실제 확률 2%(1.5배 전)를 넘지 않는다. 정의를 만드는 것은 <c>scripts/build-drop-variety.py</c> 다.
+/// 종은 실제 확률 2%(1.5배 전)를 넘지 않는다. 정의를 만드는 것은 <c>scripts/gen/items/build-drop-variety.py</c> 다.
 /// </summary>
 /// <remarks>
 /// 실제 확률 = <c>DropRate × DropBoost(1.5) ÷ 목록 칸수</c>(<c>Formulas/monsterexp.cs</c> DetermineRandomDrop).

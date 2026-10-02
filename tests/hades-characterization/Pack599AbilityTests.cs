@@ -10,7 +10,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 5.99 서버팩의 기술·마법 스크립트를 C# 으로 옮겨(`scripts/build-pack-abilities.py`) 하데스에서 돌린 것.
+/// 5.99 서버팩의 기술·마법 스크립트를 C# 으로 옮겨(`scripts/gen/ability/build-pack-abilities.py`) 하데스에서 돌린 것.
 /// 직업마다 한 가지씩, 옮긴 문장과 통역(`Pack599.cs`)이 실제 게임에서 이어지는지를 본다.
 /// </summary>
 public sealed class Pack599AbilityTests : IDisposable

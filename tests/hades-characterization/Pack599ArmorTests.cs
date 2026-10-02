@@ -10,7 +10,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 5.99 서버팩의 갑옷을 하데스 아이템 템플릿으로 옮긴 것(`scripts/build-pack-equipment.py`). 도복은 공격모션 132 라
+/// 5.99 서버팩의 갑옷을 하데스 아이템 템플릿으로 옮긴 것(`scripts/gen/items/build-pack-equipment.py`). 도복은 공격모션 132 라
 /// 무기 없이 치면 주먹이 나가고(Novaonline.exe 0x4160f7 — 무기가 없으면 갑옷의 공격모션), 도복을 입고는 신발을 못
 /// 신는다(0x41cc49 · 0x41d387, 「신발이 불편하여 입을수가 없습니다.」).
 /// </summary>

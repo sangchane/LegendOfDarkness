@@ -11,7 +11,7 @@ namespace Lod.Mobile.Core.Art;
 /// cast at. It is what keeps an effect the size and place the original gave it: 일음지 (efct042) is a 13x13
 /// sparkle high up a 111x85 canvas, so anchored at 55,70 it plays above the head. Cut out on its own and scaled
 /// to a body it covered the whole target instead — which is what the screen did before the canvas was kept
-/// (scripts/build-client-effects.py, docs/disassembly.md 4.51 0x44ba04).
+/// (scripts/gen/client/build-client-effects.py, docs/disassembly.md 4.51 0x44ba04).
 /// </remarks>
 public sealed record EffectSheet(int Frames, int Wide, int Tall, int AnchorX, int AnchorY, IReadOnlyList<int> Order)
 {
@@ -42,7 +42,7 @@ public sealed record EffectSheet(int Frames, int Wide, int Tall, int AnchorX, in
     }
 
     /// <summary>
-    /// Reads what scripts/build-client-effects.py writes: "number drawings wide tall anchorX anchorY order…"
+    /// Reads what scripts/gen/client/build-client-effects.py writes: "number drawings wide tall anchorX anchorY order…"
     /// per line, '#' lines are notes.
     /// </summary>
     public static IReadOnlyDictionary<int, EffectSheet> Read(string text)

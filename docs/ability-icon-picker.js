@@ -1,5 +1,5 @@
 /* 무도가 아이콘 고르기 — 사용자가 그림을 보고 번호를 고르면, 바꾼 것만 글로 내준다(채팅에 붙여 넣으면 템플릿 Icon 을 고친다).
-   자료: ability-icon-picker-data.js (scripts/build-ability-icon-picker.py). 고른 것은 이 브라우저에만 기억한다. */
+   자료: ability-icon-picker-data.js (scripts/gen/ability/build-ability-icon-picker.py). 고른 것은 이 브라우저에만 기억한다. */
 (function () {
   "use strict";
 

@@ -1,4 +1,4 @@
-# 번호 칸수 바탕가로 바탕세로 기준x 기준y 순서 — scripts/build-client-effects.py (순서는 effect.tbl)
+# 번호 칸수 바탕가로 바탕세로 기준x 기준y 순서 — scripts/gen/client/build-client-effects.py (순서는 effect.tbl)
 1 4 111 85 55 70 0 1 2 3
 4 10 111 85 55 70 0 1 2 3 4 5 6 7
 5 5 111 85 55 70 0 1 2 3 4

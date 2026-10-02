@@ -12,7 +12,7 @@
 |---|---|---|
 | `docs/index.html` 기술·마법 화면 | 613개 원작 계보와 Hades 연출 표시 | 기술/마법이 필터 칩이고 운영 저장 기능이 없다 |
 | `docs/abilities.js` | 카드·샌드백 미리보기·소리 재생 | 브라우저 로컬 이름 수정만 가능하다 |
-| `scripts/build-ability-page-data.py` | 템플릿·스크립트에서 실제 전송 번호 추출 | 현재 Hades 템플릿 전체를 운영 목록으로 내지 않는다 |
+| `scripts/gen/ability/build-ability-page-data.py` | 템플릿·스크립트에서 실제 전송 번호 추출 | 현재 Hades 템플릿 전체를 운영 목록으로 내지 않는다 |
 | `NetworkClient.FlushAndSend` | 모든 서버 패킷의 직렬화 경계 | 기술·마법별 연출 override가 없다 |
 | `scripts/ops/cloud-server.sh` | 게임 서버 배포 | 정적 대시보드와 인증 운영 API를 다루지 않는다 |
 
@@ -87,7 +87,7 @@
 ## 참조 파일(Files Reference)
 
 - `docs/index.html`, `docs/abilities.js`, `docs/dashboard.css`
-- `scripts/build-ability-page-data.py`, `scripts/build-client-effects.py`
+- `scripts/gen/ability/build-ability-page-data.py`, `scripts/gen/client/build-client-effects.py`
 - `sources/wren11/Dark-Ages-Private-Server/src/Hades.Server.Base/Network/NetworkClient.cs`
 - `sources/wren11/Dark-Ages-Private-Server/src/Hades.Server.Base/Network/Game/GameServerHandlers.cs`
 - `sources/wren11/Dark-Ages-Private-Server/src/Hades.Server.Base/Types/Aisling.cs`

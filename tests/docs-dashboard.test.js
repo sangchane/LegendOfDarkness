@@ -316,7 +316,7 @@ test('map images still cover Novice, Porte, and Woodland behind the summary', ()
   const html = read('docs/index.html');
   const focus = read('docs/map-focus.js');
   const images = readBrowserGlobal('docs/map-images-data.js', 'MAP_IMAGES');
-  const builder = read('scripts/build-map-images.py');
+  const builder = read('scripts/gen/world/build-map-images.py');
 
   assert.match(html, /id="novice-village-focus"/);
   assert.match(html, /id="porte-forest-focus"/);

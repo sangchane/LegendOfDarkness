@@ -19,11 +19,12 @@
 
 ## 밸런스 수치 — 코드에 박힌 숫자
 
-2026-10-02 끝 — 무도가 기술 수치(마나·초·칸·체력 배율 등)는 모두 템플릿에 있다. `scripts/build-monk-skills.py` 가 쓰고 `MonkStrike` 는 읽기만 한다.
+2026-10-02 끝 — 무도가 기술 수치(마나·초·칸·체력 배율 등)는 모두 템플릿에 있다. `scripts/gen/ability/build-monk-skills.py` 가 쓰고 `MonkStrike` 는 읽기만 한다.
 
 ## 생성기 `scripts/`
 
+2026-10-02 파이썬 생성기를 `gen/<도메인>/` 으로 옮겼다. `godot.sh`·`godot-dotnet/` 은 `mobile/client/dotnet` 링크가 가리켜 못 옮긴다.
+
 | 무엇 | 지금 | 방향 |
 |---|---|---|
-| 폴더 | `lib/` `ops/` 까지 했다(2026-10-02). 나머지 생성기는 평평 | `gen/<도메인>/` 은 나중(가리키는 곳이 많다). `godot.sh`·`godot-dotnet/` 은 `mobile/client/dotnet` 링크가 가리켜 못 옮긴다 |
 | `build-client-creatures` | `tools/pack-import/import.py` 를 `importlib` 으로 읽는다 | `tools/` 를 고칠 때 |

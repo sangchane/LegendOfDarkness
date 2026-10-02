@@ -1,7 +1,7 @@
 # 원작 아이템 표 — 분류별
 
 사람이 원작에서 모아 둔 엑셀 다섯 장(`docs/items/*.xlsx`)을 분류별로 펴낸 것이다.
-`#1` 과 `#2` 는 같은 파일이라 하나만 읽는다. 다시 만들려면 `python3 scripts/build-original-item-sheets.py`.
+`#1` 과 `#2` 는 같은 파일이라 하나만 읽는다. 다시 만들려면 `python3 scripts/gen/items/build-original-item-sheets.py`.
 
 | 분류 | 아이템 | 파일 |
 |---|---|---|

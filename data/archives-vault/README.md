@@ -19,4 +19,4 @@
 | [[아카이브/seo2\|seo2.dat]] | 181 | 9 |
 | [[아카이브/setoa\|setoa.dat]] | 731 | 130 |
 
-표 503개. `python3 scripts/build-archive-vault.py` 로 다시 만든다.
+표 503개. `python3 scripts/gen/vault/build-archive-vault.py` 로 다시 만든다.
