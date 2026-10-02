@@ -10,6 +10,12 @@
 
 ## History (append; 최신이 위)
 
+### 2026-10-02 밤 — 생성기를 `scripts/gen/<도메인>/` 으로 (보류했던 폴더 정리)
+- 파이썬 생성기 80개를 `ability/ client/ items/ world/ pack/ vault/` 로 옮겼다. 머리에 `scripts/` 를 sys.path 에 넣는 두 줄(78개). 같이 읽는 모듈 셋과 `.ps1`·`.sh` 는 그대로.
+- 가리키던 경로 본 저장소 393곳·서버 주석 293곳(서버 커밋 `5bc2d2e67`)을 고쳤다. WORKLOG 옛 기록은 그대로 둔다.
+- 확인: 파이썬 시험 89개(원래 실패 1개 그대로) · 80개 모두 불러 보기(이 맥에 `openpyxl`·`pefile` 없는 둘 빼고 통과) · 현황판 생성기 8개 실행 · 대시보드 시험 25/26(원래 실패 그대로).
+- 알아 둘 것: 현황판 자료 6개(`abilities`·`monsters`·`npcs`·`region-warps`·`feature-map`·`data-freshness`)는 다시 돌리면 내용이 바뀐다 — 원래 낡아 있던 것이라 이번 커밋에는 안 넣었다.
+
 ### 2026-10-02 저녁 — 레벨업 점수 수정 클라우드 반영 · 무도가 기술 수치를 템플릿으로
 - `cloud-server.sh deploy` 로 StatRaise 수정(능력치 올리기 점수 구멍)을 클라우드에 올렸다.
 - 무도가 기술의 마나·지속 초·건너뛸 칸·체력 배율·마구때리기 계수를 `SkillTemplate` 필드로. `build-monk-skills.py` 가 템플릿에 쓰고 `MonkStrike` 는 읽기만. 수치는 그대로(재생성 diff 로 확인).
