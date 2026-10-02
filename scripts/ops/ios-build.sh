@@ -100,7 +100,7 @@ check() {
     if renew; then
         say "서명을 새로 받았습니다 — $(days_left)일 남았습니다."
     else
-        say "서명을 새로 받지 못했습니다 — 아이패드를 켜고 같은 Wi-Fi 에 두십시오."
+        say "서명을 새로 받지 못했습니다 — $LOGS/com.lod.iossign.log 를 보십시오."
     fi
 }
 
@@ -155,16 +155,20 @@ renew() {
     local device
     device="$(device_id)"
 
+    # 기기가 안 보여도 받는다 — 이미 등록된 기기(아이폰·아이패드)는 기기 없이 받아도 서명에 그대로 들어간다(2026-10-02 확인).
+    # 기기가 보일 때만 새 기기를 등록할 수 있다.
+    local destination="generic/platform=iOS"
     if [ -z "$device" ]; then
-        echo "기기가 보이지 않습니다 — 아이패드를 켜고 같은 Wi-Fi 에 두십시오." >&2
-        return 1
-    fi
+        echo "기기가 보이지 않습니다 — 등록된 기기로 서명만 새로 받습니다."
+    else
 
     # 서명 파일은 하드웨어 UDID 로 기기를 적는다. devicectl 의 번호(연결용)를 받았으면 UDID 로 바꾼다 —
     # 그대로 비교하면 늘 "프로필에 없다" 가 된다(2026-09-24).
     local udid
     udid="$(xcrun devicectl device info details --device "$device" 2>/dev/null | awk -F': ' '/• udid:/ {print $2; exit}')"
     [ -n "$udid" ] && device="$udid"
+    destination="id=$device"
+    fi
 
     # 아직 살아 있는 서명이 있으면 Xcode 가 그것을 다시 써서 날수가 늘지 않는다. 옆으로 치워 두고 새로 받는다
     # (지우지 않는다 — ~/LOD-backups/profiles-<날짜>).
@@ -176,18 +180,24 @@ renew() {
         mv "$old" "$keep/"
     fi
 
-    echo "기기 $device 로 서명을 받습니다..."
+    echo "서명을 받습니다(${destination})..."
     # **-scheme 이어야 한다.** -target 으로 부르면 xcodebuild 가 -destination 을 통째로 무시하고
     # ("Ignoring provided run destination because no scheme was passed") 기기를 등록하지 않는다.
     # 그래서 빌드는 성공하는데 프로필에는 옛 기기만 남아, 다른 기기에 넣으면 거절당했다 (2026-09-19).
     xcodebuild -project "$project" -scheme LodClient -configuration Debug \
-        -destination "id=$device" -allowProvisioningUpdates build > "$LOGS/ios-renew.log" 2>&1 || {
-        echo "실패했습니다 — $LOGS/ios-renew.log" >&2
+        -destination "$destination" -allowProvisioningUpdates build > "$LOGS/ios-renew.log" 2>&1 || {
+        # 치워 둔 옛 서명을 되돌린다 — 안 그러면 남은 날이 있어도 빌드까지 막힌다(2026-10-02 아침에 그랬다).
+        [ -n "$old" ] && [ -z "$(profile)" ] && cp -p "$keep/$(basename "$old")" "$PROFILES/"
+        if grep -q "No Accounts" "$LOGS/ios-renew.log"; then
+            echo "Xcode 의 애플 계정 로그인이 풀렸습니다 — Xcode → Settings → Accounts 에서 다시 로그인하십시오." >&2
+        else
+            echo "실패했습니다 — $LOGS/ios-renew.log" >&2
+        fi
         return 1
     }
 
     # 빌드가 성공해도 그 기기가 프로필에 들어갔는지는 별개다. 확인하지 않으면 "새로 받았습니다" 가 거짓말이 된다.
-    if ! profile_has_device "$device"; then
+    if [ -n "$device" ] && ! profile_has_device "$device"; then
         echo "빌드는 됐는데 기기 $device 가 프로필에 없습니다 — $LOGS/ios-renew.log" >&2
         echo "프로필에 든 기기: $(profile_devices | tr '\n' ' ')" >&2
         return 1
