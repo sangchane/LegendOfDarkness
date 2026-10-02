@@ -84,14 +84,13 @@
     if (entry.남음) { notes.append(text("dt", "", "남은 것"), text("dd", "", entry.남음)); }
     article.appendChild(notes);
 
-    var sources = text("div", "change-sources");
-    entry.근거.forEach(function (path) { sources.appendChild(text("code", "", path)); });
     if (entry.문서) {
+      var sources = text("div", "change-sources");
       var link = text("a", "quiet-link", entry.문서.replace(/^docs\//, "") + " →");
       link.href = entry.문서.replace(/^docs\//, "");
       sources.appendChild(link);
+      article.appendChild(sources);
     }
-    article.appendChild(sources);
     return article;
   }
 

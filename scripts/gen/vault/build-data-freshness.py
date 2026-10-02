@@ -61,7 +61,6 @@ SHEETS = [
         "data/game-data/ability-presentation.json", "data/legend-tables/skill.tbl"]),
     # 손으로 적는 자료는 생성기가 없다. 낡았는지는 사람만 안다 — 그래서 근거도 비운다.
     ("changes-data.js", None, []),
-    ("dashboard-data.js", None, []),
 ]
 
 

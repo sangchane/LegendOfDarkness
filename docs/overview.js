@@ -124,8 +124,20 @@
     if (chosenState && row.상태 !== chosenState) { return false; }
     if (chosenGroup && row.묶음 !== chosenGroup) { return false; }
     if (!query) { return true; }
-    var hay = [row.이름, row.묶음, row.서버설명, row.모바일설명, row.근거, row.메모].join(" ").toLocaleLowerCase("ko");
+    var hay = [row.이름, row.묶음, plain(row.서버설명), plain(row.모바일설명), plain(row.메모)].join(" ").toLocaleLowerCase("ko");
     return hay.indexOf(query) >= 0;
+  }
+
+  // 소스 위치(`GSH:278-360`, `HB/Types/Party.cs` 같은 것)는 화면에 싣지 않는다 — 원문 표(feature-map.md)에 있다.
+  function plain(value) {
+    return String(value || "")
+      .replace(/`[^`]*(?:\/|\.cs|\.json|:\d)[^`]*`/g, "")
+      .replace(/\(\s*(?:[·,]\s*)*\)/g, "")
+      .replace(/(?:\s*[·,]\s*){2,}/g, " · ")
+      .replace(/^[\s·,—-]+|[\s·,—(-]+$/g, "")
+      .replace(/`|\*\*/g, "")
+      .replace(/\s+([,.)])/g, "$1")
+      .replace(/\s{2,}/g, " ");
   }
 
   function card(row) {
@@ -142,9 +154,10 @@
     article.appendChild(verdicts);
 
     var detail = text("dl", "feature-detail");
-    if (row.서버설명) { detail.append(text("dt", "", "서버"), text("dd", "", row.서버설명)); }
-    if (row.모바일설명) { detail.append(text("dt", "", "모바일"), text("dd", "", row.모바일설명)); }
-    if (row.메모) { detail.append(text("dt", "", "메모"), text("dd", "", row.메모)); }
+    [["서버", row.서버설명], ["모바일", row.모바일설명], ["메모", row.메모]].forEach(function (pair) {
+      var said = plain(pair[1]);
+      if (said) { detail.append(text("dt", "", pair[0]), text("dd", "", said)); }
+    });
     if (detail.childElementCount) { article.appendChild(detail); }
     return article;
   }

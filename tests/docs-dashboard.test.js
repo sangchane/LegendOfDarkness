@@ -41,7 +41,8 @@ test('workspaces that no longer match the build are gone', () => {
   const html = read('docs/index.html');
 
   // 실제 화면과 동떨어져 있던 넷을 지웠다(사용자, 2026-09-19). 되살아나면 이 검사가 잡는다.
-  for (const view of ['system', 'flows', 'operations', 'prototypes']) {
+  // 게임 데이터 게시판·지식 그래프는 개발 도구라 뺐다(사용자, 2026-10-02).
+  for (const view of ['system', 'flows', 'operations', 'prototypes', 'knowledge', 'delivery']) {
     assert.doesNotMatch(html, new RegExp(`data-view="${view}"`), `${view} 화면이 되살아났다`);
   }
   // 목업 6장과 HUD 시안은 실제 Godot 화면과 전혀 달랐다.
@@ -50,18 +51,19 @@ test('workspaces that no longer match the build are gone', () => {
 
   // 지운 화면만 쓰던 CSS 도 함께 없앴다.
   const css = read('docs/dashboard.css');
-  for (const selector of ['.phase-track', '.ops-grid', '.inline-lab', '.hud-pad', '.component-catalog', '.flow-steps']) {
+  for (const selector of ['.phase-track', '.ops-grid', '.inline-lab', '.hud-pad', '.component-catalog', '.flow-steps',
+    '.knowledge-row', '.graphify-layout', '.obsidian-panel', '.command-box', '.sidebar-status', '.topbar-state']) {
     assert.doesNotMatch(css, new RegExp(selector.replace('.', '\\.') + '[{ ,]'), `${selector} 가 남아 있다`);
   }
 });
 
-test('dashboard avoids invented progress and names its evidence date', () => {
+test('dashboard avoids invented progress and stale status chips', () => {
   const html = read('docs/index.html');
 
   assert.doesNotMatch(html, /--value:\s*\d+%/);
   assert.doesNotMatch(html, /\d+\s*%\s*(완료|달성|진척)/);
-  assert.match(html, /근거 기준일/);
-  assert.match(html, /id="snapshot-generated-date"/);
+  // 옛 날짜·브랜치에 멈춰 있던 칸이다(사용자, 2026-10-02).
+  assert.doesNotMatch(html, /근거 기준일|현재 브랜치/);
 });
 
 test('dashboard applies the Toss-inspired light design token system', () => {
@@ -104,15 +106,6 @@ test('the primary workspace is consistently named dashboard', () => {
 
   assert.match(html, /LOD 개발 대시보드/);
   assert.doesNotMatch(html + script, /관제실/);
-});
-
-test('knowledge board covers game content and live-operation concerns', () => {
-  const data = require('../docs/dashboard-data.js');
-  const categories = new Set(data.knowledge.map((entry) => entry.category));
-
-  for (const required of ['skills', 'spells', 'characters', 'quests', 'operations']) {
-    assert.ok(categories.has(required), `missing ${required} knowledge category`);
-  }
 });
 
 test('feature map data carries every row of the prose table with a verdict', () => {
@@ -283,14 +276,12 @@ test('changes workspace separates restored values from ones we invented', () => 
     '레벨차 경험치 감산은 근거 없이 정한 값이라 반드시 적혀 있어야 한다');
 });
 
-test('world map separates regions, exact map search, and directional warps', () => {
-  const html = read('docs/index.html');
+test('world map model separates regions, exact map search, and directional warps', () => {
   const data = readBrowserGlobal('docs/world-map-data.js', 'WORLD_MAP_DATA');
   const world = require('../docs/world-map-model.js').create(data);
 
-  assert.match(html, /id="world-regions"/);
-  assert.match(html, /data-world-filter="isolated"/);
-  assert.match(html, /들어오는 길과 나가는 길/);
+  // 「전체 월드 탐색기 초안」은 뺐다(사용자, 2026-10-02). 모델은 맵 그림 보기가 쓴다.
+  assert.equal(fs.existsSync(path.join(root, 'docs/world-map.js')), false);
   assert.equal(world.clusters.length, data['요약']['덩어리']);
   assert.equal(world.search('죽음의마을1')[0].name, '죽음의마을1');
 
@@ -299,17 +290,6 @@ test('world map separates regions, exact map search, and directional warps', () 
   assert.ok(links.incoming.length > 0);
   assert.ok(links.outgoing.length > 0);
   assert.equal(world.status(deathVillage.id), 'both');
-});
-
-test('world map pins are touch and keyboard operable and data sources are labelled', () => {
-  const script = read('docs/world-map.js');
-
-  assert.match(script, /<button type="button" class="map-pin"/);
-  assert.match(script, /data-map-pin/);
-  assert.match(script, /Hades 서버/);
-  assert.match(script, /Hades 실제 맵/);
-  assert.doesNotMatch(script, /5\.99 팩 추출본/);
-  assert.doesNotMatch(script, /들어오기만 한다/);
 });
 
 test('map images still cover Novice, Porte, and Woodland behind the summary', () => {
@@ -339,34 +319,13 @@ test('map images still cover Novice, Porte, and Woodland behind the summary', ()
   assert.doesNotMatch(builder, /Downloads/);
 });
 
-test('knowledge graph panel exposes Graphify and Obsidian without obsolete stacked-PR UI', () => {
-  const html = read('docs/index.html');
-  const sources = html + read('docs/dashboard.js') + read('docs/dashboard-data.js') + read('scripts/generate-dashboard-snapshot.js');
-
-  assert.match(html, /Graphify 지식 그래프/);
-  assert.match(html, /Obsidian vault/);
-  assert.match(html, /Obsidian에서 열기/);
-  assert.match(html, /graphify-out\/GRAPH_REPORT\.md/);
-  assert.equal((html.match(/<iframe/g) || []).length, 1);
-  assert.match(html, /sandbox="allow-scripts"/);
-  assert.match(html, /aria-describedby="graphify-description"/);
-  assert.doesNotMatch(sources, /Graphite|gt\.ps1/i);
-});
-
-test('dashboard model normalizes views and filters knowledge without mutating data', () => {
+test('dashboard model normalizes views', () => {
   const model = require('../docs/dashboard-model.js');
-  const entries = Object.freeze([
-    Object.freeze({ title: '기본 공격', category: 'skills', summary: 'Assail' }),
-    Object.freeze({ title: '운영 로그', category: 'operations', summary: '관측성' }),
-  ]);
 
   assert.equal(model.normalizeView('monsters'), 'monsters');
   assert.equal(model.normalizeView('changes'), 'changes');
   assert.equal(model.normalizeView('prototypes'), 'overview');   // 지운 화면은 되돌려 보낸다
   assert.equal(model.normalizeView('unknown'), 'overview');
-  assert.deepEqual(model.filterKnowledge(entries, 'skills', ''), [entries[0]]);
-  assert.deepEqual(model.filterKnowledge(entries, 'all', '관측'), [entries[1]]);
-  assert.equal(entries.length, 2);
 });
 
 test('obsolete standalone screen experiment pages are removed', () => {

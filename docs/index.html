@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>LOD 개발 대시보드</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="dashboard.css?v=20261002b">
+  <link rel="stylesheet" href="dashboard.css?v=20261002c">
 </head>
 <body class="toss-surface">
 <a class="skip-link" href="#workspace">본문으로 건너뛰기</a>
@@ -21,18 +21,14 @@
       <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템 도감</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도·워프</button>
       <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
-      <button type="button" class="nav-item" data-view-target="knowledge"><span aria-hidden="true">▤</span>게임 데이터</button>
-      <button type="button" class="nav-item" data-view-target="delivery"><span aria-hidden="true">◇</span>지식 그래프</button>
       <button type="button" class="nav-item" data-view-target="download"><span aria-hidden="true">⤓</span>앱 내려받기</button>
     </nav>
-    <div class="sidebar-status"><span class="status-dot is-live" aria-hidden="true"></span><div><strong>근거 기준일</strong><span id="snapshot-generated-date">—</span></div></div>
   </aside>
 
   <div class="app-column">
     <header class="topbar">
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="sidebar">☰</button>
       <div class="crumb"><span>어둠의 전설 모바일 복원</span><strong id="view-label">지금 되는 것</strong></div>
-      <div class="topbar-state"><span class="status-dot is-warning" aria-hidden="true"></span><span>현재 브랜치</span><code id="snapshot-branch">—</code></div>
       <div class="session-box"><span class="badge" id="session-badge">보기 전용</span><button type="button" class="session-plain" id="account-button" aria-label="계정 관리" title="계정 관리" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span class="session-label">계정 관리</span></button><button type="button" class="session-button" id="session-button">로그인</button></div>
       <dialog class="account-dialog" id="account-dialog" aria-labelledby="account-title">
         <form id="account-form" method="dialog">
@@ -49,7 +45,6 @@
 
     <main id="workspace" tabindex="-1">
 
-
       <section class="view is-active" data-view="overview" aria-labelledby="overview-title">
         <div class="page-heading">
           <div>
@@ -64,7 +59,7 @@
 
         <div class="filterbar item-filterbar">
           <label class="visually-hidden" for="feature-search">기능 검색</label>
-          <input id="feature-search" type="search" placeholder="기능 이름·근거 경로로 찾기" autocomplete="off">
+          <input id="feature-search" type="search" placeholder="기능 이름으로 찾기" autocomplete="off">
           <div class="item-filter-row" role="group" aria-label="구현 상태"><span>상태</span><div class="item-chips" id="feature-states"></div></div>
           <div class="item-filter-row" role="group" aria-label="묶음"><span>묶음</span><div class="item-chips" id="feature-groups-filter"></div></div>
         </div>
@@ -106,7 +101,6 @@
         <p class="empty-state" id="monster-empty" hidden>조건에 맞는 괴물이 없어요. 필터를 지워 보세요.</p>
         <div class="item-hover" id="monster-hover" hidden aria-hidden="true"></div>
 
-        <aside class="notice" id="monster-rules"></aside>
       </section>
 
       <section class="view" data-view="npcs" aria-labelledby="npcs-title" hidden>
@@ -260,45 +254,6 @@
           </div>
         </details>
 
-        <details class="world-draft">
-          <summary>전체 월드 탐색기 초안 보기 — 맵 전체, 다른 세션이 만드는 중</summary>
-          <div class="world-draft-body">
-            <ol class="world-reading" aria-label="지도 읽는 순서">
-              <li><span>1</span><div><strong>연결 구역</strong><small>서로 오갈 수 있는 맵 묶음</small></div></li>
-              <li><span>2</span><div><strong>현재 맵</strong><small>가운데에서 출발점을 확인</small></div></li>
-              <li><span>3</span><div><strong>워프 방향</strong><small>들어오는 길과 나가는 길을 구분</small></div></li>
-            </ol>
-            <div id="world-summary" class="world-summary"></div>
-            <section class="world-regions-panel" aria-labelledby="world-regions-title">
-              <div class="world-section-heading">
-                <div><p class="eyebrow">Connected regions</p><h2 id="world-regions-title">연결 구역 구조도</h2></div>
-                <p>각 구역은 다른 구역과 끊겨 있습니다. 구역을 누르면 대표 맵부터 살펴봅니다.</p>
-              </div>
-              <div id="world-regions" class="world-regions" role="group" aria-label="연결 구역 선택"></div>
-            </section>
-            <div class="world-controls">
-              <div class="world-search-field">
-                <label class="world-search-label" for="world-search">맵 이름 또는 번호로 찾기</label>
-                <input id="world-search" type="search" placeholder="예: 밀레스마을, 20287" autocomplete="off">
-              </div>
-              <div id="world-filters" class="world-filters" aria-label="맵 표시 범위">
-                <button type="button" data-world-filter="connected" aria-pressed="true">연결된 맵</button>
-                <button type="button" data-world-filter="image" aria-pressed="false">지형 그림 있음</button>
-                <button type="button" data-world-filter="isolated" aria-pressed="false">미연결 맵</button>
-                <button type="button" data-world-filter="all" aria-pressed="false">전체</button>
-              </div>
-            </div>
-            <div class="world-body">
-              <article class="panel world-panel">
-                <div id="world-detail" class="world-detail" aria-live="polite"></div>
-              </article>
-              <aside class="world-side" aria-labelledby="world-results-title">
-                <div class="world-results-heading"><h2 id="world-results-title">맵 목록</h2><span id="world-result-count"></span></div>
-                <div id="world-list" class="world-list" role="group" aria-label="검색된 맵 선택"></div>
-              </aside>
-            </div>
-          </div>
-        </details>
       </section>
 
       <section class="view" data-view="changes" aria-labelledby="changes-title" hidden>
@@ -322,12 +277,6 @@
         <p class="empty-state" id="change-empty" hidden>조건에 맞는 항목이 없어요.</p>
       </section>
 
-      <section class="view" data-view="knowledge" aria-labelledby="knowledge-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Game knowledge</p><h1 id="knowledge-title">게임 데이터 게시판</h1><p>스킬·마법·캐릭터·퀘스트와 월드 데이터를 출처·확인 수준과 함께 관리합니다.</p></div><a class="quiet-link" href="current-system-analysis/05-game-data-locations.md">분석 원문 →</a></div>
-        <div class="filterbar" role="search"><label for="knowledge-search">게시판 검색</label><input id="knowledge-search" type="search" placeholder="이름, 설명, 소스 경로 검색" autocomplete="off"><div class="filter-chips" aria-label="분류 필터"><button type="button" class="chip is-active" data-category="all" aria-pressed="true">전체</button><button type="button" class="chip" data-category="characters" aria-pressed="false">캐릭터</button><button type="button" class="chip" data-category="skills" aria-pressed="false">스킬</button><button type="button" class="chip" data-category="spells" aria-pressed="false">마법</button><button type="button" class="chip" data-category="quests" aria-pressed="false">퀘스트</button><button type="button" class="chip" data-category="world" aria-pressed="false">월드</button><button type="button" class="chip" data-category="operations" aria-pressed="false">운영</button></div></div>
-        <p class="result-count" id="knowledge-count" aria-live="polite"></p><div class="knowledge-list" id="knowledge-list"></div><div class="empty-state" id="knowledge-empty" hidden><strong>일치하는 항목이 없습니다.</strong><p>검색어를 줄이거나 다른 분류를 선택해 보세요.</p></div>
-      </section>
-
       <section class="view" data-view="download" aria-labelledby="download-title" hidden>
         <div class="page-heading"><div><p class="eyebrow">Download</p><h1 id="download-title">앱 내려받기</h1><p>받는 사람에게는 공개 페이지 주소를 보내면 됩니다. 아이폰은 그 사람의 컴퓨터에서 Sideloadly 로, PC 는 압축만 풀고 실행합니다.</p></div></div>
         <div class="download-grid">
@@ -337,24 +286,14 @@
         </div>
       </section>
 
-      <section class="view" data-view="delivery" aria-labelledby="delivery-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Connected knowledge</p><h1 id="delivery-title">Graphify 지식 그래프</h1><p>코드와 문서의 연결을 한 화면에서 봅니다. 구현 위치를 찾을 때 씁니다.</p></div><div class="section-actions"><a class="quiet-link" href="../graphify-out/GRAPH_REPORT.md">분석 보고서 →</a><a class="quiet-link" href="../graphify-out/graph.html">전체 화면 →</a></div></div>
-        <div class="graphify-summary" aria-label="Graphify 생성 현황"><article><span>노드</span><strong id="snapshot-graphify-nodes">미확인</strong></article><article><span>관계</span><strong id="snapshot-graphify-links">미확인</strong></article><article><span>커뮤니티</span><strong id="snapshot-graphify-communities">미확인</strong></article><article><span>Obsidian 노트</span><strong id="snapshot-obsidian-notes">미확인</strong></article></div>
-        <div class="graphify-layout">
-          <article class="panel graph-panel"><div class="panel-heading"><div><p class="eyebrow">Interactive map</p><h2>프로젝트 연결망을 여기서 탐색</h2><p class="snapshot" id="snapshot-graphify-mode">표시 방식 확인 중</p></div><span class="badge badge-partial" id="snapshot-graphify-state" role="status">생성 결과 확인 중</span></div><p class="graph-intro" id="graphify-description">확대·이동·노드 선택으로 구현 위치와 문서 근거를 탐색합니다. 작은 화면에서는 그래프 안을 가로로 움직여 전체 작업면을 볼 수 있습니다. 생성 시각화는 마우스 중심이므로 키보드 사용자는 위 분석 보고서와 오른쪽 구현 위치 목록을 이용해 주세요.</p><div class="graph-frame-scroll" id="graphify-frame-shell"><iframe id="graphify-frame" title="LOD Graphify 지식 그래프" src="../graphify-out/graph.html" sandbox="allow-scripts" loading="lazy" tabindex="-1" aria-describedby="graphify-description"></iframe></div><p class="graph-unavailable" id="graphify-unavailable" role="status" hidden>이 환경에는 생성된 그래프 파일이 없습니다. 프로젝트에서 Graphify를 갱신한 뒤 스냅샷을 다시 생성해 주세요.</p></article>
-          <aside class="panel obsidian-panel"><p class="eyebrow">Linked notes</p><h2>Obsidian vault</h2><p>Graphify의 노드와 커뮤니티를 노트와 Canvas로 내보냈습니다. 처음에는 <code>graphify-out/obsidian</code> 폴더를 이름이 <code>obsidian</code>인 vault로 등록하면 양방향 링크로 탐색할 수 있습니다.</p><div class="obsidian-links"><a class="primary-button" href="obsidian://open?vault=obsidian&amp;file=graph.canvas">Obsidian에서 열기</a><a class="quiet-link" href="../graphify-out/obsidian/graph.canvas">Canvas 원본 →</a><a class="quiet-link" href="../graphify-out/obsidian/">vault 폴더 →</a></div><dl class="graph-sources" aria-label="현재 작업과 함께 발견된 구현 위치"><dt>월드 세션</dt><dd><code>mobile/src/Lod.Mobile.Core/World/WorldClient.cs</code></dd><dt>화면·대상</dt><dd><code>mobile/client/src/WorldView.cs</code></dd><dt>전투 표현</dt><dd><code>mobile/client/src/Actor.cs</code></dd><dt>인벤토리</dt><dd><code>mobile/client/src/PackPanel.cs</code></dd></dl><p class="snapshot" id="snapshot-graphify-date">생성 시각 미확인</p></aside>
-        </div>
-        <article class="command-box"><div><p class="eyebrow">Snapshot</p><h2>대시보드 상태 갱신</h2></div><code>node scripts/generate-dashboard-snapshot.js --verify</code><button type="button" data-copy-command="node scripts/generate-dashboard-snapshot.js --verify">복사</button></article>
-      </section>
-
     </main>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!-- 자료가 먼저, 그다음 모델, 마지막이 화면. overview.js 가 다른 화면의 셈까지 한 줄로 보여 주므로
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-data.js"></script><script src="dashboard-snapshot.js"></script>
+<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
-<script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="world-map.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>

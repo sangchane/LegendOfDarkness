@@ -267,21 +267,6 @@
     document.querySelector("#monster-shown").textContent = shown.length;
   }
 
-  function rules() {
-    var host = document.querySelector("#monster-rules");
-    host.replaceChildren();
-    host.append(text("strong", "", "이 화면의 숫자가 어디서 오나"));
-    var list = document.createElement("ul");
-    [data.규칙.드랍, data.규칙.금화, data.규칙.선공, data.규칙.감산근거].forEach(function (line) {
-      list.appendChild(text("li", "", line));
-    });
-    host.appendChild(list);
-    if (data.빈맵.length) {
-      host.appendChild(text("p", "", "괴물이 하나도 없는 맵 " + data.빈맵.length + "개: "
-        + data.빈맵.map(function (m) { return m.맵; }).join(" · ")));
-    }
-  }
-
   var slider = document.querySelector("#monster-level");
   var output = document.querySelector("#monster-level-out");
   slider.addEventListener("input", function () {
@@ -322,7 +307,6 @@
   window.LodDashboard.onViewShown(startTurning);
   document.addEventListener("visibilitychange", startTurning);
 
-  rules();
   render();
   startTurning();
 })();

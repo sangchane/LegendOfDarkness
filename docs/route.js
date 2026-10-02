@@ -103,8 +103,6 @@
       item.appendChild(el("p", "route-what",
         step["할일"] + " — 그림의 " + whereOn(info, doors) + ", 밝게 찍힌 "
         + doors.length + "칸 중 아무 데나 밟으면 넘어간다"));
-      item.appendChild(el("p", "route-where",
-        "칸 " + doors.map(function (d) { return d["칸"].join(","); }).join(" · ")));
     } else {
       // 지도가 아닌 칸(월드맵 창)이나 아직 그림을 안 뽑은 맵. 없는 것을 있는 척하지 않는다.
       item.appendChild(el("div", "route-shot is-empty",
