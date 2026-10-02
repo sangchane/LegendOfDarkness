@@ -8,7 +8,8 @@
   var media = window.LOD_ABILITY_MEDIA;
   if (!source || !media) { return; }
 
-  var rows = source["목록"] || [];
+  // 원작 표에만 있는 영어 이름 미구현 기술은 싣지 않는다(사용자, 2026-10-02) — 구현된 것은 영어 이름이어도 남긴다.
+  var rows = (source["목록"] || []).filter(function (row) { return row.구현 || /[가-힣]/.test(row.이름); });
   var effects = media["이펙트"] || [];
   var sounds = media["소리"] || media["사운드"] || [];
   var byKey = {};

@@ -66,8 +66,6 @@
       // 이름이 없으면 찾아보지도 못한다 — 두 숫자를 따로 세워야 화면이 거짓말을 안 한다.
       cells.push({ 이름: "기술·마법 스크립트", 값: abilities.요약.구현 + " / " + abilities.요약.서로다름,
         메모: "눌러서 보이는 것은 " + abilities.요약.연출셋다 + "개뿐", 화면: "abilities" });
-      cells.push({ 이름: "연출을 못 찾은 것", 값: abilities.요약.이름없어못찾음 + abilities.요약.표에없음,
-        메모: "대부분 한글 이름이 없어서다 — 원작에 연출 없는 기술은 없다", 화면: "abilities" });
     }
     if (monsters) {
       cells.push({ 이름: "괴물", 값: monsters.셈.이름 + "종",
