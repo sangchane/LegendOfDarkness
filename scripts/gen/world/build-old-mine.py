@@ -35,11 +35,9 @@ from pathlib import Path
 
 import sys as _sys, pathlib as _pathlib  # scripts/ 를 찾게 — lib/·graphify_runtime 이 거기 있다
 _sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[2]))
-from lib._paths import ROOT
+from lib._world import AREAS, EXP_PER_HP, LOOT_NONE, LOOT_RANDOM, MAPS, SERVER, WARPS, text, warp
 
 HONDEN = Path.home() / "Downloads" / "혼든커뮤니티팩2"
-SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
-AREAS, MAPS, WARPS = SERVER / "areas", SERVER / "maps", SERVER / "templates" / "warps"
 PACK_NAME = "공식길드전용던전"
 NAME = "구광산"
 FLAGS = 106240           # 하데스 기존 맵과 같은 값(tools/pack-import DEFAULT_MAP_FLAGS)
@@ -62,9 +60,7 @@ NOVA = {
 LAST_FLOOR = 29
 DMG_MIN = (2409, 5200)        # 1층(노바) → 29층(카스마늄)
 AC_DEEP = -70
-EXP_PER_HP = 1309240 / 450000 / 7.3
 GOLD_MINIMUM = 10000
-LOOT_RANDOM, LOOT_NONE = 1 << 1, 256        # Random 이어야 DropRate 가 굴러간다(GearDropTests). 금화는 깃발과 상관없이 늘 준다
 ITEMS = SERVER / "templates" / "items"
 DROP_RATE = 0.003             # × DropBoost 1.5 = 0.45% — 헬옷은 0.5% 도 안 된다(사용자 2026-10-02)
 DROPS = {
@@ -75,14 +71,6 @@ DROPS = {
     "헬소서러": ["헬소서러로브", "헬소서러후드", "헬소서리스로브", "매직베일"],
     "헬소서리스": ["헬클레릭로브", "헬클레릭후드", "홀리베일", "헬프리스트로브"],
 }
-
-
-def text(path):
-    raw = path.read_bytes()
-    try:
-        return raw.decode("utf-8")
-    except UnicodeDecodeError:
-        return raw.decode("cp949", errors="replace")
 
 
 def our_name(pack_name):
@@ -107,18 +95,6 @@ def hades_areas():
         data = json.loads(path.read_text(encoding="utf-8-sig"))
         out.append((path, data))
     return out
-
-
-def warp(src_name, src_id, at, dst_name, dst_id, to, level=1):
-    name = f"warp {src_name}({at[0]},{at[1]}) to {dst_name}({to[0]},{to[1]})"
-    return name, {
-        "ActivationMapId": src_id,
-        "Activations": [{"AreaID": src_id, "Location": {"X": at[0], "Y": at[1]}, "PortalKey": 0}],
-        "LevelRequired": level,
-        "To": {"AreaID": dst_id, "Location": {"X": to[0], "Y": to[1]}, "PortalKey": 0},
-        "WarpRadius": 0, "WarpType": "Map", "WorldResetWarpId": 0, "WorldTransionWarpId": 0,
-        "Description": None, "Group": None, "Name": name,
-    }
 
 
 def floor_of(name):

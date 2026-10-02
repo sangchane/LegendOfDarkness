@@ -62,6 +62,7 @@ MAPS = [
     20305, 20306, 20307, 20308,  # 마인 건물: 시약상점 · 여관 · 은행 · 제조상점
     20683,  # 죽음의마을입구5 — 마인마을 워프로 닿는다
     *range(20797, 20833),  # 구광산 대기실 + 1-1~29-1 (2026-10-02 사용자, scripts/gen/world/build-old-mine.py)
+    *range(20455, 20467),  # 뤼케시온해안 대기실·1-A~4-C (2026-10-02 사용자, scripts/gen/world/build-rucesion-coast.py)
 ]
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
