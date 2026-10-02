@@ -33,7 +33,18 @@
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="sidebar">☰</button>
       <div class="crumb"><span>어둠의 전설 모바일 복원</span><strong id="view-label">지금 되는 것</strong></div>
       <div class="topbar-state"><span class="status-dot is-warning" aria-hidden="true"></span><span>현재 브랜치</span><code id="snapshot-branch">—</code></div>
-      <div class="session-box"><span class="badge" id="session-badge">보기 전용</span><button type="button" class="session-button" id="session-button">로그인</button></div>
+      <div class="session-box"><span class="badge" id="session-badge">보기 전용</span><button type="button" class="session-plain" id="account-button" hidden>계정 관리</button><button type="button" class="session-button" id="session-button">로그인</button></div>
+      <dialog class="account-dialog" id="account-dialog" aria-labelledby="account-title">
+        <form id="account-form" method="dialog">
+          <h2 id="account-title">계정 관리</h2>
+          <p class="account-who">계정 <b>lod-admin</b> · 비밀번호를 바꾸면 다른 기기의 로그인은 모두 풀립니다.</p>
+          <label>지금 비밀번호<input type="password" id="account-current" autocomplete="current-password" required></label>
+          <label>새 비밀번호 <small>(8~64자)</small><input type="password" id="account-new" autocomplete="new-password" minlength="8" maxlength="64" required></label>
+          <label>새 비밀번호 한 번 더<input type="password" id="account-again" autocomplete="new-password" minlength="8" maxlength="64" required></label>
+          <p class="account-error" id="account-error" role="alert"></p>
+          <footer><button type="button" class="session-plain" id="account-cancel">닫기</button><button type="submit" class="session-button" id="account-save">바꾸기</button></footer>
+        </form>
+      </dialog>
     </header>
 
     <main id="workspace" tabindex="-1">

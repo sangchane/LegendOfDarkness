@@ -193,6 +193,21 @@ def valid_session(token, credential, now=None):
     return hmac.compare_digest(signature, wanted)
 
 
+def save_credential(path: Path, credential):
+    """비밀번호 파일을 통째로 바꾼다 — 반쯤 쓴 파일이 남지 않게 옆에 쓰고 이름을 바꾼다."""
+    handle, temporary = tempfile.mkstemp(prefix=".credential-", dir=path.parent)
+    try:
+        with os.fdopen(handle, "w", encoding="utf-8") as stream:
+            stream.write(credential + "\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
 def cookie_value(header, name):
     for part in (header or "").split(";"):
         key, _, value = part.strip().partition("=")
@@ -235,7 +250,7 @@ def safe_static_path(root: Path, request_path: str):
 
 class OpsHandler(BaseHTTPRequestHandler):
     """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
-    root = store = credential = states = throttle = None
+    root = store = credential = states = throttle = password_file = None
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
@@ -262,6 +277,9 @@ class OpsHandler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path == "/api/logout":
             self._json(200, {"ok": True}, cookie=f"{SESSION_COOKIE}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict")
+            return
+        if path == "/api/password":
+            self._change_password()
             return
         if path != "/api/login":
             self._json(404, {"error": "없는 API입니다."})
@@ -313,6 +331,40 @@ class OpsHandler(BaseHTTPRequestHandler):
             self._json(409, {"error": str(error), "current": self.store.read()})
         except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
+
+    # 계정 관리 — 로그인한 사람이 지금 비밀번호를 한 번 더 넣고 바꾼다(사용자 2026-10-02). 바꾸면 다른 기기의
+    # 로그인은 모두 풀린다(세션 서명이 비밀번호에서 나온다). 바꾼 사람에게는 새 쿠키를 준다.
+    def _change_password(self):
+        if not self._signed_in():
+            self._json(401, {"error": "로그인이 필요합니다."})
+            return
+        who = self._client()
+        if self.throttle.blocked(who):
+            self._json(429, {"error": "너무 여러 번 틀렸습니다. 10분 뒤에 다시 해 주세요."})
+            return
+        try:
+            body = self._body(1024)
+        except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            self._json(400, {"error": str(error)})
+            return
+        user = self.credential.split(":", 1)[0]
+        current = f"{user}:{body.get('current') or ''}"
+        if not hmac.compare_digest(hashlib.sha256(current.encode()).digest(),
+                                   hashlib.sha256(self.credential.encode()).digest()):
+            self.throttle.failed(who)
+            self._json(403, {"error": "지금 비밀번호가 맞지 않습니다."})
+            return
+        new = body.get("new")
+        if not isinstance(new, str) or not 8 <= len(new) <= 64 or any(c in new for c in "\r\n"):
+            self._json(400, {"error": "새 비밀번호는 8~64자로 해 주세요."})
+            return
+        credential = f"{user}:{new}"
+        if self.password_file:
+            save_credential(self.password_file, credential)
+        type(self).credential = credential
+        token = make_session(credential, REMEMBER_SECONDS)
+        self._json(200, {"ok": True},
+                   cookie=f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age={REMEMBER_SECONDS}")
 
     def _signed_in(self):
         # 쿠키(페이지) 또는 Basic 헤더(스크립트). 401 에 WWW-Authenticate 를 붙이지 않는다 — 붙이면 팝업이 뜬다.
@@ -386,9 +438,10 @@ class OpsHandler(BaseHTTPRequestHandler):
         print(f"{self.address_string()} {pattern % args}")
 
 
-def handler_for(root, store, credential, states=None, throttle=None):
+def handler_for(root, store, credential, states=None, throttle=None, password_file=None):
     return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
-                                           "states": states, "throttle": throttle or LoginThrottle()})
+                                           "states": states, "throttle": throttle or LoginThrottle(),
+                                           "password_file": password_file})
 
 
 def main():
@@ -406,7 +459,8 @@ def main():
     data = args.overrides.parent
     log = data / "changes.jsonl"
     stores = (OverrideStore(args.catalog, args.overrides, log), StateStore(data / "state", log))
-    server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1]))
+    server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1],
+                                                                     password_file=args.password_file))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

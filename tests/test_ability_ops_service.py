@@ -95,8 +95,10 @@ class LoginAndStateTests(unittest.TestCase):
         (root / "data").mkdir()
         store = SERVICE.OverrideStore(catalog, root / "data" / "overrides.json", self.log)
         states = SERVICE.StateStore(root / "data" / "state", self.log)
+        self.password_file = root / "data" / "credential"
+        self.password_file.write_text(self.CREDENTIAL + "\n", encoding="utf-8")
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), SERVICE.handler_for(
-            root / "www", store, self.CREDENTIAL, states))
+            root / "www", store, self.CREDENTIAL, states, password_file=self.password_file))
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         self.base = f"http://127.0.0.1:{self.server.server_address[1]}"
 
@@ -194,6 +196,27 @@ class LoginAndStateTests(unittest.TestCase):
         self.assertEqual(status, 400)
         status, _, _ = self.request("PUT", "/api/state/item-names", {"value": {"a": True}}, cookie=cookie)
         self.assertEqual(status, 400)
+
+    def test_signed_in_person_changes_the_password_and_old_logins_end(self):
+        old = self.login().split(";")[0]
+        status, _, _ = self.request("POST", "/api/password", {"current": "secret", "new": "newpass99"})
+        self.assertEqual(status, 401)  # 로그인 없이는 못 바꾼다
+        status, _, _ = self.request("POST", "/api/password", {"current": "wrong", "new": "newpass99"}, cookie=old)
+        self.assertEqual(status, 403)
+        status, _, _ = self.request("POST", "/api/password", {"current": "secret", "new": "short"}, cookie=old)
+        self.assertEqual(status, 400)
+        status, headers, _ = self.request("POST", "/api/password", {"current": "secret", "new": "newpass99"}, cookie=old)
+        self.assertEqual(status, 200)
+        fresh = headers["Set-Cookie"].split(";")[0]
+        self.assertEqual(self.password_file.read_text(encoding="utf-8"), "lod-admin:newpass99\n")
+        _, _, body = self.request("GET", "/api/session", cookie=old)
+        self.assertEqual(json.loads(body), {"signedIn": False})  # 다른 기기의 옛 로그인은 풀린다
+        _, _, body = self.request("GET", "/api/session", cookie=fresh)
+        self.assertEqual(json.loads(body), {"signedIn": True})
+        status, _, _ = self.request("POST", "/api/login", {"password": "secret"})
+        self.assertEqual(status, 401)
+        status, _, _ = self.request("POST", "/api/login", {"password": "newpass99"})
+        self.assertEqual(status, 200)
 
 
 if __name__ == "__main__":
