@@ -13,7 +13,7 @@
 ### 2026-10-02 — 내려받기 페이지 윈도우 PC판 탭 · 공개 앱에 시험 계정이 실렸던 것
 
 - 고도 내보내기에 Windows 설정 추가, `scripts/ops/windows-build.sh release` 로 만들어 `/download/LodClient-windows.zip` 에 올림(161MB, 윈도우 실기 실행은 못 봄). 페이지에 「아이폰 | 윈도우 PC」 탭(`#pc`), PC 설치 그림 4단계.
-- **`*.cfg` 를 통째 싣던 탓에 공개 .ipa 안에 `login.cfg`(monk 계정)가 들어 있었다**(iOS 앱은 안 읽지만 풀면 보인다). exclude_filter 로 빼고, 두 빌드 스크립트가 실렸으면 멈추게 함. 14:06 계정 빠진 .ipa 로 바꿔 올림 — 10:00 갱신이 치운 서명을 `~/LOD-backups/profiles-20261002/` 에서 되돌려 만들었다(10월 4일께 끝). Xcode 계정 목록은 아직 비어 있다 → 로그인 뒤 `LOD_DEVICE_ID=<기기> scripts/ops/ios-build.sh renew`. 계정 검사는 `grep -q` 면 pipefail 로 놓쳐서 끝까지 읽게 했다(시험으로 확인).
+- **`*.cfg` 를 통째 싣던 탓에 공개 .ipa 안에 `login.cfg`(monk 계정)가 들어 있었다**(iOS 앱은 안 읽지만 풀면 보인다). exclude_filter 로 빼고, 두 빌드 스크립트가 실렸으면 멈추게 함. 14:06 계정 빠진 .ipa 로 바꿔 올림 — 10:00 갱신이 치운 서명을 `~/LOD-backups/profiles-20261002/` 에서 되돌려 만들었다(10월 4일께 끝). 사용자가 Xcode 에 다시 로그인 → 기기 없이 `xcodebuild … -destination 'generic/platform=iOS' -allowProvisioningUpdates` 로 새 서명(10월 9일까지, 아이폰·아이패드 둘 다). 옛 서명은 백업 폴더로 치워야 새로 받는다. 계정 검사는 `grep -q` 면 pipefail 로 놓쳐서 끝까지 읽게 했다(시험으로 확인).
 
 ### 2026-10-02 — 레벨업 점수 구멍 둘 · 멀리 있는 사람용 내려받기 페이지
 
