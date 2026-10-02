@@ -32,6 +32,8 @@ public sealed class PartyTests : IDisposable
     public async Task Asked_accepted_talked_shared_and_left()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: Plain);
+        // 무작위 괴물을 쫓으면 파티원 시야 밖으로 나가거나 기다리는 사람이 혼수에 빠져 프로필이 거절된다.
+        ExperienceNoticeTests.StandOneAtTheDoor(server, Plain.Map, new Tile(Plain.X, Plain.Y - 1));
         server.Start(TimeSpan.FromMinutes(2));
 
         LoginFlow.TryCreateAccount(server, Leader);
@@ -102,6 +104,7 @@ public sealed class PartyTests : IDisposable
         await Waiting.Until(() => leadHeard.Any(line => line.Text == "그룹 해체"),
             "그룹이 흩어졌다는 말을 듣지 못했습니다.", _deadline.Token);
 
+        Assert.DoesNotContain(mate.Ailments, ailment => ailment.Icon == 89);
         await Roster(lead);
         await Roster(mate);
         Assert.False(lead.Roster.Grouped);
@@ -118,53 +121,25 @@ public sealed class PartyTests : IDisposable
     {
         int before = world.RosterCount;
         await world.AskProfileAsync(_deadline.Token);
-        await Waiting.Until(() => world.RosterCount > before, "프로필(0x39)이 오지 않았습니다.", _deadline.Token);
+        await Waiting.Until(() => world.RosterCount > before,
+            $"프로필(0x39)이 오지 않았습니다. 체력 {world.Vitals?.Health}/{world.Vitals?.MaximumHealth} · 서버: {world.Said}",
+            _deadline.Token);
     }
 
     /// <summary>
-    /// 가장 가까운 괴물에게 걸어가 때린다 — 곁에 오면 돌아서서 치고, 아니면 한 칸 다가간다. 막히면 옆으로 한 칸.
+    /// 두 파티원 앞에 세운 표적을 잡는다 — 무작위 사냥 경로가 경험치 공유 범위를 결정하지 않게 한다.
     /// </summary>
     private async Task Hunt(WorldClient world, Func<bool> done)
     {
-        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromMinutes(3);
-        int turn = 0;
-
-        while (!done())
+        await Waiting.Until(() => world.Creatures.Any(c => c.Kind == CreatureKind.Hostile),
+            "파티 경험치 표적이 서지 않았습니다.", _deadline.Token);
+        for (int swings = 0; swings < 120 && !done(); swings++)
         {
-            if (DateTime.UtcNow > giveUp)
-            {
-                throw new TimeoutException($"3분 안에 괴물을 잡아 그룹원에게 경험치가 가지 않았습니다. 서버가 한 말: {world.Said}");
-            }
-
-            if (world.State?.Where is not { } here ||
-                world.Creatures.Where(c => c.Kind == CreatureKind.Hostile)
-                    .OrderBy(c => Math.Abs(c.Where.X - here.X) + Math.Abs(c.Where.Y - here.Y))
-                    .FirstOrDefault() is not { } prey)
-            {
-                await world.RefreshAsync(_deadline.Token);
-                await Task.Delay(500, _deadline.Token);
-                continue;
-            }
-
-            int dx = prey.Where.X - here.X;
-            int dy = prey.Where.Y - here.Y;
-            Direction toward = Math.Abs(dx) >= Math.Abs(dy)
-                ? dx > 0 ? Direction.East : Direction.West
-                : dy > 0 ? Direction.South : Direction.North;
-
-            if (Math.Abs(dx) + Math.Abs(dy) == 1)
-            {
-                await world.TurnAsync(toward, _deadline.Token);
-                await world.AttackAsync(_deadline.Token);
-                await Task.Delay(700, _deadline.Token);
-                continue;
-            }
-
-            // 막혀 제자리면 옆으로 비킨다.
-            Direction step = turn++ % 5 == 4 ? (Direction)(((int)toward + 1) % 4) : toward;
-            await world.WalkAsync(step, _deadline.Token);
-            await Task.Delay(450, _deadline.Token);
+            await world.TurnAsync(Direction.North, _deadline.Token);
+            await world.AttackAsync(_deadline.Token);
+            await Task.Delay(700, _deadline.Token);
         }
+        Assert.True(done(), $"표적을 잡아도 그룹원에게 경험치가 가지 않았습니다. 서버: {world.Said}");
     }
 
     private async Task<(WorldSession Session, WorldClient World, Heard Heard)> Enter(IsolatedHadesServer server, string who)

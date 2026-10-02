@@ -102,8 +102,8 @@ public sealed class OtherGearWindowTests : IDisposable
         await wear.UseAsync(boots!.Slot, _deadline.Token);
         await Waiting.Until(() => wear.Worn.Any(gear => gear.Slot == 13), "신발을 신지 못했습니다.", _deadline.Token);
 
-        // 같은 칸에 서 있으면 장비 그림이 그 사람을 가려 누를 수 없다 — 서·남으로 번갈아 걸어 화면 왼쪽으로 비켜 세운다.
-        foreach (Direction step in new[] { Direction.West, Direction.South, Direction.West, Direction.South, Direction.West, Direction.South })
+        // 세 칸씩은 장비 그림 뒤에 남는다. 다섯 칸씩 비켜 창과 방향판 사이에서 누른다.
+        foreach (Direction step in Enumerable.Repeat(new[] { Direction.West, Direction.South }, 5).SelectMany(pair => pair))
         {
             await wear.WalkAsync(step, _deadline.Token);
             await Task.Delay(500, _deadline.Token);
@@ -135,7 +135,8 @@ public sealed class OtherGearWindowTests : IDisposable
         await app.WaitForExitAsync(_deadline.Token);
 
         Assert.True(File.Exists(shot), "사진이 남지 않았습니다.");
-        Assert.Contains($"GREYBOX_LOOK {Wearer} 소지품 닫힘", await said, StringComparison.Ordinal);
+        string output = await said;
+        Assert.True(output.Contains($"GREYBOX_LOOK {Wearer} 소지품 닫힘", StringComparison.Ordinal), output);
     }
 
     private async Task<OtherProfile> Press(WorldClient world, uint serial)

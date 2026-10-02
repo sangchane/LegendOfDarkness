@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Model;
@@ -200,6 +201,8 @@ public static class LayoutCheck
             wrong.AddRange(await Measure(host, screen, gear));
         }
 
+        wrong.AddRange(ItemDetailsRefresh(screen));
+
         foreach (string complaint in wrong)
         {
             GD.Print($"GREYBOX_LAYOUT_BAD {complaint}");
@@ -208,6 +211,40 @@ public static class LayoutCheck
         GD.Print(wrong.Count == 0 ? "GREYBOX_LAYOUT_OK" : $"GREYBOX_LAYOUT_BAD {wrong.Count}건");
 
         host.GetTree().Quit(wrong.Count == 0 ? 0 : 1);
+    }
+
+    /// <summary>그림·칸·개수는 그대로인 교체도 이름·수치·장착 비교를 갱신해야 한다.</summary>
+    private static IEnumerable<string> ItemDetailsRefresh(GameScreen screen)
+    {
+        PackPanel pack = (PackPanel)screen.Parts.First(part => part.Name == "인벤토리").Part;
+        GearPanel gear = (GearPanel)screen.Parts.First(part => part.Name == "장비").Part;
+        List<InventoryItem> carried = PretendPack.ToList();
+        List<WornItem> worn = PretendWorn.ToList();
+        List<string> wrong = [];
+        static bool Has(Control panel, string text) => panel.FindChildren("*", "Label", true, false)
+            .OfType<Label>().Any(label => label.Text.Contains(text));
+
+        pack.Worn = worn;
+        pack.Show(carried);
+        pack.PickNth(1);
+        pack.Show(carried);
+        carried[0] = carried[0] with { Name = "가방 교체 검사", Stats = carried[0].Stats! with { Str = 73 } };
+        pack.Show(carried);
+        if (!Has(pack, "가방 교체 검사") || !Has(pack, "73")) wrong.Add("같은 그림 소지품의 이름·수치가 갱신되지 않음");
+
+        worn[1] = worn[1] with { Called = "착용 비교 교체 검사" };
+        pack.Show(carried);
+        if (!Has(pack, "착용 비교 교체 검사")) wrong.Add("가방 정보의 착용 비교가 갱신되지 않음");
+
+        Vector2 room = screen.GetViewportRect().Size;
+        gear.Show(worn, PretendVitals, 5, PretendName, true, room);
+        ((Button)gear.FindChild("Slot13", true, false)).EmitSignal(BaseButton.SignalName.Pressed);
+        gear.Show(worn, PretendVitals, 5, PretendName, true, room);
+        worn[12] = worn[12] with { Called = "장비 교체 검사", Stats = worn[12].Stats! with { Str = 73 } };
+        gear.Show(worn, PretendVitals, 5, PretendName, true, room);
+        if (!Has(gear, "장비 교체 검사") || !Has(gear, "73")) wrong.Add("같은 그림 장비의 이름·수치가 갱신되지 않음");
+        GD.Print(wrong.Count == 0 ? "GREYBOX_ITEM_REFRESH_OK" : $"GREYBOX_ITEM_REFRESH_BAD {wrong.Count}건");
+        return wrong;
     }
 
     /// <summary>만들기 화면에는 소지품·장비 같은 탭이 없다 — 갈아 끼울 상태가 없으니 한 번만 잰다.</summary>
@@ -342,6 +379,14 @@ public static class LayoutCheck
         if (gear)
         {
             wrong.AddRange(GearCellsCut(screen, screenSize));
+            // 일반 세로 폰에서는 장비 그림 아래 소지품이 두 줄 이상 남아야 한다.
+            if (Main.Portrait && screenSize.Y >= 780
+                && screen.FindChild("Items", true, false) is GridContainer items)
+            {
+                int rows = items.GetChildCount() / items.Columns;
+                GD.Print($"GREYBOX_GEAR_PACK_ROWS {rows}");
+                if (rows < 2) wrong.Add("장비창 아래 소지품이 두 줄보다 적습니다");
+            }
         }
 
         return [.. wrong.ConvertAll(complaint => $"[{tab}] {complaint}")];

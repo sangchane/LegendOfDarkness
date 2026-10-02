@@ -2,13 +2,10 @@
 """Hades 기술·마법과 세 서버팩의 한글 이름이 안전하게 합의되는 항목만 고른다.
 
 구조와 정렬의 기준은 언제나 Hades ``abilities.json`` 이다. 서버팩은 번역 후보일 뿐이며,
-같은 갈래·같은 아이콘에서 **이름을 댄 팩들이 하나의 같은 이름으로 모일 때만** 채택한다.
+같은 갈래·같은 아이콘에서 **세 팩이 각각 하나의 같은 이름을 낼 때만** 채택한다.
 Hades 쪽도 그 아이콘에 영문 이름이 하나뿐이어야 한다(직업별 중복 행은 한 이름으로 센다).
 
-**침묵은 반대가 아니다.** 셋이 다 말할 것을 요구하면 「2개 일치」 16건이 버려지는데, 그중 진짜로
-다른 이름을 댄 것은 1건뿐이고 나머지 15건은 한 팩에 그 이름이 아예 없는 경우다. 그래서 말한
-팩들만 놓고 보되, 그 안에서 갈리면 버린다. 갈린 하나는 `Stab and Twist` 이고 5.99·Novaonline 이
-`찌르기` 인데 혼든만 `찔러휘비기` 다 — 혼자 다른 쪽이 손댄 쪽이라는 뜻이라 사유에 적어 둔다.
+빈 후보나 다중 후보는 합의가 아니다. AGENTS.md 자료 규칙에 따라 미확정으로 남긴다.
 """
 import json
 from collections import defaultdict
@@ -63,25 +60,19 @@ def build_consensus(hades_rows, pack_rows):
         for icon in icons:
             english = sorted(hades_by_icon.get(icon, set()))
             candidates = {pack: sorted(by_icon.get(icon, set())) for pack, by_icon in names_by_pack.items()}
-            # **침묵은 반대가 아니다.** 예전에는 세 팩이 모두 같은 이름을 댈 때만 채택했는데, 걸러진
-            # 것을 세어 보니 「2개 일치」 16건 중 **진짜로 다른 이름을 댄 것은 1건뿐**이고 나머지
-            # 15건은 한 팩에 그 이름이 아예 없는 경우였다(Novaonline 10 · 5.99 4 · 혼든 1).
-            # 없는 것을 불일치로 세면 멀쩡한 이름 열다섯을 버리게 된다.
-            #
-            # 그래서 이름을 댄 팩들만 놓고 본다. 그 안에서 갈리면 버린다 — 실제로 갈린 하나가
-            # `Stab and Twist` 이고, 5.99·Novaonline 이 `찌르기` 인데 **혼든만 `찔러휘비기`** 다.
-            # 둘이 같고 셋째가 다르면 그 셋째가 손댄 쪽이라는 뜻이라, 버리면서 어느 팩인지 남긴다.
             spoke = {pack: values[0] for pack, values in candidates.items() if len(values) == 1}
             said = sorted(set(spoke.values()))
-            okay = len(english) == 1 and len(spoke) >= 2 and len(said) == 1
+            okay = len(english) == 1 and len(spoke) == len(PACKS) and len(said) == 1
 
             if okay:
-                agreed = "서버팩 3개 일치" if len(spoke) == len(PACKS) else "서버팩 2개 일치·나머지 침묵"
+                agreed = "서버팩 3개 일치"
                 reason = "채택"
             elif len(english) != 1:
                 agreed, reason = None, "Hades 영문 없음/다중"
-            elif len(spoke) < 2:
-                agreed, reason = None, "이름을 댄 팩이 하나 이하"
+            elif any(len(values) > 1 for values in candidates.values()):
+                agreed, reason = None, "팩 이름 다중 후보"
+            elif len(spoke) < len(PACKS):
+                agreed, reason = None, "세 팩 이름 미충족"
             else:
                 agreed = None
                 odd = [pack for pack, name in spoke.items() if list(spoke.values()).count(name) == 1]

@@ -39,6 +39,7 @@ public sealed partial class GearPanel : PanelContainer
     // 고른 자리(서버 번호), 없으면 0. 무엇을 그렸는지 — 같으면 다시 그리지 않는다.
     private int _chosen;
     private string? _showing;
+    private IReadOnlyList<WornItem> _shownWorn = [];
 
     // 남의 장비창이면 그 사람. 없으면 내 것.
     private OtherProfile? _other;
@@ -194,12 +195,13 @@ public sealed partial class GearPanel : PanelContainer
 
         string wanted = $"{_chosen}|" + string.Join(";", worn.Select(gear => $"{gear.Slot}:{gear.Icon}"));
 
-        if (wanted == _showing)
+        if (wanted == _showing && _shownWorn.SequenceEqual(worn))
         {
             return;
         }
 
         _showing = wanted;
+        _shownWorn = worn.ToArray();
         _gear.Show(worn, -_chosen);
 
         WornItem? picked = worn.FirstOrDefault(one => one.Slot == _chosen);

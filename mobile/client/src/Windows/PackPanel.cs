@@ -96,6 +96,7 @@ public sealed partial class PackPanel : PanelContainer
 
     // 무엇을 고쳐 그렸는지. 고른 것이 바뀌어도 테두리가 옮겨 가야 하므로 함께 센다.
     private string? _showing;
+    private IReadOnlyList<WornItem> _shownWorn = [];
 
     // 고른 소지품 칸 번호, 없으면 0.
     private int _chosen;
@@ -351,7 +352,7 @@ public sealed partial class PackPanel : PanelContainer
 
         string wanted = $"{_gearOnly}|{Describe(carried)}";
 
-        if (wanted == _showing)
+        if (wanted == _showing && _lastCarried.SequenceEqual(all) && _shownWorn.SequenceEqual(Worn))
         {
             return;
         }
@@ -363,7 +364,8 @@ public sealed partial class PackPanel : PanelContainer
         _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, _perPage)}";
         Fill(_rows, Paging.Page(carried, _page, _perPage));
 
-        _lastCarried = all;
+        _lastCarried = all.ToArray();
+        _shownWorn = Worn.ToArray();
         ShowChosen(all);
     }
 

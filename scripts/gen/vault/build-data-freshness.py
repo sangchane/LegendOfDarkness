@@ -32,7 +32,8 @@ SLACK = 5
 # 근거는 폴더여도 되고 파일이어도 된다. 없는 경로는 조용히 건너뛴다.
 SHEETS = [
     ("abilities-data.js", "scripts/gen/ability/build-ability-page-data.py", [
-        "data/game-data/abilities.json", "data/기술마법-한글이름.tsv", f"{HADES}/scripts"]),
+        "data/game-data/abilities.json", "data/기술마법-한글이름.tsv", f"{HADES}/scripts",
+        "scripts/ability_name_consensus.py"]),
     ("ability-operations-data.js", "scripts/gen/ability/build-ability-operations-data.py", [
         f"{HADES}/templates/skills", f"{HADES}/templates/spells",
         "data/game-data/ability-presentation.json"]),
@@ -40,7 +41,9 @@ SHEETS = [
         "data/game-data/items-hades.json", "data/pack-compare/item-korean-names.json",
         "docs/ui/assets/item-icons.json"]),
     ("monsters-data.js", "scripts/gen/world/build-monster-page-data.py", [
-        f"{HADES}/areas", f"{HADES}/templates/monsters", f"{HADES}/templates/items"]),
+        f"{HADES}/areas", f"{HADES}/templates/monsters", f"{HADES}/templates/items",
+        f"{HADES}/scripts/Formulas/monsterexp.cs", "scripts/lib/_cut_level.py",
+        "mobile/client/assets/actor/creature"]),
     ("region-warps-data.js", "scripts/gen/world/build-region-warp-data.py", [
         f"{HADES}/areas", f"{HADES}/templates/warps",
         f"{HADES}/templates/monsters", f"{HADES}/templates/mundanes",

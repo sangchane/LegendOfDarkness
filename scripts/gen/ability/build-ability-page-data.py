@@ -115,7 +115,7 @@ def add_row(here, name, consensus, manual, effects, script_of, has, listed, dept
     if corrected and corrected != automatic:
         korean, source = corrected, "사용자 수정"
     elif automatic:
-        korean, source = automatic, "서버팩 3개 일치"
+        korean, source = automatic, consensus[name]["source"]
     elif corrected:
         korean, source = corrected, "사용자 수정"
     else:

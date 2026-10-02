@@ -9,6 +9,10 @@
 - Last updated: 2026-10-01
 
 ## History (append; 최신이 위)
+- **[끝남/2026-10-02 밤 · 리뷰 7건 수정]** Windows 새 임시 출력/오류 중단/성공 ZIP 교체, 도감 nullable 괴물별 확률·확률 구간 상한·금화·CutLevel 및 정수 감산 반영, 공개 괴물 그림 59장, 세 팩 단일 후보 일치(자동 19/사용자 23), 장비/가방의 이름·수치·착용 비교 갱신. 파티 검사는 기존 경험치 고정 표적을 재사용해 혼수·거리 영향 제거, 드랍 스냅샷 723 및 해안 골드아쿠아링 54줄 검사. 코어 670·Python 92·JS 46 통과(JS 5 PowerShell 미설치 건너뜀), 서버 맵 관련 9·최종 드랍/파티 6 통과, 클라이언트 빌드 성공, Godot 세로/가로 정보 갱신·레이아웃 통과, 정적 대시보드 8개 화면/이미지 오류 없음, 실제 Windows ZIP 177MB 생성/무결성 통과. diff 리뷰 완료. 전체 장기 서버 검사는 재실행 안 함. 커밋·배포 없음. 상세 `docs/code-review-2026-10-02.md`, SPEC `plans/code-review-fixes-2026-10-02.md`.
+
+- **[끝남/2026-10-02 밤 · 전체 코드 리뷰]** 최근 이틀의 코드 분리·폴더 이동·구광산/뤼케시온해안·대시보드 최신화를 중심으로 모바일·서버 fork·생성기·운영 스크립트의 현재 동작을 대조했다. P2 7건과 재현/수정 방향은 `docs/code-review-2026-10-02.md`. 코어 670·자료 추출 31·신규 맵/월드맵/무도가/아이템 검사 8 통과, 클라이언트/서버 빌드 성공, 신규 맵 48개 원본/앱 벽 정보 일치, Godot 세로 360×780·가로 844×390 소지품/장비 레이아웃 통과. JS/Python 기대값 각각 1건 실패, 서버 드랍 연결 스냅샷은 669→723으로 불일치. 전체 서버 시험은 30분 이상 실행 후 중단했고 전체 집계 없음. 파티 탈퇴 후 프로필 응답 검사도 실패해 별도 재실행으로 재현(원인 미확정). 공개 대시보드 8개 화면 전환/JS 예외 없음, 괴물 그림 404와 공개 도감의 해안 미배포(219자리, 로컬 273자리) 확인. 임시 서버/브라우저 종료, 게임 코드 수정·커밋·배포 없음.
+
 - **[끝남/2026-10-02 밤]** 뤼케시온해안(71~98) — 월드맵 사냥터 카드(구역 11곳 바로 가기, 대기실로 드는 워프 71레벨 · 대기실 문은 월드맵 — 노바) · 해안 워프 128(혼든) · 괴물 54자리(배치 노바, 3층 에스코모이드는 두 팩 모두 정의가 없어 뺌). 수치는 사용자 「노바 안에서 구광산에 맞춤」 — 노바 강약 그대로 일렉코아틀이 구광산 1층 그림록 바로 아래(체력 5.6만~7.7만 · 공격 1,843~2,493 · 경험치 2.2만~3.1만, 보스 에리얼 14.5만). 드랍은 보스 에리얼만 골드아쿠아링(확률이 아이템에 묶여 일반 괴물 3%는 못 줌). 생성기 `scripts/gen/world/build-rucesion-coast.py`, 같이 쓰는 것은 `scripts/lib/_world.py` 로 옮김(구광산 생성기도), 시험 `RucesionCoastTests`·`WorldMapTests`. 앱 맵 그림 12장·괴물 그림 8종. 뤼케시온마을은 계속 닫아 둠.
 
 ### 2026-10-02 밤 — 대시보드 쳐내기·자료 새로 (사용자 「불필요한 내용 쳐내고 새로 업데이트」)
@@ -1146,3 +1150,18 @@ ui의 Godot 지침과 ponytail 적용. 기존 Greybox 팔레트·원작 아트�
 - 생성기 커밋 5: `scripts/lib/`(`_paths` `_io` `_dotnet` `_git` `_graphify` `_drops` …), 100줄 넘는 함수 17개 나눔, 운영 스크립트 8개 `scripts/ops/`(launchd `com.lod.backup`·`com.lod.iossign` 도 새 경로). 출력 전후 바이트 동일 101회.
 - 시험: 알맹이 669 · 서버 278(사냥 시간 시험 2개는 단독 통과) · 사진 `out/tidy-compare.png`(서버 없는 화면, 배치 같음).
 - 이펙트 첫 사용 끊김: `build-client-effects.py` 가 `effects-look.txt`(바닥줄·물들일 색)를 미리 쓰고 `Flash` 는 읽기만(알맹이 `EffectLook`, 시험 1). 생성기가 서버가 안 쓰게 된 208 줄을 지우던 것도 남기게. 08:40 클라우드 반영, 폰 설치는 사용자 외출로 대기.
+
+## 2026-10-03 — Claude 설정·스킬 Codex 연결
+
+사용자 요청으로 Claude 활성 dev 1.5.4·Superpowers 6.4.1·ECC 2.0.0-rc.1 및 개인 3개를 ~/.agents/skills에서 원본에 연결(272개). 실제 Codex skills/list 인식·활성 확인, 로딩 오류 0. 개인 공통 AGENTS와 CLAUDE.md fallback 구성, NEXT 문맥·기존 프로젝트 명령 보호 및 기존 Ponytail 훅은 Codex 공식 검토 화면에서 활성화. 모델·effort·권한·MCP·알림 보존, 설정 및 설치 목록 백업. Claude 전용 대시보드·ECC 자동화와 지원 차이는 docs/claude-codex-setup.md에 기록. 게임 코드의 이전 수정과 배포 상태는 그대로.
+
+## 2026-10-03 — 장비창 남은 검증 (M · dev:build 디버깅 / ponytail / dev:ui)
+
+- 세로 소지품 한 줄 보고를 현재 코드로 재현: 기존 `PackPanel.UnderGear`가 제목줄을 접고 장 넘김을 아래줄로 옮겨, 360×780에서는 이미 2줄·393×852에서는 3줄. 앱 동작 추가 수정 없이 일반 세로 높이 780 이상에서 최소 2줄을 검사하도록 `LayoutCheck.Measure`에 회귀 검사 추가. 360×640은 1줄로 남는 제약을 NEXT에 기록.
+- `Photograph_somebody_elses_gear` 실패 재현: 상대는 보였으나 자동 터치 좌표 (287,198)가 내 장비 그림 안에 들어 실제 터치가 막힘. 시험의 서·남 이동을 3쌍에서 5쌍으로 늘려 창과 방향판 사이로 이동. 실패 시 앱 출력을 보여 주도록 assertion 메시지 보강. 임시 진단 로그는 모두 제거.
+- 검증: `.tools/dotnet-9.0.317/dotnet build mobile/client/LodClient.csproj -v:q` 경고/오류 0. `scripts/godot.sh -- --screen game --size <크기> --orient <방향> --layout` 360×780·393×852·720×1600·1080×2400·1536×2048·852×393 모두 `GREYBOX_LAYOUT_OK` (서버 없는 배치 검사).
+- 실제 앱·격리 서버: `PATH="$PWD/.tools/dotnet-9.0.317:$PATH" DOTNET_ROOT="$PWD/.tools/dotnet-9.0.317" LOD_GEAR_SHOT="$PWD/shots/other-gear-2026-10-03.png" .tools/dotnet-9.0.317/dotnet test tests/hades-characterization/Hades.Characterization.Tests.csproj --filter Photograph_somebody_elses_gear` 실패 확인 후 수정 뒤 1/1 통과. 사진을 직접 읽어 상대 gearwear 장비창·내 소지품 닫힘 확인. 변경 diff 별도 리뷰 및 공백 검사 통과. 커밋·클라우드·폰 배포 없음.
+
+## 2026-10-03 — 로컬 변경 커밋
+
+사용자 「커밋해」에 따라 `fix/code-review-local-complete` 브랜치에 Codex 연결 설정·문서와 코드 리뷰 수정·장비창 검증을 두 커밋으로 기록. 커밋 전 Python 92·JavaScript 46·모바일 코어 670 통과, JS 5건 PowerShell 미설치로 건너뜀, 클라이언트 빌드 경고·오류 0, diff 공백·훅 JSON·Shell 구문 검사 통과. 임시 출력 `out/` 제외, 푸시·배포 없음.

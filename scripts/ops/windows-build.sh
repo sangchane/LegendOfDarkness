@@ -16,33 +16,35 @@ GODOT="$ROOT/.tools/godot-4.6-mono/Godot_mono.app/Contents/MacOS/Godot"
 export DOTNET_ROOT="$ROOT/.tools/dotnet-9.0.317"
 export PATH="$DOTNET_ROOT:$PATH"
 
-build() {
+build() (
     mkdir -p "$OUT"
-    "$GODOT" --headless --path "$CLIENT" --import >/dev/null 2>&1 || true
-    "$GODOT" --headless --path "$CLIENT" --export-release "Windows" "$OUT/LodClient.exe" >/dev/null 2>&1 || true
+    stage="$(mktemp -d "$OUT/.build.XXXXXX")"
+    trap 'rm -rf "$stage"' EXIT
+    fresh="$stage/LegendOfDarkness"
+    mkdir "$fresh"
+    "$GODOT" --headless --path "$CLIENT" --import
+    "$GODOT" --headless --path "$CLIENT" --export-release "Windows" "$fresh/LodClient.exe"
 
-    # EXPORT 결과를 믿지 않는다(ios-build.sh 와 같은 이유) — 실행 파일과 C# 폴더가 다 있는지 본다.
-    if [ ! -s "$OUT/LodClient.exe" ] || [ ! -s "$OUT/data_LodClient_windows_x86_64/LodClient.dll" ]; then
+    # 새로 내보낸 파일만 검사한다 — 이전 성공본으로 이번 실패를 가리지 않는다.
+    if [ ! -s "$fresh/LodClient.exe" ] || [ ! -s "$fresh/data_LodClient_windows_x86_64/LodClient.dll" ]; then
         echo "윈도우판을 만들지 못했습니다 — 실행 파일이나 C# 폴더가 없습니다." >&2
         exit 1
     fi
 
     # 맥 시험용 자동 로그인(login.cfg)이 실리면 받는 사람 모두 그 계정으로 들어간다(윈도우판은 그 파일을 읽는다).
     # 내보내기 설정(exclude_filter)이 빼지만, 올리기 전에 한 번 더 본다.
-    if [ -f "$CLIENT/login.cfg" ] && strings "$OUT/LodClient.exe" | grep -axF "$(head -1 "$CLIENT/login.cfg")" >/dev/null; then
+    if [ -f "$CLIENT/login.cfg" ] && strings "$fresh/LodClient.exe" | grep -axF "$(head -1 "$CLIENT/login.cfg")" >/dev/null; then
         echo "시험 계정(login.cfg)이 실렸습니다 — export_presets.cfg 의 exclude_filter 를 보십시오." >&2
         exit 1
     fi
 
-    local stage
-    stage="$(mktemp -d)"
-    mkdir "$stage/LegendOfDarkness"
-    cp -R "$OUT/LodClient.exe" "$OUT/data_LodClient_windows_x86_64" "$stage/LegendOfDarkness/"
-    rm -f "$ZIP"
-    (cd "$stage" && zip -qr -X -9 "$ZIP" LegendOfDarkness)
-    rm -rf "$stage"
+    (cd "$stage" && zip -qr -X -9 "$stage/LodClient-windows.zip" LegendOfDarkness)
+    mv -f "$fresh/LodClient.exe" "$OUT/LodClient.exe"
+    rm -rf "$OUT/data_LodClient_windows_x86_64"
+    mv "$fresh/data_LodClient_windows_x86_64" "$OUT/"
+    mv -f "$stage/LodClient-windows.zip" "$ZIP"
     echo "만들었습니다 — $ZIP ($(du -h "$ZIP" | cut -f1))"
-}
+)
 
 case "${1:-build}" in
     build) build ;;

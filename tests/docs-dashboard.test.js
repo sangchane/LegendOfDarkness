@@ -189,18 +189,22 @@ test('monster codex carries specs, drop odds, and the sprite that exists on disk
     assert.ok(monster['지역'] && monster['맵'] && monster['맵번호'] > 0);
     assert.ok(['선공', '반반', '비선공'].includes(monster['선공']));
 
-    // 떨어질 확률은 두 값의 곱이다 — 목록에서 뽑힐 확률 × 그 물건의 DropRate.
-    // 표값을 그대로 보여 주면 0.8 이 80% 처럼 읽힌다.
+    assert.ok(monster['감산레벨'] >= 1 && monster['감산레벨'] <= 99);
+    // 서버는 배율을 적용한 확률을 목록 길이 위에 순서대로 놓는다. 남은 구간 이상으로는 못 떨어진다.
+    let left = monster['드랍'].length;
     for (const drop of monster['드랍']) {
-      const expected = Math.round((drop['표확률'] / monster['드랍'].length) * 10000) / 10000;
-      assert.equal(drop['실제확률'], expected, `${monster['이름']} / ${drop['이름']}`);
-      assert.ok(drop['실제확률'] <= drop['표확률']);
+      const weight = drop['템플릿있음'] ? Math.max(0, drop['표확률'] * 1.5) : 0;
+      const expected = Math.min(left, weight) / monster['드랍'].length;
+      assert.ok(Math.abs(drop['실제확률'] - expected) <= 0.00005 + 1e-12,
+        `${monster['이름']} / ${drop['이름']}: ${drop['실제확률']} != ${expected}`);
+      assert.ok(drop['실제확률'] >= 0 && drop['실제확률'] <= 1);
+      left = Math.max(0, left - weight);
     }
 
     // 그림 번호를 적어 놓고 파일이 없으면 카드가 빈칸으로 난다.
     if (monster['스프라이트']) {
       const art = monster['스프라이트'];
-      assert.ok(fs.existsSync(path.join(root, 'mobile/client/assets/actor/creature', `${art['이름']}.png`)),
+      assert.ok(fs.existsSync(path.join(root, 'docs/ui/assets/creature', `${art['이름']}.png`)),
         `${monster['이름']}: ${art['이름']}.png 가 없다`);
       assert.ok(art['칸'] >= 1 && art['너비'] > 0 && art['높이'] > 0);
     }
@@ -210,6 +214,14 @@ test('monster codex carries specs, drop odds, and the sprite that exists on disk
   assert.equal(data['레벨표']['2'], 600);
   assert.equal(data['규칙']['감산']['용서'], 5);
   assert.match(data['규칙']['감산근거'], /우리가 정한/);
+});
+
+test('codex experience uses the server cut level and truncates like uint experience', () => {
+  const data = readBrowserGlobal('docs/monsters-data.js', 'LOD_MONSTERS');
+  const source = read('docs/monsters.js').match(/function earned\(monster, level\) \{[\s\S]*?\n  \}/)[0];
+  const earned = require('node:vm').runInNewContext(`(${source})`, { data });
+  assert.equal(earned({ '감산레벨': 51, '레벨': 1, '경험치': 22380 }, 71), 2797);
+  assert.equal(earned({ '감산레벨': 1, '경험치': 0 }, 99), 1);
 });
 
 test('region warps show what is reachable, what is stranded, and what leads out', () => {

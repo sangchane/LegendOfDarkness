@@ -37,6 +37,16 @@ class AbilityNameConsensusTest(unittest.TestCase):
         accepted, _ = build_consensus([hades(), hades("Another")], rows)
         self.assertEqual(accepted, {})
 
+    def test_rejects_missing_and_multiple_candidates_in_the_third_pack(self):
+        rows = {pack: {"skill": [packed("윈드블레이드")], "spell": []}
+                for pack in ("5.99-server", "honden-community", "novaonline")}
+        for third in ([], [packed("윈드블레이드"), packed("다른기술")]):
+            with self.subTest(third=third):
+                rows["novaonline"]["skill"] = third
+                accepted, audit = build_consensus([hades()], rows)
+                self.assertEqual(accepted, {})
+                self.assertFalse(audit[0]["accepted"])
+
     def test_current_sources_produce_the_reviewed_count(self):
         accepted, _ = load_consensus()
         self.assertEqual(len(accepted), 19)

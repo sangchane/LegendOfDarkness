@@ -2,13 +2,14 @@
 """지금 구현된 지역의 괴물을 화면에서 볼 수 있게 한 덩어리로 뽑는다.
 
 표에 흩어진 값(체력·경험치·피해·젠·선공·드랍)을 **실제로 굴러가는 규칙과 함께** 모은다.
-숫자만 옮기면 "쿠룸 0.8" 이 80% 처럼 보이지만, 하데스는 **목록에서 하나를 고른 뒤** 그 물건의
-`DropRate` 를 굴리므로(`scripts/Formulas/monsterexp.cs` DetermineRandomDrop) 목록이 넷이면 0.2 다.
-그 곱을 여기서 계산해 둔다.
+숫자만 옮기면 "쿠룸 0.8" 이 80% 처럼 보이지만, 하데스는 괴물별(없으면 물건별) `DropRate×1.5` 를
+목록 길이 위에 순서대로 놓는다(`scripts/Formulas/monsterexp.cs` DetermineRandomDrop).
+남은 구간에 들어오는 실제 확률을 여기서 계산해 둔다.
 
   쓰는 법: python3 scripts/gen/world/build-monster-page-data.py   → docs/monsters-data.js
 """
 import json
+import shutil
 import sys
 
 import sys as _sys, pathlib as _pathlib  # scripts/ 를 찾게 — lib/·graphify_runtime 이 거기 있다
@@ -16,12 +17,14 @@ _sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[2]))
 from lib._paths import ROOT
 from lib._git import git_pointer
 from lib._io import read_json as read
+from lib import _cut_level as cut
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 AREAS = SERVER / "areas"
 MONSTERS = SERVER / "templates/monsters"
 ITEMS = SERVER / "templates/items"
 SPRITES = ROOT / "mobile/client/assets/actor/creature"
 OUT = ROOT / "docs" / "monsters-data.js"
+PUBLIC_SPRITES = OUT.parent / "ui/assets/creature"
 
 # 지금 모바일로 실제 돌아다닐 수 있는 지역. 이름 앞머리로 가른다.
 REGIONS = ["노비스", "수오미", "우드랜드", "포테의숲", "아벨해안", "구광산", "뤼케시온해안"]  # 사냥터 넷은 사용자 2026-10-02
@@ -128,6 +131,8 @@ def kind_of(item):
 def monster_rows(wanted, facts):
     """괴물 자리마다 한 줄 — 맵, 수치, 금화, 드랍, 그림."""
     rows = []
+    calibration = list(cut.monsters())
+    points, brackets = cut.fit(calibration), cut.woodland(calibration)
     for folder in sorted(p for p in MONSTERS.iterdir() if p.is_dir()):
         for path in sorted(folder.glob("*.json")):
             try:
@@ -140,15 +145,18 @@ def monster_rows(wanted, facts):
 
             listed = (data.get("Drops") or {}).get("$values") or []
             share = 1 / len(listed) if listed else 0
+            left = len(listed)
             drops = []
             for name in listed:
                 item = facts.get(name, {})
-                rate = item.get("DropRate") or 0
+                override = data.get("DropRate")
+                rate = override if override is not None else (item.get("DropRate") or 0)
+                weight = max(0, rate * DROP_BOOST) if name in facts else 0
                 drops.append({
                     "이름": name,
                     "갈래": kind_of(item),
                     "표확률": rate,
-                    "실제확률": round(min(1.0, share * rate * DROP_BOOST), 4),
+                    "실제확률": round(min(left, weight) * share, 4),
                     "값": item.get("Value") or 0,
                     "체력회복": item.get("HealthRestore") or 0,
                     "마력회복": item.get("ManaRestore") or 0,
@@ -156,9 +164,15 @@ def monster_rows(wanted, facts):
                     "요구레벨": item.get("LevelRequired") or 0,
                     "템플릿있음": name in facts,
                 })
+                left = max(0, left - weight)
 
             loot = data.get("LootType") or 0
             level = data.get("Level") or 1
+            exp = data.get("Exp")
+            if exp is None:
+                exp = int(level * (level * 0.1 + 1.5) * 300)
+            per_exp = 0.02 if 20083 <= area <= 20086 or 20373 <= area <= 20394 else 0.1
+            minimum = data.get("GoldMinimum") or 0
             mood = data.get("MoodType") or 0
             rows.append({
                 "이름": data.get("Name"),
@@ -167,10 +181,11 @@ def monster_rows(wanted, facts):
                 "지역": region_of(wanted[area]),
                 "체력": data.get("MaximumHP"),
                 "마력": data.get("MaximumMP") or 0,
-                "경험치": data.get("Exp") or 0,
+                "경험치": exp,
                 "피해": [data.get("DmgMin") or 0, data.get("DmgMax") or 0],
                 "방어": data.get("Ac") or 0,
                 "레벨": level,
+                "감산레벨": cut.level_for(points, brackets, area, exp),
                 "젠최대": data.get("SpawnMax") or 0,
                 "젠주기": data.get("SpawnRate") or 0,
                 "이동속도": data.get("MovementSpeed") or 0,
@@ -178,7 +193,7 @@ def monster_rows(wanted, facts):
                 # MoodType 은 깃발이고 스폰할 때 한 번 접힌다 — docs/monster-behaviour.md 2절.
                 # Aggressive(2) 면 선공, 아니고 Unpredicable(4) 면 동전 던지기, 나머지는 비선공.
                 "선공": "선공" if mood & 2 else ("반반" if mood & 4 else "비선공"),
-                "금화": [level * 500, level * 1000] if loot & 32 else [0, 0],
+                "금화": [max(0, minimum, round(exp * per_exp * factor)) for factor in (0.8, 1.2)],
                 "드랍켜짐": bool(loot & 2),
                 "그림": data.get("Image"),
                 "스프라이트": sprite_for(data.get("Image") or 0),
@@ -192,6 +207,9 @@ def monster_rows(wanted, facts):
 
 def write_page(rows, wanted):
     """monsters-data.js 를 쓰고 수를 알린다."""
+    PUBLIC_SPRITES.mkdir(parents=True, exist_ok=True)
+    for name in sorted({r["스프라이트"]["이름"] for r in rows if r["스프라이트"]}):
+        shutil.copyfile(SPRITES / f"{name}.png", PUBLIC_SPRITES / f"{name}.png")
     # 사람이 갈 수 있는 맵인데 괴물이 하나도 없는 곳 — 마을이라 없는 것일 수도, 안 채운 것일 수도.
     filled = {r["맵번호"] for r in rows}
     empty = [{"맵번호": i, "맵": n, "지역": region_of(n)}
@@ -204,8 +222,8 @@ def write_page(rows, wanted):
         "서버포인터": pointer,
         "지역": REGIONS,
         "규칙": {
-            "드랍": "목록에서 하나를 고르고(같은 확률) 그 물건의 DropRate×1.5 를 굴린다 — monsterexp.cs DetermineRandomDrop·DropBoost",
-            "금화": "레벨 × 500 ~ 레벨 × 1000",
+            "드랍": "괴물 DropRate(없으면 물건 DropRate)×1.5 를 목록 길이 위에 순서대로 놓는다 — monsterexp.cs DetermineRandomDrop·DropBoost",
+            "금화": "경험치 × 0.1(노비스 0.02) × 0.8~1.2, GoldMinimum 이상",
             "감산": PENALTY,
             "감산근거": "레벨 차이로 경험치를 깎는 값은 우리가 정한 것이다 — 원작에도 5.99 팩에도 그 규칙이 없다",
             "선공": "MoodType 은 스폰할 때 한 번 접힌다. 반반 = Unpredicable(4), 그 마리는 죽을 때까지 그대로",

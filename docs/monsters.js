@@ -3,7 +3,7 @@
   var data = window.LOD_MONSTERS;
   if (!data) { return; }
 
-  var SPRITE_DIR = "../mobile/client/assets/actor/creature/";
+  var SPRITE_DIR = "ui/assets/creature/";
   var CLASSES = { 0: "", 1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "무도가" };
   var SORTS = [
     { id: "exp", 이름: "경험치", 재다: function (m) { return -m.경험치; } },
@@ -32,10 +32,10 @@
   /** 레벨 차이로 깎인 뒤 실제로 손에 들어오는 경험치. monsterexp.cs 의 ForLevel 과 같은 식이다. */
   function earned(monster, level) {
     var rule = data.규칙.감산;
-    var gap = level - monster.레벨;
-    if (gap <= rule.용서) { return monster.경험치; }
+    var gap = level - monster.감산레벨;
+    if (gap <= rule.용서) { return Math.max(1, monster.경험치); }
     var share = Math.pow(0.5, (gap - rule.용서) / rule.반감);
-    return Math.round(monster.경험치 * Math.max(rule.최소, share));
+    return Math.max(1, Math.floor(monster.경험치 * Math.max(rule.최소, share)));
   }
 
   /** 지금 레벨에서 다음 레벨까지 몇 마리인가. 표에 없는 레벨이면 셈하지 않는다. */
@@ -90,7 +90,7 @@
     row.appendChild(meter);
 
     var note = [(drop.실제확률 * 100).toFixed(1) + "%"];
-    note.push("표 " + (drop.표확률 * 100).toFixed(0) + "% ÷ 목록");
+    note.push("기준 " + (drop.표확률 * 100).toFixed(2) + "% ×1.5 ÷ 목록");
     if (drop.체력회복) { note.push("체력 +" + drop.체력회복); }
     if (drop.마력회복) { note.push("마력 +" + drop.마력회복); }
     if (drop.값) { note.push(number(drop.값) + "전"); }

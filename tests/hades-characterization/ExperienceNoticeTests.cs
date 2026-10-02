@@ -130,7 +130,7 @@ public sealed class ExperienceNoticeTests : IDisposable
     }
 
     /// <summary>방의 정의 하나만 문 앞칸에 가만히 세우고 그 경험치를 돌려준다 — <see cref="LevelUpVitalsTests" /> 와 같은 모양.</summary>
-    private static int StandOneAtTheDoor(IsolatedHadesServer server, int room, Tile targetTile)
+    internal static int StandOneAtTheDoor(IsolatedHadesServer server, int room, Tile targetTile)
     {
         JsonSerializerOptions indented = new() { WriteIndented = true };
         JsonDocumentOptions lenient = new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip };
