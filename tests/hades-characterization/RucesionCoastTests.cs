@@ -59,10 +59,20 @@ public sealed class RucesionCoastTests
         Assert.DoesNotContain(zones, zone => !reached.Contains(zone));
 
         HashSet<int> hunted = [];
+        List<(int Hp, double Rate)> rates = [];
         foreach (string path in Directory.EnumerateFiles(Path.Combine(server, "templates", "monsters", "뤼케시온해안"), "*.json"))
         {
-            hunted.Add(JsonNode.Parse(File.ReadAllText(path))!["AreaID"]!.GetValue<int>());
+            JsonNode monster = JsonNode.Parse(File.ReadAllText(path))!;
+            hunted.Add(monster["AreaID"]!.GetValue<int>());
+            if (monster["DropRate"] is { } rate)
+            {
+                rates.Add((monster["MaximumHP"]!.GetValue<int>(), rate.GetValue<double>()));
+            }
         }
         Assert.DoesNotContain(zones, zone => !hunted.Contains(zone));
+
+        // 괴물마다 확률 — 체력이 많은(센) 괴물일수록 덜 떨구는 일이 없다(사용자 2026-10-02).
+        Assert.NotEmpty(rates);
+        Assert.DoesNotContain(rates, a => rates.Any(b => b.Hp > a.Hp && b.Rate < a.Rate));
     }
 }

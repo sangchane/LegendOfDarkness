@@ -1,4 +1,5 @@
-"""맵·워프·괴물 생성기가 같이 쓰는 것 — 서버 자료 경로, 팩 글 읽기, 워프 템플릿, 경험치·드랍 갈래."""
+"""맵·워프·괴물 생성기가 같이 쓰는 것 — 서버 자료 경로, 팩 글 읽기, 워프 템플릿, 월드맵 카드, 경험치·드랍 갈래."""
+import json
 from pathlib import Path
 
 from lib._paths import ROOT
@@ -30,3 +31,22 @@ def warp(src_name, src_id, at, dst_name, dst_id, to, level=1):
         "WarpRadius": 0, "WarpType": "Map", "WorldResetWarpId": 0, "WorldTransionWarpId": 0,
         "Description": None, "Group": None, "Name": name,
     }
+
+
+WORLDMAP = SERVER / "templates" / "worldmaps" / "temuair.json"
+
+
+def world_card(display, lobby_id, arrival, point, zone_ids, warps):
+    """월드맵 사냥터 카드 하나를 넣은(같은 이름은 바꾼) 월드맵 — 카드는 대기실로, 구역마다 그 구역으로 드는 워프의
+    도착 칸 하나(워프 이름 순으로 처음 것)로 바로 간다. 레벨은 서버가 대기실로 드는 워프에서 읽는다(WorldMapRefusal)."""
+    arrivals = {}
+    for _, w in sorted(warps, key=lambda nw: nw[0]):
+        to = w["To"]
+        if to["AreaID"] in zone_ids:
+            arrivals.setdefault(to["AreaID"], (to["Location"]["X"], to["Location"]["Y"]))
+    zones = [{"AreaID": z, "Location": {"X": arrivals[z][0], "Y": arrivals[z][1]}, "PortalKey": 0} for z in zone_ids]
+    card = {"Destination": {"AreaID": lobby_id, "Location": {"X": arrival[0], "Y": arrival[1]}, "PortalKey": 0},
+            "DisplayName": display, "PointX": point[0], "PointY": point[1], "Zones": zones}
+    world = json.loads(WORLDMAP.read_text(encoding="utf-8-sig"))
+    world["Portals"] = [p for p in world["Portals"] if p["DisplayName"] != display] + [card]
+    return world

@@ -13,9 +13,8 @@
     노바 광산1층 그림록(99 — 구광산 1층, 체력 77,760 · 최소 공격 2,409) 바로 아래 오게 체력·공격을 같은 배율로 올린다.
     경험치는 구광산과 같은 체력 비례(build-old-EXP_PER_HP). 방어는 노바 -45 그대로.
     3층의 「에스코모이드」는 뺀다 — 노바·혼든 모두 스폰 줄만 있고 정의가 없어(아벨해안의 애스코모이드뿐) 그 서버들에서도 안 나왔다.
-  - 드랍: 노바는 일반 괴물이 3천골드·골드아쿠아링 3%, 보스 에리얼이 에리얼의팬던트 40%. 하데스는 확률이 아이템에 붙어 있어
-    골드아쿠아링(0.4, 아벨 보스 킹아크퍼스와 같이 씀)을 일반 괴물에 3% 로 줄 수 없고 팬던트는 없다 — 그래서 일반 괴물은 금화만,
-    보스 에리얼만 골드아쿠아링.
+  - 드랍: 노바는 일반 괴물이 3천골드·골드아쿠아링 3%, 보스 에리얼이 에리얼의팬던트 40%(하데스에 없음). 모두 골드아쿠아링 —
+    일반 괴물은 괴물 템플릿 DropRate 로 2%~4%(센 괴물일수록), 보스는 아이템 확률(60%, 아벨 킹아크퍼스와 같음).
 
   쓰는 법: python3 scripts/gen/world/build-rucesion-coast.py            # 무엇이 바뀌는지만
            python3 scripts/gen/world/build-rucesion-coast.py --쓰기     # 서버 자료에 쓴다
@@ -26,11 +25,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))   # scripts/ — lib/
 from lib._paths import ROOT
-from lib._world import AREAS, EXP_PER_HP, LOOT_NONE, LOOT_RANDOM, SERVER, WARPS, text, warp
+from lib._world import AREAS, EXP_PER_HP, LOOT_RANDOM, SERVER, WARPS, WORLDMAP, text, warp, world_card
 
 HONDEN = Path.home() / "Downloads" / "혼든커뮤니티팩2"
 NOVA = ROOT / "data" / "server-packs" / "extracted" / "novaonline"
-WORLDMAP = SERVER / "templates" / "worldmaps" / "temuair.json"
 MONSTERS = SERVER / "templates" / "monsters" / "뤼케시온해안"
 NAME = "뤼케시온해안"
 LOBBY = f"{NAME}대기실"
@@ -41,7 +39,16 @@ ENTRY_LEVEL = 71
 HP_SCALE = 0.99 * 77760 / 5300             # 노바 일렉코아틀(체력 5,300) = 그림록의 99%
 DMG_SCALE = 0.99 * 2409 / 220              # 노바 일렉코아틀(최소 공격 220) = 그림록 최소 공격의 99%
 AC = -45
-DROPS = {"에리얼": ["골드아쿠아링"]}
+# 일반 괴물도 골드아쿠아링 — 괴물마다 확률(템플릿 DropRate), 센 괴물일수록 조금 더(사용자 2026-10-02):
+# 체력에 비례해 블루하콘 2% → 일렉코아틀 4%(× DropBoost 1.5 를 거꾸로). 보스 에리얼은 아이템 것(0.4 × 1.5 = 60%).
+RING = "골드아쿠아링"
+RING_CHANCE = ((56154, 0.02), (76982, 0.04))      # (체력, 한 마리 확률)
+BOSS = "에리얼"
+
+
+def ring_rate(hp):
+    (lo_hp, lo), (hi_hp, hi) = RING_CHANCE
+    return round((lo + (hi - lo) * (hp - lo_hp) / (hi_hp - lo_hp)) / 1.5, 5)
 
 
 def rows(name):
@@ -60,9 +67,10 @@ def monster(kind, fields, count, area):
         "DmgMin": round(int(fields["최소공격력"]) * DMG_SCALE), "DmgMax": round(int(fields["최대공격력"]) * DMG_SCALE), "Ac": AC,
         "Level": 1, "MovementSpeed": speed, "EngagedWalkingSpeed": speed, "AttackSpeed": 1000, "CastSpeed": 8000,
         "MoodType": 4, "PathQualifer": 1,
-        "LootType": LOOT_RANDOM if kind in DROPS else LOOT_NONE, "Drops": {"$values": DROPS.get(kind, [])},
+        "LootType": LOOT_RANDOM, "Drops": {"$values": [RING]},
         "ScriptName": "Common Monster", "UpdateMapWide": True, "UpdateRate": 1000.0,
         "Grow": False, "IgnoreCollision": False,
+        **({} if kind == BOSS else {"DropRate": ring_rate(hp)}),
     }
 
 
@@ -91,18 +99,8 @@ def main():
     }))
     fresh = [n for n, _ in warps if not (WARPS / f"{n}.json").exists()]
 
-    # 월드맵 카드 — 구역마다 그 구역으로 드는 워프의 도착 칸 하나(워프 이름 순으로 처음 것).
-    arrivals = {}
-    for _, w in sorted(warps, key=lambda nw: nw[0]):
-        to = w["To"]
-        if to["AreaID"] and to["AreaID"] != ids[LOBBY]:
-            arrivals.setdefault(to["AreaID"], (to["Location"]["X"], to["Location"]["Y"]))
-    zones = [{"AreaID": ids[n], "Location": {"X": arrivals[ids[n]][0], "Y": arrivals[ids[n]][1]}, "PortalKey": 0}
-             for n in sorted(ids) if n != LOBBY]
-    card = {"Destination": {"AreaID": ids[LOBBY], "Location": {"X": LOBBY_ARRIVAL[0], "Y": LOBBY_ARRIVAL[1]}, "PortalKey": 0},
-            "DisplayName": NAME, "PointX": CARD_POINT[0], "PointY": CARD_POINT[1], "Zones": zones}
-    world = json.loads(WORLDMAP.read_text(encoding="utf-8-sig"))
-    world["Portals"] = [p for p in world["Portals"] if p["DisplayName"] != NAME] + [card]
+    zones = [ids[n] for n in sorted(ids) if n != LOBBY]
+    world = world_card(NAME, ids[LOBBY], LOBBY_ARRIVAL, CARD_POINT, zones, warps)
 
     stats = {m["이름"]: m["fields"] for m in rows("mobs.json") if "뤼케해안" in m["출처"]}
     mobs = [(f"{s['괴물']}@{s['맵']}", monster(s["괴물"], stats[s["괴물"]], int(s["마리수"]), ids[s["맵"]]))
@@ -118,7 +116,8 @@ def main():
 
     for kind, fields in stats.items():
         m = monster(kind, fields, 0, 0)
-        print(f"  {kind:8} 체력 {m['MaximumHP']:>7,} · 공격 {m['DmgMin']:,}~{m['DmgMax']:,} · 경험치 {m['Exp']:,}")
+        chance = f"{m['DropRate'] * 1.5:.1%}" if "DropRate" in m else "아이템 것"
+        print(f"  {kind:8} 체력 {m['MaximumHP']:>7,} · 공격 {m['DmgMin']:,}~{m['DmgMax']:,} · 경험치 {m['Exp']:,} · 골드아쿠아링 {chance}")
     print(f"워프 {len(warps)}장(새 {len(fresh)}) · 월드맵 카드 구역 {len(zones)} · 괴물 자리 {len(mobs)}"
           + ("" if write else "  — 미리보기, --쓰기 로 쓴다"))
 

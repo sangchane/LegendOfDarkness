@@ -9,6 +9,7 @@
   - 맵: 36장 모두 새 번호로 넣는다. 하데스의 「광산N층」·「리파이너의던전N층」이 같은 맵 파일을 쓰지만 건드리지 않는다 —
     리파이너의던전은 살아 있는 던전이고, 혼든 안에서도 22-1=3-2 · 24-1=17-1 처럼 한 파일을 두 층이 쓰므로 번호를 나누면 층이 엉킨다.
   - 워프: 혼든 `db/warp/길드성/공식길드전용던전.txt` 를 그대로(8-1 로 가는 줄만 뺀다).
+  - 월드맵 사냥터 카드 「구광산」 — 대기실로, 층마다 바로 가기(아벨해안·뤼케시온해안처럼). 레벨은 마인마을 입구 99 를 따른다.
   - 드나드는 길: 마인마을(0,49~54) → 구광산대기실(18,47) **99레벨부터**, 구광산대기실(18,49) → 마인마을(2,51).
     대기실 칸은 노바 팩 `Titan.txt`(광산대기실 18,47 도착 · 18,49 나감), 마인마을 칸은 5.99 `Casmanum_Warp.txt` 의 10시 출구.
   - 괴물: 배치(어느 층에 무엇이 몇 마리)는 혼든 `db/mob/공식길드전용던전/` 76줄 그대로. 수치는 **우리가 정했다**
@@ -19,7 +20,7 @@
       하데스 나눗수 7.3(tools/pack-import EXPERIENCE_DIVISOR). 드라코는 노바 값(2,375만)이 튀어서 혼든 비율(그림록가 아니라 헬 바로 아래 — 헬 × 혼든 드라코/헬 비율).
       금화는 한 마리에 최소 10,000전(사용자) — 템플릿 `GoldMinimum`, 그 위로는 경험치 비례식(Formulas/monsterexp.cs).
       드랍은 노바 방식(사용자): 그림록퀸 → 그림록퀸홀, 헬 직업 → 그 직업 헬옷(노바 `mine.txt` 헬불씨프1·2 처럼 갈래마다
-      한 벌씩이던 것을 한 괴물 목록으로 모았다). 확률은 노바(15%)가 아니라 **0.5% 아래**(사용자 — 원작 헬옷은 0.5% 도 안 된다).
+      한 벌씩이던 것을 한 괴물 목록으로 모았다). 확률은 노바(15%)가 아니라 **0.5% 아래**, 층이 깊을수록 조금 더(괴물 DropRate 0.30%→0.48%)(사용자 — 원작 헬옷은 0.5% 도 안 된다).
       하데스는 목록에서 하나를 고르고 그 아이템의 DropRate × 1.5 를 굴리므로 DropRate 0.003 — 한 마리에 0.45%,
       목록이 넷이면 한 벌에 0.11%. 다른 곳의 그림록퀸도 같은 그림록퀸홀(전에는 0.01)을 쓰므로 함께 0.45% 가 된다.
       일반 괴물(노바는 3백만·5백만골드 주머니)은 금화만. 드라코(노바는 캐시템 드라코의발톱)는 아직 없음.
@@ -35,7 +36,7 @@ from pathlib import Path
 
 import sys as _sys, pathlib as _pathlib  # scripts/ 를 찾게 — lib/·graphify_runtime 이 거기 있다
 _sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[2]))
-from lib._world import AREAS, EXP_PER_HP, LOOT_NONE, LOOT_RANDOM, MAPS, SERVER, WARPS, text, warp
+from lib._world import AREAS, EXP_PER_HP, LOOT_NONE, LOOT_RANDOM, MAPS, SERVER, WARPS, WORLDMAP, text, warp, world_card
 
 HONDEN = Path.home() / "Downloads" / "혼든커뮤니티팩2"
 PACK_NAME = "공식길드전용던전"
@@ -46,6 +47,7 @@ TOWN_EXIT = [(0, y) for y in range(49, 55)]
 LOBBY_IN, LOBBY_OUT, TOWN_IN = (18, 47), (18, 49), (2, 51)
 MONSTERS = SERVER / "templates" / "monsters" / NAME
 ENTRY_LEVEL = 99              # 99레벨부터 사냥하는 곳(사용자 2026-10-02) — 아벨해안처럼 들어가는 문에만 건다
+CARD_POINT = (120, 130)       # 월드맵 사냥터 카드(층 바로 가기, 사용자 2026-10-02) — 원작 field001 마인(137,113) 옆
 
 # 노바 광산 괴물 — (체력, 최대 공격, 방어, 그림). 혼든 이름에서 「길드던전」 을 뗀 이름으로 찾는다.
 NOVA = {
@@ -63,6 +65,9 @@ AC_DEEP = -70
 GOLD_MINIMUM = 10000
 ITEMS = SERVER / "templates" / "items"
 DROP_RATE = 0.003             # × DropBoost 1.5 = 0.45% — 헬옷은 0.5% 도 안 된다(사용자 2026-10-02)
+# 괴물마다 확률(템플릿 DropRate) — 깊은 층일수록 조금 더(사용자 2026-10-02 「강한 몹일수록 드랍률이 조금이라도 높게」).
+# 1층 0.002 → 29층 0.0032, × 1.5 = 0.30% → 0.48%. 아이템의 DROP_RATE 는 다른 곳 그림록퀸홀 몫으로 그대로 둔다.
+MONSTER_DROP_RATE = (0.002, 0.0032)
 DROPS = {
     "그림록퀸": ["그림록퀸홀"],
     "헬몽크": ["헬몽크아머"],
@@ -118,6 +123,7 @@ def monster(kind, count, map_name, area):
         "LootType": LOOT_RANDOM if kind in DROPS else LOOT_NONE, "Drops": {"$values": DROPS.get(kind, [])},
         "ScriptName": "Common Monster", "UpdateMapWide": True, "UpdateRate": 1000.0,
         "Grow": False, "IgnoreCollision": False, "GoldMinimum": GOLD_MINIMUM,
+        **({"DropRate": round(MONSTER_DROP_RATE[0] + (MONSTER_DROP_RATE[1] - MONSTER_DROP_RATE[0]) * step, 5)} if kind in DROPS else {}),
     }
 
 
@@ -161,9 +167,12 @@ def main():
     warps.append(warp(lobby_name, lobby, LOBBY_OUT, TOWN, town, TOWN_IN))
 
     fresh = [(n, w) for n, w in warps if not (WARPS / f"{n}.json").exists()]
+    floors = sorted((n for n in ids if n != f"{PACK_NAME}대기실"), key=lambda n: (floor_of(n), n))
+    world = world_card(NAME, lobby, LOBBY_IN, CARD_POINT, [ids[n] for n in floors], warps)
     if write:
         for n, w in warps:
             (WARPS / f"{n}.json").write_text(json.dumps(w, ensure_ascii=False, indent=2), encoding="utf-8")
+        WORLDMAP.write_text(json.dumps(world, ensure_ascii=False, indent=2), encoding="utf-8")
 
     counts = {}                                                 # 혼든에 같은 층·같은 괴물 줄이 두 번 있는 곳이 있다 — 마릿수를 합친다
     for line in text(HONDEN / "db" / "mob" / PACK_NAME / f"{PACK_NAME}_spawn.txt").splitlines():
