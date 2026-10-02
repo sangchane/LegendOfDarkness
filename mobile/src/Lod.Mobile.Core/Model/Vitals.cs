@@ -81,9 +81,8 @@ public sealed record Vitals(
 /// </remarks>
 /// <remarks>
 /// A level hands out <c>StatsPerLevel</c> points and each of these spends one. The numbers are flags in
-/// the original and the server tests them as flags (<c>Format47Handler</c>), but it only ever spends one
-/// point per packet, so sending two at once raises two attributes for the price of one — which is why
-/// nothing here combines them.
+/// the original, but the server takes exactly one per packet and refuses a combination or an attribute
+/// already at the cap without spending the point (<c>Format47Handler</c>).
 /// </remarks>
 public enum Stat : byte
 {

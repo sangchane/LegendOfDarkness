@@ -3,7 +3,7 @@
 
 - **[현재/2026-10-02] 코드 정리 끝 — 등급 M · 단계: 클라우드 반영 끝, 폰 설치 대기(브랜치 `fix/code-review-findings`, 서버도 같은 이름).** 알맹이 폴더 `Protocol/World`·`Ui`·`Automation`·`Model`, 화면 `src/` 를 `App/Screens/World/Hud/Windows/Widgets/Diagnostics` 로 · `WorldClient` 받기 루프 갈래·`Companion`·`WorldEntry` 나눔 · `Tuning.cs` · `PercentWheel`·`DiamondButton` 지움(사용자) · 옛 `--hunt` 봇 그대로(사용자) · 봇 큐 상한(버그) · 서버 `Companions` 셋으로·상점 `ShopPricing` · 생성기 `scripts/lib/`·`scripts/ops/`(운영 스크립트 경로가 **`scripts/ops/cloud-server.sh`·`scripts/ops/ios-build.sh`** 로 바뀜). 시험: 알맹이 669 · 서버 278(시간 걸린 사냥 2개는 따로 돌려 통과) · 생성기 출력 전후 동일.
   2026-10-02 08:40 클라우드 반영(서버·봇 다섯 정상). 이펙트 첫 사용 끊김도 고침(생성기가 `effects-look.txt` 를 미리).
-  **다음**: ① 사용자가 맥 곁에 오면 `scripts/ops/ios-build.sh install`(폰 앱만 남음 — 정리·이펙트 끊김) ② 레벨업 점수 구멍 둘 — `plans/backlog.md` [정할 것] ③ 남은 정리 몇 줄 `plans/split-when-touched.md`
+  **다음**: ① 사용자가 맥 곁에 오면 `scripts/ops/ios-build.sh install`(폰 앱만 남음 — 정리·이펙트 끊김) ② ~~레벨업 점수 구멍 둘~~ 고침(2026-10-02, `StatRaiseTests`) ③ 남은 정리 몇 줄 `plans/split-when-touched.md`
 
 - **[현재/2026-10-02 밤] 손맛 고치기 — 등급 M · 단계: 설치 끝, 사용자 폰 확인 대기.** 워프 칸 위 「→ 간 곳」 이름표(`WorldView.TagExits`) · 봇이 잠든 채 제 잠 풀기(서버 마법 예외에 디나르콜리·디소루마, 봇만 잠드는 시험은 못 짬 — 폰 확인) · 오솔길 보스방 체력 5.99 몹 정의로(맨티스 19500·늑대 5850, 경험치 그대로 — 사용자) · 방향키 짧게 = 돌기만(0.2초) · 모션·걷기 10% 느리게(걷기 0.44초) · 동작 중 쓴 기술·마법은 모션 없이(원작 그대로) · 월드맵 사냥터 아래 구역 바로 가기(우드랜드·포테의숲·아벨해안, 워프 레벨 제한 — 가장 엄한 것 + 카드 입구) · 정보 상자 X·다시 누르면 닫힘 · 버린 것 안 줍기. 모두 클라우드·iOS 반영.
   **남음**: ① 세로에서 장비창 아래 소지품이 한 줄뿐 ② 남의 장비창 화면 사진(사용자는 못 함 — 사용자 화면이 빌 때 내가 `LOD_GEAR_SHOT=… dotnet test --filter Photograph_somebody_elses_gear`) ③ 몬스터가 빠르게 느껴지면 서버 이동 간격을 원작과 대조(정할 것).
