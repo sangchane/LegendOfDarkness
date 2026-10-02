@@ -39,7 +39,12 @@
     window.LOD_SIGNED_IN = signedIn;
     document.body.classList.toggle("is-read-only", !signedIn);
     if (button) {
-      button.textContent = signedIn ? "로그아웃" : "로그인";
+      // 휴대폰 폭에서는 로그아웃을 아이콘만(글자가 세로로 꺾이던 것) — 글자는 .session-label 이 CSS 로 숨긴다.
+      button.innerHTML = signedIn
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></svg><span class="session-label">로그아웃</span>'
+        : "로그인";
+      button.setAttribute("aria-label", signedIn ? "로그아웃" : "로그인");
+      button.title = signedIn ? "로그아웃" : "";
       button.hidden = location.protocol === "file:";
     }
     if (badge) { badge.hidden = signedIn; }
