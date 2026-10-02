@@ -68,8 +68,11 @@ public sealed class LearnLadder
 
         List<RosterRow> rows =
         [
-            .. skills.Select(skill => new RosterRow(skill.Name, false, skill.Icon, skill.Slot, LevelOf(skill.Name, false))),
-            .. spells.Select(spell => new RosterRow(spell.Name, true, spell.Icon, spell.Slot, LevelOf(spell.Name, true)))
+            // 서버의 영어 기본공격은 한글로, 시작 마법 beag ioc fein 은 목록에서 뺀다(사용자 2026-10-03).
+            .. skills.Select(skill => new RosterRow(CompanionSpells.Bare(skill.Name) == "Assail" ? "기본공격" : skill.Name,
+                false, skill.Icon, skill.Slot, LevelOf(skill.Name, false))),
+            .. spells.Where(spell => CompanionSpells.Bare(spell.Name) != "beag ioc fein")
+                .Select(spell => new RosterRow(spell.Name, true, spell.Icon, spell.Slot, LevelOf(spell.Name, true)))
         ];
 
         HashSet<string> known = [.. rows.Select(row => CompanionSpells.Bare(row.Name))];

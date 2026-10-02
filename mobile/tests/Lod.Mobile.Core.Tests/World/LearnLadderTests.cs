@@ -41,11 +41,12 @@ public sealed class LearnLadderTests
             level: 41,
             skills: [new LearnedSkill(1, 1, "Assail (Lev:1/100)"), new LearnedSkill(2, 2, "단각 (Lev:1/100)"),
                 new LearnedSkill(3, 42, "이형환위 (Lev:1/100)"), new LearnedSkill(4, 3, "붕각 (Lev:1/100)")],
-            spells: [new LearnedSpell(1, 21, SpellTargetType.NoTarget, "쿠로토 (Lev:1/100)", string.Empty, 1)]);
+            spells: [new LearnedSpell(1, 21, SpellTargetType.NoTarget, "쿠로토 (Lev:1/100)", string.Empty, 1),
+                new LearnedSpell(2, 2, SpellTargetType.ChooseTarget, "beag ioc fein (Lev:1/100)", string.Empty, 1)]);
 
-        // 표에 없는 배운 것(Assail)이 먼저, 그 뒤 레벨 순 — 같은 레벨은 기술 먼저. 못 배운 것은 끝에 레벨과 함께.
+        // 표에 없는 배운 것(Assail → 기본공격)이 먼저 — 시작 마법 beag ioc fein 은 빠진다, 그 뒤 레벨 순 — 같은 레벨은 기술 먼저. 못 배운 것은 끝에 레벨과 함께.
         Assert.Equal(
-            ["Assail", "단각", "이형환위", "쿠로토", "붕각", "금강불괴", "장풍", "구양신공"],
+            ["기본공격", "단각", "이형환위", "쿠로토", "붕각", "금강불괴", "장풍", "구양신공"],
             rows.Select(row => LearnLadderTests.Bare(row.Name)));
         Assert.All(rows.Take(5), row => Assert.True(row.Learned));
 
@@ -73,7 +74,7 @@ public sealed class LearnLadderTests
     {
         Assert.DoesNotContain(Ladder.Roster(5, 1, [], []), row => row.Name == "숏블레이드");
         Assert.Empty(Ladder.Roster(null, 1, [], []));
-        Assert.Equal(["Assail"], Ladder.Roster(null, 1, [new LearnedSkill(1, 1, "Assail")], []).Select(row => row.Name));
+        Assert.Equal(["기본공격"], Ladder.Roster(null, 1, [new LearnedSkill(1, 1, "Assail")], []).Select(row => row.Name));
     }
 
     /// <summary>직업은 프로필(0x39) 끝, 그룹 글 뒤 세 번째 바이트다(Hades <c>ServerFormat39</c>: 그룹 상태 · 0 · 직업).</summary>

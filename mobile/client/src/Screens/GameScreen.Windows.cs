@@ -407,6 +407,7 @@ public partial class GameScreen : Control
             return;
         }
 
+        _gearPanel.ShowMine();
         _pack.Show(_server?.Pack ?? LayoutCheck.PretendPack, Mine.Gold);
 
         // 직업·그룹 받기는 프로필(0x39)에서 온다 — 열 때마다 새로 묻는다.

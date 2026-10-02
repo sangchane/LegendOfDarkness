@@ -153,17 +153,25 @@ public sealed partial class GearPanel : PanelContainer
     /// </summary>
     public void Show(IReadOnlyList<WornItem> worn, Vitals? mine, int? path, string name, bool groupOpen, Vector2 room)
     {
+        ShowMine();
+        _gear.ShowFigures(mine);
+        _gear.ShowWho(ClassName(path), name);
+        _gear.ShowGroup(groupOpen);
+        Fill(worn, room);
+    }
+
+    /// <summary>
+    /// Leaves somebody else's window for ours — the screen fills ours in only while <see cref="ShowingOther" /> is false, so
+    /// the 장비 button must clear it first (once a companion's window had opened, the button kept showing that companion).
+    /// </summary>
+    public void ShowMine()
+    {
         if (_other is not null)
         {
             _other = null;
             _chosen = 0;
             _showing = null;
         }
-
-        _gear.ShowFigures(mine);
-        _gear.ShowWho(ClassName(path), name);
-        _gear.ShowGroup(groupOpen);
-        Fill(worn, room);
     }
 
     /// <summary>Shows somebody else's gear as the server sent it (0x34). Their fighting figures are not sent, so the boxes stay empty.</summary>
