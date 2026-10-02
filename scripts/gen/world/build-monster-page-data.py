@@ -24,7 +24,7 @@ SPRITES = ROOT / "mobile/client/assets/actor/creature"
 OUT = ROOT / "docs" / "monsters-data.js"
 
 # 지금 모바일로 실제 돌아다닐 수 있는 지역. 이름 앞머리로 가른다.
-REGIONS = ["노비스", "수오미", "우드랜드", "포테의숲", "아벨해안"]  # 사냥터 셋은 사용자 2026-10-02
+REGIONS = ["노비스", "수오미", "우드랜드", "포테의숲", "아벨해안", "구광산"]  # 사냥터 넷은 사용자 2026-10-02
 
 # 목록 드랍 전체에 곱하는 배율 — `Formulas/monsterexp.cs` DropBoost 와 같아야 한다(사용자 2026-09-26, 1.5배).
 DROP_BOOST = 1.5
@@ -210,7 +210,7 @@ def write_page(rows, wanted):
             "감산근거": "레벨 차이로 경험치를 깎는 값은 우리가 정한 것이다 — 원작에도 5.99 팩에도 그 규칙이 없다",
             "선공": "MoodType 은 스폰할 때 한 번 접힌다. 반반 = Unpredicable(4), 그 마리는 죽을 때까지 그대로",
         },
-        "레벨표": {str(n): to_reach(n) for n in range(2, 51)},
+        "레벨표": {str(n): to_reach(n) for n in range(2, 100)},
         "괴물": rows,
         "빈맵": empty,
         "셈": {

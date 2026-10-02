@@ -9,9 +9,15 @@
   - 맵: 36장 모두 새 번호로 넣는다. 하데스의 「광산N층」·「리파이너의던전N층」이 같은 맵 파일을 쓰지만 건드리지 않는다 —
     리파이너의던전은 살아 있는 던전이고, 혼든 안에서도 22-1=3-2 · 24-1=17-1 처럼 한 파일을 두 층이 쓰므로 번호를 나누면 층이 엉킨다.
   - 워프: 혼든 `db/warp/길드성/공식길드전용던전.txt` 를 그대로(8-1 로 가는 줄만 뺀다).
-  - 드나드는 길: 마인마을(0,49~54) → 구광산대기실(18,47), 구광산대기실(18,49) → 마인마을(2,51).
+  - 드나드는 길: 마인마을(0,49~54) → 구광산대기실(18,47) **99레벨부터**, 구광산대기실(18,49) → 마인마을(2,51).
     대기실 칸은 노바 팩 `Titan.txt`(광산대기실 18,47 도착 · 18,49 나감), 마인마을 칸은 5.99 `Casmanum_Warp.txt` 의 10시 출구.
-  - 괴물은 아직 넣지 않는다 — 혼든 수치는 길드 최고 레벨용이라(체력 6만~40만) 사용자가 정한다.
+  - 괴물: 배치(어느 층에 무엇이 몇 마리)는 혼든 `db/mob/공식길드전용던전/` 76줄 그대로. 수치는 **우리가 정했다**
+    (사용자 2026-10-02 「층마다 올라가게 · 99레벨부터 · 기존 광산 몬스터를 레퍼런스로 · 아벨과는 비교 안 됨」):
+      1층 = 노바 팩 광산1층 수치(`novaonline/db/mob/mine.txt`) — 그림록 77,760 · 공격 2,409~9,852.
+      29층으로 갈수록 5.99 카스마늄 갱도(나중에 나온 더 깊은 광산, 체력 45만 · 공격 5,200~ · 방어 -70)에 다가간다:
+      체력 ×1→×3, 최소 공격 2,409→5,200, 방어 → -70. 경험치는 카스마늄의 경험치/체력(1,309,240/450,000)에
+      하데스 나눗수 7.3(tools/pack-import EXPERIENCE_DIVISOR). 드라코는 노바 값(2,375만)이 튀어서 혼든 비율(그림록가 아니라 헬 바로 아래 — 헬 × 혼든 드라코/헬 비율).
+      금화 500(카스마늄) · 드랍 없음(혼든·노바 모두 근거가 엇갈려 아직).
 
   쓰는 법: python3 scripts/gen/world/build-old-mine.py            # 무엇이 바뀌는지만
            python3 scripts/gen/world/build-old-mine.py --쓰기     # 서버 자료에 쓴다
@@ -35,6 +41,25 @@ FLAGS = 106240           # 하데스 기존 맵과 같은 값(tools/pack-import 
 TOWN = "마인마을"
 TOWN_EXIT = [(0, y) for y in range(49, 55)]
 LOBBY_IN, LOBBY_OUT, TOWN_IN = (18, 47), (18, 49), (2, 51)
+MONSTERS = SERVER / "templates" / "monsters" / NAME
+ENTRY_LEVEL = 99              # 99레벨부터 사냥하는 곳(사용자 2026-10-02) — 아벨해안처럼 들어가는 문에만 건다
+
+# 노바 광산 괴물 — (체력, 최대 공격, 방어, 그림). 혼든 이름에서 「길드던전」 을 뗀 이름으로 찾는다.
+NOVA = {
+    "그림록": (77760, 9852, -30, 8), "그림록병사": (138240, 9852, -30, 10), "그림록근위병": (205335, 9852, -35, 9),
+    "그림록퀸": (337500, 9852, -76, 11), "오크병사": (65340, 9852, -30, 148),
+    # 드라코는 헬 직업·그림록퀸 바로 아랫 단계다(사용자 2026-10-02 — 헬몽크아머·그림록퀸홀 아래). 노바 값(2,375만)은 튀어서,
+    # 헬(노바 337,500)에 혼든의 드라코/헬 평균 비율(322,172 / 328,516)을 곱한다 — 일반 괴물과는 크게 벌어지고 헬보다 조금 아래.
+    "드라코": (round(337500 * 322172 / 328516), 12412, -69, 151),
+    "헬몽크": (337500, 12340, -78, 238), "헬불씨프": (337500, 12340, -78, 155), "헬블루나이트": (337500, 12340, -78, 156),
+    "헬소서러": (337500, 12340, -78, 68), "헬소서리스": (337500, 12340, -78, 158),
+}
+LAST_FLOOR = 29
+DMG_MIN = (2409, 5200)        # 1층(노바) → 29층(카스마늄)
+AC_DEEP = -70
+EXP_PER_HP = 1309240 / 450000 / 7.3
+GOLD = 500
+LOOT_GOLD = 1 << 5            # tools/pack-import LOOT_GOLD
 
 
 def text(path):
@@ -69,15 +94,38 @@ def hades_areas():
     return out
 
 
-def warp(src_name, src_id, at, dst_name, dst_id, to):
+def warp(src_name, src_id, at, dst_name, dst_id, to, level=1):
     name = f"warp {src_name}({at[0]},{at[1]}) to {dst_name}({to[0]},{to[1]})"
     return name, {
         "ActivationMapId": src_id,
         "Activations": [{"AreaID": src_id, "Location": {"X": at[0], "Y": at[1]}, "PortalKey": 0}],
-        "LevelRequired": 1,
+        "LevelRequired": level,
         "To": {"AreaID": dst_id, "Location": {"X": to[0], "Y": to[1]}, "PortalKey": 0},
         "WarpRadius": 0, "WarpType": "Map", "WorldResetWarpId": 0, "WorldTransionWarpId": 0,
         "Description": None, "Group": None, "Name": name,
+    }
+
+
+def floor_of(name):
+    m = re.search(r"(\d+)-\d+$", name)
+    return int(m.group(1)) if m else 1
+
+
+def monster(kind, count, map_name, area):
+    hp, dmg_max, ac, image = NOVA[kind]
+    step = (floor_of(map_name) - 1) / (LAST_FLOOR - 1)
+    hp = round(hp * (1 + 2 * step))
+    ac = round(ac + (AC_DEEP - ac) * step) if ac > AC_DEEP else ac
+    return {
+        "Name": kind, "BaseName": kind, "AreaID": area,
+        "SpawnMax": count, "SpawnType": 2, "SpawnRate": 30, "SpawnSize": 0, "SpawnOnlyOnActiveMaps": False,
+        "Image": 0x4000 + image, "ImageVarience": 0,
+        "MaximumHP": hp, "MaximumMP": 0, "Exp": round(hp * EXP_PER_HP),
+        "DmgMin": round(DMG_MIN[0] + (DMG_MIN[1] - DMG_MIN[0]) * step), "DmgMax": dmg_max, "Ac": ac,
+        "Level": 1, "MovementSpeed": 1500, "EngagedWalkingSpeed": 1500, "AttackSpeed": 1000, "CastSpeed": 8000,
+        "MoodType": 4, "PathQualifer": 1, "LootType": LOOT_GOLD, "Drops": {"$values": []},
+        "ScriptName": "Common Monster", "UpdateMapWide": True, "UpdateRate": 1000.0,
+        "Grow": False, "IgnoreCollision": False, "Gold": GOLD, "GoldChance": 100,
     }
 
 
@@ -117,18 +165,31 @@ def main():
     town = by_name[TOWN][1]["Id"]
     lobby_name, lobby = f"{NAME}대기실", ids[f"{PACK_NAME}대기실"]
     for at in TOWN_EXIT:
-        warps.append(warp(TOWN, town, at, lobby_name, lobby, LOBBY_IN))
+        warps.append(warp(TOWN, town, at, lobby_name, lobby, LOBBY_IN, ENTRY_LEVEL))
     warps.append(warp(lobby_name, lobby, LOBBY_OUT, TOWN, town, TOWN_IN))
 
     fresh = [(n, w) for n, w in warps if not (WARPS / f"{n}.json").exists()]
     if write:
-        for n, w in fresh:
+        for n, w in warps:
             (WARPS / f"{n}.json").write_text(json.dumps(w, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    counts = {}                                                 # 혼든에 같은 층·같은 괴물 줄이 두 번 있는 곳이 있다 — 마릿수를 합친다
+    for line in text(HONDEN / "db" / "mob" / PACK_NAME / f"{PACK_NAME}_spawn.txt").splitlines():
+        parts = line.strip().split(",")
+        if len(parts) >= 3 and parts[0] in ids:
+            key = (parts[1].replace("길드던전", ""), parts[0])
+            counts[key] = counts.get(key, 0) + int(parts[2])
+    spawns = [monster(kind, n, our_name(where), ids[where]) for (kind, where), n in counts.items()]
+    if write:
+        MONSTERS.mkdir(parents=True, exist_ok=True)
+        for m in spawns:
+            map_name = next(our_name(n) for n, i in ids.items() if i == m["AreaID"])
+            (MONSTERS / f"{m['Name']}@{map_name}.json").write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
 
     for kind, before, after, number in plan:
         print(f"  {kind:4} {number}  {before} → {after}")
     print(f"맵 {len(ids)}장(새 {len(plan)}) · "
-          f"워프 {len(warps)}장(새 {len(fresh)})" + ("" if write else "  — 미리보기, --쓰기 로 쓴다"))
+          f"워프 {len(warps)}장(새 {len(fresh)}) · 괴물 자리 {len(spawns)}" + ("" if write else "  — 미리보기, --쓰기 로 쓴다"))
 
 
 if __name__ == "__main__":

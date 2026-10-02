@@ -9,7 +9,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 public sealed class OldMineTests
 {
-    /// <summary>마인마을 10시 출구 여섯 칸이 대기실로 가고, 대기실에서 워프만 타고 모든 층에 닿으며, 대기실 문이 마인마을로 돌아온다.</summary>
+    /// <summary>마인마을 10시 출구 여섯 칸이 99레벨부터 대기실로 가고, 대기실에서 워프만 타고 모든 층에 닿으며, 대기실 문이 마인마을로 돌아온다.</summary>
     [Fact]
     public void The_west_exit_of_mine_town_leads_through_the_lobby_to_every_floor()
     {
@@ -22,10 +22,15 @@ public sealed class OldMineTests
         }
 
         List<(int From, int X, int Y, int To)> warps = [];
+        List<int> entranceLevels = [];
         foreach (string path in Directory.EnumerateFiles(Path.Combine(server, "templates", "warps"), "*.json"))
         {
             JsonNode warp = JsonNode.Parse(File.ReadAllText(path))!;
             int to = warp["To"]!["AreaID"]!.GetValue<int>();
+            if (warp["ActivationMapId"]!.GetValue<int>() == ids["마인마을"] && to == ids["구광산대기실"])
+            {
+                entranceLevels.Add(warp["LevelRequired"]!.GetValue<int>());
+            }
             foreach (JsonNode? at in warp["Activations"]!.AsArray())
             {
                 warps.Add((at!["AreaID"]!.GetValue<int>(), at["Location"]!["X"]!.GetValue<int>(), at["Location"]!["Y"]!.GetValue<int>(), to));
@@ -38,6 +43,7 @@ public sealed class OldMineTests
             Assert.Contains((town, 0, y, lobby), warps);
         }
         Assert.Contains(warps, w => w.From == lobby && w.To == town);
+        Assert.Equal(Enumerable.Repeat(99, 6), entranceLevels);   // 99레벨부터 — 입구에만
 
         HashSet<int> reached = [lobby];
         Queue<int> next = new([lobby]);
