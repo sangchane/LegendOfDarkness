@@ -1,0 +1,8 @@
+# Jump Desktop 로그인 양식
+# 이 파일을 .env.jump-desktop 이름으로 복사한 뒤 아래 빈 값을 채우세요.
+# .env.jump-desktop은 Git에서 제외됩니다. 비밀번호를 채운 파일은 커밋/푸시하지 마세요.
+# 채운 .env.jump-desktop 파일은 이 대화의 비공개 첨부로 보내주세요.
+# Google 계정 비밀번호가 아니라 Jump Desktop 계정 비밀번호를 넣으세요.
+
+JUMP_DESKTOP_EMAIL=
+JUMP_DESKTOP_PASSWORD=
