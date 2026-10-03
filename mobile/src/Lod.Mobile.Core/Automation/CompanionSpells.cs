@@ -22,6 +22,17 @@ public static class CompanionSpells
         All = Lento | Sleep | Bardo | Depreco,
     }
 
+    /// <summary>
+    /// 고른 적이 없을 때의 체크 — 봇(주인 레벨 − 2, 서버 <c>Companions.LevelFor</c>)이 쓸 수 있는 가장 센 저주 하나와 나르콜리
+    /// (사용자 2026-10-03: "가장 센 거만 체크"). 레벨은 서버 <c>Companions.PriestSpells</c> 와 같다 — 렌토 11 · 바르도 41 · 데프레코 71.
+    /// </summary>
+    public static Magic DefaultMagic(int ownerLevel)
+    {
+        int bot = Math.Max(1, ownerLevel - 2);
+
+        return Magic.Sleep | (bot >= 71 ? Magic.Depreco : bot >= 41 ? Magic.Bardo : bot >= 11 ? Magic.Lento : Magic.None);
+    }
+
     /// <summary>이 마법(꼬리 뗀 이름)을 켜고 끄는 체크 — 저주·나르콜리가 아니면 None.</summary>
     public static Magic SwitchOf(string name) => Bare(name) switch
     {

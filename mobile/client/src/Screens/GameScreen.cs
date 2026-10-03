@@ -394,6 +394,7 @@ public partial class GameScreen : Control
         _leaving = true;
         _settings.Exit.Disabled = true;
         _world.Frozen = true;
+        if (Main.ActivityHost is { } host) await host.FinishActivity(false);
 
         if (_server is { } server)
         {
@@ -416,6 +417,7 @@ public partial class GameScreen : Control
         }
 
         _world.Frozen = true;
+        if (Main.ActivityHost is { } host) await host.FinishActivity(true);
 
         if (_server is { } server)
         {
@@ -544,6 +546,7 @@ public partial class GameScreen : Control
         KeepGuiding(delta);
         KeepAutoHuntButton();
         _settings.ShowCompanion(_server?.Companion is not null);
+        _settings.ShowBotMagic(Main.BotMagicFor(_server?.Vitals?.Level ?? 0));
 
         if (Main.CompanionOnStart && _companionSettling >= 0 && _world.MapId > 0 && _server?.Vitals is not null
             && ++_companionSettling == 120)

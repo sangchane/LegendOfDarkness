@@ -25,7 +25,7 @@ public partial class GameScreen : Control
     }
 
     private System.Threading.Tasks.Task SendBotMagic() =>
-        _server?.SendCompanionMagicAsync(Main.BotMagic, System.Threading.CancellationToken.None)
+        _server?.SendCompanionMagicAsync(Main.BotMagicFor(_server.Vitals?.Level ?? 0), System.Threading.CancellationToken.None)
         ?? System.Threading.Tasks.Task.CompletedTask;
 
     /// <summary>

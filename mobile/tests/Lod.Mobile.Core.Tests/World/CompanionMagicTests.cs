@@ -144,6 +144,16 @@ public sealed class CompanionMagicTests
     }
 
     [Fact]
+    public void Untouched_only_the_strongest_curse_the_bot_can_use_is_ticked()
+    {
+        // 봇 레벨 = 주인 − 2.
+        Assert.Equal(CompanionSpells.Magic.Sleep, CompanionSpells.DefaultMagic(12));
+        Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Lento, CompanionSpells.DefaultMagic(13));
+        Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Bardo, CompanionSpells.DefaultMagic(43));
+        Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Depreco, CompanionSpells.DefaultMagic(73));
+    }
+
+    [Fact]
     public void Switches_go_out_as_kind_six_and_come_back_on_the_master_tie()
     {
         Assert.Equal(new byte[] { 6, 5 }, Companion.Magic(CompanionSpells.Magic.Lento | CompanionSpells.Magic.Bardo));

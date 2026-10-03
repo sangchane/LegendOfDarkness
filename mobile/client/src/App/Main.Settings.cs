@@ -107,12 +107,16 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// 봇 탭 「마법사」 — 봇이 걸어도 되는 저주(렌토·바르도·데프레코 따로)·나르콜리. 기기에 남고(비트 숫자 한 줄), 처음엔 모두 켬.
+    /// 봇 탭 「마법사」 — 봇이 걸어도 되는 저주(렌토·바르도·데프레코 따로)·나르콜리. 기기에 남는다(비트 숫자 한 줄). 고른 적이 없으면(null)
+    /// 봇 레벨에서 가장 센 저주 하나 + 나르콜리(<see cref="CompanionSpells.DefaultMagic"/>) — 레벨이 오르면 따라 바뀐다.
     /// 서버는 메모리에만 두므로 바꿀 때와 봇을 부를 때 보낸다(0xF1 6).
     /// </summary>
     private const string BotMagicFile = "user://botmagic.cfg";
 
-    public static CompanionSpells.Magic BotMagic { get; private set; } = CompanionSpells.Magic.All;
+    public static CompanionSpells.Magic? BotMagic { get; private set; }
+
+    /// <summary>지금 봇에게 보낼 체크 — 고른 것, 없으면 내 레벨의 기본.</summary>
+    public static CompanionSpells.Magic BotMagicFor(int ownerLevel) => BotMagic ?? CompanionSpells.DefaultMagic(ownerLevel);
 
     public static void SetBotMagic(CompanionSpells.Magic magic)
     {
