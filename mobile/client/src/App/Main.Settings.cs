@@ -109,51 +109,72 @@ public partial class Main : Control
 
     /// <summary>
     /// 봇 탭 — 걸 저주 하나(셀렉트, 저주는 한 칸이라 하나만)·나르콜리 켬·해제 둘과 버프 둘 켬(비트)·회복 셀렉트 둘. 기기에 남는다
-    /// (한 줄 "저주 나르콜리 성직자비트 회복 파티회복"). 처음엔 저주 「자동」(봇이 쓸 수 있는 가장 센 것), 모두 켬, 회복 「자동」.
+    /// (한 줄 "저주 나르콜리 성직자비트 회복 파티회복", 고른 적 없는 셀렉트는 −1). 처음엔 셀렉트 셋 모두 봇이 배운 가장 센 것, 켬은 모두.
     /// 서버는 메모리에만 두므로 바꿀 때와 봇을 부를 때 보낸다(0xF1 6).
     /// </summary>
     private const string BotMagicFile = "user://botmagic.cfg";
 
-    /// <summary>저주 셀렉트의 줄 — 비트가 null 이면 자동(레벨에 맞춘 가장 센 것).</summary>
-    public static readonly (string Label, CompanionSpells.Magic? Bit)[] CurseChoices =
+    /// <summary>저주 셀렉트의 줄(마법 이름 그대로, 끝 줄 끄기) — 레벨은 봇이 배우는 레벨(서버 <c>Companions.PriestSpells</c>).</summary>
+    public static readonly (string Name, int Level, CompanionSpells.Magic Bit)[] CurseChoices =
     [
-        ("자동 (가장 센 것)", null), ("렌토 (11)", CompanionSpells.Magic.Lento), ("바르도 (41)", CompanionSpells.Magic.Bardo),
-        ("데프레코 (71)", CompanionSpells.Magic.Depreco), ("프라보 (99)", CompanionSpells.Magic.Prabo), ("끄기", CompanionSpells.Magic.None),
+        ("렌토", 11, CompanionSpells.Magic.Lento), ("바르도", 41, CompanionSpells.Magic.Bardo), ("데프레코", 71, CompanionSpells.Magic.Depreco),
+        ("프라보", 99, CompanionSpells.Magic.Prabo), ("끄기", 0, CompanionSpells.Magic.None),
     ];
 
-    /// <summary>회복 셀렉트의 줄 — 첫 줄 자동, 끝 줄 끄기, 사이는 <see cref="CompanionSpells.Heals"/> 차례(그것까지).</summary>
-    public static readonly string[] HealChoices = ["자동 (가장 센 것)", "쿠로 (1)", "쿠라노 (21)", "쿠라노소 (55)", "수페라쿠라노 (83)", "엑스쿠라노 (99)", "끄기"];
+    /// <summary>회복 셀렉트의 줄 — <see cref="CompanionSpells.Heals"/> 차례(그것까지), 끝 줄 끄기.</summary>
+    public static readonly (string Name, int Level)[] HealChoices =
+        [("쿠로", 1), ("쿠라노", 21), ("쿠라노소", 55), ("수페라쿠라노", 83), ("엑스쿠라노", 99), ("끄기", 0)];
 
-    public static readonly string[] GroupHealChoices = ["자동 (가장 센 것)", "쿠러스 (11)", "쿠라누스 (63)", "쿠라네라 (87)", "엑스쿠라네라 (99)", "끄기"];
+    public static readonly (string Name, int Level)[] GroupHealChoices =
+        [("쿠러스", 11), ("쿠라누스", 63), ("쿠라네라", 87), ("엑스쿠라네라", 99), ("끄기", 0)];
 
-    public static int BotCurse { get; private set; }
+    /// <summary>고른 줄. −1 은 고른 적 없음 — 봇 레벨(내 레벨 − 2)에서 배운 가장 센 줄(<see cref="AutoRow"/>)을 보이고 그대로 쓴다.</summary>
+    public static int BotCurse { get; private set; } = -1;
 
     public static bool BotSleep { get; private set; } = true;
 
     public static CompanionSpells.Priest BotPriest { get; private set; } = CompanionSpells.Priest.All;
 
-    public static int BotHeal { get; private set; }
+    public static int BotHeal { get; private set; } = -1;
 
-    public static int BotGroupHeal { get; private set; }
+    public static int BotGroupHeal { get; private set; } = -1;
+
+    /// <summary>봇이 이 레벨에서 배운 가장 센 줄, 하나도 없으면 끝 줄(끄기).</summary>
+    public static int AutoRow(int[] levels, int ownerLevel)
+    {
+        int bot = System.Math.Max(1, ownerLevel - 2);
+        int row = levels.Length - 1;
+
+        for (int at = 0; at < levels.Length - 1; at++)
+        {
+            if (levels[at] <= bot)
+            {
+                row = at;
+            }
+        }
+
+        return row;
+    }
 
     /// <summary>지금 봇에게 보낼 것.</summary>
     public static CompanionSettings BotOrdersFor(int ownerLevel) => new(
         Magic: (BotSleep ? CompanionSpells.Magic.Sleep : CompanionSpells.Magic.None)
-               | (CurseChoices[BotCurse].Bit ?? CompanionSpells.DefaultMagic(ownerLevel) & ~CompanionSpells.Magic.Sleep),
+               | CurseChoices[BotCurse >= 0 ? BotCurse : AutoRow([.. CurseChoices.Select(one => one.Level)], ownerLevel)].Bit,
         Priest: BotPriest,
-        Heal: HealPick(BotHeal, HealChoices),
-        GroupHeal: HealPick(BotGroupHeal, GroupHealChoices));
+        Heal: HealPick(BotHeal, HealChoices.Length),
+        GroupHeal: HealPick(BotGroupHeal, GroupHealChoices.Length));
 
-    /// <summary>셀렉트 줄 번호 → 선의 값(0 자동 · k 번째까지 · 255 끄기).</summary>
-    private static int HealPick(int row, string[] choices) => row == choices.Length - 1 ? CompanionSpells.HealOff : row;
+    /// <summary>셀렉트 줄 → 선의 값: 고른 적 없음 0(자동 — 봇이 배운 가장 센 것), k 번째 줄은 k+1(그것까지), 끝 줄 255(끄기).</summary>
+    private static int HealPick(int row, int rows) =>
+        row < 0 ? CompanionSpells.HealAuto : row == rows - 1 ? CompanionSpells.HealOff : row + 1;
 
     public static void SetBotOrders(int curse, bool sleep, CompanionSpells.Priest priest, int heal, int groupHeal)
     {
-        BotCurse = System.Math.Clamp(curse, 0, CurseChoices.Length - 1);
+        BotCurse = System.Math.Clamp(curse, -1, CurseChoices.Length - 1);
         BotSleep = sleep;
         BotPriest = priest & CompanionSpells.Priest.All;
-        BotHeal = System.Math.Clamp(heal, 0, HealChoices.Length - 1);
-        BotGroupHeal = System.Math.Clamp(groupHeal, 0, GroupHealChoices.Length - 1);
+        BotHeal = System.Math.Clamp(heal, -1, HealChoices.Length - 1);
+        BotGroupHeal = System.Math.Clamp(groupHeal, -1, GroupHealChoices.Length - 1);
 
         Godot.FileAccess? writing = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Write);
 
@@ -167,11 +188,11 @@ public partial class Main : Control
     private static void ReadBotMagic()
     {
         using Godot.FileAccess? reading = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Read);
-        int[] parts = [.. (reading?.GetLine().Trim().Split(' ') ?? []).Select(one => int.TryParse(one, out int value) ? value : -1)];
+        int?[] parts = [.. (reading?.GetLine().Trim().Split(' ') ?? []).Select(one => int.TryParse(one, out int value) ? value : (int?)null)];
 
-        if (parts.Length == 5 && parts.All(one => one >= 0))
+        if (parts.Length == 5 && parts.All(one => one is not null))
         {
-            SetBotOrders(parts[0], parts[1] != 0, (CompanionSpells.Priest)parts[2], parts[3], parts[4]);
+            SetBotOrders(parts[0]!.Value, parts[1] != 0, (CompanionSpells.Priest)parts[2]!.Value, parts[3]!.Value, parts[4]!.Value);
         }
     }
 

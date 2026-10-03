@@ -48,45 +48,30 @@ public sealed partial class SettingsPanel : PanelContainer
         // ── 봇 ───────────────────────────────────────────────
         // 봇(성직자 동료) — 부르면 서버가 봇을 내 곁으로 데려와 파티에 넣는다. 결과는 서버 알림으로 온다(우리 확장 0xF1·0x5E).
         VBoxContainer bot = Page();
-        bot.AddChild(Caption("성직자 봇이 따라다니며 회복·버프를 겁니다. 왼쪽 봇 칸을 누르면 봇 장비창이 열립니다."));
-        Companion = new Button { Text = CallText, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
-        Greybox.Plain(Companion);
-        bot.AddChild(Companion);
+        bot.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        // 마법사 — 봇이 레벨대로 배운 저주·나르콜리를 쓸지(사용자, 2026-10-03). 바뀌면 게임 화면이 서버로 보낸다(0xF1 6).
-        bot.AddChild(new Label { Text = "마법사", HorizontalAlignment = HorizontalAlignment.Center });
-        bot.AddChild(Caption("저주는 하나만 걸립니다 — 고른 것(자동은 봇이 쓸 수 있는 가장 센 것)을 주인과 싸우는 괴물에. 나르콜리는 주인이 치지 않는 괴물을 재웁니다."));
-        PercentSelect curse = PercentSelect.Of([.. Main.CurseChoices.Select(one => one.Label)], Main.BotCurse, this, width: 170);
-        curse.Changed += index => Order(curse: index);
-        bot.AddChild(Row("저주", curse));
-        bot.AddChild(Row("나르콜리 (41)", Switch(Main.BotSleep, on => Order(sleep: on))));
+        // 부르기·보내기는 켬/끔 한 줄(사용자, 2026-10-03: 공간 적게). 누르면 무엇을 할지는 게임 화면이 정한다.
+        Companion = Switch(false, _ => { });
+        bot.AddChild(BotRow("봇", Companion));
 
-        // 성직자 — 회복은 고른 것까지에서 마력이 닿는 가장 센 것(사용자, 2026-10-03: 저주와 같은 방식으로).
-        bot.AddChild(new Label { Text = "성직자", HorizontalAlignment = HorizontalAlignment.Center });
-        bot.AddChild(Caption("회복은 고른 것까지에서 마력이 닿는 가장 센 것. 디나르콜리·디소루마는 잠·빙결 풀기."));
-        PercentSelect heal = PercentSelect.Of(Main.HealChoices, Main.BotHeal, this, width: 170);
-        heal.Changed += index => Order(heal: index);
-        bot.AddChild(Row("회복", heal));
-        PercentSelect group = PercentSelect.Of(Main.GroupHealChoices, Main.BotGroupHeal, this, width: 170);
-        group.Changed += index => Order(groupHeal: index);
-        bot.AddChild(Row("파티 회복", group));
+        // 마법사·성직자 — 셀렉트는 마법 이름 그대로(고른 적 없으면 봇이 배운 가장 센 것을 보인다, ShowBotLevel), 켬은 두 칸씩.
+        bot.AddChild(Heading("마법사"));
+        _curse = PercentSelect.Of([.. Main.CurseChoices.Select(one => one.Name)], Main.BotCurse, this, SelectWidth, SelectHeight);
+        _curse.Changed += row => Order(curse: row);
+        bot.AddChild(Pair(BotRow("저주", _curse), BotRow("나르콜리", Switch(Main.BotSleep, on => Order(sleep: on)))));
 
-        // 해제 둘·버프 둘은 두 칸씩 두 줄로(사용자: 여러 줄로 늘어놓을 것 없다).
-        GridContainer priests = new() { Columns = 2, SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        priests.AddThemeConstantOverride("h_separation", Main.Gutter * 2);
-        foreach ((string name, CompanionSpells.Priest bit) in new[]
-                 {
-                     ("디나르콜리", CompanionSpells.Priest.Dinarcoli), ("디소루마", CompanionSpells.Priest.Disoruma),
-                     ("호르라마", CompanionSpells.Priest.Horrama), ("에나르마", CompanionSpells.Priest.Enarma),
-                 })
-        {
-            Control row = Row(name, Switch((Main.BotPriest & bit) != 0,
-                on => Order(priest: on ? Main.BotPriest | bit : Main.BotPriest & ~bit)));
-            row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            priests.AddChild(row);
-        }
+        bot.AddChild(Heading("성직자"));
+        _heal = PercentSelect.Of([.. Main.HealChoices.Select(one => one.Name)], Main.BotHeal, this, SelectWidth, SelectHeight);
+        _heal.Changed += row => Order(heal: row);
+        _groupHeal = PercentSelect.Of([.. Main.GroupHealChoices.Select(one => one.Name)], Main.BotGroupHeal, this, SelectWidth, SelectHeight);
+        _groupHeal.Changed += row => Order(groupHeal: row);
+        bot.AddChild(Pair(BotRow("회복", _heal), BotRow("파티", _groupHeal)));
 
-        bot.AddChild(priests);
+        Control PriestSwitch(string name, CompanionSpells.Priest bit) =>
+            BotRow(name, Switch((Main.BotPriest & bit) != 0, on => Order(priest: on ? Main.BotPriest | bit : Main.BotPriest & ~bit)));
+        bot.AddChild(Pair(PriestSwitch("디나르콜리", CompanionSpells.Priest.Dinarcoli), PriestSwitch("디소루마", CompanionSpells.Priest.Disoruma)));
+        bot.AddChild(Pair(PriestSwitch("호르라마", CompanionSpells.Priest.Horrama), PriestSwitch("에나르마", CompanionSpells.Priest.Enarma)));
+        ShowBotLevel(0);
 
         // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
         Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(76, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
@@ -232,21 +217,79 @@ public sealed partial class SettingsPanel : PanelContainer
 
     public Button Close { get; }
 
-    private const string CallText = "봇 부르기";
-    private const string DismissText = "봇 보내기";
+    /// <summary>봇 켬/끔 — 끈 채 누르면 부르기, 켠 채 누르면 보내기. 누르면 무엇을 할지는 게임 화면이 정한다.</summary>
+    public CheckButton Companion { get; }
 
-    /// <summary>[봇 부르기] — 봇이 있으면 [봇 보내기]. 누르면 무엇을 할지는 게임 화면이 정한다.</summary>
-    public Button Companion { get; }
+    private bool? _present;
 
-    /// <summary>동료가 있나(0x5E)에 따라 단추 글자를 바꾼다.</summary>
+    /// <summary>동료가 있나(0x5E)가 바뀔 때만 켬/끔을 맞춘다 — 누른 뒤 서버 답을 기다리는 동안 되돌아가지 않게.</summary>
     public void ShowCompanion(bool present)
     {
-        string text = present ? DismissText : CallText;
-
-        if (Companion.Text != text)
+        if (_present != present)
         {
-            Companion.Text = text;
+            _present = present;
+            Companion.SetPressedNoSignal(present);
         }
+    }
+
+    private const int SelectWidth = 108;
+    private const int SelectHeight = 36;
+    private readonly PercentSelect _curse;
+    private readonly PercentSelect _heal;
+    private readonly PercentSelect _groupHeal;
+
+    /// <summary>고른 적 없는 셀렉트에 지금 레벨에서 봇이 배운 가장 센 마법 이름을 보인다(게임 화면이 틱마다).</summary>
+    public void ShowBotLevel(int ownerLevel)
+    {
+        if (Main.BotCurse < 0)
+        {
+            _curse.Display(Main.AutoRow([.. Main.CurseChoices.Select(one => one.Level)], ownerLevel));
+        }
+
+        if (Main.BotHeal < 0)
+        {
+            _heal.Display(Main.AutoRow([.. Main.HealChoices.Select(one => one.Level)], ownerLevel));
+        }
+
+        if (Main.BotGroupHeal < 0)
+        {
+            _groupHeal.Display(Main.AutoRow([.. Main.GroupHealChoices.Select(one => one.Level)], ownerLevel));
+        }
+    }
+
+    private static Label Heading(string text)
+    {
+        Label heading = new() { Text = text };
+        heading.AddThemeColorOverride("font_color", Greybox.Accent);
+        heading.AddThemeFontSizeOverride("font_size", 13);
+
+        return heading;
+    }
+
+    /// <summary>봇 탭 한 칸 — 이름 왼쪽, 단추 오른쪽, 창 가장자리에서 띄운다.</summary>
+    private static Control BotRow(string title, Control control)
+    {
+        HBoxContainer row = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        Label name = new() { Text = title, VerticalAlignment = VerticalAlignment.Center, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        name.AddThemeColorOverride("font_color", Greybox.Muted);
+        name.AddThemeFontSizeOverride("font_size", 14);
+        control.CustomMinimumSize = new Vector2(control.CustomMinimumSize.X, SelectHeight);
+        row.AddChild(name);
+        row.AddChild(control);
+        row.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
+
+        return row;
+    }
+
+    /// <summary>두 칸을 한 줄에.</summary>
+    private static Control Pair(Control left, Control right)
+    {
+        HBoxContainer pair = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        pair.AddThemeConstantOverride("separation", Main.Gutter * 2);
+        pair.AddChild(left);
+        pair.AddChild(right);
+
+        return pair;
     }
 
     /// <summary>

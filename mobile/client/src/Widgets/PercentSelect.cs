@@ -39,9 +39,10 @@ public sealed partial class PercentSelect : Button
     }
 
     /// <summary>이름 목록에서 하나 — 값은 고른 줄의 번호(0부터).</summary>
-    public static PercentSelect Of(string[] labels, int index, Control bounds, int width) => new(labels, 0, index, bounds, width);
+    public static PercentSelect Of(string[] labels, int index, Control bounds, int width, int height) =>
+        new(labels, 0, index, bounds, width, height);
 
-    private PercentSelect(string[] labels, int first, int value, Control bounds, int width)
+    private PercentSelect(string[] labels, int first, int value, Control bounds, int width, int? height = null)
     {
         _labels = labels;
         _first = first;
@@ -50,7 +51,7 @@ public sealed partial class PercentSelect : Button
         _rows = new Button[labels.Length];
         _value = Mathf.Clamp(value, first, first + labels.Length - 1);
         Text = _labels[_value - _first];
-        CustomMinimumSize = new Vector2(width, Main.TouchMinimum);
+        CustomMinimumSize = new Vector2(width, height ?? Main.TouchMinimum);
         Greybox.Plain(this);
 
         VBoxContainer list = new();
@@ -78,6 +79,18 @@ public sealed partial class PercentSelect : Button
         AddChild(_picker);
 
         Pressed += Open;
+    }
+
+    /// <summary>값을 보이기만 한다(알리지 않는다) — 고른 적 없는 봇 셀렉트가 레벨에 따라 바뀐 줄을 보일 때.</summary>
+    public void Display(int value)
+    {
+        value = Mathf.Clamp(value, _first, _first + _labels.Length - 1);
+
+        if (value != _value || Text != _labels[value - _first])
+        {
+            _value = value;
+            Text = _labels[value - _first];
+        }
     }
 
     /// <summary>A new value was picked from the list.</summary>
