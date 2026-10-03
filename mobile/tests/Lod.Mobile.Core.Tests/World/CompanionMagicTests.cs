@@ -159,18 +159,18 @@ public sealed class CompanionMagicTests
     [Fact]
     public void Orders_go_out_as_kind_six_and_come_back_on_the_master_tie()
     {
-        Assert.Equal(new byte[] { 6, 5, 3, 2, 255 },
+        Assert.Equal(new byte[] { 6, 5, 3, 2, 255, 5 },
             Companion.Orders(CompanionSpells.Magic.Lento | CompanionSpells.Magic.Bardo,
-                CompanionSpells.Priest.Dinarcoli | CompanionSpells.Priest.Disoruma, 2, CompanionSpells.HealOff));
+                CompanionSpells.Priest.Dinarcoli | CompanionSpells.Priest.Disoruma, 2, CompanionSpells.HealOff, 5));
 
         byte[] old = [1, 0, 0, 0, 42, 1, (byte)'a'];
         CompanionTie plain = Companion.ReadTie(old).Tie!;
-        Assert.Equal((CompanionSpells.Magic.All, CompanionSpells.Priest.All, 0, 0), (plain.Magic, plain.Priest, plain.Heal, plain.GroupHeal));
+        Assert.Equal((CompanionSpells.Magic.All, CompanionSpells.Priest.All, 0, 0, 0), (plain.Magic, plain.Priest, plain.Heal, plain.GroupHeal, plain.Follow));
 
-        byte[] tailed = [1, 0, 0, 0, 42, 1, (byte)'a', 8, 4, 3, 255];
+        byte[] tailed = [1, 0, 0, 0, 42, 1, (byte)'a', 8, 4, 3, 255, 6];
         CompanionTie tie = Companion.ReadTie(tailed).Tie!;
-        Assert.Equal(("a", CompanionSpells.Magic.Depreco, CompanionSpells.Priest.Horrama, 3, 255),
-            (tie.Name, tie.Magic, tie.Priest, tie.Heal, tie.GroupHeal));
+        Assert.Equal(("a", CompanionSpells.Magic.Depreco, CompanionSpells.Priest.Horrama, 3, 255, 6),
+            (tie.Name, tie.Magic, tie.Priest, tie.Heal, tie.GroupHeal, tie.Follow));
     }
 
     private static readonly IReadOnlyList<LearnedSpell> Healer =

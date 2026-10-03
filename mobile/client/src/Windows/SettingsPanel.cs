@@ -11,7 +11,7 @@ namespace LodClient;
 /// <item><b>자동</b> — 자동 포션 줄 둘(체력·마력이 몇 % 이하일 때 마시나, 게이지 바 <see cref="PotionGauge"/> 10~90%), 자동 사냥의
 /// 반경 슬라이더·회복 기술 셀렉트 박스(<see cref="PercentSelect"/>, 1~99). 무엇을 마실지와 켜고 끄기는 게임 화면의 포션 단추에서
 /// 한다(<see cref="PotionChip"/>).</item>
-/// <item><b>봇</b> — [봇 부르기]/[봇 보내기], 「마법사」 저주·나르콜리 켜고 끄기.</item>
+/// <item><b>봇</b> — [봇 부르기]/[봇 보내기], 따라가기 거리, 「마법사」 저주·나르콜리 켜고 끄기.</item>
 /// </list>
 /// [로그아웃] 은 어느 탭에서나 보이는 제목 줄에 있다(누르면 [로그아웃]·[게임 종료]·[취소] 판, <see cref="ExitChoice"/>).
 /// 계정 탭(자동 로그인 끄기)은 뺐다(사용자, 2026-09-30) — 로그아웃한 로그인 화면에서 「자동 로그인」을 끄면 저장된 계정이 지워진다.
@@ -53,6 +53,11 @@ public sealed partial class SettingsPanel : PanelContainer
         // 부르기·보내기는 켬/끔 한 줄(사용자, 2026-10-03: 공간 적게). 누르면 무엇을 할지는 게임 화면이 정한다.
         Companion = Switch(false, _ => { });
         bot.AddChild(BotRow("봇", Companion));
+
+        // 주인과 몇 칸 넘게 떨어지면 따라올지 — 자동 사냥 반경처럼 직접(사용자, 2026-10-03).
+        Control follow = SliderRow("따라가기", 1, 10, 1, Main.BotFollow, value => $"{value}칸", value => Order(follow: value));
+        follow.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
+        bot.AddChild(follow);
 
         // 마법사·성직자 — 셀렉트는 마법 이름 그대로(고른 적 없으면 봇이 배운 가장 센 것을 보인다, ShowBotLevel), 켬은 두 칸씩.
         bot.AddChild(Heading("마법사"));
@@ -197,9 +202,11 @@ public sealed partial class SettingsPanel : PanelContainer
     }
 
     /// <summary>봇 탭에서 하나를 바꾸고 나머지는 그대로 둔 채 남기고 알린다.</summary>
-    private void Order(int? curse = null, bool? sleep = null, CompanionSpells.Priest? priest = null, int? heal = null, int? groupHeal = null)
+    private void Order(int? curse = null, bool? sleep = null, CompanionSpells.Priest? priest = null, int? heal = null, int? groupHeal = null,
+        int? follow = null)
     {
-        Main.SetBotOrders(curse ?? Main.BotCurse, sleep ?? Main.BotSleep, priest ?? Main.BotPriest, heal ?? Main.BotHeal, groupHeal ?? Main.BotGroupHeal);
+        Main.SetBotOrders(curse ?? Main.BotCurse, sleep ?? Main.BotSleep, priest ?? Main.BotPriest, heal ?? Main.BotHeal, groupHeal ?? Main.BotGroupHeal,
+            follow ?? Main.BotFollow);
         BotMagicChanged?.Invoke();
     }
 

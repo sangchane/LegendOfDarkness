@@ -109,7 +109,7 @@ public partial class Main : Control
 
     /// <summary>
     /// 봇 탭 — 걸 저주 하나(셀렉트, 저주는 한 칸이라 하나만)·나르콜리 켬·해제 둘과 버프 둘 켬(비트)·회복 셀렉트 둘. 기기에 남는다
-    /// (한 줄 "저주 나르콜리 성직자비트 회복 파티회복", 고른 적 없는 셀렉트는 −1). 처음엔 셀렉트 셋 모두 봇이 배운 가장 센 것, 켬은 모두.
+    /// (한 줄 "저주 나르콜리 성직자비트 회복 파티회복 따라가기", 고른 적 없는 셀렉트는 −1). 처음엔 셀렉트 셋 모두 봇이 배운 가장 센 것, 켬은 모두.
     /// 서버는 메모리에만 두므로 바꿀 때와 봇을 부를 때 보낸다(0xF1 6).
     /// </summary>
     private const string BotMagicFile = "user://botmagic.cfg";
@@ -139,6 +139,9 @@ public partial class Main : Control
 
     public static int BotGroupHeal { get; private set; } = -1;
 
+    /// <summary>주인과 이만큼(칸) 넘게 떨어지면 봇이 따라 걷는다(1~10, 기본 3 — 사용자 2026-10-03).</summary>
+    public static int BotFollow { get; private set; } = 3;
+
     /// <summary>봇이 이 레벨에서 배운 가장 센 줄, 하나도 없으면 끝 줄(끄기).</summary>
     public static int AutoRow(int[] levels, int ownerLevel)
     {
@@ -162,25 +165,27 @@ public partial class Main : Control
                | CurseChoices[BotCurse >= 0 ? BotCurse : AutoRow([.. CurseChoices.Select(one => one.Level)], ownerLevel)].Bit,
         Priest: BotPriest,
         Heal: HealPick(BotHeal, HealChoices.Length),
-        GroupHeal: HealPick(BotGroupHeal, GroupHealChoices.Length));
+        GroupHeal: HealPick(BotGroupHeal, GroupHealChoices.Length),
+        FollowFrom: BotFollow);
 
     /// <summary>셀렉트 줄 → 선의 값: 고른 적 없음 0(자동 — 봇이 배운 가장 센 것), k 번째 줄은 k+1(그것까지), 끝 줄 255(끄기).</summary>
     private static int HealPick(int row, int rows) =>
         row < 0 ? CompanionSpells.HealAuto : row == rows - 1 ? CompanionSpells.HealOff : row + 1;
 
-    public static void SetBotOrders(int curse, bool sleep, CompanionSpells.Priest priest, int heal, int groupHeal)
+    public static void SetBotOrders(int curse, bool sleep, CompanionSpells.Priest priest, int heal, int groupHeal, int follow)
     {
         BotCurse = System.Math.Clamp(curse, -1, CurseChoices.Length - 1);
         BotSleep = sleep;
         BotPriest = priest & CompanionSpells.Priest.All;
         BotHeal = System.Math.Clamp(heal, -1, HealChoices.Length - 1);
         BotGroupHeal = System.Math.Clamp(groupHeal, -1, GroupHealChoices.Length - 1);
+        BotFollow = System.Math.Clamp(follow, 1, 10);
 
         Godot.FileAccess? writing = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Write);
 
         if (writing is not null)
         {
-            writing.StoreLine($"{BotCurse} {(sleep ? 1 : 0)} {(int)BotPriest} {BotHeal} {BotGroupHeal}");
+            writing.StoreLine($"{BotCurse} {(sleep ? 1 : 0)} {(int)BotPriest} {BotHeal} {BotGroupHeal} {BotFollow}");
             writing.Close();
         }
     }
@@ -190,9 +195,11 @@ public partial class Main : Control
         using Godot.FileAccess? reading = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Read);
         int?[] parts = [.. (reading?.GetLine().Trim().Split(' ') ?? []).Select(one => int.TryParse(one, out int value) ? value : (int?)null)];
 
-        if (parts.Length == 5 && parts.All(one => one is not null))
+        // 따라가기(여섯째)는 10-03 에 더했다 — 그 전 다섯 칸 줄은 기본 3.
+        if (parts.Length is 5 or 6 && parts.All(one => one is not null))
         {
-            SetBotOrders(parts[0]!.Value, parts[1] != 0, (CompanionSpells.Priest)parts[2]!.Value, parts[3]!.Value, parts[4]!.Value);
+            SetBotOrders(parts[0]!.Value, parts[1] != 0, (CompanionSpells.Priest)parts[2]!.Value, parts[3]!.Value, parts[4]!.Value,
+                parts.Length == 6 ? parts[5]!.Value : 3);
         }
     }
 

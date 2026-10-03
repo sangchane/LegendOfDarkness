@@ -253,10 +253,15 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             Now = _clock.Elapsed,
         };
 
-        // 쓸 마법(저주·나르콜리·해제·버프·회복)은 주인이 앱 봇 탭에서 고른다(0x5E 종류 1 꼬리).
+        // 쓸 마법(저주·나르콜리·해제·버프·회복)과 따라가기 거리는 주인이 앱 봇 탭에서 고른다(0x5E 종류 1 꼬리).
         CompanionStep step = _brain.Next(sight, master is null
             ? settings
-            : settings with { Magic = master.Magic, Priest = master.Priest, Heal = master.Heal, GroupHeal = master.GroupHeal });
+            : settings with
+            {
+                Magic = master.Magic, Priest = master.Priest, Heal = master.Heal, GroupHeal = master.GroupHeal,
+                FollowFrom = master.Follow > 0 ? master.Follow : settings.FollowFrom,
+                FollowTo = master.Follow > 0 ? Math.Max(1, master.Follow - 1) : settings.FollowTo,
+            });
 
         switch (step.Act)
         {
