@@ -1,7 +1,7 @@
 namespace Lod.Mobile.Core.Automation;
 
 /// <summary>
-/// 5.99 성직자 회복·버프·해제 마법의 값 — <c>성직자(비전직).txt</c> 의 SPELL_ 블록에서: 회복량은 위즈의 몇 배, 마력, 버프는
+/// 5.99 성직자 회복·버프·해제 마법과 봇이 함께 쓰는 마법사 저주·나르콜리의 값 — <c>성직자(비전직).txt</c> 의 SPELL_ 블록에서: 회복량은 위즈의 몇 배, 마력, 버프는
 /// 몇 초. 쿠로는 신성력강화가 있으면 ×15·22마력, 없으면 ×8·15마력. 포션이 채우는 양은 서버 템플릿(templates/items)의
 /// HealthRestore·ManaRestore.
 /// </summary>
@@ -13,10 +13,19 @@ public static class CompanionSpells
         GroupHeal,
         Buff,
         Cure,
+        Curse,
+        Sleep,
     }
 
     /// <param name="State">버프는 서버가 알리는 상태 이름(5.99 스크립트의 horrama·enare), 해제는 푸는 디버프 이름.</param>
-    public sealed record Entry(Kind Kind, int Power, int Mana, int Seconds = 0, string State = "");
+    /// <param name="Icon">괴물에게 거는 것(저주·수면)은 걸렸는지를 둘레 알림(0x5C)의 그림 번호로 본다.</param>
+    public sealed record Entry(Kind Kind, int Power, int Mana, int Seconds = 0, string State = "", int Icon = 0);
+
+    /// <summary>저주 칸(5.99 <c>magic 1</c>)의 그림 — 렌토·바르도·데프레코 모두 같은 칸이라 하나만 걸린다(서버 <c>Pack599.Curse</c>).</summary>
+    public const int CurseIcon = 82;
+
+    /// <summary>수면(<c>debuff_sleep</c>)의 그림.</summary>
+    public const int SleepIcon = 90;
 
     private static readonly Dictionary<string, Entry> Known = new(StringComparer.Ordinal)
     {
@@ -34,6 +43,11 @@ public static class CompanionSpells
         // 5.99 SPELL_디나르콜리 mobnar_end → 하데스 수면(sleep), SPELL_디소루마 mobsor_end → 빙결(frozen). 30마력.
         ["디나르콜리"] = new(Kind.Cure, 0, 30, 0, "sleep"),
         ["디소루마"] = new(Kind.Cure, 0, 30, 0, "frozen"),
+        // 5.99 법사(비전직).txt — 저주는 세기(방어 +15·+25·+35)·마력·120초, 나르콜리는 50마력·20초(20% 빗나감).
+        ["렌토"] = new(Kind.Curse, 15, 30, 120, Icon: CurseIcon),
+        ["바르도"] = new(Kind.Curse, 25, 50, 120, Icon: CurseIcon),
+        ["데프레코"] = new(Kind.Curse, 35, 65, 120, Icon: CurseIcon),
+        ["나르콜리"] = new(Kind.Sleep, 0, 50, 20, Icon: SleepIcon),
     };
 
     /// <summary>포션 하나가 채우는 양 — AutoPotion 의 두 목록과 같은 이름들.</summary>

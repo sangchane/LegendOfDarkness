@@ -59,6 +59,10 @@ public sealed partial class WorldClient
         && _world.Others.ContainsKey(hit.Source)
         && DateTime.UtcNow - hit.At <= within;
 
+    /// <summary><paramref name="within"/> 안에 이것을 마지막으로 친 이(0x5D 의 Source). 없으면 0 — 봇이 주인과 싸우는 괴물을 고른다.</summary>
+    public uint StruckBy(uint target, TimeSpan within) =>
+        _struck.TryGetValue(target, out (uint Source, DateTime At) hit) && DateTime.UtcNow - hit.At <= within ? hit.Source : 0;
+
     /// <summary>Takes the next amount a blow took or a heal gave (0x5D), oldest first.</summary>
     public bool TakeFigure([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Figure? figure) => _figures.TryDequeue(out figure);
 }

@@ -26,10 +26,16 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
     /// <summary>주인이 이만큼 안 보이거나(다른 맵·시야 밖) 멀면 한 줄 남긴다.</summary>
     public static readonly TimeSpan Away = TimeSpan.FromSeconds(15);
 
+    /// <summary>이만큼 안에 친(맞은) 것을 "싸우는 중" 으로 본다 — 저주·나르콜리 고르기.</summary>
+    public static readonly TimeSpan Fighting = TimeSpan.FromSeconds(3);
+
     /// <summary>이만큼마다 한 줄 요약.</summary>
     public static readonly TimeSpan Summary = TimeSpan.FromMinutes(5);
 
     private readonly CompanionBrain _brain = new();
+
+    // 괴물 serial → 주인이 마지막으로 친 때. 0x5D 는 마지막으로 친 이 하나만 남겨, 파티원이 뒤에 치면 주인 몫이 지워진다.
+    private readonly Dictionary<uint, TimeSpan> _ownerHit = [];
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private Tile _tile;
     private int _reports = -1;
@@ -198,6 +204,22 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
         }
 
         Character? owner = master is null ? null : world.Others.FirstOrDefault(one => one.Serial == master.Serial);
+        uint ownerSerial = master?.Serial ?? 0;
+        uint hitsOwner = ownerSerial == 0 ? 0 : world.StruckBy(ownerSerial, Fighting);
+        TimeSpan now = _clock.Elapsed;
+
+        foreach (Creature one in world.Creatures)
+        {
+            if (ownerSerial != 0 && world.StruckBy(one.Serial, Fighting) == ownerSerial)
+            {
+                _ownerHit[one.Serial] = now;
+            }
+        }
+
+        foreach (uint gone in _ownerHit.Where(pair => now - pair.Value > Fighting).Select(pair => pair.Key).ToList())
+        {
+            _ownerHit.Remove(gone);
+        }
 
         CompanionSight sight = new()
         {
@@ -211,6 +233,17 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             Spells = world.Spells,
             Pack = world.Pack,
             StatusesOf = serial => world.StatusesOf(serial)?.Select(one => one.Name).ToHashSet(),
+            Foes =
+            [
+                .. world.Creatures.Where(one => one.Kind == CreatureKind.Hostile).Select(one =>
+                {
+                    var icons = world.AilmentsOf(one.Serial).Select(seen => seen.Icon).ToHashSet();
+                    return new Foe(one.Serial, one.Where,
+                        icons.Contains(CompanionSpells.CurseIcon), icons.Contains(CompanionSpells.SleepIcon),
+                        OwnerHits: _ownerHit.ContainsKey(one.Serial),
+                        HitsOwner: hitsOwner == one.Serial);
+                }),
+            ],
             Blocked = walls.For(state.Map.Id),
             Occupied =
             [
@@ -220,7 +253,8 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             Now = _clock.Elapsed,
         };
 
-        CompanionStep step = _brain.Next(sight, settings);
+        // 저주·나르콜리는 주인이 앱 봇 탭에서 켜고 끈다(0x5E 종류 1 꼬리).
+        CompanionStep step = _brain.Next(sight, settings with { Curse = master?.Curse ?? true, Sleep = master?.Sleep ?? true });
 
         switch (step.Act)
         {

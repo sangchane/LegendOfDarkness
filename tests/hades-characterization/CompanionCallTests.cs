@@ -71,7 +71,8 @@ public sealed class CompanionCallTests : IDisposable
         Assert.Equal(bot.Vitals!.MaximumHealth, bot.Vitals.Health);
         Assert.Equal(bot.Vitals.MaximumMana, bot.Vitals.Mana);
 
-        string[] priest21 = ["쿠로", "신성력강화", "쿠러스", "호르라마", "에나르마", "쿠라노", "디나르콜리", "디소루마"];
+        // 마법사 저주도 레벨대로(렌토 11 · 바르도 21, 사용자 2026-10-03).
+        string[] priest21 = ["쿠로", "신성력강화", "쿠러스", "호르라마", "에나르마", "쿠라노", "디나르콜리", "디소루마", "렌토", "바르도"];
         await Waiting.Until(() => bot.Spells.Select(s => CompanionSpells.Bare(s.Name)).Order().SequenceEqual(priest21.Order()),
             $"봇 마법이 5.99 사범 21레벨까지가 아닙니다: {string.Join(",", bot.Spells.Select(s => s.Name))}", _deadline.Token);
 

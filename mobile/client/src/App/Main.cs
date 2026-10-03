@@ -109,6 +109,7 @@ public partial class Main : Control
         Wearing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--wear") >= 0;
         GearAfter = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear-after") >= 0;
         ReadAutoLoot();
+        ReadBotMagic();
         ReadMinimapRadius();
         ReadPotions();
         ReadAutoHuntSettings();

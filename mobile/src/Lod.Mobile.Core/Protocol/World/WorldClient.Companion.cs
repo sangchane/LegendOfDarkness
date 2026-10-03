@@ -70,6 +70,10 @@ public sealed partial class WorldClient
     public Task WakeMasterAsync(CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, World.Companion.WakeMaster(), cancellationToken);
 
+    /// <summary>봇 탭 「마법사」 — 봇이 저주·나르콜리를 쓸지(0xF1 6). 서버가 주인 이름으로 기억해 봇에게 옮긴다.</summary>
+    public Task SendCompanionMagicAsync(bool curse, bool sleep, CancellationToken cancellationToken) =>
+        Send(ClientOpcode.Companion, World.Companion.Magic(curse, sleep), cancellationToken);
+
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, World.Companion.Dismiss(), cancellationToken);

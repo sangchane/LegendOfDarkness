@@ -210,6 +210,72 @@ public sealed class CompanionBotTests : IDisposable
         return world;
     }
 
+    /// <summary>
+    /// 봇 마법사 마법(사용자, 2026-10-03): 43레벨 주인의 봇(41)은 렌토·바르도·나르콜리를 배우고(데프레코는 55), 주인에게 덤비는 사슴에
+    /// 저주(그림 82)를 걸고, 주인이 치지 않으니 나르콜리(수면 90)도 건다. 봇 탭에서 끄면 그 비트가 주인 알림 꼬리로 봇에게 간다.
+    /// </summary>
+    [Fact]
+    public async Task The_bot_curses_and_sleeps_the_monster_on_its_owner_and_can_be_told_to_stop()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (ForestOne, Start.X, Start.Y));
+        CompanionCallTests.Configure(server);
+        OneDeerAhead(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, OwnerName);
+        LoginFlow.TryCreateAccount(server, CompanionCallTests.BotName);
+        CompanionCallTests.Edit(server, OwnerName, saved =>
+        {
+            saved["ExpLevel"] = 43;
+            saved["_MaximumHp"] = 30000;
+            saved["CurrentHp"] = 30000;
+        });
+        CompanionCallTests.Edit(server, CompanionCallTests.BotName, InTheVillage);
+
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName);
+        List<string> said = [];
+        _ = new CompanionRunner(bot, new MapWalls(HadesWorkspace.MapLayoutFolder), new CompanionSettings(), line =>
+        {
+            lock (said)
+            {
+                said.Add(line);
+            }
+        }).RunAsync(_deadline.Token);
+
+        WorldClient owner = await Enter(server, OwnerName);
+        DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(100);
+        while (!(owner.State?.Where == Start && owner.Creatures.Any(c => c.Where == Ahead)))
+        {
+            Assert.True(DateTime.UtcNow < giveUp, "사슴 앞칸에 서지 못했습니다.");
+            await owner.RefreshAsync(_deadline.Token);
+            await Task.Delay(400, _deadline.Token);
+        }
+
+        uint deer = owner.Creatures.First(c => c.Where == Ahead).Serial;
+        await owner.CallCompanionAsync(_deadline.Token);
+        await Waiting.Until(() => bot.Master?.Serial == owner.Serial, "봇에게 주인이 정해지지 않았습니다.", _deadline.Token);
+
+        string Learned() => string.Join(",", bot.Spells.Select(one => CompanionSpells.Bare(one.Name)));
+        for (DateTime until = DateTime.UtcNow.AddSeconds(15); !Learned().Split(',').Contains("나르콜리") && DateTime.UtcNow < until;)
+        {
+            await Task.Delay(100, _deadline.Token);
+        }
+
+        string[] learned = [.. bot.Spells.Select(one => CompanionSpells.Bare(one.Name))];
+        Assert.True(learned.Contains("렌토"), $"배운 것: {Learned()} · 봇 레벨 {bot.Vitals?.Level} · 못 읽음 {bot.UnreadCount} {bot.Unread}");
+        Assert.Contains("바르도", learned);
+        Assert.Contains("나르콜리", learned);
+        Assert.DoesNotContain("데프레코", learned);
+
+        bool Shows(int icon) => owner.AilmentsOf(deer).Any(one => one.Icon == icon);
+        await Waiting.Until(() => Shows(CompanionSpells.CurseIcon), $"사슴에 저주가 걸리지 않았습니다: {Joined(said)}", _deadline.Token, TimeSpan.FromSeconds(60));
+        await Waiting.Until(() => Shows(CompanionSpells.SleepIcon), $"사슴이 잠들지 않았습니다: {Joined(said)}", _deadline.Token, TimeSpan.FromSeconds(60));
+        Assert.Contains(Joined(said).Split(" | "), line => line.StartsWith("저주 바르도", StringComparison.Ordinal));
+
+        await owner.SendCompanionMagicAsync(curse: false, sleep: false, _deadline.Token);
+        await Waiting.Until(() => bot.Master is { Curse: false, Sleep: false }, "끈 것이 봇에게 가지 않았습니다.", _deadline.Token);
+    }
+
     /// <summary>포테의숲1존에 사슴 한 마리만 — 사람 앞칸에 붙박이로, 먼저 덤빈다(<see cref="PoteForestDeerDangerTests" /> 와 같다).</summary>
     private static void OneDeerAhead(IsolatedHadesServer server)
     {

@@ -10,13 +10,24 @@ namespace Lod.Mobile.Core.Automation;
 /// <param name="FollowTo">따라 걷다가 이만큼 가까워지면 선다.</param>
 /// <param name="PotionHealthPercent">자기 체력이 이 % 아래면 체력 포션.</param>
 /// <param name="PotionManaPercent">자기 마력이 이 % 아래면 마력 포션(가장 싼 회복도 못 걸 마력이면 그 전에라도).</param>
+/// <param name="Curse">싸우는 괴물에게 저주(렌토·바르도·데프레코)를 거나 — 주인이 앱 봇 탭에서 끈다(0x5E 종류 1 꼬리).</param>
+/// <param name="Sleep">주인이 치지 않는 괴물을 나르콜리로 재우나 — 위와 같다.</param>
 public sealed record CompanionSettings(
     int HealOwnerPercent = 70,
     int HealSelfPercent = 50,
     int FollowFrom = 3,
     int FollowTo = 2,
     int PotionHealthPercent = 40,
-    int PotionManaPercent = 30);
+    int PotionManaPercent = 30,
+    bool Curse = true,
+    bool Sleep = true);
+
+/// <summary>봇 둘레의 괴물 하나 — 저주·나르콜리를 고르려고.</summary>
+/// <param name="Cursed">저주 그림(82)이 보인다.</param>
+/// <param name="Asleep">수면 그림(90)이 보인다.</param>
+/// <param name="OwnerHits">주인이 방금(3초 안) 이 괴물을 쳤다(0x5D 의 Source).</param>
+/// <param name="HitsOwner">이 괴물이 방금 주인을 쳤다.</param>
+public sealed record Foe(uint Serial, Tile At, bool Cursed, bool Asleep, bool OwnerHits, bool HitsOwner);
 
 public enum CompanionAct
 {
@@ -78,6 +89,9 @@ public sealed record CompanionSight
     /// <summary>벽·맵 밖.</summary>
     public Func<Tile, bool> Blocked { get; init; } = _ => false;
 
+    /// <summary>보이는 괴물(지나갈 수 있는 것·상인 빼고).</summary>
+    public IReadOnlyList<Foe> Foes { get; init; } = [];
+
     /// <summary>다른 사람·괴물이 선 칸(주인 칸 포함해도 된다 — 주인 칸은 따로 뺀다).</summary>
     public IReadOnlyCollection<Tile> Occupied { get; init; } = [];
 
@@ -86,7 +100,8 @@ public sealed record CompanionSight
 
 /// <summary>
 /// 동료 봇의 판단 — 엔진 없이. <see cref="AutoHunt" /> 처럼 우선순위 순으로 훑어 할 수 있는 첫 일 하나를 돌려준다:
-/// 멈춤(혼수·죽음·유령) &gt; 주인 혼수 깨우기 &gt; 해제(수면·빙결) &gt; 주인 회복 &gt; 봇 체력 포션 &gt; 자기 회복 마법 &gt; 봇 마력 포션 &gt; 버프 유지 &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
+/// 멈춤(혼수·죽음·유령) &gt; 주인 혼수 깨우기 &gt; 해제(수면·빙결) &gt; 주인 회복 &gt; 봇 체력 포션 &gt; 자기 회복 마법 &gt; 봇 마력 포션 &gt; 버프 유지 &gt;
+/// 돕기(저주·나르콜리) &gt; 따라가기 &gt; 쉬기 &gt; 기다림.
 /// SleepHunter4 의 파티원 회복(<c>PlayerMacroState</c> 의 FlowerQueue — 체력이 기준 아래인 이를 먼저)과 버프 유지(지속 시간이
 /// 끝나면 다시)를 본떴다.
 /// </summary>
@@ -116,6 +131,19 @@ public sealed class CompanionBrain
     /// <summary>이만큼보다 멀면 주인을 회복하지 않는다(화면 밖).</summary>
     public const int CastReach = 10;
 
+    /// <summary>저주·나르콜리는 마력이 이 % 이상일 때만 — 나머지는 회복 몫이다.</summary>
+    public const int AssistManaPercent = 50;
+
+    /// <summary>
+    /// 잠든 것을 본 괴물은 이만큼(나르콜리 길이) 다시 재우지 않는다 — 주인이 기본공격으로 깨울 때마다 다시 걸면 마력이 바닥난다
+    /// (사용자, 2026-10-03). 잠은 첫 한 대를 두 배로 만들고 끝나는 것으로 친다.
+    /// </summary>
+    public static readonly TimeSpan SleepAgain = TimeSpan.FromSeconds(20);
+
+    // 괴물 serial → 잠든 것을 처음 본 때 · (마법, 괴물) → 건 때. 오래된 것은 돕기마다 지운다(봇은 오래 돈다).
+    private readonly Dictionary<uint, TimeSpan> _sleptSeen = [];
+    private readonly Dictionary<(string Spell, uint Target), TimeSpan> _tried = [];
+
     private readonly Dictionary<(string Spell, uint Target), TimeSpan> _buffed = [];
     private TimeSpan _lastCast = Reckon.Never;
     private TimeSpan _lastHeal = Reckon.Never;
@@ -138,6 +166,8 @@ public sealed class CompanionBrain
             // 주인이 바뀌면 걸어 둔 버프 기억은 뜻이 없다.
             _master = sight.Master;
             _buffed.Clear();
+            _sleptSeen.Clear();
+            _tried.Clear();
             _following = false;
         }
 
@@ -153,10 +183,12 @@ public sealed class CompanionBrain
         }
 
         Reading reading = Read(sight, settings);
+        NoteSleepers(sight);
 
         return Emergency(sight, reading)
                ?? Recover(sight, settings, reading)
                ?? Maintain(sight, reading)
+               ?? Assist(sight, settings, reading)
                ?? Follow(sight, settings, reading.Now)
                ?? (reading.Mana < reading.Cheapest
                    ? new(CompanionAct.Rest, Why: "마력 부족")
@@ -287,6 +319,95 @@ public sealed class CompanionBrain
 
         return null;
     }
+
+    /// <summary>
+    /// 돕기 — 주인과 싸우는 괴물에게 저주, 주인이 치지 않는 괴물에게 나르콜리. 마력이 넉넉할 때만.
+    /// 서버 스크립트는 마력부터 빼고 "이미 걸려 있나"를 본다 — 걸린 것에 다시 걸면 마력만 버리므로 그림으로 먼저 본다.
+    /// </summary>
+    private CompanionStep? Assist(CompanionSight sight, CompanionSettings settings, Reading reading)
+    {
+        TimeSpan now = reading.Now;
+
+        foreach ((string, uint) gone in _tried.Where(pair => now - pair.Value >= BuffConfirm).Select(pair => pair.Key).ToList())
+        {
+            _tried.Remove(gone);
+        }
+
+        if (!reading.CanCast || sight.OwnerAt is not { } owner || Reckon.ManaPercent(sight.Vitals) < AssistManaPercent)
+        {
+            return null;
+        }
+
+        List<Foe> fighting = sight.Foes
+            .Where(foe => Reckon.Steps(foe.At, sight.Standing) <= CastReach
+                          && (foe.OwnerHits || foe.HitsOwner || Reckon.Steps(foe.At, owner) <= 1))
+            .OrderByDescending(foe => foe.OwnerHits)
+            .ThenBy(foe => Reckon.Steps(foe.At, owner))
+            .ToList();
+
+        if (settings.Curse && Strongest(sight, CompanionSpells.Kind.Curse, reading.Mana) is { } curse)
+        {
+            foreach (Foe foe in fighting.Where(foe => !foe.Cursed))
+            {
+                if (Fresh(curse.Name, foe.Serial, now))
+                {
+                    return new(CompanionAct.Cast, curse.Slot, foe.Serial, Why: $"저주 {curse.Name}");
+                }
+            }
+        }
+
+        if (settings.Sleep && Strongest(sight, CompanionSpells.Kind.Sleep, reading.Mana) is { } sleep)
+        {
+            // 주인이 치는 괴물은 재워도 다음 한 대에 깬다 — 옆에서 덤비는 괴물만.
+            foreach (Foe foe in fighting.Where(foe => !foe.OwnerHits && !foe.Asleep && !_sleptSeen.ContainsKey(foe.Serial)))
+            {
+                if (Fresh(sleep.Name, foe.Serial, now))
+                {
+                    return new(CompanionAct.Cast, sleep.Slot, foe.Serial, Why: $"나르콜리 {sleep.Name}");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 잠든 괴물을 틱마다 적는다 — 돕기 앞의 일(회복·버프)이 바빠 돕기가 돌지 않는 사이 잠들었다 깨도 20초 막기가 걸리게.
+    /// </summary>
+    private void NoteSleepers(CompanionSight sight)
+    {
+        foreach (Foe foe in sight.Foes.Where(foe => foe.Asleep))
+        {
+            _sleptSeen.TryAdd(foe.Serial, sight.Now);
+        }
+
+        foreach (uint gone in _sleptSeen.Where(pair => sight.Now - pair.Value > SleepAgain).Select(pair => pair.Key).ToList())
+        {
+            _sleptSeen.Remove(gone);
+        }
+    }
+
+    /// <summary>이 괴물에 이 마법을 막 걸지 않았으면 걸었다고 적는다 — 그림이 둘레 알림에 오기를 <see cref="BuffConfirm" /> 만큼 기다린다.</summary>
+    private bool Fresh(string spell, uint target, TimeSpan now)
+    {
+        if (_tried.TryGetValue((spell, target), out TimeSpan at) && now - at < BuffConfirm)
+        {
+            return false;
+        }
+
+        _tried[(spell, target)] = now;
+        _lastCast = now;
+        return true;
+    }
+
+    /// <summary>배운 것 중 이 종류에서 마력이 닿는 가장 센 것의 칸과 이름.</summary>
+    private static (int Slot, string Name)? Strongest(CompanionSight sight, CompanionSpells.Kind kind, int mana) =>
+        sight.Spells
+            .Select(one => (Spell: one, Entry: CompanionSpells.Of(one.Name, empowered: false)))
+            .Where(pair => pair.Entry is { } entry && entry.Kind == kind && entry.Mana <= mana)
+            .OrderByDescending(pair => pair.Entry!.Power)
+            .Select(pair => ((int Slot, string Name)?)(pair.Spell.Slot, CompanionSpells.Bare(pair.Spell.Name)))
+            .FirstOrDefault();
 
     private CompanionStep Cast(CompanionStep step, TimeSpan now, bool heal)
     {

@@ -13,6 +13,21 @@ public partial class GameScreen : Control
     /// <summary>0x0A kind 11 — somebody talking to the group, not the server saying the group changed.</summary>
     private const byte GroupChat = 11;
 
+    /// <summary>[봇 부르기] — 봇 탭 「마법사」 켬을 먼저 보낸다. 서버는 메모리에만 두어 다시 뜨면 잊으므로 부를 때마다.</summary>
+    private async System.Threading.Tasks.Task CallCompanion()
+    {
+        await SendBotMagic();
+
+        if (_server is { } server)
+        {
+            await server.CallCompanionAsync(System.Threading.CancellationToken.None);
+        }
+    }
+
+    private System.Threading.Tasks.Task SendBotMagic() =>
+        _server?.SendCompanionMagicAsync(Main.BotMagic.Curse, Main.BotMagic.Sleep, System.Threading.CancellationToken.None)
+        ?? System.Threading.Tasks.Task.CompletedTask;
+
     /// <summary>
     /// Keeps the party column in step: asks for the list once on entering, puts up whoever is asking us, shows the list
     /// with each member's health, and offers 파티 초대 only for a person who could join.

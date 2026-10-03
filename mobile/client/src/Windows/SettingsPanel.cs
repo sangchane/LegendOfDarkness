@@ -9,7 +9,7 @@ namespace LodClient;
 /// <item><b>자동</b> — 자동 포션 줄 둘(체력·마력이 몇 % 이하일 때 마시나, 게이지 바 <see cref="PotionGauge"/> 10~90%), 자동 사냥의
 /// 반경 슬라이더·회복 기술 셀렉트 박스(<see cref="PercentSelect"/>, 1~99). 무엇을 마실지와 켜고 끄기는 게임 화면의 포션 단추에서
 /// 한다(<see cref="PotionChip"/>).</item>
-/// <item><b>봇</b> — [봇 부르기]/[봇 보내기].</item>
+/// <item><b>봇</b> — [봇 부르기]/[봇 보내기], 「마법사」 저주·나르콜리 켜고 끄기.</item>
 /// </list>
 /// [로그아웃] 은 어느 탭에서나 보이는 제목 줄에 있다(누르면 [로그아웃]·[게임 종료]·[취소] 판, <see cref="ExitChoice"/>).
 /// 계정 탭(자동 로그인 끄기)은 뺐다(사용자, 2026-09-30) — 로그아웃한 로그인 화면에서 「자동 로그인」을 끄면 저장된 계정이 지워진다.
@@ -41,14 +41,7 @@ public sealed partial class SettingsPanel : PanelContainer
         auto.AddChild(BuildAutoHunt());
 
         // 밟은 것을 알아서 주울지 — 원작에 없던 것이라 끌 수 있어야 한다(2026-09-19). 소지품 창에서 옮겨 왔다(사용자 2026-10-01).
-        CheckButton loot = new() { ButtonPressed = Main.AutoLoot, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
-        loot.Toggled += Main.SetAutoLoot;
-        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus" })
-        {
-            loot.AddThemeStyleboxOverride(state, new StyleBoxEmpty());
-        }
-
-        auto.AddChild(Row("아이템 자동 줍기", loot));
+        auto.AddChild(Row("아이템 자동 줍기", Switch(Main.AutoLoot, Main.SetAutoLoot)));
 
         // ── 봇 ───────────────────────────────────────────────
         // 봇(성직자 동료) — 부르면 서버가 봇을 내 곁으로 데려와 파티에 넣는다. 결과는 서버 알림으로 온다(우리 확장 0xF1·0x5E).
@@ -57,6 +50,20 @@ public sealed partial class SettingsPanel : PanelContainer
         Companion = new Button { Text = CallText, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
         Greybox.Plain(Companion);
         bot.AddChild(Companion);
+
+        // 마법사 — 봇이 레벨대로 배운 저주·나르콜리를 쓸지(사용자, 2026-10-03). 바뀌면 게임 화면이 서버로 보낸다(0xF1 6).
+        bot.AddChild(new Label { Text = "마법사", HorizontalAlignment = HorizontalAlignment.Center });
+        bot.AddChild(Caption("저주는 주인과 싸우는 괴물의 방어를 깎고, 나르콜리는 주인이 치지 않는 괴물을 재웁니다."));
+        bot.AddChild(Row("저주", Switch(Main.BotMagic.Curse, on =>
+        {
+            Main.SetBotMagic(on, Main.BotMagic.Sleep);
+            BotMagicChanged?.Invoke();
+        })));
+        bot.AddChild(Row("나르콜리", Switch(Main.BotMagic.Sleep, on =>
+        {
+            Main.SetBotMagic(Main.BotMagic.Curse, on);
+            BotMagicChanged?.Invoke();
+        })));
 
         // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
         Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(76, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
@@ -136,6 +143,22 @@ public sealed partial class SettingsPanel : PanelContainer
 
         return page;
     }
+
+    /// <summary>켜고 끄는 단추 — 테마의 체크 그림만(판 없이).</summary>
+    private static CheckButton Switch(bool on, System.Action<bool> toggled)
+    {
+        CheckButton check = new() { ButtonPressed = on, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        check.Toggled += on => toggled(on);
+        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus" })
+        {
+            check.AddThemeStyleboxOverride(state, new StyleBoxEmpty());
+        }
+
+        return check;
+    }
+
+    /// <summary>봇 탭 「마법사」 체크를 바꿨다 — 값은 <see cref="Main.BotMagic"/>.</summary>
+    public event System.Action? BotMagicChanged;
 
     private static Label Caption(string text)
     {

@@ -297,8 +297,9 @@ public partial class GameScreen : Control
             }
         };
         _settings.Companion.Pressed += () => _ = _server?.Companion is null
-            ? _server?.CallCompanionAsync(System.Threading.CancellationToken.None)
+            ? CallCompanion()
             : _server.DismissCompanionAsync(System.Threading.CancellationToken.None);
+        _settings.BotMagicChanged += () => Main.Fire(SendBotMagic());
 
         // 봇 칸을 누르면 봇 장비창. 주기·벗기기는 우리 확장 0xF1 2·3, 결과는 서버 알림과 봇 장비 안내(0x5E 종류 5).
         _party.BotOpened += () => SetWindow(GameWindow.BotGear, !_botGear.Visible);

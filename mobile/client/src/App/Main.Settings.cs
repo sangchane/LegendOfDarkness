@@ -106,6 +106,38 @@ public partial class Main : Control
         }
     }
 
+    /// <summary>
+    /// 봇 탭 「마법사」 — 봇이 저주(렌토·바르도·데프레코)·나르콜리를 쓰나. 기기에 남고(한 줄 "1 1"), 처음엔 둘 다 켬.
+    /// 서버는 메모리에만 두므로 바꿀 때와 봇을 부를 때 보낸다(0xF1 6).
+    /// </summary>
+    private const string BotMagicFile = "user://botmagic.cfg";
+
+    public static (bool Curse, bool Sleep) BotMagic { get; private set; } = (true, true);
+
+    public static void SetBotMagic(bool curse, bool sleep)
+    {
+        BotMagic = (curse, sleep);
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            writing.StoreLine($"{(curse ? 1 : 0)} {(sleep ? 1 : 0)}");
+            writing.Close();
+        }
+    }
+
+    private static void ReadBotMagic()
+    {
+        using Godot.FileAccess? reading = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Read);
+        string[] parts = reading?.GetLine().Trim().Split(' ') ?? [];
+
+        if (parts.Length == 2)
+        {
+            BotMagic = (parts[0] != "0", parts[1] != "0");
+        }
+    }
+
     /// <summary>미니맵이 보이는 반경(칸) — [+]·[−] 로 바꾸고 기기에 남는다(<c>user://minimap.cfg</c> 한 줄, 2026-09-26).</summary>
     private const string MinimapFile = "user://minimap.cfg";
 
