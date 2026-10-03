@@ -7,8 +7,17 @@ using Lod.Mobile.Core.Protocol;
 namespace Lod.Mobile.Core.Protocol.World;
 
 /// <summary>동료 사이의 한쪽 — 봇에게는 주인, 사람에게는 동료 봇.</summary>
-/// <param name="Magic">봇에게 — 주인이 체크해 둔 저주·나르콜리(0x5E 종류 1 이름 뒤 한 바이트, 없으면 모두).</param>
-public sealed record CompanionTie(uint Serial, string Name, CompanionSpells.Magic Magic = CompanionSpells.Magic.All);
+/// <param name="Magic">봇에게 — 주인이 고른 저주·나르콜리(0x5E 종류 1 이름 뒤 첫 바이트, 없으면 모두).</param>
+/// <param name="Priest">해제·버프 켬(둘째 바이트).</param>
+/// <param name="Heal">한 사람 회복 셀렉트(셋째, <see cref="CompanionSpells.Heals" />).</param>
+/// <param name="GroupHeal">파티 회복 셀렉트(넷째).</param>
+public sealed record CompanionTie(
+    uint Serial,
+    string Name,
+    CompanionSpells.Magic Magic = CompanionSpells.Magic.All,
+    CompanionSpells.Priest Priest = CompanionSpells.Priest.All,
+    int Heal = CompanionSpells.HealAuto,
+    int GroupHeal = CompanionSpells.HealAuto);
 
 /// <summary>
 /// 걸린 것 하나(0x5E 종류 3): 서버 이름(sleep·frozen·horrama·enare …) · 남은 초 · 해로움 · 그림 번호(스펠 시트, 모르면 0 —
@@ -62,8 +71,12 @@ public static class Companion
     /// <summary>봇이 혼수인 주인을 깨운다(0xF1 5) — 봇 계정만, 주인 바로 옆에서. 서버가 가려 듣는다.</summary>
     public static byte[] WakeMaster() => [5];
 
-    /// <summary>봇 탭 「마법사」 체크 비트(0xF1 6 — 1 렌토 · 2 나르콜리 · 4 바르도 · 8 데프레코 · 16 프라보). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.</summary>
-    public static byte[] Magic(CompanionSpells.Magic magic) => [6, (byte)magic];
+    /// <summary>
+    /// 봇 탭에서 고른 것(0xF1 6): 마법사 비트(1 렌토 · 2 나르콜리 · 4 바르도 · 8 데프레코 · 16 프라보) · 성직자 비트(1 디나르콜리 ·
+    /// 2 디소루마 · 4 호르라마 · 8 에나르마) · 회복 셀렉트 · 파티 회복 셀렉트(0 자동 · k 번째까지 · 255 끄기). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.
+    /// </summary>
+    public static byte[] Orders(CompanionSpells.Magic magic, CompanionSpells.Priest priest, int heal, int groupHeal) =>
+        [6, (byte)magic, (byte)priest, (byte)heal, (byte)groupHeal];
 
     /// <summary>0x5E 종류 3 — 한 사람(주인 또는 봇 자신)에게 걸린 것: 이름 · 남은 초 · 해로움.</summary>
     public static (uint Serial, IReadOnlyList<CompanionStatus> Statuses) ReadStatuses(ReadOnlySpan<byte> body)
@@ -176,9 +189,13 @@ public static class Companion
         int used = 0;
         string name = body.Length > 5 ? LegacyKoreanEncoding.DecodeStringA(body[5..], out used) : string.Empty;
 
-        // 이름 뒤 한 바이트(2026-10-03) — 옛 서버는 보내지 않는다, 그때는 모두 켬.
-        var magic = body.Length > 5 + used ? (CompanionSpells.Magic)body[5 + used] : CompanionSpells.Magic.All;
+        // 이름 뒤 네 바이트(2026-10-03) — 봇 탭에서 고른 것. 옛 서버는 보내지 않는다, 그때는 모두 켬·자동.
+        byte[] tail = body.Length > 5 + used ? body[(5 + used)..].ToArray() : [];
+        int At(int index, int otherwise) => tail.Length > index ? tail[index] : otherwise;
 
-        return (body[0], serial == 0 ? null : new CompanionTie(serial, name, magic));
+        return (body[0], serial == 0
+            ? null
+            : new CompanionTie(serial, name, (CompanionSpells.Magic)At(0, (int)CompanionSpells.Magic.All),
+                (CompanionSpells.Priest)At(1, (int)CompanionSpells.Priest.All), At(2, CompanionSpells.HealAuto), At(3, CompanionSpells.HealAuto)));
     }
 }

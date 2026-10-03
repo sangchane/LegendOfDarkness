@@ -10,6 +10,9 @@ namespace Lod.Mobile.Core.Automation;
 /// <param name="FollowTo">따라 걷다가 이만큼 가까워지면 선다.</param>
 /// <param name="PotionHealthPercent">자기 체력이 이 % 아래면 체력 포션.</param>
 /// <param name="PotionManaPercent">자기 마력이 이 % 아래면 마력 포션(가장 싼 회복도 못 걸 마력이면 그 전에라도).</param>
+/// <param name="Priest">봇 탭 「성직자」 — 해제(디나르콜리·디소루마)·버프(호르라마·에나르마) 켬.</param>
+/// <param name="Heal">한 사람 회복 셀렉트(<see cref="CompanionSpells.Heals" />) — 0 자동, k 는 k 번째까지, 255 끄기.</param>
+/// <param name="GroupHeal">파티 회복 셀렉트(<see cref="CompanionSpells.GroupHeals" />) — 위와 같다.</param>
 /// <param name="Magic">봇 탭 「마법사」 체크 — 걸어도 되는 저주(렌토·바르도·데프레코)와 나르콜리. 주인이 앱에서 고른다(0x5E 종류 1 꼬리).</param>
 public sealed record CompanionSettings(
     int HealOwnerPercent = 70,
@@ -18,7 +21,14 @@ public sealed record CompanionSettings(
     int FollowTo = 2,
     int PotionHealthPercent = 40,
     int PotionManaPercent = 30,
-    CompanionSpells.Magic Magic = CompanionSpells.Magic.All);
+    CompanionSpells.Magic Magic = CompanionSpells.Magic.All,
+    CompanionSpells.Priest Priest = CompanionSpells.Priest.All,
+    int Heal = CompanionSpells.HealAuto,
+    int GroupHeal = CompanionSpells.HealAuto)
+{
+    /// <summary>주인이 봇 탭에서 고른 대로 이 마법을 써도 되나.</summary>
+    public bool Allows(string spell) => CompanionSpells.Allowed(spell, Magic, Priest, Heal, GroupHeal);
+}
 
 /// <summary>봇 둘레의 괴물 하나 — 저주·나르콜리를 고르려고.</summary>
 /// <param name="Cursed">저주 그림(82)이 보인다.</param>
@@ -183,9 +193,9 @@ public sealed class CompanionBrain
         Reading reading = Read(sight, settings);
         NoteSleepers(sight);
 
-        return Emergency(sight, reading)
+        return Emergency(sight, settings, reading)
                ?? Recover(sight, settings, reading)
-               ?? Maintain(sight, reading)
+               ?? Maintain(sight, settings, reading)
                ?? Assist(sight, settings, reading)
                ?? Follow(sight, settings, reading.Now)
                ?? (reading.Mana < reading.Cheapest
@@ -234,7 +244,7 @@ public sealed class CompanionBrain
     }
 
     /// <summary>급한 일 — 혼수인 주인 깨우기, 그다음 해제(수면·빙결).</summary>
-    private CompanionStep? Emergency(CompanionSight sight, Reading reading)
+    private CompanionStep? Emergency(CompanionSight sight, CompanionSettings settings, Reading reading)
     {
         TimeSpan now = reading.Now;
 
@@ -257,7 +267,7 @@ public sealed class CompanionBrain
 
         // 해제가 가장 먼저 — 수면(나르콜리)·빙결이면 주인은 아무것도 못 한다(사용자, 2026-09-26). 주문 사이(1초)를 다 기다리지
         // 않는다(CureGap) — 막 버프를 걸었어도 곧 푼다.
-        if (now - _lastCast >= CureGap && Cure(sight, reading.Empowered, reading.Mana, reading.OwnerNear) is { } cure)
+        if (now - _lastCast >= CureGap && Cure(sight, settings, reading.Empowered, reading.Mana, reading.OwnerNear) is { } cure)
         {
             return Cast(cure, now, heal: false);
         }
@@ -273,8 +283,8 @@ public sealed class CompanionBrain
         // 주인 회복(둘 다 아프면 파티 회복).
         if (reading.CanHeal && reading.OwnerHurt)
         {
-            CompanionStep? heal = (reading.SelfHurt ? Best(sight, CompanionSpells.Kind.GroupHeal, sight.Master, reading.Empowered, reading.Mana, "파티 회복") : null)
-                                  ?? Best(sight, CompanionSpells.Kind.Heal, sight.Master, reading.Empowered, reading.Mana, "주인 회복");
+            CompanionStep? heal = (reading.SelfHurt ? Best(sight, settings, CompanionSpells.Kind.GroupHeal, sight.Master, reading.Empowered, reading.Mana, "파티 회복") : null)
+                                  ?? Best(sight, settings, CompanionSpells.Kind.Heal, sight.Master, reading.Empowered, reading.Mana, "주인 회복");
 
             if (heal is not null)
             {
@@ -290,7 +300,7 @@ public sealed class CompanionBrain
             return new(CompanionAct.Drink, health.Slot, Why: $"체력 포션 {health.Name}");
         }
 
-        if (reading.CanHeal && reading.SelfHurt && Best(sight, CompanionSpells.Kind.Heal, sight.Me, reading.Empowered, reading.Mana, "자기 회복") is { } self)
+        if (reading.CanHeal && reading.SelfHurt && Best(sight, settings, CompanionSpells.Kind.Heal, sight.Me, reading.Empowered, reading.Mana, "자기 회복") is { } self)
         {
             return Cast(self, now, heal: true);
         }
@@ -307,9 +317,9 @@ public sealed class CompanionBrain
     }
 
     /// <summary>유지 — 버프가 풀렸으면 다시 건다.</summary>
-    private CompanionStep? Maintain(CompanionSight sight, Reading reading)
+    private CompanionStep? Maintain(CompanionSight sight, CompanionSettings settings, Reading reading)
     {
-        if (reading.CanCast && Buff(sight, reading.Empowered, reading.Mana, reading.OwnerNear) is { } buff)
+        if (reading.CanCast && Buff(sight, settings, reading.Empowered, reading.Mana, reading.OwnerNear) is { } buff)
         {
             _lastCast = reading.Now;
             return buff;
@@ -343,7 +353,7 @@ public sealed class CompanionBrain
             .ThenBy(foe => Reckon.Steps(foe.At, owner))
             .ToList();
 
-        if (Strongest(sight, CompanionSpells.Kind.Curse, reading.Mana, settings.Magic) is { } curse)
+        if (Strongest(sight, CompanionSpells.Kind.Curse, reading.Mana, settings) is { } curse)
         {
             foreach (Foe foe in fighting.Where(foe => !foe.Cursed))
             {
@@ -354,7 +364,7 @@ public sealed class CompanionBrain
             }
         }
 
-        if (Strongest(sight, CompanionSpells.Kind.Sleep, reading.Mana, settings.Magic) is { } sleep)
+        if (Strongest(sight, CompanionSpells.Kind.Sleep, reading.Mana, settings) is { } sleep)
         {
             // 주인이 치는 괴물은 재워도 다음 한 대에 깬다 — 옆에서 덤비는 괴물만.
             foreach (Foe foe in fighting.Where(foe => !foe.OwnerHits && !foe.Asleep && !_sleptSeen.ContainsKey(foe.Serial)))
@@ -399,11 +409,11 @@ public sealed class CompanionBrain
     }
 
     /// <summary>배운 것 중 주인이 체크해 둔, 이 종류에서 마력이 닿는 가장 센 것의 칸과 이름.</summary>
-    private static (int Slot, string Name)? Strongest(CompanionSight sight, CompanionSpells.Kind kind, int mana, CompanionSpells.Magic allowed) =>
+    private static (int Slot, string Name)? Strongest(CompanionSight sight, CompanionSpells.Kind kind, int mana, CompanionSettings settings) =>
         sight.Spells
             .Select(one => (Spell: one, Entry: CompanionSpells.Of(one.Name, empowered: false)))
             .Where(pair => pair.Entry is { } entry && entry.Kind == kind && entry.Mana <= mana
-                           && (allowed & CompanionSpells.SwitchOf(pair.Spell.Name)) != 0)
+                           && settings.Allows(pair.Spell.Name))
             .OrderByDescending(pair => pair.Entry!.Power)
             .Select(pair => ((int Slot, string Name)?)(pair.Spell.Slot, CompanionSpells.Bare(pair.Spell.Name)))
             .FirstOrDefault();
@@ -435,7 +445,7 @@ public sealed class CompanionBrain
     }
 
     /// <summary>해제 — 주인 먼저 그다음 자기. 서버가 알린 디버프 중 배운 해제 마법이 푸는 것이 있으면.</summary>
-    private CompanionStep? Cure(CompanionSight sight, bool empowered, int mana, bool ownerNear)
+    private CompanionStep? Cure(CompanionSight sight, CompanionSettings settings, bool empowered, int mana, bool ownerNear)
     {
         foreach (uint target in ownerNear ? new[] { sight.Master, sight.Me } : new[] { sight.Me })
         {
@@ -448,7 +458,7 @@ public sealed class CompanionBrain
             {
                 string name = CompanionSpells.Bare(spell.Name);
 
-                if (CompanionSpells.Of(name, empowered) is { Kind: CompanionSpells.Kind.Cure } entry && entry.Mana <= mana
+                if (CompanionSpells.Of(name, empowered) is { Kind: CompanionSpells.Kind.Cure } entry && entry.Mana <= mana && settings.Allows(name)
                     && on.Contains(entry.State)
                     && !(_buffed.TryGetValue((name, target), out TimeSpan at) && sight.Now - at < BuffConfirm))
                 {
@@ -462,20 +472,21 @@ public sealed class CompanionBrain
     }
 
     /// <summary>이 종류에서 마력이 닿는 가장 센 것.</summary>
-    private static CompanionStep? Best(CompanionSight sight, CompanionSpells.Kind kind, uint target, bool empowered, int mana, string why) =>
+    private static CompanionStep? Best(CompanionSight sight, CompanionSettings settings, CompanionSpells.Kind kind, uint target, bool empowered, int mana, string why) =>
         sight.Spells
             .Select(one => (Spell: one, Entry: CompanionSpells.Of(one.Name, empowered)))
-            .Where(pair => pair.Entry is { } entry && entry.Kind == kind && entry.Mana <= mana)
+            .Where(pair => pair.Entry is { } entry && entry.Kind == kind && entry.Mana <= mana && settings.Allows(pair.Spell.Name))
             .OrderByDescending(pair => pair.Entry!.Power)
             .Select(pair => new CompanionStep(CompanionAct.Cast, pair.Spell.Slot, target, Why: $"{why} {pair.Spell.Name}"))
             .FirstOrDefault();
 
     /// <summary>버프 — 마법 차례대로, 주인 먼저 그다음 자기. 서버가 알린 상태에 없을 때만(알림이 없으면 지속 시간이 다 지난 뒤).</summary>
-    private CompanionStep? Buff(CompanionSight sight, bool empowered, int mana, bool ownerNear)
+    private CompanionStep? Buff(CompanionSight sight, CompanionSettings settings, bool empowered, int mana, bool ownerNear)
     {
         foreach (LearnedSpell spell in sight.Spells)
         {
-            if (CompanionSpells.Of(spell.Name, empowered) is not { Kind: CompanionSpells.Kind.Buff } entry || entry.Mana > mana)
+            if (CompanionSpells.Of(spell.Name, empowered) is not { Kind: CompanionSpells.Kind.Buff } entry || entry.Mana > mana
+                || !settings.Allows(spell.Name))
             {
                 continue;
             }

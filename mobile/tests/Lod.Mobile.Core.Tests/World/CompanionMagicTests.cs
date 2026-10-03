@@ -156,16 +156,47 @@ public sealed class CompanionMagicTests
     }
 
     [Fact]
-    public void Switches_go_out_as_kind_six_and_come_back_on_the_master_tie()
+    public void Orders_go_out_as_kind_six_and_come_back_on_the_master_tie()
     {
-        Assert.Equal(new byte[] { 6, 5 }, Companion.Magic(CompanionSpells.Magic.Lento | CompanionSpells.Magic.Bardo));
-        Assert.Equal(new byte[] { 6, 2 }, Companion.Magic(CompanionSpells.Magic.Sleep));
+        Assert.Equal(new byte[] { 6, 5, 3, 2, 255 },
+            Companion.Orders(CompanionSpells.Magic.Lento | CompanionSpells.Magic.Bardo,
+                CompanionSpells.Priest.Dinarcoli | CompanionSpells.Priest.Disoruma, 2, CompanionSpells.HealOff));
 
         byte[] old = [1, 0, 0, 0, 42, 1, (byte)'a'];
-        Assert.Equal(CompanionSpells.Magic.All, Companion.ReadTie(old).Tie!.Magic);
+        CompanionTie plain = Companion.ReadTie(old).Tie!;
+        Assert.Equal((CompanionSpells.Magic.All, CompanionSpells.Priest.All, 0, 0), (plain.Magic, plain.Priest, plain.Heal, plain.GroupHeal));
 
-        byte[] tailed = [1, 0, 0, 0, 42, 1, (byte)'a', 8];
+        byte[] tailed = [1, 0, 0, 0, 42, 1, (byte)'a', 8, 4, 3, 255];
         CompanionTie tie = Companion.ReadTie(tailed).Tie!;
-        Assert.Equal(("a", CompanionSpells.Magic.Depreco), (tie.Name, tie.Magic));
+        Assert.Equal(("a", CompanionSpells.Magic.Depreco, CompanionSpells.Priest.Horrama, 3, 255),
+            (tie.Name, tie.Magic, tie.Priest, tie.Heal, tie.GroupHeal));
+    }
+
+    private static readonly IReadOnlyList<LearnedSpell> Healer =
+        [Spell(1, "쿠로"), Spell(2, "쿠라노"), Spell(3, "쿠라노소"), Spell(4, "호르라마"), Spell(5, "디나르콜리")];
+
+    private static CompanionSight Hurt(int ownerHealth = 50) => Sight([]) with { Spells = Healer, HealthOf = serial => serial == Owner ? ownerHealth : null };
+
+    [Fact]
+    public void A_heal_pick_is_a_ceiling_and_off_means_none()
+    {
+        Assert.Equal(3, new CompanionBrain().Next(Hurt(), Defaults).Slot); // 자동 — 쿠라노소
+        Assert.Equal(2, new CompanionBrain().Next(Hurt(), Defaults with { Heal = 2 }).Slot); // 쿠라노까지
+        Assert.DoesNotContain("회복", new CompanionBrain().Next(Hurt(), Defaults with { Heal = CompanionSpells.HealOff }).Why);
+    }
+
+    [Fact]
+    public void Switched_off_buffs_and_cures_are_not_cast()
+    {
+        CompanionSettings none = Defaults with { Priest = CompanionSpells.Priest.None };
+
+        Assert.NotEqual(CompanionAct.Cast, new CompanionBrain().Next(Hurt(ownerHealth: 100), none).Act); // 호르라마 꺼짐
+
+        CompanionSight asleep = Hurt(ownerHealth: 100) with
+        {
+            StatusesOf = serial => serial == Owner ? new HashSet<string> { "sleep", "horrama" } : new HashSet<string> { "horrama" },
+        };
+        Assert.Equal(5, new CompanionBrain().Next(asleep, Defaults).Slot);
+        Assert.NotEqual(CompanionAct.Cast, new CompanionBrain().Next(asleep, none).Act);
     }
 }

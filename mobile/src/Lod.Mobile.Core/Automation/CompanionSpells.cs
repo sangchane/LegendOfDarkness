@@ -34,6 +34,64 @@ public static class CompanionSpells
         return Magic.Sleep | (bot >= 99 ? Magic.Prabo : bot >= 71 ? Magic.Depreco : bot >= 41 ? Magic.Bardo : bot >= 11 ? Magic.Lento : Magic.None);
     }
 
+    /// <summary>봇 탭 「성직자」 켬 — 해제 둘·버프 둘(0xF1 6 셋째 바이트). 처음엔 모두.</summary>
+    [Flags]
+    public enum Priest : byte
+    {
+        None = 0,
+        Dinarcoli = 1,
+        Disoruma = 2,
+        Horrama = 4,
+        Enarma = 8,
+        All = Dinarcoli | Disoruma | Horrama | Enarma,
+    }
+
+    /// <summary>회복 셀렉트의 차례(약한 것부터) — 값 0 은 자동, k 는 k 번째까지(그 안에서 마력이 닿는 가장 센 것), <see cref="HealOff" /> 는 끄기.</summary>
+    public static readonly string[] Heals = ["쿠로", "쿠라노", "쿠라노소", "수페라쿠라노", "엑스쿠라노"];
+
+    public static readonly string[] GroupHeals = ["쿠러스", "쿠라누스", "쿠라네라", "엑스쿠라네라"];
+
+    public const int HealAuto = 0;
+    public const int HealOff = 255;
+
+    /// <summary>주인이 봇 탭에서 고른 대로 이 마법을 써도 되나 — 저주·나르콜리 비트, 해제·버프 비트, 회복 셀렉트 둘. 그 밖의 마법은 늘 된다.</summary>
+    public static bool Allowed(string spell, Magic magic, Priest priest, int heal, int groupHeal)
+    {
+        string name = Bare(spell);
+
+        if (SwitchOf(name) is var wizard and not Magic.None)
+        {
+            return (magic & wizard) != 0;
+        }
+
+        Priest cleric = name switch
+        {
+            "디나르콜리" => Priest.Dinarcoli,
+            "디소루마" => Priest.Disoruma,
+            "호르라마" => Priest.Horrama,
+            "에나르마" => Priest.Enarma,
+            _ => Priest.None,
+        };
+
+        if (cleric != Priest.None)
+        {
+            return (priest & cleric) != 0;
+        }
+
+        int at = Array.IndexOf(Heals, name);
+
+        if (at >= 0)
+        {
+            return Within(at, heal);
+        }
+
+        at = Array.IndexOf(GroupHeals, name);
+
+        return at < 0 || Within(at, groupHeal);
+    }
+
+    private static bool Within(int at, int choice) => choice == HealAuto || (choice != HealOff && at < choice);
+
     /// <summary>이 마법(꼬리 뗀 이름)을 켜고 끄는 체크 — 저주·나르콜리가 아니면 None.</summary>
     public static Magic SwitchOf(string name) => Bare(name) switch
     {

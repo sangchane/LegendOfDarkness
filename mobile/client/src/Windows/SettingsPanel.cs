@@ -56,18 +56,37 @@ public sealed partial class SettingsPanel : PanelContainer
         // 마법사 — 봇이 레벨대로 배운 저주·나르콜리를 쓸지(사용자, 2026-10-03). 바뀌면 게임 화면이 서버로 보낸다(0xF1 6).
         bot.AddChild(new Label { Text = "마법사", HorizontalAlignment = HorizontalAlignment.Center });
         bot.AddChild(Caption("저주는 하나만 걸립니다 — 고른 것(자동은 봇이 쓸 수 있는 가장 센 것)을 주인과 싸우는 괴물에. 나르콜리는 주인이 치지 않는 괴물을 재웁니다."));
-        PercentSelect curse = PercentSelect.Of([.. Main.CurseChoices.Select(one => one.Label)], Main.BotCurse, this, width: 150);
-        curse.Changed += index =>
-        {
-            Main.SetBotMagic(index, Main.BotSleep);
-            BotMagicChanged?.Invoke();
-        };
+        PercentSelect curse = PercentSelect.Of([.. Main.CurseChoices.Select(one => one.Label)], Main.BotCurse, this, width: 170);
+        curse.Changed += index => Order(curse: index);
         bot.AddChild(Row("저주", curse));
-        bot.AddChild(Row("나르콜리 (41)", Switch(Main.BotSleep, on =>
+        bot.AddChild(Row("나르콜리 (41)", Switch(Main.BotSleep, on => Order(sleep: on))));
+
+        // 성직자 — 회복은 고른 것까지에서 마력이 닿는 가장 센 것(사용자, 2026-10-03: 저주와 같은 방식으로).
+        bot.AddChild(new Label { Text = "성직자", HorizontalAlignment = HorizontalAlignment.Center });
+        bot.AddChild(Caption("회복은 고른 것까지에서 마력이 닿는 가장 센 것. 디나르콜리·디소루마는 잠·빙결 풀기."));
+        PercentSelect heal = PercentSelect.Of(Main.HealChoices, Main.BotHeal, this, width: 170);
+        heal.Changed += index => Order(heal: index);
+        bot.AddChild(Row("회복", heal));
+        PercentSelect group = PercentSelect.Of(Main.GroupHealChoices, Main.BotGroupHeal, this, width: 170);
+        group.Changed += index => Order(groupHeal: index);
+        bot.AddChild(Row("파티 회복", group));
+
+        // 해제 둘·버프 둘은 두 칸씩 두 줄로(사용자: 여러 줄로 늘어놓을 것 없다).
+        GridContainer priests = new() { Columns = 2, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        priests.AddThemeConstantOverride("h_separation", Main.Gutter * 2);
+        foreach ((string name, CompanionSpells.Priest bit) in new[]
+                 {
+                     ("디나르콜리", CompanionSpells.Priest.Dinarcoli), ("디소루마", CompanionSpells.Priest.Disoruma),
+                     ("호르라마", CompanionSpells.Priest.Horrama), ("에나르마", CompanionSpells.Priest.Enarma),
+                 })
         {
-            Main.SetBotMagic(Main.BotCurse, on);
-            BotMagicChanged?.Invoke();
-        })));
+            Control row = Row(name, Switch((Main.BotPriest & bit) != 0,
+                on => Order(priest: on ? Main.BotPriest | bit : Main.BotPriest & ~bit)));
+            row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            priests.AddChild(row);
+        }
+
+        bot.AddChild(priests);
 
         // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
         Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(76, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
@@ -104,7 +123,11 @@ public sealed partial class SettingsPanel : PanelContainer
         // 굴리지 않는다. 세로는 다 보인다.
         if (Main.Portrait)
         {
-            inside.AddChild(pages);
+            // 세로도 봇 탭(마법사·성직자)이 길어 화면을 넘는다 — 남는 높이까지만 보이고 그 안을 굴린다(_Ready 에서 잰다).
+            _portraitScroll = new ScrollContainer { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+            _portraitScroll.AddChild(pages);
+            inside.AddChild(_portraitScroll);
+            _portraitPages = pages;
         }
         else
         {
@@ -126,6 +149,31 @@ public sealed partial class SettingsPanel : PanelContainer
         ShowTab(Main.SettingsTab is { Length: > 0 } asked && _pages.ContainsKey(asked) ? asked : "자동");
     }
 
+    private ScrollContainer? _portraitScroll;
+    private Control? _portraitPages;
+
+    /// <summary>세로 화면에서 굴림 칸의 높이 — 속 높이와 화면 아래 위 줄·제목 줄을 뺀 남는 높이 중 작은 것.</summary>
+    private void FitPortrait()
+    {
+        if (_portraitScroll is null || _portraitPages is null || !IsInsideTree())
+        {
+            return;
+        }
+
+        // 굴림 칸이 선 자리부터 화면 아래(여백·창 테두리 몫을 남기고)까지. 자리를 잡기 전이면 위 줄·제목 줄 몫(실측 약 290)을 뺀다.
+        float top = _portraitScroll.GlobalPosition.Y > 0 ? _portraitScroll.GlobalPosition.Y : 290;
+        float room = GetViewportRect().Size.Y - top - Main.Gutter * 3;
+        Vector2 inner = _portraitPages.GetCombinedMinimumSize();
+        _portraitScroll.CustomMinimumSize = new Vector2(inner.X, Mathf.Min(inner.Y, Mathf.Max(200, room)));
+    }
+
+    public override void _Ready()
+    {
+        FitPortrait();
+        VisibilityChanged += () => Callable.From(FitPortrait).CallDeferred();
+        Resized += () => Callable.From(FitPortrait).CallDeferred();
+    }
+
     /// <summary>탭 하나를 보인다 — 자동 · 봇.</summary>
     public void ShowTab(string name)
     {
@@ -135,6 +183,8 @@ public sealed partial class SettingsPanel : PanelContainer
             tab.SetPressedNoSignal(each == name);
             tab.EmitSignal(BaseButton.SignalName.Toggled, each == name);
         }
+
+        FitPortrait();
     }
 
     /// <summary>제목 줄의 [로그아웃] — 누르면 게임 화면이 [로그아웃]·[게임 종료]·[취소] 판(<see cref="ExitChoice"/>)을 연다.</summary>
@@ -161,7 +211,14 @@ public sealed partial class SettingsPanel : PanelContainer
         return check;
     }
 
-    /// <summary>봇 탭 「마법사」 저주·나르콜리를 바꿨다 — 값은 <see cref="Main.BotMagicFor"/>.</summary>
+    /// <summary>봇 탭에서 하나를 바꾸고 나머지는 그대로 둔 채 남기고 알린다.</summary>
+    private void Order(int? curse = null, bool? sleep = null, CompanionSpells.Priest? priest = null, int? heal = null, int? groupHeal = null)
+    {
+        Main.SetBotOrders(curse ?? Main.BotCurse, sleep ?? Main.BotSleep, priest ?? Main.BotPriest, heal ?? Main.BotHeal, groupHeal ?? Main.BotGroupHeal);
+        BotMagicChanged?.Invoke();
+    }
+
+    /// <summary>봇 탭에서 고른 것을 바꿨다 — 값은 <see cref="Main.BotOrdersFor"/>.</summary>
     public event System.Action? BotMagicChanged;
 
     private static Label Caption(string text)

@@ -272,8 +272,10 @@ public sealed class CompanionBotTests : IDisposable
         await Waiting.Until(() => Shows(CompanionSpells.SleepIcon), $"사슴이 잠들지 않았습니다: {Joined(said)}", _deadline.Token, TimeSpan.FromSeconds(60));
         Assert.Contains(Joined(said).Split(" | "), line => line.StartsWith("저주 바르도", StringComparison.Ordinal));
 
-        await owner.SendCompanionMagicAsync(CompanionSpells.Magic.Lento, _deadline.Token);
-        await Waiting.Until(() => bot.Master is { Magic: CompanionSpells.Magic.Lento }, "체크한 것이 봇에게 가지 않았습니다.", _deadline.Token);
+        await owner.SendCompanionOrdersAsync(new CompanionSettings(Magic: CompanionSpells.Magic.Lento, Priest: CompanionSpells.Priest.Horrama, Heal: 2,
+            GroupHeal: CompanionSpells.HealOff), _deadline.Token);
+        await Waiting.Until(() => bot.Master is { Magic: CompanionSpells.Magic.Lento, Priest: CompanionSpells.Priest.Horrama, Heal: 2, GroupHeal: 255 },
+            "고른 것이 봇에게 가지 않았습니다.", _deadline.Token);
     }
 
     /// <summary>포테의숲1존에 사슴 한 마리만 — 사람 앞칸에 붙박이로, 먼저 덤빈다(<see cref="PoteForestDeerDangerTests" /> 와 같다).</summary>

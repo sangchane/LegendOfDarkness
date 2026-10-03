@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot;
 using Lod.Mobile.Core.Automation;
 
@@ -107,8 +108,8 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// 봇 탭 「마법사」 — 걸 저주 하나(셀렉트, 저주는 한 칸이라 하나만)와 나르콜리 켬. 기기에 남는다(한 줄 "저주번호 나르콜리").
-    /// 처음엔 「자동」 — 봇 레벨에서 쓸 수 있는 가장 센 저주(<see cref="CompanionSpells.DefaultMagic"/>), 나르콜리 켬.
+    /// 봇 탭 — 걸 저주 하나(셀렉트, 저주는 한 칸이라 하나만)·나르콜리 켬·해제 둘과 버프 둘 켬(비트)·회복 셀렉트 둘. 기기에 남는다
+    /// (한 줄 "저주 나르콜리 성직자비트 회복 파티회복"). 처음엔 저주 「자동」(봇이 쓸 수 있는 가장 센 것), 모두 켬, 회복 「자동」.
     /// 서버는 메모리에만 두므로 바꿀 때와 봇을 부를 때 보낸다(0xF1 6).
     /// </summary>
     private const string BotMagicFile = "user://botmagic.cfg";
@@ -120,25 +121,45 @@ public partial class Main : Control
         ("데프레코 (71)", CompanionSpells.Magic.Depreco), ("프라보 (99)", CompanionSpells.Magic.Prabo), ("끄기", CompanionSpells.Magic.None),
     ];
 
+    /// <summary>회복 셀렉트의 줄 — 첫 줄 자동, 끝 줄 끄기, 사이는 <see cref="CompanionSpells.Heals"/> 차례(그것까지).</summary>
+    public static readonly string[] HealChoices = ["자동 (가장 센 것)", "쿠로 (1)", "쿠라노 (21)", "쿠라노소 (55)", "수페라쿠라노 (83)", "엑스쿠라노 (99)", "끄기"];
+
+    public static readonly string[] GroupHealChoices = ["자동 (가장 센 것)", "쿠러스 (11)", "쿠라누스 (63)", "쿠라네라 (87)", "엑스쿠라네라 (99)", "끄기"];
+
     public static int BotCurse { get; private set; }
 
     public static bool BotSleep { get; private set; } = true;
 
-    /// <summary>지금 봇에게 보낼 비트.</summary>
-    public static CompanionSpells.Magic BotMagicFor(int ownerLevel) =>
-        (BotSleep ? CompanionSpells.Magic.Sleep : CompanionSpells.Magic.None)
-        | (CurseChoices[BotCurse].Bit ?? CompanionSpells.DefaultMagic(ownerLevel) & ~CompanionSpells.Magic.Sleep);
+    public static CompanionSpells.Priest BotPriest { get; private set; } = CompanionSpells.Priest.All;
 
-    public static void SetBotMagic(int curse, bool sleep)
+    public static int BotHeal { get; private set; }
+
+    public static int BotGroupHeal { get; private set; }
+
+    /// <summary>지금 봇에게 보낼 것.</summary>
+    public static CompanionSettings BotOrdersFor(int ownerLevel) => new(
+        Magic: (BotSleep ? CompanionSpells.Magic.Sleep : CompanionSpells.Magic.None)
+               | (CurseChoices[BotCurse].Bit ?? CompanionSpells.DefaultMagic(ownerLevel) & ~CompanionSpells.Magic.Sleep),
+        Priest: BotPriest,
+        Heal: HealPick(BotHeal, HealChoices),
+        GroupHeal: HealPick(BotGroupHeal, GroupHealChoices));
+
+    /// <summary>셀렉트 줄 번호 → 선의 값(0 자동 · k 번째까지 · 255 끄기).</summary>
+    private static int HealPick(int row, string[] choices) => row == choices.Length - 1 ? CompanionSpells.HealOff : row;
+
+    public static void SetBotOrders(int curse, bool sleep, CompanionSpells.Priest priest, int heal, int groupHeal)
     {
         BotCurse = System.Math.Clamp(curse, 0, CurseChoices.Length - 1);
         BotSleep = sleep;
+        BotPriest = priest & CompanionSpells.Priest.All;
+        BotHeal = System.Math.Clamp(heal, 0, HealChoices.Length - 1);
+        BotGroupHeal = System.Math.Clamp(groupHeal, 0, GroupHealChoices.Length - 1);
 
         Godot.FileAccess? writing = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Write);
 
         if (writing is not null)
         {
-            writing.StoreLine($"{BotCurse} {(sleep ? 1 : 0)}");
+            writing.StoreLine($"{BotCurse} {(sleep ? 1 : 0)} {(int)BotPriest} {BotHeal} {BotGroupHeal}");
             writing.Close();
         }
     }
@@ -146,12 +167,11 @@ public partial class Main : Control
     private static void ReadBotMagic()
     {
         using Godot.FileAccess? reading = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Read);
-        string[] parts = reading?.GetLine().Trim().Split(' ') ?? [];
+        int[] parts = [.. (reading?.GetLine().Trim().Split(' ') ?? []).Select(one => int.TryParse(one, out int value) ? value : -1)];
 
-        if (parts.Length == 2 && int.TryParse(parts[0], out int curse))
+        if (parts.Length == 5 && parts.All(one => one >= 0))
         {
-            BotCurse = System.Math.Clamp(curse, 0, CurseChoices.Length - 1);
-            BotSleep = parts[1] != "0";
+            SetBotOrders(parts[0], parts[1] != 0, (CompanionSpells.Priest)parts[2], parts[3], parts[4]);
         }
     }
 
