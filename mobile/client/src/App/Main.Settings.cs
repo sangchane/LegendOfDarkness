@@ -107,26 +107,38 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// 봇 탭 「마법사」 — 봇이 걸어도 되는 저주(렌토·바르도·데프레코 따로)·나르콜리. 기기에 남는다(비트 숫자 한 줄). 고른 적이 없으면(null)
-    /// 봇 레벨에서 가장 센 저주 하나 + 나르콜리(<see cref="CompanionSpells.DefaultMagic"/>) — 레벨이 오르면 따라 바뀐다.
+    /// 봇 탭 「마법사」 — 걸 저주 하나(셀렉트, 저주는 한 칸이라 하나만)와 나르콜리 켬. 기기에 남는다(한 줄 "저주번호 나르콜리").
+    /// 처음엔 「자동」 — 봇 레벨에서 쓸 수 있는 가장 센 저주(<see cref="CompanionSpells.DefaultMagic"/>), 나르콜리 켬.
     /// 서버는 메모리에만 두므로 바꿀 때와 봇을 부를 때 보낸다(0xF1 6).
     /// </summary>
     private const string BotMagicFile = "user://botmagic.cfg";
 
-    public static CompanionSpells.Magic? BotMagic { get; private set; }
+    /// <summary>저주 셀렉트의 줄 — 비트가 null 이면 자동(레벨에 맞춘 가장 센 것).</summary>
+    public static readonly (string Label, CompanionSpells.Magic? Bit)[] CurseChoices =
+    [
+        ("자동 (가장 센 것)", null), ("렌토 (11)", CompanionSpells.Magic.Lento), ("바르도 (41)", CompanionSpells.Magic.Bardo),
+        ("데프레코 (71)", CompanionSpells.Magic.Depreco), ("프라보 (99)", CompanionSpells.Magic.Prabo), ("끄기", CompanionSpells.Magic.None),
+    ];
 
-    /// <summary>지금 봇에게 보낼 체크 — 고른 것, 없으면 내 레벨의 기본.</summary>
-    public static CompanionSpells.Magic BotMagicFor(int ownerLevel) => BotMagic ?? CompanionSpells.DefaultMagic(ownerLevel);
+    public static int BotCurse { get; private set; }
 
-    public static void SetBotMagic(CompanionSpells.Magic magic)
+    public static bool BotSleep { get; private set; } = true;
+
+    /// <summary>지금 봇에게 보낼 비트.</summary>
+    public static CompanionSpells.Magic BotMagicFor(int ownerLevel) =>
+        (BotSleep ? CompanionSpells.Magic.Sleep : CompanionSpells.Magic.None)
+        | (CurseChoices[BotCurse].Bit ?? CompanionSpells.DefaultMagic(ownerLevel) & ~CompanionSpells.Magic.Sleep);
+
+    public static void SetBotMagic(int curse, bool sleep)
     {
-        BotMagic = magic;
+        BotCurse = System.Math.Clamp(curse, 0, CurseChoices.Length - 1);
+        BotSleep = sleep;
 
         Godot.FileAccess? writing = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Write);
 
         if (writing is not null)
         {
-            writing.StoreLine(((int)magic).ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writing.StoreLine($"{BotCurse} {(sleep ? 1 : 0)}");
             writing.Close();
         }
     }
@@ -134,9 +146,12 @@ public partial class Main : Control
     private static void ReadBotMagic()
     {
         using Godot.FileAccess? reading = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Read);
-        if (int.TryParse(reading?.GetLine().Trim(), out int bits))
+        string[] parts = reading?.GetLine().Trim().Split(' ') ?? [];
+
+        if (parts.Length == 2 && int.TryParse(parts[0], out int curse))
         {
-            BotMagic = (CompanionSpells.Magic)(bits & (int)CompanionSpells.Magic.All);
+            BotCurse = System.Math.Clamp(curse, 0, CurseChoices.Length - 1);
+            BotSleep = parts[1] != "0";
         }
     }
 

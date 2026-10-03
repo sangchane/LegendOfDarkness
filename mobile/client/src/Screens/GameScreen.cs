@@ -546,7 +546,6 @@ public partial class GameScreen : Control
         KeepGuiding(delta);
         KeepAutoHuntButton();
         _settings.ShowCompanion(_server?.Companion is not null);
-        _settings.ShowBotMagic(Main.BotMagicFor(_server?.Vitals?.Level ?? 0));
 
         if (Main.CompanionOnStart && _companionSettling >= 0 && _world.MapId > 0 && _server?.Vitals is not null
             && ++_companionSettling == 120)

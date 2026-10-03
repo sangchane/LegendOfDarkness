@@ -1,9 +1,10 @@
+using System.Linq;
 using Godot;
 
 namespace LodClient;
 
 /// <summary>
-/// A select box for a percent, 1~99 in steps of one — press it and a scrollable list drops down to pick from
+/// A select box — a percent 1~99 by default, or any list of names (<see cref="Of"/> — 봇 저주 고르기, 2026-10-03) — press it and a scrollable list drops down to pick from
 /// (사용자 요청, 2026-09-26: 돌림판 대신 눌러서 뜨는 목록으로, 5~95 5칸 대신 1~99 전부).
 /// </summary>
 /// <remarks>
@@ -14,14 +15,15 @@ namespace LodClient;
 /// </remarks>
 public sealed partial class PercentSelect : Button
 {
-    private const int Minimum = 1;
-    private const int Maximum = 99;
     private const int MinVisibleRows = 3;
     private const int MaxVisibleRows = 6;
 
     private readonly PopupPanel _picker = new();
     private readonly ScrollContainer _scroll = new();
-    private readonly Button[] _rows = new Button[Maximum - Minimum + 1];
+    private readonly Button[] _rows;
+    private readonly string[] _labels;
+    private readonly int _first;
+    private readonly int _width;
     private readonly Control _bounds;
 
     private int _value;
@@ -32,29 +34,41 @@ public sealed partial class PercentSelect : Button
     /// 덮었다).
     /// </summary>
     public PercentSelect(int value, Control bounds)
+        : this([.. System.Linq.Enumerable.Range(1, 99).Select(percent => $"{percent}%")], first: 1, value, bounds, width: 96)
     {
+    }
+
+    /// <summary>이름 목록에서 하나 — 값은 고른 줄의 번호(0부터).</summary>
+    public static PercentSelect Of(string[] labels, int index, Control bounds, int width) => new(labels, 0, index, bounds, width);
+
+    private PercentSelect(string[] labels, int first, int value, Control bounds, int width)
+    {
+        _labels = labels;
+        _first = first;
+        _width = width;
         _bounds = bounds;
-        _value = Mathf.Clamp(value, Minimum, Maximum);
-        Text = $"{_value}%";
-        CustomMinimumSize = new Vector2(96, Main.TouchMinimum);
+        _rows = new Button[labels.Length];
+        _value = Mathf.Clamp(value, first, first + labels.Length - 1);
+        Text = _labels[_value - _first];
+        CustomMinimumSize = new Vector2(width, Main.TouchMinimum);
         Greybox.Plain(this);
 
         VBoxContainer list = new();
         list.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        for (int percent = Minimum; percent <= Maximum; percent++)
+        for (int at = 0; at < labels.Length; at++)
         {
-            int picked = percent;
+            int picked = first + at;
             Button row = new()
             {
-                Text = $"{percent}%",
+                Text = labels[at],
                 Alignment = HorizontalAlignment.Center,
-                CustomMinimumSize = new Vector2(96, Main.TouchMinimum)
+                CustomMinimumSize = new Vector2(width, Main.TouchMinimum)
             };
             Greybox.Plain(row);
             row.Pressed += () => Pick(picked);
 
-            _rows[percent - Minimum] = row;
+            _rows[at] = row;
             list.AddChild(row);
         }
 
@@ -86,7 +100,7 @@ public sealed partial class PercentSelect : Button
 
         bool below = spaceBelow >= rowStride * MinVisibleRows || spaceBelow >= spaceAbove;
         int rows = Mathf.Clamp((below ? spaceBelow : spaceAbove) / rowStride, MinVisibleRows, MaxVisibleRows);
-        _scroll.CustomMinimumSize = new Vector2(96, rows * rowStride);
+        _scroll.CustomMinimumSize = new Vector2(_width, Mathf.Min(rows, _labels.Length) * rowStride);
 
         _picker.Popup(new Rect2I(0, 0, 0, 0));
 
@@ -109,14 +123,14 @@ public sealed partial class PercentSelect : Button
 
         if (IsInstanceValid(this) && _picker.Visible)
         {
-            _scroll.EnsureControlVisible(_rows[_value - Minimum]);
+            _scroll.EnsureControlVisible(_rows[_value - _first]);
         }
     }
 
     private void Pick(int value)
     {
         _value = value;
-        Text = $"{value}%";
+        Text = _labels[value - _first];
         _picker.Hide();
         Changed?.Invoke(value);
     }

@@ -151,6 +151,8 @@ public sealed class CompanionMagicTests
         Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Lento, CompanionSpells.DefaultMagic(13));
         Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Bardo, CompanionSpells.DefaultMagic(43));
         Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Depreco, CompanionSpells.DefaultMagic(73));
+        Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Prabo, CompanionSpells.DefaultMagic(101));
+        Assert.Equal(CompanionSpells.Magic.Prabo, CompanionSpells.SwitchOf("프라보 (Lev:1/100)"));
     }
 
     [Fact]

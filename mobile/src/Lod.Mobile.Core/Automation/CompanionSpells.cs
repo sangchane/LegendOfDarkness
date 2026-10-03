@@ -19,18 +19,19 @@ public static class CompanionSpells
         Sleep = 2,
         Bardo = 4,
         Depreco = 8,
-        All = Lento | Sleep | Bardo | Depreco,
+        Prabo = 16,
+        All = Lento | Sleep | Bardo | Depreco | Prabo,
     }
 
     /// <summary>
     /// 고른 적이 없을 때의 체크 — 봇(주인 레벨 − 2, 서버 <c>Companions.LevelFor</c>)이 쓸 수 있는 가장 센 저주 하나와 나르콜리
-    /// (사용자 2026-10-03: "가장 센 거만 체크"). 레벨은 서버 <c>Companions.PriestSpells</c> 와 같다 — 렌토 11 · 바르도 41 · 데프레코 71.
+    /// (사용자 2026-10-03: "가장 센 거만 체크"). 레벨은 서버 <c>Companions.PriestSpells</c> 와 같다 — 렌토 11 · 바르도 41 · 데프레코 71 · 프라보 99.
     /// </summary>
     public static Magic DefaultMagic(int ownerLevel)
     {
         int bot = Math.Max(1, ownerLevel - 2);
 
-        return Magic.Sleep | (bot >= 71 ? Magic.Depreco : bot >= 41 ? Magic.Bardo : bot >= 11 ? Magic.Lento : Magic.None);
+        return Magic.Sleep | (bot >= 99 ? Magic.Prabo : bot >= 71 ? Magic.Depreco : bot >= 41 ? Magic.Bardo : bot >= 11 ? Magic.Lento : Magic.None);
     }
 
     /// <summary>이 마법(꼬리 뗀 이름)을 켜고 끄는 체크 — 저주·나르콜리가 아니면 None.</summary>
@@ -39,6 +40,7 @@ public static class CompanionSpells
         "렌토" => Magic.Lento,
         "바르도" => Magic.Bardo,
         "데프레코" => Magic.Depreco,
+        "프라보" => Magic.Prabo,
         "나르콜리" => Magic.Sleep,
         _ => Magic.None,
     };
@@ -79,10 +81,11 @@ public static class CompanionSpells
         // 5.99 SPELL_디나르콜리 mobnar_end → 하데스 수면(sleep), SPELL_디소루마 mobsor_end → 빙결(frozen). 30마력.
         ["디나르콜리"] = new(Kind.Cure, 0, 30, 0, "sleep"),
         ["디소루마"] = new(Kind.Cure, 0, 30, 0, "frozen"),
-        // 5.99 법사(비전직).txt — 저주는 세기(방어 +15·+25·+35)·마력·120초, 나르콜리는 50마력·20초(20% 빗나감).
+        // 5.99 법사(비전직).txt — 저주는 세기(방어 +15·+25·+35·+45)·마력·120초, 나르콜리는 50마력·20초(20% 빗나감).
         ["렌토"] = new(Kind.Curse, 15, 30, 120, Icon: CurseIcon),
         ["바르도"] = new(Kind.Curse, 25, 50, 120, Icon: CurseIcon),
         ["데프레코"] = new(Kind.Curse, 35, 65, 120, Icon: CurseIcon),
+        ["프라보"] = new(Kind.Curse, 45, 130, 120, Icon: CurseIcon),
         ["나르콜리"] = new(Kind.Sleep, 0, 50, 20, Icon: SleepIcon),
     };
 

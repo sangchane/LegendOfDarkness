@@ -62,7 +62,7 @@ public static class Companion
     /// <summary>봇이 혼수인 주인을 깨운다(0xF1 5) — 봇 계정만, 주인 바로 옆에서. 서버가 가려 듣는다.</summary>
     public static byte[] WakeMaster() => [5];
 
-    /// <summary>봇 탭 「마법사」 체크 비트(0xF1 6 — 1 렌토 · 2 나르콜리 · 4 바르도 · 8 데프레코). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.</summary>
+    /// <summary>봇 탭 「마법사」 체크 비트(0xF1 6 — 1 렌토 · 2 나르콜리 · 4 바르도 · 8 데프레코 · 16 프라보). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.</summary>
     public static byte[] Magic(CompanionSpells.Magic magic) => [6, (byte)magic];
 
     /// <summary>0x5E 종류 3 — 한 사람(주인 또는 봇 자신)에게 걸린 것: 이름 · 남은 초 · 해로움.</summary>
