@@ -24,7 +24,8 @@ public sealed partial class FieldPanel : PanelContainer
     private readonly GridContainer _fields = new();
     private readonly GridContainer _zones = new();
     private readonly VBoxContainer _zoneBox = new() { Visible = false };
-    private readonly Label _zoneTitle = new();
+    private readonly Button _back = new() { Visible = false, FocusMode = FocusModeEnum.None };
+    private readonly Label _title = WindowFrame.Title("월드맵");
     private readonly Button _townTab = WindowFrame.IconButton(GlyphKind.Town, "마을", tab: true, width: 56);
     private readonly Button _fieldTab = WindowFrame.IconButton(GlyphKind.Field, "사냥터", tab: true, width: 56);
     private readonly Dictionary<Button, string> _names = [];
@@ -50,22 +51,14 @@ public sealed partial class FieldPanel : PanelContainer
         _fields.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _fields.AddThemeConstantOverride("h_separation", Main.Gutter);
         _fields.AddThemeConstantOverride("v_separation", Main.Gutter);
-        // 사냥터 카드를 누르면 그 아래 구역 — 같은 모양 카드, 위에 [‹ 사냥터] 와 사냥터 이름(사용자 2026-10-02).
+        // 사냥터 카드를 누르면 그 아래 구역 — 같은 모양 카드. 돌아가기 [‹ 사냥터 이름] 은 제목 줄의 「월드맵」 자리에(사용자 2026-10-03:
+        // 따로 한 줄 차지하지 않게).
         _zones.Columns = _places.Columns;
         _zones.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _zones.AddThemeConstantOverride("h_separation", Main.Gutter);
         _zones.AddThemeConstantOverride("v_separation", Main.Gutter);
-        Button back = new() { Text = "‹ 사냥터", FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
-        Greybox.Plain(back);
-        back.Pressed += () => ShowTab(towns: false);
-        _zoneTitle.AddThemeColorOverride("font_color", Greybox.Text);
-        _zoneTitle.AddThemeFontSizeOverride("font_size", 16);
-        HBoxContainer zoneHead = new();
-        zoneHead.AddThemeConstantOverride("separation", Main.Gutter);
-        zoneHead.AddChild(back);
-        zoneHead.AddChild(_zoneTitle);
-        _zoneBox.AddThemeConstantOverride("separation", Main.Gutter);
-        _zoneBox.AddChild(zoneHead);
+        Greybox.Plain(_back);
+        _back.Pressed += () => ShowTab(towns: false);
         _zoneBox.AddChild(_zones);
         _townTab.Pressed += () => ShowTab(towns: true);
         _fieldTab.Pressed += () => ShowTab(towns: false);
@@ -89,9 +82,9 @@ public sealed partial class FieldPanel : PanelContainer
         HBoxContainer left = new();
         left.AddThemeConstantOverride("separation", Main.Gutter);
         left.AddChild(WindowFrame.Tabs(_townTab, _fieldTab));
-        Label title = WindowFrame.Title("월드맵");
-        title.AddThemeColorOverride("font_color", Greybox.Muted);
-        left.AddChild(title);
+        _title.AddThemeColorOverride("font_color", Greybox.Muted);
+        left.AddChild(_title);
+        left.AddChild(_back);
         inside.AddChild(WindowFrame.Head(left, Close));
         inside.AddChild(scroll);
 
@@ -179,7 +172,9 @@ public sealed partial class FieldPanel : PanelContainer
             _zones.AddChild(face);
         }
 
-        _zoneTitle.Text = field;
+        _back.Text = $"‹ {field}";
+        _back.Visible = true;
+        _title.Visible = false;
         _fields.Visible = false;
         _zoneBox.Visible = true;
     }
@@ -190,6 +185,8 @@ public sealed partial class FieldPanel : PanelContainer
         _places.Visible = towns;
         _fields.Visible = !towns;
         _zoneBox.Visible = false;
+        _back.Visible = false;
+        _title.Visible = true;
         _townTab.SetPressedNoSignal(towns);
         _fieldTab.SetPressedNoSignal(!towns);
         _townTab.EmitSignal(BaseButton.SignalName.Toggled, towns);
