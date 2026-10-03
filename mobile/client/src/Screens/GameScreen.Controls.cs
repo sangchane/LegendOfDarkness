@@ -19,7 +19,7 @@ public partial class GameScreen : Control
 
         foreach ((ThumbButton key, Direction where) in _keys)
         {
-            if (key.Held)
+            if (key.Held || ArrowHeld(where))
             {
                 held = true;
                 _world.StopGuiding();
@@ -251,6 +251,27 @@ public partial class GameScreen : Control
         }
 
         return pad;
+    }
+
+    /// <summary>PC 방향키 — 방향판을 누른 채인 것과 같다. 글을 쓰는 중이면 글자 칸의 것이다.</summary>
+    private bool ArrowHeld(Direction where) =>
+        GetViewport().GuiGetFocusOwner() is not (LineEdit or TextEdit)
+        && Input.IsKeyPressed(where switch
+        {
+            Direction.North => Key.Up,
+            Direction.East => Key.Right,
+            Direction.South => Key.Down,
+            _ => Key.Left,
+        });
+
+    /// <summary>PC 숫자키 1~9 — 기술(또는 마법) 칸을 차례대로 쓴다(사용자, 2026-10-03). 글자 칸이 먹은 키는 여기 오지 않는다.</summary>
+    public override void _UnhandledKeyInput(InputEvent @event)
+    {
+        if (@event is InputEventKey { Pressed: true, Echo: false } press && press.Keycode is >= Key.Key1 and <= Key.Key9)
+        {
+            _abilities.UseNth((int)(press.Keycode - Key.Key1));
+            GetViewport().SetInputAsHandled();
+        }
     }
 
     /// <summary>The messages with the button that opens what was said — the lines fade, this brings them back.</summary>

@@ -370,6 +370,24 @@ public sealed partial class AbilityBar : Control
         }
     }
 
+    /// <summary>PC 숫자키 1~9 — 지금 보이는 쪽(기술·마법)의 n 번째 칸, 쪽을 넘어 놓인 차례대로(사용자, 2026-10-03). 빈 칸·식는 중이면 안 쓴다.</summary>
+    public void UseNth(int position)
+    {
+        if (DisplayedSlotAt(_spells, position) is not { } slot || (Cooling is { } ask && ask(!_spells, slot) > 0))
+        {
+            return;
+        }
+
+        if (_spells)
+        {
+            SpellUsed?.Invoke(slot);
+        }
+        else
+        {
+            SkillUsed?.Invoke(slot);
+        }
+    }
+
     /// <summary>What the bar is showing at a given (page, index) position of one kind, regardless of which tab is open now.</summary>
     private int? DisplayedSlotAt(bool spells, int position)
     {
