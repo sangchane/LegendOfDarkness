@@ -56,7 +56,8 @@ public sealed class CompanionMagicTests
     [Fact]
     public void A_cursed_monster_is_not_cursed_again_and_a_fresh_cast_waits_for_the_report()
     {
-        Assert.NotEqual(CompanionAct.Cast, new CompanionBrain().Next(Sight([Struck(cursed: true)], spells: [Spell(11, "바르도")]), Defaults).Act);
+        // 저주는 한 칸 — 렌토가 걸려 있으면 더 센 바르도도 풀릴 때까지 안 건다.
+        Assert.NotEqual(CompanionAct.Cast, new CompanionBrain().Next(Sight([Struck(cursed: true)]), Defaults).Act);
 
         CompanionBrain brain = new();
         Assert.Equal(CompanionAct.Cast, brain.Next(Sight([Struck()], spells: [Spell(11, "바르도")]), Defaults).Act);
