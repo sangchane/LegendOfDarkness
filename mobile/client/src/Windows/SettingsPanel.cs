@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using Lod.Mobile.Core.Automation;
 
 namespace LodClient;
 
@@ -53,17 +54,19 @@ public sealed partial class SettingsPanel : PanelContainer
 
         // 마법사 — 봇이 레벨대로 배운 저주·나르콜리를 쓸지(사용자, 2026-10-03). 바뀌면 게임 화면이 서버로 보낸다(0xF1 6).
         bot.AddChild(new Label { Text = "마법사", HorizontalAlignment = HorizontalAlignment.Center });
-        bot.AddChild(Caption("저주는 주인과 싸우는 괴물의 방어를 깎고, 나르콜리는 주인이 치지 않는 괴물을 재웁니다."));
-        bot.AddChild(Row("저주", Switch(Main.BotMagic.Curse, on =>
+        bot.AddChild(Caption("체크한 저주 중 봇이 배운 가장 센 것 하나를 주인과 싸우는 괴물에 겁니다(저주는 하나만 걸림). 나르콜리는 주인이 치지 않는 괴물을 재웁니다."));
+        foreach ((string name, CompanionSpells.Magic bit) in new[]
+                 {
+                     ("렌토 (11)", CompanionSpells.Magic.Lento), ("바르도 (41)", CompanionSpells.Magic.Bardo),
+                     ("데프레코 (71)", CompanionSpells.Magic.Depreco), ("나르콜리 (41)", CompanionSpells.Magic.Sleep),
+                 })
         {
-            Main.SetBotMagic(on, Main.BotMagic.Sleep);
-            BotMagicChanged?.Invoke();
-        })));
-        bot.AddChild(Row("나르콜리", Switch(Main.BotMagic.Sleep, on =>
-        {
-            Main.SetBotMagic(Main.BotMagic.Curse, on);
-            BotMagicChanged?.Invoke();
-        })));
+            bot.AddChild(Row(name, Switch((Main.BotMagic & bit) != 0, on =>
+            {
+                Main.SetBotMagic(on ? Main.BotMagic | bit : Main.BotMagic & ~bit);
+                BotMagicChanged?.Invoke();
+            })));
+        }
 
         // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
         Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(76, Main.TouchMinimum), FocusMode = FocusModeEnum.None };

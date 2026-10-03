@@ -107,22 +107,22 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// 봇 탭 「마법사」 — 봇이 저주(렌토·바르도·데프레코)·나르콜리를 쓰나. 기기에 남고(한 줄 "1 1"), 처음엔 둘 다 켬.
+    /// 봇 탭 「마법사」 — 봇이 걸어도 되는 저주(렌토·바르도·데프레코 따로)·나르콜리. 기기에 남고(비트 숫자 한 줄), 처음엔 모두 켬.
     /// 서버는 메모리에만 두므로 바꿀 때와 봇을 부를 때 보낸다(0xF1 6).
     /// </summary>
     private const string BotMagicFile = "user://botmagic.cfg";
 
-    public static (bool Curse, bool Sleep) BotMagic { get; private set; } = (true, true);
+    public static CompanionSpells.Magic BotMagic { get; private set; } = CompanionSpells.Magic.All;
 
-    public static void SetBotMagic(bool curse, bool sleep)
+    public static void SetBotMagic(CompanionSpells.Magic magic)
     {
-        BotMagic = (curse, sleep);
+        BotMagic = magic;
 
         Godot.FileAccess? writing = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Write);
 
         if (writing is not null)
         {
-            writing.StoreLine($"{(curse ? 1 : 0)} {(sleep ? 1 : 0)}");
+            writing.StoreLine(((int)magic).ToString(System.Globalization.CultureInfo.InvariantCulture));
             writing.Close();
         }
     }
@@ -130,11 +130,9 @@ public partial class Main : Control
     private static void ReadBotMagic()
     {
         using Godot.FileAccess? reading = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Read);
-        string[] parts = reading?.GetLine().Trim().Split(' ') ?? [];
-
-        if (parts.Length == 2)
+        if (int.TryParse(reading?.GetLine().Trim(), out int bits))
         {
-            BotMagic = (parts[0] != "0", parts[1] != "0");
+            BotMagic = (CompanionSpells.Magic)(bits & (int)CompanionSpells.Magic.All);
         }
     }
 

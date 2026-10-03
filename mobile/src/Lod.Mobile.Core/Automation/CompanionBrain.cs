@@ -10,8 +10,7 @@ namespace Lod.Mobile.Core.Automation;
 /// <param name="FollowTo">따라 걷다가 이만큼 가까워지면 선다.</param>
 /// <param name="PotionHealthPercent">자기 체력이 이 % 아래면 체력 포션.</param>
 /// <param name="PotionManaPercent">자기 마력이 이 % 아래면 마력 포션(가장 싼 회복도 못 걸 마력이면 그 전에라도).</param>
-/// <param name="Curse">싸우는 괴물에게 저주(렌토·바르도·데프레코)를 거나 — 주인이 앱 봇 탭에서 끈다(0x5E 종류 1 꼬리).</param>
-/// <param name="Sleep">주인이 치지 않는 괴물을 나르콜리로 재우나 — 위와 같다.</param>
+/// <param name="Magic">봇 탭 「마법사」 체크 — 걸어도 되는 저주(렌토·바르도·데프레코)와 나르콜리. 주인이 앱에서 고른다(0x5E 종류 1 꼬리).</param>
 public sealed record CompanionSettings(
     int HealOwnerPercent = 70,
     int HealSelfPercent = 50,
@@ -19,8 +18,7 @@ public sealed record CompanionSettings(
     int FollowTo = 2,
     int PotionHealthPercent = 40,
     int PotionManaPercent = 30,
-    bool Curse = true,
-    bool Sleep = true);
+    CompanionSpells.Magic Magic = CompanionSpells.Magic.All);
 
 /// <summary>봇 둘레의 괴물 하나 — 저주·나르콜리를 고르려고.</summary>
 /// <param name="Cursed">저주 그림(82)이 보인다.</param>
@@ -345,7 +343,7 @@ public sealed class CompanionBrain
             .ThenBy(foe => Reckon.Steps(foe.At, owner))
             .ToList();
 
-        if (settings.Curse && Strongest(sight, CompanionSpells.Kind.Curse, reading.Mana) is { } curse)
+        if (Strongest(sight, CompanionSpells.Kind.Curse, reading.Mana, settings.Magic) is { } curse)
         {
             foreach (Foe foe in fighting.Where(foe => !foe.Cursed))
             {
@@ -356,7 +354,7 @@ public sealed class CompanionBrain
             }
         }
 
-        if (settings.Sleep && Strongest(sight, CompanionSpells.Kind.Sleep, reading.Mana) is { } sleep)
+        if (Strongest(sight, CompanionSpells.Kind.Sleep, reading.Mana, settings.Magic) is { } sleep)
         {
             // 주인이 치는 괴물은 재워도 다음 한 대에 깬다 — 옆에서 덤비는 괴물만.
             foreach (Foe foe in fighting.Where(foe => !foe.OwnerHits && !foe.Asleep && !_sleptSeen.ContainsKey(foe.Serial)))
@@ -400,11 +398,12 @@ public sealed class CompanionBrain
         return true;
     }
 
-    /// <summary>배운 것 중 이 종류에서 마력이 닿는 가장 센 것의 칸과 이름.</summary>
-    private static (int Slot, string Name)? Strongest(CompanionSight sight, CompanionSpells.Kind kind, int mana) =>
+    /// <summary>배운 것 중 주인이 체크해 둔, 이 종류에서 마력이 닿는 가장 센 것의 칸과 이름.</summary>
+    private static (int Slot, string Name)? Strongest(CompanionSight sight, CompanionSpells.Kind kind, int mana, CompanionSpells.Magic allowed) =>
         sight.Spells
             .Select(one => (Spell: one, Entry: CompanionSpells.Of(one.Name, empowered: false)))
-            .Where(pair => pair.Entry is { } entry && entry.Kind == kind && entry.Mana <= mana)
+            .Where(pair => pair.Entry is { } entry && entry.Kind == kind && entry.Mana <= mana
+                           && (allowed & CompanionSpells.SwitchOf(pair.Spell.Name)) != 0)
             .OrderByDescending(pair => pair.Entry!.Power)
             .Select(pair => ((int Slot, string Name)?)(pair.Spell.Slot, CompanionSpells.Bare(pair.Spell.Name)))
             .FirstOrDefault();

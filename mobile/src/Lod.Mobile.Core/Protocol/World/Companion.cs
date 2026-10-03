@@ -1,14 +1,14 @@
 using System.Buffers.Binary;
 using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.Automation;
 using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Protocol;
 
 namespace Lod.Mobile.Core.Protocol.World;
 
 /// <summary>동료 사이의 한쪽 — 봇에게는 주인, 사람에게는 동료 봇.</summary>
-/// <param name="Curse">봇에게 — 주인이 저주를 켜 두었나(0x5E 종류 1 이름 뒤 한 바이트의 1 비트, 없으면 켬).</param>
-/// <param name="Sleep">봇에게 — 주인이 나르콜리를 켜 두었나(같은 바이트의 2 비트).</param>
-public sealed record CompanionTie(uint Serial, string Name, bool Curse = true, bool Sleep = true);
+/// <param name="Magic">봇에게 — 주인이 체크해 둔 저주·나르콜리(0x5E 종류 1 이름 뒤 한 바이트, 없으면 모두).</param>
+public sealed record CompanionTie(uint Serial, string Name, CompanionSpells.Magic Magic = CompanionSpells.Magic.All);
 
 /// <summary>
 /// 걸린 것 하나(0x5E 종류 3): 서버 이름(sleep·frozen·horrama·enare …) · 남은 초 · 해로움 · 그림 번호(스펠 시트, 모르면 0 —
@@ -62,8 +62,8 @@ public static class Companion
     /// <summary>봇이 혼수인 주인을 깨운다(0xF1 5) — 봇 계정만, 주인 바로 옆에서. 서버가 가려 듣는다.</summary>
     public static byte[] WakeMaster() => [5];
 
-    /// <summary>봇 탭 「마법사」 — 저주(1)·나르콜리(2)를 켠 비트(0xF1 6). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.</summary>
-    public static byte[] Magic(bool curse, bool sleep) => [6, (byte)((curse ? 1 : 0) | (sleep ? 2 : 0))];
+    /// <summary>봇 탭 「마법사」 체크 비트(0xF1 6 — 1 렌토 · 2 나르콜리 · 4 바르도 · 8 데프레코). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.</summary>
+    public static byte[] Magic(CompanionSpells.Magic magic) => [6, (byte)magic];
 
     /// <summary>0x5E 종류 3 — 한 사람(주인 또는 봇 자신)에게 걸린 것: 이름 · 남은 초 · 해로움.</summary>
     public static (uint Serial, IReadOnlyList<CompanionStatus> Statuses) ReadStatuses(ReadOnlySpan<byte> body)
@@ -176,9 +176,9 @@ public static class Companion
         int used = 0;
         string name = body.Length > 5 ? LegacyKoreanEncoding.DecodeStringA(body[5..], out used) : string.Empty;
 
-        // 이름 뒤 한 바이트(2026-10-03) — 옛 서버는 보내지 않는다, 그때는 둘 다 켬.
-        int magic = body.Length > 5 + used ? body[5 + used] : 3;
+        // 이름 뒤 한 바이트(2026-10-03) — 옛 서버는 보내지 않는다, 그때는 모두 켬.
+        var magic = body.Length > 5 + used ? (CompanionSpells.Magic)body[5 + used] : CompanionSpells.Magic.All;
 
-        return (body[0], serial == 0 ? null : new CompanionTie(serial, name, (magic & 1) != 0, (magic & 2) != 0));
+        return (body[0], serial == 0 ? null : new CompanionTie(serial, name, magic));
     }
 }

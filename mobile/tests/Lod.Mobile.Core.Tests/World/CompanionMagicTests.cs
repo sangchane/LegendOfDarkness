@@ -113,10 +113,20 @@ public sealed class CompanionMagicTests
     [Fact]
     public void Switched_off_it_casts_neither()
     {
-        CompanionSettings off = Defaults with { Curse = false, Sleep = false };
+        CompanionSettings off = Defaults with { Magic = CompanionSpells.Magic.None };
 
         Assert.NotEqual(CompanionAct.Cast, new CompanionBrain().Next(Sight([Struck(), Biter(cursed: false)]), off).Act);
-        Assert.Equal(Add, new CompanionBrain().Next(Sight([Struck(), Biter(cursed: false)]), Defaults with { Curse = false }).Target);
+        Assert.Equal(Add, new CompanionBrain().Next(Sight([Struck(), Biter(cursed: false)]), Defaults with { Magic = CompanionSpells.Magic.Sleep }).Target);
+    }
+
+    [Fact]
+    public void Only_ticked_curses_are_cast_the_strongest_of_them()
+    {
+        // 바르도를 끄면 바르도를 배웠어도 렌토.
+        Assert.Equal(10, new CompanionBrain().Next(Sight([Struck()]), Defaults with { Magic = CompanionSpells.Magic.Lento }).Slot);
+
+        // 렌토만 끄면 바르도.
+        Assert.Equal(11, new CompanionBrain().Next(Sight([Struck()]), Defaults with { Magic = CompanionSpells.Magic.All & ~CompanionSpells.Magic.Lento }).Slot);
     }
 
     [Fact]
@@ -136,14 +146,14 @@ public sealed class CompanionMagicTests
     [Fact]
     public void Switches_go_out_as_kind_six_and_come_back_on_the_master_tie()
     {
-        Assert.Equal(new byte[] { 6, 1 }, Companion.Magic(curse: true, sleep: false));
-        Assert.Equal(new byte[] { 6, 2 }, Companion.Magic(curse: false, sleep: true));
+        Assert.Equal(new byte[] { 6, 5 }, Companion.Magic(CompanionSpells.Magic.Lento | CompanionSpells.Magic.Bardo));
+        Assert.Equal(new byte[] { 6, 2 }, Companion.Magic(CompanionSpells.Magic.Sleep));
 
         byte[] old = [1, 0, 0, 0, 42, 1, (byte)'a'];
-        Assert.Equal((true, true), (Companion.ReadTie(old).Tie!.Curse, Companion.ReadTie(old).Tie!.Sleep));
+        Assert.Equal(CompanionSpells.Magic.All, Companion.ReadTie(old).Tie!.Magic);
 
-        byte[] tailed = [1, 0, 0, 0, 42, 1, (byte)'a', 2];
+        byte[] tailed = [1, 0, 0, 0, 42, 1, (byte)'a', 8];
         CompanionTie tie = Companion.ReadTie(tailed).Tie!;
-        Assert.Equal(("a", false, true), (tie.Name, tie.Curse, tie.Sleep));
+        Assert.Equal(("a", CompanionSpells.Magic.Depreco), (tie.Name, tie.Magic));
     }
 }

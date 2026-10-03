@@ -7,6 +7,31 @@ namespace Lod.Mobile.Core.Automation;
 /// </summary>
 public static class CompanionSpells
 {
+    /// <summary>
+    /// 봇 탭 「마법사」 체크(0xF1 6 의 비트, 0x5E 1 꼬리) — 저주는 셋 따로(사용자 2026-10-03: 걸 저주를 고른다), 나르콜리 하나.
+    /// 봇은 체크된 저주 중 배운 가장 센 것 하나만 건다(저주는 한 칸).
+    /// </summary>
+    [Flags]
+    public enum Magic : byte
+    {
+        None = 0,
+        Lento = 1,
+        Sleep = 2,
+        Bardo = 4,
+        Depreco = 8,
+        All = Lento | Sleep | Bardo | Depreco,
+    }
+
+    /// <summary>이 마법(꼬리 뗀 이름)을 켜고 끄는 체크 — 저주·나르콜리가 아니면 None.</summary>
+    public static Magic SwitchOf(string name) => Bare(name) switch
+    {
+        "렌토" => Magic.Lento,
+        "바르도" => Magic.Bardo,
+        "데프레코" => Magic.Depreco,
+        "나르콜리" => Magic.Sleep,
+        _ => Magic.None,
+    };
+
     public enum Kind
     {
         Heal,
