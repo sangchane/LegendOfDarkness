@@ -189,7 +189,9 @@ public partial class LoginScreen : Control
 
         row.AddChild(Aux("테스트 환경 · 로컬"));
         row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        row.AddChild(Aux($"서버 {Main.ServerAddress}:{Main.ServerPort}"));
+        // 앱 번호(빌드 시각) — 내려받기 페이지의 번호와 같으면 최신이다(사용자 2026-10-03: 폰이 어느 판인지 보이게).
+        string app = Godot.FileAccess.FileExists("res://app-version.txt") ? Godot.FileAccess.GetFileAsString("res://app-version.txt").Trim() : "맥";
+        row.AddChild(Aux($"앱 {app} · 서버 {Main.ServerAddress}:{Main.ServerPort}"));
 
         return row;
     }
@@ -287,10 +289,10 @@ public partial class LoginScreen : Control
         panel.AddThemeStyleboxOverride("panel", Greybox.Stone());
 
         MarginContainer padding = new();
-        padding.AddThemeConstantOverride("margin_left", Main.Gutter * 2);
-        padding.AddThemeConstantOverride("margin_top", Main.Gutter * 2);
-        padding.AddThemeConstantOverride("margin_right", Main.Gutter * 2);
-        padding.AddThemeConstantOverride("margin_bottom", Main.Gutter * 2);
+        padding.AddThemeConstantOverride("margin_left", Main.Gutter);
+        padding.AddThemeConstantOverride("margin_top", Main.Gutter);
+        padding.AddThemeConstantOverride("margin_right", Main.Gutter);
+        padding.AddThemeConstantOverride("margin_bottom", Main.Gutter);
 
         TextureRect crest = Greybox.EntryTitle(new Vector2(0, LogoHeight));
 
@@ -428,6 +430,7 @@ public partial class LoginScreen : Control
         VBoxContainer identity = FormColumn();
         identity.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         identity.SizeFlagsStretchRatio = 2;
+        identity.Alignment = BoxContainer.AlignmentMode.Center; // 로고는 오른쪽 칸 높이의 가운데(사용자 2026-10-03: 위에 붙지 않게)
         identity.AddChild(crest);
         identity.AddChild(title);
 
@@ -458,8 +461,15 @@ public partial class LoginScreen : Control
         form.AddChild(FieldRow("비밀번호", _password));
         form.AddChild(_autoLogin);
         form.AddChild(_status);
-        form.AddChild(_submit);
-        form.AddChild(_create);
+
+        // 로그인 · 계정 만들기는 한 줄에(사용자 2026-10-03) — 가로 화면에서 한 줄이 빠져 창이 화면 안에 다 든다.
+        HBoxContainer actions = new();
+        actions.AddThemeConstantOverride("separation", Main.Gutter);
+        _submit.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _create.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        actions.AddChild(_submit);
+        actions.AddChild(_create);
+        form.AddChild(actions);
     }
 
     private static Control FieldRow(string caption, LineEdit field)
