@@ -118,7 +118,7 @@ public partial class Main : Control
     public static readonly (string Name, int Level, CompanionSpells.Magic Bit)[] CurseChoices =
     [
         ("렌토", 11, CompanionSpells.Magic.Lento), ("바르도", 41, CompanionSpells.Magic.Bardo), ("데프레코", 71, CompanionSpells.Magic.Depreco),
-        ("프라보", 99, CompanionSpells.Magic.Prabo), ("끄기", 0, CompanionSpells.Magic.None),
+        ("프라보", 91, CompanionSpells.Magic.Prabo), ("끄기", 0, CompanionSpells.Magic.None),
     ];
 
     /// <summary>회복 셀렉트의 줄 — <see cref="CompanionSpells.Heals"/> 차례(그것까지), 끝 줄 끄기.</summary>

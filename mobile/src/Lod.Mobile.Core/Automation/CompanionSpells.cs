@@ -25,13 +25,13 @@ public static class CompanionSpells
 
     /// <summary>
     /// 고른 적이 없을 때의 체크 — 봇(주인 레벨 − 2, 서버 <c>Companions.LevelFor</c>)이 쓸 수 있는 가장 센 저주 하나와 나르콜리
-    /// (사용자 2026-10-03: "가장 센 거만 체크"). 레벨은 서버 <c>Companions.PriestSpells</c> 와 같다 — 렌토 11 · 바르도 41 · 데프레코 71 · 프라보 99.
+    /// (사용자 2026-10-03: "가장 센 거만 체크"). 레벨은 서버 <c>Companions.PriestSpells</c> 와 같다 — 렌토 11 · 바르도 41 · 데프레코 71 · 프라보 91.
     /// </summary>
     public static Magic DefaultMagic(int ownerLevel)
     {
         int bot = Math.Max(1, ownerLevel - 2);
 
-        return Magic.Sleep | (bot >= 99 ? Magic.Prabo : bot >= 71 ? Magic.Depreco : bot >= 41 ? Magic.Bardo : bot >= 11 ? Magic.Lento : Magic.None);
+        return Magic.Sleep | (bot >= 91 ? Magic.Prabo : bot >= 71 ? Magic.Depreco : bot >= 41 ? Magic.Bardo : bot >= 11 ? Magic.Lento : Magic.None);
     }
 
     /// <summary>봇 탭 「성직자」 켬 — 해제 둘·버프 둘(0xF1 6 셋째 바이트). 처음엔 모두.</summary>

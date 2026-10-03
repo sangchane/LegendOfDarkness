@@ -7,7 +7,14 @@
       if (!r.ok) { throw new Error(); }
       var when = new Date(r.headers.get("Last-Modified"));
       var mb = Math.round(Number(r.headers.get("Content-Length")) / 1048576);
-      meta.textContent = "최신판 · " + when.toLocaleString("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }) + " · " + mb + "MB";
+      var line = "올린 시각 " + when.toLocaleString("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }) + " · " + mb + "MB";
+      meta.textContent = line;
+      // 앱 번호(빌드 시각, AppUpdate 가 견주는 값) — 앱 로그인 화면의 번호와 같으면 최신이다.
+      var version = meta.getAttribute("data-version");
+      if (!version) { return; }
+      return fetch(version, { cache: "no-store" }).then(function (v) { return v.ok ? v.text() : ""; }).then(function (text) {
+        if (text.trim()) { meta.textContent = "앱 번호 " + text.trim() + " · " + line; }
+      });
     }).catch(function () { meta.textContent = "아직 올린 파일이 없습니다."; });
   });
 
