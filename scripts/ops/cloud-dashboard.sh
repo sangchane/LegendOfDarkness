@@ -195,6 +195,11 @@ release() {
     # 페이지(docs/download/)도 늘 같이 올린다 — 앱만 바뀌고 안내가 옛것으로 남지 않게(사용자 2026-10-02).
     remote "mkdir -p $REMOTE/www/download"
     rsync -az --timeout=60 -e "ssh -i $KEY" "$ROOT/docs/download/" "$HOST:$REMOTE/www/download/"
+    # 앱 번호 — 옛 앱이 켜질 때 이것을 보고 새로 받으라고 알린다(AppUpdate). 앱 파일을 다 올린 뒤에 바꾼다.
+    if [ -s "$(dirname "$file")/version.txt" ]; then
+        rsync -az --timeout=60 -e "ssh -i $KEY" "$(dirname "$file")/version.txt" "$HOST:$REMOTE/www/download/version-${1:-ios}.txt"
+        remote "chmod 644 $REMOTE/www/download/version-${1:-ios}.txt"
+    fi
     echo "내려받기 페이지 갱신 — https://$DOMAIN/download/ ($name $(du -h "$file" | cut -f1))"
 }
 

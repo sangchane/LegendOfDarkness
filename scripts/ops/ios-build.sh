@@ -227,7 +227,10 @@ build() {
     mkdir -p "$CLIENT/build/ios"
     # 새 그림(생성기가 막 뽑은 efct###.png 등)을 먼저 들인다 — .import 없이 내보내면 앱에서 빠진다(2026-09-30).
     "$GODOT" --headless --path "$CLIENT" --import >/dev/null 2>&1 || true
+    # 앱이 켜질 때 내려받기 페이지의 번호와 견준다(AppUpdate) — 만든 시각을 앱 안과 .ipa 옆에 같이 적는다(release 가 올린다).
+    date +%Y%m%d%H%M > "$CLIENT/app-version.txt"
     "$GODOT" --headless --path "$CLIENT" --export-debug "iOS" "$IPA"
+    cp "$CLIENT/app-version.txt" "$CLIENT/build/ios/version.txt"
 
     # EXPORT SUCCEEDED 를 믿지 않는다 — C# 이 빠진 채로도 성공으로 끝난다(docs/mobile-client.md).
     # 목록을 먼저 받아 두고 본다. `unzip | grep -q` 로 이으면 grep 이 먼저 닫아 unzip 이 실패로 끝나고,

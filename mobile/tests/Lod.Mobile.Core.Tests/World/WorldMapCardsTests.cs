@@ -127,6 +127,33 @@ public sealed class WorldMapTabsTests
         Assert.Equal(towns, WorldMapCards.OpensOnTowns(place, cards));
     }
 
+    /// <summary>
+    /// The shipped <c>guide.txt</c> knows every card on the server's world map (<c>temuair.json</c>) — a card it does not
+    /// know shows its name only, no level. 뤼케시온해안 71 · 구광산 99, and 마인마을's west edge leads to 구광산대기실.
+    /// </summary>
+    [Fact]
+    public void The_shipped_guide_knows_every_card_on_the_servers_world_map()
+    {
+        string root = Path.GetFullPath(Path.Combine(HairMotionTests.Parts(), "..", ".."));   // mobile/client/assets
+        string repo = Path.GetFullPath(Path.Combine(root, "..", "..", ".."));
+        MapGuide guide = MapGuide.Read(File.ReadAllText(Path.Combine(root, "world", "guide.txt")));
+        using System.Text.Json.JsonDocument world = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(
+            repo, "sources", "wren11", "Dark-Ages-Private-Server", "database", "server", "templates", "worldmaps", "temuair.json")));
+        WorldMapInfo field = new("field001", 1,
+        [
+            .. world.RootElement.GetProperty("Portals").EnumerateArray().Select(portal => new WorldMapNode(
+                portal.GetProperty("DisplayName").GetString()!,
+                portal.GetProperty("Destination").GetProperty("AreaID").GetInt32(), 0, 0, 0, 0)),
+        ]);
+
+        IReadOnlyList<WorldMapCard> cards = WorldMapCards.From(field, guide);
+
+        Assert.All(cards, card => Assert.NotEqual(string.Empty, card.Kind));
+        Assert.Equal(71, cards.Single(card => card.Name == "뤼케시온해안").Level);
+        Assert.Equal(99, cards.Single(card => card.Name == "구광산").Level);
+        Assert.Contains(guide.ExitsOn(20304), exit => exit.To == "구광산대기실");
+    }
+
     [Fact]
     public void An_empty_tab_is_not_opened_first()
     {

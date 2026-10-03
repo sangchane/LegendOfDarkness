@@ -100,6 +100,62 @@ public partial class LoginScreen : Control
 
         RefreshSubmitState();
         Main.LayoutChanged += RebuildForOrientation;
+        CheckForUpdate();
+    }
+
+    /// <summary>
+    /// 앱 안 번호(빌드 스크립트가 넣는 <c>app-version.txt</c>)보다 내려받기 페이지의 번호가 크면 새로 받으라고 알린다
+    /// (<see cref="AppUpdate" />). 맥에서 띄운 판은 번호 파일이 없어 묻지 않는다.
+    /// </summary>
+    private void CheckForUpdate()
+    {
+        const string VersionFile = "res://app-version.txt";
+
+        if (!Godot.FileAccess.FileExists(VersionFile))
+        {
+            return;
+        }
+
+        string mine = Godot.FileAccess.GetFileAsString(VersionFile);
+        string platform = OS.GetName() == "Windows" ? "windows" : "ios";
+        HttpRequest ask = new();
+        AddChild(ask);
+        ask.RequestCompleted += (result, code, _, body) =>
+        {
+            ask.QueueFree();
+
+            if (result == (long)HttpRequest.Result.Success && code == 200
+                && AppUpdate.Outdated(mine, System.Text.Encoding.UTF8.GetString(body)))
+            {
+                ShowUpdateNotice();
+            }
+        };
+        ask.Request($"{AppUpdate.DownloadPage}version-{platform}.txt", ["Cache-Control: no-cache"]);
+    }
+
+    private void ShowUpdateNotice()
+    {
+        CenterContainer cover = new() { AnchorRight = 1, AnchorBottom = 1, ZIndex = 100 };
+        VBoxContainer list = new();
+        list.AddThemeConstantOverride("separation", Main.Gutter);
+        list.AddChild(new Label { Text = "새 버전이 나왔습니다.\n내려받기 페이지에서 새로 받아 주세요.", HorizontalAlignment = HorizontalAlignment.Center });
+
+        Button open = new() { Text = "새로 받기", CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        Greybox.Commit(open);
+        open.Pressed += () => OS.ShellOpen(AppUpdate.DownloadPage);
+        Button later = new() { Text = "나중에", CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        later.Pressed += cover.QueueFree;
+        list.AddChild(open);
+        list.AddChild(later);
+
+        PanelContainer inner = new();
+        inner.AddThemeStyleboxOverride("panel", Greybox.Plate());
+        inner.AddChild(list);
+        PanelContainer plate = new() { CustomMinimumSize = new Vector2(300, 0) };
+        plate.AddThemeStyleboxOverride("panel", Greybox.Stone());
+        plate.AddChild(inner);
+        cover.AddChild(plate);
+        AddChild(cover);
     }
 
     private void RebuildForOrientation()

@@ -23,7 +23,10 @@ build() (
     fresh="$stage/LegendOfDarkness"
     mkdir "$fresh"
     "$GODOT" --headless --path "$CLIENT" --import
+    # 앱이 켜질 때 내려받기 페이지의 번호와 견준다(AppUpdate) — release 가 build/windows/version.txt 를 올린다.
+    date +%Y%m%d%H%M > "$CLIENT/app-version.txt"
     "$GODOT" --headless --path "$CLIENT" --export-release "Windows" "$fresh/LodClient.exe"
+    cp "$CLIENT/app-version.txt" "$fresh/../version.txt"
 
     # 새로 내보낸 파일만 검사한다 — 이전 성공본으로 이번 실패를 가리지 않는다.
     if [ ! -s "$fresh/LodClient.exe" ] || [ ! -s "$fresh/data_LodClient_windows_x86_64/LodClient.dll" ]; then
@@ -43,6 +46,7 @@ build() (
     rm -rf "$OUT/data_LodClient_windows_x86_64"
     mv "$fresh/data_LodClient_windows_x86_64" "$OUT/"
     mv -f "$stage/LodClient-windows.zip" "$ZIP"
+    mv -f "$stage/version.txt" "$OUT/version.txt"
     echo "만들었습니다 — $ZIP ($(du -h "$ZIP" | cut -f1))"
 )
 
