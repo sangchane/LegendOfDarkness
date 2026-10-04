@@ -66,7 +66,7 @@ MAPS = [
     20719,  # 호러캐슬메인홀 — 입구5 호러캐슬입장이 보낸다(2026-10-04, scripts/gen/world/build-horror-castle.py)
     20714,  # 호러캐슬1 — 파티 방 사본(map_create)이 이 맵 번호를 알린다
     *range(20797, 20833),  # 구광산 대기실 + 1-1~29-1 (2026-10-02 사용자, scripts/gen/world/build-old-mine.py)
-    *range(20833, 20856),  # 서의우드랜드 입구·11구역 · 북의우드랜드 입구·10구역 (2026-10-04 사용자, scripts/gen/world/build-woodland-west-north.py)
+    *range(20833, 20881),  # 서·북의우드랜드 입구·1-1~20-1 (2026-10-04 사용자, scripts/gen/world/build-woodland-west-north.py)
     *range(20455, 20467),  # 뤼케시온해안 대기실·1-A~4-C (2026-10-02 사용자, scripts/gen/world/build-rucesion-coast.py)
 ]
 

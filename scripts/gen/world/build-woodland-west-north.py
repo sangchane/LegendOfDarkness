@@ -3,13 +3,15 @@
 SPEC `plans/woodland-west-north-spec-2026-10-04.md`. 지금 서버의 「우드랜드」(5.99 판)는 동의로 보고 건드리지 않는다.
 
   - 맵: 원작 = 노바 바이트까지 같다(`data/map-origins/woodland-origins.json`). 맥에서는 5.99 서버팩 `db/maps/default/maps/`
-    가 같은 md5 라 거기서 복사한다(md5 대조). 입구에서 노바 워프(`warp/woodland.txt`)로 닿는 맵만 — 10-1 위(서 14-1 빼고)는 워프가 없어 뺀다.
+    가 같은 md5 라 거기서 복사한다(md5 대조). 서·북 정의 전부(1-1~20-1, 갈래 9-2·17-2·19-2).
     노바의 `…대기실` 과 `…입구` 는 같은 맵 파일이라 `서의·북의우드랜드입구` 한 장으로 합친다. 번호는 지금 가장 큰 번호 다음부터.
   - 워프: 노바 줄 그대로, 레벨은 노바 7·8번째 칸(최소·최대) — 우드랜드는 모두 0~99 라 제한 없음(1).
+    노바에 길이 없는 구역은 NEW_LINKS 로 잇는다(사용자 2026-10-04) — 칸은 원작 맵 가장자리의 열린 칸(`edge_door`).
     입구 (11,24)(12,24) → 월드맵(노바 `warp/worldmap.txt`, build-rucesion-coast.py 의 door 처럼).
   - 월드맵 카드: 원작 field001 서 (155,171)·북 (255,96), 도착은 노바 월드맵의 대기실 칸 (10,16), 구역 바로가기.
   - 괴물: 노바 `mob/spawn.txt` 배치, 체력·공격·방어 노바 그대로(「노바 안에서 맞춤」), 경험치 ÷ 7.3(tools/pack-import
     EXPERIENCE_DIVISOR, 호러캐슬과 같은 규칙), 그림 0x4000 + 노바 이미지. 노바 자료 오류 셋만 고친다(FIX).
+    노바 배치가 없는 구역은 같은 줄의 앞·뒤 구역으로 채운다(`fill`).
     드랍은 노바 목록 중 하데스 아이템에 있는 것 — 장비 칸은 그 뒤 build-gear-drops → build-drop-variety → build-drop-cap 이 단마다 한 벌로 바꾼다.
 
   쓰는 법: python3 scripts/gen/world/build-woodland-west-north.py            # 무엇이 바뀌는지만
@@ -18,6 +20,7 @@ SPEC `plans/woodland-west-north-spec-2026-10-04.md`. 지금 서버의 「우드�
 import hashlib
 import json
 import shutil
+import struct
 import sys
 from collections import deque
 from pathlib import Path
@@ -40,6 +43,15 @@ SIDES = {
     "북의우드랜드": ("north.txt", "북의우드랜드 ", ("북의우드랜드대기실", "북의우드랜드입구"), (255, 96)),
 }
 # 노바 자료 오류만 고친다(SPEC 4): 맨티스 체력 ×1000 오타 · 녹색말벌 최소>최대 · 우드랜드보스1 방어 칸 이름이 「ㅍ」.
+# 노바에 길이 없는 구역(사용자 2026-10-04 「6-1부터 13까지, 14부터 20까지 연결」) — 두 줄, 양방향:
+#   줄1  … 6-1 → 9-1(노바 길) → 10-1 → 11-1 → 12-1 → 13-1. 9-2 보스방은 노바처럼 8-1 곁가지 그대로.
+#   줄2  입구 → 14-1 → 15-1 → … → 20-1. 17-2·19-2 는 17-1·19-1 곁가지(노바 8-1 → 9-2 처럼 「-2」 는 곁방).
+#        입구 → 14-1 은 서는 노바 길(21~22,0) 그대로, 북은 노바에 없어 서와 같은 자리로 하나 낸다(13 → 14 는 잇지 않는다).
+NEW_LINKS = [("9-1", "10-1"), ("10-1", "11-1"), ("11-1", "12-1"), ("12-1", "13-1"),
+             ("입구", "14-1"), ("14-1", "15-1"), ("15-1", "16-1"), ("16-1", "17-1"), ("17-1", "18-1"),
+             ("17-1", "17-2"), ("18-1", "19-1"), ("19-1", "20-1"), ("19-1", "19-2")]   # 본줄이 가운데 칸을 먼저 잡게
+GATE_HINT = 21                         # 입구 위 가장자리에서 14-1 로 나가는 칸 — 서 노바 길(21~22,0) 자리
+SOTP = SERVER / "static" / "sotp.dat"
 FIX = {"맨티스": {"체력": "6040"}, "녹색말벌": {"최소공격력": "55", "최대공격력": "60"}, "우드랜드보스1": {"방어력": "1"}}
 
 
@@ -72,6 +84,49 @@ def our(side, nova_name):
     return side + nova_name[len(prefix):] if nova_name.startswith(prefix) else None
 
 
+def walls(number, cols):
+    """원작 맵의 벽 칸 — 서버와 같은 셈(WorldMapTests.Walled: 왼·오른 그림 중 sotp 가 0x0F 인 것)."""
+    data, sotp = (MAP_FILES / f"lod{number}.map").read_bytes(), SOTP.read_bytes()
+    return lambda x, y: any(t and sotp[t - 1] == 0x0F for t in struct.unpack_from("<hh", data, (y * cols + x) * 6 + 2))
+
+
+def edge_door(number, cols, rows, used, edges, hint=None):
+    """가장자리에서 문 칸 둘 — 밟는 칸과 그 안쪽 칸이 모두 열려 있고, 이미 쓴 칸(다른 문)과 세 칸 넘게 떨어진 곳.
+    가장자리는 edges 차례로 보고, 한 가장자리 안에서는 hint(없으면 가운데)에 가장 가까운 자리. → [(밟는 칸, 안쪽 칸)] 둘."""
+    wall = walls(number, cols)
+    lines = {"top": [((x, 0), (x, 1)) for x in range(cols)], "bottom": [((x, rows - 1), (x, rows - 2)) for x in range(cols)],
+             "left": [((0, y), (1, y)) for y in range(rows)], "right": [((cols - 1, y), (cols - 2, y)) for y in range(rows)]}
+    for edge in edges:
+        cells = lines[edge]
+        ok = [not wall(*t) and not wall(*i) and all(max(abs(t[0] - u[0]), abs(t[1] - u[1])) > 3 for u in used) for t, i in cells]
+        spots = [k for k in range(len(cells) - 1) if ok[k] and ok[k + 1]]
+        if spots:
+            k = min(spots, key=lambda k: abs(k - (len(cells) // 2 if hint is None else hint)))
+            return [cells[k], cells[k + 1]]
+    raise SystemExit(f"lod{number}: 열린 가장자리가 없다")
+
+
+def fill(side, counts, zones):
+    """노바 배치가 없는 구역 — 같은 줄(1~13 · 14~20)에서 노바 배치가 있는 가장 가까운 앞·뒤 구역(갈래 「-2」 방은 빼고)의
+    종마다 평균(없는 종 0, 반올림), 뒤가 없으면 앞 그대로(사용자 2026-10-04 「이웃 구역 흐름에 맞춰」). 예: 북 4-1 = 3-1(말벌·맨티스
+    10) 과 5-1(맨티스·늑대 30) → 말벌 5 · 맨티스 20 · 늑대 15. → {(괴물, 구역): 마릿수} 더할 것과 근거 글."""
+    number = lambda z: int(z[len(side):].split("-")[0])
+    line = lambda z: number(z) >= 14
+    full = {z for _, z in counts}
+    anchors = [z for z in full if not z.endswith("-2")]
+    added, why = {}, []
+    for z in zones:
+        if z in full or z.endswith("입구"):
+            continue
+        before = max((a for a in anchors if line(a) == line(z) and number(a) < number(z)), key=number, default=None)
+        after = min((a for a in anchors if line(a) == line(z) and number(a) > number(z)), key=number, default=None)
+        used = [a for a in (before, after) if a]
+        for kind in sorted({k for k, a in counts if a in used}):
+            added[(kind, z)] = int(sum(counts.get((kind, a), 0) for a in used) / len(used) + 0.5)
+        why.append(f"{z} ← {' · '.join(used)}")
+    return added, why
+
+
 def monster(kind, f, count, area, have):
     f = {**f, **FIX.get(kind, {})}
     speed = int(f.get("속도") or 1500)
@@ -102,7 +157,7 @@ def main():
     spawns, stats = rows("mob_spawns.json"), {m["이름"]: m["fields"] for m in rows("mobs.json")}
     have = {p.stem for p in ITEMS.glob("*.json")}
 
-    plan, cards, warps, mobs, dropped, skipped = [], [], [], [], [], []
+    plan, cards, warps, mobs, dropped, skipped, new_links, filled = [], [], [], [], [], [], [], []
     for side, (_, _, _, point) in SIDES.items():
         maps = side_maps(side)
         lobby = f"{side}입구"
@@ -113,6 +168,21 @@ def main():
                 low, high = int(w["raw"][7]), int(w["raw"][8])
                 assert high >= 99, w                                  # 최대 레벨 제한이 있으면 LevelMaximum 도 옮겨야 한다
                 links.append((a, tuple(map(int, w["출발"])), b, tuple(map(int, w["도착"])), max(1, low)))
+        used = {}                                                     # 맵마다 이미 문인 칸
+        for a, at, b, to, _ in links:
+            used.setdefault(a, set()).add(at)
+        for near, far in NEW_LINKS:                                   # 노바에 길이 없는 구역 — 얕은 쪽 위 가장자리 ↔ 깊은 쪽 아래 가장자리
+            a, b = side + near, side + far
+            if any(x == a and y == b for x, _, y, _, _ in links):
+                continue                                              # 서 입구 → 14-1 은 노바 길
+            (na, ca, ra), (nb, cb, rb) = maps[a], maps[b]
+            out = edge_door(na, ca, ra, used.get(a, set()), ["top", "right", "left", "bottom"], GATE_HINT if near == "입구" else None)
+            back = edge_door(nb, cb, rb, used.get(b, set()), ["bottom", "left", "right", "top"])
+            for (at, inside_a), (to, inside_b) in zip(out, back):
+                links += [(a, at, b, inside_b, 1), (b, to, a, inside_a, 1)]
+                used.setdefault(a, set()).add(at)
+                used.setdefault(b, set()).add(to)
+            new_links.append(f"{a} {out[0][0]}~{out[1][0]} ↔ {b} {back[0][0]}~{back[1][0]}")
         reached, todo = {lobby}, deque([lobby])                       # 입구에서 워프로 닿는 맵만
         while todo:
             here = todo.popleft()
@@ -162,6 +232,9 @@ def main():
                 dropped.append(f"{s['괴물']}@{name}")
                 continue
             counts[(s["괴물"], name)] = counts.get((s["괴물"], name), 0) + int(s["마리수"])
+        added, why = fill(side, counts, order)
+        counts.update(added)
+        filled += why
         mobs += [(side, f"{kind}@{name}", monster(kind, stats[kind], n, ids[name], have)) for (kind, name), n in counts.items()]
 
     if write:
@@ -181,7 +254,9 @@ def main():
               f" · 경험치 {m['Exp']:,} · 그림 {m['Image'] - 0x4000} · 드랍 {', '.join(m['Drops']['$values']) or '-'}")
     for side, lobby_id, point, zones, side_warps in cards:
         print(f"카드 {side} {point} → {lobby_id}{LOBBY_ARRIVAL} · 구역 {len(zones)} · 워프 {len(side_warps)}")
-    print(f"뺀 맵(입구에서 워프로 안 닿음): {' · '.join(skipped)}")
+    print("새 길: " + "\n       ".join(new_links))
+    print(f"노바 배치가 없어 채운 구역: {' · '.join(filled)}")
+    print(f"뺀 맵(입구에서 워프로 안 닿음): {' · '.join(skipped) or '없음'}")
     print(f"정의 없는 괴물(뺌): {' · '.join(sorted(set(dropped)))}")
     print(f"맵 새 {len(plan)} · 워프 {len(warps)} · 괴물 자리 {len(mobs)}" + ("" if write else "  — 미리보기, --쓰기 로 쓴다"))
 

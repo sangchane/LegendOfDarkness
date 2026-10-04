@@ -45,7 +45,7 @@ import sys
 import sys as _sys, pathlib as _pathlib  # scripts/ 를 찾게 — lib/·graphify_runtime 이 거기 있다
 _sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[2]))
 from lib._paths import ROOT
-from lib._drops import drops_of
+from lib._drops import drops_of, woodland_west_north_layers
 from lib._io import read_lenient_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
@@ -128,23 +128,18 @@ TIERS = [
         ["로오의은제방패", "이아의은제방패", "메투스의은제방패", "세토아의은제방패", "세오의은제방패",
          "셔스의은제방패", "칸의은제방패"],
     ),
-    # 서·북의우드랜드(2026-10-04, scripts/gen/world/build-woodland-west-north.py) — 노바 워프엔 레벨문이 없다(0~99).
-    # 동의(지금 우드랜드)의 같은 번호 구역 단을 따른다: 2-1~4-1 = 11, 5-1 이상(7~9·14 포함) = 51. 서·북은 괴물
-    # 이름이 같아 한 무리로 묶는다(동의 무리에 섞으면 동의 괴물의 돌림 차례가 바뀐다).
-    (
-        [20835, 20836, 20837, 20847, 20848, 20849],
-        "서·북의우드랜드2-1~4-1",
-        "노바 0~99 · 동의 2~4 단 11",
-        ["로오의반지", "이아의호안석반지", "메투스의호안석반지", "세토아의호안석반지", "세오의호안석반지",
-         "셔스의호안석반지", "칸의목걸이"],
-    ),
-    (
-        [20838, 20839, 20840, 20841, 20842, 20843, 20844, 20850, 20851, 20852, 20853, 20854, 20855],
-        "서·북의우드랜드5-1~",
-        "노바 0~99 · 동의 5~6 단 51",
-        ["로오의동각반", "이아의동각반", "메투스의동각반", "세토아의동각반", "세오의동각반",
-         "셔스의동각반", "칸의동각반"],
-    ),
+]
+
+# 서·북의우드랜드(2026-10-04, scripts/gen/world/build-woodland-west-north.py) — 노바 워프엔 레벨문이 없어(0~99) 구역 깊이로 층을
+# 정했다(`lib/_drops.py` woodland_west_north_layers). 층마다 한 벌은 그 층 이하에서 가장 가까운 위 한 벌(드랍 다양화 BASE_RATE 에 있는 것):
+# 11·26 → 11레벨 반지 · 41·56 → 41레벨 동각반 · 71·86 → 71레벨 은각반. 56레벨 은제방패는 쓰지 않는다 — 아벨해안의 한 칸 괴물(×9)이
+# 그 DropRate 를 정해 여기 다섯 칸 목록에서 8% 가 된다(다른 벌은 모두 ×5 라 6%). 서·북 같은 층은 한 무리로(괴물 이름이
+# 많아야 한 벌이 고르게 돈다), 동의 무리와는 따로(섞으면 동의 괴물의 돌림 차례가 바뀐다).
+_SUIT_AT = {11: TIERS[0][3], 41: TIERS[2][3], 71: TIERS[3][3]}
+TIERS += [
+    (areas, f"서·북의우드랜드 {layer}층", f"노바 0~99 · 원작 표 {layer}층",
+     _SUIT_AT[max(level for level in _SUIT_AT if level <= layer)])
+    for layer, areas in woodland_west_north_layers(SERVER / "areas").items()
 ]
 
 # `FIELD_BOSSES` 가 이미 관리하는 이름 — 아벨해안 맵을 함께 쓰는 일반 몹 한 벌이 이 이름은 절대

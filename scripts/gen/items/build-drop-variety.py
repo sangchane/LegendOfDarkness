@@ -62,7 +62,7 @@ from collections import defaultdict
 import sys as _sys, pathlib as _pathlib  # scripts/ 를 찾게 — lib/·graphify_runtime 이 거기 있다
 _sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[2]))
 from lib._paths import ROOT
-from lib._drops import drops_of
+from lib._drops import drops_of, woodland_west_north_layers
 from lib._io import read_lenient_json as read
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server"
 ITEMS = SERVER / "templates/items"
@@ -130,15 +130,14 @@ GROUPS = [
     dict(name="아벨해안(일반 괴물)", areas=ABEL, entry=51,
          gear=[], potions={"상급체력포션": 0.3, "상급마력포션": 0.6},
          gear_min_slots=1),
-    # 서·북의우드랜드(2026-10-04) — 노바엔 레벨문이 없어 동의 같은 번호 구역의 단(build-gear-drops.py TIERS 와 같다).
-    # 노바 괴물은 잡템·포션이 없어(옛 목록 = 한 벌 장비 한 칸) 칸수가 적다 — `thin`: 이 무리 때문에 RATIO 가 오르면
-    # 모든 사냥터 목록이 바뀌므로, RATIO 는 다른 무리가 정하고 여기엔 칸수 × (RATIO-1) 만큼만 싣는다(2-1~4-1 은 90종 중 56종).
-    dict(name="서·북의우드랜드2-1~4-1", areas=[20835, 20836, 20837, 20847, 20848, 20849], entry=11,
-         gear=[], potions={}, gear_min_slots=1, thin=True),
-    dict(name="서·북의우드랜드5-1~", areas=[20838, 20839, 20840, 20841, 20842, 20843, 20844,
-                                         20850, 20851, 20852, 20853, 20854, 20855], entry=51,
-         gear=[], potions={}, gear_min_slots=1, thin=True),
 ]
+
+# 서·북의우드랜드(2026-10-04) — 노바엔 레벨문이 없어 구역 깊이로 층을 밟는다(`lib/_drops.py` woodland_west_north_layers,
+# build-gear-drops.py TIERS 와 같은 무리). 노바 괴물은 잡템·포션이 없어(옛 목록 = 한 벌 장비 한 칸) 칸수가 적다 — `thin`:
+# 이 무리 때문에 RATIO 가 오르거나 장신구 등급 층이 늘면 모든 사냥터 목록이 바뀌므로, 둘 다 다른 무리가 정하고 여기엔
+# 칸수 × (RATIO-1) 만큼만(돌림 차례대로) 싣는다. 장신구는 그 층 이하에서 가장 가까운 기존 사냥터 층의 것.
+GROUPS += [dict(name=f"서·북의우드랜드 {layer}층", areas=areas, entry=layer, gear=[], potions={}, gear_min_slots=1, thin=True)
+           for layer, areas in woodland_west_north_layers(SERVER / "areas").items()]
 
 # 이 생성기가 처음 돌기 전(2026-09-26, 1.5배 전)의 DropRate — 기존 물건은 늘 여기서 다시 계산한다.
 # 장비 0.06 은 `build-gear-drops.py` GEAR_RATE, 포션은 `build-hunting-ground-rules.py`
@@ -243,7 +242,7 @@ def power(row):
 def accessory_tiers(items, rows):
     """장신구마다 나올 사냥터 입장 레벨 — 갈래마다 점수 차례로 사냥터 층(11·21·51·81) 수만큼 고르게 나눈다.
     원작 표 레벨이 더 높으면 그 레벨을 받는 층 아래로는 안 내린다. 표에 없는 것은 넣지 않는다(레벨 규칙을 따른다)."""
-    entries = sorted({g["entry"] for g in GROUPS})
+    entries = sorted({g["entry"] for g in GROUPS if not g.get("thin")})
     kinds = defaultdict(list)
     for name, (path, item) in items.items():
         slot = item.get("EquipmentSlot") or 0
@@ -304,9 +303,10 @@ def fill_gear(items, monsters):
             if level >= group["entry"] - TIER_REACH:
                 for name in sorted(names):
                     picked.setdefault((slot, name.split("의")[0]), name)
+        own = max(e for e in tiers.values() if e <= group["entry"]) if group.get("thin") else group["entry"]
         for name, entry in sorted(tiers.items()):
             item = items[name][1]
-            if entry == group["entry"] and name not in BASE_RATE and (item.get("LevelRequired") or 0) <= entry:
+            if entry == own and name not in BASE_RATE and (item.get("LevelRequired") or 0) <= entry:
                 picked.setdefault((item["EquipmentSlot"], name.split("의")[0]), name)
         # 표대로 고친 84종(접두·접미 없는 것 포함)은 그 레벨이 이 사냥터 층 안이면 하나하나 넣는다.
         for name in sorted(TABLE_LEVELLED - set(tiers)):
@@ -315,6 +315,8 @@ def fill_gear(items, monsters):
                 if group["entry"] - TIER_REACH <= level <= group["entry"]:
                     picked.setdefault((items[name][1]["EquipmentSlot"], name), name)
         group["gear"] = sorted(picked.values())
+        if group.get("thin"):  # 다 못 싣는 무리 — 그 층(가장 높은) 장비부터 돌린다
+            group["gear"].sort(key=lambda n: -(items[n][1].get("LevelRequired") or 0))
         group["slots"] = sum(len([n for n in drops_of(m) if n in BASE_RATE]) for p, m in {
             m["Name"]: (p, m) for p, m in monsters
             if m.get("AreaID") in group["areas"] and m.get("Name") not in RESERVED_NAMES}.values())
