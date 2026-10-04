@@ -253,12 +253,13 @@ public sealed partial class SettingsPanel : PanelContainer
             _curse.Display(Main.AutoRow([.. Main.CurseChoices.Select(one => one.Level)], ownerLevel));
         }
 
-        if (Main.BotHeal < 0)
+        // 회복은 끄기가 아니면 늘 가장 센 것을 쓴다(Main.HealPick) — 예전에 고른 줄 대신 지금 쓸 것의 이름을 보인다.
+        if (Main.BotHeal != Main.HealChoices.Length - 1)
         {
             _heal.Display(Main.AutoRow([.. Main.HealChoices.Select(one => one.Level)], ownerLevel));
         }
 
-        if (Main.BotGroupHeal < 0)
+        if (Main.BotGroupHeal != Main.GroupHealChoices.Length - 1)
         {
             _groupHeal.Display(Main.AutoRow([.. Main.GroupHealChoices.Select(one => one.Level)], ownerLevel));
         }

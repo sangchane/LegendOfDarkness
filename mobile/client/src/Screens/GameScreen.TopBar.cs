@@ -53,6 +53,18 @@ public partial class GameScreen : Control
         _wealth = Aux(string.Empty);
         _wealth.AddThemeFontSizeOverride("font_size", 11);
         _wealth.AddThemeColorOverride("font_color", LolCoin);
+        // 금전 숫자가 무엇인지 알 수 있게 왼쪽에 금화 그림(원작 바닥 금화 32905, 사용자 2026-10-04).
+        TextureRect coin = new()
+        {
+            Texture = GD.Load<Texture2D>("res://assets/item/32905.png"),
+            CustomMinimumSize = new Vector2(16, 12),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            SizeFlagsVertical = SizeFlags.ShrinkCenter,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        _wealth.VisibilityChanged += () => coin.Visible = _wealth.Visible;
+        headline.AddChild(coin);
         headline.AddChild(_wealth);
         mine.AddChild(headline);
         mine.AddChild(BuildVitals());
@@ -62,7 +74,8 @@ public partial class GameScreen : Control
         // 만큼 조작 줄을 밀어내지 않게(판 네 줄이 80 안에 들어야 한다).
         _who.Visible = false;
         _who.AddThemeFontSizeOverride("font_size", 12);
-        row.AddChild(LolPlated(mine, compact: !Main.Portrait));
+        // 가로도 세로와 같은 여백 — 가로에서 납작하게(compact) 눌러 체력·마력 판의 비율이 틀어졌다(사용자 2026-10-04).
+        row.AddChild(LolPlated(mine, compact: false));
 
         // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
         _target = Aux(string.Empty);
@@ -118,6 +131,19 @@ public partial class GameScreen : Control
         Button users = MenuButton("접속자", "res://assets/ui/menu-users.png", pixel: true);
         users.Pressed += () => SetWindow(GameWindow.Users, !_users.Visible);
         actions.AddChild(users);
+
+        // 봇 켬/끔 — [접속자] 오른쪽 위 모서리에 작게 붙인다(사용자 2026-10-04). 줄에 따로 세우면 세로 360 에서 위 줄이 화면보다
+        // 넓어져 미니맵이 밀렸다. 누르면 설정 봇 탭의 [봇 부르기]/[봇 보내기]와 같다. 봇 설정은 설정 창 그대로.
+        _botToggle = new Button { Text = "봇", FocusMode = FocusModeEnum.None, TooltipText = "봇 켬/끔" };
+        _botToggle.AddThemeFontSizeOverride("font_size", 10);
+        _botToggle.Pressed += () => _settings.Companion.EmitSignal(BaseButton.SignalName.Pressed);
+        users.AddChild(_botToggle);
+        _botToggle.SetAnchorsPreset(LayoutPreset.TopRight);
+        _botToggle.OffsetLeft = -16;
+        _botToggle.OffsetRight = 8;
+        _botToggle.OffsetTop = -4;
+        _botToggle.OffsetBottom = 20;
+        PaintBotToggle(false);
 
         Button settings = MenuButton("설정", "res://assets/ui/menu-settings.png");
         settings.Pressed += () => SetWindow(GameWindow.Settings, !_settings.Visible);
@@ -205,8 +231,34 @@ public partial class GameScreen : Control
     /// 공격 단추의 모양을 자동 사냥과 맞춘다 — 켜짐은 테두리 + "자동" 글자, 손이 잠시 조작 중이면 흐리게
     /// (<see cref="AbilityBar.ShowAutoHunt" />). <c>--auto-hunt</c> 면 자리를 잡은 뒤 한 번 스스로 켠다.
     /// </summary>
+    private Button _botToggle = null!;
+    private bool? _botDrawn;
+
+    /// <summary>봇 켬/끔 단추 — 켜져 있으면 금테·금색 글자, 꺼져 있으면 흐린 테.</summary>
+    private void PaintBotToggle(bool on)
+    {
+        _botDrawn = on;
+        StyleBoxFlat ring = new() { BgColor = new Color(0, 0, 0, on ? 0.55f : 0.35f), BorderColor = on ? LolGold : LolGoldDark };
+        ring.SetBorderWidthAll(on ? 2 : 1);
+        ring.SetCornerRadiusAll(12);
+
+        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus", "disabled" })
+        {
+            _botToggle.AddThemeStyleboxOverride(state, ring);
+        }
+
+        _botToggle.AddThemeColorOverride("font_color", on ? LolGold : LolMuted);
+        _botToggle.AddThemeColorOverride("font_pressed_color", LolGold);
+        _botToggle.AddThemeColorOverride("font_hover_color", on ? LolGold : LolMuted);
+    }
+
     private void KeepAutoHuntButton()
     {
+        if ((_server?.Companion is not null) != _botDrawn)
+        {
+            PaintBotToggle(_server?.Companion is not null);
+        }
+
         if (Main.AutoHuntOnStart && _autoHuntSettling >= 0 && _world.MapId > 0 && _server?.Vitals is not null
             && ++_autoHuntSettling == 120)
         {

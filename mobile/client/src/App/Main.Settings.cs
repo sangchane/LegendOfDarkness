@@ -168,9 +168,11 @@ public partial class Main : Control
         GroupHeal: HealPick(BotGroupHeal, GroupHealChoices.Length),
         FollowFrom: BotFollow);
 
-    /// <summary>셀렉트 줄 → 선의 값: 고른 적 없음 0(자동 — 봇이 배운 가장 센 것), k 번째 줄은 k+1(그것까지), 끝 줄 255(끄기).</summary>
-    private static int HealPick(int row, int rows) =>
-        row < 0 ? CompanionSpells.HealAuto : row == rows - 1 ? CompanionSpells.HealOff : row + 1;
+    /// <summary>
+    /// 셀렉트 줄 → 선의 값: 끝 줄(끄기)만 255, 나머지는 모두 0(자동 — 봇이 쓸 수 있는 가장 센 회복). 회복도 저주처럼 늘 가장 높은
+    /// 것을 쓴다(사용자 2026-10-04) — 전에는 고른 줄이 「그것까지」 상한이라 쿠로 줄이 저장되면 99레벨 사제가 쿠로만 썼다.
+    /// </summary>
+    private static int HealPick(int row, int rows) => row == rows - 1 ? CompanionSpells.HealOff : CompanionSpells.HealAuto;
 
     public static void SetBotOrders(int curse, bool sleep, CompanionSpells.Priest priest, int heal, int groupHeal, int follow)
     {
