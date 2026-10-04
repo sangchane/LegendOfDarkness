@@ -24,6 +24,13 @@
       <HintPath>$(HadesServerAssembly)</HintPath>
       <Private>true</Private>
     </Reference>
+    <!-- 서버가 켤 때 스크립트를 컴파일하는 그 Roslyn — CombatRenewalTests 가 스크립트 식을 서버 없이 부르려고 같은 것으로 컴파일한다. -->
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>$(MSBuildThisFileDirectory)../../sources/wren11/Dark-Ages-Private-Server/Staging/net9.0/Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>$(MSBuildThisFileDirectory)../../sources/wren11/Dark-Ages-Private-Server/Staging/net9.0/Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

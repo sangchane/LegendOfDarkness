@@ -62,7 +62,8 @@ public sealed class Pack599MonsterBlowTests : IDisposable
         await world.TurnAsync(Direction.North, _deadline.Token);
 
         int armour = world.Vitals!.Armor;
-        int armoured = Math.Max(1, Blow * (armour + 101) / 99);
+        // 방어는 원작 5.99 식(scripts/Formulas/ac.cs — d + trunc(d × AC × k), k 0.01·0.009).
+        int armoured = Math.Max(1, Blow + (int)((long)Blow * armour * (armour > 0 ? 0.01 : 0.009)));
         int expected = armoured * 13 / 10;
 
         List<int> drops = [];

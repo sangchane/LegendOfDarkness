@@ -63,8 +63,10 @@ public sealed class PoteForestDeerDangerTests : IDisposable
         await world.TurnAsync(Direction.North, _deadline.Token);
 
         int armour = world.Vitals!.Armor;
-        int expectedMin = Math.Max(1, 150 * (armour + 101) / 99) * 13 / 10;
-        int expectedMax = Math.Max(1, 160 * (armour + 101) / 99) * 13 / 10;
+        // 방어는 원작 5.99 식(scripts/Formulas/ac.cs — d + trunc(d × AC × k), k 0.01·0.009).
+        static int Armoured(int blow, int ac) => Math.Max(1, blow + (int)((long)blow * ac * (ac > 0 ? 0.01 : 0.009)));
+        int expectedMin = Armoured(150, armour) * 13 / 10;
+        int expectedMax = Armoured(160, armour) * 13 / 10;
 
         List<int> drops = [];
         int seen = world.Vitals!.Health;

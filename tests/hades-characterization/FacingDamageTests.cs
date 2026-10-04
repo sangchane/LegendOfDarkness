@@ -13,7 +13,7 @@ using Xunit.Abstractions;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 때린 자리에 따라 피해가 달라진다 — 등 뒤 ×2 · 옆 ×1.5 · 정면 ×1.
+/// 때린 자리 배수는 꺼져 있다 — 등 뒤 · 옆 · 정면이 모두 ×1 이다(원작 5.99 대로, 사용자 2026-10-04). 예전엔 등 뒤 ×2 · 옆 ×1.5 였다.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -85,23 +85,30 @@ public sealed class FacingDamageTests : IDisposable
         }
     }
 
+    /// <remarks>
+    /// 평타는 이제 공격력 ± 9 를 굴리고 (치명타+1)% 로 두 배가 난다(원작 5.99 0x4166b1 · 0x4166eb). 그래서 자리마다
+    /// 세 번 쳐서 가장 작은 값(치명타가 아닌 것)끼리 견준다 — 굴림 폭 18 안이면 같은 세기다. 등 뒤 ×2 가 살아 있으면 100 넘게 벌어진다.
+    /// </remarks>
     [Fact]
-    public async Task A_plain_blow_is_worth_twice_from_behind_and_half_again_from_the_side()
+    public async Task A_plain_blow_is_worth_the_same_from_every_side()
     {
         (WorldClient world, _) = await Enter("facingblow", gameMaster: false, assailAtCeiling: true);
 
         (uint front, uint side, uint behind) = await ThreeDummies(world);
 
-        int inFront = await Swing(world, Direction.South, front);
-        int fromSide = await Swing(world, Direction.West, side);
-        int fromBehind = await Swing(world, Direction.North, behind);
+        int inFront = await Least(() => Swing(world, Direction.South, front));
+        int fromSide = await Least(() => Swing(world, Direction.West, side));
+        int fromBehind = await Least(() => Swing(world, Direction.North, behind));
 
-        _say.WriteLine($"평타 — 정면 {inFront} · 옆 {fromSide} · 등 뒤 {fromBehind}");
+        _say.WriteLine($"평타(세 번 중 가장 작은 것) — 정면 {inFront} · 옆 {fromSide} · 등 뒤 {fromBehind}");
 
         Assert.True(inFront > 0, "정면으로 친 평타가 아무 점수도 내지 못했습니다.");
-        Assert.Equal(inFront * 2, fromBehind);
-        Assert.Equal((int)(inFront * 1.5), fromSide);
+        int[] three = [inFront, fromSide, fromBehind];
+        Assert.InRange(three.Max() - three.Min(), 0, 18);
     }
+
+    private static async Task<int> Least(Func<Task<int>> swing) =>
+        Math.Min(Math.Min(await swing(), await swing()), await swing());
 
     /// <summary>
     /// 무도가 기술도 같은 판정을 받는다 — 단각(<c>Kick</c>). 기술 스크립트에는 방향에 관한 줄이 하나도 없다.
@@ -128,10 +135,64 @@ public sealed class FacingDamageTests : IDisposable
             $" (알리는 값은 {GameMasterTellsThisMuchMore} 배로 부푼 것이다)");
 
         Assert.True(inFront > 0, "정면으로 쓴 단각이 아무 점수도 내지 못했습니다.");
-        Assert.Equal(inFront * 2, fromBehind);
+        Assert.Equal(inFront, fromBehind);
+        Assert.Equal(inFront, fromSide);
+    }
 
-        // 200 배는 알리는 값에만 붙으므로 걷어내고 곱한 뒤 다시 붙인다 — 1.5 는 실제로 들어간 점수에 곱해진다.
-        Assert.Equal((int)(inFront / GameMasterTellsThisMuchMore * 1.5) * GameMasterTellsThisMuchMore, fromSide);
+    /// <summary>
+    /// 장비 공격수정(DmgModifer → BonusDmg)은 사람이 때리는 피해에 <b>방어 전에</b> 더해진다 — 원작 5.99 는 장비 공격수정 합
+    /// (P+0xA0)을 0x415173 에서 더한 뒤 AC 를 건다(사용자 2026-10-04). 인형 방어 −45 에 단각을 공격수정 +5 목걸이 없이·끼고 친다.
+    /// </summary>
+    [Fact]
+    public async Task An_attack_modifier_on_gear_is_added_before_armour()
+    {
+        const int armour = -45;
+        (WorldClient world, _) = await Enter("facingmod", gameMaster: true, assailAtCeiling: false, monk: true,
+            dummyArmour: armour, prepare: AttackModifierNecklace);
+
+        (uint front, _, _) = await ThreeDummies(world);
+
+        await world.SayAsync($"/skill \"Kick\" {AssailMaxLevel}", _deadline.Token);
+        int slot = await Learned(world, "Kick");
+
+        int bare = await Swing(world, Direction.South, front, slot) / GameMasterTellsThisMuchMore;
+
+        await world.SayAsync("/give \"공격수정시험목걸이\" 1", _deadline.Token);
+        int pack = await Slot(() => world.Pack.FirstOrDefault(item => item.Name == "공격수정시험목걸이")?.Slot,
+            "공격수정시험목걸이가 소지품에 오지 않았습니다.");
+        await world.UseAsync(pack, _deadline.Token);
+        await Until(() => world.Pack.All(item => item.Name != "공격수정시험목걸이"), "목걸이를 걸지 못했습니다.");
+
+        int worn = await Swing(world, Direction.South, front, slot) / GameMasterTellsThisMuchMore;
+
+        _say.WriteLine($"단각(방어 {armour}) — 맨 {bare} · 공격수정 +5 {worn}");
+
+        static int Armoured(int blow) => Math.Max(1, blow + (int)((long)blow * armour * 0.009));
+        Assert.Contains(Enumerable.Range(1, 100_000),
+            raw => Armoured(raw) == bare && Armoured(raw + 5) == worn);
+        Assert.NotEqual(bare + 5, worn); // AC 뒤에 더했다면 정확히 +5 다.
+    }
+
+    private static void AttackModifierNecklace(IsolatedHadesServer server)
+    {
+        string folder = Path.Combine(server.ContentLocation, "templates", "items");
+        JsonNode template = JsonNode.Parse(File.ReadAllText(Path.Combine(folder, "대지의크리스탈목걸이.json")))!;
+        template["Name"] = "공격수정시험목걸이";
+        template["OffenseElement"] = 0;
+        template["DefenseElement"] = 0;
+        template["LevelRequired"] = 1;
+        // 능력치·체력 수정은 공격력·콘 항을 바꾸므로 지우고 공격수정만 남긴다.
+        foreach (string other in new[] { "AcModifer", "HealthModifer", "ManaModifer", "StrModifer", "DexModifer",
+                     "IntModifer", "WisModifer", "ConModifer" })
+        {
+            template[other] = null;
+        }
+
+        template["DmgModifer"] = new JsonObject
+        {
+            ["$type"] = "Darkages.Types.StatusOperator, Darkages.Server", ["Option"] = 0, ["Value"] = 5,
+        };
+        File.WriteAllText(Path.Combine(folder, "공격수정시험목걸이.json"), template.ToJsonString());
     }
 
     /// <summary>
@@ -170,35 +231,26 @@ public sealed class FacingDamageTests : IDisposable
     }
 
     /// <summary>
-    /// 맞은 괴물은 때린 쪽을 바라본다. 안 그러면 문 앞에 선 놈은 늘 등을 보이고 있어 등 뒤 ×2 가 거저 나온다.
+    /// 맞은 괴물은 때린 쪽을 바라본다 — 배수는 꺼졌지만 돌아서는 것은 그대로다(사용자 2026-10-04).
     /// </summary>
     /// <remarks>
-    /// 두 가지로 확인한다 — 서버가 말하는 그 놈의 방향이 남쪽으로 바뀌는지, 그리고 <b>바로 다음 한 방이
-    /// 정면 값</b>이 되는지. 이 인형은 제자리에 고정돼 있어(<c>Training Dummy</c> 는 돌아가는 차례가 없다)
-    /// 걸음과 무관하게 방향만 도는 길이 있는지도 함께 본다.
+    /// 서버가 말하는 그 놈의 방향이 남쪽으로 바뀌는지 본다. 이 인형은 제자리에 고정돼 있어(<c>Training Dummy</c> 는
+    /// 돌아가는 차례가 없다) 걸음과 무관하게 방향만 도는 길이 있는지도 함께 본다.
     /// </remarks>
     [Fact]
     public async Task A_monster_turns_to_face_whoever_hit_it()
     {
         (WorldClient world, _) = await Enter("facingturn", gameMaster: false, assailAtCeiling: true);
 
-        (uint front, _, uint behind) = await ThreeDummies(world);
+        (_, _, uint behind) = await ThreeDummies(world);
 
         Assert.Equal(Direction.North, Standing(world, behind).Facing);
 
-        int inFront = await Swing(world, Direction.South, front);
-        int first = await Swing(world, Direction.North, behind);
+        await Swing(world, Direction.North, behind);
 
         await world.RefreshAsync(_deadline.Token);
         await Until(() => Standing(world, behind).Facing == Direction.South,
             "등 뒤에서 맞은 괴물이 때린 쪽으로 돌아서지 않았습니다.");
-
-        int second = await Swing(world, Direction.North, behind);
-
-        _say.WriteLine($"평타 — 정면 {inFront} · 등 뒤 첫 타 {first} · 돌아선 뒤 둘째 타 {second}");
-
-        Assert.Equal(inFront * 2, first);
-        Assert.Equal(inFront, second);
     }
 
     /// <summary>
@@ -296,13 +348,15 @@ public sealed class FacingDamageTests : IDisposable
     }
 
     private async Task<(WorldClient World, IsolatedHadesServer Server)> Enter(
-        string name, bool gameMaster, bool assailAtCeiling, bool monk = false, bool mana = false)
+        string name, bool gameMaster, bool assailAtCeiling, bool monk = false, bool mana = false,
+        int dummyArmour = 0, Action<IsolatedHadesServer>? prepare = null)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare(
             startTogether: (WoodlandOneOne, Start.X, Start.Y));
         _servers.Add(server);
 
-        StandThreeDummies(server);
+        StandThreeDummies(server, dummyArmour);
+        prepare?.Invoke(server);
 
         if (gameMaster)
         {
@@ -380,7 +434,7 @@ public sealed class FacingDamageTests : IDisposable
     /// 않으므로 방향을 바꾸는 것은 내 한 방뿐이다. 체력은 죽지 않을 만큼 크게 둔다(백분율로 재지 않으므로
     /// 크기는 상관없다). 방어는 0 — 세 값이 같은 방어를 거쳐야 배수만 남는다.
     /// </remarks>
-    private static void StandThreeDummies(IsolatedHadesServer server)
+    private static void StandThreeDummies(IsolatedHadesServer server, int armour)
     {
         JsonSerializerOptions indented = new() { WriteIndented = true };
         string folder = Path.Combine(server.ContentLocation, "templates", "monsters");
@@ -426,7 +480,7 @@ public sealed class FacingDamageTests : IDisposable
             dummy["DefinedX"] = at.X;
             dummy["DefinedY"] = at.Y;
             dummy["MaximumHP"] = 1_000_000;
-            dummy["Ac"] = 0;
+            dummy["Ac"] = armour;
             dummy["Grow"] = false;
 
             File.WriteAllText(Path.Combine(testFolder, $"facing-{at.X}-{at.Y}.json"), dummy.ToJsonString(indented));

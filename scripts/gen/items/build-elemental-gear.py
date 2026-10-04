@@ -16,6 +16,9 @@
 그리고 속성 — 무기는 OffenseElement, 옷은 DefenseElement (수=Water 2 · 토=Earth 4 · 풍=Wind 3 · 화=Fire 1).
 지금 하데스 전투는 목걸이·벨트 속성만 읽는다. 무기·옷 속성을 피해에 쓰는 것은 전투 리뉴얼에서 한다.
 
+**목걸이·벨트 속성도 적는다** — 이름 앞말(화염·바다·바람·대지·생명·암흑)로 목걸이 OffenseElement·벨트 DefenseElement.
+그 밖의 칸은 건드리지 않는다.
+
 기본형이 서버에 없는 표 줄(오렌○○·수오미○○ 같은 마을 접두 옷 등)은 만들지 않는다 — 그림 정본이 없다.
 **지우지 않는다.** 이미 있는 변형 파일은 같은 규칙으로 다시 쓴다.
 """
@@ -36,6 +39,11 @@ SHEET = ROOT / "data/game-data/items-original-sheets.json"
 #: ElementManager.Element
 ELEMENT = {"수": 2, "토": 4, "풍": 3, "화": 1}
 WEAPON, ARMOUR = 1, 2
+
+#: 목걸이·벨트 이름 앞말 → 속성(사용자 2026-10-04: 암흑은 수토풍화 모두에 강하고 생명은 암흑에 강하다).
+#: Dark 6 · Light 5 = 생명. 반지·씰 등 다른 자리는 원작처럼 속성을 갖지 않는다.
+JEWEL_ELEMENT = {"화염의": 1, "바다의": 2, "바람의": 3, "대지의": 4, "생명의": 5, "암흑의": 6}
+JEWEL_FIELD = {6: "OffenseElement", 11: "DefenseElement"}
 
 
 def templates():
@@ -83,8 +91,23 @@ def main():
                 (ITEMS / f"{body['Name']}.json").write_text(
                     json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    print(f"기본형 무기 {kinds[WEAPON]} · 옷 {kinds[ARMOUR]} → 변형 {len(made)}종"
+    # 목걸이(공격)·벨트(방어)는 이름 앞말이 속성이다 — 템플릿에 속성 칸이 비어 있어 전투가 못 읽었다.
+    jewels = {}
+    for name, body in sorted(templates().items()):
+        prefix = next((p for p in JEWEL_ELEMENT if name.startswith(p)), None)
+        field = JEWEL_FIELD.get(body.get("EquipmentSlot"))
+        if not prefix or not field or body.get(field) == JEWEL_ELEMENT[prefix]:
+            continue
+        body[field] = JEWEL_ELEMENT[prefix]
+        jewels[name] = f"{field} {JEWEL_ELEMENT[prefix]}"
+        if args.writing:
+            (ITEMS / f"{name}.json").write_text(
+                json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    print(f"기본형 무기 {kinds[WEAPON]} · 옷 {kinds[ARMOUR]} → 변형 {len(made)}종 · 목걸이·벨트 속성 {len(jewels)}종"
           f"{'' if args.writing else ' (아직 안 씀 — --쓰기)'}")
+    for name, what in list(jewels.items())[:6]:
+        print(f"  {name}: {what}")
     for body in made[:8]:
         print(f"  {body['Name']}: {body['Value']}골드 · 공격 {body.get('DmgMin', 0)}~{body.get('DmgMax', 0)}"
               f" · 방어 {body.get('AcModifer', {}).get('Value', 0)}")

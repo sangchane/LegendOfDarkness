@@ -20,8 +20,8 @@ namespace Lod.Hades.Characterization.Tests;
 /// <remarks>
 /// <para>
 /// It is a characterization test, so where the server's arithmetic reads oddly but deliberately this
-/// follows it rather than correcting it. <see cref="LevelOnUse" /> is the one that matters most: the skill
-/// levels on every swing, so no two swings in a row are worth the same.
+/// follows it rather than correcting it. Our blow is rolled now — attack power give or take nine, doubled on a
+/// critical (원작 5.99 0x4166b1 · 0x4166eb) — so what is checked is the range the rolls can reach.
 /// </para>
 /// <para>
 /// Both directions are here because the numbers come from opposite places. Ours come from the five
@@ -69,15 +69,6 @@ public sealed class CombatSmokeTests : IDisposable
     private const int TargetHealth = 600;
 
     private const string Name = "smokefight";
-
-    /// <summary>
-    /// 때린 자리에 따른 배수(<c>Sprite.BlowFacing</c>). 방어를 거친 뒤에 곱해지므로 <see cref="Landed" /> 의
-    /// 마지막 곱셈에 함께 들어간다. 세 각을 따로 재는 것은 <c>FacingDamageTests</c> 이고, 여기서는 문 앞의
-    /// 정해진 자리에서 나오는 두 가지만 쓴다.
-    /// </summary>
-    private const double FromBehind = 2.0;
-
-    private const double FromInFront = 1.0;
 
     /// <summary>What neither side having an element is worth (<c>scripts/Formulas/elements.cs</c>).</summary>
     /// <remarks>
@@ -172,22 +163,22 @@ public sealed class CombatSmokeTests : IDisposable
         // 바라보므로(Sprite.FaceWhoeverHit) 그 다음 대부터는 정면이다.
         await SwingUntil(world, enough: () =>
         {
-            (int Left, int Predicted, int Use, bool First)[] sofar = Blows(world, me, health, armor, standing);
+            (int Left, int Least, int Most, int Use, bool First)[] sofar = Blows(world, me, health, armor, standing);
             return sofar.Length >= BlowsMeasured && sofar.Any(blow => !blow.First);
         });
 
-        (int Left, int Predicted, int Use, bool First)[] blows = Blows(world, me, health, armor, standing);
+        (int Left, int Least, int Most, int Use, bool First)[] blows = Blows(world, me, health, armor, standing);
 
         Assert.True(blows.Length >= BlowsMeasured,
             $"{MostSwings}번 휘둘렀는데 체력이 깎인 보고가 {blows.Length}번뿐입니다 — 닿지 않았거나 기술 " +
             $"스크립트가 안 돌았습니다.{Environment.NewLine}{Said(world)}");
 
-        foreach ((int left, int predicted, int use, bool behind) in blows)
+        foreach ((int left, int least, int most, int use, bool behind) in blows)
         {
-            Assert.True(left == predicted,
-                $"{use}번째 휘두름 뒤 괴물의 체력이 {left}% 입니다. 식대로라면 {predicted}% 입니다 " +
+            Assert.True(left >= least && left <= most,
+                $"{use}번째 휘두름 뒤 괴물의 체력이 {left}% 입니다. 식대로라면 {least}~{most}% 입니다 " +
                 $"({(behind ? "등 뒤에서 친 첫 대" : "돌아선 놈을 정면에서 친 대")}, 괴물 수준 {level}, " +
-                $"체력 {health}, 방어 {armor}, 기술 수준 {LevelOnUse(use)}, 힘 {me.Str}, " +
+                $"체력 {health}, 방어 {armor}, 힘 {me.Str}, " +
                 $"민첩 {me.Dex}).{Environment.NewLine}{Said(world)}");
         }
 
@@ -309,14 +300,16 @@ public sealed class CombatSmokeTests : IDisposable
     /// 한 놈에게 온 k 번째 보고가 k 번째 휘두름이다 — 한 번 휘두르면 앞칸에 선 놈이 다 맞으므로 보고를
     /// 통째로 세면 휘두른 횟수가 아니다(<see cref="Our_blow_takes_off_what_the_formula_says" />).
     /// 한 놈을 여러 번 치므로 깎인 점수를 쌓아 가며 센다 — 괴물은 체력이 저절로 차지 않으므로(서버 어디에도
-    /// 괴물의 <c>CurrentHp +=</c> 가 없다) 쌓아 둔 값이 그대로 맞다. 그 놈에게 처음 들어간 대는 등 뒤,
-    /// 그 뒤로는 정면이다.
+    /// 괴물의 <c>CurrentHp +=</c> 가 없다) 쌓아 둔 값이 그대로 맞다. 굴림이 있으므로 쌓인 값은 범위이고, 치명타는
+    /// 한 놈에게 한 번까지 넉넉히 둔다((치명타+1)% 라 몇 대 안에 두 번 날 일은 거의 없다). 등 뒤·정면 배수는 꺼졌다.
     /// </remarks>
-    private static (int Left, int Predicted, int Use, bool First)[] Blows(
+    private static (int Left, int Least, int Most, int Use, bool First)[] Blows(
         WorldClient world, Vitals me, int health, int armor, HashSet<uint> standing)
     {
-        List<(int, int, int, bool)> blows = [];
-        Dictionary<uint, int> taken = [];
+        List<(int, int, int, int, bool)> blows = [];
+        Dictionary<uint, (int Least, int Most)> taken = [];
+        (int least, int most) blow = AssailDamage(me, armor);
+        int oneCritical = Landed(2 * (me.Str * 10 + 9), armor) - blow.most;
         Dictionary<uint, int> swings = [];
 
         // 내 체력 보고는 괴물이 때린 것이므로 세지 않는다. 헛친 휘두름은 serial 0 으로 온다.
@@ -328,40 +321,28 @@ public sealed class CombatSmokeTests : IDisposable
             }
 
             int swing = swings[serial] = swings.GetValueOrDefault(serial) + 1;
-            taken[serial] = taken.GetValueOrDefault(serial)
-                + AssailDamage(me, LevelOnUse(swing), armor, swing == 1 ? FromBehind : FromInFront);
+            (int Least, int Most) sofar = taken.GetValueOrDefault(serial);
+            taken[serial] = (sofar.Least + blow.least, sofar.Most + blow.most);
 
-            blows.Add((left, PercentLeft(health, taken[serial]), swing, swing == 1));
+            blows.Add((left, PercentLeft(health, taken[serial].Most + oneCritical),
+                PercentLeft(health, taken[serial].Least), swing, swing == 1));
         }
 
         return [.. blows];
     }
 
     /// <summary>
-    /// What level the skill was at on its <paramref name="use" />th use, counting from one.
+    /// The least and the most one Assail of ours can take off a monster, short of a critical. Every step is a
+    /// step the server takes, named where it lives: a step here that the server does not take is a bug in this
+    /// method, not in the server.
     /// </summary>
-    /// <remarks>
-    /// <b>It goes up on every single swing.</b> <c>GameClient.TrainSkill</c> improves the skill once
-    /// <c>Uses++ >= (int)(0.10 / LevelRate)</c>, and Assail's <c>LevelRate</c> is 0.5, so that threshold
-    /// truncates to zero and the comparison is true the first time and every time after. A skill meant to
-    /// take a hundred swings to improve improves on all hundred, and since the level is in the damage, no
-    /// two swings in a row are worth the same. That is why this test has to know which swing it is looking
-    /// at, and why a fight here gets visibly stronger as it goes on.
-    /// </remarks>
-    private static int LevelOnUse(int use) => Math.Min(1 + use, AssailMaxLevel);
-
-    /// <summary>
-    /// What one Assail of ours must take off a monster. Every step is a step the server takes, named where
-    /// it lives: a step here that the server does not take is a bug in this method, not in the server.
-    /// </summary>
-    private static int AssailDamage(Vitals me, int skillLevel, int monsterArmor, double facing)
+    private static (int Least, int Most) AssailDamage(Vitals me, int monsterArmor)
     {
-        // scripts/Skills/Assail.cs — imp is ten plus the skill's level, and the division truncates.
-        int dmg = me.Str * 4 + me.Dex * 2;
-        dmg += dmg * (10 + skillLevel) / 100;
+        // scripts/Skills/Assail.cs Roll — 공격력(Pack599.AttackPower: 힘 × 10, 처음 옷은 공격력 칸이 0) ± 9.
+        // 기술 수준은 이제 피해에 들어가지 않는다(사용자 2026-10-04).
+        int power = me.Str * 10;
 
-        // 때린 자리 배수는 방어 뒤에 곱해진다 — Sprite.DamageTarget 의 amplifier 한 줄에 속성과 함께 있다.
-        return Landed(dmg, monsterArmor, facing);
+        return (Landed(power - 9, monsterArmor), Landed(power + 9, monsterArmor));
     }
 
     /// <summary>
@@ -386,18 +367,13 @@ public sealed class CombatSmokeTests : IDisposable
     /// monster's blow, <see cref="MonsterBlowElement" /> in the same place as the elements.
     /// </summary>
     /// <remarks>
-    /// <c>scripts/Formulas/ac.cs</c>. Armour above -2 still makes a blow hurt more, and nobody starts below
-    /// that: <c>GameClient.SetAislingStartupVariables</c> hands a new character <c>100 - Level / 3</c>, so it
-    /// stands there wearing +100 and takes about twice what it would at -2; a level-one monster's +69 is
-    /// about 1.7 times. Armour only begins to help once gear takes it under -2, down to the -70 floor.
-    ///
-    /// That much is the design. What was a bug, and is now fixed, is that the script used to end by
-    /// returning the larger of the raw and the armoured blow — so every reduction it worked out was handed
-    /// straight back, and the best armour in the game took exactly what no armour took.
+    /// <c>scripts/Formulas/ac.cs</c> — 원작 5.99 0x4150f2: d + trunc(d × AC × k), k = 0.01(AC &gt; 0) · 0.009(AC ≤ 0).
+    /// Armour above 0 makes a blow hurt more: <c>GameClient.SetAislingStartupVariables</c> hands everyone 100, so a
+    /// new character takes twice. Armour only begins to help once gear takes it under 0, down to the -70 floor.
     /// </remarks>
     private static int Landed(int dmg, int armor, double afterArmour = 1)
     {
-        int armored = Math.Max(1, dmg * (armor + 101) / 99);
+        int armored = Math.Max(1, dmg + (int)((long)dmg * armor * (armor > 0 ? 0.01 : 0.009)));
 
         return (int)Math.Abs(armored * (NoElementEither * afterArmour));
     }
