@@ -261,6 +261,7 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
                 Magic = master.Magic, Priest = master.Priest, Heal = master.Heal, GroupHeal = master.GroupHeal,
                 FollowFrom = master.Follow > 0 ? master.Follow : settings.FollowFrom,
                 FollowTo = master.Follow > 0 ? Math.Max(1, master.Follow - 1) : settings.FollowTo,
+                HealOwnerPercent = master.HealPercent > 0 ? master.HealPercent : settings.HealOwnerPercent,
             });
 
         switch (step.Act)

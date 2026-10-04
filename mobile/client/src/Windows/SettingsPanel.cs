@@ -59,6 +59,11 @@ public sealed partial class SettingsPanel : PanelContainer
         follow.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
         bot.AddChild(follow);
 
+        // 주인 체력이 몇 % 이하면 회복할지 — 자동 포션처럼(사용자, 2026-10-05).
+        Control healAt = SliderRow("주인 회복", 10, 90, 10, Main.BotHealPercent, value => $"{value}% 이하", value => Order(healPercent: value));
+        healAt.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
+        bot.AddChild(healAt);
+
         // 마법사·성직자 — 셀렉트는 마법 이름 그대로(고른 적 없으면 봇이 배운 가장 센 것을 보인다, ShowBotLevel), 켬은 두 칸씩.
         bot.AddChild(Heading("마법사"));
         _curse = PercentSelect.Of([.. Main.CurseChoices.Select(one => one.Name)], Main.BotCurse, this, SelectWidth, SelectHeight);
@@ -204,10 +209,10 @@ public sealed partial class SettingsPanel : PanelContainer
 
     /// <summary>봇 탭에서 하나를 바꾸고 나머지는 그대로 둔 채 남기고 알린다.</summary>
     private void Order(int? curse = null, bool? sleep = null, CompanionSpells.Priest? priest = null, int? heal = null, int? groupHeal = null,
-        int? follow = null)
+        int? follow = null, int? healPercent = null)
     {
         Main.SetBotOrders(curse ?? Main.BotCurse, sleep ?? Main.BotSleep, priest ?? Main.BotPriest, heal ?? Main.BotHeal, groupHeal ?? Main.BotGroupHeal,
-            follow ?? Main.BotFollow);
+            follow ?? Main.BotFollow, healPercent ?? Main.BotHealPercent);
         BotMagicChanged?.Invoke();
     }
 

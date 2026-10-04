@@ -211,9 +211,9 @@ public sealed class CompanionMagicTests
     [Fact]
     public void Orders_go_out_as_kind_six_and_come_back_on_the_master_tie()
     {
-        Assert.Equal(new byte[] { 6, 5, 3, 2, 255, 5 },
+        Assert.Equal(new byte[] { 6, 5, 3, 2, 255, 5, 40 },
             Companion.Orders(CompanionSpells.Magic.Lento | CompanionSpells.Magic.Bardo,
-                CompanionSpells.Priest.Dinarcoli | CompanionSpells.Priest.Disoruma, 2, CompanionSpells.HealOff, 5));
+                CompanionSpells.Priest.Dinarcoli | CompanionSpells.Priest.Disoruma, 2, CompanionSpells.HealOff, 5, 40));
 
         byte[] old = [1, 0, 0, 0, 42, 1, (byte)'a'];
         CompanionTie plain = Companion.ReadTie(old).Tie!;
@@ -223,6 +223,11 @@ public sealed class CompanionMagicTests
         CompanionTie tie = Companion.ReadTie(tailed).Tie!;
         Assert.Equal(("a", CompanionSpells.Magic.Depreco, CompanionSpells.Priest.Horrama, 3, 255, 6),
             (tie.Name, tie.Magic, tie.Priest, tie.Heal, tie.GroupHeal, tie.Follow));
+
+        // 여섯째 — 주인 회복 % (2026-10-05). 콜라마·벨라르모 비트(16·32)도 그대로 온다.
+        byte[] full = [1, 0, 0, 0, 42, 1, (byte)'a', 8, 0x30, 3, 255, 6, 40];
+        CompanionTie healer = Companion.ReadTie(full).Tie!;
+        Assert.Equal((CompanionSpells.Priest.Colama | CompanionSpells.Priest.Belra, 40, 0), (healer.Priest, healer.HealPercent, tie.HealPercent));
     }
 
     private static readonly IReadOnlyList<LearnedSpell> Healer =

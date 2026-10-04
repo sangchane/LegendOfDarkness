@@ -12,6 +12,7 @@ namespace Lod.Mobile.Core.Protocol.World;
 /// <param name="Heal">한 사람 회복 셀렉트(셋째, <see cref="CompanionSpells.Heals" />).</param>
 /// <param name="GroupHeal">파티 회복 셀렉트(넷째).</param>
 /// <param name="Follow">따라가기 거리(다섯째) — 주인과 이만큼 넘게 떨어지면 따라 걷는다. 0 은 봇 기본.</param>
+/// <param name="HealPercent">주인 회복 기준(여섯째, 2026-10-05) — 주인 체력이 이 % 아래면 회복. 0 은 봇 기본.</param>
 public sealed record CompanionTie(
     uint Serial,
     string Name,
@@ -19,7 +20,8 @@ public sealed record CompanionTie(
     CompanionSpells.Priest Priest = CompanionSpells.Priest.All,
     int Heal = CompanionSpells.HealAuto,
     int GroupHeal = CompanionSpells.HealAuto,
-    int Follow = 0);
+    int Follow = 0,
+    int HealPercent = 0);
 
 /// <summary>
 /// 걸린 것 하나(0x5E 종류 3): 서버 이름(sleep·frozen·horrama·enare …) · 남은 초 · 해로움 · 그림 번호(스펠 시트, 모르면 0 —
@@ -77,8 +79,8 @@ public static class Companion
     /// 봇 탭에서 고른 것(0xF1 6): 마법사 비트(1 렌토 · 2 나르콜리 · 4 바르도 · 8 데프레코 · 16 프라보) · 성직자 비트(1 디나르콜리 ·
     /// 2 디소루마 · 4 호르라마 · 8 에나르마) · 회복 셀렉트 · 파티 회복 셀렉트(0 자동 · k 번째까지 · 255 끄기) · 따라가기 거리(칸). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.
     /// </summary>
-    public static byte[] Orders(CompanionSpells.Magic magic, CompanionSpells.Priest priest, int heal, int groupHeal, int follow) =>
-        [6, (byte)magic, (byte)priest, (byte)heal, (byte)groupHeal, (byte)follow];
+    public static byte[] Orders(CompanionSpells.Magic magic, CompanionSpells.Priest priest, int heal, int groupHeal, int follow, int healPercent = 0) =>
+        [6, (byte)magic, (byte)priest, (byte)heal, (byte)groupHeal, (byte)follow, (byte)healPercent];
 
     /// <summary>0x5E 종류 3 — 한 사람(주인 또는 봇 자신)에게 걸린 것: 이름 · 남은 초 · 해로움.</summary>
     public static (uint Serial, IReadOnlyList<CompanionStatus> Statuses) ReadStatuses(ReadOnlySpan<byte> body)
@@ -198,6 +200,6 @@ public static class Companion
         return (body[0], serial == 0
             ? null
             : new CompanionTie(serial, name, (CompanionSpells.Magic)At(0, (int)CompanionSpells.Magic.All),
-                (CompanionSpells.Priest)At(1, (int)CompanionSpells.Priest.All), At(2, CompanionSpells.HealAuto), At(3, CompanionSpells.HealAuto), At(4, 0)));
+                (CompanionSpells.Priest)At(1, (int)CompanionSpells.Priest.All), At(2, CompanionSpells.HealAuto), At(3, CompanionSpells.HealAuto), At(4, 0), At(5, 0)));
     }
 }

@@ -142,6 +142,9 @@ public partial class Main : Control
     /// <summary>주인과 이만큼(칸) 넘게 떨어지면 봇이 따라 걷는다(1~10, 기본 3 — 사용자 2026-10-03).</summary>
     public static int BotFollow { get; private set; } = 3;
 
+    /// <summary>주인 체력이 이 % 이하면 봇이 회복한다(10~90, 기본 70 — 자동 포션처럼, 사용자 2026-10-05).</summary>
+    public static int BotHealPercent { get; private set; } = 70;
+
     /// <summary>봇이 이 레벨에서 배운 가장 센 줄, 하나도 없으면 끝 줄(끄기).</summary>
     public static int AutoRow(int[] levels, int ownerLevel)
     {
@@ -166,7 +169,8 @@ public partial class Main : Control
         Priest: BotPriest,
         Heal: HealPick(BotHeal, HealChoices.Length),
         GroupHeal: HealPick(BotGroupHeal, GroupHealChoices.Length),
-        FollowFrom: BotFollow);
+        FollowFrom: BotFollow,
+        HealOwnerPercent: BotHealPercent);
 
     /// <summary>
     /// 셀렉트 줄 → 선의 값: 끝 줄(끄기)만 255, 나머지는 모두 0(자동 — 봇이 쓸 수 있는 가장 센 회복). 회복도 저주처럼 늘 가장 높은
@@ -174,8 +178,9 @@ public partial class Main : Control
     /// </summary>
     private static int HealPick(int row, int rows) => row == rows - 1 ? CompanionSpells.HealOff : CompanionSpells.HealAuto;
 
-    public static void SetBotOrders(int curse, bool sleep, CompanionSpells.Priest priest, int heal, int groupHeal, int follow)
+    public static void SetBotOrders(int curse, bool sleep, CompanionSpells.Priest priest, int heal, int groupHeal, int follow, int healPercent)
     {
+        BotHealPercent = System.Math.Clamp(healPercent, 10, 90);
         BotCurse = System.Math.Clamp(curse, -1, CurseChoices.Length - 1);
         BotSleep = sleep;
         // 10-04 전 저장(넷 다 켬 = 15)은 새로 생긴 콜라마·벨라르모도 켠다.
@@ -188,7 +193,7 @@ public partial class Main : Control
 
         if (writing is not null)
         {
-            writing.StoreLine($"{BotCurse} {(sleep ? 1 : 0)} {(int)BotPriest} {BotHeal} {BotGroupHeal} {BotFollow}");
+            writing.StoreLine($"{BotCurse} {(sleep ? 1 : 0)} {(int)BotPriest} {BotHeal} {BotGroupHeal} {BotFollow} {BotHealPercent}");
             writing.Close();
         }
     }
@@ -198,11 +203,11 @@ public partial class Main : Control
         using Godot.FileAccess? reading = Godot.FileAccess.Open(BotMagicFile, Godot.FileAccess.ModeFlags.Read);
         int?[] parts = [.. (reading?.GetLine().Trim().Split(' ') ?? []).Select(one => int.TryParse(one, out int value) ? value : (int?)null)];
 
-        // 따라가기(여섯째)는 10-03 에 더했다 — 그 전 다섯 칸 줄은 기본 3.
-        if (parts.Length is 5 or 6 && parts.All(one => one is not null))
+        // 따라가기(여섯째)는 10-03, 회복 %(일곱째)는 10-05 에 더했다 — 그 전 줄은 기본 3 · 70.
+        if (parts.Length is 5 or 6 or 7 && parts.All(one => one is not null))
         {
             SetBotOrders(parts[0]!.Value, parts[1] != 0, (CompanionSpells.Priest)parts[2]!.Value, parts[3]!.Value, parts[4]!.Value,
-                parts.Length == 6 ? parts[5]!.Value : 3);
+                parts.Length >= 6 ? parts[5]!.Value : 3, parts.Length == 7 ? parts[6]!.Value : 70);
         }
     }
 
