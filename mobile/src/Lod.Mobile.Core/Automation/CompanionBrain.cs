@@ -124,6 +124,9 @@ public sealed class CompanionBrain
     /// <summary>회복 사이 — 한 번 걸고 체력바(0x13)가 오르는 것을 본 뒤에.</summary>
     public static readonly TimeSpan HealGap = TimeSpan.FromMilliseconds(1500);
 
+    /// <summary>깨우기가 안 먹었을 때 다시 깨우기까지 — 그 사이 주문은 회복·이모탈에 쓴다.</summary>
+    public static readonly TimeSpan WakeRetry = TimeSpan.FromSeconds(3);
+
     /// <summary>걸음 사이. 서버 걷기 제한을 넉넉히 지킨다(시험들의 450ms 보다 느리게).</summary>
     public static readonly TimeSpan WalkGap = TimeSpan.FromMilliseconds(500);
 
@@ -153,6 +156,7 @@ public sealed class CompanionBrain
     private readonly Dictionary<(string Spell, uint Target), TimeSpan> _tried = [];
 
     private readonly Dictionary<(string Spell, uint Target), TimeSpan> _buffed = [];
+    private TimeSpan _lastWake = Reckon.Never;
     private TimeSpan _lastCast = Reckon.Never;
     private TimeSpan _lastHeal = Reckon.Never;
     private TimeSpan _lastWalk = Reckon.Never;
@@ -258,13 +262,16 @@ public sealed class CompanionBrain
                 return StepTo(sight, fallen, now, "주인 깨우러 가기");
             }
 
-            if (now - _lastCast >= CastGap)
+            // 안 먹으면 3초마다 다시 — 그 사이 주문 차례는 회복·이모탈에 준다.
+            if (now - _lastCast >= CastGap && now - _lastWake >= WakeRetry)
             {
                 _lastCast = now;
+                _lastWake = now;
                 return new(CompanionAct.WakeOwner, Target: sight.Master, Why: "주인 깨우기");
             }
 
-            return new(CompanionAct.Wait, Why: "주인 깨우기 사이");
+            // 깨우기 사이에는 기다리지 않고 아래(이모탈·회복)로 넘어간다 — 서버가 깨우기를 말없이 거절하면 봇이 15초 동안 깨우기만
+            // 되풀이하다 쓰러졌다(사용자 2026-10-05 「회복을 제대로 안 쓴다」).
         }
 
         // 해제가 가장 먼저 — 수면(나르콜리)·빙결이면 주인은 아무것도 못 한다(사용자, 2026-09-26). 주문 사이(1초)를 다 기다리지
@@ -282,9 +289,11 @@ public sealed class CompanionBrain
     {
         TimeSpan now = reading.Now;
 
-        // 봇이 위험하면 먼저 이모탈(10초 무적) — 그동안 주인을 계속 채울 수 있다(사용자 2026-10-04 「이모탈을 배우면 여유가」).
+        // 괴물이 붙었거나 봇이 위험하면 먼저 이모탈(10초 무적) — 그동안 주인을 계속 채울 수 있다(사용자 2026-10-04 「이모탈을 배우면
+        // 여유가」). 체력 50% 아래를 기다리면 99 사냥터에서는 이미 늦어 쓰러진 뒤에 나갔다 — 괴물이 2칸 안이면 미리 건다.
         // 이미 무적(dion)이면 걸지 않는다 — 서버가 「이미 걸려있습니다」로 거절한다.
-        if (reading.CanCast && reading.SelfHurt && sight.StatusesOf(sight.Me)?.Contains("dion") != true
+        bool threatened = reading.SelfHurt || sight.Foes.Any(foe => Reckon.Steps(foe.At, sight.Standing) <= 2);
+        if (reading.CanCast && threatened && sight.StatusesOf(sight.Me)?.Contains("dion") != true
             && Best(sight, settings, CompanionSpells.Kind.Shield, sight.Me, reading.Empowered, reading.Mana, "무적") is { } shield)
         {
             return Cast(shield, now, heal: false);

@@ -54,6 +54,31 @@ public sealed class CompanionMagicTests
 
         Assert.Equal((CompanionAct.Cast, 20, Me), (new CompanionBrain().Next(Hurt(false), Defaults) is var step ? (step.Act, step.Slot, step.Target) : default));
         Assert.NotEqual(20, new CompanionBrain().Next(Hurt(true), Defaults).Slot);
+
+        // 체력이 멀쩡해도 괴물이 2칸 안에 붙으면 미리 건다 — 99 사냥터는 반 아래로 내려가면 늦다.
+        CompanionSight Near = Sight([Biter()], spells: spells) with { StatusesOf = _ => [] };
+        Assert.Equal(20, new CompanionBrain().Next(Near, Defaults).Slot);
+    }
+
+    [Fact]
+    public void Between_wakes_the_bot_still_heals_instead_of_only_waiting()
+    {
+        CompanionBrain brain = new();
+        CompanionSight Fallen(double seconds) => Sight([], seconds) with
+        {
+            HealthOf = _ => 1,
+            StatusesOf = serial => serial == Owner ? ["skulled"] : [],
+        };
+
+        Assert.Equal(CompanionAct.WakeOwner, brain.Next(Fallen(100), Defaults).Act);
+
+        // 깨우기가 안 먹어 아직 혼수 — 주문 사이(1초) 안에는 전처럼 기다리지 않고 다른 할 일을 본다(여기선 걸을 일이 없어 기다림이어도
+        // 깨우기 사이 기다림은 아니다).
+        Assert.NotEqual("주인 깨우기 사이", brain.Next(Fallen(100.5), Defaults).Why);
+
+        // 1초 뒤 — 다시 깨우기 전에 회복이 먼저(쿠로, 칸 1). 3초가 지나면 다시 깨운다.
+        Assert.Equal((CompanionAct.Cast, 1, Owner), (brain.Next(Fallen(101.1), Defaults) is var heal ? (heal.Act, heal.Slot, heal.Target) : default));
+        Assert.Equal(CompanionAct.WakeOwner, brain.Next(Fallen(103.2), Defaults).Act);
     }
 
     [Fact]
