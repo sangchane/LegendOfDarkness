@@ -251,19 +251,76 @@
       text("span", "drop-sum", "뭐라도 " + percent(any) + " · 장비 " + percent(gear) + " · " + monster.드랍.length + "가지"));
     line.appendChild(head);
 
-    var list = text("ul", "drop-chips");
-    monster.드랍.slice().sort(function (a, b) { return b.실제확률 - a.실제확률; }).forEach(function (drop) {
-      var hit = state.query && drop.이름.toLocaleLowerCase("ko").indexOf(state.query) >= 0;
-      var chip = text("li", "drop-chip is-" + drop.갈래 + (hit ? " is-hit" : "") + (drop.템플릿있음 ? "" : " is-missing"));
-      chip.append(text("span", "", drop.이름), text("small", "", percent(drop.실제확률)));
-      if (drop.요구레벨 > 1) { chip.appendChild(text("small", "", drop.요구레벨 + "Lv")); }
-      if (cosmetic(drop)) { chip.appendChild(text("em", "", "치장")); }
-      chip.title = (drop.분류 || drop.갈래) + " · 기준 " + drop.표확률 + " ×1.5 ÷ 목록";
-      list.appendChild(chip);
-    });
-    if (!monster.드랍.length) { list.appendChild(text("li", "monster-nodrop", "떨구는 것이 없습니다")); }
+    var list = text("div", "drop-cards");
+    shapes(monster.드랍).forEach(function (shape) { list.appendChild(shapeCard(shape)); });
+    if (!monster.드랍.length) { list.appendChild(text("p", "monster-nodrop", "떨구는 것이 없습니다")); }
     line.appendChild(list);
     return line;
+  }
+
+  // 아이템 도감의 아이콘 번호(items-data.js) — 같은 그림이면 같은 번호다.
+  var ICONS = new Map();
+  ((window.LOD_ITEMS && window.LOD_ITEMS.목록) || []).forEach(function (row) {
+    if (row.ic >= 0) { ICONS.set(row.ko || row.en, row.ic); }
+  });
+  var ICON_WIDTH = (window.LOD_ITEMS && window.LOD_ITEMS.아이콘 && window.LOD_ITEMS.아이콘.너비) || 37;
+
+  /** 같은 그림(아이콘 번호)의 물건을 한 묶음으로 — 접미사(로오의·화염의 …)만 다른 것이 많다. 합이 큰 차례. */
+  function shapes(drops) {
+    var byKey = new Map();
+    drops.forEach(function (drop) {
+      var ic = ICONS.has(drop.이름) ? ICONS.get(drop.이름) : -1;
+      var key = ic >= 0 ? "ic" + ic : "name" + drop.이름;
+      if (!byKey.has(key)) { byKey.set(key, { ic: ic, drops: [], sum: 0 }); }
+      var shape = byKey.get(key);
+      shape.drops.push(drop);
+      shape.sum += drop.실제확률;
+    });
+    var list = Array.from(byKey.values());
+    list.forEach(function (shape) { shape.drops.sort(function (a, b) { return b.실제확률 - a.실제확률; }); });
+    return list.sort(function (a, b) { return b.sum - a.sum; });
+  }
+
+  /** 묶음의 기본 이름 — 모두 「앞머리의 같은꼴」이면 그 꼴(은각반), 아니면 첫 이름. */
+  function baseName(shape) {
+    var tails = shape.drops.map(function (drop) { var at = drop.이름.indexOf("의"); return at > 0 ? drop.이름.slice(at + 1) : drop.이름; });
+    return tails.every(function (tail) { return tail === tails[0]; }) && shape.drops.length > 1 ? tails[0] : shape.drops[0].이름;
+  }
+
+  function shapeCard(shape) {
+    var first = shape.drops[0];
+    var hitAny = false;
+    var card = text("article", "drop-card is-" + first.갈래);
+    var icon = text("i", "item-icon");
+    if (shape.ic >= 0) { icon.style.backgroundPosition = "-" + (shape.ic * ICON_WIDTH) + "px 0"; } else { icon.classList.add("is-blank"); }
+    card.appendChild(icon);
+
+    var head = text("div", "drop-card-head");
+    var base = baseName(shape);
+    head.append(text("b", "", base), text("small", "", percent(shape.sum)));
+    if (first.요구레벨 > 1) { head.appendChild(text("small", "", first.요구레벨 + "Lv")); }
+    if (cosmetic(first)) { head.appendChild(text("em", "", "치장")); }
+    card.appendChild(head);
+
+    if (shape.drops.length > 1 || base !== first.이름) {
+      var variants = text("ul", "drop-variants");
+      shape.drops.forEach(function (drop) {
+        var hit = state.query && drop.이름.toLocaleLowerCase("ko").indexOf(state.query) >= 0;
+        hitAny = hitAny || hit;
+        var label = drop.이름.endsWith(base) && drop.이름 !== base ? drop.이름.slice(0, drop.이름.length - base.length).replace(/의$/, "") : drop.이름;
+        var item = text("li", (hit ? "is-hit" : "") + (drop.템플릿있음 ? "" : " is-missing"));
+        item.append(text("span", "", label), text("small", "", percent(drop.실제확률)));
+        item.title = drop.이름 + " · " + (drop.분류 || drop.갈래) + " · 기준 " + drop.표확률 + " ×1.5 ÷ 목록";
+        variants.appendChild(item);
+      });
+      card.appendChild(variants);
+    } else {
+      hitAny = Boolean(state.query) && first.이름.toLocaleLowerCase("ko").indexOf(state.query) >= 0;
+      card.title = first.이름 + " · " + (first.분류 || first.갈래) + " · 기준 " + first.표확률 + " ×1.5 ÷ 목록";
+      if (!first.템플릿있음) { card.classList.add("is-missing"); }
+    }
+    card.classList.toggle("is-hit", hitAny);
+    return card;
   }
 
   var cards = new Map();
