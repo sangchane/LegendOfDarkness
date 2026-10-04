@@ -51,6 +51,7 @@ public sealed class GearDropTests
         20373, 20393, 20394,
         20380, 20381, 20382, 20383, 20384, 20385, 20386, 20387, 20388,
         20015, 20016, 20017,
+        20834, 20846, // 서·북의우드랜드1-1(2026-10-04) — 노바엔 레벨문이 없어 동의 1-1 을 따른다
     ];
 
     /// <summary>
@@ -70,6 +71,13 @@ public sealed class GearDropTests
         (20586, "아벨해안2-a"), (20587, "아벨해안2-b"), (20588, "아벨해안2-c"),
         (20589, "아벨해안3-a"), (20590, "아벨해안3-b"), (20591, "아벨해안3-c"),
         (20592, "아벨해안4-a"), (20593, "아벨해안4-b"), (20594, "아벨해안4-c"),
+        // 서·북의우드랜드(2026-10-04, build-woodland-west-north.py) — 북4-1(20849)은 노바에 괴물이 없어 뺀다.
+        (20835, "서의우드랜드2-1"), (20836, "서의우드랜드3-1"), (20837, "서의우드랜드4-1"),
+        (20847, "북의우드랜드2-1"), (20848, "북의우드랜드3-1"),
+        (20838, "서의우드랜드5-1"), (20839, "서의우드랜드6-1"), (20840, "서의우드랜드7-1"), (20841, "서의우드랜드8-1"),
+        (20842, "서의우드랜드9-1"), (20843, "서의우드랜드9-2"), (20844, "서의우드랜드14-1"),
+        (20850, "북의우드랜드5-1"), (20851, "북의우드랜드6-1"), (20852, "북의우드랜드7-1"), (20853, "북의우드랜드8-1"),
+        (20854, "북의우드랜드9-1"), (20855, "북의우드랜드9-2"),
     ];
 
     /// <summary><c>FIELD_BOSSES</c> 가 관리하는 이름 — 아벨해안 일반 몹 잣대에서 뺀다.</summary>
@@ -163,6 +171,25 @@ public sealed class GearDropTests
         [20592] = [.. DefenseSuffixAt56],
         [20593] = [.. DefenseSuffixAt56],
         [20594] = [.. DefenseSuffixAt56],
+        [20835] = [.. DefenseSuffixRing11],
+        [20836] = [.. DefenseSuffixRing11],
+        [20837] = [.. DefenseSuffixRing11],
+        [20847] = [.. DefenseSuffixRing11],
+        [20848] = [.. DefenseSuffixRing11],
+        [20849] = [.. DefenseSuffixRing11],
+        [20838] = [.. DefenseSuffixAt41],
+        [20839] = [.. DefenseSuffixAt41],
+        [20840] = [.. DefenseSuffixAt41],
+        [20841] = [.. DefenseSuffixAt41],
+        [20842] = [.. DefenseSuffixAt41],
+        [20843] = [.. DefenseSuffixAt41],
+        [20844] = [.. DefenseSuffixAt41],
+        [20850] = [.. DefenseSuffixAt41],
+        [20851] = [.. DefenseSuffixAt41],
+        [20852] = [.. DefenseSuffixAt41],
+        [20853] = [.. DefenseSuffixAt41],
+        [20854] = [.. DefenseSuffixAt41],
+        [20855] = [.. DefenseSuffixAt41],
     };
 
     /// <summary>

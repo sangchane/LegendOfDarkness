@@ -23,6 +23,8 @@ public sealed class WorldMapTests : IDisposable
     private const int RucesionCoast = 20466;
     private const int OldMine = 20832;
     private const int DeathVillage = 20683;
+    private const int WestWoodland = 20833;
+    private const int NorthWoodland = 20845;
 
     private const string Name = "mapwalker";
 
@@ -71,13 +73,15 @@ public sealed class WorldMapTests : IDisposable
         WorldMapInfo field = world.Field!;
 
         Assert.Equal("field001", field.Field);
-        // 수오미·우드랜드·노비스마을 + 다시 연 마을 + 포테의숲·아벨해안·뤼케시온해안·구광산(사냥터 카드, 2026-10-02)·죽음의마을(2026-10-04).
-        Assert.Equal(8 + Reopened.Length, field.Nodes.Count);
+        // 수오미·우드랜드·노비스마을 + 다시 연 마을 + 포테의숲·아벨해안·뤼케시온해안·구광산(사냥터 카드, 2026-10-02)·죽음의마을·서의·북의우드랜드(2026-10-04).
+        Assert.Equal(10 + Reopened.Length, field.Nodes.Count);
         Assert.Equal(PoteForest, Assert.Single(field.Nodes, node => node.Name == "포테의숲").AreaId);
         Assert.Equal(AbelCoast, Assert.Single(field.Nodes, node => node.Name == "아벨해안").AreaId);
         Assert.Equal(RucesionCoast, Assert.Single(field.Nodes, node => node.Name == "뤼케시온해안").AreaId);
         Assert.Equal(OldMine, Assert.Single(field.Nodes, node => node.Name == "구광산").AreaId);
         Assert.Equal(DeathVillage, Assert.Single(field.Nodes, node => node.Name == "죽음의마을").AreaId);
+        Assert.Equal(WestWoodland, Assert.Single(field.Nodes, node => node.Name == "서의우드랜드").AreaId);
+        Assert.Equal(NorthWoodland, Assert.Single(field.Nodes, node => node.Name == "북의우드랜드").AreaId);
 
         // 들어가면 못 나오는 곳은 목록에 두지 않는다 — 드라큐라의성(20399)·크리스마스마을(20711) 에는
         // 밟을 수 있는 워프가 하나도 없어 걸어 나갈 수도 월드맵을 다시 열 수도 없다.
@@ -196,6 +200,9 @@ public sealed class WorldMapTests : IDisposable
         Assert.Contains(zones, zone => zone.Field == RucesionCoast);
         Assert.Contains(zones, zone => zone.Field == OldMine);
         Assert.Contains(zones, zone => zone.Field == DeathVillage);
+        // 서·북의우드랜드(2026-10-04)는 노바 워프에 레벨 제한이 없어(0~99) 1레벨도 구역마다 들어간다 — barred 에 넣지 않는다.
+        Assert.Contains(zones, zone => zone.Field == WestWoodland);
+        Assert.Contains(zones, zone => zone.Field == NorthWoodland);
         HashSet<int> barred = [PoteForest, AbelCoast, RucesionCoast, OldMine, DeathVillage];
         HashSet<int> tried = [];
 
@@ -285,10 +292,14 @@ public sealed class WorldMapTests : IDisposable
     /// (`Area.cs:205-207`). 지금 수오미마을에는 그것이 없어서 이 시험이 맞다 — NPC 가 하나 더 서거나
     /// 운영자가 칸을 막으면 147칸 길이 <see cref="Assert.Fail" /> 로 죽을 수 있다.
     /// </remarks>
-    internal static Func<Tile, bool> Walled(IsolatedHadesServer server, int mapId, int columns, int rows)
+    internal static Func<Tile, bool> Walled(IsolatedHadesServer server, int mapId, int columns, int rows) =>
+        Walled(server.ContentLocation, mapId, columns, rows);
+
+    /// <summary>서버를 띄우지 않고 자료 폴더(<c>database/server</c>)에서 바로 본다.</summary>
+    internal static Func<Tile, bool> Walled(string content, int mapId, int columns, int rows)
     {
-        byte[] sotp = File.ReadAllBytes(Path.Combine(server.ContentLocation, "static", "sotp.dat"));
-        byte[] map = File.ReadAllBytes(Path.Combine(server.ContentLocation, "maps", $"lod{mapId}.map"));
+        byte[] sotp = File.ReadAllBytes(Path.Combine(content, "static", "sotp.dat"));
+        byte[] map = File.ReadAllBytes(Path.Combine(content, "maps", $"lod{mapId}.map"));
 
         bool[,] wall = new bool[columns, rows];
         int at = 0;

@@ -130,6 +130,14 @@ GROUPS = [
     dict(name="아벨해안(일반 괴물)", areas=ABEL, entry=51,
          gear=[], potions={"상급체력포션": 0.3, "상급마력포션": 0.6},
          gear_min_slots=1),
+    # 서·북의우드랜드(2026-10-04) — 노바엔 레벨문이 없어 동의 같은 번호 구역의 단(build-gear-drops.py TIERS 와 같다).
+    # 노바 괴물은 잡템·포션이 없어(옛 목록 = 한 벌 장비 한 칸) 칸수가 적다 — `thin`: 이 무리 때문에 RATIO 가 오르면
+    # 모든 사냥터 목록이 바뀌므로, RATIO 는 다른 무리가 정하고 여기엔 칸수 × (RATIO-1) 만큼만 싣는다(2-1~4-1 은 90종 중 56종).
+    dict(name="서·북의우드랜드2-1~4-1", areas=[20835, 20836, 20837, 20847, 20848, 20849], entry=11,
+         gear=[], potions={}, gear_min_slots=1, thin=True),
+    dict(name="서·북의우드랜드5-1~", areas=[20838, 20839, 20840, 20841, 20842, 20843, 20844,
+                                         20850, 20851, 20852, 20853, 20854, 20855], entry=51,
+         gear=[], potions={}, gear_min_slots=1, thin=True),
 ]
 
 # 이 생성기가 처음 돌기 전(2026-09-26, 1.5배 전)의 DropRate — 기존 물건은 늘 여기서 다시 계산한다.
@@ -315,7 +323,8 @@ def fill_gear(items, monsters):
     # 다르면 한쪽 괴물의 합이 100% 를 넘는다. 가장 많이 필요한 사냥터에 맞춘다.
     global RATIO
     # 정수 배율 — 칸수를 반올림하면 괴물마다 배율이 조금씩 달라져 합이 넘는다.
-    RATIO = 1 + math.ceil(max(len(g["gear"]) / max(1, g["slots"]) for g in GROUPS))
+    # `thin` 무리(옛 목록이 한 칸뿐인 괴물만 있는 곳)는 배율을 정하지 않는다 — 실을 수 있는 만큼만(돌림 차례대로) 싣는다.
+    RATIO = 1 + math.ceil(max(len(g["gear"]) / max(1, g["slots"]) for g in GROUPS if not g.get("thin")))
 
 
 RATIO = 1.0
