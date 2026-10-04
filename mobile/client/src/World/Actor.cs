@@ -336,9 +336,6 @@ public sealed partial class Actor : Node2D
             return;
         }
 
-        // 모든 동작을 10% 느리게(사용자 2026-10-02).
-        secondsPerFrame *= Tuning.MotionSlowdown;
-
         if (_sheet.Motion is null)
         {
             List<Texture2D?> sheets = [];

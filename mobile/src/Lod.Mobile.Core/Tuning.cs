@@ -8,15 +8,12 @@ namespace Lod.Mobile.Core;
 /// </summary>
 public static class Tuning
 {
-    /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in — 30% slower than the
-    /// original 0.28 so the walk can actually be seen on a phone (사용자, 2026-09-24), then 10% slower again (사용자, 2026-10-02).</summary>
+    /// <summary>How long one tile takes to walk, and how many frames that walk is drawn in — chosen by feel (사용자,
+    /// 2026-09-24·10-02) and close to the original's own step, 114ms × 4 = 0.456 s (docs/speed-reference.md).</summary>
     public const double StepSeconds = 0.44;
 
     /// <summary>방향키: 보고 있지 않은 쪽을 누르면 먼저 돌기만 하고, 이만큼 더 누르고 있어야 걷는다(원작처럼, 사용자 2026-10-02).</summary>
     public const double TurnHoldSeconds = 0.2;
-
-    /// <summary>몸 동작(평타·기술) 한 프레임을 서버가 말한 것보다 이만큼 길게 — 10% 느리게(사용자 2026-10-02).</summary>
-    public const double MotionSlowdown = 1.1;
 
     /// <summary>
     /// 레벨업 점수 계획: Hades <c>Class</c> 번호 → 능력치마다 목표치(<see cref="StatPlan" />). 번호는

@@ -281,14 +281,14 @@ public sealed partial class WorldView
                 continue;
             }
 
-            if (BodyMotion.Of(motion.Number) is { } body
-                && (_herd.ContainsKey(motion.Serial) || BodyMotion.Fits(motion.Number, ArmourOf(world, motion.Serial))))
-            {
-                actor.Play(body, body.SecondsPerFrame(motion.Speed));
-            }
-            else if (_herd.ContainsKey(motion.Serial))
+            // 괴물은 동작 번호·속도를 무시하고 평타만, 한 장 0.3초(원작 Legend.exe 0x59e95d).
+            if (_herd.ContainsKey(motion.Serial))
             {
                 actor.Strike();
+            }
+            else if (BodyMotion.Of(motion.Number) is { } body && BodyMotion.Fits(motion.Number, ArmourOf(world, motion.Serial)))
+            {
+                actor.Play(body, body.SecondsPerFrame(motion.Speed));
             }
             else if (Emote.Of(motion.Number) is { } emote)
             {

@@ -311,8 +311,8 @@ MNS197 은 걷기 0~4 가 뒷모습, 5~9 가 앞모습, 공격 10~11 · 12~13. �
 (128 성직자 시전 · 131 발차기 · 132 주먹 · 133 돌려차기 · 136 마법사 시전 … 145 소환). 참고 저장소 둘이 같은
 이름표를 갖고 있다 — `Arbiter/Arbiter.Net/Types/BodyAnimation.cs`, `ETDA/BotCore/Types/Action.cs`.
 `6`(HandsUp)은 `03` 파일의 0·1 칸이다(3.3절) — 하데스는 성직자·마법사가 아닌 직업이 마법을 쓸 때 이것을 보낸다.
-속도(`ServerFormat1A.Speed`)는 **동작 전체를 1/100초로 적은 것으로 읽는다** — 적힌 곳은 없고, 하데스 평타의
-30 이 그동안 그리던 한 칸 0.14초와 맞아서 그렇게 정했다(`BodyMotion.SecondsPerFrame`).
+속도(`ServerFormat1A.Speed`)는 **그림 한 장을 1/100초로 적은 것이다** — 원작 exe 가 속도 × 10ms 를 한 장 간격으로
+쓴다(Legend.exe 2005 `0x54ac37`, `docs/speed-reference.md`). 괴물은 속도를 무시하고 평타 한 장 300ms(`BodyMotion.SecondsPerFrame`).
 5.99 스크립트는 1 · 128~139 · 142 를 쓰고, 가장 많은 것은 `motion 137, 50` 이다.
 
 스킬·주문 템플릿에는 효과 번호가 들어 있다(`SkillTemplate.TargetAnimation`,
