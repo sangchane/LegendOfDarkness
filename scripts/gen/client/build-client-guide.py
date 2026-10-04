@@ -77,7 +77,7 @@ def main() -> None:
 
             if area in names:
                 name = names[area]
-                places.add((area, max(1, levels.get(area, 1)), "town" if "마을" in name else "field", name))
+                places.add((area, max(1, levels.get(area, 1)), "town" if name.endswith("마을") else "field", name))
 
             # 구역은 자료에 적힌 차례 그대로.
             for zone in portal.get("Zones") or []:
