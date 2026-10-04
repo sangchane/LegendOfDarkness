@@ -63,6 +63,8 @@ MAPS = [
     20683,  # 죽음의마을입구5 — 마인마을 워프로 닿는다
     20679, 20680, 20681, 20682,  # 죽음의마을1~4 (2026-10-04 사용자, scripts/gen/world/build-death-village.py)
     *range(20657, 20679),  # 신죽마집안 16장 · 신죽음의마을1-1~1-6 — 죽음의마을1 빈집털이 NPC 로 든다(같은 생성기)
+    20719,  # 호러캐슬메인홀 — 입구5 호러캐슬입장이 보낸다(2026-10-04, scripts/gen/world/build-horror-castle.py)
+    20714,  # 호러캐슬1 — 파티 방 사본(map_create)이 이 맵 번호를 알린다
     *range(20797, 20833),  # 구광산 대기실 + 1-1~29-1 (2026-10-02 사용자, scripts/gen/world/build-old-mine.py)
     *range(20455, 20467),  # 뤼케시온해안 대기실·1-A~4-C (2026-10-02 사용자, scripts/gen/world/build-rucesion-coast.py)
 ]
