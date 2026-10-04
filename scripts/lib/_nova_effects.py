@@ -48,7 +48,8 @@ OLD_LIST_ADD = {"리젠(Lev1)": ('p.Call("hprecovery"', "v_target", 187, 100),
 SOUND_FROM = "노바"
 # 무도가 템플릿 소리를 다른 기술과 같게 — 백보신권은 노바에 없어 단각 소리로(사용자 2026-09-30 "단각이랑 같은 사운드로").
 # SOUND_FROM 과 상관없이 늘 건다.
-SOUND_SAME_AS = {"백보신권": "단각"}
+# 선풍각은 붕각과 이펙트·소리가 같고 범위만 다르다(사용자 2026-10-04) — 노바 소리 18 대신 붕각 소리.
+SOUND_SAME_AS = {"백보신권": "단각", "선풍각": "붕각"}
 SOUND = re.compile(r'^(?P<head>\s*p\.Call\("game_sound", \(V\))(?P<n>\d+)(?P<rest>L, .*?;)(?P<tail>\s*// 노바 소리\(5\.99: (?P<was>\d+)\))?\s*$')
 SOUND_IN_PACK = re.compile(r"\b(?:game_sound|sound)\s+(\d+)")
 
