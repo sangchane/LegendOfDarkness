@@ -7,6 +7,7 @@
   <title>LOD 개발 대시보드</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="dashboard.css?v=20261002c">
+  <link rel="stylesheet" href="activity.css">
 </head>
 <body class="toss-surface">
 <a class="skip-link" href="#workspace">본문으로 건너뛰기</a>
@@ -21,6 +22,7 @@
       <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템 도감</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도·워프</button>
       <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
+      <button type="button" class="nav-item" data-view-target="activity"><span aria-hidden="true">◷</span>접속·활동</button>
       <button type="button" class="nav-item" data-view-target="download"><span aria-hidden="true">⤓</span>앱 내려받기</button>
     </nav>
   </aside>
@@ -85,7 +87,8 @@
 
         <div class="filterbar item-filterbar">
           <label class="visually-hidden" for="monster-search">괴물 검색</label>
-          <input id="monster-search" type="search" placeholder="이름·맵 이름으로 찾기" autocomplete="off">
+          <input id="monster-search" type="search" placeholder="괴물·맵·떨구는 물건 이름으로 찾기" autocomplete="off">
+          <div class="item-filter-row" role="group" aria-label="보기"><span>보기</span><div class="item-chips" id="monster-views"></div></div>
           <div class="item-filter-row" role="group" aria-label="지역"><span>지역</span><div class="item-chips" id="monster-regions"></div></div>
           <div class="item-filter-row" role="group" aria-label="맵"><span>맵</span><div class="item-chips" id="monster-maps"></div></div>
           <div class="item-filter-row" role="group" aria-label="정렬"><span>정렬</span><div class="item-chips" id="monster-sorts"></div></div>
@@ -98,6 +101,7 @@
         </div>
 
         <div class="monster-grid" id="monster-grid"></div>
+        <div class="drop-table" id="monster-droptable" hidden></div>
         <p class="empty-state" id="monster-empty" hidden>조건에 맞는 괴물이 없어요. 필터를 지워 보세요.</p>
         <div class="item-hover" id="monster-hover" hidden aria-hidden="true"></div>
 
@@ -278,6 +282,34 @@
         <p class="empty-state" id="change-empty" hidden>조건에 맞는 항목이 없어요.</p>
       </section>
 
+      <section class="view" data-view="activity" aria-labelledby="activity-title" hidden>
+        <header class="page-heading"><div><p class="eyebrow">관리자 전용</p><h1 id="activity-title">접속·활동 기록</h1><p>웹 방문과 앱 전송, 캐릭터 접속과 게임 활동을 날짜별로 봅니다.</p></div></header>
+        <form id="activity-filter" class="activity-filter">
+          <label>시작일<input type="date" id="activity-from" required></label>
+          <label>종료일<input type="date" id="activity-to" required></label>
+          <label>게임 캐릭터<input type="search" id="activity-player" maxlength="64" placeholder="전체 캐릭터"></label>
+          <label class="activity-bots"><input type="checkbox" id="activity-bots">동료 봇 포함</label>
+          <button type="submit" class="session-button" id="activity-refresh">조회</button>
+        </form>
+        <p id="activity-status" role="status">관리자 로그인 후 조회할 수 있습니다.</p>
+        <div id="activity-results" hidden>
+          <div id="activity-summary" class="activity-summary"></div>
+          <p class="activity-note">한국 시각 · 90일 보관 · 앱 통계 날짜는 서버 수신일 기준 · IP/브라우저는 접속 환경이며 사람·기기 신원을 확정하지 않습니다. 다운로드는 GET 파일 전송(부분 전송 포함), 설치 완료 여부는 알 수 없습니다. 방문에는 자동 수집기가 포함됩니다.</p>
+          <h2>날짜별 통계</h2><div id="activity-daily" class="activity-table"></div>
+          <h2>웹 방문자 · 접속 환경</h2><div id="activity-visitors" class="activity-table"></div>
+          <h2>앱 다운로드 전송</h2><div id="activity-downloads" class="activity-table"></div>
+          <h2>게임 캐릭터 통계</h2><p class="activity-note">처리한 기술·마법 등 요청 수는 성공 횟수와 다릅니다. 접속 시간은 종료된 세션 기준, 경험치·금화는 기록 구간의 순변화입니다.</p><div id="activity-players" class="activity-table"></div>
+          <h2>동시 접속 · 재방문</h2><p id="activity-observation" class="activity-note"></p><div id="activity-concurrency" class="activity-table"></div><div id="activity-returning" class="activity-table"></div><div id="activity-retention" class="activity-table"></div>
+          <h2>앱 기기 · 운영체제 · 버전</h2><p class="activity-note">앱이 보고한 값입니다. 설치 식별자는 임의로 만들며 재설치하면 달라질 수 있습니다. 기기 신원이나 Wi-Fi 이름을 증명하지 않습니다.</p><div id="activity-devices" class="activity-table"></div>
+          <h2>접속 실패 · 앱 오류</h2><p class="activity-note">비정상 종료(unclean_exit)는 강제 종료·운영체제 종료·크래시를 구분하지 못합니다. 앱 기록과 이전 실행의 진단(previous_run_exception)은 다음 로그인 성공 때 전송될 수 있으며, 인증 전 진단은 로그인한 계정에서 발생했는지 확정하지 않습니다. 서버 시각은 수신 기준이고 앱 보고 시각은 앱 시계 기준입니다. 이전 종료 진단의 시각은 발견한 시각입니다. 사유와 예외 종류만 수집하며 입력 내용·오류 메시지·대화는 수집하지 않습니다.</p><div id="activity-diagnostics" class="activity-table"></div>
+          <h2>화면 이용 · 버튼 · 이탈</h2><p class="activity-note">화면·버튼은 코드로 표시하며 입력한 글은 기록하지 않습니다. 앱이 서버에 보낸 표본의 집계로, 전송하지 못한 마지막 구간은 빠질 수 있습니다.</p><div id="activity-screens" class="activity-table"></div><div id="activity-buttons" class="activity-table"></div><div id="activity-exits" class="activity-table"></div>
+          <h2>아이템 · 금화 · 경험치 원장</h2><p class="activity-note">실제 상태 변화 기준입니다. 이동은 획득·소비와 따로 보며, 보정(reconcile)은 관측 사이 변화입니다. 사유는 서버 코드 경로입니다. 기존 순변화와 원장을 더하면 중복됩니다.</p><div id="activity-economy" class="activity-table"></div><div id="activity-ledger" class="activity-table"></div>
+          <h2>캐릭터에 남아 있는 누적 기록</h2><p class="activity-note">기간 필터와 별개로 현재 저장된 레벨·경험치·금화·처치 기록입니다. 처치 횟수는 게임 서버가 귀속시킨 카운터이며 이전 날짜별 내역은 알 수 없습니다. 서버 저장 주기만큼 늦을 수 있습니다.</p><div id="activity-saved" class="activity-table"></div><div id="activity-monsters" class="activity-table"></div>
+          <h2>게임 행동 통계</h2><div id="activity-actions" class="activity-table"></div>
+          <h2>최근 게임 활동</h2><p class="activity-note">상세 표는 각각 최근 200행입니다. 더 이전 기록은 날짜/캐릭터로 좁혀 조회하세요. 도입 이전 활동·접속 시간은 복구할 수 없습니다. 요청은 60초마다 묶어 기록하며 강제 종료 직전 구간은 빠질 수 있습니다.</p><div id="activity-events" class="activity-table"></div>
+        </div>
+      </section>
+
       <section class="view" data-view="download" aria-labelledby="download-title" hidden>
         <div class="page-heading"><div><p class="eyebrow">Download</p><h1 id="download-title">앱 내려받기</h1><p>받는 사람에게는 공개 페이지 주소를 보내면 됩니다. 아이폰은 그 사람의 컴퓨터에서 Sideloadly 로, PC 는 압축만 풀고 실행합니다.</p></div></div>
         <div class="download-grid">
@@ -295,6 +327,6 @@
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
 <script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
-<script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="activity.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="abilities.js"></script><script src="items.js"></script>
 </body>
 </html>

@@ -163,6 +163,8 @@ def monster_rows(wanted, facts):
                     "직업": item.get("Class") or 0,
                     "요구레벨": item.get("LevelRequired") or 0,
                     "템플릿있음": name in facts,
+                    # 팩이 나눈 파일(5.99표/투구/치장아이템 …) — 치장·장식은 나중에 드랍에서 뺄지 정한다(사용자 2026-10-04).
+                    "분류": item.get("Group") or "",
                 })
                 left = max(0, left - weight)
 

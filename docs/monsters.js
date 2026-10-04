@@ -16,7 +16,9 @@
   var empty = document.querySelector("#monster-empty");
   var hover = document.querySelector("#monster-hover");
   var section = grid.closest(".view");
-  var state = { query: "", region: "", map: "", sort: "exp", level: 1 };
+  var VIEWS = [{ id: "card", 이름: "카드", 끌수있나: false }, { id: "drops", 이름: "드랍표", 끌수있나: false }];
+  var table = document.querySelector("#monster-droptable");
+  var state = { query: "", region: "", map: "", sort: "exp", level: 1, view: "card" };
   // 눌러서(탭해서) 고정한 괴물. 고정되면 마우스가 떠나거나 초점이 빠져도 풍선이 남는다.
   var pinned = null, shownFor = null;
 
@@ -227,7 +229,41 @@
     if (state.region && monster.지역 !== state.region) { return false; }
     if (state.map && String(monster.맵번호) !== state.map) { return false; }
     if (!state.query) { return true; }
-    return (monster.이름 + " " + monster.맵).toLocaleLowerCase("ko").indexOf(state.query) >= 0;
+    var names = monster.드랍.map(function (drop) { return drop.이름; }).join(" ");
+    return (monster.이름 + " " + monster.맵 + " " + names).toLocaleLowerCase("ko").indexOf(state.query) >= 0;
+  }
+
+  /** 팩이 치장·장식으로 나눈 장비 — 나중에 드랍에서 뺄지 정하려고 표시만 한다(사용자 2026-10-04). */
+  function cosmetic(drop) { return /치장|장식/.test(drop.분류 || ""); }
+
+  function percent(value) { return (value * 100).toFixed(value < 0.01 ? 2 : 1) + "%"; }
+
+  /** 드랍표 한 줄 — 괴물 하나가 떨구는 것 전부를 확률 차례로. */
+  function dropLine(monster) {
+    var line = text("article", "drop-line");
+    var any = 0, gear = 0;
+    monster.드랍.forEach(function (drop) {
+      any += drop.실제확률;
+      if (drop.갈래 === "장비") { gear += drop.실제확률; }
+    });
+    var head = text("header", "");
+    head.append(text("b", "", monster.이름), text("span", "monster-where", monster.맵 + " · " + monster.맵번호),
+      text("span", "drop-sum", "뭐라도 " + percent(any) + " · 장비 " + percent(gear) + " · " + monster.드랍.length + "가지"));
+    line.appendChild(head);
+
+    var list = text("ul", "drop-chips");
+    monster.드랍.slice().sort(function (a, b) { return b.실제확률 - a.실제확률; }).forEach(function (drop) {
+      var hit = state.query && drop.이름.toLocaleLowerCase("ko").indexOf(state.query) >= 0;
+      var chip = text("li", "drop-chip is-" + drop.갈래 + (hit ? " is-hit" : "") + (drop.템플릿있음 ? "" : " is-missing"));
+      chip.append(text("span", "", drop.이름), text("small", "", percent(drop.실제확률)));
+      if (drop.요구레벨 > 1) { chip.appendChild(text("small", "", drop.요구레벨 + "Lv")); }
+      if (cosmetic(drop)) { chip.appendChild(text("em", "", "치장")); }
+      chip.title = (drop.분류 || drop.갈래) + " · 기준 " + drop.표확률 + " ×1.5 ÷ 목록";
+      list.appendChild(chip);
+    });
+    if (!monster.드랍.length) { list.appendChild(text("li", "monster-nodrop", "떨구는 것이 없습니다")); }
+    line.appendChild(list);
+    return line;
   }
 
   var cards = new Map();
@@ -252,9 +288,19 @@
     var order = SORTS.find(function (s) { return s.id === state.sort; }) || SORTS[0];
     var shown = data.괴물.filter(matches).slice().sort(function (a, b) { return order.재다(a) - order.재다(b); });
 
+    chips(document.querySelector("#monster-views"), VIEWS, state.view, function (id) { state.view = id; render(); });
+
+    var asTable = state.view === "drops";
+    grid.hidden = asTable;
+    table.hidden = !asTable;
     grid.replaceChildren();
+    table.replaceChildren();
     cards = new Map();
-    shown.forEach(function (monster) { grid.appendChild(card(monster)); });
+    if (asTable) {
+      shown.forEach(function (monster) { table.appendChild(dropLine(monster)); });
+    } else {
+      shown.forEach(function (monster) { grid.appendChild(card(monster)); });
+    }
     empty.hidden = shown.length !== 0;
 
     // 열려 있던 풍선은 새 카드에 다시 붙여 새 레벨의 값으로 그린다. 걸러져 사라졌으면 닫는다.
