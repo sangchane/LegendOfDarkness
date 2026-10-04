@@ -178,7 +178,8 @@ public partial class Main : Control
     {
         BotCurse = System.Math.Clamp(curse, -1, CurseChoices.Length - 1);
         BotSleep = sleep;
-        BotPriest = priest & CompanionSpells.Priest.All;
+        // 10-04 전 저장(넷 다 켬 = 15)은 새로 생긴 콜라마·벨라르모도 켠다.
+        BotPriest = priest == (CompanionSpells.Priest)15 ? CompanionSpells.Priest.All : priest & CompanionSpells.Priest.All;
         BotHeal = System.Math.Clamp(heal, -1, HealChoices.Length - 1);
         BotGroupHeal = System.Math.Clamp(groupHeal, -1, GroupHealChoices.Length - 1);
         BotFollow = System.Math.Clamp(follow, 1, 10);

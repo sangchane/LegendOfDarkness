@@ -43,7 +43,10 @@ public static class CompanionSpells
         Disoruma = 2,
         Horrama = 4,
         Enarma = 8,
-        All = Dinarcoli | Disoruma | Horrama | Enarma,
+        // 콜라마·벨라르모(사용자 2026-10-04 「버프류에 없다」).
+        Colama = 16,
+        Belra = 32,
+        All = Dinarcoli | Disoruma | Horrama | Enarma | Colama | Belra,
     }
 
     /// <summary>회복 셀렉트의 차례(약한 것부터) — 값 0 은 자동, k 는 k 번째까지(그 안에서 마력이 닿는 가장 센 것), <see cref="HealOff" /> 는 끄기.</summary>
@@ -70,6 +73,8 @@ public static class CompanionSpells
             "디소루마" => Priest.Disoruma,
             "호르라마" => Priest.Horrama,
             "에나르마" => Priest.Enarma,
+            "콜라마" => Priest.Colama,
+            "벨라르모" => Priest.Belra,
             _ => Priest.None,
         };
 
@@ -111,6 +116,7 @@ public static class CompanionSpells
         Cure,
         Curse,
         Sleep,
+        Shield,
     }
 
     /// <param name="State">버프는 서버가 알리는 상태 이름(5.99 스크립트의 horrama·enare), 해제는 푸는 디버프 이름.</param>
@@ -136,6 +142,9 @@ public static class CompanionSpells
         ["엑스쿠라네라"] = new(Kind.GroupHeal, 70, 430),
         ["호르라마"] = new(Kind.Buff, 0, 55, 120, "horrama"),
         ["에나르마"] = new(Kind.Buff, 0, 40, 150, "enare"),
+        // 5.99 SPELL_벨라르모 belra(120초) · SPELL_콜라마 hprecovery(10초, 지능+400 최대 1500) — 상태 이름은 Pack599 의 Belra·Regen.Slot.
+        ["벨라르모"] = new(Kind.Buff, 0, 50, 120, "노바 벨라르모"),
+        ["콜라마"] = new(Kind.Buff, 0, 0, 10, "5.99 체력회복"),
         // 5.99 SPELL_디나르콜리 mobnar_end → 하데스 수면(sleep), SPELL_디소루마 mobsor_end → 빙결(frozen). 30마력.
         ["디나르콜리"] = new(Kind.Cure, 0, 30, 0, "sleep"),
         ["디소루마"] = new(Kind.Cure, 0, 30, 0, "frozen"),
@@ -145,6 +154,8 @@ public static class CompanionSpells
         ["데프레코"] = new(Kind.Curse, 35, 65, 120, Icon: CurseIcon),
         ["프라보"] = new(Kind.Curse, 45, 130, 120, Icon: CurseIcon),
         ["나르콜리"] = new(Kind.Sleep, 0, 50, 20, Icon: SleepIcon),
+        // 5.99 성직자 SPELL_이모탈 — 50마력, 80% 로 자기 10초 무적(immortal → 하데스 dion). 봇이 위험할 때 스스로 건다(사용자 2026-10-04).
+        ["이모탈"] = new(Kind.Shield, 0, 50, 10, "dion"),
     };
 
     /// <summary>포션 하나가 채우는 양 — AutoPotion 의 두 목록과 같은 이름들.</summary>

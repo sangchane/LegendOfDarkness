@@ -196,7 +196,9 @@ public sealed class CompanionBrain
         return Emergency(sight, settings, reading)
                ?? Recover(sight, settings, reading)
                ?? Maintain(sight, settings, reading)
-               ?? Assist(sight, settings, reading)
+               // 주인이 다친 동안은 저주·나르콜리를 쉬고 다음 회복을 기다린다 — 회복 사이(1.5초)마다 저주를 끼워 넣다가 쓰러진
+               // 주인을 못 살렸다(사용자 2026-10-04).
+               ?? (reading.OwnerHurt ? null : Assist(sight, settings, reading))
                ?? Follow(sight, settings, reading.Now)
                ?? (reading.Mana < reading.Cheapest
                    ? new(CompanionAct.Rest, Why: "마력 부족")
@@ -279,6 +281,14 @@ public sealed class CompanionBrain
     private CompanionStep? Recover(CompanionSight sight, CompanionSettings settings, Reading reading)
     {
         TimeSpan now = reading.Now;
+
+        // 봇이 위험하면 먼저 이모탈(10초 무적) — 그동안 주인을 계속 채울 수 있다(사용자 2026-10-04 「이모탈을 배우면 여유가」).
+        // 이미 무적(dion)이면 걸지 않는다 — 서버가 「이미 걸려있습니다」로 거절한다.
+        if (reading.CanCast && reading.SelfHurt && sight.StatusesOf(sight.Me)?.Contains("dion") != true
+            && Best(sight, settings, CompanionSpells.Kind.Shield, sight.Me, reading.Empowered, reading.Mana, "무적") is { } shield)
+        {
+            return Cast(shield, now, heal: false);
+        }
 
         // 주인 회복(둘 다 아프면 파티 회복).
         if (reading.CanHeal && reading.OwnerHurt)

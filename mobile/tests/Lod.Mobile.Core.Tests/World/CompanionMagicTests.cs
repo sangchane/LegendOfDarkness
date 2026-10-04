@@ -43,6 +43,33 @@ public sealed class CompanionMagicTests
     };
 
     [Fact]
+    public void A_bot_in_danger_shields_itself_with_immortal_unless_already_shielded()
+    {
+        IReadOnlyList<LearnedSpell> spells = [.. Level41, Spell(20, "이모탈")];
+        CompanionSight Hurt(bool shielded) => Sight([Struck()], spells: spells) with
+        {
+            Vitals = Vitals.Unknown with { Health = 100, MaximumHealth = 500, Mana = 500, MaximumMana = 500 },
+            StatusesOf = serial => serial == Me && shielded ? ["dion"] : [],
+        };
+
+        Assert.Equal((CompanionAct.Cast, 20, Me), (new CompanionBrain().Next(Hurt(false), Defaults) is var step ? (step.Act, step.Slot, step.Target) : default));
+        Assert.NotEqual(20, new CompanionBrain().Next(Hurt(true), Defaults).Slot);
+    }
+
+    [Fact]
+    public void While_the_owner_is_hurt_the_bot_heals_and_does_not_curse_between_heals()
+    {
+        CompanionBrain brain = new();
+        CompanionSight Hurt(double seconds) => Sight([Struck()], seconds) with { HealthOf = _ => 20 };
+
+        Assert.Equal((CompanionAct.Cast, 1, Owner), (brain.Next(Hurt(100), Defaults) is var heal ? (heal.Act, heal.Slot, heal.Target) : default));
+
+        // 회복 사이(1.5초) 안, 주문 사이(1초)는 지났다 — 전에는 여기서 저주를 걸었다(사용자 2026-10-04: 쓰러진 주인 옆에서 저주·나르콜리).
+        Assert.NotEqual(CompanionAct.Cast, brain.Next(Hurt(101.1), Defaults).Act);
+        Assert.Equal((CompanionAct.Cast, 1), (brain.Next(Hurt(101.6), Defaults) is var again ? (again.Act, again.Slot) : default));
+    }
+
+    [Fact]
     public void The_monster_the_owner_fights_gets_the_strongest_curse_it_can_pay_for()
     {
         CompanionStep step = new CompanionBrain().Next(Sight([Struck()]), Defaults);

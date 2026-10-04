@@ -76,6 +76,7 @@ public sealed partial class SettingsPanel : PanelContainer
             BotRow(name, Switch((Main.BotPriest & bit) != 0, on => Order(priest: on ? Main.BotPriest | bit : Main.BotPriest & ~bit)));
         bot.AddChild(Pair(PriestSwitch("디나르콜리", CompanionSpells.Priest.Dinarcoli), PriestSwitch("디소루마", CompanionSpells.Priest.Disoruma)));
         bot.AddChild(Pair(PriestSwitch("호르라마", CompanionSpells.Priest.Horrama), PriestSwitch("에나르마", CompanionSpells.Priest.Enarma)));
+        bot.AddChild(Pair(PriestSwitch("콜라마", CompanionSpells.Priest.Colama), PriestSwitch("벨라르모", CompanionSpells.Priest.Belra)));
         ShowBotLevel(0);
 
         // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
