@@ -19,7 +19,6 @@ SPEC `plans/woodland-west-north-spec-2026-10-04.md`. 지금 서버의 「우드�
 """
 import hashlib
 import json
-import math
 import shutil
 import statistics
 import struct
@@ -56,10 +55,10 @@ NEW_LINKS = [("9-1", "10-1"), ("10-1", "11-1"), ("11-1", "12-1"), ("12-1", "13-1
 GATE_HINT = 21                         # 입구 위 가장자리에서 14-1 로 나가는 칸 — 서 노바 길(21~22,0) 자리
 SOTP = SERVER / "static" / "sotp.dat"
 # 앞 구역을 복사해 채운 구역은 「조금씩 세지게」(사용자 2026-10-04) — 복사 원본에서 한 구역 나아갈 때마다 체력·공격(최소·최대)을
-# 같은 배율로 곱하고, 경험치는 원본의 경험치/체력 비율 그대로(체력 따라), 방어·마릿수·종류는 그대로. 배율은 줄 끝 구역이 그 드랍 층과
-# 레벨이 맞는 기존 사냥터 괴물 세기(종마다 한 마리, 체력·최소 공격의 가운데 값)에 닿게: 13-1(56층) = 아벨해안(51~), 20-1(86층) =
-# 뤼케시온해안(71~98). 한 배율로 둘 다 맞출 수 없어(노바 우드랜드는 체력에 비해 공격이 낮다) 두 비율의 기하평균을 끝까지의 구역 수로
-# 나눈다. 그 값이 구역마다 5% 보다 작으면(끝이 원본보다 약하면) 구역마다 5%. 곁방 17-2·19-2 는 같은 번호 구역과 같다.
+# 곱하고(체력·공격은 따로 — 사용자 2026-10-04, 노바 우드랜드는 체력에 비해 공격이 낮아 한 배율로는 둘 다 못 맞춘다), 최대 공격은
+# 최소와 같은 배율, 경험치는 원본의 경험치/체력 비율 그대로(체력 따라), 방어·마릿수·종류는 그대로. 배율은 줄 끝 구역의 체력·최소 공격이
+# 각각 그 드랍 층과 레벨이 맞는 기존 사냥터 괴물 세기(종마다 한 마리, 가운데 값)에 닿게: 13-1(56층) = 아벨해안(51~), 20-1(86층) =
+# 뤼케시온해안(71~98). 구역마다 5% 보다 작으면(그 값의 목표가 원본보다 약하면) 그 값만 구역마다 5%. 곁방 17-2·19-2 는 같은 번호 구역과 같다.
 REACH = {13: SERVER / "templates" / "monsters" / "5.99", 20: SERVER / "templates" / "monsters" / "뤼케시온해안"}
 REACH_GLOB = {13: "*@아벨해안*.json", 20: "*.json"}
 LEAST_STEP = 1.05
@@ -153,17 +152,18 @@ def stronger(side, mobs, copies, said):
         end = 13 if number(source) < 14 else 20
         hp, hit = strength([m for n, m in mobs if n.endswith(f"@{source}")])
         ref_hp, ref_hit = strength([read_lenient_json(p) for p in REACH[end].glob(REACH_GLOB[end])])
-        reach = math.sqrt(ref_hp / hp * ref_hit / hit)
-        step = max(LEAST_STEP, reach ** (1 / (end - number(source))))
+        zones = end - number(source)
+        hp_step = max(LEAST_STEP, (ref_hp / hp) ** (1 / zones))
+        hit_step = max(LEAST_STEP, (ref_hit / hit) ** (1 / zones))
         said.append(f"{source} → {side}{end}-1: 원본 체력 {hp:,.0f}·최소공격 {hit:,.0f}, 견줄 곳 {ref_hp:,.0f}·{ref_hit:,.0f}"
-                    f" → 끝 배율 {reach:.2f} · 구역마다 ×{step:.3f}")
+                    f" → 구역마다 체력 ×{hp_step:.3f} · 공격 ×{hit_step:.3f}")
         for n, m in mobs:
             zone = n.split("@")[1]
             if copies.get(zone) == source:
-                k = step ** (number(zone) - number(source))
+                k = number(zone) - number(source)
                 per_hp = m["Exp"] / m["MaximumHP"]
-                for key in ("MaximumHP", "DmgMin", "DmgMax"):
-                    m[key] = round(m[key] * k)
+                m["MaximumHP"] = round(m["MaximumHP"] * hp_step ** k)
+                m["DmgMin"], m["DmgMax"] = (round(m[key] * hit_step ** k) for key in ("DmgMin", "DmgMax"))
                 m["Exp"] = round(m["MaximumHP"] * per_hp)
 
 
