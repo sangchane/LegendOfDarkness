@@ -149,7 +149,14 @@ public partial class GameScreen : Control
             _world.UseSkill(slot);
         };
         _world.BarSkills = _abilities.PlacedSkills;
+        _world.BarSpells = _abilities.PlacedSpells;
+        _world.AimsAtEnemy = AimsAtEnemy;
+        _abilities.AimsAtEnemy = AimsAtEnemy;
         _abilities.SpellUsed += slot => UseSpell(slot);
+
+        // 괴물을 겨누는 마법 칸을 끌면 조준, 떼면 그 괴물에(사용자 2026-10-04 — 모바일 롤처럼).
+        _abilities.AimMoved += drag => _world.AimEnemy(drag);
+        _abilities.AimReleased += slot => UseSpell(slot, aimed: true);
         _abilities.LoadSlots = Main.LoadAbilitySlots;
         _abilities.SaveSlots = Main.SaveAbilitySlots;
 
@@ -187,7 +194,9 @@ public partial class GameScreen : Control
     /// Targeted spells use the figure selected in the world. Everything else sends zero, which Hades
     /// deliberately turns into the caster. Typed-input spells need their prompt UI before they are usable.
     /// </summary>
-    private void UseSpell(int slot)
+    private bool AimsAtEnemy(LearnedSpell spell) => Main.Kit.AimsAtEnemy(_server?.Path, spell.Name);
+
+    private void UseSpell(int slot, bool aimed = false)
     {
         LearnedSpell? spell = _server?.Spells.FirstOrDefault(one => one.Slot == slot);
 
@@ -200,6 +209,23 @@ public partial class GameScreen : Control
             or SpellTargetType.ThreeDigit or SpellTargetType.TwoDigit or SpellTargetType.OneDigit)
         {
             Notify($"{spell.Name}: 입력 창이 필요한 마법입니다.");
+            return;
+        }
+
+        // 괴물을 겨누는 마법(직업 표의 「적」): 탭은 고른 괴물, 없으면 가장 가까운 괴물 — 끌어 조준했으면 이미 고른 그 괴물.
+        if (AimsAtEnemy(spell))
+        {
+            uint enemy = aimed ? _world.AimedEnemy() : _world.EnemyTarget();
+
+            if (enemy == 0)
+            {
+                Notify("가까운 괴물이 없습니다.");
+                return;
+            }
+
+            _world.FoughtByHand();
+            _world.UseSpell(spell.Slot, enemy);
+            GD.Print($"GREYBOX_AIM {spell.Name} → {enemy} {(aimed ? "조준" : "탭")}");
             return;
         }
 

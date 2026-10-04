@@ -514,9 +514,11 @@ public partial class GameScreen : Control
             : LayoutCheck.PretendStatuses);
 
         ShowTarget();
+        // 직업 표(class-kit.txt)에 있는 것만 막대·배치 목록·자동 사냥에 — 무도가는 열 가지(사용자 2026-10-04).
+        int? path = _server?.Path;
         _abilities.Show(
-            _server?.Skills ?? LayoutCheck.PretendSkills,
-            _server?.Spells ?? LayoutCheck.PretendSpells,
+            [.. (_server?.Skills ?? LayoutCheck.PretendSkills).Where(one => Main.Kit.Shows(path, false, one.Name))],
+            [.. (_server?.Spells ?? LayoutCheck.PretendSpells).Where(one => Main.Kit.Shows(path, true, one.Name))],
             _server?.Self?.Name ?? string.Empty);
 
         if (_server is { } talking && talking.TalkCount != _talked)

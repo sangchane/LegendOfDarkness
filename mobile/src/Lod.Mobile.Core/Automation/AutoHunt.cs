@@ -52,6 +52,9 @@ public enum HuntAct
 
     /// <summary>기술 칸 하나를 쓴다(<see cref="HuntStep.Slot"/> 은 기술 칸).</summary>
     Skill,
+
+    /// <summary>괴물에게 마법을 쓴다(<see cref="HuntStep.Slot"/> 은 마법 칸, <see cref="HuntStep.Target"/> 은 그 괴물).</summary>
+    Cast,
 }
 
 /// <param name="Why">무엇 때문에 — 멈출 때는 사람에게 보일 한 줄, 그 밖에는 시험·기록용.</param>
@@ -76,8 +79,11 @@ public sealed record HuntSight
     /// <summary>기술 부채꼴에 놓인 기술.</summary>
     public IReadOnlyList<LearnedSkill> Skills { get; init; } = [];
 
-    /// <summary>배운 마법 전부 — 회복 계열을 여기서 찾는다.</summary>
+    /// <summary>기술 막대에 놓인 마법 — 회복 계열을 여기서 찾는다(사용자 2026-10-04: 자동 사냥은 막대에 놓인 것만).</summary>
     public IReadOnlyList<LearnedSpell> Spells { get; init; } = [];
+
+    /// <summary>그 가운데 괴물을 겨누는 마법(직업 표의 「적」 — 다라밀공). 기술 다음, 평타 앞에 대상 괴물에 쓴다.</summary>
+    public IReadOnlyList<LearnedSpell> EnemySpells { get; init; } = [];
 
     /// <summary>(기술인가, 칸) → 남은 초. 0 이면 쓸 수 있다.</summary>
     public Func<bool, int, int> Cooling { get; init; } = (_, _) => 0;
@@ -137,6 +143,7 @@ public sealed class AutoHunt
 
     private readonly Dictionary<uint, TimeSpan> _shunned = [];
     private readonly Dictionary<int, (TimeSpan At, bool Cooled)> _skillUsed = [];
+    private readonly Dictionary<int, TimeSpan> _spellCast = [];
     private readonly List<(Tile Where, TimeSpan At)> _drops = [];
 
     private int _map;
@@ -407,6 +414,19 @@ public sealed class AutoHunt
             _lastAct = sight.Now;
             _struckTarget = true;
             return new(HuntAct.Skill, Slot: skill.Slot, Target: prey.Serial, Why: skill.Name);
+        }
+
+        // 막대의 「적」 마법 — 식는 중이 아니고, 마력이 모자라 서버가 말없이 거절해도 두드리지 않게 기술과 같은 간격(SkillRetry)으로.
+        LearnedSpell? spell = sight.EnemySpells.FirstOrDefault(one =>
+            sight.Cooling(false, one.Slot) == 0
+            && (!_spellCast.TryGetValue(one.Slot, out TimeSpan cast) || sight.Now - cast >= SkillRetry));
+
+        if (spell is not null)
+        {
+            _spellCast[spell.Slot] = sight.Now;
+            _lastAct = sight.Now;
+            _struckTarget = true;
+            return new(HuntAct.Cast, Slot: spell.Slot, Target: prey.Serial, Why: spell.Name);
         }
 
         if (sight.Now - _lastStrike >= StrikeGap)

@@ -25,6 +25,18 @@ public sealed partial class AbilityBar : Control
         }
     }
 
+    /// <summary>Presses the slot showing this spell on the first page — <c>--skill m다라밀공</c>. Nothing when it is not there.</summary>
+    public void PressSpell(string name)
+    {
+        Press(-1, spell: true);
+        int index = System.Array.FindIndex(_drawn, shown => shown is LearnedSpell one && one.Name.StartsWith(name, System.StringComparison.Ordinal));
+
+        if (index >= 0)
+        {
+            Use(index);
+        }
+    }
+
     /// <summary>--slot-hold N: 서버 없이 확인할 때, 자리를 잡고 잠시 뒤 N번째 칸을 길게 누른 셈 친다.</summary>
     private void RehearseSlotHold()
     {

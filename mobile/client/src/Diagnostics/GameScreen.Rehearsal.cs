@@ -78,7 +78,15 @@ public partial class GameScreen : Control
         // "m3" 은 마법 쪽 세 번째 칸이다.
         bool spell = Main.Ability.StartsWith('m');
 
-        if (Main.Ability.Length == 0 || !int.TryParse(spell ? Main.Ability[1..] : Main.Ability, out int slot))
+        if (Main.Ability.Length == 0)
+        {
+            return;
+        }
+
+        // "m다라밀공" — 마법 쪽에서 이 이름이 놓인 칸.
+        bool named = !int.TryParse(spell ? Main.Ability[1..] : Main.Ability, out int slot);
+
+        if (named && !spell)
         {
             return;
         }
@@ -91,6 +99,13 @@ public partial class GameScreen : Control
         }
 
         _skillWait = 0;
+
+        if (named)
+        {
+            _abilities.PressSpell(Main.Ability[1..]);
+            return;
+        }
+
         _abilities.Press(slot - 1, spell);
     }
 

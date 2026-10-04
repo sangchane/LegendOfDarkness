@@ -108,9 +108,11 @@ public sealed class AbilityArrangement
 
         HashSet<int> placed = [.. _removedSlots];
 
-        foreach (int there in _positions.Values)
+        // 막대가 줄어 그려지지 않는 자리(count 밖)에 놓인 것은 놓이지 않은 것으로 본다 — 직업 표로 거르면 쪽이 줄어
+        // 3쪽에 놓아 둔 기술이 막대에서도 자동 사냥에서도 사라졌다(리뷰 2026-10-04). 빈 칸으로 다시 들어온다.
+        foreach ((int position, int there) in _positions)
         {
-            if (there != Cleared)
+            if (there != Cleared && position < count)
             {
                 placed.Add(there);
             }

@@ -200,4 +200,15 @@ public sealed class AbilityArrangementTests
         Assert.Empty(skills.Positions);
         Assert.Empty(spells.Positions);
     }
+
+    [Fact]
+    public void Something_placed_beyond_a_shrunken_bar_comes_back_into_an_empty_slot()
+    {
+        AbilityArrangement arrangement = new();
+        arrangement.Assign(12, 7);
+
+        IReadOnlyList<Item?> filled = arrangement.Fill(Learned(5, 7), item => item.Slot, 6);
+
+        Assert.Equal([5, 7, null, null, null, null], filled.Select(item => item?.Slot));
+    }
 }

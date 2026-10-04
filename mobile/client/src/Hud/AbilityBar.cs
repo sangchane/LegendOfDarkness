@@ -172,6 +172,7 @@ public sealed partial class AbilityBar : Control
             slot.ButtonDown += () => OnSlotDown(which);
             slot.ButtonUp += () => OnSlotUp(which);
             slot.Pressed += () => Use(which);
+            slot.GuiInput += touched => OnSlotMotion(which, touched);
 
             _slots[index] = slot;
             Place(slot, AbilityFan.Slots[index], AbilityFan.ButtonSide);
@@ -337,10 +338,16 @@ public sealed partial class AbilityBar : Control
     {
         _down[index] = true;
         _longHeld[index] = false;
+        _aiming[index] = false;
         _downAt[index] = Time.GetTicksMsec();
+        _pressedAt[index] = GetGlobalMousePosition();
     }
 
-    private void OnSlotUp(int index) => _down[index] = false;
+    private void OnSlotUp(int index)
+    {
+        _down[index] = false;
+        EndAim(index);
+    }
 
     private void Use(int index)
     {
@@ -455,7 +462,9 @@ public sealed partial class AbilityBar : Control
 
         (int? path, int level) = RehearsedStanding(Standing?.Invoke() ?? (null, 0));
 
-        foreach (RosterRow entry in Main.Ladder.Roster(path, level, _learnedSkills, _learnedSpells))
+        // 직업 표(class-kit.txt)에 없는 것은 「N레벨에 배움」 줄도 보이지 않는다.
+        foreach (RosterRow entry in Main.Ladder.Roster(path, level, _learnedSkills, _learnedSpells)
+                     .Where(row => Main.Kit.Shows(path, row.Spell, row.Name)))
         {
             Button row = Row(entry.Name, Frame(entry.Spell ? SpellSheet : SkillSheet, entry.Icon));
 

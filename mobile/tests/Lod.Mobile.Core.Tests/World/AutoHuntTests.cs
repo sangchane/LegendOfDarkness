@@ -156,6 +156,27 @@ public sealed class AutoHuntTests
     }
 
     [Fact]
+    public void An_enemy_spell_on_the_bar_goes_at_the_prey_after_skills_and_rests_like_a_skill()
+    {
+        AutoHunt hunt = Started();
+        LearnedSpell daramil = new(7, 39, SpellTargetType.ChooseTarget, "다라밀공", string.Empty, 0);
+
+        HuntSight At(double seconds) => Sight(facing: Direction.East, creatures: [Beast(1, 11, 10)], seconds: seconds) with
+        {
+            Skills = [new LearnedSkill(2, 2, "붕각")],
+            Spells = [daramil],
+            EnemySpells = [daramil],
+        };
+
+        Assert.Equal(HuntAct.Skill, hunt.Next(At(10), Defaults).Act);
+
+        HuntStep cast = hunt.Next(At(10.6), Defaults);
+        Assert.Equal((HuntAct.Cast, 7, 1u), (cast.Act, cast.Slot, cast.Target));
+
+        Assert.Equal(HuntAct.Strike, hunt.Next(At(11.3), Defaults).Act);
+    }
+
+    [Fact]
     public void Healing_and_body_moving_skills_are_not_for_fighting()
     {
         Assert.False(AutoHunt.IsForFighting("쿠로토"));

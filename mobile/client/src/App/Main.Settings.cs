@@ -377,6 +377,19 @@ public partial class Main : Control
     }
 
     private static Lod.Mobile.Core.Model.LearnLadder? _ladder;
+    private static Lod.Mobile.Core.Model.ClassKit? _kit;
+
+    /// <summary>직업마다 보일 기술·마법과 마법의 대상(<c>assets/world/class-kit.txt</c>, <see cref="Lod.Mobile.Core.Model.ClassKit" />). 없으면 빈 표 — 다 보인다.</summary>
+    public static Lod.Mobile.Core.Model.ClassKit Kit => _kit ??= LoadKit();
+
+    private static Lod.Mobile.Core.Model.ClassKit LoadKit()
+    {
+        const string path = "res://assets/world/class-kit.txt";
+
+        return Godot.FileAccess.FileExists(path)
+            ? Lod.Mobile.Core.Model.ClassKit.Read(Godot.FileAccess.GetFileAsString(path))
+            : Lod.Mobile.Core.Model.ClassKit.Empty;
+    }
 
     /// <summary>
     /// 레벨이 되면 저절로 배우는 표 — 서버와 같은 것(<c>scripts/gen/ability/build-auto-learn.py</c> → <c>assets/world/auto-learn.txt</c>).

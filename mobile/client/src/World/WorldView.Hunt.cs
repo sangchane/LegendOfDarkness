@@ -159,7 +159,8 @@ public sealed partial class WorldView
             HealthOf = world.Health,
             FoughtByOthers = serial => world.StruckByOthers(serial, ContestedFor),
             Skills = BarSkills?.Invoke() ?? [],
-            Spells = world.Spells,
+            Spells = BarSpells?.Invoke() ?? [],
+            EnemySpells = [.. (BarSpells?.Invoke() ?? []).Where(one => AimsAtEnemy?.Invoke(one) == true && Main.Kit.AutoCasts(world.Path, one.Name))],
             Cooling = world.CoolingFor,
             PotionReady = Main.HealthPotion.Enabled && AutoPotion.Count(world.Pack, Main.HealthPotion.Potion) > 0,
             AutoLoot = Main.AutoLoot,
@@ -197,6 +198,9 @@ public sealed partial class WorldView
                 break;
             case HuntAct.Skill:
                 UseSkill(step.Slot);
+                break;
+            case HuntAct.Cast:
+                UseSpell(step.Slot, step.Target);
                 break;
         }
     }
