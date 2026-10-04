@@ -41,6 +41,16 @@ public sealed partial class ChatPanel : PanelContainer
         KeepEditingOnTextSubmit = true
     };
 
+    // 운영자 명령 고를 거리 — `/` 로 시작하면 입력 줄 위에 단추로 늘어선다(사용자 2026-10-04). 옆으로 민다.
+    private readonly HBoxContainer _picks = new();
+    private readonly ScrollContainer _pickRow = new()
+    {
+        Visible = false,
+        VerticalScrollMode = ScrollContainer.ScrollMode.Disabled,
+        CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+    };
+    private static GmCompletion? _gm;
+
     // 키보드가 올라와 자리가 모자라면 접는 탭 줄, 그리고 창을 들어 올린 만큼.
     private readonly HBoxContainer _head = new();
     private float _lift;
@@ -93,6 +103,10 @@ public sealed partial class ChatPanel : PanelContainer
         Greybox.Commit(send);
         send.Pressed += Say;
         _typed.TextSubmitted += _ => Say();
+        _typed.TextChanged += Offer;
+
+        _picks.AddThemeConstantOverride("separation", Main.Gutter);
+        _pickRow.AddChild(_picks);
 
         HBoxContainer typing = new();
         typing.AddThemeConstantOverride("separation", Main.Gutter);
@@ -104,6 +118,7 @@ public sealed partial class ChatPanel : PanelContainer
 
         body.AddChild(head);
         body.AddChild(_scroll);
+        body.AddChild(_pickRow);
         body.AddChild(typing);
         PanelContainer inside = new();
         inside.AddThemeStyleboxOverride("panel", Greybox.Sheet());
@@ -149,8 +164,42 @@ public sealed partial class ChatPanel : PanelContainer
 
         Sent?.Invoke(line);
         _typed.Clear();
+        Offer(string.Empty);
         _typed.GrabFocus();
     }
+
+    /// <summary>
+    /// 친 글에 맞는 명령·이름을 단추로 늘어놓는다. 누르면 그 줄로 바꾸고 이어 친다 — 키보드는 그대로(초점 없는 단추).
+    /// </summary>
+    private void Offer(string typed)
+    {
+        foreach (Node pick in _picks.GetChildren())
+        {
+            pick.QueueFree();
+        }
+
+        _gm ??= new GmCompletion(Godot.FileAccess.FileExists(GmNames) ? Godot.FileAccess.GetFileAsString(GmNames) : string.Empty);
+        IReadOnlyList<(string Label, string Text)> picks = _gm.Suggest(typed);
+        _pickRow.Visible = picks.Count > 0;
+
+        foreach ((string label, string text) in picks)
+        {
+            Button pick = new() { Text = label, CustomMinimumSize = new Vector2(0, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
+            Greybox.Plain(pick);
+            pick.Pressed += () =>
+            {
+                _typed.Text = text;
+                _typed.CaretColumn = text.Length;
+                _typed.GrabFocus();
+                Offer(text);
+            };
+            _picks.AddChild(pick);
+        }
+
+        _pickRow.ScrollHorizontal = 0;
+    }
+
+    private const string GmNames = "res://assets/gm-names.txt";
 
     private static Button Tab(string name)
     {

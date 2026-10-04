@@ -1,0 +1,2528 @@
+# tools: scripts/gen/client/build-gm-names.py 가 서버 템플릿에서 만든다. 손으로 고치지 말 것.
+item 2갱도열쇠
+item 3갱도열쇠
+item 70라피드
+item Apple
+item A구역파편
+item Blouse
+item B구역파편
+item C구역파편
+item D구역파편
+item Effect-개나리
+item Effect-근두운
+item Effect-레인보우
+item Effect-박쥐
+item Effect-버블버블
+item Effect-벚꽃
+item Effect-불의장막
+item Effect-빛의장막
+item Effect-소나기
+item Effect-유령
+item Effect-패기
+item Effect-하트
+item E구역파편
+item F구역파편
+item Gramail Prayer Necklace
+item K4
+item Luathas Bronze Shield
+item Luathas Coral Earrings
+item Shagreen Boots
+item Shirt
+item Spider's Eye
+item 가릉비가1
+item 가릉비가2
+item 가위
+item 가이아로럼
+item 가이아로럼수
+item 가이아로럼토
+item 가이아로럼풍
+item 가이아로럼화
+item 가죽가방
+item 가죽각반
+item 가죽방패
+item 가죽장갑
+item 강아지가방
+item 강화날각
+item 강화된리젠트다이아귀걸이
+item 강화된세피라링
+item 개미더듬이
+item 거북이등껍질
+item 검은색보석
+item 검정두건
+item 겨울목도리
+item 견습자의글러브
+item 고대유물
+item 고대의매직솔라
+item 고대의홀리솔라
+item 고사목뿌리
+item 고양이가방
+item 고양이꼬리
+item 고양이머리띠
+item 곡단도
+item 골드아쿠아링
+item 골드크리스탈
+item 골든플레이트
+item 골든플레이트수
+item 골든플레이트토
+item 골든플레이트투구
+item 골든플레이트풍
+item 골든플레이트화
+item 곰가방
+item 광단검
+item 광단검수
+item 광단검토
+item 광단검풍
+item 광단검화
+item 광대안경
+item 광산드레스
+item 구리방패
+item 권투장갑
+item 귀족의상(남)
+item 귀족의상(여)
+item 그라디우스
+item 그라디우스수
+item 그라디우스토
+item 그라디우스풍
+item 그라디우스화
+item 그랑죠
+item 그래브의집게
+item 그린토닉
+item 그린팜팻의알
+item 그린하이토닉
+item 그린하트각반
+item 그림록퀸홀
+item 글러브1
+item 금가위
+item 금각반
+item 금벨트
+item 금장갑
+item 금전표큐빅
+item 기사단방패
+item 긴수염
+item 꼬꼬댁의상
+item 꼬끼오가방
+item 꼬뜨
+item 꼬뜨수
+item 꼬뜨토
+item 꼬뜨풍
+item 꼬뜨화
+item 꽃장식FX
+item 꿈의바다
+item 나겔링문
+item 나겔링스타
+item 나겔링썬
+item 나겔링파워
+item 날각
+item 날개방패
+item 남자돼지의상
+item 남자산타복
+item 너가바
+item 너구리모자
+item 네비리스트
+item 네크로브
+item 네크로브수
+item 네크로브토
+item 네크로브풍
+item 네크로브화
+item 노란두건
+item 노란바람개비
+item 노랑색보석
+item 노미쉬레더
+item 노미쉬레더수
+item 노미쉬레더토
+item 노미쉬레더풍
+item 노미쉬레더화
+item 노비스마을리콜
+item 노엠마을리콜
+item 놀의단검
+item 니에가방
+item 다이아몬드
+item 다크디아나
+item 다크로럼
+item 다크로럼수
+item 다크로럼토
+item 다크로럼풍
+item 다크로럼화
+item 다크로브
+item 다크베일
+item 다크서클릿
+item 다크코로나
+item 다크크로어
+item 다크홀
+item 다크후드
+item 단도복
+item 단도복수
+item 단도복토
+item 단도복풍
+item 단도복화
+item 단독군장
+item 달마티카
+item 달마티카수
+item 달마티카토
+item 달마티카풍
+item 달마티카화
+item 닭고기
+item 대양도복
+item 대양도복수
+item 대양도복토
+item 대양도복풍
+item 대양도복화
+item 대왕관
+item 대지의가죽벨트
+item 대지의금벨트
+item 대지의금옥목걸이
+item 대지의루나사벨트
+item 대지의룬스톤목걸이
+item 대지의마기아목걸이
+item 대지의목걸이
+item 대지의벨트
+item 대지의별목걸이
+item 대지의별벨트
+item 대지의세일라링
+item 대지의씰
+item 대지의은벨트
+item 대지의진주목걸이
+item 대지의크리스탈목걸이
+item 대지의홀디트링
+item 대지의흑요석목걸이
+item 데메테르1
+item 데메테르2
+item 데스나이트의방패
+item 도가메카옷
+item 도복
+item 도복수
+item 도복토
+item 도복풍
+item 도복화
+item 도적메카옷
+item 독거미알
+item 독수리날개
+item 돈파
+item 돌괭이
+item 동각반
+item 동굴쥐의꼬리
+item 동굴지네의껍질
+item 동장갑
+item 둠
+item 듀크
+item 드라나이트
+item 드라큐라의팬던트
+item 드래곤슬레이어
+item 드래곤윙
+item 똥먹어
+item 라멜1
+item 라멜2
+item 라비린스메일
+item 라비린스메일수
+item 라비린스메일토
+item 라비린스메일풍
+item 라비린스메일화
+item 라이언방패
+item 라이온악세
+item 라이트닝액스
+item 라피스라즐리1
+item 라피스라즐리2
+item 러브핑크홀리데이숄더
+item 러브핑크홀리데이코트
+item 런닝복(빨)
+item 런닝복(파)
+item 레더로브
+item 레더로브수
+item 레더로브토
+item 레더로브풍
+item 레더로브화
+item 레더메일
+item 레더튜닉
+item 레더튜닉수
+item 레더튜닉토
+item 레더튜닉풍
+item 레더튜닉화
+item 레드굴18층
+item 레드다이아반지
+item 레드아이가면
+item 레드자스퍼
+item 레드토닉
+item 레드팜팻의알
+item 레드하이토닉
+item 레드하트각반
+item 레몬색염색약
+item 레오파드1
+item 레오파드2
+item 레인저건
+item 레인저아머
+item 레인저암
+item 레인저액스
+item 레인헌트각반
+item 레인헌트아머
+item 레인헌트장갑
+item 레인헌트투구
+item 레일라1
+item 레일라2
+item 로럼
+item 로럼수
+item 로럼토
+item 로럼풍
+item 로럼화
+item 로브
+item 로브수
+item 로브토
+item 로브풍
+item 로브화
+item 로열도적무기
+item 로열법사무기
+item 로열전사무기
+item 로열직자무기
+item 로오의가죽각반
+item 로오의가죽방패
+item 로오의가죽장갑
+item 로오의가죽팔찌
+item 로오의고루반지
+item 로오의구리방패
+item 로오의금각반
+item 로오의금반지
+item 로오의금장갑
+item 로오의금제방패
+item 로오의금팔찌
+item 로오의기사단방패
+item 로오의녹옥반지
+item 로오의동각반
+item 로오의동장갑
+item 로오의동팔찌
+item 로오의루비귀걸이
+item 로오의반지
+item 로오의빛
+item 로오의사파이어반지
+item 로오의산호귀걸이
+item 로오의산호반지
+item 로오의순옥귀걸이
+item 로오의신발
+item 로오의쌍금귀걸이
+item 로오의쌍은귀걸이
+item 로오의은각반
+item 로오의은장갑
+item 로오의은제방패
+item 로오의은총
+item 로오의은팔찌
+item 로오의자수정반지
+item 로오의철방패
+item 로오의플라늄방패
+item 로오의현철반지
+item 로오의호안석반지
+item 로오의홍옥반지
+item 로즈힐
+item 로즈힐가면
+item 로톤로더
+item 로톤로더모자
+item 로톤마을리콜
+item 로톤캐프린
+item 로톤프릴
+item 루돌프빨간코
+item 루딘의귀걸이
+item 루비
+item 루어스길드복
+item 루어스길드옷
+item 루어스길드칼
+item 루캐티윙
+item 루크1
+item 루크2
+item 뤼케시온길드복
+item 뤼케시온길드옷
+item 뤼케시온길드칼
+item 뤼케시온마을리콜
+item 리본
+item 리젠트다이아귀걸이
+item 리콜
+item 리쿠리쿠
+item 릴리
+item 마도코어
+item 마도코어달스톤
+item 마도코어별스톤
+item 마도코어해스톤
+item 마라디움
+item 마르두크1
+item 마르두크2
+item 마법학교교복(남)
+item 마법학교교복(여)
+item 마스터아머1
+item 마스터아머2
+item 마스터투구1
+item 마스터투구2
+item 마아트1
+item 마아트2
+item 마이소시아정식
+item 마인로더
+item 마인마을리콜
+item 마인프릴
+item 마퀴스
+item 막대사탕
+item 매단검
+item 매단검수
+item 매단검토
+item 매단검풍
+item 매단검화
+item 매스커레이드
+item 매스커레이드수
+item 매스커레이드토
+item 매스커레이드풍
+item 매스커레이드화
+item 매스케이드
+item 매스케이드수
+item 매스케이드토
+item 매스케이드풍
+item 매스케이드화
+item 매직로브
+item 매직로브수
+item 매직로브토
+item 매직로브풍
+item 매직로브화
+item 매직루나
+item 매직리스트
+item 매직마르시아
+item 매직머큐리아
+item 매직베일
+item 매직세페우스
+item 매직솔라
+item 매직스커트
+item 매직스커트수
+item 매직스커트토
+item 매직스커트풍
+item 매직스커트화
+item 매직아룬다이트
+item 매직쥬피티아
+item 매직파나
+item 매직프람베르그
+item 맨틀
+item 맨틀수
+item 맨틀토
+item 맨틀풍
+item 맨틀화
+item 머쉬룸켓
+item 머플러
+item 멋쟁이의상
+item 메가토닉
+item 메론바
+item 메카닉큐브1
+item 메카닉큐브2
+item 메카던전대기실
+item 메투스의가죽각반
+item 메투스의가죽방패
+item 메투스의가죽장갑
+item 메투스의가죽팔찌
+item 메투스의고루반지
+item 메투스의구리방패
+item 메투스의금각반
+item 메투스의금반지
+item 메투스의금장갑
+item 메투스의금제방패
+item 메투스의금팔찌
+item 메투스의기사단방패
+item 메투스의녹옥반지
+item 메투스의동각반
+item 메투스의동장갑
+item 메투스의동팔찌
+item 메투스의레더부츠
+item 메투스의루비귀걸이
+item 메투스의마그마부츠
+item 메투스의매직부츠
+item 메투스의바이올렛티
+item 메투스의사파이어반지
+item 메투스의산호귀걸이
+item 메투스의산호반지
+item 메투스의순옥귀걸이
+item 메투스의신발
+item 메투스의쌍금귀걸이
+item 메투스의쌍은귀걸이
+item 메투스의은각반
+item 메투스의은장갑
+item 메투스의은제방패
+item 메투스의은팔찌
+item 메투스의자수정반지
+item 메투스의철방패
+item 메투스의플라늄방패
+item 메투스의현철반지
+item 메투스의호안석반지
+item 메투스의홍옥반지
+item 메투스의회색신발
+item 멜로더의정수
+item 목깃장식
+item 몸통없는유령
+item 무당벌레장식
+item 무상관
+item 무상도복
+item 문어군
+item 물안경
+item 뮤레칸글러브+1
+item 뮤레칸디그+1
+item 뮤레칸로그강화석
+item 뮤레칸몽크강화석
+item 뮤레칸소서러강화석
+item 뮤레칸스냅+1
+item 뮤레칸워리어강화석
+item 뮤레칸의갑옷+1
+item 뮤레칸의갑주+1
+item 뮤레칸의로그각반+1
+item 뮤레칸의로그귀걸이+1
+item 뮤레칸의로그반지+1
+item 뮤레칸의로그장갑+1
+item 뮤레칸의몽크각반+1
+item 뮤레칸의몽크귀걸이+1
+item 뮤레칸의몽크반지+1
+item 뮤레칸의몽크팔찌+1
+item 뮤레칸의소서러각반+1
+item 뮤레칸의소서러귀걸이+1
+item 뮤레칸의소서러반지+1
+item 뮤레칸의소서러장갑+1
+item 뮤레칸의워리어각반+1
+item 뮤레칸의워리어귀걸이+1
+item 뮤레칸의워리어반지+1
+item 뮤레칸의워리어장갑+1
+item 뮤레칸의프리스트각반+1
+item 뮤레칸의프리스트귀걸이+1
+item 뮤레칸의프리스트반지+1
+item 뮤레칸의프리스트장갑+1
+item 뮤레칸입장티켓
+item 뮤레칸투구
+item 뮤레칸프리스트강화석
+item 미네르바반브레스
+item 미네르바브레이스
+item 미션두루마리A
+item 미션두루마리B
+item 미스릴배틀핸드
+item 미스릴부츠
+item 미스틱로브
+item 미스틱로브수
+item 미스틱로브토
+item 미스틱로브풍
+item 미스틱로브화
+item 미이라
+item 밀레스길드복
+item 밀레스길드옷
+item 밀레스길드칼
+item 밀레스마을리콜
+item 밀집모자
+item 바나나맛바
+item 바다의가죽벨트
+item 바다의금벨트
+item 바다의금옥목걸이
+item 바다의루나사벨트
+item 바다의룬스톤목걸이
+item 바다의마기아목걸이
+item 바다의목걸이
+item 바다의벨트
+item 바다의별목걸이
+item 바다의별벨트
+item 바다의세일라링
+item 바다의씰
+item 바다의은벨트
+item 바다의진주목걸이
+item 바다의크리스탈목걸이
+item 바다의홀디트링
+item 바다의흑요석목걸이
+item 바다해적옷1
+item 바다해적옷2
+item 바드하프(Lev18)
+item 바드하프(Lev8)
+item 바람개비
+item 바람의가죽벨트
+item 바람의금벨트
+item 바람의금옥목걸이
+item 바람의루나사벨트
+item 바람의룬스톤목걸이
+item 바람의마기아목걸이
+item 바람의목걸이
+item 바람의벨트
+item 바람의별목걸이
+item 바람의별벨트
+item 바람의세일라링
+item 바람의씰
+item 바람의은벨트
+item 바람의진주목걸이
+item 바람의크리스탈목걸이
+item 바람의홀디트링
+item 바람의흑요석목걸이
+item 바람처럼
+item 바론
+item 바르도클
+item 바르도클수
+item 바르도클토
+item 바르도클풍
+item 바르도클화
+item 바베큐
+item 바이런의반지
+item 바즈컨트
+item 바크의척추뼈
+item 발찌
+item 방독면
+item 배틀부츠
+item 배틀액스
+item 백팩
+item 백호악세
+item 뱀고기
+item 버터플라이윙
+item 벌꿀
+item 법사메카옷
+item 베가리스트
+item 베네티각반
+item 베누스타
+item 베누스타수
+item 베누스타토
+item 베누스타풍
+item 베누스타화
+item 베크나탑리콜
+item 벨벳
+item 벨트
+item 별각반
+item 별귀걸이
+item 별머리띠
+item 별목걸이
+item 별반지
+item 별벨트
+item 별의귀걸이
+item 별의심장
+item 별장갑
+item 병아리가방
+item 보라두건
+item 보로보로껍질
+item 보로보로냥껍질
+item 보리
+item 보리임
+item 보우(Lev18)
+item 보우(Lev8)
+item 복주머니
+item 분홍두건
+item 분홍색염색약
+item 분홍색튜브
+item 분홍토끼글러브
+item 분홍토끼머리띠
+item 불가사리
+item 불의장막+1
+item 붉은두건
+item 브레스럭각반
+item 브레스럭아머
+item 브레스럭장갑
+item 브레스럭투구
+item 브레이사
+item 브레이스글러브
+item 브론즈굴16층
+item 브리간딘
+item 브리간딘수
+item 브리간딘토
+item 브리간딘풍
+item 브리간딘화
+item 브릴윙각반
+item 브릴윙아머
+item 브릴윙장갑
+item 브릴윙투구
+item 블랙드레스
+item 블랙슈트
+item 블랙팜귀걸이
+item 블랙팜목걸이
+item 블레이드(Lev18)
+item 블레이드(Lev8)
+item 블루굴14층
+item 블루굴8층
+item 블루다이아반지
+item 블루블랙염색약
+item 블루토닉
+item 블루피치
+item 블루하이토닉
+item 블팜검투사옷(Lev18)
+item 블팜검투사옷(Lev8)
+item 블팜궁수옷(Lev18)
+item 블팜궁수옷(Lev8)
+item 블팜바드옷(Lev18)
+item 블팜바드옷(Lev8)
+item 블팜소환사옷(Lev18)
+item 블팜소환사옷(Lev8)
+item 블팜수인옷(Lev18)
+item 블팜수인옷(Lev8)
+item 비승최강길드복
+item 비승최강길드옷
+item 비승최강길드칼
+item 비키니(구)
+item 비파
+item 빅토리아반브레스
+item 빅토리아브레이스
+item 빛의날개
+item 빨강색보석
+item 뿔강아지
+item 뿔장식
+item 삐에로옷1
+item 삐에로옷2
+item 사과
+item 사과맛바
+item 사또모자
+item 사슴의정수
+item 사신펫
+item 사파이어
+item 산소통
+item 산타모자
+item 산타수염
+item 산호귀걸이
+item 산호반지
+item 살렛1
+item 살렛2
+item 상급마력포션
+item 상급체력포션
+item 새너클로우
+item 생명의목걸이
+item 생명의벨트
+item 샤인(Lev18)
+item 샤인(Lev8)
+item 샤크블레이드
+item 서큐버스윙
+item 석탄
+item 선풍기
+item 선풍도복
+item 선풍도복수
+item 선풍도복토
+item 선풍도복풍
+item 선풍도복화
+item 설
+item 설단검
+item 세계수의나뭇가지
+item 세르네티1
+item 세르네티2
+item 세오의가죽각반
+item 세오의가죽방패
+item 세오의가죽장갑
+item 세오의가죽팔찌
+item 세오의고루반지
+item 세오의구리방패
+item 세오의금각반
+item 세오의금반지
+item 세오의금장갑
+item 세오의금제방패
+item 세오의금팔찌
+item 세오의기사단방패
+item 세오의녹옥반지
+item 세오의동각반
+item 세오의동장갑
+item 세오의동팔찌
+item 세오의레더부츠
+item 세오의루비귀걸이
+item 세오의마그마부츠
+item 세오의매직부츠
+item 세오의바이올렛티
+item 세오의사파이어반지
+item 세오의산호귀걸이
+item 세오의산호반지
+item 세오의순옥귀걸이
+item 세오의신발
+item 세오의쌍금귀걸이
+item 세오의쌍은귀걸이
+item 세오의은각반
+item 세오의은장갑
+item 세오의은제방패
+item 세오의은팔찌
+item 세오의자수정반지
+item 세오의철방패
+item 세오의플라늄방패
+item 세오의현철반지
+item 세오의호안석반지
+item 세오의홍옥반지
+item 세오의회색신발
+item 세인트로브
+item 세인트베일
+item 세인트아머
+item 세인트아머수
+item 세인트아머토
+item 세인트아머풍
+item 세인트아머화
+item 세인트투구
+item 세인트홀
+item 세인트후드
+item 세일라링
+item 세줄금반지
+item 세토아의가죽각반
+item 세토아의가죽방패
+item 세토아의가죽장갑
+item 세토아의가죽팔찌
+item 세토아의고루반지
+item 세토아의구리방패
+item 세토아의금각반
+item 세토아의금반지
+item 세토아의금장갑
+item 세토아의금제방패
+item 세토아의금팔찌
+item 세토아의기사단방패
+item 세토아의녹옥반지
+item 세토아의동각반
+item 세토아의동장갑
+item 세토아의동팔찌
+item 세토아의레더부츠
+item 세토아의루비귀걸이
+item 세토아의마그마부츠
+item 세토아의매직부츠
+item 세토아의바이올렛티
+item 세토아의사파이어반지
+item 세토아의산호귀걸이
+item 세토아의산호반지
+item 세토아의순옥귀걸이
+item 세토아의신발
+item 세토아의쌍금귀걸이
+item 세토아의쌍은귀걸이
+item 세토아의은각반
+item 세토아의은장갑
+item 세토아의은제방패
+item 세토아의은팔찌
+item 세토아의자수정반지
+item 세토아의철방패
+item 세토아의플라늄방패
+item 세토아의현철반지
+item 세토아의호안석반지
+item 세토아의홍옥반지
+item 세토아의회색신발
+item 세피라링(Lev1)
+item 세피라링(Lev10)
+item 세피라링(Lev2)
+item 세피라링(Lev3)
+item 세피라링(Lev4)
+item 세피라링(Lev5)
+item 세피라링(Lev6)
+item 세피라링(Lev7)
+item 세피라링(Lev8)
+item 세피라링(Lev9)
+item 셍즈
+item 셍즈수
+item 셍즈토
+item 셍즈풍
+item 셍즈화
+item 셔스의가죽각반
+item 셔스의가죽방패
+item 셔스의가죽장갑
+item 셔스의가죽팔찌
+item 셔스의고루반지
+item 셔스의구리방패
+item 셔스의금각반
+item 셔스의금반지
+item 셔스의금장갑
+item 셔스의금제방패
+item 셔스의금팔찌
+item 셔스의기사단방패
+item 셔스의동각반
+item 셔스의동장갑
+item 셔스의동팔찌
+item 셔스의레더부츠
+item 셔스의루비귀걸이
+item 셔스의마그마부츠
+item 셔스의매직부츠
+item 셔스의바이올렛티
+item 셔스의사파이어반지
+item 셔스의산호귀걸이
+item 셔스의산호반지
+item 셔스의신발
+item 셔스의쌍금귀걸이
+item 셔스의쌍은귀걸이
+item 셔스의은각반
+item 셔스의은장갑
+item 셔스의은제방패
+item 셔스의은팔찌
+item 셔스의자수정반지
+item 셔스의철방패
+item 셔스의플라늄방패
+item 셔스의현철반지
+item 셔스의호안석반지
+item 셔스의홍옥반지
+item 셔스의회색신발
+item 솔라레스1
+item 솔라레스2
+item 수오미길드복
+item 수오미길드옷
+item 수오미길드칼
+item 수오미마을리콜
+item 순록뿔장식
+item 스노클
+item 스카우트아머
+item 스카웃튜닉
+item 스카웃튜닉수
+item 스카웃튜닉토
+item 스카웃튜닉풍
+item 스카웃튜닉화
+item 스카프
+item 스컬나이트방패
+item 스컬톤
+item 스켈톤날개
+item 스켈톤마스크
+item 스크림마스크
+item 스키고글
+item 스킬스펠지우기
+item 스톤액스
+item 스톨라
+item 스톨라수
+item 스톨라토
+item 스톨라풍
+item 스톨라화
+item 스파이크클럽
+item 슬리브
+item 승급라피드
+item 승급의리콜
+item 승급최강길드복
+item 승급최강길드옷
+item 승급최강길드칼
+item 시장리콜
+item 신발
+item 신비의천쪼가리
+item 신월도
+item 실루엣
+item 실버아쿠아링
+item 실버팜팻의인장
+item 십자가
+item 쌍금귀걸이
+item 쌍은귀걸이
+item 썬글라스
+item 아가트1
+item 아가트2
+item 아레스1
+item 아레스2
+item 아룬다이트
+item 아만마을리콜
+item 아만의증표
+item 아벨길드복
+item 아벨길드옷
+item 아벨길드칼
+item 아벨로더
+item 아벨마을리콜
+item 아벨프릴
+item 아비스1
+item 아비스2
+item 아스카론
+item 아슬론마을리콜
+item 아제일
+item 아조스
+item 아칸더스
+item 악령
+item 악마꼬리
+item 악마날개
+item 악마뿔
+item 악마외눈
+item 악어악세
+item 알세마을리콜
+item 암흑의목걸이
+item 암흑의벨트
+item 애니비아의알
+item 액스
+item 앤도르날개
+item 앵거바딜
+item 야생여자옷
+item 야생전사옷
+item 약과헤어핀
+item 어
+item 에메랄드
+item 에코프리드레스
+item 에페
+item 엑스코마디움
+item 엑스쿠라눔
+item 엔젤스노우윙
+item 엔트라이온의몸통
+item 엔트자이언트의날개
+item 엔트자이언트의몸통
+item 엘란디스
+item 엘레맨틀
+item 엘레맨틀수
+item 엘레맨틀토
+item 엘레맨틀풍
+item 엘레맨틀화
+item 엘리스의상
+item 엘리스토끼의상
+item 여관길드공문
+item 여자돼지의상
+item 여자산타복
+item 연갈색염색약
+item 연두색염색약
+item 연무도복
+item 연무도복수
+item 연무도복토
+item 연무도복풍
+item 연무도복화
+item 연무복
+item 연무복수
+item 연무복토
+item 연무복풍
+item 연무복화
+item 연보라색염색약
+item 연하늘색염색약
+item 영월궁
+item 영월도
+item 영월충
+item 옐로우팜팻의알
+item 옐로토닉
+item 옐로하이토닉
+item 오리엔탈
+item 오색의목걸이
+item 와인
+item 용각반
+item 용의발톱
+item 용자의옷(남)
+item 용자의옷(여)
+item 용팔찌
+item 우든클럽
+item 우유맛바
+item 워리어워커
+item 월영관
+item 월영도복
+item 월화이어각반
+item 월화이어아머
+item 월화이어장갑
+item 월화이어투구
+item 웨스턴
+item 위저드로브
+item 위저드로브수
+item 위저드로브토
+item 위저드로브풍
+item 위저드로브화
+item 위타천1
+item 위타천2
+item 윙부츠
+item 윙서클릿
+item 유데일
+item 은각반
+item 은빛늑대의갈기털
+item 은장갑
+item 의
+item 이모션(밝음)
+item 이모션(사랑)
+item 이모션(열받음)
+item 이모션(우울)
+item 이벤트꼬리
+item 이스빌
+item 이스빌모자
+item 이슬
+item 이아의가죽각반
+item 이아의가죽방패
+item 이아의가죽장갑
+item 이아의가죽팔찌
+item 이아의고루반지
+item 이아의구리방패
+item 이아의금각반
+item 이아의금반지
+item 이아의금장갑
+item 이아의금제방패
+item 이아의금팔찌
+item 이아의기사단방패
+item 이아의동각반
+item 이아의동장갑
+item 이아의동팔찌
+item 이아의레더부츠
+item 이아의루비귀걸이
+item 이아의마그마부츠
+item 이아의매직부츠
+item 이아의바이올렛티
+item 이아의사파이어반지
+item 이아의산호귀걸이
+item 이아의산호반지
+item 이아의순옥귀걸이
+item 이아의신발
+item 이아의쌍금귀걸이
+item 이아의쌍은귀걸이
+item 이아의은각반
+item 이아의은장갑
+item 이아의은제방패
+item 이아의은총
+item 이아의은팔찌
+item 이아의자수정반지
+item 이아의철방패
+item 이아의플라늄방패
+item 이아의현철반지
+item 이아의호안석반지
+item 이아의홍옥반지
+item 이아의회색신발
+item 이프리트메일
+item 이프리트메일수
+item 이프리트메일토
+item 이프리트메일풍
+item 이프리트메일화
+item 인디언의상(남)
+item 인디언의상(여)
+item 인섹
+item 인연인형
+item 인월도
+item 일단검
+item 일단검수
+item 일단검토
+item 일단검풍
+item 일단검화
+item 잉크병
+item 자르반의검
+item 자수정반지
+item 자이언트스톤액스
+item 자이언트스톤클럽
+item 자이언트스톤해머
+item 자이언트클럽
+item 장미폭죽A
+item 장미폭죽B
+item 장미폭죽C
+item 저승사자낫
+item 적비류선의
+item 적비류선후
+item 적비현진건
+item 적비현진의
+item 적비화무갑주
+item 적비화무투구
+item 적비화후관
+item 적비화후의
+item 적태극의
+item 적태극현
+item 전
+item 전사메카옷
+item 전통한복(남)
+item 전통한복(여)
+item 전파펭귄옷
+item 젓소옷
+item 젤리오팔
+item 좀비의공문
+item 좀비의막대기
+item 좀비의살
+item 좀비지팡이
+item 죠스바
+item 주머니모자
+item 주작의목걸이
+item 주작의반지
+item 주작의서클릿
+item 주황색보석
+item 중급마력포션
+item 중급체력포션
+item 중단검
+item 중단검수
+item 중단검토
+item 중단검풍
+item 중단검화
+item 쥐꼬리
+item 쥐돌이의상
+item 쥐머리띠
+item 쥬노아겐트리그
+item 쥬노아바브레이스
+item 쥬얼리스트
+item 지존라피드
+item 지폰
+item 지폰수
+item 지폰토
+item 지폰풍
+item 지폰화
+item 직자메카옷
+item 진주
+item 진한노랑색염색약
+item 천사날개
+item 천사모
+item 천지도복
+item 천지도복수
+item 천지도복토
+item 천지도복풍
+item 천지도복화
+item 천하제일깃발
+item 철방패
+item 철조각
+item 체력의가죽각반
+item 체력의가죽방패
+item 체력의가죽장갑
+item 체력의가죽팔찌
+item 체력의고루반지
+item 체력의고무장갑
+item 체력의구리방패
+item 체력의금각반
+item 체력의금반지
+item 체력의금장갑
+item 체력의금제방패
+item 체력의금팔찌
+item 체력의기사단방패
+item 체력의녹옥반지
+item 체력의동각반
+item 체력의동장갑
+item 체력의동팔찌
+item 체력의레더부츠
+item 체력의루비귀걸이
+item 체력의마그마부츠
+item 체력의매직부츠
+item 체력의바이올렛티
+item 체력의사파이어반지
+item 체력의산호귀걸이
+item 체력의산호반지
+item 체력의순옥귀걸이
+item 체력의신발
+item 체력의쌍금귀걸이
+item 체력의쌍은귀걸이
+item 체력의은각반
+item 체력의은장갑
+item 체력의은제방패
+item 체력의은팔찌
+item 체력의자수정반지
+item 체력의철방패
+item 체력의플라늄방패
+item 체력의현철반지
+item 체력의호안석반지
+item 체력의홍옥반지
+item 체력의회색신발
+item 체인메이스
+item 초록두건
+item 초록색보석
+item 최하급마력포션
+item 최하급체력포션
+item 축복의가죽각반
+item 축복의가죽방패
+item 축복의가죽장갑
+item 축복의가죽팔찌
+item 축복의고루반지
+item 축복의구리방패
+item 축복의금각반
+item 축복의금반지
+item 축복의금장갑
+item 축복의금제방패
+item 축복의금팔찌
+item 축복의기사단방패
+item 축복의녹옥반지
+item 축복의동각반
+item 축복의동장갑
+item 축복의동팔찌
+item 축복의레더부츠
+item 축복의루비귀걸이
+item 축복의마그마부츠
+item 축복의매직부츠
+item 축복의바이올렛티
+item 축복의사파이어반지
+item 축복의산호귀걸이
+item 축복의산호반지
+item 축복의순옥귀걸이
+item 축복의신발
+item 축복의쌍금귀걸이
+item 축복의쌍은귀걸이
+item 축복의은각반
+item 축복의은장갑
+item 축복의은제방패
+item 축복의은팔찌
+item 축복의자수정반지
+item 축복의철방패
+item 축복의플라늄방패
+item 축복의현철반지
+item 축복의호안석반지
+item 축복의홍옥반지
+item 축복의회색신발
+item 치우천왕가면
+item 치즈
+item 카디의정수
+item 카슈마나이트
+item 카스뮴아머
+item 카스뮴아머수
+item 카스뮴아머토
+item 카스뮴아머풍
+item 카스뮴아머화
+item 카스뮴플레이트
+item 카스뮴플레이트수
+item 카스뮴플레이트토
+item 카스뮴플레이트풍
+item 카스뮴플레이트화
+item 카쿰
+item 카쿰수
+item 카쿰토
+item 카쿰풍
+item 카쿰화
+item 카타르
+item 칸의가죽각반
+item 칸의가죽방패
+item 칸의가죽장갑
+item 칸의가죽팔찌
+item 칸의고루반지
+item 칸의구리방패
+item 칸의금각반
+item 칸의금반지
+item 칸의금장갑
+item 칸의금제방패
+item 칸의금팔찌
+item 칸의기사단방패
+item 칸의녹옥반지
+item 칸의동각반
+item 칸의동장갑
+item 칸의동팔찌
+item 칸의레더부츠
+item 칸의루비귀걸이
+item 칸의마그마부츠
+item 칸의매직부츠
+item 칸의목걸이
+item 칸의바이올렛티
+item 칸의사파이어반지
+item 칸의산호귀걸이
+item 칸의산호반지
+item 칸의순옥귀걸이
+item 칸의신발
+item 칸의쌍금귀걸이
+item 칸의쌍은귀걸이
+item 칸의은각반
+item 칸의은장갑
+item 칸의은제방패
+item 칸의은팔찌
+item 칸의자수정반지
+item 칸의철방패
+item 칸의플라늄방패
+item 칸의현철반지
+item 칸의호안석반지
+item 칸의홍옥반지
+item 칸의회색신발
+item 캐프린1
+item 캐프린2
+item 캐프린3
+item 캔디맛바
+item 커스아룬다이트
+item 커스프람베르그
+item 커틀라스
+item 커틀라스수
+item 커틀라스토
+item 커틀라스풍
+item 커틀라스화
+item 코르스
+item 코르스수
+item 코르스토
+item 코르스풍
+item 코르스화
+item 코마디움
+item 코뿔소악세
+item 쿠룸
+item 퀸셰어의귀걸이
+item 퀼트
+item 퀼트모자
+item 큐어아룬다이트
+item 큐어프람베르그
+item 큐이레스1
+item 큐이레스2
+item 크리샤오르
+item 크리스마스양말
+item 크리스마스얼음
+item 크리스탈목걸이
+item 클라미스
+item 클라미스수
+item 클라미스토
+item 클라미스풍
+item 클라미스화
+item 클레어리스트
+item 클리머스
+item 클리머스수
+item 클리머스토
+item 클리머스풍
+item 클리머스화
+item 키톤
+item 키톤수
+item 키톤토
+item 키톤풍
+item 키톤화
+item 킹아크퍼스의팬던트
+item 타고나이트액스
+item 타고르로더
+item 타고르로더모자
+item 타고르캐프린
+item 타고르프릴
+item 태극기망또
+item 태극장판
+item 태산도복
+item 태산도복수
+item 태산도복토
+item 태산도복풍
+item 태산도복화
+item 턱시도
+item 털목도리
+item 토끼가방
+item 토끼신발
+item 토끼헤어핀
+item 토마호크
+item 투신의머리띠1
+item 투신의머리띠2
+item 투척용표창
+item 투핸드엑시큐터
+item 투핸드엑시큐터수
+item 투핸드엑시큐터토
+item 투핸드엑시큐터풍
+item 투핸드엑시큐터화
+item 투핸드크레이모어
+item 투핸드크레이모어수
+item 투핸드크레이모어토
+item 투핸드크레이모어풍
+item 투핸드크레이모어화
+item 튜닉
+item 튜닉수
+item 튜닉토
+item 튜닉풍
+item 튜닉화
+item 트랜트의뿌리
+item 트렁크(구)
+item 트레이닝복
+item 트레이닝슈트
+item 파라솔
+item 파란두건
+item 파랑색보석
+item 파워리스트
+item 파이러햇
+item 파파야방패
+item 파프리카
+item 판테온의방패
+item 판티카
+item 팔루텐
+item 팔루텐수
+item 팔루텐토
+item 팔루텐풍
+item 팔루텐화
+item 팜팻의정수
+item 패션선글라스
+item 퍼플팜팻의알
+item 페리도트
+item 페어리윙
+item 페이로브각반
+item 페이로브아머
+item 페이로브장갑
+item 페이로브투구
+item 페플로스
+item 페플로스수
+item 페플로스토
+item 페플로스풍
+item 페플로스화
+item 펫-강시
+item 펫-강아지
+item 펫-구미호
+item 펫-드라큘라
+item 펫-마녀
+item 펫-문어군
+item 펫-처녀귀신
+item 펫-천사1
+item 펫-쵸파
+item 펫-토끼요정
+item 펫-피닉스
+item 폐
+item 포보스방패
+item 폭죽
+item 퐁퐁이의점액질
+item 풀잎각반
+item 풍요의가죽각반
+item 풍요의가죽방패
+item 풍요의가죽장갑
+item 풍요의가죽팔찌
+item 풍요의고루반지
+item 풍요의구리방패
+item 풍요의금각반
+item 풍요의금반지
+item 풍요의금장갑
+item 풍요의금제방패
+item 풍요의금팔찌
+item 풍요의기사단방패
+item 풍요의녹옥반지
+item 풍요의동각반
+item 풍요의동장갑
+item 풍요의동팔찌
+item 풍요의레더부츠
+item 풍요의루비귀걸이
+item 풍요의마그마부츠
+item 풍요의매직부츠
+item 풍요의바이올렛티
+item 풍요의사파이어반지
+item 풍요의산호귀걸이
+item 풍요의산호반지
+item 풍요의순옥귀걸이
+item 풍요의신발
+item 풍요의쌍금귀걸이
+item 풍요의쌍은귀걸이
+item 풍요의은각반
+item 풍요의은장갑
+item 풍요의은제방패
+item 풍요의은팔찌
+item 풍요의자수정반지
+item 풍요의철방패
+item 풍요의플라늄방패
+item 풍요의현철반지
+item 풍요의호안석반지
+item 풍요의홍옥반지
+item 풍요의회색신발
+item 풍월도복
+item 풍월도복수
+item 풍월도복토
+item 풍월도복풍
+item 풍월도복화
+item 풍전도복
+item 풍전도복수
+item 풍전도복토
+item 풍전도복풍
+item 풍전도복화
+item 프라이버시안경
+item 프람베르그
+item 프린세스더블릿
+item 프린세스드레스
+item 프릴1
+item 프릴2
+item 프릴3
+item 피1
+item 피4
+item 피에트로더
+item 피에트프릴
+item 하급마력포션
+item 하급체력포션
+item 하얀두건
+item 하와이안의상(남)
+item 하와이안의상(여)
+item 하이브레이질배틀액스
+item 하이브레이질배틀핸드
+item 하이브레이질액스
+item 해골벨트
+item 해골옷
+item 해바라기
+item 해바라기화관
+item 해적모자1
+item 해적모자2
+item 해적옷1
+item 해적옷2
+item 핸드액스
+item 헬2
+item 헬나이트아머
+item 헬나이트투구
+item 헬름1
+item 헬름2
+item 헬몽크아머
+item 헬소서러로브
+item 헬소서러후드
+item 헬소서리스로브
+item 헬씨프아머
+item 헬씨프투구
+item 헬클레릭로브
+item 헬클레릭후드
+item 헬프리스트로브
+item 현자옷1
+item 현자옷2
+item 혼돈의갑주
+item 홀디트링
+item 홀리데이숄더1
+item 홀리데이숄더2
+item 홀리데이숄더3
+item 홀리데이숄더모자1
+item 홀리데이숄더모자2
+item 홀리데이숄더모자3
+item 홀리데이코트1
+item 홀리데이코트2
+item 홀리데이코트3
+item 홀리데이코트모자1
+item 홀리데이코트모자2
+item 홀리데이코트모자3
+item 홀리디아나
+item 홀리로브
+item 홀리로브수
+item 홀리로브토
+item 홀리로브풍
+item 홀리로브화
+item 홀리루나
+item 홀리루딘길드복
+item 홀리루딘길드옷
+item 홀리루딘길드칼
+item 홀리루딘성리콜
+item 홀리마르시아
+item 홀리머큐리아
+item 홀리베일
+item 홀리세페우스
+item 홀리솔라
+item 홀리아룬다이트
+item 홀리쥬피티아
+item 홀리코로나
+item 홀리퀸드레스
+item 홀리퀸슈트
+item 홀리파나
+item 홀리프람베르그
+item 홍시모자
+item 홍옥반지
+item 화가옷1
+item 화가옷2
+item 화관
+item 화려한귀걸이
+item 화룡의상(남)
+item 화룡의상(여)
+item 화염의가죽벨트
+item 화염의금벨트
+item 화염의금옥목걸이
+item 화염의루나사벨트
+item 화염의룬스톤목걸이
+item 화염의마기아목걸이
+item 화염의목걸이
+item 화염의벨트
+item 화염의별목걸이
+item 화염의별벨트
+item 화염의세일라링
+item 화염의씰
+item 화염의은벨트
+item 화염의자수정목걸이
+item 화염의진주목걸이
+item 화염의크리스탈목걸이
+item 화염의홀디트링
+item 화염의흑요석목걸이
+item 화영잠1
+item 화영잠2
+item 화이어윙
+item 확성기
+item 횃불
+item 회색튜브
+item 회오리
+item 후드로브
+item 후드로브수
+item 후드로브토
+item 후드로브풍
+item 후드로브화
+item 흑비류선의
+item 흑비류선후
+item 흑비현진건
+item 흑비현진의
+item 흑비화무갑주
+item 흑비화무투구
+item 흑비화후관
+item 흑비화후의
+item 흑요석로그각반
+item 흑요석로그귀걸이
+item 흑요석로그목걸이
+item 흑요석로그반지
+item 흑요석로그벨트
+item 흑요석로그장갑
+item 흑요석몽크각반
+item 흑요석몽크귀걸이
+item 흑요석몽크목걸이
+item 흑요석몽크반지
+item 흑요석몽크벨트
+item 흑요석몽크팔찌
+item 흑요석소서러각반
+item 흑요석소서러귀걸이
+item 흑요석소서러목걸이
+item 흑요석소서러반지
+item 흑요석소서러벨트
+item 흑요석소서러장갑
+item 흑요석워리어각반
+item 흑요석워리어귀걸이
+item 흑요석워리어목걸이
+item 흑요석워리어반지
+item 흑요석워리어벨트
+item 흑요석워리어장갑
+item 흑요석프리스트각반
+item 흑요석프리스트귀걸이
+item 흑요석프리스트목걸이
+item 흑요석프리스트반지
+item 흑요석프리스트벨트
+item 흑요석프리스트장갑
+item 흑진주
+item 흑태극의
+item 흑태극현
+item 흰색염색약
+item 히야트디그
+item 히야트스냅
+spell Altar Lecture
+spell Beothaich Lecture
+spell Blind Snare
+spell Blind Trap
+spell Bolt Trap
+spell Bubble Block
+spell Coiled Bolt Trap
+spell Cold Blood
+spell Counter Attack 1
+spell Counter Attack 10
+spell Counter Attack 11
+spell Counter Attack 2
+spell Counter Attack 3
+spell Counter Attack 4
+spell Counter Attack 5
+spell Counter Attack 6
+spell Counter Attack 7
+spell Counter Attack 8
+spell Counter Attack 9
+spell Cursed Tune 1
+spell Cursed Tune 10
+spell Cursed Tune 11
+spell Cursed Tune 12
+spell Cursed Tune 2
+spell Cursed Tune 3
+spell Cursed Tune 4
+spell Cursed Tune 5
+spell Cursed Tune 6
+spell Cursed Tune 7
+spell Cursed Tune 8
+spell Cursed Tune 9
+spell Cyclone
+spell Disenchanter
+spell Draco Stance
+spell Elements Lecture
+spell Entreaties Lecture
+spell Faerie Love Lecture
+spell Feral Form
+spell Fierce Feral Form
+spell Fierce Karura Form
+spell Fierce Komodas Form
+spell Fiery Defender
+spell Frost Arrow 1
+spell Frost Arrow 2
+spell Frost Arrow 3
+spell Frost Arrow 4
+spell Frost Arrow 5
+spell Frost Arrow 6
+spell Frost Arrow 7
+spell Frost Arrow 8
+spell Frost Arrow 9
+spell Gem Polishing
+spell Gentle Touch
+spell Gods Lecture
+spell Graymayre Lecture
+spell Great Blind Snare
+spell Great Poison Snare
+spell Great Sleep Snare
+spell Greater Blind Snare
+spell Greater Poison Snare
+spell Greater Sleep Snare
+spell Groo 1
+spell Groo 10
+spell Groo 11
+spell Groo 12
+spell Groo 13
+spell Groo 14
+spell Groo 15
+spell Groo 2
+spell Groo 3
+spell Groo 4
+spell Groo 5
+spell Groo 6
+spell Groo 7
+spell Groo 8
+spell Groo 9
+spell Guide Lecture
+spell Hail of Feathers 1
+spell Hail of Feathers 10
+spell Hail of Feathers 2
+spell Hail of Feathers 3
+spell Hail of Feathers 4
+spell Hail of Feathers 5
+spell Hail of Feathers 6
+spell Hail of Feathers 7
+spell Hail of Feathers 8
+spell Hail of Feathers 9
+spell Hide
+spell Howl
+spell Inner Fire
+spell Insult
+spell Iron Skin
+spell Karura Form
+spell Keeter 1
+spell Keeter 10
+spell Keeter 11
+spell Keeter 12
+spell Keeter 13
+spell Keeter 14
+spell Keeter 15
+spell Keeter 2
+spell Keeter 3
+spell Keeter 4
+spell Keeter 5
+spell Keeter 6
+spell Keeter 7
+spell Keeter 8
+spell Keeter 9
+spell Kelberoth Stance
+spell Komodas Form
+spell Life Arrow
+spell Maiden Trap
+spell Mana Ward
+spell Master Feral Form
+spell Master Karura Form
+spell Master Komodas Form
+spell Mermaid 1
+spell Mermaid 10
+spell Mermaid 11
+spell Mermaid 12
+spell Mermaid 13
+spell Mermaid 14
+spell Mermaid 15
+spell Mermaid 2
+spell Mermaid 3
+spell Mermaid 4
+spell Mermaid 5
+spell Mermaid 6
+spell Mermaid 7
+spell Mermaid 8
+spell Mermaid 9
+spell Mist
+spell Monster_결계도가
+spell Monster_결계도적
+spell Monster_결계법사
+spell Monster_결계전사
+spell Monster_결계직자
+spell Monster_나르콜리
+spell Monster_리베라토
+spell Monster_마네나로
+spell Monster_마레노
+spell Monster_바다의엘리멘탈
+spell Monster_블러드백작
+spell Monster_소루마
+spell Monster_연막
+spell Monster_유령하녀
+spell Monster_이상한빛
+spell Monster_자르반
+spell Monster_타겟홀드
+spell Monster_플라모
+spell Monster_홀리드래곤
+spell Mud Wall
+spell Needle Trap
+spell Poison Snare
+spell Poison Trap
+spell Regeneration 1
+spell Regeneration 10
+spell Regeneration 2
+spell Regeneration 3
+spell Regeneration 4
+spell Regeneration 5
+spell Regeneration 6
+spell Regeneration 7
+spell Regeneration 8
+spell Regeneration 9
+spell Roar
+spell Scorpion Stance
+spell Set Volley
+spell Shock Arrow
+spell Sleep Snare
+spell Sleep Trap
+spell Snort
+spell Spit
+spell Spring Trap
+spell Star Arrow 1
+spell Star Arrow 10
+spell Star Arrow 11
+spell Star Arrow 2
+spell Star Arrow 3
+spell Star Arrow 4
+spell Star Arrow 5
+spell Star Arrow 6
+spell Star Arrow 7
+spell Star Arrow 8
+spell Star Arrow 9
+spell Stiletto Trap
+spell Taunt
+spell Torch 1
+spell Torch 10
+spell Torch 11
+spell Torch 12
+spell Torch 13
+spell Torch 14
+spell Torch 15
+spell Torch 2
+spell Torch 3
+spell Torch 4
+spell Torch 5
+spell Torch 6
+spell Torch 7
+spell Torch 8
+spell Torch 9
+spell Trance
+spell Volley
+spell White Bat Stance
+spell Wild Feral Form
+spell Wild Karura Form
+spell Wild Komodas Form
+spell Wings of Protection
+spell Woods Lecture
+spell ao ard cradh
+spell ao beag cradh
+spell ao cradh
+spell ao dall
+spell ao mor cradh
+spell ao puinsein
+spell ard athar
+spell ard athar nadur
+spell ard creag
+spell ard creag nadur
+spell ard leasaich athar
+spell ard leasaich creag
+spell ard leasaich sal
+spell ard leasaich srad
+spell ard naomh aite
+spell ard puinneag spiorad
+spell ard sal
+spell ard sal nadur
+spell ard seun
+spell ard srad
+spell ard srad nadur
+spell armachd
+spell armachd fein
+spell asgall faileas
+spell athar
+spell athar lamh
+spell athar meall
+spell athar nadur
+spell beag athar
+spell beag athar lamh
+spell beag breisleich
+spell beag creag
+spell beag creag lamh
+spell beag fas nadur
+spell beag ioc fein
+spell beag leasaich athar
+spell beag leasaich creag
+spell beag leasaich sal
+spell beag leasaich srad
+spell beag naomh aite
+spell beag pramh
+spell beag puinneag spiorad
+spell beag puinsein
+spell beag sal
+spell beag sal lamh
+spell beag seun
+spell beag slan
+spell beag srad
+spell beag srad lamh
+spell beannaich
+spell beothaichdeum
+spell breisleich
+spell creag
+spell creag gar
+spell creag lamh
+spell creag meall
+spell creag nadur
+spell creag neart
+spell dachaidh
+spell dall
+spell deireas faileas
+spell deo lamh
+spell deo saighead
+spell deo searg
+spell deo searg gar
+spell dion
+spell eisd creutair
+spell fas deireas
+spell fas nadur
+spell fas spiorad
+spell leasaich athar
+spell leasaich creag
+spell leasaich sal
+spell leasaich srad
+spell mor athar
+spell mor athar nadur
+spell mor beannaich
+spell mor breisleich
+spell mor creag
+spell mor creag nadur
+spell mor dion
+spell mor dion comlha
+spell mor fas nadur
+spell mor leasaich athar
+spell mor leasaich creag
+spell mor leasaich sal
+spell mor leasaich srad
+spell mor naomh aite
+spell mor puinneag spiorad
+spell mor sal nadur
+spell mor seun
+spell mor slan
+spell mor srad
+spell mor srad nadur
+spell mor strioch bais lamh
+spell mor strioch bais meall
+spell naomh aite
+spell pian na dion
+spell pramh
+spell puinneag beatha
+spell puinneag spiorad
+spell puinsein
+spell sal
+spell sal gar
+spell sal lamh
+spell sal meall
+spell sal nadur
+spell seun
+spell slan
+spell sonruich nadur
+spell spion beathach
+spell srad
+spell srad gar
+spell srad lamh
+spell srad meall
+spell srad nadur
+spell suain
+spell 금강불괴
+spell 깃털날리기(Lev1)
+spell 나르콜룸
+spell 나르콜리
+spell 다라밀공
+spell 데프레코
+spell 델리스펠라스
+spell 디나르콜룸
+spell 디나르콜리
+spell 디베노모
+spell 디소루마
+spell 디소루미아
+spell 딜루메니
+spell 라그나로크
+spell 렌토
+spell 리베라토
+spell 리젠(Lev1)
+spell 마구찌르기
+spell 마네나로
+spell 마레네라
+spell 마레노
+spell 마레누스
+spell 매직프로텍션
+spell 메가홀리쿠라노
+spell 메테오
+spell 명중률향상(Lev1)
+spell 명중률향상(Lev2)
+spell 바르도
+spell 벨라르모
+spell 봉인
+spell 블랙메테오
+spell 세멜리아
+spell 세오의손길
+spell 속성강화
+spell 수페라마레나
+spell 수페라벨라르모
+spell 수페라에나르마
+spell 수페라쿠라노
+spell 신성력강화
+spell 신의축복
+spell 아들레스투
+spell 아이스블러스트
+spell 안티매직
+spell 암살
+spell 어각베라
+spell 어둠의각인
+spell 에나르마
+spell 엑스마레나
+spell 엑스쿠라네라
+spell 엑스쿠라노
+spell 영자홀리쿠라노
+spell 원소이해력
+spell 이모탈
+spell 일루메나
+spell 일루메눔
+spell 자기보호
+spell 장풍
+spell 주먹단련
+spell 침묵
+spell 코마디아
+spell 콘푸지오
+spell 콜라마
+spell 쿠라네라
+spell 쿠라노
+spell 쿠라노소
+spell 쿠라노토
+spell 쿠라누스
+spell 쿠러스
+spell 쿠로
+spell 쿠로토
+spell 퀘이크
+spell 클레쉬스톰
+spell 파워단련
+spell 포트리스
+spell 프라베라
+spell 프라베라M
+spell 프라보
+spell 플레어
+spell 하이드
+spell 호르라마
+spell 홀리드래곤
+spell 홀리랜서
+spell 홀리볼트
+spell 홀리쿠라네라
+spell 홀리쿠라노
+spell 화이라소환(Lev1)
+spell 화이라소환(Lev2)
+spell 화이라소환(Lev3)
+spell 휴식
+skill Analyze Item
+skill Appraise
+skill Archery 1
+skill Archery 2
+skill Archery 3
+skill Archery 4
+skill Archery 5
+skill Archery 6
+skill Armor Lore
+skill Arrow Shot 1
+skill Arrow Shot 10
+skill Arrow Shot 11
+skill Arrow Shot 12
+skill Arrow Shot 2
+skill Arrow Shot 3
+skill Arrow Shot 4
+skill Arrow Shot 5
+skill Arrow Shot 6
+skill Arrow Shot 7
+skill Arrow Shot 8
+skill Arrow Shot 9
+skill Assail
+skill Assassin Strike
+skill Assault
+skill Beak Pierce 1
+skill Beak Pierce 10
+skill Beak Pierce 11
+skill Beak Pierce 2
+skill Beak Pierce 3
+skill Beak Pierce 4
+skill Beak Pierce 5
+skill Beak Pierce 6
+skill Beak Pierce 7
+skill Beak Pierce 8
+skill Beak Pierce 9
+skill Claw Fist
+skill Claw Slash 1
+skill Claw Slash 10
+skill Claw Slash 2
+skill Claw Slash 3
+skill Claw Slash 4
+skill Claw Slash 5
+skill Claw Slash 6
+skill Claw Slash 7
+skill Claw Slash 8
+skill Claw Slash 9
+skill Clobber
+skill Combat Senses
+skill Double Punch
+skill Double Rake 1
+skill Double Rake 10
+skill Double Rake 2
+skill Double Rake 3
+skill Double Rake 4
+skill Double Rake 5
+skill Double Rake 6
+skill Double Rake 7
+skill Double Rake 8
+skill Double Rake 9
+skill Dune Swipe 1
+skill Dune Swipe 10
+skill Dune Swipe 2
+skill Dune Swipe 3
+skill Dune Swipe 4
+skill Dune Swipe 5
+skill Dune Swipe 6
+skill Dune Swipe 7
+skill Dune Swipe 8
+skill Dune Swipe 9
+skill Echo Sense
+skill Elemental Bless 1
+skill Elemental Bless 2
+skill Elemental Bless 3
+skill Elemental Bless 4
+skill Elemental Bless 5
+skill Evaluate Item
+skill Food Lore
+skill Hairstyle
+skill Herbal Lore
+skill High Kick
+skill Inner Beast 1
+skill Inner Beast 2
+skill Inner Beast 3
+skill Inner Beast 4
+skill Inner Beast 5
+skill Inner Beast 6
+skill Instrumental 1
+skill Instrumental 2
+skill Instrumental 3
+skill Instrumental 4
+skill Instrumental 5
+skill Instrumental 6
+skill Instrumental Attack 1
+skill Instrumental Attack 10
+skill Instrumental Attack 11
+skill Instrumental Attack 12
+skill Instrumental Attack 2
+skill Instrumental Attack 3
+skill Instrumental Attack 4
+skill Instrumental Attack 5
+skill Instrumental Attack 6
+skill Instrumental Attack 7
+skill Instrumental Attack 8
+skill Instrumental Attack 9
+skill Intimidate
+skill Kick
+skill Long Strike
+skill Lucky Hand
+skill Mad Soul
+skill Magic Lore
+skill Mantis Kick
+skill Martial Awareness
+skill Mass Strike 1
+skill Mass Strike 10
+skill Mass Strike 11
+skill Mass Strike 12
+skill Mass Strike 2
+skill Mass Strike 3
+skill Mass Strike 4
+skill Mass Strike 5
+skill Mass Strike 6
+skill Mass Strike 7
+skill Mass Strike 8
+skill Mass Strike 9
+skill Melee Lore
+skill Mend Garment
+skill Mend Soori
+skill Mend Staff
+skill Mend Weapon
+skill Midnight Slash
+skill Missile Lore
+skill M포효
+skill Perfect Defense
+skill Perish Lore
+skill Poison Punch
+skill Potion Lore
+skill Pounce 1
+skill Pounce 10
+skill Pounce 2
+skill Pounce 3
+skill Pounce 4
+skill Pounce 5
+skill Pounce 6
+skill Pounce 7
+skill Pounce 8
+skill Pounce 9
+skill Puncture
+skill Rear Strike 1
+skill Rear Strike 2
+skill Rear Strike 3
+skill Rear Strike 4
+skill Rear Strike 5
+skill Rear Strike 6
+skill Rear Strike 7
+skill Rear Strike 8
+skill Rescue
+skill Sacrifice
+skill Sever
+skill Shadow Figure
+skill Sneak Attack
+skill Sneak Flight 1
+skill Sneak Flight 10
+skill Sneak Flight 2
+skill Sneak Flight 3
+skill Sneak Flight 4
+skill Sneak Flight 5
+skill Sneak Flight 6
+skill Sneak Flight 7
+skill Sneak Flight 8
+skill Sneak Flight 9
+skill Sting
+skill Strikedown 1
+skill Strikedown 10
+skill Strikedown 11
+skill Strikedown 2
+skill Strikedown 3
+skill Strikedown 4
+skill Strikedown 5
+skill Strikedown 6
+skill Strikedown 7
+skill Strikedown 8
+skill Strikedown 9
+skill Study Creature
+skill Tail Slam
+skill Tail Sweep 1
+skill Tail Sweep 10
+skill Tail Sweep 11
+skill Tail Sweep 12
+skill Tail Sweep 2
+skill Tail Sweep 3
+skill Tail Sweep 4
+skill Tail Sweep 5
+skill Tail Sweep 6
+skill Tail Sweep 7
+skill Tail Sweep 8
+skill Tail Sweep 9
+skill Tailoring
+skill Talon Kick 1
+skill Talon Kick 2
+skill Talon Kick 3
+skill Talon Kick 4
+skill Talon Kick 5
+skill Talon Kick 6
+skill Talon Kick 7
+skill Talon Kick 8
+skill Thrash
+skill Throw
+skill Throw Smoke Bomb
+skill Thrust Attack 1
+skill Thrust Attack 2
+skill Thrust Attack 3
+skill Thrust Attack 4
+skill Thrust Attack 5
+skill Thrust Attack 6
+skill TransferBlood
+skill Triple Kick
+skill Unlock
+skill Venom Attack 1
+skill Venom Attack 2
+skill Venom Attack 3
+skill Venom Attack 4
+skill Venom Attack 5
+skill Venom Attack 6
+skill Venom Attack 7
+skill Venom Attack 8
+skill Wallop
+skill Wheel Kick 1
+skill Wheel Kick 10
+skill Wheel Kick 2
+skill Wheel Kick 3
+skill Wheel Kick 4
+skill Wheel Kick 5
+skill Wheel Kick 6
+skill Wheel Kick 7
+skill Wheel Kick 8
+skill Wheel Kick 9
+skill Wield Staff
+skill Wise Touch
+skill Wolf Fang Fist
+skill beag suain
+skill 검투술(Lev1)
+skill 검투술(Lev2)
+skill 구양신공
+skill 기본공격
+skill 내1려치기
+skill 내려치기
+skill 늑대의위상
+skill 단각
+skill 달마신공
+skill 데빌크래셔
+skill 두번찌르기
+skill 마구때리기
+skill 마나부스터
+skill 만개표창
+skill 매드소울
+skill 매드소울진
+skill 메가블레이드
+skill 무영신공
+skill 바투
+skill 발경
+skill 백보신권
+skill 붕각
+skill 붕신선각
+skill 블랙크래셔
+skill 비스트어택(Lev1)
+skill 비스트어택(Lev2)
+skill 사격(Lev2)
+skill 선풍각
+skill 센스
+skill 센스몬스터
+skill 소매치기
+skill 소수신공
+skill 숏블레이드
+skill 수영
+skill 슈페이아움(Lev1)
+skill 슬레쉬
+skill 습격
+skill 아무네지아
+skill 암살격
+skill 암살격진
+skill 양의신권
+skill 연주공격(Lev1)
+skill 연주공격(Lev2)
+skill 연주공격(Lev3)
+skill 연주공격(Lev4)
+skill 연천단각
+skill 연환포
+skill 완전방어
+skill 원기지옥
+skill 윈드블레이드
+skill 이형환위
+skill 일음지
+skill 적갑옷해체
+skill 적무기해체
+skill 전체암살격진
+skill 전체크래셔
+skill 정권
+skill 질주
+skill 찌르기
+skill 찔러휘비기
+skill 차크라어택
+skill 크래셔
+skill 타겟어택
+skill 탐색
+skill 통배권
+skill 투핸드어택
+skill 파천각
+skill 파천각(Lev2)
+skill 표창던지기
+skill 품뒤져보기
+skill 퓨리소월루(Lev1)
+skill 피닉스모드
+skill 할퀴기(Lev1)
+skill 허공답보
+skill 휘두르기
+map (뤼케)성메인홀 14 9
+map (뤼케)성복도 3 28
+map (뤼케)성식당 6 6
+map (뤼케)알현실 8 11
+map Refugee Camp 20 15
+map Safe House 24 13
+map 구광산1-1 88 3
+map 구광산10-1 92 46
+map 구광산11-1 47 98
+map 구광산12-1 47 98
+map 구광산13-1 3 52
+map 구광산14-1 52 56
+map 구광산15-1 91 3
+map 구광산16-1 93 59
+map 구광산17-1 69 87
+map 구광산18-1 3 52
+map 구광산19-1 4 80
+map 구광산2-1 3 55
+map 구광산2-2 16 6
+map 구광산20-1 11 41
+map 구광산21-1 58 4
+map 구광산22-1 15 34
+map 구광산23-1 46 98
+map 구광산24-1 69 87
+map 구광산25-1 26 92
+map 구광산26-1 3 52
+map 구광산27-1 4 80
+map 구광산27-2 27 4
+map 구광산28-1 91 3
+map 구광산28-2 27 4
+map 구광산29-1 3 52
+map 구광산3-1 58 4
+map 구광산3-2 14 35
+map 구광산4-1 14 53
+map 구광산5-1 3 52
+map 구광산6-1 52 56
+map 구광산6-2 4 80
+map 구광산7-1 26 90
+map 구광산7-2 26 92
+map 구광산8-2 12 9
+map 구광산9-1 26 92
+map 구광산대기실 47 10
+map 노비스마을 30 49
+map 노비스마을식당 18 4
+map 노비스무기방어구상점 9 18
+map 노비스민가1 13 13
+map 노비스민가2 11 6
+map 노비스잡화상점 9 18
+map 노비스주점 18 9
+map 노비스지하던전A1 12 1
+map 노비스지하던전A2 13 38
+map 노비스지하던전A3 13 38
+map 노비스지하던전B1 1 17
+map 노비스지하던전B2 1 17
+map 노비스지하던전B3 1 17
+map 노비스지하던전C1 1 17
+map 노비스지하던전C2 1 17
+map 노비스지하던전C3 1 17
+map 노비스평원A 1 9
+map 노비스평원B 24 1
+map 도서관1 28 1
+map 도서관2 24 1
+map 로오신전 10 6
+map 뤼케시온성 25 11
+map 뤼케시온해안1-A 47 13
+map 뤼케시온해안1-B 2 9
+map 뤼케시온해안2-A 26 47
+map 뤼케시온해안2-B 36 47
+map 뤼케시온해안2-C 2 7
+map 뤼케시온해안3-A 29 47
+map 뤼케시온해안3-B 26 47
+map 뤼케시온해안3-C 21 47
+map 뤼케시온해안4-A 37 47
+map 뤼케시온해안4-B 36 47
+map 뤼케시온해안4-C 9 47
+map 뤼케시온해안대기실 2 31
+map 마인마을 2 51
+map 마인시약상점 6 13
+map 마인여관 8 16
+map 마인은행 8 15
+map 마인제조상점 7 12
+map 몬스터관 3 2
+map 밀레스교회 8 22
+map 밀레스리콜상점 6 13
+map 밀레스마을 40 77
+map 밀레스무기점 6 13
+map 밀레스방어구점 10 8
+map 밀레스시약상점 6 13
+map 밀레스신전 9 6
+map 밀레스여관 8 16
+map 밀레스우체국 6 13
+map 밀레스은행 8 15
+map 밀레스음식점 8 13
+map 밀레스주점 13 4
+map 밀레스특수스킬의집 13 8
+map 밀레스훈련소 10 5
+map 박물관1층 14 16
+map 박물관2층 28 1
+map 박물관3층 1 1
+map 세오신전 10 5
+map 세토아신전 10 5
+map 수오미기술사범의집 11 2
+map 수오미마법사범의집 2 11
+map 수오미마을 71 83
+map 수오미무기점 6 13
+map 수오미방어구점 10 8
+map 수오미여관 16 7
+map 수오미음식점 8 13
+map 수오미주점 13 4
+map 수오미특수스킬의집 6 13
+map 시장 11 7
+map 시장은행 17 10
+map 신들의세계 25 10
+map 신죽마집안2-1 18 4
+map 신죽마집안2-2 14 2
+map 신죽마집안2-3 16 4
+map 신죽마집안2-4 10 12
+map 신죽마집안21-1 18 4
+map 신죽마집안21-2 14 2
+map 신죽마집안21-3 16 4
+map 신죽마집안21-4 11 12
+map 신죽마집안4-1 7 5
+map 신죽마집안4-2 7 6
+map 신죽마집안4-3 2 14
+map 신죽마집안4-4 3 5
+map 신죽마집안5-1 3 6
+map 신죽마집안5-2 1 6
+map 신죽마집안5-3 10 68
+map 신죽마집안5-4 4 7
+map 신죽음의마을1-1 9 37
+map 신죽음의마을1-2 5 2
+map 신죽음의마을1-3 43 17
+map 신죽음의마을1-4 5 2
+map 신죽음의마을1-5 2 9
+map 신죽음의마을1-6 17 14
+map 아벨기술사범의집 7 12
+map 아벨마을 44 51
+map 아벨무기점 6 13
+map 아벨방어구점 10 8
+map 아벨성 25 11
+map 아벨성메인홀 5 11
+map 아벨성복도 3 28
+map 아벨성식당 6 6
+map 아벨알현실 8 11
+map 아벨여관 8 16
+map 아벨은행 8 15
+map 아벨음식점 8 13
+map 아벨주점 13 4
+map 아벨퀘스트상점 7 12
+map 아벨특수스킬의집 6 13
+map 아벨해안1-A 47 13
+map 아벨해안1-B 2 9
+map 아벨해안2-A 26 47
+map 아벨해안2-B 36 47
+map 아벨해안2-C 2 7
+map 아벨해안3-A 29 47
+map 아벨해안3-B 26 47
+map 아벨해안3-C 21 47
+map 아벨해안4-A 37 47
+map 아벨해안4-B 36 47
+map 아벨해안4-C 9 47
+map 아벨해안대기실 38 41
+map 역사관 28 1
+map 용자의공원 47 50
+map 우드랜드1-1 2 35
+map 우드랜드1-2 2 10
+map 우드랜드1-3 2 10
+map 우드랜드10-1 39 2
+map 우드랜드11-1 25 47
+map 우드랜드14-1 38 97
+map 우드랜드2-1 97 45
+map 우드랜드3-1 38 97
+map 우드랜드4-1 38 97
+map 우드랜드5-1 38 97
+map 우드랜드6-1 38 97
+map 우드랜드입구 37 19
+map 유물관 12 2
+map 인물관 12 3
+map 죽음의마을1 65 18
+map 죽음의마을2 23 95
+map 죽음의마을3 66 95
+map 죽음의마을4 53 95
+map 죽음의마을입구5 11 17
+map 칸신전 10 5
+map 통합대련장 4 24
+map 포테의숲1존 33 47
+map 포테의숲2존 22 47
+map 포테의숲3존 37 68
+map 포테의숲4존 1 13
+map 포테의숲5존 1 15
+map 포테의숲6존 24 28
+map 홀리루딘길드성 25 11
+map 홀리루딘성메인홀 5 11
+map 홀리루딘성복도 3 28
+map 홀리루딘성식당 6 6
+map 홀리루딘알현실 8 11
