@@ -196,11 +196,13 @@ public sealed class GearDropTests
             foreach (JsonNode monster in here)
             {
                 string[] listed = [.. Dropped(monster)];
-                // 접미사·속성 장비는 `build-drop-variety.py` 가 부위별로 더한 것 — 기본템만 찾는다.
+                // 접미사·속성 장비와 원작 표로 레벨을 고친 5.99 장비(기본템 포함, 사용자 2026-10-04 「드랍도 시켜」)는
+                // `build-drop-variety.py` 가 부위별로 더한 것 — 그 밖의 장비(하데스 영문 기본템 등)만 찾는다.
                 string[] baseGear =
                 [
                     .. listed.Where(name => IsGear(items, name) && !allowed.Contains(name)
-                        && !SuffixHeads.Any(name.StartsWith)),
+                        && !SuffixHeads.Any(name.StartsWith)
+                        && items[name]["Group"]?.GetValue<string>()?.StartsWith("5.99표/") != true),
                 ];
 
                 if (baseGear.Length > 0)

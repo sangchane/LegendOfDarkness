@@ -86,6 +86,24 @@ SUFFIXED = tuple(f"{p}의" for p in ["로오", "이아", "메투스", "세토아
                                     "축복", "체력", "풍요"])
 
 
+# 서버 레벨이 원작 표와 달랐던 5.99 팩 장비 84종(2026-10-04 조사) — 사용자 「표대로 하고 드랍도 시켜」. 레벨을 표대로
+# 고친 뒤에도 드랍 후보로 남게 이름을 박아 둔다(고치고 나면 「다른 것」으로는 다시 못 찾는다). 접두·접미가 없어도
+# 레벨이 맞는 사냥터에 들어간다(무기·기본템·흑요석 포함, 99레벨은 아직 맞는 사냥터가 없다).
+TABLE_LEVELLED = {
+    "강화된리젠트다이아귀걸이", "검정두건", "구리방패", "금각반", "금벨트", "금장갑", "기사단방패", "대왕관", "동각반", "동장갑", "레인헌트각반", "레인헌트투구", "로톤캐프린",
+    "루돌프빨간코", "루딘의귀걸이", "리젠트다이아귀걸이", "매직루나", "매직마르시아", "매직솔라", "매직쥬피티아", "무당벌레장식", "문어군", "물안경", "브레스럭각반", "브릴윙각반",
+    "브릴윙투구", "산소통", "산타모자", "산호귀걸이", "산호반지", "세일라링", "세피라링(Lev1)", "세피라링(Lev10)", "세피라링(Lev2)", "세피라링(Lev3)",
+    "세피라링(Lev4)", "세피라링(Lev5)", "세피라링(Lev6)", "세피라링(Lev7)", "세피라링(Lev8)", "세피라링(Lev9)", "신발", "쌍금귀걸이", "쌍은귀걸이",
+    "약과헤어핀", "은각반", "은장갑", "자수정반지", "철방패", "캐프린1", "캐프린2", "코뿔소악세", "크리스탈목걸이", "타고르캐프린", "파란두건", "파파야방패", "페이로브각반",
+    "홀리루나", "홀리머큐리아", "홀리솔라", "홀리쥬피티아", "홍시모자", "홍옥반지", "화려한귀걸이", "횃불", "흑요석로그각반", "흑요석로그귀걸이", "흑요석로그반지", "흑요석로그장갑",
+    "흑요석몽크각반", "흑요석몽크귀걸이", "흑요석몽크반지", "흑요석소서러각반", "흑요석소서러귀걸이", "흑요석소서러반지", "흑요석소서러장갑", "흑요석워리어각반", "흑요석워리어귀걸이",
+    "흑요석워리어반지", "흑요석워리어장갑", "흑요석프리스트각반", "흑요석프리스트귀걸이", "흑요석프리스트반지", "흑요석프리스트장갑",
+}
+
+# 강화해서 얻는 장비 — 레벨은 표대로 고치지만 드랍에는 안 넣는다(사용자 2026-10-04 「세피라링·리젠트다이아귀걸이는
+# 드랍템이 아니라 강화시키는 것」).
+ENHANCED = ("세피라링", "리젠트다이아")
+
 LOOT_RANDOM = 1 << 1
 
 # `build-gear-drops.py` FIELD_BOSSES 가 한 칸짜리 목록으로 관리한다 — 건드리지 않는다.
@@ -221,7 +239,8 @@ def accessory_tiers(items, rows):
     kinds = defaultdict(list)
     for name, (path, item) in items.items():
         slot = item.get("EquipmentSlot") or 0
-        if slot in ACCESSORY and name.startswith(SUFFIXED) and name in rows:
+        if (slot in ACCESSORY and (name.startswith(SUFFIXED) or name in TABLE_LEVELLED) and name in rows
+                and not any(word in name for word in ENHANCED)):
             kinds[ACCESSORY[slot]].append((power(rows[name]), name))
     tier = {}
     for listed in kinds.values():
@@ -239,7 +258,7 @@ def align_levels(items, rows):
     고친 아이템 이름을 돌려준다 — 적는 것은 apply."""
     fixed = []
     for name, (path, item) in items.items():
-        if ((item.get("EquipmentSlot") or 0) > 1 and name.startswith(SUFFIXED)
+        if (((item.get("EquipmentSlot") or 0) > 1 and name.startswith(SUFFIXED) or name in TABLE_LEVELLED)
                 and name in rows and str(rows[name].get("레벨제한", "")).isdigit()
                 and int(rows[name]["레벨제한"]) != (item.get("LevelRequired") or 0)):
             item["LevelRequired"] = int(rows[name]["레벨제한"])
@@ -281,6 +300,12 @@ def fill_gear(items, monsters):
             item = items[name][1]
             if entry == group["entry"] and name not in BASE_RATE and (item.get("LevelRequired") or 0) <= entry:
                 picked.setdefault((item["EquipmentSlot"], name.split("의")[0]), name)
+        # 표대로 고친 84종(접두·접미 없는 것 포함)은 그 레벨이 이 사냥터 층 안이면 하나하나 넣는다.
+        for name in sorted(TABLE_LEVELLED - set(tiers)):
+            if name in items and name not in BASE_RATE and not any(word in name for word in ENHANCED):
+                level = items[name][1].get("LevelRequired") or 0
+                if group["entry"] - TIER_REACH <= level <= group["entry"]:
+                    picked.setdefault((items[name][1]["EquipmentSlot"], name), name)
         group["gear"] = sorted(picked.values())
         group["slots"] = sum(len([n for n in drops_of(m) if n in BASE_RATE]) for p, m in {
             m["Name"]: (p, m) for p, m in monsters
@@ -305,7 +330,8 @@ def plan(monsters, items, said):
     ADDED.update(LEGACY_GEAR, (n for g in GROUPS for n in g["gear"]), (n for g in GROUPS for n in g["potions"]))
     # 지난번에 이 생성기가 붙였다가 이번 한 벌에서 빠진 것까지 걷어 낸다 — 기준값(BASE_RATE)이 아닌 접두·접미 장비.
     ADDED.update(n for n, (path, item) in items.items()
-                 if n.startswith(SUFFIXED) and (item.get("EquipmentSlot") or 0) > 0 and n not in BASE_RATE)
+                 if (n.startswith(SUFFIXED) or n in TABLE_LEVELLED) and (item.get("EquipmentSlot") or 0) > 0
+                 and n not in BASE_RATE)
     lists = {}  # path -> (monster, old, new, group)
     new_rates = {}
 

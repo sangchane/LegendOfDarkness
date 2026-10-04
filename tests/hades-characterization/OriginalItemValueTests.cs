@@ -87,11 +87,11 @@ public sealed class OriginalItemValueTests
     }
 
     /// <summary>
-    /// 지팡이 10종은 되돌리지 않는다 — 팩의 레벨 사다리(1·21·51·81·99)가 그대로 살아 있어야 한다.
-    /// 도감대로 되돌리면 열 자루가 전부 레벨 11 이 되어 사다리가 사라진다.
+    /// 지팡이 10종의 레벨제한은 원작 표대로 모두 11 이다(사용자 2026-10-04 「표대로」 — 그 전에는 팩의 레벨 사다리
+    /// 1·21·51·81·99 를 지켰다). 고치는 것은 <c>scripts/gen/items/build-drop-variety.py</c> <c>align_levels</c>.
     /// </summary>
     [Fact]
-    public void The_ten_staves_keep_the_pack_ladder()
+    public void The_ten_staves_follow_the_sheet_level()
     {
         Dictionary<string, JsonNode> items = Items();
         Dictionary<string, JsonNode> sheet = Sheet();
@@ -101,14 +101,12 @@ public sealed class OriginalItemValueTests
             Assert.True(items.ContainsKey(name), $"{name} 아이템 템플릿이 없습니다.");
             Assert.True(sheet.ContainsKey(name), $"{name} 이 도감 수치표에 없습니다 — 두는 까닭이 사라졌습니다.");
 
-            // 도감은 열 자루 모두 레벨 11 이라 적었다. 되돌리기가 그것을 따라갔으면 사다리가 뭉개진 것이다.
             Assert.Equal(11, Number(sheet[name], "레벨제한"));
         }
 
-        int[] ladder = Staves.Select(name => Whole(items[name], "LevelRequired")).Distinct().Order().ToArray();
+        int[] levels = Staves.Select(name => Whole(items[name], "LevelRequired")).Distinct().Order().ToArray();
 
-        // 매직파나·홀리파나는 원작대로 11레벨(사용자, 2026-09-24) — 사다리에 11 이 한 칸 낀다.
-        Assert.Equal([1, 11, 21, 51, 81, 99], ladder);
+        Assert.Equal([11], levels);
     }
 
     /// <summary>
