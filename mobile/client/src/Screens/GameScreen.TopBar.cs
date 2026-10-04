@@ -127,24 +127,6 @@ public partial class GameScreen : Control
         actions.AddChild(_map);
         actions.MoveChild(_map, 0);
 
-        // 접속자 — 원작 사람 목록 창(2026-10-04). 그림은 원작 직업 아이콘 첫 칸(농부).
-        Button users = MenuButton("접속자", "res://assets/ui/menu-users.png", pixel: true);
-        users.Pressed += () => SetWindow(GameWindow.Users, !_users.Visible);
-        actions.AddChild(users);
-
-        // 봇 켬/끔 — [접속자] 오른쪽 위 모서리에 작게 붙인다(사용자 2026-10-04). 줄에 따로 세우면 세로 360 에서 위 줄이 화면보다
-        // 넓어져 미니맵이 밀렸다. 누르면 설정 봇 탭의 [봇 부르기]/[봇 보내기]와 같다. 봇 설정은 설정 창 그대로.
-        _botToggle = new Button { Text = "봇", FocusMode = FocusModeEnum.None, TooltipText = "봇 켬/끔" };
-        _botToggle.AddThemeFontSizeOverride("font_size", 10);
-        _botToggle.Pressed += () => _settings.Companion.EmitSignal(BaseButton.SignalName.Pressed);
-        users.AddChild(_botToggle);
-        _botToggle.SetAnchorsPreset(LayoutPreset.TopRight);
-        _botToggle.OffsetLeft = -16;
-        _botToggle.OffsetRight = 8;
-        _botToggle.OffsetTop = -4;
-        _botToggle.OffsetBottom = 20;
-        PaintBotToggle(false);
-
         Button settings = MenuButton("설정", "res://assets/ui/menu-settings.png");
         settings.Pressed += () => SetWindow(GameWindow.Settings, !_settings.Visible);
         actions.AddChild(settings);
@@ -231,25 +213,51 @@ public partial class GameScreen : Control
     /// 공격 단추의 모양을 자동 사냥과 맞춘다 — 켜짐은 테두리 + "자동" 글자, 손이 잠시 조작 중이면 흐리게
     /// (<see cref="AbilityBar.ShowAutoHunt" />). <c>--auto-hunt</c> 면 자리를 잡은 뒤 한 번 스스로 켠다.
     /// </summary>
-    private Button _botToggle = null!;
+    private TextureButton _botToggle = null!;
     private bool? _botDrawn;
 
-    /// <summary>봇 켬/끔 단추 — 켜져 있으면 금테·금색 글자, 꺼져 있으면 흐린 테.</summary>
+    /// <summary>
+    /// 메인 메뉴 아래 오른쪽의 작은 단추 둘 — [접속자] · [봇 켬/끔](사용자 2026-10-04). 메뉴 줄에 세우면 세로 360 에서 위 줄이 넘쳤다 —
+    /// 다른 칸을 밀지 않게 덮는 층에 띄운다(Cover). 봇 설정은 설정 창 봇 탭 그대로.
+    /// 그림은 원작 클래식 UI(노바 클라이언트) 소지품 오른쪽 둥근 단추로 바꿀 자리다 — 노바 클라이언트가 맥에 없어 지금은 5.99 setoa.dat
+    /// 오른쪽 세로 단추 줄(`lback.txt`: Users = gbicon02 4·5, 봇은 짝이 없어 emot000 「두 사람」 12·13·14)을 쓴다. 같은 파일 이름으로 바꿔 끼운다.
+    /// </summary>
+    private Control BuildSideButtons()
+    {
+        HBoxContainer side = new() { MouseFilter = MouseFilterEnum.Ignore };
+        side.AddThemeConstantOverride("separation", Main.Gutter / 2);
+
+        TextureButton users = SideButton("res://assets/ui/side-users.png", "res://assets/ui/side-users-pressed.png", "접속자");
+        users.Pressed += () => SetWindow(GameWindow.Users, !_users.Visible);
+        side.AddChild(users);
+
+        _botToggle = SideButton("res://assets/ui/side-bot.png", "res://assets/ui/side-bot-pressed.png", "봇 켬/끔");
+        _botToggle.Pressed += () => _settings.Companion.EmitSignal(BaseButton.SignalName.Pressed);
+        side.AddChild(_botToggle);
+
+        return side;
+    }
+
+    private static TextureButton SideButton(string normal, string pressed, string tip) => new()
+    {
+        TextureNormal = GD.Load<Texture2D>(normal),
+        TexturePressed = GD.Load<Texture2D>(pressed),
+        IgnoreTextureSize = true,
+        StretchMode = TextureButton.StretchModeEnum.Scale,
+        TextureFilter = TextureFilterEnum.Nearest,
+        CustomMinimumSize = new Vector2(SideButtonSize, SideButtonSize),
+        FocusMode = FocusModeEnum.None,
+        TooltipText = tip
+    };
+
+    /// <summary>원작 18 돌판을 두 배 남짓 — 작게, 그래도 엄지로 누를 만큼.</summary>
+    private const int SideButtonSize = 40;
+
+    /// <summary>봇이 따라오면 켜짐 그림(원작 강조 칸).</summary>
     private void PaintBotToggle(bool on)
     {
         _botDrawn = on;
-        StyleBoxFlat ring = new() { BgColor = new Color(0, 0, 0, on ? 0.55f : 0.35f), BorderColor = on ? LolGold : LolGoldDark };
-        ring.SetBorderWidthAll(on ? 2 : 1);
-        ring.SetCornerRadiusAll(12);
-
-        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus", "disabled" })
-        {
-            _botToggle.AddThemeStyleboxOverride(state, ring);
-        }
-
-        _botToggle.AddThemeColorOverride("font_color", on ? LolGold : LolMuted);
-        _botToggle.AddThemeColorOverride("font_pressed_color", LolGold);
-        _botToggle.AddThemeColorOverride("font_hover_color", on ? LolGold : LolMuted);
+        _botToggle.TextureNormal = GD.Load<Texture2D>(on ? "res://assets/ui/side-bot-on.png" : "res://assets/ui/side-bot.png");
     }
 
     private void KeepAutoHuntButton()

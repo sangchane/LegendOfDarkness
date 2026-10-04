@@ -125,6 +125,15 @@ public partial class GameScreen : Control
         over.AddChild(_toasts);
         _over = over;
 
+        // [접속자]·[봇] 단추 — 메인 메뉴 아래 오른쪽(BuildSideButtons). 알림 줄은 그 아래에서 시작한다.
+        Control side = BuildSideButtons();
+        over.AddChild(side);
+        side.AnchorLeft = 1;
+        side.AnchorRight = 1;
+        side.GrowHorizontal = GrowDirection.Begin;
+        side.OffsetRight = -Main.Gutter;
+        side.OffsetLeft = side.OffsetRight - (SideButtonSize * 2) - (Main.Gutter / 2);
+
         // 파티는 위 줄 바로 아래 왼쪽에 — 세로는 방향판·부채꼴·기록 줄이 모두 아래에 있어 비어 있는 자리다. 가로는 왼쪽 아래
         // 방향판과 그 위 기록 줄이 위 줄 가까이까지 올라오므로 방향판 오른쪽 옆으로 비킨다(PlaceParty). 창들보다 먼저
         // 넣어 창이 열리면 그 아래로 간다.
@@ -144,7 +153,9 @@ public partial class GameScreen : Control
         _topRow.Resized += () =>
         {
             // 가로는 가운데 한 줄(배너)과 높이가 겹쳐 레벨이 오를 때 글자가 포개졌다 — 그 아래에서 시작한다.
-            _toasts.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter + (Main.Portrait ? 0 : 40);
+            side.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + (Main.Gutter / 2);
+            side.OffsetBottom = side.OffsetTop + SideButtonSize;
+            _toasts.OffsetTop = side.OffsetBottom + Main.Gutter + (Main.Portrait ? 0 : 40);
             _toasts.OffsetBottom = _toasts.OffsetTop + 120;
         };
 
