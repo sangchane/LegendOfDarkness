@@ -136,7 +136,7 @@ public sealed class GearDropTests
     /// — 이 목록 밖에서 접미사·속성이 아닌 장비가 보이면 아직 기본템이 남은 것이다.
     /// </summary>
     private static readonly string[] SuffixHeads =
-        ["로오의", "이아의", "메투스의", "세토아의", "세오의", "셔스의", "칸의", "화염의", "바다의", "바람의", "대지의"];
+        ["로오의", "이아의", "메투스의", "세토아의", "세오의", "셔스의", "칸의", "화염의", "바다의", "바람의", "대지의", "축복의", "체력의", "풍요의"];
 
     internal static readonly Dictionary<int, string[]> GroundGear = new()
     {
@@ -443,11 +443,11 @@ public sealed class GearDropTests
     {
         IReadOnlyDictionary<string, JsonNode> items = Items();
 
-        Assert.Equal(11, (int?)items["로오의반지"]["LevelRequired"]);
+        Assert.Equal(1, (int?)items["로오의반지"]["LevelRequired"]); // 레벨만 원작 표대로(사용자 2026-10-04)
         Assert.Equal(500, (int?)items["로오의반지"]["Value"]);
         Assert.Equal("5.99표/반지/공통반지", items["로오의반지"]["Group"]?.GetValue<string>());
 
-        Assert.Equal(11, (int?)items["칸의목걸이"]["LevelRequired"]);
+        Assert.Equal(1, (int?)items["칸의목걸이"]["LevelRequired"]); // 레벨만 원작 표대로(사용자 2026-10-04)
         Assert.Equal(1000, (int?)items["칸의목걸이"]["Value"]);
         Assert.Equal("5.99표/목걸이/공통목걸이", items["칸의목걸이"]["Group"]?.GetValue<string>());
     }

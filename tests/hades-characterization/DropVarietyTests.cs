@@ -28,7 +28,7 @@ public sealed class DropVarietyTests
 
     /// <summary>접미사(방어)·속성(공격) 장비의 앞머리.</summary>
     private static readonly string[] Suffixes =
-        ["로오의", "이아의", "메투스의", "세토아의", "세오의", "셔스의", "칸의", "화염의", "바다의", "바람의", "대지의"];
+        ["로오의", "이아의", "메투스의", "세토아의", "세오의", "셔스의", "칸의", "화염의", "바다의", "바람의", "대지의", "축복의", "체력의", "풍요의"];
 
     /// <summary>맵 · 입장 레벨 · 적어도 몇 부위(EquipmentSlot)의 접미사·속성 장비가 보여야 하나.</summary>
     private static readonly (int[] Maps, int Entry, int LeastSlots)[] Grounds =

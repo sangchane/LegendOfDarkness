@@ -81,7 +81,10 @@ NEW_GEAR_TOTAL = 0.04
 TIER_REACH = 30
 
 # 접미사(방어)·속성(공격) 장비 — 이름 앞머리로 가린다.
-SUFFIXED = tuple(f"{p}의" for p in ["로오", "이아", "메투스", "세토아", "세오", "셔스", "칸", "화염", "바다", "바람", "대지"])
+SUFFIXED = tuple(f"{p}의" for p in ["로오", "이아", "메투스", "세토아", "세오", "셔스", "칸", "화염", "바다", "바람", "대지",
+                                    # 축복·체력·풍요 장비도 드랍에(사용자 2026-10-04).
+                                    "축복", "체력", "풍요"])
+
 
 LOOT_RANDOM = 1 << 1
 
@@ -231,9 +234,26 @@ def accessory_tiers(items, rows):
     return tier
 
 
+def align_levels(items, rows):
+    """드랍에 쓰는 장비의 서버 레벨(LevelRequired)을 원작 표 레벨제한으로 맞춘다(사용자 2026-10-04 「레벨 제한 표대로」).
+    고친 아이템 이름을 돌려준다 — 적는 것은 apply."""
+    fixed = []
+    for name, (path, item) in items.items():
+        if ((item.get("EquipmentSlot") or 0) > 1 and name.startswith(SUFFIXED)
+                and name in rows and str(rows[name].get("레벨제한", "")).isdigit()
+                and int(rows[name]["레벨제한"]) != (item.get("LevelRequired") or 0)):
+            item["LevelRequired"] = int(rows[name]["레벨제한"])
+            fixed.append(name)
+    return fixed
+
+
+LEVELLED = []
+
+
 def fill_gear(items, monsters):
     """사냥터마다 장비 한 벌(부위마다 입장 레벨 이하 가장 높은 층, 장신구는 점수 등급)과 같은 배율 RATIO 를 정한다."""
     rows = sheet_rows()
+    LEVELLED[:] = align_levels(items, rows)
     tiers = accessory_tiers(items, rows)
     for group in GROUPS:
         best = {}
@@ -283,6 +303,9 @@ def plan(monsters, items, said):
     """괴물 파일마다 (옛 목록, 새 목록) 과 아이템마다 새 DropRate 를 정한다."""
     fill_gear(items, monsters)
     ADDED.update(LEGACY_GEAR, (n for g in GROUPS for n in g["gear"]), (n for g in GROUPS for n in g["potions"]))
+    # 지난번에 이 생성기가 붙였다가 이번 한 벌에서 빠진 것까지 걷어 낸다 — 기준값(BASE_RATE)이 아닌 접두·접미 장비.
+    ADDED.update(n for n, (path, item) in items.items()
+                 if n.startswith(SUFFIXED) and (item.get("EquipmentSlot") or 0) > 0 and n not in BASE_RATE)
     lists = {}  # path -> (monster, old, new, group)
     new_rates = {}
 
@@ -427,8 +450,14 @@ def apply(items, lists, new_rates, writing):
             changed_monsters += 1
     for name, rate in new_rates.items():
         path, item = items[name]
-        if item.get("DropRate") != rate:
+        if item.get("DropRate") != rate or name in LEVELLED:
             item["DropRate"] = rate
+            write(path, item, writing, "\n")
+            changed_items += 1
+
+    for name in LEVELLED:
+        if name not in new_rates:
+            path, item = items[name]
             write(path, item, writing, "\n")
             changed_items += 1
 
@@ -456,6 +485,7 @@ def main():
     report(monsters, items, lists, new_rates, said)
     changed_monsters, changed_items = apply(items, lists, new_rates, writing)
 
+    said.append(f"\n레벨을 원작 표대로 고친 장비 {len(LEVELLED)}종: {' · '.join(sorted(LEVELLED))}")
     print("\n".join(said))
     print(f"\n괴물 정의 {changed_monsters}장 · 아이템 {changed_items}장이 바뀐다.")
     print("적었습니다." if writing else "미리 본 것입니다 — 적으려면 --쓰기")
