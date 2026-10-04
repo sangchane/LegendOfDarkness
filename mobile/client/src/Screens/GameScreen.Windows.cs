@@ -28,6 +28,14 @@ public partial class GameScreen : Control
             {
                 _tabMap.Open();
             }
+
+            // 열 때마다 새로 묻는다(0x18 → 0x36). 창은 선 자리에 맞게 통째로 줄인다.
+            if (window == GameWindow.Users)
+            {
+                _users.Fit(((Control)_users.GetParent()).Size);
+                _usersAsked = 0;
+                AskUsers();
+            }
         }
         else
         {
@@ -41,6 +49,13 @@ public partial class GameScreen : Control
         _world.PeopleOnly = _windows.IsOpen(GameWindow.Gear);
     }
 
+    private void AskUsers()
+    {
+        _usersAsking = _server is not null && ++_usersAsked < 10;
+        _usersAskIn = 1;
+        Main.Fire(_server?.AskUsersAsync(System.Threading.CancellationToken.None));
+    }
+
     private Control WindowOf(GameWindow window) => window switch
     {
         GameWindow.Pack => _pack,
@@ -50,6 +65,7 @@ public partial class GameScreen : Control
         GameWindow.WorldMap => _field,
         GameWindow.Settings => _settings,
         GameWindow.TabMap => _tabMap,
+        GameWindow.Users => _users,
         _ => _botGear
     };
 
@@ -159,7 +175,7 @@ public partial class GameScreen : Control
 
         List<VBoxContainer> holders = [];
 
-        foreach (Control panel in new Control[] { _pack, _gearPanel, _talk, _chat, _field, _settings, _tabMap, _botGear })
+        foreach (Control panel in new Control[] { _pack, _gearPanel, _talk, _chat, _field, _settings, _tabMap, _botGear, _users })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -200,6 +216,13 @@ public partial class GameScreen : Control
 
             // 장비창은 그림 한 장이라 제 크기만큼만 — 세로는 위 줄 바로 아래 가운데(소지품은 그 바로 아래), 가로는 소지품 기둥
             // 바로 왼쪽(혼자면 오른쪽 끝) — 내 장비창은 소지품과 같이 열어 입고 벗는다(사용자 2026-10-01).
+            // 접속자 창은 설정 창처럼 위 줄 바로 아래 가운데 — 가로에서 오른쪽 기둥에 서면 공격 단추를 덮는다.
+            if (panel == _users)
+            {
+                holder.Alignment = BoxContainer.AlignmentMode.Begin;
+                _users.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+            }
+
             if (panel == _gearPanel)
             {
                 _gearHolder = holder;
@@ -278,7 +301,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _gearHolder || holder == _chatHolder || holder == _talkHolder ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _gearHolder || holder == _chatHolder || holder == _talkHolder || holder == _users.GetParent() ? 0 : column;
         }
     }
 

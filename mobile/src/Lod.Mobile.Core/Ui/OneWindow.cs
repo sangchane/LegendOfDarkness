@@ -10,7 +10,8 @@ public enum GameWindow
     WorldMap,
     Settings,
     TabMap,
-    BotGear
+    BotGear,
+    Users
 }
 
 /// <summary>

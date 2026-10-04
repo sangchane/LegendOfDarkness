@@ -43,6 +43,7 @@ public sealed partial class WorldClient
         ServerOpcode.GroupAsk => OnGroupAsk,
         ServerOpcode.CompanionTie => OnCompanionTie,
         ServerOpcode.OtherProfile => OnOtherProfile,
+        ServerOpcode.UserList => OnUserList,
         ServerOpcode.Profile => OnProfile,
         ServerOpcode.Cooldown => OnCooldown,
         ServerOpcode.Status => OnStatus,

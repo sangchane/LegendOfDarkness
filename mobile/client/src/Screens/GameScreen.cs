@@ -68,6 +68,10 @@ public partial class GameScreen : Control
     private bool _tabMapWent;
     private SettingsPanel _settings = null!;
     private readonly BotGearPanel _botGear = new();
+    private readonly UsersPanel _users = new();
+    private bool _usersAsking;
+    private double _usersAskIn;
+    private int _usersAsked;
     private Control? _botGearHolder;
     private Control? _gearHolder;
     private VBoxContainer? _packHolder;
@@ -283,6 +287,7 @@ public partial class GameScreen : Control
 
         _settings = new SettingsPanel();
         _settings.Close.Pressed += () => SetWindow(GameWindow.Settings, false);
+        _users.Close.Pressed += () => SetWindow(GameWindow.Users, false);
 
         // [종료] 는 위 줄에서 설정 창 제목 줄의 [로그아웃] 으로 옮겼다(2026-09-26). 판은 그대로 — 로그아웃 · 게임 종료 · 취소.
         _settings.Exit.Pressed += () =>
@@ -644,6 +649,18 @@ public partial class GameScreen : Control
         {
             _chat.Show(_history);
             _chatHolder.OffsetBottom = -Lifted();
+        }
+
+        // [접속자] 를 눌러 서버가 접속자 목록(0x36)을 보내 왔다. 서버는 새로고침(0x38) 뒤 0.3초 안의 0x18 을 말없이 버리므로
+        // 창이 열린 채 답이 없으면 1초마다, 열 번까지 다시 묻는다.
+        if (_server?.TakeUsers() is { } users)
+        {
+            _users.Show(users);
+            _usersAsking = false;
+        }
+        else if (_usersAsking && _users.Visible && (_usersAskIn -= delta) <= 0)
+        {
+            AskUsers();
         }
 
         // 사람을 눌러 서버가 그 사람 장비창(0x34)을 보내 왔다.

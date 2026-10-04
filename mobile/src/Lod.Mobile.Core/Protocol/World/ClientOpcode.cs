@@ -79,4 +79,7 @@ internal static class ClientOpcode
 
     /// <summary>귓속말. 받는 이 이름이 "!" 이면 그룹말이다.</summary>
     public const byte Whisper = 0x19;
+
+    /// <summary>접속자 목록을 달라는 말. 몸 없이 번호만(Hades <c>Format18Handler</c>). 오는 <see cref="ServerOpcode.RemoveSpell" /> 와 번호가 같다.</summary>
+    public const byte AskUsers = 0x18;
 }

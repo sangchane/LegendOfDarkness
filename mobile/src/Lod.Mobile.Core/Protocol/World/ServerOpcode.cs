@@ -104,4 +104,7 @@ internal static class ServerOpcode
 
     /// <summary>남의 장비창 — 사람을 누르면(0x43) 서버가 보낸다(Hades <c>ServerFormat34</c>).</summary>
     public const byte OtherProfile = 0x34;
+
+    /// <summary>접속자 목록 — 0x18 로 청하면 서버가 보낸다(Hades <c>ServerFormat36</c>).</summary>
+    public const byte UserList = 0x36;
 }

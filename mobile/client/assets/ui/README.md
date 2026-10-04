@@ -37,3 +37,5 @@ AtlasTexture 영역은 희미한 외곽 픽셀과 투명 여백을 제외해 모
 - `menu-settings.png`: 위 메뉴 [설정] 금색 톱니(`#C8AA6E`) — 원작에 맞는 그림이 없어 그렸다. [장비]·[인벤토리]는 원작 아이템 그림
   `assets/item/32786.png`(골든플레이트투구)·`40999.png`(가죽가방)을 그대로 쓴다.
 - `lodmap.png`·`lodusr.png`: 원작 451 로딩 띠(`docs/ui/original-451/`) 통째로 — 맵 바뀔 때 「Loading Map」, 접속하는 동안 「Loading ...」(`LoadingBand.cs`).
+- `users01.png`·`legends.png`: 원작 451 사람 목록 창(466×308) 통째와 직업 아이콘 여덟(20×20, 24 간격 — 농부·전사·도적·마법사·성직자·무도가·…).
+  바탕색 `#141720` 만 투명으로. 접속자 창(`Windows/UsersPanel.cs`)이 창은 화면에 맞게 통째 축소, 아이콘은 한 칸씩 잘라 쓴다. [접속자] 위 메뉴 그림 `menu-users.png` 는 그 첫 칸(농부)을 잘라 둔 것.

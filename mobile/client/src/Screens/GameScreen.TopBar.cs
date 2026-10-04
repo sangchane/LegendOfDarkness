@@ -114,6 +114,11 @@ public partial class GameScreen : Control
         actions.AddChild(_map);
         actions.MoveChild(_map, 0);
 
+        // 접속자 — 원작 사람 목록 창(2026-10-04). 그림은 원작 직업 아이콘 첫 칸(농부).
+        Button users = MenuButton("접속자", "res://assets/ui/menu-users.png", pixel: true);
+        users.Pressed += () => SetWindow(GameWindow.Users, !_users.Visible);
+        actions.AddChild(users);
+
         Button settings = MenuButton("설정", "res://assets/ui/menu-settings.png");
         settings.Pressed += () => SetWindow(GameWindow.Settings, !_settings.Visible);
         actions.AddChild(settings);

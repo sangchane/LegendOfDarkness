@@ -15,6 +15,7 @@ public partial class GameScreen : Control
     private void RehearseParty(double delta)
     {
         RehearseLook(delta);
+        RehearseUsers();
 
         if (Main.Inviting.Length > 0 && !_partyRehearsed && Time.GetTicksMsec() > 6000)
         {
@@ -267,6 +268,27 @@ public partial class GameScreen : Control
         {
             _looked = true;
             GD.Print($"GREYBOX_LOOK {Main.Looking} 소지품 {(_pack.Visible ? "열림" : "닫힘")}");
+        }
+    }
+
+    private bool _usersRehearsed;
+
+    /// <summary>손 없이 확인할 때만(<c>--users</c>): 들어간 뒤 [접속자] 창을 한 번 열고, 목록이 오면 이름들을 적는다.</summary>
+    private void RehearseUsers()
+    {
+        if (!Main.ShowingUsers || _usersRehearsed || Time.GetTicksMsec() < 6000)
+        {
+            return;
+        }
+
+        if (!_users.Visible)
+        {
+            SetWindow(GameWindow.Users, true);
+        }
+        else if (_users.Names.Count > 0)
+        {
+            _usersRehearsed = true;
+            GD.Print($"GREYBOX_USERS {string.Join(",", _users.Names)}");
         }
     }
 }
