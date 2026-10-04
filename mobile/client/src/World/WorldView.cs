@@ -335,7 +335,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             return true;
         }
 
-        if (Frozen || _walked >= 0 || Comatose)
+        if (Frozen || _walked >= 0 || Comatose || _player.Acting)
         {
             return false;
         }
@@ -348,7 +348,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     /// <summary>Starts a step. Ignored while one is still running, so a tile is never half walked.</summary>
     public void Walk(Direction direction)
     {
-        if (Frozen || _walked >= 0 || Comatose)
+        // 몸 동작 중에는 걷지 못한다 — 원작 클라이언트가 막는다(docs/speed-reference.md). 키를 누르고 있으면 끝난 뒤 걷는다.
+        if (Frozen || _walked >= 0 || Comatose || _player.Acting)
         {
             return;
         }

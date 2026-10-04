@@ -27,15 +27,11 @@ public partial class GameScreen : Control
 
                 if (_hold.IsNew(where))
                 {
-                    _hold.Pressing(looking: _world.Looking == where);
-
                     // 걸음 중이면 그 걸음이 끝난 뒤에 돈다 — 짧게 누른 것이 씹히지 않게.
-                    if (!_world.Turn(where))
+                    if (!PressDirection(where))
                     {
                         continue;
                     }
-
-                    _hold.Began(where);
                 }
                 else
                 {
@@ -60,6 +56,21 @@ public partial class GameScreen : Control
         Color look = _pad.Modulate;
         look.A = Mathf.MoveToward(look.A, wanted, (float)(delta / FadeSeconds));
         _pad.Modulate = look;
+    }
+
+    /// <summary>새 방향을 눌렀다 — 보고 있지 않은 쪽이면 돌기만 하고, 더 누르고 있어야 걷는다(<see cref="DirectionHold" />).</summary>
+    /// <returns>돌았거나 이미 그쪽을 보면 true, 걸음 중이라 아직 못 돌았으면 false.</returns>
+    private bool PressDirection(Direction where)
+    {
+        _hold.Pressing(looking: _world.Looking == where);
+
+        if (!_world.Turn(where))
+        {
+            return false;
+        }
+
+        _hold.Began(where);
+        return true;
     }
 
     /// <summary>
@@ -243,7 +254,9 @@ public partial class GameScreen : Control
                 // 방향판을 누르면 길 안내는 멈춘다 — 손이 이긴다. 자동 사냥은 잠시 쉬고, 선 자리가 새 중심이 된다.
                 _world.StopGuiding();
                 _world.SteeredByHand();
-                _world.Walk(where);
+
+                // 걷기는 KeepWalking 이 판정한다 — 여기서 바로 걸으면 짧게 눌러도 한 칸 갔다.
+                PressDirection(where);
             };
             _keys.Add((button, where));
 

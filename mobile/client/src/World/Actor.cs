@@ -97,6 +97,9 @@ public sealed partial class Actor : Node2D
 
     public string DisplayName { get; }
 
+    /// <summary>몸 동작(평타·기술)을 그리는 중인가 — 원작은 그동안 걷기·돌기 입력을 버린다(Legend.exe 0x5c8d0b).</summary>
+    public bool Acting => _struck >= 0;
+
     /// <summary>Which way the figure is turned, so a replacement can be stood the same way.</summary>
     public Direction Looking => _direction;
 
