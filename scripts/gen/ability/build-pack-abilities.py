@@ -279,7 +279,12 @@ def write_made(made, nova_skills, nova_spells, skills, spells, taught):
     for kind, name, source, code, variables, flags, lacking, delay, cls in made:
         folder = OUT / {"SKILL": "Skills", "SPELL": "Spells", "Monster": "Monsters"}[kind]
         folder.mkdir(parents=True, exist_ok=True)
-        (folder / f"{name}.cs").write_text(csharp(kind, name, source, code, variables, flags), encoding="utf-8-sig")
+        # 사람이 손본 스크립트(주석 `손본 곳` — 다라밀공·쿠로토의 동작·회복량)는 스크립트도 템플릿도 다시 쓰지 않는다.
+        script = folder / f"{name}.cs"
+        if script.exists() and "손본 곳" in script.read_text(encoding="utf-8-sig"):
+            print(f"  손본 곳이 있어 건너뜀: {kind} {name}")
+            continue
+        script.write_text(csharp(kind, name, source, code, variables, flags), encoding="utf-8-sig")
         if kind == "Monster":
             # 하데스 괴물 AI 는 같은 이름의 마법 템플릿이 있어야 스크립트를 불러온다(`CommonMonster.cs:292`) —
             # 없으면 말없이 건너뛴다. 가르치는 NPC 가 없으니 사람이 배울 길은 없다.
