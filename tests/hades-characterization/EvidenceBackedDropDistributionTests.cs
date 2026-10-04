@@ -13,8 +13,8 @@ namespace Lod.Hades.Characterization.Tests;
 public sealed class EvidenceBackedDropDistributionTests
 {
     private const int ItemTemplateCount = 1364;
-    private const int ReferencedItemTypeCount = 116;   // 구광산 헬옷 13종(2026-10-02, build-old-mine.py)
-    private const int DropRelationCount = 723;         // 구광산 669 + 뤼케시온해안 골드아쿠아링 54줄(2026-10-02)
+    private const int ReferencedItemTypeCount = 243;   // 부위별 접미사·속성 장비(2026-10-04, build-drop-variety.py)
+    private const int DropRelationCount = 1420;        // 723 + 부위별 장비(2026-10-04, build-drop-variety.py)
     private const int LootRandom = 2;
     private const int LootTable = 4;
 
@@ -80,7 +80,7 @@ public sealed class EvidenceBackedDropDistributionTests
 
     /// <summary>
     /// 현재 배치 자체가 허용 목록이다. 양수 <c>DropRate</c> 가 남은 미연결 아이템을 보고 새 연결을
-    /// 만들면 이 116종·723개 스냅샷이 바뀐다.
+    /// 만들면 이 243종·1420개 스냅샷이 바뀐다.
     /// </summary>
     [Fact]
     public void Drop_connections_are_not_synthesized_from_item_drop_rates()
