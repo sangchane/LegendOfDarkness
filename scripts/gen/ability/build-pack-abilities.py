@@ -135,13 +135,14 @@ def klass(kind, name):
 
 
 def monster_spells():
-    """5.99 괴물 정의의 `스킬 Monster_이름 N` — 괴물 이름 → 괴물 마법 이름."""
+    """5.99 괴물 정의의 `스킬 Monster_이름 N` — 괴물 이름 → (괴물 마법 이름, N)."""
     out = {}
     for path in (PACK / "mob").rglob("*.txt"):
         for chunk in re.findall(r"\{(.*?)\}", read(path), re.S):
             fields = dict(line.split("\t", 1) for line in chunk.strip().splitlines() if "\t" in line)
             if "이름" in fields and "스킬" in fields:
-                out[fields["이름"].strip()] = fields["스킬"].split("\t")[0].strip()
+                spell, _, rate = fields["스킬"].partition("\t")
+                out[fields["이름"].strip()] = (spell.strip(), int(rate.strip() or 0))
     return out
 
 
@@ -336,13 +337,15 @@ def attach_monster_spells(made):
     attached, undefined = 0, Counter()
     for path in (HADES / "templates" / "monsters" / "5.99").glob("*.json"):
         template = json.loads(path.read_text(encoding="utf-8-sig"))
-        spell = wanted.get(template.get("BaseName") or template.get("Name"))
+        spell, rate = wanted.get(template.get("BaseName") or template.get("Name"), (None, 0))
         if not spell:
             continue
         if spell[len("Monster_"):] not in defined:
             undefined[spell] += 1
             continue
         template["SpellScripts"] = [spell]
+        # 쫓거나 때린 차례마다 (N+1)% (Novaonline.exe 0x40a576) — 하데스 8초마다 30% 보다 소루마가 훨씬 드물다.
+        template["SpellChance"] = rate + 1
         path.write_text(json.dumps(template, ensure_ascii=False, indent=2), encoding="utf-8-sig")
         attached += 1
     return attached, undefined
