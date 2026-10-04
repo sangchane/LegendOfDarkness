@@ -12,13 +12,16 @@ SPEC `plans/woodland-west-north-spec-2026-10-04.md`. 지금 서버의 「우드�
   - 괴물: 노바 `mob/spawn.txt` 배치, 체력·공격·방어 노바 그대로(「노바 안에서 맞춤」), 경험치 ÷ 7.3(tools/pack-import
     EXPERIENCE_DIVISOR, 호러캐슬과 같은 규칙), 그림 0x4000 + 노바 이미지. 노바 자료 오류 셋만 고친다(FIX).
     노바 배치가 없는 구역은 같은 줄의 앞·뒤 구역으로 채운다(`fill`).
+    경험치는 그 뒤 구역 레벨로 다시 맞춘다(`level_exp`, LEVEL_KILLS 주석).
     드랍은 노바 목록 중 하데스 아이템에 있는 것 — 장비 칸은 그 뒤 build-gear-drops → build-drop-variety → build-drop-cap 이 단마다 한 벌로 바꾼다.
 
   쓰는 법: python3 scripts/gen/world/build-woodland-west-north.py            # 무엇이 바뀌는지만
            python3 scripts/gen/world/build-woodland-west-north.py --쓰기     # 서버 자료에 쓴다
+           python3 scripts/gen/world/build-woodland-west-north.py --경험치만  # 있는 괴물 파일의 Exp 칸만 고친다(드랍 등 뒤 생성기 몫은 그대로)
 """
 import hashlib
 import json
+import re
 import shutil
 import statistics
 import struct
@@ -62,6 +65,11 @@ SOTP = SERVER / "static" / "sotp.dat"
 REACH = {13: SERVER / "templates" / "monsters" / "5.99", 20: SERVER / "templates" / "monsters" / "뤼케시온해안"}
 REACH_GLOB = {13: "*@아벨해안*.json", 20: "*.json"}
 LEAST_STEP = 1.05
+# 우드랜드 서·북은 1존 1레벨 → 20존 98레벨 사냥터(사용자 2026-10-04) — n존 레벨 = 1 + (n-1)×97/19. 그 구역에서 평균 LEVEL_KILLS
+# 마리를 잡으면 그 레벨에서 한 레벨이 오르게: 구역의 마리당 평균 경험치 = 다음 레벨치(서버 ExperienceCurve 표) ÷ LEVEL_KILLS, 구역 안에서는
+# 체력에 비례해 나눈다(마릿수 가중). 지금 값보다 낮아지는 괴물은 그대로 둔다(1존·서 3~4존 — 노바 값이 이미 그보다 크다). 노바 경험치 ÷ 7.3 은 체력 1당 0.16 으로 5.99 동의우드랜드 고블린(3.5)의 20분의 1 이었다.
+LEVEL_KILLS = 50
+CURVE = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "src" / "Hades.Server.Base" / "Types" / "ExperienceCurve.cs"
 FIX = {"맨티스": {"체력": "6040"}, "녹색말벌": {"최소공격력": "55", "최대공격력": "60"}, "우드랜드보스1": {"방어력": "1"}}
 
 
@@ -165,6 +173,21 @@ def stronger(side, mobs, copies, said):
                 m["MaximumHP"] = round(m["MaximumHP"] * hp_step ** k)
                 m["DmgMin"], m["DmgMax"] = (round(m[key] * hit_step ** k) for key in ("DmgMin", "DmgMax"))
                 m["Exp"] = round(m["MaximumHP"] * per_hp)
+
+
+def level_exp(side, mobs):
+    """구역 레벨의 다음 레벨치 ÷ LEVEL_KILLS 를 마리당 평균으로, 체력 비례(LEVEL_KILLS 주석)."""
+    body = CURVE.read_text(encoding="utf-8")
+    table = [int(v) for v in re.findall(r"\d+", body[body.index("Table =") + 7:body.index("};", body.index("Table ="))])]
+    zones = {}
+    for n, m in mobs:
+        zones.setdefault(n.split("@")[1], []).append(m)
+    for zone, here in zones.items():
+        level = round(1 + (int(zone[len(side):].split("-")[0]) - 1) * 97 / 19)
+        target = table[min(level + 1, len(table) - 1)] / LEVEL_KILLS
+        mean_hp = sum(m["MaximumHP"] * m["SpawnMax"] for m in here) / sum(m["SpawnMax"] for m in here)
+        for m in here:
+            m["Exp"] = max(m["Exp"], round(target * m["MaximumHP"] / mean_hp))   # 이미 넉넉한 초반(1존 등)은 내리지 않는다
 
 
 def monster(kind, f, count, area, have):
@@ -277,7 +300,15 @@ def main():
         filled += why
         here = [(f"{kind}@{name}", monster(kind, stats[kind], n, ids[name], have)) for (kind, name), n in counts.items()]
         stronger(side, here, copies, steps)
+        level_exp(side, here)
         mobs += [(side, n, m) for n, m in here]
+
+    if "--경험치만" in sys.argv:
+        for side, n, m in mobs:
+            path = SERVER / "templates" / "monsters" / side / f"{n}.json"
+            data = json.loads(path.read_text(encoding="utf-8"))
+            data["Exp"] = m["Exp"]
+            path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if write:
         for n, w in warps:
