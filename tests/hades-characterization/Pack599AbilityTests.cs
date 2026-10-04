@@ -69,7 +69,7 @@ public sealed class Pack599AbilityTests : IDisposable
         {
             int slot = await LearnSpell(world, "쿠라노");
             int health = world.Vitals!.Health;
-            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이 5틱(0.5초)
+            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이(0.25초)
             await world.UseSpellAsync(slot, world.Serial, _deadline.Token);
             await Until(() => world.Vitals!.Health > health, $"쿠라노가 체력 {health} 을 채우지 않았습니다.");
         }
@@ -78,7 +78,7 @@ public sealed class Pack599AbilityTests : IDisposable
         {
             int slot = await LearnSpell(world, "플레어");
             int before = world.Hurts.Count;
-            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이 5틱(0.5초)
+            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이(0.25초)
             await world.UseSpellAsync(slot, target.Serial, _deadline.Token);
             await Until(() => world.Hurts.Skip(before).Any(h => h.Serial == target.Serial),
                 "플레어가 고른 표적을 치지 않았습니다.");
@@ -113,7 +113,7 @@ public sealed class Pack599AbilityTests : IDisposable
         {
             int slot = await LearnSpell(world, "메테오");
             int before = world.Hurts.Count;
-            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이 5틱(0.5초)
+            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이(0.25초)
             await world.UseSpellAsync(slot, 0, _deadline.Token);
             await Until(() => world.Hurts.Skip(before).Any(h => h.Serial == target.Serial),
                 "메테오가 둘레의 표적을 치지 않았습니다.");

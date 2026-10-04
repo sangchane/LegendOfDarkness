@@ -102,7 +102,7 @@ public sealed class MonkPackAbilityTests : IDisposable
             {
                 Drain(world);
                 int mana = world.Vitals!.Mana;
-                await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이 5틱(0.5초)
+                await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이(0.25초)
                 await world.UseSpellAsync(slot, 0, _deadline.Token);
                 said = await Told(world, "금강불괴을 외웠습니다.", "실패했습니다.");
                 await Until(() => world.Vitals!.Mana == mana - 500, $"금강불괴가 마력 500 을 쓰지 않았습니다({mana} → {world.Vitals!.Mana}).");
@@ -120,7 +120,7 @@ public sealed class MonkPackAbilityTests : IDisposable
             int slot = await LearnSpell(world, "다라밀공");
             Drain(world);
             int before = world.Hurts.Count;
-            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이 5틱(0.5초)
+            await Task.Delay(600, _deadline.Token); // 서버 마법 딜레이(0.25초)
             await world.UseSpellAsync(slot, plain.Target, _deadline.Token);
             await Until(() => world.Hurts.Skip(before).Any(h => OnAhead(world, h.Serial)), "다라밀공이 표적을 치지 않았습니다.");
             Effect flash = await NextEffect(world, "다라밀공");
