@@ -104,6 +104,7 @@ SHOPS = [
         # 5.99·노바 팩 둘 다 같은 이름·레벨 41 로 적었다(값은 둘 다 100000 — 원작 표가 먼저다). 수오미가 21~50 레벨
         # 마을이라(뮤레칸) 노비스 델란이 아니라 여기서 판다.
         "원작무기": ["액스"],
+        "속성변형": True,
         "문": (6, 13),   # warp 수오미마을(11,55) to 수오미무기점(6,13)
     },
     {
@@ -114,6 +115,7 @@ SHOPS = [
         "칸": ARMOUR_SLOT,
         "목록": ["전사갑옷사기", "도적갑옷사기", "마법사갑옷사기", "성직자갑옷사기", "무도가갑옷사기"],
         "너클": [],
+        "속성변형": True,
         "문": (10, 8),   # warp 수오미마을(19,48) to 수오미방어구점(10,8)
     },
     {
@@ -402,6 +404,15 @@ def stock(shop, lists, trouble, items, who, honden):
                 seen.add(name)
                 names.append(name)
                 from_honden.append(name)
+
+    # 수·토·풍·화 속성 무기·옷은 마을마다 찾아다니지 않게 수오미에서 이 칸 것을 전부 판다(사용자 2026-10-04,
+    # 원작 표 가격 그대로). 템플릿은 `build-elemental-gear.py` 가 만들고 속성 칸이 0 이 아닌 것으로 가른다.
+    if shop.get("속성변형"):
+        for name, it in sorted(items.items()):
+            if it.get("EquipmentSlot") in shop["칸"] and (it.get("OffenseElement") or it.get("DefenseElement")) \
+                    and name not in seen:
+                seen.add(name)
+                names.append(name)
 
     # 낮은 레벨이 먼저 보이게 놓는다 — 긴 목록에서 1레벨짜리를 끝까지 넘겨 찾지 않도록.
     names.sort(key=lambda n: (items[n].get("LevelRequired") or 1, items[n].get("Value") or 0, n))
