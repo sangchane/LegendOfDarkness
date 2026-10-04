@@ -427,6 +427,7 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     public override void _Process(double delta)
     {
+        KeepAim(delta);
         Listen();
         SpendAPoint();
         Wear();

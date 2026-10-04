@@ -156,7 +156,12 @@ public partial class GameScreen : Control
 
         // 괴물을 겨누는 마법 칸을 끌면 조준, 떼면 그 괴물에(사용자 2026-10-04 — 모바일 롤처럼).
         _abilities.AimMoved += drag => _world.AimEnemy(drag);
-        _abilities.AimReleased += slot => UseSpell(slot, aimed: true);
+        _abilities.AimReleased += slot =>
+        {
+            UseSpell(slot, aimed: true);
+            _world.AimEnded();
+        };
+        _abilities.AimCancelled += _world.AimEnded;
         _abilities.LoadSlots = Main.LoadAbilitySlots;
         _abilities.SaveSlots = Main.SaveAbilitySlots;
 

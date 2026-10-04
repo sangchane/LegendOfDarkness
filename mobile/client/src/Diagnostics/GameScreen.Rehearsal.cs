@@ -16,6 +16,7 @@ public partial class GameScreen : Control
     {
         RehearseLook(delta);
         RehearseUsers();
+        RehearseAimHold(delta);
 
         if (Main.Inviting.Length > 0 && !_partyRehearsed && Time.GetTicksMsec() > 6000)
         {
@@ -304,6 +305,36 @@ public partial class GameScreen : Control
         {
             _usersRehearsed = true;
             GD.Print($"GREYBOX_USERS {string.Join(",", _users.Names)}");
+        }
+    }
+
+    private double _aimRehearsal = -1;
+
+    /// <summary>손 없이 확인할 때만(<c>--aim-hold</c>): 8초에 위로 끈 셈 치고 끝낸 뒤, 1초·4초에 고른 이를 적는다.</summary>
+    private void RehearseAimHold(double delta)
+    {
+        if (!Main.AimHolding || Time.GetTicksMsec() < 8000 || _aimRehearsal > 5)
+        {
+            return;
+        }
+
+        if (_aimRehearsal < 0)
+        {
+            GD.Print($"GREYBOX_AIM_HOLD 끌기 → {_world.AimEnemy(new Vector2(0, -60))}");
+            _world.AimEnded();
+            _aimRehearsal = 0;
+            return;
+        }
+
+        double before = _aimRehearsal;
+        _aimRehearsal += delta;
+
+        foreach (double at in new[] { 1.0, 4.0 })
+        {
+            if (before < at && _aimRehearsal >= at)
+            {
+                GD.Print($"GREYBOX_AIM_HOLD {at:0}초 → {_world.Target}");
+            }
         }
     }
 }

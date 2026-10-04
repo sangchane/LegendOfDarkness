@@ -95,6 +95,53 @@ public sealed class MonkAimTests : IDisposable
             string.Join("\n", output.Split('\n').Where(line => line.Contains("GREYBOX") || line.Contains("다라밀") || line.Contains("서버")).Take(40)));
     }
 
+    /// <summary>
+    /// 끌어서 생긴 고름 표시는 끌기가 끝나고 3초만 유효하다 — 1초에는 그 괴물, 4초에는 끌기 전(아무도 안 고름 = 0)으로 돌아간다.
+    /// <c>LOD_AIM_HOLD_SHOT</c> 에 png 경로를 줄 때만 돈다.
+    /// </summary>
+    [Fact]
+    public async Task A_dragged_pick_lasts_three_seconds_then_goes_back()
+    {
+        if (Environment.GetEnvironmentVariable("LOD_AIM_HOLD_SHOT") is not { Length: > 0 } shot)
+        {
+            return;
+        }
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        PutTarget(server);
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, Name);
+        Save(server, saved => saved["Path"] = 5);
+
+        File.Delete(shot);
+        System.Diagnostics.ProcessStartInfo start = new(Path.Combine(HadesWorkspace.RepositoryRoot, "scripts", "godot.sh"))
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+
+        foreach (string argument in new[]
+                 {
+                     "--audio-driver", "Dummy", "--",
+                     "--server", $"127.0.0.1:{server.LoginPort}", "--login", $"{Name}:{LoginFlow.SyntheticSecret}",
+                     "--orient", "portrait", "--size", "360x780", "--aim-hold", "--shot", shot, "--shot-after", "15"
+                 })
+        {
+            start.ArgumentList.Add(argument);
+        }
+
+        using System.Diagnostics.Process app = System.Diagnostics.Process.Start(start)!;
+        Task<string> said = app.StandardOutput.ReadToEndAsync();
+        _ = app.StandardError.ReadToEndAsync();
+        await app.WaitForExitAsync(_deadline.Token);
+
+        string output = await said;
+        Match picked = new Regex(@"GREYBOX_AIM_HOLD 끌기 → (\d+)").Match(output);
+        Assert.True(picked.Success && picked.Groups[1].Value != "0", output);
+        Assert.Contains($"GREYBOX_AIM_HOLD 1초 → {picked.Groups[1].Value}", output);
+        Assert.Contains("GREYBOX_AIM_HOLD 4초 → 0", output);
+    }
+
     /// <summary>입구 세 칸 위에 움직이지 않는 표적 — 우드랜드1-1 괴물 하나를 본떠 만든다.</summary>
     private static void PutTarget(IsolatedHadesServer server)
     {
