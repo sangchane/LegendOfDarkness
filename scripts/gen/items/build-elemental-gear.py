@@ -45,6 +45,11 @@ WEAPON, ARMOUR = 1, 2
 JEWEL_ELEMENT = {"화염의": 1, "바다의": 2, "바람의": 3, "대지의": 4, "생명의": 5, "암흑의": 6}
 JEWEL_FIELD = {6: "OffenseElement", 11: "DefenseElement"}
 
+MONSTERS = ROOT / "sources/wren11/Dark-Ages-Private-Server/database/server/templates/monsters"
+#: 99레벨 사냥터 — 구광산(마인마을 워프 LevelRequired 99) · 카스마늄 갱도(드라코가 사는 5.99 갱도, 지금은 들어갈 길 없음).
+DARK_GROUNDS = ("구광산", "카스마늄")
+DARK = 6
+
 
 def templates():
     out = {}
@@ -71,6 +76,38 @@ def variant(base, row, suffix):
                              "Option": 1, "Value": abs(int(row["방어력"]))}
         body["DefenseElement"] = ELEMENT[suffix]
     return body
+
+
+def dark_monsters(writing):
+    """99레벨 사냥터에서 드라코만큼 세거나 마법을 쓰는 괴물은 공격·방어 모두 암흑으로 박는다(사용자 2026-10-04).
+
+    맵마다 드라코의 체력을 잣대로 삼는다 — 정의의 Level 칸은 모두 1이라 쓸 수 없다. 나머지 괴물은 생길 때 무작위
+    (`Creations/monsters.cs`)."""
+    by_map = {}
+    for path in sorted(MONSTERS.rglob("*.json")):
+        try:
+            body = read(path)
+        except ValueError:
+            continue
+        if isinstance(body, dict) and body.get("Name") and "@" in path.stem:
+            by_map.setdefault(path.stem.split("@", 1)[1], []).append((path, body))
+    out = []
+    for area, mobs in sorted(by_map.items()):
+        if not area.startswith(DARK_GROUNDS):
+            continue
+        draco = [b["MaximumHP"] for _, b in mobs if b["Name"].startswith("드라코")]
+        for path, body in mobs:
+            spells = body.get("SpellScripts") or {}
+            spells = spells.get("$values", []) if isinstance(spells, dict) else spells
+            if not (spells or (draco and body.get("MaximumHP", 0) >= min(draco))):
+                continue
+            out.append(f"{area} {body['Name']} 체력 {body.get('MaximumHP')}{' · 마법 ' + ','.join(spells) if spells else ''}")
+            if body.get("ElementType") == 2 and body.get("OffenseElement") == DARK == body.get("DefenseElement"):
+                continue
+            body["ElementType"], body["OffenseElement"], body["DefenseElement"] = 2, DARK, DARK
+            if writing:
+                path.write_text(json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return out
 
 
 def main():
@@ -104,8 +141,12 @@ def main():
             (ITEMS / f"{name}.json").write_text(
                 json.dumps(body, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    dark = dark_monsters(args.writing)
+
     print(f"기본형 무기 {kinds[WEAPON]} · 옷 {kinds[ARMOUR]} → 변형 {len(made)}종 · 목걸이·벨트 속성 {len(jewels)}종"
-          f"{'' if args.writing else ' (아직 안 씀 — --쓰기)'}")
+          f" · 암흑 괴물 {len(dark)}자리{'' if args.writing else ' (아직 안 씀 — --쓰기)'}")
+    for line in dark:
+        print(f"  암흑 {line}")
     for name, what in list(jewels.items())[:6]:
         print(f"  {name}: {what}")
     for body in made[:8]:
