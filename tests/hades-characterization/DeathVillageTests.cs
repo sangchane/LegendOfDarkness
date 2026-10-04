@@ -63,4 +63,28 @@ public sealed class DeathVillageTests
         }
         Assert.DoesNotContain(zones, zone => !hunted.Contains(zone));
     }
+
+    /// <summary>
+    /// 빈집털이(사용자 2026-10-04): 신죽마집안 16장·신죽음의마을 여섯 장 모두에 괴물이 있고, 수치는 노바 집털(체력 4만).
+    /// 집으로 드는 길은 죽음의마을1 의 NPC 빈집털이·빈집털이1(5.99 스크립트)이다.
+    /// </summary>
+    [Fact]
+    public void Every_house_has_nova_house_monsters()
+    {
+        string server = HadesWorkspace.ServerDataDirectory;
+        int[] houses =
+        [
+            .. Directory.EnumerateFiles(Path.Combine(server, "areas"), "*.json")
+                .Select(path => JsonNode.Parse(File.ReadAllText(path))!)
+                .Where(area => area["Name"]!.GetValue<string>() is { } name && (name.StartsWith("신죽마집안", StringComparison.Ordinal) || name.StartsWith("신죽음의마을", StringComparison.Ordinal)))
+                .Select(area => area["ID"]!.GetValue<int>())
+        ];
+        Assert.Equal(22, houses.Length);
+
+        List<JsonNode> monsters = [.. Directory.EnumerateFiles(Path.Combine(server, "templates", "monsters", "5.99"), "*@신죽*.json")
+            .Select(path => JsonNode.Parse(File.ReadAllText(path))!)];
+        Assert.DoesNotContain(houses, house => monsters.All(m => m["AreaID"]!.GetValue<int>() != house));
+        Assert.All(monsters, m => Assert.Equal(40000, m["MaximumHP"]!.GetValue<int>()));
+        Assert.True(File.Exists(Path.Combine(server, "templates", "mundanes", "빈집털이@죽음의마을1#86,90.json")));
+    }
 }

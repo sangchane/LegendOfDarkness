@@ -1,0 +1,386 @@
+# lod20664 — tools/dat-extract layout 이 만든다. 손으로 고치지 말 것.
+size 20 20
+blocked
+###########.########
+#...###............#
+#.....#............#
+#..............#.###
+##.................#
+###...........#....#
+##.................#
+#######......##....#
+######.#....###....#
+##...........##....#
+####...............#
+##.#...............#
+##.................#
+#..................#
+#.###........#.#####
+#..................#
+#..................#
+#..................#
+#..................#
+######.#############
+floor
+5259 5225 5228 5231 5234 5237 5272 5275 5287 5290 0 0 0 5302 5305 5251 5263 5266 5269 5251
+5258 5286 5289 5292 5295 5295 5274 5277 5280 5283 5286 5237 5252 5244 5247 5276 5279 5282 5285 5254
+5257 5288 5288 5291 5294 5294 5273 5276 5279 5282 5285 5237 5240 5243 5246 5275 5278 5281 5284 5294
+5286 5287 5287 5293 5234 5253 5272 5275 5278 5281 5284 5236 5239 5242 5245 5238 5253 5270 5270 5238
+5285 5298 5301 5226 5229 5232 5235 5238 5253 5256 5259 5229 5229 5232 5226 5259 5229 5255 5258 5259
+5284 5297 5300 5225 5228 5231 5234 5259 5229 5255 5258 5261 5264 5267 5270 5236 5251 5254 5257 5236
+5268 5296 5299 5224 5227 5230 5233 5236 5251 5254 5257 5260 5263 5266 5269 5250 5253 5256 5286 5250
+5267 5261 5264 5237 5240 5243 5247 5250 5253 5256 5286 5289 5292 5295 5303 5259 5262 5265 5268 5271
+5266 5252 5255 5285 5288 5252 5246 5249 5252 5255 5285 5288 5291 5294 5302 5258 5261 5264 5267 5270
+5285 5260 5263 5236 5239 5242 5245 5248 5251 5254 5284 5287 5290 5293 5259 5257 5260 5263 5266 5269
+5284 5298 5301 5304 5307 5253 5256 5259 5262 5265 5268 5271 5253 5256 5253 5276 5279 5282 5285 5288
+5259 5297 5300 5303 5306 5252 5255 5258 5261 5264 5267 5270 5252 5255 5258 5275 5278 5281 5284 5287
+5258 5296 5299 5302 5305 5251 5254 5257 5260 5263 5266 5269 5251 5254 5257 5271 5253 5256 5253 5254
+5257 5226 5229 5232 5235 5238 5273 5276 5279 5282 5285 5288 5291 5294 5301 5270 5252 5255 5258 5294
+5286 5225 5228 5231 5234 5237 5272 5275 5278 5281 5284 5287 5290 5304 5307 5270 5270 5264 5237 5238
+5285 5253 5256 5259 5262 5265 5268 5271 5253 5256 5253 5253 5256 5259 5262 5265 5268 5271 5253 5259
+5284 5252 5255 5258 5261 5264 5267 5270 5252 5255 5258 5252 5255 5258 5261 5264 5267 5270 5252 5255
+5268 5251 5254 5257 5260 5263 5266 5269 5251 5254 5257 5251 5254 5257 5260 5263 5266 5269 5251 5254
+5267 5238 5273 5276 5279 5282 5285 5288 5291 5294 5301 5238 5273 5276 5279 5282 5285 5288 5291 5294
+5266 5237 5272 5275 5278 0 0 0 5290 0 5275 5278 5281 5275 5278 5281 5284 5287 5290 5304
+tile 5224 0 0
+tile 5225 56 0
+tile 5226 112 0
+tile 5227 168 0
+tile 5228 224 0
+tile 5229 280 0
+tile 5230 336 0
+tile 5231 392 0
+tile 5232 448 0
+tile 5233 504 0
+tile 5234 0 27
+tile 5235 56 27
+tile 5236 112 27
+tile 5237 168 27
+tile 5238 224 27
+tile 5239 280 27
+tile 5240 336 27
+tile 5242 392 27
+tile 5243 448 27
+tile 5244 504 27
+tile 5245 0 54
+tile 5246 56 54
+tile 5247 112 54
+tile 5248 168 54
+tile 5249 224 54
+tile 5250 280 54
+tile 5251 336 54
+tile 5252 392 54
+tile 5253 448 54
+tile 5254 504 54
+tile 5255 0 81
+tile 5256 56 81
+tile 5257 112 81
+tile 5258 168 81
+tile 5259 224 81
+tile 5260 280 81
+tile 5261 336 81
+tile 5262 392 81
+tile 5263 448 81
+tile 5264 504 81
+tile 5265 0 108
+tile 5266 56 108
+tile 5267 112 108
+tile 5268 168 108
+tile 5269 224 108
+tile 5270 280 108
+tile 5271 336 108
+tile 5272 392 108
+tile 5273 448 108
+tile 5274 504 108
+tile 5275 0 135
+tile 5276 56 135
+tile 5277 112 135
+tile 5278 168 135
+tile 5279 224 135
+tile 5280 280 135
+tile 5281 336 135
+tile 5282 392 135
+tile 5283 448 135
+tile 5284 504 135
+tile 5285 0 162
+tile 5286 56 162
+tile 5287 112 162
+tile 5288 168 162
+tile 5289 224 162
+tile 5290 280 162
+tile 5291 336 162
+tile 5292 392 162
+tile 5293 448 162
+tile 5294 504 162
+tile 5295 0 189
+tile 5296 56 189
+tile 5297 112 189
+tile 5298 168 189
+tile 5299 224 189
+tile 5300 280 189
+tile 5301 336 189
+tile 5302 392 189
+tile 5303 448 189
+tile 5304 504 189
+tile 5305 0 216
+tile 5306 56 216
+tile 5307 112 216
+picture 6117 252 759 52 0
+picture 6118 252 811 52 0
+picture 6534 168 109 104 0
+picture 6535 28 243 118 0
+picture 6536 28 361 118 0
+picture 6537 28 479 118 0
+picture 6538 168 213 104 0
+picture 6539 168 317 104 0
+picture 6540 28 597 118 0
+picture 6541 28 715 118 0
+picture 6542 28 833 118 0
+picture 6543 168 421 104 0
+picture 6544 168 525 104 0
+picture 6547 56 0 118 0
+picture 6548 168 629 104 0
+picture 6549 168 733 104 0
+picture 6555 56 118 118 0
+picture 6556 56 236 118 0
+picture 6557 56 354 118 0
+picture 6558 168 837 104 0
+picture 6564 196 0 104 0
+picture 6565 56 472 118 0
+picture 6566 56 590 118 0
+picture 6567 56 708 118 0
+picture 6568 196 104 104 0
+picture 6569 196 208 104 0
+picture 6570 56 826 118 0
+picture 6571 84 0 118 0
+picture 6572 84 118 118 0
+picture 6573 196 312 104 0
+picture 6574 196 416 104 0
+picture 6575 84 236 118 0
+picture 6576 84 354 118 0
+picture 6577 84 472 118 0
+picture 6578 196 520 104 0
+picture 6579 196 624 104 0
+picture 6580 84 590 118 0
+picture 6581 84 708 118 0
+picture 6582 84 826 118 0
+picture 6583 196 728 104 0
+picture 6584 196 832 104 0
+picture 6585 112 0 118 0
+picture 6586 112 118 118 0
+picture 6587 112 236 118 0
+picture 6588 224 0 104 0
+picture 6591 112 354 118 0
+picture 6592 112 472 118 0
+picture 6593 224 104 104 0
+picture 6594 224 208 104 0
+picture 6596 112 590 118 0
+picture 6597 112 708 118 0
+picture 6604 0 899 123 0
+picture 6605 0 520 127 0
+picture 6606 0 264 128 0
+picture 6607 140 708 111 0
+picture 6608 140 819 111 0
+picture 6609 0 392 128 0
+picture 6610 0 647 127 0
+picture 6611 28 0 123 0
+picture 6612 252 629 65 0
+picture 6613 252 694 65 0
+picture 6614 252 494 68 0
+picture 6615 252 424 70 0
+picture 6616 252 958 35 0
+picture 6617 252 180 85 0
+picture 6618 252 93 87 0
+picture 6619 252 345 79 0
+picture 6620 252 562 67 0
+picture 6621 252 911 47 0
+picture 6622 252 265 80 0
+picture 6623 252 0 93 0
+picture 6627 224 312 104 0
+picture 6628 224 416 104 0
+picture 6629 224 520 104 0
+picture 6630 224 624 104 0
+picture 6636 224 728 104 0
+picture 6637 112 826 118 0
+picture 6638 140 0 118 0
+picture 6639 140 118 118 0
+picture 6640 224 832 104 0
+picture 6646 168 0 109 0
+picture 6647 140 236 118 0
+picture 6648 0 774 125 0
+picture 6649 140 354 118 0
+picture 6650 140 472 118 0
+picture 6651 28 123 120 0
+picture 6652 0 0 134 0
+picture 6653 140 590 118 0
+picture 6654 0 134 130 0
+picture 6655 252 863 48 0
+object 0 0 left 6629
+object 0 0 right 6630
+object 1 0 left 6569
+object 2 0 left 6570
+object 3 0 left 6571
+object 4 0 left 6572
+object 4 0 right 6573
+object 5 0 left 6539
+object 6 0 left 6540
+object 7 0 left 6541
+object 8 0 left 6547
+object 8 0 right 6548
+object 9 0 left 6549
+object 9 0 right 6640
+object 10 0 left 6637
+object 11 0 left 6638
+object 12 0 left 6639
+object 12 0 right 6640
+object 13 0 left 6541
+object 13 0 right 6543
+object 14 0 left 6542
+object 14 0 right 6543
+object 15 0 left 6549
+object 15 0 right 6548
+object 16 0 left 6535
+object 17 0 left 6536
+object 18 0 left 6537
+object 18 0 right 6538
+object 19 0 left 6542
+object 19 0 right 6628
+object 0 1 right 6568
+object 4 1 left 6629
+object 4 1 right 6628
+object 6 1 right 6616
+object 19 1 right 6576
+object 0 2 right 6567
+object 6 2 left 6614
+object 6 2 right 6615
+object 19 2 left 6574
+object 19 2 right 6575
+object 0 3 right 6566
+object 15 3 left 6621
+object 16 3 left 6622
+object 16 3 right 6623
+object 17 3 left 6629
+object 17 3 right 6630
+object 18 3 left 6629
+object 18 3 right 6630
+object 19 3 right 6583
+object 0 4 left 6564
+object 0 4 right 6565
+object 1 4 right 6611
+object 19 4 right 6582
+object 0 5 right 6588
+object 1 5 right 6610
+object 2 5 left 6612
+object 2 5 right 6613
+object 14 5 left 6629
+object 14 5 right 6630
+object 19 5 right 6581
+object 0 6 right 6587
+object 1 6 left 6608
+object 1 6 right 6609
+object 19 6 left 6579
+object 19 6 right 6580
+object 0 7 right 6586
+object 1 7 left 6627
+object 1 7 right 6630
+object 2 7 left 6539
+object 3 7 left 6540
+object 4 7 left 6541
+object 5 7 left 6542
+object 5 7 right 6543
+object 13 7 left 6117
+object 13 7 right 6118
+object 14 7 right 6611
+object 19 7 right 6588
+object 0 8 left 6584
+object 0 8 right 6597
+object 2 8 left 6651
+object 3 8 left 6652
+object 4 8 left 6653
+object 5 8 left 6654
+object 5 8 right 6655
+object 7 8 left 6612
+object 7 8 right 6613
+object 14 8 right 6610
+object 19 8 right 6587
+object 0 9 left 6594
+object 0 9 right 6596
+object 1 9 right 6650
+object 13 9 left 6612
+object 13 9 right 6613
+object 14 9 left 6608
+object 14 9 right 6609
+object 19 9 right 6586
+object 0 10 right 6593
+object 1 10 right 6649
+object 4 10 left 6619
+object 4 10 right 6620
+object 19 10 left 6584
+object 19 10 right 6585
+object 0 11 right 6592
+object 1 11 right 6648
+object 3 11 left 6617
+object 3 11 right 6618
+object 19 11 right 6583
+object 0 12 left 6574
+object 0 12 right 6591
+object 1 12 left 6646
+object 1 12 right 6647
+object 19 12 right 6576
+object 0 13 right 6586
+object 19 13 left 6574
+object 19 13 right 6575
+object 0 14 left 6584
+object 0 14 right 6585
+object 2 14 left 6604
+object 3 14 left 6605
+object 4 14 left 6606
+object 4 14 right 6607
+object 13 14 left 6621
+object 14 14 left 6622
+object 14 14 right 6623
+object 15 14 left 6629
+object 15 14 right 6630
+object 16 14 left 6629
+object 16 14 right 6630
+object 17 14 left 6539
+object 17 14 right 6630
+object 18 14 left 6540
+object 18 14 right 6630
+object 19 14 right 6583
+object 0 15 right 6578
+object 19 15 right 6582
+object 0 16 right 6577
+object 19 16 right 6577
+object 0 17 right 6576
+object 19 17 right 6576
+object 0 18 left 6574
+object 0 18 right 6575
+object 19 18 left 6574
+object 19 18 right 6575
+object 0 19 left 6539
+object 1 19 left 6540
+object 2 19 left 6541
+object 3 19 left 6542
+object 3 19 right 6543
+object 4 19 left 6544
+object 5 19 left 6637
+object 6 19 left 6638
+object 7 19 left 6639
+object 7 19 right 6640
+object 8 19 left 6549
+object 8 19 right 6640
+object 9 19 left 6636
+object 10 19 left 6555
+object 11 19 left 6556
+object 12 19 left 6557
+object 12 19 right 6558
+object 13 19 left 6555
+object 14 19 left 6556
+object 15 19 left 6557
+object 15 19 right 6558
+object 16 19 left 6534
+object 17 19 left 6535
+object 18 19 left 6536
+object 19 19 left 6537
+object 19 19 right 6628

@@ -10,6 +10,10 @@
   - 괴물: 배치·경험치·드랍은 5.99 그대로(사용자 「경험치 유지」). 체력·공격·방어만 노바 `mob/죽음의마을/` 값
     (사용자 「노바 안에서 맞춤」 — 구광산 1층이 노바 광산1층 값 그대로라 노바 값을 그대로 쓰면 둘 사이가 노바와 같다).
     노바에 없는 고사목은 5.99 에서 좀비와 벌어진 비율(체력 ×2.33)을 노바 좀비에 곱한다.
+  - 빈집털이(사용자 2026-10-04 「집털이도」): 죽음의마을1 의 NPC 빈집털이·빈집털이1(5.99 스크립트, 이미 있음)이 보내는
+    신죽마집안 16장과 그 너머 신죽음의마을1-1~1-6 — 맵·워프·괴물은 5.99 로 이미 있고, 수치만 같은 규칙으로 노바 집털
+    (`mob/죽음의마을/` 도깨비불·블랙캣·독거미 — 체력 4만)에 맞춘다. 5.99 독거미2 = 노바 독거미, 노바에 없는 니크르·웨어랫은
+    같은 방 독거미2 와의 비율.
 
   쓰는 법: python3 scripts/gen/world/build-death-village.py            # 무엇이 바뀌는지만
            python3 scripts/gen/world/build-death-village.py --쓰기     # 서버 자료에 쓴다
@@ -33,7 +37,9 @@ LOBBY_ARRIVAL = (11, 17)                       # 마인마을 워프 도착 칸
 CARD_POINT = (142, 320)                        # 원작 field001 죽음의마을
 ENTRY_LEVEL = 99
 STATS = ("MaximumHP", "DmgMin", "DmgMax", "Ac")
-NO_NOVA = {"고사목": "좀비"}                    # 노바에 없는 괴물 → 5.99 에서 견줄 괴물
+NO_NOVA = {"고사목": "좀비", "니크르": "독거미2", "웨어랫": "독거미2"}   # 노바에 없는 괴물 → 5.99 에서 견줄 괴물
+NOVA_NAME = {"독거미2": "독거미"}              # 5.99 이름 → 노바 이름
+HOUSES = ("신죽마집안", "신죽음의마을")          # 빈집털이로 드는 곳
 
 
 def nova_stats():
@@ -65,14 +71,15 @@ def main():
 
     nova = nova_stats()
     mobs = []
-    for path in sorted(MONSTERS.glob(f"*@{NAME}[1-4].json")):
+    paths = [*MONSTERS.glob(f"*@{NAME}[1-4].json"), *(p for h in HOUSES for p in MONSTERS.glob(f"*@{h}*.json"))]
+    for path in sorted(paths):
         m = json.loads(path.read_text(encoding="utf-8-sig"))
         kind = m["Name"]
-        if kind in nova:
-            new = nova[kind]
+        if kind not in NO_NOVA:
+            new = nova[NOVA_NAME.get(kind, kind)]
         else:                                                     # 5.99 의 비율을 노바 견줄 괴물에 곱한다
             peer = json.loads((MONSTERS / f"{NO_NOVA[kind]}@{path.stem.split('@')[1]}.json").read_text(encoding="utf-8-sig"))
-            new = {k: round(nova[NO_NOVA[kind]][k] * m[k] / peer[k]) for k in STATS}
+            new = {k: round(nova[NOVA_NAME.get(peer["Name"], peer["Name"])][k] * m[k] / peer[k]) for k in STATS}
         mobs.append((path, {**m, **new}))
 
     if write:

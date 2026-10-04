@@ -1,0 +1,367 @@
+# lod20668 — tools/dat-extract layout 이 만든다. 손으로 고치지 말 것.
+size 20 20
+blocked
+####################
+###....##.....#....#
+#......#...........#
+##.....#...........#
+#...#.###..........#
+##.....##..........#
+#......#####.......#
+#......#####.......#
+..........##.......#
+#..........#.......#
+#..........##......#
+######.....#.......#
+####...............#
+##.................#
+###................#
+##.................#
+#..................#
+#..................#
+#..................#
+######.#############
+floor
+5237 5298 5301 5226 5229 5232 5229 5229 5235 5238 5282 5285 5273 5276 5229 5288 5291 5294 5294 5273
+5237 5249 5255 5292 5253 5295 5226 5295 5229 5280 5283 5286 5237 5244 5229 5287 5293 5234 5253 5272
+5236 5288 5288 5291 5294 5294 5232 5255 5276 5279 5282 5285 5237 5243 5255 5301 5226 5229 5232 5235
+5229 5252 5287 5293 5234 5253 5267 5254 5275 5278 5281 5284 5236 5226 5245 5300 5225 5228 5231 5234
+5261 5252 5303 5226 5294 5254 5294 5273 5252 5253 5256 5259 5229 5232 5256 5299 5224 5227 5230 5233
+5260 5294 5302 5225 5228 5231 5295 5255 5260 5229 5255 5258 5261 5267 5270 5264 5237 5240 5243 5247
+5289 5293 5259 5224 5227 5230 5294 5254 5298 5229 5229 5229 5260 5266 5269 5255 5285 5288 5252 5246
+5307 5253 5264 5237 5240 5243 5293 5237 5272 5275 5278 5270 5289 5295 5303 5263 5236 5239 5242 5245
+5275 5278 5255 5285 5288 5252 5256 5246 5249 5252 5229 5258 5288 5294 5302 5301 5304 5307 5253 5256
+5252 5260 5263 5236 5239 5242 5255 5245 5248 5251 5254 5257 5287 5293 5259 5300 5303 5306 5252 5255
+5270 5298 5301 5304 5307 5253 5256 5256 5259 5262 5265 5301 5249 5256 5270 5299 5302 5305 5251 5254
+5237 5234 5237 5272 5275 5278 5255 5255 5258 5261 5264 5270 5270 5255 5258 5229 5232 5235 5238 5273
+5237 5252 5244 5247 5305 5251 5254 5257 5260 5263 5266 5269 5251 5254 5257 5300 5303 5306 5252 5255
+5236 5240 5243 5255 5235 5238 5273 5276 5279 5282 5285 5288 5291 5294 5301 5299 5302 5305 5251 5254
+5229 5275 5246 5245 5234 5237 5272 5275 5278 5281 5284 5287 5290 5304 5270 5229 5232 5235 5238 5273
+5261 5238 5232 5256 5242 5249 5248 5251 5254 5284 5287 5263 5236 5239 5242 5245 5248 5251 5254 5284
+5260 5260 5304 5307 5253 5256 5259 5262 5265 5268 5271 5301 5304 5307 5253 5256 5259 5262 5265 5268
+5289 5298 5303 5306 5252 5255 5258 5261 5264 5267 5270 5300 5303 5306 5252 5255 5258 5261 5264 5267
+5288 5256 5302 5305 5251 5254 5257 5260 5263 5266 5269 5299 5302 5305 5251 5254 5257 5260 5263 5266
+5287 5229 5232 5235 5238 5237 5272 5253 5282 5285 5288 5229 5232 5235 5238 5273 5276 5279 5282 5285
+tile 5224 0 0
+tile 5225 56 0
+tile 5226 112 0
+tile 5227 168 0
+tile 5228 224 0
+tile 5229 280 0
+tile 5230 336 0
+tile 5231 392 0
+tile 5232 448 0
+tile 5233 0 27
+tile 5234 56 27
+tile 5235 112 27
+tile 5236 168 27
+tile 5237 224 27
+tile 5238 280 27
+tile 5239 336 27
+tile 5240 392 27
+tile 5242 448 27
+tile 5243 0 54
+tile 5244 56 54
+tile 5245 112 54
+tile 5246 168 54
+tile 5247 224 54
+tile 5248 280 54
+tile 5249 336 54
+tile 5251 392 54
+tile 5252 448 54
+tile 5253 0 81
+tile 5254 56 81
+tile 5255 112 81
+tile 5256 168 81
+tile 5257 224 81
+tile 5258 280 81
+tile 5259 336 81
+tile 5260 392 81
+tile 5261 448 81
+tile 5262 0 108
+tile 5263 56 108
+tile 5264 112 108
+tile 5265 168 108
+tile 5266 224 108
+tile 5267 280 108
+tile 5268 336 108
+tile 5269 392 108
+tile 5270 448 108
+tile 5271 0 135
+tile 5272 56 135
+tile 5273 112 135
+tile 5275 168 135
+tile 5276 224 135
+tile 5278 280 135
+tile 5279 336 135
+tile 5280 392 135
+tile 5281 448 135
+tile 5282 0 162
+tile 5283 56 162
+tile 5284 112 162
+tile 5285 168 162
+tile 5286 224 162
+tile 5287 280 162
+tile 5288 336 162
+tile 5289 392 162
+tile 5290 448 162
+tile 5291 0 189
+tile 5292 56 189
+tile 5293 112 189
+tile 5294 168 189
+tile 5295 224 189
+tile 5298 280 189
+tile 5299 336 189
+tile 5300 392 189
+tile 5301 448 189
+tile 5302 0 216
+tile 5303 56 216
+tile 5304 112 216
+tile 5305 168 216
+tile 5306 224 216
+tile 5307 280 216
+picture 6107 196 510 46 0
+picture 6108 196 556 44 0
+picture 6113 196 633 30 0
+picture 6125 196 600 33 0
+picture 6126 196 663 29 0
+picture 6534 112 810 104 0
+picture 6535 0 753 118 0
+picture 6536 0 871 118 0
+picture 6537 28 0 118 0
+picture 6538 112 914 104 0
+picture 6539 140 0 104 0
+picture 6540 28 118 118 0
+picture 6541 28 236 118 0
+picture 6542 28 354 118 0
+picture 6543 140 104 104 0
+picture 6544 140 208 104 0
+picture 6548 140 312 104 0
+picture 6555 28 472 118 0
+picture 6556 28 590 118 0
+picture 6557 28 708 118 0
+picture 6558 140 416 104 0
+picture 6564 140 520 104 0
+picture 6565 28 826 118 0
+picture 6566 56 0 118 0
+picture 6567 56 118 118 0
+picture 6568 140 624 104 0
+picture 6569 140 728 104 0
+picture 6570 56 236 118 0
+picture 6571 56 354 118 0
+picture 6572 56 472 118 0
+picture 6573 140 832 104 0
+picture 6574 168 0 104 0
+picture 6579 168 104 104 0
+picture 6580 56 590 118 0
+picture 6584 168 208 104 0
+picture 6585 56 708 118 0
+picture 6586 56 826 118 0
+picture 6587 84 0 118 0
+picture 6588 168 312 104 0
+picture 6591 84 118 118 0
+picture 6592 84 236 118 0
+picture 6593 168 416 104 0
+picture 6594 168 520 104 0
+picture 6596 84 354 118 0
+picture 6597 84 472 118 0
+picture 6608 112 590 111 0
+picture 6609 0 130 128 0
+picture 6610 0 258 127 0
+picture 6611 0 510 123 0
+picture 6614 196 347 68 0
+picture 6615 196 277 70 0
+picture 6621 196 463 47 0
+picture 6622 196 197 80 0
+picture 6623 196 104 93 0
+picture 6629 168 624 104 0
+picture 6630 168 728 104 0
+picture 6631 168 832 104 0
+picture 6632 84 590 118 0
+picture 6633 84 708 118 0
+picture 6634 84 826 118 0
+picture 6637 112 0 118 0
+picture 6638 112 118 118 0
+picture 6639 112 236 118 0
+picture 6640 196 0 104 0
+picture 6656 196 415 48 0
+picture 6657 0 0 130 0
+picture 6658 112 354 118 0
+picture 6660 0 633 120 0
+picture 6661 112 472 118 0
+picture 6663 0 385 125 0
+picture 6665 112 701 109 0
+object 0 0 left 6629
+object 0 0 right 6630
+object 1 0 left 6569
+object 2 0 left 6570
+object 3 0 left 6571
+object 4 0 left 6572
+object 4 0 right 6573
+object 5 0 left 6539
+object 6 0 left 6557
+object 6 0 right 6558
+object 7 0 left 6557
+object 7 0 right 6558
+object 8 0 left 6535
+object 8 0 right 6558
+object 9 0 left 6536
+object 10 0 left 6555
+object 10 0 right 6548
+object 11 0 left 6556
+object 12 0 left 6537
+object 12 0 right 6538
+object 13 0 left 6539
+object 14 0 left 6557
+object 14 0 right 6558
+object 15 0 left 6539
+object 16 0 left 6540
+object 17 0 left 6541
+object 18 0 left 6557
+object 18 0 right 6558
+object 19 0 left 6542
+object 19 0 right 6543
+object 0 1 right 6568
+object 1 1 left 6125
+object 1 1 right 6126
+object 2 1 left 6614
+object 2 1 right 6615
+object 7 1 left 6579
+object 7 1 right 6580
+object 8 1 left 6125
+object 8 1 right 6126
+object 14 1 left 6125
+object 14 1 right 6126
+object 19 1 right 6593
+object 0 2 right 6567
+object 7 2 right 6588
+object 19 2 right 6592
+object 0 3 right 6566
+object 1 3 left 6113
+object 7 3 right 6587
+object 19 3 left 6574
+object 19 3 right 6591
+object 0 4 left 6564
+object 0 4 right 6565
+object 4 4 left 6621
+object 5 4 left 6622
+object 5 4 right 6623
+object 6 4 left 6544
+object 6 4 right 6548
+object 7 4 right 6586
+object 8 4 right 6611
+object 19 4 right 6586
+object 0 5 right 6588
+object 1 5 left 6544
+object 1 5 right 6548
+object 7 5 left 6584
+object 7 5 right 6597
+object 8 5 right 6610
+object 19 5 left 6584
+object 19 5 right 6585
+object 0 6 right 6587
+object 7 6 left 6594
+object 7 6 right 6596
+object 8 6 left 6608
+object 8 6 right 6609
+object 9 6 left 6125
+object 9 6 right 6126
+object 10 6 left 6125
+object 10 6 right 6126
+object 11 6 left 6125
+object 11 6 right 6126
+object 19 6 right 6567
+object 0 7 right 6634
+object 7 7 left 6539
+object 8 7 left 6540
+object 9 7 left 6541
+object 10 7 left 6542
+object 10 7 right 6543
+object 11 7 left 6629
+object 11 7 right 6630
+object 19 7 right 6566
+object 0 8 right 6633
+object 10 8 left 6125
+object 10 8 right 6126
+object 11 8 right 6611
+object 19 8 left 6564
+object 19 8 right 6565
+object 0 9 left 6631
+object 0 9 right 6632
+object 11 9 right 6610
+object 19 9 right 6588
+object 0 10 right 6593
+object 11 10 left 6608
+object 11 10 right 6609
+object 12 10 left 6107
+object 12 10 right 6108
+object 19 10 right 6587
+object 0 11 right 6592
+object 1 11 left 6537
+object 1 11 right 6538
+object 2 11 left 6539
+object 3 11 left 6540
+object 4 11 left 6541
+object 5 11 left 6542
+object 5 11 right 6543
+object 11 11 left 6629
+object 11 11 right 6630
+object 19 11 right 6586
+object 0 12 left 6574
+object 0 12 right 6591
+object 2 12 left 6661
+object 3 12 left 6663
+object 3 12 right 6665
+object 19 12 left 6584
+object 19 12 right 6597
+object 0 13 right 6586
+object 1 13 right 6660
+object 19 13 left 6594
+object 19 13 right 6596
+object 0 14 left 6584
+object 0 14 right 6585
+object 1 14 right 6658
+object 2 14 left 6113
+object 19 14 right 6593
+object 0 15 right 6593
+object 1 15 left 6656
+object 1 15 right 6657
+object 19 15 right 6592
+object 0 16 right 6592
+object 19 16 left 6574
+object 19 16 right 6591
+object 0 17 left 6574
+object 0 17 right 6591
+object 19 17 right 6586
+object 0 18 right 6586
+object 19 18 left 6584
+object 19 18 right 6585
+object 0 19 left 6584
+object 0 19 right 6585
+object 1 19 left 6570
+object 2 19 left 6571
+object 3 19 left 6572
+object 3 19 right 6573
+object 4 19 left 6539
+object 5 19 left 6637
+object 6 19 left 6638
+object 7 19 left 6639
+object 7 19 right 6640
+object 8 19 left 6555
+object 8 19 right 6548
+object 9 19 left 6556
+object 10 19 left 6557
+object 10 19 right 6558
+object 11 19 left 6540
+object 11 19 right 6548
+object 12 19 left 6534
+object 13 19 left 6535
+object 13 19 right 6558
+object 14 19 left 6536
+object 15 19 left 6537
+object 15 19 right 6538
+object 16 19 left 6539
+object 17 19 left 6540
+object 18 19 left 6541
+object 19 19 left 6542
+object 19 19 right 6543
