@@ -281,6 +281,13 @@ public sealed partial class WorldView
                 continue;
             }
 
+            // 걷는 동안 온 내 기술·마법 몸 동작은 그리지 않는다 — 걷는 모습 위로 쿠로토 손 들기가 나갔다(사용자 2026-10-04).
+            // 마법·기술 자체(이펙트·소리·피해)는 그대로다. 평타는 위에서 따로 그린다.
+            if (motion.Serial == world.Serial && _walked >= 0)
+            {
+                continue;
+            }
+
             // 괴물은 동작 번호·속도를 무시하고 평타만, 한 장 0.3초(원작 Legend.exe 0x59e95d).
             if (_herd.ContainsKey(motion.Serial))
             {
