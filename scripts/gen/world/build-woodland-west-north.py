@@ -19,13 +19,16 @@ SPEC `plans/woodland-west-north-spec-2026-10-04.md`. 지금 서버의 「우드�
 """
 import hashlib
 import json
+import math
 import shutil
+import statistics
 import struct
 import sys
 from collections import deque
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))   # scripts/ — lib/
+from lib._io import read_lenient_json
 from lib._paths import ROOT
 from lib._world import AREAS, LOOT_RANDOM, MAPS, SERVER, WARPS, WORLDMAP, warp, world_card
 
@@ -52,6 +55,14 @@ NEW_LINKS = [("9-1", "10-1"), ("10-1", "11-1"), ("11-1", "12-1"), ("12-1", "13-1
              ("17-1", "17-2"), ("18-1", "19-1"), ("19-1", "20-1"), ("19-1", "19-2")]   # 본줄이 가운데 칸을 먼저 잡게
 GATE_HINT = 21                         # 입구 위 가장자리에서 14-1 로 나가는 칸 — 서 노바 길(21~22,0) 자리
 SOTP = SERVER / "static" / "sotp.dat"
+# 앞 구역을 복사해 채운 구역은 「조금씩 세지게」(사용자 2026-10-04) — 복사 원본에서 한 구역 나아갈 때마다 체력·공격(최소·최대)을
+# 같은 배율로 곱하고, 경험치는 원본의 경험치/체력 비율 그대로(체력 따라), 방어·마릿수·종류는 그대로. 배율은 줄 끝 구역이 그 드랍 층과
+# 레벨이 맞는 기존 사냥터 괴물 세기(종마다 한 마리, 체력·최소 공격의 가운데 값)에 닿게: 13-1(56층) = 아벨해안(51~), 20-1(86층) =
+# 뤼케시온해안(71~98). 한 배율로 둘 다 맞출 수 없어(노바 우드랜드는 체력에 비해 공격이 낮다) 두 비율의 기하평균을 끝까지의 구역 수로
+# 나눈다. 그 값이 구역마다 5% 보다 작으면(끝이 원본보다 약하면) 구역마다 5%. 곁방 17-2·19-2 는 같은 번호 구역과 같다.
+REACH = {13: SERVER / "templates" / "monsters" / "5.99", 20: SERVER / "templates" / "monsters" / "뤼케시온해안"}
+REACH_GLOB = {13: "*@아벨해안*.json", 20: "*.json"}
+LEAST_STEP = 1.05
 FIX = {"맨티스": {"체력": "6040"}, "녹색말벌": {"최소공격력": "55", "최대공격력": "60"}, "우드랜드보스1": {"방어력": "1"}}
 
 
@@ -114,7 +125,7 @@ def fill(side, counts, zones):
     line = lambda z: number(z) >= 14
     full = {z for _, z in counts}
     anchors = [z for z in full if not z.endswith("-2")]
-    added, why = {}, []
+    added, why, copies = {}, [], {}
     for z in zones:
         if z in full or z.endswith("입구"):
             continue
@@ -124,7 +135,36 @@ def fill(side, counts, zones):
         for kind in sorted({k for k, a in counts if a in used}):
             added[(kind, z)] = int(sum(counts.get((kind, a), 0) for a in used) / len(used) + 0.5)
         why.append(f"{z} ← {' · '.join(used)}")
-    return added, why
+        if after is None and before:
+            copies[z] = before
+    return added, why, copies
+
+
+def strength(monsters):
+    """종마다 한 마리 — 체력·최소 공격의 가운데 값."""
+    one = {m["Name"]: m for m in monsters}.values()
+    return statistics.median(m["MaximumHP"] for m in one), statistics.median(m["DmgMin"] for m in one)
+
+
+def stronger(side, mobs, copies, said):
+    """복사한 구역을 원본에서 나아간 구역 수만큼 배율로 세게(REACH 주석)."""
+    number = lambda z: int(z[len(side):].split("-")[0])
+    for source in sorted(set(copies.values()), key=number):
+        end = 13 if number(source) < 14 else 20
+        hp, hit = strength([m for n, m in mobs if n.endswith(f"@{source}")])
+        ref_hp, ref_hit = strength([read_lenient_json(p) for p in REACH[end].glob(REACH_GLOB[end])])
+        reach = math.sqrt(ref_hp / hp * ref_hit / hit)
+        step = max(LEAST_STEP, reach ** (1 / (end - number(source))))
+        said.append(f"{source} → {side}{end}-1: 원본 체력 {hp:,.0f}·최소공격 {hit:,.0f}, 견줄 곳 {ref_hp:,.0f}·{ref_hit:,.0f}"
+                    f" → 끝 배율 {reach:.2f} · 구역마다 ×{step:.3f}")
+        for n, m in mobs:
+            zone = n.split("@")[1]
+            if copies.get(zone) == source:
+                k = step ** (number(zone) - number(source))
+                per_hp = m["Exp"] / m["MaximumHP"]
+                for key in ("MaximumHP", "DmgMin", "DmgMax"):
+                    m[key] = round(m[key] * k)
+                m["Exp"] = round(m["MaximumHP"] * per_hp)
 
 
 def monster(kind, f, count, area, have):
@@ -157,7 +197,7 @@ def main():
     spawns, stats = rows("mob_spawns.json"), {m["이름"]: m["fields"] for m in rows("mobs.json")}
     have = {p.stem for p in ITEMS.glob("*.json")}
 
-    plan, cards, warps, mobs, dropped, skipped, new_links, filled = [], [], [], [], [], [], [], []
+    plan, cards, warps, mobs, dropped, skipped, new_links, filled, steps = [], [], [], [], [], [], [], [], []
     for side, (_, _, _, point) in SIDES.items():
         maps = side_maps(side)
         lobby = f"{side}입구"
@@ -232,10 +272,12 @@ def main():
                 dropped.append(f"{s['괴물']}@{name}")
                 continue
             counts[(s["괴물"], name)] = counts.get((s["괴물"], name), 0) + int(s["마리수"])
-        added, why = fill(side, counts, order)
+        added, why, copies = fill(side, counts, order)
         counts.update(added)
         filled += why
-        mobs += [(side, f"{kind}@{name}", monster(kind, stats[kind], n, ids[name], have)) for (kind, name), n in counts.items()]
+        here = [(f"{kind}@{name}", monster(kind, stats[kind], n, ids[name], have)) for (kind, name), n in counts.items()]
+        stronger(side, here, copies, steps)
+        mobs += [(side, n, m) for n, m in here]
 
     if write:
         for n, w in warps:
@@ -256,6 +298,7 @@ def main():
         print(f"카드 {side} {point} → {lobby_id}{LOBBY_ARRIVAL} · 구역 {len(zones)} · 워프 {len(side_warps)}")
     print("새 길: " + "\n       ".join(new_links))
     print(f"노바 배치가 없어 채운 구역: {' · '.join(filled)}")
+    print("복사 구역 세기: " + "\n           ".join(steps))
     print(f"뺀 맵(입구에서 워프로 안 닿음): {' · '.join(skipped) or '없음'}")
     print(f"정의 없는 괴물(뺌): {' · '.join(sorted(set(dropped)))}")
     print(f"맵 새 {len(plan)} · 워프 {len(warps)} · 괴물 자리 {len(mobs)}" + ("" if write else "  — 미리보기, --쓰기 로 쓴다"))

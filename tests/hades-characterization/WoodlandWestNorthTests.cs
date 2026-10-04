@@ -110,6 +110,36 @@ public sealed class WoodlandWestNorthTests
             .Select(a => (a.Map, a.Name, Steps[(int.Parse(a.Match.Groups[2].Value) - 2) * Steps.Length / 19]))
             .OrderBy(a => a.Map);
 
+    /// <summary>
+    /// 앞 구역을 복사해 채운 구역(서 12·13 ← 11, 서·북 15~20 ← 14, 북 10~13 ← 9)은 앞 구역보다 같은 괴물의 체력이 크다
+    /// (사용자 2026-10-04 「조금씩 세지게」). 곁방 17-2·19-2 는 같은 번호 구역과 같다.
+    /// </summary>
+    [Theory]
+    [InlineData("서의우드랜드", new[] { 11, 12, 13 })]
+    [InlineData("서의우드랜드", new[] { 14, 15, 16, 17, 18, 19, 20 })]
+    [InlineData("북의우드랜드", new[] { 9, 10, 11, 12, 13 })]
+    [InlineData("북의우드랜드", new[] { 14, 15, 16, 17, 18, 19, 20 })]
+    public void Copied_zones_grow_stronger_one_zone_at_a_time(string side, int[] line)
+    {
+        Dictionary<(string Kind, string Zone), int> hp = [];
+        foreach (string path in Directory.EnumerateFiles(Path.Combine(HadesWorkspace.ServerDataDirectory, "templates", "monsters", side), "*.json"))
+        {
+            string[] key = Path.GetFileNameWithoutExtension(path).Split('@');
+            hp[(key[0], key[1])] = JsonNode.Parse(File.ReadAllText(path))!["MaximumHP"]!.GetValue<int>();
+        }
+        foreach (string kind in hp.Keys.Where(k => k.Zone == $"{side}{line[0]}-1").Select(k => k.Kind))
+        {
+            for (int at = 1; at < line.Length; at++)
+            {
+                Assert.True(hp[(kind, $"{side}{line[at]}-1")] > hp[(kind, $"{side}{line[at - 1]}-1")], $"{kind} {side}{line[at]}-1 이 앞 구역보다 약합니다.");
+            }
+        }
+        foreach (int branch in new[] { 17, 19 }.Where(line.Contains))
+        {
+            Assert.All(hp.Keys.Where(k => k.Zone == $"{side}{branch}-2"), k => Assert.Equal(hp[(k.Kind, $"{side}{branch}-1")], hp[k]));
+        }
+    }
+
     /// <summary>층이 구역 깊이를 따라 줄지 않는다 — 9-1 아래 41레벨(동각반·동팔찌 층), 20-1 은 86.</summary>
     [Fact]
     public void Gear_layers_climb_with_the_zone_number()
