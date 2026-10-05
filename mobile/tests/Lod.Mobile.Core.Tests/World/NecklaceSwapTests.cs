@@ -54,4 +54,15 @@ public sealed class NecklaceSwapTests
         Assert.Equal(Element.Dark, NecklaceSwap.Next([Wearing(Sea)]));
         Assert.Equal(Element.Dark, NecklaceSwap.Next([]));
     }
+
+    [Fact]
+    public void The_upright_cycle_goes_water_earth_wind_fire_and_skips_what_is_not_carried()
+    {
+        Func<Element, bool> all = _ => true;
+        Assert.Equal(Element.Water, NecklaceSwap.Next(NecklaceSwap.Singles, [], all));
+        Assert.Equal(Element.Earth, NecklaceSwap.Next(NecklaceSwap.Singles, [Wearing(Sea)], all));
+        Assert.Equal(Element.Water, NecklaceSwap.Next(NecklaceSwap.Singles, [Wearing(Dark)], all));
+        // 땅이 없으면 물 다음은 바람.
+        Assert.Equal(Element.Wind, NecklaceSwap.Next(NecklaceSwap.Singles, [Wearing(Sea)], element => element != Element.Earth));
+    }
 }

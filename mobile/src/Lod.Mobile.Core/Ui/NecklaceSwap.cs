@@ -49,7 +49,30 @@ public static class NecklaceSwap
     public static int? SlotOf(IReadOnlyList<InventoryItem> pack, string? name) =>
         pack.FirstOrDefault(item => item.Name == name && item.Stats is { Place: Place })?.Slot;
 
+    /// <summary>지금 낀 목걸이의 속성, 없으면 None.</summary>
+    public static Element Current(IReadOnlyList<WornItem> worn) => (Element)(Worn(worn)?.Stats?.Offense ?? 0);
+
     /// <summary>전환 칸이 다음에 낄 쪽: 지금 낀 것이 암흑이면 생명, 아니면 암흑.</summary>
-    public static Element Next(IReadOnlyList<WornItem> worn) =>
-        (Element)(Worn(worn)?.Stats?.Offense ?? 0) == Element.Dark ? Element.Light : Element.Dark;
+    public static Element Next(IReadOnlyList<WornItem> worn) => Next(Pair, worn, _ => true);
+
+    /// <summary>
+    /// 묶음 칸(세로의 수→토→풍→화 차례 칸, 암흑↔생명 칸)이 누르면 낄 속성 — 지금 낀 것 다음 차례 중 목걸이를 가진 첫째.
+    /// 묶음 밖의 것을 끼고 있으면 묶음 맨 앞부터. 가진 게 하나도 없으면 바로 다음 차례(칸은 흐리게 보인다).
+    /// </summary>
+    public static Element Next(IReadOnlyList<Element> group, IReadOnlyList<WornItem> worn, Func<Element, bool> has)
+    {
+        int at = group.ToList().IndexOf(Current(worn));
+
+        for (int step = 1; step <= group.Count; step++)
+        {
+            Element next = group[(at + step) % group.Count];
+
+            if (next != Current(worn) && has(next))
+            {
+                return next;
+            }
+        }
+
+        return group[(at + 1) % group.Count];
+    }
 }

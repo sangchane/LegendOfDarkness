@@ -204,10 +204,8 @@ public partial class GameScreen : Control
     private Control _necklaces = null!;
 
     /// <summary>
-    /// The pad with the necklace row on top. Five potion-sized chips (5 × 32 + 4 × 4 = 176) are wider than the pad (152):
-    /// upright the 360 width has no room for that, so the row is held in a pad-wide box and runs 24 to the right over the
-    /// 8 gap and the fan's empty top-left corner (부채꼴 x 0..16 · y 56..88 — 다음 쪽·코마 칸은 y 56 위, 기술 칸은 x 40 오른쪽).
-    /// On its side the column simply grows to the row's width.
+    /// The pad with the necklace row on top. Upright two potion-sized chips (a 수→토→풍→화 cycle and 암흑↔생명) sit in a
+    /// pad-wide box; on its side five chips (5 × 32 + 4 × 4 = 176) and the column grows to the row's width.
     /// </summary>
     private Control WithNecklaces(Control pad)
     {
@@ -218,15 +216,24 @@ public partial class GameScreen : Control
         System.Func<IReadOnlyList<WornItem>> worn = () => _server?.Worn ?? LayoutCheck.PretendWorn;
         System.Action<int> use = slot => Main.Fire(_server?.UseAsync(slot, System.Threading.CancellationToken.None));
 
-        foreach (Element element in NecklaceSwap.Singles)
+        // 세로는 두 칸 — 수→토→풍→화 차례 칸과 암흑↔생명 칸(사용자 2026-10-05: 다섯 칸은 방향판보다 넓었다). 가로는 다섯 칸.
+        if (Main.Portrait)
         {
-            chips.AddChild(new NecklaceChip(element, pack, worn, use, Notify));
+            chips.AddChild(new NecklaceChip(NecklaceSwap.Singles, pack, worn, use, Notify));
+        }
+        else
+        {
+            foreach (Element element in NecklaceSwap.Singles)
+            {
+                chips.AddChild(new NecklaceChip([element], pack, worn, use, Notify));
+            }
         }
 
-        chips.AddChild(new NecklaceChip(null, pack, worn, use, Notify));
+        chips.AddChild(new NecklaceChip(NecklaceSwap.Pair, pack, worn, use, Notify));
         _necklaces = chips;
 
-        int rowWidth = (5 * AbilityFan.PotionSide) + (4 * (Main.Gutter / 2));
+        int count = chips.GetChildCount();
+        int rowWidth = (count * AbilityFan.PotionSide) + ((count - 1) * (Main.Gutter / 2));
         int padWidth = (3 * Main.TouchMinimum) + (2 * (Main.Gutter / 2));
         Control holder = new()
         {

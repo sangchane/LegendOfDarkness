@@ -8,18 +8,21 @@ namespace LodClient;
 
 /// <summary>
 /// 방향판 위 속성 목걸이 칸 하나(사용자, 2026-10-05) — 포션 칸(<see cref="PotionChip" />)과 같은 결. 짧게 누르면 고른 목걸이를
-/// 끼고(가방 물건 사용 0x1C), 길게 누르면 그 속성 목걸이 중에서 고른다. 전환 칸은 암흑↔생명을 오간다(<see cref="NecklaceSwap.Next" />).
+/// 끼고(가방 물건 사용 0x1C), 길게 누르면 그 속성 목걸이 중에서 고른다. 묶음 칸(세로의 수→토→풍→화, 암흑↔생명)은 누를 때마다
+/// 다음 차례를 낀다(<see cref="NecklaceSwap.Next(IReadOnlyList{Element}, IReadOnlyList{WornItem}, System.Func{Element, bool})" />).
+/// 지금 끼고 있는 것은 금테 + 오른쪽 위 「●」(사용자 2026-10-05) — 묶음 칸은 묶음 안의 것을 끼고 있으면 그것을 보여 준다.
 /// </summary>
 public partial class NecklaceChip : Button
 {
     private const ulong HoldMilliseconds = 400;
 
-    private readonly Element? _single;
+    private readonly IReadOnlyList<Element> _group;
     private readonly System.Func<IReadOnlyList<InventoryItem>> _pack;
     private readonly System.Func<IReadOnlyList<WornItem>> _worn;
     private readonly System.Action<int> _use;
     private readonly System.Action<string> _say;
     private readonly Label _letter = new();
+    private readonly Label _mark = new() { Text = "●", Visible = false };
     private readonly PopupPanel _picker = new();
     private readonly StyleBox _plain;
 
@@ -28,15 +31,15 @@ public partial class NecklaceChip : Button
     private bool _held;
     private (string? Name, Element Kind, int? Slot, bool On)? _shown;
 
-    /// <param name="single">수·토·풍·화 중 하나, null 이면 암흑↔생명 전환 칸.</param>
+    /// <param name="group">속성 하나면 그 속성 칸, 여럿이면 차례로 도는 칸(수·토·풍·화 / 암흑·생명).</param>
     public NecklaceChip(
-        Element? single,
+        IReadOnlyList<Element> group,
         System.Func<IReadOnlyList<InventoryItem>> pack,
         System.Func<IReadOnlyList<WornItem>> worn,
         System.Action<int> use,
         System.Action<string> say)
     {
-        _single = single;
+        _group = group;
         _pack = pack;
         _worn = worn;
         _use = use;
@@ -56,13 +59,28 @@ public partial class NecklaceChip : Button
         _letter.OffsetLeft = 2;
         _letter.OffsetTop = -2;
         AddChild(_letter);
+
+        _mark.AddThemeFontSizeOverride("font_size", 9);
+        _mark.AddThemeColorOverride("font_color", new Color(1f, 0.82f, 0.3f));
+        _mark.AddThemeColorOverride("font_outline_color", Colors.Black);
+        _mark.AddThemeConstantOverride("outline_size", 3);
+        _mark.MouseFilter = MouseFilterEnum.Ignore;
+        _mark.HorizontalAlignment = HorizontalAlignment.Right;
+        _mark.SetAnchorsPreset(LayoutPreset.FullRect);
+        _mark.OffsetRight = -1;
+        _mark.OffsetTop = -3;
+        AddChild(_mark);
         AddChild(_picker);
     }
 
-    /// <summary>이 칸이 지금 가리키는 속성 — 전환 칸은 다음에 낄 쪽.</summary>
-    private Element Kind => _single ?? NecklaceSwap.Next(_worn());
+    private bool Single => _group.Count == 1;
 
-    private string? Target => NecklaceSwap.Chosen(Main.Necklace(Kind), _pack(), _worn(), Kind);
+    /// <summary>누르면 낄 속성 — 묶음 칸은 지금 낀 것 다음 차례 중 가방에 있는 것.</summary>
+    private Element Kind => Single ? _group[0] : NecklaceSwap.Next(_group, _worn(), element => NecklaceSwap.SlotOf(_pack(), TargetOf(element)) is not null);
+
+    private string? TargetOf(Element element) => NecklaceSwap.Chosen(Main.Necklace(element), _pack(), _worn(), element);
+
+    private string? Target => TargetOf(Kind);
 
     public override void _GuiInput(InputEvent @event)
     {
@@ -98,13 +116,13 @@ public partial class NecklaceChip : Button
             Pick();
         }
 
-        Element kind = Kind;
-        string? name = Target;
         WornItem? on = NecklaceSwap.Worn(_worn());
-        // 전환 칸은 암흑·생명 중 하나를 끼고 있으면 밝힌다 — 칸이 보여 주는 것은 다음에 낄 쪽이다.
-        bool lit = _single is null
-            ? NecklaceSwap.Pair.Contains((Element)(on?.Stats?.Offense ?? 0))
-            : on is not null && on.Name == name;
+        Element current = NecklaceSwap.Current(_worn());
+        // 묶음 칸은 묶음 안의 것을 끼고 있으면 그것을, 아니면 누르면 낄 것을 보여 준다.
+        bool wearingGroup = !Single && _group.Contains(current);
+        Element kind = wearingGroup ? current : Kind;
+        string? name = wearingGroup ? on!.Name : TargetOf(kind);
+        bool lit = wearingGroup || (on is not null && on.Name == name);
         (string?, Element, int?, bool) now = (name, kind, NecklaceSwap.SlotOf(_pack(), name), lit);
 
         if (_shown != now)
@@ -122,6 +140,7 @@ public partial class NecklaceChip : Button
         _letter.Text = NecklaceSwap.Letter(look.Kind);
         Modulate = look.Slot is not null || look.On ? Colors.White : new Color(1, 1, 1, 0.45f);
         AddThemeStyleboxOverride("normal", look.On ? Greybox.Lit() : _plain);
+        _mark.Visible = look.On;
         TooltipText = look.Name ?? $"{NecklaceSwap.Letter(look.Kind)} 목걸이 없음";
     }
 
@@ -159,7 +178,7 @@ public partial class NecklaceChip : Button
 
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        IReadOnlyList<Element> kinds = _single is { } single ? [single] : NecklaceSwap.Pair;
+        IReadOnlyList<Element> kinds = _group;
 
         foreach ((string name, int icon, Element element) in NecklaceSwap.Choices(_pack(), _worn(), kinds))
         {
