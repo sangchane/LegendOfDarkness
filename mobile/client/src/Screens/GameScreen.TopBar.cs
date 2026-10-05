@@ -384,6 +384,11 @@ public partial class GameScreen : Control
             _tabMap.TapAt(spot);
         }
 
+        if (Main.TabMapNpc.Length > 0 && _tabMapOpenFor >= 1)
+        {
+            _tabMap.PressNpc(Main.TabMapNpc);
+        }
+
         if (Main.TabMapZoom && _tabMapOpenFor >= 1 && !_tabMap.Zoomed)
         {
             _tabMap.Zoom.EmitSignal(BaseButton.SignalName.Pressed);

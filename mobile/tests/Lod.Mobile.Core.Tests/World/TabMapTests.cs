@@ -25,6 +25,8 @@ public sealed class TabMapTests
         exit 20373 63 49 월드맵
         npc 20373 40 34 멜로린
         npc 20373 3 10 자르반 3세
+        about 20373 40 34 판매: 사과, 치즈
+        room 20373 노비스마을식당|카르마 — 판매: 사과 / 베이가 — 판매: 와인
         exit 20393 0 0 노비스마을
         """;
 
@@ -53,7 +55,10 @@ public sealed class TabMapTests
     {
         MapGuide guide = MapGuide.Read(Guide);
 
-        Assert.Contains(guide.SignsOn(20373), sign => sign.Name == "자르반 3세" && sign.Where == new Tile(3, 10));
+        Assert.Contains(guide.SignsOn(20373), sign => sign.Name == "자르반 3세" && sign.Where == new Tile(3, 10) && sign.About == "");
+        Assert.Contains(guide.SignsOn(20373), sign => sign.Name == "멜로린" && sign.About == "판매: 사과, 치즈");
+        Assert.Equal(new MapRoom("노비스마을식당", "카르마 — 판매: 사과\n베이가 — 판매: 와인"), Assert.Single(guide.RoomsOn(20373)));
+        Assert.Empty(guide.RoomsOn(20393));
         Assert.Single(guide.ExitsOn(20393));
         Assert.Empty(guide.ExitsOn(1));
         Assert.Empty(guide.SignsOn(1));

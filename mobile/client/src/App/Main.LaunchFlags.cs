@@ -151,6 +151,9 @@ public partial class Main : Control
 
     public static double TabMapCloseAfter { get; private set; } = -1;
 
+    /// <summary><c>--tabmap-npc 이름</c> — 길 찾기 창 아래 NPC 목록에서 그 이름을 눌러 정보 팝업을 띄운다(사진용).</summary>
+    public static string TabMapNpc { get; private set; } = string.Empty;
+
     /// <summary>With <c>--tabmap-zoom</c>, presses 확대 once the map is open.</summary>
     public static bool TabMapZoom { get; private set; }
 

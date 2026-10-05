@@ -80,7 +80,9 @@ public sealed partial class TabMapPanel : PanelContainer
 
         inside.AddChild(WindowFrame.Head(_title, Close, Zoom, Stop));
         inside.AddChild(_canvas);
+        inside.AddChild(BuildNpcList());
         inside.AddChild(Legend());
+        BuildNpcCard();
 
         MarginContainer margin = new();
         margin.AddThemeConstantOverride("margin_left", Main.Gutter);
@@ -176,6 +178,8 @@ public sealed partial class TabMapPanel : PanelContainer
         {
             return;
         }
+
+        KeepNpcList();
 
         // 제목 한 줄이 곧 안내다: 평소에는 곳 이름과 "누르면 걷는다", 걷는 동안은 간 곳과 남은 걸음, 거절되면 그 까닭.
         string place = _world.PlaceName;

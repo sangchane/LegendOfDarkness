@@ -91,9 +91,10 @@ public partial class Main : Control
         MapTab = Flag("--map-tab");
         OpeningMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--map") >= 0 || MapGo.Length > 0;
         TabMapGo = Flag("--tabmap-go");
+        TabMapNpc = Flag("--tabmap-npc");
         TabMapCloseAfter = double.TryParse(Flag("--tabmap-close"), out double tabMapClose) ? tabMapClose : -1;
         TabMapZoom = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--tabmap-zoom") >= 0;
-        OpeningTabMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--tabmap") >= 0 || TabMapGo.Length > 0 || TabMapZoom;
+        OpeningTabMap = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--tabmap") >= 0 || TabMapGo.Length > 0 || TabMapNpc.Length > 0 || TabMapZoom;
         OnGear = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--gear") >= 0;
         Striking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--strike") >= 0;
         Hunting = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--hunt") >= 0

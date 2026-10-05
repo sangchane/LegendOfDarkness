@@ -23,8 +23,11 @@ public sealed record MapExit(string To, IReadOnlyList<Tile> Tiles)
 /// <summary>A map the world map lands on: its name, whether it is a town, and the level its warps ask (<c>area</c> lines).</summary>
 public sealed record MapPlace(int Area, string Name, bool Town, int Level);
 
-/// <summary>Somebody who always stands in the same place — a shopkeeper, a trainer.</summary>
-public sealed record MapSign(Tile Where, string Name);
+/// <summary>Whoever stands beyond an exit — a shop behind its door (<c>room</c> line): the exit's name and who is there, one per line.</summary>
+public sealed record MapRoom(string To, string About);
+
+/// <summary>Somebody who always stands in the same place — a shopkeeper, a trainer — and what they do (<c>about</c> line, may be empty).</summary>
+public sealed record MapSign(Tile Where, string Name, string About = "");
 
 /// <summary>
 /// What the 길 찾기 map knows about a map beyond its walls: the exits and the standing NPCs, read from
@@ -40,6 +43,7 @@ public sealed class MapGuide
     private readonly Dictionary<int, List<MapSign>> _signs = [];
     private readonly Dictionary<int, MapPlace> _places = [];
     private readonly Dictionary<int, List<MapPlace>> _zones = [];
+    private readonly Dictionary<int, List<MapRoom>> _rooms = [];
 
     public static MapGuide Empty { get; } = new();
 
@@ -55,6 +59,14 @@ public sealed class MapGuide
             if (words.Length == 5 && words[0] == "area" && int.TryParse(words[1], out int area) && int.TryParse(words[2], out int level))
             {
                 guide._places[area] = new MapPlace(area, words[4], words[3] == "town", level);
+                continue;
+            }
+
+            // room <맵> <간 곳>|<NPC — 하는 일 / …> — 출구 너머에 선 NPC 들.
+            if (line.StartsWith("room ", StringComparison.Ordinal) && line.Split(' ', 3) is [_, var roomMap, var rest]
+                && int.TryParse(roomMap, out int from) && rest.Split('|', 2) is [var to, var inside])
+            {
+                Add(guide._rooms, from, new MapRoom(to, inside.Replace(" / ", "\n", StringComparison.Ordinal)));
                 continue;
             }
 
@@ -80,6 +92,12 @@ public sealed class MapGuide
 
                 case "npc":
                     Add(guide._signs, map, new MapSign(new Tile(x, y), words[4]));
+                    break;
+
+                // about <맵> <x> <y> <하는 일> — 같은 자리 npc 줄 뒤에 온다.
+                case "about" when guide._signs.TryGetValue(map, out List<MapSign>? signs):
+                    int at = signs.FindIndex(sign => sign.Where == new Tile(x, y));
+                    if (at >= 0) signs[at] = signs[at] with { About = words[4] };
                     break;
             }
         }
@@ -135,6 +153,8 @@ public sealed class MapGuide
 
     /// <summary>The zones under a hunting ground's card, in the order the server's world map lists them.</summary>
     public IReadOnlyList<MapPlace> ZonesUnder(int map) => _zones.TryGetValue(map, out List<MapPlace>? zones) ? zones : [];
+
+    public IReadOnlyList<MapRoom> RoomsOn(int map) => _rooms.TryGetValue(map, out List<MapRoom>? rooms) ? rooms : [];
 
     public IReadOnlyList<MapSign> SignsOn(int map) => _signs.TryGetValue(map, out List<MapSign>? signs) ? signs : [];
 
