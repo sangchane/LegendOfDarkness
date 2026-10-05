@@ -29,6 +29,47 @@ public sealed class CompanionBotTests : IDisposable
 
     public void Dispose() => _deadline.Dispose();
 
+    /// <summary>
+    /// 맞지 않고 처음부터 체력이 낮은 주인 — 체력바(0x13)는 맞을 때만 와서 전에는 봇이 주인을 100% 로 보고 회복하지 않았다
+    /// (사용자 2026-10-05 「어떤 이벤트가 없으면 회복 안 시킨다」). 서버가 1초마다 보내는 파티원 숫자(0x5E 종류 6)로 본다.
+    /// </summary>
+    [Fact]
+    public async Task The_bot_heals_an_owner_who_came_in_hurt_without_being_hit()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (ForestOne, Start.X, Start.Y));
+        CompanionCallTests.Configure(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, OwnerName);
+        LoginFlow.TryCreateAccount(server, CompanionCallTests.BotName);
+        CompanionCallTests.Edit(server, OwnerName, saved =>
+        {
+            InTheVillage(saved);
+            saved["ExpLevel"] = 30;
+            saved["_MaximumHp"] = 3000;
+            saved["CurrentHp"] = 300;
+        });
+        CompanionCallTests.Edit(server, CompanionCallTests.BotName, InTheVillage);
+
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName);
+        List<string> said = [];
+        CompanionRunner runner = new(bot, new MapWalls(HadesWorkspace.MapLayoutFolder), new CompanionSettings(), line =>
+        {
+            lock (said)
+            {
+                said.Add(line);
+            }
+        });
+        _ = runner.RunAsync(_deadline.Token);
+
+        WorldClient owner = await Enter(server, OwnerName);
+        await owner.CallCompanionAsync(_deadline.Token);
+        await Waiting.Until(() => bot.Master?.Serial == owner.Serial, "봇에게 주인이 정해지지 않았습니다.", _deadline.Token);
+
+        await Waiting.Until(() => (owner.Vitals?.Health ?? 0) >= 2900,
+            $"봇이 맞지 않은 주인을 채우지 않았습니다 — 체력 {owner.Vitals?.Health} · 봇이 한 일: {Joined(said)}", _deadline.Token, TimeSpan.FromSeconds(60));
+    }
+
     [Fact]
     public async Task The_bot_heals_its_hurt_owner_and_walks_after_them()
     {

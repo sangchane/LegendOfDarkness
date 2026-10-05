@@ -229,7 +229,11 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             Vitals = world.Vitals,
             Comatose = Overhead.InComa(world.Ailments),
             OwnerAt = owner?.Where,
-            HealthOf = world.Health,
+            // 서버가 1초마다 보내는 파티원 숫자(0x5E 종류 6)를 먼저 — 체력바(0x13)는 맞을 때만 와서, 봇이 늦게 왔거나 맞지 않고 줄어든
+            // 체력(다라밀공 등)은 몰라 회복하지 않았다(사용자 2026-10-05 「어떤 이벤트가 없으면 회복 안 시킨다」).
+            HealthOf = serial => world.MemberNumbers(serial) is { MaximumHealth: > 0 } numbers
+                ? (int)(numbers.Health * 100L / numbers.MaximumHealth)
+                : world.MemberStatus(serial)?.HealthPercent ?? world.Health(serial),
             Spells = world.Spells,
             Pack = world.Pack,
             StatusesOf = serial => world.StatusesOf(serial)?.Select(one => one.Name).ToHashSet(),
