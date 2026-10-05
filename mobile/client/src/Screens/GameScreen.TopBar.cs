@@ -174,26 +174,47 @@ public partial class GameScreen : Control
     /// </summary>
     private Control BuildGuideChip()
     {
+        // 작게, 뒤가 비치게(사용자 2026-10-05) — 위 메뉴 원처럼 반투명 검정 + 어두운 금테.
         HBoxContainer inside = new();
-        inside.AddThemeConstantOverride("separation", Main.Gutter);
+        inside.AddThemeConstantOverride("separation", Main.Gutter / 2);
         _guideText = new Label { VerticalAlignment = VerticalAlignment.Center };
-        _guideText.AddThemeColorOverride("font_color", Greybox.Text);
+        _guideText.AddThemeColorOverride("font_color", LolText);
+        _guideText.AddThemeFontSizeOverride("font_size", 12);
 
-        Button stop = new() { Text = "멈춤", CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
-        Greybox.Plain(stop);
+        Button stop = new() { Text = "멈춤", CustomMinimumSize = new Vector2(44, 28), FocusMode = FocusModeEnum.None };
+        StyleBoxFlat stopPlate = new() { BgColor = new Color(0, 0, 0, 0.35f), BorderColor = LolGoldDark };
+        stopPlate.SetBorderWidthAll(1);
+        stopPlate.SetCornerRadiusAll(14);
+        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus" })
+        {
+            stop.AddThemeStyleboxOverride(state, stopPlate);
+        }
+        stop.AddThemeFontSizeOverride("font_size", 12);
+        stop.AddThemeColorOverride("font_color", LolText);
         stop.Pressed += () => _world.StopGuiding();
 
         inside.AddChild(_guideText);
         inside.AddChild(stop);
 
+        StyleBoxFlat glass = new() { BgColor = new Color(0, 0, 0, 0.4f), BorderColor = LolGoldDark };
+        glass.SetBorderWidthAll(1);
+        glass.SetCornerRadiusAll(16);
+        glass.ContentMarginLeft = 10;
+        glass.ContentMarginRight = 3;
+        glass.ContentMarginTop = 2;
+        glass.ContentMarginBottom = 2;
+        PanelContainer plate = new();
+        plate.AddThemeStyleboxOverride("panel", glass);
+        plate.AddChild(inside);
+
         CenterContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Visible = false };
         holder.AnchorLeft = 0;
         holder.AnchorRight = 1;
-        holder.AddChild(Plated(inside));
+        holder.AddChild(plate);
         _topRow.Resized += () =>
         {
             holder.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter;
-            holder.OffsetBottom = holder.OffsetTop + Main.TouchMinimum + 12;
+            holder.OffsetBottom = holder.OffsetTop + 32;
         };
 
         return holder;
