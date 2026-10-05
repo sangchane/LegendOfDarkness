@@ -111,7 +111,18 @@ public partial class GameScreen : Control
                 MouseFilter = MouseFilterEnum.Ignore
             };
             left.AddThemeConstantOverride("separation", Main.Gutter);
-            left.AddChild(BuildMessageRow());
+
+            // 기록 줄은 기둥 위에 떠서 위로 자란다 — 기둥 높이에 넣으면 긴 말이 여러 줄로 접힐 때 조작 줄이 높아져 화면이
+            // 위로 넘치고 위 줄이 잘렸다(사용자 2026-10-05 사진).
+            Control messages = new() { CustomMinimumSize = new Vector2(toastWidth, 0), MouseFilter = MouseFilterEnum.Ignore };
+            Control messageRow = BuildMessageRow();
+            messageRow.AnchorLeft = 0;
+            messageRow.AnchorRight = 1;
+            messageRow.AnchorTop = 1;
+            messageRow.AnchorBottom = 1;
+            messageRow.GrowVertical = GrowDirection.Begin;
+            messages.AddChild(messageRow);
+            left.AddChild(messages);
             left.AddChild(padColumn);
 
             row.AddChild(left);

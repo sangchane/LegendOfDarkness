@@ -93,10 +93,10 @@ public partial class GameScreen : Control
         HBoxContainer picked = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
         picked.AddThemeConstantOverride("separation", Main.Gutter / 2);
         picked.AddChild(_target);
-        // 퍼센트는 폭을 정해 둔다 — 9% 와 100% 사이에 판이 흔들리지 않게.
+        // 퍼센트는 폭을 정해 둔다 — 9% 와 100% 사이에 판이 흔들리지 않게. 글자는 이름 쪽(왼쪽)에 붙인다 — 오른쪽에 붙이니
+        // 이름과 퍼센트 사이가 벌어져 보였다(사용자 2026-10-05).
         _targetPercent = Aux("–");
-        _targetPercent.CustomMinimumSize = new Vector2(Main.Portrait ? 36 : 48, 0);
-        _targetPercent.HorizontalAlignment = HorizontalAlignment.Right;
+        _targetPercent.CustomMinimumSize = new Vector2(Main.Portrait ? 36 : 44, 0);
         picked.AddChild(_targetPercent);
         picked.AddChild(_targetHealth);
 
