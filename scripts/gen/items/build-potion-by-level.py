@@ -22,6 +22,7 @@
 **사냥터 레벨** — 우드랜드2-1 11 · 3-1·4-1 21 · 5-1·6-1 51 · 14-1 81, 포테의숲 21, 아벨해안 1~4구역 51·59·67·75(입장 51~80 을 4등분),
 서·북의우드랜드는 `lib/_drops.py` 층(11·26·41·56·71·86), 구광산 99. 노비스·수오미·죽음의마을·신죽·뤼케시온해안·호러캐슬·카스마늄·마운틴메리는
 건드리지 않는다(자기 확률 `DropRate` 를 괴물에 적었거나 5.99 증거값 한 칸 목록이라 칸을 늘리면 확률이 바뀐다).
+단 2026-10-05 부터 신죽·카스마늄·드라큐라백작의성·지하수로D 에서 `build-drop-variety.py` 가 99레벨 장비를 붙인(맨손이던) 괴물은 99 로 채운다(`FRESH_99`).
 **구광산 일반 괴물**은 `LootType` 이 None(256) 이라 아무것도 안 떨궜다 — Random(2) 로 바꾸고 포션만 넣는다(금화는 늘 준다).
 
 **기존 물건은 안 지운다** — 포션 칸을 더할 뿐이라 칸수가 늘어난 만큼 같은 목록의 장비·잡템 실제 확률이 (옛 칸수 ÷ 새 칸수)로 옅어진다
@@ -53,7 +54,7 @@ DROP_BOOST = 1.5            # `Formulas/monsterexp.cs` DropBoost
 CAP = 0.795                 # `build-drop-cap.py` 80% 아래
 LOOT_RANDOM, LOOT_NONE = 1 << 1, 256
 DROPS_TYPE = "System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib"
-RESERVED = {"크라켄1", "크라켄2", "킹아크퍼스1", "킹아크퍼스2"}   # `build-gear-drops.py` FIELD_BOSSES
+RESERVED = {"크라켄1", "크라켄2", "킹아크퍼스1", "킹아크퍼스2", "그림록퀸"}   # `build-gear-drops.py` FIELD_BOSSES
 
 # 새로 정하는 DropRate(1.5배 전) — 지금 DropRate 가 없는(=안 떨구던) 포션만. 체력:마력 = 1:2. 하급·중급·상급 은 그대로 둔다.
 NEW_RATES = {"최하급체력포션": 0.6, "최하급마력포션": 1.2, "파프리카": 1.4, "블루피치": 2.0}
@@ -73,6 +74,9 @@ POOLS = [
     (99, ["상급체력포션", "상급마력포션", "블루피치"]),
 ]
 MAX_EACH, MAX_SLOTS = 4, 12
+
+# 2026-10-05 드랍 검수(`plans/drop-audit-2026-10-05.md`) — `build-drop-variety.py` FRESH_REGIONS 가 99레벨 장비를 붙인 맵(구광산 밖).
+FRESH_99 = r"드라큐라백작의성.+|지하수로D-\d+|신죽(마집안|음의마을)[\d-]+|카스마늄제\d-\d갱도"
 
 
 def target(level):
@@ -120,10 +124,12 @@ def load_levels():
             levels[aid] = (name, (51, 59, 67, 75)[int(m.group(1)) - 1])
         elif re.fullmatch(r"구광산\d+-\d+", name):
             levels[aid] = (name, 99)
+        elif re.fullmatch(FRESH_99, name):
+            levels[aid] = (name, 99)
     return levels
 
 
-def load_monsters(levels):
+def load_monsters(levels, items):
     out = []
     for path in sorted(MONSTERS.rglob("*.json")):
         try:
@@ -135,6 +141,10 @@ def load_monsters(levels):
         if m.get("AreaID") not in levels or m["Name"] in RESERVED or m.get("DropRate") is not None:
             continue
         if not (loot & LOOT_RANDOM or (mine and loot == LOOT_NONE)):
+            continue
+        # 99레벨 사냥터(`FRESH_99`) — `build-drop-variety.py` 가 장비를 붙인 괴물만. 5.99 증거 물건 한 칸 목록(열쇠·가위·엑스쿠라눔)은 그대로.
+        if re.fullmatch(FRESH_99, levels[m["AreaID"]][0]) and not any(
+                (items.get(n, (None, {}))[1].get("EquipmentSlot") or 0) > 0 for n in drops_of(m)):
             continue
         out.append((path, m))
     return out
@@ -197,7 +207,7 @@ def main():
         if not rates.get(name):
             rates[name] = rate
     levels = load_levels()
-    monsters = load_monsters(levels)
+    monsters = load_monsters(levels, items)
 
     rows = defaultdict(list)    # 맵 이름 → [(전 포션, 후 포션, 전 합, 후 합, 칸 전, 칸 후)]
     changed = 0

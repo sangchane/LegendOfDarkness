@@ -335,8 +335,11 @@ def lay_gear(monsters, items, writing, said):
 
         for path, monster in here:
             listed = drops_of(monster)
-            junk = [item for item in listed if not is_gear(items, item)]
-            wanted = junk + carried.get(monster["Name"], [])
+            # 마지막 장비 칸 뒤는 `build-potion-by-level.py` 가 붙인 포션 — 그대로 뒤에 둔다(2026-10-05, 앞으로 옮기면
+            # `build-drop-variety.py` 가 그것을 옛 목록으로 세어 멈춘다).
+            cut = max((i + 1 for i, item in enumerate(listed) if is_gear(items, item)), default=len(listed))
+            junk = [item for item in listed[:cut] if not is_gear(items, item)]
+            wanted = junk + carried.get(monster["Name"], []) + listed[cut:]
 
             for name in junk:
                 if name in JUNK_RATE:
