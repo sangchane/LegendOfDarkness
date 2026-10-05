@@ -55,8 +55,21 @@ TEACHERS = [f"{name}{n}" for name in ("가렌", "이블린", "럭스", "소라�
 EXCLUDED = {
     "정권": "운영자 명령으로만 (사용자)",
 }
-BLOCKED_AUTO = {"투핸드어택": "기술이 아니라 전사 두손 무기 동작 (사용자)"}
-FORCED_WITHDRAWN = {(1, "skill", "투핸드어택")}
+BLOCKED_AUTO = {}
+#: 전사의 기본공격은 투핸드어택(5.99 `SKILL_기본공격`, 사용자 2026-10-05) — 영어 Assail 이 함께 있으면 평타가 두 번 나간다.
+FORCED_WITHDRAWN = {(1, "skill", "Assail")}
+#: 사용자가 정한 배우는 레벨 — 노바·원작 표보다 앞선다. 표에 없던 것도 넣는다.
+#: 전사(2026-10-05): 바투·윈드블레이드·메가블레이드·투핸드어택(평타형)과 쿠로토를 배운 채로 시작, 매드소울 71, 크래셔 99.
+#: 투핸드어택은 전에 「두손 무기 동작이라 기술이 아니다」로 막았던 것을 이번에 푼다(사용자 2026-10-05).
+USER_LEVELS = {
+    (1, "skill", "바투"): 1,
+    (1, "skill", "윈드블레이드"): 1,
+    (1, "skill", "메가블레이드"): 1,
+    (1, "skill", "투핸드어택"): 1,
+    (1, "spell", "쿠로토"): 1,
+    (1, "skill", "매드소울"): 71,
+    (1, "skill", "크래셔"): 99,
+}
 #: 사용자가 2026-09-27 원작 기술이라고 직접 확인한 이름. 2023 원작 표의 일반 기술·마법 행으로
 #: 직업과 레벨을 확인하며, 빠지면 생성기를 실패시켜 조용히 다시 치워지지 않게 한다.
 MANDATORY_ORIGINAL = {"양의신권", "백보신권", "소수신공", "일루메나", "피닉스모드", "콘푸지오", "딜루메니"}
@@ -243,6 +256,11 @@ def table_rows(found, known, restored, old):
     for key, value in restored.items():
         rows[key] = value
         icons[key] = int(known[key[1]][key[2]].get("Icon") or 0)
+    for key, level in USER_LEVELS.items():
+        if known[key[1]].get(key[2]) is None:
+            sys.exit(f"사용자가 정한 {key[2]} 의 템플릿이 없다")
+        rows[key] = (level, "사용자 2026-10-05")
+        icons[key] = int(known[key[1]][key[2]].get("Icon") or 0)
     replaces = {}
 
     # 5.99 에만 있던 것 — 같은 직업의 노바 1차 목록(템플릿이 없어 못 넣은 것·정권까지)에 이름이 없는 것.
@@ -250,7 +268,7 @@ def table_rows(found, known, restored, old):
     withdrawn = sorted({
         (path, kind, name)
         for (path, kind, name) in old
-        if (path, name) not in taught and (path, kind, name) not in restored
+        if (path, name) not in taught and (path, kind, name) not in restored and (path, kind, name) not in rows
     } | FORCED_WITHDRAWN)
     return rows, skipped, icons, replaces, withdrawn
 
@@ -268,7 +286,7 @@ def report(ordered, instead, replaces, skipped, withdrawn, old, promoted):
         print(f"못 넣음\t{teacher}\t{name}\t{why}")
     for path, kind, name in withdrawn:
         source = (f"5.99 {old[(path, kind, name)][0]}레벨" if (path, kind, name) in old
-                  else BLOCKED_AUTO[name])
+                  else BLOCKED_AUTO.get(name, "사용자"))
         print(f"치움(5.99 전용)\t{CLASS_KO[path]}\t{'기술' if kind == 'skill' else '마법'}\t{name}\t{source}")
     for path, tier, kind, name in promoted:
         print(f"안 넣음({tier})\t{CLASS_KO[path]}\t{'기술' if kind == 'skill' else '마법'}\t{name}")
@@ -310,7 +328,7 @@ def csharp_table(ordered, instead, replaces, withdrawn, old):
     ]
     for path, kind, name in withdrawn:
         source = (f"5.99 {old[(path, kind, name)][1]} {old[(path, kind, name)][0]}레벨"
-                  if (path, kind, name) in old else BLOCKED_AUTO[name])
+                  if (path, kind, name) in old else BLOCKED_AUTO.get(name, "사용자 2026-10-05"))
         lines.append(f'            (Class.{CLASS_NAMES[path]}, {"true" if kind == "skill" else "false"}, "{name}"), // {source}')
     lines += ["        };", "    }", "}", ""]
     return lines

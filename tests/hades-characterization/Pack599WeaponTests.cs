@@ -66,7 +66,11 @@ public sealed class Pack599WeaponTests : IDisposable
         server.Start(TimeSpan.FromMinutes(2));
 
         LoginFlow.TryCreateAccount(server, Name);
-        Save(server, saved => saved["Path"] = "Rogue");
+        Save(server, saved =>
+        {
+            saved["Path"] = "Rogue";
+            saved["ExpLevel"] = 11; // 방패(체력의가죽방패)가 11레벨
+        });
 
         using WorldSession session = await HadesLoginClient.LoginAsync(
             IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
@@ -91,6 +95,17 @@ public sealed class Pack599WeaponTests : IDisposable
 
         Motion stab = await Blow(world);
         Assert.Equal((134, 18), (stab.Number, stab.Speed));
+
+        // 방패를 들면 공통 기본공격 동작(1) — 빠르기는 무기 것(사용자 2026-10-05).
+        await world.SayAsync("/give \"체력의가죽방패\" 1", _deadline.Token);
+        InventoryItem? shield = null;
+        await Until(() => (shield = world.Pack.FirstOrDefault(item => item.Name == "체력의가죽방패")) is not null,
+            $"방패가 소지품에 오지 않았습니다. 서버가 한 말: {world.Said}");
+        await world.UseAsync(shield!.Slot, _deadline.Token);
+        await Until(() => world.Pack.All(item => item.Name != "체력의가죽방패"), $"방패를 들지 못했습니다. 서버가 한 말: {world.Said}");
+
+        Motion guarded = await Blow(world);
+        Assert.Equal((1, 18), (guarded.Number, guarded.Speed));
     }
 
     /// <summary>평타를 치고 내 몸 동작이 오기를 기다린다. 평타 간격(450ms 남짓)을 넘기려고 여러 번 친다.</summary>

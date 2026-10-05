@@ -83,8 +83,9 @@ public sealed class AutoLearnTests : IDisposable
         (string Name, string Path, int Level, string[] Skills, string[] Spells, string[] NotYet)[] cases =
         [
             // 1레벨 것은 노바 전직 첫 기술(숏블레이드·찌르기·마레노·쿠로), 나머지는 노바 1차 스킬상인. 5.99 에만 있던 것은 없다.
-            ("autowarrior", "Warrior", 41, ["숏블레이드", "윈드블레이드", "메가블레이드", "바투"], ["쿠로토"],
-                ["투핸드어택", "내려치기", "파워단련"]),
+            // 전사(사용자 2026-10-05): 바투·윈드블레이드·메가블레이드·투핸드어택·쿠로토로 시작, 매드소울 71, 크래셔 99.
+            ("autowarrior", "Warrior", 41, ["숏블레이드", "윈드블레이드", "메가블레이드", "바투", "투핸드어택"], ["쿠로토"],
+                ["매드소울", "크래셔", "Assail", "내려치기", "파워단련"]),
             ("autorogue", "Rogue", 41, ["찌르기", "센스몬스터", "찔러휘비기", "두번찌르기", "센스", "품뒤져보기", "아무네지아"],
                 ["쿠로토", "하이드", "마구찌르기"], ["습격", "명중률향상(Lev1)", "명중률향상(Lev2)"]),
             ("autowizard", "Wizard", 11, [], ["마레노", "렌토", "수페라마레나", "쿠로토", "콘푸지오"], ["나르콜리", "원소이해력"]),
@@ -165,26 +166,22 @@ public sealed class AutoLearnTests : IDisposable
     }
 
     [Fact]
-    public async Task Two_handed_attack_is_removed_from_an_existing_warrior()
+    public async Task An_existing_warrior_swings_two_handed_attack_instead_of_assail()
     {
+        // 전사의 기본공격은 투핸드어택(5.99 SKILL_기본공격, 사용자 2026-10-05) — 영어 Assail 은 말없이 치운다.
         const string name = "autotwohand";
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (MonsterRoom, Start.X, Start.Y));
-        MakeGameMaster(server, name);
         server.Start(TimeSpan.FromMinutes(2));
         LoginFlow.TryCreateAccount(server, name);
-        Edit(server, name, "Warrior", level: 99, next: 1000);
+        Edit(server, name, "Warrior", level: 1, next: 1000);
 
-        WorldClient first = await Enter(server, name);
-        await first.SayAsync("/skill \"투핸드어택\" 1", _deadline.Token);
-        await Until(() => Has(first.Skills.Select(s => s.Name), "투핸드어택"), "투핸드어택 시험 준비가 되지 않았습니다.");
-        await first.LogOutAsync(_deadline.Token);
-        await Task.Delay(TimeSpan.FromSeconds(2), _deadline.Token);
-
-        WorldClient again = await Enter(server, name);
+        WorldClient world = await Enter(server, name);
         List<string> told = [];
-        await Until(() => !Has(again.Skills.Select(s => s.Name), "투핸드어택"), "기존 투핸드어택을 치우지 않았습니다.");
-        await Until(() => { Drain(again, told); return told.Contains("투핸드어택을 잊었습니다."); },
-            $"투핸드어택을 치웠다는 알림이 없습니다: {string.Join(" / ", told)}");
+        await Until(() => Has(world.Skills.Select(s => s.Name), "투핸드어택") && !Has(world.Skills.Select(s => s.Name), "Assail"),
+            $"투핸드어택이 기본공격이 아닙니다: {Names(world.Skills.Select(s => s.Name))}");
+        await Task.Delay(TimeSpan.FromSeconds(1), _deadline.Token);
+        Drain(world, told);
+        Assert.DoesNotContain(told, line => line.Contains("Assail"));
     }
 
     private async Task<WorldClient> Enter(IsolatedHadesServer server, string name)
