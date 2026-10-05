@@ -93,7 +93,7 @@ public sealed class CompanionMagicTests
         Assert.Equal(CompanionAct.Cast, brain.Next(At(100, 50), Defaults).Act);           // 기준 70 아래 — 시작
         Assert.Equal((CompanionAct.Cast, 1), (brain.Next(At(100.35, 60), Defaults) is var tick ? (tick.Act, tick.Slot) : default)); // 채우는 중엔 틱마다(0.3초)
         Assert.Equal((CompanionAct.Cast, 1), (brain.Next(At(102, 85), Defaults) is var more ? (more.Act, more.Slot) : default)); // 기준 위지만 아직 덜 참
-        Assert.NotEqual(1, brain.Next(At(104, 100), Defaults).Slot);                    // 가득 — 멈춘다
+        Assert.NotEqual(1, brain.Next(At(104, 99), Defaults).Slot);                     // 99%(버림) 면 가득 — 멈춘다
         Assert.NotEqual(1, new CompanionBrain().Next(At(100, 85), Defaults).Slot);      // 시작한 적 없으면 85 에선 안 한다
     }
 
@@ -104,6 +104,18 @@ public sealed class CompanionMagicTests
         CompanionSight Drained = Sight([Struck()]) with { HealthOf = _ => 0, StatusesOf = _ => [] };
 
         Assert.Equal((CompanionAct.Cast, 1, Owner), (new CompanionBrain().Next(Drained, Defaults) is var step ? (step.Act, step.Slot, step.Target) : default));
+    }
+
+    [Fact]
+    public void Topping_up_above_the_mark_still_leaves_room_for_curses()
+    {
+        CompanionBrain brain = new();
+        CompanionSight At(double seconds, int health) => Sight([Struck()], seconds) with { HealthOf = _ => health };
+
+        Assert.Equal(1, brain.Next(At(100, 50), Defaults).Slot);   // 기준 아래 — 회복
+        // 기준 위(85)에서 마저 채우는 중 — 회복 사이에 저주(바르도 11)도 나간다.
+        List<int> slots = [.. new[] { 100.35, 100.7, 101.05, 101.4, 101.75, 102.1 }.Select(at => brain.Next(At(at, 85), Defaults).Slot)];
+        Assert.Contains(11, slots);
     }
 
     [Fact]

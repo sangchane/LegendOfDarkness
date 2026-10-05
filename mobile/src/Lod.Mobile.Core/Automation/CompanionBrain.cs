@@ -164,6 +164,9 @@ public sealed class CompanionBrain
     // 주인 체력이 기준 아래로 내려가 회복을 시작했으면 가득 찰 때까지 이어 채운다 — 기준(70%)을 넘는 순간 멈춰
     // 한두 번 주고 말았다(사용자 2026-10-05).
     private bool _fillingOwner;
+
+    /// <summary>「가득」 — 체력% 는 버림이라 99,999/100,000 도 99 다. 100 을 기다리면 채우기가 끝나지 않았다.</summary>
+    private const int Full = 99;
     private TimeSpan _lastCast = Reckon.Never;
     private TimeSpan _lastHeal = Reckon.Never;
     private TimeSpan _lastWalk = Reckon.Never;
@@ -209,7 +212,8 @@ public sealed class CompanionBrain
                ?? Maintain(sight, settings, reading)
                // 주인이 다친 동안은 저주·나르콜리를 쉬고 다음 회복을 기다린다 — 회복 사이(1.5초)마다 저주를 끼워 넣다가 쓰러진
                // 주인을 못 살렸다(사용자 2026-10-04).
-               ?? (reading.OwnerHurt ? null : Assist(sight, settings, reading))
+               // 기준 위에서 마저 채우는 중이면 저주·나르콜리도 쓴다 — 늘 쉬면 체력이 99% 에 머물러 저주·나르가 영영 안 나갔다(2026-10-05).
+               ?? (reading.OwnerLow ? null : Assist(sight, settings, reading))
                ?? Follow(sight, settings, reading.Now)
                ?? (reading.Mana < reading.Cheapest
                    ? new(CompanionAct.Rest, Why: "마력 부족")
@@ -224,6 +228,7 @@ public sealed class CompanionBrain
         bool CanDrink,
         bool OwnerNear,
         bool OwnerHurt,
+        bool OwnerLow,
         bool SelfHurt,
         bool Empowered,
         int Mana,
@@ -246,8 +251,9 @@ public sealed class CompanionBrain
         return new Reading(
             now,
             canCast,
-            // 주인을 채우는 중이면 틱마다(FillGap) — 1.5초마다 한 번으로는 큰 체력을 못 따라갔다(사용자 2026-10-05 「1틱마다 쭉쭉」).
-            CanHeal: _fillingOwner
+            // 주인이 기준 아래(위급)면 틱마다(FillGap) — 1.5초마다 한 번으로는 큰 체력을 못 따라갔다(사용자 2026-10-05 「1틱마다
+            // 쭉쭉」). 기준 위에서 마저 채울 땐 보통 간격이라 사이에 저주·나르콜리가 들어간다.
+            CanHeal: ownerNear && ownerHealth < settings.HealOwnerPercent
                 ? now - _lastCast >= FillGap && now - _lastHeal >= FillGap
                 : canCast && now - _lastHeal >= HealGap,
             CanDrink: now - _lastDrink >= DrinkGap,
@@ -255,7 +261,8 @@ public sealed class CompanionBrain
             // 체력바 0% 도 회복한다 — 다라밀공 뒤 체력 1/100,000 은 0% 로 와서 「쓰러짐」으로 보고 걸렀다(사용자 2026-10-05).
             // 쓰러졌는지는 혼수(skulled) 상태로만 본다 — 그때는 Emergency 가 깨운다.
             OwnerHurt: ownerNear && sight.StatusesOf(sight.Master)?.Contains("skulled") != true
-                       && (_fillingOwner = ownerHealth < settings.HealOwnerPercent || (_fillingOwner && ownerHealth < 100)),
+                       && (_fillingOwner = ownerHealth < settings.HealOwnerPercent || (_fillingOwner && ownerHealth < Full)),
+            OwnerLow: ownerNear && ownerHealth < settings.HealOwnerPercent,
             SelfHurt: Reckon.HealthPercent(sight.Vitals) < settings.HealSelfPercent,
             empowered,
             Mana: sight.Vitals?.Mana ?? 0,
