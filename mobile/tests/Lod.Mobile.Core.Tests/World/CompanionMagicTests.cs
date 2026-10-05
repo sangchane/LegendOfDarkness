@@ -82,6 +82,17 @@ public sealed class CompanionMagicTests
     }
 
     [Fact]
+    public void Colama_regen_goes_only_to_someone_hurt_not_kept_up_like_a_buff()
+    {
+        IReadOnlyList<LearnedSpell> spells = [Spell(30, "콜라마")];
+        CompanionSight OwnerAt(int health) => Sight([], spells: spells) with { HealthOf = _ => health, StatusesOf = _ => [] };
+
+        // 멀쩡하면 걸지 않는다 — 매초 그림이 떠 주인 위로 끝없이 깜빡였다(사용자 2026-10-05).
+        Assert.NotEqual(30, new CompanionBrain().Next(OwnerAt(100), Defaults).Slot);
+        Assert.Equal((CompanionAct.Cast, 30, Owner), (new CompanionBrain().Next(OwnerAt(40), Defaults) is var step ? (step.Act, step.Slot, step.Target) : default));
+    }
+
+    [Fact]
     public void While_the_owner_is_hurt_the_bot_heals_and_does_not_curse_between_heals()
     {
         CompanionBrain brain = new();
