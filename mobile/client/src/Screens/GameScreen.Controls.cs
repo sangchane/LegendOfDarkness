@@ -112,24 +112,25 @@ public partial class GameScreen : Control
             };
             left.AddThemeConstantOverride("separation", Main.Gutter);
 
-            // 기록 줄은 기둥 위에 떠서 위로 자란다 — 기둥 높이에 넣으면 긴 말이 여러 줄로 접힐 때 조작 줄이 높아져 화면이
-            // 위로 넘치고 위 줄이 잘렸다(사용자 2026-10-05 사진).
-            Control messages = new() { CustomMinimumSize = new Vector2(toastWidth, 0), MouseFilter = MouseFilterEnum.Ignore };
-            Control messageRow = BuildMessageRow();
-            messageRow.AnchorLeft = 0;
-            messageRow.AnchorRight = 1;
-            messageRow.AnchorTop = 1;
-            messageRow.AnchorBottom = 1;
-            messageRow.GrowVertical = GrowDirection.Begin;
-            messages.AddChild(messageRow);
-            left.AddChild(messages);
             left.AddChild(padColumn);
 
             row.AddChild(left);
 
             // The empty middle takes the extra width, not the toast. That keeps the two thumb clusters at
             // opposite sides while leaving their play area clear.
-            row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
+            Control middle = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
+            row.AddChild(middle);
+
+            // 기록 줄은 방향판 오른쪽 빈자리 아래에 떠서 위로 자란다 — 기둥 위에 두니 목걸이 줄·파티원 칸과 겹쳐 읽기 힘들었다
+            // (사용자 2026-10-05). 레이아웃 높이에는 넣지 않는다 — 긴 말이 조작 줄을 키워 위 줄이 잘렸다.
+            Control messageRow = BuildMessageRow();
+            messageRow.AnchorLeft = 0;
+            messageRow.AnchorRight = 0;
+            messageRow.OffsetRight = toastWidth;
+            messageRow.AnchorTop = 1;
+            messageRow.AnchorBottom = 1;
+            messageRow.GrowVertical = GrowDirection.Begin;
+            middle.AddChild(messageRow);
         }
 
         // 세로는 방향판과 부채꼴 사이의 틈이 이 칸이다(360 폭에 152 + 8 + 184). 가로는 기록 줄이 방향판 위로
