@@ -21,12 +21,14 @@ public sealed record InventoryItem(
 /// What a carried or worn thing does, as our server adds after the original 0x0F and 0x37 (우리 확장, 2026-10-01). Bonuses are signed —
 /// armour class goes down when it gets better, as in the original. <see cref="Class" /> is 0 for anyone; the elements
 /// are the server's numbers (1 불 · 2 물 · 3 바람 · 4 땅 · 5 빛 · 6 어둠). <see cref="Place" /> is the worn place it goes
-/// to, as 0x37 numbers it (0 for none).
+/// to, as 0x37 numbers it (0 for none). <see cref="HealthRestore" />·<see cref="ManaRestore" /> are what a potion gives back
+/// when drunk (0 from a server before 2026-10-05).
 /// </summary>
 public sealed record ItemStats(
     int Ac, int Hit, int Dmg, int Str, int Int, int Wis, int Con, int Dex, int Mr,
     int Hp, int Mp, int DmgMin, int DmgMax,
-    int Level, int Class, int Stage, int Weight, int Offense, int Defense, long Value, int Place);
+    int Level, int Class, int Stage, int Weight, int Offense, int Defense, long Value, int Place,
+    int HealthRestore = 0, int ManaRestore = 0);
 
 /// <summary>
 /// A piece of gear the character has on. The server names the place it sits by number — the same numbers

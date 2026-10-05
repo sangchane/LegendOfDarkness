@@ -58,6 +58,13 @@ public sealed class ItemNumbersTests : IDisposable
         WornItem? worn = null;
         await Until(() => (worn = world.Worn.FirstOrDefault(on => on.Slot == 2 && on.Name == "도복")) is not null, $"도복을 입지 못했습니다: {world.Said}");
         Assert.Equal(["방어 -10", "요구 레벨 1 · 무도가", "무게 4"], ItemActions.Stats(worn!.Stats).Select(line => line.Text));
+
+        // 물약은 마시면 얼마나 차는지가 붙어 온다(2026-10-05).
+        await world.SayAsync("/give \"하급마력포션\" 1", _deadline.Token);
+        InventoryItem? potion = null;
+        await Until(() => (potion = world.Pack.FirstOrDefault(carried => carried.Name == "하급마력포션")) is not null,
+            $"하급마력포션이 소지품에 오지 않았습니다: {world.Said}");
+        Assert.Contains("마력 회복 +1,000", ItemActions.Stats(potion!).Select(line => line.Text));
     }
 
     private async Task Until(Func<bool> condition, string failure)

@@ -48,6 +48,9 @@ public static class ItemActions
             }
         }
 
+        if (s.HealthRestore > 0) lines.Add(new("체력 회복", $"+{s.HealthRestore:N0}", 0, Numeric: false));
+        if (s.ManaRestore > 0) lines.Add(new("마력 회복", $"+{s.ManaRestore:N0}", 0, Numeric: false));
+
         if (Element(s.Offense) is { Length: > 0 } offense) lines.Add(new("공격 속성", offense, 0, Numeric: false));
         if (Element(s.Defense) is { Length: > 0 } defense) lines.Add(new("방어 속성", defense, 0, Numeric: false));
 

@@ -76,6 +76,17 @@ public sealed class PackTests
         Assert.Empty(ItemActions.Stats(WorldClient.ReadPackItem(Carrying("Boots"))));
     }
 
+    /// <summary>A potion's numbers end with what it gives back (2026-10-05) — the info box says how much.</summary>
+    [Fact]
+    public void A_potions_restore_after_the_numbers_is_said()
+    {
+        byte[] numbers = [0x01, .. new byte[18 + 16 + 6 + 4 + 1], 0x00, 0x00, 0x03, 0xE8, 0x00, 0x00, 0x01, 0xF4];
+
+        InventoryItem carried = WorldClient.ReadPackItem([.. Carrying("Boots"), .. numbers]);
+
+        Assert.Equal(["체력 회복 +1,000", "마력 회복 +500"], ItemActions.Stats(carried).Select(line => line.Text));
+    }
+
     [Fact]
     public void A_packet_that_stops_short_is_refused()
     {

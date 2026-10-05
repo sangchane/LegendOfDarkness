@@ -420,13 +420,18 @@ public sealed partial class WorldClient
         ReadOnlySpan<byte> s = tail[1..];
         ReadOnlySpan<byte> wide = s[18..];
         ReadOnlySpan<byte> small = wide[16..];
+        // 체력·마력 회복(물약)은 2026-10-05 에 덧붙였다 — 그 전 서버는 없다.
+        ReadOnlySpan<byte> restore = small[11..];
+        bool restores = restore.Length >= 8;
 
         return new ItemStats(
             Short(s, 0), Short(s, 1), Short(s, 2), Short(s, 3), Short(s, 4), Short(s, 5), Short(s, 6), Short(s, 7), Short(s, 8),
             Int(wide, 0), Int(wide, 1), Int(wide, 2), Int(wide, 3),
             small[0], small[1], small[2], small[3], small[4], small[5],
             BinaryPrimitives.ReadUInt32BigEndian(small[6..]),
-            small[10]);
+            small[10],
+            restores ? Int(restore, 0) : 0,
+            restores ? Int(restore, 1) : 0);
     }
 
     private static int Short(ReadOnlySpan<byte> from, int nth) => BinaryPrimitives.ReadInt16BigEndian(from[(nth * 2)..]);
