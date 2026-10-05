@@ -514,14 +514,6 @@ public sealed class CompanionBrain
             {
                 string name = CompanionSpells.Bare(spell.Name);
 
-                // 다쳤을 때만 거는 것(콜라마) — 주인은 회복 기준, 자기는 자기 회복 기준 아래일 때만.
-                if (entry.WhenHurt && (target == sight.Me
-                        ? Reckon.HealthPercent(sight.Vitals) >= settings.HealSelfPercent
-                        : (sight.HealthOf(target) ?? 100) >= settings.HealOwnerPercent))
-                {
-                    continue;
-                }
-
                 bool castLately = _buffed.TryGetValue((name, target), out TimeSpan at);
 
                 if (sight.StatusesOf(target) is { } on)

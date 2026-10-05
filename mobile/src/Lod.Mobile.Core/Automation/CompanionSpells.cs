@@ -124,9 +124,7 @@ public static class CompanionSpells
 
     /// <param name="State">버프는 서버가 알리는 상태 이름(5.99 스크립트의 horrama·enare), 해제는 푸는 디버프 이름.</param>
     /// <param name="Icon">괴물에게 거는 것(저주·수면)은 걸렸는지를 둘레 알림(0x5C)의 그림 번호로 본다.</param>
-    /// <param name="WhenHurt">버프지만 대상이 회복 기준 아래로 다쳤을 때만 건다(콜라마 — 체력 재생은 걸려 있는 동안 매초 그림이 떠서,
-    /// 늘 유지하면 멀쩡한 주인 위로 끝없이 깜빡였다, 사용자 2026-10-05).</param>
-    public sealed record Entry(Kind Kind, int Power, int Mana, int Seconds = 0, string State = "", int Icon = 0, bool WhenHurt = false);
+    public sealed record Entry(Kind Kind, int Power, int Mana, int Seconds = 0, string State = "", int Icon = 0);
 
     /// <summary>저주 칸(5.99 <c>magic 1</c>)의 그림 — 렌토·바르도·데프레코 모두 같은 칸이라 하나만 걸린다(서버 <c>Pack599.Curse</c>).</summary>
     public const int CurseIcon = 82;
@@ -147,9 +145,9 @@ public static class CompanionSpells
         ["엑스쿠라네라"] = new(Kind.GroupHeal, 70, 430),
         ["호르라마"] = new(Kind.Buff, 0, 55, 120, "horrama"),
         ["에나르마"] = new(Kind.Buff, 0, 40, 150, "enare"),
-        // 5.99 SPELL_벨라르모 belra(120초) · SPELL_콜라마 hprecovery(10초, 지능+400 최대 1500) — 상태 이름은 Pack599 의 Belra·Regen.Slot.
+        // 5.99 SPELL_벨라르모 belra(120초, 방어 7) · 콜라마 colama(120초, 방어 10 — 2026-10-05 원작대로) — 상태 이름은 Pack599 의 Belra·Colama.Slot.
         ["벨라르모"] = new(Kind.Buff, 0, 50, 120, "노바 벨라르모"),
-        ["콜라마"] = new(Kind.Buff, 0, 0, 10, "5.99 체력회복", WhenHurt: true),
+        ["콜라마"] = new(Kind.Buff, 0, 0, 120, "5.99 콜라마"),
         // 5.99 SPELL_디나르콜리 mobnar_end → 하데스 수면(sleep), SPELL_디소루마 mobsor_end → 빙결(frozen). 30마력.
         ["디나르콜리"] = new(Kind.Cure, 0, 30, 0, "sleep"),
         ["디소루마"] = new(Kind.Cure, 0, 30, 0, "frozen"),

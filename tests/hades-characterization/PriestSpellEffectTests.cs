@@ -15,7 +15,7 @@ namespace Lod.Hades.Characterization.Tests;
 /// - 5.99 팩 스크립트가 그대로 옮겨진 것 — 파티 그림 `group_hill 회복량, 267`(쿠러스·쿠라누스·쿠라네라·엑스쿠라네라),
 ///   `group_hill …, 380`(홀리쿠라네라), `group_mobnar_end 281`(디나르콜룸), `group_mobsor_end 282`(디소루미아·일루메눔),
 ///   `god_bless 86`(신의축복). 속도는 5.99 서버가 박아 둔 값이다(group_hill 60 — `Novaonline.exe 0x44a183`, 나머지 100).
-/// - `hprecovery`(콜라마·리젠) 는 스크립트에 그림이 없다. 5.99 서버가 1초마다 그림 22 를 속도 75 로 대상에게 보내며
+/// - `hprecovery`(리젠) 는 스크립트에 그림이 없다. 5.99 서버가 1초마다 그림 22 를 속도 75 로 대상에게 보내며
 ///   체력을 채운다(`0x46e120`).
 /// - 하데스 옛 스크립트(ao 넷·ao puinsein·armachd·deo saighead) 는 템플릿 `Animation` 을 쏜다 — 번호는
 ///   참고 저장소 Arbiter(`docs/src/effects/spells.md` · `ProxyViewModel.EffectFilters.cs`)의 원작 관찰이다.
@@ -62,15 +62,16 @@ public sealed class PriestSpellEffectTests : IDisposable
         Creature target = await FindTarget(world);
         uint me = world.Serial;
 
-        // 체력 회복(hprecovery) — 1초마다 그림 22 · 속도 75, 그리고 체력이 오른다. 둘은 5.99 에서 한 칸(0x122)을 같이 쓰므로
-        // 콜라마가 끝난 뒤에 리젠을 건다.
+        // 콜라마 — 원작대로 방어 −10 (colama, 120초, 아이콘 94 — 사용자 2026-10-05). 팩의 체력 재생이 아니다.
         {
-            int health = world.Vitals!.Health;
-            await Cast(world, "콜라마", me, me, 22, speed: 75);
-            await Until(() => world.Vitals!.Health > health, $"콜라마가 체력 {health} 을 채우지 않았습니다.");
-            await Task.Delay(TimeSpan.FromSeconds(11), _deadline.Token);
-            await Cast(world, "리젠(Lev1)", me, me, 22, speed: 75);
+            int slot = await LearnSpell(world, "콜라마");
+            Drain(world);
+            await world.UseSpellAsync(slot, me, _deadline.Token);
+            await Until(() => world.Ailments.Any(one => one.Icon == 94), "콜라마 상태(아이콘 94)가 걸리지 않았습니다.");
         }
+
+        // 체력 회복(hprecovery, 리젠) — 1초마다 그림 22 · 속도 75.
+        await Cast(world, "리젠(Lev1)", me, me, 22, speed: 75);
 
         // 5.99 파티 그림 — 혼자면 나에게.
         await Cast(world, "쿠러스", me, me, 267, speed: 60);
