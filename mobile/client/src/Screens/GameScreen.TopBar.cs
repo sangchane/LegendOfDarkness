@@ -213,51 +213,92 @@ public partial class GameScreen : Control
     /// 공격 단추의 모양을 자동 사냥과 맞춘다 — 켜짐은 테두리 + "자동" 글자, 손이 잠시 조작 중이면 흐리게
     /// (<see cref="AbilityBar.ShowAutoHunt" />). <c>--auto-hunt</c> 면 자리를 잡은 뒤 한 번 스스로 켠다.
     /// </summary>
-    private TextureButton _botToggle = null!;
+    private Button _botToggle = null!;
+    private StyleBoxFlat _botRing = null!;
+    private TextureRect _botPicture = null!;
+    private static readonly Color BotOff = new(0.55f, 0.55f, 0.55f, 0.8f);
     private bool? _botDrawn;
 
     /// <summary>
     /// 메인 메뉴 아래 오른쪽의 작은 단추 둘 — [접속자] · [봇 켬/끔](사용자 2026-10-04). 메뉴 줄에 세우면 세로 360 에서 위 줄이 넘쳤다 —
     /// 다른 칸을 밀지 않게 덮는 층에 띄운다(Cover). 봇 설정은 설정 창 봇 탭 그대로.
-    /// 그림은 원작 클래식 UI(노바 클라이언트) 소지품 오른쪽 둥근 단추로 바꿀 자리다 — 노바 클라이언트가 맥에 없어 지금은 5.99 setoa.dat
-    /// 오른쪽 세로 단추 줄(`lback.txt`: Users = gbicon02 4·5, 봇은 짝이 없어 emot000 「두 사람」 12·13·14)을 쓴다. 같은 파일 이름으로 바꿔 끼운다.
+    /// 모양은 위 메뉴처럼 반투명 원 + 금테(2026-10-05 — 원작 돌판 40px 이 커서 자동 물약 칩을 덮었다).
     /// </summary>
     private Control BuildSideButtons()
     {
         HBoxContainer side = new() { MouseFilter = MouseFilterEnum.Ignore };
         side.AddThemeConstantOverride("separation", Main.Gutter / 2);
 
-        TextureButton users = SideButton("res://assets/ui/side-users.png", "res://assets/ui/side-users-pressed.png", "접속자");
+        TextureRect person = new()
+        {
+            Texture = GD.Load<Texture2D>("res://assets/ui/menu-users.png"),
+            CustomMinimumSize = new Vector2(20, 20),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        Button users = SideButton(person, "접속자", out _);
         users.Pressed += () => SetWindow(GameWindow.Users, !_users.Visible);
         side.AddChild(users);
 
-        _botToggle = SideButton("res://assets/ui/side-bot.png", "res://assets/ui/side-bot-pressed.png", "봇 켬/끔");
+        // 봇은 원작 펫 그림(펫-강시 40889) — 따라다니는 작은 사람(사용자 2026-10-05: 선 그림은 별로).
+        _botPicture = new TextureRect
+        {
+            Texture = GD.Load<Texture2D>("res://assets/item/40889.png"),
+            CustomMinimumSize = new Vector2(26, 26),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            TextureFilter = TextureFilterEnum.Nearest,
+            Modulate = BotOff,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        _botToggle = SideButton(_botPicture, "봇 켬/끔", out _botRing);
         _botToggle.Pressed += () => _settings.Companion.EmitSignal(BaseButton.SignalName.Pressed);
         side.AddChild(_botToggle);
 
         return side;
     }
 
-    private static TextureButton SideButton(string normal, string pressed, string tip) => new()
+    /// <summary>
+    /// 위 메뉴 단추처럼 반투명 원에 금테(사용자 2026-10-05) — 글자 없이 작게, 자동 물약 칩을 덮지 않게.
+    /// </summary>
+    private static Button SideButton(Control inside, string tip, out StyleBoxFlat ring)
     {
-        TextureNormal = GD.Load<Texture2D>(normal),
-        TexturePressed = GD.Load<Texture2D>(pressed),
-        IgnoreTextureSize = true,
-        StretchMode = TextureButton.StretchModeEnum.Scale,
-        TextureFilter = TextureFilterEnum.Nearest,
-        CustomMinimumSize = new Vector2(SideButtonSize, SideButtonSize),
-        FocusMode = FocusModeEnum.None,
-        TooltipText = tip
-    };
+        Button button = new() { CustomMinimumSize = new Vector2(SideButtonSize, SideButtonSize), FocusMode = FocusModeEnum.None, TooltipText = tip };
 
-    /// <summary>원작 18 돌판을 두 배 남짓 — 작게, 그래도 엄지로 누를 만큼.</summary>
-    private const int SideButtonSize = 40;
+        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus", "disabled" })
+        {
+            button.AddThemeStyleboxOverride(state, new StyleBoxEmpty());
+        }
 
-    /// <summary>봇이 따라오면 켜짐 그림(원작 강조 칸).</summary>
+        StyleBoxFlat circle = new() { BgColor = new Color(0, 0, 0, 0.35f), BorderColor = LolGoldDark };
+        circle.SetBorderWidthAll(1);
+        circle.SetCornerRadiusAll(SideButtonSize / 2);
+        PanelContainer plate = new() { MouseFilter = MouseFilterEnum.Ignore };
+        plate.AddThemeStyleboxOverride("panel", circle);
+        plate.SetAnchorsPreset(LayoutPreset.FullRect);
+        CenterContainer middle = new() { MouseFilter = MouseFilterEnum.Ignore };
+        middle.AddChild(inside);
+        plate.AddChild(middle);
+        button.AddChild(plate);
+
+        button.ButtonDown += () => circle.BorderColor = LolGold;
+        button.ButtonUp += () => circle.BorderColor = circle.BorderWidthLeft > 1 ? LolGold : LolGoldDark;
+        ring = circle;
+
+        return button;
+    }
+
+    /// <summary>위 메뉴 원(40)보다 작게 — 엄지로 누를 만큼은.</summary>
+    private const int SideButtonSize = 32;
+
+    /// <summary>봇이 따라오면 금테를 굵고 밝게, 그림은 제 색 — 꺼지면 흐리게.</summary>
     private void PaintBotToggle(bool on)
     {
         _botDrawn = on;
-        _botToggle.TextureNormal = GD.Load<Texture2D>(on ? "res://assets/ui/side-bot-on.png" : "res://assets/ui/side-bot.png");
+        _botRing.SetBorderWidthAll(on ? 2 : 1);
+        _botRing.BorderColor = on ? LolGold : LolGoldDark;
+        _botPicture.Modulate = on ? Colors.White : BotOff;
     }
 
     private void KeepAutoHuntButton()
