@@ -56,20 +56,27 @@ EXCLUDED = {
     "정권": "운영자 명령으로만 (사용자)",
 }
 BLOCKED_AUTO = {}
-#: 전사의 기본공격은 투핸드어택(5.99 `SKILL_기본공격`, 사용자 2026-10-05) — 영어 Assail 이 함께 있으면 평타가 두 번 나간다.
-FORCED_WITHDRAWN = {(1, "skill", "Assail")}
+FORCED_WITHDRAWN = set()
 #: 사용자가 정한 배우는 레벨 — 노바·원작 표보다 앞선다. 표에 없던 것도 넣는다.
-#: 전사(2026-10-05): 바투·윈드블레이드·메가블레이드·투핸드어택(평타형)과 쿠로토를 배운 채로 시작, 매드소울 71, 크래셔 99.
-#: 투핸드어택은 전에 「두손 무기 동작이라 기술이 아니다」로 막았던 것을 이번에 푼다(사용자 2026-10-05).
+#: 전사(2026-10-05): 바투·윈드블레이드·메가블레이드와 쿠로토를 배운 채로 시작, 매드소울 71, 크래셔 99.
+#: 평타는 기본공격(Assail) → 11 더블어택 → 41 트리플어택(더블어택을 지우며). 투핸드어택은 71 — 배워야 두손 무기 동작이 나간다
+#: (전에 「두손 무기 동작이라 기술이 아니다」로 막았던 것을 푼다). 드래곤모드 41 → 91 피닉스모드(드래곤모드를 지우며).
 USER_LEVELS = {
+    (1, "skill", "Assail"): 1,
     (1, "skill", "바투"): 1,
     (1, "skill", "윈드블레이드"): 1,
     (1, "skill", "메가블레이드"): 1,
-    (1, "skill", "투핸드어택"): 1,
     (1, "spell", "쿠로토"): 1,
+    (1, "skill", "더블어택"): 11,
+    (1, "skill", "트리플어택"): 41,
+    (1, "skill", "드래곤모드"): 41,
+    (1, "skill", "투핸드어택"): 71,
     (1, "skill", "매드소울"): 71,
+    (1, "skill", "피닉스모드"): 91,
     (1, "skill", "크래셔"): 99,
 }
+#: 사용자가 정한 「주면서 지운다」— 윗단계를 주면 아랫단계를 지우고, 윗단계가 있으면 아랫단계를 주지 않는다.
+USER_REPLACES = {"트리플어택": {"더블어택"}, "피닉스모드": {"드래곤모드"}}
 #: 사용자가 2026-09-27 원작 기술이라고 직접 확인한 이름. 2023 원작 표의 일반 기술·마법 행으로
 #: 직업과 레벨을 확인하며, 빠지면 생성기를 실패시켜 조용히 다시 치워지지 않게 한다.
 MANDATORY_ORIGINAL = {"양의신권", "백보신권", "소수신공", "일루메나", "피닉스모드", "콘푸지오", "딜루메니"}
@@ -355,6 +362,10 @@ def main():
     restored = original_restored(old, found)
 
     rows, skipped, icons, replaces, withdrawn = table_rows(found, known, restored, old)
+    for upper, lowers in USER_REPLACES.items():
+        replaces.setdefault(upper, set()).update(lowers)
+        for lower in lowers:
+            instead.setdefault(lower, set()).add(upper)
 
     ordered = sorted(rows.items(), key=lambda r: (r[0][0], r[1][0], r[0][1], r[0][2]))
     report(ordered, instead, replaces, skipped, withdrawn, old, promoted)

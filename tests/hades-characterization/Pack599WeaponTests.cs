@@ -108,6 +108,43 @@ public sealed class Pack599WeaponTests : IDisposable
         Assert.Equal((1, 18), (guarded.Number, guarded.Speed));
     }
 
+    /// <summary>
+    /// 두손 무기의 두손 동작(129)은 투핸드어택을 배운 전사만(71레벨에 저절로 — 사용자 2026-10-05). 투핸드크레이모어는 71레벨 무기다.
+    /// </summary>
+    [Fact]
+    public async Task A_warrior_who_learned_two_handed_attack_swings_a_two_hander_two_handed()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        MakeGameMaster(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        Save(server, saved =>
+        {
+            saved["Path"] = "Warrior";
+            saved["ExpLevel"] = 71;
+            saved["_Str"] = 200;
+            saved["_Con"] = 200;
+            saved["_Dex"] = 200;
+        });
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.Skills.Any(skill => skill.Name.StartsWith("투핸드어택", StringComparison.Ordinal)), "71레벨 전사가 투핸드어택을 배우지 않았습니다.");
+        await world.SayAsync("/give \"투핸드크레이모어\" 1", _deadline.Token);
+        InventoryItem? sword = null;
+        await Until(() => (sword = world.Pack.FirstOrDefault(item => item.Name == "투핸드크레이모어")) is not null,
+            $"투핸드크레이모어가 소지품에 오지 않았습니다. 서버가 한 말: {world.Said}");
+        await world.UseAsync(sword!.Slot, _deadline.Token);
+        await Until(() => world.Pack.All(item => item.Name != "투핸드크레이모어"), $"투핸드크레이모어를 들지 못했습니다. 서버가 한 말: {world.Said}");
+
+        Motion swing = await Blow(world);
+        Assert.Equal((129, 37), (swing.Number, swing.Speed));
+    }
+
     /// <summary>평타를 치고 내 몸 동작이 오기를 기다린다. 평타 간격(450ms 남짓)을 넘기려고 여러 번 친다.</summary>
     private async Task<Motion> Blow(WorldClient world)
     {
