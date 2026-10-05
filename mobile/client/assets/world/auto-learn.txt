@@ -1,12 +1,12 @@
 # tools: scripts/gen/ability/build-auto-learn.py 가 서버와 같은 표로 만든다. 손으로 고치지 말 것.
 # 직업(1 전사 · 2 도적 · 3 마법사 · 4 성직자 · 5 무도가)	레벨	skill|spell	이름	그림
 1	1	skill	Assail	1
-1	1	skill	메가블레이드	16
 1	1	skill	바투	38
 1	1	skill	숏블레이드	1
 1	1	skill	윈드블레이드	15
 1	1	spell	쿠로토	21
 1	11	skill	더블어택	1
+1	11	skill	메가블레이드	16
 1	41	skill	드래곤모드	40
 1	41	skill	트리플어택	11
 1	71	skill	매드소울	20
