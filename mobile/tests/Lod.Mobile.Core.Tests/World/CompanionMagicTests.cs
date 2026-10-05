@@ -82,6 +82,18 @@ public sealed class CompanionMagicTests
     }
 
     [Fact]
+    public void Once_healing_starts_the_bot_fills_the_owner_up_not_just_past_the_mark()
+    {
+        CompanionBrain brain = new();
+        CompanionSight At(double seconds, int health) => Sight([], seconds) with { HealthOf = _ => health };
+
+        Assert.Equal(CompanionAct.Cast, brain.Next(At(100, 50), Defaults).Act);           // 기준 70 아래 — 시작
+        Assert.Equal((CompanionAct.Cast, 1), (brain.Next(At(102, 85), Defaults) is var more ? (more.Act, more.Slot) : default)); // 기준 위지만 아직 덜 참
+        Assert.NotEqual(1, brain.Next(At(104, 100), Defaults).Slot);                    // 가득 — 멈춘다
+        Assert.NotEqual(1, new CompanionBrain().Next(At(100, 85), Defaults).Slot);      // 시작한 적 없으면 85 에선 안 한다
+    }
+
+    [Fact]
     public void While_the_owner_is_hurt_the_bot_heals_and_does_not_curse_between_heals()
     {
         CompanionBrain brain = new();

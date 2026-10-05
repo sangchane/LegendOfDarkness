@@ -157,6 +157,10 @@ public sealed class CompanionBrain
 
     private readonly Dictionary<(string Spell, uint Target), TimeSpan> _buffed = [];
     private TimeSpan _lastWake = Reckon.Never;
+
+    // 주인 체력이 기준 아래로 내려가 회복을 시작했으면 가득 찰 때까지 이어 채운다 — 기준(70%)을 넘는 순간 멈춰
+    // 한두 번 주고 말았다(사용자 2026-10-05).
+    private bool _fillingOwner;
     private TimeSpan _lastCast = Reckon.Never;
     private TimeSpan _lastHeal = Reckon.Never;
     private TimeSpan _lastWalk = Reckon.Never;
@@ -242,7 +246,7 @@ public sealed class CompanionBrain
             CanHeal: canCast && now - _lastHeal >= HealGap,
             CanDrink: now - _lastDrink >= DrinkGap,
             ownerNear,
-            OwnerHurt: ownerNear && ownerHealth > 0 && ownerHealth < settings.HealOwnerPercent,
+            OwnerHurt: ownerNear && ownerHealth > 0 && (_fillingOwner = ownerHealth < settings.HealOwnerPercent || (_fillingOwner && ownerHealth < 100)),
             SelfHurt: Reckon.HealthPercent(sight.Vitals) < settings.HealSelfPercent,
             empowered,
             Mana: sight.Vitals?.Mana ?? 0,
