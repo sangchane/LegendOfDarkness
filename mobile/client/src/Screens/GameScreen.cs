@@ -220,6 +220,9 @@ public partial class GameScreen : Control
 
     public override void _Ready()
     {
+        // 앱이 뒤로 가도 자동 사냥이 이어지게 — 게임 화면이 떠 있는 동안만(KeepAlive).
+        AddChild(new KeepAlive());
+
         MarginContainer hud = Main.SafeAreaContainer();
 
         VBoxContainer rows = new();

@@ -99,6 +99,9 @@ public sealed record HuntSight
     /// <summary>다른 사람이 선 칸 — 지나갈 수 없다.</summary>
     public IReadOnlyCollection<Tile> People { get; init; } = [];
 
+    /// <summary>워프·출구 칸 — 자동 사냥은 밟지 않는다(사용자 2026-10-05: 사냥하다 다른 맵으로 넘어가지 않게).</summary>
+    public IReadOnlyCollection<Tile> Exits { get; init; } = [];
+
     public required TimeSpan Now { get; init; }
 }
 
@@ -526,11 +529,12 @@ public sealed class AutoHunt
     private static HuntStep Walk(HuntSight sight, Tile next, string why) =>
         new(HuntAct.Walk, TabMap.StepOf(sight.Standing, next), Why: why);
 
-    /// <summary>벽, 그리고 괴물·NPC·사람이 선 칸. 바닥의 물건은 밟고 지나간다.</summary>
+    /// <summary>벽, 워프 칸, 그리고 괴물·NPC·사람이 선 칸. 바닥의 물건은 밟고 지나간다.</summary>
     private static Func<Tile, bool> Blocking(HuntSight sight)
     {
         HashSet<Tile> taken = [.. sight.Creatures.Where(one => one.Kind != CreatureKind.Passable).Select(one => one.Where)];
         taken.UnionWith(sight.People);
+        taken.UnionWith(sight.Exits);
         return tile => sight.Blocked(tile) || taken.Contains(tile);
     }
 

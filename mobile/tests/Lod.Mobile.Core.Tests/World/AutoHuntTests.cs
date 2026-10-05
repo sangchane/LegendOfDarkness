@@ -300,6 +300,27 @@ public sealed class AutoHuntTests
     }
 
     [Fact]
+    public void Steps_round_a_warp_tile_instead_of_onto_it()
+    {
+        AutoHunt hunt = Started();
+        HuntSight sight = Sight(creatures: [Beast(1, 13, 10)]) with { Exits = [new Tile(11, 10)] };
+
+        HuntStep step = hunt.Next(sight, Defaults);
+
+        Assert.Equal(HuntAct.Walk, step.Act);
+        Assert.NotEqual(Direction.East, step.Toward);
+    }
+
+    [Fact]
+    public void Does_not_walk_home_through_a_warp_line()
+    {
+        AutoHunt hunt = Started();
+        HuntSight sight = Sight(standing: new Tile(10, 14)) with { Exits = [.. Enumerable.Range(-50, 120).Select(x => new Tile(x, 12))] };
+
+        Assert.Equal(HuntAct.Wait, hunt.Next(sight, Defaults).Act);
+    }
+
+    [Fact]
     public void Gives_up_on_an_unreachable_monster_for_another()
     {
         AutoHunt hunt = Started();

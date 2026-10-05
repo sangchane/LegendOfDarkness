@@ -362,9 +362,10 @@ public sealed partial class PackPanel : PanelContainer
 
         _showing = wanted;
 
-        _carriedCount = carried.Count;
-        _page = Paging.Kept(_page, carried.Count, _perPage);
-        _pageNumber.Text = $"{_page + 1}/{Paging.Pages(carried.Count, _perPage)}";
+        // 장 수는 가진 물건 수가 아니라 가방 크기(150칸)로 — 물건이 40개면 2/2 까지만 넘겨져 나머지 칸을 볼 수 없었다(사용자 2026-10-05).
+        _carriedCount = System.Math.Max(carried.Count, PackSlots);
+        _page = Paging.Kept(_page, _carriedCount, _perPage);
+        _pageNumber.Text = $"{_page + 1}/{Paging.Pages(_carriedCount, _perPage)}";
         Fill(_rows, Paging.Page(carried, _page, _perPage));
 
         _lastCarried = all.ToArray();

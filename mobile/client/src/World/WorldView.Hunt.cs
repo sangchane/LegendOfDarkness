@@ -166,6 +166,7 @@ public sealed partial class WorldView
             AutoLoot = Main.AutoLoot,
             Blocked = Walled,
             People = [.. world.Others.Where(one => one.Serial != me).Select(one => one.Where)],
+            Exits = [.. Exits.ExitsOn(MapId).SelectMany(exit => exit.Tiles)],
             Now = Now,
         };
 
