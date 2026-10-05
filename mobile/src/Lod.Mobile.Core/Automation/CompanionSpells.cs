@@ -27,9 +27,12 @@ public static class CompanionSpells
     /// 고른 적이 없을 때의 체크 — 봇(주인 레벨 − 2, 서버 <c>Companions.LevelFor</c>)이 쓸 수 있는 가장 센 저주 하나와 나르콜리
     /// (사용자 2026-10-03: "가장 센 거만 체크"). 레벨은 서버 <c>Companions.PriestSpells</c> 와 같다 — 렌토 11 · 바르도 41 · 데프레코 71 · 프라보 91.
     /// </summary>
+    /// <summary>봇 레벨 — 주인 − 2, 적어도 1, 주인이 99 면 99(서버 <c>Companions.LevelFor</c> 와 같다, 사용자 2026-10-05).</summary>
+    public static int BotLevel(int ownerLevel) => ownerLevel >= 99 ? 99 : Math.Max(1, ownerLevel - 2);
+
     public static Magic DefaultMagic(int ownerLevel)
     {
-        int bot = Math.Max(1, ownerLevel - 2);
+        int bot = BotLevel(ownerLevel);
 
         return Magic.Sleep | (bot >= 91 ? Magic.Prabo : bot >= 71 ? Magic.Depreco : bot >= 41 ? Magic.Bardo : bot >= 11 ? Magic.Lento : Magic.None);
     }

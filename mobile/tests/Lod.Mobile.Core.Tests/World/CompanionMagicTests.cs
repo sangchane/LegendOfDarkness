@@ -206,6 +206,7 @@ public sealed class CompanionMagicTests
         Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Prabo, CompanionSpells.DefaultMagic(93));
         Assert.Equal(CompanionSpells.Magic.Sleep | CompanionSpells.Magic.Depreco, CompanionSpells.DefaultMagic(92));
         Assert.Equal(CompanionSpells.Magic.Prabo, CompanionSpells.SwitchOf("프라보 (Lev:1/100)"));
+        Assert.Equal((96, 99, 1), (CompanionSpells.BotLevel(98), CompanionSpells.BotLevel(99), CompanionSpells.BotLevel(2)));
     }
 
     [Fact]

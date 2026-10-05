@@ -148,7 +148,7 @@ public partial class Main : Control
     /// <summary>봇이 이 레벨에서 배운 가장 센 줄, 하나도 없으면 끝 줄(끄기).</summary>
     public static int AutoRow(int[] levels, int ownerLevel)
     {
-        int bot = System.Math.Max(1, ownerLevel - 2);
+        int bot = CompanionSpells.BotLevel(ownerLevel);
         int row = levels.Length - 1;
 
         for (int at = 0; at < levels.Length - 1; at++)
