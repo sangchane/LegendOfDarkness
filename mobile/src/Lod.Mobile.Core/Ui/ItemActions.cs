@@ -59,7 +59,8 @@ public static class ItemActions
         if (s.Class is >= 1 and <= 5) needs.Add(Paths[s.Class]);
         if (needs.Count > 0) lines.Add(new("요구", string.Join(" · ", needs), 0, Numeric: false));
 
-        if (s.Weight > 0) lines.Add(new("무게", $"{s.Weight}", 0, Numeric: false));
+        // 무게 줄은 숨긴다 — 서버가 무게 제한을 껐다(사용자 2026-10-05 "일단"). 되살리려면:
+        // if (s.Weight > 0) lines.Add(new("무게", $"{s.Weight}", 0, Numeric: false));
 
         return lines;
     }

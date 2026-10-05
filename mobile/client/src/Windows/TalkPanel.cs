@@ -124,7 +124,7 @@ public sealed partial class TalkPanel : PanelContainer
             // 고른 줄만 가진 만큼 — 모든 줄을 채워 가방이 통째로 비었다(사용자 2026-10-05).
             var chosen = _lines.Where(line => line.Count.Value > 0).ToList();
             foreach (var line in chosen) line.Count.Value = line.Count.MaxValue;
-            _words.Text = chosen.Count == 0 ? "먼저 팔 물건을 고르세요." : "고른 물건을 모두 채웠습니다. [선택 판매]로 확정하세요.";
+            _words.Text = chosen.Count == 0 ? "먼저 물건을 고르세요." : $"고른 물건을 모두 채웠습니다. [{_commit.Text}]로 확정하세요.";
         };
         _commit.Pressed += () =>
         {
@@ -177,8 +177,8 @@ public sealed partial class TalkPanel : PanelContainer
         }
         _shop = IsShop(talk) ? talk : null;
         _checkout.Visible = _shop is not null;
-        _filters.Visible = _shop?.Kind == DialogueKind.Goods;
-        _all.Visible = _shop?.Kind == DialogueKind.PackSlots;
+        _filters.Visible = _shop?.Kind == DialogueKind.Goods && !Bank;
+        _all.Visible = _shop?.Kind == DialogueKind.PackSlots || Bank;
         if (_shop is not null)
         {
             BuildShop(talk, pack);
@@ -248,16 +248,31 @@ public sealed partial class TalkPanel : PanelContainer
         }
     }
 
-    // shop1/shop2 use these steps; bank dialogs keep their original answer path.
+    // shop1/shop2 use these steps; the bank (Banker.cs) lists what it holds at 0x000A and our pack at 0x0800, and is
+    // answered through the same bulk trade (0xF2): buying lines take out, selling lines put in.
     private static bool IsShop(Dialogue talk) =>
-        talk.Kind == DialogueKind.Goods && talk.Step == 4
-        || talk.Kind == DialogueKind.PackSlots && talk.Step == 0x0500;
+        talk.Kind == DialogueKind.Goods && talk.Step is 4 or BankHeld
+        || talk.Kind == DialogueKind.PackSlots && talk.Step is 0x0500 or BankPack;
+
+    private const ushort BankHeld = 0x000A, BankPack = 0x0800;
+
+    private bool Bank => _shop?.Step is BankHeld or BankPack;
 
     private void BuildShop(Dialogue talk, IReadOnlyList<InventoryItem> pack)
     {
         bool selling = talk.Kind == DialogueKind.PackSlots;
-        _commit.Text = selling ? "선택 판매" : "선택 구매";
-        if (selling)
+        _commit.Text = Bank ? (selling ? "선택 맡기기" : "선택 찾기") : selling ? "선택 판매" : "선택 구매";
+        _all.Text = Bank ? (selling ? "전량 맡기기" : "전량 찾기") : "전량 판매";
+        if (Bank && !selling)
+        {
+            // 맡긴 목록 — Price 는 맡긴 개수다. 값·거르개·수치 없이 상점 줄과 같은 모양으로.
+            foreach (DialogueGoods goods in talk.Goods)
+            {
+                int held = (int)System.Math.Min(65535, System.Math.Max(1, goods.Price));
+                AddTradeRow(goods.Name, goods.Icon, 0, 0, held, $"맡긴 {held:N0}개");
+            }
+        }
+        else if (selling)
         {
             foreach (InventoryItem item in pack.Where(item => talk.Slots.Contains(item.Slot)))
                 AddTradeRow(item.Name, item.Icon, 0, item.Slot, System.Math.Min(65535, System.Math.Max(1, item.Stacks)));
@@ -272,11 +287,11 @@ public sealed partial class TalkPanel : PanelContainer
                 _goodsRows.Add((row, goods));
             }
         }
-        if (_lines.Count == 0) _offers.AddChild(new Label { Text = selling ? "팔 수 있는 물건이 없습니다." : "판매 중인 물건이 없습니다." });
+        if (_lines.Count == 0) _offers.AddChild(new Label { Text = Bank ? (selling ? "맡길 수 있는 물건이 없습니다." : "맡긴 물건이 없습니다.") : selling ? "팔 수 있는 물건이 없습니다." : "판매 중인 물건이 없습니다." });
         UpdateSummary();
     }
 
-    private Control AddTradeRow(string name, int icon, uint price, int slot, int max)
+    private Control AddTradeRow(string name, int icon, uint price, int slot, int max, string? note = null)
     {
         HBoxContainer row = new();
         row.AddThemeConstantOverride("separation", Main.Gutter);
@@ -310,7 +325,7 @@ public sealed partial class TalkPanel : PanelContainer
             TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis,
             CustomMinimumSize = new Vector2(64, 0)
         });
-        Label detail = new() { MouseFilter = MouseFilterEnum.Ignore, Text = slot > 0 ? $"보유 {max:N0}개" : $"{price:N0}전 / 개" };
+        Label detail = new() { MouseFilter = MouseFilterEnum.Ignore, Text = note ?? (slot > 0 ? $"보유 {max:N0}개" : $"{price:N0}전 / 개") };
         detail.AddThemeColorOverride("font_color", Greybox.Muted);
         detail.AddThemeFontSizeOverride("font_size", 13);
         words.AddChild(detail);
@@ -463,13 +478,14 @@ public sealed partial class TalkPanel : PanelContainer
         long count = _lines.Sum(line => (long)line.Count.Value);
         long total = _lines.Sum(line => (long)line.Price * (int)line.Count.Value);
         _summary.Text = _waiting ? "거래 결과를 기다리는 중…"
+            : Bank ? $"{kinds}종 · {count:N0}개 {(selling ? "맡기기" : "찾기")}"
             : selling ? $"{kinds}종 · {count:N0}개 판매 (값은 상인이 정합니다)"
             : $"{kinds}종 · {count:N0}개 · {total:N0}전 / 보유 {_gold:N0}전";
         int hidden = _goodsRows.Count(one => !one.Row.Visible && one.Row.GetChildren().OfType<SpinBox>().Any(count => count.Value > 0));
         if (!_waiting && hidden > 0) _summary.Text += $" (필터 밖 {hidden}종 포함)";
         if (kinds > 128) _summary.Text += " (한 번에 128종까지)";
         _summary.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        _commit.Disabled = _waiting || kinds == 0 || kinds > 128 || (!selling && total > _gold);
+        _commit.Disabled = _waiting || kinds == 0 || kinds > 128 || (!selling && !Bank && total > _gold);
         _back.Disabled = _waiting;
         _all.Disabled = _waiting;
         foreach (var line in _lines) line.Count.Editable = !_waiting;
@@ -512,7 +528,7 @@ public sealed partial class TalkPanel : PanelContainer
         // 지금 접혀 있는지와 상관없이 "탭 줄을 둔다면 굴림 칸에 얼마가 남나"로 정해야 켜졌다 꺼졌다 하지 않는다.
         if (_shop is not null)
         {
-            _filters.Visible = _shop.Kind == DialogueKind.Goods && !typing;
+            _filters.Visible = _shop.Kind == DialogueKind.Goods && !Bank && !typing;
             _checkout.Visible = !typing;
             _words.Visible = !typing;
         }

@@ -48,7 +48,7 @@ public sealed class ItemNumbersTests : IDisposable
             $"도복이 소지품에 오지 않았습니다: {world.Said}");
 
         Assert.NotNull(robe!.Stats);
-        Assert.Equal(["방어 -10", "요구 레벨 1 · 무도가", "무게 4"], ItemActions.Stats(robe).Select(line => line.Text));
+        Assert.Equal(["방어 -10", "요구 레벨 1 · 무도가"], ItemActions.Stats(robe).Select(line => line.Text));
         Assert.Equal(2, robe.Stats!.Place); // 갑옷 자리
         // 새 캐릭터는 처음부터 옷을 입고 있다 — 그러면 갑옷 자리를 바꾸는 것이다.
         Assert.Equal(world.Worn.Any(on => on.Slot == 2) ? "교체" : "장착", ItemActions.Primary(robe, world.Worn));
@@ -57,7 +57,7 @@ public sealed class ItemNumbersTests : IDisposable
         await world.UseAsync(robe.Slot, _deadline.Token);
         WornItem? worn = null;
         await Until(() => (worn = world.Worn.FirstOrDefault(on => on.Slot == 2 && on.Name == "도복")) is not null, $"도복을 입지 못했습니다: {world.Said}");
-        Assert.Equal(["방어 -10", "요구 레벨 1 · 무도가", "무게 4"], ItemActions.Stats(worn!.Stats).Select(line => line.Text));
+        Assert.Equal(["방어 -10", "요구 레벨 1 · 무도가"], ItemActions.Stats(worn!.Stats).Select(line => line.Text));
 
         // 물약은 마시면 얼마나 차는지가 붙어 온다(2026-10-05).
         await world.SayAsync("/give \"하급마력포션\" 1", _deadline.Token);

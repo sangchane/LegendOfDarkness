@@ -55,6 +55,8 @@ def about(npc: dict) -> str:
         return "판매: " + ", ".join(stock)
     if key == "Class Chooser":
         return "직업을 고른다"
+    if key == "Banker":
+        return "은행: 물건·금화를 맡기고 찾는다"
 
     said = []
     script = SERVER / "scripts" / "Pack599" / "Npcs" / f"{key[len('NPC_'):]}.cs"

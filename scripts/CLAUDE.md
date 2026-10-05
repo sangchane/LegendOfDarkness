@@ -22,7 +22,7 @@
 ## 핵심 관례
 - **큰 파일을 고칠 땐 먼저 `plans/split-when-touched.md`** — 그 파일을 어떻게 나눌지 적어 둔 지도. 고치는 작업 앞에 해당 줄 하나만 나눈다(나누기 커밋 따로).
 - 생성기는 더하고 고치기만 한다 — 요청 없이 지우지 않는다. 대부분 `--쓰기` 를 줘야 파일을 쓴다(없으면 미리보기).
-- 드랍 생성기 순서: `build-gear-drops` → `build-drop-variety` → **`build-drop-cap`**(마지막).
+- 드랍 생성기 순서: `build-gear-drops` → `build-drop-variety` → `build-potion-by-level` → **`build-drop-cap`**(마지막).
 - `ops/cloud-server.sh deploy` 는 빌드하지 않고 맥의 `Staging/net9.0` 을 올린다 — 먼저 `dotnet build …/Lorule.GameServer.csproj`. 올리면 접속자가 끊긴다(직전에 알린다).
 - 현황판 숫자가 낡았는지: `python3 scripts/gen/vault/build-data-freshness.py`.
 

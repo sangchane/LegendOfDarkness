@@ -27,9 +27,12 @@ public sealed partial class PackPanel : PanelContainer
     // 원작은 33x36 칸이었다. 손가락은 그보다 커서 시안의 최소 터치 크기를 쓴다. 칸은 창 폭을 다 쓰도록 옆으로 늘어난다.
     private static readonly Vector2 CellSize = new(Main.TouchMinimum, Main.TouchMinimum);
 
-    // 한 장에 6열, 네 줄까지. 창이 받은 높이에 들어가는 만큼만 둔다(FitRows).
+    // 한 장에 6열, 다섯 줄(30칸)까지 — 가방 150칸이 다섯 장(사용자 2026-10-05). 창이 받은 높이에 들어가는 만큼만 둔다(FitRows).
     private const int Columns = 6;
-    private const int MostRows = 4;
+    private const int MostRows = 5;
+
+    // 서버 Inventory.LENGTH 와 같다(원작 59칸 → 150칸).
+    private const int PackSlots = 150;
     private int _perPage = Columns * MostRows;
 
     /// <summary>How far a finger has to travel across the pictures before it counts as turning the page.</summary>
@@ -343,7 +346,7 @@ public sealed partial class PackPanel : PanelContainer
     public void Show(IReadOnlyList<InventoryItem> carried, long gold = 0)
     {
         bool roomy = _pager.GetParent() != _foot;
-        _count.Text = $"{carried.Count}/60칸";
+        _count.Text = $"{carried.Count}/{PackSlots}칸";
         _gold.Text = roomy ? $"금화 {gold:N0}" : $"금화 {GoldFormat.Short(gold)}";
         IReadOnlyList<InventoryItem> all = carried;
         carried = _gearOnly is { } gearOnly ? [.. carried.Where(item => ItemActions.IsGear(item) == gearOnly)] : carried;

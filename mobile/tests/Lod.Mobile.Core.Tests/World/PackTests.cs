@@ -39,6 +39,20 @@ public sealed class PackTests
     }
 
     /// <summary>A longer name pushes everything after it along, and the reader has to follow.</summary>
+    /// <summary>가방은 150칸, 한 장 30칸 다섯 장(2026-10-05) — 150번째 칸의 물건이 읽히고 다섯째 장 끝에 보인다.</summary>
+    [Fact]
+    public void The_hundred_and_fiftieth_place_is_read_and_shown_on_the_fifth_page()
+    {
+        byte[] last = Carrying("Boots");
+        last[0] = 150;
+        InventoryItem carried = WorldClient.ReadPackItem(last);
+        InventoryItem[] full = [.. Enumerable.Range(1, 149).Select(slot => carried with { Slot = slot }), carried];
+
+        Assert.Equal(150, carried.Slot);
+        Assert.Equal(5, Paging.Pages(full.Length, 30));
+        Assert.Equal(carried, Paging.Page(full, 4, 30)[^1]);
+    }
+
     [Fact]
     public void A_longer_name_does_not_shift_the_numbers_after_it()
     {
@@ -71,7 +85,7 @@ public sealed class PackTests
         Assert.Equal(42, carried.Durability);
         Assert.Equal(13, carried.Stats!.Place);
         Assert.Equal(
-            ["공격력 20~40", "방어 -5", "명중 +2", "힘 +3", "마법 방어 +10", "HP +500", "공격 속성 불", "요구 레벨 41 · 무도가", "무게 3"],
+            ["공격력 20~40", "방어 -5", "명중 +2", "힘 +3", "마법 방어 +10", "HP +500", "공격 속성 불", "요구 레벨 41 · 무도가"],
             ItemActions.Stats(carried).Select(line => line.Text));
         Assert.Empty(ItemActions.Stats(WorldClient.ReadPackItem(Carrying("Boots"))));
     }
