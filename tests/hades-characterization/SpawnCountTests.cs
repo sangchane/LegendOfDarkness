@@ -32,9 +32,9 @@ public sealed class SpawnCountTests : IDisposable
     private const int Written = 4;
 
     /// <summary>
-    /// 이 맵에 서야 할 마릿수 — 4 × √6 × 0.7 × 2/3 = 4.57 × 3(HuntedCountMultiplier) = 13.7 → 14. × 0.7 만 있을 때 7, 줄이기 전(× 1)에는 10 이었다.
+    /// 이 맵에 서야 할 마릿수 — 4 × √6 × 0.7 × 2/3 = 4.57 × 2(HuntedCountMultiplier) = 9.1 → 9. × 0.7 만 있을 때 7, 줄이기 전(× 1)에는 10 이었다.
     /// </summary>
-    private static readonly int Expected = (int)Math.Round(Written * Math.Sqrt(PlainSide * PlainSide / 400) * 0.7 * 2 / 3 * 3);
+    private static readonly int Expected = (int)Math.Round(Written * Math.Sqrt(PlainSide * PlainSide / 400) * 0.7 * 2 / 3 * 2);
 
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(5));
 

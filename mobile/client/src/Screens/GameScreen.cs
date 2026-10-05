@@ -49,6 +49,7 @@ public partial class GameScreen : Control
     private Label _who = null!;
     private Label _place = null!;
     private Label _target = null!;
+    private Label _targetPercent = null!;
     private PackPanel _pack = null!;
     private GearPanel _gearPanel = null!;
     private TalkPanel _talk = null!;
@@ -738,17 +739,12 @@ public partial class GameScreen : Control
     {
         int? left = _world.Target == 0 ? null : _server?.Health(_world.Target);
 
-        _target.Text = left is { } percent
-            ? $"{_world.TargetName} {percent}%"
-            : _world.TargetName;
-
-        _targetHealth.Visible = left is not null;
+        // 퍼센트·바는 고른 이가 있으면 늘 자리를 차지한다 — 체력을 알 때만 붙여 판이 넓어졌다 좁아졌다 했다(사용자 2026-10-05).
+        _target.Text = _world.TargetName;
+        _targetPercent.Text = left is { } percent ? $"{percent}%" : "–";
+        _targetHealth.Value = left ?? 100;
+        _targetHealth.Modulate = left is null ? new Color(1, 1, 1, 0.3f) : Colors.White;
         _targetPlate.Visible = _target.Text.Length > 0;
-
-        if (left is { } value)
-        {
-            _targetHealth.Value = value;
-        }
     }
 
 }

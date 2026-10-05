@@ -181,10 +181,14 @@ public partial class GameScreen : Control
         // 기술 부채꼴 맨 위, 가장 높은 기술 칸 위로 옮겼다 — 기술 칸(48)보다 조금 작게(사용자, 2026-09-23 "기술창 제일
         // 상단쪽에 … 기술창 보다 조금 작게"). 마실 포션의 그림에 줄을 작게 적는다. 누르면 켜고 끄기, 길게 누르면 다른
         // 포션을 고른다. 줄은 설정 창에서.
-        _abilities.Hold(new PotionChip(AutoPotion.Healing,
-            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? LayoutCheck.PretendPack), 0);
-        _abilities.Hold(new PotionChip(AutoPotion.Restoring,
-            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? LayoutCheck.PretendPack), 1);
+        PotionChip health = new(AutoPotion.Healing,
+            () => Main.HealthPotion, rule => Main.SetPotions(rule, Main.ManaPotion), () => _server?.Pack ?? LayoutCheck.PretendPack);
+        PotionChip mana = new(AutoPotion.Restoring,
+            () => Main.ManaPotion, rule => Main.SetPotions(Main.HealthPotion, rule), () => _server?.Pack ?? LayoutCheck.PretendPack);
+        _abilities.Hold(health, 0);
+        _abilities.Hold(mana, 1);
+        _potionChips.Add(health);
+        _potionChips.Add(mana);
         _abilities.HoldComa(new ComaButton(() => _server, Notify));
 
         row.AddChild(_abilities);

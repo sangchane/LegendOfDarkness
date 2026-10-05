@@ -85,8 +85,7 @@ public partial class GameScreen : Control
             CustomMinimumSize = new Vector2(Main.Portrait ? 48 : 72, 10),
             MaxValue = 100,
             ShowPercentage = false,
-            SizeFlagsVertical = SizeFlags.ShrinkCenter,
-            Visible = false
+            SizeFlagsVertical = SizeFlags.ShrinkCenter
         };
         _targetHealth.AddThemeStyleboxOverride("background", Greybox.Surface());
         _targetHealth.AddThemeStyleboxOverride("fill", Greybox.Fill());
@@ -94,6 +93,11 @@ public partial class GameScreen : Control
         HBoxContainer picked = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
         picked.AddThemeConstantOverride("separation", Main.Gutter / 2);
         picked.AddChild(_target);
+        // 퍼센트는 폭을 정해 둔다 — 9% 와 100% 사이에 판이 흔들리지 않게.
+        _targetPercent = Aux("–");
+        _targetPercent.CustomMinimumSize = new Vector2(Main.Portrait ? 36 : 48, 0);
+        _targetPercent.HorizontalAlignment = HorizontalAlignment.Right;
+        picked.AddChild(_targetPercent);
         picked.AddChild(_targetHealth);
 
         // 고른 이가 없으면 판째로 숨긴다 — 빈 판이 바닥 한가운데를 가린다. 가로는 위 줄 가운데, 세로는 둘째 줄 왼쪽(첫 줄
@@ -106,19 +110,19 @@ public partial class GameScreen : Control
         // 곳 이름은 미니맵 아래 구석에 적는다(MinimapView) — 가로 위 줄에 따로 두던 판은 뺐다(2026-09-26).
         _place = Aux(string.Empty);
 
-        // 위 줄 단추(2026-09-26, 장비 2026-10-01): [월드맵] · [인벤토리] · [장비] · [설정]. [종료]는 설정 창 제목 줄의 [로그아웃]으로, [길]은 미니맵이 되었다.
+        // 위 줄 단추(2026-09-26, 장비 2026-10-01): [월드맵] · [장비] · [인벤토리] · [설정]. [종료]는 설정 창 제목 줄의 [로그아웃]으로, [길]은 미니맵이 되었다.
         HBoxContainer actions = new() { MouseFilter = MouseFilterEnum.Ignore };
         actions.AddThemeConstantOverride("separation", Main.Gutter);
 
         // 위 메뉴는 그림 + 아래 글자, 반투명 원에 금테만 — 뒤가 비친다(사용자 2026-10-02).
-        Button pack = MenuButton("인벤토리", "res://assets/item/40999.png", pixel: true);
-        pack.Pressed += () => Carrying(!_pack.Visible);
-        actions.AddChild(pack);
-
-        // 장비는 소지품 탭에서 빼서 따로 연다(사용자, 2026-10-01).
+        // 장비는 소지품 탭에서 빼서 따로 연다(사용자, 2026-10-01). 장비 다음 인벤토리 차례(사용자 2026-10-05).
         Button gear = MenuButton("장비", "res://assets/item/32786.png", pixel: true);
         gear.Pressed += () => Dressing(!_gearPanel.Visible);
         actions.AddChild(gear);
+
+        Button pack = MenuButton("인벤토리", "res://assets/item/40999.png", pixel: true);
+        pack.Pressed += () => Carrying(!_pack.Visible);
+        actions.AddChild(pack);
 
         // 월드맵은 인벤토리·설정과 같은 보통 단추(2026-09-26 3차 — 2차의 마름모 단추는 요청을 잘못 읽은 것이었다. 맨 왼쪽으로
         // 가는 것은 미니맵이다). 누르면 카드형 월드맵.

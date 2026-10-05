@@ -157,7 +157,10 @@ public partial class GameScreen : Control
             side.OffsetBottom = side.OffsetTop + SideButtonSize;
             _toasts.OffsetTop = side.OffsetBottom + Main.Gutter + (Main.Portrait ? 0 : 40);
             _toasts.OffsetBottom = _toasts.OffsetTop + 120;
+            Callable.From(() => DodgePotions(side)).CallDeferred();
         };
+        _controlRow.ItemRectChanged += () => Callable.From(() => DodgePotions(side)).CallDeferred();
+        _abilities.ItemRectChanged += () => Callable.From(() => DodgePotions(side)).CallDeferred();
 
         // 큰일은 가운데, 캐릭터 머리보다 위에 — 위 줄과 캐릭터 사이.
         over.AddChild(_banner);
@@ -502,4 +505,37 @@ public partial class GameScreen : Control
         Talk(null);
         Main.Fire(_server?.ShutDialogueAsync(System.Threading.CancellationToken.None));
     }
+
+    // 부채꼴 위 자동 포션 칸 — [접속자]·[봇] 단추가 비켜 가야 할 자리.
+    private readonly System.Collections.Generic.List<Control> _potionChips = [];
+
+    /// <summary>
+    /// [접속자]·[봇] 단추가 자동 포션 칸(위의 % 글자까지)과 겹치면 포션 칸 왼쪽으로 비킨다 — 화면이 낮으면 부채꼴 위 포션이
+    /// 위 줄 바로 밑까지 올라와 단추 아래에 깔렸다(사용자 2026-10-05).
+    /// </summary>
+    private void DodgePotions(Control side)
+    {
+        float width = (SideButtonSize * 2) + (Main.Gutter / 2);
+        side.OffsetRight = -Main.Gutter;
+        side.OffsetLeft = side.OffsetRight - width;
+        Rect2 parent = side.GetParentControl().GetGlobalRect();
+        Rect2 mine = new(parent.End.X + side.OffsetLeft, parent.Position.Y + side.OffsetTop, width, SideButtonSize);
+        float left = float.MaxValue;
+
+        foreach (Control chip in _potionChips)
+        {
+            if (!chip.IsVisibleInTree()) continue;
+            Rect2 box = chip.GetGlobalRect().GrowSide(Godot.Side.Top, PotionLabel);
+            if (box.Intersects(mine)) left = System.Math.Min(left, box.Position.X);
+        }
+
+        if (left == float.MaxValue) return;
+
+        float shift = mine.End.X - left + (Main.Gutter / 2);
+        side.OffsetRight -= shift;
+        side.OffsetLeft -= shift;
+    }
+
+    /// <summary>포션 칸 위에 얹힌 「50%」 글자 높이.</summary>
+    private const int PotionLabel = 18;
 }
