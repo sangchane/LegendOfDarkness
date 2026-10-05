@@ -90,10 +90,11 @@ public partial class GameScreen : Control
         row.AddThemeConstantOverride("separation", Main.Portrait ? 0 : Main.Gutter);
 
         _pad = BuildMovementPad();
+        Control padColumn = WithNecklaces(_pad);
 
         if (Main.Portrait)
         {
-            row.AddChild(_pad);
+            row.AddChild(padColumn);
         }
         else
         {
@@ -111,7 +112,7 @@ public partial class GameScreen : Control
             };
             left.AddThemeConstantOverride("separation", Main.Gutter);
             left.AddChild(BuildMessageRow());
-            left.AddChild(_pad);
+            left.AddChild(padColumn);
 
             row.AddChild(left);
 
@@ -197,6 +198,49 @@ public partial class GameScreen : Control
         capped.MouseFilter = MouseFilterEnum.Ignore;
 
         return capped;
+    }
+
+    // 방향판 위 속성 목걸이 다섯 칸(사용자, 2026-10-05) — 수·토·풍·화, 그리고 암흑↔생명 전환. 겹침 검사는 이 줄을 잰다.
+    private Control _necklaces = null!;
+
+    /// <summary>
+    /// The pad with the necklace row on top. Five potion-sized chips (5 × 32 + 4 × 4 = 176) are wider than the pad (152):
+    /// upright the 360 width has no room for that, so the row is held in a pad-wide box and runs 24 to the right over the
+    /// 8 gap and the fan's empty top-left corner (부채꼴 x 0..16 · y 56..88 — 다음 쪽·코마 칸은 y 56 위, 기술 칸은 x 40 오른쪽).
+    /// On its side the column simply grows to the row's width.
+    /// </summary>
+    private Control WithNecklaces(Control pad)
+    {
+        HBoxContainer chips = new() { MouseFilter = MouseFilterEnum.Ignore };
+        chips.AddThemeConstantOverride("separation", Main.Gutter / 2);
+
+        System.Func<IReadOnlyList<InventoryItem>> pack = () => _server?.Pack ?? LayoutCheck.PretendPack;
+        System.Func<IReadOnlyList<WornItem>> worn = () => _server?.Worn ?? LayoutCheck.PretendWorn;
+        System.Action<int> use = slot => Main.Fire(_server?.UseAsync(slot, System.Threading.CancellationToken.None));
+
+        foreach (Element element in NecklaceSwap.Singles)
+        {
+            chips.AddChild(new NecklaceChip(element, pack, worn, use, Notify));
+        }
+
+        chips.AddChild(new NecklaceChip(null, pack, worn, use, Notify));
+        _necklaces = chips;
+
+        int rowWidth = (5 * AbilityFan.PotionSide) + (4 * (Main.Gutter / 2));
+        int padWidth = (3 * Main.TouchMinimum) + (2 * (Main.Gutter / 2));
+        Control holder = new()
+        {
+            CustomMinimumSize = new Vector2(Main.Portrait ? padWidth : rowWidth, AbilityFan.PotionSide),
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        holder.AddChild(chips);
+
+        VBoxContainer column = new() { SizeFlagsVertical = SizeFlags.ShrinkEnd, MouseFilter = MouseFilterEnum.Ignore };
+        column.AddThemeConstantOverride("separation", Main.Gutter);
+        column.AddChild(holder);
+        column.AddChild(pad);
+
+        return column;
     }
 
     /// <summary>

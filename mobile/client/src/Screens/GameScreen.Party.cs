@@ -176,7 +176,7 @@ public partial class GameScreen : Control
         // 타일 격자: 화면 왼쪽 끝에 붙인다 — HUD 여백(틈 8)만큼 왼쪽으로 뺀다. 가로 아이폰은 노치 쪽 안전선까지만(SafeInsets 에는
         // 틈 8 이 들어 있어 뺀다). 세로로 쌓다가 방향판에 닿으면 2열(더 많으면 3열) 격자(사용자, 2026-09-27: 그리드 식).
         float edge = Main.SafeInsets.Left - Main.Gutter - _over.GetGlobalRect().Position.X;
-        float floor = _pad.GetGlobalRect().Position.Y - _over.GetGlobalRect().Position.Y - Main.Gutter;
+        float floor = _necklaces.GetGlobalRect().Position.Y - _over.GetGlobalRect().Position.Y - Main.Gutter;
         int count = Math.Max(1, _party.TileCount);
         int rowsFit = Math.Max(1, (int)((floor - top + gap) / (PartyColumn.TileRow + gap)));
         int columns = (count + rowsFit - 1) / rowsFit;

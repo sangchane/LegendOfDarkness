@@ -311,6 +311,52 @@ public partial class Main : Control
     }
 
     /// <summary>
+    /// 방향판 위 목걸이 칸마다 고른 목걸이(<see cref="NecklaceChip" />). potion.cfg 처럼 기기에 속성마다 한 줄("2 바다의목걸이").
+    /// </summary>
+    private const string NecklaceFile = "user://necklace.cfg";
+
+    private static Dictionary<Lod.Mobile.Core.Model.Element, string>? _necklaces;
+
+    public static string? Necklace(Lod.Mobile.Core.Model.Element element) =>
+        (_necklaces ??= ReadNecklaces()).GetValueOrDefault(element);
+
+    public static void SetNecklace(Lod.Mobile.Core.Model.Element element, string name)
+    {
+        (_necklaces ??= ReadNecklaces())[element] = name;
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(NecklaceFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            foreach ((Lod.Mobile.Core.Model.Element kind, string chosen) in _necklaces)
+            {
+                writing.StoreLine($"{(int)kind} {chosen}");
+            }
+
+            writing.Close();
+        }
+    }
+
+    private static Dictionary<Lod.Mobile.Core.Model.Element, string> ReadNecklaces()
+    {
+        Dictionary<Lod.Mobile.Core.Model.Element, string> read = [];
+        Godot.FileAccess? reading = Godot.FileAccess.Open(NecklaceFile, Godot.FileAccess.ModeFlags.Read);
+
+        while (reading is not null && !reading.EofReached())
+        {
+            string[] parts = reading.GetLine().Trim().Split(' ', 2);
+
+            if (parts.Length == 2 && int.TryParse(parts[0], out int kind))
+            {
+                read[(Lod.Mobile.Core.Model.Element)kind] = parts[1];
+            }
+        }
+
+        reading?.Close();
+        return read;
+    }
+
+    /// <summary>
     /// 자동 사냥의 반경(칸)과 회복 기술 줄(%). potion.cfg 처럼 기기에 한 줄("12 50")로 남는다.
     /// </summary>
     private const string AutoHuntFile = "user://autohunt.cfg";

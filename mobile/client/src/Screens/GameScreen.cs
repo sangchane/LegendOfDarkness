@@ -203,7 +203,7 @@ public partial class GameScreen : Control
     /// way. Named in Korean because the names are printed for a person to read.
     /// </summary>
     public IReadOnlyList<(string Name, Control Part)> Parts =>
-        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("방향판", _pad), ("파티원", _party.Members), ("나가기", _party.Leave), ("인벤토리", _pack), ("장비", _gearPanel), ("월드", _world)];
+        [("위 줄", _topRow), ("미니맵", _minimap), ("조작 줄", _controlRow), ("방향판", _pad), ("목걸이 줄", _necklaces), ("파티원", _party.Members), ("나가기", _party.Leave), ("인벤토리", _pack), ("장비", _gearPanel), ("월드", _world)];
 
     /// <summary>Opens the gear window, or the pack. Only a layout check asks — a thumb presses the top row's buttons.</summary>
     public void ShowGear(bool gear)
