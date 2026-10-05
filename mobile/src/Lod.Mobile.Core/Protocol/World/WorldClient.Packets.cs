@@ -408,6 +408,9 @@ public sealed partial class WorldClient
     /// Our server's addition after the original's end of 0x0F and 0x37: a 1, then the item's numbers
     /// (ServerFormat0F.WriteNumbers). An original server ends there, so there is nothing to show.
     /// </summary>
+    /// <summary>One item's numbers with what it restores — the shop list writes them back to back.</summary>
+    private const int ItemNumbersSize = 1 + (9 * 2) + (4 * 4) + 6 + 4 + 1 + 8;
+
     private static ItemStats? ReadItemStats(ReadOnlySpan<byte> tail)
     {
         const int size = 1 + (9 * 2) + (4 * 4) + 6 + 4 + 1;
@@ -649,6 +652,13 @@ public sealed partial class WorldClient
                         Circle: at < data.Length ? Byte(data, ref at) : (byte)0));
 
                     // 상점 패킷의 직업 문자열은 이제 모바일 필터에 사용한다.
+                }
+
+                // 우리 확장(2026-10-05): 목록 뒤에 물건마다 수치(ServerFormat0F.WriteNumbers, 회복량까지) — 옛 서버는 없다.
+                for (int i = 0; i < goods.Count && data.Length - at >= ItemNumbersSize; i++)
+                {
+                    goods[i] = goods[i] with { Stats = ReadItemStats(data.Slice(at, ItemNumbersSize)) };
+                    at += ItemNumbersSize;
                 }
 
                 return talk with { Step = step, Goods = goods };

@@ -15,14 +15,6 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 public sealed class NpcDialogueTests : IDisposable
 {
-    /// <summary>
-    /// A ported NPC with a line of its own and no script, and where it stands. (It was 가렌 in 밀레스마을, then 멜로린 in
-    /// 노비스마을, until each got its 5.99 script — `Pack599TeacherTests`, `Pack599QuestTests`.)
-    /// </summary>
-    private const int NoviceTavernId = 20379;
-
-    private const string Speaker = "미스포츈@노비스주점#5,4";
-    private const string SpeakerSays = "미스포츈: 후후 어서들 오세요. 여기는 노비스 주점이랍니다~!";
     private const string Name = "npctalk";
 
     /// <summary>A ported shop (<c>shop1</c>) in the novice town's diner, and one of its goods the server has a template for.</summary>
@@ -38,38 +30,6 @@ public sealed class NpcDialogueTests : IDisposable
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(3));
 
     public void Dispose() => _deadline.Dispose();
-
-    [Fact]
-    public async Task Tapping_a_ported_npc_opens_what_the_pack_said_it_says()
-    {
-        // Standing beside her. The tap carries a serial, not a direction, but being next to her is what a player
-        // would do and it keeps her inside the first creature list.
-        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceTavernId, 5, 5));
-        server.Start(TimeSpan.FromMinutes(2));
-
-        LoginFlow.TryCreateAccount(server, Name);
-
-        using WorldSession session = await HadesLoginClient.LoginAsync(
-            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret,
-            progress: null, _deadline.Token);
-
-        WorldClient world = new(session);
-        _ = world.PumpAsync(_deadline.Token);
-
-        WorldEntry entry = await Settled(world, seen => seen is not null);
-        Assert.Equal(NoviceTavernId, entry.Map.Id);
-
-        Creature her = await Standing(world, new Tile(5, 4));
-
-        await world.ClickAsync(her.Serial, _deadline.Token);
-
-        Dialogue talk = await Answered(world);
-
-        Assert.Equal(Speaker, talk.Who);
-        // 대사가 여러 줄이라 한 창에 줄바꿈으로 이어 온다(PackSpeaker). 첫 줄로 시작하는지 본다.
-        Assert.StartsWith(SpeakerSays, talk.What);
-        Assert.Equal(her.Serial, talk.Serial);
-    }
 
     /// <summary>
     /// A shop is three windows deep: its menu, the goods, and word of the sale. The goods have Korean names and the

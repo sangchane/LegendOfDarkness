@@ -264,7 +264,11 @@ public sealed partial class TalkPanel : PanelContainer
         {
             BuildFilters(talk.Goods);
             foreach (DialogueGoods goods in talk.Goods)
-                _goodsRows.Add((AddTradeRow(goods.Name, goods.Icon, goods.Price, 0, 65535), goods));
+            {
+                Control row = AddTradeRow(goods.Name, goods.Icon, goods.Price, 0, 65535);
+                AddGoodsInfo(row, goods);
+                _goodsRows.Add((row, goods));
+            }
         }
         if (_lines.Count == 0) _offers.AddChild(new Label { Text = selling ? "팔 수 있는 물건이 없습니다." : "판매 중인 물건이 없습니다." });
         UpdateSummary();

@@ -314,6 +314,7 @@ public partial class GameScreen : Control
 
         _talk = new TalkPanel();
         _talk.Close.Pressed += ShutTalk;
+        _talk.WornNow = () => _server?.Worn ?? LayoutCheck.PretendWorn;
         _talk.Traded += (merchant, selling, lines) => _ = Trade(merchant, selling, lines);
         _talk.MenuRequested += merchant => Main.Fire(_server?.ShopMenuAsync(merchant, System.Threading.CancellationToken.None));
         _talk.Answered += (speaker, step, words) => _ = words is null
@@ -498,12 +499,15 @@ public partial class GameScreen : Control
                 Kind = selling ? DialogueKind.PackSlots : DialogueKind.Goods,
                 Step = selling ? (ushort)0x0500 : (ushort)4,
                 Slots = [1, 2, 3],
-                Goods = [new(32813, 0, 150, "쿠룸"), new(32882, 0, 950, "레더튜닉", "Warrior", 1, 1),
+                // 수치는 [정보] 사진용 — 레더튜닉은 갑옷 자리(2)라 --stuff 의 시험용 갑옷과 견준다.
+                Goods = [new(32813, 0, 150, "쿠룸", Stats: new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 150, 0, HealthRestore: 250)),
+                    new(32882, 0, 950, "레더튜닉", "Warrior", 1, 1, new(-6, 0, 0, 2, 0, 0, 0, 0, 0, 30, 0, 0, 0, 11, 1, 0, 5, 0, 0, 950, 2)),
                     new(999999, 0, 1200, "그림 없는 도복", "Monk", 2, 1), new(32813, 0, 500, "마라디움")]
             };
             SetWindow(GameWindow.Talk, true);
             _talk.Show(preview, [new(1, 32813, 0, "쿠룸", 12, 0, 0), new(2, 32882, 0, "레더튜닉", 1, 30, 100)], Mine.Gold);
             if (System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--shop-check") >= 0) _talk.CheckShop();
+            if (System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--shop-info") >= 0) _talk.PressInfo("레더튜닉");
         }
 
         ShowVitals();

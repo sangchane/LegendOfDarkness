@@ -75,9 +75,12 @@ public static class ItemActions
     /// is empty (a ring or a gauntlet has two places; it counts as empty while either is). Null too for what is not
     /// gear or when the server sent no place.
     /// </summary>
-    public static WornItem? WornInstead(InventoryItem item, IReadOnlyList<WornItem> worn)
+    public static WornItem? WornInstead(InventoryItem item, IReadOnlyList<WornItem> worn) => WornInstead(item.Stats, worn);
+
+    /// <summary>The same for a thing known only by its numbers — a shop's goods.</summary>
+    public static WornItem? WornInstead(ItemStats? stats, IReadOnlyList<WornItem> worn)
     {
-        if (item.Stats is not { Place: > 0 } s)
+        if (stats is not { Place: > 0 } s)
         {
             return null;
         }

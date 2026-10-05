@@ -368,6 +368,9 @@ public sealed class TownGearShopTests : IDisposable
 
         DialogueGoods wanted = Assert.Single(shelf.Goods, one => one.Name == goods);
         Assert.Equal(price, wanted.Price);
+        // 상점 목록 뒤에 물건마다 수치가 붙어 온다(2026-10-05) — 앱 [정보]와 착용 비교.
+        Assert.All(shelf.Goods, one => Assert.NotNull(one.Stats));
+        Assert.True(wanted.Stats!.Place > 0, $"{goods} 의 장비 칸이 오지 않았습니다.");
 
         await world.AnswerAsync(keeper.Serial, shelf.Step, wanted.Name, _deadline.Token);
         await Waiting.Until(
