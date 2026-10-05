@@ -41,7 +41,7 @@ upload() {
 
     remote "mkdir -p $REMOTE/Staging/net9.0 $REMOTE/database"
     # 기록 파일(Hades_*.txt)은 맥 것이라 올리지 않는다. archives(414MB)는 서버가 읽지 않는다.
-    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'Hades_*.txt' --exclude 'LoruleConfig.json' --exclude 'MServerTable.xml' \
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'Hades_*.txt' --exclude 'activity/' --exclude 'LoruleConfig.json' --exclude 'MServerTable.xml' \
         "$FORK/Staging/net9.0/" "$HOST:$REMOTE/Staging/net9.0/"
     rsync -az --partial --timeout=60 -e "ssh -i $KEY" "$conf/" "$HOST:$REMOTE/Staging/net9.0/"
     rsync -az --partial --timeout=60 -e "ssh -i $KEY" --exclude 'aislings/' "$FORK/database/server" "$FORK/database/assets" "$HOST:$REMOTE/database/"

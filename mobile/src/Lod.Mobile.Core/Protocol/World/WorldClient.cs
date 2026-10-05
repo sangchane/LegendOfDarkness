@@ -276,6 +276,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
         catch (Exception stopped)
         {
             _broke = stopped.Message;
+            Diagnostic?.Invoke(stopped.GetType().Name);
             throw;
         }
     }
@@ -312,6 +313,7 @@ public sealed partial class WorldClient(WorldSession session) : IDisposable
             {
                 // 갈래마다 따로 잡지 않은 패킷도 여기서 막는다 — 하나가 어긋났다고 받기 루프(접속)가 죽지 않게.
                 NoteUnread($"0x{frame.Command:X2}: {unreadable.Message}");
+                Diagnostic?.Invoke("packet_unreadable");
                 _ignored++;
             }
         }

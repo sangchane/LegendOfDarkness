@@ -549,6 +549,7 @@ public sealed partial class CreateScreen : Control
         }
 
         Exception failure = finished.Exception?.GetBaseException() ?? new IOException("알 수 없는 오류");
+        Main.NoteActivityError(failure.GetType().Name);
 
         _status.Text = failure.Message;
         _create.Disabled = false;

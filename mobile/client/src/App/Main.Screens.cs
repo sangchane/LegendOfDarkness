@@ -11,7 +11,9 @@ public partial class Main : Control
         RemoveChild(login);
         login.QueueFree();
 
-        GameScreen game = new(new Lod.Mobile.Core.Protocol.World.WorldClient(session));
+        var world = new Lod.Mobile.Core.Protocol.World.WorldClient(session);
+        BindActivity(world);
+        GameScreen game = new(world);
 
         game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
         AddChild(game);
@@ -51,7 +53,9 @@ public partial class Main : Control
         RemoveChild(create);
         create.QueueFree();
 
-        GameScreen game = new(new Lod.Mobile.Core.Protocol.World.WorldClient(session));
+        var world = new Lod.Mobile.Core.Protocol.World.WorldClient(session);
+        BindActivity(world);
+        GameScreen game = new(world);
         game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
         AddChild(game);
     }
@@ -87,6 +91,7 @@ public partial class Main : Control
 
         // login.cfg, --login and a saved account are all launch conveniences. An explicit logout must not
         // consume them again and immediately put the same account back in the world.
+        BindActivity(null);
         _autoLoginGate.NoteLogout();
         AddChild(BuildLoginScreen());
     }

@@ -126,6 +126,16 @@ class LoginAndStateTests(unittest.TestCase):
         self.assertEqual(status, 200)
         return headers["Set-Cookie"]
 
+    def test_activity_is_admin_only_and_dates_are_validated(self):
+        status, _, _ = self.request("GET", "/api/activity?from=2026-10-02&to=2026-10-03")
+        self.assertEqual(status, 401)
+        cookie = self.login().split(";")[0]
+        status, _, body = self.request("GET", "/api/activity?from=2026-10-02&to=2026-10-03", cookie=cookie)
+        self.assertEqual(status, 200)
+        self.assertIn("summary", json.loads(body))
+        status, _, _ = self.request("GET", "/api/activity?from=bad&to=2026-10-03", cookie=cookie)
+        self.assertEqual(status, 400)
+
     def test_anyone_can_look_but_only_a_signed_in_person_can_change(self):
         status, _, body = self.request("GET", "/index.html")
         self.assertEqual((status, body), (200, "DASHBOARD"))

@@ -15,7 +15,11 @@ public partial class Main : Control
     public static void Fire(System.Threading.Tasks.Task? request)
     {
         request?.ContinueWith(
-            failed => GD.PushError($"서버 요청 실패: {failed.Exception?.GetBaseException().Message}"),
+            failed =>
+            {
+                NoteActivityError(failed.Exception?.GetBaseException().GetType().Name ?? "request_failed");
+                GD.PushError($"서버 요청 실패: {failed.Exception?.GetBaseException().Message}");
+            },
             System.Threading.Tasks.TaskContinuationOptions.OnlyOnFaulted);
     }
 
@@ -51,6 +55,7 @@ public partial class Main : Control
 
     public override void _Ready()
     {
+        StartActivity();
         _orientationWasForced = Flag("--orient").Length > 0;
         Portrait = Flag("--orient") == "portrait";
         ReadServer(Flag("--server"));
@@ -180,6 +185,8 @@ public partial class Main : Control
     public override void _Notification(int what)
     {
         base._Notification(what);
+        if (what == NotificationApplicationFocusOut) ActivityFocus(false);
+        if (what == NotificationApplicationFocusIn) ActivityFocus(true);
         // 1004 is Godot's NOTIFICATION_WM_WINDOW_FOCUS_IN; the C# binding exposes the application
         // notification but not this window-only alias.
         if (what == NotificationApplicationFocusIn || what == 1004)

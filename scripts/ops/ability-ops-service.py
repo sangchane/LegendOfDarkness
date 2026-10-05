@@ -13,13 +13,18 @@ import hmac
 import json
 import mimetypes
 import os
+import sys
+import sqlite3
 import tempfile
 import threading
 import time
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import unquote, urlsplit, parse_qs
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from activity_store import ActivityStore
 
 
 class InvalidRequest(ValueError):
@@ -250,13 +255,26 @@ def safe_static_path(root: Path, request_path: str):
 
 class OpsHandler(BaseHTTPRequestHandler):
     """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
-    root = store = credential = states = throttle = password_file = None
+    root = store = credential = states = throttle = password_file = activity = None
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
         # 보기는 누구나, 고치기(PUT)만 로그인한 사람 — 사용자 2026-10-02. 페이지는 /api/session 으로 편집 단추를 켠다.
         path = urlsplit(self.path).path
-        if path == "/api/session":
+        if path == "/api/activity":
+            if not self._signed_in():
+                self._json(401, {"error": "관리자 로그인이 필요합니다."})
+                return
+            query = parse_qs(urlsplit(self.path).query)
+            try:
+                result = self.activity.report(query.get("from", [""])[0], query.get("to", [""])[0],
+                                              query.get("player", [""])[0], query.get("bots", ["0"])[0] == "1")
+                self._json(200, result)
+            except ValueError:
+                self._json(400, {"error": "올바른 날짜와 1~90일 기간을 입력하세요."})
+            except (OSError, sqlite3.Error):
+                self._json(503, {"error": "기록을 읽지 못했습니다. 잠시 후 다시 조회하세요."})
+        elif path == "/api/session":
             self._json(200, {"signedIn": self._signed_in()})
         elif path.startswith("/api/state/") and self.states:
             try:
@@ -438,10 +456,11 @@ class OpsHandler(BaseHTTPRequestHandler):
         print(f"{self.address_string()} {pattern % args}")
 
 
-def handler_for(root, store, credential, states=None, throttle=None, password_file=None):
+def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None):
     return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
                                            "states": states, "throttle": throttle or LoginThrottle(),
-                                           "password_file": password_file})
+                                           "password_file": password_file,
+                                           "activity": activity or ActivityStore(store.path.parent / "activity.sqlite")})
 
 
 def main():
@@ -450,6 +469,8 @@ def main():
     parser.add_argument("--catalog", type=Path, required=True)
     parser.add_argument("--overrides", type=Path, required=True)
     parser.add_argument("--password-file", type=Path, required=True)
+    parser.add_argument("--web-activity", default=os.environ.get("LOD_WEB_ACTIVITY", ""))
+    parser.add_argument("--game-activity", default=os.environ.get("LOD_GAME_ACTIVITY", ""))
     parser.add_argument("--bind", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8787)
     args = parser.parse_args()
@@ -459,8 +480,10 @@ def main():
     data = args.overrides.parent
     log = data / "changes.jsonl"
     stores = (OverrideStore(args.catalog, args.overrides, log), StateStore(data / "state", log))
+    activity = ActivityStore(data / "activity.sqlite", args.web_activity, args.game_activity, os.environ.get("LOD_CHARACTER_DIR", ""), os.environ.get("LOD_SERVER_CONFIG", ""))
+    activity.start()
     server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1],
-                                                                     password_file=args.password_file))
+                                                                     password_file=args.password_file, activity=activity))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

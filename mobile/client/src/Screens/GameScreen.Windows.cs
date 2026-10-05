@@ -495,6 +495,7 @@ public partial class GameScreen : Control
         }
         catch (Exception failure)
         {
+            Main.NoteActivityError(failure.GetType().Name);
             _talk.TradeFailed($"거래를 보내지 못했습니다: {failure.Message}");
         }
     }

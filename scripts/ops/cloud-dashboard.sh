@@ -23,7 +23,7 @@ upload() {
     rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" \
         "$ROOT/docs/" "$HOST:$REMOTE/www/"
     rsync -az --partial --timeout=60 -e "ssh -i $KEY" \
-        "$ROOT/scripts/ops/ability-ops-service.py" "$ROOT/data/game-data/ability-operations.json" \
+        "$ROOT/scripts/ops/ability-ops-service.py" "$ROOT/scripts/ops/activity_store.py" "$ROOT/data/game-data/ability-operations.json" \
         "$HOST:$REMOTE/app/"
 }
 
@@ -95,6 +95,7 @@ sudo systemctl enable --now lod-ability-ops nginx >/dev/null
 sudo systemctl restart nginx
 SH
     nginx_site
+    remote "sudo systemctl restart lod-ability-ops && sudo systemctl reload nginx"
     save_credentials
     echo "대시보드 준비 완료 — https://$IP/?view=abilities"
 }
@@ -104,10 +105,49 @@ SH
 nginx_site() {
     remote "bash -s" <<'SH'
 set -euo pipefail
+sudo tee /etc/nginx/conf.d/lod-activity.conf >/dev/null <<'LOG'
+log_format lod_activity escape=json '{"id":"$request_id","at":"$time_iso8601","ip":"$remote_addr","agent":"$http_user_agent","path":"$uri","method":"$request_method","status":$status,"bytes":$body_bytes_sent}';
+LOG
+sudo touch /var/log/nginx/lod-activity.jsonl
+sudo chown www-data:adm /var/log/nginx/lod-activity.jsonl
+sudo chmod 640 /var/log/nginx/lod-activity.jsonl
+sudo tee /etc/logrotate.d/lod-activity >/dev/null <<'ROTATE'
+/var/log/nginx/lod-activity.jsonl {
+    daily
+    rotate 90
+    missingok
+    notifempty
+    nocompress
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        /usr/sbin/nginx -s reopen
+    endscript
+}
+ROTATE
+sudo mkdir -p /etc/systemd/system/lod-ability-ops.service.d /etc/systemd/system/lod.service.d
+sudo tee /etc/systemd/system/lod-ability-ops.service.d/activity.conf >/dev/null <<'UNIT'
+[Service]
+SupplementaryGroups=adm
+ReadWritePaths=/home/ubuntu/lod-activity
+Environment="LOD_WEB_ACTIVITY=/var/log/nginx/lod-activity.jsonl*"
+Environment="LOD_GAME_ACTIVITY=/home/ubuntu/lod-activity/*.jsonl"
+Environment=LOD_CHARACTER_DIR=/home/ubuntu/lod/database/server/aislings
+Environment=LOD_SERVER_CONFIG=/home/ubuntu/lod/Staging/net9.0/LoruleConfig.json
+UNIT
+mkdir -p /home/ubuntu/lod-activity
+chmod 700 /home/ubuntu/lod-activity
+sudo tee /etc/systemd/system/lod.service.d/activity.conf >/dev/null <<'UNIT'
+[Service]
+Environment=LOD_ACTIVITY_DIR=/home/ubuntu/lod-activity
+UNIT
+sudo systemctl daemon-reload
 sudo tee /etc/nginx/sites-available/lod-ops >/dev/null <<'NGINX'
 server {
     listen 443 ssl;
     server_name _;
+    access_log /var/log/nginx/lod-activity.jsonl lod_activity;
+    access_log /var/log/nginx/access.log combined;
     ssl_certificate /etc/ssl/certs/lod-ops.crt;
     ssl_certificate_key /etc/ssl/private/lod-ops.key;
     ssl_protocols TLSv1.2 TLSv1.3;

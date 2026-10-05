@@ -267,6 +267,7 @@ public partial class LoginScreen : Control
 
         // The server's own words when it has them, ours when the socket failed before it could speak.
         Exception failure = finished.Exception?.GetBaseException() ?? new IOException("알 수 없는 오류");
+        Main.NoteActivityError(failure.GetType().Name);
 
         _status.Text = failure.Message;
         _submit.Disabled = false;
@@ -513,7 +514,10 @@ public partial class LoginScreen : Control
     /// <summary>Client version and the font actually in use, which is what tells us Korean will render.</summary>
     private Control BuildVersionLine()
     {
-        return Aux($"클라이언트 0.1 greybox · 글꼴 {Main.FontName}");
+        var notice = Aux("접속·기기/앱 버전·화면/버튼·오류·게임 활동 기록은 운영 확인용으로 90일 보관합니다.");
+        notice.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        notice.CustomMinimumSize = new Vector2(0, 32);
+        return notice;
     }
 
     private static Label Aux(string text)

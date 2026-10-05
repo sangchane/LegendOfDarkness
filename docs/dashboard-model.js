@@ -5,7 +5,7 @@
   root.LodDashboardModel = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
-  var views = Object.freeze(["overview", "monsters", "npcs", "abilities", "items", "world", "changes", "download"]);
+  var views = Object.freeze(["overview", "monsters", "npcs", "abilities", "items", "world", "changes", "download", "activity"]);
   function normalizeView(value) { return views.indexOf(value) >= 0 ? value : "overview"; }
   function isValidDashboardSnapshot(value) {
     if (!value || value.schemaVersion !== 2 || typeof value.generatedAt !== "string") { return false; }
