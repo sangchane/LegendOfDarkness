@@ -7,8 +7,8 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 99레벨 보유경험치(2026-10-05) — 99 에서는 경험치가 보유경험치로 쌓이고(세오·칸에게 팔아 체력·마력을 산다), 0x08 의 「다음 레벨까지」
-/// 자리에 실려 앱 EXP 막대에 「보유」로 보인다.
+/// 99레벨 보유경험치(2026-10-05) — 레벨 1부터 쌓인 총 경험치를 세오·칸에게 팔아 체력·마력을 산다. 0x08 첫 칸(총 경험치)으로 앱 EXP 막대에
+/// 「보유」로 보인다.
 /// </summary>
 [Collection(TimedCollection.Name)]
 public sealed class ExpPoolTests : IDisposable
@@ -31,7 +31,7 @@ public sealed class ExpPoolTests : IDisposable
         string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
         JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
         character["ExpLevel"] = 99;
-        character["ExpPool"] = 12345;
+        character["ExpTotal"] = 12345;
         File.WriteAllText(saved, character.ToJsonString());
 
         using WorldSession session = await HadesLoginClient.LoginAsync(
@@ -39,7 +39,7 @@ public sealed class ExpPoolTests : IDisposable
         WorldClient world = new(session);
         _ = world.PumpAsync(_deadline.Token);
 
-        await Waiting.Until(() => world.Vitals is { Level: 99, ExperienceToGo: 12345 },
+        await Waiting.Until(() => world.Vitals is { Level: 99, Experience: 12345 },
             $"보유경험치 12345 가 오지 않았습니다: {world.Vitals}", _deadline.Token);
     }
 }
