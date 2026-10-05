@@ -39,7 +39,7 @@ public sealed partial class TalkPanel : PanelContainer
     private readonly Label _summary = new();
     private readonly Button _commit = new() { CustomMinimumSize = Row };
     private readonly Button _back = new() { Text = "첫 메뉴", CustomMinimumSize = Row };
-    private readonly Button _all = new() { Text = "전량 판매", TooltipText = "모든 수량을 채운 뒤 [선택 판매]로 확정합니다.", CustomMinimumSize = Row };
+    private readonly Button _all = new() { Text = "전량 판매", TooltipText = "고른 물건을 가진 만큼 다 채운 뒤 [선택 판매]로 확정합니다.", CustomMinimumSize = Row };
     private readonly List<(string Name, int Slot, uint Price, SpinBox Count)> _lines = [];
     private Dialogue? _shop;
     private long _gold;
@@ -121,8 +121,10 @@ public sealed partial class TalkPanel : PanelContainer
         };
         _all.Pressed += () =>
         {
-            foreach (var line in _lines) line.Count.Value = line.Count.MaxValue;
-            _words.Text = "모든 물건을 선택했습니다. [선택 판매]로 확정하세요.";
+            // 고른 줄만 가진 만큼 — 모든 줄을 채워 가방이 통째로 비었다(사용자 2026-10-05).
+            var chosen = _lines.Where(line => line.Count.Value > 0).ToList();
+            foreach (var line in chosen) line.Count.Value = line.Count.MaxValue;
+            _words.Text = chosen.Count == 0 ? "먼저 팔 물건을 고르세요." : "고른 물건을 모두 채웠습니다. [선택 판매]로 확정하세요.";
         };
         _commit.Pressed += () =>
         {
@@ -399,7 +401,11 @@ public sealed partial class TalkPanel : PanelContainer
         {
             Require(_all.Visible, "Sell all must be available");
             _all.EmitSignal(BaseButton.SignalName.Pressed);
-            Require(_lines.Sum(line => line.Count.Value) == 13, "Select all must use carried quantities");
+            Require(_lines.All(line => line.Count.Value == 0), "Sell all must leave unchosen lines alone");
+            _lines[0].Count.Value = 1;
+            _all.EmitSignal(BaseButton.SignalName.Pressed);
+            Require(_lines[0].Count.Value == _lines[0].Count.MaxValue && _lines.Skip(1).All(line => line.Count.Value == 0),
+                "Sell all must fill only the chosen line");
         }
         else
         {
