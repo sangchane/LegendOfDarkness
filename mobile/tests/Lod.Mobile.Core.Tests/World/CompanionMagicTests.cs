@@ -154,6 +154,15 @@ public sealed class CompanionMagicTests
     }
 
     [Fact]
+    public void Narcoli_follows_a_curse_without_waiting_a_whole_second()
+    {
+        CompanionBrain brain = new();
+        Assert.Equal(11, brain.Next(Sight([Struck(), Biter(cursed: true)]), Defaults).Slot);   // 바르도
+        Assert.NotEqual(CompanionAct.Cast, brain.Next(Sight([Struck(), Biter(cursed: true)], 100.1), Defaults).Act);
+        Assert.Equal(12, brain.Next(Sight([Struck(), Biter(cursed: true)], 100.3), Defaults).Slot); // 나르콜리
+    }
+
+    [Fact]
     public void Narcoli_goes_to_the_monster_the_owner_is_not_hitting()
     {
         CompanionStep step = new CompanionBrain().Next(Sight([Struck(cursed: true), Biter()]), Defaults);

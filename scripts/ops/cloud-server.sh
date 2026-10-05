@@ -7,6 +7,7 @@
 #   scripts/ops/cloud-server.sh backup    클라우드의 캐릭터를 맥(~/LOD-backups/cloud)으로 받아 온다
 #   scripts/ops/cloud-server.sh app       앱 주소(server.cfg)를 클라우드로 — 맥 서버로 돌아가려면 lod-server.sh config
 #   scripts/ops/cloud-server.sh bot-config  동료 봇 설정 파일을 클라우드에 만든다(비밀번호를 여기서 묻고 클라우드에만 적는다)
+#   scripts/ops/cloud-server.sh bot         동료 봇만 올리고 다시 켠다(게임 서버는 그대로 — 접속한 사람이 안 끊긴다)
 #   scripts/ops/cloud-server.sh bot-logs [줄수] [봇번호]   동료 봇 기록(줄마다 [봇 이름]) — 파일 기록은 클라우드 ~/lod-bot/logs/
 #
 # 동료 봇(성직자, mobile/bots/Lod.CompanionBot)은 서버와 같은 기계에서 봇마다 lod-bot@1~5 로 돈다(2026-09-27 — 다섯까지).
@@ -248,6 +249,7 @@ case "${1:-status}" in
     setup) setup ;;
     deploy) upload; bot_upload; restart ;;
     restart) restart ;;
+    bot) bot_upload; bot_restart ;;
     status) remote "systemctl is-active lod; $BOT_EACH; for b in \"\${bots[@]}\"; do echo \"\$b: \$(systemctl is-active \$b)\"; done; ss -ltn | grep -E ':(2610|2615) '" ;;
     logs) logs "${2:-40}" ;;
     backup) backup ;;

@@ -380,7 +380,9 @@ public sealed class CompanionBrain
             _tried.Remove(gone);
         }
 
-        if (!reading.CanCast || sight.OwnerAt is not { } owner || Reckon.ManaPercent(sight.Vitals) < AssistManaPercent)
+        // 앞 주문 뒤 1초(CastGap)가 아니라 해제처럼 0.3초 — 버프 하나 걸고 1초씩 쉬어 저주·나르가 늦었다(사용자 2026-10-05).
+        // 걷기는 따로 1초를 기다리므로 주문이 걸음에 끊기지 않는다.
+        if (now - _lastCast < CureGap || sight.OwnerAt is not { } owner || Reckon.ManaPercent(sight.Vitals) < AssistManaPercent)
         {
             return null;
         }
