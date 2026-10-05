@@ -333,10 +333,11 @@ public partial class GameScreen : Control
             PaintBotToggle(_server?.Companion is not null);
         }
 
-        if (Main.AutoHuntOnStart && _autoHuntSettling >= 0 && _world.MapId > 0 && _server?.Vitals is not null
+        if ((Main.AutoHuntOnStart || Main.ResumeAutoHunt) && _autoHuntSettling >= 0 && _world.MapId > 0 && _server?.Vitals is not null
             && ++_autoHuntSettling == 120)
         {
             _autoHuntSettling = -1;
+            Main.ResumeAutoHunt = false;
             ToggleAutoHunt();
             GD.Print("GREYBOX_AUTOHUNT 켬");
         }

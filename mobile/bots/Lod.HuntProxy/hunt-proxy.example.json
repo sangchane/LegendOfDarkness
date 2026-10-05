@@ -1,0 +1,7 @@
+{
+  "Host": "127.0.0.1",
+  "LoginPort": 2610,
+  "JobFolder": "/home/ubuntu/lod-proxy/jobs",
+  "MapFolder": "/home/ubuntu/lod-bot/world",
+  "Max": 10
+}

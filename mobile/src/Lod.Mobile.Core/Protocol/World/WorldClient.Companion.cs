@@ -74,6 +74,10 @@ public sealed partial class WorldClient
     public Task SendCompanionOrdersAsync(Automation.CompanionSettings orders, CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, World.Companion.Orders(orders.Magic, orders.Priest, orders.Heal, orders.GroupHeal, orders.FollowFrom, orders.HealOwnerPercent), cancellationToken);
 
+    /// <summary>대신 사냥 맡김 설정(0xF1 7) — null 이면 지운다. 앱이 끊기면 서버가 대리에게 넘긴다.</summary>
+    public Task ArmProxyAsync(Automation.ProxyOrders? orders, CancellationToken cancellationToken) =>
+        Send(ClientOpcode.Companion, Automation.ProxyOrders.Packet(orders), cancellationToken);
+
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, World.Companion.Dismiss(), cancellationToken);

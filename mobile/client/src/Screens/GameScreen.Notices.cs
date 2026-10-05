@@ -102,6 +102,47 @@ public partial class GameScreen : Control
         GD.PushError($"받기 멈춤: {why}");
     }
 
+    /// <summary>대신 사냥에 맡기려고 스스로 닫았다(<see cref="Background" />).</summary>
+    private bool _handedOff;
+
+    // 마지막 프레임 때(ms)와, 앱이 멈춰 있다 깨어났는지(프레임 사이가 Asleep 넘게 빔 — iOS 가 뒤로 보냈다).
+    private ulong _lastFrameMs;
+    private bool _wokeUp;
+    private const ulong Asleep = 5000;
+
+    /// <summary>
+    /// 자동 사냥 중 끊겼으면 다시 들어간다 — 그동안은 대리가 사냥했다. 스스로 닫았거나(<see cref="Background" />) 앱이 멈춰 있다
+    /// 깨어난 뒤의 끊김만. 앱이 돌고 있는데 끊긴 것(다른 기기의 로그인·운영자)은 되찾지 않는다 — 새 접속이 이긴다.
+    /// </summary>
+    private void RejoinIfHandedOff()
+    {
+        ulong now = Time.GetTicksMsec();
+        if (_lastFrameMs > 0 && now - _lastFrameMs > Asleep) _wokeUp = true;
+        _lastFrameMs = now;
+
+        if (_leaving || Main.InBackground || !(_handedOff || (_wokeUp && _server?.Broke is not null && _world.AutoHunting)))
+        {
+            return;
+        }
+
+        _leaving = true;
+        GD.Print(_handedOff ? "대신 사냥: 앱으로 돌아옴 — 다시 접속" : "대신 사냥: 자동 사냥 중 끊김 — 다시 접속");
+        Rejoin?.Invoke();
+    }
+
+    /// <summary>앱이 뒤로 간다 — 자동 사냥 중이고 대신 사냥을 켰으면 접속을 닫아 서버가 바로 대리에게 넘기게 한다.</summary>
+    public void Background()
+    {
+        if (_leaving || _handedOff || !_world.AutoHunting || Main.ProxyHours <= 0 || _server is null)
+        {
+            return;
+        }
+
+        _handedOff = true;
+        GD.Print("대신 사냥: 뒤로 감 — 접속을 닫고 맡김");
+        _server.Dispose();
+    }
+
     // 기록에 남긴 마지막 "읽지 못한 패킷" 수.
     private int _unreadLogged;
 

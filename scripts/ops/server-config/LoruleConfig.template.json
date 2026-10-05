@@ -89,6 +89,8 @@
 		// 다섯까지(사용자 결정 2026-09-27) — 클라우드는 lod-bot@1~5 가 이 차례대로 하나씩 접속한다(scripts/ops/cloud-server.sh bot-config).
 		"CompanionBots": [ "동료사제", "동료사제2", "동료사제3", "동료사제4", "동료사제5" ],
 		"CompanionHomeMap": 0,
+		// 대신 사냥(2026-10-05) — 자동 사냥 중 앱이 끊기면 작업 파일을 여기 적고, 같은 기계의 lod-proxy(mobile/bots/Lod.HuntProxy)가 집는다.
+		"ProxyJobFolder": "/home/ubuntu/lod-proxy/jobs",
 
 		// Monsters | NPCs
 		"MundaneRespawnInterval": 10.0,

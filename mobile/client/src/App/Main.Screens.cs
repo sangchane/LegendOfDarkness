@@ -16,6 +16,7 @@ public partial class Main : Control
         GameScreen game = new(world);
 
         game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
+        game.Rejoin = () => Callable.From(() => Rejoin(game)).CallDeferred();
         AddChild(game);
     }
 
@@ -57,7 +58,27 @@ public partial class Main : Control
         BindActivity(world);
         GameScreen game = new(world);
         game.LoggedOut = () => Callable.From(() => BackToLogin(game)).CallDeferred();
+        game.Rejoin = () => Callable.From(() => Rejoin(game)).CallDeferred();
         AddChild(game);
+    }
+
+    /// <summary>
+    /// 자동 사냥 중 끊겼다(대신 사냥에 맡김) — 로그인 화면으로 가서 저장 계정으로 다시 들어가고, 자리를 잡으면 자동 사냥을 다시 켠다.
+    /// 스스로 로그아웃한 것이 아니라 자동 로그인을 막지 않는다. 다시 들어가면 서버가 대리를 밀어낸다.
+    /// </summary>
+    private void Rejoin(GameScreen game)
+    {
+        if (!GodotObject.IsInstanceValid(game) || game.GetParent() != this)
+        {
+            return;
+        }
+
+        RemoveChild(game);
+        game.QueueFree();
+
+        BindActivity(null);
+        ResumeAutoHunt = true;
+        AddChild(BuildLoginScreen());
     }
 
     /// <summary>계정이 없어 만들기로 간다.</summary>
@@ -92,6 +113,7 @@ public partial class Main : Control
         // login.cfg, --login and a saved account are all launch conveniences. An explicit logout must not
         // consume them again and immediately put the same account back in the world.
         BindActivity(null);
+        ResumeAutoHunt = false;
         _autoLoginGate.NoteLogout();
         AddChild(BuildLoginScreen());
     }

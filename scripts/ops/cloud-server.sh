@@ -9,6 +9,8 @@
 #   scripts/ops/cloud-server.sh bot-config  동료 봇 설정 파일을 클라우드에 만든다(비밀번호를 여기서 묻고 클라우드에만 적는다)
 #   scripts/ops/cloud-server.sh bot         동료 봇만 올리고 다시 켠다(게임 서버는 그대로 — 접속한 사람이 안 끊긴다)
 #   scripts/ops/cloud-server.sh bot-logs [줄수] [봇번호]   동료 봇 기록(줄마다 [봇 이름]) — 파일 기록은 클라우드 ~/lod-bot/logs/
+#   scripts/ops/cloud-server.sh proxy       대신 사냥 대리 프로그램만 올리고 다시 켠다(게임 서버는 그대로)
+#   scripts/ops/cloud-server.sh proxy-logs [줄수]   대신 사냥 기록 — 파일 기록은 클라우드 ~/lod-proxy/logs/
 #
 # 동료 봇(성직자, mobile/bots/Lod.CompanionBot)은 서버와 같은 기계에서 봇마다 lod-bot@1~5 로 돈다(2026-09-27 — 다섯까지).
 # N 번째 봇 = 서버 설정 CompanionBots 의 N 번째 이름, 설정은 클라우드의 ~/lod-bot/companion-bot-N.json(비밀번호, 여기에만) —
@@ -26,6 +28,8 @@ HOST="ubuntu@$IP"
 REMOTE=/home/ubuntu/lod          # 클라우드 쪽 FORK
 BOT_REMOTE=/home/ubuntu/lod-bot  # 동료 봇: app/(프로그램) · world/(맵 벽) · companion-bot-N.json(비밀번호, 여기에만) · logs/
 BOT_PROJECT="$ROOT/mobile/bots/Lod.CompanionBot"
+PROXY_REMOTE=/home/ubuntu/lod-proxy  # 대신 사냥: app/ · jobs/(서버가 쓰는 작업 파일, 0700) · hunt-proxy.json(비밀 없음) · logs/
+PROXY_PROJECT="$ROOT/mobile/bots/Lod.HuntProxy"
 SSH=(ssh -i "$KEY" -o StrictHostKeyChecking=accept-new "$HOST")
 
 remote() { "${SSH[@]}" "$@"; }
@@ -73,7 +77,7 @@ bot_upload() {
 
     remote "mkdir -p $BOT_REMOTE/app $BOT_REMOTE/world"
     rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'companion-bot*.json' "$out/" "$HOST:$BOT_REMOTE/app/"
-    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --include 'map*.txt' --exclude '*' \
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --include 'map*.txt' --include 'guide.txt' --exclude '*' \
         "$ROOT/mobile/client/assets/world/" "$HOST:$BOT_REMOTE/world/"
     rm -rf "$out"
 
@@ -141,6 +145,53 @@ bot_config() {
 
 bot_restart() {
     remote "$BOT_EACH; sudo systemctl restart \"\${bots[@]}\""
+}
+
+# 대신 사냥 대리 — 프로그램을 올리고 lod-proxy 서비스 하나를 깐다. 맵 벽·출구(guide.txt)는 봇의 world/ 를 같이 쓴다(bot_upload).
+proxy_upload() {
+    local out
+    out="$(mktemp -d)"
+    DOTNET_ROOT="$ROOT/.tools/dotnet-9.0.317" "$ROOT/.tools/dotnet-9.0.317/dotnet" publish "$PROXY_PROJECT" \
+        -c Release -o "$out" -p:UseAppHost=false --nologo -v quiet >/dev/null
+
+    remote "mkdir -p $PROXY_REMOTE/app $PROXY_REMOTE/jobs && chmod 700 $PROXY_REMOTE/jobs"
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'hunt-proxy.json' "$out/" "$HOST:$PROXY_REMOTE/app/"
+    rm -rf "$out"
+
+    remote 'bash -s' <<'SH'
+set -euo pipefail
+[ -f /home/ubuntu/lod-proxy/hunt-proxy.json ] || cat > /home/ubuntu/lod-proxy/hunt-proxy.json <<JSON
+{
+  "Host": "127.0.0.1",
+  "LoginPort": 2610,
+  "JobFolder": "jobs",
+  "MapFolder": "/home/ubuntu/lod-bot/world",
+  "Max": 10
+}
+JSON
+sudo tee /etc/systemd/system/lod-proxy.service >/dev/null <<UNIT
+[Unit]
+Description=LOD hunt proxy (대신 사냥)
+After=lod.service
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/lod-proxy
+Environment=DOTNET_ROOT=/opt/dotnet
+ExecStart=/opt/dotnet/dotnet /home/ubuntu/lod-proxy/app/Lod.HuntProxy.dll /home/ubuntu/lod-proxy/hunt-proxy.json
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+sudo systemctl daemon-reload
+sudo systemctl enable lod-proxy >/dev/null 2>&1
+SH
+}
+
+proxy_restart() {
+    remote "sudo systemctl restart lod-proxy"
 }
 
 setup() {
@@ -218,6 +269,7 @@ restart() {
             echo "켰습니다 — $IP · 로그인 2610 · 게임 2615"
             # 서버가 새로 뜨면 봇도 다시 붙게 한다(설정 파일이 없으면 systemd 가 조건으로 건너뛴다).
             bot_restart || true
+            proxy_restart || true
             return
         fi
         sleep 1
@@ -247,10 +299,12 @@ backup() {
 
 case "${1:-status}" in
     setup) setup ;;
-    deploy) upload; bot_upload; restart ;;
+    deploy) upload; bot_upload; proxy_upload; restart ;;
     restart) restart ;;
     bot) bot_upload; bot_restart ;;
-    status) remote "systemctl is-active lod; $BOT_EACH; for b in \"\${bots[@]}\"; do echo \"\$b: \$(systemctl is-active \$b)\"; done; ss -ltn | grep -E ':(2610|2615) '" ;;
+    proxy) bot_upload; proxy_upload; proxy_restart ;;
+    proxy-logs) remote "journalctl -u lod-proxy -n ${2:-40} --no-pager" ;;
+    status) remote "systemctl is-active lod; $BOT_EACH; for b in \"\${bots[@]}\"; do echo \"\$b: \$(systemctl is-active \$b)\"; done; echo \"lod-proxy: \$(systemctl is-active lod-proxy)\"; ss -ltn | grep -E ':(2610|2615) '" ;;
     logs) logs "${2:-40}" ;;
     backup) backup ;;
     app) app ;;

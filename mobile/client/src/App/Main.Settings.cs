@@ -382,6 +382,48 @@ public partial class Main : Control
     /// </summary>
     public static bool AutoHuntPreview { get; private set; }
 
+    /// <summary>
+    /// 대신 사냥 시간(0 = 끔, 1~8) — 자동 사냥 중 앱이 끊기면 클라우드 대리 프로그램이 이만큼 대신 사냥한다(사용자 2026-10-05, 기본 2).
+    /// 기기에 한 줄(<c>user://proxyhunt.cfg</c>).
+    /// </summary>
+    public static int ProxyHours { get; private set; } = Lod.Mobile.Core.Automation.ProxyOrders.DefaultHours;
+
+    private const string ProxyHuntFile = "user://proxyhunt.cfg";
+
+    /// <summary>대신 사냥에 맡겼다가 다시 들어온 게임 화면은 자리를 잡으면 자동 사냥을 다시 켠다(한 번).</summary>
+    public static bool ResumeAutoHunt { get; set; }
+
+    /// <summary>앱이 뒤로 가 있나(NOTIFICATION_APPLICATION_PAUSED ~ RESUMED). 뒤에서는 다시 접속하지 않는다.</summary>
+    public static bool InBackground { get; private set; }
+
+    public static void SetProxyHours(int hours)
+    {
+        ProxyHours = System.Math.Clamp(hours, 0, 8);
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(ProxyHuntFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            writing.StoreLine(ProxyHours.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writing.Close();
+        }
+    }
+
+    private static void ReadProxyHours()
+    {
+        Godot.FileAccess? reading = Godot.FileAccess.Open(ProxyHuntFile, Godot.FileAccess.ModeFlags.Read);
+
+        if (reading is not null)
+        {
+            if (int.TryParse(reading.GetLine().Trim(), out int hours))
+            {
+                ProxyHours = System.Math.Clamp(hours, 0, 8);
+            }
+
+            reading.Close();
+        }
+    }
+
     public static void SetAutoHuntSettings(Lod.Mobile.Core.Automation.AutoHuntSettings settings)
     {
         AutoHuntSettings = settings;

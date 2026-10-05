@@ -92,8 +92,9 @@ public sealed partial class WorldView
     // 자동 사냥 — 판단은 알맹이(AutoHunt), 여기는 그 결정을 걸음·평타·기술로 옮기기만 한다.
     private readonly AutoHunt _autoHunt = new();
 
-    /// <summary>다른 사람이 이만큼 안에 친 괴물은 "남이 치는 것"으로 본다.</summary>
-    private static readonly System.TimeSpan ContestedFor = System.TimeSpan.FromSeconds(5);
+    // 대신 사냥 — 서버에 마지막으로 맡긴 설정(JSON, 빈 글 = 맡김 없음)과 마지막으로 견준 때.
+    private string _armed = "";
+    private System.TimeSpan _armChecked = Reckon.Never;
 
     /// <summary>자동 사냥이 켜져 있나.</summary>
     public bool AutoHunting => _autoHunt.On;
@@ -120,6 +121,52 @@ public sealed partial class WorldView
         {
             _autoHunt.Stop();
         }
+
+        ArmProxy(force: true);
+    }
+
+    /// <summary>막대의 마법 가운데 괴물에 쓰는 것(직업 표의 「적」).</summary>
+    private IReadOnlyList<LearnedSpell> EnemyBarSpells(Lod.Mobile.Core.Protocol.World.WorldClient world) =>
+        [.. (BarSpells?.Invoke() ?? []).Where(one => AimsAtEnemy?.Invoke(one) == true && Main.Kit.AutoCasts(world.Path, one.Name))];
+
+    /// <summary>
+    /// 대신 사냥 맡김(0xF1 7) — 자동 사냥이 켜져 있고 설정에서 끄지 않았으면 지금 설정을 서버에 맡겨 둔다. 앱이 끊기면 서버가
+    /// 대리(Lod.HuntProxy)에게 넘긴다. 바뀐 것이 있을 때만, 1초에 한 번까지 견준다.
+    /// </summary>
+    private void ArmProxy(bool force = false)
+    {
+        if (server is not { } world || (!force && Now - _armChecked < System.TimeSpan.FromSeconds(1)))
+        {
+            return;
+        }
+
+        _armChecked = Now;
+        ProxyOrders? orders = _autoHunt.On && Main.ProxyHours > 0
+            ? new ProxyOrders
+            {
+                Hours = Main.ProxyHours,
+                Radius = Main.AutoHuntSettings.Radius,
+                HealPercent = Main.AutoHuntSettings.HealPercent,
+                Hp = Main.HealthPotion,
+                Mp = Main.ManaPotion,
+                Loot = Main.AutoLoot,
+                Skills = [.. (BarSkills?.Invoke() ?? []).Select(one => one.Name)],
+                Spells = [.. (BarSpells?.Invoke() ?? []).Select(one => one.Name)],
+                EnemySpells = [.. EnemyBarSpells(world).Select(one => one.Name)],
+                Map = MapId,
+                X = _autoHunt.Home.X,
+                Y = _autoHunt.Home.Y,
+            }
+            : null;
+
+        string json = orders?.ToJson() ?? "";
+        if (json == _armed)
+        {
+            return;
+        }
+
+        _armed = json;
+        Main.Fire(world.ArmProxyAsync(orders, _leaving.Token));
     }
 
     /// <summary>사람이 방향판을 눌렀다 — 잠시 손에 맡기고, 선 자리를 새 중심으로.</summary>
@@ -142,33 +189,17 @@ public sealed partial class WorldView
 
     private void AutoHuntTick()
     {
+        // 자동 사냥이 스스로 멈췄으면(위험) 맡김도 지운다 — 멈춘 사냥을 대리가 이어 하지 않게.
+        ArmProxy();
+
         if (!_autoHunt.On || server is not { } world || Frozen || _walked >= 0 || _guide is not null)
         {
             return;
         }
 
-        uint me = world.Serial;
-        HuntSight sight = new()
-        {
-            Standing = _tile,
-            Facing = _player.Looking,
-            MapId = MapId,
-            Vitals = world.Vitals,
-            Comatose = Comatose,
-            Creatures = world.Creatures,
-            HealthOf = world.Health,
-            FoughtByOthers = serial => world.StruckByOthers(serial, ContestedFor),
-            Skills = BarSkills?.Invoke() ?? [],
-            Spells = BarSpells?.Invoke() ?? [],
-            EnemySpells = [.. (BarSpells?.Invoke() ?? []).Where(one => AimsAtEnemy?.Invoke(one) == true && Main.Kit.AutoCasts(world.Path, one.Name))],
-            Cooling = world.CoolingFor,
-            PotionReady = Main.HealthPotion.Enabled && AutoPotion.Count(world.Pack, Main.HealthPotion.Potion) > 0,
-            AutoLoot = Main.AutoLoot,
-            Blocked = Walled,
-            People = [.. world.Others.Where(one => one.Serial != me).Select(one => one.Where)],
-            Exits = [.. Exits.ExitsOn(MapId).SelectMany(exit => exit.Tiles)],
-            Now = Now,
-        };
+        HuntSight sight = HuntDriver.Sight(world, _tile, _player.Looking, MapId, Comatose,
+            BarSkills?.Invoke() ?? [], BarSpells?.Invoke() ?? [], EnemyBarSpells(world),
+            Main.HealthPotion, Main.AutoLoot, Walled, [.. Exits.ExitsOn(MapId).SelectMany(exit => exit.Tiles)], Now);
 
         HuntStep step = _autoHunt.Next(sight, Main.AutoHuntSettings);
 

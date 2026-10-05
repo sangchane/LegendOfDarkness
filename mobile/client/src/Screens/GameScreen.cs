@@ -188,6 +188,9 @@ public partial class GameScreen : Control
     /// <summary>Asks the host to replace this disposed game screen with a fresh login screen.</summary>
     public Action? LoggedOut { get; set; }
 
+    /// <summary>자동 사냥 중 끊겼다 — 호스트가 다시 로그인시킨다(대신 사냥에서 되찾기).</summary>
+    public Action? Rejoin { get; set; }
+
     public GameScreen(WorldClient? server = null)
     {
         _server = server;
@@ -220,9 +223,6 @@ public partial class GameScreen : Control
 
     public override void _Ready()
     {
-        // 앱이 뒤로 가도 자동 사냥이 이어지게 — 게임 화면이 떠 있는 동안만(KeepAlive).
-        AddChild(new KeepAlive());
-
         MarginContainer hud = Main.SafeAreaContainer();
 
         VBoxContainer rows = new();
@@ -556,6 +556,7 @@ public partial class GameScreen : Control
         OpenChatOnItsOwn();
         RehearseNotices();
         Dropped();
+        RejoinIfHandedOff();
         LogUnread();
         KeepWalking(delta);
         KeepGuiding(delta);

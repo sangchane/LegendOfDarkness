@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Lod.HuntProxy</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Lod.Mobile.Core/Lod.Mobile.Core.csproj" />
+    <!-- 기록(BotLog)·맵 벽(MapWalls)·예외 글(BotLogin.Describe)은 동료 봇 것을 그대로 쓴다. -->
+    <ProjectReference Include="../Lod.CompanionBot/Lod.CompanionBot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="hunt-proxy.example.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

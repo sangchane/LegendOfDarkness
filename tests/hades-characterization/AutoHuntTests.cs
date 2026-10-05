@@ -18,12 +18,12 @@ namespace Lod.Hades.Characterization.Tests;
 [Collection(TimedCollection.Name)]
 public sealed class AutoHuntTests(ITestOutputHelper output) : IDisposable
 {
-    private const int WoodlandOneOne = 20015;
+    internal const int WoodlandOneOne = 20015;
     private const int SpawnDefined = 4;
     private const int PathFixed = 2;
     private const int MoodIdle = 1;
 
-    private static readonly Tile Start = new(2, 35);
+    internal static readonly Tile Start = new(2, 35);
 
     /// <summary>두 칸 위 — 한 걸음 다가가야 닿는다.</summary>
     private static readonly Tile TargetTile = new(2, 33);
@@ -191,7 +191,7 @@ public sealed class AutoHuntTests(ITestOutputHelper output) : IDisposable
     }
 
     /// <summary>방의 괴물을 모두 빼고, 가장 약한 정의 하나를 두 칸 위에 가만히 세운다(ExperienceNoticeTests 와 같은 모양).</summary>
-    private static void StandOneWeakTarget(IsolatedHadesServer server, bool keepOthers = false)
+    internal static void StandOneWeakTarget(IsolatedHadesServer server, bool keepOthers = false)
     {
         JsonSerializerOptions indented = new() { WriteIndented = true };
         JsonDocumentOptions lenient = new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip };

@@ -119,6 +119,7 @@ public partial class Main : Control
         ReadMinimapRadius();
         ReadPotions();
         ReadAutoHuntSettings();
+        ReadProxyHours();
         AutoHuntOnStart = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auto-hunt") >= 0;
         CompanionOnStart = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--companion") >= 0;
         BotPreview = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--bot-preview") >= 0;
@@ -186,6 +187,13 @@ public partial class Main : Control
     {
         base._Notification(what);
         if (what == NotificationApplicationFocusOut) ActivityFocus(false);
+        // 대신 사냥 — 뒤로 가면 자동 사냥 중인 접속을 바로 닫아 서버가 대리에게 넘기게 한다(안 오면 서버가 30초 뒤 끊는다).
+        if (what == NotificationApplicationPaused)
+        {
+            InBackground = true;
+            foreach (GameScreen game in GetChildren().OfType<GameScreen>()) game.Background();
+        }
+        if (what == NotificationApplicationResumed || what == NotificationApplicationFocusIn) InBackground = false;
         if (what == NotificationApplicationFocusIn) ActivityFocus(true);
         // 1004 is Godot's NOTIFICATION_WM_WINDOW_FOCUS_IN; the C# binding exposes the application
         // notification but not this window-only alias.

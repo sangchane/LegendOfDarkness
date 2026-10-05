@@ -330,6 +330,10 @@ public sealed partial class SettingsPanel : PanelContainer
         rows.AddChild(Row("회복 기술", heal));
         _percentSelects["heal"] = heal;
 
+        // 대신 사냥 — 자동 사냥 중 앱이 끊기면 클라우드가 이만큼 대신 사냥한다(0 = 끔, 기본 2시간).
+        rows.AddChild(SliderRow("대신 사냥", 0, 8, 1, Main.ProxyHours, value => value == 0 ? "끔" : $"{value}시간",
+            Main.SetProxyHours));
+
         VBoxContainer block = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         block.AddThemeConstantOverride("separation", Main.Gutter / 2);
         block.AddChild(new Label { Text = "자동 사냥", HorizontalAlignment = HorizontalAlignment.Center });

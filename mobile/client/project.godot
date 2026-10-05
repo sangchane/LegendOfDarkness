@@ -15,11 +15,6 @@ run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
-[audio]
-
-general/ios/session_category=3
-general/ios/mix_with_others=true
-
 [debug]
 
 file_logging/enable_file_logging=true
