@@ -31,7 +31,7 @@ public sealed class ExpPoolTests : IDisposable
         string saved = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
         JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
         character["ExpLevel"] = 99;
-        character["ExpTotal"] = 12345;
+        character["ExpBank"] = 5_000_000_000; // 32비트(약 42억)를 넘는다
         File.WriteAllText(saved, character.ToJsonString());
 
         using WorldSession session = await HadesLoginClient.LoginAsync(
@@ -39,7 +39,7 @@ public sealed class ExpPoolTests : IDisposable
         WorldClient world = new(session);
         _ = world.PumpAsync(_deadline.Token);
 
-        await Waiting.Until(() => world.Vitals is { Level: 99, Experience: 12345 },
-            $"보유경험치 12345 가 오지 않았습니다: {world.Vitals}", _deadline.Token);
+        await Waiting.Until(() => world.Vitals is { Level: 99 } v && ((v.ExperienceToGo << 32) | v.Experience) == 5_000_000_000,
+            $"쌓인 경험치 50억이 오지 않았습니다: {world.Vitals}", _deadline.Token);
     }
 }

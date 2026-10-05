@@ -575,11 +575,11 @@ public partial class GameScreen : Control
         }
         else
         {
-            // 99 레벨(다음이 없다)이거나 아직 레벨을 모른다. 99 면 쌓인 총 경험치(레벨 1부터) — 세오·칸에게 팔아 체력·마력을 사는
-            // 양이라 숫자로 보인다(사용자 2026-10-05).
+            // 99 레벨(다음이 없다)이거나 아직 레벨을 모른다. 99 면 쌓인 경험치(레벨 1부터, 99억까지 — 서버가 아래·윗자리로 나눠
+            // 보낸다) — 세오·칸에게 팔아 체력·마력을 사는 양이라 금전처럼 만·억으로 보인다(사용자 2026-10-05).
             _experienceBar.MaxValue = 1;
             _experienceBar.Value = mine.Level > 0 ? 1 : 0;
-            _experienceText.Text = mine.Level >= 99 ? $"보유 {ExperienceGauge.Short(mine.Experience)}" : string.Empty;
+            _experienceText.Text = mine.Level >= 99 ? $"보유 {GoldFormat.Short((mine.ExperienceToGo << 32) | mine.Experience)}" : string.Empty;
         }
     }
 
