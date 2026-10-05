@@ -177,6 +177,24 @@ public sealed class CompanionKitTests : IDisposable
             () => $"빠진 호르라마를 다시 걸지 않았습니다: {Joined(did)}", TimeSpan.FromSeconds(15));
     }
 
+    /// <summary>봇의 최대 체력·마력은 주인 것보다 작지 않다 — 레벨 식만으로는 체력 100,000 주인을 감당하지 못했다(사용자 2026-10-05).</summary>
+    [Fact]
+    public async Task The_bot_is_at_least_as_tough_as_its_owner()
+    {
+        using IsolatedHadesServer server = Ready(ownerLevel: 40);
+        CompanionCallTests.Edit(server, OwnerName, saved =>
+        {
+            saved["_MaximumHp"] = 100000;
+            saved["_MaximumMp"] = 50000;
+        });
+        WorldClient owner = await Enter(server, OwnerName);
+        WorldClient bot = await Enter(server, CompanionCallTests.BotName);
+        await Call(owner, bot);
+
+        await Until(() => bot.Vitals is { MaximumHealth: >= 100000, MaximumMana: >= 50000 },
+            () => $"봇 최대 체력·마력: {bot.Vitals?.MaximumHealth}·{bot.Vitals?.MaximumMana}");
+    }
+
     private IsolatedHadesServer Ready(int ownerLevel)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare();
