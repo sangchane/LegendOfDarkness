@@ -104,6 +104,7 @@ public sealed partial class WorldView
         if (best != 0)
         {
             _target = best;
+            TargetByHand = true;
             Mark();
         }
 

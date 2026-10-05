@@ -237,8 +237,38 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
             // 이식한 NPC 는 이름에 자리가 붙어 온다(카르마@노비스마을식당#3,10). 이름만 보인다.
             return beast is null ? string.Empty
                 : beast.Name.Length > 0 ? beast.Name.Split('@')[0]
-                : $"괴물 {beast.Sprite - CreatureNumbering}";
+                : MonsterName(server?.State?.Map.Id ?? 0, beast.Sprite) ?? $"괴물 {beast.Sprite - CreatureNumbering}";
         }
+    }
+
+    /// <summary>손으로 누른 이를 골랐나 — 자동 사냥이 고른 것이면 아니다. 위 이름판은 이때만 뜬다(사용자 2026-10-05).</summary>
+    public bool TargetByHand { get; private set; }
+
+    // 괴물은 원작 형식이라 이름이 안 온다 — 서버 템플릿에서 뽑은 「맵 · 그림 → 이름」(build-monster-names.py).
+    private static Dictionary<(int Map, int Sprite), string>? _monsterNames;
+    private static Dictionary<int, string>? _monsterNamesBySprite;
+
+    private static string? MonsterName(int map, int sprite)
+    {
+        if (_monsterNames is null)
+        {
+            _monsterNames = [];
+            _monsterNamesBySprite = [];
+            using Godot.FileAccess? file = Godot.FileAccess.Open("res://assets/world/monster-names.txt", Godot.FileAccess.ModeFlags.Read);
+
+            while (file is not null && !file.EofReached())
+            {
+                string[] parts = file.GetLine().Split('\t');
+
+                if (parts.Length == 3 && int.TryParse(parts[0], out int area) && int.TryParse(parts[1], out int image))
+                {
+                    _monsterNames[(area, image)] = parts[2];
+                    _monsterNamesBySprite.TryAdd(image, parts[2]);
+                }
+            }
+        }
+
+        return _monsterNames.GetValueOrDefault((map, sprite)) ?? _monsterNamesBySprite!.GetValueOrDefault(sprite);
     }
 
     public override void _ExitTree() => _leaving.Cancel();

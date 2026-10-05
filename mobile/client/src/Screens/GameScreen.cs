@@ -744,7 +744,8 @@ public partial class GameScreen : Control
         _targetPercent.Text = left is { } percent ? $"{percent}%" : "–";
         _targetHealth.Value = left ?? 100;
         _targetHealth.Modulate = left is null ? new Color(1, 1, 1, 0.3f) : Colors.White;
-        _targetPlate.Visible = _target.Text.Length > 0;
+        // 괴물 머리 위에 체력바가 있으니 위 판은 손으로 누른 때만 — 자동 사냥이 고른 것은 띄우지 않는다(사용자 2026-10-05).
+        _targetPlate.Visible = _target.Text.Length > 0 && _world.TargetByHand;
     }
 
 }
