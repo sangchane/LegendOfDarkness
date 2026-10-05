@@ -276,7 +276,7 @@ public partial class Main : Control
         {
             foreach (Lod.Mobile.Core.Automation.PotionRule rule in new[] { health, mana })
             {
-                writing.StoreLine($"{(rule.Enabled ? "on" : "off")} {rule.Percent} {rule.Potion}");
+                writing.StoreLine($"{(rule.Enabled ? "on" : "off")} {rule.Percent} {rule.Potion} {rule.Ceiling}");
             }
 
             writing.Close();
@@ -300,8 +300,12 @@ public partial class Main : Control
         {
             string[] parts = line.Trim().Split(' ');
 
-            return parts.Length == 3 && int.TryParse(parts[1], out int percent) && percent is > 0 and < 100
-                ? new(parts[0] == "on", percent, parts[2])
+            // 넷째 칸은 마력 상한(사용자 2026-10-05) — 그 전에 남은 세 칸짜리 줄은 상한 없음으로 읽는다.
+            int ceiling = 0;
+
+            return parts.Length is 3 or 4 && int.TryParse(parts[1], out int percent) && percent is > 0 and < 100
+                && (parts.Length == 3 || int.TryParse(parts[3], out ceiling))
+                ? new(parts[0] == "on", percent, parts[2], System.Math.Max(0, ceiling))
                 : fallback;
         }
     }

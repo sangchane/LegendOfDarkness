@@ -53,6 +53,16 @@ public sealed class AutoPotionTests
     }
 
     [Fact]
+    public void Mana_stops_at_the_ceiling_even_below_the_percent_line()
+    {
+        InventoryItem[] pack = [Carried(1, "마라디움")];
+        PotionRule upTo1500 = HalfMana with { Ceiling = 1500 };
+
+        Assert.Equal(1, new AutoPotion().Next(Life(1000, 0, 10000), pack, Off, upTo1500, TimeSpan.Zero));
+        Assert.Null(new AutoPotion().Next(Life(1000, 1500, 10000), pack, Off, upTo1500, TimeSpan.Zero));
+    }
+
+    [Fact]
     public void Low_mana_drinks_a_mana_potion_and_not_a_healing_one()
     {
         AutoPotion potion = new();

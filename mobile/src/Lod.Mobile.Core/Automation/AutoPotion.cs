@@ -5,7 +5,9 @@ namespace Lod.Mobile.Core.Automation;
 /// <summary>Whether one kind of automatic drinking is on, at what share of the bar it fires, and with what.</summary>
 /// <param name="Percent">Drinks when the bar is at or below this share of its maximum.</param>
 /// <param name="Potion">The item name to drink — the player picks it; nothing else of the kind is used.</param>
-public sealed record PotionRule(bool Enabled, int Percent, string Potion);
+/// <param name="Ceiling">Stops drinking once the bar holds this much (0 = no ceiling). 다라밀공 empties mana and
+/// needs only 1300 to cast again, so filling to the percent line wastes potions (사용자 2026-10-05).</param>
+public sealed record PotionRule(bool Enabled, int Percent, string Potion, int Ceiling = 0);
 
 /// <summary>A potion the player can pick, and the picture the server uses for it (the template's DisplayImage).</summary>
 public sealed record Potion(string Name, int Icon);
@@ -100,7 +102,8 @@ public sealed class AutoPotion
         pack.Where(one => one.Name == name).Sum(one => Math.Max(1, one.Stacks));
 
     private static bool Low(int value, int maximum, PotionRule rule) =>
-        rule.Enabled && maximum > 0 && value * 100L <= (long)maximum * rule.Percent;
+        rule.Enabled && maximum > 0 && value * 100L <= (long)maximum * rule.Percent
+        && (rule.Ceiling <= 0 || value < rule.Ceiling);
 
     private static InventoryItem? Carried(IReadOnlyList<InventoryItem> pack, string name) =>
         pack.Where(one => one.Name == name).OrderBy(one => one.Slot).FirstOrDefault();

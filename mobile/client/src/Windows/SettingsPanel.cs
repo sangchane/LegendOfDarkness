@@ -40,6 +40,13 @@ public sealed partial class SettingsPanel : PanelContainer
         PotionGauge mana = new(Main.ManaPotion.Percent, Greybox.Mana);
         mana.Changed += percent => Main.SetPotions(Main.HealthPotion, Main.ManaPotion with { Percent = percent });
         auto.AddChild(Row("마력 포션", mana));
+
+        // 마력은 여기까지만 채운다 — 다라밀공은 마력을 0으로 만들고 1300이면 다시 쏘니, 줄(%)까지 채우면 포션이 샌다(사용자 2026-10-05).
+        Control ceiling = SliderRow("마력 상한", 0, 5000, 100, Main.ManaPotion.Ceiling,
+            value => value == 0 ? "없음" : $"{value}까지",
+            value => Main.SetPotions(Main.HealthPotion, Main.ManaPotion with { Ceiling = value }));
+        ceiling.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
+        auto.AddChild(ceiling);
         auto.AddChild(BuildAutoHunt());
 
         // 밟은 것을 알아서 주울지 — 원작에 없던 것이라 끌 수 있어야 한다(2026-09-19). 소지품 창에서 옮겨 왔다(사용자 2026-10-01).
