@@ -119,7 +119,7 @@ def monster(kind, count, map_name, area):
         "MaximumHP": hp, "MaximumMP": 0, "Exp": round(hp * EXP_PER_HP),
         "DmgMin": round(DMG_MIN[0] + (DMG_MIN[1] - DMG_MIN[0]) * step), "DmgMax": dmg_max, "Ac": ac,
         "Level": 1, "MovementSpeed": 1500, "EngagedWalkingSpeed": 1500, "AttackSpeed": 1000, "CastSpeed": 8000,
-        "MoodType": 4, "PathQualifer": 1,
+        "MoodType": 2, "PathQualifer": 1,   # 99레벨 사냥터는 모두 선공(사용자 2026-10-05) — 4 는 스폰 때 반반
         "LootType": LOOT_RANDOM if kind in DROPS else LOOT_NONE, "Drops": {"$values": DROPS.get(kind, [])},
         "ScriptName": "Common Monster", "UpdateMapWide": True, "UpdateRate": 1000.0,
         "Grow": False, "IgnoreCollision": False, "GoldMinimum": GOLD_MINIMUM,

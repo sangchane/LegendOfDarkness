@@ -575,10 +575,11 @@ public partial class GameScreen : Control
         }
         else
         {
-            // 99 레벨(다음이 없다)이거나 아직 레벨을 모른다.
+            // 99 레벨(다음이 없다)이거나 아직 레벨을 모른다. 99 면 서버가 「다음까지」 자리에 보유경험치를 싣는다 — 세오·칸에게 팔아
+            // 체력·마력을 사는 양이라 숫자로 보인다(사용자 2026-10-05).
             _experienceBar.MaxValue = 1;
             _experienceBar.Value = mine.Level > 0 ? 1 : 0;
-            _experienceText.Text = string.Empty;
+            _experienceText.Text = mine.Level >= 99 ? $"보유 {ExperienceGauge.Short(mine.ExperienceToGo)}" : string.Empty;
         }
     }
 

@@ -97,7 +97,7 @@ def monsters(room):
             "Image": 0x4000 + int(f["이미지"]), "ImageVarience": 0,
             **stats, "MaximumMP": 0, "Exp": round(int(f["경험치"]) / EXPERIENCE_DIVISOR),
             "Level": 1, "MovementSpeed": speed, "EngagedWalkingSpeed": speed, "AttackSpeed": 1000, "CastSpeed": 8000,
-            "MoodType": 4, "PathQualifer": 1,
+            "MoodType": 2, "PathQualifer": 1,   # 99레벨 사냥터는 모두 선공(사용자 2026-10-05) — 4 는 스폰 때 반반
             "LootType": LOOT_RANDOM, "Drops": {"$values": drops}, "DropRate": DROP_RATE[tier],
             "ScriptName": "Common Monster", "UpdateMapWide": True, "UpdateRate": 1000.0,
             "Grow": False, "IgnoreCollision": False, "GoldMinimum": GOLD_MINIMUM,
