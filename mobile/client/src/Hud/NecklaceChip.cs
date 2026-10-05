@@ -10,7 +10,8 @@ namespace LodClient;
 /// 방향판 위 속성 목걸이 칸 하나(사용자, 2026-10-05) — 포션 칸(<see cref="PotionChip" />)과 같은 결. 짧게 누르면 고른 목걸이를
 /// 끼고(가방 물건 사용 0x1C), 길게 누르면 그 속성 목걸이 중에서 고른다. 묶음 칸(세로의 수→토→풍→화, 암흑↔생명)은 누를 때마다
 /// 다음 차례를 낀다(<see cref="NecklaceSwap.Next(IReadOnlyList{Element}, IReadOnlyList{WornItem}, System.Func{Element, bool})" />).
-/// 지금 끼고 있는 것은 금테 + 오른쪽 위 「●」(사용자 2026-10-05) — 묶음 칸은 묶음 안의 것을 끼고 있으면 그것을 보여 준다.
+/// 지금 끼고 있는 것은 자동 공격처럼 둘레를 도는 빛(<see cref="AutoHuntRing" />) — 회색 칸·금테는 배경에서 튀었다(사용자 2026-10-05).
+/// 묶음 칸은 묶음 안의 것을 끼고 있으면 그것을 보여 준다.
 /// </summary>
 public partial class NecklaceChip : Button
 {
@@ -22,9 +23,8 @@ public partial class NecklaceChip : Button
     private readonly System.Action<int> _use;
     private readonly System.Action<string> _say;
     private readonly Label _letter = new();
-    private readonly Label _mark = new() { Text = "●", Visible = false };
+    private readonly AutoHuntRing _ring = new();
     private readonly PopupPanel _picker = new();
-    private readonly StyleBox _plain;
 
     private ulong _downAt;
     private bool _down;
@@ -48,8 +48,13 @@ public partial class NecklaceChip : Button
         ExpandIcon = true;
         IconAlignment = HorizontalAlignment.Center;
         FocusMode = FocusModeEnum.None;
-        Greybox.Plain(this);
-        _plain = GetThemeStylebox("normal");
+        // 포션 칸처럼 어두운 반투명 원 — 바탕 회색 칸은 길바닥 위에서 튀었다.
+        StyleBoxFlat circle = new() { BgColor = new Color(0, 0, 0, 0.35f) };
+        circle.SetCornerRadiusAll(AbilityFan.PotionSide / 2);
+        foreach (string state in new[] { "normal", "hover", "pressed", "hover_pressed", "focus", "disabled" })
+        {
+            AddThemeStyleboxOverride(state, circle);
+        }
 
         _letter.AddThemeFontSizeOverride("font_size", 10);
         _letter.AddThemeColorOverride("font_outline_color", Colors.Black);
@@ -60,16 +65,9 @@ public partial class NecklaceChip : Button
         _letter.OffsetTop = -2;
         AddChild(_letter);
 
-        _mark.AddThemeFontSizeOverride("font_size", 9);
-        _mark.AddThemeColorOverride("font_color", new Color(1f, 0.82f, 0.3f));
-        _mark.AddThemeColorOverride("font_outline_color", Colors.Black);
-        _mark.AddThemeConstantOverride("outline_size", 3);
-        _mark.MouseFilter = MouseFilterEnum.Ignore;
-        _mark.HorizontalAlignment = HorizontalAlignment.Right;
-        _mark.SetAnchorsPreset(LayoutPreset.FullRect);
-        _mark.OffsetRight = -1;
-        _mark.OffsetTop = -3;
-        AddChild(_mark);
+        _ring.SetAnchorsPreset(LayoutPreset.FullRect);
+        _ring.Show(false, false);
+        AddChild(_ring);
         AddChild(_picker);
     }
 
@@ -139,8 +137,7 @@ public partial class NecklaceChip : Button
         Icon = icon > 0 ? ItemIcons.For(icon) : null;
         _letter.Text = NecklaceSwap.Letter(look.Kind);
         Modulate = look.Slot is not null || look.On ? Colors.White : new Color(1, 1, 1, 0.45f);
-        AddThemeStyleboxOverride("normal", look.On ? Greybox.Lit() : _plain);
-        _mark.Visible = look.On;
+        _ring.Show(look.On, false);
         TooltipText = look.Name ?? $"{NecklaceSwap.Letter(look.Kind)} 목걸이 없음";
     }
 
