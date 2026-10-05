@@ -30,20 +30,40 @@ public static class NecklaceSwap
     /// <summary>지금 낀 목걸이, 없으면 null.</summary>
     public static WornItem? Worn(IReadOnlyList<WornItem> worn) => worn.FirstOrDefault(on => on.Slot == Place);
 
-    /// <summary>고를 수 있는 그 속성의 목걸이 — 지금 낀 것과 가방의 것, 이름마다 하나.</summary>
+    /// <summary>
+    /// 낄 수 있나 — 서버 착용 검사(레벨·직업, <c>CheckReqs</c>)와 같게. 직업 0 은 누구나. 내 레벨·직업을 모르면 막지 않는다.
+    /// 레벨이 모자란 목걸이는 칸에 두지 않는다(사용자 2026-10-05 「착용불가한 속성은 비워둬」).
+    /// </summary>
+    public static bool Fits(ItemStats? stats, int? level, int? path) =>
+        stats is null
+        || ((level is not { } mine || stats.Level <= mine)
+            && (stats.Class == 0 || path is not { } me || stats.Class == me));
+
+    /// <summary>고를 수 있는 그 속성의 목걸이 — 지금 낀 것과 가방의 낄 수 있는 것, 이름마다 하나.</summary>
     public static IReadOnlyList<(string Name, int Icon, Element Element)> Choices(
-        IReadOnlyList<InventoryItem> pack, IReadOnlyList<WornItem> worn, IReadOnlyList<Element> elements)
+        IReadOnlyList<InventoryItem> pack, IReadOnlyList<WornItem> worn, IReadOnlyList<Element> elements,
+        int? level = null, int? path = null)
     {
         IEnumerable<(string, int, Element)> on = worn.Where(item => item.Slot == Place)
             .Select(item => (item.Name, item.Icon, (Element)(item.Stats?.Offense ?? 0)));
-        IEnumerable<(string, int, Element)> carried = pack.Select(item => (item.Name, item.Icon, Of(item.Stats)));
+        IEnumerable<(string, int, Element)> carried = pack.Where(item => Fits(item.Stats, level, path))
+            .Select(item => (item.Name, item.Icon, Of(item.Stats)));
 
         return [.. on.Concat(carried).Where(one => elements.Contains(one.Item3)).DistinctBy(one => one.Item1)];
     }
 
-    /// <summary>칸이 가리키는 목걸이: 고른 이름, 고른 게 없으면 가진 것 중 첫째, 아무것도 없으면 null.</summary>
-    public static string? Chosen(string? picked, IReadOnlyList<InventoryItem> pack, IReadOnlyList<WornItem> worn, Element element) =>
-        !string.IsNullOrEmpty(picked) ? picked : Choices(pack, worn, [element]).Select(one => one.Name).FirstOrDefault();
+    /// <summary>
+    /// 칸이 가리키는 목걸이: 고른 이름(가방에 있는데 낄 수 없게 됐으면 버린다), 고른 게 없으면 낄 수 있는 것 중 첫째, 없으면 null.
+    /// </summary>
+    public static string? Chosen(string? picked, IReadOnlyList<InventoryItem> pack, IReadOnlyList<WornItem> worn, Element element,
+        int? level = null, int? path = null)
+    {
+        bool unfit = pack.Any(item => item.Name == picked && !Fits(item.Stats, level, path));
+
+        return !string.IsNullOrEmpty(picked) && !unfit
+            ? picked
+            : Choices(pack, worn, [element], level, path).Select(one => one.Name).FirstOrDefault();
+    }
 
     /// <summary>그 이름의 목걸이가 든 가방 칸 — 짧게 누르면 이 칸을 쓴다(0x1C). 가방에 없으면 null.</summary>
     public static int? SlotOf(IReadOnlyList<InventoryItem> pack, string? name) =>

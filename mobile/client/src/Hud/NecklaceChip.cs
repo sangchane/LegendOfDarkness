@@ -20,6 +20,7 @@ public partial class NecklaceChip : Button
     private readonly IReadOnlyList<Element> _group;
     private readonly System.Func<IReadOnlyList<InventoryItem>> _pack;
     private readonly System.Func<IReadOnlyList<WornItem>> _worn;
+    private readonly System.Func<(int? Level, int? Path)> _me;
     private readonly System.Action<int> _use;
     private readonly System.Action<string> _say;
     private readonly Label _letter = new();
@@ -36,12 +37,14 @@ public partial class NecklaceChip : Button
         IReadOnlyList<Element> group,
         System.Func<IReadOnlyList<InventoryItem>> pack,
         System.Func<IReadOnlyList<WornItem>> worn,
+        System.Func<(int? Level, int? Path)> me,
         System.Action<int> use,
         System.Action<string> say)
     {
         _group = group;
         _pack = pack;
         _worn = worn;
+        _me = me;
         _use = use;
         _say = say;
         CustomMinimumSize = new Vector2(AbilityFan.PotionSide, AbilityFan.PotionSide);
@@ -76,7 +79,7 @@ public partial class NecklaceChip : Button
     /// <summary>누르면 낄 속성 — 묶음 칸은 지금 낀 것 다음 차례 중 가방에 있는 것.</summary>
     private Element Kind => Single ? _group[0] : NecklaceSwap.Next(_group, _worn(), element => NecklaceSwap.SlotOf(_pack(), TargetOf(element)) is not null);
 
-    private string? TargetOf(Element element) => NecklaceSwap.Chosen(Main.Necklace(element), _pack(), _worn(), element);
+    private string? TargetOf(Element element) => NecklaceSwap.Chosen(Main.Necklace(element), _pack(), _worn(), element, _me().Level, _me().Path);
 
     private string? Target => TargetOf(Kind);
 
@@ -133,7 +136,7 @@ public partial class NecklaceChip : Button
     /// <summary>고른 것이 가방에도 몸에도 없으면 흐리게, 지금 끼고 있으면 밝은 테.</summary>
     private void Show((string? Name, Element Kind, int? Slot, bool On) look)
     {
-        int icon = NecklaceSwap.Choices(_pack(), _worn(), [look.Kind]).FirstOrDefault(one => one.Name == look.Name).Icon;
+        int icon = NecklaceSwap.Choices(_pack(), _worn(), [look.Kind], _me().Level, _me().Path).FirstOrDefault(one => one.Name == look.Name).Icon;
         Icon = icon > 0 ? ItemIcons.For(icon) : null;
         _letter.Text = NecklaceSwap.Letter(look.Kind);
         Modulate = look.Slot is not null || look.On ? Colors.White : new Color(1, 1, 1, 0.45f);
@@ -177,7 +180,7 @@ public partial class NecklaceChip : Button
         row.AddThemeConstantOverride("separation", Main.Gutter / 2);
         IReadOnlyList<Element> kinds = _group;
 
-        foreach ((string name, int icon, Element element) in NecklaceSwap.Choices(_pack(), _worn(), kinds))
+        foreach ((string name, int icon, Element element) in NecklaceSwap.Choices(_pack(), _worn(), kinds, _me().Level, _me().Path))
         {
             Button choice = new()
             {
@@ -193,7 +196,7 @@ public partial class NecklaceChip : Button
             Greybox.Plain(choice);
             choice.AddThemeFontSizeOverride("font_size", 11);
 
-            if (name == NecklaceSwap.Chosen(Main.Necklace(element), _pack(), _worn(), element))
+            if (name == TargetOf(element))
             {
                 choice.AddThemeStyleboxOverride("normal", Greybox.Lit());
                 choice.AddThemeColorOverride("font_color", Greybox.Engrave);

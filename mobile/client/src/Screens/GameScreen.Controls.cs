@@ -215,21 +215,23 @@ public partial class GameScreen : Control
         System.Func<IReadOnlyList<InventoryItem>> pack = () => _server?.Pack ?? LayoutCheck.PretendPack;
         System.Func<IReadOnlyList<WornItem>> worn = () => _server?.Worn ?? LayoutCheck.PretendWorn;
         System.Action<int> use = slot => Main.Fire(_server?.UseAsync(slot, System.Threading.CancellationToken.None));
+        // 낄 수 없는(레벨·직업) 목걸이는 칸에 두지 않는다 — 모르면(접속 전) 막지 않는다.
+        System.Func<(int?, int?)> me = () => (_server?.Vitals?.Level, _server?.Path);
 
         // 세로는 두 칸 — 수→토→풍→화 차례 칸과 암흑↔생명 칸(사용자 2026-10-05: 다섯 칸은 방향판보다 넓었다). 가로는 다섯 칸.
         if (Main.Portrait)
         {
-            chips.AddChild(new NecklaceChip(NecklaceSwap.Singles, pack, worn, use, Notify));
+            chips.AddChild(new NecklaceChip(NecklaceSwap.Singles, pack, worn, me, use, Notify));
         }
         else
         {
             foreach (Element element in NecklaceSwap.Singles)
             {
-                chips.AddChild(new NecklaceChip([element], pack, worn, use, Notify));
+                chips.AddChild(new NecklaceChip([element], pack, worn, me, use, Notify));
             }
         }
 
-        chips.AddChild(new NecklaceChip(NecklaceSwap.Pair, pack, worn, use, Notify));
+        chips.AddChild(new NecklaceChip(NecklaceSwap.Pair, pack, worn, me, use, Notify));
         _necklaces = chips;
 
         int count = chips.GetChildCount();

@@ -65,4 +65,16 @@ public sealed class NecklaceSwapTests
         // 땅이 없으면 물 다음은 바람.
         Assert.Equal(Element.Wind, NecklaceSwap.Next(NecklaceSwap.Singles, [Wearing(Sea)], element => element != Element.Earth));
     }
+
+    [Fact]
+    public void A_necklace_above_my_level_or_for_another_class_is_left_out()
+    {
+        InventoryItem high = Sea with { Name = "높은바다목걸이", Stats = Sea.Stats! with { Level = 80 } };
+        InventoryItem monkOnly = Sea with { Name = "무도가바다목걸이", Stats = Sea.Stats! with { Class = 5 } };
+
+        Assert.Empty(NecklaceSwap.Choices([high], [], [Element.Water], level: 57, path: 5));
+        Assert.Null(NecklaceSwap.Chosen("높은바다목걸이", [high], [], Element.Water, level: 57, path: 5));
+        Assert.Single(NecklaceSwap.Choices([monkOnly], [], [Element.Water], level: 57, path: 5));
+        Assert.Empty(NecklaceSwap.Choices([monkOnly], [], [Element.Water], level: 57, path: 4));
+    }
 }
