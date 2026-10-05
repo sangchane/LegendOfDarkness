@@ -88,6 +88,7 @@ public sealed class CompanionMagicTests
         CompanionSight At(double seconds, int health) => Sight([], seconds) with { HealthOf = _ => health };
 
         Assert.Equal(CompanionAct.Cast, brain.Next(At(100, 50), Defaults).Act);           // 기준 70 아래 — 시작
+        Assert.Equal((CompanionAct.Cast, 1), (brain.Next(At(100.35, 60), Defaults) is var tick ? (tick.Act, tick.Slot) : default)); // 채우는 중엔 틱마다(0.3초)
         Assert.Equal((CompanionAct.Cast, 1), (brain.Next(At(102, 85), Defaults) is var more ? (more.Act, more.Slot) : default)); // 기준 위지만 아직 덜 참
         Assert.NotEqual(1, brain.Next(At(104, 100), Defaults).Slot);                    // 가득 — 멈춘다
         Assert.NotEqual(1, new CompanionBrain().Next(At(100, 85), Defaults).Slot);      // 시작한 적 없으면 85 에선 안 한다
@@ -101,9 +102,9 @@ public sealed class CompanionMagicTests
 
         Assert.Equal((CompanionAct.Cast, 1, Owner), (brain.Next(Hurt(100), Defaults) is var heal ? (heal.Act, heal.Slot, heal.Target) : default));
 
-        // 회복 사이(1.5초) 안, 주문 사이(1초)는 지났다 — 전에는 여기서 저주를 걸었다(사용자 2026-10-04: 쓰러진 주인 옆에서 저주·나르콜리).
-        Assert.NotEqual(CompanionAct.Cast, brain.Next(Hurt(101.1), Defaults).Act);
-        Assert.Equal((CompanionAct.Cast, 1), (brain.Next(Hurt(101.6), Defaults) is var again ? (again.Act, again.Slot) : default));
+        // 채우는 동안은 회복만 틱마다(0.3초) — 저주가 끼지 않는다(사용자 2026-10-04: 쓰러진 주인 옆에서 저주·나르콜리).
+        Assert.Equal((CompanionAct.Cast, 1), (brain.Next(Hurt(100.35), Defaults) is var again ? (again.Act, again.Slot) : default));
+        Assert.Equal((CompanionAct.Cast, 1), (brain.Next(Hurt(100.7), Defaults) is var third ? (third.Act, third.Slot) : default));
     }
 
     [Fact]

@@ -124,6 +124,9 @@ public sealed class CompanionBrain
     /// <summary>회복 사이 — 한 번 걸고 체력바(0x13)가 오르는 것을 본 뒤에.</summary>
     public static readonly TimeSpan HealGap = TimeSpan.FromMilliseconds(1500);
 
+    /// <summary>주인을 채우는 동안 회복 사이 — 서버 마법 딜레이(0.25초) 바로 위.</summary>
+    public static readonly TimeSpan FillGap = TimeSpan.FromMilliseconds(300);
+
     /// <summary>깨우기가 안 먹었을 때 다시 깨우기까지 — 그 사이 주문은 회복·이모탈에 쓴다.</summary>
     public static readonly TimeSpan WakeRetry = TimeSpan.FromSeconds(3);
 
@@ -243,7 +246,10 @@ public sealed class CompanionBrain
         return new Reading(
             now,
             canCast,
-            CanHeal: canCast && now - _lastHeal >= HealGap,
+            // 주인을 채우는 중이면 틱마다(FillGap) — 1.5초마다 한 번으로는 큰 체력을 못 따라갔다(사용자 2026-10-05 「1틱마다 쭉쭉」).
+            CanHeal: _fillingOwner
+                ? now - _lastCast >= FillGap && now - _lastHeal >= FillGap
+                : canCast && now - _lastHeal >= HealGap,
             CanDrink: now - _lastDrink >= DrinkGap,
             ownerNear,
             OwnerHurt: ownerNear && ownerHealth > 0 && (_fillingOwner = ownerHealth < settings.HealOwnerPercent || (_fillingOwner && ownerHealth < 100)),

@@ -149,8 +149,9 @@ public sealed class CompanionTests
     {
         CompanionBrain brain = new();
         Assert.Equal(CompanionAct.Cast, brain.Next(Sight(ownerHealth: 50, seconds: 100), Defaults).Act);
-        Assert.NotEqual(CompanionAct.Cast, brain.Next(Sight(ownerHealth: 50, seconds: 100.3), Defaults).Act);
-        Assert.Equal(CompanionAct.Cast, brain.Next(Sight(ownerHealth: 50, seconds: 102), Defaults).Act);
+        // 채우는 동안은 틱마다(0.3초) — 서버 마법 딜레이(0.25초) 안으로는 보내지 않는다(사용자 2026-10-05 「1틱마다 쭉쭉」).
+        Assert.NotEqual(CompanionAct.Cast, brain.Next(Sight(ownerHealth: 50, seconds: 100.2), Defaults).Act);
+        Assert.Equal(CompanionAct.Cast, brain.Next(Sight(ownerHealth: 50, seconds: 100.35), Defaults).Act);
     }
 
     [Fact]
