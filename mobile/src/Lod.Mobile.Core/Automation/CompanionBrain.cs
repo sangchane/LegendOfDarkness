@@ -145,6 +145,12 @@ public sealed class CompanionBrain
     /// <summary>이만큼보다 멀면 주인을 회복하지 않는다(화면 밖).</summary>
     public const int CastReach = 10;
 
+    /// <summary>
+    /// 주인에게서 이만큼 안의 괴물은 주인이 치기 전에도 저주·나르콜리를 건다 — 바로 옆(1칸)만 보면 주인이 먼저 때려야 걸려
+    /// 늦었다(사용자 2026-10-05).
+    /// </summary>
+    public const int FightReach = 4;
+
     /// <summary>저주·나르콜리는 마력이 이 % 이상일 때만 — 나머지는 회복 몫이다.</summary>
     public const int AssistManaPercent = 50;
 
@@ -389,7 +395,7 @@ public sealed class CompanionBrain
 
         List<Foe> fighting = sight.Foes
             .Where(foe => Reckon.Steps(foe.At, sight.Standing) <= CastReach
-                          && (foe.OwnerHits || foe.HitsOwner || Reckon.Steps(foe.At, owner) <= 1))
+                          && (foe.OwnerHits || foe.HitsOwner || Reckon.Steps(foe.At, owner) <= FightReach))
             .OrderByDescending(foe => foe.OwnerHits)
             .ThenBy(foe => Reckon.Steps(foe.At, owner))
             .ToList();

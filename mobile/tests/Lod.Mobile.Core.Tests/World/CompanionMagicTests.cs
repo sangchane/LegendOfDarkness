@@ -234,6 +234,14 @@ public sealed class CompanionMagicTests
     }
 
     [Fact]
+    public void A_monster_coming_at_the_owner_is_cursed_before_the_owner_hits_it()
+    {
+        Foe coming = new(Add, new Tile(14, 10), false, false, OwnerHits: false, HitsOwner: false); // 주인에게서 3칸
+
+        Assert.Equal((CompanionAct.Cast, 11, Add), (new CompanionBrain().Next(Sight([coming]), Defaults) is var step ? (step.Act, step.Slot, step.Target) : default));
+    }
+
+    [Fact]
     public void A_monster_far_from_the_fight_is_left_alone()
     {
         Foe stranger = new(Add, new Tile(15, 15), false, false, OwnerHits: false, HitsOwner: false);
