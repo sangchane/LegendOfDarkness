@@ -22,6 +22,57 @@ public sealed class KurotoTests(ITestOutputHelper output) : IDisposable
 
     public void Dispose() => _deadline.Dispose();
 
+    /// <summary>
+    /// 쿠로토를 누르고 곧바로 평타 — 평타가 마법 대기 줄을 비워 쿠로토가 말없이 사라졌다(사용자 2026-10-05 「입력이 안 먹는 느낌」).
+    /// 이제 외우는 중인 마법만 끊는다. 마력 3% 조건도 원작에 없어 뺐다 — 마력 0 에서도 나간다.
+    /// </summary>
+    [Fact]
+    public async Task Kuroto_pressed_right_before_a_blow_still_goes_off_even_with_no_mana()
+    {
+        const string name = "kurotoblow";
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (WoodlandOneOne, 2, 35));
+        server.Start(TimeSpan.FromMinutes(2));
+
+        using WorldSession session = await HadesLoginClient.CreateCharacterAsync(
+            IPAddress.Loopback, server.LoginPort, name, LoginFlow.SyntheticSecret,
+            hairStyle: 12, gender: 1, hairColor: 40, path: 5, progress: null, _deadline.Token);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Waiting.Until(() => world.Spells.Any(spell => spell.Name.StartsWith("쿠로토", StringComparison.Ordinal)),
+            "쿠로토가 오지 않았습니다.", _deadline.Token);
+        await Task.Delay(1500, _deadline.Token);
+        LearnedSpell kuroto = world.Spells.First(spell => spell.Name.StartsWith("쿠로토", StringComparison.Ordinal));
+
+        int casts = 0;
+        for (int round = 0; round < 5; round++)
+        {
+            await Task.Delay(400, _deadline.Token); // 서버 마법 딜레이(0.25초) 밖에서
+            while (world.TakeEffect(out _))
+            {
+            }
+
+            await world.UseSpellAsync(kuroto.Slot, 0, _deadline.Token);
+            await world.AttackAsync(_deadline.Token);
+            DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(1.5);
+            bool seen = false;
+            while (!seen && DateTime.UtcNow < giveUp)
+            {
+                while (world.TakeEffect(out Effect? effect))
+                {
+                    seen |= effect!.Target == world.Serial && effect.Source == world.Serial && effect.SourceAnimation == 4;
+                }
+
+                await Task.Delay(50, _deadline.Token);
+            }
+
+            casts += seen ? 1 : 0;
+        }
+
+        Assert.Equal(5, casts);
+    }
+
     [Fact]
     public async Task A_monk_in_the_robe_raises_hands_for_kuroto_under_ring_four_both_slowed()
     {
