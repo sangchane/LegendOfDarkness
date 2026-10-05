@@ -252,7 +252,10 @@ public sealed class CompanionBrain
                 : canCast && now - _lastHeal >= HealGap,
             CanDrink: now - _lastDrink >= DrinkGap,
             ownerNear,
-            OwnerHurt: ownerNear && ownerHealth > 0 && (_fillingOwner = ownerHealth < settings.HealOwnerPercent || (_fillingOwner && ownerHealth < 100)),
+            // 체력바 0% 도 회복한다 — 다라밀공 뒤 체력 1/100,000 은 0% 로 와서 「쓰러짐」으로 보고 걸렀다(사용자 2026-10-05).
+            // 쓰러졌는지는 혼수(skulled) 상태로만 본다 — 그때는 Emergency 가 깨운다.
+            OwnerHurt: ownerNear && sight.StatusesOf(sight.Master)?.Contains("skulled") != true
+                       && (_fillingOwner = ownerHealth < settings.HealOwnerPercent || (_fillingOwner && ownerHealth < 100)),
             SelfHurt: Reckon.HealthPercent(sight.Vitals) < settings.HealSelfPercent,
             empowered,
             Mana: sight.Vitals?.Mana ?? 0,

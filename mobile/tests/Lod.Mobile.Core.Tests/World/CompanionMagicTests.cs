@@ -76,8 +76,11 @@ public sealed class CompanionMagicTests
         // 깨우기 사이 기다림은 아니다).
         Assert.NotEqual("주인 깨우기 사이", brain.Next(Fallen(100.5), Defaults).Why);
 
-        // 1초 뒤 — 다시 깨우기 전에 회복이 먼저(쿠로, 칸 1). 3초가 지나면 다시 깨운다.
-        Assert.Equal((CompanionAct.Cast, 1, Owner), (brain.Next(Fallen(101.1), Defaults) is var heal ? (heal.Act, heal.Slot, heal.Target) : default));
+        // 깨워졌다(서버가 체력바 1% 를 보낸다) — 곧장 회복(쿠로, 칸 1).
+        CompanionSight Woken = Sight([], 101.1) with { HealthOf = _ => 1, StatusesOf = _ => [] };
+        Assert.Equal((CompanionAct.Cast, 1, Owner), (brain.Next(Woken, Defaults) is var heal ? (heal.Act, heal.Slot, heal.Target) : default));
+
+        // 아직 혼수면 3초 뒤 다시 깨운다.
         Assert.Equal(CompanionAct.WakeOwner, brain.Next(Fallen(103.2), Defaults).Act);
     }
 
@@ -92,6 +95,15 @@ public sealed class CompanionMagicTests
         Assert.Equal((CompanionAct.Cast, 1), (brain.Next(At(102, 85), Defaults) is var more ? (more.Act, more.Slot) : default)); // 기준 위지만 아직 덜 참
         Assert.NotEqual(1, brain.Next(At(104, 100), Defaults).Slot);                    // 가득 — 멈춘다
         Assert.NotEqual(1, new CompanionBrain().Next(At(100, 85), Defaults).Slot);      // 시작한 적 없으면 85 에선 안 한다
+    }
+
+    [Fact]
+    public void An_owner_at_one_health_reads_zero_percent_and_is_still_healed_first()
+    {
+        // 다라밀공 뒤 체력 1 → 체력바 0%. 혼수가 아니면 버프·저주보다 회복이 먼저.
+        CompanionSight Drained = Sight([Struck()]) with { HealthOf = _ => 0, StatusesOf = _ => [] };
+
+        Assert.Equal((CompanionAct.Cast, 1, Owner), (new CompanionBrain().Next(Drained, Defaults) is var step ? (step.Act, step.Slot, step.Target) : default));
     }
 
     [Fact]
