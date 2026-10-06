@@ -52,6 +52,9 @@ public sealed class IsolatedHadesServer : IDisposable
     /// <summary>The object server's port for this run. Its own, so two runs do not collide.</summary>
     public int ObjectPort { get; }
 
+    /// <summary>The running server process, for load measurements (CPU time, memory).</summary>
+    public Process? Process => _process;
+
     /// <param name="startTogether">
     /// Where a new character wakes up, when the test needs somewhere other than the shipped safe house —
     /// standing next to the thing under test beats walking there through ported warps.

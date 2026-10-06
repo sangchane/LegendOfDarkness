@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Lod.EcoBots</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Lod.Mobile.Core/Lod.Mobile.Core.csproj" />
+    <!-- 기록(BotLog)·맵 벽(MapWalls)·예외 글은 동료 봇 것, 사냥 한 틱(HuntProxyRunner)은 대신 사냥 것을 그대로 쓴다. -->
+    <ProjectReference Include="../Lod.CompanionBot/Lod.CompanionBot.csproj" />
+    <ProjectReference Include="../Lod.HuntProxy/Lod.HuntProxy.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="eco-bots.example.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

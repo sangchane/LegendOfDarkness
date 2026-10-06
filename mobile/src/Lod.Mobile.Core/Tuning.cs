@@ -23,4 +23,43 @@ public static class Tuning
     {
         [5] = [(Stat.Con, 65), (Stat.Str, 77), (Stat.Int, 43), (Stat.Wis, 36)],
     };
+
+    /// <summary>
+    /// 차례형 레벨업 점수 계획 — 앞에서부터 목표에 못 미친 첫 능력치에 한 점(<see cref="StatPlan" />, 사용자 2026-10-06).
+    /// 전사: 콘 64 까지, 나머지는 힘(서버 상한 255). 도적: 위즈 23 → 콘 41 → 힘 78 → 덱스 49 → 인트 20(시작 3에서 딱 196점 = 98레벨 × 2).
+    /// 여기 있는 직업은 <see cref="StatBuilds" /> 보다 먼저 본다.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<int, (Stat Which, int Want)[]> StatOrders = new Dictionary<int, (Stat Which, int Want)[]>
+    {
+        [1] = [(Stat.Con, 64), (Stat.Str, 255)],
+        [2] = [(Stat.Wis, 23), (Stat.Con, 41), (Stat.Str, 78), (Stat.Dex, 49), (Stat.Int, 20)],
+    };
+
+    // 생태계 봇(설계 autopilot/eco-bots/03-prd.md 상수 표) — 시작값, 봇 사건 기록을 보고 손본다.
+
+    /// <summary>사냥 중 체력 물약이 이만큼 밑으로 떨어지면 마을로.</summary>
+    public const int EcoPotionLow = 5;
+
+    /// <summary>마을에서 체력 물약을 이만큼까지 채운다.</summary>
+    public const int EcoPotionStock = 30;
+
+    /// <summary>가방 빈칸이 이만큼 밑이면 마을로(가방 150칸 — 서버 <c>Inventory.LENGTH</c>).</summary>
+    public const int EcoBagLow = 5;
+
+    public const int PackSlots = 150;
+
+    /// <summary>사냥을 이만큼 했으면 마을에 한 번 들른다(장비 바꾸기·팔기).</summary>
+    public static readonly TimeSpan EcoTownEvery = TimeSpan.FromMinutes(60);
+
+    /// <summary>사람이 같은 맵에 이만큼 보이면 다른 사냥터로 비킨다.</summary>
+    public static readonly TimeSpan EcoYield = TimeSpan.FromSeconds(30);
+
+    /// <summary>이만큼 죽을 때마다 사냥터를 한 층 낮춘다.</summary>
+    public const int EcoDeathLoop = 3;
+
+    /// <summary>한 사냥터에 생태계 봇은 이만큼까지(실측 — 한 맵에 몰면 서버가 제곱으로 무거워진다).</summary>
+    public const int EcoBotsPerMap = 4;
+
+    /// <summary>마을에서 체력이 이 % 밑이면 쉬었다 나간다 — 사냥 중 물약을 마시는 줄(50%)과 같게.</summary>
+    public const int EcoRestPercent = 50;
 }

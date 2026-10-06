@@ -72,6 +72,7 @@ data/skill-spell-2023/graph/
 !.agents/skills/ui/
 !.agents/skills/setup/
 mobile/bots/Lod.CompanionBot/companion-bot.json
+mobile/bots/Lod.EcoBots/eco-bots.json
 
 # 폰에서 가져온 앱 기록(scripts/ops/ios-build.sh logs) — 계정 이름이 들어 있다
 out/ios-logs/

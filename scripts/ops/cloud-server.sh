@@ -1,5 +1,5 @@
 #!/bin/bash
-# 클라우드(Oracle Cloud 무료 ARM · Ubuntu) 에서 도는 서버를 맥에서 다룬다.
+# 클라우드(Oracle Cloud · Ubuntu · x86_64 AMD EPYC 2 vCPU · 11GB, 2026-10-06 nproc 확인) 에서 도는 서버를 맥에서 다룬다.
 #
 #   scripts/ops/cloud-server.sh setup     처음 한 번: .NET 9 · 방화벽 · 자동 실행 · 날마다 백업, 그리고 캐릭터까지 올린다
 #   scripts/ops/cloud-server.sh deploy    서버 실행 파일과 자료만 다시 올리고 서버를 새로 띄운다(캐릭터는 클라우드 것을 둔다)
@@ -11,6 +11,10 @@
 #   scripts/ops/cloud-server.sh bot-logs [줄수] [봇번호]   동료 봇 기록(줄마다 [봇 이름]) — 파일 기록은 클라우드 ~/lod-bot/logs/
 #   scripts/ops/cloud-server.sh proxy       대신 사냥 대리 프로그램만 올리고 다시 켠다(게임 서버는 그대로)
 #   scripts/ops/cloud-server.sh proxy-logs [줄수]   대신 사냥 기록 — 파일 기록은 클라우드 ~/lod-proxy/logs/
+#   scripts/ops/cloud-server.sh eco-config  생태계 봇 설정 파일을 클라우드에 만든다(비밀번호를 여기서 묻고 클라우드에만, 이미 있으면 그대로)
+#   scripts/ops/cloud-server.sh eco         생태계 봇 프로그램만 올리고 다시 켠다(게임 서버는 그대로)
+#   scripts/ops/cloud-server.sh eco-logs [줄수]     생태계 봇 기록(5분마다 요약) — 사건 기록(머신러닝)은 클라우드 ~/lod-eco/eco/
+#   scripts/ops/cloud-server.sh ml-pull     학습용 사본(~/lod-ml — 활동 기록 가명·IP 뺌 + 봇 사건)을 맥 ~/LOD-backups/ml 로 받는다
 #
 # 동료 봇(성직자, mobile/bots/Lod.CompanionBot)은 서버와 같은 기계에서 봇마다 lod-bot@1~5 로 돈다(2026-09-27 — 다섯까지).
 # N 번째 봇 = 서버 설정 CompanionBots 의 N 번째 이름, 설정은 클라우드의 ~/lod-bot/companion-bot-N.json(비밀번호, 여기에만) —
@@ -30,6 +34,9 @@ BOT_REMOTE=/home/ubuntu/lod-bot  # 동료 봇: app/(프로그램) · world/(맵 
 BOT_PROJECT="$ROOT/mobile/bots/Lod.CompanionBot"
 PROXY_REMOTE=/home/ubuntu/lod-proxy  # 대신 사냥: app/ · jobs/(서버가 쓰는 작업 파일, 0700) · hunt-proxy.json(비밀 없음) · logs/
 PROXY_PROJECT="$ROOT/mobile/bots/Lod.HuntProxy"
+ECO_REMOTE=/home/ubuntu/lod-eco      # 생태계 봇: app/ · eco-bots.json(비밀번호, 여기에만) · eco/(사건 기록) · logs/ · ml/(내보내기 스크립트)
+ECO_PROJECT="$ROOT/mobile/bots/Lod.EcoBots"
+ML_REMOTE=/home/ubuntu/lod-ml        # 학습용 사본: activity/ · eco/ · salt(비밀 소금, 여기에만)
 SSH=(ssh -i "$KEY" -o StrictHostKeyChecking=accept-new "$HOST")
 
 remote() { "${SSH[@]}" "$@"; }
@@ -194,6 +201,76 @@ proxy_restart() {
     remote "sudo systemctl restart lod-proxy"
 }
 
+# 생태계 봇 — 프로그램 하나가 봇 여럿(설계 autopilot/eco-bots/). 맵 벽·guide.txt·eco-grounds.txt·class-kit.txt 는 봇의 world/ 를 같이 쓴다(bot_upload).
+# 설정 파일(eco-bots.json)이 없으면 서비스가 뜨지 않는다 — eco-config. 날마다 4시 30분 학습용 사본을 만든다(cron).
+eco_upload() {
+    local out
+    out="$(mktemp -d)"
+    DOTNET_ROOT="$ROOT/.tools/dotnet-9.0.317" "$ROOT/.tools/dotnet-9.0.317/dotnet" publish "$ECO_PROJECT" \
+        -c Release -o "$out" -p:UseAppHost=false --nologo -v quiet >/dev/null
+
+    remote "mkdir -p $ECO_REMOTE/app $ECO_REMOTE/ml $ML_REMOTE && chmod 700 $ML_REMOTE"
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'eco-bots.json' "$out/" "$HOST:$ECO_REMOTE/app/"
+    rsync -az --partial --timeout=60 -e "ssh -i $KEY" "$ROOT/scripts/ml/export-activity.py" "$HOST:$ECO_REMOTE/ml/"
+    rm -rf "$out"
+
+    remote 'bash -s' <<'SH'
+set -euo pipefail
+[ -f /home/ubuntu/lod-ml/salt ] || (umask 077 && head -c 32 /dev/urandom | base64 > /home/ubuntu/lod-ml/salt)
+sudo tee /etc/systemd/system/lod-eco.service >/dev/null <<UNIT
+[Unit]
+Description=LOD eco bots (생태계 봇)
+After=lod.service
+# 비밀번호가 든 설정 파일이 있어야 뜬다 — scripts/ops/cloud-server.sh eco-config
+ConditionPathExists=/home/ubuntu/lod-eco/eco-bots.json
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/lod-eco
+Environment=DOTNET_ROOT=/opt/dotnet
+ExecStart=/opt/dotnet/dotnet /home/ubuntu/lod-eco/app/Lod.EcoBots.dll /home/ubuntu/lod-eco/eco-bots.json
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+sudo systemctl daemon-reload
+sudo systemctl enable lod-eco >/dev/null 2>&1
+( { crontab -l 2>/dev/null || true; } | { grep -v lod-ml || true; }; echo '30 4 * * * python3 /home/ubuntu/lod-eco/ml/export-activity.py --activity /home/ubuntu/lod/Staging/net9.0/activity --eco /home/ubuntu/lod-eco/eco --out /home/ubuntu/lod-ml --salt /home/ubuntu/lod-ml/salt --config /home/ubuntu/lod/Staging/net9.0/LoruleConfig.json >/dev/null # lod-ml' ) | crontab -
+SH
+}
+
+eco_restart() {
+    remote "sudo systemctl restart lod-eco"
+}
+
+# 생태계 봇 설정 — 이름·직업은 서버 설정 EcoBots(이름 앞: 전사봇 1 · 도적봇 2 · 무도봇 5), 비밀번호는 맥 ~/LOD-backups/eco-bot-password.txt
+# (LOD_ECO_PASSWORD_FILE 로 바꿈)에서 읽고 없으면 한 번 묻는다. 저장소에는 남기지 않는다. 이미 있으면 그대로 둔다.
+eco_config() {
+    local file="${LOD_ECO_PASSWORD_FILE:-$HOME/LOD-backups/eco-bot-password.txt}" password
+    if [ -f "$file" ]; then
+        password="$(tr -d '\r\n' < "$file")"
+    else
+        read -r -s -p "생태계 봇 계정 비밀번호(모든 봇 같게): " password
+        echo
+    fi
+
+    ECO_PASSWORD="$password" python3 - "$ROOT/scripts/ops/server-config/LoruleConfig.template.json" <<'PY' | remote "mkdir -p $ECO_REMOTE && cd $ECO_REMOTE && umask 077 && if [ -f eco-bots.json ]; then cat >/dev/null; echo '생태계 봇 설정은 이미 있습니다 — 그대로 둡니다.'; else cat > eco-bots.json; echo '생태계 봇 설정을 적었습니다.'; fi"
+import json, os, re, sys
+text = open(sys.argv[1], encoding="utf-8").read()
+names = re.findall(r'"([^"]+)"', re.search(r'"EcoBots"\s*:\s*\[([^\]]*)\]', text).group(1))
+path = {"전사봇": 1, "도적봇": 2, "무도봇": 5}
+print(json.dumps({
+    "Host": "127.0.0.1", "LoginPort": 2610, "MapFolder": "/home/ubuntu/lod-bot/world", "Password": os.environ["ECO_PASSWORD"], "MaxOnline": 30,
+    "Bots": [{"Name": n, "Path": path[n[:3]]} for n in names],
+}, ensure_ascii=False, indent=2))
+PY
+    bot_upload
+    eco_upload
+    eco_restart
+}
+
 setup() {
     remote 'bash -s' <<'SH'
 set -euo pipefail
@@ -270,6 +347,7 @@ restart() {
             # 서버가 새로 뜨면 봇도 다시 붙게 한다(설정 파일이 없으면 systemd 가 조건으로 건너뛴다).
             bot_restart || true
             proxy_restart || true
+            eco_restart || true
             return
         fi
         sleep 1
@@ -299,16 +377,20 @@ backup() {
 
 case "${1:-status}" in
     setup) setup ;;
-    deploy) upload; bot_upload; proxy_upload; restart ;;
+    deploy) upload; bot_upload; proxy_upload; eco_upload; restart ;;
     restart) restart ;;
     bot) bot_upload; bot_restart ;;
     proxy) bot_upload; proxy_upload; proxy_restart ;;
+    eco) bot_upload; eco_upload; eco_restart ;;
+    eco-config) eco_config ;;
+    eco-logs) remote "journalctl -u lod-eco -n ${2:-40} --no-pager" ;;
+    ml-pull) mkdir -p "$HOME/LOD-backups/ml"; rsync -az --timeout=60 -e "ssh -i $KEY" --exclude salt "$HOST:$ML_REMOTE/" "$HOME/LOD-backups/ml/"; echo "받았습니다 — $HOME/LOD-backups/ml" ;;
     proxy-logs) remote "journalctl -u lod-proxy -n ${2:-40} --no-pager" ;;
-    status) remote "systemctl is-active lod; $BOT_EACH; for b in \"\${bots[@]}\"; do echo \"\$b: \$(systemctl is-active \$b)\"; done; echo \"lod-proxy: \$(systemctl is-active lod-proxy)\"; ss -ltn | grep -E ':(2610|2615) '" ;;
+    status) remote "systemctl is-active lod; $BOT_EACH; for b in \"\${bots[@]}\"; do echo \"\$b: \$(systemctl is-active \$b)\"; done; echo \"lod-proxy: \$(systemctl is-active lod-proxy)\"; echo \"lod-eco: \$(systemctl is-active lod-eco)\"; ps -C dotnet -o pcpu=,rss=,args= | sed 's|/opt/dotnet/dotnet ||'; ss -ltn | grep -E ':(2610|2615) '" ;;
     logs) logs "${2:-40}" ;;
     backup) backup ;;
     app) app ;;
     bot-config) bot_config ;;
     bot-logs) bot_logs "${2:-40}" "${3:-}" ;;
-    *) echo "쓸 수 있는 것: setup deploy restart status logs backup app bot-config bot-logs"; exit 2 ;;
+    *) echo "쓸 수 있는 것: setup deploy restart status logs backup app bot-config bot-logs proxy proxy-logs eco eco-config eco-logs ml-pull"; exit 2 ;;
 esac

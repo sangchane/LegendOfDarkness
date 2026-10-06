@@ -13,11 +13,17 @@ public sealed class MapWalls(string folder)
 
     public Func<Tile, bool> For(int mapId)
     {
-        if (!_read.TryGetValue(mapId, out MapLayout? layout))
+        MapLayout? layout;
+
+        // 생태계 봇은 봇 여럿이 이것 하나를 함께 쓴다 — Dictionary 를 여러 스레드가 동시에 고치면 망가진다.
+        lock (_read)
         {
-            string path = Path.Combine(folder, $"map{mapId}.txt");
-            layout = folder.Length > 0 && File.Exists(path) ? MapLayout.Read(File.ReadAllText(path)) : null;
-            _read[mapId] = layout;
+            if (!_read.TryGetValue(mapId, out layout))
+            {
+                string path = Path.Combine(folder, $"map{mapId}.txt");
+                layout = folder.Length > 0 && File.Exists(path) ? MapLayout.Read(File.ReadAllText(path)) : null;
+                _read[mapId] = layout;
+            }
         }
 
         return layout is null ? _ => false : layout.Blocks;

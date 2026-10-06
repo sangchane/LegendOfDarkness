@@ -40,6 +40,7 @@
     <ProjectReference Include="../../mobile/bots/Lod.CompanionBot/Lod.CompanionBot.csproj" />
     <!-- 대신 사냥 대리 프로그램(ProxyHost·HuntProxyRunner)을 격리 서버에 대고 그대로 돌린다. -->
     <ProjectReference Include="../../mobile/bots/Lod.HuntProxy/Lod.HuntProxy.csproj" />
+    <ProjectReference Include="../../mobile/bots/Lod.EcoBots/Lod.EcoBots.csproj" />
   </ItemGroup>
 
   <ItemGroup>

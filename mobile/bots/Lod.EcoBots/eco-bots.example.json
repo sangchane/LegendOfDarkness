@@ -1,0 +1,12 @@
+{
+  "Host": "127.0.0.1",
+  "LoginPort": 2610,
+  "MapFolder": "/home/ubuntu/lod-bot/world",
+  "Password": "",
+  "MaxOnline": 30,
+  "Bots": [
+    { "Name": "전사봇일", "Path": 1 },
+    { "Name": "도적봇일", "Path": 2 },
+    { "Name": "무도봇일", "Path": 5 }
+  ]
+}

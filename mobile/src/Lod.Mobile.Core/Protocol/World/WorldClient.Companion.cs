@@ -78,6 +78,13 @@ public sealed partial class WorldClient
     public Task ArmProxyAsync(Automation.ProxyOrders? orders, CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, Automation.ProxyOrders.Packet(orders), cancellationToken);
 
+    /// <summary>
+    /// 생태계 봇 순간이동(0xF1 8) — 맵(2, 큰 끝) · x · y. 서버는 생태계 봇 계정이 같은 기계에서 보낸 것만 듣는다
+    /// (설계 <c>autopilot/eco-bots/05-api-contract.md</c> E1).
+    /// </summary>
+    public Task EcoMoveAsync(int map, int x, int y, CancellationToken cancellationToken) =>
+        Send(ClientOpcode.Companion, [8, (byte)(map >> 8), (byte)map, (byte)x, (byte)y], cancellationToken);
+
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, World.Companion.Dismiss(), cancellationToken);

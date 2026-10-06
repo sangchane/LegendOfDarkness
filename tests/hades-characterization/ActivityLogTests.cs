@@ -74,7 +74,7 @@ public sealed class ActivityLogTests
         await Waiting.Until(() => !client.Pack.Any(item => item.Name == "도복"), "교환 제안에 아이템을 넣지 못했습니다.", deadline.Token);
         await Exchange(3, [0, 0, 0, 100]);
         string folder = Path.Combine(server.RunRoot, "activity");
-        string Text() => string.Join("\n", Directory.GetFiles(folder, "*.jsonl").SelectMany(File.ReadAllLines));
+        string Text() => string.Join("\n", Directory.GetFiles(folder, "*.jsonl").SelectMany(Shared));
         await Waiting.Until(() => Text().Contains("\"delta\":-100"), "교환 금화 제안 원장이 없습니다.", deadline.Token);
         await client.LogOutAsync(deadline.Token);
         await Waiting.Until(() => Text().Contains("\"kind\":\"logout\",\"player\":\"refund\""), "명시적 종료 기록이 없습니다.", deadline.Token);
@@ -130,7 +130,7 @@ public sealed class ActivityLogTests
         using WorldClient client = new(session);
         _ = client.PumpAsync(deadline.Token);
         string folder = Path.Combine(server.RunRoot, "activity");
-        string Text() => Directory.Exists(folder) ? string.Join("\n", Directory.GetFiles(folder, "*.jsonl").SelectMany(File.ReadAllLines)) : "";
+        string Text() => Directory.Exists(folder) ? string.Join("\n", Directory.GetFiles(folder, "*.jsonl").SelectMany(Shared)) : "";
         await Waiting.Until(() => Text().Contains("\"kind\":\"login\""), "접속 기록이 없습니다.", deadline.Token);
         await client.SendActivityAsync("{\"kind\":\"app_device\",\"meta\":{\"platform\":\"iOS\",\"model\":\"iPhone16,1\",\"install\":\"5de69df2-14f3-43d3-8998-5cd711c0bdf1\",\"beforeLogin\":true}}", deadline.Token);
         await client.SendActivityAsync("{\"kind\":\"app_error\",\"meta\":{\"password\":\"forbidden-secret\"}}", deadline.Token);
@@ -158,7 +158,10 @@ public sealed class ActivityLogTests
         var rows = Text().Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(line => JsonDocument.Parse(line)).ToArray();
         try
         {
-            Assert.Single(rows, row => row.RootElement.GetProperty("kind").GetString() == "login");
+            var login = Assert.Single(rows, row => row.RootElement.GetProperty("kind").GetString() == "login");
+            // 머신러닝 재료(설계 autopilot/eco-bots FR-013) — detail 문장 말고 숫자 칸으로도.
+            foreach (string number in (string[])["map", "x", "y", "level", "expTotal", "goldNow"])
+                Assert.Equal(JsonValueKind.Number, login.RootElement.GetProperty(number).ValueKind);
             Assert.Single(rows, row => row.RootElement.GetProperty("kind").GetString() == "logout");
             var action = Assert.Single(rows, row => row.RootElement.GetProperty("kind").GetString() == "request_skill");
             Assert.Equal(2, action.RootElement.GetProperty("count").GetInt32());
@@ -191,5 +194,13 @@ public sealed class ActivityLogTests
             Assert.Contains(rows, row => row.RootElement.GetProperty("ip").GetString() == "127.0.0.1");
         }
         finally { foreach (var row in rows) row.Dispose(); }
+    }
+
+    /// <summary>서버가 쓰는 중인 활동 기록을 읽는다 — 윈도우는 File.ReadAllLines 가 쓰는 중인 파일을 못 연다(맥은 열린다).</summary>
+    private static string[] Shared(string path)
+    {
+        using FileStream read = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using StreamReader text = new(read);
+        return text.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries);
     }
 }

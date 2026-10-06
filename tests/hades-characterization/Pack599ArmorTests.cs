@@ -165,13 +165,11 @@ public sealed class Pack599ArmorTests : IDisposable
     private const int DurabilityBlow = 5;
 
     /// <summary>
-    /// `monk` 이 우드랜드에서 사냥하다 겪은 일(2026-09-23) — 내구도가 0 이 된 도복이 없어지지 않고 소지품으로
-    /// 돌아갔다(`EquipmentManager.DecreaseDurability` → `RemoveFromExisting`, returnit 기본값 true). 도복을 입은
-    /// 채 내구도 1 로 두고 정의 한 마리에게 한 대 맞혀, 부서진 도복이 장비 칸에도 소지품에도 남지 않고 무게도
-    /// 함께 빠지며 부서짐 알림이 오는지 본다. 고치기 전에는 소지품에 도복이 남아 실패한다.
+    /// 내구도는 꺼져 있다(사용자 2026-10-06 — 사람·봇 모두). 내구도 1 로 입은 도복이 괴물에게 몇 대 맞아도 그대로 입혀져 있고
+    /// 부서짐 알림도 없다. 전에는 한 대에 내구도가 0 이 되어 부서졌다(`EquipmentManager.DecreaseDurability`).
     /// </summary>
     [Fact]
-    public async Task A_uniform_that_breaks_while_worn_disappears_instead_of_returning_to_the_pack()
+    public async Task A_worn_uniform_never_wears_out_because_durability_is_off()
     {
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
             startTogether: (DurabilityWoodland, DurabilityStart.X, DurabilityStart.Y));
@@ -191,22 +189,18 @@ public sealed class Pack599ArmorTests : IDisposable
 
         WorldClient world = await Enter(session);
 
-        await Until(() => world.Self?.Wearing?.Armor == 3 && world.Vitals is { Weight: > 0 },
-            $"도복을 입고 무게가 잡힌 채로 들어오지 못했습니다. 갑옷 {world.Self?.Wearing?.Armor} · 무게 {world.Vitals?.Weight}");
-        int weightBefore = world.Vitals!.Weight;
-        int said = world.SaidCount;
+        await Until(() => world.Self?.Wearing?.Armor == 3 && world.Vitals is { Health: > 0 },
+            $"도복을 입은 채로 들어오지 못했습니다. 갑옷 {world.Self?.Wearing?.Armor}");
+        int full = world.Vitals!.Health;
 
-        await Until(() => world.Self?.Wearing?.Armor == 0,
-            $"도복이 부서져도 갑옷 자리가 그대로입니다. 서버가 한 말: {world.Said}");
-
+        // 서버는 두 대에 한 번 내구도를 깎았다(DamageCounter % 2) — 네 대 넘게 맞을 때까지 본다.
+        await Until(() => world.Vitals is { } now && full - now.Health >= DurabilityBlow * 4,
+            $"정의에게 충분히 맞지 않았습니다. 체력 {full} → {world.Vitals?.Health}");
         await Task.Delay(500, _deadline.Token);
 
-        Assert.DoesNotContain(world.Worn, worn => worn.Slot == 2);
-        Assert.DoesNotContain(world.Pack, carried => carried.Name == Uniform);
-        Assert.True(world.Vitals!.Weight < weightBefore,
-            $"부서진 도복의 무게가 빠지지 않았습니다. 전 {weightBefore} · 지금 {world.Vitals.Weight}");
-        Assert.True(world.SaidCount > said && world.Said.Contains("부서졌습니다"),
-            $"부서짐 알림이 오지 않았습니다. 서버가 한 말: {world.Said}");
+        Assert.Equal(3, world.Self!.Wearing!.Armor);
+        Assert.Contains(world.Worn, worn => worn.Slot == 2);
+        Assert.DoesNotContain("부서졌습니다", world.Said);
     }
 
     /// <summary>내구도 시험용 — 도복을 갑옷 자리(2)에 입힌 채로 등장시킨다. 소지품에는 넣지 않는다.</summary>
