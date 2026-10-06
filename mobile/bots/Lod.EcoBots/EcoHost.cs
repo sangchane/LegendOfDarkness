@@ -126,7 +126,8 @@ public sealed class EcoEvents(string folder)
                     Tidy(day);
                 }
 
-                File.AppendAllText(Path.Combine(folder, day + ".jsonl"), line + "\n", Encoding.UTF8);
+                // BOM 없이 — 있으면 첫 줄이 JSON 으로 안 읽힌다.
+                File.AppendAllText(Path.Combine(folder, day + ".jsonl"), line + "\n", new UTF8Encoding(false));
             }
             catch (Exception failed) when (failed is IOException or UnauthorizedAccessException)
             {
