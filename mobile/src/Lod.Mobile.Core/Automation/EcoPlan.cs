@@ -21,7 +21,8 @@ public static class EcoGrounds
 
     /// <summary>
     /// 적정 레벨 ≤ 내 레벨 중 가장 높은 층(내 레벨이 가장 낮은 층보다 낮으면 그 층, <paramref name="lower" /> 만큼 아래 층, 맨 아래 밑으로는 안 감), 그 층에서 봇이 가장 적은 맵.
-    /// 봇이 <paramref name="perMap" /> 인 맵과 <paramref name="avoid" /> 는 빼고, 그 층이 다 차면 아래 층. 없으면 null.
+    /// 봇이 <paramref name="perMap" /> 인 맵과 <paramref name="avoid" /> 는 빼고, 그 층이 다 차면 아래 층.
+    /// 갈 수 있는 층이 다 차면(새 봇이 한꺼번에 첫 층에 몰릴 때) 제 층에서 봇이 가장 적은 맵으로 넘친다 — 마을에서 놀지 않게. 사냥터가 없으면 null.
     /// </summary>
     public static EcoGround? Pick(
         IReadOnlyList<EcoGround> grounds, int level, Func<int, int> botsOn, int perMap, IReadOnlyCollection<int> avoid, int lower = 0)
@@ -30,12 +31,19 @@ public static class EcoGrounds
         int reach = grounds.Count == 0 ? level : Math.Max(level, grounds.Min(one => one.Level));
         int[] tiers = [.. grounds.Where(one => one.Level <= reach).Select(one => one.Level).Distinct().OrderByDescending(tier => tier)];
 
-        return tiers.Skip(Math.Min(lower, Math.Max(0, tiers.Length - 1)))
+        int[] open = [.. tiers.Skip(Math.Min(lower, Math.Max(0, tiers.Length - 1)))];
+
+        return open
             .Select(tier => grounds
                 .Where(one => one.Level == tier && !avoid.Contains(one.Map) && botsOn(one.Map) < perMap)
                 .OrderBy(one => botsOn(one.Map))
                 .FirstOrDefault())
-            .FirstOrDefault(found => found is not null);
+            .FirstOrDefault(found => found is not null)
+            ?? grounds
+                .Where(one => open.Length > 0 && one.Level == open[0])
+                .OrderBy(one => avoid.Contains(one.Map))
+                .ThenBy(one => botsOn(one.Map))
+                .FirstOrDefault();
     }
 }
 

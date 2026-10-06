@@ -34,7 +34,11 @@ public sealed class EcoTests
     {
         Assert.Equal(20022, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [], lower: 1)!.Map);
         Assert.Equal(1, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [], lower: 9)!.Level);
-        Assert.Null(EcoGrounds.Pick(Grounds, 30, _ => 4, 4, []));
+        // 갈 수 있는 층이 다 차면 제 층에서 봇이 가장 적은 맵으로 넘친다(새 봇 30개가 첫 층 16자리에 몰려도 마을에서 놀지 않게).
+        Assert.Equal(20264, EcoGrounds.Pick(Grounds, 30, map => map == 20263 ? 6 : 5, 4, [])!.Map);
+        // 피할 맵(사람 있음)은 넘칠 때도 뒤로.
+        Assert.Equal(20015, EcoGrounds.Pick(Grounds, 1, map => map == 20015 ? 5 : 4, 4, [20016])!.Map);
+        Assert.Null(EcoGrounds.Pick([], 30, _ => 0, 4, []));
         // 가장 낮은 사냥터보다 낮은 레벨(새 캐릭터)은 가장 낮은 층으로.
         Assert.Equal(1, EcoGrounds.Pick(Grounds, 0, _ => 0, 4, [])!.Level);
     }
