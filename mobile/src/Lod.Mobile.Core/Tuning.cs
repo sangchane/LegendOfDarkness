@@ -62,4 +62,12 @@ public static class Tuning
 
     /// <summary>마을에서 체력이 이 % 밑이면 쉬었다 나간다 — 사냥 중 물약을 마시는 줄(50%)과 같게.</summary>
     public const int EcoRestPercent = 50;
+
+    /// <summary>
+    /// 이 레벨부터 성직자와 파티로 사냥한다(결정 19). 배포 기록(10-06~07): 한 마리 잡는 시간이 12레벨부터 늘고 첫 죽음이 14레벨 — 기록이 쌓이면 고친다.
+    /// </summary>
+    public const int EcoPartyLevel = 11;
+
+    /// <summary>파티 하나의 싸우는 봇 수(성직자 하나를 더해 넷).</summary>
+    public const int EcoPartyFighters = 3;
 }

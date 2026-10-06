@@ -1,6 +1,11 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[현재/2026-10-07] 생태계 봇 그룹 사냥(⑦, 결정 19·20) — 등급 M · `dev:build` · 단계: 구현·검증·리뷰 반영·커밋 끝, 클라우드 배포 차례.** SPEC `autopilot/eco-bots/party-SPEC.md`.
+  만든 것: 알맹이 `EcoParties.Form`(성직자 1 + 파티 레벨 11 이상 싸우는 봇 3) · `CompanionSight.Mates`(파티원 회복·파티 회복·해제) · `CompanionRunner` 주인/파티원 밖에서 받기 · `EcoHost.Match`(10초마다 짓기, 끊기면 바로 풀기) · `EcoRunner`(파티원은 파티장 사냥 중심으로·옮기면 따라감, 파티장이 12칸 안에서 0x2E 청, 성직자는 사냥 중인 살아 있는 파티원 곁에서 돌봄) · 서버: 그룹 경험치 같은 맵 모두(원작 0x41a229)·받은 이에게 능력치 전부 · 서버 설정 사제봇1~10 · `eco-config` MaxOnline 40·사제봇 앞에.
+  시험: 알맹이 743 · 격리 서버 `EcoPartyTests` 통과(성직자 1→2레벨, 고치기 전 4번 실패) · 회귀 45 중 44(실패 1 은 원래 깨진 CompanionComa).
+  **다음**: ① 배포 — 서버 바뀜(`deploy`, 접속자 끊김 알림) → 클라우드 `~/lod-eco/eco-bots.json` 을 옆으로 옮기고 `eco-config`(사제봇·MaxOnline 40 반영) ② `eco-logs` 로 「파티 맺음」·성직자 레벨 확인 ③ 기록이 쌓이면 `EcoPartyLevel` 고치기. 남은 한계: 성직자 마력 물약·장비 안 삼, 파티원 혼수 깨우기 없음, 파티원 버프 없음.
+
 - **[현재/2026-10-06] 생태계 봇(서버 AI 캐릭터 1→99) — 등급 L · `dev:build` · 단계: 구현·검증·리뷰 반영·커밋·푸시 끝(d75a34a1 · 서버 882b520bf), **클라우드 배포 끝(10-06 22:35, 30개 · 첫 층 4맵에 7~8개씩 · 서버 0.72코어 · 죽음 0)**, 지켜보기 중.** 맥에서 받아 확인(10-06): 서버·EcoBots·앱 빌드 오류 0 · 알맹이 737 · 대신 사냥+EcoBot 서버 시험 8 통과. 설계·SPEC `autopilot/eco-bots/`(SPEC.md · tasks.md).
   사용자 결정: 전사·무도가·도적만(마법사 보류, 성직자는 동료 봇만) · 능력치 전사 CON64→STR, 도적 WIS23→CON41→STR78→DEX49→INT20(앱 자동 분배에도) · **내구도 끔(사람·봇 모두)** · 쌓이는 데이터는 머신러닝용으로.
   만든 것: 서버 `EcoBots`(루프백만 로그인·만들기·비번 변경, 0xF1 8 순간이동, [접속자] 길드 AI, 활동 숫자 칸) · `CheckObjectClients` 병목(한 맵 50봇 2.18→0.74코어) · 알맹이 `EcoLife`/`EcoPlan`/`StatPlan` · 봇 프로그램 `mobile/bots/Lod.EcoBots` · `eco-grounds.txt`(생성기 `scripts/gen/eco/`) · `scripts/ml/export-activity.py` · `cloud-server.sh eco|eco-config|eco-logs|ml-pull`.

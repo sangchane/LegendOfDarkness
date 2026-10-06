@@ -78,6 +78,9 @@ public sealed record CompanionSight
     /// <summary>주인이 선 칸 — 같은 맵에서 보일 때만. 안 보이면 null.</summary>
     public Tile? OwnerAt { get; init; }
 
+    /// <summary>주인 말고 함께 돌볼 파티원과 선 칸(보이는 이만) — 생태계 파티(결정 19). 동료 봇은 비어 있다.</summary>
+    public IReadOnlyDictionary<uint, Tile> Mates { get; init; } = new Dictionary<uint, Tile>();
+
     /// <summary>
     /// 남의 체력 %(0x13). 파티원 체력을 따로 알리는 패킷은 없다 — 맞을 때 곁의 사람에게 가는 막대(<c>Sprite.
     /// CompleteDamageApplication</c>)와, 회복 뒤 우리 서버가 더 보내는 막대(<c>ServerFormat5D.Healed</c>)로 안다.
@@ -337,6 +340,30 @@ public sealed class CompanionBrain
             }
         }
 
+        // 파티원 회복 — 주인 다음, 시야 안에서 기준 아래인 가장 낮은 이. 다친 이가 둘 넘으면(주인·나 포함) 파티 회복.
+        if (reading.CanCast && now - _lastHeal >= HealGap)
+        {
+            List<(uint Serial, int Health)> hurt =
+            [
+                .. sight.Mates.Where(mate => Reckon.Steps(mate.Value, sight.Standing) <= CastReach)
+                    .Select(mate => (mate.Key, sight.HealthOf(mate.Key) ?? 100))
+                    .Where(mate => mate.Item2 < settings.HealOwnerPercent)
+                    .OrderBy(mate => mate.Item2),
+            ];
+
+            if (hurt.Count > 0)
+            {
+                bool many = hurt.Count + (reading.OwnerHurt ? 1 : 0) + (reading.SelfHurt ? 1 : 0) >= 2;
+                CompanionStep? heal = (many ? Best(sight, settings, CompanionSpells.Kind.GroupHeal, hurt[0].Serial, reading.Empowered, reading.Mana, "파티 회복") : null)
+                                      ?? Best(sight, settings, CompanionSpells.Kind.Heal, hurt[0].Serial, reading.Empowered, reading.Mana, "파티원 회복");
+
+                if (heal is not null)
+                {
+                    return Cast(heal, now, heal: true);
+                }
+            }
+        }
+
         // 봇 체력 포션 — 회복 마법보다 먼저(마력을 아낀다).
         if (reading.CanDrink && Reckon.HealthPercent(sight.Vitals) < settings.PotionHealthPercent
             && Potion(sight.Pack, CompanionSpells.HealthRestore, Missing(sight.Vitals?.MaximumHealth, sight.Vitals?.Health)) is { } health)
@@ -491,10 +518,12 @@ public sealed class CompanionBrain
         return carried.FirstOrDefault(one => restore[one.Name] >= missing) ?? carried.LastOrDefault();
     }
 
-    /// <summary>해제 — 주인 먼저 그다음 자기. 서버가 알린 디버프 중 배운 해제 마법이 푸는 것이 있으면.</summary>
+    /// <summary>해제 — 주인 먼저 그다음 자기, 그다음 시야 안의 파티원. 서버가 알린 디버프 중 배운 해제 마법이 푸는 것이 있으면.</summary>
     private CompanionStep? Cure(CompanionSight sight, CompanionSettings settings, bool empowered, int mana, bool ownerNear)
     {
-        foreach (uint target in ownerNear ? new[] { sight.Master, sight.Me } : new[] { sight.Me })
+        IEnumerable<uint> mates = sight.Mates.Where(mate => Reckon.Steps(mate.Value, sight.Standing) <= CastReach).Select(mate => mate.Key);
+
+        foreach (uint target in (ownerNear ? new[] { sight.Master, sight.Me } : new[] { sight.Me }).Concat(mates))
         {
             if (sight.StatusesOf(target) is not { Count: > 0 } on)
             {

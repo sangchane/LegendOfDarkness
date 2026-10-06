@@ -1,15 +1,17 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using Lod.CompanionBot;
+using Lod.Mobile.Core;
 using Lod.Mobile.Core.Automation;
 using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Ui;
 
 namespace Lod.EcoBots;
 
-/// <summary>봇 하나 — 서버 설정 <c>EcoBots</c> 에 같은 이름이 있어야 한다. 직업 1 전사 · 2 도적 · 5 무도가, 성별 1 남 · 2 여.</summary>
+/// <summary>봇 하나 — 서버 설정 <c>EcoBots</c> 에 같은 이름이 있어야 한다. 직업 1 전사 · 2 도적 · 4 성직자(파티에서만) · 5 무도가, 성별 1 남 · 2 여.</summary>
 public sealed record EcoBotEntry(string Name, int Path, int Gender = 1);
 
 /// <summary>생태계 봇 프로그램 설정(<c>eco-bots.json</c>). 비밀번호는 이 파일에만(클라우드, 권한 600) — 모든 봇이 같다.</summary>
@@ -161,19 +163,75 @@ public sealed class EcoEvents(string folder)
 
 /// <summary>
 /// 생태계 봇 프로그램 — 봇마다 접속 하나(<see cref="EcoRunner" />)를 2초 간격으로 띄우고, 끊기면 5초~1분 간격으로 다시 들인다.
-/// 봇들이 어느 맵에 있는지 함께 세어 한 사냥터에 몰리지 않게 한다(<see cref="BotsOn" />). 5분마다 요약 한 줄.
+/// 봇들이 어느 맵에 있는지 함께 세어 한 사냥터에 몰리지 않게 한다(<see cref="BotsOn" />). 10초마다 파티를 짓고 풀며
+/// (<see cref="EcoParties" />, 결정 19), 5분마다 요약 한 줄.
 /// </summary>
 public sealed class EcoHost(EcoConfig config, EcoWorld world, EcoEvents events, Action<string> log)
 {
     public static readonly TimeSpan Stagger = TimeSpan.FromSeconds(2);
     public static readonly TimeSpan Summary = TimeSpan.FromMinutes(5);
+    public static readonly TimeSpan Matching = TimeSpan.FromSeconds(10);
 
     private readonly ConcurrentDictionary<string, EcoRunner> _running = new(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> _names = new(config.Bots.Select(bot => bot.Name), StringComparer.OrdinalIgnoreCase);
+    private readonly object _gate = new();
+    private readonly List<EcoParty> _parties = [];
 
     public IReadOnlyCollection<EcoRunner> Running => [.. _running.Values];
 
     public bool IsBot(string name) => _names.Contains(name);
+
+    /// <summary>접속 중인 봇.</summary>
+    public EcoRunner? Find(string name) => _running.GetValueOrDefault(name);
+
+    /// <summary>이 봇이 든 파티. 없으면 null.</summary>
+    public EcoParty? PartyOf(string name)
+    {
+        lock (_gate)
+        {
+            return _parties.FirstOrDefault(party => party.All.Contains(name, StringComparer.OrdinalIgnoreCase));
+        }
+    }
+
+    /// <summary>
+    /// 접속이 끝난 봇의 파티를 바로 푼다 — 10초 짓기 사이에 다시 들어오면 파티는 그대로인데 서버 그룹에서는 빠져, 파티장은 이미
+    /// 그룹원으로 알고(앱의 그룹원 표는 그룹이 끝나야 비워진다) 다시 청하지 않았다(리뷰 2026-10-07).
+    /// </summary>
+    private void Disband(string name)
+    {
+        lock (_gate)
+        {
+            foreach (EcoParty broken in _parties.Where(party => party.All.Contains(name, StringComparer.OrdinalIgnoreCase)).ToList())
+            {
+                _parties.Remove(broken);
+                log($"파티 풀림({name} 끊김): {string.Join(" ", broken.All)}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 파티 짓기·풀기 — 파티원이 하나라도 접속이 끊겼으면 푼다. 그다음 접속해 자리를 잡은(레벨을 아는) 봇 중 파티가 없는 것으로 짓는다.
+    /// </summary>
+    public void Match()
+    {
+        lock (_gate)
+        {
+            foreach (EcoParty broken in _parties.Where(party => party.All.Any(name => Find(name) is not { Level: > 0 })).ToList())
+            {
+                _parties.Remove(broken);
+                log($"파티 풀림: {string.Join(" ", broken.All)}");
+            }
+
+            HashSet<string> taken = new(_parties.SelectMany(party => party.All), StringComparer.OrdinalIgnoreCase);
+            EcoMember[] free = [.. _running.Values.Where(runner => runner.Level > 0 && !taken.Contains(runner.Name)).Select(runner => new EcoMember(runner.Name, runner.Path, runner.Level))];
+
+            foreach (EcoParty made in EcoParties.Form(free, Tuning.EcoPartyLevel))
+            {
+                _parties.Add(made);
+                log($"파티 맺음: {string.Join(" ", made.All)}");
+            }
+        }
+    }
 
     /// <summary>이 맵에 있는 (다른) 생태계 봇 수.</summary>
     public int BotsOn(int map, string except) =>
@@ -189,13 +247,25 @@ public sealed class EcoHost(EcoConfig config, EcoWorld world, EcoEvents events, 
             await Task.Delay(Stagger, token);
         }
 
+        Stopwatch clock = Stopwatch.StartNew();
+        TimeSpan nextSummary = Summary;
+
         while (!token.IsCancellationRequested)
         {
-            await Task.Delay(Summary, token);
+            await Task.Delay(Matching, token);
+            Match();
+
+            if (clock.Elapsed < nextSummary)
+            {
+                continue;
+            }
+
+            nextSummary = clock.Elapsed + Summary;
             EcoRunner[] now = [.. _running.Values];
             log($"요약: 접속 {now.Length}/{Math.Min(config.MaxOnline, config.Bots.Count)} · " +
                 string.Join(" ", now.GroupBy(runner => runner.Doing).Select(group => $"{group.Key} {group.Count()}")) +
-                (now.Length > 0 ? $" · 레벨 평균 {now.Average(runner => runner.Level):0.0} 최고 {now.Max(runner => runner.Level)}" : ""));
+                (now.Length > 0 ? $" · 레벨 평균 {now.Average(runner => runner.Level):0.0} 최고 {now.Max(runner => runner.Level)}" : "") +
+                $" · 파티 {_parties.Count}");
         }
 
         await Task.WhenAll(keeping);
@@ -226,6 +296,7 @@ public sealed class EcoHost(EcoConfig config, EcoWorld world, EcoEvents events, 
             finally
             {
                 _running.TryRemove(bot.Name, out _);
+                Disband(bot.Name);
             }
 
             await Task.Delay(wait, token);

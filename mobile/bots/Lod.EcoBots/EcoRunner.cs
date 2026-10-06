@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using Lod.CompanionBot;
 using Lod.HuntProxy;
 using Lod.Mobile.Core;
 using Lod.Mobile.Core.Art;
@@ -16,6 +17,8 @@ namespace Lod.EcoBots;
 /// 생태계 봇 하나의 접속 — 들어가(없으면 만들고) <see cref="EcoLife" /> 가 정한 일을 한다: 사냥은 대신 사냥과 같은 한 틱
 /// (<see cref="HuntProxyRunner" />), 옮기기는 봇 전용 순간이동(0xF1 8), 장보기는 가게를 차례로 돌며 입기·팔기·물약·장비.
 /// 일마다 사건 한 줄(<see cref="EcoLog" />). 접속이 끊기면 돌아온다(다시 들이기는 <see cref="EcoHost" />).
+/// 파티(<see cref="EcoParty" />, 결정 19)에 들면 싸우는 봇은 파티장의 사냥터로 가고 파티장이 서버 그룹을 청한다. 성직자는 사냥하지 않고
+/// 파티장 곁에서 동료 봇의 판단(<see cref="CompanionRunner" />, 주인 = 파티장)으로 파티원을 돌본다.
 /// </summary>
 public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, EcoHost host, EcoEvents events, Action<string> log)
 {
@@ -40,6 +43,10 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private TimeSpan _lastKill;
     private int _lastLevel;
     private bool _dead;
+    private EcoParty? _party;
+    private CompanionRunner? _priest;
+    private TimeSpan _nextAsk;
+    private string _following = string.Empty;
 
     public string Name => bot.Name;
 
@@ -47,6 +54,18 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     public int Map => _world?.State?.Map.Id ?? 0;
 
     public int Level => _world?.Vitals?.Level ?? 0;
+
+    public int Path => _world?.Path ?? bot.Path;
+
+    public uint Serial => _world?.Serial ?? 0;
+
+    public Tile Where => _world?.State?.Where ?? default;
+
+    /// <summary>사냥 중인 사냥터 맵 — 파티원이 따라온다. 사냥 중이 아니면 0.</summary>
+    public int HuntingOn => _life.Where == EcoPlace.Hunting && _hunt is { Stopped: null } ? _ground : 0;
+
+    /// <summary>사냥 중심(사냥터에 내린 칸) — 파티원은 파티장의 중심으로 간다.</summary>
+    public Tile Center { get; private set; }
 
     /// <summary>지금 하는 일 — 요약 한 줄에.</summary>
     public string Doing { get; private set; } = "접속";
@@ -107,10 +126,33 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         int map = _world.State!.Map.Id;
         Watch(now, vitals, map);
 
-        if (StatPlan.Next(_world.Path, vitals) is { } stat)
+        if ((Path == EcoParties.Priest ? EcoParties.PriestStat(vitals) : StatPlan.Next(_world.Path, vitals)) is { } stat)
         {
             await _world.RaiseAsync(stat, token);
         }
+
+        if (host.PartyOf(Name) is var party && !ReferenceEquals(party, _party))
+        {
+            await Regroup(party, token);
+        }
+
+        // 제 파티장의 그룹 청만 받는다.
+        while (_world.TakeAsk(out string? asker))
+        {
+            if (string.Equals(asker, _party?.Leader, StringComparison.OrdinalIgnoreCase))
+            {
+                log($"파티장 {asker} 의 그룹 청을 받습니다.");
+                await _world.AcceptGroupAsync(asker, token);
+            }
+        }
+
+        if (Path == EcoParties.Priest)
+        {
+            await Tend(map, token);
+            return;
+        }
+
+        await Invite(token);
 
         EcoSight sight = new(
             now,
@@ -121,6 +163,15 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             _hunt is null || _hunt.Stopped is not null,
             _personSince,
             vitals.MaximumHealth > 0 ? vitals.Health * 100 / vitals.MaximumHealth : 100);
+
+        // 파티원 — 파티장이 다른 사냥터나 다른 중심으로 옮겼으면 따라간다(마을 가는 때가 봇마다 달라 갈라진다).
+        if (_party is { } mine && !string.Equals(mine.Leader, Name, StringComparison.OrdinalIgnoreCase) && HuntingOn > 0
+            && host.Find(mine.Leader) is { HuntingOn: > 0 } boss && boss.Map == boss.HuntingOn
+            && (boss.HuntingOn != _ground || Reckon.Steps(Center, boss.Center) > 6))
+        {
+            await GoHunt(sight, token);
+            return;
+        }
 
         EcoAct act = _life.Next(sight);
         if (act != EcoAct.Hunt)
@@ -178,6 +229,97 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
     }
 
+    /// <summary>
+    /// 파티가 바뀌었다 — 옛 서버 그룹에서 나가고(제 이름을 청하면 나간다), 사냥을 멈춰 마을에 들렀다 새 사냥터로 간다
+    /// (사냥이 멈추면 <see cref="EcoLife" /> 가 마을로 보낸다).
+    /// </summary>
+    private async Task Regroup(EcoParty? party, CancellationToken token)
+    {
+        if (_party is not null)
+        {
+            Event("party", new { left = _party.All });
+            await _world.LeaveGroupAsync(token);
+        }
+
+        _party = party;
+        _hunt = null;
+        _priest = null;
+
+        if (party is not null)
+        {
+            Event("party", new { joined = party.All, leader = party.Leader });
+        }
+    }
+
+    /// <summary>파티장 — 12칸 안에 온 파티원 중 아직 그룹이 아닌 이에게 5초마다 그룹을 청한다(0x2E 1).</summary>
+    private async Task Invite(CancellationToken token)
+    {
+        if (_party is not { } party || !string.Equals(party.Leader, Name, StringComparison.OrdinalIgnoreCase) || HuntingOn == 0 || _clock.Elapsed < _nextAsk)
+        {
+            return;
+        }
+
+        _nextAsk = _clock.Elapsed + TimeSpan.FromSeconds(5);
+
+        foreach (string name in party.All.Where(name => name != Name && _world.MemberStatus(name) is null
+                                                        // 서버는 12칸 안에서만 청을 받는다(WithinRangeProximity).
+                                                        && _world.Others.Any(one => string.Equals(one.Name, name, StringComparison.OrdinalIgnoreCase)
+                                                                                    && Reckon.Steps(one.Where, Where) < 12)))
+        {
+            log($"{name} 에게 그룹을 청합니다.");
+            await _world.AskToGroupAsync(name, token);
+        }
+    }
+
+    /// <summary>
+    /// 성직자 한 틱 — 유령이면 되살아나고, 파티가 없으면 물약 가게에서 기다린다. 따를 이(사냥 중인 파티원, 파티장 먼저 — 파티장만
+    /// 마을에 가도 사냥터에 남은 이를 돌본다. 아무도 사냥 중이 아니면 파티장)와 다른 맵이거나 멀면(12칸) 곁으로 옮기고, 곁이면 동료 봇의
+    /// 판단(주인 = 따를 이, 나머지 싸우는 봇은 파티원)으로 회복·해제·따라가기.
+    /// </summary>
+    private async Task Tend(int map, CancellationToken token)
+    {
+        if (map == DeathMap)
+        {
+            await Revive(token);
+            return;
+        }
+
+        EcoRunner? leader = _party is null ? null
+            : _party.Fighters.Select(host.Find).FirstOrDefault(one => one is { HuntingOn: > 0 } && one.Map == one.HuntingOn) ?? host.Find(_party.Leader);
+
+        // 유령인 파티장을 따라 죽은 자의 맵으로 가지 않는다.
+        if (_party is null || leader is not { Map: > 0 } || leader.Map == DeathMap)
+        {
+            Doing = "파티 기다림";
+            if (land.PotionStop is { } stop && map != stop.Map)
+            {
+                await MoveTo(stop.Map, stop.Where, token);
+            }
+
+            return;
+        }
+
+        if (leader.Map != map || Reckon.Steps(Where, leader.Where) > 12)
+        {
+            Doing = "파티장에게";
+            await MoveTo(leader.Map, leader.Where, token);
+            return;
+        }
+
+        Doing = "돌봄";
+        EcoParty party = _party;
+        _following = leader.Name;
+        _priest ??= new CompanionRunner(_world, land.Walls, new CompanionSettings(), log,
+            master: () => host.Find(_following) is { Serial: > 0 } boss ? new CompanionTie(boss.Serial, boss.Name) : null,
+            mates: () => party.Fighters
+                .Where(name => name != _following)
+                .Select(name => host.Find(name)?.Serial ?? 0)
+                .Select(serial => _world.Others.FirstOrDefault(one => one.Serial == serial && serial != 0))
+                .OfType<Character>()
+                .ToDictionary(one => one.Serial, one => one.Where));
+        await _priest.Once(token);
+    }
+
     private static string Why(EcoSight sight) =>
         sight.HuntStopped ? "stopped"
         : sight.Potions < Tuning.EcoPotionLow ? "potions"
@@ -188,16 +330,40 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     {
         int level = _world.Vitals!.Level;
         int[] avoid = _personSince is not null ? [_ground] : [];
-        if (EcoGrounds.Pick(land.Grounds, level, map => host.BotsOn(map, bot.Name), Tuning.EcoBotsPerMap, avoid, _life.Lower) is not { } ground)
-        {
-            Doing = "사냥터 없음";
-            await Task.Delay(TimeSpan.FromSeconds(60), token);
-            return;
-        }
+        EcoGround ground;
+        Tile spot;
 
-        Func<Tile, bool> blocked = land.Walls.For(ground.Map);
-        Random dice = Random.Shared;
-        Tile spot = Enumerable.Range(0, 500).Select(_ => new Tile(dice.Next(2, 100), dice.Next(2, 100))).FirstOrDefault(tile => !blocked(tile), new Tile(10, 10));
+        if (_party is { } party && !string.Equals(party.Leader, Name, StringComparison.OrdinalIgnoreCase))
+        {
+            // 파티원 — 파티장이 사냥하는 맵, 파티장 곁으로.
+            if (host.Find(party.Leader) is not { HuntingOn: > 0 } leader)
+            {
+                Doing = "파티장 기다림";
+                await Task.Delay(TimeSpan.FromSeconds(2), token);
+                return;
+            }
+
+            ground = land.Grounds.FirstOrDefault(one => one.Map == leader.HuntingOn) ?? new EcoGround(leader.HuntingOn, level, "파티");
+            spot = leader.Center;
+        }
+        else
+        {
+            // 파티장은 파티 밖의 봇이 없는 맵으로(한 맵에 한 파티).
+            IEnumerable<string> mine = _party?.All ?? [Name];
+            Func<int, int> botsOn = map => host.Running.Count(runner => runner.Map == map && !mine.Contains(runner.Name, StringComparer.OrdinalIgnoreCase));
+
+            if (EcoGrounds.Pick(land.Grounds, level, botsOn, _party is null ? Tuning.EcoBotsPerMap : 1, avoid, _life.Lower) is not { } picked)
+            {
+                Doing = "사냥터 없음";
+                await Task.Delay(TimeSpan.FromSeconds(60), token);
+                return;
+            }
+
+            ground = picked;
+            Func<Tile, bool> blocked = land.Walls.For(ground.Map);
+            Random dice = Random.Shared;
+            spot = Enumerable.Range(0, 500).Select(_ => new Tile(dice.Next(2, 100), dice.Next(2, 100))).FirstOrDefault(tile => !blocked(tile), new Tile(10, 10));
+        }
 
         int from = _world.State!.Map.Id;
         if (!await MoveTo(ground.Map, spot, token))
@@ -209,6 +375,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         _ground = ground.Map;
         _personSince = null;
         _life.Arrived(EcoPlace.Hunting, _clock.Elapsed);
+        Center = _world.State!.Where;
 
         // 대신 사냥과 같은 판단 — 기술·마법은 직업 기술 표(class-kit.txt)에 보이는 것, 물약은 가방의 가장 센 체력 물약.
         int? path = _world.Path;

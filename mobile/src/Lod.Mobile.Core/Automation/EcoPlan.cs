@@ -146,3 +146,57 @@ public static class EcoShopping
     public static IReadOnlyList<InventoryItem> ToSell(IReadOnlyList<InventoryItem> pack, IReadOnlyCollection<int> keep) =>
         [.. pack.Where(item => !IsHealing(item.Name) && !keep.Contains(item.Slot)).OrderBy(item => item.Slot)];
 }
+
+/// <summary>파티를 지을 봇 하나 — 접속해 있고 아직 파티가 없는 것.</summary>
+public sealed record EcoMember(string Name, int Path, int Level);
+
+/// <summary>생태계 파티 — 성직자 하나와 싸우는 봇 셋(결정 19). 파티장은 셋 중 레벨이 가장 낮은 봇(사냥터를 그 레벨로 고른다).</summary>
+public sealed record EcoParty(string Priest, IReadOnlyList<string> Fighters)
+{
+    public string Leader => Fighters[0];
+
+    public IEnumerable<string> All => [.. Fighters, Priest];
+}
+
+/// <summary>파티 짓기(설계 <c>autopilot/eco-bots/party-SPEC.md</c>).</summary>
+public static class EcoParties
+{
+    /// <summary>성직자 직업 번호.</summary>
+    public const int Priest = 4;
+
+    /// <summary>
+    /// 성직자 봇의 레벨업 점수 — 위즈 150 까지, 그다음 콘 50(정해진 것 없어 시작값, 2026-10-07). 사람 성직자의 앱 자동 분배
+    /// (<see cref="StatPlan" />)는 건드리지 않으려고 여기 따로 둔다.
+    /// </summary>
+    public static Stat? PriestStat(Vitals mine) =>
+        mine.Unspent <= 0 ? null : mine.Wis < 150 ? Stat.Wis : mine.Con < 50 ? Stat.Con : null;
+
+    /// <summary>
+    /// 성직자마다(이름 순) 파티 레벨을 넘은 싸우는 봇 셋 — 남은 봇 중 레벨이 가장 낮은 봇을 파티장으로, 그와 레벨이 가까운 순으로
+    /// 직업이 겹치지 않는 봇을 먼저, 모자라면 아무 직업이나. 셋이 안 되면 그 성직자부터는 짓지 않는다.
+    /// </summary>
+    public static IReadOnlyList<EcoParty> Form(IReadOnlyList<EcoMember> free, int minLevel)
+    {
+        List<EcoMember> fighters = [.. free.Where(one => one.Path != Priest && one.Level >= minLevel).OrderBy(one => one.Level).ThenBy(one => one.Name)];
+        List<EcoParty> parties = [];
+
+        foreach (EcoMember priest in free.Where(one => one.Path == Priest).OrderBy(one => one.Name, StringComparer.Ordinal))
+        {
+            if (fighters.Count < Tuning.EcoPartyFighters)
+            {
+                break;
+            }
+
+            EcoMember leader = fighters[0];
+            List<EcoMember> chosen = [leader];
+            IEnumerable<EcoMember> near = fighters.Skip(1).OrderBy(one => Math.Abs(one.Level - leader.Level)).ThenBy(one => one.Name).ToList();
+
+            chosen.AddRange(near.Where(one => chosen.All(pick => pick.Path != one.Path)).DistinctBy(one => one.Path).Take(Tuning.EcoPartyFighters - 1));
+            chosen.AddRange(near.Except(chosen).Take(Tuning.EcoPartyFighters - chosen.Count));
+            fighters.RemoveAll(chosen.Contains);
+            parties.Add(new EcoParty(priest.Name, [.. chosen.Select(one => one.Name)]));
+        }
+
+        return parties;
+    }
+}

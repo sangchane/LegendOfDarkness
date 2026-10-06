@@ -245,7 +245,7 @@ eco_restart() {
     remote "sudo systemctl restart lod-eco"
 }
 
-# 생태계 봇 설정 — 이름·직업은 서버 설정 EcoBots(이름 앞: 전사봇 1 · 도적봇 2 · 무도봇 5), 비밀번호는 맥 ~/LOD-backups/eco-bot-password.txt
+# 생태계 봇 설정 — 이름·직업은 서버 설정 EcoBots(이름 앞: 전사봇 1 · 도적봇 2 · 사제봇 4 · 무도봇 5, 사제봇은 파티 성직자 — 목록 앞에 둬 MaxOnline 안에 든다), 비밀번호는 맥 ~/LOD-backups/eco-bot-password.txt
 # (LOD_ECO_PASSWORD_FILE 로 바꿈)에서 읽고 없으면 한 번 묻는다. 저장소에는 남기지 않는다. 이미 있으면 그대로 둔다.
 eco_config() {
     local file="${LOD_ECO_PASSWORD_FILE:-$HOME/LOD-backups/eco-bot-password.txt}" password
@@ -260,10 +260,10 @@ eco_config() {
 import json, os, re, sys
 text = open(sys.argv[1], encoding="utf-8").read()
 names = re.findall(r'"([^"]+)"', re.search(r'"EcoBots"\s*:\s*\[([^\]]*)\]', text).group(1))
-path = {"전사봇": 1, "도적봇": 2, "무도봇": 5}
+path = {"전사봇": 1, "도적봇": 2, "사제봇": 4, "무도봇": 5}
 print(json.dumps({
-    "Host": "127.0.0.1", "LoginPort": 2610, "MapFolder": "/home/ubuntu/lod-bot/world", "Password": os.environ["ECO_PASSWORD"], "MaxOnline": 30,
-    "Bots": [{"Name": n, "Path": path[n[:3]]} for n in names],
+    "Host": "127.0.0.1", "LoginPort": 2610, "MapFolder": "/home/ubuntu/lod-bot/world", "Password": os.environ["ECO_PASSWORD"], "MaxOnline": 40,
+    "Bots": [{"Name": n, "Path": path[n[:3]]} for n in sorted(names, key=lambda n: path[n[:3]] != 4)],
 }, ensure_ascii=False, indent=2))
 PY
     bot_upload

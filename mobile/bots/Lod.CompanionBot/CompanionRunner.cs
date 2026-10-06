@@ -8,12 +8,15 @@ namespace Lod.CompanionBot;
 
 /// <summary>
 /// 판단(<see cref="CompanionBrain" />, 알맹이)을 접속 하나에 잇는다 — 0.1초마다 보고, 하나 하고.
+/// 주인은 서버가 맺어 준 짝(0x5E)이다. 생태계 파티의 성직자는 <paramref name="master" /> 로 파티장을, <paramref name="mates" /> 로 나머지 파티원을 준다.
 /// </summary>
 /// <remarks>
 /// 서버는 걸음이 된 것을 걸은 이에게 알리지 않는다(<c>Sprite.Walk</c> 는 곁의 사람에게만 0x0C). 막혔을 때만 자리를
 /// 다시 보낸다(0x04). 그래서 앱처럼 제 칸을 스스로 옮기고, 서버가 자리를 보내면 그것으로 바로잡는다.
 /// </remarks>
-public sealed class CompanionRunner(WorldClient world, MapWalls walls, CompanionSettings settings, Action<string>? log = null)
+public sealed class CompanionRunner(
+    WorldClient world, MapWalls walls, CompanionSettings settings, Action<string>? log = null,
+    Func<CompanionTie?>? master = null, Func<IReadOnlyDictionary<uint, Tile>>? mates = null)
 {
     public static readonly TimeSpan Tick = TimeSpan.FromMilliseconds(100);
 
@@ -137,7 +140,7 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             _loggedMap = state.Map.Id;
         }
 
-        CompanionTie? master = world.Master;
+        CompanionTie? master = Master;
         Character? owner = master is null ? null : world.Others.FirstOrDefault(one => one.Serial == master.Serial);
         int? distance = owner is null ? null : Reckon.Steps(owner.Where, _tile);
         bool away = master is not null && (owner is null || distance > 12);
@@ -195,7 +198,7 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             _tile = state.Where;
         }
 
-        CompanionTie? master = world.Master;
+        CompanionTie? master = Master;
 
         if ((master?.Serial ?? 0) != _master)
         {
@@ -229,6 +232,7 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
             Vitals = world.Vitals,
             Comatose = Overhead.InComa(world.Ailments),
             OwnerAt = owner?.Where,
+            Mates = mates?.Invoke() ?? new Dictionary<uint, Tile>(),
             // 서버가 1초마다 보내는 파티원 숫자(0x5E 종류 6)를 먼저 — 체력바(0x13)는 맞을 때만 와서, 봇이 늦게 왔거나 맞지 않고 줄어든
             // 체력(다라밀공 등)은 몰라 회복하지 않았다(사용자 2026-10-05 「어떤 이벤트가 없으면 회복 안 시킨다」).
             HealthOf = serial => world.MemberNumbers(serial) is { MaximumHealth: > 0 } numbers
@@ -299,6 +303,8 @@ public sealed class CompanionRunner(WorldClient world, MapWalls walls, Companion
 
         return step;
     }
+
+    private CompanionTie? Master => master is null ? world.Master : master();
 
     /// <summary>같은 말을 거듭하지 않는다.</summary>
     private void Say(string what)

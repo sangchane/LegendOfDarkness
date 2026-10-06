@@ -185,4 +185,51 @@ public sealed class EcoTests
         Assert.Equal(4200, root.GetProperty("data").GetProperty("ms").GetInt32());
         Assert.DoesNotContain('\n', line);
     }
+
+    [Fact]
+    public void A_priest_takes_three_fighters_of_different_classes_closest_in_level()
+    {
+        IReadOnlyList<EcoParty> parties = EcoParties.Form(
+        [
+            new("사제봇1", EcoParties.Priest, 3),
+            new("전사봇1", Warrior, 11),
+            new("전사봇2", Warrior, 12),
+            new("도적봇1", 2, 15),
+            new("무도봇1", Monk, 16),
+            new("무도봇2", Monk, 40),
+        ], minLevel: 11);
+
+        EcoParty party = Assert.Single(parties);
+        Assert.Equal("사제봇1", party.Priest);
+        Assert.Equal(["전사봇1", "도적봇1", "무도봇1"], party.Fighters);
+        Assert.Equal("전사봇1", party.Leader);
+    }
+
+    [Fact]
+    public void No_party_below_the_party_level_or_without_three_fighters()
+    {
+        Assert.Empty(EcoParties.Form([new("사제봇1", EcoParties.Priest, 1), new("전사봇1", Warrior, 30), new("도적봇1", 2, 30), new("무도봇1", Monk, 10)], 11));
+        Assert.Empty(EcoParties.Form([new("전사봇1", Warrior, 30), new("도적봇1", 2, 30), new("무도봇1", Monk, 30)], 11));
+    }
+
+    [Fact]
+    public void Each_priest_gets_its_own_level_band_and_fills_with_any_class_when_one_is_missing()
+    {
+        IReadOnlyList<EcoParty> parties = EcoParties.Form(
+        [
+            new("사제봇1", EcoParties.Priest, 1),
+            new("사제봇2", EcoParties.Priest, 1),
+            new("전사봇1", Warrior, 50),
+            new("전사봇2", Warrior, 51),
+            new("전사봇3", Warrior, 52),
+            new("도적봇1", 2, 20),
+            new("무도봇1", Monk, 21),
+            new("전사봇4", Warrior, 22),
+        ], 11);
+
+        Assert.Equal(2, parties.Count);
+        Assert.Equal(["도적봇1", "무도봇1", "전사봇4"], parties[0].Fighters);
+        Assert.Equal(["전사봇1", "전사봇2", "전사봇3"], parties[1].Fighters);
+    }
 }
+
