@@ -192,23 +192,37 @@ public sealed class CompanionNewOwnerTests : IDisposable
 
     /// <summary>
     /// "주인 없는 동료사제2~5 가 유령으로 남아 한 칸에 겹쳐 있다"(사용자, 2026-10-06 클라우드 — 뮤레칸의방 10,9 에 넷). 죽은 채 주인이 나가면
-    /// 짝이 풀려 [봇 부르기] 로 되살릴 사람이 없다. 짝 없는 유령도 되살아나 대기 장소로 가야 한다.
+    /// 짝이 풀려 [봇 부르기] 로 되살릴 사람이 없었고, 되살려 보내도 대기 칸이 하나라 겹쳐 섰다. 짝 없는 유령 둘이 되살아나 대기 장소의 다른 칸에 서야 한다.
     /// </summary>
     [Fact]
-    public async Task A_ghost_bot_without_an_owner_is_revived_and_goes_home()
+    public async Task Ghost_bots_without_an_owner_are_revived_and_go_home_side_by_side()
     {
         const int Mileth = 20287;
+        string[] bots = [CompanionCallTests.BotName, $"{CompanionCallTests.BotName}2"];
 
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceVillage, 26, 21));
         CompanionCallTests.Configure(server);
+        string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
+        System.Text.Json.Nodes.JsonNode config = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path))!;
+        config["ServerConfig"]!["CompanionBots"] = new System.Text.Json.Nodes.JsonArray([.. bots.Select(name => System.Text.Json.Nodes.JsonValue.Create(name))]);
+        File.WriteAllText(path, config.ToJsonString());
         server.Start(TimeSpan.FromMinutes(2));
-        LoginFlow.TryCreateAccount(server, CompanionCallTests.BotName);
-        MurekansRoomTests.SaveAsGhostInTheRoom(server, CompanionCallTests.BotName);
 
-        WorldClient bot = await Enter(server, CompanionCallTests.BotName, map: 20138);
+        List<WorldClient> ghosts = [];
+        foreach (string name in bots)
+        {
+            LoginFlow.TryCreateAccount(server, name);
+            MurekansRoomTests.SaveAsGhostInTheRoom(server, name);
+            ghosts.Add(await Enter(server, name, map: 20138));
+        }
 
-        await Waiting.Until(() => bot.State?.Map.Id == Mileth && bot.Vitals?.Health > 1,
-            $"주인 없는 유령 봇이 남았습니다: 맵 {bot.State?.Map.Id} {bot.State?.Where} · 체력 {bot.Vitals?.Health}", _deadline.Token, TimeSpan.FromSeconds(30));
+        foreach (WorldClient ghost in ghosts)
+        {
+            await Waiting.Until(() => ghost.State?.Map.Id == Mileth && ghost.Vitals?.Health > 1,
+                $"주인 없는 유령 봇이 남았습니다: 맵 {ghost.State?.Map.Id} {ghost.State?.Where} · 체력 {ghost.Vitals?.Health}", _deadline.Token, TimeSpan.FromSeconds(30));
+        }
+
+        Assert.NotEqual(ghosts[0].State!.Where, ghosts[1].State!.Where);
     }
 
     private static int Saves(IsolatedHadesServer server) =>
