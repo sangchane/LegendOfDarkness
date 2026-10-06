@@ -35,6 +35,8 @@ public sealed class CompanionRunner(
     /// <summary>이만큼마다 한 줄 요약.</summary>
     public static readonly TimeSpan Summary = TimeSpan.FromMinutes(5);
 
+    private static readonly (int Icon, string Name)[] MemberDebuffs = [(Overhead.ComaIcon, "skulled"), (90, "sleep"), (50, "frozen")];
+
     private readonly CompanionBrain _brain = new();
 
     // 괴물 serial → 주인이 마지막으로 친 때. 0x5D 는 마지막으로 친 이 하나만 남겨, 파티원이 뒤에 치면 주인 몫이 지워진다.
@@ -240,11 +242,12 @@ public sealed class CompanionRunner(
                 : world.MemberStatus(serial)?.HealthPercent ?? world.Health(serial),
             Spells = world.Spells,
             Pack = world.Pack,
-            // 생태계 파티는 남의 상태 이름(0x5E 3 — 동료 짝에게만)을 못 받는다. 그룹원 그림(0x5E 6, 1초마다)의 혼수 그림으로
-            // 「skulled」만 채운다 — 그 밖은 null 그대로(버프는 제 시계로).
+            // 생태계 파티는 남의 상태 이름(0x5E 3 — 동료 짝에게만)을 못 받는다. 그룹원 그림(0x5E 6, 1초마다)의 혼수·수면·빙결
+            // 그림(서버 debuff_reeping 89 · sleep 90 · frozen 50)으로 깨우기·해제할 것만 채운다 — 그 밖은 null 그대로(버프는 제 시계로).
             StatusesOf = serial => world.StatusesOf(serial)?.Select(one => one.Name).ToHashSet()
-                                   ?? (mates is not null && world.MemberStatus(serial)?.Icons.Contains(Overhead.ComaIcon) == true
-                                       ? new HashSet<string> { "skulled" }
+                                   ?? (mates is not null && world.MemberStatus(serial)?.Icons is { } icons
+                                       && MemberDebuffs.Where(pair => icons.Contains(pair.Icon)).Select(pair => pair.Name).ToHashSet() is { Count: > 0 } named
+                                       ? named
                                        : null),
             Foes =
             [
