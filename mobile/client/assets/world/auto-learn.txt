@@ -26,6 +26,7 @@
 2	41	skill	품뒤져보기	26
 2	41	spell	하이드	10
 2	71	skill	습격	29
+2	71	skill	트리플어택	11
 2	99	skill	암살격	31
 3	1	spell	마레노	46
 3	11	spell	렌토	5
