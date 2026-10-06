@@ -149,7 +149,7 @@ public sealed class MurekansRoomTests : IDisposable
         File.WriteAllText(path, saved.ToJsonString());
     }
 
-    private static void SaveAsGhostInTheRoom(IsolatedHadesServer server, string who)
+    internal static void SaveAsGhostInTheRoom(IsolatedHadesServer server, string who)
     {
         string saved = Path.Combine(server.ContentLocation, "aislings", $"{who}.json");
         JsonNode character = JsonNode.Parse(File.ReadAllText(saved))!;
