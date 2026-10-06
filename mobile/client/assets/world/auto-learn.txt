@@ -21,6 +21,7 @@
 2	11	skill	두번찌르기	6
 2	11	skill	아무네지아	44
 2	11	spell	마구찌르기	142
+2	41	skill	더블어택	1
 2	41	skill	센스	9
 2	41	skill	품뒤져보기	26
 2	41	spell	하이드	10
