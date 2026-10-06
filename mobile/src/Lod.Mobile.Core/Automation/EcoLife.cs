@@ -36,8 +36,10 @@ public enum EcoPlace
 /// <param name="HuntStopped">자동 사냥이 멈췄다(위험·끝) — <c>HuntProxyRunner.Stopped</c>.</param>
 /// <param name="PersonSince">이 맵에 사람(봇 아닌)이 처음 보인 때, 안 보이면 null.</param>
 /// <param name="HealthPercent">체력 %.</param>
+/// <param name="LastGain">경험치가 마지막으로 오른 때(파티면 나눠 받은 것도), 없으면 null.</param>
 public sealed record EcoSight(
-    TimeSpan Now, bool Comatose, bool Ghost, int Potions, int FreeSlots, bool HuntStopped, TimeSpan? PersonSince, int HealthPercent);
+    TimeSpan Now, bool Comatose, bool Ghost, int Potions, int FreeSlots, bool HuntStopped, TimeSpan? PersonSince, int HealthPercent,
+    TimeSpan? LastGain = null);
 
 /// <summary>
 /// 생태계 봇의 한살이(FR-004·008, 설계 <c>autopilot/eco-bots/</c>): 사냥 → (물약·가방·시간·멈춤) → 마을에서 장보기 → (쉬기) → 사냥.
@@ -89,7 +91,11 @@ public sealed class EcoLife
             return EcoAct.GoTown;
         }
 
-        return sight.PersonSince is { } seen && sight.Now - seen >= Tuning.EcoYield ? EcoAct.GoHunt : EcoAct.Hunt;
+        // 사람에게 비키거나, 둘레를 다 잡아 경험치가 한동안 안 오르면 자리를 옮긴다(파티원은 파티장을 따라간다).
+        TimeSpan idleSince = sight.LastGain is { } gain && gain > _arrivedAt ? gain : _arrivedAt;
+        return (sight.PersonSince is { } seen && sight.Now - seen >= Tuning.EcoYield) || sight.Now - idleSince >= Tuning.EcoIdleMove
+            ? EcoAct.GoHunt
+            : EcoAct.Hunt;
     }
 
     /// <summary>봇 프로그램이 옮긴 뒤.</summary>

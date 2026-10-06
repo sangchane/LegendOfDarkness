@@ -104,8 +104,8 @@ public sealed class EcoTests
     }
 
     private static EcoSight Sight(TimeSpan now, int potions = 20, int free = 100, bool stopped = false, TimeSpan? person = null,
-        bool ghost = false, bool coma = false, int health = 100) =>
-        new(now, coma, ghost, potions, free, stopped, person, health);
+        bool ghost = false, bool coma = false, int health = 100, TimeSpan? gained = null) =>
+        new(now, coma, ghost, potions, free, stopped, person, health, gained);
 
     [Fact]
     public void Hunts_until_potions_bag_time_or_a_stop_sends_it_to_town()
@@ -122,6 +122,19 @@ public sealed class EcoTests
         Assert.Equal(EcoAct.GoTown, life.Next(Sight(t0, stopped: true)));
         Assert.Equal(EcoAct.Hunt, life.Next(Sight(t0 + TimeSpan.FromSeconds(10), person: t0)));
         Assert.Equal(EcoAct.GoHunt, life.Next(Sight(t0 + Tuning.EcoYield, person: t0)));
+    }
+
+    [Fact]
+    public void Moves_its_hunting_spot_when_no_exp_comes_for_a_while()
+    {
+        // 클라우드(10-07): 파티가 도착 자리 12칸 안을 비우고 60분 동안 서 있었다.
+        TimeSpan t0 = TimeSpan.FromMinutes(1);
+        EcoLife life = new();
+        life.Arrived(EcoPlace.Hunting, t0);
+
+        Assert.Equal(EcoAct.Hunt, life.Next(Sight(t0 + Tuning.EcoIdleMove - TimeSpan.FromSeconds(1))));
+        Assert.Equal(EcoAct.GoHunt, life.Next(Sight(t0 + Tuning.EcoIdleMove)));
+        Assert.Equal(EcoAct.Hunt, life.Next(Sight(t0 + Tuning.EcoIdleMove, gained: t0 + TimeSpan.FromSeconds(30))));
     }
 
     [Fact]

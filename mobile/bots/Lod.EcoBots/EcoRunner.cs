@@ -162,7 +162,8 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             Tuning.PackSlots - _world.Pack.Count,
             _hunt is null || _hunt.Stopped is not null,
             _personSince,
-            vitals.MaximumHealth > 0 ? vitals.Health * 100 / vitals.MaximumHealth : 100);
+            vitals.MaximumHealth > 0 ? vitals.Health * 100 / vitals.MaximumHealth : 100,
+            _lastKill);
 
         // 파티원 — 파티장이 다른 사냥터나 다른 중심으로 옮겼으면 따라간다(마을 가는 때가 봇마다 달라 갈라진다).
         if (_party is { } mine && !string.Equals(mine.Leader, Name, StringComparison.OrdinalIgnoreCase) && HuntingOn > 0
@@ -392,7 +393,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             EnemySpells = [.. _world.Spells.Select(one => one.Name)
                 .Where(name => land.Kit.Shows(path, true, name) && land.Kit.AimsAtEnemy(path, name) && land.Kit.AutoCasts(path, name))],
         };
-        _hunt = new HuntProxyRunner(_world, land.Walls, MapGuide.Empty, orders, DateTime.MaxValue);
+        _hunt = new HuntProxyRunner(_world, land.Walls, MapGuide.Empty, orders, DateTime.MaxValue, log);
     }
 
     private async Task GoTown(CancellationToken token)

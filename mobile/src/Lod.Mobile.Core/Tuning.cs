@@ -54,6 +54,9 @@ public static class Tuning
     /// <summary>사람이 같은 맵에 이만큼 보이면 다른 사냥터로 비킨다.</summary>
     public static readonly TimeSpan EcoYield = TimeSpan.FromSeconds(30);
 
+    /// <summary>사냥터에서 경험치가 이만큼 안 오르면 자리를 옮긴다(반경 12칸을 다 잡고 서 있지 않게, 클라우드 10-07).</summary>
+    public static readonly TimeSpan EcoIdleMove = TimeSpan.FromSeconds(60);
+
     /// <summary>이만큼 죽을 때마다 사냥터를 한 층 낮춘다.</summary>
     public const int EcoDeathLoop = 3;
 

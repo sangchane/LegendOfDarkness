@@ -36,7 +36,7 @@ public sealed class HuntProxyRunner(
     private int _map = -1;
     private TimeSpan _busyUntil;
     private TimeSpan _nextSummary = Summary;
-    private readonly Dictionary<HuntAct, int> _done = [];
+    private readonly Dictionary<string, int> _done = [];
 
     /// <summary>끝난 까닭. 돌고 있으면 null.</summary>
     public string? Stopped { get; private set; }
@@ -132,7 +132,9 @@ public sealed class HuntProxyRunner(
             [.. guide.ExitsOn(state.Map.Id).SelectMany(exit => exit.Tiles)], now);
 
         HuntStep step = _hunt.Next(sight, orders.Hunt);
-        _done[step.Act] = _done.GetValueOrDefault(step.Act) + 1;
+        // 기다림은 까닭별로 센다 — 멈춰 선 봇이 왜 서 있는지 요약에 보이게.
+        string done = step.Act == HuntAct.Wait ? $"{step.Act}({step.Why})" : step.Act.ToString();
+        _done[done] = _done.GetValueOrDefault(done) + 1;
 
         switch (step.Act)
         {
