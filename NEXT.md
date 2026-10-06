@@ -1,7 +1,7 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-10-06] 생태계 봇(서버 AI 캐릭터 1→99) — 등급 L · `dev:build` · 단계: 구현·검증·리뷰 반영·커밋·푸시 끝(d75a34a1 · 서버 882b520bf), 배포 전.** 맥에서 받아 확인(10-06): 서버·EcoBots·앱 빌드 오류 0 · 알맹이 737 · 대신 사냥+EcoBot 서버 시험 8 통과. 설계·SPEC `autopilot/eco-bots/`(SPEC.md · tasks.md).
+- **[현재/2026-10-06] 생태계 봇(서버 AI 캐릭터 1→99) — 등급 L · `dev:build` · 단계: 구현·검증·리뷰 반영·커밋·푸시 끝(d75a34a1 · 서버 882b520bf), **클라우드 배포 끝(10-06 22:35, 30개 · 첫 층 4맵에 7~8개씩 · 서버 0.72코어 · 죽음 0)**, 지켜보기 중.** 맥에서 받아 확인(10-06): 서버·EcoBots·앱 빌드 오류 0 · 알맹이 737 · 대신 사냥+EcoBot 서버 시험 8 통과. 설계·SPEC `autopilot/eco-bots/`(SPEC.md · tasks.md).
   사용자 결정: 전사·무도가·도적만(마법사 보류, 성직자는 동료 봇만) · 능력치 전사 CON64→STR, 도적 WIS23→CON41→STR78→DEX49→INT20(앱 자동 분배에도) · **내구도 끔(사람·봇 모두)** · 쌓이는 데이터는 머신러닝용으로.
   만든 것: 서버 `EcoBots`(루프백만 로그인·만들기·비번 변경, 0xF1 8 순간이동, [접속자] 길드 AI, 활동 숫자 칸) · `CheckObjectClients` 병목(한 맵 50봇 2.18→0.74코어) · 알맹이 `EcoLife`/`EcoPlan`/`StatPlan` · 봇 프로그램 `mobile/bots/Lod.EcoBots` · `eco-grounds.txt`(생성기 `scripts/gen/eco/`) · `scripts/ml/export-activity.py` · `cloud-server.sh eco|eco-config|eco-logs|ml-pull`.
   클라우드 실측: **x86 AMD EPYC 2 vCPU·11GB**(ARM 아님) · 바닥 0.48코어 → 시작 30·상한 50. 시험: 알맹이 737 · 격리 서버 EcoBot 3 · 회귀 67 중 원래 깨진 2(CompanionComa — 봇 체력≥주인 5000 이라 안 죽음).
