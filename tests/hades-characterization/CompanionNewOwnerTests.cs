@@ -225,6 +225,38 @@ public sealed class CompanionNewOwnerTests : IDisposable
         Assert.NotEqual(ghosts[0].State!.Where, ghosts[1].State!.Where);
     }
 
+    /// <summary>대기 칸 한 곳에 겹쳐 저장된 봇들(클라우드 동료사제 다섯, 2026-10-06 — 20373 37,29) — 들어오면 곁 칸으로 떨어져 서야 한다.</summary>
+    [Fact]
+    public async Task Bots_saved_on_the_same_home_tile_spread_out()
+    {
+        const int Mileth = 20287;
+        string[] bots = [CompanionCallTests.BotName, $"{CompanionCallTests.BotName}2"];
+
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (NoviceVillage, 26, 21));
+        CompanionCallTests.Configure(server);
+        string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
+        System.Text.Json.Nodes.JsonNode config = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(path))!;
+        config["ServerConfig"]!["CompanionBots"] = new System.Text.Json.Nodes.JsonArray([.. bots.Select(name => System.Text.Json.Nodes.JsonValue.Create(name))]);
+        File.WriteAllText(path, config.ToJsonString());
+        server.Start(TimeSpan.FromMinutes(2));
+
+        List<WorldClient> standing = [];
+        foreach (string name in bots)
+        {
+            LoginFlow.TryCreateAccount(server, name);
+            CompanionCallTests.Edit(server, name, character =>
+            {
+                character["CurrentMapId"] = Mileth;
+                character["X"] = 53;
+                character["Y"] = 46;
+            });
+            standing.Add(await Enter(server, name, map: Mileth));
+        }
+
+        await Waiting.Until(() => standing[0].State?.Where != standing[1].State?.Where,
+            $"봇 둘이 한 칸에 겹쳐 있습니다: {standing[0].State?.Where}", _deadline.Token, TimeSpan.FromSeconds(30));
+    }
+
     private static int Saves(IsolatedHadesServer server) =>
         server.ConsoleOutput.Split('\n').Count(line => line.Contains($"Aisling {OwnerName} data has been saved", StringComparison.Ordinal));
 
