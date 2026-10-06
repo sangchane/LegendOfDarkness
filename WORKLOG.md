@@ -9,6 +9,8 @@
 - Last updated: 2026-10-01
 
 ## History (append; 최신이 위)
+- **[끝남/2026-10-06 · 생태계 봇 구현, L dev:build]** 서버 EcoBots·0xF1 8·루프백 제한·내구도 제거·CheckObjectClients 이름 집합·활동 숫자 칸, 알맹이 EcoLife/EcoPlan·StatPlan 차례형, Lod.EcoBots, eco-grounds 생성기(경험치·입장·위험 레벨+노비스), ML 내보내기, 운영 스크립트. 격리 서버에서 찾은 것: 봇은 프로필을 물어야 직업을 안다 · 순간이동 직후 0x07 이 0x15 보다 먼저 와 상인이 사라짐(새로고침으로 우회, 서버 경쟁은 남음) · 서의우드랜드1-1 말벌(55~60)로 2레벨 봇 사망. 리뷰(opus) 7건 중 6 반영. 클라우드 실측 2 vCPU. 커밋·배포 안 함.
+- **[끝남/2026-10-06 · 생태계 봇 설계, L dev:design lite]** 업계 조사(mod-playerbots 서버 내장·smartScale·순간이동, Metaplay BotClient, A-Life LOD, 경제 싱크·봇 고지) + 서버 루프 감사(`CheckObjectClients` A²×C) + 격리 서버 부하 실측 5판(`tests/hades-characterization/BotLoadTests.cs`, 봇 사망 → 뮤레칸의방 함정 고침). 결과 `autopilot/eco-bots/01-recon.md` §3. 윈도우 PC 클라우드 공개키 커밋 87cea9a3.
 
 ### 2026-10-05 밤 — 대신 사냥(앱이 뒤로 가도 클라우드가 자동 사냥)
 - 무음 재생 살려 두기는 실패(게임 루프가 뒤에서 멈춤) → 되돌림. 사용자 결정: 클라우드 대리 접속, 시간 설정 기본 2시간.

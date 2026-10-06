@@ -1,6 +1,12 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[현재/2026-10-06] 생태계 봇(서버 AI 캐릭터 1→99) — 등급 L · `dev:build` · 단계: 구현·검증·리뷰 반영 끝, 커밋·배포 전.** 설계·SPEC `autopilot/eco-bots/`(SPEC.md · tasks.md).
+  사용자 결정: 전사·무도가·도적만(마법사 보류, 성직자는 동료 봇만) · 능력치 전사 CON64→STR, 도적 WIS23→CON41→STR78→DEX49→INT20(앱 자동 분배에도) · **내구도 끔(사람·봇 모두)** · 쌓이는 데이터는 머신러닝용으로.
+  만든 것: 서버 `EcoBots`(루프백만 로그인·만들기·비번 변경, 0xF1 8 순간이동, [접속자] 길드 AI, 활동 숫자 칸) · `CheckObjectClients` 병목(한 맵 50봇 2.18→0.74코어) · 알맹이 `EcoLife`/`EcoPlan`/`StatPlan` · 봇 프로그램 `mobile/bots/Lod.EcoBots` · `eco-grounds.txt`(생성기 `scripts/gen/eco/`) · `scripts/ml/export-activity.py` · `cloud-server.sh eco|eco-config|eco-logs|ml-pull`.
+  클라우드 실측: **x86 AMD EPYC 2 vCPU·11GB**(ARM 아님) · 바닥 0.48코어 → 시작 30·상한 50. 시험: 알맹이 737 · 격리 서버 EcoBot 3 · 회귀 67 중 원래 깨진 2(CompanionComa — 봇 체력≥주인 5000 이라 안 죽음).
+  **다음**: ① 커밋(서버 fork → 포인터 → 상위) ② `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh deploy`(접속자 끊김 알림) → `eco-config` → `eco-logs`·`status` 로 CPU 보기 ③ 사용자 확인: 동료사제2~5 가 주인 없이 뮤레칸의방 유령으로 대기 중(클라우드 18:18) — 그대로 둘지.
+
 - **[끝 — 폰 확인 남음 / 2026-10-06] 도적 기술 — 등급 S.** 기술창: 찔러휘비기·두번찌르기·습격·암살격·센스몬스터 + 쿠로토·하이드. 시작 센스몬스터·찔러휘비기·쿠로토, 두번찌르기 11, 하이드 41, 습격 71, 암살격 99(나머지 찌르기·아무네지아·센스·품뒤져보기·마구찌르기는 배우되 숨김). 더블어택 41 → 트리플어택 71(평타형 — 기본공격이 확률로 두·세 번, 기술창 아님, 사용자 2026-10-06).
 
 - **[끝 — 폰 확인 남음 / 2026-10-05 밤] 전사 기술 — 등급 M · `dev:build` · 커밋 2dc2b041(서버 2d2376b56) · 클라우드 배포 · 앱 폰 설치.**
