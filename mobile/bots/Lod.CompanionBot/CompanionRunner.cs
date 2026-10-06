@@ -240,7 +240,12 @@ public sealed class CompanionRunner(
                 : world.MemberStatus(serial)?.HealthPercent ?? world.Health(serial),
             Spells = world.Spells,
             Pack = world.Pack,
-            StatusesOf = serial => world.StatusesOf(serial)?.Select(one => one.Name).ToHashSet(),
+            // 생태계 파티는 남의 상태 이름(0x5E 3 — 동료 짝에게만)을 못 받는다. 그룹원 그림(0x5E 6, 1초마다)의 혼수 그림으로
+            // 「skulled」만 채운다 — 그 밖은 null 그대로(버프는 제 시계로).
+            StatusesOf = serial => world.StatusesOf(serial)?.Select(one => one.Name).ToHashSet()
+                                   ?? (mates is not null && world.MemberStatus(serial)?.Icons.Contains(Overhead.ComaIcon) == true
+                                       ? new HashSet<string> { "skulled" }
+                                       : null),
             Foes =
             [
                 .. world.Creatures.Where(one => one.Kind == CreatureKind.Hostile).Select(one =>
@@ -280,7 +285,8 @@ public sealed class CompanionRunner(
                 break;
 
             case CompanionAct.WakeOwner:
-                await world.WakeMasterAsync(token);
+                // 생태계 파티(파티원을 받는 봇)는 주인 깨우기(0xF1 5) 대신 그룹원 깨우기(0xF1 9) — 서버가 동료 봇에게만 0xF1 5 를 받는다.
+                await (mates is null ? world.WakeMasterAsync(token) : world.EcoWakeAsync(step.Target, token));
                 Say(step.Why);
                 break;
 

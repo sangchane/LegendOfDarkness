@@ -61,6 +61,10 @@ public static class EcoShopping
     /// <summary>가방의 체력 물약 수.</summary>
     public static int Potions(IReadOnlyList<InventoryItem> pack) => pack.Where(item => IsHealing(item.Name)).Sum(item => item.Stacks);
 
+    /// <summary>가방의 마력 물약 수 — 성직자 봇이 장보기를 정한다.</summary>
+    public static int ManaPotions(IReadOnlyList<InventoryItem> pack) =>
+        pack.Where(item => AutoPotion.Restoring.Any(potion => potion.Name == item.Name)).Sum(item => item.Stacks);
+
     /// <summary>가방에 있는 가장 센 체력 물약 이름, 없으면 null.</summary>
     public static string? BestPotion(IReadOnlyList<InventoryItem> pack) =>
         Enumerable.Reverse(AutoPotion.Healing).Select(potion => potion.Name).FirstOrDefault(name => pack.Any(item => item.Name == name));
@@ -68,12 +72,13 @@ public static class EcoShopping
     /// <summary>
     /// <paramref name="stock" /> 개까지 채울 물약 — 모자란 만큼을 다 살 수 있는 가장 센 것, 그런 게 없으면 가장 싼 것으로 살 수 있는 만큼. 살 게 없으면 null.
     /// </summary>
-    public static EcoBuy? PotionsToBuy(IReadOnlyList<DialogueGoods> goods, int level, long gold, int have, int stock)
+    /// <param name="kinds">살 물약 갈래(약한 것부터) — 없으면 체력 물약(<see cref="AutoPotion.Healing" />), 성직자는 마력 물약.</param>
+    public static EcoBuy? PotionsToBuy(IReadOnlyList<DialogueGoods> goods, int level, long gold, int have, int stock, IReadOnlyList<Potion>? kinds = null)
     {
         int need = stock - have;
         DialogueGoods[] sold =
         [
-            .. AutoPotion.Healing
+            .. (kinds ?? AutoPotion.Healing)
                 .Select(potion => goods.FirstOrDefault(one => one.Name == potion.Name && one.Price > 0 && (one.Stats?.Level ?? 0) <= level))
                 .OfType<DialogueGoods>(),
         ];

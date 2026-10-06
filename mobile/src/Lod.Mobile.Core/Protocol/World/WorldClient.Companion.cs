@@ -85,6 +85,10 @@ public sealed partial class WorldClient
     public Task EcoMoveAsync(int map, int x, int y, CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, [8, (byte)(map >> 8), (byte)map, (byte)x, (byte)y], cancellationToken);
 
+    /// <summary>생태계 성직자 — 혼수인 같은 그룹 파티원을 깨운다(0xF1 9, 대상 serial 4바이트 큰 끝, 2칸 안).</summary>
+    public Task EcoWakeAsync(uint target, CancellationToken cancellationToken) =>
+        Send(ClientOpcode.Companion, [9, (byte)(target >> 24), (byte)(target >> 16), (byte)(target >> 8), (byte)target], cancellationToken);
+
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, World.Companion.Dismiss(), cancellationToken);

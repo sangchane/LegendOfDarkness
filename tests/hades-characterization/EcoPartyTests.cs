@@ -34,7 +34,7 @@ public sealed class EcoPartyTests(ITestOutputHelper output) : IDisposable
             {
                 saved["Path"] = bot.Path switch { 2 => "Rogue", 4 => "Priest", 5 => "Monk", _ => "Warrior" };
                 saved["ExpLevel"] = bot.Path == 4 ? 1 : 11;
-                saved["GoldPoints"] = 20_000;
+                saved["GoldPoints"] = bot.Path == 4 ? 0 : 100_000;
             });
         }
 
@@ -58,8 +58,9 @@ public sealed class EcoPartyTests(ITestOutputHelper output) : IDisposable
 
         try
         {
-            await Waiting.Until(() => (together |= Together()) && Kinds(Priest.Name).Contains("level"),
-                "파티가 함께 사냥해 성직자가 레벨을 올리지 못했습니다.", _deadline.Token, within: TimeSpan.FromMinutes(10));
+            // 성직자는 금화 0 으로 시작한다 — 따르는 봇이 금화를 건네고(gift), 성직자가 그 금화로 마력 물약을 산다(buy).
+            await Waiting.Until(() => (together |= Together()) && Kinds(Priest.Name).Contains("level") && Kinds(Priest.Name).Contains("buy"),
+                "파티가 함께 사냥해 성직자가 레벨을 올리고 건네받은 금화로 마력 물약을 사지 못했습니다.", _deadline.Token, within: TimeSpan.FromMinutes(10));
         }
         finally
         {
@@ -84,6 +85,10 @@ public sealed class EcoPartyTests(ITestOutputHelper output) : IDisposable
         JsonElement joined = Lines().First(line => line.GetProperty("ev").GetString() == "party" && line.GetProperty("data").TryGetProperty("joined", out _));
         Assert.Equal(4, joined.GetProperty("data").GetProperty("joined").GetArrayLength());
         Assert.DoesNotContain("kill", Kinds(Priest.Name));
+        Assert.Contains(Fighters, bot => Kinds(bot.Name).Contains("gift"));
+        Assert.Contains(Lines(), line => line.GetProperty("bot").GetString() == Priest.Name && line.GetProperty("ev").GetString() == "buy"
+                                         && line.GetProperty("data").GetProperty("goldAfter").GetInt64() < line.GetProperty("data").GetProperty("goldBefore").GetInt64()
+                                         && line.GetProperty("data").GetProperty("items")[0].GetProperty("name").GetString()!.Contains("마력"));
 
         string[] Kinds(string bot) => [.. Lines().Where(line => line.GetProperty("bot").GetString() == bot).Select(line => line.GetProperty("ev").GetString()!)];
 

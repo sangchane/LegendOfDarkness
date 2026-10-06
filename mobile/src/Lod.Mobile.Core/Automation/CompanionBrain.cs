@@ -284,11 +284,18 @@ public sealed class CompanionBrain
         TimeSpan now = reading.Now;
 
         // 주인이 혼수면 가장 먼저 — 옆 칸으로 가서 깨운다(사용자 결정 2026-09-26, 서버 0xF1 5 — 코마디움과 같은 효과, 아무것도 안 쓴다).
-        if (sight.OwnerAt is { } fallen && sight.StatusesOf(sight.Master)?.Contains("skulled") == true)
+        // 그다음 시야 안의 혼수인 파티원(생태계 파티, 서버 0xF1 9 — 사용자 2026-10-07 「코마도 깨울 수 있도록」).
+        (uint Serial, Tile At, string Who)? fallen =
+            sight.OwnerAt is { } ownerAt && sight.StatusesOf(sight.Master)?.Contains("skulled") == true ? (sight.Master, ownerAt, "주인")
+            : sight.Mates.Where(mate => Reckon.Steps(mate.Value, sight.Standing) <= CastReach && sight.StatusesOf(mate.Key)?.Contains("skulled") == true)
+                .Select(mate => ((uint, Tile, string)?)(mate.Key, mate.Value, "파티원"))
+                .FirstOrDefault();
+
+        if (fallen is { } down)
         {
-            if (Reckon.Steps(fallen, sight.Standing) > 1)
+            if (Reckon.Steps(down.At, sight.Standing) > 1)
             {
-                return StepTo(sight, fallen, now, "주인 깨우러 가기");
+                return StepTo(sight, down.At, now, $"{down.Who} 깨우러 가기");
             }
 
             // 안 먹으면 3초마다 다시 — 그 사이 주문 차례는 회복·이모탈에 준다.
@@ -296,7 +303,7 @@ public sealed class CompanionBrain
             {
                 _lastCast = now;
                 _lastWake = now;
-                return new(CompanionAct.WakeOwner, Target: sight.Master, Why: "주인 깨우기");
+                return new(CompanionAct.WakeOwner, Target: down.Serial, Why: $"{down.Who} 깨우기");
             }
 
             // 깨우기 사이에는 기다리지 않고 아래(이모탈·회복)로 넘어간다 — 서버가 깨우기를 말없이 거절하면 봇이 15초 동안 깨우기만
@@ -420,9 +427,11 @@ public sealed class CompanionBrain
             return null;
         }
 
+        // 파티원 곁의 괴물도 — 생태계 파티는 주인(따를 이)만 싸우지 않는다.
         List<Foe> fighting = sight.Foes
             .Where(foe => Reckon.Steps(foe.At, sight.Standing) <= CastReach
-                          && (foe.OwnerHits || foe.HitsOwner || Reckon.Steps(foe.At, owner) <= FightReach))
+                          && (foe.OwnerHits || foe.HitsOwner || Reckon.Steps(foe.At, owner) <= FightReach
+                              || sight.Mates.Values.Any(mate => Reckon.Steps(foe.At, mate) <= FightReach)))
             .OrderByDescending(foe => foe.OwnerHits)
             .ThenBy(foe => Reckon.Steps(foe.At, owner))
             .ToList();
@@ -556,7 +565,7 @@ public sealed class CompanionBrain
             .Select(pair => new CompanionStep(CompanionAct.Cast, pair.Spell.Slot, target, Why: $"{why} {pair.Spell.Name}"))
             .FirstOrDefault();
 
-    /// <summary>버프 — 마법 차례대로, 주인 먼저 그다음 자기. 서버가 알린 상태에 없을 때만(알림이 없으면 지속 시간이 다 지난 뒤).</summary>
+    /// <summary>버프 — 마법 차례대로, 주인 먼저 그다음 자기, 그다음 시야 안의 파티원. 서버가 알린 상태에 없을 때만(알림이 없으면 지속 시간이 다 지난 뒤).</summary>
     private CompanionStep? Buff(CompanionSight sight, CompanionSettings settings, bool empowered, int mana, bool ownerNear)
     {
         foreach (LearnedSpell spell in sight.Spells)
@@ -567,7 +576,9 @@ public sealed class CompanionBrain
                 continue;
             }
 
-            foreach (uint target in ownerNear ? new[] { sight.Master, sight.Me } : new[] { sight.Me })
+            IEnumerable<uint> mates = sight.Mates.Where(mate => Reckon.Steps(mate.Value, sight.Standing) <= CastReach).Select(mate => mate.Key);
+
+            foreach (uint target in (ownerNear ? new[] { sight.Master, sight.Me } : new[] { sight.Me }).Concat(mates))
             {
                 string name = CompanionSpells.Bare(spell.Name);
 

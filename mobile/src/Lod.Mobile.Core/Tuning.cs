@@ -57,6 +57,17 @@ public static class Tuning
     /// <summary>사냥터에서 경험치가 이만큼 안 오르면 자리를 옮긴다(반경 12칸을 다 잡고 서 있지 않게, 클라우드 10-07).</summary>
     public static readonly TimeSpan EcoIdleMove = TimeSpan.FromSeconds(60);
 
+    /// <summary>성직자 봇 — 마력 물약이 이만큼 밑이면 물약 가게에 가서 <see cref="EcoPriestManaStock" /> 개까지 채운다.</summary>
+    public const int EcoPriestManaLow = 10;
+
+    public const int EcoPriestManaStock = 30;
+
+    /// <summary>
+    /// 성직자는 사냥하지 않아 금화가 없다 — 물약이 모자란데 금화가 이것의 반 밑이면, 따르는 싸우는 봇이 발밑에 이만큼 떨궈 준다
+    /// (떨구고도 그 봇에게 5,000 이 남을 때). 하급마력포션(300전) 30개 = 9,000.
+    /// </summary>
+    public const int EcoPriestGold = 10_000;
+
     /// <summary>이만큼 죽을 때마다 사냥터를 한 층 낮춘다.</summary>
     public const int EcoDeathLoop = 3;
 
