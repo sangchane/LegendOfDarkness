@@ -21,3 +21,11 @@
 1	skill	드래곤모드	-
 1	skill	피닉스모드	-
 1	spell	쿠로토	나
+# 도적(사용자 2026-10-06) — 기술 다섯 + 쿠로토·하이드.
+2	skill	찔러휘비기	-
+2	skill	두번찌르기	-
+2	skill	습격	-
+2	skill	암살격	-
+2	skill	센스몬스터	-
+2	spell	쿠로토	나
+2	spell	하이드	나

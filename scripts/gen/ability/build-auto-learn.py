@@ -56,7 +56,8 @@ EXCLUDED = {
     "정권": "운영자 명령으로만 (사용자)",
 }
 BLOCKED_AUTO = {}
-FORCED_WITHDRAWN = set()
+#: 도적 더블어택은 2026-10-05 배포에 잘못 들어가 받은 캐릭터가 있다 — 창에서 치운다(USER_SKIP 참고).
+FORCED_WITHDRAWN = {(2, "skill", "더블어택")}
 #: 사용자가 정한 배우는 레벨 — 노바·원작 표보다 앞선다. 표에 없던 것도 넣는다.
 #: 전사(2026-10-05): 바투·윈드블레이드와 쿠로토를 배운 채로 시작, 메가블레이드 11, 매드소울 71, 크래셔 99.
 #: 평타는 기본공격(Assail) → 11 더블어택 → 41 트리플어택(더블어택을 지우며). 투핸드어택은 71 — 배워야 두손 무기 동작이 나간다
@@ -74,7 +75,18 @@ USER_LEVELS = {
     (1, "skill", "매드소울"): 71,
     (1, "skill", "피닉스모드"): 91,
     (1, "skill", "크래셔"): 99,
+    # 도적(사용자 2026-10-06): 센스몬스터·찔러휘비기·쿠로토로 시작, 두번찌르기 11, 하이드 41, 습격 71, 암살격 99.
+    (2, "skill", "센스몬스터"): 1,
+    (2, "skill", "찔러휘비기"): 1,
+    (2, "spell", "쿠로토"): 1,
+    (2, "skill", "두번찌르기"): 11,
+    (2, "spell", "하이드"): 41,
+    (2, "skill", "습격"): 71,
+    (2, "skill", "암살격"): 99,
 }
+#: 사용자가 정하지 않았는데 원작 표에서 되살아나는 것 — 주지 않는다. 도적 더블어택(2023 원작 13행)은 전사용으로 템플릿을
+#: 만들자(2026-10-05) 함께 살아났다 — 도적에게는 묻지 않았다.
+USER_SKIP = {(2, "skill", "더블어택")}
 #: 사용자가 정한 「주면서 지운다」— 윗단계를 주면 아랫단계를 지우고, 윗단계가 있으면 아랫단계를 주지 않는다.
 USER_REPLACES = {"트리플어택": {"더블어택"}, "피닉스모드": {"드래곤모드"}}
 #: 사용자가 2026-09-27 원작 기술이라고 직접 확인한 이름. 2023 원작 표의 일반 기술·마법 행으로
@@ -263,10 +275,12 @@ def table_rows(found, known, restored, old):
     for key, value in restored.items():
         rows[key] = value
         icons[key] = int(known[key[1]][key[2]].get("Icon") or 0)
+    for key in USER_SKIP:
+        rows.pop(key, None)
     for key, level in USER_LEVELS.items():
         if known[key[1]].get(key[2]) is None:
             sys.exit(f"사용자가 정한 {key[2]} 의 템플릿이 없다")
-        rows[key] = (level, "사용자 2026-10-05")
+        rows[key] = (level, "사용자 결정")
         icons[key] = int(known[key[1]][key[2]].get("Icon") or 0)
     replaces = {}
 
