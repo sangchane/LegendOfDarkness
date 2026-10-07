@@ -1,11 +1,11 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-10-07] 그룹 전리품 룰렛 · 와우식 경매장 — 등급 L · `dev:build` · 단계: BUILD·VERIFY·REVIEW 끝(T1~T8 · T9 리뷰 반영), 배포 전 — 사용자 확인 기다림.** 브랜치 `feature/loot-roll-auction`(루트·서버 — 되돌릴 수 있게, 사용자). 설계 `autopilot/loot-auction/`(SPEC.md · tasks.md · decision-log DL-13). 커밋 루트 46f0344b…5344e688 · 서버 f7388485e…04a742212. 이력은 WORKLOG.
-  사진: `shots/auction-{browse,post,mine,claims}-portrait-2026-10-07.png` · `auction-{browse,post}-landscape-…` · `auction-roll-portrait-…`.
-  SPEC 결정(S-1): 동료 봇은 주인 그룹에 들어가므로 룰렛·나눔에서 뺀다(사람+동료 봇 사냥은 지금처럼 바닥).
-  **다음**: ① 사용자 확인 뒤 배포 — `dotnet build …/Lorule.GameServer.csproj` → `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh deploy`(접속자 끊김 알림, 백업 cron 도 다시 깜) → `… eco` → 앱 `scripts/ops/ios-build.sh install` ② 24시간 뒤 `cloud-server.sh auction-report`(SC-006: 봇 올림·구매 ≥1, 봇 올림 ≤5, 끊긴 조작 0) ③ 확인되면 main 에 합치기(사용자 확인).
-  끝(사용자 10-07): [취소]는 확인 판으로 먼저 묻고, 룰렛 띠는 모든 창 위에. 남은 것: 가로에서 맵 출구 표지가 창 위에 겹침(다른 창도 같은 기존 동작).
+- **[현재/2026-10-07] 그룹 전리품 룰렛 · 와우식 경매장 — 등급 L · `dev:build` · 단계: 클라우드 배포 끝(10-07 16:29, 서버 04a742212 · 봇 b0c35b3b), 폰 설치는 안 함(사용자 — 원격지).** 브랜치 `feature/loot-roll-auction`(루트·서버). 설계 `autopilot/loot-auction/`(SPEC · tasks · decision-log). 이력은 WORKLOG.
+  배포 직후 `auction-report`: 봇 올림 127·구매 7·룰렛 13, 봇 올림 최대 5, 끊긴 조작 0, 금화 어긋남 0. 고침: 봇이 값 5억 이벤트 물건(즉시 구매가가 1억 상한에 잘림)을 올려 보증금만 날릴 뻔 → 즉시 구매가 1억 넘는 것은 안 올림(b0c35b3b, eco 만 다시 올림). 이미 걸린 34건(보증금 20.7억, 전사·도적 봇 — 성직자 아님)은 10-08 유찰.
+  **다음**: ① 24시간 뒤 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh auction-report`(SC-006) ② 앱은 폰에 설치 가능할 때 `scripts/ops/ios-build.sh install` ③ 확인되면 main 에 합치기(사용자 확인).
+  **원격 폰 설치(사용자 10-07 「같은 와이파이 말고 방법」, 결정 대기)**: 맥·아이폰 15 Pro 모두 이미 같은 Tailscale(100.99.239.66). 추천 = RoamRun(맥 메뉴 앱, Bonjour 를 Tailscale 너머로 — `brew install --cask mh-mobile/tap/roamrun`, 관리자 계정, 집에서 같은 와이파이로 「Add Device」 한 번) → `ios-build.sh install`·7일 갱신이 원격으로. 대안: 대시보드 사파리 설치(manifest.plist — 무료 서명으로 성공 기록 없음, 갱신은 결국 맥이 폰을 봐야), SideStore(폰 혼자 서명·갱신, 3개 제한, 타사 앱에 애플 계정), 유료 개발자 계정 TestFlight.
+  남은 것: 가로에서 맵 출구 표지가 창 위에 겹침(기존) · 봇 금화가 상한 1억을 넘는 까닭(전사봇8 3.3억 — 이번 작업과 별개).
 
 - **[현재/2026-10-07] 생태계 봇 그룹 사냥(⑦, 결정 19·20) — 등급 M · `dev:build` · 단계: 배포·지켜보기 중.** SPEC `autopilot/eco-bots/party-SPEC.md`. 커밋 588584b9 → 41039d2a → 238fd9de → 8e5c89a8 (서버 d911d4726 · 8c82414d5 · 217087306).
   만든 것: 성직자 1 + 파티 레벨 11 이상 싸우는 봇 3, 서버 그룹 경험치 같은 맵 모두(원작) · 경험치 60초 안 오르면 자리 옮김 · 노비스주민 선공 끔.
