@@ -131,14 +131,15 @@ public partial class GameScreen : Control
         actions.AddChild(_map);
         actions.MoveChild(_map, 0);
 
+        // 경매장 — 「설정」 바로 왼쪽, 설정은 맨 오른쪽(사용자 2026-10-07). 그림은 원작 괴물 미믹(상자 괴물, 원작 hades.dat MNS090 의
+        // 자물쇠가 보이는 한 장을 누끼 그대로 — 서버엔 미믹이 없어 괴물 그림 생성기는 뽑지 않는다).
+        Button auction = MenuButton("경매장", "res://assets/ui/menu-auction.png", pixel: true);
+        auction.Pressed += () => SetWindow(GameWindow.Auction, !_auction.Visible);
+        actions.AddChild(auction);
+
         Button settings = MenuButton("설정", "res://assets/ui/menu-settings.png");
         settings.Pressed += () => SetWindow(GameWindow.Settings, !_settings.Visible);
         actions.AddChild(settings);
-
-        // 경매장 — 「설정」 옆(사용자 2026-10-07). 그림은 금화 무더기.
-        Button auction = MenuButton("경매장", "res://assets/item/32910.png", pixel: true);
-        auction.Pressed += () => SetWindow(GameWindow.Auction, !_auction.Visible);
-        actions.AddChild(auction);
 
         if (Main.Portrait)
         {
