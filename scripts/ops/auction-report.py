@@ -7,7 +7,9 @@
 보는 것
   · 사건 종류별 수 — 사람·봇 나눠(봇 = 서버 설정 EcoBots·CompanionBots 이름)
   · 봇마다 걸어 둔 올림의 최대 — 5(ECO_AUCTION_MAX) 넘으면 경고(07 R3)
-  · 끊긴 조작 — seq 가 있는데 commit 도 abort 도 없는 것(07 R1, auction-revert.py --give 로 되살린다)
+  · 끊긴 조작 — seq 가 있는데 commit 도 abort 도 없는 것(07 R1). 되살리기(auction-revert.py --give) 전에 auction.json 과 캐릭터 파일로
+    정말 빠졌는지 먼저 본다 — 경매장 파일을 늦게 쓴 조작은 다음 저장 때 commit 이 적힌다.
+  · 받기에서 캐릭터를 저장하지 못한 것(unsaved) — 다음 주기 저장에 들어갔을 수 있다, 캐릭터 파일을 확인한다
   · 금화가 기록과 맞나 — 올림·입찰·즉시 구매·취소는 goldBefore − goldAfter = gold, 받기는 goldAfter − goldBefore = gold (INV-2 대신 보는 것)
   · 지금 올린 것·받을 것, 맡긴 금화, 거래된 금화와 수수료(5%)
 """
@@ -63,6 +65,7 @@ def main() -> None:
     ends: dict[int, str] = {}
     starts: dict[int, dict] = {}
     wrong = []
+    unsaved = []
     traded = cut = 0
     seller: dict[int, str] = {}
     active: Counter = Counter()
@@ -70,8 +73,10 @@ def main() -> None:
 
     for event in events:
         ev, seq, who = event.get("ev"), event.get("seq", 0), event.get("who")
-        if ev in ("commit", "abort"):
+        if ev in ("commit", "abort", "unsaved"):
             ends[seq] = ev
+            if ev == "unsaved":
+                unsaved.append(event)
             continue
         counts[(ev, kind(who))] += 1
         if seq and ev != "outbid":
@@ -105,6 +110,9 @@ def main() -> None:
     print(f"거래된 금화 {traded:,}전 · 수수료 {cut:,}전")
     print(f"끊긴 조작(commit·abort 없음): {len(broken)}" + "".join(f"\n  seq {e['seq']} {e.get('ev')} {e.get('who')} {e.get('item')} {e.get('gold')}" for e in broken))
     print(f"금화가 기록과 다른 줄: {len(wrong)}" + "".join(f"\n  seq {e.get('seq')} {e.get('ev')} {e.get('who')}" for e in wrong))
+    print(f"받기 뒤 캐릭터 저장 못 함: {len(unsaved)}" + "".join(f"\n  seq {e.get('seq')} {e.get('who')} — 캐릭터 파일을 보고 빠졌을 때만 되살린다" for e in unsaved))
+    if broken:
+        print("  ↳ 끊긴 조작은 auction.json 의 Listings·Claims 와 캐릭터 파일로 정말 빠졌는지 본 뒤에만 --give 로 되살린다(07 R1)")
 
     book_path = os.path.join(folder, "auction.json")
     if os.path.exists(book_path):
@@ -115,7 +123,7 @@ def main() -> None:
         owed = sum(int(one.get("Gold") or 0) for one in claims)
         print(f"지금 올린 것 {len(listings)} (봇 {sum(kind(one['Seller']) == '봇' for one in listings)}) · 받을 것 {len(claims)} · 맡긴 금화 {held:,} · 받을 금화 {owed:,}")
 
-    if broken or wrong or over:
+    if broken or wrong or over or unsaved:
         sys.exit(1)
 
 

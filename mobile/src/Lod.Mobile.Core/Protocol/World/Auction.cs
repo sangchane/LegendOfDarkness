@@ -14,8 +14,8 @@ public sealed record AuctionClaim(uint Id, byte Kind, ushort Image, byte Color, 
 /// <summary>경매 쪽(0x5E 8). 보기 0 찾기 · 1 내 경매는 <see cref="Rows" />, 2 받을 것은 <see cref="Claims" /> 가 찬다.</summary>
 public sealed record AuctionPage(byte View, ushort Page, ushort Pages, ushort ClaimCount, IReadOnlyList<AuctionRow> Rows, IReadOnlyList<AuctionClaim> Claims);
 
-/// <summary>경매 결과(0x5E 9) — 내 요청의 답이거나, 내 물건이 팔리거나 밀렸다는 알림.</summary>
-public sealed record AuctionDone(bool Ok, string Message, ushort ClaimCount);
+/// <summary>경매 결과(0x5E 9) — 내 요청의 답이거나(<see cref="Notice" /> false), 내 물건이 팔리거나 밀렸다는 알림(true, 옛 서버는 늘 false).</summary>
+public sealed record AuctionDone(bool Ok, string Message, ushort ClaimCount, bool Notice = false);
 
 /// <summary>룰렛 한 번(0x5E 7). 수는 첫 굴림, 이긴 이는 같은 수를 다시 굴린 뒤의 최종.</summary>
 public sealed record LootRoll(ushort Image, byte Color, string Item, IReadOnlyList<(uint Serial, string Name, byte Roll)> Rolls, uint Winner);
@@ -85,7 +85,8 @@ public static class Auction
     public static AuctionDone ReadDone(ReadOnlySpan<byte> body)
     {
         var cursor = new Cursor(body, 5);
-        return new AuctionDone(cursor.U8() == 1, cursor.Text(), cursor.U16());
+        var done = new AuctionDone(cursor.U8() == 1, cursor.Text(), cursor.U16());
+        return cursor.Left > 0 ? done with { Notice = cursor.U8() == 1 } : done;
     }
 
     /// <summary>0xF4 본문(종류 바이트부터).</summary>

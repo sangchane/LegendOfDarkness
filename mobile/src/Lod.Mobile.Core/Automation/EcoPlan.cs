@@ -185,11 +185,14 @@ public static class EcoAuction
     /// 살 것 — 남의 경매 중 즉시 구매가가 있고, 내가 입을 수 있고 지금 것보다 좋은 장비. 부위마다 가장 좋은 것 하나, 사는 대로 금화를 빼며
     /// 물건 하나에 min(금화 × <see cref="Tuning.EcoAuctionBudget" />%, <see cref="Tuning.EcoAuctionSpendCap" />) 까지.
     /// </summary>
-    public static IReadOnlyList<AuctionRow> ToBuy(IReadOnlyList<AuctionRow> rows, IReadOnlyList<WornItem> worn, int path, int level, long gold)
+    /// <param name="refused">서버가 입기를 거절한 이름(성별 등 — 경매 줄에는 성별이 없다). 사서 못 입고 다시 올리는 일을 되풀이하지 않게.</param>
+    public static IReadOnlyList<AuctionRow> ToBuy(
+        IReadOnlyList<AuctionRow> rows, IReadOnlyList<WornItem> worn, int path, int level, long gold, IReadOnlyCollection<string>? refused = null)
     {
         List<AuctionRow> buys = [];
         foreach (IGrouping<int, AuctionRow> place in rows
-                     .Where(row => (row.Flags & 1) == 0 && row.Buyout > 0 && row.Stats is { } stats && EcoShopping.Fits(stats, path, level)
+                     .Where(row => (row.Flags & 1) == 0 && row.Buyout > 0 && refused?.Contains(row.Name) != true
+                                   && row.Stats is { } stats && EcoShopping.Fits(stats, path, level)
                                    && (worn.Where(one => one.Stats?.Place == stats.Place).Select(one => (int?)EcoShopping.Score(one.Stats!)).Min() is not { } now
                                        || EcoShopping.Score(stats) > now))
                      .GroupBy(row => row.Stats!.Place)

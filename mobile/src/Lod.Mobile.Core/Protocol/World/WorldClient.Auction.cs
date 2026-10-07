@@ -5,6 +5,8 @@ public sealed partial class WorldClient
 {
     private AuctionPage? _auctionPage;
     private AuctionDone? _auctionDone;
+    private AuctionDone? _auctionNotice;
+    private int _auctionNotices;
     private LootRoll? _lastRoll;
     private int _auctionPages;
     private int _auctionDones;
@@ -13,8 +15,13 @@ public sealed partial class WorldClient
     /// <summary>마지막으로 온 경매 쪽(찾기·내 경매·받을 것). 없으면 null.</summary>
     public AuctionPage? AuctionPage => Volatile.Read(ref _auctionPage);
 
-    /// <summary>마지막으로 온 경매 결과 — 내 요청의 답이거나 팔림·밀림 알림.</summary>
+    /// <summary>마지막으로 온 내 경매 요청의 답(0x5E 9). 남의 조작이 알린 것은 <see cref="AuctionNotice" /> 로 따로 — 섞이면 기다리던 답으로 잘못 안다.</summary>
     public AuctionDone? AuctionDone => Volatile.Read(ref _auctionDone);
+
+    /// <summary>마지막 알림 — 내 물건이 팔림·유찰, 입찰에서 밀림, 낙찰(받을 것 개수가 함께 온다).</summary>
+    public AuctionDone? AuctionNotice => Volatile.Read(ref _auctionNotice);
+
+    public int AuctionNoticeCount => Volatile.Read(ref _auctionNotices);
 
     /// <summary>마지막 룰렛.</summary>
     public LootRoll? LastRoll => Volatile.Read(ref _lastRoll);
@@ -65,8 +72,18 @@ public sealed partial class WorldClient
                 Interlocked.Increment(ref _auctionPages);
                 break;
             case Auction.DoneKind:
-                Volatile.Write(ref _auctionDone, Auction.ReadDone(body));
-                Interlocked.Increment(ref _auctionDones);
+                AuctionDone done = Auction.ReadDone(body);
+                if (done.Notice)
+                {
+                    Volatile.Write(ref _auctionNotice, done);
+                    Interlocked.Increment(ref _auctionNotices);
+                }
+                else
+                {
+                    Volatile.Write(ref _auctionDone, done);
+                    Interlocked.Increment(ref _auctionDones);
+                }
+
                 break;
         }
     }

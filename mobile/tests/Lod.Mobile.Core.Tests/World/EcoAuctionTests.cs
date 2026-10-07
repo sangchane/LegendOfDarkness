@@ -61,6 +61,14 @@ public sealed class EcoAuctionTests
     }
 
     [Fact]
+    public void Does_not_buy_what_the_server_refused_to_let_it_wear()
+    {
+        AuctionRow[] rows = [Listed(1, 1_000, Gear(1, dmgMax: 9)) with { Name = "드레스" }];
+
+        Assert.Empty(EcoAuction.ToBuy(rows, [], Warrior, level: 10, gold: 10_000, refused: ["드레스"]));
+    }
+
+    [Fact]
     public void A_rich_bot_spends_no_more_than_the_cap_on_one_piece()
     {
         AuctionRow[] rows = [Listed(1, 1_000_001, Gear(1, dmgMax: 99)), Listed(2, 1_000_000, Gear(1, dmgMax: 50))];

@@ -80,6 +80,8 @@ public sealed class AuctionReadTests
         done.AddRange(LegacyKoreanEncoding.EncodeStringA("금화가 모자랍니다"));
         done.AddRange(U16(2));
         Assert.Equal(new AuctionDone(false, "금화가 모자랍니다", 2), Auction.ReadDone([.. done]));
+        done.Add(1); // 알림 바이트(2026-10-07) — 남의 조작이 알린 것
+        Assert.True(Auction.ReadDone([.. done]).Notice);
 
         List<byte> roll = Head(Auction.RollKind);
         roll.AddRange([.. U16(0x8001), 3]);

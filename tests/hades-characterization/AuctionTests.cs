@@ -175,9 +175,9 @@ public sealed class AuctionTests : IDisposable
         Assert.Equal(50_000, c.Vitals!.Gold);
 
         // 더 높은 입찰 — 밀린 b 는 받을 것으로 돌려받고 알림을 듣는다.
-        int heard = b.AuctionDoneCount;
+        int heard = b.AuctionNoticeCount;
         Assert.True((await Act(c, () => c.AuctionBidAsync(id, 1_050, _deadline.Token))).Ok);
-        await Until(() => b.AuctionDoneCount > heard && b.AuctionDone!.Message.StartsWith("입찰에서 밀렸습니다"), "밀린 이가 알림을 듣지 못했습니다.");
+        await Until(() => b.AuctionNoticeCount > heard && b.AuctionNotice!.Message.StartsWith("입찰에서 밀렸습니다"), "밀린 이가 알림을 듣지 못했습니다.");
         Assert.Equal(1_000, Claims(Book(server), "bidb").Sum(claim => (long)claim["Gold"]!));
         Assert.Equal(200_000, Total(server, all));
 

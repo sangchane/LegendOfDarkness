@@ -565,7 +565,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         bool bought = false;
-        foreach (AuctionRow row in EcoAuction.ToBuy(page.Rows, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _world.Vitals.Gold))
+        foreach (AuctionRow row in EcoAuction.ToBuy(page.Rows, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _world.Vitals.Gold, _refused))
         {
             long before = _world.Vitals.Gold;
             if (await AuctionAct(() => _world.AuctionBuyoutAsync(row.Id, token), token) is { Ok: true })
