@@ -111,7 +111,7 @@
 
 		"PlayerLevelCap": 99,
 		"GroupExpBonus": 5.0,
-		"MaxCarryGold": 1000000000,
+		"MaxCarryGold": 2000000000,
 		"HpGainFactor": 5,
 		"MpGainFactor": 5,
 		"LootTableStackSize": 3,
