@@ -9,4 +9,4 @@ SPEC: `SPEC.md`. 위에서부터. 첫 셋이 버티컬 슬라이스(경매 한 �
 - [x] T6 봇 — `EcoPlan.ToAuction`·`AuctionBuys` 단위 시험 · `EcoRunner.Shop` 받기→올리기→사기 · 격리 봇 2(FR-014·015). model: sonnet
 - [x] T7 설정 끔·`DontSavePlayers`·불러오기 실패 닫힘 시험(FR-016) · `auction-revert.py`(FR-017, SC-007). model: opus
 - [x] T8 운영 — `cloud-server.sh` backup·cron `auction`, `auction-logs`, `auction-report.py`(SC-006 숫자·INV-2·끊긴 seq). model: sonnet
-- [ ] T9 회귀·리뷰(정확성 1 + 보안 — 복제·금화) · 커밋 · 배포는 사용자 확인 뒤.
+- [x] T9 회귀·리뷰(정확성 opus + 보안 fable — MEDIUM 7 반영) · 커밋. 배포는 사용자 확인 뒤(NEXT.md).

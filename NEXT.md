@@ -1,12 +1,11 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-10-07] 그룹 전리품 룰렛 · 와우식 경매장 — 등급 L · `dev:build` · 단계: BUILD T1~T4·T6~T8 끝, T5(앱 나머지 탭·룰렛 띠) 진행 · T9 리뷰(정확성 opus · 복제/금화 보안 fable) 진행.** 브랜치 `feature/loot-roll-auction`(루트·서버 — 되돌릴 수 있게, 사용자). 설계 `autopilot/loot-auction/`(00~08 · decision-log DL-13) · **SPEC `SPEC.md` · 작업 `tasks.md`**. 커밋 dcec9c9b…813c3c6c(서버 f7388485e·30caec89c·81196efae). **배포 안 함.**
-  사용자 답(10-07): 자동 룰렛 · 장비·희귀만 룰렛(나머지 돌림) · 그룹 금화 똑같이 · 봇은 올리기+나은 장비 사기(상한). 경매장 = 와우 방식, 앱 「설정」 옆 메뉴.
-  끝: 경매장 서버(올림·입찰·즉시 구매·취소·받기·기간 끝, 사건 seq/commit/abort, 캐릭터 저장 자물쇠, 줄마다 장비 수치 꼬리) · 룰렛·돌림·금화 나눔 · 줍기 보호 3분 고침 · 앱 찾기 탭 · 봇 경매(올리기·사기, 성직자도) · 되돌리기 `scripts/ops/auction-revert.py` · 보고 `auction-report.py` · `cloud-server.sh auction-logs|auction-report`, 배포가 클라우드 auction/ 을 덮지 않음, 백업에 포함.
-  시험: AuctionTests 13 · GroupLootTests 4 · EcoAuctionLoopTests 1 · 알맹이 756 · 회귀 31 통과. 사진 `shots/auction-browse-{portrait,landscape}-2026-10-07.png`.
+- **[현재/2026-10-07] 그룹 전리품 룰렛 · 와우식 경매장 — 등급 L · `dev:build` · 단계: BUILD·VERIFY·REVIEW 끝(T1~T8 · T9 리뷰 반영), 배포 전 — 사용자 확인 기다림.** 브랜치 `feature/loot-roll-auction`(루트·서버 — 되돌릴 수 있게, 사용자). 설계 `autopilot/loot-auction/`(SPEC.md · tasks.md · decision-log DL-13). 커밋 루트 46f0344b…5344e688 · 서버 f7388485e…04a742212. 이력은 WORKLOG.
+  사진: `shots/auction-{browse,post,mine,claims}-portrait-2026-10-07.png` · `auction-{browse,post}-landscape-…` · `auction-roll-portrait-…`.
   SPEC 결정(S-1): 동료 봇은 주인 그룹에 들어가므로 룰렛·나눔에서 뺀다(사람+동료 봇 사냥은 지금처럼 바닥).
-  **다음**: T5 받아 사진(탭 넷·룰렛 띠, 세로·가로) → 리뷰 지적 반영 → 사용자 확인 뒤 배포(`cloud-server.sh deploy` — 접속자 끊김 알림, `eco`, 앱 `ios-build.sh install`) → 클라우드 24시간 `auction-report`(SC-006).
+  **다음**: ① 사용자 확인 뒤 배포 — `dotnet build …/Lorule.GameServer.csproj` → `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh deploy`(접속자 끊김 알림, 백업 cron 도 다시 깜) → `… eco` → 앱 `scripts/ops/ios-build.sh install` ② 24시간 뒤 `cloud-server.sh auction-report`(SC-006: 봇 올림·구매 ≥1, 봇 올림 ≤5, 끊긴 조작 0) ③ 확인되면 main 에 합치기(사용자 확인).
+  정할 것: [취소] 수수료 경고가 터치에선 안 보임(툴팁) — 확인창을 넣을지 · 룰렛 띠는 창이 열려 있으면 가려짐(채팅 한 줄은 남음) · 가로에서 맵 출구 표지가 창 위에 겹침(다른 창도 같은 기존 동작).
 
 - **[현재/2026-10-07] 생태계 봇 그룹 사냥(⑦, 결정 19·20) — 등급 M · `dev:build` · 단계: 배포·지켜보기 중.** SPEC `autopilot/eco-bots/party-SPEC.md`. 커밋 588584b9 → 41039d2a → 238fd9de → 8e5c89a8 (서버 d911d4726 · 8c82414d5 · 217087306).
   만든 것: 성직자 1 + 파티 레벨 11 이상 싸우는 봇 3, 서버 그룹 경험치 같은 맵 모두(원작) · 경험치 60초 안 오르면 자리 옮김 · 노비스주민 선공 끔.
