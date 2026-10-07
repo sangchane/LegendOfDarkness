@@ -84,6 +84,9 @@ public sealed class CombatSmokeTests : IDisposable
     /// </summary>
     private const double MonsterBlowElement = 1.3;
 
+    /// <summary>허리띠가 없어 방어 무속성인 사람은 속성 있는 괴물의 한 방을 ×1.3 으로 받는다(상성표, 사용자 2026-10-07).</summary>
+    private const double NoBeltAgainstElement = 1.3;
+
     /// <summary>
     /// A swing that reached nothing is still announced, as a health report about serial zero
     /// (<c>Skills/Assail.cs</c>, the <c>!success</c> branch). It counts as a use of the skill, which is why
@@ -358,7 +361,7 @@ public sealed class CombatSmokeTests : IDisposable
     /// </summary>
     private static int[] MonsterBlows(int least, int most, int myArmor) =>
         [.. Enumerable.Range(least, most - least + 1)
-            .Select(raw => Landed(Math.Max(1, raw), myArmor, MonsterBlowElement))
+            .Select(raw => Landed(Math.Max(1, raw), myArmor, NoBeltAgainstElement * MonsterBlowElement))
             .Distinct()
             .Order()];
 

@@ -65,8 +65,9 @@ public sealed class PoteForestDeerDangerTests : IDisposable
         int armour = world.Vitals!.Armor;
         // 방어는 원작 5.99 식(scripts/Formulas/ac.cs — d + trunc(d × AC × k), k 0.01·0.009).
         static int Armoured(int blow, int ac) => Math.Max(1, blow + (int)((long)blow * ac * (ac > 0 ? 0.01 : 0.009)));
-        int expectedMin = Armoured(150, armour) * 13 / 10;
-        int expectedMax = Armoured(160, armour) * 13 / 10;
+        // 괴물 공격속성 ×1.3 · 내 방어 무속성(허리띠 없음) ×1.3(사용자 2026-10-07).
+        int expectedMin = (int)(Armoured(150, armour) * (1.3 * 1.3));
+        int expectedMax = (int)(Armoured(160, armour) * (1.3 * 1.3));
 
         List<int> drops = [];
         int seen = world.Vitals!.Health;

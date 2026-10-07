@@ -64,7 +64,8 @@ public sealed class Pack599MonsterBlowTests : IDisposable
         int armour = world.Vitals!.Armor;
         // 방어는 원작 5.99 식(scripts/Formulas/ac.cs — d + trunc(d × AC × k), k 0.01·0.009).
         int armoured = Math.Max(1, Blow + (int)((long)Blow * armour * (armour > 0 ? 0.01 : 0.009)));
-        int expected = armoured * 13 / 10;
+        // ×1.3 은 둘 — 괴물 공격속성(5.99) · 내 방어 무속성(허리띠 없음, 사용자 2026-10-07). 서버 곱셈 순서 그대로.
+        int expected = (int)(armoured * (1.3 * 1.3));
 
         List<int> drops = [];
         int seen = world.Vitals!.Health;
@@ -84,7 +85,7 @@ public sealed class Pack599MonsterBlowTests : IDisposable
         Assert.True(drops.Count > 0, "15초를 서 있었는데 괴물이 한 번도 치지 않았습니다.");
         Assert.True(
             drops.All(drop => drop % expected == 0) && drops.Contains(expected),
-            $"공격력 {Blow} 의 한 대가 방어 {armour} 를 거쳐 {armoured}, ×1.3 해서 {expected} 이어야 합니다. " +
+            $"공격력 {Blow} 의 한 대가 방어 {armour} 를 거쳐 {armoured}, ×1.3 · 무속성 ×1.3 해서 {expected} 이어야 합니다. " +
             $"줄어든 값: {string.Join(", ", drops)}");
     }
 

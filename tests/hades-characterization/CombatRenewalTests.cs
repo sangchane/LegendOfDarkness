@@ -40,7 +40,7 @@ public sealed class CombatRenewalTests : IDisposable
 
     /// <summary>
     /// 새 상성표(사용자 2026-10-04). 고리 수 &gt; 화 &gt; 풍 &gt; 토 &gt; 수 · 암흑은 넷을 이기고 생명은 암흑을 이긴다 ·
-    /// 나머지(같음·무관·없음)는 1.
+    /// 방어 무속성은 속성 있는 공격을 1.3 으로 받는다(사용자 2026-10-07) · 나머지(같음·무관·공격 무속성)는 1.
     /// </summary>
     [Theory]
     [InlineData(Element.Water, Element.Fire, 1.3)]
@@ -55,7 +55,8 @@ public sealed class CombatRenewalTests : IDisposable
     [InlineData(Element.Water, Element.Wind, 1.0)]
     [InlineData(Element.Fire, Element.Earth, 1.0)]
     [InlineData(Element.None, Element.Fire, 1.0)]
-    [InlineData(Element.Fire, Element.None, 1.0)]
+    [InlineData(Element.Fire, Element.None, 1.3)]
+    [InlineData(Element.Dark, Element.None, 1.3)]
     [InlineData(Element.None, Element.None, 1.0)]
     [InlineData(Element.Dark, Element.Water, 1.3)]
     [InlineData(Element.Dark, Element.Fire, 1.3)]
@@ -71,7 +72,7 @@ public sealed class CombatRenewalTests : IDisposable
     [InlineData(Element.Earth, Element.Light, 1.0)]
     [InlineData(Element.Dark, Element.Dark, 1.0)]
     [InlineData(Element.Light, Element.Light, 1.0)]
-    [InlineData(Element.Light, Element.None, 1.0)]
+    [InlineData(Element.Light, Element.None, 1.3)]
     [InlineData(Element.None, Element.Dark, 1.0)]
     public void Elements_follow_the_new_table(Element attack, Element defense, double expected) =>
         Assert.Equal(expected, Call<double>("Elements", "Multiplier", attack, defense));
