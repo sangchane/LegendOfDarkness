@@ -13,8 +13,8 @@
   - 판매가격 → Value (기본의 2·3·4·5배)
   - 무기: 공격력 `77m97` → DmgMin/DmgMax (+2씩)
   - 옷: 방어력(표는 음수) → AcModifer 절대값 (+1씩)
-그리고 속성 — 무기는 OffenseElement, 옷은 DefenseElement (수=Water 2 · 토=Earth 4 · 풍=Wind 3 · 화=Fire 1).
-지금 하데스 전투는 목걸이·벨트 속성만 읽는다. 무기·옷 속성을 피해에 쓰는 것은 전투 리뉴얼에서 한다.
+무기·옷의 수·토·풍·화는 **수치만** 바꾸고 속성을 주지 않는다 — 공격 속성은 목걸이, 방어 속성은 벨트(사용자 2026-10-07
+「옷에 속성은 방어력 같은 수치에 영향을 주는거야 방어 속성이 아니라」). 10-04 에는 무기 OffenseElement·옷 DefenseElement 를 적었다.
 
 **목걸이·벨트 속성도 적는다** — 이름 앞말(화염·바다·바람·대지·생명·암흑)로 목걸이 OffenseElement·벨트 DefenseElement.
 그 밖의 칸은 건드리지 않는다.
@@ -70,11 +70,9 @@ def variant(base, row, suffix):
     if base["EquipmentSlot"] == WEAPON:
         lo, hi = row["공격력"].split("m")
         body["DmgMin"], body["DmgMax"] = int(lo), int(hi)
-        body["OffenseElement"] = ELEMENT[suffix]
     else:
         body["AcModifer"] = {"$type": "Darkages.Types.StatusOperator, Darkages.Server",
                              "Option": 1, "Value": abs(int(row["방어력"]))}
-        body["DefenseElement"] = ELEMENT[suffix]
     return body
 
 

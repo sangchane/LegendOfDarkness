@@ -406,11 +406,13 @@ def stock(shop, lists, trouble, items, who, honden):
                 from_honden.append(name)
 
     # 수·토·풍·화 속성 무기·옷은 마을마다 찾아다니지 않게 수오미에서 이 칸 것을 전부 판다(사용자 2026-10-04,
-    # 원작 표 가격 그대로). 템플릿은 `build-elemental-gear.py` 가 만들고 속성 칸이 0 이 아닌 것으로 가른다.
+    # 원작 표 가격 그대로). 템플릿은 `build-elemental-gear.py` 가 만든다 — 이름 끝 수·토·풍·화를 떼면 같은 칸의 기본형이 있는 것.
+    # 속성 칸으로 가르지 않는다: 무기·옷의 수·토·풍·화는 수치만 바꾸고 속성을 주지 않는다(사용자 2026-10-07).
     if shop.get("속성변형"):
         for name, it in sorted(items.items()):
-            if it.get("EquipmentSlot") in shop["칸"] and (it.get("OffenseElement") or it.get("DefenseElement")) \
-                    and name not in seen:
+            base = items.get(name[:-1])
+            if it.get("EquipmentSlot") in shop["칸"] and name[-1:] in "수토풍화" and base \
+                    and base.get("EquipmentSlot") == it.get("EquipmentSlot") and name not in seen:
                 seen.add(name)
                 names.append(name)
 

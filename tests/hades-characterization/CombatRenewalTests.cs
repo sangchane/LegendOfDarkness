@@ -127,17 +127,9 @@ public sealed class CombatRenewalTests : IDisposable
         }
     }
 
-    /// <summary>공격 = 무기, 없으면 목걸이 · 방어 = 옷, 없으면 허리띠.</summary>
-    [Theory]
-    [InlineData(Element.Fire, Element.Earth, Element.Fire)]
-    [InlineData(Element.None, Element.Earth, Element.Earth)]
-    [InlineData(Element.None, Element.None, Element.None)]
-    public void The_weapon_or_clothes_come_before_the_necklace_or_belt(Element first, Element second, Element expected) =>
-        Assert.Equal(expected, Call<Element>("GearElements", "Pick", first, second));
-
     /// <summary>
-    /// 장비 속성을 끼고 벗는다. 광단검화(화) · 튜닉수(수)는 생성기가 넣은 그대로고, 목걸이(토) · 허리띠(암흑)는 시험용으로
-    /// 격리 서버에만 하나씩 만든다. 벗으면 남은 장비로 다시 정한다.
+    /// 장비 속성을 끼고 벗는다 — 공격 = 목걸이, 방어 = 허리띠(사용자 2026-10-07). 광단검화 · 튜닉수의 수·토·풍·화는 수치만
+    /// 바꾸고 속성을 주지 않는다. 목걸이(토) · 허리띠(암흑)는 시험용으로 격리 서버에만 하나씩 만든다.
     /// </summary>
     [Fact]
     public async Task Gear_elements_follow_what_is_worn_on_and_off()
@@ -163,18 +155,18 @@ public sealed class CombatRenewalTests : IDisposable
         await Until(() => world.Vitals is not null, "처음 수치가 오지 않았습니다.", world);
 
         await Wear(world, "광단검화");
-        await Expect(world, Element.Fire, Element.None);
+        await Expect(world, Element.None, Element.None);
         await Wear(world, "속성시험목걸이");
-        await Expect(world, Element.Fire, Element.None);
+        await Expect(world, Element.Earth, Element.None);
         await world.TakeOffAsync(1, _deadline.Token);
         await Expect(world, Element.Earth, Element.None);
         await world.TakeOffAsync(6, _deadline.Token);
         await Expect(world, Element.None, Element.None);
 
         await Wear(world, "튜닉수");
-        await Expect(world, Element.None, Element.Water);
+        await Expect(world, Element.None, Element.None);
         await Wear(world, "속성시험허리띠");
-        await Expect(world, Element.None, Element.Water);
+        await Expect(world, Element.None, Element.Dark);
         await world.TakeOffAsync(2, _deadline.Token);
         await Expect(world, Element.None, Element.Dark);
         await world.TakeOffAsync(11, _deadline.Token);
