@@ -109,12 +109,31 @@ public static class EcoShopping
     public static bool Fits(ItemStats stats, int path, int level) =>
         stats.Place > 0 && (stats.Class == 0 || stats.Class == path) && stats.Level <= level;
 
-    /// <summary>그 부위에 지금 입은 것 중 가장 약한 것의 점수(반지처럼 두 개 입는 부위). 안 입었으면 null.</summary>
-    private static int? WornScore(IReadOnlyList<WornItem> worn, int place) =>
-        worn.Where(item => item.Stats?.Place == place).Select(item => (int?)Score(item.Stats!)).Min();
+    /// <summary>두 손에 끼는 것(반지 7·8, 장갑 9·10)은 한 부위 — 서버는 빈 손에 끼우고(Generic.cs), 물건이 알리는 자리는 어느 손일 수도 있다.</summary>
+    public static int Family(int place) => place switch { 8 => 7, 10 => 9, _ => place };
 
-    private static bool Better(ItemStats stats, IReadOnlyList<WornItem> worn) =>
+    private static WornItem[] WornIn(IReadOnlyList<WornItem> worn, int place) =>
+        [.. worn.Where(item => item.Stats is { } stats && Family(stats.Place) == Family(place))];
+
+    /// <summary>그 부위에 지금 입은 것 중 가장 약한 것의 점수. 빈 자리가 있으면(반지·장갑은 두 손) null.</summary>
+    private static int? WornScore(IReadOnlyList<WornItem> worn, int place)
+    {
+        WornItem[] on = WornIn(worn, place);
+        return on.Length < (Family(place) is 7 or 9 ? 2 : 1) ? null : on.Min(item => Score(item.Stats!));
+    }
+
+    public static bool Better(ItemStats stats, IReadOnlyList<WornItem> worn) =>
         WornScore(worn, stats.Place) is not { } now || Score(stats) > now;
+
+    /// <summary>
+    /// 이것을 끼기 전에 벗을 자리 — 두 손이 다 찼으면 약한 쪽. 서버는 두 손이 다 차면 물건이 알리는 손을 바꾸므로 센 쪽이 빠질 수 있다.
+    /// 빈 손이 있거나 한 손 부위면 null(서버가 알아서 바꾼다).
+    /// </summary>
+    public static int? ToFree(ItemStats stats, IReadOnlyList<WornItem> worn)
+    {
+        WornItem[] on = WornIn(worn, stats.Place);
+        return Family(stats.Place) is 7 or 9 && on.Length >= 2 ? on.MinBy(item => Score(item.Stats!))!.Slot : null;
+    }
 
     /// <summary>부위마다(무기부터) 맞고 · 지금보다 좋고 · 남은 예산 안의 가장 좋은 것 하나.</summary>
     public static IReadOnlyList<EcoBuy> GearToBuy(
@@ -125,7 +144,7 @@ public static class EcoShopping
         foreach (IGrouping<int, DialogueGoods> place in goods
                      .Where(one => one.Stats is { } stats && Fits(stats, path, level) && one.Price > 0
                                    && (one.Gender == 255 || one.Gender == gender) && Better(stats, worn))
-                     .GroupBy(one => one.Stats!.Place)
+                     .GroupBy(one => Family(one.Stats!.Place))
                      .OrderBy(group => group.Key))
         {
             if (place.Where(one => one.Price <= budget).MaxBy(one => (Score(one.Stats!), one.Stats!.Level)) is { } pick)
@@ -143,7 +162,7 @@ public static class EcoShopping
         IReadOnlyList<InventoryItem> pack, IReadOnlyList<WornItem> worn, int path, int level, IReadOnlyCollection<string> refused) =>
     [
         .. pack.Where(item => item.Stats is { } stats && Fits(stats, path, level) && !refused.Contains(item.Name) && Better(stats, worn))
-            .GroupBy(item => item.Stats!.Place)
+            .GroupBy(item => Family(item.Stats!.Place))
             .Select(place => place.MaxBy(item => Score(item.Stats!))!)
             .OrderBy(item => item.Slot),
     ];
@@ -195,10 +214,8 @@ public static class EcoAuction
         List<AuctionRow> buys = [];
         foreach (IGrouping<int, AuctionRow> place in rows
                      .Where(row => (row.Flags & 1) == 0 && row.Buyout > 0 && refused?.Contains(row.Name) != true
-                                   && row.Stats is { } stats && EcoShopping.Fits(stats, path, level)
-                                   && (worn.Where(one => one.Stats?.Place == stats.Place).Select(one => (int?)EcoShopping.Score(one.Stats!)).Min() is not { } now
-                                       || EcoShopping.Score(stats) > now))
-                     .GroupBy(row => row.Stats!.Place)
+                                   && row.Stats is { } stats && EcoShopping.Fits(stats, path, level) && EcoShopping.Better(stats, worn))
+                     .GroupBy(row => EcoShopping.Family(row.Stats!.Place))
                      .OrderBy(group => group.Key))
         {
             long limit = Math.Min(gold * Tuning.EcoAuctionBudget / 100, Tuning.EcoAuctionSpendCap);

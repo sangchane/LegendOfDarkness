@@ -103,6 +103,26 @@ public sealed class EcoTests
         Assert.Equal("하급체력포션", EcoShopping.BestPotion(pack));
     }
 
+    [Fact]
+    public void Rings_fill_both_hands_and_a_new_one_must_beat_the_weaker()
+    {
+        // 반지는 두 손(7·8) — 서버는 빈 손에 끼운다(Generic.cs). 클라우드 10-07: 사제봇9 는 홍옥반지 하나로 오른손이 비어 있었다.
+        DialogueGoods[] shop = [Offer("홍옥반지", 1000, Gear(7, ac: -2)), Offer("산호반지", 3000, Gear(7, ac: -1))];
+        WornItem[] one = [new(7, 1, "홍옥반지", "홍옥반지", 0, 0, Gear(7, ac: -2))];
+        Assert.Equal([new EcoBuy("홍옥반지", 1)], EcoShopping.GearToBuy(shop, one, Warrior, 1, 20, budget: 5000));
+
+        InventoryItem[] pack = [new(3, 1, 0, "홍옥반지", 1, 0, 0, Gear(7, ac: -2))];
+        Assert.Equal([3], EcoShopping.ToWear(pack, one, Warrior, 20, refused: []).Select(item => item.Slot));
+        Assert.Null(EcoShopping.ToFree(Gear(7, ac: -2), one));
+
+        // 두 손이 다 차면 약한 쪽보다 좋아야 산다 — 오른손 반지는 자리를 8 로 알려 오기도 한다. 끼기 전에 약한 쪽을 벗는다.
+        WornItem[] two = [.. one, new(8, 1, "세토아의사파이어반지", "세토아의사파이어반지", 0, 0, Gear(8, ac: -5))];
+        Assert.Empty(EcoShopping.GearToBuy(shop, two, Warrior, 1, 20, budget: 5000));
+        Assert.Equal([new EcoBuy("자수정반지", 1)],
+            EcoShopping.GearToBuy([Offer("자수정반지", 7000, Gear(7, ac: -3))], two, Warrior, 1, 20, budget: 9000));
+        Assert.Equal(7, EcoShopping.ToFree(Gear(7, ac: -3), two));
+    }
+
     private static EcoSight Sight(TimeSpan now, int potions = 20, int free = 100, bool stopped = false, TimeSpan? person = null,
         bool ghost = false, bool coma = false, int health = 100, TimeSpan? gained = null) =>
         new(now, coma, ghost, potions, free, stopped, person, health, gained);

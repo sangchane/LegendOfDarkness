@@ -648,8 +648,17 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     {
         foreach (InventoryItem item in EcoShopping.ToWear(_world.Pack, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _refused))
         {
+            // 두 손이 다 찼으면 약한 쪽을 먼저 벗는다 — 서버는 빈 손에 끼운다(EcoShopping.ToFree).
+            if (EcoShopping.ToFree(item.Stats!, _world.Worn) is { } free)
+            {
+                await _world.TakeOffAsync(free, token);
+                await Until(() => _world.Worn.All(one => one.Slot != free), Answer, token);
+            }
+
+            // 같은 이름 반지를 하나 더 낄 수 있어 수가 느는지 본다.
+            int before = _world.Worn.Count(one => one.Name == item.Name);
             await _world.UseAsync(item.Slot, token);
-            bool worn = await Until(() => _world.Worn.Any(one => one.Name == item.Name), Answer, token);
+            bool worn = await Until(() => _world.Worn.Count(one => one.Name == item.Name) > before, Answer, token);
 
             if (worn)
             {
