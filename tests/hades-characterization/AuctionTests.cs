@@ -525,9 +525,19 @@ public sealed class AuctionTests : IDisposable
             "--orient", orient, "--size", orient == "portrait" ? "360x780" : "800x360",
         ];
 
-        // 룰렛 띠는 창 아래 겹이라 창 없이 찍는다(사냥 중 모습).
+        // 룰렛 띠는 창들 위에 뜬다 — 창을 연 채 함께 찍는다. 취소 확인 판은 내 경매 탭에서.
         bool roll = Environment.GetEnvironmentVariable("LOD_AUCTION_ROLL") is { Length: > 0 };
-        arguments.AddRange(roll ? ["--roll-preview"] : ["--auction", "--auction-tab", Environment.GetEnvironmentVariable("LOD_AUCTION_TAB") ?? "찾기"]);
+        bool confirm = Environment.GetEnvironmentVariable("LOD_AUCTION_CONFIRM") is { Length: > 0 };
+        arguments.AddRange(["--auction", "--auction-tab", confirm ? "내경매" : Environment.GetEnvironmentVariable("LOD_AUCTION_TAB") ?? "찾기"]);
+        if (roll)
+        {
+            arguments.Add("--roll-preview");
+        }
+
+        if (confirm)
+        {
+            arguments.Add("--auction-confirm");
+        }
 
         arguments.AddRange(["--shot", shot, "--shot-after", Environment.GetEnvironmentVariable("LOD_AUCTION_SHOT_AFTER") ?? "14"]);
         foreach (string argument in arguments)
@@ -541,7 +551,10 @@ public sealed class AuctionTests : IDisposable
         await app.WaitForExitAsync(_deadline.Token);
 
         Assert.True(File.Exists(shot), "사진이 남지 않았습니다.");
-        Assert.Contains(roll ? "GREYBOX_ROLL_PREVIEW" : "GREYBOX_AUCTION_TAB", await said, StringComparison.Ordinal);
+        string printed = await said;
+        Assert.Contains("GREYBOX_AUCTION_TAB", printed, StringComparison.Ordinal);
+        Assert.True(!roll || printed.Contains("GREYBOX_ROLL_PREVIEW"), "룰렛 띠를 띄우지 않았습니다.");
+        Assert.True(!confirm || printed.Contains("GREYBOX_AUCTION_CONFIRM"), "취소 확인 판을 띄우지 않았습니다.");
     }
 
     // ---- 도우미 ----

@@ -168,8 +168,8 @@ public partial class GameScreen : Control
         _controlRow.ItemRectChanged += () => Callable.From(() => DodgePotions(side)).CallDeferred();
         _abilities.ItemRectChanged += () => Callable.From(() => DodgePotions(side)).CallDeferred();
 
-        // 룰렛 띠는 위 줄 바로 아래 가운데 — 창들보다 먼저 넣어 창이 열리면 그 아래로 간다. 손을 받지 않는다.
-        over.AddChild(_roll);
+        // 룰렛 띠는 위 줄 바로 아래 가운데 — 창들을 다 넣은 뒤에 넣어(아래 PlaceColumn 뒤) 소지품·장비·설정·경매장이 열려 있어도 위에 뜬다
+        // (사용자 2026-10-07). 손을 받지 않아 아래 창을 누르는 데 걸리지 않는다.
         _roll.AnchorLeft = 0.5f;
         _roll.AnchorRight = 0.5f;
         _roll.GrowHorizontal = GrowDirection.Both;
@@ -321,6 +321,7 @@ public partial class GameScreen : Control
         }
 
         PlaceColumn(holders);
+        over.AddChild(_roll);
 
         // 창의 최소 폭은 글자를 잰 뒤에야 맞는다. 처음 잰 값이 모자랐다(314 — 창은 438) — 바뀔 때마다 다시 세운다.
         _pack.MinimumSizeChanged += () => PlaceColumn(holders);

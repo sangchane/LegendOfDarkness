@@ -188,6 +188,7 @@ public sealed partial class AuctionPanel : PanelContainer
         within.AddThemeStyleboxOverride("panel", Greybox.Sheet());
         within.AddChild(margin);
         AddChild(within);
+        BuildConfirm();
 
         Frame();
         Side();
@@ -210,7 +211,11 @@ public sealed partial class AuctionPanel : PanelContainer
     public string TabName => Tabs[_tab];
 
     /// <summary>창을 열 때 — 보던 탭을 다시 묻는다.</summary>
-    public void Open() => Enter();
+    public void Open()
+    {
+        _confirm.Visible = false;
+        Enter();
+    }
 
     /// <summary>서버가 보낸 보기(0x5E 8) — 지금 탭의 것이면 줄을 늘어놓는다. 받을 것 개수는 어느 보기든 갱신한다.</summary>
     public void ShowPage(AuctionPage page)

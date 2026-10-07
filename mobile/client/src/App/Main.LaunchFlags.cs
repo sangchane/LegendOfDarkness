@@ -72,6 +72,9 @@ public partial class Main : Control
     public static string AuctionTab => Flag("--auction-tab");
 
     /// <summary>손 없이 확인할 때 — 서버 없이 6초 뒤 지어낸 룰렛 결과를 띄운다(<c>--roll-preview</c>). 사진용.</summary>
+    /// <summary>손 없이 확인할 때 — 내 경매 탭이 열리면 내 첫 경매의 [취소]를 누른 셈 치고 확인 판을 띄운다(<c>--auction-confirm</c>).</summary>
+    public static bool AuctionConfirm => System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auction-confirm") >= 0;
+
     public static bool RollPreview => System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--roll-preview") >= 0;
 
     /// <summary>손 없이 확인할 때 — 파티 초대가 오면 [수락]을 누른다(<c>--accept</c>).</summary>

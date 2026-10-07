@@ -331,6 +331,11 @@ public partial class GameScreen : Control
             _auctionRehearsed = true;
             GD.Print($"GREYBOX_AUCTION_TAB {_auction.TabName} {rows}");
 
+            if (Main.AuctionConfirm && _auction.RehearseCancel())
+            {
+                GD.Print("GREYBOX_AUCTION_CONFIRM");
+            }
+
             if (_auction.TabName == "찾기" && _auction.Names.Count > 0)
             {
                 GD.Print($"GREYBOX_AUCTION {string.Join(",", _auction.Names)}");

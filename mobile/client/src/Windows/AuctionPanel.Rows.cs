@@ -70,7 +70,8 @@ public sealed partial class AuctionPanel
         HBoxContainer line = Look(row.Image, Title(row.Name, row.Stacks), Detail(row));
         if ((row.Flags & 1) != 0)
         {
-            line.AddChild(RowButton("취소", server => server.AuctionCancelAsync(row.Id, CancellationToken.None), "입찰이 있으면 현재가의 5% 수수료"));
+            _ownShown = row;
+            line.AddChild(RowButton("취소", () => AskCancel(row)));
         }
 
         return Plate(line);
@@ -84,7 +85,7 @@ public sealed partial class AuctionPanel
             gold ? GoldIcon : claim.Image,
             gold ? $"금화 {claim.Gold:N0}전" : Title(claim.Name, claim.Stacks),
             Reasons[Math.Min((int)claim.Reason, Reasons.Length - 1)]);
-        line.AddChild(RowButton("받기", server => server.AuctionTakeAsync(claim.Id, CancellationToken.None)));
+        line.AddChild(RowButton("받기", () => Act(server => server.AuctionTakeAsync(claim.Id, CancellationToken.None))));
 
         return Plate(line);
     }
@@ -225,16 +226,88 @@ public sealed partial class AuctionPanel
     }
 
     /// <summary>줄 끝의 동작 단추 — 답을 기다리는 동안 잠긴다.</summary>
-    private Button RowButton(string text, Func<WorldClient, System.Threading.Tasks.Task> call, string tip = "")
+    private Button RowButton(string text, Action press)
     {
         Button button = Small(text);
         button.CustomMinimumSize = new Vector2(64, 40);
         button.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-        button.TooltipText = tip;
         button.Disabled = _busy || _asking;
-        button.Pressed += () => Act(call);
+        button.Pressed += press;
         _acts.Add(button);
 
         return button;
+    }
+
+    private readonly CenterContainer _confirm = new() { Visible = false, MouseFilter = MouseFilterEnum.Stop };
+    private readonly Label _confirmText = new()
+    {
+        HorizontalAlignment = HorizontalAlignment.Center,
+        AutowrapMode = TextServer.AutowrapMode.WordSmart,
+        CustomMinimumSize = new Vector2(240, 0)
+    };
+
+    private uint _cancelling;
+    private AuctionRow? _ownShown;
+
+    /// <summary>손 없이 확인할 때(<c>--auction-confirm</c>) — 늘어선 내 경매 하나의 [취소]를 누른 셈. 내 것이 없으면 false.</summary>
+    public bool RehearseCancel()
+    {
+        if (_ownShown is not { } row)
+        {
+            return false;
+        }
+
+        AskCancel(row);
+        return true;
+    }
+
+    /// <summary>
+    /// [취소] 를 누르면 먼저 묻는 판(사용자 2026-10-07) — 입찰이 있으면 현재가의 5% 수수료가 들고, 없어도 보증금은 돌아오지 않는다.
+    /// 툴팁은 터치에서 뜨지 않아 판으로 묻는다. 모양은 소지품 「버리기」 판과 같다.
+    /// </summary>
+    private void BuildConfirm()
+    {
+        Button yes = Small("취소하기");
+        Greybox.Commit(yes);
+        Button no = Small("그만두기");
+        yes.CustomMinimumSize = no.CustomMinimumSize = new Vector2(96, Main.TouchMinimum);
+        yes.Pressed += () =>
+        {
+            _confirm.Visible = false;
+            uint id = _cancelling;
+            Act(server => server.AuctionCancelAsync(id, CancellationToken.None));
+        };
+        no.Pressed += () => _confirm.Visible = false;
+
+        StyleBoxFlat plate = Greybox.Plate();
+        plate.BgColor = new Color("#0f0f0f");
+        plate.BorderColor = Greybox.Muted;
+        plate.SetCornerRadiusAll(10);
+        plate.SetContentMarginAll(Main.Gutter);
+        PanelContainer ask = new();
+        ask.AddThemeStyleboxOverride("panel", plate);
+        _confirmText.AddThemeColorOverride("font_color", Greybox.Title);
+
+        HBoxContainer answers = new() { Alignment = BoxContainer.AlignmentMode.Center };
+        answers.AddThemeConstantOverride("separation", Main.Gutter);
+        answers.AddChild(yes);
+        answers.AddChild(no);
+        VBoxContainer asking = new();
+        asking.AddThemeConstantOverride("separation", Main.Gutter);
+        asking.AddChild(_confirmText);
+        asking.AddChild(answers);
+        ask.AddChild(asking);
+        _confirm.AddChild(ask);
+        AddChild(_confirm);
+    }
+
+    private void AskCancel(AuctionRow row)
+    {
+        _cancelling = row.Id;
+        long fee = (row.Flags & 4) != 0 ? (long)row.Price * 5 / 100 : 0;
+        _confirmText.Text = fee > 0
+            ? $"{row.Name} 경매를 취소할까요?\n입찰이 있어 수수료 {fee:N0}전(현재가의 5%)을 내고, 보증금은 돌려받지 못합니다."
+            : $"{row.Name} 경매를 취소할까요?\n보증금은 돌려받지 못합니다.";
+        _confirm.Visible = true;
     }
 }
