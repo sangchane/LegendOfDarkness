@@ -475,14 +475,20 @@ public sealed class AuctionTests : IDisposable
             (Sword, 1, 1_000, 10_000, 12), ("가죽방패", 1, 2_500, 0, 24), ("대지의목걸이", 1, 8_000, 15_000, 48),
             ("산호반지", 1, 1_800, 3_000, 12), ("상급체력포션", 20, 400, 900, 24),
         ];
-        using IsolatedHadesServer server = Ready(("aucshop", 1_000_000, 0), ("aucview", 50_000, 0));
+        using IsolatedHadesServer server = Ready(("aucshop", 1_000_000, 0), ("aucview", 100_000, 0));
         for (int at = 0; at < goods.Length; at++)
         {
             Give(server, "aucshop", at + 1, goods[at].Name, 1, goods[at].Stacks);
         }
 
+        // 보는 이도 탭마다 보일 것을 갖춘다 — 가방(올리기), 제가 올린 것(내 경매, 입찰이 붙은 것), 받을 것(산 것 둘).
+        Give(server, "aucview", 1, Sword, 1);
+        Give(server, "aucview", 2, "가죽방패", 1);
+        Give(server, "aucview", 3, "상급체력포션", 1, stacks: 10);
+
         WorldClient seller = Pump(await Login(server, "aucshop"));
-        await Until(() => seller.Pack.Count == goods.Length, $"올릴 물건이 오지 않았습니다: {seller.Pack.Count}");
+        WorldClient viewer = Pump(await Login(server, "aucview"));
+        await Until(() => seller.Pack.Count == goods.Length && viewer.Pack.Count == 3, $"올릴 물건이 오지 않았습니다: {seller.Pack.Count}");
         for (int at = 0; at < goods.Length; at++)
         {
             var (name, _, price, buyout, hours) = goods[at];
@@ -490,6 +496,19 @@ public sealed class AuctionTests : IDisposable
             AuctionDone posted = await Act(seller, () => seller.AuctionPostAsync(slot, price, buyout, hours, _deadline.Token));
             Assert.True(posted.Ok, $"{name}: {posted.Message}");
         }
+
+        Assert.True((await Act(viewer, () => viewer.AuctionPostAsync(1, 1_200, 6_000, 24, _deadline.Token))).Ok);
+        AuctionRow[] rows = [.. (await Browse(viewer)).Rows];
+        foreach (string name in new[] { "산호반지", "대지의목걸이" })
+        {
+            uint id = rows.First(row => row.Name.Contains(name)).Id;
+            Assert.True((await Act(viewer, () => viewer.AuctionBuyoutAsync(id, _deadline.Token))).Ok);
+        }
+
+        uint mine = rows.First(row => (row.Flags & 1) != 0).Id;
+        Assert.True((await Act(seller, () => seller.AuctionBidAsync(mine, 1_200, _deadline.Token))).Ok);
+        await viewer.LogOutAsync(_deadline.Token);
+        await Task.Delay(TimeSpan.FromSeconds(2), _deadline.Token);
 
         File.Delete(shot);
         string orient = Environment.GetEnvironmentVariable("LOD_AUCTION_ORIENT") ?? "portrait";
@@ -499,13 +518,19 @@ public sealed class AuctionTests : IDisposable
             RedirectStandardError = true,
         };
 
-        foreach (string argument in new[]
-                 {
-                     "--position", "-3000,-3000", "--audio-driver", "Dummy", "--",
-                     "--server", $"127.0.0.1:{server.LoginPort}", "--login", $"aucview:{LoginFlow.SyntheticSecret}",
-                     "--orient", orient, "--size", orient == "portrait" ? "360x780" : "800x360",
-                     "--auction", "--shot", shot, "--shot-after", "14"
-                 })
+        List<string> arguments =
+        [
+            "--position", "-3000,-3000", "--audio-driver", "Dummy", "--",
+            "--server", $"127.0.0.1:{server.LoginPort}", "--login", $"aucview:{LoginFlow.SyntheticSecret}",
+            "--orient", orient, "--size", orient == "portrait" ? "360x780" : "800x360",
+        ];
+
+        // 룰렛 띠는 창 아래 겹이라 창 없이 찍는다(사냥 중 모습).
+        bool roll = Environment.GetEnvironmentVariable("LOD_AUCTION_ROLL") is { Length: > 0 };
+        arguments.AddRange(roll ? ["--roll-preview"] : ["--auction", "--auction-tab", Environment.GetEnvironmentVariable("LOD_AUCTION_TAB") ?? "찾기"]);
+
+        arguments.AddRange(["--shot", shot, "--shot-after", Environment.GetEnvironmentVariable("LOD_AUCTION_SHOT_AFTER") ?? "14"]);
+        foreach (string argument in arguments)
         {
             start.ArgumentList.Add(argument);
         }
@@ -516,7 +541,7 @@ public sealed class AuctionTests : IDisposable
         await app.WaitForExitAsync(_deadline.Token);
 
         Assert.True(File.Exists(shot), "사진이 남지 않았습니다.");
-        Assert.Contains("GREYBOX_AUCTION", await said, StringComparison.Ordinal);
+        Assert.Contains(roll ? "GREYBOX_ROLL_PREVIEW" : "GREYBOX_AUCTION_TAB", await said, StringComparison.Ordinal);
     }
 
     // ---- 도우미 ----

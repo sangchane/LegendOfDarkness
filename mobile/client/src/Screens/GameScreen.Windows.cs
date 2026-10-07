@@ -168,6 +168,13 @@ public partial class GameScreen : Control
         _controlRow.ItemRectChanged += () => Callable.From(() => DodgePotions(side)).CallDeferred();
         _abilities.ItemRectChanged += () => Callable.From(() => DodgePotions(side)).CallDeferred();
 
+        // 룰렛 띠는 위 줄 바로 아래 가운데 — 창들보다 먼저 넣어 창이 열리면 그 아래로 간다. 손을 받지 않는다.
+        over.AddChild(_roll);
+        _roll.AnchorLeft = 0.5f;
+        _roll.AnchorRight = 0.5f;
+        _roll.GrowHorizontal = GrowDirection.Both;
+        _topRow.Resized += () => _roll.OffsetTop = _topRow.Position.Y + _topRow.Size.Y + Main.Gutter;
+
         // 큰일은 가운데, 캐릭터 머리보다 위에 — 위 줄과 캐릭터 사이.
         over.AddChild(_banner);
         _banner.AnchorLeft = 0;
@@ -243,14 +250,16 @@ public partial class GameScreen : Control
                 _users.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
             }
 
-            // 경매장 창 — 세로는 위 줄 바로 아래 폭 전체. 가로는 가운데에 460 폭, 높이가 모자라 소지품처럼 위 줄을 덮는다.
+            // 경매장 창 — 세로는 위 줄 바로 아래 폭 전체. 가로는 가운데에 600 폭(목록 옆에 입찰·올리기 칸이 선다), 높이가 모자라 소지품처럼 위 줄을 덮는다.
+            // 높이는 화면 아래(안전 구역)까지 — 목록이 남는 만큼 늘어나고, 안전 구역으로 줄어도 입찰 줄이 안 잘린다.
             if (panel == _auction)
             {
                 holder.Alignment = BoxContainer.AlignmentMode.Begin;
+                _auction.SizeFlagsVertical = SizeFlags.ExpandFill;
                 if (!Main.Portrait)
                 {
                     _auction.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-                    _auction.CustomMinimumSize = new Vector2(Mathf.Min(460, GetViewportRect().Size.X - (Main.Gutter * 4)), 0);
+                    _auction.CustomMinimumSize = new Vector2(Mathf.Min(600, GetViewportRect().Size.X - (Main.Gutter * 4)), 0);
                 }
             }
 

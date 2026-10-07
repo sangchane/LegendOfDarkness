@@ -311,7 +311,10 @@ public partial class GameScreen : Control
 
     private bool _auctionRehearsed;
 
-    /// <summary>손 없이 확인할 때만(<c>--auction</c>): 들어간 뒤 [경매장] 창을 한 번 열고, 찾기 쪽이 오면 줄 이름들을 적는다.</summary>
+    /// <summary>
+    /// 손 없이 확인할 때만(<c>--auction</c> · <c>--auction-tab 찾기|올리기|내경매|받을것</c>): 들어간 뒤 [경매장] 창을 한 번 열고, 그 탭의 줄이
+    /// 오면 <c>GREYBOX_AUCTION_TAB 탭 줄수</c> 를 적는다(찾기는 줄 이름들도 <c>GREYBOX_AUCTION</c> 으로).
+    /// </summary>
     private void RehearseAuction()
     {
         if (!Main.ShowingAuction || _auctionRehearsed || Time.GetTicksMsec() < 6000)
@@ -323,11 +326,32 @@ public partial class GameScreen : Control
         {
             SetWindow(GameWindow.Auction, true);
         }
-        else if (_auction.Names.Count > 0)
+        else if (_auction.RowCount is { } rows)
         {
             _auctionRehearsed = true;
-            GD.Print($"GREYBOX_AUCTION {string.Join(",", _auction.Names)}");
+            GD.Print($"GREYBOX_AUCTION_TAB {_auction.TabName} {rows}");
+
+            if (_auction.TabName == "찾기" && _auction.Names.Count > 0)
+            {
+                GD.Print($"GREYBOX_AUCTION {string.Join(",", _auction.Names)}");
+            }
         }
+    }
+
+    private bool _rollRehearsed;
+
+    /// <summary>손 없이 확인할 때만(<c>--roll-preview</c>): 6초 뒤 서버 없이 지어낸 룰렛 결과(셋) 하나를 띄운다.</summary>
+    private void RehearseRoll()
+    {
+        if (!Main.RollPreview || _rollRehearsed || Time.GetTicksMsec() < 6000)
+        {
+            return;
+        }
+
+        _rollRehearsed = true;
+        _roll.Show(new Lod.Mobile.Core.Protocol.World.LootRoll(
+            32957, 0, "청동 방패+2", [(1, "전사", 87), (2, "마법사", 42), (3, "성직자", 65)], 1));
+        GD.Print("GREYBOX_ROLL_PREVIEW 전사 87");
     }
 
     private double _aimRehearsal = -1;

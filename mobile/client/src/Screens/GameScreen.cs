@@ -73,6 +73,11 @@ public partial class GameScreen : Control
     private readonly AuctionPanel _auction = new();
     private int _auctionPages;
     private int _auctionDones;
+    private int _auctionNotices;
+
+    // 그룹 전리품 룰렛 띠 — 룰렛(0x5E 7)이 올 때마다 위쪽에 3초(RollBanner).
+    private readonly RollBanner _roll = new();
+    private int _rolls;
     private bool _usersAsking;
     private double _usersAskIn;
     private int _usersAsked;
@@ -296,8 +301,8 @@ public partial class GameScreen : Control
         _settings.Close.Pressed += () => SetWindow(GameWindow.Settings, false);
         _users.Close.Pressed += () => SetWindow(GameWindow.Users, false);
         _auction.Close.Pressed += () => SetWindow(GameWindow.Auction, false);
-        _auction.Search += (kind, sort, page, query) =>
-            Main.Fire(_server?.AuctionBrowseAsync(kind, sort, page, query, System.Threading.CancellationToken.None));
+        _auction.Send += call => Main.Fire(_server is { } server ? call(server) : null);
+        _auction.Bag = () => _server?.Pack ?? LayoutCheck.PretendPack;
 
         // [종료] 는 위 줄에서 설정 창 제목 줄의 [로그아웃] 으로 옮겼다(2026-09-26). 판은 그대로 — 로그아웃 · 게임 종료 · 취소.
         _settings.Exit.Pressed += () =>
@@ -561,6 +566,7 @@ public partial class GameScreen : Control
         Entered();
         OpenChatOnItsOwn();
         RehearseNotices();
+        RehearseRoll();
         Dropped();
         RejoinIfHandedOff();
         LogUnread();
@@ -680,11 +686,11 @@ public partial class GameScreen : Control
             AskUsers();
         }
 
-        // 경매장 — 찾기 쪽(0x5E 8)이 오면 늘어놓고, 거절(0x5E 9)은 창 위 한 줄로.
+        // 경매장 — 보기(0x5E 8)가 오면 늘어놓고, 내 요청의 결과(0x5E 9)는 창 위 한 줄로, 남의 조작이 알린 것(팔림·밀림)은 알림으로.
         if (_server is not null && _server.AuctionPageCount != _auctionPages)
         {
             _auctionPages = _server.AuctionPageCount;
-            if (_server.AuctionPage is { View: 0 } page)
+            if (_server.AuctionPage is { } page)
             {
                 _auction.ShowPage(page);
             }
@@ -694,6 +700,27 @@ public partial class GameScreen : Control
         {
             _auctionDones = _server.AuctionDoneCount;
             _auction.ShowDone(_server.AuctionDone!);
+        }
+
+        if (_server is not null && _server.AuctionNoticeCount != _auctionNotices)
+        {
+            _auctionNotices = _server.AuctionNoticeCount;
+            AuctionDone notice = _server.AuctionNotice!;
+            _auction.ShowNotice(notice);
+            if (!_auction.Visible)
+            {
+                _toasts.Add(notice.Message);
+            }
+        }
+
+        // 그룹 룰렛(0x5E 7) — 온 것을 위쪽 띠로 돌린다.
+        if (_server is not null && _server.RollCount != _rolls)
+        {
+            _rolls = _server.RollCount;
+            if (_server.LastRoll is { } roll)
+            {
+                _roll.Show(roll);
+            }
         }
 
         // 사람을 눌러 서버가 그 사람 장비창(0x34)을 보내 왔다.
