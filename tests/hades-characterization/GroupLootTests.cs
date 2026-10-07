@@ -119,6 +119,20 @@ public sealed class GroupLootTests : IDisposable
         Assert.Equal(0, Swords(hero) + Swords(bot));
     }
 
+    [Fact]
+    public async Task With_the_roll_turned_off_group_loot_lies_on_the_floor()
+    {
+        using IsolatedHadesServer server = Ready(target => Drops(target, Sword), config => config["GroupLootRoll"] = false,
+            ("offlead", null), ("offmate", null));
+        WorldClient lead = await Enter(server, "offlead");
+        WorldClient mate = await Enter(server, "offmate");
+        await Group(lead, "offlead", (mate, "offmate"));
+
+        await Kill(lead, () => LyingAt(lead, Spot) is not null);
+        Assert.Equal(0, lead.RollCount);
+        Assert.Equal(0, Swords(lead) + Swords(mate));
+    }
+
     // ---- 도우미 ----
 
     private static void Drops(JsonNode target, string item)

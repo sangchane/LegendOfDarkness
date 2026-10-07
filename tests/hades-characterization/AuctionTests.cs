@@ -364,6 +364,100 @@ public sealed class AuctionTests : IDisposable
         Assert.Equal(12, armour.Rows.Count);
     }
 
+    [Fact]
+    public async Task A_closed_auction_house_still_hands_out_what_is_owed()
+    {
+        using IsolatedHadesServer server = Ready(("offsell", 100_000, 2), ("offbuy", 50_000, 0));
+        WorldClient seller = Pump(await Login(server, "offsell"));
+        WorldClient buyer = Pump(await Login(server, "offbuy"));
+        await Until(() => seller.Pack.Count(item => item.Name == Sword) == 2 && buyer.Vitals is not null, "둘이 서지 못했습니다.");
+        Assert.True((await Act(seller, () => seller.AuctionPostAsync(1, Start, BuyoutPrice, 12, _deadline.Token))).Ok);
+        uint id = Assert.Single((await Browse(buyer)).Rows).Id;
+        Assert.True((await Act(buyer, () => buyer.AuctionBuyoutAsync(id, _deadline.Token))).Ok);
+
+        // 끄고 다시 켠다(FR-016) — 올림·입찰·구매·취소는 닫히고, 받기는 된다.
+        server.Restart(TimeSpan.FromMinutes(2), () => SetConfig(server, "AuctionEnabled", false));
+        seller = Pump(await LoginAgain(server, "offsell"));
+        buyer = Pump(await LoginAgain(server, "offbuy"));
+        await Until(() => seller.Pack.Any(item => item.Name == Sword) && buyer.Vitals is not null, "다시 서지 못했습니다.");
+
+        Assert.Equal("경매장이 닫혀 있습니다", (await Act(seller, () => seller.AuctionPostAsync(2, Start, 0, 12, _deadline.Token))).Message);
+        Assert.Equal("경매장이 닫혀 있습니다", (await Act(buyer, () => buyer.AuctionBidAsync(id, 1, _deadline.Token))).Message);
+        Assert.True((await Act(buyer, () => buyer.AuctionTakeAsync(0, _deadline.Token))).Ok);
+        Assert.True((await Act(seller, () => seller.AuctionTakeAsync(0, _deadline.Token))).Ok);
+        await Until(() => buyer.Pack.Any(item => item.Name == Sword) && seller.Vitals!.Gold == 100_000 - Deposit + BuyoutPrice - Cut + Deposit,
+            $"끈 뒤 받기가 되지 않았습니다: 금화 {seller.Vitals!.Gold}");
+    }
+
+    [Fact]
+    public async Task Not_saving_characters_closes_the_auction_house_entirely()
+    {
+        // 캐릭터는 저장되는 서버에서 만들고, 저장하지 않는 설정으로 다시 켠다(만들기도 저장이라 처음부터 끄면 들어갈 수 없다).
+        using IsolatedHadesServer server = Ready(("nosave", 100_000, 1));
+        server.Restart(TimeSpan.FromMinutes(2), () => SetConfig(server, "DontSavePlayers", true));
+        WorldClient world = Pump(await LoginAgain(server, "nosave"));
+        await Until(() => world.Pack.Any(item => item.Name == Sword), "서지 못했습니다.");
+
+        // 캐릭터가 저장되지 않으면 경매장 파일과 맞지 않게 된다 — 받기까지 닫는다(SPEC S-12).
+        Assert.Equal("경매장이 닫혀 있습니다", (await Act(world, () => world.AuctionPostAsync(1, Start, 0, 12, _deadline.Token))).Message);
+        Assert.Equal("경매장이 닫혀 있습니다", (await Act(world, () => world.AuctionTakeAsync(0, _deadline.Token))).Message);
+    }
+
+    [Fact]
+    public async Task Reverting_moves_listings_and_claims_into_the_owners_banks()
+    {
+        using IsolatedHadesServer server = Ready(("revsell", 100_000, 3), ("revb", 50_000, 0), ("revc", 50_000, 0));
+        WorldClient a = Pump(await Login(server, "revsell"));
+        WorldClient b = Pump(await Login(server, "revb"));
+        WorldClient c = Pump(await Login(server, "revc"));
+        await Until(() => a.Pack.Count(item => item.Name == Sword) == 3 && b.Vitals is not null && c.Vitals is not null, "셋이 서지 못했습니다.");
+
+        // 경매 셋 — 하나는 입찰이 걸린 채 남고, 받을 것 넷(밀린 입찰금 · 낙찰품 · 판매 대금 · 취소품).
+        for (byte slot = 1; slot <= 3; slot++)
+        {
+            byte at = slot;
+            Assert.True((await Act(a, () => a.AuctionPostAsync(at, Start, at == 2 ? (uint)BuyoutPrice : 0, 12, _deadline.Token))).Ok);
+        }
+
+        uint[] ids = [.. (await Browse(b)).Rows.Select(row => row.Id).Order()];
+        Assert.True((await Act(b, () => b.AuctionBidAsync(ids[0], 1_000, _deadline.Token))).Ok);
+        Assert.True((await Act(c, () => c.AuctionBidAsync(ids[0], 1_050, _deadline.Token))).Ok);
+        Assert.True((await Act(b, () => b.AuctionBuyoutAsync(ids[1], _deadline.Token))).Ok);
+        Assert.True((await Act(a, () => a.AuctionCancelAsync(ids[2], _deadline.Token))).Ok);
+        JsonNode before = Book(server);
+        Assert.Single(before["Listings"]!.AsArray());
+        Assert.Equal(4, before["Claims"]!.AsArray().Count);
+
+        string script = Path.Combine(HadesWorkspace.RepositoryRoot, "scripts", "ops", "auction-revert.py");
+        server.Restart(TimeSpan.FromMinutes(2), () =>
+        {
+            using System.Diagnostics.Process run = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("python3", [script, server.ContentLocation])
+                { RedirectStandardOutput = true, RedirectStandardError = true })!;
+            string said = run.StandardOutput.ReadToEnd() + run.StandardError.ReadToEnd();
+            run.WaitForExit();
+            Assert.True(run.ExitCode == 0, said);
+
+            (int Swords, long Gold) Bank(string who)
+            {
+                JsonNode saved = JsonNode.Parse(File.ReadAllText(Path.Combine(server.ContentLocation, "aislings", $"{who}.json")))!;
+                JsonNode? bank = saved["BankManager"];
+                return (bank?["Items"]?[Sword]?.AsArray().Count ?? 0, (long?)bank?["Gold"] ?? 0);
+            }
+
+            Assert.Equal((2, (long)(Deposit + BuyoutPrice - Cut + Deposit)), Bank("revsell"));   // 남은 경매 물건·보증금 + 취소품 + 판매 대금(보증금 포함)
+            Assert.Equal((1, 1_000L), Bank("revb"));                                     // 낙찰품 + 밀린 입찰금
+            Assert.Equal((0, 1_050L), Bank("revc"));                                     // 남은 경매에 맡긴 입찰금
+            Assert.False(File.Exists(BookPath(server)));
+            Assert.False(File.Exists(BookPath(server) + ".backup"));   // 남으면 서버가 그 사본에서 옛 경매를 되살린다
+            Assert.True(File.Exists(BookPath(server) + ".reverted"));
+        });
+
+        // 고친 캐릭터 파일로 다시 들어간다.
+        WorldClient again = Pump(await LoginAgain(server, "revsell"));
+        await Until(() => again.Vitals is not null, "되돌린 캐릭터로 들어가지 못했습니다.");
+        Assert.Empty((await Browse(again)).Rows);
+    }
+
     /// <summary>
     /// 확인 사진 — 격리 서버에 다섯 가지를 올려 두고, 실제 앱(사는 이)이 들어가 「경매장」 창을 열면(<c>--auction</c>) 찾기 목록이 선다.
     /// <c>LOD_AUCTION_SHOT</c> 에 png 경로를 줄 때만 돈다(<c>LOD_AUCTION_ORIENT</c> = portrait|landscape).
@@ -439,6 +533,14 @@ public sealed class AuctionTests : IDisposable
         }
 
         return server;
+    }
+
+    private static void SetConfig(IsolatedHadesServer server, string key, bool value)
+    {
+        string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
+        JsonNode config = JsonNode.Parse(File.ReadAllText(path))!;
+        config["ServerConfig"]![key] = value;
+        File.WriteAllText(path, config.ToJsonString());
     }
 
     /// <summary>가방 <paramref name="from" /> 칸부터 <paramref name="count" />칸에 물건을 심는다. 그림 번호는 템플릿 것(실제 물건처럼).</summary>
