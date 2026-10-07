@@ -170,6 +170,58 @@ public sealed class Pack599AbilityTests : IDisposable
         await Until(() => world.Said.Contains("플라모를 가합니다"), $"괴물이 플라모를 쓰지 않았습니다: {world.Said}");
     }
 
+    /// <summary>
+    /// 도적 센스몬스터 — 앞에 선 괴물의 공격속성·방어속성을 알려 준다. 원작 설명 「몹의 속성을 파악합니다(센스몬스터)」,
+    /// 5.99 `sense_monster`(`0x457773`)는 「공격속성(ATTACK NATURE)·방어속성(DEFENSE NATURE)」을 무·수·토·풍·화·암흑·빛으로 쓴다.
+    /// </summary>
+    [Fact]
+    public async Task Sense_monster_tells_the_elements_of_the_monster_ahead()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        MakeGameMaster(server);
+        PutStationaryTargetAhead(server, target =>
+        {
+            target["ElementType"] = 2;
+            target["OffenseElement"] = 1; // Fire
+            target["DefenseElement"] = 2; // Water
+        });
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.State is { Map.Id: WoodlandOneOne, Where: var where } && where == Start,
+            "우드랜드1-1 입구에 서지 못했습니다.");
+        await FindTarget(world);
+
+        await world.SayAsync("/skill \"센스몬스터\" 1", _deadline.Token);
+        int slot = await Slot(() => world.Skills.FirstOrDefault(s => s.Name.StartsWith("센스몬스터 ("))?.Slot, "센스몬스터");
+        await world.UseSkillAsync(slot, _deadline.Token);
+
+        List<string> told = [];
+        bool Sensed()
+        {
+            while (world.TakeTold(out _, out string text))
+            {
+                told.Add(text);
+            }
+
+            return told.Any(text => text.Contains("공격속성 화") && text.Contains("방어속성 수"));
+        }
+
+        for (DateTime giveUp = DateTime.UtcNow + TimeSpan.FromSeconds(30); !Sensed() && DateTime.UtcNow < giveUp;)
+        {
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        Assert.True(Sensed(), $"센스몬스터가 앞 괴물의 속성(공격 화 · 방어 수)을 알려 주지 않았습니다: {string.Join(" | ", told)}");
+    }
+
     private async Task<int> LearnSpell(WorldClient world, string spell)
     {
         await world.SayAsync($"/spell \"{spell}\" 1", _deadline.Token);
