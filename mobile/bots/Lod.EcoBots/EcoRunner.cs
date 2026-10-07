@@ -364,14 +364,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         int[] potions = [.. _world.Pack.Where(item => AutoPotion.Restoring.Any(potion => potion.Name == item.Name)).Select(item => item.Slot)];
-        IReadOnlyList<InventoryItem> sell = EcoShopping.ToSell(_world.Pack, keep: potions);
-        if (sell.Count > 0)
-        {
-            long before = _world.Vitals!.Gold;
-            await _world.BulkTradeAsync(seller.Serial, selling: true, [.. sell.Select(item => (item.Name, item.Slot, Math.Max(1, item.Stacks)))], token);
-            await Until(() => _world.Vitals!.Gold != before, Answer, token);
-            Event("sell", new { items = sell.Select(item => new { name = item.Name, qty = item.Stacks }), goldBefore = before, goldAfter = _world.Vitals!.Gold });
-        }
+        await Sell(seller, EcoShopping.ToSell(_world.Pack, keep: potions), token);
 
         if (await Goods(seller, token) is { } goods
             && EcoShopping.PotionsToBuy(goods, _world.Vitals!.Level, _world.Vitals.Gold, EcoShopping.ManaPotions(_world.Pack), Tuning.EcoPriestManaStock,
@@ -494,14 +487,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
 
         if (land.PotionStop is { } potions && await MoveTo(potions.Map, potions.Where, token) && await Merchant(potions, token) is { } seller)
         {
-            IReadOnlyList<InventoryItem> sell = EcoShopping.ToSell(_world.Pack, keep: []);
-            if (sell.Count > 0)
-            {
-                long before = _world.Vitals!.Gold;
-                await _world.BulkTradeAsync(seller.Serial, selling: true, [.. sell.Select(item => (item.Name, item.Slot, Math.Max(1, item.Stacks)))], token);
-                await Until(() => _world.Vitals!.Gold != before, Answer, token);
-                Event("sell", new { items = sell.Select(item => new { name = item.Name, qty = item.Stacks }), goldBefore = before, goldAfter = _world.Vitals!.Gold });
-            }
+            await Sell(seller, EcoShopping.ToSell(_world.Pack, keep: []), token);
 
             if (await Goods(seller, token) is { } goods
                 && EcoShopping.PotionsToBuy(goods, _world.Vitals!.Level, _world.Vitals.Gold, EcoShopping.Potions(_world.Pack), Tuning.EcoPotionStock) is { } buy)
@@ -517,6 +503,26 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         await BuyGear(reserve, token);
         _life.Shopped(EcoShopping.Potions(_world.Pack));
         Event("state", new { from = "Shop", to = "Town", potions = EcoShopping.Potions(_world.Pack) });
+    }
+
+    /// <summary>
+    /// 판다 — 싼 것부터 열 개씩. 서버는 받을 금화가 들 수 있는 한도(MaxCarryGold)를 넘으면 그 판매를 통째로 거절해(HandleSell), 한꺼번에 팔면
+    /// 비싼 것 하나 때문에 아무것도 안 팔리고 가방이 찬 채 마을을 오갔다(10-08 전사봇15, 산타모자 값 5억). 금화가 안 늘면 거기서 멈춘다.
+    /// 겹치지 않는 장비도 수량 1 — 0 이면 서버가 줄을 버린다. 값이 없는 것은 서버가 안 사므로 보내지 않는다.
+    /// </summary>
+    private async Task Sell(Creature seller, IReadOnlyList<InventoryItem> items, CancellationToken token)
+    {
+        foreach (InventoryItem[] chunk in items.Where(item => EcoAuction.Offer(item) > 0).OrderBy(EcoAuction.Offer).Chunk(10))
+        {
+            long before = _world.Vitals!.Gold;
+            await _world.BulkTradeAsync(seller.Serial, selling: true, [.. chunk.Select(item => (item.Name, item.Slot, Math.Max(1, item.Stacks)))], token);
+            bool sold = await Until(() => _world.Vitals!.Gold != before, Answer, token);
+            Event("sell", new { items = chunk.Select(item => new { name = item.Name, qty = item.Stacks }), goldBefore = before, goldAfter = _world.Vitals!.Gold });
+            if (!sold)
+            {
+                break;
+            }
+        }
     }
 
     /// <summary>장비 가게마다 맞고 지금보다 좋은 것(체력·방어 — <see cref="EcoShopping.Score" />)을 사서 입는다. <paramref name="reserve" /> 금화는 남긴다.</summary>
