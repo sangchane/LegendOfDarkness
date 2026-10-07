@@ -48,7 +48,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private TimeSpan _nextAsk;
     private string _following = string.Empty;
     private TimeSpan _nextStock;
-    private TimeSpan _nextPick;
 
     public string Name => bot.Name;
 
@@ -65,15 +64,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
 
     /// <summary>사냥 중인 사냥터 맵 — 파티원이 따라온다. 사냥 중이 아니면 0.</summary>
     public int HuntingOn => _life.Where == EcoPlace.Hunting && _hunt is { Stopped: null } ? _ground : 0;
-
-    public long Gold => _world?.Vitals?.Gold ?? 0;
-
-    /// <summary>성직자가 금화를 다음에 받을 수 있는 때 — 파티원 셋이 한꺼번에 떨구지 않게(건넨 봇이 1분 뒤로 적는다).</summary>
-    public DateTime NextTip { get; set; }
-
-    /// <summary>성직자 — 마력 물약이 모자란데 살 금화가 없다(사냥하지 않아 금화를 못 번다).</summary>
-    public bool NeedsGold => Path == EcoParties.Priest && _world is { } world
-                             && EcoShopping.ManaPotions(world.Pack) < Tuning.EcoPriestManaLow && Gold < Tuning.EcoPriestGold / 2;
 
     /// <summary>사냥 중심(사냥터에 내린 칸) — 파티원은 파티장의 중심으로 간다.</summary>
     public Tile Center { get; private set; }
@@ -164,7 +154,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         await Invite(token);
-        await Tip(token);
 
         EcoSight sight = new(
             now,
@@ -285,25 +274,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     }
 
     /// <summary>
-    /// 파티원 — 성직자가 물약 살 금화가 없고 3칸 안이면 발밑에 <see cref="Tuning.EcoPriestGold" /> 를 떨군다(성직자에게 1분에 한 번,
-    /// 떨구고도 제 물약 값 5,000 이 남을 때). 그룹 사냥에서 금화는 줍는 이 몫이라 사냥하지 않는 성직자는 못 번다(사용자 2026-10-07).
-    /// </summary>
-    private async Task Tip(CancellationToken token)
-    {
-        if (_party is not { } party || Gold < Tuning.EcoPriestGold + 5_000
-            || host.Find(party.Priest) is not { NeedsGold: true } priest || DateTime.UtcNow < priest.NextTip
-            || priest.Map != Map || Reckon.Steps(priest.Where, Where) > 3)
-        {
-            return;
-        }
-
-        priest.NextTip = DateTime.UtcNow + TimeSpan.FromMinutes(1);
-        log($"{priest.Name} 에게 금화 {Tuning.EcoPriestGold:N0} 을 건넵니다.");
-        Event("gift", new { to = priest.Name, gold = Tuning.EcoPriestGold });
-        await _world.DropGoldAsync(Tuning.EcoPriestGold, priest.Where, token);
-    }
-
-    /// <summary>
     /// 성직자 한 틱 — 유령이면 되살아나고, 파티가 없으면 물약 가게에서 기다린다. 따를 이(사냥 중인 파티원, 파티장 먼저 — 파티장만
     /// 마을에 가도 사냥터에 남은 이를 돌본다. 아무도 사냥 중이 아니면 파티장)와 다른 맵이거나 멀면(12칸) 곁으로 옮기고, 곁이면 동료 봇의
     /// 판단(주인 = 따를 이, 나머지 싸우는 봇은 파티원)으로 회복·해제·따라가기.
@@ -338,18 +308,8 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             return;
         }
 
-        // 받은 금화 줍기 — 따르는 봇이 떨궜다. 떨굴 때의 칸에서 이미 걸음을 옮겼을 수 있어 3칸 안까지(서버는 10칸 안 줍기를 받는다),
-        // 2초에 한 번.
-        if (NeedsGold && _clock.Elapsed >= _nextPick
-            && _world.Creatures.Where(one => one.Kind == CreatureKind.Passable && Reckon.Steps(one.Where, Where) <= 3)
-                .OrderBy(one => Reckon.Steps(one.Where, Where)).FirstOrDefault() is { } lying)
-        {
-            _nextPick = _clock.Elapsed + TimeSpan.FromSeconds(2);
-            await _world.PickUpAsync(lying.Where, token);
-        }
-
-        // 마력 물약 — 모자라고 살 금화가 있으면 물약 가게에 다녀온다(다음 틱에 파티장 곁으로 돌아간다).
-        if (EcoShopping.ManaPotions(_world.Pack) < Tuning.EcoPriestManaLow && Gold >= Tuning.EcoPriestGold / 2 && _clock.Elapsed >= _nextStock)
+        // 마력 물약 — 모자라면 물약 가게에 다녀온다(다음 틱에 파티장 곁으로 돌아간다).
+        if (EcoShopping.ManaPotions(_world.Pack) < Tuning.EcoPriestManaLow && _clock.Elapsed >= _nextStock)
         {
             _nextStock = _clock.Elapsed + TimeSpan.FromMinutes(5);
             await StockMana(token);
