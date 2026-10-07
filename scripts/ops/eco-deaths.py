@@ -1,4 +1,4 @@
-import json, collections, re, subprocess, sys
+import gzip, json, collections, re, subprocess, sys
 from datetime import datetime, timedelta
 
 # 생태계 봇 죽음 나누기 — 역할(파티원·파티장·성직자·파티 없음) · 혼수 뒤였나 · 성직자가 깨우러 왔나 · 시간별.
@@ -17,9 +17,11 @@ for l in j.splitlines():
 party, leader = {}, {}
 prev = collections.defaultdict(lambda: collections.deque(maxlen=6))
 role, coma, woke, hours, bots = collections.Counter(), collections.Counter(), collections.Counter(), collections.Counter(), set()
-for name in sorted(set([since[:10], until[:10]])):
+for name in sorted({(T(since) + timedelta(hours=9)).date().isoformat(), (T(until) + timedelta(hours=9)).date().isoformat()}):  # 파일은 한국 날짜, at 은 UTC
     try: f = open(f'/home/ubuntu/lod-eco/eco/{name}.jsonl')
-    except FileNotFoundError: continue
+    except FileNotFoundError:
+        try: f = gzip.open(f'/home/ubuntu/lod-eco/eco/{name}.jsonl.gz', 'rt')  # 지난 날은 묶여 있다
+        except FileNotFoundError: continue
     for line in f:
         d = json.loads(line); b, ev = d['bot'], d['ev']
         if ev == 'party' and 'joined' in d['data']: party[b] = d['data']['joined']; leader[b] = d['data']['leader']

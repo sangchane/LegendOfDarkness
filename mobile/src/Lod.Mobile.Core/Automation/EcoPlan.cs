@@ -139,15 +139,17 @@ public static class EcoShopping
         return Family(stats.Place) is 7 or 9 && on.Length >= 2 ? on.MinBy(item => Score(item.Stats!))!.Slot : null;
     }
 
-    /// <summary>부위마다(무기부터) 맞고 · 지금보다 좋고 · 남은 예산 안의 가장 좋은 것 하나.</summary>
+    /// <summary>부위마다(무기부터) 맞고 · 지금보다 좋고 · 남은 예산 안의 가장 좋은 것 하나. 서버가 거절했거나 두손 무기와 부딪힌 이름(<paramref name="refused" />)은 뺀다.</summary>
     public static IReadOnlyList<EcoBuy> GearToBuy(
-        IReadOnlyList<DialogueGoods> goods, IReadOnlyList<WornItem> worn, int path, int gender, int level, long budget)
+        IReadOnlyList<DialogueGoods> goods, IReadOnlyList<WornItem> worn, int path, int gender, int level, long budget,
+        IReadOnlyCollection<string>? refused = null)
     {
         List<EcoBuy> buys = [];
 
         foreach (IGrouping<int, DialogueGoods> place in goods
                      .Where(one => one.Stats is { } stats && Fits(stats, path, level) && one.Price > 0
-                                   && (one.Gender == 255 || one.Gender == gender) && Better(stats, worn))
+                                   && (one.Gender == 255 || one.Gender == gender) && Better(stats, worn)
+                                   && refused?.Contains(one.Name) != true)
                      .GroupBy(one => Family(one.Stats!.Place))
                      .OrderBy(group => group.Key))
         {

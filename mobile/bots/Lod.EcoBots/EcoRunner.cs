@@ -368,7 +368,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         if (sell.Count > 0)
         {
             long before = _world.Vitals!.Gold;
-            await _world.BulkTradeAsync(seller.Serial, selling: true, [.. sell.Select(item => (item.Name, item.Slot, item.Stacks))], token);
+            await _world.BulkTradeAsync(seller.Serial, selling: true, [.. sell.Select(item => (item.Name, item.Slot, Math.Max(1, item.Stacks)))], token);
             await Until(() => _world.Vitals!.Gold != before, Answer, token);
             Event("sell", new { items = sell.Select(item => new { name = item.Name, qty = item.Stacks }), goldBefore = before, goldAfter = _world.Vitals!.Gold });
         }
@@ -498,7 +498,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             if (sell.Count > 0)
             {
                 long before = _world.Vitals!.Gold;
-                await _world.BulkTradeAsync(seller.Serial, selling: true, [.. sell.Select(item => (item.Name, item.Slot, item.Stacks))], token);
+                await _world.BulkTradeAsync(seller.Serial, selling: true, [.. sell.Select(item => (item.Name, item.Slot, Math.Max(1, item.Stacks)))], token);
                 await Until(() => _world.Vitals!.Gold != before, Answer, token);
                 Event("sell", new { items = sell.Select(item => new { name = item.Name, qty = item.Stacks }), goldBefore = before, goldAfter = _world.Vitals!.Gold });
             }
@@ -530,7 +530,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             }
 
             Vitals mine = _world.Vitals!;
-            IReadOnlyList<EcoBuy> buys = EcoShopping.GearToBuy(goods, _world.Worn, _world.Path ?? 0, bot.Gender, mine.Level, mine.Gold - reserve);
+            IReadOnlyList<EcoBuy> buys = EcoShopping.GearToBuy(goods, _world.Worn, _world.Path ?? 0, bot.Gender, mine.Level, mine.Gold - reserve, _refused);
             if (buys.Count > 0)
             {
                 await Buy(merchant, buys, goods, token);
@@ -655,6 +655,10 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
                 await Until(() => _world.Worn.All(one => one.Slot != free), Answer, token);
             }
 
+            // 두손 무기와 방패는 함께 못 든다 — 서버가 다른 쪽을 먼저 벗긴다(Shield.cs·Weapon.cs). 앱은 두손인지 모르니 벗겨지는 것으로 안다.
+            int place = item.Stats!.Place;
+            WornItem? other = place is 1 or 3 ? _world.Worn.FirstOrDefault(one => one.Slot == (place == 1 ? 3 : 1)) : null;
+
             // 같은 이름 반지를 하나 더 낄 수 있어 수가 느는지 본다.
             int before = _world.Worn.Count(one => one.Name == item.Name);
             await _world.UseAsync(item.Slot, token);
@@ -662,7 +666,13 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
 
             if (worn)
             {
-                Event("equip", new { slot = item.Stats!.Place, name = item.Name, level = item.Stats.Level });
+                Event("equip", new { slot = place, name = item.Name, level = item.Stats.Level });
+                if (other is not null && _world.Worn.All(one => one.Slot != other.Slot))
+                {
+                    // 방패를 버린다 — 다음 WearBetter 가 빈 무기 칸에 두손 무기를 다시 든다(10-08: 둘을 번갈아 사고 껴 사냥을 못 함).
+                    // ponytail: 이름으로 기억해 한손 무기로 바꿔도 그 방패는 안 든다 — 봇 프로그램이 다시 켜지면 잊는다.
+                    _refused.Add(place == 3 ? item.Name : other.Name);
+                }
             }
             else
             {

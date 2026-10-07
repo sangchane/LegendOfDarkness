@@ -137,6 +137,17 @@ public sealed class EcoTests
         Assert.Equal(0, EcoShopping.Score(Gear(6) with { Defense = 4 }));
     }
 
+    [Fact]
+    public void A_shield_that_knocked_off_a_two_handed_weapon_is_not_bought_again()
+    {
+        // 두손 무기를 들면 방패 칸이 늘 비어 「빈 칸이니 좋다」로 보인다 — 서버가 벗긴 방패(refused)는 다시 사지 않는다(10-08 클라우드: 한 시간에 600번 사고 바꿔 낌).
+        WornItem[] worn = [new(1, 1, "투핸드크레이모어화", "투핸드크레이모어화", 0, 0, Gear(1, level: 71, cls: Warrior, dmgMax: 90))];
+        DialogueGoods[] shop = [Offer("철방패", 10000, Gear(3, ac: -3))];
+
+        Assert.Equal([new EcoBuy("철방패", 1)], EcoShopping.GearToBuy(shop, worn, Warrior, 1, 80, budget: 20000));
+        Assert.Empty(EcoShopping.GearToBuy(shop, worn, Warrior, 1, 80, budget: 20000, refused: ["철방패"]));
+    }
+
     private static EcoSight Sight(TimeSpan now, int potions = 20, int free = 100, bool stopped = false, TimeSpan? person = null,
         bool ghost = false, bool coma = false, int health = 100, TimeSpan? gained = null) =>
         new(now, coma, ghost, potions, free, stopped, person, health, gained);
