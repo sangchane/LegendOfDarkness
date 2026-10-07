@@ -1,5 +1,5 @@
 # 아키텍처 — 그룹 전리품 룰렛 · 경매장
-버전: v1.0 · 기준 03 v1.0
+버전: v1.1 · 기준 03 v1.1
 
 사전조사 3줄 — 정량: 봇 30~50 + 사람 몇 명, 올린 것 ≤ 약 1천 줄. 정성: 서버 전역 상태는 이미 JSON 파일(게시판·대신 사냥)이고 DB 없음. 사용자 영향: 물건·금화 복제/유실이 가장 비싸다(INV-1~3).
 
@@ -29,7 +29,7 @@ flowchart LR
 ### 구현 접근
 - **룰렛**: 드롭 스크립트 `database/server/scripts/Formulas/monsterexp.cs` 의 `GenerateGold`·`GenerateDrops` 가 바닥에 `Release` 하기 직전에 `GroupLoot.Share(...)` 를 부른다. 그룹이 아니거나 `GroupLootRoll` 이 꺼져 있으면 false 를 돌려주고 지금처럼 바닥으로.
   같은 맵·살아 있는 파티원 = `killer.GroupParty.PartyMembers` 중 `CurrentMapId` 같고 `!Dead`.
-- **줍기 보호 결함**: `H/Types/Area.cs:386-391` 의 `stale` 식을 고쳐 3분 보호가 실제로 걸리게 한다. 넘친 룰렛 몫은 `AuthenticatedAislings = [이긴 이]`, `Cursed = true` 로 떨군다.
+- **줍기 보호 결함**: `H/Types/Area.cs:386-391` 의 `stale` 식을 고쳐 3분 보호가 실제로 걸리게 한다. 넘친 룰렛 물건은 `AuthenticatedAislings = [이긴 이]`, `Cursed = true` 로 떨군다. 넘친 금화는 `AuctionHouse` 받을 것(까닭 5 나눔 넘침)으로.
 - **경매장**: `H/Types/AuctionHouse.cs` 하나 — 메모리 상태 + 한 자물쇠 + JSON 저장(`SafeFile`, 원자적 교체) + 사건 기록. 물건은 캐릭터 파일과 같은 Newtonsoft 설정으로 `Item` 통째 직렬화(템플릿·Upgrades·ItemVariance·Durability·Stacks·Color 보존, `Serial` 은 꺼낼 때 새로).
 - **기간 끝**: 서버 주기 일(대신 사냥 `ProxyHunt` 이 도는 곳과 같은 틀)에서 AUCTION_TICK 마다 `AuctionHouse.Expire(now)`.
 - **패킷**: 앱→서버 새 `ClientFormatF4`(종류 바이트 + 값), 서버→앱 기존 앱 전용 `0x5E` 에 종류 7·8·9 추가. 추가 방법은 01 감사의 순서(FormatStubs 3파일 + 핸들러 + 알맹이 opcode).
@@ -69,7 +69,7 @@ sequenceDiagram
   participant P as 파티원들(앱·봇)
   M->>G: Share(killer, item)
   G->>G: 같은 맵·살아 있는 파티원, 수 굴림(같으면 다시)
-  G->>G: 이긴 이 가방에 GiveTo, 안 되면 발밑(이긴 이만 줍기)
+  G->>G: 이긴 이 가방에 GiveTo, 안 되면 발밑(이긴 이만 줍기). 금화 몫이 상한을 넘으면 넘는 만큼 받을 것
   G->>P: 0x5E 7 (물건, 이름·수 목록, 이긴 이) + 채팅 한 줄
   G-->>M: true (바닥에 떨구지 않음)
 ```
@@ -84,8 +84,9 @@ sequenceDiagram
   S->>A: Buyout(client, id)
   A->>A: lock, 경매 있음·제 것 아님·금화 충분 검사
   A->>A: 사건 기록 "buyout" flush
-  A->>S: 사는 이 금화 − 즉시 구매가, 캐릭터 저장
+  A->>S: 사는 이 금화 − 즉시 구매가, 캐릭터 저장(실패하면 되돌리고 거절)
   A->>A: 물건 → 사는 이 받을 것, 대금 − 수수료 + 보증금 → 파는 이 받을 것, 밀린 입찰금 → 입찰자 받을 것, 경매장 저장
+  A->>A: 사건 기록 "commit"(같은 seq)
   A->>B: 0x5E 9 (결과 문구, 받을 것 개수)
 ```
 
@@ -97,11 +98,13 @@ sequenceDiagram
   C->>A: 0xF4 Take(claimId | 모두)
   A->>A: lock, 가방 자리·금화 상한 검사
   A->>A: 사건 기록 "take" flush, 받을 것에서 빼고 경매장 저장
-  A->>C: GiveTo / GoldPoints +=, 캐릭터 저장, 0x5E 9
+  A->>C: GiveTo / GoldPoints +=, 캐릭터 저장
+  A->>A: 사건 기록 "commit"(같은 seq)
+  A->>C: 0x5E 9
 ```
 
 ### 데이터 저장
-`{StoragePath}/auction/auction.json` = `{ nextId, listings[], claims[] }` 한 파일(05 ERD). 사건은 `{StoragePath}/auction/events-YYYY-MM-DD.jsonl`(UTC 날짜).
+`{StoragePath}/auction/auction.json` = `{ nextId, lastSeq, listings[], claims[] }` 한 파일(05 ERD). 사건은 `{StoragePath}/auction/events-YYYY-MM-DD.jsonl`(UTC 날짜).
 
 ## 검토한 대안
 - **와우식 우편**: 서버에 우편이 없어(01) 새로 만들면 범위가 두 배 → 경매장 안 「받을 것」으로 대신.

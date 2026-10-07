@@ -1,5 +1,5 @@
 # API 계약 & 데이터 스키마 — 그룹 전리품 룰렛 · 경매장
-버전: v1.0 · 기준 03 v1.0
+버전: v1.1 · 기준 03 v1.1
 
 ## 규약
 - HTTP 가 아니라 게임 패킷이다. 앱→서버 `0xF4`(새), 서버→앱 `0x5E` 종류 7·8·9(기존 앱 전용 패킷에 추가). 숫자는 빅엔디언, 글자는 Hades `WriteStringA`/`ReadStringA`(u8 길이 + EUC-KR) — 0x5E 기존 종류와 같다.
@@ -23,6 +23,8 @@
 | P-08 | 7 받기 | u32 받을 것 번호(0 = 모두) | 0x5E 9 | 가방에 자리가 없습니다 · 들 수 있는 금화를 넘습니다(남은 것은 그대로) | 로그인 |
 
 ## 패킷 표 — 서버 → 앱/봇 `0x5E`
+모든 0x5E 는 `종류 · u32 serial · 본문` — 기존 `ServerFormat5E.Serialize` 가 종류 뒤 u32 를 늘 쓰므로(`ServerFormat5E.cs:89-90`) 7·8·9 는 serial 0 을 쓰고 본문은 그 뒤.
+
 | ID | 종류 | 본문 | 보내는 때 |
 |---|---|---|---|
 | E-01 | 7 룰렛 | u16 물건 그림 · u8 색 · str 물건 이름 · u8 n · n×(u32 serial · str 이름 · u8 수) · u32 이긴 이 serial | 그룹 처치로 룰렛이 끝날 때, 같은 맵 파티원 모두 |
@@ -30,7 +32,7 @@
 | E-03 | 9 경매 결과 | u8 ok · str 문구 · u16 받을 것 개수 | P-04~08 응답, 내 물건이 팔리거나 밀렸을 때(접속 중이면) |
 
 E-02 줄: 보기 0·1 = u32 번호 · u16 그림 · u8 색 · str 이름 · u16 묶음 · u8 남은 시간 띠(0 짧게 1 보통 2 길게 3 아주 길게) · u32 현재가(입찰 없으면 시작가) · u32 즉시 구매가 · u8 표시(1 내가 올림 · 2 내가 최고 입찰 · 4 입찰 있음).
-보기 2 = u32 번호 · u8 갈래(0 물건 1 금화) · u16 그림 · u8 색 · str 이름 · u16 묶음 · u32 금화 · u8 까닭(0 낙찰품 1 판매 대금 2 유찰 3 밀린 입찰금 4 취소).
+보기 2 = u32 번호 · u8 갈래(0 물건 1 금화) · u16 그림 · u8 색 · str 이름 · u16 묶음 · u32 금화 · u8 까닭(0 낙찰품 1 판매 대금 2 유찰 3 밀린 입찰금 4 취소 5 나눔 넘침).
 
 ## 알맹이 API(앱·봇 공용, `WorldClient.Auction.cs`)
 `AuctionBrowseAsync(kind, sort, page, query)` · `AuctionMineAsync(page)` · `AuctionClaimsAsync(page)` · `AuctionPostAsync(slot, start, buyout, hours)` · `AuctionBidAsync(id, amount)` · `AuctionBuyoutAsync(id)` · `AuctionCancelAsync(id)` · `AuctionTakeAsync(id)` — 응답은 `World.AuctionPage`·`World.AuctionDone`·`World.LastRoll` 로 들어온다.
@@ -59,16 +61,16 @@ erDiagram
     int Kind "0 물건 1 금화"
     Item Item "Kind=0 일 때만"
     long Gold "Kind=1 일 때만, ≥1"
-    int Reason "0 낙찰품 1 판매 대금 2 유찰 3 밀린 입찰금 4 취소"
-    long ListingId "어느 경매에서"
+    int Reason "0 낙찰품 1 판매 대금 2 유찰 3 밀린 입찰금 4 취소 5 나눔 넘침"
+    long ListingId "어느 경매에서(나눔 넘침은 0)"
     datetime At "UTC ISO8601"
   }
 ```
-사건 기록 한 줄(JSONL): `{"at":"2026-10-07T01:02:03Z","ev":"post|bid|outbid|buyout|sold|expired|cancel|take|roll|split","who":"이름","listing":12,"item":"이름","gold":30000,"goldBefore":0,"goldAfter":0,"data":{}}` — 룰렛은 `data.rolls=[{"name":"…","roll":0}]`, 나눔은 `data.shares`.
+사건 기록 한 줄(JSONL): `{"seq":1,"at":"2026-10-07T01:02:03Z","ev":"post|bid|outbid|buyout|sold|expired|cancel|take|roll|split|commit","who":"이름","listing":12,"item":"이름","gold":30000,"goldBefore":0,"goldAfter":0,"data":{}}` — 룰렛은 `data.rolls=[{"name":"…","roll":0}]`, 나눔은 `data.shares`. `seq` 는 경매장 파일의 `lastSeq` 와 함께 늘고, 조작이 두 저장을 다 마치면 같은 seq 로 `commit` 한 줄 — commit 없는 seq 가 끊긴 조작이다(07 R1). 경매장 파일은 `{ nextId, lastSeq, listings[], claims[] }`.
 
 ## 데이터 규칙
 - 금화: 패킷 u32, 서버 계산 long, 캐릭터 `GoldPoints` int(≤ `MaxCarryGold`). 받을 것 금화는 long(상한 없음 — 받을 때 상한).
-- 보증금 = max(1, ⌊`Template.Value` × 묶음 × AUCTION_DEPOSIT_RATE[시간] / 100⌋). 수수료 = ⌊낙찰가 × AUCTION_CUT / 100⌋.
+- 보증금 = max(1, ⌊상점가(03 용어) × AUCTION_DEPOSIT_RATE[시간] / 100⌋). 수수료 = ⌊낙찰가 × AUCTION_CUT / 100⌋.
 - 다음 최소 입찰 = 입찰 없으면 시작가, 있으면 현재가 + max(1, ⌊현재가 × AUCTION_MIN_STEP / 100⌋).
 - 남은 시간 띠: < 30분 짧게 · < 2시간 보통 · < 12시간 길게 · 그 위 아주 길게(와우).
 - 종류: 무기 = 무기 칸, 방어구 = 갑옷·투구·방패·장갑·신발 칸, 장신구 = 반지·귀걸이·목걸이 칸, 나머지 기타. 칸 번호 표는 BUILD 첫 작업에서 `ItemTemplate.EquipmentSlot` 값으로 만든다.
@@ -76,7 +78,7 @@ erDiagram
 
 ## 규칙·밸런스 상수 파일
 서버 `H/Types/AuctionHouse.cs` 머리의 `const` 와 봇 `Tuning.cs` 에 03 상수 표 이름 그대로 둔다. 근거(source):
-ROLL_MAX·AUCTION_DURATIONS·AUCTION_DEPOSIT_RATE·AUCTION_CUT = 와우 출처 URL(03) · AUCTION_MIN_STEP·AUCTION_MAX_LISTINGS·AUCTION_PAGE·AUCTION_TICK·ROLL_SHOW·ECO_AUCTION_* = 임의값(설계 결정, 클라우드 사건 기록으로 조정) — 임의값 9/13.
+ROLL_MAX·AUCTION_DURATIONS·AUCTION_DEPOSIT_RATE·AUCTION_CUT = 와우 출처 URL(03) · AUCTION_MIN_STEP·AUCTION_MAX_LISTINGS·AUCTION_PAGE·AUCTION_TICK·ROLL_SHOW·ECO_AUCTION_* = 임의값(설계 결정, 클라우드 사건 기록으로 조정) — 임의값 10/14.
 설정(LoruleConfig): `GroupLootRoll`(bool, 기본 true) · `AuctionEnabled`(bool, 기본 true).
 
 ## 커버리지 매핑
@@ -86,7 +88,7 @@ ROLL_MAX·AUCTION_DURATIONS·AUCTION_DEPOSIT_RATE·AUCTION_CUT = 와우 출처 U
 | FR-002 | E-01 + 채팅 0x0A 한 줄 |
 | FR-003 | `GroupLoot.Share`(돌림 차례) |
 | FR-004 | `GroupLoot.ShareGold` + 사건 split |
-| FR-005 | `GroupLoot` 넘침 떨굼 + `Area.cs` 보호 고침 |
+| FR-005 | `GroupLoot` 물건 넘침 떨굼 + `Area.cs` 보호 고침 · 금화 넘침 → `AuctionHouse` 받을 것(까닭 5) |
 | FR-006 | P-04 → E-03 |
 | FR-007 | P-05 → E-03 (밀린 이 E-03) |
 | FR-008 | P-06 → E-03 |

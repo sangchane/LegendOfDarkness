@@ -1,5 +1,5 @@
 # 배포·운영 설계 — 그룹 전리품 룰렛 · 경매장
-버전: v1.0 · 기준 03 v1.0
+버전: v1.1 · 기준 03 v1.1
 
 ## 배포
 - 런타임: 지금과 같다 — 클라우드 x86 2 vCPU(`161.33.43.117`), 서버 Hades(systemd), 생태계 봇 lod-eco, 앱 iOS.
@@ -26,10 +26,10 @@
 ## 장애·복구
 | 장애 | 감지 | 영향 | 복구 | RTO/RPO |
 |---|---|---|---|---|
-| 경매 조작 중 서버가 꺼짐 | 사건 기록 마지막 줄이 짝 없는 조작(예: buyout 뒤 저장 줄 없음) | 한 조작의 물건·금화 유실(복제는 없음, INV-3) | R1: 서버 멈춤 → 마지막 줄의 who·item·gold 로 받을 것에 한 줄 넣기(`auction-revert.py --give 이름 --gold N` 또는 물건 JSON) → 켬 | 30분 / 조작 1건 |
+| 경매 조작 중 서버가 꺼짐 | 사건 기록에 commit 줄이 없는 seq(`auction-report.py` 가 찾음) | 한 조작의 물건·금화 유실(복제는 없음, INV-3) | R1: 서버 멈춤 → 그 seq 줄의 who·item·gold 와 `auction.json` 의 `lastSeq` 를 비교해 빠진 쪽을 받을 것에 한 줄 넣기(`auction-revert.py --give 이름 --gold N | --item 파일`, FR-017) → 켬 | 30분 / 조작 1건 |
 | auction.json 깨짐 | 서버 시작 로그 "auction load failed" — 서버는 경매만 닫고(AuctionEnabled 처럼) 게임은 뜬다 | 경매 못 씀 | R2: `auction.json.bak`(쓸 때마다 직전 본을 남김)으로 바꾸고 그 뒤 사건 기록 다시 보기 | 30분 / 마지막 조작 |
 | 봇이 시장을 채움 | 보고의 봇 활성 올림 | 사람 물건이 묻힘 | R3: `Tuning.EcoAuctionMax` 낮추고 `… eco` | 10분 |
-| 기능 전체 되돌리기 | 사용자 결정 | — | R4: 설정 두 개 false → 서버 재시작 → 접속자에게 받을 것 받으라고 알림 → 서버 멈춤 → `auction-revert.py`(남은 올린 것·받을 것을 주인 은행으로, `auction.json` 은 `.reverted` 로 이름만 바꿈) → 브랜치 되돌린 서버 배포 | 1시간 / 0 |
+| 기능 전체 되돌리기 | 사용자 결정 | — | R4: 설정 두 개 false → 서버 재시작 → 접속자에게 받을 것 받으라고 알림 → 서버 멈춤 → `auction-revert.py`(남은 경매는 수수료 없는 취소 — 물건·보증금 → 파는 이, 입찰금 → 입찰자 — 와 받을 것을 주인 은행으로, `auction.json` 은 `.reverted` 로 이름만 바꿈) → 브랜치 되돌린 서버 배포 | 1시간 / 0 |
 
 - 백업: `auction/` 폴더를 캐릭터 폴더와 같은 주기로(`cloud-server.sh backup` 에 포함 — BUILD 첫 작업에서 확인·추가), 쓸 때마다 `.bak` 1개. 복원 리허설: SC-004·SC-007 시험이 곧 리허설(배포 전마다).
 - 런북 골격(R1~R4 공통): 보고 줄 → 영향 → 진단(`ssh … tail auction/events-*.jsonl`) → 해결(위 표) → 검증(`auction-report.py` 위반 0) → 롤백(R4).
