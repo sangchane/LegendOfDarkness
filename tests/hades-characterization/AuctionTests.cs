@@ -151,6 +151,219 @@ public sealed class AuctionTests : IDisposable
         await Until(() => buyer.Pack.Any(item => item.Name == Sword), "다시 켠 뒤 받은 에페가 가방에 없습니다.");
     }
 
+    [Fact]
+    public async Task Bids_hold_the_gold_and_a_buyout_settles_the_outbid()
+    {
+        using IsolatedHadesServer server = Ready(("bidsell", 100_000, 1), ("bidb", 50_000, 0), ("bidc", 50_000, 0));
+        WorldClient a = Pump(await Login(server, "bidsell"));
+        WorldClient b = Pump(await Login(server, "bidb"));
+        WorldClient c = Pump(await Login(server, "bidc"));
+        WorldClient[] all = [a, b, c];
+        await Until(() => all.All(world => world.Vitals is not null) && a.Pack.Any(item => item.Name == Sword), "셋이 서지 못했습니다.");
+
+        Assert.True((await Act(a, () => a.AuctionPostAsync(1, Start, BuyoutPrice, 12, _deadline.Token))).Ok);
+        uint id = Assert.Single((await Browse(b)).Rows).Id;
+
+        Assert.True((await Act(b, () => b.AuctionBidAsync(id, 1_000, _deadline.Token))).Ok);
+        await Until(() => b.Vitals!.Gold == 49_000, $"입찰금이 맡겨지지 않았습니다: {b.Vitals!.Gold}");
+        Assert.Equal(200_000, Total(server, all));
+
+        // 거절 — 상태는 그대로.
+        Assert.Equal("입찰가가 낮습니다 (최소 1,050전)", (await Act(c, () => c.AuctionBidAsync(id, 1_049, _deadline.Token))).Message);
+        Assert.Equal("제 물건에는 입찰할 수 없습니다", (await Act(a, () => a.AuctionBidAsync(id, 5_000, _deadline.Token))).Message);
+        Assert.Equal("이미 최고 입찰자입니다", (await Act(b, () => b.AuctionBidAsync(id, 2_000, _deadline.Token))).Message);
+        Assert.Equal(50_000, c.Vitals!.Gold);
+
+        // 더 높은 입찰 — 밀린 b 는 받을 것으로 돌려받고 알림을 듣는다.
+        int heard = b.AuctionDoneCount;
+        Assert.True((await Act(c, () => c.AuctionBidAsync(id, 1_050, _deadline.Token))).Ok);
+        await Until(() => b.AuctionDoneCount > heard && b.AuctionDone!.Message.StartsWith("입찰에서 밀렸습니다"), "밀린 이가 알림을 듣지 못했습니다.");
+        Assert.Equal(1_000, Claims(Book(server), "bidb").Sum(claim => (long)claim["Gold"]!));
+        Assert.Equal(200_000, Total(server, all));
+
+        // 즉시 구매 — c 의 입찰금도 돌려준다.
+        Assert.True((await Act(b, () => b.AuctionBuyoutAsync(id, _deadline.Token))).Ok);
+        Assert.Equal(1_050, Claims(Book(server), "bidc").Sum(claim => (long)claim["Gold"]!));
+        await Until(() => Total(server, all) == 200_000 - Cut, $"합 {Total(server, all)}");
+
+        foreach (WorldClient world in all)
+        {
+            Assert.True((await Act(world, () => world.AuctionTakeAsync(0, _deadline.Token), done => done.Message.StartsWith("받았습니다"))).Ok);
+        }
+
+        await Until(() => a.Vitals!.Gold == 100_000 + BuyoutPrice - Cut && b.Vitals!.Gold == 40_000 && c.Vitals!.Gold == 50_000 && b.Pack.Any(item => item.Name == Sword),
+            $"받은 뒤 금화 {a.Vitals!.Gold}·{b.Vitals!.Gold}·{c.Vitals!.Gold}");
+        Assert.Empty(Book(server)["Claims"]!.AsArray());
+
+        string[] ops = [.. Events(server).Where(line => (string?)line["ev"] is "post" or "bid" or "outbid" or "buyout").Select(line => (string)line["ev"]!)];
+        Assert.Equal(["post", "bid", "bid", "outbid", "buyout", "outbid"], ops);
+    }
+
+    [Fact]
+    public async Task Cancelling_returns_the_item_and_takes_a_cut_only_when_bid_on()
+    {
+        using IsolatedHadesServer server = Ready(("cansell", 100_000, 2), ("canbid", 50_000, 0));
+        WorldClient a = Pump(await Login(server, "cansell"));
+        WorldClient b = Pump(await Login(server, "canbid"));
+        await Until(() => a.Pack.Count(item => item.Name == Sword) == 2 && b.Vitals is not null, "둘이 서지 못했습니다.");
+
+        Assert.True((await Act(a, () => a.AuctionPostAsync(1, Start, 0, 12, _deadline.Token))).Ok);
+        Assert.True((await Act(a, () => a.AuctionPostAsync(2, Start, 0, 12, _deadline.Token))).Ok);
+        uint[] ids = [.. (await Browse(b)).Rows.Select(row => row.Id).Order()];
+        Assert.True((await Act(b, () => b.AuctionBidAsync(ids[1], 2_000, _deadline.Token))).Ok);
+        long gold = a.Vitals!.Gold;
+
+        Assert.Equal("내 경매가 아닙니다", (await Act(b, () => b.AuctionCancelAsync(ids[0], _deadline.Token))).Message);
+
+        // 입찰 없음 — 보증금만 잃고(이미 냈다) 물건은 받을 것으로.
+        Assert.True((await Act(a, () => a.AuctionCancelAsync(ids[0], _deadline.Token))).Ok);
+        Assert.Equal(gold, a.Vitals!.Gold);
+
+        // 입찰 있음 — 현재가의 수수료를 내고, 입찰자는 받을 것으로 돌려받는다.
+        Assert.True((await Act(a, () => a.AuctionCancelAsync(ids[1], _deadline.Token))).Ok);
+        await Until(() => a.Vitals!.Gold == gold - 100, $"수수료 100 이 빠지지 않았습니다: {gold} → {a.Vitals!.Gold}");
+        Assert.Equal(2_000, Claims(Book(server), "canbid").Sum(claim => (long)claim["Gold"]!));
+        Assert.Equal(2, Claims(Book(server), "cansell").Count(claim => (int)claim["Reason"]! == 4));
+        Assert.Equal("이미 끝난 경매입니다", (await Act(a, () => a.AuctionCancelAsync(ids[1], _deadline.Token))).Message);
+        Assert.Empty(Book(server)["Listings"]!.AsArray());
+    }
+
+    [Fact]
+    public async Task Expired_listings_go_back_or_sell_when_their_time_comes()
+    {
+        using IsolatedHadesServer server = Ready(("expsell", 100_000, 2), ("expbid", 50_000, 0));
+        WorldClient a = Pump(await Login(server, "expsell"));
+        WorldClient b = Pump(await Login(server, "expbid"));
+        await Until(() => a.Pack.Count(item => item.Name == Sword) == 2 && b.Vitals is not null, "둘이 서지 못했습니다.");
+        Assert.True((await Act(a, () => a.AuctionPostAsync(1, Start, 0, 12, _deadline.Token))).Ok);
+        Assert.True((await Act(a, () => a.AuctionPostAsync(2, Start, 0, 12, _deadline.Token))).Ok);
+        uint[] ids = [.. (await Browse(b)).Rows.Select(row => row.Id).Order()];
+        Assert.True((await Act(b, () => b.AuctionBidAsync(ids[1], 1_000, _deadline.Token))).Ok);
+
+        // 시간을 당긴다 — 서버를 끈 사이 두 경매의 끝 시각을 지난 시각으로.
+        server.Restart(TimeSpan.FromMinutes(2), () =>
+        {
+            JsonNode book = Book(server);
+            foreach (JsonNode? listing in book["Listings"]!.AsArray())
+            {
+                listing!["ExpiresAt"] = DateTime.UtcNow.AddMinutes(-1).ToString("O");
+            }
+
+            File.WriteAllText(BookPath(server), book.ToJsonString());
+        });
+
+        await Until(() => Book(server)["Listings"]!.AsArray().Count == 0, "기간이 끝난 경매가 남았습니다.");
+        JsonNode after = Book(server);
+        var seller = Claims(after, "expsell").ToList();
+        Assert.Contains(seller, claim => (int)claim["Reason"]! == 2 && (string?)claim["Item"]!["Template"]!["Name"] == Sword);   // 유찰 — 물건만, 보증금 없음
+        Assert.Contains(seller, claim => (int)claim["Reason"]! == 1 && (long)claim["Gold"]! == 1_000 - 50 + Deposit);         // 낙찰 대금
+        Assert.Single(Claims(after, "expbid"), claim => (int)claim["Reason"]! == 0);                                            // 낙찰품
+        string[] ends = [.. Events(server).Where(line => (string?)line["ev"] is "sold" or "expired").Select(line => (string)line["ev"]!).Order()];
+        Assert.Equal(["expired", "sold"], ends);
+    }
+
+    [Fact]
+    public async Task Twenty_simultaneous_buyouts_sell_each_listing_once()
+    {
+        const int pairs = 20;
+        using IsolatedHadesServer server = Ready(("racesell", 100_000, pairs), ("racex", 30_000, 0), ("racey", 30_000, 0));
+        WorldClient seller = Pump(await Login(server, "racesell"));
+        WorldClient x = Pump(await Login(server, "racex"));
+        WorldClient y = Pump(await Login(server, "racey"));
+        await Until(() => seller.Pack.Count(item => item.Name == Sword) == pairs && x.Vitals is not null && y.Vitals is not null, "셋이 서지 못했습니다.");
+
+        for (int slot = 1; slot <= pairs; slot++)
+        {
+            byte at = (byte)slot;
+            Assert.True((await Act(seller, () => seller.AuctionPostAsync(at, 100, 1_000, 12, _deadline.Token))).Ok);
+        }
+
+        uint[] ids = [.. (await Browse(x)).Rows.Select(row => row.Id)];
+        Assert.Equal(pairs, ids.Length);
+        foreach (uint id in ids)
+        {
+            AuctionDone[] both = await Task.WhenAll(
+                Act(x, () => x.AuctionBuyoutAsync(id, _deadline.Token)),
+                Act(y, () => y.AuctionBuyoutAsync(id, _deadline.Token)));
+            Assert.Single(both, done => done.Ok);
+            Assert.Single(both, done => done.Message == "이미 끝난 경매입니다");
+        }
+
+        JsonNode book = Book(server);
+        Assert.Empty(book["Listings"]!.AsArray());
+        Assert.Equal(pairs, Claims(book, "racex").Count() + Claims(book, "racey").Count());
+        await Until(() => x.Vitals!.Gold + y.Vitals!.Gold == 60_000 - (pairs * 1_000), $"사는 이 금화 {x.Vitals!.Gold}+{y.Vitals!.Gold}");
+        Assert.Equal(Claims(book, "racex").Count() * 1_000, 30_000 - x.Vitals!.Gold);
+    }
+
+    [Fact]
+    public async Task Bad_values_and_hasty_requests_are_turned_back()
+    {
+        using IsolatedHadesServer server = Ready(("badsell", 100_000, 1), ("badpoor", 0, 1));
+        WorldClient a = Pump(await Login(server, "badsell"));
+        WorldClient poor = Pump(await Login(server, "badpoor"));
+        await Until(() => a.Pack.Any(item => item.Name == Sword) && poor.Pack.Any(item => item.Name == Sword), "둘이 서지 못했습니다.");
+
+        Assert.Equal("값이 맞지 않습니다", (await Act(a, () => a.AuctionPostAsync(1, Start, 0, 13, _deadline.Token))).Message);
+        Assert.Equal("값이 맞지 않습니다", (await Act(a, () => a.AuctionPostAsync(1, 5_000, 4_000, 12, _deadline.Token))).Message);
+        Assert.Equal("값이 맞지 않습니다", (await Act(a, () => a.AuctionPostAsync(1, 0, 0, 12, _deadline.Token))).Message);
+        Assert.Equal("올릴 수 없는 물건입니다", (await Act(a, () => a.AuctionPostAsync(99, Start, 0, 12, _deadline.Token))).Message);
+        Assert.Equal("보증금이 모자랍니다", (await Act(poor, () => poor.AuctionPostAsync(1, Start, 0, 12, _deadline.Token))).Message);
+        Assert.Equal("이미 끝난 경매입니다", (await Act(a, () => a.AuctionBuyoutAsync(424_242, _deadline.Token))).Message);
+        Assert.Equal("받을 것이 없습니다", (await Act(a, () => a.AuctionTakeAsync(0, _deadline.Token))).Message);
+
+        // 0.3초 안에 둘 — 둘째는 「잠시 뒤에」.
+        await Task.Delay(350, _deadline.Token);
+        int seen = a.AuctionDoneCount;
+        await a.AuctionClaimsAsync(0, _deadline.Token);
+        await a.AuctionClaimsAsync(0, _deadline.Token);
+        await Until(() => a.AuctionDoneCount > seen && a.AuctionDone!.Message == "잠시 뒤에 다시 하십시오", $"마지막 답: {a.AuctionDone}");
+
+        Assert.Contains(a.Pack, item => item.Name == Sword);
+        Assert.Equal(100_000, a.Vitals!.Gold);
+        Assert.Empty(Book(server)["Listings"]!.AsArray());
+    }
+
+    [Fact]
+    public async Task Browsing_pages_sorts_and_filters()
+    {
+        using IsolatedHadesServer server = Ready(("pagesell", 1_000_000, 13), ("pagesel2", 1_000_000, 0), ("pageview", 0, 0));
+        Give(server, "pagesel2", 1, "가죽방패", 12);
+        WorldClient one = Pump(await Login(server, "pagesell"));
+        WorldClient two = Pump(await Login(server, "pagesel2"));
+        WorldClient view = Pump(await Login(server, "pageview"));
+        await Until(() => one.Pack.Count == 13 && two.Pack.Count == 12 && view.Vitals is not null, "물건이 오지 않았습니다.");
+
+        for (int slot = 1; slot <= 13; slot++)
+        {
+            byte at = (byte)slot;
+            uint price = (uint)(1_000 + (slot * 10));
+            Assert.True((await Act(one, () => one.AuctionPostAsync(at, price, 0, 12, _deadline.Token))).Ok);
+        }
+
+        for (int slot = 1; slot <= 12; slot++)
+        {
+            byte at = (byte)slot;
+            uint price = (uint)(2_000 - slot);
+            Assert.True((await Act(two, () => two.AuctionPostAsync(at, price, 0, 24, _deadline.Token))).Ok);
+        }
+
+        AuctionPage first = await View(view, () => view.AuctionBrowseAsync(0, 1, 0, string.Empty, _deadline.Token));
+        Assert.Equal((0, 2, 20), (first.Page, first.Pages, first.Rows.Count));
+        Assert.Equal(first.Rows.Select(row => row.Price).Order(), first.Rows.Select(row => row.Price));
+        AuctionPage second = await View(view, () => view.AuctionBrowseAsync(0, 1, 1, string.Empty, _deadline.Token));
+        Assert.Equal(5, second.Rows.Count);
+        Assert.True(second.Rows.Min(row => row.Price) >= first.Rows.Max(row => row.Price));
+
+        AuctionPage weapons = await View(view, () => view.AuctionBrowseAsync(1, 0, 0, string.Empty, _deadline.Token));
+        Assert.Equal(13, weapons.Rows.Count);
+        Assert.All(weapons.Rows, row => Assert.Contains(Sword, row.Name));
+        AuctionPage shields = await View(view, () => view.AuctionBrowseAsync(0, 0, 0, "방패", _deadline.Token));
+        Assert.Equal(12, shields.Rows.Count);
+        AuctionPage armour = await View(view, () => view.AuctionBrowseAsync(2, 0, 0, string.Empty, _deadline.Token));
+        Assert.Equal(12, armour.Rows.Count);
+    }
+
     /// <summary>
     /// 확인 사진 — 격리 서버에 다섯 가지를 올려 두고, 실제 앱(사는 이)이 들어가 「경매장」 창을 열면(<c>--auction</c>) 찾기 목록이 선다.
     /// <c>LOD_AUCTION_SHOT</c> 에 png 경로를 줄 때만 돈다(<c>LOD_AUCTION_ORIENT</c> = portrait|landscape).
@@ -169,19 +382,10 @@ public sealed class AuctionTests : IDisposable
             ("산호반지", 1, 1_800, 3_000, 12), ("상급체력포션", 20, 400, 900, 24),
         ];
         using IsolatedHadesServer server = Ready(("aucshop", 1_000_000, 0), ("aucview", 50_000, 0));
-        CompanionCallTests.Edit(server, "aucshop", saved =>
+        for (int at = 0; at < goods.Length; at++)
         {
-            for (int at = 0; at < goods.Length; at++)
-            {
-                // 심은 물건은 그림 번호가 비어 있다(0) — 실제 물건처럼 템플릿의 그림을 함께 적는다.
-                string template = File.ReadAllText(Path.Combine(server.ContentLocation, "templates", "items", $"{goods[at].Name}.json"));
-                saved["Inventory"]!["Items"]![(at + 1).ToString()] = new JsonObject
-                {
-                    ["Template"] = new JsonObject { ["Name"] = goods[at].Name }, ["Slot"] = at + 1, ["Stacks"] = goods[at].Stacks, ["Durability"] = 100,
-                    ["DisplayImage"] = (int)JsonNode.Parse(template.TrimStart('\uFEFF'))!["DisplayImage"]!,
-                };
-            }
-        });
+            Give(server, "aucshop", at + 1, goods[at].Name, 1, goods[at].Stacks);
+        }
 
         WorldClient seller = Pump(await Login(server, "aucshop"));
         await Until(() => seller.Pack.Count == goods.Length, $"올릴 물건이 오지 않았습니다: {seller.Pack.Count}");
@@ -230,20 +434,28 @@ public sealed class AuctionTests : IDisposable
         foreach (var (who, gold, swords) in people)
         {
             LoginFlow.TryCreateAccount(server, who);
-            CompanionCallTests.Edit(server, who, saved =>
-            {
-                saved["GoldPoints"] = gold;
-                for (int slot = 1; slot <= swords; slot++)
-                {
-                    saved["Inventory"]!["Items"]![slot.ToString()] = new JsonObject
-                    {
-                        ["Template"] = new JsonObject { ["Name"] = Sword }, ["Slot"] = slot, ["Stacks"] = 1, ["Durability"] = 100,
-                    };
-                }
-            });
+            CompanionCallTests.Edit(server, who, saved => saved["GoldPoints"] = gold);
+            Give(server, who, 1, Sword, swords);
         }
 
         return server;
+    }
+
+    /// <summary>가방 <paramref name="from" /> 칸부터 <paramref name="count" />칸에 물건을 심는다. 그림 번호는 템플릿 것(실제 물건처럼).</summary>
+    private static void Give(IsolatedHadesServer server, string who, int from, string name, int count, int stacks = 1)
+    {
+        string template = File.ReadAllText(Path.Combine(server.ContentLocation, "templates", "items", $"{name}.json"));
+        int image = (int)JsonNode.Parse(template.TrimStart('\uFEFF'))!["DisplayImage"]!;
+        CompanionCallTests.Edit(server, who, saved =>
+        {
+            for (int slot = from; slot < from + count; slot++)
+            {
+                saved["Inventory"]!["Items"]![slot.ToString()] = new JsonObject
+                {
+                    ["Template"] = new JsonObject { ["Name"] = name }, ["Slot"] = slot, ["Stacks"] = stacks, ["Durability"] = 100, ["DisplayImage"] = image,
+                };
+            }
+        });
     }
 
     /// <summary>경매 요청 하나를 보내고 그 답(0x5E 9)을 기다린다. 같은 사람의 요청 사이 0.3초(SPEC S-8)를 지킨다.</summary>

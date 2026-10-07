@@ -116,10 +116,14 @@ public sealed class IsolatedHadesServer : IDisposable
         RequireCompiledScripts();
     }
 
-    /// <summary>Kills the server and starts it again on the same files — what a crash and a reboot leave behind.</summary>
-    public void Restart(TimeSpan readinessTimeout)
+    /// <summary>
+    /// Kills the server and starts it again on the same files — what a crash and a reboot leave behind. <paramref name="whileDown" />
+    /// runs between the two, for editing what the server would otherwise overwrite.
+    /// </summary>
+    public void Restart(TimeSpan readinessTimeout, Action? whileDown = null)
     {
         StopProcess();
+        whileDown?.Invoke();
 
         lock (_console)
         {
