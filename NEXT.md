@@ -5,7 +5,7 @@
   사진: `shots/auction-{browse,post,mine,claims}-portrait-2026-10-07.png` · `auction-{browse,post}-landscape-…` · `auction-roll-portrait-…`.
   SPEC 결정(S-1): 동료 봇은 주인 그룹에 들어가므로 룰렛·나눔에서 뺀다(사람+동료 봇 사냥은 지금처럼 바닥).
   **다음**: ① 사용자 확인 뒤 배포 — `dotnet build …/Lorule.GameServer.csproj` → `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh deploy`(접속자 끊김 알림, 백업 cron 도 다시 깜) → `… eco` → 앱 `scripts/ops/ios-build.sh install` ② 24시간 뒤 `cloud-server.sh auction-report`(SC-006: 봇 올림·구매 ≥1, 봇 올림 ≤5, 끊긴 조작 0) ③ 확인되면 main 에 합치기(사용자 확인).
-  정할 것: [취소] 수수료 경고가 터치에선 안 보임(툴팁) — 확인창을 넣을지 · 룰렛 띠는 창이 열려 있으면 가려짐(채팅 한 줄은 남음) · 가로에서 맵 출구 표지가 창 위에 겹침(다른 창도 같은 기존 동작).
+  끝(사용자 10-07): [취소]는 확인 판으로 먼저 묻고, 룰렛 띠는 모든 창 위에. 남은 것: 가로에서 맵 출구 표지가 창 위에 겹침(다른 창도 같은 기존 동작).
 
 - **[현재/2026-10-07] 생태계 봇 그룹 사냥(⑦, 결정 19·20) — 등급 M · `dev:build` · 단계: 배포·지켜보기 중.** SPEC `autopilot/eco-bots/party-SPEC.md`. 커밋 588584b9 → 41039d2a → 238fd9de → 8e5c89a8 (서버 d911d4726 · 8c82414d5 · 217087306).
   만든 것: 성직자 1 + 파티 레벨 11 이상 싸우는 봇 3, 서버 그룹 경험치 같은 맵 모두(원작) · 경험치 60초 안 오르면 자리 옮김 · 노비스주민 선공 끔.
