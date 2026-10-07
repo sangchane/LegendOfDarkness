@@ -30,6 +30,9 @@ internal static class ClientOpcode
     /// <summary>상점 일괄 거래(우리 확장 0xF2).</summary>
     public const byte BulkTrade = 0xF2;
 
+    /// <summary>경매장(우리 확장 0xF4 — <see cref="World.Auction" />).</summary>
+    public const byte Auction = 0xF4;
+
     /// <summary>서버 심장박동(<see cref="ServerOpcode.Heartbeat" />)에 대한 답.</summary>
     public const byte HeartbeatReply = 0x45;
 

@@ -27,7 +27,7 @@
 - **S-3 돌림 차례**: `Party` 에 `LootTurn`(int)·`LootTurnKey`(정렬한 대상 이름을 `|` 로 이은 것) 메모리 칸. 키가 바뀌면 0 부터. 받는 이 = 대상[LootTurn % n], 그 뒤 LootTurn++.
 - **S-4 룰렛 같은 수**: 가장 높은 수가 여럿이면 그들끼리만 다시 굴린다. E-01 에는 **첫 굴림**의 수를 싣고 이긴 이는 최종. 사건 `roll` 의 `data.rolls` 에는 모든 굴림.
 - **S-5 사건 기록 양**: `roll` 은 룰렛마다, `split` 은 **넘침(받을 것 금화)이 생길 때만** 적는다 — 처치마다 적으면 하루 수십만 줄. 평소 나눔 금화는 `GoldPoints` 설정자 → 활동 장부(FR-018 둘째 문장)로 남는다.
-- **S-6 캐릭터 저장 자물쇠**(착수 조건 1): `AislingStorage.Save` 를 `bool` 로 — 이름별 자물쇠 안에서 **직렬화 + 쓰기**를 함께 하고, 예외면 false, `DontSavePlayers` 면 false. `IStorage<T>.Save` 도 bool. 이것으로 주기 저장이 경매 저장보다 옛 상태를 늦게 쓰는 일이 없어진다(직렬화가 자물쇠 안이라 나중에 잡은 쪽이 새 상태를 쓴다).
+- **S-6 캐릭터 저장 자물쇠**(착수 조건 1): 새 `AislingStorage.TrySave → bool`(`Save` 는 그것을 부름) — 이름별 자물쇠 안에서 **직렬화 + 쓰기**를 함께 하고, 예외면 false, `DontSavePlayers` 면 false. `IStorage<T>` 는 그대로(구현 셋 중 하나만 필요). 이것으로 주기 저장이 경매 저장보다 옛 상태를 늦게 쓰는 일이 없어진다(직렬화가 자물쇠 안이라 나중에 잡은 쪽이 새 상태를 쓴다).
 - **S-7 저장 실패 기록**: 내주는 쪽 저장이 실패하면 메모리를 되돌리고 사건 `{"ev":"abort","seq":N}` 한 줄 — `commit` 도 `abort` 도 없는 seq 만 끊긴 조작이다(07 R1).
 - **S-8 요청 간격**: 같은 세션 0xF4 가 0.3초 안이면 **버리지 않고** `0x5E 9 ok=0 "잠시 뒤에 다시 하십시오"`(앱은 0x5E 9 까지 단추를 잠그므로 버리면 단추가 잠긴 채 남는다). 05 「넘으면 버림」을 바꾼다.
 - **S-9 입찰 규칙 보충**: 지금 최고 입찰자의 다시 입찰은 거절 「이미 최고 입찰자입니다」. 입찰가 ≥ 즉시 구매가(>0)면 즉시 구매로 처리(즉시 구매가만 냄).
@@ -37,7 +37,7 @@
 
 ## 제안 변경
 ### 서버 (`H` = Hades.Server.Base)
-1. `Storage/AislingStorage.cs` — S-6. `Storage/IStorage.cs` `bool Save(T)`. 다른 `IStorage` 구현이 있으면 같이(지금 AislingStorage 하나).
+1. `Storage/AislingStorage.cs` — S-6 `TrySave`.
 2. `Types/Area.cs:384` — `var stale = (DateTime.UtcNow - item.AbandonedDate).TotalMinutes > 3;`
 3. **새 `Types/AuctionHouse.cs`** — 머리에 03 상수 표 이름 그대로 `const`(ROLL_*·AUCTION_*). 정적 클래스.
    - 상태: `Listing`(05 ERD) · `Claim`(05 ERD) 레코드 클래스, `List<Listing>`·`List<Claim>`, `long NextId`·`long LastSeq`. 물건은 `Item` 그대로 Newtonsoft(`StorageManager.Settings`)로.

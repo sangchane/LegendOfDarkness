@@ -234,6 +234,11 @@ public sealed partial class WorldClient
                     _companionKit = World.Companion.ReadKit(body);
                     _companionKitCount++;
                     break;
+                case World.Auction.RollKind:
+                case World.Auction.PageKind:
+                case World.Auction.DoneKind:
+                    OnAuction(body);
+                    break;
             }
         }
         catch (ProtocolException cut)

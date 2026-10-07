@@ -116,6 +116,22 @@ public sealed class IsolatedHadesServer : IDisposable
         RequireCompiledScripts();
     }
 
+    /// <summary>Kills the server and starts it again on the same files — what a crash and a reboot leave behind.</summary>
+    public void Restart(TimeSpan readinessTimeout)
+    {
+        StopProcess();
+
+        lock (_console)
+        {
+            _console.Clear();
+        }
+
+        _loginOnline = false;
+        _gameOnline = false;
+        _ready.Reset();
+        Start(readinessTimeout);
+    }
+
     /// <summary>
     /// Refuses a server whose scripts did not compile. One bad script loses every script — they are compiled
     /// as one assembly — and the server then starts and listens as though nothing happened: no monster ever
