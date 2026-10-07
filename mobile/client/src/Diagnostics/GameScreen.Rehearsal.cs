@@ -16,6 +16,7 @@ public partial class GameScreen : Control
     {
         RehearseLook(delta);
         RehearseUsers();
+        RehearseAuction();
         RehearseAimHold(delta);
 
         if (Main.Inviting.Length > 0 && !_partyRehearsed && Time.GetTicksMsec() > 6000)
@@ -305,6 +306,27 @@ public partial class GameScreen : Control
         {
             _usersRehearsed = true;
             GD.Print($"GREYBOX_USERS {string.Join(",", _users.Names)}");
+        }
+    }
+
+    private bool _auctionRehearsed;
+
+    /// <summary>손 없이 확인할 때만(<c>--auction</c>): 들어간 뒤 [경매장] 창을 한 번 열고, 찾기 쪽이 오면 줄 이름들을 적는다.</summary>
+    private void RehearseAuction()
+    {
+        if (!Main.ShowingAuction || _auctionRehearsed || Time.GetTicksMsec() < 6000)
+        {
+            return;
+        }
+
+        if (!_auction.Visible)
+        {
+            SetWindow(GameWindow.Auction, true);
+        }
+        else if (_auction.Names.Count > 0)
+        {
+            _auctionRehearsed = true;
+            GD.Print($"GREYBOX_AUCTION {string.Join(",", _auction.Names)}");
         }
     }
 

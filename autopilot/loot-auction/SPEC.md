@@ -57,9 +57,9 @@
    - 보증금 = max(1, ⌊`ShopPricing.Offer(item)` × max(1,Stacks) × 비율/100⌋) · 수수료 = ⌊가 × 5/100⌋ · 다음 최소 입찰 = 05 데이터 규칙.
    - 접속 중인 파는 이·밀린 이에게 E-03(ok=1, 「경매 물건이 팔렸습니다: 이름」 / 「입찰에서 밀렸습니다: 이름」).
    - 찾기: 이름(`DisplayName`, 대소문자 무시 포함) · S-11 종류 · 정렬(남은 시간 오름 / 현재가 오름 / 즉시 구매가 오름, 0 은 맨 뒤) · AUCTION_PAGE. 파는 이·입찰자 이름은 응답에 없다.
-4. **새 `Types/GroupLoot.cs`** — `Share(Aisling killer, Item item, Sprite source)` · `ShareGold(Aisling killer, int amount, Sprite source)` → bool. `GroupLootRoll` 꺼짐 · 그룹 없음 · 대상 < 2(S-1) → false.
+4. **새 `Types/GroupLoot.cs`** — `Share(Aisling killer, Item item, Sprite source)` · `ShareGold(Aisling killer, int amount)` → bool. `GroupLootRoll` 꺼짐 · 그룹 없음 · 대상 < 2(S-1) → false.
    룰렛 물건(03 용어: `Equipable` · `Upgrades > 0` · `ItemVariance != None`) → 굴림(S-4) → `GiveTo(winner)`, 실패면 `item.Cursed=true; item.AuthenticatedAislings=[winner]; item.Release(source, winner.Position)` → 대상 모두에게 E-01 + `SendMessage(0x03, "{물건}: {이긴 이} ({수})")` → 사건 `roll`. 돌림 물건 → S-3 → `GiveTo`, 실패면 같은 떨굼. 금화 → S-2, 몫이 `MaxCarryGold − GoldPoints` 를 넘으면 넘는 만큼 `AuctionHouse.AddGoldClaim(이름, 넘침, 5)`, 받은 이에게 `SendStats(StructC)` + 「금전 N전을 나눠 받았습니다」.
-5. `monsterexp.cs` — :425 `if (!GroupLoot.ShareGold(_player, sum, _monster)) Money.Create(...)` · :211 앞 `if (GroupLoot.Share(_player, rolledItem, _monster)) return;` · :121 앞 같은 줄.
+5. `monsterexp.cs` — :425 `if (!GroupLoot.ShareGold(_player, sum)) Money.Create(...)` · :211 앞 `if (GroupLoot.Share(_player, rolledItem, _monster)) return;` · :121 앞 같은 줄.
 6. `Network/ServerFormats/ServerFormat5E.cs` — 종류 `Roll=7`·`AuctionPage=8`·`AuctionDone=9` + 본문(05 E-01~03). serial 0.
 7. **새 `Network/ClientFormats/ClientFormatF4.cs`** — 05 P-01~08 읽기(짧으면 `Kind=0xFF` 로 두어 핸들러가 버림). `Undefined.cs` 의 `ClientFormatF4` 빈 클래스 지움.
 8. `Network/Game/GameServerHandlers.cs` — `FormatF4Handler`: 로그인 검사 → S-8 → 종류별 `AuctionHouse` 호출 → 0x5E 8 / 9. `GameClient` 에 `DateTime LastAuctionRequest`.
@@ -72,14 +72,14 @@
 14. 운영 `scripts/ops/cloud-server.sh` backup·cron 에 `auction` 더함(`--ignore-failed-read`), `auction-logs` 명령 · 새 `scripts/ops/auction-revert.py`·`auction-report.py`.
 
 ## 완료 기준
-- [ ] **K1** 캐릭터 저장이 bool, 직렬화·쓰기가 한 자물쇠(S-6) — 검증: 기존 `CharacterSaveTests` 통과 + 경매 시험 INV-3(저장 폴더 읽기 전용 → 올림 거절, 가방 그대로)
-- [ ] **K2** 경매 한 바퀴(FR-006·008·011·018, SC-003 즉시 구매 경로) — 검증: `AuctionTests.Post_buyout_take_keeps_items_and_gold`(올림 → 즉시 구매 → 둘 다 받기, 단계마다 INV-1·2, 파는 이 순수익 = 즉시 − ⌊즉시×5%⌋, 사건 줄 post·buyout·take·take 와 같은 seq commit)
-- [ ] **K3** 경매 파일 다시 불러오기(SC-004 앞부분) — 검증: `AuctionTests.Restart_keeps_listings_and_claims`
-- [ ] **K4** 룰렛(FR-001·002·005, SC-001) — 검증: `GroupLootTests.Roll_gives_one_member_and_tells_everyone`(4인·10회) · 가방 가득 → 발밑·남은 줍기 거절 · 그룹 없음 → 바닥
-- [ ] **K5** 금화 나눔(FR-004·005, SC-002) — 검증: `GroupLootTests.Gold_split_sums_to_the_drop`(3인 1,000 → 333·333·334) · 상한 근처 → 받을 것 금화 줄
-- [ ] **K6** 보호 결함(DL-10) — 검증: `GroupLootTests.Solo_table_drop_is_protected`(다른 캐릭터 1분 안 줍기 거절)
-- [ ] **K7** 동료 봇 제외(S-1) — 검증: 사람 1 + 동료 봇 → 바닥에 떨어짐(지금 동작)
-- [ ] **K8** 앱 「경매장」 → 찾기 탭 목록(FR-012·013 일부) — 검증: 맥 앱 실제 로그인 사진 1장(`shots/auction-browse-*.png`) + 알맹이 E-02 읽기 단위 시험
+- [x] **K1** 캐릭터 저장이 bool, 직렬화·쓰기가 한 자물쇠(S-6) — 검증: 기존 `CharacterSaveTests` 통과 + 경매 시험 INV-3(저장 폴더 읽기 전용 → 올림 거절, 가방 그대로)
+- [x] **K2** 경매 한 바퀴(FR-006·008·011·018, SC-003 즉시 구매 경로) — 검증: `AuctionTests.Post_buyout_take_keeps_items_and_gold`(올림 → 즉시 구매 → 둘 다 받기, 단계마다 INV-1·2, 파는 이 순수익 = 즉시 − ⌊즉시×5%⌋, 사건 줄 post·buyout·take·take 와 같은 seq commit)
+- [x] **K3** 경매 파일 다시 불러오기(SC-004 앞부분) — 검증: `AuctionTests.Restart_keeps_listings_and_claims`
+- [x] **K4** 룰렛(FR-001·002·005, SC-001) — 검증: `GroupLootTests.Roll_gives_one_member_and_tells_everyone`(4인·10회) · 가방 가득 → 발밑·남은 줍기 거절 · 그룹 없음 → 바닥
+- [x] **K5** 금화 나눔(FR-004·005, SC-002) — 검증: `GroupLootTests.Gold_split_sums_to_the_drop`(3인 1,000 → 333·333·334) · 상한 근처 → 받을 것 금화 줄
+- [x] **K6** 보호 결함(DL-10) — 검증: `GroupLootTests.A_full_bag_drops_at_the_winners_feet_only_for_them`(발밑에 떨어진 것을 남이 몇 순회 뒤에도 못 주움 — 고치기 전 식이면 실패 확인)
+- [x] **K7** 동료 봇 제외(S-1) — 검증: 사람 1 + 동료 봇 → 바닥에 떨어짐(지금 동작)
+- [x] **K8** 앱 「경매장」 → 찾기 탭 목록(FR-012·013 일부) — 검증: 맥 앱 실제 로그인 사진 1장(`shots/auction-browse-*.png`) + 알맹이 E-02 읽기 단위 시험
 - [ ] **K9 이후**(tasks.md T4~): 입찰·취소·기간 끝·거절 문구·동시 즉시 구매 20쌍(SC-004) · 앱 나머지 탭·룰렛 띠(SC-005) · 봇(FR-014·015) · 설정 끔(FR-016) · 되돌리기(FR-017, SC-007) · 운영 보고(SC-006)
 
 ## 테스트 계획

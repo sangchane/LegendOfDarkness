@@ -70,6 +70,9 @@ public partial class GameScreen : Control
     private SettingsPanel _settings = null!;
     private readonly BotGearPanel _botGear = new();
     private readonly UsersPanel _users = new();
+    private readonly AuctionPanel _auction = new();
+    private int _auctionPages;
+    private int _auctionDones;
     private bool _usersAsking;
     private double _usersAskIn;
     private int _usersAsked;
@@ -292,6 +295,9 @@ public partial class GameScreen : Control
         _settings = new SettingsPanel();
         _settings.Close.Pressed += () => SetWindow(GameWindow.Settings, false);
         _users.Close.Pressed += () => SetWindow(GameWindow.Users, false);
+        _auction.Close.Pressed += () => SetWindow(GameWindow.Auction, false);
+        _auction.Search += (kind, sort, page, query) =>
+            Main.Fire(_server?.AuctionBrowseAsync(kind, sort, page, query, System.Threading.CancellationToken.None));
 
         // [종료] 는 위 줄에서 설정 창 제목 줄의 [로그아웃] 으로 옮겼다(2026-09-26). 판은 그대로 — 로그아웃 · 게임 종료 · 취소.
         _settings.Exit.Pressed += () =>
@@ -672,6 +678,22 @@ public partial class GameScreen : Control
         else if (_usersAsking && _users.Visible && (_usersAskIn -= delta) <= 0)
         {
             AskUsers();
+        }
+
+        // 경매장 — 찾기 쪽(0x5E 8)이 오면 늘어놓고, 거절(0x5E 9)은 창 위 한 줄로.
+        if (_server is not null && _server.AuctionPageCount != _auctionPages)
+        {
+            _auctionPages = _server.AuctionPageCount;
+            if (_server.AuctionPage is { View: 0 } page)
+            {
+                _auction.ShowPage(page);
+            }
+        }
+
+        if (_server is not null && _server.AuctionDoneCount != _auctionDones)
+        {
+            _auctionDones = _server.AuctionDoneCount;
+            _auction.ShowDone(_server.AuctionDone!);
         }
 
         // 사람을 눌러 서버가 그 사람 장비창(0x34)을 보내 왔다.

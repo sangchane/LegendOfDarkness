@@ -65,6 +65,9 @@ public partial class Main : Control
     /// <summary>손 없이 확인할 때 — 들어가서 [접속자] 창을 연다(<c>--users</c>).</summary>
     public static bool ShowingUsers => System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--users") >= 0;
 
+    /// <summary>손 없이 확인할 때 — 들어가서 [경매장] 창을 연다(<c>--auction</c>).</summary>
+    public static bool ShowingAuction => System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auction") >= 0;
+
     /// <summary>손 없이 확인할 때 — 파티 초대가 오면 [수락]을 누른다(<c>--accept</c>).</summary>
     public static bool Accepting { get; private set; }
 

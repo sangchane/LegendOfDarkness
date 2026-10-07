@@ -11,7 +11,8 @@ public enum GameWindow
     Settings,
     TabMap,
     BotGear,
-    Users
+    Users,
+    Auction
 }
 
 /// <summary>

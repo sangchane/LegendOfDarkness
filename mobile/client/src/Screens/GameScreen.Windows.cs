@@ -36,6 +36,11 @@ public partial class GameScreen : Control
                 _usersAsked = 0;
                 AskUsers();
             }
+
+            if (window == GameWindow.Auction)
+            {
+                _auction.Open();
+            }
         }
         else
         {
@@ -66,6 +71,7 @@ public partial class GameScreen : Control
         GameWindow.Settings => _settings,
         GameWindow.TabMap => _tabMap,
         GameWindow.Users => _users,
+        GameWindow.Auction => _auction,
         _ => _botGear
     };
 
@@ -189,7 +195,7 @@ public partial class GameScreen : Control
 
         List<VBoxContainer> holders = [];
 
-        foreach (Control panel in new Control[] { _pack, _gearPanel, _talk, _chat, _field, _settings, _tabMap, _botGear, _users })
+        foreach (Control panel in new Control[] { _pack, _gearPanel, _talk, _chat, _field, _settings, _tabMap, _botGear, _users, _auction })
         {
             VBoxContainer holder = new() { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.End };
             over.AddChild(holder);
@@ -237,6 +243,17 @@ public partial class GameScreen : Control
                 _users.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
             }
 
+            // 경매장 창 — 세로는 위 줄 바로 아래 폭 전체. 가로는 가운데에 460 폭, 높이가 모자라 소지품처럼 위 줄을 덮는다.
+            if (panel == _auction)
+            {
+                holder.Alignment = BoxContainer.AlignmentMode.Begin;
+                if (!Main.Portrait)
+                {
+                    _auction.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+                    _auction.CustomMinimumSize = new Vector2(Mathf.Min(460, GetViewportRect().Size.X - (Main.Gutter * 4)), 0);
+                }
+            }
+
             if (panel == _gearPanel)
             {
                 _gearHolder = holder;
@@ -261,7 +278,7 @@ public partial class GameScreen : Control
                 continue;
             }
 
-            if ((panel == _pack || panel == _tabMap || panel == _talk) && !Main.Portrait)
+            if ((panel == _pack || panel == _tabMap || panel == _talk || panel == _auction) && !Main.Portrait)
             {
                 holder.OffsetTop = 0;
                 continue;
@@ -315,7 +332,7 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
-            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _gearHolder || holder == _chatHolder || holder == _talkHolder || holder == _users.GetParent() ? 0 : column;
+            holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _gearHolder || holder == _chatHolder || holder == _talkHolder || holder == _users.GetParent() || holder == _auction.GetParent() ? 0 : column;
         }
     }
 

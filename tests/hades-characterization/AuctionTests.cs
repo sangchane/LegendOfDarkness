@@ -151,6 +151,76 @@ public sealed class AuctionTests : IDisposable
         await Until(() => buyer.Pack.Any(item => item.Name == Sword), "다시 켠 뒤 받은 에페가 가방에 없습니다.");
     }
 
+    /// <summary>
+    /// 확인 사진 — 격리 서버에 다섯 가지를 올려 두고, 실제 앱(사는 이)이 들어가 「경매장」 창을 열면(<c>--auction</c>) 찾기 목록이 선다.
+    /// <c>LOD_AUCTION_SHOT</c> 에 png 경로를 줄 때만 돈다(<c>LOD_AUCTION_ORIENT</c> = portrait|landscape).
+    /// </summary>
+    [Fact]
+    public async Task Photograph_the_auction_browse()
+    {
+        if (Environment.GetEnvironmentVariable("LOD_AUCTION_SHOT") is not { Length: > 0 } shot)
+        {
+            return;
+        }
+
+        (string Name, int Stacks, uint Start, uint Buyout, byte Hours)[] goods =
+        [
+            (Sword, 1, 1_000, 10_000, 12), ("가죽방패", 1, 2_500, 0, 24), ("대지의목걸이", 1, 8_000, 15_000, 48),
+            ("산호반지", 1, 1_800, 3_000, 12), ("상급체력포션", 20, 400, 900, 24),
+        ];
+        using IsolatedHadesServer server = Ready(("aucshop", 1_000_000, 0), ("aucview", 50_000, 0));
+        CompanionCallTests.Edit(server, "aucshop", saved =>
+        {
+            for (int at = 0; at < goods.Length; at++)
+            {
+                // 심은 물건은 그림 번호가 비어 있다(0) — 실제 물건처럼 템플릿의 그림을 함께 적는다.
+                string template = File.ReadAllText(Path.Combine(server.ContentLocation, "templates", "items", $"{goods[at].Name}.json"));
+                saved["Inventory"]!["Items"]![(at + 1).ToString()] = new JsonObject
+                {
+                    ["Template"] = new JsonObject { ["Name"] = goods[at].Name }, ["Slot"] = at + 1, ["Stacks"] = goods[at].Stacks, ["Durability"] = 100,
+                    ["DisplayImage"] = (int)JsonNode.Parse(template.TrimStart('\uFEFF'))!["DisplayImage"]!,
+                };
+            }
+        });
+
+        WorldClient seller = Pump(await Login(server, "aucshop"));
+        await Until(() => seller.Pack.Count == goods.Length, $"올릴 물건이 오지 않았습니다: {seller.Pack.Count}");
+        for (int at = 0; at < goods.Length; at++)
+        {
+            var (name, _, price, buyout, hours) = goods[at];
+            byte slot = (byte)(at + 1);
+            AuctionDone posted = await Act(seller, () => seller.AuctionPostAsync(slot, price, buyout, hours, _deadline.Token));
+            Assert.True(posted.Ok, $"{name}: {posted.Message}");
+        }
+
+        File.Delete(shot);
+        string orient = Environment.GetEnvironmentVariable("LOD_AUCTION_ORIENT") ?? "portrait";
+        System.Diagnostics.ProcessStartInfo start = new(Path.Combine(HadesWorkspace.RepositoryRoot, "scripts", "godot.sh"))
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+
+        foreach (string argument in new[]
+                 {
+                     "--position", "-3000,-3000", "--audio-driver", "Dummy", "--",
+                     "--server", $"127.0.0.1:{server.LoginPort}", "--login", $"aucview:{LoginFlow.SyntheticSecret}",
+                     "--orient", orient, "--size", orient == "portrait" ? "360x780" : "800x360",
+                     "--auction", "--shot", shot, "--shot-after", "14"
+                 })
+        {
+            start.ArgumentList.Add(argument);
+        }
+
+        using System.Diagnostics.Process app = System.Diagnostics.Process.Start(start)!;
+        Task<string> said = app.StandardOutput.ReadToEndAsync();
+        _ = app.StandardError.ReadToEndAsync();
+        await app.WaitForExitAsync(_deadline.Token);
+
+        Assert.True(File.Exists(shot), "사진이 남지 않았습니다.");
+        Assert.Contains("GREYBOX_AUCTION", await said, StringComparison.Ordinal);
+    }
+
     // ---- 도우미 ----
 
     private IsolatedHadesServer Ready(params (string Who, int Gold, int Swords)[] people)

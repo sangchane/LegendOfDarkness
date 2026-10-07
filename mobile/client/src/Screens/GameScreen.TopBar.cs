@@ -135,6 +135,11 @@ public partial class GameScreen : Control
         settings.Pressed += () => SetWindow(GameWindow.Settings, !_settings.Visible);
         actions.AddChild(settings);
 
+        // 경매장 — 「설정」 옆(사용자 2026-10-07). 그림은 금화 무더기.
+        Button auction = MenuButton("경매장", "res://assets/item/32910.png", pixel: true);
+        auction.Pressed += () => SetWindow(GameWindow.Auction, !_auction.Visible);
+        actions.AddChild(auction);
+
         if (Main.Portrait)
         {
             // 세로: 첫 줄 = 둥근 미니맵(맨 왼쪽) · 내 판, 둘째 줄 = 고른 이 · 월드맵 · 인벤토리 · 설정.
