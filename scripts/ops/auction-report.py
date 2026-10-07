@@ -110,7 +110,7 @@ def main() -> None:
     print(f"거래된 금화 {traded:,}전 · 수수료 {cut:,}전")
     print(f"끊긴 조작(commit·abort 없음): {len(broken)}" + "".join(f"\n  seq {e['seq']} {e.get('ev')} {e.get('who')} {e.get('item')} {e.get('gold')}" for e in broken))
     print(f"금화가 기록과 다른 줄: {len(wrong)}" + "".join(f"\n  seq {e.get('seq')} {e.get('ev')} {e.get('who')}" for e in wrong))
-    print(f"받기 뒤 캐릭터 저장 못 함: {len(unsaved)}" + "".join(f"\n  seq {e.get('seq')} {e.get('who')} — 캐릭터 파일을 보고 빠졌을 때만 되살린다" for e in unsaved))
+    print(f"받기 뒤 캐릭터 저장 못 함: {len(unsaved)}" + "".join(f"\n  seq {e.get('seq')} {e.get('who')} — 캐릭터 파일의 금화 + 은행(BankManager.Gold)을 보고 빠졌을 때만 되살린다(넘친 금화는 은행으로 간다)" for e in unsaved))
     if broken:
         print("  ↳ 끊긴 조작은 auction.json 의 Listings·Claims 와 캐릭터 파일로 정말 빠졌는지 본 뒤에만 --give 로 되살린다(07 R1)")
 

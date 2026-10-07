@@ -78,11 +78,11 @@ public sealed class EcoAuctionLoopTests(ITestOutputHelper output) : IDisposable
             }
         }
 
-        // 판 값(즉시 구매가 = 상인 매입가 937 × 4) − 수수료 5% + 보증금(24시간 30%)이 전사 봇의 받을 것에.
+        // 판 값(즉시 구매가 = 상인 매입가 937 × 4) − 수수료 5% + 보증금(24시간 = 시작가 937 × 2 의 2%, DL-14)이 전사 봇의 받을 것에.
         JsonNode book = JsonNode.Parse(File.ReadAllText(Path.Combine(server.ContentLocation, "auction", "auction.json")))!;
         Assert.Empty(book["Listings"]!.AsArray());
         const long buyout = 937 * 4;
-        Assert.Contains(book["Claims"]!.AsArray(), claim => (string?)claim!["Owner"] == Seller.Name && (long)claim["Gold"]! == buyout - (buyout * 5 / 100) + (937 * 30 / 100));
+        Assert.Contains(book["Claims"]!.AsArray(), claim => (string?)claim!["Owner"] == Seller.Name && (long)claim["Gold"]! == buyout - (buyout * 5 / 100) + (937 * 2 * 2 / 100));
     }
 
     private static JsonElement[] Lines(string events) =>

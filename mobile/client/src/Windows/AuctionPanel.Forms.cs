@@ -12,11 +12,11 @@ public sealed partial class AuctionPanel
 {
     private static readonly byte[] Hours = [12, 24, 48];
 
-    /// <summary>03 상수 표 AUCTION_DEPOSIT_RATE — 기간별 보증금(상점가의 %).</summary>
-    private static readonly int[] Rates = [15, 30, 60];
+    /// <summary>03 상수 표 AUCTION_DEPOSIT_RATE — 기간별 보증금(시작가의 %).</summary>
+    private static readonly int[] Rates = [1, 2, 4];
 
-    /// <summary>들 수 있는 금화의 상한(서버 MaxCarryGold) — 입력 칸이 이보다 큰 값은 받지 않는다.</summary>
-    private const double MostGold = 100_000_000;
+    /// <summary>값의 상한(서버 AUCTION_MAX_PRICE) — 입력 칸이 이보다 큰 값은 받지 않는다. 들고 있는 것이 모자라면 서버가 은행 금화로 낸다.</summary>
+    private const double MostGold = 2_000_000_000;
 
     private readonly SpinBox _bid = Number("입찰 ");
     private readonly Button _bidButton = new() { Text = "입찰", CustomMinimumSize = new Vector2(64, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
@@ -72,6 +72,7 @@ public sealed partial class AuctionPanel
             Hint();
         };
         _postButton.Pressed += Post;
+        _start.ValueChanged += _ => Hint();
 
         _form = new VBoxContainer();
         _form.AddThemeConstantOverride("separation", Main.Gutter / 2);
@@ -152,22 +153,13 @@ public sealed partial class AuctionPanel
     }
 
     /// <summary>
-    /// 양식 밑의 한 줄 — 보증금 약 N전(= max(1, ⌊⌊값/1.6⌋ × 묶음 × 비율/100⌋), 값은 아이템 정보에 있을 때만)과 즉시 구매가 0 의 뜻.
+    /// 양식 밑의 한 줄 — 보증금 N전(= max(1, ⌊시작가 × 비율/100⌋))과 즉시 구매가 0 의 뜻.
     /// 올리면 보증금이 바로 빠지고, 팔리면 돌아온다.
     /// </summary>
     private void Hint()
     {
-        string none = "즉시 구매가 0 은 없음";
-
-        if (_item?.Stats is { } stats)
-        {
-            long deposit = Math.Max(1, (long)(stats.Value / 1.6) * Math.Max(1, _item.Stacks) * Rates[_hoursAt] / 100);
-            _hint.Text = $"보증금 약 {deposit:N0}전 · {none}";
-        }
-        else
-        {
-            _hint.Text = none;
-        }
+        long deposit = Math.Max(1, (long)_start.Value * Rates[_hoursAt] / 100);
+        _hint.Text = $"보증금 {deposit:N0}전 · 즉시 구매가 0 은 없음";
     }
 
     /// <summary>[올리기] — 가방이 그새 바뀌었으면(칸이 다른 물건을 가리킬 수 있다) 보내지 않고 다시 보인다.</summary>

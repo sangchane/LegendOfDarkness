@@ -12,9 +12,9 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 public sealed class AuctionTests : IDisposable
 {
-    private const string Sword = "에페";            // 값 500 → 상인 매입가 312, 12시간 보증금 ⌊312 × 15%⌋ = 46
-    private const int Deposit = 46;
+    private const string Sword = "에페";
     private const int Start = 1_000;
+    private const int Deposit = Start * 1 / 100;     // 12시간 보증금 = 시작가의 1%(DL-14)
     private const int BuyoutPrice = 10_000;
     private const int Cut = BuyoutPrice * 5 / 100;
 
@@ -307,6 +307,7 @@ public sealed class AuctionTests : IDisposable
         Assert.Equal("값이 맞지 않습니다", (await Act(a, () => a.AuctionPostAsync(1, Start, 0, 13, _deadline.Token))).Message);
         Assert.Equal("값이 맞지 않습니다", (await Act(a, () => a.AuctionPostAsync(1, 5_000, 4_000, 12, _deadline.Token))).Message);
         Assert.Equal("값이 맞지 않습니다", (await Act(a, () => a.AuctionPostAsync(1, 0, 0, 12, _deadline.Token))).Message);
+        Assert.Equal("값이 맞지 않습니다", (await Act(a, () => a.AuctionPostAsync(1, 2_000_000_001, 0, 12, _deadline.Token))).Message);
         Assert.Equal("올릴 수 없는 물건입니다", (await Act(a, () => a.AuctionPostAsync(99, Start, 0, 12, _deadline.Token))).Message);
         Assert.Equal("보증금이 모자랍니다", (await Act(poor, () => poor.AuctionPostAsync(1, Start, 0, 12, _deadline.Token))).Message);
         Assert.Equal("이미 끝난 경매입니다", (await Act(a, () => a.AuctionBuyoutAsync(424_242, _deadline.Token))).Message);
@@ -322,6 +323,44 @@ public sealed class AuctionTests : IDisposable
         Assert.Contains(a.Pack, item => item.Name == Sword);
         Assert.Equal(100_000, a.Vitals!.Gold);
         Assert.Empty(Book(server)["Listings"]!.AsArray());
+    }
+
+    [Fact]
+    public async Task Prices_above_what_one_can_carry_are_paid_from_the_bank()
+    {
+        // 값 상한 20억 · 모자라면 은행 금화로 낸다 · 받을 때 들 수 없는 금화는 은행으로(DL-14). 시험 설정 MaxCarryGold = 1억.
+        const int Price = 150_000_000;
+        const int Hand = 90_000_000;
+        const int BigDeposit = Price / 100;
+        const int Owed = Price - (Price * 5 / 100) + BigDeposit;
+        using IsolatedHadesServer server = Ready(("bigsell", Hand, 1), ("bigbuy", 50_000_000, 0));
+        CompanionCallTests.Edit(server, "bigbuy", saved => saved["BankManager"] = new JsonObject { ["Items"] = new JsonObject(), ["Gold"] = 150_000_000 });
+        WorldClient seller = Pump(await Login(server, "bigsell"));
+        WorldClient buyer = Pump(await Login(server, "bigbuy"));
+        await Until(() => seller.Pack.Any(item => item.Name == Sword) && buyer.Vitals?.Gold == 50_000_000, "둘이 서지 못했습니다.");
+
+        Assert.True((await Act(seller, () => seller.AuctionPostAsync(1, Price, Price, 12, _deadline.Token))).Ok);
+        await Until(() => seller.Vitals?.Gold == Hand - BigDeposit, $"파는 이 금화 {seller.Vitals?.Gold}");
+        uint id = Assert.Single((await Browse(buyer)).Rows).Id;
+
+        // 상한을 넘는 입찰가는 즉시 구매가 이상이어도 거절.
+        Assert.Equal("값이 맞지 않습니다", (await Act(buyer, () => buyer.AuctionBidAsync(id, 2_000_000_001, _deadline.Token))).Message);
+
+        // 즉시 구매 — 들고 있는 5천만 먼저, 모자란 1억은 은행에서.
+        Assert.True((await Act(buyer, () => buyer.AuctionBuyoutAsync(id, _deadline.Token))).Ok);
+        await Until(() => buyer.Vitals?.Gold == 0, $"사는 이 금화 {buyer.Vitals?.Gold}");
+        Assert.Equal(50_000_000, BankGold(server, "bigbuy"));
+
+        // 받기 — 1억까지 손에, 넘는 것은 은행에.
+        AuctionDone paid = await Act(seller, () => seller.AuctionTakeAsync(0, _deadline.Token), done => done.Message.StartsWith("받았습니다"));
+        Assert.Contains("은행에 넣었습니다", paid.Message);
+        await Until(() => seller.Vitals?.Gold == 100_000_000, $"파는 이 금화 {seller.Vitals?.Gold}");
+        Assert.Equal(Hand - BigDeposit + Owed - 100_000_000, BankGold(server, "bigsell"));
+        Assert.Empty(Claims(Book(server), "bigsell"));
+
+        // 사건 줄의 금화 전후(손 + 은행)는 옮긴 금화와 맞는다(auction-report.py 가 보는 것).
+        Assert.All(Events(server).Where(line => line["goldBefore"] is not null),
+            line => Assert.Equal((long)line["gold"]!, Math.Abs((long)line["goldBefore"]! - (long)line["goldAfter"]!)));
     }
 
     [Fact]
@@ -640,6 +679,9 @@ public sealed class AuctionTests : IDisposable
                + book["Listings"]!.AsArray().Sum(listing => (long)listing!["Deposit"]! + (long)listing["Bid"]!)
                + book["Claims"]!.AsArray().Sum(claim => (long)claim!["Gold"]!);
     }
+
+    private static long BankGold(IsolatedHadesServer server, string who) =>
+        (long?)JsonNode.Parse(File.ReadAllText(Path.Combine(server.ContentLocation, "aislings", $"{who}.json")))!["BankManager"]?["Gold"] ?? 0;
 
     private static bool Holds(IsolatedHadesServer server, string who, string name)
     {

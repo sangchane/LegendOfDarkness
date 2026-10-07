@@ -32,12 +32,15 @@ public sealed class EcoAuctionTests
     }
 
     [Fact]
-    public void Does_not_post_what_nobody_could_pay_for()
+    public void Posts_dear_items_with_prices_held_to_the_server_cap()
     {
-        InventoryItem hat = Carried(1, "산타모자", Gear(4, value: 500_000_000));          // 상인가 3억 → 즉시 구매가가 1억을 넘는다
-        InventoryItem ring = Carried(2, "화염의룬스톤목걸이", Gear(6, value: 40_000_000)); // 상인가 2,500만 × 4 = 1억 — 된다
+        InventoryItem hat = Carried(1, "산타모자", Gear(4, value: 500_000_000));       // 상인가 3억 1,250만
+        InventoryItem crown = Carried(2, "왕관", Gear(4, value: 4_000_000_000));        // 상인가 25억 — 값 상한 20억에 잘린다
 
-        Assert.Equal([2], EcoAuction.ToPost([hat, ring], wear: [], active: 0, refused: []).Select(post => post.Item.Slot));
+        IReadOnlyList<EcoPost> posts = EcoAuction.ToPost([hat, crown], wear: [], active: 0, refused: []);
+
+        Assert.Equal(new EcoPost(crown, 2_000_000_000, 2_000_000_000), posts[0]);
+        Assert.Equal(new EcoPost(hat, 625_000_000, 1_250_000_000), posts[1]);
     }
 
     [Fact]

@@ -1,5 +1,5 @@
 # API 계약 & 데이터 스키마 — 그룹 전리품 룰렛 · 경매장
-버전: v1.1 · 기준 03 v1.1
+버전: v1.2 · 기준 03 v1.2
 
 ## 규약
 - HTTP 가 아니라 게임 패킷이다. 앱→서버 `0xF4`(새), 서버→앱 `0x5E` 종류 7·8·9(기존 앱 전용 패킷에 추가). 숫자는 빅엔디언, 글자는 Hades `WriteStringA`/`ReadStringA`(u8 길이 + EUC-KR) — 0x5E 기존 종류와 같다.
@@ -70,8 +70,8 @@ erDiagram
 사건 기록 한 줄(JSONL): `{"seq":1,"at":"2026-10-07T01:02:03Z","ev":"post|bid|outbid|buyout|sold|expired|cancel|take|roll|split|commit","who":"이름","listing":12,"item":"이름","gold":30000,"goldBefore":0,"goldAfter":0,"data":{}}` — 룰렛은 `data.rolls=[{"name":"…","roll":0}]`, 나눔은 `data.shares`. `seq` 는 경매장 파일의 `lastSeq` 와 함께 늘고, 조작이 두 저장을 다 마치면 같은 seq 로 `commit` 한 줄 — commit 없는 seq 가 끊긴 조작이다(07 R1). 경매장 파일은 `{ nextId, lastSeq, listings[], claims[] }`.
 
 ## 데이터 규칙
-- 금화: 패킷 u32, 서버 계산 long, 캐릭터 `GoldPoints` int(≤ `MaxCarryGold`). 받을 것 금화는 long(상한 없음 — 받을 때 상한).
-- 보증금 = max(1, ⌊상점가(03 용어) × AUCTION_DEPOSIT_RATE[시간] / 100⌋). 수수료 = ⌊낙찰가 × AUCTION_CUT / 100⌋.
+- 금화: 패킷 u32, 서버 계산 long, 캐릭터 `GoldPoints` int(≤ `MaxCarryGold`) + 은행 `BankManager.Gold` long. 값(시작가·즉시 구매가·입찰가) ≤ AUCTION_MAX_PRICE. 낼 때는 들고 있는 것 먼저 · 모자라면 은행, 받을 때는 들 수 있는 만큼 손 · 넘는 것은 은행(DL-14). 사건 줄 goldBefore·goldAfter 는 손 + 은행.
+- 보증금 = max(1, ⌊시작가 × AUCTION_DEPOSIT_RATE[시간] / 100⌋). 수수료 = ⌊낙찰가 × AUCTION_CUT / 100⌋.
 - 다음 최소 입찰 = 입찰 없으면 시작가, 있으면 현재가 + max(1, ⌊현재가 × AUCTION_MIN_STEP / 100⌋).
 - 남은 시간 띠: < 30분 짧게 · < 2시간 보통 · < 12시간 길게 · 그 위 아주 길게(와우).
 - 종류: 무기 = 무기 칸, 방어구 = 갑옷·투구·방패·장갑·신발 칸, 장신구 = 반지·귀걸이·목걸이 칸, 나머지 기타. 칸 번호 표는 BUILD 첫 작업에서 `ItemTemplate.EquipmentSlot` 값으로 만든다.

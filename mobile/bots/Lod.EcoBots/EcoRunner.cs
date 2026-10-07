@@ -535,7 +535,27 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     /// </summary>
     private async Task Auction(CancellationToken token)
     {
-        if (await AuctionAct(() => _world.AuctionTakeAsync(0, token), token) is null)
+        if (await AuctionView(() => _world.AuctionClaimsAsync(0, token), token) is not { } claims)
+        {
+            return;
+        }
+
+        // 유찰돼 돌아온 것(까닭 2)은 다시 올리지 않는다 — 아무도 안 사는 값이었다(DL-14). 받기는 모두 받으므로 쪽을 다 본다.
+        // ponytail: 봇 프로그램이 다시 켜지면 잊는다 — 그때 한 번 더 올려 보증금(시작가의 2%)만 잃는다. 잦으면 eco 기록에 남긴다.
+        int owed = claims.ClaimCount;
+        for (ushort at = 1; ; at++)
+        {
+            _unlisted.UnionWith(claims.Claims.Where(claim => claim.Reason == 2).Select(claim => claim.Name));
+            ushort next = at;
+            if (at >= claims.Pages || await AuctionView(() => _world.AuctionClaimsAsync(next, token), token) is not { } more)
+            {
+                break;
+            }
+
+            claims = more;
+        }
+
+        if (owed > 0 && await AuctionAct(() => _world.AuctionTakeAsync(0, token), token) is null)
         {
             return;
         }

@@ -54,8 +54,8 @@
      | 받기 | 경매장: 받을 것 지움(가방 빈칸·금화 여유를 **먼저** 세어 들어갈 것만) | 캐릭터: `GiveTo`/금화 + (S-10). `GiveTo` 가 그래도 실패하면 그 줄을 받을 것으로 되돌려 다시 저장 |
      | 기간 끝 | 경매장만: 입찰 있으면 즉시 구매와 같은 정산(까닭 0·1), 없으면 물건 → 파는 이(2), 보증금 몰수 | — |
    - 되돌림: 올림 실패면 `item` 을 같은 칸에 `Inventory.Set(item,false)` + `ServerFormat0F` · 금화 원래대로. 금화 바꾼 뒤엔 `SendStats(StatusFlags.StructC)`.
-   - 거절 검사(05 P-04~08 문구): 로그인·살아 있음(`!IsDead()`)·교환 중 아님(`Aisling.Exchange == null`)·물건 `Tradeable`·올린 수 < AUCTION_MAX_LISTINGS·값 1 ≤ 시작가 ≤ MaxCarryGold, 즉시 구매 0 또는 시작가 ≤ 즉시 ≤ MaxCarryGold·시간 ∈ {12,24,48}·계산은 long.
-   - 보증금 = max(1, ⌊`ShopPricing.Offer(item)` × max(1,Stacks) × 비율/100⌋) · 수수료 = ⌊가 × 5/100⌋ · 다음 최소 입찰 = 05 데이터 규칙.
+   - 거절 검사(05 P-04~08 문구): 로그인·살아 있음(`!IsDead()`)·교환 중 아님(`Aisling.Exchange == null`)·물건 `Tradeable`·올린 수 < AUCTION_MAX_LISTINGS·값 1 ≤ 시작가 ≤ AUCTION_MAX_PRICE, 즉시 구매 0 또는 시작가 ≤ 즉시 ≤ AUCTION_MAX_PRICE·입찰가 ≤ AUCTION_MAX_PRICE·시간 ∈ {12,24,48}·계산은 long.
+   - 보증금 = max(1, ⌊시작가 × 비율/100⌋) · 수수료 = ⌊가 × 5/100⌋ · 다음 최소 입찰 = 05 데이터 규칙. 금화는 손 먼저 · 모자라면 은행에서 내고, 받기는 손에 들 수 있는 만큼 · 넘는 것은 은행(DL-14).
    - 접속 중인 파는 이·밀린 이에게 E-03(ok=1, 「경매 물건이 팔렸습니다: 이름」 / 「입찰에서 밀렸습니다: 이름」).
    - 찾기: 이름(`DisplayName`, 대소문자 무시 포함) · S-11 종류 · 정렬(남은 시간 오름 / 현재가 오름 / 즉시 구매가 오름, 0 은 맨 뒤) · AUCTION_PAGE. 파는 이·입찰자 이름은 응답에 없다.
 4. **새 `Types/GroupLoot.cs`** — `Share(Aisling killer, Item item, Sprite source)` · `ShareGold(Aisling killer, int amount)` → bool. `GroupLootRoll` 꺼짐 · 그룹 없음 · 대상 < 2(S-1) → false.
