@@ -58,9 +58,9 @@ public sealed class EcoPartyTests(ITestOutputHelper output) : IDisposable
 
         try
         {
-            // 성직자는 금화 0 으로 시작한다 — 따르는 봇이 금화를 건네고(gift), 성직자가 그 금화로 마력 물약을 산다(buy).
+            // 성직자는 금화 0 으로 저장돼 있다 — 처음 들어올 때 서버가 1억을 주고(EcoBots.Seed), 성직자가 그 금화로 마력 물약을 산다(buy).
             await Waiting.Until(() => (together |= Together()) && Kinds(Priest.Name).Contains("level") && Kinds(Priest.Name).Contains("buy"),
-                "파티가 함께 사냥해 성직자가 레벨을 올리고 건네받은 금화로 마력 물약을 사지 못했습니다.", _deadline.Token, within: TimeSpan.FromMinutes(10));
+                "파티가 함께 사냥해 성직자가 레벨을 올리고 받은 금화로 마력 물약을 사지 못했습니다.", _deadline.Token, within: TimeSpan.FromMinutes(10));
         }
         finally
         {
@@ -85,8 +85,8 @@ public sealed class EcoPartyTests(ITestOutputHelper output) : IDisposable
         JsonElement joined = Lines().First(line => line.GetProperty("ev").GetString() == "party" && line.GetProperty("data").TryGetProperty("joined", out _));
         Assert.Equal(4, joined.GetProperty("data").GetProperty("joined").GetArrayLength());
         Assert.DoesNotContain("kill", Kinds(Priest.Name));
-        Assert.Contains(Fighters, bot => Kinds(bot.Name).Contains("gift"));
         Assert.Contains(Lines(), line => line.GetProperty("bot").GetString() == Priest.Name && line.GetProperty("ev").GetString() == "buy"
+                                         && line.GetProperty("data").GetProperty("goldBefore").GetInt64() >= 90_000_000
                                          && line.GetProperty("data").GetProperty("goldAfter").GetInt64() < line.GetProperty("data").GetProperty("goldBefore").GetInt64()
                                          && line.GetProperty("data").GetProperty("items")[0].GetProperty("name").GetString()!.Contains("마력"));
 
