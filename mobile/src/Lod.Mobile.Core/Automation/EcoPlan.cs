@@ -99,11 +99,15 @@ public static class EcoShopping
         return afford > 0 ? new EcoBuy(cheapest.Name, afford) : null;
     }
 
-    /// <summary>장비 점수 — 무기는 최대 공격력 + 공격 + 명중, 그 밖은 방어(AC 는 낮을수록 좋다) + 힘·콘·덱스 + 체력/10.</summary>
+    /// <summary>
+    /// 장비 점수 — 무기는 최대 공격력 + 공격 + 명중, 그 밖은 방어(AC 는 낮을수록 좋다) + 힘·콘·덱스 + 체력/10. 속성은 목걸이의 공격 속성과
+    /// 벨트의 방어 속성만 서버가 본다(<c>GearElements</c>) — 그 둘에 <see cref="Tuning.EcoElementScore" /> 를 더한다.
+    /// </summary>
     public static int Score(ItemStats stats) =>
         stats.Place == 1
             ? stats.DmgMax + stats.Dmg + stats.Hit
-            : -stats.Ac + stats.Str + stats.Con + stats.Dex + (stats.Hp / 10) + stats.Hit + stats.Dmg;
+            : -stats.Ac + stats.Str + stats.Con + stats.Dex + (stats.Hp / 10) + stats.Hit + stats.Dmg
+              + ((stats.Place == 6 && stats.Offense != 0) || (stats.Place == 11 && stats.Defense != 0) ? Tuning.EcoElementScore : 0);
 
     /// <summary>내가 입을 수 있나 — 장비이고, 직업(0 = 누구나)·레벨이 맞는다. 성별은 상점 목록에만 있어 <see cref="GearToBuy" /> 가 본다.</summary>
     public static bool Fits(ItemStats stats, int path, int level) =>

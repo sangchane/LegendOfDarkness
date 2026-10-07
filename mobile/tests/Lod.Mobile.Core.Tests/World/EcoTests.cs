@@ -123,6 +123,20 @@ public sealed class EcoTests
         Assert.Equal(7, EcoShopping.ToFree(Gear(7, ac: -3), two));
     }
 
+    [Fact]
+    public void An_elemental_belt_or_necklace_comes_before_a_plain_one()
+    {
+        // 공격 속성은 목걸이, 방어 속성은 벨트(사용자 10-07 「방어 속성을 뭐라도 끼고 있는건 중요하지 바다의금벨트 같은거」).
+        WornItem[] worn = [new(11, 1, "금벨트", "금벨트", 0, 0, Gear(11, ac: -4))];
+        DialogueGoods[] shop = [Offer("바다의벨트", 10000, Gear(11) with { Defense = 2 }), Offer("벨트", 2000, Gear(11, ac: -2))];
+        Assert.Equal([new EcoBuy("바다의벨트", 1)], EcoShopping.GearToBuy(shop, worn, Warrior, 1, 20, budget: 20000));
+
+        Assert.True(EcoShopping.Score(Gear(6) with { Offense = 4 }) > EcoShopping.Score(Gear(6, ac: -5)));
+        // 벨트의 공격 속성 · 목걸이의 방어 속성은 서버가 보지 않는다.
+        Assert.Equal(0, EcoShopping.Score(Gear(11) with { Offense = 4 }));
+        Assert.Equal(0, EcoShopping.Score(Gear(6) with { Defense = 4 }));
+    }
+
     private static EcoSight Sight(TimeSpan now, int potions = 20, int free = 100, bool stopped = false, TimeSpan? person = null,
         bool ghost = false, bool coma = false, int health = 100, TimeSpan? gained = null) =>
         new(now, coma, ghost, potions, free, stopped, person, health, gained);

@@ -76,6 +76,12 @@ public static class Tuning
 
     public const long EcoAuctionSpendCap = 1_000_000;
 
+    /// <summary>
+    /// 속성 목걸이(공격)·벨트(방어)의 장비 점수 덤 — 속성 없는 것보다 먼저 고른다(사용자 10-07 「방어 속성을 뭐라도 끼고 있는건
+    /// 중요하지 바다의금벨트 같은거」). 100 = 체력 1000 만큼이라 주작의목걸이(체력 15000)처럼 훨씬 센 것은 그대로 이긴다.
+    /// </summary>
+    public const int EcoElementScore = 100;
+
     /// <summary>이만큼 죽을 때마다 사냥터를 한 층 낮춘다.</summary>
     public const int EcoDeathLoop = 3;
 
