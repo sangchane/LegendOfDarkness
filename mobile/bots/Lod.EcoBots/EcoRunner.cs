@@ -49,6 +49,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private TimeSpan _nextAsk;
     private string _following = string.Empty;
     private TimeSpan _nextStock;
+    private int _gearLevel;
 
     public string Name => bot.Name;
 
@@ -324,6 +325,17 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             return;
         }
 
+        // 장비 — 레벨이 오를 때마다(처음 포함) 경매장·장비 가게를 돈다. 성직자 체력은 원래 낮아 체력·방어 장비로 채운다(사용자 10-07
+        // 「세줄금반지나 칸의녹옥반지 같은 걸로 … 체력 아이템, 장비 방어력」). 전에는 물약 가게만 들러 갑옷 하나로 99 근처까지 갔다.
+        if (_world.Vitals!.Level > _gearLevel)
+        {
+            _gearLevel = _world.Vitals.Level;
+            Doing = "장비 사기";
+            await Auction(token);
+            await BuyGear(reserve: 0, token);
+            return;
+        }
+
         Doing = "돌봄";
         EcoParty party = _party;
         _following = leader.Name;
@@ -502,6 +514,14 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             await _world.ShutDialogueAsync(token);
         }
 
+        await BuyGear(reserve, token);
+        _life.Shopped(EcoShopping.Potions(_world.Pack));
+        Event("state", new { from = "Shop", to = "Town", potions = EcoShopping.Potions(_world.Pack) });
+    }
+
+    /// <summary>장비 가게마다 맞고 지금보다 좋은 것(체력·방어 — <see cref="EcoShopping.Score" />)을 사서 입는다. <paramref name="reserve" /> 금화는 남긴다.</summary>
+    private async Task BuyGear(long reserve, CancellationToken token)
+    {
         foreach (EcoStop stop in land.GearStops)
         {
             if (!await MoveTo(stop.Map, stop.Where, token) || await Merchant(stop, token) is not { } merchant || await Goods(merchant, token) is not { } goods)
@@ -519,9 +539,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
 
             await _world.ShutDialogueAsync(token);
         }
-
-        _life.Shopped(EcoShopping.Potions(_world.Pack));
-        Event("state", new { from = "Shop", to = "Town", potions = EcoShopping.Potions(_world.Pack) });
     }
 
     private async Task Buy(Creature merchant, IReadOnlyList<EcoBuy> buys, IReadOnlyList<DialogueGoods> goods, CancellationToken token)
