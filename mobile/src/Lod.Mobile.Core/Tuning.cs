@@ -92,4 +92,11 @@ public static class Tuning
 
     /// <summary>파티 하나의 싸우는 봇 수(성직자 하나를 더해 넷).</summary>
     public const int EcoPartyFighters = 3;
+
+    /// <summary>
+    /// 파티원(파티장 말고 싸우는 봇)은 파티장이 선 칸에서 이만큼 안의 괴물만 친다 — 중심이 파티장을 따라간다. 성직자는 파티장 곁(3칸)에서
+    /// 10칸 안만 회복·깨우기를 하는데, 저마다 중심에서 12칸까지 흩어지면 파티원이 그 밖에서 혼수로 죽었다(클라우드 10-07: 혼수 죽음
+    /// 26건 중 파티원 25 · 그중 성직자가 깨우러 온 것 1). 4 + 붙어 치는 1 + 성직자 3 = 8칸.
+    /// </summary>
+    public const int EcoPartyReach = 4;
 }

@@ -197,6 +197,9 @@ public sealed class AutoHunt
         Pause(now, seconds);
     }
 
+    /// <summary>중심만 옮긴다 — 노리던 것·쉬는 것은 그대로(생태계 파티원이 파티장을 따라간다).</summary>
+    public void Recenter(Tile home) => Home = home;
+
     /// <summary>사람이 공격 단추를 눌렀다 — 잠시 손에 맡긴다. 중심은 그대로.</summary>
     public void Pause(TimeSpan now, double seconds = 3)
     {

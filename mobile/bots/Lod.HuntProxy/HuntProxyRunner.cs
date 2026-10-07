@@ -63,6 +63,9 @@ public sealed class HuntProxyRunner(
         }
     }
 
+    /// <summary>사냥 중심을 옮긴다(<see cref="AutoHunt.Recenter" />).</summary>
+    public void Recenter(Tile home) => _hunt.Recenter(home);
+
     /// <summary>한 번 보고 하나 한다. 무엇을 했는지 돌려준다(시험용).</summary>
     public async Task<HuntStep?> Once(DateTime utcNow, CancellationToken token)
     {

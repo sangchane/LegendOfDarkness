@@ -96,6 +96,21 @@ public sealed class AutoHuntTests
     }
 
     [Fact]
+    public void Recentering_moves_the_radius_with_the_party_leader()
+    {
+        // 생태계 파티원 — 중심이 파티장이 선 칸을 따라가, 옛 중심 곁의 괴물이 아니라 파티장 곁의 괴물을 노린다.
+        AutoHunt hunt = Started();
+        Creature[] beasts = [Beast(1, 9, 10), Beast(2, 22, 10)];
+
+        hunt.Recenter(new Tile(20, 10));
+        HuntStep step = hunt.Next(Sight(creatures: beasts), Defaults with { Radius = 4 });
+
+        Assert.Equal(new Tile(20, 10), hunt.Home);
+        Assert.Equal(2u, hunt.Target);
+        Assert.Equal(Direction.East, step.Toward);
+    }
+
+    [Fact]
     public void Waits_at_home_with_nothing_in_sight()
     {
         Assert.Equal(HuntAct.Wait, Started().Next(Sight(), Defaults).Act);

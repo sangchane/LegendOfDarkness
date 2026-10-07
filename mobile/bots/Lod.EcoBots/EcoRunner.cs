@@ -186,6 +186,13 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         {
             case EcoAct.Hunt:
                 Doing = "사냥";
+                // 파티원은 파티장이 선 칸을 중심으로 싸운다(Tuning.EcoPartyReach) — 성직자 손이 닿는 곳에서.
+                if (_party is { } team && !string.Equals(team.Leader, Name, StringComparison.OrdinalIgnoreCase)
+                    && _world.Others.FirstOrDefault(one => string.Equals(one.Name, team.Leader, StringComparison.OrdinalIgnoreCase)) is { } seen)
+                {
+                    _hunt!.Recenter(seen.Where);
+                }
+
                 await _hunt!.Once(DateTime.UtcNow, token);
                 break;
             case EcoAct.GoHunt:
@@ -429,7 +436,8 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         int? path = _world.Path;
         ProxyOrders orders = new()
         {
-            Radius = 12,
+            // 파티원은 파티장 곁만 — 중심은 사냥 틱마다 파티장이 선 칸으로 옮긴다(Once).
+            Radius = _party is { } team && !string.Equals(team.Leader, Name, StringComparison.OrdinalIgnoreCase) ? Tuning.EcoPartyReach : 12,
             Map = ground.Map,
             X = _world.State!.Where.X,
             Y = _world.State.Where.Y,
