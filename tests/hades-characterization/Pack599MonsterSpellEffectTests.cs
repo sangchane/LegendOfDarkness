@@ -24,6 +24,7 @@ public sealed class Pack599MonsterSpellEffectTests : IDisposable
     private const string Name = "mobspellfx";
     private const int WoodlandOneOne = 20015;
     private const int MarenoPicture = 10;
+    private const int MissPicture = 33;
 
     private static readonly Tile Start = new(2, 35);
     private static readonly Tile Ahead = new(2, 34);
@@ -81,6 +82,44 @@ public sealed class Pack599MonsterSpellEffectTests : IDisposable
     }
 
     /// <summary>
+    /// 마법방어(사용자 2026-10-07 「마방% 확률로 빗나감」) — 마법방어 70 인 나에게 괴물이 마레노를 쓰면 열에 일곱은 빗나가고,
+    /// 빗나갈 때 내 위에 원작 Miss 그림(33)이 그려진다. 60초에 여러 번 쓰므로 한 번도 안 빗나갈 확률은 0.3 의 거듭제곱이다.
+    /// </summary>
+    [Fact]
+    public async Task A_monster_spell_misses_me_by_my_magic_defense()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
+            startTogether: (WoodlandOneOne, Start.X, Start.Y));
+        StandOneCasterAhead(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        MakeSturdy(server, magicDefense: 70);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        uint me = 0;
+        List<Effect> seen = [];
+        DateTime until = DateTime.UtcNow + TimeSpan.FromSeconds(90);
+        while (DateTime.UtcNow < until && !seen.Any(f => f.Target == me && f.TargetAnimation == MissPicture))
+        {
+            me = world.Serial;
+            while (world.TakeEffect(out Effect? flash))
+            {
+                seen.Add(flash);
+            }
+
+            await Task.Delay(50, _deadline.Token);
+        }
+
+        Assert.True(seen.Any(f => f.Target == me && f.TargetAnimation == MissPicture),
+            $"마법방어 70 인데 90초 동안 Miss({MissPicture})가 내 위에 그려지지 않았습니다. 온 것 {seen.Count}개, 마지막: {string.Join(", ", seen.TakeLast(4))}");
+    }
+
+    /// <summary>
     /// 앱 사진: 같은 괴물 앞에 서서 앱을 화면 밖에 띄우고 사진을 남긴다. <c>LOD_MOBSPELL_SHOT</c> 에 png 경로를 줄 때만 돈다.
     /// <c>LOD_MOBSPELL_ENGINE</c> 는 고도 자체에 줄 인자(예 "--write-movie /tmp/f.png --fixed-fps 10").
     /// </summary>
@@ -129,12 +168,13 @@ public sealed class Pack599MonsterSpellEffectTests : IDisposable
         Assert.True(File.Exists(shot), "사진이 남지 않았습니다.");
     }
 
-    private static void MakeSturdy(IsolatedHadesServer server)
+    private static void MakeSturdy(IsolatedHadesServer server, int magicDefense = 0)
     {
         string path = Path.Combine(server.ContentLocation, "aislings", $"{Name}.json");
         JsonNode saved = JsonNode.Parse(File.ReadAllText(path))!;
         saved["_MaximumHp"] = 100_000;
         saved["CurrentHp"] = 100_000;
+        saved["_Mr"] = magicDefense;
         File.WriteAllText(path, saved.ToJsonString());
     }
 
