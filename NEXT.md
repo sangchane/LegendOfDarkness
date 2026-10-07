@@ -1,11 +1,16 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[다음 세션 — 사용자 2026-10-07 밤] 순서대로.** (더 비싼 거래·아이폰 설치는 보류 → `plans/backlog.md`)
+  1. **경매 24시간 보고**(10-08 18시 뒤): `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh auction-report` — 끊긴 조작·금화 어긋남 0 인지, 새 올림 보증금이 시작가 × 2% 인지(`auction-logs` post 줄), 10-08 유찰 34건 뒤 봇이 그 물건을 다시 안 올리는지. 괜찮으면 **main 에 합치기**(루트·서버 `feature/loot-roll-auction`, 사용자 확인 받고).
+  2. **생태계 봇 죽음 — 버그 · `dev:build` 디버깅**: 파티 봇이 21레벨 언저리에서 15분에 12번 죽는다(아래 그룹 사냥 블록 「다음 ①」). 클라우드 `eco-logs`·eco 기록의 죽음 줄로 재현 → 원인(사냥터 레벨·성직자 회복·물약) → 수정. 이어서 `EcoPartyLevel` 조정.
+  3. **워프 이어 걷기(④, M)**: 봇 순간이동(0xF1 8)을 맵 사이 길찾기로 바꾸기(`autopilot/eco-bots/decision-log.md` 15~18).
+
 - **[현재/2026-10-07] 그룹 전리품 룰렛 · 와우식 경매장 — 등급 L · `dev:build` · 단계: 값·보증금 다시 짜기(DL-14) 끝 · 클라우드 배포 끝(10-07 저녁, 서버 c813b4ca7 · 루트 600ed59d).** 브랜치 `feature/loot-roll-auction`(루트·서버). 설계 `autopilot/loot-auction/`(SPEC · tasks · decision-log DL-14). 이력은 WORKLOG.
   DL-14(사용자 「진행」): 보증금 = **시작가**의 12h 1% · 24h 2% · 48h 4%(최소 1전, 팔리면 돌려받음) · 값 상한 20억(`AUCTION_MAX_PRICE`) · 낼 때 손 먼저·모자라면 은행 · 받을 때 손 상한까지·넘는 것은 은행 · 봇은 유찰돼 돌아온 물건을 다시 안 올림(1억 거르기 없앰). 시험: 경매·룰렛·은행·저장 22 + 봇 3 + 알맹이 758 통과, 리뷰(opus) 막을 결함 0·낮음 2 반영.
   들 수 있는 금화(클라우드 `scripts/ops/server-config/LoruleConfig.template.json` `MaxCarryGold`): 10억 → **20억**(사용자 10-07 「들고 있을 수 있는 금액도 늘리고」). 저장소 기본·시험은 1억 그대로. 교환 금화 더하기를 long 으로(서버 int 넘침). 「봇 금화가 1억을 넘는 까닭」은 클라우드가 원래 10억이었기 때문.
   **한계를 아예 없애려면**: 손 금화(`GoldPoints` int)·경매 값 칸(int)·패킷(u32)이 21억까지라, 64비트로 바꾸는 큰 작업(서버·패킷·앱·봇·캐릭터 파일) — 사용자 결정 대기. 은행 금화는 이미 상한 없음.
-  **다음**: ① 24시간 뒤 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh auction-report`(SC-006) — 새 올림의 보증금이 시작가 × 2% 인지(`auction-logs` 의 post 줄 gold), 10-08 유찰 34건 뒤 봇이 그 물건을 다시 안 올리는지 ② 앱은 내려받기 페이지에 올림 — 폰에 깔 수 있을 때 `scripts/ops/ios-build.sh install` 또는 아래 LiveContainer ③ 확인되면 main 에 합치기(사용자 확인).
+  **다음**: ① 24시간 뒤 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh auction-report`(SC-006) — 새 올림의 보증금이 시작가 × 2% 인지(`auction-logs` 의 post 줄 gold), 10-08 유찰 34건 뒤 봇이 그 물건을 다시 안 올리는지 ② 앱 폰 설치는 보류(backlog) ③ 확인되면 main 에 합치기(사용자 확인).
   **원격 폰 설치(조사 끝 10-07)**: SideStore + LiveContainer 합본 — 처음 한 번은 맥이 필요(iLoader 로 깔고 페어링 파일·LocalDevVPN·개발자 모드), 그 뒤 LiveContainer [+] 로 우리 내려받기 페이지 .ipa 를 넣으면 앱 개수 제한 없음. 7일 갱신은 합본 하나만(SideStore, LocalDevVPN). Godot 앱이 바로 죽던 문제는 LiveContainer 3.4.59 에서 고쳐짐(이슈 #200) — Godot 4 C# 성공 기록은 못 찾음 → **폰에서 한 번 시험**(안 되면 앱 설정 「dlopen 오류 무시」·「검은 화면 고침」). `ios-build.sh` 에 더할 것 없음, 단 LiveContainer 안 앱은 `ios-build.sh logs`·`install` 이 안 먹을 수 있음. 다른 길: RoamRun(맥 메뉴 앱, Tailscale 너머 Bonjour) 로 지금 `install` 을 원격으로.
   남은 것: 가로에서 맵 출구 표지가 창 위에 겹침(기존) · 봇 유찰 기억은 봇 프로그램이 다시 켜지면 잊음(ponytail 주석).
 
