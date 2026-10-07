@@ -166,20 +166,25 @@ public static class EcoAuction
     public static long Offer(InventoryItem item) => (long)((item.Stats?.Value ?? 0) / 1.6) * Math.Max(1, item.Stacks);
 
     /// <summary>
-    /// 올릴 것 — 장비(입는 칸이 있는 것) 중 지금 입을 것(<paramref name="wear" />)이 아니고, 서버가 거절한 적 없고, 값이 있는 것.
-    /// 이미 걸어 둔 <paramref name="active" /> 개와 합쳐 <see cref="Tuning.EcoAuctionMax" /> 개까지.
+    /// 올릴 것 — 장비(입는 칸이 있는 것) 중 지금 입을 것(<paramref name="wear" />)이 아니고, 서버가 거절한 적 없고, 값이 있고,
+    /// 즉시 구매가가 들 수 있는 금화(1억) 안인 것. 이미 걸어 둔 <paramref name="active" /> 개와 합쳐 <see cref="Tuning.EcoAuctionMax" /> 개까지.
+    /// 값이 5억인 이벤트 물건 같은 것은 시작가·즉시 구매가가 1억에 잘려 아무도 못 사고, 하루 뒤 유찰로 보증금(9천만 남짓)만
+    /// 사라졌다(클라우드 2026-10-07 — 전사·도적 봇 34건, 20억).
     /// </summary>
     public static IReadOnlyList<EcoPost> ToPost(
         IReadOnlyList<InventoryItem> pack, IReadOnlyList<InventoryItem> wear, int active, IReadOnlyCollection<string> refused) =>
     [
-        .. pack.Where(item => item.Stats is { Place: > 0 } && Offer(item) > 0 && !refused.Contains(item.Name) && wear.All(one => one.Slot != item.Slot))
+        .. pack.Where(item => item.Stats is { Place: > 0 } && Offer(item) > 0 && Offer(item) * Tuning.EcoAuctionBuyout <= MaxGold
+                              && !refused.Contains(item.Name) && wear.All(one => one.Slot != item.Slot))
             .OrderByDescending(Offer)
             .Take(Math.Max(0, Tuning.EcoAuctionMax - active))
             .Select(item => new EcoPost(item, Price(Offer(item) * Tuning.EcoAuctionStart), Price(Offer(item) * Tuning.EcoAuctionBuyout))),
     ];
 
-    // 서버가 받는 값은 들 수 있는 금화(1억)까지.
-    private static uint Price(long gold) => (uint)Math.Clamp(gold, 1, 100_000_000);
+    // 서버가 받는 값은 들 수 있는 금화(서버 MaxCarryGold)까지.
+    private const long MaxGold = 100_000_000;
+
+    private static uint Price(long gold) => (uint)Math.Clamp(gold, 1, MaxGold);
 
     /// <summary>
     /// 살 것 — 남의 경매 중 즉시 구매가가 있고, 내가 입을 수 있고 지금 것보다 좋은 장비. 부위마다 가장 좋은 것 하나, 사는 대로 금화를 빼며

@@ -32,6 +32,15 @@ public sealed class EcoAuctionTests
     }
 
     [Fact]
+    public void Does_not_post_what_nobody_could_pay_for()
+    {
+        InventoryItem hat = Carried(1, "산타모자", Gear(4, value: 500_000_000));          // 상인가 3억 → 즉시 구매가가 1억을 넘는다
+        InventoryItem ring = Carried(2, "화염의룬스톤목걸이", Gear(6, value: 40_000_000)); // 상인가 2,500만 × 4 = 1억 — 된다
+
+        Assert.Equal([2], EcoAuction.ToPost([hat, ring], wear: [], active: 0, refused: []).Select(post => post.Item.Slot));
+    }
+
+    [Fact]
     public void Keeps_no_more_than_five_listings_and_posts_the_dearest_first()
     {
         InventoryItem[] pack = [.. Enumerable.Range(1, 4).Select(slot => Carried(slot, $"검{slot}", Gear(1, value: slot * 1_600)))];
