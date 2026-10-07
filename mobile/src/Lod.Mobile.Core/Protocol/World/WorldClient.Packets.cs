@@ -409,9 +409,9 @@ public sealed partial class WorldClient
     /// (ServerFormat0F.WriteNumbers). An original server ends there, so there is nothing to show.
     /// </summary>
     /// <summary>One item's numbers with what it restores — the shop list writes them back to back.</summary>
-    private const int ItemNumbersSize = 1 + (9 * 2) + (4 * 4) + 6 + 4 + 1 + 8;
+    internal const int ItemNumbersSize = 1 + (9 * 2) + (4 * 4) + 6 + 4 + 1 + 8;
 
-    private static ItemStats? ReadItemStats(ReadOnlySpan<byte> tail)
+    internal static ItemStats? ReadItemStats(ReadOnlySpan<byte> tail)
     {
         const int size = 1 + (9 * 2) + (4 * 4) + 6 + 4 + 1;
 

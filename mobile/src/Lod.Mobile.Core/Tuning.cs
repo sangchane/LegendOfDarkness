@@ -62,6 +62,20 @@ public static class Tuning
 
     public const int EcoPriestManaStock = 30;
 
+    /// <summary>
+    /// 경매장(설계 <c>autopilot/loot-auction/</c> 03 상수 표, DL-4·DL-11) — 봇 하나가 걸어 두는 올림 수, 시작가·즉시 구매가는 상인 매입가의 배수,
+    /// 살 때는 물건 하나에 들고 있는 금화의 이 % 와 상한 중 작은 것까지(성직자 시작 금화 1억이 시세를 끌어올리지 않게).
+    /// </summary>
+    public const int EcoAuctionMax = 5;
+
+    public const int EcoAuctionStart = 2;
+
+    public const int EcoAuctionBuyout = 4;
+
+    public const int EcoAuctionBudget = 30;
+
+    public const long EcoAuctionSpendCap = 1_000_000;
+
     /// <summary>이만큼 죽을 때마다 사냥터를 한 층 낮춘다.</summary>
     public const int EcoDeathLoop = 3;
 

@@ -1,4 +1,5 @@
 using Lod.Mobile.Core.Model;
+using Lod.Mobile.Core.Protocol.World;
 
 namespace Lod.Mobile.Core.Automation;
 
@@ -150,6 +151,60 @@ public static class EcoShopping
     /// <summary>팔 것 — 체력 물약과 <paramref name="keep" /> 칸 말고 전부(값이 없는 것은 서버가 건너뛴다).</summary>
     public static IReadOnlyList<InventoryItem> ToSell(IReadOnlyList<InventoryItem> pack, IReadOnlyCollection<int> keep) =>
         [.. pack.Where(item => !IsHealing(item.Name) && !keep.Contains(item.Slot)).OrderBy(item => item.Slot)];
+}
+
+/// <summary>경매에 올릴 것 한 줄 — 가방 칸, 시작가, 즉시 구매가.</summary>
+public sealed record EcoPost(InventoryItem Item, uint Start, uint Buyout);
+
+/// <summary>
+/// 생태계 봇의 경매장(FR-014·015) — 못 입는 장비는 올리고, 맞고 지금 것보다 좋은 장비는 즉시 구매로 산다. 값은 상인 매입가(서버
+/// <c>ShopPricing.Offer</c> = 값 / 1.6) 배수, 사는 값은 들고 있는 금화의 <see cref="Tuning.EcoAuctionBudget" />% 와 상한 중 작은 것까지.
+/// </summary>
+public static class EcoAuction
+{
+    /// <summary>서버 상인 매입가 — 값 / 1.6 내림, 묶음 수만큼.</summary>
+    public static long Offer(InventoryItem item) => (long)((item.Stats?.Value ?? 0) / 1.6) * Math.Max(1, item.Stacks);
+
+    /// <summary>
+    /// 올릴 것 — 장비(입는 칸이 있는 것) 중 지금 입을 것(<paramref name="wear" />)이 아니고, 서버가 거절한 적 없고, 값이 있는 것.
+    /// 이미 걸어 둔 <paramref name="active" /> 개와 합쳐 <see cref="Tuning.EcoAuctionMax" /> 개까지.
+    /// </summary>
+    public static IReadOnlyList<EcoPost> ToPost(
+        IReadOnlyList<InventoryItem> pack, IReadOnlyList<InventoryItem> wear, int active, IReadOnlyCollection<string> refused) =>
+    [
+        .. pack.Where(item => item.Stats is { Place: > 0 } && Offer(item) > 0 && !refused.Contains(item.Name) && wear.All(one => one.Slot != item.Slot))
+            .OrderByDescending(Offer)
+            .Take(Math.Max(0, Tuning.EcoAuctionMax - active))
+            .Select(item => new EcoPost(item, Price(Offer(item) * Tuning.EcoAuctionStart), Price(Offer(item) * Tuning.EcoAuctionBuyout))),
+    ];
+
+    // 서버가 받는 값은 들 수 있는 금화(1억)까지.
+    private static uint Price(long gold) => (uint)Math.Clamp(gold, 1, 100_000_000);
+
+    /// <summary>
+    /// 살 것 — 남의 경매 중 즉시 구매가가 있고, 내가 입을 수 있고 지금 것보다 좋은 장비. 부위마다 가장 좋은 것 하나, 사는 대로 금화를 빼며
+    /// 물건 하나에 min(금화 × <see cref="Tuning.EcoAuctionBudget" />%, <see cref="Tuning.EcoAuctionSpendCap" />) 까지.
+    /// </summary>
+    public static IReadOnlyList<AuctionRow> ToBuy(IReadOnlyList<AuctionRow> rows, IReadOnlyList<WornItem> worn, int path, int level, long gold)
+    {
+        List<AuctionRow> buys = [];
+        foreach (IGrouping<int, AuctionRow> place in rows
+                     .Where(row => (row.Flags & 1) == 0 && row.Buyout > 0 && row.Stats is { } stats && EcoShopping.Fits(stats, path, level)
+                                   && (worn.Where(one => one.Stats?.Place == stats.Place).Select(one => (int?)EcoShopping.Score(one.Stats!)).Min() is not { } now
+                                       || EcoShopping.Score(stats) > now))
+                     .GroupBy(row => row.Stats!.Place)
+                     .OrderBy(group => group.Key))
+        {
+            long limit = Math.Min(gold * Tuning.EcoAuctionBudget / 100, Tuning.EcoAuctionSpendCap);
+            if (place.Where(row => row.Buyout <= limit).MaxBy(row => (EcoShopping.Score(row.Stats!), -row.Buyout)) is { } pick)
+            {
+                buys.Add(pick);
+                gold -= pick.Buyout;
+            }
+        }
+
+        return buys;
+    }
 }
 
 /// <summary>파티를 지을 봇 하나 — 접속해 있고 아직 파티가 없는 것.</summary>

@@ -34,6 +34,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private readonly EcoLife _life = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly HashSet<string> _refused = [];
+    private readonly HashSet<string> _unlisted = [];
     private WorldClient _world = null!;
     private HuntProxyRunner? _hunt;
     private int _ground;
@@ -330,13 +331,27 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         await _priest.Once(token);
     }
 
-    /// <summary>성직자 장보기 — 물약 가게에서 마력 물약을 <see cref="Tuning.EcoPriestManaStock" /> 개까지.</summary>
+    /// <summary>
+    /// 성직자 장보기 — 경매장(룰렛으로 받은 장비를 올리고 맞는 것을 산다) → 물약 가게에서 물약 아닌 것은 팔고 마력 물약을
+    /// <see cref="Tuning.EcoPriestManaStock" /> 개까지. 그룹 전리품을 나눠 받으므로 팔지 않으면 가방이 찬다.
+    /// </summary>
     private async Task StockMana(CancellationToken token)
     {
         Doing = "물약 사기";
+        await Auction(token);
         if (land.PotionStop is not { } stop || !await MoveTo(stop.Map, stop.Where, token) || await Merchant(stop, token) is not { } seller)
         {
             return;
+        }
+
+        int[] potions = [.. _world.Pack.Where(item => AutoPotion.Restoring.Any(potion => potion.Name == item.Name)).Select(item => item.Slot)];
+        IReadOnlyList<InventoryItem> sell = EcoShopping.ToSell(_world.Pack, keep: potions);
+        if (sell.Count > 0)
+        {
+            long before = _world.Vitals!.Gold;
+            await _world.BulkTradeAsync(seller.Serial, selling: true, [.. sell.Select(item => (item.Name, item.Slot, item.Stacks))], token);
+            await Until(() => _world.Vitals!.Gold != before, Answer, token);
+            Event("sell", new { items = sell.Select(item => new { name = item.Name, qty = item.Stacks }), goldBefore = before, goldAfter = _world.Vitals!.Gold });
         }
 
         if (await Goods(seller, token) is { } goods
@@ -448,11 +463,12 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     }
 
     /// <summary>
-    /// 장보기 — 가방의 더 좋은 장비 입기 → 물약 가게에서 팔기·물약 → 장비 가게마다 살 것 사서 입기. 물약 값의 다음 번 몫은 남긴다.
+    /// 장보기 — 경매장(받기·올리기·사기) → 가방의 더 좋은 장비 입기 → 물약 가게에서 팔기·물약 → 장비 가게마다 살 것 사서 입기. 물약 값의 다음 번 몫은 남긴다.
     /// </summary>
     private async Task Shop(CancellationToken token)
     {
         Doing = "장보기";
+        await Auction(token);
         await WearBetter(token);
         long reserve = 0;
 
@@ -511,6 +527,75 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             goldBefore = before,
             goldAfter = _world.Vitals!.Gold,
         });
+    }
+
+    /// <summary>
+    /// 경매장(설계 <c>autopilot/loot-auction/</c> FR-014·015) — 받을 것을 받아 입고, 못 입는 장비는 올리고(봇당 <see cref="Tuning.EcoAuctionMax" />),
+    /// 맞고 지금 것보다 좋은 장비는 즉시 구매해 다시 받아 입는다. 서버가 경매장을 모르면(답 없음) 그냥 지나간다.
+    /// </summary>
+    private async Task Auction(CancellationToken token)
+    {
+        if (await AuctionAct(() => _world.AuctionTakeAsync(0, token), token) is null)
+        {
+            return;
+        }
+
+        await WearBetter(token);
+        if (await AuctionView(() => _world.AuctionMineAsync(0, token), token) is { } mine)
+        {
+            int active = mine.Rows.Count(row => (row.Flags & 1) != 0);
+            IReadOnlyList<InventoryItem> wear = EcoShopping.ToWear(_world.Pack, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _refused);
+            foreach (EcoPost post in EcoAuction.ToPost(_world.Pack, wear, active, _unlisted))
+            {
+                AuctionDone? done = await AuctionAct(() => _world.AuctionPostAsync((byte)post.Item.Slot, post.Start, post.Buyout, 24, token), token);
+                if (done is { Ok: true })
+                {
+                    Event("auction-post", new { name = post.Item.Name, start = post.Start, buyout = post.Buyout });
+                }
+                else
+                {
+                    _unlisted.Add(post.Item.Name);
+                }
+            }
+        }
+
+        if (await AuctionView(() => _world.AuctionBrowseAsync(0, 2, 0, string.Empty, token), token) is not { } page)
+        {
+            return;
+        }
+
+        bool bought = false;
+        foreach (AuctionRow row in EcoAuction.ToBuy(page.Rows, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _world.Vitals.Gold))
+        {
+            long before = _world.Vitals.Gold;
+            if (await AuctionAct(() => _world.AuctionBuyoutAsync(row.Id, token), token) is { Ok: true })
+            {
+                bought = true;
+                Event("auction-buy", new { name = row.Name, price = row.Buyout, goldBefore = before });
+            }
+        }
+
+        if (bought)
+        {
+            await AuctionAct(() => _world.AuctionTakeAsync(0, token), token);
+        }
+    }
+
+    /// <summary>경매 요청 하나와 그 답(0x5E 9). 같은 접속의 요청은 0.3초 넘게 띄운다(서버가 그보다 잦으면 돌려보낸다).</summary>
+    private async Task<AuctionDone?> AuctionAct(Func<Task> send, CancellationToken token)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(350), token);
+        int seen = _world.AuctionDoneCount;
+        await send();
+        return await Until(() => _world.AuctionDoneCount > seen, Answer, token) ? _world.AuctionDone : null;
+    }
+
+    private async Task<AuctionPage?> AuctionView(Func<Task> send, CancellationToken token)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(350), token);
+        int seen = _world.AuctionPageCount;
+        await send();
+        return await Until(() => _world.AuctionPageCount > seen, Answer, token) ? _world.AuctionPage : null;
     }
 
     /// <summary>가방에서 지금보다 좋은 장비를 입는다. 서버가 거절해 가방에 남은 것(성별·다른 제한)은 다시 시도하지 않고 다음에 판다.</summary>

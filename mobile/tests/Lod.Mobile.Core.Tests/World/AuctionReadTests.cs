@@ -32,6 +32,32 @@ public sealed class AuctionReadTests
     }
 
     [Fact]
+    public void Reads_the_gear_numbers_our_server_adds_after_the_rows()
+    {
+        List<byte> body = Head(Auction.PageKind);
+        body.AddRange([0, .. U16(0), .. U16(1), .. U16(0), 2]);
+        foreach (uint id in new uint[] { 1, 2 })
+        {
+            body.AddRange([.. U32(id), .. U16(0x8001), 0]);
+            body.AddRange(LegacyKoreanEncoding.EncodeStringA("검"));
+            body.AddRange([.. U16(1), 3, .. U32(100), .. U32(0), 0]);
+        }
+
+        foreach (int dmgMax in new[] { 12, 30 })
+        {
+            body.Add(1);
+            body.AddRange(new byte[9 * 2]);
+            body.AddRange([.. U32(0), .. U32(0), .. U32(0), .. U32((uint)dmgMax)]);
+            body.AddRange([11, 1, 0, 3, 0, 0]);                     // 레벨 11 · 전사 · 단계 · 무게 · 속성 둘
+            body.AddRange([.. U32(500), 1, .. U32(0), .. U32(0)]);  // 값 · 무기 칸 · 회복 둘
+        }
+
+        AuctionPage page = Auction.ReadPage([.. body]);
+
+        Assert.Equal([(12, 1, 11, 1), (30, 1, 11, 1)], page.Rows.Select(row => (row.Stats!.DmgMax, row.Stats.Place, row.Stats.Level, row.Stats.Class)));
+    }
+
+    [Fact]
     public void Reads_a_claims_page()
     {
         List<byte> body = Head(Auction.PageKind);

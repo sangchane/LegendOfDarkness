@@ -1,10 +1,12 @@
 using System.Buffers.Binary;
+using Lod.Mobile.Core.Model;
 
 namespace Lod.Mobile.Core.Protocol.World;
 
 /// <summary>경매 한 줄(찾기·내 경매). 값은 금화, 띠는 남은 시간(0 짧게 · 1 보통 · 2 길게 · 3 아주 길게).</summary>
 /// <param name="Flags">1 내가 올림 · 2 내가 최고 입찰 · 4 입찰 있음.</param>
-public sealed record AuctionRow(uint Id, ushort Image, byte Color, string Name, ushort Stacks, byte Band, uint Price, uint Buyout, byte Flags);
+/// <param name="Stats">장비 수치(쪽 끝 꼬리, 소지품 0x0F 와 같은 모양). 꼬리가 없는 서버면 null.</param>
+public sealed record AuctionRow(uint Id, ushort Image, byte Color, string Name, ushort Stacks, byte Band, uint Price, uint Buyout, byte Flags, ItemStats? Stats = null);
 
 /// <summary>받을 것 한 줄. 갈래 0 물건 · 1 금화. 까닭 0 낙찰품 · 1 판매 대금 · 2 유찰 · 3 밀린 입찰금 · 4 취소 · 5 나눔 넘침.</summary>
 public sealed record AuctionClaim(uint Id, byte Kind, ushort Image, byte Color, string Name, ushort Stacks, uint Gold, byte Reason);
@@ -68,6 +70,15 @@ public static class Auction
             }
         }
 
+        // 꼬리 — 줄마다 장비 수치(2026-10-07). 모자라면 꼬리 없는 서버로 본다.
+        if (view != 2 && cursor.Left >= rows.Count * WorldClient.ItemNumbersSize)
+        {
+            for (int i = 0; i < rows.Count; i++)
+            {
+                rows[i] = rows[i] with { Stats = WorldClient.ReadItemStats(cursor.Take(WorldClient.ItemNumbersSize)) };
+            }
+        }
+
         return new AuctionPage(view, page, pages, claims, rows, claimRows);
     }
 
@@ -125,6 +136,16 @@ public static class Auction
             uint value = BinaryPrimitives.ReadUInt32BigEndian(_body[_at..]);
             _at += 4;
             return value;
+        }
+
+        public readonly int Left => _body.Length - _at;
+
+        public ReadOnlySpan<byte> Take(int count)
+        {
+            Need(count);
+            ReadOnlySpan<byte> part = _body.Slice(_at, count);
+            _at += count;
+            return part;
         }
 
         public string Text()
