@@ -37,20 +37,40 @@
   function remember(en, value) {
     if (value) { typed[en] = value; } else { delete typed[en]; }
     try { localStorage.setItem(STORE, JSON.stringify(typed)); } catch (e) { /* 사생활 모드 */ }
-    push();
+    var change = {};
+    change[en] = value || null;
+    push(change);
+  }
+
+  function toast(message) {
+    if (window.LodDashboard) { window.LodDashboard.toast(message); }
   }
 
   // 관리 페이지(클라우드)에서는 서버에도 둔다 — 기기를 바꿔도 남고 서버가 바뀐 기록을 쌓는다(백업).
   // 파일로 열었을 때(file://)는 서버가 없으니 이 브라우저에만 남는다.
+  // 바꾼 칸만 보낸다 — 통째로 보내면 다른 기기가 그사이 고친 다른 이름을 지운다. 실패는 알리고 다음 입력 때 다시 보낸다.
   var SERVER = "/api/state/item-names";
   var serverReady = false;
   var pushTimer = null;
-  function push() {
+  var pending = {};
+  function push(changes) {
     if (!serverReady) { return; }
+    Object.keys(changes).forEach(function (en) { pending[en] = changes[en]; });
     clearTimeout(pushTimer);
     pushTimer = setTimeout(function () {
+      var sending = pending;
+      pending = {};
       fetch(SERVER, { method: "PUT", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ value: typed }) }).catch(function () { /* 다음 입력 때 다시 */ });
+                      body: JSON.stringify({ changes: sending }) }).then(function (response) {
+        if (response.ok) { return; }
+        return response.json().catch(function () { return {}; }).then(function (body) {
+          throw new Error(response.status === 401 ? "로그인해야 고칠 수 있습니다. 오른쪽 위 「로그인」."
+            : (body.error || "저장하지 못했습니다."));
+        });
+      }).catch(function (error) {
+        Object.keys(sending).forEach(function (en) { if (!(en in pending)) { pending[en] = sending[en]; } });
+        toast("한글 이름을 서버에 저장하지 못했습니다 — " + error.message);
+      });
     }, 600);
   }
   if (location.protocol !== "file:") {
@@ -64,7 +84,7 @@
       if (!first) { typed = saved; }
       try { localStorage.setItem(STORE, JSON.stringify(typed)); } catch (e) { /* 사생활 모드 */ }
       serverReady = true;
-      if (first) { push(); }
+      if (first) { push(typed); }
       if ($("item-grid")) { render(); }
     }).catch(function () { /* 서버 없음 — 브라우저에만 */ });
   }

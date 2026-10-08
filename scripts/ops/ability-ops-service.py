@@ -51,12 +51,29 @@ def atomic_write(path: Path, data):
             os.unlink(temporary)
 
 
-def log_change(log: Path, kind, key, value):
-    """바꾼 값을 한 줄씩 쌓는다 — 백업·되돌리기용. 지우지 않는다."""
-    line = json.dumps({"at": datetime.now(timezone.utc).isoformat(), "kind": kind, "key": key,
-                       "value": value}, ensure_ascii=False)
+def log_change(log: Path, kind, key, value, failed=None):
+    """바꾼 값을 한 줄씩 쌓는다 — 백업·되돌리기용. 지우지 않는다. failed 가 있으면 앞 줄의 값을 못 바꿨다는 줄."""
+    record = {"at": datetime.now(timezone.utc).isoformat(), "kind": kind, "key": key, "value": value}
+    if failed is not None:
+        record["failed"] = failed
     with open(log, "a", encoding="utf-8") as stream:
-        stream.write(line + "\n")
+        stream.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def logged_write(log, kind, key, value, write):
+    """감사기록을 먼저 쓰고 값을 바꾼다 — 기록을 못 쓰면 값은 그대로 둔 채 OSError 를 올린다(기록 없는 변경이 없게).
+    값 교체가 실패하면 실패 줄을 남기고(최선) 다시 올린다."""
+    if log:
+        log_change(log, kind, key, value)
+    try:
+        write()
+    except OSError as error:
+        if log:
+            try:
+                log_change(log, kind, key, value, failed=str(error))
+            except OSError:
+                pass
+        raise
 
 
 class StateStore:
@@ -75,20 +92,26 @@ class StateStore:
         path = self.folder / f"{name}.json"
         return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
-    def write(self, name, value):
+    def write(self, name, changes):
+        """바꾼 칸만 받는다(null 은 그 칸을 지운다). 잠근 채 최신 파일에 그 칸만 합쳐, 다른 기기가 바꾼 다른 칸을 지우지 않는다."""
         if name not in self.NAMES:
             raise InvalidRequest("없는 저장 이름입니다.")
-        if not isinstance(value, dict) or any(
-                not isinstance(k, str) or isinstance(v, bool) or not isinstance(v, (str, int))
-                for k, v in value.items()):
-            raise InvalidRequest("값은 {글자: 글자|정수} 꼴이어야 합니다.")
+        if not isinstance(changes, dict) or len(changes) > 500 or any(
+                not isinstance(k, str) or not 0 < len(k) <= 200 or isinstance(v, bool)
+                or not isinstance(v, (str, int, type(None))) or (isinstance(v, str) and len(v) > 200)
+                for k, v in changes.items()):
+            raise InvalidRequest("값은 {글자(200자까지): 글자(200자까지)|정수|null} 꼴, 한 번에 500칸까지입니다.")
         with self.lock:
-            before = self.read(name)
-            atomic_write(self.folder / f"{name}.json", value)
+            value = self.read(name)
             # 기록에는 바뀐 칸만(지운 칸은 null) — 통째로 적으면 입력할 때마다 커진다.
-            changed = {k: value.get(k) for k in set(before) | set(value) if before.get(k) != value.get(k)}
+            changed = {k: v for k, v in changes.items() if value.get(k) != v}
+            for k, v in changed.items():
+                if v is None:
+                    value.pop(k, None)
+                else:
+                    value[k] = v
             if changed:
-                log_change(self.log, "state", name, changed)
+                logged_write(self.log, "state", name, changed, lambda: atomic_write(self.folder / f"{name}.json", value))
         return value
 
 
@@ -155,9 +178,7 @@ class OverrideStore:
                 data["changedAt"].pop(key, None)
             data["revision"] += 1
             data["updatedAt"] = now
-            self._write(data)
-            if self.log:
-                log_change(self.log, "ability", key, entry)
+            logged_write(self.log, "ability", key, entry, lambda: self._write(data))
             return data
 
     def _write(self, data):
@@ -176,6 +197,7 @@ def authorized(header, expected):
         hashlib.sha256(expected.encode()).digest())
 
 
+SAVE_FAILED = "저장하지 못했습니다 — 값은 바뀌지 않았습니다. 잠시 뒤 다시 해 주세요."
 SESSION_COOKIE = "lod_ops"
 REMEMBER_SECONDS = 30 * 24 * 3600
 SESSION_SECONDS = 12 * 3600
@@ -334,9 +356,13 @@ class OpsHandler(BaseHTTPRequestHandler):
         if path.startswith("/api/state/") and self.states:
             try:
                 body = self._body(StateStore.LIMIT)
-                self._json(200, self.states.write(unquote(path[len("/api/state/"):]), body.get("value")))
-            except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+                self._json(200, self.states.write(unquote(path[len("/api/state/"):]), body.get("changes")))
+            except InvalidRequest as error:
                 self._json(400, {"error": str(error)})
+            except (ValueError, UnicodeDecodeError, json.JSONDecodeError):
+                self._json(400, {"error": "요청을 읽을 수 없습니다."})  # 해석기 문구는 내보내지 않는다
+            except OSError:
+                self._json(500, {"error": SAVE_FAILED})
             return
         if not path.startswith(prefix):
             self._json(404, {"error": "없는 API입니다."})
@@ -349,6 +375,8 @@ class OpsHandler(BaseHTTPRequestHandler):
             self._json(409, {"error": str(error), "current": self.store.read()})
         except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
+        except OSError:
+            self._json(500, {"error": SAVE_FAILED})
 
     # 계정 관리 — 로그인한 사람이 지금 비밀번호를 한 번 더 넣고 바꾼다(사용자 2026-10-02). 바꾸면 다른 기기의
     # 로그인은 모두 풀린다(세션 서명이 비밀번호에서 나온다). 바꾼 사람에게는 새 쿠키를 준다.

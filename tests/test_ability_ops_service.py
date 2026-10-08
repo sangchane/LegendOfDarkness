@@ -59,6 +59,34 @@ class AbilityOpsStoreTests(unittest.TestCase):
         self.assertIn("skill:단각", saved["changedAt"])
         self.assertEqual(self.store.read()["changedAt"], saved["changedAt"])
 
+    def test_audit_failure_leaves_every_value_unchanged(self):
+        # 리뷰 12 — 감사기록을 먼저 쓴다. 못 쓰면 값은 그대로다.
+        log = self.root / "changes.jsonl"
+        log.mkdir()
+        with self.assertRaises(OSError):
+            SERVICE.OverrideStore(self.catalog, self.overrides, log).update("skill:단각", {"effect": 42}, 0)
+        self.assertFalse(self.overrides.exists())
+        states = SERVICE.StateStore(self.root / "state", log)
+        with self.assertRaises(OSError):
+            states.write("item-names", {"Stick": "막대기"})
+        self.assertEqual(states.read("item-names"), {})
+
+    def test_value_write_failure_leaves_a_failure_line_after_the_audit_line(self):
+        from unittest import mock
+        log = self.root / "changes.jsonl"
+        store = SERVICE.OverrideStore(self.catalog, self.overrides, log)
+        states = SERVICE.StateStore(self.root / "state", log)
+        with mock.patch.object(SERVICE, "atomic_write", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                store.update("skill:단각", {"effect": 42}, 0)
+            with self.assertRaises(OSError):
+                states.write("item-names", {"Stick": "막대기"})
+        lines = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual([(line["kind"], line.get("failed")) for line in lines],
+                         [("ability", None), ("ability", "disk full"), ("state", None), ("state", "disk full")])
+        self.assertFalse(self.overrides.exists())
+        self.assertEqual(states.read("item-names"), {})
+
 
 class AbilityOpsSecurityTests(unittest.TestCase):
     def test_basic_auth_uses_the_exact_configured_secret(self):
@@ -193,19 +221,52 @@ class LoginAndStateTests(unittest.TestCase):
     def test_changed_values_are_kept_on_the_server_and_logged(self):
         import urllib.parse
         cookie = self.login().split(";")[0]
-        status, _, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}}, cookie=cookie)
+        status, _, _ = self.request("PUT", "/api/state/item-names", {"changes": {"Stick": "막대기"}}, cookie=cookie)
         self.assertEqual(status, 200)
         status, _, body = self.request("GET", "/api/state/item-names", cookie=cookie)
         self.assertEqual(json.loads(body), {"Stick": "막대기"})
         self.request("PUT", "/api/ability-overrides/" + urllib.parse.quote("skill:단각"), {"values": {"effect": 5}, "revision": 0}, cookie=cookie)
-        self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기", "Eppe": "에페"}}, cookie=cookie)
+        self.request("PUT", "/api/state/item-names", {"changes": {"Stick": "막대기", "Eppe": "에페"}}, cookie=cookie)
         lines = [json.loads(line) for line in self.log.read_text(encoding="utf-8").splitlines()]
         self.assertEqual([line["kind"] for line in lines], ["state", "ability", "state"])
         self.assertEqual(lines[2]["value"], {"Eppe": "에페"})  # 바뀐 칸만
-        status, _, _ = self.request("PUT", "/api/state/other", {"value": {}}, cookie=cookie)
+        status, _, _ = self.request("PUT", "/api/state/other", {"changes": {}}, cookie=cookie)
         self.assertEqual(status, 400)
-        status, _, _ = self.request("PUT", "/api/state/item-names", {"value": {"a": True}}, cookie=cookie)
+        status, _, _ = self.request("PUT", "/api/state/item-names", {"changes": {"a": True}}, cookie=cookie)
         self.assertEqual(status, 400)
+
+    def test_two_devices_saving_different_names_keep_both(self):
+        # 리뷰 11 — 두 기기가 같은 빈 목록을 읽고 서로 다른 칸을 고친다. 나중 저장이 앞 저장을 지우면 안 된다.
+        phone, laptop = self.login().split(";")[0], self.login().split(";")[0]
+        status, _, _ = self.request("PUT", "/api/state/item-names", {"changes": {"Stick": "막대기"}}, cookie=phone)
+        self.assertEqual(status, 200)
+        status, _, _ = self.request("PUT", "/api/state/item-names", {"changes": {"Eppe": "에페"}}, cookie=laptop)
+        self.assertEqual(status, 200)
+        _, _, body = self.request("GET", "/api/state/item-names")
+        self.assertEqual(json.loads(body), {"Stick": "막대기", "Eppe": "에페"})
+        self.request("PUT", "/api/state/item-names", {"changes": {"Stick": None}}, cookie=phone)  # null 은 그 칸만 지운다
+        _, _, body = self.request("GET", "/api/state/item-names")
+        self.assertEqual(json.loads(body), {"Eppe": "에페"})
+        # 사전을 통째로 보내던 옛 꼴은 받지 않는다 — 다른 기기의 변경을 지우던 길이다.
+        status, _, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}}, cookie=phone)
+        self.assertEqual(status, 400)
+
+    def test_audit_failure_answers_500_and_keeps_the_values(self):
+        import urllib.parse
+        cookie = self.login().split(";")[0]
+        self.request("PUT", "/api/state/item-names", {"changes": {"Stick": "막대기"}}, cookie=cookie)
+        self.log.unlink()
+        self.log.mkdir()  # 기록을 쓸 수 없게
+        status, _, body = self.request("PUT", "/api/state/item-names", {"changes": {"Stick": "몽둥이"}}, cookie=cookie)
+        self.assertEqual(status, 500)
+        self.assertIn("error", json.loads(body))
+        _, _, body = self.request("GET", "/api/state/item-names")
+        self.assertEqual(json.loads(body), {"Stick": "막대기"})
+        status, _, _ = self.request("PUT", "/api/ability-overrides/" + urllib.parse.quote("skill:단각"),
+                                    {"values": {"effect": 5}, "revision": 0}, cookie=cookie)
+        self.assertEqual(status, 500)
+        _, _, body = self.request("GET", "/api/ability-overrides")
+        self.assertEqual(json.loads(body)["revision"], 0)
 
     def test_signed_in_person_changes_the_password_and_old_logins_end(self):
         old = self.login().split(";")[0]

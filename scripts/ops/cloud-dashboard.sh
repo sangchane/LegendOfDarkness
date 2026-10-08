@@ -20,7 +20,8 @@ remote() { "${SSH[@]}" "$@"; }
 
 upload() {
     remote "mkdir -p $REMOTE/www $REMOTE/app $REMOTE/data"
-    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" \
+    # 앱 번호(download/version-*.txt)는 release 가 클라우드에서만 만든다 — 지우면 옛 앱이 새 판을 못 알아챈다.
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'download/version-*.txt' \
         "$ROOT/docs/" "$HOST:$REMOTE/www/"
     rsync -az --partial --timeout=60 -e "ssh -i $KEY" \
         "$ROOT/scripts/ops/ability-ops-service.py" "$ROOT/scripts/ops/activity_store.py" "$ROOT/data/game-data/ability-operations.json" \
@@ -271,14 +272,14 @@ SH
 #   LOD_CLOUD_IP=… scripts/ops/cloud-dashboard.sh password [새비밀번호]   (없으면 소문자·숫자 10자로 만든다)
 set_password() {
     local new="${1:-$(LC_ALL=C tr -dc 'a-z2-9' </dev/urandom | head -c 10)}"
-    remote "LOD_OPS_PASSWORD='$new' bash -s" <<'SH'
-set -euo pipefail
-REMOTE=/home/ubuntu/lod-ops
+    # 비밀번호는 원격 명령 글자에 끼우지 않고 stdin 으로 넘긴다 — 따옴표·역슬래시·공백이 있어도 그대로 도착한다.
+    printf '%s\n' "$new" | remote 'set -euo pipefail
+IFS= read -r password
 umask 077
-printf 'lod-admin:%s\n' "$LOD_OPS_PASSWORD" > "$REMOTE/data/credential"
-sudo htpasswd -b /etc/nginx/lod-ops.htpasswd lod-admin "$LOD_OPS_PASSWORD" >/dev/null 2>&1
-sudo systemctl restart lod-ability-ops
-SH
+# nginx 쪽이 되고 나서 운영 API 쪽 — 거꾸로면 htpasswd 가 실패했을 때 둘이 다른 비밀번호가 된다.
+printf "%s\n" "$password" | sudo htpasswd -i /etc/nginx/lod-ops.htpasswd lod-admin >/dev/null
+printf "lod-admin:%s\n" "$password" > /home/ubuntu/lod-ops/data/credential
+sudo systemctl restart lod-ability-ops'
     save_credentials
 }
 
