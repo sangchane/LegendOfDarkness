@@ -50,10 +50,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private string _following = string.Empty;
     private TimeSpan _nextStock;
     private int _gearLevel;
-    private TimeSpan _gearAt;
-    private readonly AutoPotion _walkPotion = new();
-    private int _walkKills;
-    private TimeSpan? _downAt;
 
     public string Name => bot.Name;
 
@@ -73,12 +69,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
 
     /// <summary>사냥 중심(사냥터에 내린 칸) — 파티원은 파티장의 중심으로 간다.</summary>
     public Tile Center { get; private set; }
-
-    /// <summary>
-    /// 걸어서 가는 중인 사냥터와 칸(아직 닿지 않았으면) — 파티원·성직자는 파티장이 닿기를 기다리지 않고 함께 걸어간다. 걸어서는 닿기까지 1~2분이라
-    /// 전처럼 닿은 뒤에야 출발하면 파티장이 혼자 싸우다 물약이 떨어져 마을로 돌아갔다(격리 서버 EcoPartyTests). 가는 곳이 없으면 맵 0.
-    /// </summary>
-    public (int Map, Tile Where) Heading { get; private set; }
 
     /// <summary>지금 하는 일 — 요약 한 줄에.</summary>
     public string Doing { get; private set; } = "접속";
@@ -320,12 +310,10 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             return;
         }
 
-        // 파티장이 사냥터로 걸어가는 중이면 그 사냥터로 먼저 간다(Heading).
-        (int Map, Tile Where) target = leader.HuntingOn == 0 && leader.Heading.Map > 0 ? leader.Heading : (leader.Map, leader.Where);
-        if (target.Map != map || Reckon.Steps(Where, target.Where) > 12)
+        if (leader.Map != map || Reckon.Steps(Where, leader.Where) > 12)
         {
             Doing = "파티장에게";
-            await MoveTo(target.Map, target.Where, token);
+            await MoveTo(leader.Map, leader.Where, token);
             return;
         }
 
@@ -412,16 +400,15 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         if (_party is { } party && !string.Equals(party.Leader, Name, StringComparison.OrdinalIgnoreCase))
         {
             // 파티원 — 파티장이 사냥하는 맵, 파티장 곁으로.
-            // 파티장이 사냥 중이면 그 중심, 아직 걸어가는 중이면 가는 곳(Heading)으로 함께.
-            if (host.Find(party.Leader) is not { } leader || (leader.HuntingOn == 0 && leader.Heading.Map == 0))
+            if (host.Find(party.Leader) is not { HuntingOn: > 0 } leader)
             {
                 Doing = "파티장 기다림";
                 await Task.Delay(TimeSpan.FromSeconds(2), token);
                 return;
             }
 
-            (int goal, spot) = leader.HuntingOn > 0 ? (leader.HuntingOn, leader.Center) : leader.Heading;
-            ground = land.Grounds.FirstOrDefault(one => one.Map == goal) ?? new EcoGround(goal, level, "파티");
+            ground = land.Grounds.FirstOrDefault(one => one.Map == leader.HuntingOn) ?? new EcoGround(leader.HuntingOn, level, "파티");
+            spot = leader.Center;
         }
         else
         {
@@ -443,10 +430,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         int from = _world.State!.Map.Id;
-        Heading = (ground.Map, spot);
-        bool arrived = await MoveTo(ground.Map, spot, token);
-        Heading = default;
-        if (!arrived)
+        if (!await MoveTo(ground.Map, spot, token))
         {
             return;
         }
@@ -457,21 +441,15 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         _life.Arrived(EcoPlace.Hunting, _clock.Elapsed);
         Center = _world.State!.Where;
 
-        // 파티원은 파티장 곁만 — 중심은 사냥 틱마다 파티장이 선 칸으로 옮긴다(Once).
-        int radius = _party is { } team && !string.Equals(team.Leader, Name, StringComparison.OrdinalIgnoreCase) ? Tuning.EcoPartyReach : 12;
-        _hunt = new HuntProxyRunner(_world, land.Walls, MapGuide.Empty, Orders(ground.Map, _world.State!.Where, radius), DateTime.MaxValue, log);
-    }
-
-    /// <summary>대신 사냥과 같은 판단 — 기술·마법은 직업 기술 표(class-kit.txt)에 보이는 것, 물약은 가방의 가장 센 체력 물약. 사냥과 걷다 싸우기가 함께 쓴다.</summary>
-    private ProxyOrders Orders(int map, Tile center, int radius)
-    {
+        // 대신 사냥과 같은 판단 — 기술·마법은 직업 기술 표(class-kit.txt)에 보이는 것, 물약은 가방의 가장 센 체력 물약.
         int? path = _world.Path;
-        return new ProxyOrders
+        ProxyOrders orders = new()
         {
-            Radius = radius,
-            Map = map,
-            X = center.X,
-            Y = center.Y,
+            // 파티원은 파티장 곁만 — 중심은 사냥 틱마다 파티장이 선 칸으로 옮긴다(Once).
+            Radius = _party is { } team && !string.Equals(team.Leader, Name, StringComparison.OrdinalIgnoreCase) ? Tuning.EcoPartyReach : 12,
+            Map = ground.Map,
+            X = _world.State!.Where.X,
+            Y = _world.State.Where.Y,
             Hp = new PotionRule(true, 50, EcoShopping.BestPotion(_world.Pack) ?? AutoPotion.Healing[0].Name),
             Loot = true,
             Skills = [.. _world.Skills.Select(one => one.Name).Where(name => land.Kit.Shows(path, false, name) && land.Kit.AutoCasts(path, name))],
@@ -479,6 +457,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             EnemySpells = [.. _world.Spells.Select(one => one.Name)
                 .Where(name => land.Kit.Shows(path, true, name) && land.Kit.AimsAtEnemy(path, name) && land.Kit.AutoCasts(path, name))],
         };
+        _hunt = new HuntProxyRunner(_world, land.Walls, MapGuide.Empty, orders, DateTime.MaxValue, log);
     }
 
     private async Task GoTown(CancellationToken token)
@@ -525,15 +504,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             await _world.ShutDialogueAsync(token);
         }
 
-        // 장비 가게는 여러 맵에 흩어져 걸어서 한 바퀴에 3분쯤 든다(10-08 클라우드 20028→20356→20357→20375) — 레벨이 올랐거나(처음 포함)
-        // 한 시간에 한 번만 돈다. 성직자도 레벨이 오를 때만 돈다(Tend).
-        if (_world.Vitals!.Level > _gearLevel || _clock.Elapsed - _gearAt >= Tuning.EcoTownEvery)
-        {
-            _gearLevel = _world.Vitals.Level;
-            _gearAt = _clock.Elapsed;
-            await BuyGear(reserve, token);
-        }
-
+        await BuyGear(reserve, token);
         _life.Shopped(EcoShopping.Potions(_world.Pack));
         Event("state", new { from = "Shop", to = "Town", potions = EcoShopping.Potions(_world.Pack) });
     }
@@ -728,9 +699,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         if (!_dead)
         {
             _dead = true;
-            // 걷다 쓰러졌나(2분 안) — 걷는 중 죽음을 따로 센다.
-            Event("death", new { ground = _ground, walking = _downAt is { } down && _clock.Elapsed - down < TimeSpan.FromMinutes(2) });
-            _downAt = null;
+            Event("death", new { ground = _ground });
         }
 
         if (_world.Creatures.FirstOrDefault(one => one.Where == Murekan) is not { } murekan)
@@ -775,32 +744,25 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             return true;
         }
 
-        int from = _world.State?.Map.Id ?? 0, legs = 0, steps = 0, potions = EcoShopping.Potions(_world.Pack);
+        int from = _world.State?.Map.Id ?? 0, legs = 0, steps = 0;
         Stopwatch took = Stopwatch.StartNew();
         HashSet<(int Map, Tile Where)> avoid = [];
         string why = "길 없음";
-        _walkKills = 0;
-        // drank = 걷는 동안(싸움 포함) 줄어든 체력 물약, kills = 걷다 잡은 괴물(Fight).
         void Walked(bool teleport) =>
-            Event("walk", new
-            {
-                from, to = map, legs, steps, seconds = (int)took.Elapsed.TotalSeconds, teleport, why = teleport ? why : null,
-                drank = Math.Max(0, potions - EcoShopping.Potions(_world.Pack)), kills = _walkKills,
-            });
+            Event("walk", new { from, to = map, legs, steps, seconds = (int)took.Elapsed.TotalSeconds, teleport, why = teleport ? why : null });
 
         while (legs < 64 && _world.State is { } now && !token.IsCancellationRequested)
         {
             if (now.Map.Id == map)
             {
-                // 상인은 계산대 안쪽 막힌 칸에 서 있기도 하다(20041 물약 가게) — 2칸부터 넓혀 가며 걸어서 닿는 칸이 있는 거리를 찾고, 거기서 2칸 더
-                // 넓힌 칸 중 가까운 곳으로. 닿는 칸이 하나뿐이면 먼저 온 봇이 서 있어 뒤에 온 봇이 20초를 기다리다 순간이동했다(10-08 클라우드:
-                // 20375 상인 (3,7) 곁은 (6,7) 하나 — 「목표 곁이 막힘」 41번). 서버 거래 거리는 12(WithinRangeProximity)라 10칸까지.
-                // 닿는 칸이 없으면(갇힌 자리) 이 맵에 온 것으로 친다.
+                // 상인은 계산대 안쪽 막힌 칸에 서 있기도 하다(20041 물약 가게) — 2칸부터 넓혀 가며 걸어서 닿는 칸 중 그 칸에 가까운 곳으로.
+                // 서버 거래 거리는 12(WithinRangeProximity)라 10칸까지. 닿는 칸이 없으면(갇힌 자리) 이 맵에 온 것으로 친다.
                 HashSet<Tile> exits = [.. land.Links.TilesOn(map)];
                 Func<Tile, bool> walls = land.Walls.For(map);
-                Func<Tile, bool> blocked = tile => tile.X < 0 || tile.Y < 0 || walls(tile) || exits.Contains(tile);
                 Tile at = now.Where;
-                if (Enumerable.Range(2, 9).FirstOrDefault(reach => TabMap.WayToAny(at, Near(where, reach), blocked) is not null) is not (> 0 and var reach))
+                if (Enumerable.Range(2, 9).Select(reach => (Tile[])[.. Near(where, reach).Where(tile => !exits.Contains(tile))])
+                        .FirstOrDefault(near => TabMap.WayToAny(at, near, tile => tile.X < 0 || tile.Y < 0 || walls(tile) || exits.Contains(tile)) is not null)
+                    is not { } goals)
                 {
                     if (from != map)
                     {
@@ -810,7 +772,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
                     return true;
                 }
 
-                Tile[] goals = [.. Near(where, Math.Min(reach + 2, 10)).Where(tile => !blocked(tile))];
                 (Walking done, int n) = await Walk(map, goals, warp: false, token);
                 steps += n;
                 if (done is Walking.Arrived && from != map)
@@ -876,8 +837,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         why = legs >= 64 ? "워프 64번 넘음" : why;
         Walked(teleport: true);
         int reports = _world.PositionReports;
-        Tile landing = Landing(map, where);
-        await _world.EcoMoveAsync(map, landing.X, landing.Y, token);
+        await _world.EcoMoveAsync(map, where.X, where.Y, token);
         bool moved = await Until(() => _world.State?.Map.Id == map && _world.PositionReports != reports, Answer, token);
 
         if (!moved)
@@ -894,21 +854,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     }
 
     private enum Walking { Arrived, Left, Stuck, Down }
-
-    /// <summary>
-    /// 순간이동할 칸 — 그 칸에서 가까운 곳 중 그 맵의 워프·월드맵 칸까지 걸어 나갈 수 있는 곳. 상인 칸으로 옮기면 서버가 계산대 안쪽 빈칸에
-    /// 내려놓아 갇혔다(10-08 클라우드: 20041 (5,4) · 20375 (2,6)·(5,2) — 다음 걷기가 「길 없음」으로 또 순간이동, 27번). 길 자료나 벽이 없으면 그 칸.
-    /// </summary>
-    private Tile Landing(int map, Tile where)
-    {
-        Tile[] doors = [.. land.Links.LinksOn(map).Select(link => link.Where).Concat(land.Links.GatesOn(map))];
-        Func<Tile, bool> walls = land.Walls.For(map);
-        Func<Tile, bool> blocked = tile => tile.X < 0 || tile.Y < 0 || walls(tile);
-        return doors.Length == 0
-            ? where
-            : Near(where, 10).Where(tile => !blocked(tile) && !doors.Contains(tile)).OrderBy(tile => Reckon.Steps(tile, where))
-                .FirstOrDefault(tile => TabMap.WayToAny(tile, doors, blocked) is not null, where);
-    }
 
     /// <summary>시야와 내 칸을 다시 받는다(0x38) — 서버는 새로고침 뒤 RefreshRate(0.3초) 동안 걸음을 말없이 버리므로 그만큼 쉬고 나서 걷는다.</summary>
     private async Task Resync(CancellationToken token)
@@ -927,8 +872,8 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     /// <summary>
     /// 이 맵 안에서 <paramref name="goals" /> 중 가까운 칸까지 걷는다 — 벽·괴물·사람 칸과 목표가 아닌 워프 칸은 피한다(엉뚱한 맵으로 가지 않게).
     /// 서버는 걸음을 되돌릴 때만 칸을 알려 주므로(0x04) 그때는 서버 칸, 아니면 내가 센 칸(<see cref="HuntProxyRunner" /> 와 같다).
-    /// 남은 길이 <see cref="Tuning.EcoWalkStuck" /> 초 동안 안 줄면 막힘(싸운 시간은 빼고), 맵이 바뀌면 떠남, 혼수·죽음이면 쓰러짐. <paramref name="warp" /> 면 목표 칸이
-    /// 워프·월드맵 칸이라 밟고 서버가 옮겨 주기를 기다린다. 걸음마다 사냥 때와 같은 물약 규칙으로 마시고, 나를 때리거나 길을 막은 곁의 괴물과는 싸운다(<see cref="Fight" />).
+    /// 남은 길이 <see cref="Tuning.EcoWalkStuck" /> 초 동안 안 줄면 막힘, 맵이 바뀌면 떠남, 혼수·죽음이면 쓰러짐. <paramref name="warp" /> 면 목표 칸이
+    /// 워프·월드맵 칸이라 밟고 서버가 옮겨 주기를 기다린다.
     /// </summary>
     private async Task<(Walking, int Steps)> Walk(int map, IReadOnlyCollection<Tile> goals, bool warp, CancellationToken token)
     {
@@ -937,14 +882,11 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         Tile here = _world.State?.Where ?? default;
         int reports = -1, steps = 0, best = int.MaxValue;
         Stopwatch stuck = Stopwatch.StartNew();
-        ProxyOrders orders = Orders(map, here, Tuning.EcoWalkFightRadius);
-        HashSet<uint> fought = [];
 
         while (!token.IsCancellationRequested)
         {
             if (_world.State is not { } now || now.Map.Id == DeathMap || Overhead.InComa(_world.Ailments))
             {
-                _downAt = _world.State is null ? _downAt : _clock.Elapsed;
                 return (Walking.Down, steps);
             }
 
@@ -982,36 +924,10 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
                 continue;
             }
 
-            // 걷는 동안에도 사냥 때와 같은 판단(사용자 10-08 「물약먹고 반격하게」) — 물약은 사냥 틱과 같은 AutoPotion·규칙(체력 50%).
-            if (_world.Vitals is { } vitals && _walkPotion.Next(vitals, _world.Pack, orders.Hp, orders.Mp, _clock.Elapsed) is { } slot)
-            {
-                await _world.UseAsync(slot, token);
-            }
-
-            Func<Tile, bool> open = tile => tile.X < 0 || tile.Y < 0 || walls(tile) || exits.Contains(tile);
             HashSet<Tile> taken = [.. _world.Creatures.Where(one => one.Kind != CreatureKind.Passable).Select(one => one.Where), .. _world.Others.Select(one => one.Where)];
-            IReadOnlyList<Tile>? way = TabMap.WayToAny(here, goals, tile => open(tile) || taken.Contains(tile));
-
-            // 나를 때린 곁의 괴물, 또는 길을 막은 괴물(벽만 보고 찾은 길의 두 칸 안에 선 것)과 싸운다 — 한 걸음에 한 마리, 같은 것과는 이번 길에 한 번,
-            // 한 맵에서 다섯 번까지(괴물이 계속 다시 나는 곳에서 막힘 판정이 끝없이 미뤄지지 않게).
-            // 10-08 클라우드: 걷는 동안 반격이 없어 99 사냥터를 지나다 죽음 13번.
-            Tile? blocker = way is { Count: > 0 } ? null : TabMap.WayToAny(here, goals, open)?.Take(2).Where(taken.Contains).Cast<Tile?>().FirstOrDefault();
-            uint hitter = _world.StruckBy(_world.Serial, HuntDriver.ContestedFor);
-            if (fought.Count < 5 && _world.Creatures.FirstOrDefault(one => one.Kind == CreatureKind.Hostile && !fought.Contains(one.Serial)
-                                                       && Reckon.Steps(one.Where, here) <= 2 && (one.Serial == hitter || one.Where == blocker)) is { } foe)
+            if (TabMap.WayToAny(here, goals, tile => tile.X < 0 || tile.Y < 0 || walls(tile) || exits.Contains(tile) || taken.Contains(tile)) is not { Count: > 0 } way)
             {
-                fought.Add(foe.Serial);
-                await Fight(foe, orders, map, token);
-                // 싸우는 동안 옮긴 칸은 서버 칸으로 다시 받았다(Fight). 싸운 시간은 막힘에 넣지 않는다.
-                reports = -1;
-                best = int.MaxValue;
-                stuck.Restart();
-                continue;
-            }
-
-            if (way is not { Count: > 0 })
-            {
-                // 길을 막은 사람·NPC 가 비키기를 기다린다 — 끝내 안 비키면 막힘.
+                // 길을 막은 괴물·사람이 비키기를 기다린다 — 끝내 안 비키면 막힘.
                 await Task.Delay(Tick, token);
                 continue;
             }
@@ -1029,35 +945,6 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         return (Walking.Down, steps);
-    }
-
-    /// <summary>
-    /// 걷다 만난 괴물 하나와 싸운다 — 대신 사냥과 같은 한 틱(<see cref="HuntProxyRunner" />: 물약·회복·기술·마법·평타)을 그 괴물이 사라지거나
-    /// <see cref="Tuning.EcoWalkFightSeconds" /> 초가 될 때까지(반경 <see cref="Tuning.EcoWalkFightRadius" />, 워프 칸은 밟지 않는다). 잡았으면 <c>_walkKills</c> 하나.
-    /// 사냥 틱은 서버 칸에서 시작하고 걸은 칸을 따로 세므로 앞뒤로 서버 칸을 다시 받는다.
-    /// </summary>
-    private async Task Fight(Creature foe, ProxyOrders orders, int map, CancellationToken token)
-    {
-        await Resync(token);
-        Tile at = _world.State?.Where ?? foe.Where;
-        MapGuide exits = MapGuide.Read(string.Join('\n', land.Links.TilesOn(map).Select(tile => $"exit {map} {tile.X} {tile.Y} 출구")));
-        HuntProxyRunner fight = new(_world, land.Walls, exits, orders with { X = at.X, Y = at.Y }, DateTime.MaxValue);
-        long exp = _world.Vitals?.Experience ?? 0;
-        Stopwatch took = Stopwatch.StartNew();
-        bool Alive() => _world.Creatures.Any(one => one.Serial == foe.Serial && one.Kind == CreatureKind.Hostile);
-
-        while (!token.IsCancellationRequested && Alive() && fight.Stopped is null && _world.State?.Map.Id == map
-               && took.Elapsed < TimeSpan.FromSeconds(Tuning.EcoWalkFightSeconds))
-        {
-            await fight.Once(DateTime.UtcNow, token);
-            await Task.Delay(Tick, token);
-        }
-
-        await Resync(token);
-        if (!Alive() && _world.Vitals?.Experience > exp)
-        {
-            _walkKills++;
-        }
     }
 
     /// <summary>가게 자리 곁의 상인.</summary>
