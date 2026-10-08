@@ -26,6 +26,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - 다음 할 일(단일 출처): `NEXT.md` · 대기·미결: `plans/backlog.md` · 히스토리: `WORKLOG.md`
 - **기능 39개가 서버·모바일·원작 중 어디에 있나: `docs/feature-map.md`** — 새 기능을 만들기 전에 여기부터
 - **Hades 에 뭐가 이미 있나(만들 것 vs 채울 것): `docs/what-hades-already-has.md`** — 콘텐츠를 이식하기 전에 여기부터
+- **장비 수치·드랍·상점을 만지기 전에: 정본 = 어둠템 `docs/items/어둠템#1~5.xlsx`(사용자 2026-10-09).** 아이템 하나는 볼트 `data/drop-vault/아이템/<이름>.md`(어둠템 대 서버 수치·누가 떨구나·누가 파나), 여럿은 `graphify query "…" --graph data/drop-vault/graph/graph.json`(없으면 `build-drop-vault.py --그래프`) — 자세한 것 `data/CLAUDE.md`
 - **원작이 어떻게 했는지 막혔을 때: `docs/where-the-answers-are.md`** (`scripts/find-in-sources.ps1`)
 - 모바일 클라이언트 빌드·실행·함정: `docs/mobile-client.md` → `mobile/CLAUDE.md`
 - 문서·현황판·UI 테마·작업지시서 목록: `docs/CLAUDE.md` · 볼트·자료 출처: `data/CLAUDE.md` · 생성기·서버 스크립트: `scripts/CLAUDE.md`

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""5.99 팩에서 들여온 무기·갑옷의 값을 **원작 도감** 값으로 되돌린다.
+"""5.99 팩에서 들여온 입는 물건(무기·갑옷·장신구·방패·투구·장갑·팔찌·각반·벨트·신발·장식)의 값을 **원작 도감** 값으로 되돌린다.
 
   python3 scripts/gen/items/build-gear-from-original.py            # 무엇이 바뀌는지만 본다
   python3 scripts/gen/items/build-gear-from-original.py --쓰기      # 아이템 템플릿에 적는다
@@ -14,12 +14,12 @@
 29마리분이 사라진다. 이 생성기는 `build-novice-drops.py` 와 같은 꼴이다: **json 을 읽고, 정한 칸만
 고치고, 나머지는 읽은 그대로 다시 쓴다.**
 
-**무엇을 고르나.** `Group` 이 `5.99표/무기/` 나 `5.99표/갑옷/` 로 시작하고 이름이 도감 수치표에 있는
-169장(무기 66 · 갑옷 103). 팩이 새로 만든 것(도감에 이름이 없는 것)과 하데스표·장신구는 손대지 않는다
-(장신구는 아래 `VALUE_ONLY` 에 이름을 적은 것만 판매가격을 따라간다).
+**무엇을 고르나.** `Group` 이 `5.99표/` 로 시작하는 입는 물건(`EquipmentSlot` > 0) 중 이름이 도감 수치표에 있는 것.
+팩이 새로 만든 것(도감에 이름이 없는 것)과 하데스표·원작표(이미 도감과 같다)는 손대지 않는다.
+처음(2026-09-23)에는 무기·갑옷 169장만 되돌렸다 — 아래 「장신구도」 참조.
 
 **고치는 칸** (괄호는 도감 열 번호):
-  판매가격(4) → Value · 무게(3) → CarryWeight · 내구력(9) → MaxDurability
+  무게(3) → CarryWeight · 내구력(9) → MaxDurability
   직업제한(20) → Class · 레벨제한(22) → LevelRequired · 공격력(25) → DmgMin/DmgMax
   방어력(10)·명중수정(11)·공격수정(12)·체력변화(13)·마력변화(14)·힘/덱스/인트/위즈/콘변화(15~19) → *Modifer
 
@@ -37,13 +37,14 @@
 뭉개진다. 도감이 지팡이 등급을 나누기 전 시절의 표다. 아래에서 그 「똑같음」을 실제로 확인하고,
 확인이 깨지면 멈춘다 — 이유가 주석이 아니라 코드에 있어야 한다.
 
-**무기·갑옷 밖에서 판매가격만 따라가는 것**(`VALUE_ONLY` 참조). 도감에 이름이 있는 장신구도 값은
-도감이 정본이다. 다만 **묶음째 되돌리지 않고 이름을 적은 것만 되돌린다** — 반지·귀걸이·목걸이·장갑·
-각반·허리띠·신발·방패·투구·장식 416장 중 도감에 이름이 있는 것이 219장이고, 묶음째 되돌리면 그
-219장의 값이 한꺼번에 움직인다(2026-09-23 세어 봄). 방금 문을 연 우드랜드 보석상 물목 22개 중
-도감에 이름이 있는 21개가 **하나도 빠짐없이** 거기 들어 있어 상점 값이 통째로 흔들린다(로오의반지
-500→200 · 가죽방패 3,000→750 …). 값 말고 다른 칸까지 되돌리면 더 크게 움직인다. 그래서
-**필요한 한 장씩** 이름과 까닭을 적어 넣는다.
+**장신구도 — 사용자 결정(2026-10-09)**: 「아이템 스펙은 이 데이터에 있는걸 기준으로 해야해」 · 「어둠템 값에 맞춰
+장비스펙은」 · 「체력이 1000이상 오르는건 승급이후에나 나오고 잘 있지도 않아」. 09-23 에는 장신구·방패·투구·장갑·각반·
+벨트·신발·장식을 묶음째 되돌리면 값이 한꺼번에 움직인다고 판매가격 다섯 장만 따라가게 했다. 그 사이 팩 값이 그대로
+남아(윙부츠 Lv1 체·마 10,000 — 도감 200 · 산호귀걸이 체·마 100 능력+6 — 도감 인트 2) 사냥터 드랍·상점이 그 값을
+기준으로 짜였다. 이제 묶음을 5.99표 입는 물건 전부로 넓힌다(`autopilot/item-specs/SPEC.md`). **값(Value)은 되돌리지 않는다** —
+사용자가 말한 것은 수치이고, 값은 10-08 결정(서클 상한 · 상점에서만 파는 치장은 금화를 빨아들이게 그대로,
+`build-price-cap.py`)이 정한다. 도감대로 되돌리면 블랙팜 치장이 7천만 → 10 이 된다. 레벨이 도감(1·11·41·71·99)으로 돌아오니 상점 서클 나눔
+(`build-circle-gear-shops.py`)·드랍 생성기·`build-client-guide.py` 를 다시 돌린다.
 """
 import argparse
 import json
@@ -60,8 +61,8 @@ ITEMS = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / 
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
 
-#: 이 묶음만 건드린다.
-GROUPS = ("5.99표/무기/", "5.99표/갑옷/")
+#: 이 묶음의 입는 물건(`EquipmentSlot` > 0)만 건드린다.
+GROUPS = ("5.99표/",)
 
 #: 되돌리지 않는 물건 — 이름: 왜.
 KEEP = {name: "도감의 지팡이 다섯 줄이 완전히 같아(4m20·레벨11) 되돌리면 무기 사다리가 한 칸으로 뭉개진다"
@@ -70,17 +71,6 @@ KEEP = {name: "도감의 지팡이 다섯 줄이 완전히 같아(4m20·레벨11
 
 #: 위 「같음」을 실제로 확인할 칸과 값. 도감이 바뀌어 사다리가 생기면 여기서 멈춘다.
 KEEP_PROOF = {"공격력": "4m20", "마법공격력": "6m30", "레벨제한": "11"}
-
-#: 무기·갑옷 밖에서 **판매가격 한 칸만** 도감을 따르는 것 — 이름: 왜. 묶음(`GROUPS`)을 넓히지 않고
-#: 여기 이름을 적는다(까닭은 위 설명 참조 — 장신구를 묶음째 되돌리면 219장이 함께 움직인다).
-VALUE_ONLY = {
-    "세줄금반지": "자이언트맨티스가 80% 로 떨구는 상인데 서버 값이 0 이라 팔아도 한 푼이 아니다",
-    "바다의목걸이": "1~10레벨 장신구로 보석상에 들였다 — 값은 도감(10,000)을 따른다(팩 1,000)",
-    "바람의목걸이": "1~10레벨 장신구로 보석상에 들였다 — 값은 도감(10,000)을 따른다(팩 1,000)",
-    "화염의목걸이": "1~10레벨 장신구로 보석상에 들였다 — 값은 도감(10,000)을 따른다(팩 1,000)",
-    "대지의목걸이": "1~10레벨 장신구로 보석상에 들였다 — 값은 도감(10,000)을 따른다(팩 1,000)",
-}
-
 
 def check_keep(rows):
     """지팡이를 두는 이유가 아직 참인지 확인한다. 아니면 멈춘다."""
@@ -100,13 +90,6 @@ def check_keep(rows):
         )
 
 
-def check_value_only(rows):
-    """판매가격만 따라가는 것이 도감에 실제로 있는지 확인한다. 없으면 따라갈 근거가 없으니 멈춘다."""
-    missing = [name for name in VALUE_ONLY if name not in rows]
-    if missing:
-        raise SystemExit("도감에 없는 이름이 `VALUE_ONLY` 에 적혀 있습니다: " + ", ".join(missing))
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--쓰기", action="store_true", dest="writing")
@@ -117,16 +100,12 @@ def main():
     for entry in sheet["수치표"]:
         rows.setdefault(entry["이름"], entry)
     check_keep(rows)
-    check_value_only(rows)
 
-    mine, only, kept, untouched = [], [], [], 0
+    mine, kept, untouched = [], [], 0
     for path in sorted(ITEMS.glob("*.json")):
         item = json.loads(path.read_text(encoding="utf-8-sig"))
         name = item.get("Name")
-        if name in VALUE_ONLY:  # 묶음 밖 — 판매가격 한 칸만 따라간다
-            only.append((path, item, rows[name]))
-            continue
-        if not str(item.get("Group") or "").startswith(GROUPS):
+        if not str(item.get("Group") or "").startswith(GROUPS) or not item.get("EquipmentSlot"):
             continue
         if name not in rows:
             untouched += 1  # 팩이 새로 만든 것 — 도감에 견줄 줄이 없다
@@ -136,8 +115,8 @@ def main():
             continue
         mine.append((path, item, rows[name]))
 
-    jobs = [(path, item, wanted(row)) for path, item, row in mine]
-    jobs += [(path, item, {"Value": max(0, number(row.get("판매가격")))}) for path, item, row in only]
+    # 값(Value)은 여기서 다루지 않는다 — 서클 상한·치장 금화 빨기(`build-price-cap.py`, 사용자 2026-10-08)가 정한다.
+    jobs = [(path, item, {field: value for field, value in wanted(row).items() if field != "Value"}) for path, item, row in mine]
 
     changed, fields, removed, lines = 0, 0, 0, []
     for path, item, want in jobs:
@@ -161,16 +140,13 @@ def main():
         if writing:
             path.write_text(json.dumps(item, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    print(f"도감에 이름이 있는 5.99 무기·갑옷 {len(mine) + len(kept)}장 + 판매가격만 따르는 {len(only)}장 중"
+    print(f"도감에 이름이 있는 5.99 입는 물건 {len(mine) + len(kept)}장 중"
           f" {changed}장 · {fields}칸을 도감 값으로 되돌렸다"
           f" ({'적었다' if writing else '미리보기 — --쓰기 로 적는다'})")
     print(f"  칸을 뺀 것 {removed}개 — 도감이 0 인 수정치다(없는 칸이 0 이다)")
     print(f"  안 되돌린 것 {len(kept)}장(지팡이): {', '.join(sorted(kept))}")
     print(f"    까닭: {next(iter(KEEP.values()))}")
-    print(f"  판매가격만 따라간 것 {len(only)}장(무기·갑옷 밖):")
-    for _, item, _ in only:
-        print(f"    {item['Name']} — {VALUE_ONLY[item['Name']]}")
-    print(f"  손대지 않은 5.99 무기·갑옷 {untouched}장 — 도감에 이름이 없다(팩이 새로 만든 것)")
+    print(f"  손대지 않은 5.99 입는 물건 {untouched}장 — 도감에 이름이 없다(팩이 새로 만든 것)")
     print("\n".join(lines))
     return 0
 

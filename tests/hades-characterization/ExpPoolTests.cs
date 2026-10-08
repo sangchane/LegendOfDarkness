@@ -72,10 +72,10 @@ public sealed class ExpPoolTests : IDisposable
 
         await Waiting.Until(() => world.Vitals is { Level: 99, MaximumHealth: 1000 }, $"99 · 최대 체력 1000 으로 들어오지 않았습니다: {world.Vitals}", _deadline.Token);
 
-        // 체력 +200 반지를 낀다 — 입은 최대 1200 으로 값을 매기면(1200·1250 × 500) 쌓인 것으로 한 번밖에 못 산다.
-        await world.SayAsync("/give \"세피라링(Lev2)\" 1", _deadline.Token);
-        await Waiting.Until(() => world.Pack.Any(item => item.Name == "세피라링(Lev2)"), $"세피라링(Lev2)이 오지 않았습니다: {world.Said}", _deadline.Token);
-        await world.UseAsync(world.Pack.First(item => item.Name == "세피라링(Lev2)").Slot, _deadline.Token);
+        // 체력 +200 반지(자수정반지 — 어둠템 체력 200, 2026-10-09 세피라링(Lev2)는 어둠템대로 바뀌었다)를 낀다 — 입은 최대 1200 으로 값을 매기면(1200·1250 × 500) 쌓인 것으로 한 번밖에 못 산다.
+        await world.SayAsync("/give \"자수정반지\" 1", _deadline.Token);
+        await Waiting.Until(() => world.Pack.Any(item => item.Name == "자수정반지"), $"자수정반지가 오지 않았습니다: {world.Said}", _deadline.Token);
+        await world.UseAsync(world.Pack.First(item => item.Name == "자수정반지").Slot, _deadline.Token);
         await Waiting.Until(() => world.Vitals is { MaximumHealth: 1200 }, $"반지를 끼고 최대 체력 1200 이 아닙니다: {world.Vitals}", _deadline.Token);
 
         // 세오는 이름표(세오@세오신전#3,4)로 온다 — 봇처럼 자리로 찾는다.

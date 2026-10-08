@@ -63,7 +63,8 @@ public sealed class Pack599ArmorTests : IDisposable
 
     /// <summary>
     /// 방패·투구·장신구·장갑·허리띠·각반·신발·장식도 같은 생성기로 들어왔다(상점 판매 목록에 없던 것 대부분). 칸마다 하데스
-    /// 스크립트·자리를 따른다 — 목걸이 Necklace 6, 장갑 Generic 9. 5.99 대지의룬스톤목걸이는 체력변화 +1000 · 레벨제한 11.
+    /// 스크립트·자리를 따른다 — 목걸이 Necklace 6, 장갑 Generic 9. 5.99 오색의목걸이는 체력변화 +400 · 레벨제한 51(어둠템에 없는 팩 물건이라
+    /// 팩 값 그대로 — 대지의룬스톤목걸이 +1000 은 2026-10-09 어둠템대로 공격수정 +3 이 됐다).
     /// </summary>
     [Fact]
     public async Task A_599_necklace_and_gloves_go_on_and_the_necklace_adds_its_health()
@@ -84,12 +85,12 @@ public sealed class Pack599ArmorTests : IDisposable
         await Until(() => world.Vitals is { MaximumHealth: > 0 }, "처음 수치가 오지 않았습니다.");
         int before = world.Vitals!.MaximumHealth;
 
-        InventoryItem necklace = await Given(world, "대지의룬스톤목걸이");
+        InventoryItem necklace = await Given(world, "오색의목걸이");
         await world.UseAsync(necklace.Slot, _deadline.Token);
-        await Until(() => world.Worn.Any(worn => worn.Slot == 6 && worn.Called.StartsWith("대지의룬스톤목걸이")),
+        await Until(() => world.Worn.Any(worn => worn.Slot == 6 && worn.Called.StartsWith("오색의목걸이")),
             $"목걸이를 걸지 못했습니다. 걸친 것: {string.Join(", ", world.Worn.Select(worn => $"{worn.Slot}:{worn.Called}"))} · 서버가 한 말: {world.Said}");
-        await Until(() => world.Vitals?.MaximumHealth == before + 1000,
-            $"목걸이의 체력 +1000 이 붙지 않았습니다. 전 {before} · 지금 {world.Vitals?.MaximumHealth}");
+        await Until(() => world.Vitals?.MaximumHealth == before + 400,
+            $"목걸이의 체력 +400 이 붙지 않았습니다. 전 {before} · 지금 {world.Vitals?.MaximumHealth}");
 
         InventoryItem gloves = await Given(world, "가죽장갑");
         await world.UseAsync(gloves.Slot, _deadline.Token);

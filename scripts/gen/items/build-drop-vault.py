@@ -25,6 +25,7 @@ import sys as _sys, pathlib as _pathlib  # scripts/ 를 찾게 — lib/·graphif
 _sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[2]))
 from lib._paths import ROOT
 from lib import _cut_level as CUT  # 깎기용 괴물 레벨 — build-monster-cut-level.py 와 같은 기준점·식
+from lib._gear_original import MODIFIERS, differs, modifier_of, number, wanted
 FORK = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 SERVER = FORK / "database/server"
 MONSTERS = SERVER / "templates/monsters"
@@ -32,6 +33,9 @@ ITEMS = SERVER / "templates/items"
 MUNDANES = SERVER / "templates/mundanes"
 FORMULA = SERVER / "scripts/Formulas/monsterexp.cs"
 VAULT = ROOT / "data" / "drop-vault"
+#: 입는 물건 수치의 정본 — 어둠템(`docs/items/어둠템#1~5.xlsx`, 사용자 2026-09-23·10-09, `autopilot/item-specs/SPEC.md`).
+SHEET = ROOT / "data" / "game-data" / "items-original-sheets.json"
+SPEC_LABELS = {"LevelRequired": "레벨제한", "Class": "직업제한", **{field: column for column, field in MODIFIERS.items()}}
 
 # `Formulas/monsterexp.cs` 의 값을 그대로 되풀이한다 — 바뀌면 여기도 다시 만든다.
 GOLD_PER_EXP = 0.1          # 노비스 밖 (2026-09-25, 0.02 의 다섯 배)
@@ -189,7 +193,10 @@ def bundle_text(item):
     """겹쳐지는 소모품(Consumable 256 | Stackable 128)은 1~3개 묶음으로 떨어진다(`monsterexp.cs` BundleSize,
     2026-09-26). 나머지는 하나."""
     both = 256 | 128
-    return "1~3개 묶음" if ((item.get("Flags") or 0) & both) == both else "1개"
+    flags = item.get("Flags") or 0
+    if isinstance(flags, str):  # 서버는 enum 이름(「NormalEquipPerish」)도 읽는다 — 장비 묶음 이름이라 겹쳐지지 않는다
+        return "1~3개 묶음" if "Consumable" in flags and "Stackable" in flags else "1개"
+    return "1~3개 묶음" if (flags & both) == both else "1개"
 
 
 # 목록 드랍 전체에 곱하는 배율 — `Formulas/monsterexp.cs` DropBoost 와 같아야 한다(사용자 2026-09-26, 1.5배).
@@ -287,10 +294,57 @@ def write_zone_notes(zone_rows):
             encoding="utf-8")
 
 
+def sheet_rows():
+    """어둠템 수치표 — 이름 → 첫 줄(`build-gear-from-original.py` 와 같은 고름)."""
+    rows = {}
+    for row in json.loads(SHEET.read_text(encoding="utf-8"))["수치표"]:
+        rows.setdefault(row["이름"], row)
+    return rows
+
+
+def stat_words(item):
+    """「AC-1 체력변화200 …」 — 그래프 이름표에 수치를 싣는다(어둠템 칸 이름 그대로)."""
+    words = [f"{column}{modifier_of(item, field)}" for column, field in MODIFIERS.items() if modifier_of(item, field)]
+    if item.get("DmgMax"):
+        words.insert(0, f"공격력{item.get('DmgMin', 0)}m{item['DmgMax']}")
+    return " ".join(words) or "수치 없음"
+
+
+def spec_verdict(item, row):
+    if row is None:
+        return "없음"
+    return "어긋남" if any(differs(item, field, value) for field, value in wanted(row).items() if field in SPEC_LABELS) else "같음"
+
+
+def spec_section(item, row):
+    """「수치 — 어둠템 대 서버」 표와 판정(같음·어긋남·없음). 값(Value)은 서클 상한이 정해 견주지 않는다."""
+    if row is None:
+        return "없음", "## 수치 — 어둠템에 없음\n\n팩이 새로 만든 물건이라 견줄 줄이 없다 — 서버 값이 유일한 근거다.\n\n"
+    want = wanted(row)
+    lines, off = [], 0
+    for field, label in SPEC_LABELS.items():
+        value = want[field]
+        sheet = (0 if value is None else (value["Value"] if value["Option"] == 0 else -value["Value"])) if field in MODIFIERS.values() else value
+        server = modifier_of(item, field) if field in MODIFIERS.values() else item.get(field, 0)
+        if sheet == 0 and server == 0:
+            continue
+        same = not differs(item, field, value)
+        off += not same
+        lines.append(f"| {label} | {sheet} | {server} | {'같음' if same else '**다름**'} |")
+    attack = row.get("공격력", "")
+    if "m" in attack:
+        lines.append(f"| 공격력 | {attack} | {item.get('DmgMin', 0)}m{item.get('DmgMax', 0)} | |")
+    verdict = "어긋남" if off else "같음"
+    return verdict, (f"## 수치 — 어둠템 대 서버 ({verdict})\n\n| 칸 | 어둠템 | 서버 | |\n|---|---|---|---|\n" + "\n".join(lines)
+                     + f"\n\n어둠템 판매가격 {number(row.get('판매가격')):,}전(서버 값은 서클 상한이 정한다)\n\n")
+
+
 def write_item_notes(dropped_by, stocked_by, items):
-    """아이템 노트 — 떨어뜨리는 괴물과 파는 상점."""
-    # 3) 아이템 노트 — 몬스터가 떨구거나 상점이 파는 것만
-    relevant = sorted(set(dropped_by) | set(stocked_by))
+    """아이템 노트 — 수치(어둠템 대 서버), 떨어뜨리는 괴물, 파는 상점."""
+    # 3) 아이템 노트 — 몬스터가 떨구거나 상점이 파는 것 + 입는 물건 전부(드랍 후보를 고를 때 수치를 여기서 본다)
+    rows = sheet_rows()
+    wearables = {name for name, (_, item) in items.items() if (item.get("EquipmentSlot") or 0) > 0}
+    relevant = sorted(set(dropped_by) | set(stocked_by) | wearables)
     for name in relevant:
         found = items.get(name)
         drops_rows = "\n".join(
@@ -299,17 +353,21 @@ def write_item_notes(dropped_by, stocked_by, items):
         ) or "| (없음) | | |"
         shops_rows = "\n".join(f"- {s}" for s in stocked_by.get(name, [])) or "- (없음)"
 
+        verdict, specs = "", ""
         if found is None:
             kind, value, level = "?", "?", "?"
         else:
             item = found[1]
             kind, value, level = slot_kind(item), item.get("Value", 0), item.get("LevelRequired", 0)
+            if kind == "장비":
+                verdict, specs = spec_section(item, rows.get(name))
 
         (VAULT / "아이템" / f"{slug(name)}.md").write_text(
             "---\n"
             f'이름: "{name}"\n갈래: "{kind}"\n값: {value}\n레벨: {level}\n'
-            "---\n\n"
-            f"# {name}\n\n갈래 {kind} · 값 {value}전 · 레벨제한 {level}\n\n"
+            + (f'어둠템: "{verdict}"\n' if verdict else "")
+            + "---\n\n"
+            f"# {name}\n\n갈래 {kind} · 값 {value}전 · 레벨제한 {level}\n\n" + specs +
             "## 어느 괴물이 떨구나\n\n"
             "| 괴물 | 사냥터 | 실제 확률 |\n|---|---|---|\n" + drops_rows + "\n\n"
             "## 어느 상점이 파나\n\n" + shops_rows + "\n",
@@ -482,6 +540,16 @@ def graph_facts():
     edge(mapping, cutting, "정한다")
 
     all_mons, all_items, all_mund = load_all()
+    rows = sheet_rows()
+    source = node("자료", "어둠템", "어둠템#1~5 — 입는 물건 수치·레벨·직업의 정본(docs/items/어둠템#1~5.xlsx, 사용자 2026-09-23·10-09)")
+
+    def item_label(name):
+        item = (all_items.get(name) or (None, {}))[1]
+        if (item.get("EquipmentSlot") or 0) <= 0:
+            return name
+        verdict = {"같음": "어둠템과 같음", "어긋남": "어둠템과 다름", "없음": "어둠템에 없음"}[spec_verdict(item, rows.get(name))]
+        return f"{name} 레벨{item.get('LevelRequired', 0)} {stat_words(item)} · {verdict}"
+
     by_area = {}
     for m in all_mons:
         by_area.setdefault(m["AreaID"], []).append(m)
@@ -508,14 +576,23 @@ def graph_facts():
                 if item is None:
                     continue
                 if name not in item_nodes:
-                    item_nodes[name] = node("아이템", name)
+                    item_nodes[name] = node("아이템", name, item_label(name))
                 edge(mon_id, item_nodes[name], "드랍")
 
     for name, shops in stocked_by.items():
         if name not in item_nodes:
-            item_nodes[name] = node("아이템", name)
+            item_nodes[name] = node("아이템", name, item_label(name))
         for shop_id in shops:
             edge(shop_id, item_nodes[name], "판다")
+
+    # 입는 물건 전부 — 수치의 정본 어둠템에서 「정한다」(같음·어긋남), 어둠템에 없는 팩 물건은 이음 없이.
+    for name, (_, item) in all_items.items():
+        if (item.get("EquipmentSlot") or 0) <= 0:
+            continue
+        if name not in item_nodes:
+            item_nodes[name] = node("아이템", name, item_label(name))
+        if name in rows:
+            edge(source, item_nodes[name], f"정한다({spec_verdict(item, rows[name])})")
     return nodes, edges
 
 

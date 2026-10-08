@@ -58,7 +58,7 @@ public sealed class OriginalItemValueTests
 
             checked_++;
 
-            Told(wrong, name, "Value", Number(row, "판매가격"), Whole(item, "Value"));
+            // 값(Value)은 보지 않는다 — 서클 상한(`build-price-cap.py`, 사용자 2026-10-08)이 정한다. 수치는 도감대로(2026-10-09).
             Told(wrong, name, "CarryWeight", Number(row, "무게"), Whole(item, "CarryWeight"));
             Told(wrong, name, "MaxDurability", Number(row, "내구력"), Whole(item, "MaxDurability"));
             Told(wrong, name, "Class", Number(row, "직업제한"), Whole(item, "Class"));
@@ -166,17 +166,14 @@ public sealed class OriginalItemValueTests
     }
 
     /// <summary>
-    /// 무기·갑옷 <b>밖에서 판매가격 한 칸만</b> 도감을 따르는 것. 지금은 세줄금반지 한 장이다 —
-    /// 자이언트맨티스가 80% 로 떨구는 상인데 서버 값이 0 이라 팔아도 한 푼이 아니었다(사용자 결정,
-    /// 2026-09-23: "그정도 난이도가 있어" → 도감 값 50만을 그대로 쓴다).
+    /// 세줄금반지 — 자이언트맨티스가 80% 로 떨구는 상인데 서버 값이 0 이라 팔아도 한 푼이 아니었다(사용자 결정,
+    /// 2026-09-23: "그정도 난이도가 있어" → 도감 값 50만). 그때는 무기·갑옷 밖에서 이 값 한 칸만 도감을 따랐다.
     /// </summary>
     /// <remarks>
-    /// <b>왜 묶음째 되돌리지 않나.</b> 반지·귀걸이·목걸이·장갑·각반·허리띠·신발·방패·투구·장식 416장 중
-    /// 도감에 이름이 있는 것이 219장이고, 묶음째 되돌리면 그 219장의 값이 한꺼번에 움직인다. 방금 문을
-    /// 연 우드랜드 보석상(<c>보석상여주인@우드랜드입구#10,15</c>) 물목 22개 중 도감에 이름이 있는 21개가
-    /// <b>하나도 빠짐없이</b> 거기 들어 있다 —
-    /// 로오의반지 500→200 · 가죽방패 3,000→750 처럼 상점 값이 통째로 흔들린다. 그래서
-    /// <c>scripts/gen/items/build-gear-from-original.py</c> 의 <c>VALUE_ONLY</c> 에 <b>이름을 적은 것만</b> 따라간다.
+    /// <b>2026-10-09 부터 장신구·방패·장갑 … 의 수치도 도감대로</b>(사용자 「아이템 스펙은 이 데이터에 있는걸 기준으로」 ·
+    /// 「어둠템 값에 맞춰 장비스펙은」, <c>autopilot/item-specs/SPEC.md</c>) — 내구력도 도감 5,000. <b>값은 따로</b>: 서클 상한
+    /// (<c>build-price-cap.py</c>, 10-08)이 정하고 <c>build-gear-from-original.py</c> 는 값을 건드리지 않는다 — 로오의반지·가죽방패 값이
+    /// 도감으로 흔들리지 않는다.
     /// </remarks>
     [Fact]
     public void The_gold_ring_the_mantis_drops_is_worth_what_the_sheet_says()
@@ -189,11 +186,11 @@ public sealed class OriginalItemValueTests
         Assert.Equal(500_000, Number(sheet["세줄금반지"], "판매가격"));
         Assert.Equal(Number(sheet["세줄금반지"], "판매가격"), Whole(items["세줄금반지"], "Value"));
 
-        // 따라간 것은 값 한 칸뿐이다. 내구력은 도감 5,000 · 서버 3,000 으로 갈린 채 그대로여야 한다.
+        // 수치는 도감대로 — 내구력 5,000.
         Assert.Equal(5_000, Number(sheet["세줄금반지"], "내구력"));
-        Assert.Equal(3_000, Whole(items["세줄금반지"], "MaxDurability"));
+        Assert.Equal(5_000, Whole(items["세줄금반지"], "MaxDurability"));
 
-        // 다른 장신구는 안 따라간다 — 보석상 물목 두 장으로 그 경계를 지킨다.
+        // 값은 도감을 따라가지 않는다 — 상점 물목 두 장으로 그 경계를 지킨다.
         Assert.Equal(500, Whole(items["로오의반지"], "Value"));   // 도감 200
         Assert.Equal(3_000, Whole(items["가죽방패"], "Value"));   // 도감 750
     }
