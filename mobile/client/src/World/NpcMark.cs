@@ -1,4 +1,5 @@
 using Godot;
+using Lod.Mobile.Core.Ui;
 
 namespace LodClient;
 
@@ -16,15 +17,24 @@ public sealed partial class NpcMark : Node2D
     /// <summary>How high the sign floats — about where a figure's waist is, which is what a tap is measured against.</summary>
     public const float Waist = 32;
 
-    public override void _Draw()
+    /// <summary>
+    /// What the NPC is for — the sign is its role icon (2026-10-08). It used to be a yellow 「!」 for all of them, which
+    /// would now read as a quest, since quests have that icon.
+    /// </summary>
+    public NpcRole Role
     {
-        const float radius = 9;
-        Vector2 middle = new(0, -Waist);
-
-        // 바닥 무늬가 금빛이라 어두운 테두리를 두르고 밝게 채운다(바닥 물건 표식과 같은 까닭).
-        DrawCircle(middle, radius + 2, new Color(0, 0, 0, 0.8f));
-        DrawCircle(middle, radius, new Color(1, 0.87f, 0.45f));
-        DrawLine(middle + new Vector2(0, -5), middle + new Vector2(0, 2), new Color(0.15f, 0.1f, 0.05f), 3);
-        DrawCircle(middle + new Vector2(0, 5), 1.6f, new Color(0.15f, 0.1f, 0.05f));
+        get => _role;
+        set
+        {
+            if (value != _role)
+            {
+                _role = value;
+                QueueRedraw();
+            }
+        }
     }
+
+    private NpcRole _role;
+
+    public override void _Draw() => RoleIcon.Draw(this, Role, new Vector2(0, -Waist), 10);
 }

@@ -360,6 +360,45 @@ public partial class GameScreen : Control
         GD.Print("GREYBOX_ROLL_PREVIEW 전사 87");
     }
 
+    private bool _roleSheetShown;
+
+    /// <summary>손 없이 확인할 때만(<c>--role-sheet</c>): 3초 뒤 NPC 역할 아이콘 16종을 반지름 6·7·8·10·14 로 한 판에.</summary>
+    private void RehearseRoleSheet()
+    {
+        if (!Main.RoleSheet || _roleSheetShown || Time.GetTicksMsec() < 3000)
+        {
+            return;
+        }
+
+        _roleSheetShown = true;
+        AddChild(new RoleSheet { ZIndex = 100, Position = new Vector2(0, 120), Size = new Vector2(360, 580) });
+        GD.Print("GREYBOX_ROLE_SHEET");
+    }
+
+    private sealed partial class RoleSheet : Control
+    {
+        public override void _Draw()
+        {
+            DrawRect(new Rect2(Vector2.Zero, Size), new Color("#0f0f0f"));
+            Font font = GetThemeDefaultFont();
+            int row = 0;
+
+            foreach (Lod.Mobile.Core.Ui.NpcRole role in System.Enum.GetValues<Lod.Mobile.Core.Ui.NpcRole>())
+            {
+                float y = 20 + (row++ * 35);
+                float x = 18;
+
+                foreach (float radius in new[] { 6f, 7f, 8f, 10f, 14f })
+                {
+                    RoleIcon.Draw(this, role, new Vector2(x + radius, y), radius);
+                    x += (radius * 2) + 12;
+                }
+
+                DrawString(font, new Vector2(x, y + 5), Lod.Mobile.Core.Ui.NpcRoles.Word(role), HorizontalAlignment.Left, -1, 13, Colors.White);
+            }
+        }
+    }
+
     private double _aimRehearsal = -1;
 
     /// <summary>손 없이 확인할 때만(<c>--aim-hold</c>): 8초에 위로 끈 셈 치고 끝낸 뒤, 1초·4초에 고른 이를 적는다.</summary>

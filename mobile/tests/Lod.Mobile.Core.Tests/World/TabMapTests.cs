@@ -26,6 +26,7 @@ public sealed class TabMapTests
         npc 20373 40 34 멜로린
         npc 20373 3 10 자르반 3세
         about 20373 40 34 판매: 사과, 치즈
+        role 20373 40 34 물약
         room 20373 노비스마을식당|카르마 — 판매: 사과 / 베이가 — 판매: 와인
         exit 20393 0 0 노비스마을
         """;
@@ -93,6 +94,50 @@ public sealed class TabMapTests
 
         Assert.DoesNotContain(markers, one => one.Where == bush.Where);
         Assert.Equal(TabMarkerKind.Me, markers[^1].Kind);
+    }
+
+    /// <summary>
+    /// Roles(2026-10-08): an NPC carries its <c>role</c> line — a merchant in sight finds it by name — and a door into a
+    /// building carries the roles inside, each once. An NPC with no role line, or a word the app does not know, is 안내.
+    /// </summary>
+    [Fact]
+    public void Npcs_and_doors_carry_their_roles()
+    {
+        // 원문 끝에는 줄바꿈이 없다 — 이어 붙이려면 하나 넣는다.
+        MapGuide guide = MapGuide.Read(Guide + "\n" + """
+            exit 20373 10 10 수오미무기점
+            room 20373 수오미무기점|가이 — 판매: 에페 / 오리아나 — 은행 / 델란 — 판매: 단검|무기,은행,무기
+            role 20373 3 10 춤
+            """);
+        Creature cook = new(2, new Tile(40, 35), Direction.South, 0x4002, CreatureKind.Merchant, "멜로린@노비스마을#40,34");
+
+        IReadOnlyList<TabMarker> markers = TabMap.Markers(
+            new Tile(20, 20), [], [cook], [], guide.ExitsOn(20373), guide.SignsOn(20373), guide.RoomsOn(20373));
+
+        Assert.Equal([NpcRole.Potion], Assert.Single(markers, one => one.Label == "멜로린").Roles);
+        Assert.Equal([NpcRole.Talk], Assert.Single(markers, one => one.Label == "자르반 3세").Roles);
+        Assert.Equal([NpcRole.Weapon, NpcRole.Bank], Assert.Single(markers, one => one.Label == "수오미무기점").Roles);
+        Assert.Empty(Assert.Single(markers, one => one.Label == "노비스평원A").Roles);
+        Assert.Equal("무기 상점", NpcRoles.Title(NpcRole.Weapon));
+        Assert.Equal("은행", NpcRoles.Word(NpcRole.Bank));
+    }
+
+    /// <summary>
+    /// The shipped <c>guide.txt</c> (<c>build-client-guide.py</c>) gives the shops and the bank the roles a player looks
+    /// for: 수오미 무기점·방어구점 doors, 마인 은행·제작상점 doors, 보석상여주인 and 메린 where they stand.
+    /// </summary>
+    [Fact]
+    public void The_shipped_guide_tells_what_the_town_npcs_do()
+    {
+        string root = Path.GetFullPath(Path.Combine(HairMotionTests.Parts(), "..", ".."));   // mobile/client/assets
+        MapGuide guide = MapGuide.Read(File.ReadAllText(Path.Combine(root, "world", "guide.txt")));
+
+        Assert.Equal([NpcRole.Weapon], guide.RoomsOn(20355).Single(room => room.To == "수오미무기점").Kinds);
+        Assert.Equal([NpcRole.Armor], guide.RoomsOn(20355).Single(room => room.To == "수오미방어구점").Kinds);
+        Assert.Equal([NpcRole.Bank], guide.RoomsOn(20304).Single(room => room.To == "마인은행").Kinds);
+        Assert.Equal([NpcRole.Craft], guide.RoomsOn(20304).Single(room => room.To == "마인제조상점").Kinds);
+        Assert.Equal(NpcRole.Accessory, guide.SignsOn(20028).Single(sign => sign.Name == "보석상여주인").Role);
+        Assert.Equal(NpcRole.Craft, guide.SignsOn(20308).Single(sign => sign.Name == "메린").Role);
     }
 
     /// <summary>The way to an exit ends on whichever of its tiles is nearest on foot, round the walls.</summary>

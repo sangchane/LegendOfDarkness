@@ -129,6 +129,9 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
 
     // 그림이 없는 NPC(팩의 스크립트 NPC)가 선 자리의 표식. 번호로 골라 말을 건다.
     private readonly Dictionary<uint, NpcMark> _signs = [];
+
+    // NPC 머리 위 이름표 — 역할 아이콘 + 이름(사용자 2026-10-08 「마을마다 어느 npc가 뭐하는지」).
+    private readonly Dictionary<uint, Control> _npcTags = [];
     private readonly List<AudioStreamPlayer> _voices = [];
 
     // Whoever is picked out, and the mark that says so. Zero is nobody.

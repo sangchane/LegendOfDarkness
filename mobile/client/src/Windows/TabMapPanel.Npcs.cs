@@ -114,20 +114,42 @@ public sealed partial class TabMapPanel
         // 건물(출구 너머 NPC)이 먼저 — 마을에서는 상점이 거의 다 건물 안이다.
         foreach (MapRoom room in rooms)
         {
-            _npcList.AddChild(Chip(room.To, () => ShowNpc(room.To, room.About, () => PointOf(room.To))));
+            _npcList.AddChild(Chip(room.To, room.Kinds, () => ShowNpc(room.To, room.Kinds, room.About, () => PointOf(room.To))));
         }
 
         foreach (MapSign sign in signs)
         {
-            _npcList.AddChild(Chip(sign.Name, () => ShowNpc(sign.Name, sign.About, () => At(sign.Where))));
+            _npcList.AddChild(Chip(sign.Name, [sign.Role], () => ShowNpc(sign.Name, [sign.Role], sign.About, () => At(sign.Where))));
         }
     }
 
-    private static Button Chip(string name, System.Action pressed)
+    /// <summary>
+    /// 목록 한 칸 — 앞에 역할 아이콘(지도·미니맵과 같은 것), 이름 뒤에 역할 낱말(「가이 · 무기」, 사용자 2026-10-08 「어느 npc가 뭐하는지」).
+    /// 안내만 하는 NPC 는 낱말을 붙이지 않는다.
+    /// </summary>
+    private static Button Chip(string name, IReadOnlyList<NpcRole> roles, System.Action pressed)
     {
-        Button chip = new() { Text = name, CustomMinimumSize = new Vector2(0, 28), FocusMode = FocusModeEnum.None };
+        NpcRole[] shown = [.. roles.Take(3)];
+        string words = string.Join("·", shown.Where(role => role != NpcRole.Talk).Select(NpcRoles.Word));
+        Button chip = new() { Text = words.Length > 0 ? $"{name} · {words}" : name, CustomMinimumSize = new Vector2(0, 28), FocusMode = FocusModeEnum.None };
+        chip.SetMeta("name", name);
         Greybox.Plain(chip);
         chip.AddThemeFontSizeOverride("font_size", 12);
+
+        // 글자는 아이콘 몫만큼 오른쪽에서 시작한다.
+        foreach (string state in new[] { "normal", "hover", "focus", "pressed" })
+        {
+            if (chip.GetThemeStylebox(state) is StyleBoxFlat box)
+            {
+                box.ContentMarginLeft = 6 + (shown.Length * 17);
+            }
+        }
+
+        for (int at = 0; at < shown.Length; at++)
+        {
+            chip.AddChild(new RoleBadge(shown[at]) { Position = new Vector2(5 + (at * 17), 6) });
+        }
+
         chip.Pressed += pressed;
         return chip;
     }
@@ -148,7 +170,7 @@ public sealed partial class TabMapPanel
 
         foreach (Node child in _npcList.GetChildren())
         {
-            if (child is Button chip && chip.Text == name)
+            if (child is Button chip && chip.GetMeta("name").AsString() == name)
             {
                 chip.EmitSignal(BaseButton.SignalName.Pressed);
                 return;
@@ -156,10 +178,11 @@ public sealed partial class TabMapPanel
         }
     }
 
-    private void ShowNpc(string name, string about, System.Func<Vector2?> goal)
+    private void ShowNpc(string name, IReadOnlyList<NpcRole> roles, string about, System.Func<Vector2?> goal)
     {
         _npcGoal = goal;
-        _npcName.Text = name;
+        string titles = string.Join(" · ", roles.Where(role => role != NpcRole.Talk).Select(NpcRoles.Title));
+        _npcName.Text = titles.Length > 0 ? $"{name} — {titles}" : name;
         _npcAbout.Text = about.Length > 0 ? about : "안내";
         _npcCard.Visible = true;
     }

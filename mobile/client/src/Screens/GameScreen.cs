@@ -568,6 +568,7 @@ public partial class GameScreen : Control
         OpenChatOnItsOwn();
         RehearseNotices();
         RehearseRoll();
+        RehearseRoleSheet();
         Dropped();
         RejoinIfHandedOff();
         LogUnread();

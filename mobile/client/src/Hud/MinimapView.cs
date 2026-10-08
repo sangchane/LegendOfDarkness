@@ -204,7 +204,8 @@ public sealed partial class MinimapView : Button
             _server?.Creatures ?? [],
             _server?.Roster.Members.Select(member => member.Name) ?? [],
             _guide.ExitsOn(MapId),
-            _guide.SignsOn(MapId));
+            _guide.SignsOn(MapId),
+            _guide.RoomsOn(MapId));
 
         if (_pretend is not null)
         {
@@ -256,6 +257,9 @@ public sealed partial class MinimapView : Button
     /// <summary>The map itself.</summary>
     private sealed partial class Face(MinimapView owner) : Control
     {
+        // 미니맵 위 역할 아이콘 반지름 — 칸 크기와 상관없이. 6 은 모양이 뭉개졌다(크기별 사진 2026-10-08).
+        private const float IconRadius = 8;
+
         public override void _Draw()
         {
             float wide = Size.X, high = Size.Y;
@@ -292,7 +296,9 @@ public sealed partial class MinimapView : Button
                 }
             }
 
-            foreach (TabMarker marker in Minimap.InSight(frame, wide, high, owner._markers))
+            IReadOnlyList<TabMarker> seen = Minimap.InSight(frame, wide, high, owner._markers);
+
+            foreach (TabMarker marker in seen)
             {
                 Color paint = TabMapPanel.Paint(marker.Kind);
 
@@ -307,7 +313,17 @@ public sealed partial class MinimapView : Button
                     continue;
                 }
 
-                Diamond(frame, marker.Where, paint);
+                // 역할을 아는 NPC 는 점 대신 아래에서 아이콘으로.
+                if (marker.Kind != TabMarkerKind.Npc || marker.Roles.Count == 0)
+                {
+                    Diamond(frame, marker.Where, paint);
+                }
+            }
+
+            // NPC 가 하는 일과 상점 건물 문 안의 일 — 아이콘(사용자 2026-10-08 「미니맵에서 찾기 쉽게」). 점들 위, 나·봇 아래.
+            foreach (TabMarker marker in seen.Where(one => one.Roles.Count > 0 && Minimap.Sees(frame, wide, high, one.Where)))
+            {
+                RoleIcon.Row(this, marker.Roles, At(frame, marker.Where), IconRadius);
             }
 
             if (owner._botAt is { } bot && Minimap.Sees(frame, wide, high, bot))

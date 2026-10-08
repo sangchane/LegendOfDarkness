@@ -238,6 +238,9 @@ public sealed partial class TabMapPanel : PanelContainer
     /// <summary>The drawn map itself: the floor baked once per map and size, the dots and the way drawn over it.</summary>
     private sealed partial class Canvas(TabMapPanel owner) : Control
     {
+        // 길 찾기 지도 위 역할 아이콘 반지름 — 미니맵(8)보다 한 치수 크게.
+        private const float IconRadius = 10;
+
         private ImageTexture? _floor;
         private (int Map, TabMapProjection Projection, bool Drawn) _baked = (-2, default, false);
 
@@ -303,7 +306,8 @@ public sealed partial class TabMapPanel : PanelContainer
                 server?.Creatures ?? [],
                 server?.Roster.Members.Select(member => member.Name) ?? [],
                 owner._guide.ExitsOn(world.MapId),
-                owner._guide.SignsOn(world.MapId));
+                owner._guide.SignsOn(world.MapId),
+                owner._guide.RoomsOn(world.MapId));
 
             QueueRedraw();
         }
@@ -371,10 +375,16 @@ public sealed partial class TabMapPanel : PanelContainer
                 {
                     foreach (Tile tile in marker.Goals) Diamond(map, tile, paint);
                 }
-                else if (marker.Kind != TabMarkerKind.Me)
+                else if (marker.Kind != TabMarkerKind.Me && (marker.Kind != TabMarkerKind.Npc || marker.Roles.Count == 0))
                 {
                     Diamond(map, marker.Where, paint);
                 }
+            }
+
+            // NPC 가 하는 일·상점 건물 문 안의 일 — 미니맵과 같은 아이콘(사용자 2026-10-08).
+            foreach (TabMarker marker in Markers.Where(one => one.Roles.Count > 0))
+            {
+                RoleIcon.Row(this, marker.Roles, At(map, marker.Where), IconRadius);
             }
 
             if (owner._server?.Companion is { } bot && owner._server.Others.FirstOrDefault(one => one.Serial == bot.Serial) is { } seen)
@@ -389,7 +399,7 @@ public sealed partial class TabMapPanel : PanelContainer
                 int fontSize = marker.Kind == TabMarkerKind.Exit ? 13 : 12;
                 Vector2 size = font.GetStringSize(marker.Label, HorizontalAlignment.Left, -1, fontSize);
                 float x = Math.Clamp(at.X - (size.X / 2), 2, Math.Max(2, Size.X - size.X - 2));
-                float y = Math.Clamp(at.Y - dot - 5, size.Y, Size.Y - 2);
+                float y = Math.Clamp(at.Y - (marker.Roles.Count > 0 ? IconRadius + 2 : dot) - 5, size.Y, Size.Y - 2);
                 Vector2 where = new(x, y);
                 Rect2 box = new(new Vector2(x - 2, y - size.Y + 2), size + new Vector2(4, 0));
 

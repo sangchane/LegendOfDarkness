@@ -86,7 +86,17 @@ public sealed partial class WorldView
             Label words = new() { Text = $"→ {exit.To}", MouseFilter = MouseFilterEnum.Ignore };
             words.AddThemeFontSizeOverride("font_size", 11);
             words.AddThemeColorOverride("font_color", new Color(1, 0.87f, 0.45f));
-            tag.AddChild(words);
+
+            // 상점 건물 문이면 안에 선 NPC 들의 역할 아이콘을 앞에(사용자 2026-10-08 「어느 npc가 뭐하는지」).
+            HBoxContainer row = new() { MouseFilter = MouseFilterEnum.Ignore };
+            row.AddThemeConstantOverride("separation", 2);
+            foreach (NpcRole role in (Exits.RoomsOn(map.Id).FirstOrDefault(room => room.To == exit.To)?.Kinds ?? []).Take(3))
+            {
+                row.AddChild(new RoleBadge(role, 14));
+            }
+
+            row.AddChild(words);
+            tag.AddChild(row);
 
             _camera.AddChild(tag);
             Vector2 size = tag.GetCombinedMinimumSize();

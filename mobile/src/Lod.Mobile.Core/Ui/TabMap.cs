@@ -23,11 +23,79 @@ public sealed record MapExit(string To, IReadOnlyList<Tile> Tiles)
 /// <summary>A map the world map lands on: its name, whether it is a town, and the level its warps ask (<c>area</c> lines).</summary>
 public sealed record MapPlace(int Area, string Name, bool Town, int Level);
 
-/// <summary>Whoever stands beyond an exit — a shop behind its door (<c>room</c> line): the exit's name and who is there, one per line.</summary>
-public sealed record MapRoom(string To, string About);
+/// <summary>
+/// Whoever stands beyond an exit — a shop behind its door (<c>room</c> line): the exit's name, who is there, one per line,
+/// and their roles as the guide wrote them (<c>무기,은행</c>, empty in an older guide).
+/// </summary>
+public sealed record MapRoom(string To, string About, string Roles = "")
+{
+    /// <summary>The roles inside, in the order they stand there, each once.</summary>
+    public IReadOnlyList<NpcRole> Kinds => [.. Roles.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(NpcRoles.Parse).Distinct()];
+}
 
-/// <summary>Somebody who always stands in the same place — a shopkeeper, a trainer — and what they do (<c>about</c> line, may be empty).</summary>
-public sealed record MapSign(Tile Where, string Name, string About = "");
+/// <summary>
+/// Somebody who always stands in the same place — a shopkeeper, a trainer — what they do (<c>about</c> line, may be
+/// empty) and the one word for it (<c>role</c> line — <see cref="NpcRole.Talk" /> when the guide has none).
+/// </summary>
+public sealed record MapSign(Tile Where, string Name, string About = "", NpcRole Role = NpcRole.Talk);
+
+/// <summary>
+/// What an NPC is for, as one icon on the minimap, the 길 찾기 map and over its head (사용자 2026-10-08 「마을마다 어느 npc가
+/// 뭐하는지 잘 모르겠던데 직관적으로」, autopilot/npc-roles/SPEC.md). <c>build-client-guide.py</c> decides it from the server's
+/// templates and scripts; shops by what most of their stock is.
+/// </summary>
+public enum NpcRole
+{
+    Talk,
+    Weapon,
+    Armor,
+    Accessory,
+    Potion,
+    Goods,
+    Bank,
+    Craft,
+    Quest,
+    Class,
+    Teach,
+    Vitality,
+    Stats,
+    Beauty,
+    Board,
+    Travel
+}
+
+/// <summary>The words <c>guide.txt</c> writes for each <see cref="NpcRole" />, and what to call it on screen.</summary>
+public static class NpcRoles
+{
+    private static readonly (NpcRole Role, string Word, string Title)[] Words =
+    [
+        (NpcRole.Weapon, "무기", "무기 상점"),
+        (NpcRole.Armor, "방어구", "방어구 상점"),
+        (NpcRole.Accessory, "장신구", "장신구 상점"),
+        (NpcRole.Potion, "물약", "물약 상점"),
+        (NpcRole.Goods, "잡화", "잡화 상점"),
+        (NpcRole.Bank, "은행", "은행"),
+        (NpcRole.Craft, "제작", "제작"),
+        (NpcRole.Quest, "퀘스트", "퀘스트"),
+        (NpcRole.Class, "전직", "전직·승급"),
+        (NpcRole.Teach, "기술", "기술·마법 배우기"),
+        (NpcRole.Vitality, "체력", "체력·마력 사기"),
+        (NpcRole.Stats, "능력치", "능력치"),
+        (NpcRole.Beauty, "미용", "미용실"),
+        (NpcRole.Board, "게시판", "게시판"),
+        (NpcRole.Travel, "이동", "이동"),
+        (NpcRole.Talk, "안내", "안내"),
+    ];
+
+    /// <summary>The role a guide word stands for — <see cref="NpcRole.Talk" /> for a word it does not know.</summary>
+    public static NpcRole Parse(string word) => Words.FirstOrDefault(one => one.Word == word).Role;
+
+    /// <summary>The short word — a chip beside a name.</summary>
+    public static string Word(NpcRole role) => Words.First(one => one.Role == role).Word;
+
+    /// <summary>What to call it in a heading — 「무기 상점」.</summary>
+    public static string Title(NpcRole role) => Words.First(one => one.Role == role).Title;
+}
 
 /// <summary>
 /// What the 길 찾기 map knows about a map beyond its walls: the exits and the standing NPCs, read from
@@ -62,11 +130,11 @@ public sealed class MapGuide
                 continue;
             }
 
-            // room <맵> <간 곳>|<NPC — 하는 일 / …> — 출구 너머에 선 NPC 들.
+            // room <맵> <간 곳>|<NPC — 하는 일 / …>[|<역할,…>] — 출구 너머에 선 NPC 들.
             if (line.StartsWith("room ", StringComparison.Ordinal) && line.Split(' ', 3) is [_, var roomMap, var rest]
-                && int.TryParse(roomMap, out int from) && rest.Split('|', 2) is [var to, var inside])
+                && int.TryParse(roomMap, out int from) && rest.Split('|', 3) is [var to, var inside, .. var roles])
             {
-                Add(guide._rooms, from, new MapRoom(to, inside.Replace(" / ", "\n", StringComparison.Ordinal)));
+                Add(guide._rooms, from, new MapRoom(to, inside.Replace(" / ", "\n", StringComparison.Ordinal), roles is [var kinds] ? kinds : ""));
                 continue;
             }
 
@@ -98,6 +166,12 @@ public sealed class MapGuide
                 case "about" when guide._signs.TryGetValue(map, out List<MapSign>? signs):
                     int at = signs.FindIndex(sign => sign.Where == new Tile(x, y));
                     if (at >= 0) signs[at] = signs[at] with { About = words[4] };
+                    break;
+
+                // role <맵> <x> <y> <역할> — 같은 자리 npc 줄 뒤에 온다.
+                case "role" when guide._signs.TryGetValue(map, out List<MapSign>? signs):
+                    int whose = signs.FindIndex(sign => sign.Where == new Tile(x, y));
+                    if (whose >= 0) signs[whose] = signs[whose] with { Role = NpcRoles.Parse(words[4]) };
                     break;
             }
         }
@@ -180,8 +254,14 @@ public enum TabMarkerKind
     Me
 }
 
-/// <summary>One dot on the map, with the words beside it when it has any.</summary>
-public sealed record TabMarker(Tile Where, TabMarkerKind Kind, string Label, IReadOnlyList<Tile> Goals);
+/// <summary>
+/// One dot on the map, with the words beside it when it has any — and for an NPC its role, for an exit into a building the
+/// roles of whoever stands inside (drawn as icons). Empty when unknown.
+/// </summary>
+public sealed record TabMarker(Tile Where, TabMarkerKind Kind, string Label, IReadOnlyList<Tile> Goals)
+{
+    public IReadOnlyList<NpcRole> Roles { get; init; } = [];
+}
 
 /// <summary>Where a tap on the map sends us: the tiles that count as arriving, and what to call it.</summary>
 public sealed record TabGoal(string Label, IReadOnlyList<Tile> Goals);
@@ -197,15 +277,18 @@ public static class TabMap
     /// are what someone finding the way is looking for; party members are told apart from other people.
     /// </summary>
     /// <param name="partyNames">Who is in our group — people whose name is here are drawn as party.</param>
+    /// <param name="rooms">Who stands behind this map's doors — an exit into one carries their roles.</param>
     public static IReadOnlyList<TabMarker> Markers(
         Tile me,
         IEnumerable<Character> others,
         IEnumerable<Creature> creatures,
         IEnumerable<string> partyNames,
         IReadOnlyList<MapExit> exits,
-        IReadOnlyList<MapSign> signs)
+        IReadOnlyList<MapSign> signs,
+        IReadOnlyList<MapRoom>? rooms = null)
     {
         HashSet<string> party = [.. partyNames];
+        Dictionary<string, NpcRole> roleOf = signs.GroupBy(sign => sign.Name).ToDictionary(group => group.Key, group => group.First().Role);
         List<TabMarker> markers = [];
         HashSet<string> named = [];
 
@@ -221,20 +304,23 @@ public static class TabMap
                     // 이식한 NPC 는 이름에 자리가 붙어 온다(카르마@노비스마을식당#3,10).
                     string name = one.Name.Split('@')[0];
                     named.Add(name);
-                    markers.Add(new TabMarker(one.Where, TabMarkerKind.Npc, name, Beside(one.Where)));
+                    markers.Add(new TabMarker(one.Where, TabMarkerKind.Npc, name, Beside(one.Where)) { Roles = RoleOf(roleOf, name) });
                     break;
             }
         }
 
         // 멀어서 아직 안 보이는 NPC 는 템플릿 자리에 둔다. 보이는 것은 서버가 말한 자리가 이긴다.
         markers.AddRange(signs.Where(sign => !named.Contains(sign.Name))
-            .Select(sign => new TabMarker(sign.Where, TabMarkerKind.Npc, sign.Name, Beside(sign.Where))));
+            .Select(sign => new TabMarker(sign.Where, TabMarkerKind.Npc, sign.Name, Beside(sign.Where)) { Roles = [sign.Role] }));
 
         markers.AddRange(others.Select(one => party.Contains(one.Name)
             ? new TabMarker(one.Where, TabMarkerKind.Party, one.Name, Beside(one.Where))
             : new TabMarker(one.Where, TabMarkerKind.Person, string.Empty, Beside(one.Where))));
 
-        markers.AddRange(exits.Select(exit => new TabMarker(exit.Middle, TabMarkerKind.Exit, exit.To, exit.Tiles)));
+        markers.AddRange(exits.Select(exit => new TabMarker(exit.Middle, TabMarkerKind.Exit, exit.To, exit.Tiles)
+        {
+            Roles = rooms?.FirstOrDefault(room => room.To == exit.To)?.Kinds ?? []
+        }));
         markers.Add(new TabMarker(me, TabMarkerKind.Me, string.Empty, []));
 
         return [.. markers.OrderBy(marker => marker.Kind)];
@@ -352,6 +438,10 @@ public static class TabMap
         : next.X < from.X ? Direction.West
         : next.Y > from.Y ? Direction.South
         : Direction.North;
+
+    /// <summary>A merchant in sight gets the role its template spot has in the guide — by name, since the server sends it.</summary>
+    private static IReadOnlyList<NpcRole> RoleOf(Dictionary<string, NpcRole> roles, string name) =>
+        roles.TryGetValue(name, out NpcRole role) ? [role] : [];
 
     /// <summary>
     /// The tiles beside somebody — they stand on their own tile, and walking up to them is arriving at one of these.

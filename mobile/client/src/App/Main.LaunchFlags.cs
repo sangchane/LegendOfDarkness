@@ -77,6 +77,9 @@ public partial class Main : Control
 
     public static bool RollPreview => System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--roll-preview") >= 0;
 
+    /// <summary>손 없이 확인할 때 — NPC 역할 아이콘 16종을 크기별로 한 판에 그린다(<c>--role-sheet</c>). 모양을 맞추는 사진용.</summary>
+    public static bool RoleSheet => System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--role-sheet") >= 0;
+
     /// <summary>손 없이 확인할 때 — 파티 초대가 오면 [수락]을 누른다(<c>--accept</c>).</summary>
     public static bool Accepting { get; private set; }
 

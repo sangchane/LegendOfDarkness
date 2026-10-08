@@ -5,6 +5,7 @@ using Godot;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Protocol.World;
+using Lod.Mobile.Core.Ui;
 using Lod.Mobile.Core;
 
 namespace LodClient;
@@ -412,12 +413,14 @@ public sealed partial class WorldView
                     {
                         if (!_signs.TryGetValue(one.Serial, out NpcMark? sign))
                         {
-                            sign = new NpcMark { Name = $"Sign{one.Serial}" };
+                            sign = new NpcMark { Name = $"Sign{one.Serial}", Role = RoleOf(one) };
                             _camera.AddChild(sign);
                             _signs[one.Serial] = sign;
                         }
 
                         sign.Position = Ground(one.Where);
+                        sign.Role = RoleOf(one);
+                        TagNpc(one, sign.Position, -NpcMark.Waist - 12, icon: false);
                     }
 
                     continue;
@@ -435,6 +438,11 @@ public sealed partial class WorldView
             if (actor.Looking != one.Facing)
             {
                 actor.Face(one.Facing);
+            }
+
+            if (one.Kind == CreatureKind.Merchant)
+            {
+                TagNpc(one, actor.Position, actor.HeadTop, icon: true);
             }
         }
 
@@ -455,6 +463,67 @@ public sealed partial class WorldView
             _signs[serial].QueueFree();
             _signs.Remove(serial);
         }
+
+        foreach (uint serial in _npcTags.Keys.Where(known => !present.Contains(known)).ToList())
+        {
+            _npcTags[serial].QueueFree();
+            _npcTags.Remove(serial);
+        }
+    }
+
+    /// <summary>
+    /// 그 NPC 의 역할 — 길 찾기 자료(<c>guide.txt</c> role 줄)에서 이름으로. 서버는 이식한 NPC 이름에 자리를 붙여 보낸다
+    /// (카르마@노비스마을식당#3,10). 자료에 없으면 안내.
+    /// </summary>
+    private NpcRole RoleOf(Creature one)
+    {
+        string name = one.Name.Split('@')[0];
+        return Exits.SignsOn(MapId).FirstOrDefault(sign => sign.Name == name)?.Role ?? NpcRole.Talk;
+    }
+
+    /// <summary>
+    /// NPC 머리 위 이름표 — 역할 아이콘 + 이름, 출구 표지와 같은 어두운 판(테두리 없이). 그림 없는 NPC 는 표지가 이미 역할
+    /// 아이콘이라 이름만. <paramref name="above" /> 는 발에서 머리 꼭대기까지(음수).
+    /// </summary>
+    private void TagNpc(Creature one, Vector2 feet, float above, bool icon)
+    {
+        // 맵을 옮길 때 새 맵의 NPC 가 맵 번호보다 먼저 오면 옛 맵 자료로 만든 이름표가 남는다 — 만든 맵이 다르면 다시 만든다(리뷰).
+        if (_npcTags.TryGetValue(one.Serial, out Control? tag) && tag.GetMeta("map").AsInt32() != MapId)
+        {
+            tag.QueueFree();
+            _npcTags.Remove(one.Serial);
+            tag = null;
+        }
+
+        if (tag is null)
+        {
+            tag = new PanelContainer { Name = $"NpcTag{one.Serial}", MouseFilter = MouseFilterEnum.Ignore, ZIndex = 40 };
+            tag.SetMeta("map", MapId);
+            StyleBoxFlat plate = new() { BgColor = new Color(0, 0, 0, 0.6f) };
+            plate.SetCornerRadiusAll(4);
+            plate.ContentMarginLeft = plate.ContentMarginRight = 4;
+            plate.ContentMarginTop = plate.ContentMarginBottom = 1;
+            tag.AddThemeStyleboxOverride("panel", plate);
+
+            HBoxContainer row = new() { MouseFilter = MouseFilterEnum.Ignore };
+            row.AddThemeConstantOverride("separation", 3);
+            if (icon)
+            {
+                row.AddChild(new RoleBadge(RoleOf(one), 14));
+            }
+
+            Label words = new() { Text = one.Name.Split('@')[0], MouseFilter = MouseFilterEnum.Ignore };
+            words.AddThemeFontSizeOverride("font_size", 11);
+            words.AddThemeColorOverride("font_color", new Color("#e8e2c8"));
+            row.AddChild(words);
+            tag.AddChild(row);
+
+            _camera.AddChild(tag);
+            _npcTags[one.Serial] = tag;
+        }
+
+        Vector2 size = tag.GetCombinedMinimumSize();
+        tag.Position = feet + new Vector2(-size.X / 2, above - size.Y - 2);
     }
 
     /// <summary>
