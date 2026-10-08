@@ -1,10 +1,10 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-10-08] 리뷰 지적 15건 수정 — 등급 L 변경 · `dev:build` · 단계: SHIP(커밋 끝, 배포 대기).** 결과 `plans/code-review-2026-10-08.md` 「수정 결과」, 명세 `plans/review-fixes-spec-2026-10-08.md`.
-  1. **저녁 배포**는 새 흐름이다(`.next` → 전환 → 실패면 `.prev`): 먼저 클라우드 `df -h /home/ubuntu/lod-ci`(6G 디스크) 여유를 보고 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh deploy`. 처음 한 번은 맥에서 서버 빌드까지 해 오래 걸린다. 끝나면 `status`·`logs`, 클라우드에 `deploy-manifest.json`.
-  2. 배포 뒤 앱 로그인(30초 제한)·비밀번호 변경·경매 보고(`auction-report` — saved 비교·깨진 줄)를 한 번 본다.
-  3. 남은 것은 `plans/backlog.md` 「리뷰 2026-10-08 수정 밖」(기존 실패 시험 6, 블라인드 스팟, .NET 10 — 지원 종료 2026-11-10).
+- **[현재/2026-10-08] 리뷰 지적 15건 수정 — 등급 L 변경 · `dev:build` · 단계: SHIP · 클라우드 배포 끝(10-08 17:50 KST, 새 흐름 `.next`→전환 성공).** 결과 `plans/code-review-2026-10-08.md` 「수정 결과」.
+  1. 배포 확인: manifest 루트 aa71d452 · 서버 d629bc284(둘 다 깨끗) · Kestrel 없음 · Newtonsoft 13.0.3 · 서비스 모두 active · 동료 봇 5·생태계 봇 차례로 입장(새 입장권으로). 대시보드도 올림 — 앱 버전 파일 남음. 앱: 아이폰 202610081752(내 기기 설치됨) · 윈도우 202610081756 내려받기 페이지에.
+  2. 지켜볼 것: 경매 보고(`cloud-server.sh auction-report`)에 새 `saved` 비교·「읽지 못한 줄」이 나오는지 · 앱 로그인(30초)·비밀번호 변경.
+  3. 남은 것은 `plans/backlog.md` 「리뷰 2026-10-08 수정 밖」(기존 실패 시험 6, 블라인드 스팟, .NET 10 — 지원 종료 2026-11-10, 사제봇6 접속 직후 끊김).
 
 - **[다음 세션 — 2026-10-08 아침 · 2·3번 진행 뒤]** (더 비싼 거래·아이폰 설치는 보류 → `plans/backlog.md`)
   1. **경매 24시간 보고**(10-08 18시 뒤, 그대로): `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-server.sh auction-report` — 끊긴 조작·금화 어긋남 0, 새 올림 보증금 = 시작가 × 2%, 유찰 물건을 봇이 다시 안 올리는지. 괜찮으면 **main 에 합치기**(루트·서버 `feature/loot-roll-auction`, 사용자 확인).

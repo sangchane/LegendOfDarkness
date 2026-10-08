@@ -10,6 +10,7 @@
   - 블라인드 스팟 표: 시험한 서버와 배포 산출물 일치(manifest 는 넣음, 시험 결과 연결은 아직) · 환경변수 없으면 통과로 세는 부하·촬영 시험 · BotLoad 체력 100,000 · Godot 화면 산술 · 맵 전환 중 옛 좌표(WorldState) · HadesConnectionTests 공유 10초 · 고아 시험 서버 회수(10-08 수정 때 7개 손으로 끔) · CharacterSaveTests 3초 대기·옛 주석 · 게임 채널 TLS · 백업 일관성(live tar) · NPC 변환 미지원 명령 baseline · ios-build.sh import 실패 무시 · 낡은 운영 문서(service-readiness·security-maintenance).
   - 은행 밖 경제 변경(상점 사고팔기 등)도 캐릭터 자물쇠 밖에서 금화·가방을 바꾼다 — 주기 저장과 엇갈릴 수 있음(은행만 고침).
   - .NET 10 전환 — `plans/dotnet10-migration-2026-10-08.md`(지원 종료 2026-11-10).
+  - 사제봇6 이 들어간 직후 서버가 그 소켓에서 `ObjectDisposedException`(NetworkServer.EndReceivePacket → BeginReceive)을 내고 끊는다 — 10-08 배포 뒤 두 번 끊기고 세 번째에 들어감, 전날 15번. 같은 오류 하루 30·91줄. 원인 미조사.
   - Node `ability-operations-ui.test.js:16` 현황판 731 vs 서버 734(더블어택·드래곤모드·트리플어택) 생성물 드리프트.
 
 - **[보류/사용자 2026-10-07] 경매 더 비싼 거래(20억 넘게).** 손 금화(`GoldPoints` int)·경매 값 칸(int)·패킷(u32)이 21억까지라, 넘기려면 64비트로 바꾸는 큰 작업(서버·패킷·앱·봇·캐릭터 파일). 지금: 들 수 있는 금화 20억(클라우드)·경매 값 상한 20억·은행 금화는 상한 없음(DL-14).
