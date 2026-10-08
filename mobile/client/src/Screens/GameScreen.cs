@@ -15,6 +15,12 @@ public partial class GameScreen : Control
     /// <summary>HUD·창의 Z — 월드 위 표지(가장 높은 것이 피해 숫자 110)보다 위. 창에서 떠오르는 판(TopLevel)은 이보다 높게.</summary>
     public const int HudZ = 200;
 
+    // 반응형(사용자 2026-10-08 「가로세로랑 기종에 따라서 반응형으로」) — 설계 크기 360×780 을 늘여 쓰는 넓은 세로 화면(아이폰 SE 438 ·
+    // 아이패드 585)에서 창이 폭 전체로 늘어 소지품 칸이 납작해지고 미니맵이 띠가 됐다. 이 폭부터는 폰 크기 그대로 둔다.
+    private const float WideFrom = 400;
+    private const float PortraitWindowMost = 380;
+    private const float MinimapMost = 220;
+
     private const int AuxFontSize = 14;
     private Label _wealth = null!;
     private Label _level = null!;

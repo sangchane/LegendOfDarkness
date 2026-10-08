@@ -323,8 +323,9 @@ public partial class GameScreen : Control
         PlaceColumn(holders);
         over.AddChild(_roll);
 
-        // 창의 최소 폭은 글자를 잰 뒤에야 맞는다. 처음 잰 값이 모자랐다(314 — 창은 438) — 바뀔 때마다 다시 세운다.
+        // 창의 최소 폭은 글자를 잰 뒤에야 맞는다. 처음 잰 값이 모자랐다(314 — 창은 438) — 바뀔 때마다 다시 세운다. 화면 크기가 바뀌어도.
         _pack.MinimumSizeChanged += () => PlaceColumn(holders);
+        GetViewport().SizeChanged += () => PlaceColumn(holders);
     }
 
     /// <summary>
@@ -342,6 +343,15 @@ public partial class GameScreen : Control
 
         foreach (VBoxContainer holder in holders)
         {
+            // 넓은 세로 화면은 창을 폰 폭 그대로 가운데에 — 폭 전체로 늘면 소지품 칸이 납작해지고 슬라이더가 길어졌다.
+            if (Main.Portrait && across > WideFrom)
+            {
+                holder.AnchorLeft = holder.AnchorRight = 0.5f;
+                holder.OffsetLeft = -PortraitWindowMost / 2;
+                holder.OffsetRight = PortraitWindowMost / 2;
+                continue;
+            }
+
             holder.AnchorLeft = Main.Portrait || holder == _settingsHolder || holder == _botGearHolder || holder == _gearHolder || holder == _chatHolder || holder == _talkHolder || holder == _users.GetParent() || holder == _auction.GetParent() ? 0 : column;
         }
     }

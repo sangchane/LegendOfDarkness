@@ -19,7 +19,9 @@ public sealed class NpcRoleTests : IDisposable
 
     /// <summary>
     /// 확인 사진 — <c>LOD_ROLE_SHOT</c> 에 png 경로를 줄 때만 돈다. <c>LOD_ROLE_AT</c> = 「맵,x,y」(기본 수오미마을 무기점·방어구점 문
-    /// 사이 20355,15,51), <c>LOD_ROLE_ARGS</c> = 앱에 더 줄 인자(빈칸으로 가름 — 예 「--tabmap」 · 「--tabmap-npc 수오미무기점」).
+    /// 사이 20355,15,51), <c>LOD_ROLE_ARGS</c> = 앱에 더 줄 인자(빈칸으로 가름 — 예 「--tabmap」 · 「--tabmap-npc 수오미무기점」),
+    /// <c>LOD_ROLE_ORIENT</c>·<c>LOD_ROLE_SIZE</c> = 화면 방향·설계 크기(기본 portrait 360x780), <c>LOD_ROLE_WINDOW</c> = 설계 크기는 두고 창만
+    /// 그 크기(기종 흉내 — 아이패드 768x1024 등) — UI 리뷰 사진도 이것으로 찍는다.
     /// </summary>
     [Fact]
     public async Task Photograph_what_the_npcs_do()
@@ -54,7 +56,10 @@ public sealed class NpcRoleTests : IDisposable
                  {
                      "--position", "-3000,-3000", "--audio-driver", "Dummy", "--",
                      "--server", $"127.0.0.1:{server.LoginPort}", "--login", $"{Name}:{LoginFlow.SyntheticSecret}",
-                     "--orient", "portrait", "--size", "360x780", "--shot", shot, "--shot-after", "12",
+                     "--orient", Environment.GetEnvironmentVariable("LOD_ROLE_ORIENT") ?? "portrait",
+                     Environment.GetEnvironmentVariable("LOD_ROLE_WINDOW") is { Length: > 0 } ? "--window" : "--size",
+                     Environment.GetEnvironmentVariable("LOD_ROLE_WINDOW") is { Length: > 0 } device ? device : Environment.GetEnvironmentVariable("LOD_ROLE_SIZE") ?? "360x780",
+                     "--shot", shot, "--shot-after", "12",
                  }.Concat((Environment.GetEnvironmentVariable("LOD_ROLE_ARGS") ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries)))
         {
             start.ArgumentList.Add(argument);

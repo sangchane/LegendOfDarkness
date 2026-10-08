@@ -154,6 +154,13 @@ public partial class Main : Control
             DisplayServer.WindowSetSize(PortraitSize * 5 / 4);
         }
 
+        // --window WxH: 설계 크기는 그대로 두고 창만 그 크기로 — 실제 기종(아이패드 768x1024 · 아이폰 SE 375x667 …)이 설계 크기를
+        // 늘여 쓰는 모습을 찍으려고(--size 는 설계 크기 자체를 바꿔 기종 흉내가 아니다, 2026-10-08 반응형 리뷰).
+        if (SizeFromCommandLine("--window") is { } device)
+        {
+            DisplayServer.WindowSetSize(device);
+        }
+
         Theme = BuildTheme();
 
         // 화면 키보드·키보드 치우기·목록 끌기 — 화면마다 따로 하지 않고 여기 한 곳에서(TouchInput).
@@ -240,9 +247,9 @@ public partial class Main : Control
     }
 
     /// <summary>The screen size a run asks for, as <c>--size 360x780</c>, or nothing for the default.</summary>
-    private static Vector2I? SizeFromCommandLine()
+    private static Vector2I? SizeFromCommandLine(string flag = "--size")
     {
-        string given = Flag("--size");
+        string given = Flag(flag);
         string[] parts = given.Split('x', 'X');
 
         return parts.Length == 2

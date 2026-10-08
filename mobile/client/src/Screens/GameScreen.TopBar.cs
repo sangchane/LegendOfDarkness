@@ -147,6 +147,16 @@ public partial class GameScreen : Control
             row.AddChild(_minimap);
             row.MoveChild(_minimap, 0);
 
+            // 넓은 세로 화면은 미니맵을 폰 크기로 두고 남는 자리를 미니맵과 내 판 사이로.
+            if (GetViewportRect().Size.X > WideFrom)
+            {
+                _minimap.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
+                _minimap.CustomMinimumSize = _minimap.CustomMinimumSize with { X = MinimapMost };
+                Control gap = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
+                row.AddChild(gap);
+                row.MoveChild(gap, 1);
+            }
+
             HBoxContainer second = new() { MouseFilter = MouseFilterEnum.Ignore };
             second.AddThemeConstantOverride("separation", Main.Gutter);
             middle.SizeFlagsHorizontal = SizeFlags.ExpandFill;

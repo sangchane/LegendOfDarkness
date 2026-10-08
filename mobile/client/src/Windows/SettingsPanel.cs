@@ -88,7 +88,7 @@ public sealed partial class SettingsPanel : PanelContainer
         ShowBotLevel(0);
 
         // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
-        Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(88, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
+        Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(76, SelectHeight), SizeFlagsVertical = SizeFlags.ShrinkCenter, FocusMode = FocusModeEnum.None };
         Greybox.Plain(Exit);
 
         Button autoTab = WindowFrame.IconButton(GlyphKind.Auto, "자동", tab: true, width: 64);
@@ -132,9 +132,12 @@ public sealed partial class SettingsPanel : PanelContainer
         {
             // ScrollContainer 는 속의 너비를 제 최소 크기로 올려 보내지 않는다 — 안 주면 가로 폭이 0 이 돼 창이 통째로 사라진다
             // (실측, 2026-09-26). 세로와 같은 내용 너비를 그대로 준다.
+            // 높이는 세로처럼 남는 만큼(FitPortrait) — 아이패드 가로(논리 높이 600)에서 두 줄만 보이고 굴려야 했다(2026-10-08 반응형).
             ScrollContainer scroll = new() { CustomMinimumSize = new Vector2(340, 200), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
             scroll.AddChild(pages);
             inside.AddChild(scroll);
+            _portraitScroll = scroll;
+            _portraitPages = pages;
         }
 
         margin.AddChild(inside);
@@ -163,7 +166,7 @@ public sealed partial class SettingsPanel : PanelContainer
         float top = _portraitScroll.GlobalPosition.Y > 0 ? _portraitScroll.GlobalPosition.Y : 290;
         float room = GetViewportRect().Size.Y - top - Main.Gutter * 3;
         Vector2 inner = _portraitPages.GetCombinedMinimumSize();
-        _portraitScroll.CustomMinimumSize = new Vector2(inner.X, Mathf.Min(inner.Y, Mathf.Max(200, room)));
+        _portraitScroll.CustomMinimumSize = new Vector2(Main.Portrait ? inner.X : Mathf.Max(340, inner.X), Mathf.Min(inner.Y, Mathf.Max(200, room)));
     }
 
     public override void _Ready()
@@ -254,8 +257,9 @@ public sealed partial class SettingsPanel : PanelContainer
     private const int NameWidth = 84;
     public const int FigureWidth = 64;
     public const int FigureSize = 16;
-    private const int SelectWidth = 108;
-    private const int SelectHeight = 40;
+    // 단추는 둘레(스위치 28 · 게이지 10)에 맞게 낮게(사용자 2026-10-08 「버튼 크기만 좀 주변 컨포넌트에 맞게 줄이면 되겠다」).
+    private const int SelectWidth = 96;
+    private const int SelectHeight = 36;
     private readonly PercentSelect _curse;
     private readonly PercentSelect _heal;
     private readonly PercentSelect _groupHeal;
