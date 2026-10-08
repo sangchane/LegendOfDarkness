@@ -77,12 +77,55 @@ public sealed class AuctionTests : IDisposable
 
         // 사건 기록 — 조작 넷이 차례로, 모두 같은 seq 의 commit.
         var lines = Events(server);
-        Assert.Equal(["post", "buyout", "take", "take"], lines.Where(line => (long)line["seq"]! > 0 && (string?)line["ev"] is not ("commit" or "abort"))
+        Assert.Equal(["post", "buyout", "take", "take"], lines.Where(line => (long)line["seq"]! > 0 && (string?)line["ev"] is not ("commit" or "abort" or "saved"))
             .Select(line => (string)line["ev"]!).ToArray());
         foreach (long seq in lines.Select(line => (long)line["seq"]!).Where(seq => seq > 0).Distinct())
         {
             Assert.Contains(lines, line => (long)line["seq"]! == seq && (string?)line["ev"] == "commit");
         }
+
+        // 금화가 움직인 조작마다 캐릭터 파일에 실제로 들어간 금화(saved)가 있고, 하기 전에 셈한 goldAfter 와 같다(리뷰 2026-10-08 #15).
+        foreach (JsonNode start in lines.Where(line => line["goldAfter"] is not null && (long)line["gold"]! > 0))
+        {
+            JsonNode saved = Assert.Single(lines, line => (string?)line["ev"] == "saved" && (long)line["seq"]! == (long)start["seq"]!);
+            Assert.Equal((long)start["goldAfter"]!, (long)saved["goldSaved"]!);
+        }
+    }
+
+    /// <summary>
+    /// 경매장 파일을 못 쓴 조작의 commit 은 다음에 파일을 쓸 때 적힌다. 끝난 거래가 「끊긴 조작」으로 남으면 런북대로 되살려 하나가 더 생긴다.
+    /// 리뷰 2026-10-08 #6 이 고친 것(경매장 파일은 썼는데 commit 줄만 못 쓴 것 · 다시 적다 일부만 못 쓴 것)은 밖에서 만들 수 없어
+    /// (조작의 첫 줄과 commit 이 같은 기록 파일에 몇 ms 사이로 쓰인다) 여기서는 Pending 길 자체만 지킨다.
+    /// </summary>
+    [Fact]
+    public async Task A_commit_held_back_by_a_failed_book_save_is_written_with_the_next_save()
+    {
+        if (OperatingSystem.IsWindows())
+            return; // 서버는 맥·리눅스에서 돈다
+
+        using IsolatedHadesServer server = Ready(("aucpend", 100_000, 2));
+        WorldClient seller = Pump(await Login(server, "aucpend"));
+        await Until(() => seller.Pack.Count(item => item.Name == Sword) == 2 && seller.Vitals?.Gold == 100_000, "가방·금화가 오지 않았습니다.");
+
+        // 경매장 파일 옆에 쓰는 임시 파일 자리를 폴더로 막는다 — 캐릭터 저장·사건 기록은 되고 경매장 파일만 못 쓴다.
+        string blocker = BookPath(server) + ".writing";
+        Directory.CreateDirectory(blocker);
+        AuctionDone first = await Act(seller, () => seller.AuctionPostAsync(1, Start, BuyoutPrice, 12, _deadline.Token));
+        Assert.True(first.Ok, first.Message);
+        long firstSeq = (long)Events(server).First(line => (string?)line["ev"] == "post")["seq"]!;
+        Assert.DoesNotContain(Events(server), line => (long)line["seq"]! == firstSeq && (string?)line["ev"] == "commit");
+
+        Directory.Delete(blocker);
+        AuctionDone second = await Act(seller, () => seller.AuctionPostAsync(2, Start, BuyoutPrice, 12, _deadline.Token));
+        Assert.True(second.Ok, second.Message);
+
+        var lines = Events(server);
+        foreach (long seq in lines.Where(line => (string?)line["ev"] == "post").Select(line => (long)line["seq"]!))
+        {
+            Assert.Single(lines, line => (long)line["seq"]! == seq && (string?)line["ev"] == "commit");
+        }
+
+        Assert.Equal(2, Book(server)["Listings"]!.AsArray().Count);
     }
 
     [Fact]

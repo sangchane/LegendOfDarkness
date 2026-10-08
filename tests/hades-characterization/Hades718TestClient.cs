@@ -136,6 +136,20 @@ public sealed class Hades718TestClient : IDisposable
         Send(command, [ordinal, .. packet.Data]);
     }
 
+    /// <summary>Reads a frame the session cipher covers and returns its plain payload. The cipher is an XOR, so it undoes itself.</summary>
+    public byte[] ReceiveSecured()
+    {
+        SecurityProvider cipher = _encryption
+            ?? throw new InvalidOperationException("The server has not handed out its parameters yet; call UseEncryption first.");
+
+        PacketFrame frame = Receive();
+        byte[] body = [frame.Command, .. frame.Payload];
+        NetworkPacket packet = new(body, body.Length);
+        cipher.Transform(packet);
+
+        return packet.Data;
+    }
+
     /// <summary>
     /// Reads a lobby or game redirect. The address arrives with its bytes reversed, and the port follows in
     /// network order.

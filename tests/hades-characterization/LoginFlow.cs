@@ -32,6 +32,7 @@ internal static class LoginFlow
     private const byte CreateAccountCommand = 0x02;
     private const byte CreateCharacterCommand = 0x04;
     private const byte LoginCommand = 0x03;
+    private const byte ChangePasswordCommand = 0x26;
 
     // ClientFormat00: version 718 as a big-endian ushort, then the two bytes the 7.18 client always sends.
     private static readonly byte[] ClientVersionPayload = [0x02, 0xCE, 0x4C, 0x4B];
@@ -172,6 +173,14 @@ internal static class LoginFlow
         $"{name} : {ServerWelcome}";
 
     private static string Describe(string direction, byte command) => $"{direction} 0x{command:X2}";
+
+    /// <summary>비밀번호 바꾸기(0x26). 서버 답(메시지 상자)의 종류 바이트 — 0x00 이면 바뀜, 그 밖은 거절.</summary>
+    public static byte ChangePassword(int loginPort, string name, string current, string next)
+    {
+        using LoginSession session = OpenSession(loginPort);
+        session.Client.SendSecured(ChangePasswordCommand, ordinal: 0, [.. LengthPrefixed(name), .. LengthPrefixed(current), .. LengthPrefixed(next)]);
+        return session.Client.ReceiveSecured()[0];
+    }
 
     private static byte[] Credentials() => Credentials(SyntheticName, SyntheticSecret);
 

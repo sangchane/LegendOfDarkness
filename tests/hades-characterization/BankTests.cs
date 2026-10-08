@@ -235,6 +235,20 @@ public sealed class BankTests : IDisposable
         Assert.Contains("맡기신 물건이 없습니다", world.Talking!.What);
     }
 
+    /// <summary>
+    /// 리뷰 2026-10-08 #3: 은행이 자기만의 자물쇠(<c>lock (bank)</c>)를 잡아, 손 금화를 뺀 뒤 은행에 더하기 전에 주기 저장(다른 스레드,
+    /// 캐릭터 자물쇠)이 끼어 그 사이를 파일에 남길 수 있었다. 밖에서는 그 틈을 매번 재현할 수 없어(주기 저장 45초) 계약을 본다 —
+    /// 은행 일은 저장·경매와 같은 캐릭터 자물쇠 안에서 한다.
+    /// </summary>
+    [Fact]
+    public void Bank_work_holds_the_same_character_lock_as_saving_and_the_auction()
+    {
+        string script = File.ReadAllText(Path.Combine(HadesWorkspace.ServerDataDirectory, "scripts", "Mundanes", "Banker.cs"));
+
+        Assert.Contains("lock (AislingStorage.LockFor(aisling.Username))", script);
+        Assert.DoesNotContain("lock (bank)", script);
+    }
+
     // ---- 도우미 ----
 
     private IsolatedHadesServer Ready(string who, Action<JsonNode> seed)
