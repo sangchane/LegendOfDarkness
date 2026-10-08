@@ -10,7 +10,11 @@
   · 끊긴 조작 — seq 가 있는데 commit 도 abort 도 없는 것(07 R1). 되살리기(auction-revert.py --give) 전에 auction.json 과 캐릭터 파일로
     정말 빠졌는지 먼저 본다 — 경매장 파일을 늦게 쓴 조작은 다음 저장 때 commit 이 적힌다.
   · 받기에서 캐릭터를 저장하지 못한 것(unsaved) — 다음 주기 저장에 들어갔을 수 있다, 캐릭터 파일을 확인한다
-  · 금화가 기록과 맞나 — 올림·입찰·즉시 구매·취소는 goldBefore − goldAfter = gold, 받기는 goldAfter − goldBefore = gold (INV-2 대신 보는 것)
+  · 예상 산술 — 올림·입찰·즉시 구매·취소는 goldBefore − goldAfter = gold, 받기는 goldAfter − goldBefore = gold. 둘 다 하기 전에 셈한
+    예상이라 이것이 맞아도 저장이 맞다는 뜻은 아니다
+  · 예상과 저장값 — 캐릭터를 저장한 직후의 saved 줄(goldSaved = 손 + 은행)이 commit 된 조작의 goldAfter 와 같은가(리뷰 2026-10-08 #15).
+    saved 줄이 없는 것(이 기록 전의 옛 줄, 또는 그 줄을 못 쓴 것)은 따로 센다. 둘 다 총재화 보존의 증명은 아니다 — 의심되면 캐릭터 파일을 본다
+  · 읽지 못한 줄 — 파일·줄 번호. 꺼지며 반만 쓰인 마지막 줄도 여기 나온다
   · 지금 올린 것·받을 것, 맡긴 금화, 거래된 금화와 수수료(5%)
 """
 from __future__ import annotations
@@ -36,17 +40,18 @@ def bots(config: str | None) -> set[str]:
     return names
 
 
-def lines(folder: str) -> list[dict]:
-    events = []
+def lines(folder: str) -> tuple[list[dict], list[tuple[str, int]]]:
+    """사건 줄과 읽지 못한 줄(파일, 줄 번호) — 조용히 건너뛰면 기록이 깨진 것도 보고서에서 사라진다."""
+    events, bad = [], []
     for name in sorted(os.listdir(folder)):
         if name.startswith("events-") and name.endswith(".jsonl"):
-            with open(os.path.join(folder, name), encoding="utf-8") as file:
-                for line in file:
+            with open(os.path.join(folder, name), encoding="utf-8", errors="replace") as file:
+                for number, line in enumerate(file, 1):
                     try:
                         events.append(json.loads(line))
                     except json.JSONDecodeError:
-                        pass   # 꺼지며 반만 쓰인 줄
-    return events
+                        bad.append((name, number))
+    return events, bad
 
 
 def main() -> None:
@@ -56,7 +61,7 @@ def main() -> None:
     if not os.path.isdir(folder):
         sys.exit(f"경매장 폴더가 없습니다: {folder}")
     robots = bots(config)
-    events = lines(folder)
+    events, bad = lines(folder)
 
     def kind(who: str | None) -> str:
         return "봇" if (who or "").lower() in robots else "사람"
@@ -66,6 +71,7 @@ def main() -> None:
     starts: dict[int, dict] = {}
     wrong = []
     unsaved = []
+    saved: dict[int, int] = {}
     traded = cut = 0
     seller: dict[int, str] = {}
     active: Counter = Counter()
@@ -73,6 +79,9 @@ def main() -> None:
 
     for event in events:
         ev, seq, who = event.get("ev"), event.get("seq", 0), event.get("who")
+        if ev == "saved":
+            saved[seq] = event.get("goldSaved")
+            continue
         if ev in ("commit", "abort", "unsaved"):
             ends[seq] = ev
             if ev == "unsaved":
@@ -100,6 +109,11 @@ def main() -> None:
             active[seller.pop(listing)] -= 1
 
     broken = [event for seq, event in starts.items() if seq not in ends]
+    # 금화가 움직이고 끝난(commit) 조작 — 저장된 금화가 예상(goldAfter)과 같아야 한다.
+    moved = [event for seq, event in starts.items()
+             if ends.get(seq) == "commit" and event.get("goldAfter") is not None and event.get("gold", 0) > 0]
+    drift = [event for event in moved if event["seq"] in saved and saved[event["seq"]] != event["goldAfter"]]
+    unrecorded = [event for event in moved if event["seq"] not in saved]
     print(f"사건 {len(events)}줄 · 봇 이름 {len(robots)}개")
     for (ev, who), n in sorted(counts.items()):
         print(f"  {ev:8} {who:2} {n}")
@@ -109,7 +123,13 @@ def main() -> None:
     print(f"봇 올림 최대: {max(bot_most.values(), default=0)}" + (f" — 5 넘음: {over}" if over else ""))
     print(f"거래된 금화 {traded:,}전 · 수수료 {cut:,}전")
     print(f"끊긴 조작(commit·abort 없음): {len(broken)}" + "".join(f"\n  seq {e['seq']} {e.get('ev')} {e.get('who')} {e.get('item')} {e.get('gold')}" for e in broken))
-    print(f"금화가 기록과 다른 줄: {len(wrong)}" + "".join(f"\n  seq {e.get('seq')} {e.get('ev')} {e.get('who')}" for e in wrong))
+    print(f"예상 산술이 어긋난 줄: {len(wrong)}" + "".join(f"\n  seq {e.get('seq')} {e.get('ev')} {e.get('who')}" for e in wrong))
+    print(f"예상과 저장값이 다른 조작: {len(drift)}" + "".join(
+        f"\n  seq {e['seq']} {e.get('ev')} {e.get('who')} 예상 {e['goldAfter']:,} · 저장 {saved[e['seq']]:,}" for e in drift))
+    if drift:
+        print("  ↳ 그 사이 다른 일(경매 밖에서 들어온 금화 등)로 달라졌을 수도 있다 — 캐릭터 파일·활동 기록으로 확인한 뒤에만 손댄다")
+    print(f"저장값 기록이 없는 조작(옛 줄이거나 saved 줄을 못 씀): {len(unrecorded)}")
+    print(f"읽지 못한 줄: {len(bad)}" + "".join(f"\n  {name}:{number}" for name, number in bad))
     print(f"받기 뒤 캐릭터 저장 못 함: {len(unsaved)}" + "".join(f"\n  seq {e.get('seq')} {e.get('who')} — 캐릭터 파일의 금화 + 은행(BankManager.Gold)을 보고 빠졌을 때만 되살린다(넘친 금화는 은행으로 간다)" for e in unsaved))
     if broken:
         print("  ↳ 끊긴 조작은 auction.json 의 Listings·Claims 와 캐릭터 파일로 정말 빠졌는지 본 뒤에만 --give 로 되살린다(07 R1)")
@@ -123,7 +143,7 @@ def main() -> None:
         owed = sum(int(one.get("Gold") or 0) for one in claims)
         print(f"지금 올린 것 {len(listings)} (봇 {sum(kind(one['Seller']) == '봇' for one in listings)}) · 받을 것 {len(claims)} · 맡긴 금화 {held:,} · 받을 금화 {owed:,}")
 
-    if broken or wrong or over or unsaved:
+    if broken or wrong or drift or bad or over or unsaved:
         sys.exit(1)
 
 
