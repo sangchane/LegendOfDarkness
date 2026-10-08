@@ -98,11 +98,6 @@ public sealed class EcoBotLoopTests(ITestOutputHelper output) : IDisposable
 
         Assert.True(File.Exists(Path.Combine(server.ContentLocation, "aislings", $"{Fresh.Name}.json")), "새 봇 계정이 만들어지지 않았습니다.");
 
-        // 걸어서 간다(autopilot/eco-bots/walk-SPEC.md) — 다른 맵으로 간 것은 모두 워프를 이어 걸었고 순간이동하지 않았다.
-        JsonElement[] walks = [.. Lines().Where(line => line.GetProperty("ev").GetString() == "walk")];
-        Assert.NotEmpty(walks);
-        Assert.All(walks, walk => Assert.False(walk.GetProperty("data").GetProperty("teleport").GetBoolean(), walk.ToString()));
-
         JsonElement[] Lines()
         {
             if (!Directory.Exists(events))

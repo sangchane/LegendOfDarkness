@@ -87,7 +87,7 @@ bot_upload() {
 
     remote "mkdir -p $BOT_REMOTE/app $BOT_REMOTE/world"
     rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --exclude 'companion-bot*.json' "$out/" "$HOST:$BOT_REMOTE/app/"
-    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --include 'map*.txt' --include 'guide.txt' --include 'eco-grounds.txt' --include 'class-kit.txt' --include 'links.txt' --exclude '*' \
+    rsync -az --partial --timeout=60 --delete -e "ssh -i $KEY" --include 'map*.txt' --include 'guide.txt' --include 'eco-grounds.txt' --include 'class-kit.txt' --exclude '*' \
         "$ROOT/mobile/client/assets/world/" "$HOST:$BOT_REMOTE/world/"
     rm -rf "$out"
 
