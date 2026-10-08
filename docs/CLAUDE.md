@@ -13,6 +13,7 @@
 - **기능 39개가 서버·모바일·원작 중 어디에 있나(패킷 골격 포함): `docs/feature-map.md`** — 새 기능을 만들기 전에 여기부터
 - **원작이 어떻게 했는지 막혔을 때 — 어디를 보나: `docs/where-the-answers-are.md`** (`scripts/find-in-sources.ps1` 한 줄로 참고 저장소 16개 검색)
 - **괴물이 어떻게 움직이고 싸우나(선공·이동·공격): `docs/monster-behaviour.md`**
+- **아이템 값이 서클마다 어떤가(사냥 금화 대비, 5.99 값 누르기): `docs/item-prices-by-circle.md`** (`scripts/gen/items/build-price-cap.py`)
 - **원작 기술·마법·퀘스트·아이템(선행 관계 그래프): `docs/game-data.md`** (`data/game-data/*.json`, Obsidian 노트 2,969장 — 맵·워프·NPC까지)
 - **Hades 에 뭐가 이미 있나(만들 것 vs 채울 것): `docs/what-hades-already-has.md`** — 콘텐츠를 이식하기 전에 **여기부터**. 그래프·볼트에 묻는 법도 여기 있다
 - **2023 기술·마법표(일반·어빌리티 539행): `docs/skill-spell-2023.md`** — 사용자 제공 워크북의 별도 계보; Hades 613개 표와 섞지 않는다
