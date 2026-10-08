@@ -29,6 +29,22 @@ public sealed class PagingTests
         Assert.All(second.Skip(2), Assert.Null);
     }
 
+    /// <summary>
+    /// 가방은 150칸만큼 넘겨진다. 물건이 40개면 3장부터는 빈 칸이어야 하는데, 물건 수로 장을 되돌려 2장의 물건이 3~7장에
+    /// 그대로 보였다(사용자 2026-10-08).
+    /// </summary>
+    [Fact]
+    public void A_page_past_the_things_is_all_empty_places()
+    {
+        string[] things = [.. Enumerable.Range(1, 40).Select(number => $"물건 {number}")];
+
+        Assert.All(Paging.PlacesOn(things, 2, 24), Assert.Null);
+        Assert.All(Paging.PlacesOn(things, 6, 24), Assert.Null);
+        Assert.Equal("물건 25", Paging.PlacesOn(things, 1, 24)[0]);
+        // 물건 수로 되돌리는 것은 Page 가 그대로 한다(기술 고리).
+        Assert.Equal("물건 25", Paging.Page(things, 2, 24)[0]);
+    }
+
     [Fact]
     public void Turning_goes_round_both_ways()
     {

@@ -366,7 +366,7 @@ public sealed partial class PackPanel : PanelContainer
         _carriedCount = System.Math.Max(carried.Count, PackSlots);
         _page = Paging.Kept(_page, _carriedCount, _perPage);
         _pageNumber.Text = $"{_page + 1}/{Paging.Pages(_carriedCount, _perPage)}";
-        Fill(_rows, Paging.Page(carried, _page, _perPage));
+        Fill(_rows, Paging.PlacesOn(carried, _page, _perPage));
 
         _lastCarried = all.ToArray();
         _shownWorn = Worn.ToArray();

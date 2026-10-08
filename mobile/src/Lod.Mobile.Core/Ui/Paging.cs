@@ -23,10 +23,13 @@ public static class Paging
         Math.Clamp((int)MathF.Floor((room - rest + gap) / (row + gap)), 1, most);
 
     /// <summary>What is on a page, in order, padded with nothing so every page has the same number of places.</summary>
-    public static IReadOnlyList<T?> Page<T>(IReadOnlyList<T> all, int page, int perPage) where T : class
-    {
-        int first = Kept(page, all.Count, perPage) * perPage;
+    public static IReadOnlyList<T?> Page<T>(IReadOnlyList<T> all, int page, int perPage) where T : class =>
+        PlacesOn(all, Kept(page, all.Count, perPage), perPage);
 
-        return [.. Enumerable.Range(first, perPage).Select(index => index < all.Count ? all[index] : null)];
-    }
+    /// <summary>
+    /// 그 장의 자리 그대로 — 물건이 거기까지 없으면 빈 자리뿐. <see cref="Page" /> 처럼 물건 수로 장을 되돌리지 않는다: 가방은 150칸만큼
+    /// 넘겨지는데 되돌리면 2장의 물건이 3~7장에 보였다(사용자 2026-10-08).
+    /// </summary>
+    public static IReadOnlyList<T?> PlacesOn<T>(IReadOnlyList<T> all, int page, int perPage) where T : class =>
+        [.. Enumerable.Range(Math.Max(0, page) * perPage, perPage).Select(index => index < all.Count ? all[index] : null)];
 }
