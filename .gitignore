@@ -73,6 +73,9 @@ data/skill-spell-2023/graph/
 !.agents/skills/setup/
 mobile/bots/Lod.CompanionBot/companion-bot.json
 mobile/bots/Lod.EcoBots/eco-bots.json
+mobile/bots/Lod.EcoBots/eco-unlisted.json
 
 # 폰에서 가져온 앱 기록(scripts/ops/ios-build.sh logs) — 계정 이름이 들어 있다
 out/ios-logs/
+# 작업 산출물(사진·기록·확인용 로그인 정보 credential 이 섞인다) — 통째로 올리지 않는다(보안 리뷰 2026-10-08).
+out/
