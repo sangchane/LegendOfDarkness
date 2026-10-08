@@ -40,10 +40,10 @@ public partial class GameScreen : Control
     private bool _shopPreviewed;
 
     /// <summary>체력·마력 막대의 높이 — 숫자를 막대 안에 얹으므로(2026-09-27) 글자 한 줄이 들 만큼.</summary>
-    private const int GaugeHeight = 16;
+    private const int GaugeHeight = 14;
 
     /// <summary>막대 안 숫자의 글자 크기. 작게 두어(사용자 지시) 막대를 더한 만큼 판이 넓어지지 않게 한다.</summary>
-    private const int GaugeFontSize = Greybox.SmallText;
+    private const int GaugeFontSize = 11;
 
     /// <summary>
     /// 막대 폭 — 전의 막대(세로 48 · 가로 72)와 옆 숫자("99999 / 99999" 약 75)를 합친 것보다 좁게, "99999/99999" 가 안에 들게
