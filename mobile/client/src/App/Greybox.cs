@@ -74,6 +74,63 @@ public static class Greybox
     /// <summary>Room between a box's edge and the picture, words or number inside it — nothing touches an edge.</summary>
     public const int Inset = 8;
 
+    /// <summary>Height of a slider's groove — a gauge a thumb can see (6 read as a hairline, 사용자 2026-10-08 「게이지도 높이 조금만 키워」).</summary>
+    public const int GrooveHeight = 10;
+
+    /// <summary>
+    /// A slider's groove: the whole track in the cell colour, the filled part in <paramref name="fill" />, both <see cref="GrooveHeight" />
+    /// tall with round ends — the potion gauges and the settings sliders share it.
+    /// </summary>
+    public static void Groove(Slider slider, Color fill)
+    {
+        StyleBoxFlat groove = Rounded(Surface(), GrooveHeight / 2);
+        StyleBoxFlat filled = Rounded(Fill(fill), GrooveHeight / 2);
+        foreach (StyleBoxFlat box in new[] { groove, filled })
+        {
+            box.ContentMarginTop = box.ContentMarginBottom = GrooveHeight / 2;
+        }
+
+        slider.AddThemeStyleboxOverride("slider", groove);
+        slider.AddThemeStyleboxOverride("grabber_area", filled);
+        slider.AddThemeStyleboxOverride("grabber_area_highlight", filled);
+    }
+
+    /// <summary>
+    /// A switch's picture, 52×28 — a pill with a knob, lit when on. The engine's own was a small thing beside the big buttons
+    /// (사용자 2026-10-08 「라디오박스 … 가로 좀 넓히고」). Drawn with soft edges so it stays smooth at any scale.
+    /// </summary>
+    public static Texture2D SwitchIcon(bool on, bool disabled = false)
+    {
+        const int wide = 52, high = 28;
+        const float r = high / 2f;
+        Color track = on ? Accent : Cell, edge = on ? Accent : Muted, knob = on ? Text : Muted;
+        float fade = disabled ? 0.4f : 1f;
+        float knobX = on ? wide - r : r;
+        Image image = Image.CreateEmpty(wide, high, false, Image.Format.Rgba8);
+
+        for (int y = 0; y < high; y++)
+        {
+            for (int x = 0; x < wide; x++)
+            {
+                float px = x + 0.5f, py = y + 0.5f;
+                float d = new Vector2(px, py).DistanceTo(new Vector2(Mathf.Clamp(px, r, wide - r), r)) - (r - 0.5f);
+                float cover = Mathf.Clamp(0.5f - d, 0, 1);
+                if (cover <= 0)
+                {
+                    image.SetPixel(x, y, Colors.Transparent);
+                    continue;
+                }
+
+                Color paint = d > -1.5f ? edge : track;
+                float knobCover = Mathf.Clamp(0.5f - (new Vector2(px, py).DistanceTo(new Vector2(knobX, r)) - (r - 4)), 0, 1);
+                paint = paint.Lerp(knob, knobCover);
+                image.SetPixel(x, y, paint with { A = cover * fade });
+            }
+        }
+
+        return ImageTexture.CreateFromImage(image);
+    }
+
     /// <summary>The same box with <see cref="Round" /> corners (or <paramref name="radius" />).</summary>
     public static StyleBoxFlat Rounded(StyleBoxFlat box, int radius = Round)
     {

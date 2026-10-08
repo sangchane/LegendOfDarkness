@@ -41,15 +41,7 @@ public sealed partial class PotionGauge : HBoxContainer
 
         // 테마의 기본 홈은 어두운 속에 묻혀 채워진 쪽만 보였다 — 홈 전체를 칸 색으로, 채운 쪽을 이 포션의 색으로
         // (SettingsPanel.SliderRow 와 같은 결).
-        StyleBoxFlat groove = Greybox.Surface();
-        groove.ContentMarginTop = 3;
-        groove.ContentMarginBottom = 3;
-        StyleBoxFlat filled = Greybox.Fill(fill);
-        filled.ContentMarginTop = 3;
-        filled.ContentMarginBottom = 3;
-        _slider.AddThemeStyleboxOverride("slider", groove);
-        _slider.AddThemeStyleboxOverride("grabber_area", filled);
-        _slider.AddThemeStyleboxOverride("grabber_area_highlight", filled);
+        Greybox.Groove(_slider, fill);
 
         HBoxContainer ticks = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         for (int percent = Minimum; percent <= Maximum; percent += Step)
@@ -73,11 +65,11 @@ public sealed partial class PotionGauge : HBoxContainer
         _value = new Label
         {
             Text = $"{shown}%",
-            CustomMinimumSize = new Vector2(56, Main.TouchMinimum),
+            CustomMinimumSize = new Vector2(SettingsPanel.FigureWidth, Main.TouchMinimum),
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Center
         };
-        _value.AddThemeFontSizeOverride("font_size", 20);
+        _value.AddThemeFontSizeOverride("font_size", SettingsPanel.FigureSize);
         _value.AddThemeColorOverride("font_color", Greybox.Text);
 
         _slider.ValueChanged += now =>

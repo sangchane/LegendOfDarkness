@@ -83,6 +83,10 @@ public partial class Main : Control
             if (state == "focus") field.BorderColor = Greybox.Muted;
             theme.SetStylebox(state, "LineEdit", field);
         }
+        theme.SetIcon("checked", "CheckButton", Greybox.SwitchIcon(true));
+        theme.SetIcon("unchecked", "CheckButton", Greybox.SwitchIcon(false));
+        theme.SetIcon("checked_disabled", "CheckButton", Greybox.SwitchIcon(true, disabled: true));
+        theme.SetIcon("unchecked_disabled", "CheckButton", Greybox.SwitchIcon(false, disabled: true));
         theme.SetIcon("checked", "CheckBox", Greybox.CheckIcon(true));
         theme.SetIcon("unchecked", "CheckBox", Greybox.CheckIcon(false));
 

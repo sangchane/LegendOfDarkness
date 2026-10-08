@@ -34,7 +34,8 @@ public sealed partial class SettingsPanel : PanelContainer
         VBoxContainer auto = Page();
         PotionGauge health = new(Main.HealthPotion.Percent, Greybox.Health);
         health.Changed += percent => Main.SetPotions(Main.HealthPotion with { Percent = percent }, Main.ManaPotion);
-        auto.AddChild(Caption("자동 포션 — 이하가 되면 저절로 마신다"));
+        auto.AddChild(Heading("자동 포션"));
+        auto.AddChild(Caption("이하가 되면 저절로 마신다"));
         auto.AddChild(Row("체력 포션", health));
 
         PotionGauge mana = new(Main.ManaPotion.Percent, Greybox.Mana);
@@ -45,7 +46,6 @@ public sealed partial class SettingsPanel : PanelContainer
         Control ceiling = SliderRow("마력 상한", 0, 5000, 100, Main.ManaPotion.Ceiling,
             value => value == 0 ? "없음" : $"{value}까지",
             value => Main.SetPotions(Main.HealthPotion, Main.ManaPotion with { Ceiling = value }));
-        ceiling.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
         auto.AddChild(ceiling);
         auto.AddChild(BuildAutoHunt());
 
@@ -62,14 +62,10 @@ public sealed partial class SettingsPanel : PanelContainer
         bot.AddChild(BotRow("봇", Companion));
 
         // 주인과 몇 칸 넘게 떨어지면 따라올지 — 자동 사냥 반경처럼 직접(사용자, 2026-10-03).
-        Control follow = SliderRow("따라가기", 1, 10, 1, Main.BotFollow, value => $"{value}칸", value => Order(follow: value));
-        follow.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
-        bot.AddChild(follow);
+        bot.AddChild(SliderRow("따라가기", 1, 10, 1, Main.BotFollow, value => $"{value}칸", value => Order(follow: value)));
 
         // 주인 체력이 몇 % 이하면 회복할지 — 자동 포션처럼(사용자, 2026-10-05).
-        Control healAt = SliderRow("주인 회복", 10, 90, 10, Main.BotHealPercent, value => $"{value}% 이하", value => Order(healPercent: value));
-        healAt.AddChild(new Control { CustomMinimumSize = new Vector2(Main.Gutter, 0) });
-        bot.AddChild(healAt);
+        bot.AddChild(SliderRow("주인 회복", 10, 90, 10, Main.BotHealPercent, value => $"{value}% 이하", value => Order(healPercent: value)));
 
         // 마법사·성직자 — 셀렉트는 마법 이름 그대로(고른 적 없으면 봇이 배운 가장 센 것을 보인다, ShowBotLevel), 켬은 두 칸씩.
         bot.AddChild(Heading("마법사"));
@@ -92,11 +88,11 @@ public sealed partial class SettingsPanel : PanelContainer
         ShowBotLevel(0);
 
         // [로그아웃] 은 탭이 아니라 제목 줄에 — 어느 탭에서나 한 번에 닿는다(사용자, 2026-09-26: 종료가 너무 깊고 로그아웃이 안 보인다).
-        Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(76, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
+        Exit = new Button { Text = "로그아웃", CustomMinimumSize = new Vector2(88, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
         Greybox.Plain(Exit);
 
-        Button autoTab = WindowFrame.IconButton(GlyphKind.Auto, "자동", tab: true, width: 52);
-        Button botTab = WindowFrame.IconButton(GlyphKind.Bot, "봇", tab: true, width: 52);
+        Button autoTab = WindowFrame.IconButton(GlyphKind.Auto, "자동", tab: true, width: 64);
+        Button botTab = WindowFrame.IconButton(GlyphKind.Bot, "봇", tab: true, width: 64);
         _pages["자동"] = (autoTab, auto);
         _pages["봇"] = (botTab, bot);
 
@@ -252,8 +248,14 @@ public sealed partial class SettingsPanel : PanelContainer
         }
     }
 
+    // 설정 창 한 벌의 치수(사용자 2026-10-08 「전체적으로 밸런스가 엉망이야 컴포넌트끼리」) — 이름 칸은 한 폭이라 게이지·슬라이더가
+    // 같은 자리에서 시작하고, 값 칸도 한 폭·한 크기라 오른쪽 끝이 맞는다. 고르기 칸은 회복 기술(96)·봇 탭(108)이 달랐다 — 봇 탭은
+    // 한 줄에 둘이 들어가야 해 108 보다 넓히면 세로 360 창이 화면 밖으로 밀린다(128 로 해 보고 밀림).
+    private const int NameWidth = 84;
+    public const int FigureWidth = 64;
+    public const int FigureSize = 16;
     private const int SelectWidth = 108;
-    private const int SelectHeight = 36;
+    private const int SelectHeight = 40;
     private readonly PercentSelect _curse;
     private readonly PercentSelect _heal;
     private readonly PercentSelect _groupHeal;
@@ -325,7 +327,7 @@ public sealed partial class SettingsPanel : PanelContainer
         rows.AddChild(SliderRow("사냥 반경", 4, 20, 1, Main.AutoHuntSettings.Radius, value => $"{value}칸",
             value => Main.SetAutoHuntSettings(Main.AutoHuntSettings with { Radius = value })));
 
-        PercentSelect heal = new(Main.AutoHuntSettings.HealPercent, this);
+        PercentSelect heal = new(Main.AutoHuntSettings.HealPercent, this) { CustomMinimumSize = new Vector2(SelectWidth, SelectHeight) };
         heal.Changed += value => Main.SetAutoHuntSettings(Main.AutoHuntSettings with { HealPercent = value });
         rows.AddChild(Row("회복 기술", heal));
         _percentSelects["heal"] = heal;
@@ -336,7 +338,7 @@ public sealed partial class SettingsPanel : PanelContainer
 
         VBoxContainer block = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         block.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        block.AddChild(new Label { Text = "자동 사냥", HorizontalAlignment = HorizontalAlignment.Center });
+        block.AddChild(Heading("자동 사냥"));
         block.AddChild(rows);
 
         return block;
@@ -348,16 +350,17 @@ public sealed partial class SettingsPanel : PanelContainer
         HBoxContainer row = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         row.AddThemeConstantOverride("separation", Main.Gutter);
 
-        Label name = new() { Text = title, VerticalAlignment = VerticalAlignment.Center };
+        Label name = new() { Text = title, VerticalAlignment = VerticalAlignment.Center, CustomMinimumSize = new Vector2(NameWidth, 0) };
         name.AddThemeColorOverride("font_color", Greybox.Muted);
 
         Label figure = new()
         {
             Text = shown(value),
-            CustomMinimumSize = new Vector2(44, 0),
+            CustomMinimumSize = new Vector2(FigureWidth, 0),
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Center
         };
+        figure.AddThemeFontSizeOverride("font_size", FigureSize);
 
         HSlider slider = new()
         {
@@ -369,15 +372,7 @@ public sealed partial class SettingsPanel : PanelContainer
             SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
         // 테마의 기본 홈은 어두운 속에 묻혀 채워진 쪽만 보였다 — 홈 전체를 칸 색으로, 채운 쪽을 강조색으로.
-        StyleBoxFlat groove = Greybox.Surface();
-        groove.ContentMarginTop = 3;
-        groove.ContentMarginBottom = 3;
-        StyleBoxFlat filled = Greybox.Fill(Greybox.Accent);
-        filled.ContentMarginTop = 3;
-        filled.ContentMarginBottom = 3;
-        slider.AddThemeStyleboxOverride("slider", groove);
-        slider.AddThemeStyleboxOverride("grabber_area", filled);
-        slider.AddThemeStyleboxOverride("grabber_area_highlight", filled);
+        Greybox.Groove(slider, Greybox.Accent);
 
         slider.ValueChanged += now =>
         {
@@ -403,6 +398,7 @@ public sealed partial class SettingsPanel : PanelContainer
         {
             Text = title,
             VerticalAlignment = VerticalAlignment.Center,
+            CustomMinimumSize = new Vector2(NameWidth, 0),
             SizeFlagsHorizontal = control is PotionGauge ? SizeFlags.ShrinkBegin : SizeFlags.ExpandFill
         };
         name.AddThemeColorOverride("font_color", Greybox.Muted);
