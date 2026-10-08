@@ -5,6 +5,13 @@
 
 ## 대기·미결
 
+- **[남음/리뷰 2026-10-08] 리뷰 지적 15건 수정 밖에 둔 것** (`plans/code-review-2026-10-08.md`, 수정 `plans/review-fixes-spec-2026-10-08.md`).
+  - 기존 실패 서버 시험 6건 — 원인 따로: CompanionComa(60초 안 뮤레칸의방 안 감) · OriginalItemValue(서클 가격 상한과 옛 원작값 기대 충돌 — 시험 안내대로 생성기를 다시 쓰면 승인된 가격 인하가 되돌아감) · MissEffect(양의신권 Miss 효과 안 옴) · EvidenceBackedDropDistribution 둘(괴물 DropRate 를 안 보는 시험 전제 · 고정 개수 1,364 vs 1,600) · Respawn(뒤 1분 재생성 7마리).
+  - 블라인드 스팟 표: 시험한 서버와 배포 산출물 일치(manifest 는 넣음, 시험 결과 연결은 아직) · 환경변수 없으면 통과로 세는 부하·촬영 시험 · BotLoad 체력 100,000 · Godot 화면 산술 · 맵 전환 중 옛 좌표(WorldState) · HadesConnectionTests 공유 10초 · 고아 시험 서버 회수(10-08 수정 때 7개 손으로 끔) · CharacterSaveTests 3초 대기·옛 주석 · 게임 채널 TLS · 백업 일관성(live tar) · NPC 변환 미지원 명령 baseline · ios-build.sh import 실패 무시 · 낡은 운영 문서(service-readiness·security-maintenance).
+  - 은행 밖 경제 변경(상점 사고팔기 등)도 캐릭터 자물쇠 밖에서 금화·가방을 바꾼다 — 주기 저장과 엇갈릴 수 있음(은행만 고침).
+  - .NET 10 전환 — `plans/dotnet10-migration-2026-10-08.md`(지원 종료 2026-11-10).
+  - Node `ability-operations-ui.test.js:16` 현황판 731 vs 서버 734(더블어택·드래곤모드·트리플어택) 생성물 드리프트.
+
 - **[보류/사용자 2026-10-07] 경매 더 비싼 거래(20억 넘게).** 손 금화(`GoldPoints` int)·경매 값 칸(int)·패킷(u32)이 21억까지라, 넘기려면 64비트로 바꾸는 큰 작업(서버·패킷·앱·봇·캐릭터 파일). 지금: 들 수 있는 금화 20억(클라우드)·경매 값 상한 20억·은행 금화는 상한 없음(DL-14).
 - **[보류/사용자 2026-10-07] 아이폰 원격 설치.** 앱은 내려받기 페이지에 있음(10-07 저녁 판). 길: SideStore + LiveContainer(처음 한 번 맥+폰 케이블, 그 뒤 폰 혼자 — 우리 앱이 그 안에서 도는지 시험 필요, 안 되면 「dlopen 오류 무시」·「검은 화면 고침」) 또는 RoamRun 으로 `ios-build.sh install` 원격. 조사 요약은 WORKLOG 10-07 저녁.
 
