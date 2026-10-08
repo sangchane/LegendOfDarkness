@@ -4,12 +4,13 @@ description: |
   웹 UI를 설계·구현할 때 "AI 티 안 나는" 고급 프론트엔드 결과를 내기 위한 디자인 취향 하네스.
   React·Tailwind·Zustand 스택에 특화(다른 스택도 적용 가능). 대시보드·관제·SaaS 내부화면·랜딩 등
   화면을 만들거나 다시 디자인할 때, 색/그림자/타이포/레이아웃/모션을 정할 때, "디자인이 밋밋하다/
-  AI스럽다"를 고칠 때 사용. 프로젝트별로 밀도·모션 "dial"을 정하고, 하드룰과 anti-slop을 강제한다.
+  AI스럽다"를 고칠 때 사용. 프로젝트별로 밀도·모션 "dial"을 정하고, 디자인 기준을 DESIGN.md 한 장에 고정하며
+  (VoltAgent/awesome-design-md 74개 사이트에서 골라 받음), 하드룰과 anti-slop을 강제한다.
   Godot 모바일 게임 UI(Control·Theme·노치·터치, 폰 해상도 스크린샷 확인)도 다룬다.
   MengTo/Skills의 design-taste-frontend를 이식·일반화. dev:build의 BUILD·REVIEW가 참조.
 metadata:
-  version: "0.3.0"
-  updated: "2026-09-30"
+  version: "0.4.0"
+  updated: "2026-10-08"
 ---
 
 # Frontend Design Taste (프론트엔드 디자인 취향)
@@ -43,6 +44,19 @@ metadata:
 | **마케팅/랜딩** | 3 | 6 | 6 | 소개·전환 유도·스토리텔링 |
 
 > NEUROS/SiWeb 같은 관제 화면 = **관제/대시보드 프로파일**이 기본. 아래 "Cockpit 모드" 규칙이 걸린다.
+
+### 디자인 기준 — DESIGN.md (프로파일 다음, 코드 전에)
+
+색·서체·반경·그림자·컴포넌트 모양을 화면마다 즉석에서 정하지 않고 문서 한 장에 고정한다. 즉석으로 정하면 화면마다 달라지고 기본값으로 흘러 AI 티가 난다.
+
+1. 프로젝트 루트에 `DESIGN.md`가 있으면 그것을 따른다.
+2. 없을 때:
+   - 기존 화면을 고치는 작업이고 이미 테마 토큰(CSS 변수 등)이 있으면 그 토큰이 기준이다. DESIGN.md를 새로 들이지 않는다(화면 전체가 바뀐다).
+   - 새 화면·새 프로젝트이거나 사용자가 "다시 디자인"을 원하면 `references/design-md.md` 추천표에서 프로파일에 맞는 1개를 받아 프로젝트 루트에 둔다.
+     그 파일의 "프로젝트에 맞게 고치기" 4단계(브랜드 지우기·한글 서체·토큰 옮기기·데이터 화면 보정)를 거친다.
+     사용자가 사이트를 지정하면 그것을 쓴다. 고른 것은 한 줄로 알린다. 묻는 것은 정말 애매할 때만, dial 질문과 한 번에.
+3. 우선순위: 기능 하드룰(레이아웃·숫자 정렬·빈/로딩/에러 상태·퍼지 안전·성능·폰 가로 스크롤) > DESIGN.md > `references/tokens.md`.
+   색·서체 취향 하드룰(세리프·순수 검정·글로우)이 DESIGN.md와 부딪히면 DESIGN.md를 따른다. 단, 데이터 표·지표 숫자 영역은 산세리프와 모노를 지킨다.
 
 ## 3. 하드룰
 
@@ -94,9 +108,11 @@ metadata:
 ## 5. Pre-Flight Check (완료 선언 전)
 
 - [ ] 빈/로딩/에러(+실시간이면 stale) 상태가 모두 있나?
-- [ ] 모바일에서 접히나(반응형 보장)?
-- [ ] 숫자는 `font-mono`인가? 세리프를 안 썼나?
-- [ ] 색이 테마 토큰(하드코드 아님)인가? 순수 #000·네온을 안 썼나?
+- [ ] 모바일에서 접히나(반응형 보장)? 폰 너비(390×844)로 스크린샷을 찍어 Read로 봤나(쓸 수 있는 브라우저 도구나 Playwright로)?
+- [ ] 폰 너비에서 가로 스크롤이 없나(`document.documentElement.scrollWidth`가 390 이하)? `-mx-*`·고정 바·가로 스크롤 줄이 흔한 원인이다.
+- [ ] DESIGN.md가 있으면 그 색·서체·반경·컴포넌트 토큰을 썼나? 문서의 Don't를 어기지 않았나? 브랜드 로고·이름·전용 서체가 남지 않았나?
+- [ ] 숫자는 `font-mono`인가? 데이터 표·지표에 세리프를 안 썼나?
+- [ ] 색이 테마 토큰(하드코드 아님)인가? 순수 #000·네온을 안 썼나(DESIGN.md가 정한 색은 예외)?
 - [ ] 동적 클래스명 대신 룩업맵인가(퍼지 안전)?
 - [ ] `min-h-[100dvh]`·Grid를 썼나? `h-screen`·flex 퍼센트를 안 썼나?
 - [ ] import한 라이브러리가 `package.json`에 실제 있나? Tailwind 버전이 맞나?
@@ -123,9 +139,10 @@ godot --path <프로젝트> --script "${CLAUDE_PLUGIN_ROOT}/skills/ui/scripts/go
 - Godot 실행 파일 경로를 모르면 사용자에게 한 번 묻고 프로젝트 AGENTS.md에 적어 둔다. `shots/`는 `.gitignore`에 넣는다.
 
 ## 참조
-- `references/tokens.md` — 그림자 3종·의미 상태색쌍·룩업맵 패턴·폰트 페어링 (복붙). 프론트 구현/리뷰 시 읽는다.
+- `references/design-md.md` — DESIGN.md 받는 법·프로젝트에 맞게 고치기·프로파일별 추천·전체 slug. DESIGN.md가 없는 새 화면에서 읽는다.
+- `references/tokens.md` — 그림자 3종·의미 상태색쌍·룩업맵 패턴·폰트 페어링 (복붙). DESIGN.md도 기존 테마도 없을 때의 기본값. 프론트 구현/리뷰 시 읽는다.
 - `references/godot-mobile.md` — Godot 모바일 게임 UI 규칙·SafeArea·확인 절차. Godot 프로젝트에서만 읽는다.
 - `scripts/godot_shots.gd` — Godot 씬을 폰·태블릿 해상도로 찍는 스크립트.
 
-출처: MengTo/Skills `design-taste-frontend`·`tailwindcss`·`beautiful-shadows`·`minimalist-ui` 이식·일반화.
+출처: MengTo/Skills `design-taste-frontend`·`tailwindcss`·`beautiful-shadows`·`minimalist-ui` 이식·일반화. DESIGN.md 레퍼런스: VoltAgent/awesome-design-md(MIT).
 버전은 프론트매터 `metadata`.

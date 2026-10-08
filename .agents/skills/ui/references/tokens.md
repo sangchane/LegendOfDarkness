@@ -1,5 +1,7 @@
 # 구체 토큰 (복붙용)
 
+> 프로젝트에 `DESIGN.md`가 있으면 그 토큰이 먼저다. 이 파일은 DESIGN.md도 기존 테마도 없을 때의 기본값이다(SKILL.md "디자인 기준").
+
 MengTo/Skills(`beautiful-shadows`·`minimalist-ui`·`tailwindcss`)에서 이식. 프로젝트에 CSS 변수
 테마가 있으면(예: NEUROS `var(--color-*)`) 하드코드 색은 그 토큰으로 치환해 다크/라이트를 지원한다.
 
