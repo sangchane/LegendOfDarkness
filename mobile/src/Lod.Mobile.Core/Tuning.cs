@@ -46,6 +46,9 @@ public static class Tuning
     /// <summary>가방 빈칸이 이만큼 밑이면 마을로(가방 150칸 — 서버 <c>Inventory.LENGTH</c>).</summary>
     public const int EcoBagLow = 5;
 
+    /// <summary>생태계 봇이 걸어서 맵 사이를 갈 때(walk-SPEC) 남은 길이 이 초 동안 안 줄면 막힌 것 — 한 걸음 0.44초, 45걸음.</summary>
+    public const int EcoWalkStuck = 20;
+
     public const int PackSlots = 150;
 
     /// <summary>사냥을 이만큼 했으면 마을에 한 번 들른다(장비 바꾸기·팔기).</summary>

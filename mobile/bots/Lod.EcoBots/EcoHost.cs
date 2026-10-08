@@ -57,10 +57,11 @@ public sealed record EcoConfig
 /// <summary>한 마을 가게 자리 — guide.txt <c>about … 판매:</c> 줄. <paramref name="Healing" /> = 파는 체력 물약 가짓수.</summary>
 public sealed record EcoStop(int Map, Tile Where, int Healing);
 
-/// <summary>봇이 함께 보는 세상 자료 — 맵 벽·사냥터·가게·직업 기술.</summary>
-public sealed class EcoWorld(MapWalls walls, IReadOnlyList<EcoGround> grounds, IReadOnlyList<EcoStop> stops, ClassKit kit)
+/// <summary>봇이 함께 보는 세상 자료 — 맵 벽·맵 사이 길·사냥터·가게·직업 기술.</summary>
+public sealed class EcoWorld(MapWalls walls, EcoLinks links, IReadOnlyList<EcoGround> grounds, IReadOnlyList<EcoStop> stops, ClassKit kit)
 {
     public MapWalls Walls => walls;
+    public EcoLinks Links => links;
     public IReadOnlyList<EcoGround> Grounds => grounds;
     /// <summary>체력 물약을 가장 여러 가지 파는 가게(음식점의 엑스쿠라눔 하나짜리가 아니라 물약 가게).</summary>
     public EcoStop? PotionStop => stops.Where(stop => stop.Healing > 0).MaxBy(stop => stop.Healing);
@@ -73,7 +74,8 @@ public sealed class EcoWorld(MapWalls walls, IReadOnlyList<EcoGround> grounds, I
     {
         string Text(string name) => folder.Length > 0 && File.Exists(Path.Combine(folder, name)) ? File.ReadAllText(Path.Combine(folder, name)) : string.Empty;
 
-        return new EcoWorld(new MapWalls(folder), EcoGrounds.Read(Text("eco-grounds.txt")), Stops(Text("guide.txt")), ClassKit.Read(Text("class-kit.txt")));
+        return new EcoWorld(new MapWalls(folder), EcoLinks.Read(Text("links.txt")), EcoGrounds.Read(Text("eco-grounds.txt")), Stops(Text("guide.txt")),
+            ClassKit.Read(Text("class-kit.txt")));
     }
 
     /// <summary>guide.txt 의 <c>about &lt;맵&gt; &lt;x&gt; &lt;y&gt; 판매: 이름, 이름…</c> 줄 — 같은 것을 파는 가게가 여럿이면 처음 것만.</summary>

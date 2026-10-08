@@ -15,7 +15,7 @@ namespace Lod.EcoBots;
 
 /// <summary>
 /// 생태계 봇 하나의 접속 — 들어가(없으면 만들고) <see cref="EcoLife" /> 가 정한 일을 한다: 사냥은 대신 사냥과 같은 한 틱
-/// (<see cref="HuntProxyRunner" />), 옮기기는 봇 전용 순간이동(0xF1 8), 장보기는 가게를 차례로 돌며 입기·팔기·물약·장비.
+/// (<see cref="HuntProxyRunner" />), 옮기기는 걸어서 워프·월드맵을 잇고(길이 없을 때만 봇 전용 순간이동 0xF1 8), 장보기는 가게를 차례로 돌며 입기·팔기·물약·장비.
 /// 일마다 사건 한 줄(<see cref="EcoLog" />). 접속이 끊기면 돌아온다(다시 들이기는 <see cref="EcoHost" />).
 /// 파티(<see cref="EcoParty" />, 결정 19)에 들면 싸우는 봇은 파티장의 사냥터로 가고 파티장이 서버 그룹을 청한다. 성직자는 사냥하지 않고
 /// 파티장 곁에서 동료 봇의 판단(<see cref="CompanionRunner" />, 주인 = 파티장)으로 파티원을 돌본다.
@@ -389,7 +389,11 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private async Task GoHunt(EcoSight sight, CancellationToken token)
     {
         int level = _world.Vitals!.Level;
-        int[] avoid = _personSince is not null ? [_ground] : [];
+        // 걸어서 못 가는 사냥터는 고르지 않는다 — 아벨해안은 적정 99 인데 입구가 51~80 만 들인다(사람과 같은 레벨 검사). 길 자료가 없으면 거르지 않는다.
+        // 마을(물약 가게 맵)에서 따진다 — 지금 맵에서 따지면 나가는 워프에 최대 레벨이 걸린 맵(노비스지하던전·포테의숲)에서 레벨이 오를 때 다 빠진다.
+        int town = land.PotionStop?.Map ?? _world.State!.Map.Id;
+        int[] avoid = [.. _personSince is not null ? [_ground] : Array.Empty<int>(),
+            .. land.Links.Fields.Count == 0 ? [] : land.Grounds.Where(one => one.Map != town && EcoRoute.Plan(land.Links, town, one.Map, level) is null).Select(one => one.Map)];
         EcoGround ground;
         Tile spot;
 
@@ -728,14 +732,110 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
     }
 
-    /// <summary>봇 전용 순간이동 — 그 맵 그 칸 곁에 설 때까지 기다린다(서버가 빈 칸으로 옮겨 놓는다).</summary>
+    /// <summary>
+    /// 걸어서 간다(결정 18, <c>autopilot/eco-bots/walk-SPEC.md</c>) — 같은 맵이면 그 칸 2칸 안으로, 다른 맵이면 워프·월드맵 칸을 이어 밟는다
+    /// (<see cref="EcoRoute" />). 걸음 칸이 막히면 그 칸을 빼고 다시 길을 찾고, 길이 없으면 봇 전용 순간이동으로 넘어간다.
+    /// 다른 맵으로 갔거나 순간이동했으면 <c>walk</c> 사건 하나.
+    /// </summary>
     private async Task<bool> MoveTo(int map, Tile where, CancellationToken token)
     {
-        if (_world.State is { } now && now.Map.Id == map && Reckon.Steps(now.Where, where) <= 3)
+        if (_world.State is { } start && start.Map.Id == map && Reckon.Steps(start.Where, where) <= 3)
         {
             return true;
         }
 
+        int from = _world.State?.Map.Id ?? 0, legs = 0, steps = 0;
+        Stopwatch took = Stopwatch.StartNew();
+        HashSet<(int Map, Tile Where)> avoid = [];
+        string why = "길 없음";
+        void Walked(bool teleport) =>
+            Event("walk", new { from, to = map, legs, steps, seconds = (int)took.Elapsed.TotalSeconds, teleport, why = teleport ? why : null });
+
+        while (legs < 64 && _world.State is { } now && !token.IsCancellationRequested)
+        {
+            if (now.Map.Id == map)
+            {
+                // 상인은 계산대 안쪽 막힌 칸에 서 있기도 하다(20041 물약 가게) — 2칸부터 넓혀 가며 걸어서 닿는 칸 중 그 칸에 가까운 곳으로.
+                // 서버 거래 거리는 12(WithinRangeProximity)라 10칸까지. 닿는 칸이 없으면(갇힌 자리) 이 맵에 온 것으로 친다.
+                HashSet<Tile> exits = [.. land.Links.TilesOn(map)];
+                Func<Tile, bool> walls = land.Walls.For(map);
+                Tile at = now.Where;
+                if (Enumerable.Range(2, 9).Select(reach => (Tile[])[.. Near(where, reach).Where(tile => !exits.Contains(tile))])
+                        .FirstOrDefault(near => TabMap.WayToAny(at, near, tile => tile.X < 0 || tile.Y < 0 || walls(tile) || exits.Contains(tile)) is not null)
+                    is not { } goals)
+                {
+                    if (from != map)
+                    {
+                        Walked(teleport: false);
+                    }
+
+                    return true;
+                }
+
+                (Walking done, int n) = await Walk(map, goals, warp: false, token);
+                steps += n;
+                if (done is Walking.Arrived && from != map)
+                {
+                    Walked(teleport: false);
+                }
+
+                if (done is Walking.Arrived or Walking.Down)
+                {
+                    return done is Walking.Arrived;
+                }
+
+                if (done is Walking.Stuck)
+                {
+                    why = "목표 곁이 막힘";
+                    break;
+                }
+
+                continue;
+            }
+
+            if (EcoRoute.Plan(land.Links, now.Map.Id, map, _world.Vitals?.Level ?? 1, avoid) is not { } leg)
+            {
+                why = "길 없음";
+                break;
+            }
+
+            int shown = _world.FieldShown;
+            (Walking went, int m) = await Walk(now.Map.Id, leg.Tiles, warp: true, token);
+            steps += m;
+            if (went is Walking.Down)
+            {
+                return false;
+            }
+
+            // 칸을 밟았는데 맵이 그대로면 월드맵이 열리는 칸이거나 서버가 옮기는 중이다. 레벨이 안 맞으면 서버가 말만 하고 그대로 둔다.
+            if (went is Walking.Arrived)
+            {
+                if (leg.Field != 0 && await Until(() => _world.FieldShown != shown, Answer, token))
+                {
+                    await _world.ChooseFieldAsync(leg.Field, token);
+                }
+
+                went = await Until(() => _world.State?.Map.Id != now.Map.Id, Answer, token) ? Walking.Left : Walking.Stuck;
+            }
+
+            if (went is Walking.Stuck)
+            {
+                avoid.UnionWith(leg.Tiles.Select(tile => (now.Map.Id, tile)));
+                continue;
+            }
+
+            legs++;
+            // 새 맵 — 순간이동 때와 같은 까닭(아래)으로 시야를 다시 받는다.
+            await Resync(token);
+        }
+
+        if (_world.State is not { } here || here.Map.Id == DeathMap || token.IsCancellationRequested)
+        {
+            return false;
+        }
+
+        why = legs >= 64 ? "워프 64번 넘음" : why;
+        Walked(teleport: true);
         int reports = _world.PositionReports;
         await _world.EcoMoveAsync(map, where.X, where.Y, token);
         bool moved = await Until(() => _world.State?.Map.Id == map && _world.PositionReports != reports, Answer, token);
@@ -751,6 +851,100 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         // 같은 맵 새로고침(0x38)은 서버가 시야를 다시 보내고 알맹이는 비우지 않는다.
         await _world.RefreshAsync(token);
         return true;
+    }
+
+    private enum Walking { Arrived, Left, Stuck, Down }
+
+    /// <summary>시야와 내 칸을 다시 받는다(0x38) — 서버는 새로고침 뒤 RefreshRate(0.3초) 동안 걸음을 말없이 버리므로 그만큼 쉬고 나서 걷는다.</summary>
+    private async Task Resync(CancellationToken token)
+    {
+        await _world.RefreshAsync(token);
+        await Task.Delay(TimeSpan.FromMilliseconds(400), token);
+    }
+
+    /// <summary>그 칸과 <paramref name="reach" /> 칸 안 — 상인·파티장은 그 칸에 서 있어 곁에 서면 된다.</summary>
+    private static IEnumerable<Tile> Near(Tile spot, int reach) =>
+        from dx in Enumerable.Range(-reach, (reach * 2) + 1)
+        from dy in Enumerable.Range(-reach, (reach * 2) + 1)
+        where Math.Abs(dx) + Math.Abs(dy) <= reach
+        select new Tile(spot.X + dx, spot.Y + dy);
+
+    /// <summary>
+    /// 이 맵 안에서 <paramref name="goals" /> 중 가까운 칸까지 걷는다 — 벽·괴물·사람 칸과 목표가 아닌 워프 칸은 피한다(엉뚱한 맵으로 가지 않게).
+    /// 서버는 걸음을 되돌릴 때만 칸을 알려 주므로(0x04) 그때는 서버 칸, 아니면 내가 센 칸(<see cref="HuntProxyRunner" /> 와 같다).
+    /// 남은 길이 <see cref="Tuning.EcoWalkStuck" /> 초 동안 안 줄면 막힘, 맵이 바뀌면 떠남, 혼수·죽음이면 쓰러짐. <paramref name="warp" /> 면 목표 칸이
+    /// 워프·월드맵 칸이라 밟고 서버가 옮겨 주기를 기다린다.
+    /// </summary>
+    private async Task<(Walking, int Steps)> Walk(int map, IReadOnlyCollection<Tile> goals, bool warp, CancellationToken token)
+    {
+        Func<Tile, bool> walls = land.Walls.For(map);
+        HashSet<Tile> exits = [.. land.Links.TilesOn(map).Except(goals)];
+        Tile here = _world.State?.Where ?? default;
+        int reports = -1, steps = 0, best = int.MaxValue;
+        Stopwatch stuck = Stopwatch.StartNew();
+
+        while (!token.IsCancellationRequested)
+        {
+            if (_world.State is not { } now || now.Map.Id == DeathMap || Overhead.InComa(_world.Ailments))
+            {
+                return (Walking.Down, steps);
+            }
+
+            if (now.Map.Id != map)
+            {
+                return (Walking.Left, steps);
+            }
+
+            if (_world.PositionReports != reports)
+            {
+                reports = _world.PositionReports;
+                here = now.Where;
+            }
+
+            // 월드맵이 열렸으면 그 칸을 밟은 것이다 — 열린 동안 서버는 걸음을 버린다.
+            if (_world.Field is not null || (!warp && goals.Contains(here)))
+            {
+                return (Walking.Arrived, steps);
+            }
+
+            if (stuck.Elapsed > TimeSpan.FromSeconds(Tuning.EcoWalkStuck))
+            {
+                return (Walking.Stuck, steps);
+            }
+
+            if (goals.Contains(here))
+            {
+                // 워프 칸이면 서버가 곧 옮기거나 월드맵을 연다. 아니면 내가 센 칸이 틀렸다 — 서버는 새로고침 뒤 0.3초(RefreshRate) 동안의 걸음을
+                // 말없이 버린다(격리 서버: 46걸음 걸어 월드맵 칸이라 셌는데 한 칸 모자람). 서버 칸을 다시 받아 이어 걷는다.
+                if (!await Until(() => _world.State?.Map.Id != map || _world.Field is not null, TimeSpan.FromSeconds(1.5), token))
+                {
+                    await Resync(token);
+                }
+
+                continue;
+            }
+
+            HashSet<Tile> taken = [.. _world.Creatures.Where(one => one.Kind != CreatureKind.Passable).Select(one => one.Where), .. _world.Others.Select(one => one.Where)];
+            if (TabMap.WayToAny(here, goals, tile => tile.X < 0 || tile.Y < 0 || walls(tile) || exits.Contains(tile) || taken.Contains(tile)) is not { Count: > 0 } way)
+            {
+                // 길을 막은 괴물·사람이 비키기를 기다린다 — 끝내 안 비키면 막힘.
+                await Task.Delay(Tick, token);
+                continue;
+            }
+
+            if (way.Count < best)
+            {
+                best = way.Count;
+                stuck.Restart();
+            }
+
+            await _world.WalkAsync(TabMap.StepOf(here, way[0]), token);
+            here = way[0];
+            steps++;
+            await Task.Delay(TimeSpan.FromSeconds(Tuning.StepSeconds), token);
+        }
+
+        return (Walking.Down, steps);
     }
 
     /// <summary>가게 자리 곁의 상인.</summary>
