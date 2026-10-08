@@ -38,7 +38,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private readonly EcoLife _life = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly HashSet<string> _refused = [];
-    private readonly HashSet<string> _unlisted = [];
+    private readonly HashSet<string> _unlisted = [.. host.Unlisted.Of(bot.Name)];
     private WorldClient _world = null!;
     private HuntProxyRunner? _hunt;
     private int _ground;
@@ -651,11 +651,17 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         // 유찰돼 돌아온 것(까닭 2)은 다시 올리지 않는다 — 아무도 안 사는 값이었다(DL-14). 받기는 모두 받으므로 쪽을 다 본다.
-        // ponytail: 봇 프로그램이 다시 켜지면 잊는다 — 그때 한 번 더 올려 보증금(시작가의 2%)만 잃는다. 잦으면 eco 기록에 남긴다.
+        // 유찰 목록은 host 가 봇 이름별로 들고 파일에 남긴다 — 재접속·재시작에도 다시 올려 보증금을 잃지 않는다(리뷰 2026-10-08 #9).
         int owed = claims.ClaimCount;
         for (ushort at = 1; ; at++)
         {
-            _unlisted.UnionWith(claims.Claims.Where(claim => claim.Reason == 2).Select(claim => claim.Name));
+            string[] expired = [.. claims.Claims.Where(claim => claim.Reason == 2).Select(claim => claim.Name)];
+            _unlisted.UnionWith(expired);
+            if (!host.Unlisted.Add(bot.Name, expired))
+            {
+                log("유찰 목록 파일을 못 썼습니다 — 이 실행 동안만 기억합니다.");
+            }
+
             ushort next = at;
             if (at >= claims.Pages || await AuctionView(() => _world.AuctionClaimsAsync(next, token), token) is not { } more)
             {

@@ -247,9 +247,12 @@ public sealed class MobileClientProtocolTests
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
         server.Start(TimeSpan.FromMinutes(2));
 
-        await Assert.ThrowsAsync<ProtocolException>(() => HadesLoginClient.CreateCharacterAsync(
+        ProtocolException refused = await Assert.ThrowsAsync<ProtocolException>(() => HadesLoginClient.CreateCharacterAsync(
             IPAddress.Loopback, server.LoginPort, MobileName, LoginFlow.SyntheticSecret,
             hairStyle: 12, gender: 2, hairColor: 40, path: 0, progress: null, _deadline.Token));
+
+        // 서버가 만들기를 거절한 까닭(저장 실패도 같은 길) 그대로 — 넘어가서 로그인하다 「없는 계정」으로 끝나지 않는다.
+        Assert.Contains("직업을 골라 주십시오", refused.Message);
 
         Assert.False(File.Exists(Path.Combine(server.ContentLocation, "aislings", $"{MobileName}.json")));
     }

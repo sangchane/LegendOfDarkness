@@ -26,4 +26,5 @@ DOTNET_ROOT=../../../.tools/dotnet-9.0.317 ../../../.tools/dotnet-9.0.317/dotnet
 
 - 프로그램 기록 `logs/eco-bots.log`(1MB×5) — 5분마다 요약(접속 수 · 하는 일별 수 · 레벨 평균·최고).
 - 사건 기록(머신러닝 재료) `eco/YYYY-MM-DD.jsonl`(한국 날짜, 지난 날은 gzip, 365일) — 한 줄 JSON, 숫자는 숫자 칸(`EcoLog`).
+- 유찰 목록 `eco-unlisted.json`(설정 파일 옆) — 봇 이름별로 경매에서 유찰돼 돌아온 물건 이름. 다시 올리지 않으며 재접속·재시작에도 남는다(임시 파일에 써서 바꿔 넣음, 깨졌으면 빈 목록). 지우면 잊는다.
 - 클라우드: `scripts/ops/cloud-server.sh eco-config`(처음 한 번) · `eco` · `eco-logs` · `ml-pull`.

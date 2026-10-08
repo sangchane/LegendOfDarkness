@@ -102,6 +102,13 @@ public static class Auction
 
     public static byte[] EncodeBid(uint id, uint amount) => [Bid, .. U32(id), .. U32(amount)];
 
+    /// <summary>
+    /// 다음 최소 입찰가 — 서버 <c>AuctionHouse.NextBid</c> 와 같은 식: 입찰이 있으면 현재가 + max(1, 현재가의 5%), 없으면 시작가(= 현재가).
+    /// ×5 가 uint 를 넘지 않게 ulong 으로 셈하고 uint 끝에서 멈춘다.
+    /// </summary>
+    public static uint NextBid(uint price, bool hasBid) =>
+        hasBid ? (uint)Math.Min(uint.MaxValue, price + Math.Max(1UL, (ulong)price * 5 / 100)) : price;
+
     private static byte[] U32(uint value) => [(byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value];
 
     private ref struct Cursor(ReadOnlySpan<byte> body, int at)

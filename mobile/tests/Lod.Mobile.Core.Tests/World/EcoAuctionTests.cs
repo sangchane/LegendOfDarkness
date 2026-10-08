@@ -87,4 +87,61 @@ public sealed class EcoAuctionTests
 
         Assert.Equal(2u, Assert.Single(EcoAuction.ToBuy(rows, [], Warrior, level: 99, gold: 100_000_000)).Id);
     }
+
+    /// <summary>
+    /// 유찰돼 돌아온 것은 재접속(새 runner 가 host 에서 받음)·프로그램 재시작(새 host 가 파일에서 읽음)에도 다시 올리지 않는다
+    /// (리뷰 2026-10-08 #9 — 전에는 runner 마다 잊어 보증금을 거듭 잃었다).
+    /// </summary>
+    [Fact]
+    public void Expired_items_stay_unlisted_per_bot_across_reconnects_and_restarts()
+    {
+        string folder = Directory.CreateTempSubdirectory().FullName;
+        string path = Path.Combine(folder, "eco-unlisted.json");
+        InventoryItem sword = Carried(1, "에페", Gear(1, value: 1_600));
+        try
+        {
+            EcoUnlisted host = new(path);
+            Assert.True(host.Add("전사봇", ["에페"]));
+            Assert.Equal(["에페"], host.Of("전사봇"));                       // 재접속 — 같은 host 에서 새 runner 가 받는 목록
+
+            EcoUnlisted restarted = new(path);                              // 재시작 — 파일에서
+            Assert.Equal(["에페"], restarted.Of("전사봇"));
+            Assert.Empty(restarted.Of("도적봇"));
+            Assert.False(File.Exists(path + ".tmp"));                       // 임시 파일에 써서 바꿔 넣었다
+
+            Assert.Empty(EcoAuction.ToPost([sword], wear: [], active: 0, refused: restarted.Of("전사봇")));
+            Assert.Single(EcoAuction.ToPost([sword], wear: [], active: 0, refused: restarted.Of("도적봇")));
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
+    }
+
+    [Theory]
+    [InlineData(null)]          // 파일 없음
+    [InlineData("{\"전사봇\": [")] // 쓰다 만 파일
+    [InlineData("[1, 2]")]       // 모양이 다름
+    [InlineData("{\"전사봇\": null}")]
+    public void A_missing_or_broken_unlisted_file_starts_empty(string? text)
+    {
+        string folder = Directory.CreateTempSubdirectory().FullName;
+        string path = Path.Combine(folder, "eco-unlisted.json");
+        try
+        {
+            if (text is not null)
+            {
+                File.WriteAllText(path, text);
+            }
+
+            EcoUnlisted read = new(path);
+            Assert.Empty(read.Of("전사봇"));
+            Assert.True(read.Add("전사봇", ["에페"]));                      // 깨진 파일은 다음 기록이 덮는다
+            Assert.Equal(["에페"], new EcoUnlisted(path).Of("전사봇"));
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
+    }
 }

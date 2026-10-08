@@ -108,4 +108,21 @@ public sealed class AuctionReadTests
 
         Assert.Throws<ProtocolException>(() => Auction.ReadPage([.. body]));
     }
+
+    /// <summary>
+    /// 화면이 입찰 칸에 채우는 값 = 서버 최소 입찰(<c>AuctionHouse.NextBid</c>: 입찰 있으면 bid + max(1, bid×5/100), 없으면 시작가).
+    /// 858,993,460 부터 uint 로 ×5 하면 넘쳐 서버가 거절하는 값이 나왔다(리뷰 2026-10-08 #7).
+    /// </summary>
+    [Theory]
+    [InlineData(858_993_459u, 901_943_131u)]
+    [InlineData(858_993_460u, 901_943_133u)]
+    [InlineData(1_000_000_000u, 1_050_000_000u)]
+    [InlineData(2_000_000_000u, 2_100_000_000u)]
+    [InlineData(10u, 11u)]
+    public void Next_bid_matches_the_server_minimum_at_overflow_edges(uint price, uint server)
+    {
+        Assert.Equal((long)price + Math.Max(1L, (long)price * 5 / 100), server); // 서버 식(long) 그대로
+        Assert.Equal(server, Auction.NextBid(price, hasBid: true));
+        Assert.Equal(price, Auction.NextBid(price, hasBid: false));
+    }
 }

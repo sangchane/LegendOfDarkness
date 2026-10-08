@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Lod.CompanionBot;
 using Lod.EcoBots;
+using Lod.Mobile.Core.Automation;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -58,7 +59,7 @@ public sealed class EcoBotLoopTests(ITestOutputHelper output) : IDisposable
             EventFolder = events,
         };
         List<string> said = [];
-        EcoHost host = new(config, EcoWorld.Load(HadesWorkspace.MapLayoutFolder), new EcoEvents(events), line => { lock (said) said.Add(line); });
+        EcoHost host = new(config, EcoWorld.Load(HadesWorkspace.MapLayoutFolder), new EcoEvents(events), new EcoUnlisted(Path.Combine(events, "eco-unlisted.json")), line => { lock (said) said.Add(line); });
 
         using CancellationTokenSource stop = CancellationTokenSource.CreateLinkedTokenSource(_deadline.Token);
         Task running = host.RunAsync(stop.Token);
@@ -140,7 +141,7 @@ public sealed class EcoBotLoopTests(ITestOutputHelper output) : IDisposable
         string events = Path.Combine(server.RunRoot, "eco");
         EcoConfig config = new() { LoginPort = server.LoginPort, Password = LoginFlow.SyntheticSecret, Bots = [bot], EventFolder = events };
         List<string> said = [];
-        EcoHost host = new(config, EcoWorld.Load(HadesWorkspace.MapLayoutFolder), new EcoEvents(events), line => { lock (said) said.Add(line); });
+        EcoHost host = new(config, EcoWorld.Load(HadesWorkspace.MapLayoutFolder), new EcoEvents(events), new EcoUnlisted(Path.Combine(events, "eco-unlisted.json")), line => { lock (said) said.Add(line); });
 
         using CancellationTokenSource stop = CancellationTokenSource.CreateLinkedTokenSource(_deadline.Token);
         Task running = host.RunAsync(stop.Token);

@@ -164,9 +164,9 @@ public sealed class EcoEvents(string folder)
 /// <summary>
 /// 생태계 봇 프로그램 — 봇마다 접속 하나(<see cref="EcoRunner" />)를 2초 간격으로 띄우고, 끊기면 5초~1분 간격으로 다시 들인다.
 /// 봇들이 어느 맵에 있는지 함께 세어 한 사냥터에 몰리지 않게 한다(<see cref="BotsOn" />). 10초마다 파티를 짓고 풀며
-/// (<see cref="EcoParties" />, 결정 19), 5분마다 요약 한 줄.
+/// (<see cref="EcoParties" />, 결정 19), 5분마다 요약 한 줄. 유찰품 목록(<see cref="Unlisted" />)은 봇 이름별로 여기서 들고 재접속에 넘긴다.
 /// </summary>
-public sealed class EcoHost(EcoConfig config, EcoWorld world, EcoEvents events, Action<string> log)
+public sealed class EcoHost(EcoConfig config, EcoWorld world, EcoEvents events, EcoUnlisted unlisted, Action<string> log)
 {
     public static readonly TimeSpan Stagger = TimeSpan.FromSeconds(2);
     public static readonly TimeSpan Summary = TimeSpan.FromMinutes(5);
@@ -178,6 +178,9 @@ public sealed class EcoHost(EcoConfig config, EcoWorld world, EcoEvents events, 
     private readonly List<EcoParty> _parties = [];
 
     public IReadOnlyCollection<EcoRunner> Running => [.. _running.Values];
+
+    /// <summary>봇 이름별 유찰품 — 다시 올리지 않는다. 설정 파일 옆 <c>eco-unlisted.json</c> 에 남아 재시작에도 잊지 않는다.</summary>
+    public EcoUnlisted Unlisted => unlisted;
 
     public bool IsBot(string name) => _names.Contains(name);
 

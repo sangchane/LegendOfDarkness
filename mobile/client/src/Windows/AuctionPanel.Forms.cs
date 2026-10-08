@@ -125,7 +125,7 @@ public sealed partial class AuctionPanel
         if (row is not null)
         {
             // 입찰이 있으면 현재가 + max(1, 현재가의 5%), 없으면 시작가(= 현재가로 온다).
-            uint least = (row.Flags & 4) != 0 ? row.Price + Math.Max(1u, row.Price * 5 / 100) : row.Price;
+            uint least = Auction.NextBid(row.Price, (row.Flags & 4) != 0);
             _bid.MaxValue = Math.Max(MostGold, least);
             _bid.MinValue = least;
             _bid.Value = least;

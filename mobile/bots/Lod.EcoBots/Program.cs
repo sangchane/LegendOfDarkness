@@ -1,5 +1,6 @@
 using Lod.CompanionBot;
 using Lod.EcoBots;
+using Lod.Mobile.Core.Automation;
 
 // 생태계 봇 프로그램 — 설정의 봇들이 혼자 사냥·장사하며 99레벨까지 자란다(설계 autopilot/eco-bots/). 봇마다 프로그램을 띄우지 않고
 // 이 프로그램 하나가 봇 여럿을 접속시킨다(실측: 봇 220개에 0.5코어). 쓰는 법: Lod.EcoBots [설정 파일]
@@ -25,7 +26,8 @@ log.Write($"시작 — {config.Host}:{config.LoginPort} · 봇 {Math.Min(config.
 
 try
 {
-    await new EcoHost(config, world, new EcoEvents(config.EventFolder), log.Write).RunAsync(stop.Token);
+    EcoUnlisted unlisted = new(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(configPath))!, "eco-unlisted.json"));
+    await new EcoHost(config, world, new EcoEvents(config.EventFolder), unlisted, log.Write).RunAsync(stop.Token);
 }
 catch (OperationCanceledException) when (stop.IsCancellationRequested)
 {

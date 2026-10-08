@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Lod.CompanionBot;
 using Lod.EcoBots;
+using Lod.Mobile.Core.Automation;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -51,7 +52,7 @@ public sealed class EcoAuctionLoopTests(ITestOutputHelper output) : IDisposable
         EcoWorld land = EcoWorld.Load(HadesWorkspace.MapLayoutFolder);
         Task Run(EcoBotEntry bot) => new EcoHost(
             new EcoConfig { LoginPort = server.LoginPort, Password = LoginFlow.SyntheticSecret, Bots = [bot], EventFolder = events },
-            land, new EcoEvents(events), line => { lock (said) said.Add(line); }).RunAsync(stop.Token);
+            land, new EcoEvents(events), new EcoUnlisted(Path.Combine(events, "eco-unlisted.json")), line => { lock (said) said.Add(line); }).RunAsync(stop.Token);
 
         bool Did(EcoBotEntry bot, string ev) => Lines(events).Any(line => line.GetProperty("bot").GetString() == bot.Name && line.GetProperty("ev").GetString() == ev
                                                                     && line.GetProperty("data").ToString().Contains(Glove));
