@@ -15,6 +15,7 @@ public sealed class EcoTests
         20015 1 우드랜드1-1
         20016 1 우드랜드1-2
         20022 6 우드랜드2-1
+        20030 15 우드랜드3-1
         20263 21 포테의숲1존
         20264 21 포테의숲2존
         """);
@@ -25,15 +26,16 @@ public sealed class EcoTests
         Assert.Equal(20022, EcoGrounds.Pick(Grounds, 10, _ => 0, 4, [])!.Map);
         Assert.Equal(20263, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [])!.Map);
         Assert.Equal(20264, EcoGrounds.Pick(Grounds, 30, map => map == 20263 ? 1 : 0, 4, [])!.Map);
-        Assert.Equal(20022, EcoGrounds.Pick(Grounds, 30, map => map is 20263 or 20264 ? 4 : 0, 4, [])!.Map);
+        Assert.Equal(20030, EcoGrounds.Pick(Grounds, 30, map => map is 20263 or 20264 ? 4 : 0, 4, [])!.Map);
         Assert.Equal(20264, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [20263])!.Map);
     }
 
     [Fact]
     public void Steps_down_a_tier_after_dying_too_often_and_never_below_the_first()
     {
-        Assert.Equal(20022, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [], lower: 1)!.Map);
-        Assert.Equal(1, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [], lower: 9)!.Level);
+        Assert.Equal(20030, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [], lower: 1)!.Map);
+        Assert.Equal(15, EcoGrounds.Pick(Grounds, 30, _ => 0, 4, [], lower: 9)!.Level); // 서클 2(11~40) 맨 아래 층까지
+        Assert.Equal(1, EcoGrounds.Pick(Grounds, 10, _ => 0, 4, [], lower: 9)!.Level);
         // 갈 수 있는 층이 다 차면 제 층에서 봇이 가장 적은 맵으로 넘친다(새 봇 30개가 첫 층 16자리에 몰려도 마을에서 놀지 않게).
         Assert.Equal(20264, EcoGrounds.Pick(Grounds, 30, map => map == 20263 ? 6 : 5, 4, [])!.Map);
         // 피할 맵(사람 있음)은 넘칠 때도 뒤로.
@@ -41,6 +43,29 @@ public sealed class EcoTests
         Assert.Null(EcoGrounds.Pick([], 30, _ => 0, 4, []));
         // 가장 낮은 사냥터보다 낮은 레벨(새 캐릭터)은 가장 낮은 층으로.
         Assert.Equal(1, EcoGrounds.Pick(Grounds, 0, _ => 0, 4, [])!.Level);
+    }
+
+    /// <summary>
+    /// 제 서클 밑으로는 안 간다 — 99 파티가 99 사냥터가 차서·죽어서 아벨해안(67)까지 내려왔다(사용자 2026-10-09). 99 층이 다 차면
+    /// 99 층에서 봇이 가장 적은 맵으로 넘친다. 서클 안에 층이 없으면(41~45 레벨인데 그 사이 사냥터가 없을 때) 예전처럼 아래 층.
+    /// </summary>
+    [Fact]
+    public void Never_hunts_below_its_own_circle()
+    {
+        IReadOnlyList<EcoGround> grounds = EcoGrounds.Read("""
+            20589 67 아벨해안3-A
+            20861 99 서의우드랜드16-1
+            20862 99 서의우드랜드17-1
+            """);
+
+        Assert.Equal(99, EcoGrounds.Pick(grounds, 99, map => map == 20589 ? 0 : 1, 1, [])!.Level);
+        Assert.Equal(99, EcoGrounds.Pick(grounds, 99, _ => 0, 4, [], lower: 5)!.Level);
+        Assert.Equal(20862, EcoGrounds.Pick(grounds, 99, _ => 0, 4, [20861])!.Map);
+        Assert.Equal(67, EcoGrounds.Pick(grounds, 80, _ => 0, 4, [])!.Level); // 71~98 층이 없다
+        Assert.Equal(99, EcoGrounds.CircleFloor(99));
+        Assert.Equal(71, EcoGrounds.CircleFloor(98));
+        Assert.Equal(11, EcoGrounds.CircleFloor(40));
+        Assert.Equal(1, EcoGrounds.CircleFloor(10));
     }
 
     private static ItemStats Gear(int place, int level = 1, int cls = 0, int ac = 0, int dmgMax = 0, int str = 0) =>

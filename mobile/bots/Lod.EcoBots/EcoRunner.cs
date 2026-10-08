@@ -316,7 +316,8 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             return;
         }
 
-        if (leader.Map != map || Reckon.Steps(Where, leader.Where) > 12)
+        // 같은 맵에서 걸어 닿으면 따라 걷는다(CompanionBrain) — 12칸 넘게 처졌다고 순간이동하면 사람 눈에 띈다(사용자 2026-10-09).
+        if (leader.Map != map || (Reckon.Steps(Where, leader.Where) > 12 && !Walkable(map, leader.Where)))
         {
             Doing = "파티장에게";
             await MoveTo(leader.Map, leader.Where, token);
@@ -475,6 +476,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     {
         int level = _world.Vitals!.Level;
         int[] avoid = _personSince is not null ? [_ground] : [];
+        int from = _world.State!.Map.Id;
         EcoGround ground;
         Tile spot;
 
@@ -497,30 +499,50 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             IEnumerable<string> mine = _party?.All ?? [Name];
             Func<int, int> botsOn = map => host.Running.Count(runner => runner.Map == map && !mine.Contains(runner.Name, StringComparer.OrdinalIgnoreCase));
 
-            if (EcoGrounds.Pick(land.Grounds, level, botsOn, _party is null ? Tuning.EcoBotsPerMap : 1, avoid, _life.Lower) is not { } picked)
+            int perMap = _party is null ? Tuning.EcoBotsPerMap : 1;
+            if (EcoGrounds.Pick(land.Grounds, level, botsOn, perMap, avoid, _life.Lower) is not { } picked)
             {
                 Doing = "사냥터 없음";
                 await Task.Delay(TimeSpan.FromSeconds(60), token);
                 return;
             }
 
+            // 사람에게 비키는 때가 아니면(둘레를 다 잡아 자리만 옮길 때) 같은 층에 자리가 있는 한 지금 맵에 머문다 — 걸어서 옮기게.
+            if (_personSince is null && land.Grounds.FirstOrDefault(one => one.Map == from) is { } here
+                && here.Level == picked.Level && botsOn(from) < perMap)
+            {
+                picked = here;
+            }
+
             ground = picked;
             Func<Tile, bool> blocked = land.Walls.For(ground.Map);
             Random dice = Random.Shared;
             spot = Enumerable.Range(0, 500).Select(_ => new Tile(dice.Next(2, 100), dice.Next(2, 100))).FirstOrDefault(tile => !blocked(tile), new Tile(10, 10));
+
+            // 같은 맵이면 둘레(12칸) 밖, 걸어 닿는 칸(WalkReach 안)을 먼저 찾는다.
+            Tile at = _world.State.Where;
+            if (ground.Map == from && Enumerable.Range(0, 300)
+                    .Select(_ => (Tile?) new Tile(at.X + dice.Next(-WalkReach, WalkReach + 1), at.Y + dice.Next(-WalkReach, WalkReach + 1)))
+                    .FirstOrDefault(tile => tile is { } near && near.X >= 0 && near.Y >= 0 && !blocked(near)
+                                            && Pathing.Way(at, near, blocked, WalkReach) is { Count: > 12 }) is { } stroll)
+            {
+                spot = stroll;
+            }
         }
 
-        int from = _world.State!.Map.Id;
-        if (!await MoveTo(ground.Map, spot, token))
+        // 같은 맵 안에서 걸어 닿는 자리면 걸어간다 — 1~2분마다 같은 맵 안에서 순간이동하는 것이 사람 눈에 띄었다(사용자 2026-10-09
+        // 「순간이동하듯이 다니는데」). 순간이동은 다른 맵으로 갈 때와 걸어 닿지 않을 때만.
+        bool walking = Walkable(ground.Map, spot);
+        if (!walking && !await MoveTo(ground.Map, spot, token))
         {
             return;
         }
 
-        Event("move", new { fromMap = from, toMap = ground.Map, why = "hunt", ground = ground.Name, groundLevel = ground.Level });
+        Event("move", new { fromMap = from, toMap = ground.Map, why = "hunt", walked = walking, ground = ground.Name, groundLevel = ground.Level });
         _ground = ground.Map;
         _personSince = null;
         _life.Arrived(EcoPlace.Hunting, _clock.Elapsed);
-        Center = _world.State!.Where;
+        Center = walking ? spot : _world.State!.Where;
 
         // 대신 사냥과 같은 판단 — 기술·마법은 직업 기술 표(class-kit.txt)에 보이는 것, 물약은 가방의 가장 센 체력 물약.
         int? path = _world.Path;
@@ -529,8 +551,8 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             // 파티원은 파티장 곁만 — 중심은 사냥 틱마다 파티장이 선 칸으로 옮긴다(Once).
             Radius = _party is { } team && !string.Equals(team.Leader, Name, StringComparison.OrdinalIgnoreCase) ? Tuning.EcoPartyReach : 12,
             Map = ground.Map,
-            X = _world.State!.Where.X,
-            Y = _world.State.Where.Y,
+            X = Center.X,
+            Y = Center.Y,
             Hp = new PotionRule(true, 50, EcoShopping.BestPotion(_world.Pack) ?? AutoPotion.Healing[0].Name),
             Loot = true,
             Skills = [.. _world.Skills.Select(one => one.Name).Where(name => land.Kit.Shows(path, false, name) && land.Kit.AutoCasts(path, name))],
@@ -824,6 +846,13 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             Event("state", new { from = "Dead", to = "Town", lower = _life.Lower });
         }
     }
+
+    /// <summary>걸어 갈 수 있는 거리 — 사냥이 중심으로 돌아가는 길(<c>AutoHunt.Reach</c>)과 같게.</summary>
+    private const int WalkReach = 30;
+
+    /// <summary>지금 맵의 그 칸에 걸어서(<see cref="WalkReach" /> 걸음 안) 닿는지.</summary>
+    private bool Walkable(int map, Tile to) =>
+        _world.State is { } now && now.Map.Id == map && Pathing.Way(now.Where, to, land.Walls.For(map), WalkReach) is not null;
 
     /// <summary>봇 전용 순간이동 — 그 맵 그 칸 곁에 설 때까지 기다린다(서버가 빈 칸으로 옮겨 놓는다).</summary>
     private async Task<bool> MoveTo(int map, Tile where, CancellationToken token)

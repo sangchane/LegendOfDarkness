@@ -21,16 +21,27 @@ public static class EcoGrounds
     ];
 
     /// <summary>
-    /// 적정 레벨 ≤ 내 레벨 중 가장 높은 층(내 레벨이 가장 낮은 층보다 낮으면 그 층, <paramref name="lower" /> 만큼 아래 층, 맨 아래 밑으로는 안 감), 그 층에서 봇이 가장 적은 맵.
+    /// 적정 레벨 ≤ 내 레벨 중 가장 높은 층(내 레벨이 가장 낮은 층보다 낮으면 그 층, <paramref name="lower" /> 만큼 아래 층, 제 서클 밑으로는 안 감), 그 층에서 봇이 가장 적은 맵.
     /// 봇이 <paramref name="perMap" /> 인 맵과 <paramref name="avoid" /> 는 빼고, 그 층이 다 차면 아래 층.
     /// 갈 수 있는 층이 다 차면(새 봇이 한꺼번에 첫 층에 몰릴 때) 제 층에서 봇이 가장 적은 맵으로 넘친다 — 마을에서 놀지 않게. 사냥터가 없으면 null.
     /// </summary>
+    /// <summary>서클의 첫 레벨 — 1~10 · 11~40 · 41~70 · 71~98 · 99(<c>docs/item-prices-by-circle.md</c>).</summary>
+    public static int CircleFloor(int level) => level >= 99 ? 99 : level >= 71 ? 71 : level >= 41 ? 41 : level >= 11 ? 11 : 1;
+
     public static EcoGround? Pick(
         IReadOnlyList<EcoGround> grounds, int level, Func<int, int> botsOn, int perMap, IReadOnlyCollection<int> avoid, int lower = 0)
     {
         // 가장 낮은 사냥터보다 레벨이 낮으면(새 캐릭터) 가장 낮은 층으로.
         int reach = grounds.Count == 0 ? level : Math.Max(level, grounds.Min(one => one.Level));
         int[] tiers = [.. grounds.Where(one => one.Level <= reach).Select(one => one.Level).Distinct().OrderByDescending(tier => tier)];
+
+        // 제 서클 밑 층으로는 내려가지 않는다 — 99 파티가 99 사냥터가 차거나 죽어서 층을 낮추다 아벨해안(67)까지 내려왔다(사용자
+        // 2026-10-09 「아벨인데 99장비입은 전사랑 도적이」). 서클 안에 층이 없을 때만 예전처럼 아래로.
+        int[] mine = [.. tiers.Where(tier => tier >= CircleFloor(reach))];
+        if (mine.Length > 0)
+        {
+            tiers = mine;
+        }
 
         int[] open = [.. tiers.Skip(Math.Min(lower, Math.Max(0, tiers.Length - 1)))];
 
