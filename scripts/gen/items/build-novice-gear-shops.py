@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """노비스마을 무기방어구상점에 장비를 파는 NPC 둘을 세운다.
 
+**2026-10-08 부터 이것이 쓴 물목은 `build-circle-gear-shops.py` 가 마을·서클별로 다시 나눈다 — 이것을 `--쓰기` 한 뒤에는 그것도 다시 돌려라.**
+
   python3 scripts/gen/items/build-novice-gear-shops.py          # 무엇이 바뀌는지만 본다
   python3 scripts/gen/items/build-novice-gear-shops.py --쓰기    # 서버 정의에 적는다
 

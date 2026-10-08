@@ -54,29 +54,65 @@ public sealed record EcoConfig
     }
 }
 
-/// <summary>한 마을 가게 자리 — guide.txt <c>about … 판매:</c> 줄. <paramref name="Healing" /> = 파는 체력 물약 가짓수.</summary>
-public sealed record EcoStop(int Map, Tile Where, int Healing);
+/// <summary>
+/// 봇이 들르는 자리 — guide.txt 의 꼬리표(생성기 <c>build-client-guide.py</c>, 서버 NPC 정의에서)로만 정한다. 가게는 <c>stock</c> 줄:
+/// <paramref name="Role" /> = 역할 낱말(무기·방어구·물약 …), <paramref name="Healing" /> = 파는 체력 물약 가짓수, <paramref name="Lowest" />~
+/// <paramref name="Highest" /> = 입는 물건이 든 서클의 레벨 폭(0 이면 입는 물건이 없다). 그 밖 NPC 는 <c>npc</c> 줄(이름표).
+/// 상점을 옮기거나 물목을 바꾸면 생성기를 다시 돌리는 것만으로 봇 동선이 따라간다(사용자 2026-10-08 「모든 정보나 봇들을 라벨링해서
+/// 데이터 수정하면 거기에 맞게 적용되도록」).
+/// </summary>
+public sealed record EcoStop(int Map, Tile Where, int Healing, string Role = "", int Lowest = 0, int Highest = 0)
+{
+    /// <summary>이 레벨이 장비를 보러 들를 가게인가 — 제 서클 가게만(다섯 마을을 다 돌면 헛걸음).</summary>
+    public bool Fits(int level) => Highest == 0 || (Lowest <= level && level <= Highest);
+}
 
 /// <summary>봇이 함께 보는 세상 자료 — 맵 벽·사냥터·가게·직업 기술.</summary>
-public sealed class EcoWorld(MapWalls walls, IReadOnlyList<EcoGround> grounds, IReadOnlyList<EcoStop> stops, ClassKit kit)
+public sealed class EcoWorld(MapWalls walls, IReadOnlyList<EcoGround> grounds, IReadOnlyList<EcoStop> stops, ClassKit kit,
+    IReadOnlyDictionary<string, EcoStop>? named = null)
 {
     public MapWalls Walls => walls;
     public IReadOnlyList<EcoGround> Grounds => grounds;
-    /// <summary>체력 물약을 가장 여러 가지 파는 가게(음식점의 엑스쿠라눔 하나짜리가 아니라 물약 가게).</summary>
-    public EcoStop? PotionStop => stops.Where(stop => stop.Healing > 0).MaxBy(stop => stop.Healing);
+    /// <summary>역할이 물약인 가게 중 체력 물약을 가장 여러 가지 파는 곳(음식점의 엑스쿠라눔 하나짜리가 아니라 물약 가게).</summary>
+    public EcoStop? PotionStop => stops.Where(stop => stop.Role == "물약" && stop.Healing > 0).MaxBy(stop => stop.Healing);
 
-    /// <summary>체력 물약을 하나도 안 파는 가게 — 무기·옷·장신구.</summary>
-    public IReadOnlyList<EcoStop> GearStops => [.. stops.Where(stop => stop.Healing == 0)];
+    /// <summary>역할이 장비인 가게 — 무기·방어구(옛 장신구). 레벨에 맞는 곳만 들르는 것은 <see cref="EcoStop.Fits" />.</summary>
+    public IReadOnlyList<EcoStop> GearStops => [.. stops.Where(stop => stop.Role is "무기" or "방어구" or "장신구")];
+
+    /// <summary>이름표로 찾는 NPC(세오·칸·뮤레칸 …) — guide.txt <c>npc</c> 줄. 같은 이름이 여럿이면 처음 것. 없으면 null.</summary>
+    public EcoStop? Npc(string name) => named is not null && named.TryGetValue(name, out EcoStop? stop) ? stop : null;
     public ClassKit Kit => kit;
 
     public static EcoWorld Load(string folder)
     {
         string Text(string name) => folder.Length > 0 && File.Exists(Path.Combine(folder, name)) ? File.ReadAllText(Path.Combine(folder, name)) : string.Empty;
 
-        return new EcoWorld(new MapWalls(folder), EcoGrounds.Read(Text("eco-grounds.txt")), Stops(Text("guide.txt")), ClassKit.Read(Text("class-kit.txt")));
+        string guide = Text("guide.txt");
+        return new EcoWorld(new MapWalls(folder), EcoGrounds.Read(Text("eco-grounds.txt")), Stops(guide), ClassKit.Read(Text("class-kit.txt")), Named(guide));
     }
 
-    /// <summary>guide.txt 의 <c>about &lt;맵&gt; &lt;x&gt; &lt;y&gt; 판매: 이름, 이름…</c> 줄 — 같은 것을 파는 가게가 여럿이면 처음 것만.</summary>
+    /// <summary>guide.txt 의 <c>npc &lt;맵&gt; &lt;x&gt; &lt;y&gt; &lt;이름&gt;</c> 줄 — 이름마다 처음 자리.</summary>
+    public static IReadOnlyDictionary<string, EcoStop> Named(string guide)
+    {
+        Dictionary<string, EcoStop> named = [];
+
+        foreach (string line in guide.Split('\n'))
+        {
+            string[] part = line.Trim().Split(' ', 5);
+            if (part.Length == 5 && part[0] == "npc" && int.TryParse(part[1], out int map) && int.TryParse(part[2], out int x)
+                && int.TryParse(part[3], out int y))
+            {
+                named.TryAdd(part[4], new EcoStop(map, new Tile(x, y), 0));
+            }
+        }
+
+        return named;
+    }
+
+    /// <summary>
+    /// guide.txt 의 <c>stock &lt;맵&gt; &lt;x&gt; &lt;y&gt; &lt;역할&gt; &lt;최저&gt; &lt;최고&gt; 이름, 이름…</c> 줄 — 같은 것을 파는 가게가 여럿이면 처음 것만.
+    /// 사람이 읽는 <c>about</c> 줄은 2026-10-08 부터 「판매: 무기 67종 · 레벨 1~99」로 줄여 적어 물건 이름이 없다.
+    /// </summary>
     public static IReadOnlyList<EcoStop> Stops(string guide)
     {
         HashSet<string> seen = [];
@@ -84,16 +120,17 @@ public sealed class EcoWorld(MapWalls walls, IReadOnlyList<EcoGround> grounds, I
 
         foreach (string line in guide.Split('\n'))
         {
-            string[] part = line.Trim().Split(' ', 5);
-            if (part.Length < 5 || part[0] != "about" || !part[4].StartsWith("판매:", StringComparison.Ordinal)
+            string[] part = line.Trim().Split(' ', 8);
+            if (part.Length < 8 || part[0] != "stock"
                 || !int.TryParse(part[1], out int map) || !int.TryParse(part[2], out int x) || !int.TryParse(part[3], out int y)
-                || !seen.Add(part[4]))
+                || !int.TryParse(part[5], out int lowest) || !int.TryParse(part[6], out int highest)
+                || !seen.Add(part[7]))
             {
                 continue;
             }
 
-            int healing = part[4][3..].Split(',').Count(name => EcoShopping.IsHealing(name.Trim()));
-            stops.Add(new EcoStop(map, new Tile(x, y), healing));
+            int healing = part[7].Split(',').Count(name => EcoShopping.IsHealing(name.Trim()));
+            stops.Add(new EcoStop(map, new Tile(x, y), healing, part[4], lowest, highest));
         }
 
         return stops;

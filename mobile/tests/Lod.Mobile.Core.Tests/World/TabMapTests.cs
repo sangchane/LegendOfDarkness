@@ -124,7 +124,7 @@ public sealed class TabMapTests
 
     /// <summary>
     /// The shipped <c>guide.txt</c> (<c>build-client-guide.py</c>) gives the shops and the bank the roles a player looks
-    /// for: 수오미 무기점·방어구점 doors, 마인 은행·제작상점 doors, 보석상여주인 and 메린 where they stand.
+    /// for: 수오미 무기점·방어구점 doors, 마인 은행·제작상점 doors, 아벨 피어스·해리슨 and 메린 where they stand.
     /// </summary>
     [Fact]
     public void The_shipped_guide_tells_what_the_town_npcs_do()
@@ -136,7 +136,9 @@ public sealed class TabMapTests
         Assert.Equal([NpcRole.Armor], guide.RoomsOn(20355).Single(room => room.To == "수오미방어구점").Kinds);
         Assert.Equal([NpcRole.Bank], guide.RoomsOn(20304).Single(room => room.To == "마인은행").Kinds);
         Assert.Equal([NpcRole.Craft], guide.RoomsOn(20304).Single(room => room.To == "마인제조상점").Kinds);
-        Assert.Equal(NpcRole.Accessory, guide.SignsOn(20028).Single(sign => sign.Name == "보석상여주인").Role);
+        // 서클 상점(2026-10-08) — 아벨 무기점·방어구점의 새 상인. 방어구상은 장신구까지 팔아도 방어구다.
+        Assert.Equal(NpcRole.Weapon, guide.SignsOn(20031).Single(sign => sign.Name == "피어스").Role);
+        Assert.Equal(NpcRole.Armor, guide.SignsOn(20032).Single(sign => sign.Name == "해리슨").Role);
         Assert.Equal(NpcRole.Craft, guide.SignsOn(20308).Single(sign => sign.Name == "메린").Role);
     }
 

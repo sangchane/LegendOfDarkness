@@ -578,6 +578,7 @@ public partial class GameScreen : Control
         RehearseNotices();
         RehearseRoll();
         RehearseRoleSheet();
+        RehearseShop();
         Dropped();
         RejoinIfHandedOff();
         LogUnread();

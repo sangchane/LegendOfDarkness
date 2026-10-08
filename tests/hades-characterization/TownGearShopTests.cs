@@ -19,6 +19,10 @@ namespace Lod.Hades.Characterization.Tests;
 /// 자리는 혼든(수오미)과 5.99(우드랜드)의 spawn 줄이다 — `scripts/gen/items/build-town-gear-shops.py`.
 /// 되돌리면(템플릿 세 장을 지우면) 아래 넷이 모두 실패한다.
 ///
+/// **2026-10-08 부터 마을마다 그 던전 서클의 장비만 판다**(사용자, `autopilot/circle-shops/SPEC.md`, 생성기
+/// `scripts/gen/items/build-circle-gear-shops.py`) — 노비스 1~2 · 수오미 2 · 아벨 3 · 뤼케시온해안대기실 4 · 구광산대기실 5,
+/// 무기상·방어구상(무기 밖 입는 것 전부) 둘씩. 우드랜드입구 장신구상은 없앴다(장신구는 노비스 드보이로).
+///
 /// **값은 아이템 템플릿에서 읽는다.** 가격·레벨은 다른 작업이 원작 도감으로 되돌리는 중이라
 /// 시험에 박아 두면 엉뚱하게 깨진다. 여기서 지키는 것은 **NPC 와 물목**이다.
 /// </summary>
@@ -27,29 +31,33 @@ public sealed class TownGearShopTests : IDisposable
     private const int SuomiTown = 20355;
     private const int SuomiWeaponShop = 20356;
     private const int SuomiArmourShop = 20357;
-    private const int WoodlandEntrance = 20028;
 
     private const string WeaponSmith = "가이@수오미무기점#7,7";
     private const string Armourer = "아돌@수오미방어구점#4,5";
-    private const string Jeweller = "보석상여주인@우드랜드입구#10,15";
+    private const string NoviceArmourer = "드보이@노비스무기방어구상점#6,2";
+    private const string AbelWeaponSmith = "피어스@아벨무기점#7,7";
+    private const string AbelArmourer = "해리슨@아벨방어구점#4,5";
+    private const int AbelArmourShop = 20032;
 
-    /// <summary>혼든 `수오미마을_npc.txt` 의 이미지 30·30·163 — NPC 도 괴물과 같은 번호 체계로 온다(0x4000 을 더한다).</summary>
+    /// <summary>장비 상인 열 — (정의 이름, 파는 서클, 무기상인가). 서클 = 레벨 1~10 · 11~40 · 41~70 · 71~98 · 99.</summary>
+    private static readonly (string Shop, int[] Circles, bool Weapons)[] CircleShops =
+    [
+        ("델란@노비스무기방어구상점#3,7", [1, 2], true), (NoviceArmourer, [1, 2], false),
+        (WeaponSmith, [2], true), (Armourer, [2], false),
+        (AbelWeaponSmith, [3], true), (AbelArmourer, [3], false),
+        ("제이@뤼케시온해안대기실#26,23", [4], true), ("프리드@뤼케시온해안대기실#30,23", [4], false),
+        ("마이어@구광산대기실#16,45", [5], true), ("마시@구광산대기실#20,45", [5], false),
+    ];
+
+    /// <summary>혼든 `수오미마을_npc.txt`·`아벨마을_npc.txt` 의 이미지 30 — NPC 도 괴물과 같은 번호 체계로 온다(0x4000 을 더한다).</summary>
     private const int WeaponSmithSprite = 0x4000 + 30;
     private const int ArmourerSprite = 0x4000 + 30;
-    private const int JewellerSprite = 0x4000 + 163;
 
-    /// <summary>1레벨 공용 무기. 5.99 `전사무기` 목록의 첫 줄이고 다섯 직업이 다 든다.</summary>
-    private const string Sword = "에페";
+    /// <summary>11레벨 공용 무기 — 수오미는 2서클(11~40)만 판다(2026-10-08). 1레벨 「에페」는 노비스 델란으로 갔다.</summary>
+    private const string Sword = "커틀라스";
 
     /// <summary>5.99 `전사갑옷사기` 목록의 전사 갑옷.</summary>
     private const string Mail = "레더메일";
-
-    /// <summary>
-    /// 5.99 `반지사기` 목록의 첫 줄이던 「로오의반지」는 방어 접미사 장비라 상점에서 뺐다
-    /// (사용자 결정 2026-09-24 — <see cref="The_shops_sell_no_defense_suffix_gear"/>). 대신 접미사
-    /// 없는 기본 반지 「홍옥반지」를 채웠다.
-    /// </summary>
-    private const string Ring = "홍옥반지";
 
     /// <summary>1~25레벨 다섯 직업이 초반 동선에서 살 것이 있어야 한다.</summary>
     private const int EarlyLevel = 25;
@@ -57,10 +65,9 @@ public sealed class TownGearShopTests : IDisposable
     /// <summary>값이 도감 값으로 오르내리는 중이라 넉넉히 준다.</summary>
     private const uint Purse = 1_000_000;
 
-    /// <summary>수오미무기점은 15x15, 수오미방어구점은 12x12, 우드랜드입구는 40x24 다(`areas/*.json`).</summary>
+    /// <summary>수오미무기점은 15x15, 수오미방어구점은 12x12 다(`areas/*.json`).</summary>
     private static readonly (int Columns, int Rows) WeaponShopSize = (15, 15);
     private static readonly (int Columns, int Rows) ArmourShopSize = (12, 12);
-    private static readonly (int Columns, int Rows) WoodlandSize = (40, 24);
 
     /// <summary>
     /// 문으로 들어오면 내려놓는 칸. 같은 문칸 수오미마을(11,55) 에 워프가 **둘** 걸려 있어
@@ -81,12 +88,6 @@ public sealed class TownGearShopTests : IDisposable
     private static readonly Tile WeaponCounter = new(7, 10);
     private static readonly Tile ArmourCounter = new(4, 8);
 
-    /// <summary>우드랜드입구에는 상점 건물이 없다 — 장신구상이 길가에 선다. 손님은 바로 옆 칸에 선다.</summary>
-    private static readonly Tile JewelStall = new(10, 15);
-    private static readonly Tile JewelCounter = new(10, 16);
-
-    /// <summary>`warp 우드랜드입구 to world map` — 세계지도에서 내려서는 칸.</summary>
-    private static readonly Tile WoodlandLanding = new(10, 23);
 
     private readonly CancellationTokenSource _deadline = new(TimeSpan.FromMinutes(4));
 
@@ -180,30 +181,55 @@ public sealed class TownGearShopTests : IDisposable
     /// 우드랜드입구는 세계지도에서 내려서는 사냥터 입구다. 내려선 칸(10,23)에서 걸어 올라가 장신구상에게
     /// 말을 걸고 반지를 산다 — 5.99 팩이 NPC 에 묶지 않아 게임에 없던 장신구다.
     /// </summary>
+    /// <summary>
+    /// 아벨방어구점(빈 건물이던 것)에 3서클 방어구상 해리슨이 선다 — 수오미방어구점과 같은 지도라 아돌과 같은 칸(4,5), 손님은 계산대 앞.
+    /// 41레벨 「동장갑」을 산다(2026-10-08).
+    /// </summary>
     [Fact]
-    public async Task Walking_up_from_the_woodland_landing_buys_a_trinket_from_the_jeweller()
+    public async Task The_abel_armourer_sells_third_circle_gear()
     {
-        const string who = "woodgear";
+        const string who = "abelgear";
 
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare(
-            startTogether: (WoodlandEntrance, WoodlandLanding.X, WoodlandLanding.Y));
+            startTogether: (AbelArmourShop, ArmourCounter.X, ArmourCounter.Y));
         server.Start(TimeSpan.FromMinutes(2));
 
-        WorldClient world = await Arrive(server, who, WoodlandEntrance);
+        WorldClient world = await Arrive(server, who, AbelArmourShop);
+        Creature keeper = await Standing(world, new Tile(4, 5));
+        Assert.Equal(ArmourerSprite, keeper.Sprite);
 
-        Func<Tile, bool> walled = WorldMapTests.Walled(
-            server, WoodlandEntrance, WoodlandSize.Columns, WoodlandSize.Rows);
+        await BuyOne(world, keeper, AbelArmourer, "동장갑");
+    }
 
-        IReadOnlyList<Tile>? way = Pathing.Way(WoodlandLanding, JewelCounter, walled, reach: 400);
-        Assert.True(way is not null, $"{WoodlandLanding} 에서 장신구 가게 앞 {JewelCounter} 로 걸어갈 길이 없습니다.");
+    /// <summary>
+    /// 장비 상인 열이 저마다 제 서클·갈래만 판다 — 무기상은 무기(자리 1)만, 방어구상은 무기 밖 입는 것. 우드랜드입구 장신구상은 없다.
+    /// </summary>
+    [Fact]
+    public void Every_gear_shop_sells_only_its_circle_and_kind()
+    {
+        Dictionary<string, JsonNode> items = Items();
+        List<string> wrong = [];
 
-        await WorldMapTests.WalkTheWay(world, way!, WoodlandEntrance, _deadline.Token);
-        Assert.Equal(JewelCounter, world.State!.Where);
+        foreach ((string shop, int[] circles, bool weapons) in CircleShops)
+        {
+            string[] stock = Stock(shop);
+            Assert.NotEmpty(stock);
 
-        Creature jeweller = await Standing(world, JewelStall);
-        Assert.Equal(JewellerSprite, jeweller.Sprite);
+            foreach (string good in stock)
+            {
+                int level = items[good]["LevelRequired"]?.GetValue<int>() ?? 1;
+                int ring = level <= 10 ? 1 : level <= 40 ? 2 : level <= 70 ? 3 : level <= 98 ? 4 : 5;
+                bool weapon = items[good]["EquipmentSlot"]?.GetValue<int>() == 1;
 
-        await BuyOne(world, jeweller, Jeweller, Ring);
+                if (!circles.Contains(ring) || weapon != weapons)
+                {
+                    wrong.Add($"{shop} → {good}(레벨 {level}, {(weapon ? "무기" : "방어구")})");
+                }
+            }
+        }
+
+        Assert.True(wrong.Count == 0, string.Join(", ", wrong));
+        Assert.False(File.Exists(Path.Combine(HadesWorkspace.ServerDataDirectory, "templates", "mundanes", "보석상여주인@우드랜드입구#10,15.json")));
     }
 
     /// <summary>
@@ -219,7 +245,7 @@ public sealed class TownGearShopTests : IDisposable
                  {
                      (WeaponSmith, new[] { 1 }),
                      (Armourer, new[] { 2 }),
-                     (Jeweller, AccessorySlots),
+                     (NoviceArmourer, AccessorySlots),
                  })
         {
             JsonNode keeper = Keeper(shop);
@@ -247,14 +273,15 @@ public sealed class TownGearShopTests : IDisposable
 
     /// <summary>
     /// 41레벨 전사 무기 「액스」는 5.99 전사무기 목록에 없어 어디서도 못 샀다(사용자 2026-09-26 "액스를 상점에").
-    /// 수오미 가이가 원작 표 값(판매가격 6100)으로 판다 — `scripts/gen/items/build-town-gear-shops.py` 원작무기.
+    /// 원작 표 값(판매가격 6100)으로 판다 — `scripts/gen/items/build-town-gear-shops.py` 원작무기. 41레벨이라 2026-10-08 부터
+    /// 3서클 아벨 피어스가 판다.
     /// </summary>
     [Fact]
-    public void The_suomi_weapon_smith_sells_the_level_41_axe_at_the_original_price()
+    public void The_abel_weapon_smith_sells_the_level_41_axe_at_the_original_price()
     {
         Dictionary<string, JsonNode> items = Items();
 
-        Assert.Contains("액스", Stock(WeaponSmith));
+        Assert.Contains("액스", Stock(AbelWeaponSmith));
         Assert.Equal(41, items["액스"]["LevelRequired"]!.GetValue<int>());
         Assert.Equal(1, items["액스"]["Class"]!.GetValue<int>());
         Assert.Equal(6100, items["액스"]["Value"]!.GetValue<int>());
@@ -263,12 +290,13 @@ public sealed class TownGearShopTests : IDisposable
     /// <summary>
     /// 5.99 팩이 NPC 에 묶지 않고 남긴 장신구 목록 — 각반·신발·벨트·귀걸이·방패·반지(+전사투구)。
     /// 장신구 칸은 방패 3 · 투구 4 · 귀걸이 5 · 목걸이 6 · 반지 7 · 장갑 9 · 벨트 11 · 각반 12 · 신발 13 이다.
-    /// 그중 **1~25레벨에 낄 수 있는 칸**이 실제로 팔리는지 본다.
+    /// 그중 **1~25레벨에 낄 수 있는 칸**이 실제로 팔리는지 본다 — 2026-10-08 부터 우드랜드입구 장신구상 대신 노비스 드보이가 판다.
     /// </summary>
     [Fact]
-    public void The_woodland_jeweller_covers_the_accessory_slots_the_pack_left_unbound()
+    public void The_novice_armourer_covers_the_accessory_slots_the_pack_left_unbound()
     {
         Dictionary<string, JsonNode> items = Items();
+        string Jeweller = NoviceArmourer;
         string[] stock = Stock(Jeweller);
 
         // 5.99 목록이 1~25레벨에 실제로 주는 칸들이다(반지·장갑·신발·벨트·각반·방패·귀걸이).
@@ -304,7 +332,7 @@ public sealed class TownGearShopTests : IDisposable
     {
         List<string> broken = [];
 
-        foreach (string shop in new[] { WeaponSmith, Armourer, Jeweller })
+        foreach (string shop in CircleShops.Select(one => one.Shop))
         {
             foreach (string good in Stock(shop))
             {

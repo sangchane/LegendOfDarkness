@@ -59,6 +59,13 @@ public partial class Main : Control
     /// <summary>손 없이 확인할 때 — 내 장비창을 연 채 이 이름의 사람을 실제로 탭해 그 사람 장비창을 받는다(<c>--look 이름</c>).</summary>
     public static string Looking { get; private set; } = string.Empty;
 
+    /// <summary>손 없이 확인할 때 — 6초 뒤 이 칸(<c>--shop-at x,y</c>)에 선 상인을 눌러 「삽니다」까지 고른다. 상점 창 사진용.</summary>
+    public static Lod.Mobile.Core.Model.Tile? ShopAt =>
+        System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--shop-at") is var at and >= 0 && at + 1 < OS.GetCmdlineUserArgs().Length
+        && OS.GetCmdlineUserArgs()[at + 1].Split(',') is [var x, var y] && int.TryParse(x, out int column) && int.TryParse(y, out int row)
+            ? new Lod.Mobile.Core.Model.Tile(column, row)
+            : null;
+
     /// <summary>손 없이 확인할 때 — 위로 끌어 조준한 셈 치고 끝낸 뒤 고름 표시가 유효 시간 뒤 돌아오는지 적는다(<c>--aim-hold</c>).</summary>
     public static bool AimHolding => System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--aim-hold") >= 0;
 

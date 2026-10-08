@@ -65,7 +65,7 @@ public sealed class GemTests : IDisposable
         WorldClient world = await Enter(Workshop);
 
         // 로오의금팔찌(99, 드랍만): 하나에 중급 49.5% + 고가 5% — 20개에 하나도 안 나올 확률은 0.455^20 ≈ 10^-7.
-        // 금장갑(99)은 보석상여주인이 4,000골드에 판다 — 사서 분해하면 금화로 보석을 사는 셈이라 거절한다.
+        // 금장갑(99)은 구광산대기실 마시가 4,000골드에 판다 — 사서 분해하면 금화로 보석을 사는 셈이라 거절한다.
         await world.SayAsync("/give \"로오의금팔찌\" 20", _deadline.Token);
         await world.SayAsync("/give \"하급체력포션\" 3", _deadline.Token);
         await world.SayAsync("/give \"금장갑\" 1", _deadline.Token);

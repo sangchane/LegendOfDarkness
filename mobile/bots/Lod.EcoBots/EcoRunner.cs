@@ -26,14 +26,15 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     public static readonly TimeSpan Dead = TimeSpan.FromSeconds(90);
     public static readonly TimeSpan Answer = TimeSpan.FromSeconds(5);
 
-    /// <summary>죽으면 오는 곳(서버 설정 DeathMap) — 뮤레칸이 12,5 에 있다.</summary>
+    /// <summary>
+    /// 죽으면 오는 곳 — 서버 설정 <c>DeathMap</c>(NPC 자료가 아니라 서버 규칙이라 여기 둔다). 뮤레칸은 guide.txt 이름표로 찾는다(<see cref="EcoWorld.Npc" />).
+    /// </summary>
     public const int DeathMap = 20138;
 
-    private static readonly Tile Murekan = new(12, 5);
-
-    /// <summary>세오(세오신전 — 체력)·칸(칸신전 — 마력). 5.99 <c>세오.cs</c>·<c>칸.cs</c>.</summary>
-    private static readonly EcoStop Seo = new(20299, new Tile(3, 4), 0);
-    private static readonly EcoStop Kan = new(20302, new Tile(3, 4), 0);
+    // 세오(세오신전 — 체력)·칸(칸신전 — 마력)·뮤레칸(부활) — 자리는 박지 않고 guide.txt 이름표에서(2026-10-08, 옮기면 생성기만 다시).
+    private EcoStop? Seo => land.Npc("세오");
+    private EcoStop? Kan => land.Npc("칸");
+    private Tile? Murekan => land.Npc("뮤레칸")?.Where;
 
     private readonly EcoLife _life = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
@@ -423,10 +424,16 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         (mana ? _world.Vitals!.MaximumMana : _world.Vitals!.MaximumHealth) - _world.Worn.Sum(one => (mana ? one.Stats?.Mp : one.Stats?.Hp) ?? 0);
 
     /// <summary>세오·칸에게서 산다 — 「체력을 산다.」·「마력을 산다.」 → 횟수 → 최대가 오를 때까지(모자라면 서버가 먼저 멈춘다).</summary>
-    private async Task<bool> Trade(EcoStop stop, bool mana, long banked, CancellationToken token)
+    private async Task<bool> Trade(EcoStop? stop, bool mana, long banked, CancellationToken token)
     {
         int step = mana ? EcoVitality.Mana : EcoVitality.Health;
         int times = EcoVitality.Times(Body(mana), banked, step);
+        if (stop is null)
+        {
+            log($"guide.txt 에 {(mana ? "칸" : "세오")} 이름표가 없습니다.");
+            return false;
+        }
+
         if (times == 0 || !await MoveTo(stop.Map, stop.Where, token) || await Merchant(stop, token) is not { } seller)
         {
             return false;
@@ -607,7 +614,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     /// <summary>장비 가게마다 맞고 지금보다 좋은 것(체력·방어 — <see cref="EcoShopping.Score" />)을 사서 입는다. <paramref name="reserve" /> 금화는 남긴다.</summary>
     private async Task BuyGear(long reserve, CancellationToken token)
     {
-        foreach (EcoStop stop in land.GearStops)
+        foreach (EcoStop stop in land.GearStops.Where(stop => stop.Fits(_world.Vitals!.Level)))
         {
             if (!await MoveTo(stop.Map, stop.Where, token) || await Merchant(stop, token) is not { } merchant || await Goods(merchant, token) is not { } goods)
             {
@@ -781,6 +788,11 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         {
             _dead = true;
             Event("death", new { ground = _ground });
+        }
+
+        if (Murekan is null)
+        {
+            log("guide.txt 에 뮤레칸 이름표가 없어 살아날 수 없습니다.");
         }
 
         if (_world.Creatures.FirstOrDefault(one => one.Where == Murekan) is not { } murekan)

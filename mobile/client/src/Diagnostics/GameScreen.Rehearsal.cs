@@ -360,6 +360,31 @@ public partial class GameScreen : Control
         GD.Print("GREYBOX_ROLL_PREVIEW 전사 87");
     }
 
+    private int _shopStep;
+    private uint _shopKeeper;
+
+    /// <summary>손 없이 확인할 때만(<c>--shop-at x,y</c>): 6초 뒤 그 칸 상인을 눌러 메뉴가 오면 「삽니다」 — 상점 창(갈래 탭) 사진용.</summary>
+    private void RehearseShop()
+    {
+        if (Main.ShopAt is not { } at || _server is null || Time.GetTicksMsec() < 6000)
+        {
+            return;
+        }
+
+        if (_shopStep == 0 && _server.Creatures.FirstOrDefault(one => one.Kind == Lod.Mobile.Core.Model.CreatureKind.Merchant && one.Where == at) is { } keeper)
+        {
+            _shopStep = 1;
+            _shopKeeper = keeper.Serial;
+            Main.Fire(_server.ClickAsync(keeper.Serial, System.Threading.CancellationToken.None));
+        }
+        else if (_shopStep == 1 && _server.Talking?.Options.FirstOrDefault(option => option.Text == "삽니다") is { } buy)
+        {
+            _shopStep = 2;
+            Main.Fire(_server.AnswerAsync(_shopKeeper, buy.Step, System.Threading.CancellationToken.None));
+            GD.Print("GREYBOX_SHOP 삽니다");
+        }
+    }
+
     private bool _roleSheetShown;
 
     /// <summary>손 없이 확인할 때만(<c>--role-sheet</c>): 3초 뒤 NPC 역할 아이콘 16종을 반지름 6·7·8·10·14 로 한 판에.</summary>

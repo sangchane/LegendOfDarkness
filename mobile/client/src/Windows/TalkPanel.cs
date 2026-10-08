@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Lod.Mobile.Core.Model;
+using Lod.Mobile.Core.Ui;
 
 namespace LodClient;
 
@@ -46,6 +47,12 @@ public sealed partial class TalkPanel : PanelContainer
     private bool _waiting;
     private double _waitSeconds;
     private OptionButton? _classFilter, _genderFilter, _circleFilter;
+
+    // 갈래 탭(사용자 2026-10-08 「탭도 안나눠져 있는거 같거든」) — 제목 줄 아래 옆으로 미는 한 줄. 「전체」는 두지 않고 갑옷이 먼저
+    // 열린다(사용자 「탭에 전체는 두지말고 갑옷을 디폴트로해」), 갑옷이 없는 상점은 첫 갈래. 「」면 거르지 않는다(갈래가 하나뿐).
+    private readonly HBoxContainer _kinds = new();
+    private readonly ScrollContainer _kindScroll = new() { VerticalScrollMode = ScrollContainer.ScrollMode.Disabled, Visible = false };
+    private string _kind = "";
     private readonly List<(Control Row, DialogueGoods Goods)> _goodsRows = [];
 
     public event System.Action<uint, bool, IReadOnlyList<(string Name, int Slot, int Quantity)>>? Traded;
@@ -96,6 +103,9 @@ public sealed partial class TalkPanel : PanelContainer
         body.AddThemeConstantOverride("separation", Main.Gutter);
         // 용문양은 뺀다 — 거르개 셋·상인 이름만으로 세로 360 이 꽉 차, 넣으면 [닫기] 가 화면 밖으로 밀렸다(2026-09-30).
         body.AddChild(Greybox.Header(head, emblem: false));
+        _kinds.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        _kindScroll.AddChild(_kinds);
+        body.AddChild(_kindScroll);
         _filters.SizeFlagsHorizontal = SizeFlags.ShrinkBegin;
         _filters.AddThemeConstantOverride("separation", Main.Gutter / 2);
         body.AddChild(scroll);
@@ -175,6 +185,13 @@ public sealed partial class TalkPanel : PanelContainer
             _filters.RemoveChild(old);
             old.QueueFree();
         }
+        foreach (Node old in _kinds.GetChildren())
+        {
+            _kinds.RemoveChild(old);
+            old.QueueFree();
+        }
+        _kind = "";
+        _kindScroll.Visible = false;
         _shop = IsShop(talk) ? talk : null;
         _checkout.Visible = _shop is not null;
         _filters.Visible = _shop?.Kind == DialogueKind.Goods && !Bank;
@@ -286,6 +303,12 @@ public sealed partial class TalkPanel : PanelContainer
                 AddGoodsInfo(row, goods);
                 _goodsRows.Add((row, goods));
             }
+
+            // 첫 갈래(갑옷)만 보이게 열린다.
+            if (_kind.Length > 0)
+            {
+                ApplyFilters();
+            }
         }
         if (_lines.Count == 0) _offers.AddChild(new Label { Text = Bank ? (selling ? "맡길 수 있는 물건이 없습니다." : "맡긴 물건이 없습니다.") : selling ? "팔 수 있는 물건이 없습니다." : "판매 중인 물건이 없습니다." });
         UpdateSummary();
@@ -362,6 +385,27 @@ public sealed partial class TalkPanel : PanelContainer
             _circleFilter.AddItem($"{circle}서클", circle);
         foreach (OptionButton filter in new[] { _classFilter, _genderFilter, _circleFilter })
             filter.ItemSelected += _ => ApplyFilters();
+
+        // 갈래가 둘 이상일 때만 탭 줄 — 무기상은 무기 하나라 숨고 거르지 않는다.
+        IReadOnlyList<string> kinds = ShopKinds.In(goods.Select(one => one.Stats));
+        ButtonGroup tabs = new();
+        string first = kinds.Count > 1 ? (kinds.Contains("갑옷") ? "갑옷" : kinds[0]) : "";
+        foreach (string kind in kinds.Count > 1 ? kinds : [])
+        {
+            Button tab = new() { Text = kind, ToggleMode = true, ButtonGroup = tabs, FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(0, 36) };
+            Greybox.Tab(tab);
+            tab.AddThemeFontSizeOverride("font_size", 13);
+            tab.Pressed += () =>
+            {
+                _kind = kind;
+                ApplyFilters();
+            };
+            tab.ButtonPressed = kind == first;
+            _kinds.AddChild(tab);
+        }
+
+        _kind = first;
+        _kindScroll.Visible = kinds.Count > 1;
     }
 
     private OptionButton Filter(string all)
@@ -398,7 +442,8 @@ public sealed partial class TalkPanel : PanelContainer
         foreach (var (row, goods) in _goodsRows)
             row.Visible = (job.Length == 0 || goods.Class.Length == 0 || goods.Class == "Peasant" || goods.Class == job)
                 && (gender == 0 || goods.Gender is 0 or 255 || goods.Gender == gender)
-                && (circle == 0 || goods.Circle == 0 || goods.Circle == circle);
+                && (circle == 0 || goods.Circle == 0 || goods.Circle == circle)
+                && (_kind.Length == 0 || ShopKinds.Of(goods.Stats) == _kind);
         // Hidden rows retain their selection; the summary explicitly counts those too.
         UpdateSummary();
     }
@@ -411,6 +456,13 @@ public sealed partial class TalkPanel : PanelContainer
             if (!value) throw new System.InvalidOperationException(message);
         }
         Require(_commit.Disabled && _lines.All(line => line.Count.Value == 0), "Initial quantities must be zero");
+        // 아래 거르개 검사는 모든 줄을 본다 — 갈래 탭(기본 갑옷)을 풀고 시작한다.
+        if (_kind.Length > 0)
+        {
+            _kind = "";
+            ApplyFilters();
+        }
+
         bool selling = _shop?.Kind == DialogueKind.PackSlots;
         if (selling)
         {
@@ -529,6 +581,7 @@ public sealed partial class TalkPanel : PanelContainer
         if (_shop is not null)
         {
             _filters.Visible = _shop.Kind == DialogueKind.Goods && !Bank && !typing;
+            _kindScroll.Visible = _filters.Visible && _kinds.GetChildCount() > 1;
             _checkout.Visible = !typing;
             _words.Visible = !typing;
         }

@@ -9,10 +9,15 @@
 
 줄 모양(알맹이 `MapGuide.Read` 가 읽는다):
   exit <맵> <x> <y> <간 곳 이름>      — 워프 칸 하나. 이어 붙은 칸은 알맹이가 한 출구로 묶는다
-  npc  <맵> <x> <y> <이름>            — mundanes 템플릿의 NPC 자리
+  npc  <맵> <x> <y> <이름>            — mundanes 템플릿의 NPC 자리. 앱 지도가 없는 맵(세오신전·칸신전 …)도 적는다 — 생태계 봇이
+                                        이름표로 세오·칸·뮤레칸을 찾는다(사용자 2026-10-08 「모든 정보나 봇들을 라벨링해서 데이터 수정하면
+                                        거기에 맞게 적용되도록」). about·role 줄도 같다.
   about <맵> <x> <y> <설명>           — 그 NPC 가 하는 일 한 줄(길 찾기 창 NPC 목록 팝업). 상점은 파는 갈래·가짓수·레벨 폭, 5.99 대화는
                                         부르는 명령으로(build-npc-page-data.py 와 같은 근거), 없으면 대사 첫 줄
   role <맵> <x> <y> <역할>            — 그 NPC 의 역할 한 낱말(미니맵·길 찾기 창·머리 위 아이콘, `ROLES`)
+  stock <맵> <x> <y> <역할> <최저> <최고> <이름, …> — 상점 물목 그대로(생태계 봇 `EcoWorld.Stops` 가 역할로 가게를 고른다 — about 은
+                                        사람이 읽게 요약한다). 최저·최고는 입는 물건이 든 서클의 레벨 폭(1~10 · 11~40 · 41~70 · 71~98 · 99),
+                                        없으면 0 0. 봇이 걸어 다닐 수 있게 앱 지도가 있는 맵만
   room <맵> <간 곳>|<NPC — 설명 / …>|<역할,…> — 출구 너머 맵(상점 건물 등)에 선 NPC 들과 그 역할. 마을 지도에서 상점 안을 말하려고
   area <맵> <입장 레벨> <town|field> <이름> — 월드맵이 내려 주는 맵(카드에 적는다). 레벨은 그 맵으로 드는 워프의
                                         LevelRequired 중 가장 큰 것(서버도 가장 엄한 것을 쓴다), 마을은 이름에 "마을"이 든 곳
@@ -76,7 +81,8 @@ def role(npc: dict, items: dict) -> str:
     stock = npc.get("DefaultMerchantStock") or []
 
     if key in ("shop1", "shop2") and stock:
-        kinds = [kind_of(items.get(name) or {}) for name in stock]
+        # 역할에서는 무기 밖 입는 것을 모두 방어구로 — 2026-10-08 부터 방어구상이 장신구까지 판다(build-circle-gear-shops.py).
+        kinds = ["방어구" if kind == "장신구" else kind for kind in (kind_of(items.get(name) or {}) for name in stock)]
         top = max(set(kinds), key=kinds.count)
         return top if kinds.count(top) * 2 > len(kinds) else "잡화"
     if key == "Banker":
@@ -94,6 +100,20 @@ def role(npc: dict, items: dict) -> str:
             calls.add("TEACH")
         return next((word for needed, word in ROLES if needed <= calls), "안내")
     return "안내"
+
+
+#: 서클 레벨 폭 — `docs/item-prices-by-circle.md`, `build-circle-gear-shops.py` 와 같다.
+CIRCLES = [(1, 10), (11, 40), (41, 70), (71, 98), (99, 99)]
+
+
+def circle_span(npc: dict, items: dict) -> tuple:
+    """상점이 파는 입는 물건이 든 서클들의 레벨 폭 — 봇이 제 레벨 가게만 들르게. 입는 물건이 없으면 (0, 0)."""
+    levels = [int((items.get(name) or {}).get("LevelRequired") or 1) for name in npc.get("DefaultMerchantStock") or []
+              if ((items.get(name) or {}).get("EquipmentSlot") or 0) > 0]
+    if not levels:
+        return 0, 0
+    ring = lambda level: next((lo, hi) for lo, hi in CIRCLES if level <= hi or hi == 99)
+    return ring(min(levels))[0], ring(max(levels))[1]
 
 
 #: 가르침 목록을 이만큼까지 이름으로, 넘으면 「외 N개」.
@@ -213,13 +233,16 @@ def main() -> None:
     lines += [f"zone {a} {z} {lv} {n}" for a, z, lv, n in zones]
 
     npcs = set()
+    stocks = []
 
     for path in sorted((SERVER / "templates" / "mundanes").glob("*.json")):
         npc = json.loads(path.read_text(encoding="utf-8-sig"))
         area = int(npc.get("AreaID") or 0)
 
-        if area in drawn:
-            npcs.add((area, int(npc["X"]), int(npc["Y"]), npc["Name"].split("@")[0], about(npc, items), role(npc, items)))
+        npcs.add((area, int(npc["X"]), int(npc["Y"]), npc["Name"].split("@")[0], about(npc, items), role(npc, items)))
+        if area in drawn and (npc.get("ScriptKey") or "") in ("shop1", "shop2") and npc.get("DefaultMerchantStock"):
+            lo, hi = circle_span(npc, items)
+            stocks.append((area, int(npc["X"]), int(npc["Y"]), role(npc, items), lo, hi, ", ".join(npc["DefaultMerchantStock"])))
 
     standing = {}
     roles_in = {}
@@ -240,6 +263,7 @@ def main() -> None:
     lines += [f"room {a} {w}|{t}|{r}" for a, w, t, r in rooms]
     lines += [f"about {a} {x} {y} {t}" for a, x, y, _, t, _ in sorted(npcs)]
     lines += [f"role {a} {x} {y} {r}" for a, x, y, _, _, r in sorted(npcs)]
+    lines += [f"stock {a} {x} {y} {r} {lo} {hi} {names}" for a, x, y, r, lo, hi, names in sorted(stocks)]
 
     (OUT / "guide.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"guide.txt: 맵 {len(drawn)} · 출구 칸 {len(exits)} · NPC {len(npcs)} · 건물 {len(rooms)} · 월드맵 맵 {len(places)} · 구역 {len(zones)}")

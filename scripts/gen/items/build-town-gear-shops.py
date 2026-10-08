@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """수오미마을과 우드랜드입구에 장비 상점을 세운다 — 무기·갑옷·장신구.
 
+**2026-10-08 부터 이것이 쓴 물목은 `build-circle-gear-shops.py` 가 마을·서클별로 다시 나눈다 — 이것을 `--쓰기` 한 뒤에는 그것도 다시 돌려라.**
+
   python3 scripts/gen/items/build-town-gear-shops.py          # 무엇이 바뀌는지만 본다
   python3 scripts/gen/items/build-town-gear-shops.py --쓰기    # 서버 정의에 적는다
 
