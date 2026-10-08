@@ -270,7 +270,7 @@ public sealed partial class AuctionPanel
         Button yes = Small("취소하기");
         Greybox.Commit(yes);
         Button no = Small("그만두기");
-        yes.CustomMinimumSize = no.CustomMinimumSize = new Vector2(96, Main.TouchMinimum);
+        yes.CustomMinimumSize = no.CustomMinimumSize = new Vector2(96, Tall);
         yes.Pressed += () =>
         {
             _confirm.Visible = false;

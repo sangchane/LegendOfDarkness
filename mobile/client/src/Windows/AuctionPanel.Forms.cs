@@ -19,12 +19,12 @@ public sealed partial class AuctionPanel
     private const double MostGold = 2_000_000_000;
 
     private readonly SpinBox _bid = Number("입찰 ");
-    private readonly Button _bidButton = new() { Text = "입찰", CustomMinimumSize = new Vector2(64, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
-    private readonly Button _buyoutButton = new() { CustomMinimumSize = new Vector2(48, Main.TouchMinimum), FocusMode = FocusModeEnum.None, ClipText = true, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+    private readonly Button _bidButton = new() { Text = "입찰", CustomMinimumSize = new Vector2(64, Tall), FocusMode = FocusModeEnum.None };
+    private readonly Button _buyoutButton = new() { CustomMinimumSize = new Vector2(48, Tall), FocusMode = FocusModeEnum.None, ClipText = true, SizeFlagsHorizontal = SizeFlags.ExpandFill };
     private readonly SpinBox _start = Number("시작 ");
     private readonly SpinBox _buyout = Number("즉시 ");
     private readonly Label _hint = Words(string.Empty, Greybox.Muted);
-    private readonly Button _postButton = new() { Text = "올리기", CustomMinimumSize = new Vector2(80, Main.TouchMinimum), FocusMode = FocusModeEnum.None, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+    private readonly Button _postButton = new() { Text = "올리기", CustomMinimumSize = new Vector2(80, Tall), FocusMode = FocusModeEnum.None, SizeFlagsHorizontal = SizeFlags.ExpandFill };
     private BoxContainer _strip = null!;
     private VBoxContainer _form = null!;
     private Control _side = null!;
@@ -59,13 +59,13 @@ public sealed partial class AuctionPanel
         _strip = new BoxContainer { Vertical = !Main.Portrait };
         _strip.AddThemeConstantOverride("separation", Main.Gutter / 2);
         _bid.SizeFlagsHorizontal = Main.Portrait ? SizeFlags.Fill : SizeFlags.ExpandFill;
-        _bid.CustomMinimumSize = new Vector2(Main.Portrait ? 104 : 0, Main.TouchMinimum);
+        _bid.CustomMinimumSize = new Vector2(Main.Portrait ? 104 : 0, Tall);
         _strip.AddChild(_bid);
         _strip.AddChild(_bidButton);
         _strip.AddChild(_buyoutButton);
         Typing(_bid, _strip);
 
-        _hoursSelect = PercentSelect.Of(["12시간", "24시간", "48시간"], _hoursAt, this, 96, Main.TouchMinimum);
+        _hoursSelect = PercentSelect.Of(["12시간", "24시간", "48시간"], _hoursAt, this, 96, Tall);
         _hoursSelect.Changed += index =>
         {
             _hoursAt = index;
@@ -197,7 +197,7 @@ public sealed partial class AuctionPanel
             Suffix = "전",
             UpdateOnTextChanged = true,
             SelectAllOnFocus = true,
-            CustomMinimumSize = new Vector2(96, Main.TouchMinimum)
+            CustomMinimumSize = new Vector2(96, Tall)
         };
         box.GetLineEdit().VirtualKeyboardType = LineEdit.VirtualKeyboardTypeEnum.Number;
 

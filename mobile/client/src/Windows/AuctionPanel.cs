@@ -21,8 +21,13 @@ namespace LodClient;
 /// </remarks>
 public sealed partial class AuctionPanel : PanelContainer
 {
+    /// <summary>이 창의 단추·입력 칸 높이 — 다른 창(48)보다 한 단계 작게(사용자 2026-10-08 「대체로 좀 크다」). 목록 줄은 그대로.</summary>
+    private const int Tall = 40;
+
     private static readonly string[] Tabs = ["찾기", "올리기", "내 경매", "받을 것"];
-    private static readonly string[] Kinds = ["전체", "무기", "방어구", "장신구", "기타"];
+    // 장비 칸별(서버 AuctionHouse.SlotGroupOf — 0x40 + 칸, 반지·장갑은 두 칸을 하나로). 기타는 옛 종류 4(장비가 아닌 것).
+    private static readonly string[] Kinds = ["종류 전체", "무기", "갑옷", "방패", "투구", "귀걸이", "목걸이", "반지", "장갑·팔찌", "벨트", "각반", "신발", "장식", "기타"];
+    private static readonly byte[] KindCodes = [0, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x49, 0x4B, 0x4C, 0x4D, 0x4E, 4];
     private static readonly string[] Sorts = ["남은 시간", "현재가", "즉시 구매가"];
     private static readonly string[] Bands = ["짧게", "보통", "길게", "아주 길게"];
     private static readonly string[] Reasons = ["낙찰품", "판매 대금", "유찰", "밀린 입찰금", "취소", "나눔 넘침"];
@@ -42,7 +47,7 @@ public sealed partial class AuctionPanel : PanelContainer
         PlaceholderText = "물건 이름",
         MaxLength = 20,
         SizeFlagsHorizontal = SizeFlags.ExpandFill,
-        CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+        CustomMinimumSize = new Vector2(0, Tall)
     };
 
     private readonly VBoxContainer _rows = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill };
@@ -50,7 +55,7 @@ public sealed partial class AuctionPanel : PanelContainer
     private readonly Label _pageLabel = Words("1 / 1", Greybox.Text);
     private readonly Button _previous = Small("◀");
     private readonly Button _next = Small("▶");
-    private readonly Button _takeAll = new() { Text = "모두 받기", CustomMinimumSize = new Vector2(96, Main.TouchMinimum), FocusMode = FocusModeEnum.None, Visible = false };
+    private readonly Button _takeAll = new() { Text = "모두 받기", CustomMinimumSize = new Vector2(96, Tall), FocusMode = FocusModeEnum.None, Visible = false };
     private readonly HBoxContainer _pager;
     private readonly Control _search;
 
@@ -90,7 +95,7 @@ public sealed partial class AuctionPanel : PanelContainer
                 ToggleMode = true,
                 ClipText = true,
                 FocusMode = FocusModeEnum.None,
-                CustomMinimumSize = new Vector2(44, Main.TouchMinimum),
+                CustomMinimumSize = new Vector2(44, Tall),
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 SizeFlagsStretchRatio = TabWidths[at]
             };
@@ -102,12 +107,12 @@ public sealed partial class AuctionPanel : PanelContainer
 
         HBoxContainer tabs = WindowFrame.Tabs(_tabButtons);
 
-        PercentSelect kind = PercentSelect.Of(Kinds, 0, this, 88, Main.TouchMinimum);
-        kind.Changed += index => { _kind = (byte)index; Ask(0); };
-        PercentSelect sort = PercentSelect.Of(Sorts, 0, this, 112, Main.TouchMinimum);
+        PercentSelect kind = PercentSelect.Of(Kinds, 0, this, 96, Tall);
+        kind.Changed += index => { _kind = KindCodes[index]; Ask(0); };
+        PercentSelect sort = PercentSelect.Of(Sorts, 0, this, 112, Tall);
         sort.Changed += index => { _sort = (byte)index; Ask(0); };
         Button find = Small("찾기");
-        find.CustomMinimumSize = new Vector2(64, Main.TouchMinimum);
+        find.CustomMinimumSize = new Vector2(64, Tall);
         find.Pressed += () => Ask(0);
         _query.TextSubmitted += _ => Ask(0);
         _previous.Pressed += () => Ask((ushort)Math.Max(0, _page - 1));
@@ -140,6 +145,7 @@ public sealed partial class AuctionPanel : PanelContainer
         _rows.AddThemeConstantOverride("separation", 4);
         scroll.AddChild(_rows);
 
+        _state.Visible = false;
         _state.ClipText = true;
         _state.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
         _state.SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -405,10 +411,11 @@ public sealed partial class AuctionPanel : PanelContainer
 
     private void Claims(ushort count) => _tabButtons[3].Text = count > 0 ? $"받을 것 {count}" : Tabs[3];
 
-    /// <summary>안내 한 줄 — 거절·결과·알림. 빈 문구는 줄만 남기고 지운다.</summary>
+    /// <summary>안내 한 줄 — 거절·결과·알림. 빈 문구면 줄을 감춘다(세로에서 빈 줄이 검색 줄과 목록 사이를 벌렸다, 사용자 2026-10-08).</summary>
     private void Say(string text, Color colour)
     {
         _state.Text = text;
+        _state.Visible = !string.IsNullOrEmpty(text);
         _state.AddThemeColorOverride("font_color", colour);
     }
 
@@ -485,7 +492,7 @@ public sealed partial class AuctionPanel : PanelContainer
 
     private static Button Small(string text)
     {
-        Button button = new() { Text = text, CustomMinimumSize = new Vector2(Main.TouchMinimum, Main.TouchMinimum), FocusMode = FocusModeEnum.None };
+        Button button = new() { Text = text, CustomMinimumSize = new Vector2(Tall, Tall), FocusMode = FocusModeEnum.None };
         Greybox.Plain(button);
         return button;
     }

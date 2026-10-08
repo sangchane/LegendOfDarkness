@@ -444,6 +444,12 @@ public sealed class AuctionTests : IDisposable
         Assert.Equal(12, shields.Rows.Count);
         AuctionPage armour = await View(view, () => view.AuctionBrowseAsync(2, 0, 0, string.Empty, _deadline.Token));
         Assert.Equal(12, armour.Rows.Count);
+
+        // 장비 칸별(0x40 + 칸) — 방패 칸(3)은 가죽방패 12, 무기 칸(1)은 에페 13, 갑옷 칸(2)·장신구는 없음.
+        Assert.Equal(12, (await View(view, () => view.AuctionBrowseAsync(0x43, 0, 0, string.Empty, _deadline.Token))).Rows.Count);
+        Assert.Equal(13, (await View(view, () => view.AuctionBrowseAsync(0x41, 0, 0, string.Empty, _deadline.Token))).Rows.Count);
+        Assert.Empty((await View(view, () => view.AuctionBrowseAsync(0x42, 0, 0, string.Empty, _deadline.Token))).Rows);
+        Assert.Empty((await View(view, () => view.AuctionBrowseAsync(0x47, 0, 0, string.Empty, _deadline.Token))).Rows);
     }
 
     [Fact]
