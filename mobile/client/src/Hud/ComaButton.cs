@@ -29,7 +29,7 @@ public sealed partial class ComaButton : Button
         TooltipText = "코마디움";
         Greybox.Plain(this);
 
-        _count.AddThemeFontSizeOverride("font_size", 11);
+        _count.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _count.AddThemeColorOverride("font_outline_color", Colors.Black);
         _count.AddThemeConstantOverride("outline_size", 4);
         _count.HorizontalAlignment = HorizontalAlignment.Right;

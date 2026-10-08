@@ -104,9 +104,9 @@ public sealed partial class GearPanel : PanelContainer
         _actionName.AddThemeColorOverride("font_color", Greybox.Title);
         _actionName.AddThemeFontSizeOverride("font_size", 15);
         _actionLine.AddThemeColorOverride("font_color", Greybox.Muted);
-        _actionLine.AddThemeFontSizeOverride("font_size", 12);
+        _actionLine.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _actionStats.AddThemeColorOverride("font_color", Greybox.Text);
-        _actionStats.AddThemeFontSizeOverride("font_size", 12);
+        _actionStats.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
 
         // 소지품 정보 상자와 같은 모양 — 그림 · 이름 · 내구, 그 아래 수치. [장착 해제]는 오른쪽 위(사용자 2026-10-01).
         VBoxContainer words = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter, SizeFlagsHorizontal = SizeFlags.ExpandFill };

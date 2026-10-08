@@ -115,7 +115,7 @@ public sealed partial class StatusStrip : Control
         if (_shown.Count > shown)
         {
             Font font = GetThemeDefaultFont();
-            DrawString(font, new Vector2(1 + (shown * step), _side), $"+{_shown.Count - shown}", HorizontalAlignment.Left, -1, 10, Greybox.Muted);
+            DrawString(font, new Vector2(1 + (shown * step), _side), $"+{_shown.Count - shown}", HorizontalAlignment.Left, -1, Greybox.SmallText, Greybox.Muted);
         }
     }
 

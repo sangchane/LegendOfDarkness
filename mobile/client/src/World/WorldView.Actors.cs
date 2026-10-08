@@ -513,7 +513,7 @@ public sealed partial class WorldView
             }
 
             Label words = new() { Text = one.Name.Split('@')[0], MouseFilter = MouseFilterEnum.Ignore };
-            words.AddThemeFontSizeOverride("font_size", 11);
+            words.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
             words.AddThemeColorOverride("font_color", new Color("#e8e2c8"));
             row.AddChild(words);
             tag.AddChild(row);

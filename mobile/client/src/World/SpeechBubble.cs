@@ -8,7 +8,7 @@ namespace LodClient;
 /// </summary>
 public sealed partial class SpeechBubble : Node2D
 {
-    private const int FontSize = 12;
+    private const int FontSize = Greybox.SmallText;
 
     /// <summary>How wide a line may get before it wraps — a little over three tiles.</summary>
     private const float Widest = 132;

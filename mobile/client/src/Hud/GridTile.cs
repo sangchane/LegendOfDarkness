@@ -41,7 +41,7 @@ public sealed partial class GridTile : VBoxContainer
         _mana.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = new Color("#0f0f0f") });
         _mana.AddThemeStyleboxOverride("fill", Greybox.Fill(Greybox.Mana));
 
-        _name.AddThemeFontSizeOverride("font_size", 10);
+        _name.AddThemeFontSizeOverride("font_size", Greybox.TightText);
         _name.AddThemeColorOverride("font_outline_color", new Color("#030303"));
         _name.AddThemeConstantOverride("outline_size", 2);
         _name.SetAnchorsPreset(LayoutPreset.FullRect);

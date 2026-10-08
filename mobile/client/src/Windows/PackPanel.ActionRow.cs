@@ -44,9 +44,9 @@ public sealed partial class PackPanel : PanelContainer
         _actionName.ClipText = true;
         _actionName.CustomMinimumSize = new Vector2(120, 0);
         _actionLine.AddThemeColorOverride("font_color", Greybox.Muted);
-        _actionLine.AddThemeFontSizeOverride("font_size", 12);
+        _actionLine.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _actionStats.AddThemeColorOverride("font_color", Greybox.Text);
-        _actionStats.AddThemeFontSizeOverride("font_size", 12);
+        _actionStats.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
 
         // 주 동작은 강조색 아이콘 — 창마다 확정은 하나(Greybox.Commit 과 같은 뜻).
         if (_use.GetMeta("glyph").As<Glyph>() is { } lit)

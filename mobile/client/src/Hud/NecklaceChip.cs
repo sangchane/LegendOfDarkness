@@ -59,7 +59,7 @@ public partial class NecklaceChip : Button
             AddThemeStyleboxOverride(state, circle);
         }
 
-        _letter.AddThemeFontSizeOverride("font_size", 10);
+        _letter.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _letter.AddThemeColorOverride("font_outline_color", Colors.Black);
         _letter.AddThemeConstantOverride("outline_size", 4);
         _letter.MouseFilter = MouseFilterEnum.Ignore;
@@ -194,7 +194,7 @@ public partial class NecklaceChip : Button
             };
 
             Greybox.Plain(choice);
-            choice.AddThemeFontSizeOverride("font_size", 11);
+            choice.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
 
             if (name == TargetOf(element))
             {

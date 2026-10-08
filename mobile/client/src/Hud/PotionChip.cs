@@ -45,7 +45,7 @@ public partial class PotionChip : Button
         Greybox.Plain(this);
 
         // 줄(70% · 끔 · 없음)은 왼쪽 위 구석에 작게 — 오른쪽 아래는 개수 자리다. 그림이 무엇을 마시는지 말하고 글자는 거든다.
-        _line.AddThemeFontSizeOverride("font_size", 10);
+        _line.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _line.AddThemeColorOverride("font_outline_color", Colors.Black);
         _line.AddThemeConstantOverride("outline_size", 4);
         _line.HorizontalAlignment = HorizontalAlignment.Left;
@@ -56,7 +56,7 @@ public partial class PotionChip : Button
         _line.OffsetTop = -2;
         AddChild(_line);
 
-        _count.AddThemeFontSizeOverride("font_size", 11);
+        _count.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _count.AddThemeColorOverride("font_outline_color", Colors.Black);
         _count.AddThemeConstantOverride("outline_size", 4);
         _count.HorizontalAlignment = HorizontalAlignment.Right;
@@ -172,7 +172,7 @@ public partial class PotionChip : Button
             };
 
             Greybox.Plain(choice);
-            choice.AddThemeFontSizeOverride("font_size", 11);
+            choice.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
 
             if (potion.Name == _read().Potion)
             {

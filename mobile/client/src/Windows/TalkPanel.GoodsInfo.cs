@@ -30,11 +30,11 @@ public sealed partial class TalkPanel
         box.AddThemeStyleboxOverride("panel", plate);
         Label line = new();
         line.AddThemeColorOverride("font_color", Greybox.Muted);
-        line.AddThemeFontSizeOverride("font_size", 12);
+        line.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         GridContainer table = new();
         Label notes = new();
         notes.AddThemeColorOverride("font_color", Greybox.Text);
-        notes.AddThemeFontSizeOverride("font_size", 12);
+        notes.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         VBoxContainer column = new();
         column.AddThemeConstantOverride("separation", 2);
         column.AddChild(line);

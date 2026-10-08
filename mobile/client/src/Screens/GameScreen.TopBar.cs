@@ -36,12 +36,12 @@ public partial class GameScreen : Control
         _myStatus.SizeFlagsVertical = SizeFlags.ShrinkCenter;
         // 첫 줄: 레벨 배지(금테 동그라미) · 금색 이름 · 금화.
         _level = new Label { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-        _level.AddThemeFontSizeOverride("font_size", 10);
+        _level.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _level.AddThemeColorOverride("font_color", LolText);
-        PanelContainer badge = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter, CustomMinimumSize = new Vector2(22, 18) };
+        PanelContainer badge = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter, CustomMinimumSize = new Vector2(26, 20) };
         StyleBoxFlat round = new() { BgColor = new Color("#0A1428"), BorderColor = LolCoin };
         round.SetBorderWidthAll(1);
-        round.SetCornerRadiusAll(9);
+        round.SetCornerRadiusAll(10);
         round.SetContentMarginAll(1);
         badge.AddThemeStyleboxOverride("panel", round);
         badge.AddChild(_level);
@@ -51,7 +51,7 @@ public partial class GameScreen : Control
         headline.AddChild(_who);
         _who.AddThemeColorOverride("font_color", LolGold);
         _wealth = Aux(string.Empty);
-        _wealth.AddThemeFontSizeOverride("font_size", 11);
+        _wealth.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _wealth.AddThemeColorOverride("font_color", LolCoin);
         // 금전 숫자가 무엇인지 알 수 있게 왼쪽에 금화 그림(원작 바닥 금화 32905, 사용자 2026-10-04).
         TextureRect coin = new()
@@ -73,7 +73,7 @@ public partial class GameScreen : Control
         // 이름 줄은 이름이 오기 전에는 접는다 — 빈 줄이 판 위에 남는다. 글자는 조금 작게 — 가로 360 에서 위 줄이 한 줄 늘어난
         // 만큼 조작 줄을 밀어내지 않게(판 네 줄이 80 안에 들어야 한다).
         _who.Visible = false;
-        _who.AddThemeFontSizeOverride("font_size", 12);
+        _who.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         // 가로도 세로와 같은 여백 — 가로에서 납작하게(compact) 눌러 체력·마력 판의 비율이 틀어졌다(사용자 2026-10-04).
         row.AddChild(LolPlated(mine, compact: false));
 
@@ -199,7 +199,7 @@ public partial class GameScreen : Control
         inside.AddThemeConstantOverride("separation", Main.Gutter / 2);
         _guideText = new Label { VerticalAlignment = VerticalAlignment.Center };
         _guideText.AddThemeColorOverride("font_color", LolText);
-        _guideText.AddThemeFontSizeOverride("font_size", 12);
+        _guideText.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
 
         Button stop = new() { Text = "멈춤", CustomMinimumSize = new Vector2(44, 28), FocusMode = FocusModeEnum.None };
         StyleBoxFlat stopPlate = new() { BgColor = new Color(0, 0, 0, 0.35f), BorderColor = LolGoldDark };
@@ -209,7 +209,7 @@ public partial class GameScreen : Control
         {
             stop.AddThemeStyleboxOverride(state, stopPlate);
         }
-        stop.AddThemeFontSizeOverride("font_size", 12);
+        stop.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         stop.AddThemeColorOverride("font_color", LolText);
         stop.Pressed += () => _world.StopGuiding();
 
@@ -522,7 +522,7 @@ public partial class GameScreen : Control
         circle.AddChild(picture);
 
         Label word = new() { Text = name, HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = MouseFilterEnum.Ignore };
-        word.AddThemeFontSizeOverride("font_size", 11);
+        word.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         word.AddThemeColorOverride("font_color", LolText);
         word.AddThemeColorOverride("font_outline_color", Colors.Black);
         word.AddThemeConstantOverride("outline_size", 3);

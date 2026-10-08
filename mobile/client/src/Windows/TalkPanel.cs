@@ -395,7 +395,7 @@ public sealed partial class TalkPanel : PanelContainer
         string first = kinds.Count > 1 ? (kinds.Contains("갑옷") ? "갑옷" : kinds[0]) : "";
         foreach (string kind in kinds.Count > 1 ? kinds : [])
         {
-            Button tab = new() { Text = kind, ToggleMode = true, ButtonGroup = tabs, FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(0, 36) };
+            Button tab = new() { Text = kind, ToggleMode = true, ButtonGroup = tabs, FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(Main.TouchMinimum, 44) };
             Greybox.Tab(tab);
             tab.AddThemeFontSizeOverride("font_size", 13);
             tab.Pressed += () =>

@@ -168,8 +168,8 @@ public sealed partial class PackPanel : PanelContainer
         {
             _pager.SizeFlagsHorizontal = SizeFlags.ShrinkEnd;
             _pageNumber.CustomMinimumSize = new Vector2(36, CellSize.Y);
-            _gold.AddThemeFontSizeOverride("font_size", 11);
-            _count.AddThemeFontSizeOverride("font_size", 11);
+            _gold.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
+            _count.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
             _foot.AddChild(_pager);
         }
 
@@ -472,7 +472,7 @@ public sealed partial class PackPanel : PanelContainer
         if (item.Stacks > 1)
         {
             Label count = new() { Text = item.Stacks.ToString(), MouseFilter = MouseFilterEnum.Ignore, HorizontalAlignment = HorizontalAlignment.Right };
-            count.AddThemeFontSizeOverride("font_size", 10);
+            count.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
             count.AddThemeColorOverride("font_color", Greybox.Text);
             count.AddThemeColorOverride("font_outline_color", Colors.Black);
             count.AddThemeConstantOverride("outline_size", 3);
@@ -481,7 +481,7 @@ public sealed partial class PackPanel : PanelContainer
             count.AnchorTop = 1;
             count.AnchorBottom = 1;
             // 숫자가 칸 테두리에 붙지 않게 모서리에서 조금 띄운다.
-            count.OffsetTop = -16;
+            count.OffsetTop = -19;
             count.OffsetRight = -5;
             count.OffsetBottom = -3;
             cell.AddChild(count);

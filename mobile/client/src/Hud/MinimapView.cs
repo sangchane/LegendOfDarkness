@@ -270,7 +270,7 @@ public sealed partial class MinimapView : Button
             if (columns == 0)
             {
                 Font font = GetThemeDefaultFont();
-                DrawString(font, new Vector2(0, (high / 2) + 4), "지도 없음", HorizontalAlignment.Center, wide, 11, Greybox.Muted);
+                DrawString(font, new Vector2(0, (high / 2) + 4), "지도 없음", HorizontalAlignment.Center, wide, Greybox.SmallText, Greybox.Muted);
                 return;
             }
 
@@ -338,8 +338,8 @@ public sealed partial class MinimapView : Button
             {
                 Font font = GetThemeDefaultFont();
                 Vector2 where = new(4, high - 4);
-                DrawStringOutline(font, where, owner.PlaceName, HorizontalAlignment.Left, wide - 28, 10, 3, Colors.Black);
-                DrawString(font, where, owner.PlaceName, HorizontalAlignment.Left, wide - 28, 10, Greybox.Title);
+                DrawStringOutline(font, where, owner.PlaceName, HorizontalAlignment.Left, wide - 28, Greybox.SmallText, 3, Colors.Black);
+                DrawString(font, where, owner.PlaceName, HorizontalAlignment.Left, wide - 28, Greybox.SmallText, Greybox.Title);
             }
         }
 

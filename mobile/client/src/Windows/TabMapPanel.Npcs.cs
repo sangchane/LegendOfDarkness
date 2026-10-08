@@ -11,6 +11,7 @@ namespace LodClient;
 /// </summary>
 public sealed partial class TabMapPanel
 {
+    private const int ChipTall = 40;
     private readonly HFlowContainer _npcList = new();
     private readonly ScrollContainer _npcScroll = new() { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
     private readonly PanelContainer _npcCard = new() { Visible = false };
@@ -25,7 +26,8 @@ public sealed partial class TabMapPanel
         _npcList.AddThemeConstantOverride("h_separation", 4);
         _npcList.AddThemeConstantOverride("v_separation", 4);
         _npcList.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        _npcScroll.CustomMinimumSize = new Vector2(0, Main.Portrait ? 64 : 34);
+        // 칩 두 줄(세로)·한 줄(가로) — 칩은 40(UI 리뷰 2026-10-09: 28 은 손가락에 작았다).
+        _npcScroll.CustomMinimumSize = new Vector2(0, Main.Portrait ? (ChipTall * 2) + 4 : ChipTall + 4);
         _npcScroll.AddChild(_npcList);
         return _npcScroll;
     }
@@ -135,10 +137,10 @@ public sealed partial class TabMapPanel
     {
         NpcRole[] shown = [.. roles.Take(3)];
         string words = string.Join("·", shown.Where(role => role != NpcRole.Talk).Select(NpcRoles.Word));
-        Button chip = new() { Text = words.Length > 0 ? $"{name} · {words}" : name, CustomMinimumSize = new Vector2(0, 28), FocusMode = FocusModeEnum.None };
+        Button chip = new() { Text = words.Length > 0 ? $"{name} · {words}" : name, CustomMinimumSize = new Vector2(0, ChipTall), FocusMode = FocusModeEnum.None };
         chip.SetMeta("name", name);
         Greybox.Plain(chip);
-        chip.AddThemeFontSizeOverride("font_size", 12);
+        chip.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
 
         // 글자는 아이콘 몫만큼 오른쪽에서 시작한다.
         foreach (string state in new[] { "normal", "hover", "focus", "pressed" })
@@ -151,7 +153,7 @@ public sealed partial class TabMapPanel
 
         for (int at = 0; at < shown.Length; at++)
         {
-            chip.AddChild(new RoleBadge(shown[at]) { Position = new Vector2(5 + (at * 17), 6) });
+            chip.AddChild(new RoleBadge(shown[at]) { Position = new Vector2(5 + (at * 17), (ChipTall - 16) / 2) });
         }
 
         chip.Pressed += pressed;

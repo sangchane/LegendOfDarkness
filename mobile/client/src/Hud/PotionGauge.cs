@@ -52,7 +52,7 @@ public sealed partial class PotionGauge : HBoxContainer
                 HorizontalAlignment = HorizontalAlignment.Center,
                 SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
-            tick.AddThemeFontSizeOverride("font_size", 9);
+            tick.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
             tick.AddThemeColorOverride("font_color", Greybox.Muted);
             ticks.AddChild(tick);
         }

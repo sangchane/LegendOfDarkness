@@ -129,7 +129,7 @@ public sealed partial class AbilityBar : Control
 
         _autoHuntTag.SetAnchorsPreset(LayoutPreset.BottomWide);
         _autoHuntTag.OffsetTop = -18;
-        _autoHuntTag.AddThemeFontSizeOverride("font_size", 9);
+        _autoHuntTag.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         _autoHuntTag.AddThemeColorOverride("font_color", Greybox.OnAccent);
         Attack.AddChild(_autoHuntTag);
 
@@ -148,7 +148,7 @@ public sealed partial class AbilityBar : Control
             Redraw();
         };
         // 쪽 표시는 포션 칸만 한 작은 칸으로 부채꼴 왼쪽 위 구석에(2026-09-26). 글자도 작게.
-        _next.AddThemeFontSizeOverride("font_size", 11);
+        _next.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
 
         // 둥근 판의 안 여백(7)은 기술 그림용이다 — 32 칸에 "1/3" 이 잘리지 않게 줄인다.
         foreach (string state in new[] { "normal", "hover", "pressed", "focus", "disabled" })
@@ -551,7 +551,7 @@ public sealed partial class AbilityBar : Control
         };
         when.SetAnchorsPreset(LayoutPreset.FullRect);
         when.OffsetRight = -Main.Gutter;
-        when.AddThemeFontSizeOverride("font_size", 10);
+        when.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         when.AddThemeColorOverride("font_color", Greybox.Muted);
         row.AddChild(when);
     }

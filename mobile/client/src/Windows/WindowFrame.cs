@@ -13,7 +13,7 @@ namespace LodClient;
 public static class WindowFrame
 {
     /// <summary>How tall the icon's label is. Small — the icon carries it; the word only settles doubt.</summary>
-    private const int LabelSize = 10;
+    private const int LabelSize = Greybox.TightText;
 
     /// <summary>The X. Bare until pressed; its glyph is a third of the pressable square.</summary>
     public static Button CloseButton()
@@ -142,7 +142,7 @@ public static class WindowFrame
     private static Label Small(string text, Color colour)
     {
         Label label = new() { Text = text };
-        label.AddThemeFontSizeOverride("font_size", 12);
+        label.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
         label.AddThemeColorOverride("font_color", colour);
 
         return label;

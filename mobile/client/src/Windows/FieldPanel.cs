@@ -255,7 +255,7 @@ public sealed partial class FieldPanel : PanelContainer
         if (about.Count > 0)
         {
             Label kind = new() { Text = string.Join(" · ", about), MouseFilter = MouseFilterEnum.Ignore };
-            kind.AddThemeFontSizeOverride("font_size", 12);
+            kind.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
             kind.AddThemeColorOverride("font_color", stripe);
             words.AddChild(kind);
         }
@@ -263,7 +263,7 @@ public sealed partial class FieldPanel : PanelContainer
         if (card.Arrival.Length > 0 && card.Arrival != card.Name)
         {
             Label arrival = new() { Text = $"도착 {card.Arrival}", MouseFilter = MouseFilterEnum.Ignore, ClipText = true };
-            arrival.AddThemeFontSizeOverride("font_size", 11);
+            arrival.AddThemeFontSizeOverride("font_size", Greybox.SmallText);
             arrival.AddThemeColorOverride("font_color", Greybox.Muted);
             words.AddChild(arrival);
         }

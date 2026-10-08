@@ -71,6 +71,15 @@ public static class Greybox
     /// <summary>Rounding of a plate floating over a window — an info box, an ask, a card. A step rounder than what it holds.</summary>
     public const int RoundPlate = 12;
 
+    /// <summary>
+    /// The smallest words anywhere — dev:ui Godot mobile 「보조 26px 이상(기준 폭 720)」 is 13 on our 360 design width; smaller does
+    /// not read on a phone (UI 리뷰 2026-10-09, there were 8 · 9 · 10 · 11 · 12 by screen).
+    /// </summary>
+    public const int SmallText = 13;
+
+    /// <summary>Words in a box that cannot grow — under an icon button (「버리는 중」 has to fit 48) and in a party tile.</summary>
+    public const int TightText = 12;
+
     /// <summary>Room between a box's edge and the picture, words or number inside it — nothing touches an edge.</summary>
     public const int Inset = 8;
 

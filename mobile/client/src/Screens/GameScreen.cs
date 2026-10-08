@@ -15,6 +15,9 @@ public partial class GameScreen : Control
     /// <summary>HUD·창의 Z — 월드 위 표지(가장 높은 것이 피해 숫자 110)보다 위. 창에서 떠오르는 판(TopLevel)은 이보다 높게.</summary>
     public const int HudZ = 200;
 
+    /// <summary>위 줄 그늘이 위 줄 아래로 흐려지는 길이.</summary>
+    private const int FadeBelow = 24;
+
     // 반응형(사용자 2026-10-08 「가로세로랑 기종에 따라서 반응형으로」) — 설계 크기 360×780 을 늘여 쓰는 넓은 세로 화면(아이폰 SE 438 ·
     // 아이패드 585)에서 창이 폭 전체로 늘어 소지품 칸이 납작해지고 미니맵이 띠가 됐다. 이 폭부터는 폰 크기 그대로 둔다.
     private const float WideFrom = 400;
@@ -37,10 +40,10 @@ public partial class GameScreen : Control
     private bool _shopPreviewed;
 
     /// <summary>체력·마력 막대의 높이 — 숫자를 막대 안에 얹으므로(2026-09-27) 글자 한 줄이 들 만큼.</summary>
-    private const int GaugeHeight = 14;
+    private const int GaugeHeight = 16;
 
     /// <summary>막대 안 숫자의 글자 크기. 작게 두어(사용자 지시) 막대를 더한 만큼 판이 넓어지지 않게 한다.</summary>
-    private const int GaugeFontSize = 11;
+    private const int GaugeFontSize = Greybox.SmallText;
 
     /// <summary>
     /// 막대 폭 — 전의 막대(세로 48 · 가로 72)와 옆 숫자("99999 / 99999" 약 75)를 합친 것보다 좁게, "99999/99999" 가 안에 들게
@@ -356,6 +359,24 @@ public partial class GameScreen : Control
         _tabMap.Close.Pressed += () => SetWindow(GameWindow.TabMap, false);
 
         AddChild(_world);
+
+        // 위 줄 그늘 — 아이콘 사이로 문 표지·이름표가 비쳐 읽기 어려웠다(UI 리뷰 2026-10-09). 월드 표지(≤110) 위, HUD 아래에 위 줄까지 짙고
+        // 아래로 흐려진다.
+        Control scrim = new() { MouseFilter = MouseFilterEnum.Ignore, ZIndex = HudZ - 50 };
+        scrim.SetAnchorsPreset(LayoutPreset.TopWide);
+        scrim.Draw += () =>
+        {
+            Color top = new(Greybox.Engrave, 0.8f), middle = new(Greybox.Engrave, 0.65f), none = new(Greybox.Engrave, 0);
+            float wide = scrim.Size.X, tall = scrim.Size.Y, fade = tall - FadeBelow;
+            scrim.DrawPolygon([new(0, 0), new(wide, 0), new(wide, fade), new(0, fade)], [top, top, middle, middle]);
+            scrim.DrawPolygon([new(0, fade), new(wide, fade), new(wide, tall), new(0, tall)], [middle, middle, none, none]);
+        };
+        _topRow.ItemRectChanged += () =>
+        {
+            scrim.OffsetBottom = _topRow.GetGlobalRect().End.Y - GetGlobalRect().Position.Y + FadeBelow;
+            scrim.QueueRedraw();
+        };
+        AddChild(scrim);
         AddChild(hud);
 
         // 월드 위 표지들(문 표지 50 · NPC 이름표 40 · 말풍선 60 · 피해 숫자 110 …)은 Z 로 인물 위에 서는데, 같은 Z 판을 쓰는 HUD·창까지
