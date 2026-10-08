@@ -49,6 +49,11 @@ public static class Tuning
     /// <summary>생태계 봇이 걸어서 맵 사이를 갈 때(walk-SPEC) 남은 길이 이 초 동안 안 줄면 막힌 것 — 한 걸음 0.44초, 45걸음.</summary>
     public const int EcoWalkStuck = 20;
 
+    /// <summary>생태계 봇이 걷다 괴물과 싸울 때 — 한 번에 이 초까지(못 잡으면 다시 걷는다), 선 자리에서 이 칸 안의 괴물만(사냥터를 쫓아다니지 않게).</summary>
+    public const int EcoWalkFightSeconds = 30;
+
+    public const int EcoWalkFightRadius = 3;
+
     public const int PackSlots = 150;
 
     /// <summary>사냥을 이만큼 했으면 마을에 한 번 들른다(장비 바꾸기·팔기).</summary>
