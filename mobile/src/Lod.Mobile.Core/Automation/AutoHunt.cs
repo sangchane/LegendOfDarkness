@@ -491,8 +491,9 @@ public sealed class AutoHunt
     }
 
     /// <summary>
-    /// 반경 안의 괴물 중 가장 가까운 것, 같으면 체력 낮은 것. 다른 사람이 치고 있는 것은 다른 게 있으면 피한다.
-    /// 노리던 것이 아직 쓸 만하면 바꾸지 않는다 — 한 대 치고 옆으로 옮겨 다니면 아무것도 못 잡는다.
+    /// 반경 안의 괴물 중 가장 가까운 것, 같으면 체력 낮은 것. 다른 사람이 치고 있는 것은 새로 고를 때 다른 게 있으면 피한다.
+    /// 노리던 것이 아직 쓸 만하면 바꾸지 않는다 — 한 대 치고 옆으로 옮겨 다니면 아무것도 못 잡는다. 다만 먼 과녁으로 걷는 중
+    /// 괴물이 바로 옆에 붙으면 그것부터(사용자 2026-10-08 「더 멀리 있는 몬스터를 공격」).
     /// </summary>
     private Creature? Choose(HuntSight sight, AutoHuntSettings settings)
     {
@@ -502,13 +503,17 @@ public sealed class AutoHunt
                           && !_shunned.ContainsKey(one.Serial))
             .ToArray();
 
-        Creature[] free = inRange.Where(one => !sight.FoughtByOthers(one.Serial)).ToArray();
-        Creature[] pool = free.Length > 0 ? free : inRange;
+        // 노리던 것은 남이 쳐도 놓지 않는다 — 지나가던 봇이 한 대 쳤다고 치던 것을 두고 먼 괴물로 걸어갔다.
+        Creature? kept = _target != 0 ? inRange.FirstOrDefault(one => one.Serial == _target) : null;
+        Creature[] beside = inRange.Where(one => Reckon.Steps(one.Where, sight.Standing) <= 1).ToArray();
 
-        if (_target != 0 && pool.FirstOrDefault(one => one.Serial == _target) is { } kept)
+        if (kept is not null && (beside.Length == 0 || beside.Contains(kept)))
         {
             return kept;
         }
+
+        Creature[] free = inRange.Where(one => !sight.FoughtByOthers(one.Serial)).ToArray();
+        Creature[] pool = beside.Length > 0 ? beside : free.Length > 0 ? free : inRange;
 
         return pool
             .OrderBy(one => Reckon.Steps(one.Where, sight.Standing))

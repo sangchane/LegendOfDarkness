@@ -71,6 +71,38 @@ public sealed class AutoHuntTests
         Assert.Equal(2u, hunt.Target);
     }
 
+    /// <summary>
+    /// 남이 친 괴물을 피하는 것은 새 과녁을 고를 때만 — 치던 괴물을 지나가던 봇이 한 대 쳤다고 두고 더 먼 괴물로 걸어갔다(사용자 2026-10-08).
+    /// </summary>
+    [Fact]
+    public void Keeps_its_prey_when_someone_else_also_hits_it()
+    {
+        AutoHunt hunt = Started();
+        Creature near = Beast(1, 10, 11);
+        Creature far = Beast(2, 10, 16);
+        hunt.Next(Sight(creatures: [near, far]), Defaults);
+        Assert.Equal(1u, hunt.Target);
+
+        hunt.Next(Sight(creatures: [near, far], seconds: 11) with { FoughtByOthers = serial => serial == 1 }, Defaults);
+
+        Assert.Equal(1u, hunt.Target);
+    }
+
+    /// <summary>먼 과녁으로 걷는 중 괴물이 바로 옆에 붙으면 그것부터 — 맞으면서 먼 쪽으로 계속 걸어갔다(사용자 2026-10-08).</summary>
+    [Fact]
+    public void Turns_to_a_monster_that_comes_right_beside_it_while_walking_to_a_far_one()
+    {
+        AutoHunt hunt = Started();
+        Creature far = Beast(1, 10, 16);
+        hunt.Next(Sight(creatures: [far]), Defaults);
+        Assert.Equal(1u, hunt.Target);
+
+        HuntStep step = hunt.Next(Sight(standing: new Tile(10, 11), creatures: [far, Beast(2, 10, 10)], seconds: 11), Defaults);
+
+        Assert.Equal(2u, hunt.Target);
+        Assert.NotEqual(HuntAct.Walk, step.Act);
+    }
+
     [Fact]
     public void Still_fights_a_contested_monster_when_it_is_the_only_one()
     {
