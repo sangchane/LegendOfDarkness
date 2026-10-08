@@ -142,8 +142,11 @@ public sealed class CompanionBrain
     /// <summary>버프를 건 뒤 서버의 상태 알림(1초마다)에 나타나기를 기다리는 시간 — 그 안에 또 걸지 않는다.</summary>
     public static readonly TimeSpan BuffConfirm = TimeSpan.FromSeconds(3);
 
-    /// <summary>포션 사이 — 한 병 마시고 가방·체력이 바뀌는 것을 본 뒤에.</summary>
-    public static readonly TimeSpan DrinkGap = TimeSpan.FromMilliseconds(1500);
+    /// <summary>
+    /// 포션 사이 — 서버 물약 쿨타임(<see cref="AutoPotion.Cooldown" />, 2초)보다 일찍 마시면 거절당한다. 마시라고 한 때부터
+    /// 재니(서버는 받은 때부터) 길이 흔들려도 넘게 0.2초를 더한다.
+    /// </summary>
+    public static readonly TimeSpan DrinkGap = AutoPotion.Cooldown + TimeSpan.FromMilliseconds(200);
 
     /// <summary>이만큼보다 멀면 주인을 회복하지 않는다(화면 밖).</summary>
     public const int CastReach = 10;

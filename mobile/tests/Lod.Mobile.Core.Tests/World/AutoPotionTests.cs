@@ -97,8 +97,21 @@ public sealed class AutoPotionTests
         Assert.Equal(1, potion.Next(Life(100, 1000), [Carried(1, "쿠룸", 5)], Half, Off, TimeSpan.Zero));
         // The server has not answered yet: same stack, still low. Asking again would drink twice.
         Assert.Null(potion.Next(Life(100, 1000), [Carried(1, "쿠룸", 5)], Half, Off, TimeSpan.FromMilliseconds(300)));
-        // One went down — the drink landed, so a still-low bar may ask for another.
-        Assert.Equal(1, potion.Next(Life(350, 1000), [Carried(1, "쿠룸", 4)], Half, Off, TimeSpan.FromMilliseconds(400)));
+        // One went down — the drink landed. The server takes the next only two seconds later (물약 쿨타임, 2026-10-08),
+        // counted from when the drink was seen to land.
+        Assert.Null(potion.Next(Life(350, 1000), [Carried(1, "쿠룸", 4)], Half, Off, TimeSpan.FromMilliseconds(400)));
+        Assert.Null(potion.Next(Life(350, 1000), [Carried(1, "쿠룸", 4)], Half, Off, TimeSpan.FromMilliseconds(2399)));
+        Assert.Equal(1, potion.Next(Life(350, 1000), [Carried(1, "쿠룸", 4)], Half, Off, TimeSpan.FromMilliseconds(2400)));
+    }
+
+    [Fact]
+    public void A_mana_potion_waits_out_the_cooldown_of_a_health_one()
+    {
+        AutoPotion potion = new();
+
+        Assert.Equal(1, potion.Next(Life(100, 100), [Carried(1, "쿠룸", 5), Carried(2, "마라디움")], Half, HalfMana, TimeSpan.Zero));
+        Assert.Null(potion.Next(Life(1000, 100), [Carried(1, "쿠룸", 4), Carried(2, "마라디움")], Half, HalfMana, TimeSpan.FromMilliseconds(100)));
+        Assert.Equal(2, potion.Next(Life(1000, 100), [Carried(1, "쿠룸", 4), Carried(2, "마라디움")], Half, HalfMana, TimeSpan.FromMilliseconds(2100)));
     }
 
     [Fact]
@@ -107,7 +120,8 @@ public sealed class AutoPotionTests
         AutoPotion potion = new();
 
         Assert.Equal(1, potion.Next(Life(100, 1000), [Carried(1, "쿠룸", 1), Carried(2, "쿠룸", 3)], Half, Off, TimeSpan.Zero));
-        Assert.Equal(2, potion.Next(Life(100, 1000), [Carried(2, "쿠룸", 3)], Half, Off, TimeSpan.FromMilliseconds(200)));
+        Assert.Null(potion.Next(Life(100, 1000), [Carried(2, "쿠룸", 3)], Half, Off, TimeSpan.FromMilliseconds(200)));
+        Assert.Equal(2, potion.Next(Life(100, 1000), [Carried(2, "쿠룸", 3)], Half, Off, TimeSpan.FromMilliseconds(2200)));
     }
 
     [Fact]

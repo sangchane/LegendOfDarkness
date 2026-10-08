@@ -16,7 +16,8 @@ public sealed record Potion(string Name, int Icon);
 /// Decides when to drink the chosen potion as health or mana falls to the chosen line.
 /// </summary>
 /// <remarks>
-/// The server has no cooldown on 0x1C, so asking every frame would empty the stack in a second. A
+/// The server takes one potion every <see cref="Cooldown" /> and turns the rest away, so asking every frame would only
+/// be refused. A
 /// drink waits for its answer — the used stack shrinking or leaving the pack — and gives up after
 /// <see cref="Patience"/> so a lost reply cannot switch the feature off for good. Health goes first:
 /// one drink at a time is enough to keep the reply easy to recognise.
@@ -58,8 +59,15 @@ public sealed class AutoPotion
 
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(2);
 
+    /// <summary>
+    /// 물약 쿨타임 — 서버가 체력·마력 물약을 함께 2초에 한 번만 받는다(<c>GameServerHandlers.Format1CHandler</c>,
+    /// 사용자 2026-10-08). 마신 것이 보인 때부터 재므로 서버보다 늦게 끝나, 거절당하지 않는다.
+    /// </summary>
+    public static readonly TimeSpan Cooldown = TimeSpan.FromSeconds(2);
+
     private InventoryItem? _waiting;
     private TimeSpan _askedAt;
+    private TimeSpan _drankAt = Reckon.Never;
 
     /// <summary>
     /// Returns the pack slot to use now, or no slot. Call once per frame with the latest snapshot.
@@ -75,7 +83,17 @@ public sealed class AutoPotion
                 return null;
             }
 
+            if (answered)
+            {
+                _drankAt = now;
+            }
+
             _waiting = null;
+        }
+
+        if (now - _drankAt < Cooldown)
+        {
+            return null;
         }
 
         if (vitals.Health <= 0)

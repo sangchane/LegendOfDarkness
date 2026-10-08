@@ -59,6 +59,47 @@ public sealed class Pack599ConsumableTests : IDisposable
     }
 
     /// <summary>
+    /// 물약은 2초에 한 번(사용자 2026-10-08 「2초」·「서버 규칙 — 사람·봇 모두」, `autopilot/eco-bots/potion-cooldown-SPEC.md`).
+    /// 그 안에 또 쓰면 서버가 거절하고 물약은 줄지 않는다.
+    /// </summary>
+    [Fact]
+    public async Task A_second_potion_within_two_seconds_is_refused_and_kept()
+    {
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
+        MakeGameMaster(server);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        LoginFlow.TryCreateAccount(server, Name);
+        Save(server, saved => saved["CurrentHp"] = 1);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(
+            IPAddress.Loopback, server.LoginPort, Name, LoginFlow.SyntheticSecret, progress: null, _deadline.Token);
+
+        WorldClient world = new(session);
+        _ = world.PumpAsync(_deadline.Token);
+
+        await Until(() => world.Vitals is { MaximumHealth: > 1, Health: 1 }, $"체력 1 로 들어오지 않았습니다. 마지막: {world.Vitals}");
+        await world.SayAsync($"/give \"{Potion}\" 2", _deadline.Token);
+        await Until(() => AutoPotion.Count(world.Pack, Potion) == 2, $"{Potion} 둘이 오지 않았습니다. 서버가 한 말: {world.Said}");
+
+        int slot = world.Pack.First(item => item.Name == Potion).Slot;
+        await world.UseAsync(slot, _deadline.Token);
+        await Until(() => AutoPotion.Count(world.Pack, Potion) == 1 && world.Vitals!.Health > 1,
+            $"첫 {Potion}을 먹지 못했습니다. 마지막: {world.Vitals} · 서버가 한 말: {world.Said}");
+        DateTime drank = DateTime.UtcNow;
+
+        int told = world.SaidCount;
+        await world.UseAsync(slot, _deadline.Token);
+        await Until(() => world.SaidCount > told && world.Said.Contains("2초"), $"곧바로 또 먹었는데 서버가 막지 않았습니다. 서버가 한 말: {world.Said}");
+        Assert.Equal(1, AutoPotion.Count(world.Pack, Potion));
+
+        TimeSpan rest = drank + TimeSpan.FromSeconds(2.2) - DateTime.UtcNow;
+        await Task.Delay(rest > TimeSpan.Zero ? rest : TimeSpan.Zero, _deadline.Token);
+        await world.UseAsync(slot, _deadline.Token);
+        await Until(() => AutoPotion.Count(world.Pack, Potion) == 0, $"2초 뒤에도 {Potion}을 먹지 못했습니다. 서버가 한 말: {world.Said}");
+    }
+
+    /// <summary>
     /// 염색약은 칸이 아니라 아이템 사용 스크립트다(`script/Item/E.T.C.txt`: `set_haircolor 16; item_del "분홍색염색약", 1;`).
     /// `scripts/gen/world/build-pack-npcs.py` 가 기다리지 않는 블록을 `ITEM_이름` 아이템 스크립트로 옮기고, 템플릿이 사용펄숫으로 그것을 부른다.
     /// </summary>
