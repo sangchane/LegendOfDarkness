@@ -7,6 +7,8 @@
 1. `NEXT.md`의 `NEXT-ACTION` 마커 사이 **현재-작업 블록**을 읽어라. 그게 지금 할 일이다.
 2. 특정 폴더의 파일을 다룰 땐 그 폴더의 `CLAUDE.md`(스코프 규칙)를 그때 읽어라 — `mobile/` `scripts/` `data/` `docs/` `sources/`.
 3. 지난 이력은 `WORKLOG.md`, 당장 안 하는 미결은 `plans/backlog.md`(항상 읽을 필요 없음).
+4. **게임 자료(아이템·NPC·맵·괴물·드랍·상점·서클·기술)를 고르거나 견주거나 고치기 전에 `scripts/ask.sh <이름>`** — 볼트 노트와 게임 그래프가
+   한 번에 나온다(템플릿 JSON 을 바로 뒤지지 않는다, 사용자 2026-10-09). 무엇의 정본이 어디인지는 `docs/knowledge-map.md`.
 
 ## 프로젝트
 Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지하는 상위 작업공간. 최초 검토한 17개 중 `DungMunkey/Dark-Ages`는 모바일 MMORPG 기준선에서 제외해 2026-09-08 제거했다.
@@ -26,7 +28,7 @@ Dark Ages(어둠의 전설) 계열 오픈소스 16개를 Git submodule로 유지
 - 다음 할 일(단일 출처): `NEXT.md` · 대기·미결: `plans/backlog.md` · 히스토리: `WORKLOG.md`
 - **기능 39개가 서버·모바일·원작 중 어디에 있나: `docs/feature-map.md`** — 새 기능을 만들기 전에 여기부터
 - **Hades 에 뭐가 이미 있나(만들 것 vs 채울 것): `docs/what-hades-already-has.md`** — 콘텐츠를 이식하기 전에 여기부터
-- **장비 수치·드랍·상점을 만지기 전에: 정본 = 어둠템 `docs/items/어둠템#1~5.xlsx`(사용자 2026-10-09).** 아이템 하나는 볼트 `data/drop-vault/아이템/<이름>.md`(어둠템 대 서버 수치·누가 떨구나·누가 파나), 여럿은 `graphify query "…" --graph data/drop-vault/graph/graph.json`(없으면 `build-drop-vault.py --그래프`) — 자세한 것 `data/CLAUDE.md`
+- **자료 지도 — 무엇의 정본이 어디인가: `docs/knowledge-map.md`** · 장비 수치 정본 = 어둠템 `docs/items/어둠템#1~5.xlsx` · 게임 볼트 `data/game-vault/`(아이템·NPC·사냥터·괴물·서클) + 그래프 — `scripts/ask.sh <이름>`
 - **원작이 어떻게 했는지 막혔을 때: `docs/where-the-answers-are.md`** (`scripts/find-in-sources.ps1`)
 - 모바일 클라이언트 빌드·실행·함정: `docs/mobile-client.md` → `mobile/CLAUDE.md`
 - 문서·현황판·UI 테마·작업지시서 목록: `docs/CLAUDE.md` · 볼트·자료 출처: `data/CLAUDE.md` · 생성기·서버 스크립트: `scripts/CLAUDE.md`

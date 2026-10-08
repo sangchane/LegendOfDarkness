@@ -1,4 +1,4 @@
-"""깎기용 괴물 레벨 — 기준점·식. build-monster-cut-level.py 와 build-drop-vault.py 가 같이 쓴다."""
+"""깎기용 괴물 레벨 — 기준점·식. build-monster-cut-level.py 와 build-game-vault.py 가 같이 쓴다."""
 import collections
 import json
 import math
