@@ -117,7 +117,7 @@ public partial class LoginScreen : Control
         }
 
         string mine = Godot.FileAccess.GetFileAsString(VersionFile);
-        string platform = OS.GetName() == "Windows" ? "windows" : "ios";
+        string platform = OS.GetName() switch { "Windows" => "windows", "Android" => "android", _ => "ios" };
         HttpRequest ask = new();
         AddChild(ask);
         ask.RequestCompleted += (result, code, _, body) =>

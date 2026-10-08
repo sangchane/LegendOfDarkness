@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>어둠의 전설 내려받기</title>
-<meta name="description" content="어둠의 전설 모바일 — 아이폰·윈도우 PC 내려받기와 설치 방법">
+<meta name="description" content="어둠의 전설 모바일 — 아이폰·안드로이드·윈도우 PC 내려받기와 설치 방법">
 <style>
 /* 루트 대시보드(docs/dashboard.css :root)와 같은 색·글꼴·모서리 — 사용자 2026-10-02 "루트 페이지 스타일과 맞춰" */
 :root{
@@ -32,7 +32,7 @@ h1{font-size:clamp(26px,4vw,32px);line-height:1.3;letter-spacing:-.025em;margin:
 .tabs{display:inline-flex;gap:4px;padding:4px;border-radius:var(--radius-pill);background:var(--panel);border:1px solid var(--edge);margin-bottom:16px}
 .tabs button{all:unset;cursor:pointer;padding:9px 20px;border-radius:var(--radius-pill);font-weight:600;color:var(--muted)}
 .tabs button[aria-selected=true]{background:var(--ink);color:#fff}
-body[data-tab=ios] .pc-only, body[data-tab=pc] .ios-only{display:none!important}
+body[data-tab=ios] .pc-only, body[data-tab=ios] .and-only, body[data-tab=pc] .ios-only, body[data-tab=pc] .and-only, body[data-tab=and] .ios-only, body[data-tab=and] .pc-only{display:none!important}
 
 .card{background:var(--panel);border-radius:var(--radius-card);padding:24px}
 .get{display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px}
@@ -133,6 +133,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
 
   <div class="tabs" role="tablist">
     <button role="tab" data-to="ios">아이폰</button>
+    <button role="tab" data-to="and">안드로이드</button>
     <button role="tab" data-to="pc">윈도우 PC</button>
   </div>
 
@@ -146,6 +147,17 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
       <a class="primary" href="LodClient.ipa" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>내려받기</a>
     </div>
     <div class="warn onphone" id="onphone">지금 휴대폰으로 보고 계십니다. 이 파일은 <b>컴퓨터</b>에서 받아야 합니다.</div>
+  </section>
+
+  <section class="card and-only">
+    <div class="get">
+      <div class="what">
+        <h2>안드로이드용 파일</h2>
+        <p>안드로이드 7.0 이상 휴대폰·태블릿(64비트). 플레이 스토어에 없는 앱이라 <b>파일을 받아 직접 설치</b>합니다(약 3분).</p>
+        <div class="meta" data-file="LodClient.apk">최신판 확인 중…</div>
+      </div>
+      <a class="primary" href="LodClient.apk" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>내려받기</a>
+    </div>
   </section>
 
   <section class="card pc-only">
@@ -317,6 +329,74 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
     </div>
   </div>
 
+  <!-- 안드로이드 -->
+  <div class="and-only">
+    <h2 class="section">설치 방법</h2>
+    <p class="section-lead">휴대폰에서 바로 받아 설치합니다. 컴퓨터는 필요 없습니다. 기종에 따라 메뉴 이름이 조금 다를 수 있습니다.</p>
+    <div class="steps">
+      <div class="card step">
+        <div>
+          <h3><span class="no">1</span>파일 받기 <span class="when">받을 때마다</span></h3>
+          <ol>
+            <li>휴대폰 <b>크롬</b>으로 이 페이지를 열고 위의 <b>내려받기</b>를 누릅니다.</li>
+            <li>「이 유형의 파일은 기기에 손상을 줄 수 있습니다」 같은 말이 뜨면 <b>「확인」</b>(또는 「그래도 다운로드」)을 누릅니다.</li>
+          </ol>
+          <div class="note">파일이 커서(약 180MB) <b>와이파이</b>에서 받는 것이 좋습니다.</div>
+        </div>
+        <div class="pic"><div class="choice">
+          <div class="ok"><b>된다</b>크롬 · 삼성 인터넷</div>
+          <div class="bad"><b>안 될 수 있다</b>카카오톡 안에서 열기</div>
+        </div></div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">2</span>「이 출처 허용」 켜기 <span class="when">처음 한 번</span></h3>
+          <ol>
+            <li>받은 파일을 누르면 「보안상 이 출처의 앱을 설치할 수 없습니다」 창이 뜹니다.</li>
+            <li><b>「설정」</b>을 누르고 <b>「이 출처 허용」</b>(또는 「이 소스 허용」)을 켭니다.</li>
+            <li>뒤로 가기로 돌아옵니다.</li>
+          </ol>
+          <div class="note">플레이 스토어 밖에서 받은 앱이라 안드로이드가 한 번 확인하는 것입니다. 「크롬」에만 허용되며 다른 앱에는 적용되지 않습니다.</div>
+        </div>
+        <div class="pic">
+          <div class="phone"><div class="scr">
+            <div class="title" style="font-size:13px">이 출처의 앱 설치</div>
+            <div class="label">Chrome</div>
+            <div class="group"><div class="row hl">이 출처 허용<span class="toggle"></span></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">3</span>설치 <span class="when">받을 때마다</span></h3>
+          <ol>
+            <li>다시 받은 파일(<b>LodClient.apk</b>)을 눌러 <b>「설치」</b>를 누릅니다.</li>
+            <li>「Play 프로텍트」가 <b>「앱 검사」·「출처를 알 수 없는 앱」</b>이라고 알리면 <b>「상세 정보」→「무시하고 설치」</b>(또는 「그래도 설치」)를 누릅니다.</li>
+            <li>끝나면 <b>「열기」</b>.</li>
+          </ol>
+          <div class="warn">구글이 아직 모르는 앱이라 뜨는 경고입니다. 기존 앱 위에 새 파일을 설치하면 캐릭터는 그대로입니다.</div>
+        </div>
+        <div class="pic">
+          <div class="phone"><div class="scr dark"><div class="dim"><div class="alert">
+            <h4>Play 프로텍트</h4>
+            <p>출처를 알 수 없는 앱입니다. 설치하기 전에 검사할까요?</p>
+            <div class="btns"><div>앱 검사</div><div class="hl" style="font-size:11px">그래도 설치</div></div>
+          </div></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section">막힐 때</h2>
+    <div class="faq">
+      <details><summary>「앱이 설치되지 않았습니다」라고 나와요</summary><p>예전에 다른 곳에서 받은 같은 앱이 있으면 충돌할 수 있습니다. 기존 「어둠의 전설」을 지우고 다시 설치하세요(캐릭터는 서버에 있어 그대로입니다).</p></details>
+      <details><summary>「이 출처 허용」 단추가 안 보여요</summary><p>설정 → 앱 → 특별한 앱 접근 → <b>알 수 없는 앱 설치</b>에서 크롬(받은 앱)을 골라 켭니다.</p></details>
+      <details><summary>Play 프로텍트가 설치를 막아요</summary><p>Play 스토어 → 내 프로필 → Play 프로텍트 → 설정(톱니바퀴)에서 「Play 프로텍트로 앱 검사」를 잠시 끄고 설치한 뒤 다시 켜세요.</p></details>
+      <details><summary>다운로드가 중간에 멈춰요</summary><p>와이파이로 바꾸고 다시 받으세요. 저장 공간이 500MB 이상 비어 있어야 합니다.</p></details>
+    </div>
+  </div>
+
   <!-- 윈도우 PC -->
   <div class="pc-only">
     <h2 class="section">설치 방법</h2>
@@ -390,7 +470,7 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0}
 <footer>어둠의 전설 모바일 · 비공개 시험판</footer>
 
 <script>
-// 탭: 주소 끝 #pc · #ios 로 고른다. 없으면 윈도우에서 연 사람은 PC, 나머지는 아이폰.
+// 탭: 주소 끝 #pc · #ios · #and 로 고른다. 없으면 윈도우에서 연 사람은 PC, 안드로이드에서 연 사람은 안드로이드, 나머지는 아이폰.
 function show(tab) {
   document.body.dataset.tab = tab;
   document.querySelectorAll('[data-to]').forEach(b => b.setAttribute('aria-selected', b.dataset.to === tab));
@@ -399,7 +479,7 @@ document.querySelectorAll('[data-to]').forEach(b => b.addEventListener('click', 
   show(b.dataset.to);
   history.replaceState(null, '', '#' + b.dataset.to);
 }));
-show(location.hash === '#pc' ? 'pc' : location.hash === '#ios' ? 'ios' : /Windows/i.test(navigator.userAgent) ? 'pc' : 'ios');
+show(location.hash === '#pc' ? 'pc' : location.hash === '#ios' ? 'ios' : location.hash === '#and' ? 'and' : /Android/i.test(navigator.userAgent) ? 'and' : /Windows/i.test(navigator.userAgent) ? 'pc' : 'ios');
 if (/iPhone|iPad|Android/i.test(navigator.userAgent)) document.getElementById('onphone').style.display = 'block';
 
 // 최신 파일의 날짜·크기를 서버에서 바로 읽는다 — 새 파일을 올리면 저절로 바뀐다.
