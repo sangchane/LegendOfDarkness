@@ -290,6 +290,12 @@ def align_levels(items, rows):
 LEVELLED = []
 
 
+def part(slot, name):
+    """한 벌을 고르는 칸 — 팔찌와 장갑은 같은 자리(9·10)에 끼지만 다른 물건이라 따로 고른다. 같은 칸으로 묶었더니
+    접두 팔찌 40종이 모두 장갑에 밀려 빠졌다(사용자 2026-10-08 「동팔찌가 드랍이 안되나본데?」 → 「드랍에 넣고」)."""
+    return slot, "팔찌" in name
+
+
 def fill_gear(items, monsters):
     """사냥터마다 장비 한 벌(부위마다 입장 레벨 이하 가장 높은 층, 장신구는 점수 등급)과 같은 배율 RATIO 를 정한다."""
     rows = sheet_rows()
@@ -306,31 +312,37 @@ def fill_gear(items, monsters):
             if (slot in (0, 1) or not name.startswith(SUFFIXED) or name in BASE_RATE or level > group["entry"]
                     or (item.get("LevelRequired") or 0) > group["entry"]):
                 continue
-            if level > best.get(slot, (-1, []))[0]:
-                best[slot] = (level, [])
-            if level == best[slot][0]:
-                best[slot][1].append(name)
+            if level > best.get(part(slot, name), (-1, []))[0]:
+                best[part(slot, name)] = (level, [])
+            if level == best[part(slot, name)][0]:
+                best[part(slot, name)][1].append(name)
         # 부위마다 앞머리(로오·화염 …) 하나에 한 종 — 11레벨 반지의 보석 갈래(루비·사파이어 …)까지 다 넣으면
         # 160종이 넘어 목록이 너무 길어진다.
         picked = {}
-        for slot, (level, names) in best.items():
+        for (slot, _), (level, names) in best.items():
             if level >= group["entry"] - TIER_REACH:
                 for name in sorted(names):
-                    picked.setdefault((slot, name.split("의")[0]), name)
+                    picked.setdefault((*part(slot, name), name.split("의")[0]), name)
         own = max(e for e in tiers.values() if e <= group["entry"]) if group.get("thin") or group.get("fresh") else group["entry"]
         for name, entry in sorted(tiers.items()):
             item = items[name][1]
             if entry == own and name not in BASE_RATE and (item.get("LevelRequired") or 0) <= entry:
-                picked.setdefault((item["EquipmentSlot"], name.split("의")[0]), name)
+                picked.setdefault((*part(item["EquipmentSlot"], name), name.split("의")[0]), name)
         # 표대로 고친 84종(접두·접미 없는 것 포함)은 그 레벨이 이 사냥터 층 안이면 하나하나 넣는다.
         for name in sorted(TABLE_LEVELLED - set(tiers)):
             if name in items and name not in BASE_RATE and not any(word in name for word in ENHANCED):
                 level = items[name][1].get("LevelRequired") or 0
                 if group["entry"] - TIER_REACH <= level <= group["entry"]:
-                    picked.setdefault((items[name][1]["EquipmentSlot"], name), name)
+                    picked.setdefault((*part(items[name][1]["EquipmentSlot"], name), name), name)
         group["gear"] = sorted(picked.values())
-        if group.get("thin"):  # 다 못 싣는 무리 — 그 층(가장 높은) 장비부터 돌린다
-            group["gear"].sort(key=lambda n: -(items[n][1].get("LevelRequired") or 0))
+        if group.get("thin"):  # 다 못 싣는 무리 — 그 층(가장 높은) 장비부터, 같은 층에서는 부위를 번갈아 돌린다
+            # (이름순 그대로면 한 부위 열 종 — 팔찌를 넣으며 은팔찌 10종이 앞자리를 다 차지했다, 2026-10-08).
+            turn, seen = {}, defaultdict(int)
+            for name in group["gear"]:
+                key = part(items[name][1]["EquipmentSlot"], name)
+                turn[name] = seen[key]
+                seen[key] += 1
+            group["gear"].sort(key=lambda n: (-(items[n][1].get("LevelRequired") or 0), turn[n]))
         group["slots"] = sum(len([n for n in drops_of(m) if n in BASE_RATE]) for p, m in {
             m["Name"]: (p, m) for p, m in monsters
             if m.get("AreaID") in group["areas"] and m.get("Name") not in RESERVED_NAMES}.values())

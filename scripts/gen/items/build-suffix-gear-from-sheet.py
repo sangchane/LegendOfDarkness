@@ -60,6 +60,10 @@ PREFIX_EN = {
 GEM_OVERRIDES = {"사파이어반지": "Lapis Ring", "현철반지": "Talos Ring",
                  "녹옥반지": "Jade Ring", "자수정반지": "Ruby Ring"}
 
+# 접두 없는 기본 팔찌 넷 — 5.99 팩에 없어 서버에 없었다(사용자 2026-10-08 「상점에서는 접두어가 없는것만 판매해」).
+# 접두 팔찌와 같은 길로 살린다: 값은 원작 표, 그림은 하데스 영문 기본형(갈래 2).
+BASE_BRACERS = {"가죽팔찌": "Leather Bracer", "동팔찌": "Iron Bracer", "은팔찌": "Mythril Bracer", "금팔찌": "Hy-Brasyl Bracer"}
+
 SKIP_GRADES = {"CONFLICT", "NAME_CLASH"}
 
 # 몸에 걸치는 자리만 — 무기(1)·갑옷(2)은 표에 섞여 있어도 뺀다("장비 접미사가 아닌 것은 빼라").
@@ -164,10 +168,10 @@ def main():
             continue
 
         prefix_ko = next((p for p in PREFIX_EN if name.startswith(p + "의")), None)
-        if prefix_ko is None:
+        if prefix_ko is None and name not in BASE_BRACERS:
             continue
         seen.add(name)
-        base = name[len(prefix_ko) + 1:]
+        base = name[len(prefix_ko) + 1:] if prefix_ko else name
 
         if name in by_name:
             path, item = by_name[name]
@@ -181,11 +185,13 @@ def main():
 
             apply_stats(item, row)
             if writing:
-                path.write_text(json.dumps(item, ensure_ascii=False, indent=2), encoding="utf-8")
+                # 끝 줄바꿈은 파일이 원래 가진 대로 — 다른 생성기가 쓴 파일을 줄바꿈 하나로 바꾸지 않게.
+                ending = "\n" if path.read_text(encoding="utf-8").endswith("\n") else ""
+                path.write_text(json.dumps(item, ensure_ascii=False, indent=2) + ending, encoding="utf-8")
             merged.append(name)
             continue
 
-        english = korean_to_english.get(name)
+        english = korean_to_english.get(name) or BASE_BRACERS.get(name)
         source = by_lower.get(english.lower()) if english else None
 
         if source is None:
@@ -215,7 +221,7 @@ def main():
 
         target = ITEMS / f"{name}.json"
         if writing:
-            target.write_text(json.dumps(item, ensure_ascii=False, indent=2), encoding="utf-8")
+            target.write_text(json.dumps(item, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         created.append(name)
 
     print(f"고침 {len(merged)}개 {'씀' if writing else '(미리 봄)'}")
