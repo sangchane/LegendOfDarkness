@@ -114,4 +114,68 @@ public sealed class EcoBotLoopTests(ITestOutputHelper output) : IDisposable
             ];
         }
     }
+
+    /// <summary>
+    /// ⑤ 99 뒤(<c>autopilot/eco-bots/vitality-SPEC.md</c>) — 99 봇은 장보기 끝에 세오신전으로 가 입은 채로 쌓인 경험치로 체력을 산다.
+    /// 최대 체력 1000 · 세 번 값(1000·1050·1100 × 500)만큼 쌓였으면 +150.
+    /// </summary>
+    [Fact]
+    public async Task A_level_99_bot_buys_health_from_seo()
+    {
+        EcoBotEntry bot = new("ecovita", 1);
+        using IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (20373, 37, 29));
+        EcoBotServerTests.Configure(server, [bot.Name]);
+        server.Start(TimeSpan.FromMinutes(2));
+
+        const long Spent = (1000 + 1050 + 1100) * 500L;
+        LoginFlow.TryCreateAccount(server, bot.Name);
+        CompanionCallTests.Edit(server, bot.Name, saved =>
+        {
+            saved["Path"] = "Warrior";
+            saved["ExpLevel"] = 99;
+            saved["_MaximumHp"] = 1000;
+            saved["ExpBank"] = Spent + 5;
+        });
+
+        string events = Path.Combine(server.RunRoot, "eco");
+        EcoConfig config = new() { LoginPort = server.LoginPort, Password = LoginFlow.SyntheticSecret, Bots = [bot], EventFolder = events };
+        List<string> said = [];
+        EcoHost host = new(config, EcoWorld.Load(HadesWorkspace.MapLayoutFolder), new EcoEvents(events), line => { lock (said) said.Add(line); });
+
+        using CancellationTokenSource stop = CancellationTokenSource.CreateLinkedTokenSource(_deadline.Token);
+        Task running = host.RunAsync(stop.Token);
+        JsonElement vitality = default;
+
+        try
+        {
+            await Waiting.Until(() => Read(events).Any(line => line.GetProperty("ev").GetString() == "vitality"),
+                "99 봇이 세오에게 체력을 사지 않았습니다.", _deadline.Token, within: TimeSpan.FromMinutes(8));
+            vitality = Read(events).First(line => line.GetProperty("ev").GetString() == "vitality");
+        }
+        finally
+        {
+            stop.Cancel();
+            await Task.WhenAny(running, Task.Delay(5000));
+            lock (said)
+            {
+                output.WriteLine(string.Join("\n", said));
+            }
+        }
+
+        JsonElement data = vitality.GetProperty("data");
+        Assert.Equal(1000, data.GetProperty("mhp").GetInt32());
+        Assert.Equal(1150, data.GetProperty("toMhp").GetInt32());
+        Assert.Equal(Spent, data.GetProperty("spent").GetInt64());
+    }
+
+    private static JsonElement[] Read(string events) =>
+        !Directory.Exists(events)
+            ? []
+            :
+            [
+                .. Directory.GetFiles(events, "*.jsonl")
+                    .SelectMany(path => { using FileStream read = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); using StreamReader text = new(read); return text.ReadToEnd().Split('\n'); })
+                    .Where(line => line.Length > 0)
+                    .Select(line => JsonDocument.Parse(line).RootElement.Clone()),
+            ];
 }

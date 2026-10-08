@@ -31,6 +31,10 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
 
     private static readonly Tile Murekan = new(12, 5);
 
+    /// <summary>세오(세오신전 — 체력)·칸(칸신전 — 마력). 5.99 <c>세오.cs</c>·<c>칸.cs</c>.</summary>
+    private static readonly EcoStop Seo = new(20299, new Tile(3, 4), 0);
+    private static readonly EcoStop Kan = new(20302, new Tile(3, 4), 0);
+
     private readonly EcoLife _life = new();
     private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly HashSet<string> _refused = [];
@@ -49,6 +53,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private TimeSpan _nextAsk;
     private string _following = string.Empty;
     private TimeSpan _nextStock;
+    private TimeSpan _nextVitality;
     private int _gearLevel;
 
     public string Name => bot.Name;
@@ -378,6 +383,79 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         await _world.ShutDialogueAsync(token);
+        await BuyVitality(token);
+    }
+
+    /// <summary>
+    /// ⑤ 99 뒤(결정 16, 사용자 「99레벨이 되면서 체력, 마력을 경험치로 바꾸면서 점점 덜 죽게되는」) — 장보기 끝에 한 시간에 한 번, 쌓인
+    /// 경험치로 세오에게 체력을 산다. 성직자는 절반으로 칸에게 마력을 먼저. 입은 채로 — 세오·칸은 본체력·본마력으로 값을 매긴다
+    /// (사용자 2026-10-08 「옷을 입건 버프 디버프가 걸려있건 본체력을 알 수 있으니까」, build-pack-npcs.py).
+    /// </summary>
+    private async Task BuyVitality(CancellationToken token)
+    {
+        bool priest = Path == EcoParties.Priest;
+
+        if (_world.Vitals is not { Level: >= 99 } mine || _clock.Elapsed < _nextVitality
+            || EcoVitality.Times(Body(priest), priest ? mine.Banked / 2 : mine.Banked, priest ? EcoVitality.Mana : EcoVitality.Health) == 0)
+        {
+            return;
+        }
+
+        // 못 샀으면(상인 안 보임·대답 없음) 5분 뒤 다시, 샀으면 한 시간 뒤.
+        _nextVitality = _clock.Elapsed + TimeSpan.FromMinutes(5);
+        Doing = "체력 사기";
+        bool bought = priest && await Trade(Kan, mana: true, mine.Banked / 2, token);
+        bought |= await Trade(Seo, mana: false, _world.Vitals!.Banked, token);
+        if (bought)
+        {
+            _nextVitality = _clock.Elapsed + TimeSpan.FromHours(1);
+        }
+
+        Vitals now = _world.Vitals!;
+        Event("vitality", new { mhp = mine.MaximumHealth, mmp = mine.MaximumMana, toMhp = now.MaximumHealth, toMmp = now.MaximumMana, spent = mine.Banked - now.Banked });
+    }
+
+    /// <summary>
+    /// 본체력·본마력(세오·칸이 값을 매기는 것) 어림 — 최대에서 입은 장비 몫을 뺀다. 버프 몫은 못 빼 어긋나면 서버가 「경험치가 부족합니다」로
+    /// 멈춘다.
+    /// </summary>
+    private int Body(bool mana) =>
+        (mana ? _world.Vitals!.MaximumMana : _world.Vitals!.MaximumHealth) - _world.Worn.Sum(one => (mana ? one.Stats?.Mp : one.Stats?.Hp) ?? 0);
+
+    /// <summary>세오·칸에게서 산다 — 「체력을 산다.」·「마력을 산다.」 → 횟수 → 최대가 오를 때까지(모자라면 서버가 먼저 멈춘다).</summary>
+    private async Task<bool> Trade(EcoStop stop, bool mana, long banked, CancellationToken token)
+    {
+        int step = mana ? EcoVitality.Mana : EcoVitality.Health;
+        int times = EcoVitality.Times(Body(mana), banked, step);
+        if (times == 0 || !await MoveTo(stop.Map, stop.Where, token) || await Merchant(stop, token) is not { } seller)
+        {
+            return false;
+        }
+
+        int Maximum() => mana ? _world.Vitals!.MaximumMana : _world.Vitals!.MaximumHealth;
+        string buy = mana ? "마력을 산다." : "체력을 산다.";
+        int before = Maximum();
+        int talks = _world.TalkCount;
+        await _world.ClickAsync(seller.Serial, token);
+        if (await Until(() => _world.TalkCount > talks && _world.Talking?.Options.Any(option => option.Text == buy) == true, Answer, token))
+        {
+            talks = _world.TalkCount;
+            await _world.AnswerAsync(seller.Serial, _world.Talking!.Options.First(option => option.Text == buy).Step, token);
+            if (await Until(() => _world.TalkCount > talks && _world.Talking?.Kind == DialogueKind.TextInput, Answer, token))
+            {
+                await _world.AnswerAsync(seller.Serial, _world.Talking!.Step, times.ToString(), token);
+            }
+        }
+
+        await Until(() => Maximum() >= before + times * step || _world.Talking?.What.Contains("부족") == true, Answer, token);
+        bool bought = Maximum() > before;
+        if (!bought)
+        {
+            log($"{(mana ? "칸" : "세오")}에게 {times}번 사지 못했습니다: {_world.Talking?.What} · 최대 {Maximum()} · 쌓인 경험치 {_world.Vitals!.Banked}");
+        }
+
+        await _world.ShutDialogueAsync(token);
+        return bought;
     }
 
     private static string Why(EcoSight sight) =>
@@ -501,6 +579,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         await BuyGear(reserve, token);
+        await BuyVitality(token);
         _life.Shopped(EcoShopping.Potions(_world.Pack));
         Event("state", new { from = "Shop", to = "Town", potions = EcoShopping.Potions(_world.Pack) });
     }

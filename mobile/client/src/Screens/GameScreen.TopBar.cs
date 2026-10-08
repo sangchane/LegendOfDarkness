@@ -657,7 +657,7 @@ public partial class GameScreen : Control
             // 보낸다) — 세오·칸에게 팔아 체력·마력을 사는 양이라 금전처럼 만·억으로 보인다(사용자 2026-10-05).
             _experienceBar.MaxValue = 1;
             _experienceBar.Value = mine.Level > 0 ? 1 : 0;
-            _experienceText.Text = mine.Level >= 99 ? $"보유 {GoldFormat.Short((mine.ExperienceToGo << 32) | mine.Experience)}" : string.Empty;
+            _experienceText.Text = mine.Level >= 99 ? $"보유 {GoldFormat.Short(mine.Banked)}" : string.Empty;
         }
     }
 

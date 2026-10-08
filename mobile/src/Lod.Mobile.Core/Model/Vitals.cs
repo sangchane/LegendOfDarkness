@@ -69,6 +69,12 @@ public sealed record Vitals(
     public static readonly Vitals Unknown = new(
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         Element.None, Element.None, 0, 0, 0, 0, false);
+
+    /// <summary>
+    /// 99 에서 쌓인 경험치(세오·칸에게 체력·마력으로 판다) — 서버가 아래·위 32비트를 <see cref="Experience" />·<see cref="ExperienceToGo" />
+    /// 에 나눠 보낸다(<c>ServerFormat08</c>). 99 전에는 0.
+    /// </summary>
+    public long Banked => Level >= 99 ? (ExperienceToGo << 32) | Experience : 0;
 }
 
 /// <summary>

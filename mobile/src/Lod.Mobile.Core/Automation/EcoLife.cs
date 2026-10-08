@@ -138,7 +138,8 @@ public static class EcoLog
             bot,
             cls = path ?? 0,
             lvl = vitals?.Level ?? 0,
-            exp = vitals?.Experience ?? 0,
+            // 99 는 쌓인 경험치(세오·칸에 판다) — 아래 32비트만 적으면 42억에서 되감겼다.
+            exp = vitals is null ? 0 : vitals.Level >= 99 ? vitals.Banked : vitals.Experience,
             gold = vitals?.Gold ?? 0,
             hp = vitals?.Health ?? 0,
             mhp = vitals?.MaximumHealth ?? 0,

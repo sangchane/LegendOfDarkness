@@ -94,7 +94,21 @@ def _garen_three(body):
     return body[:body.index("\tif(@select == 3){")]
 
 
-BLOCK_PATCH = {"리신2": _lee_sin_two, "가렌3": _garen_three}
+#: 세오·칸(`Npc_Script.txt`) — 5.99 는 다 벗어야(`get_ac == 100`) 지금 최대가 곧 본체력이라 그것으로 값을 매기고 +50·+25 했다.
+#: 사용자 2026-10-08 「애초에 옷을 입건 버프 디버프가 걸려있건 본체력을 알 수 있으니까 거기에 맞춰서 사지도록」 — 벗기 검사를 빼고
+#: 장비·버프를 뺀 본체력·본마력(`get_bodyvita`·`get_bodymana`, `Pack599.cs`)으로 값을 매기고 거기에 더한다.
+#: `get_basevita` 는 크래셔·암살격 같은 기술 위력에도 쓰여 그대로 둔다.
+def _body_stats(body):
+    """세오·칸 — 입은 채로, 본체력·본마력 기준으로."""
+    body, dropped = re.subn(r"\n[ \t]*if\(get_ac\(@myid\) != 100\)\{[^\n]*", "", body)
+    assert dropped == 1, "세오·칸의 벗기 검사가 한 줄이 아니다 — 팩 본문을 확인하라."
+    for old, new in (("get_basevita2", "get_bodyvita"), ("get_basevita", "get_bodyvita"), ("set_basevita", "set_bodyvita"),
+                     ("get_basemana2", "get_bodymana"), ("get_basemana", "get_bodymana"), ("set_basemana", "set_bodymana")):
+        body = body.replace(old, new)
+    return body
+
+
+BLOCK_PATCH = {"리신2": _lee_sin_two, "가렌3": _garen_three, "세오": _body_stats, "칸": _body_stats}
 
 #: 블록 머리 — 줄 맨 앞의 `0,0,0,0,0,0,0` 다음 탭, 이름, `{`. 안쪽의 `if(…){` 줄은 탭으로 시작해 걸리지 않는다.
 HEADER = re.compile(r"^\d[\d,]*\t([^\t{]+?)\s*\{", re.M)
