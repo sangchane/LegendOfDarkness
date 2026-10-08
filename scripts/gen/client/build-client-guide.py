@@ -158,6 +158,10 @@ def about(npc: dict, items: dict) -> str:
     return " · ".join(said).replace("\n", " ")
 
 
+#: 길 안내에 싣지 않는 NPC 스크립트 — 운영자만 거래하는 상인(`build-operator-shop.py`, 사용자 2026-10-09). 손님 목록·미니맵·봇 동선에 안 나온다.
+HIDDEN_SCRIPTS = {"operator_shop"}
+
+
 def main() -> None:
     drawn = {int(p.stem[3:]) for p in OUT.glob("map*.txt") if p.stem[3:].isdigit()}
     names = {}
@@ -237,6 +241,8 @@ def main() -> None:
 
     for path in sorted((SERVER / "templates" / "mundanes").glob("*.json")):
         npc = json.loads(path.read_text(encoding="utf-8-sig"))
+        if npc.get("ScriptKey") in HIDDEN_SCRIPTS:
+            continue
         area = int(npc.get("AreaID") or 0)
 
         npcs.add((area, int(npc["X"]), int(npc["Y"]), npc["Name"].split("@")[0], about(npc, items), role(npc, items)))
@@ -249,6 +255,8 @@ def main() -> None:
 
     for path in sorted((SERVER / "templates" / "mundanes").glob("*.json")):
         npc = json.loads(path.read_text(encoding="utf-8-sig"))
+        if npc.get("ScriptKey") in HIDDEN_SCRIPTS:
+            continue
         # room 줄은 | 로 칸을 가른다 — 설명에 든 | 는 / 로(역할 칸이 밀리지 않게).
         standing.setdefault(int(npc.get("AreaID") or 0), []).append(f"{npc['Name'].split('@')[0]} — {about(npc, items)}".replace("|", "/"))
         roles_in.setdefault(int(npc.get("AreaID") or 0), []).append(role(npc, items))
