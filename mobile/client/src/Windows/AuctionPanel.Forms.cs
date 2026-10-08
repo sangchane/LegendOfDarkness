@@ -197,6 +197,7 @@ public sealed partial class AuctionPanel
             Suffix = "전",
             UpdateOnTextChanged = true,
             SelectAllOnFocus = true,
+            Alignment = HorizontalAlignment.Center,
             CustomMinimumSize = new Vector2(96, Tall)
         };
         box.GetLineEdit().VirtualKeyboardType = LineEdit.VirtualKeyboardTypeEnum.Number;

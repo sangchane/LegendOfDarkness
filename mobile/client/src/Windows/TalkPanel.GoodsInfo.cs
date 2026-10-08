@@ -24,7 +24,7 @@ public sealed partial class TalkPanel
         StyleBoxFlat plate = Greybox.Plate();
         plate.BgColor = new Color("#0f0f0f");
         plate.BorderColor = Greybox.Muted;
-        plate.SetCornerRadiusAll(8);
+        plate.SetCornerRadiusAll(Greybox.Round);
         plate.SetContentMarginAll(6);
         PanelContainer box = new() { Visible = false };
         box.AddThemeStyleboxOverride("panel", plate);

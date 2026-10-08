@@ -34,7 +34,7 @@ public sealed partial class PackPanel : PanelContainer
         StyleBoxFlat plate = Greybox.Plate();
         plate.BgColor = new Color("#0f0f0f");
         plate.BorderColor = Greybox.Muted;
-        plate.SetCornerRadiusAll(10);
+        plate.SetCornerRadiusAll(Greybox.RoundPlate);
         plate.SetContentMarginAll(6);
         _action.AddThemeStyleboxOverride("panel", plate);
 
@@ -111,7 +111,7 @@ public sealed partial class PackPanel : PanelContainer
         armed.BgColor = new Color("#3a1414");
         armed.BorderColor = danger;
         armed.SetBorderWidthAll(2);
-        armed.SetCornerRadiusAll(8);
+        armed.SetCornerRadiusAll(Greybox.Round);
         armed.SetContentMarginAll(4);
         _drop.AddThemeStyleboxOverride("pressed", armed);
         _drop.AddThemeStyleboxOverride("hover_pressed", armed);
@@ -168,7 +168,7 @@ public sealed partial class PackPanel : PanelContainer
         StyleBoxFlat askPlate = Greybox.Plate();
         askPlate.BgColor = new Color("#0f0f0f");
         askPlate.BorderColor = Greybox.Muted;
-        askPlate.SetCornerRadiusAll(10);
+        askPlate.SetCornerRadiusAll(Greybox.RoundPlate);
         askPlate.SetContentMarginAll(Main.Gutter);
         _ask.AddThemeStyleboxOverride("panel", askPlate);
         _askName.AddThemeColorOverride("font_color", Greybox.Title);

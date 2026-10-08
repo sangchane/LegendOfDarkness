@@ -98,7 +98,7 @@ public sealed partial class GearPanel : PanelContainer
         StyleBoxFlat plate = Greybox.Plate();
         plate.BgColor = new Color("#0f0f0f");
         plate.BorderColor = Greybox.Muted;
-        plate.SetCornerRadiusAll(10);
+        plate.SetCornerRadiusAll(Greybox.RoundPlate);
         plate.SetContentMarginAll(6);
         _action.AddThemeStyleboxOverride("panel", plate);
         _actionName.AddThemeColorOverride("font_color", Greybox.Title);

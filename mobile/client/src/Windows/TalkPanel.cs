@@ -323,13 +323,16 @@ public sealed partial class TalkPanel : PanelContainer
             ToggleMode = true, CustomMinimumSize = new Vector2(104, Main.TouchMinimum),
             SizeFlagsHorizontal = SizeFlags.ExpandFill, TooltipText = name
         };
-        StyleBoxFlat selected = Greybox.Surface();
+        StyleBoxFlat selected = Greybox.Rounded(Greybox.Surface());
         selected.BorderColor = Greybox.Muted;
         select.AddThemeStyleboxOverride("pressed", selected);
         select.AddThemeStyleboxOverride("hover_pressed", selected);
         HBoxContainer content = new() { MouseFilter = MouseFilterEnum.Ignore };
         content.AddThemeConstantOverride("separation", Main.Gutter);
         content.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        // 그림·글자가 줄 테두리에 붙지 않게.
+        content.OffsetLeft = Greybox.Inset;
+        content.OffsetRight = -Greybox.Inset;
         select.AddChild(content);
         row.AddChild(select);
         content.AddChild(new TextureRect
@@ -353,7 +356,7 @@ public sealed partial class TalkPanel : PanelContainer
         detail.AddThemeFontSizeOverride("font_size", 13);
         words.AddChild(detail);
         content.AddChild(words);
-        SpinBox count = new() { MinValue = 0, MaxValue = max, Step = 1, Value = 0, CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
+        SpinBox count = new() { MinValue = 0, MaxValue = max, Step = 1, Value = 0, Alignment = HorizontalAlignment.Center, CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
         count.GetLineEdit().VirtualKeyboardType = LineEdit.VirtualKeyboardTypeEnum.Number;
         count.GetLineEdit().FocusEntered += () => _typingRow = row;
         TouchInput.Zone(count.GetLineEdit(), row);

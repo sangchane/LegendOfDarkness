@@ -64,17 +64,22 @@ public partial class Main : Control
 
         // Buttons sit over the map now. The engine default is translucent, which the floor shows straight
         // through, so every button carries its own opaque plate.
-        theme.SetStylebox("normal", "Button", Greybox.Plate());
-        theme.SetStylebox("hover", "Button", Greybox.Plate());
-        theme.SetStylebox("pressed", "Button", Greybox.Surface());
-        theme.SetStylebox("focus", "Button", Greybox.Plate());
-        theme.SetStylebox("disabled", "Button", Greybox.Surface());
-        // Opaque fields keep the stone title/frame out of small input text, including SpinBox editors.
+        // Every button and drop-down has the same corners as a field (Greybox.Round) — they were square here and rounded elsewhere.
+        foreach (string type in new[] { "Button", "OptionButton" })
+        {
+            theme.SetStylebox("normal", type, Greybox.Rounded(Greybox.Plate()));
+            theme.SetStylebox("hover", type, Greybox.Rounded(Greybox.Plate()));
+            theme.SetStylebox("pressed", type, Greybox.Rounded(Greybox.Surface()));
+            theme.SetStylebox("focus", type, Greybox.Rounded(Greybox.Plate()));
+            theme.SetStylebox("disabled", type, Greybox.Rounded(Greybox.Surface()));
+        }
+
+        // Opaque fields keep the stone title/frame out of small input text, including SpinBox editors. Words stand off the edge.
         foreach (string state in new[] { "normal", "focus", "read_only" })
         {
-            StyleBoxFlat field = Greybox.Surface();
-            field.SetCornerRadiusAll(8);
+            StyleBoxFlat field = Greybox.Rounded(Greybox.Surface());
             field.SetContentMarginAll(4);
+            field.ContentMarginLeft = field.ContentMarginRight = Greybox.Inset;
             if (state == "focus") field.BorderColor = Greybox.Muted;
             theme.SetStylebox(state, "LineEdit", field);
         }

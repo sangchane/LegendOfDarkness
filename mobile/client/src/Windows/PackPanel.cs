@@ -302,7 +302,7 @@ public sealed partial class PackPanel : PanelContainer
     {
         StyleBoxFlat place = new() { BgColor = new Color(0, 0, 0, 0.3f), BorderColor = new Color(1, 1, 1, 0.07f) };
         place.SetBorderWidthAll(1);
-        place.SetCornerRadiusAll(3);
+        place.SetCornerRadiusAll(Greybox.Round);
 
         return place;
     }
@@ -480,9 +480,10 @@ public sealed partial class PackPanel : PanelContainer
             count.AnchorRight = 1;
             count.AnchorTop = 1;
             count.AnchorBottom = 1;
-            count.OffsetTop = -14;
-            count.OffsetRight = -3;
-            count.OffsetBottom = -1;
+            // 숫자가 칸 테두리에 붙지 않게 모서리에서 조금 띄운다.
+            count.OffsetTop = -16;
+            count.OffsetRight = -5;
+            count.OffsetBottom = -3;
             cell.AddChild(count);
         }
 

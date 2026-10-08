@@ -44,7 +44,7 @@ public sealed partial class RollBanner : PanelContainer
 
         StyleBoxFlat plate = Greybox.Plate();
         plate.BgColor = plate.BgColor with { A = 0.82f };
-        plate.SetCornerRadiusAll(Greybox.Round);
+        plate.SetCornerRadiusAll(Greybox.RoundPlate);
         AddThemeStyleboxOverride("panel", plate);
 
         _item.AddThemeColorOverride("font_color", Greybox.Title);
@@ -161,7 +161,7 @@ public sealed partial class RollBanner : PanelContainer
     private static void Light(Label label, bool lit, bool final)
     {
         Color edge = lit ? (final ? Greybox.Accent : Greybox.Title) : Colors.Transparent;
-        StyleBoxFlat cell = Greybox.Surface();
+        StyleBoxFlat cell = Greybox.Rounded(Greybox.Surface());
         cell.BgColor = lit ? cell.BgColor : Colors.Transparent;
         cell.BorderColor = edge;
         cell.ContentMarginLeft = cell.ContentMarginRight = 6;

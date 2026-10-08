@@ -61,8 +61,25 @@ public static class Greybox
 
     public const int Gap = 8;
 
-    /// <summary>Rounding. Only on the inside — a stone frame has to stay square to read as the original's.</summary>
-    public const int Round = 12;
+    /// <summary>
+    /// Rounding of everything pressed, picked or filled in — buttons, fields, list rows, item cells. Only on the inside: a stone
+    /// frame, and a sheet laid inside one, stay square to read as the original's. One value for all of them (사용자 2026-10-08
+    /// 「아이템 이미지는 각지게 테두리하고 어떤 버튼은 라운드로하고 통일성이 없는거 같아 … 전반적으로」) — it was 0 · 3 · 8 · 12 by screen.
+    /// </summary>
+    public const int Round = 8;
+
+    /// <summary>Rounding of a plate floating over a window — an info box, an ask, a card. A step rounder than what it holds.</summary>
+    public const int RoundPlate = 12;
+
+    /// <summary>Room between a box's edge and the picture, words or number inside it — nothing touches an edge.</summary>
+    public const int Inset = 8;
+
+    /// <summary>The same box with <see cref="Round" /> corners (or <paramref name="radius" />).</summary>
+    public static StyleBoxFlat Rounded(StyleBoxFlat box, int radius = Round)
+    {
+        box.SetCornerRadiusAll(radius);
+        return box;
+    }
 
 
     /// <summary>Login backdrop, shared with its panel and input surfaces.</summary>

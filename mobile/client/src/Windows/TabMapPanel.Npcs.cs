@@ -36,7 +36,7 @@ public sealed partial class TabMapPanel
         StyleBoxFlat plate = Greybox.Plate();
         plate.BgColor = new Color(0.06f, 0.06f, 0.06f, 0.94f);
         plate.BorderColor = Greybox.Muted;
-        plate.SetCornerRadiusAll(10);
+        plate.SetCornerRadiusAll(Greybox.RoundPlate);
         plate.SetContentMarginAll(8);
         _npcCard.AddThemeStyleboxOverride("panel", plate);
         _npcCard.AnchorLeft = 0;

@@ -186,7 +186,7 @@ public sealed partial class AuctionPanel
     private static Control Plate(Control line)
     {
         PanelContainer plate = new() { CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
-        plate.AddThemeStyleboxOverride("panel", Greybox.Surface());
+        plate.AddThemeStyleboxOverride("panel", Greybox.Rounded(Greybox.Surface()));
         plate.AddChild(line);
 
         return plate;
@@ -204,11 +204,11 @@ public sealed partial class AuctionPanel
             SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
 
-        StyleBoxFlat lit = Greybox.Surface();
+        StyleBoxFlat lit = Greybox.Rounded(Greybox.Surface());
         lit.BorderColor = Greybox.Muted;
         foreach (string state in new[] { "normal", "hover", "focus" })
         {
-            button.AddThemeStyleboxOverride(state, Greybox.Surface());
+            button.AddThemeStyleboxOverride(state, Greybox.Rounded(Greybox.Surface()));
         }
 
         foreach (string state in new[] { "pressed", "hover_pressed" })
@@ -282,7 +282,7 @@ public sealed partial class AuctionPanel
         StyleBoxFlat plate = Greybox.Plate();
         plate.BgColor = new Color("#0f0f0f");
         plate.BorderColor = Greybox.Muted;
-        plate.SetCornerRadiusAll(10);
+        plate.SetCornerRadiusAll(Greybox.RoundPlate);
         plate.SetContentMarginAll(Main.Gutter);
         PanelContainer ask = new();
         ask.AddThemeStyleboxOverride("panel", plate);
