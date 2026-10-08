@@ -254,6 +254,7 @@ public partial class GameScreen : Control
         _pack.Close.Pressed += () => Carrying(false);
         _pack.Used += slot => Main.Fire(_server?.UseAsync(slot, System.Threading.CancellationToken.None));
         _pack.Dropped += (slot, count) => _ = Throw(slot, count);
+        _pack.Disassembled += slot => Main.Fire(_server?.DisassembleAsync(slot, System.Threading.CancellationToken.None));
         _pack.Tidy.Pressed += () => _ = Straighten();
 
         _gearPanel = new GearPanel();

@@ -146,13 +146,14 @@ public partial class GameScreen : Control
         }
     }
 
-    /// <summary><c>--pack-pick N</c>: once the pack is open and filled, taps its N-th picture so the action row shows.</summary>
+    /// <summary><c>--pack-pick N</c>: once the pack is open and filled, taps its N-th picture so the action row shows — with
+    /// <c>--pack-break</c> it then presses the info box's 분해, so the 「분해할까요?」 plate shows instead.</summary>
     private void RehearsePackPick()
     {
         if (Main.PackPick > 0 && _pack.Visible && _packPickWait >= 0 && ++_packPickWait == 45)
         {
             _packPickWait = -1;
-            GD.Print(_pack.PickNth(Main.PackPick) ? $"GREYBOX_PACK_PICK {Main.PackPick}" : "GREYBOX_PACK_PICK 없음");
+            GD.Print(_pack.PickNth(Main.PackPick, Main.PackBreaking) ? $"GREYBOX_PACK_PICK {Main.PackPick}" : "GREYBOX_PACK_PICK 없음");
         }
     }
 

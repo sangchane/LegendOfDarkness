@@ -89,6 +89,10 @@ public sealed partial class WorldClient
     public Task EcoWakeAsync(uint target, CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, [9, (byte)(target >> 24), (byte)(target >> 16), (byte)(target >> 8), (byte)target], cancellationToken);
 
+    /// <summary>내 가방 한 칸의 장비를 분해한다(0xF1 10) — 결과(보석·없음)는 서버 알림으로 온다.</summary>
+    public Task DisassembleAsync(int slot, CancellationToken cancellationToken) =>
+        Send(ClientOpcode.Companion, World.Companion.Disassemble(slot), cancellationToken);
+
     /// <summary>동료 봇을 보낸다(0xF1 0).</summary>
     public Task DismissCompanionAsync(CancellationToken cancellationToken) =>
         Send(ClientOpcode.Companion, World.Companion.Dismiss(), cancellationToken);

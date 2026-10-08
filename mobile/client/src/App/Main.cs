@@ -85,6 +85,7 @@ public partial class Main : Control
         PartyPreview = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--party-preview") >= 0;
         MinimapZoom = int.TryParse(Flag("--minimap-zoom"), out int minimapZoom) ? minimapZoom : 0;
         PackPick = int.TryParse(Flag("--pack-pick"), out int packPick) ? packPick : 0;
+        PackBreaking = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pack-break") >= 0;
         PickingPotion = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--pick-potion") >= 0;
         SlotHold = int.TryParse(Flag("--slot-hold"), out int slotHold) ? slotHold : 0;
         LearnPreview = Flag("--learn-preview").Split(':') is [var previewPath, var previewLevel]

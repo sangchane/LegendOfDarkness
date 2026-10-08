@@ -75,6 +75,9 @@ public static class Companion
     /// <summary>봇이 혼수인 주인을 깨운다(0xF1 5) — 봇 계정만, 주인 바로 옆에서. 서버가 가려 듣는다.</summary>
     public static byte[] WakeMaster() => [5];
 
+    /// <summary>내 가방 한 칸의 장비를 분해한다(0xF1 10, 2026-10-08) — 보석은 서버가 굴린다.</summary>
+    public static byte[] Disassemble(int slot) => [10, (byte)slot];
+
     /// <summary>
     /// 봇 탭에서 고른 것(0xF1 6): 마법사 비트(1 렌토 · 2 나르콜리 · 4 바르도 · 8 데프레코 · 16 프라보) · 성직자 비트(1 디나르콜리 ·
     /// 2 디소루마 · 4 호르라마 · 8 에나르마) · 회복 셀렉트 · 파티 회복 셀렉트(0 자동 · k 번째까지 · 255 끄기) · 따라가기 거리(칸). 서버가 주인 알림(0x5E 1) 꼬리로 봇에게 옮긴다.

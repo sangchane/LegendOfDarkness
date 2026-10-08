@@ -350,6 +350,12 @@ public sealed class CompanionTests
     }
 
     [Fact]
+    public void Disassembling_goes_out_as_kind_ten_with_the_pack_slot()
+    {
+        Assert.Equal(new byte[] { 10, 12 }, Companion.Disassemble(12));
+    }
+
+    [Fact]
     public void Statuses_read_name_seconds_and_harm()
     {
         byte[] body = [3, 0, 0, 0, 42, 2, .. LegacyKoreanEncoding.EncodeStringA("enare"), 0, 150, 0, .. LegacyKoreanEncoding.EncodeStringA("sleep"), 0, 9, 1];

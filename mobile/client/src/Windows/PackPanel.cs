@@ -66,9 +66,10 @@ public sealed partial class PackPanel : PanelContainer
     private readonly Label _askName = new();
     private readonly Button _askDrop = new() { Text = "버리기", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
     private readonly Button _askCancel = new() { Text = "취소", CustomMinimumSize = new Vector2(96, Main.TouchMinimum) };
-    private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기", width: 56);
+    private readonly Button _use = WindowFrame.IconButton(GlyphKind.Use, "입기");
     private readonly Button _shut = WindowFrame.CloseButton();
     private readonly Button _drop = WindowFrame.IconButton(GlyphKind.Drop, "버리기", tab: true);
+    private readonly Button _break = WindowFrame.IconButton(GlyphKind.Break, "분해");
     private readonly DoubleTap _taps = new();
     private readonly SpinBox _dropCount = new() { MinValue = 1, MaxValue = 1, Step = 1, Value = 1, CustomMinimumSize = new Vector2(80, Main.TouchMinimum) };
 
@@ -336,6 +337,9 @@ public sealed partial class PackPanel : PanelContainer
     /// <summary>Somebody asked to throw a carried thing away. The server decides whether it may be.</summary>
     public event System.Action<int, int>? Dropped;
 
+    /// <summary>Somebody asked to break a carried piece of gear into a gem (0xF1 10). The server decides what comes out.</summary>
+    public event System.Action<int>? Disassembled;
+
     /// <summary>What is worn now — the info box weighs a carried thing against what is on in its place.</summary>
     public IReadOnlyList<WornItem> Worn { get; set; } = [];
 
@@ -586,7 +590,7 @@ public sealed partial class PackPanel : PanelContainer
     /// Taps the <paramref name="nth" /> picture on the pack page (1-based) the way a finger does — only for a run with no
     /// hand on it (<c>--pack-pick</c>), to photograph the action row it opens.
     /// </summary>
-    public bool PickNth(int nth)
+    public bool PickNth(int nth, bool breaking = false)
     {
         Button? cell = _rows.GetChildren().OfType<Button>().Skip(nth - 1).FirstOrDefault();
 
@@ -596,6 +600,12 @@ public sealed partial class PackPanel : PanelContainer
         }
 
         cell.EmitSignal(BaseButton.SignalName.Pressed);
+
+        if (breaking)
+        {
+            ShowChosen(_lastCarried);
+            _break.EmitSignal(BaseButton.SignalName.Pressed);
+        }
 
         return true;
     }

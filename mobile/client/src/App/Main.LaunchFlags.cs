@@ -119,6 +119,9 @@ public partial class Main : Control
     /// <summary><c>--pack-pick N</c>: once the pack is open, taps its N-th picture (1-based) so the action row beside it can be photographed.</summary>
     public static int PackPick { get; private set; }
 
+    /// <summary><c>--pack-break</c>: <see cref="PackPick" /> then presses the info box's 분해, so its 「분해할까요?」 plate can be photographed.</summary>
+    public static bool PackBreaking { get; private set; }
+
     /// <summary><c>--exit-menu</c>: opens settings and presses [로그아웃] on its title row once the screen settles, to photograph the choice.</summary>
     public static bool OpeningExit { get; private set; }
 
