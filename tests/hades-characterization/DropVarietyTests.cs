@@ -44,7 +44,8 @@ public sealed class DropVarietyTests
 
     /// <summary>
     /// 사용자(2026-10-04) 「나오는 종류가 너무 적다 — 장비 부위별로 레벨에 맞게」: 사냥터마다 여러 부위의
-    /// 접미사·속성 장비가 나오고, 하나도 입장 레벨보다 높아 못 입는 것이 없으며, 한 종은 2%(1.5배 전)를 넘지 않는다.
+    /// 접미사·속성 장비가 나오고, 한 종은 2%(1.5배 전)를 넘지 않는다. 레벨은 2026-10-09 부터 입장 레벨 이하가 아니라
+    /// 그 사냥터 서클 폭 안(<see cref="GearDropTests.GroundCircle" />) — 아벨해안(51)에 56레벨 은제방패·레더부츠도 나온다.
     /// </summary>
     [Fact]
     public void Each_later_ground_shows_suffix_gear_of_many_slots_at_its_level()
@@ -58,10 +59,9 @@ public sealed class DropVarietyTests
             string[] gear =
             [
                 .. here.SelectMany(Dropped).Distinct()
-                    .Where(n => Suffixes.Any(n.StartsWith) && (int?)items[n]["EquipmentSlot"] is > 0)
-                    // `build-gear-drops.py` 가 먼저 깐 한 벌은 그쪽 시험(GearDropTests)이 본다.
-                    .Where(n => !maps.Any(map => GearDropTests.GroundGear[map].Contains(n))),
+                    .Where(n => Suffixes.Any(n.StartsWith) && (int?)items[n]["EquipmentSlot"] is > 0),
             ];
+            (int low, int high) = GearDropTests.GroundCircle[maps[0]];
             int slots = gear.Select(n => (int?)items[n]["EquipmentSlot"]).Distinct().Count();
 
             if (slots < leastSlots)
@@ -69,8 +69,8 @@ public sealed class DropVarietyTests
                 wrong.Add($"{maps[0]}: {slots}부위(적어도 {leastSlots})");
             }
 
-            wrong.AddRange(gear.Where(n => ((int?)items[n]["LevelRequired"] ?? 0) > entry)
-                .Select(n => $"{n} 레벨 {items[n]["LevelRequired"]} > 입장 {entry}"));
+            wrong.AddRange(gear.Where(n => ((int?)items[n]["LevelRequired"] ?? 0) is var level && (level < low || level > high))
+                .Select(n => $"{n} 레벨 {items[n]["LevelRequired"]} — 입장 {entry} 의 서클 {low}~{high} 밖"));
 
             foreach (JsonNode monster in here)
             {
@@ -88,6 +88,52 @@ public sealed class DropVarietyTests
         }
 
         Assert.True(wrong.Count == 0, string.Join(", ", wrong));
+    }
+
+    /// <summary>
+    /// 사용자(2026-10-09) 「사냥터도 서클별로 접두사 붙은 아이템 나오게 해야할거 같은데 은제방패 철방패 이런거만 잔뜩 나오는데?」 —
+    /// 아벨해안 일반 괴물(입장 51, 서클 41~70)은 그 서클의 접두 장비만 떨구고, 한 부위가 장비 몫을 독차지하지 않는다
+    /// (전에는 은제방패가 69%). 부위 = 장비 자리, 반지 7·8 과 장갑 9·10 은 하나로, 팔찌는 장갑과 따로(<c>build-drop-variety.py</c> <c>part</c>).
+    /// 부위 몫 = 그 부위 장비의 <c>DropRate × 1.5 ÷ 목록 칸수</c> 를 아벨해안 괴물 전부에 걸쳐 더한 것.
+    /// </summary>
+    [Fact]
+    public void Abel_gear_is_circle_three_prefixed_and_no_part_dominates()
+    {
+        IReadOnlyDictionary<string, JsonNode> items = Items();
+        JsonNode[] here = [.. Monsters().Where(m => Abel.Contains((int?)m["AreaID"] ?? 0) && !Reserved.Contains(Name(m)))];
+        Assert.NotEmpty(here);
+        List<string> wrong = [];
+        Dictionary<(int Slot, bool Bracelet), double> share = [];
+
+        foreach (JsonNode monster in here)
+        {
+            string[] listed = [.. Dropped(monster)];
+
+            foreach (string name in listed.Where(n => (int?)items[n]["EquipmentSlot"] is > 0))
+            {
+                int level = (int?)items[name]["LevelRequired"] ?? 0;
+
+                if (!Suffixes.Any(name.StartsWith) || level is < 41 or > 70)
+                {
+                    wrong.Add($"{Name(monster)}@{monster["AreaID"]} → {name}(레벨 {level})");
+                }
+
+                int slot = (int?)items[name]["EquipmentSlot"] ?? 0;
+                (int, bool) part = (slot switch { 8 => 7, 9 => 10, _ => slot }, name.Contains("팔찌"));
+                share[part] = share.GetValueOrDefault(part) + (((double?)items[name]["DropRate"] ?? 0) * DropBoost / listed.Length);
+            }
+        }
+
+        Assert.True(wrong.Count == 0, $"아벨해안에 서클 3 접두 장비가 아닌 것: {string.Join(", ", wrong.Distinct())}");
+        Assert.True(share.Count >= 4, $"아벨해안 장비 부위가 {share.Count}개뿐입니다.");
+
+        double average = share.Values.Sum() / share.Count;
+        string[] dominant =
+        [
+            .. share.Where(kv => kv.Value > 2 * average)
+                .Select(kv => $"자리 {kv.Key.Slot}{(kv.Key.Bracelet ? "(팔찌)" : "")} {kv.Value / share.Values.Sum():P0}"),
+        ];
+        Assert.True(dominant.Length == 0, $"평균의 두 배를 넘는 부위: {string.Join(", ", dominant)}");
     }
 
     [Fact]

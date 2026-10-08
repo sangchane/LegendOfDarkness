@@ -42,6 +42,14 @@
 괴물마다 옛 칸수 × (`RATIO`-1) 칸을 붙인다(모든 사냥터 같은 배율 — 잡템 DropRate 가 사냥터를 넘어 하나라서).
 새 장비 합은 한 마리당 `NEW_GEAR_TOTAL` — 종류가 늘어도 장비가 더 자주 나오지는 않는다.
 
+**서클대로(사용자 2026-10-09 「사냥터도 서클별로 접두사 붙은 아이템 나오게 … 은제방패 철방패 이런거만 잔뜩 나오는데?」·
+「접두사없는 녹옥반지, 자수정반지 이런건 상점에 두고」·「71,81,99는 해당 서클 존에서」)** — 위 두 단락(부위마다 가장 높은 층 ·
+장신구 점수 등급 · 표로 고친 84종)을 바꾼다. 한 벌 = 그 사냥터 **서클**(입장 레벨이 든 1~10 · 11~40 · 41~70 · 71~98 · 99)
+안 레벨의 **접두 장비만**(무기 빼고, 장신구도 레벨로). 부위마다 앞머리 전부, 바탕(철방패·은제방패 …)은 앞머리마다 돌려 모두 나오게.
+부위를 번갈아 늘어놓아 돌려 붙이므로 **부위마다 같은 몫**이다. 접두 없는 장비(84종 포함)는 이 사냥터들에서 걷어 낸다 — 상점 몫.
+`build-gear-drops.py` 가 깐 한 벌(은제방패 등)은 이제 **장비 한 칸 자리**일 뿐 — 그 칸도 이 한 벌로 바꿔 끼우고 같은 `GEAR_RATE` 를
+준다(옛 셈은 그 한 벌을 「기존 물건」으로 쳐 DropRate 를 ×7 까지 올려 아벨해안 장비의 2/3 가 방패였다).
+
 **새 장비의 확률(옛 규칙, 2026-09-26)** — 한 종의 실제 확률이 그 사냥터 기존 장비보다 높지 않고 2%(1.5배 전, 1.5배 후 3%)도
 넘지 않게 `DropRate` 를 고른다: (그 무리 기존 장비의 가장 낮은 실제 확률, 2% 중 작은 것) × 가장 짧은 목록 칸수.
 
@@ -76,10 +84,18 @@ DROP_BOOST = 1.5
 GEAR_CAP = 0.02
 
 # 새 장비 전부를 합한 한 마리당 실제 확률(1.5배 전 4% → 뒤 6%), 한 마리에 붙은 새 장비 칸 전부에 고르게 (2026-10-04).
+# 2026-10-09 부터 99레벨 사냥터(`fresh`) 몫만 — 서클 사냥터는 `GEAR_RATE`.
 NEW_GEAR_TOTAL = 0.04
 
-# 입장 레벨보다 이만큼 넘게 낮은 층의 부위는 그 사냥터에 안 넣는다.
-TIER_REACH = 30
+# 서클 사냥터(99 밖) 장비 한 종의 DropRate(1.5배 전, 2026-10-09), 서클마다 — `build-gear-drops.py` 한 벌 칸까지 이 값으로 바꿔 끼운다.
+# 잡템 많은 괴물(우드랜드·포테)은 이미 80% 상한에 닿아 있어 이보다 올리면: 서클 2 는 녹색말벌2 의 상한 전 합이 100% 를 넘어 아래
+# `report` 가 멈추고, 서클 3·4 는 `build-drop-cap.py` 가 모든 사냥터가 같이 쓰는 상급 포션·블루피치·파프리카를 깎아 다시 돌릴 때마다
+# `build-potion-by-level.py` 가 포션 칸을 더 붙인다(0.08 에서 확인). 그래서 잡템 괴물의 장비 확률은 옛값 그대로(6~9%)지만, 잡템 없이
+# 한 벌 칸뿐이던 괴물(아벨해안 문어·슬러그 · 서·북 노바 괴물)은 옛 ×7 방패 덕에 높던 8~9% 가 5~6% 로 내려간다.
+GEAR_RATE = {2: 0.07, 3: 0.075, 4: 0.075}
+
+# 서클 윗레벨 — 1~10 · 11~40 · 41~70 · 71~98 · 99 (`docs/item-prices-by-circle.md`, `build-circle-gear-shops.py` CIRCLE_TOPS).
+CIRCLE_TOPS = [10, 40, 70, 98]
 
 # 접미사(방어)·속성(공격) 장비 — 이름 앞머리로 가린다.
 SUFFIXED = tuple(f"{p}의" for p in ["로오", "이아", "메투스", "세토아", "세오", "셔스", "칸", "화염", "바다", "바람", "대지",
@@ -90,6 +106,7 @@ SUFFIXED = tuple(f"{p}의" for p in ["로오", "이아", "메투스", "세토아
 # 서버 레벨이 원작 표와 달랐던 5.99 팩 장비 84종(2026-10-04 조사) — 사용자 「표대로 하고 드랍도 시켜」. 레벨을 표대로
 # 고친 뒤에도 드랍 후보로 남게 이름을 박아 둔다(고치고 나면 「다른 것」으로는 다시 못 찾는다). 접두·접미가 없어도
 # 레벨이 맞는 사냥터에 들어간다(무기·기본템·흑요석 포함, 99레벨은 아직 맞는 사냥터가 없다).
+# → 2026-10-09 서클대로(위 머리글)부터는 드랍에 넣지 않고, 사냥터 목록에서 걷어 낼 이름으로만 쓴다(레벨 맞추기 `align_levels` 는 그대로).
 TABLE_LEVELLED = {
     "강화된리젠트다이아귀걸이", "검정두건", "구리방패", "금각반", "금벨트", "금장갑", "기사단방패", "대왕관", "동각반", "동장갑", "레인헌트각반", "레인헌트투구", "로톤캐프린",
     "루돌프빨간코", "루딘의귀걸이", "리젠트다이아귀걸이", "매직루나", "매직마르시아", "매직솔라", "매직쥬피티아", "무당벌레장식", "문어군", "물안경", "브레스럭각반", "브릴윙각반",
@@ -100,10 +117,6 @@ TABLE_LEVELLED = {
     "흑요석몽크각반", "흑요석몽크귀걸이", "흑요석몽크반지", "흑요석소서러각반", "흑요석소서러귀걸이", "흑요석소서러반지", "흑요석소서러장갑", "흑요석워리어각반", "흑요석워리어귀걸이",
     "흑요석워리어반지", "흑요석워리어장갑", "흑요석프리스트각반", "흑요석프리스트귀걸이", "흑요석프리스트반지", "흑요석프리스트장갑",
 }
-
-# 강화해서 얻는 장비 — 레벨은 표대로 고치지만 드랍에는 안 넣는다(사용자 2026-10-04 「세피라링·리젠트다이아귀걸이는
-# 드랍템이 아니라 강화시키는 것」).
-ENHANCED = ("세피라링", "리젠트다이아")
 
 LOOT_RANDOM, LOOT_GOLD = 1 << 1, 1 << 5
 
@@ -119,25 +132,24 @@ ABEL = [20584, 20585, 20586, 20587, 20588, 20589, 20590, 20591, 20592, 20593, 20
 #     장비를 얹을 괴물의 옛 목록 최소 칸수.
 GROUPS = [
     dict(name="우드랜드2-1·3-1·4-1", areas=[20022, 20023, 20024], entry=11,
-         gear=[], potions={}, gear_min_slots=1),
+         gear=[], potions={}),
     dict(name="포테의숲1~6존", areas=[20263, 20264, 20265, 20266, 20267, 20268], entry=21,
-         gear=[], potions={}, gear_min_slots=1),
+         gear=[], potions={}),
     dict(name="우드랜드5-1·6-1", areas=[20025, 20026], entry=51,
-         gear=[], potions={}, gear_min_slots=1),
+         gear=[], potions={}),
     dict(name="우드랜드14-1", areas=[20020], entry=81,
-         gear=[], potions={}, gear_min_slots=1),
+         gear=[], potions={}),
     # 상급 포션 확률: 3칸 괴물에서 체력 10%·마력 20%, 6칸 괴물에서 5%·10% (1.5배 전). 다른 사냥터의
     # 체력:마력 = 1:2 (`build-hunting-ground-rules.py` 마력 두 배)를 따른다.
     dict(name="아벨해안(일반 괴물)", areas=ABEL, entry=51,
-         gear=[], potions={"상급체력포션": 0.3, "상급마력포션": 0.6},
-         gear_min_slots=1),
+         gear=[], potions={"상급체력포션": 0.3, "상급마력포션": 0.6}),
 ]
 
 # 서·북의우드랜드(2026-10-04) — 노바엔 레벨문이 없어 구역 깊이로 층을 밟는다(`lib/_drops.py` woodland_west_north_layers,
 # build-gear-drops.py TIERS 와 같은 무리). 노바 괴물은 잡템·포션이 없어(옛 목록 = 한 벌 장비 한 칸) 칸수가 적다 — `thin`:
 # 이 무리 때문에 RATIO 가 오르거나 장신구 등급 층이 늘면 모든 사냥터 목록이 바뀌므로, 둘 다 다른 무리가 정하고 여기엔
 # 칸수 × (RATIO-1) 만큼만(돌림 차례대로) 싣는다. 장신구는 그 층 이하에서 가장 가까운 기존 사냥터 층의 것.
-GROUPS += [dict(name=f"서·북의우드랜드 {layer}층", areas=areas, entry=layer, gear=[], potions={}, gear_min_slots=1, thin=True)
+GROUPS += [dict(name=f"서·북의우드랜드 {layer}층", areas=areas, entry=layer, gear=[], potions={}, thin=True)
            for layer, areas in woodland_west_north_layers(SERVER / "areas").items()]
 
 # 99레벨 사냥터(2026-10-05 검수 `plans/drop-audit-2026-10-05.md` — 사용자 「드랍 종류가 너무 적다」). 구광산은 포션 두 가지뿐,
@@ -145,18 +157,15 @@ GROUPS += [dict(name=f"서·북의우드랜드 {layer}층", areas=areas, entry=l
 # 금장갑·금각반·매직부츠 …, 아무도 안 떨구던 것)와 81층 장신구를 맵마다 대략 `FRESH_MAP_GEAR` 종이 되게 괴물 이름마다 돌려 붙인다 — `fresh`:
 # 옛 목록이 비었거나 포션뿐이라 위 배율(RATIO) 셈을 타지 않고 그냥 뒤에 붙인다. 포션은 `build-potion-by-level.py` 가 채운다.
 # 5.99 증거 물건이 있거나 괴물에 자기 DropRate 를 적은 괴물(열쇠·가위·엑스쿠라눔·헬옷·그림록퀸홀)은 건드리지 않는다.
+# → 2026-10-09 서클대로: 장비는 99레벨 접두 장비만(기사단방패·금장갑 같은 맨 이름과 81층 장신구는 빠진다).
 FRESH_MAP_GEAR = 14
 FRESH_REGIONS = {"구광산": r"구광산\d+-\d+", "드라큐라백작의성": r"드라큐라백작의성.+", "지하수로D": r"지하수로D-\d+",
                  "신죽": r"신죽(마집안|음의마을)[\d-]+", "카스마늄": r"카스마늄제\d-\d갱도"}
 
 # 이 생성기가 처음 돌기 전(2026-09-26, 1.5배 전)의 DropRate — 기존 물건은 늘 여기서 다시 계산한다.
-# 장비 0.06 은 `build-gear-drops.py` GEAR_RATE, 포션은 `build-hunting-ground-rules.py`
-# POTION_DROP_RATE·MANA_POTION_DROP_RATE, 잡템은 그 두 생성기가 적은 값이다.
+# 포션은 `build-hunting-ground-rules.py` POTION_DROP_RATE·MANA_POTION_DROP_RATE, 잡템은 그 생성기와 `build-gear-drops.py` 가
+# 적은 값이다. `build-gear-drops.py` 한 벌(장비 0.06)은 2026-10-09 부터 기존 물건이 아니라 장비 한 칸 자리라 여기 없다.
 BASE_RATE = {
-    **{f"{p}의{kind}": 0.06 for p in DEFENSE for kind in ("동각반", "은각반", "은제방패")},
-    **{f"{p}의호안석반지": 0.06 for p in ["이아", "메투스", "세토아", "세오", "셔스"]},
-    "로오의반지": 0.06, "칸의목걸이": 0.06,
-    **{f"{e}의룬스톤목걸이": 0.06 for e in ELEMENT},
     "하급체력포션": 0.6, "하급마력포션": 1.2, "중급체력포션": 0.6, "중급마력포션": 1.2,
     "엘란디스": 0.4, "이슬": 0.4, "아칸더스": 0.4,
     "그린팜팻의알": 0.2, "레드팜팻의알": 0.2, "옐로우팜팻의알": 0.2, "퍼플팜팻의알": 0.2,
@@ -209,7 +218,7 @@ def load_area_names():
 AREA_NAMES = load_area_names()
 
 GROUPS += [dict(name=f"{region}(99)", areas=sorted(a for a, n in AREA_NAMES.items() if re.fullmatch(pattern, n or "")),
-                entry=99, gear=[], potions={}, gear_min_slots=0, fresh=True)
+                entry=99, gear=[], potions={}, fresh=True)
            for region, pattern in FRESH_REGIONS.items()]
 
 
@@ -234,46 +243,6 @@ def sheet_rows():
     return {row["이름"]: row for row in read(ROOT / "data/game-data/items-original-sheets.json")["수치표"]}
 
 
-def number(row, key):
-    try:
-        return int(row.get(key) or 0)
-    except ValueError:
-        return 0
-
-
-# 장신구 갈래 — 귀걸이 5 · 목걸이 6 · 반지 7·8 · 벨트 11. 거의 다 레벨 1·11 이라 레벨로는 못 가른다.
-ACCESSORY = {5: "귀걸이", 6: "목걸이", 7: "반지", 8: "반지", 11: "벨트"}
-
-
-def power(row):
-    """장신구의 능력치 점수(사용자 2026-10-04 「체력상승이나 포인트 상승 능력치로 등급을」) — 체력·마력 100 당 1,
-    힘·덱스·인트·위즈·콘 1 당 1, 방어력(음수가 좋다) 1 당 1, 공격수정 1 당 1, 명중수정 10 당 1."""
-    stats = sum(number(row, k) for k in ("힘변화", "덱스변화", "인트변화", "위즈변화", "콘변화"))
-    return ((number(row, "체력변화") + number(row, "마력변화")) / 100 + stats + max(0, -number(row, "방어력"))
-            + number(row, "공격수정") + number(row, "명중수정") / 10)
-
-
-def accessory_tiers(items, rows):
-    """장신구마다 나올 사냥터 입장 레벨 — 갈래마다 점수 차례로 사냥터 층(11·21·51·81) 수만큼 고르게 나눈다.
-    원작 표 레벨이 더 높으면 그 레벨을 받는 층 아래로는 안 내린다. 표에 없는 것은 넣지 않는다(레벨 규칙을 따른다)."""
-    entries = sorted({g["entry"] for g in GROUPS if not g.get("thin") and not g.get("fresh")})
-    kinds = defaultdict(list)
-    for name, (path, item) in items.items():
-        slot = item.get("EquipmentSlot") or 0
-        if (slot in ACCESSORY and (name.startswith(SUFFIXED) or name in TABLE_LEVELLED) and name in rows
-                and not any(word in name for word in ENHANCED)):
-            kinds[ACCESSORY[slot]].append((power(rows[name]), name))
-    tier = {}
-    for listed in kinds.values():
-        listed.sort()
-        for rank, (score, name) in enumerate(listed):
-            by_power = rank * len(entries) // len(listed)
-            level = number(rows[name], "레벨제한")
-            by_level = next((i for i, e in enumerate(entries) if e >= level), len(entries) - 1)
-            tier[name] = entries[max(by_power, by_level)]
-    return tier
-
-
 def align_levels(items, rows):
     """드랍에 쓰는 장비의 서버 레벨(LevelRequired)을 원작 표 레벨제한으로 맞춘다(사용자 2026-10-04 「레벨 제한 표대로」).
     고친 아이템 이름을 돌려준다 — 적는 것은 apply."""
@@ -292,74 +261,92 @@ LEVELLED = []
 
 def part(slot, name):
     """한 벌을 고르는 칸 — 팔찌와 장갑은 같은 자리(9·10)에 끼지만 다른 물건이라 따로 고른다. 같은 칸으로 묶었더니
-    접두 팔찌 40종이 모두 장갑에 밀려 빠졌다(사용자 2026-10-08 「동팔찌가 드랍이 안되나본데?」 → 「드랍에 넣고」)."""
-    return slot, "팔찌" in name
+    접두 팔찌 40종이 모두 장갑에 밀려 빠졌다(사용자 2026-10-08 「동팔찌가 드랍이 안되나본데?」 → 「드랍에 넣고」).
+    반지 7·8 과 장갑 9·10 은 한 부위로 센다(2026-10-09 — 9 에 끼는 동장갑·고무장갑 하나가 부위 하나 몫을 혼자 가져가지 않게)."""
+    return {8: 7, 9: 10}.get(slot, slot), "팔찌" in name
+
+
+def circle(level):
+    return next((at + 1 for at, top in enumerate(CIRCLE_TOPS) if level <= top), len(CIRCLE_TOPS) + 1)
+
+
+def worn(items, name):
+    return (items.get(name, (None, {}))[1].get("EquipmentSlot") or 0) > 0
+
+
+def before_cut(items, listed):
+    """(마지막 장비 칸까지, 그 뒤) — 뒤는 `build-potion-by-level.py` 가 붙인 포션 칸이라 이 생성기 몫이 아니다."""
+    cut = max((i + 1 for i, n in enumerate(listed) if worn(items, n)), default=len(listed))
+    return listed[:cut], listed[cut:]
+
+
+# `build-gear-drops.py` TIERS 한 벌의 크기 — 괴물 이름이 이보다 적은 무리는 앞 이름이 한 벌 칸을 둘 진다(우드랜드5-6·14 · 서·북 71·86층).
+# 포테의숲 한 벌은 넷이지만 괴물 이름이 열하나라 일곱으로 세어도 같다.
+SUIT_SIZE = 7
+
+
+def suit_slots(names):
+    """괴물 이름마다 `build-gear-drops.py` 가 깐 한 벌 칸수(lay_gear 와 같은 셈) — 이 생성기가 그 칸 수 그대로 바꿔 끼운다.
+    목록에서 세지 않고 셈으로 정한다: 다시 돌릴 때 목록의 장비는 이미 이 생성기 것이라 셀 수 없다."""
+    names = sorted(names)
+    return {name: 1 + len(range(i + len(names), SUIT_SIZE, len(names))) for i, name in enumerate(names)}
 
 
 def fill_gear(items, monsters):
-    """사냥터마다 장비 한 벌(부위마다 입장 레벨 이하 가장 높은 층, 장신구는 점수 등급)과 같은 배율 RATIO 를 정한다."""
-    rows = sheet_rows()
-    LEVELLED[:] = align_levels(items, rows)
-    tiers = accessory_tiers(items, rows)
+    """사냥터마다 장비 한 벌(그 서클의 접두 장비 — 부위마다 앞머리 전부, 바탕은 돌려 가며)과 같은 배율 RATIO 를 정한다."""
+    LEVELLED[:] = align_levels(items, sheet_rows())
     for group in GROUPS:
-        best = {}
+        heads = defaultdict(lambda: defaultdict(dict))  # 부위 → 앞머리 → {바탕: 이름}
         for name, (path, item) in items.items():
             slot = item.get("EquipmentSlot") or 0
-            if name in tiers:  # 장신구는 점수 등급으로 — 아래 레벨 규칙을 타지 않는다.
-                continue
-            level = number(rows[name], "레벨제한") if name in rows else item.get("LevelRequired") or 0
-            # 서버가 막는 레벨(LevelRequired)도 입장 레벨 이하여야 주운 사람이 입는다.
-            if (slot in (0, 1) or not name.startswith(SUFFIXED) or name in BASE_RATE or level > group["entry"]
-                    or (item.get("LevelRequired") or 0) > group["entry"]):
-                continue
-            if level > best.get(part(slot, name), (-1, []))[0]:
-                best[part(slot, name)] = (level, [])
-            if level == best[part(slot, name)][0]:
-                best[part(slot, name)][1].append(name)
-        # 부위마다 앞머리(로오·화염 …) 하나에 한 종 — 11레벨 반지의 보석 갈래(루비·사파이어 …)까지 다 넣으면
-        # 160종이 넘어 목록이 너무 길어진다.
-        picked = {}
-        for (slot, _), (level, names) in best.items():
-            if level >= group["entry"] - TIER_REACH:
-                for name in sorted(names):
-                    picked.setdefault((*part(slot, name), name.split("의")[0]), name)
-        own = max(e for e in tiers.values() if e <= group["entry"]) if group.get("thin") or group.get("fresh") else group["entry"]
-        for name, entry in sorted(tiers.items()):
-            item = items[name][1]
-            if entry == own and name not in BASE_RATE and (item.get("LevelRequired") or 0) <= entry:
-                picked.setdefault((*part(item["EquipmentSlot"], name), name.split("의")[0]), name)
-        # 표대로 고친 84종(접두·접미 없는 것 포함)은 그 레벨이 이 사냥터 층 안이면 하나하나 넣는다.
-        for name in sorted(TABLE_LEVELLED - set(tiers)):
-            if name in items and name not in BASE_RATE and not any(word in name for word in ENHANCED):
-                level = items[name][1].get("LevelRequired") or 0
-                if group["entry"] - TIER_REACH <= level <= group["entry"]:
-                    picked.setdefault((*part(items[name][1]["EquipmentSlot"], name), name), name)
-        group["gear"] = sorted(picked.values())
-        if group.get("thin"):  # 다 못 싣는 무리 — 그 층(가장 높은) 장비부터, 같은 층에서는 부위를 번갈아 돌린다
-            # (이름순 그대로면 한 부위 열 종 — 팔찌를 넣으며 은팔찌 10종이 앞자리를 다 차지했다, 2026-10-08).
-            turn, seen = {}, defaultdict(int)
-            for name in group["gear"]:
-                key = part(items[name][1]["EquipmentSlot"], name)
-                turn[name] = seen[key]
-                seen[key] += 1
-            group["gear"].sort(key=lambda n: (-(items[n][1].get("LevelRequired") or 0), turn[n]))
-        group["slots"] = sum(len([n for n in drops_of(m) if n in BASE_RATE]) for p, m in {
-            m["Name"]: (p, m) for p, m in monsters
-            if m.get("AreaID") in group["areas"] and m.get("Name") not in RESERVED_NAMES}.values())
+            if slot > 1 and name.startswith(SUFFIXED) and circle(item.get("LevelRequired") or 0) == circle(group["entry"]):
+                head, base = name.split("의", 1)
+                heads[part(slot, name)][head][base] = name
+        lines = []
+        for key in sorted(heads):
+            kinds = heads[key]
+            level = {base: items[name][1].get("LevelRequired") or 0 for bases in kinds.values() for base, name in bases.items()}
+            used = dict.fromkeys(sorted(level, key=lambda b: (level[b], b)), 0)
+            order = list(used)
+            line = []
+            # 앞머리마다 하나 — 가장 덜 쓴 바탕(같으면 낮은 레벨)을 골라 철방패·은제방패가 번갈아 나온다.
+            for head in sorted(kinds):
+                base = min(kinds[head], key=lambda b: (used[b], order.index(b)))
+                used[base] += 1
+                line.append(kinds[head][base])
+            # 앞머리보다 바탕이 많으면 남은 바탕도 하나씩.
+            line += [next(bases[b] for bases in kinds.values() if b in bases) for b in order if not used[b]]
+            lines.append(line)
+        # 부위를 번갈아 늘어놓는다 — 괴물마다 이 차례대로 돌려 붙이므로 부위마다 같은 몫이 된다. 종류가 적은 부위(벨트·목걸이 넷)는
+        # 제 것을 되풀이해 다른 부위와 같은 칸 수를 채운다.
+        longest = max(map(len, lines), default=0)
+        group["gear"] = [line[i % len(line)] for i in range(longest) for line in lines]
+        # 옛 칸수 = 장비 아닌 기존 물건 + `build-gear-drops.py` 한 벌 칸.
+        here = {m["Name"]: m for p, m in monsters
+                if m.get("AreaID") in group["areas"] and m.get("Name") not in RESERVED_NAMES}
+        suits = suit_slots(here)
+        group["slots"] = sum(len([n for n in before_cut(items, drops_of(m))[0] if n in BASE_RATE]) + suits[name]
+                             for name, m in here.items())
 
     # 모든 사냥터에 같은 배율(새 칸수 ÷ 옛 칸수) — 잡템·포션의 DropRate 는 사냥터를 넘어 하나라서, 배율이
     # 다르면 한쪽 괴물의 합이 100% 를 넘는다. 가장 많이 필요한 사냥터에 맞춘다.
     global RATIO
     # 정수 배율 — 칸수를 반올림하면 괴물마다 배율이 조금씩 달라져 합이 넘는다.
     # `thin` 무리(옛 목록이 한 칸뿐인 괴물만 있는 곳)는 배율을 정하지 않는다 — 실을 수 있는 만큼만(돌림 차례대로) 싣는다.
-    RATIO = 1 + math.ceil(max(len(g["gear"]) / max(1, g["slots"]) for g in GROUPS if not g.get("thin") and not g.get("fresh")))
+    RATIO = max(RATIO_LEAST, 1 + math.ceil(max(len(g["gear"]) / max(1, g["slots"])
+                                                for g in GROUPS if not g.get("thin") and not g.get("fresh"))))
 
 
 RATIO = 1.0
 
+# 배율 바닥 — 2026-10-09 서클대로 한 벌이 줄어(우드랜드 107 → 79종) 배율이 5 → 4 로 내려가면 목록이 짧아져, `build-potion-by-level.py` 가
+# 옛 길이에 맞춰 붙여 둔 뒤쪽 포션 칸이 무거워지고 80% 상한(`build-drop-cap.py`)이 모든 사냥터의 상급 포션·블루피치를 깎았다.
+RATIO_LEAST = 5
+
 
 ADDED = set()
 TAIL = {}   # path -> `build-potion-by-level.py` 가 붙인 뒤쪽 포션 칸
+OLD_LEN = {}  # path -> 옛 칸수(기존 물건 + `build-gear-drops.py` 한 벌 칸) — 한 벌 칸은 바꿔 끼우므로 old 에는 없다
 FRESH = {}  # path -> (괴물, 새 목록, 무리) — 99레벨 사냥터(`fresh`)
 FRESH_AT = 0
 
@@ -395,10 +382,9 @@ def plan(monsters, items, said):
     """괴물 파일마다 (옛 목록, 새 목록) 과 아이템마다 새 DropRate 를 정한다."""
     fill_gear(items, monsters)
     ADDED.update(LEGACY_GEAR, (n for g in GROUPS for n in g["gear"]), (n for g in GROUPS for n in g["potions"]))
-    # 지난번에 이 생성기가 붙였다가 이번 한 벌에서 빠진 것까지 걷어 낸다 — 기준값(BASE_RATE)이 아닌 접두·접미 장비.
+    # 지난번에 이 생성기가 붙였다가 이번 한 벌에서 빠진 것까지 걷어 낸다 — 접두 장비 전부(`build-gear-drops.py` 한 벌 포함)와 표로 고친 84종.
     ADDED.update(n for n, (path, item) in items.items()
-                 if (n.startswith(SUFFIXED) or n in TABLE_LEVELLED) and (item.get("EquipmentSlot") or 0) > 0
-                 and n not in BASE_RATE)
+                 if (n.startswith(SUFFIXED) or n in TABLE_LEVELLED) and (item.get("EquipmentSlot") or 0) > 0)
     lists = {}  # path -> (monster, old, new, group)
     new_rates = {}
 
@@ -412,8 +398,8 @@ def plan(monsters, items, said):
             item = items[name][1]
             if name in group["gear"]:
                 level = item.get("LevelRequired") or 0
-                if level > group["entry"] or not (item.get("EquipmentSlot") or 0):
-                    raise SystemExit(f"{name}: 레벨 {level} — {group['name']} 입장 {group['entry']} 에 못 입는다")
+                if circle(level) != circle(group["entry"]) or not (item.get("EquipmentSlot") or 0):
+                    raise SystemExit(f"{name}: 레벨 {level} — {group['name']} 입장 {group['entry']} 의 서클 밖이다")
 
         here = [(p, m) for p, m in monsters
                 if m.get("AreaID") in group["areas"] and m.get("Name") not in RESERVED_NAMES]
@@ -422,21 +408,21 @@ def plan(monsters, items, said):
             continue
         # `build-potion-by-level.py` 가 이 생성기 뒤에 붙인 포션 칸(마지막 장비 칸 뒤) — 이 생성기 몫이 아니라
         # 셈에서 빼고 그대로 뒤에 둔다(2026-10-05, 그것까지 옛 목록으로 세면 「BASE_RATE 에 없다」 며 멈췄다).
+        # 장비는 모두 걷는다 — `build-gear-drops.py` 한 벌도(그 칸 수는 아래 `suit_slots` 로 세어 이 한 벌로 바꿔 끼운다, 2026-10-09).
         old_of = {}
         for p, m in here:
-            listed = drops_of(m)
-            cut = max((i + 1 for i, n in enumerate(listed) if (items[n][1].get("EquipmentSlot") or 0) > 0),
-                      default=len(listed))
-            TAIL[p] = listed[cut:]
-            old_of[p] = [n for n in listed[:cut] if n not in ADDED]
+            head, TAIL[p] = before_cut(items, drops_of(m))
+            old_of[p] = [n for n in head if n not in ADDED and not worn(items, n)]
 
         # 장비를 얹을 괴물 이름 — 이름 차례대로 한 벌을 돌려 가며(`build-gear-drops.py` lay_gear 와 같은 꼴).
         # 옛 칸수에 비례해 붙인다 — 그래야 괴물마다 (새 칸수 ÷ 옛 칸수) 가 같아 같은 잡템을 함께 쓰는 괴물의
         # 합이 어긋나지 않는다(2026-10-04, 똑같이 붙였더니 합 110% 인 괴물이 생겼다).
-        slots = {m["Name"]: len(old_of[p]) for p, m in here if len(old_of[p]) >= group["gear_min_slots"]}
+        # 옛 칸수 = 기존 물건 + 한 벌 칸 — 그 칸도 이 한 벌에서 채운다.
+        suits = suit_slots({m["Name"] for p, m in here})
+        slots = {m["Name"]: len(old_of[p]) + suits[m["Name"]] for p, m in here}
         carried, at = {}, 0
         for name in sorted(slots):
-            count = round(slots[name] * (RATIO - 1))
+            count = round(slots[name] * (RATIO - 1)) + suits[name]
             carried[name] = [group["gear"][(at + k) % len(group["gear"])] for k in range(count)]
             at += count
 
@@ -446,12 +432,13 @@ def plan(monsters, items, said):
             old = old_of[p]
             new = old + list(group["potions"]) + carried.get(m["Name"], [])
             lists[p] = (m, old, new, group)
+            OLD_LEN[p] = slots[m["Name"]]
 
     # 기존 물건: 가장 크게 옅어진 괴물의 배율.
     factor = defaultdict(lambda: 1.0)
-    for m, old, new, group in lists.values():
+    for p, (m, old, new, group) in lists.items():
         for name in old:
-            factor[name] = max(factor[name], len(new) / len(old))
+            factor[name] = max(factor[name], len(new) / OLD_LEN[p])
 
     for name, f in factor.items():
         if name not in BASE_RATE:
@@ -466,9 +453,11 @@ def plan(monsters, items, said):
     # 새 장비: 한 마리당 합이 NEW_GEAR_TOTAL 이 되게.
     for group in GROUPS:
         rows = [(m, old, new) for m, old, new, g in lists.values() if g is group]
-        # 한 마리의 새 장비 합 = DropRate × (RATIO-1)/RATIO (1.5배 전) — 그것이 NEW_GEAR_TOTAL 이 되게.
+        # 한 마리의 새 장비 합 = DropRate × (RATIO-1)/RATIO (1.5배 전) — 그것이 NEW_GEAR_TOTAL 이 되게(99레벨 사냥터).
+        # 서클 사냥터는 장비 칸 전부(한 벌 자리 포함)가 같은 GEAR_RATE — 서클 2~4 장비는 99레벨 사냥터와 겹치지 않는다.
         for name in group["gear"]:
-            new_rates[name] = round(NEW_GEAR_TOTAL * RATIO / (RATIO - 1), 6)
+            new_rates[name] = (round(NEW_GEAR_TOTAL * RATIO / (RATIO - 1), 6) if group.get("fresh")
+                               else GEAR_RATE[circle(group["entry"])])
 
     return lists, new_rates
 
@@ -481,7 +470,7 @@ def report(monsters, items, lists, new_rates, said):
     # 괴물마다 확률 확인: 옛 물건이 떨어지지 않았나, 합이 100% 를 넘지 않나.
     for p, (m, old, new, group) in lists.items():
         for name in old:
-            before = real(BASE_RATE[name], len(old))
+            before = real(BASE_RATE[name], OLD_LEN[p])
             after = real(new_rates.get(name, 0), len(new))
             if after + 1e-9 < before:
                 raise SystemExit(f"{m['Name']} {name}: {before:.2%} → {after:.2%} 로 떨어진다")
@@ -494,16 +483,16 @@ def report(monsters, items, lists, new_rates, said):
     said.append(f"{'맵':<14}{'종류 전':>6}{'종류 후':>6}   {'뭐라도(평균) 전':>14} → 후     더한 것")
     by_area = defaultdict(list)
     for p, (m, old, new, group) in lists.items():
-        by_area[m["AreaID"]].append((m, old, new))
+        by_area[m["AreaID"]].append((m, old, new, OLD_LEN[p]))
     for group in GROUPS:
         for area in group["areas"]:
             rows = by_area.get(area)
             if not rows:
                 continue
-            kinds_before = {n for m, old, new in rows for n in old}
-            kinds_after = {n for m, old, new in rows for n in new}
-            any_before = sum(sum(real(BASE_RATE[n], len(old)) for n in old) for m, old, new in rows) / len(rows)
-            any_after = sum(sum(real(new_rates.get(n, 0), len(new)) for n in new) for m, old, new in rows) / len(rows)
+            kinds_before = {n for m, old, new, n_old in rows for n in old}
+            kinds_after = {n for m, old, new, n_old in rows for n in new}
+            any_before = sum(sum(real(BASE_RATE[n], n_old) for n in old) for m, old, new, n_old in rows) / len(rows)
+            any_after = sum(sum(real(new_rates.get(n, 0), len(new)) for n in new) for m, old, new, n_old in rows) / len(rows)
             area_name = AREA_NAMES.get(area, str(area))
             said.append(f"{area_name:<14}{len(kinds_before):>6}{len(kinds_after):>6}   {any_before:>13.1%} → {any_after:.1%}"
                         f"   {' · '.join(sorted(kinds_after - kinds_before))}")
@@ -528,7 +517,7 @@ def report(monsters, items, lists, new_rates, said):
             continue
         seen.add(key)
         parts = [f"{n} {real(new_rates.get(n, 0), len(new)):.1%}" for n in new]
-        said.append(f"  [{group['name']}] {m['Name']} ({len(old)}→{len(new)}칸): {' · '.join(parts)}")
+        said.append(f"  [{group['name']}] {m['Name']} ({OLD_LEN[p]}→{len(new)}칸): {' · '.join(parts)}")
 
     # 영향: 바꾼 DropRate 가 이 생성기 밖의 괴물(또는 배율이 더 작은 괴물)에서 오른 폭.
     said.append("\nDropRate 를 바꾼 물건과 영향 (다른 괴물에서 오른 것)")
@@ -548,7 +537,7 @@ def report(monsters, items, lists, new_rates, said):
                 mm, old, new, g = lists[p]
                 if name not in old:
                     continue
-                before, after = real(BASE_RATE[name], len(old)), real(new_rates[name], len(new))
+                before, after = real(BASE_RATE[name], OLD_LEN[p]), real(new_rates[name], len(new))
             else:
                 before, after = real(base if base is not None else was, len(listed)), real(new_rates[name], len(listed))
             if after > before + 1e-9:

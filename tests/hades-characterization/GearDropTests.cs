@@ -39,6 +39,10 @@ namespace Lod.Hades.Characterization.Tests;
 /// 아이템이 Novaonline 팩에서는 레벨제한 99 다. 1레벨이 주우면 초반이 통째로 무너진다.
 /// </para>
 /// <para>정의를 만드는 것은 <c>scripts/gen/items/build-gear-drops.py</c> 다.</para>
+/// <para>
+/// <b>2026-10-09 서클대로</b> — 사냥터 장비는 그 사냥터 서클 레벨 폭 안의 접두 장비뿐이고(<see cref="GroundCircle" />), 위
+/// 「사냥터마다 다른 한 벌」은 <c>build-drop-variety.py</c> 가 서클 한 벌로 바꿔 끼운다. 그래서 한 종의 확률 대신 괴물마다 장비 합을 잰다.
+/// </para>
 /// </remarks>
 public sealed class GearDropTests
 {
@@ -98,110 +102,56 @@ public sealed class GearDropTests
             "python3 scripts/gen/items/build-gear-drops.py --쓰기 로 다시 만드세요.");
     }
 
-    /// <summary>
-    /// 우드2-4(11레벨 대) — 로오·칸은 5.99 팩 것(표 값으로 맞춰 1레벨), 나머지 다섯은
-    /// <c>data/game-data/items-original-sheets.json</c> 원작 표로 되살린 것(11레벨).
-    /// </summary>
-    private static readonly string[] DefenseSuffixRing11 =
-    [
-        "로오의반지", "이아의호안석반지", "메투스의호안석반지",
-        "세토아의호안석반지", "세오의호안석반지", "셔스의호안석반지", "칸의목걸이",
-    ];
-
-    /// <summary>포테의숲(21레벨 대) — 접미사 반지에 21레벨 층이 없어 4원소 11레벨 층으로 채운다.</summary>
-    private static readonly string[] ElementAt11 =
-        ["화염의룬스톤목걸이", "바다의룬스톤목걸이", "바람의룬스톤목걸이", "대지의룬스톤목걸이"];
-
-    /// <summary>우드랜드5-6(41레벨 대) — 원작 표로 되살린 방어 접미사 동각반, 41레벨 그대로 맞는다.</summary>
-    private static readonly string[] DefenseSuffixAt41 =
-    [
-        "로오의동각반", "이아의동각반", "메투스의동각반",
-        "세토아의동각반", "세오의동각반", "셔스의동각반", "칸의동각반",
-    ];
-
-    /// <summary>우드랜드14(71레벨 대) — 원작 표로 되살린 방어 접미사 은각반, 그대로 들어맞는다.</summary>
-    private static readonly string[] DefenseSuffixAt71 =
-    [
-        "로오의은각반", "이아의은각반", "메투스의은각반",
-        "세토아의은각반", "세오의은각반", "셔스의은각반", "칸의은각반",
-    ];
-
-    /// <summary>아벨해안 일반 몹(51~80레벨) — 51레벨에 맞는 층이 없어 원작 표의 56레벨 은제방패를 쓴다.</summary>
-    private static readonly string[] DefenseSuffixAt56 =
-    [
-        "로오의은제방패", "이아의은제방패", "메투스의은제방패",
-        "세토아의은제방패", "세오의은제방패", "셔스의은제방패", "칸의은제방패",
-    ];
-
-    /// <summary>
-    /// 사냥터별로 레벨이 맞는 접미사·속성 장비 한 벌 — <c>scripts/gen/items/build-gear-drops.py</c> <c>TIERS</c> 와
-    /// 같은 목록. 그 위에 `build-drop-variety.py` 가 부위별 접미사·속성 장비를 더한다(2026-10-04, <see cref="DropVarietyTests"/>)
-    /// — 이 목록 밖에서 접미사·속성이 아닌 장비가 보이면 아직 기본템이 남은 것이다.
-    /// </summary>
-    private static readonly string[] SuffixHeads =
+    /// <summary>접두 장비(방어 접미사·공격 속성·축복·체력·풍요)의 앞머리.</summary>
+    internal static readonly string[] SuffixHeads =
         ["로오의", "이아의", "메투스의", "세토아의", "세오의", "셔스의", "칸의", "화염의", "바다의", "바람의", "대지의", "축복의", "체력의", "풍요의"];
 
-    internal static readonly Dictionary<int, string[]> GroundGear = WithWestNorth(new()
+    /// <summary>
+    /// 사냥터마다 그 서클(1~10 · 11~40 · 41~70 · 71~98 · 99, <c>docs/item-prices-by-circle.md</c>)의 레벨 폭 — 입장 레벨이 든 서클.
+    /// 사용자 2026-10-09 「마을별로 서클 기본템 팔듯이 사냥터도 서클별로 접두사 붙은 아이템 나오게」·「71,81,99는 해당 서클 존에서」:
+    /// 사냥터 장비는 이 폭 안 레벨의 접두 장비뿐이다(<c>scripts/gen/items/build-drop-variety.py</c> <c>fill_gear</c>).
+    /// <c>build-gear-drops.py</c> 가 까는 한 벌(은제방패 등)은 이제 장비 칸 자리일 뿐 — 그 생성기가 서클 한 벌로 바꿔 끼운다.
+    /// </summary>
+    internal static readonly Dictionary<int, (int Low, int High)> GroundCircle = WithWestNorth(new()
     {
-        [20022] = [.. DefenseSuffixRing11],
-        [20023] = [.. DefenseSuffixRing11],
-        [20024] = [.. DefenseSuffixRing11],
-        [20263] = [.. ElementAt11],
-        [20264] = [.. ElementAt11],
-        [20265] = [.. ElementAt11],
-        [20266] = [.. ElementAt11],
-        [20267] = [.. ElementAt11],
-        [20268] = [.. ElementAt11],
-        [20025] = [.. DefenseSuffixAt41],
-        [20026] = [.. DefenseSuffixAt41],
-        [20020] = [.. DefenseSuffixAt71],
-        [20584] = [.. DefenseSuffixAt56],
-        [20585] = [.. DefenseSuffixAt56],
-        [20586] = [.. DefenseSuffixAt56],
-        [20587] = [.. DefenseSuffixAt56],
-        [20588] = [.. DefenseSuffixAt56],
-        [20589] = [.. DefenseSuffixAt56],
-        [20590] = [.. DefenseSuffixAt56],
-        [20591] = [.. DefenseSuffixAt56],
-        [20592] = [.. DefenseSuffixAt56],
-        [20593] = [.. DefenseSuffixAt56],
-        [20594] = [.. DefenseSuffixAt56],
+        [20022] = (11, 40), [20023] = (11, 40), [20024] = (11, 40),
+        [20263] = (11, 40), [20264] = (11, 40), [20265] = (11, 40),
+        [20266] = (11, 40), [20267] = (11, 40), [20268] = (11, 40),
+        [20025] = (41, 70), [20026] = (41, 70),
+        [20020] = (71, 98),
+        [20584] = (41, 70), [20585] = (41, 70), [20586] = (41, 70), [20587] = (41, 70), [20588] = (41, 70),
+        [20589] = (41, 70), [20590] = (41, 70), [20591] = (41, 70), [20592] = (41, 70), [20593] = (41, 70),
+        [20594] = (41, 70),
     });
 
-    /// <summary>
-    /// 서·북의우드랜드(2026-10-04) — 층마다 한 벌(<c>build-gear-drops.py</c> TIERS): 11·26 → 11레벨 반지 · 41·56 → 동각반 ·
-    /// 71·86 → 은각반.
-    /// </summary>
-    private static Dictionary<int, string[]> WithWestNorth(Dictionary<int, string[]> grounds)
+    /// <summary>서·북의우드랜드(2026-10-04) — 구역 층(11·26·41·56·71·86)이 든 서클.</summary>
+    private static Dictionary<int, (int Low, int High)> WithWestNorth(Dictionary<int, (int Low, int High)> grounds)
     {
         foreach ((int map, _, int layer) in WoodlandWestNorthTests.Layered())
         {
             grounds[map] = layer switch
             {
-                < 41 => DefenseSuffixRing11,
-                < 71 => DefenseSuffixAt41,
-                _ => DefenseSuffixAt71,
+                < 41 => (11, 40),
+                < 71 => (41, 70),
+                _ => (71, 98),
             };
         }
         return grounds;
     }
 
-
     /// <summary>
-    /// 실제 확률이 이 안이어야 한다 — 옛 기본템 자리(잡템 2~3 + 장비 1~2칸)와 같은 폭이다. 아벨해안
-    /// 일반 몹 중 원래 잡템이 없던 여섯(문어·슬러그1·슬러그2·애스코모이드·일1·일2)은 목록이 장비
-    /// 한 칸뿐이라 같은 계산식(<c>GEAR_RATE</c> ÷ 목록칸수)이 그대로 6% 를 낸다 — 잡템을 지어내 채우지
-    /// 않았으니 위 칸까지 넓힌다("확률 계산은 지금 방식 그대로" — 사용자 지시).
+    /// 한 괴물이 장비를 떨굴 확률(1.5배 뒤, 장비 칸 전부의 합)의 폭. 2026-10-09 전에는 한 벌 한 종이 1~6%(1.5배 전) 였다 —
+    /// 이제 장비 칸이 모두 같은 DropRate 라 한 종이 아니라 괴물마다 합을 잰다(바꾸기 전 4.6~10%, 뒤 4.6~8.9%).
     /// </summary>
-    private const double GroundRateLeast = 0.01;
+    private const double GroundGearLeast = 0.03;
 
-    private const double GroundRateMost = 0.06;
+    private const double GroundGearMost = 0.12;
 
     [Fact]
-    public void Later_grounds_carry_no_base_gear_only_level_matched_suffix_or_element_gear()
+    public void Later_grounds_carry_only_prefixed_gear_of_their_circle()
     {
         IReadOnlyDictionary<string, JsonNode> items = Items();
-        List<string> stillBase = [];
+        List<string> wrong = [];
         List<string> missing = [];
         List<string> outside = [];
 
@@ -213,29 +163,20 @@ public sealed class GearDropTests
                     && !ReservedNames.Contains(m["Name"]?.GetValue<string>())),
             ];
             Assert.True(here.Length > 0, $"{ground}({map}) 에 괴물 정의가 없습니다.");
-            string[] allowed = GroundGear[map];
+            (int low, int high) = GroundCircle[map];
 
             foreach (JsonNode monster in here)
             {
                 string[] listed = [.. Dropped(monster)];
-                // 접미사·속성 장비와 원작 표로 레벨을 고친 5.99 장비(기본템 포함, 사용자 2026-10-04 「드랍도 시켜」)는
-                // `build-drop-variety.py` 가 부위별로 더한 것 — 그 밖의 장비(하데스 영문 기본템 등)만 찾는다.
-                string[] baseGear =
-                [
-                    .. listed.Where(name => IsGear(items, name) && !allowed.Contains(name)
-                        && !SuffixHeads.Any(name.StartsWith)
-                        && items[name]["Group"]?.GetValue<string>()?.StartsWith("5.99표/") != true),
-                ];
+                string[] gear = [.. listed.Where(name => IsGear(items, name))];
 
-                if (baseGear.Length > 0)
-                {
-                    stillBase.Add($"{ground} {monster["Name"]} → {string.Join('·', baseGear)}");
-                    continue;
-                }
+                // 접두 없는 장비(기본템·표로 고친 84종)는 상점 몫이고, 서클 밖 레벨은 다른 서클 사냥터 몫이다.
+                wrong.AddRange(gear
+                    .Where(name => !SuffixHeads.Any(name.StartsWith)
+                        || (int?)items[name]["LevelRequired"] is not { } level || level < low || level > high)
+                    .Select(name => $"{ground} {monster["Name"]} → {name}(레벨 {items[name]["LevelRequired"]}, 서클 {low}~{high})"));
 
-                string? picked = listed.FirstOrDefault(name => allowed.Contains(name));
-
-                if (picked is null)
+                if (gear.Length == 0)
                 {
                     missing.Add($"{ground} {monster["Name"]}");
                     continue;
@@ -246,27 +187,27 @@ public sealed class GearDropTests
                     $"{ground} {monster["Name"]} 의 LootType 이 {monster["LootType"]} 입니다 — " +
                     $"장비를 실으려면 목록에서 하나를 고르는 갈래(Random {LootRandom})여야 합니다.");
 
-                double rate = (double?)items[picked]["DropRate"] ?? 0;
-                double real = rate / listed.Length;
+                double real = gear.Sum(name => DropBoost * ((double?)items[name]["DropRate"] ?? 0)) / listed.Length;
 
-                if (real < GroundRateLeast || real > GroundRateMost)
+                if (real < GroundGearLeast || real > GroundGearMost)
                 {
-                    outside.Add(
-                        $"{ground} {monster["Name"]} → {picked} {real:P1}" +
-                        $"(DropRate {rate} ÷ {listed.Length}칸)");
+                    outside.Add($"{ground} {monster["Name"]} 장비 합 {real:P1}({gear.Length}/{listed.Length}칸)");
                 }
             }
         }
 
-        Assert.True(stillBase.Count == 0,
-            $"기본템이 아직 남은 사냥터 드롭 줄이 {stillBase.Count}개입니다: {string.Join(", ", stillBase.Order())}. " +
-            "python3 scripts/gen/items/build-gear-drops.py --쓰기 로 다시 만드세요.");
+        Assert.True(wrong.Count == 0,
+            $"서클 밖이거나 접두 없는 장비 드롭 줄이 {wrong.Count}개입니다: {string.Join(", ", wrong.Order())}. " +
+            "python3 scripts/gen/items/build-drop-variety.py --쓰기 로 다시 만드세요.");
         Assert.True(missing.Count == 0,
-            $"레벨이 맞는 접미사·속성 장비가 없는 사냥터 괴물이 {missing.Count}마리입니다: {string.Join(", ", missing.Order())}.");
+            $"장비를 하나도 안 떨구는 사냥터 괴물이 {missing.Count}마리입니다: {string.Join(", ", missing.Order())}.");
         Assert.True(outside.Count == 0,
-            $"실제 확률이 {GroundRateLeast:P0}~{GroundRateMost:P0} 밖인 드롭이 {outside.Count} 줄입니다: " +
+            $"장비 확률 합이 {GroundGearLeast:P0}~{GroundGearMost:P0} 밖인 괴물이 {outside.Count}마리입니다: " +
             $"{string.Join(", ", outside.Order())}.");
     }
+
+    /// <summary><c>Formulas/monsterexp.cs</c> <c>DropBoost</c> — 사용자 2026-09-26 "전체 확률 올려", 1.5배.</summary>
+    private const double DropBoost = 1.5;
 
     [Fact]
     public void Every_dropped_name_is_a_real_item()

@@ -12,9 +12,9 @@ namespace Lod.Hades.Characterization.Tests;
 /// </summary>
 public sealed class EvidenceBackedDropDistributionTests
 {
-    private const int ItemTemplateCount = 1364;
-    private const int ReferencedItemTypeCount = 340;   // 부위별 접미사·속성·축복·체력·풍요 장비 + 표로 레벨 고친 5.99 장비(2026-10-04, build-drop-variety.py)
-    private const int DropRelationCount = 1680;        // 723 + 부위별 장비(2026-10-04, build-drop-variety.py)
+    private const int ItemTemplateCount = 1604;   // 1364 + 속성 무기·옷 236(2026-10-04) + 기본 팔찌 4(10-08) — 아이템 들이기, 드랍과 무관
+    private const int ReferencedItemTypeCount = 322;   // 340 → 490(10-05 99레벨 사냥터 장비 · 10-08 접두 팔찌, 고치지 않고 남았던 값) → 322(10-09 서클대로 — 접두 없는 84종·서클 밖 장비를 뺐다, build-drop-variety.py)
+    private const int DropRelationCount = 7291;        // 1680 → 7207(10-05 포션 바닥선 칸·99레벨 장비 · 10-08 팔찌, 남았던 값) → 7291(10-09 서클대로, 한 벌 칸 수는 그대로)
     private const int LootRandom = 2;
     private const int LootTable = 4;
 
@@ -58,6 +58,9 @@ public sealed class EvidenceBackedDropDistributionTests
                 .Select(relation => relation.Item)
                 .Distinct(StringComparer.Ordinal)
                 .Where(name => !items.TryGetValue(name, out JsonNode? item) || DropRate(item) <= 0)
+                // 괴물이 제 DropRate 를 적었으면 그것으로 굴린다(`monsterexp.cs` `_monster.Template.DropRate ?? template.DropRate`) —
+                // 호러캐슬 보스(2026-10, 0.003)의 무기 다섯(매직세페우스·브레이스글러브·신월도·피4·홀리세페우스)은 아이템 DropRate 가 0 이어도 떨어진다.
+                .Where(name => !Relations().Any(relation => relation.Item == name && relation.MonsterRate > 0))
                 .Order(),
         ];
 
@@ -80,7 +83,7 @@ public sealed class EvidenceBackedDropDistributionTests
 
     /// <summary>
     /// 현재 배치 자체가 허용 목록이다. 양수 <c>DropRate</c> 가 남은 미연결 아이템을 보고 새 연결을
-    /// 만들면 이 340종·1680개 스냅샷이 바뀐다.
+    /// 만들면 이 322종·7291개 스냅샷이 바뀐다.
     /// </summary>
     [Fact]
     public void Drop_connections_are_not_synthesized_from_item_drop_rates()
@@ -109,6 +112,7 @@ public sealed class EvidenceBackedDropDistributionTests
         [
             .. Relations()
                 .Where(relation => !items.TryGetValue(relation.Item, out JsonNode? item) || DropRate(item) <= 0)
+                .Where(relation => relation.MonsterRate <= 0)
                 .Where(relation => !evidence.Contains((relation.Monster, relation.Item)))
                 .Distinct()
                 .OrderBy(relation => relation.Monster)
@@ -157,7 +161,8 @@ public sealed class EvidenceBackedDropDistributionTests
                 (int?)monster.Node["AreaID"] ?? 0,
                 item,
                 Dropped(monster.Node).Count(),
-                (int?)monster.Node["LootType"] ?? 0))),
+                (int?)monster.Node["LootType"] ?? 0,
+                (double?)monster.Node["DropRate"] ?? 0))),
     ];
 
     private static DropRelation[]? _relations;
@@ -271,5 +276,5 @@ public sealed class EvidenceBackedDropDistributionTests
 
     private sealed record Definition(string Path, JsonNode Node);
 
-    private sealed record DropRelation(string Monster, int Area, string Item, int ListCount, int LootType);
+    private sealed record DropRelation(string Monster, int Area, string Item, int ListCount, int LootType, double MonsterRate);
 }
