@@ -52,6 +52,9 @@ public sealed partial class TabMapPanel
         _npcName.AddThemeColorOverride("font_color", Greybox.Title);
         _npcName.AddThemeFontSizeOverride("font_size", 15);
         _npcName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        // 긴 건물 이름 + 역할이 [가기]·X 를 밀어내지 않게.
+        _npcName.ClipText = true;
+        _npcName.TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
         _npcAbout.AddThemeColorOverride("font_color", Greybox.Text);
         _npcAbout.AddThemeFontSizeOverride("font_size", 13);
         _npcAbout.SizeFlagsHorizontal = SizeFlags.ExpandFill;
@@ -79,7 +82,8 @@ public sealed partial class TabMapPanel
         ScrollContainer words = new()
         {
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
-            CustomMinimumSize = new Vector2(0, 96)
+            // 상점 물건을 늘어놓지 않고 갈래만 적게 된 뒤(2026-10-08) 한 사람에 한 줄 — 건물 안 서너 명이 들 만큼.
+            CustomMinimumSize = new Vector2(0, 60)
         };
         words.AddChild(_npcAbout);
 
@@ -181,7 +185,9 @@ public sealed partial class TabMapPanel
     private void ShowNpc(string name, IReadOnlyList<NpcRole> roles, string about, System.Func<Vector2?> goal)
     {
         _npcGoal = goal;
-        string titles = string.Join(" · ", roles.Where(role => role != NpcRole.Talk).Select(NpcRoles.Title));
+        // 역할이 하나면 「무기 상점」, 여럿이면 짧게 「무기 · 방어구」.
+        NpcRole[] named = [.. roles.Where(role => role != NpcRole.Talk)];
+        string titles = named.Length == 1 ? NpcRoles.Title(named[0]) : string.Join(" · ", named.Select(NpcRoles.Word));
         _npcName.Text = titles.Length > 0 ? $"{name} — {titles}" : name;
         _npcAbout.Text = about.Length > 0 ? about : "안내";
         _npcCard.Visible = true;

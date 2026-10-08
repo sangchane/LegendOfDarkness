@@ -10,7 +10,7 @@
 줄 모양(알맹이 `MapGuide.Read` 가 읽는다):
   exit <맵> <x> <y> <간 곳 이름>      — 워프 칸 하나. 이어 붙은 칸은 알맹이가 한 출구로 묶는다
   npc  <맵> <x> <y> <이름>            — mundanes 템플릿의 NPC 자리
-  about <맵> <x> <y> <설명>           — 그 NPC 가 하는 일 한 줄(길 찾기 창 NPC 목록 팝업). 상점은 파는 것, 5.99 대화는
+  about <맵> <x> <y> <설명>           — 그 NPC 가 하는 일 한 줄(길 찾기 창 NPC 목록 팝업). 상점은 파는 갈래·가짓수·레벨 폭, 5.99 대화는
                                         부르는 명령으로(build-npc-page-data.py 와 같은 근거), 없으면 대사 첫 줄
   role <맵> <x> <y> <역할>            — 그 NPC 의 역할 한 낱말(미니맵·길 찾기 창·머리 위 아이콘, `ROLES`)
   room <맵> <간 곳>|<NPC — 설명 / …>|<역할,…> — 출구 너머 맵(상점 건물 등)에 선 NPC 들과 그 역할. 마을 지도에서 상점 안을 말하려고
@@ -63,18 +63,20 @@ ROLES = [
 ]
 
 
+def kind_of(item: dict) -> str:
+    """상점 물건 하나의 갈래 — 무기(자리 1) · 방어구(2) · 장신구(3~13) · 물약(소모품) · 잡화."""
+    slot = item.get("EquipmentSlot") or 0
+    return ("무기" if slot == 1 else "방어구" if slot == 2 else "장신구" if slot >= 3
+            else "물약" if (item.get("Flags") or 0) & 256 else "잡화")
+
+
 def role(npc: dict, items: dict) -> str:
     """그 NPC 의 역할 한 낱말 — 상점은 물목의 과반(무기 자리 1 · 갑옷 2 · 장신구 3~13 · 소모품), 과반이 없으면 잡화."""
     key = npc.get("ScriptKey") or ""
     stock = npc.get("DefaultMerchantStock") or []
 
     if key in ("shop1", "shop2") and stock:
-        kinds = []
-        for name in stock:
-            item = items.get(name) or {}
-            slot = item.get("EquipmentSlot") or 0
-            kinds.append("무기" if slot == 1 else "방어구" if slot == 2 else "장신구" if slot >= 3
-                         else "물약" if (item.get("Flags") or 0) & 256 else "잡화")
+        kinds = [kind_of(items.get(name) or {}) for name in stock]
         top = max(set(kinds), key=kinds.count)
         return top if kinds.count(top) * 2 > len(kinds) else "잡화"
     if key == "Banker":
@@ -94,13 +96,24 @@ def role(npc: dict, items: dict) -> str:
     return "안내"
 
 
-def about(npc: dict) -> str:
-    """그 NPC 가 하는 일 한 줄 — 짐작하지 않고 템플릿·대본에 적힌 것만."""
+#: 가르침 목록을 이만큼까지 이름으로, 넘으면 「외 N개」.
+TAUGHT_SHOWN = 4
+
+
+def about(npc: dict, items: dict) -> str:
+    """그 NPC 가 하는 일 한 줄 — 짐작하지 않고 템플릿·대본에 적힌 것만. 상점은 물건 이름을 늘어놓지 않고 갈래별 가짓수와
+    레벨 폭만(사용자 2026-10-08 「아이템 리스트 텍스트 저렇게 나열 하는건 의미 없는거 같아 … 큰 맥락만」)."""
     key = npc.get("ScriptKey") or ""
     stock = npc.get("DefaultMerchantStock") or []
 
     if key in ("shop1", "shop2") and stock:
-        return "판매: " + ", ".join(stock)
+        kinds = [kind_of(items.get(name) or {}) for name in stock]
+        parts = [f"{kind} {kinds.count(kind)}종" for kind in sorted(set(kinds), key=lambda k: (-kinds.count(k), k))]
+        levels = [int((items.get(name) or {}).get("LevelRequired") or 1) for name in stock
+                  if ((items.get(name) or {}).get("EquipmentSlot") or 0) > 0]
+        if levels:
+            parts.append(f"레벨 {min(levels)}" if min(levels) == max(levels) else f"레벨 {min(levels)}~{max(levels)}")
+        return "판매: " + " · ".join(parts)
     if key == "Class Chooser":
         return "직업을 고른다"
     if key == "Banker":
@@ -114,7 +127,8 @@ def about(npc: dict) -> str:
         calls = set(re.findall(r'Call\("([a-z_]+)"', text))
         taught = list(dict.fromkeys(re.findall(r'Call\("(?:skill|spell)_add2?",\s*\(V\)"([^"]+)"\)', text)))
         if taught:
-            said.append("가르침: " + ", ".join(taught))
+            more = f" 외 {len(taught) - TAUGHT_SHOWN}개" if len(taught) > TAUGHT_SHOWN else ""
+            said.append("가르침: " + ", ".join(taught[:TAUGHT_SHOWN]) + more)
         said += [words for needed, words in DOES if needed <= calls]
 
     if not said:
@@ -205,7 +219,7 @@ def main() -> None:
         area = int(npc.get("AreaID") or 0)
 
         if area in drawn:
-            npcs.add((area, int(npc["X"]), int(npc["Y"]), npc["Name"].split("@")[0], about(npc), role(npc, items)))
+            npcs.add((area, int(npc["X"]), int(npc["Y"]), npc["Name"].split("@")[0], about(npc, items), role(npc, items)))
 
     standing = {}
     roles_in = {}
@@ -213,7 +227,7 @@ def main() -> None:
     for path in sorted((SERVER / "templates" / "mundanes").glob("*.json")):
         npc = json.loads(path.read_text(encoding="utf-8-sig"))
         # room 줄은 | 로 칸을 가른다 — 설명에 든 | 는 / 로(역할 칸이 밀리지 않게).
-        standing.setdefault(int(npc.get("AreaID") or 0), []).append(f"{npc['Name'].split('@')[0]} — {about(npc)}".replace("|", "/"))
+        standing.setdefault(int(npc.get("AreaID") or 0), []).append(f"{npc['Name'].split('@')[0]} — {about(npc, items)}".replace("|", "/"))
         roles_in.setdefault(int(npc.get("AreaID") or 0), []).append(role(npc, items))
 
     # 역할 아이콘은 건물 문에만 — 상점 안에서 마을·사냥터(월드맵이 내려 주는 곳)로 나가는 문에 마을 NPC 들의 아이콘을 달면

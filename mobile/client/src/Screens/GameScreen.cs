@@ -12,6 +12,9 @@ namespace LodClient;
 /// </summary>
 public partial class GameScreen : Control
 {
+    /// <summary>HUD·창의 Z — 월드 위 표지(가장 높은 것이 피해 숫자 110)보다 위. 창에서 떠오르는 판(TopLevel)은 이보다 높게.</summary>
+    public const int HudZ = 200;
+
     private const int AuxFontSize = 14;
     private Label _wealth = null!;
     private Label _level = null!;
@@ -348,6 +351,10 @@ public partial class GameScreen : Control
 
         AddChild(_world);
         AddChild(hud);
+
+        // 월드 위 표지들(문 표지 50 · NPC 이름표 40 · 말풍선 60 · 피해 숫자 110 …)은 Z 로 인물 위에 서는데, 같은 Z 판을 쓰는 HUD·창까지
+        // 덮었다(가로 경매창 위 「→ 노비스민가1」, 길 찾기 창 위 NPC 이름표). HUD 를 그보다 높이 — 그 위에 서야 하는 것은 더 높이.
+        hud.ZIndex = HudZ;
         hud.AddChild(rows);
         rows.AddChild(_topRow);
         rows.AddChild(_packRow = BuildPackRow());
@@ -362,6 +369,7 @@ public partial class GameScreen : Control
         rows.AddChild(_controlRow);
 
         Cover(hud);
+        _loadingMap.ZIndex = HudZ + 10;
         AddChild(_loadingMap);
 
         // 맨 위에 둔다 — 판 밖 어디를 눌러도 닫히도록 화면 전체를 받는다.
@@ -375,6 +383,7 @@ public partial class GameScreen : Control
             _exit.Shut();
             QuitGame();
         };
+        _exit.ZIndex = HudZ + 10;
         AddChild(_exit);
 
         if (Main.OpeningSettings)

@@ -371,7 +371,7 @@ public partial class GameScreen : Control
         }
 
         _roleSheetShown = true;
-        AddChild(new RoleSheet { ZIndex = 100, Position = new Vector2(0, 120), Size = new Vector2(360, 580) });
+        AddChild(new RoleSheet { ZIndex = HudZ + 100, Position = new Vector2(0, 120), Size = new Vector2(360, 580) });
         GD.Print("GREYBOX_ROLE_SHEET");
     }
 

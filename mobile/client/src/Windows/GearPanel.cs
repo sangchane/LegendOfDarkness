@@ -21,7 +21,7 @@ public sealed partial class GearPanel : PanelContainer
 {
     private readonly GearGrid _gear = new();
 
-    private readonly PanelContainer _action = new() { Name = "GearAction", TopLevel = true, Visible = false, ZIndex = 5 };
+    private readonly PanelContainer _action = new() { Name = "GearAction", TopLevel = true, Visible = false, ZIndex = GameScreen.HudZ + 5 };
     private readonly Label _actionName = new();
     private readonly Label _actionLine = new();
     private readonly Label _actionStats = new();

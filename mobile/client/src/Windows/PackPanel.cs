@@ -55,7 +55,7 @@ public sealed partial class PackPanel : PanelContainer
     };
 
     // 칸을 누르면 그 옆에 뜨는 작은 동작 줄 — 이름 · 한 줄 설명 · 아이콘 단추.
-    private readonly PanelContainer _action = new() { Name = "ItemAction", TopLevel = true, Visible = false, ZIndex = 5 };
+    private readonly PanelContainer _action = new() { Name = "ItemAction", TopLevel = true, Visible = false, ZIndex = GameScreen.HudZ + 5 };
     private readonly Label _actionName = new();
     private readonly Label _actionLine = new();
     private readonly Label _actionStats = new();
