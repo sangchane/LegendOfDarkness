@@ -83,7 +83,7 @@
     box.setAttribute("aria-hidden", "true");
     if (!art) { return box; }
     var w = Math.round(art.너비 / art.칸), h = art.높이;
-    var scale = Math.min(1, 40 / Math.max(w, h));
+    var scale = Math.min(1, 36 / Math.max(w, h));
     box.style.width = Math.round(w * scale) + "px";
     box.style.height = Math.round(h * scale) + "px";
     box.style.backgroundImage = "url(" + SPRITE_DIR + art.이름 + ".png)";
@@ -141,7 +141,7 @@
   function toItem(name) {
     return function () {
       if (window.LodItems && window.LodItems.focus(name)) { return; }
-      window.LodDashboard.toast("아이템 도감에 없는 물건입니다 — " + name);
+      window.LodDashboard.toast("아이템 목록에 없는 물건입니다 — " + name);
     };
   }
 

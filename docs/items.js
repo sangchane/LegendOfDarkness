@@ -182,7 +182,7 @@
     var art = MONSTER_ART.get(key);
     var box = el("i", "cdx-thumb");
     if (!art) { return box; }
-    var w = Math.round(art.너비 / art.칸), h = art.높이, scale = Math.min(1, 40 / Math.max(w, h));
+    var w = Math.round(art.너비 / art.칸), h = art.높이, scale = Math.min(1, 36 / Math.max(w, h));
     box.style.width = Math.round(w * scale) + "px";
     box.style.height = Math.round(h * scale) + "px";
     box.style.backgroundImage = "url(ui/assets/creature/" + art.이름 + ".png)";

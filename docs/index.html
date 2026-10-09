@@ -19,10 +19,10 @@
     <div class="brand"><span class="brand-mark" aria-hidden="true">L</span><div><strong>LOD 대시보드</strong><small>Mobile restoration</small></div></div>
     <nav class="primary-nav" aria-label="주 메뉴">
       <button type="button" class="nav-item is-active" data-view-target="overview" aria-current="page"><span aria-hidden="true">◈</span>지금 되는 것</button>
-      <button type="button" class="nav-item" data-view-target="monsters"><span aria-hidden="true">✦</span>괴물 도감</button>
-      <button type="button" class="nav-item" data-view-target="npcs"><span aria-hidden="true">⌂</span>NPC 도감</button>
+      <button type="button" class="nav-item" data-view-target="monsters"><span aria-hidden="true">✦</span>괴물</button>
+      <button type="button" class="nav-item" data-view-target="npcs"><span aria-hidden="true">⌂</span>NPC</button>
       <button type="button" class="nav-item" data-view-target="abilities"><span aria-hidden="true">✧</span>기술·마법</button>
-      <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템 도감</button>
+      <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도</button>
       <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
       <button type="button" class="nav-item" data-view-target="activity"><span aria-hidden="true">◷</span>접속·활동</button>
@@ -78,7 +78,7 @@
       <section class="view" data-view="monsters" aria-labelledby="monsters-title" hidden>
         <div class="cdx">
           <div class="cdx-head">
-            <h1 id="monsters-title">괴물 도감</h1>
+            <h1 id="monsters-title">괴물</h1>
             <p>종류 <b id="monster-kinds">—</b> · 자리 <b id="monster-slots">—</b> · 그림 <b id="monster-sprites">—</b> · 지금 <b id="monster-shown">—</b> — 지금 걸어 다닐 수 있는 지역에 서 있는 괴물</p>
             <a class="quiet-link" href="monster-behaviour.md">움직임·선공 근거 →</a>
           </div>
@@ -107,7 +107,7 @@
 
       <section class="view" data-view="npcs" aria-labelledby="npcs-title" hidden>
         <div class="item-topbar">
-          <h1 id="npcs-title">NPC 도감</h1>
+          <h1 id="npcs-title">NPC</h1>
           <dl class="item-tally">
             <dt>전체</dt><dd id="npc-total">—</dd>
             <dt>지금 서 있다</dt><dd id="npc-now">—</dd>
@@ -181,21 +181,21 @@
                 <section class="abx-compare" id="ability-compare" aria-label="원래와 지금"></section>
 
                 <section class="abx-control" aria-labelledby="ability-effect-head">
-                  <h3 id="ability-effect-head">그림 <small id="ability-effect-output"></small></h3>
+                  <div class="abx-control-head"><h3 id="ability-effect-head">그림 <small id="ability-effect-output"></small></h3>
+                    <label class="cdx-pick abx-mini"><span class="visually-hidden">그림 거르기</span><select id="ability-effect-filter"></select></label></div>
                   <p class="abx-lock" id="ability-effect-lock" hidden>이 기술은 그림을 보내지 않아 고칠 수 없습니다.</p>
-                  <div class="abx-chips abx-filter" id="ability-effect-filter" role="group" aria-label="그림 거르기"></div>
                   <div class="abx-effects" id="ability-effect-list"></div>
                 </section>
 
                 <section class="abx-control" aria-labelledby="ability-speed-head">
-                  <h3 id="ability-speed-head">빠르기 <small id="ability-speed-output"></small></h3>
-                  <div class="abx-speed"><span>빠르게</span><input id="ability-speed" type="range" min="1" max="255" value="100" aria-label="빠르기 — 왼쪽이 빠름"><span>느리게</span></div>
+                  <div class="abx-control-head"><h3 id="ability-speed-head">빠르기 <small id="ability-speed-output"></small></h3>
+                    <div class="abx-speed"><span>빠르게</span><input id="ability-speed" type="range" min="1" max="255" value="100" aria-label="빠르기 — 왼쪽이 빠름"><span>느리게</span></div></div>
                 </section>
 
                 <section class="abx-control" aria-labelledby="ability-sound-head">
-                  <h3 id="ability-sound-head">소리 <small id="ability-sound-output"></small></h3>
+                  <div class="abx-control-head"><h3 id="ability-sound-head">소리 <small id="ability-sound-output"></small></h3>
+                    <label class="cdx-pick abx-mini"><span class="visually-hidden">소리 거르기</span><select id="ability-sound-filter"></select></label></div>
                   <p class="abx-lock" id="ability-sound-lock" hidden>이 기술은 소리를 보내지 않아 고칠 수 없습니다.</p>
-                  <div class="abx-chips abx-filter" id="ability-sound-filter" role="group" aria-label="소리 거르기"></div>
                   <ul class="abx-sounds" id="ability-sound-list"></ul>
                 </section>
 
@@ -209,7 +209,7 @@
       <section class="view" data-view="items" aria-labelledby="items-title" hidden>
         <div class="cdx">
           <div class="cdx-head">
-            <h1 id="items-title">아이템 도감</h1>
+            <h1 id="items-title">아이템</h1>
             <p>전체 <b id="item-total">—</b> · 한글 <b id="item-named">—</b> · 남은 것 <b id="item-unnamed">—</b> · 지금 <b id="item-shown">—</b></p>
             <a class="quiet-link" href="../data/pack-compare/한글이름-검토.tsv">검토표 →</a>
           </div>
@@ -253,15 +253,18 @@
         <section class="atlas" aria-labelledby="world-title">
           <div class="atlas-head">
             <h1 id="world-title">지도</h1>
-            <p>맵을 누르면 그 맵으로 다가가 괴물·NPC 를 세우고 옆에 드랍까지 보여 줍니다. 화살표는 출구가 이어진 쪽, 노란 점은 문입니다.</p>
+            <div class="atlas-regions" role="tablist" aria-label="지역" id="atlas-regions"></div>
           </div>
-          <div class="atlas-regions" role="tablist" aria-label="지역" id="atlas-regions"></div>
-          <div class="atlas-body">
+          <div class="atlas-body is-bare">
             <div class="atlas-stage" id="atlas-stage">
               <svg id="atlas-svg" role="img" aria-label="이어 붙인 지도"></svg>
               <p class="atlas-state" id="atlas-state" role="status">괴물·드랍 자료를 불러오는 중…</p>
+              <ul class="atlas-legend atlas-legend-bar" aria-label="범례">
+                <li><i class="sw c1"></i>서클 1</li><li><i class="sw c2"></i>서클 2</li><li><i class="sw c3"></i>서클 3</li><li><i class="sw c4"></i>서클 4</li><li><i class="sw c5"></i>서클 5</li>
+                <li><i class="sw door"></i>문</li><li>화살표 = 출구 방향</li><li>맵을 누르면 괴물·드랍·NPC</li>
+              </ul>
             </div>
-            <aside class="atlas-panel" id="atlas-panel" aria-live="polite"></aside>
+            <aside class="atlas-panel" id="atlas-panel" aria-live="polite" hidden></aside>
           </div>
         </section>
 

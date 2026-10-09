@@ -196,10 +196,17 @@
     Array.prototype.forEach.call(svg.querySelectorAll(".atlas-map.is-chosen"), function (g) { g.classList.remove("is-chosen"); });
   }
 
+  // 맵을 고르기 전엔 옆 판을 접고 지도를 꽉 채운다(범례는 지도 아래 한 줄) — 고르면 판이 열린다.
+  function showPanel(on) {
+    panel.hidden = !on;
+    stage.parentNode.classList.toggle("is-bare", !on);
+  }
+
   function choose(id) {
     var m = region.maps[id];
     if (!m) { return; }
     chosen = id;
+    showPanel(true);  // 판이 열려 무대 폭이 바뀐 뒤에 비율을 잰다
     Array.prototype.forEach.call(svg.querySelectorAll(".atlas-map"), function (g) { g.classList.toggle("is-chosen", g.getAttribute("data-map") === id); });
     var image = svg.querySelector('.atlas-map[data-map="' + id + '"] image');
     if (image && image.getAttribute("href").indexOf("-l.webp") < 0) { image.setAttribute("href", "atlas-maps/" + id + "-l.webp"); }
@@ -217,14 +224,9 @@
 
   // ---- 옆 판: 결론 · 괴물 · 떨어지는 것 · NPC · 이어진 곳 ----
   function describe(id) {
+    if (!id) { showPanel(false); return; }
     var a = atlas();
     if (!a) { panel.innerHTML = '<p class="atlas-empty">괴물·드랍 자료를 불러오는 중입니다…</p>'; return; }
-    if (!id) {
-      panel.innerHTML = '<h2>' + esc(region.name) + '</h2><p class="atlas-lead">맵 <b class="num">' + Object.keys(region.maps).length +
-        '</b>곳 · 화살표는 출구가 이어진 방향입니다. 맵을 누르면 다가가 나오는 괴물 · 떨어지는 것 · NPC 를 보여 줍니다.</p>' +
-        '<ul class="atlas-legend"><li><i class="sw c1"></i>서클 1 · 1~10</li><li><i class="sw c2"></i>서클 2 · 11~40</li><li><i class="sw c3"></i>서클 3 · 41~70</li><li><i class="sw c4"></i>서클 4 · 71~98</li><li><i class="sw c5"></i>서클 5 · 99</li><li><i class="sw door"></i>문(건물·다른 지역)</li></ul>';
-      return;
-    }
     var m = info(id) || { name: id, monsters: [], npcs: [], exits: [] };
     var mons = m.monsters.map(function (key) { return [key, a["괴물"][key]]; }).filter(function (p) { return p[1]; });
     var items = a["아이템"];
@@ -315,7 +317,7 @@
     script.addEventListener("error", function () { script.remove(); state.textContent = "괴물·드랍 자료(atlas-data.js)를 불러오지 못했습니다 — 지도만 보입니다. 새로고침해 보세요."; });
   }
 
-  // 다른 도감의 「지도에서 보기」 — 그 맵이 든 구역을 열고 맵을 고른다. 지도에 없는 맵이면 false.
+  // 다른 화면의 「지도에서 보기」 — 그 맵이 든 구역을 열고 맵을 고른다. 지도에 없는 맵이면 false.
   window.LodAtlas = {
     focus: function (id) {
       var home = layout["지역"].filter(function (r) { return r.maps[String(id)]; })[0];

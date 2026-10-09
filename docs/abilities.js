@@ -405,9 +405,12 @@
     });
   }
 
+  // 무대는 남은 높이를 채운다 — 넓이·높이 중 작은 쪽에 맞추고 가운데에 둔다(낮은 창에서 칸이 넘치지 않게).
   function fit() {
-    var scale = $("ability-stage").clientWidth / WORLD.w;
-    if (scale) { $("ability-world").style.transform = "scale(" + scale + ")"; }
+    var box = $("ability-stage"), w = box.clientWidth, h = box.clientHeight;
+    var scale = Math.min(w / WORLD.w, h / WORLD.h);
+    if (!scale) { return; }
+    $("ability-world").style.transform = "translate(" + Math.round((w - WORLD.w * scale) / 2) + "px," + Math.round((h - WORLD.h * scale) / 2) + "px) scale(" + scale + ")";
   }
 
   /* ── 편집 ─────────────────────────────────────────── */
@@ -440,21 +443,18 @@
     return out;
   }
 
-  function chips(host, options, current, pick) {
-    host.replaceChildren();
-    options.forEach(function (pair) {
-      var button = node("button", "abx-chip" + (current === pair[0] ? " is-active" : ""), pair[1]);
-      button.type = "button";
-      button.setAttribute("aria-pressed", String(current === pair[0]));
-      button.addEventListener("click", function () { pick(pair[0]); });
-      host.appendChild(button);
-    });
+  /** 거르기 고르기 상자 — 처음 한 번 채우고 고른 값만 맞춘다(바꾸면 아래 배선이 다시 그린다). */
+  function pickFrom(host, options, current) {
+    if (!host.children.length) {
+      options.forEach(function (pair) { var option = node("option", "", pair[1]); option.value = pair[0]; host.appendChild(option); });
+    }
+    host.value = current;
   }
 
   function renderEffects(row) {
-    chips($("ability-effect-filter"),
-      [["추천", "이 직업이 쓰는 것"], ["모두", "모두"]].concat(unique(effects.map(function (e) { return e["색"]; })).map(function (c) { return [c, c]; })),
-      effectFilter, function (value) { effectFilter = value; renderEffects(row); });
+    pickFrom($("ability-effect-filter"),
+      [["추천", "이 직업이 쓰는 것"], ["모두", "모든 그림"]].concat(unique(effects.map(function (e) { return e["색"]; })).map(function (c) { return [c, c + " 빛"]; })),
+      effectFilter);
     var host = $("ability-effect-list");
     host.replaceChildren();
     var mine = row["게임"]["이펙트"] || [];
@@ -468,7 +468,7 @@
       button.type = "button";
       button.dataset.effect = number;
       button.title = look(number) + (effectUsers[number] ? " · " + who(effectUsers[number]) : "");
-      button.appendChild(thumb(number, 54));
+      button.appendChild(thumb(number, 44));
       button.appendChild(node("b", "", info["색"] + (mine.indexOf(number) >= 0 ? " · 원래" : "")));
       button.appendChild(node("small", "", who(effectUsers[number]) || "쓰지 않던 그림"));
       button.disabled = !row["반영가능"].effect;
@@ -479,8 +479,7 @@
   }
 
   function renderSounds(row) {
-    chips($("ability-sound-filter"), [["추천", "이 직업이 쓰는 것"], ["쓰는것", "쓰이는 소리"], ["모두", "모두"]],
-      soundFilter, function (value) { soundFilter = value; renderSounds(row); });
+    pickFrom($("ability-sound-filter"), [["추천", "이 직업이 쓰는 것"], ["쓰는것", "쓰이는 소리"], ["모두", "모든 소리"]], soundFilter);
     var host = $("ability-sound-list");
     host.replaceChildren();
     var kin = kinOf(row, "소리");
@@ -713,6 +712,8 @@
   $("ability-speed").addEventListener("input", function (event) { draft.speed = Number(event.target.value); syncEditor(); });
   $("ability-speed").addEventListener("change", function () { stage(false); });
   $("ability-replay").addEventListener("click", function () { stage(true); });
+  $("ability-effect-filter").addEventListener("change", function (event) { effectFilter = event.target.value; if (selected) { renderEffects(selected); } });
+  $("ability-sound-filter").addEventListener("change", function (event) { soundFilter = event.target.value; if (selected) { renderSounds(selected); } });
   $("ability-slow").addEventListener("click", function (event) {
     slow = !slow;
     event.currentTarget.setAttribute("aria-pressed", String(slow));

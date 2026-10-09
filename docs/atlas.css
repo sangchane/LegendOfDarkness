@@ -4,12 +4,13 @@
   --atlas-arrow: #ffe6b0; --atlas-door: #ffd36e;
 }
 .atlas { display: flex; flex-direction: column; gap: 12px; height: calc(100dvh - 193px); min-height: 560px; margin-bottom: 12px; }
-.atlas-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.atlas-head { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; }
 .atlas-head h1 { margin: 0; font-size: 24px; }
 .atlas-head p { margin: 0; color: var(--muted-strong); font-size: 14px; }
-.atlas-regions { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+/* 지역 탭은 줄을 넘기면 다음 줄로 — 가로 스크롤바를 만들지 않는다. */
+.atlas-regions { display: flex; flex-wrap: wrap; gap: 6px; }
 .atlas-tab { flex: none; }
-.atlas-tab { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: var(--radius-pill); border: 1px solid var(--edge); background: var(--panel); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.atlas-tab { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 10px; border-radius: var(--radius-pill); border: 1px solid var(--edge); background: var(--panel); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
 .atlas-tab .num { color: var(--muted); font-size: 12px; }
 .atlas-tab[aria-selected="true"] { background: var(--text); color: var(--white); border-color: var(--text); }
 .atlas-tab[aria-selected="true"] .num { color: var(--white-muted); }
@@ -19,7 +20,7 @@
 .atlas-stage { position: relative; border-radius: var(--radius-card); background: var(--dark-stage); overflow: hidden; min-height: 0; touch-action: none; }
 .atlas-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; user-select: none; }
 .atlas-stage svg:active { cursor: grabbing; }
-.atlas-state { position: absolute; left: 12px; bottom: 12px; margin: 0; padding: 6px 10px; border-radius: var(--radius-control); background: var(--white-faint); color: var(--white-muted); font-size: 13px; }
+.atlas-state { position: absolute; left: 12px; top: 12px; margin: 0; padding: 6px 10px; border-radius: var(--radius-control); background: var(--white-faint); color: var(--white-muted); font-size: 13px; }
 .atlas-map { cursor: pointer; }
 .atlas-outline { fill: none; stroke: var(--white-edge); stroke-width: 1.2; }
 .atlas-map.circle-1 .atlas-outline { stroke: var(--circle-1); }
@@ -98,3 +99,9 @@
 .atlas-mobs { gap: 2px; }
 .atlas-mobs li { grid-template-columns: 38px 1fr; }
 .atlas-panel h3 { margin: 10px 0 4px; }
+
+/* 맵을 고르기 전 — 옆 판 없이 지도를 꽉, 범례는 지도 아래 한 줄(사용자 10-09 「범례 불필요하게 넓다」). */
+.atlas-body.is-bare { grid-template-columns: minmax(0, 1fr); }
+.atlas-legend-bar { position: absolute; left: 12px; bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; max-width: calc(100% - 24px); margin: 0; padding: 7px 12px; border-radius: var(--radius-control); background: color-mix(in srgb, var(--dark-stage) 82%, transparent); color: var(--white-muted); font-size: 12px; pointer-events: none; }
+.atlas-legend-bar .sw { margin-right: 6px; }
+.atlas-stage svg.is-focus ~ .atlas-legend-bar { display: none; }

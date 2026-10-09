@@ -3,7 +3,7 @@
   var model = window.LodDashboardModel;
   var snapshot = model.isValidDashboardSnapshot(window.LOD_DASHBOARD_SNAPSHOT) ? window.LOD_DASHBOARD_SNAPSHOT : null;
   var labels = {
-    overview: "지금 되는 것", monsters: "괴물 도감", npcs: "NPC 도감", abilities: "기술·마법", items: "아이템 도감",
+    overview: "지금 되는 것", monsters: "괴물", npcs: "NPC", abilities: "기술·마법", items: "아이템",
     world: "지도", changes: "원작과 달라진 것", download: "앱 내려받기", activity: "접속·활동",
   };
   // 화면이 보이게 된 순간에만 할 수 있는 일이 있다 — 숨은 요소는 크기를 잴 수 없어서
