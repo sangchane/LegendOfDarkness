@@ -8,12 +8,13 @@
 
   var SPRITE_DIR = "ui/assets/creature/";
   var CLASSES = { 0: "", 1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "무도가" };
+  // 정렬은 괴물(이름) 단위 — 여러 맵이면 가장 센 맵 기준(레벨·맵 차례는 가장 낮은 맵).
   var SORTS = [
-    { id: "exp", 이름: "경험치", 재다: function (m) { return -m.경험치; } },
-    { id: "lv", 이름: "레벨", 재다: function (m) { return m.감산레벨; } },
-    { id: "hp", 이름: "체력", 재다: function (m) { return -m.체력; } },
-    { id: "dmg", 이름: "때리는 힘", 재다: function (m) { return -m.피해[1]; } },
-    { id: "map", 이름: "맵 차례", 재다: function (m) { return m.맵번호; } },
+    { id: "exp", 이름: "경험치", 재다: function (g) { return -most(g.places, function (m) { return m.경험치; }); } },
+    { id: "lv", 이름: "레벨", 재다: function (g) { return least(g.places, function (m) { return m.감산레벨; }); } },
+    { id: "hp", 이름: "체력", 재다: function (g) { return -most(g.places, function (m) { return m.체력; }); } },
+    { id: "dmg", 이름: "때리는 힘", 재다: function (g) { return -most(g.places, function (m) { return m.피해[1]; }); } },
+    { id: "map", 이름: "맵 차례", 재다: function (g) { return least(g.places, function (m) { return m.맵번호; }); } },
   ];
 
   var list = document.getElementById("monster-grid");
@@ -203,9 +204,42 @@
     return tag;
   }
 
-  function describe(monster) {
+  /* ── 괴물 하나 = 이름 하나. 같은 괴물이 여러 맵에 나오면 한 줄로 묶고, 맵마다 다른 것만 표로 ── */
+
+  // 수치 칸. 맵마다 같으면 값 하나, 다르면 범위와 「맵마다 다름」, 출현 맵 표에는 다른 것만 칸으로 낸다.
+  var FIELDS = [
+    { 이름: "체력", 글: function (m) { return number(m.체력); }, 낮: function (m) { return m.체력; }, 높: function (m) { return m.체력; } },
+    { 이름: "때리는 힘", 글: function (m) { return m.피해[0] + "~" + m.피해[1]; }, 낮: function (m) { return m.피해[0]; }, 높: function (m) { return m.피해[1]; } },
+    { 이름: "방어", 글: function (m) { return String(m.방어); }, 낮: function (m) { return m.방어; }, 높: function (m) { return m.방어; } },
+    { 이름: "경험치(표)", 글: function (m) { return number(m.경험치); }, 낮: function (m) { return m.경험치; }, 높: function (m) { return m.경험치; } },
+    { 이름: "금화", 글: function (m) { return m.금화[1] ? number(m.금화[0]) + "~" + number(m.금화[1]) : "없음"; }, 낮: function (m) { return m.금화[0]; }, 높: function (m) { return m.금화[1]; } },
+    { 이름: "한 맵 최대", 글: function (m) { return m.젠최대 + "마리" + (m.젠주기 ? " · " + m.젠주기 + "초마다" : ""); }, 낮: function (m) { return m.젠최대; }, 높: function (m) { return m.젠최대; }, 단위: "마리" },
+    { 이름: "걸음·공격", 글: function (m) { return (m.이동속도 / 1000).toFixed(1) + "초 · " + (m.공격속도 / 1000).toFixed(1) + "초"; } },
+  ];
+
+  var groups = [], groupOf = new Map();
+  data.괴물.forEach(function (m) {
+    var group = groupOf.get(m.이름);
+    if (!group) { group = { 이름: m.이름, places: [] }; groupOf.set(m.이름, group); groups.push(group); }
+    group.places.push(m);
+  });
+  groups.forEach(function (group) {
+    group.places.sort(function (a, b) { return a.감산레벨 - b.감산레벨 || a.맵번호 - b.맵번호; });
+    group.drops = new Set(group.places.map(function (m) {
+      return JSON.stringify(m.드랍.map(function (d) { return [d.이름, d.실제확률]; }).sort());
+    })).size === 1;
+  });
+
+  function most(list, pick) { return list.reduce(function (top, m) { return Math.max(top, pick(m)); }, -Infinity); }
+  function least(list, pick) { return list.reduce(function (low, m) { return Math.min(low, pick(m)); }, Infinity); }
+  function span(low, high, format) { format = format || number; return low === high ? format(low) : format(low) + "~" + format(high); }
+  function same(list, pick) { return list.every(function (m) { return pick(m) === pick(list[0]); }); }
+  function regionsOf(group) { return group.places.map(function (m) { return m.지역; }).filter(function (r, i, all) { return all.indexOf(r) === i; }); }
+
+  function describe(group, place) {
     detail.replaceChildren();
-    if (!monster) { detail.appendChild(text("p", "cdx-empty", "왼쪽에서 괴물을 고르세요.")); return; }
+    if (!group) { detail.appendChild(text("p", "cdx-empty", "왼쪽에서 괴물을 고르세요.")); return; }
+    var places = group.places, many = places.length > 1;
 
     var back = text("button", "cdx-back", "← 목록");
     back.type = "button";
@@ -214,21 +248,25 @@
 
     var hero = text("header", "cdx-hero");
     var stageBox = text("div", "cdx-stage");
-    stageBox.appendChild(sprite(monster));
+    // 두 배로 키우되 큰 괴물(드라코 …)은 판이 길어지지 않게 높이 140 안으로.
+    if (place.스프라이트) { stageBox.style.setProperty("--zoom", Math.min(2, 140 / place.스프라이트.높이).toFixed(2)); }
+    stageBox.appendChild(sprite(place));
     hero.appendChild(stageBox);
     var title = text("div");
-    title.appendChild(text("h2", "", monster.이름));
-    title.appendChild(text("p", "", monster.맵 + " · " + monster.지역 + " · Lv " + monster.감산레벨));
+    title.appendChild(text("h2", "", group.이름));
+    title.appendChild(text("p", "", (many ? "맵 " + places.length + "곳" : place.맵) + " · " + regionsOf(group).join("·")
+      + " · Lv " + span(least(places, function (m) { return m.감산레벨; }), most(places, function (m) { return m.감산레벨; }))));
     var tags = text("div", "cdx-tags");
-    tags.appendChild(aggro(monster));
-    if (!monster.드랍켜짐) { tags.appendChild(text("span", "cdx-tag is-risk", "드랍 꺼짐")); }
+    places.map(function (m) { return m.선공; }).filter(function (v, i, all) { return all.indexOf(v) === i; })
+      .forEach(function (kind) { tags.appendChild(aggro({ 선공: kind })); });
+    if (places.some(function (m) { return !m.드랍켜짐; })) { tags.appendChild(text("span", "cdx-tag is-risk", "드랍 꺼진 맵 있음")); }
     title.appendChild(tags);
     var actions = text("div", "cdx-hero-actions");
-    var where = text("button", "", "지도에서 보기 →");
+    var where = text("button", "", (many ? place.맵 + " " : "") + "지도에서 보기 →");
     where.type = "button";
     where.addEventListener("click", function () {
-      if (!(window.LodAtlas && window.LodAtlas.focus(monster.맵번호))) {
-        window.LodDashboard.toast("이 맵은 지도에 아직 없습니다 — " + monster.맵);
+      if (!(window.LodAtlas && window.LodAtlas.focus(place.맵번호))) {
+        window.LodDashboard.toast("이 맵은 지도에 아직 없습니다 — " + place.맵);
       }
     });
     actions.appendChild(where);
@@ -236,55 +274,83 @@
     hero.appendChild(title);
     detail.appendChild(hero);
 
-    // 결론 한 줄 — 내 레벨에서 이 괴물이 어떤가.
-    var gain = earned(monster, state.level);
-    var kills = killsToLevel(monster, state.level);
-    var chance = odds(monster.드랍);
+    // 결론 한 줄 — 내 레벨에서 이 괴물이 어떤가. 여러 맵이면 범위로.
+    var gains = places.map(function (m) { return earned(m, state.level); });
+    var kills = places.map(function (m) { return killsToLevel(m, state.level); }).filter(function (k) { return k !== null; });
+    var gear = places.map(function (m) { return odds(m.드랍).gear; });
+    var any = places.map(function (m) { return odds(m.드랍).any; });
     var verdict = text("p", "cdx-verdict");
     verdict.append("내 레벨 " + state.level + ": 한 마리 경험치 ");
-    verdict.appendChild(text("strong", "", number(gain)));
-    if (gain !== monster.경험치) { verdict.appendChild(text("span", "is-warn", " (표값 " + number(monster.경험치) + " 에서 깎임)")); }
+    verdict.appendChild(text("strong", "", span(Math.min.apply(null, gains), Math.max.apply(null, gains))));
+    if (places.some(function (m, i) { return gains[i] !== m.경험치; })) { verdict.appendChild(text("span", "is-warn", " (레벨 차이로 깎임)")); }
     verdict.append(" → 다음 레벨까지 ");
-    verdict.appendChild(text("strong", "", kills === null ? "—" : number(kills) + "마리"));
-    verdict.append(" · 뭐라도 떨굴 확률 " + percent(chance.any) + " · 장비 " + percent(chance.gear));
+    verdict.appendChild(text("strong", "", kills.length ? span(Math.min.apply(null, kills), Math.max.apply(null, kills)) + "마리" : "—"));
+    verdict.append(" · 뭐라도 떨굴 확률 " + span(Math.min.apply(null, any), Math.max.apply(null, any), percent)
+      + " · 장비 " + span(Math.min.apply(null, gear), Math.max.apply(null, gear), percent));
     detail.appendChild(verdict);
 
+    // 같은 수치는 한 번, 다른 수치는 범위 — 무엇이 다른지는 아래 출현 맵 표.
     var stats = text("div", "monster-stats");
-    stats.append(
-      stat("체력", number(monster.체력)),
-      stat("때리는 힘", monster.피해[0] + "~" + monster.피해[1], "방어 " + monster.방어),
-      stat("경험치(표)", number(monster.경험치), "감산 레벨 " + monster.감산레벨),
-      stat("금화", monster.금화[1] ? number(monster.금화[0]) + "~" + number(monster.금화[1]) : "없음"),
-      stat("한 맵 최대", monster.젠최대 + "마리", monster.젠주기 ? monster.젠주기 + "초마다" : ""),
-      stat("걸음·공격", (monster.이동속도 / 1000).toFixed(1) + "초 · " + (monster.공격속도 / 1000).toFixed(1) + "초"));
+    var differ = [];
+    FIELDS.forEach(function (field) {
+      if (same(places, field.글)) { stats.appendChild(stat(field.이름, field.글(places[0]))); return; }
+      differ.push(field);
+      var range = field.낮 ? span(least(places, field.낮), most(places, field.높)) + (field.단위 || "") : "—";
+      stats.appendChild(stat(field.이름, range, "맵마다 다름"));
+    });
     detail.appendChild(stats);
 
+    if (many) { detail.appendChild(placeTable(group, place, differ)); }
+
     var dropHead = text("h3", "", "떨구는 것");
-    dropHead.appendChild(text("small", "", monster.드랍.length ? monster.드랍.length + "가지 — 한 마리가 하나를 골라 한 번 굴린다 · 누르면 아이템으로" : ""));
+    var dropNote = place.드랍.length ? place.드랍.length + "가지 — 한 마리가 하나를 골라 한 번 굴린다 · 누르면 아이템으로" : "";
+    if (many) { dropNote = (group.drops ? "모든 맵 같음 · " : place.맵 + " 것 — 맵마다 다름(표에서 맵을 고르면 바뀐다) · ") + dropNote; }
+    dropHead.appendChild(text("small", "", dropNote));
     detail.appendChild(dropHead);
-    if (monster.드랍.length) {
+    if (place.드랍.length) {
       var drops = text("ul", "cdx-links");
-      shapes(monster.드랍).forEach(function (shape) { drops.appendChild(shapeRow(shape)); });
+      shapes(place.드랍).forEach(function (shape) { drops.appendChild(shapeRow(shape)); });
       detail.appendChild(drops);
     } else {
       detail.appendChild(text("p", "cdx-empty", "떨구는 것이 없습니다"));
     }
+    detail.appendChild(text("code", "cdx-source", place.근거));
+  }
 
-    var others = data.괴물.filter(function (m) { return m.이름 === monster.이름 && m !== monster; });
-    if (others.length) {
-      var otherHead = text("h3", "", "같은 괴물이 나오는 곳");
-      otherHead.appendChild(text("small", "", others.length + "곳"));
-      detail.appendChild(otherHead);
-      var places = text("div", "cdx-places");
-      others.forEach(function (m) {
-        var chip = text("button", "chip", m.맵 + " · Lv " + m.감산레벨);
-        chip.type = "button";
-        chip.addEventListener("click", function () { focus(keyOf(m)); });
-        places.appendChild(chip);
-      });
-      detail.appendChild(places);
-    }
-    detail.appendChild(text("code", "cdx-source", monster.근거));
+  /** 출현 맵 표 — 맵 · 레벨 · 맵마다 다른 수치만 · 내 레벨에서 몇 마리 · 장비 확률. 줄을 누르면 그 맵으로 맞춘다. */
+  function placeTable(group, place, differ) {
+    var box = text("section", "cdx-places-box");
+    var head = text("h3", "", "출현 맵 " + group.places.length + "곳");
+    head.appendChild(text("small", "", (differ.length ? "맵마다 다른 것만 칸으로 · " : "수치는 모든 맵 같음 · ") + "줄을 누르면 그 맵의 떨구는 것·지도"));
+    box.appendChild(head);
+    var scroller = text("div", "cdx-table-wrap");
+    var table = text("table", "cdx-table");
+    var row = text("tr");
+    ["맵", "Lv"].concat(differ.map(function (f) { return f.이름; }), ["다음 레벨", "장비"]).forEach(function (label) { row.appendChild(text("th", "", label)); });
+    var thead = text("thead");
+    thead.appendChild(row);
+    table.appendChild(thead);
+    var body = text("tbody");
+    group.places.forEach(function (m) {
+      var tr = text("tr", m === place ? "is-current" : "");
+      var cell = text("td");
+      var pick = text("button", "", m.맵);
+      pick.type = "button";
+      pick.setAttribute("aria-pressed", String(m === place));
+      pick.addEventListener("click", function () { selected = { group: group, place: m }; describe(group, m); });
+      cell.appendChild(pick);
+      tr.appendChild(cell);
+      tr.appendChild(text("td", "num", String(m.감산레벨)));
+      differ.forEach(function (field) { tr.appendChild(text("td", "num", field.글(m))); });
+      var kills = killsToLevel(m, state.level);
+      tr.appendChild(text("td", "num", kills === null ? "—" : number(kills) + "마리"));
+      tr.appendChild(text("td", "num", percent(odds(m.드랍).gear)));
+      body.appendChild(tr);
+    });
+    table.appendChild(body);
+    scroller.appendChild(table);
+    box.appendChild(scroller);
+    return box;
   }
 
   function chips(host, values, current, onPick) {
@@ -300,30 +366,35 @@
     });
   }
 
-  function matches(monster) {
+  /** 거르기는 맵 하나하나로 본다 — 그 지역·그 검색어(괴물·맵·떨구는 물건)에 맞는 맵이 하나라도 있으면 그 괴물이 남는다. */
+  function placeMatches(monster) {
     if (state.region && monster.지역 !== state.region) { return false; }
     if (!state.query) { return true; }
     var names = monster.드랍.map(function (drop) { return drop.이름; }).join(" ");
     return (monster.이름 + " " + monster.맵 + " " + names).toLocaleLowerCase("ko").indexOf(state.query) >= 0;
   }
+  function matches(group) { return group.places.some(placeMatches); }
 
-  function row(monster) {
+  function row(group) {
     var li = text("li");
     var button = text("button", "cdx-row");
     button.type = "button";
-    button.appendChild(thumb(monster));
+    var places = group.places;
+    button.appendChild(thumb(places[0]));
     var copy = text("span", "cdx-row-copy");
-    copy.appendChild(text("b", "", monster.이름));
-    copy.appendChild(text("small", "", monster.맵 + " · Lv " + monster.감산레벨 + (monster.선공 === "선공" ? " · 선공" : "")));
+    copy.appendChild(text("b", "", group.이름));
+    copy.appendChild(text("small", "", (places.length > 1 ? "맵 " + places.length + "곳" : places[0].맵)
+      + " · Lv " + span(least(places, function (m) { return m.감산레벨; }), most(places, function (m) { return m.감산레벨; }))
+      + (places.some(function (m) { return m.선공 === "선공"; }) ? " · 선공" : "")));
     button.appendChild(copy);
-    var kills = killsToLevel(monster, state.level);
-    var gain = earned(monster, state.level);
-    button.appendChild(text("em", gain !== monster.경험치 ? "is-warn" : "", kills === null ? number(gain) : number(kills) + "마리"));
-    button.title = "다음 레벨까지 " + (kills === null ? "—" : number(kills) + "마리") + " · 한 마리 " + number(gain);
-    if (monster === selected) { button.setAttribute("aria-current", "true"); }
-    button.addEventListener("click", function () { open(monster, true); });
+    var kills = places.map(function (m) { return killsToLevel(m, state.level); }).filter(function (k) { return k !== null; });
+    var cut = places.some(function (m) { return earned(m, state.level) !== m.경험치; });
+    button.appendChild(text("em", cut ? "is-warn" : "", kills.length ? span(Math.min.apply(null, kills), Math.max.apply(null, kills)) + "마리" : "—"));
+    button.title = "내 레벨 " + state.level + "에서 다음 레벨까지";
+    if (selected && group === selected.group) { button.setAttribute("aria-current", "true"); }
+    button.addEventListener("click", function () { open(group, null, true); });
     li.appendChild(button);
-    rows.set(monster, button);
+    rows.set(group, button);
     return li;
   }
 
@@ -336,10 +407,10 @@
       function (id) { state.sort = id; render(); });
 
     var order = SORTS.find(function (s) { return s.id === state.sort; }) || SORTS[0];
-    var shown = data.괴물.filter(matches).slice().sort(function (a, b) { return order.재다(a) - order.재다(b); });
+    var shown = groups.filter(matches).sort(function (a, b) { return order.재다(a) - order.재다(b); });
     rows = new Map();
     var fragment = document.createDocumentFragment();
-    shown.forEach(function (monster) { fragment.appendChild(row(monster)); });
+    shown.forEach(function (group) { fragment.appendChild(row(group)); });
     list.replaceChildren(fragment);
     empty.hidden = shown.length !== 0;
 
@@ -349,20 +420,23 @@
     document.getElementById("monster-shown").textContent = shown.length;
 
     // 넓은 화면은 상세가 늘 보이므로 첫 줄을 고른다. 고른 것이 걸러져 사라졌어도 바꾼다. 폰은 누를 때만 연다.
-    if (selected && shown.indexOf(selected) >= 0) { describe(selected); }
-    else if (!phone.matches) { selected = shown[0] || null; mark(); describe(selected); }
+    if (selected && shown.indexOf(selected.group) >= 0) { describe(selected.group, selected.place); }
+    else if (!phone.matches && shown.length) { open(shown[0], null, false); }
+    else if (!shown.length) { selected = null; describe(null); }
   }
 
   function mark() {
-    rows.forEach(function (button, monster) {
-      if (monster === selected) { button.setAttribute("aria-current", "true"); } else { button.removeAttribute("aria-current"); }
+    rows.forEach(function (button, group) {
+      if (selected && group === selected.group) { button.setAttribute("aria-current", "true"); } else { button.removeAttribute("aria-current"); }
     });
   }
 
-  function open(monster, fromUser) {
-    selected = monster;
+  /** 괴물을 연다. 맵을 안 주면 지금 거르기에 맞는 첫 맵(없으면 첫 맵). */
+  function open(group, place, fromUser) {
+    place = place || group.places.filter(placeMatches)[0] || group.places[0];
+    selected = { group: group, place: place };
     mark();
-    describe(monster);
+    describe(group, place);
     detail.scrollTop = 0;
     if (phone.matches && fromUser) {
       detail.classList.add("is-open");
@@ -375,23 +449,24 @@
   function closeSheet() {
     detail.classList.remove("is-open");
     document.body.classList.remove("codex-open");
-    var returning = selected && rows.get(selected);
+    var returning = selected && rows.get(selected.group);
     if (returning) { returning.focus(); }
   }
 
-  /** 다른 화면에서 이 괴물을 연다 — 거르기를 지워 목록에 보이게 하고 그 줄로 스크롤한다. */
+  /** 다른 화면에서 이 괴물을 그 맵으로 연다 — 거르기를 지워 목록에 보이게 하고 그 줄로 굴린다. */
   function focus(key) {
     var monster = data.괴물.find(function (m) { return keyOf(m) === key; });
     if (!monster) { return false; }
+    var group = groupOf.get(monster.이름);
     window.LodDashboard.show("monsters");
-    if (!matches(monster)) {
+    if (!placeMatches(monster)) {
       state.region = ""; state.query = "";
       document.getElementById("monster-search").value = "";
     }
-    selected = monster;
+    selected = { group: group, place: monster };
     render();
-    open(monster, true);
-    var button = rows.get(monster);
+    open(group, monster, true);
+    var button = rows.get(group);
     // 목록 칸 안에서만 굴린다 — scrollIntoView 는 창까지 밀어 머리줄이 올라간다. 폰은 상세가 덮으므로 그대로.
     if (button && !phone.matches) {
       var box = button.parentNode.parentNode.parentNode, at = button.getBoundingClientRect(), frame = box.getBoundingClientRect();

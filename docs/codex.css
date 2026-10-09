@@ -42,7 +42,8 @@
 .cdx-hero p { margin: 2px 0 0; color: var(--white-muted); font-size: 13px; }
 .cdx-hero .item-icon.is-big { width: 74px; height: 74px; background-color: transparent; }
 .cdx-stage { position: relative; display: grid; place-items: center; min-width: 120px; min-height: 120px; }
-.cdx-stage .monster-art { transform: scale(2) var(--flip); margin: 0 var(--w) var(--h) 0; }
+.cdx-stage { --zoom: 2; }
+.cdx-stage .monster-art { transform: scale(var(--zoom)) var(--flip); margin: 0 calc(var(--w) * (var(--zoom) - 1)) calc(var(--h) * (var(--zoom) - 1)) 0; }
 .cdx-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .cdx-tag { display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: var(--radius-pill); background: var(--white-faint); color: var(--white); font-size: 12px; }
 .cdx-tag.is-risk { background: var(--red-soft); color: var(--red); }
@@ -104,3 +105,15 @@
   .codex-open { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { .cdx .monster-art.is-animated { animation: none; } }
+
+/* 출현 맵 표(monsters.js placeTable) — 같은 괴물이 나오는 맵마다 한 줄, 맵마다 다른 수치만 칸으로. */
+.cdx-table-wrap { max-height: 320px; overflow: auto; border: 1px solid var(--edge); border-radius: var(--radius-control); }
+.cdx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cdx-table th { position: sticky; top: 0; padding: 6px 8px; border-bottom: 1px solid var(--edge); background: var(--raised); color: var(--muted); font-size: 11px; font-weight: 500; text-align: right; white-space: nowrap; }
+.cdx-table th:first-child { text-align: left; }
+.cdx-table td { padding: 2px 8px; border-bottom: 1px solid var(--edge-soft); white-space: nowrap; }
+.cdx-table td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.cdx-table button { min-height: 32px; padding: 0 4px; border: 0; background: transparent; color: var(--brand-text); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.cdx-table tr.is-current td { background: var(--brand-weak); }
+.cdx-detail .monster-stats { display: flex; flex-wrap: wrap; }
+.cdx-detail .monster-stat { flex: 1 1 30%; }
