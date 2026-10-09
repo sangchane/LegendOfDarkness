@@ -2,7 +2,9 @@
 """맵 배경음 채우기 — 음악이 없거나(0), 효과음 번호로 적혔거나(128 미만), 앱에 없는 곡인 맵에 배경음을 넣는다(사용자 2026-10-04 「빈 맵 전부」).
 
 서버는 맵의 `Music` 을 0x19 로 그대로 보내고 앱은 128 이상을 곡(번호 − 128, `mobile/client/assets/music/<n>.ogg`)으로 튼다.
-이미 앱이 틀 수 있는 값은 건드리지 않는다(하데스 자기 자료가 먼저). 고칠 맵은 차례로:
+이미 앱이 틀 수 있는 값은 건드리지 않는다(하데스 자기 자료가 먼저) — 단 0단계 원작 곡은 바꾼다. 고칠 맵은 차례로:
+  0. 원작 곡 — 사용자 재생목록(`docs/bgm.md`)이 그 맵 곡이라고 한 원작 번호(리뉴얼보다 오리지널, 사용자 2026-10-09).
+     맵 이름 앞머리와 지금 곡이 둘 다 맞는 맵만(같은 마을이라도 대련장처럼 따로 곡을 쓰는 맵은 그대로).
   1. 같은 이름 맵의 팩 배경음 — 5.99 팩 → 노바 → 혼든. 혼든은 곡 번호 체계가 달라(아벨마을 혼든 58 · 5.99 141) 두 팩에 같은 이름으로
      있는 맵들에서 가장 많이 짝지어진 5.99 번호로 바꿔 쓴다.
   2. 같은 묶음(이름에서 층·구역 숫자를 뗀 것 — 구광산5-1 → 구광산, 레드오피온의굴 10층 → 레드오피온의굴)의 다른 맵에서 가장 많이 쓰는 곡.
@@ -22,6 +24,16 @@ from lib._paths import ROOT
 from lib._world import AREAS, SERVER
 
 FIRST = 128
+#: (맵 이름 앞머리, 지금 곡, 원작 곡). 0NN 은 재생목록 번호 = 우리 파일 번호(길이·파일 이름표로 맞춤),
+#: 「구버전 N」 은 길이가 같은 우리 N 번(듣고 확인하지 않음 — docs/bgm.md 2절).
+ORIGINAL = [
+    ("포테의숲", 17, 44), ("숲오솔길", 17, 44),   # 「044 포테의숲」 · 파일 이름표 FORTE FOREST
+    ("마운틴메리", 29, 30),                      # 「030 크리스마스섬 마운틴메리」
+    ("로톤", 27, 64),                            # 「064 로톤마을」
+    ("루어스성", 33, 18),                        # 「구버전 18 루어스성」
+    ("피에트", 32, 12), ("마인", 6, 12),          # 「구버전 12 피에트, 마인」
+    ("수오미", 13, 11),                          # 「구버전 11 구 수오미」
+]
 SONGS = {int(p.stem) for p in (ROOT / "mobile" / "client" / "assets" / "music").glob("*.ogg")}
 PACKS = [
     ("5.99", Path.home() / "Downloads" / "5.99 서버팩" / "db" / "maps", "cp949"),
@@ -68,7 +80,12 @@ def main():
 
     chosen, why = {}, {}
     for path, _, area in areas:
-        if playable(area.get("Music")):
+        for prefix, now, song in ORIGINAL:
+            if area["Name"].startswith(prefix) and area.get("Music") == FIRST + now and song in SONGS:
+                chosen[path], why[path] = FIRST + song, f"원작 곡 「{prefix}」"
+                break
+    for path, _, area in areas:
+        if path in chosen or playable(area.get("Music")):
             continue
         name = area["Name"]
         for label in ("5.99", "노바", "혼든"):
