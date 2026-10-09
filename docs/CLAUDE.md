@@ -23,6 +23,7 @@
 - **기술·마법·이펙트·사운드 노바 정리 2차(안티그래비티 작업지시서): `docs/abilities-nova-work-order.md`** — 사용자 결정 D1~D9
 - 노바 클라이언트 이펙트 그림 가져오기(윈도우 세션 작업지시서): `docs/nova-client-work-order.md` · `.dat` 목록·비교 `scripts/gen/pack/dat-manifest.py`
 - 원작 우드랜드 확인(윈도우 세션 작업지시서): `docs/woodland-origin-work-order.md` — 지금 서버의 우드랜드는 5.99 팩이 새로 만든 판
+- **배경음악 — 유튜브 재생목록(사용자)과 우리 64곡 번호 대조 · 맵마다 지금 트는 곡 · 어긋나는 곳: `docs/bgm.md`**
 - 포테의숲(1~6존 · 보스존 개인 던전 · 수오미 건물 문 — 5.99 map_create 사본은 서버 `Systems/Instances`): `docs/pote-forest.md`
 - **서버팩 자료 — 방법·공통 규칙: `docs/server-pack-data.md`** (원작 자료와 별개)
   - 팩별 내용: `docs/server-packs/5.99-server.md` · `docs/server-packs/honden-community.md` · `docs/server-packs/novaonline.md`
