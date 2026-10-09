@@ -117,3 +117,26 @@
 .cdx-table tr.is-current td { background: var(--brand-weak); }
 .cdx-detail .monster-stats { display: flex; flex-wrap: wrap; }
 .cdx-detail .monster-stat { flex: 1 1 30%; }
+
+/* 한 화면에 — 오늘 만든 네 화면(지도·기술·아이템·괴물)은 창 높이에 맞추고 목록·상세만 안에서 굴린다(사용자 10-09
+   「불필요한 스크롤이 많아」). 거르기 줄이 몇 줄이든 본문이 남은 높이를 채운다. 135 = 화면 위 시작점 119 + 아래 여백 16. */
+main:has(> .view.is-active:is([data-view="world"], [data-view="abilities"], [data-view="items"], [data-view="monsters"])) { padding-bottom: 16px; }
+.cdx, .abx { display: flex; flex-direction: column; height: calc(100dvh - 135px); min-height: 600px; margin-bottom: 0; }
+.cdx-body, .abx-body { flex: 1 1 auto; height: auto; min-height: 0; }
+.cdx-pick { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 4px 0 12px; border: 1px solid var(--edge); border-radius: var(--radius-control); background: var(--panel); color: var(--muted); font-size: 12px; }
+.cdx-pick select { min-height: 42px; max-width: 200px; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.cdx-pick select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* 상세 판을 짧게 — 떨구는 것·떨구는 괴물·파는 곳은 두 줄로 나란히, 그림 판·표는 낮게. */
+.cdx-links { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.cdx-link { min-height: 44px; }
+.cdx-hero { padding: 10px 14px; }
+.cdx-stage { min-width: 96px; min-height: 96px; }
+.cdx-table-wrap { max-height: 240px; }
+.cdx-detail h3 { margin-top: 14px; }
+
+@media (max-width: 960px) {
+  .cdx, .abx { height: auto; min-height: 0; }
+  .cdx-pick { flex: 1 1 auto; }
+  .cdx-pick select { max-width: none; flex: 1; }
+}

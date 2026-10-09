@@ -21,7 +21,8 @@
   var empty = document.getElementById("monster-empty");
   var detail = document.getElementById("monster-detail");
   var section = list.closest(".view");
-  var state = { query: "", region: "", sort: "exp", level: 1 };
+  // 처음부터 전부 펼치지 않는다(사용자 10-09) — 첫 지역(노비스)을 레벨 차례로 연다. 「모든 지역」은 고르기 상자 끝에.
+  var state = { query: "", region: data.지역[0], sort: "lv", level: 1 };
   var selected = null;
   var rows = new Map();
   var phone = window.matchMedia ? window.matchMedia("(max-width: 960px)") : { matches: false };
@@ -248,8 +249,8 @@
 
     var hero = text("header", "cdx-hero");
     var stageBox = text("div", "cdx-stage");
-    // 두 배로 키우되 큰 괴물(드라코 …)은 판이 길어지지 않게 높이 140 안으로.
-    if (place.스프라이트) { stageBox.style.setProperty("--zoom", Math.min(2, 140 / place.스프라이트.높이).toFixed(2)); }
+    // 두 배로 키우되 큰 괴물(드라코 …)은 판이 길어지지 않게 높이 110 안으로.
+    if (place.스프라이트) { stageBox.style.setProperty("--zoom", Math.min(2, 110 / place.스프라이트.높이).toFixed(2)); }
     stageBox.appendChild(sprite(place));
     hero.appendChild(stageBox);
     var title = text("div");
@@ -353,17 +354,12 @@
     return box;
   }
 
-  function chips(host, values, current, onPick) {
-    host.replaceChildren();
-    values.forEach(function (value) {
-      var chip = text("button", "chip", value.이름);
-      chip.type = "button";
-      var active = current === value.id;
-      chip.classList.toggle("is-active", active);
-      chip.setAttribute("aria-pressed", String(active));
-      chip.addEventListener("click", function () { onPick(value.id); });
-      host.appendChild(chip);
-    });
+  /** 고르기 상자 — 처음 한 번 채우고, 그다음엔 고른 값만 맞춘다. */
+  function fillSelect(host, values, current) {
+    if (!host.children.length) {
+      values.forEach(function (value) { var option = text("option", "", value.이름); option.value = value.id; host.appendChild(option); });
+    }
+    host.value = current;
   }
 
   /** 거르기는 맵 하나하나로 본다 — 그 지역·그 검색어(괴물·맵·떨구는 물건)에 맞는 맵이 하나라도 있으면 그 괴물이 남는다. */
@@ -399,12 +395,9 @@
   }
 
   function render() {
-    chips(document.getElementById("monster-regions"),
-      [{ id: "", 이름: "모든 지역" }].concat(data.지역.map(function (name) { return { id: name, 이름: name }; })), state.region,
-      function (id) { state.region = id; render(); });
-    chips(document.getElementById("monster-sorts"),
-      SORTS.map(function (s) { return { id: s.id, 이름: s.이름 }; }), state.sort,
-      function (id) { state.sort = id; render(); });
+    fillSelect(document.getElementById("monster-regions"),
+      data.지역.map(function (name) { return { id: name, 이름: name }; }).concat([{ id: "", 이름: "모든 지역" }]), state.region);
+    fillSelect(document.getElementById("monster-sorts"), SORTS.map(function (s) { return { id: s.id, 이름: s.이름 + " 차례" }; }), state.sort);
 
     var order = SORTS.find(function (s) { return s.id === state.sort; }) || SORTS[0];
     var shown = groups.filter(matches).sort(function (a, b) { return order.재다(a) - order.재다(b); });
@@ -460,7 +453,8 @@
     var group = groupOf.get(monster.이름);
     window.LodDashboard.show("monsters");
     if (!placeMatches(monster)) {
-      state.region = ""; state.query = "";
+      // 그 괴물이 나오는 지역으로 옮긴다 — 「모든 지역」으로 풀면 목록이 다시 길어진다.
+      state.region = monster.지역; state.query = "";
       document.getElementById("monster-search").value = "";
     }
     selected = { group: group, place: monster };
@@ -476,6 +470,8 @@
   }
   window.LodMonsters = { focus: focus };
 
+  document.getElementById("monster-regions").addEventListener("change", function (event) { state.region = event.target.value; render(); });
+  document.getElementById("monster-sorts").addEventListener("change", function (event) { state.sort = event.target.value; render(); });
   var slider = document.getElementById("monster-level");
   var output = document.getElementById("monster-level-out");
   slider.addEventListener("input", function () {

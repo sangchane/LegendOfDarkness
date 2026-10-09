@@ -18,7 +18,8 @@
   var byKey = {}, effectByNumber = {}, effectUsers = {}, soundUsers = {};
   var overrides = {}, changedAt = {};
   // 구현 = 게임 스킬창에 보이는 것(레벨 표 + 기본공격, 사용자 2026-10-03). 나머지는 「아직 없는 것」에서 본다.
-  var view = "구현", kind = "기술", job = "전체", query = "";
+  // 처음부터 전부 펼치지 않는다(사용자 10-09) — 전사(공통 포함)로 연다. 「모든 직업」은 고르기 상자 끝에.
+  var view = "구현", kind = "기술", job = "전사", query = "";
   var revision = 0, apiReady = false;
   var selected = null;
   var draft = { effect: null, speed: null, sound: null };
@@ -118,7 +119,8 @@
       if (view === "미구현" && row.구현) { return false; }
       if (view === "노바와다름" && !row["노바와다름"]) { return false; }
       if (view === "운영수정" && !changed(row)) { return false; }
-      if (job !== "전체" && row["직업"] !== job) { return false; }
+      // 직업을 고르면 그 직업이 쓰는 것 — 모두가 쓰는 공통도 함께(「공통만」은 공통만).
+      if (job !== "전체" && row["직업"] !== job && !(job !== "공통" && row["직업"] === "공통")) { return false; }
       if (!query) { return true; }
       return (row["이름"] + " " + row["그룹"] + " " + row["직업"]).toLowerCase().indexOf(query) >= 0;
     });
@@ -136,14 +138,14 @@
 
   function renderJobs() {
     var host = $("ability-classes");
-    host.replaceChildren();
-    ["전체", "공통", "전사", "도적", "마법사", "사제", "무도가"].forEach(function (name) {
-      var button = node("button", "abx-chip" + (job === name ? " is-active" : ""), name);
-      button.type = "button";
-      button.setAttribute("aria-pressed", String(job === name));
-      button.addEventListener("click", function () { job = name; renderJobs(); render(); });
-      host.appendChild(button);
+    [["전사", "전사 (공통 포함)"], ["도적", "도적 (공통 포함)"], ["마법사", "마법사 (공통 포함)"], ["사제", "사제 (공통 포함)"],
+      ["무도가", "무도가 (공통 포함)"], ["공통", "공통만"], ["전체", "모든 직업"]].forEach(function (pair) {
+      var option = node("option", "", pair[1]);
+      option.value = pair[0];
+      host.appendChild(option);
     });
+    host.value = job;
+    host.addEventListener("change", function () { job = host.value; render(); });
   }
 
   function item(row) {

@@ -85,8 +85,8 @@
 
           <div class="cdx-tools">
             <label class="cdx-search" for="monster-search"><span class="visually-hidden">괴물 검색</span><input id="monster-search" type="search" placeholder="괴물·맵·떨구는 물건" autocomplete="off"></label>
-            <div class="cdx-chips" id="monster-regions" role="group" aria-label="지역"></div>
-            <div class="cdx-chips" id="monster-sorts" role="group" aria-label="정렬"></div>
+            <label class="cdx-pick"><span>지역</span><select id="monster-regions"></select></label>
+            <label class="cdx-pick"><span>정렬</span><select id="monster-sorts"></select></label>
             <div class="cdx-level monster-level-row">
               <label for="monster-level">내 레벨</label>
               <input id="monster-level" type="range" min="1" max="99" value="1" aria-describedby="monster-level-note">
@@ -147,7 +147,7 @@
               <button type="button" role="tab" data-ability-kind="마법" aria-selected="false">마법 <b id="ability-spell-count">—</b></button>
             </div>
             <label class="abx-search" for="ability-search"><span class="sr-only">이름 검색</span><input id="ability-search" type="search" placeholder="이름 — 쿠로, 단각…" autocomplete="off"></label>
-            <div class="abx-chips" id="ability-classes" role="group" aria-label="직업"></div>
+            <label class="cdx-pick"><span>직업</span><select id="ability-classes"></select></label>
             <div class="abx-chips" id="ability-views" role="group" aria-label="보기">
               <button type="button" class="abx-chip is-active" data-ability-view="구현" aria-pressed="true">게임에 있는 것 <b id="ability-done-count">—</b></button>
               <button type="button" class="abx-chip" data-ability-view="미구현" aria-pressed="false">아직 없는 것 <b id="ability-todo-count">—</b></button>
@@ -216,9 +216,9 @@
 
           <div class="cdx-tools">
             <label class="cdx-search" for="item-search"><span class="visually-hidden">아이템 검색</span><input id="item-search" type="search" placeholder="이름 — 한글·영문" autocomplete="off"></label>
-            <div class="cdx-chips" id="item-slots" role="group" aria-label="슬롯"></div>
-            <div class="cdx-chips" id="item-classes" role="group" aria-label="직업"></div>
-            <div class="cdx-chips" id="item-circles" role="group" aria-label="서클"></div>
+            <label class="cdx-pick"><span>슬롯</span><select id="item-slots"></select></label>
+            <label class="cdx-pick"><span>직업</span><select id="item-classes"></select></label>
+            <label class="cdx-pick"><span>서클</span><select id="item-circles"></select></label>
             <div class="cdx-chips" role="group" aria-label="보기">
               <button type="button" class="chip" id="item-only-unnamed" aria-pressed="false">한글 없는 것만</button>
               <button type="button" class="chip" id="item-export">표로 내보내기</button>
@@ -265,6 +265,9 @@
           </div>
         </section>
 
+        <details class="world-draft world-more">
+          <summary>가는 길 · 워프 연결 표 · 맵 그림 위 워프 자리 — 펼쳐 보기</summary>
+          <div class="world-draft-body">
         <section class="route" aria-labelledby="route-title">
           <div class="world-section-heading">
             <div><p class="eyebrow">How you actually get there</p><h2 id="route-title">가는 길 — 노비스마을에서 포테의숲까지</h2></div>
@@ -289,6 +292,8 @@
             <div id="novice-village-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-novice" aria-live="polite"></div>
             <div id="porte-forest-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-porte" aria-live="polite" hidden></div>
             <div id="woodland-focus" class="forest-focus" role="tabpanel" aria-labelledby="map-focus-tab-woodland" aria-live="polite" hidden></div>
+          </div>
+        </details>
           </div>
         </details>
 

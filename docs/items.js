@@ -21,9 +21,10 @@
   var typed = {};
   try { typed = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { typed = {}; }
 
-  var slot = "all";
-  var cls = "all";
-  var circle = 0;
+  // 처음부터 전부 펼치지 않는다(사용자 10-09) — 무기 · 전사(공용 포함) · 1서클로 연다. 「모든 …」은 고르기 상자 끝에.
+  var slot = data.슬롯[0];
+  var cls = "전사";
+  var circle = 1;
   var query = "";
   var onlyUnnamed = false;
   var selected = null;
@@ -105,7 +106,8 @@
 
   function matches(row) {
     if (slot !== "all" && row.slot !== slot) { return false; }
-    if (cls !== "all" && row.cls !== cls) { return false; }
+    // 직업을 고르면 그 직업이 쓸 수 있는 것 — 공용도 함께(「공용만」은 공용만).
+    if (cls !== "all" && row.cls !== cls && !(cls !== "공용" && row.cls === "공용")) { return false; }
     if (circle && circleOf(row) !== circle) { return false; }
     if (onlyUnnamed && nameOf(row)) { return false; }
     if (!query) { return true; }
@@ -318,18 +320,13 @@
     return li;
   }
 
-  function renderChips(host, values, current, onPick) {
-    host.replaceChildren();
-    values.forEach(function (pair) {
-      var button = el("button", "chip", pair[1]);
-      button.type = "button";
-      if (pair[0] === current) { button.classList.add("is-active"); }
-      button.setAttribute("aria-pressed", pair[0] === current ? "true" : "false");
-      button.addEventListener("click", function () { onPick(pair[0]); });
-      host.appendChild(button);
-    });
+  /** 고르기 상자 — 처음 한 번 채우고, 그다음엔 고른 값만 맞춘다. */
+  function fillSelect(host, options, current) {
+    if (!host.children.length) {
+      options.forEach(function (pair) { var option = el("option", "", pair[1]); option.value = String(pair[0]); host.appendChild(option); });
+    }
+    host.value = String(current);
   }
-  function pairs(values, all) { return [["all", all]].concat(values.map(function (v) { return [v, v]; })); }
 
   function tally() {
     var named = data.목록.filter(function (r) { return nameOf(r); }).length;
@@ -349,10 +346,11 @@
     tally();
     $("item-shown").textContent = shown.length.toLocaleString("ko-KR");
 
-    renderChips($("item-slots"), pairs(data.슬롯, "모든 슬롯"), slot, function (v) { slot = v; render(); });
-    renderChips($("item-classes"), pairs(data.직업, "모든 직업"), cls, function (v) { cls = v; render(); });
-    renderChips($("item-circles"), [[0, "모든 서클"]].concat(CIRCLES.map(function (c) { return [c[0], c[0] + "서클"]; })),
-      circle, function (v) { circle = v; render(); });
+    fillSelect($("item-slots"), data.슬롯.map(function (v) { return [v, v]; }).concat([["all", "모든 슬롯"]]), slot);
+    fillSelect($("item-classes"), data.직업.filter(function (v) { return v !== "공용"; })
+      .map(function (v) { return [v, v + " (공용 포함)"]; }).concat([["공용", "공용만"], ["all", "모든 직업"]]), cls);
+    fillSelect($("item-circles"), CIRCLES.map(function (c) { return [c[0], c[0] + "서클 (Lv " + c[1] + (c[2] > c[1] ? "~" + c[2] : "") + ")"]; })
+      .concat([[0, "모든 서클"]]), circle);
 
     // 넓은 화면은 상세가 늘 보이므로 첫 줄을 고른다. 고른 것이 걸러져 사라졌어도 바꾼다. 폰은 누를 때만 연다.
     if (selected && shown.indexOf(selected) >= 0) { describe(selected); }
@@ -386,7 +384,10 @@
     if (window.LodDashboard) { window.LodDashboard.show("items"); }
     need();
     if (!matches(row)) {
-      slot = "all"; cls = "all"; circle = 0; onlyUnnamed = false; query = "";
+      // 그 물건이 보이는 갈래로 옮긴다 — 「전체」로 풀면 목록이 다시 길어진다.
+      slot = row.slot; circle = circleOf(row);
+      if (row.cls !== "공용") { cls = row.cls; }
+      onlyUnnamed = false; query = "";
       $("item-search").value = "";
       $("item-only-unnamed").classList.remove("is-active");
       $("item-only-unnamed").setAttribute("aria-pressed", "false");
@@ -438,6 +439,9 @@
       render();
     });
     $("item-export").addEventListener("click", exportTsv);
+    $("item-slots").addEventListener("change", function (event) { slot = event.target.value; render(); });
+    $("item-classes").addEventListener("change", function (event) { cls = event.target.value; render(); });
+    $("item-circles").addEventListener("change", function (event) { circle = Number(event.target.value); render(); });
     $("item-name").addEventListener("change", function () {
       if (!selected) { return; }
       remember(selected.en, $("item-name").value.trim());
