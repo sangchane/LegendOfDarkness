@@ -134,8 +134,24 @@ public sealed partial class WorldView
         int was = (int)_overheadAt;
         _overheadAt += delta;
 
+        // 걷는 중에 건 그림이 따라오나(`--overhead follow --walk EEEE`) — 매 프레임 그림과 내 발의 차이를 찍는다. 따라오면 차이가 그대로다.
+        if (Main.Overhead == "follow")
+        {
+            foreach (Flash flash in _camera.GetChildren().OfType<Flash>())
+            {
+                GD.Print($"GREYBOX_FOLLOW gap {flash.Position - _player.Position} feet {_player.Position}");
+            }
+        }
+
         if ((int)_overheadAt == was && _overheadAt > 0)
         {
+            return;
+        }
+
+        // 따라오기 — 매초 내게 쿠로 그림(21)을 느리게(칸마다 0.3초) 건다.
+        if (Main.Overhead == "follow")
+        {
+            Show(21, _player.Position, 300, _player);
             return;
         }
 

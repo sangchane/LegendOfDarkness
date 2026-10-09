@@ -71,6 +71,11 @@ public sealed partial class WorldView
         // 그림이 제 기준점을 지니므로 발밑(칸)에 놓는다 — 몸 가운데는 그림이 정한다. 머리 이펙트만은 맞은
         // 이의 그려진 머리 바로 위 칸으로 옮긴다(Overhead.Shift) — 원작 칸 그대로면 키 큰 사람의 얼굴을 덮었다.
         flash.Land(feet, on?.HeadTop);
+        if (on is not null)
+        {
+            flash.Follow(on);
+        }
+
         _camera.AddChild(flash);
 
         if (flash.OnHead)

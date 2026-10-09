@@ -20,6 +20,10 @@ public sealed partial class Flash : Sprite2D
     private readonly double _perFrame;
     private double _age;
 
+    /// <summary>The one it landed on and how far from their feet — it follows them while it plays (walking, being pushed).</summary>
+    private Node2D? _on;
+    private Vector2 _fromFeet;
+
     /// <summary>
     /// Whether this is a head effect (<see cref="Overhead.IsHeadClass" />) — Miss, 일음지, the coma — which plays in
     /// the slot just over the head rather than where the sheet's anchor would put it.
@@ -47,6 +51,9 @@ public sealed partial class Flash : Sprite2D
 
         // 누구의 발밑 정렬도 따르지 않고 늘 위에 그린다.
         ZIndex = 100;
+
+        // 걸음이 그 프레임의 발을 옮긴 뒤에 따라간다 — 먼저 돌면 한 프레임씩 뒤처진다(우선순위가 클수록 나중).
+        ProcessPriority = 1;
     }
 
     /// <summary>The flash with this number, or nothing when it was never cut.</summary>
@@ -75,6 +82,17 @@ public sealed partial class Flash : Sprite2D
         Position = OnHead && headTop is { } head
             ? feet + new Vector2(0, Mathf.Round(Overhead.Shift(_sheet, _drawnBottom, head)))
             : feet + new Vector2(EffectSheet.AnchorFromFeet.X, EffectSheet.AnchorFromFeet.Y);
+
+    /// <summary>
+    /// Keeps to <paramref name="on" /> while it plays. Landing once left a flash on someone walking behind them
+    /// — it hung where they had been and seemed to blink out (사용자 2026-10-09, 「이동하는 중에는 좌표에 맞게 나오지 않고」).
+    /// Call after <see cref="Land" />: the gap from their feet it landed with is the one it keeps.
+    /// </summary>
+    public void Follow(Node2D on)
+    {
+        _on = on;
+        _fromFeet = Position - on.Position;
+    }
 
     private static IReadOnlyDictionary<int, EffectLook>? _looks;
 
@@ -113,6 +131,18 @@ public sealed partial class Flash : Sprite2D
 
     public override void _Process(double delta)
     {
+        if (_on is not null)
+        {
+            if (IsInstanceValid(_on))
+            {
+                Position = _on.Position + _fromFeet;
+            }
+            else
+            {
+                _on = null;  // 맞은 이가 사라지면(죽음·맵 이동) 그 자리에서 마저 돈다
+            }
+        }
+
         _age += delta;
 
         int step = (int)(_age / _perFrame);
