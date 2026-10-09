@@ -15,6 +15,12 @@
 
 **그림** — `build-map-images.py` 의 렌더러(원작 seo.dat 바닥 타일, 칸 56x27 마름모)로 그려 1/8(한눈)·1/4(확대) WebP 로 줄인다.
 .map 이 그림보다 새로울 때만 다시 그린다.
+
+**맵 위에 세우는 것**(사용자 2026-10-09 「3-a만 저 상태에서 중앙으로 이동하면서 확대시키고 실제 엔피시나 몬스터도 배치시키고」) — NPC 는
+서버 mundanes 의 실제 칸. 괴물은 서버가 정한 자리 없이 맵 안 걸을 수 있는 칸 아무 데나 나므로(SpawnMax 마리까지) 앱 지도 벽 자료
+(`mobile/client/assets/world/map<맵>.txt` blocked)에서 걸을 수 있는 칸 몇 곳을 맵 번호·이름으로 고정해 뽑는다(다시 돌려도 같다).
+그림은 앱 생물 그림(`mobile/client/assets/actor/creature/mnsNNN.png`, 번호 = Image − 16384, 곁 `.txt` 에 칸 수·서 있는 칸)을
+쓰이는 것만 `docs/atlas-sprites/` 로 옮긴다.
 """
 import importlib.util
 import json
@@ -33,6 +39,11 @@ configure_utf8_stdio(sys.stdout, sys.stderr)
 SERVER = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" / "server"
 GUIDE = ROOT / "mobile" / "client" / "assets" / "world" / "guide.txt"
 IMAGES = ROOT / "docs" / "atlas-maps"
+SPRITES_IN = ROOT / "mobile" / "client" / "assets" / "actor" / "creature"
+SPRITES_OUT = ROOT / "docs" / "atlas-sprites"
+WORLD = ROOT / "mobile" / "client" / "assets" / "world"
+SPRITE_BASE = 16384
+MOB_SPOTS = 4   # 괴물 한 종에 세우는 그림 수(나는 수는 옆 판에 숫자로)
 DATA = ROOT / "docs" / "atlas-layout-data.js"
 
 EDGE = 3        # 가장자리에서 이만큼 안의 출구는 그 방향으로 잇는다
@@ -144,6 +155,53 @@ def crosses(p, q, polygon):
     return all(turn(polygon[i], polygon[(i + 1) % len(polygon)], mid) > 0 for i in range(len(polygon)))
 
 
+def sprite(image, used):
+    """앱 생물 그림 번호 → 그림 이름(mnsNNN) — 처음 쓰일 때 칸 수·서 있는 칸을 읽어 `used` 에 둔다. 그림이 없으면 None."""
+    number = (image or 0) - SPRITE_BASE
+    name = f"mns{number:03d}"
+    png = SPRITES_IN / f"{name}.png"
+    if number <= 0 or not png.exists():
+        return None
+    if name not in used:
+        head = png.read_bytes()[:24]
+        info = {"w": int.from_bytes(head[16:20], "big"), "h": int.from_bytes(head[20:24], "big"), "frames": 1, "stand": [0, 1]}
+        meta = SPRITES_IN / f"{name}.txt"
+        for line in meta.read_text(encoding="utf-8").splitlines() if meta.exists() else []:
+            part = line.split()
+            if part and part[0] == "frames":
+                info["frames"] = max(1, int(part[1]))
+            elif len(part) >= 3 and part[0] == "stand":
+                info["stand"] = [int(part[1]), max(1, int(part[2]))]
+        used[name] = info
+    return name
+
+
+def walkable(map_id, cols, rows):
+    """앱 지도 벽 자료에서 걸을 수 있는 칸 — 없으면 가장자리 2칸 안쪽 전부."""
+    path = WORLD / f"map{map_id}.txt"
+    if path.exists():
+        lines = path.read_text(encoding="utf-8").splitlines()
+        if "blocked" in lines:
+            grid = lines[lines.index("blocked") + 1:lines.index("blocked") + 1 + rows]
+            spots = [(x, y) for y, line in enumerate(grid) for x, ch in enumerate(line[:cols]) if ch == "."]
+            if spots:
+                return spots
+    return [(x, y) for y in range(2, rows - 2) for x in range(2, cols - 2)]
+
+
+def mob_spots(map_id, name, cols, rows, count):
+    """괴물 한 종을 세울 칸 — 맵 번호·이름으로 고정해 뽑는다(다시 돌려도 같다). 서로 떨어지게 고르게."""
+    import random
+    open_ = walkable(map_id, cols, rows)
+    dice = random.Random(f"{map_id}:{name}")
+    picked = []
+    for _ in range(count):
+        best = max((dice.choice(open_) for _ in range(24)),
+                   key=lambda t: min((abs(t[0] - p[0]) + abs(t[1] - p[1]) for p in picked), default=999))
+        picked.append(best)
+    return picked
+
+
 def screen(gx, gy, scale):
     """전역 칸 → 화면 픽셀(마름모 투영)."""
     return (gx - gy) * HALF_W * scale, (gx + gy) * HALF_H * scale
@@ -186,11 +244,17 @@ def main():
             if spot.get("AreaID") in areas and to.get("AreaID"):
                 exits[spot["AreaID"]][to["AreaID"]].append(((at.get("X"), at.get("Y")), (landing.get("X"), landing.get("Y"))))
 
-    hunting = set()
-    for path in (SERVER / "templates" / "monsters").rglob("*.json"):
+    hunting, monsters_at, npcs_at = set(), defaultdict(list), defaultdict(list)
+    for path in sorted((SERVER / "templates" / "monsters").rglob("*.json")):
         monster = read(path)
         if monster and monster.get("AreaID"):
             hunting.add(monster["AreaID"])
+            monsters_at[monster["AreaID"]].append(monster)
+    for path in sorted((SERVER / "templates" / "mundanes").glob("*.json")):
+        npc = read(path)
+        if npc and npc.get("AreaID") and npc.get("ScriptKey") != "operator_shop":
+            npcs_at[npc["AreaID"]].append(npc)
+    used_sprites = {}
 
     IMAGES.mkdir(parents=True, exist_ok=True)
     module = renderer()
@@ -258,6 +322,13 @@ def main():
                           "aOut": outward(a, way), "bOut": outward(b, back)})
         gates = [{"map": m, "at": point(m, tile), "to": to, "toName": (areas.get(to) or {}).get("Name") or str(to)}
                  for m, tile, to in doors if m in placed]
+        # 맵 위에 세우는 것 — NPC 는 실제 칸, 괴물은 걸을 수 있는 칸 몇 곳(종마다 MOB_SPOTS). 칸은 그 맵 안 칸(전역 아님).
+        for map_id, m in placed.items():
+            m["npcs"] = [[npc["Name"].split("@")[0], npc.get("X"), npc.get("Y"), sprite(npc.get("Image"), used_sprites)]
+                         for npc in npcs_at.get(map_id, [])]
+            m["mobs"] = [[mob["Name"], mob_spots(map_id, mob["Name"], m["cols"], m["rows"], min(MOB_SPOTS, max(1, mob.get("SpawnMax") or 1))),
+                          mob.get("SpawnMax") or 0, sprite(mob.get("Image"), used_sprites)]
+                         for mob in monsters_at.get(map_id, [])]
         regions.append({"card": card, "name": name, "lv": level, "kind": kind,
                         "w": round(max(m["x"] + m["w"] for m in placed.values()) + 40, 1),
                         "h": round(max(m["y"] + m["h"] for m in placed.values()) + 40, 1),
@@ -268,8 +339,15 @@ def main():
                       and origin[a][1] < origin[b][1] + areas[b]["Rows"] and origin[b][1] < origin[a][1] + areas[a]["Rows"])
         print(f"  {name}: 맵 {len(placed)} · 화살표 {len(lines)} · 문 {len(gates)} · 겹친 쌍 {overlap}")
 
+    import shutil
+    SPRITES_OUT.mkdir(parents=True, exist_ok=True)
+    for name in used_sprites:
+        target = SPRITES_OUT / f"{name}.png"
+        source = SPRITES_IN / f"{name}.png"
+        if not target.exists() or target.stat().st_mtime < source.stat().st_mtime:
+            shutil.copy2(source, target)
     DATA.write_text("window.LOD_ATLAS_LAYOUT = " + json.dumps(
-        {"생성": "scripts/gen/world/build-atlas.py", "한눈": SMALL, "확대": LARGE, "지역": regions},
+        {"생성": "scripts/gen/world/build-atlas.py", "한눈": SMALL, "확대": LARGE, "그림": used_sprites, "지역": regions},
         ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     print(f"지역 {len(regions)} · 맵 그림 {drawn} -> docs/atlas-maps/ · docs/atlas-layout-data.js")
 

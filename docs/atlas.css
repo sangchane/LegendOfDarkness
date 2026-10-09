@@ -4,15 +4,19 @@
   --atlas-arrow: #ffe6b0; --atlas-door: #ffd36e;
 }
 .atlas { display: grid; gap: 12px; margin-bottom: 32px; }
-.atlas-regions { display: flex; flex-wrap: wrap; gap: 6px; }
+.atlas-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.atlas-head h1 { margin: 0; font-size: 24px; }
+.atlas-head p { margin: 0; color: var(--muted-strong); font-size: 14px; }
+.atlas-regions { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+.atlas-tab { flex: none; }
 .atlas-tab { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: var(--radius-pill); border: 1px solid var(--edge); background: var(--panel); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
 .atlas-tab .num { color: var(--muted); font-size: 12px; }
 .atlas-tab[aria-selected="true"] { background: var(--text); color: var(--white); border-color: var(--text); }
 .atlas-tab[aria-selected="true"] .num { color: var(--white-muted); }
 .atlas-tab:focus-visible, .atlas-back:focus-visible, .atlas-chips button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-.atlas-body { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 12px; min-height: 640px; }
+.atlas-body { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 12px; height: calc(100dvh - 210px); min-height: 520px; }
 .atlas-body > * { min-width: 0; }
-.atlas-stage { position: relative; border-radius: var(--radius-card); background: var(--dark-stage); overflow: hidden; min-height: 640px; touch-action: none; }
+.atlas-stage { position: relative; border-radius: var(--radius-card); background: var(--dark-stage); overflow: hidden; min-height: 0; touch-action: none; }
 .atlas-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; user-select: none; }
 .atlas-stage svg:active { cursor: grabbing; }
 .atlas-state { position: absolute; left: 12px; bottom: 12px; margin: 0; padding: 6px 10px; border-radius: var(--radius-control); background: var(--white-faint); color: var(--white-muted); font-size: 13px; }
@@ -30,12 +34,12 @@
 .atlas-arrow { stroke: var(--atlas-arrow); stroke-width: 2; stroke-linecap: round; }
 .atlas-arrow-head { fill: var(--atlas-arrow); }
 .atlas-door { fill: var(--atlas-door); stroke: var(--dark-stage); stroke-width: 1.2; }
-.atlas-labels { --atlas-unit: 1; }
+.atlas-stage svg { --atlas-unit: 1; }
 .atlas-label { fill: var(--white); font-size: calc(13px * var(--atlas-unit)); font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: var(--dark-stage); stroke-width: calc(3.5px * var(--atlas-unit)); pointer-events: none; }
 .atlas-sub { fill: var(--white-muted); font-size: calc(11px * var(--atlas-unit)); text-anchor: middle; paint-order: stroke; stroke: var(--dark-stage); stroke-width: calc(3px * var(--atlas-unit)); pointer-events: none; font-family: var(--mono); }
 .atlas-stage svg.is-far .atlas-sub { display: none; }
 .atlas-goto { fill: var(--atlas-arrow); font-size: calc(11px * var(--atlas-unit)); paint-order: stroke; stroke: var(--dark-stage); stroke-width: calc(3px * var(--atlas-unit)); pointer-events: none; }
-.atlas-panel { border-radius: var(--radius-card); background: var(--panel); border: 1px solid var(--edge); padding: 16px 18px; overflow: auto; max-height: 640px; }
+.atlas-panel { border-radius: var(--radius-card); background: var(--panel); border: 1px solid var(--edge); padding: 14px 16px; overflow: auto; }
 .atlas-panel h2 { margin: 0; font-size: 20px; }
 .atlas-panel h3 { margin: 18px 0 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
 .atlas-panel h3 small { font-weight: 400; }
@@ -66,7 +70,30 @@
 .atlas-empty { color: var(--muted); font-size: 13px; }
 .atlas .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 @media (max-width: 960px) {
-  .atlas-body { grid-template-columns: 1fr; }
+  .atlas-body { grid-template-columns: 1fr; height: auto; }
   .atlas-stage { min-height: 60dvh; }
   .atlas-panel { max-height: none; }
 }
+
+/* 고른 맵만 — 다른 맵은 흐리게, 화살표·문·이름은 숨기고 그 맵 위에 NPC·괴물을 세운다. */
+.atlas-stage svg.is-focus .atlas-map:not(.is-chosen) { opacity: 0.12; }
+.atlas-stage svg.is-focus .atlas-arrows, .atlas-stage svg.is-focus .atlas-doors, .atlas-stage svg.is-focus .atlas-labels { display: none; }
+.atlas-figure { overflow: hidden; }
+.atlas-npc-tag { fill: var(--atlas-door); font-size: calc(12px * var(--atlas-unit)); font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: var(--dark-stage); stroke-width: calc(3px * var(--atlas-unit)); pointer-events: none; }
+.atlas-mobs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.atlas-mobs li { display: grid; grid-template-columns: 44px 1fr; grid-template-rows: auto auto; column-gap: 8px; align-items: center; }
+.atlas-mobs .atlas-thumb { grid-row: span 2; justify-self: center; }
+.atlas-mobs b { font-size: 14px; }
+.atlas-mobs .num { font-size: 12px; color: var(--muted-strong); }
+.atlas-thumb { display: inline-block; background-repeat: no-repeat; image-rendering: pixelated; }
+.atlas-more { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
+.atlas-panel h3 { margin-top: 14px; }
+
+/* 한눈에 — 줄 간격을 줄여 노트북 높이에서도 판이 한 화면에 든다. */
+.atlas-panel .atlas-verdict { margin: 8px 0; }
+.atlas-panel .atlas-chips { margin-bottom: 2px; }
+.atlas-panel .atlas-chips button, .atlas-panel .atlas-chip-door { min-height: 26px; font-size: 12px; padding: 0 8px; }
+.atlas-panel .atlas-table td { padding: 3px 6px; font-size: 12.5px; }
+.atlas-mobs { gap: 2px; }
+.atlas-mobs li { grid-template-columns: 38px 1fr; }
+.atlas-panel h3 { margin: 10px 0 4px; }
