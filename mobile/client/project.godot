@@ -21,7 +21,7 @@ file_logging/enable_file_logging=true
 
 [display]
 
-window/size/viewport_width=800
+window/size/viewport_width=720
 window/size/viewport_height=360
 window/size/window_width_override=1000
 window/size/window_height_override=450
