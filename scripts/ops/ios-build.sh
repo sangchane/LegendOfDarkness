@@ -8,8 +8,8 @@
 #   scripts/ops/ios-build.sh logs [기기]      앱 기록(user://logs/godot.log)을 맥 out/ios-logs/ 로 가져온다 — 폰에서 난 문제를 볼 때
 #   scripts/ops/ios-build.sh renew            서명을 새로 받는다(LOD_DEVICE_ID 로 기기를 고른다 — 그 기기가
 #                                         프로필에 실제로 들어갔는지까지 확인한다)
-#   scripts/ops/ios-build.sh check            며칠 남았나 — 이틀 이하면 스스로 갱신한다
-#   scripts/ops/ios-build.sh watch-sign       날마다 check 를 돌게 맥에 등록한다
+#   scripts/ops/ios-build.sh check            며칠 남았나 — 이틀 이하면 스스로 갱신하고, 보이는 폰에 다시 넣는다
+#   scripts/ops/ios-build.sh watch-sign       매시간 check 를 돌게 맥에 등록한다(폰이 Wi-Fi 에 올 때 넣으려고)
 #   scripts/ops/ios-build.sh unwatch-sign     그 등록을 지운다
 #
 # **무료 계정은 서명이 7일이면 끝난다.** 명령줄로 새로 받을 수 있다 — 2026-09-18 확인: 보관본을 다시
@@ -29,6 +29,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CLIENT="$ROOT/mobile/client"
 PRESETS="$CLIENT/export_presets.cfg"
 IPA="$CLIENT/build/ios/LodClient.ipa"
+# renew 가 새 서명으로 다시 빌드한 앱 — check 가 이것을 폰에 넣는다.
+RENEWED="$CLIENT/build/ios/renewed/Build/Products/Debug-iphoneos/LodClient.app"
 GODOT="$ROOT/.tools/godot-4.6-mono/Godot_mono.app/Contents/MacOS/Godot"
 PROFILES="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
 AGENTS="$HOME/Library/LaunchAgents"
@@ -94,14 +96,39 @@ check() {
 
     if [ "$left" -ge 0 ]; then
         echo "서명이 ${left}일 남았습니다."
-        [ "$left" -gt 2 ] && return 0
     fi
 
-    if renew; then
-        say "서명을 새로 받았습니다 — $(days_left)일 남았습니다."
-    else
-        say "서명을 새로 받지 못했습니다 — $LOGS/com.lod.iossign.log 를 보십시오."
+    if [ "$left" -le 2 ]; then
+        if renew; then
+            say "서명을 새로 받았습니다 — $(days_left)일 남았습니다."
+        else
+            say "서명을 새로 받지 못했습니다 — $LOGS/com.lod.iossign.log 를 보십시오."
+        fi
     fi
+
+    put_renewed
+}
+
+# 새 서명은 맥에만 생긴다 — 폰 앱은 폰에 든 서명으로 켜지므로 받은 판을 폰에 다시 넣어야 날이 는다(2026-10-09: 맥에서만
+# 갱신하던 탓에 폰 앱이 그대로 멈췄다). 기기마다 한 번만 넣고, 폰이 같은 Wi-Fi 에 올 때까지 check 가 매시간 다시 본다.
+put_renewed() {
+    local stamp="$RENEWED/embedded.mobileprovision"
+    # 갱신 뒤에 만든 .ipa 가 더 새 판이다 — install 이 그것을 넣으므로 옛 판으로 덮지 않는다.
+    [ -f "$stamp" ] && [ "$stamp" -nt "$IPA" ] || return 0
+
+    local ends ident
+    ends="$(read_profile "$stamp" ExpirationDate)"
+    [ -n "$ends" ] || return 0
+
+    for ident in $(xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /^(available|connected)/ {print $3}'); do
+        [ "$(cat "$LOGS/ios-put-$ident" 2>/dev/null)" = "$ends" ] && continue
+        if xcrun devicectl device install app --device "$ident" "$RENEWED" >> "$LOGS/ios-renew.log" 2>&1; then
+            echo "$ends" > "$LOGS/ios-put-$ident"
+            say "새 서명을 기기에 넣었습니다 — 앱을 다시 여십시오."
+        else
+            echo "기기 $ident 에 넣지 못했습니다 — $LOGS/ios-renew.log" >&2
+        fi
+    done
 }
 
 # 기기 하나를 고른다. LOD_DEVICE_ID 가 있으면 그것을, 없으면 지금 붙어 있는(짝지은) 첫 기기를.
@@ -184,7 +211,7 @@ renew() {
     # **-scheme 이어야 한다.** -target 으로 부르면 xcodebuild 가 -destination 을 통째로 무시하고
     # ("Ignoring provided run destination because no scheme was passed") 기기를 등록하지 않는다.
     # 그래서 빌드는 성공하는데 프로필에는 옛 기기만 남아, 다른 기기에 넣으면 거절당했다 (2026-09-19).
-    xcodebuild -project "$project" -scheme LodClient -configuration Debug \
+    xcodebuild -project "$project" -scheme LodClient -configuration Debug -derivedDataPath "$CLIENT/build/ios/renewed" \
         -destination "$destination" -allowProvisioningUpdates build > "$LOGS/ios-renew.log" 2>&1 || {
         # 치워 둔 옛 서명을 되돌린다 — 안 그러면 남은 날이 있어도 빌드까지 막힌다(2026-10-02 아침에 그랬다).
         [ -n "$old" ] && [ -z "$(profile)" ] && cp -p "$keep/$(basename "$old")" "$PROFILES/"
@@ -313,15 +340,14 @@ watch_sign() {
     <key>WorkingDirectory</key><string>$ROOT</string>
     <key>StandardOutPath</key><string>$LOGS/com.lod.iossign.log</string>
     <key>StandardErrorPath</key><string>$LOGS/com.lod.iossign.log</string>
-    <key>StartCalendarInterval</key>
-    <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
+    <key>StartInterval</key><integer>3600</integer>
 </dict>
 </plist>
 PLIST
 
     launchctl unload "$AGENTS/com.lod.iossign.plist" 2>/dev/null || true
     launchctl load "$AGENTS/com.lod.iossign.plist"
-    echo "등록했습니다 — 날마다 오전 10시에 살펴보고, 이틀 이하로 남으면 스스로 새로 받습니다."
+    echo "등록했습니다 — 매시간 살펴보고, 이틀 이하로 남으면 스스로 새로 받아 같은 Wi-Fi 의 폰에 넣습니다."
 }
 
 unwatch_sign() {
