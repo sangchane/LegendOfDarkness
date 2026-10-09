@@ -4,7 +4,7 @@
   var snapshot = model.isValidDashboardSnapshot(window.LOD_DASHBOARD_SNAPSHOT) ? window.LOD_DASHBOARD_SNAPSHOT : null;
   var labels = {
     overview: "지금 되는 것", monsters: "괴물 도감", npcs: "NPC 도감", abilities: "기술·마법", items: "아이템 도감",
-    world: "지도·워프", changes: "원작과 달라진 것", download: "앱 내려받기", activity: "접속·활동",
+    world: "지도", changes: "원작과 달라진 것", download: "앱 내려받기", activity: "접속·활동",
   };
   // 화면이 보이게 된 순간에만 할 수 있는 일이 있다 — 숨은 요소는 크기를 잴 수 없어서
   // 워프 연결도의 선을 못 그린다. 그 화면들이 여기에 이름을 걸어 둔다.

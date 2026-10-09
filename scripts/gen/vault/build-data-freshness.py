@@ -56,6 +56,12 @@ SHEETS = [
     ("world-map-data.js", "scripts/gen/world/build-world-map-data.py", [
         f"{HADES}/areas", f"{HADES}/templates/warps"]),
     ("map-images-data.js", "scripts/gen/world/build-map-images.py", [f"{HADES}/templates/warps"]),
+    # 지도(맵을 이어 붙인 그림, 2026-10-09) — 배치·그림은 build-atlas.py, 괴물·드랍·NPC 는 게임 볼트 생성기가 같은 셈으로.
+    ("atlas-layout-data.js", "scripts/gen/world/build-atlas.py", [
+        f"{HADES}/areas", f"{HADES}/templates/warps", f"{HADES}/maps", "mobile/client/assets/world/guide.txt"]),
+    ("atlas-data.js", "scripts/gen/vault/build-game-vault.py", [
+        f"{HADES}/templates/monsters", f"{HADES}/templates/items", f"{HADES}/templates/mundanes", f"{HADES}/templates/warps",
+        "data/game-data/items-original-sheets.json", "mobile/client/assets/world/guide.txt"]),
     # 그림을 자르는 쪽이 이 파일도 함께 쓴다 — 바탕·기준점이 그림에서 나오기 때문이다.
     # 어느 번호를 자를지는 `ability-presentation.json`(게임이 실제로 쏘는 번호)이 정한다.
     ("ability-effects-data.js", "scripts/gen/ability/build-ability-sprites.py", [

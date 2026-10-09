@@ -8,6 +8,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="dashboard.css?v=20261002c">
   <link rel="stylesheet" href="activity.css">
+  <link rel="stylesheet" href="atlas.css">
 </head>
 <body class="toss-surface">
 <a class="skip-link" href="#workspace">본문으로 건너뛰기</a>
@@ -20,7 +21,7 @@
       <button type="button" class="nav-item" data-view-target="npcs"><span aria-hidden="true">⌂</span>NPC 도감</button>
       <button type="button" class="nav-item" data-view-target="abilities"><span aria-hidden="true">✧</span>기술·마법</button>
       <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템 도감</button>
-      <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도·워프</button>
+      <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도</button>
       <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
       <button type="button" class="nav-item" data-view-target="activity"><span aria-hidden="true">◷</span>접속·활동</button>
       <button type="button" class="nav-item" data-view-target="download"><span aria-hidden="true">⤓</span>앱 내려받기</button>
@@ -223,14 +224,22 @@
       </section>
 
       <section class="view" data-view="world" aria-labelledby="world-title" hidden>
-        <div class="page-heading">
-          <div>
-            <p class="eyebrow">Where you can walk</p>
-            <h1 id="world-title">지도 — 지금 걸어 다닐 수 있는 곳</h1>
-            <p>마을에서 몇 번 워프해야 닿는지로 줄을 세웠습니다. <b>마을에서 못 닿는 맵</b>과 <b>들어가면 못 나오는 길</b>을 따로 표시합니다. 없는 연결은 추측하지 않습니다.</p>
+        <section class="atlas" aria-labelledby="world-title">
+          <div class="page-heading">
+            <div>
+              <h1 id="world-title">지도 — 맵을 이어 붙인 그림</h1>
+              <p>서버 맵을 원작 타일로 다시 그리고 출구 방향대로 놓았습니다. <b>화살표</b>는 출구가 이어진 쪽, <b>노란 점</b>은 건물·다른 지역으로 가는 문입니다. 맵을 누르면 다가가 나오는 괴물 · 떨어지는 것 · NPC 를 보여 줍니다. 끌어서 옮기고 휠·두 손가락으로 확대합니다.</p>
+            </div>
           </div>
-          <a class="quiet-link" href="pote-forest.md">포테의숲 계획 →</a>
-        </div>
+          <div class="atlas-regions" role="tablist" aria-label="지역" id="atlas-regions"></div>
+          <div class="atlas-body">
+            <div class="atlas-stage" id="atlas-stage">
+              <svg id="atlas-svg" role="img" aria-label="이어 붙인 지도"></svg>
+              <p class="atlas-state" id="atlas-state" role="status">괴물·드랍 자료를 불러오는 중…</p>
+            </div>
+            <aside class="atlas-panel" id="atlas-panel" aria-live="polite"></aside>
+          </div>
+        </section>
 
         <section class="route" aria-labelledby="route-title">
           <div class="world-section-heading">
@@ -325,8 +334,10 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <!-- 자료가 먼저, 그다음 모델, 마지막이 화면. overview.js 가 다른 화면의 셈까지 한 줄로 보여 주므로
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
-<script src="world-map-data.js"></script><script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-snapshot.js"></script>
+<script src="world-map-data.js"></script><script src="atlas-layout-data.js"></script>
+<script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
-<script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="activity.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="abilities.js"></script><script src="items.js"></script>
+<script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="activity.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="abilities.js"></script><script src="atlas.js"></script>
+<script src="items.js"></script>
 </body>
 </html>

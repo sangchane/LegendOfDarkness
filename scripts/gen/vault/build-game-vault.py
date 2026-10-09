@@ -527,6 +527,99 @@ def write_circle_notes(zone_rows, zone_circles, shops, items):
             encoding="utf-8")
 
 
+ATLAS = ROOT / "docs" / "atlas-data.js"
+SLOT_NAMES = {1: "무기", 2: "갑옷", 3: "방패", 4: "투구", 5: "귀걸이", 6: "목걸이", 7: "반지", 8: "반지", 9: "장갑", 10: "팔찌",
+              11: "벨트", 12: "각반", 13: "신발"}
+
+
+def world_cards():
+    """월드맵 카드(앱 `guide.txt` area 줄 — 마을·사냥터 입구)와 그 아래 구역(zone 줄): 카드 맵 → (레벨, 갈래, 이름, [구역 맵])."""
+    cards, guide = {}, ROOT / "mobile" / "client" / "assets" / "world" / "guide.txt"
+    for line in guide.read_text(encoding="utf-8").splitlines() if guide.exists() else []:
+        part = line.split(" ", 4)
+        if part[0] == "area" and len(part) == 5:
+            cards[int(part[1])] = {"lv": int(part[2]), "kind": part[3], "name": part[4], "zones": []}
+        elif part[0] == "zone" and len(part) == 5 and int(part[1]) in cards:
+            cards[int(part[1])]["zones"].append(int(part[2]))
+    return cards
+
+
+def write_atlas(monsters, items, npcs, zone_rows, zone_circles, stocked_by):
+    """현황판 지도·도감(`docs/atlas-data.js`, autopilot/dashboard-atlas/SPEC.md) — 볼트와 같은 셈의 맵·괴물·아이템·NPC 를 한 덩이로."""
+    places = area_names()
+    plain = {name: item for name, (_, item) in items.items()}
+    rows = sheet_rows()
+    exits = defaultdict(set)
+    for path in (SERVER / "templates/warps").glob("*.json"):
+        d = lenient(path)
+        if not d or d.get("WarpType") != "Map":
+            continue
+        to = (d.get("To") or {}).get("AreaID")
+        for spot in d.get("Activations") or []:
+            if spot.get("AreaID") and to and spot["AreaID"] != to:
+                exits[spot["AreaID"]].add(to)
+
+    mons, drops_of_item = {}, defaultdict(list)
+    for m in monsters:
+        area = m["AreaID"]
+        zname = zone_rows.get(area, (zone_name(area, [m["_file"]]), []))[0]
+        key = f"{m['Name']}@{zname}"
+        exp = monster_exp(m)
+        names = dropped(m)
+        drops = []
+        for name in names:
+            found = items.get(name)
+            rate = real_rate(found[1], len(names), m.get("LootType") or 0) if found else 0
+            drops.append([name, None if rate is None else round(rate, 5)])
+            drops_of_item[name].append([key, None if rate is None else round(rate, 5)])
+        lo, hi = gold_range(exp, area)
+        mons[key] = {"name": m["Name"], "map": area, "lv": cut_level(exp, area), "exp": exp, "gold": [lo, hi],
+                     "img": m.get("Image"), "drops": drops}
+
+    people = {}
+    for npc in npcs:
+        note = npc_note(npc["Name"])
+        people[note] = {"name": note.split("@")[0], "map": npc.get("AreaID"), "at": [npc.get("X"), npc.get("Y")],
+                        "role": role(npc, plain), "about": about(npc, plain), "stock": npc.get("DefaultMerchantStock") or [],
+                        "teaches": taught(npc)}
+
+    things = {}
+    for name, (_, item) in items.items():
+        slot = item.get("EquipmentSlot") or 0
+        if not (slot or name in drops_of_item or name in stocked_by):
+            continue
+        level = item.get("LevelRequired") or 0
+        stats = {column: modifier_of(item, field) for column, field in MODIFIERS.items() if modifier_of(item, field)}
+        if item.get("DmgMax"):
+            stats["공격력"] = f"{item.get('DmgMin', 0)}~{item['DmgMax']}"
+        things[name] = {"kind": slot_kind(item), "slot": SLOT_NAMES.get(slot, "기타" if slot else ""), "lv": level,
+                        "circle": circle_of(max(1, level)) if slot else None, "value": item.get("Value", 0),
+                        "img": item.get("DisplayImage"), "sheet": spec_verdict(item, rows.get(name)) if slot else "",
+                        "stats": stats, "class": item.get("Class") or 0,
+                        "droppedBy": drops_of_item.get(name, []),
+                        "soldBy": [npc_note(shop) for shop in stocked_by.get(name, [])]}
+
+    cards = world_cards()
+    card_of = {zone: card for card, info in cards.items() for zone in info["zones"]}
+    kept = set(zone_rows) | {p["map"] for p in people.values()} | set(cards) | set(card_of)
+    kept |= {to for here in list(kept) for to in exits.get(here, ())}
+    maps = {}
+    for area in sorted(a for a in kept if a in places):
+        name = places[area] or f"맵{area}"
+        kind = "town" if "마을" in name else "field" if area in zone_rows else "room"
+        maps[area] = {"name": name, "kind": kind, "circle": zone_circles.get(area), "lv": (cards.get(area) or {}).get("lv") or ZONE_LEVELS.get(area),
+                      "card": card_of.get(area), "exits": sorted(to for to in exits.get(area, ()) if to in kept and to in places),
+                      "npcs": sorted(note for note, p in people.items() if p["map"] == area),
+                      "monsters": sorted(key for key, m in mons.items() if m["map"] == area)}
+
+    atlas = {"생성": "scripts/gen/vault/build-game-vault.py", "근거": "서버 템플릿(괴물·아이템·NPC·워프) · 앱 guide.txt(월드맵 카드·구역) · 어둠템",
+             "서클": [{"n": n, "lo": lo, "hi": hi} for n, (lo, hi) in enumerate(CIRCLES, 1)],
+             "카드": {str(k): v for k, v in sorted(cards.items())},
+             "맵": {str(k): v for k, v in maps.items()}, "괴물": mons, "아이템": things, "NPC": people}
+    ATLAS.write_text("window.LOD_ATLAS = " + json.dumps(atlas, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
+    return len(maps), len(mons), len(things), len(people)
+
+
 def write_readme(zone_rows, monster_notes, relevant):
     """볼트 README."""
     # README
@@ -573,6 +666,8 @@ def build_notes(monsters, items, mundanes):
     relevant = write_item_notes(dropped_by, stocked_by, items)
     shops = write_npc_notes(npcs, items, zone_rows)
     write_circle_notes(zone_rows, zone_circles, shops, items)
+    print("현황판 지도·도감 — 맵 {} · 괴물 {} · 아이템 {} · NPC {} -> docs/atlas-data.js".format(
+        *write_atlas(monsters, items, npcs, zone_rows, zone_circles, stocked_by)))
 
     # 4) 식 노트 — monsterexp.cs 근거 줄을 그대로 인용한다(다시 만들 때마다 최신 줄로 갱신됨)
     write_formula_note()
