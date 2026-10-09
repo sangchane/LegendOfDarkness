@@ -61,8 +61,10 @@ function page(putStatus, putBody) {
   const settle = () => new Promise((resolve) => setImmediate(resolve));
   const rename = async (index, value) => {
     await settle();
-    const card = nodes['item-grid'].children[index];
-    const input = card.children.find((child) => child.className === 'item-name');
+    // 목록 줄을 누르면 옆 판의 한글 이름 칸이 그 물건을 가리킨다 — 거기서 고친다.
+    const row = nodes['item-grid'].children[index].children[0];
+    row.listeners.click.forEach((listener) => listener());
+    const input = nodes['item-name'];
     input.value = value;
     input.listeners.change.forEach((listener) => listener());
     await settle(); await settle();

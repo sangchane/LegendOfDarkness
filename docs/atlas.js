@@ -304,12 +304,28 @@
     var pick = layout["지역"].filter(function (r) { return String(r.card) === params.get("card"); })[0] || layout["지역"].filter(function (r) { return r.name === "아벨해안대기실"; })[0] || layout["지역"][0];
     open(pick, params.get("map"));
     if (window.LOD_ATLAS) { state.hidden = true; return; }
-    var script = document.createElement("script");
-    script.src = "atlas-data.js";
-    script.onload = function () { state.hidden = true; open(region, chosen || params.get("map")); };
-    script.onerror = function () { state.textContent = "괴물·드랍 자료(atlas-data.js)를 불러오지 못했습니다 — 지도만 보입니다. 새로고침해 보세요."; };
-    document.head.appendChild(script);
+    // 아이템 도감이 먼저 불렀으면 그 줄을 같이 기다린다(1MB 를 두 번 받지 않게).
+    var script = document.querySelector('script[src="atlas-data.js"]');
+    if (!script) {
+      script = document.createElement("script");
+      script.src = "atlas-data.js";
+      document.head.appendChild(script);
+    }
+    script.addEventListener("load", function () { state.hidden = true; open(region, chosen || params.get("map")); });
+    script.addEventListener("error", function () { script.remove(); state.textContent = "괴물·드랍 자료(atlas-data.js)를 불러오지 못했습니다 — 지도만 보입니다. 새로고침해 보세요."; });
   }
+
+  // 다른 도감의 「지도에서 보기」 — 그 맵이 든 구역을 열고 맵을 고른다. 지도에 없는 맵이면 false.
+  window.LodAtlas = {
+    focus: function (id) {
+      var home = layout["지역"].filter(function (r) { return r.maps[String(id)]; })[0];
+      if (!home) { return false; }
+      if (dashboard) { dashboard.show("world"); }
+      start();
+      open(home, String(id));
+      return true;
+    }
+  };
   if (dashboard) { dashboard.onViewShown(function (view) { if (view === "world") { start(); } }); }
   var section = document.querySelector('[data-view="world"]');
   if (section && !section.hidden) { start(); }

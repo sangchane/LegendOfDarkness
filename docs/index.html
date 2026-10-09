@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="activity.css">
   <link rel="stylesheet" href="atlas.css">
   <link rel="stylesheet" href="abilities.css">
+  <link rel="stylesheet" href="codex.css">
 </head>
 <body class="toss-surface">
 <a class="skip-link" href="#workspace">본문으로 건너뛰기</a>
@@ -75,38 +76,33 @@
       </section>
 
       <section class="view" data-view="monsters" aria-labelledby="monsters-title" hidden>
-        <div class="item-topbar">
-          <h1 id="monsters-title">괴물 도감</h1>
-          <dl class="item-tally">
-            <dt>종류</dt><dd id="monster-kinds">—</dd>
-            <dt>자리</dt><dd id="monster-slots">—</dd>
-            <dt>그림 있음</dt><dd id="monster-sprites">—</dd>
-            <dt>지금</dt><dd id="monster-shown">—</dd>
-          </dl>
-          <p>지금 걸어 다닐 수 있는 지역에 실제로 서 있는 괴물만 있습니다</p>
-          <a class="quiet-link" href="monster-behaviour.md">움직임·선공 근거 →</a>
-        </div>
+        <div class="cdx">
+          <div class="cdx-head">
+            <h1 id="monsters-title">괴물 도감</h1>
+            <p>종류 <b id="monster-kinds">—</b> · 자리 <b id="monster-slots">—</b> · 그림 <b id="monster-sprites">—</b> · 지금 <b id="monster-shown">—</b> — 지금 걸어 다닐 수 있는 지역에 서 있는 괴물</p>
+            <a class="quiet-link" href="monster-behaviour.md">움직임·선공 근거 →</a>
+          </div>
 
-        <div class="filterbar item-filterbar">
-          <label class="visually-hidden" for="monster-search">괴물 검색</label>
-          <input id="monster-search" type="search" placeholder="괴물·맵·떨구는 물건 이름으로 찾기" autocomplete="off">
-          <div class="item-filter-row" role="group" aria-label="보기"><span>보기</span><div class="item-chips" id="monster-views"></div></div>
-          <div class="item-filter-row" role="group" aria-label="지역"><span>지역</span><div class="item-chips" id="monster-regions"></div></div>
-          <div class="item-filter-row" role="group" aria-label="맵"><span>맵</span><div class="item-chips" id="monster-maps"></div></div>
-          <div class="item-filter-row" role="group" aria-label="정렬"><span>정렬</span><div class="item-chips" id="monster-sorts"></div></div>
-          <div class="item-filter-row monster-level-row">
-            <label for="monster-level">내 레벨</label>
-            <input id="monster-level" type="range" min="1" max="99" value="1" aria-describedby="monster-level-note">
-            <output id="monster-level-out" for="monster-level">1</output>
-            <small id="monster-level-note">레벨이 높으면 경험치가 깎입니다 — 그 규칙은 <b>우리가 정한 값</b>입니다</small>
+          <div class="cdx-tools">
+            <label class="cdx-search" for="monster-search"><span class="visually-hidden">괴물 검색</span><input id="monster-search" type="search" placeholder="괴물·맵·떨구는 물건" autocomplete="off"></label>
+            <div class="cdx-chips" id="monster-regions" role="group" aria-label="지역"></div>
+            <div class="cdx-chips" id="monster-sorts" role="group" aria-label="정렬"></div>
+            <div class="cdx-level monster-level-row">
+              <label for="monster-level">내 레벨</label>
+              <input id="monster-level" type="range" min="1" max="99" value="1" aria-describedby="monster-level-note">
+              <output id="monster-level-out" for="monster-level">1</output>
+              <small id="monster-level-note">높으면 경험치가 깎임 — <b>우리가 정한 규칙</b></small>
+            </div>
+          </div>
+
+          <div class="cdx-body">
+            <nav class="cdx-list" aria-label="괴물 목록">
+              <ul id="monster-grid"></ul>
+              <p class="empty-state" id="monster-empty" hidden>조건에 맞는 괴물이 없어요. 거르기를 지워 보세요.</p>
+            </nav>
+            <article class="cdx-detail" id="monster-detail" aria-label="괴물 상세"></article>
           </div>
         </div>
-
-        <div class="monster-grid" id="monster-grid"></div>
-        <div class="drop-table" id="monster-droptable" hidden></div>
-        <p class="empty-state" id="monster-empty" hidden>조건에 맞는 괴물이 없어요. 필터를 지워 보세요.</p>
-        <div class="item-hover" id="monster-hover" hidden aria-hidden="true"></div>
-
       </section>
 
       <section class="view" data-view="npcs" aria-labelledby="npcs-title" hidden>
@@ -211,41 +207,46 @@
       </section>
 
       <section class="view" data-view="items" aria-labelledby="items-title" hidden>
-        <div class="item-topbar">
-          <h1 id="items-title">아이템 도감</h1>
-          <dl class="item-tally">
-            <dt>전체</dt><dd id="item-total">—</dd>
-            <dt>한글</dt><dd id="item-named">—</dd>
-            <dt>남은 것</dt><dd id="item-unnamed">—</dd>
-            <dt>지금</dt><dd id="item-shown">—</dd>
-          </dl>
-          <p id="item-page-info">—</p>
-          <a class="quiet-link" href="../data/pack-compare/한글이름-검토.tsv">검토표 →</a>
+        <div class="cdx">
+          <div class="cdx-head">
+            <h1 id="items-title">아이템 도감</h1>
+            <p>전체 <b id="item-total">—</b> · 한글 <b id="item-named">—</b> · 남은 것 <b id="item-unnamed">—</b> · 지금 <b id="item-shown">—</b></p>
+            <a class="quiet-link" href="../data/pack-compare/한글이름-검토.tsv">검토표 →</a>
+          </div>
+
+          <div class="cdx-tools">
+            <label class="cdx-search" for="item-search"><span class="visually-hidden">아이템 검색</span><input id="item-search" type="search" placeholder="이름 — 한글·영문" autocomplete="off"></label>
+            <div class="cdx-chips" id="item-slots" role="group" aria-label="슬롯"></div>
+            <div class="cdx-chips" id="item-classes" role="group" aria-label="직업"></div>
+            <div class="cdx-chips" id="item-circles" role="group" aria-label="서클"></div>
+            <div class="cdx-chips" role="group" aria-label="보기">
+              <button type="button" class="chip" id="item-only-unnamed" aria-pressed="false">한글 없는 것만</button>
+              <button type="button" class="chip" id="item-export">표로 내보내기</button>
+            </div>
+          </div>
+          <div id="item-export-box" hidden></div>
+
+          <div class="cdx-body">
+            <nav class="cdx-list" aria-label="아이템 목록">
+              <ul id="item-grid"></ul>
+              <p class="empty-state" id="item-empty" hidden>조건에 맞는 아이템이 없어요. 거르기를 지워 보세요.</p>
+            </nav>
+            <article class="cdx-detail" id="item-detail" aria-labelledby="item-title">
+              <button type="button" class="cdx-back" id="item-back">← 목록</button>
+              <div class="cdx-hero">
+                <i class="item-icon is-big" id="item-big-icon" aria-hidden="true"></i>
+                <div><h2 id="item-title">—</h2><p id="item-sub"></p><div class="cdx-tags" id="item-tags"></div></div>
+              </div>
+              <label class="cdx-name" for="item-name"><span>한글 이름</span><input id="item-name" class="item-name" type="text" placeholder="한글 이름" autocomplete="off"></label>
+              <p class="cdx-verdict" id="item-verdict"></p>
+              <dl class="cdx-facts" id="item-facts"></dl>
+              <h3>떨구는 괴물 <small id="item-drop-count"></small></h3>
+              <ul class="cdx-links" id="item-droppers"></ul>
+              <h3>파는 곳 <small id="item-sell-count"></small></h3>
+              <ul class="cdx-links" id="item-sellers"></ul>
+            </article>
+          </div>
         </div>
-
-        <div class="filterbar item-filterbar">
-          <label class="visually-hidden" for="item-search">아이템 검색</label>
-          <input id="item-search" type="search" placeholder="이름으로 찾기 — 한글·영문 모두" autocomplete="off">
-          <div class="item-filter-row" role="group" aria-label="슬롯"><span>슬롯</span><div class="item-chips" id="item-slots"></div></div>
-          <div class="item-filter-row" role="group" aria-label="직업"><span>직업</span><div class="item-chips" id="item-classes"></div></div>
-          <div class="item-filter-row"><span>보기</span><div class="item-chips">
-            <button type="button" class="chip" id="item-only-unnamed" aria-pressed="false">한글 없는 것만</button>
-            <button type="button" class="chip" id="item-export">표로 내보내기</button>
-          </div></div>
-        </div>
-
-        <div id="item-export-box" hidden></div>
-
-        <div class="item-grid" id="item-grid"></div>
-        <p class="empty-state" id="item-empty" hidden>조건에 맞는 아이템이 없어요. 필터를 지워 보세요.</p>
-
-        <nav class="item-pager" id="item-pager" aria-label="쪽 이동" hidden>
-          <button type="button" class="chip" data-page-step="-1">← 이전</button>
-          <span id="item-pager-label">—</span>
-          <button type="button" class="chip" data-page-step="1">다음 →</button>
-        </nav>
-
-        <div class="item-hover" id="item-hover" hidden aria-hidden="true"></div>
       </section>
 
       <section class="view" data-view="world" aria-labelledby="world-title" hidden>

@@ -1,0 +1,106 @@
+/* 아이템·괴물 도감(items.js · monsters.js) — 지도·기술과 같은 문법: 위 거르기 → 왼쪽 목록 | 오른쪽 상세. 현황판 토큰(dashboard.css :root)을 쓴다. */
+:root { --cdx-plate: radial-gradient(ellipse at 50% 80%, #2b3344 0%, #171c27 60%, #10141b 100%); }
+.cdx { display: grid; gap: 12px; margin-bottom: 32px; }
+.cdx > * { min-width: 0; }
+.cdx-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.cdx-head h1 { margin: 0; font-size: 24px; }
+.cdx-head p { flex: 1; min-width: 240px; margin: 0; color: var(--muted-strong); font-size: 14px; }
+.cdx-head p b { color: var(--text); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.cdx-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cdx-search input { width: 240px; min-height: 44px; padding: 0 12px; border: 1px solid var(--edge); border-radius: var(--radius-control); background: var(--panel); color: var(--text); font: inherit; font-size: 14px; }
+.cdx-chips { display: flex; gap: 6px; min-width: 0; overflow-x: auto; scrollbar-width: thin; max-width: 100%; }
+.cdx-chips .chip { flex: none; }
+.cdx-level { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--edge); border-radius: var(--radius-control); background: var(--panel); font-size: 13px; }
+.cdx-level input { width: 160px; accent-color: var(--brand); }
+.cdx-level output { min-width: 2ch; font: 700 14px var(--mono); }
+.cdx-level small { color: var(--muted); font-size: 11px; }
+.cdx button:focus-visible, .cdx input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.cdx-body { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 12px; height: calc(100dvh - 230px); min-height: 560px; }
+.cdx-body > * { min-width: 0; min-height: 0; }
+.cdx-list { overflow: auto; padding: 8px; border: 1px solid var(--edge); border-radius: var(--radius-card); background: var(--panel); }
+.cdx-list ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.cdx-list li { content-visibility: auto; contain-intrinsic-size: auto 52px; }
+.cdx-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 4px 8px; border: 0; border-radius: 12px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.cdx-row:hover { background: var(--raised); }
+.cdx-row[aria-current="true"] { background: var(--brand-weak); box-shadow: inset 3px 0 var(--brand); }
+.cdx-row .item-icon { grid-row: auto; align-self: center; justify-self: center; }
+.cdx-row-copy { display: grid; min-width: 0; }
+.cdx-row-copy b, .cdx-row-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cdx-row-copy b { font-size: 14px; }
+.cdx-row-copy small { color: var(--muted); font-size: 12px; }
+.cdx-row em { color: var(--muted-strong); font: 600 12px var(--mono); font-style: normal; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cdx-row em.is-warn { color: var(--warning); }
+.cdx-thumb { display: block; justify-self: center; background-repeat: no-repeat; image-rendering: pixelated; }
+
+/* 상세 판 */
+.cdx-detail { overflow: auto; padding: 14px 16px 20px; border: 1px solid var(--edge); border-radius: var(--radius-card); background: var(--panel); }
+.cdx-back { display: none; min-height: 40px; margin-bottom: 10px; padding: 0 14px; border: 1px solid var(--edge); border-radius: var(--radius-control); background: var(--raised); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.cdx-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 16px; padding: 14px 16px; border-radius: 16px; background: var(--cdx-plate); color: var(--white); }
+.cdx-hero h2 { margin: 0; font-size: 22px; }
+.cdx-hero p { margin: 2px 0 0; color: var(--white-muted); font-size: 13px; }
+.cdx-hero .item-icon.is-big { width: 74px; height: 74px; background-color: transparent; }
+.cdx-stage { position: relative; display: grid; place-items: center; min-width: 120px; min-height: 120px; }
+.cdx-stage .monster-art { transform: scale(2) var(--flip); margin: 0 var(--w) var(--h) 0; }
+.cdx-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.cdx-tag { display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: var(--radius-pill); background: var(--white-faint); color: var(--white); font-size: 12px; }
+.cdx-tag.is-risk { background: var(--red-soft); color: var(--red); }
+.cdx-tag.is-calm { background: var(--green-soft); color: var(--green); }
+.cdx-tag.is-gold { background: var(--warning-soft); color: var(--warning); }
+.cdx-hero-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.cdx-hero-actions button { min-height: 36px; padding: 0 12px; border: 1px solid var(--white-edge); border-radius: var(--radius-control); background: var(--white-faint); color: var(--white); font: inherit; font-size: 13px; cursor: pointer; }
+.cdx-verdict { margin: 12px 0 0; padding: 10px 12px; border: 1px solid var(--edge); border-radius: var(--radius-control); background: var(--raised); font-size: 14px; line-height: 1.55; }
+.cdx-verdict:empty { display: none; }
+.cdx-verdict strong { color: var(--brand-text); }
+.cdx-verdict .is-warn { color: var(--warning); font-weight: 700; }
+.cdx-detail h3 { margin: 18px 0 6px; font-size: 14px; }
+.cdx-detail h3 small { margin-left: 8px; color: var(--muted); font-size: 12px; font-weight: 500; }
+.cdx-detail .monster-stats { margin-top: 12px; border-radius: var(--radius-control); overflow: hidden; }
+.cdx-name { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.cdx-name input { min-height: 40px; padding: 0 12px; border: 1px solid var(--edge); border-radius: var(--radius-control); background: var(--raised); color: var(--text); font: inherit; font-size: 14px; }
+.cdx-name input[readonly] { color: var(--muted-strong); }
+.cdx-facts { display: flex; flex-wrap: wrap; gap: 1px; margin: 12px 0 0; overflow: hidden; border: 1px solid var(--edge); border-radius: var(--radius-control); background: var(--edge); }
+.cdx-facts div { flex: 1 1 150px; padding: 8px 10px; background: var(--raised); min-width: 0; }
+.cdx-facts dt { color: var(--muted); font-size: 11px; }
+.cdx-facts dd { margin: 2px 0 0; font: 600 14px var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.cdx-empty { margin: 0; color: var(--muted); font-size: 13px; }
+.cdx-source { display: block; margin-top: 14px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+
+/* 떨구는 것·떨구는 괴물·파는 곳 — 누르면 그쪽 도감(지도)으로 */
+.cdx-links { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.cdx-link { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 4px 8px; border: 1px solid var(--edge); border-radius: 12px; background: var(--raised); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.cdx-link:hover { border-color: var(--brand-edge); background: var(--brand-weak); }
+.cdx-link:disabled { cursor: default; }
+.cdx-link:disabled:hover { border-color: var(--edge); background: var(--raised); }
+.cdx-link .item-icon { grid-row: auto; justify-self: center; }
+.cdx-link-copy { display: grid; min-width: 0; }
+.cdx-link-copy b, .cdx-link-copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cdx-link-copy b { font-size: 14px; }
+.cdx-link-copy small { color: var(--muted); font-size: 12px; }
+.cdx-odds { display: grid; justify-items: end; gap: 3px; min-width: 76px; }
+.cdx-odds b { font: 700 13px var(--mono); font-variant-numeric: tabular-nums; }
+.cdx-odds i { display: block; width: 72px; height: 6px; border-radius: 3px; background: var(--edge); overflow: hidden; }
+.cdx-odds i::before { content: ""; display: block; width: var(--fill); height: 100%; background: var(--brand); }
+.cdx-variants { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 6px 54px; padding: 0; list-style: none; }
+.cdx-variants button { min-height: 28px; padding: 0 8px; border: 1px solid var(--edge); border-radius: var(--radius-pill); background: var(--panel); color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; }
+.cdx-variants button small { margin-left: 4px; color: var(--muted); font-family: var(--mono); }
+.cdx-variants button.is-missing { color: var(--muted); text-decoration: line-through; }
+.cdx-more { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+.cdx-places { display: flex; flex-wrap: wrap; gap: 6px; }
+
+@media (max-width: 1180px) { .cdx-body { grid-template-columns: 260px minmax(0, 1fr); } }
+/* 폰·좁은 창 — 목록만 보이고, 누르면 상세가 한 장(전체 화면)으로 열린다. */
+@media (max-width: 960px) {
+  .cdx-search, .cdx-chips { flex: 1 1 100%; }
+  .cdx-search input { width: 100%; }
+  .cdx-level { flex: 1 1 100%; }
+  .cdx-level input { flex: 1; width: auto; }
+  .cdx-body { grid-template-columns: 1fr; height: auto; min-height: 0; }
+  .cdx-list { overflow: visible; }
+  .cdx-detail { display: none; }
+  .cdx-detail.is-open { position: fixed; z-index: 90; inset: 0; display: block; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; border: 0; border-radius: 0; background: var(--bg); padding: 10px 12px 24px; }
+  .cdx-back { display: inline-flex; align-items: center; }
+  .codex-open { overflow: hidden; }
+}
+@media (prefers-reduced-motion: reduce) { .cdx .monster-art.is-animated { animation: none; } }
