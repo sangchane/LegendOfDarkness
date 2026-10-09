@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="dashboard.css?v=20261002c">
   <link rel="stylesheet" href="activity.css">
   <link rel="stylesheet" href="atlas.css">
+  <link rel="stylesheet" href="abilities.css">
 </head>
 <body class="toss-surface">
 <a class="skip-link" href="#workspace">본문으로 건너뛰기</a>
@@ -137,52 +138,76 @@
       </section>
 
       <section class="view" data-view="abilities" aria-labelledby="abilities-title" hidden>
-        <div class="ability-ops-head">
-          <div><p class="eyebrow">Live presentation</p><h1 id="abilities-title">기술·마법 연출 운영</h1><p>현재 서버 템플릿을 보고, 원작과 다른 이펙트·속도·사운드를 바로 고칩니다.</p></div>
-          <span class="ability-api-state is-loading" id="ability-api-state" role="status">운영 서버 확인 중</span>
-        </div>
+        <div class="abx">
+          <div class="abx-head">
+            <h1 id="abilities-title">기술·마법</h1>
+            <p>누가 쓰고 → 누구에게 → 어떤 그림이 어디에 → 어떤 소리. 고르면 무대에서 바로 다시 봅니다.</p>
+            <span class="ability-api-state is-loading" id="ability-api-state" role="status">운영 서버 확인 중</span>
+          </div>
 
-        <div class="ability-kind-tabs" id="ability-kind-tabs" role="tablist" aria-label="기술 또는 마법">
-          <button type="button" role="tab" data-ability-kind="기술" aria-selected="true">기술 <b id="ability-skill-count">—</b></button>
-          <button type="button" role="tab" data-ability-kind="마법" aria-selected="false">마법 <b id="ability-spell-count">—</b></button>
-        </div>
+          <div class="abx-tools">
+            <div class="ability-kind-tabs" id="ability-kind-tabs" role="tablist" aria-label="기술 또는 마법">
+              <button type="button" role="tab" data-ability-kind="기술" aria-selected="true">기술 <b id="ability-skill-count">—</b></button>
+              <button type="button" role="tab" data-ability-kind="마법" aria-selected="false">마법 <b id="ability-spell-count">—</b></button>
+            </div>
+            <label class="abx-search" for="ability-search"><span class="sr-only">이름 검색</span><input id="ability-search" type="search" placeholder="이름 — 쿠로, 단각…" autocomplete="off"></label>
+            <div class="abx-chips" id="ability-classes" role="group" aria-label="직업"></div>
+            <div class="abx-chips" id="ability-views" role="group" aria-label="보기">
+              <button type="button" class="abx-chip is-active" data-ability-view="구현" aria-pressed="true">게임에 있는 것 <b id="ability-done-count">—</b></button>
+              <button type="button" class="abx-chip" data-ability-view="미구현" aria-pressed="false">아직 없는 것 <b id="ability-todo-count">—</b></button>
+              <button type="button" class="abx-chip" data-ability-view="노바와다름" aria-pressed="false">노바 표와 다름 <b id="ability-nova-count">—</b></button>
+              <button type="button" class="abx-chip" data-ability-view="운영수정" aria-pressed="false">바꾼 것 <b id="ability-changed-count">0</b></button>
+            </div>
+          </div>
 
-        <div class="ability-ops-tools">
-          <label class="ability-search" for="ability-search"><span>이름 검색</span><input id="ability-search" type="search" placeholder="단각, 쿠로토…" autocomplete="off"></label>
-          <div class="ability-class-filter" id="ability-classes" role="group" aria-label="직업"></div>
-          <div class="ability-class-filter" id="ability-views" role="group" aria-label="보기">
-            <button type="button" class="chip is-active" data-ability-view="구현" aria-pressed="true">구현 <b id="ability-done-count">—</b></button>
-            <button type="button" class="chip" data-ability-view="미구현" aria-pressed="false">미구현 <b id="ability-todo-count">—</b></button>
-            <button type="button" class="chip" data-ability-view="노바와다름" aria-pressed="false">노바 표와 다름 <b id="ability-nova-count">—</b></button>
-            <button type="button" class="chip" data-ability-view="운영수정" aria-pressed="false">최근 바꾼 것 <b id="ability-changed-count">0</b></button>
+          <div class="abx-body">
+            <nav class="abx-list" aria-label="기술·마법 목록">
+              <p class="abx-count"><b id="ability-shown">—</b>개 <span id="ability-override-count"></span></p>
+              <ul id="ability-grid"></ul>
+              <p class="empty-state" id="ability-empty" hidden>조건에 맞는 기술이 없어요. 거르기를 지워 보세요.</p>
+            </nav>
+
+            <div class="abx-detail" id="ability-sheet">
+              <section class="abx-show" aria-label="연출 무대">
+                <button type="button" class="abx-back" id="ability-editor-close">← 목록</button>
+                <ol class="abx-flow" id="ability-flow" aria-label="쓰는 사람에서 소리까지"></ol>
+                <div class="abx-stage" id="ability-stage"><div class="abx-world" id="ability-world"></div></div>
+                <div class="abx-timeline" id="ability-timeline" aria-label="시간 순서"></div>
+                <div class="abx-play">
+                  <button type="button" id="ability-replay">▶ 다시 보기</button>
+                  <button type="button" id="ability-slow" aria-pressed="false">느리게 보기</button>
+                  <button type="button" id="ability-sound-preview" aria-pressed="true">소리 켜짐</button>
+                </div>
+              </section>
+
+              <aside class="ability-editor" id="ability-editor" aria-labelledby="ability-editor-title">
+                <header><span id="ability-editor-kind">기술</span><h2 id="ability-editor-title">—</h2><p id="ability-editor-meta">—</p></header>
+                <section class="abx-compare" id="ability-compare" aria-label="원래와 지금"></section>
+
+                <section class="abx-control" aria-labelledby="ability-effect-head">
+                  <h3 id="ability-effect-head">그림 <small id="ability-effect-output"></small></h3>
+                  <p class="abx-lock" id="ability-effect-lock" hidden>이 기술은 그림을 보내지 않아 고칠 수 없습니다.</p>
+                  <div class="abx-chips abx-filter" id="ability-effect-filter" role="group" aria-label="그림 거르기"></div>
+                  <div class="abx-effects" id="ability-effect-list"></div>
+                </section>
+
+                <section class="abx-control" aria-labelledby="ability-speed-head">
+                  <h3 id="ability-speed-head">빠르기 <small id="ability-speed-output"></small></h3>
+                  <div class="abx-speed"><span>빠르게</span><input id="ability-speed" type="range" min="1" max="255" value="100" aria-label="빠르기 — 왼쪽이 빠름"><span>느리게</span></div>
+                </section>
+
+                <section class="abx-control" aria-labelledby="ability-sound-head">
+                  <h3 id="ability-sound-head">소리 <small id="ability-sound-output"></small></h3>
+                  <p class="abx-lock" id="ability-sound-lock" hidden>이 기술은 소리를 보내지 않아 고칠 수 없습니다.</p>
+                  <div class="abx-chips abx-filter" id="ability-sound-filter" role="group" aria-label="소리 거르기"></div>
+                  <ul class="abx-sounds" id="ability-sound-list"></ul>
+                </section>
+
+                <footer><button type="button" class="ability-reset" id="ability-reset">원래 값으로</button><button type="button" class="ability-apply" id="ability-apply">운영에 반영</button></footer>
+              </aside>
+            </div>
           </div>
         </div>
-
-        <div class="ability-ops-summary"><strong id="ability-shown">—</strong><span>개 표시</span><span id="ability-override-count">운영 수정 0개</span></div>
-        <div class="ability-ops-list" id="ability-grid"></div>
-        <p class="empty-state" id="ability-empty" hidden>조건에 맞는 기술이 없어요. 필터를 지워 보세요.</p>
-
-        <nav class="item-pager" id="ability-pager" aria-label="쪽 이동" hidden>
-          <button type="button" class="chip" data-ability-page="-1">← 이전</button>
-          <span id="ability-pager-label">—</span>
-          <button type="button" class="chip" data-ability-page="1">다음 →</button>
-        </nav>
-
-        <div class="ability-editor-scrim" id="ability-editor-scrim" hidden></div>
-        <aside class="ability-editor" id="ability-editor" aria-labelledby="ability-editor-title" hidden>
-          <header><div><span id="ability-editor-kind">기술</span><h2 id="ability-editor-title">—</h2><p id="ability-editor-meta">—</p></div><button type="button" class="ability-editor-close" id="ability-editor-close" aria-label="편집 닫기">×</button></header>
-          <div class="ability-editor-scroll">
-            <section class="ability-compare" id="ability-compare" aria-label="원래 값과 비교"></section>
-            <section class="ability-live-preview" aria-label="고른 연출 미리보기"><div id="ability-effect-preview"></div><button type="button" id="ability-sound-preview">▶ 고른 소리 듣기</button></section>
-
-            <section class="ability-control"><div class="ability-control-head"><div><h3>이펙트</h3><p>그림을 누르면 바로 미리 봅니다.</p></div><output id="ability-effect-output">기본값</output></div><label class="ability-number"><span>번호</span><input id="ability-effect-number" type="number" min="1" max="999" inputmode="numeric"></label><div class="ability-media-grid effect-grid" id="ability-effect-list"></div></section>
-
-            <section class="ability-control"><div class="ability-control-head"><div><h3>속도</h3><p>작을수록 빠르게 재생됩니다.</p></div><output id="ability-speed-output">100</output></div><input id="ability-speed" type="range" min="1" max="255" value="100"></section>
-
-            <section class="ability-control"><div class="ability-control-head"><div><h3>사운드</h3><p>번호를 누르면 바로 재생합니다.</p></div><output id="ability-sound-output">기본값</output></div><label class="ability-number"><span>번호</span><input id="ability-sound-number" type="number" min="0" max="255" inputmode="numeric"></label><div class="ability-media-grid sound-grid" id="ability-sound-list"></div></section>
-          </div>
-          <footer><button type="button" class="ability-reset" id="ability-reset">원래 값으로</button><button type="button" class="ability-apply" id="ability-apply">운영에 반영</button></footer>
-        </aside>
       </section>
 
       <section class="view" data-view="items" aria-labelledby="items-title" hidden>
@@ -333,7 +358,7 @@
 <!-- 자료가 먼저, 그다음 모델, 마지막이 화면. overview.js 가 다른 화면의 셈까지 한 줄로 보여 주므로
      자료 파일은 하나도 빠짐없이 그 앞에 와야 한다. -->
 <script src="world-map-data.js"></script><script src="atlas-layout-data.js"></script>
-<script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-snapshot.js"></script>
+<script src="map-images-data.js"></script><script src="abilities-data.js"></script><script src="ability-operations-data.js"></script><script src="ability-media-catalog.js"></script><script src="body-motions-data.js"></script><script src="items-data.js"></script><script src="monsters-data.js"></script><script src="npcs-data.js"></script><script src="region-warps-data.js"></script><script src="feature-map-data.js"></script><script src="changes-data.js"></script><script src="dashboard-snapshot.js"></script>
 <script src="dashboard-model.js"></script><script src="world-map-model.js"></script>
 <script src="session.js"></script><script src="download.js"></script><script src="dashboard.js"></script><script src="activity.js"></script><script src="overview.js"></script><script src="monsters.js"></script><script src="npcs.js"></script><script src="region-warps.js"></script><script src="changes.js"></script><script src="route.js"></script><script src="map-focus.js"></script><script src="abilities.js"></script><script src="atlas.js"></script>
 <script src="items.js"></script>

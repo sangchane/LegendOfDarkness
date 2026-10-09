@@ -113,3 +113,68 @@ def sent_by(bodies, template):
         add("이펙트", template.get("Animation") or 0)
     add("소리", template.get("Sound") or 0)
     return out
+
+
+ANY_CALL = re.compile(r'Call\("([a-z_]+)"')
+#: 아군에게 거는 명령 — 체력을 채우거나 파티에 걸거나 잠·독을 푼다. 괴물을 재는 명령이 같이 있으면 적에게 거는 것이다.
+ALLY_CALLS = {"set_vita", "group_hill", "hprecovery", "god_bless", "mobnar_end", "mobsor_end",
+              "group_mobsor_end", "group_mobnar_end"}
+FOE_CALLS = {"get_mobdie", "damaged"}
+
+
+def effect_sides(bodies, template):
+    """그림이 **누구 위에** 뜨나 — 화면이 쓴 사람·맞는 쪽 위에 그림을 따로 그리게.
+
+    5.99 `effect @대상, 쓴쪽그림, 대상그림, 속도`(Pack599.cs 「case "effect"」) — `@get_myid` 면 대상이 쓴 사람
+    자신이라 두 그림이 다 쓴 사람 위다. 하데스 `SendAnimation(그림, 맞는쪽, 쓴쪽)` 과 템플릿 `TargetAnimation` 은 맞는 쪽.
+    """
+    caster, target, aims, calls = [], [], set(), set()
+
+    def add(where, number):
+        if number and number > 0 and number not in where:
+            where.append(number)
+
+    for body in bodies:
+        calls.update(ANY_CALL.findall(body))
+        for command, raw in PACK_CALL.findall(body):
+            args = split_args(raw)
+            if command == "effect" and args:
+                aim = args[0].strip()
+                own = "myid" in aim
+                aims.add("self" if own else "many" if aim.startswith("v_mob") else "one")
+                if len(args) > 1:
+                    add(caster, literal(args[1]))
+                if len(args) > 2:
+                    add(caster if own else target, literal(args[2]))
+            elif command in PARTY_PICTURE:
+                aims.add("party")
+                at = PARTY_PICTURE[command]
+                if at < len(args):
+                    add(target, literal(args[at]))
+            elif command == "hprecovery":
+                aims.add("party")
+                add(target, REGEN_PICTURE)
+        for number in SEND_ANIMATION.findall(body):
+            aims.add("one")
+            add(target, int(number, 0))
+    for number in (template.get("TargetAnimation"),
+                   template.get("Animation") if template.get("갈래") == "spells" else None):
+        if number:
+            aims.add("one")
+            add(target, number)
+
+    skill = template.get("갈래") == "skills"
+    foe = bool(calls & FOE_CALLS)
+    ally = bool(calls & ALLY_CALLS) and not foe
+    if "party" in aims:
+        who = "파티 모두"
+    elif "many" in aims:
+        who = "주변 적 여럿"
+    elif "one" in aims:
+        # 적·아군을 가르는 명령이 없으면(벨라르모·리베라토 …) 짐작하지 않는다.
+        who = "앞의 적" if skill else "고른 아군" if ally else "고른 적" if foe else "고른 대상"
+    elif "self" in aims or template.get("TargetType") == 5:
+        who = "자기 자신"
+    else:
+        who = "앞의 적" if skill else "고른 대상"
+    return {"대상": who, "쓴쪽": caster, "맞는쪽": target}

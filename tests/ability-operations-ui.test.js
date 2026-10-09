@@ -49,7 +49,7 @@ test('effect and sound catalogs only advertise files that can be served', () => 
 
 test('mobile operations UI is one-level and exposes explicit connection states', () => {
   const html = read('docs/index.html');
-  const css = read('docs/dashboard.css');
+  const css = read('docs/abilities.css');
   const script = read('docs/abilities.js');
 
   assert.match(html, /id="ability-kind-tabs"/);
@@ -60,8 +60,31 @@ test('mobile operations UI is one-level and exposes explicit connection states',
   assert.match(script, /ability-operations-data/);
   assert.match(script, /\/api\/ability-overrides/);
   assert.match(script, /읽기 전용|저장 충돌|운영에 반영/);
-  assert.match(css, /\.ability-kind-tabs[^}]*min-height:44px/s);
-  assert.match(css, /\.ability-apply[^}]*min-height:52px/s);
-  assert.match(css, /\.ability-editor[^}]*100dvh/s);
+  assert.match(html, /href="abilities\.css"/);
+  assert.match(css, /\.ability-kind-tabs button \{[^}]*min-height: 44px/);
+  assert.match(css, /\.ability-apply \{[^}]*min-height: 52px/);
+  // 폰에서는 목록을 누르면 무대와 편집이 한 장(전체 화면)으로 열린다.
+  assert.match(css, /\.abx-detail\.is-open \{[^}]*height: 100dvh/);
   assert.doesNotMatch(html, /data-ability-step=/);
+});
+
+test('every ability says whom it hits and on which side its picture lands', () => {
+  const data = browserGlobal('docs/ability-operations-data.js', 'LOD_ABILITY_OPERATIONS');
+  const media = browserGlobal('docs/ability-media-catalog.js', 'LOD_ABILITY_MEDIA');
+  const aims = new Set(['자기 자신', '앞의 적', '주변 적 여럿', '고른 적', '고른 아군', '파티 모두', '고른 대상']);
+  for (const row of data.목록) {
+    assert.ok(aims.has(row.자리.대상), `${row.운영키} 대상 ${row.자리.대상}`);
+    // 자리마다 나눈 그림은 게임이 실제로 보내는 그림 안에 있어야 한다.
+    for (const n of [...row.자리.쓴쪽, ...row.자리.맞는쪽]) {
+      assert.ok(row.게임.이펙트.includes(n), `${row.운영키} 의 ${n} 이 보내는 그림에 없다`);
+    }
+  }
+  const at = Object.fromEntries(data.목록.map((row) => [row.운영키, row.자리]));
+  assert.equal(at['skill:Assail'].대상, '앞의 적');
+  assert.equal(at['spell:쿠로'].대상, '고른 아군');
+  assert.equal(at['spell:라그나로크'].대상, '주변 적 여럿');
+  // `effect @get_myid, 쓴쪽, 대상` — 대상이 자기라 두 그림 모두 쓴 사람 위다.
+  assert.equal(at['skill:피닉스모드'].대상, '자기 자신');
+  assert.equal(at['skill:피닉스모드'].맞는쪽.length, 0);
+  for (const effect of media.이펙트) { assert.match(effect.색, /^[가-힣]+$/, `그림 ${effect.번호} 의 빛깔 이름`); }
 });

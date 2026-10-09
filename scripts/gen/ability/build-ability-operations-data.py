@@ -11,7 +11,7 @@ import shutil
 import sys as _sys, pathlib as _pathlib  # scripts/ 를 찾게 — lib/·graphify_runtime 이 거기 있다
 _sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[2]))
 from lib._paths import ROOT
-from lib._ability_page import scripted, sent_by
+from lib._ability_page import scripted, sent_by, effect_sides
 SERVER = ROOT / "sources/wren11/Dark-Ages-Private-Server"
 TEMPLATES = SERVER / "database/server/templates"
 CLIENT_EFFECTS = ROOT / "mobile/client/assets/effect"
@@ -126,6 +126,7 @@ def build_abilities():
                 "그룹": template.get("Group") or "",
                 "구현": (kind, name) in in_game,
                 "게임": sent,
+                "자리": effect_sides(bodies, shaped),
                 "기본": default,
                 "노바": reference,
                 "노바와다름": bool(reference) and any(
@@ -153,6 +154,32 @@ def build_abilities():
     }
 
 
+#: 빛깔 이름 — 색상환 각도(도) 위쪽 끝까지. 번호 대신 「노란 빛」처럼 부르려고 그림에서 잰다(사용자 2026-09-30).
+HUES = ((15, "붉은"), (40, "주황"), (70, "노란"), (160, "초록"), (200, "하늘"), (250, "파란"), (290, "보라"),
+        (345, "분홍"), (360, "붉은"))
+
+
+def tint(path):
+    """그림에서 가장 많이 보이는 빛깔 한 낱말. 거의 무채색이면 「흰」, 어두우면 「검은」."""
+    import colorsys
+    from PIL import Image
+    image = Image.open(path).convert("RGBA")
+    image.thumbnail((240, 80))
+    weight = {}
+    for r, g, b, a in image.get_flattened_data():
+        if a < 60:
+            continue
+        h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+        if v < 0.2:
+            word = "검은"
+        elif s < 0.22:
+            word = "흰"
+        else:
+            word = next(name for top, name in HUES if h * 360 <= top)
+        weight[word] = weight.get(word, 0) + a * v
+    return max(weight, key=weight.get) if weight else "흰"
+
+
 def build_media():
     DOC_EFFECTS.mkdir(parents=True, exist_ok=True)
     DOC_SOUNDS.mkdir(parents=True, exist_ok=True)
@@ -175,7 +202,7 @@ def build_media():
         if not target.exists():
             shutil.copyfile(image, target)
         effects.append({"번호": number, "파일": file, "프레임": frames,
-                        "바탕": [wide, tall], "기준": [x, y], "순서": order})
+                        "바탕": [wide, tall], "기준": [x, y], "순서": order, "색": tint(target)})
 
     sounds = []
     for source in sorted(CLIENT_SOUNDS.glob("*.mp3"), key=lambda path: int(path.stem)):

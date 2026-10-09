@@ -158,7 +158,7 @@ test('ability workspace operates the current Hades skill and spell catalog direc
   assert.match(html, /id="ability-editor"/);
   assert.match(html, /id="ability-effect-list"/);
   assert.match(html, /id="ability-sound-list"/);
-  assert.match(css, /\.ability-editor\{[^}]*100dvh/s);
+  assert.match(read('docs/abilities.css'), /\.abx-detail\.is-open \{[^}]*100dvh/);
   assert.match(script, /LOD_ABILITY_OPERATIONS/);
   assert.match(script, /LOD_ABILITY_MEDIA/);
   assert.match(script, /\/api\/ability-overrides/);
