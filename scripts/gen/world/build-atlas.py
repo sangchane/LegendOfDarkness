@@ -110,7 +110,8 @@ def lay(root, areas, exits, stops, hunting):
             if there in stops and there != root:
                 doors.append((here, (ex, ey), there))  # 다른 지역 입구 — 그 지역으로 가는 길
                 continue
-            arrows.append((here, there, (ex, ey), (ax, ay)))
+            back = side((ax, ay), areas[there]["Cols"], areas[there]["Rows"]) or {"N": "S", "S": "N", "W": "E", "E": "W"}[way]
+            arrows.append((here, there, (ex, ey), (ax, ay), way, back))
             if there in origin:
                 continue
             tc, tr = areas[there]["Cols"], areas[there]["Rows"]
@@ -129,6 +130,18 @@ def lay(root, areas, exits, stops, hunting):
             origin[there] = (int(at[0]), int(at[1]))
             queue.append(there)
     return origin, arrows, doors
+
+
+def crosses(p, q, polygon):
+    """선분 p–q 가 마름모(다각형)의 변과 만나거나 안으로 들어가는지."""
+    def turn(a, b, c):
+        return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+    for i in range(len(polygon)):
+        a, b = polygon[i], polygon[(i + 1) % len(polygon)]
+        if turn(p, q, a) * turn(p, q, b) < 0 and turn(a, b, p) * turn(a, b, q) < 0:
+            return True
+    mid = ((p[0] + q[0]) / 2, (p[1] + q[1]) / 2)
+    return all(turn(polygon[i], polygon[(i + 1) % len(polygon)], mid) > 0 for i in range(len(polygon)))
 
 
 def screen(gx, gy, scale):
@@ -209,8 +222,28 @@ def main():
             x, y = screen(gx + 0.5, gy + 0.5, SMALL)
             return round(x - left, 1), round(y - top, 1)
 
+        def diamond(m):
+            k, r, c = SMALL, m["rows"], m["cols"]
+            return [(m["x"] + r * 28 * k, m["y"]), (m["x"] + (r + c) * 28 * k, m["y"] + c * 13 * k),
+                    (m["x"] + c * 28 * k, m["y"] + (c + r) * 13 * k), (m["x"], m["y"] + r * 13 * k)]
+
+        def outward(map_id, way):
+            """그 가장자리에서 바깥으로 나가는 화면 방향(단위 벡터) — 짧은 화살표용."""
+            dx, dy = {"N": (0, -1), "S": (0, 1), "W": (-1, 0), "E": (1, 0)}[way]
+            x, y = (dx - dy) * HALF_W, (dx + dy) * HALF_H
+            size = (x * x + y * y) ** 0.5
+            return [round(x / size, 3), round(y / size, 3)]
+
+        def outside(map_id, tile, way):
+            """출구 칸을 그 가장자리 바로 바깥으로 — 화살표가 맵을 가로지르지 않고 맵 사이 빈 칸에만 그려진다(사용자 2026-10-09
+            「맵을 가르지르는 방식으로 화살표 그리지마」)."""
+            cols, rows = placed[map_id]["cols"], placed[map_id]["rows"]
+            x, y = tile
+            spot = {"N": (x, -2.5), "S": (x, rows + 1.5), "W": (-2.5, y), "E": (cols + 1.5, y)}[way]
+            return point(map_id, spot)
+
         lines, seen = [], {}
-        for a, b, out, landing in arrows:
+        for a, b, out, landing, way, back in arrows:
             if a not in placed or b not in placed:
                 continue
             key = tuple(sorted((a, b)))
@@ -218,7 +251,11 @@ def main():
                 lines[seen[key]]["both"] = True
                 continue
             seen[key] = len(lines)
-            lines.append({"from": a, "to": b, "a": point(a, out), "b": point(b, landing), "both": False})
+            start, end = outside(a, out, way), outside(b, landing, back)
+            # 곧게 그으면 다른 맵을 지나가는 연결(멀리 떨어진 던전 층) — 선 대신 양쪽 가장자리에 짧은 화살표와 갈 곳 이름만.
+            blocked = any(crosses(start, end, diamond(placed[o])) for o in placed if o not in (a, b))
+            lines.append({"from": a, "to": b, "a": start, "b": end, "both": False, "stub": blocked,
+                          "aOut": outward(a, way), "bOut": outward(b, back)})
         gates = [{"map": m, "at": point(m, tile), "to": to, "toName": (areas.get(to) or {}).get("Name") or str(to)}
                  for m, tile, to in doors if m in placed]
         regions.append({"card": card, "name": name, "lv": level, "kind": kind,

@@ -27,6 +27,11 @@
   function pct(rate) { return rate == null ? "표" : (rate * 100).toFixed(rate < 0.01 ? 2 : 1) + "%"; }
   function atlas() { return window.LOD_ATLAS || null; }
   function info(id) { var a = atlas(); return a ? a["맵"][String(id)] : null; }
+  // 지역 공통 앞말(「서의우드랜드」·「아벨해안」·「노비스」)을 떼어 짧게 — 「9-1」·「3-A」·「지하던전C1」. 전체 이름은 옆 판에.
+  function short(id) {
+    var base = region.name.replace(/(대기실|입구\d*|마을|\d+존)$/, ""), full = (info(id) || {}).name || ("맵 " + id);
+    return base && full.indexOf(base) === 0 && full.length > base.length ? full.slice(base.length) : full;
+  }
 
   // ---- 지역 고르기 ----
   function drawTabs() {
@@ -65,7 +70,18 @@
     });
 
     var lines = el("g", { class: "atlas-arrows" }, svg);
+    var stubs = [];
     region.arrows.forEach(function (a) {
+      // 곧게 그으면 다른 맵을 지나가는 연결 — 양쪽 가장자리에 짧은 화살표와 갈 곳 이름만(사용자 「맵을 가르지르는 방식으로 화살표 그리지마」).
+      if (a.stub) {
+        [[a.a, a.aOut, a.to], [a.b, a.bOut, a.from]].forEach(function (end) {
+          var p = end[0], v = end[1], tip = [p[0] + v[0] * 22, p[1] + v[1] * 22];
+          el("line", { x1: p[0], y1: p[1], x2: tip[0], y2: tip[1], class: "atlas-arrow-halo" }, lines);
+          el("line", { x1: p[0], y1: p[1], x2: tip[0], y2: tip[1], class: "atlas-arrow", "marker-end": "url(#atlas-arrow)" }, lines);
+          stubs.push([tip, v, end[2]]);
+        });
+        return;
+      }
       var dx = a.b[0] - a.a[0], dy = a.b[1] - a.a[1], len = Math.max(1, Math.hypot(dx, dy)), cut = Math.min(10, len / 4);
       var x1 = a.a[0] + dx / len * cut, y1 = a.a[1] + dy / len * cut, x2 = a.b[0] - dx / len * cut, y2 = a.b[1] - dy / len * cut;
       var attrs = { x1: x1, y1: y1, x2: x2, y2: y2, class: "atlas-arrow", "marker-end": "url(#atlas-arrow)" };
@@ -81,13 +97,16 @@
     });
 
     var labels = el("g", { class: "atlas-labels" }, svg);
+    stubs.forEach(function (s) {
+      var about = info(s[2]) || {}, label = el("text", { x: s[0][0] + s[1][0] * 6, y: s[0][1] + s[1][1] * 6 + 4, class: "atlas-goto" }, labels);
+      label.setAttribute("text-anchor", s[1][0] < -0.2 ? "end" : s[1][0] > 0.2 ? "start" : "middle");
+      label.textContent = "→ " + short(s[2]);
+    });
     Object.keys(region.maps).forEach(function (id) {
       var m = region.maps[id], about = info(id) || {};
       var t = el("text", { x: m.x + m.w / 2, y: m.y + m.h / 2, class: "atlas-label" }, labels);
       t.style.setProperty("--dy", "0");
-      // 지역 공통 앞말(「서의우드랜드」·「아벨해안」)을 떼어 짧게 — 「9-1」·「3-A」. 전체 이름은 옆 판에.
-      var base = region.name.replace(/(대기실|입구\d*|마을|\d+존)$/, ""), full = about.name || ("맵 " + id);
-      t.textContent = base && full.indexOf(base) === 0 && full.length > base.length ? full.slice(base.length) : full;
+      t.textContent = short(id);
       if (about.monsters && about.monsters.length) {
         var n = el("text", { x: m.x + m.w / 2, y: m.y + m.h / 2, dy: "1.3em", class: "atlas-sub" }, labels);
         n.textContent = "괴물 " + about.monsters.length + (about.circle ? " · 서클 " + about.circle : "");
@@ -119,7 +138,8 @@
     })(begin);
   }
   function whole(instant) {
-    var target = [0, 0, region.w, region.h];
+    var pad = Math.max(region.w, region.h) * 0.08;  // 가장자리 짧은 화살표의 이름이 잘리지 않게
+    var target = [-pad, -pad, region.w + pad * 2, region.h + pad * 2];
     if (instant) { setBox(target); } else { fly(target); }
     chosen = null;
     Array.prototype.forEach.call(svg.querySelectorAll(".atlas-map.is-chosen"), function (g) { g.classList.remove("is-chosen"); });

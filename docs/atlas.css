@@ -34,6 +34,7 @@
 .atlas-label { fill: var(--white); font-size: calc(13px * var(--atlas-unit)); font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: var(--dark-stage); stroke-width: calc(3.5px * var(--atlas-unit)); pointer-events: none; }
 .atlas-sub { fill: var(--white-muted); font-size: calc(11px * var(--atlas-unit)); text-anchor: middle; paint-order: stroke; stroke: var(--dark-stage); stroke-width: calc(3px * var(--atlas-unit)); pointer-events: none; font-family: var(--mono); }
 .atlas-stage svg.is-far .atlas-sub { display: none; }
+.atlas-goto { fill: var(--atlas-arrow); font-size: calc(11px * var(--atlas-unit)); paint-order: stroke; stroke: var(--dark-stage); stroke-width: calc(3px * var(--atlas-unit)); pointer-events: none; }
 .atlas-panel { border-radius: var(--radius-card); background: var(--panel); border: 1px solid var(--edge); padding: 16px 18px; overflow: auto; max-height: 640px; }
 .atlas-panel h2 { margin: 0; font-size: 20px; }
 .atlas-panel h3 { margin: 18px 0 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
