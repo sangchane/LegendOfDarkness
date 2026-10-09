@@ -18,7 +18,7 @@
 - **Hades 에 뭐가 이미 있나(만들 것 vs 채울 것): `docs/what-hades-already-has.md`** — 콘텐츠를 이식하기 전에 **여기부터**. 그래프·볼트에 묻는 법도 여기 있다
 - **2023 기술·마법표(일반·어빌리티 539행): `docs/skill-spell-2023.md`** — 사용자 제공 워크북의 별도 계보; Hades 613개 표와 섞지 않는다
 - **5.99 서버·클라이언트 실행 파일 역어셈블(식·평타 동작·장착 규칙·그리는 순서, 주소 근거): `docs/disassembly.md`** (`data/disassembly/findings.json` → 그래프)
-- 멀리 있는 사람 아이폰에 앱 넣기: 공개 내려받기 페이지 `docs/download/`(https://lodgame.duckdns.org/download/) · 지침 `docs/sideloadly-install-guide.md`
+- 멀리 있는 사람 아이폰에 앱 넣기: 대시보드 「앱 내려받기」 탭(로그인 — 손님 비밀번호, https://lodgame.duckdns.org/?view=download, `docs/download.js`·`download.css`) · 지침 `docs/sideloadly-install-guide.md`
 - **인게임 UI 다시 만들기(작업지침): `docs/mobile-ingame-ui-work-order.md`** — 로그인·생성 규칙 R1~R9, 돌 타일 버튼 지양
 - **기술·마법·이펙트·사운드 노바 정리 2차(안티그래비티 작업지시서): `docs/abilities-nova-work-order.md`** — 사용자 결정 D1~D9
 - 노바 클라이언트 이펙트 그림 가져오기(윈도우 세션 작업지시서): `docs/nova-client-work-order.md` · `.dat` 목록·비교 `scripts/gen/pack/dat-manifest.py`

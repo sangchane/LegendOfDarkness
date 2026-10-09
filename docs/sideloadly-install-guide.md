@@ -8,8 +8,8 @@
 
 ## 1부 — 보내는 사람(우리)이 할 일
 
-1. **받는 사람에게는 주소 하나만 보낸다: https://lodgame.duckdns.org/download/** — 내려받기 단추와 그림이 들어간
-   설치 방법(아래 2부와 같은 내용)이 한 페이지에 있다. 로그인 없이 열린다. 페이지 원본 `docs/download/index.html`.
+1. **받는 사람에게는 주소와 손님 비밀번호를 보낸다: https://lodgame.duckdns.org/?view=download** — 내려받기 단추와 그림이 들어간
+   설치 방법(아래 2부와 같은 내용)이 대시보드 「앱 내려받기」 탭에 있다. 손님 비밀번호로 로그인해야 열린다(2026-10-09). 원본 `docs/index.html`·`docs/download.js`.
 2. 페이지의 앱 파일은 **`scripts/ops/ios-build.sh install` 이 내 폰에 넣는 데 성공하면 저절로 최신판으로 바뀐다.**
    폰 없이 올리려면 `scripts/ops/ios-build.sh build && scripts/ops/ios-build.sh release`.
    페이지 글·그림을 고쳤으면 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-dashboard.sh deploy`(게임 서버는 안 끊긴다).

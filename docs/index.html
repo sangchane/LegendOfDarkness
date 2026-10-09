@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="atlas.css">
   <link rel="stylesheet" href="abilities.css">
   <link rel="stylesheet" href="codex.css">
+  <link rel="stylesheet" href="download.css">
 </head>
 <body class="toss-surface">
 <a class="skip-link" href="#workspace">본문으로 건너뛰기</a>
@@ -25,8 +26,7 @@
       <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도</button>
       <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
-      <button type="button" class="nav-item" data-view-target="activity"><span aria-hidden="true">◷</span>접속·활동</button>
-      <button type="button" class="nav-item" data-view-target="download"><span aria-hidden="true">⤓</span>앱 내려받기</button>
+      <button type="button" class="nav-item" data-view-target="activity" data-admin-only hidden><span aria-hidden="true">◷</span>접속·활동</button>
     </nav>
   </aside>
 
@@ -34,7 +34,7 @@
     <header class="topbar">
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="sidebar">☰</button>
       <div class="crumb"><span>어둠의 전설 모바일 복원</span><strong id="view-label">지금 되는 것</strong></div>
-      <div class="session-box"><span class="badge" id="session-badge">보기 전용</span><button type="button" class="session-plain" id="account-button" aria-label="계정 관리" title="계정 관리" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span class="session-label">계정 관리</span></button><button type="button" class="session-button" id="session-button">로그인</button></div>
+      <div class="session-box"><span class="badge" id="session-badge">보기 전용</span><button type="button" class="session-plain" id="account-button" aria-label="계정 관리" title="계정 관리" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span class="session-label">계정 관리</span></button><button type="button" class="session-plain" data-view-target="download" aria-label="앱 내려받기" title="앱 내려받기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg><span class="session-label">앱 내려받기</span></button><button type="button" class="session-button" id="session-button">로그인</button></div>
       <dialog class="account-dialog" id="account-dialog" aria-labelledby="account-title">
         <form id="account-form" method="dialog">
           <h2 id="account-title">계정 관리</h2>
@@ -352,11 +352,346 @@
       </section>
 
       <section class="view" data-view="download" aria-labelledby="download-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Download</p><h1 id="download-title">앱 내려받기</h1><p>받는 사람에게는 공개 페이지 주소를 보내면 됩니다. 아이폰은 그 사람의 컴퓨터에서 Sideloadly 로, PC 는 압축만 풀고 실행합니다.</p></div></div>
-        <div class="download-grid">
-          <article class="panel"><h2>📱 아이폰</h2><p>그림이 들어간 설치 방법과 최신 파일.</p><p class="download-meta" data-file="/download/LodClient.ipa" data-version="/download/version-ios.txt">확인 중…</p><a class="primary-button download-link" href="/download/#ios" target="_blank" rel="noopener">공개 페이지 열기</a><code class="download-url">https://lodgame.duckdns.org/download/#ios</code></article>
-          <article class="panel"><h2>🖥️ 윈도우 PC</h2><p>압축을 풀고 LodClient 를 실행합니다.</p><p class="download-meta" data-file="/download/LodClient-windows.zip" data-version="/download/version-windows.txt">확인 중…</p><a class="primary-button download-link" href="/download/#pc" target="_blank" rel="noopener">공개 페이지 열기</a><code class="download-url">https://lodgame.duckdns.org/download/#pc</code></article>
-          <article class="panel download-own" hidden><h2>⚡ 내 기기에 바로 설치</h2><p>우리 서명에 등록된 아이폰·아이패드만 됩니다. <b>그 기기의 사파리</b>로 이 화면을 열고 누르세요 — 같은 Wi‑Fi·케이블이 없어도 됩니다.</p><p class="download-meta" data-file="/download/LodClient.ipa" data-version="/download/version-ios.txt">확인 중…</p><a class="primary-button download-link" id="download-ota" href="itms-services://?action=download-manifest&amp;url=https://lodgame.duckdns.org/download/manifest.plist">내 아이폰에 설치</a><p class="download-note" id="download-ota-note">로그인해야 보입니다.</p></article>
+        <div class="page-heading"><div><p class="eyebrow">Download</p><h1 id="download-title">앱 내려받기</h1><p>쓰는 기기를 고르고, 파일을 받은 뒤 아래 순서대로 따라 하세요. 받는 사람에게는 이 주소(https://lodgame.duckdns.org/?view=download)와 손님 비밀번호를 알려 주면 됩니다.</p></div></div>
+        <article class="panel download-gate" id="download-gate" hidden><h2>내려받으려면 로그인하세요</h2><p>알려 받은 비밀번호로 들어오면 아이폰·안드로이드·윈도우 PC 파일과 설치 방법이 보입니다.</p><a class="primary-button download-link" href="/login.html?next=%2F%3Fview%3Ddownload">로그인</a></article>
+        <div class="dl" id="download-body" data-tab="ios" hidden>
+          <article class="panel download-own" hidden><h2>⚡ 내 기기에 바로 설치</h2><p>우리 서명에 등록된 아이폰·아이패드만 됩니다. <b>그 기기의 사파리</b>로 이 화면을 열고 누르세요 — 같은 Wi‑Fi·케이블이 없어도 됩니다.</p><p class="download-meta" data-file="/download/LodClient.ipa" data-version="/download/version-ios.txt">확인 중…</p><a class="primary-button download-link" id="download-ota" href="#">내 아이폰에 설치</a><p class="download-note">설치 확인 창에서 「설치」 → 홈 화면에서 아이콘이 채워질 때까지 기다립니다(1~3분).</p></article>
+
+
+  <div class="tabs" role="tablist">
+    <button role="tab" data-to="ios">아이폰</button>
+    <button role="tab" data-to="and">안드로이드</button>
+    <button role="tab" data-to="pc">윈도우 PC</button>
+  </div>
+
+  <section class="card ios-only">
+    <div class="get">
+      <div class="what">
+        <h2>아이폰용 파일</h2>
+        <p>앱스토어에 없는 앱이라 <b>처음 한 번은 컴퓨터와 케이블</b>로 넣습니다(약 15분).</p>
+        <div class="meta download-meta" data-file="/download/LodClient.ipa" data-version="/download/version-ios.txt">최신판 확인 중…</div>
+      </div>
+      <a class="primary" href="/download/LodClient.ipa" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>내려받기</a>
+    </div>
+    <div class="warn onphone" id="onphone">지금 휴대폰으로 보고 계십니다. 이 파일은 <b>컴퓨터</b>에서 받아야 합니다.</div>
+  </section>
+
+  <section class="card and-only">
+    <div class="get">
+      <div class="what">
+        <h2>안드로이드용 파일</h2>
+        <p>안드로이드 7.0 이상 휴대폰·태블릿(64비트). 플레이 스토어에 없는 앱이라 <b>파일을 받아 직접 설치</b>합니다(약 3분).</p>
+        <div class="meta download-meta" data-file="/download/LodClient.apk" data-version="/download/version-android.txt">최신판 확인 중…</div>
+      </div>
+      <a class="primary" href="/download/LodClient.apk" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>내려받기</a>
+    </div>
+  </section>
+
+  <section class="card pc-only">
+    <div class="get">
+      <div class="what">
+        <h2>윈도우 PC용 파일</h2>
+        <p>윈도우 10·11(64비트). 설치 없이 <b>압축만 풀고 실행</b>합니다(약 5분).</p>
+        <div class="meta download-meta" data-file="/download/LodClient-windows.zip" data-version="/download/version-windows.txt">최신판 확인 중…</div>
+      </div>
+      <a class="primary" href="/download/LodClient-windows.zip" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg>내려받기</a>
+    </div>
+  </section>
+
+  <!-- 아이폰 -->
+  <div class="ios-only">
+    <h2 class="section">설치 방법</h2>
+    <p class="section-lead">준비물: 컴퓨터(윈도우·맥) · 아이폰 · 사진을 옮길 수 있는 케이블 · 애플 계정. 그림의 <b style="color:var(--mark)">빨간 표시</b>가 누를 곳입니다.</p>
+    <div class="steps">
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">1</span>아이튠즈 깔기 <span class="when">처음 한 번 · 윈도우만</span></h3>
+          <ol>
+            <li>아래 단추로 애플 공식 아이튠즈를 받아 「다음」「설치」만 누릅니다.</li>
+            <li>다 끝나면 컴퓨터를 한 번 껐다 켭니다.</li>
+          </ol>
+          <div class="warn">마이크로소프트 스토어에서 받은 아이튠즈는 안 됩니다.</div>
+          <a class="secondary" href="https://www.apple.com/itunes/download/win64" rel="noopener">아이튠즈 받기 (윈도우)</a>
+        </div>
+        <div class="pic"><div class="choice">
+          <div class="ok"><b>된다</b>애플 홈페이지에서 받은 것</div>
+          <div class="bad"><b>안 된다</b>마이크로소프트 스토어</div>
+        </div></div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">2</span>Sideloadly 깔기 <span class="when">처음 한 번</span></h3>
+          <ol>
+            <li>아래 단추로 <b>sideloadly.io</b> 를 엽니다(꼭 이 주소에서만).</li>
+            <li>윈도우는 Windows, 맥은 macOS 를 받아 「다음」「예」만 누릅니다.</li>
+          </ol>
+          <a class="secondary" href="https://sideloadly.io/#download" rel="noopener">sideloadly.io 열기</a>
+        </div>
+        <div class="pic">
+          <div class="win"><div class="tb">sideloadly.io</div>
+            <div style="padding:18px;text-align:center"><div style="font-size:17px;font-weight:700;margin-bottom:10px">Sideloadly</div>
+              <span class="hl" style="display:inline-block;padding:7px 14px;background:#2b7de9;color:#fff;border-radius:6px">Windows</span>
+              <span style="display:inline-block;padding:7px 14px;background:#666;color:#fff;border-radius:6px;margin-left:6px">macOS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">3</span>아이폰 연결 <span class="when">처음 한 번</span></h3>
+          <ol>
+            <li>케이블로 아이폰을 컴퓨터에 꽂고 잠금을 풉니다.</li>
+            <li>「이 컴퓨터를 신뢰하겠습니까?」 → <b>「신뢰」</b> → 아이폰 암호.</li>
+          </ol>
+        </div>
+        <div class="pic">
+          <div class="phone"><div class="scr dark"><div class="dim"><div class="alert">
+            <h4>이 컴퓨터를 신뢰하겠습니까?</h4>
+            <p>설정 및 데이터는 이 컴퓨터에 연결되었을 때 접근할 수 있게 됩니다.</p>
+            <div class="btns"><div class="hl" style="font-weight:700">신뢰</div><div>신뢰 안 함</div></div>
+          </div></div></div></div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">4</span>앱 넣기 <span class="when">7일마다 여기부터</span></h3>
+          <ol>
+            <li>위에서 받은 파일을 바탕화면에 두고 <b>Sideloadly</b> 를 엽니다.</li>
+            <li><span class="mark inline">1</span>맨 위에 <b>내 아이폰 이름</b>이 보이는지 확인</li>
+            <li><span class="mark inline">2</span><b>LodClient.ipa</b> 를 IPA 네모로 끌어다 놓기</li>
+            <li><span class="mark inline">3</span><b>Apple account</b> 칸에 애플 계정 이메일</li>
+            <li><b>Advanced options</b>(고급 설정)을 펼쳐 <b>자동 갱신(automatic refresh)</b> 칸을 켭니다 — 7번에서 씁니다.</li>
+            <li><span class="mark inline">4</span><b>Start</b> → 비밀번호 → 아이폰에 뜬 <b>여섯 자리 번호</b></li>
+            <li>아래에 <b>Done.</b> 이 나오면 끝(1~3분)</li>
+          </ol>
+        </div>
+        <div class="pic">
+          <div class="win"><div class="tb">Sideloadly</div>
+            <div class="body">
+              <div class="ipa"><span class="mark">2</span><b>IPA</b>여기에 놓기</div>
+              <div>
+                <div class="field"><span class="mark">1</span><small>iDevice</small>내 iPhone ▾</div>
+                <div class="field"><span class="mark">3</span><small>Apple account</small>myname@icloud.com</div>
+              </div>
+              <div class="start"><span class="mark">4</span>Start</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">5</span>아이폰에서 「신뢰」 <span class="when">처음 한 번</span></h3>
+          <ol>
+            <li>아이폰 <b>설정 → 일반 → VPN 및 기기 관리</b></li>
+            <li>「개발자 앱」의 <b>내 애플 계정 이메일</b> → <b>「신뢰」</b> 두 번</li>
+          </ol>
+        </div>
+        <div class="pic">
+          <div class="phone"><div class="scr">
+            <div class="title">일반</div>
+            <div class="group"><div class="row">정보<em>›</em></div><div class="row">소프트웨어 업데이트<em>›</em></div></div>
+            <div class="group"><div class="row">키보드<em>›</em></div></div>
+            <div class="group"><div class="row hl">VPN 및 기기 관리<em>›</em></div></div>
+          </div></div>
+          <div class="phone"><div class="scr">
+            <div class="back">‹ 일반</div><div class="title" style="padding-top:4px;font-size:14px">VPN 및 기기 관리</div>
+            <div class="label">개발자 앱</div>
+            <div class="group"><div class="row hl">myname@icloud.com<em>›</em></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">6</span>개발자 모드 켜기 <span class="when">처음 한 번</span></h3>
+          <ol>
+            <li><b>설정 → 개인정보 보호 및 보안 → 개발자 모드</b> 켜기 → 재시동</li>
+            <li>다시 켜지면 뜨는 창에서 <b>「켜기」</b> → 아이폰 암호</li>
+            <li>홈 화면의 앱을 누르면 시작합니다.</li>
+          </ol>
+          <div class="note">이렇게 넣은 앱은 <b>7일 뒤</b> 열리지 않습니다. <b>7번</b>을 해 두면 컴퓨터가 알아서 늘려 줍니다. 캐릭터는 그대로입니다.</div>
+        </div>
+        <div class="pic">
+          <div class="phone"><div class="scr">
+            <div class="back">‹ 개인정보 보호 및 보안</div><div class="title" style="padding-top:4px;font-size:14px">개발자 모드</div>
+            <div class="group"><div class="row hl">개발자 모드<span class="toggle"></span></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">7</span>7일마다 다시 안 하게 <span class="when">처음 한 번 · 권장</span></h3>
+          <ol>
+            <li>케이블을 꽂은 채 <b>아이튠즈</b>를 열고, 위쪽 <b>아이폰 모양</b> → <b>요약</b></li>
+            <li>옵션의 <b>「Wi-Fi를 통해 이 iPhone과 동기화」</b>를 켜고 <b>「적용」</b></li>
+            <li>그 뒤로는 <b>컴퓨터를 켜 두고</b> 아이폰이 <b>같은 Wi-Fi</b>에 있으면, Sideloadly 가 만료 전에 알아서 새로 넣어 줍니다(4번에서 자동 갱신을 켰을 때).</li>
+          </ol>
+          <div class="note">맥이면 Finder 왼쪽의 아이폰 → 일반 → <b>「Wi-Fi에 연결되었을 때 이 iPhone 보기」</b>.<br>컴퓨터를 오래 꺼 두었거나 다른 곳에 있었으면 7일이 지나 멈출 수 있습니다 — 그때는 4번만 다시.</div>
+        </div>
+        <div class="pic">
+          <div class="win"><div class="tb">iTunes · iPhone · 요약</div>
+            <div style="padding:14px 16px">
+              <div style="font-weight:600;margin-bottom:8px">옵션</div>
+              <div class="item hl" style="padding:6px 8px">☑ Wi-Fi를 통해 이 iPhone과 동기화</div>
+              <div style="text-align:right;margin-top:12px"><span style="display:inline-block;padding:5px 16px;border:1px solid #bbb;border-radius:5px">적용</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section">막힐 때</h2>
+    <div class="faq">
+      <details><summary>Sideloadly 맨 위에 아이폰이 안 보여요</summary><p>케이블을 다른 구멍에 꽂고, 아이폰 잠금을 풀고, 3번 「신뢰」를 다시 하세요. 아이튠즈가 스토어판이면 지우고 1번부터.</p></details>
+      <details><summary>「iTunes」「iCloud」가 없다고 나와요</summary><p>1번을 다시 하세요(스토어판이 아닌 것으로). iCloud 를 요구하면 sideloadly.io 첫 화면의 iCloud 링크로 깝니다.</p></details>
+      <details><summary>「maximum number of apps」 비슷한 말이 나와요</summary><p>예전에 이렇게 넣은 앱을 아이폰에서 하나 지우고 4번을 다시 하세요.</p></details>
+      <details><summary>앱을 누르면 「신뢰하지 않는 개발자」</summary><p>5번을 하세요.</p></details>
+      <details><summary>앱이 바로 꺼지거나 안 열려요</summary><p>7일이 지났을 수 있습니다. 파일을 다시 받아 4번을 하세요. 자주 그러면 7번(자동 갱신)을 해 두세요.</p></details>
+    </div>
+  </div>
+
+  <!-- 안드로이드 -->
+  <div class="and-only">
+    <h2 class="section">설치 방법</h2>
+    <p class="section-lead">휴대폰에서 바로 받아 설치합니다. 컴퓨터는 필요 없습니다. 기종에 따라 메뉴 이름이 조금 다를 수 있습니다.</p>
+    <div class="steps">
+      <div class="card step">
+        <div>
+          <h3><span class="no">1</span>파일 받기 <span class="when">받을 때마다</span></h3>
+          <ol>
+            <li>휴대폰 <b>크롬</b>으로 이 화면을 열고 위의 <b>내려받기</b>를 누릅니다.</li>
+            <li>「이 유형의 파일은 기기에 손상을 줄 수 있습니다」 같은 말이 뜨면 <b>「확인」</b>(또는 「그래도 다운로드」)을 누릅니다.</li>
+          </ol>
+          <div class="note">파일이 커서(약 180MB) <b>와이파이</b>에서 받는 것이 좋습니다.</div>
+        </div>
+        <div class="pic"><div class="choice">
+          <div class="ok"><b>된다</b>크롬 · 삼성 인터넷</div>
+          <div class="bad"><b>안 될 수 있다</b>카카오톡 안에서 열기</div>
+        </div></div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">2</span>「이 출처 허용」 켜기 <span class="when">처음 한 번</span></h3>
+          <ol>
+            <li>받은 파일을 누르면 「보안상 이 출처의 앱을 설치할 수 없습니다」 창이 뜹니다.</li>
+            <li><b>「설정」</b>을 누르고 <b>「이 출처 허용」</b>(또는 「이 소스 허용」)을 켭니다.</li>
+            <li>뒤로 가기로 돌아옵니다.</li>
+          </ol>
+          <div class="note">플레이 스토어 밖에서 받은 앱이라 안드로이드가 한 번 확인하는 것입니다. 「크롬」에만 허용되며 다른 앱에는 적용되지 않습니다.</div>
+        </div>
+        <div class="pic">
+          <div class="phone"><div class="scr">
+            <div class="title" style="font-size:13px">이 출처의 앱 설치</div>
+            <div class="label">Chrome</div>
+            <div class="group"><div class="row hl">이 출처 허용<span class="toggle"></span></div></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">3</span>설치 <span class="when">받을 때마다</span></h3>
+          <ol>
+            <li>다시 받은 파일(<b>LodClient.apk</b>)을 눌러 <b>「설치」</b>를 누릅니다.</li>
+            <li>「Play 프로텍트」가 <b>「앱 검사」·「출처를 알 수 없는 앱」</b>이라고 알리면 <b>「상세 정보」→「무시하고 설치」</b>(또는 「그래도 설치」)를 누릅니다.</li>
+            <li>끝나면 <b>「열기」</b>.</li>
+          </ol>
+          <div class="warn">구글이 아직 모르는 앱이라 뜨는 경고입니다. 기존 앱 위에 새 파일을 설치하면 캐릭터는 그대로입니다.</div>
+        </div>
+        <div class="pic">
+          <div class="phone"><div class="scr dark"><div class="dim"><div class="alert">
+            <h4>Play 프로텍트</h4>
+            <p>출처를 알 수 없는 앱입니다. 설치하기 전에 검사할까요?</p>
+            <div class="btns"><div>앱 검사</div><div class="hl" style="font-size:11px">그래도 설치</div></div>
+          </div></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section">막힐 때</h2>
+    <div class="faq">
+      <details><summary>「앱이 설치되지 않았습니다」라고 나와요</summary><p>예전에 다른 곳에서 받은 같은 앱이 있으면 충돌할 수 있습니다. 기존 「어둠의 전설」을 지우고 다시 설치하세요(캐릭터는 서버에 있어 그대로입니다).</p></details>
+      <details><summary>「이 출처 허용」 단추가 안 보여요</summary><p>설정 → 앱 → 특별한 앱 접근 → <b>알 수 없는 앱 설치</b>에서 크롬(받은 앱)을 골라 켭니다.</p></details>
+      <details><summary>Play 프로텍트가 설치를 막아요</summary><p>Play 스토어 → 내 프로필 → Play 프로텍트 → 설정(톱니바퀴)에서 「Play 프로텍트로 앱 검사」를 잠시 끄고 설치한 뒤 다시 켜세요.</p></details>
+      <details><summary>다운로드가 중간에 멈춰요</summary><p>와이파이로 바꾸고 다시 받으세요. 저장 공간이 500MB 이상 비어 있어야 합니다.</p></details>
+    </div>
+  </div>
+
+  <!-- 윈도우 PC -->
+  <div class="pc-only">
+    <h2 class="section">설치 방법</h2>
+    <p class="section-lead">그림의 <b style="color:var(--mark)">빨간 표시</b>가 누를 곳입니다.</p>
+    <div class="steps">
+      <div class="card step">
+        <div>
+          <h3><span class="no">1</span>압축 풀기 <span class="when">받을 때마다</span></h3>
+          <ol>
+            <li>받은 <b>LodClient-windows.zip</b> 에서 <b>마우스 오른쪽</b> → <b>「모두 압축 풀기」</b> → 「압축 풀기」</li>
+            <li><b>LegendOfDarkness</b> 폴더가 열립니다.</li>
+          </ol>
+          <div class="warn">압축을 풀지 않고 zip 안에서 바로 열면 게임이 뜨지 않습니다.</div>
+        </div>
+        <div class="pic">
+          <div class="win" style="position:relative;min-height:170px"><div class="tb">다운로드</div>
+            <div class="item hl">LodClient-windows.zip<small>160MB</small></div>
+            <div class="menu"><div>열기</div><div class="hl" style="font-weight:600">모두 압축 풀기…</div><div>복사</div><div>삭제</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">2</span>실행 <span class="when">할 때마다</span></h3>
+          <ol>
+            <li>폴더 안의 <b>LodClient</b> 를 두 번 누릅니다.</li>
+            <li>옆의 <b>data_…</b> 폴더는 지우거나 옮기지 마세요.</li>
+          </ol>
+        </div>
+        <div class="pic">
+          <div class="win"><div class="tb">LegendOfDarkness</div>
+            <div class="item">data_LodClient_windows_x86_64<small>건드리지 않기</small></div>
+            <div class="item hl" style="font-weight:600">LodClient<small>응용 프로그램</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card step">
+        <div>
+          <h3><span class="no">3</span>「PC 보호」 창 넘기기 <span class="when">처음 한 번</span></h3>
+          <ol>
+            <li>파란 창이 뜨면 글자 <b>「추가 정보」</b>를 누릅니다.</li>
+            <li>아래에 생긴 <b>「실행」</b>을 누릅니다.</li>
+          </ol>
+          <div class="note">작은 팀이 만든 게임이라 윈도우가 아직 모르는 프로그램이어서 뜨는 창입니다. 아이폰과 같은 계정·같은 캐릭터로 들어갑니다.</div>
+        </div>
+        <div class="pic">
+          <div class="smart">
+            <h4>Windows의 PC 보호</h4>
+            Microsoft Defender SmartScreen에서 인식할 수 없는 앱의 시작을 차단했습니다.<br>
+            <u class="hl">추가 정보<span class="mark" style="left:auto;right:-14px">1</span></u>
+            <div class="row"><span class="hl">실행<span class="mark" style="left:auto;right:-14px">2</span></span><span>실행 안 함</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section">막힐 때</h2>
+    <div class="faq">
+      <details><summary>두 번 눌러도 아무 일이 없어요</summary><p>압축을 풀었는지 보세요(1번).</p></details>
+      <details><summary>「.NET」「data_…」 관련 오류가 나와요</summary><p>LodClient 와 data_… 폴더가 같은 폴더에 나란히 있어야 합니다. 다시 받아 압축을 풀어 주세요.</p></details>
+      <details><summary>백신이 지워 버렸어요</summary><p>백신의 「검역소」에서 복원·허용한 뒤 다시 실행하세요.</p></details>
+      <details><summary>「실행」 단추가 안 보여요</summary><p>파란 창의 「추가 정보」를 먼저 눌러야 나타납니다.</p></details>
+    </div>
+  </div>
+
+  <p class="section-lead" style="margin-top:28px">그래도 안 되면 화면을 사진으로 찍어 알려 준 사람에게 보내 주세요.</p>
         </div>
       </section>
 

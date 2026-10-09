@@ -108,6 +108,7 @@ class AbilityOpsSecurityTests(unittest.TestCase):
 class LoginAndStateTests(unittest.TestCase):
     """팝업 없는 로그인(쿠키)과 바꾼 값 서버 보관 — plans/ops-login-and-backup.md"""
     CREDENTIAL = "lod-admin:secret"
+    MEMBER = "member:1234"
 
     def setUp(self):
         import threading
@@ -117,6 +118,9 @@ class LoginAndStateTests(unittest.TestCase):
         (root / "www").mkdir()
         (root / "www" / "index.html").write_text("DASHBOARD", encoding="utf-8")
         (root / "www" / "login.html").write_text("LOGIN", encoding="utf-8")
+        (root / "www" / "download").mkdir()
+        (root / "www" / "download" / "manifest.plist").write_text(
+            "<string>https://lodgame.duckdns.org/download/LodClient.ipa</string>", encoding="utf-8")
         catalog = root / "catalog.json"
         catalog.write_text(json.dumps({"목록": [{"운영키": "skill:단각"}]}), encoding="utf-8")
         self.log = root / "data" / "changes.jsonl"
@@ -126,7 +130,7 @@ class LoginAndStateTests(unittest.TestCase):
         self.password_file = root / "data" / "credential"
         self.password_file.write_text(self.CREDENTIAL + "\n", encoding="utf-8")
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), SERVICE.handler_for(
-            root / "www", store, self.CREDENTIAL, states, password_file=self.password_file))
+            root / "www", store, self.CREDENTIAL, states, password_file=self.password_file, member=self.MEMBER))
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         self.base = f"http://127.0.0.1:{self.server.server_address[1]}"
 
@@ -135,10 +139,11 @@ class LoginAndStateTests(unittest.TestCase):
         self.server.server_close()
         self.scratch.cleanup()
 
-    def request(self, method, path, body=None, cookie=None):
+    def request(self, method, path, body=None, cookie=None, extra=None):
         import urllib.error
         import urllib.request
         headers = {"Content-Type": "application/json"} if body is not None else {}
+        headers.update(extra or {})
         if cookie:
             headers["Cookie"] = cookie
         data = json.dumps(body).encode() if body is not None else None
@@ -149,8 +154,8 @@ class LoginAndStateTests(unittest.TestCase):
         except urllib.error.HTTPError as error:
             return error.code, error.headers, error.read().decode()
 
-    def login(self, remember=True):
-        status, headers, _ = self.request("POST", "/api/login", {"password": "secret", "remember": remember})
+    def login(self, remember=True, password="secret"):
+        status, headers, _ = self.request("POST", "/api/login", {"password": password, "remember": remember})
         self.assertEqual(status, 200)
         return headers["Set-Cookie"]
 
@@ -168,14 +173,52 @@ class LoginAndStateTests(unittest.TestCase):
         status, _, body = self.request("GET", "/index.html")
         self.assertEqual((status, body), (200, "DASHBOARD"))
         status, _, body = self.request("GET", "/api/session")
-        self.assertEqual(json.loads(body), {"signedIn": False})
+        self.assertEqual(json.loads(body), {"signedIn": False, "role": None})
         status, _, _ = self.request("GET", "/api/ability-overrides")
         self.assertEqual(status, 200)
         status, headers, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}})
         self.assertEqual(status, 401)
         self.assertIsNone(headers.get("WWW-Authenticate"))
         status, _, body = self.request("GET", "/api/session", cookie=self.login().split(";")[0])
-        self.assertEqual(json.loads(body), {"signedIn": True})
+        self.assertEqual(json.loads(body), {"signedIn": True, "role": "admin", "ota": SERVICE.ota_token(self.CREDENTIAL)})
+
+    def test_download_gate_opens_for_admin_guest_or_the_install_token(self):
+        status, headers, _ = self.request("GET", "/api/signed-in")
+        self.assertEqual(status, 401)
+        self.assertIsNone(headers.get("WWW-Authenticate"))
+        for password in ("secret", "1234"):
+            status, _, _ = self.request("GET", "/api/signed-in", cookie=self.login(password=password).split(";")[0])
+            self.assertEqual(status, 204)
+        token = SERVICE.ota_token(self.CREDENTIAL)
+        status, _, _ = self.request("GET", "/api/signed-in", extra={"X-Original-URI": f"/download/LodClient.ipa?ota={token}"})
+        self.assertEqual(status, 204)
+        for bad in ("/download/LodClient.ipa?ota=wrong", "/download/LodClient.ipa?ota=%EC%95%88", "/download/LodClient.ipa"):
+            status, _, _ = self.request("GET", "/api/signed-in", extra={"X-Original-URI": bad})
+            self.assertEqual(status, 401)
+
+    def test_guest_password_signs_in_without_admin_rights(self):
+        status, _, body = self.request("POST", "/api/login", {"password": "1234", "remember": True})
+        self.assertEqual((status, json.loads(body)["role"]), (200, "member"))
+        guest = self.login(password="1234").split(";")[0]
+        status, _, body = self.request("GET", "/api/session", cookie=guest)
+        self.assertEqual(json.loads(body), {"signedIn": False, "role": "member"})
+        status, _, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}}, cookie=guest)
+        self.assertEqual(status, 401)
+        status, _, _ = self.request("GET", "/api/activity?from=2026-10-02&to=2026-10-03", cookie=guest)
+        self.assertEqual(status, 401)
+        status, _, _ = self.request("POST", "/api/password", {"current": "1234", "new": "longenough1"}, cookie=guest)
+        self.assertEqual(status, 401)
+        # 손님 쿠키는 관리자 서명으로 풀리지 않는다 — 열쇠가 서로의 비밀번호에서 나온다.
+        self.assertFalse(SERVICE.valid_session(guest.split("=", 1)[1], self.CREDENTIAL))
+
+    def test_install_manifest_needs_the_token_and_passes_it_to_the_ipa(self):
+        token = SERVICE.ota_token(self.CREDENTIAL)
+        status, _, _ = self.request("GET", "/api/ota-manifest?ota=wrong")
+        self.assertEqual(status, 401)
+        status, headers, body = self.request("GET", f"/api/ota-manifest?ota={token}")
+        self.assertEqual(status, 200)
+        self.assertIn("xml", headers["Content-Type"])
+        self.assertIn(f"/download/LodClient.ipa?ota={token}</string>", body)
 
     def test_login_sets_a_cookie_that_opens_the_dashboard(self):
         cookie = self.login(remember=True)
@@ -281,9 +324,9 @@ class LoginAndStateTests(unittest.TestCase):
         fresh = headers["Set-Cookie"].split(";")[0]
         self.assertEqual(self.password_file.read_text(encoding="utf-8"), "lod-admin:newpass99\n")
         _, _, body = self.request("GET", "/api/session", cookie=old)
-        self.assertEqual(json.loads(body), {"signedIn": False})  # 다른 기기의 옛 로그인은 풀린다
+        self.assertEqual(json.loads(body), {"signedIn": False, "role": None})  # 다른 기기의 옛 로그인은 풀린다
         _, _, body = self.request("GET", "/api/session", cookie=fresh)
-        self.assertEqual(json.loads(body), {"signedIn": True})
+        self.assertEqual(json.loads(body)["signedIn"], True)
         status, _, _ = self.request("POST", "/api/login", {"password": "secret"})
         self.assertEqual(status, 401)
         status, _, _ = self.request("POST", "/api/login", {"password": "newpass99"})

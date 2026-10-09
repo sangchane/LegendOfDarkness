@@ -1,0 +1,86 @@
+/* 「앱 내려받기」 탭 — 옛 공개 내려받기 페이지(docs/download/index.html)의 모양을 그대로 옮겼다(사용자 2026-10-09 통합).
+   대시보드의 .card·.tabs 와 섞이지 않게 모든 선택자를 .dl 아래에 둔다(중첩 문법은 옛 사파리가 못 읽어 쓰지 않는다). */
+.dl *{box-sizing:border-box}
+.dl{--mark:#ff3b30;color:var(--text);font:15px/1.6 var(--sans);letter-spacing:-.005em;word-break:keep-all}
+.dl .tabs{display:inline-flex;gap:4px;padding:4px;border-radius:var(--radius-pill);background:var(--panel);border:1px solid var(--edge);margin-bottom:16px}
+.dl .tabs button{all:unset;cursor:pointer;padding:9px 20px;border-radius:var(--radius-pill);font-weight:600;color:var(--muted)}
+.dl .tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+.dl[data-tab=ios] .pc-only,.dl[data-tab=ios] .and-only,.dl[data-tab=pc] .ios-only,.dl[data-tab=pc] .and-only,.dl[data-tab=and] .ios-only,.dl[data-tab=and] .pc-only{display:none!important}
+.dl .card{background:var(--panel);border-radius:var(--radius-card);padding:24px}
+.dl .get{display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px}
+.dl .get .what{flex:1 1 260px}
+.dl .get h2{font-size:18px;margin:0 0 2px}
+.dl .get p{margin:0;color:var(--muted);font-size:14px}
+.dl .primary{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:var(--radius-control);background:var(--brand);color:#fff;text-decoration:none;font-weight:700;font-size:16px}
+.dl .primary svg{width:20px;height:20px}
+.dl .secondary{display:inline-block;padding:9px 14px;border-radius:var(--radius-control);background:var(--brand-weak);color:var(--brand-text);text-decoration:none;font-weight:600;font-size:14px;margin-top:10px}
+.dl .meta{font-size:13px;color:var(--muted);margin-top:6px}
+.dl .note{margin-top:12px;padding:12px 14px;border-radius:var(--radius-control);background:var(--brand-weak);color:var(--brand-text);font-size:14px}
+.dl .warn{margin-top:10px;padding:10px 14px;border-radius:var(--radius-control);background:var(--warning-soft);color:var(--warning);font-size:14px}
+.dl .onphone{display:none}
+.dl h2.section{font-size:20px;margin:40px 0 4px}
+.dl .section-lead{color:var(--muted);margin:0 0 16px;font-size:14px}
+.dl .steps{display:grid;gap:12px}
+.dl .step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center}
+.dl .step h3{display:flex;align-items:center;gap:10px;font-size:17px;margin:0 0 8px}
+.dl .no{flex:none;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center}
+.dl .when{font-size:12px;font-weight:500;color:var(--muted);background:var(--bg);padding:2px 9px;border-radius:var(--radius-pill)}
+.dl .step ol{margin:0;padding-left:20px}
+.dl .step li{margin:4px 0}
+.dl .step b{color:var(--ink)}
+.dl .pic{background:var(--raised);border:1px solid var(--edge);border-radius:16px;padding:18px;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;min-height:120px}
+.dl .phone{width:150px;border-radius:22px;background:#111;padding:5px}
+.dl .phone .scr{border-radius:18px;background:#f2f2f7;color:#111;height:260px;overflow:hidden;font:12px/1.35 -apple-system,"Apple SD Gothic Neo",sans-serif;position:relative}
+.dl .phone .title{font-weight:700;font-size:17px;padding:22px 12px 6px}
+.dl .phone .back{color:#0a84ff;padding:20px 10px 0;font-size:12px}
+.dl .phone .group{margin:6px 8px;background:#fff;border-radius:9px;overflow:hidden}
+.dl .phone .row{display:flex;align-items:center;padding:8px 9px;border-bottom:1px solid #e5e5ea}
+.dl .phone .row:last-child{border-bottom:0}
+.dl .phone .row em{margin-left:auto;color:#8e8e93;font-style:normal}
+.dl .phone .label{font-size:10px;color:#8e8e93;padding:8px 18px 0}
+.dl .dark{background:linear-gradient(160deg,#2d3a5c,#141b2e)!important}
+.dl .dim{position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}
+.dl .alert{width:84%;background:rgba(245,245,247,.97);border-radius:13px;text-align:center;overflow:hidden}
+.dl .alert h4{margin:12px 10px 4px;font-size:13px}
+.dl .alert p{margin:0 10px 10px;font-size:10px;color:#333}
+.dl .alert .btns{display:flex;border-top:1px solid #ccc}
+.dl .alert .btns div{flex:1;padding:9px;color:#0a84ff;font-size:13px}
+.dl .alert .btns div+div{border-left:1px solid #ccc}
+.dl .toggle{margin-left:auto;width:34px;height:20px;border-radius:10px;background:#34c759;position:relative}
+.dl .toggle::after{content:"";position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff}
+.dl .hl{outline:2.5px solid var(--mark);outline-offset:-2px;border-radius:7px;position:relative}
+.dl .win{width:100%;max-width:380px;border-radius:10px;overflow:hidden;background:#fff;color:#222;font:12px/1.4 "Segoe UI",var(--sans);border:1px solid var(--edge)}
+.dl .win .tb{background:#f1f3f5;padding:7px 10px;font-size:11px;color:#555;border-bottom:1px solid var(--edge)}
+.dl .win .body{padding:12px;display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:start}
+.dl .win .ipa{height:86px;border:2px dashed #aaa;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:10px;color:#666;position:relative}
+.dl .win .ipa b{font-size:19px;color:#444}
+.dl .win .field{border:1px solid #ccc;border-radius:5px;padding:5px 7px;margin-bottom:7px;position:relative;font-size:11px}
+.dl .win .field small{display:block;color:#888;font-size:9px}
+.dl .win .start{grid-column:1/-1;justify-self:end;background:#2b7de9;color:#fff;border-radius:6px;padding:6px 22px;font-weight:600;position:relative}
+.dl .win .item{display:flex;align-items:center;gap:8px;padding:8px 12px;position:relative}
+.dl .win .item small{margin-left:auto;color:#888}
+.dl .menu{position:absolute;left:140px;top:30px;width:170px;background:#fff;border:1px solid #ccc;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.15);padding:4px 0}
+.dl .menu div{padding:6px 12px}
+.dl .mark{position:absolute;top:-9px;left:-9px;width:20px;height:20px;border-radius:50%;background:var(--mark);color:#fff;font:700 11px/20px var(--sans);text-align:center}
+.dl .mark.inline{position:static;display:inline-block;margin-right:4px}
+.dl .smart{width:100%;max-width:380px;background:#1b62b3;color:#fff;font:12px/1.5 "Segoe UI",var(--sans);padding:16px 18px;border-radius:8px}
+.dl .smart h4{font-size:17px;font-weight:400;margin:0 0 8px}
+.dl .smart u{display:inline-block;margin:6px 0 8px;padding:0 4px;position:relative}
+.dl .smart .row{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.dl .smart .row span{padding:5px 16px;border:2px solid #fff;position:relative}
+.dl .choice{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.dl .choice div{padding:12px 16px;border-radius:12px;background:#fff;border:1.5px solid var(--edge);font-size:13px;text-align:center}
+.dl .choice .ok{border-color:#00a86b}
+.dl .choice .bad{border-color:var(--red);color:var(--muted)}
+.dl .choice b{display:block;font-size:12px;margin-bottom:2px}
+.dl .choice .ok b{color:#008a5b}
+.dl .choice .bad b{color:var(--red)}
+.dl .faq details{background:var(--panel);border-radius:14px;padding:14px 18px;margin-bottom:8px}
+.dl .faq summary{cursor:pointer;font-weight:600}
+.dl .faq p{margin:8px 0 0;color:var(--muted)}
+.dl .download-own{margin-bottom:16px}
+@media (max-width:720px){
+  .dl .step{grid-template-columns:minmax(0,1fr);gap:14px}
+  .dl .phone{width:min(150px,40vw)}
+  .dl .menu{left:auto;right:8px}
+}

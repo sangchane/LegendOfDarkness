@@ -220,6 +220,16 @@ def valid_session(token, credential, now=None):
     return hmac.compare_digest(signature, wanted)
 
 
+def ota_token(credential):
+    # 「내 아이폰에 설치」는 사파리가 아니라 아이폰 시스템이 쿠키 없이 manifest·.ipa 를 받는다 — 주소에 다는 표.
+    # 관리자 비밀번호에서 나와 비밀번호를 바꾸면 함께 바뀐다(사용자 2026-10-09).
+    return hmac.new(session_key(credential), b"ota", hashlib.sha256).hexdigest()[:32]
+
+
+def same_secret(supplied, expected):
+    return hmac.compare_digest(hashlib.sha256(supplied.encode()).digest(), hashlib.sha256(expected.encode()).digest())
+
+
 def save_credential(path: Path, credential):
     """비밀번호 파일을 통째로 바꾼다 — 반쯤 쓴 파일이 남지 않게 옆에 쓰고 이름을 바꾼다."""
     handle, temporary = tempfile.mkstemp(prefix=".credential-", dir=path.parent)
@@ -277,7 +287,7 @@ def safe_static_path(root: Path, request_path: str):
 
 class OpsHandler(BaseHTTPRequestHandler):
     """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
-    root = store = credential = states = throttle = password_file = activity = None
+    root = store = credential = states = throttle = password_file = activity = member = None
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
@@ -297,7 +307,18 @@ class OpsHandler(BaseHTTPRequestHandler):
             except (OSError, sqlite3.Error):
                 self._json(503, {"error": "기록을 읽지 못했습니다. 잠시 후 다시 조회하세요."})
         elif path == "/api/session":
-            self._json(200, {"signedIn": self._signed_in()})
+            role = self._role()
+            self._json(200, {"signedIn": role == "admin", "role": role}
+                       | ({"ota": ota_token(self.credential)} if role == "admin" else {}))
+        elif path == "/api/signed-in":
+            # nginx auth_request 가 내려받기 파일마다 묻는다(사용자 2026-10-09) — 본문 없이 204/401 만.
+            # 관리자·손님 쿠키, 또는 원래 주소(X-Original-URI)에 붙은 「내 아이폰에 설치」 표.
+            token = parse_qs(urlsplit(self.headers.get("X-Original-URI") or "").query).get("ota", [""])[0]
+            self.send_response(204 if self._role() or same_secret(token, ota_token(self.credential)) else 401)
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+        elif path == "/api/ota-manifest":
+            self._ota_manifest()
         elif path.startswith("/api/state/") and self.states:
             try:
                 self._json(200, self.states.read(unquote(path[len("/api/state/"):])))
@@ -333,19 +354,21 @@ class OpsHandler(BaseHTTPRequestHandler):
         except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
             return
-        user = self.credential.split(":", 1)[0]
-        supplied = f"{user}:{body.get('password') or ''}"
-        if not hmac.compare_digest(hashlib.sha256(supplied.encode()).digest(),
-                                   hashlib.sha256(self.credential.encode()).digest()):
+        # 로그인 칸은 하나 — 관리자 비밀번호면 관리자, 손님 비밀번호(member-credential)면 손님(사용자 2026-10-09).
+        password = body.get("password") or ""
+        role = next((name for name, credential in (("admin", self.credential), ("member", self.member))
+                     if credential and same_secret(f"{credential.split(':', 1)[0]}:{password}", credential)), None)
+        if role is None:
             self.throttle.failed(who)
             self._json(401, {"error": "비밀번호가 맞지 않습니다."})
             return
         remember = body.get("remember") is True
-        token = make_session(self.credential, REMEMBER_SECONDS if remember else SESSION_SECONDS)
+        token = make_session(self.credential if role == "admin" else self.member,
+                             REMEMBER_SECONDS if remember else SESSION_SECONDS)
         cookie = f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; Secure; SameSite=Strict"
         if remember:
             cookie += f"; Max-Age={REMEMBER_SECONDS}"
-        self._json(200, {"ok": True}, cookie=cookie)
+        self._json(200, {"ok": True, "role": role}, cookie=cookie)
 
     def do_PUT(self):
         if not self._signed_in():
@@ -411,6 +434,34 @@ class OpsHandler(BaseHTTPRequestHandler):
         token = make_session(credential, REMEMBER_SECONDS)
         self._json(200, {"ok": True},
                    cookie=f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age={REMEMBER_SECONDS}")
+
+    def _ota_manifest(self):
+        # 표가 맞으면 manifest 의 .ipa 주소에 같은 표를 붙여 준다 — 아이폰이 그 주소로 .ipa 를 받는다.
+        token = parse_qs(urlsplit(self.path).query).get("ota", [""])[0]
+        if not same_secret(token, ota_token(self.credential)):
+            self._json(401, {"error": "설치 주소가 맞지 않습니다."})
+            return
+        try:
+            plist = (Path(self.root) / "download" / "manifest.plist").read_text(encoding="utf-8")
+        except OSError:
+            self._json(404, {"error": "파일이 없습니다."})
+            return
+        payload = plist.replace("/download/LodClient.ipa<", f"/download/LodClient.ipa?ota={token}<").encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/xml; charset=utf-8")
+        self.send_header("Content-Length", str(len(payload)))
+        self.send_header("Cache-Control", "no-store")
+        self._security_headers()
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def _role(self):
+        # 관리자(lod-admin) · 손님(member) — 쿠키 서명 열쇠가 각자의 비밀번호에서 나와 손님 쿠키로 관리자가 되지 않는다.
+        if self._signed_in():
+            return "admin"
+        if self.member and valid_session(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.member):
+            return "member"
+        return None
 
     def _signed_in(self):
         # 쿠키(페이지) 또는 Basic 헤더(스크립트). 401 에 WWW-Authenticate 를 붙이지 않는다 — 붙이면 팝업이 뜬다.
@@ -484,10 +535,10 @@ class OpsHandler(BaseHTTPRequestHandler):
         print(f"{self.address_string()} {pattern % args}")
 
 
-def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None):
+def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None, member=None):
     return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
                                            "states": states, "throttle": throttle or LoginThrottle(),
-                                           "password_file": password_file,
+                                           "password_file": password_file, "member": member,
                                            "activity": activity or ActivityStore(store.path.parent / "activity.sqlite")})
 
 
@@ -505,13 +556,19 @@ def main():
     credential = args.password_file.read_text(encoding="utf-8").strip()
     if ":" not in credential:
         raise SystemExit("password file must contain user:password")
+    # 손님 비밀번호(내려받기·보기만, 사용자 2026-10-09)는 관리자 비밀번호 파일 옆 member-credential — 없으면 손님 로그인 없음.
+    member_file = args.password_file.with_name("member-credential")
+    member = member_file.read_text(encoding="utf-8").strip() if member_file.exists() else None
+    if member is not None and ":" not in member:
+        raise SystemExit("member-credential must contain user:password")
     data = args.overrides.parent
     log = data / "changes.jsonl"
     stores = (OverrideStore(args.catalog, args.overrides, log), StateStore(data / "state", log))
     activity = ActivityStore(data / "activity.sqlite", args.web_activity, args.game_activity, os.environ.get("LOD_CHARACTER_DIR", ""), os.environ.get("LOD_SERVER_CONFIG", ""))
     activity.start()
     server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1],
-                                                                     password_file=args.password_file, activity=activity))
+                                                                     password_file=args.password_file, activity=activity,
+                                                                     member=member))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

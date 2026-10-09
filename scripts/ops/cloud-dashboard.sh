@@ -4,6 +4,7 @@
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh setup
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh release [ios|windows|android]   맥의 최신 앱 파일을 내려받기 페이지(/download/)에 올린다
+#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh member-password <새것>   손님(내려받기·보기만) 비밀번호
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh nginx    nginx 설정만 다시 깐다(페이지·서비스는 그대로) — 내려받기 파일 종류를 늘렸을 때
 set -euo pipefail
 
@@ -173,18 +174,46 @@ server {
         proxy_pass http://127.0.0.1:8787;
     }
 
-    # 멀리 있는 사람이 앱을 받는 페이지 — 로그인 없이 nginx 가 바로 준다(사용자 2026-10-02).
-    # 페이지는 docs/download/(www 로 올라감), 앱 파일(아이폰 .ipa·윈도우 .zip·안드로이드 .apk)은 release 가 올린 lod-ops/release/.
-    location = /download { return 301 /download/; }
-    location ~ ^/download/(LodClient\.ipa|LodClient-windows\.zip)$ {
-        alias /home/ubuntu/lod-ops/release/$1;
+    # 앱 내려받기 — 안내는 대시보드 「앱 내려받기」 탭(사용자 2026-10-09 통합), 파일은 로그인(관리자·손님 비밀번호)해야 받는다.
+    # nginx 가 요청마다 운영 서비스에 쿠키를 묻고(/api/signed-in 204·401), 아니면 로그인 화면으로 보냈다가 돌아오게 한다.
+    # 앱 파일(아이폰 .ipa·윈도우 .zip·안드로이드 .apk)은 release 가 올린 lod-ops/release/, manifest.plist 틀은 docs/download/.
+    location = /_signed_in {
+        internal;
+        proxy_pass http://127.0.0.1:8787/api/signed-in;
+        proxy_pass_request_body off;
+        # 여기서 하나라도 적으면 server 의 proxy_set_header 를 물려받지 않는다 — 횟수 제한이 보는 X-Real-IP 를 다시 적는다.
+        proxy_set_header Content-Length "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Original-URI $request_uri;
+    }
+    location @login { return 302 /login.html?next=$request_uri; }
+    # 옛 공개 페이지 주소 — 앱의 「새 판」 단추가 아직 이리로 연다.
+    location = /download { return 302 /?view=download; }
+    location = /download/ { return 302 /?view=download; }
+    # 「내 아이폰에 설치」는 사파리가 아니라 아이폰 시스템이 쿠키 없이 manifest·.ipa 를 받는다 — 주소에 단 표(?ota=)로 연다.
+    location = /download/LodClient.ipa {
+        auth_request /_signed_in;
+        error_page 401 = @login;
+        alias /home/ubuntu/lod-ops/release/LodClient.ipa;
         default_type application/octet-stream;
-        add_header Content-Disposition 'attachment; filename="$1"' always;
+        add_header Content-Disposition 'attachment; filename="LodClient.ipa"' always;
         add_header Cache-Control no-cache always;
         add_header X-Content-Type-Options nosniff always;
     }
-    # 안드로이드는 파일 종류를 .apk 로 알려야 크롬이 「설치 파일」로 받는다(정확히 일치하는 위치라 위 정규식보다 먼저 잡힌다).
+    location = /download/LodClient-windows.zip {
+        auth_request /_signed_in;
+        error_page 401 = @login;
+        alias /home/ubuntu/lod-ops/release/LodClient-windows.zip;
+        default_type application/octet-stream;
+        add_header Content-Disposition 'attachment; filename="LodClient-windows.zip"' always;
+        add_header Cache-Control no-cache always;
+        add_header X-Content-Type-Options nosniff always;
+    }
+    # 안드로이드는 파일 종류를 .apk 로 알려야 크롬이 「설치 파일」로 받는다.
     location = /download/LodClient.apk {
+        auth_request /_signed_in;
+        error_page 401 = @login;
         alias /home/ubuntu/lod-ops/release/LodClient.apk;
         types { }
         default_type application/vnd.android.package-archive;
@@ -194,12 +223,17 @@ server {
     }
     # 등록된 기기가 사파리에서 바로 설치하는 안내서 — 아이폰은 xml 로 받아야 읽는다.
     location = /download/manifest.plist {
-        alias /home/ubuntu/lod-ops/www/download/manifest.plist;
-        types { }
-        default_type application/xml;
+        proxy_pass http://127.0.0.1:8787/api/ota-manifest$is_args$args;
+    }
+    # 앱이 켜질 때 쿠키 없이 새 판 번호를 묻는다(AppUpdate) — 로그인 없이 둔다(정규식이라 아래 /download/ 보다 먼저 잡힌다).
+    location ~ ^/download/(version-[a-z]+\.txt)$ {
+        alias /home/ubuntu/lod-ops/www/download/$1;
         add_header Cache-Control no-cache always;
+        add_header X-Content-Type-Options nosniff always;
     }
     location /download/ {
+        auth_request /_signed_in;
+        error_page 401 = @login;
         alias /home/ubuntu/lod-ops/www/download/;
         add_header Cache-Control no-cache always;
         add_header X-Content-Type-Options nosniff always;
@@ -216,7 +250,7 @@ SH
 backup() {
     local out="$BACKUP_DIR/ops-data-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$out"
-    rsync -az --timeout=60 --exclude credential -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
+    rsync -az --timeout=60 --exclude '*credential' -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
     echo "관리 페이지 값 백업 — $out"
     ls -la "$out"
 }
@@ -294,6 +328,19 @@ sudo systemctl restart lod-ability-ops'
     save_credentials
 }
 
+# 손님 비밀번호 — 내려받기·보기만(사용자 2026-10-09). 관리자 비밀번호와 따로 서비스 옆 member-credential 에.
+#   LOD_CLOUD_IP=… scripts/ops/cloud-dashboard.sh member-password <새비밀번호>
+set_member_password() {
+    printf '%s\n' "$1" | remote 'set -euo pipefail
+IFS= read -r password
+umask 077
+# 관리자 비밀번호와 같으면 로그인이 관리자로 먼저 맞춰 손님이 관리자가 된다.
+if [ "$password" = "$(cut -d: -f2- /home/ubuntu/lod-ops/data/credential)" ]; then echo "관리자 비밀번호와 달라야 합니다" >&2; exit 1; fi
+printf "member:%s\n" "$password" > /home/ubuntu/lod-ops/data/member-credential
+sudo systemctl restart lod-ability-ops'
+    echo "손님 비밀번호를 바꿨습니다 — 손님 로그인은 모두 풀립니다."
+}
+
 save_credentials() {
     mkdir -p "$BACKUP_DIR"
     umask 077
@@ -311,7 +358,8 @@ case "${1:-status}" in
     credentials) save_credentials ;;
     cert) cert ;;
     password) set_password "${2:-}" ;;
+    member-password) set_member_password "${2:?새 손님 비밀번호를 붙여 주세요}" ;;
     release) release "${2:-ios}" ;;
     nginx) nginx_site; remote "sudo nginx -t && sudo systemctl reload nginx" ;;
-    *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password release nginx"; exit 2 ;;
+    *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password member-password release nginx"; exit 2 ;;
 esac
