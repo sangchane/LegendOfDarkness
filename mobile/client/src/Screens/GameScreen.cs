@@ -60,8 +60,6 @@ public partial class GameScreen : Control
     private WorldView _world = null!;
     private Label _who = null!;
     private Label _place = null!;
-    private Label _target = null!;
-    private Label _targetPercent = null!;
     private PackPanel _pack = null!;
     private GearPanel _gearPanel = null!;
     private TalkPanel _talk = null!;
@@ -135,8 +133,6 @@ public partial class GameScreen : Control
 
     // 서버가 들려준 말이 몇 줄째인가. 새로 온 것만 적는다.
     private int _heardSeen;
-    private ProgressBar _targetHealth = null!;
-    private Control _targetPlate = null!;
     private Control? _placePlate;
     private AbilityBar _abilities = null!;
 
@@ -569,7 +565,6 @@ public partial class GameScreen : Control
             ? StatusBadges.Of(me.Ailments, me.StatusesOf(me.Serial))
             : LayoutCheck.PretendStatuses);
 
-        ShowTarget();
         // 직업 표(class-kit.txt)에 있는 것만 막대·배치 목록·자동 사냥에 — 무도가는 열 가지(사용자 2026-10-04).
         int? path = _server?.Path;
         _abilities.Show(
@@ -821,23 +816,6 @@ public partial class GameScreen : Control
                 ShowGear(true);
             }
         }
-    }
-
-    /// <summary>
-    /// Whoever is picked out, and how hurt they are. The bar is never alone — the number is beside it,
-    /// because health must not be readable by colour or length alone.
-    /// </summary>
-    private void ShowTarget()
-    {
-        int? left = _world.Target == 0 ? null : _server?.Health(_world.Target);
-
-        // 퍼센트·바는 고른 이가 있으면 늘 자리를 차지한다 — 체력을 알 때만 붙여 판이 넓어졌다 좁아졌다 했다(사용자 2026-10-05).
-        _target.Text = _world.TargetName;
-        _targetPercent.Text = left is { } percent ? $"{percent}%" : "–";
-        _targetHealth.Value = left ?? 100;
-        _targetHealth.Modulate = left is null ? new Color(1, 1, 1, 0.3f) : Colors.White;
-        // 괴물 머리 위에 체력바가 있으니 위 판은 손으로 누른 때만 — 자동 사냥이 고른 것은 띄우지 않는다(사용자 2026-10-05).
-        _targetPlate.Visible = _target.Text.Length > 0 && _world.TargetByHand;
     }
 
 }

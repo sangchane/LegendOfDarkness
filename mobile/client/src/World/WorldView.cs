@@ -244,9 +244,6 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
         }
     }
 
-    /// <summary>손으로 누른 이를 골랐나 — 자동 사냥이 고른 것이면 아니다. 위 이름판은 이때만 뜬다(사용자 2026-10-05).</summary>
-    public bool TargetByHand { get; private set; }
-
     // 괴물은 원작 형식이라 이름이 안 온다 — 서버 템플릿에서 뽑은 「맵 · 그림 → 이름」(build-monster-names.py).
     private static Dictionary<(int Map, int Sprite), string>? _monsterNames;
     private static Dictionary<int, string>? _monsterNamesBySprite;

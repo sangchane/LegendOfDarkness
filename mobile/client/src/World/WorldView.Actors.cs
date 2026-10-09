@@ -124,7 +124,6 @@ public sealed partial class WorldView
             }
         }
 
-        TargetByHand = _target != 0;
         Mark();
 
         // 서버가 창을 보내 오면 화면이 연다(GameScreen). 여기서는 누른 것만 알린다. 사람은 이미 고른 이를 한 번 더 누를 때만 —

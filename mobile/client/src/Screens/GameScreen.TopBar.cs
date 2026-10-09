@@ -9,7 +9,7 @@ namespace LodClient;
 public partial class GameScreen : Control
 {
     /// <summary>
-    /// Name and health on the left, whoever is picked out in the middle, world state and inventory on the right — each on
+    /// Name and health on the left, world state and inventory on the right — each on
     /// a plate of its own that keeps it readable over the floor, with the floor showing between them.
     /// </summary>
     private Control BuildTopRow()
@@ -78,35 +78,9 @@ public partial class GameScreen : Control
         // 가로도 세로와 같은 여백 — 가로에서 납작하게(compact) 눌러 체력·마력 판의 비율이 틀어졌다(사용자 2026-10-04).
         row.AddChild(LolPlated(mine, compact: false));
 
-        // Whoever is picked out, in the middle where the original kept it. Empty until somebody is.
-        _target = Aux(string.Empty);
-
-        _targetHealth = new ProgressBar
-        {
-            CustomMinimumSize = new Vector2(Main.Portrait ? 48 : 72, 10),
-            MaxValue = 100,
-            ShowPercentage = false,
-            SizeFlagsVertical = SizeFlags.ShrinkCenter
-        };
-        _targetHealth.AddThemeStyleboxOverride("background", Greybox.Surface());
-        _targetHealth.AddThemeStyleboxOverride("fill", Greybox.Fill());
-
-        HBoxContainer picked = new() { SizeFlagsVertical = SizeFlags.ShrinkCenter };
-        picked.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        picked.AddChild(_target);
-        // 퍼센트는 폭을 정해 둔다 — 9% 와 100% 사이에 판이 흔들리지 않게. 글자는 이름 쪽(왼쪽)에 붙인다 — 오른쪽에 붙이니
-        // 이름과 퍼센트 사이가 벌어져 보였다(사용자 2026-10-05).
-        _targetPercent = Aux("–");
-        _targetPercent.CustomMinimumSize = new Vector2(Main.Portrait ? 36 : 44, 0);
-        picked.AddChild(_targetPercent);
-        picked.AddChild(_targetHealth);
-
-        // 고른 이가 없으면 판째로 숨긴다 — 빈 판이 바닥 한가운데를 가린다. 가로는 위 줄 가운데, 세로는 둘째 줄 왼쪽(첫 줄
-        // 오른쪽은 미니맵 자리다).
-        CenterContainer middle = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
-        _targetPlate = Plated(picked);
-        _targetPlate.Visible = false;
-        middle.AddChild(_targetPlate);
+        // 가운데는 빈 칸 — 오른쪽 단추를 끝으로 민다. 고른 이 판은 뺐다: 괴물·NPC를 누를 때마다 떠서 위 줄을 깼다
+        // (사용자 2026-10-09). 이름·체력은 머리 위에 있다.
+        Control middle = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore };
 
         // 곳 이름은 미니맵 아래 구석에 적는다(MinimapView) — 가로 위 줄에 따로 두던 판은 뺐다(2026-09-26).
         _place = Aux(string.Empty);
@@ -144,7 +118,7 @@ public partial class GameScreen : Control
 
         if (Main.Portrait)
         {
-            // 세로: 첫 줄 = 둥근 미니맵(맨 왼쪽) · 내 판, 둘째 줄 = 고른 이 · 월드맵 · 인벤토리 · 설정.
+            // 세로: 첫 줄 = 둥근 미니맵(맨 왼쪽) · 내 판, 둘째 줄 = 월드맵 · 인벤토리 · 설정.
             row.AddChild(_minimap);
             row.MoveChild(_minimap, 0);
 
@@ -172,7 +146,7 @@ public partial class GameScreen : Control
             return top;
         }
 
-        // 가로: 미니맵(맨 왼쪽) · 내 판 · 고른 이(가운데) · 월드맵 · 인벤토리 · 설정, 한 줄.
+        // 가로: 미니맵(맨 왼쪽) · 내 판 · (빈 칸) · 월드맵 · 인벤토리 · 설정, 한 줄.
         row.AddChild(_minimap);
         row.MoveChild(_minimap, 0);
         row.AddChild(middle);

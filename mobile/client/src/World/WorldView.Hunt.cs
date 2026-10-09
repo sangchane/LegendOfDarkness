@@ -206,7 +206,6 @@ public sealed partial class WorldView
         if (step.Target != 0 && step.Target != _target)
         {
             _target = step.Target;
-            TargetByHand = false;
             Mark();
         }
 
