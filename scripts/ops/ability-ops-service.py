@@ -849,12 +849,12 @@ class OpsHandler(BaseHTTPRequestHandler):
                 if path.stat().st_size > 4 * 1024 * 1024:
                     continue
                 who = json.loads(path.read_text(encoding="utf-8-sig"))
-            except (OSError, ValueError):
-                continue  # 저장 중이던 파일 하나 때문에 목록 전체가 막히지 않게
-            if isinstance(who, dict) and who.get("KakaoId") == kakao_id and who.get("Username"):
-                mine.append({"name": str(who["Username"]), "level": int(who.get("ExpLevel") or 0), "path": str(who.get("Path") or ""),
-                             "gender": str(who.get("Gender") or ""), "hairStyle": int(who.get("HairStyle") or 0),
-                             "hairColor": int(who.get("HairColor") or 0)})
+                if isinstance(who, dict) and who.get("KakaoId") == kakao_id and who.get("Username"):
+                    mine.append({"name": str(who["Username"]), "level": int(who.get("ExpLevel") or 0), "path": str(who.get("Path") or ""),
+                                 "gender": str(who.get("Gender") or ""), "hairStyle": int(who.get("HairStyle") or 0),
+                                 "hairColor": int(who.get("HairColor") or 0)})
+            except (OSError, ValueError, TypeError):
+                continue  # 저장 중이던·깨진 파일 하나 때문에 목록 전체가 막히지 않게
         self._json(200, {"characters": sorted(mine, key=lambda row: row["name"].lower())})
 
     def _redirect(self, location, *cookies):

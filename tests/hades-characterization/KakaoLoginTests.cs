@@ -201,6 +201,10 @@ public sealed class KakaoLoginTests : IDisposable
         Assert.Matches(@"kgone-\d{14}\.json$", moved);
         Assert.Equal("1", JsonNode.Parse(File.ReadAllText(moved))!["KakaoId"]!.GetValue<string>());
         Assert.Equal(Refused(KakaoLogin.NoCharacter), Account("kgone", Token("1") + "|delete"));
+        // 지운 이름은 아무도 다시 만들지 못한다 — 경매의 받을 것이 이름으로 묶여 있다(리뷰 2026-10-11).
+        Assert.Equal((byte)0x03, Account("kgone", Token("2"), 1, 1, 1, 1).Item1);
+        Assert.Equal((byte)0x03, Account("KGONE", Token("1"), 1, 1, 1, 1).Item1);
+        Assert.False(File.Exists(Path.Combine(aislings, "kgone.json")));
 
         // 접속 중이면 거절.
         using (await HadesLoginClient.LoginAsync(IPAddress.Loopback, server.LoginPort, "kmine", Token("1"), null, token))
