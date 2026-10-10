@@ -1,10 +1,7 @@
-/* 앱 카카오 로그인의 끝(사용자 2026-10-11) — 주소 # 뒤 6자리를 크게 보여 준다. 앱에 이 번호를 넣어야 앱이 게임 표를 받는다
-   (남이 만든 링크를 열어도 번호는 이 화면에만 있어 가로챌 수 없다 — 보안 리뷰 2026-10-11). # 뒤는 서버로 다시 가지 않는다. */
+/* 앱 카카오 로그인의 끝(사용자 2026-10-11) — 주소가 #used 면 이미 쓰였거나 지난 로그인. 6자리 번호는 뺐다(사용자 같은 날). */
 (function () {
   "use strict";
-  var code = window.location.hash.slice(1);
-  var ok = /^\d{6}$/.test(code);
-  document.getElementById("code").textContent = ok ? code : "";
-  document.getElementById("with-code").hidden = !ok;
-  document.getElementById("without-code").hidden = ok;
+  var used = window.location.hash === "#used";
+  document.getElementById("signed-in").hidden = used;
+  document.getElementById("used").hidden = !used;
 })();

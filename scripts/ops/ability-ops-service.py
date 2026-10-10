@@ -416,13 +416,13 @@ def safe_static_path(root: Path, request_path: str):
 
 class AppTickets:
     """앱 카카오 로그인 표(사용자 2026-10-11 「게임클라이언트에도 적용해」) — 앱이 받아 브라우저로 카카오 로그인을 시키고,
-    끝나면 브라우저가 6자리 번호를 보여 준다. 앱은 그 번호를 넣어야 게임 표를 받는다 — 남이 만든 링크를 열어 버려도
-    번호는 그 사람 브라우저 화면에만 있어 가로챌 수 없다(보안 리뷰 2026-10-11). 메모리에만 10분 — 다시 켜면 앱은 처음부터."""
-    LIFETIME, LIMIT, PER_CLIENT, TRIES = 600, 1000, 20, 5
+    끝나면 앱이 그 표로 게임 표를 받는다. 6자리 번호는 뺐다(사용자 2026-10-11 「6자리 인증은 필요없다」 — 남이 만든 링크를
+    열면 그 앱이 받을 수 있는 것은 SPEC game-kakao-accounts 알려진 한계). 메모리에만 10분 — 다시 켜면 앱은 처음부터."""
+    LIFETIME, LIMIT, PER_CLIENT = 600, 1000, 20
 
     def __init__(self):
         self.lock = threading.Lock()
-        self.tickets = {}  # 표 → {"expiry", "client", "id"(None 이면 아직), "name", "code", "tries"}
+        self.tickets = {}  # 표 → {"expiry", "client", "id"(None 이면 아직), "name"}
 
     def create(self, client, now=None):
         now = now or time.time()
@@ -432,7 +432,7 @@ class AppTickets:
             if len(self.tickets) >= self.LIMIT or sum(entry["client"] == client for entry in self.tickets.values()) >= self.PER_CLIENT:
                 return None
             ticket = secrets.token_urlsafe(32)
-            self.tickets[ticket] = {"expiry": now + self.LIFETIME, "client": client, "id": None, "name": "", "code": "", "tries": 0}
+            self.tickets[ticket] = {"expiry": now + self.LIFETIME, "client": client, "id": None, "name": ""}
             return ticket
 
     def exists(self, ticket, now=None):
@@ -441,30 +441,22 @@ class AppTickets:
             return bool(entry) and entry["expiry"] > (now or time.time())
 
     def bind(self, ticket, kakao_id, name):
-        """카카오 로그인이 끝난 표에 그 사람을 묶고 앱에 넣을 번호를 돌려준다. 다른 사람이 이미 묶었으면 None."""
+        """카카오 로그인이 끝난 표에 그 사람을 묶는다. 다른 사람이 이미 묶었으면 False."""
         with self.lock:
             entry = self.tickets.get(ticket)
             if not entry or entry["id"] not in (None, kakao_id):
-                return None
-            if entry["id"] is None:
-                entry.update(id=kakao_id, name=name, code=f"{secrets.randbelow(10 ** 6):06d}")
-            return entry["code"]
+                return False
+            entry.update(id=kakao_id, name=name)
+            return True
 
-    def redeem(self, ticket, code, now=None):
-        """("missing",) · ("waiting",) · ("code",) · ("wrong", 남은 기회) · ("ok", 회원번호, 닉네임). 다섯 번 틀리면 표가 사라진다."""
+    def redeem(self, ticket, now=None):
+        """("missing",) · ("waiting",) · ("ok", 회원번호, 닉네임)."""
         with self.lock:
             entry = self.tickets.get(ticket) if isinstance(ticket, str) else None
             if not entry or entry["expiry"] <= (now or time.time()):
                 return ("missing",)
             if entry["id"] is None:
                 return ("waiting",)
-            if not code:
-                return ("code",)
-            if not (isinstance(code, str) and same_secret(code.strip(), entry["code"])):
-                entry["tries"] += 1
-                if entry["tries"] >= self.TRIES:
-                    del self.tickets[ticket]
-                return ("wrong", self.TRIES - entry["tries"])
             return ("ok", entry["id"], entry["name"])
 
     def take(self, ticket):
@@ -557,6 +549,9 @@ class OpsHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/kakao/game-check":
             self._game_check()
+            return
+        if path == "/api/kakao/characters":
+            self._characters()
             return
         if path != "/api/login":
             self._json(404, {"error": "없는 API입니다."})
@@ -779,8 +774,8 @@ class OpsHandler(BaseHTTPRequestHandler):
                    f" SameSite=Lax; Max-Age={REMEMBER_SECONDS}")
         target = safe_next(unquote(target))
         if ticket:
-            # 앱에 넣을 번호는 이 브라우저 화면에만 — 주소 # 뒤라 서버로 다시 오지 않는다(대기면 초대 번호 뒤에 그 화면으로).
-            target = "/app-login.html#" + (self.app_tickets.bind(ticket, kakao_id, name) or "used")
+            # 대기면 초대 번호 뒤에 「앱으로 돌아가세요」 화면으로.
+            target = "/app-login.html" + ("" if self.app_tickets.bind(ticket, kakao_id, name) else "#used")
         self._redirect(target if status == "allowed" else "/login.html?next=" + quote(target, safe=""), clear, session)
 
     def _app_ticket(self):
@@ -792,22 +787,19 @@ class OpsHandler(BaseHTTPRequestHandler):
         self._json(200, {"ticket": ticket, "start": "/api/kakao/start?app=" + ticket})
 
     def _app_token(self):
-        # 앱 카카오 로그인 2 — 앱이 몇 초마다 묻는다. 브라우저 화면의 번호가 맞고 허가면 게임 표를 한 번만 내주고 표를 지운다.
+        # 앱 카카오 로그인 2 — 앱이 몇 초마다 묻는다. 묶였고 허가면 게임 표를 한 번만 내주고 표를 지운다.
         try:
             body = self._body(256)
         except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
             return
         ticket = body.get("ticket")
-        found = self.app_tickets.redeem(ticket, body.get("code"))
+        found = self.app_tickets.redeem(ticket)
         if found[0] == "missing":
             self._json(404, {"error": "로그인 표가 없거나 지났습니다. 처음부터 다시 해 주세요."})
             return
-        if found[0] in ("waiting", "code"):
-            self._json(202, {found[0]: True})
-            return
-        if found[0] == "wrong":
-            self._json(403, {"error": f"번호가 맞지 않습니다. 남은 기회 {found[1]}번.", "left": found[1]})
+        if found[0] == "waiting":
+            self._json(202, {"waiting": True})
             return
         _, kakao_id, name = found
         status = self.kakao_users.status(kakao_id)
@@ -825,20 +817,45 @@ class OpsHandler(BaseHTTPRequestHandler):
     def _game_check(self):
         # 게임 서버가 로그인마다 묻는다(설정 KakaoCheckUrl) — 거부하면 다음 로그인부터 막힌다.
         # 표를 가진 사람만 답을 얻으니 밖에 열려 있어도 된다.
+        kakao_id = self._game_person()
+        if kakao_id:
+            self._json(200, {"id": kakao_id})
+
+    def _game_person(self):
+        """본문의 게임 표가 허가된 사람이면 회원번호, 아니면 400/401/403 을 보내고 None."""
         try:
             token = self._body(512).get("token")
         except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
-            return
+            return None
         kakao_id = kakao_session_id(token if isinstance(token, str) else "", self.kakao_secret, kind="game")
         if not kakao_id:
             self._json(401, {"error": "카카오 로그인이 끝났습니다."})
-            return
+            return None
         status = self.kakao_users.status(kakao_id)
         if status != "allowed":
             self._json(403, {"status": status or "denied"})
+            return None
+        return kakao_id
+
+    def _characters(self):
+        # 앱의 내 캐릭터 목록(사용자 2026-10-11 「게임 아이디 선택수정추가」) — 캐릭터 파일 중 주인이 이 사람인 것. 읽기만 한다.
+        kakao_id = self._game_person()
+        if not kakao_id:
             return
-        self._json(200, {"id": kakao_id})
+        mine = []
+        for path in sorted(Path(self.characters).glob("*.json")) if self.characters else []:
+            try:
+                if path.stat().st_size > 4 * 1024 * 1024:
+                    continue
+                who = json.loads(path.read_text(encoding="utf-8-sig"))
+            except (OSError, ValueError):
+                continue  # 저장 중이던 파일 하나 때문에 목록 전체가 막히지 않게
+            if isinstance(who, dict) and who.get("KakaoId") == kakao_id and who.get("Username"):
+                mine.append({"name": str(who["Username"]), "level": int(who.get("ExpLevel") or 0), "path": str(who.get("Path") or ""),
+                             "gender": str(who.get("Gender") or ""), "hairStyle": int(who.get("HairStyle") or 0),
+                             "hairColor": int(who.get("HairColor") or 0)})
+        self._json(200, {"characters": sorted(mine, key=lambda row: row["name"].lower())})
 
     def _redirect(self, location, *cookies):
         self.send_response(302)
@@ -928,7 +945,7 @@ class OpsHandler(BaseHTTPRequestHandler):
 
 
 def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None,
-                kakao=None, kakao_users=None, exchange=None, kakao_secret=None, join_code=None):
+                kakao=None, kakao_users=None, exchange=None, kakao_secret=None, join_code=None, characters=None):
     return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
                                            "states": states, "throttle": throttle or LoginThrottle(),
                                            "password_file": password_file,
@@ -937,7 +954,8 @@ def handler_for(root, store, credential, states=None, throttle=None, password_fi
                                            "kakao_users": kakao_users or KakaoUsers(store.path.parent / "kakao-users.json"),
                                            "kakao_exchange": staticmethod(exchange or kakao_exchange),
                                            "kakao_secret": kakao_secret or secrets.token_hex(32),
-                                           "join_code": join_code, "app_tickets": AppTickets()})
+                                           "join_code": join_code, "app_tickets": AppTickets(),
+                                           "characters": characters})
 
 
 def main():
@@ -974,7 +992,8 @@ def main():
     activity.start()
     server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1],
                                                                      password_file=args.password_file, activity=activity,
-                                                                     kakao=kakao, kakao_secret=kakao_secret, join_code=join_code))
+                                                                     kakao=kakao, kakao_secret=kakao_secret, join_code=join_code,
+                                                                     characters=os.environ.get("LOD_CHARACTER_DIR", "")))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

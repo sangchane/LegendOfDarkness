@@ -193,15 +193,9 @@ class LoginAndStateTests(unittest.TestCase):
         self.assertEqual(body["start"], "/api/kakao/start?app=" + body["ticket"])
         return body["ticket"]
 
-    def app_token(self, ticket, code=None):
-        status, _, body = self.request("POST", "/api/kakao/app-token", {"ticket": ticket} | ({} if code is None else {"code": code}))
+    def app_token(self, ticket):
+        status, _, body = self.request("POST", "/api/kakao/app-token", {"ticket": ticket})
         return status, json.loads(body)
-
-    @staticmethod
-    def shown_code(location):
-        """브라우저가 보여 주는 6자리 — 곧장 「/app-login.html#번호」, 대기면 「/login.html?next=…%23번호」."""
-        import urllib.parse
-        return urllib.parse.unquote(location).rsplit("#", 1)[1]
 
     def browser_kakao(self, ticket):
         """앱이 연 브라우저 — 카카오 동의 뒤 돌아오기까지. (callback 응답 머리, 세션 쿠키)."""
@@ -215,44 +209,31 @@ class LoginAndStateTests(unittest.TestCase):
         return headers, session
 
     def test_app_gets_a_game_token_after_kakao_login_in_the_browser(self):
-        # 게임 로그인을 카카오로(사용자 2026-10-11) SC-1 — 딥링크 없이 앱은 표로 기다렸다 받는다.
+        # 게임 로그인을 카카오로(사용자 2026-10-11) — 딥링크 없이 앱은 표로 기다렸다 받는다. 6자리 번호는 없다(사용자 같은 날).
         ticket = self.app_ticket()
         self.assertEqual(self.app_token(ticket), (202, {"waiting": True}))
         headers, session = self.browser_kakao(ticket)
-        # 처음 온 사람은 대기 — 초대 번호를 넣은 뒤 「앱에 이 번호를 넣으세요」 화면으로.
-        self.assertTrue(headers["Location"].startswith("/login.html?next=%2Fapp-login.html%23"))
-        code = self.shown_code(headers["Location"])
-        self.assertRegex(code, r"^\d{6}$")
-        self.assertEqual(self.app_token(ticket), (202, {"code": True}))  # 번호 없이는 못 받는다
-        wrong = "000000" if code != "000000" else "111111"
-        self.assertEqual(self.app_token(ticket, wrong), (403, {"error": "번호가 맞지 않습니다. 남은 기회 4번.", "left": 4}))
-        self.assertEqual(self.app_token(ticket, code), (202, {"pending": True, "name": "손님"}))
+        # 처음 온 사람은 대기 — 초대 번호를 넣은 뒤 「앱으로 돌아가세요」 화면으로.
+        self.assertEqual(headers["Location"], "/login.html?next=%2Fapp-login.html")
+        self.assertEqual(self.app_token(ticket), (202, {"pending": True, "name": "손님"}))
         status, _, _ = self.request("POST", "/api/kakao/join", {"code": self.JOIN}, cookie=session)
         self.assertEqual(status, 200)
-        status, body = self.app_token(ticket, code)
+        status, body = self.app_token(ticket)
         self.assertEqual((status, body["name"]), (200, "손님"))
         self.assertTrue(body["token"].startswith("g777."))
-        self.assertEqual(self.app_token(ticket, code)[0], 404)  # 한 번만 내준다
-        self.assertEqual(self.app_token("no-such-ticket", code)[0], 404)
-        # 이미 허가된 사람은 곧장 번호 화면으로.
-        headers, _ = self.browser_kakao(self.app_ticket())
-        self.assertRegex(headers["Location"], r"^/app-login\.html#\d{6}$")
+        self.assertEqual(self.app_token(ticket)[0], 404)  # 한 번만 내준다
+        self.assertEqual(self.app_token("no-such-ticket")[0], 404)
+        # 이미 허가된 사람은 곧장 끝 화면으로.
+        ticket = self.app_ticket()
+        headers, _ = self.browser_kakao(ticket)
+        self.assertEqual(headers["Location"], "/app-login.html")
+        self.assertEqual(self.app_token(ticket)[0], 200)
         # 모르는 표로 시작하면 카카오로 보내지 않는다.
         status, headers, _ = self.request("GET", "/api/kakao/start?app=forged")
         self.assertEqual((status, headers["Location"]), (302, "/login.html?error=kakao"))
-
-    def test_app_ticket_needs_the_number_shown_in_the_browser(self):
-        # 보안 리뷰 2026-10-11 — 남이 만든 링크를 열어 버려도 번호는 그 브라우저 화면에만 있다. 다섯 번 틀리면 표가 사라진다.
-        self.kakao_login()
-        ticket = self.app_ticket()
-        headers, _ = self.browser_kakao(ticket)
-        code = self.shown_code(headers["Location"])
-        wrong = "000000" if code != "000000" else "111111"
-        self.assertEqual([self.app_token(ticket, wrong)[1]["left"] for _ in range(5)], [4, 3, 2, 1, 0])
-        self.assertEqual(self.app_token(ticket, code)[0], 404)
         # 한 주소가 표를 쌓아 남의 로그인을 막지 못한다.
         made = [self.request("POST", "/api/kakao/app-ticket")[0] for _ in range(SERVICE.AppTickets.PER_CLIENT + 2)]
-        self.assertEqual(made, [200] * SERVICE.AppTickets.PER_CLIENT + [503, 503])
+        self.assertEqual(made[-2:], [503, 503])
 
     def test_app_ticket_of_a_denied_person_is_refused(self):
         self.kakao_login()
@@ -260,14 +241,17 @@ class LoginAndStateTests(unittest.TestCase):
         ticket = self.app_ticket()
         headers, _ = self.browser_kakao(ticket)
         self.assertEqual(headers["Location"], "/login.html?error=denied")
-        self.assertEqual(self.app_token(ticket), (202, {"waiting": True}))  # 거부된 사람에게는 번호를 주지 않는다
+        self.assertEqual(self.app_token(ticket), (202, {"waiting": True}))  # 거부된 사람은 표에 묶지 않는다
+
+    def game_token(self):
+        self.kakao_login()
+        ticket = self.app_ticket()
+        self.browser_kakao(ticket)
+        return self.app_token(ticket)[1]["token"]
 
     def test_game_server_checks_the_game_token(self):
         # SC-2 — 게임 서버가 로그인마다 묻는다. 거부하면 다음 로그인부터 막힌다.
-        self.kakao_login()
-        ticket = self.app_ticket()
-        headers, _ = self.browser_kakao(ticket)
-        token = self.app_token(ticket, self.shown_code(headers["Location"]))[1]["token"]
+        token = self.game_token()
         check = lambda value: self.request("POST", "/api/kakao/game-check", {"token": value})
         status, _, body = check(token)
         self.assertEqual((status, json.loads(body)), (200, {"id": "777"}))
@@ -281,6 +265,27 @@ class LoginAndStateTests(unittest.TestCase):
             self.assertEqual(check(wrong)[0], 401, wrong)
         self.users.set_status("777", "denied")
         status, _, body = check(token)
+        self.assertEqual((status, json.loads(body)), (403, {"status": "denied"}))
+
+    def test_app_lists_only_my_characters(self):
+        # SPEC game-kakao-accounts SC-2 — 내 캐릭터만, 거부 403(대기도 같은 길), 틀린 표 401.
+        folder = Path(self.scratch.name) / "aislings"
+        folder.mkdir()
+        self.server.RequestHandlerClass.characters = str(folder)
+        for name, owner, level in (("zeta", "777", 5), ("Alpha", "777", 12), ("other", "888", 9), ("old", None, 3)):
+            (folder / f"{name.lower()}.json").write_text(json.dumps({"Username": name, "KakaoId": owner, "ExpLevel": level,
+                "Path": "Monk", "Gender": "Female", "HairStyle": 4, "HairColor": 2}), encoding="utf-8")
+        (folder / "broken.json").write_text("{", encoding="utf-8")
+        token = self.game_token()
+        listed = lambda value: self.request("POST", "/api/kakao/characters", {"token": value})
+        status, _, body = listed(token)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["characters"], [
+            {"name": "Alpha", "level": 12, "path": "Monk", "gender": "Female", "hairStyle": 4, "hairColor": 2},
+            {"name": "zeta", "level": 5, "path": "Monk", "gender": "Female", "hairStyle": 4, "hairColor": 2}])
+        self.assertEqual(listed(token[:-1] + ("0" if token[-1] != "0" else "1"))[0], 401)
+        self.users.set_status("777", "denied")
+        status, _, body = listed(token)
         self.assertEqual((status, json.loads(body)), (403, {"status": "denied"}))
 
     def test_activity_is_admin_only_and_dates_are_validated(self):
