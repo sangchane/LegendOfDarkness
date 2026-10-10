@@ -16,6 +16,7 @@
     saved 줄이 없는 것(이 기록 전의 옛 줄, 또는 그 줄을 못 쓴 것)은 따로 센다. 둘 다 총재화 보존의 증명은 아니다 — 의심되면 캐릭터 파일을 본다
   · 읽지 못한 줄 — 파일·줄 번호. 꺼지며 반만 쓰인 마지막 줄도 여기 나온다
   · 지금 올린 것·받을 것, 맡긴 금화, 거래된 금화와 수수료(5%)
+  · 아이템별 낙찰 — 건수와 낙찰가 중앙값(sold·buyout, abort 된 것 빼고). 생태 봇 시세(EcoMarket)는 이 중 최근 7일을 쓴다
 """
 from __future__ import annotations
 
@@ -54,6 +55,13 @@ def lines(folder: str) -> tuple[list[dict], list[tuple[str, int]]]:
     return events, bad
 
 
+def median(golds: list[int]) -> int:
+    """봇 시세(EcoMarket.Medians)와 같게 — 짝수 개면 가운데 둘의 평균, 내림."""
+    golds = sorted(golds)
+    middle = len(golds) // 2
+    return golds[middle] if len(golds) % 2 else (golds[middle - 1] + golds[middle]) // 2
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -73,6 +81,7 @@ def main() -> None:
     unsaved = []
     saved: dict[int, int] = {}
     traded = cut = 0
+    won: dict[int, tuple[str, int]] = {}
     seller: dict[int, str] = {}
     active: Counter = Counter()
     most: Counter = Counter()
@@ -98,6 +107,8 @@ def main() -> None:
         if ev in ("buyout", "sold"):
             traded += gold
             cut += gold * CUT // 100
+            if seq and gold > 0:
+                won[seq] = (event.get("item") or "?", gold)
 
         # 봇마다 걸어 둔 올림 — post 로 늘고, 팔림·유찰·취소로 준다.
         listing = event.get("listing", 0)
@@ -122,6 +133,12 @@ def main() -> None:
     over = {name: n for name, n in bot_most.items() if n > 5}
     print(f"봇 올림 최대: {max(bot_most.values(), default=0)}" + (f" — 5 넘음: {over}" if over else ""))
     print(f"거래된 금화 {traded:,}전 · 수수료 {cut:,}전")
+    prices: dict[str, list[int]] = {}
+    for seq, (item, gold) in won.items():
+        if ends.get(seq) != "abort":
+            prices.setdefault(item, []).append(gold)
+    print(f"아이템별 낙찰(건수 · 중앙값): {len(prices)}가지" + "".join(
+        f"\n  {item} {len(golds)}건 · {median(golds):,}전" for item, golds in sorted(prices.items(), key=lambda one: (-len(one[1]), one[0]))))
     print(f"끊긴 조작(commit·abort 없음): {len(broken)}" + "".join(f"\n  seq {e['seq']} {e.get('ev')} {e.get('who')} {e.get('item')} {e.get('gold')}" for e in broken))
     print(f"예상 산술이 어긋난 줄: {len(wrong)}" + "".join(f"\n  seq {e.get('seq')} {e.get('ev')} {e.get('who')}" for e in wrong))
     print(f"예상과 저장값이 다른 조작: {len(drift)}" + "".join(

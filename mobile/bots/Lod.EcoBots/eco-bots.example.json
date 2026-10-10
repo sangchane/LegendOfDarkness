@@ -4,6 +4,7 @@
   "MapFolder": "/home/ubuntu/lod-bot/world",
   "Password": "",
   "MaxOnline": 30,
+  "AuctionFolder": "/home/ubuntu/lod/database/server/auction",
   "Bots": [
     { "Name": "전사봇일", "Path": 1 },
     { "Name": "도적봇일", "Path": 2 },

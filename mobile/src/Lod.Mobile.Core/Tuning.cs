@@ -82,6 +82,40 @@ public static class Tuning
     /// </summary>
     public const int EcoElementScore = 100;
 
+    /// <summary>
+    /// 장비 점수(<c>EcoShopping.Score</c>, 사용자 2026-10-11) — 직업 주 능력치 1(신 이름 접두사 하나: 전사·무도가 힘·콘, 도적 힘·덱스, 성직자·마법사
+    /// 인트·위즈)과 마법방어 10(칸)이 이만큼. 그 밖 능력치는 1, 무장(−AC)은 1 — 접두사 하나가 같은 부위 기본 장비보다 확실히 앞선다(체력의 = 체력 100 = 10).
+    /// </summary>
+    public const int EcoScoreStat = 30;
+
+    /// <summary>99 — 모든 직업이 마법방어 10 · 체력 500 이상 하나를 이만큼, 무장 1 을 <see cref="EcoScoreAc99" /> 로 본다(주 능력치 1 보다 앞서게).</summary>
+    public const int EcoScoreTop = 100;
+
+    public const int EcoScoreAc99 = 50;
+
+    /// <summary>입은 것이 없는 부위는 경매에서 금화의 이 % 까지(맨몸 — 죽은 뒤 <see cref="EcoAuctionBudget" /> 에 막혀 못 사지 않게).</summary>
+    public const int EcoAuctionBareBudget = 60;
+
+    /// <summary>
+    /// 경매 시세(SPEC death-penalty-gear #4) — 서버 경매 기록의 최근 이 날수 낙찰가 중앙값. 기록은 이만큼마다 한 번 읽는다.
+    /// 올릴 때 시작가·즉시 구매가 = 시세의 이 %(시세가 없으면 상인 매입가 배수 <see cref="EcoAuctionStart" />·<see cref="EcoAuctionBuyout" />).
+    /// </summary>
+    public const int EcoMarketDays = 7;
+
+    public static readonly TimeSpan EcoMarketEvery = TimeSpan.FromMinutes(5);
+
+    public const int EcoMarketStart = 90;
+
+    public const int EcoMarketBuyout = 130;
+
+    /// <summary>
+    /// 살 때 — 점수 이득 100 마다 시세보다 이 % 더(접두사 하나 이득 30 이면 +15%, 99 의 칸 이득 100 이면 +50%), 시세 위로 많아야 <see cref="EcoMarketOverMax" />%.
+    /// 금화 비율 상한(<see cref="EcoAuctionBudget" />)은 그대로.
+    /// </summary>
+    public const int EcoMarketOver = 50;
+
+    public const int EcoMarketOverMax = 200;
+
     /// <summary>이만큼 죽을 때마다 사냥터를 한 층 낮춘다.</summary>
     public const int EcoDeathLoop = 3;
 

@@ -138,14 +138,14 @@ public sealed class EcoTests
 
         InventoryItem[] pack = [new(3, 1, 0, "홍옥반지", 1, 0, 0, Gear(7, ac: -2))];
         Assert.Equal([3], EcoShopping.ToWear(pack, one, Warrior, 20, refused: []).Select(item => item.Slot));
-        Assert.Null(EcoShopping.ToFree(Gear(7, ac: -2), one));
+        Assert.Null(EcoShopping.ToFree(Gear(7, ac: -2), one, Warrior, 20));
 
         // 두 손이 다 차면 약한 쪽보다 좋아야 산다 — 오른손 반지는 자리를 8 로 알려 오기도 한다. 끼기 전에 약한 쪽을 벗는다.
         WornItem[] two = [.. one, new(8, 1, "세토아의사파이어반지", "세토아의사파이어반지", 0, 0, Gear(8, ac: -5))];
         Assert.Empty(EcoShopping.GearToBuy(shop, two, Warrior, 1, 20, budget: 5000));
         Assert.Equal([new EcoBuy("자수정반지", 1)],
             EcoShopping.GearToBuy([Offer("자수정반지", 7000, Gear(7, ac: -3))], two, Warrior, 1, 20, budget: 9000));
-        Assert.Equal(7, EcoShopping.ToFree(Gear(7, ac: -3), two));
+        Assert.Equal(7, EcoShopping.ToFree(Gear(7, ac: -3), two, Warrior, 20));
     }
 
     [Fact]
@@ -156,10 +156,10 @@ public sealed class EcoTests
         DialogueGoods[] shop = [Offer("바다의벨트", 10000, Gear(11) with { Defense = 2 }), Offer("벨트", 2000, Gear(11, ac: -2))];
         Assert.Equal([new EcoBuy("바다의벨트", 1)], EcoShopping.GearToBuy(shop, worn, Warrior, 1, 20, budget: 20000));
 
-        Assert.True(EcoShopping.Score(Gear(6) with { Offense = 4 }) > EcoShopping.Score(Gear(6, ac: -5)));
+        Assert.True(EcoShopping.Score(Gear(6) with { Offense = 4 }, Warrior, 20) > EcoShopping.Score(Gear(6, ac: -5), Warrior, 20));
         // 벨트의 공격 속성 · 목걸이의 방어 속성은 서버가 보지 않는다.
-        Assert.Equal(0, EcoShopping.Score(Gear(11) with { Offense = 4 }));
-        Assert.Equal(0, EcoShopping.Score(Gear(6) with { Defense = 4 }));
+        Assert.Equal(0, EcoShopping.Score(Gear(11) with { Offense = 4 }, Warrior, 20));
+        Assert.Equal(0, EcoShopping.Score(Gear(6) with { Defense = 4 }, Warrior, 20));
     }
 
     [Fact]
@@ -171,6 +171,126 @@ public sealed class EcoTests
 
         Assert.Equal([new EcoBuy("철방패", 1)], EcoShopping.GearToBuy(shop, worn, Warrior, 1, 80, budget: 20000));
         Assert.Empty(EcoShopping.GearToBuy(shop, worn, Warrior, 1, 80, budget: 20000, refused: ["철방패"]));
+    }
+
+    // 신 이름 접두사(가죽장갑 바탕, 무장 1) — 세토아 힘 · 메투스 콘 · 셔스 덱스 · 로오 인트 · 이아 위즈 · 칸 마법방어 10 · 체력 100.
+    private static readonly ItemStats Glove = Gear(9, level: 11, ac: -1);
+
+    private static readonly Dictionary<string, ItemStats> Prefixed = new()
+    {
+        ["세토아"] = Glove with { Str = 1 },
+        ["메투스"] = Glove with { Con = 1 },
+        ["셔스"] = Glove with { Dex = 1 },
+        ["로오"] = Glove with { Int = 1 },
+        ["이아"] = Glove with { Wis = 1 },
+        ["칸"] = Glove with { Mr = 10 },
+        ["체력"] = Glove with { Hp = 100 },
+        ["바탕"] = Glove,
+    };
+
+    /// <summary>점수가 높은 차례 — 같은 점수는 한 묶음(이름 순).</summary>
+    private static string[][] Ranked(int path, int level) =>
+    [
+        .. Prefixed.GroupBy(one => EcoShopping.Score(one.Value, path, level))
+            .OrderByDescending(group => group.Key)
+            .Select(group => group.Select(one => one.Key).Order(StringComparer.Ordinal).ToArray()),
+    ];
+
+    [Theory]
+    [InlineData(1, "메투스,세토아,칸", "체력", "로오,셔스,이아")]   // 전사
+    [InlineData(5, "메투스,세토아,칸", "체력", "로오,셔스,이아")]   // 무도가
+    [InlineData(2, "세토아,셔스,칸", "체력", "로오,메투스,이아")]   // 도적
+    [InlineData(4, "로오,이아,칸", "체력", "메투스,세토아,셔스")]   // 성직자
+    [InlineData(3, "로오,이아,칸", "체력", "메투스,세토아,셔스")]   // 마법사
+    public void A_growing_class_puts_its_own_prefixes_first_and_any_prefix_before_plain_gear(int path, string first, string second, string third)
+    {
+        // 사용자 2026-10-11 「무도가랑 전사는 세토아, 메투스, 칸 … 도적은 세토아, 셔스, 칸 … 성직자랑 마법사는 성장할때는 로오, 이아, 칸」.
+        string[][] ranked = Ranked(path, level: 50);
+
+        Assert.Equal([first.Split(','), [second], third.Split(','), ["바탕"]], ranked);
+
+        // 접두사 하나가 한 서클 위 기본 장갑(동장갑 무장 2)보다도 앞선다.
+        Assert.True(EcoShopping.Score(Prefixed["체력"], path, 50) > EcoShopping.Score(Gear(9, level: 41, ac: -2), path, 50));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    public void At_99_every_class_puts_magic_resist_health_500_and_armour_before_its_own_stats(int path)
+    {
+        // 사용자 2026-10-11 「99가 되면 모든 직업이 칸이나 체력이 500 이상 … 혹은 무장이 같은 부위보다 방어력을 많이 높여주는 아이템을 우선순위로」.
+        ItemStats gold = Gear(9, level: 1, ac: -4);
+        ItemStats own = path is 3 or 4 ? gold with { Int = 1 } : gold with { Str = 1 };   // 제 직업 주 능력치 접두사(로오의·세토아의)
+        int Score(ItemStats stats) => EcoShopping.Score(stats, path, 99);
+
+        Assert.True(Score(gold with { Mr = 10 }) > Score(own));
+        Assert.True(Score(gold with { Hp = 500 }) > Score(own));
+        Assert.True(Score(gold with { Ac = -5 }) > Score(own));
+        Assert.True(Score(own) > Score(gold));
+
+        // 98 까지는 거꾸로 — 주 능력치가 무장 1 보다 앞선다.
+        Assert.True(EcoShopping.Score(own, path, 98) > EcoShopping.Score(gold with { Ac = -5 }, path, 98));
+
+        // 가게에서도 그대로 고른다.
+        DialogueGoods[] shop = [Offer("접두사금장갑", 1000, own), Offer("더단단한장갑", 1000, gold with { Ac = -5 })];
+        Assert.Equal([new EcoBuy("더단단한장갑", 1)], EcoShopping.GearToBuy(shop, [], path, 1, 99, budget: 1000));
+        Assert.Equal([new EcoBuy("접두사금장갑", 1)], EcoShopping.GearToBuy(shop, [], path, 1, 98, budget: 1000));
+    }
+
+    /// <summary>
+    /// 죽은 뒤 맨몸(사망 벌칙: 접두사 장비는 사라지고 나머지는 바닥 — 봇이 주워 온다)에서 가방 → 경매 → 가게 차례로 부위를 다 채운다(EcoRunner.Shop 과 같은 차례).
+    /// 금화가 적어 30% 상한이면 경매의 접두사 장갑(600)을 못 사지만, 빈 부위는 60% 까지 낸다.
+    /// </summary>
+    [Fact]
+    public void A_bare_bot_after_death_fills_every_place_from_its_pack_the_auction_and_the_shop()
+    {
+        List<WornItem> worn = [];
+        long gold = 1_000;
+        void Wear(string name, ItemStats stats) => worn.Add(new WornItem(stats.Place, 0, name, name, 0, 0, stats));
+
+        // 1) 주워 온 가방 — 접두사 없는 무기·갑옷.
+        InventoryItem[] pack =
+        [
+            new(1, 1, 0, "커틀라스", 1, 0, 0, Gear(1, level: 11, cls: Warrior, dmgMax: 12)),
+            new(2, 1, 0, "가죽갑옷", 1, 0, 0, Gear(2, level: 1, ac: -5)),
+        ];
+        foreach (InventoryItem item in EcoShopping.ToWear(pack, worn, Warrior, level: 20, refused: []))
+        {
+            Wear(item.Name, item.Stats!);
+        }
+
+        // 2) 경매 — 사라진 세토아의가죽장갑을 다시(시세 없음: 즉시 구매).
+        Lod.Mobile.Core.Protocol.World.AuctionRow[] rows = [new(1, 0, 0, "세토아의가죽장갑", 1, 3, 300, 600, 0, Prefixed["세토아"])];
+        foreach (EcoBid bid in EcoAuction.ToBuy(rows, worn, Warrior, level: 20, gold))
+        {
+            Assert.True(bid.Buyout);
+            Wear(bid.Row.Name, bid.Row.Stats!);
+            gold -= bid.Amount;
+        }
+
+        // 3) 가게 — 남은 금화로 빈 부위(반지 두 손·신발).
+        DialogueGoods[] shop =
+        [
+            Offer("홍옥반지", 100, Gear(7, level: 11, ac: -1)),
+            Offer("토끼신발", 150, Gear(13, level: 11, ac: -3)),
+            Offer("가죽갑옷", 50, Gear(2, level: 1, ac: -5)),       // 이미 입었다
+        ];
+        for (int round = 0; round < 3; round++)
+        {
+            foreach (EcoBuy buy in EcoShopping.GearToBuy(shop, worn, Warrior, gender: 1, level: 20, gold))
+            {
+                DialogueGoods goods = shop.First(one => one.Name == buy.Name);
+                Wear(goods.Name, goods.Stats!);
+                gold -= goods.Price;
+            }
+        }
+
+        Assert.Equal([1, 2, 7, 7, 9, 13], worn.Select(one => one.Slot).Order());
+        Assert.Equal(1_000 - 600 - 100 - 100 - 150, gold);
+        Assert.False(EcoShopping.Empty(7, worn));
     }
 
     private static EcoSight Sight(TimeSpan now, int potions = 20, int free = 100, bool stopped = false, TimeSpan? person = null,

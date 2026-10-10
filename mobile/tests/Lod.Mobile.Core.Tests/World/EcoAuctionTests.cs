@@ -69,7 +69,7 @@ public sealed class EcoAuctionTests
             Listed(9, 2_500, Gear(2, ac: -5)),                          // 산다 — 무기를 산 뒤 남은 9,000 의 30% = 2,700 안
         ];
 
-        Assert.Equal([1u, 9u], EcoAuction.ToBuy(rows, worn, Warrior, level: 10, gold: 10_000).Select(row => row.Id));
+        Assert.Equal([1u, 9u], EcoAuction.ToBuy(rows, worn, Warrior, level: 10, gold: 10_000).Select(bid => bid.Row.Id));
     }
 
     [Fact]
@@ -85,7 +85,113 @@ public sealed class EcoAuctionTests
     {
         AuctionRow[] rows = [Listed(1, 1_000_001, Gear(1, dmgMax: 99)), Listed(2, 1_000_000, Gear(1, dmgMax: 50))];
 
-        Assert.Equal(2u, Assert.Single(EcoAuction.ToBuy(rows, [], Warrior, level: 99, gold: 100_000_000)).Id);
+        Assert.Equal(2u, Assert.Single(EcoAuction.ToBuy(rows, [], Warrior, level: 99, gold: 100_000_000)).Row.Id);
+    }
+
+    private static readonly DateTime Now = new(2026, 10, 11, 12, 0, 0, DateTimeKind.Utc);
+
+    private static string Trade(long seq, string ev, string item, long gold, DateTime at) =>
+        $$"""{"seq":{{seq}},"ev":"{{ev}}","who":"a","listing":{{seq}},"item":"{{item}}","gold":{{gold}},"at":"{{at:yyyy-MM-ddTHH:mm:ssZ}}"}""";
+
+    /// <summary>
+    /// 시세 = 최근 7일 낙찰(기간 끝 sold · 즉시 구매 buyout) 값의 이름별 중앙값 — 서버 AuctionHouse 가 쓰는 줄 그대로. 되돌린 조작(abort)·7일 넘은 것·
+    /// 올림·입찰·유찰·반만 쓰인 줄은 뺀다. 짝수 개면 가운데 둘의 평균.
+    /// </summary>
+    [Fact]
+    public void The_market_price_is_the_median_of_last_weeks_winning_prices_per_item()
+    {
+        string[] lines =
+        [
+            Trade(1, "buyout", "에페", 1_000, Now.AddDays(-1)),
+            Trade(2, "sold", "에페", 3_000, Now.AddDays(-2)),
+            Trade(3, "buyout", "에페", 2_000, Now.AddHours(-1)),
+            Trade(4, "buyout", "에페", 900_000, Now.AddHours(-1)),     // 되돌림 — 뺀다
+            """{"seq":4,"ev":"abort"}""",
+            Trade(5, "sold", "에페", 50, Now.AddDays(-8)),             // 7일 넘음
+            Trade(6, "post", "에페", 70_000, Now.AddHours(-1)),        // 올림은 거래가 아니다
+            Trade(7, "bid", "에페", 70_000, Now.AddHours(-1)),
+            Trade(8, "expired", "에페", 70_000, Now.AddHours(-1)),
+            Trade(9, "sold", "칸의가죽장갑", 10_000, Now.AddDays(-3)),
+            Trade(10, "buyout", "칸의가죽장갑", 13_000, Now.AddDays(-3)),
+            """{"seq":11,"ev":"buyout","item":"반""",
+            """{"seq":9,"ev":"commit"}""",
+        ];
+
+        IReadOnlyDictionary<string, long> market = EcoMarket.Medians(lines, Now);
+
+        Assert.Equal(2, market.Count);
+        Assert.Equal(2_000, market["에페"]);
+        Assert.Equal(11_500, market["칸의가죽장갑"]);
+    }
+
+    /// <summary>봇 프로그램은 폴더(설정 AuctionFolder)를 5분에 한 번만 읽는다. 폴더가 없으면 빈 시세.</summary>
+    [Fact]
+    public void The_market_reads_the_server_folder_at_most_every_few_minutes()
+    {
+        string folder = Directory.CreateTempSubdirectory().FullName;
+        try
+        {
+            File.WriteAllText(Path.Combine(folder, "events-2026-10-11.jsonl"), Trade(1, "buyout", "에페", 1_000, Now) + "\n");
+            File.WriteAllText(Path.Combine(folder, "events-2026-10-01.jsonl"), Trade(2, "buyout", "투구", 1_000, Now) + "\n");   // 날짜가 창 밖 파일은 안 연다
+            EcoMarket market = new(folder);
+
+            Assert.Equal(new Dictionary<string, long> { ["에페"] = 1_000 }, market.Prices(Now));
+
+            File.AppendAllText(Path.Combine(folder, "events-2026-10-11.jsonl"), Trade(3, "buyout", "에페", 3_000, Now) + "\n");
+            Assert.Equal(1_000, market.Prices(Now.AddMinutes(4))["에페"]);
+            Assert.Equal(2_000, market.Prices(Now.AddMinutes(5))["에페"]);
+
+            Assert.Empty(new EcoMarket(null).Prices(Now));
+            Assert.Empty(new EcoMarket(Path.Combine(folder, "없음")).Prices(Now));
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
+    }
+
+    [Fact]
+    public void Posts_at_the_market_price_when_there_is_one_and_the_merchant_multiple_otherwise()
+    {
+        InventoryItem sword = Carried(1, "에페", Gear(1, value: 1_600));       // 상인 매입가 1,000
+        InventoryItem hat = Carried(2, "투구", Gear(4, value: 1_600));
+
+        IReadOnlyList<EcoPost> posts = EcoAuction.ToPost([sword, hat], wear: [], active: 0, refused: [], market: new Dictionary<string, long> { ["에페"] = 10_000 });
+
+        Assert.Equal(new EcoPost(sword, 9_000, 13_000), posts.Single(post => post.Item == sword));
+        Assert.Equal(new EcoPost(hat, 2_000, 4_000), posts.Single(post => post.Item == hat));
+    }
+
+    /// <summary>
+    /// 사는 값 — 시세 10,000 인 장갑. 점수 이득이 작은 봇(전사, 50레벨, 덱스 장갑 = 이득 1)은 시세 가까이(10,000)까지만 내 즉시 구매가 13,000 은 안 사고
+    /// 시작가로 입찰하고, 이득이 큰 봇(99, 칸 = 이득 100)은 시세의 150% 까지라 즉시 구매한다. 금화 비율 상한은 그대로.
+    /// </summary>
+    [Fact]
+    public void A_bot_that_gains_more_pays_more_over_the_market_price()
+    {
+        Dictionary<string, long> market = new() { ["장갑"] = 10_000 };
+        ItemStats dex = Gear(9, ac: -1) with { Dex = 1 };
+        ItemStats kan = Gear(9, ac: -1) with { Mr = 10 };
+        AuctionRow row = Listed(1, 13_000, dex) with { Name = "장갑", Price = 9_000 };
+        WornItem[] two = [new(9, 1, "가죽장갑", "가죽장갑", 0, 0, Gear(9, ac: -1)), new(10, 1, "가죽장갑", "가죽장갑", 0, 0, Gear(9, ac: -1))];
+
+        Assert.Equal(10_000, EcoAuction.Ceiling(row, two, Warrior, 50, market));
+        Assert.Equal(15_000, EcoAuction.Ceiling(row with { Stats = kan }, two, Warrior, 99, market));
+        Assert.Null(EcoAuction.Ceiling(row, two, Warrior, 50, new Dictionary<string, long>()));
+
+        EcoBid small = Assert.Single(EcoAuction.ToBuy([row], two, Warrior, 50, gold: 1_000_000, market: market));
+        Assert.Equal((9_000u, false), (small.Amount, small.Buyout));                // 시작가로 입찰
+
+        EcoBid big = Assert.Single(EcoAuction.ToBuy([row with { Stats = kan }], two, Warrior, 99, gold: 1_000_000, market: market));
+        Assert.Equal((13_000u, true), (big.Amount, big.Buyout));                   // 즉시 구매
+
+        // 남이 입찰해 둔 것(값 9,600)은 5% 위(10,080)가 상한(10,000)을 넘어 안 낸다 · 이미 최고 입찰자면 기다린다 · 금화 30% 상한은 그대로.
+        Assert.Empty(EcoAuction.ToBuy([row with { Price = 9_600, Flags = 4 }], two, Warrior, 50, gold: 1_000_000, market: market));
+        Assert.Empty(EcoAuction.ToBuy([row with { Flags = 6 }], two, Warrior, 50, gold: 1_000_000, market: market));
+        Assert.Empty(EcoAuction.ToBuy([row with { Stats = kan }], two, Warrior, 99, gold: 20_000, market: market));
+
+        // 시세가 없으면 예전대로 즉시 구매만 — 즉시 구매가가 없는 경매는 안 산다.
+        Assert.Empty(EcoAuction.ToBuy([row with { Buyout = 0 }], two, Warrior, 50, gold: 1_000_000));
     }
 
     /// <summary>

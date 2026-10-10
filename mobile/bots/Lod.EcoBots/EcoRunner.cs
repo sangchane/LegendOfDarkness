@@ -57,6 +57,10 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private TimeSpan _nextVitality;
     private int _gearLevel;
 
+    // 살아 있던 마지막 자리 — 죽으면 사망 벌칙이 제 것을 여기 떨군다(Recover). 그 줍기에서 또 죽었으면 다음엔 가지 않는다.
+    private (int Map, Tile Where)? _alive;
+    private bool _noRecover;
+
     public string Name => bot.Name;
 
     /// <summary>지금 맵(요약·사냥터 나누기용). 접속 전이면 0.</summary>
@@ -133,6 +137,11 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         TimeSpan now = _clock.Elapsed;
         Vitals vitals = _world.Vitals!;
         int map = _world.State!.Map.Id;
+        if (map != DeathMap)
+        {
+            _alive = (map, _world.State.Where);
+        }
+
         Watch(now, vitals, map);
 
         if ((Path == EcoParties.Priest ? EcoParties.PriestStat(vitals) : StatPlan.Next(_world.Path, vitals)) is { } stat)
@@ -710,7 +719,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         {
             int active = mine.Rows.Count(row => (row.Flags & 1) != 0);
             IReadOnlyList<InventoryItem> wear = EcoShopping.ToWear(_world.Pack, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _refused);
-            foreach (EcoPost post in EcoAuction.ToPost(_world.Pack, wear, active, _unlisted))
+            foreach (EcoPost post in EcoAuction.ToPost(_world.Pack, wear, active, _unlisted, host.Market.Prices(DateTime.UtcNow)))
             {
                 AuctionDone? done = await AuctionAct(() => _world.AuctionPostAsync((byte)post.Item.Slot, post.Start, post.Buyout, 24, token), token);
                 if (done is { Ok: true })
@@ -730,13 +739,19 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         bool bought = false;
-        foreach (AuctionRow row in EcoAuction.ToBuy(page.Rows, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _world.Vitals.Gold, _refused))
+        foreach (EcoBid bid in EcoAuction.ToBuy(
+                     page.Rows, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _world.Vitals.Gold, _refused, host.Market.Prices(DateTime.UtcNow)))
         {
             long before = _world.Vitals.Gold;
-            if (await AuctionAct(() => _world.AuctionBuyoutAsync(row.Id, token), token) is { Ok: true })
+            if (bid.Buyout && await AuctionAct(() => _world.AuctionBuyoutAsync(bid.Row.Id, token), token) is { Ok: true })
             {
                 bought = true;
-                Event("auction-buy", new { name = row.Name, price = row.Buyout, goldBefore = before });
+                Event("auction-buy", new { name = bid.Row.Name, price = bid.Row.Buyout, goldBefore = before });
+            }
+            else if (!bid.Buyout && await AuctionAct(() => _world.AuctionBidAsync(bid.Row.Id, bid.Amount, token), token) is { Ok: true })
+            {
+                // 낙찰되면 기간 끝에 받을 것으로 온다 — 다음 장보기의 받기에서 받아 입는다.
+                Event("auction-bid", new { name = bid.Row.Name, price = bid.Amount, goldBefore = before });
             }
         }
 
@@ -769,7 +784,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         foreach (InventoryItem item in EcoShopping.ToWear(_world.Pack, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _refused))
         {
             // 두 손이 다 찼으면 약한 쪽을 먼저 벗는다 — 서버는 빈 손에 끼운다(EcoShopping.ToFree).
-            if (EcoShopping.ToFree(item.Stats!, _world.Worn) is { } free)
+            if (EcoShopping.ToFree(item.Stats!, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level) is { } free)
             {
                 await _world.TakeOffAsync(free, token);
                 await Until(() => _world.Worn.All(one => one.Slot != free), Answer, token);
@@ -790,7 +805,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
                 if (other is not null && _world.Worn.All(one => one.Slot != other.Slot))
                 {
                     // 방패를 버린다 — 다음 WearBetter 가 빈 무기 칸에 두손 무기를 다시 든다(10-08: 둘을 번갈아 사고 껴 사냥을 못 함).
-                    // ponytail: 이름으로 기억해 한손 무기로 바꿔도 그 방패는 안 든다 — 봇 프로그램이 다시 켜지면 잊는다.
+                    // ponytail: 이름으로 기억해 한손 무기로 바꿔도 그 방패는 안 든다 — 봇 프로그램이 다시 켜지거나 죽으면(Revive) 잊는다.
                     _refused.Add(place == 3 ? item.Name : other.Name);
                 }
             }
@@ -844,7 +859,51 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             _life.Revived();
             _life.Arrived(EcoPlace.Town, _clock.Elapsed);
             Event("state", new { from = "Dead", to = "Town", lower = _life.Lower });
+
+            // 맨몸으로 다시 갖춘다 — 두손 무기에 밀린 방패·서버가 한 번 거절한 이름을 잊고(죽기 전 장비 때문에 거절된 것이 맨몸을 막지 않게),
+            // 성직자는 레벨이 오를 때만 장비를 보러 가니 다음 틱에 다시 보게 한다.
+            _refused.Clear();
+            _gearLevel = 0;
+
+            // 사망 벌칙이 켜져 장비·가방이 다 빠졌으면(접두사 없는 것과 금화는 죽은 자리 바닥에) 먼저 주우러 간다.
+            if (_world.Worn.Count == 0 && _world.Pack.Count == 0 && _alive is { } spot && !_noRecover)
+            {
+                await Recover(spot.Map, spot.Where, token);
+                _noRecover = _world.State?.Map.Id == DeathMap;
+            }
+            else
+            {
+                _noRecover = false;
+            }
         }
+    }
+
+    /// <summary>
+    /// 죽은 자리에서 제 것을 줍는다 — 사망 벌칙(서버 <c>DeathDropsItems</c>, SPEC death-penalty-gear #2)은 접두사 없는 장비·가방·금화를 그 자리에 떨구고
+    /// 10분은 주인만 줍게 한다. 금화도 떨궈, 줍지 않으면 맨몸·빈손이라 장을 못 본다. 서버는 둘레 10칸(<c>ClickLootDistance</c>) 안 그 칸의 맨 위 것을
+    /// 주고 남의 것은 안 준다 — 바닥 것마다 한 번씩만 청한다.
+    /// </summary>
+    private async Task Recover(int map, Tile where, CancellationToken token)
+    {
+        Doing = "죽은 자리";
+        if (!await MoveTo(map, where, token))
+        {
+            return;
+        }
+
+        int items = _world.Pack.Count;
+        long gold = _world.Vitals!.Gold;
+        HashSet<uint> asked = [];
+        while (!token.IsCancellationRequested && _world.State?.Map.Id == map
+               && _world.Creatures.FirstOrDefault(one => one.Kind == CreatureKind.Passable && !asked.Contains(one.Serial)
+                                                         && Reckon.Steps(one.Where, Where) <= 10) is { } thing)
+        {
+            asked.Add(thing.Serial);
+            await _world.PickUpAsync(thing.Where, token);
+            await Until(() => _world.Creatures.All(one => one.Serial != thing.Serial), TimeSpan.FromSeconds(1), token);
+        }
+
+        Event("recover", new { map, items = _world.Pack.Count - items, gold = _world.Vitals!.Gold - gold });
     }
 
     /// <summary>걸어 갈 수 있는 거리 — 사냥이 중심으로 돌아가는 길(<c>AutoHunt.Reach</c>)과 같게.</summary>

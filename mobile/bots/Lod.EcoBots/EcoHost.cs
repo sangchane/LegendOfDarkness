@@ -34,6 +34,12 @@ public sealed record EcoConfig
     /// <summary>사건 기록(머신러닝 재료) 폴더 — <c>YYYY-MM-DD.jsonl</c>(한국 날짜), 지난 날은 gzip.</summary>
     public string EventFolder { get; init; } = string.Empty;
 
+    /// <summary>
+    /// 서버 경매 폴더(<c>database/server/auction</c>, 사건 기록 <c>events-날짜.jsonl</c>) — 있으면 그 낙찰가로 시세(<see cref="EcoMarket" />)를 낸다.
+    /// 없으면 경매 값은 예전 고정식(상인 매입가 배수).
+    /// </summary>
+    public string? AuctionFolder { get; init; }
+
     public static EcoConfig Load(string path)
     {
         EcoConfig config = JsonSerializer.Deserialize<EcoConfig>(File.ReadAllText(path))
@@ -50,6 +56,7 @@ public sealed record EcoConfig
             MapFolder = config.MapFolder.Length == 0 ? string.Empty : Path.GetFullPath(config.MapFolder, here),
             LogFile = Path.GetFullPath(config.LogFile ?? Path.Combine("logs", "eco-bots.log"), here),
             EventFolder = Path.GetFullPath(config.EventFolder.Length == 0 ? "eco" : config.EventFolder, here),
+            AuctionFolder = string.IsNullOrEmpty(config.AuctionFolder) ? null : Path.GetFullPath(config.AuctionFolder, here),
         };
     }
 }
@@ -218,6 +225,9 @@ public sealed class EcoHost(EcoConfig config, EcoWorld world, EcoEvents events, 
 
     /// <summary>봇 이름별 유찰품 — 다시 올리지 않는다. 설정 파일 옆 <c>eco-unlisted.json</c> 에 남아 재시작에도 잊지 않는다.</summary>
     public EcoUnlisted Unlisted => unlisted;
+
+    /// <summary>경매 시세 — 봇들이 함께 쓰고, 기록은 몇 분에 한 번만 읽는다.</summary>
+    public EcoMarket Market { get; } = new(config.AuctionFolder);
 
     public bool IsBot(string name) => _names.Contains(name);
 

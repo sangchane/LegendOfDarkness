@@ -56,6 +56,24 @@ class AuctionReportTests(unittest.TestCase):
         self.assertIn('events-2026-10-08.jsonl:4', done.stdout)
         self.assertEqual(1, done.returncode)
 
+    def test_items_are_listed_with_their_winning_count_and_median_price(self):
+        done = report([
+            event(seq=1, ev='buyout', who='a', listing=1, item='에페', gold=1000, goldBefore=5000, goldAfter=4000),
+            event(seq=1, ev='commit'),
+            event(seq=2, ev='sold', who='b', listing=2, item='에페', gold=3000),
+            event(seq=2, ev='commit'),
+            event(seq=3, ev='buyout', who='a', listing=3, item='에페', gold=900000, goldBefore=900000, goldAfter=0),
+            event(seq=3, ev='abort'),
+            event(seq=4, ev='sold', who='b', listing=4, item='칸의가죽장갑', gold=10000),
+            event(seq=4, ev='commit'),
+            event(seq=5, ev='post', who='b', listing=5, item='투구', gold=10, goldBefore=50, goldAfter=40),
+            event(seq=5, ev='commit'),
+        ])
+        self.assertIn('아이템별 낙찰(건수 · 중앙값): 2가지', done.stdout)
+        self.assertIn('에페 2건 · 2,000전', done.stdout)
+        self.assertIn('칸의가죽장갑 1건 · 10,000전', done.stdout)
+        self.assertNotIn('투구', done.stdout)
+
 
 if __name__ == '__main__':
     unittest.main()

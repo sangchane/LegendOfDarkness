@@ -111,14 +111,38 @@ public static class EcoShopping
     }
 
     /// <summary>
-    /// 장비 점수 — 무기는 최대 공격력 + 공격 + 명중, 그 밖은 방어(AC 는 낮을수록 좋다) + 힘·콘·덱스 + 체력/10. 속성은 목걸이의 공격 속성과
-    /// 벨트의 방어 속성만 서버가 본다(<c>GearElements</c>) — 그 둘에 <see cref="Tuning.EcoElementScore" /> 를 더한다.
+    /// 장비 점수 — 무기는 최대 공격력 + 공격 + 명중. 그 밖은 무장(AC 는 낮을수록 좋다) + 능력치 + 마법방어 + 체력/10 + 명중·공격, 능력치는 직업의 주 능력치
+    /// (<see cref="Main" />)를 <see cref="Tuning.EcoScoreStat" /> 로, 마법방어 10 도 그만큼(사용자 2026-10-11). 99 는 모든 직업이 마법방어 · 체력 500 이상 ·
+    /// 무장을 먼저(<see cref="Tuning.EcoScoreTop" />·<see cref="Tuning.EcoScoreAc99" />). 속성은 목걸이의 공격 속성과 벨트의 방어 속성만 서버가 본다
+    /// (<c>GearElements</c>) — 그 둘에 <see cref="Tuning.EcoElementScore" /> 를 더한다.
     /// </summary>
-    public static int Score(ItemStats stats) =>
-        stats.Place == 1
-            ? stats.DmgMax + stats.Dmg + stats.Hit
-            : -stats.Ac + stats.Str + stats.Con + stats.Dex + (stats.Hp / 10) + stats.Hit + stats.Dmg
-              + ((stats.Place == 6 && stats.Offense != 0) || (stats.Place == 11 && stats.Defense != 0) ? Tuning.EcoElementScore : 0);
+    public static int Score(ItemStats stats, int path, int level)
+    {
+        if (stats.Place == 1)
+        {
+            return stats.DmgMax + stats.Dmg + stats.Hit;
+        }
+
+        Stat[] main = Main(path);
+        int Weigh(Stat which, int value) => value * (main.Contains(which) ? Tuning.EcoScoreStat : 1);
+        bool top = level >= 99;
+
+        return -stats.Ac * (top ? Tuning.EcoScoreAc99 : 1)
+               + Weigh(Stat.Str, stats.Str) + Weigh(Stat.Con, stats.Con) + Weigh(Stat.Dex, stats.Dex) + Weigh(Stat.Int, stats.Int) + Weigh(Stat.Wis, stats.Wis)
+               + (stats.Mr * (top ? Tuning.EcoScoreTop : Tuning.EcoScoreStat) / 10)
+               + (stats.Hp / 10) + (top && stats.Hp >= 500 ? Tuning.EcoScoreTop : 0)
+               + stats.Hit + stats.Dmg
+               + ((stats.Place == 6 && stats.Offense != 0) || (stats.Place == 11 && stats.Defense != 0) ? Tuning.EcoElementScore : 0);
+    }
+
+    /// <summary>직업의 주 능력치 — 전사·무도가 힘(세토아)·콘(메투스), 도적 힘·덱스(셔스), 마법사·성직자 인트(로오)·위즈(이아). 평민은 없음.</summary>
+    public static Stat[] Main(int path) => path switch
+    {
+        1 or 5 => [Stat.Str, Stat.Con],
+        2 => [Stat.Str, Stat.Dex],
+        3 or 4 => [Stat.Int, Stat.Wis],
+        _ => [],
+    };
 
     /// <summary>내가 입을 수 있나 — 장비이고, 직업(0 = 누구나)·레벨이 맞는다. 성별은 상점 목록에만 있어 <see cref="GearToBuy" /> 가 본다.</summary>
     public static bool Fits(ItemStats stats, int path, int level) =>
@@ -131,23 +155,27 @@ public static class EcoShopping
         [.. worn.Where(item => item.Stats is { } stats && Family(stats.Place) == Family(place))];
 
     /// <summary>그 부위에 지금 입은 것 중 가장 약한 것의 점수. 빈 자리가 있으면(반지·장갑은 두 손) null.</summary>
-    private static int? WornScore(IReadOnlyList<WornItem> worn, int place)
-    {
-        WornItem[] on = WornIn(worn, place);
-        return on.Length < (Family(place) is 7 or 9 ? 2 : 1) ? null : on.Min(item => Score(item.Stats!));
-    }
+    private static int? WornScore(IReadOnlyList<WornItem> worn, int place, int path, int level) =>
+        Empty(place, worn) ? null : WornIn(worn, place).Min(item => Score(item.Stats!, path, level));
 
-    public static bool Better(ItemStats stats, IReadOnlyList<WornItem> worn) =>
-        WornScore(worn, stats.Place) is not { } now || Score(stats) > now;
+    public static bool Better(ItemStats stats, IReadOnlyList<WornItem> worn, int path, int level) =>
+        WornScore(worn, stats.Place, path, level) is not { } now || Score(stats, path, level) > now;
+
+    /// <summary>입으면 오르는 점수 — 빈 자리면 점수 그대로. 경매에서 얼마까지 낼지(<see cref="EcoAuction.ToBuy" />)를 정한다.</summary>
+    public static int Gain(ItemStats stats, IReadOnlyList<WornItem> worn, int path, int level) =>
+        Score(stats, path, level) - (WornScore(worn, stats.Place, path, level) ?? 0);
+
+    /// <summary>그 부위가 비었나(반지·장갑은 한 손이라도).</summary>
+    public static bool Empty(int place, IReadOnlyList<WornItem> worn) => WornIn(worn, place).Length < (Family(place) is 7 or 9 ? 2 : 1);
 
     /// <summary>
     /// 이것을 끼기 전에 벗을 자리 — 두 손이 다 찼으면 약한 쪽. 서버는 두 손이 다 차면 물건이 알리는 손을 바꾸므로 센 쪽이 빠질 수 있다.
     /// 빈 손이 있거나 한 손 부위면 null(서버가 알아서 바꾼다).
     /// </summary>
-    public static int? ToFree(ItemStats stats, IReadOnlyList<WornItem> worn)
+    public static int? ToFree(ItemStats stats, IReadOnlyList<WornItem> worn, int path, int level)
     {
         WornItem[] on = WornIn(worn, stats.Place);
-        return Family(stats.Place) is 7 or 9 && on.Length >= 2 ? on.MinBy(item => Score(item.Stats!))!.Slot : null;
+        return Family(stats.Place) is 7 or 9 && on.Length >= 2 ? on.MinBy(item => Score(item.Stats!, path, level))!.Slot : null;
     }
 
     /// <summary>부위마다(무기부터) 맞고 · 지금보다 좋고 · 남은 예산 안의 가장 좋은 것 하나. 서버가 거절했거나 두손 무기와 부딪힌 이름(<paramref name="refused" />)은 뺀다.</summary>
@@ -159,12 +187,12 @@ public static class EcoShopping
 
         foreach (IGrouping<int, DialogueGoods> place in goods
                      .Where(one => one.Stats is { } stats && Fits(stats, path, level) && one.Price > 0
-                                   && (one.Gender == 255 || one.Gender == gender) && Better(stats, worn)
+                                   && (one.Gender == 255 || one.Gender == gender) && Better(stats, worn, path, level)
                                    && refused?.Contains(one.Name) != true)
                      .GroupBy(one => Family(one.Stats!.Place))
                      .OrderBy(group => group.Key))
         {
-            if (place.Where(one => one.Price <= budget).MaxBy(one => (Score(one.Stats!), one.Stats!.Level)) is { } pick)
+            if (place.Where(one => one.Price <= budget).MaxBy(one => (Score(one.Stats!, path, level), one.Stats!.Level)) is { } pick)
             {
                 buys.Add(new EcoBuy(pick.Name, 1));
                 budget -= pick.Price;
@@ -178,9 +206,9 @@ public static class EcoShopping
     public static IReadOnlyList<InventoryItem> ToWear(
         IReadOnlyList<InventoryItem> pack, IReadOnlyList<WornItem> worn, int path, int level, IReadOnlyCollection<string> refused) =>
     [
-        .. pack.Where(item => item.Stats is { } stats && Fits(stats, path, level) && !refused.Contains(item.Name) && Better(stats, worn))
+        .. pack.Where(item => item.Stats is { } stats && Fits(stats, path, level) && !refused.Contains(item.Name) && Better(stats, worn, path, level))
             .GroupBy(item => Family(item.Stats!.Place))
-            .Select(place => place.MaxBy(item => Score(item.Stats!))!)
+            .Select(place => place.MaxBy(item => Score(item.Stats!, path, level))!)
             .OrderBy(item => item.Slot),
     ];
 
@@ -192,9 +220,16 @@ public static class EcoShopping
 /// <summary>경매에 올릴 것 한 줄 — 가방 칸, 시작가, 즉시 구매가.</summary>
 public sealed record EcoPost(InventoryItem Item, uint Start, uint Buyout);
 
+/// <summary>경매에서 낼 것 한 줄 — <see cref="Amount" /> 가 즉시 구매가면 즉시 구매, 아니면 그 값으로 입찰.</summary>
+public sealed record EcoBid(AuctionRow Row, uint Amount)
+{
+    public bool Buyout => Row.Buyout > 0 && Amount >= Row.Buyout;
+}
+
 /// <summary>
-/// 생태계 봇의 경매장(FR-014·015) — 못 입는 장비는 올리고, 맞고 지금 것보다 좋은 장비는 즉시 구매로 산다. 값은 상인 매입가(서버
-/// <c>ShopPricing.Offer</c> = 값 / 1.6) 배수, 사는 값은 들고 있는 금화의 <see cref="Tuning.EcoAuctionBudget" />% 와 상한 중 작은 것까지.
+/// 생태계 봇의 경매장(FR-014·015) — 못 입는 장비는 올리고, 맞고 지금 것보다 좋은 장비는 산다. 올리는 값은 시세(<see cref="EcoMarket" />)가 있으면
+/// 시세 배수, 없으면 상인 매입가(서버 <c>ShopPricing.Offer</c> = 값 / 1.6) 배수. 사는 값은 들고 있는 금화의 <see cref="Tuning.EcoAuctionBudget" />% 와 상한 중
+/// 작은 것까지, 시세가 있으면 점수 이득이 클수록 시세 위로 더(<see cref="Tuning.EcoMarketOver" />) — 수요가 값을 올린다.
 /// </summary>
 public static class EcoAuction
 {
@@ -205,14 +240,18 @@ public static class EcoAuction
     /// 올릴 것 — 장비(입는 칸이 있는 것) 중 지금 입을 것(<paramref name="wear" />)이 아니고, 서버가 거절했거나 유찰돼 돌아온 적 없고
     /// (<paramref name="refused" />), 값이 있는 것. 이미 걸어 둔 <paramref name="active" /> 개와 합쳐 <see cref="Tuning.EcoAuctionMax" /> 개까지.
     /// </summary>
+    /// <param name="market">이름별 시세 — 있으면 시작가·즉시 구매가 = 시세의 <see cref="Tuning.EcoMarketStart" />·<see cref="Tuning.EcoMarketBuyout" />%.</param>
     public static IReadOnlyList<EcoPost> ToPost(
-        IReadOnlyList<InventoryItem> pack, IReadOnlyList<InventoryItem> wear, int active, IReadOnlyCollection<string> refused) =>
+        IReadOnlyList<InventoryItem> pack, IReadOnlyList<InventoryItem> wear, int active, IReadOnlyCollection<string> refused,
+        IReadOnlyDictionary<string, long>? market = null) =>
     [
         .. pack.Where(item => item.Stats is { Place: > 0 } && Offer(item) > 0
                               && !refused.Contains(item.Name) && wear.All(one => one.Slot != item.Slot))
             .OrderByDescending(Offer)
             .Take(Math.Max(0, Tuning.EcoAuctionMax - active))
-            .Select(item => new EcoPost(item, Price(Offer(item) * Tuning.EcoAuctionStart), Price(Offer(item) * Tuning.EcoAuctionBuyout))),
+            .Select(item => market?.TryGetValue(item.Name, out long price) == true
+                ? new EcoPost(item, Price(price * Tuning.EcoMarketStart / 100), Price(price * Tuning.EcoMarketBuyout / 100))
+                : new EcoPost(item, Price(Offer(item) * Tuning.EcoAuctionStart), Price(Offer(item) * Tuning.EcoAuctionBuyout))),
     ];
 
     // 서버가 받는 값의 상한(서버 AuctionHouse.AUCTION_MAX_PRICE).
@@ -221,29 +260,65 @@ public static class EcoAuction
     private static uint Price(long gold) => (uint)Math.Clamp(gold, 1, MaxPrice);
 
     /// <summary>
-    /// 살 것 — 남의 경매 중 즉시 구매가가 있고, 내가 입을 수 있고 지금 것보다 좋은 장비. 부위마다 가장 좋은 것 하나, 사는 대로 금화를 빼며
-    /// 물건 하나에 min(금화 × <see cref="Tuning.EcoAuctionBudget" />%, <see cref="Tuning.EcoAuctionSpendCap" />) 까지.
+    /// 살 것 — 남의 경매 중 내가 입을 수 있고 지금 것보다 좋은 장비. 부위마다 가장 좋은 것 하나, 사는 대로 금화를 빼며 물건 하나에
+    /// min(금화 × <see cref="Tuning.EcoAuctionBudget" />%(빈 부위는 <see cref="Tuning.EcoAuctionBareBudget" />%), <see cref="Tuning.EcoAuctionSpendCap" />) 까지.
+    /// 즉시 구매가가 그 안이고 <see cref="Ceiling" /> 안이면 즉시 구매, 시세가 있으면 다음 입찰가가 그 안일 때 입찰. 시세가 없으면 즉시 구매만(예전 그대로).
+    /// 이미 최고 입찰자인 부위는 그 경매를 기다린다.
     /// </summary>
     /// <param name="refused">서버가 입기를 거절한 이름(성별 등 — 경매 줄에는 성별이 없다). 사서 못 입고 다시 올리는 일을 되풀이하지 않게.</param>
-    public static IReadOnlyList<AuctionRow> ToBuy(
-        IReadOnlyList<AuctionRow> rows, IReadOnlyList<WornItem> worn, int path, int level, long gold, IReadOnlyCollection<string>? refused = null)
+    public static IReadOnlyList<EcoBid> ToBuy(
+        IReadOnlyList<AuctionRow> rows, IReadOnlyList<WornItem> worn, int path, int level, long gold, IReadOnlyCollection<string>? refused = null,
+        IReadOnlyDictionary<string, long>? market = null)
     {
-        List<AuctionRow> buys = [];
+        List<EcoBid> buys = [];
         foreach (IGrouping<int, AuctionRow> place in rows
-                     .Where(row => (row.Flags & 1) == 0 && row.Buyout > 0 && refused?.Contains(row.Name) != true
-                                   && row.Stats is { } stats && EcoShopping.Fits(stats, path, level) && EcoShopping.Better(stats, worn))
+                     .Where(row => (row.Flags & 1) == 0 && refused?.Contains(row.Name) != true
+                                   && row.Stats is { } stats && EcoShopping.Fits(stats, path, level) && EcoShopping.Better(stats, worn, path, level))
                      .GroupBy(row => EcoShopping.Family(row.Stats!.Place))
                      .OrderBy(group => group.Key))
         {
-            long limit = Math.Min(gold * Tuning.EcoAuctionBudget / 100, Tuning.EcoAuctionSpendCap);
-            if (place.Where(row => row.Buyout <= limit).MaxBy(row => (EcoShopping.Score(row.Stats!), -row.Buyout)) is { } pick)
+            if (place.Any(row => (row.Flags & 2) != 0))
+            {
+                continue;
+            }
+
+            int share = EcoShopping.Empty(place.Key, worn) ? Tuning.EcoAuctionBareBudget : Tuning.EcoAuctionBudget;
+            long limit = Math.Min(gold * share / 100, Tuning.EcoAuctionSpendCap);
+            // 낼 값은 즉시 구매가(uint)이거나 서버 값 상한(20억)의 5% 위까지라 uint 에 든다.
+            if (place.Select(row => new EcoBid(row, (uint)Pay(row, Ceiling(row, worn, path, level, market))))
+                    .Where(bid => bid.Amount > 0 && bid.Amount <= limit)
+                    .MaxBy(bid => (EcoShopping.Score(bid.Row.Stats!, path, level), -(long)bid.Amount)) is { } pick)
             {
                 buys.Add(pick);
-                gold -= pick.Buyout;
+                gold -= pick.Amount;
             }
         }
 
         return buys;
+    }
+
+    /// <summary>
+    /// 이 봇이 낼 값의 상한 — 시세 × (100 + 점수 이득 × <see cref="Tuning.EcoMarketOver" /> / 100, 많아야 <see cref="Tuning.EcoMarketOverMax" />)%.
+    /// 시세가 없으면 null(금화 상한만).
+    /// </summary>
+    public static long? Ceiling(AuctionRow row, IReadOnlyList<WornItem> worn, int path, int level, IReadOnlyDictionary<string, long>? market) =>
+        market?.TryGetValue(row.Name, out long price) == true
+            ? price * (100 + Math.Min(EcoShopping.Gain(row.Stats!, worn, path, level) * Tuning.EcoMarketOver / 100, Tuning.EcoMarketOverMax)) / 100
+            : null;
+
+    /// <summary>
+    /// 낼 값 — 즉시 구매가가 상한 안이면 그것, 상한(시세)이 있으면 다음 입찰가(서버 <c>NextBid</c>: 입찰이 없으면 시작가, 있으면
+    /// <c>AUCTION_MIN_STEP</c> 5% 위)가 상한 안이면 그것, 아니면 0.
+    /// </summary>
+    private static long Pay(AuctionRow row, long? ceiling)
+    {
+        if (row.Buyout > 0 && row.Buyout <= (ceiling ?? long.MaxValue))
+        {
+            return row.Buyout;
+        }
+
+        long next = (row.Flags & 4) != 0 ? row.Price + Math.Max(1L, row.Price * 5L / 100) : row.Price;
+        return ceiling is { } most && next <= most ? next : 0;
     }
 }
 

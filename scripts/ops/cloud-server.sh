@@ -309,6 +309,7 @@ names = re.findall(r'"([^"]+)"', re.search(r'"EcoBots"\s*:\s*\[([^\]]*)\]', text
 path = {"전사봇": 1, "도적봇": 2, "사제봇": 4, "무도봇": 5}
 print(json.dumps({
     "Host": "127.0.0.1", "LoginPort": 2610, "MapFolder": "/home/ubuntu/lod-bot/world", "Password": os.environ["ECO_PASSWORD"], "MaxOnline": 40,
+    "AuctionFolder": "/home/ubuntu/lod/database/server/auction",
     "Bots": [{"Name": n, "Path": path[n[:3]]} for n in sorted(names, key=lambda n: path[n[:3]] != 4)],
 }, ensure_ascii=False, indent=2))
 PY

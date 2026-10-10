@@ -14,6 +14,7 @@ DOTNET_ROOT=../../../.tools/dotnet-9.0.317 ../../../.tools/dotnet-9.0.317/dotnet
 - 계정이 없으면 설정의 `Path`(1 전사 · 2 도적 · 5 무도가)로 만든다.
 - `MapFolder` — 앱의 맵 자료(`mobile/client/assets/world`): 벽 `map*.txt` · 가게 `guide.txt` · 사냥터 `eco-grounds.txt`(`scripts/gen/eco/build-eco-grounds.py`) · 직업 기술 `class-kit.txt`.
 - `MaxOnline` — 함께 접속할 수(목록 앞에서부터). 클라우드(2 vCPU)는 시작 30, 상한 50(`01-recon.md` §4).
+- `AuctionFolder`(선택) — 서버 경매 폴더(`database/server/auction`). 있으면 사건 기록의 최근 7일 낙찰가 중앙값을 시세로 올리고 사며(`EcoMarket`, 5분에 한 번 읽음), 없으면 상인 매입가 배수.
 
 ## 판단 (알맹이 `Automation/EcoLife.cs`·`EcoPlan.cs`, 시험 `EcoTests`)
 
