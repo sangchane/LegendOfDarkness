@@ -105,9 +105,36 @@ class ActivityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);characters=root/'characters';characters.mkdir()
             (characters/'one.json').write_text(json.dumps({'Username':'helper'}))
-            config=root/'config.json';config.write_text('// comment\n{"ServerConfig":{"CompanionBots":["HELPER"]}}')
+            # 생태계 봇(EcoBots, 2026-10-06~)도 봇이다 — 빠지면 저장된 캐릭터에 봇 40명이 사람으로 섞였다.
+            (characters/'two.json').write_text(json.dumps({'Username':'전사봇1'}))
+            config=root/'config.json';config.write_text('// comment\n{"ServerConfig":{"CompanionBots":["HELPER"],\n"EcoBots": [ "전사봇1" ]}}')
             store=module.ActivityStore(root/'activity.sqlite',characters=str(characters),server_config=str(config))
             self.assertEqual(store.report('2026-10-02','2026-10-03')['savedCharacters'],[])
-            self.assertTrue(store.report('2026-10-02','2026-10-03',bots=True)['savedCharacters'][0]['bot'])
+            self.assertEqual([row['bot'] for row in store.report('2026-10-02','2026-10-03',bots=True)['savedCharacters']],[True,True])
+
+    def test_people_only_report_skips_bot_rows_by_index(self):
+        # 생태 봇이 하루 100만 줄 넘게 남기면서(2026-10-07~) 사람만 보는 조회가 30초를 넘어 nginx 60초에 끊겼다(504).
+        import sqlite3
+        from contextlib import contextmanager
+        plans=[]
+        class Explained(sqlite3.Connection):
+            def execute(self,sql,args=()):
+                if 'FROM events' in sql:
+                    plans.append(' / '.join(row[3] for row in super().execute('EXPLAIN QUERY PLAN '+sql,args)))
+                return super().execute(sql,args)
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);characters=root/'characters';characters.mkdir()
+            store=module.ActivityStore(root/'activity.sqlite',characters=str(characters))
+            @contextmanager
+            def connect():
+                db=sqlite3.connect(store.database,factory=Explained);db.row_factory=sqlite3.Row
+                try:
+                    with db:yield db
+                finally:db.close()
+            store.connect=connect
+            store.report('2026-10-10','2026-10-11')
+        self.assertTrue(plans)
+        for plan in plans:
+            self.assertIn('event_bot',plan,plan)
 
 if __name__ == '__main__':unittest.main()

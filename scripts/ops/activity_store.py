@@ -57,6 +57,8 @@ class ActivityStore:
             if 'meta' not in {row['name'] for row in db.execute('PRAGMA table_info(events)')}:
                 db.execute("ALTER TABLE events ADD COLUMN meta TEXT NOT NULL DEFAULT '{}'")
             db.execute('CREATE INDEX IF NOT EXISTS event_session ON events(source, kind, session)')
+            # 생태 봇이 하루 100만 줄 넘게 남긴다(2026-10-07~) — 사람만 볼 때 봇 줄을 아예 건너뛰게 bot 을 맨 앞에.
+            db.execute('CREATE INDEX IF NOT EXISTS event_bot ON events(bot, source, kind, day)')
         os.chmod(self.database, 0o600)
 
     @contextmanager
@@ -305,13 +307,17 @@ class ActivityStore:
             return []
         if not self.characters.is_dir():
             raise OSError('캐릭터 기록 폴더를 읽지 못했습니다.')
-        with self.connect() as db:
-            bot_names = {row[0].lower() for row in db.execute("SELECT DISTINCT player FROM events WHERE bot=1")}
-        if self.server_config:
+        if not self.server_config:
+            # 설정이 있으면 설정 목록만 쓴다 — 봇 줄 수백만을 헛되이 훑지 않게 설정이 없을 때만 읽는다.
+            with self.connect() as db:
+                bot_names = {row[0].lower() for row in db.execute("SELECT DISTINCT player FROM events WHERE bot=1")}
+        else:
             try:
-                # 기존 cloud-server.sh의 bot_names와 같은 설정 목록. 이 설정에는 // 주석이 있다.
-                match = re.search(r'"CompanionBots"\s*:\s*(\[[^\]]*\])', self.server_config.read_text(encoding='utf-8-sig'))
-                bot_names = {str(name).lower() for name in json.loads(match.group(1))} if match else set()
+                # 기존 cloud-server.sh의 bot_names와 같은 설정 목록(동료 봇)과 생태계 봇(2026-10-06~). 이 설정에는 // 주석이 있다.
+                text = self.server_config.read_text(encoding='utf-8-sig')
+                bot_names = {str(name).lower() for key in ('CompanionBots', 'EcoBots')
+                             for match in [re.search(rf'"{key}"\s*:\s*(\[[^\]]*\])', text)] if match
+                             for name in json.loads(match.group(1))}
             except (OSError, ValueError, TypeError):
                 raise OSError('봇 설정을 읽지 못했습니다.')
         result = []
