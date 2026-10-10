@@ -28,38 +28,12 @@ public sealed class KakaoSignInTests
         Assert.Null(KakaoSignIn.ReadTicket(status, body));
 
     [Fact]
-    public void The_token_request_carries_the_code_only_once_typed()
-    {
+    public void The_token_request_carries_only_the_ticket() =>
         Assert.Equal("{\"ticket\":\"abc\"}", KakaoSignIn.TokenRequest("abc"));
-        Assert.Equal("{\"ticket\":\"abc\"}", KakaoSignIn.TokenRequest("abc", "12345"));
-        Assert.Equal("{\"ticket\":\"abc\",\"code\":\"012345\"}", KakaoSignIn.TokenRequest("abc", "012345"));
-    }
-
-    [Theory]
-    [InlineData("012345", true)]
-    [InlineData("12345", false)]
-    [InlineData("1234567", false)]
-    [InlineData("12a456", false)]
-    [InlineData("١٢٣٤٥٦", false)]   // 다른 문자의 숫자
-    [InlineData(null, false)]
-    public void A_code_is_six_digits(string? code, bool expected) =>
-        Assert.Equal(expected, KakaoSignIn.IsCode(code));
-
-    [Fact]
-    public void The_browser_finishing_asks_for_the_code() =>
-        Assert.Equal(KakaoWait.NeedsCode, KakaoSignIn.ReadToken(202, "{\"code\":true}").State);
-
-    [Fact]
-    public void A_wrong_code_says_how_many_chances_are_left()
-    {
-        Assert.Equal(
-            new KakaoReply(KakaoWait.WrongCode, Error: "번호가 맞지 않습니다. 남은 기회 3번.", Left: 3),
-            KakaoSignIn.ReadToken(403, "{\"error\":\"번호가 맞지 않습니다. 남은 기회 3번.\",\"left\":3}"));
-        Assert.Equal(0, KakaoSignIn.ReadToken(403, "{\"left\":0}").Left);
-    }
 
     [Theory]
     [InlineData(202, "{\"waiting\":true}", KakaoWait.Waiting)]
+    [InlineData(202, "{\"code\":true}", KakaoWait.Waiting)]   // 옛 서비스의 번호 요구 — 앱은 번호를 보내지 않는다
     [InlineData(0, "", KakaoWait.Waiting)]
     [InlineData(502, "<html>Bad Gateway</html>", KakaoWait.Waiting)]
     [InlineData(404, "{\"error\":\"로그인 표가 없거나 지났습니다.\"}", KakaoWait.StartOver)]
@@ -128,13 +102,58 @@ public sealed class KakaoSignInTests
         Assert.Equal([Token, "길 동"], new KakaoAccount(Token, "길\n동").ToLines());
 
     [Fact]
-    public void Linking_puts_the_old_password_after_the_token() =>
-        Assert.Equal(Token + "|옛비번|1", KakaoSignIn.Link(Token, "옛비번|1"));
+    public void The_verbs_go_after_the_token()
+    {
+        Assert.Equal(Token + "|look", KakaoSignIn.Look(Token));
+        Assert.Equal(Token + "|delete", KakaoSignIn.Delete(Token));
+    }
+
+    [Fact]
+    public void The_characters_request_carries_the_game_token()
+    {
+        Assert.Equal("https://lodgame.duckdns.org/api/kakao/characters", KakaoSignIn.CharactersUrl);
+        Assert.Equal($"{{\"token\":\"{Token}\"}}", KakaoSignIn.CharactersRequest(Token));
+    }
+
+    [Fact]
+    public void My_characters_are_read_in_the_servers_order()
+    {
+        IReadOnlyList<KakaoCharacter>? mine = KakaoSignIn.ReadCharacters(200,
+            "{\"characters\":[{\"name\":\"길동\",\"level\":41,\"path\":\"Monk\",\"gender\":\"Female\",\"hairStyle\":7,\"hairColor\":12},"
+            + "{\"name\":\"새싹\",\"level\":1,\"path\":\"Peasant\",\"gender\":\"Male\",\"hairStyle\":1,\"hairColor\":0}]}");
+
+        Assert.Equal([new KakaoCharacter("길동", 41, "Monk", "Female", 7, 12), new KakaoCharacter("새싹", 1, "Peasant", "Male", 1, 0)], mine);
+        Assert.Equal(("무도가", (byte)5, (byte)2), (mine![0].Job, mine[0].PathNumber, mine[0].GenderNumber));
+        Assert.Equal(("평민", (byte)0, (byte)1), (mine[1].Job, mine[1].PathNumber, mine[1].GenderNumber));
+    }
+
+    [Fact]
+    public void No_characters_is_an_empty_list_not_a_failure() =>
+        Assert.Empty(KakaoSignIn.ReadCharacters(200, "{\"characters\":[]}")!);
+
+    [Fact]
+    public void A_broken_line_is_skipped_and_odd_fields_fall_back()
+    {
+        IReadOnlyList<KakaoCharacter>? mine = KakaoSignIn.ReadCharacters(200,
+            "{\"characters\":[{\"level\":3},7,{\"name\":\"길\\n동\",\"level\":\"9\",\"path\":\"Bard\"}]}");
+
+        Assert.Equal([new KakaoCharacter("길 동", 0, "Bard", "", 0, 0)], mine);
+        Assert.Equal(("Bard", (byte)0, (byte)1), (mine![0].Job, mine[0].PathNumber, mine[0].GenderNumber));
+    }
+
+    [Theory]
+    [InlineData(403, "{\"status\":\"pending\"}")]
+    [InlineData(401, "{\"error\":\"bad\"}")]
+    [InlineData(200, "{\"characters\":{}}")]
+    [InlineData(200, "<html>")]
+    [InlineData(0, "")]
+    public void No_list_without_a_good_answer(long status, string body) =>
+        Assert.Null(KakaoSignIn.ReadCharacters(status, body));
 
     [Theory]
     [InlineData("카카오 로그인이 끝났습니다. 앱에서 다시 로그인해 주십시오.", true)]
     [InlineData("다른 카카오 계정의 캐릭터입니다.", false)]
-    [InlineData("아직 카카오에 이어지지 않은 캐릭터입니다. 「옛 캐릭터 잇기」로 옛 비밀번호를 한 번 넣어 주십시오.", false)]
+    [InlineData("아직 카카오에 이어지지 않은 캐릭터입니다. 관리자에게 이어 달라고 해 주십시오.", false)]
     public void Only_the_ended_refusal_signs_out(string refusal, bool signedOut) =>
         Assert.Equal(signedOut, KakaoSignIn.IsSignedOut(refusal));
 }

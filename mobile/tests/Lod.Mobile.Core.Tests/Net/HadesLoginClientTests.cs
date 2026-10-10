@@ -70,6 +70,20 @@ public sealed class HadesLoginClientTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => attempt);
     }
 
+    /// <summary>지우기의 0x02 뒤에 메시지 상자가 아닌 것이 오면 지워졌다고 치지 않는다.</summary>
+    [Fact]
+    public async Task Deleting_needs_a_message_box_answer()
+    {
+        using FakeServer server = new();
+        server.Expect([[.. Hello, .. Parameters, .. server.Redirect()], [.. Hello, .. Hello, .. Hello]]);
+
+        Task deleting = HadesLoginClient.DeleteCharacterAsync(IPAddress.Loopback, server.Port, "tester", "token", timeout: Guard);
+
+        Assert.Same(deleting, await Task.WhenAny(deleting, Task.Delay(Guard + Guard)));
+        ProtocolException refused = await Assert.ThrowsAsync<ProtocolException>(() => deleting);
+        Assert.Equal("서버가 로그인을 받아주지 않았습니다.", refused.Message);
+    }
+
     private static Task<WorldSession> Attempt(FakeServer server, bool create, TimeSpan timeout, CancellationToken token = default) => create
         ? HadesLoginClient.CreateCharacterAsync(IPAddress.Loopback, server.Port, "tester", "1234", 1, 1, 1, 1, cancellationToken: token, timeout: timeout)
         : HadesLoginClient.LoginAsync(IPAddress.Loopback, server.Port, "tester", "1234", cancellationToken: token, timeout: timeout);

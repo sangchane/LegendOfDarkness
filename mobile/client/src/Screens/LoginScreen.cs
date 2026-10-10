@@ -16,8 +16,9 @@ namespace LodClient;
 /// </summary>
 /// <remarks>
 /// 카카오 로그인(사용자 2026-10-11, <c>autopilot/game-kakao-login/SPEC.md</c>) — 캐릭터 비밀번호 대신 카카오로 받은 게임 표를
-/// 비밀번호 칸에 보낸다(<see cref="KakaoSignIn" />). 표가 없으면 노란 [카카오로 로그인] 하나, 있으면 캐릭터 이름과 [들어가기]·[새 캐릭터]·
-/// [옛 캐릭터 잇기]·[카카오 로그아웃]. 데스크톱 <c>--login</c>·<c>login.cfg</c>(맥 서버 시험용 이름·비밀번호)는 그 비밀번호를 표 대신 쓴다.
+/// 비밀번호 칸에 보낸다(<see cref="KakaoSignIn" />). 표가 없으면 노란 [카카오로 로그인] 하나, 있으면 내 캐릭터 목록 — 줄마다
+/// [들어가기]·[생김새]·[삭제], 아래 [새 캐릭터]·[카카오 로그아웃](<c>autopilot/game-kakao-accounts/SPEC.md</c>).
+/// 데스크톱 <c>--login</c>·<c>login.cfg</c>(맥 서버 시험용 이름·비밀번호)는 이름·비밀번호 칸으로 표 대신 쓴다.
 /// </remarks>
 public partial class LoginScreen : Control
 {
@@ -30,7 +31,6 @@ public partial class LoginScreen : Control
     private const int CaptionWidth = 72;
 
     private const string BrowserText = "브라우저에서 카카오 로그인을 마치고 돌아오세요.";
-    private const string CodeText = "브라우저에 보이는 번호 6자리를 넣고 [확인]을 누르세요.";
     private const string PendingText = "초대 번호를 넣거나 관리자 승인을 기다려 주세요.";
 
     private readonly ConcurrentQueue<string> _reported = new();
@@ -45,21 +45,19 @@ public partial class LoginScreen : Control
     /// <summary>계정이 없다 — 만들기 화면으로 가고 싶을 때(Main 이 화면을 바꿔 준다).</summary>
     public Action? WantsToCreate { get; set; }
 
+    /// <summary>[생김새] — 만들기 화면을 바꾸기 모드로(Main 이 화면을 바꿔 준다).</summary>
+    public Action<KakaoCharacter>? WantsToChangeLook { get; set; }
+
     private MarginContainer _safeArea = null!;
     private Label _status = null!;
     private LineEdit _username = null!;
 
-    /// <summary>옛 캐릭터 잇기의 옛 비밀번호 — 시험 계정(<see cref="Rehearsing" />)이면 그 비밀번호.</summary>
+    /// <summary>시험 계정(<see cref="Rehearsing" />)의 비밀번호 — 이름 칸과 함께 시험 계정에서만 보인다.</summary>
     private LineEdit _password = null!;
-
-    /// <summary>브라우저에 뜬 번호 6자리.</summary>
-    private LineEdit _code = null!;
     private Button _submit = null!;
     private Button _create = null!;
-    private Button _link = null!;
     private Button _signOut = null!;
     private Button _kakao = null!;
-    private Button _confirmCode = null!;
     private CheckBox _autoLogin = null!;
     private Label _who = null!;
 
@@ -67,21 +65,33 @@ public partial class LoginScreen : Control
     private Control _whoRow = null!;
     private Control _nameRow = null!;
     private Control _passwordRow = null!;
-    private Control _codeRow = null!;
     private Control _actions = null!;
     private Control _linkRow = null!;
+
+    // 내 캐릭터 목록 — 굴림 칸·줄들·줄마다의 단추(접속하는 동안 잠근다)·지우기 확인 판.
+    private ScrollContainer _listScroll = null!;
+    private VBoxContainer _list = null!;
+    private readonly List<Button> _rowButtons = [];
+    private Control? _confirm;
+
+    /// <summary>받은 목록, 없으면 아직 못 받음(<see cref="_listNote" /> 가 까닭).</summary>
+    private IReadOnlyList<KakaoCharacter>? _characters;
+    private string _listNote = string.Empty;
+    private bool _loadingList;
+
+    /// <summary>들어가는 캐릭터 이름 — 들어가면 마지막 이름으로 남긴다.</summary>
+    private string _entering = string.Empty;
+
+    /// <summary>지우는 중(0x02 <c>표|delete</c>)과 그 이름.</summary>
+    private Task? _deleting;
+    private string _deletingName = string.Empty;
 
     /// <summary>표와 마지막 이름으로 손 없이 들어가나 — 저장된 값에서 시작한다.</summary>
     private bool _autoLoginWanted;
 
-    /// <summary>[옛 캐릭터 잇기]로 옛 비밀번호 칸을 열었나.</summary>
-    private bool _linking;
-
-    // 카카오 기다림 — 받은 표(없으면 기다리지 않는다)·받은 시각·보낸 번호·번호를 기다리는지·묻는 중인지.
+    // 카카오 기다림 — 받은 표(없으면 기다리지 않는다)·받은 시각·묻는 중인지.
     private string? _ticket;
     private ulong _ticketStarted;
-    private string? _sentCode;
-    private bool _codeAsked;
     private bool _asking;
     // 표를 받는 중 — 화면을 돌려 판을 다시 지어도 카카오 단추가 다시 눌리지 않게(리뷰 2026-10-11).
     private bool _openingKakao;
@@ -109,12 +119,14 @@ public partial class LoginScreen : Control
         GrowVertical = GrowDirection.Both;
     }
 
-    /// <summary>레이아웃 검사가 훑는 자리들(숨은 것은 건너뛴다).</summary>
-    public IReadOnlyList<(string Name, Control Part)> Parts =>
-    [
-        ("카카오 단추", _kakao), ("번호 줄", _codeRow), ("카카오 계정", _whoRow), ("이름", _nameRow), ("옛 비밀번호", _passwordRow),
-        ("안내", _status), ("들어가기 줄", _actions), ("잇기 줄", _linkRow)
-    ];
+    /// <summary>레이아웃 검사가 훑는 자리들(숨은 것은 건너뛴다). 지우기 확인 판이 떠 있으면 판을 덮으니 그것만.</summary>
+    public IReadOnlyList<(string Name, Control Part)> Parts => _confirm is not null
+        ? [("삭제 확인", _confirm)]
+        :
+        [
+            ("카카오 단추", _kakao), ("카카오 계정", _whoRow), ("이름", _nameRow), ("비밀번호", _passwordRow), ("캐릭터 목록", _listScroll),
+            ("안내", _status), ("들어가기 줄", _actions), ("새 캐릭터 줄", _linkRow)
+        ];
 
     public override void _Ready()
     {
@@ -131,15 +143,24 @@ public partial class LoginScreen : Control
         Build();
 
         // --login / login.cfg (desktop rehearsal) wins over a saved Kakao sign-in when both are somehow present.
-        _username.Text = Rehearsing ? Main.Rehearsal.Username : Main.LastCharacter;
+        _username.Text = Rehearsing ? Main.Rehearsal.Username : string.Empty;
         _password.Text = Rehearsing ? Main.Rehearsal.Password : string.Empty;
         _status.Text = SignedIn ? string.Empty : "카카오로 로그인하면 캐릭터 비밀번호 없이 들어갑니다.";
         ApplyKakaoPreview();
         RefreshSubmitState();
 
-        if (AutomaticLogin && (Rehearsing || (Main.Kakao is not null && _autoLoginWanted && Main.LastCharacter.Length > 0)))
+        if (AutomaticLogin && Rehearsing)
         {
-            BeginLogin();
+            BeginLogin(_username.Text);
+        }
+        else if (AutomaticLogin && Main.Kakao is not null && _autoLoginWanted && Main.LastCharacter.Length > 0)
+        {
+            BeginLogin(Main.LastCharacter);
+        }
+
+        if (!Rehearsing && Main.KakaoPreview.Length == 0)
+        {
+            LoadCharacters();
         }
 
         Main.LayoutChanged += Rebuild;
@@ -212,10 +233,10 @@ public partial class LoginScreen : Control
         ShowState();
     }
 
-    /// <summary>돌리면 판을 다시 짓는다 — 친 글자·안내·카카오 기다림은 그대로.</summary>
+    /// <summary>돌리면 판을 다시 짓는다 — 친 글자·안내·카카오 기다림·목록은 그대로.</summary>
     private void Rebuild()
     {
-        string username = _username.Text, password = _password.Text, code = _code.Text, status = _status.Text;
+        string username = _username.Text, password = _password.Text, status = _status.Text;
         foreach (Node child in _safeArea.GetChildren())
         {
             _safeArea.RemoveChild(child);
@@ -224,30 +245,27 @@ public partial class LoginScreen : Control
         Build();
         _username.Text = username;
         _password.Text = password;
-        _code.Text = code;
-        _confirmCode.Disabled = !KakaoSignIn.IsCode(code);
         RefreshSubmitState();
         _status.Text = status;
     }
 
-    /// <summary>표가 있나·기다리나·잇는 중인가에 맞춰 줄을 보이고 숨긴다.</summary>
+    /// <summary>표가 있나·시험 계정인가에 맞춰 줄을 보이고 숨긴다.</summary>
     private void ShowState()
     {
         bool signedIn = SignedIn;
 
         _kakao.Visible = !signedIn;
         _kakao.Disabled = _openingKakao;
-        _codeRow.Visible = !signedIn && _ticket is not null;
         _whoRow.Visible = signedIn;
-        _nameRow.Visible = signedIn;
-        _actions.Visible = signedIn;
-        _passwordRow.Visible = signedIn && (Rehearsing || _linking);
-        _linkRow.Visible = signedIn && !Rehearsing;
+        _nameRow.Visible = Rehearsing;
+        _passwordRow.Visible = Rehearsing;
+        _actions.Visible = Rehearsing;
+        _listScroll.Visible = signedIn && !Rehearsing;
+        _linkRow.Visible = signedIn;
+        _signOut.Visible = !Rehearsing;
         _autoLogin.Visible = !Rehearsing;
         _who.Text = Rehearsing ? "시험 계정 — 비밀번호로 들어갑니다" : $"카카오: {Main.Kakao?.Name}";
-        _link.Text = _linking ? "잇기 닫기" : "옛 캐릭터 잇기";
-        // 브라우저 로그인이 끝나 번호를 기다리면 번호 칸 테두리를 밝힌다.
-        StyleField(_code, _codeAsked && _sentCode is null);
+        FillList();
     }
 
     /// <summary>Environment on the left, which server we will talk to on the right.</summary>
@@ -268,41 +286,29 @@ public partial class LoginScreen : Control
     /// Starts the login and leaves it running. Nothing here touches the tree from the task: progress lands
     /// in a queue and _Process drains it, because a Godot node may only be changed on the main thread.
     /// </summary>
-    private void BeginLogin()
+    private void BeginLogin(string name)
     {
-        if (_attempt is not null || Secret() is not { Length: > 0 } secret || _username.Text.Length == 0)
+        if (_attempt is not null || _deleting is not null || Secret() is not { Length: > 0 } secret || name.Length == 0)
         {
             return;
         }
 
-        _submit.Disabled = true;
+        _entering = name;
         _status.Text = "접속하는 중…";
         _loginStarted = Time.GetTicksMsec();
 
         _attempt = HadesLoginClient.LoginAsync(
             Main.ServerAddress,
             Main.ServerPort,
-            _username.Text,
+            name,
             secret,
             new Progress<string>(_reported.Enqueue),
             _closing.Token);
+        RefreshSubmitState(keepStatus: true);
     }
 
-    /// <summary>비밀번호 칸에 갈 것 — 시험 계정은 그 비밀번호, 아니면 게임 표(잇는 중이면 <c>표|옛비밀번호</c>).</summary>
-    private string? Secret()
-    {
-        if (Rehearsing)
-        {
-            return _password.Text;
-        }
-
-        if (Main.Kakao is not { } kakao)
-        {
-            return null;
-        }
-
-        return _linking ? (_password.Text.Length > 0 ? KakaoSignIn.Link(kakao.Token, _password.Text) : null) : kakao.Token;
-    }
+    /// <summary>비밀번호 칸에 갈 것 — 시험 계정은 그 비밀번호, 아니면 게임 표.</summary>
+    private string? Secret() => Rehearsing ? _password.Text : Main.Kakao?.Token;
 
     /// <summary>Reports what the login is doing, and what became of it.</summary>
     private readonly LoadingBand _loading = new(map: false);
@@ -335,12 +341,10 @@ public partial class LoginScreen : Control
             _session = finished.Result;
             _status.Text = $"{_session.Character.CharacterName} 님, 월드에 들어왔습니다.";
             _submit.Text = "접속됨";
-            // 옛 비밀번호는 한 번 쓰고 버린다 — 이은 뒤로는 표만으로 들어간다.
-            _password.Text = string.Empty;
 
             if (!Rehearsing)
             {
-                Main.SetLastCharacter(_username.Text, _autoLoginWanted);
+                Main.SetLastCharacter(_entering, _autoLoginWanted);
             }
 
             // The world takes the connection from here, so this screen must not close it.
@@ -359,11 +363,49 @@ public partial class LoginScreen : Control
         if (!Rehearsing && KakaoSignIn.IsSignedOut(failure.Message))
         {
             Main.SetKakao(null);
-            _linking = false;
             ShowState();
         }
 
         _status.Text = failure.Message;
+        RefreshSubmitState(keepStatus: true);
+    }
+
+    /// <summary>지우기가 끝났으면 — 됐으면 목록을 새로, 아니면 서버의 말(표가 끝났으면 표를 지우고 처음으로).</summary>
+    private void DrainDelete()
+    {
+        if (_deleting is not { IsCompleted: true } finished)
+        {
+            return;
+        }
+
+        _deleting = null;
+
+        if (finished.IsCompletedSuccessfully)
+        {
+            _status.Text = $"{_deletingName} 을(를) 지웠습니다.";
+
+            // 지운 이름으로 자동 로그인하지 않게.
+            if (_deletingName == Main.LastCharacter)
+            {
+                Main.SetLastCharacter(string.Empty, false);
+            }
+
+            LoadCharacters();
+        }
+        else
+        {
+            Exception failure = finished.Exception?.GetBaseException() ?? new IOException("알 수 없는 오류");
+            Main.NoteActivityError(failure.GetType().Name);
+
+            if (KakaoSignIn.IsSignedOut(failure.Message))
+            {
+                Main.SetKakao(null);
+                ShowState();
+            }
+
+            _status.Text = failure.Message;
+        }
+
         RefreshSubmitState(keepStatus: true);
     }
 
@@ -400,12 +442,9 @@ public partial class LoginScreen : Control
         title.AddThemeColorOverride("font_color", Greybox.Title);
 
         _username = Field(LineEdit.VirtualKeyboardTypeEnum.Default);
-        // 비밀번호 칸은 iOS 에 비밀번호라고 알린다(자동 완성 줄의 열쇠). 번호 칸은 숫자 자판.
+        // 비밀번호 칸은 iOS 에 비밀번호라고 알린다(자동 완성 줄의 열쇠).
         _password = Field(LineEdit.VirtualKeyboardTypeEnum.Password);
         _password.Secret = true;
-        _code = Field(LineEdit.VirtualKeyboardTypeEnum.Number);
-        _code.MaxLength = 6;
-        _code.PlaceholderText = "번호 6자리";
 
         // 엔터(키보드의 완료)는 다음 칸으로, 마지막 칸에서는 들어가기로 — 손가락이 키보드를 떠나지 않아도 된다.
         _username.TextSubmitted += _ =>
@@ -414,7 +453,6 @@ public partial class LoginScreen : Control
             else SubmitFromKeyboard();
         };
         _password.TextSubmitted += _ => SubmitFromKeyboard();
-        _code.TextSubmitted += _ => ConfirmCode();
 
         _status = new Label
         {
@@ -436,17 +474,8 @@ public partial class LoginScreen : Control
         _submit.AddThemeStyleboxOverride("disabled", disabled);
 
         _create = PlainButton("새 캐릭터");
-        _link = PlainButton("옛 캐릭터 잇기");
         _signOut = PlainButton("카카오 로그아웃");
         _kakao = KakaoButton();
-
-        _confirmCode = new Button
-        {
-            Text = "확인",
-            Disabled = true,
-            CustomMinimumSize = new Vector2(88, Main.TouchMinimum)
-        };
-        Greybox.Commit(_confirmCode);
 
         _autoLogin = new CheckBox
         {
@@ -482,8 +511,7 @@ public partial class LoginScreen : Control
 
         _username.TextChanged += _ => RefreshSubmitState();
         _password.TextChanged += _ => RefreshSubmitState();
-        _code.TextChanged += text => _confirmCode.Disabled = !KakaoSignIn.IsCode(text);
-        _submit.Pressed += BeginLogin;
+        _submit.Pressed += () => BeginLogin(_username.Text);
         _create.Pressed += () =>
         {
             // 켠 자동 로그인을 만들기 화면이 이어받게 — 만들기는 저장된 값을 쓴다(리뷰 2026-10-11).
@@ -494,10 +522,8 @@ public partial class LoginScreen : Control
 
             WantsToCreate?.Invoke();
         };
-        _link.Pressed += ToggleLink;
         _signOut.Pressed += SignOut;
         _kakao.Pressed += StartKakao;
-        _confirmCode.Pressed += ConfirmCode;
 
         if (Main.Portrait)
         {
@@ -590,28 +616,206 @@ public partial class LoginScreen : Control
     }
 
     /// <summary>
-    /// 두 상태의 줄을 모두 쌓고 <see cref="ShowState" /> 가 고른다. 표 없음: [카카오로 로그인] · 번호 줄 · 안내.
-    /// 표 있음: 캐릭터 · (옛 비밀번호) · 안내 · [들어가기][새 캐릭터] · [옛 캐릭터 잇기][카카오 로그아웃].
+    /// 세 상태의 줄을 모두 쌓고 <see cref="ShowState" /> 가 고른다. 표 없음: [카카오로 로그인] · 안내.
+    /// 표 있음: 내 캐릭터 목록 · 안내 · [새 캐릭터][카카오 로그아웃]. 시험 계정: 이름 · 비밀번호 · 안내 · [들어가기] · [새 캐릭터].
     /// </summary>
     private void AddCredentials(Container form)
     {
         // Captions sit beside their fields rather than above them, so the keyboard never turns each input
         // into two rows. Both orientations use this same compact field treatment.
         form.AddChild(_nameRow = FieldRow("캐릭터", _username));
-        form.AddChild(_passwordRow = FieldRow(Rehearsing ? "비밀번호" : "옛 비밀번호", _password));
+        form.AddChild(_passwordRow = FieldRow("비밀번호", _password));
         form.AddChild(_kakao);
 
-        HBoxContainer code = new();
-        code.AddThemeConstantOverride("separation", Main.Gutter);
-        Control codeField = FieldRow("번호", _code);
-        codeField.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        code.AddChild(codeField);
-        code.AddChild(_confirmCode);
-        form.AddChild(_codeRow = code);
+        // 목록이 길면 판 안에서 굴린다 — 세로는 세 줄, 짧은 가로는 한 줄 반까지 보인다.
+        _list = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        _list.AddThemeConstantOverride("separation", Main.Gutter);
+        _listScroll = new ScrollContainer { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        _listScroll.AddChild(_list);
+        form.AddChild(_listScroll);
 
         form.AddChild(_status);
-        form.AddChild(_actions = ButtonRow(_submit, _create));
-        form.AddChild(_linkRow = ButtonRow(_link, _signOut));
+        form.AddChild(_actions = _submit);
+        _submit.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        form.AddChild(_linkRow = ButtonRow(_create, _signOut));
+    }
+
+    /// <summary>
+    /// 목록을 그린다 — 줄마다 이름·레벨·직업, 아래 [들어가기][생김새][삭제]. 비면 만들라는 말, 못 받았으면 까닭과 [다시 불러오기].
+    /// </summary>
+    private void FillList()
+    {
+        foreach (Node child in _list.GetChildren())
+        {
+            _list.RemoveChild(child);
+            child.QueueFree();
+        }
+
+        _rowButtons.Clear();
+        int rows = 1;
+
+        if (_characters is null || _characters.Count == 0)
+        {
+            Label note = Aux(_characters is null ? _listNote : "캐릭터가 없습니다. 새 캐릭터를 만드세요.");
+            note.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            note.AddThemeColorOverride("font_color", Greybox.Text);
+            _list.AddChild(note);
+
+            if (_characters is null && !_loadingList)
+            {
+                Button again = PlainButton("다시 불러오기");
+                again.Pressed += LoadCharacters;
+                _list.AddChild(again);
+            }
+        }
+        else
+        {
+            foreach (KakaoCharacter character in _characters)
+            {
+                _list.AddChild(CharacterRow(character));
+            }
+
+            rows = _characters.Count;
+        }
+
+        float rowHeight = Main.TouchMinimum + 24 + Main.Gutter;
+        _listScroll.CustomMinimumSize = new Vector2(0, Mathf.Min(rows, Main.Portrait ? 3f : 1.5f) * rowHeight);
+        RefreshSubmitState(keepStatus: true);
+    }
+
+    private Control CharacterRow(KakaoCharacter character)
+    {
+        Label title = Aux($"{character.Name} · Lv {character.Level} · {character.Job}");
+        title.AddThemeColorOverride("font_color", Greybox.Title);
+        title.ClipText = true;
+
+        Button enter = new() { Text = "들어가기", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        Greybox.Commit(enter);
+        Button look = PlainButton("생김새");
+        Button delete = PlainButton("삭제");
+        look.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        delete.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+        enter.Pressed += () => BeginLogin(character.Name);
+        look.Pressed += () => WantsToChangeLook?.Invoke(character);
+        delete.Pressed += () => AskDelete(character.Name);
+        _rowButtons.AddRange([enter, look, delete]);
+
+        HBoxContainer buttons = new();
+        buttons.AddThemeConstantOverride("separation", Main.Gutter);
+        buttons.AddChild(enter);
+        buttons.AddChild(look);
+        buttons.AddChild(delete);
+
+        VBoxContainer row = new();
+        row.AddThemeConstantOverride("separation", Main.Gutter / 2);
+        row.AddChild(title);
+        row.AddChild(buttons);
+
+        return row;
+    }
+
+    /// <summary>내 캐릭터 목록을 홈페이지에 묻는다. 표가 끝났거나(401) 대기·거부(403)면 표를 지우고 카카오 단추로.</summary>
+    private void LoadCharacters()
+    {
+        if (Main.Kakao is not { } kakao || _loadingList)
+        {
+            return;
+        }
+
+        _loadingList = true;
+        _characters = null;
+        _listNote = "내 캐릭터를 불러오는 중…";
+        FillList();
+
+        // 걸린 채 멈추지 않게 — 넘으면 「못 닿음」으로 끝난다.
+        HttpRequest ask = new() { Timeout = 10 };
+        AddChild(ask);
+        ask.RequestCompleted += (result, code, _, body) =>
+        {
+            ask.QueueFree();
+            _loadingList = false;
+
+            // 그사이 로그아웃했거나 다른 카카오로 들어왔다 — 옛 답은 버린다.
+            if (Main.Kakao != kakao)
+            {
+                return;
+            }
+
+            string answer = System.Text.Encoding.UTF8.GetString(body);
+
+            if (result == (long)HttpRequest.Result.Success && code is 401 or 403)
+            {
+                Main.SetKakao(null);
+                ShowState();
+                _status.Text = "카카오 로그인이 끝났습니다. [카카오로 로그인]을 다시 눌러 주세요.";
+                return;
+            }
+
+            _characters = result == (long)HttpRequest.Result.Success ? KakaoSignIn.ReadCharacters(code, answer) : null;
+            _listNote = result == (long)HttpRequest.Result.Success
+                ? KakaoSignIn.ErrorOf(answer, "캐릭터 목록을 불러오지 못했습니다. 잠시 뒤 다시 해 주세요.")
+                : "홈페이지에 닿지 못했습니다. 인터넷 연결을 확인해 주세요.";
+            FillList();
+        };
+
+        if (ask.Request(KakaoSignIn.CharactersUrl, ["Content-Type: application/json"], Godot.HttpClient.Method.Post, KakaoSignIn.CharactersRequest(kakao.Token)) != Godot.Error.Ok)
+        {
+            ask.QueueFree();
+            _loadingList = false;
+            _listNote = "홈페이지에 닿지 못했습니다. 인터넷 연결을 확인해 주세요.";
+            FillList();
+        }
+    }
+
+    /// <summary>[삭제] — 한 번 묻고, [지우기]면 0x02 <c>표|delete</c>.</summary>
+    private void AskDelete(string name)
+    {
+        CenterContainer cover = new() { AnchorRight = 1, AnchorBottom = 1, ZIndex = 100 };
+        VBoxContainer list = new();
+        list.AddThemeConstantOverride("separation", Main.Gutter);
+        list.AddChild(new Label
+        {
+            Text = $"{name} 을(를) 지웁니다.\n되돌리려면 관리자에게 말해야 합니다.",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart
+        });
+
+        Button cancel = PlainButton("취소");
+        Button delete = new() { Text = "지우기", CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        Greybox.Commit(delete);
+        cancel.Pressed += CloseConfirm;
+        delete.Pressed += () =>
+        {
+            CloseConfirm();
+
+            if (Main.Kakao is not { } kakao || _attempt is not null || _deleting is not null)
+            {
+                return;
+            }
+
+            _deletingName = name;
+            _status.Text = "지우는 중…";
+            _deleting = HadesLoginClient.DeleteCharacterAsync(Main.ServerAddress, Main.ServerPort, name, kakao.Token, _closing.Token);
+            RefreshSubmitState(keepStatus: true);
+        };
+        list.AddChild(ButtonRow(cancel, delete));
+
+        PanelContainer inner = new();
+        inner.AddThemeStyleboxOverride("panel", Greybox.Plate());
+        inner.AddChild(list);
+        PanelContainer plate = new() { CustomMinimumSize = new Vector2(300, 0) };
+        plate.AddThemeStyleboxOverride("panel", Greybox.Stone());
+        plate.AddChild(inner);
+        cover.AddChild(plate);
+        AddChild(cover);
+        _confirm = plate;
+    }
+
+    private void CloseConfirm()
+    {
+        _confirm?.GetParent().QueueFree();
+        _confirm = null;
     }
 
     /// <summary>두 단추를 한 줄에 반씩(사용자 2026-10-03: 가로 화면에서 한 줄이 빠져 창이 화면 안에 다 든다).</summary>
@@ -740,7 +944,7 @@ public partial class LoginScreen : Control
     {
         if (!_submit.Disabled)
         {
-            BeginLogin();
+            BeginLogin(_username.Text);
         }
         else if (_username.Text.Length == 0)
         {
@@ -748,21 +952,11 @@ public partial class LoginScreen : Control
         }
     }
 
-    /// <summary>[옛 캐릭터 잇기] — 옛 비밀번호 칸을 열고 닫는다. 닫으면 친 것은 버린다.</summary>
-    private void ToggleLink()
-    {
-        _linking = !_linking;
-        _password.Text = string.Empty;
-        ShowState();
-        RefreshSubmitState();
-    }
-
     /// <summary>[카카오 로그아웃] — 이 기기의 표를 지우고 카카오 단추로.</summary>
     private void SignOut()
     {
         Main.SetKakao(null);
-        _linking = false;
-        _password.Text = string.Empty;
+        _characters = null;
         ShowState();
         _status.Text = "카카오에서 로그아웃했습니다.";
     }
@@ -813,7 +1007,7 @@ public partial class LoginScreen : Control
         }
     }
 
-    /// <summary>2초마다 — 번호를 넣었으면 그 번호와 함께 게임 표를 달라고 묻는다. 한 번에 하나만.</summary>
+    /// <summary>2초마다 — 게임 표를 달라고 묻는다. 한 번에 하나만.</summary>
     private void AskForToken()
     {
         if (_ticket is not { } ticket || _asking)
@@ -845,7 +1039,7 @@ public partial class LoginScreen : Control
             Heard(KakaoSignIn.ReadToken(result == (long)HttpRequest.Result.Success ? code : 0, System.Text.Encoding.UTF8.GetString(body)));
         };
 
-        if (ask.Request(KakaoSignIn.TokenUrl, ["Content-Type: application/json"], Godot.HttpClient.Method.Post, KakaoSignIn.TokenRequest(ticket, _sentCode)) != Godot.Error.Ok)
+        if (ask.Request(KakaoSignIn.TokenUrl, ["Content-Type: application/json"], Godot.HttpClient.Method.Post, KakaoSignIn.TokenRequest(ticket)) != Godot.Error.Ok)
         {
             ask.QueueFree();
             _asking = false;
@@ -857,35 +1051,8 @@ public partial class LoginScreen : Control
         switch (reply.State)
         {
             case KakaoWait.Waiting:
-                // 못 닿은 것도 여기 — 번호를 기다리는 안내는 덮지 않는다.
-                if (!_codeAsked)
-                {
-                    _status.Text = BrowserText;
-                }
-
-                break;
-
-            case KakaoWait.NeedsCode:
-                // 처음 한 번만 안내 — 번호가 틀렸다는 말·남은 기회를 다음 물음이 덮지 않게(리뷰 2026-10-11).
-                if (!_codeAsked)
-                {
-                    _codeAsked = true;
-                    _status.Text = CodeText;
-                    ShowState();
-                }
-
-                break;
-
-            case KakaoWait.WrongCode when reply.Left > 0:
-                _sentCode = null;
-                _code.Text = string.Empty;
-                _confirmCode.Disabled = true;
-                _status.Text = reply.Error;
-                ShowState();
-                break;
-
-            case KakaoWait.WrongCode:
-                StartOver($"{reply.Error} [카카오로 로그인]을 다시 눌러 주세요.");
+                // 못 닿은 것도 여기.
+                _status.Text = BrowserText;
                 break;
 
             case KakaoWait.Pending:
@@ -896,8 +1063,8 @@ public partial class LoginScreen : Control
                 ForgetTicket();
                 Main.SetKakao(new KakaoAccount(reply.Token, reply.Name));
                 ShowState();
-                RefreshSubmitState();
-                _status.Text = $"카카오: {reply.Name} — 캐릭터 이름을 넣고 들어가세요. 처음이면 [새 캐릭터], 예전 캐릭터는 [옛 캐릭터 잇기].";
+                _status.Text = $"카카오: {reply.Name} — 캐릭터를 골라 들어가세요. 처음이면 [새 캐릭터].";
+                LoadCharacters();
                 break;
 
             case KakaoWait.Refused:
@@ -908,21 +1075,6 @@ public partial class LoginScreen : Control
                 StartOver("로그인 표가 없거나 지났습니다. [카카오로 로그인]을 다시 눌러 주세요.");
                 break;
         }
-    }
-
-    /// <summary>[확인] — 브라우저에 뜬 번호를 다음 물음부터 함께 보낸다(지금 묻는 중이 아니면 바로).</summary>
-    private void ConfirmCode()
-    {
-        if (_ticket is null || !KakaoSignIn.IsCode(_code.Text))
-        {
-            return;
-        }
-
-        _sentCode = _code.Text;
-        _code.ReleaseFocus();
-        _status.Text = "번호를 확인하는 중…";
-        ShowState();
-        AskForToken();
     }
 
     private void StartOver(string message)
@@ -936,14 +1088,10 @@ public partial class LoginScreen : Control
     {
         _poll.Stop();
         _ticket = null;
-        _sentCode = null;
-        _codeAsked = false;
-        _code.Text = string.Empty;
-        _confirmCode.Disabled = true;
     }
 
     /// <summary>
-    /// <c>--kakao 기다림|번호|대기|잇기</c> — 홈페이지 없이 그 상태를 그려 본다(<see cref="Main.KakaoPreview" />). 묻지는 않는다.
+    /// <c>--kakao 기다림|대기|표|빈목록|삭제</c> — 홈페이지 없이 그 상태를 그려 본다(<see cref="Main.KakaoPreview" />). 묻지는 않는다.
     /// </summary>
     private void ApplyKakaoPreview()
     {
@@ -953,26 +1101,26 @@ public partial class LoginScreen : Control
                 _ticket = "미리보기";
                 _status.Text = BrowserText;
                 break;
-            case "번호":
-                _ticket = "미리보기";
-                _codeAsked = true;
-                _status.Text = CodeText;
-                break;
             case "대기":
                 _ticket = "미리보기";
-                _codeAsked = true;
-                _sentCode = _code.Text = "123456";
-                _confirmCode.Disabled = false;
                 _status.Text = $"카카오닉네임 님 — {PendingText}";
                 break;
-            case "잇기":
-                _linking = true;
+            case "표" or "삭제":
+                _characters = [Main.PretendCharacter, new KakaoCharacter("새싹이", 1, "Peasant", "Female", 2, 0)];
+                break;
+            case "빈목록":
+                _characters = [];
                 break;
             default:
                 return;
         }
 
         ShowState();
+
+        if (Main.KakaoPreview == "삭제")
+        {
+            AskDelete(Main.PretendCharacter.Name);
+        }
     }
 
     /// <summary>Client version and the font actually in use, which is what tells us Korean will render.</summary>
@@ -1014,7 +1162,7 @@ public partial class LoginScreen : Control
         {
             // 지금 자리는 이미 올린 만큼 올라가 있다 — 올리기 전 자리로 되돌려 잰다.
             Rect2 typed = field.GetGlobalRect();
-            Rect2 finish = (SignedIn ? _actions : _codeRow).GetGlobalRect();
+            Rect2 finish = _actions.GetGlobalRect();
 
             slide = KeyboardFit.Slide(
                 typed.Position.Y + _slide,
@@ -1033,6 +1181,7 @@ public partial class LoginScreen : Control
         }
 
         DrainLogin();
+        DrainDelete();
     }
 
     public override void _ExitTree()
@@ -1044,15 +1193,16 @@ public partial class LoginScreen : Control
     }
 
     /// <summary>
-    /// No request goes out until it can succeed, per the wireframe transition rules: a name, and a token (or the
-    /// rehearsal password), and while linking the old password too.
+    /// No request goes out until it can succeed, per the wireframe transition rules: a name and the rehearsal
+    /// password, or a token for the list's buttons.
     /// </summary>
     private void RefreshSubmitState(bool keepStatus = false)
     {
-        // 접속하는 동안 표를 지우거나 잇기로 바꾸지 못하게 — 이미 보낸 표로 들어가 상태가 꼬였다(리뷰 2026-10-11).
-        bool busy = _attempt is not null || _session is not null;
+        // 접속·지우는 동안 표를 지우거나 다른 캐릭터를 누르지 못하게 — 이미 보낸 표로 들어가 상태가 꼬였다(리뷰 2026-10-11).
+        bool busy = _attempt is not null || _session is not null || _deleting is not null;
         _signOut.Disabled = busy;
-        _link.Disabled = busy;
+        _create.Disabled = busy;
+        _rowButtons.ForEach(button => button.Disabled = busy);
 
         if (busy)
         {
@@ -1064,19 +1214,11 @@ public partial class LoginScreen : Control
 
         _submit.Disabled = !ready;
 
-        if (keepStatus || !SignedIn)
+        if (keepStatus || !Rehearsing)
         {
             return;
         }
 
-        _status.Text = (Rehearsing, _linking, ready) switch
-        {
-            (true, _, true) => "로그인할 준비가 됐습니다.",
-            (true, _, false) => "사용자명과 비밀번호를 입력하세요.",
-            (_, true, true) => "옛 비밀번호가 맞으면 이 캐릭터가 카카오 계정에 이어집니다. 한 번만 하면 됩니다.",
-            (_, true, false) => "이을 캐릭터 이름과 그 캐릭터의 옛 비밀번호를 넣으세요.",
-            (_, _, true) => "들어갈 준비가 됐습니다.",
-            _ => "캐릭터 이름을 넣으세요. 처음이면 [새 캐릭터]."
-        };
+        _status.Text = ready ? "로그인할 준비가 됐습니다." : "사용자명과 비밀번호를 입력하세요.";
     }
 }

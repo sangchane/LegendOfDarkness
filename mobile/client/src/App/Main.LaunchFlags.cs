@@ -267,14 +267,18 @@ public partial class Main : Control
     }
 
     /// <summary>
-    /// <c>--kakao 없음|기다림|번호|대기|표|잇기</c> — 홈페이지·서버 없이 로그인 화면의 카카오 상태를 그려 본다(사진·배치 검사).
+    /// <c>--kakao 없음|기다림|대기|표|빈목록|삭제|생김새</c> — 홈페이지·서버 없이 로그인 화면의 카카오 상태를 그려 본다(사진·배치 검사).
+    /// <c>생김새</c> 는 <c>--screen create</c> 와 함께 — 만들기 화면의 바꾸기 모드(<see cref="PretendCharacter" />).
     /// 기기의 kakao.cfg·character.cfg 는 읽지도 쓰지도 않고, login.cfg 로 저절로 들어가지도 않는다. 표는 꼴만 맞춘 가짜다.
     /// </summary>
     public static string KakaoPreview { get; private set; } = string.Empty;
 
+    /// <summary>미리보기 목록의 첫 줄·바꾸기 모드의 캐릭터.</summary>
+    public static readonly Lod.Mobile.Core.Net.KakaoCharacter PretendCharacter = new("미리보기", 41, "Monk", "Male", 3, 5);
+
     private static void PretendKakao()
     {
-        if (KakaoPreview is "표" or "잇기")
+        if (KakaoPreview is "표" or "빈목록" or "삭제" or "생김새")
         {
             Kakao = new Lod.Mobile.Core.Net.KakaoAccount("g1.9999999999." + new string('0', 64), "카카오닉네임");
             LastCharacter = "미리보기";

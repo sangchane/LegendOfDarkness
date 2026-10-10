@@ -190,7 +190,7 @@ public partial class Main : Control
         }
         else if (Flag("--screen") == "create")
         {
-            CreateScreen create = BuildCreateScreen();
+            CreateScreen create = BuildCreateScreen(KakaoPreview == "생김새" ? PretendCharacter : null);
 
             AddChild(create);
             LayoutCheck.RunIfRequested(this, create);

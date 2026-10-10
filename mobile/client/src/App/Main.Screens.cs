@@ -28,13 +28,14 @@ public partial class Main : Control
         // in the middle of one.
         login.Entered = session => Callable.From(() => Enter(login, session)).CallDeferred();
         login.WantsToCreate = () => Callable.From(() => GoToCreate(login)).CallDeferred();
+        login.WantsToChangeLook = character => Callable.From(() => GoToCreate(login, character)).CallDeferred();
 
         return login;
     }
 
-    private CreateScreen BuildCreateScreen()
+    private CreateScreen BuildCreateScreen(Lod.Mobile.Core.Net.KakaoCharacter? changing = null)
     {
-        CreateScreen create = new();
+        CreateScreen create = new() { Changing = changing };
 
         create.Cancelled = () => Callable.From(() => BackToLogin(create)).CallDeferred();
         create.Entered = session => Callable.From(() => Enter(create, session)).CallDeferred();
@@ -81,16 +82,16 @@ public partial class Main : Control
         AddChild(BuildLoginScreen());
     }
 
-    /// <summary>계정이 없어 만들기로 간다.</summary>
-    private void GoToCreate(LoginScreen login)
+    /// <summary>계정이 없어 만들기로 간다 — 캐릭터를 주면 그 캐릭터의 생김새 바꾸기.</summary>
+    private void GoToCreate(LoginScreen login, Lod.Mobile.Core.Net.KakaoCharacter? changing = null)
     {
         RemoveChild(login);
         login.QueueFree();
 
-        AddChild(BuildCreateScreen());
+        AddChild(BuildCreateScreen(changing));
     }
 
-    /// <summary>취소를 눌러 로그인 화면으로 돌아간다.</summary>
+    /// <summary>취소를 눌러(생김새는 저장한 뒤에도) 로그인 화면으로 돌아간다.</summary>
     private void BackToLogin(CreateScreen create)
     {
         RemoveChild(create);

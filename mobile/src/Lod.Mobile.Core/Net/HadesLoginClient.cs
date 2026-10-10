@@ -105,11 +105,47 @@ public static class HadesLoginClient
         WithinDeadline(token => Login(address, loginPort, username, password, progress, token), timeout, cancellationToken);
 
     /// <summary>
+    /// 카카오 캐릭터 지우기(<c>autopilot/game-kakao-accounts/SPEC.md</c>) — 만들기 첫 패킷 0x02 에 이름과 <c>표|delete</c>
+    /// (<see cref="KakaoSignIn.Delete" />). 메시지 상자 0x00 이면 지워진 것, 아니면 그 글로 <see cref="ProtocolException" />.
+    /// </summary>
+    public static Task DeleteCharacterAsync(
+        IPAddress address,
+        int loginPort,
+        string username,
+        string token,
+        CancellationToken cancellationToken = default,
+        TimeSpan? timeout = null) =>
+        WithinDeadline(
+            walk => Manage(address, loginPort, username, KakaoSignIn.Delete(token), look: null, walk),
+            timeout,
+            cancellationToken);
+
+    /// <summary>
+    /// 카카오 캐릭터 생김새 바꾸기 — 0x02 에 이름과 <c>표|look</c>(<see cref="KakaoSignIn.Look" />), 0x00 이면 이어서 0x04.
+    /// 서버는 머리 모양·색만 반영한다(성별·직업은 무시하니 지금 값 그대로 보낸다).
+    /// </summary>
+    public static Task ChangeLookAsync(
+        IPAddress address,
+        int loginPort,
+        string username,
+        string token,
+        byte hairStyle,
+        byte gender,
+        byte hairColor,
+        byte path,
+        CancellationToken cancellationToken = default,
+        TimeSpan? timeout = null) =>
+        WithinDeadline(
+            walk => Manage(address, loginPort, username, KakaoSignIn.Look(token), (hairStyle, gender, hairColor, path), walk),
+            timeout,
+            cancellationToken);
+
+    /// <summary>
     /// 호출자 토큰에 제한시간(기본 <see cref="Deadline" />)을 묶어 한 번에 건다. 제한시간이 끊은 것은 <see cref="TimeoutException" />,
     /// 호출자가 그만둔 것은 그대로 <see cref="OperationCanceledException" />.
     /// </summary>
-    private static async Task<WorldSession> WithinDeadline(
-        Func<CancellationToken, Task<WorldSession>> walk,
+    private static async Task<T> WithinDeadline<T>(
+        Func<CancellationToken, Task<T>> walk,
         TimeSpan? timeout,
         CancellationToken cancellationToken)
     {
@@ -140,32 +176,10 @@ public static class HadesLoginClient
     {
         progress?.Report("로그인 서버에 접속하는 중…");
 
-        EncryptionParameters parameters;
-        RedirectTarget lobby;
-
-        using (HadesConnection greeting = await HadesConnection.ConnectAsync(address, loginPort, cancellationToken))
-        {
-            await greeting.ReceiveAsync(cancellationToken);
-
-            await greeting.SendAsync(Hades718LoginProtocol.CreateVersionRequest(), cancellationToken);
-            parameters = Hades718LoginProtocol.ParseServerParameters(await greeting.ReceiveAsync(cancellationToken));
-
-            // Acknowledging the cipher is what makes the server hand out the lobby address.
-            await greeting.SendAsync(
-                HadesCipher.EncodeSecured(EncryptionReceivedCommand, ordinal: 0, [0x00], parameters),
-                cancellationToken);
-
-            lobby = Hades718LoginProtocol.ParseRedirect(await greeting.ReceiveAsync(cancellationToken));
-        }
+        (HadesConnection login, EncryptionParameters parameters) = await OpenLobby(address, loginPort, cancellationToken);
+        using HadesConnection _ = login;
 
         progress?.Report("계정을 만드는 중…");
-
-        using HadesConnection login = await HadesConnection.ConnectAsync(address, lobby.Port, cancellationToken);
-
-        await login.ReceiveAsync(cancellationToken);
-
-        await login.SendAsync(Hades718LoginProtocol.CreateGameEntryRequest(lobby), cancellationToken);
-        await login.ReceiveAsync(cancellationToken);
 
         await login.SendAsync(
             Hades718LoginProtocol.CreateAccountRequest(username, password, parameters, ordinal: 0),
@@ -187,6 +201,92 @@ public static class HadesLoginClient
 
         progress?.Report("새 영웅으로 월드에 들어가는 중…");
         return await Login(address, loginPort, username, password, progress, cancellationToken);
+    }
+
+    /// <summary>지우기·생김새 — 0x02(이름·동사 칸)가 받아들여지면, 생김새는 0x04 까지. 둘 다 메시지 상자 0x00 이어야 한다.</summary>
+    private static async Task<bool> Manage(
+        IPAddress address,
+        int loginPort,
+        string username,
+        string secret,
+        (byte HairStyle, byte Gender, byte HairColor, byte Path)? look,
+        CancellationToken cancellationToken)
+    {
+        (HadesConnection login, EncryptionParameters parameters) = await OpenLobby(address, loginPort, cancellationToken);
+        using HadesConnection _ = login;
+
+        await login.SendAsync(Hades718LoginProtocol.CreateAccountRequest(username, secret, parameters, ordinal: 0), cancellationToken);
+        await Accepted(login, parameters, cancellationToken);
+
+        if (look is { } chosen)
+        {
+            await login.SendAsync(
+                Hades718LoginProtocol.CreateCharacterRequest(chosen.HairStyle, chosen.Gender, chosen.HairColor, chosen.Path, parameters, ordinal: 0),
+                cancellationToken);
+            await Accepted(login, parameters, cancellationToken);
+        }
+
+        return true;
+    }
+
+    /// <summary>다음 답이 메시지 상자 0x00 이 아니면 그 까닭으로 끝낸다.</summary>
+    private static async Task Accepted(HadesConnection login, EncryptionParameters parameters, CancellationToken cancellationToken)
+    {
+        PacketFrame reply = await login.ReceiveAsync(cancellationToken);
+
+        if (reply.Command != MessageBoxCommand)
+        {
+            throw new ProtocolException(Explain(null));
+        }
+
+        if (Refusal(reply, parameters) is { } refused)
+        {
+            throw new ProtocolException(refused);
+        }
+    }
+
+    /// <summary>
+    /// 로그인 서버와 암호를 맞추고 로비로 옮겨 인사까지 — 만들기·지우기·생김새가 그 연결에 0x02 를 보낸다. 연결은 호출자가 닫는다.
+    /// </summary>
+    private static async Task<(HadesConnection Login, EncryptionParameters Parameters)> OpenLobby(
+        IPAddress address,
+        int loginPort,
+        CancellationToken cancellationToken)
+    {
+        EncryptionParameters parameters;
+        RedirectTarget lobby;
+
+        using (HadesConnection greeting = await HadesConnection.ConnectAsync(address, loginPort, cancellationToken))
+        {
+            await greeting.ReceiveAsync(cancellationToken);
+
+            await greeting.SendAsync(Hades718LoginProtocol.CreateVersionRequest(), cancellationToken);
+            parameters = Hades718LoginProtocol.ParseServerParameters(await greeting.ReceiveAsync(cancellationToken));
+
+            // Acknowledging the cipher is what makes the server hand out the lobby address.
+            await greeting.SendAsync(
+                HadesCipher.EncodeSecured(EncryptionReceivedCommand, ordinal: 0, [0x00], parameters),
+                cancellationToken);
+
+            lobby = Hades718LoginProtocol.ParseRedirect(await greeting.ReceiveAsync(cancellationToken));
+        }
+
+        HadesConnection login = await HadesConnection.ConnectAsync(address, lobby.Port, cancellationToken);
+
+        try
+        {
+            await login.ReceiveAsync(cancellationToken);
+
+            await login.SendAsync(Hades718LoginProtocol.CreateGameEntryRequest(lobby), cancellationToken);
+            await login.ReceiveAsync(cancellationToken);
+        }
+        catch
+        {
+            login.Dispose();
+            throw;
+        }
+
+        return (login, parameters);
     }
 
     private static async Task<WorldSession> Login(

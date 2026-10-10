@@ -21,6 +21,8 @@ namespace LodClient;
 /// <c>CreateAccountRequest</c>)이 이름·비밀번호만 받는다. 원작은 HAIR·COLOR 를 ◀ ▶ 로 숫자를 하나씩
 /// 넘기게 했지만, 숫자만 보고는 무슨 모양·무슨 색인지 알 수 없다(사용자, 2026-09-19) — 그래서 여기서는
 /// 격자를 깔아 눈으로 보고 누르게 바꿨다. 머리·색은 격자로 고르고, 미리보기 양옆 화살표는 몸의 방향만 바꾼다.
+/// <see cref="Changing" /> 이 있으면 그 캐릭터의 생김새 바꾸기 — 이름·성별·직업 고르기를 숨기고 지금 머리로 시작해, [저장]이
+/// 0x02 <c>표|look</c> → 0x04 를 보낸 뒤 목록으로 돌아간다(<c>autopilot/game-kakao-accounts/SPEC.md</c>).
 /// </remarks>
 public sealed partial class CreateScreen : Control
 {
@@ -33,7 +35,13 @@ public sealed partial class CreateScreen : Control
 
     private Task<WorldSession>? _attempt;
 
-    /// <summary>취소를 눌렀을 때. Main 이 로그인 화면으로 돌려보낸다.</summary>
+    /// <summary>생김새 저장 중(<see cref="HadesLoginClient.ChangeLookAsync" />).</summary>
+    private Task? _saving;
+
+    /// <summary>생김새를 바꿀 캐릭터, 없으면 새로 만들기.</summary>
+    public KakaoCharacter? Changing { get; init; }
+
+    /// <summary>취소를 눌렀을 때(생김새는 저장한 뒤에도). Main 이 로그인 화면으로 돌려보낸다.</summary>
     public Action? Cancelled { get; set; }
 
     private MarginContainer _safeArea = null!;
@@ -86,11 +94,25 @@ public sealed partial class CreateScreen : Control
         _safeArea = Main.SafeAreaContainer();
         AddChild(_safeArea);
 
+        if (Changing is { } character)
+        {
+            // 지금 머리로 시작 — 가로에서는 직업 탭 대신 머리 탭부터.
+            _gender = character.GenderNumber;
+            _hairStyle = character.HairStyle;
+            _hairColor = character.HairColor;
+            _path = character.PathNumber;
+            _appearanceTab = 1;
+        }
+
         _safeArea.AddChild(BuildForm());
 
-        ApplyPickedLook();
-        ApplyPickedPath();
-        ApplyRehearsal();
+        if (Changing is null)
+        {
+            ApplyPickedLook();
+            ApplyPickedPath();
+            ApplyRehearsal();
+        }
+
         RefreshGender();
         RefreshPathSelection();
         PopulateHairGrid();
@@ -180,7 +202,7 @@ public sealed partial class CreateScreen : Control
 
         Label title = new()
         {
-            Text = "캐릭터 만들기",
+            Text = Changing is null ? "캐릭터 만들기" : $"{Changing.Name} 생김새 바꾸기",
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
@@ -220,7 +242,7 @@ public sealed partial class CreateScreen : Control
         _status.AddThemeFontSizeOverride("font_size", AuxFontSize);
         _status.AddThemeColorOverride("font_color", Greybox.Muted);
 
-        _create = new Button { Text = "만들기", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        _create = new Button { Text = Changing is null ? "만들기" : "저장", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
         Greybox.Commit(_create);
 
         _back = new Button { Text = "취소", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
@@ -241,6 +263,15 @@ public sealed partial class CreateScreen : Control
         Control form = Main.Portrait
             ? BuildPortraitForm(heading, authRow, preview, gender, path, hair, color, buttons)
             : BuildLandscapeForm(heading, authRow, preview, gender, path, hair, color, buttons);
+
+        // 생김새 바꾸기 — 서버가 머리 모양·색만 바꾼다(성별 전용 옷이 깨지므로 성별·직업은 그대로).
+        if (Changing is not null)
+        {
+            authRow.Visible = false;
+            _username.Visible = false;
+            gender.Visible = false;
+            path.Visible = false;
+        }
 
         padding.AddChild(form);
         PanelContainer interior = new();
@@ -333,6 +364,7 @@ public sealed partial class CreateScreen : Control
                 }
             };
             selectors.Add(tab);
+            tab.Visible = index != 0 || Changing is null;
             tabs.AddChild(tab);
         }
         appearance.AddChild(tabs);
@@ -489,6 +521,20 @@ public sealed partial class CreateScreen : Control
     /// </summary>
     private void BeginCreate()
     {
+        if (Changing is { } character)
+        {
+            if (_saving is null && Main.Kakao is { } kakao)
+            {
+                _create.Disabled = true;
+                _status.Text = "저장하는 중…";
+                _saving = HadesLoginClient.ChangeLookAsync(
+                    Main.ServerAddress, Main.ServerPort, character.Name, kakao.Token,
+                    (byte)_hairStyle, _gender, (byte)_hairColor, character.PathNumber, _closing.Token);
+            }
+
+            return;
+        }
+
         if (_attempt is not null || Secret is not { Length: > 0 } secret || _path is null)
         {
             return;
@@ -517,6 +563,20 @@ public sealed partial class CreateScreen : Control
             _status.Text = line;
         }
 
+        if (_saving is { IsCompleted: true } saved)
+        {
+            _saving = null;
+
+            if (saved.IsCompletedSuccessfully)
+            {
+                Cancelled?.Invoke();
+                return;
+            }
+
+            Fail(saved.Exception);
+            return;
+        }
+
         if (_attempt is null || !_attempt.IsCompleted)
         {
             return;
@@ -539,7 +599,13 @@ public sealed partial class CreateScreen : Control
             return;
         }
 
-        Exception failure = finished.Exception?.GetBaseException() ?? new IOException("알 수 없는 오류");
+        Fail(finished.Exception);
+    }
+
+    /// <summary>만들기·저장이 거절됐다 — 서버의 말을 보인다.</summary>
+    private void Fail(AggregateException? error)
+    {
+        Exception failure = error?.GetBaseException() ?? new IOException("알 수 없는 오류");
         Main.NoteActivityError(failure.GetType().Name);
 
         // 표가 지났다 — 지우고, [만들기]를 잠근 채 까닭을 보인다([취소]로 로그인 화면의 카카오 단추로).
@@ -604,8 +670,17 @@ public sealed partial class CreateScreen : Control
     /// <summary>이름·직업과 보낼 표(<see cref="Secret" />)가 다 있어야 만들 수 있다.</summary>
     private void RefreshCreateState()
     {
-        if (_attempt is not null)
+        if (_attempt is not null || _saving is not null)
         {
+            return;
+        }
+
+        if (Changing is not null)
+        {
+            _create.Disabled = Main.Kakao is null;
+            _status.Text = Main.Kakao is null
+                ? "카카오 로그인이 필요합니다. [취소]로 돌아가 카카오로 로그인하세요."
+                : "머리 모양과 색을 고른 뒤 [저장]을 누르세요.";
             return;
         }
 

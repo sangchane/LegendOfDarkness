@@ -10,13 +10,7 @@ public enum KakaoWait
     /// <summary>아직 브라우저에서 로그인을 안 마쳤다 — 계속 묻는다(못 닿은 것·서버 오류도 여기).</summary>
     Waiting,
 
-    /// <summary>브라우저는 끝났다 — 브라우저에 뜬 번호 6자리를 앱에 넣어야 한다.</summary>
-    NeedsCode,
-
-    /// <summary>번호가 틀렸다 — 남은 기회(<see cref="KakaoReply.Left" />)를 보이고 칸을 비운다. 0 이면 다음 답은 처음부터.</summary>
-    WrongCode,
-
-    /// <summary>번호는 맞고 관리자 승인 대기 — 초대 번호를 넣거나 기다린다. 같은 번호로 계속 묻는다.</summary>
+    /// <summary>관리자 승인 대기 — 초대 번호를 넣거나 기다린다. 계속 묻는다.</summary>
     Pending,
 
     /// <summary>게임 표를 받았다(한 번만 온다).</summary>
@@ -29,8 +23,25 @@ public enum KakaoWait
     StartOver
 }
 
-/// <summary>app-token 답 하나. 이름은 카카오 닉네임, 표는 <see cref="KakaoWait.Granted" /> 일 때만, 남은 기회는 <see cref="KakaoWait.WrongCode" /> 일 때만.</summary>
-public sealed record KakaoReply(KakaoWait State, string Name = "", string Token = "", string Error = "", int Left = 0);
+/// <summary>app-token 답 하나. 이름은 카카오 닉네임, 표는 <see cref="KakaoWait.Granted" /> 일 때만.</summary>
+public sealed record KakaoReply(KakaoWait State, string Name = "", string Token = "", string Error = "");
+
+/// <summary>내 캐릭터 목록(<c>/api/kakao/characters</c>)의 한 줄. 직업·성별은 서버 이름 그대로(<c>Monk</c>·<c>Female</c>).</summary>
+public sealed record KakaoCharacter(string Name, int Level, string Path, string Gender, int HairStyle, int HairColor)
+{
+    // 서버 Class 차례(평민 0 ~ 무도가 5) — 0x04 의 직업 번호와 같다.
+    private static readonly string[] Paths = ["Peasant", "Warrior", "Rogue", "Wizard", "Priest", "Monk"];
+    private static readonly string[] Jobs = ["평민", "전사", "도적", "마법사", "성직자", "무도가"];
+
+    /// <summary>화면에 적을 직업, 모르는 이름이면 그대로.</summary>
+    public string Job => Array.IndexOf(Paths, Path) is >= 0 and int at ? Jobs[at] : Path;
+
+    /// <summary>0x04 의 직업 번호(모르면 평민) — 생김새 바꾸기는 서버가 무시하니 미리보기 옷에만 쓰인다.</summary>
+    public byte PathNumber => (byte)Math.Max(0, Array.IndexOf(Paths, Path));
+
+    /// <summary>0x04 의 성별 번호 1=남·2=여.</summary>
+    public byte GenderNumber => Gender == "Female" ? (byte)2 : (byte)1;
+}
 
 /// <summary>
 /// 기기에 남기는 카카오 로그인(<c>user://kakao.cfg</c> 두 줄: 게임 표 · 닉네임). 파일 읽고 쓰기는 화면 쪽이 하고,
@@ -49,9 +60,9 @@ public sealed record KakaoAccount(string Token, string Name)
 /// <summary>
 /// 앱 카카오 로그인(사용자 2026-10-11, <c>autopilot/game-kakao-login/SPEC.md</c>) — 딥링크 없이 「브라우저에서 로그인,
 /// 앱은 기다렸다 받기」. 홈페이지에서 표(ticket)를 받아 브라우저로 start 를 열고, 2초마다 app-token 을 물어 게임 표를 받는다.
-/// 브라우저 로그인이 끝나면 브라우저에 번호 6자리가 뜨고, 앱이 그 번호를 함께 보내야 표가 나온다 — 남이 보낸 링크로 로그인해도
-/// 그 사람 앱이 내 표를 가져가지 못하게(보안 리뷰 2026-10-11). 받은 게임 표가 캐릭터 비밀번호 칸으로 간다.
-/// 여기는 주소·답 읽기·잇기 칸만(순수 함수) — 묻는 것은 화면이 한다.
+/// 6자리 번호는 없앴다(사용자 2026-10-11, <c>autopilot/game-kakao-accounts/SPEC.md</c>). 받은 게임 표가 캐릭터 비밀번호 칸으로 가고,
+/// 내 캐릭터 목록을 묻고, 지우기·생김새 바꾸기는 비밀번호 칸 동사(<c>표|delete</c>·<c>표|look</c>)로 한다.
+/// 여기는 주소·답 읽기·동사 칸만(순수 함수) — 묻는 것은 화면이 한다.
 /// </summary>
 public static class KakaoSignIn
 {
@@ -61,6 +72,8 @@ public static class KakaoSignIn
     public static string TicketUrl => Site + "/api/kakao/app-ticket";
 
     public static string TokenUrl => Site + "/api/kakao/app-token";
+
+    public static string CharactersUrl => Site + "/api/kakao/characters";
 
     /// <summary>몇 초마다 묻나.</summary>
     public const double PollSeconds = 2;
@@ -85,16 +98,35 @@ public static class KakaoSignIn
             : null;
     }
 
-    /// <summary>브라우저에 뜬 번호 꼴 — 숫자 여섯.</summary>
-    public static bool IsCode(string? code) => code is { Length: 6 } && code.All(char.IsAsciiDigit);
+    /// <summary>app-token 에 실어 보낼 본문.</summary>
+    public static string TokenRequest(string ticket) => $"{{\"ticket\":\"{JsonEncodedText.Encode(ticket)}\"}}";
 
-    /// <summary>app-token 에 실어 보낼 본문 — 번호는 넣었을 때만.</summary>
-    public static string TokenRequest(string ticket, string? code = null) =>
-        IsCode(code)
-            ? $"{{\"ticket\":\"{JsonEncodedText.Encode(ticket)}\",\"code\":\"{code}\"}}"
-            : $"{{\"ticket\":\"{JsonEncodedText.Encode(ticket)}\"}}";
+    /// <summary>캐릭터 목록에 실어 보낼 본문.</summary>
+    public static string CharactersRequest(string token) => $"{{\"token\":\"{JsonEncodedText.Encode(token)}\"}}";
 
-    /// <summary>app-token 의 상태 코드와 본문 → 기다림 / 번호 넣기 / 번호 틀림(남은 기회) / 대기(닉네임) / 받음(표·닉네임) / 거부 / 처음부터.</summary>
+    /// <summary>
+    /// 캐릭터 목록의 답 → 줄들(서버 차례 그대로). 200 이 아니거나 꼴이 틀리면 없음 — 401·403 이면 화면이 표를 지운다.
+    /// 이름 없는 줄은 건너뛴다.
+    /// </summary>
+    public static IReadOnlyList<KakaoCharacter>? ReadCharacters(long status, string body)
+    {
+        if (status != 200 || Parse(body) is not { } json
+            || !json.TryGetProperty("characters", out JsonElement list) || list.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        return
+        [
+            .. list.EnumerateArray()
+                .Where(entry => entry.ValueKind == JsonValueKind.Object && OneLine(Text(entry, "name")).Length > 0)
+                .Select(entry => new KakaoCharacter(
+                    OneLine(Text(entry, "name")), Number(entry, "level"), Text(entry, "path"), Text(entry, "gender"),
+                    Number(entry, "hairStyle"), Number(entry, "hairColor")))
+        ];
+    }
+
+    /// <summary>app-token 의 상태 코드와 본문 → 기다림 / 대기(닉네임) / 받음(표·닉네임) / 거부 / 처음부터.</summary>
     public static KakaoReply ReadToken(long status, string body)
     {
         JsonElement? json = Parse(body);
@@ -103,12 +135,8 @@ public static class KakaoSignIn
         return status switch
         {
             202 when Flag(json, "pending") => new KakaoReply(KakaoWait.Pending, name),
-            202 when Flag(json, "code") => new KakaoReply(KakaoWait.NeedsCode),
             202 => new KakaoReply(KakaoWait.Waiting),
             200 => IsGameToken(token) ? new KakaoReply(KakaoWait.Granted, name, token) : new KakaoReply(KakaoWait.StartOver),
-            // 「left」가 있으면 번호가 틀린 것, 없으면 거부된 계정.
-            403 when json is { } found && found.TryGetProperty("left", out JsonElement left) && left.TryGetInt32(out int chances) =>
-                new KakaoReply(KakaoWait.WrongCode, Error: error.Length > 0 ? error : $"번호가 맞지 않습니다. 남은 기회 {chances}번.", Left: chances),
             403 => new KakaoReply(KakaoWait.Refused, Error: error.Length > 0 ? error : "들어올 수 없는 카카오 계정입니다."),
             >= 400 and < 500 => new KakaoReply(KakaoWait.StartOver, Error: error),
             // 0(못 닿음)·5xx — 잠깐 끊긴 것. 시간 안이면 계속 묻는다.
@@ -120,8 +148,11 @@ public static class KakaoSignIn
     public static string ErrorOf(string body, string fallback) =>
         OneLine(Text(Parse(body), "error")) is { Length: > 0 } error ? error : fallback;
 
-    /// <summary>옛 캐릭터 잇기 — 비밀번호 칸에 <c>표|옛비밀번호</c>(서버 KakaoLogin 이 처음 「|」에서 가른다).</summary>
-    public static string Link(string token, string oldPassword) => token + "|" + oldPassword;
+    /// <summary>생김새 바꾸기 — 0x02 비밀번호 칸에 <c>표|look</c>, 이어지는 0x04 가 머리 모양·색만 바꾼다(서버 KakaoLogin 이 처음 「|」에서 가른다).</summary>
+    public static string Look(string token) => token + "|look";
+
+    /// <summary>캐릭터 지우기 — 0x02 비밀번호 칸에 <c>표|delete</c>.</summary>
+    public static string Delete(string token) => token + "|delete";
 
     /// <summary>
     /// 서버가 표를 더 받지 않는다(만료·서명 틀림) — 앱은 표를 지우고 카카오 단추로 돌아간다. 서버 문구는 CP949 로 오니
@@ -147,6 +178,9 @@ public static class KakaoSignIn
 
     private static bool Flag(JsonElement? json, string key) =>
         json is { } found && found.TryGetProperty(key, out JsonElement value) && value.ValueKind == JsonValueKind.True;
+
+    private static int Number(JsonElement json, string key) =>
+        json.TryGetProperty(key, out JsonElement value) && value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out int number) ? number : 0;
 
     private static string Text(JsonElement? json, string key) =>
         json is { } found && found.TryGetProperty(key, out JsonElement value) && value.ValueKind == JsonValueKind.String
