@@ -186,6 +186,77 @@ class LoginAndStateTests(unittest.TestCase):
             self.request("POST", "/api/kakao/join", {"code": code}, cookie=session)
         return (status, headers), session
 
+    def app_ticket(self):
+        status, _, body = self.request("POST", "/api/kakao/app-ticket")
+        self.assertEqual(status, 200)
+        body = json.loads(body)
+        self.assertEqual(body["start"], "/api/kakao/start?app=" + body["ticket"])
+        return body["ticket"]
+
+    def app_token(self, ticket):
+        status, _, body = self.request("POST", "/api/kakao/app-token", {"ticket": ticket})
+        return status, json.loads(body)
+
+    def browser_kakao(self, ticket):
+        """앱이 연 브라우저 — 카카오 동의 뒤 돌아오기까지. (callback 응답 머리, 세션 쿠키)."""
+        status, headers, _ = self.request("GET", "/api/kakao/start?app=" + ticket)
+        self.assertEqual(status, 302)
+        state_cookie = headers["Set-Cookie"].split(";")[0]
+        state = state_cookie.split("=", 1)[1].split("|")[0]
+        status, headers, _ = self.request("GET", f"/api/kakao/callback?code=good&state={state}", cookie=state_cookie)
+        self.assertEqual(status, 302)
+        session = next((c.split(";")[0] for c in headers.get_all("Set-Cookie") or [] if c.startswith("lod_ops=")), None)
+        return headers, session
+
+    def test_app_gets_a_game_token_after_kakao_login_in_the_browser(self):
+        # 게임 로그인을 카카오로(사용자 2026-10-11) SC-1 — 딥링크 없이 앱은 표로 기다렸다 받는다.
+        ticket = self.app_ticket()
+        self.assertEqual(self.app_token(ticket), (202, {"waiting": True}))
+        headers, session = self.browser_kakao(ticket)
+        # 처음 온 사람은 대기 — 번호를 넣은 뒤 「앱으로 돌아가세요」 화면으로.
+        self.assertEqual(headers["Location"], "/login.html?next=%2Fapp-login.html")
+        self.assertEqual(self.app_token(ticket), (202, {"pending": True, "name": "손님"}))
+        status, _, _ = self.request("POST", "/api/kakao/join", {"code": self.JOIN}, cookie=session)
+        self.assertEqual(status, 200)
+        status, body = self.app_token(ticket)
+        self.assertEqual((status, body["name"]), (200, "손님"))
+        self.assertTrue(body["token"].startswith("g777."))
+        self.assertEqual(self.app_token(ticket)[0], 404)  # 한 번만 내준다
+        self.assertEqual(self.app_token("no-such-ticket")[0], 404)
+        # 이미 허가된 사람은 곧장 그 화면으로.
+        headers, _ = self.browser_kakao(self.app_ticket())
+        self.assertEqual(headers["Location"], "/app-login.html")
+        # 모르는 표로 시작하면 카카오로 보내지 않는다.
+        status, headers, _ = self.request("GET", "/api/kakao/start?app=forged")
+        self.assertEqual((status, headers["Location"]), (302, "/login.html?error=kakao"))
+
+    def test_app_ticket_of_a_denied_person_is_refused(self):
+        self.kakao_login()
+        self.users.set_status("777", "denied")
+        ticket = self.app_ticket()
+        headers, _ = self.browser_kakao(ticket)
+        self.assertEqual(headers["Location"], "/login.html?error=denied")
+        self.assertEqual(self.app_token(ticket)[0], 403)
+        self.assertEqual(self.app_token(ticket)[0], 404)
+
+    def test_game_server_checks_the_game_token(self):
+        # SC-2 — 게임 서버가 로그인마다 묻는다. 거부하면 다음 로그인부터 막힌다.
+        ticket = self.app_ticket()
+        self.browser_kakao(ticket)
+        self.users.set_status("777", "allowed")
+        token = self.app_token(ticket)[1]["token"]
+        check = lambda value: self.request("POST", "/api/kakao/game-check", {"token": value})
+        status, _, body = check(token)
+        self.assertEqual((status, json.loads(body)), (200, {"id": "777"}))
+        secret = self.server.RequestHandlerClass.kakao_secret
+        for wrong in (SERVICE.kakao_session(secret, "777", -10, kind="game"),  # 지남
+                      SERVICE.kakao_session(secret, "777", 600),  # 웹 쿠키 값은 게임 표가 아니다
+                      token[:-1] + ("0" if token[-1] != "0" else "1"), "", "g777"):
+            self.assertEqual(check(wrong)[0], 401, wrong)
+        self.users.set_status("777", "denied")
+        status, _, body = check(token)
+        self.assertEqual((status, json.loads(body)), (403, {"status": "denied"}))
+
     def test_activity_is_admin_only_and_dates_are_validated(self):
         status, _, _ = self.request("GET", "/api/activity?from=2026-10-02&to=2026-10-03")
         self.assertEqual(status, 401)

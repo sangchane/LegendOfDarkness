@@ -262,23 +262,24 @@ KAKAO_COOKIE = "lod_kakao"
 PUBLIC_FILES = {"login.html", "login.js", "favicon.svg"}
 
 
-def kakao_session(secret, kakao_id, lifetime, now=None):
+def kakao_session(secret, kakao_id, lifetime, now=None, kind="kakao"):
     # 관리자 쿠키(만료.서명)와 꼴이 달라(k번호.만료.서명) 서로 풀리지 않는다. 열쇠는 관리자 비밀번호가 아니라 따로 둔
     # session-secret — 관리자 비밀번호를 바꿔도 카카오 손님은 그대로(사용자 2026-10-10). 모두 내보내려면 그 파일을 지우고 다시 켠다.
+    # 게임 표(kind="game" → g번호.만료.서명, 사용자 2026-10-11)는 같은 열쇠지만 서명하는 글이 달라 웹 쿠키와 서로 못 바꿔 쓴다.
     expiry = str(int((now or time.time()) + lifetime))
-    signature = hmac.new(session_key(secret), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
-    return f"k{kakao_id}.{expiry}.{signature}"
+    signature = hmac.new(session_key(secret), f"{kind}:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
+    return f"{kind[0]}{kakao_id}.{expiry}.{signature}"
 
 
-def kakao_session_id(token, secret, now=None):
-    """맞는 카카오 쿠키면 카카오 회원번호, 아니면 None."""
+def kakao_session_id(token, secret, now=None, kind="kakao"):
+    """맞는 카카오 쿠키(또는 게임 표)면 카카오 회원번호, 아니면 None."""
     head, _, rest = (token or "").partition(".")
     expiry, _, signature = rest.partition(".")
     kakao_id = head[1:]
-    if not (head.startswith("k") and kakao_id.isascii() and kakao_id.isdigit() and len(kakao_id) < 20
+    if not (head.startswith(kind[0]) and kakao_id.isascii() and kakao_id.isdigit() and len(kakao_id) < 20
             and expiry.isascii() and expiry.isdigit() and len(expiry) < 12) or int(expiry) < (now or time.time()):
         return None
-    wanted = hmac.new(session_key(secret), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
+    wanted = hmac.new(session_key(secret), f"{kind}:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
     return kakao_id if signature.isascii() and hmac.compare_digest(signature, wanted) else None
 
 
@@ -413,9 +414,46 @@ def safe_static_path(root: Path, request_path: str):
     return candidate if candidate.is_file() else None
 
 
+class AppTickets:
+    """앱 카카오 로그인 표(사용자 2026-10-11 「게임클라이언트에도 적용해」) — 앱이 받아 브라우저로 카카오 로그인을 시키고,
+    끝나면 그 표로 게임 표를 받는다(딥링크 없음). 메모리에만 10분 — 서비스를 다시 켜면 앱은 처음부터 다시 한다."""
+    LIFETIME, LIMIT = 600, 1000
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.tickets = {}  # 표 → [만료, 카카오 회원번호 또는 None, 닉네임]
+
+    def create(self, now=None):
+        now = now or time.time()
+        with self.lock:
+            self.tickets = {key: entry for key, entry in self.tickets.items() if entry[0] > now}
+            if len(self.tickets) >= self.LIMIT:
+                return None
+            ticket = secrets.token_urlsafe(32)
+            self.tickets[ticket] = [now + self.LIFETIME, None, ""]
+            return ticket
+
+    def get(self, ticket, now=None):
+        """(카카오 회원번호 또는 None, 닉네임). 없거나 지났으면 None."""
+        with self.lock:
+            entry = self.tickets.get(ticket) if isinstance(ticket, str) else None
+            return (entry[1], entry[2]) if entry and entry[0] > (now or time.time()) else None
+
+    def bind(self, ticket, kakao_id, name):
+        # 처음 묶인 사람으로 굳는다 — 같은 표로 다른 카카오 계정이 덮어쓰지 못하게.
+        with self.lock:
+            entry = self.tickets.get(ticket)
+            if entry and entry[1] is None:
+                entry[1], entry[2] = kakao_id, name
+
+    def drop(self, ticket):
+        with self.lock:
+            self.tickets.pop(ticket, None)
+
+
 class OpsHandler(BaseHTTPRequestHandler):
     """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
-    root = store = credential = states = throttle = password_file = activity = kakao = kakao_users = kakao_exchange = kakao_secret = join_code = None
+    root = store = credential = states = throttle = password_file = activity = kakao = kakao_users = kakao_exchange = kakao_secret = join_code = app_tickets = None
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
@@ -488,6 +526,15 @@ class OpsHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/kakao/join":
             self._kakao_join()
+            return
+        if path == "/api/kakao/app-ticket":
+            self._app_ticket()
+            return
+        if path == "/api/kakao/app-token":
+            self._app_token()
+            return
+        if path == "/api/kakao/game-check":
+            self._game_check()
             return
         if path != "/api/login":
             self._json(404, {"error": "없는 API입니다."})
@@ -661,17 +708,28 @@ class OpsHandler(BaseHTTPRequestHandler):
         if not self.kakao:
             self._redirect("/login.html?error=kakao-off")
             return
-        target = safe_next(parse_qs(urlsplit(self.path).query).get("next", ["/"])[0])
+        query = parse_qs(urlsplit(self.path).query)
+        target = safe_next(query.get("next", ["/"])[0])
+        ticket = query.get("app", [""])[0]
+        if ticket:
+            # 앱이 연 브라우저(사용자 2026-10-11) — 끝나면 「앱으로 돌아가세요」. 모르는 표는 카카오로 보내지 않는다
+            # (우리가 만든 표만 쿠키에 실리니 쿠키를 깨는 글자도 못 들어온다).
+            if self.app_tickets.get(ticket) is None:
+                self._redirect("/login.html?error=kakao")
+                return
+            target = "/app-login.html"
         state = secrets.token_urlsafe(24)
-        cookie = f"{KAKAO_COOKIE}={state}|{quote(target, safe='')}; Path=/api/kakao/; Max-Age=600; HttpOnly; Secure; SameSite=Lax"
+        value = f"{state}|{quote(target, safe='')}" + (f"|{ticket}" if ticket else "")
+        cookie = f"{KAKAO_COOKIE}={value}; Path=/api/kakao/; Max-Age=600; HttpOnly; Secure; SameSite=Lax"
         self._redirect("https://kauth.kakao.com/oauth/authorize?" + urlencode({
             "response_type": "code", "client_id": self.kakao["client_id"],
             "redirect_uri": self.kakao["redirect_uri"], "state": state}), cookie)
 
     def _kakao_callback(self):
         query = parse_qs(urlsplit(self.path).query)
-        state, _, target = (cookie_value(self.headers.get("Cookie"), KAKAO_COOKIE) or "").partition("|")
-        clear = f"{KAKAO_COOKIE}=; Path=/api/kakao/; Max-Age=0; HttpOnly; Secure; SameSite=Lax"
+        state, _, rest = (cookie_value(self.headers.get("Cookie"), KAKAO_COOKIE) or "").partition("|")
+        target, _, ticket = rest.partition("|")
+        clear =f"{KAKAO_COOKIE}=; Path=/api/kakao/; Max-Age=0; HttpOnly; Secure; SameSite=Lax"
         code = query.get("code", [""])[0]
         if not self.kakao:
             self._redirect("/login.html?error=kakao-off", clear)
@@ -691,6 +749,9 @@ class OpsHandler(BaseHTTPRequestHandler):
         except (OSError, ValueError):  # 목록 파일이 깨졌으면 덮어쓰지 않고 들이지 않는다
             self._redirect("/login.html?error=kakao", clear)
             return
+        if ticket:
+            # 거부·대기여도 묶는다 — 앱이 기다리다 「거부」·「대기」를 알아야 한다.
+            self.app_tickets.bind(ticket, kakao_id, name)
         if status == "denied":
             self._redirect("/login.html?error=denied", clear)
             return
@@ -699,6 +760,57 @@ class OpsHandler(BaseHTTPRequestHandler):
                    f" SameSite=Lax; Max-Age={REMEMBER_SECONDS}")
         target = safe_next(unquote(target))
         self._redirect(target if status == "allowed" else "/login.html?next=" + quote(target, safe=""), clear, session)
+
+    def _app_ticket(self):
+        # 앱 카카오 로그인 1 — 표를 받아 브라우저로 start 를 연다(사용자 2026-10-11).
+        ticket = self.app_tickets.create() if self.kakao else None
+        if not ticket:
+            self._json(503, {"error": "카카오 로그인이 아직 준비되지 않았습니다." if not self.kakao else "잠시 뒤 다시 해 주세요."})
+            return
+        self._json(200, {"ticket": ticket, "start": "/api/kakao/start?app=" + ticket})
+
+    def _app_token(self):
+        # 앱 카카오 로그인 2 — 앱이 몇 초마다 묻는다. 허가되면 게임 표를 한 번만 내주고 표를 지운다.
+        try:
+            ticket = self._body(256).get("ticket")
+        except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            self._json(400, {"error": str(error)})
+            return
+        found = self.app_tickets.get(ticket)
+        if found is None:
+            self._json(404, {"error": "로그인 표가 없거나 지났습니다. 처음부터 다시 해 주세요."})
+            return
+        kakao_id, name = found
+        if kakao_id is None:
+            self._json(202, {"waiting": True})
+            return
+        status = self.kakao_users.status(kakao_id)
+        if status == "pending":
+            self._json(202, {"pending": True, "name": name})
+            return
+        self.app_tickets.drop(ticket)
+        if status != "allowed":
+            self._json(403, {"error": "들어올 수 없는 카카오 계정입니다."})
+            return
+        self._json(200, {"token": kakao_session(self.kakao_secret, kakao_id, REMEMBER_SECONDS, kind="game"), "name": name})
+
+    def _game_check(self):
+        # 게임 서버가 로그인마다 묻는다(설정 KakaoCheckUrl) — 거부하면 다음 로그인부터 막힌다.
+        # 표를 가진 사람만 답을 얻으니 밖에 열려 있어도 된다.
+        try:
+            token = self._body(512).get("token")
+        except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            self._json(400, {"error": str(error)})
+            return
+        kakao_id = kakao_session_id(token if isinstance(token, str) else "", self.kakao_secret, kind="game")
+        if not kakao_id:
+            self._json(401, {"error": "카카오 로그인이 끝났습니다."})
+            return
+        status = self.kakao_users.status(kakao_id)
+        if status != "allowed":
+            self._json(403, {"status": status or "denied"})
+            return
+        self._json(200, {"id": kakao_id})
 
     def _redirect(self, location, *cookies):
         self.send_response(302)
@@ -797,7 +909,7 @@ def handler_for(root, store, credential, states=None, throttle=None, password_fi
                                            "kakao_users": kakao_users or KakaoUsers(store.path.parent / "kakao-users.json"),
                                            "kakao_exchange": staticmethod(exchange or kakao_exchange),
                                            "kakao_secret": kakao_secret or secrets.token_hex(32),
-                                           "join_code": join_code})
+                                           "join_code": join_code, "app_tickets": AppTickets()})
 
 
 def main():
