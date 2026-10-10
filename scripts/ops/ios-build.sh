@@ -170,7 +170,16 @@ profile_has_device() {
     profile_devices | grep -qxF "$want"
 }
 
-# 서명 새로 받기. 기기를 지정해 Xcode 프로젝트를 빌드하면 7일짜리 서명이 새로 만들어진다.
+# Xcode 프로젝트를 빌드해 서명을 받는다. 결과 앱은 RENEWED 에 남는다(check 가 폰에 넣는다).
+# **-scheme 이어야 한다.** -target 으로 부르면 xcodebuild 가 -destination 을 통째로 무시하고
+# ("Ignoring provided run destination because no scheme was passed") 기기를 등록하지 않는다.
+# 그래서 빌드는 성공하는데 프로필에는 옛 기기만 남아, 다른 기기에 넣으면 거절당했다 (2026-09-19).
+provision() {
+    xcodebuild -project "$CLIENT/build/ios/LodClient.xcodeproj" -scheme LodClient -configuration Debug \
+        -derivedDataPath "$CLIENT/build/ios/renewed" -destination "$1" -allowProvisioningUpdates build >> "$LOGS/ios-renew.log" 2>&1
+}
+
+# 서명 새로 받기. Xcode 프로젝트를 빌드하면 7일짜리 서명이 새로 만들어진다.
 renew() {
     local project="$CLIENT/build/ios/LodClient.xcodeproj"
 
@@ -182,9 +191,8 @@ renew() {
     local device
     device="$(device_id)"
 
-    # 기기가 안 보여도 받는다 — 이미 등록된 기기(아이폰·아이패드)는 기기 없이 받아도 서명에 그대로 들어간다(2026-10-02 확인).
-    # 기기가 보일 때만 새 기기를 등록할 수 있다.
-    local destination="generic/platform=iOS"
+    # 기기 없이 먼저 받는다 — 이미 등록된 기기(아이폰·아이패드)는 그대로 서명에 들어간다(2026-10-02 확인). 처음부터 기기를
+    # 지정하면 그 기기가 잠겨 있을 때 xcodebuild 가 풀리기를 기다리다 실패했다(2026-10-10 아이패드). 새 기기만 뒤에서 지정해 등록한다.
     if [ -z "$device" ]; then
         echo "기기가 보이지 않습니다 — 등록된 기기로 서명만 새로 받습니다."
     else
@@ -194,7 +202,6 @@ renew() {
     local udid
     udid="$(xcrun devicectl device info details --device "$device" 2>/dev/null | awk -F': ' '/• udid:/ {print $2; exit}')"
     [ -n "$udid" ] && device="$udid"
-    destination="id=$device"
     fi
 
     # 아직 살아 있는 서명이 있으면 Xcode 가 그것을 다시 써서 날수가 늘지 않는다. 옆으로 치워 두고 새로 받는다
@@ -207,12 +214,9 @@ renew() {
         mv "$old" "$keep/"
     fi
 
-    echo "서명을 받습니다(${destination})..."
-    # **-scheme 이어야 한다.** -target 으로 부르면 xcodebuild 가 -destination 을 통째로 무시하고
-    # ("Ignoring provided run destination because no scheme was passed") 기기를 등록하지 않는다.
-    # 그래서 빌드는 성공하는데 프로필에는 옛 기기만 남아, 다른 기기에 넣으면 거절당했다 (2026-09-19).
-    xcodebuild -project "$project" -scheme LodClient -configuration Debug -derivedDataPath "$CLIENT/build/ios/renewed" \
-        -destination "$destination" -allowProvisioningUpdates build > "$LOGS/ios-renew.log" 2>&1 || {
+    echo "서명을 받습니다..."
+    : > "$LOGS/ios-renew.log"
+    provision "generic/platform=iOS" || {
         # 치워 둔 옛 서명을 되돌린다 — 안 그러면 남은 날이 있어도 빌드까지 막힌다(2026-10-02 아침에 그랬다).
         [ -n "$old" ] && [ -z "$(profile)" ] && cp -p "$keep/$(basename "$old")" "$PROFILES/"
         if grep -q "No Accounts" "$LOGS/ios-renew.log"; then
@@ -222,6 +226,11 @@ renew() {
         fi
         return 1
     }
+
+    if [ -n "$device" ] && ! profile_has_device "$device"; then
+        echo "새 기기 $device 를 서명에 넣습니다..."
+        provision "id=$device" || true
+    fi
 
     # 빌드가 성공해도 그 기기가 프로필에 들어갔는지는 별개다. 확인하지 않으면 "새로 받았습니다" 가 거짓말이 된다.
     if [ -n "$device" ] && ! profile_has_device "$device"; then
