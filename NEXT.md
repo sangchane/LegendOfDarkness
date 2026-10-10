@@ -1,9 +1,9 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-10-10] 운영 홈페이지 카카오 로그인 — 등급 L 변경 · `dev:build` · 단계: 구현·리뷰 반영 끝(브랜치 `feature/kakao-login`, 푸시) → 카카오 키 받으면 배포.** 리뷰(opus) 정확성·보안 모두 막을 결함 0, 낮음 8 중 6 고침(남은 것: 목록 파일을 요청마다 읽음·새 사람 알림 없음). 명세 `autopilot/kakao-login/SPEC.md`.
+- **[현재/2026-10-10] 운영 홈페이지 카카오 로그인 — 등급 L 변경 · `dev:build` · 단계: 배포 끝(10-11, 키·초대 번호 넣고 deploy — 잠금 302·version 200·카카오 시작 → 카카오 로그인 화면·가짜 code 로 KOE320(키·시크릿 맞음) 확인) → 사용자 폰 실제 로그인(SC-9) 남음.** 리뷰(opus) 정확성·보안 모두 막을 결함 0, 낮음 8 중 6 고침(남은 것: 목록 파일을 요청마다 읽음·새 사람 알림 없음). 명세 `autopilot/kakao-login/SPEC.md`.
   사용자 「아무나 접근 할 수 없게 … 카카오톡 로그인」 · 정한 것: 처음 오면 대기 → 초대 번호(사용자가 준 번호, 서버 `data/join-code` 에만)를 넣으면 즉시 허가, 못 넣으면 관리자가 계정 관리 창에서 허가·거부 · 손님 4자리 비밀번호 없앰(관리자 비번은 비상용) · 손님 범위는 그대로 · 관리자 비번을 바꿔도 카카오 손님은 안 풀림(`data/session-secret`).
-  1. **사용자가 developers.kakao.com 에 앱 등록**(카카오 로그인 ON, 닉네임 동의, [앱] > [플랫폼 키] > [REST API 키] 에 Redirect `…/api/kakao/callback`·클라이언트 시크릿) → `~/LOD-backups/kakao.env`(600) 의 `KAKAO_REST_API_KEY`(10-11 넣음)·`KAKAO_CLIENT_SECRET`(아직 빈칸).
+  1. **사용자가 developers.kakao.com 에 앱 등록**(카카오 로그인 ON, 닉네임 동의, [앱] > [플랫폼 키] > [REST API 키] 에 Redirect `…/api/kakao/callback`·클라이언트 시크릿) → `~/LOD-backups/kakao.env`(600) 의 `KAKAO_REST_API_KEY`(10-11 넣음)·`KAKAO_CLIENT_SECRET`(둘 다 10-11 넣음).
   2. 그 뒤 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.env` → `… join-code < ~/LOD-backups/join-code.txt` → `… deploy`(키·번호 먼저 — 순서가 바뀌면 손님이 못 들어온다) → 로그인 없이 302·version-ios.txt 200 확인 → 사용자가 폰으로 카카오 로그인 → 계정 관리에 이름(SC-9).
 
 - **[현재/2026-10-09 끝·푸시] 현황판 개편 · 이펙트 따라가기 · 원작 배경음 — 등급 M · `dev:build` + dev:ui · 단계: 끝·배포(대시보드·서버·앱 셋).** 다음 세션은 아래 「남은 것」부터.
