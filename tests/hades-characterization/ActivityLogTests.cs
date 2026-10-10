@@ -196,6 +196,47 @@ public sealed class ActivityLogTests
         finally { foreach (var row in rows) row.Dispose(); }
     }
 
+    [Fact]
+    public async Task Bot_ledger_is_batched_into_one_line_until_flush()
+    {
+        // 봇은 하루 100만 줄 넘게 남겼다 — 같은 장부는 flush(5분·종료) 때 한 줄(count)로(사용자 2026-10-11 「반복 데이터를 최대한 압축시켜」).
+        using var deadline = new CancellationTokenSource(TimeSpan.FromMinutes(3));
+        using var server = IsolatedHadesServer.Prepare(startTogether: (20015, 2, 35));
+        EcoBotServerTests.Configure(server, "ecolog");
+        Waiting.MakeGameMaster(server, "ecolog");
+        server.Start(TimeSpan.FromMinutes(2));
+        LoginFlow.TryCreateAccount(server, "ecolog");
+        using var session = await HadesLoginClient.LoginAsync(IPAddress.Loopback, server.LoginPort,
+            "ecolog", LoginFlow.SyntheticSecret, null, deadline.Token);
+        using var client = new WorldClient(session);
+        _ = client.PumpAsync(deadline.Token);
+        await Waiting.Until(() => client.State != null, "봇이 들어오지 못했습니다.", deadline.Token);
+        for (int given = 1; given <= 3; given++)
+        {
+            await client.SayAsync("/give \"도복\" 1", deadline.Token);
+            int wanted = given;
+            await Waiting.Until(() => client.Pack.Count(item => item.Name == "도복") == wanted, "도복을 받지 못했습니다.", deadline.Token);
+        }
+        await client.LogOutAsync(deadline.Token);
+        string folder = Path.Combine(server.RunRoot, "activity");
+        string Text() => string.Join("\n", Directory.GetFiles(folder, "*.jsonl").SelectMany(Shared));
+        await Waiting.Until(() => Text().Contains("\"kind\":\"logout\",\"player\":\"ecolog\""), "봇 종료 기록이 없습니다.", deadline.Token);
+        var rows = Text().Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(line => JsonDocument.Parse(line)).ToArray();
+        try
+        {
+            var given = Assert.Single(rows, row => row.RootElement.GetProperty("player").GetString() == "ecolog"
+                && row.RootElement.GetProperty("kind").GetString() == "ledger"
+                && row.RootElement.GetProperty("meta").GetProperty("asset").GetString() == "item"
+                && row.RootElement.GetProperty("meta").GetProperty("item").GetString() == "도복");
+            Assert.True(given.RootElement.GetProperty("bot").GetBoolean());
+            Assert.Equal(3, given.RootElement.GetProperty("count").GetInt32());
+            Assert.Equal(3, given.RootElement.GetProperty("meta").GetProperty("quantity").GetInt32());
+            Assert.Equal(3, given.RootElement.GetProperty("meta").GetProperty("delta").GetInt32());
+            Assert.Equal(3, given.RootElement.GetProperty("meta").GetProperty("balance").GetInt32());
+        }
+        finally { foreach (var row in rows) row.Dispose(); }
+    }
+
     /// <summary>서버가 쓰는 중인 활동 기록을 읽는다 — 윈도우는 File.ReadAllLines 가 쓰는 중인 파일을 못 연다(맥은 열린다).</summary>
     private static string[] Shared(string path)
     {

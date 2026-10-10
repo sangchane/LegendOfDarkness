@@ -129,6 +129,21 @@ public sealed class AutoHuntTests(ITestOutputHelper output) : IDisposable
         Assert.True(world.Vitals.Experience > before, $"4분 안에 경험치가 오르지 않았습니다. 한 일: {string.Join(", ", done)}");
         Assert.True(done.GetValueOrDefault(HuntAct.Walk) > 0, "다가가지 않았습니다.");
         Assert.True(done.GetValueOrDefault(HuntAct.Strike) + done.GetValueOrDefault(HuntAct.Skill) > 0, "치지 않았습니다.");
+
+        // 처치 기록·처치 수 — OnDeath 가 대상을 지운 뒤에 세서 늘 0 이었다(2026-10-11 고침).
+        string folder = Path.Combine(server.RunRoot, "activity");
+        string Activity() => string.Join("\n", Directory.GetFiles(folder, "*.jsonl").Select(path =>
+        {
+            using FileStream read = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using StreamReader text = new(read);
+            return text.ReadToEnd();
+        }));
+        await Waiting.Until(() => Directory.Exists(folder) && Activity().Contains("\"kind\":\"kill\",\"player\":\"autohunt\""),
+            "처치 기록이 남지 않았습니다.", _deadline.Token);
+        await world.LogOutAsync(_deadline.Token);
+        string saved = Path.Combine(server.ContentLocation, "aislings", "autohunt.json");
+        await Waiting.Until(() => File.Exists(saved) && File.ReadAllText(saved).Contains("\"TotalKills\""),
+            "처치 수가 저장되지 않았습니다.", _deadline.Token);
     }
 
     /// <summary>
