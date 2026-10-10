@@ -91,6 +91,9 @@
 		"CompanionHomeMap": 0,
 		// 대신 사냥(2026-10-05) — 자동 사냥 중 앱이 끊기면 작업 파일을 여기 적고, 같은 기계의 lod-proxy(mobile/bots/Lod.HuntProxy)가 집는다.
 		"ProxyJobFolder": "/home/ubuntu/lod-proxy/jobs",
+		// 게임 로그인을 카카오로(사용자 2026-10-11, 명세 autopilot/game-kakao-login/SPEC.md) — 같은 기계의 홈페이지 서비스가 게임 표를 확인한다.
+		// 비우면 끔(옛 비밀번호 로그인). 켜면 밖에서는 표로만, 같은 기계(봇 셋)는 평문 그대로. 새 앱을 내보낸 뒤에 이 설정으로 서버를 올린다.
+		"KakaoCheckUrl": "http://127.0.0.1:8787/api/kakao/game-check",
 		// 생태계 봇(2026-10-06, 설계 autopilot/eco-bots/) — 같은 기계의 lod-eco(mobile/bots/Lod.EcoBots)가 이 이름으로 접속해 혼자 사냥·장사하며 자란다.
 		// 이 이름은 같은 기계에서만 로그인·만들기가 되고 [접속자] 길드명 자리에 AI 가 보인다. 비밀번호는 lod-eco 설정 파일에만(cloud-server.sh eco-config).
 		// 이름 앞이 직업: 전사봇 · 도적봇 · 무도봇. 함께 접속하는 수는 lod-eco 설정 MaxOnline(시작 30, 상한 50 — 2 vCPU 실측 01-recon §4).

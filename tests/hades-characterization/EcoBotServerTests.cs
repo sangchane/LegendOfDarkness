@@ -96,7 +96,7 @@ public sealed class EcoBotServerTests(ITestOutputHelper output) : IDisposable
     }
 
     /// <summary>이 기계의 루프백이 아닌 IPv4 — 서버는 모든 주소에서 듣는다. 거기로 붙으면 서버가 보는 주소가 루프백이 아니다.</summary>
-    private static IPAddress? OtherAddress() =>
+    internal static IPAddress? OtherAddress() =>
         NetworkInterface.GetAllNetworkInterfaces()
             .Where(card => card.OperationalStatus == OperationalStatus.Up && card.NetworkInterfaceType != NetworkInterfaceType.Loopback)
             .SelectMany(card => card.GetIPProperties().UnicastAddresses)
