@@ -266,6 +266,21 @@ public partial class Main : Control
         }
     }
 
+    /// <summary>
+    /// <c>--kakao 없음|기다림|번호|대기|표|잇기</c> — 홈페이지·서버 없이 로그인 화면의 카카오 상태를 그려 본다(사진·배치 검사).
+    /// 기기의 kakao.cfg·character.cfg 는 읽지도 쓰지도 않고, login.cfg 로 저절로 들어가지도 않는다. 표는 꼴만 맞춘 가짜다.
+    /// </summary>
+    public static string KakaoPreview { get; private set; } = string.Empty;
+
+    private static void PretendKakao()
+    {
+        if (KakaoPreview is "표" or "잇기")
+        {
+            Kakao = new Lod.Mobile.Core.Net.KakaoAccount("g1.9999999999." + new string('0', 64), "카카오닉네임");
+            LastCharacter = "미리보기";
+        }
+    }
+
     /// <summary>`gender,hairStyle,hairColor` — 셋 다 숫자가 아니면 아무것도 미리 고르지 않는다.</summary>
     private static (byte, byte, byte)? ReadPickedLook(string value)
     {

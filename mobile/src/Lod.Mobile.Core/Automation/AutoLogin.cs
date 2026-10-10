@@ -1,21 +1,6 @@
 namespace Lod.Mobile.Core.Automation;
 
 /// <summary>
-/// An account saved on the device to sign in with automatically, once the login screen's own toggle has
-/// been turned on. The device file it lives in (<c>user://autologin.cfg</c>, two lines) is engine-only I/O
-/// and stays in the client project; this record only turns those two lines into an account or back.
-/// </summary>
-public sealed record AutoLoginAccount(string Username, string Password)
-{
-    /// <summary>Turns two saved lines back into an account, or nothing when either one is missing.</summary>
-    public static AutoLoginAccount? Parse(string username, string password) =>
-        username.Length > 0 && password.Length > 0 ? new AutoLoginAccount(username, password) : null;
-
-    /// <summary>The two lines to save, in the order <see cref="Parse"/> reads them back.</summary>
-    public string[] ToLines() => [Username, Password];
-}
-
-/// <summary>
 /// Decides, once per run, whether a launch-time (<c>--login</c> / <c>login.cfg</c>) or a saved account may
 /// be filled in and submitted with no tap.
 /// </summary>

@@ -59,7 +59,9 @@ public partial class Main : Control
         _orientationWasForced = Flag("--orient").Length > 0;
         Portrait = Flag("--orient") == "portrait";
         ReadServer(Flag("--server"));
-        ReadRehearsal(Flag("--login"));
+        // --kakao 로 카카오 화면을 그려 볼 때는 login.cfg 로 저절로 들어가지 않는다.
+        KakaoPreview = Flag("--kakao");
+        if (KakaoPreview.Length == 0) ReadRehearsal(Flag("--login"));
         Rehearse = Flag("--walk");
         Holding = Flag("--hold");
         Ability = Flag("--skill");
@@ -126,7 +128,15 @@ public partial class Main : Control
         BotPreview = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--bot-preview") >= 0;
         BotGearOpen = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--bot-gear") >= 0;
         AutoHuntPreview = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--auto-hunt-preview") >= 0;
-        ReadSavedLogin();
+        if (KakaoPreview.Length == 0)
+        {
+            ReadKakao();
+            ReadLastCharacter();
+        }
+        else
+        {
+            PretendKakao();
+        }
         Throwing = System.Array.IndexOf(OS.GetCmdlineUserArgs(), "--throw") >= 0;
 
         // 입거나 버려 보려면 소지품이 열려 있어야 한다 — 따로 적게 하지 않는다.
@@ -147,6 +157,9 @@ public partial class Main : Control
         {
             GetWindow().ContentScaleSize = wanted;
             DisplayServer.WindowSetSize(wanted);
+
+            // 헤드리스 창은 크기를 듣지 않는다(늘 780x780) — 비율을 지키게 해 잴 화면이 꼭 --size 가 되게(창 없이 배치 검사).
+            if (DisplayServer.GetName() == "headless") GetWindow().ContentScaleAspect = Window.ContentScaleAspectEnum.Keep;
         }
         else if (Portrait)
         {
@@ -184,7 +197,10 @@ public partial class Main : Control
         }
         else
         {
-            AddChild(BuildLoginScreen());
+            LoginScreen login = BuildLoginScreen();
+
+            AddChild(login);
+            LayoutCheck.RunIfRequested(this, login);
         }
 
         Screenshot.CaptureIfRequested(this);

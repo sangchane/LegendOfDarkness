@@ -12,8 +12,9 @@ using Lod.Mobile.Core.Ui;
 namespace LodClient;
 
 /// <summary>
-/// 캐릭터 만들기 화면, 원작 <c>dlgcre00.png</c> 의 배치를 세로 한 줄로 편다 — 이름·비밀번호·확인,
-/// 남/여, HAIR·COLOR 를 눈으로 보고 고르는 격자, 가운데 미리보기, 만들기/취소.
+/// 캐릭터 만들기 화면, 원작 <c>dlgcre00.png</c> 의 배치를 세로 한 줄로 편다 — 이름,
+/// 남/여, HAIR·COLOR 를 눈으로 보고 고르는 격자, 가운데 미리보기, 만들기/취소. 비밀번호 칸은 없다 — 비밀번호 자리에
+/// 카카오 게임 표(<see cref="Main.Kakao" />)를 보낸다(사용자 2026-10-11). 데스크톱 시험 계정(<c>--login</c>·<c>login.cfg</c>)이면 그 비밀번호.
 /// </summary>
 /// <remarks>
 /// 원작의 E-MAIL 칸과 PHRASE MACRO 표는 뺐다 — 서버 프로토콜(<see cref="Hades718LoginProtocol"/> 의
@@ -37,8 +38,6 @@ public sealed partial class CreateScreen : Control
 
     private MarginContainer _safeArea = null!;
     private LineEdit _username = null!;
-    private LineEdit _password = null!;
-    private LineEdit _confirm = null!;
     private Label _status = null!;
     private Button _create = null!;
     private Button _back = null!;
@@ -76,7 +75,7 @@ public sealed partial class CreateScreen : Control
     /// <summary>레이아웃 검사가 훑는 자리들.</summary>
     public IReadOnlyList<(string Name, Control Part)> Parts =>
     [
-        ("이름", _username), ("비밀번호", _password), ("비밀번호 확인", _confirm),
+        ("이름", _username),
         ("성별", _genderRow), ("직업", _pathRow), ("미리보기", _preview), ("머리", _hairRow), ("색", _colorRow),
         ("단추 줄", _buttonsRow)
     ];
@@ -110,7 +109,7 @@ public sealed partial class CreateScreen : Control
     private void RebuildForOrientation()
     {
         if (!IsInsideTree() || !GodotObject.IsInstanceValid(_safeArea)) return;
-        string username = _username.Text, password = _password.Text, confirm = _confirm.Text, status = _status.Text;
+        string username = _username.Text, status = _status.Text;
         foreach (Node child in _safeArea.GetChildren())
         {
             _safeArea.RemoveChild(child);
@@ -118,8 +117,6 @@ public sealed partial class CreateScreen : Control
         }
         _safeArea.AddChild(BuildForm());
         _username.Text = username;
-        _password.Text = password;
-        _confirm.Text = confirm;
         _status.Text = status;
         RefreshGender();
         RefreshPathSelection();
@@ -146,9 +143,8 @@ public sealed partial class CreateScreen : Control
     }
 
     /// <summary>
-    /// 손 없이 확인할 때 이름·비밀번호도 미리 채운다 — 새 인자를 만들지 않고 로그인 화면과 같은
-    /// <c>--login 이름:비밀번호</c>(<see cref="Main.Rehearsal"/>)를 그대로 쓴다. 계정 만들기도 이름·
-    /// 비밀번호가 필요하다는 점은 로그인과 같다.
+    /// 손 없이 확인할 때 이름도 미리 채운다 — 새 인자를 만들지 않고 로그인 화면과 같은
+    /// <c>--login 이름:비밀번호</c>(<see cref="Main.Rehearsal"/>)를 그대로 쓴다. 비밀번호는 <see cref="Secret" /> 가 보낸다.
     /// </summary>
     private void ApplyRehearsal()
     {
@@ -158,9 +154,11 @@ public sealed partial class CreateScreen : Control
         }
 
         _username.Text = Main.Rehearsal.Username;
-        _password.Text = Main.Rehearsal.Password;
-        _confirm.Text = Main.Rehearsal.Password;
     }
+
+    /// <summary>비밀번호 칸에 갈 것 — 시험 계정은 그 비밀번호(카카오를 끈 맥 서버), 아니면 카카오 게임 표. 없으면 만들 수 없다.</summary>
+    private static string? Secret =>
+        Main.Rehearsal.Username.Length > 0 ? Main.Rehearsal.Password : Main.Kakao?.Token;
 
     private Control BuildForm()
     {
@@ -208,22 +206,15 @@ public sealed partial class CreateScreen : Control
         heading.AddChild(title);
         _title = heading;
 
-        _username = Field(secret: false, placeholder: "이름");
-        _password = Field(secret: true, placeholder: "비밀번호");
-        _confirm = Field(secret: true, placeholder: "확인");
+        _username = Field(placeholder: "캐릭터 이름");
 
-        // 엔터(키보드의 완료)는 이름 → 비밀번호 → 확인 → 만들기(아직 못 만들면 키보드만 내린다).
-        _username.TextSubmitted += _ => _password.Edit();
-        _password.TextSubmitted += _ => _confirm.Edit();
-        _confirm.TextSubmitted += _ => SubmitFromKeyboard();
+        // 엔터(키보드의 완료)는 만들기(아직 못 만들면 키보드만 내린다).
+        _username.TextSubmitted += _ => SubmitFromKeyboard();
 
         BoxContainer authRow = Main.Portrait ? new HBoxContainer() : new VBoxContainer();
         authRow.AddThemeConstantOverride("separation", Main.Gutter);
-        if (!Main.Portrait)
-            foreach (LineEdit field in new[] { _username, _password, _confirm }) field.PlaceholderText = string.Empty;
+        if (!Main.Portrait) _username.PlaceholderText = string.Empty;
         authRow.AddChild(Main.Portrait ? _username : LabelledField("이름", _username));
-        authRow.AddChild(Main.Portrait ? _password : LabelledField("비밀번호", _password));
-        authRow.AddChild(Main.Portrait ? _confirm : LabelledField("확인", _confirm));
 
         _status = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
         _status.AddThemeFontSizeOverride("font_size", AuxFontSize);
@@ -260,8 +251,6 @@ public sealed partial class CreateScreen : Control
         panel.AddChild(interior);
 
         _username.TextChanged += _ => RefreshCreateState();
-        _password.TextChanged += _ => RefreshCreateState();
-        _confirm.TextChanged += _ => RefreshCreateState();
         _back.Pressed += () => Cancelled?.Invoke();
         _create.Pressed += BeginCreate;
 
@@ -500,7 +489,7 @@ public sealed partial class CreateScreen : Control
     /// </summary>
     private void BeginCreate()
     {
-        if (_attempt is not null)
+        if (_attempt is not null || Secret is not { Length: > 0 } secret || _path is null)
         {
             return;
         }
@@ -512,7 +501,7 @@ public sealed partial class CreateScreen : Control
             Main.ServerAddress,
             Main.ServerPort,
             _username.Text,
-            _password.Text,
+            secret,
             (byte)_hairStyle,
             _gender,
             (byte)_hairColor,
@@ -538,10 +527,12 @@ public sealed partial class CreateScreen : Control
 
         if (finished.IsCompletedSuccessfully)
         {
-            // The submitted secret lives only in the current attempt/field. The screen is removed as the
-            // live world takes ownership of its session, so it is not retained for a later login.
-            _password.Text = string.Empty;
-            _confirm.Text = string.Empty;
+            // 다음에 로그인 화면이 이 이름을 채운다(시험 계정은 남기지 않는다 — 로그인 화면과 같다).
+            if (Main.Rehearsal.Username.Length == 0)
+            {
+                Main.SetLastCharacter(_username.Text, Main.AutoLogin);
+            }
+
             _status.Text = "노비스마을에 들어왔습니다.";
             WorldSession session = finished.Result;
             Entered?.Invoke(session);
@@ -551,24 +542,26 @@ public sealed partial class CreateScreen : Control
         Exception failure = finished.Exception?.GetBaseException() ?? new IOException("알 수 없는 오류");
         Main.NoteActivityError(failure.GetType().Name);
 
+        // 표가 지났다 — 지우고, [만들기]를 잠근 채 까닭을 보인다([취소]로 로그인 화면의 카카오 단추로).
+        if (Main.Rehearsal.Username.Length == 0 && KakaoSignIn.IsSignedOut(failure.Message))
+        {
+            Main.SetKakao(null);
+        }
+
+        RefreshCreateState();
         _status.Text = failure.Message;
-        _create.Disabled = false;
     }
 
     /// <summary>
-    /// 이름·비밀번호·확인 칸 하나. 옆에 따로 캡션을 두지 않고 칸 안 흐린 힌트 글자
-    /// (<c>PlaceholderText</c>)로 무슨 칸인지 알린다 — 몸 미리보기를 가운데·크게 두려고 세 칸을
-    /// 세로로 쌓지 않고 한 줄에 나란히 두기로 하면서(사용자, 2026-09-19), 옆 캡션까지 있으면 칸이
-    /// 너무 좁아져 뺐다. 높이는 그대로 <see cref="Main.TouchMinimum"/> — 터치 최소보다 낮추지
-    /// 않는다.
+    /// 이름 칸. 세로에서는 옆에 따로 캡션을 두지 않고 칸 안 흐린 힌트 글자(<c>PlaceholderText</c>)로 무슨 칸인지 알린다
+    /// (사용자, 2026-09-19). 높이는 그대로 <see cref="Main.TouchMinimum"/> — 터치 최소보다 낮추지 않는다.
     /// </summary>
-    private static LineEdit Field(bool secret, string placeholder)
+    private static LineEdit Field(string placeholder)
     {
         LineEdit field = new()
         {
-            Secret = secret,
             PlaceholderText = placeholder,
-            VirtualKeyboardType = secret ? LineEdit.VirtualKeyboardTypeEnum.Password : LineEdit.VirtualKeyboardTypeEnum.Default,
+            VirtualKeyboardType = LineEdit.VirtualKeyboardTypeEnum.Default,
             CustomMinimumSize = new Vector2(0, Main.TouchMinimum),
             SizeFlagsHorizontal = SizeFlags.ExpandFill
         };
@@ -608,7 +601,7 @@ public sealed partial class CreateScreen : Control
         return label;
     }
 
-    /// <summary>이름과 비밀번호(확인 포함)가 다 있어야 만들 수 있다 — 로그인 화면과 같은 규칙.</summary>
+    /// <summary>이름·직업과 보낼 표(<see cref="Secret" />)가 다 있어야 만들 수 있다.</summary>
     private void RefreshCreateState()
     {
         if (_attempt is not null)
@@ -616,12 +609,13 @@ public sealed partial class CreateScreen : Control
             return;
         }
 
-        bool ready = _username.Text.Length > 0 && _password.Text.Length > 0 && _password.Text == _confirm.Text && _path is not null;
+        bool ready = _username.Text.Length > 0 && Secret is { Length: > 0 } && _path is not null;
 
         _create.Disabled = !ready;
         _status.Text = ready
             ? "직업과 꾸밈을 확인한 뒤 만들 수 있습니다."
-            : _path is null ? "직업을 하나 고르세요." : "이름과 비밀번호(확인 포함)를 입력하세요.";
+            : Secret is null ? "카카오 로그인이 필요합니다. [취소]로 돌아가 카카오로 로그인하세요."
+            : _path is null ? "직업을 하나 고르세요." : "캐릭터 이름을 넣으세요.";
     }
 
     /// <summary>키보드의 엔터를 마지막 칸에서 누르면 — 만들 수 있으면 만들고, 아니면 키보드만 내려 직업·꾸밈을 보인다.</summary>

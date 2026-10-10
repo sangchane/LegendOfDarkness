@@ -23,10 +23,16 @@ public partial class Main : Control
     private const string LoginFile = "res://login.cfg";
 
     /// <summary>
-    /// 로그인 화면의 "자동 로그인"을 켜고 로그인에 성공하면 그 계정이 여기 남는다(기기 안 user:// —
-    /// 저장소가 아니라 이 기기에만). 로그인 화면에서 끄면 지운다. 처음에는 없다(꺼져 있다).
+    /// 카카오로 받은 게임 표와 닉네임 두 줄(<see cref="Lod.Mobile.Core.Net.KakaoAccount" />) — 표가 캐릭터 비밀번호 칸으로 간다
+    /// (사용자 2026-10-11). 기기 안 user:// 에만. [카카오 로그아웃]·서버가 「카카오 로그인이 끝났습니다」면 지운다.
     /// </summary>
-    private const string AutoLoginFile = "user://autologin.cfg";
+    private const string KakaoFile = "user://kakao.cfg";
+
+    /// <summary>마지막으로 들어간 캐릭터 이름(첫 줄)과 자동 로그인(둘째 줄 <c>auto</c>). 비밀번호는 없다 — 표는 kakao.cfg.</summary>
+    private const string CharacterFile = "user://character.cfg";
+
+    /// <summary>카카오 전의 자동 로그인 — 이름·비밀번호 평문이라 이름만 옮기고 지운다.</summary>
+    private const string OldAutoLoginFile = "user://autologin.cfg";
 
     /// <summary>이 파일이 실려 있으면 캐릭터가 스스로 사냥한다. 실기기가 인자를 못 받아 파일로 켠다.</summary>
     private const string HuntFile = "res://hunt.cfg";
@@ -39,30 +45,36 @@ public partial class Main : Control
 
     public static bool AutoLoot { get; private set; } = true;
 
-    /// <summary>The account the login screen's own "자동 로그인" toggle has saved, or none.</summary>
-    public static Lod.Mobile.Core.Automation.AutoLoginAccount? SavedLogin { get; private set; }
+    /// <summary>이 기기의 카카오 로그인, 없으면 null(카카오 단추부터).</summary>
+    public static Lod.Mobile.Core.Net.KakaoAccount? Kakao { get; private set; }
+
+    /// <summary>마지막으로 들어간 캐릭터 — 로그인 화면 이름 칸을 채운다.</summary>
+    public static string LastCharacter { get; private set; } = string.Empty;
+
+    /// <summary>표와 <see cref="LastCharacter" /> 로 손 없이 들어가나(로그인 화면의 "자동 로그인").</summary>
+    public static bool AutoLogin { get; private set; }
 
     // Launch-time credentials (--login / login.cfg) and a saved account may each submit once. An explicit
     // logout turns that convenience off for every login screen reached afterward, including a round trip
     // through account creation, until the app is launched again.
     private readonly Lod.Mobile.Core.Automation.AutoLoginGate _autoLoginGate = new();
 
-    /// <summary>Saves, or (given <c>null</c>) forgets, the account to sign in with automatically next launch.</summary>
-    public static void SetSavedLogin(Lod.Mobile.Core.Automation.AutoLoginAccount? account)
+    /// <summary>Saves, or (given <c>null</c>) forgets, this device's Kakao sign-in.</summary>
+    public static void SetKakao(Lod.Mobile.Core.Net.KakaoAccount? account)
     {
-        SavedLogin = account;
+        Kakao = account;
 
         if (account is null)
         {
-            if (Godot.FileAccess.FileExists(AutoLoginFile))
+            if (Godot.FileAccess.FileExists(KakaoFile))
             {
-                Godot.DirAccess.RemoveAbsolute(AutoLoginFile);
+                Godot.DirAccess.RemoveAbsolute(KakaoFile);
             }
 
             return;
         }
 
-        Godot.FileAccess? writing = Godot.FileAccess.Open(AutoLoginFile, Godot.FileAccess.ModeFlags.Write);
+        Godot.FileAccess? writing = Godot.FileAccess.Open(KakaoFile, Godot.FileAccess.ModeFlags.Write);
 
         if (writing is not null)
         {
@@ -75,22 +87,63 @@ public partial class Main : Control
         }
     }
 
-    private static void ReadSavedLogin()
+    /// <summary>들어간 캐릭터 이름과 자동 로그인을 남긴다.</summary>
+    public static void SetLastCharacter(string name, bool automatic)
     {
-        if (!Godot.FileAccess.FileExists(AutoLoginFile))
+        LastCharacter = name;
+        AutoLogin = automatic;
+
+        Godot.FileAccess? writing = Godot.FileAccess.Open(CharacterFile, Godot.FileAccess.ModeFlags.Write);
+
+        if (writing is not null)
+        {
+            writing.StoreLine(name);
+            writing.StoreLine(automatic ? "auto" : string.Empty);
+            writing.Close();
+        }
+    }
+
+    private static void ReadKakao()
+    {
+        // 열기가 실패하면(권한·손상) 표가 없는 것으로 친다 — 시작하자마자 죽지 않게.
+        using Godot.FileAccess? reading = Godot.FileAccess.FileExists(KakaoFile)
+            ? Godot.FileAccess.Open(KakaoFile, Godot.FileAccess.ModeFlags.Read)
+            : null;
+
+        if (reading is not null)
+        {
+            Kakao = Lod.Mobile.Core.Net.KakaoAccount.Parse(reading.GetLine(), reading.GetLine());
+        }
+    }
+
+    private static void ReadLastCharacter()
+    {
+        using (Godot.FileAccess? reading = Godot.FileAccess.FileExists(CharacterFile)
+                   ? Godot.FileAccess.Open(CharacterFile, Godot.FileAccess.ModeFlags.Read)
+                   : null)
+        {
+            if (reading is not null)
+            {
+                LastCharacter = reading.GetLine().Trim();
+                AutoLogin = reading.GetLine().Trim() == "auto";
+            }
+        }
+
+        if (!Godot.FileAccess.FileExists(OldAutoLoginFile))
         {
             return;
         }
 
-        // 열기가 실패하면(권한·손상) 저장된 계정이 없는 것으로 친다 — 시작하자마자 죽지 않게.
-        using Godot.FileAccess? reading = Godot.FileAccess.Open(AutoLoginFile, Godot.FileAccess.ModeFlags.Read);
-
-        if (reading is null)
+        // 옛 자동 로그인 파일: 이름은 「옛 캐릭터 잇기」에 쓰라고 남기고, 평문 비밀번호는 기기에서 지운다.
+        using (Godot.FileAccess? old = Godot.FileAccess.Open(OldAutoLoginFile, Godot.FileAccess.ModeFlags.Read))
         {
-            return;
+            if (LastCharacter.Length == 0 && old?.GetLine().Trim() is { Length: > 0 } name)
+            {
+                SetLastCharacter(name, false);
+            }
         }
 
-        SavedLogin = Lod.Mobile.Core.Automation.AutoLoginAccount.Parse(reading.GetLine().Trim(), reading.GetLine().Trim());
+        Godot.DirAccess.RemoveAbsolute(OldAutoLoginFile);
     }
 
     /// <summary>Turns picking-up-as-you-walk on or off, and remembers which.</summary>

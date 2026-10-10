@@ -252,12 +252,21 @@ public static class LayoutCheck
     {
         if (Requested())
         {
-            _ = ResizeSequenceRequested() ? ReportResizeSequence(host, screen) : ReportAfterLayout(host, screen.Parts);
+            _ = ResizeSequenceRequested() ? ReportResizeSequence(host, () => screen.Parts) : ReportAfterLayout(host, screen.Parts);
+        }
+    }
+
+    /// <summary>로그인 화면도 한 번만 잰다 — 카카오 상태는 <c>--kakao</c> 로 고른다.</summary>
+    public static void RunIfRequested(Node host, LoginScreen screen)
+    {
+        if (Requested())
+        {
+            _ = ResizeSequenceRequested() ? ReportResizeSequence(host, () => screen.Parts) : ReportAfterLayout(host, screen.Parts);
         }
     }
 
     /// <summary>Seven iPhone drawable replacements exercise portrait/landscape reflow without a timer.</summary>
-    private static async System.Threading.Tasks.Task ReportResizeSequence(Node host, CreateScreen screen)
+    private static async System.Threading.Tasks.Task ReportResizeSequence(Node host, System.Func<IReadOnlyList<(string Name, Control Part)>> parts)
     {
         Vector2I[] sizes = [new(393, 852), new(852, 393), new(360, 780), new(640, 360), new(360, 640), new(852, 393), new(393, 852)];
         List<string> wrong = [];
@@ -270,7 +279,7 @@ public static class LayoutCheck
             Vector2 visible = host.GetViewport().GetVisibleRect().Size;
             Vector2 scale = host.GetViewport().GetCanvasTransform().Scale;
             if (!Mathf.IsEqualApprox(scale.X, scale.Y)) wrong.Add($"{size.X}x{size.Y} X/Y scale differs ({scale.X}/{scale.Y})");
-            foreach ((string name, Control part) in screen.Parts)
+            foreach ((string name, Control part) in parts())
             {
                 Rect2 where = part.GetGlobalRect();
                 if (part.Visible && (where.Position.X < -1 || where.Position.Y < -1 || where.End.X > visible.X + 1 || where.End.Y > visible.Y + 1))

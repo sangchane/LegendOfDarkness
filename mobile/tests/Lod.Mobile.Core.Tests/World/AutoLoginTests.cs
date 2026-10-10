@@ -2,30 +2,6 @@ using Lod.Mobile.Core.Automation;
 
 namespace Lod.Mobile.Core.Tests.World;
 
-public sealed class AutoLoginAccountTests
-{
-    [Fact]
-    public void Parse_builds_an_account_from_both_saved_lines()
-    {
-        Assert.Equal(new AutoLoginAccount("wren", "test1234"), AutoLoginAccount.Parse("wren", "test1234"));
-    }
-
-    [Fact]
-    public void Parse_rejects_a_missing_username_or_password()
-    {
-        Assert.Null(AutoLoginAccount.Parse(string.Empty, "test1234"));
-        Assert.Null(AutoLoginAccount.Parse("wren", string.Empty));
-    }
-
-    [Fact]
-    public void ToLines_round_trips_through_Parse()
-    {
-        AutoLoginAccount account = new("wren", "test1234");
-
-        Assert.Equal(account, AutoLoginAccount.Parse(account.ToLines()[0], account.ToLines()[1]));
-    }
-}
-
 public sealed class AutoLoginGateTests
 {
     [Fact]
