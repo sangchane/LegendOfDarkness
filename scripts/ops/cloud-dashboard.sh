@@ -174,7 +174,7 @@ server {
         proxy_pass http://127.0.0.1:8787;
     }
 
-    # 앱 내려받기 — 안내는 대시보드 「앱 내려받기」 탭(사용자 2026-10-09 통합), 파일은 로그인(관리자·손님 비밀번호)해야 받는다.
+    # 앱 내려받기 — 안내는 대시보드 「앱 내려받기」 탭(사용자 2026-10-09 통합), 파일은 로그인(카카오·관리자 비밀번호 — 사용자 2026-10-10)해야 받는다.
     # nginx 가 요청마다 운영 서비스에 쿠키를 묻고(/api/signed-in 204·401), 아니면 로그인 화면으로 보냈다가 돌아오게 한다.
     # 앱 파일(아이폰 .ipa·윈도우 .zip·안드로이드 .apk)은 release 가 올린 lod-ops/release/, manifest.plist 틀은 docs/download/.
     location = /_signed_in {
@@ -338,8 +338,8 @@ set_kakao_keys() {
 import json, re, sys
 words = [line.split()[-1] for line in sys.stdin.read().splitlines() if line.strip()]
 key, secret = (words + ["", ""])[:2]
-if not re.fullmatch(r"[0-9A-Za-z]{16,64}", key) or (secret and not re.fullmatch(r"[0-9A-Za-z]{16,64}", secret)):
-    sys.exit("REST API 키(첫 줄)·Client Secret(둘째 줄)이 키 꼴(영문·숫자 16~64자)이 아닙니다")
+if not re.fullmatch(r"[0-9A-Za-z]{16,64}", key) or not re.fullmatch(r"[0-9A-Za-z]{16,64}", secret):
+    sys.exit("REST API 키(첫 줄)·Client Secret(둘째 줄) 둘 다 있어야 합니다(영문·숫자 16~64자) — 카카오 「보안」에서 Client Secret 을 켜 주세요")
 print(json.dumps({"client_id": key, "client_secret": secret, "redirect_uri": sys.argv[1]}))
 ' "https://$DOMAIN/api/kakao/callback")"
     printf '%s\n' "$json" | remote "umask 077; cat > $REMOTE/data/kakao.json.new && mv $REMOTE/data/kakao.json.new $REMOTE/data/kakao.json && sudo systemctl restart lod-ability-ops"

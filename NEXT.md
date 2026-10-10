@@ -1,6 +1,11 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[현재/2026-10-10] 운영 홈페이지 카카오 로그인 — 등급 L 변경 · `dev:build` · 단계: 구현·리뷰 반영 끝(브랜치 `feature/kakao-login`, 푸시) → 카카오 키 받으면 배포.** 리뷰(opus) 정확성·보안 모두 막을 결함 0, 낮음 8 중 6 고침(남은 것: 목록 파일을 요청마다 읽음·새 사람 알림 없음). 명세 `autopilot/kakao-login/SPEC.md`.
+  사용자 「아무나 접근 할 수 없게 … 카카오톡 로그인」 · 정한 것: 처음 오면 모두 허가, 관리자가 계정 관리 창에서 거부 · 손님 4자리 없앰(관리자 비번은 비상용) · 손님 범위는 그대로.
+  1. **사용자가 developers.kakao.com 에 앱 등록**(Web 도메인 `https://lodgame.duckdns.org`, Redirect `…/api/kakao/callback`, 닉네임 동의, Client Secret) → REST API 키·Client Secret 두 줄을 `~/LOD-backups/kakao.txt` 에.
+  2. 그 뒤 `LOD_CLOUD_IP=161.33.43.117 scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.txt` → `… deploy`(키 먼저 — 순서가 바뀌면 손님이 못 들어온다) → 로그인 없이 302·version-ios.txt 200 확인 → 사용자가 폰으로 카카오 로그인 → 계정 관리에 이름(SC-9).
+
 - **[현재/2026-10-09 끝·푸시] 현황판 개편 · 이펙트 따라가기 · 원작 배경음 — 등급 M · `dev:build` + dev:ui · 단계: 끝·배포(대시보드·서버·앱 셋).** 다음 세션은 아래 「남은 것」부터.
   1. 대시보드(https://lodgame.duckdns.org): 지도(원작 타일·방향 잇기·누르면 괴물·드랍·NPC, 고르기 전엔 옆 판 없이 꽉·범례 한 줄) · 기술·마법(쓴 사람 → 대상 → 그림 어느 쪽 → 소리 무대, 그림·소리 고르며 고치기) · 아이템 · 괴물(같은 괴물 한 줄 + 출현 맵 표). 처음엔 「전체」 대신 한 갈래(무기·전사·1서클 / 노비스 / 전사), 1440×900 한 화면·안쪽 스크롤 하나. 「도감」 표현 뺌. SPEC `autopilot/dashboard-atlas/SPEC.md`.
   2. 앱(아이폰 설치·안드로이드·윈도우 올림): 이펙트가 맞은 이를 따라간다(`Flash.Follow`, 확인 `--screen game --overhead follow --walk EEEEEE`). 서버: 맵 배경음 원작 곡 69곳(`docs/bgm.md` · `build-map-music.py` 0단계 — 포테의숲 44 · 마운틴메리 30 · 로톤 64 · 루어스성 18 · 피에트·마인 12 · 수오미 11, 뒤의 셋은 구버전 길이로만 맞춤).

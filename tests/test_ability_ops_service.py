@@ -279,6 +279,9 @@ class LoginAndStateTests(unittest.TestCase):
         [person] = self.users.listing()
         self.assertEqual((person["id"], person["name"], person["allowed"]), ("777", "새이름", True))
         self.assertLessEqual(person["first"], person["last"])
+        self.kakao_person = ("888", "나중사람")
+        self.kakao_login()
+        self.assertEqual([p["id"] for p in self.users.listing()], ["888", "777"])  # 마지막에 온 사람이 위
 
     def test_kakao_callback_refuses_a_wrong_state_a_cancel_or_a_bad_code(self):
         # SC-3 — 다른 브라우저에서 시작했거나 동의를 취소했거나 코드가 틀리면 세션 없이 로그인 화면으로.
@@ -328,11 +331,35 @@ class LoginAndStateTests(unittest.TestCase):
         self.assertIsNone(SERVICE.kakao_session_id(token, "lod-admin:changed", now=1030))
         self.assertIsNone(SERVICE.kakao_session_id(token.replace("k777.", "k778.", 1), self.CREDENTIAL, now=1030))
         self.assertIsNone(SERVICE.kakao_session_id("k²." + token.split(".", 1)[1], self.CREDENTIAL, now=1030))
+        # 서명 자리에 비ASCII 가 오면 예외로 연결이 끊기지 않고 그냥 아니다(보안 리뷰 2026-10-10 낮음 4).
+        self.assertIsNone(SERVICE.kakao_session_id("k1.9999999999.é", self.CREDENTIAL))
+        self.assertFalse(SERVICE.valid_session("9999999999.é", self.CREDENTIAL))
 
     def test_kakao_button_says_not_ready_without_keys(self):
         self.server.RequestHandlerClass.kakao = None
         status, headers, _ = self.request("GET", "/api/kakao/start")
         self.assertEqual((status, headers["Location"]), (302, "/login.html?error=kakao-off"))
+        status, headers, _ = self.request("GET", "/api/kakao/callback?code=good&state=x", cookie="lod_kakao=x|%2F")
+        self.assertEqual((status, headers["Location"]), (302, "/login.html?error=kakao-off"))
+
+    def test_a_broken_people_file_lets_no_guest_in_and_is_not_overwritten(self):
+        # 리뷰 2026-10-10 낮음 2 — 깨진 목록이면 손님은 막히고(502 아님), 덮어써 거부 목록을 잃지 않는다.
+        guest = self.kakao_login()[1]
+        self.users.path.write_text("[broken", encoding="utf-8")
+        self.assertEqual(self.request("GET", "/index.html", cookie=guest)[0], 302)
+        (status, headers), again = self.kakao_login()
+        self.assertEqual((headers["Location"], again), ("/login.html?error=kakao", None))
+        self.assertEqual(self.users.path.read_text(encoding="utf-8"), "[broken")
+        self.assertEqual(self.request("GET", "/api/kakao/users", cookie=self.login().split(";")[0])[0], 500)
+
+    def test_a_cut_off_kakao_answer_sends_back_to_login(self):
+        # 리뷰 2026-10-10 낮음 1 — 카카오 응답이 중간에 끊겨도 처리기가 죽지 않는다.
+        import http.client
+        def cut(config, code):
+            raise http.client.IncompleteRead(b"")
+        self.server.RequestHandlerClass.kakao_exchange = staticmethod(cut)
+        (status, headers), session = self.kakao_login()
+        self.assertEqual((status, headers["Location"], session), (302, "/login.html?error=kakao", None))
 
     def test_install_manifest_needs_the_token_and_passes_it_to_the_ipa(self):
         token = SERVICE.ota_token(self.CREDENTIAL)

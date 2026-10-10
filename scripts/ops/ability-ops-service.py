@@ -10,6 +10,7 @@ import argparse
 import base64
 import hashlib
 import hmac
+import http.client
 import json
 import mimetypes
 import os
@@ -219,7 +220,7 @@ def valid_session(token, credential, now=None):
     if not (expiry.isascii() and expiry.isdigit() and len(expiry) < 12) or int(expiry) < (now or time.time()):
         return False
     wanted = hmac.new(session_key(credential), expiry.encode(), hashlib.sha256).hexdigest()
-    return hmac.compare_digest(signature, wanted)
+    return signature.isascii() and hmac.compare_digest(signature, wanted)  # 비ASCII 는 compare_digest 가 TypeError
 
 
 def ota_token(credential):
@@ -277,7 +278,7 @@ def kakao_session_id(token, credential, now=None):
             and expiry.isascii() and expiry.isdigit() and len(expiry) < 12) or int(expiry) < (now or time.time()):
         return None
     wanted = hmac.new(session_key(credential), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
-    return kakao_id if hmac.compare_digest(signature, wanted) else None
+    return kakao_id if signature.isascii() and hmac.compare_digest(signature, wanted) else None
 
 
 def safe_next(value):
@@ -315,13 +316,20 @@ class KakaoUsers:
 
     def _read(self):
         try:
-            return json.loads(self.path.read_text(encoding="utf-8"))
+            users = json.loads(self.path.read_text(encoding="utf-8"))
         except FileNotFoundError:
             return {}
+        if not isinstance(users, dict):
+            raise ValueError("kakao-users.json 꼴이 깨졌습니다")
+        return users
 
     def allowed(self, kakao_id):
+        # 파일이 깨졌으면 아무도 손님이 아니다 — 덮어쓰면 거부 목록이 사라지니 고칠 때까지 막아 둔다.
         with self.lock:
-            return self._read().get(kakao_id, {}).get("allowed") is True
+            try:
+                return self._read().get(kakao_id, {}).get("allowed") is True
+            except ValueError:
+                return False
 
     def arrive(self, kakao_id, name):
         """로그인할 때 — 처음이면 허가로 적고, 들어와도 되는지 돌려준다."""
@@ -397,7 +405,10 @@ class OpsHandler(BaseHTTPRequestHandler):
         elif path == "/api/kakao/callback":
             self._kakao_callback()
         elif path == "/api/kakao/users":
-            self._json(200, self.kakao_users.listing())
+            try:
+                self._json(200, self.kakao_users.listing())
+            except ValueError as error:
+                self._json(500, {"error": str(error)})
         elif path == "/api/activity":
             if not self._signed_in():
                 self._json(401, {"error": "관리자 로그인이 필요합니다."})
@@ -605,13 +616,13 @@ class OpsHandler(BaseHTTPRequestHandler):
             return
         try:
             kakao_id, name = self.kakao_exchange(self.kakao, code)
-        except (OSError, ValueError, KeyError, TypeError) as error:
+        except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException) as error:  # 응답이 중간에 끊긴 것까지
             self.log_message("kakao login failed: %s", type(error).__name__)  # 코드·토큰은 적지 않는다
             self._redirect("/login.html?error=kakao", clear)
             return
         try:
             allowed = self.kakao_users.arrive(kakao_id, name)
-        except OSError:
+        except (OSError, ValueError):  # 목록 파일이 깨졌으면 덮어쓰지 않고 들이지 않는다
             self._redirect("/login.html?error=kakao", clear)
             return
         if not allowed:

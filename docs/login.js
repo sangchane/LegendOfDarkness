@@ -21,10 +21,14 @@
     "kakao-off": "카카오 로그인이 아직 준비되지 않았습니다."
   }[params.get("error")] || "";
 
-  // 이미 로그인돼 있으면 바로 원래 화면으로 — 카톡 링크처럼 바깥에서 열면 관리자 쿠키(SameSite=Strict)가 첫 요청에 안 실려 여기로 온다.
+  // 관리자면 바로 원래 화면으로 — 카톡 링크처럼 바깥에서 열면 관리자 쿠키(SameSite=Strict)가 첫 요청에 안 실려 여기로 온다.
+  // 카카오 손님이 여기 왔으면 관리자로 바꾸러 온 것 — 관리자 칸을 펼쳐 둔다.
   fetch("/api/session", { cache: "no-store" })
     .then(function (response) { return response.json(); })
-    .then(function (body) { if (body.role) { window.location.replace(target.href); } })
+    .then(function (body) {
+      if (body.role === "admin") { window.location.replace(target.href); }
+      else if (body.role === "member") { form.closest("details").open = true; }
+    })
     .catch(function () {});
 
   form.addEventListener("submit", function (event) {
