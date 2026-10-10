@@ -23,17 +23,21 @@ namespace LodClient;
 /// </remarks>
 public partial class LoginScreen : Control
 {
-    private const int TitleFontSize = 22;
+    // 판은 안전 영역을 꽉 채우고 안의 것도 그만큼 키운다(사용자 2026-10-11: 판이 가운데 작게 떠 위아래가 비었다).
+    private const int TitleFontSize = 28;
 
-    private static int LogoHeight => Main.Portrait ? 112 : 88;
+    private static int LogoHeight => Main.Portrait ? 140 : 120;
     private const int AuxFontSize = 14;
     private const int FootFontSize = 10;
 
-    // 캐릭터 카드 — 원작 한 칸(1배) 그림 + 이름·Lv 두 줄. 폭은 판(300) 안에 두 장 반이 보이게 — 반 장이 굴릴 수 있다고 알린다.
-    private const int CardWidth = 112;
-    private const int FigureHeight = 96;
-    private const int FormWidth = 300;
-    private const int LandscapeFormWidth = 560;
+    /// <summary>로그인 화면 단추 높이 — 손가락 최소(<see cref="Main.TouchMinimum" />)보다 크게.</summary>
+    private const int ButtonHeight = 56;
+
+    // 캐릭터 카드 — 원작 그림 2배(정수배라 흐려지지 않는다) + 이름·Lv 두 줄. 폭은 판 안에 두 장 반쯤 보이게 — 반 장이 굴릴 수 있다고 알린다.
+    private const int CardWidth = 150;
+    private const int FigureHeight = 120;
+    private const int FigureScale = 2;
+    private const int CaptionHeight = 48;
     private const int CaptionWidth = 72;
 
     private const string BrowserText = "브라우저에서 카카오 로그인을 마치고 돌아오세요.";
@@ -130,7 +134,7 @@ public partial class LoginScreen : Control
         :
         [
             ("카카오 단추", _kakao), ("카카오 계정", _whoRow), ("이름", _nameRow), ("비밀번호", _passwordRow), ("캐릭터 목록", _listScroll),
-            ("안내", _status), ("들어가기 줄", _actions), ("새 캐릭터 줄", _linkRow)
+            ("안내", _status), ("들어가기 줄", _actions), ("새 캐릭터 줄", _linkRow), ("아래 안내 줄", _versionLine)
         ];
 
     public override void _Ready()
@@ -229,11 +233,7 @@ public partial class LoginScreen : Control
 
     private void Build()
     {
-        VBoxContainer rows = new();
-        rows.AddThemeConstantOverride("separation", Main.Gutter);
-        _safeArea.AddChild(rows);
-        rows.AddChild(BuildForm());
-        rows.AddChild(_versionLine = BuildVersionLine());
+        _safeArea.AddChild(BuildForm());
         ShowState();
     }
 
@@ -401,17 +401,12 @@ public partial class LoginScreen : Control
 
     private Control BuildForm()
     {
-        CenterContainer center = new()
-        {
-            Name = "FormCenter",
-            // 가로에서는 굴림 칸 안에 들어가, 폭을 다 쓰라고 하지 않으면 제 최소 폭으로 왼쪽에 붙었다.
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            SizeFlagsVertical = SizeFlags.ExpandFill
-        };
-
+        // 판이 안전 영역을 꽉 채운다 — 가로에서는 굴림 칸 안에 들어가, 폭·높이를 다 쓰라고 하지 않으면 제 최소 크기로 붙었다.
         PanelContainer panel = new()
         {
-            CustomMinimumSize = new Vector2(Main.Portrait ? FormWidth : LandscapeFormWidth, 0)
+            Name = "Form",
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
         };
         panel.AddThemeStyleboxOverride("panel", Greybox.Stone());
 
@@ -454,7 +449,7 @@ public partial class LoginScreen : Control
         _submit = new Button
         {
             Text = "들어가기",
-            CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+            CustomMinimumSize = new Vector2(0, ButtonHeight)
         };
 
         Greybox.Commit(_submit);
@@ -471,7 +466,7 @@ public partial class LoginScreen : Control
         {
             ToggleMode = true,
             ButtonPressed = _autoLoginWanted,
-            CustomMinimumSize = new Vector2(0, Main.TouchMinimum)
+            CustomMinimumSize = new Vector2(0, ButtonHeight)
         };
         _autoLogin.Text = "자동 로그인";
 
@@ -489,15 +484,19 @@ public partial class LoginScreen : Control
         Control form = Main.Portrait
             ? PortraitForm(crest, title)
             : LandscapeForm(crest, title);
+        form.SizeFlagsVertical = SizeFlags.ExpandFill;
 
-        padding.AddChild(form);
+        // 환경·안내 한 줄은 판 안 맨 아래(사용자 2026-10-11: 테두리 밖에 떠 있었다).
+        VBoxContainer inside = FormColumn();
+        inside.AddChild(form);
+        inside.AddChild(_versionLine = BuildVersionLine());
+        padding.AddChild(inside);
         PanelContainer interior = new();
         StyleBoxFlat surface = Greybox.Sheet();
         surface.SetContentMarginAll(0);
         interior.AddThemeStyleboxOverride("panel", surface);
         interior.AddChild(padding);
         panel.AddChild(interior);
-        center.AddChild(panel);
 
         _username.TextChanged += _ => RefreshSubmitState();
         _password.TextChanged += _ => RefreshSubmitState();
@@ -517,7 +516,7 @@ public partial class LoginScreen : Control
 
         if (Main.Portrait)
         {
-            return center;
+            return panel;
         }
 
         // A short landscape screen (360) can have less height than the form. Keep the controls at their accessible
@@ -530,7 +529,7 @@ public partial class LoginScreen : Control
             SizeFlagsVertical = SizeFlags.ExpandFill,
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
         };
-        formScroll.AddChild(center);
+        formScroll.AddChild(panel);
 
         return formScroll;
     }
@@ -539,6 +538,7 @@ public partial class LoginScreen : Control
     private Control PortraitForm(TextureRect crest, Label title)
     {
         VBoxContainer form = FormColumn();
+        form.Alignment = BoxContainer.AlignmentMode.Center;
         form.AddChild(crest);
         form.AddChild(title);
         form.AddChild(BuildWho());
@@ -675,11 +675,16 @@ public partial class LoginScreen : Control
 
     /// <summary>
     /// 캐릭터 카드(사용자 2026-10-11) — 지금 입은 옷 그대로 선 그림(게임이 사람을 그리는 <see cref="WorldView.Dress" />) · 이름 · Lv.
-    /// 카드를 누르면 들어간다. 위 귀퉁이 아이콘 둘(생김새·삭제)은 카드 위의 따로 된 단추라 누르는 손가락을 카드가 받지 않는다.
+    /// 카드를 누르면 들어간다. 위 귀퉁이 아이콘 둘(생김새·삭제)은 카드의 자식이 아니라 카드와 나란한 형제다 — 목록 안 단추는
+    /// 끌기를 굴림 칸에 넘기려고 누름을 부모에게도 넘기므로(<see cref="TouchInput" /> Adopt), 자식이던 아이콘의 누름이 카드에도
+    /// 가서 들어가기가 함께 불렸다(사용자 2026-10-11 실기기). 검사: <c>--kakao 표 --card-taps</c>.
     /// </summary>
     private Control CharacterCard(KakaoCharacter character)
     {
-        Button card = new() { Name = "Card", CustomMinimumSize = new Vector2(CardWidth, FigureHeight + 44), ClipContents = true };
+        Control slot = new() { CustomMinimumSize = new Vector2(CardWidth, FigureHeight + CaptionHeight), MouseFilter = MouseFilterEnum.Pass };
+        Button card = new() { Name = "Card", ClipContents = true };
+        card.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        slot.AddChild(card);
         Greybox.Plain(card);
         card.Pressed += () => BeginLogin(character.Name);
 
@@ -687,7 +692,11 @@ public partial class LoginScreen : Control
         Control stage = new() { MouseFilter = MouseFilterEnum.Ignore, ClipContents = true };
         stage.SetAnchorsAndOffsetsPreset(LayoutPreset.TopWide);
         stage.OffsetBottom = FigureHeight;
-        Node2D wrapper = new() { Position = new Vector2(CardWidth / 2f + CreateScreen.BodyCentreOffsetX, FigureHeight / 2f + CreateScreen.BodyCentreOffsetY) };
+        Node2D wrapper = new()
+        {
+            Position = new Vector2(CardWidth / 2f + CreateScreen.BodyCentreOffsetX * FigureScale, FigureHeight / 2f + CreateScreen.BodyCentreOffsetY * FigureScale),
+            Scale = new Vector2(FigureScale, FigureScale)
+        };
         Actor figure = new(character.Name, WorldView.Dress(new Character(0, default, Direction.South, character.Look, character.Name)));
         wrapper.AddChild(figure);
         stage.AddChild(wrapper);
@@ -695,28 +704,27 @@ public partial class LoginScreen : Control
         figure.Face(Direction.South);
 
         Label name = new() { Text = character.Name, HorizontalAlignment = HorizontalAlignment.Center, ClipText = true };
-        name.AddThemeFontSizeOverride("font_size", AuxFontSize);
+        name.AddThemeFontSizeOverride("font_size", 17);
         name.AddThemeColorOverride("font_color", Greybox.Title);
         Label level = Aux($"Lv {character.Level} · {character.Job}");
-        level.AddThemeFontSizeOverride("font_size", 12);
         level.HorizontalAlignment = HorizontalAlignment.Center;
         level.ClipText = true;
         VBoxContainer caption = new() { MouseFilter = MouseFilterEnum.Ignore };
         caption.AddThemeConstantOverride("separation", 0);
         caption.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide);
-        caption.OffsetTop = -44;
+        caption.OffsetTop = -CaptionHeight;
         caption.AddChild(name);
         caption.AddChild(level);
         card.AddChild(caption);
 
         // 한글 시스템 글꼴에 연필(✎)이 없어(맥에서 HasChar 거짓) 연필은 그려 넣는다. ×는 글꼴에 있다.
-        Button look = CornerIcon(card, left: true, string.Empty, "생김새 바꾸기");
-        Button delete = CornerIcon(card, left: false, "×", "지우기");
+        Button look = CornerIcon(slot, left: true, string.Empty, "생김새 바꾸기");
+        Button delete = CornerIcon(slot, left: false, "×", "지우기");
         look.Pressed += () => WantsToChangeLook?.Invoke(character);
         delete.Pressed += () => AskDelete(character.Name);
         _rowButtons.AddRange([card, look, delete]);
 
-        return card;
+        return slot;
     }
 
     /// <summary>카드 위 귀퉁이 아이콘 — 손가락 칸은 <see cref="Main.TouchMinimum" />, 보이는 것은 그 안의 작은 어두운 동그라미.</summary>
@@ -881,7 +889,7 @@ public partial class LoginScreen : Control
 
     private static Button PlainButton(string text)
     {
-        Button button = new() { Text = text, CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        Button button = new() { Text = text, CustomMinimumSize = new Vector2(0, ButtonHeight) };
         Greybox.Plain(button);
 
         return button;
@@ -895,7 +903,7 @@ public partial class LoginScreen : Control
     {
         Color yellow = new("#FEE500");
         Color label = new(0, 0, 0, 0.85f);
-        Button button = new() { Text = "카카오로 로그인", CustomMinimumSize = new Vector2(0, Main.TouchMinimum) };
+        Button button = new() { Text = "카카오로 로그인", CustomMinimumSize = new Vector2(0, ButtonHeight) };
 
         foreach (string state in new[] { "normal", "hover", "focus", "pressed", "hover_pressed", "disabled" })
         {

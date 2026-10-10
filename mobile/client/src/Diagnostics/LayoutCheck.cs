@@ -259,7 +259,11 @@ public static class LayoutCheck
     /// <summary>로그인 화면도 한 번만 잰다 — 카카오 상태는 <c>--kakao</c> 로 고른다.</summary>
     public static void RunIfRequested(Node host, LoginScreen screen)
     {
-        if (Requested())
+        if (CardTapCheck.Requested())
+        {
+            _ = CardTapCheck.Run(host, screen);
+        }
+        else if (Requested())
         {
             _ = ResizeSequenceRequested() ? ReportResizeSequence(host, () => screen.Parts) : ReportAfterLayout(host, screen.Parts);
         }
