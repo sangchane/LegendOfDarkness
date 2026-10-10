@@ -321,6 +321,12 @@ public partial class Main : Control
             int top = (int)preview["top"].AsDouble(), bottom = (int)preview["bottom"].AsDouble();
             safe = new Rect2I(0, top, screen.X, screen.Y - top - bottom);
         }
+        else if (!OS.HasFeature("mobile"))
+        {
+            // PC·맥 창은 모니터를 다 덮지 않는다 — 모니터의 작업 표시줄·메뉴 막대를 창 안 여백으로 옮기면 위아래가 까닭 없이
+            // 비고, 높이 360 창에서는 위 줄이 화면 위로 밀렸다(2026-10-10). 노치·홈 막대는 폰에만 있다.
+            return (Gutter, Gutter, Gutter, Gutter);
+        }
 
         if (screen.X <= 0 || screen.Y <= 0 || safe.Size.X <= 0 || safe.Size.Y <= 0)
         {

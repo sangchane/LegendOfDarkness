@@ -242,7 +242,9 @@ public partial class GameScreen : Control
         MarginContainer hud = Main.SafeAreaContainer();
 
         VBoxContainer rows = new();
-        rows.AddThemeConstantOverride("separation", Main.Gutter);
+        // 가로는 위 줄과 조작 줄 사이에 빈 자리 줄(BuildPackRow)이 끼어 간격이 두 번 붙는다 — 반씩이면 둘 사이가 한 칸(8).
+        // 8 씩이면 높이 360(갤럭시 S23 3배)에서 86+16+248 이 넘쳐 위 줄이 화면 위로 밀렸다(2026-10-10).
+        rows.AddThemeConstantOverride("separation", Main.Portrait ? Main.Gutter : Main.Gutter / 2);
 
         // In landscape the HUD lies over the whole world, and a container that eats taps would stop anyone
         // ever touching a figure. The plates and buttons inside it still take their own.
