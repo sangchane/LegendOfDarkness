@@ -110,6 +110,7 @@ class LoginAndStateTests(unittest.TestCase):
     CREDENTIAL = "lod-admin:secret"
     KAKAO = {"client_id": "rest-key", "client_secret": "kakao-secret",
              "redirect_uri": "https://lodgame.duckdns.org/api/kakao/callback"}
+    JOIN = "4321"  # 시험용 초대 번호 — 진짜 번호는 서버 data/join-code 에만
 
     def setUp(self):
         import threading
@@ -139,7 +140,7 @@ class LoginAndStateTests(unittest.TestCase):
         self.users = SERVICE.KakaoUsers(root / "data" / "kakao-users.json")
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), SERVICE.handler_for(
             root / "www", store, self.CREDENTIAL, states, password_file=self.password_file,
-            kakao=self.KAKAO, kakao_users=self.users, exchange=exchange))
+            kakao=self.KAKAO, kakao_users=self.users, exchange=exchange, join_code=self.JOIN))
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         self.base = f"http://127.0.0.1:{self.server.server_address[1]}"
 
@@ -172,8 +173,8 @@ class LoginAndStateTests(unittest.TestCase):
         self.assertEqual(status, 200)
         return headers["Set-Cookie"]
 
-    def kakao_login(self, next_path="/?view=download"):
-        """카카오 단추 → 동의 → 돌아오기. (돌아온 답, 세션 쿠키 「lod_ops=…」 또는 None)."""
+    def kakao_login(self, next_path="/?view=download", code=JOIN):
+        """카카오 단추 → 동의 → 돌아오기(→ 대기면 초대 번호). (돌아온 답, 세션 쿠키 「lod_ops=…」 또는 None)."""
         import urllib.parse
         status, headers, _ = self.request("GET", "/api/kakao/start?next=" + urllib.parse.quote(next_path, safe=""))
         self.assertEqual(status, 302)
@@ -181,6 +182,8 @@ class LoginAndStateTests(unittest.TestCase):
         state = state_cookie.split("=", 1)[1].split("|")[0]
         status, headers, _ = self.request("GET", f"/api/kakao/callback?code=good&state={state}", cookie=state_cookie)
         session = next((c.split(";")[0] for c in headers.get_all("Set-Cookie") or [] if c.startswith("lod_ops=")), None)
+        if session and code and headers["Location"].startswith("/login.html"):
+            self.request("POST", "/api/kakao/join", {"code": code}, cookie=session)
         return (status, headers), session
 
     def test_activity_is_admin_only_and_dates_are_validated(self):
@@ -229,7 +232,7 @@ class LoginAndStateTests(unittest.TestCase):
     def test_kakao_guest_looks_and_downloads_but_cannot_change(self):
         # SC-4 — 지금 손님과 같게(사용자 2026-10-10): 보기·내려받기, 고치기·접속 기록·사람 관리는 관리자만.
         (status, headers), guest = self.kakao_login()
-        self.assertEqual((status, headers["Location"]), (302, "/?view=download"))
+        self.assertEqual((status, headers["Location"]), (302, "/login.html?next=%2F%3Fview%3Ddownload"))  # 처음엔 대기
         self.assertIn("SameSite=Lax", next(c for c in headers.get_all("Set-Cookie") if c.startswith("lod_ops=")))
         status, _, body = self.request("GET", "/index.html", cookie=guest)
         self.assertEqual((status, body), (200, "DASHBOARD"))
@@ -241,7 +244,7 @@ class LoginAndStateTests(unittest.TestCase):
                                    ("GET", "/api/activity?from=2026-10-02&to=2026-10-03", None),
                                    ("POST", "/api/password", {"current": "x", "new": "longenough1"}),
                                    ("GET", "/api/kakao/users", None),
-                                   ("PUT", "/api/kakao/users/777", {"allowed": False})):
+                                   ("PUT", "/api/kakao/users/777", {"status": "denied"})):
             status, _, _ = self.request(method, path, body, cookie=guest)
             self.assertEqual(status, 401, path)
         # 카카오 쿠키는 관리자 쿠키로 읽히지 않고, 관리자 쿠키도 카카오 쿠키로 읽히지 않는다.
@@ -271,17 +274,59 @@ class LoginAndStateTests(unittest.TestCase):
             self.assertIn(part, cookie)
         self.assertNotIn("kakao-secret", headers["Location"])
 
-    def test_first_kakao_visit_is_allowed_and_remembered(self):
-        # SC-3 — 처음 오면 일단 허가(사용자 2026-10-10).
-        self.kakao_login()
+    def test_first_kakao_visit_waits_and_is_remembered(self):
+        # 처음 오면 대기, 초대 번호를 맞히면 허가(사용자 2026-10-10).
+        self.kakao_login(code=None)
+        self.assertEqual(self.users.listing()[0]["status"], "pending")
         self.kakao_person = ("777", "새이름")
         self.kakao_login()
         [person] = self.users.listing()
-        self.assertEqual((person["id"], person["name"], person["allowed"]), ("777", "새이름", True))
+        self.assertEqual((person["id"], person["name"], person["status"]), ("777", "새이름", "allowed"))
         self.assertLessEqual(person["first"], person["last"])
         self.kakao_person = ("888", "나중사람")
-        self.kakao_login()
+        self.kakao_login(code=None)
         self.assertEqual([p["id"] for p in self.users.listing()], ["888", "777"])  # 마지막에 온 사람이 위
+
+    def test_a_waiting_person_gets_in_with_the_invite_code_or_the_admin(self):
+        # 사용자 2026-10-10 「번호를 입력하면 즉시 승인이고 입력 못하면 대기상태로」.
+        (status, headers), waiting = self.kakao_login(code=None)
+        self.assertEqual(headers["Location"], "/login.html?next=%2F%3Fview%3Ddownload")
+        self.assertEqual(self.request("GET", "/index.html", cookie=waiting)[0], 302)
+        self.assertEqual(self.request("GET", "/api/signed-in", cookie=waiting)[0], 401)
+        status, _, body = self.request("GET", "/api/session", cookie=waiting)
+        self.assertEqual(json.loads(body), {"signedIn": False, "role": None, "pending": True})
+        status, _, body = self.request("POST", "/api/kakao/join", {"code": "0000"}, cookie=waiting)
+        self.assertEqual((status, json.loads(body)["error"]), (403, "번호가 맞지 않습니다. 남은 기회 4번."))
+        status, _, _ = self.request("POST", "/api/kakao/join", {"code": " 4321 "}, cookie=waiting)
+        self.assertEqual(status, 200)
+        self.assertEqual(self.request("GET", "/index.html", cookie=waiting)[0], 200)
+        # 번호를 모르는 사람은 관리자가 허가한다.
+        self.kakao_person = ("888", "모르는사람")
+        stranger = self.kakao_login(code=None)[1]
+        admin = self.login().split(";")[0]
+        status, _, _ = self.request("PUT", "/api/kakao/users/888", {"status": "allowed"}, cookie=admin)
+        self.assertEqual(status, 200)
+        self.assertEqual(self.request("GET", "/index.html", cookie=stranger)[0], 200)
+        # 카카오 쿠키 없이는 번호를 넣을 수 없다.
+        self.assertEqual(self.request("POST", "/api/kakao/join", {"code": "4321"})[0], 401)
+
+    def test_the_invite_code_stops_working_after_five_wrong_tries(self):
+        # 4자리를 계정 하나로 다 맞혀 보지 못하게 — 다섯 번 틀리면 번호로는 못 들어오고 관리자를 기다린다.
+        waiting = self.kakao_login(code=None)[1]
+        for left in (4, 3, 2, 1):
+            status, _, body = self.request("POST", "/api/kakao/join", {"code": "0000"}, cookie=waiting)
+            self.assertEqual(json.loads(body)["error"], f"번호가 맞지 않습니다. 남은 기회 {left}번.")
+        for code in ("0000", "4321"):
+            status, _, body = self.request("POST", "/api/kakao/join", {"code": code}, cookie=waiting)
+            self.assertEqual((status, json.loads(body)["error"]),
+                             (403, "여러 번 틀려 번호로는 들어올 수 없습니다 — 관리자 승인을 기다려 주세요."))
+        self.assertEqual(self.users.listing()[0]["status"], "pending")
+
+    def test_without_an_invite_code_everyone_waits_for_the_admin(self):
+        self.server.RequestHandlerClass.join_code = None
+        waiting = self.kakao_login(code=None)[1]
+        status, _, body = self.request("POST", "/api/kakao/join", {"code": "4321"}, cookie=waiting)
+        self.assertEqual((status, json.loads(body)["error"]), (403, "초대 번호로는 들어올 수 없습니다 — 관리자 승인을 기다려 주세요."))
 
     def test_kakao_callback_refuses_a_wrong_state_a_cancel_or_a_bad_code(self):
         # SC-3 — 다른 브라우저에서 시작했거나 동의를 취소했거나 코드가 틀리면 세션 없이 로그인 화면으로.
@@ -300,20 +345,22 @@ class LoginAndStateTests(unittest.TestCase):
         guest = self.kakao_login()[1]
         admin = self.login().split(";")[0]
         status, _, body = self.request("GET", "/api/kakao/users", cookie=admin)
-        self.assertEqual([(p["id"], p["allowed"]) for p in json.loads(body)], [("777", True)])
-        status, _, body = self.request("PUT", "/api/kakao/users/777", {"allowed": False}, cookie=admin)
-        self.assertEqual((status, json.loads(body)[0]["allowed"]), (200, False))
+        self.assertEqual([(p["id"], p["status"]) for p in json.loads(body)], [("777", "allowed")])
+        status, _, body = self.request("PUT", "/api/kakao/users/777", {"status": "denied"}, cookie=admin)
+        self.assertEqual((status, json.loads(body)[0]["status"]), (200, "denied"))
         status, headers, _ = self.request("GET", "/index.html", cookie=guest)
         self.assertEqual(status, 302)
         status, _, _ = self.request("GET", "/api/signed-in", cookie=guest)
         self.assertEqual(status, 401)
         (status, headers), again = self.kakao_login()
         self.assertEqual((headers["Location"], again), ("/login.html?error=denied", None))
-        status, _, _ = self.request("PUT", "/api/kakao/users/777", {"allowed": "no"}, cookie=admin)
+        self.assertEqual(self.request("POST", "/api/kakao/join", {"code": "4321"}, cookie=guest)[0], 403)  # 번호로 거부를 못 푼다
+        for body in ({"status": "maybe"}, {"status": "pending"}, {"allowed": True}):
+            status, _, _ = self.request("PUT", "/api/kakao/users/777", body, cookie=admin)
+            self.assertEqual(status, 400, body)
+        status, _, _ = self.request("PUT", "/api/kakao/users/999", {"status": "allowed"}, cookie=admin)
         self.assertEqual(status, 400)
-        status, _, _ = self.request("PUT", "/api/kakao/users/999", {"allowed": True}, cookie=admin)
-        self.assertEqual(status, 400)
-        self.request("PUT", "/api/kakao/users/777", {"allowed": True}, cookie=admin)
+        self.request("PUT", "/api/kakao/users/777", {"status": "allowed"}, cookie=admin)
         self.assertEqual(self.request("GET", "/index.html", cookie=guest)[0], 200)
 
     def test_after_login_the_person_only_goes_somewhere_on_this_site(self):
@@ -321,7 +368,9 @@ class LoginAndStateTests(unittest.TestCase):
         for outside in ("//evil.example/x", "/\\evil.example", "https://evil.example/", "/a\r\nSet-Cookie: x=1", "evil"):
             self.assertEqual(SERVICE.safe_next(outside), "/", outside)
         self.assertEqual(SERVICE.safe_next("/?view=items&x=1"), "/?view=items&x=1")
-        (status, headers), _ = self.kakao_login("//evil.example/x")
+        (status, headers), _ = self.kakao_login("//evil.example/x")  # 처음(대기) — 번호 칸으로 가도 next 는 이 사이트만
+        self.assertEqual(headers["Location"], "/login.html?next=%2F")
+        (status, headers), _ = self.kakao_login("//evil.example/x", code=None)  # 허가된 뒤
         self.assertEqual(headers["Location"], "/")
 
     def test_kakao_session_is_signed_and_expires(self):

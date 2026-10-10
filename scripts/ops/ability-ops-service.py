@@ -308,8 +308,11 @@ def kakao_exchange(config, code):
 
 
 class KakaoUsers:
-    """카카오로 들어온 사람 — 처음 오면 허가, 관리자가 모르는 사람을 거부로 바꾼다(사용자 2026-10-10).
-    파일 `{"회원번호": {"name", "allowed", "first", "last"}}` 를 요청마다 읽는다 — 거부하면 그 자리에서 끊긴다."""
+    """카카오로 들어온 사람 — 처음 오면 대기, 초대 번호를 맞히면 허가, 모르면 관리자가 허가·거부(사용자 2026-10-10).
+    파일 `{"회원번호": {"name", "status": allowed|pending|denied, "tries", "first", "last"}}` 를 요청마다 읽는다
+    — 거부하면 그 자리에서 끊긴다."""
+    STATUSES = ("allowed", "pending", "denied")
+    TRIES = 5  # 초대 번호를 이만큼 틀리면 번호로는 못 들어오고 관리자를 기다린다(4자리를 계정 하나로 다 맞혀 보지 못하게)
 
     def __init__(self, path: Path):
         self.path = path
@@ -324,32 +327,53 @@ class KakaoUsers:
             raise ValueError("kakao-users.json 꼴이 깨졌습니다")
         return users
 
-    def allowed(self, kakao_id):
+    def _save(self, users):
+        save_credential(self.path, json.dumps(users, ensure_ascii=False, indent=1))  # 옆에 써서 바꾸기(600)
+
+    def status(self, kakao_id):
         # 파일이 깨졌으면 아무도 손님이 아니다 — 덮어쓰면 거부 목록이 사라지니 고칠 때까지 막아 둔다.
         with self.lock:
             try:
-                return self._read().get(kakao_id, {}).get("allowed") is True
+                return self._read().get(kakao_id, {}).get("status")
             except ValueError:
-                return False
+                return None
 
     def arrive(self, kakao_id, name):
-        """로그인할 때 — 처음이면 허가로 적고, 들어와도 되는지 돌려준다."""
+        """로그인할 때 — 처음이면 대기로 적고, 지금 상태를 돌려준다."""
         now = datetime.now(timezone.utc).isoformat()
         with self.lock:
             users = self._read()
-            user = users.setdefault(kakao_id, {"name": name, "allowed": True, "first": now})
+            user = users.setdefault(kakao_id, {"name": name, "status": "pending", "tries": 0, "first": now})
             user["name"] = name or user.get("name", "")
             user["last"] = now
-            save_credential(self.path, json.dumps(users, ensure_ascii=False, indent=1))  # 옆에 써서 바꾸기(600)
-            return user["allowed"] is True
+            self._save(users)
+            return user["status"]
 
-    def set_allowed(self, kakao_id, allowed):
+    def try_code(self, kakao_id, right):
+        """대기 중인 사람이 초대 번호를 넣었다 — (지금 상태, 남은 기회). 맞으면 허가, 틀리면 기회가 준다."""
+        with self.lock:
+            users = self._read()
+            user = users.get(kakao_id)
+            if not user or user["status"] != "pending":
+                return (user or {}).get("status"), 0
+            if user.get("tries", 0) >= self.TRIES:
+                return "pending", 0
+            if right:
+                user["status"] = "allowed"
+            else:
+                user["tries"] = user.get("tries", 0) + 1
+            self._save(users)
+            return user["status"], self.TRIES - user.get("tries", 0)
+
+    def set_status(self, kakao_id, status):
+        if status not in ("allowed", "denied"):
+            raise InvalidRequest("status 는 allowed·denied 여야 합니다.")
         with self.lock:
             users = self._read()
             if kakao_id not in users:
                 raise InvalidRequest("없는 사람입니다.")
-            users[kakao_id]["allowed"] = allowed
-            save_credential(self.path, json.dumps(users, ensure_ascii=False, indent=1))
+            users[kakao_id]["status"] = status
+            self._save(users)
 
     def listing(self):
         with self.lock:
@@ -391,7 +415,7 @@ def safe_static_path(root: Path, request_path: str):
 
 class OpsHandler(BaseHTTPRequestHandler):
     """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
-    root = store = credential = states = throttle = password_file = activity = kakao = kakao_users = kakao_exchange = kakao_secret = None
+    root = store = credential = states = throttle = password_file = activity = kakao = kakao_users = kakao_exchange = kakao_secret = join_code = None
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
@@ -425,8 +449,11 @@ class OpsHandler(BaseHTTPRequestHandler):
                 self._json(503, {"error": "기록을 읽지 못했습니다. 잠시 후 다시 조회하세요."})
         elif path == "/api/session":
             role = self._role()
+            # 카카오로 들어왔지만 아직 대기면 로그인 화면이 초대 번호 칸을 띄운다.
+            pending = role is None and self._kakao_status() == "pending"
             self._json(200, {"signedIn": role == "admin", "role": role}
-                       | ({"ota": ota_token(self.credential)} if role == "admin" else {}))
+                       | ({"ota": ota_token(self.credential)} if role == "admin" else {})
+                       | ({"pending": True} if pending else {}))
         elif path == "/api/signed-in":
             # nginx auth_request 가 내려받기 파일마다 묻는다(사용자 2026-10-09) — 본문 없이 204/401 만.
             # 관리자·손님 쿠키, 또는 원래 주소(X-Original-URI)에 붙은 「내 아이폰에 설치」 표.
@@ -458,6 +485,9 @@ class OpsHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/password":
             self._change_password()
+            return
+        if path == "/api/kakao/join":
+            self._kakao_join()
             return
         if path != "/api/login":
             self._json(404, {"error": "없는 API입니다."})
@@ -493,10 +523,7 @@ class OpsHandler(BaseHTTPRequestHandler):
         if path.startswith("/api/kakao/users/"):
             # 허가·거부 바꾸기 — 관리자만(위에서 걸렀다).
             try:
-                allowed = self._body(256).get("allowed")
-                if not isinstance(allowed, bool):
-                    raise InvalidRequest("allowed 는 true·false 여야 합니다.")
-                self.kakao_users.set_allowed(unquote(path[len("/api/kakao/users/"):]), allowed)
+                self.kakao_users.set_status(unquote(path[len("/api/kakao/users/"):]), self._body(256).get("status"))
                 self._json(200, self.kakao_users.listing())
             except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
                 self._json(400, {"error": str(error)})
@@ -586,10 +613,48 @@ class OpsHandler(BaseHTTPRequestHandler):
         # 관리자(비밀번호 쿠키·Basic) · 손님(허가된 카카오 쿠키). 거부된 카카오 사람은 쿠키가 맞아도 손님이 아니다.
         if self._signed_in():
             return "admin"
-        kakao_id = kakao_session_id(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.kakao_secret)
-        if kakao_id and self.kakao_users.allowed(kakao_id):
-            return "member"
-        return None
+        return "member" if self._kakao_status() == "allowed" else None
+
+    def _kakao_id(self):
+        return kakao_session_id(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.kakao_secret)
+
+    def _kakao_status(self):
+        kakao_id = self._kakao_id()
+        return self.kakao_users.status(kakao_id) if kakao_id else None
+
+    def _kakao_join(self):
+        # 대기 중인 카카오 사람이 초대 번호를 넣는다(사용자 2026-10-10) — 맞으면 바로 허가. 번호는 서버 data/join-code 에만.
+        kakao_id = self._kakao_id()
+        if not kakao_id:
+            self._json(401, {"error": "카카오 로그인을 먼저 해 주세요."})
+            return
+        who = self._client()
+        if self.throttle.blocked(who):
+            self._json(429, {"error": "너무 여러 번 틀렸습니다. 10분 뒤에 다시 해 주세요."})
+            return
+        try:
+            code = self._body(256).get("code")
+        except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+            self._json(400, {"error": str(error)})
+            return
+        if not self.join_code:
+            self._json(403, {"error": "초대 번호로는 들어올 수 없습니다 — 관리자 승인을 기다려 주세요."})
+            return
+        right = isinstance(code, str) and same_secret(code.strip(), self.join_code)
+        try:
+            status, left = self.kakao_users.try_code(kakao_id, right)
+        except (OSError, ValueError):
+            self._json(500, {"error": SAVE_FAILED})
+            return
+        if status == "allowed":
+            self._json(200, {"ok": True})
+        elif status == "denied" or status is None:
+            self._json(403, {"error": "들어올 수 없는 계정입니다. 관리자에게 물어보세요."})
+        elif left <= 0:
+            self._json(403, {"error": "여러 번 틀려 번호로는 들어올 수 없습니다 — 관리자 승인을 기다려 주세요."})
+        else:
+            self.throttle.failed(who)
+            self._json(403, {"error": f"번호가 맞지 않습니다. 남은 기회 {left}번."})
 
     def _kakao_start(self):
         # 카카오 동의 화면으로 — 돌아왔을 때 같은 사람인지 보려고 state 를 쿠키에(Lax: 카카오에서 돌아오는 길에도 실린다).
@@ -622,16 +687,18 @@ class OpsHandler(BaseHTTPRequestHandler):
             self._redirect("/login.html?error=kakao", clear)
             return
         try:
-            allowed = self.kakao_users.arrive(kakao_id, name)
+            status = self.kakao_users.arrive(kakao_id, name)
         except (OSError, ValueError):  # 목록 파일이 깨졌으면 덮어쓰지 않고 들이지 않는다
             self._redirect("/login.html?error=kakao", clear)
             return
-        if not allowed:
+        if status == "denied":
             self._redirect("/login.html?error=denied", clear)
             return
+        # 대기여도 쿠키는 준다 — 누구인지 알아야 초대 번호를 받는다. 대기인 동안은 로그인 화면 밖으로 못 나간다.
         session = (f"{SESSION_COOKIE}={kakao_session(self.kakao_secret, kakao_id, REMEMBER_SECONDS)}; Path=/; HttpOnly; Secure;"
                    f" SameSite=Lax; Max-Age={REMEMBER_SECONDS}")
-        self._redirect(safe_next(unquote(target)), clear, session)
+        target = safe_next(unquote(target))
+        self._redirect(target if status == "allowed" else "/login.html?next=" + quote(target, safe=""), clear, session)
 
     def _redirect(self, location, *cookies):
         self.send_response(302)
@@ -721,7 +788,7 @@ class OpsHandler(BaseHTTPRequestHandler):
 
 
 def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None,
-                kakao=None, kakao_users=None, exchange=None, kakao_secret=None):
+                kakao=None, kakao_users=None, exchange=None, kakao_secret=None, join_code=None):
     return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
                                            "states": states, "throttle": throttle or LoginThrottle(),
                                            "password_file": password_file,
@@ -729,7 +796,8 @@ def handler_for(root, store, credential, states=None, throttle=None, password_fi
                                            "kakao": kakao,
                                            "kakao_users": kakao_users or KakaoUsers(store.path.parent / "kakao-users.json"),
                                            "kakao_exchange": staticmethod(exchange or kakao_exchange),
-                                           "kakao_secret": kakao_secret or secrets.token_hex(32)})
+                                           "kakao_secret": kakao_secret or secrets.token_hex(32),
+                                           "join_code": join_code})
 
 
 def main():
@@ -756,6 +824,9 @@ def main():
     if not secret_file.exists():
         save_credential(secret_file, secrets.token_hex(32))
     kakao_secret = secret_file.read_text(encoding="utf-8").strip()
+    # 초대 번호(cloud-dashboard.sh join-code) — 공개 저장소에 적지 않는다. 없으면 대기한 사람은 관리자 승인만 기다린다.
+    join_file = args.password_file.with_name("join-code")
+    join_code = join_file.read_text(encoding="utf-8").strip() if join_file.exists() else None
     data = args.overrides.parent
     log = data / "changes.jsonl"
     stores = (OverrideStore(args.catalog, args.overrides, log), StateStore(data / "state", log))
@@ -763,7 +834,7 @@ def main():
     activity.start()
     server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1],
                                                                      password_file=args.password_file, activity=activity,
-                                                                     kakao=kakao, kakao_secret=kakao_secret))
+                                                                     kakao=kakao, kakao_secret=kakao_secret, join_code=join_code))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

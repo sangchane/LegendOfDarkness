@@ -5,6 +5,7 @@
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh release [ios|windows|android]   맥의 최신 앱 파일을 내려받기 페이지(/download/)에 올린다
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.txt   카카오 로그인 앱 키(REST API 키·Client Secret 두 줄)
+#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh join-code < ~/LOD-backups/join-code.txt   카카오로 처음 온 사람이 넣으면 바로 허가되는 초대 번호
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh nginx    nginx 설정만 다시 깐다(페이지·서비스는 그대로) — 내려받기 파일 종류를 늘렸을 때
 set -euo pipefail
 
@@ -250,7 +251,7 @@ SH
 backup() {
     local out="$BACKUP_DIR/ops-data-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$out"
-    rsync -az --timeout=60 --exclude '*credential' --exclude 'kakao.json' --exclude 'session-secret' -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
+    rsync -az --timeout=60 --exclude '*credential' --exclude 'kakao.json' --exclude 'session-secret' --exclude 'join-code' -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
     echo "관리 페이지 값 백업 — $out"
     ls -la "$out"
 }
@@ -346,6 +347,16 @@ print(json.dumps({"client_id": key, "client_secret": secret, "redirect_uri": sys
     echo "카카오 키를 넣었습니다 — 돌아오는 주소 https://$DOMAIN/api/kakao/callback 이 카카오 앱 설정과 같아야 합니다."
 }
 
+# 초대 번호(사용자 2026-10-10) — 카카오로 처음 온 사람은 대기, 이 번호를 넣으면 바로 허가. 공개 저장소에 적지 않고 stdin 으로만.
+set_join_code() {
+    local code
+    IFS= read -r code || true
+    code="$(printf '%s' "$code" | tr -d '[:space:]')"
+    [[ "$code" =~ ^[0-9A-Za-z]{4,32}$ ]] || { echo "초대 번호는 영문·숫자 4~32자 한 줄이어야 합니다" >&2; exit 1; }
+    printf '%s\n' "$code" | remote "umask 077; cat > $REMOTE/data/join-code.new && mv $REMOTE/data/join-code.new $REMOTE/data/join-code && sudo systemctl restart lod-ability-ops"
+    echo "초대 번호를 바꿨습니다(화면에는 찍지 않음)."
+}
+
 save_credentials() {
     mkdir -p "$BACKUP_DIR"
     umask 077
@@ -364,7 +375,8 @@ case "${1:-status}" in
     cert) cert ;;
     password) set_password "${2:-}" ;;
     kakao-keys) set_kakao_keys ;;
+    join-code) set_join_code ;;
     release) release "${2:-ios}" ;;
     nginx) nginx_site; remote "sudo nginx -t && sudo systemctl reload nginx" ;;
-    *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password kakao-keys release nginx"; exit 2 ;;
+    *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password kakao-keys join-code release nginx"; exit 2 ;;
 esac

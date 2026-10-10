@@ -9,6 +9,7 @@
   <style>
     :root { --bg: #f2f4f6; --card: #fff; --ink: #191f28; --muted: #6b7684; --line: #e5e8eb; --blue: #3182f6; --bad: #f04452; }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }  /* .kakao 처럼 display 를 준 것도 숨긴다 */
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px;
            background: var(--bg); color: var(--ink); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif; }
     main { width: 100%; max-width: 360px; background: var(--card); border-radius: 20px; padding: 28px 24px; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
@@ -31,12 +32,22 @@
     .keep input { width: 18px; height: 18px; accent-color: var(--blue); }
     button { width: 100%; font: inherit; font-weight: 600; padding: 13px; border: 0; border-radius: 12px; background: var(--blue); color: #fff; cursor: pointer; }
     button:disabled { opacity: .6; }
+    .note { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+    #join input { width: 100%; font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #f9fafb; margin-bottom: 16px; }
+    #join input:focus { outline: 2px solid var(--blue); outline-offset: 1px; background: #fff; }
   </style>
 </head>
 <body>
   <main>
     <div class="brand"><span class="mark" aria-hidden="true">L</span><h1>LOD 대시보드</h1></div>
     <a class="kakao" id="kakao" href="/api/kakao/start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.8 1.8 5.27 4.54 6.69l-.97 3.56c-.09.31.27.56.54.38l4.2-2.78c.55.07 1.11.11 1.69.11 5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg>카카오 로그인</a>
+    <!-- 카카오로 처음 온 사람(대기) — 초대 번호를 맞히면 바로 들어오고, 모르면 관리자 승인을 기다린다(사용자 2026-10-10). -->
+    <form id="join" hidden>
+      <p class="note">카카오 로그인은 됐습니다. 초대 번호를 넣으면 바로 들어오고, 모르면 관리자 승인을 기다려 주세요.</p>
+      <label for="join-code">초대 번호</label>
+      <input id="join-code" inputmode="numeric" autocomplete="off" maxlength="32" required>
+      <button type="submit">확인</button>
+    </form>
     <p class="error" id="error" role="alert"></p>
     <details>
       <summary>관리자 비밀번호로 들어가기</summary>

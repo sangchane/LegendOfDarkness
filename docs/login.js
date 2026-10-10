@@ -28,8 +28,31 @@
     .then(function (body) {
       if (body.role === "admin") { window.location.replace(target.href); }
       else if (body.role === "member") { form.closest("details").open = true; }
+      else if (body.pending) { join.hidden = false; document.getElementById("kakao").hidden = true; document.getElementById("join-code").focus(); }
     })
     .catch(function () {});
+
+  // 초대 번호 — 맞으면 서버가 허가로 바꾸고, 원래 가려던 화면으로.
+  var join = document.getElementById("join");
+  join.addEventListener("submit", function (event) {
+    event.preventDefault();
+    var button = join.querySelector("button");
+    button.disabled = true;
+    error.textContent = "";
+    fetch("/api/kakao/join", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: document.getElementById("join-code").value })
+    }).then(function (response) {
+      return response.json().then(function (body) {
+        if (!response.ok) { throw new Error(body.error || "들어가지 못했습니다."); }
+        window.location.href = target.href;
+      });
+    }).catch(function (e) {
+      error.textContent = e.message;
+      button.disabled = false;
+    });
+  });
 
   form.addEventListener("submit", function (event) {
     event.preventDefault();

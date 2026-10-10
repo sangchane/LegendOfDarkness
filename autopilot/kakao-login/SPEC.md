@@ -2,7 +2,8 @@
 
 ## 배경
 사용자: 「홈페이지 말이야 아무나 접근 할 수 없게 해줄래 카카오톡 로그인 같은 기능 말이야」.
-정한 것(같은 날): 카카오로 처음 들어오면 **일단 모두 허가**, 관리자가 모르는 사람을 **거부**로 바꾼다 ·
+정한 것(같은 날): 카카오로 처음 들어오면 **대기** — **초대 번호**를 맞히면 즉시 허가, 못 넣으면 관리자가 허가·거부
+(사용자 「카카오로그인하면 아무나 이용가능하니까 … 입력하면 즉시 승인이고 입력 못하면 대기상태로 하자」, 처음안 「일단 모두 허가」를 바꿈) ·
 손님 4자리 비밀번호는 없애고 관리자 비밀번호는 비상용으로 남긴다 · 카카오 손님이 보는 범위는 지금 손님과 같다
 (자료 보기·앱 내려받기. 편집·접속 기록·사람 관리는 관리자만).
 
@@ -22,7 +23,10 @@
      (grant_type=authorization_code, client_id, redirect_uri, code, client_secret) → `GET https://kapi.kakao.com/v2/user/me`(Bearer)
      → `id`(정수)·닉네임. 교환 함수는 클래스 속성 `kakao_exchange` 로 두어 시험이 가짜로 바꾼다.
    - 실패(state 다름·취소 `error=`·교환 실패) → `/login.html?error=kakao`. 설정 파일 없음 → `?error=kakao-off`. 거부된 사람 → `?error=denied`.
-2. **사람 목록** `data/kakao-users.json` — `{"<id>": {"name", "allowed", "first", "last"}}`(UTC ISO). 처음 오면 `allowed: true`, 올 때마다 `last`.
+2. **사람 목록** `data/kakao-users.json` — `{"<id>": {"name", "status": allowed|pending|denied, "tries", "first", "last"}}`(UTC ISO).
+   처음 오면 `pending`, 카카오 로그인 때마다 `last`. 대기여도 세션 쿠키는 준다(누구인지 알아야 번호를 받는다) — 대기는 로그인 화면 밖으로 못 나간다.
+   **초대 번호** `data/join-code`(600, `cloud-dashboard.sh join-code` 가 stdin 으로 — 공개 저장소에 적지 않는다): `POST /api/kakao/join {"code"}`
+   맞으면 `allowed`, 틀리면 `tries`+1, 5번이면 번호로는 못 들어오고 관리자를 기다린다(IP 횟수 제한도 함께). 번호 파일이 없으면 모두 관리자 승인.
    잠금 하나로 읽고·바꾸고, `save_credential` 처럼 옆에 써서 이름 바꾸기.
 3. **카카오 세션** — 쿠키 `lod_ops=k<id>.<만료>.<서명>`, 서명 = HMAC(session_key(`data/session-secret`), `kakao:<id>:<만료>`), 30일,
    SameSite=Lax(카카오에서 돌아오는 302 사슬에서도 쿠키가 실리게). 요청마다 목록에서 `allowed` 를 본다 — 거부하면 바로 끊긴다.
@@ -31,7 +35,7 @@
 4. **모두 잠그기** — 역할이 없으면 `_static` 은 `login.html`·`login.js`·`favicon.svg` 만 주고 나머지는 `/login.html?next=<원래 주소>` 로 302.
    `GET /api/state/*`·`/api/ability-overrides` 는 401. `/api/session`·`/api/health`·`/api/signed-in`·`/api/ota-manifest`·카카오 두 길은 그대로 열림.
 5. **역할** — 관리자 쿠키·Basic → `admin`, 허가된 카카오 쿠키 → `member`, 그 밖 → 없음. 손님 비밀번호(`member`)와 `member-credential` 읽기를 없앤다.
-6. **관리 API(관리자만)** — `GET /api/kakao/users` → `[{id, name, allowed, first, last}]`(마지막 접속 순) · `PUT /api/kakao/users/<id>` `{"allowed": bool}`.
+6. **관리 API(관리자만)** — `GET /api/kakao/users` → `[{id, name, allowed, first, last}]`(마지막 접속 순) · `PUT /api/kakao/users/<id>` `{"status": "allowed"|"denied"}`.
 7. **화면**
    - `docs/login.html`·`login.js`: 노란 「카카오 로그인」 단추(카카오 디자인 — 배경 #FEE500, 글자 #000 85%, 말풍선 심볼) → `/api/kakao/start?next=…`.
      관리자 비밀번호 칸은 그 아래 「관리자 비밀번호로 들어가기」 접힘. `?error=` 문구 셋.
@@ -43,12 +47,13 @@
 ## 완료 기준
 - [ ] SC-1 로그인 없이 `/index.html`·`/?view=abilities` → 302 `/login.html?next=…`, `/api/state/x`·`/api/ability-overrides` → 401, `/login.html` 200 — 시험
 - [ ] SC-2 `/api/kakao/start` → 302 kauth 주소(client_id·redirect_uri·state), state 쿠키 Lax·HttpOnly — 시험
-- [ ] SC-3 callback: 맞는 state + 가짜 교환 → 세션 쿠키·302 next, 목록에 allowed true · 다른 state/`error=` → `?error=kakao`, 쿠키 없음 — 시험
+- [ ] SC-3 callback: 맞는 state + 가짜 교환 → 세션 쿠키 · 처음이면 대기(302 `/login.html?next=…`), 허가된 사람은 302 next · 다른 state/`error=` → `?error=kakao`, 쿠키 없음 — 시험
 - [ ] SC-4 카카오 손님: `/index.html` 200 · `/api/signed-in` 204 · PUT·activity·password·kakao/users 401 · session `{"signedIn": false, "role": "member"}` — 시험
 - [ ] SC-5 거부로 바꾸면 그 쿠키로 바로 302/401, 다시 카카오로 와도 `?error=denied` — 시험
 - [ ] SC-6 손님 비밀번호로는 못 들어온다(401), 관리자 비밀번호·Basic·OTA 표는 그대로 — 시험(기존 시험 고침)
 - [ ] SC-7 `next` 가 바깥 주소(`//evil`·`/\evil`·`https://…`)면 `/` 로 — 시험
 - [ ] SC-8 화면: 로그인(카카오 단추·접힌 관리자 칸, 390px·1440px) · 계정 관리 표 — 헤드리스 사진
+- [ ] SC-10 대기: 화면·내려받기 막힘, `/api/session` 에 `pending`, 맞는 번호 → 허가, 틀리면 남은 기회, 5번 뒤 번호 안 먹음, 관리자 허가 — 시험
 - [ ] SC-9 클라우드: 키를 넣고 배포 → 로그인 없이 302 · version-ios.txt 200 · 사용자가 폰에서 카카오로 들어옴 · 관리자 화면에 그 이름
 
 ## 테스트 계획

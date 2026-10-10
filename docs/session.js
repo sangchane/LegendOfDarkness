@@ -16,7 +16,7 @@
     var error = document.getElementById("account-error");
     var people = document.getElementById("kakao-people-list");
 
-    // 카카오로 들어온 사람 — 처음엔 허가, 관리자가 [거부]로 바꾼다(사용자 2026-10-10). 닉네임은 남이 정한 글자라 textContent 로만.
+    // 카카오로 들어온 사람 — 처음엔 대기(초대 번호를 맞히면 허가), 관리자가 허가·거부(사용자 2026-10-10). 닉네임은 남이 정한 글자라 textContent 로만.
     function showPeople(list) {
       people.replaceChildren();
       if (!list.length) {
@@ -28,31 +28,37 @@
       }
       list.forEach(function (person) {
         var row = document.createElement("li");
-        row.classList.toggle("is-denied", !person.allowed);
+        row.classList.toggle("is-denied", person.status === "denied");
         var text = document.createElement("span");
         var name = document.createElement("b");
         name.textContent = person.name || "(이름 없음)";
         var when = document.createElement("small");
         var last = new Date(person.last || person.first);
-        when.textContent = (person.allowed ? "허가" : "거부") + " · 마지막 " + last.toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
+        when.textContent = ({ allowed: "허가", pending: "대기", denied: "거부" }[person.status] || "?") + " · 마지막 " +
+          last.toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
         text.append(name, when);
-        var flip = document.createElement("button");
-        flip.type = "button";
-        flip.className = person.allowed ? "session-plain" : "session-button";
-        flip.textContent = person.allowed ? "거부" : "허가";
-        flip.addEventListener("click", function () {
-          flip.disabled = true;
-          fetch("/api/kakao/users/" + encodeURIComponent(person.id), {
-            method: "PUT", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ allowed: !person.allowed })
-          }).then(function (response) {
-            return response.json().then(function (body) {
-              if (!response.ok) { throw new Error(body.error || "바꾸지 못했습니다."); }
-              showPeople(body);
-            });
-          }).catch(function (e) { error.textContent = e.message; flip.disabled = false; });
+        row.append(text);
+        // 허가된 사람은 [거부], 거부된 사람은 [허가], 대기는 둘 다.
+        [["allowed", "허가", "session-button"], ["denied", "거부", "session-plain"]].forEach(function (choice) {
+          if (person.status === choice[0]) { return; }
+          var flip = document.createElement("button");
+          flip.type = "button";
+          flip.className = choice[2];
+          flip.textContent = choice[1];
+          flip.addEventListener("click", function () {
+            flip.disabled = true;
+            fetch("/api/kakao/users/" + encodeURIComponent(person.id), {
+              method: "PUT", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ status: choice[0] })
+            }).then(function (response) {
+              return response.json().then(function (body) {
+                if (!response.ok) { throw new Error(body.error || "바꾸지 못했습니다."); }
+                showPeople(body);
+              });
+            }).catch(function (e) { error.textContent = e.message; flip.disabled = false; });
+          });
+          row.append(flip);
         });
-        row.append(text, flip);
         people.append(row);
       });
     }
