@@ -4,7 +4,7 @@
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh setup
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh release [ios|windows|android]   맥의 최신 앱 파일을 내려받기 페이지(/download/)에 올린다
-#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.txt   카카오 로그인 앱 키(REST API 키·Client Secret 두 줄)
+#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.env   카카오 로그인 앱 키(KAKAO_REST_API_KEY·KAKAO_CLIENT_SECRET 두 줄)
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh join-code < ~/LOD-backups/join-code.txt   카카오로 처음 온 사람이 넣으면 바로 허가되는 초대 번호
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh nginx    nginx 설정만 다시 깐다(페이지·서비스는 그대로) — 내려받기 파일 종류를 늘렸을 때
 set -euo pipefail
@@ -330,17 +330,17 @@ sudo systemctl restart lod-ability-ops'
     save_credentials
 }
 
-# 카카오 로그인 앱 키(사용자 2026-10-10) — developers.kakao.com 「앱 키」의 REST API 키와 「보안」의 Client Secret 을 두 줄로.
-#   LOD_CLOUD_IP=… scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.txt
-# 줄마다 마지막 낱말을 쓴다(「REST API 키: abcd…」처럼 적어도 된다). 키는 stdin 으로만 넘기고 화면에 찍지 않는다.
+# 카카오 로그인 앱 키(사용자 2026-10-10) — developers.kakao.com [앱] > [플랫폼 키] > [REST API 키] 화면의 키와 [클라이언트 시크릿].
+#   LOD_CLOUD_IP=… scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.env
+# 「#」 줄을 빼고 줄마다 =·:·빈칸 뒤 마지막 값을 쓴다(KAKAO_REST_API_KEY=… 첫 줄, KAKAO_CLIENT_SECRET=… 둘째 줄). 키는 stdin 으로만 넘기고 화면에 찍지 않는다.
 set_kakao_keys() {
     local json
     json="$(python3 -c '
 import json, re, sys
-words = [line.split()[-1] for line in sys.stdin.read().splitlines() if line.strip()]
+words = [re.split(r"[\s=:]+", line.strip())[-1] for line in sys.stdin.read().splitlines() if line.strip() and not line.lstrip().startswith("#")]
 key, secret = (words + ["", ""])[:2]
 if not re.fullmatch(r"[0-9A-Za-z]{16,64}", key) or not re.fullmatch(r"[0-9A-Za-z]{16,64}", secret):
-    sys.exit("REST API 키(첫 줄)·Client Secret(둘째 줄) 둘 다 있어야 합니다(영문·숫자 16~64자) — 카카오 「보안」에서 Client Secret 을 켜 주세요")
+    sys.exit("REST API 키(첫 줄)·Client Secret(둘째 줄) 둘 다 있어야 합니다(영문·숫자 16~64자) — 카카오 [플랫폼 키] > [REST API 키] > [클라이언트 시크릿]")
 print(json.dumps({"client_id": key, "client_secret": secret, "redirect_uri": sys.argv[1]}))
 ' "https://$DOMAIN/api/kakao/callback")"
     printf '%s\n' "$json" | remote "umask 077; cat > $REMOTE/data/kakao.json.new && mv $REMOTE/data/kakao.json.new $REMOTE/data/kakao.json && sudo systemctl restart lod-ability-ops"

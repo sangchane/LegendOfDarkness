@@ -41,7 +41,7 @@
      관리자 비밀번호 칸은 그 아래 「관리자 비밀번호로 들어가기」 접힘. `?error=` 문구 셋.
    - `docs/index.html`·`session.js`: 관리자 「계정 관리」 창에 「카카오로 들어온 사람」 표(이름·처음·마지막·[허가/거부]).
 8. **운영** — `cloud-dashboard.sh`: `member-password` 명령·함수를 지우고 배포 때 `data/member-credential` 을 지운다 ·
-   `kakao-keys` 명령(stdin 두 줄: REST API 키, Client Secret → `data/kakao.json` 600, redirect `https://lodgame.duckdns.org/api/kakao/callback`) ·
+   `kakao-keys` 명령(stdin env 두 줄: `KAKAO_REST_API_KEY=`, `KAKAO_CLIENT_SECRET=` → `data/kakao.json` 600, redirect `https://lodgame.duckdns.org/api/kakao/callback`) ·
    backup 은 `kakao.json` 을 받지 않는다. 설정 파일 `kakao.json` = `{"client_id", "client_secret", "redirect_uri"}`.
 
 ## 완료 기준
