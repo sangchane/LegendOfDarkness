@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Darkages.Security;
 using Darkages.Types;
 using Lod.Mobile.Core.Net;
 using Xunit;
@@ -58,6 +59,40 @@ public sealed class KakaoLoginTests : IDisposable
     }
 
     [Fact]
+    public void Asking_the_service_reads_its_answer_and_fails_closed()
+    {
+        using var check = new FakeCheck();
+        Assert.Equal(new KakaoLogin.Check("1", null), KakaoLogin.Ask(check.Url, Token("1")));
+        Assert.Equal(new KakaoLogin.Check(null, KakaoLogin.Pending), KakaoLogin.Ask(check.Url, Token("9")));
+        Assert.Equal(new KakaoLogin.Check(null, KakaoLogin.Denied), KakaoLogin.Ask(check.Url, Token("8")));
+        Assert.Equal(new KakaoLogin.Check(null, KakaoLogin.Expired), KakaoLogin.Ask(check.Url, Token("5")));
+        // 서비스가 꺼졌거나 주소가 틀리면 들이지 않는다.
+        Assert.Equal(new KakaoLogin.Check(null, KakaoLogin.Unreachable), KakaoLogin.Ask($"http://127.0.0.1:{FreePort()}/api/kakao/game-check", Token("1")));
+        Assert.Equal(new KakaoLogin.Check(null, KakaoLogin.Unreachable), KakaoLogin.Ask("not a url", Token("1")));
+    }
+
+    [Fact]
+    public void Linking_an_old_character_stops_after_five_wrong_passwords_for_ten_minutes()
+    {
+        DateTime now = DateTime.UtcNow;
+        string name = "link" + Guid.NewGuid().ToString("N")[..6];
+        for (int wrong = 0; wrong < 4; wrong++)
+            KakaoLogin.LinkFailed(name, now);
+        Assert.False(KakaoLogin.LinkBlocked(name, now));
+        KakaoLogin.LinkFailed(name, now);
+        Assert.True(KakaoLogin.LinkBlocked(name, now));
+        Assert.False(KakaoLogin.LinkBlocked("x" + name, now));
+        Assert.False(KakaoLogin.LinkBlocked(name, now.AddMinutes(11)));
+    }
+
+    private static int FreePort()
+    {
+        using var probe = new TcpListener(IPAddress.Loopback, 0);
+        probe.Start();
+        return ((IPEndPoint)probe.LocalEndpoint).Port;
+    }
+
+    [Fact]
     public async Task A_game_token_makes_its_own_character_and_links_an_old_one_with_its_old_password_once()
     {
         using var check = new FakeCheck();
@@ -79,6 +114,8 @@ public sealed class KakaoLoginTests : IDisposable
         using (await HadesLoginClient.CreateCharacterAsync(IPAddress.Loopback, server.LoginPort, "kakaonew", Token("1"),
                    hairStyle: 1, gender: 1, hairColor: 1, path: 1, cancellationToken: token)) { }
         Assert.Equal("1", Owner("kakaonew"));
+        string kept = JsonNode.Parse(File.ReadAllText(Path.Combine(server.ContentLocation, "aislings", "kakaonew.json")))!["Password"]!.GetValue<string>();
+        Assert.False(Passwords.Verify(kept, Token("1"), out _));
         using (await Login(IPAddress.Loopback, "kakaonew", Token("1"))) { }
         Assert.Contains(KakaoLogin.OtherOwner, await Refused(IPAddress.Loopback, "kakaonew", Token("2")));
         Assert.Contains(KakaoLogin.Pending, await Refused(IPAddress.Loopback, "kakaonew", Token("9")));
@@ -97,9 +134,10 @@ public sealed class KakaoLoginTests : IDisposable
         // 같은 기계의 평문(봇 셋)은 그대로, 밖의 평문(옛 앱)은 거절.
         LoginFlow.TryCreateAccount(server, "botlike");
         using (await Login(IPAddress.Loopback, "botlike", LoginFlow.SyntheticSecret)) { }
+        Assert.Equal(0x00, LoginFlow.ChangePassword(server.LoginPort, "botlike", LoginFlow.SyntheticSecret, "botsecret2"));
         IPAddress? lan = EcoBotServerTests.OtherAddress();
         if (lan != null)
-            Assert.Contains(KakaoLogin.OldApp, await Refused(lan, "botlike", LoginFlow.SyntheticSecret));
+            Assert.Contains(KakaoLogin.OldApp, await Refused(lan, "botlike", "botsecret2"));
     }
 
     /// <summary>홈페이지 서비스의 <c>/api/kakao/game-check</c> 대신 — 표 셋만 안다.</summary>
@@ -134,6 +172,7 @@ public sealed class KakaoLoginTests : IDisposable
                 (int status, string json) = token == Token("1") ? (200, "{\"id\":\"1\"}")
                     : token == Token("2") ? (200, "{\"id\":\"2\"}")
                     : token == Token("9") ? (403, "{\"status\":\"pending\"}")
+                    : token == Token("8") ? (403, "{\"status\":\"denied\"}")
                     : (401, "{}");
                 byte[] bytes = Encoding.UTF8.GetBytes(json);
                 context.Response.StatusCode = status;

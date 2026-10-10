@@ -416,39 +416,61 @@ def safe_static_path(root: Path, request_path: str):
 
 class AppTickets:
     """앱 카카오 로그인 표(사용자 2026-10-11 「게임클라이언트에도 적용해」) — 앱이 받아 브라우저로 카카오 로그인을 시키고,
-    끝나면 그 표로 게임 표를 받는다(딥링크 없음). 메모리에만 10분 — 서비스를 다시 켜면 앱은 처음부터 다시 한다."""
-    LIFETIME, LIMIT = 600, 1000
+    끝나면 브라우저가 6자리 번호를 보여 준다. 앱은 그 번호를 넣어야 게임 표를 받는다 — 남이 만든 링크를 열어 버려도
+    번호는 그 사람 브라우저 화면에만 있어 가로챌 수 없다(보안 리뷰 2026-10-11). 메모리에만 10분 — 다시 켜면 앱은 처음부터."""
+    LIFETIME, LIMIT, PER_CLIENT, TRIES = 600, 1000, 20, 5
 
     def __init__(self):
         self.lock = threading.Lock()
-        self.tickets = {}  # 표 → [만료, 카카오 회원번호 또는 None, 닉네임]
+        self.tickets = {}  # 표 → {"expiry", "client", "id"(None 이면 아직), "name", "code", "tries"}
 
-    def create(self, now=None):
+    def create(self, client, now=None):
         now = now or time.time()
         with self.lock:
-            self.tickets = {key: entry for key, entry in self.tickets.items() if entry[0] > now}
-            if len(self.tickets) >= self.LIMIT:
+            self.tickets = {key: entry for key, entry in self.tickets.items() if entry["expiry"] > now}
+            # 한 주소가 표를 쌓아 남의 로그인을 막지 못하게(전체 상한과 따로).
+            if len(self.tickets) >= self.LIMIT or sum(entry["client"] == client for entry in self.tickets.values()) >= self.PER_CLIENT:
                 return None
             ticket = secrets.token_urlsafe(32)
-            self.tickets[ticket] = [now + self.LIFETIME, None, ""]
+            self.tickets[ticket] = {"expiry": now + self.LIFETIME, "client": client, "id": None, "name": "", "code": "", "tries": 0}
             return ticket
 
-    def get(self, ticket, now=None):
-        """(카카오 회원번호 또는 None, 닉네임). 없거나 지났으면 None."""
+    def exists(self, ticket, now=None):
         with self.lock:
             entry = self.tickets.get(ticket) if isinstance(ticket, str) else None
-            return (entry[1], entry[2]) if entry and entry[0] > (now or time.time()) else None
+            return bool(entry) and entry["expiry"] > (now or time.time())
 
     def bind(self, ticket, kakao_id, name):
-        # 처음 묶인 사람으로 굳는다 — 같은 표로 다른 카카오 계정이 덮어쓰지 못하게.
+        """카카오 로그인이 끝난 표에 그 사람을 묶고 앱에 넣을 번호를 돌려준다. 다른 사람이 이미 묶었으면 None."""
         with self.lock:
             entry = self.tickets.get(ticket)
-            if entry and entry[1] is None:
-                entry[1], entry[2] = kakao_id, name
+            if not entry or entry["id"] not in (None, kakao_id):
+                return None
+            if entry["id"] is None:
+                entry.update(id=kakao_id, name=name, code=f"{secrets.randbelow(10 ** 6):06d}")
+            return entry["code"]
 
-    def drop(self, ticket):
+    def redeem(self, ticket, code, now=None):
+        """("missing",) · ("waiting",) · ("code",) · ("wrong", 남은 기회) · ("ok", 회원번호, 닉네임). 다섯 번 틀리면 표가 사라진다."""
         with self.lock:
-            self.tickets.pop(ticket, None)
+            entry = self.tickets.get(ticket) if isinstance(ticket, str) else None
+            if not entry or entry["expiry"] <= (now or time.time()):
+                return ("missing",)
+            if entry["id"] is None:
+                return ("waiting",)
+            if not code:
+                return ("code",)
+            if not (isinstance(code, str) and same_secret(code.strip(), entry["code"])):
+                entry["tries"] += 1
+                if entry["tries"] >= self.TRIES:
+                    del self.tickets[ticket]
+                return ("wrong", self.TRIES - entry["tries"])
+            return ("ok", entry["id"], entry["name"])
+
+    def take(self, ticket):
+        """한 번만 내준다 — 동시에 물어도 꺼낸 쪽만 True."""
+        with self.lock:
+            return self.tickets.pop(ticket, None) is not None
 
 
 class OpsHandler(BaseHTTPRequestHandler):
@@ -714,7 +736,7 @@ class OpsHandler(BaseHTTPRequestHandler):
         if ticket:
             # 앱이 연 브라우저(사용자 2026-10-11) — 끝나면 「앱으로 돌아가세요」. 모르는 표는 카카오로 보내지 않는다
             # (우리가 만든 표만 쿠키에 실리니 쿠키를 깨는 글자도 못 들어온다).
-            if self.app_tickets.get(ticket) is None:
+            if not self.app_tickets.exists(ticket):
                 self._redirect("/login.html?error=kakao")
                 return
             target = "/app-login.html"
@@ -749,9 +771,6 @@ class OpsHandler(BaseHTTPRequestHandler):
         except (OSError, ValueError):  # 목록 파일이 깨졌으면 덮어쓰지 않고 들이지 않는다
             self._redirect("/login.html?error=kakao", clear)
             return
-        if ticket:
-            # 거부·대기여도 묶는다 — 앱이 기다리다 「거부」·「대기」를 알아야 한다.
-            self.app_tickets.bind(ticket, kakao_id, name)
         if status == "denied":
             self._redirect("/login.html?error=denied", clear)
             return
@@ -759,36 +778,45 @@ class OpsHandler(BaseHTTPRequestHandler):
         session = (f"{SESSION_COOKIE}={kakao_session(self.kakao_secret, kakao_id, REMEMBER_SECONDS)}; Path=/; HttpOnly; Secure;"
                    f" SameSite=Lax; Max-Age={REMEMBER_SECONDS}")
         target = safe_next(unquote(target))
+        if ticket:
+            # 앱에 넣을 번호는 이 브라우저 화면에만 — 주소 # 뒤라 서버로 다시 오지 않는다(대기면 초대 번호 뒤에 그 화면으로).
+            target = "/app-login.html#" + (self.app_tickets.bind(ticket, kakao_id, name) or "used")
         self._redirect(target if status == "allowed" else "/login.html?next=" + quote(target, safe=""), clear, session)
 
     def _app_ticket(self):
         # 앱 카카오 로그인 1 — 표를 받아 브라우저로 start 를 연다(사용자 2026-10-11).
-        ticket = self.app_tickets.create() if self.kakao else None
+        ticket = self.app_tickets.create(self._client()) if self.kakao else None
         if not ticket:
             self._json(503, {"error": "카카오 로그인이 아직 준비되지 않았습니다." if not self.kakao else "잠시 뒤 다시 해 주세요."})
             return
         self._json(200, {"ticket": ticket, "start": "/api/kakao/start?app=" + ticket})
 
     def _app_token(self):
-        # 앱 카카오 로그인 2 — 앱이 몇 초마다 묻는다. 허가되면 게임 표를 한 번만 내주고 표를 지운다.
+        # 앱 카카오 로그인 2 — 앱이 몇 초마다 묻는다. 브라우저 화면의 번호가 맞고 허가면 게임 표를 한 번만 내주고 표를 지운다.
         try:
-            ticket = self._body(256).get("ticket")
+            body = self._body(256)
         except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
             return
-        found = self.app_tickets.get(ticket)
-        if found is None:
+        ticket = body.get("ticket")
+        found = self.app_tickets.redeem(ticket, body.get("code"))
+        if found[0] == "missing":
             self._json(404, {"error": "로그인 표가 없거나 지났습니다. 처음부터 다시 해 주세요."})
             return
-        kakao_id, name = found
-        if kakao_id is None:
-            self._json(202, {"waiting": True})
+        if found[0] in ("waiting", "code"):
+            self._json(202, {found[0]: True})
             return
+        if found[0] == "wrong":
+            self._json(403, {"error": f"번호가 맞지 않습니다. 남은 기회 {found[1]}번.", "left": found[1]})
+            return
+        _, kakao_id, name = found
         status = self.kakao_users.status(kakao_id)
         if status == "pending":
             self._json(202, {"pending": True, "name": name})
             return
-        self.app_tickets.drop(ticket)
+        if not self.app_tickets.take(ticket):
+            self._json(404, {"error": "로그인 표가 없거나 지났습니다. 처음부터 다시 해 주세요."})
+            return
         if status != "allowed":
             self._json(403, {"error": "들어올 수 없는 카카오 계정입니다."})
             return
