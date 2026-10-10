@@ -182,6 +182,23 @@ internal static class LoginFlow
         return session.Client.ReceiveSecured()[0];
     }
 
+    /// <summary>
+    /// 만들기 0x02 만, 또는 그 답이 0x00 이면 0x04(머리 모양·성별·머리색·직업)까지 — 카카오 「표|look」·「표|delete」.
+    /// 마지막 답(메시지 상자)의 종류 바이트와 글.
+    /// </summary>
+    public static (byte Code, string Text) Account(int loginPort, string name, string field, byte[]? character = null)
+    {
+        using LoginSession session = OpenSession(loginPort);
+        session.Client.SendSecured(CreateAccountCommand, ordinal: 0, Credentials(name, field));
+        byte[] answer = session.Client.ReceiveSecured();
+        if (answer[0] == 0x00 && character != null)
+        {
+            session.Client.SendSecured(CreateCharacterCommand, ordinal: 0, character);
+            answer = session.Client.ReceiveSecured();
+        }
+        return (answer[0], LegacyEncoding.GetString(answer, 2, answer[1]).TrimEnd('\0'));
+    }
+
     private static byte[] Credentials() => Credentials(SyntheticName, SyntheticSecret);
 
     private static byte[] Credentials(string name, string secret) =>

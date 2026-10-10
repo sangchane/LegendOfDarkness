@@ -85,6 +85,18 @@ public sealed class KakaoLoginTests : IDisposable
         Assert.False(KakaoLogin.LinkBlocked(name, now.AddMinutes(11)));
     }
 
+    [Fact]
+    public void Changing_a_character_needs_it_to_be_mine_and_out_of_the_game()
+    {
+        Assert.Null(KakaoLogin.MayChange(exists: true, owner: "1", kakaoId: "1", online: false));
+        Assert.Equal(KakaoLogin.NoCharacter, KakaoLogin.MayChange(false, null, "1", false));
+        Assert.Equal(KakaoLogin.OtherOwner, KakaoLogin.MayChange(true, "2", "1", false));
+        Assert.Equal(KakaoLogin.NotLinked, KakaoLogin.MayChange(true, "", "1", false));
+        Assert.Equal(KakaoLogin.InGame, KakaoLogin.MayChange(true, "1", "1", true));
+        // 남의 캐릭터는 접속 중인지도 알려 주지 않는다.
+        Assert.Equal(KakaoLogin.OtherOwner, KakaoLogin.MayChange(true, "2", "1", true));
+    }
+
     private static int FreePort()
     {
         using var probe = new TcpListener(IPAddress.Loopback, 0);
@@ -138,6 +150,66 @@ public sealed class KakaoLoginTests : IDisposable
         IPAddress? lan = EcoBotServerTests.OtherAddress();
         if (lan != null)
             Assert.Contains(KakaoLogin.OldApp, await Refused(lan, "botlike", "botsecret2"));
+    }
+
+    [Fact]
+    public async Task My_character_changes_only_its_hair_and_is_moved_aside_when_deleted()
+    {
+        using var check = new FakeCheck();
+        using var server = IsolatedHadesServer.Prepare();
+        string path = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
+        JsonNode config = JsonNode.Parse(File.ReadAllText(path))!;
+        config["ServerConfig"]!["KakaoCheckUrl"] = check.Url;
+        File.WriteAllText(path, config.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+        server.Start(TimeSpan.FromMinutes(2));
+        CancellationToken token = _deadline.Token;
+        string aislings = Path.Combine(server.ContentLocation, "aislings");
+        string deleted = Path.Combine(server.ContentLocation, "aislings-deleted");
+        JsonNode Saved(string name) => JsonNode.Parse(File.ReadAllText(Path.Combine(aislings, name + ".json")))!;
+        (byte, string) Account(string name, string field, params byte[] character) =>
+            LoginFlow.Account(server.LoginPort, name, field, character.Length == 0 ? null : character);
+        (byte, string) Refused(string text) => (0x03, text);
+
+        // 표로 만든 내 캐릭터 — 생김새 바꾸기는 머리 모양·색만, 성별·직업·레벨은 그대로(0x04 가 다른 값을 보내도).
+        Assert.Equal((byte)0x00, Account("kmine", Token("1"), 1, 1, 1, 1).Item1);
+        JsonNode before = Saved("kmine");
+        Assert.Equal(((byte)0x00, ""), Account("kmine", Token("1") + "|look", 7, 2, 5, 3));
+        JsonNode after = Saved("kmine");
+        Assert.Equal(7, after["HairStyle"]!.GetValue<int>());
+        Assert.Equal(5, after["HairColor"]!.GetValue<int>());
+        foreach (string kept in new[] { "Gender", "Path", "ExpLevel", "KakaoId", "Password" })
+            Assert.Equal(before[kept]!.ToJsonString(), after[kept]!.ToJsonString());
+
+        // 남의 것·주인 없는 것·없는 것은 거절 — 바꾸지도 지우지도 않는다.
+        Assert.Equal(Refused(KakaoLogin.OtherOwner), Account("kmine", Token("2") + "|look", 9, 1, 9, 1));
+        Assert.Equal(Refused(KakaoLogin.OtherOwner), Account("kmine", Token("2") + "|delete"));
+        LoginFlow.TryCreateAccount(server, "kold");
+        Assert.Equal(Refused(KakaoLogin.NotLinked), Account("kold", Token("1") + "|delete"));
+        Assert.Equal(Refused(KakaoLogin.NoCharacter), Account("knobody", Token("1") + "|look", 1, 1, 1, 1));
+        Assert.Equal(Refused(KakaoLogin.Pending), Account("kmine", Token("9") + "|delete"));
+        Assert.Equal(7, Saved("kmine")["HairStyle"]!.GetValue<int>());
+        Assert.True(File.Exists(Path.Combine(aislings, "kold.json")));
+
+        // 지우기 — 앞 저장이 남긴 것까지 aislings-deleted 로 옮긴다(남으면 Load 가 되살린다).
+        Assert.Equal((byte)0x00, Account("kgone", Token("1"), 1, 1, 1, 1).Item1);
+        Assert.Equal((byte)0x00, Account("kgone", Token("1") + "|look", 2, 1, 2, 1).Item1);
+        Assert.True(File.Exists(Path.Combine(aislings, "kgone.json.backup")));
+        Assert.Equal(((byte)0x00, "지웠습니다."), Account("kgone", Token("1") + "|delete"));
+        Assert.False(File.Exists(Path.Combine(aislings, "kgone.json")));
+        Assert.False(File.Exists(Path.Combine(aislings, "kgone.json.backup")));
+        string moved = Assert.Single(Directory.GetFiles(deleted, "kgone-*.json"));
+        Assert.Matches(@"kgone-\d{14}\.json$", moved);
+        Assert.Equal("1", JsonNode.Parse(File.ReadAllText(moved))!["KakaoId"]!.GetValue<string>());
+        Assert.Equal(Refused(KakaoLogin.NoCharacter), Account("kgone", Token("1") + "|delete"));
+
+        // 접속 중이면 거절.
+        using (await HadesLoginClient.LoginAsync(IPAddress.Loopback, server.LoginPort, "kmine", Token("1"), null, token))
+        {
+            LoginFlow.WaitForLog(server, LoginFlow.WelcomeMessage("kmine"), TimeSpan.FromSeconds(30));
+            Assert.Equal(Refused(KakaoLogin.InGame), Account("kmine", Token("1") + "|look", 3, 1, 3, 1));
+            Assert.Equal(Refused(KakaoLogin.InGame), Account("kmine", Token("1") + "|delete"));
+        }
+        Assert.True(File.Exists(Path.Combine(aislings, "kmine.json")));
     }
 
     /// <summary>홈페이지 서비스의 <c>/api/kakao/game-check</c> 대신 — 표 셋만 안다.</summary>
