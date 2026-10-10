@@ -139,7 +139,7 @@ device_id() {
     fi
 
     # 상태 칸이 "available (paired)" 나 "connected" 인 것만. "unavailable" 도 available 을 품고 있다.
-    xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /^(available|connected)/ {print $3; exit}'
+    xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /^(available|connected)/ && !n++ {print $3}'
 }
 
 # 지금 보이는 기기를 이름·번호와 함께 보여 준다. 아이패드와 아이폰을 따로 다루려면 이것부터 본다.
@@ -149,7 +149,7 @@ devices() {
     while IFS=$'\t' read -r name ident; do
         [ -z "$ident" ] && continue
         local udid
-        udid="$(xcrun devicectl device info details --device "$ident" 2>/dev/null | awk -F': ' '/• udid:/ {print $2; exit}')"
+        udid="$(xcrun devicectl device info details --device "$ident" 2>/dev/null | awk -F': ' '/• udid:/ && !n++ {print $2}')"
         printf '%-22s %s\n' "$name" "${udid:-$ident}"
     done
 }
@@ -200,7 +200,7 @@ renew() {
     # 서명 파일은 하드웨어 UDID 로 기기를 적는다. devicectl 의 번호(연결용)를 받았으면 UDID 로 바꾼다 —
     # 그대로 비교하면 늘 "프로필에 없다" 가 된다(2026-09-24).
     local udid
-    udid="$(xcrun devicectl device info details --device "$device" 2>/dev/null | awk -F': ' '/• udid:/ {print $2; exit}')"
+    udid="$(xcrun devicectl device info details --device "$device" 2>/dev/null | awk -F': ' '/• udid:/ && !n++ {print $2}')"
     [ -n "$udid" ] && device="$udid"
     fi
 
@@ -216,7 +216,9 @@ renew() {
 
     echo "서명을 받습니다..."
     : > "$LOGS/ios-renew.log"
-    provision "generic/platform=iOS" || {
+    # 계정을 다시 로그인하면 팀에 등록된 기기가 하나도 없어 기기 없이는 못 받는다(2026-10-11) — 보이는 기기로 다시 받는다.
+    provision "generic/platform=iOS" || { [ -n "$device" ] && grep -q "has no devices" "$LOGS/ios-renew.log" &&
+        echo "팀에 등록된 기기가 없습니다 — 기기 $device 를 지정해 받습니다..." && provision "id=$device"; } || {
         # 치워 둔 옛 서명을 되돌린다 — 안 그러면 남은 날이 있어도 빌드까지 막힌다(2026-10-02 아침에 그랬다).
         [ -n "$old" ] && [ -z "$(profile)" ] && cp -p "$keep/$(basename "$old")" "$PROFILES/"
         if grep -q "No Accounts" "$LOGS/ios-renew.log"; then
@@ -301,7 +303,7 @@ install_to() {
     # 짝지은 아이폰이 있으면 2분까지 다시 보이기를 기다린다.
     if [ -z "$device" ]; then
         local paired
-        paired="$(xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /paired|unavailable/ && $5 ~ /iPhone/ {print $3; exit}')"
+        paired="$(xcrun devicectl list devices 2>/dev/null | awk -F'  +' '$4 ~ /paired|unavailable/ && $5 ~ /iPhone/ && !n++ {print $3}')"
         if [ -n "$paired" ]; then
             echo "아이폰이 잠들어 안 보입니다 — 화면을 켜고 잠금을 풀어 두십시오(2분 기다립니다)." >&2
             for _ in $(seq 1 24); do
