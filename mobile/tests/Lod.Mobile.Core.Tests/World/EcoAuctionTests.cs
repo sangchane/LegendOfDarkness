@@ -156,10 +156,14 @@ public sealed class EcoAuctionTests
         InventoryItem sword = Carried(1, "에페", Gear(1, value: 1_600));       // 상인 매입가 1,000
         InventoryItem hat = Carried(2, "투구", Gear(4, value: 1_600));
 
-        IReadOnlyList<EcoPost> posts = EcoAuction.ToPost([sword, hat], wear: [], active: 0, refused: [], market: new Dictionary<string, long> { ["에페"] = 10_000 });
+        IReadOnlyList<EcoPost> posts = EcoAuction.ToPost([sword, hat], wear: [], active: 0, refused: [], market: new Dictionary<string, long> { ["에페"] = 6_000 });
 
-        Assert.Equal(new EcoPost(sword, 9_000, 13_000), posts.Single(post => post.Item == sword));
+        Assert.Equal(new EcoPost(sword, 5_400, 7_800), posts.Single(post => post.Item == sword));
         Assert.Equal(new EcoPost(hat, 2_000, 4_000), posts.Single(post => post.Item == hat));
+
+        // 시세가 상인 매입가의 8배를 넘으면 8배(8,000)에서 멈춘다 — 봇끼리 130% 에 사고팔아 끝없이 오르지 않게.
+        EcoPost capped = Assert.Single(EcoAuction.ToPost([sword], wear: [], active: 0, refused: [], market: new Dictionary<string, long> { ["에페"] = 100_000 }));
+        Assert.Equal(new EcoPost(sword, 7_200, 10_400), capped);
     }
 
     /// <summary>

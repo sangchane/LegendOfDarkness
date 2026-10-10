@@ -250,9 +250,13 @@ public static class EcoAuction
             .OrderByDescending(Offer)
             .Take(Math.Max(0, Tuning.EcoAuctionMax - active))
             .Select(item => market?.TryGetValue(item.Name, out long price) == true
-                ? new EcoPost(item, Price(price * Tuning.EcoMarketStart / 100), Price(price * Tuning.EcoMarketBuyout / 100))
+                ? Posted(item, Math.Min(price, Offer(item) * Tuning.EcoMarketCap))
                 : new EcoPost(item, Price(Offer(item) * Tuning.EcoAuctionStart), Price(Offer(item) * Tuning.EcoAuctionBuyout))),
     ];
+
+    // 시세는 상인 매입가의 EcoMarketCap 배에서 멈춘다 — 130% 에 산 값이 다시 시세가 되어 끝없이 오르지 않게.
+    private static EcoPost Posted(InventoryItem item, long price) =>
+        new(item, Price(price * Tuning.EcoMarketStart / 100), Price(price * Tuning.EcoMarketBuyout / 100));
 
     // 서버가 받는 값의 상한(서버 AuctionHouse.AUCTION_MAX_PRICE).
     private const long MaxPrice = 2_000_000_000;

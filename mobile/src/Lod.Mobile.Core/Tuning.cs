@@ -108,6 +108,9 @@ public static class Tuning
 
     public const int EcoMarketBuyout = 130;
 
+    /// <summary>올릴 때 쓰는 시세의 상한 — 상인 매입가의 이 배(옛 즉시 구매가 4배의 두 배). 봇끼리 130% 에 사고팔아 값이 끝없이 오르지 않게.</summary>
+    public const int EcoMarketCap = 8;
+
     /// <summary>
     /// 살 때 — 점수 이득 100 마다 시세보다 이 % 더(접두사 하나 이득 30 이면 +15%, 99 의 칸 이득 100 이면 +50%), 시세 위로 많아야 <see cref="EcoMarketOverMax" />%.
     /// 금화 비율 상한(<see cref="EcoAuctionBudget" />)은 그대로.
