@@ -180,7 +180,7 @@ public sealed class PoteDungeonTests : IDisposable
     /// `coma_delay 12`). 엔트자이언트의날개가 없으면 그대로 빠지고, 12초 안에 누가 살리지 않으면 죽는다(`__COMA_END__`). 5.99 서버 역어셈블로
     /// 확인한 혼수는 하데스 빈사(아이콘 89 · 그림 24)와 같아 그것을 건다. 운영자는 빈사에 걸리지 않으므로 보통 캐릭터로.
     /// 죽으면 5.99·Novaonline `__SCRIPT_DEAD__` 대로 뮤레칸의방 10,9 로 가고, 뮤레칸(12,5)을 누르면 살아나 레벨에 맞는 마을로 간다
-    /// (30레벨 → 수오미마을 39,19). 죽음 벌칙은 꺼 두었으니 소지품·골드는 그대로다.
+    /// (30레벨 → 수오미마을 39,19). 격리 서버는 죽음 벌칙이 꺼진 기본값(DeathDropsItems=false)이라 소지품·골드는 그대로다 — 켠 쪽은 DeathPenaltyTests.
     /// </summary>
     [Fact]
     public async Task Walking_the_trail_without_a_wing_drops_you_into_a_coma_that_ends_in_death_at_murekan_who_revives_you_in_a_village()

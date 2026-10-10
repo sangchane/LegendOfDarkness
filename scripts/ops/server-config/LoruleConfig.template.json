@@ -82,8 +82,9 @@
 		"CanMoveDuringReap": false,
 		"DeathMapX": 10,
 		"DeathMapY": 9,
-		// 죽으면 뮤레칸의방(20138) 10,9 — 5.99·Novaonline __SCRIPT_DEAD__. 소지품을 떨어뜨리는 벌칙은 끈다.
-		"DeathDropsItems": false,
+		// 죽으면 뮤레칸의방(20138) 10,9 — 5.99·Novaonline __SCRIPT_DEAD__. 죽음 벌칙(사용자 2026-10-11): 장비·가방의 사라짐 물건
+		// (신 이름 접두사 + 속성 목걸이·벨트, build-death-perish.py)은 없어지고 나머지·금화는 죽은 자리에 — 10분(DeathLootMinutes) 동안 죽은 본인만 줍는다. 동료 봇은 빠진다.
+		"DeathDropsItems": true,
 		// 동료 봇(성직자) 계정 이름 — 봇 프로그램(mobile/bots/Lod.CompanionBot)이 이 이름으로 접속한다. 비밀번호는 봇 쪽 설정 파일에만.
 		// 보낸 동료는 CompanionHomeMap(0 이면 StartingMap)의 CompanionHomePosition(없으면 StartingPosition)에서 기다린다.
 		// 다섯까지(사용자 결정 2026-09-27) — 클라우드는 lod-bot@1~5 가 이 차례대로 하나씩 접속한다(scripts/ops/cloud-server.sh bot-config).
