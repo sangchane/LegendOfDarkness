@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Ui;
 
 namespace Lod.Mobile.Core.Net;
@@ -26,8 +27,11 @@ public enum KakaoWait
 /// <summary>app-token 답 하나. 이름은 카카오 닉네임, 표는 <see cref="KakaoWait.Granted" /> 일 때만.</summary>
 public sealed record KakaoReply(KakaoWait State, string Name = "", string Token = "", string Error = "");
 
-/// <summary>내 캐릭터 목록(<c>/api/kakao/characters</c>)의 한 줄. 직업·성별은 서버 이름 그대로(<c>Monk</c>·<c>Female</c>).</summary>
-public sealed record KakaoCharacter(string Name, int Level, string Path, string Gender, int HairStyle, int HairColor)
+/// <summary>
+/// 내 캐릭터 목록(<c>/api/kakao/characters</c>)의 한 줄. 직업·성별은 서버 이름 그대로(<c>Monk</c>·<c>Female</c>).
+/// <see cref="Look" /> 는 게임 서버가 남을 그릴 때 보내는 0x33 옷 값 그대로(지금 입은 장비) — 옛 서비스면 없음.
+/// </summary>
+public sealed record KakaoCharacter(string Name, int Level, string Path, string Gender, int HairStyle, int HairColor, Appearance? Look = null)
 {
     // 서버 Class 차례(평민 0 ~ 무도가 5) — 0x04 의 직업 번호와 같다.
     private static readonly string[] Paths = ["Peasant", "Warrior", "Rogue", "Wizard", "Priest", "Monk"];
@@ -122,9 +126,18 @@ public static class KakaoSignIn
                 .Where(entry => entry.ValueKind == JsonValueKind.Object && OneLine(Text(entry, "name")).Length > 0)
                 .Select(entry => new KakaoCharacter(
                     OneLine(Text(entry, "name")), Number(entry, "level"), Text(entry, "path"), Text(entry, "gender"),
-                    Number(entry, "hairStyle"), Number(entry, "hairColor")))
+                    Number(entry, "hairStyle"), Number(entry, "hairColor"), LookOf(entry)))
         ];
     }
+
+    // 서는 그림 한 장이라 쉬는 자세(Resting)는 늘 0.
+    private static Appearance? LookOf(JsonElement entry) =>
+        entry.TryGetProperty("look", out JsonElement look) && look.ValueKind == JsonValueKind.Object
+            ? new Appearance(
+                Number(look, "head"), Number(look, "body"), Number(look, "armor"), Number(look, "boots"), Number(look, "shield"),
+                Number(look, "weapon"), Number(look, "hairColor"), Number(look, "bootColor"), Number(look, "headAccessory1"),
+                Number(look, "lantern"), Number(look, "headAccessory2"), Resting: 0, Number(look, "overCoat"))
+            : null;
 
     /// <summary>app-token 의 상태 코드와 본문 → 기다림 / 대기(닉네임) / 받음(표·닉네임) / 거부 / 처음부터.</summary>
     public static KakaoReply ReadToken(long status, string body)

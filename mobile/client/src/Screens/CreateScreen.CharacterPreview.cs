@@ -27,8 +27,8 @@ public sealed partial class CreateScreen : Control
     // (약 29.25, 41) 이었다 — 기준점과의 차이만큼 미리보기를 옮겨 기준점이 아니라 실제 그림이 칸
     // 한가운데 오게 한다. 뒷모습·앞모습이 이 차이가 서로 거의 같아(값이 다르지 않음) 방향이 바뀌어도
     // 이 보정은 그대로 쓴다 — 그래서 돌아도 들썩이지 않는다.
-    private const float BodyCentreOffsetX = 2.25f;
-    private const float BodyCentreOffsetY = 36f;
+    internal const float BodyCentreOffsetX = 2.25f;
+    internal const float BodyCentreOffsetY = 36f;
 
     /// <summary>맨몸·머리 그림이 하나도 없을 때만 쓰는 마지막 대안(있을 리 없음).</summary>
     private const string HeroSheet = "res://assets/actor/hero-walk.png";

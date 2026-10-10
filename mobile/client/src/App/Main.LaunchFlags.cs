@@ -273,8 +273,9 @@ public partial class Main : Control
     /// </summary>
     public static string KakaoPreview { get; private set; } = string.Empty;
 
-    /// <summary>미리보기 목록의 첫 줄·바꾸기 모드의 캐릭터.</summary>
-    public static readonly Lod.Mobile.Core.Net.KakaoCharacter PretendCharacter = new("미리보기", 41, "Monk", "Male", 3, 5);
+    /// <summary>미리보기 목록의 첫 카드·바꾸기 모드의 캐릭터 — 도복·신·무기를 입혀 카드 그림이 옷을 그리는지 보이게.</summary>
+    public static readonly Lod.Mobile.Core.Net.KakaoCharacter PretendCharacter = new("미리보기", 41, "Monk", "Male", 3, 5,
+        new Lod.Mobile.Core.Model.Appearance(3, 16, 3, 1, 0, 5, 5, 0, 0, 0, 0, 0, 0));
 
     private static void PretendKakao()
     {

@@ -402,6 +402,40 @@ class LoginThrottle:
             self.failures.setdefault(who, []).append(now or time.time())
 
 
+# 서버 BodySprite(Types/BodySprite.cs) — 캐릭터 파일의 Display 는 이름으로 적힌다.
+BODY_SPRITES = {"None": 0, "Male": 16, "Female": 32, "MaleGhost": 48, "FemaleGhost": 64, "MaleInvis": 80, "FemaleInvis": 96,
+                "MaleJester": 112, "MaleHead": 128, "FemaleHead": 144, "BlankMale": 160, "BlankFemale": 176}
+
+
+def character_look(who):
+    """캐릭터 파일 → 게임 서버가 남을 그릴 때 보내는 0x33 옷 값(ServerFormat33.cs). 접속하면 장비마다 Equipped 가 다시 돌아
+    Armor·Weapon 따위를 덮으므로(GameClient.LoadEquipment) 저장된 값 위에 장비 값을 같은 규칙(scripts/Items/*.cs)으로 얹는다.
+    숫자가 아니면 ValueError — 부르는 쪽이 그 줄만 건너뛴다."""
+    worn = {key: int(who.get(key) or 0) for key in ("Armor", "Boots", "BootColor", "Shield", "Weapon", "Helmet", "Pants", "HairStyle",
+                                                     "HairColor", "HeadAccessory1", "HeadAccessory2", "Lantern", "OverCoat")}
+    for slot in ((who.get("EquipmentManager") or {}).get("Equipment") or {}).values():
+        item = (slot or {}).get("Item") or {}
+        template = item.get("Template") or {}
+        script = template.get("ScriptName")
+        if script == "Armor":
+            worn["Armor"], worn["Pants"] = int(item.get("Image") or 0), 1 if template.get("HasPants") else 0
+        elif script == "Helmet":
+            worn["Helmet"] = int(item.get("Image") or 0)
+        elif script == "Boot":
+            worn["Boots"], worn["BootColor"] = int(item.get("Image") or 0) & 0xFF, int(template.get("Color") or 0) & 0xFF
+        elif script == "Shield":
+            worn["Shield"] = int(template.get("Image") or 0) & 0xFF
+        elif script == "Weapon":
+            worn["Weapon"] = int(template.get("Image") or 0)
+    display = who.get("Display")
+    body = display if isinstance(display, int) else BODY_SPRITES.get(display, 0)
+    # 투구 그림(>100)이 머리를 대신한다. ponytail: 서버는 PK 맵에서는 머리를 보이지만 목록은 맵 밖이라 그 예외를 뺐다.
+    return {"head": worn["Helmet"] if worn["Helmet"] > 100 else worn["HairStyle"], "body": (body + worn["Pants"]) & 0xFF,
+            "armor": worn["Armor"], "boots": worn["Boots"], "shield": worn["Shield"], "weapon": worn["Weapon"] & 0xFF,
+            "hairColor": worn["HairColor"], "bootColor": worn["BootColor"], "headAccessory1": worn["HeadAccessory1"],
+            "lantern": worn["Lantern"], "headAccessory2": worn["HeadAccessory2"], "overCoat": worn["OverCoat"]}
+
+
 def safe_static_path(root: Path, request_path: str):
     decoded = unquote(urlsplit(request_path).path)
     relative = decoded.lstrip("/") or "index.html"
@@ -852,7 +886,7 @@ class OpsHandler(BaseHTTPRequestHandler):
                 if isinstance(who, dict) and who.get("KakaoId") == kakao_id and who.get("Username"):
                     mine.append({"name": str(who["Username"]), "level": int(who.get("ExpLevel") or 0), "path": str(who.get("Path") or ""),
                                  "gender": str(who.get("Gender") or ""), "hairStyle": int(who.get("HairStyle") or 0),
-                                 "hairColor": int(who.get("HairColor") or 0)})
+                                 "hairColor": int(who.get("HairColor") or 0), "look": character_look(who)})
             except (OSError, ValueError, TypeError):
                 continue  # 저장 중이던·깨진 파일 하나 때문에 목록 전체가 막히지 않게
         self._json(200, {"characters": sorted(mine, key=lambda row: row["name"].lower())})

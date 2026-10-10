@@ -1,3 +1,4 @@
+using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Net;
 
 namespace Lod.Mobile.Core.Tests.Net;
@@ -125,6 +126,19 @@ public sealed class KakaoSignInTests
         Assert.Equal([new KakaoCharacter("길동", 41, "Monk", "Female", 7, 12), new KakaoCharacter("새싹", 1, "Peasant", "Male", 1, 0)], mine);
         Assert.Equal(("무도가", (byte)5, (byte)2), (mine![0].Job, mine[0].PathNumber, mine[0].GenderNumber));
         Assert.Equal(("평민", (byte)0, (byte)1), (mine[1].Job, mine[1].PathNumber, mine[1].GenderNumber));
+    }
+
+    [Fact]
+    public void What_a_character_wears_is_read_like_the_servers_0x33()
+    {
+        IReadOnlyList<KakaoCharacter>? mine = KakaoSignIn.ReadCharacters(200,
+            "{\"characters\":[{\"name\":\"길동\",\"look\":{\"head\":285,\"body\":33,\"armor\":3,\"boots\":5,\"shield\":9,"
+            + "\"weapon\":37,\"hairColor\":2,\"bootColor\":9,\"headAccessory1\":4,\"lantern\":1,\"headAccessory2\":6,\"overCoat\":7}},"
+            + "{\"name\":\"옛줄\"},{\"name\":\"이상\",\"look\":7}]}");
+
+        Assert.Equal(new Appearance(285, 33, 3, 5, 9, 37, 2, 9, 4, 1, 6, 0, 7), mine![0].Look);
+        Assert.Null(mine[1].Look);
+        Assert.Null(mine[2].Look);
     }
 
     [Fact]

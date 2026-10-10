@@ -274,15 +274,29 @@ class LoginAndStateTests(unittest.TestCase):
         self.server.RequestHandlerClass.characters = str(folder)
         for name, owner, level in (("zeta", "777", 5), ("Alpha", "777", 12), ("other", "888", 9), ("old", None, 3)):
             (folder / f"{name.lower()}.json").write_text(json.dumps({"Username": name, "KakaoId": owner, "ExpLevel": level,
-                "Path": "Monk", "Gender": "Female", "HairStyle": 4, "HairColor": 2}), encoding="utf-8")
+                "Path": "Monk", "Gender": "Female", "HairStyle": 4, "HairColor": 2, "Display": "Female", "OverCoat": 7}), encoding="utf-8")
+        # 입은 옷은 접속 때처럼 장비에서 — 저장된 맨 위 값(Armor 0)이 낡아도 장비 그림이 이긴다(서버 GameClient.LoadEquipment).
+        alpha = json.loads((folder / "alpha.json").read_text(encoding="utf-8"))
+        # 갑옷·투구·신은 아이템 Image, 무기·방패는 템플릿 Image 를 쓴다(scripts/Items/*.cs) — 안 쓰는 쪽에 엉뚱한 값을 둔다.
+        own = ("Armor", "Helmet", "Boot")
+        gear = lambda script, image, **more: {"Item": {"Image": image if script in own else image + 1000,
+            "Template": {"ScriptName": script, "Image": image + 1000 if script in own else image, **more}}}
+        alpha.update({"Armor": 0, "EquipmentManager": {"Equipment": {"1": gear("Weapon", 37), "2": gear("Armor", 3, HasPants=True),
+            "3": gear("Shield", 9), "4": gear("Helmet", 285), "8": gear("Boot", 5, Color=9), "6": None}}})
+        (folder / "alpha.json").write_text(json.dumps(alpha), encoding="utf-8")
+        (folder / "badlook.json").write_text(json.dumps({"Username": "badlook", "KakaoId": "777", "Armor": "cloth"}), encoding="utf-8")
         (folder / "broken.json").write_text("{", encoding="utf-8")
         token = self.game_token()
         listed = lambda value: self.request("POST", "/api/kakao/characters", {"token": value})
         status, _, body = listed(token)
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)["characters"], [
-            {"name": "Alpha", "level": 12, "path": "Monk", "gender": "Female", "hairStyle": 4, "hairColor": 2},
-            {"name": "zeta", "level": 5, "path": "Monk", "gender": "Female", "hairStyle": 4, "hairColor": 2}])
+            {"name": "Alpha", "level": 12, "path": "Monk", "gender": "Female", "hairStyle": 4, "hairColor": 2,
+             "look": {"head": 285, "body": 33, "armor": 3, "boots": 5, "shield": 9, "weapon": 37, "hairColor": 2, "bootColor": 9,
+                      "headAccessory1": 0, "lantern": 0, "headAccessory2": 0, "overCoat": 7}},
+            {"name": "zeta", "level": 5, "path": "Monk", "gender": "Female", "hairStyle": 4, "hairColor": 2,
+             "look": {"head": 4, "body": 32, "armor": 0, "boots": 0, "shield": 0, "weapon": 0, "hairColor": 2, "bootColor": 0,
+                      "headAccessory1": 0, "lantern": 0, "headAccessory2": 0, "overCoat": 7}}])
         self.assertEqual(listed(token[:-1] + ("0" if token[-1] != "0" else "1"))[0], 401)
         self.users.set_status("777", "denied")
         status, _, body = listed(token)

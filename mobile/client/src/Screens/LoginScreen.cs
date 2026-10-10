@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Godot;
 using Lod.Mobile.Core.Art;
+using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Net;
 using Lod.Mobile.Core.Ui;
 
@@ -16,8 +17,8 @@ namespace LodClient;
 /// </summary>
 /// <remarks>
 /// 카카오 로그인(사용자 2026-10-11, <c>autopilot/game-kakao-login/SPEC.md</c>) — 캐릭터 비밀번호 대신 카카오로 받은 게임 표를
-/// 비밀번호 칸에 보낸다(<see cref="KakaoSignIn" />). 표가 없으면 노란 [카카오로 로그인] 하나, 있으면 내 캐릭터 목록 — 줄마다
-/// [들어가기]·[생김새]·[삭제], 아래 [새 캐릭터]·[카카오 로그아웃](<c>autopilot/game-kakao-accounts/SPEC.md</c>).
+/// 비밀번호 칸에 보낸다(<see cref="KakaoSignIn" />). 표가 없으면 노란 [카카오로 로그인] 하나, 있으면 내 캐릭터 카드 — 지금 입은 옷
+/// 그대로 선 그림·이름, 누르면 들어가고 위 귀퉁이 아이콘이 생김새·삭제, 아래 [새 캐릭터]·[카카오 로그아웃](<c>autopilot/game-kakao-accounts/SPEC.md</c>).
 /// 데스크톱 <c>--login</c>·<c>login.cfg</c>(맥 서버 시험용 이름·비밀번호)는 이름·비밀번호 칸으로 표 대신 쓴다.
 /// </remarks>
 public partial class LoginScreen : Control
@@ -26,6 +27,11 @@ public partial class LoginScreen : Control
 
     private static int LogoHeight => Main.Portrait ? 112 : 88;
     private const int AuxFontSize = 14;
+    private const int FootFontSize = 10;
+
+    // 캐릭터 카드 — 원작 한 칸(1배) 그림 + 이름·Lv 두 줄. 폭은 판(300) 안에 두 장 반이 보이게 — 반 장이 굴릴 수 있다고 알린다.
+    private const int CardWidth = 112;
+    private const int FigureHeight = 96;
     private const int FormWidth = 300;
     private const int LandscapeFormWidth = 560;
     private const int CaptionWidth = 72;
@@ -68,7 +74,7 @@ public partial class LoginScreen : Control
     private Control _actions = null!;
     private Control _linkRow = null!;
 
-    // 내 캐릭터 목록 — 굴림 칸·줄들·줄마다의 단추(접속하는 동안 잠근다)·지우기 확인 판.
+    // 내 캐릭터 목록 — 굴림 칸·카드들·카드와 그 아이콘(접속하는 동안 잠근다)·지우기 확인 판.
     private ScrollContainer _listScroll = null!;
     private VBoxContainer _list = null!;
     private readonly List<Button> _rowButtons = [];
@@ -97,8 +103,7 @@ public partial class LoginScreen : Control
     private bool _openingKakao;
     private Godot.Timer _poll = null!;
 
-    // 키보드가 올라와 있는 동안 접어 두는 줄(위 환경 줄·아래 판 번호·안내 한 줄), 그리고 화면을 올린 만큼.
-    private Control _statusRow = null!;
+    // 키보드가 올라와 있는 동안 접어 두는 줄(아래 환경·안내 한 줄), 그리고 화면을 올린 만큼.
     private Control _versionLine = null!;
     private float _slide;
 
@@ -227,7 +232,6 @@ public partial class LoginScreen : Control
         VBoxContainer rows = new();
         rows.AddThemeConstantOverride("separation", Main.Gutter);
         _safeArea.AddChild(rows);
-        rows.AddChild(_statusRow = BuildStatusRow());
         rows.AddChild(BuildForm());
         rows.AddChild(_versionLine = BuildVersionLine());
         ShowState();
@@ -266,20 +270,6 @@ public partial class LoginScreen : Control
         _autoLogin.Visible = !Rehearsing;
         _who.Text = Rehearsing ? "시험 계정 — 비밀번호로 들어갑니다" : $"카카오: {Main.Kakao?.Name}";
         FillList();
-    }
-
-    /// <summary>Environment on the left, which server we will talk to on the right.</summary>
-    private static Control BuildStatusRow()
-    {
-        HBoxContainer row = new() { Name = "StatusRow" };
-
-        row.AddChild(Aux("테스트 환경 · 로컬"));
-        row.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill });
-        // 앱 번호(빌드 시각) — 내려받기 페이지의 번호와 같으면 최신이다(사용자 2026-10-03: 폰이 어느 판인지 보이게).
-        string app = Godot.FileAccess.FileExists("res://app-version.txt") ? Godot.FileAccess.GetFileAsString("res://app-version.txt").Trim() : "맥";
-        row.AddChild(Aux($"앱 {app} · 서버 {Main.ServerAddress}:{Main.ServerPort}"));
-
-        return row;
     }
 
     /// <summary>
@@ -627,10 +617,10 @@ public partial class LoginScreen : Control
         form.AddChild(_passwordRow = FieldRow("비밀번호", _password));
         form.AddChild(_kakao);
 
-        // 목록이 길면 판 안에서 굴린다 — 세로는 세 줄, 짧은 가로는 한 줄 반까지 보인다.
+        // 카드는 가로로 늘어놓고 넘치면 판 안에서 가로로 굴린다(사용자 2026-10-11). 목록이 넓게 펴져야(ExpandFill) 안내 글이 판 폭으로 접힌다.
         _list = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         _list.AddThemeConstantOverride("separation", Main.Gutter);
-        _listScroll = new ScrollContainer { HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        _listScroll = new ScrollContainer { VerticalScrollMode = ScrollContainer.ScrollMode.Disabled };
         _listScroll.AddChild(_list);
         form.AddChild(_listScroll);
 
@@ -641,7 +631,7 @@ public partial class LoginScreen : Control
     }
 
     /// <summary>
-    /// 목록을 그린다 — 줄마다 이름·레벨·직업, 아래 [들어가기][생김새][삭제]. 비면 만들라는 말, 못 받았으면 까닭과 [다시 불러오기].
+    /// 목록을 그린다 — 캐릭터마다 카드 한 장(<see cref="CharacterCard" />). 비면 만들라는 말, 못 받았으면 까닭과 [다시 불러오기].
     /// </summary>
     private void FillList()
     {
@@ -652,7 +642,6 @@ public partial class LoginScreen : Control
         }
 
         _rowButtons.Clear();
-        int rows = 1;
 
         if (_characters is null || _characters.Count == 0)
         {
@@ -670,49 +659,108 @@ public partial class LoginScreen : Control
         }
         else
         {
+            HBoxContainer cards = new();
+            cards.AddThemeConstantOverride("separation", Main.Gutter);
+
             foreach (KakaoCharacter character in _characters)
             {
-                _list.AddChild(CharacterRow(character));
+                cards.AddChild(CharacterCard(character));
             }
 
-            rows = _characters.Count;
+            _list.AddChild(cards);
         }
 
-        float rowHeight = Main.TouchMinimum + 24 + Main.Gutter;
-        _listScroll.CustomMinimumSize = new Vector2(0, Mathf.Min(rows, Main.Portrait ? 3f : 1.5f) * rowHeight);
         RefreshSubmitState(keepStatus: true);
     }
 
-    private Control CharacterRow(KakaoCharacter character)
+    /// <summary>
+    /// 캐릭터 카드(사용자 2026-10-11) — 지금 입은 옷 그대로 선 그림(게임이 사람을 그리는 <see cref="WorldView.Dress" />) · 이름 · Lv.
+    /// 카드를 누르면 들어간다. 위 귀퉁이 아이콘 둘(생김새·삭제)은 카드 위의 따로 된 단추라 누르는 손가락을 카드가 받지 않는다.
+    /// </summary>
+    private Control CharacterCard(KakaoCharacter character)
     {
-        Label title = Aux($"{character.Name} · Lv {character.Level} · {character.Job}");
-        title.AddThemeColorOverride("font_color", Greybox.Title);
-        title.ClipText = true;
+        Button card = new() { Name = "Card", CustomMinimumSize = new Vector2(CardWidth, FigureHeight + 44), ClipContents = true };
+        Greybox.Plain(card);
+        card.Pressed += () => BeginLogin(character.Name);
 
-        Button enter = new() { Text = "들어가기", CustomMinimumSize = new Vector2(0, Main.TouchMinimum), SizeFlagsHorizontal = SizeFlags.ExpandFill };
-        Greybox.Commit(enter);
-        Button look = PlainButton("생김새");
-        Button delete = PlainButton("삭제");
-        look.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        delete.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        // 만들기 화면 미리보기와 같은 자리 맞춤 — 발 기준점이 아니라 그림 한가운데가 칸 가운데(1배라 흐려지지 않는다).
+        Control stage = new() { MouseFilter = MouseFilterEnum.Ignore, ClipContents = true };
+        stage.SetAnchorsAndOffsetsPreset(LayoutPreset.TopWide);
+        stage.OffsetBottom = FigureHeight;
+        Node2D wrapper = new() { Position = new Vector2(CardWidth / 2f + CreateScreen.BodyCentreOffsetX, FigureHeight / 2f + CreateScreen.BodyCentreOffsetY) };
+        Actor figure = new(character.Name, WorldView.Dress(new Character(0, default, Direction.South, character.Look, character.Name)));
+        wrapper.AddChild(figure);
+        stage.AddChild(wrapper);
+        card.AddChild(stage);
+        figure.Face(Direction.South);
 
-        enter.Pressed += () => BeginLogin(character.Name);
+        Label name = new() { Text = character.Name, HorizontalAlignment = HorizontalAlignment.Center, ClipText = true };
+        name.AddThemeFontSizeOverride("font_size", AuxFontSize);
+        name.AddThemeColorOverride("font_color", Greybox.Title);
+        Label level = Aux($"Lv {character.Level} · {character.Job}");
+        level.AddThemeFontSizeOverride("font_size", 12);
+        level.HorizontalAlignment = HorizontalAlignment.Center;
+        level.ClipText = true;
+        VBoxContainer caption = new() { MouseFilter = MouseFilterEnum.Ignore };
+        caption.AddThemeConstantOverride("separation", 0);
+        caption.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide);
+        caption.OffsetTop = -44;
+        caption.AddChild(name);
+        caption.AddChild(level);
+        card.AddChild(caption);
+
+        // 한글 시스템 글꼴에 연필(✎)이 없어(맥에서 HasChar 거짓) 연필은 그려 넣는다. ×는 글꼴에 있다.
+        Button look = CornerIcon(card, left: true, string.Empty, "생김새 바꾸기");
+        Button delete = CornerIcon(card, left: false, "×", "지우기");
         look.Pressed += () => WantsToChangeLook?.Invoke(character);
         delete.Pressed += () => AskDelete(character.Name);
-        _rowButtons.AddRange([enter, look, delete]);
+        _rowButtons.AddRange([card, look, delete]);
 
-        HBoxContainer buttons = new();
-        buttons.AddThemeConstantOverride("separation", Main.Gutter);
-        buttons.AddChild(enter);
-        buttons.AddChild(look);
-        buttons.AddChild(delete);
+        return card;
+    }
 
-        VBoxContainer row = new();
-        row.AddThemeConstantOverride("separation", Main.Gutter / 2);
-        row.AddChild(title);
-        row.AddChild(buttons);
+    /// <summary>카드 위 귀퉁이 아이콘 — 손가락 칸은 <see cref="Main.TouchMinimum" />, 보이는 것은 그 안의 작은 어두운 동그라미.</summary>
+    private static Button CornerIcon(Control card, bool left, string glyph, string tip)
+    {
+        Button button = new() { Name = left ? "Look" : "Delete", TooltipText = tip, Size = new Vector2(Main.TouchMinimum, Main.TouchMinimum) };
+        button.SetAnchorsAndOffsetsPreset(left ? LayoutPreset.TopLeft : LayoutPreset.TopRight);
+        button.OffsetLeft = left ? 0 : -Main.TouchMinimum;
+        button.OffsetRight = left ? Main.TouchMinimum : 0;
+        button.OffsetBottom = Main.TouchMinimum;
+        foreach (string state in new[] { "normal", "hover", "focus", "pressed", "hover_pressed", "disabled" })
+            button.AddThemeStyleboxOverride(state, new StyleBoxEmpty());
 
-        return row;
+        const int Dot = 26;
+        Label mark = new()
+        {
+            Text = glyph,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            MouseFilter = MouseFilterEnum.Ignore,
+            Position = new Vector2(left ? 4 : Main.TouchMinimum - Dot - 4, 4),
+            Size = new Vector2(Dot, Dot)
+        };
+        StyleBoxFlat plate = Greybox.Sheet();
+        plate.BorderColor = Greybox.Muted;
+        plate.SetCornerRadiusAll(Dot / 2 - 1);
+        plate.SetContentMarginAll(0);
+        mark.AddThemeStyleboxOverride("normal", plate);
+        mark.AddThemeFontSizeOverride("font_size", 14);
+        mark.AddThemeColorOverride("font_color", Greybox.Text);
+        if (glyph.Length == 0)
+        {
+            // 연필 — 몸통 사선·뾰족한 끝·끝의 지우개(글자보다 먼저 그린 판 위에 얹힌다).
+            mark.Draw += () =>
+            {
+                mark.DrawLine(new Vector2(9, 17), new Vector2(17, 9), Greybox.Text, 4);
+                mark.DrawColoredPolygon([new Vector2(6, 20), new Vector2(7.5f, 15.5f), new Vector2(10.5f, 18.5f)], Greybox.Text);
+                mark.DrawLine(new Vector2(17, 9), new Vector2(19.5f, 6.5f), Greybox.Accent, 4);
+            };
+        }
+        button.AddChild(mark);
+        card.AddChild(button);
+
+        return button;
     }
 
     /// <summary>내 캐릭터 목록을 홈페이지에 묻는다. 표가 끝났거나(401) 대기·거부(403)면 표를 지우고 카카오 단추로.</summary>
@@ -1106,7 +1154,13 @@ public partial class LoginScreen : Control
                 _status.Text = $"카카오닉네임 님 — {PendingText}";
                 break;
             case "표" or "삭제":
-                _characters = [Main.PretendCharacter, new KakaoCharacter("새싹이", 1, "Peasant", "Female", 2, 0)];
+                // 셋째 카드는 판 폭을 넘겨 가로 굴림까지 그려 보려고.
+                _characters =
+                [
+                    Main.PretendCharacter,
+                    new KakaoCharacter("새싹이", 1, "Peasant", "Female", 2, 0, new Appearance(2, 32, 2, 1, 0, 10, 0, 0, 0, 0, 0, 0, 0)),
+                    new KakaoCharacter("기다란이름의전사", 99, "Warrior", "Male", 1, 2, new Appearance(1, 16, 5, 1, 1, 5, 2, 0, 0, 0, 0, 0, 0))
+                ];
                 break;
             case "빈목록":
                 _characters = [];
@@ -1123,12 +1177,19 @@ public partial class LoginScreen : Control
         }
     }
 
-    /// <summary>Client version and the font actually in use, which is what tells us Korean will render.</summary>
-    private Control BuildVersionLine()
+    /// <summary>
+    /// 환경·앱 번호·서버와 기록 보관 안내를 아래 아주 작은 한 줄로(사용자 2026-10-11: 위아래 글이 자리를 너무 차지한다).
+    /// 안내 문구는 운영상 남긴다.
+    /// </summary>
+    private static Control BuildVersionLine()
     {
-        var notice = Aux("접속·기기/앱 버전·화면/버튼·오류·게임 활동 기록은 운영 확인용으로 90일 보관합니다.");
+        // 앱 번호(빌드 시각) — 내려받기 페이지의 번호와 같으면 최신이다(사용자 2026-10-03: 폰이 어느 판인지 보이게).
+        string app = Godot.FileAccess.FileExists("res://app-version.txt") ? Godot.FileAccess.GetFileAsString("res://app-version.txt").Trim() : "맥";
+        Label notice = Aux($"테스트 환경 · 로컬 · 앱 {app} · 서버 {Main.ServerAddress}:{Main.ServerPort} · "
+                           + "접속·기기/앱 버전·화면/버튼·오류·게임 활동 기록은 운영 확인용으로 90일 보관합니다.");
+        notice.AddThemeFontSizeOverride("font_size", FootFontSize);
         notice.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        notice.CustomMinimumSize = new Vector2(0, 32);
+        notice.HorizontalAlignment = HorizontalAlignment.Center;
         return notice;
     }
 
@@ -1152,7 +1213,6 @@ public partial class LoginScreen : Control
         float covered = TouchInput.Covered;
         bool typing = covered > 0;
 
-        _statusRow.Visible = !typing;
         _versionLine.Visible = !typing;
         _status.Visible = !typing;
 
