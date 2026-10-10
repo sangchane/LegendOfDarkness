@@ -21,6 +21,8 @@ class RuleTest(unittest.TestCase):
         self.assertTrue(MODULE.perishes({"Name": "바람의진주목걸이", "EquipmentSlot": 6, "OffenseElement": 3}))
         self.assertTrue(MODULE.perishes({"Name": "화염의가죽벨트", "EquipmentSlot": 11, "DefenseElement": 1}))
         self.assertFalse(MODULE.perishes({"Name": "대지의크리스탈목걸이", "EquipmentSlot": 6, "OffenseElement": 4}))
+        self.assertFalse(MODULE.perishes({"Name": "빛의목걸이", "EquipmentSlot": 6, "OffenseElement": 5}))  # 빛·어둠은 수토풍화 밖
+        self.assertFalse(MODULE.perishes({"Name": "어둠의벨트", "EquipmentSlot": 11, "DefenseElement": 6}))
 
     def test_plain_gear_and_elemental_other_slots_stay(self):
         self.assertFalse(MODULE.perishes({"Name": "진주목걸이", "EquipmentSlot": 6, "OffenseElement": 0}))

@@ -8,7 +8,7 @@
 「사라지는 것 = 신 이름 접두사 전부 + 수토풍화 속성 목걸이·벨트, 크리스탈목걸이는 바닥에」. 서버(`Aisling.SendToHell`)는
 이 표시 하나만 보고 없앨지 바닥에 둘지 정한다.
   - 이름이 신 이름 접두사(세토아의·메투스의·칸의 …)로 시작하는 장비
-  - 목걸이(6)·벨트(11) 자리이고 OffenseElement·DefenseElement 중 하나가 0 이 아니며 이름에 「크리스탈」이 없는 것
+  - 목걸이(6)·벨트(11) 자리이고 OffenseElement·DefenseElement 중 하나가 수토풍화(1~4)이며 이름에 「크리스탈」이 없는 것
   - 그 밖의 장비(Flags 에 Equipable)는 Perishable 을 끈다. 장비가 아닌 물건은 건드리지 않는다.
 
 Flags 는 숫자(61)나 글자(「NormalEquipPerish」·「A, B」) 꼴이 섞여 있다 — 원래 꼴을 지켜 그 한 줄만 바꾼다(BOM·들여쓰기·나머지 필드 그대로).
@@ -44,12 +44,16 @@ PERISH = FLAG["Perishable"]
 FLAGS_LINE = re.compile(r'^(\s*"Flags"\s*:\s*)("[^"]*"|-?\d+)', re.M)
 
 
+FOUR = (1, 2, 3, 4)
+
+
 def perishes(body):
     """이 장비가 죽을 때 사라져야 하나 — 사용자 규칙(2026-10-11)."""
     name = body.get("Name") or ""
     if PREFIX.match(name):
         return True
-    elemental = (body.get("OffenseElement") or 0) != 0 or (body.get("DefenseElement") or 0) != 0
+    # 수토풍화(불1·물2·바람3·땅4)만 — 빛·어둠은 사용자가 말한 범위 밖이라 바닥에 떨어진다.
+    elemental = body.get("OffenseElement") in FOUR or body.get("DefenseElement") in FOUR
     return body.get("EquipmentSlot") in (NECK, BELT) and elemental and "크리스탈" not in name
 
 
