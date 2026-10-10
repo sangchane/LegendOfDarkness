@@ -36,6 +36,11 @@
       <div class="crumb"><span>어둠의 전설 모바일 복원</span><strong id="view-label">지금 되는 것</strong></div>
       <div class="session-box"><span class="badge" id="session-badge">보기 전용</span><button type="button" class="session-plain" id="account-button" aria-label="계정 관리" title="계정 관리" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span class="session-label">계정 관리</span></button><button type="button" class="session-plain" data-view-target="download" aria-label="앱 내려받기" title="앱 내려받기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M6 10l6 6 6-6M4 20h16"/></svg><span class="session-label">앱 내려받기</span></button><button type="button" class="session-button" id="session-button">로그인</button></div>
       <dialog class="account-dialog" id="account-dialog" aria-labelledby="account-title">
+        <section class="kakao-people" aria-labelledby="kakao-people-title">
+          <h2 id="kakao-people-title">카카오로 들어온 사람</h2>
+          <p class="account-who">처음 들어오면 허가돼 있습니다. 모르는 사람은 [거부]로 바꾸면 바로 끊깁니다.</p>
+          <ul id="kakao-people-list"></ul>
+        </section>
         <form id="account-form" method="dialog">
           <h2 id="account-title">계정 관리</h2>
           <p class="account-who">계정 <b>lod-admin</b> · 비밀번호를 바꾸면 다른 기기의 로그인은 모두 풀립니다.</p>
@@ -352,8 +357,8 @@
       </section>
 
       <section class="view" data-view="download" aria-labelledby="download-title" hidden>
-        <div class="page-heading"><div><p class="eyebrow">Download</p><h1 id="download-title">앱 내려받기</h1><p>쓰는 기기를 고르고, 파일을 받은 뒤 아래 순서대로 따라 하세요. 받는 사람에게는 이 주소(https://lodgame.duckdns.org/?view=download)와 손님 비밀번호를 알려 주면 됩니다.</p></div></div>
-        <article class="panel download-gate" id="download-gate" hidden><h2>내려받으려면 로그인하세요</h2><p>알려 받은 비밀번호로 들어오면 아이폰·안드로이드·윈도우 PC 파일과 설치 방법이 보입니다.</p><a class="primary-button download-link" href="/login.html?next=%2F%3Fview%3Ddownload">로그인</a></article>
+        <div class="page-heading"><div><p class="eyebrow">Download</p><h1 id="download-title">앱 내려받기</h1><p>쓰는 기기를 고르고, 파일을 받은 뒤 아래 순서대로 따라 하세요. 받는 사람에게는 이 주소(https://lodgame.duckdns.org/?view=download)를 보내 주세요 — 카카오로 로그인하면 열립니다.</p></div></div>
+        <article class="panel download-gate" id="download-gate" hidden><h2>내려받으려면 로그인하세요</h2><p>카카오로 로그인하면 아이폰·안드로이드·윈도우 PC 파일과 설치 방법이 보입니다.</p><a class="primary-button download-link" href="/login.html?next=%2F%3Fview%3Ddownload">로그인</a></article>
         <div class="dl" id="download-body" data-tab="ios" hidden>
           <article class="panel download-own" hidden><h2>⚡ 내 기기에 바로 설치</h2><p>우리 서명에 등록된 아이폰·아이패드만 됩니다. <b>그 기기의 사파리</b>로 이 화면을 열고 누르세요 — 같은 Wi‑Fi·케이블이 없어도 됩니다.</p><p class="download-meta" data-file="/download/LodClient.ipa" data-version="/download/version-ios.txt">확인 중…</p><a class="primary-button download-link" id="download-ota" href="#">내 아이폰에 설치</a><p class="download-note">설치 확인 창에서 「설치」 → 홈 화면에서 아이콘이 채워질 때까지 기다립니다(1~3분).</p></article>
 

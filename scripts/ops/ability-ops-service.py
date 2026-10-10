@@ -13,15 +13,17 @@ import hmac
 import json
 import mimetypes
 import os
+import secrets
 import sys
 import sqlite3
 import tempfile
 import threading
 import time
+import urllib.request
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlsplit, parse_qs
+from urllib.parse import quote, unquote, urlencode, urlsplit, parse_qs
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from activity_store import ActivityStore
@@ -253,6 +255,99 @@ def cookie_value(header, name):
     return None
 
 
+# 카카오 로그인(사용자 2026-10-10 「아무나 접근 할 수 없게 … 카카오톡 로그인」) — 명세 autopilot/kakao-login/SPEC.md.
+KAKAO_COOKIE = "lod_kakao"
+# 로그인하지 않은 사람이 받을 수 있는 파일 — 로그인 화면뿐.
+PUBLIC_FILES = {"login.html", "login.js", "favicon.svg"}
+
+
+def kakao_session(credential, kakao_id, lifetime, now=None):
+    # 관리자 쿠키(만료.서명)와 꼴이 달라(k번호.만료.서명) 서로 풀리지 않는다. 관리자 비밀번호를 바꾸면 함께 풀린다.
+    expiry = str(int((now or time.time()) + lifetime))
+    signature = hmac.new(session_key(credential), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
+    return f"k{kakao_id}.{expiry}.{signature}"
+
+
+def kakao_session_id(token, credential, now=None):
+    """맞는 카카오 쿠키면 카카오 회원번호, 아니면 None."""
+    head, _, rest = (token or "").partition(".")
+    expiry, _, signature = rest.partition(".")
+    kakao_id = head[1:]
+    if not (head.startswith("k") and kakao_id.isascii() and kakao_id.isdigit() and len(kakao_id) < 20
+            and expiry.isascii() and expiry.isdigit() and len(expiry) < 12) or int(expiry) < (now or time.time()):
+        return None
+    wanted = hmac.new(session_key(credential), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
+    return kakao_id if hmac.compare_digest(signature, wanted) else None
+
+
+def safe_next(value):
+    # 로그인 뒤 돌아갈 곳 — 이 사이트 안 경로만. 「//evil」「/\evil」은 브라우저가 바깥 주소로 읽고, 줄바꿈은 머리글을 깬다.
+    if value.startswith("/") and not value.startswith(("//", "/\\")) and all(32 < ord(c) < 127 for c in value):
+        return value
+    return "/"
+
+
+def kakao_exchange(config, code):
+    """인가 코드 → (회원번호, 닉네임). 카카오 REST — 토큰 받기 뒤 사용자 정보 가져오기."""
+    form = {"grant_type": "authorization_code", "client_id": config["client_id"],
+            "redirect_uri": config["redirect_uri"], "code": code}
+    if config.get("client_secret"):
+        form["client_secret"] = config["client_secret"]
+    request = urllib.request.Request("https://kauth.kakao.com/oauth/token", data=urlencode(form).encode(),
+                                     headers={"Content-Type": "application/x-www-form-urlencoded;charset=utf-8"})
+    with urllib.request.urlopen(request, timeout=10) as response:
+        access = json.load(response)["access_token"]
+    request = urllib.request.Request("https://kapi.kakao.com/v2/user/me", headers={"Authorization": f"Bearer {access}"})
+    with urllib.request.urlopen(request, timeout=10) as response:
+        me = json.load(response)
+    profile = (me.get("kakao_account") or {}).get("profile") or {}
+    name = profile.get("nickname") or (me.get("properties") or {}).get("nickname") or ""
+    return str(int(me["id"])), str(name)[:40]
+
+
+class KakaoUsers:
+    """카카오로 들어온 사람 — 처음 오면 허가, 관리자가 모르는 사람을 거부로 바꾼다(사용자 2026-10-10).
+    파일 `{"회원번호": {"name", "allowed", "first", "last"}}` 를 요청마다 읽는다 — 거부하면 그 자리에서 끊긴다."""
+
+    def __init__(self, path: Path):
+        self.path = path
+        self.lock = threading.Lock()
+
+    def _read(self):
+        try:
+            return json.loads(self.path.read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            return {}
+
+    def allowed(self, kakao_id):
+        with self.lock:
+            return self._read().get(kakao_id, {}).get("allowed") is True
+
+    def arrive(self, kakao_id, name):
+        """로그인할 때 — 처음이면 허가로 적고, 들어와도 되는지 돌려준다."""
+        now = datetime.now(timezone.utc).isoformat()
+        with self.lock:
+            users = self._read()
+            user = users.setdefault(kakao_id, {"name": name, "allowed": True, "first": now})
+            user["name"] = name or user.get("name", "")
+            user["last"] = now
+            save_credential(self.path, json.dumps(users, ensure_ascii=False, indent=1))  # 옆에 써서 바꾸기(600)
+            return user["allowed"] is True
+
+    def set_allowed(self, kakao_id, allowed):
+        with self.lock:
+            users = self._read()
+            if kakao_id not in users:
+                raise InvalidRequest("없는 사람입니다.")
+            users[kakao_id]["allowed"] = allowed
+            save_credential(self.path, json.dumps(users, ensure_ascii=False, indent=1))
+
+    def listing(self):
+        with self.lock:
+            users = self._read()
+        return sorted(({"id": key} | value for key, value in users.items()), key=lambda user: user.get("last", ""), reverse=True)
+
+
 class LoginThrottle:
     """같은 곳에서 10분에 5번 넘게 틀리면 10분 쉰다."""
     WINDOW, TRIES = 600, 5
@@ -287,13 +382,23 @@ def safe_static_path(root: Path, request_path: str):
 
 class OpsHandler(BaseHTTPRequestHandler):
     """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
-    root = store = credential = states = throttle = password_file = activity = member = None
+    root = store = credential = states = throttle = password_file = activity = kakao = kakao_users = kakao_exchange = None
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
-        # 보기는 누구나, 고치기(PUT)만 로그인한 사람 — 사용자 2026-10-02. 페이지는 /api/session 으로 편집 단추를 켠다.
+        # 보기도 로그인한 사람만(카카오 손님·관리자 — 사용자 2026-10-10), 고치기(PUT)는 관리자만. 페이지는 /api/session 으로 편집 단추를 켠다.
         path = urlsplit(self.path).path
-        if path == "/api/activity":
+        if path in ("/api/ability-overrides", "/api/kakao/users") or path.startswith("/api/state/"):
+            if not self._role() or (path == "/api/kakao/users" and self._role() != "admin"):
+                self._json(401, {"error": "로그인이 필요합니다."})
+                return
+        if path == "/api/kakao/start":
+            self._kakao_start()
+        elif path == "/api/kakao/callback":
+            self._kakao_callback()
+        elif path == "/api/kakao/users":
+            self._json(200, self.kakao_users.listing())
+        elif path == "/api/activity":
             if not self._signed_in():
                 self._json(401, {"error": "관리자 로그인이 필요합니다."})
                 return
@@ -354,21 +459,18 @@ class OpsHandler(BaseHTTPRequestHandler):
         except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
             self._json(400, {"error": str(error)})
             return
-        # 로그인 칸은 하나 — 관리자 비밀번호면 관리자, 손님 비밀번호(member-credential)면 손님(사용자 2026-10-09).
+        # 비밀번호 칸은 관리자만(비상용) — 손님 비밀번호는 카카오 로그인으로 바꿨다(사용자 2026-10-10).
         password = body.get("password") or ""
-        role = next((name for name, credential in (("admin", self.credential), ("member", self.member))
-                     if credential and same_secret(f"{credential.split(':', 1)[0]}:{password}", credential)), None)
-        if role is None:
+        if not same_secret(f"{self.credential.split(':', 1)[0]}:{password}", self.credential):
             self.throttle.failed(who)
             self._json(401, {"error": "비밀번호가 맞지 않습니다."})
             return
         remember = body.get("remember") is True
-        token = make_session(self.credential if role == "admin" else self.member,
-                             REMEMBER_SECONDS if remember else SESSION_SECONDS)
+        token = make_session(self.credential, REMEMBER_SECONDS if remember else SESSION_SECONDS)
         cookie = f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; Secure; SameSite=Strict"
         if remember:
             cookie += f"; Max-Age={REMEMBER_SECONDS}"
-        self._json(200, {"ok": True, "role": role}, cookie=cookie)
+        self._json(200, {"ok": True, "role": "admin"}, cookie=cookie)
 
     def do_PUT(self):
         if not self._signed_in():
@@ -376,6 +478,19 @@ class OpsHandler(BaseHTTPRequestHandler):
             return
         prefix = "/api/ability-overrides/"
         path = urlsplit(self.path).path
+        if path.startswith("/api/kakao/users/"):
+            # 허가·거부 바꾸기 — 관리자만(위에서 걸렀다).
+            try:
+                allowed = self._body(256).get("allowed")
+                if not isinstance(allowed, bool):
+                    raise InvalidRequest("allowed 는 true·false 여야 합니다.")
+                self.kakao_users.set_allowed(unquote(path[len("/api/kakao/users/"):]), allowed)
+                self._json(200, self.kakao_users.listing())
+            except (InvalidRequest, ValueError, UnicodeDecodeError, json.JSONDecodeError) as error:
+                self._json(400, {"error": str(error)})
+            except OSError:
+                self._json(500, {"error": SAVE_FAILED})
+            return
         if path.startswith("/api/state/") and self.states:
             try:
                 body = self._body(StateStore.LIMIT)
@@ -456,12 +571,65 @@ class OpsHandler(BaseHTTPRequestHandler):
         self.wfile.write(payload)
 
     def _role(self):
-        # 관리자(lod-admin) · 손님(member) — 쿠키 서명 열쇠가 각자의 비밀번호에서 나와 손님 쿠키로 관리자가 되지 않는다.
+        # 관리자(비밀번호 쿠키·Basic) · 손님(허가된 카카오 쿠키). 거부된 카카오 사람은 쿠키가 맞아도 손님이 아니다.
         if self._signed_in():
             return "admin"
-        if self.member and valid_session(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.member):
+        kakao_id = kakao_session_id(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.credential)
+        if kakao_id and self.kakao_users.allowed(kakao_id):
             return "member"
         return None
+
+    def _kakao_start(self):
+        # 카카오 동의 화면으로 — 돌아왔을 때 같은 사람인지 보려고 state 를 쿠키에(Lax: 카카오에서 돌아오는 길에도 실린다).
+        if not self.kakao:
+            self._redirect("/login.html?error=kakao-off")
+            return
+        target = safe_next(parse_qs(urlsplit(self.path).query).get("next", ["/"])[0])
+        state = secrets.token_urlsafe(24)
+        cookie = f"{KAKAO_COOKIE}={state}|{quote(target, safe='')}; Path=/api/kakao/; Max-Age=600; HttpOnly; Secure; SameSite=Lax"
+        self._redirect("https://kauth.kakao.com/oauth/authorize?" + urlencode({
+            "response_type": "code", "client_id": self.kakao["client_id"],
+            "redirect_uri": self.kakao["redirect_uri"], "state": state}), cookie)
+
+    def _kakao_callback(self):
+        query = parse_qs(urlsplit(self.path).query)
+        state, _, target = (cookie_value(self.headers.get("Cookie"), KAKAO_COOKIE) or "").partition("|")
+        clear = f"{KAKAO_COOKIE}=; Path=/api/kakao/; Max-Age=0; HttpOnly; Secure; SameSite=Lax"
+        code = query.get("code", [""])[0]
+        if not self.kakao:
+            self._redirect("/login.html?error=kakao-off", clear)
+            return
+        # 동의 취소(error=)·다른 브라우저에서 시작한 것·쿠키 없음은 모두 다시 하게.
+        if "error" in query or not code or not state or not same_secret(query.get("state", [""])[0], state):
+            self._redirect("/login.html?error=kakao", clear)
+            return
+        try:
+            kakao_id, name = self.kakao_exchange(self.kakao, code)
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            self.log_message("kakao login failed: %s", type(error).__name__)  # 코드·토큰은 적지 않는다
+            self._redirect("/login.html?error=kakao", clear)
+            return
+        try:
+            allowed = self.kakao_users.arrive(kakao_id, name)
+        except OSError:
+            self._redirect("/login.html?error=kakao", clear)
+            return
+        if not allowed:
+            self._redirect("/login.html?error=denied", clear)
+            return
+        session = (f"{SESSION_COOKIE}={kakao_session(self.credential, kakao_id, REMEMBER_SECONDS)}; Path=/; HttpOnly; Secure;"
+                   f" SameSite=Lax; Max-Age={REMEMBER_SECONDS}")
+        self._redirect(safe_next(unquote(target)), clear, session)
+
+    def _redirect(self, location, *cookies):
+        self.send_response(302)
+        self.send_header("Location", location)
+        for cookie in cookies:
+            self.send_header("Set-Cookie", cookie)
+        self.send_header("Content-Length", "0")
+        self.send_header("Cache-Control", "no-store")
+        self._security_headers()
+        self.end_headers()
 
     def _signed_in(self):
         # 쿠키(페이지) 또는 Basic 헤더(스크립트). 401 에 WWW-Authenticate 를 붙이지 않는다 — 붙이면 팝업이 뜬다.
@@ -498,6 +666,11 @@ class OpsHandler(BaseHTTPRequestHandler):
 
     def _static(self):
         path = safe_static_path(self.root, self.path)
+        # 로그인하지 않았으면 로그인 화면만 — 없는 파일도 먼저 로그인으로 보내 무엇이 있는지 드러내지 않는다.
+        public = path is not None and path.parent == Path(self.root).resolve() and path.name in PUBLIC_FILES
+        if not public and not self._role():
+            self._redirect("/login.html?next=" + quote(safe_next(self.path), safe=""))
+            return
         if path is None:
             self._json(404, {"error": "파일이 없습니다."})
             return
@@ -535,11 +708,15 @@ class OpsHandler(BaseHTTPRequestHandler):
         print(f"{self.address_string()} {pattern % args}")
 
 
-def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None, member=None):
+def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None,
+                kakao=None, kakao_users=None, exchange=None):
     return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
                                            "states": states, "throttle": throttle or LoginThrottle(),
-                                           "password_file": password_file, "member": member,
-                                           "activity": activity or ActivityStore(store.path.parent / "activity.sqlite")})
+                                           "password_file": password_file,
+                                           "activity": activity or ActivityStore(store.path.parent / "activity.sqlite"),
+                                           "kakao": kakao,
+                                           "kakao_users": kakao_users or KakaoUsers(store.path.parent / "kakao-users.json"),
+                                           "kakao_exchange": staticmethod(exchange or kakao_exchange)})
 
 
 def main():
@@ -556,11 +733,11 @@ def main():
     credential = args.password_file.read_text(encoding="utf-8").strip()
     if ":" not in credential:
         raise SystemExit("password file must contain user:password")
-    # 손님 비밀번호(내려받기·보기만, 사용자 2026-10-09)는 관리자 비밀번호 파일 옆 member-credential — 없으면 손님 로그인 없음.
-    member_file = args.password_file.with_name("member-credential")
-    member = member_file.read_text(encoding="utf-8").strip() if member_file.exists() else None
-    if member is not None and ":" not in member:
-        raise SystemExit("member-credential must contain user:password")
+    # 카카오 앱 키는 관리자 비밀번호 파일 옆 kakao.json(cloud-dashboard.sh kakao-keys) — 없으면 카카오 단추가 「준비 안 됨」.
+    kakao_file = args.password_file.with_name("kakao.json")
+    kakao = json.loads(kakao_file.read_text(encoding="utf-8")) if kakao_file.exists() else None
+    if kakao is not None and not (kakao.get("client_id") and kakao.get("redirect_uri")):
+        raise SystemExit("kakao.json must contain client_id and redirect_uri")
     data = args.overrides.parent
     log = data / "changes.jsonl"
     stores = (OverrideStore(args.catalog, args.overrides, log), StateStore(data / "state", log))
@@ -568,7 +745,7 @@ def main():
     activity.start()
     server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1],
                                                                      password_file=args.password_file, activity=activity,
-                                                                     member=member))
+                                                                     kakao=kakao))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

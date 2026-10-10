@@ -108,7 +108,8 @@ class AbilityOpsSecurityTests(unittest.TestCase):
 class LoginAndStateTests(unittest.TestCase):
     """팝업 없는 로그인(쿠키)과 바꾼 값 서버 보관 — plans/ops-login-and-backup.md"""
     CREDENTIAL = "lod-admin:secret"
-    MEMBER = "member:1234"
+    KAKAO = {"client_id": "rest-key", "client_secret": "kakao-secret",
+             "redirect_uri": "https://lodgame.duckdns.org/api/kakao/callback"}
 
     def setUp(self):
         import threading
@@ -129,8 +130,16 @@ class LoginAndStateTests(unittest.TestCase):
         states = SERVICE.StateStore(root / "data" / "state", self.log)
         self.password_file = root / "data" / "credential"
         self.password_file.write_text(self.CREDENTIAL + "\n", encoding="utf-8")
+        # 카카오 대신 — 코드 "good" 만 이 사람으로 바꿔 준다.
+        self.kakao_person = ("777", "손님")
+        def exchange(config, code):
+            if config is not self.KAKAO or code != "good":
+                raise ValueError("bad code")
+            return self.kakao_person
+        self.users = SERVICE.KakaoUsers(root / "data" / "kakao-users.json")
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), SERVICE.handler_for(
-            root / "www", store, self.CREDENTIAL, states, password_file=self.password_file, member=self.MEMBER))
+            root / "www", store, self.CREDENTIAL, states, password_file=self.password_file,
+            kakao=self.KAKAO, kakao_users=self.users, exchange=exchange))
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         self.base = f"http://127.0.0.1:{self.server.server_address[1]}"
 
@@ -148,8 +157,12 @@ class LoginAndStateTests(unittest.TestCase):
             headers["Cookie"] = cookie
         data = json.dumps(body).encode() if body is not None else None
         req = urllib.request.Request(self.base + path, data=data, method=method, headers=headers)
+
+        class Stay(urllib.request.HTTPRedirectHandler):  # 302 를 따라가지 않고 그대로 본다
+            def redirect_request(self, *args):
+                return None
         try:
-            with urllib.request.urlopen(req) as response:
+            with urllib.request.build_opener(Stay).open(req) as response:
                 return response.status, response.headers, response.read().decode()
         except urllib.error.HTTPError as error:
             return error.code, error.headers, error.read().decode()
@@ -158,6 +171,17 @@ class LoginAndStateTests(unittest.TestCase):
         status, headers, _ = self.request("POST", "/api/login", {"password": password, "remember": remember})
         self.assertEqual(status, 200)
         return headers["Set-Cookie"]
+
+    def kakao_login(self, next_path="/?view=download"):
+        """카카오 단추 → 동의 → 돌아오기. (돌아온 답, 세션 쿠키 「lod_ops=…」 또는 None)."""
+        import urllib.parse
+        status, headers, _ = self.request("GET", "/api/kakao/start?next=" + urllib.parse.quote(next_path, safe=""))
+        self.assertEqual(status, 302)
+        state_cookie = headers["Set-Cookie"].split(";")[0]
+        state = state_cookie.split("=", 1)[1].split("|")[0]
+        status, headers, _ = self.request("GET", f"/api/kakao/callback?code=good&state={state}", cookie=state_cookie)
+        session = next((c.split(";")[0] for c in headers.get_all("Set-Cookie") or [] if c.startswith("lod_ops=")), None)
+        return (status, headers), session
 
     def test_activity_is_admin_only_and_dates_are_validated(self):
         status, _, _ = self.request("GET", "/api/activity?from=2026-10-02&to=2026-10-03")
@@ -169,25 +193,31 @@ class LoginAndStateTests(unittest.TestCase):
         status, _, _ = self.request("GET", "/api/activity?from=bad&to=2026-10-03", cookie=cookie)
         self.assertEqual(status, 400)
 
-    def test_anyone_can_look_but_only_a_signed_in_person_can_change(self):
-        status, _, body = self.request("GET", "/index.html")
-        self.assertEqual((status, body), (200, "DASHBOARD"))
+    def test_nobody_sees_anything_but_the_login_page_until_signed_in(self):
+        # SC-1 — 사용자 2026-10-10 「아무나 접근 할 수 없게」.
+        for path, wanted in (("/index.html", "%2Findex.html"), ("/?view=abilities", "%2F%3Fview%3Dabilities"),
+                             ("/no-such-file.js", "%2Fno-such-file.js")):
+            status, headers, _ = self.request("GET", path)
+            self.assertEqual((status, headers["Location"]), (302, "/login.html?next=" + wanted))
+        for path in ("/api/ability-overrides", "/api/state/item-names", "/api/kakao/users"):
+            status, _, _ = self.request("GET", path)
+            self.assertEqual(status, 401, path)
+        status, _, body = self.request("GET", "/login.html")
+        self.assertEqual((status, body), (200, "LOGIN"))
         status, _, body = self.request("GET", "/api/session")
         self.assertEqual(json.loads(body), {"signedIn": False, "role": None})
-        status, _, _ = self.request("GET", "/api/ability-overrides")
-        self.assertEqual(status, 200)
         status, headers, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}})
         self.assertEqual(status, 401)
         self.assertIsNone(headers.get("WWW-Authenticate"))
         status, _, body = self.request("GET", "/api/session", cookie=self.login().split(";")[0])
         self.assertEqual(json.loads(body), {"signedIn": True, "role": "admin", "ota": SERVICE.ota_token(self.CREDENTIAL)})
 
-    def test_download_gate_opens_for_admin_guest_or_the_install_token(self):
+    def test_download_gate_opens_for_admin_kakao_guest_or_the_install_token(self):
         status, headers, _ = self.request("GET", "/api/signed-in")
         self.assertEqual(status, 401)
         self.assertIsNone(headers.get("WWW-Authenticate"))
-        for password in ("secret", "1234"):
-            status, _, _ = self.request("GET", "/api/signed-in", cookie=self.login(password=password).split(";")[0])
+        for cookie in (self.login().split(";")[0], self.kakao_login()[1]):
+            status, _, _ = self.request("GET", "/api/signed-in", cookie=cookie)
             self.assertEqual(status, 204)
         token = SERVICE.ota_token(self.CREDENTIAL)
         status, _, _ = self.request("GET", "/api/signed-in", extra={"X-Original-URI": f"/download/LodClient.ipa?ota={token}"})
@@ -196,20 +226,113 @@ class LoginAndStateTests(unittest.TestCase):
             status, _, _ = self.request("GET", "/api/signed-in", extra={"X-Original-URI": bad})
             self.assertEqual(status, 401)
 
-    def test_guest_password_signs_in_without_admin_rights(self):
-        status, _, body = self.request("POST", "/api/login", {"password": "1234", "remember": True})
-        self.assertEqual((status, json.loads(body)["role"]), (200, "member"))
-        guest = self.login(password="1234").split(";")[0]
+    def test_kakao_guest_looks_and_downloads_but_cannot_change(self):
+        # SC-4 — 지금 손님과 같게(사용자 2026-10-10): 보기·내려받기, 고치기·접속 기록·사람 관리는 관리자만.
+        (status, headers), guest = self.kakao_login()
+        self.assertEqual((status, headers["Location"]), (302, "/?view=download"))
+        self.assertIn("SameSite=Lax", next(c for c in headers.get_all("Set-Cookie") if c.startswith("lod_ops=")))
+        status, _, body = self.request("GET", "/index.html", cookie=guest)
+        self.assertEqual((status, body), (200, "DASHBOARD"))
         status, _, body = self.request("GET", "/api/session", cookie=guest)
         self.assertEqual(json.loads(body), {"signedIn": False, "role": "member"})
-        status, _, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}}, cookie=guest)
-        self.assertEqual(status, 401)
-        status, _, _ = self.request("GET", "/api/activity?from=2026-10-02&to=2026-10-03", cookie=guest)
-        self.assertEqual(status, 401)
-        status, _, _ = self.request("POST", "/api/password", {"current": "1234", "new": "longenough1"}, cookie=guest)
-        self.assertEqual(status, 401)
-        # 손님 쿠키는 관리자 서명으로 풀리지 않는다 — 열쇠가 서로의 비밀번호에서 나온다.
+        status, _, _ = self.request("GET", "/api/ability-overrides", cookie=guest)
+        self.assertEqual(status, 200)
+        for method, path, body in (("PUT", "/api/state/item-names", {"changes": {"Stick": "막대기"}}),
+                                   ("GET", "/api/activity?from=2026-10-02&to=2026-10-03", None),
+                                   ("POST", "/api/password", {"current": "x", "new": "longenough1"}),
+                                   ("GET", "/api/kakao/users", None),
+                                   ("PUT", "/api/kakao/users/777", {"allowed": False})):
+            status, _, _ = self.request(method, path, body, cookie=guest)
+            self.assertEqual(status, 401, path)
+        # 카카오 쿠키는 관리자 쿠키로 읽히지 않고, 관리자 쿠키도 카카오 쿠키로 읽히지 않는다.
         self.assertFalse(SERVICE.valid_session(guest.split("=", 1)[1], self.CREDENTIAL))
+        self.assertIsNone(SERVICE.kakao_session_id(self.login().split(";")[0].split("=", 1)[1], self.CREDENTIAL))
+
+    def test_the_old_guest_password_no_longer_opens_anything(self):
+        # SC-6 — 손님 4자리는 없앴다. 관리자 비밀번호는 비상용으로 그대로.
+        status, _, _ = self.request("POST", "/api/login", {"password": "1234", "remember": True})
+        self.assertEqual(status, 401)
+        status, _, body = self.request("POST", "/api/login", {"password": "secret"})
+        self.assertEqual((status, json.loads(body)), (200, {"ok": True, "role": "admin"}))
+
+    def test_kakao_start_goes_to_kakao_with_a_state_cookie(self):
+        # SC-2
+        import urllib.parse
+        status, headers, _ = self.request("GET", "/api/kakao/start?next=%2F%3Fview%3Ditems")
+        self.assertEqual(status, 302)
+        place = urllib.parse.urlsplit(headers["Location"])
+        query = urllib.parse.parse_qs(place.query)
+        self.assertEqual((place.scheme, place.netloc, place.path), ("https", "kauth.kakao.com", "/oauth/authorize"))
+        self.assertEqual((query["client_id"], query["redirect_uri"], query["response_type"]),
+                         (["rest-key"], [self.KAKAO["redirect_uri"]], ["code"]))
+        cookie = headers["Set-Cookie"]
+        self.assertTrue(cookie.startswith(f"lod_kakao={query['state'][0]}|%2F%3Fview%3Ditems;"))
+        for part in ("HttpOnly", "Secure", "SameSite=Lax", "Path=/api/kakao/", "Max-Age=600"):
+            self.assertIn(part, cookie)
+        self.assertNotIn("kakao-secret", headers["Location"])
+
+    def test_first_kakao_visit_is_allowed_and_remembered(self):
+        # SC-3 — 처음 오면 일단 허가(사용자 2026-10-10).
+        self.kakao_login()
+        self.kakao_person = ("777", "새이름")
+        self.kakao_login()
+        [person] = self.users.listing()
+        self.assertEqual((person["id"], person["name"], person["allowed"]), ("777", "새이름", True))
+        self.assertLessEqual(person["first"], person["last"])
+
+    def test_kakao_callback_refuses_a_wrong_state_a_cancel_or_a_bad_code(self):
+        # SC-3 — 다른 브라우저에서 시작했거나 동의를 취소했거나 코드가 틀리면 세션 없이 로그인 화면으로.
+        status, headers, _ = self.request("GET", "/api/kakao/start")
+        state_cookie = headers["Set-Cookie"].split(";")[0]
+        state = state_cookie.split("=", 1)[1].split("|")[0]
+        for query, cookie in ((f"code=good&state=other", state_cookie), (f"code=good&state={state}", None),
+                              (f"error=access_denied&state={state}", state_cookie), (f"code=bad&state={state}", state_cookie)):
+            status, headers, _ = self.request("GET", "/api/kakao/callback?" + query, cookie=cookie)
+            self.assertEqual((status, headers["Location"]), (302, "/login.html?error=kakao"), query)
+            self.assertFalse(any(c.startswith("lod_ops=") for c in headers.get_all("Set-Cookie") or []), query)
+        self.assertEqual(self.users.listing(), [])
+
+    def test_a_denied_person_is_cut_off_at_once_and_cannot_come_back(self):
+        # SC-5 — 관리자가 거부로 바꾸면 그 쿠키는 바로 막히고, 카카오로 다시 와도 못 들어온다.
+        guest = self.kakao_login()[1]
+        admin = self.login().split(";")[0]
+        status, _, body = self.request("GET", "/api/kakao/users", cookie=admin)
+        self.assertEqual([(p["id"], p["allowed"]) for p in json.loads(body)], [("777", True)])
+        status, _, body = self.request("PUT", "/api/kakao/users/777", {"allowed": False}, cookie=admin)
+        self.assertEqual((status, json.loads(body)[0]["allowed"]), (200, False))
+        status, headers, _ = self.request("GET", "/index.html", cookie=guest)
+        self.assertEqual(status, 302)
+        status, _, _ = self.request("GET", "/api/signed-in", cookie=guest)
+        self.assertEqual(status, 401)
+        (status, headers), again = self.kakao_login()
+        self.assertEqual((headers["Location"], again), ("/login.html?error=denied", None))
+        status, _, _ = self.request("PUT", "/api/kakao/users/777", {"allowed": "no"}, cookie=admin)
+        self.assertEqual(status, 400)
+        status, _, _ = self.request("PUT", "/api/kakao/users/999", {"allowed": True}, cookie=admin)
+        self.assertEqual(status, 400)
+        self.request("PUT", "/api/kakao/users/777", {"allowed": True}, cookie=admin)
+        self.assertEqual(self.request("GET", "/index.html", cookie=guest)[0], 200)
+
+    def test_after_login_the_person_only_goes_somewhere_on_this_site(self):
+        # SC-7
+        for outside in ("//evil.example/x", "/\\evil.example", "https://evil.example/", "/a\r\nSet-Cookie: x=1", "evil"):
+            self.assertEqual(SERVICE.safe_next(outside), "/", outside)
+        self.assertEqual(SERVICE.safe_next("/?view=items&x=1"), "/?view=items&x=1")
+        (status, headers), _ = self.kakao_login("//evil.example/x")
+        self.assertEqual(headers["Location"], "/")
+
+    def test_kakao_session_is_signed_expires_and_ends_with_a_new_admin_password(self):
+        token = SERVICE.kakao_session(self.CREDENTIAL, "777", 60, now=1000)
+        self.assertEqual(SERVICE.kakao_session_id(token, self.CREDENTIAL, now=1030), "777")
+        self.assertIsNone(SERVICE.kakao_session_id(token, self.CREDENTIAL, now=1061))
+        self.assertIsNone(SERVICE.kakao_session_id(token, "lod-admin:changed", now=1030))
+        self.assertIsNone(SERVICE.kakao_session_id(token.replace("k777.", "k778.", 1), self.CREDENTIAL, now=1030))
+        self.assertIsNone(SERVICE.kakao_session_id("k²." + token.split(".", 1)[1], self.CREDENTIAL, now=1030))
+
+    def test_kakao_button_says_not_ready_without_keys(self):
+        self.server.RequestHandlerClass.kakao = None
+        status, headers, _ = self.request("GET", "/api/kakao/start")
+        self.assertEqual((status, headers["Location"]), (302, "/login.html?error=kakao-off"))
 
     def test_install_manifest_needs_the_token_and_passes_it_to_the_ipa(self):
         token = SERVICE.ota_token(self.CREDENTIAL)
@@ -285,10 +408,10 @@ class LoginAndStateTests(unittest.TestCase):
         self.assertEqual(status, 200)
         status, _, _ = self.request("PUT", "/api/state/item-names", {"changes": {"Eppe": "에페"}}, cookie=laptop)
         self.assertEqual(status, 200)
-        _, _, body = self.request("GET", "/api/state/item-names")
+        _, _, body = self.request("GET", "/api/state/item-names", cookie=phone)
         self.assertEqual(json.loads(body), {"Stick": "막대기", "Eppe": "에페"})
         self.request("PUT", "/api/state/item-names", {"changes": {"Stick": None}}, cookie=phone)  # null 은 그 칸만 지운다
-        _, _, body = self.request("GET", "/api/state/item-names")
+        _, _, body = self.request("GET", "/api/state/item-names", cookie=phone)
         self.assertEqual(json.loads(body), {"Eppe": "에페"})
         # 사전을 통째로 보내던 옛 꼴은 받지 않는다 — 다른 기기의 변경을 지우던 길이다.
         status, _, _ = self.request("PUT", "/api/state/item-names", {"value": {"Stick": "막대기"}}, cookie=phone)
@@ -303,12 +426,12 @@ class LoginAndStateTests(unittest.TestCase):
         status, _, body = self.request("PUT", "/api/state/item-names", {"changes": {"Stick": "몽둥이"}}, cookie=cookie)
         self.assertEqual(status, 500)
         self.assertIn("error", json.loads(body))
-        _, _, body = self.request("GET", "/api/state/item-names")
+        _, _, body = self.request("GET", "/api/state/item-names", cookie=cookie)
         self.assertEqual(json.loads(body), {"Stick": "막대기"})
         status, _, _ = self.request("PUT", "/api/ability-overrides/" + urllib.parse.quote("skill:단각"),
                                     {"values": {"effect": 5}, "revision": 0}, cookie=cookie)
         self.assertEqual(status, 500)
-        _, _, body = self.request("GET", "/api/ability-overrides")
+        _, _, body = self.request("GET", "/api/ability-overrides", cookie=cookie)
         self.assertEqual(json.loads(body)["revision"], 0)
 
     def test_signed_in_person_changes_the_password_and_old_logins_end(self):

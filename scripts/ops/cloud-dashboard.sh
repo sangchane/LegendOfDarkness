@@ -4,7 +4,7 @@
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh setup
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh deploy|backup|status|logs|credentials|cert
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh release [ios|windows|android]   맥의 최신 앱 파일을 내려받기 페이지(/download/)에 올린다
-#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh member-password <새것>   손님(내려받기·보기만) 비밀번호
+#   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.txt   카카오 로그인 앱 키(REST API 키·Client Secret 두 줄)
 #   LOD_CLOUD_IP=... scripts/ops/cloud-dashboard.sh nginx    nginx 설정만 다시 깐다(페이지·서비스는 그대로) — 내려받기 파일 종류를 늘렸을 때
 set -euo pipefail
 
@@ -250,7 +250,7 @@ SH
 backup() {
     local out="$BACKUP_DIR/ops-data-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$out"
-    rsync -az --timeout=60 --exclude '*credential' -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
+    rsync -az --timeout=60 --exclude '*credential' --exclude 'kakao.json' -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
     echo "관리 페이지 값 백업 — $out"
     ls -la "$out"
 }
@@ -258,7 +258,8 @@ backup() {
 deploy() {
     upload
     nginx_site
-    remote "sudo systemctl restart lod-ability-ops && sudo systemctl reload nginx"
+    # 손님 4자리 비밀번호는 카카오 로그인으로 바꿨다(사용자 2026-10-10) — 서비스가 더는 읽지 않지만 남은 파일도 치운다.
+    remote "rm -f $REMOTE/data/member-credential && sudo systemctl restart lod-ability-ops && sudo systemctl reload nginx"
     echo "대시보드 갱신 완료 — https://$DOMAIN"
 }
 
@@ -328,17 +329,21 @@ sudo systemctl restart lod-ability-ops'
     save_credentials
 }
 
-# 손님 비밀번호 — 내려받기·보기만(사용자 2026-10-09). 관리자 비밀번호와 따로 서비스 옆 member-credential 에.
-#   LOD_CLOUD_IP=… scripts/ops/cloud-dashboard.sh member-password <새비밀번호>
-set_member_password() {
-    printf '%s\n' "$1" | remote 'set -euo pipefail
-IFS= read -r password
-umask 077
-# 관리자 비밀번호와 같으면 로그인이 관리자로 먼저 맞춰 손님이 관리자가 된다.
-if [ "$password" = "$(cut -d: -f2- /home/ubuntu/lod-ops/data/credential)" ]; then echo "관리자 비밀번호와 달라야 합니다" >&2; exit 1; fi
-printf "member:%s\n" "$password" > /home/ubuntu/lod-ops/data/member-credential
-sudo systemctl restart lod-ability-ops'
-    echo "손님 비밀번호를 바꿨습니다 — 손님 로그인은 모두 풀립니다."
+# 카카오 로그인 앱 키(사용자 2026-10-10) — developers.kakao.com 「앱 키」의 REST API 키와 「보안」의 Client Secret 을 두 줄로.
+#   LOD_CLOUD_IP=… scripts/ops/cloud-dashboard.sh kakao-keys < ~/LOD-backups/kakao.txt
+# 줄마다 마지막 낱말을 쓴다(「REST API 키: abcd…」처럼 적어도 된다). 키는 stdin 으로만 넘기고 화면에 찍지 않는다.
+set_kakao_keys() {
+    local json
+    json="$(python3 -c '
+import json, re, sys
+words = [line.split()[-1] for line in sys.stdin.read().splitlines() if line.strip()]
+key, secret = (words + ["", ""])[:2]
+if not re.fullmatch(r"[0-9A-Za-z]{16,64}", key) or (secret and not re.fullmatch(r"[0-9A-Za-z]{16,64}", secret)):
+    sys.exit("REST API 키(첫 줄)·Client Secret(둘째 줄)이 키 꼴(영문·숫자 16~64자)이 아닙니다")
+print(json.dumps({"client_id": key, "client_secret": secret, "redirect_uri": sys.argv[1]}))
+' "https://$DOMAIN/api/kakao/callback")"
+    printf '%s\n' "$json" | remote "umask 077; cat > $REMOTE/data/kakao.json.new && mv $REMOTE/data/kakao.json.new $REMOTE/data/kakao.json && sudo systemctl restart lod-ability-ops"
+    echo "카카오 키를 넣었습니다 — 돌아오는 주소 https://$DOMAIN/api/kakao/callback 이 카카오 앱 설정과 같아야 합니다."
 }
 
 save_credentials() {
@@ -358,8 +363,8 @@ case "${1:-status}" in
     credentials) save_credentials ;;
     cert) cert ;;
     password) set_password "${2:-}" ;;
-    member-password) set_member_password "${2:?새 손님 비밀번호를 붙여 주세요}" ;;
+    kakao-keys) set_kakao_keys ;;
     release) release "${2:-ios}" ;;
     nginx) nginx_site; remote "sudo nginx -t && sudo systemctl reload nginx" ;;
-    *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password member-password release nginx"; exit 2 ;;
+    *) echo "쓸 수 있는 것: setup deploy backup status logs credentials cert password kakao-keys release nginx"; exit 2 ;;
 esac
