@@ -415,6 +415,10 @@ public partial class GameScreen : Control
         {
             SetWindow(GameWindow.Settings, true);
         }
+
+        // 위 줄은 rows 에 들어가는 순간 제 크기를 잡아 Resized 를 낸다 — 그 뒤에 붙은 자리 잡기([접속자]·[봇]·창·띠)는 위 줄 크기가 다시
+        // 바뀌어야 불렸다. 금화·레벨 글자가 안 바뀌는 캐릭터(1레벨·금화 0)는 끝내 안 불려 단추가 위 줄 위에 겹쳤다(사용자 2026-10-11).
+        Callable.From(() => _topRow.EmitSignal(Control.SignalName.Resized)).CallDeferred();
     }
 
     /// <summary>The world itself, filling the screen with the HUD floating over it.</summary>
