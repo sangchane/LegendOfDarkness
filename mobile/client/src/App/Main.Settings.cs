@@ -64,6 +64,12 @@ public partial class Main : Control
     {
         Kakao = account;
 
+        // --kakao 미리보기는 기기의 표를 건드리지 않는다(리뷰 2026-10-11 — 로그아웃 미리보기가 진짜 kakao.cfg 를 지웠다).
+        if (KakaoPreview.Length > 0)
+        {
+            return;
+        }
+
         if (account is null)
         {
             if (Godot.FileAccess.FileExists(KakaoFile))
@@ -92,6 +98,11 @@ public partial class Main : Control
     {
         LastCharacter = name;
         AutoLogin = automatic;
+
+        if (KakaoPreview.Length > 0)
+        {
+            return; // 미리보기는 기기 파일을 쓰지 않는다
+        }
 
         Godot.FileAccess? writing = Godot.FileAccess.Open(CharacterFile, Godot.FileAccess.ModeFlags.Write);
 

@@ -83,6 +83,8 @@ public partial class LoginScreen : Control
     private string? _sentCode;
     private bool _codeAsked;
     private bool _asking;
+    // 표를 받는 중 — 화면을 돌려 판을 다시 지어도 카카오 단추가 다시 눌리지 않게(리뷰 2026-10-11).
+    private bool _openingKakao;
     private Godot.Timer _poll = null!;
 
     // 키보드가 올라와 있는 동안 접어 두는 줄(위 환경 줄·아래 판 번호·안내 한 줄), 그리고 화면을 올린 만큼.
@@ -234,6 +236,7 @@ public partial class LoginScreen : Control
         bool signedIn = SignedIn;
 
         _kakao.Visible = !signedIn;
+        _kakao.Disabled = _openingKakao;
         _codeRow.Visible = !signedIn && _ticket is not null;
         _whoRow.Visible = signedIn;
         _nameRow.Visible = signedIn;
@@ -481,7 +484,16 @@ public partial class LoginScreen : Control
         _password.TextChanged += _ => RefreshSubmitState();
         _code.TextChanged += text => _confirmCode.Disabled = !KakaoSignIn.IsCode(text);
         _submit.Pressed += BeginLogin;
-        _create.Pressed += () => WantsToCreate?.Invoke();
+        _create.Pressed += () =>
+        {
+            // 켠 자동 로그인을 만들기 화면이 이어받게 — 만들기는 저장된 값을 쓴다(리뷰 2026-10-11).
+            if (_autoLoginWanted != Main.AutoLogin)
+            {
+                Main.SetLastCharacter(Main.LastCharacter, _autoLoginWanted);
+            }
+
+            WantsToCreate?.Invoke();
+        };
         _link.Pressed += ToggleLink;
         _signOut.Pressed += SignOut;
         _kakao.Pressed += StartKakao;
@@ -762,7 +774,7 @@ public partial class LoginScreen : Control
     private void StartKakao()
     {
         ForgetTicket();
-        _kakao.Disabled = true;
+        _openingKakao = true;
         _status.Text = "카카오 로그인을 여는 중…";
         ShowState();
 
@@ -772,6 +784,7 @@ public partial class LoginScreen : Control
         ask.RequestCompleted += (result, code, _, body) =>
         {
             ask.QueueFree();
+            _openingKakao = false;
             _kakao.Disabled = false;
             string answer = System.Text.Encoding.UTF8.GetString(body);
 
@@ -794,6 +807,7 @@ public partial class LoginScreen : Control
         if (ask.Request(KakaoSignIn.TicketUrl, [], Godot.HttpClient.Method.Post) != Godot.Error.Ok)
         {
             ask.QueueFree();
+            _openingKakao = false;
             _kakao.Disabled = false;
             _status.Text = "홈페이지에 닿지 못했습니다. 인터넷 연결을 확인해 주세요.";
         }
@@ -852,9 +866,14 @@ public partial class LoginScreen : Control
                 break;
 
             case KakaoWait.NeedsCode:
-                _codeAsked = true;
-                _status.Text = CodeText;
-                ShowState();
+                // 처음 한 번만 안내 — 번호가 틀렸다는 말·남은 기회를 다음 물음이 덮지 않게(리뷰 2026-10-11).
+                if (!_codeAsked)
+                {
+                    _codeAsked = true;
+                    _status.Text = CodeText;
+                    ShowState();
+                }
+
                 break;
 
             case KakaoWait.WrongCode when reply.Left > 0:
@@ -1030,7 +1049,12 @@ public partial class LoginScreen : Control
     /// </summary>
     private void RefreshSubmitState(bool keepStatus = false)
     {
-        if (_attempt is not null || _session is not null)
+        // 접속하는 동안 표를 지우거나 잇기로 바꾸지 못하게 — 이미 보낸 표로 들어가 상태가 꼬였다(리뷰 2026-10-11).
+        bool busy = _attempt is not null || _session is not null;
+        _signOut.Disabled = busy;
+        _link.Disabled = busy;
+
+        if (busy)
         {
             _submit.Disabled = true;
             return;
