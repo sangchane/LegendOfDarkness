@@ -24,9 +24,10 @@
    - 실패(state 다름·취소 `error=`·교환 실패) → `/login.html?error=kakao`. 설정 파일 없음 → `?error=kakao-off`. 거부된 사람 → `?error=denied`.
 2. **사람 목록** `data/kakao-users.json` — `{"<id>": {"name", "allowed", "first", "last"}}`(UTC ISO). 처음 오면 `allowed: true`, 올 때마다 `last`.
    잠금 하나로 읽고·바꾸고, `save_credential` 처럼 옆에 써서 이름 바꾸기.
-3. **카카오 세션** — 쿠키 `lod_ops=k<id>.<만료>.<서명>`, 서명 = HMAC(session_key(관리자 비밀번호), `kakao:<id>:<만료>`), 30일,
+3. **카카오 세션** — 쿠키 `lod_ops=k<id>.<만료>.<서명>`, 서명 = HMAC(session_key(`data/session-secret`), `kakao:<id>:<만료>`), 30일,
    SameSite=Lax(카카오에서 돌아오는 302 사슬에서도 쿠키가 실리게). 요청마다 목록에서 `allowed` 를 본다 — 거부하면 바로 끊긴다.
-   관리자 비밀번호를 바꾸면 카카오 로그인도 모두 풀린다(다시 카카오 한 번).
+   열쇠 `session-secret` 은 처음 켤 때 서비스가 만든다(600) — 관리자 비밀번호를 바꿔도 카카오 손님은 그대로
+   (사용자 「관리자 비번 바꾼다고 다 다시 로그인하면 되나」). 모두 내보내려면 그 파일을 지우고 서비스를 다시 켠다. backup 은 받지 않는다.
 4. **모두 잠그기** — 역할이 없으면 `_static` 은 `login.html`·`login.js`·`favicon.svg` 만 주고 나머지는 `/login.html?next=<원래 주소>` 로 302.
    `GET /api/state/*`·`/api/ability-overrides` 는 401. `/api/session`·`/api/health`·`/api/signed-in`·`/api/ota-manifest`·카카오 두 길은 그대로 열림.
 5. **역할** — 관리자 쿠키·Basic → `admin`, 허가된 카카오 쿠키 → `member`, 그 밖 → 없음. 손님 비밀번호(`member`)와 `member-credential` 읽기를 없앤다.

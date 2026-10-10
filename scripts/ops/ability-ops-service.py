@@ -262,14 +262,15 @@ KAKAO_COOKIE = "lod_kakao"
 PUBLIC_FILES = {"login.html", "login.js", "favicon.svg"}
 
 
-def kakao_session(credential, kakao_id, lifetime, now=None):
-    # 관리자 쿠키(만료.서명)와 꼴이 달라(k번호.만료.서명) 서로 풀리지 않는다. 관리자 비밀번호를 바꾸면 함께 풀린다.
+def kakao_session(secret, kakao_id, lifetime, now=None):
+    # 관리자 쿠키(만료.서명)와 꼴이 달라(k번호.만료.서명) 서로 풀리지 않는다. 열쇠는 관리자 비밀번호가 아니라 따로 둔
+    # session-secret — 관리자 비밀번호를 바꿔도 카카오 손님은 그대로(사용자 2026-10-10). 모두 내보내려면 그 파일을 지우고 다시 켠다.
     expiry = str(int((now or time.time()) + lifetime))
-    signature = hmac.new(session_key(credential), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
+    signature = hmac.new(session_key(secret), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
     return f"k{kakao_id}.{expiry}.{signature}"
 
 
-def kakao_session_id(token, credential, now=None):
+def kakao_session_id(token, secret, now=None):
     """맞는 카카오 쿠키면 카카오 회원번호, 아니면 None."""
     head, _, rest = (token or "").partition(".")
     expiry, _, signature = rest.partition(".")
@@ -277,7 +278,7 @@ def kakao_session_id(token, credential, now=None):
     if not (head.startswith("k") and kakao_id.isascii() and kakao_id.isdigit() and len(kakao_id) < 20
             and expiry.isascii() and expiry.isdigit() and len(expiry) < 12) or int(expiry) < (now or time.time()):
         return None
-    wanted = hmac.new(session_key(credential), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
+    wanted = hmac.new(session_key(secret), f"kakao:{kakao_id}:{expiry}".encode(), hashlib.sha256).hexdigest()
     return kakao_id if signature.isascii() and hmac.compare_digest(signature, wanted) else None
 
 
@@ -390,7 +391,7 @@ def safe_static_path(root: Path, request_path: str):
 
 class OpsHandler(BaseHTTPRequestHandler):
     """운영 API 와 정적 파일. 설정은 `handler_for` 가 하위 클래스의 클래스 속성으로 넣는다."""
-    root = store = credential = states = throttle = password_file = activity = kakao = kakao_users = kakao_exchange = None
+    root = store = credential = states = throttle = password_file = activity = kakao = kakao_users = kakao_exchange = kakao_secret = None
     server_version = "LODAbilityOps/1"
 
     def do_GET(self):
@@ -585,7 +586,7 @@ class OpsHandler(BaseHTTPRequestHandler):
         # 관리자(비밀번호 쿠키·Basic) · 손님(허가된 카카오 쿠키). 거부된 카카오 사람은 쿠키가 맞아도 손님이 아니다.
         if self._signed_in():
             return "admin"
-        kakao_id = kakao_session_id(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.credential)
+        kakao_id = kakao_session_id(cookie_value(self.headers.get("Cookie"), SESSION_COOKIE), self.kakao_secret)
         if kakao_id and self.kakao_users.allowed(kakao_id):
             return "member"
         return None
@@ -628,7 +629,7 @@ class OpsHandler(BaseHTTPRequestHandler):
         if not allowed:
             self._redirect("/login.html?error=denied", clear)
             return
-        session = (f"{SESSION_COOKIE}={kakao_session(self.credential, kakao_id, REMEMBER_SECONDS)}; Path=/; HttpOnly; Secure;"
+        session = (f"{SESSION_COOKIE}={kakao_session(self.kakao_secret, kakao_id, REMEMBER_SECONDS)}; Path=/; HttpOnly; Secure;"
                    f" SameSite=Lax; Max-Age={REMEMBER_SECONDS}")
         self._redirect(safe_next(unquote(target)), clear, session)
 
@@ -720,14 +721,15 @@ class OpsHandler(BaseHTTPRequestHandler):
 
 
 def handler_for(root, store, credential, states=None, throttle=None, password_file=None, activity=None,
-                kakao=None, kakao_users=None, exchange=None):
+                kakao=None, kakao_users=None, exchange=None, kakao_secret=None):
     return type("Handler", (OpsHandler,), {"root": root, "store": store, "credential": credential,
                                            "states": states, "throttle": throttle or LoginThrottle(),
                                            "password_file": password_file,
                                            "activity": activity or ActivityStore(store.path.parent / "activity.sqlite"),
                                            "kakao": kakao,
                                            "kakao_users": kakao_users or KakaoUsers(store.path.parent / "kakao-users.json"),
-                                           "kakao_exchange": staticmethod(exchange or kakao_exchange)})
+                                           "kakao_exchange": staticmethod(exchange or kakao_exchange),
+                                           "kakao_secret": kakao_secret or secrets.token_hex(32)})
 
 
 def main():
@@ -749,6 +751,11 @@ def main():
     kakao = json.loads(kakao_file.read_text(encoding="utf-8")) if kakao_file.exists() else None
     if kakao is not None and not (kakao.get("client_id") and kakao.get("redirect_uri")):
         raise SystemExit("kakao.json must contain client_id and redirect_uri")
+    # 카카오 쿠키 서명 열쇠 — 처음 켤 때 만들어 둔다(600). 관리자 비밀번호와 따로라 비밀번호를 바꿔도 카카오 손님은 안 풀린다.
+    secret_file = args.password_file.with_name("session-secret")
+    if not secret_file.exists():
+        save_credential(secret_file, secrets.token_hex(32))
+    kakao_secret = secret_file.read_text(encoding="utf-8").strip()
     data = args.overrides.parent
     log = data / "changes.jsonl"
     stores = (OverrideStore(args.catalog, args.overrides, log), StateStore(data / "state", log))
@@ -756,7 +763,7 @@ def main():
     activity.start()
     server = ThreadingHTTPServer((args.bind, args.port), handler_for(args.root, stores[0], credential, stores[1],
                                                                      password_file=args.password_file, activity=activity,
-                                                                     kakao=kakao))
+                                                                     kakao=kakao, kakao_secret=kakao_secret))
     print(f"LOD ability operations: http://{args.bind}:{args.port}", flush=True)
     server.serve_forever()
 

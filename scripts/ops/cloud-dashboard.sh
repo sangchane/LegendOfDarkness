@@ -250,7 +250,7 @@ SH
 backup() {
     local out="$BACKUP_DIR/ops-data-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$out"
-    rsync -az --timeout=60 --exclude '*credential' --exclude 'kakao.json' -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
+    rsync -az --timeout=60 --exclude '*credential' --exclude 'kakao.json' --exclude 'session-secret' -e "ssh -i $KEY" "$HOST:$REMOTE/data/" "$out/"
     echo "관리 페이지 값 백업 — $out"
     ls -la "$out"
 }

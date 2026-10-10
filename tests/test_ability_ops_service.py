@@ -324,16 +324,25 @@ class LoginAndStateTests(unittest.TestCase):
         (status, headers), _ = self.kakao_login("//evil.example/x")
         self.assertEqual(headers["Location"], "/")
 
-    def test_kakao_session_is_signed_expires_and_ends_with_a_new_admin_password(self):
+    def test_kakao_session_is_signed_and_expires(self):
         token = SERVICE.kakao_session(self.CREDENTIAL, "777", 60, now=1000)
         self.assertEqual(SERVICE.kakao_session_id(token, self.CREDENTIAL, now=1030), "777")
         self.assertIsNone(SERVICE.kakao_session_id(token, self.CREDENTIAL, now=1061))
-        self.assertIsNone(SERVICE.kakao_session_id(token, "lod-admin:changed", now=1030))
+        self.assertIsNone(SERVICE.kakao_session_id(token, "another-secret", now=1030))
         self.assertIsNone(SERVICE.kakao_session_id(token.replace("k777.", "k778.", 1), self.CREDENTIAL, now=1030))
         self.assertIsNone(SERVICE.kakao_session_id("k²." + token.split(".", 1)[1], self.CREDENTIAL, now=1030))
         # 서명 자리에 비ASCII 가 오면 예외로 연결이 끊기지 않고 그냥 아니다(보안 리뷰 2026-10-10 낮음 4).
         self.assertIsNone(SERVICE.kakao_session_id("k1.9999999999.é", self.CREDENTIAL))
         self.assertFalse(SERVICE.valid_session("9999999999.é", self.CREDENTIAL))
+
+    def test_changing_the_admin_password_keeps_kakao_guests_signed_in(self):
+        # 사용자 2026-10-10 「관리자 비번 바꾼다고 다 다시 로그인하면 되나」 — 카카오 쿠키는 따로 둔 열쇠로 서명한다.
+        guest = self.kakao_login()[1]
+        admin = self.login().split(";")[0]
+        status, _, _ = self.request("POST", "/api/password", {"current": "secret", "new": "longenough1"}, cookie=admin)
+        self.assertEqual(status, 200)
+        self.assertEqual(self.request("GET", "/index.html", cookie=guest)[0], 200)
+        self.assertEqual(self.request("GET", "/index.html", cookie=admin)[0], 302)  # 옛 관리자 로그인만 풀린다
 
     def test_kakao_button_says_not_ready_without_keys(self):
         self.server.RequestHandlerClass.kakao = None
