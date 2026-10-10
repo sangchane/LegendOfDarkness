@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """머신러닝용 사본 — 게임 활동 기록과 생태계 봇 사건을 날짜별 gzip JSONL 로 모은다(설계 autopilot/eco-bots/05 E8).
-원본 활동 기록(서버 activity/YYYY-MM-DD.jsonl)은 IP 가 있어 90일 뒤 지워진다. 이 사본은 IP·detail(한국어 문장)을 빼고
+원본 활동 기록(서버 activity/YYYY-MM-DD.jsonl)은 IP 가 있어 지워진다(이 사본이 있는 날은 3일, 없으면 90일 — activity_store). 이 사본은 IP·detail(한국어 문장)을 빼고
 사람 이름은 비밀 소금으로 HMAC-SHA256 한 앞 16글자(p)로 바꿔 오래 둔다. 이름 그대로 두는 것은 서버 설정의 봇 이름(EcoBots·CompanionBots)뿐 —
 bot=true 는 대신 사냥 중인 사람에게도 서므로 그것만 믿지 않는다. meta 의 거래 상대(counterparty)도 같이 바꾸고 기기 번호(install)는 뺀다.
-오늘 파일은 아직 자라니 건너뛴다.
+오늘 파일은 아직 자라니 건너뛴다. 봇 사건은 같은 디스크라 하드링크로 둔다(안 되면 복사). 사본은 365일 지나면 지운다.
   쓰는 법: python3 scripts/ml/export-activity.py --activity <서버 activity 폴더> --eco <봇 eco 폴더> --out <ml 폴더> --salt <소금 파일> --config <LoruleConfig.json>
   산출물:  <out>/activity/YYYY-MM-DD.jsonl.gz · <out>/eco/YYYY-MM-DD.jsonl.gz (이미 있으면 그대로)
 """
@@ -14,6 +14,7 @@ import gzip
 import hashlib
 import hmac
 import json
+import os
 import re
 import shutil
 from datetime import datetime, timedelta, timezone
@@ -79,8 +80,16 @@ def export(activity: Path, eco: Path, out: Path, salt: bytes, today: str, bots: 
         target = out / "eco" / source.name
         if not target.exists():
             target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source, target)
+            try:
+                os.link(source, target)  # lod-eco/eco 와 똑같은 두 벌이 디스크를 두 번 먹었다(2026-10-11)
+            except OSError:
+                shutil.copyfile(source, target)
             done.append(str(target))
+
+    cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=365)).strftime("%Y-%m-%d")
+    for old in [*out.glob("activity/????-??-??.jsonl.gz"), *out.glob("eco/????-??-??.jsonl.gz")]:
+        if old.name[:10] < cutoff:
+            old.unlink()
     return done
 
 

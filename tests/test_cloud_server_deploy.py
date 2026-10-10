@@ -69,7 +69,8 @@ exit 0
 """,
     "crontab": """#!/bin/bash
 # 가짜 crontab — 이 맥의 진짜 crontab 을 건드리지 않는다.
-if [ "${1:-}" = -l ]; then cat "$FAKE_STATE/crontab" 2>/dev/null; else cat > "$FAKE_STATE/crontab"; fi
+# 진짜처럼 다 읽은 뒤에 쓴다 — `crontab -l | … | crontab -` 가 읽기 전에 파일을 비우지 않게.
+if [ "${1:-}" = -l ]; then cat "$FAKE_STATE/crontab" 2>/dev/null; else table="$(cat)"; printf '%s\n' "$table" > "$FAKE_STATE/crontab"; fi
 """,
     "sleep": "#!/bin/bash\nexit 0\n",
     "flock": "#!/bin/bash\nexit 0\n",  # 맥에는 없다 — 클라우드(우분투)의 util-linux flock 자리
@@ -257,6 +258,10 @@ class CloudServerDeployTests(FakeCloudCase):
         self.assertEqual(after["lod-proxy/app/Lod.HuntProxy.dll"], "new Lod.HuntProxy build")
         self.assertEqual(after["lod-eco/app/Lod.EcoBots.dll"], "new Lod.EcoBots build")
         self.assertEqual(after["lod-eco/ml/export-activity.py"], "new export script")
+        # 머신러닝 사본은 게임 서버가 실제로 쓰는 활동 기록 폴더에서(autopilot/bot-data-cleanup 5), journal 은 500MB.
+        self.assertIn(f"--activity {self.remote}/lod-activity --eco", (self.state / "crontab").read_text())
+        self.assertIn("sudo tee /etc/systemd/journald.conf.d/lod.conf", (self.state / "sudo.log").read_text())
+        self.assertIn("restart systemd-journald", self.systemctl_log())
         # 옛 코드는 .prev 에 남아 손으로도 되돌릴 수 있다.
         self.assertEqual((self.remote / "lod/Staging/net9.0.prev/Lorule.GameServer.dll").read_text(), "old-server")
         # 빌드가 덮어쓴 맥 서버 설정은 되돌려 둔다.

@@ -340,11 +340,12 @@
         <p id="activity-status" role="status">관리자 로그인 후 조회할 수 있습니다.</p>
         <div id="activity-results" hidden>
           <div id="activity-summary" class="activity-summary"></div>
-          <p class="activity-note">한국 시각 · 90일 보관 · 앱 통계 날짜는 서버 수신일 기준 · IP/브라우저는 접속 환경이며 사람·기기 신원을 확정하지 않습니다. 다운로드는 GET 파일 전송(부분 전송 포함), 설치 완료 여부는 알 수 없습니다. 방문에는 자동 수집기가 포함됩니다.</p>
+          <p class="activity-note">한국 시각 · 90일 보관(봇 기록은 7일) · 앱 통계 날짜는 서버 수신일 기준 · IP/브라우저는 접속 환경이며 사람·기기 신원을 확정하지 않습니다. 다운로드는 GET 파일 전송(부분 전송 포함), 설치 완료 여부는 알 수 없습니다. 방문에는 자동 수집기가 포함됩니다.</p>
           <h2>날짜별 통계</h2><div id="activity-daily" class="activity-table"></div>
           <h2>웹 방문자 · 접속 환경</h2><div id="activity-visitors" class="activity-table"></div>
           <h2>앱 다운로드 전송</h2><div id="activity-downloads" class="activity-table"></div>
           <h2>게임 캐릭터 통계</h2><p class="activity-note">처리한 기술·마법 등 요청 수는 성공 횟수와 다릅니다. 접속 시간은 종료된 세션 기준, 경험치·금화는 기록 구간의 순변화입니다.</p><div id="activity-players" class="activity-table"></div>
+          <h2>봇 이상 구간</h2><p class="activity-note">봇(동료 봇 제외)을 10분 칸으로 봅니다. 가만히 서 있음 = 위치 그대로·요청 0·경험치 0, 몬스터 못 잡음 = 기술+마법 20번 이상인데 경험치 0, 수입 끊김 = 경험치·금화·아이템 늘어남 0이 20분 이상(맵 이동·상점 칸 제외). 접속·종료가 낀 칸은 보지 않습니다. 봇 줄은 7일 뒤 지워도 이 표는 89일 남습니다. 「동료 봇 포함」과 상관없이 보입니다.</p><div id="activity-anomalies" class="activity-table"></div>
           <h2>동시 접속 · 재방문</h2><p id="activity-observation" class="activity-note"></p><div id="activity-concurrency" class="activity-table"></div><div id="activity-returning" class="activity-table"></div><div id="activity-retention" class="activity-table"></div>
           <h2>앱 기기 · 운영체제 · 버전</h2><p class="activity-note">앱이 보고한 값입니다. 설치 식별자는 임의로 만들며 재설치하면 달라질 수 있습니다. 기기 신원이나 Wi-Fi 이름을 증명하지 않습니다.</p><div id="activity-devices" class="activity-table"></div>
           <h2>접속 실패 · 앱 오류</h2><p class="activity-note">비정상 종료(unclean_exit)는 강제 종료·운영체제 종료·크래시를 구분하지 못합니다. 앱 기록과 이전 실행의 진단(previous_run_exception)은 다음 로그인 성공 때 전송될 수 있으며, 인증 전 진단은 로그인한 계정에서 발생했는지 확정하지 않습니다. 서버 시각은 수신 기준이고 앱 보고 시각은 앱 시계 기준입니다. 이전 종료 진단의 시각은 발견한 시각입니다. 사유와 예외 종류만 수집하며 입력 내용·오류 메시지·대화는 수집하지 않습니다.</p><div id="activity-diagnostics" class="activity-table"></div>

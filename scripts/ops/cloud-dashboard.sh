@@ -138,6 +138,7 @@ Environment="LOD_WEB_ACTIVITY=/var/log/nginx/lod-activity.jsonl*"
 Environment="LOD_GAME_ACTIVITY=/home/ubuntu/lod-activity/*.jsonl"
 Environment=LOD_CHARACTER_DIR=/home/ubuntu/lod/database/server/aislings
 Environment=LOD_SERVER_CONFIG=/home/ubuntu/lod/Staging/net9.0/LoruleConfig.json
+Environment=LOD_ML_ACTIVITY=/home/ubuntu/lod-ml/activity
 UNIT
 mkdir -p /home/ubuntu/lod-activity
 chmod 700 /home/ubuntu/lod-activity

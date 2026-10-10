@@ -32,11 +32,14 @@ def allowed_meta(value):
 
 
 class ActivityStore:
-    def __init__(self, database, web='', game='', characters='', server_config=''):
+    def __init__(self, database, web='', game='', characters='', server_config='', ml_activity=''):
         self.database = Path(database)
         self.sources = {'web': web, 'game': game}
         self.characters = Path(characters) if characters else None
         self.server_config = Path(server_config) if server_config else None
+        # 운영 서비스(ability-ops-service.py)는 넘기지 않는다 — 머신러닝 사본 폴더는 서비스 환경변수에서.
+        ml_activity = ml_activity or os.environ.get('LOD_ML_ACTIVITY', '')
+        self.ml_activity = Path(ml_activity) if ml_activity else None
         self.lock = threading.Lock()
         self.status = {'collectedAt': None, 'errors': [], 'retentionDays': 90}
         self.database.parent.mkdir(parents=True, exist_ok=True)
@@ -59,6 +62,11 @@ class ActivityStore:
             db.execute('CREATE INDEX IF NOT EXISTS event_session ON events(source, kind, session)')
             # 생태 봇이 하루 100만 줄 넘게 남긴다(2026-10-07~) — 사람만 볼 때 봇 줄을 아예 건너뛰게 bot 을 맨 앞에.
             db.execute('CREATE INDEX IF NOT EXISTS event_bot ON events(bot, source, kind, day)')
+            # 봇 이상 구간(autopilot/bot-data-cleanup 3) — 봇 줄을 7일 뒤 지워도 이것은 89일 남는다.
+            db.execute('''CREATE TABLE IF NOT EXISTS anomalies (
+                player TEXT NOT NULL, rule TEXT NOT NULL, start TEXT NOT NULL, "end" TEXT NOT NULL,
+                minutes INTEGER NOT NULL, map INTEGER, x INTEGER, y INTEGER, detail TEXT NOT NULL,
+                actions INTEGER NOT NULL, PRIMARY KEY (player, rule, start))''')
         os.chmod(self.database, 0o600)
 
     @contextmanager
@@ -72,7 +80,7 @@ class ActivityStore:
             db.close()
 
     def collect(self):
-        errors = []
+        errors, behind = [], False
         with self.lock, self.connect() as db:
             for source, pattern in self.sources.items():
                 if not pattern:
@@ -108,16 +116,39 @@ class ActivityStore:
                                 except (ValueError, TypeError, KeyError, OverflowError):
                                     errors.append(source + ': 읽을 수 없는 기록을 건너뛰었습니다.')
                                 position = stream.tell()
+                            behind = behind or (source == 'game' and budget <= 0)
                             db.execute('INSERT OR REPLACE INTO offsets VALUES (?,?)', (key, position))
                     except OSError:
                         errors.append(source + ': 기록 파일을 읽지 못했습니다.')
-            cutoff = (datetime.now(KST) - timedelta(days=89)).date().isoformat()
+            db.commit()  # 이상 구간 계산이 길어도 읽은 줄은 먼저 남긴다
+            if not behind:  # 덜 읽은 게임 기록이 있으면 칸이 비어 보인다 — 다 따라잡은 뒤에 센다
+                try:
+                    self.find_anomalies(db)
+                except OSError as error:
+                    errors.append('이상 구간: ' + str(error))
+            today = datetime.now(KST).date()
+            cutoff = (today - timedelta(days=89)).isoformat()
             db.execute('DELETE FROM events WHERE day < ?', (cutoff,))
+            db.execute('DELETE FROM anomalies WHERE start < ?', (cutoff,))
+            done = db.execute("SELECT position FROM offsets WHERE file='anomalies'").fetchone()
+            if done:
+                # 봇 줄은 7일 — 그 날의 이상 구간을 남긴 뒤에만 지운다. 하루치(100만 줄)를 한 번에 지우면 1분 가까이 조회가 막혀
+                # 수집마다 2만 줄씩. event_bot 으로 가면 봇 줄 전체를 훑는다.
+                week = min((today - timedelta(days=7)).isoformat(), datetime.fromtimestamp(done[0], KST).date().isoformat())
+                db.execute('''DELETE FROM events WHERE rowid IN
+                    (SELECT rowid FROM events INDEXED BY event_day WHERE day < ? AND bot=1 LIMIT 20000)''', (week,))
+            recent = (today - timedelta(days=3)).isoformat()
             for filename in glob.glob(self.sources['game']):
                 path = Path(filename)
                 try:
                     day = datetime.strptime(path.stem, '%Y-%m-%d').date().isoformat()
-                    if day < cutoff:
+                    # 원본은 하루 1GB 가까이 — 머신러닝 사본을 만들고 다 읽은 날은 3일 뒤 지운다. 사본이 없으면 89일.
+                    copied = self.ml_activity is not None and (self.ml_activity / f'{day}.jsonl.gz').exists()
+                    if copied:
+                        stat = path.stat()
+                        read = db.execute('SELECT position FROM offsets WHERE file=?', (f'game:{stat.st_dev}:{stat.st_ino}',)).fetchone()
+                        copied = bool(read) and read[0] >= stat.st_size
+                    if day < cutoff or (copied and day < recent):
                         path.unlink()
                 except ValueError:
                     pass
@@ -154,6 +185,84 @@ class ActivityStore:
             path, status, size, detail, text('session', 80), max(1, int(event.get('count') or 1)),
             int(event.get('xp') or 0), int(event.get('gold') or 0), max(0, int(event.get('seconds') or 0)),
             json.dumps(allowed_meta(event.get('meta')), ensure_ascii=False)))
+
+    def find_anomalies(self, db):
+        """봇 줄(동료 봇 제외)을 10분 칸으로 보고 이상 구간을 남긴다 — 끝난 칸만, 한 번만(offsets 'anomalies' = 어디까지 했나)."""
+        now = datetime.now(KST)
+        # 봇은 5분마다 묶어 쓴다 — 칸이 끝나고 10분 기다려 늦게 쓰인 줄까지 담는다.
+        ready = (now - timedelta(minutes=10)).replace(second=0, microsecond=0)
+        ready -= timedelta(minutes=ready.minute % 10)
+        row = db.execute("SELECT position FROM offsets WHERE file='anomalies'").fetchone()
+        begin = (datetime.fromtimestamp(row[0], KST) if row else
+                 datetime.combine(now.date() - timedelta(days=89), datetime.min.time(), KST))
+        companions = self.config_names(('CompanionBots',)) if self.server_config else set()
+        while begin < ready:
+            end = min(ready, datetime.combine(begin.date() + timedelta(days=1), datetime.min.time(), KST))
+            day = begin.date().isoformat()
+            players = [row[0] for row in db.execute(
+                "SELECT DISTINCT player FROM events WHERE day=? AND source='game' AND bot=1", (day,))]
+            for player in players:
+                if player and player.lower() not in companions:
+                    self.player_anomalies(db, player, day, begin, end)
+            begin = end
+            db.execute("INSERT OR REPLACE INTO offsets VALUES ('anomalies',?)", (int(begin.timestamp()),))
+            if players:
+                break  # ponytail: 한 번에 하루치 — 밀린 날(처음 540만 줄)은 다음 수집(30초 뒤)에서 이어 간다.
+
+    def player_anomalies(self, db, player, day, begin, end):
+        # 건수는 sum(amount) — 옛 줄은 한 줄 한 건, 봇을 5분씩 묶은 뒤로는 count(2026-10-11).
+        bins = db.execute('''SELECT bin, max(at||'|'||place) last, count(DISTINCT place) places,
+            sum(kind IN ('login','logout')) edges, sum(kind='heartbeat') beats,
+            sum(CASE WHEN kind LIKE 'request_%' THEN amount ELSE 0 END) requests,
+            sum(CASE WHEN kind IN ('request_skill','request_spell') THEN amount ELSE 0 END) actions,
+            sum(kind IN ('map','request_shop') OR reason LIKE '%.HandleBuy' OR reason LIKE '%.HandleSell') shop,
+            sum(CASE WHEN asset='xp' AND delta>0 THEN amount ELSE 0 END) xp,
+            sum(CASE WHEN asset IN ('xp','gold','item') AND delta>0 THEN amount ELSE 0 END) income
+            FROM (SELECT substr(at,1,15) bin, at, kind, amount, substr(detail,1,instr(detail||' · ',' · ')-1) place,
+                CASE WHEN kind='ledger' THEN json_extract(meta,'$.asset') END asset,
+                CASE WHEN kind='ledger' THEN json_extract(meta,'$.delta') END delta,
+                CASE WHEN kind='ledger' THEN ifnull(json_extract(meta,'$.reason'),'') ELSE '' END reason
+                FROM events WHERE day=? AND source='game' AND bot=1 AND player=? AND at>=? AND at<?)
+            GROUP BY bin ORDER BY bin''', (day, player, begin.isoformat(), end.isoformat()))
+        step, runs = timedelta(minutes=10), {}
+        for row in bins:
+            start = datetime.fromisoformat(row['bin'] + '0:00+09:00')
+            whole = row['edges'] == 0 and row['beats'] > 0  # 접속·종료가 낀 칸은 일부만 있었다
+            hits = {'stand': row['places'] == 1 and row['xp'] == 0 and row['requests'] == 0,
+                    'blind': row['actions'] >= 20 and row['xp'] == 0,
+                    'income': row['shop'] == 0 and row['income'] == 0}
+            for rule, hit in hits.items():
+                if not (whole and hit):
+                    continue
+                run = runs.setdefault(rule, [])
+                if run and run[-1][1] == start:
+                    run[-1][1] += step
+                    run[-1][3] += row['actions']
+                else:
+                    run.append([start, start + step, row['last'].split('|', 1)[1], row['actions']])
+        for rule, run in runs.items():
+            for start, finish, place, actions in run:
+                # 앞 계산에서 끝난 칸에 바로 이어지면 그 구간을 늘린다(하루·수집 경계를 넘어 한 구간).
+                before = db.execute('SELECT start,actions FROM anomalies WHERE player=? AND rule=? AND "end"=?',
+                                    (player, rule, start.isoformat())).fetchone()
+                if before:
+                    start, actions = datetime.fromisoformat(before['start']), actions + before['actions']
+                found = re.match(r'맵 (-?\d+) \((-?\d+),(-?\d+)\)', place)
+                db.execute('INSERT OR REPLACE INTO anomalies VALUES (?,?,?,?,?,?,?,?,?,?)', (
+                    player, rule, start.isoformat(), finish.isoformat(), (finish - start) // timedelta(minutes=1),
+                    *(map(int, found.groups()) if found else (None, None, None)),
+                    {'stand': 'request 0 · xp 0', 'blind': f'skill+spell {actions}회 · xp 0', 'income': 'xp·gold·item 0'}[rule],
+                    actions))
+
+    def config_names(self, keys):
+        try:
+            # 기존 cloud-server.sh의 bot_names와 같은 설정 목록. 이 설정에는 // 주석이 있다.
+            text = self.server_config.read_text(encoding='utf-8-sig')
+            return {str(name).lower() for key in keys
+                    for match in [re.search(rf'"{key}"\s*:\s*(\[[^\]]*\])', text)] if match
+                    for name in json.loads(match.group(1))}
+        except (OSError, ValueError, TypeError):
+            raise OSError('봇 설정을 읽지 못했습니다.')
 
     def report(self, start, end, player='', bots=False):
         first, last = datetime.strptime(start, '%Y-%m-%d').date(), datetime.strptime(end, '%Y-%m-%d').date()
@@ -222,12 +331,17 @@ class ActivityStore:
                 sum(coalesce(json_extract(meta,'$.quantity'),0)) quantity,count(*) transactions
                 FROM events WHERE {where} AND kind='ledger' GROUP BY player,asset,item,reason ORDER BY transactions DESC''')
             analytics = self.analytics(db, first, last, player, bots)
+            # 봇만의 표라 「봇 포함」과 상관없이 보인다. 수입 끊김은 20분 이상만(10분짜리는 이어 붙이려고 남겨 둔다).
+            anomalies = [dict(row) for row in db.execute(f'''SELECT player,rule,start,"end",minutes,map,x,y,detail
+                FROM anomalies WHERE start>=? AND start<? AND (rule!='income' OR minutes>=20)
+                {'AND lower(player)=lower(?)' if player else ''} ORDER BY start DESC LIMIT 200''',
+                [first.isoformat(), (last + timedelta(days=1)).isoformat()] + ([player] if player else []))]
         return {'summary': {key: value or 0 for key,value in dict(totals).items()},
                 'daily': daily, 'visitors': visitors, 'players': players, 'actions': actions,
                 'events': events, 'downloads': downloads, 'collection': self.status, 'limit': 200,
                 'savedCharacters': self.saved_characters(player, bots), 'devices': devices,
                 'diagnostics': diagnostics, 'screens': screens, 'buttons': buttons, 'exits': exits,
-                'ledger': ledger, 'economy': economy, **analytics}
+                'ledger': ledger, 'economy': economy, 'anomalies': anomalies, **analytics}
 
     def analytics(self, db, first, last, player, bots):
         where, args = "source='game' AND player!=''", []
@@ -312,14 +426,7 @@ class ActivityStore:
             with self.connect() as db:
                 bot_names = {row[0].lower() for row in db.execute("SELECT DISTINCT player FROM events WHERE bot=1")}
         else:
-            try:
-                # 기존 cloud-server.sh의 bot_names와 같은 설정 목록(동료 봇)과 생태계 봇(2026-10-06~). 이 설정에는 // 주석이 있다.
-                text = self.server_config.read_text(encoding='utf-8-sig')
-                bot_names = {str(name).lower() for key in ('CompanionBots', 'EcoBots')
-                             for match in [re.search(rf'"{key}"\s*:\s*(\[[^\]]*\])', text)] if match
-                             for name in json.loads(match.group(1))}
-            except (OSError, ValueError, TypeError):
-                raise OSError('봇 설정을 읽지 못했습니다.')
+            bot_names = self.config_names(('CompanionBots', 'EcoBots'))  # 동료 봇과 생태계 봇(2026-10-06~)
         result = []
         for path in sorted(self.characters.glob('*.json')):
             try:

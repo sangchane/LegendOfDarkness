@@ -9,6 +9,7 @@
   var names = { login:"접속 성공", legacy_login:"과거 환영 로그(접속 추정)", logout:"접속 종료", map:"맵 입장", kill:"괴물 처치(서버 카운터)", exchange:"교환 처리", state:"캐릭터 상태", request_skill:"기술 요청", request_spell:"마법 요청", request_pickup:"줍기 요청", request_drop:"버리기 요청", request_item:"아이템 사용 요청", request_drop_gold:"금화 버리기 요청", request_npc:"NPC 요청", request_npc_choice:"NPC 선택 요청", request_exchange:"교환 요청", request_profile:"정보 조회 요청", request_worldmap:"월드맵 요청", request_warp:"워프 요청", request_companion:"동료 조작 요청", request_shop:"상점 거래 요청" };
   Object.assign(names,{heartbeat:"접속 확인",ledger:"재화 원장",login_failure:"로그인 실패",app_device:"앱 기기",app_screen:"화면 이용",app_button:"버튼 사용",app_error:"앱 오류",app_lifecycle:"앱 상태"});
   var assets = {gold:"금화",xp:"경험치",item:"아이템"};
+  var rules = {stand:"가만히 서 있음",blind:"몬스터 못 잡음",income:"수입 끊김"};
   function minutes(seconds) { return (Number(seconds||0)/60).toFixed(1)+"분"; }
   function metadata(row) { var m=row.meta||{};return Object.keys(m).map(function(key) { return key+"="+m[key]; }).join(" · "); }
   function day(date) { return new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Seoul"}).format(date); }
@@ -40,6 +41,7 @@
     table("activity-visitors","최근 접속 환경 최대 200개",["IP","브라우저·수집기","요청","다운로드","전송량","최근 접속"],data.visitors.map(function(r) { return [r.ip,r.agent,number(r.requests),number(r.downloads),bytes(r.bytes),time(r.lastAt)]; }));
     table("activity-downloads","최근 전송 최대 200건 · HEAD 제외",["시각","IP","파일","HTTP","전송량","브라우저·수집기"],data.downloads.map(function(r) { return [time(r.at),r.ip,r.path,r.status,bytes(r.bytes),r.agent]; }));
     table("activity-players","캐릭터별 기간 전체 집계",["캐릭터","접속","종료","접속 시간","처치","맵 입장","행동 요청","경험치 변화","금화 변화","최근 기록"],data.players.map(function(r) { return [r.player+(r.bot?" (봇)":""),number(r.logins),number(r.logouts),(r.seconds/60).toFixed(1)+"분",number(r.kills),number(r.maps),number(r.actions),number(r.xp),number(r.gold),time(r.lastAt)]; }));
+    table("activity-anomalies","최근 봇 이상 구간 최대 200건 · 10분 칸",["봇","종류","시작","길이(분)","위치","근거"],data.anomalies.map(function(r) { return [r.player,rules[r.rule]||r.rule,time(r.start),number(r.minutes),r.map==null?"—":"맵 "+r.map+" ("+r.x+","+r.y+")",r.detail]; }));
     document.getElementById("activity-observation").textContent="확정 접속 관측 시작 "+(data.analyticsSince||"기록 없음")+" · 최근 접속 확인 "+time(data.current.lastObserved)+" · "+(data.current.stale?"90초 이상 확인 지연, 현재 인원은 확정할 수 없습니다.":"현재 인원은 날짜와 별개로 최근 접속 확인 기준입니다.")+" 시간별 최대는 접속 구간을 기준으로 계산합니다. 재방문·잔존율은 보관된 90일 안의 첫 관측 접속 기준으로 신규 가입률과 다릅니다. D1/7/30은 해당 날짜에 다시 접속한 비율이며 아직 그 날짜가 끝나지 않은 계정은 분모에서 제외합니다.";
     table("activity-concurrency","한국 시각 시간별 최대 동시 접속 · 중복 계정 제외",["시각","최대 캐릭터"],data.concurrency.map(function(r) { return [time(r.hour),number(r.peak)]; }));
     table("activity-returning","날짜별 재방문",["날짜","활동 캐릭터","첫 관측","재방문"],data.returning.map(function(r) { return [r.day,number(r.players),number(r.firstObserved),number(r.returning)]; }));

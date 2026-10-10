@@ -137,4 +137,136 @@ class ActivityTests(unittest.TestCase):
         for plan in plans:
             self.assertIn('event_bot',plan,plan)
 
+    def test_bot_anomalies_from_old_and_new_rows_once(self):
+        # SC-3 — 옛 꼴(한 줄 한 건)과 새 꼴(5분 묶음 count) 모두, 동료 봇·사람·상점·맵 이동은 빼고, 다시 돌려도 한 번만.
+        from datetime import timedelta
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);config=root/'config.json'
+            config.write_text('// 주석\n{"CompanionBots":["helper"],"EcoBots":["Stander"]}')
+            store=module.ActivityStore(root/'activity.sqlite',server_config=str(config))
+            day=datetime.now(module.KST).replace(hour=0,minute=0,second=0,microsecond=0)-timedelta(days=2)
+            serial=iter(range(10**6))
+            def add(db,who,minute,kind,place=(1,5,5),bot=True,**extra):
+                store.insert(db,'game',dict(id=str(next(serial)),at=(day+timedelta(minutes=minute)).isoformat(),kind=kind,
+                    player=who,bot=bot,detail='맵 %d (%d,%d) · 레벨 1'%place,**extra))
+            def stand(db,who,first,last,bot=True):
+                add(db,who,first,'login',bot=bot)
+                for minute in range(first+1,last):
+                    add(db,who,minute,'heartbeat',bot=bot);add(db,who,minute,'state',bot=bot)
+                add(db,who,last,'logout',bot=bot)
+            ledger=lambda asset,delta,count=1,reason='Monsterexp.HandleExp':dict(count=count,meta={'asset':asset,'delta':delta,'reason':reason})
+            with store.connect() as db:
+                stand(db,'Stander',595,635)   # 옛 꼴: 10:00~10:30 가만히(접속·종료가 낀 칸은 빼고)
+                stand(db,'Helper',595,635)    # 동료 봇
+                stand(db,'Person',595,635,bot=False)
+                stand(db,'Night',1415,1475)   # 23:40~다음 날 00:30 — 하루·수집 경계를 넘어 한 구간
+                # 새 꼴: 5분마다 묶음. 11:00~11:20 기술·마법 25번씩인데 경험치 0, 자리는 움직인다.
+                add(db,'Blinder',655,'login')
+                for minute in (662,667,672,677):
+                    add(db,'Blinder',minute,'heartbeat',place=(2,minute,1))
+                for minute in (662,672):
+                    add(db,'Blinder',minute,'request_skill',place=(2,minute,2),count=15)
+                    add(db,'Blinder',minute,'request_spell',place=(2,minute,3),count=10)
+                add(db,'Blinder',685,'logout')
+                # 정상 사냥 두 칸 뒤 10분만 수입 0 — 20분이 안 돼 보이지 않는다.
+                add(db,'Hunter',705,'login')
+                for minute in (712,717,722,727,732,737):
+                    add(db,'Hunter',minute,'heartbeat',place=(3,minute,1))
+                for minute in (712,722):
+                    add(db,'Hunter',minute,'request_skill',place=(3,minute,2),count=30)
+                    add(db,'Hunter',minute,'ledger',place=(3,minute,3),**ledger('xp',400,40))
+                add(db,'Hunter',732,'request_item',place=(3,732,2),count=3)
+                add(db,'Hunter',745,'logout')
+                # 수입 0 이 40분이지만 가운데 상점(장부 이유)·맵 이동 칸이 끊는다.
+                add(db,'Shopper',795,'login')
+                for minute in range(796,840):
+                    add(db,'Shopper',minute,'heartbeat',place=(4,minute,1))
+                add(db,'Shopper',812,'ledger',**ledger('gold',-50,reason='GameServer.HandleBuy'))
+                add(db,'Shopper',825,'map')
+                add(db,'Shopper',845,'logout')
+            def found():
+                with store.connect() as db:
+                    return [tuple(row) for row in db.execute('SELECT * FROM anomalies ORDER BY player,rule')]
+            for _ in range(3):
+                store.collect()
+            first=found()
+            for _ in range(2):
+                store.collect()
+            self.assertEqual(found(),first)
+            self.assertEqual(store.status['errors'],[])
+            start=lambda minute:(day+timedelta(minutes=minute)).isoformat()
+            report=store.report(day.date().isoformat(),(day+timedelta(days=1)).date().isoformat())
+            got={(r['player'],r['rule']):(r['start'],r['minutes'],r['detail']) for r in report['anomalies']}
+            self.assertEqual(got,{
+                ('Stander','stand'):(start(600),30,'request 0 · xp 0'),('Stander','income'):(start(600),30,'xp·gold·item 0'),
+                ('Night','stand'):(start(1420),50,'request 0 · xp 0'),('Night','income'):(start(1420),50,'xp·gold·item 0'),
+                ('Blinder','blind'):(start(660),20,'skill+spell 50회 · xp 0'),('Blinder','income'):(start(660),20,'xp·gold·item 0')})
+            row=next(r for r in report['anomalies'] if r['player']=='Stander')
+            self.assertEqual((row['map'],row['x'],row['y'],row['end']),(1,5,5,start(630)))
+            self.assertEqual({r['player'] for r in store.report(day.date().isoformat(),day.date().isoformat(),player='blinder')['anomalies']},{'Blinder'})
+
+    def test_bot_rows_wait_for_anomalies_then_seven_days_and_raw_files_after_ml_copy(self):
+        # SC-4 — 봇 줄은 이상 구간을 남긴 뒤 7일, 사람 줄은 89일. 원본은 머신러닝 사본이 있고 다 읽은 3일 지난 날만.
+        from datetime import timedelta
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);game=root/'game';ml=root/'ml';game.mkdir();ml.mkdir()
+            today=datetime.now(module.KST).replace(hour=0,minute=0,second=0,microsecond=0)
+            name=lambda days:(today-timedelta(days=days)).date().isoformat()
+            line=lambda days:json.dumps(dict(id='raw'+str(days),at=(today-timedelta(days=days)).isoformat(),kind='login',player='Person'))+'\n'
+            for days in (2,4,5,6,100):
+                (game/f'{name(days)}.jsonl').write_text(line(days))
+            with (game/f'{name(6)}.jsonl').open('a') as raw:raw.write('{"id":"half')  # 아직 다 안 읽은 날
+            for days in (2,4,6):
+                (ml/f'{name(days)}.jsonl.gz').write_bytes(b'')
+            config=root/'config.json'
+            store=module.ActivityStore(root/'activity.sqlite',game=str(game/'*.jsonl'),server_config=str(config),ml_activity=str(ml))
+            old=today-timedelta(days=8)
+            with store.connect() as db:
+                store.insert(db,'game',dict(id='login',at=(old+timedelta(minutes=595)).isoformat(),kind='login',player='Eco1',bot=True,detail='맵 7 (1,1)'))
+                for minute in range(596,640):
+                    store.insert(db,'game',dict(id=str(minute),at=(old+timedelta(minutes=minute)).isoformat(),kind='heartbeat',player='Eco1',bot=True,detail='맵 7 (1,1)'))
+                store.insert(db,'game',dict(id='person',at=(old+timedelta(minutes=600)).isoformat(),kind='login',player='Person'))
+                store.insert(db,'game',dict(id='recent',at=(today-timedelta(days=6,hours=-1)).isoformat(),kind='heartbeat',player='Eco1',bot=True))
+            def rows(day):
+                with store.connect() as db:
+                    return [tuple(row) for row in db.execute('SELECT player,bot FROM events WHERE day=? GROUP BY player,bot',(day,))]
+            store.collect()  # 설정을 못 읽어 이상 구간을 못 셌다 — 봇 줄도 그대로
+            self.assertIn('이상 구간: 봇 설정을 읽지 못했습니다.',store.status['errors'])
+            self.assertEqual(sorted(rows(name(8))),[('Eco1',1),('Person',0)])
+            self.assertEqual(sorted(path.name for path in game.iterdir()),[f'{name(days)}.jsonl' for days in (6,5,2)])
+            config.write_text('{"CompanionBots":[]}')
+            for _ in range(3):
+                store.collect()
+            self.assertEqual(rows(name(8)),[('Person',0)])
+            self.assertIn(('Eco1',1),rows(name(6)))
+            self.assertEqual(sorted((r['player'],r['rule'],r['minutes']) for r in store.report(name(8),name(8))['anomalies']),
+                             [('Eco1','income',40),('Eco1','stand',40)])
+
+    def test_collection_reads_events_only_by_index(self):
+        # 봇 줄 540만(2026-10-11) — 이상 구간·보관 쿼리가 표를 통째로 훑으면 30초 수집이 밀린다.
+        import sqlite3
+        from contextlib import contextmanager
+        from datetime import timedelta
+        plans=[]
+        class Explained(sqlite3.Connection):
+            def execute(self,sql,args=()):
+                if 'FROM events' in sql:
+                    plans.append(' / '.join(row[3] for row in super().execute('EXPLAIN QUERY PLAN '+sql,args)))
+                return super().execute(sql,args)
+        with tempfile.TemporaryDirectory() as folder:
+            store=module.ActivityStore(Path(folder)/'activity.sqlite')
+            with store.connect() as db:
+                store.insert(db,'game',dict(id='1',at=(datetime.now(module.KST)-timedelta(days=9)).isoformat(),kind='heartbeat',player='Eco1',bot=True))
+            @contextmanager
+            def connect():
+                db=sqlite3.connect(store.database,factory=Explained);db.row_factory=sqlite3.Row
+                try:
+                    with db:yield db
+                finally:db.close()
+            store.connect=connect
+            store.collect();store.collect()
+        self.assertGreaterEqual(len(plans),5)
+        for plan in plans:
+            self.assertIn('event_day',plan,plan)
+
 if __name__ == '__main__':unittest.main()

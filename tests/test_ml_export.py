@@ -51,9 +51,28 @@ class MlExportTests(unittest.TestCase):
             self.assertEqual((20015, 30, 999), (rows[0]['map'], rows[0]['level'], rows[0]['expTotal']))
             self.assertEqual('전사봇일', rows[1]['bot_name'])
             self.assertTrue((root / 'ml' / 'eco' / '2026-10-05.jsonl.gz').exists())
+            # 봇 사건은 두 벌이 아니라 하드링크(autopilot/bot-data-cleanup 5).
+            self.assertEqual((root / 'eco' / '2026-10-05.jsonl.gz').stat().st_ino, (root / 'ml' / 'eco' / '2026-10-05.jsonl.gz').stat().st_ino)
 
             # 다시 돌려도 이미 있는 것은 그대로.
             self.assertEqual([], module.export(root / 'activity', root / 'eco', root / 'ml', b'0123456789abcdef-salt', today='2026-10-06', bots=bots))
+
+    def test_copy_falls_back_when_link_fails_and_drops_files_after_365_days(self):
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'eco').mkdir()
+            (root / 'eco' / '2026-10-05.jsonl.gz').write_bytes(b'eco')
+            for name in ('activity/2025-10-05.jsonl.gz', 'activity/2025-10-06.jsonl.gz', 'eco/2025-10-05.jsonl.gz', 'eco/2025-10-06.jsonl.gz'):
+                (root / 'ml' / name).parent.mkdir(parents=True, exist_ok=True)
+                (root / 'ml' / name).write_bytes(b'old')
+            with mock.patch.object(module.os, 'link', side_effect=OSError('다른 디스크')):
+                module.export(root / 'activity', root / 'eco', root / 'ml', b'0123456789abcdef-salt', today='2026-10-06')
+            copy = root / 'ml' / 'eco' / '2026-10-05.jsonl.gz'
+            self.assertEqual(b'eco', copy.read_bytes())
+            self.assertNotEqual((root / 'eco' / '2026-10-05.jsonl.gz').stat().st_ino, copy.stat().st_ino)
+            left = sorted(str(path.relative_to(root / 'ml')) for path in (root / 'ml').rglob('*.gz'))
+            self.assertEqual(['activity/2025-10-06.jsonl.gz', 'eco/2025-10-06.jsonl.gz', 'eco/2026-10-05.jsonl.gz'], left)
 
 
 if __name__ == '__main__':

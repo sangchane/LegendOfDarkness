@@ -277,7 +277,13 @@ WantedBy=multi-user.target
 UNIT
 sudo systemctl daemon-reload
 sudo systemctl enable lod-eco >/dev/null 2>&1
-( { crontab -l 2>/dev/null || true; } | { grep -v lod-ml || true; }; echo '30 4 * * * python3 /home/ubuntu/lod-eco/ml/export-activity.py --activity /home/ubuntu/lod/Staging/net9.0/activity --eco /home/ubuntu/lod-eco/eco --out /home/ubuntu/lod-ml --salt /home/ubuntu/lod-ml/salt --config /home/ubuntu/lod/Staging/net9.0/LoruleConfig.json >/dev/null # lod-ml' ) | crontab -
+( { crontab -l 2>/dev/null || true; } | { grep -v lod-ml || true; }; echo '30 4 * * * python3 /home/ubuntu/lod-eco/ml/export-activity.py --activity /home/ubuntu/lod-activity --eco /home/ubuntu/lod-eco/eco --out /home/ubuntu/lod-ml --salt /home/ubuntu/lod-ml/salt --config /home/ubuntu/lod/Staging/net9.0/LoruleConfig.json >/dev/null # lod-ml' ) | crontab -
+# 봇 표준출력까지 받아 journal 이 1.1GB 였다(2026-10-11) — 500MB 로 묶는다. 바뀌었을 때만 journald 를 다시 켠다.
+if ! printf '[Journal]\nSystemMaxUse=500M\n' | cmp -s - /etc/systemd/journald.conf.d/lod.conf; then
+    sudo mkdir -p /etc/systemd/journald.conf.d
+    printf '[Journal]\nSystemMaxUse=500M\n' | sudo tee /etc/systemd/journald.conf.d/lod.conf >/dev/null
+    sudo systemctl restart systemd-journald
+fi
 SH
 }
 
