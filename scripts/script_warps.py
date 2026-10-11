@@ -29,7 +29,7 @@ def script_warp_destination(server: Path, warp: dict):
             if len(parts) == 2 and parts[1].strip().isdigit():
                 files[parts[0].strip()] = int(parts[1])
 
-    for path in (server / "scripts" / "Pack599" / "Npcs").glob("*.cs"):
+    for path in (server / "scripts" / "Pack599").rglob("*.cs"):          # Npcs(팩) · Quests(손으로 쓴 퀘스트 — 킹아크퍼스암초)
         text = path.read_text(encoding="utf-8-sig")
         if f'[Script("{npc}"' not in text:
             continue

@@ -37,6 +37,33 @@ def crabs():
     return [(int(x), int(y)) for x, y in re.findall(r"\((\d+), (\d+)\)", line)]
 
 
+def coma():
+    """킹아크퍼스 외딴길 코마 칸 — 대본 `Coma` 배열(여러 줄)."""
+    script = (SERVER / "scripts" / "Pack599" / "Quests" / "킹아크퍼스암초.cs").read_text(encoding="utf-8-sig")
+    block = script[script.index("Coma =") : script.index("};", script.index("Coma ="))]
+    return [(int(x), int(y)) for x, y in re.findall(r"\((\d+), (\d+)\)", block)]
+
+
+def king_arcfus(gold, blue, green, pink, purple, red):
+    """킹아크퍼스 퀘스트(2026-10-11) — 3-C 숨은 칸 · 외딴곳 · 4-C 바위 틈 · 외딴길 코마밭 · 숨겨진길 A·B · 두 본거지."""
+    render(20591, 50, 50, [((20, 37), "숨은 칸", gold)], OUT / "arcfus-hole.webp", crop=((8, 26), (34, 46)), width=1100)
+    render(20883, 10, 10, [((5, 8), "도착", blue), ((6, 5), "브라토", gold), ((9, 8), "<3-C 로", green)], OUT / "arcfus-nook.webp", width=900)
+    render(20594, 50, 50, [((10, 39), "바위 틈", gold)], OUT / "arcfus-reef.webp", crop=((0, 28), (24, 48)), width=1100)
+    render(20884, 40, 60, [((21, 57), "시작", blue), ((12, 0), "<숨겨진길로", green)] + [(c, "", red) for c in coma()],
+           OUT / "arcfus-trail.webp")
+    render(20885, 14, 14, [((1, 1), "도착", blue), ((12, 13), "<다음 방", green)], OUT / "arcfus-road-a.webp", width=900)
+    render(20886, 13, 13, [((1, 1), "도착", blue), ((12, 11), "<본거지로", green)], OUT / "arcfus-road-b.webp", width=900)
+    render(20887, 20, 20, [((5, 5), "도착", blue), ((14, 14), "거대문어", purple), ((19, 19), "<대기실로", green)], OUT / "arcfus-fake.webp", width=1000)
+    render(20888, 12, 12, [((1, 9), "도착", blue), ((8, 4), "킹아크퍼스", purple), ((10, 10), "<미레", pink)], OUT / "arcfus-lair.webp", width=900)
+    for number, name in ((254, "arcfus"), (237, "octopus")):
+        sprite(number, OUT / f"{name}.png")
+    for file, name in (("터틀껍질", "turtle-shell"), ("게껍질", "crab-shell"), ("퐁퐁이조각", "pongpong"), ("대지의인장", "seal"),
+                       ("해저의팬던트", "sea-pendant"), ("문어다리", "octopus-leg"), ("문어의원한", "grudge"), ("원한의에센스", "essence"),
+                       ("세줄금반지", "ring")):
+        image = json.loads((SERVER / "templates" / "items" / f"{file}.json").read_text(encoding="utf-8-sig"))["DisplayImage"]
+        Image.open(ICONS / f"{image}.png").convert("RGBA").resize((64, 64), Image.NEAREST).save(OUT / f"{name}.png")
+
+
 def render(number, cols, rows, marks, out, crop=None, width=1400):
     full = OUT / f".{number}-full.png"
     mapimages.render_map_without_dotnet(mapimages.SEO, SERVER / "maps" / f"lod{number}.map", cols, rows, full)
@@ -96,6 +123,7 @@ def main():
     for file, name in (("블루하콘무기", "blue-hakon"), ("레드하콘다리", "red-hakon"), ("킹아크퍼스의팬던트", "pendant"), ("파파야방패", "papaya")):
         image = json.loads((SERVER / "templates" / "items" / f"{file}.json").read_text(encoding="utf-8-sig"))["DisplayImage"]
         Image.open(ICONS / f"{image}.png").convert("RGBA").resize((64, 64), Image.NEAREST).save(OUT / f"{name}.png")
+    king_arcfus(gold, blue, green, pink, purple, red)
     print(f"→ {OUT.relative_to(ROOT)}: " + " ".join(sorted(p.name for p in OUT.iterdir() if not p.name.startswith("."))))
 
 

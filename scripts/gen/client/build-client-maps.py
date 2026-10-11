@@ -69,6 +69,7 @@ MAPS = [
     *range(20833, 20881),  # 서·북의우드랜드 입구·1-1~20-1 (2026-10-04 사용자, scripts/gen/world/build-woodland-west-north.py)
     *range(20455, 20467),  # 뤼케시온해안 대기실·1-A~4-C (2026-10-02 사용자, scripts/gen/world/build-rucesion-coast.py)
     20881, 20882,  # 뤼케시온해안3-D · 게길(에리얼 퀘스트 사본 원본) — 2026-10-11 사용자, scripts/gen/world/build-aerial-quest.py
+    *range(20883, 20889),  # 아벨신해안외딴곳·외딴길·숨겨진길A·B·거대문어·킹아크퍼스의본거지(킹아크퍼스 퀘스트) — scripts/gen/world/build-king-arcfus-quest.py
 ]
 
 configure_utf8_stdio(sys.stdout, sys.stderr)

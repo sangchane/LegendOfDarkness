@@ -62,6 +62,8 @@ def main() -> None:
 
     for path in sorted((SERVER / "templates" / "warps").glob("*.json")):
         warp = json.loads(path.read_text(encoding="utf-8-sig"))
+        if warp.get("Description") == "숨은 칸":            # 찾아내는 재미 — 아벨해안3-C → 외딴곳(build-king-arcfus-quest.py)
+            continue
         to = warp.get("To") or {}
         world = warp.get("WarpType") == "World" or not to.get("AreaID")
         where = "월드맵" if world else names.get(int(to["AreaID"]), str(to["AreaID"]))

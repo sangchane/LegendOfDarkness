@@ -104,7 +104,7 @@ def main():
     lines = MAPFILES.read_text(encoding="utf-8").splitlines()
     kept = [line for line in lines if not line.startswith("db/maps/aerial/")]
     mapfiles = kept + [f"{pack_file}\t{ids[name]}" for name, _, _, _, pack_file in NEW_AREAS]
-    if mapfiles != lines:
+    if sorted(mapfiles) != sorted(lines):              # 표는 두 퀘스트 생성기가 나눠 쓴다 — 줄 순서는 따지지 않는다
         changes.append(f"맵 대응표 {len(NEW_AREAS)}줄")
         if write:
             MAPFILES.write_text("\n".join(mapfiles) + "\n", encoding="utf-8")
@@ -128,11 +128,15 @@ def main():
         data.pop("DropRate", None)                     # 하콘 목록에 없다 — QuestDrops 가 굴린다
         write_json(TEMPLATES / "items" / f"{item}.json", data, write, changes)
 
-    drops = "".join(f"{monster}\t{item}\t{MATERIAL_CHANCE}\n" for item, _, monster in MATERIALS)
-    if not QUEST_DROPS.exists() or QUEST_DROPS.read_text(encoding="utf-8") != drops:
+    # 표는 킹아크퍼스 생성기와 나눠 쓴다 — 제 줄(하콘)만 바꾼다.
+    drops = [f"{monster}\t{item}\t{MATERIAL_CHANCE}" for item, _, monster in MATERIALS]
+    ours = {monster for _, _, monster in MATERIALS}
+    old = QUEST_DROPS.read_text(encoding="utf-8").splitlines() if QUEST_DROPS.exists() else []
+    table = drops + [line for line in old if line.split("\t")[0] not in ours]
+    if table != old:
         changes.append(f"재료 표 {QUEST_DROPS.name}")
         if write:
-            QUEST_DROPS.write_text(drops, encoding="utf-8")
+            QUEST_DROPS.write_text("\n".join(table) + "\n", encoding="utf-8")
 
     crab = json.loads((TEMPLATES / "monsters" / "5.99" / "그래브@아벨해안2-a.json").read_text(encoding="utf-8-sig"))
     crab.update({"Name": CRAB, "BaseName": CRAB, "AreaID": ids[TRAIL], "SpawnMax": 0, "MaximumHP": CRAB_HP, "Exp": 0,

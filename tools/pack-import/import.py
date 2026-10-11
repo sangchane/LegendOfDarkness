@@ -513,11 +513,11 @@ def write_map_files(rows):
     seen = {}
     for file, number in rows:
         seen.setdefault(file, number)                   # 같은 파일을 여러 맵이 나눠 쓰면 먼저 나온 맵
-    # 팩에 없는 우리 줄(에리얼 퀘스트 `db/maps/aerial/` — scripts/gen/world/build-aerial-quest.py)은 남긴다.
+    # 팩에 없는 우리 줄(에리얼 `db/maps/aerial/` · 킹아크퍼스 `db/maps/kingarcfus/` — scripts/gen/world/build-*-quest.py)은 남긴다.
     if path.exists():
         for line in path.read_text(encoding="utf-8").splitlines():
             cells = line.split("\t")
-            if len(cells) == 2 and cells[0].startswith("db/maps/aerial/"):
+            if len(cells) == 2 and cells[0].startswith(("db/maps/aerial/", "db/maps/kingarcfus/")):
                 seen.setdefault(cells[0], int(cells[1]))
     path.write_text("".join(f"{file}\t{number}\n" for file, number in seen.items()), encoding="utf-8")
     return path

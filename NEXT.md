@@ -1,9 +1,9 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[다음/2026-10-11] 킹아크퍼스 퀘스트(3서클) 구현 — 등급 M · `dev:build` · 단계: 시작 전(사용자 「다음 세션에서 … 킹아크퍼스도 구현할게」).** 출처 https://m.dcinside.com/board/darkages/2919
-  다음: 1. 글 원문·스크린샷 읽기(`curl https://r.jina.ai/<주소>`, 그림은 `-e https://m.dcinside.com/` 로 받아 보기) 2. `scripts/ask.sh 킹아크퍼스` — 지금 킹아크퍼스1·2 는 아벨해안4-A·4-C 사냥터 보스(팬던트 약 40%), 에리얼 퀘스트는 이 팬던트가 있으면 제물 면제 3. 에리얼 틀 재사용: 사본 던전 `Pack599/Quests/에리얼입구.cs`(map_create·npc_spawn·mob_spawn3 x,y·legend_add·item_room) · 재료 따로 굴리기 `static/quest-drops.tsv` · 생성기 `scripts/gen/world/build-aerial-quest.py` · 시험 `AerialQuestTests` → SPEC `autopilot/king-arcfus-quest/SPEC.md` → 구현 → 격리 시험 → 리뷰 → 홈페이지 퀘스트 탭에 공략 추가(`docs/index.html` `#quest-…` · `build-quest-images.py`)
-  원작 맵이 없을 수 있다 — 에리얼 때 원작 맵 찾기 기록(서버 해안 12장은 아벨해안 복사본 · 원작 `database/assets/MapFiles` 안 쓰는 모래 해안 6625·6627·6924 · `sangchane/LOD` 복원 맵에도 없음)을 먼저 보고 사용자에게 묻는다.
+- **[현재/2026-10-11] 킹아크퍼스 퀘스트(3서클) — 등급 M · `dev:build` · 단계: 리뷰 반영·커밋 끝(서버 `59fc9a663`, 서버·루트 푸시 전) → 배포 대기(사용자에게 알린 뒤).** 명세 `autopilot/king-arcfus-quest/SPEC.md` · 생성기 `scripts/gen/world/build-king-arcfus-quest.py` · 대본 `Pack599/Quests/킹아크퍼스*.cs`·브라토·대장장이·제단·미레 · 시험 `KingArcfusQuestTests` · 홈페이지 퀘스트 탭 `#quest-arcfus`.
+  다음: 1. 푸시(서버 `feature/loot-roll-auction`·루트) 2. `cloud-server.sh deploy`(에리얼과 함께, 접속자 끊김 — 직전에 알림) 3. 앱 `ios-build.sh install`(새 맵 그림 6장) 4. 사용자 확인 ※: 껍질 10% · 코마 칸 28 · 잡몹 8 · NPC 그림(대장장이=피어스 · 브라토=에리얼입구 사내 · 제단=사람 그림) · 아이콘(대지의인장 초록 별 · 해저의팬던트 = 킹아크퍼스의팬던트 그림).
+  남은 것(리뷰 낮음): 그룹이면 문어의원한이 문어다리 없는 그룹원에게 갈 수 있음(건네면 됨) · 1분 안에 다시 들면 미레 둘 · 성직자 갈래 시험 없음 · 진행자 NPC 원본이 앱 외딴길 NPC 목록에 이름으로 뜸(호러캐슬·에리얼 마레와 같음).
 
 - **[현재/2026-10-11] 에리얼 퀘스트 구현 — 등급 M · `dev:build` · 단계: 리뷰 반영·커밋 끝(서버 `a2397f090`) → 배포 대기(사용자에게 알린 뒤).** 맵은 사용자 「닮은 원작 맵으로」(10-11). 생성기 `scripts/gen/world/build-aerial-quest.py`(구역 20881 3-D · 20882 게길, 바다는 Blocks) · 서버 `Pack599/Quests/에리얼입구.cs`·`마레.cs` · `Monsters/AerialCrab.cs` · `Types/QuestDrops.cs` · Pack599 `npc_spawn`·`legend_add`·`item_room`·`mob_spawn3 x,y`.
   시험: `AerialQuestTests` · 회귀 31(포테·호러캐슬·직업선택·드랍·보석·뤼케시온해안·사본 로그인) · 알맹이 847 · 아이템 수치. 리뷰(opus) 막을 결함 0 · 중간 3 고침(가방 가득 · import.py 대응표 · 게 자리).
