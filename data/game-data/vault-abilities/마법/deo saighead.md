@@ -1,7 +1,7 @@
 ---
 이름: "deo saighead"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "ioc"
 레벨: 45
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # deo saighead
 
-마법 · 사제 · 레벨 45
+마법 · 성직자 · 레벨 45
 
 능력치 요구: 힘 3 · 지능 40 · 지혜 50 · 체력 3 · 민첩 3
 

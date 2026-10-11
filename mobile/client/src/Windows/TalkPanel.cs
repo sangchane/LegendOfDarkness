@@ -377,7 +377,7 @@ public sealed partial class TalkPanel : PanelContainer
         _classFilter = Filter("직업 전체");
         foreach (string job in goods.Select(one => one.Class).Where(one => one.Length > 0 && one != "Peasant").Distinct())
         {
-            _classFilter.AddItem(job switch { "Warrior" => "전사", "Rogue" => "도적", "Wizard" => "마법사", "Priest" => "사제", "Monk" => "무도가", _ => job });
+            _classFilter.AddItem(job switch { "Warrior" => "전사", "Rogue" => "도적", "Wizard" => "마법사", "Priest" => "성직자", "Monk" => "무도가", _ => job });
             _classFilter.SetItemMetadata(_classFilter.ItemCount - 1, job);
         }
         _genderFilter = Filter("성별 전체");

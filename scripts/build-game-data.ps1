@@ -357,7 +357,7 @@ function Write-Note {
     [System.IO.File]::WriteAllText($Path, ($Lines -join [Environment]::NewLine), $plainUtf8)
 }
 
-$className = @{ 1 = '전사'; 2 = '도적'; 3 = '마법사'; 4 = '사제'; 5 = '수도사' }
+$className = @{ 1 = '전사'; 2 = '도적'; 3 = '마법사'; 4 = '성직자'; 5 = '수도사' }
 
 # 무엇이 무엇을 선행으로 삼는가 — 되돌아가는 간선을 미리 모은다.
 $unlocks = @{}

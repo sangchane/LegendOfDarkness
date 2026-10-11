@@ -10,7 +10,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 사제 회복·해제·보조 마법이 **이펙트(0x29)를 보내는가.** 번호는 원작 근거에서 왔다:
+/// 성직자 회복·해제·보조 마법이 **이펙트(0x29)를 보내는가.** 번호는 원작 근거에서 왔다:
 ///
 /// - 5.99 팩 스크립트가 그대로 옮겨진 것 — 파티 그림 `group_hill 회복량, 267`(쿠러스·쿠라누스·쿠라네라·엑스쿠라네라),
 ///   `group_hill …, 380`(홀리쿠라네라), `group_mobnar_end 281`(디나르콜룸), `group_mobsor_end 282`(디소루미아·일루메눔),
@@ -231,8 +231,8 @@ public sealed class PriestSpellEffectTests : IDisposable
             .First(path => woodland.IsMatch(File.ReadAllText(path)));
         JsonNode target = JsonNode.Parse(File.ReadAllText(source), documentOptions: options)!;
 
-        target["Name"] = "사제마법시험표적";
-        target["BaseName"] = "사제마법시험표적";
+        target["Name"] = "성직자마법시험표적";
+        target["BaseName"] = "성직자마법시험표적";
         target["AreaID"] = WoodlandOneOne;
         target["SpawnMax"] = 1;
         target["SpawnType"] = 4;

@@ -104,7 +104,7 @@ public partial class GameScreen : Control
 
         if (bot is null && Main.BotPreview)
         {
-            bot = new CompanionTie(1, "동료사제");
+            bot = new CompanionTie(1, "동료성직자");
             (health, mana) = (72, 45);
             numbers = new VitalNumbers(655, 910, 322, 715);
             kit = new CompanionKit(

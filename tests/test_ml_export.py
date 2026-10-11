@@ -32,7 +32,7 @@ class MlExportTests(unittest.TestCase):
             with gzip.open(root / 'eco' / '2026-10-05.jsonl.gz', 'wt', encoding='utf-8') as eco:
                 eco.write('{"v":1,"bot":"전사봇일","ev":"kill"}\n')
 
-            bots = module.bot_names('{ // 주석\n "EcoBots": [ "전사봇일" ], "CompanionBots": [ "동료사제" ] }')
+            bots = module.bot_names('{ // 주석\n "EcoBots": [ "전사봇일" ], "CompanionBots": [ "동료성직자" ] }')
             done = module.export(root / 'activity', root / 'eco', root / 'ml', b'0123456789abcdef-salt', today='2026-10-06', bots=bots)
 
             self.assertEqual(2, len(done))

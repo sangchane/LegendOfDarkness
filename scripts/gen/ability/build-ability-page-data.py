@@ -23,7 +23,7 @@ OUT = ROOT / "docs" / "abilities-data.js"
 USED = ROOT / "data" / "game-data" / "ability-presentation.json"
 WORKBOOK_FACTS = ROOT / "data" / "skill-spell-2023" / "skills.json"
 
-CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "수도사"}
+CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "성직자", 5: "수도사"}
 def original_monk_table():
     """정규화된 2023 표의 도가 일반 행만 화면에 낸다.
 

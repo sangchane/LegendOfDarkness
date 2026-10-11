@@ -131,7 +131,7 @@ public sealed class EcoTests
     [Fact]
     public void Rings_fill_both_hands_and_a_new_one_must_beat_the_weaker()
     {
-        // 반지는 두 손(7·8) — 서버는 빈 손에 끼운다(Generic.cs). 클라우드 10-07: 사제봇9 는 홍옥반지 하나로 오른손이 비어 있었다.
+        // 반지는 두 손(7·8) — 서버는 빈 손에 끼운다(Generic.cs). 클라우드 10-07: 성직자봇9 는 홍옥반지 하나로 오른손이 비어 있었다.
         DialogueGoods[] shop = [Offer("홍옥반지", 1000, Gear(7, ac: -2)), Offer("산호반지", 3000, Gear(7, ac: -1))];
         WornItem[] one = [new(7, 1, "홍옥반지", "홍옥반지", 0, 0, Gear(7, ac: -2))];
         Assert.Equal([new EcoBuy("홍옥반지", 1)], EcoShopping.GearToBuy(shop, one, Warrior, 1, 20, budget: 5000));
@@ -394,7 +394,7 @@ public sealed class EcoTests
     {
         IReadOnlyList<EcoParty> parties = EcoParties.Form(
         [
-            new("사제봇1", EcoParties.Priest, 3),
+            new("성직자봇1", EcoParties.Priest, 3),
             new("전사봇1", Warrior, 11),
             new("전사봇2", Warrior, 12),
             new("도적봇1", 2, 15),
@@ -403,7 +403,7 @@ public sealed class EcoTests
         ], minLevel: 11);
 
         EcoParty party = Assert.Single(parties);
-        Assert.Equal("사제봇1", party.Priest);
+        Assert.Equal("성직자봇1", party.Priest);
         Assert.Equal(["전사봇1", "도적봇1", "무도봇1"], party.Fighters);
         Assert.Equal("전사봇1", party.Leader);
     }
@@ -411,7 +411,7 @@ public sealed class EcoTests
     [Fact]
     public void No_party_below_the_party_level_or_without_three_fighters()
     {
-        Assert.Empty(EcoParties.Form([new("사제봇1", EcoParties.Priest, 1), new("전사봇1", Warrior, 30), new("도적봇1", 2, 30), new("무도봇1", Monk, 10)], 11));
+        Assert.Empty(EcoParties.Form([new("성직자봇1", EcoParties.Priest, 1), new("전사봇1", Warrior, 30), new("도적봇1", 2, 30), new("무도봇1", Monk, 10)], 11));
         Assert.Empty(EcoParties.Form([new("전사봇1", Warrior, 30), new("도적봇1", 2, 30), new("무도봇1", Monk, 30)], 11));
     }
 
@@ -420,8 +420,8 @@ public sealed class EcoTests
     {
         IReadOnlyList<EcoParty> parties = EcoParties.Form(
         [
-            new("사제봇1", EcoParties.Priest, 1),
-            new("사제봇2", EcoParties.Priest, 1),
+            new("성직자봇1", EcoParties.Priest, 1),
+            new("성직자봇2", EcoParties.Priest, 1),
             new("전사봇1", Warrior, 50),
             new("전사봇2", Warrior, 51),
             new("전사봇3", Warrior, 52),

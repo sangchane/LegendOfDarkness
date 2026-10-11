@@ -221,12 +221,12 @@ public sealed class CompanionTests
     [Fact]
     public void The_tie_names_whose_companion_or_master()
     {
-        byte[] body = [2, 0, 0, 0, 9, .. LegacyKoreanEncoding.EncodeStringA("동료사제")];
+        byte[] body = [2, 0, 0, 0, 9, .. LegacyKoreanEncoding.EncodeStringA("동료성직자")];
 
         (byte kind, CompanionTie? tie) = Companion.ReadTie(body);
 
         Assert.Equal(Companion.CompanionKind, kind);
-        Assert.Equal(new CompanionTie(9, "동료사제"), tie);
+        Assert.Equal(new CompanionTie(9, "동료성직자"), tie);
     }
 
     [Fact]

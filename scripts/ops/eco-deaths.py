@@ -11,7 +11,7 @@ j = subprocess.run(['journalctl', '-u', 'lod-eco', '--since', (T(since) + timede
                     '--until', (T(until) + timedelta(hours=9)).strftime('%Y-%m-%d %H:%M:%S'), '--no-pager', '-o', 'short-iso'],
                    capture_output=True, text=True).stdout
 for l in j.splitlines():
-    m = re.search(r'(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) \[생태계\] (사제봇\d+): (주인|파티원) 깨우기', l)
+    m = re.search(r'(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) \[생태계\] (성직자봇\d+): (주인|파티원) 깨우기', l)
     if m: wakes[m.group(2)].append(datetime.fromisoformat(m.group(1)) - timedelta(hours=9))
 
 party, leader = {}, {}
@@ -29,11 +29,11 @@ for name in sorted({(T(since) + timedelta(hours=9)).date().isoformat(), (T(until
         if since <= d['at'] < until:
             bots.add(b)
             if ev == 'death':
-                r = 'priest' if b.startswith('사제') else 'solo' if b not in leader else 'leader' if leader[b] == b else 'member'
+                r = 'priest' if b.startswith('성직자') else 'solo' if b not in leader else 'leader' if leader[b] == b else 'member'
                 c = any(x == 'Wait' for x in prev[b])
                 role[r] += 1; coma[(r, c)] += 1; hours[d['at'][:13]] += 1
                 if c and b in party:
-                    pr = [p for p in party[b] if p.startswith('사제')]
+                    pr = [p for p in party[b] if p.startswith('성직자')]
                     t = T(d['at'])
                     woke[(r, bool(pr and any(timedelta(0) <= t - w <= timedelta(seconds=30) for w in wakes[pr[0]])))] += 1
         prev[b].append(d['state'])

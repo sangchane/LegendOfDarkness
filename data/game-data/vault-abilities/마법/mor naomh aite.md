@@ -1,7 +1,7 @@
 ---
 이름: "mor naomh aite"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "armachd"
 레벨: 70
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # mor naomh aite
 
-마법 · 사제 · 레벨 70
+마법 · 성직자 · 레벨 70
 
 능력치 요구: 힘 7 · 지능 53 · 지혜 63 · 체력 7 · 민첩 7
 

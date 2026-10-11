@@ -1,7 +1,7 @@
 ---
 이름: "Guide Lecture"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: ""
 레벨: 0
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # Guide Lecture
 
-마법 · 사제 · 레벨 0
+마법 · 성직자 · 레벨 0
 
 능력치 요구: 힘 4 · 지능 4 · 지혜 10 · 체력 4 · 민첩 4
 

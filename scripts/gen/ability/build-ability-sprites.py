@@ -75,7 +75,7 @@ CUT = re.compile(r"프레임 (\d+)개 · 바탕 (\d+)x(\d+) · 기준 (-?\d+),(-
 def used_numbers():
     """**게임이 실제로 쏘는** 연출 번호. `build-ability-page-data.py` 가 적어 둔다.
 
-    팩 표의 번호로 뽑으면 화면과 게임이 다른 그림을 보여 준다 — 사제 마법이 특히 그랬다.
+    팩 표의 번호로 뽑으면 화면과 게임이 다른 그림을 보여 준다 — 성직자 마법이 특히 그랬다.
     """
     if not USED.exists():
         print(f"{USED.relative_to(ROOT)} 이 없습니다. 먼저: python3 scripts/gen/ability/build-ability-page-data.py")

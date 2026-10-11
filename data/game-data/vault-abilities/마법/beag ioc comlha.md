@@ -1,7 +1,7 @@
 ---
 이름: "beag ioc comlha"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "beag ioc"
 레벨: 30
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # beag ioc comlha
 
-마법 · 사제 · 레벨 30
+마법 · 성직자 · 레벨 30
 
 능력치 요구: 힘 3 · 지능 14 · 지혜 22 · 체력 3 · 민첩 3
 

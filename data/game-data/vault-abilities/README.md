@@ -14,7 +14,7 @@ Hades 의 `database/server/metafile/SClass1~5` 가 원본이고, 팩(5.99)의 15
 | 전사 | 62 | 4 |
 | 도적 | 51 | 48 |
 | 마법사 | 12 | 143 |
-| 사제 | 26 | 100 |
+| 성직자 | 26 | 100 |
 | 수도사 | 124 | 43 |
 
 아이콘 번호는 여기 없다. `data/archives-vault` 의 `Legend — skill.tbl` 을 본다.

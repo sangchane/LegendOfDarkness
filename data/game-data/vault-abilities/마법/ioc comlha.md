@@ -1,7 +1,7 @@
 ---
 이름: "ioc comlha"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "beag ioc comlha"
 레벨: 20
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # ioc comlha
 
-마법 · 사제 · 레벨 20
+마법 · 성직자 · 레벨 20
 
 능력치 요구: 힘 4 · 지능 18 · 지혜 28 · 체력 4 · 민첩 4
 

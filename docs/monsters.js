@@ -7,7 +7,7 @@
   if (!data) { return; }
 
   var SPRITE_DIR = "ui/assets/creature/";
-  var CLASSES = { 0: "", 1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "무도가" };
+  var CLASSES = { 0: "", 1: "전사", 2: "도적", 3: "마법사", 4: "성직자", 5: "무도가" };
   // 정렬은 괴물(이름) 단위 — 여러 맵이면 가장 센 맵 기준(레벨·맵 차례는 가장 낮은 맵).
   var SORTS = [
     { id: "exp", 이름: "경험치", 재다: function (g) { return -most(g.places, function (m) { return m.경험치; }); } },

@@ -1,7 +1,7 @@
 ---
 이름: "beothaichdeum"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "beag ioc"
 레벨: 10
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # beothaichdeum
 
-마법 · 사제 · 레벨 10
+마법 · 성직자 · 레벨 10
 
 능력치 요구: 힘 3 · 지능 6 · 지혜 8 · 체력 3 · 민첩 3
 

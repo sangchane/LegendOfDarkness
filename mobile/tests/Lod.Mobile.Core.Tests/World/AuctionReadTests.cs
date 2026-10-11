@@ -91,13 +91,13 @@ public sealed class AuctionReadTests
         roll.AddRange(LegacyKoreanEncoding.EncodeStringA("전사"));
         roll.Add(87);
         roll.AddRange(U32(22));
-        roll.AddRange(LegacyKoreanEncoding.EncodeStringA("사제"));
+        roll.AddRange(LegacyKoreanEncoding.EncodeStringA("성직자"));
         roll.Add(12);
         roll.AddRange(U32(11));
 
         LootRoll read = Auction.ReadRoll([.. roll]);
         Assert.Equal(("에페", 11u), (read.Item, read.Winner));
-        Assert.Equal([(11u, "전사", (byte)87), (22u, "사제", (byte)12)], read.Rolls);
+        Assert.Equal([(11u, "전사", (byte)87), (22u, "성직자", (byte)12)], read.Rolls);
     }
 
     [Fact]

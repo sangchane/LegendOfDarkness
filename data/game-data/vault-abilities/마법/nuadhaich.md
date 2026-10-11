@@ -1,7 +1,7 @@
 ---
 이름: "nuadhaich"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "ard ioc"
 레벨: 90
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # nuadhaich
 
-마법 · 사제 · 레벨 90
+마법 · 성직자 · 레벨 90
 
 능력치 요구: 힘 10 · 지능 55 · 지혜 120 · 체력 10 · 민첩 10
 

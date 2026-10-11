@@ -238,7 +238,7 @@ public partial class Main : Control
 
     /// <summary>
     /// 셀렉트 줄 → 선의 값: 끝 줄(끄기)만 255, 나머지는 모두 0(자동 — 봇이 쓸 수 있는 가장 센 회복). 회복도 저주처럼 늘 가장 높은
-    /// 것을 쓴다(사용자 2026-10-04) — 전에는 고른 줄이 「그것까지」 상한이라 쿠로 줄이 저장되면 99레벨 사제가 쿠로만 썼다.
+    /// 것을 쓴다(사용자 2026-10-04) — 전에는 고른 줄이 「그것까지」 상한이라 쿠로 줄이 저장되면 99레벨 성직자가 쿠로만 썼다.
     /// </summary>
     private static int HealPick(int row, int rows) => row == rows - 1 ? CompanionSpells.HealOff : CompanionSpells.HealAuto;
 

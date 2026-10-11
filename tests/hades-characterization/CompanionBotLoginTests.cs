@@ -6,7 +6,7 @@ using Xunit;
 namespace Lod.Hades.Characterization.Tests;
 
 /// <summary>
-/// 봇 프로그램의 첫 접속을 클라우드와 같은 조건으로: 계정이 없는 상태 · 이름 "동료사제"(한글 넷) · 영숫자 10자 비밀번호.
+/// 봇 프로그램의 첫 접속을 클라우드와 같은 조건으로: 계정이 없는 상태 · 이름 "동료성직자"(한글 넷) · 영숫자 10자 비밀번호.
 /// 로그인이 거절되면 성직자로 만들고 들어가 기다린다 — 두 번째 접속(다시 붙기)도 같은 계정으로 들어간다.
 /// </summary>
 public sealed class CompanionBotLoginTests : IDisposable
@@ -21,7 +21,7 @@ public sealed class CompanionBotLoginTests : IDisposable
         using IsolatedHadesServer server = IsolatedHadesServer.Prepare();
         server.Start(TimeSpan.FromMinutes(2));
 
-        BotConfig config = new() { Host = "127.0.0.1", LoginPort = server.LoginPort, Name = "동료사제", Password = "a1b2c3d4e5" };
+        BotConfig config = new() { Host = "127.0.0.1", LoginPort = server.LoginPort, Name = "동료성직자", Password = "a1b2c3d4e5" };
         List<string> said = [];
 
         foreach (int round in new[] { 1, 2 })
@@ -50,7 +50,7 @@ public sealed class CompanionBotLoginTests : IDisposable
 
         Assert.Equal(["계정이 없어 성직자로 만듭니다."], said);
         System.Text.Json.Nodes.JsonNode saved = System.Text.Json.Nodes.JsonNode.Parse(
-            File.ReadAllText(Path.Combine(server.ContentLocation, "aislings", "동료사제.json")))!;
+            File.ReadAllText(Path.Combine(server.ContentLocation, "aislings", "동료성직자.json")))!;
         Assert.Contains(saved["Path"]!.ToJsonString().Trim('"'), new[] { "4", "Priest" });
     }
 }

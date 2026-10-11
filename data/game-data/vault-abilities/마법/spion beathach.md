@@ -1,7 +1,7 @@
 ---
 이름: "spion beathach"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "seun"
 레벨: 10
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # spion beathach
 
-마법 · 사제 · 레벨 10
+마법 · 성직자 · 레벨 10
 
 능력치 요구: 힘 3 · 지능 65 · 지혜 81 · 체력 3 · 민첩 3
 

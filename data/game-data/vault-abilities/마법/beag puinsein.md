@@ -1,7 +1,7 @@
 ---
 이름: "beag puinsein"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: ""
 레벨: 0
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # beag puinsein
 
-마법 · 사제 · 레벨 0
+마법 · 성직자 · 레벨 0
 
 능력치 요구: 힘 10 · 지능 15 · 지혜 12 · 체력 12 · 민첩 15
 

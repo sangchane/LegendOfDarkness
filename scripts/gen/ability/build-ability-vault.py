@@ -21,7 +21,7 @@ SRC = ROOT / "data" / "game-data" / "abilities.json"
 VAULT = ROOT / "data" / "game-data" / "vault-abilities"
 
 BANNED = re.compile(r'[\\/:*?"<>|#\[\]^]')
-CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "수도사"}
+CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "성직자", 5: "수도사"}
 STATS = ["힘", "지능", "지혜", "체력", "민첩"]      # statCosts 다섯 칸의 순서는 아직 확인 못 했다
 
 

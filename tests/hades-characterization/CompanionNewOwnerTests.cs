@@ -191,7 +191,7 @@ public sealed class CompanionNewOwnerTests : IDisposable
     }
 
     /// <summary>
-    /// "주인 없는 동료사제2~5 가 유령으로 남아 한 칸에 겹쳐 있다"(사용자, 2026-10-06 클라우드 — 뮤레칸의방 10,9 에 넷). 죽은 채 주인이 나가면
+    /// "주인 없는 동료성직자2~5 가 유령으로 남아 한 칸에 겹쳐 있다"(사용자, 2026-10-06 클라우드 — 뮤레칸의방 10,9 에 넷). 죽은 채 주인이 나가면
     /// 짝이 풀려 [봇 부르기] 로 되살릴 사람이 없었고, 되살려 보내도 대기 칸이 하나라 겹쳐 섰다. 짝 없는 유령 둘이 되살아나 대기 장소의 다른 칸에 서야 한다.
     /// </summary>
     [Fact]
@@ -225,7 +225,7 @@ public sealed class CompanionNewOwnerTests : IDisposable
         Assert.NotEqual(ghosts[0].State!.Where, ghosts[1].State!.Where);
     }
 
-    /// <summary>대기 칸 한 곳에 겹쳐 저장된 봇들(클라우드 동료사제 다섯, 2026-10-06 — 20373 37,29) — 들어오면 곁 칸으로 떨어져 서야 한다.</summary>
+    /// <summary>대기 칸 한 곳에 겹쳐 저장된 봇들(클라우드 동료성직자 다섯, 2026-10-06 — 20373 37,29) — 들어오면 곁 칸으로 떨어져 서야 한다.</summary>
     [Fact]
     public async Task Bots_saved_on_the_same_home_tile_spread_out()
     {

@@ -10,7 +10,7 @@
   - 블라인드 스팟 표: 시험한 서버와 배포 산출물 일치(manifest 는 넣음, 시험 결과 연결은 아직) · 환경변수 없으면 통과로 세는 부하·촬영 시험 · BotLoad 체력 100,000 · Godot 화면 산술 · 맵 전환 중 옛 좌표(WorldState) · HadesConnectionTests 공유 10초 · 고아 시험 서버 회수(10-08 수정 때 7개 손으로 끔) · CharacterSaveTests 3초 대기·옛 주석 · 게임 채널 TLS · 백업 일관성(live tar) · NPC 변환 미지원 명령 baseline · ios-build.sh import 실패 무시 · 낡은 운영 문서(service-readiness·security-maintenance).
   - 은행 밖 경제 변경(상점 사고팔기 등)도 캐릭터 자물쇠 밖에서 금화·가방을 바꾼다 — 주기 저장과 엇갈릴 수 있음(은행만 고침).
   - .NET 10 전환 — `plans/dotnet10-migration-2026-10-08.md`(지원 종료 2026-11-10).
-  - 사제봇6 이 들어간 직후 서버가 그 소켓에서 `ObjectDisposedException`(NetworkServer.EndReceivePacket → BeginReceive)을 내고 끊는다 — 10-08 배포 뒤 두 번 끊기고 세 번째에 들어감, 전날 15번. 같은 오류 하루 30·91줄. 원인 미조사.
+  - 성직자봇6 이 들어간 직후 서버가 그 소켓에서 `ObjectDisposedException`(NetworkServer.EndReceivePacket → BeginReceive)을 내고 끊는다 — 10-08 배포 뒤 두 번 끊기고 세 번째에 들어감, 전날 15번. 같은 오류 하루 30·91줄. 원인 미조사.
   - Node `ability-operations-ui.test.js:16` 현황판 731 vs 서버 734(더블어택·드래곤모드·트리플어택) 생성물 드리프트.
 
 - **[보류/사용자 2026-10-07] 경매 더 비싼 거래(20억 넘게).** 손 금화(`GoldPoints` int)·경매 값 칸(int)·패킷(u32)이 21억까지라, 넘기려면 64비트로 바꾸는 큰 작업(서버·패킷·앱·봇·캐릭터 파일). 지금: 들 수 있는 금화 20억(클라우드)·경매 값 상한 20억·은행 금화는 상한 없음(DL-14).
@@ -41,7 +41,7 @@
 - **[보류/사용자 2026-09-27] 밀레스 사범 5.99 전용 메뉴 20개 막기** — 막을 것이지만 지금은 보류(목록 `docs/abilities-nova-work-order.md` 결과 T6).
 - **[보류/사용자 2026-10-02] 헬 괴물(구광산 헬 직업)이 떨굴 무기** — 지금은 제 직업 헬옷만 0.45%. 무기는 나중에 정한다(`scripts/gen/world/build-old-mine.py`).
 
-- **[할 일] 봇 여러 개** — 지금은 봇 계정 하나(`동료사제`)·봇 프로그램 하나라 두 번째 사람이 [봇 부르기]를 누르면 "봇이 모두 다른 분과 함께 있습니다". 서버 `CompanionBots` 는 목록이라 계정·봇 프로그램(systemd 여러 개)만 늘리면 된다. 몇 개로 할지 사용자에게 묻는 중.
+- **[할 일] 봇 여러 개** — 지금은 봇 계정 하나(`동료성직자`)·봇 프로그램 하나라 두 번째 사람이 [봇 부르기]를 누르면 "봇이 모두 다른 분과 함께 있습니다". 서버 `CompanionBots` 는 목록이라 계정·봇 프로그램(systemd 여러 개)만 늘리면 된다. 몇 개로 할지 사용자에게 묻는 중.
 
 - **[정할 것/글러브1 이 너무 세다]** 노바 팩 값 그대로 들여온 글러브1 은 1레벨에 80~100 인데 같은 1레벨
   에페가 15~20 이다 — 네댓 배. **사용자: 일단 그대로 둔다**(2026-09-23). 무도가 무기 사다리를 다시 볼
@@ -69,7 +69,7 @@
   그대로다 — 묶음째 되돌리면 219장이 한꺼번에 움직이고 방금 문을 연 보석상 물목 21개가 전부 흔들린다.
   필요해지면 `scripts/gen/items/build-gear-from-original.py` 의 `VALUE_ONLY` 에 이름을 하나씩 적는다.
 
-- **[남음/사제 마법 19개가 이펙트를 아예 안 쏜다]** `ao cradh`·`ao beag cradh`·`ao mor cradh`·`ao ard cradh`·
+- **[남음/성직자 마법 19개가 이펙트를 아예 안 쏜다]** `ao cradh`·`ao beag cradh`·`ao mor cradh`·`ao ard cradh`·
   `ao puinsein`·`armachd`·`deo saighead`·`디나르콜룸`·`디소루미아`·`리젠(Lev1)`·`신성력강화`·`신의축복`·
   `엑스쿠라네라`·`일루메눔`·`콜라마`·`쿠라네라`·`쿠라누스`·`쿠러스`·`홀리쿠라네라`.
   스크립트는 있는데 `effect` 를 안 부르고 템플릿 `TargetAnimation` 도 0 이다 — 5.99 원본 스크립트에 있는지

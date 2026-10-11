@@ -1,7 +1,7 @@
 ---
 이름: "Counter Attack 7"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "Counter Attack 6"
 레벨: 100
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # Counter Attack 7
 
-마법 · 사제 · 레벨 100
+마법 · 성직자 · 레벨 100
 
 능력치 요구: 힘 3 · 지능 3 · 지혜 3 · 체력 3 · 민첩 3
 

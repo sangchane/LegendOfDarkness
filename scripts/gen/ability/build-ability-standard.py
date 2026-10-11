@@ -30,7 +30,7 @@ SCRIPTS = ROOT / "sources" / "wren11" / "Dark-Ages-Private-Server" / "database" 
 PAGE = ROOT / "docs" / "abilities-data.js"
 OUT = ROOT / "data" / "game-data" / "ability-standard.json"
 
-CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "수도사"}
+CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "성직자", 5: "수도사"}
 WORKBOOK_COUNTS = {
     "전사": {"ordinary": 23, "ability": 44}, "도적": {"ordinary": 32, "ability": 81},
     "법사": {"ordinary": 53, "ability": 65}, "직자": {"ordinary": 53, "ability": 53},

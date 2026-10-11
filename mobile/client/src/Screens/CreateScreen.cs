@@ -444,7 +444,7 @@ public sealed partial class CreateScreen : Control
 
         foreach ((byte path, string label) in new[]
         {
-            ((byte)1, "전사"), ((byte)2, "도적"), ((byte)3, "법사"), ((byte)4, "사제"), ((byte)5, "무도")
+            ((byte)1, "전사"), ((byte)2, "도적"), ((byte)3, "법사"), ((byte)4, "성직자"), ((byte)5, "무도")
         })
         {
             Button tile = new()

@@ -1,7 +1,7 @@
 ---
 이름: "ard naomh aite"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "armachd"
 레벨: 80
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # ard naomh aite
 
-마법 · 사제 · 레벨 80
+마법 · 성직자 · 레벨 80
 
 능력치 요구: 힘 13 · 지능 83 · 지혜 73 · 체력 13 · 민첩 13
 

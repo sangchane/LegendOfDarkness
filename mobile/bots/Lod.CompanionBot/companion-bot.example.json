@@ -1,7 +1,7 @@
 {
   "Host": "127.0.0.1",
   "LoginPort": 2610,
-  "Name": "동료사제",
+  "Name": "동료성직자",
   "Password": "여기에-봇-비밀번호",
   "MapFolder": "../../client/assets/world",
   "HealOwnerPercent": 70,

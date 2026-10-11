@@ -1,7 +1,7 @@
 ---
 이름: "TransferBlood"
 갈래: 기술
-직업: "사제"
+직업: "성직자"
 선행: ""
 레벨: 0
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # TransferBlood
 
-기술 · 사제 · 레벨 0
+기술 · 성직자 · 레벨 0
 
 능력치 요구: 힘 3 · 지능 3 · 지혜 8 · 체력 3 · 민첩 8
 

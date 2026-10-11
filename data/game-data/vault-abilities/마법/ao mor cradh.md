@@ -1,7 +1,7 @@
 ---
 이름: "ao mor cradh"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "ao cradh"
 레벨: 60
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # ao mor cradh
 
-마법 · 사제 · 레벨 60
+마법 · 성직자 · 레벨 60
 
 능력치 요구: 힘 3 · 지능 59 · 지혜 47 · 체력 3 · 민첩 3
 

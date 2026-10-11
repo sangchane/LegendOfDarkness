@@ -1,7 +1,7 @@
 ---
 이름: "beag naomh aite"
 갈래: 마법
-직업: "사제"
+직업: "성직자"
 선행: "armachd"
 레벨: 20
 출처: "Hades database/server/metafile/SClass1~5"
@@ -9,7 +9,7 @@
 
 # beag naomh aite
 
-마법 · 사제 · 레벨 20
+마법 · 성직자 · 레벨 20
 
 능력치 요구: 힘 3 · 지능 33 · 지혜 43 · 체력 3 · 민첩 3
 

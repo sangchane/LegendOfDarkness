@@ -322,121 +322,121 @@
 마법	마법사	mor strioch pian gar		0	라그나로크
 마법	마법사	pian na dion		0	
 마법	마법사	puinneag spiorad		0	
-기술	사제	Instrumental 1		0	
-기술	사제	· Instrumental 2	Instrumental 1	0	
-기술	사제	·· Instrumental 3	Instrumental 2	0	
-기술	사제	··· Instrumental 4	Instrumental 3	0	
-기술	사제	···· Instrumental 5	Instrumental 4	0	
-기술	사제	····· Instrumental 6	Instrumental 5	0	
-기술	사제	Instrumental Attack 1		0	
-기술	사제	· Instrumental Attack 2	Instrumental Attack 1	100	
-기술	사제	·· Instrumental Attack 3	Instrumental Attack 2	100	
-기술	사제	··· Instrumental Attack 4	Instrumental Attack 3	100	
-기술	사제	···· Instrumental Attack 5	Instrumental Attack 4	100	
-기술	사제	····· Instrumental Attack 6	Instrumental Attack 5	100	
-기술	사제	······ Instrumental Attack 7	Instrumental Attack 6	100	
-기술	사제	······· Instrumental Attack 8	Instrumental Attack 7	100	
-기술	사제	········ Instrumental Attack 9	Instrumental Attack 8	100	
-기술	사제	········· Instrumental Attack 10	Instrumental Attack 9	100	
-기술	사제	·········· Instrumental Attack 11	Instrumental Attack 10	100	
-기술	사제	··········· Instrumental Attack 12	Instrumental Attack 11	100	
-기술	사제	Perish Lore		0	
-기술	사제	TransferBlood		0	
-마법	사제	Altar Lecture		0	
-마법	사제	Beothaich Lecture		0	
-마법	사제	Counter Attack 1		0	
-마법	사제	· Counter Attack 2	Counter Attack 1	100	
-마법	사제	·· Counter Attack 3	Counter Attack 2	100	
-마법	사제	··· Counter Attack 4	Counter Attack 3	100	
-마법	사제	···· Counter Attack 5	Counter Attack 4	100	
-마법	사제	····· Counter Attack 6	Counter Attack 5	100	
-마법	사제	······ Counter Attack 7	Counter Attack 6	100	
-마법	사제	······· Counter Attack 8	Counter Attack 7	100	
-마법	사제	········ Counter Attack 9	Counter Attack 8	100	
-마법	사제	········· Counter Attack 10	Counter Attack 9	100	
-마법	사제	·········· Counter Attack 11	Counter Attack 10	100	
-마법	사제	Cursed Tune 1		0	
-마법	사제	· Cursed Tune 2	Cursed Tune 1	100	
-마법	사제	·· Cursed Tune 3	Cursed Tune 2	100	
-마법	사제	··· Cursed Tune 4	Cursed Tune 3	100	
-마법	사제	···· Cursed Tune 5	Cursed Tune 4	100	
-마법	사제	····· Cursed Tune 6	Cursed Tune 5	100	
-마법	사제	······ Cursed Tune 7	Cursed Tune 6	100	
-마법	사제	······· Cursed Tune 8	Cursed Tune 7	100	
-마법	사제	········ Cursed Tune 9	Cursed Tune 8	100	
-마법	사제	········· Cursed Tune 10	Cursed Tune 9	100	
-마법	사제	·········· Cursed Tune 11	Cursed Tune 10	100	
-마법	사제	··········· Cursed Tune 12	Cursed Tune 11	100	
-마법	사제	Entreaties Lecture		0	
-마법	사제	Faerie Love Lecture		0	
-마법	사제	Gods Lecture		0	
-마법	사제	Guide Lecture		0	
-마법	사제	Regeneration 1		0	
-마법	사제	· Regeneration 2	Regeneration 1	100	
-마법	사제	·· Regeneration 3	Regeneration 2	100	
-마법	사제	··· Regeneration 4	Regeneration 3	100	
-마법	사제	···· Regeneration 5	Regeneration 4	100	
-마법	사제	····· Regeneration 6	Regeneration 5	100	
-마법	사제	······ Regeneration 7	Regeneration 6	100	
-마법	사제	······· Regeneration 8	Regeneration 7	100	
-마법	사제	········ Regeneration 9	Regeneration 8	100	
-마법	사제	········· Regeneration 10	Regeneration 9	100	
-마법	사제	Salvation		0	홀리쿠라네라
-마법	사제	Woods Lecture		0	
-마법	사제	ao beag cradh		0	
-마법	사제	· ao cradh	ao beag cradh	30	
-마법	사제	·· ao mor cradh	ao cradh	60	
-마법	사제	··· ao ard cradh	ao mor cradh	75	
-마법	사제	ao dall		0	
-마법	사제	· ao suain	ao dall	75	디소루마
-마법	사제	ao puinsein		0	
-마법	사제	armachd		0	
-마법	사제	· ard naomh aite	armachd	80	
-마법	사제	· beag naomh aite	armachd	20	
-마법	사제	· mor dion	armachd	75	
-마법	사제	·· deireas faileas	mor dion	90	
-마법	사제	· mor naomh aite	armachd	70	
-마법	사제	armachd fein		0	
-마법	사제	beag cradh		0	렌토
-마법	사제	· cradh	beag cradh	30	바르도
-마법	사제	·· mor cradh	cradh	75	데프레코
-마법	사제	··· ard cradh	mor cradh	70	프라보
-마법	사제	beag ioc		0	쿠로
-마법	사제	· beag ioc comlha	beag ioc	30	쿠러스
-마법	사제	·· ioc comlha	beag ioc comlha	20	쿠라누스
-마법	사제	··· mor ioc comlha	ioc comlha	75	쿠라네라
-마법	사제	· beothaichdeum	beag ioc	10	
-마법	사제	· ioc	beag ioc	30	쿠라노
-마법	사제	·· deo saighead	ioc	45	
-마법	사제	·· mor ioc	ioc	75	쿠라노소
-마법	사제	··· ard ioc	mor ioc	75	수페라쿠라노
-마법	사제	···· nuadhaich	ard ioc	90	엑스쿠라노
-마법	사제	beag ioc fein		0	
-마법	사제	beag puinsein		0	
-마법	사제	· beag pramh	beag puinsein	10	
-마법	사제	· puinsein	beag puinsein	10	
-마법	사제	·· pramh	puinsein	60	
-마법	사제	beag seun		0	
-마법	사제	· seun	beag seun	10	
-마법	사제	·· mor seun	seun	30	
-마법	사제	··· ard seun	mor seun	40	
-마법	사제	·· spion beathach	seun	10	
-마법	사제	··· sonruich nadur	spion beathach	10	
-마법	사제	beag slan		0	
-마법	사제	· slan	beag slan	10	
-마법	사제	·· mor slan	slan	10	
-마법	사제	beannaich		0	
-마법	사제	· fas deireas	beannaich	30	
-마법	사제	· mor beannaich	beannaich	10	
-마법	사제	creag neart		0	
-마법	사제	deo lamh		0	
-마법	사제	deo searg		0	
-마법	사제	deo searg gar		0	
-마법	사제	mor breisleich		0	
-마법	사제	mor dion comlha		0	
-마법	사제	naomh aite		0	
-마법	사제	dall	breisleich	75	
-마법	사제	· suain	dall	70	
+기술	성직자	Instrumental 1		0	
+기술	성직자	· Instrumental 2	Instrumental 1	0	
+기술	성직자	·· Instrumental 3	Instrumental 2	0	
+기술	성직자	··· Instrumental 4	Instrumental 3	0	
+기술	성직자	···· Instrumental 5	Instrumental 4	0	
+기술	성직자	····· Instrumental 6	Instrumental 5	0	
+기술	성직자	Instrumental Attack 1		0	
+기술	성직자	· Instrumental Attack 2	Instrumental Attack 1	100	
+기술	성직자	·· Instrumental Attack 3	Instrumental Attack 2	100	
+기술	성직자	··· Instrumental Attack 4	Instrumental Attack 3	100	
+기술	성직자	···· Instrumental Attack 5	Instrumental Attack 4	100	
+기술	성직자	····· Instrumental Attack 6	Instrumental Attack 5	100	
+기술	성직자	······ Instrumental Attack 7	Instrumental Attack 6	100	
+기술	성직자	······· Instrumental Attack 8	Instrumental Attack 7	100	
+기술	성직자	········ Instrumental Attack 9	Instrumental Attack 8	100	
+기술	성직자	········· Instrumental Attack 10	Instrumental Attack 9	100	
+기술	성직자	·········· Instrumental Attack 11	Instrumental Attack 10	100	
+기술	성직자	··········· Instrumental Attack 12	Instrumental Attack 11	100	
+기술	성직자	Perish Lore		0	
+기술	성직자	TransferBlood		0	
+마법	성직자	Altar Lecture		0	
+마법	성직자	Beothaich Lecture		0	
+마법	성직자	Counter Attack 1		0	
+마법	성직자	· Counter Attack 2	Counter Attack 1	100	
+마법	성직자	·· Counter Attack 3	Counter Attack 2	100	
+마법	성직자	··· Counter Attack 4	Counter Attack 3	100	
+마법	성직자	···· Counter Attack 5	Counter Attack 4	100	
+마법	성직자	····· Counter Attack 6	Counter Attack 5	100	
+마법	성직자	······ Counter Attack 7	Counter Attack 6	100	
+마법	성직자	······· Counter Attack 8	Counter Attack 7	100	
+마법	성직자	········ Counter Attack 9	Counter Attack 8	100	
+마법	성직자	········· Counter Attack 10	Counter Attack 9	100	
+마법	성직자	·········· Counter Attack 11	Counter Attack 10	100	
+마법	성직자	Cursed Tune 1		0	
+마법	성직자	· Cursed Tune 2	Cursed Tune 1	100	
+마법	성직자	·· Cursed Tune 3	Cursed Tune 2	100	
+마법	성직자	··· Cursed Tune 4	Cursed Tune 3	100	
+마법	성직자	···· Cursed Tune 5	Cursed Tune 4	100	
+마법	성직자	····· Cursed Tune 6	Cursed Tune 5	100	
+마법	성직자	······ Cursed Tune 7	Cursed Tune 6	100	
+마법	성직자	······· Cursed Tune 8	Cursed Tune 7	100	
+마법	성직자	········ Cursed Tune 9	Cursed Tune 8	100	
+마법	성직자	········· Cursed Tune 10	Cursed Tune 9	100	
+마법	성직자	·········· Cursed Tune 11	Cursed Tune 10	100	
+마법	성직자	··········· Cursed Tune 12	Cursed Tune 11	100	
+마법	성직자	Entreaties Lecture		0	
+마법	성직자	Faerie Love Lecture		0	
+마법	성직자	Gods Lecture		0	
+마법	성직자	Guide Lecture		0	
+마법	성직자	Regeneration 1		0	
+마법	성직자	· Regeneration 2	Regeneration 1	100	
+마법	성직자	·· Regeneration 3	Regeneration 2	100	
+마법	성직자	··· Regeneration 4	Regeneration 3	100	
+마법	성직자	···· Regeneration 5	Regeneration 4	100	
+마법	성직자	····· Regeneration 6	Regeneration 5	100	
+마법	성직자	······ Regeneration 7	Regeneration 6	100	
+마법	성직자	······· Regeneration 8	Regeneration 7	100	
+마법	성직자	········ Regeneration 9	Regeneration 8	100	
+마법	성직자	········· Regeneration 10	Regeneration 9	100	
+마법	성직자	Salvation		0	홀리쿠라네라
+마법	성직자	Woods Lecture		0	
+마법	성직자	ao beag cradh		0	
+마법	성직자	· ao cradh	ao beag cradh	30	
+마법	성직자	·· ao mor cradh	ao cradh	60	
+마법	성직자	··· ao ard cradh	ao mor cradh	75	
+마법	성직자	ao dall		0	
+마법	성직자	· ao suain	ao dall	75	디소루마
+마법	성직자	ao puinsein		0	
+마법	성직자	armachd		0	
+마법	성직자	· ard naomh aite	armachd	80	
+마법	성직자	· beag naomh aite	armachd	20	
+마법	성직자	· mor dion	armachd	75	
+마법	성직자	·· deireas faileas	mor dion	90	
+마법	성직자	· mor naomh aite	armachd	70	
+마법	성직자	armachd fein		0	
+마법	성직자	beag cradh		0	렌토
+마법	성직자	· cradh	beag cradh	30	바르도
+마법	성직자	·· mor cradh	cradh	75	데프레코
+마법	성직자	··· ard cradh	mor cradh	70	프라보
+마법	성직자	beag ioc		0	쿠로
+마법	성직자	· beag ioc comlha	beag ioc	30	쿠러스
+마법	성직자	·· ioc comlha	beag ioc comlha	20	쿠라누스
+마법	성직자	··· mor ioc comlha	ioc comlha	75	쿠라네라
+마법	성직자	· beothaichdeum	beag ioc	10	
+마법	성직자	· ioc	beag ioc	30	쿠라노
+마법	성직자	·· deo saighead	ioc	45	
+마법	성직자	·· mor ioc	ioc	75	쿠라노소
+마법	성직자	··· ard ioc	mor ioc	75	수페라쿠라노
+마법	성직자	···· nuadhaich	ard ioc	90	엑스쿠라노
+마법	성직자	beag ioc fein		0	
+마법	성직자	beag puinsein		0	
+마법	성직자	· beag pramh	beag puinsein	10	
+마법	성직자	· puinsein	beag puinsein	10	
+마법	성직자	·· pramh	puinsein	60	
+마법	성직자	beag seun		0	
+마법	성직자	· seun	beag seun	10	
+마법	성직자	·· mor seun	seun	30	
+마법	성직자	··· ard seun	mor seun	40	
+마법	성직자	·· spion beathach	seun	10	
+마법	성직자	··· sonruich nadur	spion beathach	10	
+마법	성직자	beag slan		0	
+마법	성직자	· slan	beag slan	10	
+마법	성직자	·· mor slan	slan	10	
+마법	성직자	beannaich		0	
+마법	성직자	· fas deireas	beannaich	30	
+마법	성직자	· mor beannaich	beannaich	10	
+마법	성직자	creag neart		0	
+마법	성직자	deo lamh		0	
+마법	성직자	deo searg		0	
+마법	성직자	deo searg gar		0	
+마법	성직자	mor breisleich		0	
+마법	성직자	mor dion comlha		0	
+마법	성직자	naomh aite		0	
+마법	성직자	dall	breisleich	75	
+마법	성직자	· suain	dall	70	
 기술	수도사	Ambush		0	이형환위
 기술	수도사	Beak Pierce 1		0	
 기술	수도사	· Beak Pierce 2	Beak Pierce 1	100	

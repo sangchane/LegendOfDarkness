@@ -25,7 +25,7 @@ AUTO = ROOT / "mobile/client/assets/world/auto-learn.txt"
 NOVA = ROOT / "data/game-data/ability-effects.json"
 NOVA_TAIL = re.compile(r",\s*(\d+)\s*,\s*\d+\s*$")
 
-CLASS = {0: "공통", 1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "무도가", 6: "평민"}
+CLASS = {0: "공통", 1: "전사", 2: "도적", 3: "마법사", 4: "성직자", 5: "무도가", 6: "평민"}
 PACK_EFFECT = re.compile(
     r'p\.Call\("effect",\s*[^,]+,\s*\(V\)(\d+)L,\s*\(V\)(\d+)L,\s*\(V\)(\d+)L\)')
 

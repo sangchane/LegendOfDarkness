@@ -9,7 +9,7 @@
 기술	1	전사	Long Strike	기본공격 | 더블어택 | 숏블레이드	후보 3×7
 기술	1	도적	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
 기술	1	마법사	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
-기술	1	사제	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
+기술	1	성직자	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
 기술	1	수도사	Assail	기본공격 | 더블어택 | 숏블레이드	후보 3×7
 기술	2	수도사	Kick	아들레스투 | 단각	후보 2×2
 기술	2	수도사	High Kick	아들레스투 | 단각	후보 2×2
@@ -166,61 +166,61 @@
 기술	96	수도사	Claw Slash 8	할퀴기(Lev1) | 늑대의위상	후보 2×10
 기술	96	수도사	Claw Slash 9	할퀴기(Lev1) | 늑대의위상	후보 2×10
 기술	96	수도사	Claw Slash 10	할퀴기(Lev1) | 늑대의위상	후보 2×10
-기술	98	사제	Instrumental 1	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental 2	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental 3	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental 4	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental 5	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental 6	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 1	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 2	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 3	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 4	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 5	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 6	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 7	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 8	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 9	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 10	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 11	연주공격(Lev3)	후보 1×18
-기술	98	사제	Instrumental Attack 12	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental 1	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental 2	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental 3	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental 4	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental 5	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental 6	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 1	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 2	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 3	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 4	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 5	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 6	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 7	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 8	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 9	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 10	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 11	연주공격(Lev3)	후보 1×18
+기술	98	성직자	Instrumental Attack 12	연주공격(Lev3)	후보 1×18
 마법	3	마법사	Graymayre Lecture	딜루메니	후보 1×11
 마법	3	마법사	Elements Lecture	딜루메니	후보 1×11
-마법	3	사제	Woods Lecture	딜루메니	후보 1×11
-마법	3	사제	Altar Lecture	딜루메니	후보 1×11
-마법	3	사제	Gods Lecture	딜루메니	후보 1×11
-마법	3	사제	Faerie Love Lecture	딜루메니	후보 1×11
-마법	3	사제	Graymayre Lecture	딜루메니	후보 1×11
-마법	3	사제	Beothaich Lecture	딜루메니	후보 1×11
-마법	3	사제	Entreaties Lecture	딜루메니	후보 1×11
-마법	3	사제	Guide Lecture	딜루메니	후보 1×11
-마법	3	사제	dall	딜루메니	후보 1×11
-마법	5	사제	beag cradh	렌토	확실
+마법	3	성직자	Woods Lecture	딜루메니	후보 1×11
+마법	3	성직자	Altar Lecture	딜루메니	후보 1×11
+마법	3	성직자	Gods Lecture	딜루메니	후보 1×11
+마법	3	성직자	Faerie Love Lecture	딜루메니	후보 1×11
+마법	3	성직자	Graymayre Lecture	딜루메니	후보 1×11
+마법	3	성직자	Beothaich Lecture	딜루메니	후보 1×11
+마법	3	성직자	Entreaties Lecture	딜루메니	후보 1×11
+마법	3	성직자	Guide Lecture	딜루메니	후보 1×11
+마법	3	성직자	dall	딜루메니	후보 1×11
+마법	5	성직자	beag cradh	렌토	확실
 마법	10	도적	Hide	하이드	후보 1×2
 마법	10	수도사	White Bat Stance	하이드	후보 1×2
-마법	11	사제	beag naomh aite	호르라마 | 안티매직	후보 2×4
-마법	11	사제	naomh aite	호르라마 | 안티매직	후보 2×4
-마법	11	사제	mor naomh aite	호르라마 | 안티매직	후보 2×4
-마법	11	사제	ard naomh aite	호르라마 | 안티매직	후보 2×4
+마법	11	성직자	beag naomh aite	호르라마 | 안티매직	후보 2×4
+마법	11	성직자	naomh aite	호르라마 | 안티매직	후보 2×4
+마법	11	성직자	mor naomh aite	호르라마 | 안티매직	후보 2×4
+마법	11	성직자	ard naomh aite	호르라마 | 안티매직	후보 2×4
 마법	16	도적	Needle Trap	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
 마법	16	도적	Stiletto Trap	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
-마법	16	사제	beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
-마법	16	사제	mor beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
+마법	16	성직자	beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
+마법	16	성직자	mor beannaich	명중률향상(Lev1) | 명중률향상(Lev2)	후보 2×4
 마법	20	도적	beag breisleich	콘푸지오	후보 1×5
 마법	20	도적	breisleich	콘푸지오	후보 1×5
-마법	20	사제	beag breisleich	콘푸지오	후보 1×5
-마법	20	사제	breisleich	콘푸지오	후보 1×5
-마법	20	사제	mor breisleich	콘푸지오	후보 1×5
-마법	25	사제	ao dall	일루메나	후보 1×2
+마법	20	성직자	beag breisleich	콘푸지오	후보 1×5
+마법	20	성직자	breisleich	콘푸지오	후보 1×5
+마법	20	성직자	mor breisleich	콘푸지오	후보 1×5
+마법	25	성직자	ao dall	일루메나	후보 1×2
 마법	25	수도사	ao dall	일루메나	후보 1×2
 마법	27	수도사	beag nochd	장풍	확실
-마법	28	사제	beag ioc	쿠로	확실
-마법	29	사제	ioc	쿠라노	확실
-마법	30	사제	mor ioc	쿠라노소	확실
-마법	31	사제	ard ioc	수페라쿠라노	확실
-마법	32	사제	beag ioc comlha	쿠러스	확실
-마법	33	사제	ioc comlha	쿠라누스	확실
-마법	34	사제	mor ioc comlha	쿠라네라	확실
+마법	28	성직자	beag ioc	쿠로	확실
+마법	29	성직자	ioc	쿠라노	확실
+마법	30	성직자	mor ioc	쿠라노소	확실
+마법	31	성직자	ard ioc	수페라쿠라노	확실
+마법	32	성직자	beag ioc comlha	쿠러스	확실
+마법	33	성직자	ioc comlha	쿠라누스	확실
+마법	34	성직자	mor ioc comlha	쿠라네라	확실
 마법	46	마법사	beag sal	마레노	후보 1×6
 마법	46	마법사	sal	마레노	후보 1×6
 마법	46	마법사	beag leasaich sal	마레노	후보 1×6
@@ -228,55 +228,55 @@
 마법	46	마법사	leasaich sal	마레노	후보 1×6
 마법	46	마법사	ard leasaich sal	마레노	후보 1×6
 마법	47	마법사	mor sal	마레누스	확실
-마법	51	사제	ao suain	디소루마	확실
+마법	51	성직자	ao suain	디소루마	확실
 마법	52	도적	Coiled Bolt Trap	에나르마	후보 1×5
 마법	52	도적	Bolt Trap	에나르마	후보 1×5
 마법	52	도적	Spring Trap	에나르마	후보 1×5
 마법	52	도적	Maiden Trap	에나르마	후보 1×5
-마법	52	사제	fas deireas	에나르마	후보 1×5
+마법	52	성직자	fas deireas	에나르마	후보 1×5
 마법	53	마법사	beag fas nadur	이모탈	후보 1×9
 마법	53	마법사	fas nadur	이모탈	후보 1×9
 마법	53	마법사	mor fas nadur	이모탈	후보 1×9
 마법	53	마법사	Wings of Protection	이모탈	후보 1×9
-마법	53	사제	mor dion	이모탈	후보 1×9
-마법	53	사제	mor dion comlha	이모탈	후보 1×9
+마법	53	성직자	mor dion	이모탈	후보 1×9
+마법	53	성직자	mor dion comlha	이모탈	후보 1×9
 마법	53	수도사	dion	이모탈	후보 1×9
 마법	53	수도사	Draco Stance	이모탈	후보 1×9
 마법	53	수도사	Iron Skin	이모탈	후보 1×9
 마법	54	전사	asgall faileas	리플렉토	후보 1×2
-마법	54	사제	deireas faileas	리플렉토	후보 1×2
+마법	54	성직자	deireas faileas	리플렉토	후보 1×2
 마법	63	마법사	beag sal lamh	수페라마레나	후보 1×2
 마법	63	마법사	sal lamh	수페라마레나	후보 1×2
 마법	68	마법사	athar gar	마네나로	확실
-마법	71	사제	deo saighead	홀리볼트 | 홀리랜서	후보 2×1
+마법	71	성직자	deo saighead	홀리볼트 | 홀리랜서	후보 2×1
 마법	72	마법사	mor strioch bais	세멜리아	확실
 마법	75	마법사	mor strioch pian gar	라그나로크	확실
-마법	77	사제	nuadhaich	엑스쿠라노	확실
-마법	82	사제	cradh	바르도	확실
-마법	83	사제	mor cradh	데프레코	확실
-마법	84	사제	ard cradh	프라보	확실
+마법	77	성직자	nuadhaich	엑스쿠라노	확실
+마법	82	성직자	cradh	바르도	확실
+마법	83	성직자	mor cradh	데프레코	확실
+마법	84	성직자	ard cradh	프라보	확실
 마법	86	도적	Life Arrow	코마디아	후보 1×2
-마법	86	사제	beothaichdeum	코마디아	후보 1×2
-마법	90	사제	beag pramh	나르콜리	후보 1×2
-마법	90	사제	pramh	나르콜리	후보 1×2
-마법	94	사제	armachd fein	콜라마	후보 1×3
-마법	94	사제	armachd	콜라마	후보 1×3
+마법	86	성직자	beothaichdeum	코마디아	후보 1×2
+마법	90	성직자	beag pramh	나르콜리	후보 1×2
+마법	90	성직자	pramh	나르콜리	후보 1×2
+마법	94	성직자	armachd fein	콜라마	후보 1×3
+마법	94	성직자	armachd	콜라마	후보 1×3
 마법	94	수도사	Scorpion Stance	콜라마	후보 1×3
-마법	107	사제	Salvation	홀리쿠라네라	확실
+마법	107	성직자	Salvation	홀리쿠라네라	확실
 마법	122	수도사	Wraith Touch	홀리드래곤	확실
 마법	124	수도사	Cat's Hearing	세오의손길	확실
 마법	150	마법사	Disenchanter	속성강화	후보 1×12
-마법	150	사제	Counter Attack 1	속성강화	후보 1×12
-마법	150	사제	Counter Attack 2	속성강화	후보 1×12
-마법	150	사제	Counter Attack 3	속성강화	후보 1×12
-마법	150	사제	Counter Attack 4	속성강화	후보 1×12
-마법	150	사제	Counter Attack 5	속성강화	후보 1×12
-마법	150	사제	Counter Attack 6	속성강화	후보 1×12
-마법	150	사제	Counter Attack 7	속성강화	후보 1×12
-마법	150	사제	Counter Attack 8	속성강화	후보 1×12
-마법	150	사제	Counter Attack 9	속성강화	후보 1×12
-마법	150	사제	Counter Attack 10	속성강화	후보 1×12
-마법	150	사제	Counter Attack 11	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 1	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 2	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 3	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 4	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 5	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 6	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 7	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 8	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 9	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 10	속성강화	후보 1×12
+마법	150	성직자	Counter Attack 11	속성강화	후보 1×12
 마법	151	도적	Frost Arrow 1	포트리스	후보 1×9
 마법	151	도적	Frost Arrow 2	포트리스	후보 1×9
 마법	151	도적	Frost Arrow 3	포트리스	후보 1×9

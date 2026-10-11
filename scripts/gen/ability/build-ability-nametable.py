@@ -21,7 +21,7 @@ from lib._paths import ROOT
 SRC = ROOT / "data" / "game-data" / "abilities.json"
 OUT = ROOT / "data" / "기술마법-한글이름.tsv"
 
-CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "사제", 5: "수도사"}
+CLASS = {1: "전사", 2: "도적", 3: "마법사", 4: "성직자", 5: "수도사"}
 HEAD = ["갈래", "직업", "영문이름", "선행", "레벨", "한글이름"]
 
 
