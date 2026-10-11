@@ -1,8 +1,10 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[현재/2026-10-11] 사망 패널티 + 직업·서클별 장비 + 경매 시세 + 「사제」→「성직자」 — 등급 L 변경 · `dev:build` · 단계: BUILD(에이전트 둘: 서버 사망·자료 / 봇 점수·시세).** 명세 `autopilot/death-penalty-gear/SPEC.md`.
-  다음: 둘 끝나면 「사제」→「성직자」 바꾸기(봇 이름 포함, 클라우드 캐릭터 파일) → 현재 캐릭터 장비 보고(맵 이름으로) → 리뷰 → 배포 한꺼번에.
+- **[현재/2026-10-11] 사망 패널티 + 직업·서클별 장비 + 경매 시세 + 「사제」→「성직자」 — 등급 L 변경 · `dev:build` · 단계: 구현 끝, 리뷰 중 → 배포.** 명세 `autopilot/death-penalty-gear/SPEC.md`.
+  커밋: 서버 `64c1bb06d`(사라짐 표시)·`b721a6123`(사망)·`f9e463d47`(생명·암흑 제외)·`b394dfa8f`(이름) · 루트 `bc7c778e`·`e50ca34f`·`53ca30b4`(봇 점수·시세·맨몸)·`8ff7bae7`(시세 상한 8배)·`bc38815d`(성직자).
+  배포 순서: 리뷰 반영 → 클라우드 lod·lod-eco·lod-bot@* 멈춤 → `scripts/ops/rename-bots.sh --apply` → eco-bots.json 순서를 직업별 10개씩(사용자 결정 — 무도봇 16 이 동시 40 한도로 한 번도 못 떴다) + `"AuctionFolder": "/home/ubuntu/lod/database/server/auction"` → `cloud-server.sh deploy`(DeathDropsItems=true) → 앱(동료성직자 이름) ios install·android release.
+  확인: 봇 하나 죽음 → 사라짐·바닥·10분 잠금·다시 갖춤 · `auction-report` 아이템별 중앙값 · 장비 보고(맵 이름)를 다시.
 - **[현재/2026-10-11] 앱 카카오 로그인 단순화 + 내 캐릭터 관리 — 등급 L 변경 · `dev:build` · 단계: 배포 끝(05:07), 사용자 실기기 확인 대기.** 명세 `autopilot/game-kakao-accounts/SPEC.md`.
   6자리 번호 없음 · 앱 = 카카오 → 내 캐릭터 목록(들어가기·생김새·삭제·새 캐릭터), 이름 칸·옛 캐릭터 잇기 없음. 옛 캐릭터 17개(봇 빼고) KakaoId=5130553996(백업 클라우드 `~/aislings-backup-20261011-050350`).
   커밋: 서비스 `b19c9e07` · 서버 `f79736c0d`·`3c2ad6ea2`(지운 이름 다시 못 만듦) · 시험 `4c494c3e` · 앱 `c1f673b9` · 리뷰 반영·포인터 `a40fd2ff`. 리뷰 둘(서비스·서버 / 앱) 막을 결함 반영 끝.
