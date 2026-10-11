@@ -590,7 +590,7 @@ public sealed partial class CreateScreen : Control
             // 다음에 로그인 화면이 이 이름을 채운다(시험 계정은 남기지 않는다 — 로그인 화면과 같다).
             if (Main.Rehearsal.Username.Length == 0)
             {
-                Main.SetLastCharacter(_username.Text, Main.AutoLogin);
+                Main.SetLastCharacter(_username.Text);
             }
 
             _status.Text = "노비스마을에 들어왔습니다.";

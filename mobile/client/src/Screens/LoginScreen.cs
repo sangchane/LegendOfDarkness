@@ -68,7 +68,6 @@ public partial class LoginScreen : Control
     private Button _create = null!;
     private Button _signOut = null!;
     private Button _kakao = null!;
-    private CheckBox _autoLogin = null!;
     private Label _who = null!;
 
     // 상태마다 보이고 숨는 줄.
@@ -97,7 +96,6 @@ public partial class LoginScreen : Control
     private string _deletingName = string.Empty;
 
     /// <summary>표와 마지막 이름으로 손 없이 들어가나 — 저장된 값에서 시작한다.</summary>
-    private bool _autoLoginWanted;
 
     // 카카오 기다림 — 받은 표(없으면 기다리지 않는다)·받은 시각·묻는 중인지.
     private string? _ticket;
@@ -148,7 +146,6 @@ public partial class LoginScreen : Control
         _poll.Timeout += AskForToken;
         AddChild(_poll);
 
-        _autoLoginWanted = Main.AutoLogin;
         Build();
 
         // --login / login.cfg (desktop rehearsal) wins over a saved Kakao sign-in when both are somehow present.
@@ -161,10 +158,6 @@ public partial class LoginScreen : Control
         if (AutomaticLogin && Rehearsing)
         {
             BeginLogin(_username.Text);
-        }
-        else if (AutomaticLogin && Main.Kakao is not null && _autoLoginWanted && Main.LastCharacter.Length > 0)
-        {
-            BeginLogin(Main.LastCharacter);
         }
 
         if (!Rehearsing && Main.KakaoPreview.Length == 0)
@@ -267,7 +260,6 @@ public partial class LoginScreen : Control
         _listScroll.Visible = signedIn && !Rehearsing;
         _linkRow.Visible = signedIn;
         _signOut.Visible = !Rehearsing;
-        _autoLogin.Visible = !Rehearsing;
         _who.Text = Rehearsing ? "시험 계정 — 비밀번호로 들어갑니다" : $"카카오: {Main.Kakao?.Name}";
         FillList();
     }
@@ -334,7 +326,7 @@ public partial class LoginScreen : Control
 
             if (!Rehearsing)
             {
-                Main.SetLastCharacter(_entering, _autoLoginWanted);
+                Main.SetLastCharacter(_entering);
             }
 
             // The world takes the connection from here, so this screen must not close it.
@@ -373,12 +365,6 @@ public partial class LoginScreen : Control
         if (finished.IsCompletedSuccessfully)
         {
             _status.Text = $"{_deletingName} 을(를) 지웠습니다.";
-
-            // 지운 이름으로 자동 로그인하지 않게.
-            if (_deletingName == Main.LastCharacter)
-            {
-                Main.SetLastCharacter(string.Empty, false);
-            }
 
             LoadCharacters();
         }
@@ -462,25 +448,6 @@ public partial class LoginScreen : Control
         _signOut = PlainButton("카카오 로그아웃");
         _kakao = KakaoButton();
 
-        _autoLogin = new CheckBox
-        {
-            ToggleMode = true,
-            ButtonPressed = _autoLoginWanted,
-            CustomMinimumSize = new Vector2(0, ButtonHeight)
-        };
-        _autoLogin.Text = "자동 로그인";
-
-        _autoLogin.Pressed += () =>
-        {
-            _autoLoginWanted = _autoLogin.ButtonPressed;
-
-            // 끄면 그 자리에서 — 켜는 것은 이 이름으로 실제로 들어갔을 때 남는다.
-            if (!_autoLoginWanted && Main.AutoLogin)
-            {
-                Main.SetLastCharacter(Main.LastCharacter, false);
-            }
-        };
-
         Control form = Main.Portrait
             ? PortraitForm(crest, title)
             : LandscapeForm(crest, title);
@@ -501,16 +468,7 @@ public partial class LoginScreen : Control
         _username.TextChanged += _ => RefreshSubmitState();
         _password.TextChanged += _ => RefreshSubmitState();
         _submit.Pressed += () => BeginLogin(_username.Text);
-        _create.Pressed += () =>
-        {
-            // 켠 자동 로그인을 만들기 화면이 이어받게 — 만들기는 저장된 값을 쓴다(리뷰 2026-10-11).
-            if (_autoLoginWanted != Main.AutoLogin)
-            {
-                Main.SetLastCharacter(Main.LastCharacter, _autoLoginWanted);
-            }
-
-            WantsToCreate?.Invoke();
-        };
+        _create.Pressed += () => WantsToCreate?.Invoke();
         _signOut.Pressed += SignOut;
         _kakao.Pressed += StartKakao;
 
@@ -595,12 +553,10 @@ public partial class LoginScreen : Control
         _who.HorizontalAlignment = Main.Portrait ? HorizontalAlignment.Left : HorizontalAlignment.Center;
         _who.ClipText = true;
         _who.AddThemeColorOverride("font_color", Greybox.Title);
-        _autoLogin.SizeFlagsHorizontal = Main.Portrait ? SizeFlags.Fill : SizeFlags.ShrinkCenter;
 
         BoxContainer who = Main.Portrait ? new HBoxContainer() : new VBoxContainer();
         who.AddThemeConstantOverride("separation", Main.Gutter);
         who.AddChild(_who);
-        who.AddChild(_autoLogin);
 
         return _whoRow = who;
     }

@@ -28,7 +28,7 @@ public partial class Main : Control
     /// </summary>
     private const string KakaoFile = "user://kakao.cfg";
 
-    /// <summary>마지막으로 들어간 캐릭터 이름(첫 줄)과 자동 로그인(둘째 줄 <c>auto</c>). 비밀번호는 없다 — 표는 kakao.cfg.</summary>
+    /// <summary>마지막으로 들어간 캐릭터 이름. 비밀번호는 없다 — 표는 kakao.cfg. 자동 로그인은 뺐다(사용자 2026-10-11 — 카드를 누르면 바로 들어간다).</summary>
     private const string CharacterFile = "user://character.cfg";
 
     /// <summary>카카오 전의 자동 로그인 — 이름·비밀번호 평문이라 이름만 옮기고 지운다.</summary>
@@ -50,9 +50,6 @@ public partial class Main : Control
 
     /// <summary>마지막으로 들어간 캐릭터 — 로그인 화면 이름 칸을 채운다.</summary>
     public static string LastCharacter { get; private set; } = string.Empty;
-
-    /// <summary>표와 <see cref="LastCharacter" /> 로 손 없이 들어가나(로그인 화면의 "자동 로그인").</summary>
-    public static bool AutoLogin { get; private set; }
 
     // Launch-time credentials (--login / login.cfg) and a saved account may each submit once. An explicit
     // logout turns that convenience off for every login screen reached afterward, including a round trip
@@ -93,11 +90,10 @@ public partial class Main : Control
         }
     }
 
-    /// <summary>들어간 캐릭터 이름과 자동 로그인을 남긴다.</summary>
-    public static void SetLastCharacter(string name, bool automatic)
+    /// <summary>들어간 캐릭터 이름을 남긴다.</summary>
+    public static void SetLastCharacter(string name)
     {
         LastCharacter = name;
-        AutoLogin = automatic;
 
         if (KakaoPreview.Length > 0)
         {
@@ -109,7 +105,6 @@ public partial class Main : Control
         if (writing is not null)
         {
             writing.StoreLine(name);
-            writing.StoreLine(automatic ? "auto" : string.Empty);
             writing.Close();
         }
     }
@@ -136,7 +131,6 @@ public partial class Main : Control
             if (reading is not null)
             {
                 LastCharacter = reading.GetLine().Trim();
-                AutoLogin = reading.GetLine().Trim() == "auto";
             }
         }
 
@@ -150,7 +144,7 @@ public partial class Main : Control
         {
             if (LastCharacter.Length == 0 && old?.GetLine().Trim() is { Length: > 0 } name)
             {
-                SetLastCharacter(name, false);
+                SetLastCharacter(name);
             }
         }
 
