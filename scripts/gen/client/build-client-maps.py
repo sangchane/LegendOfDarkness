@@ -68,6 +68,7 @@ MAPS = [
     *range(20797, 20833),  # 구광산 대기실 + 1-1~29-1 (2026-10-02 사용자, scripts/gen/world/build-old-mine.py)
     *range(20833, 20881),  # 서·북의우드랜드 입구·1-1~20-1 (2026-10-04 사용자, scripts/gen/world/build-woodland-west-north.py)
     *range(20455, 20467),  # 뤼케시온해안 대기실·1-A~4-C (2026-10-02 사용자, scripts/gen/world/build-rucesion-coast.py)
+    20881, 20882,  # 뤼케시온해안3-D · 게길(에리얼 퀘스트 사본 원본) — 2026-10-11 사용자, scripts/gen/world/build-aerial-quest.py
 ]
 
 configure_utf8_stdio(sys.stdout, sys.stderr)
@@ -78,8 +79,21 @@ def areas():
     found = {}
     for path in (SERVER / "areas").glob("*.json"):
         area = json.loads(path.read_text(encoding="utf-8-sig"))
-        found[area["Id"]] = (area["Name"], area["Cols"], area["Rows"], SERVER / "maps" / Path(area["FilePath"]).name)
+        found[area["Id"]] = (area["Name"], area["Cols"], area["Rows"], SERVER / "maps" / Path(area["FilePath"]).name,
+                             [(b["X"], b["Y"]) for b in area.get("Blocks") or []])
     return found
+
+
+def add_blocks(layout, blocks):
+    """서버가 구역 JSON 의 Blocks 칸도 막으므로(Area.cs) 앱 배치 글의 blocked 판에도 찍는다 — 바다가 바닥 타일뿐인 원작 맵(에리얼 3-D)."""
+    if not blocks:
+        return
+    lines = layout.read_text(encoding="utf-8").split("\n")
+    top = lines.index("blocked") + 1
+    for x, y in blocks:
+        row = lines[top + y]
+        lines[top + y] = row[:x] + "#" + row[x + 1:]
+    layout.write_text("\n".join(lines), encoding="utf-8")
 
 
 def main():
@@ -96,7 +110,7 @@ def main():
         if number not in known:
             failed.append(f"{number}(맵 정의 없음)")
             continue
-        name, columns, rows, map_file = known[number]
+        name, columns, rows, map_file, blocks = known[number]
         proc = subprocess.run(
             [str(DOTNET), str(TOOL), "layout", str(CLIENT / "seo.dat"), str(CLIENT / "ia.dat"),
              str(SERVER / "static" / "sotp.dat"), str(map_file), str(columns), str(rows), str(OUT / f"map{number}")],
@@ -104,6 +118,7 @@ def main():
         if proc.returncode != 0:
             failed.append(f"{number} {name}: {proc.stderr.strip() or proc.stdout.strip()}")
             continue
+        add_blocks(OUT / f"map{number}.txt", blocks)
         summary = next((line for line in proc.stdout.splitlines() if "바닥 타일" in line), "")
         print(f"{number} {name} {columns}x{rows} — {summary.split('—')[-1].split('→')[0].strip()}")
 

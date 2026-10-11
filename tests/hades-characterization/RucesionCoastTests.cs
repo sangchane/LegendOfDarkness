@@ -24,8 +24,10 @@ public sealed class RucesionCoastTests
             ids.TryAdd(area["Name"]!.GetValue<string>(), area["ID"]!.GetValue<int>());
         }
         int lobby = ids["뤼케시온해안대기실"];
-        int[] zones = [.. ids.Where(kv => kv.Key.StartsWith("뤼케시온해안", StringComparison.Ordinal) && kv.Value != lobby).Select(kv => kv.Value)];
-        Assert.Equal(11, zones.Length);
+        // 1-A~4-C 11장 + 3-D(에리얼 퀘스트, 3-C 에서 든다). 게길은 에리얼 사본의 원본일 뿐 워프로 잇지 않는다(build-aerial-quest.py).
+        int[] zones = [.. ids.Where(kv => kv.Key.StartsWith("뤼케시온해안", StringComparison.Ordinal) && kv.Value != lobby
+            && kv.Key != "뤼케시온해안게길").Select(kv => kv.Value)];
+        Assert.Equal(12, zones.Length);
 
         List<(int From, int To)> warps = [];
         List<int> intoLobby = [];

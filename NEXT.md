@@ -1,8 +1,13 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
-- **[다음/2026-10-11] 에리얼 퀘스트 구현 — 등급 M · `dev:build` · 단계: 시작 전(사용자 「다음 세션에서 하자」).** 출처 https://m.blog.naver.com/ttykr/220041743309
-  다음: 1. 블로그 원문 읽기(`agent-reach` 또는 `curl https://r.jina.ai/<주소>`) 2. `scripts/ask.sh 에리얼` · `docs/what-hades-already-has.md` · `docs/feature-map.md` 로 서버에 이미 있는 NPC·퀘스트 틀 확인 3. 1쪽 SPEC(`autopilot/aerial-quest/SPEC.md`) → 구현 → 격리 서버 시험 → 리뷰 → 배포
+- **[현재/2026-10-11] 에리얼 퀘스트 구현 — 등급 M · `dev:build` · 단계: 리뷰 반영·커밋 끝(서버 `a2397f090`) → 배포 대기(사용자에게 알린 뒤).** 맵은 사용자 「닮은 원작 맵으로」(10-11). 생성기 `scripts/gen/world/build-aerial-quest.py`(구역 20881 3-D · 20882 게길, 바다는 Blocks) · 서버 `Pack599/Quests/에리얼입구.cs`·`마레.cs` · `Monsters/AerialCrab.cs` · `Types/QuestDrops.cs` · Pack599 `npc_spawn`·`legend_add`·`item_room`·`mob_spawn3 x,y`.
+  시험: `AerialQuestTests` · 회귀 31(포테·호러캐슬·직업선택·드랍·보석·뤼케시온해안·사본 로그인) · 알맹이 847 · 아이템 수치. 리뷰(opus) 막을 결함 0 · 중간 3 고침(가방 가득 · import.py 대응표 · 게 자리).
+  다음: 1. `cloud-server.sh deploy`(접속자 끊김 — 직전에 알림) 2. 앱 `ios-build.sh install`(새 맵 그림) 3. 사용자 확인: 재료 15% · 게 15마리 · 3초 간격 ※ · `legend_add` 로 초보자도우미 직업 전설도 이제 붙음. 출처 https://m.blog.naver.com/ttykr/220041743309
+  원작(블로그 스크린샷): 뤼케시온해안 **3-D**(야자수 모래사장, 동쪽 천막 입구) → **게길**(바닷가 모래밭에 갈색 게, 닿으면 재료 잃음) → **대기실**(돌 석상) → **에리얼**(보라 큰 조개) → 갇힌 **마레** 누르기 → 파파야방패 + 전설 「뤼케시온 해안의 에리얼을 진정시키다」.
+  사용자 정한 것(10-11): 그룹이면 함께·혼자도 됨 · 재료는 블루하콘무기·레드하콘다리 2종(하콘이 떨굼) + 게길(킹아크퍼스의팬던트 있으면 면제) · 방패는 깰 때마다.
+  찾은 것: 서버 뤼케시온해안 12장은 **아벨해안 맵 복사본**(5.99·혼든 모두) — 원작 3-D·게길·대기실·에리얼 방 맵은 어느 출처에도 없음(한국판 전용 맵 30장도 아님). 대신 원작 맵 파일(`database/assets/MapFiles`) 중 안 쓰는 모래 해안: **6625**(80×50, 야자수 사장 — 3-D 닮음) · **6627**(70×30, 바다 낀 긴 모래길 — 게길 닮음) · 6924(50×50 섬). 틀은 `포테의숲오솔길입장.cs`(map_create·warp_create·group_warp·mob_spawn3) 그대로 쓸 수 있음.
+  다음: 1. 사용자에게 맵 후보 확인 2. `autopilot/aerial-quest/SPEC.md` 3. 구현 → 격리 서버 시험 → 리뷰 → 배포
 - **[현재/2026-10-11] 사망 패널티 + 직업·서클별 장비 + 경매 시세 + 「사제」→「성직자」 — 등급 L 변경 · `dev:build` · 단계: 배포 끝(11:31), 관찰 중.** 명세 `autopilot/death-penalty-gear/SPEC.md`.
   배포: 서버(DeathDropsItems=true, 리뷰 반영 서버 `d6f7680f4`·루트 `70b46eb7`) · 봇 이름 바꿈(`rename-bots.sh --apply`, 백업 클라우드 `~/lod-backups/rename-20261011-113020`) · eco-bots.json 직업별 10개씩 + AuctionFolder · 앱 ios install·android release.
   확인됨: 동료성직자 5 · 생태 40(전사·도적·무도·성직자 각 10, 무도봇은 새로 1레벨부터) 접속.
