@@ -3,6 +3,7 @@
 
 - **[현재/2026-10-11] 에리얼 퀘스트 구현 — 등급 M · `dev:build` · 단계: 리뷰 반영·커밋 끝(서버 `a2397f090`) → 배포 대기(사용자에게 알린 뒤).** 맵은 사용자 「닮은 원작 맵으로」(10-11). 생성기 `scripts/gen/world/build-aerial-quest.py`(구역 20881 3-D · 20882 게길, 바다는 Blocks) · 서버 `Pack599/Quests/에리얼입구.cs`·`마레.cs` · `Monsters/AerialCrab.cs` · `Types/QuestDrops.cs` · Pack599 `npc_spawn`·`legend_add`·`item_room`·`mob_spawn3 x,y`.
   시험: `AerialQuestTests` · 회귀 31(포테·호러캐슬·직업선택·드랍·보석·뤼케시온해안·사본 로그인) · 알맹이 847 · 아이템 수치. 리뷰(opus) 막을 결함 0 · 중간 3 고침(가방 가득 · import.py 대응표 · 게 자리).
+  홈페이지 「퀘스트」 탭(10-11 사용자 「홈페이지에 퀘스트탭 만들어서 자세한 공략정보」): 에리얼 공략 + 포테의숲 오솔길 — `docs/index.html` `data-view="quests"` · `docs/quests.css` · 그림 `python3 scripts/gen/vault/build-quest-images.py`(대본 게 자리를 읽으니 대본을 바꾸면 다시).
   다음: 1. `cloud-server.sh deploy`(접속자 끊김 — 직전에 알림) 2. 앱 `ios-build.sh install`(새 맵 그림) 3. 사용자 확인: 재료 15% · 게 15마리 · 3초 간격 ※ · `legend_add` 로 초보자도우미 직업 전설도 이제 붙음. 출처 https://m.blog.naver.com/ttykr/220041743309
   원작(블로그 스크린샷): 뤼케시온해안 **3-D**(야자수 모래사장, 동쪽 천막 입구) → **게길**(바닷가 모래밭에 갈색 게, 닿으면 재료 잃음) → **대기실**(돌 석상) → **에리얼**(보라 큰 조개) → 갇힌 **마레** 누르기 → 파파야방패 + 전설 「뤼케시온 해안의 에리얼을 진정시키다」.
   사용자 정한 것(10-11): 그룹이면 함께·혼자도 됨 · 재료는 블루하콘무기·레드하콘다리 2종(하콘이 떨굼) + 게길(킹아크퍼스의팬던트 있으면 면제) · 방패는 깰 때마다.

@@ -1,0 +1,34 @@
+/* 퀘스트 공략 탭 — 사용자 2026-10-11 「홈페이지에 퀘스트탭 만들어서 자세한 공략정보」. 그림은 scripts/gen/vault/build-quest-images.py */
+.quest-jump{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.quest-jump a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:var(--radius-pill);background:var(--panel);color:var(--ink);font-weight:700;text-decoration:none}
+.quest-jump a:hover{background:var(--brand-weak);color:var(--brand-text)}
+.quest-jump img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
+.quest{display:grid;gap:16px;margin-bottom:44px;scroll-margin-top:84px}
+.quest-head{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
+.quest-head img{width:96px;height:96px;object-fit:contain;image-rendering:pixelated}
+.quest-head h2{margin:0;font-size:24px;letter-spacing:-.02em}
+.quest-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quest .notice{margin:0;font-size:14px;line-height:1.6}
+.quest-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.quest-facts .panel h3{margin:0 0 10px;font-size:13px;color:var(--muted-strong)}
+.quest-thing{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:center;padding:6px 0}
+.quest-thing+.quest-thing{border-top:1px solid var(--edge-soft)}
+.quest-thing img{width:40px;height:40px;object-fit:contain;image-rendering:pixelated}
+.quest-thing strong{display:block;font-size:13px}
+.quest-thing small{display:block;color:var(--muted);font-size:12px;line-height:1.5}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.quest-steps{display:grid;gap:12px;margin:0;padding:0;list-style:none;counter-reset:step}
+.quest-steps>li{counter-increment:step;display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;padding:20px;border-radius:var(--radius-card);background:var(--panel)}
+.quest-steps>li::before{content:counter(step);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--brand-weak);color:var(--brand-text);font:700 15px var(--mono)}
+.quest-steps h3{margin:6px 0 6px;font-size:16px}
+.quest-steps p,.quest-steps ul{margin:0 0 8px;color:var(--ink)}
+.quest-steps ul{padding-left:18px}
+.quest-steps figure{margin:10px 0 0}
+.quest-steps figure img{display:block;width:100%;max-width:900px;height:auto;border-radius:12px;background:var(--dark-stage)}
+.quest-steps figcaption{margin-top:6px;color:var(--muted);font-size:12px}
+.quest-more{border-radius:16px;background:var(--panel)}
+.quest-more>summary{min-height:48px;padding:14px 18px;font-weight:700;cursor:pointer}
+.quest-more>div{padding:0 18px 16px}
+.quest-more ul{margin:0;padding-left:18px}
+.quest-more li+li{margin-top:4px}
+@media(max-width:560px){.quest-head img{width:64px;height:64px}.quest-head h2{font-size:20px}.quest-steps>li{grid-template-columns:1fr;padding:16px}}

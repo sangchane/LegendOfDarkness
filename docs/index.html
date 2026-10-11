@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="abilities.css">
   <link rel="stylesheet" href="codex.css">
   <link rel="stylesheet" href="download.css">
+  <link rel="stylesheet" href="quests.css">
 </head>
 <body class="toss-surface">
 <a class="skip-link" href="#workspace">본문으로 건너뛰기</a>
@@ -25,6 +26,7 @@
       <button type="button" class="nav-item" data-view-target="abilities"><span aria-hidden="true">✧</span>기술·마법</button>
       <button type="button" class="nav-item" data-view-target="items"><span aria-hidden="true">◈</span>아이템</button>
       <button type="button" class="nav-item" data-view-target="world"><span aria-hidden="true">⇢</span>지도</button>
+      <button type="button" class="nav-item" data-view-target="quests"><span aria-hidden="true">✓</span>퀘스트</button>
       <button type="button" class="nav-item" data-view-target="changes"><span aria-hidden="true">⇄</span>원작과 달라진 것</button>
       <button type="button" class="nav-item" data-view-target="activity" data-admin-only hidden><span aria-hidden="true">◷</span>접속·활동</button>
     </nav>
@@ -326,6 +328,141 @@
 
         <div class="change-list" id="change-list"></div>
         <p class="empty-state" id="change-empty" hidden>조건에 맞는 항목이 없어요.</p>
+      </section>
+
+      <section class="view" data-view="quests" aria-labelledby="quests-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Quest</p>
+            <h1 id="quests-title">퀘스트</h1>
+            <p>게임에 있는 퀘스트를 어디서 시작해 무엇을 들고 가서 무엇을 받는지 순서대로 정리했습니다. 칸 좌표는 (가로, 세로)입니다.</p>
+          </div>
+        </div>
+
+        <nav class="quest-jump" aria-label="퀘스트 고르기">
+          <a href="#quest-aerial"><img src="quests/aerial.png" alt="">뤼케시온해안 에리얼 · 4서클</a>
+          <a href="#quest-pote">포테의숲 오솔길 · 2서클</a>
+        </nav>
+
+        <article class="quest" id="quest-aerial" aria-labelledby="quest-aerial-title">
+          <div class="quest-head">
+            <img src="quests/aerial.png" alt="보라색 큰 조개 모양의 에리얼">
+            <div>
+              <h2 id="quest-aerial-title">뤼케시온해안 에리얼</h2>
+              <div class="quest-badges">
+                <span class="badge badge-active">4서클</span><span class="badge">71레벨부터</span><span class="badge">혼자도 · 그룹이면 함께</span><span class="badge badge-done">깰 때마다 보상</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="notice"><strong>한 줄 요약</strong> 제물 한 벌(블루하콘무기 + 레드하콘다리)이나 킹아크퍼스의팬던트를 들고 뤼케시온해안3-D 동쪽 「에리얼입구」에게 말을 겁니다. 게를 피해 게길을 지나 에리얼을 잡고, 붙잡혀 있던 마레를 누르면 파파야방패를 받습니다.</p>
+
+          <div class="quest-facts">
+            <section class="panel" aria-labelledby="aerial-bring">
+              <h3 id="aerial-bring">준비물 — 둘 중 하나</h3>
+              <div class="quest-thing"><img src="quests/blue-hakon.png" alt=""><div><strong>블루하콘무기</strong><small>블루하콘이 한 마리에 <span class="num">15%</span> — 뤼케시온해안 어느 구역이든</small></div></div>
+              <div class="quest-thing"><img src="quests/red-hakon.png" alt=""><div><strong>레드하콘다리</strong><small>레드하콘이 한 마리에 <span class="num">15%</span>. 둘을 하나씩 = 제물 한 벌</small></div></div>
+              <div class="quest-thing"><img src="quests/pendant.png" alt=""><div><strong>킹아크퍼스의팬던트</strong><small>있으면 제물이 필요 없고 게도 건드리지 않습니다. 아벨해안4-A·4-C 킹아크퍼스가 약 <span class="num">40%</span>. 줄어들지 않음</small></div></div>
+            </section>
+            <section class="panel" aria-labelledby="aerial-reward">
+              <h3 id="aerial-reward">보상</h3>
+              <div class="quest-thing"><img src="quests/papaya.png" alt=""><div><strong>파파야방패</strong><small>레벨 <span class="num">71</span> · 방어력 <span class="num">-20</span>. 들어갈 때마다 다시 받을 수 있습니다</small></div></div>
+              <div class="quest-thing"><img src="quests/mare.png" alt=""><div><strong>전설 표식</strong><small>「뤼케시온 해안의 에리얼을 진정시키다」(한 번만 붙습니다)</small></div></div>
+            </section>
+            <section class="panel" aria-labelledby="aerial-foes">
+              <h3 id="aerial-foes">상대</h3>
+              <div class="quest-thing"><img src="quests/aerial.png" alt=""><div><strong>에리얼</strong><small>체력 <span class="num">145,250</span> · 경험치 <span class="num">57,890</span>(<span class="num">87</span>레벨부터 줄어듦) · 금화 <span class="num">4,631~6,947</span> · 골드아쿠아링 <span class="num">60%</span></small></div></div>
+              <div class="quest-thing"><img src="quests/crab.png" alt=""><div><strong>게 <span class="num">15</span>마리</strong><small>때리지 않습니다. 옆 칸(대각선 포함)에 서면 제물 한 벌을 빼앗고, 없으면 3-D 로 쫓아냅니다. 잡을 수는 없다고 보면 됩니다</small></div></div>
+            </section>
+          </div>
+
+          <ol class="quest-steps">
+            <li>
+              <div>
+                <h3>뤼케시온해안3-D 로 가기</h3>
+                <p>월드맵 「뤼케시온해안」 → 대기실 위쪽 출구 → 2-C → 위쪽 출구 → 3-C. 3-C 오른쪽 해변 끝(<span class="num">36, 35~38</span>)을 밟으면 3-D 서쪽에 섭니다. 3-D 에도 하콘이 나오니 제물은 여기서 모아도 됩니다.</p>
+                <figure><img src="quests/aerial-shore.webp" alt="뤼케시온해안3-D 지도 — 서쪽에 3-C 에서 드는 자리, 동쪽 바닷가에 에리얼입구" loading="lazy"><figcaption>3-D — 왼쪽 「3-C 에서」로 들어와 오른쪽 바닷가 「에리얼입구」(<span class="num">57, 25</span>)로.</figcaption></figure>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>에리얼입구에게 말 걸고 「입장한다」</h3>
+                <p>제물이 한 벌도 없고 팬던트도 없으면 「제물이 한 벌도 없습니다」로 끝납니다. 제물은 들어갈 때 줄지 않고 게에게 닿을 때만 줄어듭니다.</p>
+                <p>같은 3-D 에 서 있는 그룹원은 모두 함께 들어갑니다. 다른 맵에 있는 그룹원은 따라오지 않습니다. 들어갈 때마다 우리 그룹만의 게길·대기실·에리얼의방이 새로 생깁니다.</p>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>게길 — 게를 피해 동쪽 끝까지</h3>
+                <p>왼쪽 끝(<span class="num">1, 6</span>)에서 시작해 위쪽 모래길을 따라 오른쪽 끝(<span class="num">69, 5~8</span>)으로 갑니다. 게는 천천히 돌아다닙니다.</p>
+                <ul>
+                  <li>게 옆 칸에 서면 제물 한 벌을 빼앗기고 「남은 제물 N벌」이 뜹니다. 같은 사람은 <span class="num">3</span>초에 한 번만 털립니다.</li>
+                  <li>제물이 없는데 또 닿으면 「제물이 없어 게에게 쫓겨났습니다」 — 3-D 입구 옆으로 돌아갑니다.</li>
+                  <li>여유분을 넉넉히 들고 가세요. 팬던트가 있으면 신경 쓰지 않아도 됩니다.</li>
+                </ul>
+                <figure><img src="quests/aerial-trail.webp" alt="게길 지도 — 왼쪽 위 시작, 오른쪽 아래 대기실로 가는 끝, 길 위 붉은 점 15개가 게" loading="lazy"><figcaption>붉은 점이 처음 게가 서는 자리입니다(그 뒤로 움직입니다). 아래쪽 바다는 걸을 수 없습니다.</figcaption></figure>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>대기실 — 오른쪽 문으로</h3>
+                <p><span class="num">20, 30</span> 에 도착합니다. 한 칸 위(<span class="num">29</span>줄)로 올라 오른쪽으로 곧장 가면 <span class="num">45, 28~31</span> 문이 에리얼의방으로 보내 줍니다. 대기실에는 괴물이 없습니다.</p>
+                <figure><img src="quests/aerial-lobby.webp" alt="대기실 — 왼쪽 도착 자리와 오른쪽 에리얼의방 문" loading="lazy"><figcaption>대기실(3-D 와 같은 모양).</figcaption></figure>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>에리얼의방 — 에리얼 잡기</h3>
+                <p><span class="num">20, 30</span> 에 도착하면 오른쪽 <span class="num">45, 30</span> 언저리에 에리얼, 그 오른쪽 위 <span class="num">48, 27</span> 에 마레가 있습니다. 도착 자리에서는 둘 다 보이지 않으니 오른쪽으로 다가가세요.</p>
+                <p>원작 공략 순서: 나르콜리로 재우고 → 베노미로 체력을 깎고 → 마력이 떨어지면 평타로 마무리.</p>
+                <figure><img src="quests/aerial-room.webp" alt="에리얼의방 — 도착 자리, 에리얼, 마레" loading="lazy"><figcaption>에리얼은 돌아다니므로 표시한 자리는 처음 자리입니다.</figcaption></figure>
+              </div>
+            </li>
+            <li>
+              <div>
+                <h3>마레를 눌러 보상 받기</h3>
+                <p>에리얼이 살아 있으면 마레는 「에리얼이 아직 날뛰고 있어요!」라고만 합니다. 잡은 뒤 누르고 「다음」을 누르면 파파야방패와 전설 표식을 받고 3-D 입구 옆(<span class="num">55, 25</span>)으로 나옵니다. 그룹원은 저마다 마레를 눌러 각자 받습니다.</p>
+                <p>가방에 빈 칸이 없으면 방패를 주지 않고 「가방에 빈 자리를 만들고 다시 말을 걸어 주세요」라고 합니다 — 비우고 다시 누르면 됩니다.</p>
+              </div>
+            </li>
+          </ol>
+
+          <details class="quest-more">
+            <summary>알아 둘 것</summary>
+            <div><ul>
+              <li>대기실·에리얼의방에는 밖으로 나가는 문이 없습니다. 에리얼을 못 잡겠으면 접속을 끊었다 들어오면 시작 마을로 돌아갑니다.</li>
+              <li>사본은 모두가 나가고 1분이 지나면 사라집니다. 다시 말을 걸면 새 에리얼이 섭니다.</li>
+              <li>에리얼이 떨군 금화·물건을 줍지 않고 나가도, 마지막으로 나가는 사람의 가방에 들어옵니다.</li>
+            </ul></div>
+          </details>
+          <details class="quest-more">
+            <summary>원작과 다른 점</summary>
+            <div><ul>
+              <li>원작은 다섯 직업이 한 명씩 정확히 5명이어야 했습니다. 여기서는 혼자도 됩니다.</li>
+              <li>원작 재료는 넷(주황·초록 달팽이 껍질 포함)이었지만 서버에 달팽이가 없어 불가사리 둘만 씁니다. 세오의깃털 면제도 없습니다.</li>
+              <li>원작 3-D·게길·에리얼 방 맵은 남은 자료가 없어 가장 닮은 원작 바닷가 맵으로 대신했습니다. 대기실의 석상은 없습니다.</li>
+              <li>출처: 블로그 「뤼케시온던전 에리얼(4써클)」(2014) 스크린샷과 설명.</li>
+            </ul></div>
+          </details>
+        </article>
+
+        <article class="quest" id="quest-pote" aria-labelledby="quest-pote-title">
+          <div class="quest-head">
+            <div></div>
+            <div>
+              <h2 id="quest-pote-title">포테의숲 오솔길</h2>
+              <div class="quest-badges">
+                <span class="badge badge-active">2서클</span><span class="badge">21~51레벨</span><span class="badge">혼자도 · 그룹이면 함께</span>
+              </div>
+            </div>
+          </div>
+          <p class="notice"><strong>한 줄 요약</strong> 포테의숲5존 위쪽 끝(<span class="num">26~27, 0</span>)을 밟고 「입장한다」 → 오솔길 → 대기실 늑대 6마리 → 보스존 늑대 8마리와 자이언트맨티스를 모두 잡으면 경험치 <span class="num">200,000</span> 을 받고 5존 <span class="num">16, 16</span> 으로 나옵니다.</p>
+          <ol class="quest-steps">
+            <li><div><h3>오솔길 — 혼수 함정</h3><p>오솔길에서 움직이는 동안 1초마다 <span class="num">1/5</span> 로 혼수에 빠집니다. 가방에 엔트자이언트의날개가 있으면 대신 하나가 사라지고 무사합니다. 혼수가 <span class="num">12</span>초 안에 안 풀리면 죽어서 뮤레칸의방으로 갑니다.</p></div></li>
+            <li><div><h3>대기실 — 늑대 6마리</h3><p>사나운은빛늑대 6마리를 다 잡아야 보스존 문이 열립니다.</p></div></li>
+            <li><div><h3>보스존 — 늑대 8마리 · 자이언트맨티스</h3><p>모두 잡으면 5초 뒤 경험치 <span class="num">200,000</span> 과 함께 밖으로 나갑니다. 자이언트맨티스는 세계수의나뭇가지 하나와 세줄금반지(<span class="num">80%</span>)를 떨굽니다. 줍지 못한 것은 나갈 때 가방에 들어옵니다.</p></div></li>
+          </ol>
+        </article>
       </section>
 
       <section class="view" data-view="activity" aria-labelledby="activity-title" hidden>
