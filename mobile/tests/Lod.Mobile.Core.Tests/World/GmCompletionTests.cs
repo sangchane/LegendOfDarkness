@@ -11,21 +11,21 @@ public sealed class GmCompletionTests
     [Fact]
     public void A_slash_alone_offers_the_commands()
     {
-        Assert.Contains(Names.Suggest("/"), s => s.Text == "/give ");
-        Assert.Equal(["/give "], Names.Suggest("/gi").Select(s => s.Text));
+        Assert.Contains(Names.Suggest("/"), s => s.Text == "/item ");
+        Assert.Equal(["/item "], Names.Suggest("/it").Select(s => s.Text));
     }
 
     [Fact]
     public void Names_holding_the_typed_letters_come_back_ready_to_send_with_those_starting_with_them_first()
     {
-        Assert.Equal(["/give \"글러브1\"", "/give \"견습자의글러브\""], Names.Suggest("/give 글러브").Select(s => s.Text));
-        Assert.Equal("/give \"Dark Belt\"", Assert.Single(Names.Suggest("/give dark")).Text);
+        Assert.Equal(["/item \"글러브1\"", "/item \"견습자의글러브\""], Names.Suggest("/item 글러브").Select(s => s.Text));
+        Assert.Equal("/item \"Dark Belt\"", Assert.Single(Names.Suggest("/item dark")).Text);
     }
 
     [Fact]
     public void A_map_brings_the_tile_to_land_on()
     {
-        Assert.Equal("/tp \"죽음의마을입구5\" 11 17", Assert.Single(Names.Suggest("/tp 죽음")).Text);
+        Assert.Equal("/이동 \"죽음의마을입구5\" 11 17", Assert.Single(Names.Suggest("/이동 죽음")).Text);
     }
 
     [Fact]

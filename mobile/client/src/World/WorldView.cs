@@ -56,6 +56,8 @@ public sealed partial class WorldView(WorldClient? server = null) : Control
     // 없음이라, 사전과 달리 값 하나로 둔다.
     private Appearance? _wearingOwn;
     private bool _dressedOnce;
+    private bool _unseen;                                           // 하이드로 숨어 반투명하게 그리는 중
+    private static readonly Color HiddenTint = new(1, 1, 1, 0.4f);
     private Vector2 _floorSize;
 
     /// <summary>Which map's picture is down, so it is only swapped when the map actually changes.</summary>

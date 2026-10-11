@@ -32,6 +32,12 @@ public static class Wardrobe
     /// (sources/FallenDev/dark-ages-ts/.../paper-doll-container.ts): the shield behind everything, then the
     /// body and what covers it, then the weapon, then the head.
     /// </remarks>
+    /// <summary>
+    /// 숨은 몸(BodySprite 5 남 · 6 여 — 하이드, ServerFormat33 이 옷 없이 0x50 을 보낸다). 그대로 그리면 맨몸이 되므로
+    /// 그리는 쪽이 입던 옷을 반투명하게 둔다(사용자 2026-10-11 「투명상태까지」).
+    /// </summary>
+    public static bool Unseen(Appearance worn) => (worn.Body & Kind) >> 4 is 5 or 6;
+
     public static IReadOnlyList<Piece> Pieces(Appearance worn)
     {
         char gender = Women.Contains((worn.Body & Kind) >> 4) ? 'w' : 'm';

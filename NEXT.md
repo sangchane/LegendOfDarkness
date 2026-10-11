@@ -1,6 +1,7 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[현재/2026-10-11] 운영자 명령·카카오 운영자·젠 고침·하이드 반투명·달마신공 71 — 등급 L 변경 · `dev:build` · 단계: 커밋 끝(서버 `d15675168`) → 배포(킹아크퍼스·에리얼과 함께).** 다음: 1. `cloud-server.sh deploy` · `cloud-dashboard.sh deploy`(로그인 문구·퀘스트 탭) · `ios-build.sh install` 2. 사용자가 게임에서 `/운영자 ?` 확인 3. 지켜볼 것: 젠 거두기 3분·사람 곁 절반이 너무 잦거나 드문지(봇 처치 수 · 이상 구간 표) · 도적봇13 「Wait」 멈춤은 봇 쪽 원인 미확인.
 - **[현재/2026-10-11] 킹아크퍼스 퀘스트(3서클) — 등급 M · `dev:build` · 단계: 리뷰 반영·커밋 끝(서버 `59fc9a663`, 서버·루트 푸시 전) → 배포 대기(사용자에게 알린 뒤).** 명세 `autopilot/king-arcfus-quest/SPEC.md` · 생성기 `scripts/gen/world/build-king-arcfus-quest.py` · 대본 `Pack599/Quests/킹아크퍼스*.cs`·브라토·대장장이·제단·미레 · 시험 `KingArcfusQuestTests` · 홈페이지 퀘스트 탭 `#quest-arcfus`.
   다음: 1. 푸시(서버 `feature/loot-roll-auction`·루트) 2. `cloud-server.sh deploy`(에리얼과 함께, 접속자 끊김 — 직전에 알림) 3. 앱 `ios-build.sh install`(새 맵 그림 6장) 4. 사용자 확인 ※: 껍질 10% · 코마 칸 28 · 잡몹 8 · NPC 그림(대장장이=피어스 · 브라토=에리얼입구 사내 · 제단=사람 그림) · 아이콘(대지의인장 초록 별 · 해저의팬던트 = 킹아크퍼스의팬던트 그림).
   남은 것(리뷰 낮음): 그룹이면 문어의원한이 문어다리 없는 그룹원에게 갈 수 있음(건네면 됨) · 1분 안에 다시 들면 미레 둘 · 성직자 갈래 시험 없음 · 진행자 NPC 원본이 앱 외딴길 NPC 목록에 이름으로 뜸(호러캐슬·에리얼 마레와 같음).

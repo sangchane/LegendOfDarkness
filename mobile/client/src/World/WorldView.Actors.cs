@@ -337,7 +337,15 @@ public sealed partial class WorldView
             return;
         }
 
-        if (_dressedOnce && _wearingOwn == mine.Wearing)
+        // 하이드 — 서버는 옷 없이 「숨은 몸」을 보낸다. 입던 옷을 벗기지 않고 반투명하게 둔다(사용자 2026-10-11 「투명상태까지」).
+        bool unseen = Wardrobe.Unseen(mine.Wearing);
+        if (unseen != _unseen)
+        {
+            _unseen = unseen;
+            _player.Modulate = unseen ? HiddenTint : Colors.White;
+        }
+
+        if (unseen || (_dressedOnce && _wearingOwn == mine.Wearing))
         {
             return;
         }

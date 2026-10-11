@@ -145,8 +145,9 @@
 		"LOGIN_PORT": 2610,
 		"SERVER_TITLE": "Hades",
 		"ServerWelcomeMessage": "어둠의 전설에 오신 것을 환영합니다!",
-		"GameMasters": [
-			"wren", "lol", "nov"
+		"GameMasters": [],
+		"GameMasterKakaoIds": [
+			"5130553996"
 		],
 		"DontSavePlayers": false,
 		"GroupLootRoll": true,

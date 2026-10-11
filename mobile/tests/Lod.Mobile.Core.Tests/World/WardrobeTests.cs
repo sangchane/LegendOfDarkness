@@ -38,6 +38,17 @@ public sealed class WardrobeTests
         Assert.Equal([drawing], Names(Wearing(body: body, hairColour: 5)));
     }
 
+    /// <summary>하이드로 숨은 몸(0x50 — 남 0x10+0x40 · 여 0x20+0x30)은 숨음, 산 몸·유령은 아님.</summary>
+    [Theory]
+    [InlineData(0x50, true)]
+    [InlineData(0x60, true)]
+    [InlineData(0x10, false)]
+    [InlineData(0x30, false)]
+    public void A_hidden_body_is_told_apart(int body, bool unseen)
+    {
+        Assert.Equal(unseen, Wardrobe.Unseen(Wearing(body: body, hairColour: 5)));
+    }
+
     [Fact]
     public void Every_piece_the_server_names_is_asked_for()
     {

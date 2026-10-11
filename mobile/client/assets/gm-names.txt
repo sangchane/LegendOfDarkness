@@ -41,6 +41,7 @@ item 가죽가방
 item 가죽각반
 item 가죽방패
 item 가죽장갑
+item 가죽팔찌
 item 강아지가방
 item 강화날각
 item 강화된리젠트다이아귀걸이
@@ -49,6 +50,7 @@ item 개미더듬이
 item 거북이등껍질
 item 검은색보석
 item 검정두건
+item 게껍질
 item 겨울목도리
 item 견습자의글러브
 item 고대유물
@@ -97,6 +99,7 @@ item 금각반
 item 금벨트
 item 금장갑
 item 금전표큐빅
+item 금팔찌
 item 기사단방패
 item 긴수염
 item 꼬꼬댁의상
@@ -181,6 +184,7 @@ item 대지의별벨트
 item 대지의세일라링
 item 대지의씰
 item 대지의은벨트
+item 대지의인장
 item 대지의진주목걸이
 item 대지의크리스탈목걸이
 item 대지의홀디트링
@@ -203,6 +207,7 @@ item 동각반
 item 동굴쥐의꼬리
 item 동굴지네의껍질
 item 동장갑
+item 동팔찌
 item 둠
 item 듀크
 item 드라나이트
@@ -244,6 +249,7 @@ item 레드자스퍼
 item 레드토닉
 item 레드팜팻의알
 item 레드하이토닉
+item 레드하콘다리
 item 레드하트각반
 item 레몬색염색약
 item 레오파드1
@@ -450,6 +456,8 @@ item 무당벌레장식
 item 무상관
 item 무상도복
 item 문어군
+item 문어다리
+item 문어의원한
 item 물안경
 item 뮤레칸글러브+1
 item 뮤레칸디그+1
@@ -626,6 +634,7 @@ item 블루블랙염색약
 item 블루토닉
 item 블루피치
 item 블루하이토닉
+item 블루하콘무기
 item 블팜검투사옷(Lev18)
 item 블팜검투사옷(Lev8)
 item 블팜궁수옷(Lev18)
@@ -959,6 +968,7 @@ item 용팔찌
 item 우든클럽
 item 우유맛바
 item 워리어워커
+item 원한의에센스
 item 월영관
 item 월영도복
 item 월화이어각반
@@ -979,6 +989,7 @@ item 유데일
 item 은각반
 item 은빛늑대의갈기털
 item 은장갑
+item 은팔찌
 item 의
 item 이모션(밝음)
 item 이모션(사랑)
@@ -1315,6 +1326,7 @@ item 태산도복수
 item 태산도복토
 item 태산도복풍
 item 태산도복화
+item 터틀껍질
 item 턱시도
 item 털목도리
 item 토끼가방
@@ -1386,6 +1398,7 @@ item 폐
 item 포보스방패
 item 폭죽
 item 퐁퐁이의점액질
+item 퐁퐁이조각
 item 풀잎각반
 item 풍요의가죽각반
 item 풍요의가죽방패
@@ -1459,6 +1472,7 @@ item 해골벨트
 item 해골옷
 item 해바라기
 item 해바라기화관
+item 해저의팬던트
 item 해적모자1
 item 해적모자2
 item 해적옷1
@@ -2264,8 +2278,10 @@ skill 내려치기
 skill 늑대의위상
 skill 단각
 skill 달마신공
+skill 더블어택
 skill 데빌크래셔
 skill 두번찌르기
+skill 드래곤모드
 skill 마구때리기
 skill 마나부스터
 skill 만개표창
@@ -2321,6 +2337,7 @@ skill 타겟어택
 skill 탐색
 skill 통배권
 skill 투핸드어택
+skill 트리플어택
 skill 파천각
 skill 파천각(Lev2)
 skill 표창던지기
@@ -2330,6 +2347,237 @@ skill 피닉스모드
 skill 할퀴기(Lev1)
 skill 허공답보
 skill 휘두르기
+monster bees
+monster 가스
+monster 거대문어
+monster 거지좀비
+monster 게
+monster 고블린가드
+monster 고블린가드1
+monster 고블린병사
+monster 고블린병사1
+monster 고블린전사
+monster 고블린전사1
+monster 고사목
+monster 광관돌돌이
+monster 광관드워프
+monster 광부좀비
+monster 광산드워프1
+monster 광산드워프2
+monster 그래브
+monster 그렘린
+monster 그린팜팻
+monster 그림록
+monster 그림록1
+monster 그림록2
+monster 그림록근위병
+monster 그림록근위병1
+monster 그림록근위병2
+monster 그림록병사
+monster 그림록병사1
+monster 그림록병사2
+monster 그림록퀸
+monster 노비스엔트자이언트
+monster 노비스주민1
+monster 노비스주민2
+monster 노비스풀뱀
+monster 녹색말벌
+monster 녹색말벌1
+monster 녹색말벌2
+monster 녹색말벌3
+monster 녹색말벌4
+monster 녹색벌
+monster 놀
+monster 농부좀비
+monster 늑대
+monster 늑대1
+monster 늑대2
+monster 늑대3
+monster 늑대4
+monster 늑대인간
+monster 늑대인간1
+monster 늑대인간2
+monster 니에1
+monster 니크르
+monster 도깨비불
+monster 독거미
+monster 독거미2
+monster 드라코
+monster 드라코1
+monster 드라코2
+monster 드라코3
+monster 레드팜팻
+monster 레드하콘
+monster 레아로1
+monster 레아로2
+monster 레아로3
+monster 레아로4
+monster 로밍래더1
+monster 로밍래더2
+monster 로밍래더3
+monster 로밍래더4
+monster 로밍스테츄1
+monster 로밍스테츄2
+monster 로밍스테츄3
+monster 로밍스테츄4
+monster 로밍체어1
+monster 로밍체어2
+monster 로밍체어3
+monster 로밍체어4
+monster 루돌프변장늑대인간1
+monster 루돌프변장늑대인간2
+monster 루돌프변장늑대인간3
+monster 루돌프변장늑대인간4
+monster 마법좀비
+monster 말벌
+monster 맨티스
+monster 맨티스1
+monster 맨티스2
+monster 맨티스3
+monster 맨티스4
+monster 맨티스5
+monster 멜로더
+monster 목도리니에1
+monster 목도리니에2
+monster 목도리니에3
+monster 목도리니에4
+monster 목수좀비
+monster 문어
+monster 미러테이블1
+monster 미러테이블2
+monster 미러테이블3
+monster 미러테이블4
+monster 바크
+monster 바클라시우스1
+monster 바클라시우스2
+monster 바탈리우스1
+monster 바탈리우스2
+monster 백사
+monster 백작부인
+monster 뱀
+monster 뱀1
+monster 뱀2
+monster 부1
+monster 부2
+monster 부3
+monster 부4
+monster 브라운맨티스
+monster 브라운맨티스1
+monster 블랙캣
+monster 블루하콘
+monster 사나운은빛늑대
+monster 사슴
+monster 산타옷늑대1
+monster 산타옷늑대2
+monster 산타옷늑대3
+monster 산타옷늑대4
+monster 생쥐
+monster 설원의늑대1
+monster 설원의늑대2
+monster 설원의늑대3
+monster 설원의늑대4
+monster 슈리커
+monster 슈리커1
+monster 슈크래시우스1
+monster 슈크래시우스2
+monster 슬러그1
+monster 슬러그2
+monster 실버팜팻
+monster 아크퍼스
+monster 애스코모이드
+monster 에리얼
+monster 에인트
+monster 에인트1
+monster 엔트라이온
+monster 엔트자이언트
+monster 옐로우팜팻
+monster 오크가드1
+monster 오크가드2
+monster 오크병사
+monster 오크병사1
+monster 오크병사2
+monster 오크병사3
+monster 오크전사1
+monster 오크전사2
+monster 오크전사3
+monster 오튜
+monster 완두콩1
+monster 완두콩2
+monster 요오다
+monster 우드랜드보스1
+monster 우드랜드보스10
+monster 우드랜드보스11
+monster 우드랜드보스2
+monster 우드랜드보스3
+monster 우드랜드보스4
+monster 우드랜드보스5
+monster 우드랜드보스6
+monster 우드랜드보스7
+monster 우드랜드보스8
+monster 우드랜드보스9
+monster 웨어랫
+monster 위스프
+monster 위스프1
+monster 은빛늑대
+monster 일1
+monster 일2
+monster 일렉코아틀
+monster 자이언트맨티스
+monster 좀비
+monster 지네
+monster 촌촌
+monster 카디
+monster 카카포
+monster 코아틀
+monster 쿠우
+monster 크라켄
+monster 크라켄1
+monster 크라켄2
+monster 크리스마스니에1
+monster 크리스마스니에2
+monster 크리스마스니에3
+monster 크리스마스니에4
+monster 크리스마스스켈레톤1
+monster 크리스마스스켈레톤2
+monster 크리스마스스켈레톤3
+monster 크리스마스스켈레톤4
+monster 킹아크퍼스
+monster 킹아크퍼스1
+monster 킹아크퍼스2
+monster 타클라시우스1
+monster 타클라시우스2
+monster 터틀1
+monster 터틀2
+monster 트랜트
+monster 트리변장홉고블린1
+monster 트리변장홉고블린2
+monster 트리변장홉고블린3
+monster 트리변장홉고블린4
+monster 팜팻1
+monster 팜팻2
+monster 퍼플팜팻
+monster 포이즌카카포
+monster 퐁퐁이1
+monster 퐁퐁이2
+monster 플렌트아크퍼스
+monster 헤라시우스1
+monster 헤라시우스2
+monster 헤브렐리우스1
+monster 헤브렐리우스2
+monster 헬도가
+monster 헬도적
+monster 헬몽크
+monster 헬법사
+monster 헬불씨프
+monster 헬블루나이트
+monster 헬소서러
+monster 헬소서리스
+monster 헬전사
+monster 헬직자
+monster 홉고블린
+monster 홉고블린1
+monster 홍사
+monster 황사
 map (뤼케)성메인홀 14 9
 map (뤼케)성복도 3 28
 map (뤼케)성식당 6 6
@@ -2402,6 +2650,7 @@ map 뤼케시온해안2-C 2 7
 map 뤼케시온해안3-A 29 47
 map 뤼케시온해안3-B 26 47
 map 뤼케시온해안3-C 21 47
+map 뤼케시온해안3-D 2 20
 map 뤼케시온해안4-A 37 47
 map 뤼케시온해안4-B 36 47
 map 뤼케시온해안4-C 9 47
@@ -2429,6 +2678,54 @@ map 밀레스훈련소 10 5
 map 박물관1층 14 16
 map 박물관2층 28 1
 map 박물관3층 1 1
+map 북의우드랜드1-1 2 48
+map 북의우드랜드10-1 25 1
+map 북의우드랜드11-1 25 48
+map 북의우드랜드12-1 25 48
+map 북의우드랜드13-1 25 48
+map 북의우드랜드14-1 25 1
+map 북의우드랜드15-1 25 48
+map 북의우드랜드16-1 25 48
+map 북의우드랜드17-1 25 48
+map 북의우드랜드17-2 25 48
+map 북의우드랜드18-1 25 48
+map 북의우드랜드19-1 25 48
+map 북의우드랜드19-2 25 48
+map 북의우드랜드2-1 98 49
+map 북의우드랜드20-1 25 48
+map 북의우드랜드3-1 25 98
+map 북의우드랜드4-1 25 98
+map 북의우드랜드5-1 25 98
+map 북의우드랜드6-1 23 1
+map 북의우드랜드7-1 25 48
+map 북의우드랜드8-1 48 25
+map 북의우드랜드9-1 28 1
+map 북의우드랜드9-2 25 48
+map 북의우드랜드입구 23 15
+map 서의우드랜드1-1 2 48
+map 서의우드랜드10-1 25 1
+map 서의우드랜드11-1 25 48
+map 서의우드랜드12-1 25 48
+map 서의우드랜드13-1 25 48
+map 서의우드랜드14-1 25 1
+map 서의우드랜드15-1 25 48
+map 서의우드랜드16-1 25 48
+map 서의우드랜드17-1 25 48
+map 서의우드랜드17-2 25 48
+map 서의우드랜드18-1 25 48
+map 서의우드랜드19-1 25 48
+map 서의우드랜드19-2 25 48
+map 서의우드랜드2-1 98 49
+map 서의우드랜드20-1 25 48
+map 서의우드랜드3-1 25 98
+map 서의우드랜드4-1 25 98
+map 서의우드랜드5-1 25 98
+map 서의우드랜드6-1 23 1
+map 서의우드랜드7-1 25 48
+map 서의우드랜드8-1 48 25
+map 서의우드랜드9-1 28 1
+map 서의우드랜드9-2 25 48
+map 서의우드랜드입구 23 15
 map 세오신전 10 5
 map 세토아신전 10 5
 map 수오미기술사범의집 11 2
@@ -2487,7 +2784,7 @@ map 아벨해안2-B 36 47
 map 아벨해안2-C 2 7
 map 아벨해안3-A 29 47
 map 아벨해안3-B 26 47
-map 아벨해안3-C 21 47
+map 아벨해안3-C 21 38
 map 아벨해안4-A 37 47
 map 아벨해안4-B 36 47
 map 아벨해안4-C 9 47
@@ -2521,6 +2818,7 @@ map 포테의숲3존 37 68
 map 포테의숲4존 1 13
 map 포테의숲5존 1 15
 map 포테의숲6존 24 28
+map 호러캐슬메인홀 22 10
 map 홀리루딘길드성 25 11
 map 홀리루딘성메인홀 5 11
 map 홀리루딘성복도 3 28

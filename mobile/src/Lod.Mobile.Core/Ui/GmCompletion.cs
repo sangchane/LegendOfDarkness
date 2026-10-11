@@ -8,14 +8,22 @@ namespace Lod.Mobile.Core.Ui;
 public sealed class GmCompletion
 {
     /// <summary>명령과 그 뒤에 고를 이름의 종류(없으면 이름 없이 그대로 보낸다).</summary>
+    /// 서버의 한글 명령(<c>Systems/GmCommands.cs</c>, 사용자 2026-10-11) — 영어 명령(`/give` `/tp` …)도 서버에선 그대로 듣지만 단추로는 안 띄운다.
     private static readonly (string Command, string? Kind, string Hint)[] Commands =
     [
-        ("give", "item", "아이템 받기"),
-        ("spell", "spell", "마법 배우기"),
-        ("skill", "skill", "기술 배우기"),
-        ("tp", "map", "순간이동"),
-        ("pt", null, "사람에게 가기"),
-        ("sp", null, "사람 부르기"),
+        ("운영자", null, "도움말"),
+        ("item", "item", "아이템 만들기"),
+        ("이동", "map", "맵 이동"),
+        ("가기", null, "사람에게 가기"),
+        ("소환", null, "사람 부르기"),
+        ("괴물", "monster", "괴물 세우기"),
+        ("기술", "skill", "기술 배우기"),
+        ("마법", "spell", "마법 배우기"),
+        ("회복", null, "체력·마력 가득"),
+        ("레벨", null, "레벨 바꾸기"),
+        ("돈", null, "금화 받기"),
+        ("무적", null, "켜기·끄기"),
+        ("숨기", null, "켜기·끄기"),
     ];
 
     private readonly Dictionary<string, List<(string Name, string Tail)>> _names = [];

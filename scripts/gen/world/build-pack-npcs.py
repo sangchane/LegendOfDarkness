@@ -108,7 +108,18 @@ def _body_stats(body):
     return body
 
 
-BLOCK_PATCH = {"리신2": _lee_sin_two, "가렌3": _garen_three, "세오": _body_stats, "칸": _body_stats}
+#: 달마신공(리신4 2번 갈래) — 5.99 81레벨 → 71레벨(사용자 2026-10-11 「무도가 달마신공 71레벨로 하향」). 메뉴 글과 그 갈래의 레벨만.
+def _lee_sin_four(body):
+    """리신4 — 달마신공만 71레벨부터."""
+    body = body.replace('"달마신공[81]"', '"달마신공[71]"')
+    start = body.index("\tif(@select == 2){")
+    end = body.index("\tif(@select == 3){")
+    branch = body[start:end]
+    assert "달마신공" in branch and branch.count("81") == 2, "리신4 2번 갈래가 달마신공 81레벨 모양이 아니다 — 팩 본문을 확인하라."
+    return body[:start] + branch.replace("81", "71") + body[end:]
+
+
+BLOCK_PATCH = {"리신2": _lee_sin_two, "리신4": _lee_sin_four, "가렌3": _garen_three, "세오": _body_stats, "칸": _body_stats}
 
 #: 블록 머리 — 줄 맨 앞의 `0,0,0,0,0,0,0` 다음 탭, 이름, `{`. 안쪽의 `if(…){` 줄은 탭으로 시작해 걸리지 않는다.
 HEADER = re.compile(r"^\d[\d,]*\t([^\t{]+?)\s*\{", re.M)
