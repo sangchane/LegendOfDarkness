@@ -1,6 +1,8 @@
 <!-- NEXT-ACTION:START -->
 ## ▶ 지금 할 일 (새 세션은 이 블록부터 — SessionStart 훅이 자동 주입)
 
+- **[다음/2026-10-11] 에리얼 퀘스트 구현 — 등급 M · `dev:build` · 단계: 시작 전(사용자 「다음 세션에서 하자」).** 출처 https://m.blog.naver.com/ttykr/220041743309
+  다음: 1. 블로그 원문 읽기(`agent-reach` 또는 `curl https://r.jina.ai/<주소>`) 2. `scripts/ask.sh 에리얼` · `docs/what-hades-already-has.md` · `docs/feature-map.md` 로 서버에 이미 있는 NPC·퀘스트 틀 확인 3. 1쪽 SPEC(`autopilot/aerial-quest/SPEC.md`) → 구현 → 격리 서버 시험 → 리뷰 → 배포
 - **[현재/2026-10-11] 사망 패널티 + 직업·서클별 장비 + 경매 시세 + 「사제」→「성직자」 — 등급 L 변경 · `dev:build` · 단계: 배포 끝(11:31), 관찰 중.** 명세 `autopilot/death-penalty-gear/SPEC.md`.
   배포: 서버(DeathDropsItems=true, 리뷰 반영 서버 `d6f7680f4`·루트 `70b46eb7`) · 봇 이름 바꿈(`rename-bots.sh --apply`, 백업 클라우드 `~/lod-backups/rename-20261011-113020`) · eco-bots.json 직업별 10개씩 + AuctionFolder · 앱 ios install·android release.
   확인됨: 동료성직자 5 · 생태 40(전사·도적·무도·성직자 각 10, 무도봇은 새로 1레벨부터) 접속.
