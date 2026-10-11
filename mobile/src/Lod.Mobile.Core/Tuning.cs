@@ -93,7 +93,7 @@ public static class Tuning
 
     public const int EcoScoreAc99 = 50;
 
-    /// <summary>입은 것이 없는 부위는 경매에서 금화의 이 % 까지(맨몸 — 죽은 뒤 <see cref="EcoAuctionBudget" /> 에 막혀 못 사지 않게).</summary>
+    /// <summary>입은 것이 없는 부위들은 다 합쳐 경매에서 금화(물약 몫을 뗀)의 이 % 까지(맨몸 — 죽은 뒤 <see cref="EcoAuctionBudget" /> 에 막혀 못 사지 않게).</summary>
     public const int EcoAuctionBareBudget = 60;
 
     /// <summary>

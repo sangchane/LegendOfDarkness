@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using Lod.Mobile.Core.Art;
 using Lod.Mobile.Core.Model;
 using Lod.Mobile.Core.Net;
+using Lod.Mobile.Core.Protocol.Login;
 using Lod.Mobile.Core.Protocol.World;
 using Xunit;
 
@@ -130,6 +131,97 @@ public sealed class DeathPenaltyTests : IDisposable
 
         Assert.Equal(before, Names(dead));
         Assert.Equal(Gold, dead.Vitals!.Gold);
+    }
+
+    /// <summary>
+    /// 리뷰 H1 — 같은 칸의 금화 더미 합침이 잠금을 버리지 않는다. 남이 먼저 버린 금화 위에서 죽어도 남의 금화는 잠기지 않고(따로 한 더미),
+    /// 잠긴 죽은 자리 금화 위에 남이 금화를 버려도 남은 제 금화만 되줍는다.
+    /// </summary>
+    [Fact]
+    public async Task Death_gold_lies_apart_from_anyone_elses_gold_on_the_same_tile()
+    {
+        const string victim = "deathpile";
+        const string other = "deathpiler";
+        using IsolatedHadesServer server = Ready(drops: true, minutes: 10, victim, other);
+        CompanionCallTests.Edit(server, other, saved => saved["GoldPoints"] = 500);
+
+        WorldClient dead = await Enter(server, victim);
+        WorldClient passer = await Enter(server, other);
+        await Until(() => passer.Vitals?.Gold == 500, "다른 이의 금화 500 이 보이지 않습니다.");
+
+        // 남이 죽을 칸에 먼저 200 을 버린다.
+        await passer.DropGoldAsync(200, Start, _deadline.Token);
+        await Until(() => passer.Vitals?.Gold == 300, $"금화를 버리지 못했습니다: {passer.Vitals?.Gold} · 서버가 한 말: {passer.Said}");
+
+        await Die(dead);
+        await Until(() => dead.Vitals?.Gold == 0, $"죽었는데 금화가 남았습니다: {dead.Vitals?.Gold}");
+        await Until(async () =>
+        {
+            await passer.RefreshAsync(_deadline.Token);
+            await Task.Delay(400, _deadline.Token);
+            return passer.Creatures.Count(c => IsCoin(c) && c.Where == Start) == 2;
+        }, $"죽은 칸에 금화 두 더미(남의 것·죽은 이 것)가 없습니다: {string.Join(", ", passer.Creatures)}");
+
+        // 남은 제 200 만 되줍는다 — 죽은 이의 1000 은 잠겨 남는다.
+        await Until(async () =>
+        {
+            await passer.PickUpAsync(Start, _deadline.Token);
+            await Task.Delay(500, _deadline.Token);
+            return passer.Vitals?.Gold == 500;
+        }, $"남이 제 금화를 되줍지 못했습니다: {passer.Vitals?.Gold} · 서버가 한 말: {passer.Said}");
+        await Task.Delay(1000, _deadline.Token);
+        Assert.Equal(500, passer.Vitals!.Gold);
+        Assert.Contains(passer.Creatures, c => IsCoin(c) && c.Where == Start);
+
+        // 잠긴 더미 위에 100 을 버리고 주워도 100 만 돌아온다.
+        await passer.DropGoldAsync(100, Start, _deadline.Token);
+        await Until(() => passer.Vitals?.Gold == 400, $"금화를 다시 버리지 못했습니다: {passer.Vitals?.Gold}");
+        await Until(async () =>
+        {
+            await passer.PickUpAsync(Start, _deadline.Token);
+            await Task.Delay(500, _deadline.Token);
+            return passer.Vitals?.Gold >= 500;
+        }, $"남이 다시 버린 금화를 되줍지 못했습니다: {passer.Vitals?.Gold}");
+        await Task.Delay(1000, _deadline.Token);
+        Assert.Equal(500, passer.Vitals!.Gold);
+        Assert.Contains(passer.Creatures, c => IsCoin(c) && c.Where == Start);
+        Assert.Contains($"금화 {Gold}", await DeathRow(server, victim));
+    }
+
+    /// <summary>리뷰 M1 — 교환 중에 죽으면 올려 둔 물건·금화가 먼저 돌아온 뒤 벌칙을 받는다(상대에게 넘어가지 않는다).</summary>
+    [Fact]
+    public async Task Dying_mid_exchange_takes_the_offer_back_before_the_penalty()
+    {
+        const string victim = "deathtrader";
+        const string other = "deathpeer";
+        using IsolatedHadesServer server = Ready(drops: true, minutes: 10, victim, other);
+
+        using WorldSession session = await HadesLoginClient.LoginAsync(IPAddress.Loopback, server.LoginPort, victim, LoginFlow.SyntheticSecret, null, _deadline.Token);
+        WorldClient dead = new(session);
+        _ = dead.PumpAsync(_deadline.Token);
+        WorldClient passer = await Enter(server, other);
+        await Until(() => dead.Pack.Count == 2 && dead.Vitals?.Gold == Gold && passer.Serial != 0, $"교환할 것이 보이지 않습니다: {Names(dead)}");
+
+        // 교환 열기(0) · 포션 올리기(1, 칸) · 금화 100 올리기(3) — ActivityLogTests 와 같은 0x4A.
+        int potionSlot = dead.Pack.First(item => item.Name == Potion).Slot;
+        byte ordinal = 50;
+        Task Exchange(byte kind, byte[] extra) => session.Connection.SendAsync(HadesCipher.EncodeSecured(0x4A, ordinal++,
+            [kind, (byte)(passer.Serial >> 24), (byte)(passer.Serial >> 16), (byte)(passer.Serial >> 8), (byte)passer.Serial, .. extra],
+            session.Parameters), _deadline.Token);
+        await Exchange(0, []);
+        await Exchange(1, [(byte)potionSlot, 0]);
+        await Until(() => dead.Pack.All(item => item.Name != Potion), $"포션을 교환에 올리지 못했습니다: {Names(dead)}");
+        await Exchange(3, [0, 0, 0, 100]);
+        await Until(() => dead.Vitals?.Gold == Gold - 100, $"금화를 교환에 올리지 못했습니다: {dead.Vitals?.Gold}");
+
+        await Die(dead);
+
+        // 돌려받은 포션·금화 전부가 벌칙을 받았다 — 기록에 포션과 금화 1000.
+        string row = await DeathRow(server, victim);
+        Assert.Contains(Potion, row);
+        Assert.Contains($"금화 {Gold}", row);
+        Assert.DoesNotContain(passer.Pack, item => item.Name == Potion);
+        Assert.Equal(0, passer.Vitals!.Gold);
     }
 
     // ---- 도우미 ----

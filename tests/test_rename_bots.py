@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -78,6 +79,39 @@ class RenameBotsTests(unittest.TestCase):
             # 다시 돌리면 할 일이 없다
             self.assertEqual([], module.run(True, aislings=a, eco=root / 'eco.json', bot_dir=root / 'bot', auction=root / 'auction',
                                             unlisted=root / 'unlisted.json', log=lambda _: None))
+
+    def test_rerun_after_a_stop_finishes_what_was_left(self):
+        """리뷰 M5 — 캐릭터 파일만 옮기고 멈췄다(새 이름 파일만 있음) → 다시 돌리면 「이미 옮김」으로 경매·유찰 목록·설정을 마저 바꾼다."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self.make(root)
+            a = root / 'aislings'
+            (a / '사제봇1.json').rename(a / '성직자봇1.json')
+            (a / '사제봇1.json.backup').rename(a / '성직자봇1.json.backup')
+            done, lines = self.run_on(root, apply=True)
+            self.assertIn(('사제봇1', '성직자봇1'), done)
+            self.assertTrue(any('사제봇1' in line and '이미 옮김' in line for line in lines))
+            self.assertIn('Nickname', (a / '성직자봇1.json').read_text(encoding='utf-8-sig'))   # 옮긴 파일은 그대로 둔다
+            eco = json.loads((root / 'eco.json').read_text(encoding='utf-8'))
+            self.assertEqual('성직자봇1', eco['Bots'][0]['Name'])
+            book = json.loads((root / 'auction/auction.json').read_text(encoding='utf-8'))
+            self.assertEqual('성직자봇1', book['Listings'][0]['Seller'])
+            self.assertIn('성직자봇1', json.loads((root / 'unlisted.json').read_text(encoding='utf-8')))
+            # 옛·새 이름 둘 다 있는 사제봇2 는 여전히 건너뛰고 경고
+            self.assertTrue(any('경고' in line and '사제봇2' in line for line in lines))
+
+    def test_prints_the_backup_folder_and_undo_commands_that_restore_everything(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            self.make(root)
+            before = {p.relative_to(root): p.read_bytes() for p in root.rglob('*') if p.is_file()}
+            done, lines = self.run_on(root, apply=True)
+            self.assertTrue(any(str(root / 'backup') in line and '되돌리기' in line for line in lines))
+            undo = [line.strip() for line in lines[lines.index(next(l for l in lines if '되돌리기' in l)) + 1:]]
+            self.assertTrue(undo)
+            subprocess.run(['bash', '-c', ' && '.join(undo)], check=True)
+            after = {p.relative_to(root): p.read_bytes() for p in root.rglob('*') if p.is_file() and 'backup' not in p.relative_to(root).parts[:1]}
+            self.assertEqual(before, after)
 
 
 if __name__ == '__main__':

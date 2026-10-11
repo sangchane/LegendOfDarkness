@@ -61,6 +61,13 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     private (int Map, Tile Where)? _alive;
     private bool _noRecover;
 
+    // 그때 지닌 것의 그림(가방·장비 아이콘 — 바닥 물건의 그림과 같은 값)과 금화가 있었는지 — Recover 가 남의 물건을 줍지 않게(리뷰 M3).
+    private HashSet<int> _carried = [];
+    private bool _hadGold;
+
+    // 물약 가게 한 번 분량(지난번 본 값 × 채울 개수) — 경매에서 먼저 떼어 둔다(리뷰 M4). 처음 장보기 전엔 0.
+    private long _potionReserve;
+
     public string Name => bot.Name;
 
     /// <summary>지금 맵(요약·사냥터 나누기용). 접속 전이면 0.</summary>
@@ -137,10 +144,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         TimeSpan now = _clock.Elapsed;
         Vitals vitals = _world.Vitals!;
         int map = _world.State!.Map.Id;
-        if (map != DeathMap)
-        {
-            _alive = (map, _world.State.Where);
-        }
+        Mark();
 
         Watch(now, vitals, map);
 
@@ -386,6 +390,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             && EcoShopping.PotionsToBuy(goods, _world.Vitals!.Level, _world.Vitals.Gold, EcoShopping.ManaPotions(_world.Pack), Tuning.EcoPriestManaStock,
                 AutoPotion.Restoring) is { } buy)
         {
+            _potionReserve = goods.First(one => one.Name == buy.Name).Price * Tuning.EcoPriestManaStock;
             await Buy(seller, [buy], goods, token);
         }
         else
@@ -610,6 +615,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             {
                 uint price = goods.First(one => one.Name == buy.Name).Price;
                 reserve = price * Tuning.EcoPotionStock;
+                _potionReserve = reserve;
                 await Buy(seller, [buy], goods, token);
             }
 
@@ -740,7 +746,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
 
         bool bought = false;
         foreach (EcoBid bid in EcoAuction.ToBuy(
-                     page.Rows, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _world.Vitals.Gold, _refused, host.Market.Prices(DateTime.UtcNow)))
+                     page.Rows, _world.Worn, _world.Path ?? 0, _world.Vitals!.Level, _world.Vitals.Gold, _refused, host.Market.Prices(DateTime.UtcNow), _potionReserve))
         {
             long before = _world.Vitals.Gold;
             if (bid.Buyout && await AuctionAct(() => _world.AuctionBuyoutAsync(bid.Row.Id, token), token) is { Ok: true })
@@ -868,7 +874,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
             // 사망 벌칙이 켜져 장비·가방이 다 빠졌으면(접두사 없는 것과 금화는 죽은 자리 바닥에) 먼저 주우러 간다.
             if (_world.Worn.Count == 0 && _world.Pack.Count == 0 && _alive is { } spot && !_noRecover)
             {
-                await Recover(spot.Map, spot.Where, token);
+                await Recover(spot.Map, spot.Where, _carried, _hadGold, token);
                 _noRecover = _world.State?.Map.Id == DeathMap;
             }
             else
@@ -881,9 +887,11 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
     /// <summary>
     /// 죽은 자리에서 제 것을 줍는다 — 사망 벌칙(서버 <c>DeathDropsItems</c>, SPEC death-penalty-gear #2)은 접두사 없는 장비·가방·금화를 그 자리에 떨구고
     /// 10분은 주인만 줍게 한다. 금화도 떨궈, 줍지 않으면 맨몸·빈손이라 장을 못 본다. 서버는 둘레 10칸(<c>ClickLootDistance</c>) 안 그 칸의 맨 위 것을
-    /// 주고 남의 것은 안 준다 — 바닥 것마다 한 번씩만 청한다.
+    /// 주고 남의 것은 안 준다 — 바닥 것마다 한 번씩만 청한다. 서버는 바닥 물건의 주인·이름을 알려 주지 않아(0x07 은 그림·개수뿐) 죽기 전에
+    /// 지녔던 그림(<paramref name="carried" />)과 같은 물건, 금화가 있었으면 금화만 청한다 — 풀린 남의 물건까지 쓸어 가지 않게.
     /// </summary>
-    private async Task Recover(int map, Tile where, CancellationToken token)
+    // ponytail: 같은 그림의 남의 물건·한 칸의 남의 금화는 가리지 못한다(서버 줍기는 칸 단위) — 서버가 주인을 알려 주면 그것으로.
+    private async Task Recover(int map, Tile where, IReadOnlySet<int> carried, bool hadGold, CancellationToken token)
     {
         Doing = "죽은 자리";
         if (!await MoveTo(map, where, token))
@@ -896,6 +904,7 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         HashSet<uint> asked = [];
         while (!token.IsCancellationRequested && _world.State?.Map.Id == map
                && _world.Creatures.FirstOrDefault(one => one.Kind == CreatureKind.Passable && !asked.Contains(one.Serial)
+                                                         && (IsCoin(one) ? hadGold : carried.Contains(one.Sprite))
                                                          && Reckon.Steps(one.Where, Where) <= 10) is { } thing)
         {
             asked.Add(thing.Serial);
@@ -904,6 +913,24 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         }
 
         Event("recover", new { map, items = _world.Pack.Count - items, gold = _world.Vitals!.Gold - gold });
+    }
+
+    /// <summary>금화 더미 그림(서버 Money.Image = 0x8000 + MoneySprites 0x89~0x8E).</summary>
+    private static bool IsCoin(Creature one) => one.Sprite is >= 0x8089 and <= 0x808E;
+
+    /// <summary>
+    /// 살아 있는 동안 지금 자리·지닌 것을 적는다 — 틱 시작과 기다림(<see cref="Until" />)마다 불러 긴 걷기·순간이동 중에 죽어도 죽은 자리가 맞다(리뷰 M3).
+    /// </summary>
+    private void Mark()
+    {
+        if (_world.State is not { } now || now.Map.Id == DeathMap)
+        {
+            return;
+        }
+
+        _alive = (now.Map.Id, now.Where);
+        _carried = [.. _world.Pack.Select(one => one.Icon), .. _world.Worn.Select(one => one.Icon)];
+        _hadGold = _world.Vitals?.Gold > 0;
     }
 
     /// <summary>걸어 갈 수 있는 거리 — 사냥이 중심으로 돌아가는 길(<c>AutoHunt.Reach</c>)과 같게.</summary>
@@ -988,12 +1015,13 @@ public sealed class EcoRunner(EcoBotEntry bot, EcoConfig config, EcoWorld land, 
         events.Write(EcoLog.Line(DateTime.UtcNow, bot.Name, _world.Path, _world.Vitals, _world.State?.Map.Id ?? 0, where, Doing, ev, data));
     }
 
-    private static async Task<bool> Until(Func<bool> done, TimeSpan within, CancellationToken token)
+    private async Task<bool> Until(Func<bool> done, TimeSpan within, CancellationToken token)
     {
         Stopwatch waited = Stopwatch.StartNew();
 
         while (!done())
         {
+            Mark();
             if (waited.Elapsed >= within)
             {
                 return false;

@@ -4,7 +4,9 @@ scripts/ops/rename-bots.sh 가 서버·봇이 멈춘 것을 확인하고 클라�
 옮길 이름은 봇 설정(eco-bots.json Bots[].Name · companion-bot-N.json Name) 중 「사제」가 든 것 — 사제봇N → 성직자봇N,
 동료사제N → 동료성직자N. 바꾸는 곳: 캐릭터 파일 aislings/<소문자 이름>.json(+ .json.backup) 이름과 그 안의 Username,
 봇 설정 두 곳의 Name, 경매장 auction.json(+ .backup)의 Seller·Bidder·Owner, 생태계 봇 유찰 목록 eco-unlisted.json 의 키.
-값은 글자 그대로 바꾼다(파일의 BOM·들여쓰기·다른 칸은 그대로). 새 이름 파일이 이미 있으면 그 봇은 통째로 건너뛴다.
+값은 글자 그대로 바꾼다(파일의 BOM·들여쓰기·다른 칸은 그대로). 새 이름 파일과 옛 이름 파일이 둘 다 있으면 그 봇은 통째로 건너뛴다.
+중간에 멈춘 뒤 다시 돌리면 이어서 끝낸다 — 새 이름 파일만 있으면 「이미 옮김」으로 보고 경매·유찰 목록·봇 설정만 마저 바꾼다.
+봇 설정이 옮길 이름을 찾는 곳이라 맨 나중에 바꾼다(그 전에 멈춰도 다음에 다시 찾는다). 끝에 백업 폴더와 되돌리는 명령을 출력한다.
 서버 설정 LoruleConfig.json 은 deploy 가 틀(server-config/LoruleConfig.template.json)로 다시 만들므로 여기서 안 건드린다.
 """
 import re
@@ -55,11 +57,15 @@ def names(eco, companions):
 
 
 def backup(to, aislings, eco, companions, auction, unlisted):
+    """바꾸기 전 모습을 to 에 — 되돌리는 명령(줄 목록)을 돌려준다."""
     to.mkdir(parents=True)
     shutil.copytree(aislings, to / "aislings")
+    undo = [f"rm -rf '{aislings}' && cp -a '{to / 'aislings'}' '{aislings}'"]
     for path in [eco, unlisted, *companions, *sorted(auction.glob("auction.json*"))]:
         if path.exists():
             shutil.copy2(path, to / path.name)
+            undo.append(f"cp -a '{to / path.name}' '{path}'")
+    return undo
 
 
 def run(apply, aislings=AISLINGS, eco=ECO, bot_dir=BOT_DIR, auction=AUCTION, unlisted=UNLISTED, backup_to=None, log=print):
@@ -68,18 +74,23 @@ def run(apply, aislings=AISLINGS, eco=ECO, bot_dir=BOT_DIR, auction=AUCTION, unl
     if not todo:
         log("옮길 이름이 없습니다(봇 설정에 「사제」가 든 이름 없음).")
         return []
+    undo = []
     if apply and backup_to:
-        backup(backup_to, aislings, eco, companions, auction, unlisted)
+        undo = backup(backup_to, aislings, eco, companions, auction, unlisted)
         log(f"백업 → {backup_to}")
     done = []
     for old in todo:
         new = old.replace(OLD, NEW)
         src, dst = aislings / f"{old.lower()}.json", aislings / f"{new.lower()}.json"
-        if dst.exists() or dst.with_name(dst.name + ".backup").exists():
+        olds = src.exists() or src.with_name(src.name + ".backup").exists()
+        news = dst.exists() or dst.with_name(dst.name + ".backup").exists()
+        if olds and news:
             log(f"경고: {dst.name}(또는 .backup) 이 이미 있어 {old} 는 건너뜁니다(설정·경매도 그대로).")
             continue
         what = []
-        if src.exists():
+        if news:
+            what.append("이미 옮김")
+        elif src.exists():
             if USERNAME(old).search(src.read_bytes()) is None:
                 log(f"경고: {src.name} 안에 Username \"{old}\" 가 없어 {old} 는 건너뜁니다.")
                 continue
@@ -91,12 +102,16 @@ def run(apply, aislings=AISLINGS, eco=ECO, bot_dir=BOT_DIR, auction=AUCTION, unl
                     what.append(path.name)
         else:
             what.append("캐릭터 파일 없음")
-        settings = sum(swap(path, NAME(old), new, apply) for path in [eco, *companions])
         trades = sum(swap(path, PEOPLE(old), new, apply) for path in sorted(auction.glob("auction.json*")))
         skipped = swap(unlisted, key_of(old), new, apply)
+        settings = sum(swap(path, NAME(old), new, apply) for path in [eco, *companions])
         log(f"{old} → {new}: {' · '.join(what)} · 봇 설정 {settings} · 경매 {trades} · 유찰 목록 {skipped}")
         done.append((old, new))
     log(("바꿨습니다" if apply else "미리보기 — --apply 로 바꿉니다") + f" ({len(done)}/{len(todo)})")
+    if undo:
+        log(f"되돌리기 — 서버·봇을 멈춘 뒤 클라우드에서(백업 {backup_to}):")
+        for line in undo:
+            log(f"  {line}")
     return done
 
 

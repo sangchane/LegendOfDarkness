@@ -265,16 +265,20 @@ public static class EcoAuction
 
     /// <summary>
     /// 살 것 — 남의 경매 중 내가 입을 수 있고 지금 것보다 좋은 장비. 부위마다 가장 좋은 것 하나, 사는 대로 금화를 빼며 물건 하나에
-    /// min(금화 × <see cref="Tuning.EcoAuctionBudget" />%(빈 부위는 <see cref="Tuning.EcoAuctionBareBudget" />%), <see cref="Tuning.EcoAuctionSpendCap" />) 까지.
+    /// min((금화 − <paramref name="reserve" />) × <see cref="Tuning.EcoAuctionBudget" />%, <see cref="Tuning.EcoAuctionSpendCap" />) 까지. 빈 부위(맨몸)는
+    /// 다 합쳐 처음 (금화 − <paramref name="reserve" />) × <see cref="Tuning.EcoAuctionBareBudget" />% 한 몫에서 — 부위마다 곱하면 죽은 뒤 거의 다 썼다(리뷰 M4).
     /// 즉시 구매가가 그 안이고 <see cref="Ceiling" /> 안이면 즉시 구매, 시세가 있으면 다음 입찰가가 그 안일 때 입찰. 시세가 없으면 즉시 구매만(예전 그대로).
     /// 이미 최고 입찰자인 부위는 그 경매를 기다린다.
     /// </summary>
     /// <param name="refused">서버가 입기를 거절한 이름(성별 등 — 경매 줄에는 성별이 없다). 사서 못 입고 다시 올리는 일을 되풀이하지 않게.</param>
+    /// <param name="reserve">먼저 떼어 둘 금화 — 물약 가게 한 번 분량.</param>
     public static IReadOnlyList<EcoBid> ToBuy(
         IReadOnlyList<AuctionRow> rows, IReadOnlyList<WornItem> worn, int path, int level, long gold, IReadOnlyCollection<string>? refused = null,
-        IReadOnlyDictionary<string, long>? market = null)
+        IReadOnlyDictionary<string, long>? market = null, long reserve = 0)
     {
         List<EcoBid> buys = [];
+        gold = Math.Max(0, gold - reserve);
+        long bare = gold * Tuning.EcoAuctionBareBudget / 100;
         foreach (IGrouping<int, AuctionRow> place in rows
                      .Where(row => (row.Flags & 1) == 0 && refused?.Contains(row.Name) != true
                                    && row.Stats is { } stats && EcoShopping.Fits(stats, path, level) && EcoShopping.Better(stats, worn, path, level))
@@ -286,8 +290,8 @@ public static class EcoAuction
                 continue;
             }
 
-            int share = EcoShopping.Empty(place.Key, worn) ? Tuning.EcoAuctionBareBudget : Tuning.EcoAuctionBudget;
-            long limit = Math.Min(gold * share / 100, Tuning.EcoAuctionSpendCap);
+            bool empty = EcoShopping.Empty(place.Key, worn);
+            long limit = Math.Min(empty ? Math.Min(bare, gold) : gold * Tuning.EcoAuctionBudget / 100, Tuning.EcoAuctionSpendCap);
             // 낼 값은 즉시 구매가(uint)이거나 서버 값 상한(20억)의 5% 위까지라 uint 에 든다.
             if (place.Select(row => new EcoBid(row, (uint)Pay(row, Ceiling(row, worn, path, level, market))))
                     .Where(bid => bid.Amount > 0 && bid.Amount <= limit)
@@ -295,6 +299,10 @@ public static class EcoAuction
             {
                 buys.Add(pick);
                 gold -= pick.Amount;
+                if (empty)
+                {
+                    bare -= pick.Amount;
+                }
             }
         }
 
@@ -303,12 +311,19 @@ public static class EcoAuction
 
     /// <summary>
     /// 이 봇이 낼 값의 상한 — 시세 × (100 + 점수 이득 × <see cref="Tuning.EcoMarketOver" /> / 100, 많아야 <see cref="Tuning.EcoMarketOverMax" />)%.
-    /// 시세가 없으면 null(금화 상한만).
+    /// 시세는 올릴 때처럼 상인 매입가의 <see cref="Tuning.EcoMarketCap" /> 배에서 멈춘다(값이 없는 물건은 그대로). 시세가 없으면 null(금화 상한만).
     /// </summary>
     public static long? Ceiling(AuctionRow row, IReadOnlyList<WornItem> worn, int path, int level, IReadOnlyDictionary<string, long>? market) =>
         market?.TryGetValue(row.Name, out long price) == true
-            ? price * (100 + Math.Min(EcoShopping.Gain(row.Stats!, worn, path, level) * Tuning.EcoMarketOver / 100, Tuning.EcoMarketOverMax)) / 100
+            ? Capped(row, price) * (100 + Math.Min(EcoShopping.Gain(row.Stats!, worn, path, level) * Tuning.EcoMarketOver / 100, Tuning.EcoMarketOverMax)) / 100
             : null;
+
+    // 살 때도 상인 매입가(값 / 1.6)의 EcoMarketCap 배까지만 시세로 본다 — 부푼 시세로 사 주면 그 값이 다시 시세가 된다(리뷰 L2).
+    private static long Capped(AuctionRow row, long price)
+    {
+        long offer = (long)((row.Stats?.Value ?? 0) / 1.6) * Math.Max(1, (int)row.Stacks);
+        return offer > 0 ? Math.Min(price, offer * Tuning.EcoMarketCap) : price;
+    }
 
     /// <summary>
     /// 낼 값 — 즉시 구매가가 상한 안이면 그것, 상한(시세)이 있으면 다음 입찰가(서버 <c>NextBid</c>: 입찰이 없으면 시작가, 있으면

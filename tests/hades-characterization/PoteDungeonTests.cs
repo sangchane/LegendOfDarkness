@@ -101,10 +101,19 @@ public sealed class PoteDungeonTests : IDisposable
 
     /// <summary>5존 26,1 에서 들어가 오솔길 사본 9,39 에 선다. 5존 사냥터 괴물은 치운다(나르콜리에 잠들면 대화 대답이 무시된다).</summary>
     private async Task<(IsolatedHadesServer Server, WorldSession Session, WorldClient World)> EnterTrail(
-        string who, bool gameMaster, (string Name, int Stacks)[]? pack = null, long gold = 0)
+        string who, bool gameMaster, (string Name, int Stacks)[]? pack = null, long gold = 0,
+        bool deathDrops = false, (int Place, string Name)[]? worn = null)
     {
         IsolatedHadesServer server = IsolatedHadesServer.Prepare(startTogether: (FifthZone, 26, 1));
         _server = server;
+        if (deathDrops)
+        {
+            string config = Path.Combine(server.RunRoot, HadesWorkspace.ConfigFileName);
+            JsonNode settings = JsonNode.Parse(File.ReadAllText(config))!;
+            settings["ServerConfig"]!["DeathDropsItems"] = true;
+            File.WriteAllText(config, settings.ToJsonString());
+        }
+
         if (gameMaster)
         {
             Waiting.MakeGameMaster(server, who);
@@ -146,6 +155,15 @@ public sealed class PoteDungeonTests : IDisposable
                 ["Durability"] = 100,
             };
             slot++;
+        }
+
+        foreach ((int place, string item) in worn ?? [])
+        {
+            character["EquipmentManager"]!["Equipment"]![place.ToString()] = new JsonObject
+            {
+                ["Slot"] = place,
+                ["Item"] = new JsonObject { ["Template"] = new JsonObject { ["Name"] = item }, ["Stacks"] = 1, ["Durability"] = 1000 },
+            };
         }
 
         File.WriteAllText(saved, character.ToJsonString());
@@ -260,6 +278,33 @@ public sealed class PoteDungeonTests : IDisposable
         await Waiting.Until(() => Flags(server, "potecoma") == 0, "살아났는데 저장된 캐릭터가 아직 유령입니다.", _deadline.Token,
             TimeSpan.FromSeconds(60));
         Assert.Equal(before, Belongings(world));
+        Assert.Equal(1000, world.Vitals?.Gold);
+    }
+
+    /// <summary>
+    /// 리뷰 H2 — 죽음 벌칙을 켜도 개인 사본(오솔길)에서 죽으면 사라짐(세토아의고루반지)만 없어지고, 나머지 물건·금화는 바닥이 아니라
+    /// 가방·지갑에 남는다. 장비는 벗겨 가방으로. 사본은 1분 뒤 바닥째 지워지기 때문이다.
+    /// </summary>
+    [Fact]
+    public async Task Dying_in_a_private_copy_keeps_everything_but_perishables_in_the_pack()
+    {
+        (IsolatedHadesServer server, WorldSession session, WorldClient world) = await EnterTrail("potedead", gameMaster: false,
+            pack: [("상급체력포션", 3), ("세토아의고루반지", 1)], gold: 1000, deathDrops: true, worn: [(1, "에페")]);
+        using IsolatedHadesServer ownedServer = server;
+        using WorldSession ownedSession = session;
+        await Waiting.Until(() => world.Worn.Any(w => w.Name == "에페") && world.Pack.Any(item => item.Name == "세토아의고루반지"),
+            $"입힌 에페·넣은 반지가 보이지 않습니다: {string.Join(", ", Belongings(world))}", _deadline.Token);
+
+        await WalkUntilComa(world, server);
+        const int MurekansRoom = 20138;
+        await Waiting.Until(() => world.State?.Map.Id == MurekansRoom,
+            $"혼수가 끝나도 뮤레칸의방으로 가지 않았습니다. 마지막: {world.State} · 서버가 한 말: {world.Said}", _deadline.Token, TimeSpan.FromSeconds(30));
+
+        await Waiting.Until(() => world.Worn.Count == 0 && world.Pack.Any(item => item.Name == "에페"),
+            $"죽은 뒤 장비가 가방으로 오지 않았습니다: 입은 것 [{string.Join(",", world.Worn.Select(w => w.Name))}] 가방 {string.Join(", ", Belongings(world))}",
+            _deadline.Token);
+        Assert.Contains(world.Pack, item => item.Name == "상급체력포션" && item.Stacks == 3);
+        Assert.DoesNotContain(world.Pack, item => item.Name == "세토아의고루반지");
         Assert.Equal(1000, world.Vitals?.Gold);
     }
 

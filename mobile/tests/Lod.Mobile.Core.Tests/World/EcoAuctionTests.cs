@@ -174,8 +174,8 @@ public sealed class EcoAuctionTests
     public void A_bot_that_gains_more_pays_more_over_the_market_price()
     {
         Dictionary<string, long> market = new() { ["장갑"] = 10_000 };
-        ItemStats dex = Gear(9, ac: -1) with { Dex = 1 };
-        ItemStats kan = Gear(9, ac: -1) with { Mr = 10 };
+        ItemStats dex = Gear(9, ac: -1, value: 16_000) with { Dex = 1 };    // 상인가 10,000 — 8배 상한(80,000)에 안 걸린다
+        ItemStats kan = Gear(9, ac: -1, value: 16_000) with { Mr = 10 };
         AuctionRow row = Listed(1, 13_000, dex) with { Name = "장갑", Price = 9_000 };
         WornItem[] two = [new(9, 1, "가죽장갑", "가죽장갑", 0, 0, Gear(9, ac: -1)), new(10, 1, "가죽장갑", "가죽장갑", 0, 0, Gear(9, ac: -1))];
 
@@ -196,6 +196,39 @@ public sealed class EcoAuctionTests
 
         // 시세가 없으면 예전대로 즉시 구매만 — 즉시 구매가가 없는 경매는 안 산다.
         Assert.Empty(EcoAuction.ToBuy([row with { Buyout = 0 }], two, Warrior, 50, gold: 1_000_000));
+    }
+
+    /// <summary>리뷰 L2 — 살 때도 시세는 상인 매입가의 8배에서 멈춘다(상인가 1,000 인데 시세 10만 → 8,000 기준). 값이 없는 물건은 시세 그대로.</summary>
+    [Fact]
+    public void The_buying_ceiling_holds_the_market_price_to_eight_times_the_merchant_price()
+    {
+        Dictionary<string, long> market = new() { ["장갑"] = 100_000 };
+        AuctionRow row = Listed(1, 13_000, Gear(9, ac: -1, value: 1_600) with { Dex = 1 }) with { Name = "장갑" };
+        WornItem[] two = [new(9, 1, "가죽장갑", "가죽장갑", 0, 0, Gear(9, ac: -1)), new(10, 1, "가죽장갑", "가죽장갑", 0, 0, Gear(9, ac: -1))];
+
+        Assert.Equal(8_000, EcoAuction.Ceiling(row, two, Warrior, 50, market));
+        EcoBid bid = Assert.Single(EcoAuction.ToBuy([row], two, Warrior, 50, gold: 1_000_000, market: market));
+        Assert.Equal((6_500u, false), (bid.Amount, bid.Buyout));                   // 즉시 구매가 13,000 > 8,000 — 시작가로 입찰
+        Assert.Equal(100_000, EcoAuction.Ceiling(row with { Stats = row.Stats! with { Value = 0 } }, two, Warrior, 50, market));
+    }
+
+    /// <summary>
+    /// 리뷰 M4 — 맨몸(죽은 뒤) 장보기는 물약 몫(reserve)을 먼저 떼고, 빈 부위 전부를 합쳐 남은 금화의 60% 한 몫으로 산다.
+    /// 전에는 부위마다 남은 금화의 60% 를 곱해 셋째 부위까지 사며 거의 다 썼다.
+    /// </summary>
+    [Fact]
+    public void A_bare_bot_keeps_potion_money_and_spends_sixty_percent_once_across_all_bare_places()
+    {
+        AuctionRow[] dear = [Listed(1, 3_000, Gear(1, dmgMax: 9)), Listed(2, 3_000, Gear(2, ac: -5)), Listed(3, 3_000, Gear(4, ac: -3))];
+        // 10,000 − 물약 2,000 = 8,000, 그 60% = 4,800 — 3,000 하나만.
+        Assert.Equal([1u], EcoAuction.ToBuy(dear, [], Warrior, level: 10, gold: 10_000, reserve: 2_000).Select(bid => bid.Row.Id));
+
+        AuctionRow[] cheap = [Listed(1, 2_000, Gear(1, dmgMax: 9)), Listed(2, 2_000, Gear(2, ac: -5)), Listed(3, 2_000, Gear(4, ac: -3))];
+        // 4,800 한 몫에서 2,000 둘(남은 몫 800) — 셋째는 못 산다.
+        Assert.Equal([1u, 2u], EcoAuction.ToBuy(cheap, [], Warrior, level: 10, gold: 10_000, reserve: 2_000).Select(bid => bid.Row.Id));
+
+        // 물약 몫을 떼면 남는 것이 없으면 사지 않는다.
+        Assert.Empty(EcoAuction.ToBuy(cheap, [], Warrior, level: 10, gold: 2_500, reserve: 2_000));
     }
 
     /// <summary>
