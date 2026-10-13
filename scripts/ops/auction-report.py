@@ -72,7 +72,9 @@ def main() -> None:
     events, bad = lines(folder)
 
     def kind(who: str | None) -> str:
-        return "봇" if (who or "").lower() in robots else "사람"
+        # 이름을 바꾸기 전 기록(10-11 「사제봇N」 → 「성직자봇N」)은 설정 목록에 없다 — 「…봇+숫자」 꼴이면 봇으로 본다.
+        name = (who or "").lower()
+        return "봇" if name in robots or re.search(r"봇\d+$", name) else "사람"
 
     counts: Counter = Counter()
     ends: dict[int, str] = {}
